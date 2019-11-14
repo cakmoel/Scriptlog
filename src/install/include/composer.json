@@ -1,0 +1,5 @@
+{
+    "require": {
+        "sinergi/browser-detector": "^6.1"
+    }
+}

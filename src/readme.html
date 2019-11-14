@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Scriptlog ReadMe</title>
+<link rel="shortcut icon" href="favicon.ico">
+<style type="text/css">
+body {
+border-top: 20px solid #eee;
+background: #fff;
+font: 13px/19px verdana;
+text-align: left;
+margin: 0;
+padding:0;
+color: #777;
+}
+
+a { text-decoration: none; color: #122430; }
+a:hover { text-decoration: underline; }
+b { color: #000; }
+h2 {font: 28px/36px times new roman; color: #7c9403;}
+em {background: #fffdde; }
+#main {
+margin: 0 auto 100px auto;
+padding: 0;
+width: 600px;
+}
+
+code {
+white-space:pre;
+border: 2px solid #ddd;
+margin: 5px;
+display: block;
+padding: 10px;
+}
+</style>
+
+</head>
+<body>
+
+<div id="main">
+
+<h2>Welcome to Scriptlog</h2>
+<b>Your personal blogware platform!</b>
+
+<p>Scriptlog is free and open source PHP blog software. We're refactoring our legacy weblog code.
+Make it more simple, robust, modular, fast and lightweight personal blogging system. 
+Scriptlog runs on PHP 5.6 or higher and uses MySQL.
+<br /><br />
+For developers, it offers DAO(Data Access Object), Library, Function, and View management. 
+Plus others features like URI Routing, Cache, Plugins and more!. If you are new the world of OOP - then this system is for you.
+Every line is documented and it is as simple of a system to tear-apart as you can get.</p>
+
+<p>Scriptlog is <i>not</i> a replacement for a full Content Management System. 
+Do not plan on building the next Drupal or CMS Framework with it! 
+However, It is built for several reasons.</p>
+
+<ul>
+<li>Teach How OOP implemented in blogging system and Works with a simple-to-understand code structure.</li>
+<li>Provide a base speed for comparing content management system.</li>
+<li>Run small scripts and systems without a lot of overhead.</li>
+<li>To power parts of weblog or personal website that did not need a full CMS.</li>
+</ul>
+
+<p>Before you install Scriptlog on your host, make sure Scriptlog can work correctly in your
+environment. Scritplog need the following 
+<b>system requirement :</b></p>
+
+<h2>Requirements</h2>
+
+<ul>
+<li><a href="https://www.mysql.com">MySQL</a> version 5.5 or greater 
+    or any version of <a href="https://mariadb.org">MariaDB</a></li>
+<li><a href="https://secure.php.net">PHP</a> version 5.6 or greater</li>
+<li>mod_rewrite (apache module)</li>
+<li>PDO</li>
+<li>curl</li>
+<li>gd</li>
+<li>iconv</li>
+<li>filter_list</li>
+<li>HTTPS Support</li>
+</ul>
+
+<h2>Installation</h2>
+
+<b>1) Download <a href="https://scriptlog.web.id/">Scriptlog</a></b>
+<p>Every release of Scriptlog is available for download, whether the current stable release, 
+upcoming test-builds, or previous versions for historical intererst. 
+When you visit the download page you will find a link to each of the three main editions.</p>
+
+<p><em>Stable releases</em> of Scriptlog are intended to be used by general public, 
+so this will be the appropriate choice for the majority of users. The current Scriptlog release
+can always be downloaded from the  
+<a href="https://scriptlog.web.id/get-scriptlog/">Get Scriptlog</a> page.<br />
+Older stable releases can also be downloaded from the Stable Release section of the 
+<a href="https://sourceforge.net/projects/scriptlog/files/release/">Sourceforge website.</a>
+</p>
+
+<p><em>Test builds</em> of Scriptlog are intended to be used by developers 
+and testers to identify any bugs or issues during the development process.
+These are not suitable for use as a main blogging system by the general public.
+However, should you wish to try out a test build(preverably in local webhost), 
+each current release can be downloaded from the Test Build section of 
+<a href="https://sourceforge.net/projects/scriptlog/files/testbuild/">
+sourceforge website.</a></p>
+
+<b>2) Ensure you have the required system.</b>
+<p>if you have <i>not</i> the required system yet, 
+Scriptlog may <i>not</i> work properly in your host environment.</p>
+
+<b>3) Unzip the package downloaded</b>
+<p>Extract it in an empty directory. You will see the following files, folders or directories after you extract it
+
+<ul>
+<li>admin/</li>
+<li>install/</li>
+<li>lib/</li>
+<li>public/</li>
+<li>config.sample.php</li>
+<li>.htaccess</li>
+<li>index.php</li>
+<li>license.txt</li>
+<li>readme.html</li>                
+</ul>
+                
+</p>
+
+<b>4) Upload Scriptlog</b>
+<p>Upload all files, folders or directories above through FTP/SFTP or whatever upload method 
+you prefer to the public-facing directory of your site.</p>
+
+<b>5) Ensure that permission for :</b>
+<p><em>install</em>, <em>public/log</em>, <em>public/cache</em>, <em>public/themes</em> 
+and <em>library/plugins</em> folders are set to <em>writeable</em> 
+and that all files belong to the web user or is a part of the same group as the web user.</p>
+
+<b>6) Create database for Scriptlog</b>
+<p>You may name it anything you like. The method for database creation varies depending 
+on your webhost but may require using adminer, PHPMyAdmin or etc. If you are unsure 
+how to createt this, ask your host.</p>
+
+<b>7) Follow the installation procedure</b>
+<p>Open <em>install/</em> in your browser. You will be asked to fill each column provided. 
+You should enter all database connection details and administrator account.
+These informations will help you through process to set up a <em>config.php</em> file.</p>
+
+<p>if some reason this does not work, don't worry. Open up <em>config.sample.php</em> with text editor  
+and change the following line:</p>
+<code>
+  return [
+
+    'db' => [
+        
+         'host' => 'hostname', # database's hostname
+         'user' => 'username', # database's username
+         'pass' => 'password', # database's password
+         'name' => 'dbname'    # database's name
+
+      ],
+
+    'app' => [
+
+         'url'   => 'http://yourservername',  # your server-name
+         'email' => 'email address',          # administrator's email 
+         'key'   => 'application key'         # optional
+     ]
+
+  ];
+
+</code>
+
+<p>fill in your database connection details, your server name and administrator's email.<br>
+Save the file as <em>config.php</em> and upload it.</p>
+
+<p>Open <em>install/</em> in your browser. Once the configuration file is set up, 
+the installer will set up the tables needed for your blog. If there is an error, 
+double-check your <em>config.php</em> file, and try again. </p>
+
+
+<b>8) Remove the installation directory</b>
+<p>For security purpose, delete the <em>install</em> folder when you are finish.</p>
+
+<h2>Usage</h2>
+<p>After you finish installation, you can populate your blog. To manage your blog content, go to
+administrator panel on web browser: <em>http://your-server-name/admin/</em>.
+</p>
+
+
+<h2>How the System Works</h2>
+
+When a request is sent to the folder where Scriptlog resides, 
+the .htaccess file will send the request to <em>index.php</em> as <em>front-controller</em>. 
+The index will load the main engine files in "library" and
+then checks to see if a "cached" version of the page already exists. 
+If not, then it will continue to load the core system files.</p>
+
+<p>After this, it will check with <em>dispatcher</em> 
+to figure out what route and rules to call. </p>
+
+<ol>
+<li>If a route requested mattching the URL is found in <em>rules</em>, then the method given 
+(either in the URL or config) is run and the output is returned.</li>
+
+<li>If a route requested is <i>not</i> found, then it will trigger a 404 error as the output.</li>
+</ol>
+
+<p>The output (whether an error or not) is then placed in the current theme and the final content is
+sent to the users browser</p>
+
+<h2>Contributing</h2>
+<p>Everyone is welcome to contribute code to the project. There are several ways to help out:</p>
+
+<b>Prerequisites</b>
+<p>All contributors need to have an account at 
+<em><a href="https://github.com">Github</a></em></p>
+
+<b>How To</b>
+<p>
+<ol>
+  <li>Create an <em><a href="https://github.com/cakmoel/scriptlog/issues">issue</a></em> on Github if you have found a bug.</li>
+  <li>Write test cases for open bug issues.</li>
+  <li>Write patches for open bug/feature issues, preferably with test cases included</li>
+  <li>Contribute to the <em><a href="https://github/cakmoel/scriptlog/wiki">Documentation</a></em></li>    
+</ol>
+</p>
+
+<b>Bug fix workflow</b>
+<p>Either submit a ticket or choose a ticket you wish to contribute to. 
+Fix the bug in a topic branch and make a pull request.<br />
+Sometimes bug fixes are trivial enough to not require a ticket, 
+but a detailed commit message is enough.
+</p>
+
+<b>Guidelines</b>
+<p>Please follow these guidelines when contributing</p>
+
+<h2>Online Resources</h2>
+<p>If you have any questions that aren't addressed in this document, 
+please take advantage of Scriptlog'numerous online resources:</p>
+
+
+<h2>Pass it on!</h2>
+<p>Scriptlog has no unlimited dollar marketing campaign or company sponsors, 
+but we believe in you as community that share this love. 
+If you enjoy Scriptlog please consider pass it on to your fiends, family and colleagues!, 
+setting it up for someone less knowledgable than yourself, install it on webhost, 
+or write it article about Scriptlog.</p>
+
+<p>If you would like to support Scriptlog, please consider <a href="https://scriptlog.web.id/donate">donating</a>.</p>
+
+<h2>License</h2>
+<p>Scriptlog is licenced under the <a href="https://opensource.org/licenses/MIT">MIT license</a>
+so you can use it for any personal or corporate projects free of charge. See <em><a href="license.txt">license.txt</a></em></p>
+
+<br /><br />
+<center><b>Thank you for creating with Scriptlog</b><br /> 
+<a href="https://scriptlog.web.id">M.Noermoehammad</a></center>
+</div>
+</body>
+</html>
