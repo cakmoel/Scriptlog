@@ -60,7 +60,7 @@ class ThemeEvent
 
   private $sanitize;
 
-  public function __construct(Theme $themeDao, FormValidator $validator, Sanitize $sanitize)
+  public function __construct(ThemeDao $themeDao, FormValidator $validator, Sanitize $sanitize)
   {
     $this->themeDao = $themeDao;
     $this->validator = $validator;

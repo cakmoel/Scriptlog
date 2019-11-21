@@ -2,7 +2,7 @@
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $pluginId = isset($_GET['pluginId']) ? abs((int)$_GET['pluginId']) : 0;
-$pluginDao = new Plugin();
+$pluginDao = new PluginDao();
 $validator = new FormValidator();
 $pluginEvent = new PluginEvent($pluginDao, $validator, $sanitizer);
 $pluginApp = new PluginApp($pluginEvent);

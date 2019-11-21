@@ -50,7 +50,7 @@ class ConfigurationEvent
 
   private $sanitizer;
 
-  public function __construct(Configuration $configDao, FormValidator $validator, Sanitize $sanitize)
+  public function __construct(ConfigurationDao $configDao, FormValidator $validator, Sanitize $sanitize)
   {
     $this->configDao = $configDao;
     $this->validator = $validator;

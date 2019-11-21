@@ -116,7 +116,7 @@ class Authentication
   /**
    * 
    */
-  public function __construct(User $userDao, UserToken $userToken, FormValidator $validator)
+  public function __construct(UserDao $userDao, UserTokenDao $userToken, FormValidator $validator)
   {
     $this->userDao = $userDao;
     $this->userToken = $userToken;
@@ -263,7 +263,7 @@ class Authentication
 
        $this->userDao->updateUserSession($recent_session, abs((int)$account_info['ID']));
        
-       direct_page('index.php?load=dashboard', 200);
+       direct_page('index.php?load=dashboard', 302);
    
  }
  
@@ -289,6 +289,7 @@ public function logout()
     
     $logout = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname($_SERVER['PHP_SELF']) . DS;
 
+    header($_SERVER["SERVER_PROTOCOL"]." 302 Found");
     header("Location: $logout");
     exit();
     

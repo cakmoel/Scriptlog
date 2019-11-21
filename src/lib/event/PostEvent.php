@@ -118,7 +118,7 @@ class PostEvent
    * @param object $sanitizer
    * 
    */
-  public function __construct(Post $postDao, FormValidator $validator, Sanitize $sanitizer)
+  public function __construct(PostDao $postDao, FormValidator $validator, Sanitize $sanitizer)
   {
      $this->postDao = $postDao;
      $this->validator = $validator;

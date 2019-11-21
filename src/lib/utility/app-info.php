@@ -11,7 +11,7 @@
 function app_info()
 {
 
- $configurations = new Configuration();
+ $configurations = new ConfigurationDao();
  $app_info = array();
  $results = $configurations -> findConfigs();
 

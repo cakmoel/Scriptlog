@@ -2,7 +2,7 @@
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $subMenuId = isset($_GET['subMenuId']) ? abs((int)$_GET['subMenuId']) : 0;
-$menuChildDao = new MenuChild();
+$menuChildDao = new MenuChildDao();
 $validator = new FormValidator();
 $menuChildEvent = new MenuChildEvent($menuChildDao, $validator, $sanitizer);
 $menuChildApp = new MenuChildApp($menuChildEvent);

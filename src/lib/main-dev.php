@@ -101,9 +101,11 @@ $library = array(
 
 load_engine($library);
 
+call_htmlpurifier();
+
 #===================== RULES ===========================
 
-// rules used by dispatcher to route request
+// rules adapted by dispatcher to route request
 
 /*******************************************************  
 
@@ -165,7 +167,7 @@ $searchPost = new SearchFinder($dbc);
 $frontPaginator = new Paginator(10, 'p');
 $postFeeds = new RssFeed($dbc);
 $sanitizer = new Sanitize();
-$userDao = new User();
+$userDao = new UserDao();
 $userToken = new UserToken();
 $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);

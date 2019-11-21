@@ -10,6 +10,7 @@
  * @param string $filename
  * @param string $filetype
  * @return string
+ * 
  */
 function image_encoder($filename, $filetype)
 {

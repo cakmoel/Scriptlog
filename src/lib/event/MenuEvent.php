@@ -28,7 +28,7 @@ class MenuEvent
 
   private $sanitize;
   
-  public function __construct(Menu $menuDao, FormValidator $validator, Sanitize $sanitize)
+  public function __construct(MenuDao $menuDao, FormValidator $validator, Sanitize $sanitize)
   {
     $this->menuDao = $menuDao;
     $this->validator = $validator;

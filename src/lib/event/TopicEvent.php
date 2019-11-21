@@ -57,7 +57,7 @@ class TopicEvent
 
   private $sanitizer;
 
-  public function __construct(Topic $topicDao, FormValidator $validator, Sanitize $sanitizer)
+  public function __construct(TopicDao $topicDao, FormValidator $validator, Sanitize $sanitizer)
   {
     $this->topicDao = $topicDao;
     $this->validator = $validator;

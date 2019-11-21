@@ -121,7 +121,7 @@ class PageEvent
   /**
    * Initialize or instanstiate of class propertis
    */
-  public function __construct(Page $pageDao, FormValidator $validator, Sanitize $sanitizer)
+  public function __construct(PageDao $pageDao, FormValidator $validator, Sanitize $sanitizer)
   {
     $this->pageDao = $pageDao;
     $this->validator = $validator;

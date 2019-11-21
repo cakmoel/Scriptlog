@@ -2,7 +2,7 @@
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $postId = isset($_GET['postId']) ? abs((int)$_GET['postId']) : 0;
-$postDao = new Post();
+$postDao = new PostDao();
 $validator = new FormValidator();
 $postEvent = new PostEvent($postDao, $validator, $sanitizer);
 $postApp = new PostApp($postEvent);

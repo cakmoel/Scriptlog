@@ -10,45 +10,28 @@
  * @param string $mode
  * 
  */
-function upload_photo($field_name, $width, $height, $mode, $folder)
+function upload_photo($file_location, $file_size, $file_type, $width, $height, $mode, $file_name)
 {
     
     // picture directory
-    if(!is_dir('../../public/files/pictures/'.$folder . DIRECTORY_SEPARATOR)) {
-
-        if(!is_writable('../../public/files/pictures/'.$folder . DIRECTORY_SEPARATOR)) {
-
-            scriptlog_error('Directory destination is not writable', E_NOTICE);
-
-        } else {
-
-
-           $upload_path = mkdir('../../public/files/pictures/'.$folder . DIRECTORY_SEPARATOR);
-
-           $upload_path_thumb = mkdir('../../public/files/pictures/'.$folder. DIRECTORY_SEPARATOR . 'thumbs' . DIRECTORY_SEPARATOR);
-        
-        }
-        
-    }
-    
-    $file_uploaded = $upload_path . $_FILES[$field_name]['name'];
-    $file_type = $_FILES[$field_name]['type'];
-    $file_size = $_FILES[$field_name]['size'];
+    $image_path = __DIR__ . '/../../public/files/pictures/';
+    $image_path_thumb = __DIR__ . '/../../public/files/pictures/thumbs/';
+    $image_uploaded = $image_path.$file_name;
     
     // save picture from resources
     
-    if ($file_size > 524867) {
+    if ($file_size > APP_FILE_SIZE) {
         
-        move_uploaded_file($_FILES[$field_name]['tmp_name'], $file_uploaded);
+        move_uploaded_file($file_location, $image_uploaded);
         
         // resize picture
-        $resizeImage = new Resize($file_uploaded);
+        $resizeImage = new Resize($image_uploaded);
         $resizeImage ->resizeImage($width, $height, $mode);
-        $resizeImage ->saveImage($file_uploaded, 100);
+        $resizeImage ->saveImage($image_uploaded, 100);
                
     } else {
         
-        move_uploaded_file($_FILES[$field_name]['tmp_name'], $file_uploaded);
+        move_uploaded_file($file_location, $image_uploaded);
         
     }
     
@@ -57,20 +40,20 @@ function upload_photo($field_name, $width, $height, $mode, $folder)
     
     if ($file_type == "image/jpeg") {
         
-        $img_source = imagecreatefromjpeg($file_uploaded);
+        $img_source = imagecreatefromjpeg($image_uploaded);
         
     } elseif ($file_type == "image/png") {
         
-        $img_source = imagecreatefrompng($file_uploaded);
-        
-    } elseif ($file_type == "image/jpg") {
-        
-        $img_source = imagecreatefromjpeg($file_uploaded);
+        $img_source = imagecreatefrompng($image_uploaded);
         
     } elseif ($file_type == "image/gif") {
         
-        $img_source = imagecreatefromgif($file_uploaded);
+        $img_source = imagecreatefromgif($image_uploaded);
         
+    } elseif($file_type == "image/webp") {
+
+        $img_source = imagecreatefromwebp($image_uploaded);
+
     }
     
     $source_width = imagesx($img_source);
@@ -85,23 +68,27 @@ function upload_photo($field_name, $width, $height, $mode, $folder)
     imagecopyresampled($img_processed, $img_source, 0, 0, 0, 0, $set_width, $set_height, $source_width, $source_height);
     
     // save picture's thumbnail
-    if ($_FILES['image']['type'] == "image/jpeg") {
+    if ($file_type == "image/jpeg") {
+
+        header('Content-Type: image/jpeg');
+        imagejpeg($img_processed, $image_path_thumb . "thumb_" . $file_name);
         
-        imagejpeg($img_processed, $upload_path_thumb . "thumb_" . $file_name);
+    } elseif ($file_type == "image/png") {
         
-    } elseif ($_FILES['image']['type'] == "image/png") {
+        header('Content-Type: image/png');
+        imagepng($img_processed, $image_path_thumb . "thumb_" . $file_name);
         
-        imagepng($img_processed, $upload_path_thumb . "thumb_" . $file_name);
+    } elseif ($file_type == "image/gif") {
         
-    } elseif ($_FILES['image']['type'] == "image/gif") {
+        header('Content-Type: image/gif');
+        imagegif($img_processed, $image_path_thumb . "thumb_" . $file_name);
         
-        imagegif($img_processed, $upload_path_thumb . "thumb_" . $file_name);
-        
-    } elseif ($_FILES['image']['type'] == "image/jpg") {
-        
-        imagejpeg($img_processed, $upload_path_thumb . "thumb_" . $file_name);
-        
-    }
+    } elseif ($file_type == "image/webp") {
+
+        header('Content-Type: image/webp');
+        imagewebp($img_processed, $image_path_thumb . "thumb_" . $file_name);
+
+    } 
     
     // Delete Picture in computer's memory
     imagedestroy($img_source);

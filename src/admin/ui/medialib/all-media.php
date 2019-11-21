@@ -69,9 +69,9 @@
                 <tr>
                   <th>#</th>
                   <th>Filename</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th>Edit</th>
+                  <th>Size</th>
+                  <th>Type</th>
+                  <th>Download</th>
                   <th>Delete</th>
                 </tr>
                 </thead>
@@ -98,11 +98,11 @@
                 <tfoot>
                 <tr>
                   <th>#</th>
-                  <th>media</th>
-                  <th>Description</th>
-                  <th>Level</th>
-                  <th>Edit</th>
-                  <th>Status</th>
+                  <th>Filename</th>
+                  <th>Size</th>
+                  <th>Type</th>
+                  <th>Download</th>
+                  <th>Delete</th>
                 </tr>
                 </tfoot>
               </table>

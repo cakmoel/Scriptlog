@@ -2,7 +2,7 @@
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $themeId = isset($_GET['themeId']) ? abs((int)$_GET['themeId']) : 0;
-$themeDao = new Theme();
+$themeDao = new ThemeDao();
 $validator = new FormValidator();
 $themeEvent = new ThemeEvent($themeDao, $validator, $sanitizer);
 $themeApp = new ThemeApp($themeEvent);

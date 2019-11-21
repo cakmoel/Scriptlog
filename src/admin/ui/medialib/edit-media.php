@@ -58,7 +58,7 @@ endif;
 <div class="box-body">
 <div class="form-group">
 <label>Select file  (required)</label>
-<input type="file"  name="media" id="mediaUploaded" accept="application/zip,application/octet-stream,application/x-zip,application/x-zip-compressed" required>
+<input type="file"  name="media" id="mediaUploaded" required>
 <p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
 </div>
 

@@ -2,7 +2,7 @@
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";  
 $commentId = isset($_GET['commentId']) ? abs((int)$_GET['commentId']) : 0;
-$commentDao = new Comment();
+$commentDao = new CommentDao();
 $validator = new FormValidator();
 $commentEvent = new CommentEvent($commentDao, $validator, $sanitizer);
 $commentApp = new CommentApp($commentEvent);

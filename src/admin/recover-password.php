@@ -65,7 +65,7 @@ if (empty($recoverFormSubmitted) == false) {
 
       $badCSRF = false;
       unset($_SESSION['CSRF']);
-      $authenticator -> updateNewPassword($password, $user['ID']);
+      $authenticator -> updateNewPassword($password, abs((int)$user['ID']));
       direct_page('login.php?status=changed', 200);
 
    }

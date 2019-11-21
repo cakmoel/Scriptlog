@@ -112,10 +112,27 @@ public function insert()
     $media_target = $_POST['media_target'];
     $media_access = $_POST['media_access'];
 
-    $accepted_files = array('pdf' => 'application/pdf', 'doc' => 'application/msword', 'rar' => 'application/rar', 
- 	               'zip' => 'application/zip', 'xls' => 'application/vnd.ms-excel', 'xls' => 'application/octet-stream', 
- 	               'exe' => 'application/octet-stream', 'ppt' => 'application/vnd.ms-powerpoint',
- 	               'jpeg' => 'image/jpeg', 'jpg' => 'image/jpeg', 'png' => 'image/png', 'gif' => 'image/gif');
+    $accepted_files = array(
+                 'pdf'  => 'application/pdf', 
+                 'doc'  => 'application/msword', 
+                 'rar'  => 'application/rar', 
+                 'zip'  => 'application/zip', 
+                 'xls'  => 'application/vnd.ms-excel', 
+                 'xls'  => 'application/octet-stream', 
+                 'exe'  => 'application/vnd.microsoft.portable-executable', 
+                 'ppt'  => 'application/vnd.ms-powerpoint',
+                 'jpeg' => 'image/jpeg', 
+                 'jpg'  => 'image/jpeg', 
+                 'png'  => 'image/png', 
+                 'gif'  => 'image/gif', 
+                 'webp' => 'image/webp',
+                 'mp3'  => 'audio/mpeg', 
+                 'wav'  => 'audio/wav',
+                 'ogg'  => 'audio/ogg',
+                 'mp4'  => 'video/mp4',
+                 'webm' => 'video/webm',
+                 'ogg'  => 'video/ogg'
+                );
 
     try {
 
@@ -133,26 +150,10 @@ public function insert()
         
       }
 
-      if (empty($file_location)) {
-
-        $checkError = false;
-        array_push($errors, "No file uploaded");
-
-      }
-
-      if ($file_size > 524876) {
-
-         $checkError = false;
-         array_push($errors, "Exceeded file size limit. Maximum file size is. ".format_size_unit(524876));
-
-      }
-
       switch ($file_error) {
 
         case UPLOAD_ERR_OK:
- 	         
  	         break;
- 	         
         case UPLOAD_ERR_NO_FILE:
            
            $checkError = false;
@@ -177,6 +178,27 @@ public function insert()
           
       }
 
+      if ($file_size > APP_FILE_SIZE) {
+
+         $checkError = false;
+         array_push($errors, "Exceeded file size limit. Maximum file size is. ".format_size_unit(APP_FILE_SIZE));
+
+      }
+
+      if(false === check_file_name($file_location)) {
+
+        $checkError = false;
+        array_push($errors, "file name is not valid");
+
+      }
+
+      if(true === check_file_length($file_location)) {
+
+        $checkError = false;
+        array_push($errors, "file name is too long");
+        
+      }
+
       if(false == check_mime_type($accepted_files, $file_location)) {
 
         $checkError = false;
@@ -184,13 +206,14 @@ public function insert()
 
       }
 
+      // get new filename
       $file_info = pathinfo($file_name);
       $name = $file_info['filename'];
       $file_extension = $file_info['extension'];
       $tmp = str_replace(array('.',' '), array('',''), microtime());
       $new_filename = rename_file(md5($name.$tmp)).'-'.date('Ymd').'.'.$file_extension;
 
-      list($width, $heigh) = getimagesize($file_location);
+      list($width, $height) = getimagesize($file_location);
 
       $media_metavalue = array(
         'File name' => $new_filename, 
@@ -199,13 +222,18 @@ public function insert()
         'Uploaded on' => date("Y-m-d H:i:s"), 
         'Dimension' => $width.'x'.$height);
 
-      upload_media('media',true,true);
+      // upload file
+      if (is_uploaded_file($file_location)) {
 
+        upload_media($file_location, $file_type, $file_size, basename($new_filename));
+
+      }
+     
       if (!$checkError) {
 
          $this->setView('edit-media');
          $this->setPageTitle('Upload New Media');
-         $this->setFormAction('newMedia');
+         $this->setFormAction(ActionConst::NEWMEDIA);
          $this->view->set('pageTitle', $this->getPageTitle());
          $this->view->set('formAction', $this->getFormAction());
          $this->view->set('errors', $errors);
@@ -230,8 +258,10 @@ public function insert()
             
            $this->mediaEvent->setMediaId($media_id);
            $this->mediaEvent->setMediaKey($new_filename);
-           $this->mediaEvent->setMediaValue($media_metavalue);
-            
+           $this->mediaEvent->setMediaValue(json_encode($media_metavalue));
+
+           $this->mediaEvent->addMediaMeta();
+ 
          }
 
          direct_page('index.php?load=medialib&status=mediaAdded', 200);
@@ -276,6 +306,28 @@ public function update($id)
 
   }
 
+  $accepted_files = array(
+    'pdf'  => 'application/pdf', 
+    'doc'  => 'application/msword', 
+    'rar'  => 'application/rar', 
+    'zip'  => 'application/zip', 
+    'xls'  => 'application/vnd.ms-excel', 
+    'xls'  => 'application/octet-stream', 
+    'exe'  => 'application/vnd.microsoft.portable-executable', 
+    'ppt'  => 'application/vnd.ms-powerpoint',
+    'jpeg' => 'image/jpeg', 
+    'jpg'  => 'image/jpeg', 
+    'png'  => 'image/png', 
+    'gif'  => 'image/gif', 
+    'webp' => 'image/webp',
+    'mp3'  => 'audio/mpeg', 
+    'wav'  => 'audio/wav',
+    'ogg'  => 'audio/ogg',
+    'mp4'  => 'video/mp4',
+    'webm' => 'video/webm',
+    'ogg'  => 'video/ogg'
+   );
+
   $data_media = array(
     
     'ID' => $getMedia['ID'],
@@ -293,7 +345,7 @@ public function update($id)
 
     $file_location = isset($_FILES['media']['tmp_name']) ? $_FILES['media']['tmp_name'] : '';
     $file_type = isset($_FILES['media']['type']) ? $_FILES['media']['type'] : '';
-    $file_name = isset($_FILES['media']['name']) ? $_FILES['media']['name'] : '';
+    $file_name = isset($_FILES['media']['name']) ? $_FILES['media_generci']['name'] : '';
     $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : '';
     $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
 
@@ -313,87 +365,133 @@ public function update($id)
         
       }
 
-      if (!isset($file_error) || is_array($file_error)) {
-
-        $checkError = false;
-        array_push($errors, "Invalid paramenter");
-        
-      }
-
-      if ($file_size > 524876) {
-
-         $checkError = false;
-         array_push($errors, "Exceeded file size limit. Maximum file size is. ".format_size_unit(524876));
-
-      }
-
-      // get filename
-	    $file_info = pathinfo($file_name);
-	    $name = $file_info['filename'];
-	    $file_extension = $file_info['extension'];
-      $tmp = str_replace(array('.',' '), array('',''), microtime());
-      $newFileName = rename_file(md5($name.$tmp)).'-'.date('Ymd').$file_extension;
-
-      $fileUploaded = upload_media('media',true,true);
-
-      if (is_array($fileUploaded['error'])) {
-
-        $message = '';
-        foreach ($fileUploaded['error'] as $msg) {
-          
-          $message .= $msg;
-           
-        }
-
-        $checkError = false;
-        array_push($errors, $message);
-
-      }
-
       if (!$checkError) {
 
-         $this->setView('edit-media');
-         $this->setPageTitle('Upload New Media');
-         $this->setFormAction('newMedia');
-         $this->view->set('pageTitle', $this->getPageTitle());
-         $this->view->set('formAction', $this->getFormAction());
-         $this->view->set('errors', $errors);
-         $this->view->set('mediaData', $data_media);
-         $this->view->set('mediaType', $this->mediaEvent->mediaTypeDropDown($getMedia['media_type']));
-         $this->view->set('mediaTarget', $this->mediaEvent->mediaTargetDropDown($getMedia['media_target']));
-         $this->view->set('mediaAccess', $this->mediaEvent->mediaAccessDropDown($getMedia['media_access']));
-         $this->view->set('mediaStatus', $this->mediaEvent->mediaStatusDropDown($getMedia['media_status']));
-         $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+        $this->setView('edit-media');
+        $this->setPageTitle('Edit Media');
+        $this->setFormAction(ActionConst::EDITMEDIA);
+        $this->view->set('pageTitle', $this->getPageTitle());
+        $this->view->set('formAction', $this->getFormAction());
+        $this->view->set('errors', $errors);
+        $this->view->set('mediaData', $data_media);
+        $this->view->set('mediaType', $this->mediaEvent->mediaTypeDropDown($getMedia['media_type']));
+        $this->view->set('mediaTarget', $this->mediaEvent->mediaTargetDropDown($getMedia['media_target']));
+        $this->view->set('mediaAccess', $this->mediaEvent->mediaAccessDropDown($getMedia['media_access']));
+        $this->view->set('mediaStatus', $this->mediaEvent->mediaStatusDropDown($getMedia['media_status']));
+        $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+
+     } 
+
+     if (!empty($file_location)) {
+
+        if (!isset($file_error) || is_array($file_error)) {
+
+          $checkError = false;
+          array_push($errors, "Invalid paramenter");
+          
+        }
+  
+        switch ($file_error) {
+  
+           case UPLOAD_ERR_OK:
+              break;
+           case UPLOAD_ERR_NO_FILE:
+             
+             $checkError = false;
+             array_push($errors, "No file uploaded");
+  
+             break;
+         
+           case UPLOAD_ERR_INI_SIZE:
+           case UPLOAD_ERR_FORM_SIZE:
+            
+             $checkError = false;
+             array_push($errors, "Exceeded filesize limit");
+  
+             break;
+  
+           default:
+              
+             $checkError = false;
+             array_push($errors, "Unknown errors");
+            
+             break;
+            
+         }
+  
+         if ($file_size > APP_FILE_SIZE) {
+  
+           $checkError = false;
+           array_push($errors, "Exceeded file size limit. Maximum file size is. ".format_size_unit(APP_FILE_SIZE));
+  
+         }
+  
+         if(false === check_file_name($file_location)) {
+  
+          $checkError = false;
+          array_push($errors, "file name is not valid");
+  
+         }
+  
+         if(true === check_file_length($file_location)) {
+  
+          $checkError = false;
+          array_push($errors, "file name is too long");
+          
+         }
+  
+         if(false == check_mime_type($accepted_files, $file_location)) {
+  
+          $checkError = false;
+          array_push($errors, "Invalid file format");
+  
+         }
+  
+        // get new filename
+        $file_info = pathinfo($file_name);
+        $name = $file_info['filename'];
+        $file_extension = $file_info['extension'];
+        $tmp = str_replace(array('.',' '), array('',''), microtime());
+        $new_filename = rename_file(md5($name.$tmp)).'-'.date('Ymd').$file_extension;
+  
+        list($width, $height) = getimagesize($file_location);
+  
+        $media_metavalue = array(
+          'File name' => $new_filename, 
+          'File type' => $file_type, 
+          'File size' => $file_size, 
+          'Uploaded on' => date("Y-m-d H:i:s"), 
+          'Dimension' => $width.'x'.$height);
+  
+         if (is_uploaded_file($file_location)) {
+
+            upload_media($file_location, $file_type, $file_size, basename($new_filename));
+
+         }
+        
+         $this->mediaEvent->setMediaFilename($new_filename);
+         $this->mediaEvent->setMediaCaption($caption);
+         $this->mediaEvent->setMediaType($type);
+         $this->mediaEvent->setMediaTarget($target);
+         $this->mediaEvent->setMediaAccess($access);
+         $this->mediaEvent->setMediaStatus($status);
+         $this->mediaEvent->setMediaId($media_id);
 
       } else {
 
-        if (!empty($file_location)) {
+        $this->mediaEvent->setMediaFilename($new_filename);
+        $this->mediaEvent->setMediaCaption($caption);
+        $this->mediaEvent->setMediaType($type);
+        $this->mediaEvent->setMediaTarget($target);
+        $this->mediaevent->setMediaUser($this->mediaEvent->isMediaUser());
+        $this->mediaEvent->setMediaAccess($access);
+        $this->mediaEvent->setMediaStatus($status);
+        $this->mediaEvent->setMediaId($media_id);
 
-          $this->mediaEvent->setMediaFilename($newFileName);
-          $this->mediaEvent->setMediaCaption($caption);
-          $this->mediaEvent->setMediaType($type);
-          $this->mediaEvent->setMediaTarget($target);
-          $this->mediaEvent->setMediaAccess($access);
-          $this->mediaEvent->setMediaStatus($status);
-          $this->mediaEvent->setMediaId($media_id);
-
-        } else {
-
-          $this->mediaEvent->setMediaFilename($newFileName);
-          $this->mediaEvent->setMediaCaption($caption);
-          $this->mediaEvent->setMediaType($type);
-          $this->mediaEvent->setMediaTarget($target);
-          $this->mediaevent->setMediaUser($this->mediaEvent->isMediaUser());
-          $this->mediaEvent->setMediaAccess($access);
-          $this->mediaEvent->setMediaStatus($status);
-          $this->mediaEvent->setMediaId($media_id);
-
-        }
-
-        $this->mediaEvent->modifyMedia();
-        direct_page('index.php?load=medialib&status=mediaUpdated', 200);
-        
       }
+
+      $this->mediaEvent->modifyMedia();
+      direct_page('index.php?load=medialib&status=mediaUpdated', 200);
 
     } catch(AppException $e) {
 
@@ -426,7 +524,7 @@ public function update($id)
 public function remove($id)
 {
   $this->mediaEvent->setMediaId($id);
-  $this->mediaEvent->removeMedi();
+  $this->mediaEvent->removeMedia();
   direct_page('index.php?load=medialib&status=mediaDeleted', 200);
 }
 

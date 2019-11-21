@@ -13,7 +13,7 @@
 function theme_identifier()
 {
   
-  $theme_init = new Theme();
+  $theme_init = new ThemeDao();
   
   if($theme_init->totalThemeRecords() > 0) {
 

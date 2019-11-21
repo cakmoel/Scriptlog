@@ -12,5 +12,5 @@
  */
 class UploadException extends CoreException
 {
-
+  
 }

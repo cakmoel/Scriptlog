@@ -78,6 +78,7 @@ if (!empty($loginFormSubmitted)) {
   
     } else {
 
+       header($_SERVER["SERVER_PROTOCOL"]." 401 Unauthorized");
        $errors['errorMessage'] = "Invalid Login";
        
     }
@@ -116,7 +117,9 @@ if (!empty($loginFormSubmitted)) {
   
     <!-- Google Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
-    
+    <!-- Icon -->
+   <link href="favicon.ico" rel="Shortcut Icon">
+
   </head>
   <body class="hold-transition login-page">
   <div class="login-box">

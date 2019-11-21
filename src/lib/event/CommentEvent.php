@@ -59,7 +59,7 @@ class CommentEvent
 
   private $sanitize;
   
-  public function __construct(Comment $commentDao, FormValidator $validator, Sanitize $sanitize)
+  public function __construct(CommentDao $commentDao, FormValidator $validator, Sanitize $sanitize)
   {
    $this->commentDao = $commentDao;
    $this->validator = $validator;
@@ -158,10 +158,23 @@ class CommentEvent
    * 
    * @param string $selected
    * @return string
+   * 
    */
   public function commentStatementDropDown($selected = "")
   {
      return $this->commentDao->dropDownCommentStatement($selected);
   }
-  
+
+/**
+ * Total Comments recorded
+ * 
+ * @param array $data
+ * @return integer
+ * 
+ */
+  public function totalComments($data = null)
+  {
+    return $this->commentDao->totalCommentRecords($data);
+  }
+
 }

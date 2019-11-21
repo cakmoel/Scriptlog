@@ -2,7 +2,7 @@
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $mediaId = isset($_GET['mediaId']) ? abs((int)$_GET['mediaId']) : 0;
-$mediaDao = new Media();
+$mediaDao = new MediaDao();
 $validator = new FormValidator();
 $mediaEvent = new MediaEvent($mediaDao, $validator, $sanitizer);
 $mediaLib = new MediaApp($mediaEvent);
@@ -39,7 +39,15 @@ switch ($action) {
 
     case ActionConst::DELETEMEDIA:
 
-         $mediaLib -> remove($mediaId);
+       if ($mediaDao -> checkMediaId($mediaId, $sanitizer)) {
+
+           $mediaLib -> remove($mediaId);
+
+       } else {
+
+         direct_page('index.php?load=medialib&error=mediaNotFound', 404);
+
+       }
          
        break;
 

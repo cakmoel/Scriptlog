@@ -7,53 +7,55 @@
  * @param bool $random_name
  * 
  */
-function upload_media($field_name, $check_image = false, $random_name = false)
+function upload_media($file_location, $file_type, $file_size, $file_name)
 {
-  
- if((!empty($_FILES[$field_name])) && ($_FILES[$field_name]['error'] == 0 )) {
+ 
+  switch ($file_type) {
 
-    $file_info = pathinfo($_FILES[$field_name]['name']);
-    $name = $file_info['filename'];
-    $file_extension = $file_info['extension'];
-    $tmp = str_replace(array('.',' '), array('',''), microtime());
-    $new_filename = rename_file(md5($name.$tmp)).'-'.date('Ymd').'.'.$file_extension;
+     case 'application/pdf' :
+     case 'application/msword':
+     case 'application/vnd.ms-excel' :
+     case 'application/octet-stream' :
+     case 'application/vnd.ms-powerpoint':
+     case 'application/rar':
+     case 'application/zip':
+     case 'application/vnd.microsoft.portable-executable':
+     
+       upload_doc($file_size, $file_size, $file_type, $file_name);
+   
+       break;
 
-    if($random_name) {
+     case 'audio/mp4' :
+     case 'audio/3gpp':
+     case 'audio/mpeg':
+     case 'audio/wav' :
 
-      $tmp = str_replace(array('.',' '), array('',''), microtime());
+       upload_audio($file_size, $file_size, $file_type, $file_name);
+
+       break;
       
-      if(!$tmp || $tmp == '' ) {
-         
-         scriptlog_error("File must have a name", E_USER_NOTICE);
+     case 'image/jpeg' :
+     case 'image/png'  :
+     case 'image/gif'  :
+     case 'image/webp' : 
+     
+       upload_photo($file_location, $file_size, $file_type, 770, 400, 'crop', $file_name);
 
-		}
-		// generate random filename
-		$new_filename = rename_file(md5($name.$tmp)).'-'.date('Ymd').'.'.$ext;
-		
-    }
+       break;
 
-    $upload_time_path = date('Y').DS.date('m').DS.date('d').DS;
-    $upload_path = isset($_SESSION['user_login']) ? $_SESSION['user_login'] : '';
+     case 'video/mp4':
+     case 'video/webm':
+     case 'video/ogg':
+      
+       upload_video();
+       
+       break;
 
-    switch($file_extension) {
-
-       case 'jpg':
-       case 'jpeg':
-       case 'gif':
-       case 'png':
-
-            $image_path = $upload_path . DIRECTORY_SEPARATOR . $upload_time_path . $new_filename;
-
-            upload_photo($field_name, 770, 400, 'crop', $image_path);
-
-         break;
-
-    }
-    
-
- } else {
-
-    scriptlog_error("No file uploaded", E_USER_NOTICE);
+     default:
+  
+        throw new UploadException("Error - file type not allowed!");
+      
+        break;
 
  }
 

@@ -93,7 +93,7 @@ class PluginEvent
    * @param object $sanitize
    * 
    */
-  public function __construct(Plugin $pluginDao, FormValidator $validator, Sanitize $sanitize)
+  public function __construct(PluginDao $pluginDao, FormValidator $validator, Sanitize $sanitize)
   {
     $this->pluginDao = $pluginDao;
     $this->validator = $validator;

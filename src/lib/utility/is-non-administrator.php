@@ -12,8 +12,8 @@ function is_non_administrator()
 {
   $user_level = false;
 
-  $userDao = new User();
-  $userToken = new UserToken();
+  $userDao = new UserDao();
+  $userToken = new UserTokenDao();
   $validator = new FormValidator();
   $authenticator = new Authentication($userDao, $userToken, $validator);
 

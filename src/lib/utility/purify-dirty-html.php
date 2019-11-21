@@ -5,6 +5,7 @@
  * @param string $dirty_html
  * 
  */
+
 function purify_dirty_html($dirty_html)
 {
 

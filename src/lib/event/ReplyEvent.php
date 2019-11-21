@@ -28,7 +28,7 @@ class ReplyEvent
 
   private $sanitize;
 
-  public function __construct(Reply $replyDao, FormValidator $validator, Sanitize $sanitize)  {
+  public function __construct(ReplyDao $replyDao, FormValidator $validator, Sanitize $sanitize)  {
 
     $this->replyDao = $replyDao;
     $this->validator = $validator;

@@ -148,7 +148,9 @@ function scriptlog_format_error($datetime, $errno, $errstr, $errfile, $errline)
 function scriptlog_error_mail($errorMsg, $MsgType, $destination, $headers)
 {
   if ($MsgType === 1) {
+
     return error_log($errorMsg, $MsgType, $destination, $headers);
+    
   }
   
   return false;

@@ -86,7 +86,7 @@ class UserEvent
   * @method __constructor()
   * 
   */
- public function __construct(User $userDao, FormValidator $validator, Sanitize $sanitize)
+ public function __construct(UserDao $userDao, FormValidator $validator, Sanitize $sanitize)
  {
     $this->userDao = $userDao;
 
@@ -335,10 +335,13 @@ class UserEvent
    return $this->userDao->checkUserEmail($user_email);    
  }
  
- /**
-  * Checking user level
-  * 
-  */
+/**
+ * Check whether user level 
+ * session defined or not
+ * 
+ * @return boolean
+ * 
+ */ 
  public function isUserLevel()
  {
 
@@ -352,10 +355,13 @@ class UserEvent
 
  }
 
- /**
-  * Total Users records
-  * @return boolean
-  */
+/**
+ * Total User recorded
+ * 
+ * @param array $data
+ * @return integer
+ * 
+ */
  public function totalUsers($data = null)
  {
    return $this->userDao->totalUserRecords($data);

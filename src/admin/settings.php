@@ -2,7 +2,7 @@
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $settingId = isset($_GET['settingId']) ? abs((int)$_GET['settingId']) : 0;
-$configDao = new Configuration();
+$configDao = new ConfigurationDao();
 $validator = new FormValidator();
 $configEvent = new ConfigurationEvent($configDao, $validator, $sanitizer);
 $configApp = new ConfigurationApp($configEvent);

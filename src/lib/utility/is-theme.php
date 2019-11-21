@@ -8,6 +8,6 @@
  */
 function is_theme($status)
 {
-  $theme = new Theme();
+  $theme = new ThemeDao();
   return $theme->loadTheme($status);
 }

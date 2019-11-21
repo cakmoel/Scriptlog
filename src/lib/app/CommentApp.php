@@ -43,8 +43,6 @@ class CommentApp extends BaseApp
     }
     
     $this->setView('all-comments');
-    $this->setPageTitle('Comments');
-    $this->view->set('pageTitle', $this->getPageTitle());
     
     if (!$checkError) {
         $this->view->set('errors', $errors);
@@ -53,9 +51,12 @@ class CommentApp extends BaseApp
     if ($checkStatus) {
         $this->view->set('status', $status);
     }
-    
-    $this->view->set('commentsTotal', count($this->commentEvent->grabComments()));
+
+    $this->setPageTitle('Comments');
+    $this->view->set('pageTitle', $this->getPageTitle());
+    $this->view->set('commentsTotal', $this->commentEvent->totalComments());
     $this->view->set('comments', $this->commentEvent->grabComments());
+    
     return $this->view->render();
     
   }

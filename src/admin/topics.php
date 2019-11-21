@@ -2,7 +2,7 @@
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $topicId = isset($_GET['topicId']) ? abs((int)$_GET['topicId']) : 0;
-$topicDao = new Topic();
+$topicDao = new TopicDao();
 $validator = new FormValidator();
 $topicEvent = new TopicEvent($topicDao, $validator, $sanitizer);
 $topicApp = new TopicApp($topicEvent);

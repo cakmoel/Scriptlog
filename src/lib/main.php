@@ -30,6 +30,7 @@ define('APP_ADMIN', 'admin');
 define('APP_PUBLIC', 'public');
 define('APP_LIBRARY', 'lib');
 define('APP_CACHE', false);
+define('APP_FILE_SIZE', 524867);
 define('SCRIPTLOG', $checkIncKey);
 
 if (!defined('APP_ROOT')) define('APP_ROOT', dirname(dirname(__FILE__)) . DS);
@@ -97,18 +98,20 @@ if (is_dir(APP_ROOT . APP_LIBRARY) && is_file(APP_ROOT . APP_LIBRARY . DS . 'Scr
 
 // load all libraries 
 $library = array(
-    APP_ROOT . APP_LIBRARY . DS .'core'. DS,
-    APP_ROOT . APP_LIBRARY . DS .'dao'. DS,
-    APP_ROOT . APP_LIBRARY . DS .'event'. DS,
-    APP_ROOT . APP_LIBRARY . DS .'app'. DS,
-    APP_ROOT . APP_LIBRARY . DS .'plugins'. DS
+    APP_ROOT . APP_LIBRARY . DS . 'core'    . DS,
+    APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
+    APP_ROOT . APP_LIBRARY . DS . 'event'   . DS,
+    APP_ROOT . APP_LIBRARY . DS . 'app'     . DS,
+    APP_ROOT . APP_LIBRARY . DS . 'plugins' . DS
 );
 
 load_engine($library);
 
+call_htmlpurifier();
+
 #===================== RULES ==========================
 
-// rules used by dispatcher to route request
+// rules adapted by dispatcher to route request
 
 /****************************************************** 
 
@@ -160,10 +163,10 @@ Registry::setAll(array('dbc' => $dbc, 'route' => $rules));
 /* an instances of class that necessary for the system
  * please do not change this below variable 
  * 
- * @var $searchPost used by search functionality
- * @var $frontPaginator used by front pagination funtionality
- * @var $postFeeds used by rss feed functionality
- * @var $sanitizer used by sanitize functionality
+ * @var $searchPost invoked by search functionality
+ * @var $frontPaginator called by front pagination funtionality
+ * @var $postFeeds run by rss feed functionality
+ * @var $sanitizer adapted by sanitize functionality
  * @var $userDao, $validator, $authenticator --
  * these are collection of objects or instances of classes 
  * that will be run by the system.
@@ -173,8 +176,8 @@ $searchPost = new SearchFinder($dbc);
 $frontPaginator = new Paginator(10, 'p');
 $postFeeds = new RssFeed($dbc);
 $sanitizer = new Sanitize();
-$userDao = new User();
-$userToken = new UserToken();
+$userDao = new UserDao();
+$userToken = new UserTokenDao();
 $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);
 
@@ -182,9 +185,11 @@ $authenticator = new Authentication($userDao, $userToken, $validator);
 # set_error_handler('LogError::errorHandler');
 # register_shutdown_function('scriptlog_shutdown_fatal');
 
-if (!isset($_SESSION)) {
+if (!start_session_on_site()) {
     
+    session_start(uniqid());
     session_start();
+    session_regenerate_id();
     
 }
 

@@ -91,7 +91,7 @@ class MediaEvent
  * @var string
  * 
  */
- private $media_key;
+ private $meta_key;
 
 /**
  * Media metadata value
@@ -99,7 +99,7 @@ class MediaEvent
  * @var string
  * 
  */
- private $media_value;
+ private $meta_value;
 
 /**
  * Validator
@@ -125,7 +125,7 @@ class MediaEvent
  * @param object $sanitizer
  * 
  */
- public function __construct(Media $mediaDao, FormValidator $validator, Sanitize $sanitizer)
+ public function __construct(MediaDao $mediaDao, FormValidator $validator, Sanitize $sanitizer)
  {
    $this->mediaDao  = $mediaDao;
    $this->validator = $validator;
@@ -228,7 +228,7 @@ class MediaEvent
  */
  public function setMediaKey($key)
  {
-   $this->media_key = $key;
+   $this->meta_key = $key;
  }
 
 /**
@@ -239,7 +239,7 @@ class MediaEvent
  */
  public function setMediaValue($value)
  {
-   $this->media_value = $value;
+   $this->meta_value = $value;
  }
 
 /**
@@ -301,13 +301,13 @@ class MediaEvent
  public function addMediaMeta()
  {
    $this->validator->sanitize($this->mediaId, 'int');
-   $this->validator->sanitize($this->media_key, 'string');
-   $this->validator->sanitize($this->media_value, 'string');
+   $this->validator->sanitize($this->meta_key, 'string');
+   $this->validator->sanitize($this->meta_value, 'string');
 
    return $this->mediaDao->createMediaMeta([
      'media_id' => $this->mediaId,
-     'media_key' => $this->media_key,
-     'media_value' => $this->media_value
+     'meta_key' => $this->meta_key,
+     'meta_value' => $this->meta_value
    ]);
 
  }
