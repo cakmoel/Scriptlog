@@ -3,7 +3,6 @@
  * Dao Class
  * Data Access Object
  * 
- * @package   SCRIPTLOG/LIB/CORE/Dao
  * @category  Core Class
  * @author    M.Noermoehammad
  * @license   MIT
@@ -225,7 +224,7 @@ class Dao
   */
  protected function create($table, $params)
  {
-   $stmt = $this->dbc->dbInsert($table, $params);
+    $this->dbc->dbInsert($table, $params);
  }
  
  /**
@@ -238,7 +237,7 @@ class Dao
   */
  protected function modify($table, $params, $where)
  {
-   $stmt = $this->dbc->dbUpdate($table, $params, $where);
+    $this->dbc->dbUpdate($table, $params, $where);
  }
  
  /**

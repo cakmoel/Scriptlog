@@ -4,7 +4,6 @@
  * Initialize main engine, define constants, and object instantiated
  * include functions needed by application
  * 
- * @package  SCRIPTLOG
  * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0

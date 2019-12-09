@@ -1,9 +1,8 @@
 <?php 
 /**
- * Class UserApp extends BaseApp
+ * Class UserApp 
  *
- * @package   SCRIPTLOG/LIB/APP/UserApp
- * @category  App Class
+ * @category  Class UserApp extends BaseApp
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
@@ -112,7 +111,7 @@ class UserApp extends BaseApp
 
     $this->setView('edit-myprofile');
     $this->setPageTitle('Profile');
-    $this->setFormAction('editUser');
+    $this->setFormAction(ActionConst::EDITUSER);
     $this->view->set('pageTitle', $this->getPageTitle());
     $this->view->set('formAction', $this->getFormAction());
     $this->view->set('userData', $data_user);
@@ -234,7 +233,7 @@ class UserApp extends BaseApp
                 
                 $this->setView('edit-user');
                 $this->setPageTitle('Add New User');
-                $this->setFormAction('newUser');
+                $this->setFormAction(ActionConst::NEWUSER);
                 $this->view->set('pageTitle', $this->getPageTitle());
                 $this->view->set('formAction', $this->getFormAction());
                 $this->view->set('errors', $errors);
@@ -282,7 +281,7 @@ class UserApp extends BaseApp
         
         $this->setView('edit-user');
         $this->setPageTitle('Add New User');
-        $this->setFormAction('newUser');
+        $this->setFormAction(ActionConst::NEWUSER);
         $this->view->set('pageTitle', $this->getPageTitle());
         $this->view->set('formAction', $this->getFormAction());
         $this->view->set('userRole', $this->userEvent->userLevelDropDown());
@@ -374,7 +373,7 @@ class UserApp extends BaseApp
             
               $this->setView('edit-user');
               $this->setPageTitle('Edit User');
-              $this->setFormAction('editUser');
+              $this->setFormAction(ActionConst::EDITUSER);
               $this->view->set('pageTitle', $this->getPageTitle());
               $this->view->set('formAction', $this->getFormAction());
               $this->view->set('errors', $errors);
@@ -422,7 +421,7 @@ class UserApp extends BaseApp
     
         $this->setView('edit-user');
         $this->setPageTitle('Edit User');
-        $this->setFormAction('editUser');
+        $this->setFormAction(ActionConst::EDITUSER);
         $this->view->set('pageTitle', $this->getPageTitle());
         $this->view->set('formAction', $this->getFormAction());
         $this->view->set('userData', $data_user);
@@ -535,7 +534,7 @@ class UserApp extends BaseApp
 
                 $this->setView('edit-myprofile');
                 $this->setPageTitle('Profile');
-                $this->setFormAction('editUser');
+                $this->setFormAction(ActionConst::EDITUSER);
                 $this->view->set('pageTitle', $this->getPageTitle());
                 $this->view->set('formAction', $this->getFormAction());
                 $this->view->set('errors', $errors);
@@ -572,7 +571,7 @@ class UserApp extends BaseApp
 
         $this->setView('edit-myprofile');
         $this->setPageTitle('Profile');
-        $this->setFormAction('editUser');
+        $this->setFormAction(ActionConst::EDITUSER);
         $this->view->set('pageTitle', $this->getPageTitle());
         $this->view->set('formAction', $this->getFormAction());
         $this->view->set('userData', $data_user);
@@ -588,6 +587,7 @@ class UserApp extends BaseApp
    * 
    * {@inheritDoc}
    * @see BaseApp::delete()
+   * 
    */
   public function remove($id)
   {

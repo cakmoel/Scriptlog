@@ -1,9 +1,8 @@
 <?php
 /**
- * Class MenuChildApp extends BaseApp
+ * Class MenuChildApp
  * 
- * @package  SCRIPTLOG/LIB/APP/MenuChildApp
- * @category App Class
+ * @category Class MenuChildApp extends BaseApp
  * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0

@@ -4,7 +4,6 @@
  * Initialize main engine, define constants, and object instantiated
  * include functions needed by application
  * 
- * @package  SCRIPTLOG
  * @category library\main.php file
  * @author   M.Noermoehammad
  * @license  https://opensource.org/licenses/MIT MIT License
@@ -31,6 +30,10 @@ define('APP_PUBLIC', 'public');
 define('APP_LIBRARY', 'lib');
 define('APP_CACHE', false);
 define('APP_FILE_SIZE', 524867);
+define('APP_IMAGE', APP_PUBLIC . DS . 'files' . DS . 'pictures' . DS);
+define('APP_AUDIO', APP_PUBLIC . DS . 'files' . DS . 'audio' . DS);
+define('APP_VIDEO', APP_PUBLIC . DS . 'files' . DS . 'video' . DS);
+define('APP_DOCUMENT', APP_PUBLIC . DS . 'files' . DS . 'docs' . DS);
 define('SCRIPTLOG', $checkIncKey);
 
 if (!defined('APP_ROOT')) define('APP_ROOT', dirname(dirname(__FILE__)) . DS);

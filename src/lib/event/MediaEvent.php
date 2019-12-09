@@ -2,7 +2,6 @@
 /**
  * Class MediaEvent
  * 
- * @package  SCRIPTLOG/LIB/EVENT/MediaEvent
  * @category Event Class
  * @author   M.Noermoehammad
  * @license  MIT
@@ -249,9 +248,9 @@ class MediaEvent
  * @param integer $orderBy
  * 
  */
- public function grabAllMedia($orderBy = 'ID')
+ public function grabAllMedia($orderBy = 'ID', $user_level = null)
  {
-   return $this->mediaDao->findAllMedia($orderBy);
+   return $this->mediaDao->findAllMedia($orderBy, $user_level);
  }
 
 /**
@@ -369,17 +368,26 @@ class MediaEvent
 
       switch ($filetype) {
 
-        case 'audio':
+        case 'audio/mpeg':
+        case 'audio/wav':
+        case 'audio/ogg':    
 
-          if(is_readable(__DIR__ . '/../public/files/audio/'.$filename)) {
+          if(is_readable(__DIR__ . '/../../public/files/audio/'.$filename)) {
 
-             unlink(__DIR__ . '/../public/files/audio/'.$filename);
+             unlink(__DIR__ . '/../../public/files/audio/'.$filename);
 
           }
 
           break;
 
-        case 'document':
+        case 'application/pdf':
+        case 'application/msword':
+        case 'application/rar':
+        case 'application/zip':
+        case 'application/vnd.ms-excel':
+        case 'application/vnd.microsoft.portable-executable':
+        case 'application/vnd.ms-powerpoint':
+        case 'application/octet-stream':              
 
           if(is_readable(__DIR__ . '/../public/files/docs/'.$filename)) {
 
@@ -389,7 +397,9 @@ class MediaEvent
 
           break;
 
-        case 'video':
+        case 'video/mp4':
+        case 'video/webm':
+        case 'video/ogg':    
 
           if(is_readable(__DIR__ . '/../public/files/video/'.$filename)) {
 

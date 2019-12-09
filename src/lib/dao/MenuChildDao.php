@@ -2,7 +2,7 @@
 /**
  * Menu Child class extends Dao
  *
- * @package   SCRIPTLOG/LIB/DAO/MenuChild
+ * 
  * @category  Dao Class
  * @author    M.Noermoehammad
  * @license   MIT

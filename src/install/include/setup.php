@@ -1,8 +1,10 @@
 <?php
 #######################################################################
-#   Setup.php File
-#   This is file to setup installation and write config.php file
-#   @Package    SCRIPTLOG
+#   File Setup.php 
+#   These collections of functions to setup installation 
+#   and write config.php file
+#
+#   @category   Installation file
 #   @author     M.Noermoehammad
 #   @license    MIT
 #   @version    1.0
@@ -148,12 +150,32 @@ $theme_designer  = "Ondrej Svestka";
 $theme_directory = "themes/bootstrapious";
 $theme_status    = "Y";
 
-// setting App Key
+// Setting App Key
 $setting_name_key = "app_key";
 
 // Setting App URL
 $setting_name_url  = "app_url";
 $setting_value_url = $protocol.'://'.$server_host.dirname(dirname($_SERVER['PHP_SELF'])).DIRECTORY_SEPARATOR;
+
+// Setting Site_Name
+$site_name  = "site_name";
+$site_name_value = "Scriptlog 1.0";
+
+// Setting Site_Tagline
+$site_tagline = "site_tagline";
+$site_tagline_value = "Just another personal weblog";
+
+// Setting Site_Description
+$site_description = "site_description";
+$site_description_value = "Scriptlog power you blog";
+
+// Setting Site_Keywords
+$site_keywords = "site_keywords";
+$site_keywords_value = "Weblog, Personal blog, Blogware";
+
+// Setting Site_Email
+$site_email = "site_email";
+
 
 if ($link instanceof mysqli) 
 #create users table
@@ -187,16 +209,41 @@ if ($link->insert_id && $createAdmin->affected_rows > 0) {
     $createSetting = $link -> query($tableSetting);
     $createTheme = $link -> query($tableTheme);
     
-    // insert configuration - setting app key
+    // insert configuration - app_key
     $recordAppKey = $link -> prepare($saveAppKey);
     $recordAppKey -> bind_param('ss', $setting_name_key, $key);
     $recordAppKey -> execute();
 
-    // insert configuration - setting app url
+    // insert configuration - app_url
     $recordAppURL = $link -> prepare($saveAppURL);
     $recordAppURL -> bind_param('ss', $setting_name_url, $setting_value_url);
     $recordAppURL -> execute();
     
+    // insert configuration - site_name
+    $recordAppSiteName = $link -> prepare($saveSiteName);
+    $recordAppSiteName -> bind_param('ss', $site_name, $site_name_value);
+    $recordAppSiteName -> execute();
+
+    // insert configuration - site_tagline
+    $recordAppSiteTagline = $link -> prepare($saveSiteTagline);
+    $recordAppSiteTagline -> bind_param('ss', $site_tagline, $site_tagline_value);
+    $recordAppSiteTagline -> execute();
+
+    // insert configuration - site_description
+    $recordAppSiteDescription = $link -> prepare($saveSiteDescription);
+    $recordAppSiteDescription -> bind_param('ss', $site_description, $site_description_value);
+    $recordAppSiteDescription -> execute();
+
+    // insert configuration - site_keywords
+    $recordAppSiteKeywords = $link -> prepare($saveSiteKeywords);
+    $recordAppSiteKeywords -> bind_param('ss', $site_keywords, $site_keywords_value);
+    $recordAppSiteKeywords -> execute();
+
+    // insert configuration - site_email
+    $recordAppSiteEmail = $link -> prepare($saveSiteEmail);
+    $recordAppSiteEmail -> bind_param('ss', $site_email, $user_email);
+    $recordAppSiteEmail -> execute();
+
     // insert default theme
     $recordTheme = $link -> prepare($saveTheme);
     $recordTheme -> bind_param('sssss', $theme_title, $theme_desc, $theme_designer, $theme_directory, $theme_status);

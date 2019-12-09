@@ -3,7 +3,6 @@
  * Tokenizer Class
  * Utitlize Cookies for authorization and authentication
  *
- * @package   SCRIPTLOG/LIB/CORE/Tokenizer
  * @category  Core Class
  * @author    Vincy vincy@gmail.com
  * @link      https://phppot.com/php/secure-remember-me-for-login-using-php-session-and-cookies/

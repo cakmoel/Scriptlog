@@ -1,13 +1,12 @@
 <?php
 /**
- * Class ThemeApp extends BaseApp
+ * Class ThemeApp
  * 
- * @package  SCRIPTLOG/LIB/APP/ThemeApp
- * @category App Class
+ * @category Class ThemeApp extends BaseApp
  * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0.0
- * @since    Since Release 1.0.0
+ * @since    Since Release 1.0
  * 
  */
 class ThemeApp extends BaseApp

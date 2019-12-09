@@ -1,8 +1,7 @@
 <?php
 /**
- * AppException Class extends CoreException
+ * Class AppException
  * 
- * @package  SCRIPTLOG/LIB/CORE/AppException
  * @category Core Class
  * @author   M.Noermoehammad
  * @license  MIT

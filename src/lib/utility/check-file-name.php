@@ -3,7 +3,6 @@
  * Function check uploaded filename
  * 
  * @category function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @see https://www.php.net/manual/en/function.move-uploaded-file.php#111412
  * @param string $filename
  * @return bool

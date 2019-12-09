@@ -2,6 +2,7 @@
 /**
  * Make Date Function
  * 
+ * @category Function
  * @param string $value
  * @param null $locale
  * @return string

@@ -2,7 +2,6 @@
 /**
  * CoreException Class extends Exception implements IException
  *
- * @package   SCRIPTLOG/LIB/CORE/CoreException
  * @category  Core Class
  * @link      https://secure.php.net/manual/en/language.exceptions.php#91159
  * @version   1.0

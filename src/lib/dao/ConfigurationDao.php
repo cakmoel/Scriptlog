@@ -2,7 +2,7 @@
 /**
  * Class Configuration extends Dao
  * 
- * @package   SCRIPTLOG/LIB/DAO/Configuration
+ * 
  * @category  Dao Class
  * @author    Maoelana Noermoehammad
  * @license   MIT

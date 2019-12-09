@@ -3,7 +3,6 @@
  * Function autolink
  * 
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * @see http://www.couchcode.com/php/auto-link-function/
  * @param string $text
  * @return string

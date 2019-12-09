@@ -9,7 +9,7 @@
       </h1>
       <ol class="breadcrumb">
         <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="index.php?load=media">Media</a></li>
+        <li><a href="index.php?load=medialib">Media</a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
     </section>
@@ -51,26 +51,60 @@ echo "Error saving data. Please try again." . $saveError;
 endif;
 ?>
 
-<form method="post" action="index.php?load=medialib&action=<?=(isset($formAction)) ? $formAction : null; ?>&mediaId=0" 
+<form method="post" action="index.php?load=medialib&action=<?=(isset($formAction)) ? $formAction : null; ?>&Id=0" 
   role="form" enctype="multipart/form-data" autocomplete="off" >
    
 <input type="hidden" name="MAX_FILE_SIZE" value="10485760" />
 <div class="box-body">
+
+<?php 
+if (isset($mediaData['media_filename'])) :
+
+  $image_src = invoke_image_uploaded($mediaData['media_filename'], false);
+  $image_src_thumb = invoke_image_uploaded($mediaData['media_filename']);
+
+     if(!$image_src_thumb) :
+      
+      $image_src_thumb = __DIR__ . '/../../../public/files/pictures/thumbs/nophoto.jpg';
+
+     endif;
+
+  if($image_src) :
+
+?>
+<div class="form-group">
+<br><a href="<?=$image_src; ?>" target="_blank">
+<img src="<?=$image_src_thumb; ?>"></a><br>
+<label>Change file</label>
+<input type="file"  name="media" id="mediaUploaded" >
+<p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
+</div>
+  <?php else: ?>
+<div class="form-group">
+<br><a href="#"><?=invoke_fileicon($mediaData['media_type']);?></a><br>
+<label>Change file</label>
+<input type="file"  name="media" id="mediaUploaded" >
+<p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
+</div>
+  <?php endif; ?>
+
+<?php else: ?>
 <div class="form-group">
 <label>Select file  (required)</label>
 <input type="file"  name="media" id="mediaUploaded" required>
 <p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
 </div>
+<?php endif; ?>
 
 <div class="form-group">
 <label>Caption </label>
 <input type="text" class="form-control" name="media_caption" placeholder="type media caption" value="
-<?=(isset($mediaData['media_caption'])) ? htmlspecialchars($pluginData['media_caption']) : ""; ?>
+<?=(isset($mediaData['media_caption'])) ? htmlspecialchars($mediaData['media_caption']) : ""; ?>
 <?=(isset($formData['media_caption'])) ? htmlspecialchars($formData['media_caption'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" >
 </div>
 
 <div class="form-group">
-<label>Media will be shown on</label>
+<label>Display on</label>
 <?=(isset($mediaTarget)) ? $mediaTarget : ""; ?>
 </div>
 <!-- media target -->
@@ -88,8 +122,8 @@ endif;
 <div class="radio">
 <label>
 <input type="radio" name="media_status" id="optionsRadios1" value="Y" 
-<?=(isset($mediaData['media_status']) && $mediaData['media_status'] === 'Y') ? 'checked="checked"' : "";  ?>
-<?=(isset($formData['media_status']) && $formData['media_status'] === 'Y') ? 'checked="checked"' : "" ?>>
+<?=(isset($mediaData['media_status']) && $mediaData['media_status'] === 1) ? 'checked="checked"' : "";  ?>
+<?=(isset($formData['media_status']) && $formData['media_status'] === 1) ? 'checked="checked"' : "" ?>>
    Yes
  </label>
 </div>
@@ -97,8 +131,8 @@ endif;
 <div class="radio">
 <label>
 <input type="radio" name="media_status" id="optionsRadios1" value="N" 
-<?=(isset($mediaData['media_status']) && $mediaData['media_status'] === 'N') ? 'checked="checked"' : ""; ?>
-<?=(isset($formData['media_status']) && $formData['media_status'] == 'N') ? 'checked="checked"' : ""; ?>>
+<?=(isset($mediaData['media_status']) && $mediaData['media_status'] === 0) ? 'checked="checked"' : ""; ?>
+<?=(isset($formData['media_status']) && $formData['media_status'] == 0) ? 'checked="checked"' : ""; ?>>
    No
  </label>
 </div>
@@ -111,7 +145,7 @@ endif;
 <!-- /.box-body -->
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
-<input type="submit" name="mediaFormSubmit" class="btn btn-primary" value="Upload">
+<input type="submit" name="mediaFormSubmit" class="btn btn-primary" value="<?=(isset($mediaData['ID']) && $mediaData['ID'] != '') ? "Update" : "Upload"; ?>">
 
 </div>
 </form>
@@ -127,5 +161,8 @@ endif;
 </div>
 <!-- /.content-wrapper -->
 <script type="text/javascript">
-
+  var loadFile = function(event) {
+	    var output = document.getElementById('output');
+	    output.src = URL.createObjectURL(event.target.files[0]);
+	  };
 </script>

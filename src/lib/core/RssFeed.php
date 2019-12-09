@@ -2,7 +2,6 @@
 /**
  * RssFeed Class
  *
- * @package   SCRIPTLOG/LIB/CORE/RssFeed
  * @category  Core Class
  * @author    M.Noermoehammad
  * @license   MIT

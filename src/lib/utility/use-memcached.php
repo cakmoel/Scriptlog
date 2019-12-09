@@ -4,8 +4,6 @@
  * to use memcached functionality
  * 
  * @category Function to use memcached class
- * @package  SCRIPTLOG/LIB/UTILITY
- * 
  * 
  */
 

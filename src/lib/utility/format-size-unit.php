@@ -3,7 +3,6 @@
  * Format size unit function
  * 
  * @category  Function
- * @package   SCRIPTLOG/LIB/UTILITY
  * @param number $bytes
  * @return string
  * 

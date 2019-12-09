@@ -1,9 +1,8 @@
 <?php 
 /**
- * Abstract Class BaseApp implements AppInterface
+ * Abstract Class BaseApp 
  *
- * @package   SCRIPTLOG/LIB/CORE/BaseApp
- * @category  Core Class
+ * @category  Abstract Class BaseApp implements AppInterface
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0

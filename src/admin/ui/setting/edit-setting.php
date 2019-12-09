@@ -61,7 +61,7 @@ endif;
 <input type="text" class="form-control" name="setting_name" placeholder="Enter name here" value="
 <?=(isset($settingData['setting_name'])) ? htmlspecialchars($settingData['setting_name']) : ""; ?>
 <?=(isset($formData['setting_name'])) ? htmlspecialchars($formData['setting_name'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" required 
-<?=(isset($settingData['setting_name']) && ($settingData['setting_name'] == 'app_key')) ? "disabled" : ""; ?>>
+<?=(isset($settingData['setting_name'])) ? "disabled" : ""; ?>>
 </div>
 
 <div class="form-group">

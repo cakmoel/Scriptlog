@@ -37,4 +37,5 @@ function check_path_in_folder($path, $folder) {
     }
     // OK
     return $path;
+    
 }

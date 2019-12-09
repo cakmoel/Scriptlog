@@ -2,7 +2,6 @@
 /**
  * Class FIleCache
  * 
- * @package  SCRIPTLOG/LIB/CORE/FileCache
  * @category Core Class
  * @author   Evert Pot
  * @see      https://evertpot.com/107/

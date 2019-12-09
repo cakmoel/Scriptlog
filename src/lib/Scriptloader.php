@@ -3,8 +3,7 @@
  * Class Scriptloader
  * Load all class files in any directories selected
  * 
- * @package     SCRIPTLOG
- * @category    library\Scriptloader 
+ * @category    Library Class Scriptloader load all class directories selected 
  * @author      M.Noermoehammad 
  * @license     MIT
  * @version     1.0

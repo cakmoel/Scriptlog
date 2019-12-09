@@ -1,11 +1,12 @@
 <?php
 /**
- * ActionConst Class
- * 
  * The collection of actions constant 
  * 
- * @package SCRIPTLOG/LIB/CORE/ActionConst
- * @category Core Class
+ * @category Class ActionConst
+ * @author   M.Noermoehammad
+ * @license  MIT
+ * @version  1.0
+ * @since    Since Release 1.0
  * 
  */
 class ActionConst

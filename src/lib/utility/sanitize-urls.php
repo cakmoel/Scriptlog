@@ -3,7 +3,6 @@
  * Function sanitize_urls
  * 
  * @category function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @see https://github.com/vito/chyrp/blob/35c646dda657300b345a233ab10eaca7ccd4ec10/includes/helpers.php#L515
  * @return string
  * 

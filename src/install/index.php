@@ -2,14 +2,15 @@
 /**
  * File index.php 
  * 
- * @package   SCRIPTLOG INSTALLATION
- * @category  install\index.php file
+ * @category  installation file -- index.php
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   0.1
  * @since     Since Release 0.1
  * 
  */
+
+header('Content-Type: text/html; charset=utf-8');
 require dirname(__FILE__) . '/include/settings.php';
 require dirname(__FILE__) . '/include/check-engine.php';
 require dirname(__FILE__) . '/include/setup.php';
@@ -33,8 +34,7 @@ if((check_dbtable($dbconnect, 'tbl_users') == true) || (check_dbtable($dbconnect
 || (check_dbtable($dbconnect, 'tbl_post_topic') == true) || (check_dbtable($dbconnect, 'tbl_plugin') == true)
 || (check_dbtable($dbconnect, 'tbl_menu_child') == true) || (check_dbtable($dbconnect, 'tbl_menu') == true)
 || (check_dbtable($dbconnect, 'tbl_mediameta') == true) || (check_dbtable($dbconnect, 'tbl_media') == true)
-|| (check_dbtable($dbconnect, 'tbl_comments') == true) 
-|| (check_dbtable($dbconnect, 'tbl_comment_reply') == true)) {
+|| (check_dbtable($dbconnect, 'tbl_comments') == true) || (check_dbtable($dbconnect, 'tbl_comment_reply') == true)) {
 
   $create_db = $protocol . '://' . $server_host . dirname($_SERVER['PHP_SELF']) . DIRECTORY_SEPARATOR .'install.php';
 
@@ -291,7 +291,17 @@ install_header($current_path, $protocol, $server_host);
     </h4>
 
     <?= required_settings(); ?>
+
+    <?php if(check_web_server()['WebServer'] == 'nginx') : ?>
+      
+      <h4 class="d-flex justify-content-between align-items-center mb-3">
+      <span class="text-muted">Directories and Files</span>
+      </h4>
     
+    <?= check_dir_file(); ?>
+
+    <?php else: ?>
+
     <?= check_mod_rewrite(); ?>
     
     <h4 class="d-flex justify-content-between align-items-center mb-3">
@@ -299,6 +309,8 @@ install_header($current_path, $protocol, $server_host);
     </h4>
     
     <?= check_dir_file(); ?>
+
+    <?php endif; ?>
 
 </div>
         

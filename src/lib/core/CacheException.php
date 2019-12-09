@@ -1,9 +1,8 @@
 <?php
 /**
- * CacheException Class extends CoreException Class
+ * CacheException Class 
  * 
- * @package  SCRIPTLOG/LIB/CORE/CacheException
- * @category Core Class
+ * @category CacheException Class extends CoreException Class
  * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0

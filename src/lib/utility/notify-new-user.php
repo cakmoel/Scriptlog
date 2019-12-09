@@ -1,6 +1,8 @@
 <?php
 /**
  * Mail Sender Function
+ * 
+ * @category Function
  * @param string $sender
  * @param string $recipient
  * @param string $subject

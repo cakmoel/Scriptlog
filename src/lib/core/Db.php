@@ -4,7 +4,6 @@
  * This Class DB uses PDO-MySQL functionality 
  * and it's methods implemented from DbInterface
  * 
- * @package   SCRIPTLOG/LIB/CORE/Db
  * @category  Core Class
  * @author    M.Noermoehammad
  * @license   MIT

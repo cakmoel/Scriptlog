@@ -4,7 +4,6 @@
  * giving dashboard application interface to set page title and handle dashboard's view.
  * This class inherented to Class Dashboard
  * 
- * @package   SCRIPTLOG/LIB/CORE/BoardInterface
  * @category  Core Class
  * @author    M.Noermoehammad
  * @license   MIT

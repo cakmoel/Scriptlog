@@ -2,13 +2,13 @@
 /**
  * File finish.php
  * 
- * @category  installation file finish.php
- * @package   SCRIPTLOG INSTALLATION
+ * @category  installation file -- finish.php
  * @author    M.Noermoehammad
  * @license   MIT
- * @version   1.0
+ * @version   0.1
+ * @since     Since Release 0.1
  *   
- * */
+ */
 require dirname(__FILE__) . '/include/settings.php';
 require dirname(__FILE__) . '/include/setup.php';
 require dirname(__FILE__) . '/install-layout.php';

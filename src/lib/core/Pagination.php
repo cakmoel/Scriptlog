@@ -3,8 +3,6 @@
  * Pagination class
  * digunakan untuk paging
  * 
- * 
- * @package  SCRIPTLOG/LIB/CORE/Pagination
  * @category Core Class
  * @author   Lukmanul Hakim - Bukulokomedia 
  * 

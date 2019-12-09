@@ -3,7 +3,6 @@
  * file activate-user.php
  * 
  * @category  file user activation
- * @package   SCRIPTLOG
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0

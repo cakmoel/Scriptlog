@@ -3,7 +3,6 @@
  * Function check_integer
  * 
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * @param integer $input
  * @see https://www.php.net/manual/en/function.is-int.php#82857
  * @return boolean

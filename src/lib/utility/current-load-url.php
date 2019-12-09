@@ -3,7 +3,6 @@
  * Function current_load_url
  * 
  * @category function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @see https://webcheatsheet.com/php/get_current_page_url.php
  * @return string
  * 

@@ -2,7 +2,6 @@
 /**
  * Authentication Class
  *
- * @package   SCRIPTLOG/LIB/CORE/Authentication
  * @category  Core Class
  * @author    M.Noermoehammad
  * @license   MIT
@@ -192,8 +191,8 @@ class Authentication
  public function login(array $values)
  {
     
-     $email = $values['user_email'];
-     $password = $values['user_pass'];
+     $email = htmlspecialchars($values['user_email']);
+     $password = htmlspecialchars($values['user_pass']);
      $remember_me = isset($values['remember']);
 
      $this->validator->sanitize($email, 'email');
@@ -439,14 +438,14 @@ public function userAccessControl($control = 'dashboard')
 
         case 'themes':
 
-           if($this->accessLevel() != 'manager') {
+           if($this->accessLevel() != 'manager' && $this->accessLevel() != 'administrator') {
 
                return false;
 
            }
 
             break;
-
+        
         default:
           
             if($this->accessLevel() != 'administrator' && $this->accessLevel() != 'manager' 

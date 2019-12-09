@@ -2,6 +2,7 @@
 /**
  * Prevent Injection Function
  * 
+ * @category Function
  * @param string $data
  * @return string
  */

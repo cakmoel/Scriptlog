@@ -3,7 +3,6 @@
  * file recover-password.php
  * 
  * @category  recovering user password
- * @package   SCRIPTLOG
  * @author    M.Noermoehammad
  * 
  */
@@ -102,6 +101,8 @@ if (empty($recoverFormSubmitted) == false) {
 
   <!-- Google Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+  <!-- Icon -->
+  <link href="favicon.ico" rel="Shortcut Icon">
   
 </head>
 <body class="hold-transition login-page">

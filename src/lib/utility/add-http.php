@@ -4,7 +4,6 @@
  * add http prefix to URL when it missing
  *  
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * @see https://stackoverflow.com/questions/2762061/how-to-add-http-if-it-doesnt-exists-in-the-url
  * @param string $url
  * @return string

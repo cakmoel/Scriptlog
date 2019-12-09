@@ -4,7 +4,6 @@
  * Retrieving site setting info
  * 
  * @category function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @return array[][]
  * 
  */

@@ -2,7 +2,6 @@
 /**
  * Class PageEvent
  *
- * @package   SCRIPTLOG/LIB/EVENT/PageEvent
  * @category  Event Class
  * @author    M.Noermoehammad
  * @license   MIT

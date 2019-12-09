@@ -2,7 +2,6 @@
 /**
  * Registry Class
  * 
- * @package   SCRIPTLOG/LIB/CORE/Registry
  * @category  Core Class
  * @author    M.Noermoehammad
  * @license   MIT

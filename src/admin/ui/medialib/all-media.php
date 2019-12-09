@@ -7,7 +7,7 @@
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
         <small>
-        <a href="index.php?load=medialib&action=newMedia&mediaId=0" class="btn btn-primary"><i class="fa fa-cloud-upload"></i> Add New</a>
+        <a href="index.php?load=medialib&action=newMedia&Id=0" class="btn btn-primary"><i class="fa fa-cloud-upload"></i> Add New</a>
         </small>
       </h1>
       <ol class="breadcrumb">
@@ -68,10 +68,10 @@
                 <thead>
                 <tr>
                   <th>#</th>
-                  <th>Filename</th>
-                  <th>Size</th>
+                  <th>File</th>
                   <th>Type</th>
-                  <th>Download</th>
+                  <th>Display on</th>
+                  <th>Edit</th>
                   <th>Delete</th>
                 </tr>
                 </thead>
@@ -85,8 +85,20 @@
               
                     <tr>
                        <td><?= $no; ?></td>
-                      
-                    
+                       <td><a href="<?=medialib_link($media['media_type'], $media['media_filename']);?>"  title="<?=htmlspecialchars($media['media_caption']);?>"><?=invoke_fileicon($media['media_type']); ?></a></td>
+                       <td><?= htmlspecialchars($media['media_type']); ?></td>
+                       <td><?= htmlspecialchars($media['media_target']); ?></td>
+
+                       <td>
+                       <a href="<?=generate_request("index.php", 'get', ['medialib', 'editMedia', $media['ID']])['link']; ?>" class="btn btn-warning">
+                       <i class="fa fa-pencil fa-fw"></i> Edit</a>
+                       </td>
+
+                       <td>
+                       <a href="javascript:deleteMedia('<?= abs((int)$media['ID']); ?>', '<?= $media['media_user']; ?>')" class="btn btn-danger">
+                       <i class="fa fa-trash-o fa-fw"></i> Delete</a>
+                       </td>
+
                     </tr>
                 
                 <?php 
@@ -98,10 +110,10 @@
                 <tfoot>
                 <tr>
                   <th>#</th>
-                  <th>Filename</th>
-                  <th>Size</th>
+                  <th>File</th>
                   <th>Type</th>
-                  <th>Download</th>
+                  <th>Display on</th>
+                  <th>Edit</th>
                   <th>Delete</th>
                 </tr>
                 </tfoot>
@@ -118,3 +130,12 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
+  <script type="text/javascript">
+  function deleteMedia(id, level)
+  {
+	  if (confirm("Are you sure want to delete media from '" + level + "'"))
+	  {
+	  	window.location.href = 'index.php?load=medialib&action=deleteMedia&Id=' + id;
+	  }
+  }
+</script>

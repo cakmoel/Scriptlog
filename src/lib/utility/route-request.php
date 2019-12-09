@@ -4,6 +4,7 @@
  * this function will be called in index.php file
  * on top of our site directory
  * 
+ * @category Function 
  * @return mixed
  * 
  */

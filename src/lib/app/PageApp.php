@@ -1,9 +1,8 @@
 <?php 
 /**
- * Class PageApp extends BaseApp
+ * Class PageApp
  *
- * @package   SCRIPTLOG/LIB/APP/PageApp
- * @category  App Class
+ * @category  Class PageApp extends BaseApp
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0

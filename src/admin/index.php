@@ -2,11 +2,9 @@
 /**
  * File index.php
  * 
- * @package  SCRIPTLOG
  * @category admin\index.php
  * @author   M.Noermoehammad 
  * @license  https://opensource.org/licenses/MIT MIT License
- * @link     https://scriptlog.web.id
  * 
  */
 if (file_exists(__DIR__ . '/../config.php')) {

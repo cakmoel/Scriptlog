@@ -1,5 +1,8 @@
 <?php
 /**
+ * Function start session on site
+ * 
+ * @category function 
  * 
  */
 function start_session_on_site()

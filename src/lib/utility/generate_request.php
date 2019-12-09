@@ -1,0 +1,78 @@
+<?php
+/**
+ * Function generate request
+ * create http query to request within HTML ahref attribute
+ * 
+ * @category Function
+ * @param string $value
+ * @param string $type
+ * @return array
+ * 
+ */
+function generate_request($base, $type, $data = array(), $string_encoded = true )
+{
+ 
+ $html = array();
+
+ $load = (is_array($data) && array_key_exists(0, $data)) ? rawurlencode($data[0]) : '';
+ $action = (is_array($data) && array_key_exists(1, $data)) ? urlencode($data[1]) : '';
+ $id = (is_array($data) && array_key_exists(2, $data)) ? urlencode($data[2]) : '';
+ $unique_id = (is_array($data) && array_key_exists(3, $data)) ? urlencode($data[3]) : '';
+
+ switch ($type) {
+
+   case 'get':
+
+      if ($string_encoded) {
+
+         if ($load === 'users') {
+
+            $query_data = array(
+              
+              'load' => $load,
+              'action'=> $action,
+              'Id'=> abs((int)$id),
+              'sessionId' => sanitize_urls($unique_id)
+
+            );
+
+         } else {
+
+            $query_data = array(
+              
+              'load' => $load,
+              'action'=> $action,
+              'Id'=> abs((int)$id)
+         
+           );
+
+         }
+
+         $html['link'] = build_query($base, $query_data);
+
+      } else {
+
+         $query_data = array(
+
+             'load' => sanitize_urls($load)
+
+         );
+
+         $html['link'] = build_query($base, $query_data);
+          
+      } 
+
+      break;
+
+
+   case 'post':
+
+      
+      break;
+
+       
+ }
+
+ return $html;
+   
+}

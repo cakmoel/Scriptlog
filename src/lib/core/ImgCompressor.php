@@ -4,7 +4,6 @@
 * Coded by Ican Bachors 2016.
 * http://ibacor.com/labs/php-image-compressor-class
 * Updates will be posted to this site.
-* @package SCRIPTLOG/LIB/CORE/ImgCompressor
 * @category Core Class
 ***********************************************************/
 class ImgCompressor {	

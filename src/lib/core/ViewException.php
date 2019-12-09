@@ -2,7 +2,6 @@
 /**
  * ViewException Class
  *
- * @package   SCRIPTLOG/LIB/CORE/ViewException
  * @category  Core Class
  * @author    M.Noermoehammad
  * @license   MIT

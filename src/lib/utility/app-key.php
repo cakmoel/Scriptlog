@@ -5,7 +5,6 @@
  * between application key on database and configuration file
  * 
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * @return string
  * 
  */

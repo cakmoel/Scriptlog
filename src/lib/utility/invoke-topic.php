@@ -3,7 +3,6 @@
  * invoke topic function
  * 
  * @category Function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @param integer $args
  * 
  */

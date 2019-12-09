@@ -1,8 +1,7 @@
 <?php
 /**
  * Class FrontException extends CoreException
- * 
- * @package  SCRIPTLOG/LIB/CORE/FrontException
+ *
  * @category Core Class
  * @author   M.Noermoehammad
  * @license  MIT

@@ -4,7 +4,6 @@
  * find request URI path
  * 
  * @category Function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @return array
  * 
  */

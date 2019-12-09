@@ -2,7 +2,7 @@
 /**
  * Plugin class extends Plugin
  *
- * @package   SCRIPTLOG/LIB/DAO/Plugin
+ * 
  * @category  Dao Class
  * @author    M.Noermoehammad
  * @license   MIT

@@ -2,7 +2,7 @@
 /**
  * Class Media extends Dao
  * 
- * @package  SCRIPTLOG/LIB/DAO/Media
+ * 
  * @category Dao Class
  * @author   M.Noermoehammad
  * @license  MIT
@@ -13,9 +13,7 @@
 class MediaDao extends Dao
 {
 
-/**
- * 
- */
+
 public function __construct()
 {
     parent::__construct();
@@ -29,24 +27,48 @@ public function __construct()
  * @return array
  * 
  */
-public function findAllMedia($orderBy = 'ID')
+public function findAllMedia($orderBy = 'ID', $user_level = null)
 {
 
-  $sql = "SELECT ID, 
-                 media_filename, 
-                 media_caption, 
-                 media_type, 
-                 media_target,
-                 media_user, 
-                 media_access,
-                 media_status
-         FROM tbl_media
+  if (!is_null($user_level)) {
+
+    $sql = "SELECT m.ID, 
+                 m.media_filename, 
+                 m.media_caption, 
+                 m.media_type, 
+                 m.media_target,
+                 m.media_user, 
+                 m.media_access,
+                 m.media_status,
+                 u.user_level
+         FROM tbl_media AS m
+         INNER JOIN tbl_users AS u ON m.media_user = u.user_level
+         WHERE m.media_user = :user_level
          ORDER BY :orderBy DESC";
 
-  $this->setSQL($sql);
+    $this->setSQL($sql);
   
-  $medias = $this->findAll([':orderBy' => $orderBy]);
+    $medias = $this->findAll([':orderBy' => $orderBy, ':user_level'=> $user_level]);
 
+  } else {
+
+     $sql = "SELECT ID, 
+                    media_filename, 
+                    media_caption, 
+                    media_type, 
+                    media_target,
+                    media_user, 
+                    media_access,
+                    media_status
+            FROM tbl_media
+            ORDER BY :orderBy DESC";
+
+    $this->setSQL($sql);
+    
+    $medias = $this->findAll([':orderBy' => $orderBy]);
+    
+  }
+  
   if(empty($medias)) return false;
 
   return $medias;

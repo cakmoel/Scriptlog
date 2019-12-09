@@ -1,7 +1,7 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$postId = isset($_GET['postId']) ? abs((int)$_GET['postId']) : 0;
+$postId = isset($_GET['Id']) ? abs((int)$_GET['Id']) : 0;
 $postDao = new PostDao();
 $validator = new FormValidator();
 $postEvent = new PostEvent($postDao, $validator, $sanitizer);

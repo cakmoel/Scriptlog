@@ -3,7 +3,6 @@
  * Abstract Class Cache
  * Abstract it functionality to read cache, write cache, and remove cache
  * 
- * @package  SCRIPTLOG/LIB/CORE/Cache
  * @category Core Class
  * @abstract Class Cache
  * @author   Evert Pot

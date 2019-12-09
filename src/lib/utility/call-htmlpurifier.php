@@ -3,7 +3,6 @@
  * Function Call HTMLPurifier
  * 
  * @category Function
- * @package SCRIPTLOG/LIB/UTILITY
  * @return string
  * 
  */

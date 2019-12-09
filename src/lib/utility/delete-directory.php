@@ -3,7 +3,6 @@
  * Delete Directory Function
  * 
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * @param string $dirname
  * @return boolean
  * 

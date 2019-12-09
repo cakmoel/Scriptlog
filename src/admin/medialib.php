@@ -1,7 +1,7 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$mediaId = isset($_GET['mediaId']) ? abs((int)$_GET['mediaId']) : 0;
+$mediaId = isset($_GET['Id']) ? abs((int)$_GET['Id']) : 0;
 $mediaDao = new MediaDao();
 $validator = new FormValidator();
 $mediaEvent = new MediaEvent($mediaDao, $validator, $sanitizer);

@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * File dbtable.php
+ * 
+ */
 $tableUser = "CREATE TABLE IF NOT EXISTS tbl_users (
 ID BIGINT(20) unsigned NOT NULL auto_increment,
 user_login VARCHAR(60) NOT NULL,
@@ -162,8 +165,13 @@ theme_status enum('Y','N') NOT NULL DEFAULT 'N',
 PRIMARY KEY(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
-$saveAdmin   = "INSERT INTO tbl_users (user_login, user_email, user_pass, user_level, user_registered, `user_session`) VALUES (?, ?, ?, ?, ?, ?)";
-$saveAppKey  = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
-$saveAppURL  = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
+$saveAdmin    = "INSERT INTO tbl_users (user_login, user_email, user_pass, user_level, user_registered, `user_session`) VALUES (?, ?, ?, ?, ?, ?)";
+$saveAppKey   = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
+$saveAppURL   = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
+$saveSiteName = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
+$saveSiteTagline = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
+$saveSiteDescription = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
+$saveSiteKeywords = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
+$saveSiteEmail = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
 $savePermalinks = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
 $saveTheme   = "INSERT INTO tbl_themes (theme_title, theme_desc, theme_designer, theme_directory, theme_status) VALUES (?, ?, ?, ?, ?)";

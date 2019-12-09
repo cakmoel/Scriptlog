@@ -3,6 +3,7 @@
  * setplugin function
  * Checking whether plugin actived then set it as plugin navigation on sidebar nav
  * 
+ * @category Function
  * @param string $access_level
  * 
  */

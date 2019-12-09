@@ -2,6 +2,7 @@
 /**
  * Functions apcu_read_cache
  * 
+ * @category Function
  * @param string $key
  * 
  */

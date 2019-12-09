@@ -1,10 +1,9 @@
 <?php
 /**
- * Class APC extends Cache
+ * Class APC 
  * This is APC Cache functionality to handle APC implemented by system caches
  * 
- * @package  SCRIPTLOG/LIB/CORE/APC
- * @category Core Class
+ * @category Class APC extends Cache
  * @author   Evert Pot
  * @see      https://evertpot.com/107/
  * @license  MIT

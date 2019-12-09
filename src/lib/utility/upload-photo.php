@@ -2,8 +2,7 @@
 /**
  * Upload photo
  * 
- * @package SCRIPTLOG FUNCTIONS
- * @category lib\upload-photo.php
+ * @category Function upload_photo
  * @param string $file_name
  * @param integer $width
  * @param integer $height

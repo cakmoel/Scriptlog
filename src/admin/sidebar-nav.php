@@ -33,7 +33,7 @@ if ($level == 'administrator' || $level == 'manager' || $level == 'editor'
           </a>
           <ul class="treeview-menu">
             <li><a href="<?= $url.'index.php?load=posts'; ?>">All Posts</a></li>
-            <li><a href="<?= $url.'index.php?load=posts&action=newPost&postId=0'; ?>">Add New</a></li>
+            <li><a href="<?= $url.'index.php?load=posts&action=newPost&Id=0'; ?>">Add New</a></li>
             <?php 
              if ($level == 'administrator' || $level == 'manager' || $level == 'editor') :
             ?>
@@ -66,7 +66,7 @@ if ($level == 'administrator' || $level == 'manager' || $level == 'editor'
           <ul class="treeview-menu">
 
             <li><a href="<?= $url.'index.php?load=medialib'; ?>">Library</a></li>
-            <li><a href="<?= $url.'index.php?load=medialib&action=newMedia&mediaId=0'; ?>">Add New</a></li>
+            <li><a href="<?= $url.'index.php?load=medialib&action=newMedia&Id=0'; ?>">Add New</a></li>
             
           </ul>
 
@@ -101,7 +101,7 @@ if ($level == 'administrator' || $level == 'manager') :
           </a>
           <ul class="treeview-menu">
             <li><a href="<?= $url.'index.php?load=pages'; ?>">All Pages</a></li>
-            <li><a href="<?= $url.'index.php?load=pages&action=newPage&pageId=0'; ?>">Add New</a></li>
+            <li><a href="<?= $url.'index.php?load=pages&action=newPage&Id=0'; ?>">Add New</a></li>
           </ul>
         </li>
         
@@ -120,7 +120,7 @@ if($level == 'administrator' || $level == 'manager') :
           </a>
           <ul class="treeview-menu">
             <li><a href="<?= $url.'index.php?load=users'; ?>">All Users</a></li>
-            <li><a href="<?= $url.'index.php?load=users&action=newUser&userId=0'; ?>">Add New</a></li>
+            <li><a href="<?= $url.'index.php?load=users&action=newUser&Id=0'; ?>">Add New</a></li>
           </ul>
         </li>
 <?php 
@@ -166,7 +166,7 @@ if($level == 'administrator') :
           </a>
           <ul class="treeview-menu">
             <li><a href="<?= $url.'index.php?load=plugins'; ?>">Installed Plugins</a></li>
-            <li><a href="<?= $url.'index.php?load=plugins&action=newPlugin&pluginId=0'; ?>">Add New</a></li>
+            <li><a href="<?= $url.'index.php?load=plugins&action=newPlugin&Id=0'; ?>">Add New</a></li>
           </ul>
         </li>
 

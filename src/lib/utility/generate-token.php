@@ -5,7 +5,6 @@
  * that send random string to user
  * 
  * @category Function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @param number $length
  * @return string
  * 

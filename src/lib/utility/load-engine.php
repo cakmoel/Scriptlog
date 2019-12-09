@@ -3,7 +3,6 @@
  * Load engine function
  * 
  * @category Function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @param array $directory
  * @return mixed
  * 

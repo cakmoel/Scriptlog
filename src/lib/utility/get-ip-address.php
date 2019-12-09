@@ -3,7 +3,6 @@
  * Get IP Address Function
  * 
  * @category  Function
- * @package   SCRIPTLOG/LIB/UTILITY
  * @link https://stackoverflow.com/questions/1634782/what-is-the-most-accurate-way-to-retrieve-a-users-correct-ip-address-in-php
  * @return string
  * 

@@ -1,9 +1,8 @@
 <?php
 /**
- * Class PluginApp extends BaseApp
+ * Class PluginApp
  * 
- * @package  SCRIPTLOG/LIB/APP/PluginApp
- * @category App Class
+ * @category Class PluginApp extends BaseApp
  * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0.0

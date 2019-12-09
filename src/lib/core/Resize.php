@@ -9,8 +9,7 @@
  * $resizeObj -> resizeImage(150, 100, 0)
  * $resizeObj -> saveImage('images/cars/large/output.jpg', 100);
  * 
- * @package  SCRIPTLOG
- * @category libray\core\Resize
+ * @category Core Class
  * @author   Jarrod Oberto
  * 
  */

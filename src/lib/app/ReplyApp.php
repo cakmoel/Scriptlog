@@ -1,9 +1,8 @@
 <?php
 /**
- * Class ReplyApp extends Class BaseApp
+ * Class ReplyApp 
  * 
- * @package  SCRIPTLOG/LIB/ReplyApp
- * @category App Class
+ * @category Class ReplyApp extends BaseApp
  * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0

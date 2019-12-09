@@ -2,8 +2,7 @@
 /**
  * Class MediaApp
  * 
- * @package  SCRIPTLOG/LIB/APP/MediaApp
- * @category App Class
+ * @category Class MediaApp extends BaseApp
  * @author   M.Noermoehammad 
  * @license  MIT
  * @version  1.0
@@ -82,7 +81,17 @@ public function listItems()
   }
 
   $this->view->set('mediaTotal', $this->mediaEvent->totalMedia());
-  $this->view->set('mediaLib', $this->mediaEvent->grabAllMedia());
+
+  if ($this->mediaEvent->isMediaUser() != 'administrator') {
+
+     $this->view->set('mediaLib', $this->mediaEvent->grabAllMedia('ID', $this->mediaEvent->isMediaUser()));
+
+  } else {
+     
+     $this->view->set('mediaLib', $this->mediaEvent->grabAllMedia());
+
+  }
+
   return $this->view->render();
   
 }
@@ -218,7 +227,7 @@ public function insert()
       $media_metavalue = array(
         'File name' => $new_filename, 
         'File type' => $file_type, 
-        'File size' => $file_size, 
+        'File size' => format_size_unit($file_size), 
         'Uploaded on' => date("Y-m-d H:i:s"), 
         'Dimension' => $width.'x'.$height);
 
@@ -280,12 +289,11 @@ public function insert()
 
      $this->setView('edit-media');
      $this->setPageTitle('Media Library');
-     $this->setFormAction('newMedia');
+     $this->setFormAction(ActionConst::NEWMEDIA);
      $this->view->set('pageTitle', $this->getPageTitle());
      $this->view->set('formAction', $this->getFormAction());
      $this->view->set('mediaTarget', $this->mediaEvent->mediaTargetDropDown());
      $this->view->set('mediaAccess', $this->mediaEvent->mediaAccessDropDown());
-     $this->view->set('mediaStatus', $this->mediaEvent->mediaStatusDropDown());
      $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
  
   }
@@ -302,7 +310,7 @@ public function update($id)
 
   if (!$getMedia = $this->mediaEvent->grabMedia($id)) {
 
-     direct_page('index.php?load=media&error=mediaNotFound', 404);
+     direct_page('index.php?load=medialib&error=mediaNotFound', 404);
 
   }
 
@@ -374,7 +382,6 @@ public function update($id)
         $this->view->set('formAction', $this->getFormAction());
         $this->view->set('errors', $errors);
         $this->view->set('mediaData', $data_media);
-        $this->view->set('mediaType', $this->mediaEvent->mediaTypeDropDown($getMedia['media_type']));
         $this->view->set('mediaTarget', $this->mediaEvent->mediaTargetDropDown($getMedia['media_target']));
         $this->view->set('mediaAccess', $this->mediaEvent->mediaAccessDropDown($getMedia['media_access']));
         $this->view->set('mediaStatus', $this->mediaEvent->mediaStatusDropDown($getMedia['media_status']));
@@ -479,11 +486,9 @@ public function update($id)
 
       } else {
 
-        $this->mediaEvent->setMediaFilename($new_filename);
         $this->mediaEvent->setMediaCaption($caption);
         $this->mediaEvent->setMediaType($type);
         $this->mediaEvent->setMediaTarget($target);
-        $this->mediaevent->setMediaUser($this->mediaEvent->isMediaUser());
         $this->mediaEvent->setMediaAccess($access);
         $this->mediaEvent->setMediaStatus($status);
         $this->mediaEvent->setMediaId($media_id);
@@ -505,11 +510,10 @@ public function update($id)
     
     $this->setView('edit-media');
     $this->setPageTitle('Media Library');
-    $this->setFormAction('editMedia');
+    $this->setFormAction(ActionConst::EDITMEDIA);
     $this->view->set('pageTitle', $this->getPageTitle());
     $this->view->set('formAction', $this->getFormAction());
     $this->view->set('mediaData', $data_media);
-    $this->view->set('mediaType', $this->mediaEvent->mediaTypeDropDown($getMedia['media_type']));
     $this->view->set('mediaTarget', $this->mediaEvent->mediaTargetDropDown($getMedia['media_target']));
     $this->view->set('mediaAccess', $this->mediaEvent->mediaAccessDropDown($getMedia['media_access']));
     $this->view->set('mediaStatus', $this->mediaEvent->mediaStatusDropDown($getMedia['media_status']));

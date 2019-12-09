@@ -3,9 +3,8 @@
 /**
  * Class Uploader
  * Handling file upload beside file image
- * 
- * @package   SCRIPTLOG
- * @category  library\core\Uploader
+ *
+ * @category  Core Class Class uploader
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0

@@ -3,7 +3,6 @@
  * Generate Hash Function
  * 
  * @category Function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @param string $quantityChar
  * @return NULL|string
  */

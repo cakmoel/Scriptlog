@@ -5,7 +5,6 @@
  * Example: nl2br(htmlspecialchars(paragraph_trim($post_content)))
  * 
  * @category Function
- * @package SCRIPTLOG/LIB/UTILITY
  * @param string $content
  * @param integer|number $limit
  * @param string $schr

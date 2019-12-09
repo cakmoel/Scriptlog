@@ -2,7 +2,6 @@
 /**
  * Class FrontContent extends Class ContentGateway
  * 
- * @package  SCRIPTLOG/LIB/CORE/FrontContent
  * @category Core Class
  * @author   M.Noermoehammad
  * @license  MIT

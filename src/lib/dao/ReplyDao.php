@@ -2,7 +2,7 @@
 /**
  * Reply class extends Dao
  *
- * @package   SCRIPTLOG/LIB/DAO/Reply
+ * 
  * @category  Dao Class
  * @author    M.Noermoehammad
  * @license   MIT

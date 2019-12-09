@@ -3,7 +3,6 @@
  * ScriptlogUploader Class
  * This class designed to handle file uploaded especially image or picture.
  * 
- * @package  SCRIPTLOG/LIB/CORE/ScriptlogUploader
  * @category Core Class
  * @author   M.Noermoehammad
  * @license  MIT

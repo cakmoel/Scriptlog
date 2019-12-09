@@ -1,9 +1,8 @@
 <?php 
 /**
- * Class CommentApp extends BaseApp
+ * Class CommentApp
  *
- * @package   SCRIPTLOG/LIB/APP/CommentApp
- * @category  App Class
+ * @category  Class CommentApp extends BaseApp
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0

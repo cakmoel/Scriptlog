@@ -2,12 +2,11 @@
 /**
  * IException interface
  * 
- * @package  SCRIPTLOG
  * @category Core Class
- * @see     https://stackoverflow.com/questions/628408/custom-exception-messages-best-practices
+ * @see      https://stackoverflow.com/questions/628408/custom-exception-messages-best-practices
  * @see      https://secure.php.net/manual/en/language.exceptions.php#91159
  * @license  MIT
- * @version  0.0
+ * @version  1.0
  * @since    1.0
  * 
  */

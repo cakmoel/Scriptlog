@@ -4,7 +4,6 @@
  * login functionality 
  * to access control panel or administrator page
  * 
- * @package  SCRIPTLOG
  * @category admin\login.php file
  * @author   M.Noermoehammad
  * @license  MIT
@@ -118,7 +117,7 @@ if (!empty($loginFormSubmitted)) {
     <!-- Google Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     <!-- Icon -->
-   <link href="favicon.ico" rel="Shortcut Icon">
+    <link href="favicon.ico" rel="Shortcut Icon">
 
   </head>
   <body class="hold-transition login-page">

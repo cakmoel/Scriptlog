@@ -4,7 +4,6 @@
  * Class Wall will use this class to check user's access level
  * 
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * @return string
  * 
  */

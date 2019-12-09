@@ -1,9 +1,8 @@
 <?php
 /**
- * Class ConfigurationApp extends BaseApp
+ * Class ConfigurationApp 
  *
- * @package   SCRIPTLOG/LIB/APP/ConfigurationApp
- * @category  App Class
+ * @category  Class Configuration extends BaseApp
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0

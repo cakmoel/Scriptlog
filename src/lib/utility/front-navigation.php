@@ -3,7 +3,6 @@
  * Front Navigation Function
  * 
  * @category Function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @return mixed
  * 
  */

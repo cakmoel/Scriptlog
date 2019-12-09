@@ -5,7 +5,6 @@
  * installed for PHP
  * 
  * @category Function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @return bool
  * 
  */

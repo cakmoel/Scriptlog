@@ -3,7 +3,6 @@
  * Parse Query Function 
  * 
  * @category Function
- * @package SCRIPTLOG/LIB/UTILITY
  * @source PHP.Net to parse out the query element from the output of parse_url()
  * @see   https://secure.php.net/manual/en/function.parse-url.php#95304
  * 

@@ -1,6 +1,11 @@
 <?php
 /**
- * Class APCU extends Cache
+ * Class APCU
+ * 
+ * @category Class APCU extends Cache
+ * @author   M.Noermoehammad
+ * @license  MIT
+ * @version  1.0
  * 
  */
 class APCU extends Cache
@@ -32,6 +37,7 @@ class APCU extends Cache
  * Cache a variable in the data store
  * 
  * @return boolean on success or false on failure
+ * 
  */
  public function writeCache($key, $value, $expiration)
  {

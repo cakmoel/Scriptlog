@@ -2,7 +2,6 @@
 /**
  * Class Dispatcher
  * 
- * @package  SCRIPTLOG/LIB/CORE/Dispatcher
  * @category Core Class
  * @author   M.Noermoehammad
  * @license  MIT

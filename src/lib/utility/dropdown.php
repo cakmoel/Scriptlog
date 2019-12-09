@@ -3,7 +3,6 @@
  * Dropdown Function
  * 
  * @category Function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @see   https://www.phpro.org/tutorials/Dropdown-Select-With-PHP-and-MySQL.html
  * @param  string $name
  * @param  array  $options

@@ -2,8 +2,8 @@
 /**
  * File settings.php
  * 
- * @category  installation file settings.php
- * @package   SCRIPTLOG INSTALLATION
+ * @category  file settings.php define constant 
+ *            and variables need by installation process
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0

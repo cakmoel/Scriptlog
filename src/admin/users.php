@@ -1,7 +1,7 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$userId = isset($_GET['userId']) ? abs((int)$_GET['userId']) : "";
+$userId = isset($_GET['Id']) ? abs((int)$_GET['Id']) : "";
 $sessionId = isset($_GET['sessionId']) ? $_GET['sessionId'] : "";
 $userEvent = new UserEvent($userDao, $validator, $sanitizer);
 $userApp = new UserApp($userEvent);

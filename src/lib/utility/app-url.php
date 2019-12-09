@@ -4,7 +4,6 @@
  * Retrieving URL configuration from database
  * 
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * @return string
  * 
  */

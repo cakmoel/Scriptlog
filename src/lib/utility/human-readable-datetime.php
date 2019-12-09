@@ -5,7 +5,6 @@
  * 
  * 
  * @category Function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @param string $date
  * @param string $format
  * @return string

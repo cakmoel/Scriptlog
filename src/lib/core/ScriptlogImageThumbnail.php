@@ -2,7 +2,6 @@
 /**
  * Class ScriptlogImageThumbnail
  * 
- * @package  SCRIPTLOG/LIB/CORE/ScriptlogImageThumbnail
  * @category Core Class
  * @author   M.Noermoehammad
  * @license  MIT

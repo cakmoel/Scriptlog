@@ -53,7 +53,7 @@
               <!-- Menu Footer-->
               <li class="user-footer">
                 <div class="pull-left">
-                  <a href="<?=($user_level != 'administrator' && $user_level != 'manager') ? htmlspecialchars("index.php?load=users") : "index.php?load=users&action=editUser&userId=".sanitize_urls($user_id)."&sessionId=$user_session"; ?>" 
+                  <a href="<?=($user_level != 'administrator' && $user_level != 'manager') ? htmlspecialchars("index.php?load=users") : "index.php?load=users&action=editUser&Id=".sanitize_urls($user_id)."&sessionId=$user_session"; ?>" 
                   class="btn btn-default btn-flat"><i class="fa fa-user fa-fw"></i>Profile</a>
                 </div>
                 <div class="pull-right">

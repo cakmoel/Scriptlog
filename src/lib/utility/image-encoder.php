@@ -5,8 +5,7 @@
  * source into the html request
  * 
  * @category Function
- * @package  SCRIPTLOG/LIB/UTILITY
- * @link  https://secure.php.net/manual/en/function.base64-encode.php
+ * @link https://www.php.net/manual/en/function.base64-encode.php#105200
  * @param string $filename
  * @param string $filetype
  * @return string

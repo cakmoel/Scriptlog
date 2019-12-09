@@ -3,7 +3,6 @@
  * Checking Mime Type 
  * 
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * @param array $accepted_type
  * @param array $tmp_name
  * @return bool

@@ -2,7 +2,6 @@
 /**
  * PHP Pagination Class
  *
- * @package  SCRIPTLOG/LIB/CORE/Paginator
  * @category Core Class
  * @author   David Carr - dave@daveismyname.com - http://www.daveismyname.com
  * @version  1.0

@@ -3,7 +3,6 @@
  * File check-engine.php
  * 
  * @category  installation file check-engine.php
- * @package   SCRIPTLOG INSTALLATION
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
@@ -433,8 +432,6 @@ function check_modrewrite()
         return true;
     }
     
-  } elseif ((check_web_server()['WebServer'] == 'nginx')) {
-      return false;
-  }
+  } 
   
 }

@@ -2,7 +2,6 @@
 /**
  * MemCache Class extends Cache Class
  * 
- * @package  SCRIPTLOG/LIB/CORE/MemCache
  * @category Core Class
  * @author   Evert Pot
  * @see      https://evertpot.com/107/

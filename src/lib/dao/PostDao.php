@@ -2,7 +2,7 @@
 /**
  * Post class extends Dao
  *
- * @package   SCRIPTLOG/LIB/DAO/Post
+ * 
  * @category  Dao Class
  * @author    M.Noermoehammad
  * @license   MIT

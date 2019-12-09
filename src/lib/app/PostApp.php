@@ -1,9 +1,8 @@
 <?php 
 /**
- * Class PostApp extends BaseApp
+ * Class PostApp
  *
- * @package   SCRIPTLOG/LIB/APP/PostApp
- * @category  App Class
+ * @category  Class PostApp
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
@@ -95,7 +94,7 @@ class PostApp extends BaseApp
   public function insert()
   {
     
-    $topics = new Topic();
+    $topics = new TopicDao();
     $errors = array();
     $checkError = true;
     

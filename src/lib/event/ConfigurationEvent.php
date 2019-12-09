@@ -2,7 +2,6 @@
 /**
  * Class ConfigurationEvent
  *
- * @package   SCRIPTLOG/LIB/EVENT/ConfigurationEvent
  * @category  Event Class
  * @author    M.Noermoehammad
  * @license   MIT

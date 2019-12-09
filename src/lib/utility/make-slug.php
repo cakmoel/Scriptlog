@@ -4,7 +4,6 @@
  * to create URL SEO Friendly
  * 
  * @category  Function
- * @package   SCRIPTLOG/LIB/UITLITY
  * @param string $slug
  * @return string|mixed
  * 

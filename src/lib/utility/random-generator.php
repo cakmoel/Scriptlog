@@ -3,6 +3,7 @@
  * Random Generator Function
  * to create random string
  * 
+ * @category function Random generator 
  * @param number $digits
  * @return string|number
  */

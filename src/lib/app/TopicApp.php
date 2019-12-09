@@ -1,9 +1,8 @@
 <?php 
 /**
- * Class TopicApp extends  BaseApp
+ * Class TopicApp
  *
- * @package   SCRIPTLOG/LIB/APP/TopicApp
- * @category  App Class
+ * @category  Class TopicApp extends BaseApp
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0

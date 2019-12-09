@@ -3,7 +3,6 @@
  * Relative URL function
  * 
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * @see https://www.php.net/manual/en/reserved.variables.server.php#112693 PHP:$_SERVER Manual
  * @return mixed
  * 

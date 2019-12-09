@@ -4,7 +4,6 @@
  * print control panel page title
  * 
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * @param string $value
  * 
  */

@@ -2,7 +2,6 @@
 /**
  * Class ContentGateway
  * 
- * @package  SCRIPTLOG/LIB/CORE/ContentGateway
  * @category Core Class
  * @author   M.Noermoehammad
  * @license  MIT

@@ -2,7 +2,6 @@
 /**
  * UserToken Class extends Dao Class
  * 
- * @package  SCRIPTLOG/LIB/DAO/UserToken
  * @category Dao Class
  * @author   M.Noermoehammad
  * @license  MIT

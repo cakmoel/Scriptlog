@@ -3,7 +3,6 @@
  * Facebook graph protocol function
  * 
  * @category Function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @author   M.Noermoehammad
  * 
  */

@@ -1,6 +1,7 @@
 <?php
 /**
  * User Activation Key
+ * @category Function
  * @param string $value
  * @return string
  */

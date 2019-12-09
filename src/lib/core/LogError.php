@@ -3,7 +3,6 @@
  * LogError Class
  * Error Handling and Logging
  * 
- * @package   SCRIPTLOG/LIB/CORE/LogError
  * @category  Core Class
  * @author    M.Noermoehammad
  * @license   MIT

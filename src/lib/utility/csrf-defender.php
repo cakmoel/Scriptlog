@@ -3,7 +3,6 @@
  * CSRF Check Token Function
  * 
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * @param string $key
  * @param string $origin
  * @param string $timespan

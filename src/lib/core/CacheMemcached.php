@@ -2,6 +2,11 @@
 /**
  * Class CacheMemcached
  * 
+ * @category Core Class CacheMemcaced
+ * @author   M.Noermoehammad
+ * @license  MIT
+ * @version  1.0
+ * 
  */
 class CacheMemcached
 {

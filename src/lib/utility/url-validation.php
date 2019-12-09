@@ -3,6 +3,7 @@
  * URL Validation Function
  * URL Validation with regular expression
  * 
+ * @category Function
  * @param string $url
  * @return boolean
  */

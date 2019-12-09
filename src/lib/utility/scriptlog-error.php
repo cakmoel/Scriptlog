@@ -4,7 +4,6 @@
  * Generates user-level error/warning/notice message
  * 
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * @see https://www.php.net/manual/en/function.trigger-error.php#118794
  * @param string $message
  * @param string $level
@@ -31,7 +30,6 @@ function scriptlog_error($error_message, $error_type = E_USER_NOTICE, $context =
  * Function scriptlog_shutdown_fatal
  * 
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * 
  */
 function scriptlog_shutdown_fatal()
@@ -95,7 +93,6 @@ function scriptlog_shutdown_fatal()
  * Function scriptlog_format_error
  * 
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * @return string
  * 
  */
@@ -141,7 +138,6 @@ function scriptlog_format_error($datetime, $errno, $errstr, $errfile, $errline)
  * Function scriptlog_error_mail
  * 
  * @category function
- * @package SCRIPTLOG/LIB/UTILITY
  * @return bool
  * 
  */

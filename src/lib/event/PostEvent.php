@@ -2,7 +2,6 @@
 /**
  * PostEvent Class
  *
- * @package   SCRIPTLOG/LIB/EVENT/PostEvent
  * @category  Event Class
  * @author    M.Noermoehammad
  * @license   MIT

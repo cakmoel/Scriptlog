@@ -2,7 +2,6 @@
 /**
  * TopicEvent Class
  *
- * @package   SCRIPTLOG/LIB/EVENT/TopicEvent
  * @category  Event Class
  * @author    M.Noermoehammad
  * @license   MIT

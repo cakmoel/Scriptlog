@@ -3,7 +3,6 @@
  * collection of function uses MySQL Improved (MySQLi) extension
  * 
  * @category function
- * @package  SCRIPTLOG/LIB/UTILITY
  * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0

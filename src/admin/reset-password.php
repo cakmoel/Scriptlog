@@ -3,7 +3,6 @@
  * file reset-password.php
  * 
  * @category resetting user password
- * @package  SCRIPTLOG
  * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0
@@ -88,6 +87,8 @@ if (empty($resetFormSubmitted) == false) {
 
   <!-- Google Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+  <!-- Icon -->
+  <link href="favicon.ico" rel="Shortcut Icon">
   
 </head>
 <body class="hold-transition login-page">
