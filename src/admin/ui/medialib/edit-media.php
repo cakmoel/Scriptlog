@@ -153,11 +153,56 @@ if (isset($mediaData['media_filename'])) :
 </div>
 <!-- /.box -->
 </div>
-<!-- /.col-md-12 -->
+<!--/.col-md-12 -->
+<?php 
+if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
+?>
+<div class="col-md-6">
+<div class="box box-solid">
+            <div class="box-header with-border">
+             <?=(isset($mediaData['media_type'])) ? invoke_fileicon($mediaData['media_type']) : ""; ?>
+
+              <h3 class="box-title">Media properties</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <dl class="dl-horizontal">
+              
+              <?php 
+                 if (isset($mediaProperties['meta_value'])) :
+                   $media_properties = media_properties($mediaProperties['meta_value']);
+              ?>
+
+                <dt>File name</dt>
+                <dd><?= $media_properties['File name']; ?></dd>
+                <dt>MIME type</dt>
+                <dd><?= $media_properties['File type']; ?>.</dd>
+                <dt>File size</dt>
+                <dd><?= $media_properties['File size']; ?></dd>
+                <dt>Uploaded by</dt>
+                <dd><?=(isset($mediaData['media_user'])) ? htmlspecialchars($mediaData['media_user']) : ""; ?></dd>
+                <dt>Upload date</dt>
+                <dd>on <?=$media_properties['Uploaded on']; ?></dd>
+                <dt>Dimension</dt>
+                <dd><?= $media_properties['Dimension']; ?> pixel</dd>
+
+              <?php
+                 endif;
+              ?>
+              
+              </dl>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+</div>
+<!--/.col-md-6 -->
+<?php endif; ?>
+
 </div>
 <!-- /.row --> 
 </section>
-
+<!--/.content -->
 </div>
 <!-- /.content-wrapper -->
 <script type="text/javascript">

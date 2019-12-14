@@ -20,6 +20,7 @@ function upload_media($file_location, $file_type, $file_size, $file_name)
      case 'application/rar':
      case 'application/zip':
      case 'application/vnd.microsoft.portable-executable':
+     case 'application/vnd.oasis.opendocument.text': 
      
        upload_doc($file_size, $file_size, $file_type, $file_name);
    
@@ -53,8 +54,9 @@ function upload_media($file_location, $file_type, $file_size, $file_name)
 
      default:
   
-        throw new UploadException("Error - file type not allowed!");
-      
+        
+        scriptlog_error("Error - file type not allowed!", E_USER_ERROR);
+
         break;
 
  }

@@ -8,9 +8,9 @@
  * @version  1.0
  * 
  */
-if (file_exists(__DIR__ . '/../config.php')) {
+if (file_exists(__DIR__ . '/../config.sample.php')) {
     
-  include(dirname(dirname(__FILE__)).'/lib/main.php');
+  include(dirname(dirname(__FILE__)).'/lib/main-dev.php');
 
 } else {
 

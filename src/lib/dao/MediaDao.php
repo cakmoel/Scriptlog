@@ -141,6 +141,32 @@ public function findMediaByType($type)
 }
 
 /**
+ * find mediameta by media's Id
+ * 
+ * @method public findMediaMeta()
+ * @param int $mediaId
+ * @param object $sanitize
+ * 
+ */
+public function findMediaMetaValue($mediaId, $media_filename, $sanitize)
+{
+ 
+ $idsanitized = $this->filteringId($sanitize, $mediaId, 'sql');
+
+ $sql = "SELECT ID, media_id, meta_key, meta_value FROM tbl_mediameta 
+         WHERE media_id = ? AND meta_key = ?";
+
+ $this->setSQL($sql);
+
+ $mediameta_details = $this->findRow([$idsanitized, $media_filename]);
+
+ if(empty($mediameta_details)) return false;
+
+ return $mediameta_details;
+
+}
+
+/**
  * Add new media
  * 
  * @method public addMedia()

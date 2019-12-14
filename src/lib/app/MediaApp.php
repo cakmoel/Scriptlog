@@ -130,6 +130,7 @@ public function insert()
                  'xls'  => 'application/octet-stream', 
                  'exe'  => 'application/vnd.microsoft.portable-executable', 
                  'ppt'  => 'application/vnd.ms-powerpoint',
+                 'odt'  => 'application/vnd.oasis.opendocument.text',
                  'jpeg' => 'image/jpeg', 
                  'jpg'  => 'image/jpeg', 
                  'png'  => 'image/png', 
@@ -349,6 +350,17 @@ public function update($id)
 
   );
 
+  $getMediaMeta = $this->mediaEvent->grabMediaMeta($getMedia['ID'], $getMedia['media_filename']);
+
+  $media_properties = array(
+
+    'ID' => $getMediaMeta['ID'],
+    'media_id' => $getMediaMeta['media_id'],
+    'meta_key' => $getMediaMeta['meta_key'],
+    'meta_value' => $getMediaMeta['meta_value']
+
+  );
+
   if (isset($_POST['mediaFormSubmit'])) {
 
     $file_location = isset($_FILES['media']['tmp_name']) ? $_FILES['media']['tmp_name'] : '';
@@ -385,6 +397,7 @@ public function update($id)
         $this->view->set('mediaTarget', $this->mediaEvent->mediaTargetDropDown($getMedia['media_target']));
         $this->view->set('mediaAccess', $this->mediaEvent->mediaAccessDropDown($getMedia['media_access']));
         $this->view->set('mediaStatus', $this->mediaEvent->mediaStatusDropDown($getMedia['media_status']));
+        $this->view->set('mediaProperties', $media_properties);
         $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
      } 
@@ -517,6 +530,7 @@ public function update($id)
     $this->view->set('mediaTarget', $this->mediaEvent->mediaTargetDropDown($getMedia['media_target']));
     $this->view->set('mediaAccess', $this->mediaEvent->mediaAccessDropDown($getMedia['media_access']));
     $this->view->set('mediaStatus', $this->mediaEvent->mediaStatusDropDown($getMedia['media_status']));
+    $this->view->set('mediaProperties', $media_properties);
     $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
   }

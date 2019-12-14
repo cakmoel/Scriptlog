@@ -11,7 +11,8 @@
  */
 
 # date_default_timezone_set("GMT");
-ini_set("memory_limit", "1M");
+ini_set("memory_limit", "2M");
+error_reporting(E_ALL);
 # ini_set("session.cookie_secure", "True");  //secure
 # ini_set("session.cookie_httponly", "True"); // httpOnly
 # header("Content-Security-Policy: default-src https:; font-src 'unsafe-inline' data: https:; form-action 'self' https://kartatopia.com;img-src data: https:; child-src https:; object-src 'self' www.google-analytics.com ajax.googleapis.com platform-api.sharethis.com kartatopia-studio.disqus.com; script-src 'unsafe-inline' https:; style-src 'unsafe-inline' https:;");
@@ -28,6 +29,11 @@ define('APP_PUBLIC', 'public');
 define('APP_LIBRARY', 'lib');
 define('APP_DEVELOPMENT', true);
 define('APP_CACHE', true);
+define('APP_FILE_SIZE', 524867);
+define('APP_IMAGE', APP_PUBLIC . DS . 'files' . DS . 'pictures' . DS);
+define('APP_AUDIO', APP_PUBLIC . DS . 'files' . DS . 'audio' . DS);
+define('APP_VIDEO', APP_PUBLIC . DS . 'files' . DS . 'video' . DS);
+define('APP_DOCUMENT', APP_PUBLIC . DS . 'files' . DS . 'docs' . DS);
 define('SCRIPTLOG', $checkIncKey);
 
 if (!defined('APP_ROOT')) define('APP_ROOT', dirname(dirname(__FILE__)) . DS);
@@ -52,7 +58,7 @@ if (file_exists(APP_ROOT . 'config.sample.php')) {
 
 } 
 
-// call functions in folder utility
+#================================== call functions in directory lib/utility ===========================================
 $function_directory = new RecursiveDirectoryIterator(__DIR__ . DS .'utility'. DS, FilesystemIterator::FOLLOW_SYMLINKS);
 $filter_iterator = new RecursiveCallbackFilterIterator($function_directory, function ($current, $key, $iterator){
     
@@ -63,39 +69,42 @@ $filter_iterator = new RecursiveCallbackFilterIterator($function_directory, func
     
     if ($current->isDir()) {
         
-        // only recurse into intended subdirectories
+        # only recurse into intended subdirectories
         return $current->getFilename() === __DIR__ . DS .'utility'. DS;
         
     } else {
         
-        // only consume files of interest
+        # only invoke files of interest
         return strpos($current -> getFilename(), '.php');
         
     }
     
 });
-        
-$files_dir_iterator = new RecursiveIteratorIterator($filter_iterator);
     
+$files_dir_iterator = new RecursiveIteratorIterator($filter_iterator); 
+
 foreach ($files_dir_iterator as $file) {
-        
-   include($file -> getPathname());
-        
+    
+    include $file -> getPathname();
+    
 }
-    
+
+#====================End of call functions in directory lib/utility=====================================================
+
+// check if loader is exists
 if (is_dir(APP_ROOT . APP_LIBRARY) && is_file(APP_ROOT . APP_LIBRARY . DS . 'Scriptloader.php')) {
-    
+ 
     require __DIR__ . DS . 'Scriptloader.php';
-    
+      
 }
 
 // load all libraries 
 $library = array(
-    APP_ROOT . APP_LIBRARY . DS .'core'. DS,
-    APP_ROOT . APP_LIBRARY . DS .'dao'. DS,
-    APP_ROOT . APP_LIBRARY . DS .'event'. DS,
-    APP_ROOT . APP_LIBRARY . DS .'app'. DS,
-    APP_ROOT . APP_LIBRARY . DS .'plugins'. DS
+    APP_ROOT . APP_LIBRARY . DS . 'core'    . DS,
+    APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
+    APP_ROOT . APP_LIBRARY . DS . 'event'   . DS,
+    APP_ROOT . APP_LIBRARY . DS . 'app'     . DS,
+    APP_ROOT . APP_LIBRARY . DS . 'plugins' . DS
 );
 
 load_engine($library);
@@ -153,13 +162,13 @@ Registry::setAll(array('dbc' => $dbc, 'route' => $rules));
 /* an instances of class that necessary for the system
  * please do not change this below variable 
  * 
- * @var $searchPost used by search functionality
- * @var $frontPaginator used by front pagination funtionality
- * @var $postFeeds used by rss feed functionality
- * @var $sanitizer used by sanitize functionality
+ * @var $searchPost invoked by search functionality
+ * @var $frontPaginator called by front pagination funtionality
+ * @var $postFeeds run by rss feed functionality
+ * @var $sanitizer adapted by sanitize functionality
  * @var $userDao, $validator, $authenticator --
  * these are collection of objects or instances of classes 
- * that will be run by the system
+ * that will be run by the system.
  * 
  */
 $searchPost = new SearchFinder($dbc);
@@ -167,7 +176,7 @@ $frontPaginator = new Paginator(10, 'p');
 $postFeeds = new RssFeed($dbc);
 $sanitizer = new Sanitize();
 $userDao = new UserDao();
-$userToken = new UserToken();
+$userToken = new UserTokenDao();
 $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);
 
@@ -179,9 +188,11 @@ $authenticator = new Authentication($userDao, $userToken, $validator);
 # set_error_handler('LogError::errorHandler');
 # register_shutdown_function('scriptlog_shutdown_fatal');
 
-if (!isset($_SESSION)) {
-
+if (!start_session_on_site()) {
+    
+    session_start(uniqid());
     session_start();
+    session_regenerate_id();
     
 }
 

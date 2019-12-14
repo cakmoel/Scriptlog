@@ -5,7 +5,7 @@
     <section class="content-header">
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
-        <small>	<a href="index.php?load=users&action=newUser&userId=0"
+        <small>	<a href="index.php?load=users&action=newUser&Id=0"
 					class="btn btn-primary"> <i
 					class="fa fa-plus-circle"></i> Add New
 				</a>

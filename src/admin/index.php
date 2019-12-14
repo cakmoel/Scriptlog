@@ -7,9 +7,9 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  * 
  */
-if (file_exists(__DIR__ . '/../config.php')) {
+if (file_exists(__DIR__ . '/../config.sample.php')) {
     
-    include __DIR__ . '/../lib/main.php';
+    include __DIR__ . '/../lib/main-dev.php';
     require __DIR__ . '/authorizer.php';
 
 } else {

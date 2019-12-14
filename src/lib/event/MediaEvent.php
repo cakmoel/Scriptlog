@@ -255,7 +255,7 @@ class MediaEvent
 
 /**
  * GrabMedia
- * retrieve single record of media
+ * retrieve a single record of media
  * 
  * @param integer $id
  * 
@@ -263,6 +263,19 @@ class MediaEvent
  public function grabMedia($id)
  {
    return $this->mediaDao->findMediaById($id, $this->sanitizer);
+ }
+
+/**
+ * Grab media meta
+ * retrieve a single record of media properties(meta)
+ * 
+ * @param integer $id
+ * @return mixed
+ * 
+ */
+ public function grabMediaMeta($id, $filename)
+ {
+   return $this->mediaDao->findMediaMetaValue($id, $filename, $this->sanitizer); 
  }
 
 /**

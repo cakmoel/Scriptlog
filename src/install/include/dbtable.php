@@ -49,7 +49,6 @@ FOREIGN KEY (post_author) REFERENCES tbl_users(ID),
 KEY (media_id)    
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
-
 $tableMedia = "CREATE TABLE IF NOT EXISTS tbl_media (    
 ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,    
 media_filename VARCHAR(200) DEFAULT NULL,    

@@ -25,6 +25,13 @@ switch ($action) {
 
     case ActionConst::EDITMEDIA:
 
+       if ((!check_integer($mediaId)) && (gettype($mediaId) !== "integer")) {
+
+         header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+         throw new AppException("Invalid ID data type!");
+
+       }
+       
        if ($mediaDao -> checkMediaId($mediaId, $sanitizer)) {
 
            $mediaLib -> update($mediaId);
