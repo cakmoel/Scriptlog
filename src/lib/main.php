@@ -34,6 +34,7 @@ define('APP_IMAGE', APP_PUBLIC . DS . 'files' . DS . 'pictures' . DS);
 define('APP_AUDIO', APP_PUBLIC . DS . 'files' . DS . 'audio' . DS);
 define('APP_VIDEO', APP_PUBLIC . DS . 'files' . DS . 'video' . DS);
 define('APP_DOCUMENT', APP_PUBLIC . DS . 'files' . DS . 'docs' . DS);
+define('APP_DEVELOPMENT', false);
 define('SCRIPTLOG', $checkIncKey);
 
 if (!defined('APP_ROOT')) define('APP_ROOT', dirname(dirname(__FILE__)) . DS);
@@ -183,6 +184,7 @@ $userDao = new UserDao();
 $userToken = new UserTokenDao();
 $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);
+$ubench = new Ubench();
 
 # set_exception_handler('LogError::exceptionHandler');
 # set_error_handler('LogError::errorHandler');

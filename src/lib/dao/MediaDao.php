@@ -226,7 +226,7 @@ public function updateMedia($sanitize, $bind, $ID)
   
   $id_sanitized = $this->filteringId($sanitize, $ID, 'sql');
  
-  if(!empty($bind['filename'])) {
+  if(!empty($bind['media_filename'])) {
 
      $this->modify("tbl_media", [
         
@@ -242,7 +242,7 @@ public function updateMedia($sanitize, $bind, $ID)
     
      $this->modify("tbl_media", [
         
-        'media_caption' => $bind['cmedia_aption'],
+        'media_caption' => $bind['media_caption'],
         'media_target'  => $bind['media_target'],
         'media_access'  => $bind['media_access'],
         'media_status'  => $bind['media_status']
@@ -256,7 +256,7 @@ public function updateMedia($sanitize, $bind, $ID)
   $media_id = $this->findColumn([$id_sanitized]);
 
   // update media meta
-  if(!empty($bind['filename'])) {
+  if(!empty($bind['media_filename'])) {
 
      $this->modify("tbl_mediameta", [
 
@@ -390,9 +390,20 @@ public function dropDownMediaStatus($selected = "")
  */
 public function totalMediaRecords($data = null)
 {
-  $sql = "SELECT ID FROM tbl_media";
-  $this->setSQL($sql);
-  return $this->checkCountValue($data);  
+
+  if (!empty($data)) {
+
+    $sql = "SELECT ID FROM tbl_media WHERE media_user = ? ";
+
+  } else {
+
+    $sql = "SELECT ID FROM tbl_media";
+     
+  }
+
+   $this->setSQL($sql);
+   return $this->checkCountValue($data);  
+   
 }
 
 }

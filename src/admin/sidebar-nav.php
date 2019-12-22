@@ -1,5 +1,5 @@
 <?php 
-function sidebar_navigation($module, $url, $level = null)
+function sidebar_navigation($module, $url, $level = null, $user_id = null, $user_session = null)
 {
 ?>
  <!-- Left side column. contains the logo and sidebar -->
@@ -127,7 +127,7 @@ if($level == 'administrator' || $level == 'manager') :
 else :
 ?>
 <li <?=($module == 'users') ? 'class="active"' : 'class=""'; ?>>
-<a href="<?= $url.'index.php?load=users'; ?>"><i class="fa fa-user"></i> 
+<a href="<?= $url.generate_request('index.php', 'get', ['users', 'editUser', $user_id, $user_session])['link']; ?>"><i class="fa fa-user"></i> 
 <span>My Profile</span></a>
 </li>
 <?php 

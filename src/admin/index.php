@@ -12,6 +12,12 @@ if (file_exists(__DIR__ . '/../config.sample.php')) {
     include __DIR__ . '/../lib/main-dev.php';
     require __DIR__ . '/authorizer.php';
 
+    if ((isset($ubench)) && (true === APP_DEVELOPMENT)) {
+
+         $ubench->start();
+
+    }
+
 } else {
 
     header("Location: ../install");
@@ -54,6 +60,6 @@ include 'admin-layout.php';
 admin_header($stylePath, $breadCrumbs, $allowedQuery);
 include 'navigation.php';
 include 'request.php';
-admin_footer($currentURL);
+admin_footer($currentURL, $ubench);
 ob_end_flush();
     

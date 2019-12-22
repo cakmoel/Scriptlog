@@ -46,6 +46,13 @@ switch ($action) {
 
     case ActionConst::DELETEMEDIA:
 
+      if ((!check_integer($mediaId)) && (gettype($mediaId) !== "integer")) {
+
+         header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+         throw new AppException("Invalid ID data type!");
+
+       }
+       
        if ($mediaDao -> checkMediaId($mediaId, $sanitizer)) {
 
            $mediaLib -> remove($mediaId);

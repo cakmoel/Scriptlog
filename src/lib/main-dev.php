@@ -15,7 +15,7 @@ ini_set("memory_limit", "2M");
 error_reporting(E_ALL);
 # ini_set("session.cookie_secure", "True");  //secure
 # ini_set("session.cookie_httponly", "True"); // httpOnly
-# header("Content-Security-Policy: default-src https:; font-src 'unsafe-inline' data: https:; form-action 'self' https://kartatopia.com;img-src data: https:; child-src https:; object-src 'self' www.google-analytics.com ajax.googleapis.com platform-api.sharethis.com kartatopia-studio.disqus.com; script-src 'unsafe-inline' https:; style-src 'unsafe-inline' https:;");
+# header("Content-Security-Policy: default-src https:; font-src 'unsafe-inline' data: https:; form-action 'self' http://scriptlog.web.id;img-src data: https:; child-src https:; object-src 'self' www.google-analytics.com ajax.googleapis.com platform-api.sharethis.com kartatopia-studio.disqus.com; script-src 'unsafe-inline' https:; style-src 'unsafe-inline' https:;");
 
 $key = '5c12IpTl0g!@#';
 $checkIncKey = sha1(mt_rand(1, 1000).$key);
@@ -43,14 +43,6 @@ if (!defined('PHP_EOL')) define('PHP_EOL', strtoupper(substr(PHP_OS, 0, 3) == 'W
 if (!defined('APP_PROTOCOL')) define('APP_PROTOCOL', strpos(strtolower($_SERVER['SERVER_PROTOCOL']),'https') === false ? 'http' : 'https');
 
 if (!defined('APP_HOSTNAME')) define('APP_HOSTNAME', isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
-
-if (true === APP_DEVELOPMENT) {
-
-    if (!defined('SCRIPTLOG_START_TIME')) define('SCRIPTLOG_START_TIME', microtime(true));
-
-    if (!defined('SCRIPTLOG_START_MEMORY')) define('SCRIPTLOG_START_MEMORY', memory_get_usage());
-
-}
 
 if (file_exists(APP_ROOT . 'config.sample.php')) {
 
@@ -179,6 +171,7 @@ $userDao = new UserDao();
 $userToken = new UserTokenDao();
 $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);
+$ubench = new Ubench();
 
 // These line (175 and 176) are experimental code. You do not need it.
 # $bones = new Bones();

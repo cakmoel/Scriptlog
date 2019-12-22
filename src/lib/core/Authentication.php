@@ -211,10 +211,10 @@ class Authentication
      $this->user_session = $_SESSION['user_session'] = generate_session_key($email, 13);
      
      $this->agent = $_SESSION['agent'] = sha1(
-                         $_SERVER['HTTP_ACCEPT_CHARSET'].
-                         $_SERVER['HTTP_ACCEPT_ENCODING'].
-                         $_SERVER['HTTP_ACCEPT_LANGUAGE'].
-                         $_SERVER['HTTP_USER_AGENT']);
+                    $_SERVER['HTTP_ACCEPT_CHARSET'].
+                    $_SERVER['HTTP_ACCEPT_ENCODING'].
+                    $_SERVER['HTTP_ACCEPT_LANGUAGE'].
+                    $_SERVER['HTTP_USER_AGENT']);
 
       if ($remember_me == true) {
            

@@ -53,8 +53,7 @@
               <!-- Menu Footer-->
               <li class="user-footer">
                 <div class="pull-left">
-                  <a href="<?=($user_level != 'administrator' && $user_level != 'manager') ? htmlspecialchars("index.php?load=users") : "index.php?load=users&action=editUser&Id=".sanitize_urls($user_id)."&sessionId=$user_session"; ?>" 
-                  class="btn btn-default btn-flat"><i class="fa fa-user fa-fw"></i>Profile</a>
+                  <a href="<?=generate_request('index.php', 'get', ['users', 'editUser', $user_id, $user_session])['link']; ?>" class="btn btn-default btn-flat"><i class="fa fa-user fa-fw"></i>Profile</a>
                 </div>
                 <div class="pull-right">
                   <a href="index.php?load=logout" class="btn btn-default btn-flat"><i class="fa fa-sign-out fa-fw"></i>Sign out</a>
@@ -72,5 +71,5 @@
   </header>
   
 <?php 
-  echo sidebar_navigation($breadCrumbs, $currentURL, $user_level);
+  echo sidebar_navigation($breadCrumbs, $currentURL, $user_level, $user_id, $user_session);
 ?>

@@ -81,18 +81,17 @@ class UserApp extends BaseApp
      
     if (isset($_GET['error'])) {
         $checkError = false;
-        if ($_GET['error'] == 'userNotFound') array_push($errors, "Error: User Not Found!");
+        if ($_GET['error'] == 'profileNotFound') array_push($errors, "Error: Profile Not Found!");
     }
     
     if (isset($_GET['status'])) {
         $checkStatus = true;
-        if ($_GET['status'] == 'userUpdated') array_push($status, "User has been updated");
-        if ($_GET['status'] == 'userDeleted') array_push($status, "User deleted");
+        if ($_GET['status'] == 'profilUpdated') array_push($status, "Profile has been updated");
     }
     
     if (!$getUser = $this->userEvent->grabUser($id)) {
         
-        direct_page('index.php?load=users&error=userNotFound', 404);
+        direct_page('index.php?load=users&error=profileNotFound', 404);
          
     }
 
@@ -444,6 +443,12 @@ class UserApp extends BaseApp
     
   }
 
+/**
+ * updateProfile 
+ *
+ * @param [integer] $id
+ * @return void
+ */
   public function updateProfile($id)
   {
 
@@ -451,10 +456,10 @@ class UserApp extends BaseApp
     $checkError = true;
 
     if(!$getProfile = $this->userEvent->grabUser($id)) {
-        direct_page('index.php?load=users&error=userNotFound', 404);
+        direct_page('index.php?load=users&error=profileNotFound', 404);
     }
 
-    $data_user = array(
+    $data_profile = array(
         
         'ID' => (int)$getProfile['ID'],
         'user_login' => $getProfile['user_login'],
@@ -538,7 +543,7 @@ class UserApp extends BaseApp
                 $this->view->set('pageTitle', $this->getPageTitle());
                 $this->view->set('formAction', $this->getFormAction());
                 $this->view->set('errors', $errors);
-                $this->view->set('userData', $data_user);
+                $this->view->set('userData', $data_profile);
                 $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
             } else {
@@ -574,7 +579,7 @@ class UserApp extends BaseApp
         $this->setFormAction(ActionConst::EDITUSER);
         $this->view->set('pageTitle', $this->getPageTitle());
         $this->view->set('formAction', $this->getFormAction());
-        $this->view->set('userData', $data_user);
+        $this->view->set('userData', $data_profile);
         $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
     }

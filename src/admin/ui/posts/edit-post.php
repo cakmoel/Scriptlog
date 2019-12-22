@@ -51,7 +51,7 @@ echo "Error saving data. Please try again." . $saveError;
 endif;
 ?>
 
-<form method="post" action="index.php?load=posts&action=<?=(isset($formAction)) ? $formAction : null; ?>&postId=<?=(isset($postData['ID'])) ? $postData['ID'] : 0; ?>" role="form" enctype="multipart/form-data" >
+<form method="post" action="index.php?load=posts&action=<?=(isset($formAction)) ? $formAction : null; ?>&Id=<?=(isset($postData['ID'])) ? $postData['ID'] : 0; ?>" role="form" enctype="multipart/form-data" >
 <input type="hidden" name="post_id" value="<?=(isset($postData['ID'])) ? $postData['ID'] : 0; ?>" />
 <input type="hidden" name="MAX_FILE_SIZE" value="697856"/>
 

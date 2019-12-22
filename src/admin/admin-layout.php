@@ -53,6 +53,10 @@ function admin_header($stylePath, $breadCrumbs, $allowedQuery)
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/skins/scriptlog-skin.css">
   <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/ie10-viewport-bug-workaround.css">
+  <!-- Image Preview -->
+  <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/imagePreview.css">
+  <!-- Audio Preview -->
+  <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/audioPreview.css">
    <!-- wysiwyg editor-->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/wysihtml5/bootstrap3-wysihtml5.min.css">
 
@@ -77,7 +81,7 @@ function admin_header($stylePath, $breadCrumbs, $allowedQuery)
 <?php 
 }
 
-function admin_footer($stylePath)
+function admin_footer($stylePath, $ubench = null)
 {
     
 ?>
@@ -93,6 +97,7 @@ function admin_footer($stylePath)
     <strong>Thank you for creating with 
     <a href="https://scriptlog.web.id" targer="_blank" title="Personal Blogware Platform">Scriptlog</a>
      <?php echo APP_VERSION; ?></strong>
+     <strong><?=((true === APP_DEVELOPMENT) && (isset($ubench))) ? " Execution Time: ". $ubench->getTime() . " Memory usage: ".$ubench->getMemoryUsage() : "" ?></strong>
   </footer>
   
    <!-- Add the sidebar's background. This div must be placed
@@ -129,6 +134,7 @@ function admin_footer($stylePath)
 <script src="<?= $stylePath; ?>/assets/dist/js/imagesizechecker.js"></script>
 <!-- Bootstrap WYSIHTML5 -->
 <script src="<?= $stylePath; ?>/assets/components/wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
+<script type="text/javascript" src="<?= $stylePath; ?>/assets/dist/js/jquery.uploadPreview.min.js"></script>
 <!-- data-table script -->
 <script>
 $(document).ready(function(){
@@ -150,6 +156,15 @@ $(document).ready(function(){
     //bootstrap WYSIHTML5 - text editor
     $('.textarea').wysihtml5()
   })
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+  $.uploadPreview({
+    input_field: "#image-upload",
+    preview_box: "#image-preview",
+    label_field: "#image-label"
+  });
+});
 </script>
 </body>
 </html>

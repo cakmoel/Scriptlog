@@ -51,12 +51,15 @@ echo "Error saving data. Please try again." . $saveError;
 endif;
 ?>
 
-<form method="post" action="index.php?load=medialib&action=<?=(isset($formAction)) ? $formAction : null; ?>&Id=0" 
-  role="form" enctype="multipart/form-data" autocomplete="off" >
-   
+<?php 
+$action = isset($formAction) ? $formAction : null;
+$media_id = isset($mediaData['ID']) ? $mediaData['ID'] : 0;
+?>
+<form method="post" action="<?=generate_request('index.php', 'post', ['medialib', $action, $media_id])['link'];?>" role="form" enctype="multipart/form-data" autocomplete="off" >
 <input type="hidden" name="MAX_FILE_SIZE" value="10485760" />
-<div class="box-body">
+<input type="hidden" name="media_id" value="<?= $media_id; ?>" >
 
+<div class="box-body">
 <?php 
 if (isset($mediaData['media_filename'])) :
 
@@ -90,8 +93,10 @@ if (isset($mediaData['media_filename'])) :
 
 <?php else: ?>
 <div class="form-group">
-<label>Select file  (required)</label>
-<input type="file"  name="media" id="mediaUploaded" required>
+<div id="image-preview">
+  <label for="image-upload" id="image-label">Choose File</label>
+  <input type="file" name="media" id="image-upload" required>
+</div>
 <p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
 </div>
 <?php endif; ?>
@@ -121,7 +126,7 @@ if (isset($mediaData['media_filename'])) :
 <label>Actived</label>
 <div class="radio">
 <label>
-<input type="radio" name="media_status" id="optionsRadios1" value="Y" 
+<input type="radio" name="media_status" id="optionsRadios1" value="1" 
 <?=(isset($mediaData['media_status']) && $mediaData['media_status'] === 1) ? 'checked="checked"' : "";  ?>
 <?=(isset($formData['media_status']) && $formData['media_status'] === 1) ? 'checked="checked"' : "" ?>>
    Yes
@@ -130,7 +135,7 @@ if (isset($mediaData['media_filename'])) :
 
 <div class="radio">
 <label>
-<input type="radio" name="media_status" id="optionsRadios1" value="N" 
+<input type="radio" name="media_status" id="optionsRadios1" value="0" 
 <?=(isset($mediaData['media_status']) && $mediaData['media_status'] === 0) ? 'checked="checked"' : ""; ?>
 <?=(isset($formData['media_status']) && $formData['media_status'] == 0) ? 'checked="checked"' : ""; ?>>
    No
@@ -184,7 +189,8 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
                 <dt>Upload date</dt>
                 <dd>on <?=$media_properties['Uploaded on']; ?></dd>
                 <dt>Dimension</dt>
-                <dd><?= $media_properties['Dimension']; ?> pixel</dd>
+                <dd><?=(isset($mediaData['media_type']) && $mediaData['media_type'] != "image/jpeg" && $mediaData['media_type'] != "image/png" 
+                     && $mediaData['media_type'] != "image/webp" && $mediaData['media_type'] != "image/gif") ? "Not specified" : $media_properties['Dimension']; ?> </dd>
 
               <?php
                  endif;

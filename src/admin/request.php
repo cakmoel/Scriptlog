@@ -51,3 +51,5 @@ try {
     LogError::customErrorMessage('admin');
     
 } 
+
+(isset($ubench) && (true == APP_DEVELOPMENT)) ? $ubench->end() : null;

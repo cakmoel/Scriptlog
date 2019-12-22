@@ -30,3 +30,23 @@ return [
 
 **************************************************************************/
 
+return [
+                    
+    'db' => [
+
+          'host' => 'localhost',
+          'user' => 'root',
+          'pass' => '5oeL4ka1987!@#',
+          'name' => 'blogware'
+          
+        ],
+
+    'app' => [
+
+           'url'   => 'http://localhost/scriptlog/',
+           'email' => 'alanmoehammad@gmail.com',
+           'key'   => 'JMPBTN-H3EHGX-WZL4EV-974AF'
+           
+        ]
+
+];

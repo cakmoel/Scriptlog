@@ -80,14 +80,14 @@ public function listItems()
      $this->view->set('status', $status);
   }
 
-  $this->view->set('mediaTotal', $this->mediaEvent->totalMedia());
-
   if ($this->mediaEvent->isMediaUser() != 'administrator') {
 
+     $this->view->set('mediaTotal', $this->mediaEvent->totalMedia([$this->mediaEvent->isMediaUser()]));
      $this->view->set('mediaLib', $this->mediaEvent->grabAllMedia('ID', $this->mediaEvent->isMediaUser()));
 
   } else {
      
+     $this->view->set('mediaTotal', $this->mediaEvent->totalMedia());
      $this->view->set('mediaLib', $this->mediaEvent->grabAllMedia());
 
   }
@@ -225,13 +225,26 @@ public function insert()
 
       list($width, $height) = getimagesize($file_location);
 
-      $media_metavalue = array(
-        'File name' => $new_filename, 
-        'File type' => $file_type, 
-        'File size' => format_size_unit($file_size), 
-        'Uploaded on' => date("Y-m-d H:i:s"), 
-        'Dimension' => $width.'x'.$height);
+      if ($file_extension == '.jpeg' || $file_extension == '.png' || $file_extension == '.gif' || $file_extension == '.webp') {
 
+         $media_metavalue = array(
+                       'File name' => $new_filename, 
+                       'File type' => $file_type, 
+                       'File size' => format_size_unit($file_size), 
+                       'Uploaded on' => date("Y-m-d H:i:s"), 
+                       'Dimension' => $width.'x'.$height);
+
+      } else {
+
+         $media_metavalue = array(
+          'File name' => $new_filename, 
+          'File type' => $file_type, 
+          'File size' => format_size_unit($file_size), 
+          'Uploaded on' => date("Y-m-d H:i:s"
+        ));
+
+      }
+      
       // upload file
       if (is_uploaded_file($file_location)) {
 
@@ -303,6 +316,13 @@ public function insert()
 
 }
 
+/**
+ * update an existing media 
+ *
+ * @param [type] $id
+ * @return void
+ * 
+ */
 public function update($id)
 {
 
@@ -365,12 +385,11 @@ public function update($id)
 
     $file_location = isset($_FILES['media']['tmp_name']) ? $_FILES['media']['tmp_name'] : '';
     $file_type = isset($_FILES['media']['type']) ? $_FILES['media']['type'] : '';
-    $file_name = isset($_FILES['media']['name']) ? $_FILES['media_generci']['name'] : '';
+    $file_name = isset($_FILES['media']['name']) ? $_FILES['media']['name'] : '';
     $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : '';
     $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
 
-    $caption = isset($_POST['caption']) ? prevent_injection($_POST['caption']) : '';
-    $media_type = $_POST['media_type'];
+    $media_caption = isset($_POST['media_caption']) ? prevent_injection($_POST['media_caption']) : '';
     $media_target = $_POST['media_target'];
     $media_access = $_POST['media_access'];
     $media_status = $_POST['media_status'];
@@ -490,20 +509,18 @@ public function update($id)
          }
         
          $this->mediaEvent->setMediaFilename($new_filename);
-         $this->mediaEvent->setMediaCaption($caption);
-         $this->mediaEvent->setMediaType($type);
-         $this->mediaEvent->setMediaTarget($target);
-         $this->mediaEvent->setMediaAccess($access);
-         $this->mediaEvent->setMediaStatus($status);
+         $this->mediaEvent->setMediaCaption($media_caption);
+         $this->mediaEvent->setMediaTarget($media_target);
+         $this->mediaEvent->setMediaAccess($media_access);
+         $this->mediaEvent->setMediaStatus($media_status);
          $this->mediaEvent->setMediaId($media_id);
 
       } else {
 
-        $this->mediaEvent->setMediaCaption($caption);
-        $this->mediaEvent->setMediaType($type);
-        $this->mediaEvent->setMediaTarget($target);
-        $this->mediaEvent->setMediaAccess($access);
-        $this->mediaEvent->setMediaStatus($status);
+        $this->mediaEvent->setMediaCaption($media_caption);
+        $this->mediaEvent->setMediaTarget($media_target);
+        $this->mediaEvent->setMediaAccess($media_access);
+        $this->mediaEvent->setMediaStatus($media_status);
         $this->mediaEvent->setMediaId($media_id);
 
       }
@@ -522,7 +539,7 @@ public function update($id)
   } else {
     
     $this->setView('edit-media');
-    $this->setPageTitle('Media Library');
+    $this->setPageTitle('Edit Media ');
     $this->setFormAction(ActionConst::EDITMEDIA);
     $this->view->set('pageTitle', $this->getPageTitle());
     $this->view->set('formAction', $this->getFormAction());

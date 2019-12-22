@@ -10,6 +10,9 @@
 function upload_media($file_location, $file_type, $file_size, $file_name)
 {
  
+  $errors = array();
+  $checkError = true;
+
   switch ($file_type) {
 
      case 'application/pdf' :
@@ -54,9 +57,10 @@ function upload_media($file_location, $file_type, $file_size, $file_name)
 
      default:
   
+        //scriptlog_error("Error - file type not allowed!", E_USER_ERROR);
+        $checkError = false;
+        return (array(array_push($errors, "Error - file type not allowed"), $checkError));
         
-        scriptlog_error("Error - file type not allowed!", E_USER_ERROR);
-
         break;
 
  }

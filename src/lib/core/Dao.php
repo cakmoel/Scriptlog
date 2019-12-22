@@ -250,9 +250,9 @@ class Dao
  protected function deleteRecord($table, $where, $limit = null)
  {
      if (!is_null($limit)) {
-         $stmt = $this->dbc->dbDelete($table, $where, $limit);
+         $this->dbc->dbDelete($table, $where, $limit);
      } else {
-         $stmt = $this->dbc->dbDelete($table, $where);
+         $this->dbc->dbDelete($table, $where);
      }
  }
  

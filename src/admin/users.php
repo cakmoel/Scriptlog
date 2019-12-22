@@ -48,7 +48,7 @@ switch ($action) {
             
             if(false === $authenticator -> userAccessControl('users')) {
     
-                $userApp -> updateProfile($user_id);
+                $userApp -> updateProfile($userId);
     
             } else {
     

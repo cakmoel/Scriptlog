@@ -53,9 +53,14 @@ echo "Error saving data. Please try again." . $saveError;
 endif;
 ?>
 
-<form method="post" action="index.php?load=users&action=<?=(isset($formAction)) ? $formAction : null; ?>&userId=<?=(isset($userData['ID'])) ? $userData['ID'] : 0; ?>&sessionId=<?=(isset($sessionId)) ? $sessionId : md5(get_ip_address()); ?>" role="form">
-<input type="hidden" name="session_id" value="<?=(isset($userData['user_session'])) ? $userData['user_session'] : md5(get_ip_address()); ?>" />
-<input type="hidden" name="user_id" value="<?=(isset($userData['ID'])) ? $userData['ID'] : 0; ?>" />
+<?php
+$action = isset($formAction) ? $formAction : null;
+$user_id = isset($userData['ID']) ? $userData['ID'] : 0;
+$session_id = isset($userData['user_session']) ? $userData['user_session'] :  md5(get_ip_address());
+?>
+<form method="post" action="<?=generate_request('index.php', 'post', ['users', $action, $user_id, $session_id])['link']; ?>" role="form">
+<input type="hidden" name="session_id" value="<?=$session_id; ?>" />
+<input type="hidden" name="user_id" value="<?=$user_id; ?>" />
 <div class="box-body">
 
 <?php

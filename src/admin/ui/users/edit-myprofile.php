@@ -113,10 +113,14 @@ if (isset($status)) :
   endif;
 ?>
 
-<form name="scriptlogForm" method="post" action="index.php?load=users&action=<?=(isset($formAction)) ? $formAction : null; ?>&userId=<?=(isset($userData['ID'])) ? $userData['ID'] : 0; ?>"  
-role="form" enctype="multipart/form-data" autocomplete="off">
-<input type="hidden" name="user_id" value="<?=(isset($userData['ID'])) ? $userData['ID'] : 0; ?>" />
-<input type="hidden" name="session_id" value="<?=(isset($userData['user_session'])) ? $userData['user_session'] : md5(get_ip_address()); ?>" />
+<?php
+$action = isset($formAction) ? $formAction : null;
+$user_id = isset($userData['ID']) ? $userData['ID'] : 0;
+$session_id = isset($userData['user_session']) ? $userData['user_session'] : null;
+?>
+<form name="scriptlogForm" method="post" action="<?=generate_request('index.php', 'post', ['users', $action, $user_id, $session_id])['link']; ?>" role="form" autocomplete="off">
+<input type="hidden" name="user_id" value="<?= $user_id; ?>" />
+<input type="hidden" name="session_id" value="<?= $session_id; ?>" />
 
 <div class="box-body">
 <?php 

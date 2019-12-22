@@ -91,7 +91,7 @@
                        <td><?= htmlspecialchars($user['user_email']); ?></td>
                        <td><?= htmlspecialchars($user['user_level']); ?></td>
                        <td>
-                       <a href="<?=generate_request("index.php", 'get', ['users', 'editUser', $user['ID'], $user['user_session']])['link']; ?>" class="btn btn-warning">
+                       <a href="<?=generate_request('index.php', 'get', ['users', 'editUser', $user['ID'], $user['user_session']])['link']; ?>" class="btn btn-warning">
                        <i class="fa fa-pencil fa-fw"></i> Edit</a>
                        </td>
                        <td>
