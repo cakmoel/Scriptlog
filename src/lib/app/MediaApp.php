@@ -122,27 +122,27 @@ public function insert()
     $media_access = $_POST['media_access'];
 
     $accepted_files = array(
-                 'pdf'  => 'application/pdf', 
-                 'doc'  => 'application/msword', 
-                 'rar'  => 'application/rar', 
-                 'zip'  => 'application/zip', 
-                 'xls'  => 'application/vnd.ms-excel', 
-                 'xls'  => 'application/octet-stream', 
-                 'exe'  => 'application/vnd.microsoft.portable-executable', 
-                 'ppt'  => 'application/vnd.ms-powerpoint',
-                 'odt'  => 'application/vnd.oasis.opendocument.text',
-                 'jpeg' => 'image/jpeg', 
-                 'jpg'  => 'image/jpeg', 
-                 'png'  => 'image/png', 
-                 'gif'  => 'image/gif', 
-                 'webp' => 'image/webp',
-                 'mp3'  => 'audio/mpeg', 
-                 'wav'  => 'audio/wav',
-                 'ogg'  => 'audio/ogg',
-                 'mp4'  => 'video/mp4',
-                 'webm' => 'video/webm',
-                 'ogg'  => 'video/ogg'
-                );
+      'pdf'  => 'application/pdf', 
+      'doc'  => 'application/msword', 
+      'rar'  => 'application/rar', 
+      'zip'  => 'application/zip', 
+      'xls'  => 'application/vnd.ms-excel', 
+      'xls'  => 'application/octet-stream', 
+      'exe'  => 'application/vnd.microsoft.portable-executable', 
+      'ppt'  => 'application/vnd.ms-powerpoint',
+      'odt'  => 'application/vnd.oasis.opendocument.text',
+      'jpeg' => 'image/jpeg', 
+      'jpg'  => 'image/jpeg', 
+      'png'  => 'image/png', 
+      'gif'  => 'image/gif', 
+      'webp' => 'image/webp',
+      'mp3'  => 'audio/mpeg', 
+      'wav'  => 'audio/wav',
+      'ogg'  => 'audio/ogg',
+      'mp4'  => 'video/mp4',
+      'webm' => 'video/webm',
+      'ogg'  => 'video/ogg'
+    );
 
     try {
 
@@ -209,7 +209,7 @@ public function insert()
         
       }
 
-      if(false == check_mime_type($accepted_files, $file_location)) {
+      if(false === check_mime_type($accepted_files, $file_location)) {
 
         $checkError = false;
         array_push($errors, "Invalid file format");
@@ -282,7 +282,6 @@ public function insert()
            $this->mediaEvent->setMediaId($media_id);
            $this->mediaEvent->setMediaKey($new_filename);
            $this->mediaEvent->setMediaValue(json_encode($media_metavalue));
-
            $this->mediaEvent->addMediaMeta();
  
          }
@@ -344,6 +343,7 @@ public function update($id)
     'xls'  => 'application/octet-stream', 
     'exe'  => 'application/vnd.microsoft.portable-executable', 
     'ppt'  => 'application/vnd.ms-powerpoint',
+    'odt'  => 'application/vnd.oasis.opendocument.text',
     'jpeg' => 'image/jpeg', 
     'jpg'  => 'image/jpeg', 
     'png'  => 'image/png', 
@@ -355,7 +355,7 @@ public function update($id)
     'mp4'  => 'video/mp4',
     'webm' => 'video/webm',
     'ogg'  => 'video/ogg'
-   );
+  );
 
   $data_media = array(
     
@@ -419,8 +419,9 @@ public function update($id)
         $this->view->set('mediaProperties', $media_properties);
         $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
-     } 
+     } else {
 
+    
      if (!empty($file_location)) {
 
         if (!isset($file_error) || is_array($file_error)) {
@@ -434,13 +435,7 @@ public function update($id)
   
            case UPLOAD_ERR_OK:
               break;
-           case UPLOAD_ERR_NO_FILE:
-             
-             $checkError = false;
-             array_push($errors, "No file uploaded");
-  
-             break;
-         
+          
            case UPLOAD_ERR_INI_SIZE:
            case UPLOAD_ERR_FORM_SIZE:
             
@@ -479,7 +474,7 @@ public function update($id)
           
          }
   
-         if(false == check_mime_type($accepted_files, $file_location)) {
+         if(false === check_mime_type($accepted_files, $file_location)) {
   
           $checkError = false;
           array_push($errors, "Invalid file format");
@@ -491,17 +486,30 @@ public function update($id)
         $name = $file_info['filename'];
         $file_extension = $file_info['extension'];
         $tmp = str_replace(array('.',' '), array('',''), microtime());
-        $new_filename = rename_file(md5($name.$tmp)).'-'.date('Ymd').$file_extension;
+        $new_filename = rename_file(md5($name.$tmp)).'-'.date('Ymd').'.'.$file_extension;
   
         list($width, $height) = getimagesize($file_location);
   
-        $media_metavalue = array(
-          'File name' => $new_filename, 
-          'File type' => $file_type, 
-          'File size' => $file_size, 
-          'Uploaded on' => date("Y-m-d H:i:s"), 
-          'Dimension' => $width.'x'.$height);
+         if ($file_extension == '.jpeg' || $file_extension == '.png' || $file_extension == '.gif' || $file_extension == '.webp') {
+
+            $media_metavalue = array(
+                        'File name' => $new_filename, 
+                        'File type' => $file_type, 
+                        'File size' => format_size_unit($file_size), 
+                        'Uploaded on' => date("Y-m-d H:i:s"), 
+                        'Dimension' => $width.'x'.$height);
+ 
+          } else {
+ 
+            $media_metavalue = array(
+                  'File name' => $new_filename, 
+                  'File type' => $file_type, 
+                  'File size' => format_size_unit($file_size), 
+                  'Uploaded on' => date("Y-m-d H:i:s"));
+ 
+          }
   
+         // upload file
          if (is_uploaded_file($file_location)) {
 
             upload_media($file_location, $file_type, $file_size, basename($new_filename));
@@ -515,18 +523,26 @@ public function update($id)
          $this->mediaEvent->setMediaStatus($media_status);
          $this->mediaEvent->setMediaId($media_id);
 
+         $this->mediaEvent->setMediaKey($new_filename);
+         $this->mediaEvent->setMediaValue(json_encode($media_metavalue));
+         $this->mediaEvent->modifyMediaMeta();
+
       } else {
 
-        $this->mediaEvent->setMediaCaption($media_caption);
-        $this->mediaEvent->setMediaTarget($media_target);
-        $this->mediaEvent->setMediaAccess($media_access);
-        $this->mediaEvent->setMediaStatus($media_status);
-        $this->mediaEvent->setMediaId($media_id);
+         $this->mediaEvent->setMediaCaption($media_caption);
+         $this->mediaEvent->setMediaTarget($media_target);
+         $this->mediaEvent->setMediaAccess($media_access);
+         $this->mediaEvent->setMediaStatus($media_status);
+         $this->mediaEvent->setMediaId($media_id);
 
       }
 
       $this->mediaEvent->modifyMedia();
+      
       direct_page('index.php?load=medialib&status=mediaUpdated', 200);
+
+     }
+     
 
     } catch(AppException $e) {
 

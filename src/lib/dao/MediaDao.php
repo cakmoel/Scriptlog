@@ -251,19 +251,28 @@ public function updateMedia($sanitize, $bind, $ID)
 
   }
 
-  // query Id
-  $this->setSQL("SELECT ID from tbl_media WHERE ID = ?");
-  $media_id = $this->findColumn([$id_sanitized]);
+}
 
-  // update media meta
-  if(!empty($bind['media_filename'])) {
+/**
+ * Update media meta
+ *
+ * @param object $sanitize
+ * @param array $bind
+ * @param integer $ID
+ * @return void
+ * 
+ */
+public function updateMediaMeta($sanitize, $bind, $ID)
+{
+  $idsanitized = $this->filteringId($sanitize, $ID, 'sql');
 
-     $this->modify("tbl_mediameta", [
+  if (!empty($bind['meta_key'])) {
 
-         'meta_value' => $bind['meta_value']
+      $this->modify("tbl_mediameta", [
+        'meta_key' => $bind['meta_key'],
+        'meta_value' => $bind['meta_value']
+      ], "media_id = {$idsanitized}");
 
-     ], "ID = {$media_id['ID']}");
-     
   }
 
 }

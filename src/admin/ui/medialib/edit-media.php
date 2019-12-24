@@ -77,16 +77,17 @@ if (isset($mediaData['media_filename'])) :
 ?>
 <div class="form-group">
 <br><a href="<?=$image_src; ?>" target="_blank">
-<img src="<?=$image_src_thumb; ?>"></a><br>
+<img src="<?=$image_src_thumb; ?>" class="img-responsive pad" ></a><br>
 <label>Change file</label>
-<input type="file"  name="media" id="mediaUploaded" >
+<input type="file"  name="media" id="mediaUploaded" onchange="loadFile(event)" maxlength="512" >
+<img id="output" class="img-responsive pad" >
 <p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
 </div>
   <?php else: ?>
 <div class="form-group">
 <br><a href="#"><?=invoke_fileicon($mediaData['media_type']);?></a><br>
 <label>Change file</label>
-<input type="file"  name="media" id="mediaUploaded" >
+<input type="file"  name="media" id="mediaUploaded"  maxlength="512" >
 <p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
 </div>
   <?php endif; ?>
@@ -213,7 +214,7 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
 <!-- /.content-wrapper -->
 <script type="text/javascript">
   var loadFile = function(event) {
-	    var output = document.getElementById('output');
-	    output.src = URL.createObjectURL(event.target.files[0]);
+	  var output = document.getElementById('output');
+	      output.src = URL.createObjectURL(event.target.files[0]);
 	  };
 </script>

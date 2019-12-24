@@ -29,10 +29,9 @@ function upload_media($file_location, $file_type, $file_size, $file_name)
    
        break;
 
-     case 'audio/mp4' :
-     case 'audio/3gpp':
      case 'audio/mpeg':
-     case 'audio/wav' :
+     case 'audio/wav':
+     case 'audio/ogg' :
 
        upload_audio($file_size, $file_size, $file_type, $file_name);
 
@@ -51,17 +50,15 @@ function upload_media($file_location, $file_type, $file_size, $file_name)
      case 'video/webm':
      case 'video/ogg':
       
-       upload_video();
+       upload_video($file_location, $file_size, $file_type, $file_name);
        
        break;
 
      default:
   
-        //scriptlog_error("Error - file type not allowed!", E_USER_ERROR);
-        $checkError = false;
-        return (array(array_push($errors, "Error - file type not allowed"), $checkError));
+       scriptlog_error("Error - file type not allowed!", E_USER_ERROR);
         
-        break;
+       break;
 
  }
 

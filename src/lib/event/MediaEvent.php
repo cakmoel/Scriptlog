@@ -350,6 +350,7 @@ class MediaEvent
       return $this->mediaDao->updateMedia($this->sanitizer, [
          'media_filename' => $this->media_filename,
          'media_caption' => $this->media_caption,
+         'media_target' => $this->media_target,
          'media_access' => $this->media_access,
          'media_status' => $this->media_status
       ], $this->mediaId);
@@ -357,6 +358,27 @@ class MediaEvent
    }
 
  }
+
+/**
+ * Modify meta media
+ *
+ * @return void
+ * 
+ */
+public function modifyMediaMeta()
+{
+  $this->validator->sanitize($this->mediaId, 'int');
+
+  if (!empty($this->meta_key)) {
+
+    return $this->mediaDao->updateMediaMeta($this->sanitizer, [
+        'meta_key' => $this->meta_key,
+        'meta_value' => $this->meta_value
+    ], $this->mediaId);
+
+  }
+
+}
 
 /**
  * Removes media record

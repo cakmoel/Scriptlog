@@ -13,7 +13,7 @@ switch ($action) {
 
        if ($mediaId == 0) {
 
-          $mediaLib -> insert();
+          $mediaLib->insert();
 
        } else {
 
@@ -32,9 +32,9 @@ switch ($action) {
 
        }
        
-       if ($mediaDao -> checkMediaId($mediaId, $sanitizer)) {
+       if ($mediaDao->checkMediaId($mediaId, $sanitizer)) {
 
-           $mediaLib -> update($mediaId);
+           $mediaLib->update($mediaId);
 
        } else {
 
@@ -53,9 +53,9 @@ switch ($action) {
 
        }
        
-       if ($mediaDao -> checkMediaId($mediaId, $sanitizer)) {
+       if ($mediaDao->checkMediaId($mediaId, $sanitizer)) {
 
-           $mediaLib -> remove($mediaId);
+           $mediaLib->remove($mediaId);
 
        } else {
 
