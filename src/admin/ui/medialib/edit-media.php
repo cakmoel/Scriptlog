@@ -187,8 +187,8 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
                 <dd><?= $media_properties['File size']; ?></dd>
                 <dt>Uploaded by</dt>
                 <dd><?=(isset($mediaData['media_user'])) ? htmlspecialchars($mediaData['media_user']) : ""; ?></dd>
-                <dt>Upload date</dt>
-                <dd>on <?=$media_properties['Uploaded on']; ?></dd>
+                <dt>Uploaded on</dt>
+                <dd><?=$media_properties['Uploaded on']; ?></dd>
                 <dt>Dimension</dt>
                 <dd><?=(isset($mediaData['media_type']) && $mediaData['media_type'] != "image/jpeg" && $mediaData['media_type'] != "image/png" 
                      && $mediaData['media_type'] != "image/webp" && $mediaData['media_type'] != "image/gif") ? "Not specified" : $media_properties['Dimension']; ?> </dd>

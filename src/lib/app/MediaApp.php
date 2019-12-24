@@ -225,7 +225,7 @@ public function insert()
 
       list($width, $height) = getimagesize($file_location);
 
-      if ($file_extension == '.jpeg' || $file_extension == '.png' || $file_extension == '.gif' || $file_extension == '.webp') {
+      if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
 
          $media_metavalue = array(
                        'File name' => $new_filename, 
@@ -490,7 +490,7 @@ public function update($id)
   
         list($width, $height) = getimagesize($file_location);
   
-         if ($file_extension == '.jpeg' || $file_extension == '.png' || $file_extension == '.gif' || $file_extension == '.webp') {
+         if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
 
             $media_metavalue = array(
                         'File name' => $new_filename, 
