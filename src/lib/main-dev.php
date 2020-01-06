@@ -99,6 +99,8 @@ $library = array(
     APP_ROOT . APP_LIBRARY . DS . 'plugins' . DS
 );
 
+get_server_load();
+
 load_engine($library);
 
 call_htmlpurifier();
@@ -165,7 +167,6 @@ Registry::setAll(array('dbc' => $dbc, 'route' => $rules));
  */
 $searchPost = new SearchFinder($dbc);
 $frontPaginator = new Paginator(10, 'p');
-$postFeeds = new RssFeed($dbc);
 $sanitizer = new Sanitize();
 $userDao = new UserDao();
 $userToken = new UserTokenDao();

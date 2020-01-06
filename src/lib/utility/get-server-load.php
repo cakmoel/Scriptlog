@@ -17,7 +17,7 @@ function get_server_load()
 
     $factor = 1.5;
 
-    $threshold = number_cpus() . $factor;
+    $threshold = number_cpus() * $factor . PHP_EOL;
 
     if (stristr(PHP_OS, 'win')) {
 
@@ -45,7 +45,7 @@ function get_server_load()
         header('Status: 503 Service Temporarily Unavailable');
         header('Retry-After: 300');
         die("Server too busy. Please try again later.");
-        
+
     }
 
 }
