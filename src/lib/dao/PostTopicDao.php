@@ -39,9 +39,7 @@ class PostTopicDao extends Dao
     
     $post_topics = $this->findRow([':post_id' => $cleanId]);
     
-    if (empty($post_topics)) return false;
-    
-    return $post_topics;
+    return (empty($post_topics)) ?: $post_topics;
     
   }
   
@@ -108,9 +106,7 @@ class PostTopicDao extends Dao
       
       $postByTopics = $this->findAll([':topic_id' => $cleanId]);
       
-      if (empty($postByTopics)) return false;
-      
-      return $postByTopics;
+      return (empty($postByTopics)) ?: $postByTopics;
       
   }
               

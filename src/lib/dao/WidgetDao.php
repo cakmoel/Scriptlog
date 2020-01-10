@@ -26,20 +26,10 @@ class WidgetDao extends Dao
                 ORDER BY ID LIMIT 1";
   
   $this->setSQL($sql);
+   
+  $nextLink = (is_null($fetchMode)) ? $this->findRow([':ID' => $id_sanitized]) : $this->findRow([':ID' => $id_sanitized], $fetchMode);
   
-  if (is_null($fetchMode)) {
-      
-    $nextLink = $this->findRow([':ID' => $id_sanitized]);
-     
-  } else {
-  
-    $nextLink = $this->findRow([':ID' => $id_sanitized], $fetchMode);
-      
-  }
-  
-  if (empty($nextLink)) return false;
-  
-  return $nextLink;
+  return (empty($nextLink)) ?: $nextLink;
   
  }
  
@@ -98,18 +88,16 @@ class WidgetDao extends Dao
   		FROM
             tbl_posts
   		WHERE
-            post_status = :status AND post_type = 'blog'
+            post_status = :post_status AND post_type = 'blog'
       ORDER BY ID DESC LIMIT :position, :limit";
       
   try {
   
   $this->setSQL($sql);
   
-  $recentPosts = $this->findAll([':status' => $status, ':position' => $position, ':limit' => $limit]);
+  $recentPosts = $this->findAll([':post_status' => $status, ':position' => $position, ':limit' => $limit]);
   
-  if (empty($recentPosts)) return false;
-  
-  return $recentPosts;
+  return (empty($recentPosts)) ?: $recentPosts;
   
   } catch (DbException $e) {
       

@@ -41,11 +41,10 @@ class TopicDao extends Dao
             ORDER BY :orderBy DESC";
 
     $this->setSQL($sql);
+    
     $topics = $this->findAll([':orderBy' => $orderBy]);
   
-    if (empty($topics)) return false;
-      
-    return $topics;
+    return (empty($topics)) ?: $topics;
       
   }
   
@@ -66,19 +65,9 @@ class TopicDao extends Dao
     
     $this->setSQL($sql);
     
-    if (is_null($fetchMode)) {
-        
-        $topicDetails = $this->findRow([$cleanId]);
-        
-    } else {
-        
-        $topicDetails = $this->findRow([$cleanId], $fetchMode);
-        
-    }
+    $topicById = (is_null($fetchMode)) ? $this->findRow([$cleanId]) : $this->findRow([$cleanId], $fetchMode);
     
-    if (empty($topicDetails)) return false;
-    
-    return $topicDetails;
+    return (empty($topicById)) ?: $topicById;
     
   }
   
@@ -99,20 +88,10 @@ class TopicDao extends Dao
       $slug_sanitized = $this->filteringId($sanitize, $slug, 'xss');
       
       $this->setSQL($sql);
-      
-      if (is_null($fetchMode)) {
+     
+      $topicBySlug = (is_null($fetchMode)) ? $this->findRow([$slug_sanitized]) : $this->findRow([$slug_sanitized], $fetchMode);
 
-          $topicDetails = $this->findRow([$slug_sanitized]);
-
-      } else {
-
-          $topicDetails = $this->findRow([$slug_sanitized], $fetchMode);
-          
-      }
-      
-      if (empty($topicDetails)) return false;
-      
-      return $topicDetails;
+      return (empty($topicBySlug)) ?: $topicBySlug;
       
   }
   
@@ -126,7 +105,7 @@ class TopicDao extends Dao
   public function createTopic($bind)
   {
     
-    $stmt = $this->create("tbl_topics", [
+    $this->create("tbl_topics", [
         'topic_title' => $bind['topic_title'], 
         'topic_slug' => $bind['topic_slug']
     ]);
@@ -147,7 +126,7 @@ class TopicDao extends Dao
   {
       
    $id_sanitized = $this->filteringId($sanitize, $ID, 'sql'); 
-   $stmt = $this->modify("tbl_topics", [
+   $this->modify("tbl_topics", [
        'topic_title' => $bind['topic_title'],
        'topic_slug' => $bind['topic_slug'],
        'topic_status' => $bind['topic_status']
@@ -163,9 +142,9 @@ class TopicDao extends Dao
    */
  public function deleteTopic($ID, $sanitize)
  {  	
-  $cleanId = $this->filteringId($sanitize, $ID, 'sql');
+   $cleanId = $this->filteringId($sanitize, $ID, 'sql');
   
-  $stmt = $this->deleteRecord("tbl_topics", "ID = $cleanId");
+   $this->deleteRecord("tbl_topics", "ID = $cleanId");
  }
 
  /**
@@ -186,9 +165,7 @@ class TopicDao extends Dao
      
      $post_topic = $this->findRow(['topic_id' => $topicId, 'post_id' => $postId]);
      
-     if (empty($post_topic)) return false;
-     
-     return $post_topic;
+     return (empty($post_topic)) ?: $post_topic;
      
  }
  

@@ -44,9 +44,7 @@ class MenuChildDao extends Dao
          
     $menuChilds = $this->findAll([':orderBy' => $orderBy]);
          
-    if (empty($menuChilds)) return false;
-   
-    return $menuChilds;
+    return (empty($menuChilds)) ?: $menuChilds;
    
  }
  
@@ -74,9 +72,7 @@ class MenuChildDao extends Dao
    
    $menuChildDetails = $this->findRow([$idsanitized]);
    
-   if (empty($menuChildDetails)) return false;
-   
-   return $menuChildDetails;
+   return (empty($menuChildDetails)) ?: $menuChildDetails;
    
  }
  
@@ -90,12 +86,17 @@ class MenuChildDao extends Dao
  */
  public function findAscMenu($id, $sanitize)
  {
-   $sql = "SELECT menu_id FROM tbl_menu_child WHERE ID = ?";
-   $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-   $this->setSQL($sql);
-   $ascendentMenu = $this->findColumn([$idsanitized]);
-   if (empty($ascendentMenu)) return false;
-   return $ascendentMenu;
+   
+  $sql = "SELECT menu_id FROM tbl_menu_child WHERE ID = ?";
+   
+  $idsanitized = $this->filteringId($sanitize, $id, 'sql');
+   
+  $this->setSQL($sql);
+   
+  $ascendentMenu = $this->findColumn([$idsanitized]);
+   
+  return (empty($ascendentMenu)) ?: $ascendentMenu;
+
  }
 
 /**
@@ -109,7 +110,8 @@ class MenuChildDao extends Dao
  {
      
   $menuChildSorted = $this->findSortMenuChild();
-  $stmt = $this->create("tbl_menu_child", [
+  
+  $this->create("tbl_menu_child", [
       'menu_child_label' => $bind['menu_child_label'],
       'menu_child_link'  => $bind['menu_child_link'],
       'menu_id' => $bind['menu_id'],
@@ -118,13 +120,14 @@ class MenuChildDao extends Dao
   ]);
  
   $sql = "SELECT ID, menu_child_link FROM tbl_menu_child WHERE ID = ?";
+  
   $this->setSQL($sql);
+  
   $getChildLink = $this->findColumn([$this->lastId()]);
-  $data_child_link = array("menu_child_link" => ['#']);
+  
+  $data_child = array("menu_child_link" => ['#']);
 
-  if (empty($getChildLink['menu_child_link'])) {
-     $stmt2 = $this->modify("tbl_menu_child", $data_child_link, "`ID` = {$getChildLink['ID']}");
-  }
+  $menuChildLink = (!empty($getChildLink['menu_child_link'])) ?: $this->modify("tbl_menu_child", $data_child, "ID = {$getChildLink['ID']}");
   
  }
  
@@ -141,7 +144,7 @@ class MenuChildDao extends Dao
  {
    
    $cleanId = $this->filteringId($sanitize, $ID, 'sql');
-   $stmt = $this->modify("tbl_menu_child", [
+   $this->modify("tbl_menu_child", [
        'menu_child_label' => $bind['menu_child_label'],
        'menu_child_link'  => $bind['menu_child_link'],
        'menu_id' => $bind['menu_id'],
@@ -163,19 +166,19 @@ class MenuChildDao extends Dao
  public function activateMenuChild($id, $sanitize)
  {
    $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-   $stmt = $this->modify("tbl_menu_child", ['menu_child_status' => 'Y'], "`ID` => {$idsanitized}");
+   $this->modify("tbl_menu_child", ['menu_child_status' => 'Y'], "`ID` => {$idsanitized}");
  }
 
  public function deactivateMenuChild($id, $sanitize)
  {
    $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-   $stmt = $this->modify("tbl_menu_child", ['menu_child_status' => 'N'], "`ID` => {$idsanitized}");
+   $this->modify("tbl_menu_child", ['menu_child_status' => 'N'], "`ID` => {$idsanitized}");
  }
 
  public function deleteMenuChild($id, $sanitize)
  {
    $id_sanitized = $this->filteringId($sanitize, $id, 'sql');
-   $stmt = $this->deleteRecord("tbl_menu_child", "`ID` = {$id_sanitized}");    
+   $this->deleteRecord("tbl_menu_child", "`ID` = {$id_sanitized}");    
  }
  
  public function menuChildExists($menu_child_label)

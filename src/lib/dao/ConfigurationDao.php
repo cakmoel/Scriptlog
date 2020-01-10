@@ -99,9 +99,7 @@ public function findConfigs($orderBy = 'ID')
 
 	$configs = $this->findAll([':orderBy' => $orderBy]);
 
-	if (empty($configs)) return false;
-
-	return $configs;
+	return (empty($configs)) ?: $configs;
 	
 }
 
@@ -124,11 +122,9 @@ public function findConfig($id, $sanitize)
 
   $this->setSQL($sql);
 
-  $detailSetting = $this->findRow([':ID' => $id_sanitized]);
+  $detailConfig = $this->findRow([':ID' => $id_sanitized]);
 
-  if (empty($detailSetting)) return false;
-
-  return $detailSetting;
+  return (empty($detailConfig)) ?: $detailConfig;
   
 }
 

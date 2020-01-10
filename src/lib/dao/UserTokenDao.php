@@ -39,20 +39,10 @@ class UserTokenDao extends Dao
              WHERE u.user_email = :user_email AND t.is_expired = :expired";
 
       $this->setSQL($sql);
-
-      if (is_null($fetchMode)) {
-
-        $userToken = $this->findRow([':user_email' => $user_email, ':expired' => $expired]);
-
-      } else {
-
-        $userToken = $this->findRow([':user_email' => $user_email, ':expired' => $expired], $fetchMode);
-
-      }
+  
+      $userToken = (is_null($fetchMode)) ? $this->findRow([':user_email' => $user_email, ':expired' => $expired]) : $this->findRow([':user_email' => $user_email, ':expired' => $expired], $fetchMode);
       
-      if (empty($userToken)) return false;
-
-      return $userToken;
+      return (empty($userToken)) ?: $userToken;
 
   }
 
@@ -65,7 +55,7 @@ class UserTokenDao extends Dao
   public function updateTokenExpired($userTokenId)
   {
     $bind = ['is_expired' => 1];
-    $stmt = $this->modify("tbl_user_token", $bind, "ID = {$userTokenId}");
+    $this->modify("tbl_user_token", $bind, "ID = {$userTokenId}");
   }
 
 /**
@@ -77,7 +67,7 @@ class UserTokenDao extends Dao
   public function createUserToken($bind)
   {
 
-    $stmt = $this->create("tbl_user_token", [
+    $this->create("tbl_user_token", [
 
       'user_id' => $bind['user_id'],
       'pwd_hash' => $bind['pwd_hash'],

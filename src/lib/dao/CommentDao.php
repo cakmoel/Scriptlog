@@ -28,19 +28,18 @@ class CommentDao extends Dao
  public function findComments($orderBy = 'ID')
  {
    $sql = "SELECT c.ID, c.comment_post_id, c.comment_author_name,  
-             c.comment_author_ip, c.comment_content, c.comment_status, 
-             c.comment_date, p.post_title 
+                  c.comment_author_ip, c.comment_content, c.comment_status, 
+                  c.comment_date, p.post_title 
            FROM tbl_comments AS c 
            INNER JOIN tbl_posts AS p 
            ON c.comment_post_id = p.ID ORDER BY :orderBy DESC ";
    
    $this->setSQL($sql);
+
    $comments = $this->findAll([':orderBy' => $orderBy]);
    
-   if (empty($comments)) return false;
-   
-   return $comments;
-   
+   return (empty($comments)) ?: $comments;
+
  }
  
 /**
@@ -58,15 +57,13 @@ class CommentDao extends Dao
    
    $sql = "SELECT ID, comment_post_id, comment_author_name, 
            comment_author_ip, comment_content, comment_status, 
-           comment_date FROM tbl_comments WHERE ID = ?";
+           comment_date FROM tbl_comments WHERE ID = ? ";
    
    $this->setSQL($sql);
    
    $commentDetails = $this->findRow([$id_sanitized]);
    
-   if (empty($commentDetails)) return false;
-   
-   return $commentDetails;
+   return (empty($commentDetails)) ?: $commentDetails;
    
  }
  
@@ -84,7 +81,7 @@ class CommentDao extends Dao
         'comment_post_id' => $bind['comment_post_id'],
         'comment_author_name' => $bind['comment_author_name'],
         'comment_author_ip' => $bind['comment_author_ip'],
-        'comment_content' => $bind['comment_content'],
+        'comment_content' => purify_dirty_html($bind['comment_content']),
         'comment_date' => $bind['comment_date']
    ]); 
     
@@ -105,7 +102,7 @@ class CommentDao extends Dao
    $cleanId = $this->filteringId($sanitize, $ID, 'sql');
    $this->modify("tbl_comments", [
        'comment_author_name' => $bind['comment_author_name'],
-       'comment_content' => $bind['comment_content'],
+       'comment_content' => purify_dirty_html($bind['comment_content']),
        'comment_status' => $bind['comment_status']
    ], "`ID` = {$cleanId}");
    

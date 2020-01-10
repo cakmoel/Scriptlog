@@ -13,7 +13,6 @@
 class MediaDao extends Dao
 {
 
-
 public function __construct()
 {
     parent::__construct();
@@ -48,7 +47,7 @@ public function findAllMedia($orderBy = 'ID', $user_level = null)
 
     $this->setSQL($sql);
   
-    $medias = $this->findAll([':orderBy' => $orderBy, ':user_level'=> $user_level]);
+    $allMedia = $this->findAll([':orderBy' => $orderBy, ':user_level'=> $user_level]);
 
   } else {
 
@@ -65,14 +64,12 @@ public function findAllMedia($orderBy = 'ID', $user_level = null)
 
     $this->setSQL($sql);
     
-    $medias = $this->findAll([':orderBy' => $orderBy]);
+    $allMedia = $this->findAll([':orderBy' => $orderBy]);
     
   }
   
-  if(empty($medias)) return false;
+  return (empty($allMedia)) ?: $allMedia;
 
-  return $medias;
-  
 }
 
 /**
@@ -100,11 +97,9 @@ public function findMediaById($mediaId, $sanitize)
 
   $this->setSQL($sql);
 
-  $mediaDetails = $this->findRow([$idsanitized]);
+  $mediaById = $this->findRow([$idsanitized]);
 
-  if(empty($mediaDetails)) return false;
-
-  return $mediaDetails;
+  return (empty($mediaById)) ?: $mediaById;
 
 }
 
@@ -132,16 +127,14 @@ public function findMediaByType($type)
 
   $this->setSQL($sql);
   
-  $mediaDetails = $this->findRow([':media_type' => $type]);
+  $mediaByType = $this->findRow([':media_type' => $type]);
 
-  if(empty($mediaDetails)) return false;
-
-  return $mediaDetails;
+  return (empty($mediaByType)) ?: $mediaByType;
   
 }
 
 /**
- * find mediameta by media's Id
+ * find mediameta by it's id and key
  * 
  * @method public findMediaMeta()
  * @param int $mediaId
@@ -158,11 +151,60 @@ public function findMediaMetaValue($mediaId, $media_filename, $sanitize)
 
  $this->setSQL($sql);
 
- $mediameta_details = $this->findRow([$idsanitized, $media_filename]);
+ $mediameta = $this->findRow([$idsanitized, $media_filename]);
 
- if(empty($mediameta_details)) return false;
+ return (empty($mediameta)) ?: $mediameta;
 
- return $mediameta_details;
+}
+
+/**
+ * Find all media for downloaded
+ *
+ * @param int $orderBy
+ * @return void
+ * 
+ */
+public function findAllMediaDownload($orderBy = 'ID')
+{
+   
+ $sql = "SELECT ID, media_filename, media_caption, media_type, media_taget, 
+                media_user, media_access, media_status
+         FROM tbl_media 
+         WHERE media_target = 'download' 
+         AND media_access = 'public' AND media_status = '1'
+         ORDER BY :orderBy DESC";
+ 
+  $this->setSQL($sql);
+
+  $items = $this->findAll([':orderBy' => $orderBy]);
+
+  return (empty($items)) ?:  $items;
+   
+}
+
+/**
+ * Find media for downloaded based on ID
+ *
+ * @param int $mediaId
+ * @param obj $sanitize
+ * @return void
+ * 
+ */
+public function findMediaDownload($mediaId, $sanitize)
+{
+
+ $id_sanitized = $this->filteringId($sanitize, $mediaId, 'sql');
+
+ $sql = "SELECT ID, media_filename, media_caption, media_type, media_taget, 
+                media_user, media_access, media_status
+         FROM tbl_media 
+         WHERE ID = :ID 
+         AND media_target = 'download' 
+         AND media_access = 'public' AND media_status = '1' ";
+
+ $item = $this->findRow([':ID' => $id_sanitized]);
+ 
+ return (empty($item)) ?: $item;
 
 }
 
@@ -179,7 +221,7 @@ public function createMedia($bind)
   $this->create("tbl_media", [
 
       'media_filename' => $bind['media_filename'],
-      'media_caption'  => $bind['media_caption'],
+      'media_caption'  => purify_dirty_html($bind['media_caption']),
       'media_type'     => $bind['media_type'],
       'media_target'   => $bind['media_target'],
       'media_user'     => $bind['media_user'],
@@ -231,7 +273,7 @@ public function updateMedia($sanitize, $bind, $ID)
      $this->modify("tbl_media", [
         
          'media_filename' => $bind['media_filename'],
-         'media_caption'  => $bind['media_caption'],
+         'media_caption'  => purify_dirty_html($bind['media_caption']),
          'media_target'   => $bind['media_target'],
          'media_access'   => $bind['media_access'],
          'media_status'   => $bind['media_status']

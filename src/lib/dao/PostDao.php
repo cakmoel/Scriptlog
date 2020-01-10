@@ -85,9 +85,7 @@ public function findPosts($orderBy = 'ID', $author = null)
 
     $posts = $this->findAll($data);
     
-    if (empty($posts)) return false;
-    
-    return $posts;
+    return (empty($posts)) ?: $posts;
     
 }
 
@@ -151,10 +149,36 @@ public function findPost($id, $sanitize, $author = null)
   
   $postDetail = $this->findRow($data);
 
-  if (empty($postDetail)) return false;
-  
-  return $postDetail;
+  return (empty($postDetail)) ?: $postDetail;
    
+}
+
+/**
+ * Retrieve posts records for sharing post
+ * on post feeds
+ *
+ * @param integer $limit
+ * @return void
+ */
+public function showPostFeeds($limit = 5)
+{
+  $sql =  "SELECT p.ID, p.post_image, p.post_author,
+                  p.post_date, p.post_modified, p.post_title,
+                  p.post_slug, p.post_content, p.post_type,
+                  p.post_status, u.user_login
+            FROM tbl_posts AS p
+            INNER JOIN tbl_users AS u ON p.post_author = u.ID
+            WHERE p.post_type = 'blog' AND p.post_status = 'publish' 
+            ORDER BY p.ID DESC LIMIT :limit";
+
+  $data = array(':limit' => $limit);
+
+  $this->setSQL($sql);
+
+  $feeds = $this->findAll($data);
+    
+  return (empty($feeds)) ?: $feeds;
+
 }
 
 /**
@@ -179,11 +203,9 @@ public function showPostById($id, $sanitize)
     
     $this->setSQL($sql);
     
-    $readPost = $this->findRow([':ID' => $sanitized_id]);
+    $postById = $this->findRow([':ID' => $sanitized_id]);
     
-    if (empty($readPost)) return false;
-    
-    return $readPost;
+    return (empty($postById)) ?: $postById;
     
 }
 
@@ -207,11 +229,9 @@ public function showPostBySlug($slug)
 
   $this->setSQL($sql);
 
-  $readPost = $this->findRow([':slug' => $slug]);
+  $postBySlug = $this->findRow([':slug' => $slug]);
 
-  if (empty($readPost)) return false;
-
-  return $readPost;
+  return (empty($postBySlug)) ?: $postBySlug;
    
 }
 
@@ -248,9 +268,7 @@ public function showPostsPublished(Paginator $perPage, $sanitize)
     
     $pagination = $this->linkPosts->page_links($sanitize);
     
-    if (empty($postsPublished)) return false;
-
-    return(['postsPublished' => $postsPublished, 'paginationLink' => $pagination]);
+    return (empty($postsPublished)) ?: ['postsPublished' => $postsPublished, 'paginationLink' => $pagination];
         
 }
 
@@ -274,9 +292,7 @@ public function showRelatedPosts($post_title)
 
   $relatedPosts = $this->findRow([$post_title]);
 
-  if (empty($relatedPosts)) return false;
-
-  return $relatedPosts;
+  return (empty($relatedPosts)) ?: $relatedPosts;
 
 }
 
@@ -292,7 +308,7 @@ public function createPost($bind, $topicId)
  if (!empty($bind['media_id'])) {
   		
   	// insert into posts
-   $stmt = $this->create("tbl_posts", [
+   $this->create("tbl_posts", [
        'media_id' => $bind['media_id'],
        'post_author' => $bind['post_author'],
        'post_date' => $bind['post_date'],
@@ -307,7 +323,7 @@ public function createPost($bind, $topicId)
      	 
  } else {
   			
-  $stmt = $this->create("tbl_posts", [
+  $this->create("tbl_posts", [
       'post_author' => $bind['post_author'],
       'post_date' => $bind['post_date'],
       'post_title' => $bind['post_title'],
@@ -359,7 +375,7 @@ public function updatePost($sanitize, $bind, $ID, $topicId)
 
  if (!empty($bind['media_id'])) {
   	  	
-  	$stmt = $this->modify("tbl_posts", [
+  	$this->modify("tbl_posts", [
   	    'media_id' => $bind['media_id'],
   	    'post_author' => $bind['post_author'],
   	    'post_modified' => $bind['post_modified'],
@@ -374,7 +390,7 @@ public function updatePost($sanitize, $bind, $ID, $topicId)
   	 	
   } else {
   	 
-      $stmt = $this->modify("tbl_posts", [
+      $this->modify("tbl_posts", [
           'post_author' => $bind['post_author'],
           'post_modified' => $bind['post_modified'],
           'post_title' => $bind['post_title'],
@@ -393,13 +409,13 @@ public function updatePost($sanitize, $bind, $ID, $topicId)
   $post_id = $this->findColumn([$cleanId]);
   
   // delete post_topic
-  $stmt2 = $this->deleteRecord("tbl_post_topic", "ID = {$post_id['ID']}");
+  $this->deleteRecord("tbl_post_topic", "ID = {$post_id['ID']}");
   	  
   if (is_array($topicId)) {
   	     
   	 foreach ($_POST['catID'] as $topicId) {
   	     
-  	    $stmt3 = $this->create("tbl_post_topic", [
+  	    $this->create("tbl_post_topic", [
   	        'post_id' => $cleanId,
   	        'topic_id' => $topicId
   	    ]);
@@ -408,7 +424,7 @@ public function updatePost($sanitize, $bind, $ID, $topicId)
   	     
   } else {
   	      
-      $stmt3 = $this->create("tbl_post_topic", [
+      $this->create("tbl_post_topic", [
           'post_id' => $cleanId,
           'topic_id' => $topicId
       ]);
@@ -426,7 +442,7 @@ public function updatePost($sanitize, $bind, $ID, $topicId)
 public function deletePost($id, $sanitize)
 { 
  $idsanitized = $this->filteringId($sanitize, $id, 'sql');
- $stmt = $this->deleteRecord("tbl_posts", "ID = {$idsanitized}"); 	  
+ $this->deleteRecord("tbl_posts", "ID = {$idsanitized}"); 	  
 }
 
 /**

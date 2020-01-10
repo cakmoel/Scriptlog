@@ -38,9 +38,7 @@ class ThemeDao extends Dao
     
     $themes = $this->findAll([':orderBy' => $orderBy]);
 
-    if (empty($themes)) return false;
-    
-    return $themes;
+    return (empty($themes)) ?: $themes;
     
   }
   
@@ -66,11 +64,9 @@ class ThemeDao extends Dao
 
     $this->setSQL($sql);
     
-    $themeDetails = $this->findRow([$idsanitized]);
+    $themeDetail = $this->findRow([$idsanitized]);
     
-    if (empty($themeDetails)) return false;
-
-    return $themeDetails;
+    return (empty($themeDetail)) ?: $themeDetail;
 
   }
 
@@ -84,7 +80,7 @@ class ThemeDao extends Dao
    */
   public function insertTheme($bind)
   {
-    $stmt = $this->create("tbl_themes", [
+    $this->create("tbl_themes", [
       'theme_title' => $bind['theme_title'],
       'theme_desc' => $bind['theme_desc'],
       'theme_designer' => $bind['theme_designer'],
@@ -106,7 +102,7 @@ class ThemeDao extends Dao
   {
 
     $cleanId = $this->filteringId($sanitize, $ID, 'sql');
-    $stmt = $this->modify("tbl_themes", [
+    $this->modify("tbl_themes", [
        'theme_title' => $bind['theme_title'],
        'theme_desc' => $bind['theme_desc'],
        'theme_designer' => $bind['theme_designer'],
@@ -128,7 +124,7 @@ class ThemeDao extends Dao
   public function deleteTheme($id, $sanitize)
   {
     $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-    $stmt = $this->deleteRecord("tbl_themes", "ID = {$idsanitized}");
+    $this->deleteRecord("tbl_themes", "ID = {$idsanitized}");
   }
   
   /**
@@ -166,9 +162,7 @@ class ThemeDao extends Dao
        $this->setSQL($sql);
        $is_actived = $this->findColumn([$theme_title]);
 
-       if(empty($is_actived)) return false;
-
-       return $is_actived;
+       return (empty($is_actived)) ?: $is_actived;
 
     } else {
 
@@ -261,9 +255,7 @@ class ThemeDao extends Dao
     
     $activeTheme = $this->findRow([':theme_status' => $theme_status]);
 
-    if (empty($activeTheme)) return false;
-
-    return $activeTheme;
+    return (empty($activeTheme)) ?: $activeTheme;
     
   }
   

@@ -27,9 +27,7 @@ class ReplyDao extends Dao
     $this->setSQL($sql);
     $replies = $this->findAll([':orderBy' => $orderBy]);
     
-    if (empty($replies)) return false;
-    
-    return $replies;
+    return (empty($replies)) ?: $replies;
     
   }
   
@@ -38,17 +36,18 @@ class ReplyDao extends Dao
     $idsanitized = $this->filteringId($sanitize, $id, 'sql');
     $sql = "SELECT ID, comment_id, user_id, reply_content, reply_status, reply_date 
             FROM tbl_comment_reply WHERE ID = ?";
-    $this->setSQL($sql);
-    $replyDetails = $this->findRow([$idsanitized], PDO::FETCH_ASSOC);
-    if (empty($replyDetails)) return false;
     
-    return $replyDetails;
+    $this->setSQL($sql);
+    
+    $replyDetail = $this->findRow([$idsanitized], PDO::FETCH_ASSOC);
+    
+    return (empty($replyDetail)) ?: $replyDetail;
     
   }
   
   public function createReply($bind)
   {
-    $stmt = $this->create("tbl_comment_reply", [
+    $this->create("tbl_comment_reply", [
         'comment_id' => $bind['comment_id'],
         'user_id' => $bind['user_id'],
         'reply_content' => $bind['reply_content'],
@@ -60,7 +59,7 @@ class ReplyDao extends Dao
   public function updateReply($sanitize, $bind, $id)
   {
      $cleanId = $this->filteringId($sanitize, $id, 'sql');
-     $stmt = $this->modify("tbl_comment_reply", [
+     $this->modify("tbl_comment_reply", [
          'comment_id' => $bind['comment_id'],
          'user_id' => $bind['user_id'],
          'reply_content' => $bind['reply_content'],
@@ -72,7 +71,7 @@ class ReplyDao extends Dao
   public function deleteReply($id, $sanitize)
   { 
     $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-    $stmt = $this->deleteRecord("tbl_comment_reply", "`ID` = {$idsanitized}");
+    $this->deleteRecord("tbl_comment_reply", "`ID` = {$idsanitized}");
   }
   
   public function checkReplyId($id, $sanitize)

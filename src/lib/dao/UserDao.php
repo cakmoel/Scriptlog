@@ -38,24 +38,14 @@ class UserDao extends Dao
                    user_fullname,
 				   user_level, 
                    user_session
-		   FROM tbl_users ORDER BY '$orderBy' DESC";
+		   FROM tbl_users ";
      
      $this->setSQL($sql);
      
-     if (!is_null($fetchMode)) {
-         
-         $users = $this->findAll($fetchMode);
-         
-     } else {
-         
-         $users = $this->findAll();
-         
-     }
-     
-     if (empty($users)) return false;
-     
-     return $users;
-     
+     $users = (!is_null($fetchMode)) ? $this->findAll($fetchMode) : $this->findAll();
+
+     return (empty($users)) ?: $users;
+    
  }
 
 /**
@@ -80,21 +70,11 @@ class UserDao extends Dao
            FROM tbl_users WHERE ID = :ID";
    
    $this->setSQL($sql);
-   
-   if (is_null($fetchMode)) {
-       
-    $userDetails = $this->findRow([':ID' => $cleanId]);
-       
-   } else {
-       
-    $userDetails = $this->findRow([':ID' => $cleanId], $fetchMode);
-        
-   }
-   
-   if (empty($userDetails)) return false;
-   
-   return $userDetails;
-   
+
+   $userById = (is_null($fetchMode)) ? $this->findRow([':ID' => $cleanId]) : $this->findRow([':ID' => $cleanId], $fetchMode);
+
+   return (empty($userById)) ?: $userById;
+
  }
 
  /**
@@ -118,20 +98,10 @@ class UserDao extends Dao
    
    $this->setSQL($sql);
    
-   if (is_null($fetchMode)) {
-       
-       $userDetails = $this->findRow([':user_email' => $user_email]);
-       
-   } else {
-       
-       $userDetails = $this->findRow([':user_email' => $user_email], $fetchMode);
-       
-   }
+   $userByEmail = (is_null($fetchMode)) ? $this->findRow([':user_email' => $user_email]) : $this->findRow([':user_email'], $fetchMode);
    
-   if (empty($userDetails)) return false;
-   
-   return $userDetails;
-   
+   return (empty($userByEmail)) ?: $userByEmail;
+
  }
  
  /**
@@ -150,10 +120,8 @@ class UserDao extends Dao
    
    $resetKeyDetails = $this->findRow([':reset_key' => $reset_key]);
 
-   if (empty($resetKeyDetails)) return false;
-
-   return $resetKeyDetails;
-
+   return (empty($resetKeyDetails)) ?: $resetKeyDetails;
+   
  }
 
  /**

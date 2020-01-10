@@ -29,6 +29,7 @@ public function __construct()
  */
 public function findPages($type, $orderBy = 'ID')
 {
+   
    $sql = "SELECT ID, post_author, post_date, post_modified,
   		  post_title, post_type
   		  FROM tbl_posts WHERE post_type = :type
@@ -37,10 +38,8 @@ public function findPages($type, $orderBy = 'ID')
     $this->setSQL($sql);
     
     $pages = $this->findAll([':type' => $type, ':orderBy' => $orderBy]);
-    
-    if (empty($pages)) return false;
-    
-    return $pages;
+
+    return (empty($pages)) ?: $pages;
     
 }
 
@@ -67,9 +66,7 @@ public function findPageById($pageId, $post_type, $sanitize)
     
     $pageById = $this->findRow([$id_sanitized, $post_type]);
     
-    if (empty($pageById)) return false;
-    
-    return $pageById;
+    return (empty($pageById)) ?: $pageById;
     
 }
 
@@ -102,9 +99,7 @@ public function findPageBySlug($slug, $sanitize)
 
     $pageBySlug = $this->findRow([':slug' => $slug_sanitized]);
     
-    if (empty($pageBySlug)) return false;
-    
-    return $pageBySlug;
+    return (empty($pageBySlug)) ?: $pageBySlug;
     
 }
 
@@ -156,7 +151,7 @@ public function updatePage($sanitize, $bind, $ID)
 
  if (empty($bind['post_image'])) {
  
- 	$stmt = $this->modify("tbl_posts", [
+ 	$this->modify("tbl_posts", [
  	    'post_modified' => $bind['post_modified'],
  	    'post_title' => $bind['post_title'],
  	    'post_slug' => $bind['post_slug'],
@@ -166,7 +161,7 @@ public function updatePage($sanitize, $bind, $ID)
  	
  } else {
  	
- 	$stmt = $this->modify("tbl_posts", [
+ 	$this->modify("tbl_posts", [
  	    'post_image' => $bind['post_image'],
  	    'post_modified' => $bind['post_modified'],
  	    'post_title' => $bind['post_title'],
@@ -189,7 +184,7 @@ public function updatePage($sanitize, $bind, $ID)
 public function deletePage($ID, $sanitize, $type)
 {
  $id_sanitized = $this->filteringId($sanitize, $ID, 'sql');
- $stmt = $this->deleteRecord("tbl_posts", "`ID` = {$id_sanitized} AND post_type = {$type}");  
+ $this->deleteRecord("tbl_posts", "`ID` = {$id_sanitized} AND post_type = {$type}");  
 }
 
 /**

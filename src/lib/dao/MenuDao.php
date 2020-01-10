@@ -35,11 +35,9 @@ class MenuDao extends Dao
 
     $this->setSQL($sql);
 
-    $menus = $this->findAll([':orderBy' => $orderBy]);
+    $allMenu = $this->findAll([':orderBy' => $orderBy]);
 
-    if (empty($menus)) return false;
-     
-    return $menus;
+    return (empty($allMenu)) ?: $allMenu;
      
  }
 
@@ -62,11 +60,9 @@ class MenuDao extends Dao
      
      $this->setSQL($sql);
      
-     $menuDetails = $this->findRow([$idsanitized]);
+     $menuDetail = $this->findRow([$idsanitized]);
      
-     if (empty($menuDetails)) return false;
-     
-     return $menuDetails;
+     return (empty($menuDetail)) ?: $menuDetail;
      
  }
  
@@ -110,7 +106,7 @@ class MenuDao extends Dao
  {
   
   $cleanId = $this->filteringId($sanitize, $ID, 'sql');
-  $stmt = $this->modify("tbl_menu", [
+  $this->modify("tbl_menu", [
       'menu_label' => $bind['menu_label'],
       'menu_link' => $bind['menu_link'],
       'menu_sort' => $bind['menu_sort'],
@@ -129,7 +125,7 @@ class MenuDao extends Dao
  public function activateMenu($id, $sanitize)
  {
    $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-   $stmt = $this->modify("tbl_menu", ['menu_status' => 'Y'], "ID => {$idsanitized}");
+   $this->modify("tbl_menu", ['menu_status' => 'Y'], "ID => {$idsanitized}");
  }
 
  /**
@@ -142,7 +138,7 @@ class MenuDao extends Dao
  public function deactivateMenu($id, $sanitize)
  {
   $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-  $stmt = $this->modify("tbl_menu", ['menu_status' => 'N'], "ID => {$idsanitized}");
+  $this->modify("tbl_menu", ['menu_status' => 'N'], "ID => {$idsanitized}");
  }
 
  /**
@@ -155,7 +151,7 @@ class MenuDao extends Dao
  public function deleteMenu($id, $sanitize)
  {
   $cleanId = $this->filteringId($sanitize, $id, 'sql');
-  $stmt = $this->deleteRecord("tbl_menu", "ID = {$cleanId}");
+  $this->deleteRecord("tbl_menu", "ID = {$cleanId}");
  }
 
  /**
@@ -375,9 +371,7 @@ class MenuDao extends Dao
   
   $field = $this->findColumn();
   
-  $menu_sorted = $field['menu_sort'] + 1;
-  
-  return $menu_sorted;
+  return $field['menu_sort'] + 1;
   
  }
 
