@@ -24,7 +24,7 @@ if (file_exists(__DIR__ . '/../config.sample.php')) {
 }
 
 $errors = [];
-$loginFormSubmitted = isset($_POST['Login']);
+$loginFormSubmitted = (isset($_POST['Login'])) ? $_POST['Login'] : null;
   
 if (!empty($loginFormSubmitted)) {
       
@@ -71,7 +71,7 @@ if (!empty($loginFormSubmitted)) {
         $isAuthenticated = true;
     }
   
-    if ($isAuthenticated) {
+    if ($isAuthenticated === true) {
 
       $authenticator -> login($_POST);
   

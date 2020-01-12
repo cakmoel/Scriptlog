@@ -146,14 +146,9 @@ class Authentication
    */
   public function checkEmailExists($email)
   {
-      if ($this->userDao->checkUserEmail($email)) {
-         
-        return true;
-          
-      }
       
-      return false;
-      
+    return ($this->userDao->checkUserEmail($email)) ?: false;
+  
   }
 
 /**
@@ -246,7 +241,7 @@ class Authentication
            $bind = ['user_id' => $account_info['ID'], 'pwd_hash' => $hashed_password, 
                    'selector_hash' => $hashed_selector, 'expired_date' => $expired_date];
 
-           $newUserToken = $this->userToken->createUserToken($bind);
+           $this->userToken->createUserToken($bind);
 
       } else {
 
