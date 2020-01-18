@@ -275,7 +275,7 @@ public function createMedia($bind)
   $this->create("tbl_media", [
 
       'media_filename' => $bind['media_filename'],
-      'media_caption'  => purify_dirty_html($bind['media_caption']),
+      'media_caption'  => $bind['media_caption'],
       'media_type'     => $bind['media_type'],
       'media_target'   => $bind['media_target'],
       'media_user'     => $bind['media_user'],
@@ -308,6 +308,12 @@ public function createMediaMeta($bind)
 
 }
 
+/**
+ * create media downloaded
+ *
+ * @param array $bind
+ * 
+ */
 public function createMediaDownload($bind)
 {
 
@@ -341,7 +347,7 @@ public function updateMedia($sanitize, $bind, $ID)
      $this->modify("tbl_media", [
         
          'media_filename' => $bind['media_filename'],
-         'media_caption'  => purify_dirty_html($bind['media_caption']),
+         'media_caption'  => $bind['media_caption'],
          'media_target'   => $bind['media_target'],
          'media_access'   => $bind['media_access'],
          'media_status'   => $bind['media_status']

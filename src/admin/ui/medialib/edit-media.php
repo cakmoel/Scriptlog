@@ -57,9 +57,14 @@ $media_id = isset($mediaData['ID']) ? $mediaData['ID'] : 0;
 ?>
 <form method="post" action="<?=generate_request('index.php', 'post', ['medialib', $action, $media_id])['link'];?>" role="form" enctype="multipart/form-data" autocomplete="off" >
 <input type="hidden" name="MAX_FILE_SIZE" value="10485760" />
-<input type="hidden" name="media_id" value="<?= $media_id; ?>" >
+<input type="hidden" name="media_id" value="<?=(int)$media_id; ?>" >
 
 <div class="box-body">
+<div class="form-group">
+<label for="mediaType">Media</label>
+
+</div>
+
 <?php 
 if (isset($mediaData['media_filename'])) :
 
@@ -75,10 +80,11 @@ if (isset($mediaData['media_filename'])) :
   if($image_src) :
 
 ?>
+
 <div class="form-group">
 <br><a href="<?=$image_src; ?>" target="_blank">
 <img src="<?=$image_src_thumb; ?>" class="img-responsive pad" ></a><br>
-<label>Change file</label>
+<label for="ChangePicture">Change picture</label>
 <input type="file"  name="media" id="mediaUploaded" onchange="loadFile(event)" maxlength="512" >
 <img id="output" class="img-responsive pad" >
 <p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
@@ -86,20 +92,22 @@ if (isset($mediaData['media_filename'])) :
   <?php else: ?>
 <div class="form-group">
 <br><a href="#"><?=invoke_fileicon($mediaData['media_type']);?></a><br>
-<label>Change file</label>
+<label for="ChangeFile">Change file</label>
 <input type="file"  name="media" id="mediaUploaded"  maxlength="512" >
 <p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
 </div>
   <?php endif; ?>
 
 <?php else: ?>
+
 <div class="form-group">
 <div id="image-preview">
-  <label for="image-upload" id="image-label">Choose File</label>
-  <input type="file" name="media" id="image-upload" required>
+  <label for="image-upload" id="image-label">Choose picture</label>
+  <input type="file" name="media" id="image-upload" accept="image/*" maxlength="512" required>
 </div>
 <p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
 </div>
+
 <?php endif; ?>
 
 <div class="form-group">
@@ -136,7 +144,7 @@ if (isset($mediaData['media_filename'])) :
 
 <div class="radio">
 <label>
-<input type="radio" name="media_status" id="optionsRadios1" value="0" 
+<input type="radio" name="media_status" id="optionsRadios2" value="0" 
 <?=(isset($mediaData['media_status']) && $mediaData['media_status'] === 0) ? 'checked="checked"' : ""; ?>
 <?=(isset($formData['media_status']) && $formData['media_status'] == 0) ? 'checked="checked"' : ""; ?>>
    No
