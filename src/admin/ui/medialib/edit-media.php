@@ -60,10 +60,6 @@ $media_id = isset($mediaData['ID']) ? $mediaData['ID'] : 0;
 <input type="hidden" name="media_id" value="<?=(int)$media_id; ?>" >
 
 <div class="box-body">
-<div class="form-group">
-<label for="mediaType">Media</label>
-
-</div>
 
 <?php 
 if (isset($mediaData['media_filename'])) :

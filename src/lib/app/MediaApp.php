@@ -117,7 +117,7 @@ public function insert()
     $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : '';
     $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
 
-    $media_caption = isset($_POST['media_caption']) ? purify_dirty_html($_POST['media_caption']) : '';
+    $media_caption = isset($_POST['media_caption']) ? prevent_injection($_POST['media_caption']) : '';
     $media_target = $_POST['media_target'];
     $media_access = $_POST['media_access'];
 
