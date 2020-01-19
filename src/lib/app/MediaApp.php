@@ -117,32 +117,11 @@ public function insert()
     $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : '';
     $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
 
-    $media_caption = isset($_POST['media_caption']) ? prevent_injection($_POST['media_caption']) : '';
-    $media_target = $_POST['media_target'];
-    $media_access = $_POST['media_access'];
-
-    $accepted_files = array(
-      'pdf'  => 'application/pdf', 
-      'doc'  => 'application/msword', 
-      'rar'  => 'application/rar', 
-      'zip'  => 'application/zip', 
-      'xls'  => 'application/vnd.ms-excel', 
-      'xls'  => 'application/octet-stream', 
-      'exe'  => 'application/vnd.microsoft.portable-executable', 
-      'ppt'  => 'application/vnd.ms-powerpoint',
-      'odt'  => 'application/vnd.oasis.opendocument.text',
-      'jpeg' => 'image/jpeg', 
-      'jpg'  => 'image/jpeg', 
-      'png'  => 'image/png', 
-      'gif'  => 'image/gif', 
-      'webp' => 'image/webp',
-      'mp3'  => 'audio/mpeg', 
-      'wav'  => 'audio/wav',
-      'ogg'  => 'audio/ogg',
-      'mp4'  => 'video/mp4',
-      'webm' => 'video/webm',
-      'ogg'  => 'video/ogg'
-    );
+    $filters = [
+      'media_caption' => FILTER_SANITIZE_SPECIAL_CHARS,
+      'media_target' => FILTER_SANITIZE_STRING,
+      'media_access' => FILTER_SANITIZE_STRING,
+    ];
 
     try {
 
@@ -209,7 +188,7 @@ public function insert()
         
       }
 
-      if(false === check_mime_type($accepted_files, $file_location)) {
+      if(false === check_mime_type(mime_type_dictionary(), $file_location)) {
 
         $checkError = false;
         array_push($errors, "Invalid file format");
@@ -217,15 +196,15 @@ public function insert()
       }
 
       // get new filename
-      $file_info = pathinfo($file_name);
-      $name = $file_info['filename'];
-      $file_extension = $file_info['extension'];
-      $tmp = str_replace(array('.',' '), array('',''), microtime());
-      $new_filename = rename_file(md5($name.$tmp)).'-'.date('Ymd').'.'.$file_extension;
-
+      $new_filename = generate_filename($file_name)['new_filename'];
+     
       list($width, $height) = getimagesize($file_location);
 
-      if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
+      if (generate_filename($file_name)['file_extension'] == "jpeg" 
+          || generate_filename($file_name)['file_extension'] == "jpg" 
+          || generate_filename($file_name)['file_extension'] == "png" 
+          || generate_filename($file_name)['file_extension'] == "gif" 
+          || generate_filename($file_name)['file_extension'] == "webp") {
 
          $media_metavalue = array(
                        'File name' => $new_filename, 
@@ -268,11 +247,11 @@ public function insert()
       } else {
 
          $this->mediaEvent->setMediaFilename($new_filename);
-         $this->mediaEvent->setMediaCaption($media_caption);
+         $this->mediaEvent->setMediaCaption(prevent_injection(distill_post_request($filters)['media_caption']));
          $this->mediaEvent->setMediaType($file_type);
-         $this->mediaEvent->setMediaTarget($media_target);
+         $this->mediaEvent->setMediaTarget(distill_post_request($filters)['media_target']);
          $this->mediaEvent->setMediaUser($this->mediaEvent->isMediaUser());
-         $this->mediaEvent->setMediaAccess($media_access);
+         $this->mediaEvent->setMediaAccess(distill_post_request($filters)['media_access']);
          $this->mediaEvent->setMediaStatus('1');
         
          $media_id = $this->mediaEvent->addMedia();
@@ -334,29 +313,6 @@ public function update($id)
 
   }
 
-  $accepted_files = array(
-    'pdf'  => 'application/pdf', 
-    'doc'  => 'application/msword', 
-    'rar'  => 'application/rar', 
-    'zip'  => 'application/zip', 
-    'xls'  => 'application/vnd.ms-excel', 
-    'xls'  => 'application/octet-stream', 
-    'exe'  => 'application/vnd.microsoft.portable-executable', 
-    'ppt'  => 'application/vnd.ms-powerpoint',
-    'odt'  => 'application/vnd.oasis.opendocument.text',
-    'jpeg' => 'image/jpeg', 
-    'jpg'  => 'image/jpeg', 
-    'png'  => 'image/png', 
-    'gif'  => 'image/gif', 
-    'webp' => 'image/webp',
-    'mp3'  => 'audio/mpeg', 
-    'wav'  => 'audio/wav',
-    'ogg'  => 'audio/ogg',
-    'mp4'  => 'video/mp4',
-    'webm' => 'video/webm',
-    'ogg'  => 'video/ogg'
-  );
-
   $data_media = array(
     
     'ID' => $getMedia['ID'],
@@ -389,11 +345,13 @@ public function update($id)
     $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : '';
     $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
 
-    $media_caption = isset($_POST['media_caption']) ? prevent_injection($_POST['media_caption']) : '';
-    $media_target = $_POST['media_target'];
-    $media_access = $_POST['media_access'];
-    $media_status = $_POST['media_status'];
-    $media_id = (int)$_POST['media_id'];
+    $filters = [
+      'media_caption' => FILTER_SANITIZE_SPECIAL_CHARS,
+      'media_target' => FILTER_SANITIZE_STRING,
+      'media_access' => FILTER_SANITIZE_STRING,
+      'media_status' => FILTER_SANITIZE_NUMBER_INT,
+      'media_id' => FILTER_SANITIZE_NUMBER_INT
+    ];
 
     try {
 
@@ -474,7 +432,7 @@ public function update($id)
           
          }
   
-         if(false === check_mime_type($accepted_files, $file_location)) {
+         if(false === check_mime_type(mime_type_dictionary(), $file_location)) {
   
           $checkError = false;
           array_push($errors, "Invalid file format");
@@ -482,15 +440,15 @@ public function update($id)
          }
   
         // get new filename
-        $file_info = pathinfo($file_name);
-        $name = $file_info['filename'];
-        $file_extension = $file_info['extension'];
-        $tmp = str_replace(array('.',' '), array('',''), microtime());
-        $new_filename = rename_file(md5($name.$tmp)).'-'.date('Ymd').'.'.$file_extension;
-  
+        $new_filename = generate_filename($file_name)['new_filename'];
+
         list($width, $height) = getimagesize($file_location);
   
-         if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
+         if (generate_filename($file_name)['file_extension'] == "jpeg" 
+            || generate_filename($file_name)['file_extension'] == "jpg" 
+            || generate_filename($file_name)['file_extension'] == "png" 
+            || generate_filename($file_name)['file_extension'] == "gif" 
+            || generate_filename($file_name)['file_extension'] == "webp") {
 
             $media_metavalue = array(
                         'File name' => $new_filename, 
@@ -517,11 +475,11 @@ public function update($id)
          }
         
          $this->mediaEvent->setMediaFilename($new_filename);
-         $this->mediaEvent->setMediaCaption($media_caption);
-         $this->mediaEvent->setMediaTarget($media_target);
-         $this->mediaEvent->setMediaAccess($media_access);
-         $this->mediaEvent->setMediaStatus($media_status);
-         $this->mediaEvent->setMediaId($media_id);
+         $this->mediaEvent->setMediaCaption(prevent_injection(distill_post_request($filters)['media_caption']));
+         $this->mediaEvent->setMediaTarget(distill_post_request($filters)['media_target']);
+         $this->mediaEvent->setMediaAccess(distill_post_request($filters)['media_access']);
+         $this->mediaEvent->setMediaStatus(distill_post_request($filters)['media_status']);
+         $this->mediaEvent->setMediaId(distill_post_request($filters)['media_id']);
 
          $this->mediaEvent->setMediaKey($new_filename);
          $this->mediaEvent->setMediaValue(json_encode($media_metavalue));
@@ -529,11 +487,11 @@ public function update($id)
 
       } else {
 
-         $this->mediaEvent->setMediaCaption($media_caption);
-         $this->mediaEvent->setMediaTarget($media_target);
-         $this->mediaEvent->setMediaAccess($media_access);
-         $this->mediaEvent->setMediaStatus($media_status);
-         $this->mediaEvent->setMediaId($media_id);
+         $this->mediaEvent->setMediaCaption(prevent_injection(distill_post_request($filters)['media_caption']));
+         $this->mediaEvent->setMediaTarget(distill_post_request($filters)['media_target']);
+         $this->mediaEvent->setMediaAccess(distill_post_request($filters)['media_access']);
+         $this->mediaEvent->setMediaStatus(distill_post_request($filters)['media_status']);
+         $this->mediaEvent->setMediaId(distill_post_request($filters)['media_id']);
 
       }
 
@@ -577,11 +535,6 @@ public function remove($id)
   $this->mediaEvent->setMediaId($id);
   $this->mediaEvent->removeMedia();
   direct_page('index.php?load=medialib&status=mediaDeleted', 200);
-}
-
-public function download($Id)
-{
-
 }
 
 protected function setView($viewName)
