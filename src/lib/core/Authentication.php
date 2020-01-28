@@ -138,6 +138,11 @@ class Authentication
     return $this->userToken->getTokenByUserEmail($email, $expired);
   }
 
+  public function findUserByLogin($user_login)
+  {
+    return $this->userDao->getUserByLogin($user_login);
+  }
+
   /**
    * Is Email Exists
    * 
@@ -146,9 +151,15 @@ class Authentication
    */
   public function checkEmailExists($email)
   {
-      
-    return ($this->userDao->checkUserEmail($email)) ?: false;
-  
+
+    if ($this->userDao->checkUserEmail($email)) {
+
+       return true;
+
+    }
+
+    return false;
+    
   }
 
 /**
@@ -186,9 +197,9 @@ class Authentication
  public function login(array $values)
  {
     
-     $email = htmlspecialchars($values['user_email']);
-     $password = htmlspecialchars($values['user_pass']);
-     $remember_me = isset($values['remember']);
+     $email = (isset($values['user_email'])) ? $values['user_email'] : null;
+     $password = (isset($values['user_pass'])) ? $values['user_pass'] : null;
+     $remember_me = ($values['remember']) ? $values['remember'] : null;
 
      $this->validator->sanitize($email, 'email');
      $this->validator->validate($email, 'email');
@@ -203,7 +214,6 @@ class Authentication
      $this->user_level = $_SESSION['user_level'] = $account_info['user_level'];
      $this->user_login = $_SESSION['user_login'] = $account_info['user_login'];
      $this->user_fullname = $_SESSION['user_fullname'] = $account_info['user_fullname'];
-     $this->user_session = $_SESSION['user_session'] = generate_session_key($email, 13);
      
      $this->agent = $_SESSION['agent'] = sha1(
                     $_SERVER['HTTP_ACCEPT_CHARSET'].
@@ -217,7 +227,6 @@ class Authentication
            setcookie("cookie_user_login", $this->user_login, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
            setcookie("cookie_user_level", $this->user_level, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
            setcookie("cookie_user_fullname", $this->user_fullname, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
-           setcookie("cookie_user_session", $this->user_session, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
            setcookie("cookie_user_id", $this->user_id, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
 
            $random_password = $tokenizer -> createToken(16);
@@ -249,13 +258,13 @@ class Authentication
 
       }
 
-       $last_session = session_id();
+       $old_session = session_id();
 
        session_regenerate_id(true);
-       
-       $recent_session = session_id();
 
-       $this->userDao->updateUserSession($recent_session, abs((int)$account_info['ID']));
+       $new_session = session_id();
+
+       $this->userDao->updateUserSession($new_session, abs((int)$account_info['ID']));
        
        direct_page('index.php?load=dashboard', 302);
    
@@ -363,7 +372,7 @@ public function updateNewPassword($user_pass, $user_id)
 public function removeCookies()
 {
 
-  if (isset($_COOKIE['cookie_user_email']) && isset($_COOKIE['random_pwd']) && isset($_COOKIE['random_selector'])) {
+  if ((isset($_COOKIE['cookie_user_email'])) && (isset($_COOKIE['random_pwd'])) && (isset($_COOKIE['random_selector']))) {
 
     setcookie("cookie_user_email", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
     setcookie("cookie_user_id", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
@@ -407,23 +416,24 @@ public function activateUserAccount($key)
  * @param string $control
  * 
  */
-public function userAccessControl($control = 'dashboard')
+public function userAccessControl($control = null)
 {
 
     switch ($control) {
 
-        case 'users':
+        case ActionConst::NEWUSER:
+        case ActionConst::DELETEUSER:  
             
-            if($this->accessLevel() != 'administrator' && $this->accessLevel() != 'manager') {
+            if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager')) {
 
                 return false;
             }
 
             break;
 
-        case 'plugin':
+        case ActionConst::PLUGINS:
            
-            if($this->accessLevel() != 'administrator' && $this->accessLevel() != 'manager') {
+            if($this->accessLevel() != 'administrator') {
 
                 return false;
 
@@ -431,15 +441,45 @@ public function userAccessControl($control = 'dashboard')
 
             break;
 
-        case 'themes':
+        case ActionConst::THEMES:
 
-           if($this->accessLevel() != 'manager' && $this->accessLevel() != 'administrator') {
+           if($this->accessLevel() != 'administrator') {
 
                return false;
 
            }
 
             break;
+
+        case ActionConst::CONFIGURATION:
+
+           if($this->accessLevel() != 'administrator') {
+
+             return false;
+
+           }
+
+          break;
+
+        case ActionConst::MEDIALIB:
+
+           if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager') && ($this->accessLevel() != 'editor') && ($this->accessLevel() != 'author')) {
+
+              return false;
+
+           }
+
+          break;
+
+        case ActionConst::PAGES:
+
+           if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager')) {
+
+              return false;
+
+           }
+
+          break;
         
         default:
           
