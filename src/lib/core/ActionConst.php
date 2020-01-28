@@ -2,7 +2,7 @@
 /**
  * The collection of actions constant 
  * 
- * @category Class ActionConst
+ * @category Core Class
  * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0
@@ -15,9 +15,10 @@ class ActionConst
 /**
  * action constant for configuration functionality
  */
- const NEWCONFIG    = "newConfig";
- const EDITCONFIG   = "editConfig";
- const DELETECONFIG = "deleteConfig"; 
+ const CONFIGURATION = "configuration";
+ const NEWCONFIG     = "newConfig";
+ const EDITCONFIG    = "editConfig";
+ const DELETECONFIG  = "deleteConfig"; 
 
 /**
  * action constant for post functionality
@@ -30,6 +31,7 @@ class ActionConst
 /**
  * action constant for page functionality
  */
+ const PAGES       = "pages";
  const NEWPAGE     = "newPage";
  const EDITPAGE    = "editPage";
  const DELETEPAGE  = "deletePage";
@@ -61,13 +63,15 @@ class ActionConst
 /**
  * action constant for media functionality
  */
- const NEWMEDIA     = "newMedia";
- const EDITMEDIA    = "editMedia";
- const DELETEMEDIA  = "deleteMedia";
+ const MEDIALIB      = "medialib";
+ const NEWMEDIA      = "newMedia";
+ const EDITMEDIA     = "editMedia";
+ const DELETEMEDIA   = "deleteMedia";
 
 /**
  * action constant for plugin functionality
  */
+ const PLUGINS          = "plugins";
  const INSTALLPLUGIN    = "installPlugin";
  const ACTIVATEPLUGIN   = "activatePlugin";
  const DEACTIVATEPLUGIN = "deactivatePlugin";
@@ -78,10 +82,12 @@ class ActionConst
 /**
  * action constant for theme functionality
  */
- const NEWTHEME     = "newTheme";
- const INSTALLTHEME = "installTheme";
- const EDITTHEME    = "editTheme";
- const DELETETHEME  = "deleteTheme";
+ const THEMES        = "themes";
+ const NEWTHEME      = "newTheme";
+ const INSTALLTHEME  = "installTheme";
+ const ACTIVATETHEME = "activateTheme";
+ const EDITTHEME     = "editTheme";
+ const DELETETHEME   = "deleteTheme";
 
 /**
  * action const for user functionality
