@@ -1,6 +1,6 @@
 <?php 
 
-function admin_header($stylePath, $breadCrumbs, $allowedQuery) 
+function admin_header($stylePath, $breadCrumbs = null, $allowedQuery = null) 
 {
   
 ?>
@@ -97,7 +97,7 @@ function admin_footer($stylePath, $ubench = null)
     <strong>Thank you for creating with 
     <a href="https://scriptlog.web.id" targer="_blank" title="Personal Blogware Platform">Scriptlog</a>
      <?php echo APP_VERSION; ?></strong>
-     <strong><?=((true === APP_DEVELOPMENT) && (isset($ubench))) ? " Execution Time: ". $ubench->getTime() . " Memory usage: ".$ubench->getMemoryUsage() : "" ?></strong>
+     <strong><?=((true === APP_DEVELOPMENT) && (isset($ubench))) ? " Page generated in: ". $ubench->getTime() . " Memory usage: ".$ubench->getMemoryUsage() : "" ?></strong>
   </footer>
   
    <!-- Add the sidebar's background. This div must be placed
