@@ -378,7 +378,6 @@ public function removeCookies()
     setcookie("cookie_user_id", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
     setcookie("cookie_user_level", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
     setcookie("cookie_user_login", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-    setcookie("cookie_user_session", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
     setcookie("cookie_user_fullname", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
     setcookie("random_pwd", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);  
     setcookie("random_selector", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
