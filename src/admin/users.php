@@ -1,8 +1,8 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$userId = isset($_GET['Id']) ? abs((int)$_GET['Id']) : "";
-$sessionId = isset($_GET['sessionId']) ? $_GET['sessionId'] : "";
+$userId = isset($_GET['Id']) ? abs((int)$_GET['Id']) : 0;
+$sessionId = isset($_GET['sessionId']) ? $_GET['sessionId'] : null;
 $userEvent = new UserEvent($userDao, $validator, $sanitizer);
 $userApp = new UserApp($userEvent);
 
@@ -10,9 +10,9 @@ switch ($action) {
     
     case ActionConst::NEWUSER:
     
-      if (false === $authenticator -> userAccessControl('users')) {
+      if (false === $authenticator -> userAccessControl(ActionConst::NEWUSER)) {
 
-          direct_page('index.php?load=users&error=userNotFound', 404);
+          direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
       } else {
 
@@ -21,14 +21,16 @@ switch ($action) {
            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
            throw new AppException("invalid ID data type!");
 
+        } 
+
+        if ($userId == 0) {
+
+            $userApp -> insert();
+
         } else {
 
-            if ($userId == 0) {
-
-                $userApp -> insert();
-
-            }
-
+            direct_page('index.php?load=dashboard', 302);
+            
         }
 
       }
@@ -45,55 +47,88 @@ switch ($action) {
         }
 
         if ($userDao -> checkUserId($userId, $sanitizer)) {
-            
-            if(false === $authenticator -> userAccessControl('users')) {
-    
-                $userApp -> updateProfile($userId);
-    
+
+            if (($authenticator -> accessLevel() != 'administrator') && ($authenticator -> accessLevel() != 'manager')) {
+
+                $userApp -> updateProfile($user_login);
+
             } else {
-    
+
                 $userApp -> update($userId);
-    
+
             }
-            
-        } elseif (false === $userDao -> checkUserSession($sessionId)) {
-    
-            direct_page('index.php?load=users&error=userNotFound', 404);
-                
+
         } else {
-            
-            direct_page('index.php?load=users&error=userNotFound', 404);
+
+            if ($authenticator -> accessLevel() != 'administrator') {
+
+                 direct_page('index.php?load=404&notfound='.notfound_id(), 404);
+
+            } else {
+
+                 direct_page('index.php?load=users&error=userNotFound', 404);
+
+            }
+             
+        }
+
+        if (false === $userDao -> checkUserSession($sessionId)) {
+
+            if ($authenticator -> accessLevel() != 'administrator') {
+
+                direct_page('index.php?load=404&notfound='.notfound_id(), 404);
                 
+            } else {
+
+                direct_page('index.php?load=users&error=userNotFound', 404);
+
+            }
+
         }
 
         break;
         
     case ActionConst::DELETEUSER:
-        
-        if(false === $authenticator -> userAccessControl('users')) {
+ 
+        if(false === $authenticator -> userAccessControl(ActionConst::DELETEUSER)) {
 
-            direct_page('index.php?load=users&error=userNotFound', 404);
+            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
         } else {
 
-            $userApp -> remove($userId);
+            if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
 
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                throw new AppException("Invalid ID data type!");
+    
+            }
+            
+            if ($userDao -> checkUserId($userId, $sanitizer)) {
+
+                $userApp -> remove($userId);
+            
+            } else {
+
+                direct_page('index.php?load=users&error=userNotFound', 404);
+
+            }
+            
         }
         
         break;
                 
     default:
         
-        if(false === $authenticator -> userAccessControl('users')) {
+       if (($authenticator -> accessLevel() !== 'administrator') && ($authenticator -> accessLevel() !== 'manager')) {
 
-            $userApp -> showProfile($user_id);
+           $userApp -> showProfile($user_login);
 
-        } else {
+       } else {
 
-            $userApp -> listItems();
-            
-        }
-        
-        break;
+          $userApp -> listItems();
+
+      }
+    
+      break;
         
 }
