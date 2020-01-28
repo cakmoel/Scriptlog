@@ -74,20 +74,14 @@ class Dao
    try {
         
         if (!$this->sql) {
+
             throw new DbException("No SQL Query");
+
         }
         
-        if (!is_null($fetchMode)) {
-            
-            $stmt = $this->dbc->dbQuery($this->sql, $data);
-            return $stmt->fetchAll($fetchMode);
-           
-        } else {
-           
-            $stmt = $this->dbc->dbQuery($this->sql, $data);
-            return $stmt -> fetchAll();
-            
-        }
+        $findAll = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchAll($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchAll();
+
+        return $findAll;
         
     } catch (DbException $e) {
     
@@ -118,19 +112,11 @@ class Dao
     
         throw new DbException("No SQL Query!");
     }
-    
-    if (!is_null($fetchMode)) {
+     
+    $findRow = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetch();
 
-        $stmt = $this->dbc->dbQuery($this->sql, $data);
-        return $stmt -> fetch($fetchMode);
+    return $findRow;
 
-    } else {
-
-        $stmt = $this->dbc->dbQuery($this->sql, $data);
-        return $stmt->fetch();
-        
-    }
-    
   } catch (DbException $e) {
      
       $this->closeConnection();
@@ -161,18 +147,10 @@ class Dao
            
        }
        
-       if (!is_null($fetchMode)) {
-           
-           $stmt = $this->dbc->dbQuery($this->sql, $data);
-           return $stmt -> fetchColumn($fetchMode);
-           
-       } else {
-           
-           $stmt = $this->dbc->dbQuery($this->sql, $data);
-           return $stmt -> fetchColumn();
-           
-       }
-          
+       $findColumn = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchColumn($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
+
+       return $findColumn;
+
    } catch (DbException $e) {
        
        $this->closeConnection();
@@ -203,6 +181,7 @@ class Dao
         }
          
          $stmt = $this->dbc->dbQuery($this->sql, $data);
+         
          return $stmt->rowCount();
               
      } catch (DbException $e) {
@@ -249,11 +228,7 @@ class Dao
   */
  protected function deleteRecord($table, $where, $limit = null)
  {
-     if (!is_null($limit)) {
-         $this->dbc->dbDelete($table, $where, $limit);
-     } else {
-         $this->dbc->dbDelete($table, $where);
-     }
+    (!is_null($limit)) ? $this->dbc->dbDelete($table, $where, $limit) : $this->dbc->dbDelete($table, $where);
  }
  
  /**
@@ -310,9 +285,9 @@ class Dao
       
       case 'xss':
             
-          if (preventInject($str)) {
+          if (filter_var($str, FILTER_SANITIZE_FULL_SPECIAL_CHARS)) {
               
-            return $this->sanitizing->sanitasi($str, 'xss');
+            return $this->sanitizing->sanitasi(prevent_injection($str), 'xss');
               
           } else {
               
