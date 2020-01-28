@@ -1,0 +1,76 @@
+<html>
+<head>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <title>Mime type checker</title>
+    <script>
+        $(function () {
+            var result = $('div#result');
+            if (window.FileReader && window.Blob) {
+                $('span#submit').click(function () {
+                    var files = $('input#file').get(0).files;
+                    if (files.length > 0) {
+                        var file = files[0];
+                        console.log('Loaded file: ' + file.name);
+                        console.log('Blob mime: ' + file.type);
+
+                        var fileReader = new FileReader();
+                        fileReader.onloadend = function (e) {
+                            var arr = (new Uint8Array(e.target.result)).subarray(0, 4);
+                            var header = '';
+                            for (var i = 0; i < arr.length; i++) {
+                                header += arr[i].toString(16);
+                            }
+                            console.log('File header: ' + header);
+
+                            // Check the file signature against known types
+                            var type = 'unknown';
+                            switch (header) {
+                                case '89504e47':
+                                    type = 'image/png';
+                                    break;
+                                case '47494638':
+                                    type = 'image/gif';
+                                    break;
+                                case 'ffd8ffe0':
+                                case 'ffd8ffe1':
+                                case 'ffd8ffe2':
+                                    type = 'image/jpeg';
+                                    break;
+                                case '25504446':
+                                    type = 'application/pdf';
+                                    break;
+                            }
+
+                            if (file.type !== type) {
+                                result.html('<span style="color: red; ">Mime type detected: ' + type + '. Does not match file extension.</span>');
+                            } else {
+                                result.html('<span style="color: green; ">Mime type detected: ' + type + '. Matches file extension.</span>');
+                            }
+                        };
+                        fileReader.readAsArrayBuffer(file);
+                    }
+                });
+            } else {
+                result.html('<span style="color: red; ">Your browser is not supported. Sorry.</span>');
+                console.error('FileReader or Blob is not supported by browser.');
+            }
+        });
+    </script>
+    <style>
+        .submit {
+            border: 1px grey solid;
+            padding: 3px;
+            position: relative;
+            top: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+Check mime type of your file in one click<br>
+<input type="file" id="file"><br>
+<div id="result"></div>
+<span class="submit" id="submit">Check</span>
+</body>
+</html>
+
