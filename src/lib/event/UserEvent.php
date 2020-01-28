@@ -184,9 +184,14 @@ class UserEvent
    return $this->userDao->getUsers($orderBy, $fetchMode);    
  }
  
- public function grabUser($userId)
+ public function grabUser($userId, $fetchMode = null)
  {
-   return $this->userDao->getUserById($userId, $this->sanitize);
+   return $this->userDao->getUserById($userId, $this->sanitize, $fetchMode);
+ }
+
+ public function grabUserByLogin($user_login, $fetchMode = null)
+ {
+   return $this->userDao->getUserByLogin($user_login, $fetchMode);
  }
  
  public function addUser()
@@ -293,7 +298,7 @@ class UserEvent
 
    if (!$this->userDao->getUserById($this->user_id, $this->sanitize)) {
        
-    direct_page('index.php?load=users&error=userNotFound', 404);
+      direct_page('index.php?load=users&error=userNotFound', 404);
    
    }
    
