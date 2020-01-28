@@ -150,8 +150,8 @@ class MenuDao extends Dao
   */
  public function deleteMenu($id, $sanitize)
  {
-  $cleanId = $this->filteringId($sanitize, $id, 'sql');
-  $this->deleteRecord("tbl_menu", "ID = {$cleanId}");
+  $clean_id = $this->filteringId($sanitize, $id, 'sql');
+  $this->deleteRecord("tbl_menu", "ID = ".(int)$clean_id);
  }
 
  /**

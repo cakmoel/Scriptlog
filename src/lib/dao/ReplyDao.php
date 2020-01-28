@@ -70,8 +70,8 @@ class ReplyDao extends Dao
   
   public function deleteReply($id, $sanitize)
   { 
-    $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-    $this->deleteRecord("tbl_comment_reply", "`ID` = {$idsanitized}");
+    $clean_id = $this->filteringId($sanitize, $id, 'sql');
+    $this->deleteRecord("tbl_comment_reply", "ID = ".(int)$clean_id);
   }
   
   public function checkReplyId($id, $sanitize)

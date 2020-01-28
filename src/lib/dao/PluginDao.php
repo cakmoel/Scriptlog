@@ -160,8 +160,8 @@ class PluginDao extends Dao
    */
   public function deletePlugin($id, $sanitize)
   {
-    $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-    $this->deleteRecord("tbl_plugin", "`ID` = {$idsanitized}");
+    $clean_id = $this->filteringId($sanitize, $id, 'sql');
+    $this->deleteRecord("tbl_plugin", "ID = ".(int)$clean_id);
   }
   
   /**

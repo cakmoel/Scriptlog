@@ -37,7 +37,7 @@ class PostTopicDao extends Dao
     
     $this->setSQL($sql);
     
-    $post_topics = $this->findRow([':post_id' => $cleanId]);
+    $post_topics = $this->findRow([':post_id' => (int)$cleanId]);
     
     return (empty($post_topics)) ?: $post_topics;
     
@@ -63,7 +63,7 @@ class PostTopicDao extends Dao
        
         if (!$position) {
         
-            $html[] = '<a href="'.$url.'category/'.preventInject($linkCategory['category_slug']).'" class="tag-name">'.preventInject($linkCategory->topic_title).'</a>';
+            $html[] = '<a href="'.$url.'category/'.prevent_injection($linkCategory['category_slug']).'" class="tag-name">'.prevent_injection($linkCategory->topic_title).'</a>';
         
         } else {
             
@@ -104,7 +104,7 @@ class PostTopicDao extends Dao
       
       $this -> setSQL($sql);
       
-      $postByTopics = $this->findAll([':topic_id' => $cleanId]);
+      $postByTopics = $this->findAll([':topic_id' => (int)$cleanId]);
       
       return (empty($postByTopics)) ?: $postByTopics;
       

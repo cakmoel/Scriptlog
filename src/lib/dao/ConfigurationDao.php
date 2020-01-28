@@ -35,11 +35,8 @@ public function createConfig($bind)
   // insert into settings
   $this->create("tbl_settings", [
               
-              'setting_name' => $bind['setting_name'],
-      
-              'setting_value' => $bind['setting_value'],
-      
-              'setting_desc' => $bind['setting_desc']
+       'setting_name' => $bind['setting_name'],
+       'setting_value' => $bind['setting_value']
 
   ]);
 
@@ -62,7 +59,6 @@ public function updateConfig($sanitize, $bind, $ID)
   $this->modify("tbl_settings", [
 	  'setting_name' => $bind['setting_name'],
 	  'setting_value' => $bind['setting_value'],
-	  'setting_desc' => $bind['setting_desc']
   ], "`ID` = {$cleanId}");
 
 }
@@ -76,9 +72,9 @@ public function updateConfig($sanitize, $bind, $ID)
  */
 public function deleteConfig($ID, $sanitize)
 {
-  $cleanId = $this->filteringId($sanitize, $ID, 'sql');
+  $clean_id = $this->filteringId($sanitize, $ID, 'sql');
 
-  $this->deleteRecord("tbl_settings", "ID = $cleanId");
+  $this->deleteRecord("tbl_settings", "ID = ".(int)$clean_id);
 
 }
 
@@ -92,7 +88,7 @@ public function deleteConfig($ID, $sanitize)
  */
 public function findConfigs($orderBy = 'ID')
 {
-  $sql = "SELECT ID, setting_name, setting_value, setting_desc
+  $sql = "SELECT ID, setting_name, setting_value
 	FROM tbl_settings ORDER BY :orderBy DESC";
 
 	$this->setSQL($sql);

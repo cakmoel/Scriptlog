@@ -127,7 +127,7 @@ class MenuChildDao extends Dao
   
   $data_child = array("menu_child_link" => ['#']);
 
-  $menuChildLink = (!empty($getChildLink['menu_child_link'])) ?: $this->modify("tbl_menu_child", $data_child, "ID = {$getChildLink['ID']}");
+  $menuChildLink = (!empty($getChildLink['menu_child_link'])) ?: $this->modify("tbl_menu_child", $data_child, "ID = ".(int)$getChildLink['ID']);
   
  }
  
@@ -177,8 +177,8 @@ class MenuChildDao extends Dao
 
  public function deleteMenuChild($id, $sanitize)
  {
-   $id_sanitized = $this->filteringId($sanitize, $id, 'sql');
-   $this->deleteRecord("tbl_menu_child", "`ID` = {$id_sanitized}");    
+   $clean_id = $this->filteringId($sanitize, $id, 'sql');
+   $this->deleteRecord("tbl_menu_child", "ID = ".(int)$clean_id);    
  }
  
  public function menuChildExists($menu_child_label)

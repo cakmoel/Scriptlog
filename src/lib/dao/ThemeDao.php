@@ -123,8 +123,8 @@ class ThemeDao extends Dao
    */
   public function deleteTheme($id, $sanitize)
   {
-    $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-    $this->deleteRecord("tbl_themes", "ID = {$idsanitized}");
+    $clean_id = $this->filteringId($sanitize, $id, 'sql');
+    $this->deleteRecord("tbl_themes", "ID = ".(int)$clean_id);
   }
   
   /**

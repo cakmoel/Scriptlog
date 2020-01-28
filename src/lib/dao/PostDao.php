@@ -409,7 +409,7 @@ public function updatePost($sanitize, $bind, $ID, $topicId)
   $post_id = $this->findColumn([$cleanId]);
   
   // delete post_topic
-  $this->deleteRecord("tbl_post_topic", "ID = {$post_id['ID']}");
+  $this->deleteRecord("tbl_post_topic", "ID = '{$post_id['ID']}'");
   	  
   if (is_array($topicId)) {
   	     
@@ -441,8 +441,8 @@ public function updatePost($sanitize, $bind, $ID, $topicId)
  */
 public function deletePost($id, $sanitize)
 { 
- $idsanitized = $this->filteringId($sanitize, $id, 'sql');
- $this->deleteRecord("tbl_posts", "ID = {$idsanitized}"); 	  
+ $clean_id = $this->filteringId($sanitize, $id, 'sql');
+ $this->deleteRecord("tbl_posts", "ID = ".(int)$clean_id); 	  
 }
 
 /**

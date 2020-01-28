@@ -183,8 +183,8 @@ public function updatePage($sanitize, $bind, $ID)
  */
 public function deletePage($ID, $sanitize, $type)
 {
- $id_sanitized = $this->filteringId($sanitize, $ID, 'sql');
- $this->deleteRecord("tbl_posts", "`ID` = {$id_sanitized} AND post_type = {$type}");  
+ $clean_id = $this->filteringId($sanitize, $ID, 'sql');
+ $this->deleteRecord("tbl_posts", "ID = ".(int)$clean_id." AND post_type = "."{$type}");  
 }
 
 /**

@@ -5,7 +5,7 @@
  * and select records from users table
  *
  * @category  Dao Class
- * @author    Maoelana Noermoehammad
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0
@@ -42,7 +42,7 @@ class UserDao extends Dao
      
      $this->setSQL($sql);
      
-     $users = (!is_null($fetchMode)) ? $this->findAll($fetchMode) : $this->findAll();
+     $users = (is_null($fetchMode)) ? $this->findAll() : $this->findAll($fetchMode);
 
      return (empty($users)) ?: $users;
     
@@ -62,12 +62,8 @@ class UserDao extends Dao
  {
    $cleanId = $this->filteringId($sanitize, $userId, 'sql');
    
-   $sql = "SELECT ID, user_login, user_email, 
-                  user_level, user_fullname, 
-                  user_url, 
-                  user_registered,
-                  user_session 
-           FROM tbl_users WHERE ID = :ID";
+   $sql = "SELECT ID, user_login, user_email, user_level, user_fullname, user_url, user_registered, user_session 
+           FROM tbl_users WHERE ID = :ID LIMIT 1";
    
    $this->setSQL($sql);
 
@@ -98,12 +94,34 @@ class UserDao extends Dao
    
    $this->setSQL($sql);
    
-   $userByEmail = (is_null($fetchMode)) ? $this->findRow([':user_email' => $user_email]) : $this->findRow([':user_email'], $fetchMode);
+   $userByEmail = (is_null($fetchMode)) ? $this->findRow([':user_email' => $user_email]) : $this->findRow([':user_email' => $user_email], $fetchMode);
    
    return (empty($userByEmail)) ?: $userByEmail;
 
  }
- 
+
+/**
+ * get user by login 
+ *
+ * @param string $user_login
+ * @param static PDO::FETCH_MODE $fetchMode
+ * @return mixed
+ * 
+ */
+ public function getUserByLogin($user_login, $fetchMode = null) 
+ {
+
+   $sql = "SELECT ID, user_login, user_email, user_level, user_fullname, user_url, user_registered, user_session
+           FROM tbl_users WHERE user_login = :user_login LIMIT 1";
+
+   $this->setSQL($sql);
+
+   $userByLogin = (is_null($fetchMode)) ? $this->findRow([':user_login' => $user_login]) : $this->findRow([':user_login' => $user_login], $fetchMode);
+
+   return (empty($userByLogin)) ?: $userByLogin;
+
+ }
+
  /**
   * get User by reset key
   * 
@@ -233,7 +251,7 @@ class UserDao extends Dao
           
      }
      
-     $this->modify("tbl_users", $bind, "ID = {$cleanId}");
+     $this->modify("tbl_users", $bind, "ID = '{$cleanId}'");
      
  }
 
@@ -247,8 +265,7 @@ class UserDao extends Dao
   */
  public function updateUserSession($user_session, $user_id)
  {
-    $newSession = generate_session_key($user_session, 13);
-    $bind = ['user_session' => $newSession];
+    $bind = ['user_session' => generate_session_key($user_session, 32)];
     $this->modify("tbl_users", $bind, "ID = {$user_id}");
  }
 
@@ -280,7 +297,7 @@ class UserDao extends Dao
    $this->modify("tbl_users", [
           'user_pass' => $recoverPassword, 
           'user_reset_complete' => $bind['user_reset_complete']
-          ], "ID = {$user_id}");
+          ], "ID = '{$user_id}'");
           
  }
 
@@ -324,7 +341,7 @@ class UserDao extends Dao
   
   $clean_id = $this->filteringId($sanitize, $ID, 'sql');
    
-  $this->deleteRecord("tbl_users", "ID = {$clean_id}");
+  $this->deleteRecord("tbl_users", "ID = ".(int)$clean_id);
 	 
  }
  
@@ -428,7 +445,7 @@ class UserDao extends Dao
  {
     $sql = "SELECT user_pass FROM tbl_users WHERE user_email = :user_email LIMIT 1";
     $this->setSQL($sql);
-    $stmt = $this->checkCountValue([$email]);
+    $stmt = $this->checkCountValue([':user_email' => $email]);
     
     if ($stmt > 0) {
         

@@ -117,8 +117,8 @@ class CommentDao extends Dao
  */
  public function deleteComment($id, $sanitize)
  {
-   $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-   $this->deleteRecord("tbl_comments", "`ID` = {$idsanitized}");
+   $clean_id = $this->filteringId($sanitize, $id, 'sql');
+   $this->deleteRecord("tbl_comments", "ID = ".(int)$clean_id);
  }
  
 /**

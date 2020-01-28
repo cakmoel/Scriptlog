@@ -348,6 +348,7 @@ public function updateMedia($sanitize, $bind, $ID)
         
          'media_filename' => $bind['media_filename'],
          'media_caption'  => $bind['media_caption'],
+         'media_type'     => $bind['media_type'],
          'media_target'   => $bind['media_target'],
          'media_access'   => $bind['media_access'],
          'media_status'   => $bind['media_status']
@@ -385,9 +386,11 @@ public function updateMediaMeta($sanitize, $bind, $ID)
   if (!empty($bind['meta_key'])) {
 
       $this->modify("tbl_mediameta", [
-        'meta_key' => $bind['meta_key'],
-        'meta_value' => $bind['meta_value']
-      ], "media_id = {$idsanitized}");
+
+          'meta_key' => $bind['meta_key'],
+          'meta_value' => $bind['meta_value']
+          
+      ],  "media_id = {$idsanitized}");
 
   }
 
@@ -404,11 +407,11 @@ public function updateMediaMeta($sanitize, $bind, $ID)
 public function deleteMedia($ID, $sanitize)
 {
   
-  $id_sanitized = $this->filteringId($sanitize, $ID, 'sql');
+  $clean_id = $this->filteringId($sanitize, $ID, 'sql');
   
-  if($this->deleteRecord("tbl_media", "ID = {$id_sanitized}")) {
+  if($this->deleteRecord("tbl_media", "ID = ".(int)$clean_id)) {
 
-     $this->deleteRecord("tbl_mediameta", "media_id = {$id_sanitized}");
+     $this->deleteRecord("tbl_mediameta", "media_id = ".(int)$clean_id);
 
   }
 

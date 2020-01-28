@@ -142,9 +142,10 @@ class TopicDao extends Dao
    */
  public function deleteTopic($ID, $sanitize)
  {  	
-   $cleanId = $this->filteringId($sanitize, $ID, 'sql');
+   $clean_id = $this->filteringId($sanitize, $ID, 'sql');
   
-   $this->deleteRecord("tbl_topics", "ID = $cleanId");
+   $this->deleteRecord("tbl_topics", "ID = ".(int)$clean_id);
+   
  }
 
  /**
