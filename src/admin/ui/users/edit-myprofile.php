@@ -18,19 +18,25 @@
 
       <div class="row">
         <div class="col-md-3">
+
           <!-- Profile Image -->
           <div class="box box-primary">
             <div class="box-body box-profile">
+
+              <img class="profile-user-img img-responsive img-circle" src="<?=app_url().APP_ADMIN.DS.'assets/dist/img/profilepict.png'?>" alt="User profile picture">
               
-             
               <h3 class="profile-username text-center"><?=(isset($userData['user_login'])) ? htmlspecialchars($userData['user_login']) : ""; ?></h3>
 
               <p class="text-muted text-center"><?=(isset($userData['user_fullname'])) ? htmlspecialchars($userData['user_fullname']) : ""; ?></p>
 
               <ul class="list-group list-group-unbordered">
+
                 <li class="list-group-item">
-                  <b><?=(isset($userData['user_url'])) ? htmlspecialchars($userData['user_url']) : "Site Address (URL)"; ?></b> <a class="pull-right" href="<?=($userData['user_url'] == '#') ? "#" : htmlspecialchars($userData['user_url']); ?>"><i class="fa fa-external-link"></i></a>
+
+                  <b><?=(!empty($userData['user_url'])) ? htmlspecialchars($userData['user_url']) : "Site Address(URL):"; ?></b>  <a class="pull-right" href="<?=($userData['user_url'] == '#') ? "#" : htmlspecialchars($userData['user_url']); ?>"></a>
+                
                 </li>
+             
               </ul>
 
             </div>
