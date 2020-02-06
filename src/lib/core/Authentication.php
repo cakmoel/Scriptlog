@@ -221,7 +221,7 @@ class Authentication
                     $_SERVER['HTTP_ACCEPT_LANGUAGE'].
                     $_SERVER['HTTP_USER_AGENT']);
 
-      if ($remember_me == true) {
+      if (!empty($remember_me) && ($remember_me == true)) {
            
            setcookie("cookie_user_email", $this->user_email, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
            setcookie("cookie_user_login", $this->user_login, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
@@ -258,15 +258,11 @@ class Authentication
 
       }
 
-       $old_session = session_id();
+      $new_session = regenerate_session();
 
-       session_regenerate_id(true);
-
-       $new_session = session_id();
-
-       $this->userDao->updateUserSession($new_session, abs((int)$account_info['ID']));
+      $this->userDao->updateUserSession($new_session, abs((int)$account_info['ID']));
        
-       direct_page('index.php?load=dashboard', 302);
+      direct_page('index.php?load=dashboard', 302);
    
  }
  
@@ -276,19 +272,20 @@ class Authentication
   */
 public function logout()
 {
+    regenerate_session();
+    
     unset($_SESSION['user_id']);
     unset($_SESSION['user_email']);
     unset($_SESSION['user_login']);
     unset($_SESSION['user_fullname']);
-    unset($_SESSION['user_session']);
     unset($_SESSION['user_level']);
     unset($_SESSION['agent']);
-  
+    
     $_SESSION = array();
-    session_destroy();
-    session_regenerate_id();
     
     $this->removeCookies();
+
+    session_destroy();
     
     $logout = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname($_SERVER['PHP_SELF']) . DS;
 
@@ -383,6 +380,16 @@ public function removeCookies()
     setcookie("random_selector", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
 
   }
+
+  if (ini_get("session.use_cookies")) {
+      
+      $params = session_get_cookie_params();
+      
+      setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]
+    
+  );
+
+}
 
 }
 
