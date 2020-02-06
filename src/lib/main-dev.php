@@ -10,15 +10,17 @@
  * 
  */
 
-# date_default_timezone_set("GMT");
-ini_set("memory_limit", "2M");
+ini_set('memory_limit', "5M");
 error_reporting(E_ALL);
 # ini_set("session.cookie_secure", "True");  //secure
 # ini_set("session.cookie_httponly", "True"); // httpOnly
+ini_set('session.use_strict_mode', 1); // use_strict_mode is mandatory for security reasons.
 # header("Content-Security-Policy: default-src https:; font-src 'unsafe-inline' data: https:; form-action 'self' http://scriptlog.web.id;img-src data: https:; child-src https:; object-src 'self' www.google-analytics.com ajax.googleapis.com platform-api.sharethis.com kartatopia-studio.disqus.com; script-src 'unsafe-inline' https:; style-src 'unsafe-inline' https:;");
+# date_default_timezone_set("GMT");
 
 $key = '5c12IpTl0g!@#';
 $checkIncKey = sha1(mt_rand(1, 1000).$key);
+$config = null;
 
 define('DS', DIRECTORY_SEPARATOR);
 define('APP_TITLE', 'Scriptlog');
@@ -29,7 +31,7 @@ define('APP_PUBLIC', 'public');
 define('APP_LIBRARY', 'lib');
 define('APP_DEVELOPMENT', true);
 define('APP_CACHE', true);
-define('APP_FILE_SIZE', 524867);
+define('APP_FILE_SIZE', 697856);
 define('APP_IMAGE', APP_PUBLIC . DS . 'files' . DS . 'pictures' . DS);
 define('APP_AUDIO', APP_PUBLIC . DS . 'files' . DS . 'audio' . DS);
 define('APP_VIDEO', APP_PUBLIC . DS . 'files' . DS . 'video' . DS);
@@ -67,7 +69,7 @@ $filter_iterator = new RecursiveCallbackFilterIterator($function_directory, func
     } else {
         
         # only invoke files of interest
-        return strpos($current -> getFilename(), '.php');
+        return strpos($current->getFilename(), '.php');
         
     }
     
@@ -77,7 +79,7 @@ $files_dir_iterator = new RecursiveIteratorIterator($filter_iterator);
 
 foreach ($files_dir_iterator as $file) {
     
-    include $file -> getPathname();
+    include $file->getPathname();
     
 }
 
@@ -174,7 +176,7 @@ $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);
 $ubench = new Ubench();
 
-// These line (175 and 176) are experimental code. You do not need it.
+// These line (179 and 180) are experimental code. You do not need it.
 # $bones = new Bones();
 # $request = new RequestHandler($bones);
 
@@ -184,10 +186,7 @@ $ubench = new Ubench();
 
 if (!start_session_on_site()) {
     
-    session_start(uniqid());
-    session_start();
-    session_regenerate_id();
+    ob_start();
     
 }
 
-ob_start();

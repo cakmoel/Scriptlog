@@ -15,6 +15,7 @@
 # date_default_timezone_set("GMT");
 # ini_set("session.cookie_secure", "True");  // cookie_secure
 # ini_set("session.cookie_httponly", "True"); // cookie_httpOnly
+# ini_set('session.use_strict_mode', 1); // use_strict_mode is mandatory for security reasons.
 # header("Content-Security-Policy: default-src https:; font-src 'unsafe-inline' data: https:; form-action 'self' https://yourdomain.com;img-src data: https:; child-src https:; object-src 'self' www.google-analytics.com ajax.googleapis.com platform-api.sharethis.com yourusername.disqus.com; script-src 'unsafe-inline' https:; style-src 'unsafe-inline' https:;");
 
 $key = '5c12IpTl0g!@#';
@@ -29,7 +30,7 @@ define('APP_ADMIN', 'admin');
 define('APP_PUBLIC', 'public');
 define('APP_LIBRARY', 'lib');
 define('APP_CACHE', false);
-define('APP_FILE_SIZE', 524867);
+define('APP_FILE_SIZE', 697856);
 define('APP_IMAGE', APP_PUBLIC . DS . 'files' . DS . 'pictures' . DS);
 define('APP_AUDIO', APP_PUBLIC . DS . 'files' . DS . 'audio' . DS);
 define('APP_VIDEO', APP_PUBLIC . DS . 'files' . DS . 'video' . DS);
@@ -77,7 +78,7 @@ $filter_iterator = new RecursiveCallbackFilterIterator($function_directory, func
     } else {
         
         # only invoke files of interest
-        return strpos($current -> getFilename(), '.php');
+        return strpos($current->getFilename(), '.php');
         
     }
     
@@ -87,7 +88,7 @@ $files_dir_iterator = new RecursiveIteratorIterator($filter_iterator);
 
 foreach ($files_dir_iterator as $file) {
     
-    include $file -> getPathname();
+    include $file->getPathname();
     
 }
 
@@ -191,11 +192,8 @@ $ubench = new Ubench();
 # register_shutdown_function('scriptlog_shutdown_fatal');
 
 if (!start_session_on_site()) {
-    
-    session_start(uniqid());
-    session_start();
-    session_regenerate_id();
+
+    ob_start();
     
 }
 
-ob_start();
