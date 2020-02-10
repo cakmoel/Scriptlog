@@ -11,4 +11,6 @@
  */
 require __DIR__ . '/lib/main-dev.php'; 
 
-route_request();
+route_request($config);
+
+
