@@ -25,12 +25,6 @@ class MenuChildEvent
 
   private $child_status;
 
-  private $menuChildDao;
-
-  private $validator;
-
-  private $sanitize;
-
   public function __construct(MenuchildDao $menuChildDao, FormValidator $validator, Sanitize $sanitize)
   {
     $this->menuChildDao = $menuChildDao;

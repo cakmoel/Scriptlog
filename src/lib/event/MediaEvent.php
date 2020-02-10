@@ -77,14 +77,6 @@ class MediaEvent
  private $media_status;
 
 /**
- * Media DAO 
- * 
- * @var object
- * 
- */
- private $mediaDao;
-
-/**
  * Media metadata key
  * 
  * @var string
@@ -99,22 +91,6 @@ class MediaEvent
  * 
  */
  private $meta_value;
-
-/**
- * Validator
- * 
- * @var object
- * 
- */
- private $validator;
-
-/**
- * Sanitizer
- * 
- * @var object
- * 
- */
- private $sanitizer;
 
 /**
  * Initialize an intanciates of class properties or method
@@ -339,21 +315,22 @@ class MediaEvent
    if(empty($this->media_filename)) {
 
       return $this->mediaDao->updateMedia($this->sanitizer, [
-        'media_caption' => $this->media_caption,
-        'media_target' => $this->media_target,
-        'media_access' => $this->media_access,
-        'media_status' => $this->media_status
-      ], $this->mediaId);
+          'media_caption' => $this->media_caption,
+          'media_target' => $this->media_target,
+          'media_access' => $this->media_access,
+          'media_status' => $this->media_status
+      ],  $this->mediaId);
 
    } else {
 
       return $this->mediaDao->updateMedia($this->sanitizer, [
-         'media_filename' => $this->media_filename,
-         'media_caption' => $this->media_caption,
-         'media_target' => $this->media_target,
-         'media_access' => $this->media_access,
-         'media_status' => $this->media_status
-      ], $this->mediaId);
+          'media_filename' => $this->media_filename,
+          'media_caption' => $this->media_caption,
+          'media_type'   => $this->media_type,
+          'media_target' => $this->media_target,
+          'media_access' => $this->media_access,
+          'media_status' => $this->media_status
+      ],  $this->mediaId);
 
    }
 

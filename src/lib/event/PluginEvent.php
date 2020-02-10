@@ -59,30 +59,6 @@ class PluginEvent
    * @var string
    */
   private $sort;
-
-/**
- * Plugin DAO
- * 
- * @var object
- * 
- */
-  private $pluginDao;
-
-/**
- * Validator
- * 
- * @var object
- * 
- */
-  private $validator;
-
-/**
- * Sanitize
- * 
- * @var object
- * 
- */
-  private $sanitize;
   
   /**
    * Constructor

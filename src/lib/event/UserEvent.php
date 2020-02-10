@@ -67,21 +67,6 @@ class UserEvent
  private $user_session;
  
  /**
-  * @var object
-  */
- private $userDao;
-
- /**
-  * @var object
-  */
- private $validator;
-
- /**
-  * @var object
-  */
- private $sanitize;
-
- /**
   * @method __constructor()
   * 
   */

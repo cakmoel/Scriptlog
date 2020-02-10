@@ -21,12 +21,6 @@ class ReplyEvent
 
   private $reply_status;
 
-  private $replyDao;
-
-  private $validator;
-
-  private $sanitize;
-
   public function __construct(ReplyDao $replyDao, FormValidator $validator, Sanitize $sanitize)  {
 
     $this->replyDao = $replyDao;

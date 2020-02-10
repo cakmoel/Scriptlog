@@ -87,29 +87,6 @@ class PostEvent
   private $topics; 
  
   /**
-   * Post DAO
-   * 
-   * @var object
-   * 
-   */
-  private $postDao;
-
-  /**
-   * Validator
-   * 
-   * @var object
-   */
-  private $validator;
-
-  /**
-   * Sanitizer
-   * 
-   * @var object
-   * 
-   */
-  private $sanitizer;
-
-  /**
    * Constructor
    * 
    * @param object $postDao

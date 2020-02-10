@@ -32,23 +32,6 @@ class ConfigurationEvent
    */
   private $setting_value;
   
-  /**
-   * Setting Description
-   * 
-   * @var string
-   */
-  private $setting_desc;
-
-  /**
-   * Configuration Dao
-   * @var object
-   */
-  private $configDao;
-
-  private $validator;
-
-  private $sanitizer;
-
   public function __construct(ConfigurationDao $configDao, FormValidator $validator, Sanitize $sanitize)
   {
     $this->configDao = $configDao;
@@ -71,11 +54,6 @@ class ConfigurationEvent
     $this->setting_value = $setting_value;
   }
 
-  public function setConfigDesc($setting_desc)
-  {
-    $this->setting_desc = $setting_desc;    
-  }
-
   public function grabSettings($orderBy = 'ID')
   {
     return $this->configDao->findConfigs($orderBy);
@@ -91,21 +69,17 @@ class ConfigurationEvent
     
     $this->validator->sanitize($this->setting_name, 'string');
     $this->validator->sanitize($this->setting_value, 'string');
-    $this->validator->sanitize($this->setting_desc, 'string');
     
     return $this->configDao->createConfig([
 
       'setting_name' => $this->setting_name,
-      'setting_value' => $this->setting_value,
-      'setting_desc' => $this->setting_desc
-
+      'setting_value' => $this->setting_value
     ]);
 
   }
 
   public function modifySetting()
   {
-    
     $this->validator->sanitize($this->setting_name, 'string');
     $this->validator->sanitize($this->setting_value, 'string');
     $this->validator->sanitize($this->setting_desc, 'string');
@@ -117,7 +91,7 @@ class ConfigurationEvent
        'setting_desc' => $this->setting_desc
 
     ], $this->setting_id);
-
+    
   }
   
   public function removeSetting()

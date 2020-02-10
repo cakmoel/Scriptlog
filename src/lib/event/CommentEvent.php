@@ -48,16 +48,6 @@ class CommentEvent
    */
   private $status;
 
-  /**
-   * Comment Dao
-   * @var object
-   */
-  private $commentDao;
-
-  private $validator;
-
-  private $sanitize;
-  
   public function __construct(CommentDao $commentDao, FormValidator $validator, Sanitize $sanitize)
   {
    $this->commentDao = $commentDao;

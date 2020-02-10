@@ -94,30 +94,6 @@ class PageEvent
   private $comment_status;
 
   /**
-   * Page DAO
-   * 
-   * @var object
-   * 
-   */
-  private $pageDao;
-
-  /**
-   * Form Validator
-   * 
-   * @var object
-   * 
-   */
-  private $validator;
-
-  /**
-   * Sanitizer
-   * 
-   * @var object
-   * 
-   */
-  private $sanitizer;
- 
-  /**
    * Initialize or instanstiate of class propertis
    */
   public function __construct(PageDao $pageDao, FormValidator $validator, Sanitize $sanitizer)
