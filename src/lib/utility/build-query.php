@@ -13,8 +13,8 @@ function build_query($base, $query_data)
   
   $url = basename($base) . "?". http_build_query($query_data);
   
-  $safe_url = htmlspecialchars($url, ENT_COMPAT, 'UTF-8');
-  
+  $safe_url = escape_html($url);
+
   return $safe_url;
   
 }
