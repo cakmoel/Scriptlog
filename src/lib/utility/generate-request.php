@@ -81,6 +81,15 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
 
                );
   
+            } elseif ($load === 'settings') {
+
+               $query_data = array(
+
+                   'load' => $load,
+                   'action' => $action,
+                   'args' => $id  
+               );
+
             } else {
   
               $query_data = array(
