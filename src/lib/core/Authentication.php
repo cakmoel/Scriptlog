@@ -29,34 +29,12 @@ class Authentication
   private $user_session;
  
   /**
-   * User DAO
-   * 
-   * @var object
-   * 
-   */
-  private $userDao;
-
-  /**
    * File Manager
    * 
    * @var string
    * 
    */
   private $fileManager;
-
-  /**
-   * User Token
-   * 
-   * @var object
-   */
-  private $userToken;
-
-  /**
-   * Form validator
-   * 
-   * @var object
-   */
-  private $validator;
 
   /**
    * User Agent
@@ -72,7 +50,7 @@ class Authentication
    * @var string
    * 
    */
-  public $user_email;
+  protected $user_email;
 
   /**
    * Username for login
@@ -80,7 +58,7 @@ class Authentication
    * @var string
    * 
    */
-  public $user_login;
+  protected $user_login;
 
   /**
    * user nicename
@@ -88,7 +66,7 @@ class Authentication
    * @var string
    * 
    */
-  public $user_fullname;
+  protected $user_fullname;
 
   /**
    * user level
@@ -96,7 +74,7 @@ class Authentication
    * @var string
    * 
    */
-  public $user_level;
+  protected $user_level;
 
   /**
    * Constant COOKIE_EXPIRE
@@ -112,9 +90,6 @@ class Authentication
    */
   const COOKIE_PATH = "/";  //Available in whole domain
  
-  /**
-   * 
-   */
   public function __construct(UserDao $userDao, UserTokenDao $userToken, FormValidator $validator)
   {
     $this->userDao = $userDao;
@@ -221,7 +196,7 @@ class Authentication
                     $_SERVER['HTTP_ACCEPT_LANGUAGE'].
                     $_SERVER['HTTP_USER_AGENT']);
 
-      if (!empty($remember_me) && ($remember_me == true)) {
+      if (!empty($remember_me)) {
            
            setcookie("cookie_user_email", $this->user_email, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
            setcookie("cookie_user_login", $this->user_login, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
@@ -258,14 +233,11 @@ class Authentication
 
       }
 
-      $new_session = regenerate_session();
-
-      $this->userDao->updateUserSession($new_session, abs((int)$account_info['ID']));
+      $this->userDao->updateUserSession(regenerate_session(), abs((int)$account_info['ID']));
        
       direct_page('index.php?load=dashboard', 302);
    
  }
- 
  
 /**
   * Logout
