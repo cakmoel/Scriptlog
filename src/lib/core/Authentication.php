@@ -108,9 +108,9 @@ class Authentication
     return $this->userDao->getUserByEmail($email);
   }
 
-  public function findTokenByUserEmail($email, $expired)
+  public function findTokenByLogin($login, $expired)
   {
-    return $this->userToken->getTokenByUserEmail($email, $expired);
+    return $this->userToken->getTokenByLogin($login, $expired);
   }
 
   public function findUserByLogin($user_login)
@@ -172,15 +172,25 @@ class Authentication
  public function login(array $values)
  {
     
-     $email = (isset($values['user_email'])) ? $values['user_email'] : null;
+     $login = (isset($values['login'])) ? $values['login'] : null;
      $password = (isset($values['user_pass'])) ? $values['user_pass'] : null;
      $remember_me = ($values['remember']) ? $values['remember'] : null;
 
-     $this->validator->sanitize($email, 'email');
-     $this->validator->validate($email, 'email');
-     $this->validator->validate($password, 'password'); 
+     if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+        
+       $this->validator->sanitize($login, 'email');
+       $this->validator->validate($login, 'email');
+       $account_info = $this->findUserByEmail($login);
 
-     $account_info = $this->findUserByEmail($email);
+     } else {
+
+       $this->validator->sanitize($login, 'string');
+       $this->validator->validate($login, 'string');
+       $account_info = $this->findUserByLogin($login);
+
+     }
+
+     $this->validator->validate($password, 'password'); 
 
      $tokenizer = new Tokenizer();
      
@@ -190,13 +200,9 @@ class Authentication
      $this->user_login = $_SESSION['user_login'] = $account_info['user_login'];
      $this->user_fullname = $_SESSION['user_fullname'] = $account_info['user_fullname'];
      
-     $this->agent = $_SESSION['agent'] = sha1(
-                    $_SERVER['HTTP_ACCEPT_CHARSET'].
-                    $_SERVER['HTTP_ACCEPT_ENCODING'].
-                    $_SERVER['HTTP_ACCEPT_LANGUAGE'].
-                    $_SERVER['HTTP_USER_AGENT']);
+     $this->agent = $_SESSION['agent'] = sha1($_SERVER['HTTP_ACCEPT_CHARSET'].$_SERVER['HTTP_ACCEPT_ENCODING'].$_SERVER['HTTP_ACCEPT_LANGUAGE'].$_SERVER['HTTP_USER_AGENT']);
 
-      if (!empty($remember_me)) {
+      if ((!empty($remember_me)) && ($remember_me == 'true')) {
            
            setcookie("cookie_user_email", $this->user_email, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
            setcookie("cookie_user_login", $this->user_login, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
@@ -274,10 +280,10 @@ public function logout()
   * @param string $password
   * @return boolean
   */
-public function validateUserAccount($email, $password)
+public function validateUserAccount($login, $password)
 {
     
-  $result = $this->userDao->checkUserPassword($email, $password);
+  $result = $this->userDao->checkUserPassword($login, $password);
 
   if (false === $result) {
 
@@ -341,7 +347,7 @@ public function updateNewPassword($user_pass, $user_id)
 public function removeCookies()
 {
 
-  if ((isset($_COOKIE['cookie_user_email'])) && (isset($_COOKIE['random_pwd'])) && (isset($_COOKIE['random_selector']))) {
+  if ((isset($_COOKIE['cookie_user_login'])) && (isset($_COOKIE['cookie_user_email'])) && (isset($_COOKIE['random_pwd'])) && (isset($_COOKIE['random_selector']))) {
 
     setcookie("cookie_user_email", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
     setcookie("cookie_user_id", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
