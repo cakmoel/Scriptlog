@@ -25,11 +25,11 @@ if (file_exists(__DIR__ . '/../config.sample.php')) {
 
 $errors = [];
   
-if ((isset($_POST['Login'])) && ($_POST['Login'] == 'Login')) {
+if ((isset($_POST['LogIn'])) && ($_POST['LogIn'] == 'Login')) {
       
   $isAuthenticated = false;
 
-  $user_email = isset($_POST['user_email']) ? filter_input(INPUT_POST, 'user_email', FILTER_SANITIZE_EMAIL) : "";
+  $login = isset($_POST['login']) ? prevent_injection($_POST['login']) : "";
   $user_pass = isset($_POST['user_pass']) ? prevent_injection($_POST['user_pass']) : "";
   
   $badCSRF = true;
@@ -43,24 +43,28 @@ if ((isset($_POST['Login'])) && ($_POST['Login'] == 'Login')) {
      
   } 
   
-  if (empty($user_email) || empty($user_pass)) {
+  if (empty($login) || empty($user_pass)) {
   
      $errors['errorMessage'] = "All Column must be filled";
   
   } 
   
-  if (email_validation($user_email) == 0) {
+  if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+
+     if (email_validation($login) == 0) {
   
-     $errors['errorMessage'] = "Please enter a valid email address";
+       $errors['errorMessage'] = "Please enter a valid email address";
+   
+     }
+
+     if (false === $authenticator -> checkEmailExists($login)) {
   
-  } 
-  
-  if (false === $authenticator -> checkEmailExists($user_email)) {
-  
-     $errors['errorMessage'] = "Your email address is not registered";
-  
-  } 
-  
+      $errors['errorMessage'] = "Your email address is not registered";
+    
+     }
+
+  }
+   
   if (strlen($user_pass) < 8) {
   
      $errors['errorMessage'] = "Your password must consist of least 8 characters";
@@ -73,7 +77,7 @@ if ((isset($_POST['Login'])) && ($_POST['Login'] == 'Login')) {
      
   } 
 
-  if (false === $authenticator -> validateUserAccount($user_email, $user_pass)) {
+  if (false === $authenticator -> validateUserAccount($login, $user_pass)) {
 
      $errors['errorMessage'] = "Invalid login";
 
@@ -83,7 +87,7 @@ if ((isset($_POST['Login'])) && ($_POST['Login'] == 'Login')) {
 
      $badCSRF = false;
          
-      unset($_SESSION['CSRF']);
+     unset($_SESSION['CSRF']);
 
      if (empty($errors['errorMessage'])) {
 
@@ -136,7 +140,7 @@ if ((isset($_POST['Login'])) && ($_POST['Login'] == 'Login')) {
 <body class="hold-transition login-page">
 <div class="login-box">
 <div class="login-logo">
-  <a href="#"><img class="d-block mx-auto mb-4" src="assets/dist/img/icon612x612.png" alt="Scriptlog Installation Procedure" width="72" height="72"></a>
+  <a href="#"><img class="d-block mx-auto mb-4" src="assets/dist/img/icon612x612.png" alt="Log In" width="72" height="72"></a>
 </div>
     <!-- /.login-logo -->
   <div class="login-box-body">  
@@ -168,14 +172,16 @@ if ((isset($_POST['Login'])) && ($_POST['Login'] == 'Login')) {
   
   ?>
   
-<form name="formlogin" action="login.php" method="post" onSubmit="return validasi(this)" role="form" autocomplete="off">
+<form name="formlogin" action="login.php" method="post" onSubmit="return validasi(this)"  role="form" autocomplete="off">
 <div class="form-group has-feedback">
-<input type="email" class="form-control" name="user_email" placeholder="Email" required autofocus maxlength="186" value="<?=(isset($_COOKIE['user_email'])) ? $_COOKIE['user_email'] : ""; ?> " >
-  <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+<label>Username or Email Address</label>
+<input type="text"  class="form-control" name="login" maxlength="186" value="<?=(isset($_COOKIE['cookie_user_login'])) ? $_COOKIE['cookie_user_login'] : ""; ?>" autofocus required>
+<span class="glyphicon glyphicon-user form-control-feedback"></span>
 </div>
 
 <div class="form-group has-feedback">
-<input type="password" class="form-control" name="user_pass" placeholder="Password" required maxlength="50" autocomplete="off" value="<?=(isset($_COOKIE['user_pwd'])) ? $_COOKIE['user_pwd'] : ""; ?>" >
+<label>Password</label>
+<input type="password" class="form-control" name="user_pass" maxlength="50" autocomplete="off" value="<?=(isset($_COOKIE['user_pwd'])) ? $_COOKIE['user_pwd'] : ""; ?>" required>
 <span class="glyphicon glyphicon-lock form-control-feedback"></span>  
 </div>
         
@@ -197,7 +203,7 @@ if ((isset($_POST['Login'])) && ($_POST['Login'] == 'Login')) {
     $_SESSION['CSRF'] = $CSRF;
   ?>
     <input type="hidden" name="csrf" value="<?= $CSRF; ?>">
-    <input type="submit" class="btn btn-primary btn-block btn-flat" name="Login" value="Login">
+    <input type="submit" class="btn btn-primary btn-block btn-flat" name="LogIn" value="Login">
   </div>
   <!-- /.col -->
   </div>
