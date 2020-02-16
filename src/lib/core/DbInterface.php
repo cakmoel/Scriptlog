@@ -40,7 +40,7 @@ interface DbInterface
  * @param string $parameters default NULL
  * 
  */
- public function dbQuery($sql, $parameters = null);
+ public function dbQuery($sql, $parameters = array());
  
 /**
  * Insert new record
@@ -62,7 +62,7 @@ interface DbInterface
  * 
  */
  public function dbUpdate($tablename, $params, $where);
- 
+
 /**
  * Delete record
  * 
