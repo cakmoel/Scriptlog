@@ -62,7 +62,8 @@ class UserDao extends Dao
  {
    $cleanId = $this->filteringId($sanitize, $userId, 'sql');
    
-   $sql = "SELECT ID, user_login, user_email, user_level, user_fullname, user_url, user_registered, user_session 
+   $sql = "SELECT ID, user_login, user_email, user_pass, user_level, 
+                  user_fullname, user_url, user_registered, user_session 
            FROM tbl_users WHERE ID = :ID LIMIT 1";
    
    $this->setSQL($sql);
@@ -84,7 +85,7 @@ class UserDao extends Dao
  public function getUserByEmail($user_email, $fetchMode = null)
  {
      
-   $sql = "SELECT ID, user_login, user_email, 
+   $sql = "SELECT ID, user_login, user_email, user_pass,
                   user_level, 
                   user_fullname, 
                   user_url, 
@@ -111,7 +112,8 @@ class UserDao extends Dao
  public function getUserByLogin($user_login, $fetchMode = null) 
  {
 
-   $sql = "SELECT ID, user_login, user_email, user_level, user_fullname, user_url, user_registered, user_session
+   $sql = "SELECT ID, user_login, user_email, user_pass, 
+                  user_level, user_fullname, user_url, user_registered, user_session
            FROM tbl_users WHERE user_login = :user_login LIMIT 1";
 
    $this->setSQL($sql);
@@ -251,7 +253,7 @@ class UserDao extends Dao
           
      }
      
-     $this->modify("tbl_users", $bind, "ID = '{$cleanId}'");
+     $this->modify("tbl_users", $bind, "ID = ".(int)$cleanId);
      
  }
 
@@ -266,7 +268,7 @@ class UserDao extends Dao
  public function updateUserSession($user_session, $user_id)
  {
     $bind = ['user_session' => generate_session_key($user_session, 32)];
-    $this->modify("tbl_users", $bind, "ID = {$user_id}");
+    $this->modify("tbl_users", $bind, "ID = ".(int)$user_id);
  }
 
  /**
@@ -441,45 +443,91 @@ class UserDao extends Dao
  * @return bool
  * 
  */
- public function checkUserPassword($email, $password)
+ public function checkUserPassword($login, $password)
  {
-    $sql = "SELECT user_pass FROM tbl_users WHERE user_email = :user_email LIMIT 1";
-    $this->setSQL($sql);
-    $stmt = $this->checkCountValue([':user_email' => $email]);
     
-    if ($stmt > 0) {
+    if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+
+        $sql = "SELECT user_pass FROM tbl_users WHERE user_email = :user_email LIMIT 1";
+        $this->setSQL($sql);
+        $stmt = $this->checkCountValue([':user_email' => $login]);
+
+        if ($stmt > 0) {
         
-        $row = $this->findRow([':user_email' => $email]);
-        
-        $expected = crypt($password, $row['user_pass']);
-        $correct = crypt($password, $row['user_pass']);
-
-        if(!function_exists('hash_equals')) {
-
-            if(timing_safe_equals($expected, $correct) == 0) {
-
-                if(scriptlog_verify_password($password, $row['user_pass'])) {
-
-                    return true;
-
+            $row = $this->findRow([':user_email' => $login]);
+            
+            $expected = crypt($password, $row['user_pass']);
+            $correct = crypt($password, $row['user_pass']);
+    
+            if(!function_exists('hash_equals')) {
+    
+                if(timing_safe_equals($expected, $correct) == 0) {
+    
+                    if(scriptlog_verify_password($password, $row['user_pass'])) {
+    
+                        return true;
+    
+                    }
+    
                 }
-
-            }
-
-        } else {
-
-            if(hash_equals($expected, $correct)) {
-
-                if (scriptlog_verify_password($password, $row['user_pass'])) {
-
-                    return true;
-
+    
+            } else {
+    
+                if(hash_equals($expected, $correct)) {
+    
+                    if (scriptlog_verify_password($password, $row['user_pass'])) {
+    
+                        return true;
+    
+                    }
+    
                 }
-
+                
             }
             
         }
+    
+    } else {
+
+        $sql = "SELECT user_pass FROM tbl_users WHERE user_login = :user_login LIMIT 1";
+        $this->setSQL($sql);
+        $stmt = $this->checkCountValue([':user_login' => $login]);
+
+        if ($stmt > 0) {
         
+            $row = $this->findRow([':user_login' => $login]);
+            
+            $expected = crypt($password, $row['user_pass']);
+            $correct = crypt($password, $row['user_pass']);
+    
+            if(!function_exists('hash_equals')) {
+    
+                if(timing_safe_equals($expected, $correct) == 0) {
+    
+                    if(scriptlog_verify_password($password, $row['user_pass'])) {
+    
+                        return true;
+    
+                    }
+    
+                }
+    
+            } else {
+    
+                if(hash_equals($expected, $correct)) {
+    
+                    if (scriptlog_verify_password($password, $row['user_pass'])) {
+    
+                        return true;
+    
+                    }
+    
+                }
+                
+            }
+            
+        }
+
     }
     
     return false;
