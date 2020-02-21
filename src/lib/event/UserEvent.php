@@ -340,6 +340,12 @@ class UserEvent
 
    }
 
+   if (isset($_COOKIE['cookie_user_level'])) {
+
+      return $_COOKIE['cookie_user_level'];
+      
+   }
+
    return false;
 
  }
