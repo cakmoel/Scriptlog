@@ -21,16 +21,14 @@ function regenerate_session()
 
  $newsid = session_id();
 
- $_SESSION['deleted_time'] = time();
+ $_SESSION['deleted_time'] = time() - Authentication::COOKIE_EXPIRE;
 
  session_write_close();
-
- ini_set('session.use_strict_mode', 0);
 
  session_id($newsid);
 
  session_start();
 
- session_regenerate_id(true);
+ session_regenerate_id();
 
 }
