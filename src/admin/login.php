@@ -23,7 +23,11 @@ if (file_exists(__DIR__ . '/../config.sample.php')) {
   
 }
 
-$errors = [];
+if ($isUserLoggedIn) {
+
+   direct_page('index.php?load=dashboard', 302);
+   
+}
   
 if ((isset($_POST['LogIn'])) && ($_POST['LogIn'] == 'Login')) {
       
@@ -43,7 +47,7 @@ if ((isset($_POST['LogIn'])) && ($_POST['LogIn'] == 'Login')) {
      
   } 
   
-  if (empty($login) || empty($user_pass)) {
+  if ((empty($login)) || (empty($user_pass))) {
   
      $errors['errorMessage'] = "All Column must be filled";
   
@@ -59,8 +63,16 @@ if ((isset($_POST['LogIn'])) && ($_POST['LogIn'] == 'Login')) {
 
      if (false === $authenticator -> checkEmailExists($login)) {
   
-      $errors['errorMessage'] = "Your email address is not registered";
+       $errors['errorMessage'] = "Your email address is not registered";
     
+     }
+
+  } else {
+
+     if (!preg_match('/^[A-Za-z][A-Za-z0-9]{5,31}$/', $login)) {
+
+        $errors['errorMessage'] = "Please enter username, use letters and numbers only at least 6-32 characters";
+
      }
 
   }
@@ -77,30 +89,26 @@ if ((isset($_POST['LogIn'])) && ($_POST['LogIn'] == 'Login')) {
      
   } 
 
-  if (false === $authenticator -> validateUserAccount($login, $user_pass)) {
+  if ($authenticator -> validateUserAccount($login, $user_pass)) {
 
-     $errors['errorMessage'] = "Invalid login";
+      $isAuthenticated = true;
+
+  }
+
+  if ($isAuthenticated) {
+
+    $badCSRF = false;
+
+    unset($_SESSION['CSRF']);
+
+    $authenticator -> login($_POST);
 
   } else {
 
-     $isAuthenticated = true;
+      $errors['errorMessage'] = "Invalid login";
 
-     $badCSRF = false;
-         
-     unset($_SESSION['CSRF']);
+  }
 
-     if (empty($errors['errorMessage'])) {
-
-         if (true === $isAuthenticated) {
-
-             $authenticator->login($_POST);
-
-         }
-         
-     }
-
-  } 
-  
 }
   
 ?>
@@ -175,13 +183,14 @@ if ((isset($_POST['LogIn'])) && ($_POST['LogIn'] == 'Login')) {
 <form name="formlogin" action="login.php" method="post" onSubmit="return validasi(this)"  role="form" autocomplete="off">
 <div class="form-group has-feedback">
 <label>Username or Email Address</label>
-<input type="text"  class="form-control" name="login" maxlength="186" value="<?=(isset($_COOKIE['cookie_user_login'])) ? $_COOKIE['cookie_user_login'] : ""; ?>" autofocus required>
+<input type="text"  class="form-control" name="login" maxlength="186" value="<?php if (isset($_COOKIE['cookie_user_login'])) : echo $_COOKIE['cookie_user_login'];
+elseif (isset($_COOKIE['cookie_user_email'])) : echo $_COOKIE['cookie_user_email']; endif; ?>" autofocus required>
 <span class="glyphicon glyphicon-user form-control-feedback"></span>
 </div>
 
 <div class="form-group has-feedback">
 <label>Password</label>
-<input type="password" class="form-control" name="user_pass" maxlength="50" autocomplete="off" value="<?=(isset($_COOKIE['user_pwd'])) ? $_COOKIE['user_pwd'] : ""; ?>" required>
+<input type="password" class="form-control" name="user_pass" maxlength="50" autocomplete="off" value="<?=(isset($_COOKIE['user_pass'])) ? $_COOKIE['user_pass'] : ""; ?>" required>
 <span class="glyphicon glyphicon-lock form-control-feedback"></span>  
 </div>
         
@@ -189,7 +198,8 @@ if ((isset($_POST['LogIn'])) && ($_POST['LogIn'] == 'Login')) {
   <div class="col-xs-8">
     <div class="checkbox icheck">
       <label>
-        <input type="checkbox" name="remember" <?=(isset($_COOKIE["user_email"])) ? "checked" : "" ?> > Remember Me
+        <input type="checkbox" name="remember" <?php if (isset($_COOKIE['cookie_user_login'])) : ?> checked> 
+        <?php elseif($_COOKIE['cooke_user_email']) : echo "checked"; ?>> <?php endif; ?> Remember Me
       </label>
     </div>
   </div>
