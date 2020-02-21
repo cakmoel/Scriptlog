@@ -20,13 +20,38 @@ class Wall extends Dashboard
  */
  public function listItems()
  {
+   
    if(true === is_non_administrator()) {
 
-     $this->welcomeUser('Hello '.$_SESSION['user_fullname']);
+     if (isset($_SESSION['user_fullname'])) {
+
+        $non_admin = $_SESSION['user_fullname'];
+
+     }
+
+     if (isset($_COOKIE['cookie_user_fullname'])) {
+
+        $non_admin = $_COOKIE['cookie_user_fullname'];
+
+     }
+
+     $this->welcomeUser('Hello '.$non_admin);
 
    } else {
 
-     $this->welcomeAdmin('Hello '.$_SESSION['user_login']);
+     if (isset($_SESSION['user_login'])) {
+
+         $administrator = $_SESSION['user_login'];
+
+     } 
+
+     if (isset($_COOKIE['cookie_user_login'])) {
+
+        $administrator = $_COOKIE['cookie_user_login'];
+
+     }
+
+     $this->welcomeAdmin('Hello '.$administrator);
 
    }
 
