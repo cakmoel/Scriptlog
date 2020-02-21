@@ -10,7 +10,6 @@
  * 
  */
 
-header('Content-Type: text/html; charset=utf-8');
 require dirname(__FILE__) . '/include/settings.php';
 require dirname(__FILE__) . '/include/check-engine.php';
 require dirname(__FILE__) . '/include/setup.php';
@@ -95,13 +94,21 @@ if ($install != 'install') {
 
     $link = make_connection($dbhost, $dbuser, $dbpass, $dbname);
     
-    if(ctype_alnum($username) && (mb_strlen($username) > 0) && (mb_strlen($username) <= 32)) {
+    if(ctype_alnum($username) && (mb_strlen($username) > 5) && (mb_strlen($username) <= 32)) {
       
-       $clean_setup['username'] = $username;
+       if (preg_match('/^[A-Za-z][A-Za-z0-9]{5,31}$/', $username)) {
+
+          $clean_setup['username'] = $username;
+
+       } else {
+
+          $errors['errorSetup'] = "Please enter a valid username with only alphabetic and numeric characters, at least 6-32 characters length";
+
+       }
 
     } else {
 
-       $errors['errorSetup'] = 'Please enter a valid username with only alphabetic and numeric characters, at least 0-32 characters length';
+       $errors['errorSetup'] = 'Please enter a valid username with only alphabetic and numeric characters, at least 6-32 characters length';
 
     }
 
@@ -249,7 +256,7 @@ if ($install != 'install') {
 
               if (true === write_config_file($protocol, $server_host, $dbhost, $dbuser, $dbpass, $dbname, $email, $key)) {
 
-              header("Location:".$protocol."://".$server_host.dirname($_SERVER['PHP_SELF']).DIRECTORY_SEPARATOR."finish.php?status=success&token={$key}");
+                header("Location:".$protocol."://".$server_host.dirname($_SERVER['PHP_SELF']).DIRECTORY_SEPARATOR."finish.php?status=success&token={$key}");
 
             }       
         
