@@ -29,33 +29,39 @@ class UserTokenDao extends Dao
  * @return 
  * 
  */
-  public function getTokenByUserEmail($user_email, $expired, $fetchMode = null)
+  public function getTokenByLogin($login, $expired, $fetchMode = null)
   {
-      $sql = "SELECT t.ID, t.user_id, t.pwd_hash, t.selector_hash, 
+
+    if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+
+       $sql = "SELECT t.ID, t.user_login, t.pwd_hash, t.selector_hash, 
                      t.is_expired, t.expired_date,
-                     u.user_email 
+                     u.user_email, u.user_login
              FROM tbl_user_token AS t
-             INNER JOIN tbl_users AS u ON t.user_id = u.ID 
+             INNER JOIN tbl_users AS u ON t.user_login = u.user_login 
              WHERE u.user_email = :user_email AND t.is_expired = :expired";
 
+       $this->setSQL($sql);
+
+       $userToken = (is_null($fetchMode)) ? $this->findRow([':user_email' => $login, ':expired' => $expired]) : $this->findRow([':user_email'=>$login, ':expired'=>$expired], $fetchMode);
+    
+    } else {
+
+      $sql = "SELECT t.ID, t.user_login, t.pwd_hash, t.selector_hash, 
+                     t.is_expired, t.expired_date,
+                     u.user_login, u.user_email
+             FROM tbl_user_token AS t
+             INNER JOIN tbl_users AS u ON t.user_login = u.user_login 
+             WHERE u.user_login = :user_login AND t.is_expired = :expired";
+
       $this->setSQL($sql);
-  
-      $userToken = (is_null($fetchMode)) ? $this->findRow([':user_email' => $user_email, ':expired' => $expired]) : $this->findRow([':user_email' => $user_email, ':expired' => $expired], $fetchMode);
+
+      $userToken = (is_null($fetchMode)) ? $this->findRow([':user_login' => $login, ':expired' => $expired]) : $this->findRow([':user_login' => $login, ':expired' => $expired], $fetchMode);
+
+    }
       
-      return (empty($userToken)) ?: $userToken;
+    return (empty($userToken)) ?: $userToken;
 
-  }
-
-/**
- * Update token expired
- * 
- * @param string $userTokenId
- * 
- */
-  public function updateTokenExpired($userTokenId)
-  {
-    $bind = ['is_expired' => 1];
-    $this->modify("tbl_user_token", $bind, "ID = {$userTokenId}");
   }
 
 /**
@@ -69,7 +75,7 @@ class UserTokenDao extends Dao
 
     $this->create("tbl_user_token", [
 
-      'user_id' => $bind['user_id'],
+      'user_login' => $bind['user_login'],
       'pwd_hash' => $bind['pwd_hash'],
       'selector_hash' => $bind['selector_hash'],
       'expired_date' => $bind['expired_date']
@@ -77,5 +83,29 @@ class UserTokenDao extends Dao
     ]);
 
   }
+
+/**
+ * Update token expired
+ * 
+ * @param string $userTokenId
+ * 
+ */
+public function updateTokenExpired($userTokenId)
+{
+  $this->modify("tbl_user_token", ['is_expired' => 1], "ID = {$userTokenId}");
+}
+
+/**
+ * Delete user token
+ * deleting user token when logout from app
+ *
+ * @param string $user_login
+ * @return void
+ * 
+ */
+public function deleteUserToken($user_login)
+{
+  $this->deleteRecord("tbl_user_token", " user_login = '{$user_login}' AND is_expired = '1'");
+}
 
 }
