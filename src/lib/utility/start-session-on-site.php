@@ -7,7 +7,7 @@
  */
 function start_session_on_site()
 {
-  $life_time = 600;
+  $life_time = time() + Authentication::COOKIE_EXPIRE;
 
   $session_name = session_name();
   
