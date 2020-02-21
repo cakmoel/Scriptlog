@@ -543,11 +543,17 @@ class UserDao extends Dao
   */
  public function checkUserId($userId, $sanitize)
  {
+     
      $sql = "SELECT ID FROM tbl_users WHERE ID = ?";
+
      $idsanitized = $this->filteringId($sanitize, $userId, 'sql');
+
      $this->setSQL($sql);
+
      $stmt = $this->checkCountValue([$idsanitized]);
+
      return($stmt > 0);
+
  }
  
 /**
