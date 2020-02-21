@@ -18,7 +18,7 @@ class Authentication
    * @var integer
    * 
    */
-  private $user_id;
+  protected $user_id;
 
   /**
    * user session
@@ -26,7 +26,7 @@ class Authentication
    * @var mixed
    * 
    */
-  private $user_session;
+  protected $user_session;
  
   /**
    * File Manager
@@ -34,7 +34,7 @@ class Authentication
    * @var string
    * 
    */
-  private $fileManager;
+  protected $fileManager;
 
   /**
    * User Agent
@@ -42,7 +42,7 @@ class Authentication
    * @var string
    * 
    */
-  private $agent;
+  protected $agent;
 
   /**
    * User's Email
@@ -112,6 +112,11 @@ class Authentication
   {
     return $this->userToken->getTokenByLogin($login, $expired);
   }
+  
+  public function markCookieAsExpired($tokenId)
+  {
+    return $this->userToken->updateTokenExpired($tokenId);
+  }
 
   public function findUserByLogin($user_login)
   {
@@ -174,7 +179,7 @@ class Authentication
     
      $login = (isset($values['login'])) ? $values['login'] : null;
      $password = (isset($values['user_pass'])) ? $values['user_pass'] : null;
-     $remember_me = ($values['remember']) ? $values['remember'] : null;
+     $remember_me = (isset($values['remember'])) ? $values['remember'] : null;
 
      if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
         
@@ -190,68 +195,78 @@ class Authentication
 
      }
 
-     $this->validator->validate($password, 'password'); 
+      $account_id = (isset($account_info['ID'])) ? (int)$account_info['ID'] : 0;
+      $account_login = (isset($account_info['user_login'])) ? $account_info['user_login'] : "";
+      $account_email = (isset($account_info['user_email'])) ? $account_info['user_email'] : "";
+      $account_level = (isset($account_info['user_level'])) ? $account_info['user_level'] : "";
+      $account_name = (isset($account_info['user_fullname'])) ? $account_info['user_fullname'] : "";
 
-     $tokenizer = new Tokenizer();
-     
-     $this->user_id = $_SESSION['user_id'] = $account_info['ID'];
-     $this->user_email = $_SESSION['user_email'] = $account_info['user_email'];
-     $this->user_level = $_SESSION['user_level'] = $account_info['user_level'];
-     $this->user_login = $_SESSION['user_login'] = $account_info['user_login'];
-     $this->user_fullname = $_SESSION['user_fullname'] = $account_info['user_fullname'];
-     
-     $this->agent = $_SESSION['agent'] = sha1($_SERVER['HTTP_ACCEPT_CHARSET'].$_SERVER['HTTP_ACCEPT_ENCODING'].$_SERVER['HTTP_ACCEPT_LANGUAGE'].$_SERVER['HTTP_USER_AGENT']);
+      $this->validator->validate($password, 'password'); 
 
-      if ((!empty($remember_me)) && ($remember_me == 'true')) {
-           
-           setcookie("cookie_user_email", $this->user_email, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
-           setcookie("cookie_user_login", $this->user_login, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
-           setcookie("cookie_user_level", $this->user_level, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
-           setcookie("cookie_user_fullname", $this->user_fullname, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
-           setcookie("cookie_user_id", $this->user_id, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+      $this->user_id = $_SESSION['user_id'] = intval($account_info['ID']);
+      $this->user_email = $_SESSION['user_email'] = $account_info['user_email'];
+      $this->user_level = $_SESSION['user_level'] = $account_info['user_level'];
+      $this->user_login = $_SESSION['user_login'] = $account_info['user_login'];
+      $this->user_fullname = $_SESSION['user_fullname'] = $account_info['user_fullname'];
+ 
+      $user_agent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : '';
+      $accept_charset = (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) ? $_SERVER['HTTP_ACCEPT_CHARSET'] : '';
+      $accept_encoding = (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
 
-           $random_password = $tokenizer -> createToken(16);
-           setcookie("random_pwd", $random_password, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+      $this->agent = $_SESSION['agent'] = sha1(get_ip_address().$accept_charset.$accept_encoding.$user_agent);
 
-           $random_selector = $tokenizer -> createToken(32);
-           setcookie("random_selector", $random_selector, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+      $this->userDao->updateUserSession(regenerate_session(), $account_id);
 
-           $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
-           $hashed_selector = password_hash($random_selector, PASSWORD_DEFAULT);
-           $expired_date = date("Y-m-d H:i:s", time() + self::COOKIE_EXPIRE);
+      if ($remember_me == true) {
 
-           $token_info = $this->findTokenByUserEmail($email, 0);
+          $tokenizer = new Tokenizer();
 
-           if (!empty($token_info['ID'])) {
-
-             $updateExpired = $this->userToken->updateTokenExpired($token_info['ID']);
-
-           }
-
-           $bind = ['user_id' => $account_info['ID'], 'pwd_hash' => $hashed_password, 
-                   'selector_hash' => $hashed_selector, 'expired_date' => $expired_date];
-
-           $this->userToken->createUserToken($bind);
+          setcookie("cookie_user_login", $account_login, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          setcookie("cookie_user_email", $account_email, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          setcookie("cookie_user_level", $account_level, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          setcookie("cookie_user_fullname", $account_name, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          setcookie("cookie_user_id", $account_id, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          
+          $random_password = $tokenizer -> createToken(16);
+          setcookie("random_pwd", $random_password, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+        
+          $random_selector = $tokenizer -> createToken(32);
+          setcookie("random_selector", $random_selector, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+        
+          $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
+          $hashed_selector = password_hash($random_selector, PASSWORD_DEFAULT);
+          
+          $expiry_date = date("Y-m-d H:i:s", time() + self::COOKIE_EXPIRE);
+                  
+          $token_info = $this->findTokenByLogin($login, 0);
+        
+          if (!empty($token_info['ID'])) {
+        
+             $this->userToken->updateTokenExpired($token_info['ID']);
+        
+          }
+        
+          $bind = ['user_login' => $account_login, 'pwd_hash' => $hashed_password, 
+                  'selector_hash' => $hashed_selector, 'expired_date' => $expiry_date];
+        
+          $this->userToken->createUserToken($bind);
 
       } else {
 
-           $this->removeCookies();
+          $this->removeCookies();
 
       }
 
-      $this->userDao->updateUserSession(regenerate_session(), abs((int)$account_info['ID']));
-       
       direct_page('index.php?load=dashboard', 302);
-   
+
  }
- 
+
 /**
   * Logout
   */
 public function logout()
 {
-    regenerate_session();
-    
+
     unset($_SESSION['user_id']);
     unset($_SESSION['user_email']);
     unset($_SESSION['user_login']);
@@ -359,16 +374,25 @@ public function removeCookies()
 
   }
 
-  if (ini_get("session.use_cookies")) {
-      
-      $params = session_get_cookie_params();
-      
-      setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]
-    
-  );
-
 }
 
+/**
+ * Clear authentication cookies
+ *
+ * @return void
+ */
+public function clearAuthCookies()
+{
+
+  if ((isset($_COOKIE['cookie_user_login'])) && (isset($_COOKIE['random_pwd'])) && (isset($_COOKIE['random_selector']))) {
+
+     $this->userToken->deleteUserToken($_COOKIE['cookie_user_login']);
+     
+     setcookie("cookie_user_login", "");
+     setcookie("random_pwd", "");
+     setcookie("random_selector", "");
+
+  }
 }
 
 /**
