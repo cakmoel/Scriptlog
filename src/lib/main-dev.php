@@ -14,7 +14,7 @@ ini_set('memory_limit', "5M");
 error_reporting(E_ALL);
 # ini_set("session.cookie_secure", "True");  //secure
 # ini_set("session.cookie_httponly", "True"); // httpOnly
-ini_set('session.use_strict_mode', 1); // use_strict_mode is mandatory for security reasons.
+# ini_set('session.use_strict_mode', 1); // use_strict_mode is mandatory for security reasons.
 # header("Content-Security-Policy: default-src https:; font-src 'unsafe-inline' data: https:; form-action 'self' http://scriptlog.web.id;img-src data: https:; child-src https:; object-src 'self' www.google-analytics.com ajax.googleapis.com platform-api.sharethis.com kartatopia-studio.disqus.com; script-src 'unsafe-inline' https:; style-src 'unsafe-inline' https:;");
 # date_default_timezone_set("GMT");
 
@@ -185,8 +185,9 @@ $ubench = new Ubench();
 # register_shutdown_function('scriptlog_shutdown_fatal');
 
 if (!start_session_on_site()) {
-    
+     
     ob_start();
     
 }
 
+$errors = [];

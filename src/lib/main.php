@@ -197,3 +197,4 @@ if (!start_session_on_site()) {
     
 }
 
+$errors = [];
