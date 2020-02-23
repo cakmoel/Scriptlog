@@ -199,7 +199,7 @@ elseif (isset($_COOKIE['cookie_user_email'])) : echo $_COOKIE['cookie_user_email
     <div class="checkbox icheck">
       <label>
         <input type="checkbox" name="remember" <?php if (isset($_COOKIE['cookie_user_login'])) : ?> checked> 
-        <?php elseif($_COOKIE['cooke_user_email']) : echo "checked"; ?>> <?php endif; ?> Remember Me
+        <?php elseif(isset($_COOKIE['cooke_user_email'])) : echo "checked"; ?>> <?php endif; ?> Remember Me
       </label>
     </div>
   </div>
