@@ -10,7 +10,7 @@ user_email VARCHAR(100) NOT NULL,
 user_pass VARCHAR(255) NOT NULL,
 user_level VARCHAR(20) NOT NULL,
 user_fullname VARCHAR(120) DEFAULT NULL,
-user_url VARCHAR(100) DEFAULT '#',
+user_url VARCHAR(100) DEFAULT NULL,
 user_registered datetime NOT NULL DEFAULT '2018-04-01 12:00:00',
 user_activation_key varchar(255) NOT NULL DEFAULT '',
 user_reset_key varchar(255) DEFAULT NULL,
@@ -27,6 +27,11 @@ selector_hash VARCHAR(255) NOT NULL,
 is_expired INT(11) NOT NULL DEFAULT '0',
 expired_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 PRIMARY KEY (ID)
+)Engine=InnoDB DEFAULT CHARSET=utf8mb4";
+
+$tableLoginAttempt = "CREATE TABLE IF NOT EXISTS tbl_login_attempt (
+ip_address VARCHAR(255) NOT NULL,
+login_date datetime NOT NULL DEFAULT '2018-04-01 12:00:00'
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
 $tablePost = "CREATE TABLE IF NOT EXISTS tbl_posts (
