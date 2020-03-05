@@ -10,69 +10,52 @@
  */
 
 // database connection 
-function db_connect($host, $user, $passwd, $dbname)
+function db_instance()
 {
+  $database = DbMySQLi::getInstance();
 
-  mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-  
-  $database_connection = mysqli_connect($host, $user, $passwd, $dbname);
-
-  if(mysqli_connect_errno()) {
-
-    scriptlog_error('Failed to connect to MySQL '.mysqli_connect_error(), E_USER_NOTICE);
-    exit();
-
-  }
-
-  return $database_connection;
-
+  return $database;
 }
 
-// close database connection
-function db_close($connection)
-{
- return mysqli_close($connection);
-}
 
-// query table name 
-function table_exists($connection, $table, $counter = 0)
-{
-  if ($connection) {
-    $counter++;
-
-    $check = mysqli_query($connection, "SHOW TABLES LIKE '".$table."'");
-
-    if($check !== false) {
-
-       if(mysqli_num_rows($check) > 0) {
-
-         return true;
-
-       } else {
-
-         return false;
-
-       }
-
-    }
-
-  }
-
-}
-
-// check whether database table does exist 
-function check_table($connection, $table)
+/**
+ * db mysqli query
+ * $sql = DML
+ * 
+ * @param string $sql
+ * @param array $params
+ * @return void
+ */
+function db_prepared_query($sql, $params)
 {
   
+  $stmt = db_instance()->preparedQuery($sql, $params);
+
+  return $stmt;
+
+}
+
+function is_table_exists($table)
+{
+
+  $is_exists = db_instance()->isTableExists($table);
+
+  return $is_exists;
+
+}
+
+function check_table($table)
+{
+ 
   $install = false;
 
-  if(!table_exists($connection, $table)) {
+  if(is_table_exists($table)) {
       
-    $install = true;
+    $install = false;
 
   } else {
 
-    $install = false;
+    $install = true;
 
   }
 
@@ -80,14 +63,56 @@ function check_table($connection, $table)
 
 }
 
-function db_query($connection, $query_type, $table_name, $SQL)
+function sanitizing_data($sanitizer, $str, $type)
 {
-  if (mysqli_query($connection, $SQL)) {
+   
+try {
+  
+  if (is_object($sanitizer)) {
 
-     print("$query_type query for $table_name - success");
+
+   switch ($type) {
+ 
+    case 'sql':
+      
+      if (filter_var($str, FILTER_SANITIZE_NUMBER_INT)) {
+              
+        return $sanitizer->sanitasi($str, 'sql');
+          
+      } else {
+          
+        header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+        throw new DbException("ERROR: this - $str - Id is considered invalid.");
+          
+      }
+      
+      break;
+    
+    case 'xss':
+
+      if (filter_var($str, FILTER_SANITIZE_FULL_SPECIAL_CHARS)) {
+              
+        return $sanitizer->sanitasi(prevent_injection($str), 'xss');
+          
+      } else {
+          
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+          throw new DbException("ERROR: this - $str - is considered invalid.");
+
+      }
+      
+      break;
+
+   }
 
   }
 
+} catch (DbException $e) {
+
+  $this->error = LogError::setStatusCode(http_response_code());
+  $this->error = LogError::newMessage($e);
+  $this->error = LogError::customErrorMessage();
+
 }
 
-
+}
