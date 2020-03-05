@@ -11,9 +11,10 @@
  * @since    Since Release 1.0
  * 
  */
-if (file_exists(__DIR__ . '/../config.sample.php')) {
+
+if (file_exists(__DIR__ . '/../config.php')) {
     
-    include __DIR__ . '/../lib/main-dev.php';
+    include __DIR__ . '/../lib/main.php';
     require __DIR__ . '/authorizer.php';
 
 } else {
@@ -28,25 +29,38 @@ if ($isUserLoggedIn) {
    direct_page('index.php?load=dashboard', 302);
    
 }
-  
+
 if ((isset($_POST['LogIn'])) && ($_POST['LogIn'] == 'Login')) {
       
   $isAuthenticated = false;
+  $captcha = true;
+  $badCSRF = true;
 
   $login = isset($_POST['login']) ? prevent_injection($_POST['login']) : "";
   $user_pass = isset($_POST['user_pass']) ? prevent_injection($_POST['user_pass']) : "";
-  
-  $badCSRF = true;
-  
-  if (!isset($_POST['csrf']) || !isset($_SESSION['CSRF']) || empty($_POST['csrf'])
-     || $_POST['csrf'] !== $_SESSION['CSRF']) {
-         
-      $errors['errorMessage'] = "Sorry, there was a security issue";
+
+  if (!isset($_POST['csrf']) || !isset($_SESSION['CSRF']) || empty($_POST['csrf']) || $_POST['csrf'] !== $_SESSION['CSRF']) {
      
       $badCSRF = true;
+
+      $errors['errorMessage'] = "Sorry, there was a security issue";
      
   } 
+
+  if ((count($_POST)>0) && (isset($_POST["captcha_code"])) && ($_POST["captcha_code"] !== $_SESSION["captcha_code"])) {
+
+    $captcha = false;
+
+    $errors['errorMessage'] = "Please enter correct captcha code";
+
+  }
+
+  $ip = (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : get_ip_address());
+
+  $login_attempt = get_login_attempt($ip);
   
+  $failed_login_attempt = $login_attempt['failed_login_attempt'];
+
   if ((empty($login)) || (empty($user_pass))) {
   
      $errors['errorMessage'] = "All Column must be filled";
@@ -95,7 +109,7 @@ if ((isset($_POST['LogIn'])) && ($_POST['LogIn'] == 'Login')) {
 
   }
 
-  if ($isAuthenticated) {
+  if ((count($_POST)>0) && ($isAuthenticated) && ($captcha == true)) {
 
     $badCSRF = false;
 
@@ -103,9 +117,23 @@ if ((isset($_POST['LogIn'])) && ($_POST['LogIn'] == 'Login')) {
 
     $authenticator -> login($_POST);
 
+    delete_login_attempt($ip);
+
+    direct_page('index.php?load=dashboard', 302);
+
   } else {
 
       $errors['errorMessage'] = "Invalid login";
+
+      if ($failed_login_attempt < 3 ) {
+
+         create_login_attempt($ip);
+ 
+      } else {
+ 
+         $errors['errorMessage'] = "You have tried more than 3 invalid attempts. Enter captcha code.";
+ 
+     }
 
   }
 
@@ -180,7 +208,7 @@ if ((isset($_POST['LogIn'])) && ($_POST['LogIn'] == 'Login')) {
   
   ?>
   
-<form name="formlogin" action="login.php" method="post" onSubmit="return validasi(this)"  role="form" autocomplete="off">
+<form name="formlogin" action="<?=app_url().'admin/login.php';?>" method="post" onSubmit="return validasi(this)"  role="form" autocomplete="off">
 <div class="form-group has-feedback">
 <label>Username or Email Address</label>
 <input type="text"  class="form-control" name="login" maxlength="186" value="<?php if (isset($_COOKIE['cookie_user_login'])) : echo $_COOKIE['cookie_user_login'];
@@ -193,13 +221,24 @@ elseif (isset($_COOKIE['cookie_user_email'])) : echo $_COOKIE['cookie_user_email
 <input type="password" class="form-control" name="user_pass" maxlength="50" autocomplete="off" value="<?=(isset($_COOKIE['user_pass'])) ? $_COOKIE['user_pass'] : ""; ?>" required>
 <span class="glyphicon glyphicon-lock form-control-feedback"></span>  
 </div>
-        
+
+<?php if (isset($failed_login_attempt) && $failed_login_attempt >= 3) : ?> 
+
+<div class="form-group has-feedback">
+<label>Enter captcha code</label>
+<input type="text" class="form-control" name="captcha_code" >
+<span class="glyphicon glyphicon-hand-down form-control-feedback"></span>
+<img src="<?=app_url().'admin/captcha.php'; ?>" alt="image_captcha">
+</div>
+
+<?php endif; ?>
+
 <div class="row">
   <div class="col-xs-8">
     <div class="checkbox icheck">
       <label>
-        <input type="checkbox" name="remember" <?php if (isset($_COOKIE['cookie_user_login'])) : ?> checked> 
-        <?php elseif(isset($_COOKIE['cooke_user_email'])) : echo "checked"; ?>> <?php endif; ?> Remember Me
+        <input type="checkbox" name="remember" <?php if (isset($_COOKIE['cookie_user_login'])) : echo "checked"?> 
+        <?php elseif(isset($_COOKIE['cooke_user_email'])) : echo "checked";?><?php endif; ?>> Remember Me
       </label>
     </div>
   </div>
