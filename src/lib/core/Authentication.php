@@ -211,11 +211,12 @@ class Authentication
  
       $user_agent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : '';
       $accept_charset = (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) ? $_SERVER['HTTP_ACCEPT_CHARSET'] : '';
-      $accept_encoding = (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
+      $accept_encoding = (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
+      $accept_language = (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
 
-      $this->agent = $_SESSION['agent'] = sha1(get_ip_address().$accept_charset.$accept_encoding.$user_agent);
+      $this->agent = $_SESSION['user_agent'] = sha1($accept_charset.$accept_encoding.$accept_language.$user_agent);
 
-      $this->userDao->updateUserSession(regenerate_session(), $account_id);
+      $this->userDao->updateUserSession(regenerate_session(), (int)$account_info['ID']);
 
       if ($remember_me == true) {
 
@@ -256,8 +257,6 @@ class Authentication
           $this->removeCookies();
 
       }
-
-      direct_page('index.php?load=dashboard', 302);
 
  }
 
@@ -393,6 +392,7 @@ public function clearAuthCookies()
      setcookie("random_selector", "");
 
   }
+  
 }
 
 /**
