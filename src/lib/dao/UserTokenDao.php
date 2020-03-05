@@ -26,8 +26,7 @@ class UserTokenDao extends Dao
  * @param string $user_email
  * @param string $expired
  * @param string $fetchMode default value = null
- * @return 
- * 
+ * @return mixed
  */
   public function getTokenByLogin($login, $expired, $fetchMode = null)
   {
