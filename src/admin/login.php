@@ -12,9 +12,9 @@
  * 
  */
 
-if (file_exists(__DIR__ . '/../config.php')) {
+if (file_exists(__DIR__ . '/../config.sample.php')) {
     
-    include __DIR__ . '/../lib/main.php';
+    include __DIR__ . '/../lib/main-dev.php';
     require __DIR__ . '/authorizer.php';
 
 } else {
@@ -115,7 +115,7 @@ if ((isset($_POST['LogIn'])) && ($_POST['LogIn'] == 'Login')) {
 
     unset($_SESSION['CSRF']);
 
-    $authenticator -> login($_POST);
+    $authenticator->login($_POST);
 
     delete_login_attempt($ip);
 
@@ -226,7 +226,7 @@ elseif (isset($_COOKIE['cookie_user_email'])) : echo $_COOKIE['cookie_user_email
 
 <div class="form-group has-feedback">
 <label>Enter captcha code</label>
-<input type="text" class="form-control" name="captcha_code" >
+<input type="text" class="form-control" name="captcha_code">
 <span class="glyphicon glyphicon-hand-down form-control-feedback"></span>
 <img src="<?=app_url().'admin/captcha.php'; ?>" alt="image_captcha">
 </div>
@@ -263,14 +263,14 @@ elseif (isset($_COOKIE['cookie_user_email'])) : echo $_COOKIE['cookie_user_email
 </div>
   <!-- /.login-box -->
 
-  <!-- jQuery 3 -->
-  <script src="assets/components/jquery/dist/jquery.min.js"></script>
-  <!-- Bootstrap 3.3.7 -->
-  <script src="assets/components/bootstrap/dist/js/bootstrap.min.js"></script>
-  <!-- iCheck -->
-  <script src="assets/components/iCheck/icheck.min.js"></script>
-  <script src="assets/dist/js/checklogin.js"></script>
-  <script>
+<!-- jQuery 3 -->
+<script src="assets/components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="assets/components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- iCheck -->
+<script src="assets/components/iCheck/icheck.min.js"></script>
+<script src="assets/dist/js/checklogin.js"></script>
+<script>
     $(function () {
       $('input').iCheck({
         checkboxClass: 'icheckbox_square-blue',
@@ -278,6 +278,18 @@ elseif (isset($_COOKIE['cookie_user_email'])) : echo $_COOKIE['cookie_user_email
         increaseArea: '20%' /* optional */
       });
     });
-  </script>
+</script>
+<script>
+$('img').bind('contextmenu',function(e){return false;}); 
+</script>
+<script>
+$(document).bind("contextmenu",function(e){return false;});
+</script>
+<script>
+document.onkeydown=function(e){if(e.ctrlKey&&(e.keyCode===67||e.keyCode===86||e.keyCode===85||e.keyCode===117)){return false;}else{return true;}};$(document).keypress("u",function(e){if(e.ctrlKey)
+{return false;}
+else
+{return true;}});
+</script>
 </body>
 </html>
