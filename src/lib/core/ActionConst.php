@@ -39,6 +39,7 @@ class ActionConst
 /**
  * action constant for topic functionality
  */
+ const TOPICS      = "topics";
  const NEWTOPIC    = "newTopic";
  const EDITTOPIC   = "editTopic";
  const DELETETOPIC = "deleteTopic";
@@ -46,16 +47,18 @@ class ActionConst
 /**
  * action constant for comment functionality
  */
+ const COMMENTS      = "comments";
  const EDITCOMMENT   = "editComment";
  const DELETECOMMENT = "deleteComment";
 
 /**
- * action constant for menu functionality
+ * action constant for navigation or menu functionality
  */
+ const NAVIGATION  = "navigation";
  const NEWMENU     = "newMenu";
  const EDITMENU    = "editMenu";
  const DELETEMENU  = "deleteMenu";
-
+ 
  const NEWSUBMENU    = "newSubMenu";
  const EDITSUBMENU   = "editSubMenu";
  const DELETESUBMENU = "deleteSubMenu";
@@ -92,6 +95,7 @@ class ActionConst
 /**
  * action const for user functionality
  */
+ const USERS      = "users";
  const NEWUSER    = "newUser";
  const EDITUSER   = "editUser";
  const DELETEUSER = "deleteUser";
