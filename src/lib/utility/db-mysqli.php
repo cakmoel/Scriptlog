@@ -38,18 +38,38 @@ function db_prepared_query($sql, $params)
 function is_table_exists($table)
 {
 
-  $is_exists = db_instance()->isTableExists($table);
+  if (is_array($table)) {
 
-  return $is_exists;
+      foreach ($table as $tbl) {
 
+          if (db_instance()->isTableExists($tbl)) {
+
+              return false;
+
+          } else {
+
+              return true;
+
+          }
+
+      }
+
+  } else {
+
+    $is_exists = db_instance()->isTableExists($table);
+
+    return $is_exists;
+      
+  }
+  
 }
 
-function check_table($table)
+function check_table()
 {
- 
+  
   $install = false;
 
-  if(is_table_exists($table)) {
+  if(is_table_exists(database_default_table())) {
       
     $install = false;
 
@@ -60,6 +80,18 @@ function check_table($table)
   }
 
   return $install;
+
+}
+
+function database_default_table()
+{
+
+  $default_table = [
+    'tbl_comments', 'tbl_comment_reply', 'tbl_login_attempt', 'tbl_media', 'tbl_mediameta', 
+    'tbl_media_download', 'tbl_menu', 'tbl_menu_child', 'tbl_plugin', 'tbl_posts', 
+    'tbl_post_topic', 'tbl_settings', 'tbl_themes', 'tbl_topics', 'tbl_users', 'tbl_user_token'];
+
+    return $default_table;
 
 }
 
