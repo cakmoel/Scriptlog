@@ -1,74 +1,112 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$mediaId = isset($_GET['Id']) ? abs((int)$_GET['Id']) : 0;
+$mediaId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $mediaDao = new MediaDao();
-$validator = new FormValidator();
 $mediaEvent = new MediaEvent($mediaDao, $validator, $sanitizer);
 $mediaLib = new MediaApp($mediaEvent);
 
 switch ($action) {
 
-    case ActionConst::NEWMEDIA:
+    case ActionConst::NEWMEDIA: // new media
 
-       if ($mediaId == 0) {
+       if (false === $authenticator->userAccessControl(ActionConst::MEDIALIB)) {
 
-          $mediaLib->insert();
+           direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
        } else {
 
-          direct_page('index.php?load=dashboard', 200);
+           if ((!check_integer($mediaId)) && (gettype($mediaId) !== "integer")) {
+
+               header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+               throw new AppException("Invalid ID data type!");
+
+           }
+           
+           if ($mediaId == 0) {
+
+                $mediaLib->insert();
+  
+            } else {
+  
+                 direct_page('index.php?load=dashboard', 200);
+            
+            }
           
        }
-
+    
        break;
 
     case ActionConst::EDITMEDIA:
 
        if ((!check_integer($mediaId)) && (gettype($mediaId) !== "integer")) {
 
-         header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-         throw new AppException("Invalid ID data type!");
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            throw new AppException("Invalid ID data type!");
 
        }
        
-       if ($mediaDao->checkMediaId($mediaId, $sanitizer)) {
+       if (false === $authenticator->userAccessControl(ActionConst::MEDIALIB)) {
 
-           $mediaLib->update($mediaId);
+           direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
        } else {
 
-           direct_page('index.php?load=medialib&error=mediaNotFound', 404);
-            
-       } 
+         if ($mediaDao->checkMediaId($mediaId, $sanitizer)) {
 
+             $mediaLib->update(settype($mediaId, "integer"));
+ 
+         } else {
+ 
+             direct_page('index.php?load=medialib&error=mediaNotFound', 404);
+             
+         }
+          
+       }
+    
        break;
 
     case ActionConst::DELETEMEDIA:
 
-      if ((!check_integer($mediaId)) && (gettype($mediaId) !== "integer")) {
+      if (false === $authenticator->userAccessControl(ActionConst::MEDIALIB)) {
 
-         header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-         throw new AppException("Invalid ID data type!");
+          direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
-       }
-       
-       if ($mediaDao->checkMediaId($mediaId, $sanitizer)) {
+      } else {
 
-           $mediaLib->remove($mediaId);
+         if ((!check_integer($mediaId)) && (gettype($mediaId) !== "integer")) {
 
-       } else {
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            throw new AppException("Invalid ID data type!");
+   
+          }
+          
+          if ($mediaDao->checkMediaId($mediaId, $sanitizer)) {
+   
+              $mediaLib->remove(settype($mediaId, "integer"));
+   
+          } else {
+   
+            direct_page('index.php?load=medialib&error=mediaNotFound', 404);
+   
+          }
 
-         direct_page('index.php?load=medialib&error=mediaNotFound', 404);
-
-       }
+      }
          
        break;
 
     default:
 
-        $mediaLib -> listItems();
+        if( false === $authenticator->userAccessControl(ActionConst::MEDIALIB)) {
 
+            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+
+        } else {
+
+           $mediaLib -> listItems();
+
+        }
+        
         break;
 
 }
