@@ -38,60 +38,33 @@ function db_prepared_query($sql, $params)
 function is_table_exists($table)
 {
 
-  if (is_array($table)) {
+  $is_exists = db_instance()->isTableExists($table);
 
-      foreach ($table as $tbl) {
+  return $is_exists;
 
-          if (db_instance()->isTableExists($tbl)) {
-
-              return false;
-
-          } else {
-
-              return true;
-
-          }
-
-      }
-
-  } else {
-
-    $is_exists = db_instance()->isTableExists($table);
-
-    return $is_exists;
-      
-  }
-  
 }
 
 function check_table()
 {
-  
-  $install = false;
 
-  if(is_table_exists(database_default_table())) {
-      
-    $install = false;
+  $dbscheme = false;
+
+  if (!(is_table_exists('tbl_comments') || (is_table_exists('tbl_comment_reply') || (is_table_exists('tbl_login_attempt')) 
+      || (is_table_exists('tbl_media') || (is_table_exists('tbl_mediameta') || (is_table_exists('tbl_media_download') 
+      || (is_table_exists('tbl_menu') || (is_table_exists('tbl_menu_child') || (is_table_exists('tbl_plugin') 
+      || (is_table_exists('tbl_posts') || (is_table_exists('tbl_post_topic') || (is_table_exists('tbl_settings') 
+      || (is_table_exists('tbl_themes') || (is_table_exists('tbl_topics') || (is_table_exists('tbl_users') 
+      || (is_table_exists('tbl_user_token'))))))))))))))))) {
+
+        $dbscheme = false;
 
   } else {
 
-    $install = true;
+      $dbscheme = true;
 
   }
 
-  return $install;
-
-}
-
-function database_default_table()
-{
-
-  $default_table = [
-    'tbl_comments', 'tbl_comment_reply', 'tbl_login_attempt', 'tbl_media', 'tbl_mediameta', 
-    'tbl_media_download', 'tbl_menu', 'tbl_menu_child', 'tbl_plugin', 'tbl_posts', 
-    'tbl_post_topic', 'tbl_settings', 'tbl_themes', 'tbl_topics', 'tbl_users', 'tbl_user_token'];
-
-    return $default_table;
+  return $dbscheme;
 
 }
 
