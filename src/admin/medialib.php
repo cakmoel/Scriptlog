@@ -29,7 +29,7 @@ switch ($action) {
   
             } else {
   
-                 direct_page('index.php?load=dashboard', 200);
+                 direct_page('index.php?load=dashboard', 302);
             
             }
           
