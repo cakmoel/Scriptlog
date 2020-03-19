@@ -18,7 +18,7 @@ class Authentication
    * @var integer
    * 
    */
-  protected $user_id;
+  private $user_id;
 
   /**
    * user session
@@ -26,7 +26,7 @@ class Authentication
    * @var mixed
    * 
    */
-  protected $user_session;
+  private $user_session;
  
   /**
    * File Manager
@@ -34,7 +34,7 @@ class Authentication
    * @var string
    * 
    */
-  protected $fileManager;
+  private $fileManager;
 
   /**
    * User Agent
@@ -42,7 +42,7 @@ class Authentication
    * @var string
    * 
    */
-  protected $agent;
+  private $agent;
 
   /**
    * User's Email
@@ -50,7 +50,7 @@ class Authentication
    * @var string
    * 
    */
-  protected $user_email;
+  private $user_email;
 
   /**
    * Username for login
@@ -58,7 +58,7 @@ class Authentication
    * @var string
    * 
    */
-  protected $user_login;
+  private $user_login;
 
   /**
    * user nicename
@@ -66,7 +66,7 @@ class Authentication
    * @var string
    * 
    */
-  protected $user_fullname;
+  private $user_fullname;
 
   /**
    * user level
@@ -74,7 +74,7 @@ class Authentication
    * @var string
    * 
    */
-  protected $user_level;
+  private $user_level;
 
   /**
    * Constant COOKIE_EXPIRE
@@ -95,6 +95,7 @@ class Authentication
     $this->userDao = $userDao;
     $this->userToken = $userToken;
     $this->validator = $validator;
+  
   }
   
   /**
@@ -157,9 +158,9 @@ class Authentication
     
     }
 
-    if (isset($_SESSION['user_level'])) {
+    if (isset($this->getSessionInstance()->user_level)) {
 
-       return $_SESSION['user_level'];
+       return $this->getSessionInstance->user_level;
        
     }
       
@@ -203,18 +204,23 @@ class Authentication
 
       $this->validator->validate($password, 'password'); 
 
-      $this->user_id = $_SESSION['user_id'] = intval($account_info['ID']);
-      $this->user_email = $_SESSION['user_email'] = $account_info['user_email'];
-      $this->user_level = $_SESSION['user_level'] = $account_info['user_level'];
-      $this->user_login = $_SESSION['user_login'] = $account_info['user_login'];
-      $this->user_fullname = $_SESSION['user_fullname'] = $account_info['user_fullname'];
- 
+      $session_data = $this->getSessionInstance();
+      $session_data->user_id = $this->user_id = intval($account_info['ID']);
+      $session_data->user_email = $this->user_email = $account_info['user_email'];
+      $session_data->user_level = $this->user_level = $account_info['user_level'];
+      $session_data->user_login = $this->user_login = $account_info['user_login'];
+      $session_data->user_fullname = $this->user_fullname = $account_info['user_fullname'];
+
       $user_agent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : '';
       $accept_charset = (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) ? $_SERVER['HTTP_ACCEPT_CHARSET'] : '';
       $accept_encoding = (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
       $accept_language = (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
 
-      $this->agent = $_SESSION['user_agent'] = sha1($accept_charset.$accept_encoding.$accept_language.$user_agent);
+      $session_data->agent = $this->agent = sha1($accept_charset.$accept_encoding.$accept_language.$user_agent);
+
+      get_session_data();
+
+      clear_duplicate_cookies();
 
       $this->userDao->updateUserSession(regenerate_session(), (int)$account_info['ID']);
 
@@ -271,7 +277,7 @@ public function logout()
     unset($_SESSION['user_login']);
     unset($_SESSION['user_fullname']);
     unset($_SESSION['user_level']);
-    unset($_SESSION['agent']);
+    unset($_SESSION['user_agent']);
     
     $_SESSION = array();
     
@@ -378,7 +384,6 @@ public function removeCookies()
 /**
  * Clear authentication cookies
  *
- * @return void
  */
 public function clearAuthCookies()
 {
@@ -470,7 +475,7 @@ public function userAccessControl($control = null)
 
         case ActionConst::MEDIALIB:
 
-           if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager') && ($this->accessLevel() != 'editor')) {
+           if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager') && ($this->accessLevel() != 'editor') && ($this->accessLevel() != 'author')) {
 
               return false;
 
@@ -533,6 +538,13 @@ public function userAccessControl($control = null)
     }
 
     return true;
+
+}
+
+private function getSessionInstance()
+{
+
+  return Session::getInstance();
 
 }
 
