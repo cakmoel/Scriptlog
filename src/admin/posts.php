@@ -1,9 +1,8 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$postId = isset($_GET['Id']) ? abs((int)$_GET['Id']) : 0;
+$postId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $postDao = new PostDao();
-$validator = new FormValidator();
 $postEvent = new PostEvent($postDao, $validator, $sanitizer);
 $postApp = new PostApp($postEvent);
 
@@ -11,38 +10,103 @@ switch ($action) {
     
     case ActionConst::NEWPOST:
         
-        if ($postId == 0) {
+        if (false === $authenticator->userAccessControl()) {
+
+            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+
+        } else {
+
+            if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
+
+                header($_SERVER["SERVER_PROTOCOL"]." 403");
+                throw new AppException("Invalid ID data type");
+
+            }
+
+            if ($postId == 0) {
             
-            $postApp -> insert();
-            
+                $postApp -> insert();
+                
+            } else {
+
+                direct_page('index.php?load=dashboard', 302);
+                
+            }
+
         }
         
         break;
         
     case ActionConst::EDITPOST:
         
-        if ($postDao -> checkPostId($postId, $sanitizer)) {
+        if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
+
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            throw new AppException("Invalid ID data type!");
+
+        }
+
+        if (false === $authenticator->userAccessControl()) {
+
+            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
         
-            $postApp -> update($postId);
-            
         } else {
-            
-           direct_page('index.php?load=posts&error=postNotFound', 404);
-            
+
+            if ($postDao -> checkPostId($postId, $sanitizer)) {
+        
+                $postApp -> update(settype($postId, "integer"));
+                
+            } else {
+                
+               direct_page('index.php?load=posts&error=postNotFound', 404);
+                
+            }
+
         }
         
         break;
         
     case ActionConst::DELETEPOST:
         
-        $postApp -> remove($postId);
-        
+        if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
+
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            throw new AppException("Invalid ID data type!");
+
+        }
+
+        if (false === $authenticator->userAccessControl()) {
+
+            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+
+        } else {
+
+            if ($postDao->checkPostId($postId, $sanitizer)) {
+
+                $postApp -> remove(settype($postId, "integer"));
+
+            } else {
+
+                direct_page('index.php?load=posts&error=postNotFound', 404);
+
+            }
+                   
+        }
+    
         break;
         
     default:
         
-        $postApp -> listItems();
-        
+        if (false === $authenticator->userAccessControl()) {
+
+             direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+
+        } else {
+
+            $postApp -> listItems();
+
+        }
+    
         break;
         
 }
