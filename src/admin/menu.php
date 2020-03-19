@@ -1,9 +1,8 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
  
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$menuId = isset($_GET['menuId']) ? abs((int)$_GET['menuId']) : 0;
+$menuId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $menuDao = new MenuDao();
-$validator = new FormValidator();
 $menuEvent = new MenuEvent($menuDao, $validator, $sanitizer);
 $menuApp = new MenuApp($menuEvent);
     
@@ -11,36 +10,103 @@ $menuApp = new MenuApp($menuEvent);
     
         case ActionConst::NEWMENU:
             # Add New Menu
-            if ($menuId == 0) {
+            if (false === $authenticator->userAccessControl(ActionConst::NAVIGATION)) {
+
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+
+            } else {
+
+                if ((!check_integer($menuId)) && (gettype($menuId) !== "integer")) {
+
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                    throw new AppException("invalid ID data type!");
+
+                }
+        
+                if ($menuId == 0) {
     
-                $menuApp -> insert();
-    
+                    $menuApp -> insert();
+        
+                } else {
+
+                    direct_page('index.php?load=dashboard', 302);
+                    
+                }
+
             }
-    
+        
             break;
         
         case ActionConst::EDITMENU:
     
-            if ($menuDao -> checkMenuId($menuId, $sanitizer)) {
-    
-                $menuApp -> update($menuId);
-    
-            } else {
-    
-                direct_page('index.php?load=menu&error=menuNotFound', 404);
+            if ((!check_integer($menuId)) && (gettype($menuId) !== "integer")) {
+
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                throw new AppException("Invalid ID data type!");
     
             }
+
+            if (false === $authenticator->userAccessControl(ActionConst::NAVIGATION)) {
+
+                direct_page('index.php?load=403&error=forbidden='.forbidden_id(), 403);
+
+            } else {
+
+                if ($menuDao -> checkMenuId($menuId, $sanitizer)) {
     
+                    $menuApp -> update(settype($menuId));
+        
+                } else {
+        
+                    direct_page('index.php?load=menu&error=menuNotFound', 404);
+        
+                }
+
+            }
+            
             break;
     
         case ActionConst::DELETEMENU:
     
-            $menuApp -> remove($menuId);
+            if ((!check_integer($menuId)) && (gettype($menuId) !== "integer")) {
+
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                throw new AppException("Invalid ID data type!");
+    
+            }
+
+            if (false === $authenticator->userAccessControl(ActionConst::NAVIGATION)) {
+
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+
+            } else {
+
+                if ($menuDao->checkMenuId($menuId, $sanitizer)) {
+
+                    $menuApp -> remove(settype($menuId, "integer"));
+    
+                } else {
+    
+                    direct_page('index.php?load=menu&error=menuNotFound', 404);
+    
+                }
+
+            }
+            
+            break;
     
         default:
             
-            $menuApp -> listItems();
-    
+            if (false === $authenticator->userAccessControl(ActionConst::NAVIGATION)) {
+
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+
+            } else {
+
+                $menuApp -> listItems();
+                
+            }
+            
             break;
             
     }
