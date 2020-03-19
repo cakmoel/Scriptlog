@@ -2,9 +2,11 @@
 
 $load = null;
 
+$current_request = (isset($_SERVER['REQUEST_METHOD'])) ? $_SERVER['REQUEST_METHOD'] : "";
+
 try {
 
-    if (isset($_GET['load']) || array_key_exists('load', $_GET)) {
+    if ((isset($_GET['load'])) || (array_key_exists('load', $_GET))) {
      
         $load = htmlentities(strip_tags(strtolower(basename($_GET['load']))), ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');
         $load = filter_var($load, FILTER_SANITIZE_URL);
@@ -49,15 +51,21 @@ try {
         
            if (false === $authenticator -> userAccessControl()) {
 
-               header($_SERVER['SERVER_PROTOCOL']." 400 Bad Request");
-               header("Status: 400 Bad Request");
-               header("Retry-After: 300");
-               die("Application not response to bad request. Please try again later.");
+               http_response_code(403);
+               throw new AppException("403 - Forbidden");
 
            } else {
                
-               include __DIR__ . DS . $load .'.php';
+               if (true === block_request_type($current_request)) {
 
+                   throw new AppException("405 - Method Not Allowed");
+
+               } else {
+
+                  include __DIR__ . DS . $load .'.php';
+                  
+               }
+            
            }
            
         }
