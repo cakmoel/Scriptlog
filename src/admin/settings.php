@@ -1,50 +1,40 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
 
-$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$settingId = isset($_GET['settingId']) ? abs((int)$_GET['settingId']) : 0;
+$action = (isset($_GET['action'])) ? htmlentities(strip_tags($_GET['action'])) : "";
+$args = (isset($_GET['args'])) ? escape_html($_GET['args']) : null;
 $configDao = new ConfigurationDao();
-$validator = new FormValidator();
 $configEvent = new ConfigurationEvent($configDao, $validator, $sanitizer);
 $configApp = new ConfigurationApp($configEvent);
 
 switch ($action) {
 
-    case ActionConst::NEWCONFIG:
-
-        if($settingId == 0) {
-
-           $configApp -> insert();
-
-        }
-
-        break;
-
     case ActionConst::EDITCONFIG:
         
-        # edit configuration
-        if ($configDao -> checkConfigId($settingId, $sanitizer)) {
+        if (false === $authenticator -> userAccessControl(ActionConst::CONFIGURATION)) {
 
-            $configApp -> update($settingId);
-            
+            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+
         } else {
 
-            direct_page('index.php?load=settings&error=configNotFound', 404);
-            
+            # edit configuration
+            $configApp -> update($args);
+
         }
 
         break;
-
-    case ActionConst::DELETECONFIG:
-      
-        // delete setting
-        
-        break;
     
-    default:
+    default: 
+    
+       if (false === $authenticator -> userAccessControl(ActionConst::CONFIGURATION)) {
 
-       # display setting
-       $configApp -> listItems();
+          direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
+       } else {
+
+          $configApp -> listItems();
+          
+       }
+       
        break;
 
 }
