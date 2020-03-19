@@ -1,7 +1,7 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$themeId = isset($_GET['themeId']) ? abs((int)$_GET['themeId']) : 0;
+$themeId = isset($_GET['Id']) ? abs((int)$_GET['Id']) : 0;
 $themeDao = new ThemeDao();
 $themeEvent = new ThemeEvent($themeDao, $validator, $sanitizer);
 $themeApp = new ThemeApp($themeEvent);
@@ -81,7 +81,7 @@ switch ($action) {
 
             if ($themeDao -> checkThemeId($themeId, $sanitizer)) {
 
-                 $themeApp -> update($themeId);
+                 $themeApp -> update(settype($themeId, "integer"));
 
             } else {
 
@@ -110,7 +110,7 @@ switch ($action) {
             
             if ($themeDao -> checkThemeId($themeId, $sanitizer)) {
 
-                $themeApp -> remove($themeId);
+                $themeApp -> remove(settype($themeId, "integer"));
 
             } else {
 
