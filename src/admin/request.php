@@ -41,6 +41,27 @@ try {
             
         }
 
+        if (strstr($_GET['load'], 'php://input')) {
+
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            throw new AppException("Remote file inclusion attempt!");
+
+        }
+
+        if (strstr($_GET['load'], 'php://filter')) {
+
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            throw new AppException("Remote file inclusion attempt!");
+
+        }
+
+        if (strstr($_GET['load'], 'data:')) {
+
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            throw new AppException("Remote file inclusion attempt!");
+
+        }
+
         if ((!is_readable(dirname(dirname(__FILE__)) .DS. APP_ADMIN .DS."{$load}.php")) 
             || (empty($load)) || (!in_array($load, $allowedQuery, true)) ) {
         
@@ -57,8 +78,9 @@ try {
            } else {
                
                if (true === block_request_type($current_request)) {
-
-                   throw new AppException("405 - Method Not Allowed");
+                 
+                  http_response_code(405);
+                  throw new AppException("405 - Method Not Allowed");
 
                } else {
 
