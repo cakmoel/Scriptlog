@@ -77,6 +77,14 @@ class Authentication
   private $user_level;
 
   /**
+   * session data
+   *
+   * @var string
+   * 
+   */
+  private $session_data;
+
+  /**
    * Constant COOKIE_EXPIRE
    * 
    * @var const|numeric
@@ -160,7 +168,7 @@ class Authentication
 
     if (isset($this->getSessionInstance()->user_level)) {
 
-       return $this->getSessionInstance->user_level;
+       return $this->getSessionInstance()->user_level;
        
     }
       
@@ -541,10 +549,12 @@ public function userAccessControl($control = null)
 
 }
 
-private function getSessionInstance()
+protected function getSessionInstance()
 {
 
-  return Session::getInstance();
+  $this->session_data = Session::getInstance();
+
+  return $this->session_data;
 
 }
 
