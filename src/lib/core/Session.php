@@ -16,9 +16,9 @@
 class Session
 {
 
-const SESSION_STARTED = true;
+const SESSION_STARTED = FALSE;
 
-const SESSION_NOT_STARTED = false;
+const SESSION_NOT_STARTED = TRUE;
 
 private $session_state = self::SESSION_NOT_STARTED;
 
@@ -44,7 +44,7 @@ public static function getInstance()
 public function startSession()
 {
 
- if ($this->session_state == self::SESSION_NOT_STARTED) {
+ if (!$this->session_state == self::SESSION_NOT_STARTED) {
 
      $this->session_state = session_start();
 
@@ -82,7 +82,7 @@ public function __isset($name)
 public function destroy()
 {
  
- if ($this->session_state = self::SESSION_STARTED) {
+ if (!$this->session_state = self::SESSION_STARTED) {
 
     $this->session_state = !session_destroy();
     
