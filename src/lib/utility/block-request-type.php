@@ -17,10 +17,6 @@ function block_request_type($current_request)
 
      $block = true;
 
-     http_response_code(405);
-
-     exit();
-
  } else {
 
      $block = false;
