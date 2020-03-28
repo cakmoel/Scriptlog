@@ -54,7 +54,7 @@ switch ($action) {
 
             if ($pageDao -> checkPageId($pageId, $sanitizer)) {
             
-                $pageApp -> update(settype($pageId, "integer"));
+                $pageApp -> update((int)$pageId);
                 
             } else {
                 
@@ -83,7 +83,7 @@ switch ($action) {
 
             if ($pageDao->checkPageId($pageId, $sanitizer)) {
 
-                $pageApp -> remove(settype($pageId, "integer"));
+                $pageApp -> remove((int)$pageId);
 
             } else {
 
