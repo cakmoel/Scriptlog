@@ -1,9 +1,8 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$pluginId = isset($_GET['pluginId']) ? abs((int)$_GET['pluginId']) : 0;
+$pluginId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $pluginDao = new PluginDao();
-$validator = new FormValidator();
 $pluginEvent = new PluginEvent($pluginDao, $validator, $sanitizer);
 $pluginApp = new PluginApp($pluginEvent);
 
@@ -11,39 +10,100 @@ switch ($action) {
 
     case ActionConst::INSTALLPLUGIN:
         
-        if ($pluginId == 0) {
-            
-            $pluginApp -> installPlugin();
-            
+        if (false === $authenticator -> userAccessControl('plugins')) {
+
+            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+
         } else {
 
-            direct_page('index.php?load=dashboard', 200);
+            if ((!check_integer($pluginId)) && (gettype($pluginId))) {
+
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                throw new AppException("Invalid ID data type!");
+
+            }
+            if ($pluginId == 0) {
+
+                $pluginApp -> installPlugin();
+
+            } else {
+
+                direct_page('index.php?load=dashboard', 302);
+                
+            }
 
         }
 
         break;
     
     case ActionConst::ACTIVATEPLUGIN:
-        
-        $pluginApp -> enablePlugin($pluginId);
 
+        if (false === $authenticator -> userAccessControl(ActionConst::PLUGINS)) {
+
+            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+
+        } else {
+
+            if ($pluginDao -> checkPluginId($pluginId, $sanitizer)) {
+               
+                $pluginApp -> enablePlugin(settype($pluginId, "integer"));
+
+            } else {
+
+                direct_page('index.php?load=plugins&error=pluginNotFound', 404);
+
+            }
+
+        }
+       
         break;
 
     case ActionConst::DEACTIVATEPLUGIN:
         
-        $pluginApp -> disablePlugin($pluginId);
+        if (false === $authenticator -> userAccessControl(ActionConst::PLUGINS)) {
 
+             direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+
+        } else {
+
+            if ($pluginDao -> checkPluginId($pluginId, $sanitizer)) {
+
+                $pluginApp -> disablePlugin(settype($pluginId, "integer"));
+
+            } else {
+
+                direct_page('index.php?load=plugins&error=pluginNotFound', 404);
+
+            }
+            
+        }
+    
         break;
 
     case ActionConst::NEWPLUGIN:
        
-       if ($pluginId == 0) {
+       if (false === $authenticator -> userAccessControl(ActionConst::PLUGINS)) {
 
-          $pluginApp -> insert();
+           direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
        } else {
 
-          direct_page('index.php?load=dashboard', 200);
+          if ((!check_integer($pluginId)) && (gettype($pluginId) !== "integer")) {
+
+             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+             throw new AppException("Invalid ID data type!");
+
+          }
+
+          if ($pluginId == 0) {
+
+            $pluginApp -> insert();
+  
+          } else {
+  
+            direct_page('index.php?load=dashboard', 200);
+            
+          }
           
        }
 
@@ -51,27 +111,72 @@ switch ($action) {
 
     case ActionConst::EDITPLUGIN:
        
-       if ($pluginDao -> checkPluginId($pluginId, $sanitizer)) {
+       if (false === $authenticator -> userAccessControl(ActionConst::PLUGINS)) {
 
-          $pluginApp -> update($pluginId);
+          direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
        } else {
-         
-           direct_page('index.php?load=plugins&error=pluginNotFound', 404);
 
+         if ((!check_integer($pluginId)) && (gettype($pluginId) !== "integer")) {
+
+            header($_SERVER["SERVER_PROTOCOL"]."400 Bad Request");
+            throw new AppException("Invalid ID data type!");
+  
+         }
+
+         if ($pluginDao -> checkPluginId($pluginId, $sanitizer)) {
+
+            $pluginApp -> update((int)$pluginId);
+  
+         } else {
+           
+             direct_page('index.php?load=plugins&error=pluginNotFound', 404);
+  
+         }
+  
        }
 
        break;
 
     case ActionConst::DELETEPLUGIN:
-       
-        $pluginApp -> remove($pluginId);
+        
+        if (false === $authenticator -> userAccessControl(ActionConst::PLUGINS)) {
 
+            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+
+        } else {
+
+            if ((!check_integer($pluginId)) && (gettype($pluginId) !== "integer")) {
+
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                throw new AppException("Invalid ID data type!");
+    
+            }
+
+            if ($pluginDao -> checkPluginId($pluginId, $sanitizer)) {
+
+                $pluginApp -> remove((int)$pluginId);
+
+            } else {
+
+                direct_page('index.php?load-plugin&error=pluginNotFound', 404);
+
+            }
+        }
+        
        break;
 
     default:
         
-        $pluginApp -> listItems();
+        if (false === $authenticator -> userAccessControl(ActionConst::PLUGINS)) {
+
+            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+
+        } else {
+
+            $pluginApp -> listItems();
+
+        }
         
         break;
 
