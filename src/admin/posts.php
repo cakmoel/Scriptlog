@@ -54,7 +54,7 @@ switch ($action) {
 
             if ($postDao -> checkPostId($postId, $sanitizer)) {
         
-                $postApp -> update(settype($postId, "integer"));
+                $postApp -> update((int)$postId);
                 
             } else {
                 
@@ -83,7 +83,7 @@ switch ($action) {
 
             if ($postDao->checkPostId($postId, $sanitizer)) {
 
-                $postApp -> remove(settype($postId, "integer"));
+                $postApp -> remove((int)$postId);
 
             } else {
 
