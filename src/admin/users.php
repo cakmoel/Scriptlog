@@ -1,8 +1,8 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$userId = isset($_GET['Id']) ? abs((int)$_GET['Id']) : 0;
-$sessionId = isset($_GET['sessionId']) ? $_GET['sessionId'] : null;
+$userId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
+$sessionId = isset($_GET['sessionId']) ? safe_html($_GET['sessionId']): null;
 $userEvent = new UserEvent($userDao, $validator, $sanitizer);
 $userApp = new UserApp($userEvent);
 
@@ -10,7 +10,7 @@ switch ($action) {
     
     case ActionConst::NEWUSER:
     
-      if (false === $authenticator -> userAccessControl(ActionConst::NEWUSER)) {
+      if (false === $authenticator -> userAccessControl(ActionConst::USERS)) {
 
           direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
@@ -46,42 +46,28 @@ switch ($action) {
 
         }
 
-        if ($userDao -> checkUserId($userId, $sanitizer)) {
+        if ((!$userDao->checkUserId($userId, $sanitizer))) {
 
-            if (($authenticator -> accessLevel() != 'administrator') && ($authenticator -> accessLevel() != 'manager')) {
+            if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
 
-                $userApp -> updateProfile($user_login);
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
-            } else {
-
-                $userApp -> update($userId);
-
-            }
-
-        } else {
-
-            if ($authenticator -> accessLevel() != 'administrator') {
-
-                 direct_page('index.php?load=404&notfound='.notfound_id(), 404);
-
-            } else {
-
-                 direct_page('index.php?load=users&error=userNotFound', 404);
-
-            }
-             
-        }
-
-        if (false === $userDao -> checkUserSession($sessionId)) {
-
-            if ($authenticator -> accessLevel() != 'administrator') {
-
-                direct_page('index.php?load=404&notfound='.notfound_id(), 404);
-                
-            } else {
+           } else {
 
                 direct_page('index.php?load=users&error=userNotFound', 404);
 
+           }
+
+        } else {
+
+            if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
+
+                $userApp -> updateProfile($user_login);
+    
+            } else {
+    
+                $userApp -> update((int)$userId);
+    
             }
 
         }
@@ -90,7 +76,7 @@ switch ($action) {
         
     case ActionConst::DELETEUSER:
  
-        if(false === $authenticator -> userAccessControl(ActionConst::DELETEUSER)) {
+        if(false === $authenticator -> userAccessControl(ActionConst::USERS)) {
 
             direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
@@ -105,7 +91,7 @@ switch ($action) {
             
             if ($userDao -> checkUserId($userId, $sanitizer)) {
 
-                $userApp -> remove($userId);
+                $userApp -> remove((int)$userId);
             
             } else {
 
@@ -119,7 +105,7 @@ switch ($action) {
                 
     default:
         
-       if (($authenticator -> accessLevel() !== 'administrator') && ($authenticator -> accessLevel() !== 'manager')) {
+       if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
 
            $userApp -> showProfile($user_login);
 
