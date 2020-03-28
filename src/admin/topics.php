@@ -55,7 +55,7 @@ switch ($action) {
 
             if ($topicDao -> checkTopicId($topicId, $sanitizer)) {
             
-                $topicApp -> update(settype($topicId));
+                $topicApp -> update((int)$topicId);
                 
             } else {
     
@@ -84,7 +84,7 @@ switch ($action) {
 
              if($topicDao->checkTopicId($topicId, $sanitizer)) {
 
-                $topicApp -> remove(settype($topicId));
+                $topicApp -> remove((int)$topicId);
 
              } else {
 
