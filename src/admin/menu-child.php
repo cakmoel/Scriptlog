@@ -54,7 +54,7 @@ switch ($action) {
 
             if ($menuChildDao -> checkMenuChildId($subMenuId, $sanitizer)) {
     
-                $menuChildApp -> update(settype($subMenuId, "integer"));
+                $menuChildApp -> update((int)$subMenuId);
         
             } else {
         
@@ -83,7 +83,7 @@ switch ($action) {
 
             if ($menuChildDao->checkMenuChildId($subMenuId, $sanitizer)) {
 
-                $menuChildApp -> remove(settype($subMenuIdId, "integer"));
+                $menuChildApp -> remove((int)$subMenuId);
                 
             } else {
 
