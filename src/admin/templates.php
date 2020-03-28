@@ -81,7 +81,7 @@ switch ($action) {
 
             if ($themeDao -> checkThemeId($themeId, $sanitizer)) {
 
-                 $themeApp -> update(settype($themeId, "integer"));
+                 $themeApp -> update((int)$themeId);
 
             } else {
 
@@ -110,7 +110,7 @@ switch ($action) {
             
             if ($themeDao -> checkThemeId($themeId, $sanitizer)) {
 
-                $themeApp -> remove(settype($themeId, "integer"));
+                $themeApp -> remove((int)$themeId);
 
             } else {
 
@@ -139,7 +139,7 @@ switch ($action) {
 
             if ($themeDao -> checkThemeId($themeId, $sanitizer)) {
 
-                $themeApp->enableTheme($themeId);
+                $themeApp->enableTheme((int)$themeId);
 
             } else {
 
