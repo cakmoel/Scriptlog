@@ -18,7 +18,7 @@ $commentApp = new CommentApp($commentEvent);
 
                 if ($commentDao -> checkCommentId($commentId, $sanitizer)) {
                 
-                    $commentApp -> update(settype($commentId, "integer"));
+                    $commentApp -> update((int)$commentId);
                     
                 } else {
                     
@@ -47,7 +47,7 @@ $commentApp = new CommentApp($commentEvent);
 
                 if ($commentDao->checkCommentId($commentId, $sanitizer)) {
 
-                    $commentApp -> remove(settype($commentId, "integer"));
+                    $commentApp -> remove((int)$commentId);
 
                 } else {
 
