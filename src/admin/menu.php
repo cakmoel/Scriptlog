@@ -54,7 +54,7 @@ $menuApp = new MenuApp($menuEvent);
 
                 if ($menuDao -> checkMenuId($menuId, $sanitizer)) {
     
-                    $menuApp -> update(settype($menuId));
+                    $menuApp -> update((int)$menuId);
         
                 } else {
         
@@ -83,7 +83,7 @@ $menuApp = new MenuApp($menuEvent);
 
                 if ($menuDao->checkMenuId($menuId, $sanitizer)) {
 
-                    $menuApp -> remove(settype($menuId, "integer"));
+                    $menuApp -> remove((int)$menuId);
     
                 } else {
     
