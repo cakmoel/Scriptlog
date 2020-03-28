@@ -39,22 +39,22 @@ switch ($action) {
 
     case ActionConst::EDITMEDIA:
 
-       if ((!check_integer($mediaId)) && (gettype($mediaId) !== "integer")) {
-
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-            throw new AppException("Invalid ID data type!");
-
-       }
-       
        if (false === $authenticator->userAccessControl(ActionConst::MEDIALIB)) {
 
            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
        } else {
 
+         if ((!check_integer($mediaId)) && (gettype($mediaId) !== "integer")) {
+
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            throw new AppException("Invalid ID data type!");
+
+         }
+
          if ($mediaDao->checkMediaId($mediaId, $sanitizer)) {
 
-             $mediaLib->update(settype($mediaId, "integer"));
+             $mediaLib->update((int)$mediaId);
  
          } else {
  
@@ -83,7 +83,7 @@ switch ($action) {
           
           if ($mediaDao->checkMediaId($mediaId, $sanitizer)) {
    
-              $mediaLib->remove(settype($mediaId, "integer"));
+              $mediaLib->remove((int)$mediaId);
    
           } else {
    
