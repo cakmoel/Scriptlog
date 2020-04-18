@@ -49,9 +49,9 @@ public function findPosts($orderBy = 'ID', $author = null)
   			INNER JOIN tbl_users AS u ON p.post_author = u.ID
   			WHERE p.post_author = :author
   			AND p.post_type = 'blog'
-  			ORDER BY p.{$orderBy} DESC";
+  			ORDER BY :orderBy DESC";
           
-        $data = array(':author' => $author);
+        $data = array(':author' => $author, ':orderBy' => $orderBy);
 
     } else {
         
@@ -75,9 +75,10 @@ public function findPosts($orderBy = 'ID', $author = null)
 
   		    WHERE
                  p.post_type = 'blog'
-  			ORDER BY p.{$orderBy} DESC";
+
+  			ORDER BY :orderBy DESC";
           
-        $data = array();
+        $data = array(':orderBy' => $orderBy);
 
     }
     
@@ -107,15 +108,15 @@ public function findPost($id, $sanitize, $author = null)
         $sql = "SELECT ID, 
                   media_id, 
                   post_author,
-  	  		      post_date, 
+  	  		        post_date, 
                   post_modified, 
                   post_title,
-  	  		      post_slug, 
+  	  		        post_slug, 
                   post_content, 
                   post_summary, 
                   post_keyword, 
                   post_status,
-  	  		      post_type, 
+  	  		        post_type, 
                   comment_status
   	  		  FROM tbl_posts
   	  		  WHERE ID = :ID AND post_author = :author
@@ -128,15 +129,15 @@ public function findPost($id, $sanitize, $author = null)
        $sql = "SELECT ID, 
               media_id, 
               post_author,
-  	  		  post_date, 
+  	  		    post_date, 
               post_modified, 
               post_title,
-  	  		  post_slug, 
+  	  		    post_slug, 
               post_content, 
               post_summary, 
               post_keyword, 
               post_status,
-  	  		  post_type, 
+  	  		    post_type, 
               comment_status
   	  		  FROM tbl_posts
   	  		  WHERE ID = :ID AND post_type = 'blog'";
@@ -162,7 +163,7 @@ public function findPost($id, $sanitize, $author = null)
  */
 public function showPostFeeds($limit = 5)
 {
-  $sql =  "SELECT p.ID, p.post_image, p.post_author,
+  $sql =  "SELECT p.ID, p.media_id, p.post_author,
                   p.post_date, p.post_modified, p.post_title,
                   p.post_slug, p.post_content, p.post_type,
                   p.post_status, u.user_login
@@ -307,7 +308,6 @@ public function createPost($bind, $topicId)
   
  if (!empty($bind['media_id'])) {
   		
-  	// insert into posts
    $this->create("tbl_posts", [
        'media_id' => $bind['media_id'],
        'post_author' => $bind['post_author'],
@@ -323,7 +323,7 @@ public function createPost($bind, $topicId)
      	 
  } else {
   			
-  $this->create("tbl_posts", [
+   $this->create("tbl_posts", [
       'post_author' => $bind['post_author'],
       'post_date' => $bind['post_date'],
       'post_title' => $bind['post_title'],
@@ -333,7 +333,7 @@ public function createPost($bind, $topicId)
       'post_keyword' => $bind['post_keyword'],
       'post_status' => $bind['post_status'],
       'comment_status' => $bind['comment_status']
-  ]);
+   ]);
   		  
  }
   	
@@ -409,7 +409,7 @@ public function updatePost($sanitize, $bind, $ID, $topicId)
   $post_id = $this->findColumn([$cleanId]);
   
   // delete post_topic
-  $this->deleteRecord("tbl_post_topic", "ID = '{$post_id['ID']}'");
+  $this->deleteRecord("tbl_post_topic", "post_id = '{$post_id['ID']}'");
   	  
   if (is_array($topicId)) {
   	     
@@ -499,7 +499,7 @@ public function dropDownCommentStatus($selected = "")
  	
     $name = 'comment_status';
  	// list position in array
- 	$comment_status = array('open' => 'Open', 'close' => 'Close');
+ 	$comment_status = array('open' => 'Open', 'closed' => 'Closed');
  	
  	if ($selected != '') {
  	    $selected = $selected;
@@ -519,7 +519,15 @@ public function dropDownCommentStatus($selected = "")
 public function totalPostRecords($data = null)
 {
 
-  $sql = "SELECT ID FROM tbl_posts";
+  if (!empty($data)) {
+
+     $sql = "SELECT ID FROM tbl_posts WHERE post_author = ?";
+
+  } else {
+
+     $sql = "SELECT ID FROM tbl_posts";
+
+  }
     
   $this->setSQL($sql);
     
