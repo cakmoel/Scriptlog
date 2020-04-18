@@ -36,10 +36,11 @@ function admin_header($stylePath, $breadCrumbs = null, $allowedQuery = null)
   ?>
 
   </title>
-  <!-- Tell the browser to be responsive to screen width -->
+  
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.7 -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/bootstrap/dist/css/bootstrap-select.css">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/font-awesome/css/font-awesome.min.css">
   <!-- Ionicons -->
@@ -60,7 +61,6 @@ function admin_header($stylePath, $breadCrumbs = null, $allowedQuery = null)
    <!-- wysiwyg editor-->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/wysihtml5/bootstrap3-wysihtml5.min.css">
 
-  
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>
@@ -72,12 +72,20 @@ function admin_header($stylePath, $breadCrumbs = null, $allowedQuery = null)
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 <!-- Icon -->
 <link href="<?= $stylePath; ?>/favicon.ico" rel="Shortcut Icon">
-   
+<style>
+  .avatar {
+  vertical-align: middle;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+</style>
+
 </head>
 
 <body class="hold-transition skin-scriptlog sidebar-mini">
-
 <div class="wrapper">
+
 <?php 
 }
 
@@ -85,57 +93,42 @@ function admin_footer($stylePath, $ubench = null)
 {
     
 ?>
- <!-- Main Footer -->
-  <footer class="main-footer">
-    <!-- To the right -->
+ 
+<footer class="main-footer">
+   
     <div class="pull-right hidden-xs">
       <?php 
         echo APP_CODENAME;
        ?>
     </div>
-    <!-- Default to the left -->
+    
     <strong>Thank you for creating with 
-    <a href="https://scriptlog.web.id" targer="_blank" title="Personal Blogware Platform">Scriptlog</a>
+    <a href="https://scriptlog.my.id" targer="_blank" title="Personal Blogware Platform">Scriptlog</a>
      <?php echo APP_VERSION; ?></strong>
      <strong><?=((true === APP_DEVELOPMENT) && (isset($ubench))) ? " Page generated in: ". $ubench->getTime() . " Memory usage: ".$ubench->getMemoryUsage() : "" ?></strong>
-  </footer>
+</footer>
   
-   <!-- Add the sidebar's background. This div must be placed
-  immediately after the control sidebar -->
-  <div class="control-sidebar-bg"></div>
-  </div>
-<!-- ./wrapper -->
+  <div class="control-sidebar-bg"></div>  
+</div>
 
-<!-- jQuery 3 -->
 <script src="<?= $stylePath; ?>/assets/components/jquery/dist/jquery.min.js"></script>
-<!-- Bootstrap 3.3.7 -->
 <script src="<?= $stylePath; ?>/assets/components/bootstrap/dist/js/bootstrap.min.js"></script>
-<!-- DataTables -->
+<script src="<?= $stylePath; ?>/assets/components/bootstrap/dist/js/bootstrap-select.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/datatables.net/js/responsive.bootstrap.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/datatables.net/js/responsive.dataTables.js"></script>
-<!-- AdminLTE App -->
 <script src="<?= $stylePath; ?>/assets/dist/js/adminlte.min.js"></script>
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script src="<?= $stylePath; ?>/assets/dist/js/ie10-viewport-bug-workaround.js"></script>
-<!-- Slimscroll -->
 <script src="<?= $stylePath; ?>/assets/components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
-<!-- FastClick -->
 <script src="<?= $stylePath; ?>/assets/components/fastclick/lib/fastclick.js"></script>
-<!-- Checking Form Field -->
 <script src="<?= $stylePath; ?>/assets/dist/js/checkFormSetting.js"></script>
-<!-- Mandatory Plugin File Uploaded -->
 <script src="<?= $stylePath; ?>/assets/dist/js/mandatory-plugin-upload.js"></script>
-<!-- Mandatory Theme File Uploaded -->
 <script src="<?= $stylePath; ?>/assets/dist/js/mandatory-theme-upload.js"></script>
-<!-- Validate Image -->
 <script src="<?= $stylePath; ?>/assets/dist/js/imagevalidation.js"></script>
-<script src="<?= $stylePath; ?>/assets/dist/js/imagesizechecker.js"></script>
-<!-- Bootstrap WYSIHTML5 -->
+<script src="<?= $stylePath; ?>/assets/dist/js/toggle-field.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
 <script type="text/javascript" src="<?= $stylePath; ?>/assets/dist/js/jquery.uploadPreview.min.js"></script>
-<!-- data-table script -->
 <script>
 $(document).ready(function(){
 	$('#scriptlog-table').DataTable({
@@ -150,10 +143,8 @@ $(document).ready(function(){
    });
 });
 </script>
-<!-- Text Editor -->
 <script>
   $(function () {
-    //bootstrap WYSIHTML5 - text editor
     $('.textarea').wysihtml5()
   })
 </script>
@@ -166,7 +157,9 @@ $(document).ready(function() {
   });
 });
 </script>
-</body>
+<script>
+$('img').bind('contextmenu',function(e){return false;}); 
+</script>
 </html>
 <?php 
 }
