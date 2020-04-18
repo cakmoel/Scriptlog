@@ -57,7 +57,7 @@
                <div class="box-header with-border">
                 <h3 class="box-title">
               <?=(isset($mediaTotal)) ? $mediaTotal : 0; ?> 
-               media<?=($mediaTotal != 1) ? 's' : ''; ?>
+               item<?=($mediaTotal != 1) ? 's' : ''; ?>
                in Total  
               </h3>
                </div>
@@ -79,13 +79,13 @@
                  <?php 
                    if (is_array($mediaLib)) : 
                    $no = 0;
-                   foreach ($mediaLib as $p => $media) :
+                   foreach ($mediaLib as $media) :
                    $no++;
                   ?>
               
                     <tr>
                        <td><?= $no; ?></td>
-                       <td><a href="<?=medialib_link($media['media_type'], $media['media_filename']);?>"  title="<?=htmlspecialchars($media['media_caption']);?>"><?=invoke_fileicon($media['media_type']); ?></a></td>
+                       <td><a href="<?=medialib_link($media['media_type'], $media['media_filename']);?>" title="<?= safe_html($media['media_caption']); ?>" ><?=invoke_fileicon($media['media_type']); ?></a></td>
                        <td><?= htmlspecialchars($media['media_type']); ?></td>
                        <td><?= htmlspecialchars($media['media_target']); ?></td>
 
@@ -133,7 +133,7 @@
   <script type="text/javascript">
   function deleteMedia(id, level)
   {
-	  if (confirm("Are you sure want to delete media from '" + level + "'"))
+	  if (confirm("Are you sure want to delete media belongs to '" + level + "'"))
 	  {
 	  	window.location.href = 'index.php?load=medialib&action=deleteMedia&Id=' + id;
 	  }
