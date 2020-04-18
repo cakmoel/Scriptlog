@@ -1,8 +1,8 @@
 <?php
 /**
  * File install.php
- * this file will be used when file config.php created
- * but database has not been installed yet
+ * this file will be used when file config.php exists and  
+ * successfully created but database tables has not been installed yet
  *
  * @category Installation file -- install.php
  * @author   M.Noermoehammad
@@ -12,7 +12,6 @@
  * 
  */
 require dirname(__FILE__) . '/include/settings.php';
-require dirname(__FILE__) . '/include/check-engine.php';
 require dirname(__FILE__) . '/include/setup.php';
 require dirname(__FILE__) . '/install-layout.php';
 
@@ -49,8 +48,6 @@ $install_path = preg_replace("/\/install\.php.*$/i", "", current_url());
 
 install_header($install_path, $protocol, $server_host);
 
-$clean_install = array();
-
 $setup = isset($_POST['setup']) ? stripcslashes($_POST['setup']) : '';
 
 if($setup != 'install') {
@@ -76,14 +73,28 @@ if($setup != 'install') {
     $confirm = isset($_POST['user_pass2']) ? $_POST['user_pass2'] : "";
     $email = filter_input(INPUT_POST, 'user_email', FILTER_SANITIZE_EMAIL);
 
-    if(ctype_alnum($username) && (mb_strlen($username) > 0) && (mb_strlen($username) <= 32)) {
+    if (strlen($username) < 8) {
 
-        $clean_install['username'] = $username;
+      $errors['errorSetup'] = 'Admin username must be at least 8 characters.';
 
-    } else {
+    } 
+    
+    if (strlen($username) > 20) {
 
-        $errors['errorInstall'] = 'Please enter a valid username with only alphabetic and numeric characters, at least 0-32 characters length';
+      $errors['errorSetup'] = 'Admin username may not be longer than 20 characters.';
 
+    } 
+    
+    if (preg_match('/^[0-9]*$/', $username)) {
+
+     $errors['errorSetup'] = 'Sorry, admin username must have letters too!';
+   
+    } 
+   
+    if ((!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $username))) {
+
+      $errors['erroSetup'] = 'Admin username can only contain Admin username can only contain alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
+      
     }
 
     if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -142,7 +153,7 @@ if($setup != 'install') {
 
           if(check_mysql_version($link, "5.6")) {
 
-             install_database_table($link, $protocol, $server_host, $clean_install['username'], $password, $email, $key);
+             install_database_table($link, $protocol, $server_host, $username, $password, $email, $key);
 
              header("Location:".$protocol."://".$server_host.dirname($_SERVER['PHP_SELF']).DIRECTORY_SEPARATOR."finish.php?status=success&token={$key}");
 
