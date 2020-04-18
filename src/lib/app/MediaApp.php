@@ -80,15 +80,15 @@ public function listItems()
      $this->view->set('status', $status);
   }
 
-  if ($this->mediaEvent->isMediaUser() != 'administrator') {
+  if ($this->mediaEvent->isMediaUser() == 'administrator') {
 
-     $this->view->set('mediaTotal', $this->mediaEvent->totalMedia([$this->mediaEvent->isMediaUser()]));
-     $this->view->set('mediaLib', $this->mediaEvent->grabAllMedia('ID', $this->mediaEvent->isMediaUser()));
-
+    $this->view->set('mediaTotal', $this->mediaEvent->totalMedia());
+    $this->view->set('mediaLib', $this->mediaEvent->grabAllMedia());
+    
   } else {
      
-     $this->view->set('mediaTotal', $this->mediaEvent->totalMedia());
-     $this->view->set('mediaLib', $this->mediaEvent->grabAllMedia());
+    $this->view->set('mediaTotal', $this->mediaEvent->totalMedia([$this->mediaEvent->isMediaUser()]));
+    $this->view->set('mediaLib', $this->mediaEvent->grabAllMedia('ID', $this->mediaEvent->isMediaUser()));
 
   }
 
@@ -117,11 +117,7 @@ public function insert()
     $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : '';
     $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
 
-    $filters = [
-      'media_caption' => FILTER_SANITIZE_SPECIAL_CHARS,
-      'media_target' => FILTER_SANITIZE_STRING,
-      'media_access' => FILTER_SANITIZE_STRING,
-    ];
+    $filters = ['media_caption' => FILTER_SANITIZE_SPECIAL_CHARS, 'media_target' => FILTER_SANITIZE_STRING, 'media_access' => FILTER_SANITIZE_STRING];
 
     try {
 
@@ -198,7 +194,7 @@ public function insert()
       // get new filename
       $new_filename = generate_filename($file_name)['new_filename'];
      
-      list($width, $height) = getimagesize($file_location);
+      list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
 
       if (generate_filename($file_name)['file_extension'] == "jpeg" 
           || generate_filename($file_name)['file_extension'] == "jpg" 
@@ -207,19 +203,19 @@ public function insert()
           || generate_filename($file_name)['file_extension'] == "webp") {
 
          $media_metavalue = array(
-                       'File name' => $new_filename, 
-                       'File type' => $file_type, 
-                       'File size' => format_size_unit($file_size), 
-                       'Uploaded on' => date("Y-m-d H:i:s"), 
-                       'Dimension' => $width.'x'.$height);
+              'Origin' => rename_file($file_name), 
+              'File type' => $file_type, 
+              'File size' => format_size_unit($file_size), 
+              'Uploaded on' => date("Y-m-d H:i:s"), 
+              'Dimension' => $width.'x'.$height);
 
       } else {
 
          $media_metavalue = array(
-          'File name' => $new_filename, 
-          'File type' => $file_type, 
-          'File size' => format_size_unit($file_size), 
-          'Uploaded on' => date("Y-m-d H:i:s"
+            'Origin' => rename_file($file_name), 
+            'File type' => $file_type, 
+            'File size' => format_size_unit($file_size), 
+            'Uploaded on' => date("Y-m-d H:i:s"
         ));
 
       }
@@ -379,7 +375,6 @@ public function update($id)
 
      } else {
 
-    
      if (!empty($file_location)) {
 
         if (!isset($file_error) || is_array($file_error)) {
@@ -420,8 +415,8 @@ public function update($id)
   
          if(false === check_file_name($file_location)) {
   
-          $checkError = false;
-          array_push($errors, "file name is not valid");
+           $checkError = false;
+           array_push($errors, "file name is not valid");
   
          }
   
@@ -434,15 +429,15 @@ public function update($id)
   
          if(false === check_mime_type(mime_type_dictionary(), $file_location)) {
   
-          $checkError = false;
-          array_push($errors, "Invalid file format");
+            $checkError = false;
+            array_push($errors, "Invalid file format");
   
          }
   
         // get new filename
         $new_filename = generate_filename($file_name)['new_filename'];
 
-        list($width, $height) = getimagesize($file_location);
+        list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
   
          if (generate_filename($file_name)['file_extension'] == "jpeg" 
             || generate_filename($file_name)['file_extension'] == "jpg" 
@@ -451,7 +446,8 @@ public function update($id)
             || generate_filename($file_name)['file_extension'] == "webp") {
 
             $media_metavalue = array(
-                        'File name' => $new_filename, 
+
+                        'Origin' => rename_file($file_name), 
                         'File type' => $file_type, 
                         'File size' => format_size_unit($file_size), 
                         'Uploaded on' => date("Y-m-d H:i:s"), 
@@ -460,7 +456,8 @@ public function update($id)
           } else {
  
             $media_metavalue = array(
-                  'File name' => $new_filename, 
+              
+                  'Origin' => rename_file($file_name), 
                   'File type' => $file_type, 
                   'File size' => format_size_unit($file_size), 
                   'Uploaded on' => date("Y-m-d H:i:s"));
@@ -476,6 +473,7 @@ public function update($id)
         
          $this->mediaEvent->setMediaFilename($new_filename);
          $this->mediaEvent->setMediaCaption(prevent_injection(distill_post_request($filters)['media_caption']));
+         $this->mediaEvent->setMediaType($file_type);
          $this->mediaEvent->setMediaTarget(distill_post_request($filters)['media_target']);
          $this->mediaEvent->setMediaAccess(distill_post_request($filters)['media_access']);
          $this->mediaEvent->setMediaStatus(distill_post_request($filters)['media_status']);
@@ -495,9 +493,9 @@ public function update($id)
 
       }
 
-      $this->mediaEvent->modifyMedia();
+       $this->mediaEvent->modifyMedia();
       
-      direct_page('index.php?load=medialib&status=mediaUpdated', 200);
+       direct_page('index.php?load=medialib&status=mediaUpdated', 200);
 
      }
      
