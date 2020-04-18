@@ -51,76 +51,38 @@ echo "Error saving data. Please try again." . $saveError;
 endif;
 ?>
 
-<form method="post" action="index.php?load=posts&action=<?=(isset($formAction)) ? $formAction : null; ?>&Id=<?=(isset($postData['ID'])) ? $postData['ID'] : 0; ?>" role="form" enctype="multipart/form-data" >
-<input type="hidden" name="post_id" value="<?=(isset($postData['ID'])) ? $postData['ID'] : 0; ?>" />
+<?php
+$action = isset($formAction) ? $formAction : null;
+$post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
+?>
+<form method="post" action="<?=generate_request('index.php', 'post', ['posts', $action, $post_id])['link']; ?>" role="form" enctype="multipart/form-data" >
+<input type="hidden" name="post_id" value="<?= $post_id; ?>" />
 <input type="hidden" name="MAX_FILE_SIZE" value="697856"/>
 
 <div class="box-body">
 <div class="form-group">
 <label>Title (required)</label>
 <input type="text" class="form-control" name="post_title" placeholder="Enter title here" value="
-<?=(isset($postData['post_title'])) ? htmlspecialchars($postData['post_title']) : ""; ?>
-<?=(isset($formData['post_title'])) ? htmlspecialchars($formData['post_title'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" required>
+<?=(isset($postData['post_title'])) ? safe_html($postData['post_title']) : ""; ?>
+<?=(isset($formData['post_title'])) ? safe_html($formData['post_title']) : ""; ?>" maxlength="200" required>
 </div>
-
-<?=(isset($topics)) ? $topics : ""; ?>
-
-<?php 
-if (isset($postData['post_image'])) :
-?>
-<div class="form-group">
-<?php 
-$image = '../public/files/pictures/'.$postData['post_image'];
-$imageThumb = '../public/files/pictures/thumbs/thumb_'.$postData['post_image'];
-
-if (!is_readable($imageThumb)) :
-    $imageThumb = '../public/files/pictures/thumbs/nophoto.jpg';
-endif;
-
-if (is_readable($image)) :
-?>
-<br><a href="<?php echo $image; ?>"><img src="<?php  echo $imageThumb; ?>" class="img-responsive pad"></a><br> 
-<label>change picture :</label> 
-<input type="file" name="image" id="file" accept="image/*" onchange="loadFile(event)" maxlength="512" />
-<img id="output" class="img-responsive pad" />
-<p class="help-block">Maximum file size: <?= format_size_unit(697856); ?></p>
-<?php 
-else :
-?>
-<br><img src="<?php echo $imageThumb; ?>" class="img-responsive pad"><br> 
-<label>change picture :</label> 
-<input type="file" name="image" id="file" onchange="loadFile(event)"  maxlength="512" >
-<img id="output" class="img-responsive pad" />
-<p class="help-block">Maximum file size: <?= format_size_unit(697856); ?></p>
-<?php 
-endif;
-?>
-</div>
-<?php else : ?>
-<div class="form-group">
-<label>Upload Picture :</label> 
-<input type="file" name="image" id="file" onchange="loadFile(event)"  maxlength="512" >
-<img id="output" class="img-responsive pad" />
-<p class="help-block">Maximum file size: <?= format_size_unit(697856); ?></p>
-</div>
-<?php 
-endif;
-?>
 
 <div class="form-group">
 <label>Meta Description</label>
-<textarea class="form-control" name="post_summary" rows="3" maxlength="500" >
-<?=(isset($postData['post_summary'])) ? $postData['post_summary'] : ""; ?>
-<?=(isset($formData['post_summary'])) ? htmlspecialchars($formData['post_summary'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>
+<textarea class="form-control" name="post_summary" rows="3" maxlength="320" >
+<?=(isset($postData['post_summary'])) ? safe_html($postData['post_summary']) : ""; ?>
+<?=(isset($formData['post_summary'])) ? safe_html($formData['post_summary']) : ""; ?>
 </textarea>
+<p class="help-block">Maximum 320 characters</p>
 </div>
 
 <div class="form-group">
 <label>Meta Keywords</label>
 <textarea class="form-control" name="post_keyword" rows="3" maxlength="200" >
-<?=(isset($postData['post_keyword'])) ? $postData['post_keyword'] : ""; ?>
-<?=(isset($formData['post_keyword'])) ? htmlspecialchars($formData['post_keyword'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>
+<?=(isset($postData['post_keyword'])) ? safe_html($postData['post_keyword']) : ""; ?>
+<?=(isset($formData['post_keyword'])) ? safe_html($formData['post_keyword']) : ""; ?>
 </textarea>
+<p class="help-block">Maximum 200 characters</p>
 </div>
 
 <div class="form-group">
@@ -128,10 +90,12 @@ endif;
 <textarea class="textarea" placeholder="Place some text here"
 style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" 
 name="post_content"  maxlength="10000"  required>
-<?=(isset($postData['post_content'])) ? $postData['post_content'] : ""; ?>
-<?=(isset($formData['post_content'])) ? htmlspecialchars($formData['post_content'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>
+<?=(isset($postData['post_content'])) ? safe_html($postData['post_content']) : ""; ?>
+<?=(isset($formData['post_content'])) ? safe_html($formData['post_content']) : ""; ?>
 </textarea>
 </div>
+
+<?=(isset($topics)) ? $topics : ""; ?>
 
 <div class="form-group">
 <label>Post status</label>
@@ -144,11 +108,13 @@ name="post_content"  maxlength="10000"  required>
 <?=(isset($commentStatus)) ? $commentStatus : ""; ?>
 </div>
 <!-- /.comment status -->
-</div>
+
+<?=(isset($medialibs)) ? $medialibs : "Media Not Found"; ?>
+
 <!-- /.box-body -->
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
-<input type="submit" class="btn btn-primary" name="postFormSubmit" value="<?=(isset($postData['ID']) && $postData['ID'] != '') ? "Update" : "Publish"; ?>" >
+<input type="submit" class="btn btn-primary" name="postFormSubmit" value="<?=(isset($post_id) && ($post_id != '')) ? "Update" : "Publish"; ?>" >
 </div>
 </form>
             
