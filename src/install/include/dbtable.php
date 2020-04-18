@@ -11,7 +11,7 @@ user_pass VARCHAR(255) NOT NULL,
 user_level VARCHAR(20) NOT NULL,
 user_fullname VARCHAR(120) DEFAULT NULL,
 user_url VARCHAR(100) DEFAULT NULL,
-user_registered datetime NOT NULL DEFAULT '2018-04-01 12:00:00',
+user_registered datetime NOT NULL DEFAULT '1987-11-20 12:00:00',
 user_activation_key varchar(255) NOT NULL DEFAULT '',
 user_reset_key varchar(255) DEFAULT NULL,
 user_reset_complete VARCHAR(3) DEFAULT 'No',
@@ -22,8 +22,8 @@ PRIMARY KEY(ID)
 $tableUserToken = "CREATE TABLE IF NOT EXISTS tbl_user_token (
 ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 user_login VARCHAR(60) NOT NULL,
-pwd_hash VARCHAR(255) NOT NULL,
-selector_hash VARCHAR(255) NOT NULL,
+hash_validator VARCHAR(255) NOT NULL,
+hash_selector VARCHAR(255) NOT NULL,
 is_expired INT(11) NOT NULL DEFAULT '0',
 expired_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 PRIMARY KEY (ID)
@@ -31,15 +31,15 @@ PRIMARY KEY (ID)
 
 $tableLoginAttempt = "CREATE TABLE IF NOT EXISTS tbl_login_attempt (
 ip_address VARCHAR(255) NOT NULL,
-login_date datetime NOT NULL DEFAULT '2018-04-01 12:00:00'
+login_date datetime NOT NULL DEFAULT '1987-11-20 12:00:00'
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
 $tablePost = "CREATE TABLE IF NOT EXISTS tbl_posts (
 ID bigint(20) unsigned NOT NULL auto_increment,
 media_id bigint(20) UNSIGNED NOT NULL DEFAULT '0',
 post_author bigint(20) UNSIGNED NOT NULL DEFAULT '0',
-post_date datetime NOT NULL DEFAULT '2018-04-01 12:00:00',
-post_modified datetime NOT NULL DEFAULT '2018-04-01 12:00:00',
+post_date datetime NOT NULL DEFAULT '1987-11-20 12:00:00',
+post_modified datetime NOT NULL DEFAULT '1987-11-20 12:00:00',
 post_title text NOT NULL,
 post_slug tinytext NOT NULL,
 post_content longtext NOT NULL,    
@@ -111,7 +111,7 @@ comment_author_name VARCHAR(60) NOT NULL,
 comment_author_ip VARCHAR(100) NOT NULL,
 comment_content text NOT NULL,
 comment_status VARCHAR(20) NOT NULL DEFAULT 'approved',
-comment_date datetime NOT NULL DEFAULT '2018-04-01 12:00:00',
+comment_date datetime NOT NULL DEFAULT '1987-11-20 12:00:00',
 PRIMARY KEY (ID),
 FOREIGN KEY (comment_post_id) REFERENCES tbl_posts(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
@@ -122,7 +122,7 @@ comment_id BIGINT(20)unsigned NOT NULL,
 user_id BIGINT(20) unsigned NOT NULL,
 reply_content text NOT NULL,
 reply_status enum('0','1') NOT NULL DEFAULT '1',
-reply_date datetime NOT NULL DEFAULT '2018-04-01 12:00:00',
+reply_date datetime NOT NULL DEFAULT '1987-11-20 12:00:00',
 PRIMARY KEY (ID, comment_id),
 FOREIGN KEY (comment_id) REFERENCES tbl_comments(ID),
 FOREIGN KEY (user_id) REFERENCES tbl_users(ID)
