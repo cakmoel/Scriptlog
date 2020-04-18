@@ -49,7 +49,7 @@ public function findAllMedia($orderBy = 'ID', $user_level = null)
 
     $this->setSQL($sql);
   
-    $allMedia = $this->findAll([':orderBy' => $orderBy, ':user_level'=> $user_level]);
+    $allMedia = $this->findAll([':user_level'=> $user_level, ':orderBy' => $orderBy]);
 
   } else {
 
@@ -95,11 +95,11 @@ public function findMediaById($mediaId, $sanitize)
             media_access,
             media_status
           FROM tbl_media
-          WHERE ID = ?";
+          WHERE ID = :ID";
 
   $this->setSQL($sql);
 
-  $mediaById = $this->findRow([$idsanitized]);
+  $mediaById = $this->findRow([':ID' => $idsanitized]);
 
   return (empty($mediaById)) ?: $mediaById;
 
@@ -149,11 +149,11 @@ public function findMediaMetaValue($mediaId, $media_filename, $sanitize)
  $idsanitized = $this->filteringId($sanitize, $mediaId, 'sql');
 
  $sql = "SELECT ID, media_id, meta_key, meta_value FROM tbl_mediameta 
-         WHERE media_id = ? AND meta_key = ?";
+         WHERE media_id = :media_id AND meta_key = :meta_key";
 
  $this->setSQL($sql);
 
- $mediameta = $this->findRow([$idsanitized, $media_filename]);
+ $mediameta = $this->findRow([':media_id' => $idsanitized, ':meta_key' => $media_filename]);
 
  return (empty($mediameta)) ?: $mediameta;
 
@@ -209,6 +209,54 @@ public function findMediaDownload($mediaId, $sanitize)
  $item = $this->findRow([':ID' => $id_sanitized]);
  
  return (empty($item)) ?: $item;
+
+}
+
+/**
+ * Find all media for Blog
+ *
+ * @return void
+ * 
+ */
+public function findAllMediaBlog($orderBy = 'ID')
+{
+  
+ $sql = "SELECT ID, media_filename, media_caption, media_type, media_target
+         FROM tbl_media  WHERE media_target = 'blog' 
+         AND media_access = 'public' AND media_status = '1'
+         ORDER BY :orderBy DESC";
+
+ $this->setSQL($sql);
+
+ $items = $this->findAll([':orderBy' => $orderBy]);
+
+ return (empty($items)) ?: $items;
+
+}
+
+/**
+ * Find media for blog based on ID
+ *
+ * @param int $mediaId
+ * @param obj $sanitize
+ * @return mixed
+ */
+public function findMediaBlog($mediaId)
+{
+
+ $sql = "SELECT ID, media_filename, media_caption, media_type, media_target, 
+                media_user, media_access, media_status 
+         FROM tbl_media
+         WHERE ID = :ID 
+         AND media_target = 'blog'
+         AND media_access = 'public'
+         AND media_status = '1'";
+  
+  $this->setSQL($sql);
+
+  $item = $this->findRow([':ID' => (int)$mediaId]);
+
+  return (empty($item)) ?: $item;
 
 }
 
@@ -508,6 +556,99 @@ public function dropDownMediaStatus($selected = "")
 
 }
 
+public function dropDownMediaSelect($selected = "")
+{
+
+  $dropdown  = '<div class="form-group">';
+  $dropdown .= '<label>Uploaded image</label><br>';
+  $dropdown .= '<select name="image_id" class="selectpicker" >';
+
+  $selected = $selected;
+
+  $media_ids = [];
+
+  $media_ids = $this->findAllMediaBlog();
+
+  $sanitizer = new Sanitize;
+
+  if (is_array($media_ids)) {
+
+       $dropdown .= '<option>Select primary image</option>';
+
+       foreach ($media_ids as $m => $media) {
+
+           $media_meta = $this->findMediaMetaValue($media['ID'], $media['media_filename'], $sanitizer);
+           
+           $media_properties = isset($media_meta['meta_value']) ? media_properties($media_meta['meta_value']) : null;
+
+           $select = $selected === $m ? ' selected' : null;
+
+           $dropdown .= '<option data-content="<img src='.app_url().'public/files/pictures/thumbs/thumb_'.safe_html(basename($media['media_filename'])).'></img>" value="'.(int)$media['ID'].'"'.$select.'>'.safe_html($media_properties['Origin']).'</option>'."\n";
+
+       }
+
+  } 
+  
+  $dropdown .= '</select>'."\n";
+
+  $dropdown .= '</div>';
+
+  return $dropdown;
+
+}
+
+public function mediaBlogImageUploaded($mediaId = null) 
+{
+
+  $mediablog  = '<div class="form-group">';
+
+  if (!empty($mediaId) && $mediaId != 0) {
+
+    $data_media = $this->findMediaBlog((int)$mediaId);
+
+    $image_src = invoke_image_uploaded($data_media['media_filename'], false);
+    $image_src_thumb = invoke_image_uploaded($data_media['media_filename']);
+
+     if (!$image_src_thumb) {
+         
+         $image_src_thumb = app_url().'public/files/pictures/thumbs/nophoto.jpg';
+
+     }
+
+     if ($image_src) {
+
+       $mediablog .= '<a class="thumbnail" href="'.$image_src.'" ><img src="'.$image_src_thumb.'" class="img-responsive pad" width="320"></a>';
+       $mediablog .= '<label>Change picture:</label>';
+       $mediablog .= '<input type="file" name="image" id="file" accept="image/*" onchange="loadFile(event)" maxlength="512" >';
+       $mediablog .= '<img id="output" class="img-responsive pad" >';
+       $mediablog .= '<p class="help-block>Maximum file size: '.format_size_unit(697856).'</p>';
+        
+     } else {
+
+        $mediablog .= '<br><img src="'.$image_src_thumb.'" class="img-responsive pad" width="320"><br>';
+        $mediablog .= '<label>Change picture:</label>';
+        $mediablog .= '<input type="file" name="image" id="file" accept="image/*" onchange="loadFile(event)"  maxlength="512" >';
+        $mediablog .= '<img id="output" class="img-responsive pad">';
+        $mediablog .= '<p class="help-block">Maximum file size:'.format_size_unit(697856).'</p>';
+
+     }
+
+  } else {
+
+    $mediablog .= '<div id="image-preview">';
+    $mediablog .= '<label for="image-upload" id="image-label">Choose picture</label>';
+    $mediablog .= '<input type="file" name="media" id="image-upload" accept="image/*" maxlength="512" >';
+    $mediablog .= '</div>';
+    $mediablog .= '<p class="help-block"> Maximum file size: '.format_size_unit(697856).'</p>'; 
+  
+  }
+ 
+  $mediablog .= '</div>';
+
+  return $mediablog;
+
+}
+
 /**
  * Total media records
  * 
@@ -530,6 +671,7 @@ public function totalMediaRecords($data = null)
   }
 
    $this->setSQL($sql);
+   
    return $this->checkCountValue($data);  
    
 }
