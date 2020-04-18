@@ -92,6 +92,12 @@ class MediaEvent
  */
  private $meta_value;
 
+ private $mediaDao;
+
+ private $validator;
+
+ private $sanitizer;
+ 
 /**
  * Initialize an intanciates of class properties or method
  * 
@@ -373,7 +379,7 @@ public function modifyMediaMeta()
       direct_page('index.php?load=media&error=mediaNotFound', 404);
    }
 
-   $filename = $data_media['media_filename'];
+   $filename = basename($data_media['media_filename']);
    $filetype = $data_media['media_type'];
 
    if($filename !== '') {
@@ -487,11 +493,19 @@ public function modifyMediaMeta()
  public function isMediaUser()
  {
 
-  if (isset($_SESSION['user_level'])) {
+    if (isset($_COOKIE['scriptlog_cookie_level'])) {
 
-    return $_SESSION['user_level'];
+       return $_COOKIE['scriptlog_cookie_level'];
+ 
+    }
 
-  }
+    if (isset(Session::getInstance()->scriptlog_session_level)) {
+
+      return Session::getInstance()->scriptlog_session_level;
+    
+    }
+   
+    return false;
   
  }
 
