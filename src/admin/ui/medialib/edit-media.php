@@ -78,18 +78,17 @@ if (isset($mediaData['media_filename'])) :
 ?>
 
 <div class="form-group">
-<br><a href="<?=$image_src; ?>" target="_blank">
-<img src="<?=$image_src_thumb; ?>" class="img-responsive pad" ></a><br>
+<a class="thumbnail" href="<?=$image_src;?>" target="_blank"><img src="<?=$image_src_thumb;?>" class="img-responsive pad" width="320"></a>
 <label for="ChangePicture">Change picture</label>
-<input type="file"  name="media" id="mediaUploaded" onchange="loadFile(event)" maxlength="512" >
+<input type="file"  name="media" id="mediaUploaded" accept="image/*" onchange="loadFile(event)" maxlength="512" >
 <img id="output" class="img-responsive pad" >
 <p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
 </div>
   <?php else: ?>
 <div class="form-group">
-<br><a href="#"><?=invoke_fileicon($mediaData['media_type']);?></a><br>
+<a href="#" class="thumbnail"><?=invoke_fileicon($mediaData['media_type']);?></a>
 <label for="ChangeFile">Change file</label>
-<input type="file"  name="media" id="mediaUploaded"  maxlength="512" >
+<input type="file"  name="media" id="mediaUploaded" accept="image/*"  maxlength="512" >
 <p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
 </div>
   <?php endif; ?>
@@ -184,7 +183,7 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
               ?>
 
                 <dt>File name</dt>
-                <dd><?= $media_properties['File name']; ?></dd>
+                <dd><?= $media_properties['Origin']; ?></dd>
                 <dt>MIME type</dt>
                 <dd><?= $media_properties['File type']; ?>.</dd>
                 <dt>File size</dt>
@@ -195,7 +194,9 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
                 <dd><?=$media_properties['Uploaded on']; ?></dd>
                 <dt>Dimension</dt>
                 <dd><?=(isset($mediaData['media_type']) && $mediaData['media_type'] != "image/jpeg" && $mediaData['media_type'] != "image/png" 
-                     && $mediaData['media_type'] != "image/webp" && $mediaData['media_type'] != "image/gif") ? "Not specified" : $media_properties['Dimension']; ?> </dd>
+                      && $mediaData['media_type'] != "image/webp" 
+                      && $mediaData['media_type'] != "image/gif") ? "Not specified" : $media_properties['Dimension']; ?> 
+                </dd>
 
               <?php
                  endif;
