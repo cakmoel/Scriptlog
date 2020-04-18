@@ -135,9 +135,11 @@ class UserApp extends BaseApp
   }
   
   /**
+   * Insert user
    * 
    * {@inheritDoc}
    * @see BaseApp::insert()
+   * 
    */
   public function insert()
   {
@@ -147,8 +149,10 @@ class UserApp extends BaseApp
     
     if (isset($_POST['userFormSubmit'])) {
        
-        $filters = ['user_login' => FILTER_SANITIZE_STRING, 'user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 'user_pass' => FILTER_SANITIZE_MAGIC_QUOTES, 'user_url' => FILTER_SANITIZE_URL,
-                    'user_level' => FILTER_SANITIZE_STRING, 'session_id' => FILTER_SANITIZE_ENCODED, 'send_user_notification' => FILTER_SANITIZE_NUMBER_INT];
+        $filters = ['user_login' => FILTER_SANITIZE_STRING, 'user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 
+                    'user_pass' => FILTER_SANITIZE_MAGIC_QUOTES, 'user_url' => FILTER_SANITIZE_URL,
+                    'user_level' => FILTER_SANITIZE_STRING, 'session_id' => FILTER_SANITIZE_ENCODED, 
+                    'send_user_notification' => FILTER_SANITIZE_NUMBER_INT];
 
         try {
         
@@ -166,10 +170,10 @@ class UserApp extends BaseApp
                
             }
             
-            if ((isset($_POST['user_login'])) && (!preg_match('/^[A-Za-z][A-Za-z0-9]{5,31}$/', $_POST['user_login']))) {
+            if ((isset($_POST['user_login'])) && (!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $_POST['user_login']))) {
                 
                 $checkError = false;
-                array_push($errors, "Please enter username, use letters and numbers only at least 6-32 characters");
+                array_push($errors, "Please enter only alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20");
                 
             } elseif ($this->userEvent->checkUserLogin($_POST['user_login'])) {
                 
@@ -190,22 +194,28 @@ class UserApp extends BaseApp
                 
             }
             
-            if ((isset($_POST['user_pass'])) && (strlen($_POST['user_pass']) < 8)) {
+            if (isset($_POST['user_pass'])) {
 
-                $checkError = false;
-                array_push($errors, "The password must consist of least 8 characters");
+                if (check_common_password($_POST['user_pass']) === true) {
 
-            } elseif (!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,50}$/', $_POST['user_pass'])) {
+                    $checkError = false;
+                    array_push($errors, "Your password seems to be the most hacked password, please try another");
 
-                $checkError = false;
-                array_push($errors, "The password may contain letter and numbers, at least one number and one letter, any of these characters !@#$%");
+                }
+
+                if (false === check_pwd_strength($_POST['user_pass'])) {
+
+                    $checkError = false;
+                    array_push($errors, "The password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters");
+                    
+                }
 
             }
 
             if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
                 
                 $checkError = false;
-                array_push($errors, "Please enter a valid URL");
+                array_push($errors, "Please enter a valid URL.");
                 
             }
             
@@ -285,9 +295,11 @@ class UserApp extends BaseApp
   }
   
   /**
+   * Update user
    * 
    * {@inheritDoc}
    * @see BaseApp::update()
+   * 
    */
   public function update($id)
   {
@@ -316,8 +328,10 @@ class UserApp extends BaseApp
     
     if (isset($_POST['userFormSubmit'])) {
        
-        $filters = ['user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 'user_pass' => FILTER_SANITIZE_MAGIC_QUOTES, 'user_pass2' => FILTER_SANITIZE_MAGIC_QUOTES,
-                    'user_url' => FILTER_SANITIZE_URL, 'user_level' => FILTER_SANITIZE_STRING, 'user_id' => FILTER_SANITIZE_NUMBER_INT];
+        $filters = ['user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 
+                    'user_pass' => FILTER_SANITIZE_MAGIC_QUOTES, 'user_pass2' => FILTER_SANITIZE_MAGIC_QUOTES,
+                    'user_url' => FILTER_SANITIZE_URL, 'user_level' => FILTER_SANITIZE_STRING, 
+                    'user_id' => FILTER_SANITIZE_NUMBER_INT];
         
     try {
       
@@ -328,23 +342,32 @@ class UserApp extends BaseApp
               
         }
 
-        if ((isset($_POST['user_pass'])) && (isset($_POST['user_pass2'])) && (!empty($_POST['user_pass']))) {
+        if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass']))) {
 
             if (!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,50}$/', $_POST['user_pass'])) {
                
                 $checkError = false;
-                array_push($errors, "The Password may contain letter and numbers, at least one number and one letter, any of these characters !@#$%");
+                array_push($errors, "The Password may contain letter and numbers at least 8 characters length with one number, one letter, and or any of these characters !@#$%");
 
-            } elseif (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
+            } 
+             
+            if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
 
                 $checkError = false;
                 array_push($errors, "Password should both be equal");
+
+            } 
+            
+            if (check_common_password($_POST['user_pass']) === true) {
+
+                $checkError = false;
+                array_push($errors, "Your password seems to be the most hacked password, please try another.");
 
             }
             
         }
 
-        if (isset($_POST['user_fullname'])) {
+        if (!empty($_POST['user_fullname'])) {
             
             if (!preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname'])) {
                 
@@ -353,6 +376,13 @@ class UserApp extends BaseApp
                 
             }
             
+        }
+
+        if (!preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([.])+([a-zA-Z0-9\._-]+)+$/", $_POST['user_email'])) {
+
+            $checkError = false;
+            array_push($errors, "Please enter a valid email address");
+
         }
 
         if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
@@ -371,9 +401,19 @@ class UserApp extends BaseApp
               $this->view->set('formAction', $this->getFormAction());
               $this->view->set('errors', $errors);
               $this->view->set('userData', $data_user);
-              $this->view->set('userRole', $this->userEvent->userLevelDropDown($getUser['user_level']));
+             
+              if ($getUser['ID'] == 1 && $this->userEvent->isUserLevel() == 'administrator') {
+
+                $this->view->set('userRole', $this->userEvent->isUserLevel());
+    
+              } else {
+    
+                $this->view->set('userRole', $this->userEvent->userLevelDropDown($getUser['user_level']));
+    
+              }
+        
               $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-              
+
           } else {
               
               $this->userEvent->setUserEmail(distill_post_request($filters)['user_email']);
@@ -398,6 +438,7 @@ class UserApp extends BaseApp
               }
 
               $this->userEvent->modifyUser();
+
               direct_page('index.php?load=users&status=userUpdated', 200);
                       
           }
@@ -482,25 +523,38 @@ class UserApp extends BaseApp
 
             }
             
-            if ((isset($_POST['user_pass'])) && (isset($_POST['user_pass2'])) && (!empty($_POST['user_pass']))) {
+            if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass']))) {
 
                 if (!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,50}$/', $_POST['user_pass'])) {
                    
                     $checkError = false;
-                    array_push($errors, 
-                              "The Password may contain letter and numbers, 
-                              at least one number and one letter, 
-                              any of these characters !@#$%");
+                    array_push($errors, "The Password may contain letter and numbers at least 8 characters length with one number, one letter, and or any of these characters !@#$%");
     
-                } elseif (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
+                } 
+                
+                if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
 
                     $checkError = false;
                     array_push($errors, "Password should both be equal");
+
+                } 
+                
+                if (check_common_password($_POST['user_pass']) === true) {
+
+                    $checkError = false;
+                    array_push($errors, "Your password seems to be the most hacked password, please try another.");
 
                 }
                 
             }
     
+            if (!preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([.])+([a-zA-Z0-9\._-]+)+$/", $_POST['user_email'])) {
+
+                $checkError = false;
+                array_push($errors, "Please enter a valid email address");
+
+            }
+
             if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
                  
                 $checkError = false;
@@ -537,9 +591,9 @@ class UserApp extends BaseApp
                 $this->userEvent->setUserUrl((isset($_POST['user_url']) ? escape_html(distill_post_request($filters)['user_url']) : ""));
                 $this->userEvent->setUserId((isset($_POST['user_id']) ? abs((int)distill_post_request($filters)['user_id']) : 0));
 
-                if((isset($_POST['user_pass'])) && (!empty($_POST['user_pass']))) {
+                if(!empty($_POST['user_pass'])) {
 
-                  $this->userEvent->setUserPass($user_pass);
+                  $this->userEvent->setUserPass(purify_dirty_html(distill_post_request($filters)['user_pass']));
 
                 }
 
