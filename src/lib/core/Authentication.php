@@ -27,15 +27,7 @@ class Authentication
    * 
    */
   private $user_session;
- 
-  /**
-   * File Manager
-   * 
-   * @var string
-   * 
-   */
-  private $fileManager;
-
+  
   /**
    * User Agent
    * 
@@ -86,14 +78,16 @@ class Authentication
 
   /**
    * Constant COOKIE_EXPIRE
+   * default 1 month
    * 
    * @var const|numeric
    * 
    */
-  const COOKIE_EXPIRE =  2592000;  // default 1 month
+  const COOKIE_EXPIRE =  2592000;  
 
   /**
    * Constant COOKIE_PATH
+   * Available in whole domain
    * 
    */
   const COOKIE_PATH = "/";  //Available in whole domain
@@ -117,6 +111,18 @@ class Authentication
     return $this->userDao->getUserByEmail($email);
   }
 
+/**
+ * Find User by Login
+ *
+ * @param string $user_login
+ * @return void
+ * 
+ */
+  public function findUserByLogin($user_login)
+  {
+    return $this->userDao->getUserByLogin($user_login);
+  }
+
   public function findTokenByLogin($login, $expired)
   {
     return $this->userToken->getTokenByLogin($login, $expired);
@@ -125,11 +131,6 @@ class Authentication
   public function markCookieAsExpired($tokenId)
   {
     return $this->userToken->updateTokenExpired($tokenId);
-  }
-
-  public function findUserByLogin($user_login)
-  {
-    return $this->userDao->getUserByLogin($user_login);
   }
 
   /**
@@ -141,7 +142,7 @@ class Authentication
   public function checkEmailExists($email)
   {
 
-    if ($this->userDao->checkUserEmail($email)) {
+    if ($this->userDao->checkUserEmail($email) > 0) {
 
        return true;
 
@@ -160,15 +161,15 @@ class Authentication
  public function accessLevel()
  {
    
-    if (isset($_COOKIE['cookie_user_level'])) {
+    if (isset($_COOKIE['scriptlog_cookie_level'])) {
 
-       return $_COOKIE['cookie_user_level'];
+       return $_COOKIE['scriptlog_cookie_level'];
     
     }
 
-    if (isset($this->getSessionInstance()->user_level)) {
+    if (isset($this->getSessionInstance()->scriptlog_session_level)) {
 
-       return $this->getSessionInstance()->user_level;
+       return $this->getSessionInstance()->scriptlog_session_level;
        
     }
       
@@ -204,27 +205,27 @@ class Authentication
 
      }
 
-      $account_id = (isset($account_info['ID'])) ? (int)$account_info['ID'] : 0;
-      $account_login = (isset($account_info['user_login'])) ? $account_info['user_login'] : "";
-      $account_email = (isset($account_info['user_email'])) ? $account_info['user_email'] : "";
-      $account_level = (isset($account_info['user_level'])) ? $account_info['user_level'] : "";
-      $account_name = (isset($account_info['user_fullname'])) ? $account_info['user_fullname'] : "";
+      $account_id = (int)$account_info['ID'];
+      $account_login = $account_info['user_login'];
+      $account_email = $account_info['user_email'];
+      $account_level = $account_info['user_level'];
+      $account_name = $account_info['user_fullname'];
 
       $this->validator->validate($password, 'password'); 
 
       $session_data = $this->getSessionInstance();
-      $session_data->user_id = $this->user_id = intval($account_info['ID']);
-      $session_data->user_email = $this->user_email = $account_info['user_email'];
-      $session_data->user_level = $this->user_level = $account_info['user_level'];
-      $session_data->user_login = $this->user_login = $account_info['user_login'];
-      $session_data->user_fullname = $this->user_fullname = $account_info['user_fullname'];
+      $session_data->scriptlog_session_id = $this->user_id = intval($account_info['ID']);
+      $session_data->scriptlog_session_email = $this->user_email = $account_info['user_email'];
+      $session_data->scriptlog_session_level = $this->user_level = $account_info['user_level'];
+      $session_data->scriptlog_session_login = $this->user_login = $account_info['user_login'];
+      $session_data->scriptlog_session_fullname = $this->user_fullname = $account_info['user_fullname'];
 
       $user_agent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : '';
       $accept_charset = (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) ? $_SERVER['HTTP_ACCEPT_CHARSET'] : '';
       $accept_encoding = (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
       $accept_language = (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
 
-      $session_data->agent = $this->agent = sha1($accept_charset.$accept_encoding.$accept_language.$user_agent);
+      $session_data->scriptlog_session_agent = $this->agent = sha1($accept_charset.$accept_encoding.$accept_language.$user_agent);
 
       get_session_data();
 
@@ -236,17 +237,17 @@ class Authentication
 
           $tokenizer = new Tokenizer();
 
-          setcookie("cookie_user_login", $account_login, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
-          setcookie("cookie_user_email", $account_email, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
-          setcookie("cookie_user_level", $account_level, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
-          setcookie("cookie_user_fullname", $account_name, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
-          setcookie("cookie_user_id", $account_id, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          setcookie('scriptlog_cookie_login', $account_login, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          setcookie('scriptlog_cookie_email', $account_email, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          setcookie('scriptlog_cookie_level', $account_level, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          setcookie('scriptlog_cookie_fullname', $account_name, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          setcookie('scriptlog_cookie_id', $account_id, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
           
           $random_password = $tokenizer -> createToken(16);
-          setcookie("random_pwd", $random_password, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          setcookie('scriptlog_validator', $random_password, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
         
           $random_selector = $tokenizer -> createToken(32);
-          setcookie("random_selector", $random_selector, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          setcookie('scriptlog_selector', $random_selector, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
         
           $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
           $hashed_selector = password_hash($random_selector, PASSWORD_DEFAULT);
@@ -261,8 +262,8 @@ class Authentication
         
           }
         
-          $bind = ['user_login' => $account_login, 'pwd_hash' => $hashed_password, 
-                  'selector_hash' => $hashed_selector, 'expired_date' => $expiry_date];
+          $bind = ['user_login' => $account_login, 'hash_validator' => $hashed_password, 
+                  'hash_selector' => $hashed_selector, 'expired_date' => $expiry_date];
         
           $this->userToken->createUserToken($bind);
 
@@ -280,24 +281,22 @@ class Authentication
 public function logout()
 {
 
-    unset($_SESSION['user_id']);
-    unset($_SESSION['user_email']);
-    unset($_SESSION['user_login']);
-    unset($_SESSION['user_fullname']);
-    unset($_SESSION['user_level']);
-    unset($_SESSION['user_agent']);
+  unset($_SESSION['scriptlog_session_id']);
+  unset($_SESSION['scriptlog_session_email']);
+  unset($_SESSION['scriptlog_session_login']);
+  unset($_SESSION['scriptlog_session_fullname']);
+  unset($_SESSION['scriptlog_session_level']);
+  unset($_SESSION['scriptlog_session_agent']);
     
-    $_SESSION = array();
+  $_SESSION = array();
+  $this->removeCookies();
+  session_destroy();
     
-    $this->removeCookies();
+  $logout = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname($_SERVER['PHP_SELF']) . DS;
 
-    session_destroy();
-    
-    $logout = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname($_SERVER['PHP_SELF']) . DS;
-
-    header($_SERVER["SERVER_PROTOCOL"]." 302 Found");
-    header("Location: $logout");
-    exit();
+  header($_SERVER["SERVER_PROTOCOL"]." 302 Found");
+  header("Location: $logout");
+  exit();
     
 }
   
@@ -313,7 +312,7 @@ public function validateUserAccount($login, $password)
     
   $result = $this->userDao->checkUserPassword($login, $password);
 
-  if (false === $result) {
+  if ($result == false) {
 
       return false;
 
@@ -375,16 +374,16 @@ public function updateNewPassword($user_pass, $user_id)
 public function removeCookies()
 {
 
-  if ((isset($_COOKIE['cookie_user_login'])) && (isset($_COOKIE['cookie_user_email'])) && (isset($_COOKIE['random_pwd'])) && (isset($_COOKIE['random_selector']))) {
+  if ((isset($_COOKIE['scriptlog_cookie_login'])) && (isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector'])) ) {
 
-    setcookie("cookie_user_email", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-    setcookie("cookie_user_id", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-    setcookie("cookie_user_level", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-    setcookie("cookie_user_login", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-    setcookie("cookie_user_fullname", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-    setcookie("random_pwd", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);  
-    setcookie("random_selector", "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-
+     setcookie('scriptlog_cookie_email', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
+     setcookie('scriptlog_cookie_id', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
+     setcookie('scriptlog_cookie_level', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
+     setcookie('scriptlog_cookie_login', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
+     setcookie('scriptlog_cookie_fullname', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
+     setcookie('scriptlog_validator', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);  
+     setcookie('scriptlog_selector', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
+    
   }
 
 }
@@ -396,16 +395,20 @@ public function removeCookies()
 public function clearAuthCookies()
 {
 
-  if ((isset($_COOKIE['cookie_user_login'])) && (isset($_COOKIE['random_pwd'])) && (isset($_COOKIE['random_selector']))) {
+  if ((isset($_COOKIE['scriptlog_cookie_login'])) && (isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector']))) {
 
-     $this->userToken->deleteUserToken($_COOKIE['cookie_user_login']);
+       $this->userToken->deleteUserToken($_COOKIE['scriptlog_cookie_login']);
      
-     setcookie("cookie_user_login", "");
-     setcookie("random_pwd", "");
-     setcookie("random_selector", "");
-
-  }
+       setcookie('scriptlog_cookie_email', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
+       setcookie('scriptlog_cookie_id', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
+       setcookie('scriptlog_cookie_level', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
+       setcookie('scriptlog_cookie_login', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
+       setcookie('scriptlog_cookie_fullname', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
+       setcookie('scriptlog_validator', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);  
+       setcookie('scriptlog_selector', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
   
+  }
+
 }
 
 /**
@@ -510,7 +513,7 @@ public function userAccessControl($control = null)
            }
 
           break;
-
+  
         case ActionConst::COMMENTS:
           
            if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager') && ($this->accessLevel() != 'author')) {
@@ -530,18 +533,17 @@ public function userAccessControl($control = null)
             }
 
           break;
-          
+
         default:
           
-            if($this->accessLevel() != 'administrator' && $this->accessLevel() != 'manager' 
-               && $this->accessLevel() != 'editor' && $this->accessLevel() != 'author' 
-               && $this->accessLevel() != 'contributor') {
+            if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager') && ($this->accessLevel() != 'editor') 
+               && ($this->accessLevel() != 'author') && ($this->accessLevel() != 'contributor')) {
 
               return false;
-
+            
             }
-             
-           break;
+
+          break;
 
     }
 
@@ -549,7 +551,7 @@ public function userAccessControl($control = null)
 
 }
 
-protected function getSessionInstance()
+private function getSessionInstance()
 {
 
   $this->session_data = Session::getInstance();
