@@ -65,6 +65,12 @@ class UserEvent
   * @var string
   */
  private $user_session;
+
+ private $userDao;
+
+ private $validator;
+
+ private $sanitize;
  
  /**
   * @method __constructor()
@@ -97,7 +103,7 @@ class UserEvent
   */
  public function setUserLogin($user_login)
  {
-   $this->user_login = $user_login;
+   $this->user_login = remove_accents($user_login);
  }
  
  /**
@@ -334,18 +340,18 @@ class UserEvent
  public function isUserLevel()
  {
 
-   if (isset($_SESSION['user_level'])) {
+   if (isset($_COOKIE['scriptlog_cookie_level'])) {
 
-      return $_SESSION['user_level'];
-
+     return $_COOKIE['scriptlog_cookie_level'];
+ 
    }
 
-   if (isset($_COOKIE['cookie_user_level'])) {
+   if (isset(Session::getInstance()->scriptlog_session_level)) {
 
-      return $_COOKIE['cookie_user_level'];
-      
+    return Session::getInstance()->scriptlog_session_level;
+  
    }
-
+  
    return false;
 
  }
