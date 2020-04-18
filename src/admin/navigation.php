@@ -1,11 +1,10 @@
  <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
 
- require 'sidebar-nav.php';
+ require __DIR__ . '/sidebar-nav.php';
  
  ?>
-  <!-- Main Header -->
-  <header class="main-header">
-
+ 
+<header class="main-header">
     <!-- Logo -->
     <a href="<?= $currentURL . 'index.php?load=dashboard'?>" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
@@ -63,13 +62,15 @@
           </li>
           <!-- Control Sidebar Toggle Button -->
           <li>
-            <a href="<?= app_url(); ?>" title="view site" target="_blank"><i class="fa fa-home"></i></a>
+            <a href="<?= app_url(); ?>" title="Visit Site" target="_blank"><i class="fa fa-home"></i></a>
           </li>
         </ul>
       </div>
     </nav>
-  </header>
+
+</header>  
+<!-- .Main Header -->
   
 <?php 
-  echo sidebar_navigation($breadCrumbs, $currentURL, $user_level, $user_id, $user_session);
+  echo sidebar_navigation($breadCrumbs, $currentURL, $user_id, $user_session);
 ?>
