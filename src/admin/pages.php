@@ -16,7 +16,7 @@ switch ($action) {
 
         } else {
 
-            if ((!check_integer($pluginId)) && (gettype($pluginId) !== "integer")) {
+            if ((!check_integer($pageId)) && (gettype($pageId) !== "integer")) {
 
                 header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
                 throw new AppException("Invalid ID data type!");
@@ -45,7 +45,7 @@ switch ($action) {
 
         } else {
 
-            if ((!check_integer($pluginId)) && (gettype($pluginId) !== "integer")) {
+            if ((!check_integer($pageId)) && (gettype($pageId) !== "integer")) {
 
                 header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
                 throw new AppException("Invalid ID data type!");
@@ -74,7 +74,7 @@ switch ($action) {
 
         } else {
 
-            if ((!check_integer($pageId)) && (gettype($pageId))) {
+            if ((!check_integer($pageId)) && (gettype($pageId) !== "integer")) {
 
                 header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
                 throw new AppException("Invalid ID data type");
