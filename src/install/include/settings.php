@@ -9,18 +9,19 @@
  * @version   1.0
  * 
  */
-ini_set('display_errors',1);
-error_reporting(-1);
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 define('APP_PATH', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
 define('APP_INC', 'include');
 
 $protocol = strpos(strtolower($_SERVER['SERVER_PROTOCOL']),'https') === false ? 'http' : 'https';
 $server_host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
 
-if (file_exists(APP_PATH . APP_INC . '/vendor/autoload.php')) {
+if (file_exists(__DIR__ . '/../../lib/vendor/autoload.php')) {
     
-  require(__DIR__ . '/vendor/autoload.php');
-    
+  require(__DIR__ . '/../../lib/vendor/autoload.php');
+  require(__DIR__ . '/check-engine.php');
+
 }
 
 if (!ini_get('date.timezone')) {
