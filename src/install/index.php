@@ -11,7 +11,6 @@
  */
 
 require dirname(__FILE__) . '/include/settings.php';
-require dirname(__FILE__) . '/include/check-engine.php';
 require dirname(__FILE__) . '/include/setup.php';
 require dirname(__FILE__) . '/install-layout.php';
 
@@ -51,8 +50,6 @@ if((check_dbtable($dbconnect, 'tbl_users') == true) || (check_dbtable($dbconnect
   $current_path = preg_replace("/\/index\.php.*$/i", "", current_url());
 
   $installation_path = $protocol . '://' . $server_host . dirname($_SERVER['PHP_SELF']) . DIRECTORY_SEPARATOR;
-
-  $clean_setup = array();
 
   $completed = false;
 
@@ -94,29 +91,35 @@ if ($install != 'install') {
 
     $link = make_connection($dbhost, $dbuser, $dbpass, $dbname);
     
-    if(ctype_alnum($username) && (mb_strlen($username) > 5) && (mb_strlen($username) <= 32)) {
+    if (strlen($username) < 8) {
+
+       $errors['errorSetup'] = 'Admin username must be at least 8 characters.';
+
+    } 
+    
+    if (strlen($username) > 20) {
+
+       $errors['errorSetup'] = 'Admin username may not be longer than 20 characters.';
+
+    } 
+    
+    if (preg_match('/^[0-9]*$/', $username)) {
+
+      $errors['errorSetup'] = 'Sorry, admin username must have letters too!';
+    
+    } 
+    
+    if ((!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $username))) {
+
+      $errors['erroSetup'] = 'Admin username can only contain alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
       
-       if (preg_match('/^[A-Za-z][A-Za-z0-9]{5,31}$/', $username)) {
-
-          $clean_setup['username'] = $username;
-
-       } else {
-
-          $errors['errorSetup'] = "Please enter a valid username with only alphabetic and numeric characters, at least 6-32 characters length";
-
-       }
-
-    } else {
-
-       $errors['errorSetup'] = 'Please enter a valid username with only alphabetic and numeric characters, at least 6-32 characters length';
-
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         
         $errors['errorSetup'] = 'Please enter a valid email address';
         
-    }
+    } 
     
     if (empty($password) && (empty($confirm))) { 
 
@@ -126,9 +129,9 @@ if ($install != 'install') {
 
         $errors['errorSetup'] = 'Admin password should both be equal';
 
-    } elseif (!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,50}$/', $password)) {
+    } elseif (!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
 
-        $errors['errorSetup'] = 'Admin password may contain letter and numbers, at least one number and one letter, any of these characters !@#$%';
+        $errors['errorSetup'] = 'Admin password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters';
 
     }
     
@@ -252,7 +255,7 @@ if ($install != 'install') {
         
            if (check_mysql_version($link, "5.6")) {
 
-              install_database_table($link, $protocol, $server_host, $clean_setup['username'], $password, $email, $key);
+              install_database_table($link, $protocol, $server_host, $username, $password, $email, $key);
 
               if (true === write_config_file($protocol, $server_host, $dbhost, $dbuser, $dbpass, $dbname, $email, $key)) {
 
