@@ -85,12 +85,7 @@ class UserDao extends Dao
  public function getUserByEmail($user_email, $fetchMode = null)
  {
      
-   $sql = "SELECT ID, user_login, user_email, user_pass,
-                  user_level, 
-                  user_fullname, 
-                  user_url, 
-                  user_registered, 
-                  user_session 
+   $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, user_session 
            FROM tbl_users WHERE user_email = :user_email LIMIT 1";
    
    $this->setSQL($sql);
@@ -112,8 +107,7 @@ class UserDao extends Dao
  public function getUserByLogin($user_login, $fetchMode = null) 
  {
 
-   $sql = "SELECT ID, user_login, user_email, user_pass, 
-                  user_level, user_fullname, user_url, user_registered, user_session
+   $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, user_session
            FROM tbl_users WHERE user_login = :user_login LIMIT 1";
 
    $this->setSQL($sql);
@@ -268,7 +262,7 @@ class UserDao extends Dao
  public function updateUserSession($user_session, $user_id)
  {
     $bind = ['user_session' => generate_session_key($user_session, 32)];
-    $this->modify("tbl_users", $bind, "ID = ".(int)$user_id);
+    $this->modify("tbl_users", $bind, "ID = {$user_id}");
  }
 
  /**
@@ -402,11 +396,11 @@ class UserDao extends Dao
   * @param string $sesi
   * @return boolean
   */
- public function checkUserSession($sesi)
+ public function checkUserSession($user_session)
  {
     $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_session = :user_session";
     $this->setSQL($sql);
-    $stmt = $this->findColumn([':user_session' => $sesi]);
+    $stmt = $this->findColumn([':user_session' => $user_session]);
      
     if ($stmt == 1) {
          
