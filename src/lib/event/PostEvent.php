@@ -19,7 +19,7 @@ class PostEvent
   
   /**
    * post's Image
-   * @var string
+   * @var integer
    */
   private $post_image;
 
@@ -85,6 +85,12 @@ class PostEvent
    * @var integer
    */
   private $topics; 
+
+  private $postDao;
+
+  private $validator;
+
+  private $sanitizer;
  
   /**
    * Constructor
@@ -160,7 +166,7 @@ class PostEvent
    */
   public function setPostContent($content)
   {
-    $this->content = prevent_injection($content);
+    $this->content = purify_dirty_html($content);
   }
   
   /**
@@ -170,7 +176,7 @@ class PostEvent
    */
   public function setMetaDesc($meta_desc)
   {
-    $this->meta_desc = $meta_desc;
+    $this->meta_desc = prevent_injection($meta_desc);
   }
   
   /**
@@ -180,7 +186,7 @@ class PostEvent
    */
   public function setMetaKeys($meta_keys)
   {
-    $this->meta_key = $meta_keys;
+    $this->meta_key = prevent_injection($meta_keys);
   }
   
   /**
@@ -249,108 +255,75 @@ class PostEvent
   public function addPost()
   {
     
-     $category = new Topic();
+     $category = new TopicDao();
      
      $this->validator->sanitize($this->author, 'int');
+     $this->validator->sanitize($this->post_image, 'int');
      $this->validator->sanitize($this->title, 'string');
      
      if ((!empty($this->meta_desc)) || (!empty($this->meta_key))) {
       $this->validator->sanitize($this->meta_desc, 'string');
       $this->validator->sanitize($this->meta_key, 'string');
+
      }
      
-     if (empty($this->post_image)) {
-         
-         if ($this->topics == 0) {
+     if ($this->topics == 0) {
              
-             $categoryId = $category -> createTopic(['topic_title' => 'Uncategorized', 'topic_slug' => 'uncategorized']);
-             $getCategory = $category -> findTopicById($categoryId, $this->sanitizer, PDO::FETCH_ASSOC);
-             
-             return $this->postDao->createPost([
-                 'post_author' => $this->author,
-                 'post_date' => date("Y-m-d H:i:s"),
-                 'post_title' => $this->title,
-                 'post_slug'  => $this->slug,
-                 'post_content' => $this->content,
-                 'post_summary' => $this->meta_desc,
-                 'post_keyword' => $this->meta_key,
-                 'post_status' => $this->post_status,
-                 'comment_status' => $this->comment_status
-             ], $getCategory['ID']);
-             
-         } else {
-             
-             return $this->postDao->createPost([
-                 'post_author' => $this->author,
-                 'post_date' => date("Y-m-d H:i:s"),
-                 'post_title' => $this->title,
-                 'post_slug'  => $this->slug,
-                 'post_content' => $this->content,
-                 'post_summary' => $this->meta_desc,
-                 'post_keyword' => $this->meta_key,
-                 'post_status' => $this->post_status,
-                 'comment_status' => $this->comment_status
-             ], $this->topics);
-             
-         }
-         
+      $categoryId = $category -> createTopic(['topic_title' => 'Uncategorized', 'topic_slug' => 'uncategorized']);
+
+      $getCategory = $category -> findTopicById($categoryId, $this->sanitizer, PDO::FETCH_ASSOC);
+      
+      return $this->postDao->createPost([
+          'media_id' => $this->post_image,
+          'post_author' => $this->author,
+          'post_date' => date("Y-m-d H:i:s"),
+          'post_title' => $this->title,
+          'post_slug'  => $this->slug,
+          'post_content' => $this->content,
+          'post_summary' => $this->meta_desc,
+          'post_keyword' => $this->meta_key,
+          'post_status' => $this->post_status,
+          'comment_status' => $this->comment_status
+      ], $getCategory['ID']);
+      
      } else {
-              
-         if ($this->topics == 0) {
-             
-             $categoryId = $category -> createTopic(['topic_title' => 'Uncategorized', 'topic_slug' => 'uncategorized']);
-             $getCategory = $category -> findTopicById($categoryId, $this->sanitizer, PDO::FETCH_ASSOC);
-             
-             return $this->postDao->createPost([
-                 'post_image' => $this->post_image,
-                 'post_author' => $this->author,
-                 'post_date' => date("Y-m-d H:i:s"),
-                 'post_title' => $this->title,
-                 'post_slug'  => $this->slug,
-                 'post_content' => $this->content,
-                 'post_summary' => $this->meta_desc,
-                 'post_keyword' => $this->meta_key,
-                 'post_status' => $this->post_status,
-                 'comment_status' => $this->comment_status
-             ], $getCategory['ID']);
-             
-         } else {
-             
-             return $this->postDao->createPost([
-                 'post_image' => $this->post_image,
-                 'post_author' => $this->author,
-                 'post_date' => date("Y-m-d H:i:s"),
-                 'post_title' => $this->title,
-                 'post_slug'  => $this->slug,
-                 'post_content' => $this->content,
-                 'post_summary' => $this->meta_desc,
-                 'post_keyword' => $this->meta_key,
-                 'post_status' => $this->post_status,
-                 'comment_status' => $this->comment_status
-             ], $this->topics);
-             
-         }
-         
-     }
-     
+      
+       return $this->postDao->createPost([
+            'media_id' => $this->post_image,
+            'post_author' => $this->author,
+            'post_date' => date("Y-m-d H:i:s"),
+            'post_title' => $this->title,
+            'post_slug'  => $this->slug,
+            'post_content' => $this->content,
+            'post_summary' => $this->meta_desc,
+            'post_keyword' => $this->meta_key,
+            'post_status' => $this->post_status,
+            'comment_status' => $this->comment_status
+          ], $this->topics);
+      
+      }
+  
   }
   
   public function modifyPost()
   {
+    
+     $this->validator->sanitize($this->postId, 'int');  
+     $this->validator->sanitize($this->author, 'int');
+     $this->validator->sanitize($this->post_image, 'int');
+     $this->validator->sanitize($this->title, 'string');
      
-    $category = new Topic();
+     if ((!empty($this->meta_desc)) || (!empty($this->meta_key))) {
+       $this->validator->sanitize($this->meta_desc, 'string');
+       $this->validator->sanitize($this->meta_key, 'string');
+     }
       
-    $this->validator->sanitize($this->postId, 'int');
-    $this->validator->sanitize($this->author, 'int');
-    $this->validator->sanitize($this->title, 'string');
-    $this->validator->sanitize($this->meta_desc, 'string');
-    $this->validator->sanitize($this->meta_key, 'string');
-      
-    if (empty($this->post_image)) {
+    
+    if (!empty($this->post_image)) {
           
         return $this->postDao->updatePost($this->sanitizer, [
             'post_author' => $this->author,
-            'date_modified' => date("Y-m-d H:i:s"),
+            'post_modified' => date("Y-m-d H:i:s"),
             'post_title' => $this->title,
             'post_slug' => $this->slug,
             'post_content' => $this->content,
@@ -363,9 +336,9 @@ class PostEvent
     } else {
          
         return $this->postDao->updatePost($this->sanitizer, [
-            'post_image' => $this->post_image,
+            'media_id' => $this->post_image,
             'post_author' => $this->author,
-            'date_modified' => date("Y-m-d H:i:s"),
+            'post_modified' => date("Y-m-d H:i:s"),
             'post_title' => $this->title,
             'post_slug' => $this->slug,
             'post_content' => $this->content,
@@ -385,16 +358,23 @@ class PostEvent
     $this->validator->sanitize($this->postId, 'int');
     
     if (!$data_post = $this->postDao->findPost($this->postId, $this->sanitizer)) {
+
        direct_page('index.php?load=posts&error=postNotFound', 404); 
+       
     }
     
-    $post_image = $data_post['post_image'];
+    $media_id = $data_post['media_id'];
+    
+    $medialib = new MediaDao();
+    $media_data = $medialib->findMediaById((int)$media_id, $this->sanitizer);
+    $post_image = basename($media_data['media_filename']);
+
     if ($post_image !== '') {
         
-       if (is_readable(__DIR__ . '/../public/files/pictures/'.$post_image)) {
+       if (is_readable(__DIR__ . '/../../public/files/pictures/'.$post_image)) {
            
-           unlink(__DIR__ . '/../public/files/pictures'.$post_image);
-           unlink(__DIR__ . '/../public/files/pictures/thumbs/thumbs_'.$post_image);
+           unlink(__DIR__ . '/../../public/files/pictures'.$post_image);
+           unlink(__DIR__ . '/../../public/files/pictures/thumbs/thumbs_'.$post_image);
            
        }
        
@@ -436,12 +416,18 @@ class PostEvent
    * @return string
    * 
    */
-  public function isPostAuthor()
+  public function postAuthorId()
   {
 
-    if (isset($_SESSION['user_id'])) {
+    if (isset($_COOKIE['scriptlog_cookie_id'])) {
+
+        return $_COOKIE['scriptlog_cookie_id'];
+
+    }
+    
+    if (isset(Session::getInstance()->scriptlog_session_id)) {
       
-        return $_SESSION['user_id'];
+        return Session::getInstance()->scriptlog_session_id;
 
     }
 
@@ -449,7 +435,26 @@ class PostEvent
 
   }
 
-  /**
+ public function postAuthorLevel()
+ {
+ 
+   if (isset($_COOKIE['scriptlog_cookie_level'])) {
+
+      return $_COOKIE['scriptlog_cookie_level'];
+  
+   }
+
+   if (isset(Session::getInstance()->scriptlog_session_level)) {
+
+      return Session::getInstance()->scriptlog_session_level;
+    
+    }
+    
+    return false;
+
+ }
+ 
+/**
    * Total posts records
    * 
    * @param array $data
