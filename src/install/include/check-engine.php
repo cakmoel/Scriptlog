@@ -73,12 +73,21 @@ function check_os()
 /**
  * Checking Browser
  */
-function check_browser()
+function grab_browser()
 {
  $browser = new Browser();
  
- return $browser -> getName();
+ return $browser;
  
+}
+
+function check_browser()
+{
+   
+  $browser = grab_browser()->getName();
+
+  return $browser;
+
 }
 
 /**
@@ -86,7 +95,7 @@ function check_browser()
  */
 function check_browser_version()
 {
- $browser = new Browser();
+ $browser = grab_browser();
  
  if (($browser-> getName() == 'Chrome') && ($browser -> getVersion() < 65)) {
      
@@ -122,11 +131,8 @@ function check_browser_version()
  */
 function get_browser_Version()
 {
-  $browser =  new Browser();
-
-  if($browser -> getName()) {
-      return $browser->getVersion();
-  }
+  
+  return grab_browser()->getVersion();
 
 }
 
