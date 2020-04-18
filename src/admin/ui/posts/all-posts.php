@@ -5,7 +5,7 @@
     <section class="content-header">
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
-        <small><a href="index.php?load=posts&action=newPost&postId=0"
+        <small><a href="index.php?load=posts&action=newPost&Id=0"
 					class="btn btn-primary"> <i
 					class="fa fa-plus-circle"></i> Add New
 				</a></small>
@@ -85,12 +85,12 @@
               
                     <tr>
                        <td><?= $no; ?></td>
-                       <td><?= htmlspecialchars($post['post_title']); ?></td>
-                       <td><?= htmlspecialchars($post['user_login']); ?></td>
-                       <td><?= htmlspecialchars(make_date($post['post_date'])); ?></td>
+                       <td><?= safe_html($post['post_title']); ?></td>
+                       <td><?= safe_html($post['user_login']); ?></td>
+                       <td><?= safe_html(make_date($post['post_date'])); ?></td>
                       
                        <td>
-                       <a href="index.php?load=posts&action=editPost&postId=<?= htmlspecialchars((int)$post['ID']);?>" class="btn btn-warning">
+                       <a href="<?=generate_request("index.php", 'get', ['posts', 'editPost', $post['ID']])['link']; ?>" class="btn btn-warning">
                        <i class="fa fa-pencil fa-fw"></i> Edit</a>
                        </td>
                        <td>
@@ -134,7 +134,7 @@
   {
 	  if (confirm("Are you sure want to delete Post '" + title + "'"))
 	  {
-	  	window.location.href = 'index.php?load=posts&action=deletePost&postId=' + id;
+	  	window.location.href = 'index.php?load=posts&action=deletePost&tId=' + id;
 	  }
   }
 </script>
