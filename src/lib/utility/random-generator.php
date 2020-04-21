@@ -1,11 +1,12 @@
 <?php
 /**
  * Random Generator Function
- * to create random string
+ * A funtion for generating random strings and numbers
  * 
  * @category function Random generator 
  * @param number $digits
  * @return string|number
+ * 
  */
 function random_generator($digits)
 {
@@ -28,4 +29,83 @@ function random_generator($digits)
     } // end of for loop
     
     return $randomGenerator;
+
+}
+
+/**
+ * ircmaxel generator string function
+ * A function for generating random string of various strength
+ * 
+ * @see https://github.com/ircmaxell/RandomLib
+ * @param string $strength
+ * @param integer $length
+ * @param string $character_list
+ * @return void
+ * 
+ */
+function ircmaxell_generator_string($strength, $length = 32, $character_list = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/')
+{
+
+  $factory = new RandomLib\Factory;
+
+  switch ($strength) {
+
+    case 'low':
+
+        $generator = $factory->getLowStrengthGenerator();
+
+        return $generator->generateString($length, $character_list)."\n";
+
+    break;
+
+    case 'high':
+
+        $generator = $factory->getHighStrengthGenerator();
+
+        return $generator->generateString($length, $character_list)."\n";
+
+    break;
+
+    default:
+
+        $generator = $factory->getMediumStrengthGenerator();
+
+        return $generator->generateString($length, $character_list)."\n";
+
+    break;
+    
+  }
+
+}
+
+/**
+ * ircmaxell generator numbers function
+ * A function for generating random numbers 
+ * 
+ * @param number|integer $min
+ * @param number|integer $max
+ * @return void
+ */
+function ircmaxell_generator_numbers($min, $max)
+{
+
+$factory = new RandomLib\Factory;
+
+$generator = $factory->getGenerator(new SecurityLib\Strength(SecurityLib\Strength::MEDIUM));
+
+$random_int = $generator->generateInt($min, $max);
+
+return $random_int;
+
+}
+
+function ircmaxell_random_generator($length)
+{
+
+$factory = new RandomLib\Factory;
+
+$generator = $factory->getGenerator(new SecurityLib\Strength(SecurityLib\Strength::MEDIUM));
+
+$bytes = $generator->generate($length);
+
 }
