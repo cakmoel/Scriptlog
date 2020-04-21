@@ -8,9 +8,9 @@
  * @version  1.0
  * 
  */
-if (file_exists(__DIR__ . '/../config.sample.php')) {
+if (file_exists(__DIR__ . '/../config.php')) {
     
-  include(dirname(dirname(__FILE__)).'/lib/main-dev.php');
+  include(dirname(dirname(__FILE__)).'/lib/main.php');
 
 } else {
 
@@ -20,21 +20,31 @@ if (file_exists(__DIR__ . '/../config.sample.php')) {
 }
 
 $errors = [];
+
 $resetFormSubmitted = isset($_POST['Reset']);
   
 if (empty($resetFormSubmitted) == false) {
 
   $user_email = filter_input(INPUT_POST, 'user_email', FILTER_SANITIZE_EMAIL);
   $badCSRF = true;
+  $captcha = true;
 
-  if (!isset($_POST['csrf']) || !isset($_SESSION['CSRF']) || empty($_POST['csrf'])
-  || $_POST['csrf'] !== $_SESSION['CSRF']) {
-      
+  if (false === verify_form_token('resetPwd')) {
+     
+    $badCSRF = true;
     $errors['errorMessage'] = "Sorry, there was a security issue";
   
-    $badCSRF = true;
-  
-  } elseif (empty($user_email)) {
+  }
+
+  if ((isset($_POST["captcha_code"]) && (isset($_SESSION['scriptlog_reset_pwd']))) 
+      && ($_POST["captcha_code"] !== $_SESSION['scriptlog_reset_pwd'])) {
+
+      $captcha = false;
+      $errors['errorMessage'] = "Please enter correct captcha code";
+
+  }
+
+  if (empty($user_email)) {
 
      $errors['errorMessage'] = "Please enter email address";
 
@@ -46,13 +56,21 @@ if (empty($resetFormSubmitted) == false) {
 
      $errors['errorMessage'] = "Your email address is not registered";
 
+  } elseif (scriptpot_validate($_POST) == false) {
+
+    $errors['errorMessage'] = "anomaly behaviour detected";
+
   } else {
 
-    $badCSRF = false;
-    unset($_SESSION['CSRF']);
-    $authenticator -> resetUserPassword($user_email);
-    direct_page('reset-password.php?status=reset', 200);
+    if ($captcha == true) {
 
+      $badCSRF = false;
+      unset($_SESSION['CSRF']);
+      $authenticator -> resetUserPassword($user_email);
+      direct_page('reset-password.php?status=reset', 200);
+
+    }
+    
   }
 
 }
@@ -85,11 +103,12 @@ if (empty($resetFormSubmitted) == false) {
   <script src="assets/dist/js/respond.min.js"></script>
   <![endif]-->
 
-  <!-- Google Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
-  <!-- Icon -->
-  <link href="favicon.ico" rel="Shortcut Icon">
   
+  <link href="favicon.ico" rel="Shortcut Icon">
+<style>
+.scriptpot{opacity:0;position:absolute;top:0;left:0;height:0;width:0;z-index:-1}
+</style>
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
@@ -126,28 +145,43 @@ if (empty($resetFormSubmitted) == false) {
    else :
   ?>
 
-  <p class="login-box-msg">Please enter your email address. You will receive a link to create a new password via email.</p>
+<p class="login-box-msg">Enter your email address. You will receive a link to create a new password via email.</p>
   
-    <form name="formlogin" action="reset-password.php" method="post" onSubmit="return validasi(this)" role="form" autocomplete="off">
-      <div class="form-group has-feedback">
-        <input type="email" class="form-control" name="user_email" placeholder="Email" autofocus required>
-        <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
-      </div>
+<form name="formlogin" action="reset-password.php" method="post" onSubmit="return validasi(this)" role="form" autocomplete="off">
       
-      <div class="row">
-        <div class="col-xs-8">
-      <?php 
-      // prevent CSRF
-      $key= random_generator(13);
-      $CSRF = bin2hex(openssl_random_pseudo_bytes(32).$key);
-      $_SESSION['CSRF'] = $CSRF;
-      ?>
-        <input type="hidden" name="csrf" value="<?php echo $CSRF; ?>">
+<div class="form-group has-feedback">
+<label>Email Address</label>
+  <input type="email" class="form-control" name="user_email" placeholder="Email" autofocus required>
+  <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+</div>
+
+<div class="form-group has-feedback">
+  <input type="text" name="scriptpot_name" class="form-control scriptpot" autocomplete="off">
+</div>
+
+<div class="form-group has-feedback">
+  <input type="email" name="scriptpot_email" class="form-control scriptpot" autocomplete="off">
+</div>
+
+<div class="form-group has-feedback">
+  <label>Enter captcha code</label>
+  <input type="text" class="form-control" placeholder="Please type a captcha code here" name="captcha_code">
+<span class="glyphicon glyphicon-hand-down form-control-feedback"></span>
+<img src="<?=app_url().'admin/captcha-forgot-pwd.php'; ?>" alt="image_captcha">
+</div>
+      
+<div class="row">
+    <div class="col-xs-8">
+  
+  <?php 
+    $block_csrf = generate_form_token('resetPwd', 24); // prevent csrf
+  ?>
+        <input type="hidden" name="csrf" value="<?= $block_csrf; ?>">
         <input type="submit" class="btn btn-primary btn-block btn-flat" name="Reset" value="Get New Password">
         </div>
         <!-- /.col -->
       </div>
-    </form>
+</form>
 
     <div class="social-auth-links text-center"></div>
     
@@ -176,5 +210,18 @@ if (empty($resetFormSubmitted) == false) {
     });
   });
 </script>
+<script>
+$('img').bind('contextmenu',function(e){return false;}); 
+</script>
+<script>
+$(document).bind("contextmenu",function(e){return false;});
+</script>
+<script>
+document.onkeydown=function(e){if(e.ctrlKey&&(e.keyCode===67||e.keyCode===86||e.keyCode===85||e.keyCode===117)){return false;}else{return true;}};$(document).keypress("u",function(e){if(e.ctrlKey)
+{return false;}
+else
+{return true;}});
+</script>
+
 </body>
 </html>
