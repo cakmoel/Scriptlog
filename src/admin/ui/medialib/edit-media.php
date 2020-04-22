@@ -56,7 +56,7 @@ $action = isset($formAction) ? $formAction : null;
 $media_id = isset($mediaData['ID']) ? $mediaData['ID'] : 0;
 ?>
 <form method="post" action="<?=generate_request('index.php', 'post', ['medialib', $action, $media_id])['link'];?>" role="form" enctype="multipart/form-data" autocomplete="off" >
-<input type="hidden" name="MAX_FILE_SIZE" value="10485760" />
+<input type="hidden" name="MAX_FILE_SIZE" value="<?= APP_FILE_SIZE; ?>" >
 <input type="hidden" name="media_id" value="<?=(int)$media_id; ?>" >
 
 <div class="box-body">
