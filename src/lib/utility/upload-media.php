@@ -10,9 +10,6 @@
 function upload_media($file_location, $file_type, $file_size, $file_name)
 {
  
-  $errors = array();
-  $checkError = true;
-
   switch ($file_type) {
 
      case 'application/pdf' :
@@ -38,11 +35,12 @@ function upload_media($file_location, $file_type, $file_size, $file_name)
        break;
       
      case 'image/jpeg' :
+     case 'image/pjpeg' :
      case 'image/png'  :
      case 'image/gif'  :
      case 'image/webp' : 
      
-       upload_photo($file_location, $file_size, $file_type, 770, 400, 'crop', $file_name);
+       upload_photo($file_location, $file_size, $file_type, $file_name);
 
        break;
 
