@@ -10,13 +10,13 @@
 function invoke_image_uploaded($media_filename, $image_thumb = true)
 {
 
-   $image_dir =  __DIR__ . '/../../public/files/pictures/thumbs/thumb_'.$media_filename;
+   $image_dir =  __DIR__ . '/../../public/files/pictures/thumbs/small_'.$media_filename;
 
    if (is_readable($image_dir)) {
 
        if ($image_thumb) {
 
-          $image_src = app_url().APP_IMAGE.'thumbs/thumb_'.$media_filename;
+          $image_src = app_url().APP_IMAGE.'thumbs/small_'.$media_filename;
 
           return $image_src;
 
