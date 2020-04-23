@@ -583,7 +583,7 @@ public function dropDownMediaSelect($selected = "")
 
            $select = $selected === $m ? ' selected' : null;
 
-           $dropdown .= '<option data-content="<img src='.app_url().'public/files/pictures/thumbs/thumb_'.safe_html(basename($media['media_filename'])).'></img>" value="'.(int)$media['ID'].'"'.$select.'>'.safe_html($media_properties['Origin']).'</option>'."\n";
+           $dropdown .= '<option data-content="<img src='.app_url().'public/files/pictures/thumbs/small_'.safe_html(basename($media['media_filename'])).'></img>" value="'.(int)$media['ID'].'"'.$select.'>'.safe_html($media_properties['Origin']).'</option>'."\n";
 
        }
 
