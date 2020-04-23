@@ -407,9 +407,9 @@ public function modifyMediaMeta()
         case 'application/vnd.ms-powerpoint':
         case 'application/octet-stream':              
 
-          if(is_readable(__DIR__ . '/../public/files/docs/'.$filename)) {
+          if(is_readable(__DIR__ . '/../../public/files/docs/'.$filename)) {
 
-             unlink(__DIR__ . '/../public/files/docs/'.$filename);
+             unlink(__DIR__ . '/../../public/files/docs/'.$filename);
 
           } 
 
@@ -419,9 +419,9 @@ public function modifyMediaMeta()
         case 'video/webm':
         case 'video/ogg':    
 
-          if(is_readable(__DIR__ . '/../public/files/video/'.$filename)) {
+          if(is_readable(__DIR__ . '/../../public/files/video/'.$filename)) {
 
-            unlink(__DIR__ . '/../public/files/video/'.$filename);
+            unlink(__DIR__ . '/../../public/files/video/'.$filename);
             
           }
 
@@ -431,10 +431,11 @@ public function modifyMediaMeta()
           
          # default delete file image
 
-          if(is_readable(__DIR__ . '/../public/files/pictures/'.$filename)) {
+          if(is_readable(__DIR__ . '/../../public/files/pictures/'.$filename)) {
             
-            unlink(__DIR__ . '/../public/files/pictures/'.$filename);
-            unlink(__DIR__ . '/../public/files/pictures/thumbs/thumbs_'.$filename);
+            unlink(__DIR__ . '/../../public/files/pictures/'.$filename);
+            unlink(__DIR__ . '/../../public/files/pictures/thumbs/medium_'.$filename);
+            unlink(__DIR__ . '/../../public/files/pictures/thumbs/small_'.$filename);
             
           }
 
