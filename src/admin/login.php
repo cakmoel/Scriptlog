@@ -14,13 +14,13 @@
 
 $ip = (isset($_SERVER["REMOTE_ADDR"])) ? $_SERVER["REMOTE_ADDR"] : get_ip_address();
 
-if (file_exists(__DIR__ . '/../config.sample.php')) {
+if (file_exists(__DIR__ . '/../config.php')) {
     
-  include __DIR__ . '/../lib/main-dev.php';
+  include __DIR__ . '/../lib/main.php';
   require __DIR__ . '/authorizer.php';
   include __DIR__ . '/login-layout.php';
 
-  $stylePath = $config['app']['url'] . APP_ADMIN;
+  $stylePath =  preg_replace("/\/login\.php.*$/i", "", app_url().DS.APP_ADMIN);
 
 } else {
 
@@ -45,14 +45,14 @@ switch ($action) {
   
      if (false === block_request_type(current_request_method(), ['POST'])) {
 
-        list($errors, $failed_login) = processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $_POST);    
+        list($errors, $failed_login) = processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, $_POST);    
 
      }
      
     break;
 
   default:
-     // login form will be displayed by default
+     // login form displayed
   break;
   
 }
@@ -60,20 +60,21 @@ switch ($action) {
 login_header($stylePath);
 
 ?>
-  
+
 <div class="login-logo">
   <a href="#"><img class="d-block mx-auto mb-4" src="<?=$stylePath; ?>/assets/dist/img/icon612x612.png" alt="Log In" width="72" height="72"></a>
 </div>
 <div class="login-box-body">  
+
 <?php 
   if (isset($errors['errorMessage'])) : 
 ?>
-    
+
 <div class="alert alert-danger alert-dismissable">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
   <?= $errors['errorMessage']; ?>
 </div>
-  
+
 <?php 
     endif; 
 
@@ -91,7 +92,7 @@ login_header($stylePath);
 
 ?>
 
-<form name="formlogin" action="<?= human_login_request('login.php', ['LogIn', human_login_id(), app_key().$ip])['doLogin']; ?>" method="post" onSubmit="return validasi(this)"  role="form">
+<form name="formlogin" action="<?= human_login_request('login.php', ['LogIn', human_login_id(), md5(app_key().$ip)])['doLogin']; ?>" method="post" onSubmit="return validasi(this)"  role="form">
 <div class="form-group has-feedback">
 <label>Username or Email Address</label>
 <input type="text"  class="form-control" placeholder="username or email" name="login" maxlength="186" value="
@@ -118,7 +119,7 @@ elseif (isset($_COOKIE['scriptlog_cookie_email'])) : echo $_COOKIE['scriptlog_co
 <label>Enter captcha code</label>
 <input type="text" class="form-control" placeholder="Please type a captcha code here" name="captcha_code">
 <span class="glyphicon glyphicon-hand-down form-control-feedback"></span>
-<img src="<?=app_url().'admin/captcha-login.php'; ?>" alt="image_captcha">
+<img src="<?=app_url().'/admin/captcha-login.php'; ?>" alt="image_captcha">
 </div>
 
 <?php endif; ?>
@@ -131,8 +132,7 @@ elseif (isset($_COOKIE['scriptlog_cookie_email'])) : echo $_COOKIE['scriptlog_co
         <?php elseif(isset($_COOKIE['scriptlog_cookie_email'])) : echo "checked";?><?php endif; ?>> Remember Me
       </label>
     </div>
-</div>
-          
+</div>          
 <div class="col-xs-4">
 
 <?php 
@@ -142,7 +142,6 @@ elseif (isset($_COOKIE['scriptlog_cookie_email'])) : echo $_COOKIE['scriptlog_co
 <input type="hidden" name="csrf" value="<?= $block_csrf; ?>">
   <input type="submit" class="btn btn-primary btn-block btn-flat" name="LogIn" value="Login">
 </div>
-
 </div>
 </form>
   <a href="reset-password.php" class="text-center">Lost your password?</a>    
