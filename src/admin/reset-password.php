@@ -19,25 +19,22 @@ if (file_exists(__DIR__ . '/../config.php')) {
 
 }
 
-$errors = [];
+if (isset($_POST['Reset'])) {
 
-$resetFormSubmitted = isset($_POST['Reset']);
-  
-if (empty($resetFormSubmitted) == false) {
-
+  $csrf = isset($_POST['csrf']) ? $_POST['csrf'] : '';
   $user_email = filter_input(INPUT_POST, 'user_email', FILTER_SANITIZE_EMAIL);
-  $badCSRF = true;
+  $valid = !empty($csrf) && verify_form_token('reset_pwd', $csrf);
+
+  $captcha_code = isset($_POST['captcha_code']) ? $_POST['captcha_code'] : '';
   $captcha = true;
 
-  if (false === verify_form_token('resetPwd')) {
+  if( !$valid ) {
      
-    $badCSRF = true;
-    $errors['errorMessage'] = "Sorry, there was a security issue";
+    $errors['errorMessage'] = "Sorry, Attack detected!";
   
   }
 
-  if ((isset($_POST["captcha_code"]) && (isset($_SESSION['scriptlog_reset_pwd']))) 
-      && ($_POST["captcha_code"] !== $_SESSION['scriptlog_reset_pwd'])) {
+  if (count($_POST)> 0 && $captcha_code != $_SESSION['scriptlog_reset_pwd']) {
 
       $captcha = false;
       $errors['errorMessage'] = "Please enter correct captcha code";
@@ -52,26 +49,27 @@ if (empty($resetFormSubmitted) == false) {
 
      $errors['errorMessage'] = "Please enter a valid email address";
 
-  } elseif ($authenticator -> checkEmailExists($user_email) === false) {
+  } elseif ($authenticator -> checkEmailExists($user_email) == false) {
 
      $errors['errorMessage'] = "Your email address is not registered";
 
-  } elseif (scriptpot_validate($_POST) == false) {
-
-    $errors['errorMessage'] = "anomaly behaviour detected";
-
   } else {
+    
+    if($captcha == true) {
 
-    if ($captcha == true) {
-
-      $badCSRF = false;
-      unset($_SESSION['CSRF']);
       $authenticator -> resetUserPassword($user_email);
-      direct_page('reset-password.php?status=reset', 200);
 
+      direct_page('reset-password.php?status=reset', 200);
+       
     }
     
   }
+  
+  if (scriptpot_validate($_POST) == false) {
+
+    $errors['errorMessage'] = "anomaly behaviour detected!";
+
+  } 
 
 }
 
@@ -103,50 +101,45 @@ if (empty($resetFormSubmitted) == false) {
   <script src="assets/dist/js/respond.min.js"></script>
   <![endif]-->
 
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
-  
-  <link href="favicon.ico" rel="Shortcut Icon">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+<link href="favicon.ico" rel="Shortcut Icon">
 <style>
 .scriptpot{opacity:0;position:absolute;top:0;left:0;height:0;width:0;z-index:-1}
 </style>
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
-  <div class="login-logo">
-    <a href="#"><img class="d-block mx-auto mb-4" src="assets/dist/img/icon612x612.png" alt="Reset Password" width="72" height="72"></a>
-  </div>
-  <!-- /.login-logo -->
-  <div class="login-box-body">
+<div class="login-logo">
+  <a href="#"><img class="d-block mx-auto mb-4" src="assets/dist/img/icon612x612.png" alt="Reset Password" width="72" height="72"></a>
+</div>
+<!-- /.login-logo -->
+<div class="login-box-body">
   
-  <?php 
-       if (isset($errors['errorMessage'])) : 
-    ?>
-    
-       <div class="alert alert-danger alert-dismissable">
-    <button type="button" class="close" data-dismiss="alert"
-      aria-hidden="true">&times;</button>
-           <?= $errors['errorMessage']; ?>
-    </div>
-  
-    <?php 
-      endif; 
-    ?>
+<?php 
+  if (isset($errors['errorMessage'])) : 
+?>
 
-  <?php 
-    if (isset($_GET['status']) && $_GET['status'] == 'reset') : ?>
+<div class="alert alert-danger alert-dismissable">
+  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <?= $errors['errorMessage']; ?>
+</div>
+  
+<?php 
+  endif; 
+
+  if (isset($_GET['status']) && $_GET['status'] == 'reset') : ?>
 				<div class="alert alert-success alert-dismissable">
 					<button type="button" class="close" data-dismiss="alert"
 						aria-hidden="true">&times;</button>
-				 password has been <strong><?= htmlspecialchars($_GET['status']); ?> </strong>.
+				 password has been <strong><?= safe_html($_GET['status']); ?> </strong>.
 					check your e-mail !
 				</div>
-				
-  <?php 
-   else :
-  ?>
 
-<p class="login-box-msg">Enter your email address. You will receive a link to create a new password via email.</p>
-  
+<?php 
+  else :
+?>
+
+<p class="login-box-msg">Enter your email address. You will receive a link to create a new password via email.</p>  
 <form name="formlogin" action="reset-password.php" method="post" onSubmit="return validasi(this)" role="form" autocomplete="off">
       
 <div class="form-group has-feedback">
@@ -167,39 +160,38 @@ if (empty($resetFormSubmitted) == false) {
   <label>Enter captcha code</label>
   <input type="text" class="form-control" placeholder="Please type a captcha code here" name="captcha_code">
 <span class="glyphicon glyphicon-hand-down form-control-feedback"></span>
-<img src="<?=app_url().'admin/captcha-forgot-pwd.php'; ?>" alt="image_captcha">
+<img src="<?=app_url().'/admin/captcha-forgot-pwd.php'; ?>" alt="image_captcha">
 </div>
       
 <div class="row">
-    <div class="col-xs-8">
+  <div class="col-xs-8">
   
-  <?php 
-    $block_csrf = generate_form_token('resetPwd', 24); // prevent csrf
-  ?>
-        <input type="hidden" name="csrf" value="<?= $block_csrf; ?>">
-        <input type="submit" class="btn btn-primary btn-block btn-flat" name="Reset" value="Get New Password">
-        </div>
-        <!-- /.col -->
-      </div>
+<?php 
+  $block_csrf = generate_form_token('reset_pwd', 24); // prevent csrf
+?>
+        
+<input type="hidden" name="csrf" value="<?= $block_csrf; ?>">
+<input type="submit" class="btn btn-primary btn-block btn-flat" name="Reset" value="Get New Password">
+</div>
+    <!-- /.col -->
+</div>
 </form>
 
-    <div class="social-auth-links text-center"></div>
+<div class="social-auth-links text-center"></div>
+<a href="login.php" class="text-center">Log In</a>
     
-    <a href="login.php" class="text-center">Log In</a>
-    <?php 
-      endif;
-    ?>
-  </div>
+<?php 
+  endif;
+?>
+
+</div>
   <!-- /.login-box-body -->
 </div>
 <!-- /.login-box -->
 
-<!-- jQuery 3 -->
 <script src="assets/components/jquery/dist/jquery.min.js"></script>
 <script src="assets/dist/js/checklogin.js"></script>
-<!-- Bootstrap 3.3.7 -->
 <script src="assets/components/bootstrap/dist/js/bootstrap.min.js"></script>
-<!-- iCheck -->
 <script src="assets/components/iCheck/icheck.min.js"></script>
 <script>
   $(function () {
@@ -222,6 +214,5 @@ document.onkeydown=function(e){if(e.ctrlKey&&(e.keyCode===67||e.keyCode===86||e.
 else
 {return true;}});
 </script>
-
 </body>
 </html>
