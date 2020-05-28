@@ -3,8 +3,8 @@
  * File dbtable.php
  * 
  */
-$tableUser = "CREATE TABLE IF NOT EXISTS tbl_users (
-ID BIGINT(20) unsigned NOT NULL auto_increment,
+$tblUser = "CREATE TABLE IF NOT EXISTS tbl_users (
+ID INT(20) unsigned NOT NULL auto_increment,
 user_login VARCHAR(60) NOT NULL,
 user_email VARCHAR(100) NOT NULL,
 user_pass VARCHAR(255) NOT NULL,
@@ -19,32 +19,33 @@ user_session VARCHAR(255) NOT NULL,
 PRIMARY KEY(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
-$tableUserToken = "CREATE TABLE IF NOT EXISTS tbl_user_token (
-ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+$tblUserToken = "CREATE TABLE IF NOT EXISTS tbl_user_token (
+ID INT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 user_login VARCHAR(60) NOT NULL,
-hash_validator VARCHAR(255) NOT NULL,
-hash_selector VARCHAR(255) NOT NULL,
+pwd_hash VARCHAR(255) NOT NULL,
+selector_hash VARCHAR(255) NOT NULL,
 is_expired INT(11) NOT NULL DEFAULT '0',
 expired_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 PRIMARY KEY (ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
-$tableLoginAttempt = "CREATE TABLE IF NOT EXISTS tbl_login_attempt (
+$tblLoginAttempt = "CREATE TABLE IF NOT EXISTS tbl_login_attempt (
 ip_address VARCHAR(255) NOT NULL,
 login_date datetime NOT NULL DEFAULT '1987-11-20 12:00:00'
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
-$tablePost = "CREATE TABLE IF NOT EXISTS tbl_posts (
-ID bigint(20) unsigned NOT NULL auto_increment,
-media_id bigint(20) UNSIGNED NOT NULL DEFAULT '0',
-post_author bigint(20) UNSIGNED NOT NULL DEFAULT '0',
+$tblPost = "CREATE TABLE IF NOT EXISTS tbl_posts (
+ID INT(20) unsigned NOT NULL auto_increment,
+media_id INT(11) UNSIGNED NOT NULL DEFAULT '0',
+post_author INT(20) UNSIGNED NOT NULL DEFAULT '0',
 post_date datetime NOT NULL DEFAULT '1987-11-20 12:00:00',
 post_modified datetime NOT NULL DEFAULT '1987-11-20 12:00:00',
 post_title text NOT NULL,
 post_slug tinytext NOT NULL,
 post_content longtext NOT NULL,    
 post_summary tinytext DEFAULT NULL,    
-post_keyword text DEFAULT NULL,    
+post_keyword text DEFAULT NULL,  
+post_tags varchar(255) DEFAULT NULL,  
 post_status varchar(20) NOT NULL DEFAULT 'publish',    
 post_type varchar(120) NOT NULL DEFAULT 'blog',   
 comment_status varchar(20) NOT NULL DEFAULT 'open',
@@ -53,8 +54,8 @@ FOREIGN KEY (post_author) REFERENCES tbl_users(ID),
 KEY (media_id)    
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
-$tableMedia = "CREATE TABLE IF NOT EXISTS tbl_media (    
-ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,    
+$tblMedia = "CREATE TABLE IF NOT EXISTS tbl_media (    
+ID INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,    
 media_filename VARCHAR(200) DEFAULT NULL,    
 media_caption VARCHAR(200) DEFAULT NULL,    
 media_type VARCHAR(20) NOT NULL,    
@@ -65,9 +66,9 @@ media_status INT(11) NOT NULL DEFAULT '0',
 PRIMARY KEY (ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
     
-$tableMediaMeta = "CREATE TABLE IF NOT EXISTS tbl_mediameta (
-ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,    
-media_id BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',    
+$tblMediaMeta = "CREATE TABLE IF NOT EXISTS tbl_mediameta (
+ID INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,    
+media_id INT(11) UNSIGNED NOT NULL DEFAULT '0',    
 meta_key VARCHAR(255) NOT NULL,    
 meta_value LONGTEXT DEFAULT NULL,    
 PRIMARY KEY (ID),
@@ -75,10 +76,10 @@ KEY media_id(media_id),
 KEY meta_key(meta_key(191))
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
-$tableMediaDownload = "CREATE TABLE IF NOT EXISTS tbl_media_download (
-ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-media_id BIGINT(20) UNSIGNED NOT NULL,
-media_identifier VARCHAR(255) NOT NULL,
+$tblMediaDownload = "CREATE TABLE IF NOT EXISTS tbl_media_download (
+ID INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+media_id INT(11) UNSIGNED NOT NULL,
+media_identifier VARCHAR(64) NOT NULL,
 before_expired VARCHAR(50) NOT NULL,
 ip_address VARCHAR(50) NOT NULL,
 created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -87,26 +88,26 @@ UNIQUE KEY media_identifier(media_identifier),
 FOREIGN KEY (media_id) REFERENCES tbl_media(ID) ON DELETE CASCADE ON UPDATE CASCADE
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
-$tableTopic = "CREATE TABLE IF NOT EXISTS tbl_topics (
-ID bigint(20) unsigned NOT NULL auto_increment,    
+$tblTopic = "CREATE TABLE IF NOT EXISTS tbl_topics (
+ID INT(20) unsigned NOT NULL auto_increment,    
 topic_title varchar(255) NOT NULL,    
 topic_slug varchar(255) NOT NULL,    
 topic_status enum('Y','N') NOT NULL DEFAULT 'Y',
 PRIMARY KEY (ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
         
-$tablePostTopic = "CREATE TABLE IF NOT EXISTS tbl_post_topic (
-ID BIGINT(20) unsigned NOT NULL auto_increment,    
-post_id bigint(20) unsigned DEFAULT NULL,    
-topic_id bigint(20) unsigned DEFAULT NULL,
+$tblPostTopic = "CREATE TABLE IF NOT EXISTS tbl_post_topic (
+ID INT(20) unsigned NOT NULL auto_increment,    
+post_id INT(20) unsigned DEFAULT NULL,    
+topic_id INT(20) unsigned DEFAULT NULL,
 PRIMARY KEY(ID),
 FOREIGN KEY (post_id) REFERENCES tbl_posts(ID) ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (topic_id) REFERENCES tbl_topics(ID) ON DELETE CASCADE ON UPDATE CASCADE
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
         
-$tableComment = "CREATE TABLE IF NOT EXISTS tbl_comments (
-ID BIGINT(20) unsigned NOT NULL auto_increment,
-comment_post_id BIGINT(20) unsigned NOT NULL,
+$tblComment = "CREATE TABLE IF NOT EXISTS tbl_comments (
+ID INT(20) unsigned NOT NULL auto_increment,
+comment_post_id INT(20) unsigned NOT NULL,
 comment_author_name VARCHAR(60) NOT NULL,
 comment_author_ip VARCHAR(100) NOT NULL,
 comment_content text NOT NULL,
@@ -116,10 +117,10 @@ PRIMARY KEY (ID),
 FOREIGN KEY (comment_post_id) REFERENCES tbl_posts(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
     
-$tableReply = "CREATE TABLE IF NOT EXISTS tbl_comment_reply (
-ID BIGINT(20) unsigned NOT NULL auto_increment,    
-comment_id BIGINT(20)unsigned NOT NULL,
-user_id BIGINT(20) unsigned NOT NULL,
+$tblReply = "CREATE TABLE IF NOT EXISTS tbl_comment_reply (
+ID INT(20) unsigned NOT NULL auto_increment,    
+comment_id INT(20)unsigned NOT NULL,
+user_id INT(20) unsigned NOT NULL,
 reply_content text NOT NULL,
 reply_status enum('0','1') NOT NULL DEFAULT '1',
 reply_date datetime NOT NULL DEFAULT '1987-11-20 12:00:00',
@@ -128,8 +129,8 @@ FOREIGN KEY (comment_id) REFERENCES tbl_comments(ID),
 FOREIGN KEY (user_id) REFERENCES tbl_users(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
         
-$tableMenu = "CREATE TABLE IF NOT EXISTS tbl_menu (
-ID BIGINT(20) unsigned NOT NULL auto_increment,
+$tblMenu = "CREATE TABLE IF NOT EXISTS tbl_menu (
+ID INT(20) unsigned NOT NULL auto_increment,
 menu_label VARCHAR(200) NOT NULL,
 menu_link VARCHAR(255) DEFAULT NULL,
 menu_sort INT(5) NOT NULL DEFAULT '0',
@@ -137,20 +138,20 @@ menu_status enum('Y','N') NOT NULL DEFAULT 'Y',
 PRIMARY KEY(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
         
-$tableMenuChild = "CREATE TABLE IF NOT EXISTS tbl_menu_child (
-ID BIGINT(20) unsigned NOT NULL auto_increment,
+$tblMenuChild = "CREATE TABLE IF NOT EXISTS tbl_menu_child (
+ID INT(20) unsigned NOT NULL auto_increment,
 menu_child_label VARCHAR(200) NOT NULL,
 menu_child_link VARCHAR(255) DEFAULT NULL,
-menu_id BIGINT(20) unsigned NOT NULL,
-menu_sub_child BIGINT(20) unsigned NOT NULL,
+menu_id INT(20) unsigned NOT NULL,
+menu_sub_child INT(20) unsigned NOT NULL,
 menu_child_sort INT(5) NOT NULL DEFAULT '0',
 menu_child_status enum('Y','N') NOT NULL DEFAULT 'Y',
 PRIMARY KEY(ID),
 FOREIGN KEY(menu_id) REFERENCES tbl_menu(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
         
-$tablePlugin = "CREATE TABLE IF NOT EXISTS tbl_plugin (
-ID BIGINT(20) unsigned NOT NULL auto_increment,
+$tblPlugin = "CREATE TABLE IF NOT EXISTS tbl_plugin (
+ID INT(20) unsigned NOT NULL auto_increment,
 plugin_name VARCHAR(100) NOT NULL,
 plugin_link VARCHAR(100) NOT NULL DEFAULT '#',
 plugin_desc tinytext,
@@ -160,8 +161,8 @@ plugin_sort INT(5) DEFAULT NULL,
 PRIMARY KEY(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
         
-$tableSetting = "CREATE TABLE IF NOT EXISTS tbl_settings (
-ID SMALLINT(5) unsigned NOT NULL AUTO_INCREMENT,
+$tblSetting = "CREATE TABLE IF NOT EXISTS tbl_settings (
+ID INT(5) unsigned NOT NULL AUTO_INCREMENT,
 setting_name VARCHAR(100) NOT NULL,
 setting_value VARCHAR(255) NOT NULL,
 PRIMARY KEY(ID),
@@ -169,8 +170,8 @@ KEY (setting_name),
 KEY (setting_value)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
         
-$tableTheme = "CREATE TABLE IF NOT EXISTS tbl_themes (
-ID BIGINT(20) unsigned NOT NULL auto_increment,
+$tblTheme = "CREATE TABLE IF NOT EXISTS tbl_themes (
+ID INT(20) unsigned NOT NULL auto_increment,
 theme_title VARCHAR(100) NOT NULL,
 theme_desc tinytext,
 theme_designer VARCHAR(90) NOT NULL,
