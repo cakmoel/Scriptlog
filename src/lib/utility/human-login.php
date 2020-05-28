@@ -8,6 +8,7 @@
  * @return void
  * 
  */
+
 function human_login_id()
 {
  
@@ -53,6 +54,15 @@ if(!isset($_SESSION['human_login_id'])) {
 
 }
 
+/**
+ * Human login request
+ * generate login query string parameters
+ *
+ * @param string $base
+ * @param array $data
+ * @return mixed
+ * 
+ */
 function human_login_request($base, array $data)
 {
 
@@ -66,7 +76,7 @@ $query_data = array(
 
    'action' => $action,
    'Id' => abs((int)$id),
-   'uniqueKey'=> md5($uniqueKey)
+   'uniqueKey'=> sanitize_urls($uniqueKey),
 
 );
 
@@ -76,6 +86,16 @@ return $html;
 
 }
 
+/**
+ * Safe human login
+ *
+ * @param string $ip
+ * @param integer|number $loginId
+ * @param string $uniqueKey
+ * @param array $values
+ * @return void
+ * 
+ */
 function safe_human_login($ip, $loginId, $uniqueKey, array $values)
 {
 
@@ -88,31 +108,55 @@ if( check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'script
 
 }
 
+if(false === verify_human_login_id($loginId)) {
+
+   http_response_code(400);
+   scriptlog_error("Sorry, unpleasant attempt request");
+
 }
 
-function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, array $values)
-{
+if(!isset($uniqueKey) && ($uniqueKey !== md5(app_key().$ip))) {
 
-global $errors;
+   http_response_code(400);
+   scriptlog_error("Sorry, unpleasant attempt request");
+
+}
+
+}
+
+/**
+ * Processiong human login
+ *
+ * @param object $authenticator
+ * @param string $ip
+ * @param integer|number $loginId
+ * @param string $uniqueKey
+ * @param array $values
+ * @return void
+ * 
+ */
+function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, array $values)
+{
 
 $login = (isset($values['login'])) ? prevent_injection($values['login']) : null;
 $user_pass = (isset($values['user_pass'])) ? prevent_injection($values['user_pass']) : null;
+$csrf = isset($values['csrf']) ? $values['csrf'] : '';
+$captcha_code = isset($values['captcha_code']) ? $values['captcha_code'] : '';
 
 $is_authenticated = false;
 $captcha = true;
-$badCSRF = true;
 
+// validate form
 safe_human_login($ip, $loginId, $uniqueKey, $values);
+$valid = !empty($csrf) && verify_form_token('login_form', $csrf);
 
-if (false === verify_form_token('login_form')) {
-     
-    $badCSRF = true;
-    $errors['errorMessage'] = "Sorry, there was a security issue";
-     
-} 
+if(!$valid) {
 
-if ((isset($_POST["captcha_code"]) && (isset($_SESSION['scriptlog_captcha_code']))) 
-    && ($_POST["captcha_code"] !== $_SESSION['scriptlog_captcha_code'])) {
+   $errors['errorMessage'] = "Sorry, attack detected!";
+
+}
+
+if (isset($_SESSION['scriptlog_captcha_code']) && ($captcha_code !== $_SESSION['scriptlog_captcha_code'])) {
   
    $captcha = false;
    $errors['errorMessage'] = "Please enter a captcha code correctly.";
@@ -133,15 +177,11 @@ if ($authenticator -> validateUserAccount($login, $user_pass)) {
    
 }
 
-if (($is_authenticated) && ($captcha == true)) {
-
-   $badCSRF = false;
-
-   unset($_SESSION['login_form_csrf']);
+if (($is_authenticated == true) && ($captcha == true)) {
 
    unset($_SESSION['human_login_id']);
 
-   $authenticator->login($_POST);
+   $authenticator->login($values);
 
    delete_login_attempt($ip);
 
@@ -183,7 +223,7 @@ if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
 
 if (scriptpot_validate($values) == false) {
 
-   $errors['errorMessage'] = "anomaly behaviour detected";
+   $errors['errorMessage'] = "anomaly behaviour detected!";
 
 }
 
