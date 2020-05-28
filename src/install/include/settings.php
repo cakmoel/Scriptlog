@@ -14,21 +14,31 @@ error_reporting(E_ALL);
 define('APP_PATH', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
 define('APP_INC', 'include');
 
-$protocol = strpos(strtolower($_SERVER['SERVER_PROTOCOL']),'https') === false ? 'http' : 'https';
-$server_host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
-
 if (file_exists(__DIR__ . '/../../lib/vendor/autoload.php')) {
     
   require(__DIR__ . '/../../lib/vendor/autoload.php');
+  require(__DIR__ . '/../../lib/utility/is-ssl.php');
   require(__DIR__ . '/check-engine.php');
 
 }
-
+  
 if (!ini_get('date.timezone')) {
 
   date_default_timezone_set('GMT');
 
 }
+
+if(false === is_ssl()) {
+
+  $protocol = strpos(strtolower($_SERVER['SERVER_PROTOCOL']),'https') === false ? 'http' : 'https';
+ 
+} else {
+
+  $protocol = strpos(strtolower($_SERVER['SERVER_PROTOCOL']),'https') === false ? 'https' : 'http';
+
+}
+
+$server_host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
 
 if (!isset($_SESSION)) {
     
