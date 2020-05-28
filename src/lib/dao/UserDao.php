@@ -97,7 +97,7 @@ class UserDao extends Dao
  }
 
 /**
- * get user by login 
+ * get user by username
  *
  * @param string $user_login
  * @param static PDO::FETCH_MODE $fetchMode
@@ -259,10 +259,9 @@ class UserDao extends Dao
   * @param array $bind
   * @param integer $userId
   */
- public function updateUserSession($user_session, $user_id)
+ public function updateUserSession($bind, $user_id)
  {
-    $bind = ['user_session' => generate_session_key($user_session, 32)];
-    $this->modify("tbl_users", $bind, "ID = {$user_id}");
+   $this->modify("tbl_users", ['user_session' => generate_session_key($bind['user_session'], 32)], "ID = {$user_id}");
  }
 
  /**
@@ -274,10 +273,9 @@ class UserDao extends Dao
   * @param string $user_email
   *
   */
- public function updateResetKey($reset_key, $user_email)
+ public function updateResetKey($bind, $user_email)
  {
-   $bind = ['user_reset_key' => $reset_key, 'user_reset_complete' => 'No'];
-   $this->modify("tbl_users", $bind, "user_email = {$user_email}");
+   $this->modify("tbl_users", ['user_reset_key' => $bind['user_reset_key'], 'user_reset_complete' => $bind['user_reset_complete']], "user_email = '{$user_email}'");
  }
 
  /**
@@ -290,10 +288,7 @@ class UserDao extends Dao
  public function recoverNewPassword($bind, $user_id)
  {
    $recoverPassword = scriptlog_password($bind['user_pass']);
-   $this->modify("tbl_users", [
-          'user_pass' => $recoverPassword, 
-          'user_reset_complete' => $bind['user_reset_complete']
-          ], "ID = '{$user_id}'");
+   $this->modify("tbl_users", ['user_pass' => $recoverPassword, 'user_reset_complete' => $bind['user_reset_complete']], "ID = '{$user_id}'");
           
  }
 
