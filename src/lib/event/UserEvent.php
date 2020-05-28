@@ -59,6 +59,30 @@ class UserEvent
   * @var string
   */
  private $user_activation_key;
+
+/**
+ * Password validator for cookies
+ *
+ * @var string
+ * 
+ */
+ private $pwd_hash;
+
+/**
+ * Selector validator for cookies
+ *
+ * @var string
+ * 
+ */
+ private $selector_hash;
+
+/**
+ * Cookie expired date
+ *
+ * @var string
+ * 
+ */
+ private $cookie_expired_date;
  
  /**
   * user session
@@ -68,6 +92,8 @@ class UserEvent
 
  private $userDao;
 
+ private $userToken;
+
  private $validator;
 
  private $sanitize;
@@ -76,9 +102,11 @@ class UserEvent
   * @method __constructor()
   * 
   */
- public function __construct(UserDao $userDao, FormValidator $validator, Sanitize $sanitize)
+ public function __construct(UserDao $userDao, FormValidator $validator, UserTokenDao $userToken, Sanitize $sanitize)
  {
     $this->userDao = $userDao;
+
+    $this->userToken = $userToken;
 
     $this->validator = $validator;
     
@@ -124,7 +152,38 @@ class UserEvent
  {
    $this->user_pass = $user_pass;
  }
- 
+
+/**
+ * setPwdHash
+ * set password hash validator for cookies
+ * 
+ * @param string $pwd_hash
+ * @return void
+ * 
+ */
+ public function setPwdHash($pwd_hash)
+ {
+   $this->pwd_hash = $pwd_hash;
+ }
+
+/**
+ * setSelectorHash
+ * set selector hash validator for cookies
+ *
+ * @param string $selector_hash
+ * @return void
+ * 
+ */
+ public function setSelectorHash($selector_hash)
+ {
+   $this->selector_hash = $selector_hash;
+ }
+
+ public function setCookieExpireDate($cookie_expired_date)
+ {
+   $this->cookie_expired_date = $cookie_expired_date;
+ }
+
 /**
  * Set user level
  * @param string $user_level
@@ -185,6 +244,11 @@ class UserEvent
    return $this->userDao->getUserByLogin($user_login, $fetchMode);
  }
  
+ public function grabTokenByLogin($login, $expired, $fetchMode = null)
+ {
+   return $this->userToken->getTokenByLogin($login, $expired, $fetchMode);
+ }
+
  public function addUser()
  {
   $this->validator->sanitize($this->user_login, 'string');
@@ -242,7 +306,7 @@ class UserEvent
                'user_fullname' => $this->user_fullname,
                'user_url'      => $this->user_url
               ];
-           
+
        } else {
            
            $bind = [
@@ -277,11 +341,31 @@ class UserEvent
        }
        
    }
-      
+
+   if($this->identifyCookieToken()) {
+ 
+      $bind_meta = ['pwd_hash' => $this->pwd_hash, 'selector_hash' => $this->selector_hash, 'expired_date' => $this->cookie_expired_date];
+
+      $this->userToken->updateUserToken($this->sanitize, $bind_meta, $this->user_login);
+
+   }
+
    return $this->userDao->updateUser($this->isUserLevel(), $this->sanitize, $bind, $this->user_id);
-   
+
  }
  
+/**
+ * Update token expired
+ *
+ * @param integer $userTokenId
+ * @return void
+ * 
+ */
+ public function modifyTokenExpired($userTokenId)
+ {
+   return $this->userToken->updateTokenExpired($userTokenId);
+ }
+
  public function removeUser()
  {
    
@@ -331,9 +415,11 @@ class UserEvent
  }
  
 /**
- * Check whether user level 
- * session defined or not
+ * isUserLevel
+ * Check whether user level session defined or not
+ * if defined then return it
  * 
+ * @method public isUserLevel()
  * @return boolean
  * 
  */ 
@@ -352,6 +438,34 @@ class UserEvent
   
    }
   
+   return false;
+
+ }
+
+/**
+ * identifyUserLogin
+ * Check whether user login session or cookies defined or not
+ * if defined then return it
+ *
+ * @method public identifyUserLogin()
+ * @return void
+ * 
+ */
+ public function identifyCookieToken()
+ {
+
+   if (isset($_COOKIE['scriptlog_validator'])) {
+
+      return $_COOKIE['scriptlog_validator'];
+
+   }
+
+   if (isset($_COOKIE['scriptlog_selector'])) {
+
+      return $_COOKIE['scriptlog_selector'];
+
+   }
+
    return false;
 
  }
