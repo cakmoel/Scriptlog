@@ -32,7 +32,8 @@ if((check_dbtable($dbconnect, 'tbl_users') == true) || (check_dbtable($dbconnect
 || (check_dbtable($dbconnect, 'tbl_post_topic') == true) || (check_dbtable($dbconnect, 'tbl_plugin') == true)
 || (check_dbtable($dbconnect, 'tbl_menu_child') == true) || (check_dbtable($dbconnect, 'tbl_menu') == true)
 || (check_dbtable($dbconnect, 'tbl_mediameta') == true) || (check_dbtable($dbconnect, 'tbl_media') == true)
-|| (check_dbtable($dbconnect, 'tbl_comments') == true) || (check_dbtable($dbconnect, 'tbl_comment_reply') == true)) {
+|| (check_dbtable($dbconnect, 'tbl_media_download') == true) || (check_dbtable($dbconnect, 'tbl_comments') == true) 
+|| (check_dbtable($dbconnect, 'tbl_comment_reply') == true)) {
 
   $create_db = $protocol . '://' . $server_host . dirname($_SERVER['PHP_SELF']) . DIRECTORY_SEPARATOR .'install.php';
 
@@ -73,14 +74,14 @@ if ($install != 'install') {
     
   } else {
     
-    $dbhost = isset($_POST['db_host']) ? $_POST['db_host'] : "";
+    $dbhost = isset($_POST['db_host']) ? escapeHTML($_POST['db_host']) : "";
     $dbname = filter_input(INPUT_POST, 'db_name', FILTER_SANITIZE_STRING);
     $dbuser = isset($_POST['db_user']) ? remove_bad_characters($_POST['db_user']) : "";
-    $dbpass = isset($_POST['db_pass']) ? $_POST['db_pass'] : "";
+    $dbpass = isset($_POST['db_pass']) ? escapeHTML($_POST['db_pass']) : "";
     
     $username = isset($_POST['user_login']) ? remove_bad_characters($_POST['user_login']) : "";
-    $password = isset($_POST['user_pass1']) ? $_POST['user_pass1'] : "";
-    $confirm = isset($_POST['user_pass2']) ? $_POST['user_pass2'] : "";
+    $password = isset($_POST['user_pass1']) ? escapeHTML($_POST['user_pass1']) : "";
+    $confirm = isset($_POST['user_pass2']) ? escapeHTML($_POST['user_pass2']) : "";
     $email = filter_input(INPUT_POST, 'user_email', FILTER_SANITIZE_EMAIL);
     
     if ($dbhost == '' || $dbname == '' || $dbuser == '' || $dbpass == '') {
@@ -93,25 +94,25 @@ if ($install != 'install') {
     
     if (strlen($username) < 8) {
 
-       $errors['errorSetup'] = 'Admin username must be at least 8 characters.';
+       $errors['errorSetup'] = 'username for admin must be at least 8 characters.';
 
     } 
     
     if (strlen($username) > 20) {
 
-       $errors['errorSetup'] = 'Admin username may not be longer than 20 characters.';
+       $errors['errorSetup'] = 'username for admin may not be longer than 20 characters.';
 
     } 
     
     if (preg_match('/^[0-9]*$/', $username)) {
 
-      $errors['errorSetup'] = 'Sorry, admin username must have letters too!';
+      $errors['errorSetup'] = 'Sorry, username for admin must have letters too!';
     
     } 
     
     if ((!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $username))) {
 
-      $errors['erroSetup'] = 'Admin username can only contain alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
+      $errors['erroSetup'] = 'username for admin requires only alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
       
     }
 
@@ -348,7 +349,7 @@ install_header($current_path, $protocol, $server_host);
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="databaseHost">Database Host</label>
-                <input type="text" class="form-control" id="databaseHost" name="db_host" placeholder="Hostname or the database server IP" value="<?=(isset($_POST['db_host'])) ? escapeHTML($_POST['db_host'])  : ""; ?>"  required>
+                <input type="text" class="form-control" id="databaseHost" name="db_host" placeholder="Database host" value="<?=(isset($_POST['db_host'])) ? escapeHTML($_POST['db_host'])  : ""; ?>"  required>
                 <div class="invalid-feedback">
                   Valid database host is required.
                 </div>
@@ -364,14 +365,14 @@ install_header($current_path, $protocol, $server_host);
 
             <div class="row">
             <div class="col-md-6 mb-3">
-                <label for="databaseUser">Database Username</label>
-                <input type="text" class="form-control" id="databaseUser" name="db_user" placeholder="Database username" value="<?=(isset($_POST['db_user'])) ? escapeHTML($_POST['db_user']) : ""; ?>" required>
+                <label for="databaseUser">MySQL Username</label>
+                <input type="text" class="form-control" id="databaseUser" name="db_user" placeholder="Database user" value="<?=(isset($_POST['db_user'])) ? escapeHTML($_POST['db_user']) : ""; ?>" required>
                 <div class="invalid-feedback">
                   Valid database username is required.
                 </div>
               </div>
               <div class="col-md-6 mb-3">
-                <label for="databasePass">Database Password</label>
+                <label for="databasePass">MySQL Password</label>
                 <input type="password" class="form-control" id="databasePass" name="db_pass" placeholder="Database password" required>
                 <div class="invalid-feedback">
                   Valid database password is required.
