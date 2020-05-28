@@ -173,7 +173,7 @@ class UserApp extends BaseApp
             if ((isset($_POST['user_login'])) && (!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $_POST['user_login']))) {
                 
                 $checkError = false;
-                array_push($errors, "Please enter only alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20");
+                array_push($errors, "Username requires only alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20");
                 
             } elseif ($this->userEvent->checkUserLogin($_POST['user_login'])) {
                 
@@ -206,7 +206,7 @@ class UserApp extends BaseApp
                 if (false === check_pwd_strength($_POST['user_pass'])) {
 
                     $checkError = false;
-                    array_push($errors, "The password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters");
+                    array_push($errors, "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters");
                     
                 }
 
@@ -254,7 +254,7 @@ class UserApp extends BaseApp
                 
                 if ((isset($_POST['send_user_notification'])) && ($_POST['send_user_notification'] == 1)) {
                     
-                    $this->userEvent->setUserActivationKey(user_activation_key(distill_post_request($filters)['user_login'].get_ip_address()));
+                    $this->userEvent->setUserActivationKey(user_activation_key(distill_post_request($filters)['user_email'].get_ip_address()));
                       
                     $this->userEvent->addUser();
                     
@@ -343,14 +343,7 @@ class UserApp extends BaseApp
         }
 
         if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass']))) {
-
-            if (!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,50}$/', $_POST['user_pass'])) {
-               
-                $checkError = false;
-                array_push($errors, "The Password may contain letter and numbers at least 8 characters length with one number, one letter, and or any of these characters !@#$%");
-
-            } 
-             
+ 
             if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
 
                 $checkError = false;
@@ -362,6 +355,13 @@ class UserApp extends BaseApp
 
                 $checkError = false;
                 array_push($errors, "Your password seems to be the most hacked password, please try another.");
+
+            }
+
+            if (false === check_pwd_strength($_POST['user_pass'])) {
+
+                $checkError = false;
+                array_push($errors, "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters");
 
             }
             
@@ -378,7 +378,7 @@ class UserApp extends BaseApp
             
         }
 
-        if (!preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([.])+([a-zA-Z0-9\._-]+)+$/", $_POST['user_email'])) {
+        if (email_validation($_POST['user_email']) == 0) {
 
             $checkError = false;
             array_push($errors, "Please enter a valid email address");
@@ -433,10 +433,43 @@ class UserApp extends BaseApp
               
               if (!empty($_POST['user_pass'])) {
                       
-                $this->userEvent->setUserPass(prevent_injection(distill_post_request($filters)['user_pass']));
-                
+                  $this->userEvent->setUserPass(prevent_injection(distill_post_request($filters)['user_pass']));
+
               }
 
+              if($this->userEvent->identifyCookieToken()) {
+
+                $tokenizer = new Tokenizer();
+                 
+                if(!empty($_POST['user_pass'])) {
+
+                  $random_password = $tokenizer->createToken(64);
+                  setcookie('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+            
+                  $random_selector = $tokenizer->createToken(64);
+                  setcookie('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+
+                  $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
+                  $hashed_selector = password_hash($random_selector, PASSWORD_DEFAULT);
+              
+                  $this->userEvent->setPwdHash($hashed_password);
+                  $this->userEvent->setSelectorHash($hashed_selector);
+
+                  $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
+                  $hashed_selector = password_hash($random_selector, PASSWORD_DEFAULT);
+            
+                  $this->userEvent->setPwdHash($hashed_password);
+                  $this->userEvent->setSelectorHash($hashed_selector);
+                
+                  $this->userEvent->setUserLogin($getUser['user_login']);
+
+                  $expiry_date = date("Y-m-d H:i:s", time() + 2592000);
+                  $this->userEvent->setCookieExpireDate($expiry_date); 
+
+                }
+                
+            }
+ 
               $this->userEvent->modifyUser();
 
               direct_page('index.php?load=users&status=userUpdated', 200);
@@ -525,13 +558,6 @@ class UserApp extends BaseApp
             
             if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass']))) {
 
-                if (!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,50}$/', $_POST['user_pass'])) {
-                   
-                    $checkError = false;
-                    array_push($errors, "The Password may contain letter and numbers at least 8 characters length with one number, one letter, and or any of these characters !@#$%");
-    
-                } 
-                
                 if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
 
                     $checkError = false;
@@ -545,10 +571,17 @@ class UserApp extends BaseApp
                     array_push($errors, "Your password seems to be the most hacked password, please try another.");
 
                 }
-                
+
+                if (false === check_pwd_strength($_POST['user_pass'])) {
+
+                    $checkError = false;
+                    array_push($errors, "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters");
+
+                }
+
             }
     
-            if (!preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([.])+([a-zA-Z0-9\._-]+)+$/", $_POST['user_email'])) {
+            if (email_validation($_POST['user_email']) == 0) {
 
                 $checkError = false;
                 array_push($errors, "Please enter a valid email address");
@@ -597,7 +630,35 @@ class UserApp extends BaseApp
 
                 }
 
+                if ($this->userEvent->identifyCookieToken()) {
+
+                    // set password token and selector token here
+                    $tokenizer = new Tokenizer();
+
+                    if(!empty($_POST['user_pass'])) {
+
+                        $random_password = $tokenizer->createToken(64);
+                        setcookie('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+                
+                        $random_selector = $tokenizer->createToken(64);
+                        setcookie('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+                
+                        $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
+                        $hashed_selector = password_hash($random_selector, PASSWORD_DEFAULT);
+                
+                        $this->userEvent->setPwdHash($hashed_password);
+                        $this->userEvent->setSelectorHash($hashed_selector);
+                        $this->userEvent->setUserLogin($getProfile['user_login']);
+
+                        $expiry_date = date("Y-m-d H:i:s", time() + 2592000);
+                        $this->userEvent->setCookieExpireDate($expiry_date);
+
+                    }
+              
+                }
+
                 $this->userEvent->modifyUser();
+
                 direct_page('index.php?load=users&status=userUpdated', 200);
 
             }
