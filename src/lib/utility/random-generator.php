@@ -66,6 +66,7 @@ function ircmaxell_generator_string($strength, $length = 32, $character_list = '
 
     break;
 
+    case 'medium':
     default:
 
         $generator = $factory->getMediumStrengthGenerator();
@@ -99,6 +100,14 @@ return $random_int;
 
 }
 
+/**
+ * irc_random_generantor function
+ *
+ * @param int $length
+ * @see https://github.com/ircmaxell/RandomLib
+ * @return void
+ * 
+ */
 function ircmaxell_random_generator($length)
 {
 
@@ -107,5 +116,7 @@ $factory = new RandomLib\Factory;
 $generator = $factory->getGenerator(new SecurityLib\Strength(SecurityLib\Strength::MEDIUM));
 
 $bytes = $generator->generate($length);
+
+return $bytes;
 
 }
