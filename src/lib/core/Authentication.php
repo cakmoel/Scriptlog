@@ -90,7 +90,7 @@ class Authentication
    * Available in whole domain
    * 
    */
-  const COOKIE_PATH = "/";  //Available in whole domain
+  const COOKIE_PATH = APP_ADMIN;  
  
   public function __construct(UserDao $userDao, UserTokenDao $userToken, FormValidator $validator)
   {
@@ -182,6 +182,10 @@ class Authentication
  * 
  * @method public login()
  * @param array $values
+ * @uses regenerate_session()
+ * @uses get_session_data()
+ * @uses clear_duplicate_cookies()
+ * @see regenerate-session.php on lib/utility
  * 
  */
  public function login(array $values)
@@ -231,23 +235,25 @@ class Authentication
 
       clear_duplicate_cookies();
 
-      $this->userDao->updateUserSession(regenerate_session(), (int)$account_info['ID']);
+      $bind_session = ['user_session' => regenerate_session()];
+      $this->userDao->updateUserSession($bind_session, (int)$account_info['ID']);
 
+      // Set Auth Cookies if 'Remember Me' checked
       if ($remember_me == true) {
 
           $tokenizer = new Tokenizer();
 
-          setcookie('scriptlog_cookie_login', $account_login, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
-          setcookie('scriptlog_cookie_email', $account_email, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
-          setcookie('scriptlog_cookie_level', $account_level, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
-          setcookie('scriptlog_cookie_fullname', $account_name, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
-          setcookie('scriptlog_cookie_id', $account_id, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          setcookie('scriptlog_cookie_login', $account_login, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+          setcookie('scriptlog_cookie_email', $account_email, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(),is_cookies_secured(), true);
+          setcookie('scriptlog_cookie_level', $account_level, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+          setcookie('scriptlog_cookie_fullname', $account_name, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+          setcookie('scriptlog_cookie_id', $account_id, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
           
-          $random_password = $tokenizer -> createToken(16);
-          setcookie('scriptlog_validator', $random_password, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          $random_password = $tokenizer -> createToken(64);
+          setcookie('scriptlog_validator', $random_password, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
         
-          $random_selector = $tokenizer -> createToken(32);
-          setcookie('scriptlog_selector', $random_selector, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH);
+          $random_selector = $tokenizer -> createToken(64);
+          setcookie('scriptlog_selector', $random_selector, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
         
           $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
           $hashed_selector = password_hash($random_selector, PASSWORD_DEFAULT);
@@ -262,36 +268,37 @@ class Authentication
         
           }
         
-          $bind = ['user_login' => $account_login, 'hash_validator' => $hashed_password, 
-                  'hash_selector' => $hashed_selector, 'expired_date' => $expiry_date];
+          $bind_token = ['user_login' => $account_login, 'pwd_hash' => $hashed_password, 'selector_hash' => $hashed_selector, 'expired_date' => $expiry_date];
         
-          $this->userToken->createUserToken($bind);
+          $this->userToken->createUserToken($bind_token);
 
       } else {
 
-          $this->removeCookies();
+          $this->clearAuthCookies($account_login);
 
       }
 
  }
 
 /**
-  * Logout
-  */
+ * logout
+ *
+ * @see https://stackoverflow.com/questions/3512507/proper-way-to-logout-from-a-session-in-php
+ * @see https://www.php.net/session_destroy
+ * @return void
+ * 
+ */
 public function logout()
 {
 
-  unset($_SESSION['scriptlog_session_id']);
-  unset($_SESSION['scriptlog_session_email']);
-  unset($_SESSION['scriptlog_session_login']);
-  unset($_SESSION['scriptlog_session_fullname']);
-  unset($_SESSION['scriptlog_session_level']);
-  unset($_SESSION['scriptlog_session_agent']);
-    
+  $this->getSessionInstance()->startSession();
+
   $_SESSION = array();
+  
   $this->removeCookies();
-  session_destroy();
-    
+
+  $this->getSessionInstance()->destroy();
+
   $logout = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname($_SERVER['PHP_SELF']) . DS;
 
   header($_SERVER["SERVER_PROTOCOL"]." 302 Found");
@@ -301,12 +308,14 @@ public function logout()
 }
   
 /**
-  * Validate User Account
-  * 
-  * @param string $email
-  * @param string $password
-  * @return boolean
-  */
+ * Validate User Account
+ *
+ * @method public validateUserAccount()
+ * @param string $login
+ * @param string $password
+ * @return void
+ * 
+ */
 public function validateUserAccount($login, $password)
 {
     
@@ -331,14 +340,20 @@ public function validateUserAccount($login, $password)
  */
 public function resetUserPassword($user_email)
 {
-   
-  $reset_key = md5(uniqid(rand(),true));
+  
+  $reset_key = ircmaxell_random_generator(32);
+  
+  if(filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
 
-  if ($this->userDao->updateResetKey($reset_key, $user_email)) {
+    $bind = ['user_reset_key' => $reset_key, 'user_reset_complete' => 'No'];
+    
+    if ($this->userDao->updateResetKey($bind, $user_email)) {
       
       # send notification to user email account
       reset_password($user_email, $reset_key);
     
+    }
+      
   }
 
 }
@@ -353,6 +368,7 @@ public function resetUserPassword($user_email)
  */
 public function updateNewPassword($user_pass, $user_id)
 {
+
   $this->validator->sanitize($user_id, 'int');
   $this->validator->validate($user_id, 'number');
   $this->validator->validate($user_pass, 'password');
@@ -376,13 +392,13 @@ public function removeCookies()
 
   if ((isset($_COOKIE['scriptlog_cookie_login'])) && (isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector'])) ) {
 
-     setcookie('scriptlog_cookie_email', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-     setcookie('scriptlog_cookie_id', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-     setcookie('scriptlog_cookie_level', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-     setcookie('scriptlog_cookie_login', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-     setcookie('scriptlog_cookie_fullname', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-     setcookie('scriptlog_validator', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);  
-     setcookie('scriptlog_selector', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
+     setcookie('scriptlog_cookie_email', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+     setcookie('scriptlog_cookie_id', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+     setcookie('scriptlog_cookie_level', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+     setcookie('scriptlog_cookie_login', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
+     setcookie('scriptlog_cookie_fullname', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+     setcookie('scriptlog_validator', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);  
+     setcookie('scriptlog_selector', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
     
   }
 
@@ -392,20 +408,20 @@ public function removeCookies()
  * Clear authentication cookies
  *
  */
-public function clearAuthCookies()
+public function clearAuthCookies($user_login)
 {
+
+  $this->userToken->deleteUserToken($user_login);
 
   if ((isset($_COOKIE['scriptlog_cookie_login'])) && (isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector']))) {
 
-       $this->userToken->deleteUserToken($_COOKIE['scriptlog_cookie_login']);
-     
-       setcookie('scriptlog_cookie_email', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-       setcookie('scriptlog_cookie_id', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-       setcookie('scriptlog_cookie_level', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-       setcookie('scriptlog_cookie_login', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-       setcookie('scriptlog_cookie_fullname', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
-       setcookie('scriptlog_validator', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);  
-       setcookie('scriptlog_selector', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH);
+       setcookie('scriptlog_cookie_email', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+       setcookie('scriptlog_cookie_id', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+       setcookie('scriptlog_cookie_level', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+       setcookie('scriptlog_cookie_login', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+       setcookie('scriptlog_cookie_fullname', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+       setcookie('scriptlog_validator', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);  
+       setcookie('scriptlog_selector', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
   
   }
 
@@ -475,7 +491,7 @@ public function userAccessControl($control = null)
             break;
 
         case ActionConst::CONFIGURATION:
-
+      
            if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager')) {
 
              return false;
