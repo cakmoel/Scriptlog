@@ -37,7 +37,8 @@ if((check_dbtable($link, 'tbl_users') == false) || (check_dbtable($link, 'tbl_us
    || (check_dbtable($link, 'tbl_post_topic') == false) || (check_dbtable($link, 'tbl_plugin') == false)
    || (check_dbtable($link, 'tbl_menu_child') == false) || (check_dbtable($link, 'tbl_menu') == false)
    || (check_dbtable($link, 'tbl_mediameta') == false) || (check_dbtable($link, 'tbl_media') == false)
-   || (check_dbtable($link, 'tbl_comments') == false) || (check_dbtable($link, 'tbl_comment_reply') == false)) {
+   || (check_dbtable($dbconnect, 'tbl_media_download') == false) || (check_dbtable($link, 'tbl_comments') == false) 
+   || (check_dbtable($link, 'tbl_comment_reply') == false)) {
 
   header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
   exit("Database has been installed");
@@ -75,25 +76,25 @@ if($setup != 'install') {
 
     if (strlen($username) < 8) {
 
-      $errors['errorSetup'] = 'Admin username must be at least 8 characters.';
+      $errors['errorSetup'] = 'username for admin must be at least 8 characters.';
 
     } 
     
     if (strlen($username) > 20) {
 
-      $errors['errorSetup'] = 'Admin username may not be longer than 20 characters.';
+      $errors['errorSetup'] = 'username for admin may not be longer than 20 characters.';
 
     } 
     
     if (preg_match('/^[0-9]*$/', $username)) {
 
-     $errors['errorSetup'] = 'Sorry, admin username must have letters too!';
+     $errors['errorSetup'] = 'Sorry, username for admin must have letters too!';
    
     } 
    
     if ((!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $username))) {
 
-      $errors['erroSetup'] = 'Admin username can only contain Admin username can only contain alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
+      $errors['erroSetup'] = 'Username for admin only contain alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
       
     }
 
@@ -105,15 +106,15 @@ if($setup != 'install') {
 
     if(empty($password) && (empty($confirm))) {
 
-        $errors['errorInstall'] = 'Admin password should not be empty';
+        $errors['errorInstall'] = 'Password should not be empty';
 
     } elseif($password != $confirm) {
 
-        $errors['errorInstall'] = 'Admin password should be equal';
+        $errors['errorInstall'] = 'Password should be equal';
 
-    } elseif(!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,50}$/', $password)) {
+    } elseif(!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
 
-        $errors['errorInstall'] = 'Admin password may contain letter and numbers, at least one number and one letter, any of these characters !@#$%';
+        $errors['errorInstall'] = 'Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters';
 
     }
 
