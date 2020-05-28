@@ -17,15 +17,15 @@ use Sinergi\BrowserDetector\Browser;
 function check_php_version()
 {
    
-    if (version_compare(PHP_VERSION, '5.6', '>=')) {
+  if (version_compare(PHP_VERSION, '5.6', '>=')) {
         
-        return true;
+    return true;
         
-    } else {
+  } else {
         
-        return false;
+    return false;
         
-    }
+  }
     
 }
 
@@ -97,26 +97,34 @@ function check_browser_version()
 {
  $browser = grab_browser();
  
- if (($browser-> getName() == 'Chrome') && ($browser -> getVersion() < 65)) {
+ if (($browser-> getName() === Browser::CHROME) && ($browser -> getVersion() < 65)) {
      
     return true;
      
- } elseif (($browser-> getName() == 'Firefox') && ($browser -> getVersion() < 56.0)) {
+ } elseif (($browser-> getName() === Browser::FIREFOX) && ($browser -> getVersion() < 56.0)) {
      
     return true;
          
- } elseif (($browser->getName() == 'Opera') && ($browser -> getVersion() < 52.0)) {
+ } elseif (($browser->getName() === Browser::OPERA) && ($browser -> getVersion() < 52.0)) {
         
     return true;
 
- } elseif (($browser->getName() == 'Vivaldi') && ($browser -> getVersion() < 1.14)) {
+ } elseif (($browser->getName() === Browser::VIVALDI) && ($browser -> getVersion() < 1.14)) {
           
     return true;
      
- } elseif (($browser->getName() == 'Internet Explorer') && ($browser -> getVersion() < 11)) {
+ } elseif (($browser->getName() === Browser::IE) && ($browser -> getVersion() < 11)) {
      
     return true;
      
+ } elseif (($browser->getName() === Browser::SAFARI) && ($browser->getVersion() < 13)) { 
+
+    return true;
+
+ } elseif(($browser->getName() === Browser::EDGE) && ($browser->getVersion() < 75)) {
+
+    return true;
+
  } else {
 
     return false;
@@ -141,6 +149,7 @@ function get_browser_Version()
  */
 function check_web_server()
 {
+
   $get_web_server = isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : $_SERVER['SERVER_NAME'];
   
   $slice = explode("/", $get_web_server);
@@ -175,6 +184,7 @@ function check_main_dir()
  */
 function check_loader()
 {
+    
     if (is_dir(APP_PATH) && is_file(APP_PATH . '../lib/Scriptloader.php')) {
         
      return true;
