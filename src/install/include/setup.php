@@ -139,15 +139,15 @@ require __DIR__ . '/dbtable.php';
 
 // Users  
 $date_registered = date("Y-m-d H:i:s");
-$user_session    = md5(microtime());
+$user_session    = md5(uniqid());
 $shield_pass     = password_hash(base64_encode(hash('sha384', $user_pass, true)), PASSWORD_DEFAULT);
 $user_level      = 'administrator';
 
 // Theme 
-$theme_title     = "Bootstrap Blog";
-$theme_desc      = "Ondrej Svestka create this beautiful responsive blog theme and we are really love to use it as our default theme";
-$theme_designer  = "Ondrej Svestka";
-$theme_directory = "themes/bootstrapious";
+$theme_title     = "Mini Blog";
+$theme_desc      = "Simple yet clean design for personal blog";
+$theme_designer  = "Colorlib";
+$theme_directory = "themes/miniblog";
 $theme_status    = "Y";
 
 // Setting App Key
@@ -155,7 +155,7 @@ $setting_name_key = "app_key";
 
 // Setting App URL
 $setting_name_url  = "app_url";
-$setting_value_url = $protocol.'://'.$server_host.dirname(dirname($_SERVER['PHP_SELF'])).DIRECTORY_SEPARATOR;
+$setting_value_url = setup_base_url($protocol, $server_host);
 
 // Setting Site_Name
 $site_name  = "site_name";
@@ -176,10 +176,13 @@ $site_keywords_value = "Weblog, Personal blog, Blogware";
 // Setting Site_Email
 $site_email = "site_email";
 
+// Setting Permalink
+$permalink_key = "permalink_setting";
+$permalink_value = "yes";
 
 if ($link instanceof mysqli) 
 #create users table
-$createUser = $link->query($tableUser);
+$createUser = $link->query($tblUser);
 
 #save administrator
 $createAdmin = $link->prepare($saveAdmin);
@@ -195,19 +198,21 @@ if (false !== $createAdmin) {
 if ($link->insert_id && $createAdmin->affected_rows > 0) {
     
     // create other database tables
-    $createUserToken = $link -> query($tableUserToken);
-    $createPost = $link -> query($tablePost);
-    $createTopic = $link -> query($tableTopic);
-    $createPostTopic = $link -> query($tablePostTopic);
-    $createComment = $link -> query($tableComment);
-    $createReply = $link -> query($tableReply);
-    $createMenu = $link -> query($tableMenu);
-    $createMenuChild = $link -> query($tableMenuChild);
-    $createMedia = $link -> query($tableMedia);
-    $createMediaMeta = $link -> query($tableMediaMeta);
-    $createPlugin = $link -> query($tablePlugin);
-    $createSetting = $link -> query($tableSetting);
-    $createTheme = $link -> query($tableTheme);
+    $createUserToken = $link -> query($tblUserToken);
+    $createPost = $link -> query($tblPost);
+    $createTopic = $link -> query($tblTopic);
+    $createPostTopic = $link -> query($tblPostTopic);
+    $createComment = $link -> query($tblComment);
+    $createReply = $link -> query($tblReply);
+    $createLoginAttempt = $link -> query($tblLoginAttempt);
+    $createMenu = $link -> query($tblMenu);
+    $createMenuChild = $link -> query($tblMenuChild);
+    $createMedia = $link -> query($tblMedia);
+    $createMediaMeta = $link -> query($tblMediaMeta);
+    $createMediaDownload = $link -> query($tblMediaDownload);
+    $createPlugin = $link -> query($tblPlugin);
+    $createSetting = $link -> query($tblSetting);
+    $createTheme = $link -> query($tblTheme);
     
     // insert configuration - app_key
     $recordAppKey = $link -> prepare($saveAppKey);
@@ -244,6 +249,11 @@ if ($link->insert_id && $createAdmin->affected_rows > 0) {
     $recordAppSiteEmail -> bind_param('ss', $site_email, $user_email);
     $recordAppSiteEmail -> execute();
 
+    // insert configuration - permalinks
+    $recordPermalinks = $link -> prepare($savePermalinks);
+    $recordPermalinks -> bind_param('ss', $permalink_key, $permalink_value);
+    $recordPermalinks -> execute();
+
     // insert default theme
     $recordTheme = $link -> prepare($saveTheme);
     $recordTheme -> bind_param('sssss', $theme_title, $theme_desc, $theme_designer, $theme_directory, $theme_status);
@@ -262,19 +272,28 @@ if ($link->insert_id && $createAdmin->affected_rows > 0) {
 /**
  * Write Config File Function
  * 
- * @param string $host
- * @param string $user
- * @param string $password
- * @param string $database
+ * @param string $protocol
+ * @param string $server_name
+ * @param string $dbhost
+ * @param string $dbuser
+ * @param string $dbpassword
+ * @param string $dbname
  * @param string $email
  * @param string $key
  * @throws Exception
  * 
  */
-function write_config_file($protocol, $server_name, $host, $user, $password, $database, $email, $key)
+function write_config_file($protocol, $server_name, $dbhost, $dbuser, $dbpassword, $dbname, $email, $key)
 {
 
-$link = mysqli_connect($host, $user, $password, $database);
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+$link = mysqli_connect($dbhost, $dbuser, $dbpassword, $dbname);
+
+if (mysqli_connect_errno()) {
+    printf("Connect failed: %s\n", mysqli_connect_error(), E_USER_ERROR);
+    exit();
+}
 
 $configuration = false;
 
@@ -301,16 +320,16 @@ if (isset($_SESSION['install']) && $_SESSION['install'] == true) {
                     
             'db' => [
 
-                  'host' => '".addslashes($host)."',
-                  'user' => '".addslashes($user)."',
-                  'pass' => '".addslashes($password)."',
-                  'name' => '".addslashes($database)."'
+                  'host' => '".addslashes($dbhost)."',
+                  'user' => '".addslashes($dbuser)."',
+                  'pass' => '".addslashes($dbpassword)."',
+                  'name' => '".addslashes($dbname)."'
                   
                 ],
         
             'app' => [
 
-                   'url'   => '".addslashes($protocol.'://'.$server_name.dirname(dirname($_SERVER['PHP_SELF'])).DIRECTORY_SEPARATOR)."',
+                   'url'   => '".addslashes(setup_base_url($protocol, $server_name))."',
                    'email' => '".addslashes($email)."',
                    'key'   => '".addslashes($app_key)."'
                    
@@ -345,7 +364,7 @@ if (isset($_SESSION['install']) && $_SESSION['install'] == true) {
 function remove_bad_characters($str_words, $escape = false, $level = 'high')
 {
     $found = false;
-    $str_words = htmlentities(strip_tags($str_words));
+    $str_words = escapeHTML(strip_tags($str_words));
     if($level == 'low') {
         
         $bad_string = array('drop', '--', 'insert', 'xp_', '%20union%20', '/*', '*/union/*', '+union+', 'load_file', 'outfile', 'document.cookie', 'onmouse', '<script', '<iframe', '<applet', '<meta', '<style', '<form', '<body', '<link', '_GLOBALS', '_REQUEST', '_GET', '_POST', 'include_path', 'prefix', 'ftp://', 'smb://', 'onmouseover=', 'onmouseout=');
@@ -472,6 +491,30 @@ function convert_memory_used($size)
 {
   $unit=array('b','kb','mb','gb','tb','pb');
   return round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+}
+
+/**
+ * Setup base URL
+ *
+ * @param string $protocol
+ * @param string $server_host
+ * @return void
+ * 
+ */
+function setup_base_url($protocol, $server_host)
+{
+  $base_url = $protocol . '://' . $server_host . dirname(dirname($_SERVER['PHP_SELF']));
+
+  if(substr($base_url, -1) == DIRECTORY_SEPARATOR) {
+
+    return rtrim($base_url, DIRECTORY_SEPARATOR);
+
+  } else {
+
+    return $base_url;
+
+  }
+  
 }
 
 /**
