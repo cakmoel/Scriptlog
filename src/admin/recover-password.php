@@ -6,9 +6,9 @@
  * @author    M.Noermoehammad
  * 
  */
-if (file_exists(__DIR__ . '/../config.sample.php')) {
+if (file_exists(__DIR__ . '/../config.php')) {
     
-    include(dirname(dirname(__FILE__)).'/lib/main-dev.php');
+    include(dirname(dirname(__FILE__)).'/lib/main.php');
   
 } else {
 
@@ -38,19 +38,21 @@ if (empty($recoverFormSubmitted) == false) {
 
     $badCSRF = true;
 
-    if (!isset($_POST['csrf']) || !isset($_SESSION['CSRF']) || empty($_POST['csrf'])
-        || $_POST['csrf'] !== $_SESSION['CSRF']) {
-      
-        $errors['errorMessage'] = "Sorry, there was a security issue";
-        $badCSRF = true;
-  
-    } elseif (empty($password) || empty($confirmPass)) {
+    if (false === verify_form_token('recoverPwd')) {
+     
+      $badCSRF = true;
+      write_log($ip, 'form_recover_pwd');
+      $errors['errorMessage'] = "Sorry, there was a security issue";
+    
+    }
+
+    if (empty($password) || empty($confirmPass)) {
 
        $errors['errorMessage'] = "All column must be filled";
 
-    } elseif (!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,50}$/', $password)) {
+    } elseif (!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
 
-      $errors['errorMessage'] = "The password may contain letter and numbers, at least one number and one letter, any of these characters !@#$%";
+      $errors['errorMessage'] = "The Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters'";
 
    } elseif (strlen($password) < 8) {
 
@@ -153,13 +155,10 @@ else :
         
       <div class="row">
         <div class="col-xs-8">
-      <?php 
-      // prevent CSRF
-      $key= random_generator(13);
-      $CSRF = bin2hex(openssl_random_pseudo_bytes(32).$key);
-      $_SESSION['CSRF'] = $CSRF;
-      ?>
-        <input type="hidden" name="csrf" value="<?= $CSRF; ?>">
+  <?php 
+    $block_csrf = generate_form_token('recoverPwd', 16); // prevent csrf
+  ?>
+        <input type="hidden" name="csrf" value="<?= $block_csrf; ?>">
         <input type="submit" class="btn btn-primary btn-block btn-flat" name="Change" value="Change Password">
         </div>
         <!-- /.col -->
