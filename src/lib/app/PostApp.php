@@ -110,149 +110,119 @@ class PostApp extends BaseApp
     $checkError = true;
     
     if (isset($_POST['postFormSubmit'])) {
-        
-        $file_location = isset($_FILES['media']['tmp_name']) ? $_FILES['media']['tmp_name'] : '';
- 	      $file_type = isset($_FILES['media']['type']) ? $_FILES['media']['type'] : '';
- 	      $file_name = isset($_FILES['media']['name']) ? $_FILES['media']['name'] : '';
- 	      $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : '';
- 	      $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
-       
-        $filters = [
-            'post_title' => FILTER_SANITIZE_SPECIAL_CHARS,
-            'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-            'media_id' => FILTER_SANITIZE_NUMBER_INT,
-            'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
-            'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-            'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-            'post_status' => FILTER_SANITIZE_STRING,
-            'comment_status' => FILTER_SANITIZE_STRING
-        ];
 
-        $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 10000];
+        $file_location = isset($_FILES['media']['tmp_name']) ? $_FILES['media']['tmp_name'] : '';
+        $file_type = isset($_FILES['media']['type']) ? $_FILES['media']['type'] : '';
+        $file_name = isset($_FILES['media']['name']) ? $_FILES['media']['name'] : '';
+        $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : '';
+        $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
+
+        $filters = [
+          'post_title' => FILTER_SANITIZE_SPECIAL_CHARS,
+          'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+          'image_id' => FILTER_SANITIZE_NUMBER_INT,
+          'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
+          'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+          'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+          'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+          'post_status' => FILTER_SANITIZE_STRING,
+          'comment_status' => FILTER_SANITIZE_STRING
+       ];
+
+       $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 50000];
 
       try {
-        
-         if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
+
+        if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
          
-             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+             header(APP_PROTOCOL.' 400 Bad Request');
              throw new AppException("Sorry, unpleasant attempt detected!");
              
+         } 
+        
+         if( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'comment_status']) == false) {
+
+            header(APP_PROTOCOL.' 413 Payload Too Large');
+            header('Status: 413 Payload Too Large');
+            header('Retry-After: 3600');
+            throw new AppException("Sorry, Unpleasant attempt detected");
+
          }
-         
+
          if ((empty($_POST['post_title'])) || (empty($_POST['post_content']))) {
            
             $checkError = false;
-            array_push($errors, "Please enter a required fields");
+            array_push($errors, "Please enter a required field");
             
+         }
+
+         if(true === form_size_validation($form_fields)) {
+
+            $checkError = false;
+            array_push($errors, "Form data is longer than allowed");
+
          }
          
-         if (!empty($file_location)) {
+         if( !empty($file_location) ) {
 
-           if (!isset($file_error) || is_array($file_error)) {
+            if (!isset($file_error) || is_array($file_error)) {
 
-             $checkError = false;
-             array_push($errors, "Invalid paramenter");
+                $checkError = false;
+                array_push($errors, "Invalid paramenter");
             
-          }
+            }
   
-          switch ($file_error) {
+           switch ($file_error) {
   
-            case UPLOAD_ERR_OK:
+             case UPLOAD_ERR_OK:
                 break;
            
-            case UPLOAD_ERR_INI_SIZE:
-            case UPLOAD_ERR_FORM_SIZE:
+             case UPLOAD_ERR_INI_SIZE:
+             case UPLOAD_ERR_FORM_SIZE:
               
-              $checkError = false;
-              array_push($errors, "Exceeded filesize limit");
+               $checkError = false;
+               array_push($errors, "Exceeded filesize limit");
     
               break;
     
-            default:
+             default:
                 
-              $checkError = false;
-              array_push($errors, "Unknown errors");
+               $checkError = false;
+               array_push($errors, "Unknown errors");
               
               break;
               
-          }
+           }
   
-          if ($file_size > APP_FILE_SIZE) {
+           if ($file_size > APP_FILE_SIZE) {
   
-            $checkError = false;
-            array_push($errors, "Exceeded file size limit. Maximum file size is. ".format_size_unit(APP_FILE_SIZE));
+              $checkError = false;
+              array_push($errors, "Exceeded file size limit. Maximum file size is. ".format_size_unit(APP_FILE_SIZE));
    
-          }
+            }
    
-          if(false === check_file_name($file_location)) {
+            if(false === check_file_name($file_location)) {
    
-            $checkError = false;
-            array_push($errors, "file name is not valid");
+              $checkError = false;
+              array_push($errors, "File name is not valid");
    
-          }
+            }
    
-          if(true === check_file_length($file_location)) {
+            if(true === check_file_length($file_location)) {
    
-            $checkError = false;
-            array_push($errors, "file name is too long");
+              $checkError = false;
+              array_push($errors, "File name is too long");
            
-          }
+            }
    
-         if(false === check_mime_type(mime_type_dictionary(), $file_location)) {
+            if(false === check_mime_type(mime_type_dictionary(), $file_location)) {
    
-            $checkError = false;
-            array_push($errors, "Invalid file format");
+              $checkError = false;
+              array_push($errors, "Invalid file format");
    
+            }
+
          }
-
-       }
-
-       $new_filename = generate_filename($file_name)['new_filename'];
-
-       list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
-
-       if (generate_filename($file_name)['file_extension'] == "jpeg" 
-               || generate_filename($file_name)['file_extension'] == "jpg" 
-               || generate_filename($file_name)['file_extension'] == "png" 
-               || generate_filename($file_name)['file_extension'] == "gif" 
-               || generate_filename($file_name)['file_extension'] == "webp") {
-
-              $media_metavalue = array(
-                  'Origin' => rename_file($file_name), 
-                  'File type' => $file_type, 
-                  'File size' => format_size_unit($file_size), 
-                  'Uploaded on' => date("Y-m-d H:i:s"), 
-                  'Dimension' => $width.'x'.$height);
-
-        } else {
-
-              $media_metavalue = array(
-                  'Origin' => rename_file($file_name), 
-                  'File type' => $file_type, 
-                  'File size' => format_size_unit($file_size), 
-                  'Uploaded on' => date("Y-m-d H:i:s"));
-
-        }
-
-        // upload image
-        if (is_uploaded_file($file_location)) {
-
-          upload_media($file_location, $file_type, $file_size, basename($new_filename));
-
-        }
-
-        $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
-
-        $bind_media = [
-          'media_filename' => $new_filename, 
-          'media_caption' => prevent_injection(distill_post_request($filters)['post_title']), 
-          'media_type' => $file_type, 
-          'media_target' => 'blog', 
-          'media_user' => $this->postEvent->postAuthorLevel(), 
-          'media_access' => $media_access, 
-          'media_status' => '1'];
-
-        $append_media = $medialib->createMedia($bind_media);
 
         if (!$checkError) {
             
@@ -271,7 +241,7 @@ class PostApp extends BaseApp
 
           } else {
 
-           $this->view->set('medialibs', $medialib->mediaBlogImageUploaded());
+           $this->view->set('medialibs', $medialib->imageUploadHandler());
 
           }
 
@@ -279,55 +249,17 @@ class PostApp extends BaseApp
           $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown());
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
         
-       } else {
-
-        if (empty($file_location)) {
-
-           if (isset($_POST['media_id']) && gettype($_POST['media_id'] == "integer")) {
-
-              $this->postEvent->setPostImage((int)distill_post_request($filters)['media_id']);
-
-           }
-
-           if(isset($_POST['catID']) && ($_POST['catID'] == 0)) {
-
-              $this->postEvent->setTopics(0);
-              $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
-              $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
-              $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
-              $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
-              $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
-              $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
-              $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
-              $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-
-           } else {
-
-              $this->postEvent->setTopics(distill_post_request($filters)['catID']);
-              $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
-              $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
-              $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
-              $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
-              $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
-              $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
-              $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
-              $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-
-           }
-
         } else {
 
-            $mediameta = [
-              'media_id' => $append_media,
-              'meta_key' => $new_filename,
-              'meta_value' => json_encode($media_metavalue)
-            ];
+           if (empty($file_location)) {
 
-            $medialib->createMediaMeta($mediameta);
+              if ( (isset($_POST['image_id'])) && (!empty($_POST['image_id'])) ) {
 
-            $this->postEvent->setPostImage($append_media);
+                  $this->postEvent->setPostImage((int)distill_post_request($filters)['image_id']);
 
-            if (isset($_POST['catID']) && ($_POST['catID'] == 0)) {
+              }
+
+              if(isset($_POST['catID']) && $_POST['catID'] == 0) {
 
                $this->postEvent->setTopics(0);
                $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
@@ -338,28 +270,113 @@ class PostApp extends BaseApp
                $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
                $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
                $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
+               $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
+
+              } else {
+
+               $this->postEvent->setTopics(distill_post_request($filters)['catID']);
+               $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
+               $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
+               $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
+               $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
+               $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
+               $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
+               $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
+               $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
+               $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
+
+              }
 
             } else {
 
-              $this->postEvent->setTopics(distill_post_request($filters)['catID']);
-              $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
-              $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
-              $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
-              $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
-              $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
-              $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
-              $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
-              $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
+              $new_filename = generate_filename($file_name)['new_filename'];
+              $file_extension = generate_filename($file_name)['file_extension'];
+       
+              list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
+       
+              if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
+       
+                     $media_metavalue = array(
+                         'Origin' => rename_file($file_name), 
+                         'File type' => $file_type, 
+                         'File size' => format_size_unit($file_size), 
+                         'Uploaded on' => date("Y-m-d H:i:s"), 
+                         'Dimension' => $width.'x'.$height);
+       
+               } else {
+       
+                     $media_metavalue = array(
+                         'Origin' => rename_file($file_name), 
+                         'File type' => $file_type, 
+                         'File size' => format_size_unit($file_size), 
+                         'Uploaded on' => date("Y-m-d H:i:s"));
+       
+               }
+       
+               // upload image
+               if (is_uploaded_file($file_location)) {
+       
+                 upload_media($file_location, $file_type, $file_size, basename($new_filename));
+       
+               }
+       
+               $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
+       
+               $bind_media = [
+                 'media_filename' => $new_filename, 
+                 'media_caption' => rename_file($file_name), 
+                 'media_type' => $file_type, 
+                 'media_target' => 'blog', 
+                 'media_user' => $this->postEvent->postAuthorLevel(), 
+                 'media_access' => $media_access, 
+                 'media_status' => '1'];
+       
+               $append_media = $medialib->createMedia($bind_media);
+
+               $mediameta = [
+                'media_id' => $append_media,
+                'meta_key' => $new_filename,
+                'meta_value' => json_encode($media_metavalue)];
+
+               $medialib->createMediaMeta($mediameta);
+
+               $this->postEvent->setPostImage($append_media);
+
+              if (isset($_POST['catID']) && $_POST['catID'] == 0) {
+
+               $this->postEvent->setTopics(0);
+               $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
+               $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
+               $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
+               $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
+               $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
+               $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
+               $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
+               $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
+               $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
+
+              } else {
+
+               $this->postEvent->setTopics(distill_post_request($filters)['catID']);
+               $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
+               $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
+               $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
+               $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
+               $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
+               $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
+               $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
+               $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
+               $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
+
+              }
 
             }
 
-          }
-
-             $this->postEvent->addPost();
+            $this->postEvent->addPost();
       
             direct_page('index.php?load=posts&status=postAdded', 200);
 
-       }
+        }
       
       } catch (AppException $e) {
           
@@ -380,11 +397,11 @@ class PostApp extends BaseApp
         
         if ($this->postEvent->postAuthorLevel() == 'contributor') { 
 
-           $this->view->set('medialibs', $medialib->dropDownMediaSelect());
+            $this->view->set('medialibs', $medialib->dropDownMediaSelect());
 
         } else {
 
-            $this->view->set('medialibs', $medialib->mediaBlogImageUploaded());
+            $this->view->set('medialibs', $medialib->imageUploadHandler());
 
         }
         
@@ -425,13 +442,12 @@ class PostApp extends BaseApp
         'post_title' => $getPost['post_title'],
         'post_content' => $getPost['post_content'],
         'post_summary' => $getPost['post_summary'],
-        'post_keyword' => $getPost['post_keyword']
+        'post_keyword' => $getPost['post_keyword'],
+        'post_tags' => $getPost['post_tags']
     );
 
-    $getMedia = $medialib->findMediaBlog((int)$getPost['media_id']);
-    
     if (isset($_POST['postFormSubmit'])) {
-        
+
        $file_location = isset($_FILES['media']['tmp_name']) ? $_FILES['media']['tmp_name'] : '';
        $file_type = isset($_FILES['media']['type']) ? $_FILES['media']['type'] : '';
        $file_name = isset($_FILES['media']['name']) ? $_FILES['media']['name'] : '';
@@ -439,35 +455,113 @@ class PostApp extends BaseApp
        $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
 
        $filters = [
-          'post_id' => FILTER_SANITIZE_NUMBER_INT,
-          'post_title' => FILTER_SANITIZE_SPECIAL_CHARS,
-          'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-          'media_id' => FILTER_SANITIZE_NUMBER_INT,
-          'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
-          'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-          'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-          'post_status' => FILTER_SANITIZE_STRING,
-          'comment_status' => FILTER_SANITIZE_STRING
-       ];
+        'post_id' => FILTER_SANITIZE_NUMBER_INT,
+        'post_title' => FILTER_SANITIZE_SPECIAL_CHARS,
+        'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'image_id' => FILTER_SANITIZE_NUMBER_INT,
+        'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
+        'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'post_status' => FILTER_SANITIZE_STRING,
+        'comment_status' => FILTER_SANITIZE_STRING
+      ];
 
-       $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 10000];
- 
-        try {
-            
+      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 50000];
+
+      try {
+
             if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                 
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                header(APP_PROTOCOL." 400 Bad Request");
                 throw new AppException("Sorry, unpleasant attempt detected!");
                 
+            } 
+            
+            if( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'comment_status']) == false) {
+
+                header(APP_PROTOCOL.' 413 Payload Too Large');
+                header('Status: 413 Payload Too Large');
+                header('Retry-After: 3600');
+                throw new AppException("Sorry, Unpleasant attempt detected");
+
             }
             
             if ((empty($_POST['post_title'])) || (empty($_POST['post_content']))) {
            
                $checkError = false;
-               array_push($errors, "Please enter a required fields");
+               array_push($errors, "Please enter a required field");
               
             }
             
+            if(true === form_size_validation($form_fields)) {
+
+              $checkError = false;
+              array_push($errors, "Form data is longer than allowed");
+  
+            }
+            
+            if( !empty($file_location) ) {
+
+               if (!isset($file_error) || is_array($file_error)) {
+              
+                 $checkError = false;
+                 array_push($errors, "Invalid paramenter");
+           
+               }
+
+               switch ($file_error) {
+      
+                   case UPLOAD_ERR_OK:
+                      break;
+                
+                   case UPLOAD_ERR_INI_SIZE:
+                   case UPLOAD_ERR_FORM_SIZE:
+                 
+                      $checkError = false;
+                      array_push($errors, "Exceeded filesize limit");
+       
+                      break;
+       
+                   default:
+                   
+                      $checkError = false;
+                      array_push($errors, "Unknown errors");
+                 
+                      break;
+                 
+                }
+
+                if ($file_size > APP_FILE_SIZE) {
+           
+                   $checkError = false;
+                   array_push($errors, "Exceeded file size limit. Maximum file size is. ".format_size_unit(APP_FILE_SIZE));
+          
+                }
+
+                if (true === check_file_length($file_location)) {
+           
+                   $checkError = false;
+                   array_push($errors, "File name is too long");
+        
+                }
+
+                if (false === check_file_name($file_location)) {
+           
+                   $checkError = false;
+                   array_push($errors, "File name is not valid");
+        
+                }
+
+                if (false === check_mime_type(mime_type_dictionary(), $file_location)) {
+           
+                   $checkError = false;
+                   array_push($errors, "Invalid file format");
+                  
+                }
+
+            }
+
             if (!$checkError) {
                 
                 $this->setView('edit-post');
@@ -485,7 +579,7 @@ class PostApp extends BaseApp
        
                 } else {
        
-                   $this->view->set('medialibs', $medialib->mediaBlogImageUploaded($getPost['media_id']));
+                   $this->view->set('medialibs', $medialib->imageUploadHandler($getPost['media_id']));
        
                 }
 
@@ -495,145 +589,13 @@ class PostApp extends BaseApp
                 
             } else {
               
-                if (!empty($file_location)) {
+              if( empty($file_location) ) {
 
-                  if (!isset($file_error) || is_array($file_error)) {
-              
-                    $checkError = false;
-                    array_push($errors, "Invalid paramenter");
-               
-                  }
-      
-                 switch ($file_error) {
-      
-                   case UPLOAD_ERR_OK:
-                       break;
-                    
-                   case UPLOAD_ERR_INI_SIZE:
-                   case UPLOAD_ERR_FORM_SIZE:
-                     
-                     $checkError = false;
-                     array_push($errors, "Exceeded filesize limit");
-           
-                     break;
-           
-                   default:
-                       
-                     $checkError = false;
-                     array_push($errors, "Unknown errors");
-                     
-                     break;
-                     
-                  }
-           
-                 if ($file_size > APP_FILE_SIZE) {
-           
-                   $checkError = false;
-                   array_push($errors, "Exceeded file size limit. Maximum file size is. ".format_size_unit(APP_FILE_SIZE));
-           
+                 if (  (isset($_POST['image_id'])) && (!empty($_POST['image_id'])) ) {
+
+                    $this->postEvent->setPostImage((int)distill_post_request($filters)['image_id']);
+   
                  }
-           
-                 if (true === form_size_validation($form_fields)) {
-           
-                    $checkError = false;
-                    array_push($errors, "Exceeded characters limit than allowed.");
-                      
-                 }
-              
-                 if (true === check_file_length($file_location)) {
-           
-                     $checkError = false;
-                     array_push($errors, "file name is too long");
-           
-                 }
-           
-                 if (false === check_file_name($file_location)) {
-           
-                     $checkError = false;
-                     array_push($errors, "file name is not valid");
-           
-                 }
-           
-                 if (false === check_mime_type(mime_type_dictionary(), $file_location)) {
-           
-                     $checkError = false;
-                     array_push($errors, "Invalid file format");
-                     
-                 }
-
-                  $new_filename = generate_filename($file_name)['new_filename'];
-
-                  list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
-
-                  if (generate_filename($file_name)['file_extension'] == "jpeg" 
-                      || generate_filename($file_name)['file_extension'] == "jpg" 
-                      || generate_filename($file_name)['file_extension'] == "png" 
-                      || generate_filename($file_name)['file_extension'] == "gif" 
-                      || generate_filename($file_name)['file_extension'] == "webp") {
-
-                      $media_metavalue = array(
-                          'Origin' => rename_file($file_name), 
-                          'File type' => $file_type, 
-                          'File size' => format_size_unit($file_size), 
-                          'Uploaded on' => date("Y-m-d H:i:s"), 
-                          'Dimension' => $width.'x'.$height);
-
-                  } else {
-
-                      $media_metavalue = array(
-                          'Origin' => rename_file($file_name), 
-                          'File type' => $file_type, 
-                          'File size' => format_size_unit($file_size), 
-                          'Uploaded on' => date("Y-m-d H:i:s"));
-
-                  }
-
-                  if (is_uploaded_file($file_location)) {
-
-                    upload_media($file_location, $file_type, $file_size, basename($new_filename));
-      
-                  }
-
-                  $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
-
-                  $bind_media = [
-                    'media_filename' => $new_filename, 
-                    'media_caption' => prevent_injection(distill_post_request($filters)['post_title']), 
-                    'media_type' => $file_type, 
-                    'media_target' => 'blog', 
-                    'media_user' => $this->postEvent->postAuthorId(), 
-                    'media_access' => $media_access, 
-                    'media_status' => '1'];
-        
-                  $append_media = $medialib->createMedia($bind_media);
-
-                  $mediameta = [
-                    'media_id' => $append_media,
-                    'meta_key' => $new_filename,
-                    'meta_value' => json_encode($media_metavalue)
-                  ];
-  
-                  $medialib->createMediaMeta($mediameta);
-
-                  $this->postEvent->setPostId((int)distill_post_request($filters)['post_id']);
-                  $this->postEvent->setPostImage($append_media);
-                  $this->postEvent->setTopics(distill_post_request($filters)['catID']);
-                  $this->postEvent->setPostAuthor($this->postEvent->postAuthorId());
-                  $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
-                  $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
-                  $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
-                  $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
-                  $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
-                  $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
-                  $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-
-                } else {
-
-                  if (isset($_POST['media_id']) && gettype($_POST['media_id'] == "integer")) {
-
-                     $this->postEvent->setPostImage((int)distill_post_request($filters)['media_id']);
-      
-                  }
 
                   $this->postEvent->setPostId((int)distill_post_request($filters)['post_id']);
                   $this->postEvent->setTopics(distill_post_request($filters)['catID']);
@@ -645,10 +607,78 @@ class PostApp extends BaseApp
                   $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
                   $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
                   $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-                    
-                }
- 
+                  $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
+                  
+              } else {
+
+                $new_filename = generate_filename($file_name)['new_filename'];
+                $file_extension = generate_filename($file_name)['file_extension'];
+
+                list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
+
+                if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
+
+                  $media_metavalue = array(
+                   'Origin' => rename_file($file_name), 
+                   'File type' => $file_type, 
+                   'File size' => format_size_unit($file_size), 
+                   'Uploaded on' => date("Y-m-d H:i:s"), 
+                   'Dimension' => $width.'x'.$height);
+
+              } else {
+
+                  $media_metavalue = array(
+                   'Origin' => rename_file($file_name), 
+                   'File type' => $file_type, 
+                   'File size' => format_size_unit($file_size), 
+                   'Uploaded on' => date("Y-m-d H:i:s"));
+
+              }
+
+              if (is_uploaded_file($file_location)) {
+
+                 upload_media($file_location, $file_type, $file_size, basename($new_filename));
+
+              }
+
+              $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
+
+               $bind_media = [
+                  'media_filename' => $new_filename, 
+                  'media_caption' => prevent_injection(distill_post_request($filters)['post_title']), 
+                  'media_type' => $file_type, 
+                  'media_target' => 'blog', 
+                  'media_user' => $this->postEvent->postAuthorId(), 
+                  'media_access' => $media_access, 
+                  'media_status' => '1'];
+  
+                $append_media = $medialib->createMedia($bind_media);
+
+                $mediameta = [
+                  'media_id' => $append_media,
+                  'meta_key' => $new_filename,
+                  'meta_value' => json_encode($media_metavalue)
+                ];
+
+                $medialib->createMediaMeta($mediameta);
+
+                $this->postEvent->setPostImage($append_media);
+                $this->postEvent->setPostId((int)distill_post_request($filters)['post_id']);
+                $this->postEvent->setTopics(distill_post_request($filters)['catID']);
+                $this->postEvent->setPostAuthor($this->postEvent->postAuthorId());
+                $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
+                $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
+                $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
+                $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
+                $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
+                $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
+                $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
+                $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
+                 
+              }
+            
                 $this->postEvent->modifyPost();
+                
                 direct_page('index.php?load=posts&status=postUpdated', 200);
                 
             }
@@ -677,7 +707,7 @@ class PostApp extends BaseApp
 
         } else {
 
-           $this->view->set('medialibs', $medialib->mediaBlogImageUploaded($getPost['media_id']));
+           $this->view->set('medialibs', $medialib->imageUploadHandler($getPost['media_id']));
 
         }
 
