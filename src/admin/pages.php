@@ -12,7 +12,7 @@ switch ($action) {
     
         if (false === $authenticator->userAccessControl(ActionConst::PAGES)) {
 
-            direct_page('index.php?load=403&forbidden='.forbidden_id());
+            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
         } else {
 
