@@ -111,11 +111,11 @@ public function insert()
 
   if (isset($_POST['mediaFormSubmit'])) {
 
-    $file_location = isset($_FILES['media']['tmp_name']) ? $_FILES['media']['tmp_name'] : '';
-    $file_type = isset($_FILES['media']['type']) ? $_FILES['media']['type'] : '';
-    $file_name = isset($_FILES['media']['name']) ? $_FILES['media']['name'] : '';
-    $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : '';
-    $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
+    $file_location = isset($_FILES['media']['tmp_name']) ? $_FILES['media']['tmp_name'] : null;
+    $file_type = isset($_FILES['media']['type']) ? $_FILES['media']['type'] : null;
+    $file_name = isset($_FILES['media']['name']) ? $_FILES['media']['name'] : null;
+    $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : null;
+    $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : null;
 
     $filters = ['media_caption' => FILTER_SANITIZE_SPECIAL_CHARS, 'media_target' => FILTER_SANITIZE_STRING, 'media_access' => FILTER_SANITIZE_STRING];
 
