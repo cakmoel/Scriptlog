@@ -20,7 +20,7 @@
 <div class="col-md-12">
 <div class="box box-primary">
 <div class="box-header with-border"></div>
-<!-- /.box-header -->
+
 <?php
 if (isset($errors)) :
 ?>
@@ -49,15 +49,14 @@ echo "Error saving data. Please try again." . $saveError;
 </div>
 <?php 
 endif;
-?>
 
-<?php
 $action = isset($formAction) ? $formAction : null;
 $post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
 ?>
+
 <form method="post" action="<?=generate_request('index.php', 'post', ['posts', $action, $post_id])['link']; ?>" role="form" enctype="multipart/form-data" >
 <input type="hidden" name="post_id" value="<?= $post_id; ?>" />
-<input type="hidden" name="MAX_FILE_SIZE" value="697856"/>
+<input type="hidden" name="MAX_FILE_SIZE" value="<?=APP_FILE_SIZE;?>">
 
 <div class="box-body">
 <div class="form-group">
@@ -86,10 +85,16 @@ $post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
 </div>
 
 <div class="form-group">
+<label>Tags</label>
+<input type="text" class="form-control" name="post_tags" placeholder="Enter tags here" value="
+<?=(isset($postData['post_tags'])) ? safe_html($postData['post_tags']) : ""; ?>
+<?=(isset($formData['post_tags'])) ? safe_html($formData['post_tags']) : ""; ?>" maxlength="400">
+<p class="help-block">Comma separated</p>
+</div>
+
+<div class="form-group">
 <label>Content (required)</label>
-<textarea class="textarea" placeholder="Place some text here"
-style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" 
-name="post_content"  maxlength="10000"  required>
+<textarea class="textarea" placeholder="Place some text here" style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" name="post_content" maxlength="50000"  required>
 <?=(isset($postData['post_content'])) ? safe_html($postData['post_content']) : ""; ?>
 <?=(isset($formData['post_content'])) ? safe_html($formData['post_content']) : ""; ?>
 </textarea>
@@ -101,21 +106,19 @@ name="post_content"  maxlength="10000"  required>
 <label>Post status</label>
 <?=(isset($postStatus)) ? $postStatus : ""; ?>
 </div>
-<!-- /.post status -->
 
 <div class="form-group">
 <label>Comment status</label>
 <?=(isset($commentStatus)) ? $commentStatus : ""; ?>
 </div>
-<!-- /.comment status -->
 
 <?=(isset($medialibs)) ? $medialibs : "Media Not Found"; ?>
 
-<!-- /.box-body -->
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
 <input type="submit" class="btn btn-primary" name="postFormSubmit" value="<?=(isset($post_id) && ($post_id != '')) ? "Update" : "Publish"; ?>" >
 </div>
+
 </form>
             
 </div>
@@ -123,11 +126,10 @@ name="post_content"  maxlength="10000"  required>
 </div>
 <!-- /.col-md-12 -->
 </div>
-<!-- /.row --> 
+
 </section>
 
 </div>
-<!-- /.content-wrapper --->
 
 <script type="text/javascript">
   var loadFile = function(event) {
