@@ -42,6 +42,7 @@ public function findPosts($orderBy = 'ID', $author = null)
                 p.post_title, 
                 p.post_slug,
                 p.post_content, 
+                p.post_tags,
                 p.post_status, 
                 p.post_type, 
                 u.user_login
@@ -63,6 +64,7 @@ public function findPosts($orderBy = 'ID', $author = null)
                 p.post_title,
                 p.post_slug, 
                 p.post_content, 
+                p.post_tags,
                 p.post_status, 
                 p.post_type, 
                 u.user_login
@@ -97,6 +99,7 @@ public function findPosts($orderBy = 'ID', $author = null)
  * @param object $sanitize
  * @param string $author
  * @return boolean|array|object
+ * 
  */
 public function findPost($id, $sanitize, $author = null)
 {
@@ -115,6 +118,7 @@ public function findPost($id, $sanitize, $author = null)
                   post_content, 
                   post_summary, 
                   post_keyword, 
+                  post_tags,
                   post_status,
   	  		        post_type, 
                   comment_status
@@ -136,6 +140,7 @@ public function findPost($id, $sanitize, $author = null)
               post_content, 
               post_summary, 
               post_keyword, 
+              post_tags,
               post_status,
   	  		    post_type, 
               comment_status
@@ -165,7 +170,7 @@ public function showPostFeeds($limit = 5)
 {
   $sql =  "SELECT p.ID, p.media_id, p.post_author,
                   p.post_date, p.post_modified, p.post_title,
-                  p.post_slug, p.post_content, p.post_type,
+                  p.post_slug, p.post_content, p.post_tags, p.post_type,
                   p.post_status, u.user_login
             FROM tbl_posts AS p
             INNER JOIN tbl_users AS u ON p.post_author = u.ID
@@ -194,7 +199,8 @@ public function showPostById($id, $sanitize)
 {
     $sql = "SELECT p.ID, p.media_id, p.post_author,
                 p.post_date, p.post_modified, p.post_title,
-                p.post_slug, p.post_content, p.post_summary, p.post_keyword, 
+                p.post_slug, p.post_content, p.post_summary, 
+                p.post_keyword, p.post_tags,
                 p.post_status, p.post_type, p.comment_status, u.user_login
   		   FROM tbl_posts AS p
   		   INNER JOIN tbl_users AS u ON p.post_author = u.ID
@@ -222,7 +228,8 @@ public function showPostBySlug($slug)
   
   $sql = "SELECT p.ID, p.media_id, p.post_author,
                  p.post_date, p.post_modified, p.post_title,
-                 p.post_slug, p.post_content, p.post_summary, p.post_keyword, 
+                 p.post_slug, p.post_content, p.post_summary, 
+                 p.post_keyword, p.post_tags,
                  p.post_status, p.post_type, p.comment_status, u.user_login
           FROM tbl_posts AS p
           INNER JOIN tbl_users AS u ON p.post_author = u.ID
@@ -242,6 +249,7 @@ public function showPostBySlug($slug)
  * @param Paginator $perPage
  * @param object $sanitize
  * @return boolean|array[]|object[]|string[]
+ * 
  */
 public function showPostsPublished(Paginator $perPage, $sanitize)
 {
@@ -256,7 +264,8 @@ public function showPostsPublished(Paginator $perPage, $sanitize)
     
     $sql = "SELECT p.ID, p.media_id, p.post_author,
                      p.post_date, p.post_modified, p.post_title,
-                     p.post_slug, p.post_content, p.post_summary, p.post_keyword,
+                     p.post_slug, p.post_content, p.post_summary, 
+                     p.post_keyword, p.post_tags,
                      p.post_type, p.post_status, u.user_login
   			FROM tbl_posts AS p
   			INNER JOIN tbl_users AS u ON p.post_author = u.ID
@@ -284,7 +293,7 @@ public function showRelatedPosts($post_title)
 {
   
   $sql = "SELECT ID, media_id, post_author, post_date, post_modified, 
-                 post_title, post_slug, post_content, MATCH(post_title, post_content) 
+                 post_title, post_slug, post_content, post_tags, MATCH(post_title, post_content, post_tags) 
                  AGAINST(?) AS score
           FROM tbl_posts WHERE MATCH(post_title, post_content) AGAINTS(?)
           ORDER BY score ASC LIMIT 3";
@@ -317,6 +326,7 @@ public function createPost($bind, $topicId)
        'post_content' => $bind['post_content'],
        'post_summary' => $bind['post_summary'],
        'post_keyword' => $bind['post_keyword'],
+       'post_tags' => $bind['post_tags'],
        'post_status' => $bind['post_status'],
        'comment_status' => $bind['comment_status']
    ]);
@@ -331,6 +341,7 @@ public function createPost($bind, $topicId)
       'post_content' => $bind['post_content'],
       'post_summary' => $bind['post_summary'],
       'post_keyword' => $bind['post_keyword'],
+      'post_tags' => $bind['post_tags'],
       'post_status' => $bind['post_status'],
       'comment_status' => $bind['comment_status']
    ]);
@@ -343,19 +354,17 @@ public function createPost($bind, $topicId)
   			
   	foreach ($_POST['topic_id'] as $topicId) {
   	
-  	$stmt2 = $this->create("tbl_post_topic", [
+  	  $this->create("tbl_post_topic", [
   	    'post_id' => $postId,
-  	    'topic_id' => $topicId
-  	]);
+  	    'topic_id' => $topicId]);
   			
    }
   			
  } else {
  
-  $stmt2 = $this->create("tbl_post_topic", [
+    $this->create("tbl_post_topic", [
       'post_id' => $postId,
-      'topic_id' => $topicId
-  ]);
+      'topic_id' => $topicId]);
   
  }
  
@@ -373,7 +382,11 @@ public function updatePost($sanitize, $bind, $ID, $topicId)
         
  $cleanId = $this->filteringId($sanitize, $ID, 'sql');
 
- if (!empty($bind['media_id'])) {
+try {
+  
+  $this->callTransaction();
+
+  if (!empty($bind['media_id'])) {
   	  	
   	$this->modify("tbl_posts", [
   	    'media_id' => $bind['media_id'],
@@ -383,7 +396,8 @@ public function updatePost($sanitize, $bind, $ID, $topicId)
   	    'post_slug' => $bind['post_slug'],
   	    'post_content' => $bind['post_content'],
   	    'post_summary' => $bind['post_summary'],
-  	    'post_keyword' => $bind['post_keyword'],
+        'post_keyword' => $bind['post_keyword'],
+        'post_tags' => $bind['post_tags'],
   	    'post_status' => $bind['post_status'],
   	    'comment_status' => $bind['comment_status']
   	], "ID = {$cleanId}");
@@ -398,6 +412,7 @@ public function updatePost($sanitize, $bind, $ID, $topicId)
           'post_content' => $bind['post_content'],
           'post_summary' => $bind['post_summary'],
           'post_keyword' => $bind['post_keyword'],
+          'post_tags' => $bind['post_tags'],
           'post_status' => $bind['post_status'],
           'comment_status' => $bind['comment_status']
       ], "ID = {$cleanId}");
@@ -430,6 +445,16 @@ public function updatePost($sanitize, $bind, $ID, $topicId)
       ]);
       
   }
+  
+  $this->callCommit();
+  
+} catch (DbException $e) {
+  
+   $this->callRollBack();
+   $this->error = LogError::newMessage($e);
+   $this->error = LogError::customErrorMessage('admin');
+
+}
   	  
 }
 
@@ -438,6 +463,7 @@ public function updatePost($sanitize, $bind, $ID, $topicId)
  * 
  * @param integer $id
  * @param object $sanitizing
+ * 
  */
 public function deletePost($id, $sanitize)
 { 
@@ -451,6 +477,7 @@ public function deletePost($id, $sanitize)
  * @param integer $id
  * @param object $sanitizing
  * @return numeric
+ * 
  */
 public function checkPostId($id, $sanitizing)
 {
@@ -473,7 +500,7 @@ public function dropDownPostStatus($selected = "")
 {
   
   $name = 'post_status';
-  // list position in array
+  
   $posts_status = array('publish' => 'Publish', 'draft' => 'Draft');
  	
   if ($selected != '') {
@@ -497,8 +524,8 @@ public function dropDownPostStatus($selected = "")
 public function dropDownCommentStatus($selected = "")
 {
  	
-    $name = 'comment_status';
- 	// list position in array
+  $name = 'comment_status';
+ 	
  	$comment_status = array('open' => 'Open', 'closed' => 'Closed');
  	
  	if ($selected != '') {
