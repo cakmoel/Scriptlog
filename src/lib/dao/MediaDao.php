@@ -521,7 +521,7 @@ public function dropDownMediaTarget($selected = "")
 {
  $name = 'media_target';
 
- $media_target = array('blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery', 'page' => 'Page');
+ $media_target = array('blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery');
 
  if($selected != '') {
 
@@ -556,14 +556,18 @@ public function dropDownMediaStatus($selected = "")
 
 }
 
-public function dropDownMediaSelect($selected = "")
+public function dropDownMediaSelect($selected = null)
 {
 
   $dropdown  = '<div class="form-group">';
   $dropdown .= '<label>Uploaded image</label><br>';
-  $dropdown .= '<select name="image_id" class="selectpicker" >';
+  $dropdown .= '<br><select name="image_id" class="selectpicker" ><br><br>';
 
-  $selected = $selected;
+  if (is_null($selected)) {
+
+     $selected = "";
+
+  }
 
   $media_ids = [];
 
@@ -581,9 +585,9 @@ public function dropDownMediaSelect($selected = "")
            
            $media_properties = isset($media_meta['meta_value']) ? media_properties($media_meta['meta_value']) : null;
 
-           $select = $selected === $m ? ' selected' : null;
+           $select = $selected === $media['ID'] ? ' selected' : null;
 
-           $dropdown .= '<option data-content="<img src='.app_url().'public/files/pictures/thumbs/small_'.safe_html(basename($media['media_filename'])).'></img>" value="'.(int)$media['ID'].'"'.$select.'>'.safe_html($media_properties['Origin']).'</option>'."\n";
+           $dropdown .= '<option data-content="<img src='.app_url().'public/files/pictures/thumbs/small_'.basename(safe_html($media['media_filename'])).'></img>" value="'.(int)$media['ID'].'"'.$select.'>'.safe_html($media_properties['Origin']).'</option>'."\n";
 
        }
 
@@ -597,7 +601,7 @@ public function dropDownMediaSelect($selected = "")
 
 }
 
-public function mediaBlogImageUploaded($mediaId = null) 
+public function imageUploadHandler($mediaId = null) 
 {
 
   $mediablog  = '<div class="form-group">';
@@ -611,25 +615,27 @@ public function mediaBlogImageUploaded($mediaId = null)
 
      if (!$image_src_thumb) {
          
-         $image_src_thumb = app_url().'public/files/pictures/thumbs/nophoto.jpg';
+         $image_src_thumb = app_url().'/public/files/pictures/thumbs/nophoto.jpg';
 
      }
 
      if ($image_src) {
 
-       $mediablog .= '<a class="thumbnail" href="'.$image_src.'" ><img src="'.$image_src_thumb.'" class="img-responsive pad" width="320"></a>';
+       $mediablog .= '<a class="thumbnail" href="'.$image_src.'" ><img src="'.$image_src_thumb.'" class="img-responsive pad"></a>';
        $mediablog .= '<label>Change picture:</label>';
        $mediablog .= '<input type="file" name="image" id="file" accept="image/*" onchange="loadFile(event)" maxlength="512" >';
-       $mediablog .= '<img id="output" class="img-responsive pad" >';
-       $mediablog .= '<p class="help-block>Maximum file size: '.format_size_unit(697856).'</p>';
+       $mediablog .= '<input type="hidden" name="image_id"  value="'.$mediaId.'">';
+       $mediablog .= '<img id="output" class="img-responsive pad">';
+       $mediablog .= '<p class="help-block>Maximum file size: '.format_size_unit(APP_FILE_SIZE).'</p>';
         
      } else {
 
-        $mediablog .= '<br><img src="'.$image_src_thumb.'" class="img-responsive pad" width="320"><br>';
+        $mediablog .= '<br><img src="'.$image_src_thumb.'" class="img-responsive pad"><br>';
         $mediablog .= '<label>Change picture:</label>';
         $mediablog .= '<input type="file" name="image" id="file" accept="image/*" onchange="loadFile(event)"  maxlength="512" >';
+        $mediablog .= '<input type="hidden" name="image_id"  value="'.$mediaId.'">';
         $mediablog .= '<img id="output" class="img-responsive pad">';
-        $mediablog .= '<p class="help-block">Maximum file size:'.format_size_unit(697856).'</p>';
+        $mediablog .= '<p class="help-block">Maximum file size:'.format_size_unit(APP_FILE_SIZE).'</p>';
 
      }
 
@@ -639,7 +645,7 @@ public function mediaBlogImageUploaded($mediaId = null)
     $mediablog .= '<label for="image-upload" id="image-label">Choose picture</label>';
     $mediablog .= '<input type="file" name="media" id="image-upload" accept="image/*" maxlength="512" >';
     $mediablog .= '</div>';
-    $mediablog .= '<p class="help-block"> Maximum file size: '.format_size_unit(697856).'</p>'; 
+    $mediablog .= '<p class="help-block"> Maximum file size: '.format_size_unit(APP_FILE_SIZE).'</p>'; 
   
   }
  
