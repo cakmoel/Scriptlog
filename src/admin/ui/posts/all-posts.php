@@ -94,7 +94,7 @@
                        <i class="fa fa-pencil fa-fw"></i> Edit</a>
                        </td>
                        <td>
-                       <a href="javascript:deletePost('<?= abs((int)$post['ID']); ?>', '<?= $post['post_title']; ?>')" class="btn btn-danger">
+                       <a href="javascript:deletePost('<?= abs((int)$post['ID']); ?>', '<?= safe_html($post['post_title']); ?>')" class="btn btn-danger">
                        <i class="fa fa-trash-o fa-fw"></i> Delete</a>
                        </td>
                     
