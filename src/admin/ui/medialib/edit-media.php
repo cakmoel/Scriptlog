@@ -69,7 +69,7 @@ if (isset($mediaData['media_filename'])) :
 
      if(!$image_src_thumb) :
       
-      $image_src_thumb = __DIR__ . '/../../../public/files/pictures/thumbs/nophoto.jpg';
+      $image_src_thumb = app_url().'/public/files/pictures/thumbs/nophoto.jpg';
 
      endif;
 
@@ -78,7 +78,7 @@ if (isset($mediaData['media_filename'])) :
 ?>
 
 <div class="form-group">
-<a class="thumbnail" href="<?=$image_src;?>" target="_blank"><img src="<?=$image_src_thumb;?>" class="img-responsive pad" width="320"></a>
+<a class="thumbnail" href="<?=$image_src;?>"><img src="<?=$image_src_thumb;?>" class="img-responsive pad" width="320"></a>
 <label for="ChangePicture">Change picture</label>
 <input type="file"  name="media" id="mediaUploaded" accept="image/*" onchange="loadFile(event)" maxlength="512" >
 <img id="output" class="img-responsive pad" >
