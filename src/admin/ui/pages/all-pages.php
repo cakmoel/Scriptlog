@@ -5,7 +5,7 @@
     <section class="content-header">
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
-        <small><a href="index.php?load=pages&action=newPage&pageId=0"
+        <small><a href="index.php?load=pages&action=newPage&Id=0"
 					class="btn btn-primary"> <i
 					class="fa fa-plus-circle"></i> Add New
 				</a></small>
@@ -90,11 +90,11 @@
                        <td><?= htmlspecialchars(make_date($page['post_date'])); ?></td>
                        
                        <td>
-                       <a href="index.php?load=pages&action=editPage&pageId=<?= htmlspecialchars((int)$page['ID']);?>" class="btn btn-warning">
+                       <a href="<?=generate_request('index.php', 'get', ['pages', 'editPage', $page['ID']])['link']; ?>" class="btn btn-warning">
                        <i class="fa fa-pencil fa-fw"></i> Edit</a>
                        </td>
                        <td>
-                       <a href="javascript:deletePage('<?= abs((int)$page['ID']); ?>', '<?= $page['post_title']; ?>')" class="btn btn-danger">
+                       <a href="javascript:deletePage('<?= abs((int)$page['ID']); ?>', '<?= safe_html($page['post_title']); ?>')" class="btn btn-danger">
                        <i class="fa fa-trash-o fa-fw"></i> Delete</a>
                        </td>
                        
