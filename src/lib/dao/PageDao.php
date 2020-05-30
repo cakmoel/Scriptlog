@@ -53,7 +53,7 @@ public function findPages($type, $orderBy = 'ID')
  */
 public function findPageById($pageId, $post_type, $sanitize)
 {
-    $sql = "SELECT ID, post_image, post_author,
+    $sql = "SELECT ID, media_id, post_author,
   	  	      post_date, post_modified, post_title,
   	  	      post_slug, post_content, post_status,
   	  	      post_type, comment_status
@@ -80,7 +80,7 @@ public function findPageById($pageId, $post_type, $sanitize)
 public function findPageBySlug($slug, $sanitize)
 {
     $sql = "SELECT
-              tbl_posts.ID, tbl_posts.post_image, 
+              tbl_posts.ID, tbl_posts.media_id, 
 			  tbl_posts.post_author, tbl_posts.post_date, 
 			  tbl_posts.post_modified, tbl_posts.post_title,
   	  	      tbl_posts.post_slug, tbl_posts.post_content,  
@@ -107,17 +107,21 @@ public function findPageBySlug($slug, $sanitize)
  * Insert new page
  * 
  * @param array $bind
+ * 
  */
 public function createPage($bind)
 {
  
- if (!empty($bind['post_image'])) {
+ if (!empty($bind['media_id'])) {
  
  	$this->create("tbl_posts", [
- 	    'post_image' => $bind['post_image'],
+ 	    'media_id' => $bind['media_id'],
  	    'post_author' => $bind['post_author'],
- 	    'post_date' => $bind['post_date'],
- 	    'post_content' => $bind['post_content'],
+		'post_date' => $bind['post_date'],
+		'post_title' => $bind['post_title'], 
+		'post_content' => $bind['post_content'],
+		'post_summary' => $bind['post_summary'],
+		'post_keyword' => $bind['post_keyword'], 
  	    'post_status' => $bind['post_status'],
  	    'post_type' => $bind['post_type'],
  	    'comment_status' => $bind['comment_status']
@@ -127,8 +131,11 @@ public function createPage($bind)
  	
  	$this->create("tbl_posts", [
  	    'post_author' => $bind['post_author'],
- 	    'post_date' => $bind['post_date'],
- 	    'post_content' => $bind['post_content'],
+		'post_date' => $bind['post_date'],
+		'post_title' => $bind['post_title'], 
+		'post_content' => $bind['post_content'],
+		'post_summary' => $bind['post_summary'],
+		'post_keyword' => $bind['post_keyword'], 
  	    'post_status' => $bind['post_status'],
  	    'post_type' => $bind['post_type'],
  	    'comment_status' => $bind['comment_status']
@@ -149,23 +156,29 @@ public function updatePage($sanitize, $bind, $ID)
  
  $cleanId = $this->filteringId($sanitize, $ID, 'sql');
 
- if (empty($bind['post_image'])) {
+ if (empty($bind['media_id'])) {
  
  	$this->modify("tbl_posts", [
  	    'post_modified' => $bind['post_modified'],
  	    'post_title' => $bind['post_title'],
- 	    'post_slug' => $bind['post_slug'],
+		'post_slug' => $bind['post_slug'],
+		'post_content' => $bind['post_content'], 
+		'post_summary' => $bind['post_summary'],
+		'post_keyword' => $bind['post_keyword'],
  	    'post_status' => $bind['post_status'],
  	    'comment_status' => $bind['comment_status']
- 	], "ID = {$cleanId}"." AND `post_type` = {$bind['post_type']}");
+ 	    ], "ID = {$cleanId}"." AND `post_type` = {$bind['post_type']}");
  	
  } else {
  	
  	$this->modify("tbl_posts", [
- 	    'post_image' => $bind['post_image'],
+ 	    'media_id' => $bind['media_id'],
  	    'post_modified' => $bind['post_modified'],
  	    'post_title' => $bind['post_title'],
- 	    'post_slug' => $bind['post_slug'],
+		'post_slug' => $bind['post_slug'],
+		'post_content' => $bind['post_content'],
+		'post_summary' => $bind['post_summary'],
+		'post_keyword' => $bind['post_keyword'], 
  	    'post_status' => $bind['post_status'],
  	    'comment_status' => $bind['comment_status']
  	    ], "ID = {$cleanId}"." AND `post_type` = {$bind['post_type']}");
@@ -233,15 +246,15 @@ public function dropDownPostStatus($selected = "")
 public function dropDownCommentStatus($selected = '')
 {
     
-    $name = 'comment_status';
-    // list position in array
-    $comment_status = array('open' => 'Open', 'close' => 'Close');
+ $name = 'comment_status';
     
-    if ($selected != '') {
-        $selected = $selected;
-    }
+ $comment_status = array('open' => 'Open', 'close' => 'Close');
     
-    return dropdown($name, $comment_status, $selected);
+ if ($selected != '') {
+    $selected = $selected;
+ }
+    
+ return dropdown($name, $comment_status, $selected);
     
 }
 
