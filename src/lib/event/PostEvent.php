@@ -62,6 +62,15 @@ class PostEvent
    * @var string
    */
   private $meta_key;
+
+  /**
+   * post's tags
+   * the tags will be added to the posts
+   * 
+   * @var string
+   * 
+   */
+  private $post_tags;
   
   /**
    * post's status
@@ -190,6 +199,20 @@ class PostEvent
   }
   
   /**
+   * set post's tag
+   * adding tag to the posts
+   * 
+   * @param string $tags
+   * @return void
+   * 
+   */
+  public function setPostTags($tags)
+  {
+    $this->post_tags = prevent_injection($tags);
+
+  }
+
+  /**
    * set post's status
    * published or save as draft
    * 
@@ -261,10 +284,10 @@ class PostEvent
      $this->validator->sanitize($this->post_image, 'int');
      $this->validator->sanitize($this->title, 'string');
      
-     if ((!empty($this->meta_desc)) || (!empty($this->meta_key))) {
-      $this->validator->sanitize($this->meta_desc, 'string');
-      $this->validator->sanitize($this->meta_key, 'string');
-
+     if ((!empty($this->meta_desc)) || (!empty($this->meta_key)) || (!empty($this->post_tags))) {
+        $this->validator->sanitize($this->meta_desc, 'string');
+        $this->validator->sanitize($this->meta_key, 'string');
+        $this->validator->sanitize($this->post_tags, 'string');
      }
      
      if ($this->topics == 0) {
@@ -282,6 +305,7 @@ class PostEvent
           'post_content' => $this->content,
           'post_summary' => $this->meta_desc,
           'post_keyword' => $this->meta_key,
+          'post_tags' => $this->post_tags,
           'post_status' => $this->post_status,
           'comment_status' => $this->comment_status
       ], $getCategory['ID']);
@@ -297,6 +321,7 @@ class PostEvent
             'post_content' => $this->content,
             'post_summary' => $this->meta_desc,
             'post_keyword' => $this->meta_key,
+            'post_tags' => $this->post_tags,
             'post_status' => $this->post_status,
             'comment_status' => $this->comment_status
           ], $this->topics);
@@ -313,13 +338,13 @@ class PostEvent
      $this->validator->sanitize($this->post_image, 'int');
      $this->validator->sanitize($this->title, 'string');
      
-     if ((!empty($this->meta_desc)) || (!empty($this->meta_key))) {
-       $this->validator->sanitize($this->meta_desc, 'string');
-       $this->validator->sanitize($this->meta_key, 'string');
+     if ((!empty($this->meta_desc)) || (!empty($this->meta_key)) || (!empty($this->post_tags))) {
+         $this->validator->sanitize($this->meta_desc, 'string');
+         $this->validator->sanitize($this->meta_key, 'string');
+         $this->validator->sanitize($this->post_tags, 'string');
      }
       
-    
-    if (!empty($this->post_image)) {
+    if (empty($this->post_image)) {
           
         return $this->postDao->updatePost($this->sanitizer, [
             'post_author' => $this->author,
@@ -329,6 +354,7 @@ class PostEvent
             'post_content' => $this->content,
             'post_summary' => $this->meta_desc,
             'post_keyword' => $this->meta_key,
+            'post_tags' => $this->post_tags,
             'post_status' => $this->post_status,
             'comment_status' => $this->comment_status
         ], $this->postId, $this->topics);
@@ -344,6 +370,7 @@ class PostEvent
             'post_content' => $this->content,
             'post_summary' => $this->meta_desc,
             'post_keyword' => $this->meta_key,
+            'post_tags' => $this->post_tags,
             'post_status' => $this->post_status,
             'comment_status' => $this->comment_status
         ], $this->postId, $this->topics);
@@ -366,15 +393,16 @@ class PostEvent
     $media_id = $data_post['media_id'];
     
     $medialib = new MediaDao();
-    $media_data = $medialib->findMediaById((int)$media_id, $this->sanitizer);
+    $media_data = $medialib->findMediaBlog((int)$media_id);
     $post_image = basename($media_data['media_filename']);
 
     if ($post_image !== '') {
         
        if (is_readable(__DIR__ . '/../../public/files/pictures/'.$post_image)) {
            
-           unlink(__DIR__ . '/../../public/files/pictures'.$post_image);
-           unlink(__DIR__ . '/../../public/files/pictures/thumbs/thumbs_'.$post_image);
+           unlink(__DIR__ . '/../../public/files/pictures/'.$post_image);
+           unlink(__DIR__ . '/../../public/files/pictures/thumbs/medium_'.$post_image);
+           unlink(__DIR__ . '/../../public/files/pictures/thumbs/small_'.$post_image);
            
        }
        
@@ -404,6 +432,7 @@ class PostEvent
    * 
    * @param string $selected
    * @return string
+   * 
    */
   public function commentStatusDropDown($selected = "")
   {
@@ -411,7 +440,8 @@ class PostEvent
   }
  
   /**
-   * Checking whether author session exists
+   * postAuthorId
+   * Checking whether author cookie_id or session_id exists
    * 
    * @return string
    * 
@@ -435,6 +465,13 @@ class PostEvent
 
   }
 
+/**
+ * postAuthorLevel
+ * Checking whether author cookie_level or session_level exists
+ *
+ * @return void
+ * 
+ */
  public function postAuthorLevel()
  {
  
