@@ -7,9 +7,9 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  * 
  */
-if (file_exists(__DIR__ . '/../config.sample.php')) {
+if (file_exists(__DIR__ . '/../config.php')) {
     
-    include __DIR__ . '/../lib/main-dev.php';
+    include __DIR__ . '/../lib/main.php';
     require __DIR__ . '/authorizer.php';
 
     if ((isset($ubench)) && (true === APP_DEVELOPMENT)) {
@@ -25,46 +25,47 @@ if (file_exists(__DIR__ . '/../config.sample.php')) {
        
 }
 
-if (!$isUserLoggedIn) {
+if (!$loggedIn) {
    
    header("Location: login.php");
    exit();
    
-} 
+} else {
 
-$user_id = isset($_COOKIE['cookie_user_id']) ? $_COOKIE['cookie_user_id'] : $_SESSION['user_id'];
-$user_email = isset($_COOKIE['cookie_user_email']) ? $_COOKIE['cookie_user_email'] : $_SESSION['user_email'];
-$user_level = isset($_COOKIE['cookie_user_level']) ? $_COOKIE['cookie_user_level'] : $_SESSION['user_level'];
-$user_login = isset($_COOKIE['cookie_user_login']) ? $_COOKIE['cookie_user_login'] : $_SESSION['user_login'];
-$user_session = user_info($authenticator, $user_login)['user_session'];
+    $user_id = (isset($_COOKIE['scriptlog_cookie_id'])) ? $_COOKIE['scriptlog_cookie_id'] : Session::getInstance()->scriptlog_session_id;
+    $user_email = (isset($_COOKIE['scriptlog_cookie_email'])) ? $_COOKIE['scriptlog_cookie_email'] : Session::getInstance()->scriptlog_session_email;
+    $user_level = (isset($_COOKIE['scriptlog_cookie_level'])) ? $_COOKIE['scriptlog_cookie_level'] : Session::getInstance()->scriptlog_session_level;
+    $user_login = (isset($_COOKIE['scriptlog_cookie_login'])) ? $_COOKIE['scriptlog_cookie_login'] : Session::getInstance()->scriptlog_session_login;
+    $user_session = user_info($authenticator, $user_login)['user_session'];
+        
+    // BreadCrumbs
+    $breadCrumbs = isset($_GET['load']) ? htmlentities(sanitize_urls($_GET['load']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : http_response_code();
     
-// BreadCrumbs
-$breadCrumbs = isset($_GET['load']) ? htmlentities(sanitize_urls($_GET['load']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : http_response_code();
-
-// StylePath
-$stylePath = $config['app']['url'] . APP_ADMIN;
-
-// Current URL
-$currentURL = APP_PROTOCOL . '://'. APP_HOSTNAME . dirname($_SERVER['PHP_SELF']) . DS;
-
-// Allowed query
-$allowedQuery = array('dashboard', 'posts', 'medialib',
-                      'pages', 'topics', 'comments', 'templates', 
-                      'menu', 'menu-child', 'users', 'settings', 
-                      'plugins', 'logout', '403', '404');    
-
-// retrieve plugin actived -- for administrator
-$plugin_navigation = setplugin($user_level, 'private');
-
-include 'admin-layout.php';
-
-admin_header($stylePath, $breadCrumbs, $allowedQuery);
-
-include 'navigation.php';
-
-include 'request.php';
-
-admin_footer($currentURL, $ubench);
-
-ob_end_flush();
+    // Current URL
+    $currentURL =  preg_replace("/\/index\.php.*$/i", "", app_url().DS.APP_ADMIN);
     
+    // Allowed query
+    $allowedQuery = array('dashboard'=>'dashboard.php', 'posts'=>'posts.php', 'medialib'=>'medialib.php',
+                          'pages'=>'pages.php', 'topics'=>'topics.php', 'comments'=>'comments.php', 
+                          'reply'=>'reply.php', 'templates'=>'templates.php', 'menu'=>'menu.php', 
+                          'menu-child'=>'menu-child.php', 'users'=>'users.php', 'option-general'=>'option-general.php', 
+                          'option-permalink'=>'option-permalink.php', 'plugins'=>'plugins.php', 
+                          'logout'=>'logout.php', '403'=>'403.php', '404'=>'404.php');    
+    
+    // retrieve plugin actived -- for administrator
+    $plugin_navigation = setplugin($user_level, 'private');
+    
+    include dirname(__FILE__) . '/admin-layout.php';
+    
+    admin_header($currentURL, $breadCrumbs, $allowedQuery);
+    
+    include dirname(__FILE__) . '/navigation.php';
+    
+    include dirname(__FILE__) . '/request.php';
+    
+    admin_footer($currentURL, $ubench);
+    
+    ob_end_flush();
+    
+}
+
