@@ -1,16 +1,16 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed");
 
 $load = null;
-
-$current_request = (isset($_SERVER['REQUEST_METHOD'])) ? $_SERVER['REQUEST_METHOD'] : "";
+$current_request = current_request_method();
+$method_allowed = ['GET', 'POST'];
 
 try {
 
-    if ((isset($_GET['load'])) || (array_key_exists('load', $_GET))) {
+   if ((isset($_GET['load'])) || (array_key_exists('load', $_GET))) {
      
-        $load = htmlentities(strip_tags(strtolower(basename($_GET['load']))), ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');
+        $load = htmlentities(strip_tags(strtolower($_GET['load'])), ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');
         $load = filter_var($load, FILTER_SANITIZE_URL);
-
+       
         // checking if the string contains parent directory
         if (strstr($_GET['load'], '../') !== false) {
             
@@ -63,40 +63,57 @@ try {
         }
 
         if ((!is_readable(dirname(dirname(__FILE__)) .DS. APP_ADMIN .DS."{$load}.php")) 
-            || (empty($load)) || (!in_array($load, $allowedQuery, true)) ) {
-        
+            || (empty($load)) || (!in_array($load, array_keys($allowedQuery)))) {
+
             header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-            throw new AppException("404 - Page requested not found");
-        
+            throw new AppException(" 404 Page requested not found");
+
         } else {
-        
-           if (false === $authenticator -> userAccessControl()) {
 
-               http_response_code(403);
-               throw new AppException("403 - Forbidden");
+            if (false === $authenticator -> userAccessControl()) {
 
-           } else {
-               
-               if (true === block_request_type($current_request)) {
-                 
-                  http_response_code(405);
-                  throw new AppException("405 - Method Not Allowed");
-
-               } else {
-
-                  include __DIR__ . DS . $load .'.php';
+                http_response_code(403);
+                throw new AppException("403 - Forbidden");
+ 
+            } else {
+                
+                if (true === block_request_type($current_request, $method_allowed)) {
                   
-               }
-            
-           }
-           
+                   http_response_code(405);
+                   throw new AppException("405 - Method Not Allowed");
+ 
+                } else {
+ 
+                    include __DIR__ . DS . basename($load).'.php';
+                   
+                }
+             
+            }
+             
         }
-    
+
     } else {
 
-        header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-        throw new AppException("404 - Page requested not found");
+        if (false === $authenticator->userAccessControl()) {
 
+            http_response_code(403);
+            throw new AppException("403 Forbidden");
+
+        } else {
+
+            if (true === block_request_type($current_request, $method_allowed)) {
+
+                 http_response_code(405);
+                 throw new AppException("405 - Method Not Allowed");
+
+            } else {
+
+                direct_page('index.php?load=dashboard', 302);
+
+            }
+            
+        }
+        
     }
     
 } catch (AppException $e) {
