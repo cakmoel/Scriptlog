@@ -44,20 +44,12 @@ if (!$loggedIn) {
     // Current URL
     $currentURL =  preg_replace("/\/index\.php.*$/i", "", app_url().DS.APP_ADMIN);
     
-    // Allowed query
-    $allowedQuery = array('dashboard'=>'dashboard.php', 'posts'=>'posts.php', 'medialib'=>'medialib.php',
-                          'pages'=>'pages.php', 'topics'=>'topics.php', 'comments'=>'comments.php', 
-                          'reply'=>'reply.php', 'templates'=>'templates.php', 'menu'=>'menu.php', 
-                          'menu-child'=>'menu-child.php', 'users'=>'users.php', 'option-general'=>'option-general.php', 
-                          'option-permalink'=>'option-permalink.php', 'plugins'=>'plugins.php', 
-                          'logout'=>'logout.php', '403'=>'403.php', '404'=>'404.php');    
-    
     // retrieve plugin actived -- for administrator
     $plugin_navigation = setplugin($user_level, 'private');
     
     include dirname(__FILE__) . '/admin-layout.php';
     
-    admin_header($currentURL, $breadCrumbs, $allowedQuery);
+    admin_header($currentURL, $breadCrumbs, admin_query());
     
     include dirname(__FILE__) . '/navigation.php';
     
