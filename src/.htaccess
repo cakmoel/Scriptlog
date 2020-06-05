@@ -4,7 +4,7 @@
 ################################
 
 # Hide the following from the world
-<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|sql)$">
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|sql|tpl)$">
  Order Allow,Deny
  Deny from all
 </FilesMatch>
@@ -15,7 +15,7 @@
  #Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
  Header set Connection keep-alive
  Header set Referrer-Policy "no-referrer-when-downgrade"
- <FilesMatch ".(js|css|ico|txt|htm|html|png|jpg|gif|js|eot|svg|ttf|woff|woff2|php)$">
+ <FilesMatch ".(js|css|ico|txt|htm|html|png|jpg|webp|gif|js|eot|svg|ttf|woff|woff2|php)$">
    Header set Cache-Control "max-age=31536000, public"
  </FilesMatch>
 </IfModule>
@@ -23,7 +23,7 @@
 ############### SET COOKIES DOMAIN ##################
 # Use Mod_deflate to compress static files
 <IfModule mod_deflate.c>
- <Filesmatch ".(js|css|ico|txt|htm|html|png|jpg|gif|js|eot|svg|ttf|woff|woff2|php)$">
+ <Filesmatch ".(js|css|ico|txt|htm|html|png|jpg|gif|webp||js|eot|svg|ttf|woff|woff2|php)$">
  SetOutputFilter DEFLATE
  </Filesmatch>
 </IfModule>
@@ -41,7 +41,7 @@ RewriteEngine On
 #RewriteRule ^/?$ "https\:\/\/yourdomain\.TLD\/" [R=301, L]
 
 # Ensure all front-end UI-UX files readable
-RewriteCond %{REQUEST_FILENAME} !\.(ico|css|png|jpg|gif|js|eot|svg|ttf|woff|woff2)$ [NC]
+RewriteCond %{REQUEST_FILENAME} !\.(ico|css|png|jpg|webp|gif|js|eot|svg|ttf|woff|woff2)$ [NC]
 RewriteRule ^public/.*$ index.php
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
