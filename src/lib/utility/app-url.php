@@ -13,7 +13,15 @@ function app_url()
       
       if(filter_var(app_info()['app_url'], FILTER_VALIDATE_URL)) {
           
-        return app_info()['app_url'];
+        if(substr(app_info()['app_url'], -1) == DIRECTORY_SEPARATOR) {
+
+             return rtrim(app_info()['app_url'], DIRECTORY_SEPARATOR);
+
+        } else {
+
+             return app_info()['app_url'];
+
+        }
         
       }
 

@@ -51,7 +51,7 @@ class Dispatcher
 
     if (!$themeActived = $this->invokeTheme()) {
         
-      include(APP_ROOT.APP_PUBLIC.DS.'themes'.DS.'maintenance.php');
+        include(APP_ROOT.APP_PUBLIC.DS.'themes'.DS.'maintenance.php');
       
     } else {
 

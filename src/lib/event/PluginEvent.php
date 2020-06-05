@@ -60,6 +60,12 @@ class PluginEvent
    */
   private $sort;
   
+  private $pluginDao;
+
+  private $validator;
+
+  private $sanitize;
+  
   /**
    * Constructor
    * 

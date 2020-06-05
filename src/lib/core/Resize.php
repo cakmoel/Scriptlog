@@ -44,14 +44,16 @@ class Resize
         switch ($extension) {
             case '.jpg':
             case '.jpeg':
-                $img = @imagecreatefromjpeg($file);
+                $img = imagecreatefromjpeg($file);
                 break;
             case '.gif':
-                $img = @imagecreatefromgif($file);
+                $img = imagecreatefromgif($file);
                 break;
             case '.png':
-                $img = @imagecreatefrompng($file);
+                $img = imagecreatefrompng($file);
                 break;
+            case '.webp':
+                $img = imagecreatefromwebp($file);
             default:
                 $img = false;
                 break;
@@ -106,10 +108,12 @@ class Resize
                 $optimalHeight = $optionArray['optimalHeight'];
                 break;
         }
+        
         return array(
             'optimalWidth' => $optimalWidth,
             'optimalHeight' => $optimalHeight
         );
+
     }
 
     // # --------------------------------------------------------
@@ -229,14 +233,27 @@ class Resize
                 }
                 break;
             
+            case '.webp':
+
+                if (imagetypes() && IMG_WEBP) {
+
+                    imagewebp($this->imageResized, $savePath);
+
+                }
+
+                break;
             // ... etc
-            
             default:
                 // *** No extension - No save.
                 break;
         }
         
-        imagedestroy($this->imageResized);
+        if(is_resource($this->imageResized)) {
+
+            imagedestroy($this->imageResized);
+            
+        }
+        
     }
     
     // # --------------------------------------------------------

@@ -24,7 +24,6 @@ function markdown_html($text)
   $text = preg_replace('/_([^_]+)_/', '<em>$1</em>', $text);
   $text = preg_replace('/\*([^\*]+)\*/', '<em>$1</em>', $text);
 
-
   // convert windows (\r\n) to unix(\n)
   $text = str_replace("\r\n", "\n", $text);
   // convert macintosh(\r) to unix(\n)

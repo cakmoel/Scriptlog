@@ -12,17 +12,19 @@ function invoke_image_uploaded($media_filename, $image_thumb = true)
 
    $image_dir =  __DIR__ . '/../../public/files/pictures/thumbs/small_'.$media_filename;
 
+   $image_src = null;
+
    if (is_readable($image_dir)) {
 
        if ($image_thumb) {
 
-          $image_src = app_url().APP_IMAGE.'thumbs/small_'.$media_filename;
+          $image_src = app_url().DS.APP_IMAGE_THUMB.'small_'.rawurlencode(basename($media_filename));
 
           return $image_src;
 
        } else {
 
-          $image_src = app_url().APP_IMAGE.rawurlencode(basename($media_filename));
+          $image_src = app_url().DS.APP_IMAGE.rawurlencode(basename($media_filename));
 
           return $image_src;
 

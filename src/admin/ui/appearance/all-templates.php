@@ -6,7 +6,7 @@
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
         <small>
-        <a href="index.php?load=templates&action=newTheme&themeId=0" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Add New</a>
+        <a href="<?= generate_request('index.php', 'get', ['templates', ActionConst::NEWTHEME, 0])['link']; ?>" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Add New</a>
         </small>
       </h1>
       <ol class="breadcrumb">
@@ -78,28 +78,28 @@
                  <?php 
                    if (is_array($themes)) : 
                    $no = 0;
-                   foreach ($themes as $p => $theme) :
+                   foreach ($themes as $theme) :
                    $no++;
                   ?>
               
                     <tr>
                        <td><?= $no; ?></td>
                        <td>
-                       <a href="index.php?load=templates&action=editTheme&themeId=<?= htmlspecialchars((int)$theme['ID']);?>"><?= htmlspecialchars($theme['theme_title']); ?>
+                       <a href="index.php?load=templates&action=editTheme&Id=<?= safe_html((int)$theme['ID']);?>"><?= safe_html($theme['theme_title']); ?>
                        </a>
                        </td>
-                       <td><?= html_entity_decode($theme['theme_designer']); ?></td>
-                       <td><?= htmlspecialchars($theme['theme_directory']); ?></td>
+                       <td><?= safe_html($theme['theme_designer']); ?></td>
+                       <td><?= safe_html($theme['theme_directory']); ?></td>
                        <td>
-                       <a href="index.php?load=templates&action=editTheme&themeId=<?= htmlspecialchars((int)$theme['ID']);?>" class="btn btn-warning">
+                       <a href="index.php?load=templates&action=editTheme&Id=<?= safe_html((int)$theme['ID']);?>" class="btn btn-warning">
                        <i class="fa fa-pencil fa-fw"></i> Edit</a>
                        </td>
                        <td>
                        <?php if($theme['theme_status'] == 'N') : ?>
-                       <a href="javascript:activateTheme('<?= abs((int)$theme['ID']); ?>', '<?= $theme['theme_title']; ?>')" class="btn btn-success" title="Activate theme">
+                       <a href="javascript:activateTheme('<?= abs((int)$theme['ID']); ?>', '<?= safe_html($theme['theme_title']); ?>')" class="btn btn-success" title="Activate theme">
                        <i class="fa fa-check fa-fw"></i> Activate</a>
                        <?php else : ?>
-                       <a href="javascript:deactivateTheme('<?= abs((int)$theme['ID']); ?>', '<?= $theme['theme_title']; ?>')" class="btn btn-danger" title="Deactivate theme">
+                       <a href="javascript:deactivateTheme('<?= abs((int)$theme['ID']); ?>', '<?= safe_html($theme['theme_title']); ?>')" class="btn btn-danger" title="Deactivate theme">
                        <i class="fa fa-times-circle fa-fw"></i> Deactivate</a>
                        <?php endif; ?>
                        </td>
@@ -140,7 +140,7 @@
   {
 	  if (confirm("Are you sure want to activate Theme '" + theme + "'"))
 	  {
-	  	window.location.href = 'index.php?load=templates&action=activateTheme&themeId=' + id;
+	  	window.location.href = 'index.php?load=templates&action=activateTheme&Id=' + id;
 	  }
   }
 
@@ -148,7 +148,7 @@
   {
 	  if (confirm("Are you sure want to deactivate theme '" + theme + "'"))
 	  {
-	  	window.location.href = 'index.php?load=templates&action=deactivatTheme&themeId=' + id;
+	  	window.location.href = 'index.php?load=templates&action=deactivatTheme&Id=' + id;
 	  }
   }
 </script>

@@ -85,7 +85,7 @@ class ThemeApp extends BaseApp
 
         if ($this->themeEvent->isThemeExists($theme_title) === true) {
           $checkError = false;
-          array_push($errors, "Sorr, you have installed this theme before.");
+          array_push($errors, "Sorry, you have installed this theme before.");
         }
 
         if (!$checkError) {
@@ -154,7 +154,6 @@ class ThemeApp extends BaseApp
 
       try {
 
-
         if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
          
           header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
@@ -165,7 +164,7 @@ class ThemeApp extends BaseApp
         if ((empty($file_location))) {
            
           $checkError = false;
-          array_push($errors, "if you .");
+          array_push($errors, "Please upload your selected file");
 
         }
 
@@ -332,6 +331,13 @@ class ThemeApp extends BaseApp
     $this->themeEvent->setThemeId($id);
     $this->themeEvent->removeTheme();
     direct_page('index.php?load=templates&status=themeDeleted', 200);
+  }
+
+  public function enableTheme($id)
+  {
+    $this->themeEvent->setThemeId($id);
+    $this->themeEvent->activateInstalledTheme();
+    direct_page('index.php?load=templates&status=themeActived', 200);
   }
 
   protected function setView($viewName)

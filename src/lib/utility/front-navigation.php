@@ -9,7 +9,7 @@
 function front_navigation()
 {
   
-  $navigation = new Menu();
+  $navigation = new MenuDao();
   return $navigation -> findFrontNavigation(find_request()[0]);
 
 }

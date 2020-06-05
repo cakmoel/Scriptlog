@@ -51,9 +51,8 @@ echo "Error saving data. Please try again." . $saveError;
 endif;
 ?>
 
-<form method="post" action="index.php?load=plugins&action=<?=(isset($formAction)) ? $formAction : null; ?>&pluginId=0" 
-  role="form" onsubmit="return(mandatoryPluginUpload());" enctype="multipart/form-data" autocomplete="off">
-  <input type="hidden" name="MAX_FILE_SIZE" value="10485760" />
+<form method="post" action="index.php?load=plugins&action=<?=(isset($formAction)) ? $formAction : null; ?>&Id=0" role="form" onsubmit="return(mandatoryPluginUpload());" enctype="multipart/form-data" autocomplete="off">
+<input type="hidden" name="MAX_FILE_SIZE" value="10485760" />
 <div class="box-body">
 
 <div class="form-group">
@@ -70,7 +69,7 @@ endif;
 </div>
 
 <div class="form-group">
-<label>Level</label>
+<label>Access</label>
 <?=(isset($pluginLevel)) ? $pluginLevel : ""; ?>
 </div>
 <!-- /.plugin level -->

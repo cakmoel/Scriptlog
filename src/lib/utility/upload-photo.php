@@ -49,7 +49,7 @@ function upload_photo($file_location, $file_size, $file_type, $file_name)
  
  list($current_width, $current_height) = getimagesize($file_location);
 
-if($file_type == "image/jpeg" || $file_type == "image/jpg" || $file_type == "image/png" || $file_type == "image/gif") {
+ if($file_type == "image/jpeg" || $file_type == "image/jpg" || $file_type == "image/png" || $file_type == "image/gif") {
 
   if(false === set_webp_regular($current_width, $current_height, $file_location, $file_size, $image_uploaded, $image_path, $file_name)) {
 

@@ -53,12 +53,11 @@ public function createConfig($bind)
  */
 public function updateConfig($sanitize, $bind, $ID)
 {
-	
   $cleanId = $this->filteringId($sanitize, $ID, 'sql');
 
   $this->modify("tbl_settings", [
 	  'setting_name' => $bind['setting_name'],
-	  'setting_value' => $bind['setting_value'],
+	  'setting_value' => $bind['setting_value']
   ], "`ID` = {$cleanId}");
 
 }
@@ -100,6 +99,48 @@ public function findConfigs($orderBy = 'ID')
 }
 
 /**
+ * Find general configurations
+ *
+ * @param string $orderBy
+ * @param integer $limit
+ * @return void
+ * 
+ */
+public function findGeneralConfigs($orderBy = 'ID', $limit = 7)
+{
+ $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings ORDER BY :orderBy DESC LIMIT :limit";
+
+ $this->setSQL($sql);
+
+ $general_configs = $this->findAll([':orderBy' => $orderBy, ':limit' => $limit]);
+
+ return (empty($general_configs)) ?: $general_configs;
+
+}
+
+/**
+ * find permalink configuration
+ *
+ * @param string $permalink_key
+ * @return void
+ * 
+ */
+public function findPermalinkConfig($permalink_key, $sanitize)
+{
+
+  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE setting_name = :setting_name LIMIT 1";
+
+  $sanitized_key = $this->filteringId($sanitize, $permalink_key, 'xss');
+
+  $this->setSQL($sql);
+
+  $detailPermalink = $this->findRow([':setting_name' => $sanitized_key]);
+
+  return (empty($detailPermalink)) ?: $detailPermalink;
+
+}
+
+/**
  * Find Configuration
  * 
  * @method public findConfig()
@@ -111,7 +152,7 @@ public function findConfigs($orderBy = 'ID')
 public function findConfig($id, $sanitize)
 {
   
-  $sql = "SELECT ID, setting_name, setting_value, setting_desc
+  $sql = "SELECT ID, setting_name, setting_value
 		      FROM tbl_settings WHERE ID = :ID ";
    
   $id_sanitized = $this->filteringId($sanitize, $id, 'sql');
@@ -122,6 +163,19 @@ public function findConfig($id, $sanitize)
 
   return (empty($detailConfig)) ?: $detailConfig;
   
+}
+
+public function findConfigByName($setting_name)
+{
+  
+  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE setting_name = :setting_name";
+
+  $this->setSQL($sql);
+
+  $detailConfig = $this->findRow([':setting_name' => $setting_name]);
+
+  return (empty($detailConfig)) ?: $detailConfig;
+
 }
 
 /**

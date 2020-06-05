@@ -6,7 +6,7 @@
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
         <small>
-        <a href="index.php?load=menu-child&action=newSubmenu&subMenuId=0" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Add New</a>
+        <a href="index.php?load=menu-child&action=newSubMenu&Id=0" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Add New</a>
         </small>
       </h1>
       <ol class="breadcrumb">

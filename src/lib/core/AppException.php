@@ -1,6 +1,6 @@
 <?php
 /**
- * Class AppException
+ * Class AppException extends CoreException
  * 
  * @category Core Class
  * @author   M.Noermoehammad

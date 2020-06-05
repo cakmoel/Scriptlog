@@ -65,6 +65,35 @@ class LogError
                     
                     break;
                     
+                case 403 :
+
+                    echo '<div class="content-wrapper">
+                         <section class="content-header">
+                         <h1>'.self::$httpResponseCode.' Forbidden</h1>
+                         <ol class="breadcrumb">
+                         <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+                         <li><a href="#">Error</a></li>
+                         <li class="active">'.self::$httpResponseCode.'</li>
+                         </ol>
+                         </section>';
+              
+                  echo '<section class="content">
+                        <div class="error-page">
+                        <h2 class="headline text-yellow">'.self::$httpResponseCode.'</h2>
+                        <div class="error-content">
+                        <h3><i class="fa fa-warning text-yellow"></i> Oops! Forbidden.</h3>
+                        <p>
+                          Please check your log error and send it to - email: scriptlog@yandex.com
+                          <a href="index.php?load=dashboard">return to dashboard</a>.
+                        </p>
+                        </div>
+                        </div>
+                        </section>';
+              
+                  echo '</div>';
+                 
+                  break;
+
                 case 404 :
                     
                     echo '<div class="content-wrapper">
@@ -93,6 +122,93 @@ class LogError
                     echo '</div>';
                     
                     break;
+
+                case 405 :
+
+                    echo '<div class="content-wrapper">
+                         <section class="content-header">
+                         <h1>'.self::$httpResponseCode.' Method Not Allowed</h1>
+                         <ol class="breadcrumb">
+                         <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+                         <li><a href="#">Error</a></li>
+                         <li class="active">'.self::$httpResponseCode.'</li>
+                         </ol>
+                         </section>'; 
+                    
+                    echo '<section class="content">
+                          <div class="error-page">
+                          <h2 class="headline text-yellow">'.self::$httpResponseCode.'</h2>
+                          <div class="error-content">
+                          <h3><i class="fa fa-warning text-yellow"></i> Oops! Method Not Allowed.</h3>
+                          <p>
+                           Please check your log error and send it to - email: scriptlog@yandex.com
+                           <a href="index.php?load=dashboard">return to dashboard</a>.
+                          </p>
+                          </div>
+                          </div>
+                          </section>';
+
+                    echo '</div>';
+                
+                  break;
+                
+                case 413 :
+
+                    echo '<div class="content-wrapper">
+                          <section class="content-header">
+                          <h1>'.self::$httpResponseCode.' Payload Too Large</h1>
+                          <ol class="breadcrumb">
+                          <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+                          <li><a href="#">Error</a></li>
+                          <li class="active">'.self::$httpResponseCode.'</li>
+                          </ol>
+                          </section>';
+              
+                    echo '<section class="content">
+                          <div class="error-page">
+                          <h2 class="headline text-yellow">'.self::$httpResponseCode.'</h2>
+                          <div class="error-content">
+                          <h3><i class="fa fa-warning text-yellow"></i> Oops! Payload Too Large.</h3>
+                          <p>
+                           Please check your log error and send it to - email: scriptlog@yandex.com
+                             <a href="index.php?load=dashboard">return to dashboard</a>.
+                          </p>
+                          </div>
+                          </div>
+                          </section>';
+              
+                    echo '</div>';
+
+                  break;
+
+                case 500 :
+
+                    echo '<div class="content-wrapper">
+                           <section class="content-header">
+                           <h1>'.self::$httpResponseCode.' Internal Server Error</h1>
+                          <ol class="breadcrumb">
+                          <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+                           <li><a href="#">Error</a></li>
+                          <li class="active">'.self::$httpResponseCode.'</li>
+                           </ol>
+                          </section>';
+              
+                    echo '<section class="content">
+                          <div class="error-page">
+                         <h2 class="headline text-yellow">'.self::$httpResponseCode.'</h2>
+                         <div class="error-content">
+                         <h3><i class="fa fa-warning text-yellow"></i> Oops! Internal Server Error.</h3>
+                         <p>
+                          Please check your log error and send it to - email: scriptlog@yandex.com
+                          <a href="index.php?load=dashboard">return to dashboard</a>.
+                         </p>
+                         </div>
+                         </div>
+                         </section>';
+              
+                    echo '</div>';
+              
+              break;
                             
                      
             }

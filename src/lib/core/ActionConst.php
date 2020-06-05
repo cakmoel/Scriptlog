@@ -12,48 +12,40 @@
 class ActionConst
 {
 
-/**
- * action constant for configuration functionality
- */
+ // action constant for configuration functionality
+ 
  const CONFIGURATION = "configuration";
- const NEWCONFIG     = "newConfig";
- const EDITCONFIG    = "editConfig";
- const DELETECONFIG  = "deleteConfig"; 
+ const GENERAL_CONFIG = "generalConfig";
+ const PERMALINK_CONFIG = "permalinkConfig";
 
-/**
- * action constant for post functionality
- * 
- */
+ // action constant for post functionality
+ 
  const NEWPOST     = "newPost";
  const EDITPOST    = "editPost";
  const DELETEPOST  = "deletePost";
  
-/**
- * action constant for page functionality
- */
+ // action constant for page functionality
+
  const PAGES       = "pages";
  const NEWPAGE     = "newPage";
  const EDITPAGE    = "editPage";
  const DELETEPAGE  = "deletePage";
 
-/**
- * action constant for topic functionality
- */
+ // action constant for topic functionality
+ 
  const TOPICS      = "topics";
  const NEWTOPIC    = "newTopic";
  const EDITTOPIC   = "editTopic";
  const DELETETOPIC = "deleteTopic";
 
-/**
- * action constant for comment functionality
- */
+// action constant for comment functionality
+ 
  const COMMENTS      = "comments";
  const EDITCOMMENT   = "editComment";
  const DELETECOMMENT = "deleteComment";
 
-/**
- * action constant for navigation or menu functionality
- */
+// action constant for navigation or menu functionality
+ 
  const NAVIGATION  = "navigation";
  const NEWMENU     = "newMenu";
  const EDITMENU    = "editMenu";
@@ -63,17 +55,15 @@ class ActionConst
  const EDITSUBMENU   = "editSubMenu";
  const DELETESUBMENU = "deleteSubMenu";
 
-/**
- * action constant for media functionality
- */
+ // action constant for media functionality
+ 
  const MEDIALIB      = "medialib";
  const NEWMEDIA      = "newMedia";
  const EDITMEDIA     = "editMedia";
  const DELETEMEDIA   = "deleteMedia";
 
-/**
- * action constant for plugin functionality
- */
+// action constant for plugin functionality
+ 
  const PLUGINS          = "plugins";
  const INSTALLPLUGIN    = "installPlugin";
  const ACTIVATEPLUGIN   = "activatePlugin";
@@ -82,9 +72,8 @@ class ActionConst
  const EDITPLUGIN       = "editPlugin";
  const DELETEPLUGIN     = "deletePlugin";
 
-/**
- * action constant for theme functionality
- */
+// action constant for theme functionality
+
  const THEMES        = "themes";
  const NEWTHEME      = "newTheme";
  const INSTALLTHEME  = "installTheme";
@@ -92,9 +81,8 @@ class ActionConst
  const EDITTHEME     = "editTheme";
  const DELETETHEME   = "deleteTheme";
 
-/**
- * action const for user functionality
- */
+// action const for user functionality
+ 
  const USERS      = "users";
  const NEWUSER    = "newUser";
  const EDITUSER   = "editUser";

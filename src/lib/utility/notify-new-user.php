@@ -10,7 +10,7 @@
  * @return boolean
  * 
  */
-function notify_new_user($recipient, $user_email, $user_pass)
+function notify_new_user($recipient, $user_pass)
 {
   
   $site_info = app_info();
@@ -20,13 +20,15 @@ function notify_new_user($recipient, $user_email, $user_pass)
   $sender = $site_info['email_address'];
   $sanitize_sender = sanitize_email($sender);
   
+  $postman = new Mailer();
+
   $subject = "Join for The Best Team in Town!";
   $content = "<html><body>
               If you never ask to be a user at {$site_name}.
               please feel free to ignore this email.
               But if you are asking for this information,
               here is your profile data:<br />
-              <b>Email address:</b>{$user_email}<br />
+              <b>Email address:</b>{$recipient}<br />
               <b>Password:</b>{$user_pass}<br />
               Activate your account by clicking the link below:<br />
               <a href={$app_url}".APP_ADMIN.DIRECTORY_SEPARATOR."activate-user.php?key={$activation_key}".">Activate My Account</a><br /><br />
@@ -47,12 +49,11 @@ function notify_new_user($recipient, $user_email, $user_pass)
     if (filter_var($recipient, FILTER_SANITIZE_EMAIL)) {
         
         if (filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
-                       
-            if (mail($recipient, $subject, $content, $email_headers)) {
-                
-            } else {
-                
+
+            if (false === $postman->send($recipient, $subject, $content, $email_headers)) {
+
                 scriptlog_error("E-mail notification fail to sent", E_USER_ERROR);
+
             }
             
         }

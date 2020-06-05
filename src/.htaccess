@@ -3,7 +3,7 @@
 # .htaccess v1.0 2018
 ################################
 
-# Hide the following from the world
+############## Hide the following from the world ################
 <FilesMatch "\.(htaccess|htpasswd|ini|log|sh|sql|tpl)$">
  Order Allow,Deny
  Deny from all

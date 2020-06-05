@@ -53,6 +53,12 @@ class ThemeEvent
    */
   private $theme_status;
 
+  private $themeDao;
+
+  private $validator;
+
+  private $sanitize;
+
   public function __construct(ThemeDao $themeDao, FormValidator $validator, Sanitize $sanitize)
   {
     $this->themeDao = $themeDao;

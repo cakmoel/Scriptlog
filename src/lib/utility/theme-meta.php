@@ -6,6 +6,7 @@
  */
 function theme_meta()
 {
+  
   $match = find_request(0);
   $param1 = find_request(1);
   $param2 = find_request(2);
@@ -39,7 +40,7 @@ function theme_meta()
       case 'category':
           
         meta_tag();
-        title_tag($param1);
+        title_tag($match.' | '.$param1);
           
         break;
 

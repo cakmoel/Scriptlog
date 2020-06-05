@@ -51,16 +51,15 @@ echo "Error saving data. Please try again." . $saveError;
 </div>
 <?php 
 endif;
+
+$action = (isset($formAction)) ? $formAction : null;
+$user_id = (isset($userData['ID'])) ? safe_html((int)$userData['ID']) : 0;
+$session_id = (isset($userData['user_session'])) ? safe_html($userData['user_session']) :  md5(uniqid());
 ?>
 
-<?php
-$action = isset($formAction) ? $formAction : null;
-$user_id = isset($userData['ID']) ? $userData['ID'] : 0;
-$session_id = isset($userData['user_session']) ? $userData['user_session'] :  md5(get_ip_address());
-?>
 <form method="post" action="<?=generate_request('index.php', 'post', ['users', $action, $user_id, $session_id])['link']; ?>" role="form">
-<input type="hidden" name="session_id" value="<?=$session_id; ?>" />
-<input type="hidden" name="user_id" value="<?=$user_id; ?>" />
+<input type="hidden" name="session_id" value="<?=$session_id; ?>" >
+<input type="hidden" name="user_id" value="<?=$user_id; ?>" >
 <div class="box-body">
 
 <?php
@@ -68,7 +67,7 @@ if(isset($userData['user_registered'])) :
 ?>
 <div class="form-group">
 <label>Registered</label>
-<?= read_datetime($userData['user_registered']); ?>
+<?= read_datetime(safe_html($userData['user_registered'])); ?>
 </div>
 <?php 
 endif;
@@ -76,21 +75,25 @@ endif;
 
 <div class="form-group">
 <label>Username <?=(isset($userData['user_login'])) ? "" : "(required)" ?></label>
-<input type="text" class="form-control" name="user_login" placeholder="Enter username" value="<?=(isset($formData['user_login'])) ? htmlspecialchars($formData['user_login'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>
-<?=(isset($userData['user_login'])) ? htmlspecialchars($userData['user_login']) : ""; ?>" 
+<input type="text" class="form-control" name="user_login" placeholder="Enter username" value="
+<?=(isset($formData['user_login'])) ? safe_html($formData['user_login']) : ""; ?>
+<?=(isset($userData['user_login'])) ? safe_html($userData['user_login']) : ""; ?>" 
   required <?=(isset($userData['user_login']) && $userData['user_login'] !== '') ? "disabled" : ""; ?>>
+  <p class="help-block">This username can not be changed.</p>
 </div>
 
 <div class="form-group">
 <label>Fullname</label>
-<input type="text" class="form-control" name="user_fullname" placeholder="Enter real name" value="<?=(isset($userData['user_fullname'])) ? htmlspecialchars($userData['user_fullname']) : ""; ?>
-<?=(isset($formData['user_fullname'])) ? htmlspecialchars($formData['user_fullname'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : "";  ?>" >
+<input type="text" class="form-control" name="user_fullname" placeholder="Enter real name" value="
+<?=(isset($userData['user_fullname'])) ? safe_html($userData['user_fullname']) : ""; ?>
+<?=(isset($formData['user_fullname'])) ? safe_html($formData['user_fullname']) : "";  ?>" >
 </div>
 
 <div class="form-group">
 <label>Email (required)</label>
-<input type="email" class="form-control" name="user_email" placeholder="Enter email" value="<?=(isset($userData['user_email'])) ? htmlspecialchars($userData['user_email']) : ""; ?>
-<?=(isset($formData['user_email'])) ? htmlspecialchars($formData['user_email'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" 
+<input type="email" class="form-control" name="user_email" placeholder="Enter email" value="
+<?=(isset($userData['user_email'])) ? safe_html($userData['user_email']) : ""; ?>
+<?=(isset($formData['user_email'])) ? safe_html($formData['user_email']) : ""; ?>" 
   required>
 </div>
 
@@ -108,8 +111,9 @@ endif;
 
 <div class="form-group">
 <label>Website</label>
-<input type="text" class="form-control" name="user_url" placeholder="Enter url" value="<?=(isset($formData['user_url'])) ? htmlspecialchars($formData['user_url'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>
-<?=(isset($userData['user_url'])) ? $userData['user_url'] : ""; ?>" >
+<input type="text" class="form-control" name="user_url" placeholder="Enter url" value="
+<?=(isset($formData['user_url'])) ? safe_html($formData['user_url']) : ""; ?>
+<?=(isset($userData['user_url'])) ? safe_html($userData['user_url']) : ""; ?>" >
 </div>
 
 <div class="form-group">
@@ -133,7 +137,7 @@ endif;
 
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">
-<input type="submit" class="btn btn-primary" name="userFormSubmit" value="<?=(isset($userData['ID']) && $userData['ID'] != '') ? "Update Profile" : "Add New User"; ?>" >
+<input type="submit" class="btn btn-primary" name="userFormSubmit" value="<?=(($user_id) && ($user_id != '')) ? "Update Profile" : "Add New User"; ?>" >
 </div>
 </form>
             

@@ -1,6 +1,6 @@
 <?php 
 /**
- * View Class
+ * Class View
  *
  * @category  Core Class
  * @author    M.Noermoehammad
@@ -97,9 +97,10 @@ class View
             throw new ViewException('View '.$this->file.'.php'. ' does not exists');
         }
         
-        extract($this->data);
+        unreg_globals();
+        extract($this->data, EXTR_SKIP);
         ob_start();
-        require $this->dir.$this->file.'.php';
+        require $this->dir.basename($this->file).'.php';
         $render = ob_get_contents();
         ob_end_clean();
         echo $render;

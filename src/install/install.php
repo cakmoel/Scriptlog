@@ -26,10 +26,7 @@ if (!file_exists(__DIR__ . '/../config.php')) {
 
 $set_config = require __DIR__ . '/../config.php';
 
-$link = make_connection($set_config['db']['host'], 
-            $set_config['db']['user'], 
-            $set_config['db']['pass'], 
-            $set_config['db']['name']);
+$link = make_connection($set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name']);
 
 if((check_dbtable($link, 'tbl_users') == false) || (check_dbtable($link, 'tbl_user_token') == false)
    || (check_dbtable($link, 'tbl_topics') == false) || (check_dbtable($link, 'tbl_themes') == false) 
@@ -76,25 +73,25 @@ if($setup != 'install') {
 
     if (strlen($username) < 8) {
 
-      $errors['errorSetup'] = 'username for admin must be at least 8 characters.';
+      $errors['errorInstall'] = 'username for admin must be at least 8 characters.';
 
     } 
     
     if (strlen($username) > 20) {
 
-      $errors['errorSetup'] = 'username for admin may not be longer than 20 characters.';
+      $errors['errorInstall'] = 'username for admin may not be longer than 20 characters.';
 
     } 
     
     if (preg_match('/^[0-9]*$/', $username)) {
 
-     $errors['errorSetup'] = 'Sorry, username for admin must have letters too!';
+     $errors['errorInstall'] = 'Sorry, username for admin must have letters too!';
    
     } 
    
     if ((!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $username))) {
 
-      $errors['erroSetup'] = 'Username for admin only contain alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
+      $errors['errorInstall'] = 'Username for admin only contain alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
       
     }
 
@@ -106,15 +103,15 @@ if($setup != 'install') {
 
     if(empty($password) && (empty($confirm))) {
 
-        $errors['errorInstall'] = 'Password should not be empty';
+        $errors['errorInstall'] = 'Admin password should not be empty';
 
     } elseif($password != $confirm) {
 
-        $errors['errorInstall'] = 'Password should be equal';
+        $errors['errorInstall'] = 'Admin password should be equal';
 
     } elseif(!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
 
-        $errors['errorInstall'] = 'Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters';
+        $errors['errorInstall'] = 'Admin password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters';
 
     }
 
@@ -124,7 +121,91 @@ if($setup != 'install') {
 
     }
 
-    if(empty($errors['errorInstall']) == true) {
+    if(false === check_php_version()) {
+
+       $errors['errorInstall'] = 'Requires PHP 5.6 or newer';
+
+    }
+
+    if (true === check_pcre_utf8()) {
+
+      $errors['errorInstall'] = 'PCRE has not been compiled with UTF-8 or Unicode property support';
+
+   }
+
+   if (false === check_spl_enabled('spl_autoload_register')) {
+
+       $errors['errorInstall'] = 'spl autoload register is either not loaded or compiled in';
+
+   }
+
+   if (false === check_filter_enabled()) {
+
+      $errors['errorInstall'] = 'The filter extension is either not loaded or compiled in';
+
+   }
+
+   if (false === check_iconv_enabled()) {
+
+      $errors['errorInstall'] = 'The Iconv extension is not loaded';
+
+   }
+
+   if (true === check_character_type()) {
+
+      $errors['errorInstall'] = 'The ctype extension is overloading PHP\'s native string functions';
+
+   } 
+
+   if (false === check_gd_enabled()) {
+      
+      $errors['errorInstall'] = 'requires GD v2 for the image manipulation';
+
+   }
+
+   if (false === check_pdo_mysql()) {
+
+      $errors['errorInstall'] = 'requires PDO MySQL enabled';
+
+   }
+
+   if (false === check_mysqli_enabled()) {
+
+      $errors['errorInstall'] = 'requires MySQLi enabled';
+      
+   }
+
+   if (false === check_uri_determination()) {
+
+     $errors['errorInstall'] = 'Neither $_SERVER[REQUEST_URI], $_SERVER[PHP_SELF] or $_SERVER[PATH_INFO] is available';
+
+   }
+
+   if (false === check_log_dir()) {
+
+     $errors['errorInstall'] = 'requires log directory writeable';
+
+   }
+
+   if (false === check_cache_dir()) {
+
+     $errors['errorInstall'] = 'requires cache directory writeable';
+
+   }
+
+   if (false === check_theme_dir()) {
+
+     $errors['errorInstall'] = 'requires theme directory writeable';
+
+   }
+
+   if (false === check_plugin_dir()) {
+
+     $errors['errorInstall'] = 'requires plugin directory writeable';
+     
+   }
+
+   if(empty($errors['errorInstall']) == true) {
 
         try {
 
@@ -213,10 +294,10 @@ if($setup != 'install') {
     Scriptlog may not work correctly with your environment
   </div>
   <?php 
-  elseif (isset($errors['errorSetup']) && (!$completed)) :
+  elseif (isset($errors['errorInstall']) && (!$completed)) :
   ?>
    <div class="alert alert-danger" role="alert">
-  <?= $errors['errorSetup']; ?>
+  <?= $errors['errorInstall']; ?>
    </div>
   <?php 
   else:

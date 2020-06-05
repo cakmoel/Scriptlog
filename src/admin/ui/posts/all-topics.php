@@ -5,7 +5,7 @@
     <section class="content-header">
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
-        <small><a href="index.php?load=topics&action=newTopic&topicId=0"
+        <small><a href="index.php?load=topics&action=newTopic&Id=0"
 					class="btn btn-primary"> <i
 					class="fa fa-plus-circle"></i> Add New
 				</a></small>
@@ -84,16 +84,16 @@
                   ?>
                      <tr>
                       <td><?= $no; ?></td>
-                      <td><?= htmlspecialchars($topic['topic_title']); ?></td>
-                      <td><?= htmlspecialchars($topic['topic_slug']); ?></td>
-                      <td><?= htmlspecialchars($topic['topic_status']); ?></td>
+                      <td><?= safe_html($topic['topic_title']); ?></td>
+                      <td><?= safe_html($topic['topic_slug']); ?></td>
+                      <td><?= safe_html($topic['topic_status']); ?></td>
 
                       <td>
-                       <a href="index.php?load=topics&action=editTopic&topicId=<?= htmlspecialchars((int)$topic['ID']);?>" class="btn btn-warning">
+                       <a href="<?=generate_request("index.php", 'get', ['topics', 'editTopic', $topic['ID']])['link']; ?>" class="btn btn-warning">
                        <i class="fa fa-pencil fa-fw"></i> Edit</a>
                        </td>
                        <td>
-                       <a href="javascript:deleteTopic('<?= abs((int)$topic['ID']); ?>', '<?= $topic['topic_title']; ?>')" class="btn btn-danger">
+                       <a href="javascript:deleteTopic('<?= abs((int)$topic['ID']); ?>', '<?= safe_html($topic['topic_title']); ?>')" class="btn btn-danger">
                        <i class="fa fa-trash-o fa-fw"></i> Delete</a>
                        </td>
 
@@ -132,7 +132,7 @@
   {
 	  if (confirm("Are you sure want to delete Topic '" + title + "'"))
 	  {
-	  	window.location.href = 'index.php?load=topics&action=deleteTopic&topicId=' + id;
+	  	window.location.href = 'index.php?load=topics&action=deleteTopic&Id=' + id;
 	  }
   }
 </script>

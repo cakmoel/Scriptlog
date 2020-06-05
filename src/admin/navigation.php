@@ -6,11 +6,11 @@
  
 <header class="main-header">
     <!-- Logo -->
-    <a href="<?= $currentURL . 'index.php?load=dashboard'?>" class="logo">
+    <a href="<?= app_url().DS.APP_ADMIN.'/index.php?load=dashboard'?>" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
-      <span class="logo-mini"><img alt="logo-scriptlog-50x50" src="<?=(isset($stylePath)) ? $stylePath : ""; ?>/assets/dist/img/logo50x50.gif"></span>
+      <span class="logo-mini"><img alt="logo-scriptlog-50x50" src="<?=(isset($currentURL)) ? $currentURL : ""; ?>/assets/dist/img/logo50x50.gif"></span>
       <!-- logo for regular state and mobile devices -->
-      <span class="logo-lg"><img alt="logo-scriptlog-90x50" src="<?=(isset($stylePath)) ? $stylePath : ""; ?>/assets/dist/img/logo90x50.gif"></span>
+      <span class="logo-lg"><img alt="logo-scriptlog-90x50" src="<?=(isset($currentURL)) ? $currentURL : ""; ?>/assets/dist/img/logo90x50.gif"></span>
     </a>
 
     <!-- Header Navbar -->
@@ -52,17 +52,17 @@
               <!-- Menu Footer-->
               <li class="user-footer">
                 <div class="pull-left">
-                  <a href="<?=generate_request('index.php', 'get', ['users', 'editUser', $user_id, $user_session])['link']; ?>" class="btn btn-default btn-flat"><i class="fa fa-user fa-fw"></i>Profile</a>
+                  <a href="<?=generate_request('index.php', 'get', ['users', ActionConst::EDITUSER, $user_id, $user_session])['link']; ?>" class="btn btn-default btn-flat"><i class="fa fa-user fa-fw"></i>Profile</a>
                 </div>
                 <div class="pull-right">
-                  <a href="index.php?load=logout" class="btn btn-default btn-flat"><i class="fa fa-sign-out fa-fw"></i>Sign out</a>
+                  <a href="<?= $currentURL; ?>/index.php?load=logout" class="btn btn-default btn-flat"><i class="fa fa-sign-out fa-fw"></i>Sign out</a>
                 </div>
               </li>
             </ul>
           </li>
           <!-- Control Sidebar Toggle Button -->
           <li>
-            <a href="<?= app_url(); ?>" title="Visit Site" target="_blank"><i class="fa fa-home"></i></a>
+            <a href="<?= app_url(); ?>" title="Visit Site" ><i class="fa fa-home"></i></a>
           </li>
         </ul>
       </div>

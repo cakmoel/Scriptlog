@@ -38,6 +38,12 @@ class TopicEvent
    * @var string
    */
   private $topic_status;
+
+  private $topicDao;
+
+  private $validator;
+
+  private $sanitizer;
   
   public function __construct(TopicDao $topicDao, FormValidator $validator, Sanitize $sanitizer)
   {

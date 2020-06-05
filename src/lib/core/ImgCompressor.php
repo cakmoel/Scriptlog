@@ -134,6 +134,7 @@ class ImgCompressor {
 		}
 		
 		return $result;
+		
 	}
 	
 }

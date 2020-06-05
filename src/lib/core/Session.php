@@ -8,7 +8,6 @@
  * $data->destroy();
  * 
  * @category Core Class
- * @license MIT 
  * @see https://www.php.net/manual/en/function.session-start.php#102460
  * @version 1.0
  * 

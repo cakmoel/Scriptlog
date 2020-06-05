@@ -86,8 +86,8 @@
                     <tr>
                        <td><?= $no; ?></td>
                        <td><a href="<?=medialib_link($media['media_type'], $media['media_filename']);?>" title="<?= safe_html($media['media_caption']); ?>" ><?=invoke_fileicon($media['media_type']); ?></a></td>
-                       <td><?= htmlspecialchars($media['media_type']); ?></td>
-                       <td><?= htmlspecialchars($media['media_target']); ?></td>
+                       <td><?= safe_html($media['media_type']); ?></td>
+                       <td><?= safe_html($media['media_target']); ?></td>
 
                        <td>
                        <a href="<?=generate_request("index.php", 'get', ['medialib', 'editMedia', $media['ID']])['link']; ?>" class="btn btn-warning">

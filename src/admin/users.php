@@ -3,7 +3,7 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $userId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $sessionId = isset($_GET['sessionId']) ? safe_html($_GET['sessionId']): null;
-$userEvent = new UserEvent($userDao, $validator, $sanitizer);
+$userEvent = new UserEvent($userDao, $validator, $userToken, $sanitizer);
 $userApp = new UserApp($userEvent);
 
 switch ($action) {

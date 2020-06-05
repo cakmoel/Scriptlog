@@ -1,8 +1,8 @@
 //JavaScript Document
 function validasi(form){
-if (formlogin.user_email.value == ""){
-alert("Please enter your email address");
-formlogin.user_email.focus();
+if (formlogin.login.value == ""){
+alert("Please enter username or email address");
+formlogin.login.focus();
 return false;
 }
      

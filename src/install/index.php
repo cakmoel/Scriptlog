@@ -20,10 +20,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
 
   $set_config = require __DIR__ . '/../config.php';
 
-  $dbconnect = make_connection($set_config['db']['host'], 
-                               $set_config['db']['user'], 
-                               $set_config['db']['pass'], 
-                               $set_config['db']['name']);
+  $dbconnect = make_connection($set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name']);
   
 // check if database table exists or not
 if((check_dbtable($dbconnect, 'tbl_users') == true) || (check_dbtable($dbconnect, 'tbl_user_token') == true)
@@ -112,7 +109,7 @@ if ($install != 'install') {
     
     if ((!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $username))) {
 
-      $errors['erroSetup'] = 'username for admin requires only alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
+      $errors['errorSetup'] = 'username for admin requires only alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
       
     }
 
@@ -132,7 +129,7 @@ if ($install != 'install') {
 
     } elseif (!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
 
-        $errors['errorSetup'] = 'Admin password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters';
+        $errors['errorSetup'] = 'Admin password must contain at least 8 characters with uppercase letters, numbers and special characters';
 
     }
     
@@ -397,6 +394,7 @@ install_header($current_path, $protocol, $server_host);
               <div class="invalid-feedback">
                 Please enter your password.
               </div>
+              <span class="text-muted">8+ characters, an uppercase and a lowercase letter, numbers and any symbols</span>
             </div>
              <div class="mb-3">
               <label for="pass2">Confirm password</label>
@@ -406,11 +404,12 @@ install_header($current_path, $protocol, $server_host);
               </div>
             </div>
              <div class="mb-3">
-              <label for="email">Email <span class="text-muted">(Administrator's E-mail)</span></label>
+              <label for="email">Email</label>
               <input type="email" class="form-control" id="email" name="user_email" placeholder="you@example.com" value="<?=(isset($_POST['user_email'])) ? escapeHTML($_POST['user_email']) : ""; ?>" required>
               <div class="invalid-feedback">
                 Please enter a valid email address.
               </div>
+              <span class="text-muted">E-mail address for administrator</span>
             </div>
              <div class="row"></div>
             <hr class="mb-4">

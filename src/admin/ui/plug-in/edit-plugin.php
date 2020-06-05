@@ -51,7 +51,7 @@ echo "Error saving data. Please try again." . $saveError;
 endif;
 ?>
 
-<form method="post" action="index.php?load=plugins&action=<?=(isset($formAction)) ? $formAction : null; ?>&pluginId=<?=(isset($pluginData['ID'])) ? $pluginData['ID'] : 0; ?>" role="form">
+<form method="post" action="index.php?load=plugins&action=<?=(isset($formAction)) ? $formAction : null; ?>&Id=<?=(isset($pluginData['ID'])) ? $pluginData['ID'] : 0; ?>" role="form">
 <input type="hidden" name="plugin_id" value="<?=(isset($pluginData['ID'])) ? $pluginData['ID'] : 0; ?>" />
 
 <div class="box-body">

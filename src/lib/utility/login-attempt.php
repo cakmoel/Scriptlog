@@ -20,6 +20,13 @@ function get_login_attempt($ip)
 
 }
 
+/**
+ * Create login attempt
+ *
+ * @param string $ip
+ * @return void
+ * 
+ */
 function create_login_attempt($ip)
 {
   
@@ -31,10 +38,17 @@ function create_login_attempt($ip)
   
 }
 
+/**
+ * Delete login attempt
+ *
+ * @param string $ip
+ * @return void
+ * 
+ */
 function delete_login_attempt($ip)
 {
 
-   unset($_SESSION["captcha_code"]);
+   unset($_SESSION['scriptlog_captcha_code']);
 
    $sql = "DELETE FROM tbl_login_attempt WHERE ip_address = ?";
 

@@ -1,4 +1,4 @@
-var _validFileExtensions = [".jpg", ".jpeg", ".gif", ".png"];    
+var _validFileExtensions = [".jpg", ".jpeg", ".gif", ".png", ".webp"];    
 function ValidateImage(oForm) {
     var arrInputs = oForm.getElementsByTagName("input");
     for (var i = 0; i < arrInputs.length; i++) {

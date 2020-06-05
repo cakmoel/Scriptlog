@@ -55,7 +55,7 @@ endif;
 $action = isset($formAction) ? $formAction : nul;
 $page_id = isset($pageData['ID']) ? (int)$pageData['ID'] : 0;
 ?>
-<form method="post" action="<?=generate_request('index.php', 'post', ['posts', $action, $page_id])['link']; ?>" role="form" enctype="multipart/form-data" autocomplete="off">
+<form method="post" action="<?=generate_request('index.php', 'post', ['pages', $action, $page_id])['link']; ?>" role="form" enctype="multipart/form-data" autocomplete="off">
 <input type="hidden" name="page_id" value="<?= $page_id; ?>" />
 <input type="hidden" name="MAX_FILE_SIZE" value="<?=APP_FILE_SIZE; ?>" >
 

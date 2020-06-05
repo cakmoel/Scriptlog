@@ -48,11 +48,34 @@ class CommentEvent
    */
   private $status;
 
+/**
+ * An instance of CommentDao
+ *
+ * @var object
+ * 
+ */
+  private $commentDao;
+
+/**
+ * An instance of formValidator
+ *
+ * @var object
+ * 
+ */
+  private $validator;
+
+/**
+ * An instance of Sanitize
+ *
+ * @var [type]
+ */
+  private $sanitizer;
+
   public function __construct(CommentDao $commentDao, FormValidator $validator, Sanitize $sanitize)
   {
    $this->commentDao = $commentDao;
    $this->validator = $validator;
-   $this->sanitize = $sanitize;
+   $this->sanitizer = $sanitize;
   }
   
   public function setCommentId($comment_id)

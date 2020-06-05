@@ -7,61 +7,135 @@
  * @param string $value
  * 
  */
-function cp_tag_title($value) 
+function cp_tag_title($value, $allowed_request) 
 {
+    $title = null;
+
     switch($value) {
 
          case 'posts':
 
-             echo 'Post';
+             $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+
+             return $title;
 
             break;
 
          case 'medialib':
 
-             echo 'Media Library';
+             $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+
+             return $title;
 
              break;
 
          case 'comments':
             
-             echo 'Comments';
+             $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+
+             return $title;
 
              break;
 
          case 'menu':
 
-             echo 'Menu';
+             $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+
+             return $title;
 
              break;
 
          case 'menu-child':
 
-             echo 'Sub Menu';
+             $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+
+             return $title;
 
              break;
 
          case 'pages':
 
-             echo 'Pages';
+            $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+
+            return $title;
 
              break;
 
          case 'plugins':
 
-             echo 'Plugins';
+            $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+
+            return $title;
 
              break;
 
          case 'users':
 
-             echo 'Users';
+            $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+
+            return $title;
+
+             break;
+        
+         case 'topics':
+
+            $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+
+            return $title;
+
+             break;
+         
+         case 'option-general':
+
+             $title .= safe_html("General setting")." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+
+             return $title;
 
              break;
 
+         case 'option-permalink':
+
+            $title .= safe_html("Permalink setting")." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+
+            return $title;
+
+           break;
+        
+         case 'templates':
+
+            $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+
+            return $title;
+
+          break;
+
+         case 'dashboard':
+
+            $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+
+             return $title;
+
+           break;
+         
          default:
+          
+           if((strstr($value, '../') !== false) || (strstr($value, 'file://') !== false)) {
+
+              http_response_code(400);
+              
+              $title .= safe_html(strtoupper($value)) . ' ERROR: ' . http_response_code(400);
+
+           }
+           
+           if((empty($breadCrumbs)) || (!in_array($breadCrumbs, array_keys($allowedQuery)))) {
+
+              http_response_code(404);
             
-           echo 'Dashboard';
+              $title .= safe_html(strtoupper($value)) . ' ERROR: ' . http_response_code(404);
+
+           }
+
+           return $title;
 
            break;
 

@@ -14,6 +14,6 @@ function theme_dir()
 
   $folder = $themeActived['theme_directory'].DS;
 
-  return app_info()['app_url'].APP_PUBLIC.DS.$folder;
+  return app_info()['app_url'].DS.APP_PUBLIC.DS.$folder;
 
 }

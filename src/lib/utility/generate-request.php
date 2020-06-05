@@ -24,9 +24,11 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
 
    case 'get':
 
-      if ($string_encoded) {
+      check_request_generated();
 
-         if ($load === 'users') {
+        if ($string_encoded) {
+
+           if ($load === 'users') {
 
                $query_data = array(
               
@@ -37,7 +39,7 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
 
                );
 
-         } else {
+           } else {
 
               $query_data = array(
               
@@ -46,10 +48,7 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
                 'Id'=> abs((int)$id)
          
                );
-
-         }
-
-         $html['link'] = build_query($base, $query_data);
+           }
 
         } else {
 
@@ -59,14 +58,15 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
 
            );
 
-       } 
+        } 
 
-      
       $html['link'] = build_query($base, $query_data);
       
       break;
 
    case 'post':
+
+      check_request_generated();
 
          if ($string_encoded) {
 
@@ -81,15 +81,6 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
 
                );
   
-            } elseif ($load === 'settings') {
-
-               $query_data = array(
-
-                   'load' => $load,
-                   'action' => $action,
-                   'args' => $id  
-               );
-
             } else {
   
               $query_data = array(
@@ -111,5 +102,23 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
  }
 
    return $html;
+
+}
+
+function check_request_generated()
+{
+
+$method = ['GET', 'POST'];
+
+if(true === block_request_type(current_request_method(), $method)) {
+
+   http_response_code(405);
+   scriptlog_error("405 - Method Not Allowed");
+
+} else {
+
+    unset($method);
+
+}
 
 }

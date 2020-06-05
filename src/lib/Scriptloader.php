@@ -3,7 +3,7 @@
  * Class Scriptloader
  * Load all class files in any directories selected
  * 
- * @category    Library Class Scriptloader load all class directories selected 
+ * @category    Library or Class Scriptloader load all class directories selected 
  * @author      M.Noermoehammad 
  * @license     MIT
  * @version     1.0
@@ -134,6 +134,7 @@ class Scriptloader
  
 /**
  * running loader to load all classes needed by the system
+ * 
  * @method public runLoader()
  * @uses Scriptloader::loadLibrary 
  * @uses SPL Autoload Register

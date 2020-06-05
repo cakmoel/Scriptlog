@@ -5,7 +5,7 @@
     <section class="content-header">
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
-        <small>	<a href="index.php?load=users&action=newUser&Id=0"
+        <small>	<a href="<?= generate_request('index.php', 'get', ['users', ActionConst::NEWUSER, 0, md5(microtime())])['link']; ?>"
 					class="btn btn-primary"> <i
 					class="fa fa-plus-circle"></i> Add New
 				</a>
@@ -87,15 +87,15 @@
                    
                      <tr>
                        <td><?= $no; ?></td>
-                       <td><?= htmlspecialchars($user['user_login']); ?></td>
-                       <td><?= htmlspecialchars($user['user_email']); ?></td>
-                       <td><?= htmlspecialchars($user['user_level']); ?></td>
+                       <td><?= safe_html($user['user_login']); ?></td>
+                       <td><?= safe_html($user['user_email']); ?></td>
+                       <td><?= safe_html($user['user_level']); ?></td>
                        <td>
                        <a href="<?=generate_request('index.php', 'get', ['users', 'editUser', $user['ID'], $user['user_session']])['link']; ?>" class="btn btn-warning">
                        <i class="fa fa-pencil fa-fw"></i> Edit</a>
                        </td>
                        <td>
-                       <a href="javascript:deleteUser('<?= abs((int)$user['ID']); ?>', '<?= $user['user_fullname']; ?>')" class="btn btn-danger">
+                       <a href="javascript:deleteUser('<?= abs((int)$user['ID']); ?>', '<?= safe_html($user['user_fullname']); ?>')" class="btn btn-danger">
                        <i class="fa fa-trash-o fa-fw"></i> Delete</a>
                        </td>
                      </tr>

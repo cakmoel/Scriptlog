@@ -23,35 +23,35 @@ class Wall extends Dashboard
    
    if(true === is_non_administrator()) {
 
-     if (isset($_SESSION['user_fullname'])) {
+     if (isset(Session::getInstance()->scriptlog_session_fullname)) {
 
-        $non_admin = $_SESSION['user_fullname'];
-
-     }
-
-     if (isset($_COOKIE['cookie_user_fullname'])) {
-
-        $non_admin = $_COOKIE['cookie_user_fullname'];
+        $non_admin = Session::getInstance()->scriptlog_session_fullname;
 
      }
 
-     $this->welcomeUser('Hello '.$non_admin);
+     if (isset($_COOKIE['scriptlog_cookie_fullname'])) {
+
+        $non_admin = $_COOKIE['scriptlog_cookie_fullname'];
+
+     }
+
+     $this->welcomeUser('Hello '.safe_html($non_admin));
 
    } else {
 
-     if (isset($_SESSION['user_login'])) {
+     if (isset(Session::getInstance()->scriptlog_session_login)) {
 
-         $administrator = $_SESSION['user_login'];
+         $administrator = Session::getInstance()->scriptlog_session_login;
 
      } 
 
-     if (isset($_COOKIE['cookie_user_login'])) {
+     if (isset($_COOKIE['scriptlog_cookie_login'])) {
 
-        $administrator = $_COOKIE['cookie_user_login'];
+        $administrator = $_COOKIE['scriptlog_cookie_login'];
 
      }
 
-     $this->welcomeAdmin('Hello '.$administrator);
+     $this->welcomeAdmin('Hello '.safe_html($administrator));
 
    }
 

@@ -13,7 +13,7 @@
  * @version 0.2
  * 
  */
-class Html 
+final class Html 
 {
      
      /**
@@ -220,7 +220,8 @@ class Html
       * 
       * @param $val string Value filter
       */
-     public function filter( $val ) {
+     public function filter( $val ) 
+     {
           
          if ( !isset( $val ) || empty( $val ) ) {
              return '';
@@ -286,12 +287,8 @@ class Html
      }
       
       
-     protected function cleanAttributeNode( 
-         &$node, 
-         &$attr, 
-         &$goodAttributes, 
-         &$href
-     ) {
+     protected function cleanAttributeNode ( &$node, &$attr, &$goodAttributes, &$href) 
+     {
          /**
           * Why the devil is an attribute name called "nodeName"?!
           */

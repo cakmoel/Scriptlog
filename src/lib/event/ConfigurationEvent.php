@@ -31,6 +31,30 @@ class ConfigurationEvent
    * @var string
    */
   private $setting_value;
+
+/**
+ * An instance of ConfigurationDao
+ *
+ * @var object
+ * 
+ */
+  private $configDao;
+
+/**
+ * An instance of formValidator
+ *
+ * @var object
+ * 
+ */
+  private $validator;
+
+/**
+ * An instance of sanitizer
+ *
+ * @var object
+ * 
+ */
+  private $sanitizer;
   
   public function __construct(ConfigurationDao $configDao, FormValidator $validator, Sanitize $sanitize)
   {
@@ -46,17 +70,27 @@ class ConfigurationEvent
 
   public function setConfigName($setting_name)
   {
-    $this->setting_name = $setting_name;    
+    $this->setting_name = prevent_injection($setting_name);    
   }
 
   public function setConfigValue($setting_value)
   {
-    $this->setting_value = $setting_value;
+    $this->setting_value = prevent_injection($setting_value);
   }
 
   public function grabSettings($orderBy = 'ID')
   {
     return $this->configDao->findConfigs($orderBy);
+  }
+
+  public function grabGeneralSettings($orderBy = 'ID', $limit = 7)
+  {
+    return $this->configDao->findGeneralConfigs($orderBy, $limit);
+  }
+
+  public function grabPermalinkSetting($permalink_key)
+  {
+    return $this->configDao->findPermalinkConfig($permalink_key, $this->sanitizer);
   }
 
   public function grabSetting($id)
@@ -71,7 +105,6 @@ class ConfigurationEvent
     $this->validator->sanitize($this->setting_value, 'string');
     
     return $this->configDao->createConfig([
-
       'setting_name' => $this->setting_name,
       'setting_value' => $this->setting_value
     ]);
@@ -80,16 +113,13 @@ class ConfigurationEvent
 
   public function modifySetting()
   {
+    
     $this->validator->sanitize($this->setting_name, 'string');
     $this->validator->sanitize($this->setting_value, 'string');
-    $this->validator->sanitize($this->setting_desc, 'string');
   
     return $this->configDao->updateConfig($this->sanitizer, [
-
        'setting_name' => $this->setting_name,
-       'setting_value' => $this->setting_value,
-       'setting_desc' => $this->setting_desc
-
+       'setting_value' => $this->setting_value
     ], $this->setting_id);
     
   }

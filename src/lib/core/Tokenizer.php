@@ -4,8 +4,9 @@
  * Utitlize Cookies for authorization and authentication
  *
  * @category  Core Class
- * @author    Vincy vincy@gmail.com
- * @link      https://phppot.com/php/secure-remember-me-for-login-using-php-session-and-cookies/
+ * @author    Scott 
+ * @see      https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string
+ * @see      https://phppot.com/php/secure-remember-me-for-login-using-php-session-and-cookies/
  * 
  */
 class  Tokenizer
@@ -21,48 +22,53 @@ class  Tokenizer
  */
   public function createToken($length)
   {
-     $token = "";
-     $key  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-     $key .= "!@#$%^&*?{}";
-     $key .= "0123456789";
-     $key .= "abcdefghijklmnopqrstuvwxyz";
      
-     $max = strlen($key) - 1;
-        
-       for ($i = 0; $i < $length; $i ++) {
+    $generator = (new \RandomLib\Factory())->getMediumStrengthGenerator();
+    
+    $token = $generator->generateString($length);
 
-            $token .= $key[$this->randomSecureToken(0, $max)];
-
-        }
-        
-      return $token;
+    return $token;
 
   }
 
-  public function randomSecureToken($min, $max)
+  private function randomSecureToken($min, $max)
   {
 
     $range = $max - $min;
 
-        if ($range < 1) {
-            return $min; 
-        }
+    if ($range < 1) {
+            
+      return $min; 
+        
+    }
 
-        $log = ceil(log($range, 2));
-        $bytes = (int) ($log / 8) + 1; 
-        $bits = (int) $log + 1; 
-        $filter = (int) (1 << $bits) - 1; 
+    $log = ceil(log($range, 2));
+    $bytes = (int) ($log / 8) + 1; 
+    $bits = (int) $log + 1; 
+    $filter = (int) (1 << $bits) - 1; 
 
-        do {
+    do {
 
-            $rnd = hexdec(bin2hex(openssl_random_pseudo_bytes($bytes)));
-            $rnd = $rnd & $filter; 
+      if(function_exists("random_bytes")) {
 
-        } while ($rnd >= $range);
+        $rnd = hexdec(bin2hex(random_bytes($bytes)));
+ 
+      } elseif(function_exists("openssl_random_pseudo_bytes")) {
+ 
+       $rnd = hexdec(bin2hex(openssl_random_pseudo_bytes($bytes)));
+        
+      } else {
+ 
+        $rnd = hexdec(bin2hex(ircmaxell_random_generator($bytes)));
+ 
+      }
 
-        return $min + $rnd;
+      $rnd = $rnd & $filter; 
+
+    } while ($rnd > $range);
+
+      return $min + $rnd;
 
   }
 
-  
 }

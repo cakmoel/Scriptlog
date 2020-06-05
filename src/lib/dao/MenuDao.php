@@ -30,8 +30,9 @@ class MenuDao extends Dao
  */
  public function findMenus($orderBy = 'ID')
  {
-    $sql = "SELECT ID, menu_label, menu_link, menu_sort, menu_status
-    FROM tbl_menu ORDER BY :orderBy DESC";
+    $sql = "SELECT ID, menu_label, menu_link, 
+                   menu_sort, menu_status
+            FROM tbl_menu ORDER BY :orderBy DESC";
 
     $this->setSQL($sql);
 
@@ -219,7 +220,7 @@ class MenuDao extends Dao
    
    $dropDown = '<select class="form-control" name="parent" id="parent">'."\n"; 
 
-   if (!empty($menus)) {
+   if (is_array($menus)) {
 
    foreach ($menus as $menu) {
       
@@ -272,6 +273,7 @@ class MenuDao extends Dao
   
     $parent = "SELECT ID, menu_label, menu_link, menu_sort, menu_status 
                FROM tbl_menu WHERE menu_status = 'Y'";
+               
     $stmt = $this->dbc->dbQuery($parent);
 
     $html = '';

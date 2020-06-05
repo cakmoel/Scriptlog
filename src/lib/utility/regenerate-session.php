@@ -32,6 +32,7 @@ function regenerate_session()
 
 }
 
+// get session data
 function get_session_data($session_name = 'PHPSESSID', $session_save_handler = 'files')
 {
 
@@ -73,6 +74,7 @@ function get_session_data($session_name = 'PHPSESSID', $session_save_handler = '
 
 }
 
+// clear duplicate cookies
 function clear_duplicate_cookies()
 {
 

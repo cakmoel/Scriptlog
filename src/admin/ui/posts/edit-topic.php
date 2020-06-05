@@ -51,15 +51,19 @@ echo "Error saving data. Please try again." . $saveError;
 endif;
 ?>
 
-<form method="post" action="index.php?load=topics&action=<?=(isset($formAction)) ? $formAction : null; ?>&topicId=<?=(isset($topicData['ID'])) ? $topicData['ID'] : 0; ?>" role="form">
-<input type="hidden" name="topic_id" value="<?=(isset($topicData['ID'])) ? $topicData['ID'] : 0; ?>" />
+<?php
+$action = (isset($formAction)) ? $formAction : null;
+$topic_id = (isset($topicData)) ? abs((int)$topicData['ID']) : 0;
+?>
+<form method="post" action="<?=generate_request('index.php', 'post', ['topics', $action, $topic_id])['link']?>" role="form">
+<input type="hidden" name="topic_id" value="<?=$topic_id; ?>">
 
 <div class="box-body">
 <div class="form-group">
 <label>Title (required)</label>
 <input type="text" class="form-control" name="topic_title" placeholder="Enter title here" value="
-<?=(isset($topicData['topic_title'])) ? htmlspecialchars($topicData['topic_title']) : ""; ?>
-<?=(isset($formData['topic_title'])) ? htmlspecialchars($formData['topic_title'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" required>
+<?=(isset($topicData['topic_title'])) ? safe_html($topicData['topic_title']) : ""; ?>
+<?=(isset($formData['topic_title'])) ? safe_html($formData['topic_title']) : ""; ?>" required>
 </div>
 
 <?php if (isset($topicData['topic_status'])) : ?>
@@ -93,7 +97,7 @@ endif;
 
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
-<input type="submit" name="topicFormSubmit" class="btn btn-primary" value="<?=(isset($topicData['ID']) && $topicData['ID'] != '') ? "Update" : "Add New Topic" ?>">
+<input type="submit" name="topicFormSubmit" class="btn btn-primary" value="<?=(($topic_id) && ($topic_id != '')) ? "Update" : "Add New Topic" ?>">
 </div>
 </form>
             

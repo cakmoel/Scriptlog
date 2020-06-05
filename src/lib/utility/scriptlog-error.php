@@ -18,7 +18,9 @@ function scriptlog_error($error_message, $error_type = E_USER_NOTICE, $context =
 
         if (false === ($frame = next($stack))) break;
 
+        $error_message .= "<p>";
         $error_message .= " in: " . $frame['function'] . '() function called from: ' . $frame['file'] . ' on line ' . $frame['line'] .' '."\n ";
+        $error_message .= '</p>';
 
     }
 

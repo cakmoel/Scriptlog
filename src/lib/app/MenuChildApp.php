@@ -60,7 +60,7 @@ class MenuChildApp extends BaseApp
 
   public function insert()
   {
-    $menus = new Menu(); 
+    $menus = new MenuDao(); 
     $errors = [];
     $checkError = true;
     
@@ -146,7 +146,7 @@ class MenuChildApp extends BaseApp
 
   public function update($id)
   {
-    $menus = new Menu();
+    $menus = new MenuDao();
     $errors = [];
     $checkError = true;
 

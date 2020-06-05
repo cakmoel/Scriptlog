@@ -52,6 +52,13 @@ function is_valid_domain($url)
 
 }
 
+/**
+ * domain name function
+ * returning server http host where website hosted
+ *
+ * @return string
+ * 
+ */
 function domain_name()
 {
   $domain = (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] != 'localhost') ? $_SERVER['HTTP_HOST'] : "";

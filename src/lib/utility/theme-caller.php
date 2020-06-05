@@ -19,7 +19,7 @@ function theme_identifier()
     return $theme_init->loadTheme('Y');
 
   }
-
+  
 }
 
 // call theme header

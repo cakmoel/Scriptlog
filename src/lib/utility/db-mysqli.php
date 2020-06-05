@@ -3,6 +3,7 @@
  * collection of function uses MySQL Improved (MySQLi) extension
  * 
  * @category function
+ * @uses DbMySQLi::getInstance
  * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0
@@ -17,9 +18,17 @@ function db_instance()
   return $database;
 }
 
+function db_simple_query($sql)
+{
+  
+  $stmt = db_instance()->simpleQuery($sql);
+
+  return $stmt;
+
+}
 
 /**
- * db mysqli query
+ * mysqli prepared statement
  * $sql = DML
  * 
  * @param string $sql
@@ -68,56 +77,3 @@ function check_table()
 
 }
 
-function sanitizing_data($sanitizer, $str, $type)
-{
-   
-try {
-  
-  if (is_object($sanitizer)) {
-
-
-   switch ($type) {
- 
-    case 'sql':
-      
-      if (filter_var($str, FILTER_SANITIZE_NUMBER_INT)) {
-              
-        return $sanitizer->sanitasi($str, 'sql');
-          
-      } else {
-          
-        header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-        throw new DbException("ERROR: this - $str - Id is considered invalid.");
-          
-      }
-      
-      break;
-    
-    case 'xss':
-
-      if (filter_var($str, FILTER_SANITIZE_FULL_SPECIAL_CHARS)) {
-              
-        return $sanitizer->sanitasi(prevent_injection($str), 'xss');
-          
-      } else {
-          
-          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-          throw new DbException("ERROR: this - $str - is considered invalid.");
-
-      }
-      
-      break;
-
-   }
-
-  }
-
-} catch (DbException $e) {
-
-  $this->error = LogError::setStatusCode(http_response_code());
-  $this->error = LogError::newMessage($e);
-  $this->error = LogError::customErrorMessage();
-
-}
-
-}

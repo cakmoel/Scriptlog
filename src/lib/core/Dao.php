@@ -41,7 +41,11 @@ class Dao
   */
  public function __construct() 
  {
-   if (Registry::isKeySet('dbc')) $this->dbc = Registry::get('dbc');
+   if (Registry::isKeySet('dbc')) {
+
+       $this->dbc = Registry::get('dbc');
+
+   }
  }
 
  public function __desctruct()
@@ -180,15 +184,15 @@ class Dao
            
         }
          
-         $stmt = $this->dbc->dbQuery($this->sql, $data);
+        $stmt = $this->dbc->dbQuery($this->sql, $data);
          
-         return $stmt->rowCount();
+        return $stmt->rowCount();
               
      } catch (DbException $e) {
          
-         $this->closeConnection();
-         $this->error = LogError::newMessage($e);
-         $this->error = LogError::customErrorMessage('admin');
+        $this->closeConnection();
+        $this->error = LogError::newMessage($e);
+        $this->error = LogError::customErrorMessage('admin');
          
      }
      
@@ -231,6 +235,38 @@ class Dao
     (!is_null($limit)) ? $this->dbc->dbDelete($table, $where, $limit) : $this->dbc->dbDelete($table, $where);
  }
  
+ /**
+ * startTransaction
+ * begin transaction for multiple queries as a unified block 
+ * 
+ * @return void
+ * 
+ */
+protected function callTransaction()
+{
+  $this->dbc->dbTransaction();
+}
+
+/**
+ * callCommit
+ * commit the transaction if no problems have been encountered
+ * 
+ */
+protected function callCommit()
+{
+  $this->dbc->dbCommit();
+}
+
+/**
+ * callRollBack
+ * to roll back the tables to their original state.
+ * 
+ */
+protected function callRollBack()
+{
+  $this->dbc->dbRollBack();
+}
+
  /**
   * Close database connection
   * 
@@ -308,6 +344,6 @@ class Dao
           
       }
 			
-	}
+}
 	
 }

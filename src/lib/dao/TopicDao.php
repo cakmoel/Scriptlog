@@ -61,7 +61,7 @@ class TopicDao extends Dao
     $cleanId = $this->filteringId($sanitize, $topicId, 'sql');
     
     $sql = "SELECT ID, topic_title, topic_slug, topic_status
-		    FROM tbl_topics WHERE ID = ?";
+		        FROM tbl_topics WHERE ID = ?";
     
     $this->setSQL($sql);
     
@@ -181,28 +181,27 @@ class TopicDao extends Dao
  public function setCheckBoxTopic($postId = '', $checked = null)
  {
                   
+   
    if (is_null($checked)) {
-       $checked = "checked='checked'";
-    }
+      $checked = "checked='checked'";
+   }
       
-  $html = array();
-  $html[] = '<div class="form-group">';
-  $html[] = '<label>Category : </label>';
+   $html = '<div class="form-group">';
+   $html .= '<label>Category : </label>';
 
-  $items = null;
-  $items = $this->findTopics();
+   $items = $this->findTopics('topic_title');
  
-  if (empty($postId)) {
+   if (empty($postId)) {
        
      if (is_array($items)) {
          
-         foreach ($items as $i => $item) {
+         foreach ($items as $item) {
              
              if (isset($_POST['catID'])) {
                  
                  if (in_array($item['ID'], $_POST['catID'])) {
                      
-                     $checked = "checked='checked'";
+                    $checked="checked='checked'";
                      
                  } else {
                      
@@ -212,26 +211,26 @@ class TopicDao extends Dao
                  
              }
             
-            $html[] = '<div class="checkbox">';
-            $html[] = '<label>';
-            $html[] = '<input type="checkbox" name="catID[]" value="'.$item['ID'].'"'.$checked.'>'.$item['topic_title'];
-            $html[] = '</label>';
-            $html[] = '</div>';
+            $html .= '<div class="checkbox">';
+            $html .= '<label>';
+            $html .= '<input type="checkbox" name="catID[]" value="'.$item['ID'].'" '.$checked.'>'.$item['topic_title'];
+            $html .= '</label>';
+            $html .= '</div>';
              
          }
          
      } else {
          
-         $html[] = '<div class="checkbox">';
-         $html[] = '<label>';
-         $html[] = '<input type="checkbox" name="catID" value="0" checked>Uncategorized';
-         $html[] = '</label>';
-         $html[] = '</div>';
+         $html .= '<div class="checkbox">';
+         $html .= '<label>';
+         $html .= '<input type="checkbox" name="catID" value="0" checked>Uncategorized';
+         $html .= '</label>';
+         $html .= '</div>';
          
      }
     
     
- } else {
+  } else {
      
      if (is_array($items)) {
 
@@ -241,28 +240,29 @@ class TopicDao extends Dao
                
             if ($post_topic['topic_id'] == $item['ID']) {
               
-              $checked="checked='checked'";
+              $checked = "checked='checked'";
             
             } else {
              
               $checked = null;
+              
             }
                
-               $html[] = '<div class="checkbox">';
-               $html[] = '<label>';
-               $html[] = '<input type="checkbox" name="catID[]" value="'.$item['ID'].'"'.$checked.'>'.$item['topic_title'];
-               $html[] = '</label>';
-               $html[] = '</div>';
+               $html .= '<div class="checkbox">';
+               $html .= '<label>';
+               $html .= '<input type="checkbox" name="catID[]" value="'.$item['ID'].'" '.$checked.'>'.$item['topic_title'];
+               $html .= '</label>';
+               $html .= '</div>';
                
            }
 
-     }
+    } 
      
- }
+  }
  
-  $html[] = '</div>';
+  $html .= '</div>';
  
-  return implode("\n", $html);
+  return $html;
  
  }
  

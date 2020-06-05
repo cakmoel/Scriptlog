@@ -6,7 +6,7 @@
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
         <small>
-        <a href="index.php?load=plugins&action=installPlugin&pluginId=0" class="btn btn-primary"><i class="fa fa-cloud-upload"></i> Upload Plugin</a>
+        <a href="<?= generate_request('index.php', 'get', ['plugins', ActionConst::INSTALLPLUGIN, 0])['link']; ?>" class="btn btn-primary"><i class="fa fa-cloud-upload"></i> Upload Plugin</a>
         </small>
       </h1>
       <ol class="breadcrumb">

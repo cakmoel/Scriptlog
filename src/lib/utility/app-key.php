@@ -22,7 +22,7 @@ function app_key()
 
   } else {
 
-    scriptlog_error("Sorry, your application key not recognized!");
+     return false;
 
   }
   

@@ -6,14 +6,12 @@
  * @return void
  * 
  */
-function block_request_type($current_request)
+function block_request_type($current_request, array $method_allowed)
 {
 
  $block = false;
 
- $allowed_request = ['GET', 'POST'];
-
- if (!in_array($current_request, $allowed_request)) {
+ if (!in_array($current_request, $method_allowed)) {
 
      $block = true;
 

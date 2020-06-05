@@ -78,7 +78,36 @@ interface DbInterface
  * Last insert Id
  * 
  * @method public dbLastInsertId()
+ * 
  */
  public function dbLastInsertId();
-    
+
+/**
+ * dbTransaction
+ * begin transaction for multiple queries as a unified block 
+ *
+ * @method public dbTransaction()
+ * 
+ */
+ public function dbTransaction();
+
+/**
+ * dbCommit
+ * commit the transaction if no problems have been encountered
+ *
+ * @method public dbCommit()
+ * 
+ */
+ public function dbCommit();
+
+/**
+ * dbRollBack
+ * If any errors are detected, you can roll back all tables to their 
+ * original state at the end of the sequence.
+ *
+ * @method public dbRollBack()
+ * 
+ */
+ public function dbRollBack();
+
 }

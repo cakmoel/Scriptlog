@@ -1,8 +1,8 @@
 <?php
 /**
- * Class APCU
+ * Class APCU extends Class Cache
  * 
- * @category Class APCU extends Cache
+ * @category Core Class
  * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0

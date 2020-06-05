@@ -1,6 +1,10 @@
 <?php
 
 /*
+ * Class Ubench
+ * 
+ * @category Core Class
+ * @author Jeremy Perret
  * Copyright (c) 2012 Jeremy Perret
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,6 +24,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
  */
 
 class Ubench

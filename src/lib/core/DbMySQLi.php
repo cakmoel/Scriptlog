@@ -92,6 +92,12 @@ public static function activateReportMode()
 
 }
 
+/**
+ * getInstance
+ *
+ * @return object
+ * 
+ */
 public static function getInstance()
 {
 
@@ -270,27 +276,29 @@ public function cleanOutputDisplay($data)
 
 public function isTableExists($table_name)
 {
-  self::$counter++;
+  
+ try {
+   
+  $check = $this->dbc->query("SHOW TABLES LIKE '".$table_name."'");
+ 
+  if ($check->num_rows == 1) {
 
-  $check = $this->dbc->query("SELECT 1 FROM $table_name");
-
-  if ($check !== false) {
-
-      if ($check->num_rows > 0) {
-
-          return true;
-
-      } else {
-
-          return false;
-
-      }
+    return true;
 
   } else {
 
-      return false;
+    return false;
 
   }
+
+  $check->free();
+
+ } catch (mysqli_sqli_exception $e) {
+   
+    $this->errors = LogError::newMessage($e);
+    $this->errors = LogError::customErrorMessage();
+
+ }
   
 }
 
@@ -325,26 +333,9 @@ public function getNumRows($sql)
 private function getConfiguration()
 {
 
-  try {
-  
-    $filename = __DIR__ . '/../../config.php';
+  $config = AppConfig::readConfiguration(invoke_config());
 
-    if (!check_config_file($filename)) {
-
-      throw new DbException("Database configuration not Found");
-
-    }
-  
-    $config = AppConfig::readConfiguration($filename);
-
-    return $config;
-
-  } catch (DbException $e) {
-    
-      $this->errors = LogError::newMessage($e);
-      $this->errors = LogError::customErrorMessage('admin');
-
-  }
+  return $config;
   
 }
 

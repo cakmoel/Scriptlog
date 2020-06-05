@@ -95,18 +95,16 @@ class SearchFinder
   	
   	$sth = $this->dbc->prepare($this->sql);
   	
-  	if ( $sth -> execute($this->bind) !== false )
-  	{
+  	if ( $sth -> execute($this->bind) !== false ) {
   		
-  		if (preg_match("/^(" . implode("|", array ("select", "describe", "pragma")) . ") /i", $this->sql))
-  		{
-  			
-  			return $sth->fetchAll(PDO::FETCH_ASSOC);
-  		}
-  		elseif (preg_match("/^(" . implode("|", array ("delete", "insert", "update")) . ") /i", $this->sql))
-  		{
-  			
-  			return $sth->rowCount();
+  		if (preg_match("/^(" . implode("|", array ("select", "describe", "pragma")) . ") /i", $this->sql)) {
+
+			  return $sth->fetchAll(PDO::FETCH_ASSOC);
+			  
+  		} elseif (preg_match("/^(" . implode("|", array ("delete", "insert", "update")) . ") /i", $this->sql)) {
+
+			  return $sth->rowCount();
+			  
   		}
   		
   	}

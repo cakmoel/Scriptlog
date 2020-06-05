@@ -27,7 +27,7 @@ function upload_media($file_location, $file_type, $file_size, $file_name)
        break;
 
      case 'audio/mpeg':
-     case 'audio/wav':
+     case 'audio/wav' :
      case 'audio/ogg' :
 
        upload_audio($file_size, $file_size, $file_type, $file_name);
@@ -35,10 +35,9 @@ function upload_media($file_location, $file_type, $file_size, $file_name)
        break;
       
      case 'image/jpeg' :
-     case 'image/pjpeg' :
      case 'image/png'  :
      case 'image/gif'  :
-     case 'image/webp' : 
+     case 'image/webp' :
      
        upload_photo($file_location, $file_size, $file_type, $file_name);
 
@@ -54,7 +53,7 @@ function upload_media($file_location, $file_type, $file_size, $file_name)
 
      default:
   
-       scriptlog_error("Error - file type not allowed!", E_USER_ERROR);
+       scriptlog_error("Error - file type not allowed!", E_USER_WARNING);
         
        break;
 

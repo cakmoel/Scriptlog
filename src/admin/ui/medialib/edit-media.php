@@ -81,7 +81,7 @@ if (isset($mediaData['media_filename'])) :
 ?>
 
 <div class="form-group">
-<a href="<?=$image_src;?>" title="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
+<a href="<?=$webp_src;?>" title="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
 <picture class="thumbnail">
 <source srcset="<?=$webp_src_thumb; ?>" type="image/webp">
 <img src="<?=$image_src_thumb;?>" class="img-responsive pad" width="320" alt="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">

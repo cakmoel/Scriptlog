@@ -86,7 +86,7 @@
                          <td><?= human_readable_datetime(read_datetime($comment['comment_date']), 'g:ia \o\n l jS F Y'); ?></td>
 
                          <td>
-                          <a href="index.php?load=comments&action=editComment&commentId=<?= htmlspecialchars((int)$topic['ID']);?>" class="btn btn-warning">
+                          <a href="index.php?load=comments&action=editComment&Id=<?= htmlspecialchars((int)$topic['ID']);?>" class="btn btn-warning">
                            <i class="fa fa-pencil fa-fw"></i> Edit</a>
                          </td>
                          <td>
@@ -128,7 +128,7 @@
   {
 	  if (confirm("Are you sure want to delete comment from '" + name + "'"))
 	  {
-	  	window.location.href = 'index.php?load=comments&action=deleteComment&commentId=' + id;
+	  	window.location.href = 'index.php?load=comments&action=deleteComment&Id=' + id;
 	  }
   }
 </script>

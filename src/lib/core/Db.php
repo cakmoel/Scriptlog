@@ -38,7 +38,7 @@ class Db implements DbInterface
  */
  public function __construct($values, $options)
  {
-     $this->setDbConnection($values, $options);
+    $this->setDbConnection($values, $options);
  }
  
  /**
@@ -66,7 +66,9 @@ class Db implements DbInterface
       $this->dbc = new PDO($dsn, $dbUser, $dbPass, $options);
       
       if (!$this->dbc) {
+
           throw new DbException("Connection Failed!");
+          
       }
        
    } catch (DbException $e) {
@@ -93,7 +95,7 @@ class Db implements DbInterface
   * {@inheritDoc}
   * @see DbInterface::dbQuery()
   */
- public function dbQuery($sql, $args = null)
+ public function dbQuery($sql, $args = array())
  {
      if (!$args) {
          
@@ -102,8 +104,12 @@ class Db implements DbInterface
      }
      
      $stmt = $this->dbc->prepare($sql);
+
+     
      $stmt -> execute($args);
+     
      return $stmt;
+     
  }
  
  /**
@@ -167,6 +173,7 @@ class Db implements DbInterface
    try {
        
        ksort($params);
+
        $columns = null;
        
        foreach ($params as $key => $value) {
@@ -178,7 +185,7 @@ class Db implements DbInterface
        $columns = rtrim($columns,',');
        
        $stmt = $this->dbc->prepare("UPDATE $tablename SET $columns WHERE  $where");
-       
+
        foreach ($params as $key => $value) {
            $stmt->bindValue(":$key", $value);
        }
@@ -217,7 +224,10 @@ class Db implements DbInterface
         }
         
         $stmt = $this->dbc->prepare($sql);
-        return $stmt->execute();
+        
+        $stmt->execute();
+
+        return $stmt->rowCount();
         
     } catch (DbException $e) {
         
@@ -228,5 +238,41 @@ class Db implements DbInterface
     }
     
  }
- 
+
+/**
+ * database transaction
+ * 
+ * {@inheritDoc}
+ * @see DbInterface::dbTransaction
+ * 
+ */
+public function dbTransaction()
+{
+  return $this->dbc->BeginTransaction();
+}
+
+/**
+ * database commit
+ * 
+ * @inheritDoc
+ * @see DbInterface::dbCommit
+ *
+ */
+public function dbCommit()
+{
+  return $this->dbc->commit();
+}
+
+/**
+ * database rollback
+ * 
+ * @inheritDoc
+ * @see DbInterface::dbRollBack
+ * 
+ */
+public function dbRollBack()
+{
+  return $this->dbc->rollBack();
+}
+
 }

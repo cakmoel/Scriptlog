@@ -64,6 +64,7 @@ function direct_page($page = '', $http_status_code = null)
  
  // redirect the user
  header("Location: $url");
+ 
  exit();
  
 }

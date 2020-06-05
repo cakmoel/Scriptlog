@@ -9,7 +9,11 @@
  */
 function setplugin($user_level, $plugin_level)
 {
+  
   $plugin = new PluginDao();
+  
   $plugin_actived = $plugin -> setMenuPlugin($user_level, $plugin_level);
+  
   return $plugin_actived;
+  
 }

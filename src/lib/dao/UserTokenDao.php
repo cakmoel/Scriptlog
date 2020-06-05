@@ -72,16 +72,25 @@ class UserTokenDao extends Dao
   public function createUserToken($bind)
   {
 
-    $this->create("tbl_user_token", [
-
-      'user_login' => $bind['user_login'],
-      'pwd_hash' => $bind['pwd_hash'],
-      'selector_hash' => $bind['selector_hash'],
-      'expired_date' => $bind['expired_date']
-
-    ]);
+    $this->create("tbl_user_token", ['user_login' => $bind['user_login'], 'pwd_hash' => $bind['pwd_hash'], 'selector_hash' => $bind['selector_hash'], 'expired_date' => $bind['expired_date']]);
 
   }
+
+/**
+ * UpdateUserToken
+ *
+ * @param object $sanitize
+ * @param array $bind
+ * @param string $user_login
+ * @return void
+ * 
+ */
+public function updateUserToken($sanitize, $bind, $user_login)
+{
+  
+  $this->modify("tbl_user_token", ['pwd_hash' => $bind['pwd_hash'], 'selector_hash' => $bind['selector_hash'], 'expired_date' => $bind['expired_date']], " user_login = '{$user_login}' AND is_expired = '0'");
+
+}
 
 /**
  * Update token expired

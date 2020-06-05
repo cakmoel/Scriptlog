@@ -226,7 +226,7 @@ class MenuChildDao extends Dao
 
    $dropDown = '<select class="form-control" name="child" id="child">'."\n";
 
-   if (!empty($subMenus)) {
+   if (is_array($subMenus)) {
 
     foreach ($subMenus as $subMenu) {
 

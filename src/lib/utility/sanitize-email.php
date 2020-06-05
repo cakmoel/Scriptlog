@@ -3,8 +3,10 @@
  * Sanitize Email Header Function
  * 
  * @author Kevin Waterson
+ * @see https://phpro.org/tutorials/PHP-Security.html
  * @param string $email
  * @return mixed
+ * 
  */
 function sanitize_email($email)
 {

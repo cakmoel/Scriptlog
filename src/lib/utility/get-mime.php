@@ -4,7 +4,6 @@
  * retrieve media type info from file
  * 
  * @category Function
- * @package  category
  * @param string $filename
  * 
  */

@@ -4,7 +4,7 @@
  * 
  * @category Core Class
  * @author   jason
- * @link     http://www.xeweb.net/2011/11/03/simple-php-caching-improved/
+ * @see     http://www.xeweb.net/2011/11/03/simple-php-caching-improved/
  * @version  1.0
  * 
  */
@@ -13,7 +13,7 @@ class PageCache
 
  private $cache_expires = 3600;
  
- private $cache_folder = APP_SYSPATH . 'public/cache/';
+ private $cache_folder = APP_ROOT . 'public/cache/';
  
  private $include_query_strings = true;
  
@@ -25,7 +25,7 @@ class PageCache
  public function __construct() 
  {
      
-     $file = $_SERVER['REQUEST_URI'];
+     $file = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : "";
      if (!$this->include_query_strings && strpos($file, "?") !== false) {
          $qs = explode("?", $file);
          $file = $qs[0];

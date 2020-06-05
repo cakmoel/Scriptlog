@@ -13,7 +13,7 @@ function route_request()
   
   $dispatcher = new Dispatcher();
   
-if (true === check_table()) {
+if (check_table() == true) {
 
      return $dispatcher -> dispatch();
 

@@ -17,9 +17,8 @@ if (file_exists(__DIR__ . '/../config.php')) {
   
 }
 
-$errors = [];
 $stop = null;
-$recoverFormSubmitted = isset($_POST['Change']);
+
 $tempKey = isset($_GET['tempKey']) ? htmlentities(strip_tags($_GET['tempKey'])) : "";
 $user = $userDao -> getUserByResetKey($tempKey);
 
@@ -31,45 +30,41 @@ if ($user['user_reset_complete'] == 'Yes') {
     $stop = "Your password has been changed";
 }
 
-if (empty($recoverFormSubmitted) == false) {
-   
-    $password = isset($_POST['pass1']) ? prevent_injection($_POST['pass1']) : "";
-    $confirmPass = isset($_POST['pass2']) ? prevent_injection($_POST['pass2']) : "";
+if (isset($_POST['Change']) && $_POST['Change'] == 'Change Password') {
 
-    $badCSRF = true;
+  $password = isset($_POST['pass1']) ? prevent_injection($_POST['pass1']) : "";
+  $confirmPass = isset($_POST['pass2']) ? prevent_injection($_POST['pass2']) : "";
+  $csrf = isset($_POST['csrf']) ? $_POST['csrf'] : '';
+  $valid = !empty($csrf) && verify_form_token('recover_pwd', $csrf);
 
-    if (false === verify_form_token('recoverPwd')) {
-     
-      $badCSRF = true;
-      write_log($ip, 'form_recover_pwd');
-      $errors['errorMessage'] = "Sorry, there was a security issue";
+  if(!$valid) {
+
+    $errors['errorMessage'] = "Sorry, there was a security issue";
+
+  }
     
-    }
+  if (empty($password) || empty($confirmPass)) {
 
-    if (empty($password) || empty($confirmPass)) {
+      $errors['errorMessage'] = "All column must be filled";
 
-       $errors['errorMessage'] = "All column must be filled";
+  } elseif (!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
 
-    } elseif (!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
+      $errors['errorMessage'] = "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters";
 
-      $errors['errorMessage'] = "The Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters'";
+  } elseif (strlen($password) < 8) {
 
-   } elseif (strlen($password) < 8) {
+      $errors['errorMessage'] = "Password must consist of least 8 characters";
 
-      $errors['errorMessage'] = "The Password must consist of least 8 characters";
+  } elseif ($password !== $confirmPass) {
 
-   } elseif ($password !== $confirmPass) {
+      $errors['errorMessage'] = "Password does not match";
 
-     $errors['errorMessage'] = "The Password does not match";
+  } else {
 
-   } else {
-
-      $badCSRF = false;
-      unset($_SESSION['CSRF']);
       $authenticator -> updateNewPassword($password, abs((int)$user['ID']));
       direct_page('login.php?status=changed', 200);
 
-   }
+  }
 
 }
 
@@ -156,7 +151,7 @@ else :
       <div class="row">
         <div class="col-xs-8">
   <?php 
-    $block_csrf = generate_form_token('recoverPwd', 16); // prevent csrf
+    $block_csrf = generate_form_token('recover_pwd', 64); 
   ?>
         <input type="hidden" name="csrf" value="<?= $block_csrf; ?>">
         <input type="submit" class="btn btn-primary btn-block btn-flat" name="Change" value="Change Password">

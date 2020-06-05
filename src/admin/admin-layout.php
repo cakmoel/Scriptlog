@@ -11,31 +11,7 @@ function admin_header($stylePath, $breadCrumbs = null, $allowedQuery = null)
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-<title>
-
-  <?php 
-    
-  if (strstr($breadCrumbs, '../') !== false) {
-    
-        echo 'Error: 400 Bad Request';
-    
-  } elseif(strstr($breadCrumbs, 'file://') !== false ) {
-   
-        echo 'Error: 400 Bad Request';
-        
-  } elseif ((empty($breadCrumbs)) || (!in_array($breadCrumbs, $allowedQuery))) {
-  
-        echo 'Error: 404 Not Found';
-       
-  } else {
-      
-      cp_tag_title($breadCrumbs);
-      
-  }
-       
-  ?>
-
-  </title>
+<title><?= cp_tag_title($breadCrumbs, $allowedQuery); ?></title>
   
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.7 -->
@@ -60,6 +36,8 @@ function admin_header($stylePath, $breadCrumbs = null, $allowedQuery = null)
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/audioPreview.css">
    <!-- wysiwyg editor-->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/wysihtml5/bootstrap3-wysihtml5.min.css">
+  <!-- select2 -->
+  <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/select2.min.css">
 
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -128,6 +106,7 @@ function admin_footer($stylePath, $ubench = null)
 <script src="<?= $stylePath; ?>/assets/dist/js/imagevalidation.js"></script>
 <script src="<?= $stylePath; ?>/assets/dist/js/toggle-field.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
+<script src="<?= $stylePath; ?>/assets/dist/js/select2.full.min.js"></script>
 <script type="text/javascript" src="<?= $stylePath; ?>/assets/dist/js/jquery.uploadPreview.min.js"></script>
 <script>
 $(document).ready(function(){

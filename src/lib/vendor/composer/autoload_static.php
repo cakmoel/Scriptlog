@@ -49,11 +49,29 @@ class ComposerStaticInit65d8d43f7e5871d489681098837a6b70
         ),
     );
 
+    public static $prefixesPsr0 = array (
+        'S' => 
+        array (
+            'SecurityLib' => 
+            array (
+                0 => __DIR__ . '/..' . '/ircmaxell/security-lib/lib',
+            ),
+        ),
+        'R' => 
+        array (
+            'RandomLib' => 
+            array (
+                0 => __DIR__ . '/..' . '/ircmaxell/random-lib/lib',
+            ),
+        ),
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit65d8d43f7e5871d489681098837a6b70::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit65d8d43f7e5871d489681098837a6b70::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit65d8d43f7e5871d489681098837a6b70::$prefixesPsr0;
 
         }, null, ClassLoader::class);
     }

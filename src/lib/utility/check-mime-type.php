@@ -12,10 +12,14 @@ function check_mime_type($accepted_type, $tmp_name)
 {
 
  $mime_type = false;
+ 
+ if (!empty($tmp_name)) {
 
- $file_info = new finfo(FILEINFO_MIME_TYPE);
- $file_content = file_get_contents($tmp_name);
- $mime_type = $file_info -> buffer($file_content);
+   $file_info = new finfo(FILEINFO_MIME_TYPE);
+   $file_content = file_get_contents($tmp_name);
+   $mime_type = $file_info -> buffer($file_content);
+
+ }
  
  $extension = array_search($mime_type, $accepted_type, true);
 

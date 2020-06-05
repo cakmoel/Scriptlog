@@ -13,7 +13,6 @@ function reset_password($recipient, $reset_key)
     $site_info = app_info();
     $app_url = $site_info['app_url'];
     $site_name = $site_info['site_name'];
-    $activation_key = user_activation_key($recipient.get_ip_address());
     $sender = $site_info['email_address'];
     $sanitize_sender = sanitize_email($sender);
 

@@ -3,6 +3,8 @@
  * Function start session on site
  * 
  * @category function 
+ * @uses turn_on_session()
+ * @return mixed
  * 
  */
 function start_session_on_site()
