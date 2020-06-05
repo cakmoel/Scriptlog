@@ -21,7 +21,19 @@ function medialib_link($media_type, $media_filename)
       case "image/png":
       case "image/webp":
 
-        $image_link = app_url().DS.APP_IMAGE_THUMB.'medium_'.rawurlencode($media_filename);
+        $image_dir =  __DIR__ . '/../../public/files/pictures/thumbs/medium_'.$media_filename;
+
+        $file_basename = substr($media_filename, 0, strripos($media_filename, '.'));
+
+        if(is_readable($image_dir)) {
+
+          $image_link = app_url().DS.APP_IMAGE_THUMB.'medium_'.rawurlencode($media_filename);
+
+        } else {
+
+          $image_link = app_url().DS.APP_IMAGE_THUMB.'medium_'.rawurlencode($file_basename.'.webp');
+
+        }
 
         return $image_link;
           
