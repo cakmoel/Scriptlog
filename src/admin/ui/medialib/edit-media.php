@@ -64,21 +64,29 @@ $media_id = isset($mediaData['ID']) ? $mediaData['ID'] : 0;
 <?php 
 if (isset($mediaData['media_filename'])) :
 
+  $webp_src = invoke_webp_image($mediaData['media_filename'], false);
   $image_src = invoke_image_uploaded($mediaData['media_filename'], false);
+  $webp_src_thumb = invoke_webp_image($mediaData['media_filename']);
   $image_src_thumb = invoke_image_uploaded($mediaData['media_filename']);
-
-     if(!$image_src_thumb) :
+  
+     if(!$webp_src_thumb || !$image_src_thumb) :
       
-      $image_src_thumb = app_url().'/public/files/pictures/thumbs/nophoto.jpg';
+       $webp_src_thumb = app_url().'/public/files/pictures/thumbs/nophoto.jpg';
+       $image_src_thumb = app_url().'/public/files/pictures/thumbs/nophoto.jpg';
 
      endif;
 
-  if($image_src) :
+  if($image_src || $webp_src) :
 
 ?>
 
 <div class="form-group">
-<a class="thumbnail" href="<?=$image_src;?>"><img src="<?=$image_src_thumb;?>" class="img-responsive pad" width="320"></a>
+<a href="<?=$image_src;?>" title="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
+<picture class="thumbnail">
+<source srcset="<?=$webp_src_thumb; ?>" type="image/webp">
+<img src="<?=$image_src_thumb;?>" class="img-responsive pad" width="320" alt="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
+</picture>
+</a>
 <label for="ChangePicture">Change picture</label>
 <input type="file"  name="media" id="mediaUploaded" accept="image/*" onchange="loadFile(event)" maxlength="512" >
 <img id="output" class="img-responsive pad" >
@@ -108,8 +116,8 @@ if (isset($mediaData['media_filename'])) :
 <div class="form-group">
 <label>Caption </label>
 <input type="text" class="form-control" name="media_caption" placeholder="type media caption" value="
-<?=(isset($mediaData['media_caption'])) ? htmlspecialchars($mediaData['media_caption']) : ""; ?>
-<?=(isset($formData['media_caption'])) ? htmlspecialchars($formData['media_caption'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" >
+<?=(isset($mediaData['media_caption'])) ? safe_html($mediaData['media_caption']) : ""; ?>
+<?=(isset($formData['media_caption'])) ? safe_html($formData['media_caption']) : ""; ?>" maxlength="200" >
 </div>
 
 <div class="form-group">
@@ -141,7 +149,7 @@ if (isset($mediaData['media_filename'])) :
 <label>
 <input type="radio" name="media_status" id="optionsRadios2" value="0" 
 <?=(isset($mediaData['media_status']) && $mediaData['media_status'] === 0) ? 'checked="checked"' : ""; ?>
-<?=(isset($formData['media_status']) && $formData['media_status'] == 0) ? 'checked="checked"' : ""; ?>>
+<?=(isset($formData['media_status']) && $formData['media_status'] === 0) ? 'checked="checked"' : ""; ?>>
    No
  </label>
 </div>
@@ -183,19 +191,19 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
               ?>
 
                 <dt>File name</dt>
-                <dd><?= $media_properties['Origin']; ?></dd>
+                <dd><?= safe_html($media_properties['Origin']); ?></dd>
                 <dt>MIME type</dt>
-                <dd><?= $media_properties['File type']; ?>.</dd>
+                <dd><?= safe_html($media_properties['File type']); ?></dd>
                 <dt>File size</dt>
-                <dd><?= $media_properties['File size']; ?></dd>
+                <dd><?= safe_html($media_properties['File size']); ?></dd>
                 <dt>Uploaded by</dt>
-                <dd><?=(isset($mediaData['media_user'])) ? htmlspecialchars($mediaData['media_user']) : ""; ?></dd>
+                <dd><?=(isset($mediaData['media_user'])) ? safe_html($mediaData['media_user']) : ""; ?></dd>
                 <dt>Uploaded on</dt>
-                <dd><?=$media_properties['Uploaded on']; ?></dd>
+                <dd><?= safe_html($media_properties['Uploaded on']); ?></dd>
                 <dt>Dimension</dt>
                 <dd><?=(isset($mediaData['media_type']) && $mediaData['media_type'] != "image/jpeg" && $mediaData['media_type'] != "image/png" 
                       && $mediaData['media_type'] != "image/webp" 
-                      && $mediaData['media_type'] != "image/gif") ? "Not specified" : $media_properties['Dimension']; ?> 
+                      && $mediaData['media_type'] != "image/gif") ? "Not specified" : safe_html($media_properties['Dimension']); ?> 
                 </dd>
 
               <?php
