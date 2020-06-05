@@ -433,9 +433,15 @@ public function modifyMediaMeta()
 
           if(is_readable(__DIR__ . '/../../public/files/pictures/'.$filename)) {
             
+            // get filename for remove webp image format
+            $file_basename = substr($filename, 0, strripos($filename, '.'));
+
             unlink(__DIR__ . '/../../public/files/pictures/'.$filename);
             unlink(__DIR__ . '/../../public/files/pictures/thumbs/medium_'.$filename);
             unlink(__DIR__ . '/../../public/files/pictures/thumbs/small_'.$filename);
+            unlink(__DIR__ . '/../../public/files/pictures/'.$file_basename.'.webp');
+            unlink(__DIR__ . '/../../public/files/pictures/thumbs/medium_'.$file_basename.'.webp');
+            unlink(__DIR__ . '/../../public/files/pictures/thumbs/small_'.$file_basename.'.webp');
             
           }
 
