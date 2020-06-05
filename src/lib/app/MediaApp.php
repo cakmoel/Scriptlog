@@ -119,6 +119,8 @@ public function insert()
 
     $filters = ['media_caption' => FILTER_SANITIZE_SPECIAL_CHARS, 'media_target' => FILTER_SANITIZE_STRING, 'media_access' => FILTER_SANITIZE_STRING];
 
+    $form_fields = ['media_caption' => 200];
+
     try {
 
       if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
@@ -126,6 +128,17 @@ public function insert()
         header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
         throw new AppException("Sorry, unpleasant attempt detected!");
         
+      }
+
+      if (!empty($_POST['media_caption'])) {
+
+          if(true === form_size_validation($form_fields)) {
+
+             $checkError = false;
+             array_push($errors, "Form data is longer than allowed");
+
+          }
+
       }
 
       if (!isset($file_error) || is_array($file_error)) {
@@ -191,16 +204,13 @@ public function insert()
 
       }
 
-      // get new filename
+      // get new filename and extension
       $new_filename = generate_filename($file_name)['new_filename'];
+      $file_extension = generate_filename($file_name)['file_extension'];
      
       list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
 
-      if (generate_filename($file_name)['file_extension'] == "jpeg" 
-          || generate_filename($file_name)['file_extension'] == "jpg" 
-          || generate_filename($file_name)['file_extension'] == "png" 
-          || generate_filename($file_name)['file_extension'] == "gif" 
-          || generate_filename($file_name)['file_extension'] == "webp") {
+      if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif") {
 
          $media_metavalue = array(
               'Origin' => rename_file($file_name), 
@@ -349,6 +359,8 @@ public function update($id)
       'media_id' => FILTER_SANITIZE_NUMBER_INT
     ];
 
+    $form_fields = ['media_caption' => 200];
+
     try {
 
       if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
@@ -356,6 +368,17 @@ public function update($id)
         header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
         throw new AppException("Sorry, unpleasant attempt detected!");
         
+      }
+
+      if (!empty($_POST['media_caption'])) {
+
+         if(true === form_size_validation($form_fields)) {
+
+           $checkError = false;
+           array_push($errors, "Form data is longer than allowed");
+
+         }
+
       }
 
       if (!$checkError) {
@@ -436,14 +459,12 @@ public function update($id)
   
         // get new filename
         $new_filename = generate_filename($file_name)['new_filename'];
+        $file_extension = generate_filename($file_name)['file_extension'];
+     
 
         list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
   
-         if (generate_filename($file_name)['file_extension'] == "jpeg" 
-            || generate_filename($file_name)['file_extension'] == "jpg" 
-            || generate_filename($file_name)['file_extension'] == "png" 
-            || generate_filename($file_name)['file_extension'] == "gif" 
-            || generate_filename($file_name)['file_extension'] == "webp") {
+         if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif") {
 
             $media_metavalue = array(
 
