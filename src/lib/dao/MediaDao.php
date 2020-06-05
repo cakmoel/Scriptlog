@@ -457,11 +457,8 @@ public function deleteMedia($ID, $sanitize)
   
   $clean_id = $this->filteringId($sanitize, $ID, 'sql');
   
-  if($this->deleteRecord("tbl_media", "ID = ".(int)$clean_id)) {
-
-     $this->deleteRecord("tbl_mediameta", "media_id = ".(int)$clean_id);
-
-  }
+  $this->deleteRecord("tbl_media", "ID = ".(int)$clean_id, 1);
+  $this->deleteRecord("tbl_mediameta", "media_id = ".(int)$clean_id, 1);
 
 }
 
