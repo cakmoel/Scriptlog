@@ -141,6 +141,20 @@ public function insert()
 
       }
 
+      if (false === sanitize_selection_box(distill_post_request($filters)['media_target'], ['blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery'])) {
+
+          $checkError = false;
+          array_push($errors, "Please choose the available value provided!");
+
+      }
+
+      if (false === sanitize_selection_box(distill_post_request($filters)['media_access'], ['public' => 'Public', 'private' => 'Private'])) {
+
+          $checkError = false;
+          array_push($errors, "Please choose the available value provided!");
+
+      }
+
       if (!isset($file_error) || is_array($file_error)) {
 
         $checkError = false;
@@ -379,6 +393,27 @@ public function update($id)
 
          }
 
+      }
+
+      if (false === sanitize_selection_box(distill_post_request($filters)['media_target'], ['blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery'])) {
+
+        $checkError = false;
+        array_push($errors, "Please choose the available value provided!");
+
+      }
+
+      if (false === sanitize_selection_box(distill_post_request($filters)['media_access'], ['public' => 'Public', 'private' => 'Private'])) {
+
+         $checkError = false;
+         array_push($errors, "Please choose the available value provided!");
+
+      }
+
+      if (false === sanitize_selection_box(distill_post_request($filters)['media_status'], ['Enabled', 'Disabled'])) {
+
+         $checkError = false;
+         array_push($errors, "Please choose the available value provided!");
+         
       }
 
       if (!$checkError) {
