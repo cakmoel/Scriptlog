@@ -584,7 +584,7 @@ public function dropDownMediaSelect($selected = null)
 
            $select = $selected === $media['ID'] ? ' selected' : null;
 
-           $dropdown .= '<option data-content="<img src='.app_url().'public/files/pictures/thumbs/small_'.basename(safe_html($media['media_filename'])).'></img>" value="'.(int)$media['ID'].'"'.$select.'>'.safe_html($media_properties['Origin']).'</option>'."\n";
+           $dropdown .= '<option data-content="<img src='.app_url().DS.APP_IMAGE_THUMB.'small_'.rawurlencode(basename(safe_html($media['media_filename']))).'></img>" value="'.(int)$media['ID'].'"'.$select.'>'.safe_html($media_properties['Origin']).'</option>'."\n";
 
        }
 
