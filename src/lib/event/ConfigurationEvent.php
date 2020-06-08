@@ -88,9 +88,9 @@ class ConfigurationEvent
     return $this->configDao->findGeneralConfigs($orderBy, $limit);
   }
 
-  public function grabPermalinkSetting($permalink_key)
+  public function grabSettingByName($setting_name)
   {
-    return $this->configDao->findPermalinkConfig($permalink_key, $this->sanitizer);
+    return $this->configDao->findConfigByName($setting_name, $this->sanitizer);
   }
 
   public function grabSetting($id)
