@@ -27,167 +27,12 @@ class ConfigurationApp extends BaseApp
 
   public function insert()
   {
-    $errors = array();
-    $checkError = true;
-
-    if (isset($_POST['configFormSubmit'])) {
-      
-      $setting_name = (isset($_POST['setting_name'])) ? filter_var($_POST['setting_name'], FILTER_SANITIZE_STRING) : "";
-      $setting_value = (isset($_POST['setting_value'])) ? filter_var($_POST['setting_value'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : "";
-      
-      $filters = [ 'setting_name' => FILTER_SANITIZE_STRING, 'setting_value' => FILTER_SANITIZE_FULL_SPECIAL_CHARS];
-
-      try {
-
-        if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
-                
-          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-          throw new AppException("Sorry, unpleasant attempt detected!");
-
-        }
-
-        if (empty($_POST['setting_name']) || empty($_POST['setting_value'])) {
-
-          $checkError = false;
-          array_push($errors, "Column name and value required must be filled");
-
-        }
-
-        if (isset($_POST['setting_name']) && (strlen($_POST['setting_name']) > 100)) {
-
-           $checkError = false;
-           array_push($errors, "Exceeded characters limit. Maximum 100 characters are allowed.");
-
-        }
-
-        if (isset($_POST['setting_value']) && (strlen($_POST['setting_value']) > 300)) {
-
-           $checkError = false;
-           array_push($errors, "Exceeded characters limit. Maximum 300 characters are allowed.");
-
-        }
-
-        if (!$checkError) {
-
-           $this->setView('edit-setting');
-           $this->setPageTitle('Add New Setting');
-           $this->setFormAction('newConfig');
-           $this->view->set('pageTitle', $this->getPageTitle());
-           $this->view->set('formAction', $this->getFormAction());
-           $this->view->set('errors', $errors);
-           $this->view->set('formData', $_POST);
-           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-
-        } else {
-
-          $this->configEvent->setConfigName($setting_name);
-          $this->configEvent->setConfigValue($setting_value);
-          $this->configEvent->addSetting();
-          direct_page('index.php?load=settings&status=configAdded', 200);
-           
-        }
-
-      } catch (AppException $e) {
-
-        LogError::setStatusCode(http_response_code());
-        LogError::newMessage($e);
-        LogError::customErrorMessage('admin');
-
-      }
-
-    } else {
-
-       $this->setView('edit-setting');
-       $this->setPageTitle('Add New Setting');
-       $this->setFormAction('newConfig');
-       $this->view->set('pageTitle', $this->getPageTitle());
-       $this->view->set('formAction', $this->getFormAction());
-       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-
-    }
-
-    return $this->view->render();
-
+   
   }
 
   public function update($id)
   {
   
-    $errors = array();
-    $checkError = true;
-
-    if (!$getSetting = $this->configEvent->grabSetting($id)) {
-
-      direct_page('index.php?load=settings&error=configNotFound', 404);
-
-    }
-
-    $data_config = array(
-      'ID' => $getSetting['ID'],
-      'setting_name' => $getSetting['setting_name'],
-      'setting_value' => $getSetting['setting_value'],
-      
-    );
-
-    if (isset($_POST['configFormSubmit'])) {
-
-      $setting_id = isset($_POST['setting_id']) ? abs((int)$_POST['setting_id']) : 0;
-      $setting_name = filter_input('INPUT_POST', 'setting_name', FILTER_SANITIZE_STRING);
-      $setting_value = filter_input('INPUT_POST', 'setting_value', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-     
-      try {
-
-        if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
-                
-          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-          throw new AppException("Sorry, unpleasant attempt detected!");
-
-        }
-
-        if (!$checkError) {
-
-          $this->setView('edit-setting');
-          $this->setPageTitle('Edit Setting');
-          $this->setFormAction(ActionConst::EDITCONFIG);
-          $this->view->set('pageTitle', $this->getPageTitle());
-          $this->view->set('formAction', $this->getFormAction());
-          $this->view->set('errors', $errors);
-          $this->view->set('configData', $data_config);
-          $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-
-        } else {
-
-          $this->configEvent->setConfigId($setting_id);
-          $this->configEvent->setConfigName($setting_name);
-          $this->configEvent->setConfigValue($setting_value);
-        
-          $this->configEvent->modifySetting();
-          direct_page('index.php?load=settings&status=configUpdated', 200);
-
-        }
-
-      } catch (AppException $e) {
-
-         LogError::setStatusCode(http_response_code());
-         LogError::newMessage($e);
-         LogError::customErrorMessage('admin');
-
-      }
-
-    } else {
-      
-      $this->setView('edit-setting');
-      $this->setPageTitle('Edit Setting');
-      $this->setFormAction(ActionConst::EDITCONFIG);
-      $this->view->set('pageTitle', $this->getPageTitle());
-      $this->view->set('formAction', $this->getFormAction());
-      $this->view->set('settingData', $data_config);
-      $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-      
-    }
-
-    return $this->view->render();
-
   }
 
   /**
@@ -233,7 +78,7 @@ class ConfigurationApp extends BaseApp
         if(isset($_POST['setting_value']['1']) && strcmp($_POST['setting_value']['1'], app_key())) {
 
           $checkError = false;
-          array_push($errors, "Application key does not match with configuration file");
+          array_push($errors, "Application key does not match with the configuration file");
              
         }
         
@@ -253,10 +98,10 @@ class ConfigurationApp extends BaseApp
            $i = 0;
            while ($i < $size) {
 
-               $setting_value = prevent_injection(distill_post_request($filters)['setting_value'][$i]);
+               $setting_value = purify_dirty_html(distill_post_request($filters)['setting_value'][$i]);
                $setting_id = distill_post_request($filters)['setting_id'][$i];
 
-               $sql = "UPDATE tbl_settings SET setting_value = '$setting_value' WHERE ID = ".(int)$setting_id;
+               $sql = sprintf("UPDATE tbl_settings SET setting_value = '$setting_value' WHERE ID = %d", (int)$setting_id);
                db_simple_query($sql);
                ++$i;
 
@@ -302,7 +147,7 @@ class ConfigurationApp extends BaseApp
        $this->view->set('settings', $this->configEvent->grabGeneralSettings('ID', 7));
        $this->view->set('formAction', $this->getFormAction());
        $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-
+       
     }
 
     return $this->view->render();
@@ -317,7 +162,7 @@ class ConfigurationApp extends BaseApp
     $checkError = true;
     $checkStatus = false;
 
-    if(!$getPermalinkValue = $this->configEvent->grabPermalinkSetting('permalink_setting')) {
+    if(!$getPermalinkValue = $this->configEvent->grabSettingByName('permalink_setting')) {
 
       direct_page('index.php?load=option-permalink&error=permalinkValueNotFound', 404);
       
@@ -329,6 +174,8 @@ class ConfigurationApp extends BaseApp
       'setting_value' => $getPermalinkValue['setting_value']
     );
 
+    $filters = ['permalinks' => FILTER_SANITIZE_STRING, 'setting_id' => FILTER_SANITIZE_NUMBER_INT, 'setting_name' => FILTER_SANITIZE_STRING];
+    
     if(isset($_POST['configFormSubmit'])) {
 
       try {
@@ -340,7 +187,34 @@ class ConfigurationApp extends BaseApp
         
         }
 
-        
+        if(false === sanitize_selection_box(distill_post_request($filters)['permalinks'], ['yes', 'no'])) {
+
+           $checkError = false;
+           array_push($errors, "Please choose the available value provided!");
+
+        }
+
+        if(!$checkError) {
+
+          $this->setView('permalink-setting');
+          $this->setPageTitle('Permalink Setting');
+          $this->setFormAction(ActionConst::PERMALINK_CONFIG);
+          $this->view->set('pageTitle', $this->getPageTitle());
+          $this->view->set('settingData', $data_permalink);
+          $this->view->set('errors', $errors);
+          $this->view->set('formAction', $this->getFormAction());
+          $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+
+        } else {
+
+          $this->configEvent->setConfigId((int)distill_post_request($filters)['setting_id']);
+          $this->configEvent->setConfigName(prevent_injection(distill_post_request($filters)['setting_name']));
+          $this->configEvent->setConfigValue(distill_post_request($filters)['permalinks']);
+          $this->configEvent->modifySetting();
+
+          direct_page('index.php?load=option-permalink&status=permalinkConfigUpdated', 200);
+           
+        }
 
       } catch (AppException $e) {
         
