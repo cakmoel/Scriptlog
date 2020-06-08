@@ -87,8 +87,7 @@ public function deleteConfig($ID, $sanitize)
  */
 public function findConfigs($orderBy = 'ID')
 {
-  $sql = "SELECT ID, setting_name, setting_value
-	FROM tbl_settings ORDER BY :orderBy DESC";
+  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings ORDER BY :orderBy DESC";
 
 	$this->setSQL($sql);
 
@@ -119,28 +118,6 @@ public function findGeneralConfigs($orderBy = 'ID', $limit = 7)
 }
 
 /**
- * find permalink configuration
- *
- * @param string $permalink_key
- * @return void
- * 
- */
-public function findPermalinkConfig($permalink_key, $sanitize)
-{
-
-  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE setting_name = :setting_name LIMIT 1";
-
-  $sanitized_key = $this->filteringId($sanitize, $permalink_key, 'xss');
-
-  $this->setSQL($sql);
-
-  $detailPermalink = $this->findRow([':setting_name' => $sanitized_key]);
-
-  return (empty($detailPermalink)) ?: $detailPermalink;
-
-}
-
-/**
  * Find Configuration
  * 
  * @method public findConfig()
@@ -165,10 +142,12 @@ public function findConfig($id, $sanitize)
   
 }
 
-public function findConfigByName($setting_name)
+public function findConfigByName($setting_name, $sanitize)
 {
   
-  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE setting_name = :setting_name";
+  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE setting_name = :setting_name LIMIT 1";
+
+  $name_sanitized = $this->filteringId($sanitize, $setting_name, 'xss');
 
   $this->setSQL($sql);
 
