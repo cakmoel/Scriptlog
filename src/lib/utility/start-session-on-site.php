@@ -2,6 +2,8 @@
 /**
  * Function start session on site
  * 
+ * @see https://github.com/GoogleChromeLabs/samesite-examples/blob/master/php.md 
+ * @see https://stackoverflow.com/a/46971326/2308553 
  * @category function 
  * @uses turn_on_session()
  * @return mixed
@@ -9,9 +11,35 @@
  */
 function start_session_on_site()
 {
+  
   $life_time = time() + Authentication::COOKIE_EXPIRE;
 
-  $session_name = session_name();
+  $current_cookie_params = session_get_cookie_params();
+
+  if (PHP_VERSION_ID >= 70300) { 
+      
+      session_set_cookie_params([
+        'lifetime' => $life_time,
+        'path' => '/',
+        'domain' => $current_cookie_params["domain"],
+        'secure' => $current_cookie_params["secure"],
+        'httponly' => $current_cookie_params["httponly"],
+        'samesite' => 'Lax'
+      ]);
+
+    } else { 
+
+      session_set_cookie_params(
+        $life_time,
+        '/; samesite=Lax',
+        $current_cookie_params["domain"],
+        $current_cookie_params["secure"],
+        $current_cookie_params["httponly"]
+      );
+
+    }
+
+  $session_name = session_name('scl');
   
   if (isset($_COOKIE[$session_name])) {
 
@@ -23,7 +51,7 @@ function start_session_on_site()
 
  } else {
 
-   return turn_on_session($life_time, $session_name);
+   return turn_on_session($life_time, $session_name, $current_cookie_params["path"], $current_cookie_params["domain"], $current_cookie_params["secure"], $current_cookie_params["httponly"]);
    
  }
 
@@ -33,7 +61,7 @@ function start_session_on_site()
 
 } 
 
-return turn_on_session($life_time, $session_name);
+return turn_on_session($life_time, $session_name, $current_cookie_params["path"], $current_cookie_params["domain"], $current_cookie_params["secure"], $current_cookie_params["httponly"]);
 
 }
 
