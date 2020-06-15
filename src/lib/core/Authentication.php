@@ -243,17 +243,17 @@ class Authentication
 
           $tokenizer = new Tokenizer();
 
-          setcookie('scriptlog_cookie_login', $account_login, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-          setcookie('scriptlog_cookie_email', $account_email, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(),is_cookies_secured(), true);
-          setcookie('scriptlog_cookie_level', $account_level, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-          setcookie('scriptlog_cookie_fullname', $account_name, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-          setcookie('scriptlog_cookie_id', $account_id, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-          
+          set_cookies_scl('scriptlog_cookie_login', $account_login, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+          set_cookies_scl('scriptlog_cookie_email', $account_email, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+          set_cookies_scl('scriptlog_cookie_level', $account_level, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+          set_cookies_scl('scriptlog_cookie_fullname', $account_name, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+          set_cookies_scl('scriptlog_cookie_id', $account_id, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+
           $random_password = $tokenizer -> createToken(64);
-          setcookie('scriptlog_validator', $random_password, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+          set_cookies_scl('scriptlog_validator', $random_password, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
         
           $random_selector = $tokenizer -> createToken(64);
-          setcookie('scriptlog_selector', $random_selector, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+          set_cookies_scl('scriptlog_selector', $random_selector, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
         
           $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
           $hashed_selector = password_hash($random_selector, PASSWORD_DEFAULT);
