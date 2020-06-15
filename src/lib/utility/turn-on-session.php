@@ -4,12 +4,14 @@
  * Turn on Function
  * Checking too old session ID and start session
  * 
+ * @see https://github.com/GoogleChromeLabs/samesite-examples/blob/master/php.md 
+ * @see https://stackoverflow.com/a/46971326/2308553 
  * @param number $life_time
  * @param string $session_name
  * @return void
  * 
  */
-function turn_on_session($life_time, $session_name)
+function turn_on_session($life_time, $session_name, $path, $domain, $secure, $httponly)
 {
    
    session_start();
@@ -21,8 +23,8 @@ function turn_on_session($life_time, $session_name)
         
       session_start();
 
-      setcookie($session_name, session_id(), time()+$life_time);
- 
+      set_cookies_scl($session_name, session_id(), time()+$life_time, $path, $domain, $secure, $httponly);
+     
    }
 
 }
