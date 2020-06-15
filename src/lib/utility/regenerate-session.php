@@ -33,7 +33,7 @@ function regenerate_session()
 }
 
 // get session data
-function get_session_data($session_name = 'PHPSESSID', $session_save_handler = 'files')
+function get_session_data($session_name = 'scl', $session_save_handler = 'files')
 {
 
  $session_data = array();
