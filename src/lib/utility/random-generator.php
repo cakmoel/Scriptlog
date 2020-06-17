@@ -128,11 +128,11 @@ return $bytes;
  * @return string
  * 
  */
-function ircmaxell_random_compat($length = 128)
+function ircmaxell_random_compat($length = 16)
 {
 
   $random_compat = new Random();
 
-  return $random_compat->token($length);
+  return bin2hex($random_compat->bytes($length));
 
 }
