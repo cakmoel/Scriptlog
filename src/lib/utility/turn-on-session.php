@@ -4,6 +4,7 @@
  * Checking too old session ID and start session
  * 
  * @see https://github.com/GoogleChromeLabs/samesite-examples/blob/master/php.md 
+ * @see https://stackoverflow.com/questions/36877/how-do-you-set-up-use-httponly-cookies-in-php
  * @see https://stackoverflow.com/a/46971326/2308553 
  * @param number $life_time
  * @param string $session_name
@@ -13,10 +14,8 @@
 function turn_on_session($life_time, $cookies_name, $path, $domain, $secure, $httponly)
 {
    
-   $cookies_value = session_id(ircmaxell_random_compat());
-
    session_start();
-    
+ 
    // Do not allow to use too old session ID
    if (!empty($_SESSION['deleted_time']) && $_SESSION['deleted_time'] < time() - $life_time) {
         
@@ -24,7 +23,7 @@ function turn_on_session($life_time, $cookies_name, $path, $domain, $secure, $ht
         
       session_start();
 
-      set_cookies_scl($cookies_name, $cookies_value, $life_time, $path, $domain, $secure, $httponly);
+      set_cookies_scl($cookies_name, session_id(), $life_time, $path, $domain, $secure, $httponly);
      
    }
 
