@@ -12,8 +12,9 @@ function random_generator($digits)
 {
     srand((double) microtime() * 10000000);
     //Array of alphabets
-    $input = array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
-        "R", "S", "T", "U", "V", "W", "X", "Y", "Z");
+    $input = array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", 
+                   "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", 
+                   "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z");
     
     $randomGenerator = ""; // Initialize the string to store random numbers
     for ($i = 1; $i < $digits + 1; $i++) { // Loop the number of times of required digits
@@ -52,7 +53,7 @@ function ircmaxell_generator_string($strength, $length = 32, $character_list = '
 
     case 'low':
 
-        $generator = $factory->getLowStrengthGenerator();
+        $generator = $factory->getGenerator(new SecurityLib\Strength(SecurityLib\Strength::LOW));
 
         return $generator->generateString($length, $character_list)."\n";
 
@@ -60,16 +61,15 @@ function ircmaxell_generator_string($strength, $length = 32, $character_list = '
 
     case 'high':
 
-        $generator = $factory->getHighStrengthGenerator();
+        $generator = $factory->getGenerator(new SecurityLib\Strength(SecurityLib\Strength::HIGH));
 
         return $generator->generateString($length, $character_list)."\n";
 
     break;
 
     case 'medium':
-    default:
 
-        $generator = $factory->getMediumStrengthGenerator();
+        $generator = $factory->getGenerator(new SecurityLib\Strength(SecurityLib\Strength::MEDIUM));
 
         return $generator->generateString($length, $character_list)."\n";
 
@@ -118,5 +118,21 @@ $generator = $factory->getGenerator(new SecurityLib\Strength(SecurityLib\Strengt
 $bytes = $generator->generate($length);
 
 return $bytes;
+
+}
+
+/**
+ * ircmaxell_random_compat
+ *
+ * https://github.com/ircmaxell/random_compat
+ * @return string
+ * 
+ */
+function ircmaxell_random_compat($length = 128)
+{
+
+  $random_compat = new Random();
+
+  return $random_compat->token($length);
 
 }
