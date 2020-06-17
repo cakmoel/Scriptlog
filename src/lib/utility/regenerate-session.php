@@ -18,7 +18,7 @@ function regenerate_session()
 
  }
 
- $newsid = session_id();
+ $newsid = session_id(ircmaxell_random_compat());
 
  $_SESSION['deleted_time'] = time() - Authentication::COOKIE_EXPIRE;
 
@@ -33,7 +33,7 @@ function regenerate_session()
 }
 
 // get session data
-function get_session_data($session_name = 'scl', $session_save_handler = 'files')
+function get_session_data($session_name = 'scriptlog', $session_save_handler = 'files')
 {
 
  $session_data = array();
