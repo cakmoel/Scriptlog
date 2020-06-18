@@ -13,9 +13,9 @@
  */
 function turn_on_session($life_time, $cookies_name, $path, $domain, $secure, $httponly)
 {
-   
+
    session_start();
- 
+
    // Do not allow to use too old session ID
    if (!empty($_SESSION['deleted_time']) && $_SESSION['deleted_time'] < time() - $life_time) {
         
@@ -23,7 +23,7 @@ function turn_on_session($life_time, $cookies_name, $path, $domain, $secure, $ht
         
       session_start();
 
-      set_cookies_scl($cookies_name, session_id(), $life_time, $path, $domain, $secure, $httponly);
+      set_cookies_scl($cookies_name, session_id(), time()+$life_time, $path, $domain, $secure, $httponly);
      
    }
 
