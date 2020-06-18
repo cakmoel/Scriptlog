@@ -12,13 +12,13 @@
 function regenerate_session()
 {
 
- if (session_status() != PHP_SESSION_ACTIVE) {
+ $newsid = session_id(ircmaxell_random_compat());
+ 
+ if (isset($_COOKIE[session_name()]) || session_status() != PHP_SESSION_ACTIVE) {
       
      session_start();
 
  }
-
- $newsid = session_id(ircmaxell_random_compat());
 
  $_SESSION['deleted_time'] = time() - Authentication::COOKIE_EXPIRE;
 
@@ -74,7 +74,13 @@ function get_session_data($session_name = 'scriptlog', $session_save_handler = '
 
 }
 
-// clear duplicate cookies
+/**
+ * clear_duplicate_cookies function
+ * 
+ * @see https://www.php.net/manual/en/function.session-start.php#117157
+ * @return void
+ * 
+ */
 function clear_duplicate_cookies()
 {
 
