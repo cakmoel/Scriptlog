@@ -74,7 +74,7 @@ class Authentication
    * @var string
    * 
    */
-  private $session_data;
+  private $session_data = [];
 
   /**
    * Constant COOKIE_EXPIRE
@@ -217,19 +217,22 @@ class Authentication
 
       $this->validator->validate($password, 'password'); 
 
-      $session_data = $this->getSessionInstance();
-      $session_data->scriptlog_session_id = $this->user_id = intval($account_info['ID']);
-      $session_data->scriptlog_session_email = $this->user_email = $account_info['user_email'];
-      $session_data->scriptlog_session_level = $this->user_level = $account_info['user_level'];
-      $session_data->scriptlog_session_login = $this->user_login = $account_info['user_login'];
-      $session_data->scriptlog_session_fullname = $this->user_fullname = $account_info['user_fullname'];
+      $this->session_data = $this->getSessionInstance();
+      $this->session_data->scriptlog_session_id = $this->user_id = intval($account_info['ID']);
+      $this->session_data->scriptlog_session_email = $this->user_email = $account_info['user_email'];
+      $this->session_data->scriptlog_session_level = $this->user_level = $account_info['user_level'];
+      $this->session_data->scriptlog_session_login = $this->user_login = $account_info['user_login'];
+      $this->session_data->scriptlog_session_fullname = $this->user_fullname = $account_info['user_fullname'];
 
       $user_agent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : '';
       $accept_charset = (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) ? $_SERVER['HTTP_ACCEPT_CHARSET'] : '';
       $accept_encoding = (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
       $accept_language = (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
 
-      $session_data->scriptlog_session_agent = $this->agent = sha1($accept_charset.$accept_encoding.$accept_language.$user_agent);
+      $this->session_data->scriptlog_session_agent = $this->agent = sha1($accept_charset.$accept_encoding.$accept_language.$user_agent);
+      
+      $ip_address = (isset($_SERVER['REMOTE_ADDR'])) ? $_SERVER['REMOTE_ADDR'] : get_ip_address();
+      $this->session_data->scriptlog_session_ip = $ip_address;
 
       get_session_data();
 
@@ -392,13 +395,13 @@ public function removeCookies()
 
   if ((isset($_COOKIE['scriptlog_cookie_login'])) && (isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector'])) ) {
 
-     setcookie('scriptlog_cookie_email', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-     setcookie('scriptlog_cookie_id', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-     setcookie('scriptlog_cookie_level', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-     setcookie('scriptlog_cookie_login', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
-     setcookie('scriptlog_cookie_fullname', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-     setcookie('scriptlog_validator', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);  
-     setcookie('scriptlog_selector', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+     set_cookies_scl('scriptlog_cookie_email', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+     set_cookies_scl('scriptlog_cookie_id', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+     set_cookies_scl('scriptlog_cookie_level', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+     set_cookies_scl('scriptlog_cookie_login', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
+     set_cookies_scl('scriptlog_cookie_fullname', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+     set_cookies_scl('scriptlog_validator', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);  
+     set_cookies_scl('scriptlog_selector', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
     
   }
 
@@ -415,14 +418,14 @@ public function clearAuthCookies($user_login)
 
   if ((isset($_COOKIE['scriptlog_cookie_login'])) && (isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector']))) {
 
-       setcookie('scriptlog_cookie_email', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-       setcookie('scriptlog_cookie_id', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-       setcookie('scriptlog_cookie_level', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-       setcookie('scriptlog_cookie_login', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-       setcookie('scriptlog_cookie_fullname', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-       setcookie('scriptlog_validator', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);  
-       setcookie('scriptlog_selector', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-  
+     set_cookies_scl('scriptlog_cookie_email', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+     set_cookies_scl('scriptlog_cookie_id', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+     set_cookies_scl('scriptlog_cookie_level', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+     set_cookies_scl('scriptlog_cookie_login', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
+     set_cookies_scl('scriptlog_cookie_fullname', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+     set_cookies_scl('scriptlog_validator', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);  
+     set_cookies_scl('scriptlog_selector', "", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+   
   }
 
 }
