@@ -14,7 +14,7 @@ function regenerate_session()
 
  $newsid = session_id(ircmaxell_random_compat());
  
- if (isset($_COOKIE[session_name()]) || session_status() != PHP_SESSION_ACTIVE) {
+ if (isset($_COOKIE[session_name()]) || is_session_started() === false) {
       
      session_start();
 
@@ -28,7 +28,35 @@ function regenerate_session()
 
  session_start();
 
- session_regenerate_id();
+ session_regenerate_id(true);
+
+}
+
+/**
+ * is_session_started
+ *
+ * @see https://www.php.net/manual/en/function.session-status.php#113468
+ * @return boolean
+ * 
+ */
+function is_session_started()
+{
+
+ if(php_sapi_name() !== 'cli') {
+
+    if(version_compare(phpversion(), '5.4.0', '>=')) {
+
+       return session_status() === PHP_SESSION_ACTIVE ? true : false;
+
+    } else {
+
+       return session_id() === '' ? false : true;
+
+    }
+
+ }
+
+return false;
 
 }
 
