@@ -7,6 +7,8 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  * 
  */
+$ip = (isset($_SERVER["REMOTE_ADDR"])) ? $_SERVER["REMOTE_ADDR"] : get_ip_address();
+
 if (file_exists(__DIR__ . '/../config.php')) {
     
     include __DIR__ . '/../lib/main.php';
