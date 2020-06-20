@@ -234,11 +234,17 @@ class Authentication
       $ip_address = (isset($_SERVER['REMOTE_ADDR'])) ? $_SERVER['REMOTE_ADDR'] : get_ip_address();
       $this->session_data->scriptlog_session_ip = $ip_address;
 
+      $fingerprint = hash_hmac('sha256', $user_agent, hash('sha256', $ip_address, true));
+      
       get_session_data();
 
       clear_duplicate_cookies();
 
       $bind_session = ['user_session' => regenerate_session()];
+
+      $this->session_data->scriptlog_fingerprint = $fingerprint;
+      $this->session_data->scriptlog_last_active = time();
+      
       $this->userDao->updateUserSession($bind_session, (int)$account_info['ID']);
 
       // Set Auth Cookies if 'Remember Me' checked
