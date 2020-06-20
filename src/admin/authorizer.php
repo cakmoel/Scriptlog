@@ -10,11 +10,19 @@
  * @see     https://paragonie.com/blog/2015/04/secure-authentication-php-with-long-term-persistence
  */
 
+$timeout = 60 * 30;
 $current_date = date("Y-m-d H:i:s", time()); 
+$fingerprint  = hash_hmac('sha256', $_SERVER['HTTP_USER_AGENT'], hash('sha256', $ip, true));
 $loggedIn = false;
 
-// Check if loggedin session and redirect if session exists
-if (!empty($_SESSION['scriptlog_session_id'])) {
+if ((isset(Session::getInstance()->scriptlog_last_active) && Session::getInstance()->scriptlog_last_active < (time()-$timeout)) 
+    || (isset(Session::getInstance()->scriptlog_fingerprint)) && Session::getInstance()->scriptlog_fingerprint != $fingerprint) {
+
+    do_logout($authenticator);
+
+}
+
+if (!empty(Session::getInstance()->scriptlog_session_id)) {
 
     $loggedIn = true;
 
