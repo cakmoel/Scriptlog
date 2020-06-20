@@ -62,7 +62,8 @@ $paramId = (isset($settingData['ID'])) ? abs((int)$settingData['ID']) : 0;
 <div class="box-body">
   
      <form method="post" action="<?= generate_request('index.php', 'get', ['option-permalink', $action, 0])['link']; ?>" role="form">
-        <input type="hidden" name="setting_id" valu="<?= $paramId; ?>">
+        <input type="hidden" name="setting_id" value="<?= $paramId; ?>">
+        <input type="hidden" name="setting_name" value="<?=(!isset($settingData['setting_name']) ?: safe_html($settingData['setting_name'])); ?>">
         <div class="form-group">
           <label>Enable SEO-Friendly URL</label>
           <select class="form-control select2" style="width: 100%;" name="permalinks">
@@ -82,7 +83,7 @@ $paramId = (isset($settingData['ID'])) ? abs((int)$settingData['ID']) : 0;
         </div>
         <div class="box-footer">
         <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
-        <input type="submit" name="configFormSubmit" class="btn btn-primary" value="Update &raquo;">
+        <input type="submit" name="configFormSubmit" class="btn btn-primary" value="Update">
         </div>
      </form>
    </div>
