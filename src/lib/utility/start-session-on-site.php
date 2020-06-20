@@ -16,6 +16,12 @@ function start_session_on_site()
   
   $life_time = Authentication::COOKIE_EXPIRE;
 
+  if(is_dir(__DIR__ . '/.sessions')) {
+
+    session_save_path(__DIR__ . '/.sessions');
+    
+  }
+
   $session_name = session_name('scriptlog');
   
   if(ini_get('session.use_cookies')) {
