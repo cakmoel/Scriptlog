@@ -1,6 +1,7 @@
 <?php
 /**
- * Get IP Address Function
+ * get_ip_address function
+ * Get IP Address
  * 
  * @category  Function
  * @link https://stackoverflow.com/questions/1634782/what-is-the-most-accurate-way-to-retrieve-a-users-correct-ip-address-in-php
@@ -35,4 +36,22 @@ function get_ip_address()
 
     }
     
+}
+
+/**
+ * zend_ip_address function
+ * get ip address from proxy if it's provided
+ * 
+ * @uses RemoteAddress::getIpAddress
+ * @see https://github.com/zendframework/zend-http/blob/master/src/PhpEnvironment/RemoteAddress.php
+ * @see https://framework.zend.com/apidoc/2.1/classes/Zend.Http.PhpEnvironment.RemoteAddress.html
+ * @return void
+ */
+function zend_ip_address()
+{
+ 
+  $ip = new RemoteAddress();
+
+  return $ip->getIpAddress();
+
 }
