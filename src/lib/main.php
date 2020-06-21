@@ -13,10 +13,15 @@
  */
 
 #ini_set("session.cookie_secure", 1);  
-#ini_set("session.cookie_httponly", 1);
+#ini_set("session.cookie_lifetime", 0);  
+ini_set("session.cookie_httponly", 1);
 #ini_set("session.use_cookies", 1);
-#ini_set("session.use_only_cookies", 1);
-#ini_set('session.use_strict_mode', 1);
+ini_set("session.use_only_cookies", 1);
+#ini_set("session.use_strict_mode", 1);
+#ini_set("session.use_trans_sid", 0);
+ini_set('session.gc_maxlifetime', 1200);
+ini_set('session.gc_probability',100);
+ini_set('session.gc_divisor', 1);
 #header("Content-Security-Policy: default-src https:; font-src 'unsafe-inline' data: https:; form-action 'self' https://yourdomain.com;img-src data: https:; child-src https:; object-src 'self' www.google-analytics.com ajax.googleapis.com platform-api.sharethis.com yourusername.disqus.com; script-src 'unsafe-inline' https:; style-src 'unsafe-inline' https:;");
 #header('X-Frame-Options: DENY);
 #date_default_timezone_set("GMT");
