@@ -18,6 +18,7 @@ function db_instance()
   return $database;
 }
 
+// database query
 function db_simple_query($sql)
 {
   
@@ -28,22 +29,29 @@ function db_simple_query($sql)
 }
 
 /**
- * mysqli prepared statement
+ * db_prepared_query function
  * $sql = DML
  * 
  * @param string $sql
  * @param array $params
  * @return void
  */
-function db_prepared_query($sql, $params)
+function db_prepared_query($sql, $params, $types)
 {
   
-  $stmt = db_instance()->preparedQuery($sql, $params);
+  $stmt = db_instance()->preparedQuery($sql, $params, $types);
 
   return $stmt;
 
 }
 
+/**
+ * is_table_exists function
+ * Checking whether table name exists on database
+ * 
+ * @param string $table
+ * @return boolean
+ */
 function is_table_exists($table)
 {
 
@@ -53,6 +61,11 @@ function is_table_exists($table)
 
 }
 
+/**
+ * check_table function
+ * This function will check all of tables needed for your weblog 
+ * @return void
+ */
 function check_table()
 {
 
