@@ -13,11 +13,15 @@
  */
 function turn_on_session($life_time, $cookies_name, $path, $domain, $secure, $httponly)
 {
-
-   session_start();
-
-   // Do not allow to use too old session ID
-   if (!empty($_SESSION['deleted_time']) && $_SESSION['deleted_time'] < time() - $life_time) {
+   
+  if (isset($_COOKIE[session_name()]) || is_session_started() === false) {
+      
+      session_start();
+ 
+  }
+  
+  // Do not allow to use too old session ID
+  if (!empty($_SESSION['deleted_time']) && $_SESSION['deleted_time'] < time() - $life_time) {
         
       session_unset();
 
@@ -29,9 +33,9 @@ function turn_on_session($life_time, $cookies_name, $path, $domain, $secure, $ht
 
       session_regenerate_id(true);
      
-   }
+  }
 
-   session_canary();
+  session_canary();
    
 }
 
@@ -51,7 +55,8 @@ if (!isset($_SESSION['canary'])) {
    session_regenerate_id(true);
    $_SESSION['canary'] = time();
 }
-// Regenerate session ID every five minutes:
+
+// Regenerate session ID 
 if ($_SESSION['canary'] < time() - 300) {
    session_regenerate_id(true);
    $_SESSION['canary'] = time();
