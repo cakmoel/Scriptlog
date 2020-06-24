@@ -11,8 +11,7 @@
  * @since    Since Release 1.0
  * 
  */
-
-$ip = (isset($_SERVER["REMOTE_ADDR"])) ? $_SERVER["REMOTE_ADDR"] : get_ip_address();
+$ip = (isset($_SERVER["REMOTE_ADDR"])) ? $_SERVER["REMOTE_ADDR"] : zend_ip_address();
 
 if (file_exists(__DIR__ . '/../config.php')) {
     
@@ -35,26 +34,12 @@ if ($loggedIn) {
    
 }
 
-$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$loginId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
-$uniqueKey = isset($_GET['uniqueKey']) ? safe_html($_GET['uniqueKey']) : null;
+if(isset($_POST['LogIn']) && $_POST['LogIn'] == 'Login') {
 
-switch ($action) {
-
-  case 'LogIn':
+  safe_human_login($_POST);
   
-     if (false === block_request_type(current_request_method(), ['POST'])) {
+  list($errors, $failed_login) = processing_human_login($ip, $authenticator, $errors, $_POST);   
 
-        list($errors, $failed_login) = processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, $_POST);    
-
-     }
-     
-    break;
-
-  default:
-     // login form displayed
-  break;
-  
 }
 
 login_header($stylePath);
@@ -92,7 +77,7 @@ login_header($stylePath);
 
 ?>
 
-<form name="formlogin" action="<?= human_login_request('login.php', ['LogIn', human_login_id(), md5(app_key().$ip)])['doLogin']; ?>" method="post" onSubmit="return validasi(this)"  role="form">
+<form name="formlogin" action="login.php" method="post" onSubmit="return validasi(this)"  role="form">
 <div class="form-group has-feedback">
 <label>Username or Email Address</label>
 <input type="text"  class="form-control" placeholder="username or email" name="login" maxlength="186" value="
