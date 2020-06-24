@@ -261,7 +261,7 @@ class UserDao extends Dao
   */
  public function updateUserSession($bind, $user_id)
  {
-   $this->modify("tbl_users", ['user_session' => generate_session_key($bind['user_session'], 32)], "ID = {$user_id}");
+   $this->modify("tbl_users", ['user_session' => generate_session_key($bind['user_session'], 128)], "ID = {$user_id}");
  }
 
  /**
