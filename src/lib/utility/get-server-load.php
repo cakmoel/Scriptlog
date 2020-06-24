@@ -15,7 +15,7 @@ function get_server_load()
 {
     $load = array();
 
-    $factor = 1578;
+    $factor = 15780543;
 
     $threshold = number_cpus() * $factor . PHP_EOL;
 
@@ -44,7 +44,7 @@ function get_server_load()
         
     }
      
-    if ($load[0] > $threshold) {
+    if ($load[0] >= $threshold) {
      
         header(APP_PROTOCOL.' 503 Service Temporarily Unavailable');
         header('Status: 503 Service Temporarily Unavailable');
@@ -87,8 +87,11 @@ function win_architecture()
                 return "Itanium-based system";
             case 9:
                 return "x64";
+
         }
+
     }
+    
     return "Unknown";
 
 }
