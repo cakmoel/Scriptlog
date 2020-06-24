@@ -38,7 +38,7 @@ function get_login_attempt($ip)
     WHERE ip_address = ? 
     AND login_date BETWEEN DATE_SUB( NOW() , INTERVAL 1 DAY ) AND NOW()";
 
-    $row = db_prepared_query($sql, [$ip])->get_result()->fetch_assoc();
+    $row = db_prepared_query($sql, [$ip], "s")->get_result()->fetch_assoc();
 
 
   }
@@ -59,7 +59,7 @@ function create_login_attempt($ip)
   
   $sql = "INSERT INTO tbl_login_attempt (ip_address, login_date) VALUES (?, NOW())";
 
-  $stmt = db_prepared_query($sql, [$ip]);
+  $stmt = db_prepared_query($sql, [$ip], "s");
 
   return $stmt;
   
