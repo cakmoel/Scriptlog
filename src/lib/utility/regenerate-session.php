@@ -12,24 +12,16 @@
 function regenerate_session()
 {
 
- $newsid = session_id(ircmaxell_random_compat());
+ $old_session_id = session_id();
  
- if (isset($_COOKIE[session_name()]) || is_session_started() === false) {
-      
-     session_start();
-
- }
-
  $_SESSION['deleted_time'] = time() - Authentication::COOKIE_EXPIRE;
 
- session_write_close();
+ session_regenerate_id();
 
- session_id($newsid);
-
- session_start();
-
- session_regenerate_id(true);
-
+ unset($_SESSION['deleted_time']);
+ 
+ $new_session_id = session_id();
+ 
 }
 
 /**
