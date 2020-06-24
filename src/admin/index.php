@@ -9,15 +9,13 @@
  */
 $ip = (isset($_SERVER["REMOTE_ADDR"])) ? $_SERVER["REMOTE_ADDR"] : get_ip_address();
 
-if (file_exists(__DIR__ . '/../config.php')) {
+if (file_exists(__DIR__.'/../config.php') && is_file(__DIR__.'/../config.php')) {
     
     include __DIR__ . '/../lib/main.php';
     require __DIR__ . '/authorizer.php';
 
     if ((isset($ubench)) && (true === APP_DEVELOPMENT)) {
-
-         $ubench->start();
-
+        $ubench->start();
     }
 
 } else {
