@@ -10,12 +10,39 @@
 function get_login_attempt($ip)
 {
  
-  $sql = "SELECT count(ip_address) AS failed_login_attempt 
-          FROM tbl_login_attempt 
-          WHERE ip_address = ? AND login_date BETWEEN DATE_SUB( NOW() , INTERVAL 1 DAY ) AND NOW()";
+  if(version_compare(PHP_VERSION, "7.3", ">=")) {
 
-  $row = db_prepared_query($sql, [$ip])->get_result()->fetch_assoc();
-  
+    $sql = "SELECT count(ip_address) AS failed_login_attempt 
+            FROM tbl_login_attempt 
+            WHERE ip_address = '$ip' 
+            AND login_date BETWEEN DATE_SUB( NOW() , INTERVAL 1 DAY ) AND NOW()";
+
+    if($result = db_simple_query($sql)) {
+
+      if(is_array($result)) {
+
+        while ($row = $result->fetch_assoc()) {
+         
+             $row['failed_login_attempt'];
+
+        }
+
+      }
+       
+    }
+    
+  } else {
+
+    $sql = "SELECT count(ip_address) AS failed_login_attempt 
+    FROM tbl_login_attempt 
+    WHERE ip_address = ? 
+    AND login_date BETWEEN DATE_SUB( NOW() , INTERVAL 1 DAY ) AND NOW()";
+
+    $row = db_prepared_query($sql, [$ip])->get_result()->fetch_assoc();
+
+
+  }
+
   return $row;
 
 }
@@ -52,7 +79,7 @@ function delete_login_attempt($ip)
 
    $sql = "DELETE FROM tbl_login_attempt WHERE ip_address = ?";
 
-   $removed = db_prepared_query($sql, [$ip]);
+   $removed = db_prepared_query($sql, [$ip], "s");
 
    return $removed;
 
