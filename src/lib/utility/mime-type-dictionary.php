@@ -28,7 +28,8 @@ function mime_type_dictionary()
       'mp3'  => 'audio/mpeg', 
       'wav'  => 'audio/wav',
       'ogg'  => 'audio/ogg',
-      'mp4'  => 'video/mp4',
+      'mpeg' => 'video/mpeg',
+      'mp4'  => 'video/mp4',   
       'webm' => 'video/webm',
       'ogg'  => 'video/ogg'
 
