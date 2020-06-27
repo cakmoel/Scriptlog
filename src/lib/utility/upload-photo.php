@@ -1,10 +1,12 @@
 <?php
 /**
- * Upload picture with Intervention Image Manipulation Class Library
+ * upload_photo function 
+ * Uploading picture or image with Intervention Image Manipulation Class Library
  * 
- * @category Package
- * @author  Oliver Vogel the author of Intervention Image 
- * @see http://image.intervention.io/
+ * @category Functions
+ * @author  Oliver Vogel the author of Intervention Image Class Library
+ * @uses Intervention\Image\ImageManager
+ * @see http://image.intervention.io/use/basics
  * @see https://anchetawern.github.io/blog/2016/02/18/using-the-intervention-image-library-in-php/
  * @see https://www.tutmecode.com/php/create-thumbnail-from-big-size-image-in-php-or-laravel/
  * @license MIT
