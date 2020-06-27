@@ -417,7 +417,8 @@ public function modifyMediaMeta()
 
         case 'video/mp4':
         case 'video/webm':
-        case 'video/ogg':    
+        case 'video/ogg':
+        case 'video/mpeg':    
 
           if(is_readable(__DIR__ . '/../../public/files/video/'.$filename)) {
 
