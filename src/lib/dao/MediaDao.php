@@ -572,6 +572,8 @@ public function dropDownMediaSelect($selected = null)
 
   $sanitizer = new Sanitize;
 
+  $picture_bucket_list = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
   if (is_array($media_ids)) {
 
        $dropdown .= '<option>Select primary image</option>';
@@ -584,8 +586,12 @@ public function dropDownMediaSelect($selected = null)
 
            $select = $selected === $media['ID'] ? ' selected' : null;
 
-           $dropdown .= '<option data-content="<img src='.app_url().DS.APP_IMAGE_THUMB.'small_'.rawurlencode(basename(safe_html($media['media_filename']))).'></img>" value="'.(int)$media['ID'].'"'.$select.'>'.safe_html($media_properties['Origin']).'</option>'."\n";
+           if(in_array($media['media_type'], $picture_bucket_list)) {
 
+            $dropdown .= '<option data-content="<img src='.app_url().DS.APP_IMAGE_THUMB.'small_'.rawurlencode(basename(safe_html($media['media_filename']))).'></img>" value="'.(int)$media['ID'].'"'.$select.'>'.safe_html($media_properties['Origin']).'</option>'."\n";
+
+           } 
+           
        }
 
   } 
