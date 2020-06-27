@@ -22,7 +22,7 @@ function upload_media($file_location, $file_type, $file_size, $file_name)
      case 'application/vnd.microsoft.portable-executable':
      case 'application/vnd.oasis.opendocument.text': 
      
-       upload_doc($file_size, $file_size, $file_type, $file_name);
+       upload_doc($file_location, $file_size, $file_type, $file_name);
    
        break;
 
@@ -30,7 +30,7 @@ function upload_media($file_location, $file_type, $file_size, $file_name)
      case 'audio/wav' :
      case 'audio/ogg' :
 
-       upload_audio($file_size, $file_size, $file_type, $file_name);
+       upload_audio($file_location, $file_size, $file_type, $file_name);
 
        break;
       
@@ -46,6 +46,7 @@ function upload_media($file_location, $file_type, $file_size, $file_name)
      case 'video/mp4':
      case 'video/webm':
      case 'video/ogg':
+     case 'video/mpeg':
       
        upload_video($file_location, $file_size, $file_type, $file_name);
        
