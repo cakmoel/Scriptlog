@@ -1,5 +1,14 @@
 <?php
-
+/**
+ * upload_audio function
+ *
+ * @param string $file_location
+ * @param string $file_size
+ * @param string $file_type
+ * @param string $file_name
+ * @category function
+ * @return void
+ */
 function upload_audio($file_location, $file_size, $file_type, $file_name)
 {
   
