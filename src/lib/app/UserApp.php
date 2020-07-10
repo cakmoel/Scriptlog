@@ -9,6 +9,12 @@
  * @since     Since Release 1.0
  *
  */
+
+use Egulias\EmailValidator\EmailValidator;
+use Egulias\EmailValidator\Validation\DNSCheckValidation;
+use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
+use Egulias\EmailValidator\Validation\RFCValidation;
+
 class UserApp extends BaseApp
 {
 
@@ -182,7 +188,7 @@ class UserApp extends BaseApp
                 
             }
             
-            if ((isset($_POST['user_email'])) && (email_validation($_POST['user_email']) == 0)) {
+            if ((isset($_POST['user_email'])) && (!email_validation($_POST['user_email'], new RFCValidation()))) {
                 
                 $checkError = false;
                 array_push($errors, "Please enter a valid email address");
@@ -378,7 +384,7 @@ class UserApp extends BaseApp
             
         }
 
-        if (email_validation($_POST['user_email']) == 0) {
+        if (!email_validation($_POST['user_email'], new RFCValidation())) {
 
             $checkError = false;
             array_push($errors, "Please enter a valid email address");
@@ -581,7 +587,7 @@ class UserApp extends BaseApp
 
             }
     
-            if (email_validation($_POST['user_email']) == 0) {
+            if (!email_validation($_POST['user_email'], new RFCValidation())) {
 
                 $checkError = false;
                 array_push($errors, "Please enter a valid email address");
