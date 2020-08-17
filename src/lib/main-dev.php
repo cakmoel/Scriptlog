@@ -4,7 +4,7 @@
  * Initialize main engine, define constants, and object instantiated
  * include functions needed by application
  * 
- * @category library\main.php file
+ * @category main.php file
  * @author   M.Noermoehammad
  * @license  https://opensource.org/licenses/MIT MIT License
  * @version  1.0
@@ -15,18 +15,20 @@
 ini_set('memory_limit', "5M");
 error_reporting(-1);
 #ini_set("session.cookie_secure", 1);  
-#ini_set("session.cookie_lifetime", 0);  
+#ini_set("session.cookie_lifetime", 86400);  
 ini_set("session.cookie_httponly", 1);
 #ini_set("session.use_cookies", 1);
 ini_set("session.use_only_cookies", 1);
 #ini_set("session.use_strict_mode", 1);
 #ini_set("session.use_trans_sid", 0);
-ini_set('session.gc_maxlifetime', 1200);
-ini_set('session.gc_probability',100);
-ini_set('session.gc_divisor', 1);
+ini_set('session.save_handler', 'files');
+ini_set('session.gc_divisor', 100);
+ini_set('session.gc_maxlifetime', 1440);
+ini_set('session.gc_probability',1);
 #header("Content-Security-Policy: default-src https:; font-src 'unsafe-inline' data: https:; form-action 'self' https://yourdomain.com;img-src data: https:; child-src https:; object-src 'self' www.google-analytics.com ajax.googleapis.com platform-api.sharethis.com yourusername.disqus.com; script-src 'unsafe-inline' https:; style-src 'unsafe-inline' https:;");
 #header('X-Frame-Options: DENY);
 #date_default_timezone_set("GMT");
+
 
 require __DIR__ . '/common.php';
 
@@ -187,6 +189,10 @@ $userToken = new UserTokenDao();
 $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);
 $ubench = new Ubench();
+$sessionMaker = new SessionMaker(app_key());
+
+session_set_save_handler($sessionMaker, true);
+session_save_path(__DIR__ . '/utility/.sessions');
 
 // These line (179 and 180) are experimental code. You do not need it.
 # $bones = new Bones();
@@ -196,7 +202,7 @@ $ubench = new Ubench();
 # set_error_handler('LogError::errorHandler');
 # register_shutdown_function('scriptlog_shutdown_fatal');
 
-if (!start_session_on_site()) {
+if (!start_session_on_site($sessionMaker)) {
      
     ob_start();
     
