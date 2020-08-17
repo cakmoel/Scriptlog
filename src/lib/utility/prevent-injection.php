@@ -3,16 +3,18 @@
  * Prevent Injection Function
  * 
  * @category Function
+ * @uses htmLawed($text) htmLawed
+ * @see  http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed 
  * @param string $data
  * @return string
  * 
  */
-function prevent_injection($data)
+function prevent_injection($str)
 {
     
-  $data = @trim(stripslashes(strip_tags(htmlspecialchars($data, ENT_COMPAT|ENT_HTML5, 'UTF-8'))));
+  $str = @trim(stripslashes(strip_tags(htmlspecialchars($str, ENT_COMPAT|ENT_HTML5, 'UTF-8'))));
   
-  $filter = htmLawed($data, array('safe' => 1, 'deny_attribute'=>'style'));
+  $filter = htmLawed($str);
 
   return $filter;
     
