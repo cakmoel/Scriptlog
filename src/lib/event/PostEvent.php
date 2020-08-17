@@ -95,11 +95,7 @@ class PostEvent
    */
   private $topics; 
 
-  private $postDao;
-
-  private $validator;
-
-  private $sanitizer;
+  private $postDao, $validator, $sanitizer;
  
   /**
    * Constructor
@@ -398,11 +394,12 @@ class PostEvent
 
     if ($post_image !== '') {
         
-       if (is_readable(__DIR__ . '/../../public/files/pictures/'.$post_image)) {
+       if (is_readable(__DIR__ . '/../../'.APP_IMAGE.$post_image)) {
            
-           unlink(__DIR__ . '/../../public/files/pictures/'.$post_image);
-           unlink(__DIR__ . '/../../public/files/pictures/thumbs/medium_'.$post_image);
-           unlink(__DIR__ . '/../../public/files/pictures/thumbs/small_'.$post_image);
+           unlink(__DIR__ . '/../../'.APP_IMAGE.$post_image);
+           unlink(__DIR__ . '/../../'.APP_IMAGE_LARGE.'large_'.$post_image);
+           unlink(__DIR__ . '/../../'.APP_IMAGE_MEDIUM.'medium_'.$post_image);
+           unlink(__DIR__ . '/../../'.APP_IMAGE_SMALL.'small_'.$post_image);
            
        }
        
@@ -422,9 +419,9 @@ class PostEvent
    * @param string $selected
    * @return string
    */
-  public function postStatusDropDown($selected = "")
+  public static function postStatusDropDown($selected = "")
   {
-     return $this->postDao->dropDownPostStatus($selected);
+     return PostDao::dropDownPostStatus($selected);
   }
   
   /**
@@ -434,9 +431,9 @@ class PostEvent
    * @return string
    * 
    */
-  public function commentStatusDropDown($selected = "")
+  public static function commentStatusDropDown($selected = "")
   {
-     return $this->postDao->dropDownCommentStatus($selected);
+     return PostDao::dropDownCommentStatus($selected);
   }
  
   /**
@@ -449,12 +446,6 @@ class PostEvent
   public function postAuthorId()
   {
 
-    if (isset($_COOKIE['scriptlog_cookie_id'])) {
-
-        return $_COOKIE['scriptlog_cookie_id'];
-
-    }
-    
     if (isset(Session::getInstance()->scriptlog_session_id)) {
       
         return Session::getInstance()->scriptlog_session_id;
@@ -475,12 +466,6 @@ class PostEvent
  public function postAuthorLevel()
  {
  
-   if (isset($_COOKIE['scriptlog_cookie_level'])) {
-
-      return $_COOKIE['scriptlog_cookie_level'];
-  
-   }
-
    if (isset(Session::getInstance()->scriptlog_session_level)) {
 
       return Session::getInstance()->scriptlog_session_level;

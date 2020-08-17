@@ -384,6 +384,12 @@ public function modifyMediaMeta()
 
    if($filename !== '') {
 
+      if (!preg_match('/^(?:[a-z0-9_-]|\.(?!\.))+$/iD', $filename)) {
+
+          scriptlog_error("Bad filename", E_USER_WARNING);
+ 
+      }
+
       switch ($filetype) {
 
         case 'audio/mpeg':
@@ -437,13 +443,15 @@ public function modifyMediaMeta()
             // get filename for remove webp image format
             $file_basename = substr($filename, 0, strripos($filename, '.'));
 
-            unlink(__DIR__ . '/../../public/files/pictures/'.$filename);
-            unlink(__DIR__ . '/../../public/files/pictures/thumbs/medium_'.$filename);
-            unlink(__DIR__ . '/../../public/files/pictures/thumbs/small_'.$filename);
-            unlink(__DIR__ . '/../../public/files/pictures/'.$file_basename.'.webp');
-            unlink(__DIR__ . '/../../public/files/pictures/thumbs/medium_'.$file_basename.'.webp');
-            unlink(__DIR__ . '/../../public/files/pictures/thumbs/small_'.$file_basename.'.webp');
-            
+            unlink(__DIR__ . '/../../'.APP_IMAGE.$filename);
+            unlink(__DIR__ . '/../../'.APP_IMAGE_LARGE.'large_'.$filename);
+            unlink(__DIR__ . '/../../'.APP_IMAGE_MEDIUM.'medium_'.$filename);
+            unlink(__DIR__ . '/../../'.APP_IMAGE_SMALL.'small_'.$filename);
+            unlink(__DIR__ . '/../../'.APP_IMAGE.$filename.'.webp');
+            unlink(__DIR__ . '/../../'.APP_IMAGE_LARGE.'large_'.$filename.'.webp');
+            unlink(__DIR__ . '/../../'.APP_IMAGE_MEDIUM.'medium_'.$filename.'.webp');
+            unlink(__DIR__ . '/../../'.APP_IMAGE_SMALL.'small_'.$filename.'.webp');
+
           }
 
           break;

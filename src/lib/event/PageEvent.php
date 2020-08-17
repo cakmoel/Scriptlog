@@ -346,10 +346,13 @@ class PageEvent
 
     if ($page_image !== '') {
         
-        if (is_readable(__DIR__ . '/../../public/files/pictures/'.$page_image)) {
-            unlink(__DIR__ . '/../../public/files/pictures/'.$page_image);
-            unlink(__DIR__ . '/../../public/files/pictures/thumbs/medium_'.$page_image);
-            unlink(__DIR__ . '/../../public/files/pictures/thumbs/small_'.$page_image);
+        if (is_readable(__DIR__ . '/../../'.APP_IMAGE.$page_image)) {
+
+            unlink(__DIR__ . '/../../'.APP_IMAGE.$page_image);
+            unlink(__DIR__ . '/../../'.APP_IMAGE_LARGE.'large_'.$page_image);
+            unlink(__DIR__ . '/../../'.APP_IMAGE_MEDIUM.'medium_'.$page_image);
+            unlink(__DIR__ . '/../../'.APP_IMAGE_SMALL.'small_'.$page_image);
+            
         }
         
         return $this->pageDao->deletePage($this->pageId, $this->sanitizer, $this->post_type);
