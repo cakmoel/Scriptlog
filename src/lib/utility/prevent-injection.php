@@ -12,10 +12,8 @@
 function prevent_injection($str)
 {
     
-  $str = @trim(stripslashes(strip_tags(htmlspecialchars($str, ENT_COMPAT|ENT_HTML5, 'UTF-8'))));
+  $filter = @trim(stripslashes(strip_tags(htmlspecialchars($str, ENT_COMPAT|ENT_HTML5, 'UTF-8'))));
   
-  $filter = htmLawed($str);
+  return htmLawed($filter);
 
-  return $filter;
-    
 }
