@@ -2,9 +2,9 @@ Scriptlog is an Open Source and Free
 You may use Scriptlog under terms of either :
 MIT License or The GNU General Public License Version 3
 You will find both licenses below in this document
-Please notice that ImpressPages uses third party libraries which might be distributed under other licenses
+Please notice that scriptlog uses third party libraries which might be distributed under other licenses
 
-The MIT License (MIT)
+MIT License (MIT)
 
 Copyright (c) 2018 M.Noermoehammad
 
