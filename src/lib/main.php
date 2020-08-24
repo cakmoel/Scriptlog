@@ -138,8 +138,11 @@ call_htmlpurifier();
     'album' => "/album/(?'album'[\w\-]+)",              
     
      ### '/category/category-slug'
-    'category' => "/category/(?'category'[\w\-]+)",        
+    'category' => "/category/(?'category'[\w\-]+)", 
     
+     ### 'archive/12/2017
+     'archive' => "/archive/[0-9]{2}/[0-9]{2}/[0-9]{4}",
+
      ### '/blog?p=255'
     'blog' => "/blog([^/]*)",                       
     
@@ -158,6 +161,7 @@ $rules = array(
     
     'home'     => "/",                               
     'category' => "/category/(?'category'[\w\-]+)",
+    'archive'  => "/archive/[0-9]{2}/[0-9]{2}/[0-9]{4}",
     'blog'     => "/blog([^/]*)",
     'page'     => "/page/(?'page'[^/]+)",
     'single'   => "/post/(?'id'\d+)/(?'post'[\w\-]+)",
@@ -167,7 +171,7 @@ $rules = array(
 
 #==================== END OF RULES ======================
 
-// an instantiation of Database connection
+#====== an instantiation of Database connection =========
 $dbc = DbFactory::connect(['mysql:host='.$config['db']['host'].';dbname='.$config['db']['name'], $config['db']['user'], $config['db']['pass']]);
 
 // Register rules and an instance of database connection
@@ -179,7 +183,7 @@ Registry::setAll(array('dbc' => $dbc, 'route' => $rules));
  * @var $searchPost invoked by search functionality
  * @var $frontPaginator called by front pagination funtionality
  * @var $sanitizer adapted by sanitize functionality
- * @var $userDao, $validator, $authenticator --
+ * @var $userDao, $validator, $authenticator, $ubench --
  * these are collection of objects or instances of classes 
  * that will be run by the system.
  * 
@@ -192,7 +196,7 @@ $userToken = new UserTokenDao();
 $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);
 $ubench = new Ubench();
-$sessionMaker = new SessionMaker(app_key());
+$sessionMaker = new SessionMaker(set_session_cookies_key());
 
 session_set_save_handler($sessionMaker, true);
 session_save_path(__DIR__ . '/utility/.sessions'.DS);
