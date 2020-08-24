@@ -112,7 +112,7 @@ $large_path = __DIR__ . '/../../'.APP_IMAGE_LARGE;
 create_directory($large_path);
 $large_path_uploaded = $large_path . $large_thumb_name;
 
-if (!(function_exists('finfo_open') || class_exists('finfo'))) {
+if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exists('finfo'))) {
 
   if (resize_image($current_width, $current_height, $medium_size, $medium_path_uploaded, $img_source, 80, $img_type)) {
 
