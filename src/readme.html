@@ -77,6 +77,7 @@ environment. Scritplog need the following
     or any version of <a href="https://mariadb.org">MariaDB</a></li>
 <li><a href="https://secure.php.net">PHP</a> version 5.6 or greater</li>
 <li>PDO</li>
+<li>mysqli</li>
 <li>mysqlnd</li>
 <li>curl</li>
 <li>Gd</li>
@@ -141,9 +142,9 @@ and <em>library/plugins</em> folders are set to <em>writeable</em>
 and that all files belong to the web user or is a part of the same group as the web user.</p>
 
 <b>6) Create database for Scriptlog</b>
-<p>You may name it anything you like. The method for database creation varies depending 
-on your webhost but may require using adminer, PHPMyAdmin or etc. If you are unsure 
-how to createt this, ask your host.</p>
+<p>You may name it anything you like. Choose <em>utf8mb4_general_ci</em> as it <b>collation</b>. 
+The method for database creation varies depending on your webhost but may require using adminer, PHPMyAdmin or etc. 
+If you are unsure how to createt this, ask your host.</p>
 
 <b>7) Follow the installation procedure</b>
 <p>Open <em>install/</em> in your browser. You will be asked to fill each column provided. 
