@@ -8,8 +8,8 @@
         <small>Control Panel</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="index.php?load=plugins">Plugins</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i>Home</a></li>
+        <li><a href="index.php?load=templates">Themes</a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
     </section>
@@ -49,16 +49,18 @@ echo "Error saving data. Please try again." . $saveError;
 </div>
 <?php 
 endif;
+
+$action = isset($formAction) ? $formAction : null;
 ?>
 
-<form method="post" action="index.php?load=templates&action=<?=(isset($formAction)) ? $formAction : null; ?>&themeId=0" 
-  role="form" onsubmit="return(mandatoryThemeUpload());" enctype="multipart/form-data" autocomplete="off">
-  <input type="hidden" name="MAX_FILE_SIZE" value="10485760" />
+<form method="post" action="<?= generate_request('index.php', 'post', ['templates', $action, 0])['link'];?>" role="form" onsubmit="return(mandatoryThemeUpload());" enctype="multipart/form-data" autocomplete="off">
+<input type="hidden" name="MAX_FILE_SIZE" value="<?= scriptlog_upload_filesize(); ?>" >
+
 <div class="box-body">
 
 <div class="form-group">
 <label>Upload Theme (required)</label>
-<input type="file"  name="zip_file" id="themeUploaded" accept="application/zip,application/octet-stream,application/x-zip,application/x-zip-compressed" required>
+<input type="file"  name="zip_file" id="themeUploaded" accept="application/zip,application/x-zip,application/x-zip-compressed" required>
 <p class="help-block">If you have a theme in a .zip format, you may install it by uploading it here.</p>
 </div>
 
