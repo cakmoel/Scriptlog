@@ -106,8 +106,7 @@ class ThemeDao extends Dao
        'theme_title' => $bind['theme_title'],
        'theme_desc' => $bind['theme_desc'],
        'theme_designer' => $bind['theme_designer'],
-       'theme_directory' => $bind['theme_directory'],
-       'theme_status' => $bind['theme_status']
+       'theme_directory' => $bind['theme_directory']
      ], "ID = {$cleanId}");
 
   }
