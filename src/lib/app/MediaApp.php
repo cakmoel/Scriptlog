@@ -125,11 +125,10 @@ public function insert()
 
       if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
               
-        header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-        $checkError = false;
-        array_push($errors, "Sorry, unpleasant attempt detected!");
-        throw new AppException("Sorry, unpleasant attempt detected!");
-        
+         header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+         $checkError = false;
+         array_push($errors, "Sorry, unpleasant attempt detected!");
+       
       }
 
       if (!empty($_POST['media_caption'])) {
@@ -216,17 +215,18 @@ public function insert()
       // get new filename and extension
       $new_filename = generate_filename($file_name)['new_filename'];
       $file_extension = generate_filename($file_name)['file_extension'];
-     
-      if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
 
-         list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
+      if ($file_extension === "jpeg" || $file_extension === "jpg" || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp") {
+
+         list($width, $height) = ($file_location) ? getimagesize($file_location) : null;
 
          $media_metavalue = array(
               'Origin' => rename_file($file_name), 
               'File type' => $file_type, 
               'File size' => format_size_unit($file_size), 
               'Uploaded on' => date("Y-m-d H:i:s"), 
-              'Dimension' => $width.'x'.$height);
+              'Dimension' => $width.'x'.$height
+            );
 
       } else {
 
@@ -238,23 +238,23 @@ public function insert()
         ));
 
       }
-      
-      // upload file
+
+       // upload file
       if (is_uploaded_file($file_location)) {
 
-        if(false === check_mime_type(mime_type_dictionary(), $file_location)) {
+         if(false === check_mime_type(mime_type_dictionary(), $file_location)) {
 
-          $checkError = false;
-          array_push($errors, "Invalid file format");
+           $checkError = false;
+           array_push($errors, "Invalid file format");
   
-        } else {
+          } else {
 
-          upload_media($file_location, $file_type, $file_size, basename($new_filename));
+            upload_media($file_location, $file_type, $file_size, basename($new_filename));
 
-        }
+         }
          
       }
-     
+
       if (!$checkError) {
 
          $this->setView('edit-media');
@@ -515,23 +515,23 @@ public function update($id)
                   'Uploaded on' => date("Y-m-d H:i:s"));
  
           }
-  
-         // upload file
-         if (is_uploaded_file($file_location)) {
+          
+          // upload file
+        if (is_uploaded_file($file_location)) {
 
-            if(false === check_mime_type(mime_type_dictionary(), $file_location)) {
-  
-               $checkError = false;
-               array_push($errors, "Invalid file format");
-  
-            } else {
+          if(false === check_mime_type(mime_type_dictionary(), $file_location)) {
 
-               upload_media($file_location, $file_type, $file_size, basename($new_filename));
-               
-            }
-            
-         }
-        
+            $checkError = false;
+            array_push($errors, "Invalid file format");
+  
+          } else {
+
+           upload_media($file_location, $file_type, $file_size, basename($new_filename));
+
+          }
+         
+        }
+
          $this->mediaEvent->setMediaFilename($new_filename);
          $this->mediaEvent->setMediaCaption(prevent_injection(distill_post_request($filters)['media_caption']));
          $this->mediaEvent->setMediaType($file_type);
