@@ -2,7 +2,11 @@ Scriptlog is an Open Source and Free
 
 You may use Scriptlog under terms of either :
 
-MIT License or The GNU General Public License Version 3
+MIT License (https://www.opensource.org/licenses/mit-license.html) 
+
+or
+
+The GNU General Public License Version 3 (https://www.gnu.org/licenses/gpl-3.0.html)
 
 You will find both licenses below in this document
 
