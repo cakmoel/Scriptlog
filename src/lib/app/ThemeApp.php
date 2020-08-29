@@ -322,12 +322,9 @@ class ThemeApp extends BaseApp
 
     if (isset($_POST['themeFormSubmit'])) {
 
-      $theme_title = (isset($_POST['theme_title']) ? preg_replace('/[^\.\,\-\_\'\"\@\?\!\:\$ a-zA-Z0-9()]/', '', $_POST['theme_title']) : "");
-      $theme_desc = (isset($_POST['theme_description']) ? prevent_injection($_POST['theme_description']) : "");
-      $theme_designer = (isset($_POST['theme_designer']) ? preg_replace('/[^\.\,\-\_\'\"\@\?\!\:\$ a-zA-Z0-9()]/', '', $_POST['theme_designer']) : "");
-      $theme_dir = (isset($_POST['theme_directory']) ? $_POST['theme_directory'] : "");
-      $theme_id = abs((int)$_POST['theme_id']);
-
+      $filters = ['theme_title' => FILTER_SANITIZE_STRING, 'theme_description' => FILTER_SANITIZE_SPECIAL_CHARS, 
+                  'theme_designer' => FILTER_SANITIZE_STRING, 
+                  'theme_directory' => FILTER_SANITIZE_STRING, 'theme_id' => FILTER_SANITIZE_NUMBER_INT];
       try {
 
         if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
@@ -346,7 +343,7 @@ class ThemeApp extends BaseApp
 
           $this->setView('edit-template');
           $this->setPageTitle('Edit Theme');
-          $this->setFormAction('editTheme');
+          $this->setFormAction(ActionConst::EDITTHEME);
           $this->view->set('pageTitle', $this->getPageTitle());
           $this->view->set('formAction', $this->getFormAction());
           $this->view->set('errors', $errors);
@@ -355,11 +352,11 @@ class ThemeApp extends BaseApp
 
         } else {
 
-          $this->themeEvent->setThemeId($theme_id);
-          $this->themeEvent->setThemeTitle($theme_title);
-          $this->themeEvent->setThemeDescription($theme_desc);
-          $this->themeEvent->setThemeDesigner($theme_designer);
-          $this->themeEvent->setThemeDirectory($theme_dir);
+          $this->themeEvent->setThemeId((int)distill_post_request($filters)['theme_id']);
+          $this->themeEvent->setThemeTitle(prevent_injection(distill_post_request($filters)['theme_title']));
+          $this->themeEvent->setThemeDescription(purify_dirty_html(distill_post_request($filters)['theme_description']));
+          $this->themeEvent->setThemeDesigner(distill_post_request($filters)['theme_designer']);
+          $this->themeEvent->setThemeDirectory(prevent_injection(distill_post_request($filters)['theme_directory']));
           $this->themeEvent->modifyTheme();
           direct_page('index.php?load=templates&status=themeUpdated', 200);
 
@@ -377,7 +374,7 @@ class ThemeApp extends BaseApp
        
        $this->setView('edit-template');
        $this->setPageTitle('Edit Theme');
-       $this->setFormAction('editTheme');
+       $this->setFormAction(ActionConst::EDITTHEME);
        $this->view->set('pageTitle', $this->getPageTitle());
        $this->view->set('formAction', $this->getFormAction());
        $this->view->set('themeData', $data_theme);
