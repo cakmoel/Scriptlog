@@ -147,7 +147,7 @@ $user_level      = 'administrator';
 $theme_title     = "Mini Blog";
 $theme_desc      = "Simple yet clean design for personal blog";
 $theme_designer  = "Colorlib";
-$theme_directory = "themes/miniblog";
+$theme_directory = "miniblog";
 $theme_status    = "Y";
 
 // Setting App Key
@@ -206,7 +206,6 @@ if ($link->insert_id && $createAdmin->affected_rows > 0) {
     $createReply = $link -> query($tblReply);
     $createLoginAttempt = $link -> query($tblLoginAttempt);
     $createMenu = $link -> query($tblMenu);
-    $createMenuChild = $link -> query($tblMenuChild);
     $createMedia = $link -> query($tblMedia);
     $createMediaMeta = $link -> query($tblMediaMeta);
     $createMediaDownload = $link -> query($tblMediaDownload);
@@ -360,6 +359,7 @@ if (isset($_SESSION['install']) && $_SESSION['install'] == true) {
  * @param boolean $escape
  * @param string $level
  * @return string
+ * 
  */
 function remove_bad_characters($str_words, $escape = false, $level = 'high')
 {
