@@ -11,6 +11,7 @@
  */
 class MenuApp extends BaseApp
 {
+  
   private $view;
 
   private $menuEvent;
@@ -44,7 +45,7 @@ class MenuApp extends BaseApp
     }
 
     $this->setView('all-menus');
-    $this->setPageTitle('Menu');
+    $this->setPageTitle('Menus');
     $this->view->set('pageTitle', $this->getPageTitle());
 
     if (!$checkError) {
@@ -68,8 +69,7 @@ class MenuApp extends BaseApp
 
     if (isset($_POST['menuFormSubmit'])) {
       
-      $menu_label = isset($_POST['menu_label']) ? prevent_injection($_POST['menu_label']) : "";
-      $menu_link = isset($_POST['menu_link']) ? trim($_POST['menu_link']) : "";
+      $filters = ['parent_id' => FILTER_SANITIZE_NUMBER_INT, 'menu_label' => FILTER_SANITIZE_STRING, 'menu_link' => FILTER_SANITIZE_URL];
 
       try {
 
@@ -80,35 +80,37 @@ class MenuApp extends BaseApp
           
         }
 
-        if (empty($menu_label)) {
+        if (empty($_POST['menu_label'])) {
           
           $checkError = false;
-          array_push($errors, "All columns required must be filled");
+          array_push($errors, "Menu name must be filled");
 
         }
 
-        if ($this->menuEvent->isMenuExists($menu_label) === true) {
+        if ($this->menuEvent->isMenuExists(distill_post_request($filters)['menu_label']) === true) {
           
           $checkError = false;
           array_push($errors, "Menu has been used");
           
         }
-      
+
         if (!$checkError) {
 
           $this->setView('edit-menu');
           $this->setPageTitle('Add New Menu');
-          $this->setFormAction('newMenu');
+          $this->setFormAction(ActionConst::NEWMENU);
           $this->view->set('pageTitle', $this->getPageTitle());
           $this->view->set('formAction', $this->getFormAction());
           $this->view->set('errors', $errors);
           $this->view->set('formData', $_POST);
+          $this->view->set('parent', $this->menuEvent->parentDropDown());
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
         } else {
 
-           $this->menuEvent->setMenuLabel($menu_label);
-           $this->menuEvent->setMenuLink($menu_link);
+           $this->menuEvent->setParentId((int)distill_post_request($filters)['parent_id']);
+           $this->menuEvent->setMenuLabel(prevent_injection(distill_post_request($filters)['menu_label']));
+           $this->menuEvent->setMenuLink(escape_html(trim(distill_post_request($filters)['menu_link'])));
            $this->menuEvent->addMenu();
            direct_page('index.php?load=menu&status=menuAdded', 200);
 
@@ -126,9 +128,10 @@ class MenuApp extends BaseApp
 
       $this->setView('edit-menu');
       $this->setPageTitle('Add New Menu');
-      $this->setFormAction('newMenu');
+      $this->setFormAction(ActionConst::NEWMENU);
       $this->view->set('pageTitle', $this->getPageTitle());
       $this->view->set('formAction', $this->getFormAction());
+      $this->view->set('parent', $this->menuEvent->parentDropDown());
       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
     }
@@ -156,11 +159,8 @@ class MenuApp extends BaseApp
 
     if (isset($_POST['menuFormSubmit'])) {
 
-      $menu_label = prevent_injection($_POST['menu_label']);
-      $menu_link = trim($_POST['menu_link']);
-      $menu_sort = (is_int($_POST['menu_sort']) ? abs((int)$_POST['menu_sort']) : 0);
-      $menu_status = $_POST['menu_status'];
-      $menu_id = abs((int)$_POST['menu_id']);
+      $filters = ['parent_id' => FILTER_SANITIZE_NUMBER_INT, 'menu_label' => FILTER_SANITIZE_STRING, 'menu_link' => FILTER_SANITIZE_URL, 
+                  'menu_sort' => FILTER_SANITIZE_NUMBER_INT, 'menu_status' => FILTER_SANITIZE_STRING, 'menu_id' => FILTER_SANITIZE_NUMBER_INT];
 
       try {
 
@@ -171,29 +171,40 @@ class MenuApp extends BaseApp
           
         }
 
-        if (empty($menu_label)) {
-          $checkError = false;
-          array_push($errors, "All columns required must be filled");
+        if (empty($_POST['menu_label'])) {
+
+           $checkError = false;
+           array_push($errors, "Menu name must be filled");
+
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['menu_status'], ['Y', 'N'])) {
+
+           $checkError = false;
+           array_push($errors, "Please choose the available value provided!");
+
         }
 
         if (!$checkError) {
 
           $this->setView('edit-menu');
           $this->setPageTitle('Edit Menu');
-          $this->setFormAction('editMenu');
+          $this->setFormAction(ActionConst::EDITMENU);
           $this->view->set('pageTitle', $this->getPageTitle());
           $this->view->set('formAction', $this->getFormAction());
           $this->view->set('errors', $errors);
           $this->view->set('menuData', $data_menu);
+          $this->view->set('parent', $this->menuEvent->parentDropDown($getMenu['parent_id']));
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
         } else {
 
-          $this->menuEvent->setMenuId($menu_id);
-          $this->menuEvent->setMenuLabel($menu_label);
-          $this->menuEvent->setMenuLink($menu_link);
-          $this->menuEvent->setMenuOrder($menu_sort);
-          $this->menuEvent->setMenuStatus($menu_status);
+          $this->menuEvent->setParentId((int)distill_post_request($filters)['parent_id']);
+          $this->menuEvent->setMenuId((int)distill_post_request($filters)['menu_id']);
+          $this->menuEvent->setMenuLabel(prevent_injection(distill_post_request($filters)['menu_label']));
+          $this->menuEvent->setMenuLink(escape_html(distill_post_request($filters)['menu_link']));
+          $this->menuEvent->setMenuOrder((is_int($_POST['menu_sort']) ? distill_post_request($filters)['menu_sort'] : 0 ));
+          $this->menuEvent->setMenuStatus(distill_post_request($filters)['menu_status']);
           $this->menuEvent->modifyMenu();
           direct_page('index.php?load=menu&status=menuUpdated', 200);
 
@@ -211,10 +222,11 @@ class MenuApp extends BaseApp
 
       $this->setView('edit-menu');
       $this->setPageTitle('Edit Menu');
-      $this->setFormAction('editMenu');
+      $this->setFormAction(ActionConst::EDITMENU);
       $this->view->set('pageTitle', $this->getPageTitle());
       $this->view->set('formAction', $this->getFormAction());
       $this->view->set('menuData', $data_menu);
+      $this->view->set('parent', $this->menuEvent->parentDropDown($getMenu['parent_id']));
       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
     }
