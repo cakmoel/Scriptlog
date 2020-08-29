@@ -13,6 +13,8 @@ class MenuEvent
 {
   private $menu_id;
   
+  private $parent_id;
+  
   private $label;
   
   private $link;
@@ -37,6 +39,11 @@ class MenuEvent
   public function setMenuId($menu_id)
   {
     $this->menu_id = $menu_id;
+  }
+
+  public function setParentId($parent_id)
+  {
+    $this->parent_id = $parent_id;
   }
 
   public function setMenuLabel($menu_label)
@@ -69,8 +76,14 @@ class MenuEvent
     return $this->menuDao->findMenu($id, $this->sanitize);
   }
 
+  public function grabMenuParent($parent_id)
+  {
+    return $this->menuDao->findMenuParent($parent_id, $this->sanitize);
+  }
+
   public function addMenu()
   {
+    
     $this->validator->sanitize($this->label, 'string');
     
     if (!empty($this->link)) {
@@ -80,6 +93,7 @@ class MenuEvent
     }
     
     return $this->menuDao->insertMenu([
+      'parent_id' => $this->parent_id,
       'menu_label' => $this->label,
       'menu_link' => $this->link
     ]);
@@ -88,16 +102,20 @@ class MenuEvent
 
   public function modifyMenu()
   {
+    $this->validator->sanitize($this->parent_id, 'int');
     $this->validator->sanitize($this->menu_id, 'int');
     $this->validator->sanitize($this->link, 'url');
     $this->validator->sanitize($this->label, 'string');
 
     return $this->menuDao->updateMenu($this->sanitize, [
-      'menu_label' => $this->label,
-      'menu_link' => $this->link,
-      'menu_sort' => $this->order,
-      'menu_status' => $this->status
-    ], $this->menu_id);
+
+          'parent_id' => $this->parent_id,
+          'menu_label' => $this->label,
+          'menu_link' => $this->link,
+          'menu_sort' => $this->order,
+          'menu_status' => $this->status
+    
+        ], $this->menu_id);
 
   }
 
@@ -137,6 +155,11 @@ class MenuEvent
 
   }
   
+  public function parentDropDown($selected = "")
+  {
+    return $this->menuDao->dropDownMenuParent($selected);
+  }
+
   public function isMenuExists($menu_label)
   {
     return $this->menuDao->menuExists($menu_label);
