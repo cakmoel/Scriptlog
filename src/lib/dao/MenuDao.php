@@ -30,8 +30,7 @@ class MenuDao extends Dao
  */
  public function findMenus($orderBy = 'ID')
  {
-    $sql = "SELECT ID, menu_label, menu_link, 
-                   menu_sort, menu_status
+    $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_sort, menu_status
             FROM tbl_menu ORDER BY :orderBy DESC";
 
     $this->setSQL($sql);
@@ -54,7 +53,7 @@ class MenuDao extends Dao
  public function findMenu($menuId, $sanitizing)
  {
      
-     $sql = "SELECT ID, menu_label, menu_link, menu_sort, menu_status
+     $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_sort, menu_status
              FROM tbl_menu WHERE ID = ?";
      
      $idsanitized = $this->filteringId($sanitizing, $menuId, 'sql');
@@ -67,6 +66,21 @@ class MenuDao extends Dao
      
  }
  
+ public function findMenuParent($parentId, $sanitizing)
+ {
+   
+   $sql = "SELECT ID, parent_id, menu_label FROM tbl_menu WHERE ID = :parent_id";
+   
+   $idsanitized = $this->filteringId($sanitizing, $parentId, 'sql');
+
+   $this->setSQL($sql);
+
+   $menuParent = $this->findRow([':parent_id' => $idsanitized]);
+
+   return (empty($menuParent)) ?: $menuParent;
+
+ }
+
  /**
   * Insert new menu
   * 
@@ -76,6 +90,7 @@ class MenuDao extends Dao
  {
      
    $this->create("tbl_menu", [
+       'parent_id' => $bind['parent_id'],
        'menu_label' => $bind['menu_label'],
        'menu_link' => $bind['menu_link'],
        'menu_sort' => $this->findSortMenu()
@@ -108,6 +123,7 @@ class MenuDao extends Dao
   
   $cleanId = $this->filteringId($sanitize, $ID, 'sql');
   $this->modify("tbl_menu", [
+      'parent_id' => $bind['parent_id'],
       'menu_label' => $bind['menu_label'],
       'menu_link' => $bind['menu_link'],
       'menu_sort' => $bind['menu_sort'],
@@ -202,14 +218,17 @@ class MenuDao extends Dao
 
  }
 
- /**
-  * Drop down menu
-  *
-  * @param string $selected
-  *
-  */
- public function dropDownMenu($selected = '')
+/**
+ * dropDownMenu
+ * Retrieving menu ID to drop down menu parent
+ *
+ * @param string $selected
+ * @return void
+ * 
+ */
+ public function dropDownMenuParent($selected = '')
  {
+
    $option_selected = '';
 
    if (!$selected) {
@@ -218,7 +237,7 @@ class MenuDao extends Dao
 
    $menus = $this->findMenus();
    
-   $dropDown = '<select class="form-control" name="parent" id="parent">'."\n"; 
+   $dropDown = '<select class="form-control" name="parent_id" id="parent">'."\n"; 
 
    if (is_array($menus)) {
 
@@ -239,7 +258,7 @@ class MenuDao extends Dao
   }
 
    if (empty($selected) || empty($menu['ID'])) {
-      $dropDown .= '<option value="0" selected>--Menu--</option>';
+      $dropDown .= '<option value="0" selected>--Parent--</option>';
    }
    
    $dropDown .= '</select>'."\n";
