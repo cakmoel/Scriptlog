@@ -66,8 +66,8 @@
                <table id="scriptlog-table" class="table table-bordered table-striped">
                 <thead>
                 <tr>
-                  <th>#</th>
                   <th>Menu</th>
+                  <th>Parent</th>
                   <th>Link</th>
                   <th>Status</th>
                   <th>Edit</th>
@@ -78,13 +78,25 @@
                  <?php 
                    if (is_array($menus)) : 
                    $no = 0;
+                   $parents = null;
                    foreach ($menus as $m => $menu) :
-                   $no++;
+
+                    $parents = nav_parent($menu['parent_id']);
+
                   ?>
               
                     <tr>
-                       <td><?= $no; ?></td>
+                      
                        <td><?= htmlspecialchars($menu['menu_label']); ?></td>
+                       <td>
+                       <?php
+                           foreach ($parents as $parent) :
+
+                            echo $parent['menu_label'];
+    
+                            endforeach;
+                       ?>
+                       </td>
                        <td><?= htmlspecialchars($menu['menu_link']); ?></td>
                        <td>
                         <?php if ($menu['menu_status'] === 'N') :?> 
@@ -107,6 +119,7 @@
                     </tr>
                 
                 <?php 
+                  $no++;
                 endforeach;
                 endif; 
                 ?>
@@ -114,8 +127,8 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                  <th>#</th>
                   <th>Menu</th>
+                  <th>Parent</th>
                   <th>Link</th>
                   <th>Status</th>
                   <th>Edit</th>

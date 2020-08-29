@@ -52,15 +52,21 @@ endif;
 ?>
 
 <form method="post" action="index.php?load=menu&action=<?=(isset($formAction)) ? $formAction : null; ?>&menuId=<?=(isset($menuData['ID'])) ? $menuData['ID'] : 0; ?>" role="form">
-<input type="hidden" name="menu_id" value="<?=(isset($menuData['ID'])) ? $menuData['ID'] : 0; ?>" />
+<input type="hidden" name="menu_id" value="<?=(isset($menuData['ID'])) ? (int)$menuData['ID'] : 0; ?>" />
 
 <div class="box-body">
 <div class="form-group">
-<label>Menu (required)</label>
-<input type="text" class="form-control" name="menu_label" placeholder="Enter menu label here" value="
+<label>Menu name</label>
+<input type="text" class="form-control" name="menu_label" placeholder="Enter menu name here" value="
 <?=(isset($menuData['menu_label'])) ? htmlspecialchars($menuData['menu_label']) : ""; ?>
 <?=(isset($formData['menu_label'])) ? htmlspecialchars($formData['menu_label'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" required>
 </div>
+
+<div class="form-group">
+<label>Parent</label>
+<?=(isset($parent)) ? $parent : ""; ?>
+</div>
+<!-- menu parent -->
 
 <div class="form-group">
 <label>Link</label>
