@@ -245,8 +245,8 @@ class PostApp extends BaseApp
 
           }
 
-          $this->view->set('postStatus', $this->postEvent->postStatusDropDown());
-          $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown());
+          $this->view->set('postStatus', PostEvent::postStatusDropDown());
+          $this->view->set('commentStatus', PostEvent::commentStatusDropDown());
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
         
         } else {
@@ -324,7 +324,7 @@ class PostApp extends BaseApp
        
                $bind_media = [
                  'media_filename' => $new_filename, 
-                 'media_caption' => rename_file($file_name), 
+                 'media_caption' => prevent_injection(distill_post_request($filters)['post_title']), 
                  'media_type' => $file_type, 
                  'media_target' => 'blog', 
                  'media_user' => $this->postEvent->postAuthorLevel(), 
@@ -405,8 +405,8 @@ class PostApp extends BaseApp
 
         }
         
-        $this->view->set('postStatus', $this->postEvent->postStatusDropDown());
-        $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown());
+        $this->view->set('postStatus', PostEvent::postStatusDropDown());
+        $this->view->set('commentStatus', PostEvent::commentStatusDropDown());
         $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
         
     }
@@ -583,8 +583,8 @@ class PostApp extends BaseApp
        
                 }
 
-                $this->view->set('postStatus', $this->postEvent->postStatusDropDown($getPost['post_status']));
-                $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown($getPost['comment_status']));
+                $this->view->set('postStatus', PostEvent::postStatusDropDown($getPost['post_status']));
+                $this->view->set('commentStatus', PostEvent::commentStatusDropDown($getPost['comment_status']));
                 $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
                 
             } else {
@@ -711,8 +711,8 @@ class PostApp extends BaseApp
 
         }
 
-        $this->view->set('postStatus', $this->postEvent->postStatusDropDown($getPost['post_status']));
-        $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown($getPost['comment_status']));
+        $this->view->set('postStatus', PostEvent::postStatusDropDown($getPost['post_status']));
+        $this->view->set('commentStatus', PostEvent::commentStatusDropDown($getPost['comment_status']));
         $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
         
     }
