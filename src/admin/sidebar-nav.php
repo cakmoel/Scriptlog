@@ -140,7 +140,7 @@ endif;
 <?php 
 if(access_control_list(ActionConst::THEMES)) :
 ?>
-        <li <?=($module == 'templates' || $module == 'menu' || $module == 'menu-child') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+        <li <?=($module == 'templates' || $module == 'menu') ? 'class="treeview active"' : 'class="treeview"'; ?>>
           <a href="#"><i class="fa fa-paint-brush"></i> 
           <span>Appearance</span>
             <span class="pull-right-container">
@@ -152,10 +152,8 @@ if(access_control_list(ActionConst::THEMES)) :
                <?php 
                   if (access_control_list(ActionConst::NAVIGATION)) :
                ?>
-                      
-                      <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['menu'], false)['link']; ?>">Menu</a></li>
-                      <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['menu-child'], false)['link']; ?>">Sub Menu</a></li>
-                
+                    <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['menu'], false)['link']; ?>">Menus</a></li>
+                    
                 <?php endif; ?>
           </ul>
         </li>
