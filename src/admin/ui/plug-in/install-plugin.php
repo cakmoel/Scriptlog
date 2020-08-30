@@ -52,7 +52,7 @@ endif;
 ?>
 
 <form method="post" action="index.php?load=plugins&action=<?=(isset($formAction)) ? $formAction : null; ?>&Id=0" role="form" onsubmit="return(mandatoryPluginUpload());" enctype="multipart/form-data" autocomplete="off">
-<input type="hidden" name="MAX_FILE_SIZE" value="10485760" />
+<input type="hidden" name="MAX_FILE_SIZE" value="<?= scriptlog_upload_filesize(); ?>" >
 <div class="box-body">
 
 <div class="form-group">
@@ -63,7 +63,7 @@ endif;
 
 <div class="form-group">
 <label>Description (required)</label>
-<textarea class="form-control" id="sl" name="description" rows="10" maxlength="100000" required>
+<textarea class="form-control" id="sl" name="description" rows="10" maxlength="500" required>
 <?=(isset($formData['description'])) ? $formData['description'] : ""; ?>
 </textarea>
 </div>
