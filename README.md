@@ -13,3 +13,7 @@ Scriptlog is not a replacement for a full Content Management System. Do not plan
 2. Runs small scripts and systems without a lot of overhead.
 3. Provides a base speed for your personal weblog day to day.
 4. Emphasizing simplicity and security for blog software.
+
+## Disclaimer
+
+we have not finished yet, if you persist in using it, please be aware on your own risk. 
