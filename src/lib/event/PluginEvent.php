@@ -230,10 +230,10 @@ class PluginEvent
 
     if ($plugin_link != '#') {
 
-       if (is_readable("../library/plugins/$plugin_name")) {
+       if (is_readable(__DIR__ . '/../'.APP_LIBRARY.DS.'plugins'.DS.$plugin_name)) {
           
-          delete_directory("../library/plugins/$plugin_name");
-          unlink("../library/plugins/$plugin_name.php");
+          delete_directory(__DIR__ . '/../'.APP_LIBRARY.DS.'plugins'.DS.$plugin_name);
+          unlink(__DIR__.'/../'.APP_LIBRARY.DS.'plugins'.DS.basename($plugin_name).'php');
 
        }
  
