@@ -172,9 +172,11 @@ class PluginApp extends BaseApp
 
     if (isset($_POST['pluginFormSubmit'])) {
 
-      $file_name = (isset($_FILES['zip_file']['name']) ? $_FILES['zip_file']['name']  : "");
-      $file_location = (isset($_FILES['zip_file']['tmp_name']) ? $_FILES['zip_file']['tmp_name'] : "");
-      $max_filesize = $_POST['MAX_FILE_SIZE'];
+      $file_name = isset($_FILES['zip_file']['name']) ? $_FILES['zip_file']['name']  : null;
+      $file_size = isset($_FILES['zip_file']['size']) ? $_FILES['zip_file']['size'] : null;
+      $file_location = isset($_FILES['zip_file']['tmp_name']) ? $_FILES['zip_file']['tmp_name'] : null;
+      $file_type = isset($_FILES['zip_file']['type']) ? $_FILES['zip_file']['type'] : null;
+      $file_error = isset($_FILES['zip_file']['error']) ? $_FILES['zip_file']['error'] : null;
       
       $plugin_desc = prevent_injection($_POST['description']);
       $plugin_level = (isset($_POST['plugin_level']) ? $_POST['plugin_level'] : "");
@@ -183,7 +185,7 @@ class PluginApp extends BaseApp
       $split = explode(".", $file_name);
       $extension = (array_key_exists(1, $split) ? $split[1] : null);
       $field = array('load', $plugin_name);
-      $plugin_link = APP_PROTOCOL . '://'.APP_HOSTNAME . dirname($_SERVER['PHP_SELF']).'/admin/index.php?'.http_build_query($field);
+      $plugin_link = app_url().'/admin/index.php?'.http_build_query($field);
       $validate_format = (strtolower($extension) == 'zip' ? true : false);
       
       try {
@@ -195,22 +197,75 @@ class PluginApp extends BaseApp
           
         }
 
-        if ((empty($plugin_desc)) || (empty($file_location))) {
-           $checkError = false;
-           array_push($errors, "All columns required must be filled.");
-        }
-        
-        if (!$validate_format) {
+        if (!isset($file_error) || is_array($file_error)) {
+
           $checkError = false;
-          array_push($errors,"Invalid file format.Make sure you have a .zip format.");
+          array_push($errors, "Invalid paramenter");
+          
         }
 
-        if (!is_writable('../library/plugins/')) {
+        switch ($file_error) {
+  
+          case UPLOAD_ERR_OK:
+              break;
+          case UPLOAD_ERR_NO_FILE:
+             
+             $checkError = false;
+             array_push($errors, "No file uploaded");
+  
+             break;
+         
+          case UPLOAD_ERR_INI_SIZE:
+          case UPLOAD_ERR_FORM_SIZE:
+            
+            $checkError = false;
+            array_push($errors, "Exceeded filesize limit");
+  
+            break;
+  
+          default:
+              
+            $checkError = false;
+            array_push($errors, "Unknown errors");
+            
+            break;
+            
+        }
+
+        if ($file_size > scriptlog_upload_filesize()) {
+
+          $checkError = false;
+          array_push($errors, "Exceeded file size limit. Maximum file size is. ".format_size_unit(scriptlog_upload_filesize()));
+
+        }
+
+        if (false === check_file_name($file_location)) {
+
+           $checkError = false;
+           array_push($errors, "file name is not valid");
+
+        }
+
+        if (true == check_file_length($file_location)) {
+
+            $checkError = false;
+            array_push($errors, "file name is too long");
+
+        }
+
+        if ( empty($plugin_desc) ) {
+
+           $checkError = false;
+           array_push($errors, "The description columns must be filled.");
+
+        }
+        
+        if (!is_writable(__DIR__ .'/../'.APP_LIBRARY.DS.'plugins'.DS)) {
            
            $checkError = false;
            array_push($errors, "Permission denied.");
 
-        } elseif ((is_dir('../library/plugins/'.$plugin_name.'/')) || (is_readable('../library/plugins/'.$plugin_name.'.php'))) {
+        } elseif ((is_dir(__DIR__ .'/../'.APP_LIBRARY.DS.'plugins'.DS.$plugin_name.DS)) || (is_readable(__DIR__ .'/../'.APP_LIBRARY.DS.'plugins'.DS.basename($plugin_name).'.php'))) {
            
            $checkError = false;
            array_push($errors, "Sorry you have installed this plugin before.");
@@ -222,11 +277,26 @@ class PluginApp extends BaseApp
 
         }
 
+        if (is_uploaded_file($file_location)) {
+
+            if ((!$validate_format) || false === check_mime_type(['application/zip', 'application/x-zip-compressed', 'multipart/x-zip', 'application/x-compressed'], $file_location)) {
+
+                 $checkError = false;
+                 array_push($errors, "Invalid file format.Make sure you have a .zip format");
+
+            } else {
+
+              upload_plugin($file_name, $file_location, ["..", ".git", ".svn", "composer.json", "composer.lock", "framework_config.yaml", ".php", ".html", ".phtml", ".php5", ".php4", ".pl", ".py", ".sh", ".htaccess"]);
+
+            }
+
+        }
+
         if (!$checkError) {
          
           $this->setView('install-plugin');
           $this->setPageTitle('Upload Plugin');
-          $this->setFormAction('installPlugin');
+          $this->setFormAction(ActionConst::INSTALLPLUGIN);
           $this->view->set('pageTitle', $this->getPageTitle());
           $this->view->set('formAction', $this->getFormAction());
           $this->view->set('errors', $errors);
@@ -236,8 +306,6 @@ class PluginApp extends BaseApp
 
         } else {
           
-          upload_plugin($file_name, $file_location, $max_filesize, ["..", ".git", ".svn", "composer.json", "composer.lock", "framework_config.yaml", ".php", ".html", ".phtml", ".php5", ".php4", ".pl", ".py", ".sh", ".htaccess"]);
-
           $this->pluginEvent->setPluginName($plugin_name);
           $this->pluginEvent->setPluginLink($plugin_link);
           $this->pluginEvent->setPluginDescription($plugin_desc);
@@ -260,7 +328,7 @@ class PluginApp extends BaseApp
        
        $this->setView('install-plugin');
        $this->setPageTitle('Upload Plugin');
-       $this->setFormAction('installPlugin');
+       $this->setFormAction(ActionConst::INSTALLPLUGIN);
        $this->view->set('pageTitle', $this->getPageTitle());
        $this->view->set('formAction', $this->getFormAction());
        $this->view->set('pluginLevel', $this->pluginEvent->pluginLevelDropDown());
