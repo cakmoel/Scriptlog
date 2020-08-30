@@ -9,10 +9,10 @@
 Scriptlog's base original code was forked from **Piluscart 1.4.1**. We took her out from her weblog engine that support blog functionality on Piluscart 1.4.1. Obviously Scriptlog is Piluscart's little sister. She was being refactored to help her siblings going further on next generation of Piluscart development which is undefined yet.
 Scriptlog is not a replacement for a full Content Management System. Do not plan on building the next Drupal or CMS Framework with it! However, It is built for several reasons.
 
-1.To power parts of weblog or personal website that did not need a full CMS.
+1. To power parts of weblog or personal website that did not need a full CMS.
 
-2.Runs small scripts and systems without a lot of overhead.
+2. Runs small scripts and systems without a lot of overhead.
 
-3.Provides a base speed for your personal weblog day to day.
+3. Provides a base speed for your personal weblog day to day.
 
-4.Emphasizing simplicity and security for blog software.
+4. Emphasizing simplicity and security for blog software.
