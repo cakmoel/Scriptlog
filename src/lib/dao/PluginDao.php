@@ -59,11 +59,11 @@ class PluginDao extends Dao
      
      $sql = "SELECT ID, plugin_name, plugin_link, plugin_desc, 
              plugin_status, plugin_level, plugin_sort 
-             FROM tbl_plugin WHERE ID = ?"; 
+             FROM tbl_plugin WHERE ID = :ID"; 
      
      $this->setSQL($sql);
      
-     $pluginDetail = $this->findRow([$idsanitized]);
+     $pluginDetail = $this->findRow([':ID' => $idsanitized]);
      
      return (empty($pluginDetail)) ?: $pluginDetail;
      
@@ -101,7 +101,7 @@ class PluginDao extends Dao
      
      if ($link['plugin_link'] == '') {
          
-        $this->modify("tbl_plugin", ['plugin_link' => '#'], "ID = {$link['ID']}");
+        $this->modify("tbl_plugin", ['plugin_link' => '#'], "ID = ".(int)$link['ID']);
          
      }
      
@@ -124,12 +124,13 @@ class PluginDao extends Dao
         'plugin_desc' => $bind['plugin_desc'],
         'plugin_status' => $bind['plugin_status'],
         'plugin_sort' => $bind['plugin_sort']
-    ],  "ID = {$cleanId}");
+    ],  "ID = ".(int)$cleanId);
     
   }
   
   /**
-   * Activate plugin
+   * activatePlugin
+   * Enable plugin
    * 
    * @param integer $id
    * 
@@ -137,11 +138,12 @@ class PluginDao extends Dao
   public function activatePlugin($id, $sanitize)
   {
     $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-    $this->modify("tbl_plugin", ['plugin_status' => 'Y'], "ID = {$idsanitized}");
+    $this->modify("tbl_plugin", ['plugin_status' => 'Y'], "ID = ".(int)$idsanitized);
   }
   
   /**
-   * Deactivate plugin
+   * deactivatePlugin
+   * Disable plugin
    * 
    * @param integer $id
    * 
@@ -149,7 +151,7 @@ class PluginDao extends Dao
   public function deactivatePlugin($id, $sanitize)
   {
     $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-    $this->modify("tbl_plugin", ['plugin_status' => 'N'], "ID = {$idsanitized}");  
+    $this->modify("tbl_plugin", ['plugin_status' => 'N'], "ID = ".(int)$idsanitized);  
   }
   
   /**
