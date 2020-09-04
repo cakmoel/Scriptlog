@@ -20,7 +20,8 @@ class Sanitize
 		   default:
 			
 		   case'sql':
-				$d = array ('-','/','\\',',','#',':',';','\'','"','[',']','{','}',')','(','|','`','~','!','%','$','^','&','*','=','?','+');
+
+				$d = array('-','/','\\',',','#',':',';','\'','"','[',']','{','}',')','(','|','`','~','!','%','$','^','&','*','=','?','+');
 				$str = str_replace($d, '', $str);
 				$str = stripcslashes($str);
 				$str = htmlspecialchars($str);
@@ -29,10 +30,13 @@ class Sanitize
 				break;
 			
 			case'xss':
-				$d = array ('\\','#',';','\'','"','[',']','{','}',')','(','|','`','~','!','%','$','^','&','*','=','?','+');
+				
+				$d = array('\\','#',';','\'','"','[',']','{','}',')','(','|','`','~','!','%','$','^','&','*','=','?','+');
 				$str = str_replace($d, '', $str);
 				$str = stripcslashes($str);
 				$str = htmlspecialchars($str);
+				$str = preg_replace('/[\W]/','', $str);
+				$str = remove_xss($str);
 				return $str;
 				break;
 		}
@@ -45,4 +49,5 @@ class Sanitize
 			return $file['basename'];
 		}
 	}
+
 }
