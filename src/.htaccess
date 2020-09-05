@@ -9,21 +9,13 @@
  Deny from all
 </FilesMatch>
 
-############### SET Keep-Alive ##################
-<IfModule mod_headers.c>
- Header always append X-Frame-Options SAMEORIGIN
- #Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
- Header set Connection keep-alive
- Header set Referrer-Policy "no-referrer-when-downgrade"
- <FilesMatch ".(js|css|ico|txt|htm|html|png|jpg|webp|gif|js|eot|svg|ttf|woff|woff2|php)$">
-   Header set Cache-Control "max-age=31536000, public"
- </FilesMatch>
-</IfModule>
+# Deny Folder Indexes.
+Options -Indexes
 
 ############### SET COOKIES DOMAIN ##################
 # Use Mod_deflate to compress static files
 <IfModule mod_deflate.c>
- <Filesmatch ".(js|css|ico|txt|htm|html|png|jpg|gif|webp||js|eot|svg|ttf|woff|woff2|php)$">
+ <Filesmatch ".(js|css|ico|txt|htm|html|png|jpg|jpeg|gif|webp||js|eot|svg|ttf|woff|woff2|webm|ogg|mp4|wav|mp3|pdf|php|tpl)$">
  SetOutputFilter DEFLATE
  </Filesmatch>
 </IfModule>
@@ -41,13 +33,23 @@ RewriteEngine On
 #RewriteRule ^/?$ "https\:\/\/yourdomain\.TLD\/" [R=301, L]
 
 # Ensure all front-end UI-UX files readable
-RewriteCond %{REQUEST_FILENAME} !\.(ico|css|png|jpg|webp|gif|js|eot|svg|ttf|woff|woff2)$ [NC]
+RewriteCond %{REQUEST_FILENAME} !\.(ico|css|png|jpg|jpeg|webp|gif|js|txt|htm|html|eot|svg|ttf|woff|woff2|webm|ogg|mp4|wav|mp3|pdf|tpl)$ [NC]
 RewriteRule ^public/.*$ index.php
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-l 
 RewriteRule ^(.*)$ index.php [QSA,L]
+
+############### SET HTTP HEADER ##################
+  <IfModule mod_headers.c>
+  Header always append X-Frame-Options SAMEORIGIN
+  #Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
+  Header set Connection keep-alive
+  Header set Referrer-Policy "no-referrer-when-downgrade"
+  <FilesMatch ".(js|css|ico|txt|htm|html|png|jpg|jpeg|webp|gif|js|eot|svg|ttf|woff|woff2|webm|ogg|mp4|wav|mp3|pdf|php|tpl)$">
+   Header set Cache-Control "max-age=31536000, public"
+  </FilesMatch>
+  </IfModule>
 </IfModule>
 
-# Deny Folder Indexes.
-Options -Indexes
+
