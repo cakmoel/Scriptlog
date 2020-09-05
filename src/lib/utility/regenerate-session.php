@@ -6,6 +6,7 @@
  * User logged in
  * Certain period has passed
  * 
+ * @category function
  * @return void
  * 
  */
@@ -16,82 +17,12 @@ function regenerate_session()
  
  $_SESSION['deleted_time'] = time() - Authentication::COOKIE_EXPIRE;
 
- session_regenerate_id();
+ session_regenerate_id(true);
 
  unset($_SESSION['deleted_time']);
  
  $new_session_id = session_id();
  
-}
-
-/**
- * is_session_started
- *
- * @see https://www.php.net/manual/en/function.session-status.php#113468
- * @return boolean
- * 
- */
-function is_session_started()
-{
-
- if(php_sapi_name() !== 'cli') {
-
-    if(version_compare(phpversion(), '5.4.0', '>=')) {
-
-       return session_status() === PHP_SESSION_ACTIVE ? true : false;
-
-    } else {
-
-       return session_id() === '' ? false : true;
-
-    }
-
- }
-
-return false;
-
-}
-
-// get session data
-function get_session_data($session_name = 'scriptlog', $session_save_handler = 'files')
-{
-
- $session_data = array();
-
- if (array_key_exists($session_name, $_COOKIE)) {
-
-    $session_id = $_COOKIE[$session_name];
-
-    $old_session_id = session_id();
-
-    session_write_close();
-
-    $old_session_save_handler = ini_get('session.save_handler');
-
-    ini_set('session.save_handler', $session_save_handler);
-
-    $old_session_name = session_name($session_name);
-
-    session_id($session_id);
-
-    session_start();
-
-    $session_data = $_SESSION;
-
-    session_write_close();
-
-    ini_set('session.save_handler', $old_session_save_handler);
-
-    session_name($old_session_name);
-
-    session_id($old_session_id);
-
-    session_start();
-
- }
-
- return $session_data;
-
 }
 
 /**
