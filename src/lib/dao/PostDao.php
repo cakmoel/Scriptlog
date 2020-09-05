@@ -197,14 +197,15 @@ public function showPostFeeds($limit = 5)
  */
 public function showPostById($id, $sanitize)
 {
-    $sql = "SELECT p.ID, p.media_id, p.post_author,
-                p.post_date, p.post_modified, p.post_title,
-                p.post_slug, p.post_content, p.post_summary,
-                p.post_keyword, p.post_tags,
-                p.post_status, p.post_type, p.comment_status, u.user_login
-  		   FROM tbl_posts AS p
-  		   INNER JOIN tbl_users AS u ON p.post_author = u.ID
-  		   WHERE p.ID = :ID AND p.post_type = 'blog'";
+    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
+            p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_type, p.comment_status,
+            m.ID, m.media_filename, m.media_caption, m.media_target, m.media_access, u.ID, u.user_fullname
+    FROM tbl_posts AS p
+    INNER JOIN tbl_media AS m ON p.media_id = m.ID
+    INNER JOIN tbl_users AS u ON p.post_author = u.ID
+    WHERE p.ID = :ID AND p.post_status = 'publish'
+    AND p.post_type = 'blog' AND m.media_target = 'blog'
+    AND m.media_access = 'public' AND m.media_status = '1'";
 
     $sanitized_id = $this->filteringId($sanitize, $id, 'sql');
 
@@ -270,7 +271,7 @@ public function showPostsPublished(Paginator $perPage, $sanitize)
                      m.ID, m.media_filename, m.media_caption
   			FROM tbl_posts AS p
   			INNER JOIN tbl_users AS u ON p.post_author = u.ID
-            INNER JOIN tbl_media AS m ON p.media_id = m.ID
+        INNER JOIN tbl_media AS m ON p.media_id = m.ID
   			WHERE p.post_type = 'blog' AND p.post_status = 'publish'
   			ORDER BY p.ID DESC " . $this->linkPosts->get_limit($sanitize);
 
@@ -333,6 +334,92 @@ public function showRandomPosts($limit)
   $randomPosts = $this->findAll($data);
 
   return (empty($randomPosts)) ?: $randomPosts;
+
+}
+
+/**
+ * showNextPost
+ *
+ * @param int $postId
+ * @param object $sanitize
+ * @param string $fetchMode
+ * @return void
+ * 
+ */
+public function showNextPost($postId, $sanitize, $fetchMode = null)
+{
+
+  $id_sanitized = $this->filteringId($sanitize, $postId, 'sql');
+
+  $sql = "SELECT ID, post_title, post_slug, post_type
+          FROM tbl_posts WHERE ID > :ID
+          AND post_status = 'publish' AND post_type = 'blog'
+          ORDER BY ID LIMIT 1";
+
+  $this->setSQL($sql);
+
+  $nextPost = (is_null($fetchMode)) ? $this->findRow([':ID' => $id_sanitized]) : $this->findRow([':ID' => $id_sanitized], $fetchMode);
+
+  return (empty($nextPost)) ?: $nextPost;
+
+}
+
+/**
+ * showPrevPost
+ * 
+ * @param int $postId
+ * @param object $sanitize
+ * @param string $fetchMode
+ * @return void
+ * 
+ */
+public function showPrevPost($postId, $sanitize, $fetchMode = null)
+{
+  
+  $id_sanitized = $this->filteringId($sanitize, $postId, 'sql');
+
+  $sql = "SELECT ID, post_title, post_slug, post_type
+          FROM tbl_posts WHERE ID < :ID
+          AND post_status = 'publish' AND post_type = 'blog'
+          ORDER BY ID LIMIT 1";
+
+  $this->setSQL($sql);
+
+  $prevPost = (is_null($fetchMode)) ? $this->findRow([':ID' => $id_sanitized]) : $this->findRow([':ID' => $id_sanitized], $fetchMode);
+
+  return (empty($prevPost)) ?: $prevPost;
+
+}
+
+/**
+ * showPostsOnSidebar
+ *
+ * @param string $status
+ * @param int|num $start
+ * @param int|num $limit
+ * @return void
+ * 
+ */
+public function showPostsOnSidebar($status, $start, $limit)
+{
+
+$sql = "SELECT p.ID, p.media_id, p.post_author,
+               p.post_date, p.post_modified, p.post_title,
+               p.post_slug, p.post_content, p.post_summary,
+               p.post_keyword, p.post_tags,
+               p.post_type, p.post_status, u.user_login, u.user_fullname,
+               m.ID, m.media_filename, m.media_caption
+  FROM tbl_posts AS p
+  INNER JOIN tbl_users AS u ON p.post_author = u.ID
+  INNER JOIN tbl_media AS m ON p.media_id = m.ID
+  WHERE p.post_type = 'blog' AND p.post_status = :status
+  ORDER BY p.ID DESC LIMIT :position, :limit ";
+
+$this->setSQL($sql);
+
+$sidebar_posts = $this->findAll([':status' => $status, ':position'=> $start, ':limit' => $limit]);
+
+return (empty($sidebar_posts)) ?: ['sidebarPosts' => $sidebar_posts];
 
 }
 
