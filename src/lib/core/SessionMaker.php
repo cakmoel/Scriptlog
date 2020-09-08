@@ -12,12 +12,38 @@
 class SessionMaker extends SessionHandler
 {
 
+/**
+ * key
+ *
+ * @var string
+ * 
+ */
 protected $key;
 
+/**
+ * name
+ *
+ * @var string
+ * 
+ */
 protected $name; 
 
+/**
+ * cookie
+ *
+ * @var array
+ * 
+ */
 protected $cookie = [];
 
+/**
+ * Instantiate session cookies
+ *
+ * @param string $key
+ * @param string $name
+ * @param array $cookie
+ * 
+ */
 public function __construct($key, $name = '_scriptlog', $cookie = [])
 {
 
@@ -62,11 +88,19 @@ public function __construct($key, $name = '_scriptlog', $cookie = [])
 
 }
 
+/**
+ * setup
+ * set the session cookie parameters
+ * 
+ * @method private setup()
+ * @return void
+ * 
+ */
 private function setup()
 {
 
  session_name($this->name);
-
+ 
  if (PHP_VERSION_ID >= 70300) {
 
     session_set_cookie_params([
@@ -84,7 +118,7 @@ private function setup()
 }
 
 /**
- * start()
+ * start
  *
  * @return bool 
  * 
@@ -106,12 +140,19 @@ return false;
 
 }
 
+/**
+ * forget
+ * destroy session
+ * 
+ * @return void
+ * 
+ */
 public function forget()
 {
 
- if (session_id() === '') {
+ if (self::isSessionStarted() === false) {
 
-    return false;
+     return false;
 
  }
 
@@ -125,17 +166,38 @@ public function forget()
 
 }
 
+/**
+ * refresh
+ *
+ * @return void
+ * 
+ */
 public function refresh()
 {
    return session_regenerate_id(true);
 }
 
+/**
+ * read
+ *
+ * @param string $id
+ * @return string
+ * 
+ */
 public function read($id)
 {
   $data = parent::read($id);
   return empty($data) ? '' : $this->decrypt($data, $this->key);
 }
 
+/**
+ * write
+ *
+ * @param string $id
+ * @param string $data
+ * @return boolean
+ * 
+ */
 public function write($id, $data)
 {
  
@@ -143,6 +205,12 @@ public function write($id, $data)
 
 }
 
+/**
+ * isExpired
+ *
+ * @param integer $ttl
+ * @return boolean
+ */
 public function isExpired($ttl = 3600)
 {
 
@@ -160,6 +228,11 @@ public function isExpired($ttl = 3600)
 
 }
 
+/**
+ * isGenuine
+ *
+ * @return boolean
+ */
 public function isGenuine()
 {
  
@@ -181,71 +254,25 @@ public function isGenuine()
 
 }
 
+/**
+ * isValid
+ *
+ * @param integer $ttl
+ * @return boolean
+ */
 public function isValid($ttl = 3600)
 {
  return ! $this->isExpired($ttl) && $this->isGenuine();
 }
 
-public function getSessionAccess($name)
-{
-
- // prevent the session is started
- if (session_id() === '') {$this->start();}
-
- $parsed = [];
- $parsed = explode('.', $name);
-
- $result = [];
- $result = $_SESSION;
-
- while ($parsed) {
-
-    $next = array_shift($parsed);
-
-    if (isset($result[$next])) {
-
-      $result = $result[$next];
-        
-    } else {
-
-       return null;
-
-    }
-
- }
-
- return $result;
- 
-}
-
-public function putSessionAccess($name, $value)
-{
-
-// prevent the session is started
-if (session_id() === '') { $this->start(); }
-
-$parsed = [];
-$parsed = explode('.', $name);
-
-$session =& $_SESSION;
-
-while (count($parsed) > 1) {
-   $next = array_shift($parsed);
-
-   if ( !isset($session[$next]) || !is_array($session[$next])) {
-
-        $session[$next] = [];
-
-   }
-
-   $session =& $session[$next];
-
-}
-
-$session[array_shift($parsed)] = $value;
-
-}
-
+/**
+ * encrypy
+ *
+ * @param string $data
+ * @param string $key
+ * @return void
+ * 
+ */
 protected function encrypt($data, $key)
 {
 
@@ -275,6 +302,14 @@ return $hmac . $iv . $ciphertext;
 
 }
 
+/**
+ * decrypt
+ *
+ * @param string $data
+ * @param string $key
+ * @return void
+ * 
+ */
 protected function decrypt($data, $key)
 {
 
@@ -296,6 +331,12 @@ protected function decrypt($data, $key)
 
 }
 
+/**
+ * isSessionStarted
+ *
+ * @return boolean
+ * 
+ */
 private static function isSessionStarted()
 {
 
@@ -313,6 +354,8 @@ private static function isSessionStarted()
   
    }
   
+   return false;
+
 }
 
 }
