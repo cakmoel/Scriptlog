@@ -417,10 +417,10 @@ class UserDao extends Dao
   */
  public function checkUserEmail($email)
  {
-     $sql = "SELECT ID FROM tbl_users WHERE user_email = :email LIMIT 1";
-     $this->setSQL($sql);
-     $stmt = $this->checkCountValue([':email' => $email]);
-     return($stmt > 0);
+    $sql = "SELECT ID FROM tbl_users WHERE user_email = :email LIMIT 1";
+    $this->setSQL($sql);
+    $stmt = $this->checkCountValue([':email' => $email]);
+    return($stmt > 0);
  }
 
 /**
@@ -438,8 +438,7 @@ class UserDao extends Dao
     if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
 
         $sql = "SELECT user_pass FROM tbl_users WHERE user_email = :user_email LIMIT 1";
-        $this->setSQL($sql);
-        $stmt = $this->checkCountValue([':user_email' => $login]);
+        $stmt = $this->setSQL($sql)->checkCountValue([':user_email' => $login]);
 
         if ($stmt > 0) {
         
