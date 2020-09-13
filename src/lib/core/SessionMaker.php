@@ -64,7 +64,7 @@ public function __construct($key, $name = '_scriptlog', $cookie = [])
        'lifetime' => $current_cookie_params['lifetime'],
        'path' => ini_get('session.cookies_path'),
        'domain' => $current_cookie_params['domain'],
-       'secure' => $current_cookie_params['secure'],
+       'secure' => is_cookies_secured(),
        'httponly' => 1,
        'samesite' => 'Strict'
 
@@ -77,7 +77,7 @@ public function __construct($key, $name = '_scriptlog', $cookie = [])
       'lifetime' => $current_cookie_params['lifetime'],
       'path' => '/; samesite=Strict',
       'domain' => $current_cookie_params['domain'],
-      'secure' => $current_cookie_params['secure'],
+      'secure' => is_cookies_secured(),
       'httponly' => 1
          
      ];
@@ -211,12 +211,12 @@ public function write($id, $data)
  * @param integer $ttl
  * @return boolean
  */
-public function isExpired($ttl = 3600)
+public function isExpired($ttl = 60)
 {
 
  $last_activity = isset($_SESSION['_last_activity']) ? $_SESSION['_last_activity'] : false;
 
- if ($last_activity !== false && time() - $last_activity > $ttl * 60) {
+ if ($last_activity !== false && time() - $last_activity > $ttl * 3600) {
 
     return true;
 
@@ -260,7 +260,7 @@ public function isGenuine()
  * @param integer $ttl
  * @return boolean
  */
-public function isValid($ttl = 3600)
+public function isValid($ttl = 60)
 {
  return ! $this->isExpired($ttl) && $this->isGenuine();
 }
