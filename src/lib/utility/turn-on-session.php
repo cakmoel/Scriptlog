@@ -40,7 +40,7 @@ function turn_on_session($session_handler, $life_time, $cookies_name, $path, $do
  
       $session_handler->start();
         
-      set_cookies_scl($cookies_name, session_id(), time() + $life_time, $path, $domain, $secure, $httponly);
+      set_cookies_scl($cookies_name, session_id(), $life_time, $path, $domain, $secure, $httponly);
 
       $session_handler->refresh();
      
