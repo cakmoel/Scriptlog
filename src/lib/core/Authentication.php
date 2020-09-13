@@ -298,12 +298,8 @@ public function logout()
 
   $this->getSessionInstance()->destroy();
 
-  $logout = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname($_SERVER['PHP_SELF']) . DS;
-
-  header($_SERVER["SERVER_PROTOCOL"]." 302 Found");
-  header("Location: $logout");
-  exit();
-    
+  direct_page('login.php', 302);
+  
 }
   
 /**
