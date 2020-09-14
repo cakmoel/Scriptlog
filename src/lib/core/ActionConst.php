@@ -88,4 +88,7 @@ class ActionConst
  const EDITUSER   = "editUser";
  const DELETEUSER = "deleteUser";
 
+// action const for logging out from admin panel
+ const LOGOUT = "doLogOut";
+
 }
