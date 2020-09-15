@@ -95,7 +95,7 @@
                        <i class="fa fa-pencil fa-fw"></i> Edit</a>
                        </td>
                        <td>
-                       <a href="javascript:deleteUser('<?= abs((int)$user['ID']); ?>', '<?= safe_html($user['user_fullname']); ?>')" class="btn btn-danger">
+                       <a href="javascript:deleteUser('<?= abs((int)$user['ID']); ?>', '<?= safe_html($user['user_login']); ?>')" class="btn btn-danger">
                        <i class="fa fa-trash-o fa-fw"></i> Delete</a>
                        </td>
                      </tr>
