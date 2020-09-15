@@ -6,115 +6,125 @@ $sessionId = isset($_GET['sessionId']) ? safe_html($_GET['sessionId']): null;
 $userEvent = new UserEvent($userDao, $validator, $userToken, $sanitizer);
 $userApp = new UserApp($userEvent);
 
-switch ($action) {
+try {
+
+    switch ($action) {
     
-    case ActionConst::NEWUSER:
+        case ActionConst::NEWUSER:
+        
+          if (false === $authenticator -> userAccessControl(ActionConst::USERS)) {
     
-      if (false === $authenticator -> userAccessControl(ActionConst::USERS)) {
-
-          direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-      } else {
-
-        if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
-
-           header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-           throw new AppException("invalid ID data type!");
-
-        } 
-
-        if ($userId == 0) {
-
-            $userApp -> insert();
-
-        } else {
-
-            direct_page('index.php?load=dashboard', 302);
-            
-        }
-
-      }
-        
-      break;
-        
-    case ActionConst::EDITUSER:
-        
-        if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
-
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-            throw new AppException("Invalid ID data type!");
-
-        }
-
-        if ((!$userDao->checkUserId($userId, $sanitizer))) {
-
-            if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
-
-                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-           } else {
-
-                direct_page('index.php?load=users&error=userNotFound', 404);
-
-           }
-
-        } else {
-
-            if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
-
-                $userApp -> updateProfile($user_login);
+              direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
+          } else {
+    
+            if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
+    
+               header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+               throw new AppException("invalid ID data type!");
+    
+            } 
+    
+            if ($userId == 0) {
+    
+                $userApp -> insert();
     
             } else {
     
-                $userApp -> update((int)$userId);
-    
+                direct_page('index.php?load=dashboard', 302);
+                
             }
-
-        }
-
-        break;
-        
-    case ActionConst::DELETEUSER:
- 
-        if(false === $authenticator -> userAccessControl(ActionConst::USERS)) {
-
-            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-        } else {
-
+    
+          }
+            
+          break;
+            
+        case ActionConst::EDITUSER:
+            
             if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
-
+    
                 header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
                 throw new AppException("Invalid ID data type!");
     
             }
-            
-            if ($userDao -> checkUserId($userId, $sanitizer)) {
-
-                $userApp -> remove((int)$userId);
-            
+    
+            if ((!$userDao->checkUserId($userId, $sanitizer))) {
+    
+                if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
+    
+                    direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
+               } else {
+    
+                    direct_page('index.php?load=users&error=userNotFound', 404);
+    
+               }
+    
             } else {
-
-                direct_page('index.php?load=users&error=userNotFound', 404);
-
+    
+                if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
+    
+                    $userApp -> updateProfile($user_login);
+        
+                } else {
+        
+                    $userApp -> update((int)$userId);
+        
+                }
+    
+            }
+    
+            break;
+            
+        case ActionConst::DELETEUSER:
+     
+            if(false === $authenticator -> userAccessControl(ActionConst::USERS)) {
+    
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
+            } else {
+    
+                if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
+    
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                    throw new AppException("Invalid ID data type!");
+        
+                }
+                
+                if ($userDao -> checkUserId($userId, $sanitizer)) {
+    
+                    $userApp -> remove((int)$userId);
+                
+                } else {
+    
+                    direct_page('index.php?load=users&error=userNotFound', 404);
+    
+                }
+                
             }
             
-        }
-        
-        break;
-                
-    default:
-        
-       if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
-
-           $userApp -> showProfile($user_login);
-
-       } else {
-
-          $userApp -> listItems();
-
-      }
+            break;
+                    
+        default:
+            
+           if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
     
-      break;
+               $userApp -> showProfile($user_login);
+    
+           } else {
+    
+              $userApp -> listItems();
+    
+          }
         
+          break;
+            
+    }
+
+} catch (AppException $e) {
+
+    LogError::setStatusCode(http_response_code());
+    LogError::newMessage($e);
+    LogError::customErrorMessage('admin');
+    
 }
