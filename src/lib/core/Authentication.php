@@ -308,7 +308,7 @@ public function logout()
  * @method public validateUserAccount()
  * @param string $login
  * @param string $password
- * @return void
+ * @return boolean
  * 
  */
 public function validateUserAccount($login, $password)
