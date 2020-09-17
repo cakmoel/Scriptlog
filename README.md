@@ -17,4 +17,4 @@ Scriptlog is not a replacement for a full Content Management System. Do not plan
 
 ## Disclaimer
 
-we have not finished yet, if you persist in using it, please be aware on your own risk.
+if you persist in using it, please be aware on your own risk.
