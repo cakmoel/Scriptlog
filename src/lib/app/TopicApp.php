@@ -66,9 +66,8 @@ class TopicApp extends BaseApp
     
     if (isset($_POST['topicFormSubmit'])) {
        
-      $title = isset($_POST['topic_title']) ? trim($_POST['topic_title']) : "";
-      $slug = make_slug($title);
-      
+      $filters = ['topic_title' => FILTER_SANITIZE_STRING];
+     
       try {
           
           if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
@@ -78,7 +77,7 @@ class TopicApp extends BaseApp
               
           }
           
-          if (empty($title)) {
+          if (empty($_POST['topic_title'])) {
               
               $checkError = false;
               array_push($errors, "Please enter title");
@@ -98,8 +97,8 @@ class TopicApp extends BaseApp
              
           } else {
               
-             $this->topicEvent->setTopicTitle($title);
-             $this->topicEvent->setTopicSlug($slug);
+             $this->topicEvent->setTopicTitle(prevent_injection(trim(distill_post_request($filters)['topic_title'])));
+             $this->topicEvent->setTopicSlug(make_slug(distill_post_request($filters)['topic_title']));
              $this->topicEvent->addTopic();
              direct_page('index.php?load=topics&status=topicAdded', 200);
              
@@ -110,6 +109,7 @@ class TopicApp extends BaseApp
           LogError::setStatusCode(http_response_code());
           LogError::newMessage($e);
           LogError::customErrorMessage('admin');
+
       }
       
     } else {
@@ -148,11 +148,8 @@ class TopicApp extends BaseApp
     
     if (isset($_POST['topicFormSubmit'])) {
         
-        $topic_title = isset($_POST['topic_title']) ? trim($_POST['topic_title']) : "";
-        $topic_slug = make_slug($topic_title);
-        $topic_status = isset($_POST['topic_status']) ? $_POST['topic_status'] : "";
-        $topic_id = isset($_POST['topic_id']) ? abs((int)$_POST['topic_id']) : 0;
-        
+        $filters = ['topic_title' => FILTER_SANITIZE_STRING, 'topic_status' => FILTER_SANITIZE_STRING, 'topic_id' => FILTER_SANITIZE_NUMBER_INT];
+ 
         try {
             
             if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
@@ -162,11 +159,18 @@ class TopicApp extends BaseApp
                 
             }
             
-            if (empty($topic_title)) {
+            if (empty($_POST['topic_title'])) {
                 
                 $checkError = false;
                 array_push($errors, "Please enter title");
                 
+            }
+
+            if (false === sanitize_selection_box(distill_post_request($filters)['topic_status'], ['Y', 'N'])) {
+
+               $checkError = false;
+               array_push($errors, "Please choose the available value provided!");
+
             }
             
             if (!$checkError) {
@@ -182,10 +186,10 @@ class TopicApp extends BaseApp
                 
             } else {
                 
-                $this->topicEvent->setTopicId($topic_id);
-                $this->topicEvent->setTopicTitle($topic_title);
-                $this->topicEvent->setTopicSlug($topic_slug);
-                $this->topicEvent->setTopicStatus($topic_status);
+                $this->topicEvent->setTopicId((int)distill_post_request($filters)['topic_id']);
+                $this->topicEvent->setTopicTitle(prevent_injection(distill_post_request($filters)['topic_title']));
+                $this->topicEvent->setTopicSlug(make_slug(distill_post_request($filters)['topic_title']));
+                $this->topicEvent->setTopicStatus(distill_post_request($filters)['topic_status']);
                 $this->topicEvent->modifyTopic();
                 direct_page('index.php?load=topics&status=topicUpdated', 200);
                 
