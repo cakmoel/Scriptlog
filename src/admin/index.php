@@ -5,17 +5,22 @@
  * @category admin\index.php file
  * @author   M.Noermoehammad 
  * @license  https://opensource.org/licenses/MIT MIT License
+ * @version 1.0
  * 
  */
-$ip = (isset($_SERVER["REMOTE_ADDR"])) ? $_SERVER["REMOTE_ADDR"] : get_ip_address();
 
 if (file_exists(__DIR__.'/../config.php') && is_file(__DIR__.'/../config.php')) {
     
     include __DIR__ . '/../lib/main.php';
+
+    $ip = (isset($_SERVER["REMOTE_ADDR"])) ? $_SERVER["REMOTE_ADDR"] : get_ip_address();
+
     require __DIR__ . '/authorizer.php';
 
     if ((isset($ubench)) && (true === APP_DEVELOPMENT)) {
+        
         $ubench->start();
+
     }
 
 } else {
@@ -32,12 +37,12 @@ if (!$loggedIn) {
    
 } else {
 
-    $user_id = (isset($_COOKIE['scriptlog_cookie_id'])) ? $_COOKIE['scriptlog_cookie_id'] : Session::getInstance()->scriptlog_session_id;
-    $user_email = (isset($_COOKIE['scriptlog_cookie_email'])) ? $_COOKIE['scriptlog_cookie_email'] : Session::getInstance()->scriptlog_session_email;
-    $user_level = (isset($_COOKIE['scriptlog_cookie_level'])) ? $_COOKIE['scriptlog_cookie_level'] : Session::getInstance()->scriptlog_session_level;
-    $user_login = (isset($_COOKIE['scriptlog_cookie_login'])) ? $_COOKIE['scriptlog_cookie_login'] : Session::getInstance()->scriptlog_session_login;
+    $user_login = (isset($_COOKIE['scriptlog_auth'])) ? $_COOKIE['scriptlog_auth'] : Session::getInstance()->scriptlog_session_login;
+    $user_email = (isset($_SESSION['scriptlog_session_email'])) ? Session::getInstance()->scriptlog_session_email : user_info($authenticator, $user_login)['user_email'];
+    $user_level = (isset($_SESSION['scriptlog_session_level'])) ? Session::getInstance()->scriptlog_session_level : user_info($authenticator, $user_login)['user_level'];
+    $user_id = (isset($_SESSION['scriptlog_session_id'])) ? Session::getInstance()->scriptlog_session_id : user_info($authenticator, $user_login)['ID'];
     $user_session = user_info($authenticator, $user_login)['user_session'];
-        
+
     // BreadCrumbs
     $breadCrumbs = isset($_GET['load']) ? htmlentities(sanitize_urls($_GET['load']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : http_response_code();
     
