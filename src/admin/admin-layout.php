@@ -12,7 +12,7 @@ function admin_header($stylePath, $breadCrumbs = null, $allowedQuery = null)
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <title><?= cp_tag_title($breadCrumbs, $allowedQuery); ?></title>
-  
+  <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.7 -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/bootstrap/dist/css/bootstrap.min.css">
@@ -25,6 +25,8 @@ function admin_header($stylePath, $breadCrumbs = null, $allowedQuery = null)
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/datatables.net-bs/css/dataTables.bootstrap.min.css">
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/datatables.net/css/responsive.bootstrap.min.css">
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/datatables.net/css/responsive.dataTables.min.css">
+  <!-- select2 -->
+  <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/select2/css/select2.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/AdminLTE.min.css">
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/skins/scriptlog-skin.css">
@@ -35,9 +37,7 @@ function admin_header($stylePath, $breadCrumbs = null, $allowedQuery = null)
   <!-- Audio Preview -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/audioPreview.css">
    <!-- wysiwyg editor-->
-  <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/wysihtml5/bootstrap3-wysihtml5.min.css">
-  <!-- select2 -->
-  <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/select2.min.css">
+  <link href="<?= $stylePath; ?>/wysiwyg/summernote/summernote.min.css" rel="stylesheet">
 
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -96,6 +96,7 @@ function admin_footer($stylePath, $ubench = null)
 <script src="<?= $stylePath; ?>/assets/components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/datatables.net/js/responsive.bootstrap.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/datatables.net/js/responsive.dataTables.js"></script>
+<script src="<?= $stylePath; ?>/assets/components/select2/js/select2.full.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/dist/js/adminlte.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/dist/js/ie10-viewport-bug-workaround.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
@@ -105,8 +106,7 @@ function admin_footer($stylePath, $ubench = null)
 <script src="<?= $stylePath; ?>/assets/dist/js/mandatory-theme-upload.js"></script>
 <script src="<?= $stylePath; ?>/assets/dist/js/imagevalidation.js"></script>
 <script src="<?= $stylePath; ?>/assets/dist/js/toggle-field.js"></script>
-<script src="<?= $stylePath; ?>/assets/components/wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
-<script src="<?= $stylePath; ?>/assets/dist/js/select2.full.min.js"></script>
+<script src="<?= $stylePath; ?>/wysiwyg/summernote/summernote.min.js"></script>
 <script type="text/javascript" src="<?= $stylePath; ?>/assets/dist/js/jquery.uploadPreview.min.js"></script>
 <script>
 $(document).ready(function(){
@@ -122,11 +122,6 @@ $(document).ready(function(){
    });
 });
 </script>
-<script>
-  $(function () {
-    $('.textarea').wysihtml5()
-  })
-</script>
 <script type="text/javascript">
 $(document).ready(function() {
   $.uploadPreview({
@@ -138,6 +133,22 @@ $(document).ready(function() {
 </script>
 <script>
 $('img').bind('contextmenu',function(e){return false;}); 
+</script>
+<script>
+$(document).ready(function() {
+  $('#summernote').summernote({
+    height: 300,                 
+    minHeight: null,             
+    maxHeight: null,             
+  });
+});
+</script>
+<script>
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2()
+
+  })
 </script>
 </html>
 <?php 
