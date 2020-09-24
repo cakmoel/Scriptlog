@@ -135,14 +135,14 @@ class PostApp extends BaseApp
 
         if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
          
-             header(APP_PROTOCOL.' 400 Bad Request');
+             header($_SERVER["SERVER_PROTOCOL"].' 400 Bad Request');
              throw new AppException("Sorry, unpleasant attempt detected!");
              
          } 
         
          if( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'comment_status']) == false) {
 
-            header(APP_PROTOCOL.' 413 Payload Too Large');
+            header($_SERVER["SERVER_PROTOCOL"].' 413 Payload Too Large');
             header('Status: 413 Payload Too Large');
             header('Retry-After: 3600');
             throw new AppException("Sorry, Unpleasant attempt detected");
@@ -473,14 +473,14 @@ class PostApp extends BaseApp
 
             if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                 
-                header(APP_PROTOCOL." 400 Bad Request");
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
                 throw new AppException("Sorry, unpleasant attempt detected!");
                 
             } 
             
             if( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'comment_status']) == false) {
 
-                header(APP_PROTOCOL.' 413 Payload Too Large');
+                header($_SERVER["SERVER_PROTOCOL"]." 413 Payload Too Large");
                 header('Status: 413 Payload Too Large');
                 header('Retry-After: 3600');
                 throw new AppException("Sorry, Unpleasant attempt detected");

@@ -438,7 +438,8 @@ class UserDao extends Dao
     if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
 
         $sql = "SELECT user_pass FROM tbl_users WHERE user_email = :user_email LIMIT 1";
-        $stmt = $this->setSQL($sql)->checkCountValue([':user_email' => $login]);
+        $this->setSQL($sql);
+        $stmt = $this->checkCountValue([':user_email' => $login]);
 
         if ($stmt > 0) {
         
