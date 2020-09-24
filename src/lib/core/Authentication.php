@@ -160,13 +160,19 @@ class Authentication
  */
  public function accessLevel()
  {
-   
-   if (isset($this->getSessionInstance()->scriptlog_session_level)) {
 
-      return $this->getSessionInstance()->scriptlog_session_level;
+  if (isset($_COOKIE['scriptlog_auth'])) {
+
+    return $_COOKIE['scriptlog_auth'];
+ 
+  }
+
+  if (isset($this->getSessionInstance()->scriptlog_session_level)) {
+
+    return $this->getSessionInstance()->scriptlog_session_level;
        
-   }
-      
+  }
+   
   return false;
 
  }
@@ -227,15 +233,14 @@ class Authentication
       
       $ip_address = (isset($_SERVER['REMOTE_ADDR'])) ? $_SERVER['REMOTE_ADDR'] : zend_ip_address();
       $this->session_data->scriptlog_session_ip = $ip_address;
-
-      $fingerprint = hash_hmac('sha256', $user_agent, hash('sha256', $ip_address, true));
-      
+  
       clear_duplicate_cookies();
 
-      $bind_session = ['user_session' => regenerate_session()];
-
-      $this->session_data->scriptlog_fingerprint = $fingerprint;
+      $this->session_data->scriptlog_fingerprint = hash_hmac('sha256', $user_agent, hash('sha256', $ip_address, true));
+      
       $this->session_data->scriptlog_last_active = time();
+
+      $bind_session = ['user_session' => regenerate_session()];
       
       $this->userDao->updateUserSession($bind_session, (int)$account_info['ID']);
 
@@ -446,7 +451,7 @@ public function activateUserAccount($key)
 }
 
 /**
- * User access control
+ * userAccessControl
  * 
  * @param string $control
  * 
@@ -527,9 +532,19 @@ public function userAccessControl($control = null)
   
         case ActionConst::COMMENTS:
           
-           if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager') && ($this->accessLevel() != 'author')) {
+           if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'author') && ($this->accessLevel() != 'contributor')) {
 
               return false;
+
+           }
+
+          break;
+
+        case ActionConst::REPLY:
+
+           if (($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'editor') && ($this->accessLevel() != 'author')) {
+
+             return false;
 
            }
 
@@ -571,7 +586,7 @@ public function userAccessControl($control = null)
 private function getUserAuthSession()
 {
   
- $ip_address = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : get_ip_address();
+ $ip_address = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : zend_ip_address();
  $user_agent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : '';
  $accept_charset = (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) ? $_SERVER['HTTP_ACCEPT_CHARSET'] : '';
  $accept_encoding = (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
