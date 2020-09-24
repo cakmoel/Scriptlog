@@ -11,10 +11,10 @@
 class Sanitize 
 {
 
-	function __construct(){}
+ public function __construct(){}
 
-	function sanitasi($str, $tipe)
-	{
+ public function sanitasi($str, $tipe)
+ {
 		switch($tipe){
 			
 		   default:
@@ -42,12 +42,28 @@ class Sanitize
 		}
 	}
 
-	private static function extension($path)
-	{
-		$file = pathinfo($path);
-		if(file_exists($file['dirname'].'/'.$file['basename'])){
-			return $file['basename'];
-		}
-	}
+ public static function mildSanitizer($str)
+ {
+   return simple_remove_xss($str);
+ }
+
+ public static function severeSanitizer($str)
+ {
+   return remove_xss($str);
+ }
+
+ public static function strictSanitizer($str)
+ {
+   return purify_dirty_html($str);
+ }
+
+ private static function extension($path)
+ {
+	 $file = pathinfo($path);
+	 if(file_exists($file['dirname'].'/'.$file['basename'])){
+		 return $file['basename'];
+	 }
+
+ }
 
 }

@@ -20,40 +20,45 @@ class Wall extends Dashboard
  */
  public function listItems()
  {
-   
-   if(true === is_non_administrator()) {
+  
+  $non_admin = null;
+  
+  $administrator = null;
 
-     if (isset(Session::getInstance()->scriptlog_session_fullname)) {
+  if(true === is_non_administrator()) {
 
-        $non_admin = Session::getInstance()->scriptlog_session_fullname;
+    if (isset(Session::getInstance()->scriptlog_session_fullname)) {
 
-     }
+       $non_admin = Session::getInstance()->scriptlog_session_fullname;
 
-     if (isset($_COOKIE['scriptlog_cookie_fullname'])) {
+    }
 
-        $non_admin = $_COOKIE['scriptlog_cookie_fullname'];
+    if (isset($_COOKIE['scriptlog_auth'])) {
 
-     }
+       $non_admin = $_COOKIE['scriptlog_auth'];
 
-     $this->welcomeUser('Hello '.safe_html($non_admin));
+    }
 
-   } else {
+    $this->welcomeUser('Hello '.safe_html($non_admin));
 
-     if (isset(Session::getInstance()->scriptlog_session_login)) {
+  } else {
 
-         $administrator = Session::getInstance()->scriptlog_session_login;
+    if (isset(Session::getInstance()->scriptlog_session_login)) {
 
-     } 
+        $administrator = Session::getInstance()->scriptlog_session_login;
 
-     if (isset($_COOKIE['scriptlog_cookie_login'])) {
+    } 
 
-        $administrator = $_COOKIE['scriptlog_cookie_login'];
+    if (isset($_COOKIE['scriptlog_auth'])) {
 
-     }
+       $administrator = $_COOKIE['scriptlog_auth'];
 
-     $this->welcomeAdmin('Hello '.safe_html($administrator));
+    }
 
-   }
+    $this->welcomeAdmin('Hello '.safe_html($administrator));
+
+  }
+
 
  }
 

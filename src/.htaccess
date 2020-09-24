@@ -41,9 +41,13 @@ RewriteCond %{REQUEST_FILENAME} !-l
 RewriteRule ^(.*)$ index.php [QSA,L]
 
 ############### SET HTTP HEADER ##################
-  <IfModule mod_headers.c>
-  Header always append X-Frame-Options SAMEORIGIN
-  #Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
+ <IfModule mod_headers.c>
+ #These headers are also helpful in increasing security
+ Header set X-Content-Type-Options "nosniff"
+ Header set X-XSS-Protection "1; mode=block"
+ Header set X-Frame-Options "DENY"
+ #Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
+ 
   Header set Connection keep-alive
   Header set Referrer-Policy "no-referrer-when-downgrade"
   <FilesMatch ".(js|css|ico|txt|htm|html|png|jpg|jpeg|webp|gif|js|eot|svg|ttf|woff|woff2|webm|ogg|mp4|wav|mp3|pdf|php|tpl)$">
