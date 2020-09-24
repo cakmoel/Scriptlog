@@ -161,8 +161,7 @@ class ThemeApp extends BaseApp
         if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
          
           header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-          $checkError = false;
-          array_push($errors, "Sorry, unpleasant attempt detected!");
+          throw new AppException("Sorry, unpleasant attempt detected!");
           
         }
 
