@@ -90,14 +90,14 @@ class UserEvent
   */
  private $user_session;
 
- private $userDao;
+/**
+ * userDao, userToken, vaidator and sanitize of the instance of their classes
+ *
+ * @var object
+ * 
+ */
+ private $userDao, $userToken, $validator, $sanitize;
 
- private $userToken;
-
- private $validator;
-
- private $sanitize;
- 
  /**
   * @method __constructor()
   * 
@@ -366,6 +366,11 @@ class UserEvent
    return $this->userToken->updateTokenExpired($userTokenId);
  }
 
+/**
+ * removeUser
+ * remove user from record on user table
+ * 
+ */
  public function removeUser()
  {
    
@@ -426,15 +431,9 @@ class UserEvent
  public function isUserLevel()
  {
 
-   if (isset($_COOKIE['scriptlog_cookie_level'])) {
-
-     return $_COOKIE['scriptlog_cookie_level'];
- 
-   }
-
    if (isset(Session::getInstance()->scriptlog_session_level)) {
 
-    return Session::getInstance()->scriptlog_session_level;
+       return Session::getInstance()->scriptlog_session_level;
   
    }
   

@@ -58,7 +58,7 @@ function direct_page($page = '', $http_status_code = null)
  $url = rtrim($url, '/\\');
     
  // add the page
- $url .= '/' . $page;
+ $url .= DIRECTORY_SEPARATOR . $page;
  
  if (!is_null($http_status_code)) header($http[$http_status_code]);
  

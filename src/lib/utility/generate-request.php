@@ -39,6 +39,16 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
 
                );
 
+           } elseif($load === 'logout') {
+
+             $query_data = array(
+              
+               'load' => sanitize_urls($load),
+               'action'=> $action,
+               'logOutId'=> $id,
+               
+              );
+                  
            } else {
 
               $query_data = array(
@@ -105,6 +115,13 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
 
 }
 
+/**
+ * check_request_generated
+ *
+ * @category Function
+ * @return void
+ * 
+ */
 function check_request_generated()
 {
 

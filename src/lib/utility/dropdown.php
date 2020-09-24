@@ -13,7 +13,7 @@
 function dropdown($name, array $options, $selected=null)
 {
     
-    $dropdown = '<select class="form-control" name="'.$name.'" id="'.$name.'">'."\n";
+    $dropdown = '<select class="form-control select2" name="'.$name.'" id="'.$name.'">'."\n";
 
     $selected = $selected;
 

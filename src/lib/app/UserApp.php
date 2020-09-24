@@ -38,6 +38,7 @@ class UserApp extends BaseApp
     if (isset($_GET['error'])) {
         $checkError = false;
         if ($_GET['error'] == 'userNotFound') array_push($errors, "Error: User Not Found!");
+        if ($_GET['error'] == 'adminDeleteNotified') array_push($errors, "Error: Administrator could not be deleted");
     }
     
     if (isset($_GET['status'])) {
@@ -156,9 +157,8 @@ class UserApp extends BaseApp
     if (isset($_POST['userFormSubmit'])) {
        
         $filters = ['user_login' => FILTER_SANITIZE_STRING, 'user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 
-                    'user_pass' => FILTER_SANITIZE_MAGIC_QUOTES, 'user_url' => FILTER_SANITIZE_URL,
-                    'user_level' => FILTER_SANITIZE_STRING, 'session_id' => FILTER_SANITIZE_ENCODED, 
-                    'send_user_notification' => FILTER_SANITIZE_NUMBER_INT];
+                    'user_pass' => FILTER_SANITIZE_MAGIC_QUOTES, 'user_url' => FILTER_SANITIZE_URL, 'user_level' => FILTER_SANITIZE_STRING, 
+                    'session_id' => FILTER_SANITIZE_ENCODED, 'send_user_notification' => FILTER_SANITIZE_NUMBER_INT];
 
         try {
         
@@ -450,11 +450,11 @@ class UserApp extends BaseApp
                 if(!empty($_POST['user_pass'])) {
 
                   $random_password = $tokenizer->createToken(64);
-                  setcookie('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-            
+                  set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+                  
                   $random_selector = $tokenizer->createToken(64);
-                  setcookie('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-
+                  set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+                  
                   $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
                   $hashed_selector = password_hash($random_selector, PASSWORD_DEFAULT);
               
@@ -469,7 +469,7 @@ class UserApp extends BaseApp
                 
                   $this->userEvent->setUserLogin($getUser['user_login']);
 
-                  $expiry_date = date("Y-m-d H:i:s", time() + 2592000);
+                  $expiry_date = date("Y-m-d H:i:s", time() + Authentication::COOKIE_EXPIRE);
                   $this->userEvent->setCookieExpireDate($expiry_date); 
 
                 }
@@ -550,7 +550,8 @@ class UserApp extends BaseApp
 
     if(isset($_POST['userFormSubmit'])) {
 
-        $filters = ['user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 'user_pass' => FILTER_SANITIZE_MAGIC_QUOTES, 'user_pass2' => FILTER_SANITIZE_MAGIC_QUOTES,
+        $filters = ['user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 
+                    'user_pass' => FILTER_SANITIZE_MAGIC_QUOTES, 'user_pass2' => FILTER_SANITIZE_MAGIC_QUOTES,
                     'user_url' => FILTER_SANITIZE_URL, 'user_id' => FILTER_SANITIZE_NUMBER_INT];
 
     try {
@@ -644,10 +645,10 @@ class UserApp extends BaseApp
                     if(!empty($_POST['user_pass'])) {
 
                         $random_password = $tokenizer->createToken(64);
-                        setcookie('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+                        set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
                 
                         $random_selector = $tokenizer->createToken(64);
-                        setcookie('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+                        set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
                 
                         $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
                         $hashed_selector = password_hash($random_selector, PASSWORD_DEFAULT);
@@ -656,7 +657,7 @@ class UserApp extends BaseApp
                         $this->userEvent->setSelectorHash($hashed_selector);
                         $this->userEvent->setUserLogin($getProfile['user_login']);
 
-                        $expiry_date = date("Y-m-d H:i:s", time() + 2592000);
+                        $expiry_date = date("Y-m-d H:i:s", time() + Authentication::COOKIE_EXPIRE);
                         $this->userEvent->setCookieExpireDate($expiry_date);
 
                     }
@@ -701,9 +702,57 @@ class UserApp extends BaseApp
    */
   public function remove($id)
   {
-    $this->userEvent->setUserId($id);
-    $this->userEvent->removeUser();
-    direct_page('index.php?load=users&status=userDeleted', 200);
+
+    $checkError = true;
+
+    if (isset($_GET['Id'])) {
+
+        $getUser = $this->userEvent->grabUser($id);
+        
+     try {
+        
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+
+        if (($getUser['ID'] == 1) && ($getUser['user_level'] == 'administrator')) {
+
+            $checkError = false;
+           
+        } 
+
+        if (!$checkError) {
+
+            direct_page('index.php?load=users&error=adminDeleteNotified', 307);
+
+        } else {
+
+           $this->userEvent->setUserId($id);
+           $this->userEvent->removeUser();
+           direct_page('index.php?load=users&status=userDeleted', 200);
+
+        }
+
+     } catch (AppException $e) {
+        
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($e);
+        LogError::customErrorMessage('admin');
+         
+     }
+
+    } 
+
   }
   
   protected function setView($viewName)
