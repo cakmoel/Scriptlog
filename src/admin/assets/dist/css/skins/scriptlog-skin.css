@@ -44,7 +44,7 @@
 }
 .skin-scriptlog .main-header .logo {
   background-color: #122430;
-  color: #a4c400;
+  color: #8aCa2b;
   border-bottom: 0 solid transparent;
 }
 .skin-scriptlog .main-header .logo:hover {
@@ -66,7 +66,7 @@
   color: #fff;
 }
 .skin-scriptlog .sidebar-menu > li.header {
-  color: #7b98a5;
+  color: #b8c7ce;
   background: #204055;
 }
 .skin-scriptlog .sidebar-menu > li > a {
@@ -76,7 +76,7 @@
 .skin-scriptlog .sidebar-menu > li.active > a,
 .skin-scriptlog .sidebar-menu > li.menu-open > a {
   color: #122430;
-  background: #a4c400;
+  background: #8aCa2b;
 }
 .skin-scriptlog .sidebar-menu > li.active > a {
   border-left-color: #122430;
@@ -92,7 +92,7 @@
   text-decoration: none;
 }
 .skin-scriptlog .sidebar-menu .treeview-menu > li > a {
-  color: #8aa4af;
+  color: #b8c7ce;
 }
 .skin-scriptlog .sidebar-menu .treeview-menu > li.active > a,
 .skin-scriptlog .sidebar-menu .treeview-menu > li > a:hover {
@@ -100,13 +100,13 @@
 }
 .skin-scriptlog .sidebar-form {
   border-radius: 3px;
-  border: 1px solid #a4c400;
+  border: 1px solid #8aCa2b;
   margin: 10px 10px;
 }
 .skin-scriptlog .sidebar-form input[type="text"],
 .skin-scriptlog .sidebar-form .btn {
   box-shadow: none;
-  background-color: #a4c400;
+  background-color: #8aCa2b;
   border: 1px solid transparent;
   height: 35px;
 }
