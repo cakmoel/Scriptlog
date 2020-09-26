@@ -51,7 +51,7 @@ if (isset($_POST['Reset'])) {
 
   } elseif ($authenticator -> checkEmailExists($user_email) == false) {
 
-     $errors['errorMessage'] = "Your email address is not registered";
+     $errors['errorMessage'] = "No user account was found with the email address you entered";
 
   } else {
     
@@ -76,13 +76,14 @@ if (isset($_POST['Reset'])) {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="robots" content="noindex,noarchive" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Lost Password | Scriptlog</title>
-  <!-- Tell the browser to be responsive to screen width -->
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <meta content="width=device-width" name="viewport">
   <!-- Bootstrap 3.3.7 -->
   <link rel="stylesheet" href="assets/components/bootstrap/dist/css/bootstrap.min.css">
   <!-- Font Awesome -->
@@ -110,7 +111,9 @@ if (isset($_POST['Reset'])) {
 <body class="hold-transition login-page">
 <div class="login-box">
 <div class="login-logo">
+  <h1>
   <a href="#"><img class="d-block mx-auto mb-4" src="assets/dist/img/icon612x612.png" alt="Reset Password" width="72" height="72"></a>
+  </h1>
 </div>
 <!-- /.login-logo -->
 <div class="login-box-body">
@@ -143,8 +146,8 @@ if (isset($_POST['Reset'])) {
 <form name="formlogin" action="reset-password.php" method="post" onSubmit="return validasi(this)" role="form" autocomplete="off">
       
 <div class="form-group has-feedback">
-<label>Email Address</label>
-  <input type="email" class="form-control" name="user_email" placeholder="Email" autofocus required>
+<label for="inputEmail">Email Address</label>
+  <input type="email" class="form-control" id="inputEmail" name="user_email" placeholder="Email" autofocus required>
   <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
 </div>
 
@@ -157,8 +160,8 @@ if (isset($_POST['Reset'])) {
 </div>
 
 <div class="form-group has-feedback">
-  <label>Enter captcha code</label>
-  <input type="text" class="form-control" placeholder="Please type a captcha code here" name="captcha_code">
+  <label for="inputCaptcha">Enter captcha code</label>
+  <input type="text" class="form-control" id="inputCaptcha" placeholder="Please type a captcha code here" name="captcha_code">
 <span class="glyphicon glyphicon-hand-down form-control-feedback"></span>
 <img src="<?=app_url().'/admin/captcha-forgot-pwd.php'; ?>" alt="image_captcha">
 </div>
