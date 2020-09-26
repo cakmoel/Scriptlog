@@ -55,7 +55,11 @@ login_header($stylePath);
 ?>
 
 <div class="login-logo">
-  <a href="#"><img class="d-block mx-auto mb-4" src="<?=$stylePath; ?>/assets/dist/img/icon612x612.png" alt="Log In" width="72" height="72"></a>
+  <h1>
+  <a href="#">
+    <img class="d-block mx-auto mb-4" src="<?=$stylePath; ?>/assets/dist/img/icon612x612.png" alt="scriptlog-logo" width="72" height="72">
+  </a>
+  </h1> 
 </div>
 <div class="login-box-body">  
 
@@ -85,17 +89,17 @@ login_header($stylePath);
 
 ?>
 
-<form name="formlogin" action="<?= human_login_request('login.php', ['LogIn', human_login_id(), md5(app_key().$ip)])['doLogin']; ?>" method="post" onSubmit="return validasi(this)"  role="form">
+<form name="formlogin" action="<?= human_login_request('login.php', ['LogIn', human_login_id(), md5(app_key().$ip)])['doLogin']; ?>" method="post" onSubmit="return validasi(this)" role="form" autocomplete="off">
 <div class="form-group has-feedback">
-<label>Username or Email Address</label>
-<input type="text"  class="form-control" placeholder="username or email" name="login" maxlength="186" value="
+<label for="inputLogin">Username or Email Address</label>
+<input type="text"  class="form-control" id="inputLogin" placeholder="username or email" name="login" maxlength="186" value="
 <?php if (isset($_COOKIE['scriptlog_cookie_login'])) : echo $_COOKIE['scriptlog_cookie_login'];
-elseif (isset($_COOKIE['scriptlog_cookie_email'])) : echo $_COOKIE['scriptlog_cookie_email']; endif; ?>" autocomplete="off" autofocus required>
+elseif (isset($_COOKIE['scriptlog_cookie_email'])) : echo $_COOKIE['scriptlog_cookie_email']; endif; ?>" autocomplete="off" autocapitalize="off" autofocus required>
 <span class="glyphicon glyphicon-user form-control-feedback"></span>
 </div>
 <div class="form-group has-feedback">
-<label>Password</label>
-<input type="password" class="form-control" placeholder="Password" name="user_pass" maxlength="50" autocomplete="off" value="
+<label for="inputPassword">Password</label>
+<input type="password" class="form-control" id="inputPassword" placeholder="Password" name="user_pass" maxlength="50" autocomplete="off" value="
 <?=(isset($_COOKIE['user_pass'])) ? $_COOKIE['user_pass'] : ""; ?>" required>
 <span class="glyphicon glyphicon-lock form-control-feedback"></span>  
 </div>
@@ -129,7 +133,7 @@ elseif (isset($_COOKIE['scriptlog_cookie_email'])) : echo $_COOKIE['scriptlog_co
 <div class="col-xs-4">
 
 <?php 
-  $block_csrf = generate_form_token('login_form', 32);
+  $block_csrf = generate_form_token('login_form', 40);
 ?>
     
 <input type="hidden" name="csrf" value="<?= $block_csrf; ?>">
