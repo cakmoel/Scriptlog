@@ -26,7 +26,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
+<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -35,44 +35,31 @@ endforeach;
 </div>
 <?php 
 endif;
+
+$action = isset($formAction) ? $formAction : null;
+$comment_id = isset($commentData['ID']) ? (int)$commentData['ID'] : 0;
 ?>
 
-<?php
-if (isset($saveError)) :
-?>
-<div class="alert alert-danger alert-dismissible">
-<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-ban"></i> Alert!</h4>
-<?php 
-echo "Error saving data. Please try again." . $saveError;
-?>
-</div>
-<?php 
-endif;
-?>
-
-<form method="post" action="index.php?load=comments&action=<?=(isset($formAction)) ? $formAction : null; ?>&commentId=<?=(isset($commentData['ID'])) ? $commentData['ID'] : 0; ?>" role="form">
+<form method="post" action="<?=generate_request('index.php', 'post', ['comments', $action, $comment_id])['link'];?>" role="form">
 <input type="hidden" name="comment_id" value="<?=(isset($commentData['ID'])) ? $commentData['ID'] : 0; ?>" >
 <input type="hidden" name="post_id" value="<?=(isset($commentData['comment_post_id'])) ? $commentData['comment_post_id'] : 0; ?>" >
 
 <div class="box-body">
 <div class="form-group">
-<label>Author</label>
-<input type="text" class="form-control" name="author_name" placeholder="" value="
+<label for="comment_author">Author</label>
+<input type="text" class="form-control" id="comment_author" name="author_name" placeholder="" value="
 <?=(isset($commentData['comment_author_name'])) ? htmlspecialchars($commentData['comment_author_name']) : ""; ?>" required>
 </div>
 
 <div class="form-group">
-<label>Content (required)</label>
-<textarea class="textarea" placeholder="Place some text here"
-style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" 
-name="comment_content"  maxlength="500" >
+<label for="comment">Content (required)</label>
+<textarea class="form-control" id="comment" rows="3" placeholder="Enter ..." name="comment_content" maxlength="500" >
 <?=(isset($commentData['comment_content'])) ? $commentData['comment_content'] : ""; ?>
 </textarea>
 </div>
 
 <div class="form-group">
-<label>Comment status</label>
+<label for="comment_status">Comment status</label>
 <?=(isset($commentStatus)) ? $commentStatus : ""; ?>
 </div>
 <!-- /.comment status -->
@@ -93,21 +80,21 @@ name="comment_content"  maxlength="500" >
 
 <div class="col-md-6">
 <!-- Form Element sizes -->
-          <div class="box box-info">
-            <div class="box-header with-border">
+    <div class="box box-info">
+        <div class="box-header with-border">
               <h3 class="box-title">Response To: <?=(isset($commentData['post_title'])) ? $commentData['post_title'] : ""; ?></h3>
-            </div>
-            <div class="box-body">
-              <div class="form-group">
+        </div>
+        <div class="box-body">
+            <div class="form-group">
                 <label><i class="fa fa-calendar"></i> Submited On</label>
                 <p class="text-aqua"><?=(isset($commentData['comment_date'])) ? human_readable_datetime(read_datetime($commentData['comment_date']), 'g:ia \o\n l jS F Y') : ""; ?></p>
-              </div>
-              <div class="form-group">
-                <a href="index.php?load=reply" class="btn btn-primary"></a>
-              </div>
             </div>
+            <div class="form-group">
+                <a href="<?= generate_request("index.php", 'get', ['reply', ActionConst::NEWREPLY, 0])['link']; ?>" class="btn btn-primary"></a>
+            </div>
+        </div>
             <!-- /.box-body -->
-          </div>
+        </div>
           <!-- /.box -->
 </div>
 <!-- /.col-md-6 -->
@@ -117,9 +104,3 @@ name="comment_content"  maxlength="500" >
 
 </div>
 <!-- /.content-wrapper -->
-<script type="text/javascript">
-  var loadFile = function(event) {
-	  var output = document.getElementById('output');
-	      output.src = URL.createObjectURL(event.target.files[0]);
-	  };
-</script>
