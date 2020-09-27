@@ -26,7 +26,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
+<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -37,24 +37,11 @@ endforeach;
 endif;
 ?>
 
-<?php
-if (isset($saveError)) :
-?>
-<div class="alert alert-danger alert-dismissible">
-<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-ban"></i> Alert!</h4>
-<?php 
-echo "Error saving data. Please try again." . $saveError;
-?>
-</div>
-<?php 
-endif;
-?>
-
 <?php 
 $action = isset($formAction) ? $formAction : null;
 $media_id = isset($mediaData['ID']) ? $mediaData['ID'] : 0;
 ?>
+
 <form method="post" action="<?=generate_request('index.php', 'post', ['medialib', $action, $media_id])['link'];?>" role="form" enctype="multipart/form-data" autocomplete="off" >
 <input type="hidden" name="MAX_FILE_SIZE" value="<?= APP_FILE_SIZE; ?>" >
 <input type="hidden" name="media_id" value="<?=(int)$media_id; ?>" >
@@ -62,72 +49,98 @@ $media_id = isset($mediaData['ID']) ? $mediaData['ID'] : 0;
 <div class="box-body">
 
 <?php 
-if (isset($mediaData['media_filename'])) :
+if (isset($mediaData['media_filename']) && isset($mediaData['media_type'])) :
 
   $webp_src = invoke_webp_image($mediaData['media_filename'], false);
   $image_src = invoke_image_uploaded($mediaData['media_filename'], false);
   $webp_src_thumb = invoke_webp_image($mediaData['media_filename']);
   $image_src_thumb = invoke_image_uploaded($mediaData['media_filename']);
+  $video_src = invoke_video_uploaded($mediaData['media_filename']);
+  $audio_src = invoke_audio_uploaded($mediaData['media_filename']);
   
-     if(!$webp_src_thumb || !$image_src_thumb) :
+     if( ! ($image_src_thumb || $webp_src_thumb)) :
       
-       $webp_src_thumb = app_url().'/public/files/pictures/thumbs/nophoto.jpg';
-       $image_src_thumb = app_url().'/public/files/pictures/thumbs/nophoto.jpg';
+       $webp_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
+       $image_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
 
      endif;
 
-  if($image_src || $webp_src) :
+if($image_src || $webp_src) :
 
 ?>
 
 <div class="form-group">
 <a href="<?=$webp_src;?>" title="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
 <picture class="thumbnail">
-<source srcset="<?=$webp_src_thumb; ?>" type="image/webp">
-<img src="<?=$image_src_thumb;?>" class="img-responsive pad" width="320" alt="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
+<source srcset="<?= $webp_src_thumb; ?>" type="image/webp">
+<img src="<?= $image_src_thumb;?>" class="img-responsive pad" width="320" alt="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
 </picture>
 </a>
-<label for="ChangePicture">Change picture</label>
-<input type="file"  name="media" id="mediaUploaded" accept="image/*" onchange="loadFile(event)" maxlength="512" >
-<img id="output" class="img-responsive pad" >
-<p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
+<div id="image-preview">
+  <label for="image-upload" id="image-label">Change picture</label>
+  <input type="file" name="media" id="image-upload" accept="image/*" maxlength="512" required>
 </div>
-  <?php else: ?>
+<p class="help-block">Maximum upload file size: <?= format_size_unit(APP_FILE_SIZE); ?>.</p>
+</div>
+  
+<?php else: ?>
+
 <div class="form-group">
+
+<?php 
+if ($mediaData['media_type'] == "video/webm" || $mediaData['media_type'] == "video/mp4" || $mediaData['media_type'] == "video/ogg") :
+?>
+
+<video class="thumbnail"controls width="600" height="320">
+<source src="<?=$video_src; ?>" type="<?=$mediaData['media_type']; ?>">
+Sorry, your browser doesn't support embedded <code>videos</code>
+</video>
+
+<?php  elseif($mediaData['media_type'] == "audio/mpeg" || $mediaData['media_type'] == "audio/wav" || $mediaData['media_type'] == "audio/ogg") : ?>
+
+<audio class="thumbnail" controls>
+<source src="<?=$audio_src; ?>" type="<?=$mediaData['media_type']; ?>">
+Your browser does not support the <code>audio</code> element. 
+</audio>
+
+<?php else :?>
+
 <a href="#" class="thumbnail"><?=invoke_fileicon($mediaData['media_type']);?></a>
+
+<?php endif; ?>
+
 <label for="ChangeFile">Change file</label>
-<input type="file"  name="media" id="mediaUploaded" accept="image/*"  maxlength="512" >
-<p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
+<input type="file"  name="media" id="mediaUploaded" maxlength="512" required>
+<p class="help-block">Maximum upload file size: <?= format_size_unit(APP_FILE_SIZE); ?>.</p>
 </div>
-  <?php endif; ?>
+
+<?php endif; ?>
 
 <?php else: ?>
 
 <div class="form-group">
-<div id="image-preview">
-  <label for="image-upload" id="image-label">Choose picture</label>
-  <input type="file" name="media" id="image-upload" accept="image/*" maxlength="512" required>
-</div>
-<p class="help-block">Maximum upload file size: <?= format_size_unit(697856); ?>.</p>
+<label for="mediaUploaded">Media</label>
+<input type="file" name="media" id="mediaUploaded" maxlength="512" required>
+<p class="help-block">Maximum upload file size: <?= format_size_unit(APP_FILE_SIZE); ?>.</p>
 </div>
 
 <?php endif; ?>
 
 <div class="form-group">
-<label>Caption </label>
-<input type="text" class="form-control" name="media_caption" placeholder="type media caption" value="
-<?=(isset($mediaData['media_caption'])) ? safe_html($mediaData['media_caption']) : ""; ?>
+<label for="caption">Caption </label>
+<input type="text" class="form-control" id="caption" name="media_caption" placeholder="type media caption" value="
+<?=(isset($mediaData['media_caption'])) ? purify_dirty_html($mediaData['media_caption']) : ""; ?>
 <?=(isset($formData['media_caption'])) ? safe_html($formData['media_caption']) : ""; ?>" maxlength="200" >
 </div>
 
 <div class="form-group">
-<label>Display on</label>
+<label for="media_target">Display on</label>
 <?=(isset($mediaTarget)) ? $mediaTarget : ""; ?>
 </div>
 <!-- media target -->
 
 <div class="form-group">
-<label>Access</label>
+<label for="media_access">Access</label>
 <?=(isset($mediaAccess)) ? $mediaAccess : ""; ?>
 </div>
 <!-- media access -->
@@ -170,28 +183,28 @@ if (isset($mediaData['media_filename'])) :
 </div>
 <!-- /.box -->
 </div>
-<!--/.col-md-12 -->
+<!--/.col-md-6 -->
+
 <?php 
 if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
 ?>
 <div class="col-md-6">
 <div class="box box-solid">
-            <div class="box-header with-border">
-             <?=(isset($mediaData['media_type'])) ? invoke_fileicon($mediaData['media_type']) : ""; ?>
-
-              <h3 class="box-title">Media properties</h3>
-            </div>
-            <!-- /.box-header -->
-            <div class="box-body">
-              <dl class="dl-horizontal">
-              
-              <?php 
-                 if (isset($mediaProperties['meta_value'])) :
-                   $media_properties = media_properties($mediaProperties['meta_value']);
-              ?>
+<div class="box-header with-border">
+      <?=(isset($mediaData['media_type'])) ? invoke_fileicon($mediaData['media_type']) : ""; ?>
+<h3 class="box-title">Media properties</h3>
+</div>
+<!-- /.box-header -->
+            
+<div class="box-body">
+  <dl class="dl-horizontal">            
+    <?php 
+       if (isset($mediaProperties['meta_value'])) :
+          $media_properties = media_properties($mediaProperties['meta_value']);
+    ?>
 
                 <dt>File name</dt>
-                <dd><?= safe_html($media_properties['Origin']); ?></dd>
+                <dd><?= purify_dirty_html($media_properties['Origin']); ?></dd>
                 <dt>MIME type</dt>
                 <dd><?= safe_html($media_properties['File type']); ?></dd>
                 <dt>File size</dt>
@@ -225,9 +238,4 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
 <!--/.content -->
 </div>
 <!-- /.content-wrapper -->
-<script type="text/javascript">
-  var loadFile = function(event) {
-	  var output = document.getElementById('output');
-	      output.src = URL.createObjectURL(event.target.files[0]);
-	  };
-</script>
+
