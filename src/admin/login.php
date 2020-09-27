@@ -113,8 +113,8 @@ elseif (isset($_COOKIE['scriptlog_cookie_email'])) : echo $_COOKIE['scriptlog_co
 <?php if (isset($failed_login) && $failed_login >= 5) : ?> 
 
 <div class="form-group has-feedback">
-<label>Enter captcha code</label>
-<input type="text" class="form-control" placeholder="Please type a captcha code here" name="captcha_code">
+<label for="inputCaptcha">Enter captcha code</label>
+<input type="text" class="form-control" id="inputCaptcha" placeholder="Please type a captcha code here" name="captcha_code">
 <span class="glyphicon glyphicon-hand-down form-control-feedback"></span>
 <img src="<?=app_url().'/admin/captcha-login.php'; ?>" alt="image_captcha">
 </div>
