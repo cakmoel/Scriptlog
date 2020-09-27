@@ -25,7 +25,7 @@
 
               <img class="profile-user-img img-responsive img-circle" src="<?=app_url().DS.APP_ADMIN.DS.'assets/dist/img/profilepict.png'?>" alt="User profile picture">
               
-              <h3 class="profile-username text-center"><?=(isset($userData['user_login'])) ? safe_html($userData['user_login']) : ""; ?></h3>
+              <h2 class="profile-username text-center"><?=(isset($userData['user_login'])) ? safe_html($userData['user_login']) : ""; ?></h2>
 
               <p class="text-muted text-center"><?=(isset($userData['user_fullname'])) ? safe_html($userData['user_fullname']) : ""; ?></p>
 
@@ -89,7 +89,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
+<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -133,8 +133,8 @@ $session_id = isset($userData['user_session']) ? safe_html($userData['user_sessi
 if ((isset($userData['user_login'])) && ($userData['user_login'] != '')) : 
 ?>
 <div class="form-group">
-<label>Username</label>
-<input type="text" class="form-control" name="user_login" value="
+<label for="username">Username</label>
+<input type="text" class="form-control" id="username" name="user_login" value="
 <?=($userData['user_login']) ? safe_html($userData['user_login']) : ""; ?>"
 <?=(!empty($userData['user_login'])) ? "disabled" : ""; ?>>
 <p class="help-block">This username can not be changed.</p>
@@ -142,34 +142,34 @@ if ((isset($userData['user_login'])) && ($userData['user_login'] != '')) :
 <?php endif;  ?>
 
 <div class="form-group">
-<label>Fullname</label>
-<input type="text" class="form-control" name="user_fullname" placeholder="Enter real name" value="
+<label for="fullname">Fullname</label>
+<input type="text" class="form-control" id="fullname" name="user_fullname" placeholder="Enter real name" value="
 <?=(!empty($userData['user_fullname'])) ? safe_html($userData['user_fullname']) : ""; ?>
 <?=(isset($formData['user_fullname'])) ? safe_html($formData['user_fullname']) : ""; ?>">
 </div>
 
 <div class="form-group">
-<label>Email (required)</label>
-<input type="email" class="form-control" name="user_email" placeholder="something@example.com" value="
+<label for="email">Email (required)</label>
+<input type="email" class="form-control" id="email" name="user_email" placeholder="something@example.com" value="
 <?=(isset($userData['user_email']) && $userData['user_email'] != '#') ? safe_html($userData['user_email']) : ""; ?>
 <?=(isset($formData['user_email'])) ? safe_html($formData['user_email']) : ""; ?>" required>
 </div>
 
 <div class="form-group">
-<label>Password (required)</label>
-<input type="password" class="form-control" name="user_pass" placeholder="Enter password" maxlength="50" autocomplete="off">
+<label for="passwd">Password (required)</label>
+<input type="password" class="form-control" id="passwd" name="user_pass" placeholder="Enter password" maxlength="50" autocomplete="off">
 </div>
 
 <?php if(!empty($userData['user_email'])) :?>
 <div class="form-group">
-<label>confirm Password (required)</label>
-<input type="password" class="form-control" name="user_pass2" placeholder="Confirm password" maxlength="50" autocomplete="off">
+<label for="confirm_pwd">confirm Password (required)</label>
+<input type="password" class="form-control" id="confirm_pwd" name="user_pass2" placeholder="Confirm password" maxlength="50" autocomplete="off">
 </div>
 <?php  endif; ?>
 
 <div class="form-group">
-<label>Website</label>
-<input type="text" class="form-control" name="user_url" placeholder="Enter url" value="<?=(isset($formData['user_url'])) ? safe_html($formData['user_url']) : ""; ?>
+<label for="website">Website</label>
+<input type="text" class="form-control" id="website" name="user_url" placeholder="Enter url" value="<?=(isset($formData['user_url'])) ? safe_html($formData['user_url']) : ""; ?>
 <?=(isset($userData['user_url'])) ? safe_html($userData['user_url']) : ""; ?>" >
 </div>
 
