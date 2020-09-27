@@ -35,42 +35,32 @@ endforeach;
 </div>
 <?php 
 endif;
+
+$action = (isset($formAction)) ? $formAction : null;
+$menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
+
 ?>
 
-<?php
-if (isset($saveError)) :
-?>
-<div class="alert alert-danger alert-dismissible">
-<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-ban"></i> Alert!</h4>
-<?php 
-echo "Error saving data. Please try again." . $saveError;
-?>
-</div>
-<?php 
-endif;
-?>
-
-<form method="post" action="index.php?load=menu&action=<?=(isset($formAction)) ? $formAction : null; ?>&menuId=<?=(isset($menuData['ID'])) ? $menuData['ID'] : 0; ?>" role="form">
+<form method="post" action="<?=generate_request('index.php', 'post', ['menu', $action, $menu_id])['link'];?>" role="form">
 <input type="hidden" name="menu_id" value="<?=(isset($menuData['ID'])) ? (int)$menuData['ID'] : 0; ?>" />
 
 <div class="box-body">
 <div class="form-group">
-<label>Menu name</label>
-<input type="text" class="form-control" name="menu_label" placeholder="Enter menu name here" value="
+<label for="menu_name">Menu name</label>
+<input type="text" class="form-control" id="menu_name" name="menu_label" placeholder="Enter menu name here" value="
 <?=(isset($menuData['menu_label'])) ? htmlspecialchars($menuData['menu_label']) : ""; ?>
 <?=(isset($formData['menu_label'])) ? htmlspecialchars($formData['menu_label'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" required>
 </div>
 
 <div class="form-group">
-<label>Parent</label>
+<label for="parent">Parent</label>
 <?=(isset($parent)) ? $parent : ""; ?>
 </div>
 <!-- menu parent -->
 
 <div class="form-group">
-<label>Link</label>
-<input type="text" class="form-control" name="menu_link" placeholder="ex:about-us" value="
+<label for="menu_url">Link</label>
+<input type="text" class="form-control" id="menu_url" name="menu_link" placeholder="ex:about-us" value="
 <?=(isset($menuData['menu_link'])) ? htmlspecialchars($menuData['menu_link']) : ""; ?>
 <?=(isset($formData['menu_link'])) ? htmlspecialchars($formData['menu_link'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" >
 </div>
