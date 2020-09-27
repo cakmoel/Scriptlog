@@ -26,7 +26,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
+<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -42,7 +42,7 @@ if (isset($saveError)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-ban"></i> Alert!</h4>
+<h2><i class="icon fa fa-ban"></i> Alert!</h2>
 <?php 
 echo "Error saving data. Please try again." . $saveError;
 ?>
@@ -59,7 +59,7 @@ $action = isset($formAction) ? $formAction : null;
 <div class="box-body">
 
 <div class="form-group">
-<label>Upload Theme (required)</label>
+<label for="themeUploaded">Upload Theme (required)</label>
 <input type="file"  name="zip_file" id="themeUploaded" accept="application/zip,application/x-zip,application/x-zip-compressed" required>
 <p class="help-block">If you have a theme in a .zip format, you may install it by uploading it here.</p>
 </div>
