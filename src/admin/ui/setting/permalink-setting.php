@@ -65,8 +65,8 @@ $paramId = (isset($settingData['ID'])) ? abs((int)$settingData['ID']) : 0;
         <input type="hidden" name="setting_id" value="<?= $paramId; ?>">
         <input type="hidden" name="setting_name" value="<?=(!isset($settingData['setting_name']) ?: safe_html($settingData['setting_name'])); ?>">
         <div class="form-group">
-          <label>Enable SEO-Friendly URL</label>
-          <select class="form-control select2" style="width: 100%;" name="permalinks">
+          <label for="permalink">Enable SEO-Friendly URL</label>
+          <select class="form-control select2" style="width: 100%;" name="permalinks" id="permalink">
             
             <?php 
               if(isset($settingData['setting_value']) && $settingData['setting_value'] == 'yes'):
