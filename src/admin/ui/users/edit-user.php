@@ -20,7 +20,7 @@
 <div class="col-md-6">
 <div class="box box-primary">
 <div class="box-header with-border">
- <h3 class="box-title"><?=(isset($userData['ID']) && $userData != '') ? "Personal Detail"  : "Create a brand new user and add them to this site"; ?></h3>
+ <h2 class="box-title"><?=(isset($userData['ID']) && $userData != '') ? "Personal Detail"  : "Create a brand new user and add them to this site"; ?></h2>
 </div>
 <!-- /.box-header -->
 <?php
@@ -28,7 +28,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
+<h3><i class="icon fa fa-warning"></i> Invalid Form Data!</h3>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -39,19 +39,7 @@ endforeach;
 endif;
 ?>
 
-<?php
-if (isset($saveError)) :
-?>
-<div class="alert alert-danger alert-dismissible">
-<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-ban"></i> Alert!</h4>
 <?php 
-echo "Error saving data. Please try again." . $saveError;
-?>
-</div>
-<?php 
-endif;
-
 $action = (isset($formAction)) ? $formAction : null;
 $user_id = (isset($userData['ID'])) ? safe_html((int)$userData['ID']) : 0;
 $session_id = (isset($userData['user_session'])) ? safe_html($userData['user_session']) :  md5(uniqid());
@@ -74,8 +62,8 @@ endif;
 ?>
 
 <div class="form-group">
-<label>Username <?=(isset($userData['user_login'])) ? "" : "(required)" ?></label>
-<input type="text" class="form-control" name="user_login" placeholder="Enter username" value="
+<label for="username">Username <?=(isset($userData['user_login'])) ? "" : "(required)" ?></label>
+<input type="text" class="form-control" id="username" name="user_login" placeholder="Enter username" value="
 <?=(isset($formData['user_login'])) ? safe_html($formData['user_login']) : ""; ?>
 <?=(isset($userData['user_login'])) ? safe_html($userData['user_login']) : ""; ?>" 
   required <?=(isset($userData['user_login']) && $userData['user_login'] !== '') ? "disabled" : ""; ?>>
@@ -83,41 +71,41 @@ endif;
 </div>
 
 <div class="form-group">
-<label>Fullname</label>
-<input type="text" class="form-control" name="user_fullname" placeholder="Enter real name" value="
+<label for="fullname">Fullname</label>
+<input type="text" class="form-control" id="fullname" name="user_fullname" placeholder="Enter real name" value="
 <?=(isset($userData['user_fullname'])) ? safe_html($userData['user_fullname']) : ""; ?>
 <?=(isset($formData['user_fullname'])) ? safe_html($formData['user_fullname']) : "";  ?>" >
 </div>
 
 <div class="form-group">
-<label>Email (required)</label>
-<input type="email" class="form-control" name="user_email" placeholder="Enter email" value="
+<label for="email">Email (required)</label>
+<input type="email" class="form-control" id="email" name="user_email" placeholder="Enter email" value="
 <?=(isset($userData['user_email'])) ? safe_html($userData['user_email']) : ""; ?>
 <?=(isset($formData['user_email'])) ? safe_html($formData['user_email']) : ""; ?>" 
   required>
 </div>
 
 <div class="form-group">
-<label>Password (required)</label>
-<input type="password" class="form-control" name="user_pass" placeholder="Enter password" maxlength="50" autocomplete="off">
+<label for="passwd">Password <?=(!empty($userData['user_email'])) ? "": "(required)"; ?></label>
+<input type="password" class="form-control" id="passwd" name="user_pass" placeholder="Enter password" maxlength="50" autocomplete="off">
 </div>
 
 <?php if(!empty($userData['user_email'])) :?>
 <div class="form-group">
-<label>confirm Password (required)</label>
-<input type="password" class="form-control" name="user_pass2" placeholder="Confirm password" maxlength="50" autocomplete="off">
+<label for="confirm_pwd">Confirm password <?=(!empty($userData['user_email'])) ? "": "(required)"; ?></label>
+<input type="password" class="form-control" id="confirm_pwd" name="user_pass2" placeholder="Confirm password" maxlength="50" autocomplete="off">
 </div>
 <?php  endif; ?>
 
 <div class="form-group">
-<label>Website</label>
-<input type="text" class="form-control" name="user_url" placeholder="Enter url" value="
+<label for="website">Website</label>
+<input type="text" class="form-control" id="website" name="user_url" placeholder="Enter url" value="
 <?=(isset($formData['user_url'])) ? safe_html($formData['user_url']) : ""; ?>
 <?=(isset($userData['user_url'])) ? safe_html($userData['user_url']) : ""; ?>" >
 </div>
 
 <div class="form-group">
-<label>Role</label>
+<label for="user_level">Role</label>
 <?=(isset($userRole)) ? $userRole : ""; ?>
 </div>
 
@@ -125,8 +113,8 @@ endif;
 if (empty($userData['user_email'])) :
 ?>
 <div class="checkbox">
-<label>
-<input type="checkbox" name="send_user_notification" value="1"> Send the new user an email about their account 
+<label for="1">
+<input id="1" type="checkbox" name="send_user_notification" value="1"> Send the new user an email about their account 
 </label>
 </div>
 <?php 
