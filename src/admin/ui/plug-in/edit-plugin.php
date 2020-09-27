@@ -26,25 +26,11 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
+<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
 endforeach;
-?>
-</div>
-<?php 
-endif;
-?>
-
-<?php
-if (isset($saveError)) :
-?>
-<div class="alert alert-danger alert-dismissible">
-<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-ban"></i> Alert!</h4>
-<?php 
-echo "Error saving data. Please try again." . $saveError;
 ?>
 </div>
 <?php 
@@ -56,39 +42,37 @@ endif;
 
 <div class="box-body">
 <div class="form-group">
-<label>Plugin (required)</label>
-<input type="text" class="form-control" name="plugin_name" placeholder="Enter plugin name here" value="
+<label for="plugin_name">Plugin (required)</label>
+<input type="text" class="form-control" id="plugin_name" name="plugin_name" placeholder="Enter plugin name here" value="
 <?=(isset($pluginData['plugin_name'])) ? htmlspecialchars($pluginData['plugin_name']) : ""; ?>
 <?=(isset($formData['plugin_name'])) ? htmlspecialchars($formData['plugin_name'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" required>
 </div>
 
 <div class="form-group">
-<label>Link </label>
-<input type="text" class="form-control" name="plugin_link" placeholder="?load=plugin_name" value="
+<label for="plugin_link">Link </label>
+<input type="text" class="form-control" id="plugin_link" name="plugin_link" placeholder="?load=plugin_name" value="
 <?=(isset($pluginData['plugin_link'])) ? htmlspecialchars($pluginData['plugin_link']) : ""; ?>
 <?=(isset($formData['plugin_link'])) ? htmlspecialchars($formData['plugin_link'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" >
 </div>
 
 <div class="form-group">
-<label>Description (required)</label>
-<textarea class="textarea" placeholder="Place some text here"
-style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" 
-name="description"  maxlength="1000" >
+<label for="description">Description (required)</label>
+<textarea class="form-control" id="description" rows="3" placeholder="Enter ..." name="description"  maxlength="1000" >
 <?=(isset($pluginData['plugin_desc'])) ? $pluginData['plugin_desc'] : ""; ?>
 <?=(isset($formData['description'])) ? htmlspecialchars($formData['description'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>
 </textarea>
 </div>
 
 <div class="form-group">
-<label>Level</label>
+<label for="plugin_level">Level</label>
 <?=(isset($pluginLevel)) ? $pluginLevel : ""; ?>
 </div>
 <!-- /.plugin level -->
 
 <?php if(!empty($pluginData['plugin_sort'])) : ?>
 <div class="form-group">
-<label>sort</label>
-<input type="text" class="form-control" name="plugin_sort" value="<?=(isset($pluginData['plugin_sort']) ? abs((int)$pluginData['plugin_sort']) : 0);  ?>" >
+<label for="plugin_sort">sort</label>
+<input type="text" class="form-control" id="plugin_sort" name="plugin_sort" value="<?=(isset($pluginData['plugin_sort']) ? abs((int)$pluginData['plugin_sort']) : 0);  ?>" >
 </div>
 <?php endif;  ?>
 <!-- /.plugin sort -->
