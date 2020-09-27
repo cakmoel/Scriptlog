@@ -21,30 +21,17 @@
 <div class="box box-primary">
 <div class="box-header with-border"></div>
 <!-- /.box-header -->
+
 <?php
 if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
+<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
 endforeach;
-?>
-</div>
-<?php 
-endif;
-?>
-
-<?php
-if (isset($saveError)) :
-?>
-<div class="alert alert-danger alert-dismissible">
-<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-ban"></i> Alert!</h4>
-<?php 
-echo "Error saving data. Please try again." . $saveError;
 ?>
 </div>
 <?php 
@@ -60,8 +47,8 @@ $topic_id = (isset($topicData)) ? abs((int)$topicData['ID']) : 0;
 
 <div class="box-body">
 <div class="form-group">
-<label>Title (required)</label>
-<input type="text" class="form-control" name="topic_title" placeholder="Enter title here" value="
+<label for="title">Title (required)</label>
+<input type="text" class="form-control" id="title" name="topic_title" placeholder="Enter title here" value="
 <?=(isset($topicData['topic_title'])) ? safe_html($topicData['topic_title']) : ""; ?>
 <?=(isset($formData['topic_title'])) ? safe_html($formData['topic_title']) : ""; ?>" required>
 </div>
