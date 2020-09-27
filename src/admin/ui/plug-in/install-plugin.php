@@ -35,41 +35,29 @@ endforeach;
 </div>
 <?php 
 endif;
+
+$action = isset($formAction) ? $formAction : null;
 ?>
 
-<?php
-if (isset($saveError)) :
-?>
-<div class="alert alert-danger alert-dismissible">
-<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-ban"></i> Alert!</h4>
-<?php 
-echo "Error saving data. Please try again." . $saveError;
-?>
-</div>
-<?php 
-endif;
-?>
-
-<form method="post" action="index.php?load=plugins&action=<?=(isset($formAction)) ? $formAction : null; ?>&Id=0" role="form" onsubmit="return(mandatoryPluginUpload());" enctype="multipart/form-data" autocomplete="off">
+<form method="post" action="<?=generate_request('index.php', 'post', ['plugins', $action, 0])['link']; ?>" role="form" onsubmit="return(mandatoryPluginUpload());" enctype="multipart/form-data" autocomplete="off">
 <input type="hidden" name="MAX_FILE_SIZE" value="<?= scriptlog_upload_filesize(); ?>" >
 <div class="box-body">
 
 <div class="form-group">
-<label>Upload Plugin (required)</label>
-<input type="file"  name="zip_file" id="pluginUploaded" accept="application/zip,application/octet-stream,application/x-zip,application/x-zip-compressed" required>
+<label for="pluginUploaded">Upload Plugin (required)</label>
+<input type="file" name="zip_file" id="pluginUploaded" accept="application/zip,application/octet-stream,application/x-zip,application/x-zip-compressed" required>
 <p class="help-block">If you have a plugin in a .zip format, you may install it by uploading it here.</p>
 </div>
 
 <div class="form-group">
-<label>Description (required)</label>
-<textarea class="form-control" id="sl" name="description" rows="10" maxlength="500" required>
+<label for="description">Description (required)</label>
+<textarea class="form-control" id="description" name="description" rows="3" maxlength="500" required>
 <?=(isset($formData['description'])) ? $formData['description'] : ""; ?>
 </textarea>
 </div>
 
 <div class="form-group">
-<label>Access</label>
+<label for="plugin_level">Access</label>
 <?=(isset($pluginLevel)) ? $pluginLevel : ""; ?>
 </div>
 <!-- /.plugin level -->
