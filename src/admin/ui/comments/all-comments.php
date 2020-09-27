@@ -63,7 +63,7 @@
                   <table id="scriptlog-table" class="table table-bordered table-striped">
                 <thead>
                 <tr>
-                  <th>Author</th>
+                  <th>#</th>
                   <th>Comment</th>
                   <th>In Response To</th>
                   <th>Submited On</th>
@@ -76,17 +76,16 @@
                       if(is_array($comments)) :
                         $no = 0;
                         foreach($comments as $comment) :
-                          $no++;
+                        $no++;
                    ?>
                        <tr>
                          <td><?= $no; ?></td>
-                         <td><?= htmlspecialchars($comment['comment_author_name']); ?></td>
-                         <td><?= htmlspecialchars($comment['comment_content']); ?></td>
+                         <td><a href="<?= generate_request("index.php", 'get', ['reply', ActionConst::NEWREPLY, 0])['link']; ?>"><?= htmlspecialchars($comment['comment_content']); ?></a></td>
                          <td><?= htmlspecialchars($comment['post_title']); ?></td>
                          <td><?= human_readable_datetime(read_datetime($comment['comment_date']), 'g:ia \o\n l jS F Y'); ?></td>
 
                          <td>
-                          <a href="index.php?load=comments&action=editComment&Id=<?= htmlspecialchars((int)$topic['ID']);?>" class="btn btn-warning">
+                          <a href="<?= generate_request("index.php", 'get', ['comments', ActionConst::EDITCOMMENT, $comment['ID']])['link']; ?>" class="btn btn-warning">
                            <i class="fa fa-pencil fa-fw"></i> Edit</a>
                          </td>
                          <td>
@@ -102,7 +101,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                  <th>Author</th>
+                  <th>#</th>
                   <th>Comment</th>
                   <th>In Response To</th>
                   <th>Submited On</th>
