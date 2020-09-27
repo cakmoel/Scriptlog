@@ -9,7 +9,7 @@
 					class="btn btn-primary"> <i
 					class="fa fa-plus-circle"></i> Add New
 				</a>
-		</small>
+		    </small>
       </h1>
       <ol class="breadcrumb">
         <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -57,11 +57,11 @@
          
             <div class="box box-primary">
                <div class="box-header with-border">
-              <h3 class="box-title">
+              <h2 class="box-title">
               <?=(isset($usersTotal)) ? $usersTotal : 0; ?> 
                User<?=($usersTotal != 1) ? 's' : ''; ?>
                in Total  
-              </h3>
+              </h2>
             </div>
               <!-- /.box-header -->
              
@@ -91,12 +91,12 @@
                        <td><?= safe_html($user['user_email']); ?></td>
                        <td><?= safe_html($user['user_level']); ?></td>
                        <td>
-                       <a href="<?=generate_request('index.php', 'get', ['users', 'editUser', $user['ID'], $user['user_session']])['link']; ?>" class="btn btn-warning">
-                       <i class="fa fa-pencil fa-fw"></i> Edit</a>
+                       <a href="<?=generate_request('index.php', 'get', ['users', 'editUser', $user['ID'], $user['user_session']])['link']; ?>" class="btn btn-warning" title="Edit user">
+                       <i class="fa fa-pencil fa-fw"></i></a>
                        </td>
                        <td>
-                       <a href="javascript:deleteUser('<?= abs((int)$user['ID']); ?>', '<?= safe_html($user['user_login']); ?>')" class="btn btn-danger">
-                       <i class="fa fa-trash-o fa-fw"></i> Delete</a>
+                       <a href="javascript:deleteUser('<?= abs((int)$user['ID']); ?>', '<?= safe_html($user['user_login']); ?>')" class="btn btn-danger" title="Delete user">
+                       <i class="fa fa-trash-o fa-fw"></i></a>
                        </td>
                      </tr>
                   
