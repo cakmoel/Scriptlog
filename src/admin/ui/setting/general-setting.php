@@ -26,7 +26,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
+<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -42,7 +42,7 @@ endif;
 ?>
 <div class="alert alert-success alert-dismissible">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-    <h4><i class="icon fa fa-check"></i> Success!</h4>
+    <h2><i class="icon fa fa-check"></i> Success!</h2>
     <?php 
         foreach ($status as $s) :
           echo $s;
@@ -119,7 +119,7 @@ $action = (isset($formAction)) ? $formAction : null;
               <th><label for="<?=(isset($s['setting_name'])) ? safe_html($s['setting_name']) : ""; ?>"> <?= safe_html($setting_name); ?></label></th>
               <td>
               <input type="hidden" name="<?= 'setting_id['.$s['ID'].']'; ?>" value="<?= safe_html((int)$s['ID']);?>">
-              <input type="text" name="<?= 'setting_value['.$s['ID'].']' ?>" class="form-control" value="<?= safe_html($s['setting_value']); ?>" maxlength="255" >
+              <input type="text" name="<?= 'setting_value['.$s['ID'].']' ?>" class="form-control" id="<?=(isset($s['setting_name'])) ? safe_html($s['setting_name']) : ""; ?>" value="<?= safe_html($s['setting_value']); ?>" maxlength="255" >
               </td>
              </tr>
              
