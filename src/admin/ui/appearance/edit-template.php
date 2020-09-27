@@ -5,7 +5,9 @@
     <section class="content-header">
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
+        <?php if (empty($themeData['ID'])) : ?>
         <small><a href="index.php?load=templates&action=installTheme&Id=0" class="btn btn-primary"><i class="fa fa-cloud-upload"></i> Upload Theme</a></small>
+        <?php endif; ?>
       </h1>
       <ol class="breadcrumb">
         <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -26,7 +28,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
+<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -35,59 +37,41 @@ endforeach;
 </div>
 <?php 
 endif;
-?>
 
-<?php
-if (isset($saveError)) :
-?>
-<div class="alert alert-danger alert-dismissible">
-<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-ban"></i> Alert!</h4>
-<?php 
-echo "Error saving data. Please try again." . $saveError;
-?>
-</div>
-<?php 
-endif;
-?>
-
-<?php
 $action = (isset($formAction)) ? $formAction : null;
 $theme_id = (isset($themeData['ID'])) ? safe_html((int)$themeData['ID']) : 0;
 ?>
+
 <form method="post" action="<?=generate_request('index.php', 'post', ['templates', $action, $theme_id])['link']; ?>" role="form">
-<input type="hidden" name="theme_id" value="<?= $theme_id; ?>" />
+<input type="hidden" name="theme_id" value="<?= $theme_id; ?>" >
 
 <div class="box-body">
 
 <div class="form-group">
-<label>Theme (required)</label>
-<input type="text" class="form-control" name="theme_title" placeholder="Enter theme name here" value="
+<label for="theme_name">Theme (required)</label>
+<input type="text" class="form-control" id="theme_name" name="theme_title" placeholder="Enter theme name here" value="
 <?=(isset($themeData['theme_title'])) ? safe_html($themeData['theme_title']) : ""; ?>
 <?=(isset($formData['theme_title'])) ? safe_html($formData['theme_title']) : ""; ?>" required>
 </div>
 
 <div class="form-group">
-<label>Directory/Folder (required)</label>
-<input type="text" class="form-control" name="theme_directory" placeholder="/public/themes/yourthemefolder" value="
+<label for="theme_dir">Directory/Folder (required)</label>
+<input type="text" class="form-control" id="theme_dir" name="theme_directory" placeholder="your theme folder" value="
 <?=(isset($themeData['theme_directory'])) ? safe_html($themeData['theme_directory']) : ""; ?>
 <?=(isset($formData['theme_directory'])) ? safe_html($formData['theme_directory']) : ""; ?>">
-<p class="help-block">Fill in the directory with the format: public/themes/yourthemedirectory</p>
 </div>
 
 <div class="form-group">
-<label>Description </label>
-<textarea class="textarea" placeholder="Place some text here"  
-style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"  
-name="theme_description"  maxlength="1000" >
+<label for="description">Description </label>
+<textarea class="form-control" id="description" rows="3" placeholder="Enter ..." name="theme_description"  maxlength="1000" >
 <?=(isset($themeData['theme_desc'])) ? safe_html($themeData['theme_desc']) : ""; ?>
 <?=(isset($formData['theme_description'])) ? safe_html($formData['theme_description']) : ""; ?>
 </textarea>
 </div>
 
 <div class="form-group">
-<label>Designer (required)</label>
-<input type="text" class="form-control" name="theme_designer" placeholder="Designer's name" value="
+<label for="designer_name">Designer (required)</label>
+<input type="text" class="form-control" id="designer_name" name="theme_designer" placeholder="Designer's name" value="
 <?=(isset($themeData['theme_designer'])) ? safe_html($themeData['theme_designer']) : ""; ?>
 <?=(isset($formData['theme_designer'])) ? safe_html($formData['theme_designer']) : ""; ?>" required>
 </div>
