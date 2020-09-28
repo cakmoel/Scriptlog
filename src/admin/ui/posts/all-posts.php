@@ -25,8 +25,8 @@
          if (isset($errors)) :
          ?>
          <div class="alert alert-danger alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h4><i class="icon fa fa-ban"></i> Error!</h4>
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h2><i class="icon fa fa-ban"></i> Error!</h2>
            <?php 
               foreach ($errors as $e) :
                 echo $e;
@@ -42,7 +42,7 @@
          ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h4><i class="icon fa fa-check"></i> Success!</h4>
+                <h2><i class="icon fa fa-check"></i> Success!</h2>
            <?php 
               foreach ($status as $s) :
                 echo $s;
@@ -55,11 +55,10 @@
          
             <div class="box box-primary">
                <div class="box-header with-border">
-                <h3 class="box-title">
-              <?=(isset($postsTotal)) ? $postsTotal : 0; ?> 
+                <h2 class="box-title"> <?=(isset($postsTotal)) ? $postsTotal : 0; ?> 
                Post<?=($postsTotal != 1) ? 's' : ''; ?>
                in Total  
-              </h3>
+              </h2>
                </div>
               <!-- /.box-header -->
               
@@ -91,11 +90,11 @@
                       
                        <td>
                        <a href="<?=generate_request("index.php", 'get', ['posts', 'editPost', $post['ID']])['link']; ?>" class="btn btn-warning">
-                       <i class="fa fa-pencil fa-fw"></i> Edit</a>
+                       <i class="fa fa-pencil fa-fw"></i> </a>
                        </td>
                        <td>
                        <a href="javascript:deletePost('<?= abs((int)$post['ID']); ?>', '<?= safe_html($post['post_title']); ?>')" class="btn btn-danger">
-                       <i class="fa fa-trash-o fa-fw"></i> Delete</a>
+                       <i class="fa fa-trash-o fa-fw"></i> </a>
                        </td>
                     
                     </tr>
