@@ -41,7 +41,7 @@
          ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h4><i class="icon fa fa-check"></i> Success!</h4>
+                <h2><i class="icon fa fa-check"></i> Success!</h2>
            <?php 
               foreach ($status as $s) :
                 echo $s;
@@ -54,11 +54,11 @@
          
             <div class="box box-primary">
                <div class="box-header with-border">
-                <h3 class="box-title">
+                <h2 class="box-title">
               <?=(isset($themesTotal)) ? $themesTotal : 0; ?> 
                theme<?=($themesTotal != 1) ? 's' : ''; ?>
                in Total  
-              </h3>
+              </h2>
                </div>
               <!-- /.box-header -->
               
@@ -92,15 +92,15 @@
                        <td><?= safe_html($theme['theme_directory']); ?></td>
                        <td>
                        <a href="index.php?load=templates&action=editTheme&Id=<?= safe_html((int)$theme['ID']);?>" class="btn btn-warning">
-                       <i class="fa fa-pencil fa-fw"></i> Edit</a>
+                       <i class="fa fa-pencil fa-fw"></i> </a>
                        </td>
                        <td>
                        <?php if($theme['theme_status'] == 'N') : ?>
                        <a href="javascript:activateTheme('<?= abs((int)$theme['ID']); ?>', '<?= safe_html($theme['theme_title']); ?>')" class="btn btn-success" title="Activate theme">
-                       <i class="fa fa-check fa-fw"></i> Activate</a>
+                       <i class="fa fa-check fa-fw"></i> </a>
                        <?php else : ?>
                        <a href="javascript:deactivateTheme('<?= abs((int)$theme['ID']); ?>', '<?= safe_html($theme['theme_title']); ?>')" class="btn btn-danger" title="Deactivate theme">
-                       <i class="fa fa-times-circle fa-fw"></i> Deactivate</a>
+                       <i class="fa fa-times-circle fa-fw"></i> </a>
                        <?php endif; ?>
                        </td>
                     
