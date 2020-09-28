@@ -109,7 +109,7 @@ Your browser does not support the <code>audio</code> element.
 
 <?php endif; ?>
 
-<label for="ChangeFile">Change file</label>
+<label for="mediaUploaded">Change file</label>
 <input type="file"  name="media" id="mediaUploaded" maxlength="512" required>
 <p class="help-block">Maximum upload file size: <?= format_size_unit(APP_FILE_SIZE); ?>.</p>
 </div>
@@ -192,7 +192,7 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
 <div class="box box-solid">
 <div class="box-header with-border">
       <?=(isset($mediaData['media_type'])) ? invoke_fileicon($mediaData['media_type']) : ""; ?>
-<h3 class="box-title">Media properties</h3>
+<h2 class="box-title">Media properties</h2>
 </div>
 <!-- /.box-header -->
             
