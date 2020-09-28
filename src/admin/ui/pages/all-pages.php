@@ -26,7 +26,7 @@
          ?>
          <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                <h2><i class="icon fa fa-ban"></i> Alert!</h2>
            <?php 
               foreach ($errors as $e) :
                 echo $e;
@@ -42,7 +42,7 @@
          ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                <h2><i class="icon fa fa-check"></i> Alert!</h2>
            <?php 
               foreach ($status as $s) :
                 echo $s;
@@ -55,11 +55,11 @@
          
             <div class="box box-primary">
                <div class="box-header with-border">
-                   <h3 class="box-title">
+                   <h2 class="box-title">
                     <?=(isset($pagesTotal)) ? $pagesTotal : 0; ?> 
                     Page<?=($pagesTotal != 1) ? 's' : ''; ?>
                     in Total  
-                  </h3>
+                  </h2>
                </div>
               <!-- /.box-header -->
               
@@ -91,11 +91,11 @@
                        
                        <td>
                        <a href="<?=generate_request('index.php', 'get', ['pages', 'editPage', $page['ID']])['link']; ?>" class="btn btn-warning">
-                       <i class="fa fa-pencil fa-fw"></i> Edit</a>
+                       <i class="fa fa-pencil fa-fw"></i> </a>
                        </td>
                        <td>
                        <a href="javascript:deletePage('<?= abs((int)$page['ID']); ?>', '<?= safe_html($page['post_title']); ?>')" class="btn btn-danger">
-                       <i class="fa fa-trash-o fa-fw"></i> Delete</a>
+                       <i class="fa fa-trash-o fa-fw"></i> </a>
                        </td>
                        
                     </tr>
