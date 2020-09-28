@@ -41,7 +41,7 @@
          ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h4><i class="icon fa fa-check"></i> Success!</h4>
+                <h2><i class="icon fa fa-check"></i> Success!</h2>
            <?php 
               foreach ($status as $s) :
                 echo $s;
@@ -54,11 +54,11 @@
          
             <div class="box box-primary">
                <div class="box-header with-border">
-                <h3 class="box-title">
+                <h2 class="box-title">
               <?=(isset($menusTotal)) ? $menusTotal : 0; ?> 
                Menu<?=($menusTotal != 1) ? 's' : ''; ?>
                in Total  
-              </h3>
+              </h2>
                </div>
               <!-- /.box-header -->
               
@@ -109,11 +109,11 @@
                        </td>
                        <td>
                        <a href="index.php?load=menu&action=editMenu&menuId=<?= htmlspecialchars((int)$menu['ID']);?>" class="btn btn-warning">
-                       <i class="fa fa-pencil fa-fw"></i> Edit</a>
+                       <i class="fa fa-pencil fa-fw"></i> </a>
                        </td>
                        <td>
                        <a href="javascript:deleteMenu('<?= abs((int)$menu['ID']); ?>', '<?= $menu['menu_label']; ?>')" class="btn btn-danger" title="Deactivate menu">
-                       <i class="fa fa-trash-o fa-fw"></i> Delete</a>  
+                       <i class="fa fa-trash-o fa-fw"></i> </a>  
                        </td>
                     
                     </tr>
