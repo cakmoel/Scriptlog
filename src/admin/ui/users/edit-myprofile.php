@@ -32,9 +32,19 @@
               <ul class="list-group list-group-unbordered">
 
                 <li class="list-group-item">
+                 
+                  <?php 
+                    if (isset($userData['user_url']) && !empty($userData['user_url']) && $userData['user_url'] != '#') :
 
-                  <b><?=(!empty($userData['user_url'])) ? safe_html($userData['user_url']) : "Site Address(URL):"; ?></b>  <a class="pull-right" href="<?=($userData['user_url'] == '#') ? "#" : safe_html($userData['user_url']); ?>"></a>
+                      
+                  ?>
+                    <b> <?= safe_html($userData['user_url']); ?></b> 
+                    <a class="pull-right" href="<?=safe_html($userData['user_url']); ?>"><i class="fa fa-external-link"></i> </a>
                 
+                  <?php 
+                    endif;
+                  ?>
+                   
                 </li>
              
               </ul>
@@ -69,7 +79,7 @@
               <strong><i class="fa fa-calendar-check-o margin-r-5"></i> Registered</strong>
 
 <p>
-  <span class="label label-success"><?= read_datetime(safe_html($userData['user_registered'])); ?></span>
+<?= read_datetime(safe_html($userData['user_registered'])); ?>
 </p>
 
 
@@ -156,13 +166,13 @@ if ((isset($userData['user_login'])) && ($userData['user_login'] != '')) :
 </div>
 
 <div class="form-group">
-<label for="passwd">Password (required)</label>
+<label for="passwd">Password <?=(!empty($userData['user_email'])) ? "": "(required)"; ?></label>
 <input type="password" class="form-control" id="passwd" name="user_pass" placeholder="Enter password" maxlength="50" autocomplete="off">
 </div>
 
 <?php if(!empty($userData['user_email'])) :?>
 <div class="form-group">
-<label for="confirm_pwd">confirm Password (required)</label>
+<label for="confirm_pwd">confirm Password <?=(!empty($userData['user_email'])) ? "": "(required)"; ?></label>
 <input type="password" class="form-control" id="confirm_pwd" name="user_pass2" placeholder="Confirm password" maxlength="50" autocomplete="off">
 </div>
 <?php  endif; ?>
