@@ -10,7 +10,7 @@ switch ($action) {
 
     case ActionConst::INSTALLPLUGIN:
         
-        if (false === $authenticator -> userAccessControl('plugins')) {
+        if (false === $authenticator -> userAccessControl(ActionConst::PLUGINS)) {
 
             direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
