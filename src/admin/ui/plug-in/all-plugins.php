@@ -91,7 +91,7 @@
                        <td><?= html_entity_decode($plugin['plugin_desc']); ?></td>
                        <td><?= htmlspecialchars($plugin['plugin_level']); ?></td>
                        <td>
-                       <a href="index.php?load=plugins&action=editPlugin&pluginId=<?= htmlspecialchars((int)$plugin['ID']);?>" class="btn btn-warning">
+                       <a href="index.php?load=plugins&action=editPlugin&pluginId=<?= htmlspecialchars((int)$plugin['ID']);?>" class="btn btn-warning" title="Edit plugin">
                        <i class="fa fa-pencil fa-fw"></i> </a>
                        </td>
                        <td>
