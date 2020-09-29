@@ -85,11 +85,11 @@
                          <td><?= human_readable_datetime(read_datetime($comment['comment_date']), 'g:ia \o\n l jS F Y'); ?></td>
 
                          <td>
-                          <a href="<?= generate_request("index.php", 'get', ['comments', ActionConst::EDITCOMMENT, $comment['ID']])['link']; ?>" class="btn btn-warning">
+                          <a href="<?= generate_request("index.php", 'get', ['comments', ActionConst::EDITCOMMENT, $comment['ID']])['link']; ?>" class="btn btn-warning" title="Edit comment">
                            <i class="fa fa-pencil fa-fw"></i> </a>
                          </td>
                          <td>
-                          <a href="javascript:deleteComment('<?= abs((int)$comment['ID']); ?>', '<?= $comment['comment_author_name']; ?>')" class="btn btn-danger">
+                          <a href="javascript:deleteComment('<?= abs((int)$comment['ID']); ?>', '<?= $comment['comment_author_name']; ?>')" class="btn btn-danger" title="Delete comment">
                            <i class="fa fa-trash-o fa-fw"></i> </a>
                          </td>
 
