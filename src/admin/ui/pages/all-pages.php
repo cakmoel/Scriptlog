@@ -90,11 +90,11 @@
                        <td><?= htmlspecialchars(make_date($page['post_date'])); ?></td>
                        
                        <td>
-                       <a href="<?=generate_request('index.php', 'get', ['pages', 'editPage', $page['ID']])['link']; ?>" class="btn btn-warning">
+                       <a href="<?=generate_request('index.php', 'get', ['pages', 'editPage', $page['ID']])['link']; ?>" class="btn btn-warning" title="Edit page">
                        <i class="fa fa-pencil fa-fw"></i> </a>
                        </td>
                        <td>
-                       <a href="javascript:deletePage('<?= abs((int)$page['ID']); ?>', '<?= safe_html($page['post_title']); ?>')" class="btn btn-danger">
+                       <a href="javascript:deletePage('<?= abs((int)$page['ID']); ?>', '<?= safe_html($page['post_title']); ?>')" class="btn btn-danger" title="Delete page">
                        <i class="fa fa-trash-o fa-fw"></i> </a>
                        </td>
                        
