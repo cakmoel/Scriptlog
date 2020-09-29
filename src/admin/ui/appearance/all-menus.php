@@ -25,7 +25,7 @@
          ?>
          <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h4><i class="icon fa fa-ban"></i> Error!</h4>
+                <h2><i class="icon fa fa-ban"></i> Error!</h2>
            <?php 
               foreach ($errors as $e) :
                 echo $e;
@@ -108,7 +108,7 @@
                         <?php endif; ?>
                        </td>
                        <td>
-                       <a href="index.php?load=menu&action=editMenu&menuId=<?= htmlspecialchars((int)$menu['ID']);?>" class="btn btn-warning">
+                       <a href="index.php?load=menu&action=editMenu&menuId=<?= htmlspecialchars((int)$menu['ID']);?>" class="btn btn-warning" title="Edit menu">
                        <i class="fa fa-pencil fa-fw"></i> </a>
                        </td>
                        <td>
