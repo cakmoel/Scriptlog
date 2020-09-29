@@ -89,11 +89,11 @@
                        <td><?= safe_html(make_date($post['post_date'])); ?></td>
                       
                        <td>
-                       <a href="<?=generate_request("index.php", 'get', ['posts', 'editPost', $post['ID']])['link']; ?>" class="btn btn-warning">
+                       <a href="<?=generate_request("index.php", 'get', ['posts', 'editPost', $post['ID']])['link']; ?>" class="btn btn-warning" title="Edit post">
                        <i class="fa fa-pencil fa-fw"></i> </a>
                        </td>
                        <td>
-                       <a href="javascript:deletePost('<?= abs((int)$post['ID']); ?>', '<?= safe_html($post['post_title']); ?>')" class="btn btn-danger">
+                       <a href="javascript:deletePost('<?= abs((int)$post['ID']); ?>', '<?= safe_html($post['post_title']); ?>')" class="btn btn-danger" title="Delete post">
                        <i class="fa fa-trash-o fa-fw"></i> </a>
                        </td>
                     
