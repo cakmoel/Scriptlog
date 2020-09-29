@@ -91,7 +91,7 @@
                        <td><?= safe_html($theme['theme_designer']); ?></td>
                        <td><?= safe_html($theme['theme_directory']); ?></td>
                        <td>
-                       <a href="index.php?load=templates&action=editTheme&Id=<?= safe_html((int)$theme['ID']);?>" class="btn btn-warning">
+                       <a href="index.php?load=templates&action=editTheme&Id=<?= safe_html((int)$theme['ID']);?>" class="btn btn-warning" title="Edit theme">
                        <i class="fa fa-pencil fa-fw"></i> </a>
                        </td>
                        <td>
