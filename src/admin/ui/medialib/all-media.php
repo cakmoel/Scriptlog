@@ -85,17 +85,19 @@
               
                     <tr>
                        <td><?= $no; ?></td>
-                       <td><a href="<?=medialib_link($media['media_type'], $media['media_filename']);?>" title="<?= safe_html($media['media_caption']); ?>" ><?=invoke_fileicon($media['media_type']); ?></a></td>
+                       <td>
+                       <a href="<?=medialib_link($media['media_type'], $media['media_filename']);?>" title="<?= (!empty(safe_html($media['media_caption']))) ? safe_html($media['media_caption']) : "Filename"; ?>" ><?=invoke_fileicon($media['media_type']); ?></a>
+                       </td>
                        <td><?= safe_html($media['media_type']); ?></td>
                        <td><?= safe_html($media['media_target']); ?></td>
 
                        <td>
-                       <a href="<?=generate_request("index.php", 'get', ['medialib', 'editMedia', $media['ID']])['link']; ?>" class="btn btn-warning">
+                       <a href="<?=generate_request("index.php", 'get', ['medialib', 'editMedia', $media['ID']])['link']; ?>" class="btn btn-warning" title="Edit media">
                        <i class="fa fa-pencil fa-fw"></i> </a>
                        </td>
 
                        <td>
-                       <a href="javascript:deleteMedia('<?= abs((int)$media['ID']); ?>', '<?= $media['media_user']; ?>')" class="btn btn-danger">
+                       <a href="javascript:deleteMedia('<?= abs((int)$media['ID']); ?>', '<?= $media['media_user']; ?>')" class="btn btn-danger" title="Delete media">
                        <i class="fa fa-trash-o fa-fw"></i> </a>
                        </td>
 
