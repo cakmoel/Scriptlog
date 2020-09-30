@@ -105,7 +105,6 @@ function admin_footer($stylePath, $ubench = null)
 <script src="<?= $stylePath; ?>/assets/dist/js/mandatory-plugin-upload.js"></script>
 <script src="<?= $stylePath; ?>/assets/dist/js/mandatory-theme-upload.js"></script>
 <script src="<?= $stylePath; ?>/assets/dist/js/imagevalidation.js"></script>
-<script src="<?= $stylePath; ?>/assets/dist/js/toggle-field.js"></script>
 <script src="<?= $stylePath; ?>/wysiwyg/summernote/summernote.min.js"></script>
 <script type="text/javascript" src="<?= $stylePath; ?>/assets/dist/js/jquery.uploadPreview.min.js"></script>
 <script>
