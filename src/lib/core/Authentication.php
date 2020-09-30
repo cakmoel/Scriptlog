@@ -163,7 +163,7 @@ class Authentication
 
   if (isset($_COOKIE['scriptlog_auth'])) {
 
-    return $_COOKIE['scriptlog_auth'];
+     return $_COOKIE['scriptlog_auth'];
  
   }
 
@@ -249,7 +249,7 @@ class Authentication
 
           $tokenizer = new Tokenizer();
           
-          set_cookies_scl('scriptlog_auth', $account_login, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+          set_cookies_scl('scriptlog_auth', $account_level, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
           
           $random_password = $tokenizer -> createToken(64);
           set_cookies_scl('scriptlog_validator', $random_password, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
