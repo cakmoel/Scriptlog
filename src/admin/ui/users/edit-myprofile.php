@@ -39,7 +39,7 @@
                       
                   ?>
                     <b> <?= safe_html($userData['user_url']); ?></b> 
-                    <a class="pull-right" href="<?=safe_html($userData['user_url']); ?>"><i class="fa fa-external-link"></i> </a>
+                    <a class="pull-right" href="<?=safe_html($userData['user_url']); ?>" target="_blank" rel="noopener noreferrer" title="site_address"><i class="fa fa-external-link"></i> </a>
                 
                   <?php 
                     endif;
