@@ -81,7 +81,7 @@ function admin_footer($stylePath, $ubench = null)
     </div>
     
     <strong>Thank you for creating with 
-    <a href="https://scriptlog.my.id" targer="_blank" title="Personal Blogware Platform">Scriptlog</a>
+    <a href="https://scriptlog.my.id" target="_blank" rel="noopener noreferrer" title="Personal Blogware Platform">Scriptlog</a>
      <?php echo APP_VERSION; ?></strong>
      <strong><?=((true === APP_DEVELOPMENT) && (isset($ubench))) ? " Page generated in: ". $ubench->getTime() . " Memory usage: ".$ubench->getMemoryUsage() : "" ?></strong>
 </footer>
