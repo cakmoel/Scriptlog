@@ -134,6 +134,13 @@ if ((isset($_COOKIE[session_name()])) || (self::isSessionStarted() === false)) {
 
    }
 
+   if (!isset($_SESSION['SERVER_GENERATED_SID'])) {
+      session_regenerate_id(true);
+      @session_start();
+      header('X-Session-Reinit: true');
+      $_SESSION['SERVER_GENERATED_SID'] = $_SERVER['REMOTE_ADDR'] . $_SERVER['QUERY_STRING'];
+   }
+
 }
 
 return false;
@@ -340,7 +347,7 @@ protected function decrypt($data, $key)
 private static function isSessionStarted()
 {
 
-   if(php_sapi_name() !== 'cli') {
+   if(!headers_sent() && php_sapi_name() !== 'cli') {
 
       if(version_compare(phpversion(), '5.6.0', '>=')) {
   
@@ -351,9 +358,9 @@ private static function isSessionStarted()
          return session_id() === '' ? false : true;
   
       }
-  
+
    }
-  
+
    return false;
 
 }

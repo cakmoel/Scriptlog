@@ -18,14 +18,14 @@ class Wall extends Dashboard
  * @method listItems()
  * 
  */
- public function listItems()
+ public function listItems($authenticator, $user_login)
  {
   
   $non_admin = null;
   
   $administrator = null;
 
-  if(true === is_non_administrator()) {
+  if(is_non_administrator() === true) {
 
     if (isset(Session::getInstance()->scriptlog_session_fullname)) {
 
@@ -33,9 +33,9 @@ class Wall extends Dashboard
 
     }
 
-    if (isset($_COOKIE['scriptlog_auth'])) {
+    if (isset($_COOKIE['scriptlog_auth']) && $_COOKIE['scriptlog_auth'] == user_info($authenticator, $user_login)['user_level']) {
 
-       $non_admin = $_COOKIE['scriptlog_auth'];
+       $non_admin = user_info($authenticator, $user_login)['user_login'];
 
     }
 
