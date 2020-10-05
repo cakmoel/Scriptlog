@@ -134,13 +134,7 @@ if ((isset($_COOKIE[session_name()])) || (self::isSessionStarted() === false)) {
 
    }
 
-   if (!isset($_SESSION['SERVER_GENERATED_SID'])) {
-      session_regenerate_id(true);
-      @session_start();
-      header('X-Session-Reinit: true');
-      $_SESSION['SERVER_GENERATED_SID'] = $_SERVER['REMOTE_ADDR'] . $_SERVER['QUERY_STRING'];
-   }
-
+   
 }
 
 return false;
@@ -181,7 +175,7 @@ public function forget()
  */
 public function refresh()
 {
-   return session_regenerate_id(true);
+  return session_regenerate_id(true);
 }
 
 /**
@@ -193,8 +187,11 @@ public function refresh()
  */
 public function read($id)
 {
-  $data = parent::read($id);
-  return empty($data) ? '' : $this->decrypt($data, $this->key);
+  
+ $data = parent::read($id);
+
+ return empty($data) ? '' : $this->decrypt($data, $this->key);
+
 }
 
 /**
@@ -245,7 +242,7 @@ public function isGenuine()
  
  $agent = getenv('HTTP_USER_AGENT', true) ?: getenv('HTTP_USER_AGENT');
 
- $ip = getenv('REMOTE_ADDR', true) ? zend_ip_address() : getenv('REMOTE_ADDR');
+ $ip = getenv('REMOTE_ADDR', true) ? get_ip_address() : getenv('REMOTE_ADDR');
 
  $hash = md5( $agent . (ip2long($ip) & ip2long('255.255.0.0')));
 
@@ -266,6 +263,7 @@ public function isGenuine()
  *
  * @param integer $ttl
  * @return boolean
+ * 
  */
 public function isValid($ttl = 60)
 {
@@ -283,29 +281,7 @@ public function isValid($ttl = 60)
 protected function encrypt($data, $key)
 {
 
-$iv = null;
-
-if (function_exists('random_bytes')) {
-
-   $iv = random_bytes(16);
-
-} elseif (function_exists('openssl_random_pseudo_bytes')) {
-
-   $iv = openssl_random_pseudo_bytes(16);
-
-} else {
-
-   $iv = ircmaxell_random_generator(16);
-
-}
-
-// encryption
-$ciphertext = openssl_encrypt($data, 'AES-256-CBC', mb_substr($key, 0, 32, '8bit'), OPENSSL_RAW_DATA, $iv);
-
-// authentication
-$hmac = hash_hmac('SHA256', $iv.$ciphertext, mb_substr($key, 32, null, '8bit'), true);
-
-return $hmac . $iv . $ciphertext;
+return ScriptlogCrypto::encryptAES($data, $key);
 
 }
 
@@ -320,21 +296,7 @@ return $hmac . $iv . $ciphertext;
 protected function decrypt($data, $key)
 {
 
- $hmac       = mb_substr($data, 0, 32, '8bit');
- $iv         = mb_substr($data, 32, 16, '8bit');
- $ciphertext = mb_substr($data, 48, null, '8bit');
-
- // authentication
- $hmac_new = hash_hmac('SHA256', $iv.$ciphertext, mb_substr($key, 32, null, '8bit'), true);
-
- if (! hash_equals($hmac, $hmac_new)) {
-
-     throw new SessionMakerException('Authentication of cryptography failed');
-
- }
-
- // Decrypt
- return openssl_decrypt($ciphertext, 'AES-256-CBC', mb_substr($key, 0, 32, '8bit'), OPENSSL_RAW_DATA, $iv);
+return ScriptlogCrypto::decryptAES($data, $key);
 
 }
 
