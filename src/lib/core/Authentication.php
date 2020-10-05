@@ -99,11 +99,24 @@ class Authentication
     $this->validator = $validator;
   
   }
-  
+ 
   /**
-   * Find User by Email
+   * findUserById
+   *
+   * @param integer|num $id
+   * @return array
+   * 
+   */
+  public function findUserById($id)
+  {
+    return $this->userDao->getUserById($id);
+  }
+
+  /**
+   * findUserByEmail
+   * 
    * @param string $email
-   * @return 
+   * @return array
    * 
    */
   public function findUserByEmail($email)
@@ -161,20 +174,28 @@ class Authentication
  public function accessLevel()
  {
 
+  $key = scriptlog_cipher_key();
+
+  $user_login = (isset($_COOKIE['scriptlog_auth'])) ? scriptlog_decipher($_COOKIE['scriptlog_auth'], $key) : $this->getSessionInstance()->scriptlog_session_login;
+
+  if (!$getUser = $this->findUserByLogin($user_login)) {
+
+      return false;
+
+  }
+
   if (isset($_COOKIE['scriptlog_auth'])) {
 
-     return $_COOKIE['scriptlog_auth'];
- 
+     return $getUser['user_level'];
+
   }
 
   if (isset($this->getSessionInstance()->scriptlog_session_level)) {
 
     return $this->getSessionInstance()->scriptlog_session_level;
-       
+    
   }
-   
-  return false;
-
+  
  }
  
 /**
@@ -248,8 +269,11 @@ class Authentication
       if ($remember_me == true) {
 
           $tokenizer = new Tokenizer();
+      
+          $key = scriptlog_cipher_key();
+          $encrypt_auth = scriptlog_cipher($account_login, $key);
           
-          set_cookies_scl('scriptlog_auth', $account_level, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+          set_cookies_scl('scriptlog_auth', $encrypt_auth, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true); 
           
           $random_password = $tokenizer -> createToken(64);
           set_cookies_scl('scriptlog_validator', $random_password, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
@@ -393,10 +417,14 @@ public function removeCookies()
   if ((isset($_COOKIE['scriptlog_auth'])) && (isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector'])) ) {
 
      unset($_COOKIE['scriptlog_auth']);
+     unset($_COOKIE['scriptlog_accid']);
+     unset($_COOKIE['scriptlog_uid']);
      unset($_COOKIE['scriptlog_validator']);
      unset($_COOKIE['scriptlog_selector']);
 
      set_cookies_scl('scriptlog_auth', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
+     set_cookies_scl('scriptlog_accid', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
+     set_cookies_scl('scriptlog_uid', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
      set_cookies_scl('scriptlog_validator', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);  
      set_cookies_scl('scriptlog_selector', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
     
@@ -416,10 +444,14 @@ public function clearAuthCookies($user_login)
   if ((isset($_COOKIE['scriptlog_auth'])) && (isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector']))) {
      
     unset($_COOKIE['scriptlog_auth']);
+    unset($_COOKIE['scriptlog_accid']);
+    unset($_COOKIE['scriptlog_uid']);
     unset($_COOKIE['scriptlog_validator']);
     unset($_COOKIE['scriptlog_selector']);
 
     set_cookies_scl('scriptlog_auth', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
+    set_cookies_scl('scriptlog_accid', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
+    set_cookies_scl('scriptlog_uid', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
     set_cookies_scl('scriptlog_validator', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);  
     set_cookies_scl('scriptlog_selector', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
    
@@ -463,7 +495,7 @@ public function userAccessControl($control = null)
 
         case ActionConst::USERS:
             
-            if($this->accessLevel() != 'administrator') {
+            if($this->accessLevel() !== 'administrator') {
 
                 return false;
             }
@@ -472,7 +504,7 @@ public function userAccessControl($control = null)
 
         case ActionConst::PLUGINS:
            
-            if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager')) {
+            if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
 
                 return false;
 
@@ -482,7 +514,7 @@ public function userAccessControl($control = null)
 
         case ActionConst::THEMES:
 
-           if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager')) {
+           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
 
                return false;
 
@@ -492,7 +524,7 @@ public function userAccessControl($control = null)
 
         case ActionConst::CONFIGURATION:
       
-           if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager')) {
+           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
 
              return false;
 
@@ -502,7 +534,8 @@ public function userAccessControl($control = null)
 
         case ActionConst::MEDIALIB:
 
-           if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager') && ($this->accessLevel() != 'editor') && ($this->accessLevel() != 'author')) {
+           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
+               && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author')) {
 
               return false;
 
@@ -512,7 +545,7 @@ public function userAccessControl($control = null)
 
         case ActionConst::TOPICS:
 
-           if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager') && ($this->accessLevel() != 'editor')) {
+           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') && ($this->accessLevel() !== 'editor')) {
 
               return false;
 
@@ -522,7 +555,7 @@ public function userAccessControl($control = null)
           
         case ActionConst::PAGES:
 
-           if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager')) {
+           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
 
               return false;
 
@@ -532,7 +565,7 @@ public function userAccessControl($control = null)
   
         case ActionConst::COMMENTS:
           
-           if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'author') && ($this->accessLevel() != 'contributor')) {
+           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'author') && ($this->accessLevel() !== 'contributor')) {
 
               return false;
 
@@ -542,7 +575,7 @@ public function userAccessControl($control = null)
 
         case ActionConst::REPLY:
 
-           if (($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'editor') && ($this->accessLevel() != 'author')) {
+           if (($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author')) {
 
              return false;
 
@@ -552,7 +585,7 @@ public function userAccessControl($control = null)
 
         case ActionConst::NAVIGATION:
 
-            if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager')) {
+            if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
 
                return false;
 
@@ -562,8 +595,8 @@ public function userAccessControl($control = null)
 
         default:
           
-            if(($this->accessLevel() != 'administrator') && ($this->accessLevel() != 'manager') && ($this->accessLevel() != 'editor') 
-               && ($this->accessLevel() != 'author') && ($this->accessLevel() != 'contributor')) {
+            if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
+               && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author') && ($this->accessLevel() !== 'contributor')) {
 
               return false;
             
@@ -586,25 +619,26 @@ public function userAccessControl($control = null)
 private function getUserAuthSession()
 {
   
- $ip_address = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : zend_ip_address();
+ $ip_address = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : get_ip_address();
  $user_agent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : '';
  $accept_charset = (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) ? $_SERVER['HTTP_ACCEPT_CHARSET'] : '';
  $accept_encoding = (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
  $accept_language = (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
  
- if(Session::getInstance()->scriptlog_session_ip !== $ip_address 
-    || Session::getInstance()->scriptlog_session_agent !== sha1($accept_charset.$accept_encoding.$accept_language.$user_agent)) {
+ if($this->getSessionInstance()->scriptlog_session_ip !== $ip_address 
+    || $this->getSessionInstance()->scriptlog_session_agent !== sha1($accept_charset.$accept_encoding.$accept_language.$user_agent)) {
 
       session_unset();
       session_destroy();
       session_regenerate_id(true);
       
-      Session::getInstance()->scriptlog_session_agent = $user_agent;
-      Session::getInstance()->scriptlog_session_ip = $ip_address;
+      $this->getSessionInstance()->scriptlog_session_agent = $user_agent;
+      $this->getSessionInstance()->scriptlog_session_ip = $ip_address;
         
   }
 
 }
+
 
 /**
  * getSessionInstance
