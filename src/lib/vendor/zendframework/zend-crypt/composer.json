@@ -1,0 +1,64 @@
+{
+    "name": "zendframework/zend-crypt",
+    "description": "Strong cryptography tools and password hashing",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "zf",
+        "zendframework",
+        "crypt"
+    ],
+    "support": {
+        "docs": "https://docs.zendframework.com/zend-crypt/",
+        "issues": "https://github.com/zendframework/zend-crypt/issues",
+        "source": "https://github.com/zendframework/zend-crypt",
+        "rss": "https://github.com/zendframework/zend-crypt/releases.atom",
+        "chat": "https://zendframework-slack.herokuapp.com",
+        "forum": "https://discourse.zendframework.com/c/questions/components"
+    },
+    "require": {
+        "php": "^5.6 || ^7.0",
+        "ext-mbstring": "*",
+        "container-interop/container-interop": "^1.2",
+        "zendframework/zend-math": "^3.0",
+        "zendframework/zend-stdlib": "^2.7.7 || ^3.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.7.27 || ^6.5.8 || ^7.1.2",
+        "zendframework/zend-coding-standard": "~1.0.0"
+    },
+    "suggest": {
+        "ext-openssl": "Required for most features of Zend\\Crypt"
+    },
+    "autoload": {
+        "psr-4": {
+            "Zend\\Crypt\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "files": [
+            "test/_autoload.php"
+        ],
+        "psr-4": {
+            "ZendTest\\Crypt\\": "test/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.3.x-dev",
+            "dev-develop": "3.4.x-dev"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
+    }
+}
