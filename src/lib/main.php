@@ -23,13 +23,32 @@ ini_set('session.save_handler', 'files');
 ini_set('session.gc_divisor', 100);
 ini_set('session.gc_maxlifetime', 1440);
 ini_set('session.gc_probability',1);
-#header("Content-Security-Policy: default-src https:; font-src 'unsafe-inline' data: https:; form-action 'self' https://yourdomain.com;img-src data: https:; child-src https:; object-src 'self' www.google-analytics.com ajax.googleapis.com platform-api.sharethis.com yourusername.disqus.com; script-src 'unsafe-inline' https:; style-src 'unsafe-inline' https:;");
-#header('X-Frame-Options: DENY);
+
 #date_default_timezone_set("GMT");
 
 require __DIR__ . '/common.php';
 
-if (!defined('PHP_EOL')) define('PHP_EOL', strtoupper(substr(PHP_OS, 0, 3) == 'WIN') ? "\r\n" : "\n");
+if (!defined('PHP_EOL')) {
+
+  if (strtoupper(substr(PHP_OS,0,3) == 'WIN')) {
+        
+    define('PHP_EOL',"\r\n");
+
+  } elseif (strtoupper(substr(PHP_OS,0,3) == 'MAC')) {
+        
+    define('PHP_EOL',"\r");
+    
+  } elseif (strtoupper(substr(PHP_OS,0,3) == 'DAR')) {
+        
+    define('PHP_EOL',"\n");
+      
+  } else {
+        
+    define('PHP_EOL',"\n");
+      
+  }
+
+} 
 
 $is_secure = false;
 
@@ -150,7 +169,7 @@ call_htmlpurifier();
     'page' => "/page/(?'page'[^/]+)
      
     ### '/post/60/post-slug'
-    'post' => "/post/(?'id'\d+)/(?'post'[\w\-]+)",     
+    'single' => "/post/(?'id'\d+)/(?'post'[\w\-]+)",     
     
      ### '/'
     'home' => "/"                                        
@@ -174,29 +193,36 @@ $rules = array(
 #====== an instantiation of Database connection =========
 $dbc = DbFactory::connect(['mysql:host='.$config['db']['host'].';dbname='.$config['db']['name'], $config['db']['user'], $config['db']['pass']]);
 
-// Register rules and an instance of database connection
+// Register rules of routes and an instance of database connection
 Registry::setAll(array('dbc' => $dbc, 'route' => $rules));
 
 /* an instances of class that necessary for the system
  * please do not change this below variable 
  * 
  * @var $searchPost invoked by search functionality
- * @var $frontPaginator called by front pagination funtionality
  * @var $sanitizer adapted by sanitize functionality
  * @var $userDao, $validator, $authenticator, $ubench --
  * these are collection of objects or instances of classes 
  * that will be run by the system.
  * 
  */
+$key = scriptlog_cipher_key();
 $searchPost = new SearchFinder($dbc);
-$frontPaginator = new Paginator(10, 'p');
 $sanitizer = new Sanitize();
 $userDao = new UserDao();
 $userToken = new UserTokenDao();
+$postDao = new PostDao();
+$topicDao = new TopicDao();
+$postTopicDao = new PostTopicDao();
+$pageDao = new PageDao();
+$menuDao = new MenuDao();
+$frontDispatcher = new Dispatcher();
 $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);
 $ubench = new Ubench();
 $sessionMaker = new SessionMaker(set_session_cookies_key());
+
+content_security_policy();
 
 session_set_save_handler($sessionMaker, true);
 session_save_path(__DIR__ . '/utility/.sessions'.DS);
