@@ -1,16 +1,16 @@
 <?php
 /**
  * File authorizer.php
- * checking whether session or cookies exists or not
+ * checking whether session or cookies exists
  * 
  * @category checking whether cookies or session exists or not
  * @author   Vincy vincy@gmail.com
- * @see     https://phppot.com/php/secure-remember-me-for-login-using-php-session-and-cookies/
- * @see     https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string
- * @see     https://paragonie.com/blog/2015/04/secure-authentication-php-with-long-term-persistence
+ * @see https://phppot.com/php/secure-remember-me-for-login-using-php-session-and-cookies/
+ * @see https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string
+ * @see https://paragonie.com/blog/2015/04/secure-authentication-php-with-long-term-persistence
+ * @see https://en.wikibooks.org/wiki/PHP_Programming/Sessions#Avoiding_Session_Fixation
  */
-
-$timeout = 60 * 30;
+$timeout = Authentication::COOKIE_EXPIRE;
 $current_date = date("Y-m-d H:i:s", time()); 
 $fingerprint  = hash_hmac('sha256', $_SERVER['HTTP_USER_AGENT'], hash('sha256', $ip, true));
 $loggedIn = false;
@@ -26,14 +26,17 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
 
     $loggedIn = true;
 
-} elseif ((!empty($_COOKIE['scriptlog_cookie_login'])) && (!empty($_COOKIE['scriptlog_validator'])) && (!empty($_COOKIE['scriptlog_selector']))) {  
+} elseif ((!empty($_COOKIE['scriptlog_auth'])) && (!empty($_COOKIE['scriptlog_validator'])) && (!empty($_COOKIE['scriptlog_selector']))) {  
 
     $validator_verified = false;
-    $selector_verified = false;
-    $expired_verified = false;
-    
+    $selector_verified  = false;
+    $expired_verified   = false;
+ 
     // retrieve user token info
-    $token_info = $authenticator -> findTokenByLogin($_COOKIE['scriptlog_cookie_login'], 0);
+  
+    $decrypt_auth = scriptlog_decipher($_COOKIE['scriptlog_auth'], $key);
+
+    $token_info = $authenticator -> findTokenByLogin($decrypt_auth, 0);
 
     $expected_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
     $correct_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
@@ -96,7 +99,7 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
 
     /** 
      * Redirect if all cookies based validation return true
-     * Else, mark the token as expired and clear cookies
+     * else mark the token as expired and clear cookies
      */
 
     if ((!empty($token_info['ID'])) && $validator_verified && $selector_verified && $expired_verified ) {
@@ -107,7 +110,7 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
 
          if (!empty($token_info['ID'])) {
 
-             $userToken -> updateTokenExpired($token_info['ID']);
+            $authenticator -> markCookieAsExpired($token_info['ID']);
 
          }
 
