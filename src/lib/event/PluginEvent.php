@@ -59,7 +59,13 @@ class PluginEvent
    * @var string
    */
   private $sort;
-  
+
+  /**
+   * pluginDao
+   *
+   * @var object
+   * 
+   */
   private $pluginDao;
 
   private $validator;
@@ -88,7 +94,7 @@ class PluginEvent
 
   public function setPluginName($name)
   {
-    $this->name = $name;
+    $this->name = prevent_injection($name);
   }
 
   public function setPluginLink($link)
@@ -98,7 +104,7 @@ class PluginEvent
 
   public function setPluginDescription($description)
   {
-    $this->description = $description;
+    $this->description = prevent_injection($description);
   }
 
   public function setPluginStatus($status)
@@ -170,7 +176,7 @@ class PluginEvent
       direct_page('index.php?load=plugins&error=pluginNotFound', 404);
     }
 
-    $sql_path = '../library/plugins/'.$data_plugin['plugin_name'].'sql';
+    $sql_path = __DIR__ . '/../'.APP_LIBRARY.DS.'plugins'.DS.basename($data_plugin['plugin_name'].'sql');
 
     if(file_exists($sql_path)) {
 
