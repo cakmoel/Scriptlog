@@ -11,6 +11,7 @@
  */
 class PluginApp extends BaseApp
 {
+
   private $view;
 
   private $pluginEvent;
@@ -22,6 +23,7 @@ class PluginApp extends BaseApp
 
   public function listItems()
   {
+
     $errors = array();
     $status = array();
     $checkError = true;
@@ -67,15 +69,19 @@ class PluginApp extends BaseApp
 
   public function insert()
   {
+
     $errors = array();
     $checkError = true;
 
     if (isset($_POST['pluginFormSubmit'])) {
 
-      $plugin_name = trim($_POST['plugin_name']);
-      $plugin_link = (isset($_POST['plugin_link']) ? filter_var($_POST['plugin_link'], FILTER_SANITIZE_URL) : "");
-      $plugin_desc = prevent_injection($_POST['description']);
-      $plugin_level = $_POST['plugin_level'];
+      $filters = [
+      'plugin_name' => FILTER_SANITIZE_STRING, 
+      'plugin_link' => FILTER_SANITIZE_URL,
+      'description' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 
+      'plugin_level' => FILTER_SANITIZE_STRING];
+
+      $form_fields = ['plugin_name' => 150, 'plugin_link' => 255, 'description' => 500];
 
       try {
 
@@ -86,31 +92,40 @@ class PluginApp extends BaseApp
           
         }
 
-        if (empty($plugin_name) || empty($plugin_desc)) {
-           $checkError = false;
-           array_push($errors, "All columns required must be filled.");
+        if (check_form_request($_POST, ['plugin_name, plugin_link, description, plugin_level']) == false) {
+          
+           header($_SERVER["SERVER_PROTOCOL"].' 413 Payload Too Large');
+           header('Status: 413 Payload Too Large');
+           header('Retry-After: 3600');
+           throw new AppException("Sorry, Unpleasant attempt detected");
+
         }
 
-        if($this->pluginEvent->isPluginExists($plugin_name) === true) {
+        if (empty($_POST['plugin_name']) || empty($_POST['description'])) {
+           $checkError = false;
+           array_push($errors, "Please enter a required field.");
+        }
+
+        if ($this->pluginEvent->isPluginExists($_POST['plugin_name']) === true) {
           $checkError = false;
           array_push($errors, "Sorry you have installed this plugin before.");
         }
 
-        if($plugin_link != '') {
+        if (!empty($_POST['plugin_link'])) {
 
-          $parseOutQuery = parse_query($plugin_link);
+          $parseOutQuery = parse_query($_POST['plugin_link']);
 
-           if(!filter_var($plugin_link, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED)) {
+           if(!filter_var($_POST['plugin_link'], FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED)) {
              
              $checkError = false;
              array_push($errors, "Invalid plugin link.");
 
-           } elseif($plugin_link !== unparse_url(parse_url($plugin_link))) {
+           } elseif($_POST['plugin_link'] !== unparse_url(parse_url($_POST['plugin_link']))) {
              
              $checkError = false;
              array_push($errors, "Not match!.");
 
-           } elseif($parseOutQuery['load'] !== $plugin_name) {
+           } elseif($parseOutQuery['load'] !== $_POST['plugin_name']) {
 
              $checkError = false;
              array_push($errors, "Invalid query string. Query string must be same with Plugin name");
@@ -119,11 +134,25 @@ class PluginApp extends BaseApp
 
         }
 
+        if (true === form_size_validation($form_fields)) {
+
+           $checkError = false;
+           array_push($errors, "Form data is longer thant allowed");
+
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['plugin_level'], ['public' => 'Public', 'private' => 'Private'])) {
+
+           $checkError = false;
+           array_push($errors, "Please choose the available value provided");
+
+        }
+        
         if (!$checkError) {
 
           $this->setView('edit-plugin');
           $this->setPageTitle('Add New Plugin');
-          $this->setFormAction('newPlugin');
+          $this->setFormAction(ActionConst::NEWPLUGIN);
           $this->view->set('pageTitle', $this->getPageTitle());
           $this->view->set('formAction', $this->getFormAction());
           $this->view->set('errors', $errors);
@@ -132,10 +161,11 @@ class PluginApp extends BaseApp
 
         } else {
 
-           $this->pluginEvent->setPluginName($plugin_name);
-           $this->pluginEvent->setPluginLink($plugin_link);
-           $this->pluginEvent->setPluginDescription($plugin_desc);
-           $this->pluginEvent->setPluginLevel($plugin_level);
+           $this->pluginEvent->setPluginName(distill_post_request($filters)['plugin_name']);
+           $this->pluginEvent->setPluginLink(distill_post_request($filters)['plugin_link']);
+           $this->pluginEvent->setPluginDescription(distill_post_request($filters)['description']);
+           $this->pluginEvent->setPluginLevel(distill_post_request($filters)['plugin_level']);
+           
            $this->pluginEvent->addPlugin();
            direct_page('index.php?load=plugins&status=pluginAdded', 200);
 
@@ -153,7 +183,7 @@ class PluginApp extends BaseApp
        
        $this->setView('edit-plugin');
        $this->setPageTitle('Add New Plugin');
-       $this->setFormAction('newPlugin');
+       $this->setFormAction(ActionConst::NEWPLUGIN);
        $this->view->set('pageTitle', $this->getPageTitle());
        $this->view->set('formAction', $this->getFormAction());
        $this->view->set('pluginLevel', $this->pluginEvent->pluginLevelDropDown());
@@ -368,6 +398,18 @@ class PluginApp extends BaseApp
       $plugin_sort = (int)$_POST['plugin_sort'];
       $plugin_id = abs((int)$_POST['plugin_id']);
 
+      $filters = [
+        'plugin_name' => FILTER_SANITIZE_STRING,
+        'plugin_link' => FILTER_SANITIZE_URL,
+        'description' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'plugin_status' => FILTER_SANITIZE_STRING,
+        'plugin_level' => FILTER_SANITIZE_STRING,
+        'plugin_sort' => FILTER_SANITIZE_NUMBER_INT,
+        'plugin_id' => FILTER_SANITIZE_NUMBER_INT
+      ];
+
+      $form_fields = ['plugin_name' => 150, 'plugin_link' => 255, 'description' => 500];
+
       try {
 
         if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
@@ -377,26 +419,26 @@ class PluginApp extends BaseApp
           
         }
 
-        if (empty($plugin_name) || empty($plugin_desc)) {
+        if (empty($_POST['plugin_name']) || empty($_POST['description'])) {
           $checkError = false;
           array_push($errors, "All columns required must be filled");
         }
 
-        if($plugin_link != '') {
+        if (!empty($_POST['plugin_link'])) {
 
-          $parseOutQuery = parse_query($plugin_link);
+          $parseOutQuery = parse_query($_POST['plugin_link']);
 
-           if(!filter_var($plugin_link, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED)) {
+           if(!filter_var($_POST['plugin_link'], FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED)) {
              
              $checkError = false;
-             array_push($errors, "Invalid plugin link");
+             array_push($errors, "Invalid plugin link.");
 
-           } elseif($plugin_link !== unparse_url(parse_url($plugin_link))) {
+           } elseif($_POST['plugin_link'] !== unparse_url(parse_url($_POST['plugin_link']))) {
              
              $checkError = false;
-             array_push($errors, "Not match!");
+             array_push($errors, "Not match!.");
 
-           } elseif($parseOutQuery['load'] !== $plugin_name) {
+           } elseif($parseOutQuery['load'] !== $_POST['plugin_name']) {
 
              $checkError = false;
              array_push($errors, "Invalid query string. Query string must be same with Plugin name");
@@ -404,7 +446,21 @@ class PluginApp extends BaseApp
            }
 
         }
-        
+
+        if (true === form_size_validation($form_fields)) {
+
+          $checkError = false;
+          array_push($errors, "Form data is longer thant allowed");
+
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['plugin_level'], ['public' => 'Public', 'private' => 'Private'])) {
+
+          $checkError = false;
+          array_push($errors, "Please choose the available value provided");
+
+        }
+ 
         if(!$checkError) {
 
           $this->setView('edit-plugin');
@@ -419,13 +475,14 @@ class PluginApp extends BaseApp
 
         } else {
 
-          $this->pluginEvent->setPluginId($plugin_id);
-          $this->pluginEvent->setPluginName($plugin_name);
-          $this->pluginEvent->setPluginLink($plugin_link);
-          $this->pluginEvent->setPluginDescription($plugin_desc);
-          $this->pluginEvent->setPluginStatus($plugin_status);
-          $this->pluginEvent->setPluginLevel($plugin_level);
-          $this->pluginEvent->setPluginSort($plugin_sort);
+          $this->pluginEvent->setPluginId(distill_post_request($filters)['plugin_id']);
+          $this->pluginEvent->setPluginName(distill_post_request($filters)['plugin_name']);
+          $this->pluginEvent->setPluginLink(distill_post_request($filters)['plugin_link']);
+          $this->pluginEvent->setPluginDescription(distill_post_request($filters)['description']);
+          $this->pluginEvent->setPluginStatus(distill_post_request($filters)['plugin_status']);
+          $this->pluginEvent->setPluginLevel(distill_post_request($filters)['plugin_level']);
+          $this->pluginEvent->setPluginSort(distill_post_request($filters)['plugin_sort']);
+          
           $this->pluginEvent->modifyPlugin();
           direct_page('index.php?load=plugins&status=pluginUpdated', 200);
           
