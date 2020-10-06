@@ -1,11 +1,14 @@
-<?php 
+<?php
+
 /**
  * sanitize.class.php
  * Sanitizing  input and output
  * 
  * @category   Core Class
  * @author     Khairu a.k.a wenkhairu
- * @copyright  wenkhairu
+ * @author     M.Noermoehammad
+ * @copyright  wenkhairu|M.Noermoehammad
+ * @license    MIT
  *
  */
 class Sanitize 
@@ -36,7 +39,7 @@ class Sanitize
 				$str = stripcslashes($str);
 				$str = htmlspecialchars($str);
 				$str = preg_replace('/[\W]/','', $str);
-				$str = remove_xss($str);
+				$str = prevent_injection($str);
 				return $str;
 				break;
 		}
@@ -57,10 +60,10 @@ class Sanitize
    return purify_dirty_html($str);
  }
 
- private static function extension($path)
+ public static function checkFileBase($path)
  {
-	 $file = pathinfo($path);
-	 if(file_exists($file['dirname'].'/'.$file['basename'])){
+	 $file = pathinfo($path, PATHINFO_BASENAME);
+	 if(file_exists($file['dirname'].DIRECTORY_SEPARATOR.$file['basename'])){
 		 return $file['basename'];
 	 }
 
