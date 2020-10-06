@@ -2,7 +2,7 @@
 /**
  * Class PostApp
  *
- * @category  Class PostApp
+ * @category  Class PostApp extends BaseApp
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
@@ -140,7 +140,7 @@ class PostApp extends BaseApp
              
          } 
         
-         if( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'comment_status']) == false) {
+         if ( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'comment_status']) == false) {
 
             header($_SERVER["SERVER_PROTOCOL"].' 413 Payload Too Large');
             header('Status: 413 Payload Too Large');
@@ -156,10 +156,24 @@ class PostApp extends BaseApp
             
          }
 
-         if(true === form_size_validation($form_fields)) {
+         if (true === form_size_validation($form_fields)) {
 
             $checkError = false;
             array_push($errors, "Form data is longer than allowed");
+
+         }
+
+         if (false === sanitize_selection_box(distill_post_request($filters)['post_status'], ['publish' => 'Publish', 'draft' => 'Draft'])) {
+
+            $checkError = false;
+            array_push($errors, "Please choose the available value provided");
+
+         }
+
+         if (false === sanitize_selection_box(distill_post_request($filters)['comment_status'], ['open' => 'Open', 'closed' => 'Closed'])) {
+
+            $checkError = false;
+            array_push($errors, "Please choose the available value provided");
 
          }
          
@@ -416,10 +430,11 @@ class PostApp extends BaseApp
   }
   
   /**
-   * Update post
+   * update
    * 
    * {@inheritDoc}
    * @see BaseApp::update()
+   * @param int|num $id
    * 
    */
   public function update($id)
@@ -499,6 +514,20 @@ class PostApp extends BaseApp
               $checkError = false;
               array_push($errors, "Form data is longer than allowed");
   
+            }
+
+            if (false === sanitize_selection_box(distill_post_request($filters)['post_status'], ['publish' => 'Publish', 'draft' => 'Draft'])) {
+
+              $checkError = false;
+              array_push($errors, "Please choose the available value provided");
+  
+            }
+  
+            if (false === sanitize_selection_box(distill_post_request($filters)['comment_status'], ['open' => 'Open', 'closed' => 'Closed'])) {
+  
+              $checkError = false;
+              array_push($errors, "Please choose the available value provided");
+              
             }
             
             if( !empty($file_location) ) {
@@ -722,10 +751,11 @@ class PostApp extends BaseApp
   }
   
   /**
-   * Delete post
+   * remove
    * 
    * {@inheritDoc}
    * @see BaseApp::remove()
+   * 
    */
   public function remove($id)
   {
