@@ -8,54 +8,27 @@ try {
 
    if ((isset($_GET['load'])) || (array_key_exists('load', $_GET))) {
      
-        $load = htmlentities(strip_tags(strtolower($_GET['load'])), ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');
+        $load = htmlentities(strip_tags(strtolower(basename($_GET['load']))), ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');
         $load = filter_var($load, FILTER_SANITIZE_URL);
+        $load = filter_input(INPUT_GET, 'load', FILTER_SANITIZE_STRING);
        
         // checking if the string contains parent directory
-        if (strstr($_GET['load'], '../') !== false) {
-            
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-            throw new AppException("Directory traversal attempt!");
-            
-        }
-
         if (strpos($_GET['load'], '..')) {
 
             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
             throw new AppException("Directory traversal attempt!");
-
+            
         }
 
         // checking remote file inclusions
-        if (strstr($_GET['load'], 'file://') !== false) {
+        if ((strstr($_GET['load'], '../') !== false) || (strstr($_GET['load'], 'file://') !== false) || (strstr($_GET['load'], 'http://') !== false)) {
             
             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
             throw new AppException("Remote file inclusion attempt!");
             
         }
     
-        if (strstr($_GET['load'], 'http://') !== false) {
-            
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-            throw new AppException("Remote file inclusion attempt!");
-            
-        }
-
-        if (strstr($_GET['load'], 'php://input')) {
-
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-            throw new AppException("Remote file inclusion attempt!");
-
-        }
-
-        if (strstr($_GET['load'], 'php://filter')) {
-
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-            throw new AppException("Remote file inclusion attempt!");
-
-        }
-
-        if (strstr($_GET['load'], 'data:')) {
+        if ((strstr($_GET['load'], 'php://input')) || (strstr($_GET['load'], 'php://filter')) || (strstr($_GET['load'], 'data:'))) {
 
             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
             throw new AppException("Remote file inclusion attempt!");
@@ -84,7 +57,7 @@ try {
  
                 } else {
  
-                    include __DIR__ . DS . basename($load).'.php';
+                    include __DIR__ . DS . basename( $load .'.php');
                    
                 }
              
@@ -97,7 +70,7 @@ try {
         if (false === $authenticator->userAccessControl()) {
 
             http_response_code(403);
-            throw new AppException("403 Forbidden");
+            throw new AppException("403 - Forbidden");
 
         } else {
 
