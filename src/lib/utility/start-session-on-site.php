@@ -61,64 +61,36 @@ return turn_on_session($session_handler, $life_time, $session_name, $current_coo
 function session_valid_id($session_id)
 {
 
-if (is_string($session_id)) {
+  if (is_string($session_id)) {
 
-  if (PHP_VERSION_ID >= 70100) {
-
-    $sidLength = ini_get('session.sid_length');
-     
-      switch (ini_get('session.sid_bits_per_character')) {
-          case 6:
-              $characterClass = '0-9a-zA-z,-';
-              break;
-          case 5:
-              $characterClass = '0-9a-v';
-              break;
-          case 4:
-              $characterClass = '0-9a-f';
-              break;
-          default:
-              throw new \RuntimeException('Unknown value in session.sid_bits_per_character.');
-      }
+    if (PHP_VERSION_ID >= 70100) {
+  
+      $sidLength = ini_get('session.sid_length');
+       
+        switch (ini_get('session.sid_bits_per_character')) {
+            case 6:
+                $characterClass = '0-9a-zA-z,-';
+                break;
+            case 5:
+                $characterClass = '0-9a-v';
+                break;
+            case 4:
+                $characterClass = '0-9a-f';
+                break;
+            default:
+                throw new \RuntimeException('Unknown value in session.sid_bits_per_character.');
+        }
+      
+        $pattern = '/^[' . $characterClass . ']{' . $sidLength . '}$/';
     
-      $pattern = '/^[' . $characterClass . ']{' . $sidLength . '}$/';
-  
-      return preg_match($pattern, $session_id) === 1;
-     
-  } else {
-  
-    return preg_match('/^[-,a-zA-Z0-9]{1,128}$/', $session_id) === 1;
-  
+        return preg_match($pattern, $session_id) === 1;
+       
+    } else {
+    
+      return preg_match('/^[-,a-zA-Z0-9]{1,128}$/', $session_id) === 1;
+    
+    }
+    
   }
   
 }
-  
-}
-
-
-function isValidSessionId($session_id)
-{
-
- if (is_string($session_id)) {
-
-  $sidLength = ini_get('session.sid_length');
- 
-  switch (ini_get('session.sid_bits_per_character')) {
-      case 6:
-          $characterClass = '0-9a-zA-z,-';
-          break;
-      case 5:
-          $characterClass = '0-9a-v';
-          break;
-      case 4:
-          $characterClass = '0-9a-f';
-          break;
-      default:
-          throw new \RuntimeException('Unknown value in session.sid_bits_per_character.');
-  }
-
-  $pattern = '/^[' . $characterClass . ']{' . $sidLength . '}$/';
- 
- }
-    
-} 
