@@ -15,6 +15,7 @@ class ComposerStaticInit65d8d43f7e5871d489681098837a6b70
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '023d27dca8066ef29e6739335ea73bad' => __DIR__ . '/..' . '/symfony/polyfill-php70/bootstrap.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        'e1e8b49c332434256b5df11b0f0c2a62' => __DIR__ . '/..' . '/league/uri-parser/src/functions_include.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         'b46ad4fe52f4d1899a2951c7e6ea56b0' => __DIR__ . '/..' . '/voku/portable-utf8/bootstrap.php',
     );
@@ -44,13 +45,26 @@ class ComposerStaticInit65d8d43f7e5871d489681098837a6b70
         ),
         'P' => 
         array (
+            'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Container\\' => 14,
+        ),
+        'M' => 
+        array (
+            'Masterminds\\' => 12,
+        ),
+        'L' => 
+        array (
+            'League\\Uri\\' => 11,
         ),
         'I' => 
         array (
             'Intervention\\Image\\' => 19,
             'Interop\\Container\\' => 18,
+        ),
+        'H' => 
+        array (
+            'HtmlSanitizer\\' => 14,
         ),
         'G' => 
         array (
@@ -121,6 +135,10 @@ class ComposerStaticInit65d8d43f7e5871d489681098837a6b70
         array (
             0 => __DIR__ . '/..' . '/sinergi/browser-detector/src',
         ),
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+        ),
         'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
@@ -129,6 +147,14 @@ class ComposerStaticInit65d8d43f7e5871d489681098837a6b70
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
         ),
+        'Masterminds\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/masterminds/html5/src',
+        ),
+        'League\\Uri\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/league/uri-parser/src',
+        ),
         'Intervention\\Image\\' => 
         array (
             0 => __DIR__ . '/..' . '/intervention/image/src/Intervention/Image',
@@ -136,6 +162,10 @@ class ComposerStaticInit65d8d43f7e5871d489681098837a6b70
         'Interop\\Container\\' => 
         array (
             0 => __DIR__ . '/..' . '/container-interop/container-interop/src/Interop/Container',
+        ),
+        'HtmlSanitizer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/tgalopin/html-sanitizer/src',
         ),
         'GuzzleHttp\\Psr7\\' => 
         array (
