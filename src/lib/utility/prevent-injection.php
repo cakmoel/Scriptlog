@@ -1,5 +1,4 @@
 <?php
-use HtmlSanitizer\Sanitizer;
 /**
  * Prevent Injection Function
  * 
@@ -15,18 +14,6 @@ function prevent_injection($str)
     
   $filter = @trim(stripslashes(strip_tags(htmlspecialchars($str, ENT_COMPAT|ENT_HTML5, 'UTF-8'))));
   
-  $sanitizer = \HtmlSanitizer\Sanitizer::create(['extensions' => ['basic']]);
-
-  if (PHP_VERSION_ID >= 70100) {
-
-     $safe_html = $sanitizer->sanitize($filter);
-
-  } else {
-
-     $safe_html = htmLawed($filter);
-
-  }
-  
-  return $safe_html;
+  return htmLawed($filter);
 
 }
