@@ -45,19 +45,19 @@ endif;
 <label for="plugin_name">Plugin (required)</label>
 <input type="text" class="form-control" id="plugin_name" name="plugin_name" placeholder="Enter plugin name here" value="
 <?=(isset($pluginData['plugin_name'])) ? htmlspecialchars($pluginData['plugin_name']) : ""; ?>
-<?=(isset($formData['plugin_name'])) ? htmlspecialchars($formData['plugin_name'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" required>
+<?=(isset($formData['plugin_name'])) ? htmlspecialchars($formData['plugin_name'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" maxlength="150" required>
 </div>
 
 <div class="form-group">
 <label for="plugin_link">Link </label>
 <input type="text" class="form-control" id="plugin_link" name="plugin_link" placeholder="?load=plugin_name" value="
 <?=(isset($pluginData['plugin_link'])) ? htmlspecialchars($pluginData['plugin_link']) : ""; ?>
-<?=(isset($formData['plugin_link'])) ? htmlspecialchars($formData['plugin_link'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" >
+<?=(isset($formData['plugin_link'])) ? htmlspecialchars($formData['plugin_link'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" maxlength="255" >
 </div>
 
 <div class="form-group">
 <label for="description">Description (required)</label>
-<textarea class="form-control" id="description" rows="3" placeholder="Enter ..." name="description"  maxlength="1000" >
+<textarea class="form-control" id="description" rows="3" placeholder="Enter ..." name="description"  maxlength="500" >
 <?=(isset($pluginData['plugin_desc'])) ? $pluginData['plugin_desc'] : ""; ?>
 <?=(isset($formData['description'])) ? htmlspecialchars($formData['description'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>
 </textarea>
@@ -86,8 +86,7 @@ endif;
  if(!empty($pluginData['ID'])) :
 ?>
 <a href="javascript:deletePlugin('<?=(isset($pluginData['ID']) ? $pluginData['ID'] : 0); ?>', '<?=(isset($pluginData['plugin_name']) ? $pluginData['plugin_name'] : ""); ?>')"
-	title="Uninstall Plugin" class="btn btn-danger pull-right"> <i
-					class="fa fa-exclamation-circle fa-fw"></i> Uninstall
+	title="Uninstall Plugin" class="btn btn-danger pull-right"> <i class="fa fa-exclamation-circle fa-fw"></i> Uninstall
 </a>
 <?php 
  endif;
@@ -110,7 +109,7 @@ endif;
   {
 	  if (confirm("Are you sure want to delete Plugin '" + plugin + "'"))
 	  {
-	  	window.location.href = 'index.php?load=plugins&action=deletePlugin&pluginId=' + id;
+	  	window.location.href = 'index.php?load=plugins&action=deletePlugin&Id=' + id;
 	  }
   }
 </script>
