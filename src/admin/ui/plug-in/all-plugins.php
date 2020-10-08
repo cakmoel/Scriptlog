@@ -85,21 +85,21 @@
                     <tr>
                        <td><?= $no; ?></td>
                        <td>
-                       <a href="index.php?load=plugins&action=editPlugin&pluginId=<?= htmlspecialchars((int)$plugin['ID']);?>"><?= htmlspecialchars($plugin['plugin_name']); ?>
+                       <a href="<?=generate_request('index.php', 'get', ['plugins', ActionConst::EDITPLUGIN, $plugin['ID']])['link']?>"> <?= safe_html($plugin['plugin_name']); ?>
                        </a>
                        </td>
                        <td><?= html_entity_decode($plugin['plugin_desc']); ?></td>
-                       <td><?= htmlspecialchars($plugin['plugin_level']); ?></td>
+                       <td><?= safe_html($plugin['plugin_level']); ?></td>
                        <td>
-                       <a href="index.php?load=plugins&action=editPlugin&pluginId=<?= htmlspecialchars((int)$plugin['ID']);?>" class="btn btn-warning" title="Edit plugin">
+                       <a href="<?= generate_request('index.php', 'get', ['plugins', ActionConst::EDITPLUGIN, $plugin['ID']])['link'];?>" class="btn btn-warning" title="Edit plugin">
                        <i class="fa fa-pencil fa-fw"></i> </a>
                        </td>
                        <td>
                        <?php if($plugin['plugin_status'] == 'N') : ?>
-                       <a href="javascript:activatePlugin('<?= abs((int)$plugin['ID']); ?>', '<?= $plugin['plugin_name']; ?>')" class="btn btn-success" title="Activate plugin">
+                       <a href="javascript:activatePlugin('<?= abs((int)$plugin['ID']); ?>', '<?= safe_html($plugin['plugin_name']); ?>')" class="btn btn-success" title="Activate plugin">
                        <i class="fa fa-check fa-fw"></i> </a>
                        <?php else : ?>
-                       <a href="javascript:deactivatePlugin('<?= abs((int)$plugin['ID']); ?>', '<?= $plugin['plugin_name']; ?>')" class="btn btn-danger" title="Deactivate plugin">
+                       <a href="javascript:deactivatePlugin('<?= abs((int)$plugin['ID']); ?>', '<?= safe_html($plugin['plugin_name']); ?>')" class="btn btn-danger" title="Deactivate plugin">
                        <i class="fa fa-times-circle fa-fw"></i> </a>
                        <?php endif; ?>
                        </td>
