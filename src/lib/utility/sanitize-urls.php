@@ -13,8 +13,17 @@ function sanitize_urls($string, $force_lowercase = true, $anal = false)
         "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
         "—", "–", ",", "<", ".", ">", "/", "?");
 
-    $clean = trim(str_replace($strip, "", strip_tags($string)));
+    if (!is_array($string)) {
 
+      $clean = trim(str_replace($strip, "", htmlspecialchars($string,  ENT_QUOTES|ENT_HTML5, 'UTF-8', false)));
+
+    } else {
+
+      $clean = implode($string);
+      $clean = trim(str_replace($strip, "", htmlspecialchars($clean,  ENT_QUOTES|ENT_HTML5, 'UTF-8', false)));
+
+    }
+    
     $clean = preg_replace('/\s+/', "-", $clean);
 
     $clean = ($anal ? preg_replace("/[^a-zA-Z0-9]/", "", $clean) : $clean);
