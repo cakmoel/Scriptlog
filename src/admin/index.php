@@ -58,7 +58,7 @@ if (!$loggedIn) {
     
     admin_header($current_url, $breadcrumb, admin_query());
     
-    include dirname(__FILE__) . '/navigation.php';
+    include dirname(__FILE__) . DS .'navigation.php';
      
     include dirname(__FILE__) . DS .'request.php';
     
