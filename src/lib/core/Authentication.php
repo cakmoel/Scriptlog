@@ -176,7 +176,7 @@ class Authentication
 
   $key = scriptlog_cipher_key();
 
-  $user_login = (isset($_COOKIE['scriptlog_auth'])) ? scriptlog_decipher($_COOKIE['scriptlog_auth'], $key) : $this->getSessionInstance()->scriptlog_session_login;
+  $user_login = isset($_COOKIE['scriptlog_auth']) ? scriptlog_decipher($_COOKIE['scriptlog_auth'], $key) : $this->getSessionInstance()->scriptlog_session_login ;
 
   if (!$getUser = $this->findUserByLogin($user_login)) {
 
@@ -252,7 +252,7 @@ class Authentication
 
       $this->session_data->scriptlog_session_agent = $this->agent = sha1($accept_charset.$accept_encoding.$accept_language.$user_agent);
       
-      $ip_address = (isset($_SERVER['REMOTE_ADDR'])) ? $_SERVER['REMOTE_ADDR'] : zend_ip_address();
+      $ip_address = (isset($_SERVER['REMOTE_ADDR'])) ? $_SERVER['REMOTE_ADDR'] : get_ip_address();
       $this->session_data->scriptlog_session_ip = $ip_address;
   
       clear_duplicate_cookies();
