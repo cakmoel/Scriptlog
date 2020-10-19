@@ -97,7 +97,7 @@ public function listItems()
 }
 
 /**
- * Insert new media
+ * insert
  * 
  * {@inheritDoc}
  * @see BaseApp::insert()
@@ -216,7 +216,7 @@ public function insert()
       $new_filename = generate_filename($file_name)['new_filename'];
       $file_extension = generate_filename($file_name)['file_extension'];
 
-      if ($file_extension === "jpeg" || $file_extension === "jpg" || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp") {
+      if ($file_extension === "jpeg" || $file_extension === "jpg" || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp" || $file_extension === "bmp" || $file_extension === 'tiff' || $file_extension === 'tif' || $file_extension === 'ico') {
 
          list($width, $height) = ($file_location) ? getimagesize($file_location) : null;
 
@@ -242,7 +242,7 @@ public function insert()
        // upload file
       if (is_uploaded_file($file_location)) {
 
-         if(false === check_mime_type(mime_type_dictionary(), $file_location)) {
+         if((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
 
            $checkError = false;
            array_push($errors, "Invalid file format");
@@ -319,9 +319,11 @@ public function insert()
 }
 
 /**
- * update an existing media 
- *
- * @param [type] $id
+ * update
+ * 
+ * @inheritDoc
+ * @uses BaseApp::update()
+ * @param int $id
  * @return void
  * 
  */
@@ -519,7 +521,7 @@ public function update($id)
           // upload file
         if (is_uploaded_file($file_location)) {
 
-          if(false === check_mime_type(mime_type_dictionary(), $file_location)) {
+          if ((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
 
             $checkError = false;
             array_push($errors, "Invalid file format");
@@ -589,6 +591,14 @@ public function update($id)
 
 }
 
+/**
+ * remove
+ *
+ * {@inheritDoc}
+ * @see BaseApp::remove()
+ * @param int|num $id
+ * 
+ */
 public function remove($id)
 {
   $this->mediaEvent->setMediaId($id);
