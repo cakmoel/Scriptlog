@@ -2,7 +2,7 @@
 /**
  * File index.php
  * 
- * @category admin\index.php file
+ * @category admin/index.php file
  * @author   M.Noermoehammad 
  * @license  https://opensource.org/licenses/MIT MIT License
  * @version 1.0
@@ -45,24 +45,24 @@ if (!$loggedIn) {
     $user_id = (isset($_SESSION['scriptlog_session_id']) || (isset($_COOKIE['scriptlog_uid']))) ? Session::getInstance()->scriptlog_session_id : user_info($authenticator, $user_login)['ID'];
     $user_session = user_info($authenticator, $user_login)['user_session'];
 
-    // BreadCrumbs
-    $breadCrumbs = isset($_GET['load']) ? htmlentities(sanitize_urls($_GET['load']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : http_response_code();
+    // Breadcrumb
+    $breadcrumb = isset($_GET['load']) ? htmlentities(sanitize_urls($_GET['load']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : http_response_code();
     
     // Current URL
-    $currentURL =  preg_replace("/\/index\.php.*$/i", "", app_url().DS.APP_ADMIN);
+    $current_url =  preg_replace("/\/index\.php.*$/i", "", app_url().DS.APP_ADMIN);
     
     // retrieve plugin actived -- for administrator
     $plugin_navigation = setplugin($user_level, 'private');
     
-    include dirname(__FILE__) . '/admin-layout.php';
+    include dirname(__FILE__) . DS .'admin-layout.php';
     
-    admin_header($currentURL, $breadCrumbs, admin_query());
+    admin_header($current_url, $breadcrumb, admin_query());
     
-    include dirname(__FILE__) . '/navigation.php';
+    include dirname(__FILE__) . DS .'navigation.php';
     
-    include dirname(__FILE__) . '/request.php';
+    include dirname(__FILE__) . DS .'request.php';
     
-    admin_footer($currentURL, $ubench);
+    admin_footer($current_url, $ubench);
     
     ob_end_flush();
     
