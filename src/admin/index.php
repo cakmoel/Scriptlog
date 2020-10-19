@@ -37,12 +37,12 @@ if (!$loggedIn) {
    
 } else {
 
-    $decrypt_login = (isset($_COOKIE['scriptlog_auth'])) ? scriptlog_decipher($_COOKIE['scriptlog_auth'], $key) : "";
-
-    $user_login = (isset($_COOKIE['scriptlog_auth']) || (isset($_SESSION['scriptlog_session_login']))) ? user_info($authenticator, $decrypt_login)['user_login'] : Session::getInstance()->scriptlog_session_login;
-    $user_email = (isset($_SESSION['scriptlog_session_email'])) ? Session::getInstance()->scriptlog_session_email : user_info($authenticator, $user_login)['user_email'];
-    $user_level = (isset($_SESSION['scriptlog_session_level']) || (isset($_COOKIE['scriptlog_accid']))) ? Session::getInstance()->scriptlog_session_level : user_info($authenticator, $user_login)['user_level'];
-    $user_id = (isset($_SESSION['scriptlog_session_id']) || (isset($_COOKIE['scriptlog_uid']))) ? Session::getInstance()->scriptlog_session_id : user_info($authenticator, $user_login)['ID'];
+    $decrypt_login = isset($_COOKIE['scriptlog_auth']) ? scriptlog_decipher($_COOKIE['scriptlog_auth'], $key) : "";
+    
+    $user_login = isset($_COOKIE['scriptlog_auth']) ? user_info($authenticator, $decrypt_login)['user_login'] : Session::getInstance()->scriptlog_session_login;
+    $user_email = isset($_SESSION['scriptlog_session_email']) ? Session::getInstance()->scriptlog_session_email : user_info($authenticator, $user_login)['user_email'];
+    $user_level = isset($_SESSION['scriptlog_session_level']) ? Session::getInstance()->scriptlog_session_level : user_info($authenticator, $user_login)['user_level'];
+    $user_id = isset($_SESSION['scriptlog_session_id']) ? Session::getInstance()->scriptlog_session_id : user_info($authenticator, $user_login)['ID'];
     $user_session = user_info($authenticator, $user_login)['user_session'];
 
     // Breadcrumb
@@ -58,8 +58,8 @@ if (!$loggedIn) {
     
     admin_header($current_url, $breadcrumb, admin_query());
     
-    include dirname(__FILE__) . DS .'navigation.php';
-    
+    include dirname(__FILE__) . '/navigation.php';
+     
     include dirname(__FILE__) . DS .'request.php';
     
     admin_footer($current_url, $ubench);
