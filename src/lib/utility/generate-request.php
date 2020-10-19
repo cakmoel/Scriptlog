@@ -32,7 +32,7 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
 
                $query_data = array(
               
-                   'load' => $load,
+                   'load' => sanitize_urls($load),
                    'action'=> $action,
                    'Id'=> abs((int)$id),
                    'sessionId' => sanitize_urls($unique_id)
@@ -53,7 +53,7 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
 
               $query_data = array(
               
-                'load' => $load,
+                'load' => sanitize_urls($load),
                 'action'=> $action,
                 'Id'=> abs((int)$id)
          
