@@ -83,7 +83,7 @@ if (access_control_list(ActionConst::PAGES)) :
 ?>
 
          <li <?=($module == 'pages') ? 'class="treeview active"' : 'class="treeview"'; ?>>
-          <a href="#"><i class="fa fa-clone"></i> 
+          <a href="#"><i class="fa fa-file"></i> 
           <span>Pages</span>
             <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
@@ -185,14 +185,10 @@ endif;
 if(access_control_list(ActionConst::PLUGINS)) :
 ?>
 
-<li <?=($module == 'plugins') ? 'class="treeview active"' : 'class="treeview"'; ?>>
-<a href="#"><i class="fa fa-plug"></i> <span>Plugins</span>
-<span class="pull-right-container"> <i class="fa fa-angle-left pull-right"></i> </span>
+<li <?=($module == 'plugins') ? 'class="active"' : 'class=""'; ?>>
+<a href="<?= $url.'/'.generate_request('index.php', 'get', ['plugins', ActionConst::PLUGINS], false)['link']; ?>">
+<i class="fa fa-plug"></i> <span>Plugins</span>
 </a>
-<ul class="treeview-menu">
-<li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['plugins', ActionConst::PLUGINS], false)['link']; ?>">Installed Plugins</a></li>
-<li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['plugins', ActionConst::NEWPLUGIN, 0])['link']; ?>">Add New</a></li>
-</ul>
 </li>
 
 <li class="header">PLUGIN NAVIGATION</li>
