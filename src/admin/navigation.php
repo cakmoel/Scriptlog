@@ -72,5 +72,5 @@
 <!-- .Main Header -->
   
 <?php 
-  echo sidebar_navigation($breadCrumbs, $currentURL, $user_id, $user_session);
+  echo sidebar_navigation($breadcrumb, $current_url, $user_id, $user_session);
 ?>
