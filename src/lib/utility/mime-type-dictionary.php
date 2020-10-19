@@ -11,28 +11,45 @@ function mime_type_dictionary()
 
   $mime_types = [
 
-      'pdf'  => 'application/pdf', 
-      'doc'  => 'application/msword', 
-      'rar'  => 'application/rar', 
-      'zip'  => 'application/zip', 
-      'xls'  => 'application/vnd.ms-excel', 
-      'xls'  => 'application/octet-stream', 
-      'exe'  => 'application/vnd.microsoft.portable-executable', 
-      'ppt'  => 'application/vnd.ms-powerpoint',
-      'odt'  => 'application/vnd.oasis.opendocument.text',
-      'jpeg' => 'image/jpeg', 
-      'jpg'  => 'image/jpeg', 
-      'png'  => 'image/png', 
-      'gif'  => 'image/gif', 
-      'webp' => 'image/webp',
-      'mp3'  => 'audio/mpeg', 
-      'wav'  => 'audio/wav',
-      'ogg'  => 'audio/ogg',
-      'mpeg' => 'video/mpeg',
-      'mp4'  => 'video/mp4',   
-      'webm' => 'video/webm',
-      'ogg'  => 'video/ogg'
+        // images
+        'png'  => 'image/png',
+        'jpe'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'jpg'  => 'image/jpeg',
+        'gif'  => 'image/gif',
+        'bmp'  => 'image/bmp',
+        'ico'  => 'image/vnd.microsoft.icon',
+        'tiff' => 'image/tiff',
+        'tif'  => 'image/tiff',
+        'webp' => 'image/webp',
+      
+        // archives
+        'zip' => 'application/zip',
+        
+        // audio/video
+        'mp3' => 'audio/mpeg',
+        'wav' => 'audio/wav',
+        'ogg' => 'audio/ogg',
+        'mp4' => 'video/mp4',
+        'ogg' => 'video/ogg',
+        'webm' => 'video/webm',
 
+        // adobe
+        'pdf' => 'application/pdf',
+      
+        // ms office
+        'doc' => 'application/msword',
+        'docx' => 'application/msword',
+        'rtf' => 'application/rtf',
+        'xls' => 'application/vnd.ms-excel',
+        'xlsx' => 'application/vnd.ms-excel',
+        'ppt' => 'application/vnd.ms-powerpoint',
+        'pptx' => 'application/vnd.ms-powerpoint',
+
+        // open office
+        'odt' => 'application/vnd.oasis.opendocument.text',
+        'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+        
   ];
 
   return $mime_types;
