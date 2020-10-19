@@ -44,6 +44,12 @@ class ActionConst
  const EDITCOMMENT   = "editComment";
  const DELETECOMMENT = "deleteComment";
 
+// action constant for reply functionality
+
+ const REPLY       = "reply";
+ const NEWREPLY    = "newReply";
+ const DELETEREPLY = "deleteReply";
+
 // action constant for navigation or menu functionality
  
  const NAVIGATION  = "navigation";
@@ -68,8 +74,6 @@ class ActionConst
  const INSTALLPLUGIN    = "installPlugin";
  const ACTIVATEPLUGIN   = "activatePlugin";
  const DEACTIVATEPLUGIN = "deactivatePlugin";
- const NEWPLUGIN        = "newPlugin";
- const EDITPLUGIN       = "editPlugin";
  const DELETEPLUGIN     = "deletePlugin";
 
 // action constant for theme functionality
