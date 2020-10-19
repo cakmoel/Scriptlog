@@ -8,12 +8,14 @@ try {
 
    if ((isset($_GET['load'])) || (array_key_exists('load', $_GET))) {
      
-        $load = htmlentities(strip_tags(strtolower(basename($_GET['load']))), ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');
+        $load = is_array($_GET['load']) ? implode($_GET['load']) : $_GET['load'];
         $load = filter_var($load, FILTER_SANITIZE_URL);
         $load = filter_input(INPUT_GET, 'load', FILTER_SANITIZE_STRING);
+        $load = str_replace(chr(0), '', $load);
+        $load = htmlspecialchars(strtolower(basename($load)), ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');
        
         // checking if the string contains parent directory
-        if (strpos($_GET['load'], '..')) {
+        if (strpos($load, '..')) {
 
             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
             throw new AppException("Directory traversal attempt!");
@@ -21,14 +23,14 @@ try {
         }
 
         // checking remote file inclusions
-        if ((strstr($_GET['load'], '../') !== false) || (strstr($_GET['load'], 'file://') !== false) || (strstr($_GET['load'], 'http://') !== false)) {
+        if ((strstr($load, '../') !== false) || (strstr($load, 'file://') !== false) || (strstr($load, 'http://') !== false)) {
             
             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
             throw new AppException("Remote file inclusion attempt!");
             
         }
     
-        if ((strstr($_GET['load'], 'php://input')) || (strstr($_GET['load'], 'php://filter')) || (strstr($_GET['load'], 'data:'))) {
+        if ((strstr($load, 'php://input')) || (strstr($load, 'php://filter')) || (strstr($load, 'data:')) || (strstr($load, 'zip://'))) {
 
             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
             throw new AppException("Remote file inclusion attempt!");
@@ -56,9 +58,17 @@ try {
                    throw new AppException("405 - Method Not Allowed");
  
                 } else {
- 
-                    include __DIR__ . DS . basename( $load .'.php');
-                   
+
+                    if (!function_exists('realpath')) {
+
+                        include dirname(__FILE__) . DS . basename(absolute_path($load.'.php'));
+
+                    } else {
+
+                        include dirname(__FILE__) . DS . basename(realpath($load.'.php'));
+                        
+                    }
+                    
                 }
              
             }
