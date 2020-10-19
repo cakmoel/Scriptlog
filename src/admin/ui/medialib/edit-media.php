@@ -78,7 +78,7 @@ if($image_src || $webp_src) :
 </a>
 <div id="image-preview">
   <label for="image-upload" id="image-label">Change picture</label>
-  <input type="file" name="media" id="image-upload" accept="image/*" maxlength="512" required>
+  <input type="file" name="media" id="image-upload" accept="image/*" maxlength="512" >
 </div>
 <p class="help-block">Maximum upload file size: <?= format_size_unit(APP_FILE_SIZE); ?>.</p>
 </div>
@@ -110,7 +110,7 @@ Your browser does not support the <code>audio</code> element.
 <?php endif; ?>
 
 <label for="mediaUploaded">Change file</label>
-<input type="file"  name="media" id="mediaUploaded" maxlength="512" required>
+<input type="file"  name="media" id="mediaUploaded" maxlength="512" >
 <p class="help-block">Maximum upload file size: <?= format_size_unit(APP_FILE_SIZE); ?>.</p>
 </div>
 
