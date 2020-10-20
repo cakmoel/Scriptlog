@@ -174,9 +174,9 @@ class Authentication
  public function accessLevel()
  {
 
-  $key = scriptlog_cipher_key();
+  $key = ScriptlogCryptonize::scriptlogCipherKey();
 
-  $user_login = isset($_COOKIE['scriptlog_auth']) ? scriptlog_decipher($_COOKIE['scriptlog_auth'], $key) : $this->getSessionInstance()->scriptlog_session_login ;
+  $user_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $key) : $this->getSessionInstance()->scriptlog_session_login ;
 
   if (!$getUser = $this->findUserByLogin($user_login)) {
 
