@@ -12,6 +12,8 @@
  * 
  */
 
+ini_set('memory_limit', "5M");
+error_reporting(-1);
 #ini_set("session.cookie_secure", 1);  
 #ini_set("session.cookie_lifetime", 86400);  
 ini_set("session.cookie_httponly", 1);
@@ -198,15 +200,15 @@ Registry::setAll(array('dbc' => $dbc, 'route' => $rules));
 
 /* an instances of class that necessary for the system
  * please do not change this below variable 
+ * these are collection of objects or instances of classes 
+ * that will be run by the system.
  * 
  * @var $searchPost invoked by search functionality
  * @var $sanitizer adapted by sanitize functionality
  * @var $userDao, $validator, $authenticator, $ubench --
- * these are collection of objects or instances of classes 
- * that will be run by the system.
  * 
  */
-$key = scriptlog_cipher_key();
+$key = ScriptlogCryptonize::scriptlogCipherKey();
 $searchPost = new SearchFinder($dbc);
 $sanitizer = new Sanitize();
 $userDao = new UserDao();
