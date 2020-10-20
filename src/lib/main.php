@@ -135,7 +135,7 @@ $library = array(
     APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
     APP_ROOT . APP_LIBRARY . DS . 'event'   . DS,
     APP_ROOT . APP_LIBRARY . DS . 'app'     . DS,
-    APP_ROOT . APP_LIBRARY . DS . 'plugins' . DS
+    APP_ROOT . APP_ADMIN . DS . 'plugins' . DS
 );
 
 get_server_load();
@@ -198,15 +198,15 @@ Registry::setAll(array('dbc' => $dbc, 'route' => $rules));
 
 /* an instances of class that necessary for the system
  * please do not change this below variable 
+ * these are collection of objects or instances of classes 
+ * that will be run by the system.
  * 
  * @var $searchPost invoked by search functionality
  * @var $sanitizer adapted by sanitize functionality
  * @var $userDao, $validator, $authenticator, $ubench --
- * these are collection of objects or instances of classes 
- * that will be run by the system.
  * 
  */
-$key = scriptlog_cipher_key();
+$key = ScriptlogCryptonize::scriptlogCipherKey();
 $searchPost = new SearchFinder($dbc);
 $sanitizer = new Sanitize();
 $userDao = new UserDao();
