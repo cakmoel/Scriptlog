@@ -1,14 +1,16 @@
-<?php
+<?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
 /**
  * File authorizer.php
  * checking whether session or cookies exists
  * 
  * @category checking whether cookies or session exists or not
- * @author   Vincy vincy@gmail.com
+ * @author M.Noermoehammad scriptlog@yandex.com
+ * @author Vincy vincy@gmail.com
  * @see https://phppot.com/php/secure-remember-me-for-login-using-php-session-and-cookies/
  * @see https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string
  * @see https://paragonie.com/blog/2015/04/secure-authentication-php-with-long-term-persistence
  * @see https://en.wikibooks.org/wiki/PHP_Programming/Sessions#Avoiding_Session_Fixation
+ * 
  */
 $timeout = Authentication::COOKIE_EXPIRE;
 $current_date = date("Y-m-d H:i:s", time()); 
@@ -33,8 +35,7 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
     $expired_verified   = false;
  
     // retrieve user token info
-  
-    $decrypt_auth = scriptlog_decipher($_COOKIE['scriptlog_auth'], $key);
+    $decrypt_auth = ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $key);
 
     $token_info = $authenticator -> findTokenByLogin($decrypt_auth, 0);
 
