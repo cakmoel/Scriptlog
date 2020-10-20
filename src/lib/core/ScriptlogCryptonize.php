@@ -11,8 +11,10 @@
  */
 
 use Zend\Crypt\BlockCipher;
+use Defuse\Crypto\Crypto;
+use Defuse\Crypto\Key;
 
-class ScriptlogCrypto
+class ScriptlogCryptonize
 {
 
 const METHOD = 'AES-128-CBC';
@@ -52,6 +54,23 @@ public static function cipherMessage($message, $key)
 }
 
 /**
+ * scriptlogCipher
+ *
+ * @param string $message
+ * @param string $key
+ * @return string
+ * 
+ */
+public static function scriptlogCipher($message, $key)
+{
+
+$ciphertext = \Defuse\Crypto\Crypto::encrypt($message, $key);
+
+return $ciphertext;
+
+}
+
+/**
  * encryptAES
  * 
  * @param string $data
@@ -62,38 +81,28 @@ public static function cipherMessage($message, $key)
 public static function encryptAES($plaintext, $password)
 {
 
-try {
+ // Set a random salt
+ if (function_exists("random_bytes")) {
 
-  // Set a random salt
-  if (function_exists("random_bytes")) {
+  $iv = random_bytes(16);
 
-    $iv = random_bytes(16);
+} elseif (function_exists("openssl_random_pseudo_bytes")) {
 
-  } elseif (function_exists("openssl_random_pseudo_bytes")) {
+  $iv = openssl_random_pseudo_bytes(16);
 
-    $iv = openssl_random_pseudo_bytes(16);
+} else {
 
-  } else {
-
-    $iv = simple_salt(16);
-
-  }
-  
-  $key = hash('sha256', $password, true);
- 
-  $ciphertext = openssl_encrypt($plaintext, self::METHOD, $key, OPENSSL_RAW_DATA, $iv);
-  
-  $hash = hash_hmac('sha256', $ciphertext . $iv, $key, true);
-
-  return $iv . $hash . $ciphertext;
-     
-} catch (ScriptlogCryptoException $e) {
-   
-   LogError::setStatusCode(http_response_code());
-   LogError::newMessage($e);
-   LogError::customErrorMessage('admin');
+  $iv = simple_salt(16);
 
 }
+
+$key = hash('sha256', $password, true);
+
+$ciphertext = openssl_encrypt($plaintext, self::METHOD, $key, OPENSSL_RAW_DATA, $iv);
+
+$hash = hash_hmac('sha256', $ciphertext . $iv, $key, true);
+
+return $iv . $hash . $ciphertext;
 
 }
 
@@ -118,11 +127,16 @@ try {
   
   $key = hash('sha256', $password, true);
 
-  if (!hash_equals(hash_hmac('sha256', $ciphertext . $iv, $key, true), $hash)) return null;
+  if (!hash_equals(hash_hmac('sha256', $ciphertext . $iv, $key, true), $hash)) {
+
+    http_response_code(500);
+    throw new ScriptlogCryptonizeException("Invalid ciphertext");
+
+  }
 
   return openssl_decrypt($ciphertext, self::METHOD, $key, OPENSSL_RAW_DATA, $iv);
    
-} catch (ScriptlogCryptoException $e) {
+} catch (ScriptlogCryptonizeException $e) {
    
    LogError::setStatusCode(http_response_code());
    LogError::newMessage($e);
@@ -143,13 +157,47 @@ try {
 public static function decipherMessage($ciphertext, $key)
 {
 
-  $cipher = \Zend\Crypt\BlockCipher::factory('openssl', array('algo' => 'aes'));
+$cipher = \Zend\Crypt\BlockCipher::factory('openssl', array('algo' => 'aes'));
 
-  $cipher->setKey($key);
+$cipher->setKey($key);
  
-  $result = $cipher->decrypt($ciphertext);
+$result = $cipher->decrypt($ciphertext);
  
-  return $result;
+return $result;
+
+}
+
+/**
+ * scriptlogDecipher
+ *
+ * @param string $ciphertext
+ * @param string $key
+ * @return string
+ * 
+ */
+public static function scriptlogDecipher($ciphertext, $key)
+{
+
+$plaintext = \Defuse\Crypto\Crypto::decrypt($ciphertext, $key);
+ 
+return $plaintext;
+
+}
+
+/**
+ * scriptlogCipherKey
+ *
+ * @return string
+ * 
+ */
+public static function scriptlogCipherKey()
+{
+
+$key_ascii = file_get_contents(__DIR__ . '/../lib/utility/.lts/lts.txt');
+
+$loaded = \Defuse\Crypto\Key::loadFromAsciiSafeString($key_ascii);
+
+return $loaded;
 
 }
 
@@ -159,7 +207,7 @@ public static function decipherMessage($ciphertext, $key)
  * @return string
  * 
  */
-private static function defaultSecretKey()
+protected static function defaultSecretKey()
 {
 
  if (function_exists("random_bytes")) {
