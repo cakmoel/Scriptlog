@@ -281,7 +281,7 @@ public function isValid($ttl = 60)
 protected function encrypt($data, $key)
 {
 
-return ScriptlogCrypto::encryptAES($data, $key);
+return ScriptlogCryptonize::encryptAES($data, $key);
 
 }
 
@@ -296,7 +296,7 @@ return ScriptlogCrypto::encryptAES($data, $key);
 protected function decrypt($data, $key)
 {
 
-return ScriptlogCrypto::decryptAES($data, $key);
+return ScriptlogCryptonize::decryptAES($data, $key);
 
 }
 
