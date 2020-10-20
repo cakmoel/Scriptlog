@@ -193,7 +193,7 @@ return $plaintext;
 public static function scriptlogCipherKey()
 {
 
-$key_ascii = file_get_contents(__DIR__ . '/../lib/utility/.lts/lts.txt');
+$key_ascii = file_get_contents(__DIR__ . '/../../lib/utility/.lts/lts.txt');
 
 $loaded = \Defuse\Crypto\Key::loadFromAsciiSafeString($key_ascii);
 
