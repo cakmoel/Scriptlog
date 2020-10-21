@@ -270,8 +270,8 @@ class Authentication
 
           $tokenizer = new Tokenizer();
       
-          $key = scriptlog_cipher_key();
-          $encrypt_auth = scriptlog_cipher($account_login, $key);
+          $key = ScriptlogCryptonize::scriptlogCipherKey();
+          $encrypt_auth = ScriptlogCryptonize::scriptlogCipher($account_login, $key);
           
           set_cookies_scl('scriptlog_auth', $encrypt_auth, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true); 
           
