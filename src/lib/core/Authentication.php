@@ -77,6 +77,14 @@ class Authentication
   private $session_data = [];
 
   /**
+   * key
+   *
+   * @var string
+   * 
+   */
+  private $key;
+
+  /**
    * Constant COOKIE_EXPIRE
    * default 1 month
    * 
@@ -98,6 +106,12 @@ class Authentication
     $this->userToken = $userToken;
     $this->validator = $validator;
   
+    if (Registry::isKeySet('key')) {
+
+       $this->key = Registry::get('key');
+
+    }
+
   }
  
   /**
@@ -174,10 +188,8 @@ class Authentication
  public function accessLevel()
  {
 
-  $key = ScriptlogCryptonize::scriptlogCipherKey();
-
-  $user_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $key) : $this->getSessionInstance()->scriptlog_session_login ;
-
+  $user_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $this->key) : $this->getSessionInstance()->scriptlog_session_login;
+    
   if (!$getUser = $this->findUserByLogin($user_login)) {
 
       return false;
@@ -270,9 +282,8 @@ class Authentication
 
           $tokenizer = new Tokenizer();
       
-          $key = ScriptlogCryptonize::scriptlogCipherKey();
-          $encrypt_auth = ScriptlogCryptonize::scriptlogCipher($account_login, $key);
-          
+          $encrypt_auth = ScriptlogCryptonize::scriptlogCipher($account_login, $this->key);
+
           set_cookies_scl('scriptlog_auth', $encrypt_auth, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true); 
           
           $random_password = $tokenizer -> createToken(64);
@@ -417,14 +428,10 @@ public function removeCookies()
   if ((isset($_COOKIE['scriptlog_auth'])) && (isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector'])) ) {
 
      unset($_COOKIE['scriptlog_auth']);
-     unset($_COOKIE['scriptlog_accid']);
-     unset($_COOKIE['scriptlog_uid']);
      unset($_COOKIE['scriptlog_validator']);
      unset($_COOKIE['scriptlog_selector']);
 
      set_cookies_scl('scriptlog_auth', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
-     set_cookies_scl('scriptlog_accid', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
-     set_cookies_scl('scriptlog_uid', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
      set_cookies_scl('scriptlog_validator', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);  
      set_cookies_scl('scriptlog_selector', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
     
@@ -444,14 +451,10 @@ public function clearAuthCookies($user_login)
   if ((isset($_COOKIE['scriptlog_auth'])) && (isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector']))) {
      
     unset($_COOKIE['scriptlog_auth']);
-    unset($_COOKIE['scriptlog_accid']);
-    unset($_COOKIE['scriptlog_uid']);
     unset($_COOKIE['scriptlog_validator']);
     unset($_COOKIE['scriptlog_selector']);
 
     set_cookies_scl('scriptlog_auth', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
-    set_cookies_scl('scriptlog_accid', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
-    set_cookies_scl('scriptlog_uid', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
     set_cookies_scl('scriptlog_validator', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);  
     set_cookies_scl('scriptlog_selector', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
    
@@ -620,10 +623,10 @@ private function getUserAuthSession()
 {
   
  $ip_address = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : get_ip_address();
- $user_agent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : '';
- $accept_charset = (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) ? $_SERVER['HTTP_ACCEPT_CHARSET'] : '';
- $accept_encoding = (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
- $accept_language = (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
+ $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+ $accept_charset = isset($_SERVER['HTTP_ACCEPT_CHARSET']) ? $_SERVER['HTTP_ACCEPT_CHARSET'] : '';
+ $accept_encoding = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
+ $accept_language = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
  
  if($this->getSessionInstance()->scriptlog_session_ip !== $ip_address 
     || $this->getSessionInstance()->scriptlog_session_agent !== sha1($accept_charset.$accept_encoding.$accept_language.$user_agent)) {
