@@ -251,6 +251,7 @@ class UserEvent
 
  public function addUser()
  {
+   
   $this->validator->sanitize($this->user_login, 'string');
   $this->validator->sanitize($this->user_fullname, 'string');
   $this->validator->sanitize($this->user_email, 'email');
@@ -431,6 +432,14 @@ class UserEvent
  public function isUserLevel()
  {
 
+   if (isset($_COOKIE['scriptlog_auth'])) {
+
+      Authorization::setAuthInstance(new Authentication($this->userDao, $this->userToken, $this->validator));
+
+      return Authorization::authorizeLevel();
+
+   }
+   
    if (isset(Session::getInstance()->scriptlog_session_level)) {
 
        return Session::getInstance()->scriptlog_session_level;
@@ -442,8 +451,8 @@ class UserEvent
  }
 
 /**
- * identifyUserLogin
- * Check whether user login session or cookies defined or not
+ * identifyCookieToken
+ * Check whether session cookies defined or not
  * if defined then return it
  *
  * @method public identifyUserLogin()
