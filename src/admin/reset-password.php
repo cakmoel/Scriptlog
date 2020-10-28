@@ -8,6 +8,7 @@
  * @version  1.0
  * 
  */
+
 if (file_exists(__DIR__ . '/../config.php')) {
     
   include(dirname(dirname(__FILE__)).'/lib/main.php');
@@ -30,7 +31,7 @@ if (isset($_POST['Reset'])) {
 
   if( !$valid ) {
      
-    $errors['errorMessage'] = "Sorry, Attack detected!";
+    $errors['errorMessage'] = "Sorry, there was a security issue";
   
   }
 
@@ -45,7 +46,7 @@ if (isset($_POST['Reset'])) {
 
      $errors['errorMessage'] = "Please enter email address";
 
-  } elseif (email_validation($user_email) == 0) {
+  } elseif (!filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
 
      $errors['errorMessage'] = "Please enter a valid email address";
 
