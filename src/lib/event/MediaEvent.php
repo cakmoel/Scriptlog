@@ -526,12 +526,10 @@ public function modifyMediaMeta()
  public function isMediaUser()
  {
 
-    $userDao = new UserDao();
-    $userToken = new UserTokenDao();
-
     if (isset($_COOKIE['scriptlog_auth'])) {
 
-        Authorization::setAuthInstance(new Authentication($userDao, $userToken, $this->validator));
+        Authorization::setAuthInstance(new Authentication(new UserDao, new UserTokenDao, $this->validator));
+        
         return Authorization::authorizeLevel();
 
     }
