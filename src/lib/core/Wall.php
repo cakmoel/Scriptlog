@@ -21,44 +21,19 @@ class Wall extends Dashboard
  public function listItems($authenticator, $user_login)
  {
   
-  $non_admin = null;
-  
-  $administrator = null;
-
   if(is_non_administrator() === true) {
 
-    if (isset(Session::getInstance()->scriptlog_session_fullname)) {
-
-       $non_admin = Session::getInstance()->scriptlog_session_fullname;
-
-    }
-
-    if (isset($_COOKIE['scriptlog_auth']) && $_COOKIE['scriptlog_auth'] == user_info($authenticator, $user_login)['user_level']) {
-
-       $non_admin = user_info($authenticator, $user_login)['user_login'];
-
-    }
-
+    $non_admin = isset($_COOKIE['scriptlog_auth']) ? user_info($authenticator, $user_login)['user_fullname'] : Session::getInstance()->scriptlog_session_fullname;
+    
     $this->welcomeUser('Hello '.safe_html($non_admin));
 
   } else {
 
-    if (isset(Session::getInstance()->scriptlog_session_login)) {
-
-        $administrator = Session::getInstance()->scriptlog_session_login;
-
-    } 
-
-    if (isset($_COOKIE['scriptlog_auth'])) {
-
-       $administrator = $_COOKIE['scriptlog_auth'];
-
-    }
+    $administrator = isset($_COOKIE['scriptlog_auth']) ? user_info($authenticator, $user_login)['user_login'] : Session::getInstance()->scriptlog_session_login;
 
     $this->welcomeAdmin('Hello '.safe_html($administrator));
 
   }
-
 
  }
 
