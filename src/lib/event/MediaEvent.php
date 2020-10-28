@@ -85,19 +85,34 @@ class MediaEvent
  private $meta_key;
 
 /**
- * Media metadata value
+ * meta_value
  * 
  * @var string
  * 
  */
  private $meta_value;
 
+ /**
+  * mediaDao
+  *
+  * @var object
+  */
  private $mediaDao;
 
+ /**
+  * validator
+  *
+  * @var object
+  */
  private $validator;
 
+ /**
+  * sanitizer
+  *
+  * @var object
+  */
  private $sanitizer;
- 
+
 /**
  * Initialize an intanciates of class properties or method
  * 
@@ -108,9 +123,11 @@ class MediaEvent
  */
  public function __construct(MediaDao $mediaDao, FormValidator $validator, Sanitize $sanitizer)
  {
+
    $this->mediaDao  = $mediaDao;
    $this->validator = $validator;
    $this->sanitizer = $sanitizer;
+
  }
 
 /**
@@ -204,12 +221,12 @@ class MediaEvent
 /**
  * Set media metadata key
  * 
- * @param string $key
+ * @param string $meta_key
  * 
  */
- public function setMediaKey($key)
+ public function setMediaKey($meta_key)
  {
-   $this->meta_key = $key;
+   $this->meta_key = $meta_key;
  }
 
 /**
@@ -509,10 +526,14 @@ public function modifyMediaMeta()
  public function isMediaUser()
  {
 
-    if (isset($_COOKIE['scriptlog_cookie_level'])) {
+    $userDao = new UserDao();
+    $userToken = new UserTokenDao();
 
-       return $_COOKIE['scriptlog_cookie_level'];
- 
+    if (isset($_COOKIE['scriptlog_auth'])) {
+
+        Authorization::setAuthInstance(new Authentication($userDao, $userToken, $this->validator));
+        return Authorization::authorizeLevel();
+
     }
 
     if (isset(Session::getInstance()->scriptlog_session_level)) {
