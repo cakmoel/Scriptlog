@@ -126,14 +126,13 @@ private function setup()
 public function start()
 {
 
-if ((isset($_COOKIE[session_name()])) || (self::isSessionStarted() === false)) {
+if (self::isSessionStarted()) {
 
    if(session_start()) {
 
       return (mt_rand(0, 4) === 0) ? $this->refresh() : true;
 
    }
-
    
 }
 
@@ -181,6 +180,7 @@ public function refresh()
 /**
  * read
  *
+ * @see https://www.php.net/manual/en/function.session-start.php#120589
  * @param string $id
  * @return string
  * 
@@ -190,8 +190,10 @@ public function read($id)
   
  $data = parent::read($id);
 
- return empty($data) ? '' : $this->decrypt($data, $this->key);
+ ( ( is_null($data) ) || ( empty($data) ) ) ? $data = '' : $data = $this->decrypt($data, $this->key);
 
+ return $data;
+ 
 }
 
 /**
@@ -313,17 +315,15 @@ private static function isSessionStarted()
 
       if(version_compare(phpversion(), '5.6.0', '>=')) {
   
-         return session_status() === PHP_SESSION_ACTIVE ? true : false;
+         return (session_status() === PHP_SESSION_ACTIVE) ? true : false;
   
       } else {
   
-         return session_id() === '' ? false : true;
+         return (session_id() === '') ? true : false;
   
       }
 
    }
-
-   return false;
 
 }
 
