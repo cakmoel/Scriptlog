@@ -95,7 +95,29 @@ class PostEvent
    */
   private $topics; 
 
-  private $postDao, $validator, $sanitizer;
+  /**
+   * postDao
+   *
+   * @var object
+   * 
+   */
+  private $postDao; 
+  
+  /**
+   * validator
+   *
+   * @var object
+   * 
+   */
+  private $validator; 
+  
+  /**
+   * sanitizer
+   *
+   * @var object
+   * 
+   */
+  private $sanitizer;
  
   /**
    * Constructor
@@ -466,6 +488,14 @@ class PostEvent
  public function postAuthorLevel()
  {
  
+   if (isset($_COOKIE['scriptlog_auth'])) {
+
+      Authorization::setAuthInstance(new Authentication(new UserDao, new UserTokenDao, $this->validator));
+       
+      return Authorization::authorizeLevel();
+
+   }
+
    if (isset(Session::getInstance()->scriptlog_session_level)) {
 
       return Session::getInstance()->scriptlog_session_level;
