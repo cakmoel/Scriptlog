@@ -1,6 +1,6 @@
 <?php
 /**
- * Class ScriptlogCrypto
+ * Class ScriptlogCryptonize
  * 
  * @category Core Class
  * @author M.Noermoehammad
@@ -17,7 +17,7 @@ use Defuse\Crypto\Key;
 class ScriptlogCryptonize
 {
 
-const METHOD = 'AES-128-CBC';
+const METHOD =  'AES-256-CBC';
 
 /**
  * generateSecretKey
@@ -96,13 +96,13 @@ public static function encryptAES($plaintext, $password)
 
 }
 
-$key = hash('sha256', $password, true);
+// Encryption
+$ciphertext = openssl_encrypt($plaintext, self::METHOD, mb_substr($key, 0, 32, '8bit'), OPENSSL_RAW_DATA, $iv);
 
-$ciphertext = openssl_encrypt($plaintext, self::METHOD, $key, OPENSSL_RAW_DATA, $iv);
+// Authentication
+$hmac = hash_hmac('SHA256', $iv.$ciphertext, mb_substr($key, 32, null, '8bit'), true);
 
-$hash = hash_hmac('sha256', $ciphertext . $iv, $key, true);
-
-return $iv . $hash . $ciphertext;
+return $hmac . $iv . $ciphertext;
 
 }
 
@@ -114,28 +114,28 @@ return $iv . $hash . $ciphertext;
  * @return string
  * 
  */
-public static function decryptAES($ciphertext, $password)
+public static function decryptAES($ciphertext, $key)
 {
  
 try {
 
-  $iv = substr($ciphertext, 0, 16);
-  
-  $hash = substr($ciphertext, 16, 32);
-  
-  $ciphertext = substr($ciphertext, 48);
-  
-  $key = hash('sha256', $password, true);
+  $hmac   = mb_substr($ciphertext, 0, 32, '8bit');
+  $iv     = mb_substr($ciphertext, 32, 16, '8bit');
+  $cipher = mb_substr($ciphertext, 48, null, '8bit');
 
-  if (!hash_equals(hash_hmac('sha256', $ciphertext . $iv, $key, true), $hash)) {
+  // Authentication
+  $hmac_new = hash_hmac('SHA256', $iv . $cipher, mb_substr($key, 32, null, '8bit'), true);
 
+  if (!hash_equals($hmac, $hmac_new)) {
+    
     http_response_code(500);
     throw new ScriptlogCryptonizeException("Invalid ciphertext");
 
   }
 
-  return openssl_decrypt($ciphertext, self::METHOD, $key, OPENSSL_RAW_DATA, $iv);
-   
+  // Decrypt
+  return openssl_decrypt($cipher, self::METHOD, mb_substr($key, 0, 32, '8bit'), OPENSSL_RAW_DATA, $iv);
+ 
 } catch (ScriptlogCryptonizeException $e) {
    
    LogError::setStatusCode(http_response_code());
@@ -193,7 +193,17 @@ return $plaintext;
 public static function scriptlogCipherKey()
 {
 
-$key_ascii = file_get_contents(__DIR__ . '/../../lib/utility/.lts/lts.txt');
+if ( file_exists(__DIR__ . '/../../lib/utility/.lts/lts.txt')) {
+
+  $key_ascii = file_get_contents(__DIR__ . '/../../lib/utility/.lts/lts.txt');
+
+} else {
+
+  $keyObject = new Key();
+
+  $key_ascii = $keyObject->saveToAsciiSafeString();
+
+}
 
 $loaded = \Defuse\Crypto\Key::loadFromAsciiSafeString($key_ascii);
 
@@ -207,7 +217,7 @@ return $loaded;
  * @return string
  * 
  */
-protected static function defaultSecretKey()
+private static function defaultSecretKey()
 {
 
  if (function_exists("random_bytes")) {
