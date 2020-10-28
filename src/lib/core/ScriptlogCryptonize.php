@@ -9,7 +9,6 @@
  * @since Since Release 1.0
  * 
  */
-
 use Zend\Crypt\BlockCipher;
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
@@ -17,7 +16,7 @@ use Defuse\Crypto\Key;
 class ScriptlogCryptonize
 {
 
-const METHOD =  'AES-256-CBC';
+const METHOD = 'AES-256-CBC';
 
 /**
  * generateSecretKey
