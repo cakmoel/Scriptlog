@@ -1,6 +1,6 @@
 <?php
 /**
- * Authentication Class
+ * class Authentication
  *
  * @category  Core Class
  * @author    M.Noermoehammad
