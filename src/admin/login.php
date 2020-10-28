@@ -16,7 +16,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
     
   include __DIR__ . '/../lib/main.php';
  
-  $ip = getenv('REMOTE_ADDR', true) ?: zend_ip_address();
+  $ip = getenv('REMOTE_ADDR', true) ? $_SERVER['REMOTE_ADDR'] : zend_ip_address();
   
   require __DIR__ . '/authorizer.php';
   include __DIR__ . '/login-layout.php';
@@ -93,8 +93,7 @@ login_header($stylePath);
 <div class="form-group has-feedback">
 <label for="inputLogin">Username or Email Address</label>
 <input type="text"  class="form-control" id="inputLogin" placeholder="username or email" name="login" maxlength="186" value="
-<?php if (isset($_COOKIE['scriptlog_cookie_login'])) : echo $_COOKIE['scriptlog_cookie_login'];
-elseif (isset($_COOKIE['scriptlog_cookie_email'])) : echo $_COOKIE['scriptlog_cookie_email']; endif; ?>" autocomplete="off" autocapitalize="off" autofocus required>
+<?= (isset($_COOKIE['scriptlog_auth']) ? $_COOKIE['scriptlog_auth'] : ""); ?>" autocomplete="off" autocapitalize="off" autofocus required>
 <span class="glyphicon glyphicon-user form-control-feedback"></span>
 </div>
 <div class="form-group has-feedback">
@@ -124,9 +123,8 @@ elseif (isset($_COOKIE['scriptlog_cookie_email'])) : echo $_COOKIE['scriptlog_co
 <div class="row">
   <div class="col-xs-8">
     <div class="checkbox icheck">
-      <label>
-        <input type="checkbox" name="remember" <?php if (isset($_COOKIE['scriptlog_cookie_login'])) : echo "checked"?> 
-        <?php elseif(isset($_COOKIE['scriptlog_cookie_email'])) : echo "checked";?><?php endif; ?>> Remember Me
+      <label for="remember-me">
+<input type="checkbox" name="remember" id="remember-me" <?php if (isset($_COOKIE['scriptlog_auth'])) : ?> checked<?php endif; ?>>  Remember Me
       </label>
     </div>
 </div>          
