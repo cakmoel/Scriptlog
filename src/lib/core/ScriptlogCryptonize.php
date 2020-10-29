@@ -77,7 +77,7 @@ return $ciphertext;
  * @return string
  * 
  */
-public static function encryptAES($plaintext, $password)
+public static function encryptAES($plaintext, $key)
 {
 
  // Set a random salt
