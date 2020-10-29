@@ -126,7 +126,7 @@ private function setup()
 public function start()
 {
 
-if (self::isSessionStarted()) {
+if ((isset($_COOKIE[session_name()])) || (self::isSessionStarted() === false)) {
 
    if(session_start()) {
 
@@ -305,6 +305,7 @@ return ScriptlogCryptonize::decryptAES($data, $key);
 /**
  * isSessionStarted
  *
+ * @see https://www.php.net/manual/en/function.session-status.php#113468
  * @return boolean
  * 
  */
@@ -319,11 +320,13 @@ private static function isSessionStarted()
   
       } else {
   
-         return (session_id() === '') ? true : false;
+         return (session_id() === '') ? false : true;
   
       }
 
    }
+
+   return false;
 
 }
 
