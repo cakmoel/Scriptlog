@@ -13,14 +13,24 @@ class Registry
 {
 
 /**
+ * objects
+ *
+ * @var array of objects
+ * 
+ */
+private static $objects;
+
+/**
  * Data registered
  * 
  * @property array $_data
  * @static
  * @var array
  */
- private static $data = array();
+ private static $data;
  
+public function __construct() {}
+
 /**
  * get
  * 
@@ -30,7 +40,9 @@ class Registry
  */
  public static function get($key)
  {
-   return (isset(self::$data[$key]) ? self::$data[$key] : null);
+   
+  return isset(self::$data[$key]) ? self::$data[$key] : null;
+
  }
  
 /**
@@ -55,7 +67,7 @@ class Registry
  * @param array $key
  * 
  */
- public static function setAll(array $key = array()) 
+ public static function setAll(array $key = []) 
  {
    self::$data = $key;
  }
@@ -72,7 +84,31 @@ class Registry
  */
  public static function isKeySet($key)
  {
-   return (isset(self::$data[$key]));  
+   return isset(self::$data[$key]);  
  }
  
+/**
+ * registryObject
+ *
+ * @return void
+ */
+ public static function registerObject( $object, $key )
+ {
+
+   self::$objects[$key] = new $object(self::$objects);
+
+ }
+
+/**
+ * getObjectRegistered
+ *
+ * @param string $key
+ * @return Object
+ * 
+ */
+ public static function getObjectRegistered( $key )
+ {
+   return self::$objects[ $key ];
+ }
+
 }
