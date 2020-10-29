@@ -27,7 +27,7 @@ private static $objects;
  * @static
  * @var array
  */
- private static $data;
+ private static $data = [];
  
 public function __construct() {}
 
