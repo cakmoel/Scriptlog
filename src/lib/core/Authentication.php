@@ -69,14 +69,6 @@ class Authentication
   private $user_level;
 
   /**
-   * session data
-   *
-   * @var string
-   * 
-   */
-  private $session_data = [];
-
-  /**
    * key
    *
    * @var string
@@ -188,7 +180,7 @@ class Authentication
  public function accessLevel()
  {
 
-  $user_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $this->key) : $this->getSessionInstance()->scriptlog_session_login;
+  $user_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $this->key) : Session::getInstance()->scriptlog_session_login;
     
   if (!$getUser = $this->findUserByLogin($user_login)) {
 
@@ -202,9 +194,9 @@ class Authentication
 
   }
 
-  if (isset($this->getSessionInstance()->scriptlog_session_level)) {
+  if (isset(Session::getInstance()->scriptlog_session_level)) {
 
-    return $this->getSessionInstance()->scriptlog_session_level;
+    return Session::getInstance()->scriptlog_session_level;
     
   }
   
@@ -250,28 +242,27 @@ class Authentication
 
       $this->validator->validate($password, 'password'); 
 
-      $this->session_data = $this->getSessionInstance();
-      $this->session_data->scriptlog_session_id = $this->user_id = intval($account_info['ID']);
-      $this->session_data->scriptlog_session_email = $this->user_email = $account_info['user_email'];
-      $this->session_data->scriptlog_session_level = $this->user_level = $account_info['user_level'];
-      $this->session_data->scriptlog_session_login = $this->user_login = $account_info['user_login'];
-      $this->session_data->scriptlog_session_fullname = $this->user_fullname = $account_info['user_fullname'];
+      Session::getInstance()->scriptlog_session_id = $this->user_id = intval($account_info['ID']);
+      Session::getInstance()->scriptlog_session_email = $this->user_email = $account_info['user_email'];
+      Session::getInstance()->scriptlog_session_level = $this->user_level = $account_info['user_level'];
+      Session::getInstance()->scriptlog_session_login = $this->user_login = $account_info['user_login'];
+      Session::getInstance()->scriptlog_session_fullname = $this->user_fullname = $account_info['user_fullname'];
 
       $user_agent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : '';
       $accept_charset = (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) ? $_SERVER['HTTP_ACCEPT_CHARSET'] : '';
       $accept_encoding = (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
       $accept_language = (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
 
-      $this->session_data->scriptlog_session_agent = $this->agent = sha1($accept_charset.$accept_encoding.$accept_language.$user_agent);
+      Session::getInstance()->scriptlog_session_agent = $this->agent = sha1($accept_charset.$accept_encoding.$accept_language.$user_agent);
       
       $ip_address = (isset($_SERVER['REMOTE_ADDR'])) ? $_SERVER['REMOTE_ADDR'] : get_ip_address();
-      $this->session_data->scriptlog_session_ip = $ip_address;
+      Session::getInstance()->scriptlog_session_ip = $ip_address;
   
       clear_duplicate_cookies();
 
-      $this->session_data->scriptlog_fingerprint = hash_hmac('sha256', $user_agent, hash('sha256', $ip_address, true));
+      Session::getInstance()->scriptlog_fingerprint = hash_hmac('sha256', $user_agent, hash('sha256', $ip_address, true));
       
-      $this->session_data->scriptlog_last_active = time();
+      Session::getInstance()->scriptlog_last_active = time();
 
       $bind_session = ['user_session' => regenerate_session()];
       
@@ -330,13 +321,13 @@ public function logout()
 
   $this->getUserAuthSession();
   
-  $this->getSessionInstance()->startSession();
+  Session::getInstance()->startSession();
 
   $_SESSION = array();
 
   $this->removeCookies();
 
-  $this->getSessionInstance()->destroy();
+  Session::getInstance()->destroy();
 
   direct_page('login.php', 302);
   
@@ -628,33 +619,17 @@ private function getUserAuthSession()
  $accept_encoding = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
  $accept_language = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
  
- if($this->getSessionInstance()->scriptlog_session_ip !== $ip_address 
-    || $this->getSessionInstance()->scriptlog_session_agent !== sha1($accept_charset.$accept_encoding.$accept_language.$user_agent)) {
+ if(Session::getInstance()->scriptlog_session_ip !== $ip_address 
+    || Session::getInstance()->scriptlog_session_agent !== sha1($accept_charset.$accept_encoding.$accept_language.$user_agent)) {
 
       session_unset();
       session_destroy();
       session_regenerate_id(true);
       
-      $this->getSessionInstance()->scriptlog_session_agent = $user_agent;
-      $this->getSessionInstance()->scriptlog_session_ip = $ip_address;
+      Session::getInstance()->scriptlog_session_agent = $user_agent;
+      Session::getInstance()->scriptlog_session_ip = $ip_address;
         
   }
-
-}
-
-
-/**
- * getSessionInstance
- *
- * @return void
- * 
- */
-private function getSessionInstance()
-{
-
-  $this->session_data = Session::getInstance();
-
-  return $this->session_data;
 
 }
 
