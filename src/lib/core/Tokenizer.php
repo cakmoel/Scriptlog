@@ -1,26 +1,39 @@
 <?php
 /**
  * Tokenizer Class
- * Utitlize Cookies for authorization and authentication
+ * 
+ * implementing minimum requirements for secure user authentication in scriptlog
+ * with long-term persistence - login with "Remember Me" Cookies
  *
- * @category  Core Class
- * @author    Scott 
- * @see      https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string
- * @see      https://phppot.com/php/secure-remember-me-for-login-using-php-session-and-cookies/
+ * @category Core Class
+ * 
+ * @see https://github.com/ircmaxell/RandomLib
+ * @see https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string
+ * @see https://phppot.com/php/secure-remember-me-for-login-using-php-session-and-cookies/
+ * @see https://paragonie.com/blog/2015/05/using-encryption-and-authentication-correctly
+ * @see https://gist.github.com/wopot/94e33bdd1d7faaaa56e2
+ * @see https://paragonie.com/blog/2015/04/secure-authentication-php-with-long-term-persistence
+ * @see https://paragonie.com/blog/2015/11/choosing-right-cryptography-library-for-your-php-project-guide
+ * @see https://www.zimuel.it/blog/cryptography-made-easy-with-zend-framework
+ * 
+ * @author   M.Noermoehammad
+ * @license  MIT
+ * @version  1.0
  * 
  */
-class  Tokenizer
+final class  Tokenizer
 {
 
 /**
  * Create token
  * 
  * @method public createToken()
+ * @static
  * @param integer|number $length
  * @return string
  * 
  */
-  public function createToken($length)
+  public static function createToken($length)
   {
      
     $generator = (new \RandomLib\Factory())->getMediumStrengthGenerator();
@@ -31,43 +44,89 @@ class  Tokenizer
 
   }
 
-  private function randomSecureToken($min, $max)
+/**
+ * setRandomPasswordProtected
+ *
+ * @param string $password
+ * @param string $key
+ * @return void
+ * 
+ */
+  public static function setRandomPasswordProtected($password, $key)
   {
 
-    $range = $max - $min;
+    $hash_data = hash('SHA256', $password, true);
 
-    if ($range < 1) {
-            
-      return $min; 
-        
-    }
+    $hash_encoded = base64_encode($hash_data);
 
-    $log = ceil(log($range, 2));
-    $bytes = (int) ($log / 8) + 1; 
-    $bits = (int) $log + 1; 
-    $filter = (int) (1 << $bits) - 1; 
+    $cipher_data = password_hash($hash_encoded, PASSWORD_DEFAULT);
 
-    do {
+    return ScriptlogCryptonize::cipherMessage($cipher_data, $key);
 
-      if(function_exists("random_bytes")) {
+  }
 
-        $rnd = hexdec(bin2hex(random_bytes($bytes)));
- 
-      } elseif(function_exists("openssl_random_pseudo_bytes")) {
- 
-       $rnd = hexdec(bin2hex(openssl_random_pseudo_bytes($bytes)));
-        
-      } else {
- 
-        $rnd = hexdec(bin2hex(ircmaxell_random_generator($bytes)));
- 
-      }
+/**
+ * getRandomPasswordProtected
+ *
+ * @param string $cipher_data
+ * @param string $password
+ * @param string $key
+ * @return void
+ * 
+ */
+  public static function getRandomPasswordProtected($cipher_data, $password, $key)
+  {
 
-      $rnd = $rnd & $filter; 
+    $decipher = ScriptlogCryptonize::decipherMessage($cipher_data, $key);
 
-    } while ($rnd > $range);
+    $hash_data = hash('SHA256', $password, true);
 
-      return $min + $rnd;
+    $hash_encoded = base64_encode($hash_data);
+
+    return password_verify($hash_encoded, $decipher);
+
+  }
+
+/**
+ * setRandomSelectorProtected
+ *
+ * @param string $selector
+ * @param string $key
+ * @return void
+ * 
+ */
+  public static function setRandomSelectorProtected($selector, $key)
+  {
+
+    $hash_data = hash('SHA256', $selector, true);
+
+    $hash_encoded = base64_encode($hash_data);
+
+    $cipher_data = password_hash($hash_encoded, PASSWORD_DEFAULT);
+
+    return ScriptlogCryptonize::cipherMessage($cipher_data, $key);
+
+  }
+
+/**
+ * getRandomSelectorProtected
+ *
+ * @param string $cipher_data
+ * @param string $selector
+ * @param string $key
+ * @return void
+ * 
+ */
+  public static function getRandomSelectorProtected($cipher_data, $selector, $key)
+  {
+
+    $decipher = ScriptlogCryptonize::decipherMessage($cipher_data, $key);
+
+    $hash_data = hash('SHA256', $selector, true);
+
+    $hash_encoded = base64_encode($hash_data);
+
+    return password_verify($hash_encoded, $decipher);
 
   }
 
