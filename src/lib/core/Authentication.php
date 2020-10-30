@@ -250,8 +250,7 @@ class Authentication
      }
 
       $account_login = $account_info['user_login'];
-      $account_email = $account_info['user_email'];
-    
+      
       $this->validator->validate($password, 'password'); 
 
       Session::getInstance()->scriptlog_session_id = $this->user_id = intval($account_info['ID']);
