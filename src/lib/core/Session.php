@@ -12,7 +12,7 @@
  * @version 1.0
  * 
  */
-class Session
+final class Session
 {
 
 const SESSION_STARTED = FALSE;
