@@ -142,11 +142,26 @@ class Authentication
     return $this->userDao->getUserByLogin($user_login);
   }
 
+/**
+ * findTokenByLogin
+ *
+ * @param string $login
+ * @param string $expired
+ * @return void
+ * 
+ */
   public function findTokenByLogin($login, $expired)
   {
     return $this->userToken->getTokenByLogin($login, $expired);
   }
   
+/**
+ * markCookieAsExpired
+ *
+ * @param string $tokenId
+ * @return void
+ * 
+ */
   public function markCookieAsExpired($tokenId)
   {
     return $this->userToken->updateTokenExpired($tokenId);
@@ -234,12 +249,9 @@ class Authentication
 
      }
 
-      $account_id = (int)$account_info['ID'];
       $account_login = $account_info['user_login'];
       $account_email = $account_info['user_email'];
-      $account_level = $account_info['user_level'];
-      $account_name = $account_info['user_fullname'];
-
+    
       $this->validator->validate($password, 'password'); 
 
       Session::getInstance()->scriptlog_session_id = $this->user_id = intval($account_info['ID']);
@@ -271,20 +283,19 @@ class Authentication
       // Set Auth Cookies if 'Remember Me' checked
       if ($remember_me == true) {
 
-          $tokenizer = new Tokenizer();
-      
           $encrypt_auth = ScriptlogCryptonize::scriptlogCipher($account_login, $this->key);
 
           set_cookies_scl('scriptlog_auth', $encrypt_auth, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true); 
           
-          $random_password = $tokenizer -> createToken(64);
+          $secret = ScriptlogCryptonize::generateSecretKey();
+          $random_password = Tokenizer::createToken(32);
           set_cookies_scl('scriptlog_validator', $random_password, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
         
-          $random_selector = $tokenizer -> createToken(64);
+          $random_selector = Tokenizer::createToken(32);
           set_cookies_scl('scriptlog_selector', $random_selector, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
         
-          $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
-          $hashed_selector = password_hash($random_selector, PASSWORD_DEFAULT);
+          $hashed_password = Tokenizer::setRandomPasswordProtected($random_password, $secret);
+          $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
           
           $expiry_date = date("Y-m-d H:i:s", time() + self::COOKIE_EXPIRE);
                   
