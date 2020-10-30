@@ -6,6 +6,8 @@
  * @category checking whether cookies or session exists or not
  * @author M.Noermoehammad scriptlog@yandex.com
  * @author Vincy vincy@gmail.com
+ * @license MIT
+ * @version 1.0
  * @see https://phppot.com/php/secure-remember-me-for-login-using-php-session-and-cookies/
  * @see https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string
  * @see https://paragonie.com/blog/2015/04/secure-authentication-php-with-long-term-persistence
@@ -36,8 +38,10 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
  
     // retrieve user token info
     $decrypt_auth = ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $key);
+    
+    $token_info = $authenticator->findTokenByLogin($decrypt_auth, 0);
 
-    $token_info = $authenticator -> findTokenByLogin($decrypt_auth, 0);
+    $secret = ScriptlogCryptonize::generateSecretKey();
 
     $expected_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
     $correct_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
@@ -49,23 +53,22 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
 
          if(timing_safe_equals($expected_validator, $correct_validator) == 0) {
 
-              // validate random validator cookie with database
-              if(password_verify($_COOKIE['scriptlog_validator'], $token_info['pwd_hash'])) {
+            // validate random validator cookie with database
+            if (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash'], $secret)) {
 
-                  $validator_verified = true;
+                $validator_verified = true;
 
-              }
+            }
 
          }
 
          if(timing_safe_equals($expected_selector, $correct_selector) == 0) {
 
-              // Validate random selector cookie with database
-              if(password_verify($_COOKIE['scriptlog_selector'], $token_info['selector_hash'])) {
+            if ( Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret)) {
 
-                  $selector_verified = true;
+                $selector_verified = true;
 
-              }
+            }
 
          }
 
@@ -73,22 +76,22 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
 
          if(hash_equals($expected_validator, $correct_validator)) {
 
-              if(password_verify($_COOKIE['scriptlog_validator'], $token_info['pwd_hash'])) {
+            if ( Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash'], $secret) ) {
 
                  $validator_verified = true;
 
-              }
+            }
 
          }
 
          if(hash_equals($expected_selector, $correct_selector)) {
 
-             if(password_verify($_COOKIE['scriptlog_selector'], $token_info['selector_hash'])) {
+            if ( Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret)) {
 
-                 $selector_verified = true;
+                $selector_verified = true;
 
-             }
-
+            }
+             
          }
 
     }
@@ -111,12 +114,12 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
 
          if (!empty($token_info['ID'])) {
 
-            $authenticator -> markCookieAsExpired($token_info['ID']);
+            $authenticator->markCookieAsExpired($token_info['ID']);
 
          }
 
          // clear cookies
-         $authenticator -> clearAuthCookies($token_info['user_login']);
+         $authenticator->clearAuthCookies($token_info['user_login']);
          
     } 
 
