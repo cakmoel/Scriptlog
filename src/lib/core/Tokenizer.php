@@ -1,6 +1,6 @@
 <?php
 /**
- * Tokenizer Class
+ * class Tokenizer
  * 
  * implementing minimum requirements for secure user authentication in scriptlog
  * with long-term persistence - login with "Remember Me" Cookies
@@ -15,6 +15,10 @@
  * @see https://paragonie.com/blog/2015/04/secure-authentication-php-with-long-term-persistence
  * @see https://paragonie.com/blog/2015/11/choosing-right-cryptography-library-for-your-php-project-guide
  * @see https://www.zimuel.it/blog/cryptography-made-easy-with-zend-framework
+ * 
+ * @uses \RandomLib\Factory::getMediumStrengthGenerator
+ * @uses ScriptlogCryptonize::cipherMessage
+ * @uses ScriptlogCryptonize::decipherMessage
  * 
  * @author   M.Noermoehammad
  * @license  MIT
