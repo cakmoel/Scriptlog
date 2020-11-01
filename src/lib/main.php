@@ -11,7 +11,8 @@
  * @since    Since Release 1.0
  * 
  */
-
+ini_set('memory_limit', "6M");
+error_reporting(-1);
 #ini_set("session.cookie_secure", 1);  
 #ini_set("session.cookie_lifetime", 86400);  
 ini_set("session.cookie_httponly", 1);
@@ -193,8 +194,10 @@ $rules = array(
 #====== an instantiation of Database connection =========
 $dbc = DbFactory::connect(['mysql:host='.$config['db']['host'].';dbname='.$config['db']['name'], $config['db']['user'], $config['db']['pass']]);
 
-// Register rules of routes and an instance of database connection
-Registry::setAll(array('dbc' => $dbc, 'route' => $rules));
+$key = ScriptlogCryptonize::scriptlogCipherKey();
+
+// Register rules of routes, an instance of database connection and key for cryptography
+Registry::setAll(array('dbc' => $dbc, 'route' => $rules, 'key' => $key));
 
 /* an instances of class that necessary for the system
  * please do not change this below variable 
@@ -206,7 +209,6 @@ Registry::setAll(array('dbc' => $dbc, 'route' => $rules));
  * @var $userDao, $validator, $authenticator, $ubench --
  * 
  */
-$key = ScriptlogCryptonize::scriptlogCipherKey();
 $searchPost = new SearchFinder($dbc);
 $sanitizer = new Sanitize();
 $userDao = new UserDao();
