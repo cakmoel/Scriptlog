@@ -20,6 +20,11 @@ class Authorization
  */
 private static $authentication;
 
+public function __construct(Authentication $authentication)
+{
+   self::$authentication = $authentication;
+}
+
 /**
  * setAuthInstance
  *
@@ -41,7 +46,7 @@ public static function setAuthInstance($authentication)
 /**
  * getAuthInstance
  *
- * @return void
+ * @return object
  * 
  */
 public static function getAuthInstance()
@@ -58,7 +63,9 @@ public static function getAuthInstance()
  */
 public static function authorizeRole($role)
 {
-return self::getAuthInstance()->userAccessControl($role);
+
+ return self::getAuthInstance()->userAccessControl($role);
+
 }
 
 /**
@@ -69,7 +76,9 @@ return self::getAuthInstance()->userAccessControl($role);
  */
 public static function authorizeLevel()
 {
-return self::getAuthInstance()->accessLevel();
+
+ return self::getAuthInstance()->accessLevel();
+  
 }
 
 }
