@@ -9,7 +9,7 @@
  * @since Since Release 1.0
  * 
  */
-use Zend\Crypt\BlockCipher;
+use Laminas\Crypt\BlockCipher;
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
 
@@ -42,7 +42,7 @@ public static function generateSecretKey()
 public static function cipherMessage($message, $key)
 {
 
-  $cipher = \Zend\Crypt\BlockCipher::factory('openssl', array('algo' => 'aes'));
+  $cipher = \Laminas\Crypt\BlockCipher::factory('openssl', array('algo' => 'aes'));
 
   $cipher->setKey($key);
 
@@ -156,7 +156,7 @@ try {
 public static function decipherMessage($ciphertext, $key)
 {
 
-$cipher = \Zend\Crypt\BlockCipher::factory('openssl', array('algo' => 'aes'));
+$cipher = \Laminas\Crypt\BlockCipher::factory('openssl', array('algo' => 'aes'));
 
 $cipher->setKey($key);
  
@@ -198,7 +198,7 @@ if ( file_exists(__DIR__ . '/../../lib/utility/.lts/lts.txt')) {
 
 } else {
 
-  $keyObject = new Key();
+  $keyObject = \Defuse\Crypto\Key::createNewRandomKey();
 
   $key_ascii = $keyObject->saveToAsciiSafeString();
 
@@ -221,15 +221,15 @@ private static function defaultSecretKey()
 
  if (function_exists("random_bytes")) {
 
-   $key = random_bytes(64);
+   $key = random_bytes(16);
        
  } elseif(function_exists("openssl_random_pseudo_bytes")) {
 
-   $key = openssl_random_pseudo_bytes(64);
+   $key = openssl_random_pseudo_bytes(16);
 
  } else {
 
-   $key = ircmaxell_random_compat();
+   $key = ircmaxell_random_compat(16);
 
  }
 
