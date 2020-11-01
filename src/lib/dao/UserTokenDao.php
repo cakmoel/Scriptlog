@@ -85,7 +85,7 @@ class UserTokenDao extends Dao
  * @return void
  * 
  */
-public function updateUserToken($sanitize, $bind, $user_login)
+public function updateUserToken($bind, $user_login)
 {
   
   $this->modify("tbl_user_token", ['pwd_hash' => $bind['pwd_hash'], 'selector_hash' => $bind['selector_hash'], 'expired_date' => $bind['expired_date']], " user_login = '{$user_login}' AND is_expired = '0'");
