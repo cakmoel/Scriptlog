@@ -21,7 +21,7 @@ class UserApp extends BaseApp
   private $view;
 
   private $userEvent;
-  
+
   public function __construct(UserEvent $userEvent)
   {
     $this->userEvent = $userEvent;       
@@ -38,7 +38,7 @@ class UserApp extends BaseApp
     if (isset($_GET['error'])) {
         $checkError = false;
         if ($_GET['error'] == 'userNotFound') array_push($errors, "Error: User Not Found!");
-        if ($_GET['error'] == 'adminDeleteNotified') array_push($errors, "Error: Administrator could not be deleted");
+        if ($_GET['error'] == 'adminDeletedNotified') array_push($errors, "Error: Administrator could not be deleted");
     }
     
     if (isset($_GET['status'])) {
@@ -157,7 +157,7 @@ class UserApp extends BaseApp
     if (isset($_POST['userFormSubmit'])) {
        
         $filters = ['user_login' => FILTER_SANITIZE_STRING, 'user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 
-                    'user_pass' => FILTER_SANITIZE_MAGIC_QUOTES, 'user_url' => FILTER_SANITIZE_URL, 'user_level' => FILTER_SANITIZE_STRING, 
+                    'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'user_url' => FILTER_SANITIZE_URL, 'user_level' => FILTER_SANITIZE_STRING, 
                     'session_id' => FILTER_SANITIZE_ENCODED, 'send_user_notification' => FILTER_SANITIZE_NUMBER_INT];
 
         try {
@@ -269,7 +269,7 @@ class UserApp extends BaseApp
                 } else {
                 
                     $this->userEvent->addUser();
-                    
+                                        
                 }
                 
                 direct_page('index.php?load=users&status=userAdded', 200);
@@ -335,7 +335,7 @@ class UserApp extends BaseApp
     if (isset($_POST['userFormSubmit'])) {
        
         $filters = ['user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 
-                    'user_pass' => FILTER_SANITIZE_MAGIC_QUOTES, 'user_pass2' => FILTER_SANITIZE_MAGIC_QUOTES,
+                    'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                     'user_url' => FILTER_SANITIZE_URL, 'user_level' => FILTER_SANITIZE_STRING, 
                     'user_id' => FILTER_SANITIZE_NUMBER_INT];
         
@@ -443,30 +443,23 @@ class UserApp extends BaseApp
 
               }
 
-              if($this->userEvent->identifyCookieToken()) {
-
-                $tokenizer = new Tokenizer();
-                 
+              if($this->userEvent->identifyCookieToken() == true) {
+ 
                 if(!empty($_POST['user_pass'])) {
 
-                  $random_password = $tokenizer->createToken(64);
+                  $secret = ScriptlogCryptonize::generateSecretKey();
+
+                  $random_password = Tokenizer::createToken(32);
                   set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
                   
-                  $random_selector = $tokenizer->createToken(64);
+                  $random_selector = Tokenizer::createToken(32);
                   set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
                   
-                  $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
-                  $hashed_selector = password_hash($random_selector, PASSWORD_DEFAULT);
+                  $hashed_password = Tokenizer::setRandomPasswordProtected($random_password, $secret);
+                  $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
               
                   $this->userEvent->setPwdHash($hashed_password);
                   $this->userEvent->setSelectorHash($hashed_selector);
-
-                  $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
-                  $hashed_selector = password_hash($random_selector, PASSWORD_DEFAULT);
-            
-                  $this->userEvent->setPwdHash($hashed_password);
-                  $this->userEvent->setSelectorHash($hashed_selector);
-                
                   $this->userEvent->setUserLogin($getUser['user_login']);
 
                   $expiry_date = date("Y-m-d H:i:s", time() + Authentication::COOKIE_EXPIRE);
@@ -551,7 +544,7 @@ class UserApp extends BaseApp
     if(isset($_POST['userFormSubmit'])) {
 
         $filters = ['user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 
-                    'user_pass' => FILTER_SANITIZE_MAGIC_QUOTES, 'user_pass2' => FILTER_SANITIZE_MAGIC_QUOTES,
+                    'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                     'user_url' => FILTER_SANITIZE_URL, 'user_id' => FILTER_SANITIZE_NUMBER_INT];
 
     try {
@@ -637,21 +630,23 @@ class UserApp extends BaseApp
 
                 }
 
-                if ($this->userEvent->identifyCookieToken()) {
+                if ($this->userEvent->identifyCookieToken() == true) {
 
                     // set password token and selector token here
                     $tokenizer = new Tokenizer();
 
                     if(!empty($_POST['user_pass'])) {
 
-                        $random_password = $tokenizer->createToken(64);
+                        $secret = ScriptlogCryptonize::generateSecretKey();
+
+                        $random_password = $tokenizer->createToken(32);
                         set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
                 
-                        $random_selector = $tokenizer->createToken(64);
+                        $random_selector = $tokenizer->createToken(32);
                         set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
                 
-                        $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
-                        $hashed_selector = password_hash($random_selector, PASSWORD_DEFAULT);
+                        $hashed_password = Tokenizer::setRandomPasswordProtected($random_password, $secret);
+                        $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
                 
                         $this->userEvent->setPwdHash($hashed_password);
                         $this->userEvent->setSelectorHash($hashed_selector);
@@ -733,7 +728,7 @@ class UserApp extends BaseApp
 
         if (!$checkError) {
 
-            direct_page('index.php?load=users&error=adminDeleteNotified', 307);
+            direct_page('index.php?load=users&error=adminDeletedNotified', 307);
 
         } else {
 
