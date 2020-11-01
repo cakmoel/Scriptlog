@@ -1,9 +1,13 @@
 <?php
 /**
- * Captcha login generator
+ * captcha_login_generator()
+ * 
  * Generating captcha for login when 3 times attempts failed
  * 
  * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * 
  */
 function captcha_login_generator()
@@ -15,7 +19,7 @@ function captcha_login_generator()
  $_SESSION['scriptlog_captcha_code'] = $captcha_code;
     
  $layer = imagecreatetruecolor(70,30);
- $background = imagecolorallocate($layer, 153, 204, 0);
+ $background = imagecolorallocate($layer, 127, 255, 0);
  imagefill($layer, 0, 0, $background);
  $text_color =  imagecolorallocate($layer, 0, 0, 0);
  imagestring($layer, 5, 5, 5, $captcha_code, $text_color);
