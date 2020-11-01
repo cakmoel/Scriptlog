@@ -59,14 +59,22 @@ final class  Tokenizer
   public static function setRandomPasswordProtected($password, $key)
   {
 
-    $hash_data = hash('SHA256', $password, true);
+    if (get_browser_name() == 'Chrome') {
 
-    $hash_encoded = base64_encode($hash_data);
+      $hash_data = hash('SHA256', $password, true);
 
-    $cipher_data = password_hash($hash_encoded, PASSWORD_DEFAULT);
+      $hash_encoded = base64_encode($hash_data);
 
-    return ScriptlogCryptonize::cipherMessage($cipher_data, $key);
+      $cipher_data = password_hash($hash_encoded, PASSWORD_DEFAULT);
+        
+      return ScriptlogCryptonize::cipherMessage($cipher_data, $key);
+       
+    } else {
 
+      return password_hash($password, PASSWORD_DEFAULT);
+
+    }
+    
   }
 
 /**
@@ -81,13 +89,21 @@ final class  Tokenizer
   public static function getRandomPasswordProtected($cipher_data, $password, $key)
   {
 
-    $decipher = ScriptlogCryptonize::decipherMessage($cipher_data, $key);
+    if (get_browser_name() == 'Chrome') {
 
-    $hash_data = hash('SHA256', $password, true);
+      $decipher = ScriptlogCryptonize::decipherMessage($cipher_data, $key);
 
-    $hash_encoded = base64_encode($hash_data);
+      $hash_data = hash('SHA256', $password, true);
 
-    return password_verify($hash_encoded, $decipher);
+      $hash_encoded = base64_encode($hash_data);
+
+      return password_verify($hash_encoded, $decipher);
+
+    } else {
+
+      return password_verify($cipher_data, $password);
+
+    }
 
   }
 
@@ -102,14 +118,22 @@ final class  Tokenizer
   public static function setRandomSelectorProtected($selector, $key)
   {
 
-    $hash_data = hash('SHA256', $selector, true);
+    if (get_browser_name() == 'Chrome') {
 
-    $hash_encoded = base64_encode($hash_data);
+      $hash_data = hash('SHA256', $selector, true);
 
-    $cipher_data = password_hash($hash_encoded, PASSWORD_DEFAULT);
+      $hash_encoded = base64_encode($hash_data);
 
-    return ScriptlogCryptonize::cipherMessage($cipher_data, $key);
+      $cipher_data = password_hash($hash_encoded, PASSWORD_DEFAULT);
 
+      return ScriptlogCryptonize::cipherMessage($cipher_data, $key);
+
+    } else {
+
+      return password_hash($selector, PASSWORD_DEFAULT);
+
+    }
+    
   }
 
 /**
@@ -124,14 +148,22 @@ final class  Tokenizer
   public static function getRandomSelectorProtected($cipher_data, $selector, $key)
   {
 
-    $decipher = ScriptlogCryptonize::decipherMessage($cipher_data, $key);
+    if (get_browser_name() == 'Chrome') {
 
-    $hash_data = hash('SHA256', $selector, true);
+      $decipher = ScriptlogCryptonize::decipherMessage($cipher_data, $key);
 
-    $hash_encoded = base64_encode($hash_data);
+      $hash_data = hash('SHA256', $selector, true);
 
-    return password_verify($hash_encoded, $decipher);
+      $hash_encoded = base64_encode($hash_data);
 
+      return password_verify($hash_encoded, $decipher);
+
+    } else {
+
+       return password_verify($cipher_data, $selector);
+
+    }
+    
   }
 
 }
