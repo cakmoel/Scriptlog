@@ -52,15 +52,15 @@ class UserDao extends Dao
  * getUserById
  * fetch single value of record by ID
  * 
- * @param integer $userId
+ * @param integer $user_id
  * @param object $sanitize
  * @param static $fetchMode = null
  * @return boolean|array|object
  * 
  */
- public function getUserById($userId, $sanitize, $fetchMode = null)
+ public function getUserById($user_id, $sanitize, $fetchMode = null)
  {
-   $cleanId = $this->filteringId($sanitize, $userId, 'sql');
+   $cleanId = $this->filteringId($sanitize, $user_id, 'sql');
    
    $sql = "SELECT ID, user_login, user_email, user_pass, user_level, 
                   user_fullname, user_url, user_registered, user_session 
@@ -68,7 +68,7 @@ class UserDao extends Dao
    
    $this->setSQL($sql);
 
-   $userById = (is_null($fetchMode)) ? $this->findRow([':ID' => $cleanId]) : $this->findRow([':ID' => $cleanId], $fetchMode);
+   $userById = (is_null($fetchMode)) ? $this->findRow([':ID' => (int)$cleanId]) : $this->findRow([':ID' => (int)$cleanId], $fetchMode);
 
    return (empty($userById)) ?: $userById;
 
@@ -194,10 +194,10 @@ class UserDao extends Dao
   * @param array $bind
   * @param integer $ID
   */
- public function updateUser($accessLevel, $sanitize, $bind, $userId)
+ public function updateUser($accessLevel, $sanitize, $bind, $user_id)
  {
   
-    $cleanId = $this->filteringId($sanitize, $userId, 'sql');
+    $cleanId = $this->filteringId($sanitize, $user_id, 'sql');
   
     $hash_password = scriptlog_password($bind['user_pass']);
   
@@ -257,11 +257,11 @@ class UserDao extends Dao
   * @param string $accessLevel
   * @param object $sanitize
   * @param array $bind
-  * @param integer $userId
+  * @param integer $user_id
   */
  public function updateUserSession($bind, $user_id)
  {
-   $this->modify("tbl_users", ['user_session' => generate_session_key($bind['user_session'], 128)], "ID = {$user_id}");
+   $this->modify("tbl_users", ['user_session' => generate_session_key($bind['user_session'], 32)], "ID = {$user_id}");
  }
 
  /**
@@ -526,16 +526,16 @@ class UserDao extends Dao
  /**
   * Check User Id
   * 
-  * @param integer $userId
+  * @param integer $user_id
   * @param object $sanitize
   * @return numeric
   */
- public function checkUserId($userId, $sanitize)
+ public function checkUserId($user_id, $sanitize)
  {
      
      $sql = "SELECT ID FROM tbl_users WHERE ID = ?";
 
-     $idsanitized = $this->filteringId($sanitize, $userId, 'sql');
+     $idsanitized = $this->filteringId($sanitize, $user_id, 'sql');
 
      $this->setSQL($sql);
 
