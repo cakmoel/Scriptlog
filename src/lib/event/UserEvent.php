@@ -96,8 +96,36 @@ class UserEvent
  * @var object
  * 
  */
- private $userDao, $userToken, $validator, $sanitize;
+ private $userDao; 
 
+/**
+ * userToken
+ *
+ * @var object
+ * 
+ */
+ private $userToken; 
+ 
+/**
+ * validator
+ *
+ * @var object
+ * 
+ */
+ private $validator; 
+ 
+ private $sanitize;
+
+ private $key;
+
+ private $validator_verified = false;
+
+ private $selector_verified = false;
+
+ private $expired_verified = false;
+
+ const VERIFIED_SELECTOR = false;
+ 
  /**
   * @method __constructor()
   * 
@@ -111,6 +139,13 @@ class UserEvent
     $this->validator = $validator;
     
     $this->sanitize = $sanitize;
+
+    if ( Registry::isKeySet('key') ) {
+
+       $this->key = Registry::get('key');
+
+    }
+
  }
 
  /**
@@ -297,7 +332,7 @@ class UserEvent
   $this->validator->sanitize($this->user_fullname, 'string');
   $this->validator->sanitize($this->user_email, 'email');
   
-   if ($this->isUserLevel() != 'administrator' && $this->isUserLevel() != 'manager') {
+   if ($this->isUserLevel() != 'administrator') {
    
        if (!empty($this->user_pass)) {
            
@@ -347,7 +382,7 @@ class UserEvent
  
       $bind_meta = ['pwd_hash' => $this->pwd_hash, 'selector_hash' => $this->selector_hash, 'expired_date' => $this->cookie_expired_date];
 
-      $this->userToken->updateUserToken($this->sanitize, $bind_meta, $this->user_login);
+      $this->userToken->updateUserToken($bind_meta, $this->user_login);
 
    }
 
@@ -462,19 +497,58 @@ class UserEvent
  public function identifyCookieToken()
  {
 
-   if (isset($_COOKIE['scriptlog_validator'])) {
+   $this->user_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $this->key) : Session::getInstance()->scriptlog_session_login;
 
-      return $_COOKIE['scriptlog_validator'];
+   $secret = ScriptlogCryptonize::generateSecretKey();
 
+   if ( ( isset($_COOKIE['scriptlog_validator']) ) && ( isset($_COOKIE['scriptlog_selector']) ) ) {
+
+      //retrieve user token info
+      $token_info = $this->grabTokenByLogin($this->user_login, 0);
+
+      $expected_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
+      $correct_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
+
+      $expected_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
+      $correct_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
+
+      if ( hash_equals($expected_validator, $correct_validator) ) {
+
+          if ( Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash'], $secret) ) {
+
+            $this->validator_verified = true;
+
+          }
+
+      } 
+
+      if ( hash_equals($expected_selector, $correct_selector) ) {
+
+          if ( Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret) ) {
+
+            $this->selector_verified = true;
+
+          }
+
+      }
+
+      if ( $token_info['expired_date'] >= date("Y-m-d H:i:s", time())) {
+
+          $this->expired_verified = true;
+
+      }
+
+      if ((!empty($token_info['ID'])) && $this->validator_verified && $this->selector_verified && $this->expired_verified ) {
+
+           return true;
+
+      } else {
+
+          return false;
+
+      }
+      
    }
-
-   if (isset($_COOKIE['scriptlog_selector'])) {
-
-      return $_COOKIE['scriptlog_selector'];
-
-   }
-
-   return false;
 
  }
 
