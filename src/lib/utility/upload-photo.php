@@ -1,29 +1,21 @@
 <?php
 /**
- * Upload picture with Intervention Image Manipulation Class Library
+ * photo_instance()
+ * 
  * if fileinfo enabled then Intervention Image works properly else will implement non-secure approach
  * 
- * @category Package
+ * @category function
  * @author  Oliver Vogel the author of Intervention Image 
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @see http://image.intervention.io/
  * @see https://anchetawern.github.io/blog/2016/02/18/using-the-intervention-image-library-in-php/
  * @see https://www.tutmecode.com/php/create-thumbnail-from-big-size-image-in-php-or-laravel/
- * @license MIT
  * 
  */
-
 use Intervention\Image\ImageManager;
-use Intervention\Image\ImageManagerStatic as Image;
 
-/**
- * photo_instance
- * create an image manager instance with favored driver
- * 
- * @category Function
- * @uses ImageManager
- * @return object
- * 
- */
 function photo_instance()
 {
   // Currently you can choose between gd and imagick
@@ -34,9 +26,14 @@ function photo_instance()
 }
 
 /**
- * upload_photo
+ * upload_photo()
+ * 
+ * uploading picture
  *
- * @category Function
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param string $file_location
  * @param string $file_size
  * @param string $file_type
@@ -126,7 +123,7 @@ if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exi
 
       // creating large size thumbnail
       $large_size_thumb = new Resize($origin_path_uploaded);
-      $large_size_thumb ->resizeImage(770, 400, "crop");
+      $large_size_thumb ->resizeImage($large_size, 400, "crop");
       $large_size_thumb -> saveImage($large_path_uploaded, 80);
   
     } else {
@@ -240,13 +237,13 @@ if( filesize($file_path_uploaded) !== $file_size ) {
  * set_webp_origin
  * 
  * @category Function
- * @param [type] $current_width
- * @param [type] $current_height
- * @param [type] $file_location
- * @param [type] $file_size
- * @param [type] $origin_path_uploaded
- * @param [type] $origin_path
- * @param [type] $file_name
+ * @param int|numeric $current_width
+ * @param int|numeric $current_height
+ * @param string $file_location
+ * @param string $file_size
+ * @param string $origin_path_uploaded
+ * @param string $origin_path
+ * @param string $file_name
  * @return void
  * 
  */
