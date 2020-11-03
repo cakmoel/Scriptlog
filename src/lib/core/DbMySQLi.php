@@ -24,6 +24,8 @@ private $dbname;
 
 private static $report_mode;
 
+private static $config = [];
+
 public $errors;
 
 public static $inst = null;
@@ -35,14 +37,12 @@ public function __construct()
 
   try {
 
-    $config = [];
+    self::$config = $this->getConfiguration();
 
-    $config = $this->getConfiguration();
-
-    $this->dbhost = $config['db']['host'];
-    $this->dbuser = $config['db']['user'];
-    $this->dbpass = $config['db']['pass'];
-    $this->dbname = $config['db']['name'];
+    $this->dbhost = self::$config['db']['host'];
+    $this->dbuser = self::$config['db']['user'];
+    $this->dbpass = self::$config['db']['pass'];
+    $this->dbname = self::$config['db']['name'];
 
     $this->dbc = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->dbname);
       
@@ -146,12 +146,13 @@ public function simpleQuery($sql)
 }
 
 /**
+ * preparedQuery
  * mysqli prepared statement
  *
  * @example usage:
  * // populate with data
  *  $sql = "INSERT INTO tmp_mysqli_helper_test (name) VALUES (?),(?),(?)";
- *  $stmt = prepared_query($conn, $sql, ['Sam','Bob','Joe']);
+ *  $stmt = $this->preparedQuery($conn, $sql, ['Sam','Bob','Joe']);
  *  $stmt->affected_rows;
  *  $conn->insert_id;
  * 
@@ -159,7 +160,7 @@ public function simpleQuery($sql)
  *  $start = 0;
  *  $limit = 10;
  *  $sql = "SELECT * FROM tmp_mysqli_helper_test LIMIT ?,?";
- *  $all = prepared_query($conn, $sql, [$start, $limit])->get_result()->fetch_all(MYSQLI_ASSOC);
+ *  $all = $this->preparedQuery($conn, $sql, [$start, $limit])->get_result()->fetch_all(MYSQLI_ASSOC);
  *  foreach ($all as $row) {
  *    echo "{$row['id']}: {$row['name']}\n"; 
  *  }
@@ -170,7 +171,7 @@ public function simpleQuery($sql)
  * @param string $types
  * @return void
  */
-public function preparedQuery($sql, $params, $types = "")
+public function preparedQuery($sql, $params = [], $types = "")
 {
   
   $types = $types ?: str_repeat("s", count($params));
@@ -192,7 +193,7 @@ public function preparedQuery($sql, $params, $types = "")
  *    $start = 0;
  *    $limit = 10;
  *    $sql = "SELECT * FROM users LIMIT ?,?";
- *    $user_list = prepared_select($mysqli, $sql, [$start, $limit])->fetch_all(MYSQLI_ASSOC);
+ *    $user_list = $this->preparedSelect($mysqli, $sql, [$start, $limit])->fetch_all(MYSQLI_ASSOC);
  * 
  * @param string $sql
  * @param array $params
@@ -201,7 +202,9 @@ public function preparedQuery($sql, $params, $types = "")
  */
 public function preparedSelect($sql, $params = [], $types = "")
 {
-  return prepared_query($sql, $params, $types)->get_result();
+  $items = $this->preparedQuery($sql, $params, $types);
+  return $items->getResult();
+  
 }
 
 /**
@@ -218,7 +221,7 @@ public function preparedInsert($table, $data)
   $keys = array_keys($data);
   $keys = array_map('escape_string', $keys);
   $fields = implode(",", $keys);
-  $table = escape_string($table);
+  $table = $this->escape_string($table);
   $placeholders = str_repeat('?,', count($keys) - 1). '?';
   $sql = "INSERT INTO $table ($fields) VALUES ($placeholders)";
 
@@ -226,6 +229,45 @@ public function preparedInsert($table, $data)
 
 }
 
+/**
+ * preparedUpdate
+ *
+ * @param string $table
+ * @param array $data
+ * @param int $id
+ * @return void
+ * 
+ */
+public function preparedUpdate($table, $data, $id)
+{
+
+$table = $this->escape_string($table);
+
+$sql = "UPDATE $table SET ";
+
+foreach (array_keys($data) as $d => $field) {
+  
+    $field = $this->escape_string($field);
+    $sql .= ($d) ? ", " : "";
+    $sql .= "$field = ?";
+
+}
+
+$sql .= " WHERE ID = ?";
+
+$data[] = (int)$id;
+
+$this->preparedQuery($sql, array_values($data));
+
+}
+
+/**
+ * escape_string
+ *
+ * @param string $field
+ * @return void
+ * 
+ */
 public function escape_string($field)
 {
    return "`".str_replace("`", "``", $field)."`";
@@ -234,18 +276,18 @@ public function escape_string($field)
 /**
  * Filtering user data
  * @example usage:
- * $user_name = $database->filteringUserData( $_POST['user_name'] );
+ * $user_name = $database->filterData( $_POST['user_name'] );
  * 
  * Or to filter an entire array:
  * $data = array( 'name' => $_POST['name'], 'email' => 'email@address.com' );
- * $data = $database->filter( $data );
+ * $data = $database->filterData( $data );
  * 
  * 
  * @param mixed $data
  * @return mixed
  * 
  */
-public function filteringUserData($data)
+public function filterData($data)
 {
 
  if (!is_array($data)) {
@@ -255,7 +297,7 @@ public function filteringUserData($data)
     
  } else {
 
-    $data = array_map( array( $this, 'filter' ), $data );
+    $data = array_map( array( $this, 'filterData' ), $data );
 
  }
 
@@ -274,14 +316,24 @@ public function cleanOutputDisplay($data)
 
 }
 
+/**
+ * isTableExists
+ * checking whether table name exists on database
+ * @param string $table_name
+ * @see https://stackoverflow.com/questions/6432178/how-can-i-check-if-a-mysql-table-exists-with-php
+ * @return boolean
+ * 
+ */
 public function isTableExists($table_name)
 {
   
  try {
    
-  $check = $this->dbc->query("SHOW TABLES LIKE '".$table_name."'");
+  $database = $this->dbname;
+  $check_table = $this->dbc->query("SHOW TABLES LIKE '$table_name'");
+  $check_table_schema = $this->dbc->query("SELECT table_name FROM information_schema.tables WHERE table_schema = '$database' AND table_name = '$table_name'");
  
-  if ($check->num_rows == 1) {
+  if (($check_table->num_rows > 0) || ($check_table_schema->num_rows == 1)) {
 
     return true;
 
@@ -293,7 +345,7 @@ public function isTableExists($table_name)
 
   $check->free();
 
- } catch (mysqli_sqli_exception $e) {
+ } catch (mysqli_sql_exception $e) {
    
     $this->errors = LogError::newMessage($e);
     $this->errors = LogError::customErrorMessage();
@@ -302,6 +354,13 @@ public function isTableExists($table_name)
   
 }
 
+/**
+ * getNumRows
+ *
+ * @param string $sql
+ * @return void
+ * 
+ */
 public function getNumRows($sql)
 {
   
@@ -330,6 +389,38 @@ public function getNumRows($sql)
 
 }
 
+/**
+ * getResult
+ * 
+ * @param string $Statement
+ * @see https://stackoverflow.com/questions/10752815/mysqli-get-result-alternative
+ * @return array
+ * 
+ */
+public function getResult($Statement)
+{
+
+$result = array();
+$Statement->store_result();
+    for ( $i = 0; $i < $Statement->num_rows; $i++ ) {
+        $Metadata = $Statement->result_metadata();
+        $params = array();
+        while ( $Field = $Metadata->fetch_field() ) {
+            $params[] = &$result[ $i ][ $Field->name ];
+        }
+        call_user_func_array( array( $Statement, 'bind_result' ), $params );
+        $Statement->fetch();
+    }
+    return $result;
+
+}
+
+/**
+ * getConfiguration
+ *
+ * @return void
+ * 
+ */
 private function getConfiguration()
 {
 
