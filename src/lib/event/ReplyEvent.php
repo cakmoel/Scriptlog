@@ -11,20 +11,66 @@
  */
 class ReplyEvent
 {
+/**
+ * reply_id
+ *
+ * @var integer
+ * 
+ */
   private $reply_id;
 
+/**
+ * comment_id
+ *
+ * @var integer
+ */
   private $comment_id;
 
+/**
+ * user_id
+ *
+ * @var integer
+ */
   private $user_id;
 
+/**
+ * reply_content
+ *
+ * @var string
+ * 
+ */
   private $reply_content;
 
+/**
+ * reply_status
+ *
+ * @var bool
+ * 
+ */
   private $reply_status;
 
+/**
+ * replyDao
+ *
+ * @var object
+ * 
+ */
   private $replyDao;
 
+/**
+ * validator
+ *
+ * @var object
+ * 
+ */
   private $validator;
 
+/**
+ * sanitize
+ *
+ * @var object
+ * 
+ */
   private $sanitize;
 
   public function __construct(ReplyDao $replyDao, FormValidator $validator, Sanitize $sanitize)  {

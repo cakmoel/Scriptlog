@@ -518,7 +518,9 @@ public function modifyMediaMeta()
  }
 
 /**
- * Checking if user session available return it
+ * isMediaUser
+ * 
+ * Checking if user's session level available then return it
  * 
  * @return string
  * 
@@ -527,10 +529,10 @@ public function modifyMediaMeta()
  {
 
     if (isset($_COOKIE['scriptlog_auth'])) {
-
-        Authorization::setAuthInstance(new Authentication(new UserDao, new UserTokenDao, $this->validator));
+  
+      Authorization::setAuthInstance(new Authentication(new UserDao, new UserTokenDao, $this->validator));
         
-        return Authorization::authorizeLevel();
+      return Authorization::authorizeLevel();
 
     }
 
