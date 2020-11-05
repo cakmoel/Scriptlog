@@ -27,10 +27,9 @@ if((check_dbtable($dbconnect, 'tbl_users') == true) || (check_dbtable($dbconnect
 || (check_dbtable($dbconnect, 'tbl_topics') == true) || (check_dbtable($dbconnect, 'tbl_themes') == true)
 || (check_dbtable($dbconnect, 'tbl_settings') == true) || (check_dbtable($dbconnect, 'tbl_posts') == true)
 || (check_dbtable($dbconnect, 'tbl_post_topic') == true) || (check_dbtable($dbconnect, 'tbl_plugin') == true)
-|| (check_dbtable($dbconnect, 'tbl_menu_child') == true) || (check_dbtable($dbconnect, 'tbl_menu') == true)
-|| (check_dbtable($dbconnect, 'tbl_mediameta') == true) || (check_dbtable($dbconnect, 'tbl_media') == true)
-|| (check_dbtable($dbconnect, 'tbl_media_download') == true) || (check_dbtable($dbconnect, 'tbl_comments') == true) 
-|| (check_dbtable($dbconnect, 'tbl_comment_reply') == true)) {
+|| (check_dbtable($dbconnect, 'tbl_menu') == true) || (check_dbtable($dbconnect, 'tbl_mediameta') == true) 
+|| (check_dbtable($dbconnect, 'tbl_media') == true) || (check_dbtable($dbconnect, 'tbl_media_download') == true) 
+|| (check_dbtable($dbconnect, 'tbl_comments') == true) || (check_dbtable($dbconnect, 'tbl_comment_reply') == true)) {
 
   $create_db = $protocol . '://' . $server_host . dirname($_SERVER['PHP_SELF']) . DIRECTORY_SEPARATOR .'install.php';
 

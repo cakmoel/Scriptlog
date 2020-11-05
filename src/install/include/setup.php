@@ -518,7 +518,7 @@ function setup_base_url($protocol, $server_host)
 }
 
 /**
- * Purge Intallation Function
+ * purge_installation
  * Clean up installation procedure
  * 
  */
