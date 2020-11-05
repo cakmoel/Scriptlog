@@ -95,15 +95,13 @@ class ConfigurationApp extends BaseApp
            
         } else {
 
-           $i = 0;
-           while ($i < $size) {
+           for ($i=1; $i<=$size; $i++) { 
 
-               $setting_value = purify_dirty_html(distill_post_request($filters)['setting_value'][$i]);
-               $setting_id = distill_post_request($filters)['setting_id'][$i];
+             $setting_value = purify_dirty_html(distill_post_request($filters)['setting_value'][$i]);
+             $setting_id = distill_post_request($filters)['setting_id'][$i];
 
-               $sql = sprintf("UPDATE tbl_settings SET setting_value = '$setting_value' WHERE ID = %d", (int)$setting_id);
-               db_simple_query($sql);
-               ++$i;
+             $sql = sprintf("UPDATE tbl_settings SET setting_value = '$setting_value' WHERE ID = %d", (int)$setting_id);
+             db_simple_query($sql);
 
            }
 

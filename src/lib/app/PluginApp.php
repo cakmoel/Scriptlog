@@ -70,129 +70,6 @@ class PluginApp extends BaseApp
   public function insert()
   {
 
-    $errors = array();
-    $checkError = true;
-
-    if (isset($_POST['pluginFormSubmit'])) {
-
-      $filters = [
-      'plugin_name' => FILTER_SANITIZE_STRING, 
-      'plugin_link' => FILTER_SANITIZE_URL,
-      'description' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 
-      'plugin_level' => FILTER_SANITIZE_STRING];
-
-      $form_fields = ['plugin_name' => 150, 'plugin_link' => 255, 'description' => 500];
-
-      try {
-
-        if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
-         
-          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-          throw new AppException("Sorry, unpleasant attempt detected!.");
-          
-        }
-
-        if (check_form_request($_POST, ['plugin_name, plugin_link, description, plugin_level']) == false) {
-          
-           header($_SERVER["SERVER_PROTOCOL"].' 413 Payload Too Large');
-           header('Status: 413 Payload Too Large');
-           header('Retry-After: 3600');
-           throw new AppException("Sorry, Unpleasant attempt detected");
-
-        }
-
-        if (empty($_POST['plugin_name']) || empty($_POST['description'])) {
-           $checkError = false;
-           array_push($errors, "Please enter a required field.");
-        }
-
-        if ($this->pluginEvent->isPluginExists($_POST['plugin_name']) === true) {
-          $checkError = false;
-          array_push($errors, "Sorry you have installed this plugin before.");
-        }
-
-        if (!empty($_POST['plugin_link'])) {
-
-          $parseOutQuery = parse_query($_POST['plugin_link']);
-
-           if(!filter_var($_POST['plugin_link'], FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED)) {
-             
-             $checkError = false;
-             array_push($errors, "Invalid plugin link.");
-
-           } elseif($_POST['plugin_link'] !== unparse_url(parse_url($_POST['plugin_link']))) {
-             
-             $checkError = false;
-             array_push($errors, "Not match!.");
-
-           } elseif($parseOutQuery['load'] !== $_POST['plugin_name']) {
-
-             $checkError = false;
-             array_push($errors, "Invalid query string. Query string must be same with Plugin name");
-
-           }
-
-        }
-
-        if (true === form_size_validation($form_fields)) {
-
-           $checkError = false;
-           array_push($errors, "Form data is longer thant allowed");
-
-        }
-
-        if (false === sanitize_selection_box(distill_post_request($filters)['plugin_level'], ['public' => 'Public', 'private' => 'Private'])) {
-
-           $checkError = false;
-           array_push($errors, "Please choose the available value provided");
-
-        }
-        
-        if (!$checkError) {
-
-          $this->setView('edit-plugin');
-          $this->setPageTitle('Add New Plugin');
-          $this->setFormAction(ActionConst::NEWPLUGIN);
-          $this->view->set('pageTitle', $this->getPageTitle());
-          $this->view->set('formAction', $this->getFormAction());
-          $this->view->set('errors', $errors);
-          $this->view->set('formData', $_POST);
-          $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-
-        } else {
-
-           $this->pluginEvent->setPluginName(distill_post_request($filters)['plugin_name']);
-           $this->pluginEvent->setPluginLink(distill_post_request($filters)['plugin_link']);
-           $this->pluginEvent->setPluginDescription(distill_post_request($filters)['description']);
-           $this->pluginEvent->setPluginLevel(distill_post_request($filters)['plugin_level']);
-           
-           $this->pluginEvent->addPlugin();
-           direct_page('index.php?load=plugins&status=pluginAdded', 200);
-
-        }
-        
-      } catch(AppException $e) {
-        
-        LogError::setStatusCode(http_response_code());
-        LogError::newMessage($e);
-        LogError::customErrorMessage('admin');
-            
-      }
-      
-    } else {
-       
-       $this->setView('edit-plugin');
-       $this->setPageTitle('Add New Plugin');
-       $this->setFormAction(ActionConst::NEWPLUGIN);
-       $this->view->set('pageTitle', $this->getPageTitle());
-       $this->view->set('formAction', $this->getFormAction());
-       $this->view->set('pluginLevel', $this->pluginEvent->pluginLevelDropDown());
-       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-
-    }
-
-    return $this->view->render();
-
   }
 
   public function installPlugin()
@@ -207,16 +84,11 @@ class PluginApp extends BaseApp
       $file_location = isset($_FILES['zip_file']['tmp_name']) ? $_FILES['zip_file']['tmp_name'] : null;
       $file_type = isset($_FILES['zip_file']['type']) ? $_FILES['zip_file']['type'] : null;
       $file_error = isset($_FILES['zip_file']['error']) ? $_FILES['zip_file']['error'] : null;
-      
-      $plugin_desc = prevent_injection($_POST['description']);
-      $plugin_level = (isset($_POST['plugin_level']) ? $_POST['plugin_level'] : "");
-      $plugin_name = current(explode(".", $file_name));
-      $extension = [];
-      $split = explode(".", $file_name);
-      $extension = (array_key_exists(1, $split) ? $split[1] : null);
-      $field = array('load', $plugin_name);
-      $plugin_link = app_url().'/admin/index.php?'.http_build_query($field);
-      $validate_format = (strtolower($extension) == 'zip' ? true : false);
+       
+      // get extension
+      $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
+      $validate_ext = (strtolower($file_extension) == 'zip' ? true : false);
+      $plugin_ini = null;
       
       try {
 
@@ -262,7 +134,7 @@ class PluginApp extends BaseApp
             
         }
 
-        if ($file_size > scriptlog_upload_filesize()) {
+        if (($file_size > scriptlog_upload_filesize()) || (format_size_unit(get_zip_size($file_location)) == '0 bytes')) {
 
           $checkError = false;
           array_push($errors, "Exceeded file size limit. Maximum file size is. ".format_size_unit(scriptlog_upload_filesize()));
@@ -283,45 +155,40 @@ class PluginApp extends BaseApp
 
         }
 
-        if ( empty($plugin_desc) ) {
-
-           $checkError = false;
-           array_push($errors, "The description columns must be filled.");
-
-        }
-        
-        if (!is_writable(__DIR__ .'/../'.APP_LIBRARY.DS.'plugins'.DS)) {
+        if ((is_dir(__DIR__ .'/../../'.APP_PLUGIN.current(explode(".",$file_name)).DS))) {
            
-           $checkError = false;
-           array_push($errors, "Permission denied.");
+          $checkError = false;
+          array_push($errors, "Sorry you have installed this plugin before.");
 
-        } elseif ((is_dir(__DIR__ .'/../'.APP_LIBRARY.DS.'plugins'.DS.$plugin_name.DS)) || (is_readable(__DIR__ .'/../'.APP_LIBRARY.DS.'plugins'.DS.basename($plugin_name).'.php'))) {
-           
-           $checkError = false;
-           array_push($errors, "Sorry you have installed this plugin before.");
+        } 
+       
+        if ($this->pluginEvent->isPluginExists(current(explode(".",$file_name))) == true) {
 
-        } elseif ($this->pluginEvent->isPluginExists($plugin_name) == true) {
-
-           $checkError = false;
-           array_push($errors, "Sorry you have installed this plugin before.");
+          $checkError = false;
+          array_push($errors, "Sorry you have installed this plugin before.");
 
         }
 
         if (is_uploaded_file($file_location)) {
 
-            if ((!$validate_format) || false === check_mime_type(['application/zip', 'application/x-zip-compressed', 'multipart/x-zip', 'application/x-compressed'], $file_location)) {
+          if ( (!$validate_ext) || (false === check_mime_type(['application/zip', 'application/x-zip-compressed', 'multipart/x-zip', 'application/x-compressed'], $file_location))) {
 
-                 $checkError = false;
-                 array_push($errors, "Invalid file format.Make sure you have a .zip format");
+               $checkError = false;
+               array_push($errors, "Invalid file format");
 
-            } else {
+          } else {
 
-              upload_plugin($file_name, $file_location, ["..", ".git", ".svn", "composer.json", "composer.lock", "framework_config.yaml", ".php", ".html", ".phtml", ".php5", ".php4", ".pl", ".py", ".sh", ".htaccess"]);
+            if (upload_plugin($file_location, basename($file_name)) === false) {
+
+                $checkError = false;
+                array_push($errors, "Zip file corrupted");
 
             }
 
-        }
+          }
 
+        }
+        
         if (!$checkError) {
          
           $this->setView('install-plugin');
@@ -335,14 +202,27 @@ class PluginApp extends BaseApp
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
         } else {
-          
-          $this->pluginEvent->setPluginName($plugin_name);
-          $this->pluginEvent->setPluginLink($plugin_link);
-          $this->pluginEvent->setPluginDescription($plugin_desc);
-          $this->pluginEvent->setPluginLevel($plugin_level);
-          $this->pluginEvent->addPlugin();
-          
-          direct_page("index.php?load=plugins&status=pluginInstalled", 200);
+
+          if (file_exists(__DIR__ . '/../../'.APP_PLUGIN.basename($file_name, '.zip').DS.'plugin.ini')) {
+
+            $plugin_ini = parse_ini_file(__DIR__ . '/../../'.APP_PLUGIN.basename($file_name, '.zip').DS.'plugin.ini');
+
+            $plugin_link = generate_request('index.php', 'get', [$plugin_ini['plugin_loader'], $plugin_ini['plugin_action'], 0])['link'];
+
+            $this->pluginEvent->setPluginName($plugin_ini['plugin_name']);
+            $this->pluginEvent->setPluginLink($plugin_link);
+            $this->pluginEvent->setPluginDirectory($plugin_ini['plugin_directory']);
+            $this->pluginEvent->setPluginDescription($plugin_ini['plugin_description']);
+            $this->pluginEvent->setPluginLevel($plugin_ini['plugin_level']);
+            $this->pluginEvent->addPlugin();
+
+            direct_page("index.php?load=plugins&status=pluginInstalled", 200);
+
+          } else {
+
+            direct_page("index.php?load=plugins", 302);
+
+          }
           
         }
 
@@ -371,153 +251,19 @@ class PluginApp extends BaseApp
 
   public function update($id)
   {
-    $errors = array();
-    $checkError = true;
-
-    if(!$getPlugin = $this->pluginEvent->grabPlugin($id)) {
-      direct_page('index.php?load=plugins&error=pluginNotFound', 404);
-    }
-
-    $data_plugin = array(
-      'ID' => $getPlugin['ID'],
-      'plugin_name' => $getPlugin['plugin_name'],
-      'plugin_link' => $getPlugin['plugin_link'],
-      'plugin_desc' => $getPlugin['plugin_desc'],
-      'plugin_status' => $getPlugin['plugin_status'],
-      'plugin_level' => $getPlugin['plugin_level'],
-      'plugin_sort' => $getPlugin['plugin_sort']
-    );
-    
-    if(isset($_POST['pluginFormSubmit'])) {
-
-      $plugin_name = trim($_POST['plugin_name']);
-      $plugin_link = (isset($_POST['plugin_link']) ? filter_var($_POST['plugin_link'], FILTER_SANITIZE_URL) : "");
-      $plugin_desc = prevent_injection($_POST['description']);
-      $plugin_status = $_POST['plugin_status'];
-      $plugin_level = (isset($_POST['plugin_level']) ? $_POST['plugin_level'] : "");
-      $plugin_sort = (int)$_POST['plugin_sort'];
-      $plugin_id = abs((int)$_POST['plugin_id']);
-
-      $filters = [
-        'plugin_name' => FILTER_SANITIZE_STRING,
-        'plugin_link' => FILTER_SANITIZE_URL,
-        'description' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'plugin_status' => FILTER_SANITIZE_STRING,
-        'plugin_level' => FILTER_SANITIZE_STRING,
-        'plugin_sort' => FILTER_SANITIZE_NUMBER_INT,
-        'plugin_id' => FILTER_SANITIZE_NUMBER_INT
-      ];
-
-      $form_fields = ['plugin_name' => 150, 'plugin_link' => 255, 'description' => 500];
-
-      try {
-
-        if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
-         
-          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-          throw new AppException("Sorry, unpleasant attempt detected!");
-          
-        }
-
-        if (empty($_POST['plugin_name']) || empty($_POST['description'])) {
-          $checkError = false;
-          array_push($errors, "All columns required must be filled");
-        }
-
-        if (!empty($_POST['plugin_link'])) {
-
-          $parseOutQuery = parse_query($_POST['plugin_link']);
-
-           if(!filter_var($_POST['plugin_link'], FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED)) {
-             
-             $checkError = false;
-             array_push($errors, "Invalid plugin link.");
-
-           } elseif($_POST['plugin_link'] !== unparse_url(parse_url($_POST['plugin_link']))) {
-             
-             $checkError = false;
-             array_push($errors, "Not match!.");
-
-           } elseif($parseOutQuery['load'] !== $_POST['plugin_name']) {
-
-             $checkError = false;
-             array_push($errors, "Invalid query string. Query string must be same with Plugin name");
-
-           }
-
-        }
-
-        if (true === form_size_validation($form_fields)) {
-
-          $checkError = false;
-          array_push($errors, "Form data is longer thant allowed");
-
-        }
-
-        if (false === sanitize_selection_box(distill_post_request($filters)['plugin_level'], ['public' => 'Public', 'private' => 'Private'])) {
-
-          $checkError = false;
-          array_push($errors, "Please choose the available value provided");
-
-        }
- 
-        if(!$checkError) {
-
-          $this->setView('edit-plugin');
-          $this->setPageTitle('Edit Plugin');
-          $this->setFormAction('editPlugin');
-          $this->view->set('pageTitle', $this->getPageTitle());
-          $this->view->set('formAction', $this->getFormAction());
-          $this->view->set('errors', $errors);
-          $this->view->set('pluginData', $data_plugin);
-          $this->view->set('pluginLevel', $this->pluginEvent->pluginLevelDropDown($getPlugin['plugin_level']));
-          $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-
-        } else {
-
-          $this->pluginEvent->setPluginId(distill_post_request($filters)['plugin_id']);
-          $this->pluginEvent->setPluginName(distill_post_request($filters)['plugin_name']);
-          $this->pluginEvent->setPluginLink(distill_post_request($filters)['plugin_link']);
-          $this->pluginEvent->setPluginDescription(distill_post_request($filters)['description']);
-          $this->pluginEvent->setPluginStatus(distill_post_request($filters)['plugin_status']);
-          $this->pluginEvent->setPluginLevel(distill_post_request($filters)['plugin_level']);
-          $this->pluginEvent->setPluginSort(distill_post_request($filters)['plugin_sort']);
-          
-          $this->pluginEvent->modifyPlugin();
-          direct_page('index.php?load=plugins&status=pluginUpdated', 200);
-          
-        }
-                
-      } catch(AppException $e) {
-        
-        LogError::setStatusCode(http_response_code());
-        LogError::newMessage($e);
-        LogError::customErrorMessage('admin');
-        
-      }
-
-    } else {
-
-      $this->setView('edit-plugin');
-      $this->setPageTitle('Edit Plugin');
-      $this->setFormAction('editPlugin');
-      $this->view->set('pageTitle', $this->getPageTitle());
-      $this->view->set('formAction', $this->getFormAction());
-      $this->view->set('pluginData', $data_plugin);
-      $this->view->set('pluginLevel', $this->pluginEvent->pluginLevelDropDown($getPlugin['plugin_level']));
-      $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-
-    }
-
-    return $this->view->render();
     
   }
 
   public function enablePlugin($id)
   {
     $this->pluginEvent->setPluginId($id);
-    $this->pluginEvent->activateInstalledPlugin();
-    direct_page('index.php?load=plugins&status=pluginActivated', 200);
+    
+    if ( $this->pluginEvent->activateInstalledPlugin() === true ) {
+
+      direct_page('index.php?load=plugins&status=pluginActivated', 200);
+
+    }
+    
   }
 
   public function disablePlugin($id)

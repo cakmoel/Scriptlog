@@ -88,7 +88,7 @@ class TopicApp extends BaseApp
               
              $this->setView('edit-topic');
              $this->setPageTitle('Add New Topic');
-             $this->setFormAction('newTopic');
+             $this->setFormAction(ActionConst::NEWTOPIC);
              $this->view->set('pageTitle', $this->getPageTitle());
              $this->view->set('formAction', $this->getFormAction());
              $this->view->set('errors', $errors);
@@ -116,7 +116,7 @@ class TopicApp extends BaseApp
       
        $this->setView('edit-topic');
        $this->setPageTitle('Add New Topic');
-       $this->setFormAction('newTopic');
+       $this->setFormAction(ActionConst::NEWTOPIC);
        $this->view->set('pageTitle', $this->getPageTitle());
        $this->view->set('formAction', $this->getFormAction());
        $this->view->set('csrfToken', csrf_generate_token('csrfToken'));

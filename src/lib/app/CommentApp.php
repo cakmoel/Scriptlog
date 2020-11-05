@@ -12,10 +12,28 @@
 class CommentApp extends BaseApp
 {
 
+/**
+ * view
+ *
+ * @var object
+ * 
+ */
   private $view;
-  
+
+/**
+ * commentEvent
+ *
+ * @var object
+ * 
+ */
   private $commentEvent;
   
+/**
+ * __constructor
+ *
+ * @param CommentEvent $commentEvent
+ * 
+ */
   public function __construct(CommentEvent $commentEvent)
   {
     $this->commentEvent = $commentEvent;
@@ -62,62 +80,7 @@ class CommentApp extends BaseApp
   
   public function insert()
   {
-    $errors = array();
-    $checkError = true;
-    
-    if (isset($_POST['commentFormSubmit'])) {
-        
-        $post_id = isset($_POST['post_id']) ? abs((int)$_POST['post_id']) : 0;
-        $author_name = isset($_POST['author_name']) ? trim(htmlspecialchars($_POST['author_name'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8")) : "";
-        $author_ip = get_ip_address();
-        $comment_content = isset($_POST['comment_content']) ? $_POST['comment_content'] : "";
-        
-        try {
-            
-            if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
-                
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-                throw new AppException("Sorry, unpleasant attempt detected!");
-                
-            }
-            
-            if (empty($author_name)) {
-                
-                $checkError = false;
-                array_push($errors, "Please enter your name");
-                
-            }
-            
-            if (empty($comment_content)) {
-                
-                $checkError = false;
-                array_push($errors, "Please enter content");
-                
-            }
-            
-            if (!$checkError) {
-                
-                $this->setView('submit-comment', 'public');
-                $this->setPageTitle("Leave Comment");
-                $this->setFormAction("leaveComment");
-                
-               
-            } else {
-                
-                
-            }
-            
-            
-        } catch (AppException $e) {
-            
-            LogError::setStatusCode(http_response_code());
-            LogError::newMessage($e);
-            LogError::customErrorMessage();
-            
-        }
-        
-    }
-    
+    #leave empty  
   }
   
   public function update($id)
@@ -179,7 +142,7 @@ class CommentApp extends BaseApp
                 
                 $this->setView('edit-comment');
                 $this->setPageTitle("Edit Comment");
-                $this->setFormAction("editComment");
+                $this->setFormAction(ActionConst::EDITCOMMENT);
                 $this->view->set('pageTitle', $this->getPageTitle());
                 $this->view->set('formAction', $this->getFormAction());
                 $this->view->set('errors', $errors);
@@ -209,7 +172,7 @@ class CommentApp extends BaseApp
         
         $this->setView('edit-comment');
         $this->setPageTitle("Edit Comment");
-        $this->setFormAction("editComment");
+        $this->setFormAction(ActionConst::EDITCOMMENT);
         $this->view->set('pageTitle', $this->getPageTitle());
         $this->view->set('formAction', $this->getFormAction());
         $this->view->set('commentData', $data_comment);
@@ -229,18 +192,9 @@ class CommentApp extends BaseApp
      direct_page('index.php?load=comments&status=commentDeleted', 200);
   }
   
-  protected function setView($viewName, $uiPath = null)
+  protected function setView($viewName)
   {
-      if (!is_null($uiPath)) {
-          
-          $this->view = new View('public', $uiPath, $viewName);
-      
-      } else {
-      
-          $this->view = new View('admin', 'ui', 'comments', $viewName);
-          
-      }
-      
+    $this->view = new View('admin', 'ui', 'comments', $viewName);
   }
   
 }
