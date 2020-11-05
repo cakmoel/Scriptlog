@@ -253,7 +253,7 @@ function check_cache_dir()
  */
 function check_plugin_dir()
 {
-    if (is_dir(APP_PATH) && is_dir(APP_PATH . '../lib/plugins') && is_writable(APP_PATH . '../lib/plugins')) {
+    if (is_dir(APP_PATH) && is_dir(APP_PATH . '../admin/plugins') && is_writable(APP_PATH . '../admin/plugins')) {
         
         return true;
         

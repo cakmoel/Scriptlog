@@ -545,7 +545,7 @@ function check_dir_file()
                    
                   endif;
               ?>
-             <small class="<?=(isset($plugin_passed)) ? $plugin_passed : 'text-danger'; ?>"><?=(isset($plugin_passed)) ? 'lib/plugins writeable' : $errors['errorChecking'] = 'lib/plugins is not writeable'; ?></small>
+             <small class="<?=(isset($plugin_passed)) ? $plugin_passed : 'text-danger'; ?>"><?=(isset($plugin_passed)) ? 'admin/plugins writeable' : $errors['errorChecking'] = 'admin/plugins is not writeable'; ?></small>
              </div>
             <span class="<?=(isset($plugin_passed)) ? $plugin_passed : 'text-danger' ?>"><i class="<?=(isset($plugin_checked)) ? $plugin_checked : 'fa fa-close fa-lg'; ?>"></i></span>
             </li>
