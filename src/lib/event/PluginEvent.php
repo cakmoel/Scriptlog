@@ -33,6 +33,14 @@ class PluginEvent
   private $link;
 
   /**
+   * Plugins's Directory
+   *
+   * @var string
+   * 
+   */
+  private $directory;
+
+  /**
    * Plugin's description
    * 
    * @var string
@@ -102,6 +110,11 @@ class PluginEvent
     $this->link = $link;
   }
 
+  public function setPluginDirectory($directory)
+  {
+    $this->directory = $directory;
+  }
+
   public function setPluginDescription($description)
   {
     $this->description = prevent_injection($description);
@@ -143,6 +156,7 @@ class PluginEvent
     return $this->pluginDao->insertPlugin([
       'plugin_name' => $this->name,
       'plugin_link' => $this->link,
+      'plugin_directory' => $this->directory,
       'plugin_desc' => $this->description,
       'plugin_level' => $this->level
     ]);
@@ -151,32 +165,24 @@ class PluginEvent
 
   public function modifyPlugin()
   {
-    $this->validator->sanitize($this->plugin_id, 'int');
-    $this->validator->sanitize($this->name, 'string');
-    $this->validator->sanitize($this->link, 'string');
-    $this->validator->sanitize($this->description, 'string');
-
-    return $this->pluginDao->updatePlugin($this->sanitize, [
-      'plugin_name'   => $this->name,
-      'plugin_link'   => $this->link,
-      'plugin_desc'   => $this->description,
-      'plugin_status' => $this->status,
-      'plugin_level'  => $this->level,
-      'plugin_sort'   => $this->sort
-    ], $this->plugin_id);
-
+    
   }
 
   public function activateInstalledPlugin()
   {
 
+    $activation = false;
+
     $this->validator->sanitize($this->plugin_id, 'int');
 
     if(!($data_plugin = $this->pluginDao->getPlugin($this->plugin_id, $this->sanitize))) {
+
+      $activation = false;
       direct_page('index.php?load=plugins&error=pluginNotFound', 404);
+
     }
 
-    $sql_path = __DIR__ . '/../'.APP_LIBRARY.DS.'plugins'.DS.basename($data_plugin['plugin_name'].'sql');
+    $sql_path = __DIR__ . '/../../'.APP_PLUGIN.basename($data_plugin['plugin_directory'].'sql');
 
     if(file_exists($sql_path)) {
 
@@ -190,12 +196,20 @@ class PluginEvent
 
         if(!$result) {
 
+          $activation = false;
+          
           unlink($sql_path);
+
           direct_page('index.php?load=plugins&error=tableNotFound', 404);
 
         } else {
 
-          return $this->pluginDao->activatePlugin($this->plugin_id, $this->sanitize);
+          $activation = true;
+
+          enable_plugin(__DIR__ . '/../../'.APP_PLUGIN.basename($data_plugin['plugin_directory']));
+          
+          $this->pluginDao->activatePlugin($this->plugin_id, $this->sanitize);
+          
           unlink($sql_path);
 
         }
@@ -204,9 +218,13 @@ class PluginEvent
 
     } else {
 
-       return $this->pluginDao->activatePlugin($this->plugin_id, $this->sanitize);
+      $activation = true;
+
+      $this->pluginDao->activatePlugin($this->plugin_id, $this->sanitize);
        
     }
+
+    return $activation;
 
   }
 
@@ -231,15 +249,17 @@ class PluginEvent
        direct_page('index.php?load=plugins&error=pluginNotFound', 404);
     }
 
-    $plugin_name = $data_plugin['plugin_name'];
+    $plugin_dir = str_replace(' ', '', $data_plugin['plugin_directory']);
+      
     $plugin_link = $data_plugin['plugin_link'];
 
     if ($plugin_link != '#') {
 
-       if (is_readable(__DIR__ . '/../'.APP_LIBRARY.DS.'plugins'.DS.$plugin_name)) {
+       if (is_readable(__DIR__ . '/../../'.APP_PLUGIN.$plugin_dir)) {
           
-          delete_directory(__DIR__ . '/../'.APP_LIBRARY.DS.'plugins'.DS.$plugin_name);
-          unlink(__DIR__.'/../'.APP_LIBRARY.DS.'plugins'.DS.basename($plugin_name).'php');
+          delete_directory(__DIR__ . '/../../'.APP_PLUGIN.$plugin_dir);
+
+          unlink(__DIR__.'/../../'.APP_PLUGIN.basename($plugin_dir.'php'));
 
        }
  
