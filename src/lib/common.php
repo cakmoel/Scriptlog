@@ -18,5 +18,6 @@ define('APP_AUDIO', APP_PUBLIC . DS . 'files' . DS . 'audio' . DS);
 define('APP_VIDEO', APP_PUBLIC . DS . 'files' . DS . 'video' . DS);
 define('APP_DOCUMENT', APP_PUBLIC . DS . 'files' . DS . 'docs' . DS);
 define('APP_THEME', APP_PUBLIC . DS . 'themes' . DS);
+define('APP_PLUGIN', APP_ADMIN . DS . 'plugins' . DS);
 define('APP_DEVELOPMENT', true);
 define('SCRIPTLOG', sha1(mt_rand(1, 1000).'M4Le053Nk4Wo12!@#'));
