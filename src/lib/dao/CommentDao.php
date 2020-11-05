@@ -12,6 +12,10 @@
 class CommentDao extends Dao
 {
 
+/**
+ * Constructor
+ * 
+ */
  public function __construct()
  {
    parent::__construct();
@@ -109,10 +113,11 @@ class CommentDao extends Dao
  }
  
 /**
- * Delete comment
+ * DeleteComment
  * 
  * @method public deleteComment()
  * @param integer $ID
+ * @param object $sanitize
  * 
  */
  public function deleteComment($id, $sanitize)
@@ -122,7 +127,7 @@ class CommentDao extends Dao
  }
  
 /**
- * Check comment Id
+ * CheckCommentId
  * 
  * @method public checkCommentId()
  * @param integer $id
@@ -140,7 +145,7 @@ class CommentDao extends Dao
  }
  
 /**
- * Drop down comment status
+ * DropDownCommentStatement
  * 
  * @method public dropDownCommentStatement($selected)
  * @param string $selected
@@ -163,7 +168,7 @@ class CommentDao extends Dao
  }
 
 /**
- * Total comments records
+ * TotalCommentRecords
  * 
  * @param array $data
  * @return integer

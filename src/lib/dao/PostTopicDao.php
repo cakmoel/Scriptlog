@@ -1,6 +1,6 @@
 <?php 
 /**
- * PostTopic class extends Model
+ * PostTopic class extends Dao
  * 
  * @category  Dao Class
  * @author    M.Noermoehammad
@@ -28,6 +28,7 @@ class PostTopicDao extends Dao
    */
   public function findPostTopic($postId, $sanitize)
   {
+    
     $sql = "SELECT topic_title, topic_slug 
             FROM tbl_topics, tbl_post_topic
             WHERE tbl_topics.ID = tbl_post_topic.topic_id
@@ -44,30 +45,32 @@ class PostTopicDao extends Dao
   }
   
   /**
-   * Set Link Topics
+   * SetLinkTopics
    * 
    * @param integer $postId
    * @param object $sanitize
    * @param string $position
    * @return string
+   * 
    */
-  public function setLinkTopics($postId, $sanitize, $position = 'meta')
+  public function setLinkTopics($postId, $sanitize, $position = 'href', $href_attr = "")
   {
-    $url = APP_PROTOCOL.'://'.APP_HOSTNAME.dirname(dirname($_SERVER['PHP_SELF'])).'/';
+    
+    $url = app_url().DS;
     
     $html = array();
    
     $linkCategories = $this->findPostTopic($postId, $sanitize);
    
-    foreach ($linkCategories as $l => $linkCategory) {
+    foreach ($linkCategories as $linkCategory) {
        
         if (!$position) {
         
-            $html[] = '<a href="'.$url.'category/'.prevent_injection($linkCategory['category_slug']).'" class="tag-name">'.prevent_injection($linkCategory->topic_title).'</a>';
-        
+          $html[] = prevent_injection($linkCategory['topic_title']);
+            
         } else {
             
-            $html[] = prevent_injection($linkCategory -> topic_title);
+          $html[] = '<a href="'.$url.'category/'.prevent_injection($linkCategory['topic_slug']).'" class="'.$href_attr.'">'.prevent_injection($linkCategory['topic_title']).'</a>';
             
         }
     }

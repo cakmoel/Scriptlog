@@ -79,20 +79,16 @@ public function findPageById($pageId, $post_type, $sanitize)
  */
 public function findPageBySlug($slug, $sanitize)
 {
-    $sql = "SELECT
-              tbl_posts.ID, tbl_posts.media_id, 
-			  tbl_posts.post_author, tbl_posts.post_date, 
-			  tbl_posts.post_modified, tbl_posts.post_title,
-  	  	      tbl_posts.post_slug, tbl_posts.post_content,  
-			  tbl_posts.post_status, tbl_posts.post_type, 
-			  tbl_posts.comment_status, tbl_users.user_login
-  	  	   FROM
-               tbl_posts, tbl_users
-  	  	   WHERE
-              tbl_posts.post_slug = :slug
-              AND tbl_posts.post_status = 'publish'
-              AND tbl_posts.post_type = 'page' ";
-    
+	$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
+    p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_type, p.comment_status,
+    m.ID, m.media_filename, m.media_caption, m.media_access, u.ID, u.user_fullname
+    FROM tbl_posts AS p
+    INNER JOIN tbl_media AS m ON p.media_id = m.ID
+    INNER JOIN tbl_users AS u ON p.post_author = u.ID
+    WHERE p.post_slug = :slug 
+	AND p.post_status = 'publish' AND p.post_type = 'page' 
+	AND m.media_access = 'public' AND m.media_status = '1'";
+	
 	$this->setSQL($sql);
 	
 	$slug_sanitized = $this->filteringId($sanitize, $slug, 'xss');

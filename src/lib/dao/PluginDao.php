@@ -32,7 +32,7 @@ class PluginDao extends Dao
   public function getPlugins($orderBy = 'ID')
   {
      
-    $sql = "SELECT ID, plugin_name, plugin_link, plugin_desc, 
+    $sql = "SELECT ID, plugin_name, plugin_link, plugin_directory, plugin_desc, 
             plugin_status, plugin_level,
             plugin_sort FROM tbl_plugin ORDER BY :orderBy DESC";
    
@@ -57,7 +57,7 @@ class PluginDao extends Dao
   {
      $idsanitized = $this->filteringId($sanitize, $id, 'sql');
      
-     $sql = "SELECT ID, plugin_name, plugin_link, plugin_desc, 
+     $sql = "SELECT ID, plugin_name, plugin_link, plugin_directory, plugin_desc, 
              plugin_status, plugin_level, plugin_sort 
              FROM tbl_plugin WHERE ID = :ID"; 
      
@@ -86,6 +86,7 @@ class PluginDao extends Dao
      $this->create("tbl_plugin", [
          'plugin_name' => $bind['plugin_name'],
          'plugin_link' => $bind['plugin_link'],
+         'plugin_directory' => $bind['plugin_directory'],
          'plugin_desc' => $bind['plugin_desc'],
          'plugin_level' => $bind['plugin_level'],
          'plugin_sort' => $plugin_sorted
@@ -114,13 +115,15 @@ class PluginDao extends Dao
    * @param array $bind
    * 
    */
-  public function updatePlugin($sanitize, $bind, $ID)
+  public function updatePlugin($sanitize, $bind, $id)
   {
 
-    $cleanId = $this->filteringId($sanitize, $ID, 'sql');
+    $cleanId = $this->filteringId($sanitize, $id, 'sql');
+
     $this->modify("tbl_plugin", [
         'plugin_name' => $bind['plugin_name'],
         'plugin_link' => $bind['plugin_link'],
+        'plugin_directory' => $bind['plugin_directory'],
         'plugin_desc' => $bind['plugin_desc'],
         'plugin_status' => $bind['plugin_status'],
         'plugin_sort' => $bind['plugin_sort']
@@ -174,13 +177,19 @@ class PluginDao extends Dao
    * @return numeric
    * 
    */
-  public function checkPluginId($id,$sanitize)
+  public function checkPluginId($id, $sanitize)
   {
-    $idsanitized = $this->filteringId($sanitize, $id, 'sql');
+
     $sql = "SELECT ID FROM tbl_plugin WHERE ID = ?";
+
+    $idsanitized = $this->filteringId($sanitize, $id, 'sql');
+
     $this->setSQL($sql);
+
     $stmt = $this->checkCountValue([$idsanitized]);
+
     return($stmt > 0);
+
   }
   
   /**
@@ -221,7 +230,7 @@ class PluginDao extends Dao
   {
     $this->accessLevel = $user_level;
     
-    $plugins = $this->setPlugins($plugin_level);
+    $plugins = $this->findPluginsEnabled($plugin_level);
     
     $html = array();
     
@@ -229,13 +238,13 @@ class PluginDao extends Dao
 
       foreach ($plugins as $plugin) {
         
-        $pluginPath = APP_ROOT . APP_LIBRARY . '/plugin/'.strtolower($plugin->plugin_name).'/'.strtolower($plugin->plugin_name).'.php';
+        $pluginPath = __DIR__ .'/../../'.APP_PLUGIN.safe_html(strtolower($plugin['plugin_name'])).'/'.absolute_path((make_slug(strtolower($plugin['plugin_name'])).'.php'));
         
         if ($this->accessLevel == 'administrator') {
               
-            if (is_dir(APP_ROOT.APP_LIBRARY.'/plugin/'.strtolower($plugin->plugin_name)) && is_readable($pluginPath)) {
+            if (is_dir(__DIR__ . '/../../'.APP_PLUGIN.safe_html($plugin['plugin_name'])) && is_readable($pluginPath)) {
                 
-                $html[] = '<li><a href="'.$plugin->plugin_link.'">'.$plugin->plugin_name.'</a></li>';
+                $html[] = '<li><a href="'.safe_html($plugin['plugin_link']).'">'.safe_html($plugin['plugin_name']).'</a></li>';
                 
             }
              
@@ -285,14 +294,14 @@ class PluginDao extends Dao
   }
   
   /**
-   * Set private plugin
+   * SetPlugins
    * 
    * @return boolean|array|object
    * 
    */
-  public function setPlugins($plugin_level)
+  public function findPluginsEnabled($plugin_level)
   {
-    $sql = "SELECT ID, plugin_name, plugin_link, plugin_desc, 
+    $sql = "SELECT ID, plugin_name, plugin_link, plugin_directory, plugin_desc, 
             plugin_status, plugin_level, plugin_sort
             FROM tbl_plugin 
             WHERE plugin_level = :plugin_level 
@@ -300,14 +309,15 @@ class PluginDao extends Dao
     
     $this->setSQL($sql);
     
-    $privatePlugins = $this->findRow([':plugin_level' => $plugin_level]);
+    $privatePlugins = $this->findAll([':plugin_level' => $plugin_level]);
     
     return (empty($privatePlugins)) ?: $privatePlugins;
     
   }
  
   /**
-   * is plugin exists or not
+   * pluginExists
+   * checking whether plugin names exists 
    * 
    * @param string $plugin_name
    * @return boolean

@@ -87,7 +87,9 @@ public function deleteConfig($ID, $sanitize)
  */
 public function findConfigs($orderBy = 'ID')
 {
-  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings ORDER BY :orderBy DESC";
+  $sql = "SELECT ID, setting_name, setting_value 
+          FROM tbl_settings 
+          ORDER BY :orderBy DESC";
 
 	$this->setSQL($sql);
 

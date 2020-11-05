@@ -1,7 +1,6 @@
 <?php 
 /**
- * Topic class extends Dao
- *
+ * Class TopicDao extends Dao
  * 
  * @category  Dao Class
  * @author    M.Noermoehammad
@@ -95,6 +94,28 @@ class TopicDao extends Dao
       
   }
   
+/**
+  * findPostTopic
+  * 
+  * @param integer $topicId
+  * @param integer $postId
+  * @return boolean|array|object
+  */
+  public function findPostTopic($topicId, $postId)
+  {
+      $sql = "SELECT topic_id 
+              FROM tbl_post_topic
+              WHERE topic_id = :topic_id 
+              AND post_id = :post_id";
+      
+      $this->setSQL($sql);
+      
+      $post_topic = $this->findRow(['topic_id' => $topicId, 'post_id' => $postId]);
+      
+      return (empty($post_topic)) ?: $post_topic;
+      
+  }
+
   /**
    * Insert a new records
    * 
@@ -146,49 +167,6 @@ class TopicDao extends Dao
   
    $this->deleteRecord("tbl_topics", "ID = ".(int)$clean_id);
    
- }
-
- /**
-  * get post topic table
-  * 
-  * @param integer $topicId
-  * @param integer $postId
-  * @return boolean|array|object
-  */
- public function getPostTopic($topicId, $postId)
- {
-     $sql = "SELECT topic_id 
-             FROM tbl_post_topic
-             WHERE topic_id = :topic_id 
-             AND post_id = :post_id";
-     
-     $this->setSQL($sql);
-     
-     $post_topic = $this->findRow(['topic_id' => $topicId, 'post_id' => $postId]);
-     
-     return (empty($post_topic)) ?: $post_topic;
-     
- }
- 
-/**
- * showAllActiveTopics
- * retrieve all active topics and display it on sidebar themes
- * 
- * @return array
- * 
- */
- public function showAllActiveTopics()
- {
-  
-  $sql = "SELECT ID, topic_title, topic_slug, topic_status FROM  tbl_topics 
-          WHERE topic_status = 'Y' ORDER BY ID ";
-
-  $this->setSQL($sql);
-
-  $active_topics = $this->findAll();
-
-  return (empty($active_topics)) ?: $active_topics;
-
  }
 
  /**
@@ -257,7 +235,7 @@ class TopicDao extends Dao
 
         foreach ($items as $item) {
          
-            $post_topic = $this->getPostTopic($item['ID'], $postId);
+            $post_topic = $this->findPostTopic($item['ID'], $postId);
                
             if ($post_topic['topic_id'] == $item['ID']) {
               
