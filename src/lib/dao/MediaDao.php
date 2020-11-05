@@ -557,8 +557,8 @@ public function dropDownMediaSelect($selected = null)
 {
 
   $dropdown  = '<div class="form-group">';
-  $dropdown .= '<label>Uploaded image</label><br>';
-  $dropdown .= '<br><select name="image_id" class="selectpicker" ><br><br>';
+  $dropdown .= '<label for="image_id">Uploaded image</label><br><br>';
+  $dropdown .= '<select name="image_id" id="image_id" class="selectpicker"><br><br>';
 
   if (is_null($selected)) {
 
@@ -572,7 +572,7 @@ public function dropDownMediaSelect($selected = null)
 
   $sanitizer = new Sanitize;
 
-  $picture_bucket_list = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+  $picture_bucket_list = ["image/jpeg", "image/pjpeg", "image/png", "image/gif", "image/webp"];
 
   if (is_array($media_ids)) {
 
@@ -588,7 +588,7 @@ public function dropDownMediaSelect($selected = null)
 
            if(in_array($media['media_type'], $picture_bucket_list)) {
 
-            $dropdown .= '<option data-content="<img src='.app_url().DS.APP_IMAGE_THUMB.'small_'.rawurlencode(basename(safe_html($media['media_filename']))).'></img>" value="'.(int)$media['ID'].'"'.$select.'>'.safe_html($media_properties['Origin']).'</option>'."\n";
+            $dropdown .= '<option data-content="<img src='.app_url().DS.APP_IMAGE_SMALL.'small_'.rawurlencode(basename(safe_html($media['media_filename']))).'></img>" value="'.(int)$media['ID'].'"'.$select.'>'.safe_html($media_properties['Origin']).'</option>'."\n";
 
            } 
            
@@ -604,6 +604,12 @@ public function dropDownMediaSelect($selected = null)
 
 }
 
+/**
+ * imageUploadHandler
+ *
+ * @param int|num $mediaId
+ * @return void
+ */
 public function imageUploadHandler($mediaId = null) 
 {
 

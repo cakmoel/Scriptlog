@@ -12,12 +12,23 @@
  */
 class ReplyDao extends Dao
 {
-    
+
+/**
+ * Constructor
+ * 
+ */  
   public function __construct()
   {
     parent::__construct();
   }
-  
+
+/**
+ * findReplies
+ *
+ * @param string $orderBy
+ * @return array
+ * 
+ */
   public function findReplies($orderBy = 'ID')
   {
     $sql = "SELECT ID, comment_id, user_id, 
@@ -31,6 +42,14 @@ class ReplyDao extends Dao
     
   }
   
+/**
+ * findReply
+ *
+ * @param int $id
+ * @param object $sanitize
+ * @return array
+ * 
+ */
   public function findReply($id, $sanitize)
   {
     $idsanitized = $this->filteringId($sanitize, $id, 'sql');
@@ -44,7 +63,14 @@ class ReplyDao extends Dao
     return (empty($replyDetail)) ?: $replyDetail;
     
   }
-  
+
+/**
+ * createReply
+ *
+ * @param array $bind
+ * @return void
+ * 
+ */
   public function createReply($bind)
   {
     $this->create("tbl_comment_reply", [
@@ -56,24 +82,49 @@ class ReplyDao extends Dao
     
   }
   
+/**
+ * updateReply
+ *
+ * @param object $sanitize
+ * @param array $bind
+ * @param int $id
+ * @return void
+ * 
+ */
   public function updateReply($sanitize, $bind, $id)
   {
-     $cleanId = $this->filteringId($sanitize, $id, 'sql');
+     $cleanId = (int)$this->filteringId($sanitize, $id, 'sql');
      $this->modify("tbl_comment_reply", [
          'comment_id' => $bind['comment_id'],
          'user_id' => $bind['user_id'],
          'reply_content' => $bind['reply_content'],
          'reply_status' => $bind['reply_status']
-     ], "ID = {$cleanId}");
+     ], "`ID` = {$cleanId}");
      
   }
   
+/**
+ * deleteReply
+ *
+ * @param integer $id
+ * @param object $sanitize
+ * @return void
+ * 
+ */
   public function deleteReply($id, $sanitize)
   { 
     $clean_id = $this->filteringId($sanitize, $id, 'sql');
     $this->deleteRecord("tbl_comment_reply", "ID = ".(int)$clean_id);
   }
   
+/**
+ * checkReplyId
+ *
+ * @param integer $id
+ * @param object $sanitize
+ * @return void
+ * 
+ */
   public function checkReplyId($id, $sanitize)
   {
     $sql = "SELECT ID FROM tbl_comment_reply WHERE ID = ?";
@@ -83,11 +134,18 @@ class ReplyDao extends Dao
     return $stmt > 0;
   }
 
+/**
+ * DropDownReplyStatus
+ *
+ * @param string $selected
+ * @return void
+ * 
+ */
   public function dropDownReplyStatus($selected = '')
   {
     $name = 'reply_status';
 
-    $reply_status = array('active', 'disable');
+    $reply_status = array('activated', 'deactivated');
 
     if($selected != '') {
       $selected = $selected;
@@ -97,6 +155,13 @@ class ReplyDao extends Dao
 
   }
 
+/**
+ * totalReplyRecords
+ *
+ * @param array $data
+ * @return integer
+ * 
+ */
   public function totalReplyRecords($data = null)
   {
     $sql = "SELECT ID FROM tbl_comment_reply";
