@@ -149,7 +149,7 @@ class ThemeApp extends BaseApp
       $file_error = isset($_FILES['zip_file']['error']) ? $_FILES['zip_file']['error'] : null;
       
       $theme_title = current(explode(".",$file_name));
-      $extension = [];
+      $extension = null;
       $split = explode(".",$file_name);
       $extension = (array_key_exists(1, $split) ? $split[1] : null);
       $validate_format = (strtolower($extension) == 'zip' ? true : false);
@@ -245,13 +245,7 @@ class ThemeApp extends BaseApp
           } else {
 
             # upload theme 
-            upload_theme(basename($file_name), $file_location, ["..", ".git", ".svn", "composer.json", "composer.lock", "framework_config.yaml", ".php", ".html", ".phtml", ".php5", ".php4", ".pl", ".py", ".sh", ".htaccess"]);
-           
-            if (file_exists(APP_ROOT.'public/themes/'.$theme_title.'/theme.ini')) {
-
-              $theme_ini = parse_ini_file(APP_ROOT.'public/themes/'.$theme_title.'/theme.ini');
- 
-            }
+            upload_theme(basename($file_name), $file_location, ["..", ".git", ".svn", "composer.json", "composer.lock", "framework_config.yaml", ".html", ".phtml", ".pl", ".py", ".sh"]);
                
           }
            
@@ -269,12 +263,19 @@ class ThemeApp extends BaseApp
 
         } else {
 
-            $this->themeEvent->setThemeTitle($theme_ini['theme_name']);
-            $this->themeEvent->setThemeDescription($theme_ini['theme_description']);
-            $this->themeEvent->setThemeDesigner($theme_ini['theme_designer']);
-            $this->themeEvent->setThemeDirectory($theme_dir);
-            $this->themeEvent->addTheme();
-            direct_page('index.php?load=templates&status=themeAdded', 200);
+          if (file_exists(APP_ROOT.'public/themes/'.$theme_title.'/theme.ini')) {
+
+             $theme_ini = parse_ini_file(APP_ROOT.'public/themes/'.$theme_title.'/theme.ini');
+
+          }
+
+          $this->themeEvent->setThemeTitle($theme_ini['theme_name']);
+          $this->themeEvent->setThemeDescription($theme_ini['theme_description']);
+          $this->themeEvent->setThemeDesigner($theme_ini['theme_designer']);
+          $this->themeEvent->setThemeDirectory($theme_dir);
+          $this->themeEvent->addTheme();
+            
+          direct_page('index.php?load=templates&status=themeAdded', 200);
               
         }
 
