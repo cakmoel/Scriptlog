@@ -124,8 +124,6 @@ class UserEvent
 
  private $expired_verified = false;
 
- const VERIFIED_SELECTOR = false;
- 
  /**
   * @method __constructor()
   * 
