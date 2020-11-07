@@ -136,7 +136,7 @@ $library = array(
     APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
     APP_ROOT . APP_LIBRARY . DS . 'event'   . DS,
     APP_ROOT . APP_LIBRARY . DS . 'app'     . DS,
-    APP_ROOT . APP_LIBRARY . DS . 'plugins' . DS
+    APP_ROOT . APP_ADMIN   . DS . 'plugins' . DS
 );
 
 get_server_load();
