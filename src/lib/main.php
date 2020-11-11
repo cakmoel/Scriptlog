@@ -11,8 +11,6 @@
  * @since    Since Release 1.0
  * 
  */
-ini_set('memory_limit', "6M");
-error_reporting(-1);
 #ini_set("session.cookie_secure", 1);  
 #ini_set("session.cookie_lifetime", 86400);  
 ini_set("session.cookie_httponly", 1);
@@ -118,16 +116,16 @@ foreach ($files_dir_iterator as $file) {
 #====================End of call functions in directory lib/utility=====================================================
 
 // check if loader is exists
-if (is_dir(APP_ROOT . APP_LIBRARY) && is_file(APP_ROOT . APP_LIBRARY . DS . 'Scriptloader.php')) {
- 
-    require __DIR__ . DS . 'Scriptloader.php';
-      
-}
-
 if (is_readable(APP_ROOT.APP_LIBRARY.DS.'vendor/autoload.php')) {
 
     require __DIR__ . DS . 'vendor/autoload.php';
     
+}
+
+if (is_dir(APP_ROOT . APP_LIBRARY) && is_file(APP_ROOT . APP_LIBRARY . DS . 'Scriptloader.php')) {
+ 
+    require __DIR__ . DS . 'Scriptloader.php';
+      
 }
 
 // load all libraries 
@@ -136,7 +134,7 @@ $library = array(
     APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
     APP_ROOT . APP_LIBRARY . DS . 'event'   . DS,
     APP_ROOT . APP_LIBRARY . DS . 'app'     . DS,
-    APP_ROOT . APP_ADMIN . DS . 'plugins' . DS
+    APP_ROOT . APP_ADMIN   . DS . 'plugins' . DS
 );
 
 get_server_load();
@@ -236,7 +234,7 @@ session_save_path(__DIR__ . '/utility/.sessions'.DS);
 if (!start_session_on_site($sessionMaker)) {
 
     ob_start();
-    
+
 }
 
 $errors = [];
