@@ -230,7 +230,7 @@ class PageApp extends BaseApp
 
                 $new_filename = generate_filename($file_name)['new_filename'];
                 $file_extension = generate_filename($file_name)['file_extension'];
-                list($width, $length) = (!empty($file_location)) ? getimagesize($file_location) : null;
+                list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
 
                 if( $file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp" ) {
 
@@ -240,7 +240,7 @@ class PageApp extends BaseApp
                         'File type' => $file_type,
                         'File size' => format_size_unit($file_size),
                         'Uploaded on' => date("Y-m-d H:i:s"),
-                        'Dimension' => $width.'x'.$length);
+                        'Dimension' => $width.'x'.$height);
 
                 } else {
 
@@ -484,7 +484,7 @@ class PageApp extends BaseApp
                   $new_filename = generate_filename($file_name)['new_filename'];
                   $file_extension = generate_filename($file_name)['file_extension'];
 
-                  list($width, $length) = (!empty($file_location)) ? getimagesize($file_location) : null;
+                  list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
 
                   if($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
 
