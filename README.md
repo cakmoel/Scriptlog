@@ -4,8 +4,6 @@
 
 [![Open Source Helpers](https://www.codetriage.com/cakmoel/scriptlog/badges/users.svg)](https://www.codetriage.com/cakmoel/scriptlog)
 
-[![Known Vulnerabilities](https://snyk.io/test/github/cakmoel/Scriptlog/badge.svg?targetFile=src/lib/composer.lock)](https://snyk.io/test/github/cakmoel/Scriptlog?targetFile=src/lib/composer.lock)
-
 **Scriptlog** is a free and an open source PHP blog software. We're refactoring our legacy weblog code. Making it more simple, secure, modular, fast and robust personal blogging system. Scriptlog runs on PHP 5.6 or higher and uses MySQL.
 
 Scriptlog's base original code was forked from **Piluscart 1.4.1**. We took her out from her weblog engine that support blog functionality on Piluscart 1.4.1. Obviously Scriptlog is Piluscart's little sister. She was being refactored to help her siblings going further on next generation of Piluscart development which is undefined yet.
