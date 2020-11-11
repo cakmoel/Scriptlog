@@ -57,7 +57,7 @@ function make_connection($host, $username, $passwd, $dbname)
  */
 function close_connection($link)
 {
-  $link -> close();
+  $link->close();
 }
 
 /**
@@ -144,7 +144,7 @@ $shield_pass     = password_hash(base64_encode(hash('sha384', $user_pass, true))
 $user_level      = 'administrator';
 
 // Theme 
-$theme_title     = "Mini Blog";
+$theme_title     = "Mediumious";
 $theme_desc      = "Simple yet clean design for personal blog";
 $theme_designer  = "Colorlib";
 $theme_directory = "miniblog";
@@ -189,78 +189,77 @@ $createAdmin = $link->prepare($saveAdmin);
 
 if (false !== $createAdmin) {
    
-    $createAdmin->bind_param("ssssss", $user_login, 
-    $user_email, $shield_pass, $user_level, $date_registered, $user_session);
-    $createAdmin->execute();
+  $createAdmin->bind_param("ssssss", $user_login, $user_email, $shield_pass, $user_level, $date_registered, $user_session);
+  $createAdmin->execute();
 
 }
 
 if ($link->insert_id && $createAdmin->affected_rows > 0) {
     
     // create other database tables
-    $createUserToken = $link -> query($tblUserToken);
-    $createPost = $link -> query($tblPost);
-    $createTopic = $link -> query($tblTopic);
-    $createPostTopic = $link -> query($tblPostTopic);
-    $createComment = $link -> query($tblComment);
-    $createReply = $link -> query($tblReply);
-    $createLoginAttempt = $link -> query($tblLoginAttempt);
-    $createMenu = $link -> query($tblMenu);
-    $createMedia = $link -> query($tblMedia);
-    $createMediaMeta = $link -> query($tblMediaMeta);
-    $createMediaDownload = $link -> query($tblMediaDownload);
-    $createPlugin = $link -> query($tblPlugin);
-    $createSetting = $link -> query($tblSetting);
-    $createTheme = $link -> query($tblTheme);
+    $createUserToken = $link->query($tblUserToken);
+    $createPost = $link->query($tblPost);
+    $createTopic = $link->query($tblTopic);
+    $createPostTopic = $link->query($tblPostTopic);
+    $createComment = $link->query($tblComment);
+    $createReply = $link->query($tblReply);
+    $createLoginAttempt = $link->query($tblLoginAttempt);
+    $createMenu = $link->query($tblMenu);
+    $createMedia = $link->query($tblMedia);
+    $createMediaMeta = $link->query($tblMediaMeta);
+    $createMediaDownload = $link->query($tblMediaDownload);
+    $createPlugin = $link->query($tblPlugin);
+    $createSetting = $link->query($tblSetting);
+    $createTheme = $link->query($tblTheme);
     
     // insert configuration - app_key
-    $recordAppKey = $link -> prepare($saveAppKey);
-    $recordAppKey -> bind_param('ss', $setting_name_key, $key);
-    $recordAppKey -> execute();
+    $recordAppKey = $link->prepare($saveAppKey);
+    $recordAppKey->bind_param('ss', $setting_name_key, $key);
+    $recordAppKey->execute();
 
     // insert configuration - app_url
-    $recordAppURL = $link -> prepare($saveAppURL);
-    $recordAppURL -> bind_param('ss', $setting_name_url, $setting_value_url);
-    $recordAppURL -> execute();
+    $recordAppURL = $link->prepare($saveAppURL);
+    $recordAppURL->bind_param('ss', $setting_name_url, $setting_value_url);
+    $recordAppURL->execute();
     
     // insert configuration - site_name
-    $recordAppSiteName = $link -> prepare($saveSiteName);
-    $recordAppSiteName -> bind_param('ss', $site_name, $site_name_value);
-    $recordAppSiteName -> execute();
+    $recordAppSiteName = $link->prepare($saveSiteName);
+    $recordAppSiteName->bind_param('ss', $site_name, $site_name_value);
+    $recordAppSiteName->execute();
 
     // insert configuration - site_tagline
-    $recordAppSiteTagline = $link -> prepare($saveSiteTagline);
-    $recordAppSiteTagline -> bind_param('ss', $site_tagline, $site_tagline_value);
-    $recordAppSiteTagline -> execute();
+    $recordAppSiteTagline = $link->prepare($saveSiteTagline);
+    $recordAppSiteTagline->bind_param('ss', $site_tagline, $site_tagline_value);
+    $recordAppSiteTagline->execute();
 
     // insert configuration - site_description
-    $recordAppSiteDescription = $link -> prepare($saveSiteDescription);
-    $recordAppSiteDescription -> bind_param('ss', $site_description, $site_description_value);
-    $recordAppSiteDescription -> execute();
+    $recordAppSiteDescription = $link->prepare($saveSiteDescription);
+    $recordAppSiteDescription->bind_param('ss', $site_description, $site_description_value);
+    $recordAppSiteDescription->execute();
 
     // insert configuration - site_keywords
-    $recordAppSiteKeywords = $link -> prepare($saveSiteKeywords);
-    $recordAppSiteKeywords -> bind_param('ss', $site_keywords, $site_keywords_value);
-    $recordAppSiteKeywords -> execute();
+    $recordAppSiteKeywords = $link->prepare($saveSiteKeywords);
+    $recordAppSiteKeywords->bind_param('ss', $site_keywords, $site_keywords_value);
+    $recordAppSiteKeywords->execute();
 
     // insert configuration - site_email
-    $recordAppSiteEmail = $link -> prepare($saveSiteEmail);
-    $recordAppSiteEmail -> bind_param('ss', $site_email, $user_email);
-    $recordAppSiteEmail -> execute();
+    $recordAppSiteEmail = $link->prepare($saveSiteEmail);
+    $recordAppSiteEmail->bind_param('ss', $site_email, $user_email);
+    $recordAppSiteEmail->execute();
 
     // insert configuration - permalinks
-    $recordPermalinks = $link -> prepare($savePermalinks);
-    $recordPermalinks -> bind_param('ss', $permalink_key, $permalink_value);
-    $recordPermalinks -> execute();
+    $recordPermalinks = $link->prepare($savePermalinks);
+    $recordPermalinks->bind_param('ss', $permalink_key, $permalink_value);
+    $recordPermalinks->execute();
 
     // insert default theme
-    $recordTheme = $link -> prepare($saveTheme);
-    $recordTheme -> bind_param('sssss', $theme_title, $theme_desc, $theme_designer, $theme_directory, $theme_status);
-    $recordTheme -> execute();
+    $recordTheme = $link->prepare($saveTheme);
+    $recordTheme->bind_param('sssss', $theme_title, $theme_desc, $theme_designer, $theme_directory, $theme_status);
+    $recordTheme->execute();
 
     if ($recordAppKey -> affected_rows > 0) {
 
-        $link -> close();
+        $link->close();
         
      } 
  
