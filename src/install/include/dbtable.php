@@ -5,8 +5,8 @@
  */
 $tblUser = "CREATE TABLE IF NOT EXISTS tbl_users (
 ID BIGINT(20) unsigned NOT NULL auto_increment,
-user_login VARCHAR(60) NOT NULL,
-user_email VARCHAR(100) NOT NULL,
+user_login VARCHAR(60) NOT NULL UNIQUE,
+user_email VARCHAR(100) NOT NULL UNIQUE,
 user_pass VARCHAR(255) NOT NULL,
 user_level VARCHAR(20) NOT NULL,
 user_fullname VARCHAR(120) DEFAULT NULL,
