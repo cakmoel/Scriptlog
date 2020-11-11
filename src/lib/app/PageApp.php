@@ -11,9 +11,21 @@
  */
 class PageApp extends BaseApp
 {
-    
+
+/**
+ * view
+ *
+ * @var object
+ * 
+ */
  private $view;
 
+/**
+ * pageEvent
+ *
+ * @var object
+ * 
+ */
  private $pageEvent;
 
  public function __construct(PageEvent $pageEvent)
@@ -328,9 +340,9 @@ class PageApp extends BaseApp
        'ID' => $getPage['ID'],
        'media_id' => $getPage['media_id'],
        'post_title' => $getPage['post_title'],
-       'post_content' => $getPost['post_content'],
-       'post_summary' => $getPost['post_summary'],
-       'post_keyword' => $getPost['post_keyword']
+       'post_content' => $getPage['post_content'],
+       'post_summary' => $getPage['post_summary'],
+       'post_keyword' => $getPage['post_keyword']
    );
    
    if (isset($_POST['pageFormSubmit'])) {
