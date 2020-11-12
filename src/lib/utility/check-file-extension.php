@@ -1,12 +1,14 @@
 <?php
 /**
- * check_file_extension
+ * check_file_extension()
  *
- * @category Function
+ * checking file extension
+ * 
+ * @category function
  * @author M.Noermoehammad
- * @param string $file_name
  * @license MIT
  * @version 1.0
+ * @param string $file_name
  * @return bool
  * 
  */
@@ -15,26 +17,11 @@ function check_file_extension($file_name)
 
 $extension = null;
 
-if (function_exists('pathinfo')) {
-
-$extension = pathinfo($file_name, PATHINFO_EXTENSION);
-
-} elseif(class_exists('SplFileInfo')) {
-
-$finfo = new SplFileInfo($file_name);
-$extension = $finfo->getExtension();
-
-} else {
-
-$split = explode(".", $file_name);
-    
-$extension = (array_key_exists(1, $split) ? $split[1] : null);
-      
-}
+$extension = get_file_extension($file_name);
 
 switch (strtolower($extension)) {
     
-    // image 
+// image 
 case 'jpg':
 case 'jpe':
 case 'jpeg':
