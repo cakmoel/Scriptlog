@@ -16,7 +16,7 @@ function upload_doc($file_location, $file_name)
 
       if ((zip_file_scanner($file_name) === true) || (format_size_unit(get_zip_size($file_location)) == '0 bytes')) {
 
-          return false;
+          scriptlog_error("Document corrupted!");
 
       }
 
@@ -24,7 +24,7 @@ function upload_doc($file_location, $file_name)
 
   if (!move_uploaded_file($file_location, $doc_uploaded)) {
 
-    return false;
+    scriptlog_error("upload doc failed!");
 
   }
 
