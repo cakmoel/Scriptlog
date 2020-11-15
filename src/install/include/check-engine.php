@@ -323,6 +323,9 @@ function check_filter_enabled()
 
 /**
  * Checking extension iconv
+ * 
+ * @return bool
+ * 
  */
 function check_iconv_enabled()
 {
@@ -336,6 +339,47 @@ function check_iconv_enabled()
         
     }
     
+}
+
+/**
+ * checking extension mbstring
+ *
+ * @return bool
+ * 
+ */
+function check_mbstring_enabled()
+{
+
+ if (extension_loaded('mbstring')) {
+
+     return true;
+
+ } else {
+
+    return false;
+
+ }
+
+}
+
+/**
+ * check extension fileinfo
+ *
+ * @return bool
+ */
+function check_fileinfo_enabled()
+{
+
+ if (extension_loaded('fileinfo')) {
+
+    return true;
+
+ } else {
+
+    return false;
+
+ }
+
 }
 
 /**
