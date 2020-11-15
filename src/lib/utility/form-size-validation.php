@@ -12,7 +12,7 @@ function form_size_validation(array $form_fields)
 
     foreach ($form_fields as $k => $v) {
         
-        if(!empty($_POST[$k]) && isset($_POST[$k]{$v + 1})) {
+        if(!empty($_POST[$k]) && isset($_POST[$k][$v + 1])) {
             
             $exceded_limit = true;
             
