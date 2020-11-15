@@ -14,8 +14,6 @@ require dirname(__FILE__) . '/include/settings.php';
 require dirname(__FILE__) . '/include/setup.php';
 require dirname(__FILE__) . '/install-layout.php';
 
-use Sinergi\BrowserDetector\Browser;
-
 if (file_exists(__DIR__ . '/../config.php')) {
 
   $set_config = require __DIR__ . '/../config.php';
@@ -168,6 +166,18 @@ if ($install != 'install') {
 
     }
 
+    if (false === check_mbstring_enabled()) {
+
+       $errors['errorSetup'] = 'The Mbstring extension is not loaded';
+
+    }
+
+    if (false === check_fileinfo_enabled()) {
+
+       $errors['errorSetup'] = 'The Fileinfo extension is not loaded';
+
+    }
+    
     if (true === check_character_type()) {
 
        $errors['errorSetup'] = 'The ctype extension is overloading PHP\'s native string functions';
