@@ -304,6 +304,52 @@ function required_settings()
 </li>
 
 <li class="list-group-item d-flex justify-content-between lh-condensed">
+              
+    <div>
+                
+        <h6 class="my-0">Mbstring Extension Loaded</h6>
+                
+            <?php 
+                
+              if (check_mbstring_enabled()) {
+                    
+                  $mbstring_passed = 'text-success';
+                  $mbstring_checked = 'fa fa-check fa-lg';
+                
+              }
+                
+            ?>
+
+      <small class="<?=(isset($mbstring_passed)) ? $mbstring_passed : 'text-danger'; ?>"><?=(isset($mbstring_passed)) ? 'Pass' : $errors['errorChecking'] = 'The Mbstring extension is not loaded'; ?></small>
+      </div>
+      <span class="<?=(isset($mbstring_passed)) ? $mbstring_passed : 'text-danger'; ?>"><i class="<?=(isset($mbstring_checked)) ? $mbstring_checked : 'fa fa-close fa-lg'; ?>"></i></span>
+            
+</li>
+
+<li class="list-group-item d-flex justify-content-between lh-condensed">
+              
+    <div>
+                
+        <h6 class="my-0">Fileinfo Extension Loaded</h6>
+                
+            <?php 
+                
+              if (check_fileinfo_enabled()) {
+                    
+                  $fileinfo_passed = 'text-success';
+                  $fileinfo_checked = 'fa fa-check fa-lg';
+                
+              }
+                
+            ?>
+
+      <small class="<?=(isset($fileinfo_passed)) ? $fileinfo_passed : 'text-danger'; ?>"><?=(isset($fileinfo_passed)) ? 'Pass' : $errors['errorChecking'] = 'The Fileinfo extension is not loaded'; ?></small>
+      </div>
+      <span class="<?=(isset($fileinfo_passed)) ? $fileinfo_passed : 'text-danger'; ?>"><i class="<?=(isset($fileinfo_checked)) ? $fileinfo_checked : 'fa fa-close fa-lg'; ?>"></i></span>
+            
+</li>
+
+<li class="list-group-item d-flex justify-content-between lh-condensed">
     <div>
       
       <h6 class="my-0">Character Type Extension</h6>
