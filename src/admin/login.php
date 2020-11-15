@@ -16,9 +16,9 @@ if (file_exists(__DIR__ . '/../config.php')) {
     
   include __DIR__ . '/../lib/main.php';
  
-  $ip = getenv('REMOTE_ADDR', true) ? $_SERVER['REMOTE_ADDR'] : zend_ip_address();
+  $ip = getenv('REMOTE_ADDR', true) ?: zend_ip_address();
   
-  require __DIR__ . '/authorizer.php';
+  require __DIR__ . '/authenticator.php';
   include __DIR__ . '/login-layout.php';
 
   $stylePath =  preg_replace("/\/login\.php.*$/i", "", app_url().DS.APP_ADMIN);
@@ -30,9 +30,9 @@ if (file_exists(__DIR__ . '/../config.php')) {
   
 }
 
-if ($loggedIn) {
+if ($loggedIn === true) {
 
-   direct_page('index.php?load=dashboard', 302);
+  direct_page('index.php?load=dashboard', 200);
    
 }
 
@@ -80,12 +80,14 @@ login_header($stylePath);
       echo '<div class="alert alert-info alert-dismissable">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>The password has been ' . htmlspecialchars($_GET['status']) . '. Please enter with your new password!</div>';
    
-  } elseif (isset($_GET['status']) && $_GET['status'] == 'actived') {
+  } 
+  
+  if (isset($_GET['status']) && $_GET['status'] == 'actived') {
  
       echo '<div class="alert alert-info alert-dismissable">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>The account has been ' . htmlspecialchars($_GET['status']) . '. Pleas log in with your email and password!</div>';
  
-  }
+  } 
 
 ?>
 
@@ -93,13 +95,12 @@ login_header($stylePath);
 <div class="form-group has-feedback">
 <label for="inputLogin">Username or Email Address</label>
 <input type="text"  class="form-control" id="inputLogin" placeholder="username or email" name="login" maxlength="186" value="
-<?= (isset($_COOKIE['scriptlog_auth']) ? $_COOKIE['scriptlog_auth'] : ""); ?>" autocomplete="off" autocapitalize="off" autofocus required>
+<?= isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $key) : ""; ?>" autocomplete="off" autocapitalize="off" autofocus required>
 <span class="glyphicon glyphicon-user form-control-feedback"></span>
 </div>
 <div class="form-group has-feedback">
 <label for="inputPassword">Password</label>
-<input type="password" class="form-control" id="inputPassword" placeholder="Password" name="user_pass" maxlength="50" autocomplete="off" value="
-<?=(isset($_COOKIE['user_pass'])) ? $_COOKIE['user_pass'] : ""; ?>" required>
+<input type="password" class="form-control" id="inputPassword" placeholder="Password" name="user_pass" maxlength="50" autocomplete="off" value="" required>
 <span class="glyphicon glyphicon-lock form-control-feedback"></span>  
 </div>
 <div class="form-group has-feedback">
@@ -142,4 +143,8 @@ login_header($stylePath);
   <a href="reset-password.php" class="text-center">Lost your password?</a>    
 </div>
   
-<?= login_footer($stylePath); ?>
+<?php 
+
+login_footer($stylePath); 
+
+?>
