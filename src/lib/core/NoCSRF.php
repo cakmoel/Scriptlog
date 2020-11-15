@@ -115,13 +115,8 @@ class NoCSRF
      */
     protected static function randomString($length)
     {
-        $seed = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijqlmnopqrtsuvwxyz0123456789';
-        $max = strlen($seed) - 1;
-        
-        $string = '';
-        for ($i = 0; $i < $length; ++ $i)
-            $string .= $seed{intval(mt_rand(0.0, $max))};
-        
-        return $string;
+
+     return ircmaxell_random_generator($length);
+
     }
 }
