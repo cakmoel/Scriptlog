@@ -57,30 +57,32 @@ public function __construct($key, $name = '_scriptlog', $cookie = [])
 
  }
 
- if (PHP_VERSION_ID >= 70300) {
+ $httponly = true; 
+ 
+ if (PHP_VERSION_ID < 70300) {
 
-    $this->cookie += [
-       
-       'lifetime' => $current_cookie_params['lifetime'],
-       'path' => ini_get('session.cookies_path'),
-       'domain' => $current_cookie_params['domain'],
-       'secure' => is_cookies_secured(),
-       'httponly' => 1,
-       'samesite' => 'Strict'
-
-    ];
-
- } else {
-
-     $this->cookie += [
+   $this->cookie += [
 
       'lifetime' => $current_cookie_params['lifetime'],
-      'path' => '/; samesite=Strict',
-      'domain' => $current_cookie_params['domain'],
-      'secure' => is_cookies_secured(),
-      'httponly' => 1
-         
-     ];
+      'path'     => '/; samesite=lax',
+      'domain'   => $current_cookie_params['domain'],
+      'secure'   => is_cookies_secured(),
+      'httponly' => $httponly
+            
+   ];
+   
+ } else {
+
+   $this->cookie += [
+       
+      'lifetime' => $current_cookie_params['lifetime'],
+      'path'     => ini_get('session.cookies_path'),
+      'domain'   => $current_cookie_params['domain'],
+      'secure'   => is_cookies_secured(),
+      'httponly' => $httponly,
+      'samesite' => 'lax'
+   
+   ];
 
  }
 
@@ -101,17 +103,22 @@ private function setup()
 
  session_name($this->name);
  
- if (PHP_VERSION_ID >= 70300) {
+ if (PHP_VERSION_ID < 70300) {
 
-    session_set_cookie_params([
-
-        $this->cookie['lifetime'], $this->cookie['path'], $this->cookie['domain'], $this->cookie['secure'], $this->cookie['httponly'], $this->cookie['samesite']
-
-    ]);
+   session_set_cookie_params($this->cookie['lifetime'],  $this->cookie['path'], $this->cookie['domain'], $this->cookie['secure'], $this->cookie['httponly']);
 
  } else {
 
-    session_set_cookie_params($this->cookie['lifetime'], $this->cookie['path'], $this->cookie['domain'], $this->cookie['secure'], $this->cookie['httponly']);
+   session_set_cookie_params([
+      
+      'lifetime' => $this->cookie['lifetime'],
+      'path' => $this->cookie['path'],
+      'domain' => $this->cookie['domain'],
+      'secure' => $this->cookie['secure'],
+      'httponly' => $this->cookie['httponly'],
+      'samesite' => $this->cookie['samesite']
+
+  ]);
 
  }
 
@@ -126,7 +133,7 @@ private function setup()
 public function start()
 {
 
-if ((isset($_COOKIE[session_name()])) || (self::isSessionStarted() === false)) {
+if ((!isset($_COOKIE[session_name()])) || (self::isSessionStarted() === false)) {
 
    if(session_start()) {
 
@@ -156,7 +163,7 @@ public function forget()
 
  }
 
- $_SESSION = [];
+ unset($_SESSION);
 
  set_cookies_scl($this->name, '', time() - Authentication::COOKIE_EXPIRE, $this->cookie['path'], $this->cookie['domain'], $this->cookie['secure'], $this->cookie['httponly']);
 
@@ -190,8 +197,8 @@ public function read($id)
   
  $data = parent::read($id);
 
- ( ( is_null($data) ) || ( empty($data) ) ) ? $data = '' : $data = $this->decrypt($data, $this->key);
-
+ (is_null($data) || empty($data)) ? $data = '' : $data = $this->decrypt($data, $this->key);
+ 
  return $data;
  
 }
@@ -244,9 +251,9 @@ public function isGenuine()
  
  $agent = getenv('HTTP_USER_AGENT', true) ?: getenv('HTTP_USER_AGENT');
 
- $ip = getenv('REMOTE_ADDR', true) ? get_ip_address() : getenv('REMOTE_ADDR');
+ $ip_client = getenv('REMOTE_ADDR', true) ? get_ip_address() : getenv('REMOTE_ADDR');
 
- $hash = md5( $agent . (ip2long($ip) & ip2long('255.255.0.0')));
+ $hash = md5( $agent . (ip2long($ip_client) & ip2long('255.255.0.0')));
 
  if (isset($_SESSION['_genuine'])) {
 
