@@ -207,6 +207,10 @@ Registry::setAll(array('dbc' => $dbc, 'route' => $rules, 'key' => $key));
  * @var $userDao, $validator, $authenticator, $ubench --
  * 
  */
+
+content_security_policy();
+
+$sessionMaker = new SessionMaker(set_session_cookies_key());
 $searchPost = new SearchFinder($dbc);
 $sanitizer = new Sanitize();
 $userDao = new UserDao();
@@ -220,9 +224,6 @@ $frontDispatcher = new Dispatcher();
 $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);
 $ubench = new Ubench();
-$sessionMaker = new SessionMaker(set_session_cookies_key());
-
-content_security_policy();
 
 session_set_save_handler($sessionMaker, true);
 session_save_path(__DIR__ . '/utility/.sessions'.DS);
