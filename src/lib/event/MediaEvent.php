@@ -464,10 +464,10 @@ public function modifyMediaMeta()
             unlink(__DIR__ . '/../../'.APP_IMAGE_LARGE.'large_'.$filename);
             unlink(__DIR__ . '/../../'.APP_IMAGE_MEDIUM.'medium_'.$filename);
             unlink(__DIR__ . '/../../'.APP_IMAGE_SMALL.'small_'.$filename);
-            unlink(__DIR__ . '/../../'.APP_IMAGE.$filename.'.webp');
-            unlink(__DIR__ . '/../../'.APP_IMAGE_LARGE.'large_'.$filename.'.webp');
-            unlink(__DIR__ . '/../../'.APP_IMAGE_MEDIUM.'medium_'.$filename.'.webp');
-            unlink(__DIR__ . '/../../'.APP_IMAGE_SMALL.'small_'.$filename.'.webp');
+            unlink(__DIR__ . '/../../'.APP_IMAGE.$file_basename.'.webp');
+            unlink(__DIR__ . '/../../'.APP_IMAGE_LARGE.'large_'.$file_basename.'.webp');
+            unlink(__DIR__ . '/../../'.APP_IMAGE_MEDIUM.'medium_'.$file_basename.'.webp');
+            unlink(__DIR__ . '/../../'.APP_IMAGE_SMALL.'small_'.$file_basename.'.webp');
 
           }
 
