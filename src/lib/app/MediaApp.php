@@ -15,7 +15,7 @@ class MediaApp extends BaseApp
 /**
  * View
  * 
- * @var string
+ * @var object
  * 
  */
 private $view;
@@ -23,7 +23,7 @@ private $view;
 /**
  * MediaEvent
  * 
- * @var string
+ * @var object
  * 
  */
 private $mediaEvent;
@@ -249,7 +249,7 @@ public function insert()
   
           } else {
 
-            upload_media($file_location, $file_type, $file_size, basename($new_filename));
+           upload_media($file_location, $file_type, $file_size, basename($new_filename));
 
          }
          
