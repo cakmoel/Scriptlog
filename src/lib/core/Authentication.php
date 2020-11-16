@@ -167,6 +167,19 @@ class Authentication
     return $this->userToken->updateTokenExpired($tokenId);
   }
 
+/**
+ * setPersistentLoginCookie
+ *
+ * @param array $bind
+ * @param string $login
+ * @return void
+ * 
+ */
+  public function renewPersistentLogin($bind, $login)
+  {
+    return $this->userToken->updateUserToken($bind, $login);
+  }
+
   /**
    * Is Email Exists
    * 
@@ -231,27 +244,27 @@ class Authentication
  public function login(array $values)
  {
     
-     $login = (isset($values['login'])) ? $values['login'] : null;
-     $password = (isset($values['user_pass'])) ? $values['user_pass'] : null;
-     $remember_me = (isset($values['remember'])) ? $values['remember'] : null;
+    $login = (isset($values['login'])) ? $values['login'] : null;
+    $password = (isset($values['user_pass'])) ? $values['user_pass'] : null;
+    $remember_me = (isset($values['remember'])) ? $values['remember'] : null;
 
-     if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+    if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
         
-       $this->validator->sanitize($login, 'email');
-       $this->validator->validate($login, 'email');
-       $account_info = $this->findUserByEmail($login);
+      $this->validator->sanitize($login, 'email');
+      $this->validator->validate($login, 'email');
+      $account_info = $this->findUserByEmail($login);
 
-     } else {
+    } else {
 
-       $this->validator->sanitize($login, 'string');
-       $this->validator->validate($login, 'string');
-       $account_info = $this->findUserByLogin($login);
+      $this->validator->sanitize($login, 'string');
+      $this->validator->validate($login, 'string');
+      $account_info = $this->findUserByLogin($login);
 
-     }
+    }
 
-      $account_login = $account_info['user_login'];
+    $account_login = $account_info['user_login'];
       
-      $this->validator->validate($password, 'password'); 
+    $this->validator->validate($password, 'password'); 
 
       Session::getInstance()->scriptlog_session_id = $this->user_id = intval($account_info['ID']);
       Session::getInstance()->scriptlog_session_email = $this->user_email = $account_info['user_email'];
@@ -283,19 +296,19 @@ class Authentication
       if ($remember_me == true) {
 
           $encrypt_auth = ScriptlogCryptonize::scriptlogCipher($account_login, $this->key);
-
           set_cookies_scl('scriptlog_auth', $encrypt_auth, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true); 
           
-          $secret = ScriptlogCryptonize::generateSecretKey();
-          $random_password = Tokenizer::createToken(32);
+          $random_password = Tokenizer::createToken(128);
           set_cookies_scl('scriptlog_validator', $random_password, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
         
-          $random_selector = Tokenizer::createToken(32);
+          $random_selector = Tokenizer::createToken(128); 
           set_cookies_scl('scriptlog_selector', $random_selector, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
         
-          $hashed_password = Tokenizer::setRandomPasswordProtected($random_password, $secret);
+          $hashed_password = Tokenizer::setRandomPasswordProtected($random_password);
+
+          $secret = ScriptlogCryptonize::generateSecretKey();
           $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
-          
+
           $expiry_date = date("Y-m-d H:i:s", time() + self::COOKIE_EXPIRE);
                   
           $token_info = $this->findTokenByLogin($login, 0);
@@ -495,120 +508,120 @@ public function activateUserAccount($key)
 public function userAccessControl($control = null)
 {
 
-    switch ($control) {
+  switch ($control) {
 
-        case ActionConst::USERS:
+      case ActionConst::USERS:
             
-            if($this->accessLevel() !== 'administrator') {
+          if($this->accessLevel() !== 'administrator') {
 
-                return false;
-            }
+              return false;
+          }
 
-            break;
+          break;
 
-        case ActionConst::PLUGINS:
+      case ActionConst::PLUGINS:
            
-            if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
+          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
 
-                return false;
+              return false;
 
-            }
+          }
 
-            break;
+          break;
 
-        case ActionConst::THEMES:
+      case ActionConst::THEMES:
 
-           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
+          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
 
-               return false;
+              return false;
 
-           }
+          }
 
-            break;
+          break;
 
-        case ActionConst::CONFIGURATION:
+      case ActionConst::CONFIGURATION:
       
-           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
+          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
 
-             return false;
+            return false;
 
-           }
-
-          break;
-
-        case ActionConst::MEDIALIB:
-
-           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
-               && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author')) {
-
-              return false;
-
-           }
+          }
 
           break;
 
-        case ActionConst::TOPICS:
+      case ActionConst::MEDIALIB:
 
-           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') && ($this->accessLevel() !== 'editor')) {
+          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
+              && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author')) {
 
-              return false;
+            return false;
 
-           }
+          }
+
+          break;
+
+      case ActionConst::TOPICS:
+
+          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') && ($this->accessLevel() !== 'editor')) {
+
+            return false;
+
+          }
 
           break;
           
-        case ActionConst::PAGES:
+      case ActionConst::PAGES:
 
-           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
+          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
 
-              return false;
+            return false;
 
-           }
+          }
 
           break;
   
-        case ActionConst::COMMENTS:
+      case ActionConst::COMMENTS:
           
-           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'author') && ($this->accessLevel() !== 'contributor')) {
+          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'author') && ($this->accessLevel() !== 'contributor')) {
+
+            return false;
+
+          }
+
+          break;
+
+      case ActionConst::REPLY:
+
+          if (($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author')) {
+
+            return false;
+
+          }
+
+          break;
+
+      case ActionConst::NAVIGATION:
+
+          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
 
               return false;
 
-           }
+          }
 
           break;
 
-        case ActionConst::REPLY:
-
-           if (($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author')) {
-
-             return false;
-
-           }
-
-          break;
-
-        case ActionConst::NAVIGATION:
-
-            if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
-
-               return false;
-
-            }
-
-          break;
-
-        default:
+      default:
           
-            if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
-               && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author') && ($this->accessLevel() !== 'contributor')) {
+          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
+              && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author') && ($this->accessLevel() !== 'contributor')) {
 
-              return false;
+            return false;
             
-            }
+          }
 
           break;
 
-    }
+  }
 
     return true;
 
