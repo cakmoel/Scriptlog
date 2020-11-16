@@ -2,7 +2,7 @@
 # "themes
 public/*
 !public/themes/
-
+lib/utility/.lts/
 
 #Ignore log files and database
 *.log
