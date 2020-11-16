@@ -22,7 +22,7 @@ private $dbpass;
 
 private $dbname;
 
-private static $report_mode;
+private static $report_mode = [];
 
 private static $config = [];
 
@@ -84,9 +84,9 @@ public function __destruct()
 public static function activateReportMode()
 {
   
-  if (self::$report_mode = new mysqli_driver()) {
+  if (self::$report_mode[] = new mysqli_driver()) {
 
-      return self::$report_mode =  MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+      self::$report_mode[] =  MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
 
   }
 
@@ -121,19 +121,7 @@ public function simpleQuery($sql)
 
   try {
   
-    $run_query = $this->dbc->query($sql);
-
-    if ($this->dbc->error) {
-
-        throw new mysqli_sql_exception("Invalid query: ".$this->dbc->error);
-
-        return false;
-
-    } else {
-
-        return true;
-
-    }
+    return $this->dbc->query($sql);
 
   } catch (mysqli_sql_exception $e) {
     
@@ -169,7 +157,8 @@ public function simpleQuery($sql)
  * @param string $sql
  * @param array $params
  * @param string $types
- * @return void
+ * @return object
+ * 
  */
 public function preparedQuery($sql, $params = [], $types = "")
 {
@@ -198,7 +187,8 @@ public function preparedQuery($sql, $params = [], $types = "")
  * @param string $sql
  * @param array $params
  * @param string $types
- * @return void
+ * @return object
+ * 
  */
 public function preparedSelect($sql, $params = [], $types = "")
 {
@@ -343,7 +333,7 @@ public function isTableExists($table_name)
 
   }
 
-  $check->free();
+  $check_table->free();
 
  } catch (mysqli_sql_exception $e) {
    
@@ -401,17 +391,28 @@ public function getResult($Statement)
 {
 
 $result = array();
+
 $Statement->store_result();
-    for ( $i = 0; $i < $Statement->num_rows; $i++ ) {
-        $Metadata = $Statement->result_metadata();
-        $params = array();
-        while ( $Field = $Metadata->fetch_field() ) {
-            $params[] = &$result[ $i ][ $Field->name ];
-        }
-        call_user_func_array( array( $Statement, 'bind_result' ), $params );
-        $Statement->fetch();
+    
+  for ( $i = 0; $i < $Statement->num_rows; $i++ ) {
+        
+     $Metadata = $Statement->result_metadata();
+        
+     $params = array();
+        
+    while ( $Field = $Metadata->fetch_field() ) {
+            
+      $params[] = &$result[ $i ][ $Field->name ];
+        
     }
-    return $result;
+        
+    call_user_func_array( array( $Statement, 'bind_result' ), $params );
+        
+    $Statement->fetch();
+    
+  }
+    
+  return $result;
 
 }
 
