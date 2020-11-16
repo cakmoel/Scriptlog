@@ -1,10 +1,13 @@
 <?php
 /**
- * get_file_extension
+ * get_file_extension()
  *
+ * read file extension witn SplFileInfo and match it 
+ * 
  * @category Function
+ * @author M.Noermoehammad
  * @param string $file_name
- * @return string
+ * @return bool|string -- false if extension does not match 
  * 
  */
 function get_file_extension($file_name)
@@ -25,6 +28,15 @@ if (($file_ext == file_extension_str($file_name)) || ($file_ext == file_extensio
  
 }
 
+/**
+ * file_extension_explode()
+ * 
+ * read file extension with explode function
+ *
+ * @param string $file_name
+ * @return array
+ * 
+ */
 function file_extension_explode($file_name)
 {
 
@@ -36,6 +48,15 @@ return $extension[1];
 
 }
 
+/**
+ * file_extension_end()
+ *
+ * read file extension with end--explode function
+ * 
+ * @param string $file_name
+ * @return string
+ * 
+ */
 function file_extension_end($file_name)
 {
 
@@ -45,6 +66,15 @@ return $extension;
 
 }
 
+/**
+ * file_extension_pathinfo()
+ * 
+ * read file extension with pathinfo
+ *
+ * @param string $file_name
+ * @return string
+ * 
+ */
 function file_extension_pathinfo($file_name)
 {
 
@@ -54,6 +84,15 @@ return $extension;
 
 }
 
+/**
+ * file_extension_str()
+ * 
+ * read file extensin with substr--strrchr
+ *
+ * @param string $file_name
+ * @return string
+ * 
+ */
 function file_extension_str($file_name)
 {
 
