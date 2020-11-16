@@ -42,7 +42,7 @@ public static function generateSecretKey()
 public static function cipherMessage($message, $key)
 {
 
-  $cipher = \Laminas\Crypt\BlockCipher::factory('openssl', array('algo' => 'aes'));
+  $cipher = BlockCipher::factory('openssl', array('algo' => 'aes'));
 
   $cipher->setKey($key);
 
@@ -63,7 +63,7 @@ public static function cipherMessage($message, $key)
 public static function scriptlogCipher($message, $key)
 {
 
-$ciphertext = \Defuse\Crypto\Crypto::encrypt($message, $key);
+$ciphertext = Crypto::encrypt($message, $key);
 
 return $ciphertext;
 
@@ -156,7 +156,7 @@ try {
 public static function decipherMessage($ciphertext, $key)
 {
 
-$cipher = \Laminas\Crypt\BlockCipher::factory('openssl', array('algo' => 'aes'));
+$cipher = BlockCipher::factory('openssl', array('algo' => 'aes'));
 
 $cipher->setKey($key);
  
@@ -177,7 +177,7 @@ return $result;
 public static function scriptlogDecipher($ciphertext, $key)
 {
 
-$plaintext = \Defuse\Crypto\Crypto::decrypt($ciphertext, $key);
+$plaintext = Crypto::decrypt($ciphertext, $key);
  
 return $plaintext;
 
@@ -198,13 +198,13 @@ if ( file_exists(__DIR__ . '/../../lib/utility/.lts/lts.txt')) {
 
 } else {
 
-  $keyObject = \Defuse\Crypto\Key::createNewRandomKey();
+  $keyObject = Key::createNewRandomKey();
 
   $key_ascii = $keyObject->saveToAsciiSafeString();
 
 }
 
-$loaded = \Defuse\Crypto\Key::loadFromAsciiSafeString($key_ascii);
+$loaded = Key::loadFromAsciiSafeString($key_ascii);
 
 return $loaded;
 
