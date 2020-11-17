@@ -47,7 +47,7 @@ protected $cookie = [];
 public function __construct($key, $name = '_scriptlog', $cookie = [])
 {
 
- $this->key = substr(hash('SHA256', $key), 0, 32);
+ $this->key = substr(hash('sha256', $key), 0, 32);
  $this->name = $name;
  $this->cookie = $cookie;
  
@@ -135,12 +135,12 @@ public function start()
 
 if ((!isset($_COOKIE[session_name()])) || (self::isSessionStarted() === false)) {
 
-   if(session_start()) {
+   if (session_start()) {
 
-      return (mt_rand(0, 4) === 0) ? $this->refresh() : true;
+      return (mt_rand(0, 4) === 0) ? $this->refresh() : true; 
+      
+  }
 
-   }
-   
 }
 
 return false;
@@ -184,6 +184,7 @@ public function refresh()
   return session_regenerate_id(true);
 }
 
+
 /**
  * read
  *
@@ -197,9 +198,7 @@ public function read($id)
   
  $data = parent::read($id);
 
- (is_null($data) || empty($data)) ? $data = '' : $data = $this->decrypt($data, $this->key);
- 
- return $data;
+ return empty($data) ? '' : $this->decrypt($data, $this->key);
  
 }
 
