@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => 'ccb7d027aa034c5d9afd26071069bd97c98d92da',
+    'reference' => '027f9d48da106bf74ebf7f5a0f27b1256e60e1d4',
     'name' => '__root__',
   ),
   'versions' => 
@@ -18,7 +18,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => 'ccb7d027aa034c5d9afd26071069bd97c98d92da',
+      'reference' => '027f9d48da106bf74ebf7f5a0f27b1256e60e1d4',
     ),
     'doctrine/lexer' => 
     array (
@@ -99,6 +99,15 @@
       ),
       'reference' => '120b605dfeb996808c31b6477290a714d356e822',
     ),
+    'selective/archive-bomb-scanner' => 
+    array (
+      'pretty_version' => '1.1.0',
+      'version' => '1.1.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '537f631787d2a76b01a83b723d26a419617b8f3a',
+    ),
     'sinergi/browser-detector' => 
     array (
       'pretty_version' => '6.1.3',
@@ -164,30 +173,30 @@
     ),
     'voku/anti-xss' => 
     array (
-      'pretty_version' => '4.1.28',
-      'version' => '4.1.28.0',
+      'pretty_version' => '4.1.30',
+      'version' => '4.1.30.0',
       'aliases' => 
       array (
       ),
-      'reference' => '8919a19846d2b100e664d9e3cecfcaba4f57d9b4',
+      'reference' => 'ff6e54f4a98ad1cd28f8b4a0f3c3f92f3c421f0a',
     ),
     'voku/portable-ascii' => 
     array (
-      'pretty_version' => '1.5.3',
-      'version' => '1.5.3.0',
+      'pretty_version' => '1.5.6',
+      'version' => '1.5.6.0',
       'aliases' => 
       array (
       ),
-      'reference' => '25bcbf01678930251fd572891447d9e318a6e2b8',
+      'reference' => '80953678b19901e5165c56752d087fc11526017c',
     ),
     'voku/portable-utf8' => 
     array (
-      'pretty_version' => '5.4.47',
-      'version' => '5.4.47.0',
+      'pretty_version' => '5.4.50',
+      'version' => '5.4.50.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'c92522515a2d5ec9b03fd3c9e231b8b277c65121',
+      'reference' => 'f14ed68ea9ced6639e71ca989c6d907892115ba0',
     ),
   ),
 );
