@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d9edb027e5d58ecdf4cc8d7aeb3be175",
+    "content-hash": "6b896557f03c42c8fa6ced7eed40de04",
     "packages": [
         {
             "name": "doctrine/lexer",
@@ -471,6 +471,60 @@
             ],
             "description": "A polyfill for getallheaders.",
             "time": "2019-03-08T08:55:37+00:00"
+        },
+        {
+            "name": "selective/archive-bomb-scanner",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/selective-php/archive-bomb-scanner.git",
+                "reference": "537f631787d2a76b01a83b723d26a419617b8f3a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/selective-php/archive-bomb-scanner/zipball/537f631787d2a76b01a83b723d26a419617b8f3a",
+                "reference": "537f631787d2a76b01a83b723d26a419617b8f3a",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2"
+            },
+            "require-dev": {
+                "overtrue/phplint": "^1.1",
+                "phpstan/phpstan": "*",
+                "phpunit/phpunit": "^7",
+                "selective/rar": "^0.1",
+                "squizlabs/php_codesniffer": "^3.4"
+            },
+            "suggest": {
+                "ext-zip": "Use this extension to detect ZIP archive bombs",
+                "selective/rar": "Use this package to detect RAR archive bombs"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Selective\\ArchiveBomb\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "ZIP and PNG bomb scanner",
+            "homepage": "https://github.com/selective-php/archive-bomb-scanner",
+            "keywords": [
+                "archive-bomb",
+                "png",
+                "png-bomb",
+                "scanner",
+                "zip",
+                "zip-bomb"
+            ],
+            "support": {
+                "issues": "https://github.com/selective-php/archive-bomb-scanner/issues",
+                "source": "https://github.com/selective-php/archive-bomb-scanner/tree/1.1.0"
+            },
+            "time": "2020-08-05T20:52:23+00:00"
         },
         {
             "name": "sinergi/browser-detector",
@@ -1244,5 +1298,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.0.0"
 }
