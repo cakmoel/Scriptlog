@@ -266,6 +266,8 @@ class Authentication
       
     $this->validator->validate($password, 'password'); 
 
+    clear_duplicate_cookies();
+
       Session::getInstance()->scriptlog_session_id = $this->user_id = intval($account_info['ID']);
       Session::getInstance()->scriptlog_session_email = $this->user_email = $account_info['user_email'];
       Session::getInstance()->scriptlog_session_level = $this->user_level = $account_info['user_level'];
@@ -281,8 +283,6 @@ class Authentication
       
       $ip_address = (isset($_SERVER['REMOTE_ADDR'])) ? $_SERVER['REMOTE_ADDR'] : get_ip_address();
       Session::getInstance()->scriptlog_session_ip = $ip_address;
-  
-      clear_duplicate_cookies();
 
       Session::getInstance()->scriptlog_fingerprint = hash_hmac('sha256', $user_agent, hash('sha256', $ip_address, true));
       
