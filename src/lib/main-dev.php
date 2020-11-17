@@ -231,7 +231,7 @@ session_save_path(__DIR__ . '/utility/.sessions'.DS);
 
 # set_exception_handler('LogError::exceptionHandler');
 # set_error_handler('LogError::errorHandler');
-# register_shutdown_function('scriptlog_shutdown_fatal');
+register_shutdown_function('session_write_close');
 
 if (!start_session_on_site($sessionMaker)) {
 
