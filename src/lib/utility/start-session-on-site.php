@@ -1,8 +1,10 @@
 <?php
 /**
- * Function start session on site
+ * start_session_on_site
  * 
  * @category function 
+ * @author M.Noermoehammad
+ * @license MIT
  * @see https://www.php.net/manual/en/ref.session.php
  * @see https://github.com/GoogleChromeLabs/samesite-examples/blob/master/php.md 
  * @see https://stackoverflow.com/questions/36877/how-do-you-set-up-use-httponly-cookies-in-php
@@ -11,7 +13,6 @@
  * @return mixed
  * 
  */
-
 function start_session_on_site($session_handler)
 {
   
@@ -50,8 +51,11 @@ return turn_on_session($session_handler, $life_time, $session_name, $current_coo
 }
 
 /**
- * session_valid_id function
+ * session_valid_id
  * 
+ * @category function
+ * @license MIT
+ * @version 1.0
  * @see https://www.php.net/manual/en/function.session-id.php
  * @see https://akrabat.com/validating-default-php-session-id-values/
  * @param string $session_id
@@ -87,7 +91,7 @@ function session_valid_id($session_id)
        
     } else {
     
-      return preg_match('/^[-,a-zA-Z0-9]{1,128}$/', $session_id) === 1;
+      return preg_match('/^[-,a-zA-Z0-9]{1,128}$/', $session_id) > 0;
     
     }
     
