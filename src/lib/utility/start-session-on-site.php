@@ -20,11 +20,13 @@ function start_session_on_site($session_handler)
 
   $session_name = session_name();
   
-  if(ini_get('session.use_cookies')) {
+ if(ini_get('session.use_cookies')) {
 
     $current_cookie_params = session_get_cookie_params();
 
-  }
+ }
+
+ $_SESSION['deleted_time'] = time();
 
  if (isset($_COOKIE[$session_name])) {
 
