@@ -17,35 +17,23 @@
 function regenerate_session()
 {
 
+ if (isset($_SESSION['deleted_time']) && $_SESSION['deleted_time'] < time() - Authentication::COOKIE_EXPIRE) {
+  
+   unset($_SESSION['user_login']);
+
+ }
+ 
+ $oldid = session_id();
+
+ $_SESSION['deleted_time'] = time();
+
+ session_regenerate_id();
+
+ unset($_SESSION['deleted_time']);
+
  $newid = session_id();
 
- if (session_status() != PHP_SESSION_ACTIVE) {
-      
-   session_start();
-  
- }
-
- if (isset($_SESSION['deleted_time']) && time() - $_SESSION['deleted_time'] > Authentication::COOKIE_EXPIRE) {
-   
-   session_unset();
-   
-   session_destroy();
-   
-   session_write_close();
-   
-   session_regenerate_id(true);
-
-}
-
-$_SESSION['deleted_time'] = time();
-
-session_commit();
-
-session_regenerate_id();
-
-unset($_SESSION['deleted_time']);
-
-session_id($newid);
+ return $newid;
 
 }
 
