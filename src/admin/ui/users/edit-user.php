@@ -42,7 +42,7 @@ endif;
 <?php 
 $action = (isset($formAction)) ? $formAction : null;
 $user_id = (isset($userData['ID'])) ? safe_html((int)$userData['ID']) : 0;
-$session_id = (isset($userData['user_session'])) ? safe_html($userData['user_session']) :  md5(uniqid());
+$session_id = (isset($userData['user_session'])) ? safe_html($userData['user_session']) : sha1(app_key());
 ?>
 
 <form method="post" action="<?=generate_request('index.php', 'post', ['users', $action, $user_id, $session_id])['link']; ?>" role="form">
@@ -86,15 +86,22 @@ endif;
 </div>
 
 <div class="form-group">
-<label for="passwd">Password <?=(!empty($userData['user_email'])) ? "": "(required)"; ?></label>
+<label for="passwd"><?=(!empty($userData['user_email'])) ? "New password": "Password (required)"; ?></label>
 <input type="password" class="form-control" id="passwd" name="user_pass" placeholder="Enter password" maxlength="50" autocomplete="off">
 </div>
 
 <?php if(!empty($userData['user_email'])) :?>
+
 <div class="form-group">
-<label for="confirm_pwd">Confirm password <?=(!empty($userData['user_email'])) ? "": "(required)"; ?></label>
-<input type="password" class="form-control" id="confirm_pwd" name="user_pass2" placeholder="Confirm password" maxlength="50" autocomplete="off">
+<label for="confirm_pwd"><?=(!empty($userData['user_email'])) ? "Confirm new password (required)": ""; ?></label>
+<input type="password" class="form-control" id="confirm_pwd" name="user_pass2" placeholder="Confirm new password" maxlength="50" autocomplete="off">
 </div>
+
+<div class="form-group">
+<label for="current_pwd"><?=(!empty($userData['user_email'])) ? "Current password (required)": ""; ?></label>
+<input type="password" class="form-control" id="current_pwd" name="current_pwd" placeholder="Your current password" maxlength="50" autocomplete="off">
+</div>
+
 <?php  endif; ?>
 
 <div class="form-group">
