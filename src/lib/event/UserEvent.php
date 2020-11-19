@@ -330,7 +330,9 @@ class UserEvent
   $this->validator->sanitize($this->user_fullname, 'string');
   $this->validator->sanitize($this->user_email, 'email');
   
-   if ($this->isUserLevel() != 'administrator') {
+  $secret = ScriptlogCryptonize::generateSecretKey();
+
+  if ($this->isUserLevel() != 'administrator') {
    
        if (!empty($this->user_pass)) {
            
@@ -376,7 +378,7 @@ class UserEvent
        
    }
 
-   if($this->identifyCookieToken()) {
+   if($this->identifyCookieToken($secret)) {
  
       $bind_meta = ['pwd_hash' => $this->pwd_hash, 'selector_hash' => $this->selector_hash, 'expired_date' => $this->cookie_expired_date];
 
@@ -484,6 +486,19 @@ class UserEvent
  }
 
 /**
+ * reAuthenticateUserPrivilege
+ *
+ * @param string $login
+ * @param string $password
+ * @return bool
+ * 
+ */
+public function reAuthenticateUserPrivilege($login, $password)
+{
+  return $this->userDao->checkUserPassword($login, $password);
+}
+
+/**
  * identifyCookieToken
  * Check whether session cookies defined or not
  * if defined then return it
@@ -492,12 +507,10 @@ class UserEvent
  * @return void
  * 
  */
- public function identifyCookieToken()
+ public function identifyCookieToken($secret)
  {
 
    $this->user_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $this->key) : Session::getInstance()->scriptlog_session_login;
-
-   $secret = ScriptlogCryptonize::generateSecretKey();
 
    if ( ( isset($_COOKIE['scriptlog_validator']) ) && ( isset($_COOKIE['scriptlog_selector']) ) ) {
 
@@ -512,7 +525,7 @@ class UserEvent
 
       if ( hash_equals($expected_validator, $correct_validator) ) {
 
-          if ( Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash'], $secret) ) {
+          if ( Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']) ) {
 
             $this->validator_verified = true;
 
