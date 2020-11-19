@@ -42,7 +42,7 @@ $uniqueKey = isset($_GET['uniqueKey']) ? safe_html($_GET['uniqueKey']) : null;
 
 if ($action == 'LogIn') {
 
-  if (false === block_request_type(current_request_method(), ['POST'])) {
+  if (block_request_type(current_request_method(), ['POST']) == false) {
 
     list($errors, $failed_login) = processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, $_POST);    
 
@@ -98,28 +98,30 @@ login_header($stylePath);
 <?= isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $key) : ""; ?>" autocomplete="off" autocapitalize="off" autofocus required>
 <span class="glyphicon glyphicon-user form-control-feedback"></span>
 </div>
+
 <div class="form-group has-feedback">
 <label for="inputPassword">Password</label>
 <input type="password" class="form-control" id="inputPassword" placeholder="Password" name="user_pass" maxlength="50" autocomplete="off" value="" required>
 <span class="glyphicon glyphicon-lock form-control-feedback"></span>  
-</div>
-<div class="form-group has-feedback">
-<input type="text" name="scriptpot_name" class="form-control scriptpot" autocomplete="off">
-</div>
-<div class="form-group has-feedback">
-<input type="email" name="scriptpot_email" class="form-control scriptpot" autocomplete="off">
 </div>
 
 <?php if (isset($failed_login) && $failed_login >= 5) : ?> 
 
 <div class="form-group has-feedback">
 <label for="inputCaptcha">Enter captcha code</label>
-<input type="text" class="form-control" id="inputCaptcha" placeholder="Please type a captcha code here" name="captcha_code">
+<input type="text" class="form-control" id="inputCaptcha" placeholder="Please type a captcha code here" name="captcha_login" required>
 <span class="glyphicon glyphicon-hand-down form-control-feedback"></span>
 <img src="<?=app_url().'/admin/captcha-login.php'; ?>" alt="image_captcha">
 </div>
 
 <?php endif; ?>
+
+<div class="form-group has-feedback">
+<input type="text" name="scriptpot_name" class="form-control scriptpot" autocomplete="off">
+</div>
+<div class="form-group has-feedback">
+<input type="email" name="scriptpot_email" class="form-control scriptpot" autocomplete="off">
+</div>
 
 <div class="row">
   <div class="col-xs-8">

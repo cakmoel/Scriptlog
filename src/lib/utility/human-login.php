@@ -14,7 +14,7 @@
 function human_login_id()
 {
  
- $random_int = ircmaxell_generator_numbers(0, 99999);
+ $random_int = ircmaxell_generator_numbers(0, 999);
  
  $_SESSION['human_login_id'] = $random_int;
  
@@ -95,7 +95,7 @@ $query_data = array(
 
 $html['doLogin'] = build_query($base, $query_data);
 
-return $html;
+return Sanitize::severeSanitizer($html);
 
 }
 
@@ -118,7 +118,7 @@ return $html;
 function safe_human_login($ip, $loginId, $uniqueKey, array $values)
 {
 
-if( check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'scriptpot_email', 'captcha_code', 'remember', 'csrf', 'LogIn']) == false )  {
+if( check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'scriptpot_email', 'captcha_login', 'remember', 'csrf', 'LogIn']) == false )  {
 
      header(APP_PROTOCOL.' 413 Payload Too Large');
      header('Status: 413 Payload Too Large');
@@ -157,99 +157,94 @@ if(!isset($uniqueKey) && ($uniqueKey !== md5(app_key().$ip))) {
 function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, array $values)
 {
 
-$login = (isset($values['login'])) ? prevent_injection($values['login']) : null;
-$user_pass = (isset($values['user_pass'])) ? prevent_injection($values['user_pass']) : null;
-$csrf = isset($values['csrf']) ? $values['csrf'] : '';
-$captcha_code = isset($values['captcha_code']) ? $values['captcha_code'] : '';
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-$is_authenticated = false;
-$captcha = false;
-
+$login = (isset($values['login']) && $values['login'] == $_POST['login']) ? prevent_injection($values['login']) : null;
+$user_pass = (isset($values['user_pass']) && $values['user_pass'] == $_POST['user_pass']) ? prevent_injection($values['user_pass']) : null;
+$csrf = (isset($values['csrf']) && $values['csrf'] == $_POST['csrf']) ? $values['csrf'] : '';
+   
+$captcha_verified = true;
+   
 // validate form
 safe_human_login($ip, $loginId, $uniqueKey, $values);
 $valid = !empty($csrf) && verify_form_token('login_form', $csrf);
-
+   
 if(!$valid) {
-
+   
    $errors['errorMessage'] = "Sorry, attack detected!";
-
-}
-
-$failed_login_attempt = get_login_attempt($ip)['failed_login_attempt'];
-
-if ((empty($login)) && (empty($user_pass))) {
-  
-   $errors['errorMessage'] = "All Column must be filled";
-
-}
-
-if ($authenticator->validateUserAccount($login, $user_pass)) {
-
-   $is_authenticated = true;
    
 }
+   
+if (count($values) > 0 && isset($values['captcha_login']) && $values['captcha_login'] != Session::getInstance()->captcha_login) {
+   
+   $captcha_verified = false;
+   $errors['errorMessage'] = "Enter captcha code correctly";
+   
+}
+   
+$failed_login_attempt = get_login_attempt($ip)['failed_login_attempt'];
+   
+if (count($values) > 0 && $captcha_verified == true ) {
+    
+$authenticate_user = is_a($authenticator, 'Authentication') ? $authenticator->validateUserAccount($login, $user_pass) : "";
 
-if ( ( $is_authenticated == true) && ( $captcha == true ) ) {
+ if ($authenticate_user === false) {
 
-   unset($_SESSION['human_login_id']);
+    $errors['errorMessage'] = "Invalid login !";
 
-   $authenticator->login($values);
-
-   delete_login_attempt($ip);
-
-   direct_page('index.php?load=dashboard', 200);
-
-}  else {
-
-   $errors['errorMessage'] = "Invalid Login!";
-
-   if ($failed_login_attempt < 5 ) {
-
+    if ($failed_login_attempt < 5 ) {
+      
       create_login_attempt($ip);
 
-   } else {
+   }  else {
 
       $errors['errorMessage'] = "You have tried more than 5 times. Please enter a captcha code!";
 
    } 
 
-}
+ } else {
 
-if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+    unset($_SESSION['human_login_id']);
+    unset($_SESSION['captcha_login']);
 
-   if ($authenticator->checkEmailExists($login) == false) {
+    $authenticator->login($_POST);
 
-      $errors['errorMessage'] = "Your email address is not registered";
-       
-   }
+    delete_login_attempt($ip);
 
-} else {
-
-   if (!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $login)) {
-
-     $errors['errorMessage'] = "Incorrect username!";
-     
-   }
+    direct_page('index.php?load=dashboard', 302);
     
+ }
+   
+ if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+   
+   if ($authenticator->checkEmailExists($login) == false) {
+   
+      $errors['errorMessage'] = "Your email address is not registered";
+          
+   }
+   
+ } else {
+   
+   
+   if (!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $login)) {
+   
+      $errors['errorMessage'] = "Please enter a valid username";
+        
+   } 
+       
+ }
+
+ if (scriptpot_validate($values) == false) {
+   
+    $errors['errorMessage'] = "anomaly behaviour detected!";
+   
+ }
+   
 }
-
-if ( ( isset($_SESSION['scriptlog_captcha_code']) ) && ( $captcha_code !== $_SESSION['scriptlog_captcha_code'] ) ) {
-  
-   $captcha = false;
-   $errors['errorMessage'] = "Please enter a captcha code correctly";
-
-} else {
-
-   $captcha = true;
+   
+return array($errors, $failed_login_attempt);
    
 }
 
-if (scriptpot_validate($values) == false) {
-
-   $errors['errorMessage'] = "anomaly behaviour detected!";
-
-}
-
-return array($errors, $failed_login_attempt);
 
 }
