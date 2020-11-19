@@ -166,15 +166,22 @@ if ((isset($userData['user_login'])) && ($userData['user_login'] != '')) :
 </div>
 
 <div class="form-group">
-<label for="passwd">Password <?=(!empty($userData['user_email'])) ? "": "(required)"; ?></label>
+<label for="passwd"><?=(!empty($userData['user_email'])) ? "New password": "Password(required)"; ?></label>
 <input type="password" class="form-control" id="passwd" name="user_pass" placeholder="Enter password" maxlength="50" autocomplete="off">
 </div>
 
 <?php if(!empty($userData['user_email'])) :?>
+
 <div class="form-group">
-<label for="confirm_pwd">confirm Password <?=(!empty($userData['user_email'])) ? "": "(required)"; ?></label>
+<label for="confirm_pwd"><?=(!empty($userData['user_email'])) ? "Confirm new passowrd (required)": ""; ?></label>
 <input type="password" class="form-control" id="confirm_pwd" name="user_pass2" placeholder="Confirm password" maxlength="50" autocomplete="off">
 </div>
+
+<div class="form-group">
+<label for="current_pwd"><?=(!empty($userData['user_email'])) ? "Current password (required)": ""; ?></label>
+<input type="password" class="form-control" id="current_pwd" name="current_pwd" placeholder="Your current password" maxlength="50" autocomplete="off">
+</div>
+
 <?php  endif; ?>
 
 <div class="form-group">
