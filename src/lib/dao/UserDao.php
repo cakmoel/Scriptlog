@@ -261,7 +261,7 @@ class UserDao extends Dao
   */
  public function updateUserSession($bind, $user_id)
  {
-   $this->modify("tbl_users", ['user_session' => generate_session_key($bind['user_session'], 32)], "ID = {$user_id}");
+    $this->modify("tbl_users", ['user_session' => generate_session_key($bind['user_session'], 32), 'login_time' => date('Y-m-d H:i:s')], "ID = {$user_id}");
  }
 
  /**
@@ -359,13 +359,14 @@ class UserDao extends Dao
   
  }
 
- /**
-  * Checking username
-  * exists or not
-  * 
-  * @param string $user_login
-  * @return boolean
-  */
+/**
+ * isUserLoginExists
+ *
+ * checkign whether user_login availability
+ * 
+ * @param [type] $user_login
+ * @return boolean
+ */
  public function isUserLoginExists($user_login)
  {
    
@@ -385,12 +386,15 @@ class UserDao extends Dao
 	
  }
 	 
- /**
-  * checking user session
-  * 
-  * @param string $sesi
-  * @return boolean
-  */
+/**
+ * checkUserSession
+ *
+ * checking whether user_session availability
+ * 
+ * @param string $user_session
+ * @return bool
+ * 
+ */
  public function checkUserSession($user_session)
  {
     $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_session = :user_session";
@@ -523,13 +527,14 @@ class UserDao extends Dao
     
  }
  
- /**
-  * Check User Id
-  * 
-  * @param integer $user_id
-  * @param object $sanitize
-  * @return numeric
-  */
+/**
+ * checkUserId
+ *
+ * @param integer $user_id
+ * @param object $sanitize
+ * @return numeric
+ * 
+ */
  public function checkUserId($user_id, $sanitize)
  {
      
