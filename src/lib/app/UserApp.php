@@ -10,9 +10,6 @@
  *
  */
 
-use Egulias\EmailValidator\EmailValidator;
-use Egulias\EmailValidator\Validation\DNSCheckValidation;
-use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use Egulias\EmailValidator\Validation\RFCValidation;
 
 class UserApp extends BaseApp
@@ -192,6 +189,11 @@ class UserApp extends BaseApp
                 
                 $checkError = false;
                 array_push($errors, "Please enter a valid email address");
+                
+            } elseif (!email_multiple_validation($_POST['user_email'])) {
+
+                $checkError = false;
+                array_push($errors, "Unknown DNS records that signal the server accepts emails");
                 
             } elseif ($this->userEvent->isEmailExists($_POST['user_email'])) {
                 
@@ -398,6 +400,11 @@ class UserApp extends BaseApp
             $checkError = false;
             array_push($errors, "Please enter a valid email address");
 
+        } elseif (!email_multiple_validation($_POST['user_email'])) {
+
+            $checkError = false;
+            array_push($errors, "Unknown DNS records that signal the server accepts emails");
+            
         }
 
         if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
@@ -602,6 +609,11 @@ class UserApp extends BaseApp
                 $checkError = false;
                 array_push($errors, "Please enter a valid email address");
 
+            } elseif (!email_multiple_validation($_POST['user_email'])) {
+
+                $checkError = false;
+                array_push($errors, "Unknown DNS records that signal the server accepts emails");
+                
             }
 
             if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
