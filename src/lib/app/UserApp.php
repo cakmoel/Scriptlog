@@ -312,7 +312,8 @@ class UserApp extends BaseApp
     
     $errors = array();
     $checkError = true;
-    
+    $secret = ScriptlogCryptonize::generateSecretKey();
+
     if (!$getUser = $this->userEvent->grabUser($id)) {
         
        direct_page('index.php?load=users&error=userNotFound', 404);
@@ -336,6 +337,7 @@ class UserApp extends BaseApp
        
         $filters = ['user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 
                     'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+                    'current_pwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                     'user_url' => FILTER_SANITIZE_URL, 'user_level' => FILTER_SANITIZE_STRING, 
                     'user_id' => FILTER_SANITIZE_NUMBER_INT];
         
@@ -348,7 +350,7 @@ class UserApp extends BaseApp
               
         }
 
-        if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass']))) {
+        if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass'])) || (!empty($_POST['current_pwd']))) {
  
             if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
 
@@ -368,6 +370,13 @@ class UserApp extends BaseApp
 
                 $checkError = false;
                 array_push($errors, "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters");
+
+            }
+
+            if (false === $this->userEvent->reAuthenticateUserPrivilege($getUser['user_login'], $_POST['current_pwd'])) {
+
+                $checkError = false;
+                array_push($errors, "re-authentication failed, please check your current password");
 
             }
             
@@ -443,19 +452,17 @@ class UserApp extends BaseApp
 
               }
 
-              if($this->userEvent->identifyCookieToken() == true) {
+              if($this->userEvent->identifyCookieToken($secret) == true) {
  
                 if(!empty($_POST['user_pass'])) {
 
-                  $secret = ScriptlogCryptonize::generateSecretKey();
-
-                  $random_password = Tokenizer::createToken(32);
+                  $random_password = Tokenizer::createToken(128);
                   set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
                   
-                  $random_selector = Tokenizer::createToken(32);
+                  $random_selector = Tokenizer::createToken(128);
                   set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
                   
-                  $hashed_password = Tokenizer::setRandomPasswordProtected($random_password, $secret);
+                  $hashed_password = Tokenizer::setRandomPasswordProtected($random_password);
                   $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
               
                   $this->userEvent->setPwdHash($hashed_password);
@@ -521,6 +528,7 @@ class UserApp extends BaseApp
 
     $errors = array();
     $checkError = true;
+    $secret = ScriptlogCryptonize::generateSecretKey();
 
     if(!$getProfile = $this->userEvent->grabUserByLogin($user_login)) {
 
@@ -545,6 +553,7 @@ class UserApp extends BaseApp
 
         $filters = ['user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 
                     'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+                    'current_pwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                     'user_url' => FILTER_SANITIZE_URL, 'user_id' => FILTER_SANITIZE_NUMBER_INT];
 
     try {
@@ -556,7 +565,7 @@ class UserApp extends BaseApp
 
             }
             
-            if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass']))) {
+            if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass'])) || (!empty($_POST['current_pwd']))) {
 
                 if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
 
@@ -576,6 +585,13 @@ class UserApp extends BaseApp
 
                     $checkError = false;
                     array_push($errors, "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters");
+
+                }
+
+                if (false === $this->userEvent->reAuthenticateUserPrivilege($getProfile['user_login'], $_POST['current_pwd'])) {
+
+                    $checkError = false;
+                    array_push($errors, "re-authentication failed, please check your current password");
 
                 }
 
@@ -630,22 +646,17 @@ class UserApp extends BaseApp
 
                 }
 
-                if ($this->userEvent->identifyCookieToken() == true) {
-
-                    // set password token and selector token here
-                    $tokenizer = new Tokenizer();
+                if ($this->userEvent->identifyCookieToken($secret) == true) {
 
                     if(!empty($_POST['user_pass'])) {
 
-                        $secret = ScriptlogCryptonize::generateSecretKey();
-
-                        $random_password = $tokenizer->createToken(32);
+                        $random_password = Tokenizer::createToken(128);
                         set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
                 
-                        $random_selector = $tokenizer->createToken(32);
+                        $random_selector = Tokenizer::createToken(128);
                         set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
                 
-                        $hashed_password = Tokenizer::setRandomPasswordProtected($random_password, $secret);
+                        $hashed_password = Tokenizer::setRandomPasswordProtected($random_password);
                         $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
                 
                         $this->userEvent->setPwdHash($hashed_password);
