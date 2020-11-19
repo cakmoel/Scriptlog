@@ -13,21 +13,13 @@ class Authentication
 {
 
   /**
-   * user's ID
+   * user ID
    * 
    * @var integer
    * 
    */
   private $user_id;
-
-  /**
-   * user session
-   * 
-   * @var mixed
-   * 
-   */
-  private $user_session;
-  
+ 
   /**
    * User Agent
    * 
@@ -77,6 +69,30 @@ class Authentication
   private $key;
 
   /**
+   * userDao
+   *
+   * @var object
+   * 
+   */
+  private $userDao;
+
+  /**
+   * userToken
+   *
+   * @var object
+   * 
+   */
+  private $userToken;
+
+  /**
+   * validator
+   *
+   * @var object
+   * 
+   */
+  private $validator;
+
+  /**
    * Constant COOKIE_EXPIRE
    * default 1 month
    * 
@@ -94,6 +110,7 @@ class Authentication
  
   public function __construct(UserDao $userDao, UserTokenDao $userToken, FormValidator $validator)
   {
+
     $this->userDao = $userDao;
     $this->userToken = $userToken;
     $this->validator = $validator;
@@ -257,14 +274,14 @@ class Authentication
     } else {
 
       $this->validator->sanitize($login, 'string');
-      $this->validator->validate($login, 'string');
+    
       $account_info = $this->findUserByLogin($login);
 
     }
 
+    $this->validator->sanitize($password, 'string');
+    
     $account_login = $account_info['user_login'];
-      
-    $this->validator->validate($password, 'password'); 
 
     clear_duplicate_cookies();
 
@@ -368,16 +385,22 @@ public function logout()
 public function validateUserAccount($login, $password)
 {
     
-  $result = $this->userDao->checkUserPassword($login, $password);
+ $verified = false;
 
-  if ($result == false) {
+ $result = $this->userDao->checkUserPassword($login, $password);
 
-      return false;
+ if (true === $result) {
 
-  }
+    $verified = true;
+
+ } else {
+
+    $verified = false;
+
+ }
+
+ return $verified;
   
-  return true;
-    
 }
 
 /**
