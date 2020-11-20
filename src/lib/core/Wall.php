@@ -18,7 +18,7 @@ class Wall extends Dashboard
  * @method listItems()
  * 
  */
- public function listItems($authenticator, $user_login)
+ public function listItems(Authentication $authenticator, $user_login)
  {
   
   if(is_non_administrator() === true) {
@@ -34,6 +34,7 @@ class Wall extends Dashboard
     $this->welcomeAdmin('Hello '.safe_html($administrator));
 
   }
+
 
  }
 
