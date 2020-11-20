@@ -175,7 +175,7 @@ if(!$valid) {
    
 }
    
-if (count($values) > 0 && isset($values['captcha_login']) && $values['captcha_login'] != Session::getInstance()->captcha_login) {
+if (count($values) > 0 && (isset($values['captcha_login']) && $values['captcha_login'] == $_POST['captcha_login']) && ($values['captcha_login'] != Session::getInstance()->captcha_login)) {
    
    $captcha_verified = false;
    $errors['errorMessage'] = "Enter captcha code correctly";
