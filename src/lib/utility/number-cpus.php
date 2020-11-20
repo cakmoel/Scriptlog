@@ -50,8 +50,12 @@ function number_cpus()
             $cpu_core = intval($matches[1][0]);
         }
 
-        pclose();
+        if (is_resource($process)) {
 
+         pclose($process);
+         
+        }
+        
     }
 
  }
