@@ -57,7 +57,7 @@ abstract class Dashboard implements BoardInterface
    return $this->pageTitle;
  }
 
- abstract protected function listItems();
+ abstract protected function listItems(Authentication $authenticator, $user_login);
 
  abstract protected function detailItem($id);
 
