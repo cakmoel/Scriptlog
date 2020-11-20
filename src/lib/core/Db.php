@@ -114,7 +114,7 @@ class Db implements DbInterface
      $stmt = $this->dbc->prepare($sql);
 
      
-     $stmt -> execute($args);
+     $stmt->execute($args);
      
      return $stmt;
      
