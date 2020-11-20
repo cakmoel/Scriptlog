@@ -16,19 +16,22 @@ class Db implements DbInterface
  
  /**
   * database connection
-  * @var string
+  * @var object
+  *
   */
  private $dbc;
 
 /**
- * Cache
- * @var string
+ * cache
+ * @var object
+ * 
  */
  private static $cache;
  
  /**
-  * Error
-  * @var string
+  * error
+  * @var object
+  *
   */
  private $error;
 
@@ -45,6 +48,8 @@ class Db implements DbInterface
   * set database connection
   * {@inheritDoc}
   * @see DbInterface::setDbConnection()
+  * @return object
+  * 
   */
  public function setDbConnection($values = [], $options = [])
  {
@@ -95,6 +100,8 @@ class Db implements DbInterface
   * 
   * {@inheritDoc}
   * @see DbInterface::dbQuery()
+  * @return object
+  *
   */
  public function dbQuery($sql, $args = array())
  {
@@ -121,9 +128,12 @@ class Db implements DbInterface
   */
  public function dbInsert($tablename, array $params)
  {
+    
+    $clean_table = Sanitize::mildSanitizer($tablename);
+
     try {
         
-        $sql = "INSERT INTO $tablename ";
+        $sql = "INSERT INTO $clean_table ";
         $fields = array_keys($params);
         $values = array_values($params);
 
@@ -171,13 +181,17 @@ class Db implements DbInterface
   */
  public function dbUpdate($tablename, $params, $where)
  {
+    
+   $clean_table = Sanitize::mildSanitizer($tablename);
+   $clean_where = Sanitize::severeSanitizer($where);
+   
    try {
        
        ksort($params);
 
        $columns = null;
        
-       foreach ($params as $key => $value) {
+       foreach ((array)$params as $key => $value) {
            
            $columns .= "$key = :$key,";
            
@@ -185,9 +199,9 @@ class Db implements DbInterface
        
        $columns = rtrim($columns, ',');
        
-       $stmt = $this->dbc->prepare("UPDATE $tablename SET $columns WHERE  $where");
+       $stmt = $this->dbc->prepare("UPDATE $clean_table SET $columns WHERE $clean_where");
 
-       foreach ($params as $key => $value) {
+       foreach ((array)$params as $key => $value) {
            $stmt->bindValue(":$key", $value);
        }
        
@@ -213,15 +227,18 @@ class Db implements DbInterface
   */
  public function dbDelete($tablename, $where, $limit = null)
  {
+    $clean_table = Sanitize::mildSanitizer($tablename);
+    $clean_where = Sanitize::severeSanitizer($where);
+
     try {
         
         if (!is_null($limit)) {
             
-            $sql = "DELETE FROM $tablename WHERE $where LIMIT $limit";
+            $sql = "DELETE FROM $clean_table WHERE $clean_where LIMIT $limit";
         
         } else {
             
-            $sql = "DELETE FROM $tablename WHERE $where";
+            $sql = "DELETE FROM $clean_table WHERE $clean_where";
         }
         
         $stmt = $this->dbc->prepare($sql);
