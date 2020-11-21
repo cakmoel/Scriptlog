@@ -33,16 +33,13 @@ class UserDao extends Dao
  public function getUsers($orderBy = 'ID', $fetchMode = null)
  {
     
-    $sql = "SELECT ID, user_login,
-				   user_email, 
-                   user_fullname,
-				   user_level, 
-                   user_session
-		   FROM tbl_users ";
+    $sql = "SELECT ID, user_login, user_email, user_fullname,
+				   user_level, user_session, user_banned, user_signin_count, user_locked_until, login_time
+		   FROM tbl_users ORDER BY :orderBy ";
      
      $this->setSQL($sql);
      
-     $users = (is_null($fetchMode)) ? $this->findAll() : $this->findAll($fetchMode);
+     $users = (is_null($fetchMode)) ? $this->findAll([':orderBy' => $orderBy]) : $this->findAll([':orderBy' => $orderBy], $fetchMode);
 
      return (empty($users)) ?: $users;
     
@@ -62,8 +59,8 @@ class UserDao extends Dao
  {
    $cleanId = $this->filteringId($sanitize, $user_id, 'sql');
    
-   $sql = "SELECT ID, user_login, user_email, user_pass, user_level, 
-                  user_fullname, user_url, user_registered, user_session 
+   $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
+                user_session, user_banned, user_signin_count, user_locked_until, login_time
            FROM tbl_users WHERE ID = :ID LIMIT 1";
    
    $this->setSQL($sql);
@@ -85,7 +82,8 @@ class UserDao extends Dao
  public function getUserByEmail($user_email, $fetchMode = null)
  {
      
-   $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, user_session 
+   $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
+             user_session, user_banned, user_signin_count, user_locked_until, login_time 
            FROM tbl_users WHERE user_email = :user_email LIMIT 1";
    
    $this->setSQL($sql);
@@ -107,7 +105,8 @@ class UserDao extends Dao
  public function getUserByLogin($user_login, $fetchMode = null) 
  {
 
-   $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, user_session
+   $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
+                user_session, user_banned, user_signin_count, user_locked_until, login_time
            FROM tbl_users WHERE user_login = :user_login LIMIT 1";
 
    $this->setSQL($sql);
