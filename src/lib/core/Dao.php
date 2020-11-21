@@ -14,7 +14,8 @@ class Dao
 {
  /**
   * Database connection 
-  * @var string
+  * @var object
+  *
   */
  protected $dbc;
  
@@ -33,17 +34,15 @@ class Dao
  /**
   * Sanitize
   * @var object
+  *
   */
  protected $sanitizing;
 
- /**
-  * 
-  */
  public function __construct() 
  {
    if (Registry::isKeySet('dbc')) {
 
-       $this->dbc = Registry::get('dbc');
+      $this->dbc = Registry::get('dbc');
 
    }
  }
@@ -54,10 +53,12 @@ class Dao
    session_write_close();
  }
 
- /**
-  * Set SQL
-  * @param string $sql
-  */
+/**
+ * setSQL
+ *
+ * @param string $sql
+ * 
+ */
  protected function setSQL($sql)
  {
     $this->sql = $sql;
@@ -173,7 +174,7 @@ class Dao
   * @return integer|numeric
   *
   */
- protected function checkCountValue($data = null)
+ public function checkCountValue($data = null)
  {
      
    try {
@@ -236,10 +237,8 @@ class Dao
  }
  
  /**
- * startTransaction
+ * callTransaction
  * begin transaction for multiple queries as a unified block 
- * 
- * @return void
  * 
  */
 protected function callTransaction()
@@ -267,24 +266,25 @@ protected function callRollBack()
   $this->dbc->dbRollBack();
 }
 
- /**
-  * Close database connection
-  * 
-  * @return bool
-  */
- protected function closeConnection()
- {
-   $this->dbc->closeDbConnection();
- }
+/**
+ * closeConnection
+ *
+ */
+protected function closeConnection()
+{
+  $this->dbc->closeDbConnection();
+}
  
- /**
-  * Last insert Id
-  * @return integer
-  */
- protected function lastId()
- {
-   return $this->dbc->dbLastInsertId();
- }
+/**
+ * lastId
+ *
+ * @return integer
+ * 
+ */
+protected function lastId()
+{
+  return $this->dbc->dbLastInsertId();
+}
  
 /**
  * Filtering Id passed by HTTP request
@@ -292,7 +292,7 @@ protected function callRollBack()
  * @param object $sanitize
  * @param string $str
  * @param string $type
- * @return 
+ * @return string|integer
  * 
  */
  protected function filteringId(Sanitize $sanitize, $str, $type)
