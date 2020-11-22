@@ -16,6 +16,10 @@ user_activation_key varchar(255) NOT NULL DEFAULT '',
 user_reset_key varchar(255) DEFAULT NULL,
 user_reset_complete VARCHAR(3) DEFAULT 'No',
 user_session VARCHAR(255) NOT NULL,
+user_banned TINYINT NOT NULL DEFAULT 0,
+user_signin_count INT NOT NULL DEFAULT 0,
+user_locked_until DATETIME NULL,
+login_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 PRIMARY KEY(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
