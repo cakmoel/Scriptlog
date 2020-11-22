@@ -35,8 +35,8 @@ function make_connection($host, $username, $passwd, $dbname)
   
   if ($connect->connect_errno) {
 
-      printf("Failed to connect to MySQL: (" . $connect->connect_errno . ") " . $connect->connect_error, E_USER_ERROR);
-      exit();
+    printf("Failed to connect to MySQL: (" . $connect->connect_errno . ") " . $connect->connect_error, E_USER_ERROR);
+    exit();
 
   }
 
@@ -138,7 +138,7 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
 require __DIR__ . '/dbtable.php';
 
 // Users  
-$date_registered = date("Y-m-d H:i:s");
+$date_registered = date('Y-m-d H:i:s');
 $user_session    = md5(uniqid());
 $shield_pass     = password_hash(base64_encode(hash('sha384', $user_pass, true)), PASSWORD_DEFAULT);
 $user_level      = 'administrator';
