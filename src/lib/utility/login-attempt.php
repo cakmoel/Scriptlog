@@ -101,7 +101,8 @@ function sign_in_count($sign_in_count, $login)
 if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
 
   $sql = "UPDATE tbl_users SET user_signin_count = ? WHERE user_email = ?";
-
+  
+  
 } else {
 
   $sql = "UPDATE tbl_users SET user_signin_count = ? WHERE user_login = ?";
@@ -128,16 +129,68 @@ function locked_down_until($sign_in_count, $locked_until, $login)
 
 if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
 
-$sql = "UPDATE tbl_users SET user_signin_count = ?, user_locked_until = ? WHERE  user_email = ?";
+  $sql = "UPDATE tbl_users SET user_signin_count = ?, user_locked_until = ? WHERE  user_email = ?";
 
 } else {
 
-$sql = "UPDATE tbl_users SET user_signin_count = ?, user_locked_until = ? WHERE user_login = ?";
+  $sql = "UPDATE tbl_users SET user_signin_count = ?, user_locked_until = ? WHERE user_login = ?";
 
 }
 
 $locked_down = db_prepared_query($sql, [$sign_in_count, $locked_until, $login], "iss");
 
 return $locked_down;
+
+}
+
+/**
+ * signin_count_to_zero
+ *
+ * @param string $login
+ * @return void
+ * 
+ */
+function signin_count_to_zero($login)
+{
+
+if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+
+  $sql = "UPDATE tbl_users SET user_signin_count = 0 WHERE user_email = ?";
+
+} else {
+
+  $sql = "UPDATE tbl_users SET user_signin_count = 0 WHERE user_login = ?";
+
+}
+
+$stmt = db_prepared_query($sql, [$login], 's');
+
+return $stmt;
+
+}
+
+/**
+ * locked_until_to_null
+ *
+ * @param string $login
+ * @return void
+ * 
+ */
+function locked_down_to_null($login)
+{
+
+if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+
+$sql = "UPDATE tbl_users SET user_locked_until = null WHERE user_email = ?";
+
+} else {
+
+$sql = "UPDATE tbl_users SET user_locked_until = null WHERE user_login = ?";
+
+}
+
+$stmt = db_prepared_query($sql, [$login], 's');
+
+return $stmt;
 
 }
