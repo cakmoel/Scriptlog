@@ -146,6 +146,10 @@ if(!isset($uniqueKey) && ($uniqueKey !== md5(app_key().$ip))) {
 /**
  * processiong_human_login()
  *
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param object $authenticator
  * @param string $ip
  * @param integer|number $loginId
@@ -174,77 +178,117 @@ if(!$valid) {
    $errors['errorMessage'] = "Sorry, attack detected!";
    
 }
-   
+
 if (count($values) > 0 && (isset($values['captcha_login']) && $values['captcha_login'] == $_POST['captcha_login']) && ($values['captcha_login'] != Session::getInstance()->captcha_login)) {
    
    $captcha_verified = false;
    $errors['errorMessage'] = "Enter captcha code correctly";
-   
+    
 }
    
 $failed_login_attempt = get_login_attempt($ip)['failed_login_attempt'];
-   
+$data = get_user_signin($login);
+$datetime = (!empty($data['user_locked_until'])) ? strtotime($data['user_locked_until']) : null;
+$signin = (!empty($data['user_signin_count'])) ? $data['user_signin_count'] : 0;
+
 if (count($values) > 0 && $captcha_verified == true ) {
     
 $authenticate_user = is_a($authenticator, 'Authentication') ? $authenticator->validateUserAccount($login, $user_pass) : "";
 
- if ($authenticate_user === false) {
+if (time() > $datetime) {
 
-    $errors['errorMessage'] = "Invalid login !";
+   if ($authenticate_user === false) {
 
-    if ($failed_login_attempt < 5 ) {
-      
-      create_login_attempt($ip);
-
-   }  else {
-
-      $errors['errorMessage'] = "You have tried more than 5 times. Please enter a captcha code!";
-
-   } 
-
- } else {
-
-    unset($_SESSION['human_login_id']);
-    unset($_SESSION['captcha_login']);
-
-    $authenticator->login($_POST);
-
-    delete_login_attempt($ip);
-
-    direct_page('index.php?load=dashboard', 302);
-    
- }
+      $errors['errorMessage'] = "Invalid login !";
    
- if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+      $signin++;
    
-   if ($authenticator->checkEmailExists($login) == false) {
-   
-      $errors['errorMessage'] = "Your email address is not registered";
-          
-   }
-   
- } else {
-   
-   
-   if (!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $login)) {
-   
-      $errors['errorMessage'] = "Please enter a valid username";
+      if ( ($failed_login_attempt < 5) || ( $signin % 15 ) ) {
         
-   } 
-       
- }
+         create_login_attempt($ip);
+   
+         sign_in_count($signin, $login);
+   
+      } else {
+   
+         $errors['errorMessage'] = "You have tried more than 5 times. Please enter a captcha code!";
 
- if (scriptpot_validate($values) == false) {
+         $multiplicator = $signin / 15;
+     
+         if ($multiplicator > 5) {
+         
+            $multiplicator = 5;
+     
+         }
+     
+         locked_down_until($signin, date('Y-m-d H:i:s', time() + 60 * 5 * $multiplicator), $login);
    
-    $errors['errorMessage'] = "anomaly behaviour detected!";
+      } 
    
- }
+   } else {
    
+      unset($_SESSION['human_login_id']);
+      unset($_SESSION['captcha_login']);
+   
+      if (!$data['user_banned']) {
+   
+        if ($data['user_signin_count']) {
+   
+           signin_count_to_zero($login);
+   
+        }
+   
+        if ($datetime) {
+   
+           locked_down_to_null($login);
+   
+        }
+        
+        $authenticator->login($_POST);
+   
+        delete_login_attempt($ip);
+   
+        direct_page('index.php?load=dashboard', 302);
+   
+      }
+      
+   }
+
+   if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+   
+      if ($authenticator->checkEmailExists($login) == false) {
+      
+         $errors['errorMessage'] = "Your email address is not registered";
+             
+      }
+      
+    } else {
+        
+      if (!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $login)) {
+      
+         $errors['errorMessage'] = "Please enter a valid username";
+           
+      } 
+          
+    }
+   
+   if (scriptpot_validate($values) == false) {
+      
+      $errors['errorMessage'] = "anomaly behaviour detected!";
+      
+   }
+
+} else {
+
+   $datetime = date("Y-m-d H:i:s", $datetime);
+   $errors['errorMessage'] = "Account is locked until {$datetime}";
+
 }
+    
+} 
    
 return array($errors, $failed_login_attempt);
    
 }
-
 
 }
