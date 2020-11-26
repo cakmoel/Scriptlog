@@ -49,7 +49,7 @@ class PluginDao extends Dao
    * get single value of plugin
    * 
    * @param integer $id
-   * @param integer $sanitize
+   * @param object $sanitize
    * @return boolean|array|object
    * 
    */
@@ -201,7 +201,7 @@ class PluginDao extends Dao
    */
   public function isPluginActived($plugin_name)
   {
-      if ($this->plugiExists($plugin_name) == true) {
+      if ($this->pluginExists($plugin_name) == true) {
           
          $sql = "SELECT plugin_status FROM tbl_plugin WHERE plugin_name = ?";
          
