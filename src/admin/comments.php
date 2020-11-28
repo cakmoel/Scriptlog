@@ -6,19 +6,21 @@ $commentDao = new CommentDao();
 $commentEvent = new CommentEvent($commentDao, $validator, $sanitizer);
 $commentApp = new CommentApp($commentEvent);
     
+try {
+
     switch ($action) {
         
         case ActionConst::EDITCOMMENT:
             
-            if (false === $authenticator->userAccessControl(Action)) {
+            if (false === $authenticator->userAccessControl(ActionConst::COMMENTS)) {
 
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
             } else {
 
-                if ($commentDao -> checkCommentId($commentId, $sanitizer)) {
+                if ($commentDao->checkCommentId($commentId, $sanitizer)) {
                 
-                    $commentApp -> update((int)$commentId);
+                    $commentApp->update((int)$commentId);
                     
                 } else {
                     
@@ -47,7 +49,7 @@ $commentApp = new CommentApp($commentEvent);
 
                 if ($commentDao->checkCommentId($commentId, $sanitizer)) {
 
-                    $commentApp -> remove((int)$commentId);
+                    $commentApp->remove((int)$commentId);
 
                 } else {
 
@@ -67,10 +69,18 @@ $commentApp = new CommentApp($commentEvent);
 
             } else {
 
-                $commentApp -> listItems();
+                $commentApp->listItems();
 
             }
             
         break;
         
-    }
+}
+
+} catch (AppException $e) {
+
+    LogError::setStatusCode(http_response_code());
+    LogError::newMessage($e);
+    LogError::customErrorMessage('admin');
+    
+}
