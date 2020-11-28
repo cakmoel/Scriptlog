@@ -18,7 +18,7 @@ switch ($action) {
 
        } else {
 
-         $displayWall -> listItems();
+         $displayWall->listItems($authenticator, $user_login);
 
        }
         
