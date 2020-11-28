@@ -6,163 +6,173 @@ $themeDao = new ThemeDao();
 $themeEvent = new ThemeEvent($themeDao, $validator, $sanitizer);
 $themeApp = new ThemeApp($themeEvent);
 
-switch ($action) {
+try {
 
-    case ActionConst::NEWTHEME:
-        
-        if (false === $authenticator -> userAccessControl(ActionConst::THEMES)) {
+    switch ($action) {
 
-            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-        } else {
-
-            if ((!check_integer($themeId)) && (gettype($themeId) !== "integer")) {
-
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-                throw new AppException("invalid ID data type!");
-
-            }
-
-            if ($themeId == 0) {
-
-                $themeApp -> insert();
-
+        case ActionConst::NEWTHEME:
+            
+            if (false === $authenticator->userAccessControl(ActionConst::THEMES)) {
+    
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
             } else {
-
-                direct_page('index.php?load=dashboard', 302);
-                
-            }
-
-        }
-        
-        break;
-
-    case ActionConst::INSTALLTHEME:
-        
-        if (false === $authenticator -> userAccessControl(ActionConst::THEMES)) {
-
-            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-        } else {
-
-            if ((!check_integer($themeId)) && (gettype($themeId) !== "integer")) {
-
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-                throw new AppException("invalid ID data type!");
-
-            } else {
-
-                if ($themeId == 0) {
-
-                    $themeApp -> setupTheme();
-
+    
+                if ((!check_integer($themeId)) && (gettype($themeId) !== "integer")) {
+    
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                    throw new AppException("invalid ID data type!");
+    
                 }
-
+    
+                if ($themeId == 0) {
+    
+                    $themeApp->insert();
+    
+                } else {
+    
+                    direct_page('index.php?load=dashboard', 302);
+                    
+                }
+    
             }
-
-        }
-
-        break;
-
-    case ActionConst::EDITTHEME:
-
-        if (false === $authenticator -> userAccessControl(ActionConst::THEMES)) {
-
-            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-        } else {
-
+            
+            break;
+    
+        case ActionConst::INSTALLTHEME:
+            
+            if (false === $authenticator->userAccessControl(ActionConst::THEMES)) {
+    
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
+            } else {
+    
+                if ((!check_integer($themeId)) && (gettype($themeId) !== "integer")) {
+    
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                    throw new AppException("invalid ID data type!");
+    
+                } else {
+    
+                    if ($themeId == 0) {
+    
+                        $themeApp->setupTheme();
+    
+                    }
+    
+                }
+    
+            }
+    
+            break;
+    
+        case ActionConst::EDITTHEME:
+    
+            if (false === $authenticator->userAccessControl(ActionConst::THEMES)) {
+    
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
+            } else {
+    
+                if ((!check_integer($themeId)) && (gettype($themeId) !== "integer")) {
+    
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                    throw new AppException("Invalid ID data type!");
+    
+                }
+    
+                if ($themeDao->checkThemeId($themeId, $sanitizer)) {
+    
+                     $themeApp->update((int)$themeId);
+    
+                } else {
+    
+                    direct_page('index.php?load=templates&error=themeNotFound', 404);
+    
+                }
+    
+            }
+        
+            break;
+    
+        case ActionConst::DELETETHEME:
+    
             if ((!check_integer($themeId)) && (gettype($themeId) !== "integer")) {
-
+    
                 header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
                 throw new AppException("Invalid ID data type!");
-
-            }
-
-            if ($themeDao -> checkThemeId($themeId, $sanitizer)) {
-
-                 $themeApp -> update((int)$themeId);
-
-            } else {
-
-                direct_page('index.php?load=templates&error=themeNotFound', 404);
-
-            }
-
-        }
     
-        break;
-
-    case ActionConst::DELETETHEME:
-
-        if ((!check_integer($themeId)) && (gettype($themeId) !== "integer")) {
-
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-            throw new AppException("Invalid ID data type!");
-
-        }
-
-        if (false === $authenticator -> userAccessControl(ActionConst::THEMES)) {
-
-            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-        } else {
-            
-            if ($themeDao -> checkThemeId($themeId, $sanitizer)) {
-
-                $themeApp -> remove((int)$themeId);
-
+            }
+    
+            if (false === $authenticator->userAccessControl(ActionConst::THEMES)) {
+    
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
             } else {
-
-                direct_page('index.php?load=templates&error=themeNotFound', 404);
-
+                
+                if ($themeDao->checkThemeId($themeId, $sanitizer)) {
+    
+                    $themeApp->remove((int)$themeId);
+    
+                } else {
+    
+                    direct_page('index.php?load=templates&error=themeNotFound', 404);
+    
+                }
+                
+            }
+    
+           break;
+    
+        case ActionConst::ACTIVATETHEME:
+    
+            if ((!check_integer($themeId)) && (gettype($themeId) !== "integer")) {
+    
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                throw new AppException("Invalid ID data type!");
+    
+            }
+    
+            if (false === $authenticator->userAccessControl(ActionConst::THEMES)) {
+    
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
+            } else {
+    
+                if ($themeDao->checkThemeId($themeId, $sanitizer)) {
+    
+                    $themeApp->enableTheme((int)$themeId);
+    
+                } else {
+    
+                    direct_page('index.php?load=templates&error=themeNotFound', 404);
+    
+                }
+    
+            }
+    
+          break;
+    
+        default:
+    
+            if (false === $authenticator->userAccessControl(ActionConst::THEMES)) {
+    
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
+            } else {
+    
+                $themeApp -> listItems(); // show list of all themes
+    
             }
             
-        }
+            break;
+    
+    }
 
-       break;
+} catch (AppException $e) {
 
-    case ActionConst::ACTIVATETHEME:
-
-        if ((!check_integer($themeId)) && (gettype($themeId) !== "integer")) {
-
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-            throw new AppException("Invalid ID data type!");
-
-        }
-
-        if (false === $authenticator -> userAccessControl(ActionConst::THEMES)) {
-
-            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-        } else {
-
-            if ($themeDao -> checkThemeId($themeId, $sanitizer)) {
-
-                $themeApp->enableTheme((int)$themeId);
-
-            } else {
-
-                direct_page('index.php?load=templates&error=themeNotFound', 404);
-
-            }
-
-        }
-
-      break;
-
-    default:
-
-        if (false === $authenticator -> userAccessControl(ActionConst::THEMES)) {
-
-            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-        } else {
-
-            $themeApp -> listItems(); // show list of all themes
-
-        }
-        
-        break;
-
+    LogError::setStatusCode(http_response_code());
+    LogError::newMessage($e);
+    LogError::customErrorMessage('admin');
+    
 }
