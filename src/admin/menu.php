@@ -25,7 +25,7 @@ $menuApp = new MenuApp($menuEvent);
         
                 if ($menuId == 0) {
     
-                    $menuApp -> insert();
+                    $menuApp->insert();
         
                 } else {
 
@@ -52,9 +52,9 @@ $menuApp = new MenuApp($menuEvent);
 
             } else {
 
-                if ($menuDao -> checkMenuId($menuId, $sanitizer)) {
+                if ($menuDao->checkMenuId($menuId, $sanitizer)) {
     
-                    $menuApp -> update((int)$menuId);
+                    $menuApp->update((int)$menuId);
         
                 } else {
         
@@ -83,7 +83,7 @@ $menuApp = new MenuApp($menuEvent);
 
                 if ($menuDao->checkMenuId($menuId, $sanitizer)) {
 
-                    $menuApp -> remove((int)$menuId);
+                    $menuApp->remove((int)$menuId);
     
                 } else {
     
@@ -103,7 +103,7 @@ $menuApp = new MenuApp($menuEvent);
 
             } else {
 
-                $menuApp -> listItems();
+                $menuApp->listItems();
                 
             }
             
