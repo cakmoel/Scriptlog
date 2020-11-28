@@ -12,7 +12,7 @@ try {
     
         case ActionConst::NEWUSER:
         
-          if (false === $authenticator -> userAccessControl(ActionConst::USERS)) {
+          if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
     
               direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
@@ -27,7 +27,7 @@ try {
     
             if ($userId == 0) {
     
-                $userApp -> insert();
+                $userApp->insert();
     
             } else {
     
@@ -47,7 +47,7 @@ try {
                 throw new AppException("Invalid ID data type!");
     
             }
-    
+
             if ((!$userDao->checkUserId($userId, $sanitizer))) {
     
                 if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
@@ -64,11 +64,11 @@ try {
     
                 if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
     
-                    $userApp -> updateProfile($user_login);
+                    $userApp->updateProfile($user_login);
         
                 } else {
         
-                    $userApp -> update((int)$userId);
+                    $userApp->update((int)$userId);
         
                 }
     
@@ -78,7 +78,7 @@ try {
             
         case ActionConst::DELETEUSER:
      
-            if(false === $authenticator -> userAccessControl(ActionConst::USERS)) {
+            if(false === $authenticator->userAccessControl(ActionConst::USERS)) {
     
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
@@ -91,9 +91,9 @@ try {
         
                 }
                 
-                if ($userDao -> checkUserId($userId, $sanitizer)) {
+                if ($userDao->checkUserId($userId, $sanitizer)) {
     
-                    $userApp -> remove((int)$userId);
+                    $userApp->remove((int)$userId);
                 
                 } else {
     
@@ -109,11 +109,11 @@ try {
             
            if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
     
-               $userApp -> showProfile($user_login);
+               $userApp->showProfile($user_login);
     
            } else {
     
-              $userApp -> listItems();
+              $userApp->listItems();
     
           }
         
