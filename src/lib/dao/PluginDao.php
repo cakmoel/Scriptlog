@@ -193,7 +193,9 @@ class PluginDao extends Dao
   }
   
   /**
-   * Is plugin active or not
+   * isPluginActived
+   * 
+   * checking whether plugin enabled or disabled
    * 
    * @param string $plugin_name
    * @return boolean
@@ -226,35 +228,42 @@ class PluginDao extends Dao
    * @return string
    * 
    */
-  public function setMenuPlugin($user_level, $plugin_level)
+  public function setMenuPlugin($module, $user_level)
   {
     $this->accessLevel = $user_level;
     
-    $plugins = $this->findPluginsEnabled($plugin_level);
-    
-    $html = array();
-    
+    $plugins = $this->findPluginsEnabled($this->accessLevel);
+
+    $html = '<li class="header">PLUGIN NAVIGATION</li>';
+
     if (is_array($plugins)) {
 
       foreach ($plugins as $plugin) {
         
         $pluginPath = __DIR__ .'/../../'.APP_PLUGIN.safe_html(strtolower($plugin['plugin_name'])).'/'.absolute_path((make_slug(strtolower($plugin['plugin_name'])).'.php'));
         
-        if ($this->accessLevel == 'administrator') {
+        if ( $this->accessLevel == 'administrator' || $this->accessLevel == 'manager' ) {
               
             if (is_dir(__DIR__ . '/../../'.APP_PLUGIN.safe_html($plugin['plugin_name'])) && is_readable($pluginPath)) {
                 
-                $html[] = '<li><a href="'.safe_html($plugin['plugin_link']).'">'.safe_html($plugin['plugin_name']).'</a></li>';
+              $plugin_selected = (isset($module) && $module == $plugin['plugin_name']) ? 'class="active"' : 'class=""';
+
+              $html .= '<li "'.$plugin_selected.'">';
+
+              (isset($plugin['plugin_status']) && $plugin['plugin_status'] == 'Y') ? $html .= '<a href="'.safe_html($plugin['plugin_link']).'">'.clip('clip_'.safe_html($plugin['plugin_name']), null, safe_html($plugin['plugin_name'])).'</a>' : 
+              $html .= '<a href="#">'.clip('clip_'.safe_html($plugin['plugin_name']), null, false).'</a>';
+               
+              $html .= '</li>';
                 
             }
              
-        }
+        } 
         
       }
 
     }
     
-    return implode("\n", $html);
+    return $html;
     
   }
   
@@ -269,10 +278,12 @@ class PluginDao extends Dao
   {
      $name = 'plugin_level';
 
-     $plugin_level = array('public' => 'Public', 'private' => 'Private');
+     $plugin_level = array('administrator' => 'Administrator', 'manager' => 'Manager');
 
      if ($selected != '') {
+
          $selected = $selected;
+         
      }
 
      return dropdown($name, $plugin_level, $selected);
