@@ -10,7 +10,7 @@ switch ($action) {
 
     case ActionConst::INSTALLPLUGIN:
         
-        if (false === $authenticator -> userAccessControl(ActionConst::PLUGINS)) {
+        if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
 
             direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
@@ -24,7 +24,7 @@ switch ($action) {
             }
             if ($pluginId == 0) {
 
-                $pluginApp -> installPlugin();
+                $pluginApp->installPlugin();
 
             } else {
 
@@ -38,15 +38,15 @@ switch ($action) {
     
     case ActionConst::ACTIVATEPLUGIN:
 
-        if (false === $authenticator -> userAccessControl(ActionConst::PLUGINS)) {
+        if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
 
             direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
         } else {
 
-            if ($pluginDao -> checkPluginId($pluginId, $sanitizer)) {
+            if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
                
-                $pluginApp -> enablePlugin(settype($pluginId, "integer"));
+                $pluginApp->enablePlugin((int)$pluginId);
 
             } else {
 
@@ -60,15 +60,15 @@ switch ($action) {
 
     case ActionConst::DEACTIVATEPLUGIN:
         
-        if (false === $authenticator -> userAccessControl(ActionConst::PLUGINS)) {
+        if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
 
              direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
         } else {
 
-            if ($pluginDao -> checkPluginId($pluginId, $sanitizer)) {
+            if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
 
-                $pluginApp -> disablePlugin(settype($pluginId, "integer"));
+                $pluginApp->disablePlugin((int)$pluginId);
 
             } else {
 
@@ -80,67 +80,9 @@ switch ($action) {
     
         break;
 
-    case ActionConst::NEWPLUGIN:
-       
-       if (false === $authenticator -> userAccessControl(ActionConst::PLUGINS)) {
-
-           direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-       } else {
-
-          if ((!check_integer($pluginId)) && (gettype($pluginId) !== "integer")) {
-
-             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-             throw new AppException("Invalid ID data type!");
-
-          }
-
-          if ($pluginId == 0) {
-
-            $pluginApp -> insert();
-  
-          } else {
-  
-            direct_page('index.php?load=dashboard', 200);
-            
-          }
-          
-       }
-
-       break;
-
-    case ActionConst::EDITPLUGIN:
-       
-       if (false === $authenticator -> userAccessControl(ActionConst::PLUGINS)) {
-
-          direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-       } else {
-
-         if ((!check_integer($pluginId)) && (gettype($pluginId) !== "integer")) {
-
-            header($_SERVER["SERVER_PROTOCOL"]."400 Bad Request");
-            throw new AppException("Invalid ID data type!");
-  
-         }
-
-         if ($pluginDao -> checkPluginId($pluginId, $sanitizer)) {
-
-            $pluginApp -> update((int)$pluginId);
-  
-         } else {
-           
-             direct_page('index.php?load=plugins&error=pluginNotFound', 404);
-  
-         }
-  
-       }
-
-       break;
-
     case ActionConst::DELETEPLUGIN:
         
-        if (false === $authenticator -> userAccessControl(ActionConst::PLUGINS)) {
+        if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
 
             direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
@@ -153,9 +95,9 @@ switch ($action) {
     
             }
 
-            if ($pluginDao -> checkPluginId($pluginId, $sanitizer)) {
+            if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
 
-                $pluginApp -> remove((int)$pluginId);
+                $pluginApp->remove((int)$pluginId);
 
             } else {
 
@@ -168,13 +110,13 @@ switch ($action) {
 
     default:
         
-        if (false === $authenticator -> userAccessControl(ActionConst::PLUGINS)) {
+        if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
 
             direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
         } else {
 
-            $pluginApp -> listItems();
+            $pluginApp->listItems();
 
         }
         
