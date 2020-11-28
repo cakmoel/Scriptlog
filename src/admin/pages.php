@@ -25,7 +25,7 @@ switch ($action) {
 
             if ($pageId == 0) {
             
-                $pageApp -> insert();
+                $pageApp->insert();
                 
             } else {
 
@@ -52,9 +52,9 @@ switch ($action) {
    
             }
 
-            if ($pageDao -> checkPageId($pageId, $sanitizer)) {
+            if ($pageDao->checkPageId($pageId, $sanitizer)) {
             
-                $pageApp -> update((int)$pageId);
+                $pageApp->update((int)$pageId);
                 
             } else {
                 
@@ -83,7 +83,7 @@ switch ($action) {
 
             if ($pageDao->checkPageId($pageId, $sanitizer)) {
 
-                $pageApp -> remove((int)$pageId);
+                $pageApp->remove((int)$pageId);
 
             } else {
 
@@ -103,7 +103,7 @@ switch ($action) {
 
         } else {
 
-            $pageApp -> listItems();
+            $pageApp->listItems();
 
         }
         
