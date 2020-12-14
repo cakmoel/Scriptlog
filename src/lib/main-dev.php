@@ -199,6 +199,8 @@ $key = ScriptlogCryptonize::scriptlogCipherKey();
 // Register rules of routes, an instance of database connection and key for decryption message
 Registry::setAll(array('dbc' => $dbc, 'route' => $rules, 'key' => $key));
 
+whoops_error();
+
 /* an instances of class that necessary for the system
  * please do not change this below variable 
  * these are collection of objects or instances of classes 
@@ -216,12 +218,6 @@ $searchPost = new SearchFinder($dbc);
 $sanitizer = new Sanitize();
 $userDao = new UserDao();
 $userToken = new UserTokenDao();
-$postDao = new PostDao();
-$topicDao = new TopicDao();
-$postTopicDao = new PostTopicDao();
-$pageDao = new PageDao();
-$menuDao = new MenuDao();
-$frontDispatcher = new Dispatcher();
 $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);
 $ubench = new Ubench();
