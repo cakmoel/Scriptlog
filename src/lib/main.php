@@ -118,7 +118,7 @@ foreach ($files_dir_iterator as $file) {
 // check if loader is exists
 if (is_readable(APP_ROOT.APP_LIBRARY.DS.'vendor/autoload.php')) {
 
-    require __DIR__ . DS . 'vendor/autoload.php';
+    require_once __DIR__ . DS . 'vendor/autoload.php';
     
 }
 
@@ -134,7 +134,7 @@ $library = array(
     APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
     APP_ROOT . APP_LIBRARY . DS . 'event'   . DS,
     APP_ROOT . APP_LIBRARY . DS . 'app'     . DS,
-    APP_ROOT . APP_ADMIN   . DS . 'plugins' . DS
+    APP_ROOT . APP_LIBRARY . DS . 'provider'. DS
 );
 
 get_server_load();
@@ -197,6 +197,8 @@ $key = ScriptlogCryptonize::scriptlogCipherKey();
 // Register rules of routes, an instance of database connection and key for cryptography
 Registry::setAll(array('dbc' => $dbc, 'route' => $rules, 'key' => $key));
 
+whoops_error();
+
 /* an instances of class that necessary for the system
  * please do not change this below variable 
  * these are collection of objects or instances of classes 
@@ -215,12 +217,6 @@ $searchPost = new SearchFinder($dbc);
 $sanitizer = new Sanitize();
 $userDao = new UserDao();
 $userToken = new UserTokenDao();
-$postDao = new PostDao();
-$topicDao = new TopicDao();
-$postTopicDao = new PostTopicDao();
-$pageDao = new PageDao();
-$menuDao = new MenuDao();
-$frontDispatcher = new Dispatcher();
 $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);
 $ubench = new Ubench();
@@ -228,8 +224,6 @@ $ubench = new Ubench();
 session_set_save_handler($sessionMaker, true);
 session_save_path(__DIR__ . '/utility/.sessions'.DS);
 
-# set_exception_handler('LogError::exceptionHandler');
-# set_error_handler('LogError::errorHandler');
 register_shutdown_function('session_write_close');
 
 if (!start_session_on_site($sessionMaker)) {
