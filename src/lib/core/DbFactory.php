@@ -38,18 +38,25 @@ class DbFactory
             return new $database($connection, $options);  
             
          } else {
-             
-             throw new DbException("Database Object is not exists");
-             
+
+            throw new DbException("Database object does not exists");
+
          }
          
      } catch (DbException $e) {
+        
+        self::$error = LogError::setStatusCode(http_response_code(500));
+        self::$error = LogError::newMessage($e);
+        self::$error = LogError::customErrorMessage();
          
-         self::$error = LogError::newMessage($e);
-         self::$error = LogError::customErrorMessage();
-         
+     } catch (PDOException $e) {
+
+        self::$error = LogError::setStatusCode(http_response_code(500));
+        self::$error = LogError::newMessage($e);
+        self::$error = LogError::customErrorMessage();
+
      }
-     
+
   }
   
 }
