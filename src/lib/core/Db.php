@@ -70,19 +70,23 @@ class Db implements DbInterface
       $options = array_replace($default_options, $options);
       
       $this->dbc = new PDO($dsn, $dbUser, $dbPass, $options);
-      
-      if (!$this->dbc) {
-
-          throw new DbException("Connection Failed!");
-          
-      }
        
    } catch (DbException $e) {
        
       $this->closeDbConnection();
+      $this->error = LogError::setStatusCode(http_response_code(500));
       $this->error = LogError::newMessage($e);
-      $this->error = LogError::customErrorMessage('admin');
+      $this->error = LogError::customErrorMessage();
       
+   } catch (PDOException $e) {
+
+      throw new PDOException("Error Database Connection");
+
+      $this->closeDbConnection();
+      $this->error = LogError::setStatusCode(http_response_code(500));
+      $this->error = LogError::newMessage($e);
+      $this->error = LogError::customErrorMessage();
+
    }
    
  }
@@ -105,7 +109,10 @@ class Db implements DbInterface
   */
  public function dbQuery($sql, $args = array())
  {
-     if (!$args) {
+     
+  try {
+      
+    if (!$args) {
          
         return $this->dbc->query($sql);
          
@@ -117,6 +124,15 @@ class Db implements DbInterface
      $stmt->execute($args);
      
      return $stmt;
+
+  } catch (DbException $e) {
+     
+    $this->closeDbConnection();
+    $this->error = LogError::setStatusCode(http_response_code(500));
+    $this->error = LogError::newMessage($e);
+    $this->error = LogError::customErrorMessage();
+     
+  }
      
  }
  
