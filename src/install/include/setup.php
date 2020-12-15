@@ -52,7 +52,7 @@ function make_connection($host, $username, $passwd, $dbname)
  * function closeConnection
  * closing database connection
  * 
- * @param string $link
+ * @param object $link
  * 
  */
 function close_connection($link)
@@ -64,7 +64,7 @@ function close_connection($link)
  * function table_exists
  * checking whether table exists or not
  * 
- * @param string $link
+ * @param object $link
  * @param string $table
  * @param numeric $counter
  * 
@@ -125,7 +125,7 @@ function check_dbtable($link, $table)
 /**
  * Install Database Table Function
  * 
- * @param string $link
+ * @param object $link
  * @param string $user_login
  * @param string $user_pass
  * @param string $user_email
@@ -144,10 +144,10 @@ $shield_pass     = password_hash(base64_encode(hash('sha384', $user_pass, true))
 $user_level      = 'administrator';
 
 // Theme 
-$theme_title     = "Mediumious";
+$theme_title     = "Bootstrap Blog";
 $theme_desc      = "Simple yet clean design for personal blog";
-$theme_designer  = "Colorlib";
-$theme_directory = "miniblog";
+$theme_designer  = "Ondrej - bootstrapious";
+$theme_directory = "blog";
 $theme_status    = "Y";
 
 // Setting App Key
@@ -197,20 +197,20 @@ if (false !== $createAdmin) {
 if ($link->insert_id && $createAdmin->affected_rows > 0) {
     
     // create other database tables
-    $createUserToken = $link->query($tblUserToken);
-    $createPost = $link->query($tblPost);
-    $createTopic = $link->query($tblTopic);
-    $createPostTopic = $link->query($tblPostTopic);
-    $createComment = $link->query($tblComment);
-    $createReply = $link->query($tblReply);
-    $createLoginAttempt = $link->query($tblLoginAttempt);
-    $createMenu = $link->query($tblMenu);
-    $createMedia = $link->query($tblMedia);
-    $createMediaMeta = $link->query($tblMediaMeta);
-    $createMediaDownload = $link->query($tblMediaDownload);
-    $createPlugin = $link->query($tblPlugin);
-    $createSetting = $link->query($tblSetting);
-    $createTheme = $link->query($tblTheme);
+    $link->query($tblUserToken);
+    $link->query($tblPost);
+    $link->query($tblTopic);
+    $link->query($tblPostTopic);
+    $link->query($tblComment);
+    $link->query($tblReply);
+    $link->query($tblLoginAttempt);
+    $link->query($tblMenu);
+    $link->query($tblMedia);
+    $link->query($tblMediaMeta);
+    $link->query($tblMediaDownload);
+    $link->query($tblPlugin);
+    $link->query($tblSetting);
+    $link->query($tblTheme);
     
     // insert configuration - app_key
     $recordAppKey = $link->prepare($saveAppKey);
@@ -360,7 +360,7 @@ if (isset($_SESSION['install']) && $_SESSION['install'] == true) {
  * @return string
  * 
  */
-function remove_bad_characters($str_words, $escape = false, $level = 'high')
+function remove_bad_characters($str_words, $host, $user, $password, $database, $escape = false, $level = 'high')
 {
     $found = false;
     $str_words = escapeHTML(strip_tags($str_words));
@@ -386,7 +386,8 @@ function remove_bad_characters($str_words, $escape = false, $level = 'high')
     
     if($escape) {
         
-       $str_words = mysqli_real_escape_string($str_words);
+      $link = mysqli_connect($host, $user, $password, $database);
+      $str_words = mysqli_real_escape_string($link, $str_words);
     
     }
     
