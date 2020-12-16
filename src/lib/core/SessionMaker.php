@@ -135,11 +135,25 @@ public function start()
 
 if ((!isset($_COOKIE[session_name()])) || (self::isSessionStarted() === false)) {
 
-   if (session_start()) {
-
-      return (mt_rand(0, 4) === 0) ? $this->refresh() : true; 
+   if (version_compare(PHP_VERSION, '5.6.0', '<')) {
       
-  }
+      if(session_id() == '') {
+         
+         session_start();
+         
+      }
+   
+   } else  {
+     
+       if (session_status() == PHP_SESSION_NONE) {
+          
+         session_start();
+      
+      }
+  
+   }
+
+   return (mt_rand(0, 4) === 0) ? $this->refresh() : true; 
 
 }
 
