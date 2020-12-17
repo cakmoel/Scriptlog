@@ -5,6 +5,13 @@
  * @category Core Class
  * @author   M.Noermoehammad
  * @license  MIT
+ * @see https://stackoverflow.com/questions/11696718/htaccess-rewrite-book-phpid-1234-to-book-1234
+ * @see https://stackoverflow.com/questions/1039725/how-to-do-url-re-writing-in-php
+ * @see https://stackoverflow.com/questions/60339372/how-to-rewrite-url-by-htaccess-with-basic-parameters-in-core-php
+ * @see https://httpd.apache.org/docs/trunk/mod/mod_dir.html#fallbackresource
+ * @see https://stackoverflow.com/questions/26419426/htaccess-url-re-styling-image-url-to-seo-friendly
+ * @see https://mediatemple.net/community/products/dv/204643270/using-htaccess-rewrite-rules
+ * @see https://stackoverflow.com/questions/16388959/url-rewriting-with-php
  * @version  1.0
  * @since    Since Release 0.1
  * 
@@ -14,10 +21,10 @@ class Dispatcher
   /**
    * routes 
    * 
-   * @var string
+   * @var object
    * 
    */
-  private $route;
+  private static $route;
 
   /**
    * errors
@@ -35,7 +42,7 @@ class Dispatcher
   {
      if (Registry::isKeySet('route')) {
 
-        $this->route = Registry::get('route');
+      self::$route = Registry::get('route');
 
      }
 
@@ -51,33 +58,32 @@ class Dispatcher
 
     if (!$themeActived = $this->invokeTheme()) {
         
-        include(APP_ROOT.APP_PUBLIC.DS.'themes'.DS.'maintenance.php');
+        include(APP_ROOT.APP_THEME.'themes'.DS.'maintenance.php');
       
     } else {
 
-      $theme_dir = APP_ROOT.APP_PUBLIC.DS.$themeActived['theme_directory'].DS;
+      $theme_dir = APP_ROOT.APP_THEME.safe_html($themeActived['theme_directory']).DS;
 
-      if (false === $this->allowedPath(['/', '//', 'post', 'page', 'blog', 'category', 'contact'])) {
+      if (false === self::allowedPath(self::whiteListPathRequested())) {
 
         // nothing is found so handle the error page 404
         $this->errorNotFound($theme_dir);
 
       } else {
 
-        foreach ($this->route as $action => $routes) {
+        foreach (self::$route as $action => $routes) {
         
-          if (preg_match( '~^'.$routes.'$~i', $this->requestURI(), $params)) {
+          if (preg_match( '~^'.$routes.'$~i', self::requestURI(), $matches)) {
              
               if (is_dir($theme_dir)) {
-  
-                 call_theme_header();
+
+                 call_theme_header(); 
                  call_theme_content($action);
                  call_theme_footer();
-
+                
               }
   
-             // avoid the 404 message 
-             exit();
+             exit();  // avoid the 404 message 
      
           } 
      
@@ -103,7 +109,7 @@ class Dispatcher
     $keys = array();
     $values = array();
   
-    foreach ($this->route as $key => $value) {
+    foreach (self::$route as $key => $value) {
       
       $keys[] = $key; 
       $values[] = $value;    
@@ -117,15 +123,15 @@ class Dispatcher
   /**
    * Find request path
    * 
-   * @param array $args
+   * @param int $args
    * @return mixed if true $var path return array
-   * @return false if $var path does not return path
+   * @return bool|false if $var path does not return path
    * 
    */
-  public function findRequestPath($args)
+  public static function findRequestPath($args)
   {
-    $path = $this->requestPath();
-    $path = explode('/', $path);
+    
+    $path = explode('/', self::requestPath());
 
     if (isset($path[$args])) {
 
@@ -145,30 +151,34 @@ class Dispatcher
    * @return mixed
    * 
    */
-  public function findRequestParam()
+  public static function findRequestParam()
   {
     
     $parameters = [];
 
-    foreach ($this->route as $key => $value) {
+    if (is_array(self::$route)) {
+
+      foreach (self::$route as $key => $value) {
       
-       if (preg_match('~^'.$value.'$~i', $this->requestURI(), $matches)) {
-
-         return $parameters[] = $matches;
-
-       }
+        if (preg_match('~^'.$value.'$~i', self::requestURI(), $matches)) {
+ 
+          return $parameters[] = $matches;
+ 
+        }
+ 
+     }
 
     }
-
+    
   }
 
   /**
-   * Parse query from URL requested
+   * parseQuery from URL requested
    * 
    * @return mixed
    * 
    */
-  public function parseQuery()
+  public function parseQuery($var)
   {
     $var  = parse_url($var, PHP_URL_QUERY);
     $var  = html_entity_decode($var);
@@ -189,12 +199,12 @@ class Dispatcher
   }
 
   /**
-   * Request path
+   * RequestPath
    * 
    * @return mixed;
    * 
    */
-  protected function requestPath()
+  private static function requestPath()
   {
     
     $request_uri = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
@@ -225,7 +235,7 @@ class Dispatcher
    * @return mixed
    * 
    */
-  protected function requestURI()
+  private static function requestURI()
   {
     $uri = rtrim(dirname($_SERVER["SCRIPT_NAME"]), '/' );
     $uri = '/' . trim(str_replace( $uri, '', $_SERVER['REQUEST_URI'] ), '/' );
@@ -250,14 +260,14 @@ class Dispatcher
    * @return bool|true|false
    * 
    */
-  private function allowedPath(array $path)
+  private static function allowedPath(array $path)
   {
     
-    $findParam = $this->findRequestParam();
+    $findParam = self::findRequestParam();
     
     $param1 = (is_array($findParam) && array_key_exists(0, $findParam)) ? $findParam[0] : '';
     
-    if (!(in_array($this->findRequestPath(0), $path, true) || (in_array($param1, $path, true)))) {
+    if (!(in_array(self::findRequestPath(0), $path, true) || (in_array($param1, $path, true)))) {
 
       return false; 
        
@@ -280,6 +290,18 @@ class Dispatcher
   {
     header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found", true, 404);
     include($theme_dir.'404.php');
+  }
+
+/**
+ * whiteListPathRequested
+ * whitelist allowed path that being requested on the common visitor-side (not admin dir)
+ * 
+ * @return array
+ * 
+ */
+  private static function whiteListPathRequested()
+  {
+    return ['/', '//', 'post', 'page', 'blog', 'category', 'archive'];
   }
 
 } // End of class Dispatcher
