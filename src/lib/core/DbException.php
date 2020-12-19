@@ -9,7 +9,7 @@
  * @since     Since Release 1.0
  *
  */
-class DbException extends CoreException
+class DbException extends PDOException
 {
   
 }
