@@ -172,8 +172,9 @@ class Db implements DbInterface
     } catch (DbException $e) {
         
        $this->closeDbConnection();
+       $this->error = LogError::setStatusCode(http_response_code(500));
        $this->error = LogError::newMessage($e);
-       $this->error = LogError::customErrorMessage('admin');
+       $this->error = LogError::customErrorMessage();
        
     }
     
@@ -228,6 +229,7 @@ class Db implements DbInterface
    } catch (DbException $e) {
        
        $this->closeDbConnection();
+       $this->error = LogError::setStatusCode(http_response_code(500));
        $this->error = LogError::newMessage($e);
        $this->error = LogError::customErrorMessage();
        
@@ -235,6 +237,88 @@ class Db implements DbInterface
    
  }
  
+/**
+ * dbReplace()
+ *
+ * {@inheritDoc}
+ * @uses DbInterface::dbReplace
+ * 
+ */
+ public function dbReplace($tablename, $params, $to)
+ {
+
+  $clean_table = Sanitize::mildSanitizer($tablename);
+
+  try {
+    
+    switch ($to) {
+
+      case 'update':
+
+        ksort($params);
+
+        $columns = null;
+      
+        foreach ((array)$params as $key => $value) {
+          
+          $columns .= "$key = :$key,";
+          
+        }
+      
+        $columns = rtrim($columns, ',');
+      
+        $stmt = $this->dbc->prepare(" REPLACE INTO $clean_table SET $columns ");
+
+        foreach ((array)$params as $key => $value) {
+          
+             $stmt->bindValue(":$key", $value);
+        }
+      
+        $stmt->execute();
+      
+        return $stmt->rowCount();
+
+        break;
+      
+      case 'insert':
+
+        $sql = " REPLACE INTO $clean_table ";
+        $fields = array_keys($params);
+        $values = array_values($params);
+
+        $sql .= '('.implode(',', $fields).') ';
+
+        $args = [];
+       
+        foreach ($fields as $f) {
+          $args[] = '?';
+        }
+
+       $sql .= 'VALUES ('.implode(',', $args).') ';
+
+       $statement = $this->dbc->prepare($sql);
+      
+       foreach ($values as $i => $v) {
+          $statement->bindValue($i+1, $v);
+       }
+
+       return $statement->execute();
+
+      break;
+
+    }
+    
+  } catch (DbException $e) {
+    
+    $this->closeDbConnection();
+    $this->error = LogError::setStatusCode(http_response_code(500));
+    $this->error = LogError::newMessage($e);
+    $this->error = LogError::customErrorMessage();
+
+  }
+
+ }
+
  /**
   * delete record
   * 
@@ -266,6 +350,7 @@ class Db implements DbInterface
     } catch (DbException $e) {
         
         $this->closeDbConnection();
+        $this->error = LogError::setStatusCode(http_response_code(500));
         $this->error = LogError::newMessage($e);
         $this->error = LogError::customErrorMessage();
         
