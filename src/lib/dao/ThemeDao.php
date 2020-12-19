@@ -203,11 +203,11 @@ class ThemeDao extends Dao
    * @return numeric|integer
    * 
    */
-  public function totalThemeRecords($data = null)
+  public function totalThemeRecords($data = array())
   {
     $sql = "SELECT ID FROM tbl_themes";
     $this->setSQL($sql);
-    return $this->checkCountValue($data);
+    return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
   }
 
   /**
