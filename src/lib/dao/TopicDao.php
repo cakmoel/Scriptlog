@@ -110,7 +110,7 @@ class TopicDao extends Dao
       
       $this->setSQL($sql);
       
-      $post_topic = $this->findRow(['topic_id' => $topicId, 'post_id' => $postId]);
+      $post_topic = $this->findRow([':topic_id' => $topicId, ':post_id' => $postId]);
       
       return (empty($post_topic)) ?: $post_topic;
       
@@ -290,11 +290,11 @@ class TopicDao extends Dao
   * @return numeric
   *
   */
- public function totalTopicRecords($data = null)
+ public function totalTopicRecords($data = array())
  {
     $sql = "SELECT ID FROM tbl_topics";
     $this->setSQL($sql);
-    return $this->checkCountValue($data);
+    return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
  }
 
 }
