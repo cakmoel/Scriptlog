@@ -148,7 +148,7 @@ class Authentication
   }
 
 /**
- * Find User by Login
+ * findUserByLogin()
  *
  * @param string $user_login
  * @return void
@@ -308,7 +308,7 @@ class Authentication
       $bind_session = ['user_session' => regenerate_session()];
       
       $this->userDao->updateUserSession($bind_session, (int)$account_info['ID']);
-
+      
       // Set Auth Cookies if 'Remember Me' checked
       if ($remember_me == true) {
 
@@ -389,18 +389,10 @@ public function validateUserAccount($login, $password)
 
  $result = $this->userDao->checkUserPassword($login, $password);
 
- if (true === $result) {
-
-    $verified = true;
-
- } else {
-
-    $verified = false;
-
- }
+ (isset($verified) && true === $result) ? $verified = true : $verified = false;
 
  return $verified;
-  
+
 }
 
 /**
@@ -537,7 +529,8 @@ public function userAccessControl($control = null)
             
           if($this->accessLevel() !== 'administrator') {
 
-              return false;
+            return false;
+
           }
 
           break;
@@ -546,7 +539,7 @@ public function userAccessControl($control = null)
            
           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
 
-              return false;
+            return false;
 
           }
 
@@ -556,7 +549,7 @@ public function userAccessControl($control = null)
 
           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
 
-              return false;
+            return false;
 
           }
 
@@ -651,7 +644,7 @@ public function userAccessControl($control = null)
 }
 
 /**
- * getUserAuthSession
+ * getUserAuthSession()
  *
  * @return void
  * 
