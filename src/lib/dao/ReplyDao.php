@@ -162,11 +162,11 @@ class ReplyDao extends Dao
  * @return integer
  * 
  */
-  public function totalReplyRecords($data = null)
+  public function totalReplyRecords($data = array())
   {
     $sql = "SELECT ID FROM tbl_comment_reply";
     $this->setSQL($sql);
-    return $this->checkCountValue($data);
+    return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
   }
 
 }
