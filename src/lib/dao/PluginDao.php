@@ -297,11 +297,11 @@ class PluginDao extends Dao
    * @return numeric
    * 
    */
-  public function totalPluginRecords($data = null)
+  public function totalPluginRecords($data = array())
   {
     $sql = "SELECT ID FROM tbl_plugin";
     $this->setSQL($sql);
-    return $this->checkCountValue($data);
+    return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
   }
   
   /**

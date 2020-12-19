@@ -69,16 +69,9 @@ public function findPosts($orderBy = 'ID', $author = null)
                 p.post_status,
                 p.post_type,
                 u.user_login
-  		    FROM
-                 tbl_posts AS p
-
-  		    INNER JOIN
-
-                 tbl_users AS u ON p.post_author = u.ID
-
-  		    WHERE
-                 p.post_type = 'blog'
-
+  		  FROM tbl_posts AS p
+  		  INNER JOIN tbl_users AS u ON p.post_author = u.ID
+  		  WHERE p.post_type = 'blog'
   			ORDER BY :orderBy DESC";
 
         $data = array(':orderBy' => $orderBy);
@@ -399,7 +392,7 @@ public static function dropDownCommentStatus($selected = "")
  * @return numeric
  *
  */
-public function totalPostRecords($data = null)
+public function totalPostRecords($data = array())
 {
 
   if (!empty($data)) {
@@ -414,7 +407,7 @@ public function totalPostRecords($data = null)
 
   $this->setSQL($sql);
 
-  return $this->checkCountValue($data);
+  return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
 
 }
 

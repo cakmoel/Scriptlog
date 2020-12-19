@@ -260,11 +260,11 @@ public function dropDownCommentStatus($selected = '')
  * @param array $data
  * @return numeric
  */
-public function totalPageRecords($data = null)
+public function totalPageRecords($data = array())
 {
    $sql = "SELECT ID FROM tbl_posts WHERE post_type = 'page'";
    $this->setSQL($sql);
-   return $this->checkCountValue();
+   return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
 }
 
 }

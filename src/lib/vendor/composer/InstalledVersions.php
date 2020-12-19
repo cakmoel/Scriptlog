@@ -19,7 +19,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '027f9d48da106bf74ebf7f5a0f27b1256e60e1d4',
+    'reference' => 'd89d90d1b238a6f31398e3f02f729f234b7c25ab',
     'name' => '__root__',
   ),
   'versions' => 
@@ -31,7 +31,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '027f9d48da106bf74ebf7f5a0f27b1256e60e1d4',
+      'reference' => 'd89d90d1b238a6f31398e3f02f729f234b7c25ab',
     ),
     'doctrine/lexer' => 
     array (
@@ -44,12 +44,21 @@ private static $installed = array (
     ),
     'egulias/email-validator' => 
     array (
-      'pretty_version' => '2.1.23',
-      'version' => '2.1.23.0',
+      'pretty_version' => '2.1.24',
+      'version' => '2.1.24.0',
       'aliases' => 
       array (
       ),
-      'reference' => '5fa792ad1853ae2bc60528dd3e5cbf4542d3c1df',
+      'reference' => 'ca90a3291eee1538cd48ff25163240695bd95448',
+    ),
+    'filp/whoops' => 
+    array (
+      'pretty_version' => '2.9.1',
+      'version' => '2.9.1.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '307fb34a5ab697461ec4c9db865b20ff2fd40771',
     ),
     'guzzlehttp/psr7' => 
     array (
@@ -102,6 +111,15 @@ private static $installed = array (
       array (
         0 => '1.0',
       ),
+    ),
+    'psr/log' => 
+    array (
+      'pretty_version' => '1.1.3',
+      'version' => '1.1.3.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '0f73288fd15629204f9d42b7055f72dacbe811fc',
     ),
     'ralouphie/getallheaders' => 
     array (
@@ -186,12 +204,12 @@ private static $installed = array (
     ),
     'voku/anti-xss' => 
     array (
-      'pretty_version' => '4.1.30',
-      'version' => '4.1.30.0',
+      'pretty_version' => '4.1.31',
+      'version' => '4.1.31.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'ff6e54f4a98ad1cd28f8b4a0f3c3f92f3c421f0a',
+      'reference' => '22dea9be8dbffa466995ea87a12da5f3bce874bb',
     ),
     'voku/portable-ascii' => 
     array (
@@ -204,12 +222,12 @@ private static $installed = array (
     ),
     'voku/portable-utf8' => 
     array (
-      'pretty_version' => '5.4.50',
-      'version' => '5.4.50.0',
+      'pretty_version' => '5.4.51',
+      'version' => '5.4.51.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'f14ed68ea9ced6639e71ca989c6d907892115ba0',
+      'reference' => '578f5266725dc9880483d24ad0cfb39f8ce170f7',
     ),
   ),
 );
