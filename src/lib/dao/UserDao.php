@@ -33,15 +33,15 @@ class UserDao extends Dao
  public function getUsers($orderBy = 'ID', $fetchMode = null)
  {
     
-    $sql = "SELECT ID, user_login, user_email, user_fullname,
-				   user_level, user_session, user_banned, user_signin_count, user_locked_until, login_time
-		   FROM tbl_users ORDER BY :orderBy ";
+ $sql = "SELECT ID, user_login, user_email, user_fullname,
+				user_level, user_session, user_banned, user_signin_count, user_locked_until, login_time
+		FROM tbl_users ORDER BY :orderBy ";
      
-     $this->setSQL($sql);
+ $this->setSQL($sql);
      
-     $users = (is_null($fetchMode)) ? $this->findAll([':orderBy' => $orderBy]) : $this->findAll([':orderBy' => $orderBy], $fetchMode);
+ $users = (is_null($fetchMode)) ? $this->findAll([':orderBy' => $orderBy]) : $this->findAll([':orderBy' => $orderBy], $fetchMode);
 
-     return (empty($users)) ?: $users;
+ return (empty($users)) ?: $users;
     
  }
 
@@ -49,15 +49,15 @@ class UserDao extends Dao
  * getUserById
  * fetch single value of record by ID
  * 
- * @param integer $user_id
+ * @param integer $userID
  * @param object $sanitize
  * @param static $fetchMode = null
  * @return boolean|array|object
  * 
  */
- public function getUserById($user_id, $sanitize, $fetchMode = null)
+ public function getUserById($userID, $sanitize, $fetchMode = null)
  {
-   $cleanId = $this->filteringId($sanitize, $user_id, 'sql');
+   $cleanID = $this->filteringId($sanitize, $userID, 'sql');
    
    $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
                 user_session, user_banned, user_signin_count, user_locked_until, login_time
@@ -65,7 +65,7 @@ class UserDao extends Dao
    
    $this->setSQL($sql);
 
-   $userById = (is_null($fetchMode)) ? $this->findRow([':ID' => (int)$cleanId]) : $this->findRow([':ID' => (int)$cleanId], $fetchMode);
+   $userById = (is_null($fetchMode)) ? $this->findRow([':ID' => (int)$cleanID]) : $this->findRow([':ID' => (int)$cleanID], $fetchMode);
 
    return (empty($userById)) ?: $userById;
 
@@ -95,8 +95,10 @@ class UserDao extends Dao
  }
 
 /**
- * get user by username
+ * getUserByLogin()
  *
+ * retrieving user record based on user_login
+ * 
  * @param string $user_login
  * @param static PDO::FETCH_MODE $fetchMode
  * @return mixed
@@ -114,6 +116,34 @@ class UserDao extends Dao
    $userByLogin = (is_null($fetchMode)) ? $this->findRow([':user_login' => $user_login]) : $this->findRow([':user_login' => $user_login], $fetchMode);
 
    return (empty($userByLogin)) ?: $userByLogin;
+
+ }
+
+/**
+ * getUserBySession()
+ *
+ * retrieving user record based on user_session
+ * 
+ * @param string $user_session
+ * @param static PDO::FETCH_MODE $fetchMode $fetchMode
+ * @return void
+ * 
+ */
+ public function getUserBySession($user_session, $fetchMode = null)
+ {
+  
+    $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
+                   user_session, user_banned, user_signin_count, user_locked_until, login_time
+            FROM tbl_users 
+            WHERE user_session = :user_session
+            AND (login_time >= (NOW() - INTERVAL 7 DAY)) AND user_banned = 0; 
+            LIMIT 1";
+
+    $this->setSQL($sql);
+
+    $userBySession = (is_null($fetchMode)) ? $this->findRow([':user_session' => $user_session]) : $this->findRow([':user_session' => $user_session], $fetchMode);
+
+    return (empty($userBySession)) ?: $userBySession;
 
  }
 
@@ -193,10 +223,10 @@ class UserDao extends Dao
   * @param array $bind
   * @param integer $ID
   */
- public function updateUser($accessLevel, $sanitize, $bind, $user_id)
+ public function updateUser($accessLevel, $sanitize, $bind, $userID)
  {
   
-    $cleanId = $this->filteringId($sanitize, $user_id, 'sql');
+    $cleanID = $this->filteringId($sanitize, $userID, 'sql');
   
     $hash_password = scriptlog_password($bind['user_pass']);
   
@@ -246,7 +276,7 @@ class UserDao extends Dao
           
      }
      
-     $this->modify("tbl_users", $bind, "ID = ".(int)$cleanId);
+     $this->modify("tbl_users", $bind, "ID = ".(int)$cleanID);
      
  }
 
@@ -256,11 +286,11 @@ class UserDao extends Dao
   * @param string $accessLevel
   * @param object $sanitize
   * @param array $bind
-  * @param integer $user_id
+  * @param integer $userID
   */
- public function updateUserSession($bind, $user_id)
- {
-    $this->modify("tbl_users", ['user_session' => generate_session_key($bind['user_session'], 32), 'login_time' => date('Y-m-d H:i:s')], "ID = {$user_id}");
+ public function updateUserSession($bind, $userID)
+ { 
+   $this->modify("tbl_users", ['user_session' => generate_session_key($bind['user_session'], 32), 'login_time' => date('Y-m-d H:i:s')], "ID = {$userID}");
  }
 
  /**
@@ -281,13 +311,13 @@ class UserDao extends Dao
   * Recover New password
   * 
   * @param array $bind
-  * @param integer $user_id
+  * @param integer $userID
   *
   */
- public function recoverNewPassword($bind, $user_id)
+ public function recoverNewPassword($bind, $userID)
  {
    $recoverPassword = scriptlog_password($bind['user_pass']);
-   $this->modify("tbl_users", ['user_pass' => $recoverPassword, 'user_reset_complete' => $bind['user_reset_complete']], "ID = '{$user_id}'");
+   $this->modify("tbl_users", ['user_pass' => $recoverPassword, 'user_reset_complete' => $bind['user_reset_complete']], "ID = '{$userID}'");
           
  }
 
@@ -329,9 +359,9 @@ class UserDao extends Dao
  public function deleteUser($ID, $sanitize)
  {
   
-  $clean_id = $this->filteringId($sanitize, $ID, 'sql');
+  $cleanID = $this->filteringId($sanitize, $ID, 'sql');
    
-  $this->deleteRecord("tbl_users", "ID = ".(int)$clean_id);
+  $this->deleteRecord("tbl_users", "ID = ".(int)$cleanID);
 	 
  }
  
@@ -396,20 +426,15 @@ class UserDao extends Dao
  */
  public function checkUserSession($user_session)
  {
-    $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_session = :user_session";
+
+    $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_session = :user_session ";
+    
     $this->setSQL($sql);
-    $stmt = $this->findColumn([':user_session' => $user_session]);
-     
-    if ($stmt == 1) {
-         
-        return true;
-     
-    } else {
-        
-        return false;
-     
-    }
-     
+    
+    $stmt = $this->findColumn([':user_session' => $user_session]);     
+    
+    return ($stmt == 1) ? true : false;
+ 
  }
 
  /**
@@ -529,17 +554,17 @@ class UserDao extends Dao
 /**
  * checkUserId
  *
- * @param integer $user_id
+ * @param integer $userID
  * @param object $sanitize
  * @return numeric
  * 
  */
- public function checkUserId($user_id, $sanitize)
+ public function checkUserId($userID, $sanitize)
  {
      
      $sql = "SELECT ID FROM tbl_users WHERE ID = ?";
 
-     $idsanitized = $this->filteringId($sanitize, $user_id, 'sql');
+     $idsanitized = $this->filteringId($sanitize, $userID, 'sql');
 
      $this->setSQL($sql);
 
@@ -556,13 +581,13 @@ class UserDao extends Dao
  * @return integer
  *  
  */
- public function totalUserRecords($data = null)
+ public function totalUserRecords($data = array())
  {
-     $sql = "SELECT ID FROM tbl_users";
+    $sql = "SELECT ID FROM tbl_users";
      
-     $this->setSQL($sql);
+    $this->setSQL($sql);
      
-     return $this->checkCountValue($data);
+    return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
      
  }
  
