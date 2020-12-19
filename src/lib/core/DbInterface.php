@@ -43,7 +43,9 @@ interface DbInterface
  public function dbQuery($sql, $parameters = array());
  
 /**
- * Insert new record
+ * dbInsert
+ * 
+ * insert new record
  * 
  * @method public dbInsert()
  * @param string $tablename
@@ -53,15 +55,30 @@ interface DbInterface
  public function dbInsert($tablename, array $params);
  
 /**
- * Update record
+ * dbUpdate()
+ * 
+ * update existing record
  * 
  * @method public dbUpdate()
  * @param string $tablename
- * @param string $params
+ * @param array $params
  * @param string $where
  * 
  */
  public function dbUpdate($tablename, $params, $where);
+
+/**
+ * dbReplace()
+ * 
+ * replace statement to insert or update row
+ * 
+ * @param string $tablename
+ * @param array $params
+ * @param string $to
+ * @return void
+ * 
+ */
+ public function dbReplace($tablename, $params, $to);
 
 /**
  * Delete record
