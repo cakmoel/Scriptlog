@@ -24,6 +24,10 @@ class ComposerStaticInit65d8d43f7e5871d489681098837a6b70
             'voku\\helper\\' => 12,
             'voku\\' => 5,
         ),
+        'W' => 
+        array (
+            'Whoops\\' => 7,
+        ),
         'S' => 
         array (
             'Symfony\\Polyfill\\Php72\\' => 23,
@@ -37,6 +41,7 @@ class ComposerStaticInit65d8d43f7e5871d489681098837a6b70
         ),
         'P' => 
         array (
+            'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
         ),
         'I' => 
@@ -66,6 +71,10 @@ class ComposerStaticInit65d8d43f7e5871d489681098837a6b70
         array (
             0 => __DIR__ . '/..' . '/voku/portable-ascii/src/voku',
             1 => __DIR__ . '/..' . '/voku/portable-utf8/src/voku',
+        ),
+        'Whoops\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/filp/whoops/src/Whoops',
         ),
         'Symfony\\Polyfill\\Php72\\' => 
         array (
@@ -98,6 +107,10 @@ class ComposerStaticInit65d8d43f7e5871d489681098837a6b70
         'Selective\\ArchiveBomb\\' => 
         array (
             0 => __DIR__ . '/..' . '/selective/archive-bomb-scanner/src',
+        ),
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
         ),
         'Psr\\Http\\Message\\' => 
         array (
