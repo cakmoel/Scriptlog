@@ -73,7 +73,7 @@ class Dao
   * @throws DbException
   * @return array|object
   */
- protected function findAll($data = null, $fetchMode = null)
+ protected function findAll(array $data = array(), $fetchMode = null)
  {
      
    try {
@@ -94,6 +94,11 @@ class Dao
         $this->error = LogError::newMessage($e);
         $this->error = LogError::customErrorMessage('admin');
         
+    } catch (PDOException $e) {
+
+        throw new PDOException("Error on SQL Query: " .$e->getMessage());
+        $this->closeConnection();
+
     }
     
  }
@@ -108,7 +113,7 @@ class Dao
   * @return array|object
   *
   */
- protected function findRow($data = null, $fetchMode = null)
+ protected function findRow(array $data = array(), $fetchMode = null)
  {
      
   try {
@@ -141,7 +146,7 @@ class Dao
   * @throws DbException
   * @return boolean false if no more rows
   */
- protected function findColumn($data = null, $fetchMode = null)
+ protected function findColumn(array $data = array(), $fetchMode = null)
  {
      
    try {
@@ -174,7 +179,7 @@ class Dao
   * @return integer|numeric
   *
   */
- public function checkCountValue($data = null)
+ public function checkCountValue($data = array())
  {
      
    try {
@@ -225,7 +230,7 @@ class Dao
  }
  
  /**
-  * Delete record
+  * deleteRecord()
   * 
   * @param string $table
   * @param integer $where
@@ -236,6 +241,19 @@ class Dao
     (!is_null($limit)) ? $this->dbc->dbDelete($table, $where, $limit) : $this->dbc->dbDelete($table, $where);
  }
  
+/**
+ * replaceRecord()
+ *
+ * @param string $table
+ * @param array $params
+ * @param string $to
+ * 
+ */
+ protected function replaceRecord($table, $params, $to)
+ {
+   $this->dbc->dbReplace($table, $params, $to);
+ }
+
  /**
  * callTransaction
  * begin transaction for multiple queries as a unified block 
