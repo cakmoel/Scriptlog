@@ -45,6 +45,7 @@ public function findPosts($orderBy = 'ID', $author = null)
                 p.post_content,
                 p.post_tags,
                 p.post_status,
+                p.post_sticky,
                 p.post_type,
                 u.user_login
   			FROM tbl_posts AS p
@@ -67,6 +68,7 @@ public function findPosts($orderBy = 'ID', $author = null)
                 p.post_content,
                 p.post_tags,
                 p.post_status,
+                p.post_sticky,
                 p.post_type,
                 u.user_login
   		  FROM tbl_posts AS p
@@ -115,6 +117,7 @@ public function findPost($id, $sanitize, $author = null)
                   post_keyword,
                   post_tags,
                   post_status,
+                  post_sticky,
   	  		        post_type,
                   comment_status
   	  		  FROM tbl_posts
@@ -137,6 +140,7 @@ public function findPost($id, $sanitize, $author = null)
               post_keyword,
               post_tags,
               post_status,
+              post_sticky,
   	  		    post_type,
               comment_status
   	  		  FROM tbl_posts
@@ -176,6 +180,7 @@ public function createPost($bind, $topicId)
        'post_keyword' => $bind['post_keyword'],
        'post_tags' => $bind['post_tags'],
        'post_status' => $bind['post_status'],
+       'post_sticky' => $bind['post_sticky'],
        'comment_status' => $bind['comment_status']
    ]);
 
@@ -191,6 +196,7 @@ public function createPost($bind, $topicId)
       'post_keyword' => $bind['post_keyword'],
       'post_tags' => $bind['post_tags'],
       'post_status' => $bind['post_status'],
+      'post_sticky' => $bind['post_sticky'],
       'comment_status' => $bind['comment_status']
    ]);
 
@@ -247,7 +253,8 @@ try {
   	    'post_summary' => $bind['post_summary'],
         'post_keyword' => $bind['post_keyword'],
         'post_tags' => $bind['post_tags'],
-  	    'post_status' => $bind['post_status'],
+        'post_status' => $bind['post_status'],
+        'post_sticky' => $bind['post_sticky'],
   	    'comment_status' => $bind['comment_status']
   	], "ID = {$cleanId}");
 
@@ -263,6 +270,7 @@ try {
           'post_keyword' => $bind['post_keyword'],
           'post_tags' => $bind['post_tags'],
           'post_status' => $bind['post_status'],
+          'post_sticky' => $bind['post_sticky'],
           'comment_status' => $bind['comment_status']
       ], "ID = {$cleanId}");
 
