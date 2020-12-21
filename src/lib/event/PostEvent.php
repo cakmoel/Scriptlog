@@ -81,6 +81,14 @@ class PostEvent
   private $post_status;
   
   /**
+   * post_sticky
+   *
+   * @var integer
+   * 
+   */
+  private $post_sticky;
+
+  /**
    * comment's status
    * is comment opened(allowed) or closed(not allowed)
    * 
@@ -129,9 +137,9 @@ class PostEvent
    */
   public function __construct(PostDao $postDao, FormValidator $validator, Sanitize $sanitizer)
   {
-     $this->postDao = $postDao;
-     $this->validator = $validator;
-     $this->sanitizer = $sanitizer;
+    $this->postDao = $postDao;
+    $this->validator = $validator;
+    $this->sanitizer = $sanitizer;
   }
   
   /**
@@ -240,6 +248,17 @@ class PostEvent
   {
     $this->post_status = $post_status;
   }
+
+  /**
+   * set sticky post
+   *
+   * @param int $post_sticky
+   * 
+   */
+  public function setSticky($post_sticky)
+  {
+    $this->post_sticky = $post_sticky;
+  }
   
   /**
    * set comment's status
@@ -283,9 +302,9 @@ class PostEvent
    * @param integer $id
    * @return boolean|array|object
    */
-  public function grabPost($id)
+  public function grabPost($postId)
   {
-    return $this->postDao->findPost($id, $this->sanitizer);     
+    return $this->postDao->findPost($postId, $this->sanitizer);     
   }
   
   /**
@@ -310,9 +329,9 @@ class PostEvent
      
      if ($this->topics == 0) {
              
-      $categoryId = $category -> createTopic(['topic_title' => 'Uncategorized', 'topic_slug' => 'uncategorized']);
+      $categoryId = $category->createTopic(['topic_title' => 'Uncategorized', 'topic_slug' => 'uncategorized']);
 
-      $getCategory = $category -> findTopicById($categoryId, $this->sanitizer, PDO::FETCH_ASSOC);
+      $getCategory = $category->findTopicById($categoryId, $this->sanitizer, PDO::FETCH_ASSOC);
       
       return $this->postDao->createPost([
           'media_id' => $this->post_image,
@@ -325,6 +344,7 @@ class PostEvent
           'post_keyword' => $this->meta_key,
           'post_tags' => $this->post_tags,
           'post_status' => $this->post_status,
+          'post_sticky' => $this->post_sticky,
           'comment_status' => $this->comment_status
       ], $getCategory['ID']);
       
@@ -341,6 +361,7 @@ class PostEvent
             'post_keyword' => $this->meta_key,
             'post_tags' => $this->post_tags,
             'post_status' => $this->post_status,
+            'post_sticky' => $this->post_sticky,
             'comment_status' => $this->comment_status
           ], $this->topics);
       
@@ -374,6 +395,7 @@ class PostEvent
             'post_keyword' => $this->meta_key,
             'post_tags' => $this->post_tags,
             'post_status' => $this->post_status,
+            'post_sticky' => $this->post_sticky,
             'comment_status' => $this->comment_status
         ], $this->postId, $this->topics);
          
@@ -390,6 +412,7 @@ class PostEvent
             'post_keyword' => $this->meta_key,
             'post_tags' => $this->post_tags,
             'post_status' => $this->post_status,
+            'post_sticky' => $this->post_sticky,
             'comment_status' => $this->comment_status
         ], $this->postId, $this->topics);
         
@@ -515,7 +538,7 @@ class PostEvent
    */
   public function totalPosts($data = null)
   {
-     return $this->postDao->totalPostRecords($data);
+    return $this->postDao->totalPostRecords($data);
   }
   
 }
