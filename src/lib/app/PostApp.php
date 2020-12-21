@@ -15,7 +15,7 @@ class PostApp extends BaseApp
 /**
  * an instance of View
  * 
- * @var string
+ * @var object
  * 
  */
   private $view;
@@ -23,7 +23,7 @@ class PostApp extends BaseApp
 /**
  * an instance of PostEvent
  * 
- * @var string
+ * @var object
  * 
  */
   private $postEvent;
@@ -126,6 +126,7 @@ class PostApp extends BaseApp
           'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
           'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
           'post_status' => FILTER_SANITIZE_STRING,
+          'post_sticky' => FILTER_SANITIZE_NUMBER_INT,
           'comment_status' => FILTER_SANITIZE_STRING
        ];
 
@@ -138,7 +139,7 @@ class PostApp extends BaseApp
              header($_SERVER["SERVER_PROTOCOL"].' 400 Bad Request');
              throw new AppException("Sorry, unpleasant attempt detected!");
              
-         } 
+        } 
         
          if ( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'comment_status']) == false) {
 
@@ -273,34 +274,6 @@ class PostApp extends BaseApp
 
               }
 
-              if(isset($_POST['catID']) && $_POST['catID'] == 0) {
-
-               $this->postEvent->setTopics(0);
-               $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
-               $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
-               $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
-               $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
-               $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
-               $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
-               $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
-               $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-               $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
-
-              } else {
-
-               $this->postEvent->setTopics(distill_post_request($filters)['catID']);
-               $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
-               $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
-               $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
-               $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
-               $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
-               $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
-               $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
-               $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-               $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
-
-              }
-
             } else {
 
               $new_filename = generate_filename($file_name)['new_filename'];
@@ -356,35 +329,28 @@ class PostApp extends BaseApp
 
                $this->postEvent->setPostImage($append_media);
 
-              if (isset($_POST['catID']) && $_POST['catID'] == 0) {
-
-               $this->postEvent->setTopics(0);
-               $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
-               $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
-               $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
-               $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
-               $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
-               $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
-               $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
-               $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-               $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
-
-              } else {
-
-               $this->postEvent->setTopics(distill_post_request($filters)['catID']);
-               $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
-               $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
-               $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
-               $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
-               $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
-               $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
-               $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
-               $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-               $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
-
-              }
-
             }
+
+            if(isset($_POST['catID']) && $_POST['catID'] == 0) {
+
+              $this->postEvent->setTopics(0);
+              
+            } else {
+
+              $this->postEvent->setTopics(distill_post_request($filters)['catID']);
+              
+            }
+
+            $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
+            $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
+            $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
+            $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
+            $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
+            $this->postEvent->setSticky(distill_post_request($filters)['post_sticky']);
+            $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
+            $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
+            $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
+            $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
 
             $this->postEvent->addPost();
       
@@ -458,7 +424,10 @@ class PostApp extends BaseApp
         'post_content' => $getPost['post_content'],
         'post_summary' => $getPost['post_summary'],
         'post_keyword' => $getPost['post_keyword'],
-        'post_tags' => $getPost['post_tags']
+        'post_tags' => $getPost['post_tags'],
+        'post_status' => $getPost['post_status'], 
+        'post_sticky' => $getPost['post_sticky'],
+        'comment_status' => $getPost['comment_status']
     );
 
     if (isset($_POST['postFormSubmit'])) {
@@ -479,6 +448,7 @@ class PostApp extends BaseApp
         'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_status' => FILTER_SANITIZE_STRING,
+        'post_sticky' => FILTER_SANITIZE_NUMBER_INT,
         'comment_status' => FILTER_SANITIZE_STRING
       ];
 
@@ -626,18 +596,6 @@ class PostApp extends BaseApp
    
                  }
 
-                  $this->postEvent->setPostId((int)distill_post_request($filters)['post_id']);
-                  $this->postEvent->setTopics(distill_post_request($filters)['catID']);
-                  $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
-                  $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
-                  $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
-                  $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
-                  $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
-                  $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
-                  $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
-                  $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-                  $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
-                  
               } else {
 
                 $new_filename = generate_filename($file_name)['new_filename'];
@@ -654,7 +612,7 @@ class PostApp extends BaseApp
                    'Uploaded on' => date("Y-m-d H:i:s"), 
                    'Dimension' => $width.'x'.$height);
 
-              } else {
+                } else {
 
                   $media_metavalue = array(
                    'Origin' => rename_file($file_name), 
@@ -662,15 +620,15 @@ class PostApp extends BaseApp
                    'File size' => format_size_unit($file_size), 
                    'Uploaded on' => date("Y-m-d H:i:s"));
 
-              }
+                }
 
-              if (is_uploaded_file($file_location)) {
+                if (is_uploaded_file($file_location)) {
 
                  upload_media($file_location, $file_type, $file_size, basename($new_filename));
 
-              }
+                }
 
-              $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
+               $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
 
                $bind_media = [
                   'media_filename' => $new_filename, 
@@ -692,23 +650,24 @@ class PostApp extends BaseApp
                 $medialib->createMediaMeta($mediameta);
 
                 $this->postEvent->setPostImage($append_media);
-                $this->postEvent->setPostId((int)distill_post_request($filters)['post_id']);
-                $this->postEvent->setTopics(distill_post_request($filters)['catID']);
-                $this->postEvent->setPostAuthor($this->postEvent->postAuthorId());
-                $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
-                $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
-                $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
-                $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
-                $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
-                $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
-                $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-                $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
-                 
+               
               }
             
-                $this->postEvent->modifyPost();
+              $this->postEvent->setPostId((int)distill_post_request($filters)['post_id']);
+              $this->postEvent->setTopics(distill_post_request($filters)['catID']);
+              $this->postEvent->setPostAuthor($this->postEvent->postAuthorId());
+              $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
+              $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
+              $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
+              $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
+              $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
+              $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
+              $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
+              $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
+               
+              $this->postEvent->modifyPost();
                 
-                direct_page('index.php?load=posts&status=postUpdated', 200);
+              direct_page('index.php?load=posts&status=postUpdated', 200);
                 
             }
             
@@ -767,7 +726,7 @@ class PostApp extends BaseApp
 /**
  * Set View
  * 
- * @param string $viewName
+ * @param object $viewName
  * 
  */
   protected function setView($viewName)
