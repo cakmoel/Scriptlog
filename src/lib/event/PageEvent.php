@@ -85,6 +85,14 @@ class PageEvent
   private $page_status;
 
   /**
+   * Stick to the top of the blog
+   *
+   * @var string
+   * 
+   */
+  private $page_sticky;
+
+  /**
    * Post type
    * 
    * @var string
@@ -100,10 +108,28 @@ class PageEvent
    */
   private $comment_status;
 
+  /**
+   * PageDao
+   *
+   * @var object
+   * 
+   */
   private $pageDao;
 
+  /**
+   * Validator
+   *
+   * @var object
+   * 
+   */
   private $validator;
 
+  /**
+   * Sanitizer
+   *
+   * @var object
+   * 
+   */
   private $sanitizer;
 
   /**
@@ -221,6 +247,19 @@ class PageEvent
     $this->post_type = $post_type;    
   }
   
+  /**
+   * setSticky
+   * 
+   * stick to the top of the blog
+   *
+   * @param int $page_sticky
+   * 
+   */
+  public function setSticky($page_sticky)
+  {
+    $this->page_sticky = $page_sticky; 
+  }
+
   public function setComment($comment_status)
   {
    $this->comment_status = $comment_status;
@@ -260,6 +299,7 @@ class PageEvent
            'post_summary' => $this->meta_desc,
            'post_keyword' => $this->meta_key,
            'post_status' => $this->page_status,
+           'post_sticky' => $this->page_sticky,
            'post_type' => $this->post_type,
            'comment_status' => $this->comment_status
       ]);
@@ -275,6 +315,7 @@ class PageEvent
           'post_summary' => $this->meta_desc,
           'post_keyword' => $this->meta_key,
           'post_status' => $this->page_status,
+          'post_sticky' => $this->page_sticky,
           'post_type' => $this->post_type,
           'comment_status' => $this->comment_status
       ]);
@@ -307,6 +348,7 @@ class PageEvent
           'post_keyword' => $this->meta_key,
           'post_type' => $this->post_type,
           'post_status' => $this->page_status,
+          'post_sticky' => $this->page_sticky,
           'comment_status' => $this->comment_status
       ], $this->pageId);
       
@@ -322,6 +364,7 @@ class PageEvent
            'post_keyword' => $this->meta_key,
            'post_type' => $this->post_type,
            'post_status' => $this->page_status,
+           'post_sticky' => $this->page_sticky,
            'comment_status' => $this->comment_status
        ], $this->pageId);
        
@@ -365,11 +408,26 @@ class PageEvent
     
   }
   
+  /**
+   * postStatusDropDown()
+   *
+   * select box post status
+   * 
+   * @param string $selected
+   * @return void
+   * 
+   */
   public function postStatusDropDown($selected = "") 
   {
     return $this->pageDao->dropDownPostStatus($selected);
   }
-  
+
+  /**
+   * commentStatusDropDown()
+   *
+   * @param string $selected
+   * 
+   */
   public function commentStatusDropDown($selected = "")
   {
     return $this->pageDao->dropDownCommentStatus($selected);
@@ -378,17 +436,13 @@ class PageEvent
   public function pageAuthorId()
   {
 
-    if(isset($_COOKIE['scriptlog_cookie_id'])) {
-
-      return $_COOKIE['scriptlog_cookie_id'];
-
-    }
-
     if(isset(Session::getInstance()->scriptlog_session_id)) {
 
-       return Session::getInstance()->scriptlog_session_id;
+      return Session::getInstance()->scriptlog_session_id;
 
     }
+
+    return false;
 
   }
   
