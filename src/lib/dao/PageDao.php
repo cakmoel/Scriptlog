@@ -55,8 +55,8 @@ public function findPageById($pageId, $post_type, $sanitize)
 {
     $sql = "SELECT ID, media_id, post_author,
   	  	      post_date, post_modified, post_title,
-  	  	      post_slug, post_content, post_status,
-  	  	      post_type, comment_status
+  	  	      post_slug, post_content, post_summary, post_keyword, 
+			  post_status, post_sticky, post_type, comment_status
   	  	   FROM tbl_posts
   	  	   WHERE ID = ? AND post_type = ? ";
     
@@ -80,7 +80,8 @@ public function findPageById($pageId, $post_type, $sanitize)
 public function findPageBySlug($slug, $sanitize)
 {
 	$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
-    p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_type, p.comment_status,
+    p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_sticky, 
+	p.post_type, p.comment_status,
     m.ID, m.media_filename, m.media_caption, m.media_access, u.ID, u.user_fullname
     FROM tbl_posts AS p
     INNER JOIN tbl_media AS m ON p.media_id = m.ID
@@ -118,7 +119,8 @@ public function createPage($bind)
 		'post_content' => $bind['post_content'],
 		'post_summary' => $bind['post_summary'],
 		'post_keyword' => $bind['post_keyword'], 
- 	    'post_status' => $bind['post_status'],
+		'post_status' => $bind['post_status'],
+		'post_sticky' => $bind['post_sticky'],
  	    'post_type' => $bind['post_type'],
  	    'comment_status' => $bind['comment_status']
  	]);
@@ -132,7 +134,8 @@ public function createPage($bind)
 		'post_content' => $bind['post_content'],
 		'post_summary' => $bind['post_summary'],
 		'post_keyword' => $bind['post_keyword'], 
- 	    'post_status' => $bind['post_status'],
+		'post_status' => $bind['post_status'],
+		'post_sticky' => $bind['post_sticky'], 
  	    'post_type' => $bind['post_type'],
  	    'comment_status' => $bind['comment_status']
  	]);
@@ -161,7 +164,8 @@ public function updatePage($sanitize, $bind, $ID)
 		'post_content' => $bind['post_content'], 
 		'post_summary' => $bind['post_summary'],
 		'post_keyword' => $bind['post_keyword'],
- 	    'post_status' => $bind['post_status'],
+		'post_status' => $bind['post_status'],
+		'post_sticky' => $bind['post_sticky'], 
  	    'comment_status' => $bind['comment_status']
  	    ], "ID = {$cleanId}"." AND `post_type` = {$bind['post_type']}");
  	
@@ -175,7 +179,8 @@ public function updatePage($sanitize, $bind, $ID)
 		'post_content' => $bind['post_content'],
 		'post_summary' => $bind['post_summary'],
 		'post_keyword' => $bind['post_keyword'], 
- 	    'post_status' => $bind['post_status'],
+		'post_status' => $bind['post_status'],
+		'post_sticky' => $bind['post_sticky'], 
  	    'comment_status' => $bind['comment_status']
  	    ], "ID = {$cleanId}"." AND `post_type` = {$bind['post_type']}");
  	
@@ -221,15 +226,16 @@ public function checkPageId($id, $sanitizing)
 public function dropDownPostStatus($selected = "")
 {
      
-    $name = 'post_status';
-    // list position in array
-    $posts_status = array('publish' => 'Publish', 'draft' => 'Draft');
+ $name = 'post_status';
+ // list position in array
+ $posts_status = array('publish' => 'Publish', 'draft' => 'Draft');
     
-    if ($selected != '') {
-        $selected = $selected;
-    }
+ if ($selected != '') {
+	
+	 $selected = $selected;
+ }
     
-    return dropdown($name, $posts_status, $selected);
+ return dropdown($name, $posts_status, $selected);
     
 }
 
