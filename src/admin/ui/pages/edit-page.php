@@ -71,6 +71,12 @@ $page_id = isset($pageData['ID']) ? (int)$pageData['ID'] : 0;
 </textarea>
 </div>
 
+<div class="checkbox">
+<label for="sticky">
+  <input type="checkbox" id="sticky" name="post_sticky" <?=(isset($pageData['post_sticky']) && $pageData['post_sticky'] == 1) ? "checked='checked'" : "";?>> Stick to the top of the blog
+</label>
+</div>
+
 <div class="form-group">
 <label for="summernote">Content (required)</label>
 <textarea class="form-control" id="summernote" name="post_content" rows="10" cols="80" maxlength="50000" required>
