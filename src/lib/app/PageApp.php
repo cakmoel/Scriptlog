@@ -99,6 +99,7 @@ class PageApp extends BaseApp
          'post_summary'=>FILTER_SANITIZE_FULL_SPECIAL_CHARS,
          'post_keyword'=>FILTER_SANITIZE_FULL_SPECIAL_CHARS,
          'post_status'=>FILTER_SANITIZE_STRING,
+         'post_sticky' => FILTER_SANITIZE_NUMBER_INT,
          'comment_status'=>FILTER_SANITIZE_STRING
      ];
 
@@ -189,7 +190,7 @@ class PageApp extends BaseApp
 
               }
 
-              if(false === check_mime_type(mime_type_dictionary(), $file_location)) {
+              if((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
 
                  $checkError = false;
                  array_push($errors, "Invalid file format");
@@ -214,19 +215,7 @@ class PageApp extends BaseApp
               
           } else {
               
-              if(empty($file_location)) {
-
-                $this->pageEvent->setPageAuthor((int)$this->pageEvent->pageAuthorId());
-                $this->pageEvent->setPageTitle(distill_post_request($filters)['post_title']);
-                $this->pageEvent->setPageSlug(distill_post_request($filters)['post_title']);
-                $this->pageEvent->setPageContent(distill_post_request($filters)['post_content']);
-                $this->pageEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
-                $this->pageEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-                $this->pageEvent->setPublish(distill_post_request($filters)['post_status']);
-                $this->pageEvent->setComment(distill_post_request($filters)['comment_status']);
-                $this->pageEvent->setPostType('page');
-
-              } else {
+            if(!empty($file_location)) {
 
                 $new_filename = generate_filename($file_name)['new_filename'];
                 $file_extension = generate_filename($file_name)['file_extension'];
@@ -282,22 +271,24 @@ class PageApp extends BaseApp
                 $medialib->createMediaMeta($mediameta);
 
                 $this->pageEvent->setPageImage($append_media);
-                $this->pageEvent->setPageAuthor((int)$this->pageEvent->pageAuthorId());
-                $this->pageEvent->setPageTitle(distill_post_request($filters)['post_title']);
-                $this->pageEvent->setPageSlug(distill_post_request($filters)['post_title']);
-                $this->pageEvent->setPageContent(distill_post_request($filters)['post_content']);
-                $this->pageEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
-                $this->pageEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-                $this->pageEvent->setPublish(distill_post_request($filters)['post_status']);
-                $this->pageEvent->setComment(distill_post_request($filters)['comment_status']);
-                $this->pageEvent->setPostType('page');
-                
-              }
+
+            } 
+              
+              $this->pageEvent->setPageAuthor((int)$this->pageEvent->pageAuthorId());
+              $this->pageEvent->setPageTitle(distill_post_request($filters)['post_title']);
+              $this->pageEvent->setPageSlug(distill_post_request($filters)['post_title']);
+              $this->pageEvent->setPageContent(distill_post_request($filters)['post_content']);
+              $this->pageEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
+              $this->pageEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
+              $this->pageEvent->setPublish(distill_post_request($filters)['post_status']);
+              $this->pageEvent->setSticky(distill_post_request($filters)['post_sticky']);
+              $this->pageEvent->setComment(distill_post_request($filters)['comment_status']);
+              $this->pageEvent->setPostType('page');
               
               $this->pageEvent->addPage();
               direct_page('index.php?load=pages&status=pageAdded', 200);
 
-          }
+        }
           
       } catch (AppException $e) {
           
@@ -342,7 +333,10 @@ class PageApp extends BaseApp
        'post_title' => $getPage['post_title'],
        'post_content' => $getPage['post_content'],
        'post_summary' => $getPage['post_summary'],
-       'post_keyword' => $getPage['post_keyword']
+       'post_keyword' => $getPage['post_keyword'],
+       'post_status' => $getPage['post_status'],
+       'post_sticky' => $getPage['post_sticky'],
+       'comment_status' => $getPage['comment_status']
    );
    
    if (isset($_POST['pageFormSubmit'])) {
@@ -360,6 +354,7 @@ class PageApp extends BaseApp
         'post_summary'=>FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_keyword'=>FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_status'=>FILTER_SANITIZE_STRING,
+        'post_sticky' => FILTER_SANITIZE_NUMBER_INT,
         'comment_status'=>FILTER_SANITIZE_STRING
       ];
 
@@ -442,7 +437,7 @@ class PageApp extends BaseApp
 
               }
 
-              if(false === check_mime_type(mime_type_dictionary(), $file_location)) {
+              if((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
 
                   $checkError = false;
                   array_push($errors, "Invalid file format");
@@ -467,83 +462,72 @@ class PageApp extends BaseApp
                
            } else {
                
-               if(empty($file_location)) {
+               if(!empty($file_location)) {
 
-                   $this->pageEvent->setPageId((int)distill_post_request($filters)['post_id']);
-                   $this->pageEvent->setPageTitle(distill_post_request($filters)['post_title']);
-                   $this->pageEvent->setPageSlug(distill_post_request($filters)['post_title']);
-                   $this->pageEvent->setPageContent(distill_post_request($filters)['post_content']);
-                   $this->pageEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
-                   $this->pageEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-                   $this->pageEvent->setPublish(distill_post_request($filters)['post_status']);
-                   $this->pageEvent->setPostType('page');
-                   $this->pageEvent->setComment(distill_post_request($filters)['comment_status']);
+                $new_filename = generate_filename($file_name)['new_filename'];
+                $file_extension = generate_filename($file_name)['file_extension'];
 
-               } else {
-                 
-                  $new_filename = generate_filename($file_name)['new_filename'];
-                  $file_extension = generate_filename($file_name)['file_extension'];
+                list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
 
-                  list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
+                if($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
 
-                  if($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
+                     $media_metavalue = array(
+                      'Origin' => rename_file($file_name), 
+                      'File type' => $file_type, 
+                      'File size' => format_size_unit($file_size), 
+                      'Uploaded on' => date("Y-m-d H:i:s"), 
+                      'Dimension' => $width.'x'.$height);
 
-                       $media_metavalue = array(
-                        'Origin' => rename_file($file_name), 
-                        'File type' => $file_type, 
-                        'File size' => format_size_unit($file_size), 
-                        'Uploaded on' => date("Y-m-d H:i:s"), 
-                        'Dimension' => $width.'x'.$height);
+                } else {
 
-                  } else {
+                     $media_metavalue = array(
+                      'Origin' => rename_file($file_name), 
+                      'File type' => $file_type, 
+                      'File size' => format_size_unit($file_size), 
+                      'Uploaded on' => date("Y-m-d H:i:s"));
 
-                       $media_metavalue = array(
-                        'Origin' => rename_file($file_name), 
-                        'File type' => $file_type, 
-                        'File size' => format_size_unit($file_size), 
-                        'Uploaded on' => date("Y-m-d H:i:s"));
+                }
 
-                  }
+                if(is_uploaded_file($file_location)) {
 
-                  if(is_uploaded_file($file_location)) {
+                    upload_media($file_location, $file_type, $file_size, basename($new_filename));
 
-                      upload_media($file_location, $file_type, $file_size, basename($new_filename));
+                }
 
-                  }
+                $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
 
-                  $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
+                $bind_media = [
+                  'media_filename' => $new_filename, 
+                  'media_caption' => prevent_injection(distill_post_request($filters)['post_title']), 
+                  'media_type' => $file_type, 
+                  'media_target' => 'page', 
+                  'media_user' => $this->postEvent->postAuthorId(), 
+                  'media_access' => $media_access, 
+                  'media_status' => '1'];
 
-                  $bind_media = [
-                    'media_filename' => $new_filename, 
-                    'media_caption' => prevent_injection(distill_post_request($filters)['post_title']), 
-                    'media_type' => $file_type, 
-                    'media_target' => 'page', 
-                    'media_user' => $this->postEvent->postAuthorId(), 
-                    'media_access' => $media_access, 
-                    'media_status' => '1'];
+                $append_media = $medialib->createMedia($bind_media);
 
-                  $append_media = $medialib->createMedia($bind_media);
+                $mediameta = [
+                    'media_id' => $append_media,
+                    'meta_key' => $new_filename,
+                    'meta_value' => json_encode($media_metavalue)
+                ];
 
-                  $mediameta = [
-                      'media_id' => $append_media,
-                      'meta_key' => $new_filename,
-                      'meta_value' => json_encode($media_metavalue)
-                  ];
+                $medialib->createMediaMeta($mediameta);
 
-                  $medialib->createMediaMeta($mediameta);
-
-                  $this->pageEvent->setPageImage($append_media);
-                  $this->pageEvent->setPageId((int)distill_post_request($filters)['post_id']);
-                  $this->pageEvent->setPageTitle(distill_post_request($filters)['post_title']);
-                  $this->pageEvent->setPageSlug(distill_post_request($filters)['post_title']);
-                  $this->pageEvent->setPageContent(distill_post_request($filters)['post_content']);
-                  $this->pageEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
-                  $this->pageEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-                  $this->pageEvent->setPublish(distill_post_request($filters)['post_status']);
-                  $this->pageEvent->setPostType('page');
-                  $this->pageEvent->setComment(distill_post_request($filters)['comment_status']);
-
+                $this->pageEvent->setPageImage($append_media);
+                  
                } 
+
+                $this->pageEvent->setPageId((int)distill_post_request($filters)['post_id']);
+                $this->pageEvent->setPageTitle(distill_post_request($filters)['post_title']);
+                $this->pageEvent->setPageSlug(distill_post_request($filters)['post_title']);
+                $this->pageEvent->setPageContent(distill_post_request($filters)['post_content']);
+                $this->pageEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
+                $this->pageEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
+                $this->pageEvent->setPublish(distill_post_request($filters)['post_status']);
+                $this->pageEvent->setPostType('page');
+                $this->pageEvent->setComment(distill_post_request($filters)['comment_status']);
 
                $this->pageEvent->modifyPage();
                direct_page('index.php?load=pages&status=pageUpdated', 200);
