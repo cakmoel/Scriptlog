@@ -79,6 +79,12 @@ $post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
 <p class="help-block">Comma separated</p>
 </div>
 
+<div class="checkbox">
+<label for="sticky">
+  <input type="checkbox" id="sticky" name="post_sticky" <?=(isset($postData['post_sticky']) && $postData['post_sticky'] == 1) ? "checked='checked'" : "";?>> Stick to the top of the blog
+</label>
+</div>
+
 <div class="form-group">
 <label for="summernote">Content (required)</label>
 <textarea class="form-control" id="summernote" name="post_content" rows="10" cols="80" maxlength="50000" required>
