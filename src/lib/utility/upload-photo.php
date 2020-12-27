@@ -48,7 +48,7 @@ $small_size = 320;
 $medium_size = 640;
 $large_size = 770; 
 $temp_src = $file_location;
-$img_ext = pathinfo($file_name, PATHINFO_EXTENSION);
+$img_ext = get_file_extension($file_name);
 $img_name = pathinfo($file_name, PATHINFO_BASENAME);
 $img_type = $file_type;
 $img_source = null;
@@ -123,8 +123,8 @@ if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exi
 
       // creating large size thumbnail
       $large_size_thumb = new Resize($origin_path_uploaded);
-      $large_size_thumb ->resizeImage($large_size, 400, "crop");
-      $large_size_thumb -> saveImage($large_path_uploaded, 80);
+      $large_size_thumb->resizeImage($large_size, 400, "crop");
+      $large_size_thumb->saveImage($large_path_uploaded, 80);
   
     } else {
   
@@ -212,24 +212,29 @@ scriptlog_error("Error creating smaller size of picture", E_USER_WARNING);
  */
 function set_origin_photo( $current_width, $current_height, $file_location, $file_size, $file_path_uploaded) {
 
+$img_uploaded = true;
+
 if($current_width <= 0 || $current_height <= 0) {
 
-  return false;
+  $img_uploaded = false;
 
 }
 
 if( !move_uploaded_file($file_location, $file_path_uploaded) ) {
 
-  return false;
+  $img_uploaded = false;
 
 } 
 
 if( filesize($file_path_uploaded) !== $file_size ) {
 
+    $img_uploaded = false;
+    
     unlink($file_path_uploaded);
-    return false;
 
 }
+
+return $img_uploaded;
 
 }
 
