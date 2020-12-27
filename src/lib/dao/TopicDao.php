@@ -237,7 +237,7 @@ class TopicDao extends Dao
          
             $post_topic = $this->findPostTopic($item['ID'], $postId);
                
-            if ($post_topic['topic_id'] == $item['ID']) {
+            if (isset($post_topic['topic_id']) && $post_topic['topic_id'] == $item['ID']) {
               
               $checked = "checked='checked'";
             
