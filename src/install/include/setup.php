@@ -182,7 +182,7 @@ $permalink_value = "yes";
 
 if ($link instanceof mysqli) 
 #create users table
-$createUser = $link->query($tblUser);
+$link->query($tblUser);
 
 #save administrator
 $createAdmin = $link->prepare($saveAdmin);
@@ -303,7 +303,7 @@ if (isset($_SESSION['install']) && $_SESSION['install'] == true) {
    
    $row = mysqli_fetch_assoc(mysqli_query($link, $getAppKey));
 
-   $app_key = generate_license(substr($row['setting_value'], 0, 5));
+   $app_key = generate_license(substr($row['setting_value'], 0, 6));
 
    $updateAppKey = "UPDATE tbl_settings SET setting_value = '$app_key'
                     WHERE setting_name = 'app_key' 
@@ -427,8 +427,8 @@ function generate_license($suffix = null)
      
   } else {
       
-     $num_segments = 4;
-     $segment_chars = 5;
+     $num_segments = 3;
+     $segment_chars = 6;
     
   }
   
