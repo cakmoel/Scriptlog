@@ -38,7 +38,7 @@ endif;
 ?>
 
 <?php 
-$action = isset($formAction) ? $formAction : nul;
+$action = isset($formAction) ? $formAction : null;
 $page_id = isset($pageData['ID']) ? (int)$pageData['ID'] : 0;
 ?>
 <form method="post" action="<?=generate_request('index.php', 'post', ['pages', $action, $page_id])['link']; ?>" role="form" enctype="multipart/form-data" autocomplete="off">
@@ -73,7 +73,7 @@ $page_id = isset($pageData['ID']) ? (int)$pageData['ID'] : 0;
 
 <div class="checkbox">
 <label for="sticky">
-  <input type="checkbox" id="sticky" name="post_sticky" <?=(isset($pageData['post_sticky']) && $pageData['post_sticky'] == 1) ? "checked='checked'" : "";?>> Stick to the top of the blog
+  <input type="checkbox" id="sticky" name="post_sticky" <?=(isset($pageData['post_sticky']) && $pageData['post_sticky'] == 'Y') ? "checked='checked'" : "";?>> Stick to the top of the blog
 </label>
 </div>
 
