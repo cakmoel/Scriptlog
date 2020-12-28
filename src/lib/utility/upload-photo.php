@@ -78,6 +78,18 @@ switch (strtolower($img_type)) {
     
     break;
 
+  case 'image/webp':
+
+    $img_source = imagecreatefromwebp($file_location);
+
+    break;
+  
+  case 'image/bmp':
+
+    $img_source = imagecreatefrombmp($file_location);
+
+    break;
+
   default:
     
     scriptlog_error("Unsupported File!");
@@ -136,7 +148,7 @@ if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exi
 
 } else {
 
-  if($file_type == "image/jpeg" || $file_type == "image/jpg" || $file_type == "image/png" || $file_type == "image/gif") {
+  if(($file_type == "image/jpeg" || $file_type == "image/jpg" || $file_type == "image/png" || $file_type == "image/gif") ) {
 
     if (false === set_webp_origin($current_width, $current_height, $file_location, $file_size, $origin_path_uploaded, $origin_path, $file_name)) {
 
@@ -212,29 +224,23 @@ scriptlog_error("Error creating smaller size of picture", E_USER_WARNING);
  */
 function set_origin_photo( $current_width, $current_height, $file_location, $file_size, $file_path_uploaded) {
 
-$img_uploaded = true;
-
 if($current_width <= 0 || $current_height <= 0) {
 
-  $img_uploaded = false;
+  return false;
 
 }
 
 if( !move_uploaded_file($file_location, $file_path_uploaded) ) {
 
-  $img_uploaded = false;
+  return false;
 
 } 
 
 if( filesize($file_path_uploaded) !== $file_size ) {
 
-    $img_uploaded = false;
-    
     unlink($file_path_uploaded);
 
 }
-
-return $img_uploaded;
 
 }
 
