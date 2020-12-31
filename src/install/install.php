@@ -15,8 +15,6 @@ require dirname(__FILE__) . '/include/settings.php';
 require dirname(__FILE__) . '/include/setup.php';
 require dirname(__FILE__) . '/install-layout.php';
 
-use Sinergi\BrowserDetector\Browser;
-
 if (!file_exists(__DIR__ . '/../config.php')) {
 
     header("Location: ".$protocol . '://' . $server_host . dirname($_SERVER['PHP_SELF']) . DIRECTORY_SEPARATOR);
@@ -66,7 +64,7 @@ if($setup != 'install') {
 
 } else {
 
-    $username = isset($_POST['user_login']) ? remove_bad_characters($_POST['user_login']) : "";
+    $username = isset($_POST['user_login']) ? remove_bad_characters($_POST['user_login'], $set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name']) : "";
     $password = isset($_POST['user_pass1']) ? $_POST['user_pass1'] : "";
     $confirm = isset($_POST['user_pass2']) ? $_POST['user_pass2'] : "";
     $email = filter_input(INPUT_POST, 'user_email', FILTER_SANITIZE_EMAIL);
