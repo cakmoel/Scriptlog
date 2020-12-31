@@ -11,20 +11,38 @@
  */
 function scriptlog_error($error_message, $error_type = E_USER_NOTICE, $context = 1)
 {
-  
-  $stack = debug_backtrace();
+
+  if (version_compare(phpversion(), "5.6", "==")) {
+
+    $stack = debug_backtrace();
+
+    $frame = [];
 
     for ($i = 0; $i < $context; $i++) {
 
-        if (false === ($frame = next($stack))) break;
-
+      if (false === ($frame = next($stack))) { 
+          
+        if (isset($frame['function']) || isset($frame['file']) || isset($frame['line'])) {
+          
         $error_message .= "<p>";
         $error_message .= " in: " . $frame['function'] . '() function called from: ' . $frame['file'] . ' on line ' . $frame['line'] .' '."\n ";
         $error_message .= '</p>';
+  
+        break;
+
+        }
+
+      }
 
     }
 
     return trigger_error($error_message, $error_type);
+  
+  } else {
+
+     throw new EventException($error_message);
+     
+  }
   
 }
 
