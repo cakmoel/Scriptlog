@@ -50,10 +50,9 @@ $large_size = 770;
 $temp_src = $file_location;
 $img_ext = get_file_extension($file_name);
 $img_name = pathinfo($file_name, PATHINFO_BASENAME);
-$img_type = $file_type;
 $img_source = null;
 
-switch (strtolower($img_type)) {
+switch (strtolower($file_type)) {
 
   case 'image/png':
     
@@ -123,32 +122,30 @@ $large_path_uploaded = $large_path . $large_thumb_name;
 
 if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exists('finfo'))) {
 
-  if (resize_image($current_width, $current_height, $medium_size, $medium_path_uploaded, $img_source, 80, $img_type)) {
+  if (resize_image($current_width, $current_height, $medium_size, $medium_path_uploaded, $img_source, 80, $file_type)) {
 
-    if (!crop_image($current_width, $current_height, $small_size, $small_path_uploaded, $img_source, 80, $img_type)) {
+    if (!crop_image($current_width, $current_height, $small_size, $small_path_uploaded, $img_source, 80, $file_type)) {
 
         scriptlog_error("Error Creating small size of thumbnail!");
 
     }
     
-    if (move_uploaded_file($temp_src, $origin_path_uploaded)) {
+    if (! move_uploaded_file($temp_src, $origin_path_uploaded)) {
 
-      // creating large size thumbnail
-      $large_size_thumb = new Resize($origin_path_uploaded);
-      $large_size_thumb->resizeImage($large_size, 400, "crop");
-      $large_size_thumb->saveImage($large_path_uploaded, 80);
-  
-    } else {
-  
       scriptlog_error("Error uploading picture");
-  
-    }
+      
+    } 
+
+    // creating large size thumbnail
+    $large_size_thumb = new Resize($origin_path_uploaded);
+    $large_size_thumb->resizeImage($large_size, 400, "crop");
+    $large_size_thumb->saveImage($large_path_uploaded, 80);
 
   }
 
 } else {
 
-  if(($file_type == "image/jpeg" || $file_type == "image/jpg" || $file_type == "image/png" || $file_type == "image/gif") ) {
+  if(($img_ext == "jpeg" || $img_ext == "jpg" || $img_ext == "png" || $img_ext == "gif") ) {
 
     if (false === set_webp_origin($current_width, $current_height, $file_location, $file_size, $origin_path_uploaded, $origin_path, $file_name)) {
 
@@ -174,26 +171,28 @@ if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exi
   
     }
   
-  }
-
-// save origin picture
-if (false === set_origin_photo( $current_width, $current_height, $file_location, $file_size, $origin_path_uploaded) ) {
-
-  scriptlog_error("Error uploading picture", E_USER_WARNING);
+  } 
 
 }
 
-// crop to regular size
+ // save origin picture
+ if (false === set_origin_photo( $current_width, $current_height, $file_location, $file_size, $origin_path_uploaded) ) {
+
+  scriptlog_error("Error uploading picture", E_USER_WARNING);
+ 
+ }
+
+ // crop to regular size
 if (false === set_regular_photo($current_width, $current_height, $origin_path_uploaded, $large_path, $file_name, $file_type)) {
 
-  scriptlog_error("Error creating regular size of picture", E_USER_WARNING);
+ scriptlog_error("Error creating regular size of picture", E_USER_WARNING);
 
 }
 
 // crop to medium size
 if( false === set_medium_photo($current_width, $current_height, $origin_path_uploaded, $medium_path, $file_name, $file_type) ) {
 
- scriptlog_error("Error creating medium size of picture", E_USER_WARNING);
+scriptlog_error("Error creating medium size of picture", E_USER_WARNING);
 
 }
 
@@ -201,8 +200,6 @@ if( false === set_medium_photo($current_width, $current_height, $origin_path_upl
 if( false === set_small_photo($current_width, $current_height, $origin_path_uploaded, $small_path, $file_name, $file_type ) ) {
 
 scriptlog_error("Error creating smaller size of picture", E_USER_WARNING);
-
-}
 
 }
 
@@ -230,18 +227,16 @@ if($current_width <= 0 || $current_height <= 0) {
 
 }
 
-if( !move_uploaded_file($file_location, $file_path_uploaded) ) {
+if(move_uploaded_file($file_location, $file_path_uploaded)) {
 
-  return false;
-
-} 
-
-if( filesize($file_path_uploaded) !== $file_size ) {
+  if( filesize($file_path_uploaded) !== $file_size ) {
 
     unlink($file_path_uploaded);
+  
+  } 
 
 }
-
+ 
 }
 
 /**
