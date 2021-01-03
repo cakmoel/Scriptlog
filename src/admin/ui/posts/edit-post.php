@@ -81,7 +81,7 @@ $post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
 
 <div class="checkbox">
 <label for="sticky">
-  <input type="checkbox" id="sticky" name="post_sticky" <?=(isset($postData['post_sticky']) && $postData['post_sticky'] == 'Y') ? "checked='checked'" : "";?>> Stick to the top of the blog
+  <input type="checkbox" id="sticky" name="post_sticky" <?=(isset($postData['post_sticky']) && $postData['post_sticky'] == '1') ? "checked='checked'" : "";?>> Stick to the top of the blog
 </label>
 </div>
 
