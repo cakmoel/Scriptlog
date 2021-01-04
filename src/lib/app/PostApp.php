@@ -132,6 +132,9 @@ class PostApp extends BaseApp
 
        $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 50000];
 
+       $new_filename = generate_filename($file_name)['new_filename'];
+       $file_extension = generate_filename($file_name)['file_extension'];
+       
       try {
 
         if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
@@ -229,15 +232,15 @@ class PostApp extends BaseApp
               array_push($errors, "File name is too long");
            
             }
-   
-            if(false === check_mime_type(mime_type_dictionary(), $file_location)) {
-   
+
+            if((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
+      
               $checkError = false;
               array_push($errors, "Invalid file format");
    
             }
 
-         }
+        }
 
         if (!$checkError) {
             
@@ -276,9 +279,6 @@ class PostApp extends BaseApp
 
             } else {
 
-              $new_filename = generate_filename($file_name)['new_filename'];
-              $file_extension = generate_filename($file_name)['file_extension'];
-       
               list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
        
               if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
@@ -299,15 +299,14 @@ class PostApp extends BaseApp
                          'Uploaded on' => date("Y-m-d H:i:s"));
        
                }
-       
-               // upload image
+
                if (is_uploaded_file($file_location)) {
-       
-                 upload_media($file_location, $file_type, $file_size, basename($new_filename));
-       
+
+                upload_media($file_location, $file_type, $file_size, basename($new_filename));
+      
                }
-       
-               $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
+
+              $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
        
                $bind_media = [
                  'media_filename' => $new_filename, 
@@ -358,11 +357,17 @@ class PostApp extends BaseApp
 
         }
       
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage('admin');
+         
       } catch (AppException $e) {
           
-         LogError::setStatusCode(http_response_code());
-         LogError::newMessage($e);
-         LogError::customErrorMessage('admin');
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($e);
+        LogError::customErrorMessage('admin');
          
       }
     
@@ -453,6 +458,9 @@ class PostApp extends BaseApp
       ];
 
       $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 50000];
+
+      $new_filename = generate_filename($file_name)['new_filename'];
+      $file_extension = generate_filename($file_name)['file_extension'];
 
       try {
 
@@ -552,13 +560,21 @@ class PostApp extends BaseApp
         
                 }
 
-                if ((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
-           
-                   $checkError = false;
-                   array_push($errors, "Invalid file format");
-                  
-                }
+                if (is_uploaded_file($file_location)) {
 
+                  if ((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
+           
+                    $checkError = false;
+                    array_push($errors, "Invalid file format");
+                   
+                  } else {
+  
+                    upload_media($file_location, $file_type, $file_size, basename($new_filename));
+
+                  }
+
+                }
+                
             }
 
             if (!$checkError) {
@@ -598,9 +614,6 @@ class PostApp extends BaseApp
 
               } else {
 
-                $new_filename = generate_filename($file_name)['new_filename'];
-                $file_extension = generate_filename($file_name)['file_extension'];
-
                 list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
 
                 if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
@@ -619,12 +632,6 @@ class PostApp extends BaseApp
                    'File type' => $file_type, 
                    'File size' => format_size_unit($file_size), 
                    'Uploaded on' => date("Y-m-d H:i:s"));
-
-                }
-
-                if (is_uploaded_file($file_location)) {
-
-                 upload_media($file_location, $file_type, $file_size, basename($new_filename));
 
                 }
 
@@ -671,6 +678,12 @@ class PostApp extends BaseApp
                 
             }
             
+        } catch (Throwable $th) {
+
+            LogError::setStatusCode(http_response_code());
+            LogError::newMessage($th);
+            LogError::customErrorMessage('admin');
+
         } catch (AppException $e) {
    
             LogError::setStatusCode(http_response_code());
@@ -718,9 +731,64 @@ class PostApp extends BaseApp
    */
   public function remove($id)
   {
-    $this->postEvent->setPostId($id);
-    $this->postEvent->removePost();  
-    direct_page('index.php?load=posts&status=postDeleted', 200);
+    $checkError = true;
+    $errors = array();
+
+    if (isset($_GET['Id'])) {
+
+      $getPost = $this->postEvent->grabPost($id);
+
+      try {
+        
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+      
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+
+        if (!$getPost) {
+
+           $checkError = false;
+           array_push($errors, "Post not found!");
+
+        }
+
+        if (!$checkError) {
+
+            direct_page('index.php?load=posts&error=postNotFound', 404);
+
+        } else {
+
+          $this->postEvent->setPostId($id);
+          $this->postEvent->removePost();  
+          direct_page('index.php?load=posts&status=postDeleted', 200);
+           
+        }
+      
+      } catch (Throwable $th) {
+        
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage('admin');
+
+      } catch (AppException $e) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($e);
+        LogError::customErrorMessage('admin');
+
+      }
+
+    }
+    
   }
     
 /**
