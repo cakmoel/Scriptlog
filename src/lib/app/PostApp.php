@@ -763,7 +763,24 @@ class PostApp extends BaseApp
 
         if (!$checkError) {
 
-            direct_page('index.php?load=posts&error=postNotFound', 404);
+          $this->setView('all-posts');
+          $this->setPageTitle('Post not found');
+          $this->view->set('pageTitle', $this->getPageTitle());
+          $this->view->set('errors', $errors);
+
+          if ($this->postEvent->postAuthorLevel() == 'administrator') {
+
+            $this->view->set('postsTotal', $this->postEvent->totalPosts());
+            $this->view->set('posts', $this->postEvent->grabPosts());
+      
+          } else {
+      
+            $this->view->set('postsTotal', $this->postEvent->totalPosts([$this->postEvent->postAuthorId()]));
+            $this->view->set('posts', $this->postEvent->grabPosts('ID', $this->postEvent->postAuthorId()));
+            
+          }
+
+          return $this->view->render();
 
         } else {
 
