@@ -278,6 +278,12 @@ class UserApp extends BaseApp
                 
             }
             
+        } catch (Throwable $th) {
+
+            LogError::setStatusCode(http_response_code());
+            LogError::newMessage($th);
+            LogError::customErrorMessage('admin');
+
         } catch (AppException $e) {
             
             LogError::setStatusCode(http_response_code());
@@ -722,6 +728,7 @@ class UserApp extends BaseApp
   {
 
     $checkError = true;
+    $errors = array();
 
     if (isset($_GET['Id'])) {
 
@@ -731,14 +738,14 @@ class UserApp extends BaseApp
         
         if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
 
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
             throw new AppException("Sorry, unpleasant attempt detected!");
 
         }
-
+        
         if (!filter_var($id, FILTER_VALIDATE_INT)) {
 
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
             throw new AppException("Sorry, unpleasant attempt detected!");
 
         }
@@ -746,12 +753,19 @@ class UserApp extends BaseApp
         if (($getUser['ID'] == 1) && ($getUser['user_level'] == 'administrator')) {
 
             $checkError = false;
+            array_push($errors, "Error: administrator could not be deleted");
            
         } 
 
         if (!$checkError) {
 
-            direct_page('index.php?load=users&error=adminDeletedNotified', 307);
+            $this->setView('all-users');
+            $this->setPageTitle('User Not Found');
+            $this->view->set('pageTitle', $this->getPageTitle());
+            $this->view->set('errors', $errors);
+            $this->view->set('usersTotal', $this->userEvent->totalUsers());
+            $this->view->set('users', $this->userEvent->grabUsers());
+            return $this->view->render();
 
         } else {
 
@@ -760,6 +774,12 @@ class UserApp extends BaseApp
            direct_page('index.php?load=users&status=userDeleted', 200);
 
         }
+
+     } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage('admin');
 
      } catch (AppException $e) {
         
