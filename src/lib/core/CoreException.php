@@ -1,42 +1,38 @@
 <?php
 /**
- * CoreException Class extends Exception implements IException
+ * CoreException Class extends Exception implements ICoreThrowable
  *
  * @category  Core Class
  * @link      https://secure.php.net/manual/en/language.exceptions.php#91159
+ * @see       https://www.php.net/manual/en/language.exceptions.extending.php
  * @version   1.0
  * @since     Since Release 1.0
  *
  */
-abstract class CoreException extends Exception implements IException
+class CoreException extends Exception implements ICoreThrowable
 {
   
-  protected $message = 'Unknown Exception';
+  
+protected $message = 'Unknown Exception';
 
-  protected $code = 0;
+public function __construct($message = null, $code = 0, Exception $previous = null)
+{
 
-  protected $file;
+  $code = $this->getCode();
 
-  protected $line; 
-
-  private $string;
-
-  private $trace;
-
-  public function __construct($message = null, $code = 0)
-  {
-    if (!$message) {
-      throw new $this('Unknown'.get_class($this));
-    }
-
-    parent::__construct($message, $code);
-
+  if (!$message) {
+    throw new $this('Unknown'.get_class($this));
+    
   }
 
-  public function __toString()
-  {
-    return get_class($this) . "'{$this->message}' in {$this->file}({$this->line})\n"
+  parent::__construct($message, $code, $previous);
+
+}
+
+public function __toString()
+{
+  return get_class($this) . "'{$this->message}' in {$this->getFile()}({$this->getLine()})\n"
                             . "{$this->getTraceAsString()}";
-  }
+}
   
 }
