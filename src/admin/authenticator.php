@@ -1,6 +1,6 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
 /**
- * File authorizer.php
+ * File authenticator.php
  * checking whether session or cookies exists
  * 
  * @category checking whether cookies or session exists or not
@@ -44,7 +44,6 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
 
     $expected_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
     $correct_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
-
     $expected_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
     $correct_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
 
