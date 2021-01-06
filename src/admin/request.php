@@ -9,10 +9,10 @@ try {
    if ((isset($_GET['load'])) || (array_key_exists('load', $_GET))) {
      
         $load = is_array($_GET['load']) ? implode($_GET['load']) : $_GET['load'];
-        $load = filter_var($load, FILTER_SANITIZE_URL);
+        $load = filter_var($load, FILTER_VALIDATE_URL, ['flags' => FILTER_FLAG_QUERY_REQUIRED]);
         $load = filter_input(INPUT_GET, 'load', FILTER_SANITIZE_STRING);
         $load = str_replace(chr(0), '', $load);
-        $load = htmlspecialchars(strtolower(basename($load)), ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');
+        $load = htmlspecialchars(strtolower($load), ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');
        
         // checking if the string contains parent directory
         if (strpos($load, '..')) {
@@ -45,7 +45,7 @@ try {
 
         } else {
 
-            if (false === $authenticator -> userAccessControl()) {
+            if (false === $authenticator->userAccessControl()) {
 
                 http_response_code(403);
                 throw new AppException("403 - Forbidden");
@@ -98,6 +98,12 @@ try {
         }
         
     }
+    
+} catch (Throwable $th) {
+
+    LogError::setStatusCode(http_response_code());
+    LogError::newMessage($th);
+    LogError::customErrorMessage('admin');
     
 } catch (AppException $e) {
 
