@@ -5,6 +5,8 @@ $menuId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $menuDao = new MenuDao();
 $menuEvent = new MenuEvent($menuDao, $validator, $sanitizer);
 $menuApp = new MenuApp($menuEvent);
+
+try {
     
     switch ($action) {
     
@@ -110,3 +112,18 @@ $menuApp = new MenuApp($menuEvent);
             break;
             
     }
+    
+} catch (Throwable $th) {
+
+    LogError::setStatusCode(http_response_code());
+    LogError::newMessage($th);
+    LogError::customErrorMessage('admin');
+
+} catch (AppException $e) {
+
+    LogError::setStatusCode(http_response_code());
+    LogError::newMessage($e);
+    LogError::customErrorMessage('admin');
+    
+}
+    
