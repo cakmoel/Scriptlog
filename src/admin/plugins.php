@@ -6,120 +6,137 @@ $pluginDao = new PluginDao();
 $pluginEvent = new PluginEvent($pluginDao, $validator, $sanitizer);
 $pluginApp = new PluginApp($pluginEvent);
 
-switch ($action) {
+try {
+    
+    switch ($action) {
 
-    case ActionConst::INSTALLPLUGIN:
-        
-        if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
-
-            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-        } else {
-
-            if ((!check_integer($pluginId)) && (gettype($pluginId))) {
-
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-                throw new AppException("Invalid ID data type!");
-
-            }
-            if ($pluginId == 0) {
-
-                $pluginApp->installPlugin();
-
+        case ActionConst::INSTALLPLUGIN:
+            
+            if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
+    
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
             } else {
-
-                direct_page('index.php?load=dashboard', 302);
+    
+                if ((!check_integer($pluginId)) && (gettype($pluginId))) {
+    
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                    throw new AppException("Invalid ID data type!");
+    
+                }
+                if ($pluginId == 0) {
+    
+                    $pluginApp->installPlugin();
+    
+                } else {
+    
+                    direct_page('index.php?load=dashboard', 302);
+                    
+                }
+    
+            }
+    
+            break;
+        
+        case ActionConst::ACTIVATEPLUGIN:
+    
+            if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
+    
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
+            } else {
+    
+                if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
+                   
+                    $pluginApp->enablePlugin((int)$pluginId);
+    
+                } else {
+    
+                    direct_page('index.php?load=plugins&error=pluginNotFound', 404);
+    
+                }
+    
+            }
+           
+            break;
+    
+        case ActionConst::DEACTIVATEPLUGIN:
+            
+            if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
+    
+                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
+            } else {
+    
+                if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
+    
+                    $pluginApp->disablePlugin((int)$pluginId);
+    
+                } else {
+    
+                    direct_page('index.php?load=plugins&error=pluginNotFound', 404);
+    
+                }
                 
             }
-
-        }
-
-        break;
-    
-    case ActionConst::ACTIVATEPLUGIN:
-
-        if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
-
-            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-        } else {
-
-            if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
-               
-                $pluginApp->enablePlugin((int)$pluginId);
-
-            } else {
-
-                direct_page('index.php?load=plugins&error=pluginNotFound', 404);
-
-            }
-
-        }
-       
-        break;
-
-    case ActionConst::DEACTIVATEPLUGIN:
         
-        if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
-
-             direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-        } else {
-
-            if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
-
-                $pluginApp->disablePlugin((int)$pluginId);
-
+            break;
+    
+        case ActionConst::DELETEPLUGIN:
+            
+            if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
+    
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
             } else {
-
-                direct_page('index.php?load=plugins&error=pluginNotFound', 404);
-
+    
+                if ((!check_integer($pluginId)) && (gettype($pluginId) !== "integer")) {
+    
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                    throw new AppException("Invalid ID data type!");
+        
+                }
+    
+                if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
+    
+                    $pluginApp->remove((int)$pluginId);
+    
+                } else {
+    
+                    direct_page('index.php?load-plugin&error=pluginNotFound', 404);
+    
+                }
             }
             
-        }
+           break;
     
-        break;
-
-    case ActionConst::DELETEPLUGIN:
-        
-        if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
-
-            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-
-        } else {
-
-            if ((!check_integer($pluginId)) && (gettype($pluginId) !== "integer")) {
-
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-                throw new AppException("Invalid ID data type!");
+        default:
+            
+            if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
     
-            }
-
-            if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
-
-                $pluginApp->remove((int)$pluginId);
-
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
             } else {
-
-                direct_page('index.php?load-plugin&error=pluginNotFound', 404);
-
+    
+                $pluginApp->listItems();
+    
             }
-        }
-        
-       break;
+            
+            break;
+    
+    }
 
-    default:
-        
-        if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
 
-            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+} catch (Throwable $th) {
+    
+    LogError::setStatusCode(http_response_code());
+    LogError::newMessage($th);
+    LogError::customErrorMessage('admin');
 
-        } else {
+} catch (AppException $e) {
 
-            $pluginApp->listItems();
-
-        }
-        
-        break;
+    LogError::setStatusCode(http_response_code());
+    LogError::newMessage($e);
+    LogError::customErrorMessage('admin');
 
 }
