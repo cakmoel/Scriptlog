@@ -114,6 +114,12 @@ try {
             
     }
 
+} catch (Throwable $th) {
+
+    LogError::setStatusCode(http_response_code());
+    LogError::newMessage($th);
+    LogError::customErrorMessage('admin');
+
 } catch (AppException $e) {
 
     LogError::setStatusCode(http_response_code());
