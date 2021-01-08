@@ -105,6 +105,9 @@ class PageApp extends BaseApp
 
      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 50000];
 
+     $new_filename = generate_filename($file_name)['new_filename'];
+     $file_extension = generate_filename($file_name)['file_extension'];
+
       try {
           
           if(!csrf_check_token('csrfToken', $_POST, 60*10)) {
@@ -190,13 +193,21 @@ class PageApp extends BaseApp
 
               }
 
-              if((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
+              if (is_uploaded_file($file_location)) {
+                  
+                if((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
 
-                 $checkError = false;
-                 array_push($errors, "Invalid file format");
+                    $checkError = false;
+                    array_push($errors, "Invalid file format");
+   
+                } else {
+
+                    upload_media($file_location, $file_type, $file_size, basename($new_filename));
+
+                }
 
               }
-
+             
           }
           
           if (!$checkError) {
@@ -217,8 +228,6 @@ class PageApp extends BaseApp
               
             if(!empty($file_location)) {
 
-                $new_filename = generate_filename($file_name)['new_filename'];
-                $file_extension = generate_filename($file_name)['file_extension'];
                 list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
 
                 if( $file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp" ) {
@@ -239,13 +248,6 @@ class PageApp extends BaseApp
                         'File type' => $file_type,
                         'File size' => format_size_unit($file_size),
                         'Uploaded on' => date("Y-m-d H:i:s"));
-
-                }
-
-                // upload image
-                if( is_uploaded_file($file_location)) {
-
-                     upload_media($file_location, $file_type, $file_size, basename($new_filename));
 
                 }
 
@@ -290,11 +292,17 @@ class PageApp extends BaseApp
 
         }
           
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage('admin');
+        
       } catch (AppException $e) {
           
-          LogError::setStatusCode(http_response_code());
-          LogError::newMessage($e);
-          LogError::customErrorMessage('admin');
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($e);
+        LogError::customErrorMessage('admin');
           
       }
       
@@ -360,7 +368,10 @@ class PageApp extends BaseApp
 
       $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 50000];
 
-       try {
+      $new_filename = generate_filename($file_name)['new_filename'];
+      $file_extension = generate_filename($file_name)['file_extension'];
+       
+      try {
            
            if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                
@@ -437,13 +448,21 @@ class PageApp extends BaseApp
 
               }
 
-              if((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
+              if (is_uploaded_file($file_location)) {
 
-                  $checkError = false;
-                  array_push($errors, "Invalid file format");
+                if((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
+
+                    $checkError = false;
+                    array_push($errors, "Invalid file format");
+  
+                } else {
+
+                    upload_media($file_location, $file_type, $file_size, basename($new_filename));
+
+                }
 
               }
-
+            
            }
 
            if (!$checkError) {
@@ -464,9 +483,6 @@ class PageApp extends BaseApp
                
                if(!empty($file_location)) {
 
-                $new_filename = generate_filename($file_name)['new_filename'];
-                $file_extension = generate_filename($file_name)['file_extension'];
-
                 list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
 
                 if($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
@@ -485,12 +501,6 @@ class PageApp extends BaseApp
                       'File type' => $file_type, 
                       'File size' => format_size_unit($file_size), 
                       'Uploaded on' => date("Y-m-d H:i:s"));
-
-                }
-
-                if(is_uploaded_file($file_location)) {
-
-                    upload_media($file_location, $file_type, $file_size, basename($new_filename));
 
                 }
 
@@ -534,11 +544,17 @@ class PageApp extends BaseApp
                
            }
            
+       } catch (Throwable $th) {
+
+         LogError::setStatusCode(http_response_code());
+         LogError::newMessage($th);
+         LogError::customErrorMessage('admin');
+
        } catch (AppException $e) {
            
-           LogError::setStatusCode(http_response_code());
-           LogError::newMessage($e);
-           LogError::customErrorMessage('admin');
+         LogError::setStatusCode(http_response_code());
+         LogError::newMessage($e);
+         LogError::customErrorMessage('admin');
            
        }
        
@@ -563,9 +579,71 @@ class PageApp extends BaseApp
  
  public function remove($id)
  {
-   $this->pageEvent->setPageId($id);
-   $this->pageEvent->removePage();
-   direct_page('index.php?load=pages&status=pageDeleted', 200);
+
+   $checkError = true;
+   $errors = array();
+
+   if (isset($_GET['Id'])) {
+
+     $getPage = $this->pageEvent->grabPage($id, 'page');
+
+     try {
+
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+            throw new AppException("Sorry, unpleasant attempt detected!");
+  
+        }
+        
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+  
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+            throw new AppException("Sorry, unpleasant attempt detected!");
+  
+        }
+        
+        if (!$getPage) {
+
+            $checkError = false;
+            array_push($errors, 'Error: Page not found');
+
+        }
+
+        if (!$checkError) {
+
+            $this->setView('all-pages');
+            $this->setPageTitle('Page not found');
+            $this->view->set('pageTitle', $this->getPageTitle());
+            $this->view->set('errors', $errors);
+            $this->view->set('pagesTotal', $this->pageEvent->totalPages());
+            $this->view->set('pages', $this->pageEvent->grabPages('page'));
+            return $this->view->render();
+
+        } else {
+
+          $this->pageEvent->setPageId($id);
+          $this->pageEvent->removePage();
+          direct_page('index.php?load=pages&status=pageDeleted', 200);
+
+        }
+
+     } catch (Throwable $th) {
+         
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage('admin');
+
+     } catch (AppException $e) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($e);
+        LogError::customErrorMessage('admin');
+
+     }
+
+   }
+
  }
  
  protected function setView($viewName)
