@@ -104,11 +104,17 @@ class TopicApp extends BaseApp
              
           }
           
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage('admin');
+
       } catch (AppException $e) {
          
-          LogError::setStatusCode(http_response_code());
-          LogError::newMessage($e);
-          LogError::customErrorMessage('admin');
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($e);
+        LogError::customErrorMessage('admin');
 
       }
       
@@ -195,11 +201,17 @@ class TopicApp extends BaseApp
                 
             }
             
+        } catch (Throwable $th) {
+
+          LogError::setStatusCode(http_response_code());
+          LogError::newMessage($th);
+          LogError::customErrorMessage('admin');
+          
         } catch (AppException $e) {
             
-            LogError::setStatusCode(http_response_code());
-            LogError::newMessage($e);
-            LogError::customErrorMessage('admin');
+          LogError::setStatusCode(http_response_code());
+          LogError::newMessage($e);
+          LogError::customErrorMessage('admin');
             
         }
         
@@ -221,9 +233,71 @@ class TopicApp extends BaseApp
   
   public function remove($id)
   {
-    $this->topicEvent->setTopicId($id);
-    $this->topicEvent->removeTopic();
-    direct_page('index.php?load=topics&status=topicDeleted', 200);
+
+    $checkError = true;
+    $errors = array();
+
+    if (isset($_GET['Id'])) {
+
+      $getTopic = $this->topicEvent->grabTopic($id);
+
+      try {
+        
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+      
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+
+        if (!$getTopic) {
+
+            $checkError = false;
+            array_push($errors, 'Error: Topic not found');
+
+        }
+
+        if (!$checkError) {
+
+          $this->setView('all-topics');
+          $this->setPageTitle('Topic not found');
+          $this->view->set('pageTitle', $this->getPageTitle());
+          $this->view->set('errors', $errors);
+          $this->view->set('topicsTotal', $this->topicEvent->totalTopics());
+          $this->view->set('topics', $this->topicEvent->grabTopics());
+          return $this->view->render();
+
+        } else {
+
+          $this->topicEvent->setTopicId($id);
+          $this->topicEvent->removeTopic();
+          direct_page('index.php?load=topics&status=topicDeleted', 200);
+
+        }
+
+      } catch (Throwable $th) {
+        
+         LogError::setStatusCode(http_response_code());
+         LogError::newMessage($th);
+         LogError::customErrorMessage('admin');
+
+      } catch (AppException $e) {
+
+         LogError::setStatusCode(http_response_code());
+         LogError::newMessage($e);
+         LogError::customErrorMessage('admin');
+
+      }
+
+    }
+
   }
   
   protected function setView($viewName)
