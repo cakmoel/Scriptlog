@@ -495,6 +495,12 @@ class UserApp extends BaseApp
                       
           }
           
+      } catch (Throwable $th) {
+
+          LogError::setStatusCode(http_response_code());
+          LogError::newMessage($th);
+          LogError::customErrorMessage('admin');
+
       } catch (AppException $e) {
           
           LogError::setStatusCode(http_response_code());
@@ -693,6 +699,12 @@ class UserApp extends BaseApp
                 direct_page('index.php?load=users&status=userUpdated', 200);
 
             }
+            
+        } catch (Throwable $th) {
+
+            LogError::setStatusCode(http_response_code());
+            LogError::newMessage($th);
+            LogError::customErrorMessage('admin');
             
         } catch (AppException $e) {
             
