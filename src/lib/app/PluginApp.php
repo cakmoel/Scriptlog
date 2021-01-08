@@ -12,8 +12,20 @@
 class PluginApp extends BaseApp
 {
 
+/**
+ * view
+ *
+ * @var object
+ * 
+ */
   private $view;
 
+/**
+ * pluginEvent
+ *
+ * @var object
+ * 
+ */
   private $pluginEvent;
 
   public function __construct(PluginEvent $pluginEvent)
@@ -226,6 +238,12 @@ class PluginApp extends BaseApp
           
         }
 
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage('admin');
+
       } catch(AppException $e) {
 
         LogError::setStatusCode(http_response_code());
@@ -256,28 +274,212 @@ class PluginApp extends BaseApp
 
   public function enablePlugin($id)
   {
-    $this->pluginEvent->setPluginId($id);
+
+    $checkError = true;
+    $errors = array();
+
+    if (isset($_GET['Id'])) {
+
+       $getPlugin = $this->pluginEvent->grabPlugin($id);
+
+       try {
+         
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+      
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+
+        if (!$getPlugin) {
+
+          $checkError =false;
+          array_push($errors, 'Error: Plugin not found');
+
+        }
+
+        if (!$checkError) {
+
+           $this->setView('all-plugins');
+           $this->setPageTitle('Plugin not found');
+           $this->view->set('pageTitle', $this->getPageTitle());
+           $this->view->set('errors', $errors);
+           $this->view->set('pluginsTotal', $this->pluginEvent->totalPlugins());
+           $this->view->set('plugins', $this->pluginEvent->grabPlugins());
+           return $this->view->render();
+
+        } else {
+
+          $this->pluginEvent->setPluginId($id);
     
-    if ( $this->pluginEvent->activateInstalledPlugin() === true ) {
+          if ( $this->pluginEvent->activateInstalledPlugin() === true ) {
 
-      direct_page('index.php?load=plugins&status=pluginActivated', 200);
+          direct_page('index.php?load=plugins&status=pluginActivated', 200);
 
+          }
+
+        }
+
+       } catch (Throwable $th) {
+
+         LogError::setStatusCode(http_response_code());
+         LogError::newMessage($th);
+         LogError::customErrorMessage('admin');
+
+       } catch (AppException $e) {
+
+         LogError::setStatusCode(http_response_code());
+         LogError::newMessage($e);
+         LogError::customErrorMessage('admin');
+
+       }
     }
     
   }
 
   public function disablePlugin($id)
   {
-   $this->pluginEvent->setPluginId($id);
-   $this->pluginEvent->deactivateInstalledPlugin();
-   direct_page('index.php?load=plugins&status=pluginDeactivated', 200);
+
+    $checkError = true;
+    $errors = array();
+
+    if (isset($_GET['Id'])) {
+
+      $getPlugin = $this->pluginEvent->grabPlugin($id); 
+
+      try {
+      
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+      
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+
+        if (!$getPlugin) {
+
+           $checkError = false;
+           array_push($errors, 'Error: Plugin not found');
+
+        }
+
+        if (!$checkError) {
+
+           $this->setView('all-plugins');
+           $this->setPageTitle('Plugin not found');
+           $this->view->set('pageTitle', $this->getPageTitle());
+           $this->view->set('errors', $errors);
+           $this->view->set('pluginsTotal', $this->pluginEvent->totalPlugins());
+           $this->view->set('plugins', $this->pluginEvent->grabPlugins());
+           return $this->view->render();
+
+        } else {
+
+          $this->pluginEvent->setPluginId($id);
+          $this->pluginEvent->deactivateInstalledPlugin();
+          direct_page('index.php?load=plugins&status=pluginDeactivated', 200);
+
+        }
+        
+        
+       } catch (Throwable $th) {
+
+         LogError::setStatusCode(http_response_code());
+         LogError::newMessage($th);
+         LogError::customErrorMessage();
+
+       } catch (AppException $e) {
+
+         LogError::setStatusCode(http_response_code());
+         LogError::newMessage($e);
+         LogError::customErrorMessage();
+         
+       }
+
+    }
+   
   }
 
   public function remove($id)
   {
-    $this->pluginEvent->setPluginId($id);
-    $this->pluginEvent->removePlugin();
-    direct_page('index.php?load=plugins&status=pluginDeleted', 200);
+
+    $checkError = true;
+    $errors = array();
+
+    if (isset($_GET['Id'])) {
+
+      $getPlugin = $this->pluginEvent->grabPlugin($id);
+
+       try {
+      
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+      
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+        
+        if (!$getPlugin) {
+
+          $checkError = false;
+          array_push($errors, 'Error: Plugin not found');
+
+        }
+
+        if (!$checkError) {
+
+          $this->setView('all-plugins');
+          $this->setPageTitle('Plugin not found');
+          $this->view->set('pageTitle', $this->getPageTitle());
+          $this->view->set('errors', $errors);
+          $this->view->set('pluginsTotal', $this->pluginEvent->totalPlugins());
+          $this->view->set('plugins', $this->pluginEvent->grabPlugins());
+          return $this->view->render();
+ 
+        } else {
+
+          $this->pluginEvent->setPluginId($id);
+          $this->pluginEvent->removePlugin();
+          direct_page('index.php?load=plugins&status=pluginDeleted', 200);
+
+        }
+
+       } catch (Throwable $th) {
+         
+         LogError::setStatusCode(http_response_code());
+         LogError::newMessage($th);
+         LogError::customErrorMessage('admin');
+
+       } catch (AppException $e) {
+
+         LogError::setStatusCode(http_response_code());
+         LogError::newMessage($e);
+         LogError::customErrorMessage('admin');
+
+       }
+    }
+    
   }
 
   protected function setView($viewName)
