@@ -112,6 +112,12 @@ class ThemeApp extends BaseApp
 
         }
 
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage('admin');
+
       } catch (AppException $e) {
 
         LogError::setStatusCode(http_response_code());
@@ -279,6 +285,12 @@ class ThemeApp extends BaseApp
               
         }
 
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage('admin');
+
       } catch (AppException $e) {
 
         LogError::setStatusCode(http_response_code());
@@ -362,6 +374,12 @@ class ThemeApp extends BaseApp
 
         }
 
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage('admin');
+
       } catch (AppException $e) {
         
         LogError::setStatusCode(http_response_code());
@@ -388,16 +406,140 @@ class ThemeApp extends BaseApp
 
   public function remove($id)
   {
-    $this->themeEvent->setThemeId($id);
-    $this->themeEvent->removeTheme();
-    direct_page('index.php?load=templates&status=themeDeleted', 200);
+
+    $checkError = true;
+    $errors = array();
+
+    if (isset($_GET['Id'])) {
+
+       $getTheme = $this->themeEvent->grabTheme($id);
+
+      try {
+        
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+      
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+
+        if (!$getTheme) {
+
+          $checkError = false;
+          array_push($errors, 'Error: Theme not found');
+
+        }
+
+        if (!$checkError) {
+
+          $this->setView('all-templates');
+          $this->setPageTitle('Theme not found');
+          $this->view->set('pageTitle', $this->getPageTitle());
+          $this->view->set('errors', $errors);
+          $this->view->set('themesTotal', $this->themeEvent->totalThemes());
+          $this->view->set('themes', $this->themeEvent->grabThemes());
+          return $this->view->render();
+
+        } else {
+
+          $this->themeEvent->setThemeId($id);
+          $this->themeEvent->removeTheme();
+          direct_page('index.php?load=templates&status=themeDeleted', 200);
+
+        }
+
+      } catch (Throwable $th) {
+        
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage('admin');
+        
+      } catch (AppException $e) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($e);
+        LogError::customErrorMessage('admin');
+
+      }
+
+    }
+    
   }
 
   public function enableTheme($id)
   {
-    $this->themeEvent->setThemeId($id);
-    $this->themeEvent->activateInstalledTheme();
-    direct_page('index.php?load=templates&status=themeActived', 200);
+
+    $checkError = true;
+    $errors = array();
+
+    if (isset($_GET['Id'])) {
+
+      $getTheme = $this->themeEvent->grabTheme($id);
+
+      try {
+        
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+      
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+
+        if (!$getTheme) {
+
+           $checkError = false;
+           array_push($errors, 'Error: Theme not found');
+
+        }
+
+        if (!$checkError) {
+
+          $this->setView('all-templates');
+          $this->setPageTitle('Theme not found');
+          $this->view->set('pageTitle', $this->getPageTitle());
+          $this->view->set('errors', $errors);
+          $this->view->set('themesTotal', $this->themeEvent->totalThemes());
+          $this->view->set('themes', $this->themeEvent->grabThemes());
+          return $this->view->render();
+           
+        } else {
+
+          $this->themeEvent->setThemeId($id);
+          $this->themeEvent->activateInstalledTheme();
+          direct_page('index.php?load=templates&status=themeActived', 200);
+
+        }
+
+      } catch (Throwable $th) {
+      
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage('admin');
+
+      } catch (AppException $e) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($e);
+        LogError::customErrorMessage('admin');
+
+      }
+
+    }
+   
   }
 
   protected function setView($viewName)
