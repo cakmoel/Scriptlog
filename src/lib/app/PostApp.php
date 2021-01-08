@@ -757,7 +757,7 @@ class PostApp extends BaseApp
         if (!$getPost) {
 
            $checkError = false;
-           array_push($errors, "Post not found!");
+           array_push($errors, "Error: Post not found!");
 
         }
 
