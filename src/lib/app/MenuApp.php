@@ -12,8 +12,20 @@
 class MenuApp extends BaseApp
 {
   
+/**
+ * view
+ *
+ * @var object
+ * 
+ */
   private $view;
 
+/**
+ * menuEvent
+ *
+ * @var object
+ * 
+ */
   private $menuEvent;
 
   public function __construct(MenuEvent $menuEvent)
@@ -116,6 +128,12 @@ class MenuApp extends BaseApp
 
         }
 
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage('admin');
+
       } catch (AppException $e) {
 
         LogError::setStatusCode(http_response_code());
@@ -210,6 +228,12 @@ class MenuApp extends BaseApp
 
         }
 
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage('admin');
+
       } catch (AppException $e) {
 
         LogError::setStatusCode(http_response_code());
@@ -237,9 +261,70 @@ class MenuApp extends BaseApp
   
   public function remove($id)
   {
-    $this->menuEvent->setMenuId($id);
-    $this->menuEvent->removeMenu();
-    direct_page('index.php?load=menu&status=menuDeleted', 200);
+
+    $checkError = true;
+    $errors = array();
+
+    if (isset($_GET['Id'])) {
+
+       $getMenu = $this->menuEvent->grabMenu($id);
+
+      try {
+        
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+      
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+
+        if (!$getMenu) {
+
+           $checkError = false;
+           array_push($errors, 'Error: Menu not found');
+
+        }
+
+        if (!$checkError) {
+
+          $this->setView('all-menus');
+          $this->setPageTitle('Menu not found');
+          $this->view->set('pageTitle', $this->getPageTitle());
+          $this->view->set('errors', $errors);
+          $this->view->set('menusTotal', $this->menuEvent->totalMenus());
+          $this->view->set('menus', $this->menuEvent->grabMenus());
+          return $this->view->render();
+
+        } else {
+
+          $this->menuEvent->setMenuId($id);
+          $this->menuEvent->removeMenu();
+          direct_page('index.php?load=menu&status=menuDeleted', 200);
+
+        }
+      } catch (Throwable $th) {
+        
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($th);
+        LogError::customErrorMessage();
+
+      } catch (AppException $e) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::newMessage($e);
+        LogError::customErrorMessage('admin');
+        
+      }
+
+    }
+    
   }
   
   protected function setView($viewName)
