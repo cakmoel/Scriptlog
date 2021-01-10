@@ -128,9 +128,9 @@ Your browser does not support the <code>audio</code> element.
 
 <div class="form-group">
 <label for="caption">Caption </label>
-<input type="text" class="form-control" id="caption" name="media_caption" placeholder="type media caption" value="
-<?=(isset($mediaData['media_caption'])) ? purify_dirty_html($mediaData['media_caption']) : ""; ?>
-<?=(isset($formData['media_caption'])) ? safe_html($formData['media_caption']) : ""; ?>" maxlength="200" >
+<input type="text" class="form-control" id="caption" name="media_caption" placeholder="enter media caption" value="
+<?=(isset($mediaData['media_caption'])) ? safe_html($mediaData['media_caption']) : ""; ?>
+<?=(isset($formData['media_caption'])) ? purify_dirty_html($formData['media_caption']) : ""; ?>" maxlength="200" >
 </div>
 
 <div class="form-group">
@@ -204,7 +204,7 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
     ?>
 
                 <dt>File name</dt>
-                <dd><?= purify_dirty_html($media_properties['Origin']); ?></dd>
+                <dd><?= safe_html($media_properties['Origin']); ?></dd>
                 <dt>MIME type</dt>
                 <dd><?= safe_html($media_properties['File type']); ?></dd>
                 <dt>File size</dt>
