@@ -36,7 +36,7 @@ if ($loggedIn === true) {
    
 }
 
-$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
+$action = isset($_GET['action']) ? safe_html($_GET['action']) : "";
 $loginId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $uniqueKey = isset($_GET['uniqueKey']) ? safe_html($_GET['uniqueKey']) : null;
 

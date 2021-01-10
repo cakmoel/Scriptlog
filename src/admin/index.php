@@ -49,9 +49,6 @@ $breadcrumb = isset($_GET['load']) ? htmlentities(sanitize_urls($_GET['load']), 
 // Current URL
 $current_url =  preg_replace("/\/index\.php.*$/i", "", app_url().DS.APP_ADMIN);
 
-// retrieve plugin actived -- for administrator
-if ( $user_level == 'administrator') { $plugin_navigation = setplugin($user_level, 'private'); }
-
 include dirname(__FILE__) . DS .'admin-layout.php';
 
 admin_header($current_url, $breadcrumb, admin_query());

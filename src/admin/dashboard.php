@@ -3,25 +3,40 @@
 $action = isset($_GET['action']) ? safe_html($_GET['action']) : "";
 $displayWall = new Wall();
 
-switch ($action) {
+try {
+   
+   switch ($action) {
     
-    case 'detailItem':
-      # code ...
+      case 'detailItem':
+  
+         break;
+         
+      default:
+          
+         if (false === $authenticator->userAccessControl()) {
+  
+            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+  
+         } else {
+  
+           $displayWall->listItems($authenticator, $user_login);
+  
+         }
+          
+        break;
+         
+  }
+     
+} catch (Throwable $th) {
+   
+   LogError::setStatusCode(http_response_code());
+   LogError::newMessage($th);
+   LogError::customErrorMessage('admin');
 
-       break;
-       
-    default:
-        
-       if (false === $authenticator->userAccessControl()) {
+} catch (AppException $e) {
 
-          direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+   LogError::setStatusCode(http_response_code());
+   LogError::newMessage($e);
+   LogError::customErrorMessage('admin');
 
-       } else {
-
-         $displayWall->listItems($authenticator, $user_login);
-
-       }
-        
-      break;
-       
 }

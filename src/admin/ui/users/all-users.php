@@ -5,7 +5,7 @@
     <section class="content-header">
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
-        <small>	<a href="<?= generate_request('index.php', 'get', ['users', ActionConst::NEWUSER, 0, md5(microtime())])['link']; ?>"
+        <small>	<a href="<?= generate_request('index.php', 'get', ['users', ActionConst::NEWUSER, 0, sha1(app_key())])['link']; ?>"
 					class="btn btn-primary"> <i
 					class="fa fa-plus-circle"></i> Add New
 				</a>
@@ -91,7 +91,7 @@
                        <td><?= safe_html($user['user_email']); ?></td>
                        <td><?= safe_html($user['user_level']); ?></td>
                        <td>
-                       <a href="<?=generate_request('index.php', 'get', ['users', 'editUser', $user['ID'], $user['user_session']])['link']; ?>" class="btn btn-warning" title="Edit user">
+                       <a href="<?=generate_request('index.php', 'get', ['users', ActionConst::EDITUSER, $user['ID'], $user['user_session']])['link']; ?>" class="btn btn-warning" title="Edit user">
                        <i class="fa fa-pencil fa-fw"></i></a>
                        </td>
                        <td>

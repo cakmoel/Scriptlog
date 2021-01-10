@@ -121,7 +121,7 @@ if(access_control_list(ActionConst::USERS)) :
           </a>
           <ul class="treeview-menu">
             <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['users'], false)['link']; ?>">All Users</a></li>
-            <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['users', ActionConst::NEWUSER, 0, md5(uniqid())])['link']; ?>">Add New</a></li>
+            <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['users', ActionConst::NEWUSER, 0, sha1(app_key())])['link']; ?>">Add New</a></li>
           </ul>
         </li>
 <?php 
@@ -190,12 +190,12 @@ if(access_control_list(ActionConst::PLUGINS)) :
 <i class="fa fa-plug"></i> <span>Plugins</span>
 </a>
 </li>
-
-<li class="header">PLUGIN NAVIGATION</li>
-<?=isset($plugin_navigation) ? $plugin_navigation : ""; ?>
         
+
 <?php 
+
 endif;
+
 ?>
 
 </ul>

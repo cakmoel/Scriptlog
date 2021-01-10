@@ -19,7 +19,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
 
 $stop = null;
 
-$tempKey = isset($_GET['tempKey']) ? htmlentities(strip_tags($_GET['tempKey'])) : "";
+$tempKey = isset($_GET['tempKey']) ? escape_html($_GET['tempKey']) : "";
 $user = $userDao -> getUserByResetKey($tempKey);
 
 if (!$user) {
@@ -75,9 +75,11 @@ if (isset($_POST['Change']) && $_POST['Change'] == 'Change Password') {
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="robots" content="noindex,noarchive" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Change Password | Scriptlog</title>
   <!-- Tell the browser to be responsive to screen width -->
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <meta content="width=device-width" name="viewport">
   <!-- Bootstrap 3.3.7 -->
   <link rel="stylesheet" href="assets/components/bootstrap/dist/css/bootstrap.min.css">
   <!-- Font Awesome -->
@@ -105,7 +107,9 @@ if (isset($_POST['Change']) && $_POST['Change'] == 'Change Password') {
 <body class="hold-transition login-page">
 <div class="login-box">
   <div class="login-logo">
+    <h1>
     <a href="#"><img class="d-block mx-auto mb-4" src="assets/dist/img/icon612x612.png" alt="Recover Password" width="72" height="72"></a>
+    </h1>
   </div>
   <!-- /.login-logo -->
   <div class="login-box-body">
@@ -139,7 +143,8 @@ else :
     <form name="formlogin" action="recover-password.php" method="post" onSubmit="return validasi(this)" role="form" autocomplete="off">
       
       <div class="form-group has-feedback">
-        <input type="password" class="form-control" name="pass1" placeholder="New password" autofocus required maxlength="50" autocomplete="off">
+      <label for="inputNewPassword">New password</label>
+        <input type="password" class="form-control" id="inputNewPassword" name="pass1" placeholder="New password" autofocus required maxlength="50" autocomplete="off">
         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
       </div>
       

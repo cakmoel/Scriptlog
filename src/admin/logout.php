@@ -7,7 +7,6 @@ try {
     
     switch ($action) {
 
-        default:
         case ActionConst::LOGOUT:
             
             if (false === $authenticator->userAccessControl()) {
@@ -32,7 +31,21 @@ try {
            }
         
            break;
-    
+
+        default:
+
+           if ( false === $authenticator->userAccessControl()) {
+
+              direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+
+           } else {
+
+              direct_page('index.php?load=dashboard', 302);
+
+           }
+
+           break;
+
     }
 
 } catch (AppException $e) {

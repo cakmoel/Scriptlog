@@ -25,7 +25,7 @@
          ?>
          <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h2><i class="icon fa fa-ban"></i> Error!</h2>
+                <h4><i class="icon fa fa-ban"></i> Error!</h4>
            <?php 
               foreach ($errors as $e) :
                 echo $e;
@@ -41,7 +41,7 @@
          ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h2><i class="icon fa fa-check"></i> Success!</h2>
+                <h4><i class="icon fa fa-check"></i> Success!</h4>
            <?php 
               foreach ($status as $s) :
                 echo $s;
@@ -70,7 +70,7 @@
                   <th>Plugin</th>
                   <th>Description</th>
                   <th>Level</th>
-                  <th>Edit</th>
+                  <th>Delete</th>
                   <th>Status</th>
                 </tr>
                 </thead>
@@ -85,22 +85,21 @@
                     <tr>
                        <td><?= $no; ?></td>
                        <td>
-                       <a href="<?=generate_request('index.php', 'get', ['plugins', ActionConst::EDITPLUGIN, $plugin['ID']])['link']?>"> <?= safe_html($plugin['plugin_name']); ?>
-                       </a>
+                       <?= safe_html($plugin['plugin_name']); ?>
                        </td>
-                       <td><?= html_entity_decode($plugin['plugin_desc']); ?></td>
+                       <td><p><?= html_entity_decode($plugin['plugin_desc']); ?></p></td>
                        <td><?= safe_html($plugin['plugin_level']); ?></td>
                        <td>
-                       <a href="<?= generate_request('index.php', 'get', ['plugins', ActionConst::EDITPLUGIN, $plugin['ID']])['link'];?>" class="btn btn-warning" title="Edit plugin">
-                       <i class="fa fa-pencil fa-fw"></i> </a>
+                       <a href="javascript:deletePlugin('<?=(isset($plugin['ID']) ?  safe_html((int)$plugin['ID']) : 0); ?>', '<?=(isset($plugin['plugin_name']) ? safe_html($plugin['plugin_name']) : ""); ?>')" title="Delete Plugin" class="btn btn-danger"> 
+                       <i class="fa fa-remove fa-fw"></i> Delete</a>
                        </td>
                        <td>
                        <?php if($plugin['plugin_status'] == 'N') : ?>
-                       <a href="javascript:activatePlugin('<?= abs((int)$plugin['ID']); ?>', '<?= safe_html($plugin['plugin_name']); ?>')" class="btn btn-success" title="Activate plugin">
-                       <i class="fa fa-check fa-fw"></i> </a>
+                       <a href="javascript:activatePlugin('<?= abs((int)$plugin['ID']); ?>', '<?= safe_html($plugin['plugin_name']); ?>')" class="btn btn-success" title="Enabled plugin">
+                       <i class="fa fa-toggle-on fa-fw"></i> Enabled</a>
                        <?php else : ?>
-                       <a href="javascript:deactivatePlugin('<?= abs((int)$plugin['ID']); ?>', '<?= safe_html($plugin['plugin_name']); ?>')" class="btn btn-danger" title="Deactivate plugin">
-                       <i class="fa fa-times-circle fa-fw"></i> </a>
+                       <a href="javascript:deactivatePlugin('<?= abs((int)$plugin['ID']); ?>', '<?= safe_html($plugin['plugin_name']); ?>')" class="btn btn-danger" title="Disabled plugin">
+                       <i class="fa fa-toggle-off fa-fw"></i> Disabled</a>
                        <?php endif; ?>
                        </td>
                     
@@ -118,7 +117,7 @@
                   <th>Plugin</th>
                   <th>Description</th>
                   <th>Level</th>
-                  <th>Edit</th>
+                  <th>Delete</th>
                   <th>Status</th>
                 </tr>
                 </tfoot>
@@ -138,17 +137,26 @@
 <script type="text/javascript">
   function activatePlugin(id, plugin)
   {
-	  if (confirm("Are you sure want to activate Plugin '" + plugin + "'"))
+	  if (confirm("Are you sure want to activate '" + plugin + "'?"))
 	  {
-	  	window.location.href = 'index.php?load=plugins&action=activatePlugin&pluginId=' + id;
+	  	window.location.href = 'index.php?load=plugins&action=activatePlugin&Id=' + id;
 	  }
   }
 
   function deactivatePlugin(id, plugin)
   {
-	  if (confirm("Are you sure want to deactivate Plugin '" + plugin + "'"))
+	  if (confirm("Are you sure want to deactivate '" + plugin + "'?"))
 	  {
-	  	window.location.href = 'index.php?load=plugins&action=deactivatePlugin&pluginId=' + id;
+	  	window.location.href = 'index.php?load=plugins&action=deactivatePlugin&Id=' + id;
 	  }
   }
+  
+  function deletePlugin(id, plugin)
+  {
+	  if (confirm("Are you sure want to uninstall '" + plugin + "'?"))
+	  {
+	  	window.location.href = 'index.php?load=plugins&action=deletePlugin&Id=' + id;
+	  }
+  }
+
 </script>
