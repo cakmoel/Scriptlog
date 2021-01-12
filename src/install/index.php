@@ -70,10 +70,10 @@ if ($install != 'install') {
     
     $dbhost = isset($_POST['db_host']) ? escapeHTML($_POST['db_host']) : "";
     $dbname = filter_input(INPUT_POST, 'db_name', FILTER_SANITIZE_STRING);
-    $dbuser = isset($_POST['db_user']) ? remove_bad_characters($_POST['db_user']) : "";
     $dbpass = isset($_POST['db_pass']) ? escapeHTML($_POST['db_pass']) : "";
+    $dbuser = isset($_POST['db_user']) ? remove_bad_characters($_POST['db_user'], $dbhost, $_POST['db_user'], $dbpass, $dbname) : "";
     
-    $username = isset($_POST['user_login']) ? remove_bad_characters($_POST['user_login']) : "";
+    $username = isset($_POST['user_login']) ? remove_bad_characters($_POST['user_login'], $dbhost, $dbuser, $dbpass, $dbname) : "";
     $password = isset($_POST['user_pass1']) ? escapeHTML($_POST['user_pass1']) : "";
     $confirm = isset($_POST['user_pass2']) ? escapeHTML($_POST['user_pass2']) : "";
     $email = filter_input(INPUT_POST, 'user_email', FILTER_SANITIZE_EMAIL);
