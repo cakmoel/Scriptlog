@@ -12,9 +12,9 @@
 class DbException extends PDOException implements IDaoThrowable
 {
   
-protected $message = '';
+protected $message = 'Unknown Exception';
 
-public function __construct($message = null, $code = 0, Exception $previous)
+public function __construct($message = null, $code = 0, Exception $previous = null)
 {
 
  $code = $this->getCode();
@@ -27,10 +27,11 @@ public function __construct($message = null, $code = 0, Exception $previous)
 
  parent::__construct($message, $code, $previous);
 
- if (!is_null($previous))
- {
-   $this->previous = $previous;
- }
+ if (!is_null($previous)) {
+
+  $this->previous = $previous;
+  
+}
  
 }
 
