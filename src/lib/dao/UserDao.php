@@ -72,7 +72,7 @@ class UserDao extends Dao
  }
 
  /**
-  * get user by email
+  * getUserByEmail()
   * 
   * @param string $user_email
   * @param static PDO::FETCH_MODE $fetchMode
@@ -83,8 +83,10 @@ class UserDao extends Dao
  {
      
    $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
-             user_session, user_banned, user_signin_count, user_locked_until, login_time 
-           FROM tbl_users WHERE user_email = :user_email LIMIT 1";
+                  user_session, user_banned, user_signin_count, user_locked_until, login_time 
+           FROM tbl_users 
+           WHERE user_email = :user_email 
+           AND user_banned = '0' LIMIT 1";
    
    $this->setSQL($sql);
    
@@ -109,7 +111,8 @@ class UserDao extends Dao
 
    $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
                 user_session, user_banned, user_signin_count, user_locked_until, login_time
-           FROM tbl_users WHERE user_login = :user_login LIMIT 1";
+           FROM tbl_users WHERE user_login = :user_login 
+           AND user_banned = '0' LIMIT 1";
 
    $this->setSQL($sql);
 
@@ -136,8 +139,7 @@ class UserDao extends Dao
                    user_session, user_banned, user_signin_count, user_locked_until, login_time
             FROM tbl_users 
             WHERE user_session = :user_session
-            AND (login_time >= (NOW() - INTERVAL 7 DAY)) AND user_banned = 0; 
-            LIMIT 1";
+            AND (login_time >= (NOW() - INTERVAL 7 DAY)) AND user_banned = '0' ";
 
     $this->setSQL($sql);
 
@@ -192,7 +194,7 @@ class UserDao extends Dao
 	          'user_fullname' => $bind['user_fullname'],
 	          'user_url'   => $user_url,
 	          'user_activation_key' => $bind['user_activation_key'],
-	          'user_session' => $bind['user_session']
+              'user_session' => $bind['user_session'],
 	          
 	      ]);
 	      
@@ -228,7 +230,7 @@ class UserDao extends Dao
   
     $cleanID = $this->filteringId($sanitize, $userID, 'sql');
   
-    $hash_password = scriptlog_password($bind['user_pass']);
+    $hash_password = (!empty($bind['user_pass'])) ? scriptlog_password($bind['user_pass']) : "";
   
      if ($accessLevel != 'administrator') {
          
@@ -237,7 +239,7 @@ class UserDao extends Dao
              $bind = array(
                 'user_email' => $bind['user_email'],
                 'user_fullname' => $bind['user_fullname'],
-                'user_url' => $bind['user_url'] 
+                'user_url' => $bind['user_url']
              );
              
          } else {
@@ -259,7 +261,8 @@ class UserDao extends Dao
                  'user_email' => $bind['user_email'],
                  'user_level' => $bind['user_level'],
                  'user_fullname' => $bind['user_fullname'],
-                 'user_url'=> $bind['user_url']
+                 'user_url'=> $bind['user_url'],
+                 'user_banned' => $bind['user_banned']
              );
              
          } else {
@@ -269,7 +272,8 @@ class UserDao extends Dao
                  'user_pass' => $hash_password,
                  'user_level' => $bind['user_level'],
                  'user_fullname' => $bind['user_fullname'],
-                 'user_url' => $bind['user_url']
+                 'user_url' => $bind['user_url'],
+                 'user_banned' => $bind['user_banned']
              );
              
          }
@@ -317,8 +321,7 @@ class UserDao extends Dao
  public function recoverNewPassword($bind, $userID)
  {
    $recoverPassword = scriptlog_password($bind['user_pass']);
-   $this->modify("tbl_users", ['user_pass' => $recoverPassword, 'user_reset_complete' => $bind['user_reset_complete']], "ID = '{$userID}'");
-          
+   $this->modify("tbl_users", ['user_pass' => $recoverPassword, 'user_reset_complete' => $bind['user_reset_complete']], "ID = '{$userID}'");          
  }
 
  /**
@@ -612,5 +615,3 @@ class UserDao extends Dao
  }
  
 }
-
-
