@@ -124,9 +124,24 @@ if (empty($userData['user_email'])) :
 <input id="1" type="checkbox" name="send_user_notification" value="1"> Send the new user an email about their account 
 </label>
 </div>
+
 <?php 
 endif;
 ?>
+
+<?php 
+if (!empty($userData['user_level']) && $userData['user_level'] != 'administrator') :
+?>
+<div class="checkbox">
+<label for="user_banned">
+<input id="user_banned" type="checkbox" name="user_banned" value="1" <?=(isset($userData['user_banned']) && $userData['user_banned'] == 1) ? "checked='checked'" : ""; ?>> 
+banned user
+</label>
+</div>
+<?php 
+endif;
+?>
+
 </div>
 <!-- /.box-body -->
 
