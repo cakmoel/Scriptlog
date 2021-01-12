@@ -91,6 +91,13 @@ class UserEvent
  private $user_session;
 
 /**
+ * user_banned
+ *
+ * @var int|numeric
+ */
+ private $user_banned;
+
+/**
  * userDao, userToken, vaidator and sanitize of the instance of their classes
  *
  * @var object
@@ -114,6 +121,12 @@ class UserEvent
  */
  private $validator; 
  
+/**
+ * sanitize
+ *
+ * @var object
+ * 
+ */
  private $sanitize;
 
  private $key;
@@ -140,17 +153,20 @@ class UserEvent
 
     if ( Registry::isKeySet('key') ) {
 
-       $this->key = Registry::get('key');
+      $this->key = Registry::get('key');
 
     }
 
  }
 
- /**
-  * Set user id
-  * @param integer $userId
-  *
-  */
+/**
+ * set user Id
+ *
+ * @method public setUserId()
+ * @param int $userId
+ * @return void
+ * 
+ */
  public function setUserId($userId)
  {
    $this->user_id = $userId;   
@@ -236,8 +252,11 @@ class UserEvent
  }
 
 /**
- * Set user website - url
+ * SetUserUrl
+ * 
+ * @method public setUserUrl()
  * @param string $user_url
+ * 
  */
  public function setUserUrl($user_url)
  {
@@ -245,8 +264,11 @@ class UserEvent
  }
 
 /**
- * Set user activation key
+ * SetUserActivationKey
+ * 
+ * @method public setUserActivationKey($activation_key)
  * @param string $activation_key
+ * 
  */
  public function setUserActivationKey($activation_key)
  {
@@ -254,17 +276,39 @@ class UserEvent
  }
  
 /**
- * Set user session
+ * SetUserSession()
  * @param string $user_session
+ * 
  */
  public function setUserSession($user_session)
  {
    $this->user_session = $user_session;
  }
  
+/**
+ * setUserBanned
+ *
+ * @param [type] $user_banned
+ * @return void
+ */
+ public function setUserBanned($user_banned)
+ {
+   $this->user_banned = $user_banned;
+ }
+
+/**
+ * Retrieving All records from table users
+ *
+ * @method public grabUsers()
+ * @param string $orderBy
+ * @param [type] $fetchMode
+ * @return array
+ * 
+ */
  public function grabUsers($orderBy = 'ID', $fetchMode = null)
  {
-   return $this->userDao->getUsers($orderBy, $fetchMode);    
+   $orderBySanitized = sanitize_sql_orderby($orderBy);
+   return $this->userDao->getUsers($orderBySanitized, $fetchMode);    
  }
  
  public function grabUser($userId, $fetchMode = null)
@@ -362,7 +406,8 @@ class UserEvent
                'user_pass' => $this->user_pass,
                'user_level' => $this->user_level,
                'user_fullname' => $this->user_fullname,
-               'user_url' => $this->user_url
+               'user_url' => $this->user_url,
+               'user_banned' => $this->user_banned
            ];
            
        } else {
@@ -371,7 +416,8 @@ class UserEvent
                'user_email' => $this->user_email,
                'user_level' => $this->user_level,
                'user_fullname' => $this->user_fullname,
-               'user_url' => $this->user_url
+               'user_url' => $this->user_url,
+               'user_banned' => $this->user_banned
            ];
            
        }
@@ -477,7 +523,7 @@ class UserEvent
    
    if (isset(Session::getInstance()->scriptlog_session_level)) {
 
-       return Session::getInstance()->scriptlog_session_level;
+      return Session::getInstance()->scriptlog_session_level;
   
    }
   
