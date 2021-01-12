@@ -12,7 +12,6 @@
 class CoreException extends Exception implements ICoreThrowable
 {
   
-  
 protected $message = 'Unknown Exception';
 
 public function __construct($message = null, $code = 0, Exception $previous = null)
@@ -21,11 +20,18 @@ public function __construct($message = null, $code = 0, Exception $previous = nu
   $code = $this->getCode();
 
   if (!$message) {
+
     throw new $this('Unknown'.get_class($this));
     
   }
 
   parent::__construct($message, $code, $previous);
+
+  if (!is_null($previous)) {
+
+   $this->previous = $previous;
+
+  }
 
 }
 
