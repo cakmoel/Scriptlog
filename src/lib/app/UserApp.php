@@ -337,17 +337,21 @@ class UserApp extends BaseApp
         'user_fullname' => $getUser['user_fullname'],
         'user_url'      => $getUser['user_url'],
         'user_registered' => $getUser['user_registered'],
-        'user_session'  => $getUser['user_session']
+        'user_session'  => $getUser['user_session'],
+        'user_banned'   => $getUser['user_banned']
         
     );
     
     if (isset($_POST['userFormSubmit'])) {
        
         $filters = ['user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 
-                    'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+                    'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 
+                    'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                     'current_pwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                     'user_url' => FILTER_SANITIZE_URL, 'user_level' => FILTER_SANITIZE_STRING, 
-                    'user_id' => FILTER_SANITIZE_NUMBER_INT];
+                    'user_id' => FILTER_SANITIZE_NUMBER_INT, 
+                    'user_banned' => FILTER_SANITIZE_NUMBER_INT
+                ];
         
     try {
       
@@ -430,7 +434,7 @@ class UserApp extends BaseApp
               $this->view->set('errors', $errors);
               $this->view->set('userData', $data_user);
              
-              if ($getUser['ID'] == 1 && $this->userEvent->isUserLevel() == 'administrator') {
+              if (($getUser['ID'] == 1) && ($this->userEvent->isUserLevel() == 'administrator')) {
 
                 $this->view->set('userRole', $this->userEvent->isUserLevel());
     
@@ -448,6 +452,7 @@ class UserApp extends BaseApp
               $this->userEvent->setUserFullname((isset($_POST['user_fullname']) ? purify_dirty_html(distill_post_request($filters)['user_fullname']) : ""));
               $this->userEvent->setUserUrl((isset($_POST['user_url']) ? escape_html(distill_post_request($filters)['user_url']) : ""));
               $this->userEvent->setUserId((isset($_POST['user_id']) ? abs((int)distill_post_request($filters)['user_id']) : 0));
+              $this->userEvent->setUserBanned((isset($_POST['user_banned']) ? abs((int)distill_post_request($filters)['user_banned']) : 0));
 
               if ((isset($_POST['user_id'])) && ($_POST['user_id'] == 1) && ($this->userEvent->isUserLevel() == 'administrator')) {
 
