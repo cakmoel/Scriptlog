@@ -1,5 +1,10 @@
 <?php
 /**
+ * 
+ * generate_form_token()
+ * 
+ * generating unique value token 
+ * 
  * Collection of form Security function
  * this form security goals are:
  * the form is being submitted by human being
@@ -14,12 +19,6 @@
  * @see https://www.sitepoint.com/client-side-form-validation-html5/
  * @see https://www.eschrade.com/page/generating-secure-cross-site-request-forgery-tokens-csrf/
  * @see https://blog.ircmaxell.com/2013/02/preventing-csrf-attacks.html
- * 
- */
-
-/**
- * Generate form token
- * generating unique value token 
  * 
  * @param string $form
  * @param number|integer $length
@@ -61,7 +60,9 @@ function generate_form_token($form, $length)
 }
 
 /**
- * verifying form token
+ * verify_form_token()
+ * 
+ * verifying token from form
  *
  * @param string $form
  * @return void
@@ -96,15 +97,15 @@ function check_form_request($data, array $whitelist)
   
   foreach($data as $key => $value) {
 
-      if (!in_array($key, $whitelist)) {
+    if (!in_array($key, $whitelist)) {
 
-          return false;
+      return false;
 
-      } else {
+    } else {
 
-          return true;
+      return true;
 
-      }
+    }
 
   }
 
