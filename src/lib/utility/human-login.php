@@ -199,7 +199,8 @@ if (time() > $datetime) {
 
    if ($authenticate_user === false) {
 
-      $errors['errorMessage'] = "Invalid login !";
+      http_response_code(403);
+      $errors['errorMessage'] = "Check your login details";
    
       $signin++;
    
@@ -211,7 +212,7 @@ if (time() > $datetime) {
    
       } else {
    
-         $errors['errorMessage'] = "You have tried more than 5 times. Please enter a captcha code!";
+         $errors['errorMessage'] = "Please enter a captcha code!";
 
          $multiplicator = $signin / 15;
      
@@ -227,9 +228,13 @@ if (time() > $datetime) {
    
    } else {
    
-      unset($_SESSION['human_login_id']);
-      unset($_SESSION['captcha_login']);
-   
+      if ((Session::getInstance()->human_login_id) && (Session::getInstance()->captcha_login)) {
+
+         unset($_SESSION['human_login_id']);
+         unset($_SESSION['captcha_login']);
+
+      } 
+      
       if (!$data['user_banned']) {
    
         if ($data['user_signin_count']) {
@@ -258,7 +263,7 @@ if (time() > $datetime) {
    
       if ($authenticator->checkEmailExists($login) == false) {
       
-         $errors['errorMessage'] = "Your email address is not registered";
+         $errors['errorMessage'] = "The email you entered is not registered";
              
       }
       
@@ -266,7 +271,7 @@ if (time() > $datetime) {
         
       if (!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $login)) {
       
-         $errors['errorMessage'] = "Please enter a valid username";
+         $errors['errorMessage'] = "The username you entered is not valid";
            
       } 
           
@@ -274,12 +279,14 @@ if (time() > $datetime) {
    
    if (scriptpot_validate($values) == false) {
       
+      http_response_code(403);
       $errors['errorMessage'] = "anomaly behaviour detected!";
       
    }
 
 } else {
 
+   http_response_code(403);
    $datetime = date("Y-m-d H:i:s", $datetime);
    $errors['errorMessage'] = "Account is locked until {$datetime}";
 
