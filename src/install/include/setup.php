@@ -483,7 +483,7 @@ function generate_license($suffix = null)
  * Convert Memory Used Function
  * Format size memory usage onto b, kb, mb, gb, tb and pb
  * 
- * @param number $size
+ * @param int|float $size
  * @return mixed
  * 
  */
