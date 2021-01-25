@@ -396,9 +396,11 @@ public function validateUserAccount($login, $password)
 }
 
 /**
- * Reset user password
+ * ResetUserPassword
+ * 
  * updating reset key and send notification to user
  * 
+ * @method public resetUserPassword()
  * @param string $email
  * 
  */
