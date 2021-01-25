@@ -136,7 +136,7 @@ $library = array(
     APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
     APP_ROOT . APP_LIBRARY . DS . 'event'   . DS,
     APP_ROOT . APP_LIBRARY . DS . 'app'     . DS,
-    APP_ROOT . APP_ADMIN   . DS . 'plugins' . DS
+    APP_ROOT . APP_LIBRARY . DS . 'provider'. DS
 );
 
 get_server_load();
@@ -194,12 +194,15 @@ $rules = array(
 #====== an instantiation of Database connection =========
 $dbc = DbFactory::connect(['mysql:host='.$config['db']['host'].';dbname='.$config['db']['name'], $config['db']['user'], $config['db']['pass']]);
 
+#====== an instantiation of scriptlog cipher key ========
 $key = ScriptlogCryptonize::scriptlogCipherKey();
 
 // Register rules of routes, an instance of database connection and key for decryption message
 Registry::setAll(array('dbc' => $dbc, 'route' => $rules, 'key' => $key));
 
 whoops_error();
+
+content_security_policy();
 
 /* an instances of class that necessary for the system
  * please do not change this below variable 
@@ -211,8 +214,6 @@ whoops_error();
  * @var $userDao, $validator, $authenticator, $ubench --
  * 
  */
-content_security_policy();
-
 $sessionMaker = new SessionMaker(set_session_cookies_key());
 $searchPost = new SearchFinder($dbc);
 $sanitizer = new Sanitize();
