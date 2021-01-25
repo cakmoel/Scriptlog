@@ -139,7 +139,7 @@ class UserDao extends Dao
                    user_session, user_banned, user_signin_count, user_locked_until, login_time
             FROM tbl_users 
             WHERE user_session = :user_session
-            AND (login_time >= (NOW() - INTERVAL 7 DAY)) AND user_banned = '0' ";
+            AND (login_time >= (NOW() - INTERVAL 7 DAY)) AND user_banned = '0' LIMIT 1";
 
     $this->setSQL($sql);
 
@@ -159,7 +159,7 @@ class UserDao extends Dao
  public function getUserByResetKey($reset_key)
  {
    $sql = "SELECT ID, user_reset_key, user_reset_complete FROM tbl_users 
-           WHERE user_reset_key = :reset_key LIMIT 1";
+           WHERE user_reset_key = :reset_key AND user_banned = '0' LIMIT 1";
    
    $this->setSQL($sql);
    
@@ -394,7 +394,7 @@ class UserDao extends Dao
 /**
  * isUserLoginExists
  *
- * checkign whether user_login availability
+ * checking whether user_login record does exists
  * 
  * @param [type] $user_login
  * @return boolean
@@ -402,7 +402,7 @@ class UserDao extends Dao
  public function isUserLoginExists($user_login)
  {
    
-   $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_login = ?";
+   $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_login = ? AND user_banned = '0' LIMIT 1";
    $this->setSQL($sql);
    $stmt = $this->findColumn([$user_login]);
      
@@ -430,7 +430,7 @@ class UserDao extends Dao
  public function checkUserSession($user_session)
  {
 
-    $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_session = :user_session ";
+    $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_session = :user_session AND user_banned = '0' LIMIT 1";
     
     $this->setSQL($sql);
     
@@ -448,13 +448,15 @@ class UserDao extends Dao
   */
  public function checkUserEmail($email)
  {
-    $sql = "SELECT ID FROM tbl_users WHERE user_email = :email LIMIT 1";
+    $sql = "SELECT ID FROM tbl_users WHERE user_email = :email AND user_banned = '0' LIMIT 1";
     $this->setSQL($sql);
     $stmt = $this->checkCountValue([':email' => $email]);
     return($stmt > 0);
  }
 
 /**
+ * checkUserPassword
+ * 
  * Checking user password
  * 
  * @method public checkUserPassword()
@@ -468,7 +470,7 @@ class UserDao extends Dao
     
     if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
 
-        $sql = "SELECT user_pass FROM tbl_users WHERE user_email = :user_email LIMIT 1";
+        $sql = "SELECT user_pass FROM tbl_users WHERE user_email = :user_email AND user_banned = '0' LIMIT 1";
         $this->setSQL($sql);
         $stmt = $this->checkCountValue([':user_email' => $login]);
 
@@ -509,7 +511,7 @@ class UserDao extends Dao
     
     } else {
 
-        $sql = "SELECT user_pass FROM tbl_users WHERE user_login = :user_login LIMIT 1";
+        $sql = "SELECT user_pass FROM tbl_users WHERE user_login = :user_login AND user_banned = '0' LIMIT 1";
         $this->setSQL($sql);
         $stmt = $this->checkCountValue([':user_login' => $login]);
 
