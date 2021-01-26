@@ -2,17 +2,16 @@
 
 namespace Egulias\EmailValidator;
 
-use Egulias\EmailValidator\Exception\ExpectingATEXT;
-use Egulias\EmailValidator\Exception\NoLocalPart;
-use Egulias\EmailValidator\Parser\DomainPart;
+use Egulias\EmailValidator\EmailLexer;
+use Egulias\EmailValidator\Result\Result;
 use Egulias\EmailValidator\Parser\LocalPart;
+use Egulias\EmailValidator\Parser\DomainPart;
+use Egulias\EmailValidator\Result\ValidEmail;
+use Egulias\EmailValidator\Result\InvalidEmail;
 use Egulias\EmailValidator\Warning\EmailTooLong;
+use Egulias\EmailValidator\Result\Reason\ExpectingATEXT;
+use Egulias\EmailValidator\Result\Reason\NoLocalPart;
 
-/**
- * EmailParser
- *
- * @author Eduardo Gulias Davis <me@egulias.com>
- */
 class EmailParser
 {
     const EMAIL_MAX_LENGTH = 254;
@@ -36,84 +35,90 @@ class EmailParser
      */
     protected $lexer;
 
-    /**
-     * @var LocalPart
-     */
-    protected $localPartParser;
-
-    /**
-     * @var DomainPart
-     */
-    protected $domainPartParser;
-
     public function __construct(EmailLexer $lexer)
     {
         $this->lexer = $lexer;
-        $this->localPartParser = new LocalPart($this->lexer);
-        $this->domainPartParser = new DomainPart($this->lexer);
     }
 
-    /**
-     * @param string $str
-     * @return array
-     */
-    public function parse($str)
+    public function parse(string $str) : Result
     {
         $this->lexer->setInput($str);
 
         if (!$this->hasAtToken()) {
-            throw new NoLocalPart();
+            return new InvalidEmail(new NoLocalPart(), $this->lexer->token["value"]);
         }
 
+        $localPartResult = $this->processLocalPart();
 
-        $this->localPartParser->parse($str);
-        $this->domainPartParser->parse($str);
+        if ($localPartResult->isInvalid()) {
+            return $localPartResult;
+        }
 
-        $this->setParts($str);
+        $domainPartResult = $this->processDomainPart();
+
+        if ($domainPartResult->isInvalid()) {
+            return $domainPartResult;
+        }
 
         if ($this->lexer->hasInvalidTokens()) {
-            throw new ExpectingATEXT();
+            return new InvalidEmail(new ExpectingATEXT("Invalid tokens found"), $this->lexer->token["value"]);
         }
 
-        return array('local' => $this->localPart, 'domain' => $this->domainPart);
+        $this->addLongEmailWarning($this->localPart, $this->domainPart);
+
+        return new ValidEmail();
+    }
+
+    private function processLocalPart() : Result
+    {
+        $this->lexer->startRecording();
+        $localPartParser = new LocalPart($this->lexer);
+        $localPartResult = $localPartParser->parse();
+        $this->lexer->stopRecording();
+        $this->localPart = rtrim($this->lexer->getAccumulatedValues(), '@');
+        $this->warnings = array_merge($localPartParser->getWarnings(), $this->warnings);
+
+        return $localPartResult;
+    }
+
+    private function processDomainPart() : Result
+    {
+        $this->lexer->clearRecorded();
+        $this->lexer->startRecording();
+        $domainPartParser = new DomainPart($this->lexer);
+        $domainPartResult = $domainPartParser->parse();
+        $this->lexer->stopRecording();
+        $this->domainPart = $this->lexer->getAccumulatedValues();
+        $this->warnings = array_merge($domainPartParser->getWarnings(), $this->warnings);
+        
+        return $domainPartResult;
     }
 
     /**
      * @return Warning\Warning[]
      */
-    public function getWarnings()
+    public function getWarnings() : array
     {
-        $localPartWarnings = $this->localPartParser->getWarnings();
-        $domainPartWarnings = $this->domainPartParser->getWarnings();
-        $this->warnings = array_merge($localPartWarnings, $domainPartWarnings);
-
-        $this->addLongEmailWarning($this->localPart, $this->domainPart);
-
         return $this->warnings;
     }
 
     /**
      * @return string
      */
-    public function getParsedDomainPart()
+    public function getDomainPart() : string
     {
         return $this->domainPart;
     }
 
-    /**
-     * @param string $email
-     */
-    protected function setParts($email)
+    public function getLocalPart() : string
     {
-        $parts = explode('@', $email);
-        $this->domainPart = $this->domainPartParser->getDomainPart();
-        $this->localPart = $parts[0];
+        return $this->localPart;
     }
 
     /**
      * @return bool
      */
-    protected function hasAtToken()
+    protected function hasAtToken() : bool
     {
         $this->lexer->moveNext();
         $this->lexer->moveNext();
@@ -128,7 +133,7 @@ class EmailParser
      * @param string $localPart
      * @param string $parsedDomainPart
      */
-    protected function addLongEmailWarning($localPart, $parsedDomainPart)
+    protected function addLongEmailWarning($localPart, $parsedDomainPart) : void
     {
         if (strlen($localPart . '@' . $parsedDomainPart) > self::EMAIL_MAX_LENGTH) {
             $this->warnings[EmailTooLong::CODE] = new EmailTooLong();
