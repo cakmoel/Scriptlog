@@ -1,6 +1,6 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
 
-$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
+$action = isset($_GET['action']) ? safe_html($_GET['action']) : "";
 $logOutId =  isset($_GET['logOutId']) ? safe_html($_GET['logOutId']): null;
 
 try {
