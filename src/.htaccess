@@ -25,6 +25,9 @@ Options -Indexes
 # mod_rewrite rules
 RewriteEngine On 
 
+RewriteCond %{HTTP_USER_AGENT} libwww-perl.* 
+RewriteRule .* – [F,L]
+
 # The RewriteBase of the system (change if you are using this sytem in a sub-folder).
 #RewriteBase /
 
