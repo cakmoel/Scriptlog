@@ -1,30 +1,68 @@
 <?php
 /**
- * Escape all HTML, JavaScript, and CSS
+ * escape_html()
+ * 
+ * Escape HTML, HTML Atrributes, JavaScript, CSS and Url.
+ * This function for escaping data for output not be misused for filtering input data
  * 
  * @param string $input The input string
- * @param string $encoding Which character encoding are we using?
+ * @param string $encoding Character encoding
+ * @uses laminas-escaper
  * @see https://paragonie.com/blog/2015/06/preventing-xss-vulnerabilities-in-php-everything-you-need-know
+ * @see https://docs.laminas.dev/laminas-escaper/
+ * @see https://docs.laminas.dev/laminas-escaper/escaping-html/
+ * @see https://docs.laminas.dev/laminas-escaper/escaping-html-attributes/
+ * @see https://docs.laminas.dev/laminas-escaper/escaping-javascript/
+ * @see https://docs.laminas.dev/laminas-escaper/escaping-css/
+ * @see https://docs.laminas.dev/laminas-escaper/escaping-url/
  * @return string
  * 
  */
-function escape_html($input, $encoding = "UTF-8")
-{
-  return htmlentities($input, ENT_QUOTES | ENT_HTML5, $encoding);
-}
-
-/**
- * escape_null_byte
- *
- * @param string $input
- * @return void
- * 
- */
-function escape_null_byte($input)
+function escape_html($input, $type = 'html', $encoding = 'utf-8')
 {
 
- $input = str_replace(chr(0), '', $input);
+  $escaper = new Laminas\Escaper\Escaper($encoding);
 
- return $input;
+  switch ($type) {
 
+    case 'html_attributes':
+      
+      $output = $escaper->escapeHtmlAttr($input);
+
+      return $output;
+
+      break;
+
+    case 'js':
+
+      $output = $escaper->escapeJs($input);
+
+      return $output;
+
+      break;
+
+    case 'css':
+
+      $output = $escaper->escapeCss($input);
+
+      return $output;
+
+      break;
+
+    case 'url':
+
+      $output = $escaper->escapeUrl($input);
+
+      return $output;
+
+      break;
+    
+    default:
+
+      return $escaper->escapeHtml($input); 
+
+      break;
+
+  }
+  
 }
