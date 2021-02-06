@@ -35,7 +35,7 @@ if (isset($_POST['Reset'])) {
   
   }
 
-  if (count($_POST)> 0 && $captcha_code != $_SESSION['scriptlog_reset_pwd']) {
+  if (count($_POST)> 0 && $captcha_code != $_SESSION['reset_pwd']) {
 
       $captcha = false;
       $errors['errorMessage'] = "Please enter correct captcha code";
