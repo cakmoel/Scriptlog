@@ -24,8 +24,6 @@ $scanner = new BombScanner();
 
 $scanner->addEngine(new ZipBombEngine());
 
-$result = $scanner->scanFile($file);
-
 if (version_compare(PHP_VERSION, '5.6', '>=')) {
 
    clearstatcache();
@@ -35,6 +33,8 @@ if (version_compare(PHP_VERSION, '5.6', '>=')) {
    clearstatcache(true);
    
 }
+
+$result = $scanner->scanFile($file);
 
 if ($result->isBomb()) {
 
@@ -68,6 +68,16 @@ $scanner = new BombScanner();
 
 $scanner->addEngine(new RarBombEngine());
 
+if (version_compare(PHP_VERSION, '5.6', '>=')) {
+
+   clearstatcache();
+
+} else {
+
+   clearstatcache(true);
+   
+}
+
 $result = $scanner->scanFile($file);
 
 if ( $result->isBomb()) {
@@ -81,37 +91,5 @@ if ( $result->isBomb()) {
 }
 
 return $is_bomb;
-
-}
-
-/**
- * get_zip_size
- *
- * @category Function
- * @see https://www.php.net/manual/en/function.zip-entry-filesize.php
- * @param string $filename
- * @return int|numeric|number
- * 
- */
-function get_zip_size($filename)
-{
-
- $size = 0;
- 
- $resource = zip_open($filename);
- 
- if (is_resource($resource)) {
-
-   while ($dir_resource = zip_read($resource)) {
-    
-      $size += zip_entry_filesize($dir_resource);
-      
-   }
-      
-  zip_close($resource);  
-
- } 
-
- return $size;
 
 }
