@@ -146,7 +146,7 @@ class PluginApp extends BaseApp
             
         }
 
-        if (($file_size > scriptlog_upload_filesize()) || (format_size_unit(get_zip_size($file_location)) == '0 bytes')) {
+        if (($file_size > scriptlog_upload_filesize()) || (format_size_unit(filesize($file_location)) == '0 bytes')) {
 
           $checkError = false;
           array_push($errors, "Exceeded file size limit. Maximum file size is. ".format_size_unit(scriptlog_upload_filesize()));
