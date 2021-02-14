@@ -144,7 +144,7 @@ if(!isset($uniqueKey) && ($uniqueKey !== md5(app_key().$ip))) {
 }
 
 /**
- * processiong_human_login()
+ * processing_human_login()
  *
  * @category function
  * @author M.Noermoehammad
