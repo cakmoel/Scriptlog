@@ -63,6 +63,30 @@ if(!isset($_SESSION['human_login_id'])) {
 }
 
 /**
+ * review_login_attempt
+ *
+ * @param string $ip
+ * @return bool
+ * 
+ */
+function review_login_attempt($ip)
+{
+
+ $review_attempt = alert_login_attempt($ip)['alert_login_attempt'];
+
+ if ($review_attempt >= 20) {
+
+   return false;
+
+ } else {
+
+   return true;
+
+ }
+
+}
+
+/**
  * human_login_request()
  * 
  * generate login query string parameters
@@ -120,10 +144,19 @@ function safe_human_login($ip, $loginId, $uniqueKey, array $values)
 
 if( check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'scriptpot_email', 'captcha_login', 'remember', 'csrf', 'LogIn']) == false )  {
 
-     header(APP_PROTOCOL.' 413 Payload Too Large');
+     header(APP_PROTOCOL.' 413 Payload Too Large', true, 413);
      header('Status: 413 Payload Too Large');
      header('Retry-After: 3600');
      die("413 Payload Too Large");
+
+}
+
+if(false === review_login_attempt($ip)) {
+
+   header(APP_PROTOCOL.' 400 Bad Request', true, 400);
+   header('Status: 400 Bad Request');
+   header('Retry-After: 3600');
+   exit("400 Bad Request");
 
 }
 
