@@ -46,19 +46,19 @@ public function __construct()
 
     $this->dbc = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->dbname);
       
-    if ($this->dbc->connect_errno) {
-
-       throw new mysqli_sql_exception("Error Processing Request", 1);
-       
-    }
-
     self::activateReportMode();
 
-  } catch (mysqli_sql_exception $e) {
+    if ($this->dbc->connect_errno) {
+
+      throw new mysqli_sql_exception("Error Processing Request", 1);
       
-      $this->disconnect();
-      $this->errors = LogError::newMessage($e);
-      $this->errors = LogError::customErrorMessage('admin');
+    }
+
+  } catch (mysqli_sql_exception $e) {
+        
+   $this->disconnect();
+   $this->errors = LogError::newMessage($e);
+   $this->errors = LogError::customErrorMessage('admin');
 
   }
 
@@ -356,9 +356,7 @@ public function getNumRows($sql)
   
  try {
    
-  self::$counter++;
-
-  $num_rows = $this->dbc->query($sql);
+  $result = $this->dbc->query($sql);
 
   if ($this->dbc->error) {
 
@@ -366,7 +364,11 @@ public function getNumRows($sql)
 
   } else {
 
-      return $num_rows->num_rows;
+    if ($row_count = $result->num_rows) {
+
+        return $row_count;
+        
+    }
 
   }
 
@@ -382,7 +384,7 @@ public function getNumRows($sql)
 /**
  * getResult
  * 
- * @param string $Statement
+ * @param object $Statement
  * @see https://stackoverflow.com/questions/10752815/mysqli-get-result-alternative
  * @return array
  * 
