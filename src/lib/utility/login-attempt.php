@@ -1,8 +1,9 @@
 <?php
 /**
- * login_attempt()
+ * get_login_attempt
  *
  * @category function
+ * @author M.Noermoehammad
  * @param string $ip
  * @return array
  * 
@@ -192,5 +193,30 @@ $sql = "UPDATE tbl_users SET user_locked_until = null WHERE user_login = ?";
 $stmt = db_prepared_query($sql, [$login], 's');
 
 return $stmt;
+
+}
+
+/**
+ * alert_login_attempt
+ *
+ * @param string $ip
+ * @return array
+ * 
+ */
+function alert_login_attempt($ip)
+{
+
+ if (filter_var($ip, FILTER_VALIDATE_IP)) {
+
+  $sql = "SELECT count(ip_address) AS alert_login_attempt 
+         FROM tbl_login_attempt 
+         WHERE ip_address = ? 
+         AND login_date = NOW()";
+
+  $row = db_prepared_query($sql, [$ip], "s")->get_result()->fetch_assoc();
+
+  return $row;
+
+ }
 
 }
