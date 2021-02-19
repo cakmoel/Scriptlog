@@ -199,6 +199,8 @@ return $stmt;
 /**
  * alert_login_attempt
  *
+ * @category function
+ * @author M.Noermoehammad
  * @param string $ip
  * @return array
  * 
@@ -211,7 +213,7 @@ function alert_login_attempt($ip)
   $sql = "SELECT count(ip_address) AS alert_login_attempt 
          FROM tbl_login_attempt 
          WHERE ip_address = ? 
-         AND login_date = NOW()";
+         AND login_date = NOW() LIMIT 50";
 
   $row = db_prepared_query($sql, [$ip], "s")->get_result()->fetch_assoc();
 
