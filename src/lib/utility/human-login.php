@@ -65,6 +65,8 @@ if(!isset($_SESSION['human_login_id'])) {
 /**
  * review_login_attempt
  *
+ * @category function
+ * @author M.Noermoehammad
  * @param string $ip
  * @return bool
  * 
@@ -74,8 +76,10 @@ function review_login_attempt($ip)
 
  $review_attempt = alert_login_attempt($ip)['alert_login_attempt'];
 
- if ($review_attempt >= 20) {
+ if ($review_attempt >= 50) {
 
+   delete_login_attempt($ip);
+   
    return false;
 
  } else {
@@ -151,27 +155,32 @@ if( check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'script
 
 }
 
-if(false === review_login_attempt($ip)) {
-
-   header(APP_PROTOCOL.' 400 Bad Request', true, 400);
-   header('Status: 400 Bad Request');
-   header('Retry-After: 3600');
-   exit("400 Bad Request");
-
-}
-
 if(false === verify_human_login_id($loginId)) {
 
-   http_response_code(400);
-   write_log($ip, 'unpleasant login attempt!');
+   http_response_code(503);
+
+   if ( false === review_login_attempt($ip) ) {
+
+      write_log($ip, 'unpleasant login attempt!');
+
+   }
    
+   exit("Server too busy. Please try again later.");
+
 }
 
 if(!isset($uniqueKey) && ($uniqueKey !== md5(app_key().$ip))) {
 
-   http_response_code(400);
-   write_log($ip, 'unpleasant login attempt!');
+   http_response_code(503);
+   
+   if ( false === review_login_attempt($ip) ) {
 
+      write_log($ip, 'unpleasant login attempt!');
+
+   }
+
+   exit("Server too busy. Please try again later.");
+   
 }
 
 }
