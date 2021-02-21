@@ -78,8 +78,6 @@ function review_login_attempt($ip)
 
  if ($review_attempt >= 50) {
 
-   delete_login_attempt($ip);
-   
    return false;
 
  } else {
@@ -155,31 +153,24 @@ if( check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'script
 
 }
 
+if ( false === review_login_attempt($ip) ) {
+
+   write_log($ip, 'unpleasant login attempt!');
+   delete_login_attempt($ip);
+
+}
+
 if(false === verify_human_login_id($loginId)) {
 
-   http_response_code(503);
-
-   if ( false === review_login_attempt($ip) ) {
-
-      write_log($ip, 'unpleasant login attempt!');
-
-   }
-   
-   exit("Server too busy. Please try again later.");
+   http_response_code(400);
+   exit("400 Bad Request");
 
 }
 
 if(!isset($uniqueKey) && ($uniqueKey !== md5(app_key().$ip))) {
 
-   http_response_code(503);
-   
-   if ( false === review_login_attempt($ip) ) {
-
-      write_log($ip, 'unpleasant login attempt!');
-
-   }
-
-   exit("Server too busy. Please try again later.");
+   http_response_code(400);
+   exit("400 Bad Request ");
    
 }
 
@@ -305,7 +296,7 @@ if (time() > $datetime) {
    
       if ($authenticator->checkEmailExists($login) == false) {
       
-         $errors['errorMessage'] = "The email you entered is not registered";
+         $errors['errorMessage'] = "Email or password is not correct";
              
       }
       
@@ -313,7 +304,7 @@ if (time() > $datetime) {
         
       if (!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $login)) {
       
-         $errors['errorMessage'] = "The username you entered is not valid";
+         $errors['errorMessage'] = "Username or password is not correct";
            
       } 
           
