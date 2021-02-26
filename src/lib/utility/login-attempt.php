@@ -16,9 +16,7 @@ function get_login_attempt($ip)
           WHERE ip_address = ? 
           AND login_date BETWEEN DATE_SUB( NOW() , INTERVAL 1 DAY ) AND NOW()";
 
-  $row = db_prepared_query($sql, [$ip], "s")->get_result()->fetch_assoc();
-
-  return $row;
+  return db_prepared_query($sql, [$ip], "s")->get_result()->fetch_assoc();
 
 }
 
@@ -34,9 +32,7 @@ function create_login_attempt($ip)
   
   $sql = "INSERT INTO tbl_login_attempt (ip_address, login_date) VALUES (?, NOW())";
 
-  $stmt = db_prepared_query($sql, [$ip], "s");
-
-  return $stmt;
+  return db_prepared_query($sql, [$ip], "s");
   
 }
 
@@ -50,11 +46,9 @@ function create_login_attempt($ip)
 function delete_login_attempt($ip)
 {
 
-   $sql = "DELETE FROM tbl_login_attempt WHERE ip_address = ?";
+  $sql = "DELETE FROM tbl_login_attempt WHERE ip_address = ?";
 
-   $removed = db_prepared_query($sql, [$ip], "s");
-
-   return $removed;
+  return db_prepared_query($sql, [$ip], "s");
 
 }
 
@@ -82,9 +76,7 @@ if (filter_var($user_login, FILTER_VALIDATE_EMAIL)) {
 
 }
 
-$stmt = db_prepared_query($sql, [$user_login], "s")->get_result()->fetch_assoc();
-
-return $stmt;
+return db_prepared_query($sql, [$user_login], "s")->get_result()->fetch_assoc();
 
 }
 
@@ -110,9 +102,7 @@ if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
 
 }
 
-$login_count = db_prepared_query($sql, [$sign_in_count, $login], "is");
-
-return $login_count;
+return db_prepared_query($sql, [$sign_in_count, $login], "is");
 
 }
 
@@ -138,9 +128,7 @@ if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
 
 }
 
-$locked_down = db_prepared_query($sql, [$sign_in_count, $locked_until, $login], "iss");
-
-return $locked_down;
+return db_prepared_query($sql, [$sign_in_count, $locked_until, $login], "iss");
 
 }
 
@@ -164,9 +152,7 @@ if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
 
 }
 
-$stmt = db_prepared_query($sql, [$login], 's');
-
-return $stmt;
+return db_prepared_query($sql, [$login], 's');
 
 }
 
@@ -190,9 +176,7 @@ $sql = "UPDATE tbl_users SET user_locked_until = null WHERE user_login = ?";
 
 }
 
-$stmt = db_prepared_query($sql, [$login], 's');
-
-return $stmt;
+return db_prepared_query($sql, [$login], 's');
 
 }
 
@@ -211,13 +195,11 @@ function alert_login_attempt($ip)
  if (filter_var($ip, FILTER_VALIDATE_IP)) {
 
   $sql = "SELECT count(ip_address) AS alert_login_attempt 
-         FROM tbl_login_attempt 
-         WHERE ip_address = ? 
-         AND login_date = NOW() LIMIT 50";
+          FROM tbl_login_attempt 
+          WHERE ip_address = ? 
+          AND login_date = NOW()";
 
-  $row = db_prepared_query($sql, [$ip], "s")->get_result()->fetch_assoc();
-
-  return $row;
+  return db_prepared_query($sql, [$ip], "s")->get_result()->fetch_assoc();
 
  }
 
