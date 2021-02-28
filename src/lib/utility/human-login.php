@@ -62,7 +62,7 @@ function review_login_attempt($ip)
 
  return (alert_login_attempt($ip)['alert_login_attempt'] >= 20) ? true : false;
 
-}
+}                                                    
 
 /**
  * human_login_request()
@@ -177,141 +177,137 @@ if ( midfielder() === true) {
 function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, array $values)
 {
 
-   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-      $login = (isset($values['login']) && $values['login'] == $_POST['login']) ? prevent_injection($values['login']) : null;
-      $user_pass = (isset($values['user_pass']) && $values['user_pass'] == $_POST['user_pass']) ? prevent_injection($values['user_pass']) : null;
-      $csrf = (isset($values['csrf']) && $values['csrf'] == $_POST['csrf']) ? $values['csrf'] : '';
-         
-      $captcha_verified = true;
-         
-      // validate form
-      safe_human_login($ip, $loginId, $uniqueKey, $values);
-      $valid = !empty($csrf) && verify_form_token('login_form', $csrf);
-         
-      if(!$valid) {
-         
-         $errors['errorMessage'] = "Sorry, attack detected!";
-         
-      }
+   $login = (isset($values['login']) && $values['login'] == $_POST['login']) ? prevent_injection($values['login']) : null;
+   $user_pass = (isset($values['user_pass']) && $values['user_pass'] == $_POST['user_pass']) ? prevent_injection($values['user_pass']) : null;
+   $csrf = (isset($values['csrf']) && $values['csrf'] == $_POST['csrf']) ? $values['csrf'] : '';
       
-      if ( ( !empty($values) ) && ( isset( $values['captcha_login'] ) && $values['captcha_login'] == $_POST['captcha_login'] ) && ( $values['captcha_login'] != Session::getInstance()->captcha_login)) {
-         
-         $captcha_verified = false;
-         $errors['errorMessage'] = "Enter captcha code correctly";
-          
-      }
-         
-      $failed_login_attempt = get_login_attempt($ip)['failed_login_attempt'];
-      $data = get_user_signin($login);
-      $datetime = (!empty($data['user_locked_until'])) ? strtotime($data['user_locked_until']) : null;
-      $signin = (!empty($data['user_signin_count'])) ? $data['user_signin_count'] : 0;
+   $captcha_verified = true;
       
-    if ( !empty($values) && $captcha_verified === true ) {
-          
-      $authenticate_user = is_a($authenticator, 'Authentication') ? $authenticator->validateUserAccount($login, $user_pass) : "";
+   // validate form
+   safe_human_login($ip, $loginId, $uniqueKey, $values);
+   $valid = !empty($csrf) && verify_form_token('login_form', $csrf);
       
-      if (time() > $datetime) {
+   if(!$valid) {
       
-         if ($authenticate_user === false) {
+      $errors['errorMessage'] = "Sorry, attack detected!";
       
-            http_response_code(403);
-            $errors['errorMessage'] = "Check your login details";
-         
-            $signin++;
-         
-            if ( ($failed_login_attempt < 5) || ( $signin % 15 ) ) {
-              
-               create_login_attempt($ip);
-         
-               sign_in_count($signin, $login);
-         
-            } else {
-         
-               $errors['errorMessage'] = "Please enter a captcha code!";
+   }
+   
+   if ( ( !empty($values) ) && ( isset( $values['captcha_login'] ) && $values['captcha_login'] == $_POST['captcha_login'] ) && ( $values['captcha_login'] != Session::getInstance()->captcha_login)) {
       
-               $multiplicator = $signin / 15;
+      $captcha_verified = false;
+      $errors['errorMessage'] = "Enter captcha code correctly";
+       
+   }
+      
+   $failed_login_attempt = get_login_attempt($ip)['failed_login_attempt'];
+   $data = get_user_signin($login);
+   $datetime = (!empty($data['user_locked_until'])) ? strtotime($data['user_locked_until']) : null;
+   $signin = (!empty($data['user_signin_count'])) ? $data['user_signin_count'] : 0;
+   
+ if ( !empty($values) && $captcha_verified === true ) {
+       
+   $authenticate_user = is_a($authenticator, 'Authentication') ? $authenticator->validateUserAccount($login, $user_pass) : "";
+   
+   if (time() > $datetime) {
+   
+      if ($authenticate_user === false) {
+   
+         http_response_code(403);
+         $errors['errorMessage'] = "Check your login details";
+      
+         $signin++;
+      
+         if ( ($failed_login_attempt < 5) || ( $signin % 15 ) ) {
            
-               if ($multiplicator > 5) {
-               
-                  $multiplicator = 5;
-           
-               }
-           
-               locked_down_until($signin, date('Y-m-d H:i:s', time() + 60 * 5 * $multiplicator), $login);
-         
-            } 
-         
+            create_login_attempt($ip);
+      
+            sign_in_count($signin, $login);
+      
          } else {
-         
-            if ((Session::getInstance()->human_login_id) && (Session::getInstance()->captcha_login)) {
       
-               unset($_SESSION['human_login_id']);
-               unset($_SESSION['captcha_login']);
-      
-            } 
+            $errors['errorMessage'] = "Please enter a captcha code!";
+   
+            $multiplicator = $signin / 15;
+        
+            if ($multiplicator > 5) {
             
-            if (!$data['user_banned']) {
-         
-              if ($data['user_signin_count']) {
-         
-                 signin_count_to_zero($login);
-         
-              }
-         
-              if ($datetime) {
-         
-                 locked_down_to_null($login);
-         
-              }
-              
-              $authenticator->login($_POST);
-         
-              delete_login_attempt($ip);
-         
-              direct_page('index.php?load=dashboard', 302);
-         
+               $multiplicator = 5;
+        
             }
-            
-         }
+        
+            locked_down_until($signin, date('Y-m-d H:i:s', time() + 60 * 5 * $multiplicator), $login);
       
-         if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
-         
-            if ($authenticator->checkEmailExists($login) === false) {
-            
-               $errors['errorMessage'] = "Email or password is not correct";
-                   
-            }
-            
-         } else {
-              
-            if (!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $login)) {
-            
-               $errors['errorMessage'] = "Username or password is not correct";
-                 
-            } 
-                
-         }
-         
-         if (scriptpot_validate($values) === false) {
-            
-            http_response_code(403);
-            $errors['errorMessage'] = "anomaly behaviour detected!";
-            
-         }
+         } 
       
       } else {
       
-         http_response_code(403);
-         $datetime = date("Y-m-d H:i:s", $datetime);
-         $errors['errorMessage'] = "Account is locked until {$datetime}";
+         if ((Session::getInstance()->human_login_id) && (Session::getInstance()->captcha_login)) {
+   
+            unset($_SESSION['human_login_id']);
+            unset($_SESSION['captcha_login']);
+   
+         } 
+         
+         if (!$data['user_banned']) {
       
+           if ($data['user_signin_count']) {
+      
+              signin_count_to_zero($login);
+      
+           }
+      
+           if ($datetime) {
+      
+              locked_down_to_null($login);
+      
+           }
+           
+           $authenticator->login($_POST);
+      
+           delete_login_attempt($ip);
+      
+           direct_page('index.php?load=dashboard', 302);
+      
+         }
+         
       }
-          
-    } 
+   
+      if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+      
+         if ($authenticator->checkEmailExists($login) === false) {
          
-      return array($errors, $failed_login_attempt);
+            $errors['errorMessage'] = "Email or password is not correct";
+                
+         }
          
+      } else {
+           
+         if (!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $login)) {
+         
+            $errors['errorMessage'] = "Username or password is not correct";
+              
+         } 
+             
+      }
+      
+      if (scriptpot_validate($values) === false) {
+         
+         http_response_code(403);
+         $errors['errorMessage'] = "anomaly behaviour detected!";
+         
+      }
+   
+   } else {
+   
+      http_response_code(403);
+      $datetime = date("Y-m-d H:i:s", $datetime);
+      $errors['errorMessage'] = "Account is locked until {$datetime}";
+   
    }
+       
+ } 
+      
+ return array($errors, $failed_login_attempt);
          
 }
