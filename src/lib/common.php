@@ -20,4 +20,4 @@ define('APP_DOCUMENT', APP_PUBLIC . DS . 'files' . DS . 'docs' . DS);
 define('APP_THEME', APP_PUBLIC . DS . 'themes' . DS);
 define('APP_PLUGIN', APP_ADMIN . DS . 'plugins' . DS);
 define('APP_DEVELOPMENT', true);
-define('SCRIPTLOG', sha1(mt_rand(1, 1000).'M4Le053Nk4Wo12!@#'));
+define('SCRIPTLOG', hash_hmac('sha256', APP_TITLE.':'.APP_CODENAME.mt_rand(1, 1000), hash('sha256', uniqid().'M4Le053Nk4WoR!@#{>}>01[:+]-07|=_$%^&*(id)')));
