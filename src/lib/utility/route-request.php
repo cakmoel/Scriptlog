@@ -1,10 +1,14 @@
 <?php
 /**
- * Route Request Function
+ * route_request()
+ * 
  * this function will be called in index.php file
  * on top of our site directory
  * 
- * @category Function 
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @return mixed
  * 
  */
@@ -15,7 +19,7 @@ function route_request()
   
 if (check_table() == true) {
 
-     return $dispatcher -> dispatch();
+    return $dispatcher->dispatch();
 
 } else {
 
