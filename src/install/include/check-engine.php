@@ -34,6 +34,7 @@ function check_php_version()
  */
 function check_mysql_version($link, $min)
 {
+
   if ($link instanceof mysqli)  {
 
     $mysql_version = $link->server_version;
@@ -134,7 +135,7 @@ function check_browser_version()
 }
 
 /**
- * get browser version
+ * get_browser version
  * 
  */
 function get_browser_Version()
@@ -167,33 +168,36 @@ function check_web_server()
  */
 function check_main_dir()
 {
-    if (is_dir(APP_PATH) && is_file(APP_PATH . '../lib/main.php')) {
+    
+  if (is_dir(APP_PATH) && is_file(APP_PATH . '../lib/main.php')) {
         
-       return true;
+    return true;
        
-    } else {
+  } else {
         
-       return false;
+    return false;
        
-    }
+  }
     
 }
 
 /**
  * Checking Load Engine
+ * 
+ * 
  */
 function check_loader()
 {
     
-    if (is_dir(APP_PATH) && is_file(APP_PATH . '../lib/Scriptloader.php')) {
+  if (is_dir(APP_PATH) && is_file(APP_PATH . '../lib/Scriptloader.php')) {
         
-     return true;
+    return true;
      
-    } else {
+  } else {
         
-     return false;
+    return false;
      
-    }
+  }
     
 }
 
@@ -202,15 +206,22 @@ function check_loader()
  */
 function check_log_dir()
 {
-    if (is_dir(APP_PATH ) && is_dir(APP_PATH . '../public/log') && is_writable(APP_PATH . '../public/log')) {
+
+  $perms = fileperms(APP_PATH . '../public/log');
+
+  if ( is_dir(APP_PATH ) && is_dir(APP_PATH . '../public/log') ) {
         
-        return true;
+    return true;
         
-    } else {
+  } elseif (is_writable(APP_PATH . '../public/log') || ($perms & 0x0080) || ($perms & 0x0010) || ($perms & 0x0002) ) {
+
+    return true;
+
+  } else {
         
-        return false;
+    return false;
         
-    }
+  }
     
 }
 
@@ -219,70 +230,95 @@ function check_log_dir()
  */
 function check_theme_dir()
 {
-    if (is_dir(APP_PATH ) && is_dir(APP_PATH . '../public/themes') && is_writable(APP_PATH . '../public/themes')) {
+
+ $perms = fileperms(APP_PATH . '../public/themes');
+
+ if (is_dir(APP_PATH ) && is_dir(APP_PATH . '../public/themes') ) {
         
-        return true;
+    return true;
         
-    } else {
+ } elseif (is_writable(APP_PATH . '../public/themes') || ($perms & 0x0080) || ($perms & 0x0010) || ($perms & 0x0002) ) {
+
+    return true;
+
+ } else {
         
-        return false;
+    return false;
         
-    }
+ }
     
 }
 
 /**
  * Checking Cache Directory. It is writable or not
+ * 
  */
 function check_cache_dir()
 {
-    if (is_dir(APP_PATH) && is_dir(APP_PATH . '../public/cache') && is_writable(APP_PATH . '../public/cache')) {
+   
+ $perms = fileperms(APP_PATH . '../public/cache/');
+
+ if (is_dir(APP_PATH) && is_dir(APP_PATH . '../public/cache')  ) {
         
-        return true;
+   return true;
         
-    } else {
+ } elseif ( is_writable(APP_PATH . '../public/cache') || ($perms & 0x0080) || ($perms & 0x0010) || ($perms & 0x0002) ) {
+
+   return true;
+
+ } else {
         
-        return false;
+   return false;
         
-    }
+ }
     
 }
 
 /**
  * Checking lib Plugin Directory. It is writeable or not
+ * 
  */
 function check_plugin_dir()
 {
-    if (is_dir(APP_PATH) && is_dir(APP_PATH . '../admin/plugins') && is_writable(APP_PATH . '../admin/plugins')) {
+
+  $perms = fileperms(APP_PATH . '../admin/plugins');
+
+  if (is_dir(APP_PATH) && is_dir(APP_PATH . '../admin/plugins')  ) {
         
-        return true;
+    return true;
         
-    } else {
+  } elseif (is_writable(APP_PATH . '../admin/plugins') || ($perms & 0x0080) || ($perms & 0x0010) || ($perms & 0x0002) ) {
+
+    return true;
+    
+  } else {
         
-        return false;
+    return false;
         
-    }
+  }
     
 }
 
 /**
  * Checking PCRE UTF-8
+ * 
  */
 function check_pcre_utf8()
 {
-    if (!@preg_match('/^.$/u', 'ñ')) {
+    
+  if (!@preg_match('/^.$/u', 'ñ')) {
         
-        return true;
+    return true;
         
-    } elseif (!@preg_match('/^\pL$/u', 'ñ')) {
+  } elseif (!@preg_match('/^\pL$/u', 'ñ')) {
         
-        return true;
+    return true;
         
-    } else {
+  } else {
         
-        return false;
+    return false;
         
-    }
+  }
     
 }
 
