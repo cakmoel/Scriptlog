@@ -19,7 +19,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '9ad8702e90f7481d9f3c9f31bebed41b89f58ede',
+    'reference' => '491cab8d2079638875da0d619ce7fdcb382f503e',
     'name' => '__root__',
   ),
   'versions' => 
@@ -31,7 +31,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '9ad8702e90f7481d9f3c9f31bebed41b89f58ede',
+      'reference' => '491cab8d2079638875da0d619ce7fdcb382f503e',
     ),
     'doctrine/lexer' => 
     array (
@@ -53,21 +53,21 @@ private static $installed = array (
     ),
     'filp/whoops' => 
     array (
-      'pretty_version' => '2.9.2',
-      'version' => '2.9.2.0',
+      'pretty_version' => '2.12.0',
+      'version' => '2.12.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'df7933820090489623ce0be5e85c7e693638e536',
+      'reference' => 'd501fd2658d55491a2295ff600ae5978eaad7403',
     ),
     'guzzlehttp/psr7' => 
     array (
-      'pretty_version' => '1.7.0',
-      'version' => '1.7.0.0',
+      'pretty_version' => '1.8.1',
+      'version' => '1.8.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => '53330f47520498c0ae1f61f7e2c90f55690c06a3',
+      'reference' => '35ea11d335fd638b5882ff1725228b3d35496ab1',
     ),
     'intervention/image' => 
     array (
@@ -222,12 +222,12 @@ private static $installed = array (
     ),
     'voku/anti-xss' => 
     array (
-      'pretty_version' => '4.1.31',
-      'version' => '4.1.31.0',
+      'pretty_version' => '4.1.32',
+      'version' => '4.1.32.0',
       'aliases' => 
       array (
       ),
-      'reference' => '22dea9be8dbffa466995ea87a12da5f3bce874bb',
+      'reference' => '159b49a50cf3f6cf72ee43b0dcf7c2580a0c12d1',
     ),
     'voku/portable-ascii' => 
     array (
