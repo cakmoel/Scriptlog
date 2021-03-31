@@ -9,7 +9,7 @@
  Deny from all
 </FilesMatch>
 
-# Deny Folder Indexes.
+ServerSignature Off
 Options -Indexes
 
 ############### SET COOKIES DOMAIN ##################
@@ -20,6 +20,20 @@ Options -Indexes
  </Filesmatch>
 </IfModule>
 
+############### SET HTTP HEADER ##################
+ <IfModule mod_headers.c>
+ #These headers are also helpful in increasing security
+ Header set X-Content-Type-Options nosniff
+ Header set X-XSS-Protection "1; mode=block"
+ Header always append X-Frame-Options DENY
+ #Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
+ Header set Connection keep-alive
+ Header set Referrer-Policy "no-referrer-when-downgrade"
+ <FilesMatch ".(js|css|ico|txt|htm|html|png|jpg|jpeg|webp|gif|js|eot|svg|ttf|woff|woff2|webm|ogg|mp4|wav|mp3|pdf|php|tpl)$">
+  Header set Cache-Control "max-age=31536000, public"
+ </FilesMatch>
+</IfModule>
+
 ############## Write Friendly URL ################
 <IfModule mod_rewrite.c>
 # mod_rewrite rules
@@ -28,7 +42,7 @@ RewriteEngine On
 RewriteCond %{HTTP_USER_AGENT} libwww-perl.* 
 RewriteRule .* – [F,L]
 
-# The RewriteBase of the system (change if you are using this sytem in a sub-folder).
+# The RewriteBase of the system (change if you are using this system in a sub-folder).
 #RewriteBase /
 
 # This will make the site only accessible without the "www." 
@@ -43,20 +57,6 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-l 
 RewriteRule ^(.*)$ index.php [QSA,L]
 
-############### SET HTTP HEADER ##################
- <IfModule mod_headers.c>
- #These headers are also helpful in increasing security
- Header set X-Content-Type-Options "nosniff"
- Header set X-XSS-Protection "1; mode=block"
- Header set X-Frame-Options "DENY"
- #Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
- 
-  Header set Connection keep-alive
-  Header set Referrer-Policy "no-referrer-when-downgrade"
-  <FilesMatch ".(js|css|ico|txt|htm|html|png|jpg|jpeg|webp|gif|js|eot|svg|ttf|woff|woff2|webm|ogg|mp4|wav|mp3|pdf|php|tpl)$">
-   Header set Cache-Control "max-age=31536000, public"
-  </FilesMatch>
-  </IfModule>
 </IfModule>
 
 
