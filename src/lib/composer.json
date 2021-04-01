@@ -6,6 +6,7 @@
         "egulias/email-validator": "^3.0",
         "voku/anti-xss": "^4.1",
         "selective/archive-bomb-scanner": "^1.1",
-        "filp/whoops": "^2.9"
+        "filp/whoops": "^2.9",
+        "laminas/laminas-escaper": "^2.7"
     }
 }
