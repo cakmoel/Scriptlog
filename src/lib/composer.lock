@@ -96,7 +96,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/62c3b73c581c834885acf6e120b412b76acc495a",
+                "url": "https://github.com/egulias/EmailValidator.git",
                 "reference": "62c3b73c581c834885acf6e120b412b76acc495a",
                 "shasum": ""
             },
