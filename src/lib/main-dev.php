@@ -11,10 +11,8 @@
  * @since    Since Release 1.0
  * 
  */
-ini_set('memory_limit', "5M");
-error_reporting(-1);
 #ini_set("session.cookie_secure", 1);  
-#ini_set("session.cookie_lifetime", 86400);  
+#ini_set("session.cookie_lifetime", 604800);  
 ini_set("session.cookie_httponly", 1);
 #ini_set("session.use_cookies", 1);
 ini_set("session.use_only_cookies", 1);
@@ -118,19 +116,19 @@ foreach ($files_dir_iterator as $file) {
 #====================End of call functions in directory lib/utility=====================================================
 
 // check if loader is exists
-if (is_dir(APP_ROOT . APP_LIBRARY) && is_file(APP_ROOT . APP_LIBRARY . DS . 'Scriptloader.php')) {
- 
-    require __DIR__ . DS . 'Scriptloader.php';
-      
-}
-
 if (is_readable(APP_ROOT.APP_LIBRARY.DS.'vendor/autoload.php')) {
 
-    require __DIR__ . DS . 'vendor/autoload.php';
+    require_once __DIR__ . DS . 'vendor/autoload.php';
     
 }
 
-// load all libraries 
+if (file_exists(APP_ROOT.APP_LIBRARY.DS.'Autoloader.php')) {
+
+    require __DIR__ . DS . 'Autoloader.php';
+
+}
+
+// load libraries necessary by system
 $library = array(
     APP_ROOT . APP_LIBRARY . DS . 'core'    . DS,
     APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
@@ -141,7 +139,9 @@ $library = array(
 
 get_server_load();
 
-load_engine($library);
+Autoloader::setBaseDir(APP_ROOT);
+
+Autoloader::addClassDir($library); 
 
 call_htmlpurifier();
 
@@ -189,16 +189,19 @@ $rules = array(
     
 );
 
-#==================== END OF RULES ======================
+#==================== END OF RULES =======================
 
-#====== an instantiation of Database connection =========
+#====== an instantiation of Database connection ==========
 $dbc = DbFactory::connect(['mysql:host='.$config['db']['host'].';dbname='.$config['db']['name'], $config['db']['user'], $config['db']['pass']]);
 
-#====== an instantiation of scriptlog cipher key ========
+#====== an instantiation of scriptlog cipher key =========
 $key = ScriptlogCryptonize::scriptlogCipherKey();
 
-// Register rules of routes, an instance of database connection and key for decryption message
-Registry::setAll(array('dbc' => $dbc, 'route' => $rules, 'key' => $key));
+#====== an instantiation of scriptlog request path =======
+$uri = new RequestPath();
+
+// Register rules of routes, an instance of database connection, cipher key for cryptography and uri requested
+Registry::setAll(array('dbc' => $dbc,  'key' => $key, 'route' => $rules, 'uri'=>$uri));
 
 whoops_error();
 
@@ -226,14 +229,12 @@ $ubench = new Ubench();
 session_set_save_handler($sessionMaker, true);
 session_save_path(__DIR__ . '/utility/.sessions'.DS);
 
-# set_exception_handler('LogError::exceptionHandler');
-# set_error_handler('LogError::errorHandler');
 register_shutdown_function('session_write_close');
 
 if (!start_session_on_site($sessionMaker)) {
 
     ob_start();
-    
+
 }
 
 $errors = [];
