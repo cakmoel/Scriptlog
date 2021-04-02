@@ -12,7 +12,7 @@
  * 
  */
 #ini_set("session.cookie_secure", 1);  
-#ini_set("session.cookie_lifetime", 86400);  
+#ini_set("session.cookie_lifetime", 604800);  
 ini_set("session.cookie_httponly", 1);
 #ini_set("session.use_cookies", 1);
 ini_set("session.use_only_cookies", 1);
@@ -122,13 +122,13 @@ if (is_readable(APP_ROOT.APP_LIBRARY.DS.'vendor/autoload.php')) {
     
 }
 
-if (is_dir(APP_ROOT . APP_LIBRARY) && is_file(APP_ROOT . APP_LIBRARY . DS . 'Scriptloader.php')) {
- 
-    require __DIR__ . DS . 'Scriptloader.php';
-      
+if (file_exists(APP_ROOT.APP_LIBRARY.DS.'Autoloader.php')) {
+
+    require __DIR__ . DS . 'Autoloader.php';
+
 }
 
-// load all libraries 
+// load libraries necessary by system
 $library = array(
     APP_ROOT . APP_LIBRARY . DS . 'core'    . DS,
     APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
@@ -139,7 +139,9 @@ $library = array(
 
 get_server_load();
 
-load_engine($library);
+Autoloader::setBaseDir(APP_ROOT);
+
+Autoloader::addClassDir($library); 
 
 call_htmlpurifier();
 
@@ -187,17 +189,23 @@ $rules = array(
     
 );
 
-#==================== END OF RULES ======================
+#==================== END OF RULES =======================
 
-#====== an instantiation of Database connection =========
+#====== an instantiation of Database connection ==========
 $dbc = DbFactory::connect(['mysql:host='.$config['db']['host'].';dbname='.$config['db']['name'], $config['db']['user'], $config['db']['pass']]);
 
+#====== an instantiation of scriptlog cipher key =========
 $key = ScriptlogCryptonize::scriptlogCipherKey();
 
-// Register rules of routes, an instance of database connection and key for cryptography
-Registry::setAll(array('dbc' => $dbc, 'route' => $rules, 'key' => $key));
+#====== an instantiation of scriptlog request path =======
+$uri = new RequestPath();
+
+// Register rules of routes, an instance of database connection, cipher key for cryptography and uri requested
+Registry::setAll(array('dbc' => $dbc,  'key' => $key, 'route' => $rules, 'uri'=>$uri));
 
 whoops_error();
+
+content_security_policy();
 
 /* an instances of class that necessary for the system
  * please do not change this below variable 
@@ -209,9 +217,6 @@ whoops_error();
  * @var $userDao, $validator, $authenticator, $ubench --
  * 
  */
-
-content_security_policy();
-
 $sessionMaker = new SessionMaker(set_session_cookies_key());
 $searchPost = new SearchFinder($dbc);
 $sanitizer = new Sanitize();
