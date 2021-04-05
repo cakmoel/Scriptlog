@@ -75,31 +75,16 @@ class Dao
   */
  protected function findAll(array $data = array(), $fetchMode = null)
  {
-     
-   try {
-        
-        if (!$this->sql) {
+   
+  if (!$this->sql) {
 
-            throw new DbException("No SQL Query");
+    throw new DbException("No SQL Query");
 
-        }
-        
-        $findAll = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchAll($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchAll();
+  }
 
-        return $findAll;
-        
-    } catch (DbException $e) {
-    
-        $this->closeConnection();
-        $this->error = LogError::newMessage($e);
-        $this->error = LogError::customErrorMessage('admin');
-        
-    } catch (PDOException $e) {
-
-        throw new PDOException("Error on SQL Query: " .$e->getMessage());
-        $this->closeConnection();
-
-    }
+  $findAll = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchAll($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchAll();
+  
+  return $findAll;
     
  }
  
@@ -116,23 +101,14 @@ class Dao
  protected function findRow(array $data = array(), $fetchMode = null)
  {
      
-  try {
+  if (!$this->sql) {
     
-    if (!$this->sql) {
-    
-        throw new DbException("No SQL Query!");
-    }
-     
-    $findRow = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetch();
+    throw new DbException("No SQL Query!");
+  }
+  
+  $findRow = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetch();
 
-    return $findRow;
-
-  } catch (DbException $e) {
-     
-      $this->closeConnection();
-      $this->error = LogError::newMessage($e);
-      $this->error = LogError::customErrorMessage('admin');
-  }   
+  return $findRow;
   
  }
  
@@ -149,25 +125,15 @@ class Dao
  protected function findColumn(array $data = array(), $fetchMode = null)
  {
      
-   try {
-    
-       if (!$this->sql) {
+  if (!$this->sql) {
            
-          throw new DbException("No SQL Query!");
-           
-       }
-       
-       $findColumn = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchColumn($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
+    throw new DbException("No SQL Query!");
+     
+  }
+ 
+  $findColumn = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchColumn($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
 
-       return $findColumn;
-
-   } catch (DbException $e) {
-       
-       $this->closeConnection();
-       $this->error = LogError::newMessage($e);
-       $this->error = LogError::customErrorMessage('admin');
-       
-   }
+  return $findColumn;
      
  }
  
@@ -182,25 +148,15 @@ class Dao
  public function checkCountValue($data = array())
  {
      
-   try {
-         
-        if (!$this->sql) {
+  if (!$this->sql) {
              
-           throw new DbException("No SQL Query!");
-           
-        }
-         
-        $stmt = $this->dbc->dbQuery($this->sql, $data);
-         
-        return $stmt->rowCount();
-              
-     } catch (DbException $e) {
-         
-        $this->closeConnection();
-        $this->error = LogError::newMessage($e);
-        $this->error = LogError::customErrorMessage('admin');
-         
-     }
+    throw new DbException("No SQL Query!");
+    
+  }
+  
+  $stmt = $this->dbc->dbQuery($this->sql, $data);
+  
+  return $stmt->rowCount();
      
  }
  
@@ -316,9 +272,7 @@ protected function lastId()
  protected function filteringId(Sanitize $sanitize, $str, $type)
  {
 
- try {
-
-   $this->sanitizing = $sanitize;
+  $this->sanitizing = $sanitize;
 	 	
    switch ($type) {
       
@@ -345,23 +299,15 @@ protected function lastId()
               
           } else {
               
-              header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-              throw new DbException("ERROR: this - $str - is considered invalid.");
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            throw new DbException("ERROR: this - $str - is considered invalid.");
 
           }
           
           break;
       
        }
-	 	
-      } catch (DbException $e) {
-	 	
-        $this->error = LogError::setStatusCode(http_response_code());
-        $this->error = LogError::newMessage($e);
-        $this->error = LogError::customErrorMessage();
-          
-      }
-			
-}
-	
+
+ }
+
 }
