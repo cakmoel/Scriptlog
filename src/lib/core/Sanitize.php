@@ -14,8 +14,6 @@
 class Sanitize 
 {
 
- public function __construct(){}
-
  public function sanitasi($str, $tipe)
  {
 		switch($tipe){
@@ -64,7 +62,7 @@ class Sanitize
  {
 	 $file = pathinfo($path, PATHINFO_BASENAME);
 	 if(file_exists($file['dirname'].DIRECTORY_SEPARATOR.$file['basename'])){
-		 return $file['basename'];
+		return $file['basename'];
 	 }
 
  }
