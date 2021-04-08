@@ -1,6 +1,7 @@
 <?php
 /**
- * LogError Class
+ * class LogError
+ * 
  * Error Handling and Logging
  * 
  * @category  Core Class
@@ -13,8 +14,6 @@
 class LogError
 {
 
-   private static $_printError = false;
-
    private static $logFilePath = APP_ROOT . APP_PUBLIC . '/log/';
 
    private static $httpResponseCode;
@@ -25,8 +24,9 @@ class LogError
    }
 
     /**
+     * 
      * @method customErrorMessage
-     * @param string 
+     * @param string $privilege
      * 
      */
     public static function customErrorMessage($privilege = null)
@@ -38,188 +38,45 @@ class LogError
                 
                 case 400 :
                     
-                    echo '<div class="content-wrapper">
-                          <section class="content-header">
-                          <h1>'.self::$httpResponseCode.' Bad Request</h1>
-                          <ol class="breadcrumb">
-                          <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-                          <li><a href="#">Error</a></li>
-                         <li class="active">'.self::$httpResponseCode.'</li>
-                         </ol>
-                         </section>';
-                    
-                    echo '<section class="content">
-                         <div class="error-page">
-                         <h2 class="headline text-yellow">'.self::$httpResponseCode.'</h2>
-                         <div class="error-content">
-                         <h3><i class="fa fa-warning text-yellow"></i> Application not response to bad request.</h3>
-                         <p>
-                            Please check your log error and send it to - email: scriptlog@yandex.com
-                            <a href="index.php?load=dashboard">return to dashboard</a>.
-                         </p>
-                         </div>
-                         </div>
-                         </section>';
-                    
-                    echo '</div>';
+                    echo MessageLog::contentMessage(static::$httpResponseCode, 'Bad Request', $privilege);
                     
                     break;
                     
                 case 403 :
 
-                    echo '<div class="content-wrapper">
-                         <section class="content-header">
-                         <h1>'.self::$httpResponseCode.' Forbidden</h1>
-                         <ol class="breadcrumb">
-                         <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-                         <li><a href="#">Error</a></li>
-                         <li class="active">'.self::$httpResponseCode.'</li>
-                         </ol>
-                         </section>';
-              
-                  echo '<section class="content">
-                        <div class="error-page">
-                        <h2 class="headline text-yellow">'.self::$httpResponseCode.'</h2>
-                        <div class="error-content">
-                        <h3><i class="fa fa-warning text-yellow"></i> Oops! Forbidden.</h3>
-                        <p>
-                          Please check your log error and send it to - email: scriptlog@yandex.com
-                          <a href="index.php?load=dashboard">return to dashboard</a>.
-                        </p>
-                        </div>
-                        </div>
-                        </section>';
-              
-                  echo '</div>';
+                    echo MessageLog::contentMessage(static::$httpResponseCode, 'Forbidden', $privilege);
                  
                   break;
 
                 case 404 :
                     
-                    echo '<div class="content-wrapper">
-                          <section class="content-header">
-                          <h1>'.self::$httpResponseCode.' Not Found</h1>
-                          <ol class="breadcrumb">
-                          <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-                          <li><a href="#">Error</a></li>
-                         <li class="active">'.self::$httpResponseCode.'</li>
-                         </ol>
-                         </section>';
-                    
-                    echo '<section class="content">
-                         <div class="error-page">
-                         <h2 class="headline text-yellow">'.self::$httpResponseCode.'</h2>
-                         <div class="error-content">
-                         <h3><i class="fa fa-warning text-yellow"></i> Oops! Page Not Found.</h3>
-                         <p>
-                            Please check your log error and send it to - email: scriptlog@yandex.com
-                            <a href="index.php?load=dashboard">return to dashboard</a>.
-                         </p>
-                         </div>
-                         </div>
-                         </section>';
-                    
-                    echo '</div>';
+                    echo MessageLog::contentMessage(static::$httpResponseCode, 'Not Found', $privilege);
                     
                     break;
 
                 case 405 :
 
-                    echo '<div class="content-wrapper">
-                         <section class="content-header">
-                         <h1>'.self::$httpResponseCode.' Method Not Allowed</h1>
-                         <ol class="breadcrumb">
-                         <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-                         <li><a href="#">Error</a></li>
-                         <li class="active">'.self::$httpResponseCode.'</li>
-                         </ol>
-                         </section>'; 
-                    
-                    echo '<section class="content">
-                          <div class="error-page">
-                          <h2 class="headline text-yellow">'.self::$httpResponseCode.'</h2>
-                          <div class="error-content">
-                          <h3><i class="fa fa-warning text-yellow"></i> Oops! Method Not Allowed.</h3>
-                          <p>
-                           Please check your log error and send it to - email: scriptlog@yandex.com
-                           <a href="index.php?load=dashboard">return to dashboard</a>.
-                          </p>
-                          </div>
-                          </div>
-                          </section>';
-
-                    echo '</div>';
+                    echo MessageLog::contentMessage(static::$httpResponseCode, 'Method Not Allowed', $privilege);
                 
                   break;
                 
                 case 413 :
 
-                    echo '<div class="content-wrapper">
-                          <section class="content-header">
-                          <h1>'.self::$httpResponseCode.' Payload Too Large</h1>
-                          <ol class="breadcrumb">
-                          <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-                          <li><a href="#">Error</a></li>
-                          <li class="active">'.self::$httpResponseCode.'</li>
-                          </ol>
-                          </section>';
-              
-                    echo '<section class="content">
-                          <div class="error-page">
-                          <h2 class="headline text-yellow">'.self::$httpResponseCode.'</h2>
-                          <div class="error-content">
-                          <h3><i class="fa fa-warning text-yellow"></i> Oops! Payload Too Large.</h3>
-                          <p>
-                           Please check your log error and send it to - email: scriptlog@yandex.com
-                             <a href="index.php?load=dashboard">return to dashboard</a>.
-                          </p>
-                          </div>
-                          </div>
-                          </section>';
-              
-                    echo '</div>';
+                    echo MessageLog::contentMessage(static::$httpResponseCode, 'Payload Too Large', $privilege);
 
                   break;
 
                 case 500 :
 
-                    echo '<div class="content-wrapper">
-                           <section class="content-header">
-                           <h1>'.self::$httpResponseCode.' Internal Server Error</h1>
-                          <ol class="breadcrumb">
-                          <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-                           <li><a href="#">Error</a></li>
-                          <li class="active">'.self::$httpResponseCode.'</li>
-                           </ol>
-                          </section>';
-              
-                    echo '<section class="content">
-                          <div class="error-page">
-                         <h2 class="headline text-yellow">'.self::$httpResponseCode.'</h2>
-                         <div class="error-content">
-                         <h3><i class="fa fa-warning text-yellow"></i> Oops! Internal Server Error.</h3>
-                         <p>
-                          Please check your log error and send it to - email: scriptlog@yandex.com
-                          <a href="index.php?load=dashboard">return to dashboard</a>.
-                         </p>
-                         </div>
-                         </div>
-                         </section>';
-              
-                    echo '</div>';
-              
-              break;
-                            
-                     
+                    echo MessageLog::contentMessage(static::$httpResponseCode, 'Internal Server Error', $privilege);
+
+                  break;
+                             
             }
             
         } else {
             
-            echo '<div class="content-wrapper">';
-            echo '<div class="alert alert-danger" role="alert">';
-            echo 'Please check your error log and send it to - email: 
-                  scriptlog@yandex.com';   
-            echo '</div></div>';
+            echo MessageLog::contentMessage(static::$httpResponseCode);
 
         }
         
@@ -229,7 +86,7 @@ class LogError
      * exception handler
      *
      * @method exceptionHandler
-     * @param string $e
+     * @param object $e
      */
     public static function exceptionHandler($e)
     {
@@ -247,85 +104,37 @@ class LogError
      * @param string $file
      * @param string $line
      * @return number
+     * 
      */
-    public static function errorHandler($errorNumber, $errorString, $file, $line)
+    public static function errorHandler($code, $description, $file = null, $line = null)
     {
-        if (!(error_reporting() & $errorNumber)) {
-            
-            return false;
-        }
-        
-        switch ($errorNumber) {
-            
-            case E_NOTICE:
-            case E_USER_NOTICE:
-            case E_DEPRECATED:
-            case E_USER_DEPRECATED:
-            case E_STRICT:
-                
-                $errorMessage = "<b>STRICT ERROR: </b> [$errorNumber] - $errorString<br />\n";
-                
-                self::errorMessage($errorMessage);
-                self::customErrorMessage();
-                
-                break;
-            
-            case E_WARNING:
-            case E_USER_WARNING:
-                
-                $errorMessage = "<b>WARNING: </b> [$errorNumber] - $errorString<br />\n";
-                
-                self::errorMessage($errorMessage);
-                self::customErrorMessage();
-                
-                break;
-            
-            case E_ERROR:
-            case E_CORE_ERROR:
-            case E_USER_ERROR:
-            case E_RECOVERABLE_ERROR:
-                
-                $errorMessage = "<b>FATAL: </b> [$errorNumber] - $errorString";
-                $errorMessage .= " Fatal error on line $line in file $file";
-                $errorMessage .= " PHP " . PHP_VERSION . " (" . PHP_OS . ")<br />\n";
-                
-                self::errorMessage($errorMessage);
-                self::customErrorMessage();
-                
-                break;
-            
-            default:
-                
-                $errorMessage = "Unknown error type: [$errorNumber] - $errorString<br />\n";
-                
-                self::errorMessage($errorMessage);
-                self::customErrorMessage();
-                
-                break;
-                
-        }
-        
-        /* Don't execute PHP internal error handler */
-        return true;
-        
+      return MessageLog::messageError($code, $description, self::logPath().'error.log', $file, $line); 
     }
 
     /**
      *
      * @static method newMessage
-     * @param Exception $exception
+     * @param Exception|Throwable $exception
      * @param string $_printError
      * @param string $clear
      * @param string $error_file
      */
-    public static function newMessage(Exception $exception, $_printError = false, $clear = false, $error_file = 'logerror.html')
+    public static function newMessage($exception, $_printError = false, $clear = false, $error_file = 'logerror.html')
     {
-        $message = $exception->getMessage();
-        $code = $exception->getCode();
-        $file = $exception->getFile();
-        $line = $exception->getLine();
-        $trace = $exception->getTraceAsString();
-        $date = date('M d, Y G:iA');
+
+      if ( ! $exception instanceof Exception) {
+
+        $exception = new CoreException($exception);
+
+      }
+
+      $message = $exception->getMessage();
+      $code = $exception->getCode();
+      $file = $exception->getFile();
+      $line = $exception->getLine();
+      $trace = $exception->getTraceAsString();
+      
+      $date = date('M d, Y G:iA');
         
         $log_message = "<h3>Exception information:</h3>\n
 		<p><strong>Date:</strong> {$date}</p>\n
@@ -342,54 +151,35 @@ class LogError
         }
         
         if ($clear) {
+
             $content = '';
+
         } else {
+            
             $content = file_get_contents(self::logPath() . $error_file);
+
         }
         
         file_put_contents(self::logPath() . $error_file, $log_message . $content);
         
         if ($_printError == true) {
+            
             echo $log_message;
+            
             exit();
+            
         }
         
     }
 
-    /**
-     *
-     * @static method errorMessage
-     * @param string $error
-     * @param string $_printError
-     * @param string $error_file
-     */
-    public static function errorMessage($error, $_printError = false, $error_file = 'errorlog.html')
-    {
-        $date = date('M d, Y G:iA');
-        $log_message = "<p>Error on $date - $error</p>";
-        
-        if (is_file(self::logPath() . $error_file) === false) {
-            file_put_contents(self::logPath() . $error_file, '');
-        }
-        
-        $content = file_get_contents(self::logPath() . $error_file);
-        file_put_contents(self::logPath() . $error_file, $log_message . $content);
-        
-        if ($_printError == true) {
-            echo $log_message;
-            exit();
-        }
-         
-    }
+  public static function setStatusCode($statusCode)
+  {
+    self::$httpResponseCode = $statusCode;
+  }
+    
+  private static function getStatusCode()
+  {
+    return static::$httpResponseCode;
+  }
 
-    public static function setStatusCode($statusCode)
-    {
-      self::$httpResponseCode = $statusCode;
-    }
-    
-    private static function getStatusCode()
-    {
-      return static::$httpResponseCode;
-    }
-    
 }
