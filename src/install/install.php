@@ -30,10 +30,9 @@ if((check_dbtable($link, 'tbl_users') == false) || (check_dbtable($link, 'tbl_us
    || (check_dbtable($link, 'tbl_topics') == false) || (check_dbtable($link, 'tbl_themes') == false) 
    || (check_dbtable($link, 'tbl_ settings') == false) || (check_dbtable($link, 'tbl_posts') == false)
    || (check_dbtable($link, 'tbl_post_topic') == false) || (check_dbtable($link, 'tbl_plugin') == false)
-   || (check_dbtable($link, 'tbl_menu_child') == false) || (check_dbtable($link, 'tbl_menu') == false)
-   || (check_dbtable($link, 'tbl_mediameta') == false) || (check_dbtable($link, 'tbl_media') == false)
-   || (check_dbtable($dbconnect, 'tbl_media_download') == false) || (check_dbtable($link, 'tbl_comments') == false) 
-   || (check_dbtable($link, 'tbl_comment_reply') == false)) {
+   || (check_dbtable($link, 'tbl_menu') == false) || (check_dbtable($link, 'tbl_mediameta') == false) 
+   || (check_dbtable($link, 'tbl_media') == false) || (check_dbtable($dbconnect, 'tbl_media_download') == false) 
+   || (check_dbtable($link, 'tbl_comments') == false) || (check_dbtable($link, 'tbl_comment_reply') == false)) {
 
   header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
   exit("Database has been installed");
