@@ -8,7 +8,6 @@
  * @version 1.0
  * 
  */
-
 class DbMySQLi
 {
 
@@ -45,14 +44,14 @@ public function __construct()
     $this->dbname = self::$config['db']['name'];
 
     $this->dbc = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->dbname);
-      
-    self::activateReportMode();
-
+   
     if ($this->dbc->connect_errno) {
 
       throw new mysqli_sql_exception("Error Processing Request", 1);
       
     }
+    
+    self::activateReportMode();
 
   } catch (mysqli_sql_exception $e) {
         
@@ -76,7 +75,7 @@ public function __destruct()
 }
 
 /**
- * Unable active report mode on MySQLi Driver
+ * activate report mode on MySQLi Driver
  *
  * @return void
  * 
@@ -316,31 +315,25 @@ public function cleanOutputDisplay($data)
  */
 public function isTableExists($table_name)
 {
-  
- try {
-   
   $database = $this->dbname;
-  $check_table = $this->dbc->query("SHOW TABLES LIKE '$table_name'");
-  $check_table_schema = $this->dbc->query("SELECT table_name FROM information_schema.tables WHERE table_schema = '$database' AND table_name = '$table_name'");
+  $check_table = yield $this->dbc->query("SHOW TABLES LIKE '$table_name'");
+  $check_table_schema = yield $this->dbc->query("SELECT table_name FROM information_schema.tables WHERE table_schema = '$database' AND table_name = '$table_name'");
  
   if (($check_table->num_rows > 0) || ($check_table_schema->num_rows == 1)) {
 
-    return true;
+    yield true;
 
   } else {
 
-    return false;
+    yield false;
 
   }
 
-  $check_table->free();
+  if (is_resource($check_table) || is_resource($check_table_schema)) {
 
- } catch (mysqli_sql_exception $e) {
-   
-    $this->errors = LogError::newMessage($e);
-    $this->errors = LogError::customErrorMessage();
+    $check_table->free();
 
- }
+  }
   
 }
 
