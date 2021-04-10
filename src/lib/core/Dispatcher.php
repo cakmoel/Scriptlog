@@ -56,13 +56,13 @@ class Dispatcher
   public function dispatch()
   {
 
-    if (!$themeActived = $this->invokeTheme()) {
+    if (!$this->invokeTheme()) {
         
         include(APP_ROOT.APP_THEME.'themes'.DS.'maintenance.php');
       
     } else {
 
-      $theme_dir = APP_ROOT.APP_THEME.safe_html($themeActived['theme_directory']).DS;
+      $theme_dir = APP_ROOT.APP_THEME.safe_html($this->invokeTheme()['theme_directory']).DS;
 
       if (false === self::allowedPath(self::whiteListPathRequested())) {
 
