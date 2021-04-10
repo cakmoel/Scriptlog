@@ -14,9 +14,7 @@
 function db_instance()
 {
 
-  $database = DbMySQLi::getInstance();
-
-  return $database;
+  return DbMySQLi::getInstance();
 
 }
 
@@ -34,9 +32,7 @@ function db_instance()
 function db_simple_query($sql)
 {
   
-  $stmt = db_instance()->simpleQuery($sql);
-
-  return $stmt;
+  return db_instance()->simpleQuery($sql);
 
 }
 
@@ -56,10 +52,8 @@ function db_simple_query($sql)
 function db_prepared_query($sql, $params, $types)
 {
   
-  $stmt = db_instance()->preparedQuery($sql, $params, $types);
-
-  return $stmt;
-
+  return db_instance()->preparedQuery($sql, $params, $types);
+  
 }
 
 /**
@@ -79,7 +73,7 @@ function is_table_exists($table)
 
   $is_exists = db_instance()->isTableExists($table);
 
-  return $is_exists;
+  yield $is_exists;
 
 }
 
@@ -123,7 +117,7 @@ function check_table()
 
   }
 
-  return $dbscheme;
+  yield $dbscheme;
 
 }
 
