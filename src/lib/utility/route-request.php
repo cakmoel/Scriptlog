@@ -19,7 +19,7 @@ function route_request()
   
 if (check_table() == true) {
 
-    return $dispatcher->dispatch();
+    $dispatcher->dispatch();
 
 } else {
 
