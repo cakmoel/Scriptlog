@@ -63,8 +63,58 @@ MSG;
   
 }
 
-public static function messageException()
+public static function messageException($exception, $logPath)
 {
+
+    if ( ! $exception instanceof Exception) {
+
+        $exception = new CoreException($exception);
+
+    }
+
+    $class_except = get_class($exception);
+    $messages = $exception->getMessage();
+    $file = $exception->getFile();
+    $line = $exception->getLine();
+    $responseCode = http_response_code(500);
+
+    if (APP_DEVELOPMENT == true) {
+
+    $msg = <<<MSG
+        <div class="content-wrapper">
+        <section class="content-header">
+        <h1>$responseCode</h1>
+        <ol class="breadcrumb">
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Error</a></li>
+        <li class="active">$responseCode</li>
+        </ol>
+        </section>
+        <section class="content">
+        <div class="error-page">
+        <h2 class="headline text-yellow">$responseCode</h2>
+        <div class="error-content">
+        <h3><i class="fa fa-warning text-yellow"></i> Type: $class_except.</h3>
+        <p>
+           Message: $messages <br> File: $file <br> Line: $line
+        </p>
+        </div>
+        </div>
+        </section>
+        </div>
+MSG;
+
+        print $msg;
+  
+    } else {
+
+        $data = ["Type:" => $class_except, "Messages:"=> $messages, "File:"=>$file, "Line:"=>$line];
+       
+        file_put_contents( $logPath, json_encode($data) . PHP_EOL, FILE_APPEND );
+        direct_page('index.php', 301);
+  
+    }
+
 
 }
 
