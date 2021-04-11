@@ -3,27 +3,22 @@
 $load = null;
 $current_request = current_request_method();
 $method_allowed = ['GET', 'POST'];
-$protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : "";
 
 try {
 
-   if (! in_array($protocol, ['HTTP/1.1', 'HTTP/2', 'HTTP/2.0'], true)) {
-
-    $protocol = 'HTTP/1.0';
-
-   }
+   $protocol = current_http_version();
 
    if ((isset($_GET['load'])) || (array_key_exists('load', $_GET))) {
      
         $load = is_array($_GET['load']) ? implode('', $_GET['load']) : $_GET['load'];
         $load = filter_var($load, FILTER_VALIDATE_URL, ['flags' => FILTER_FLAG_QUERY_REQUIRED]);
         $load = filter_input(INPUT_GET, 'load', FILTER_SANITIZE_STRING);
-        $load = str_replace(chr(0), '', $load);
+        $load = escape_null_byte($load);
         $load = preg_replace( '/[^a-z0-9,_-]+/i', '', $load );
         $load = htmlspecialchars(strtolower($load), ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');
        
         // checking if the string contains parent directory
-        if (strpos($load, '..')) {
+        if (strpos($load, '..') !== false) {
 
             header($protocol." 400 Bad Request", true, 400);
             throw new AppException("Directory traversal attempt!");
@@ -31,26 +26,25 @@ try {
         }
 
         // checking remote file inclusions
-        if ((strstr($load, '../') !== false) || (strstr($load, 'file://') !== false) || (strstr($load, 'http://') !== false)) {
+        if (strstr($load, '../') || strstr($load, 'http://') || strstr($load, 'file://') || strstr($load, 'data:') || strstr($load, 'zip://')) {
             
             header($protocol." 400 Bad Request", true, 400);
             throw new AppException("Remote file inclusion attempt!");
             
-        }
-    
-        if ((strstr($load, 'php://input')) || (strstr($load, 'php://filter')) || (strstr($load, 'data:')) || (strstr($load, 'zip://'))) {
+        }  
+        
+        if (strstr($load, 'php://input') || strstr($load, 'php://filter')) {
 
             header($protocol." 400 Bad Request", true, 400);
             throw new AppException("Remote file inclusion attempt!");
 
-        }
+        } 
 
         if ((!is_readable(dirname(dirname(__FILE__)) .DS. APP_ADMIN .DS."{$load}.php")) 
             || (empty($load)) || (!in_array($load, array_keys(admin_query())))) {
 
-            header($protocol." 404 Not Found", true, 400);
-            throw new AppException(" 404 Page requested not found");
-
+            direct_page('index.php?load=404&notfound='.notfound_id(), 404);
+            
         } else {
 
             if (false === $authenticator->userAccessControl()) {
@@ -110,14 +104,12 @@ try {
 } catch (Throwable $th) {
 
     LogError::setStatusCode(http_response_code());
-    LogError::newMessage($th);
-    LogError::customErrorMessage('admin');
+    LogError::exceptionHandler($th);
     
 } catch (AppException $e) {
 
     LogError::setStatusCode(http_response_code());
-    LogError::newMessage($e);
-    LogError::customErrorMessage('admin');
+    LogError::exceptionHandler($e);
     
 } 
 
