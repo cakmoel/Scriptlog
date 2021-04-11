@@ -20,7 +20,7 @@ try {
     
             if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
     
-               header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+               header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                throw new AppException("invalid ID data type!");
     
             } 
@@ -124,13 +124,11 @@ try {
 } catch (Throwable $th) {
 
     LogError::setStatusCode(http_response_code());
-    LogError::newMessage($th);
-    LogError::customErrorMessage('admin');
+    LogError::exceptionHandler($th);
     
 } catch (AppException $e) {
 
     LogError::setStatusCode(http_response_code());
-    LogError::newMessage($e);
-    LogError::customErrorMessage('admin');
+    LogError::exceptionHandler($e);
     
 }
