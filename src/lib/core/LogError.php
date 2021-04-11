@@ -90,8 +90,18 @@ class LogError
      */
     public static function exceptionHandler($e)
     {
+      
+      if (APP_DEVELOPMENT == true) {
+
         self::newMessage($e);
-        self::customErrorMessage();
+        
+      } else {
+
+        self::newMessage($e);
+        self::customErrorMessage('admin');
+
+      }
+      
     }
 
     /**
@@ -119,58 +129,12 @@ class LogError
      * @param string $clear
      * @param string $error_file
      */
-    public static function newMessage($exception, $_printError = false, $clear = false, $error_file = 'logerror.html')
-    {
+  public static function newMessage($exception)
+  {
 
-      if ( ! $exception instanceof Exception) {
-
-        $exception = new CoreException($exception);
-
-      }
-
-      $message = $exception->getMessage();
-      $code = $exception->getCode();
-      $file = $exception->getFile();
-      $line = $exception->getLine();
-      $trace = $exception->getTraceAsString();
-      
-      $date = date('M d, Y G:iA');
-        
-        $log_message = "<h3>Exception information:</h3>\n
-		<p><strong>Date:</strong> {$date}</p>\n
-		<p><strong>Message:</strong> {$message}</p>\n
-		<p><strong>Code:</strong> {$code}</p>\n
-		<p><strong>File:</strong> {$file}</p>\n
-		<p><strong>Line:</strong> {$line}</p>\n
-		<h3>Stack trace:</h3>\n
-		<pre>{$trace}</pre>\n
-		<hr />\n";
-        
-        if (is_readable(self::logPath() . $error_file) === false) {
-            file_put_contents(self::logPath() . $error_file, '');
-        }
-        
-        if ($clear) {
-
-            $content = '';
-
-        } else {
-            
-            $content = file_get_contents(self::logPath() . $error_file);
-
-        }
-        
-        file_put_contents(self::logPath() . $error_file, $log_message . $content);
-        
-        if ($_printError == true) {
-            
-            echo $log_message;
-            
-            exit();
-            
-        }
-        
-    }
+   return MessageLog::messageException($exception, self::logPath().'exceptions.log');
+   
+  }
 
   public static function setStatusCode($statusCode)
   {
