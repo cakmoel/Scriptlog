@@ -15,7 +15,7 @@ class DbFactory
    * Error
    * @var string
    */
-  private static $error;
+  protected static $error;
   
   /**
    * Connect
@@ -43,17 +43,15 @@ class DbFactory
 
          }
          
-     } catch (DbException $e) {
+     } catch (Throwable $th) {
         
-        self::$error = LogError::setStatusCode(http_response_code(500));
-        self::$error = LogError::newMessage($e);
-        self::$error = LogError::customErrorMessage();
+        static::$error = LogError::setStatusCode(http_response_code(500));
+        static::$error = LogError::exceptionHandler($th);
          
-     } catch (PDOException $e) {
+     } catch (DbException $e) {
 
-        self::$error = LogError::setStatusCode(http_response_code(500));
-        self::$error = LogError::newMessage($e);
-        self::$error = LogError::customErrorMessage();
+        static::$error = LogError::setStatusCode(http_response_code(500));
+        static::$error = LogError::exceptionHandler($e);
 
      }
 
