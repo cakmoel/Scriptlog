@@ -53,7 +53,7 @@ public function __construct($key, $name = '_scriptlog', $cookie = [])
  
  if (ini_get('session.use_cookies')) {
 
-    $current_cookie_params = session_get_cookie_params();
+   $current_cookie_params = session_get_cookie_params();
 
  }
 
@@ -133,7 +133,7 @@ private function setup()
 public function start()
 {
 
-if ((!isset($_COOKIE[session_name()])) || (self::isSessionStarted() === false)) {
+if ((!isset($_COOKIE[session_name()])) || ($this->isSessionStarted() === false)) {
 
    if (version_compare(PHP_VERSION, '5.6.0', '<')) {
       
@@ -171,7 +171,7 @@ return false;
 public function forget()
 {
 
- if (self::isSessionStarted() === false) {
+ if ($this->isSessionStarted() === false) {
 
      return false;
 
@@ -270,7 +270,7 @@ public function isGenuine()
 
  if (isset($_SESSION['_genuine'])) {
 
-     return $_SESSION['_genuine'] === $hash;
+   return $_SESSION['_genuine'] === $hash;
 
  }
 
@@ -329,7 +329,7 @@ return ScriptlogCryptonize::decryptAES($data, $key);
  * @return boolean
  * 
  */
-private static function isSessionStarted()
+private function isSessionStarted()
 {
 
    if(!headers_sent() && php_sapi_name() !== 'cli') {
