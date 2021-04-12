@@ -53,11 +53,17 @@ public function __construct()
     
     self::activateReportMode();
 
+  } catch (Throwable $th) {
+
+    $this->disconnect();
+    $this->errors = LogError::setStatusCode(http_response_code(500));
+    $this->errors = LogError::exceptionHandler($th);
+
   } catch (mysqli_sql_exception $e) {
         
-   $this->disconnect();
-   $this->errors = LogError::newMessage($e);
-   $this->errors = LogError::customErrorMessage('admin');
+    $this->disconnect();
+    $this->errors = LogError::setStatusCode(http_response_code(500));
+    $this->errors = LogError::exceptionHandler($e);
 
   }
 
@@ -125,8 +131,8 @@ public function simpleQuery($sql)
   } catch (mysqli_sql_exception $e) {
     
      $this->disconnect();
-     $this->errors = LogError::newMessage($e);
-     $this->errors = LogError::customErrorMessage();
+     $this->errors = LogError::setStatusCode(http_response_code(500));
+     $this->errors = LogError::exceptionHandler($e);
 
   }
 
@@ -347,30 +353,21 @@ public function isTableExists($table_name)
 public function getNumRows($sql)
 {
   
- try {
-   
   $result = $this->dbc->query($sql);
 
   if ($this->dbc->error) {
 
-     throw new mysqli_sql_exception($this->dbc->error);
+    throw new mysqli_sql_exception($this->dbc->error);
 
   } else {
 
     if ($row_count = $result->num_rows) {
 
-        return $row_count;
+      return $row_count;
         
     }
 
   }
-
- } catch (mysqli_sql_exception $e) {
-   
-    $this->errors = LogError::newMessage($e);
-    $this->errors = LogError::customErrorMessage();
-
- }
 
 }
 
