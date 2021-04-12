@@ -223,8 +223,8 @@ class Mailer
 			{
 				$headers[] = 'MIME-Version: 1.0';
 				$headers[] = 'Content-Type: text/html; charset="utf-8"';
-				$headers[] = 'From: <'.APP_EMAIL.'>';
-				$headers[] = 'Reply-To: '.APP_EMAIL;
+				$headers[] = 'From: <'.self::getAppEmail().'>';
+				$headers[] = 'Reply-To: '.self::getAppEmail();
 
 				$message = $this->HTMLBody;
 				
@@ -234,8 +234,8 @@ class Mailer
 			{
 
 				$headers[] = 'MIME-Version: 1.0';
-				$headers[] = "From: <".APP_EMAIL.">";
-				$headers[] = "Reply-To:".APP_EMAIL;
+				$headers[] = "From: <".self::getAppEmail().">";
+				$headers[] = "Reply-To:".self::getAppEmail();
 
 				$message .= 'Content-Type: text/plain; charset="utf-8"';
 				$message .= 'Content-Transfer-Encoding: 7bit';
@@ -253,6 +253,25 @@ class Mailer
 
 		}
 		
+	}
+
+/**
+ * getAppEmail
+ *
+ * @method private static getAppEmail()
+ * 
+ * @return string
+ * 
+ */
+	private static function getAppEmail()
+	{
+		
+		$email_config = AppConfig::readConfiguration(invoke_config());
+
+		$app_email = $email_config['app']['email'];
+
+		return $app_email;
+
 	}
 
 }
