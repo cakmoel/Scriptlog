@@ -57,6 +57,7 @@ class UserDao extends Dao
  */
  public function getUserById($userID, $sanitize, $fetchMode = null)
  {
+
    $cleanID = $this->filteringId($sanitize, $userID, 'sql');
    
    $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
