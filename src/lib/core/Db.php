@@ -71,19 +71,17 @@ class Db implements DbInterface
       
       $this->dbc = new PDO($dsn, $dbUser, $dbPass, $options);
        
-   } catch (Throwable $e) {
+   } catch (Throwable $th) {
        
       $this->closeDbConnection();
       $this->error = LogError::setStatusCode(http_response_code(500));
-      $this->error = LogError::newMessage($e);
-      $this->error = LogError::customErrorMessage();
+      $this->error = LogError::exceptionHandler($th);
       
    } catch (DbException $e) {
 
       $this->closeDbConnection();
       $this->error = LogError::setStatusCode(http_response_code(500));
-      $this->error = LogError::newMessage($e);
-      $this->error = LogError::customErrorMessage();
+      $this->error = LogError::exceptionHandler($e);
 
    }
    
