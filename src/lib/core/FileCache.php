@@ -18,7 +18,7 @@ class FileCache extends Cache
 
     $filename = $this->getFileName($key);
     if (!file_exists($filename)) return false;
-    $fetchCache = fopen($filename, r);
+    $fetchCache = fopen($filename, 'r');
     
     if(!$fetchCache) return false;
 
