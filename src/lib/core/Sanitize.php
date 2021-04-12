@@ -16,9 +16,10 @@ class Sanitize
 
  public function sanitasi($str, $tipe)
  {
-		switch($tipe){
+	
+	switch($tipe){
 			
-		   default:
+		default:
 			
 		   case'sql':
 
@@ -41,23 +42,52 @@ class Sanitize
 				return $str;
 				break;
 		}
-	}
 
+ }
+
+/**
+ * mildSanitizer
+ *
+ * @param string $str
+ * @return string
+ * 
+ */
  public static function mildSanitizer($str)
  {
    return simple_remove_xss($str);
  }
 
+/**
+ * severeSanitizer
+ *
+ * @param string $str
+ * @return string
+ * 
+ */
  public static function severeSanitizer($str)
  {
    return remove_xss($str);
  }
 
+/**
+ * strictSanitizer
+ *
+ * @param string $str
+ * @return string
+ * 
+ */
  public static function strictSanitizer($str)
  {
    return purify_dirty_html($str);
  }
 
+/**
+ * checkFileBase
+ *
+ * @param string $path
+ * @return string
+ * 
+ */
  public static function checkFileBase($path)
  {
 	 $file = pathinfo($path, PATHINFO_BASENAME);
