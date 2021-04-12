@@ -1,6 +1,6 @@
 <?php 
 /**
- * PHP Pagination Class
+ * Class Paginator
  *
  * @category Core Class
  * @author   David Carr - dave@daveismyname.com - http://www.daveismyname.com
@@ -83,6 +83,7 @@ class Paginator
 	 *
 	 * creates the starting point for limiting the dataset
 	 * @return integer
+	 * 
 	 */
 	private function get_start()
 	{
@@ -137,6 +138,7 @@ class Paginator
 	 * @var string $path optionally set the path for the link
 	 * @var string $ext optionally pass in extra parameters to the GET
 	 * @return string returns the html menu
+	 * 
 	 */
  public function page_links(Sanitize $sanitize, $path = '?', $ext = null)
  {
@@ -153,7 +155,10 @@ class Paginator
 	try {
 		   
 		    if ($this->_page > $this->_totalRows) {
-		       throw new Exception("Error 404!");
+			
+			   http_response_code(404);
+		       throw new CoreException("404 Error page not found");
+
 		    }
 		    
 		    if($lastpage > 1) {
@@ -245,12 +250,18 @@ class Paginator
 		    
 		return $pagination;
 		    
-     } catch (Exception $e) {
+     } catch (Throwable $th) {
 		   
-		 $this->_errors = LogError::newMessage($e);
-		 $this->_errors = LogError::customErrorMessage();
+		$this->_errors = LogError::setStatusCode(http_response_code());
+		$this->_errors = LogError::exceptionHandler($th);
 		   
-		}		
+	 } catch (AppException $e) {
+
+		$this->_errors = LogError::setStatusCode(http_response_code());
+		$this->_errors = LogError::exceptionHandler($e);
+		 
+	 }
+
  }
 	
 }
