@@ -11,6 +11,9 @@
  * @since    Since Release 1.0
  * 
  */
+ini_set('memory_limit', "5M");
+error_reporting(-1);
+ini_set("display_errors", "On");
 #ini_set("session.cookie_secure", 1);  
 #ini_set("session.cookie_lifetime", 604800);  
 ini_set("session.cookie_httponly", 1);
@@ -128,20 +131,17 @@ if (file_exists(APP_ROOT.APP_LIBRARY.DS.'Autoloader.php')) {
 
 }
 
-// load libraries necessary by system
-$library = array(
-    APP_ROOT . APP_LIBRARY . DS . 'core'    . DS,
-    APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
-    APP_ROOT . APP_LIBRARY . DS . 'event'   . DS,
-    APP_ROOT . APP_LIBRARY . DS . 'app'     . DS,
-    APP_ROOT . APP_LIBRARY . DS . 'provider'. DS
-);
-
 get_server_load();
 
 Autoloader::setBaseDir(APP_ROOT);
-
-Autoloader::addClassDir($library); 
+// load libraries necessary by system
+Autoloader::addClassDir(array(
+  APP_ROOT . APP_LIBRARY . DS . 'core'    . DS,
+  APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
+  APP_ROOT . APP_LIBRARY . DS . 'event'   . DS,
+  APP_ROOT . APP_LIBRARY . DS . 'app'     . DS,
+  APP_ROOT . APP_LIBRARY . DS . 'provider'. DS
+)); 
 
 call_htmlpurifier();
 
@@ -218,7 +218,7 @@ content_security_policy();
  * 
  */
 $sessionMaker = new SessionMaker(set_session_cookies_key());
-$searchPost = new SearchFinder($dbc);
+$searchPost = new SearchFinder();
 $sanitizer = new Sanitize();
 $userDao = new UserDao();
 $userToken = new UserTokenDao();
