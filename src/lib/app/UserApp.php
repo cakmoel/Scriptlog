@@ -161,7 +161,7 @@ class UserApp extends BaseApp
         
             if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                 
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                 throw new AppException("Sorry, unpleasant attempt detected!");
                 
             }
@@ -281,14 +281,12 @@ class UserApp extends BaseApp
         } catch (Throwable $th) {
 
             LogError::setStatusCode(http_response_code());
-            LogError::newMessage($th);
-            LogError::customErrorMessage('admin');
+            LogError::exceptionHandler($th);
 
         } catch (AppException $e) {
             
             LogError::setStatusCode(http_response_code());
-            LogError::newMessage($e);
-            LogError::customErrorMessage('admin');
+            LogError::exceptionHandler($e);
             
         }
         
@@ -502,15 +500,13 @@ class UserApp extends BaseApp
           
       } catch (Throwable $th) {
 
-          LogError::setStatusCode(http_response_code());
-          LogError::newMessage($th);
-          LogError::customErrorMessage('admin');
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);  
 
       } catch (AppException $e) {
           
-          LogError::setStatusCode(http_response_code());
-          LogError::newMessage($e);
-          LogError::customErrorMessage('admin');
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($e);
           
       }
       
@@ -582,142 +578,140 @@ class UserApp extends BaseApp
 
     try {
             
-            if(!csrf_check_token('csrfToken', $_POST, 60*10)) {
+        if(!csrf_check_token('csrfToken', $_POST, 60*10)) {
 
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-                throw new AppException("Sorry, unpleasant attempt detected!");
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            throw new AppException("Sorry, unpleasant attempt detected!");
 
-            }
+        }
             
-            if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass'])) || (!empty($_POST['current_pwd']))) {
+        if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass'])) || (!empty($_POST['current_pwd']))) {
 
-                if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
+            if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
 
-                    $checkError = false;
-                    array_push($errors, "Password should both be equal");
+                $checkError = false;
+                array_push($errors, "Password should both be equal");
 
-                } 
+            } 
                 
-                if (check_common_password($_POST['user_pass']) === true) {
+            if (check_common_password($_POST['user_pass']) === true) {
 
-                    $checkError = false;
-                    array_push($errors, "Your password seems to be the most hacked password, please try another.");
-
-                }
-
-                if (false === check_pwd_strength($_POST['user_pass'])) {
-
-                    $checkError = false;
-                    array_push($errors, "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters");
-
-                }
-
-                if (false === $this->userEvent->reAuthenticateUserPrivilege($getProfile['user_login'], $_POST['current_pwd'])) {
-
-                    $checkError = false;
-                    array_push($errors, "re-authentication failed, please check your current password");
-
-                }
+                $checkError = false;
+                array_push($errors, "Your password seems to be the most hacked password, please try another.");
 
             }
+
+            if (false === check_pwd_strength($_POST['user_pass'])) {
+
+                $checkError = false;
+                array_push($errors, "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters");
+
+            }
+
+            if (false === $this->userEvent->reAuthenticateUserPrivilege($getProfile['user_login'], $_POST['current_pwd'])) {
+
+                $checkError = false;
+                array_push($errors, "re-authentication failed, please check your current password");
+
+            }
+
+        }
     
-            if (!email_validation($_POST['user_email'], new RFCValidation())) {
+        if (!email_validation($_POST['user_email'], new RFCValidation())) {
 
-                $checkError = false;
-                array_push($errors, "Please enter a valid email address");
+            $checkError = false;
+            array_push($errors, "Please enter a valid email address");
 
-            } elseif (!email_multiple_validation($_POST['user_email'])) {
+        } elseif (!email_multiple_validation($_POST['user_email'])) {
 
-                $checkError = false;
-                array_push($errors, "Unknown DNS records that signal the server accepts emails");
+            $checkError = false;
+            array_push($errors, "Unknown DNS records that signal the server accepts emails");
                 
-            }
+        }
 
-            if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
+        if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
                  
+            $checkError = false;
+            array_push($errors, "Please enter a valid URL");
+                
+        }
+
+        if(!empty($_POST['user_fullname'])) {
+                
+            if(!preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname'])) {
+
                 $checkError = false;
-                array_push($errors, "Please enter a valid URL");
-                
-            }
-
-            if(!empty($_POST['user_fullname'])) {
-                
-                if(!preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname'])) {
-
-                    $checkError = false;
-                    array_push($errors, "Please enter a valid fullname");
-
-                }
+                array_push($errors, "Please enter a valid fullname");
 
             }
 
-            if (!$checkError) {
+        }
 
-                $this->setView('edit-myprofile');
-                $this->setPageTitle('Profile');
-                $this->setFormAction(ActionConst::EDITUSER);
-                $this->view->set('pageTitle', $this->getPageTitle());
-                $this->view->set('formAction', $this->getFormAction());
-                $this->view->set('errors', $errors);
-                $this->view->set('userData', $data_profile);
-                $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+        if (!$checkError) {
 
-            } else {
+            $this->setView('edit-myprofile');
+            $this->setPageTitle('Profile');
+            $this->setFormAction(ActionConst::EDITUSER);
+            $this->view->set('pageTitle', $this->getPageTitle());
+            $this->view->set('formAction', $this->getFormAction());
+            $this->view->set('errors', $errors);
+            $this->view->set('userData', $data_profile);
+            $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
-                $this->userEvent->setUserEmail(distill_post_request($filters)['user_email']);
-                $this->userEvent->setUserFullname((isset($_POST['user_fullname']) ? purify_dirty_html(distill_post_request($filters)['user_fullname']) : ""));
-                $this->userEvent->setUserUrl((isset($_POST['user_url']) ? escape_html(distill_post_request($filters)['user_url']) : ""));
-                $this->userEvent->setUserId((isset($_POST['user_id']) ? abs((int)distill_post_request($filters)['user_id']) : 0));
+        } else {
+
+            $this->userEvent->setUserEmail(distill_post_request($filters)['user_email']);
+            $this->userEvent->setUserFullname((isset($_POST['user_fullname']) ? purify_dirty_html(distill_post_request($filters)['user_fullname']) : ""));
+            $this->userEvent->setUserUrl((isset($_POST['user_url']) ? escape_html(distill_post_request($filters)['user_url'], 'url') : ""));
+            $this->userEvent->setUserId((isset($_POST['user_id']) ? abs((int)distill_post_request($filters)['user_id']) : 0));
+
+            if(!empty($_POST['user_pass'])) {
+
+                $this->userEvent->setUserPass(purify_dirty_html(distill_post_request($filters)['user_pass']));
+
+            }
+
+            if ($this->userEvent->identifyCookieToken($secret) == true) {
 
                 if(!empty($_POST['user_pass'])) {
 
-                  $this->userEvent->setUserPass(purify_dirty_html(distill_post_request($filters)['user_pass']));
+                    $random_password = Tokenizer::createToken(128);
+                    set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+                
+                    $random_selector = Tokenizer::createToken(128);
+                    set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+                
+                    $hashed_password = Tokenizer::setRandomPasswordProtected($random_password);
+                    $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
+                
+                    $this->userEvent->setPwdHash($hashed_password);
+                    $this->userEvent->setSelectorHash($hashed_selector);
+                    $this->userEvent->setUserLogin($getProfile['user_login']);
+
+                    $expiry_date = date("Y-m-d H:i:s", time() + Authentication::COOKIE_EXPIRE);
+                    $this->userEvent->setCookieExpireDate($expiry_date);
 
                 }
-
-                if ($this->userEvent->identifyCookieToken($secret) == true) {
-
-                    if(!empty($_POST['user_pass'])) {
-
-                        $random_password = Tokenizer::createToken(128);
-                        set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-                
-                        $random_selector = Tokenizer::createToken(128);
-                        set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-                
-                        $hashed_password = Tokenizer::setRandomPasswordProtected($random_password);
-                        $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
-                
-                        $this->userEvent->setPwdHash($hashed_password);
-                        $this->userEvent->setSelectorHash($hashed_selector);
-                        $this->userEvent->setUserLogin($getProfile['user_login']);
-
-                        $expiry_date = date("Y-m-d H:i:s", time() + Authentication::COOKIE_EXPIRE);
-                        $this->userEvent->setCookieExpireDate($expiry_date);
-
-                    }
               
-                }
-
-                $this->userEvent->modifyUser();
-
-                direct_page('index.php?load=users&status=userUpdated', 200);
-
             }
-            
-        } catch (Throwable $th) {
 
-            LogError::setStatusCode(http_response_code());
-            LogError::newMessage($th);
-            LogError::customErrorMessage('admin');
-            
-        } catch (AppException $e) {
-            
-            LogError::setStatusCode(http_response_code());
-            LogError::newMessage($e);
-            LogError::customErrorMessage('admin');
+            $this->userEvent->modifyUser();
+
+            direct_page('index.php?load=users&status=userUpdated', 200);
 
         }
+            
+    } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+            
+    } catch (AppException $e) {
+            
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($e);
+        
+    }
 
     } else {
 
@@ -795,14 +789,12 @@ class UserApp extends BaseApp
      } catch (Throwable $th) {
 
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($th);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($th);
 
      } catch (AppException $e) {
         
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($e);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($e);
          
      }
 
