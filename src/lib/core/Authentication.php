@@ -13,13 +13,29 @@ class Authentication
 {
 
   /**
-   * user ID
-   * 
-   * @var integer
+   * Account's info
+   *
+   * @var array
    * 
    */
-  private $user_id;
- 
+  private $account_info = [];
+
+  /**
+   * session_cookies
+   *
+   * @var string
+   * 
+   */
+  private $session_cookies;
+
+  /**
+   * user_login
+   *
+   * @var string
+   * 
+   */
+  private $user_login;
+
   /**
    * User Agent
    * 
@@ -29,36 +45,36 @@ class Authentication
   private $agent;
 
   /**
-   * User's Email
-   * 
+   * accept_charset
+   *
    * @var string
    * 
    */
-  private $user_email;
+  private $accept_charset;
 
   /**
-   * Username for login
-   * 
+   * accept_language
+   *
    * @var string
    * 
    */
-  private $user_login;
+  private $accept_language;
 
   /**
-   * user nicename
-   * 
+   * accept_encoding
+   *
    * @var string
    * 
    */
-  private $user_fullname;
+  private $accept_encoding;
 
   /**
-   * user level
-   * 
+   * ip_address
+   *
    * @var string
    * 
    */
-  private $user_level;
+  private $ip_address;
 
   /**
    * key
@@ -111,15 +127,22 @@ class Authentication
   public function __construct(UserDao $userDao, UserTokenDao $userToken, FormValidator $validator)
   {
 
-    $this->userDao = $userDao;
-    $this->userToken = $userToken;
-    $this->validator = $validator;
-  
     if (Registry::isKeySet('key')) {
 
        $this->key = Registry::get('key');
 
     }
+
+    $this->userDao = $userDao;
+    $this->userToken = $userToken;
+    $this->validator = $validator;
+    
+    $this->session_cookies = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $this->key) : Session::getInstance()->scriptlog_session_login;
+    $this->agent =  isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+    $this->ip_address = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : get_ip_address();
+    $this->accept_charset = isset($_SERVER['HTTP_ACCEPT_CHARSET']) ? $_SERVER['HTTP_ACCEPT_CHARSET'] : '';
+    $this->accept_encoding = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
+    $this->accept_language = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
 
   }
  
@@ -224,10 +247,8 @@ class Authentication
  */
  public function accessLevel()
  {
-
-  $user_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $this->key) : Session::getInstance()->scriptlog_session_login;
-    
-  if (!$getUser = $this->findUserByLogin($user_login)) {
+  
+  if (!$getUser = $this->findUserByLogin($this->session_cookies)) {
 
       return false;
 
@@ -269,50 +290,40 @@ class Authentication
         
       $this->validator->sanitize($login, 'email');
       $this->validator->validate($login, 'email');
-      $account_info = $this->findUserByEmail($login);
+      $this->account_info = $this->findUserByEmail($login);
 
     } else {
 
       $this->validator->sanitize($login, 'string');
     
-      $account_info = $this->findUserByLogin($login);
+      $this->account_info = $this->findUserByLogin($login);
 
     }
 
     $this->validator->sanitize($password, 'string');
     
-    $account_login = $account_info['user_login'];
+    $this->user_login = $this->account_info['user_login'];
 
     clear_duplicate_cookies();
 
-      Session::getInstance()->scriptlog_session_id = $this->user_id = intval($account_info['ID']);
-      Session::getInstance()->scriptlog_session_email = $this->user_email = $account_info['user_email'];
-      Session::getInstance()->scriptlog_session_level = $this->user_level = $account_info['user_level'];
-      Session::getInstance()->scriptlog_session_login = $this->user_login = $account_info['user_login'];
-      Session::getInstance()->scriptlog_session_fullname = $this->user_fullname = $account_info['user_fullname'];
-
-      $user_agent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : '';
-      $accept_charset = (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) ? $_SERVER['HTTP_ACCEPT_CHARSET'] : '';
-      $accept_encoding = (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
-      $accept_language = (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
-
-      Session::getInstance()->scriptlog_session_agent = $this->agent = sha1($accept_charset.$accept_encoding.$accept_language.$user_agent);
-      
-      $ip_address = (isset($_SERVER['REMOTE_ADDR'])) ? $_SERVER['REMOTE_ADDR'] : get_ip_address();
-      Session::getInstance()->scriptlog_session_ip = $ip_address;
-
-      Session::getInstance()->scriptlog_fingerprint = hash_hmac('sha256', $user_agent, hash('sha256', $ip_address, true));
-      
+      Session::getInstance()->scriptlog_session_id = intval($this->account_info['ID']);
+      Session::getInstance()->scriptlog_session_email = $this->account_info['user_email'];
+      Session::getInstance()->scriptlog_session_level = $this->account_info['user_level'];
+      Session::getInstance()->scriptlog_session_login = $this->account_info['user_login'];
+      Session::getInstance()->scriptlog_session_fullname = $this->account_info['user_fullname'];
+      Session::getInstance()->scriptlog_session_agent = sha1($this->accept_charset.$this->accept_encoding.$this->accept_language.$this->agent);
+      Session::getInstance()->scriptlog_session_ip = $this->ip_address;
+      Session::getInstance()->scriptlog_fingerprint = hash_hmac('sha256', $this->agent, hash('sha256', $this->ip_address, true));
       Session::getInstance()->scriptlog_last_active = time();
 
       $bind_session = ['user_session' => regenerate_session()];
       
-      $this->userDao->updateUserSession($bind_session, (int)$account_info['ID']);
+      $this->userDao->updateUserSession($bind_session, (int)$this->account_info['ID']);
       
       // Set Auth Cookies if 'Remember Me' checked
       if ($remember_me == true) {
 
-          $encrypt_auth = ScriptlogCryptonize::scriptlogCipher($account_login, $this->key);
+          $encrypt_auth = ScriptlogCryptonize::scriptlogCipher($this->user_login, $this->key);
           set_cookies_scl('scriptlog_auth', $encrypt_auth, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true); 
           
           $random_password = Tokenizer::createToken(128);
@@ -336,13 +347,13 @@ class Authentication
         
           }
         
-          $bind_token = ['user_login' => $account_login, 'pwd_hash' => $hashed_password, 'selector_hash' => $hashed_selector, 'expired_date' => $expiry_date];
+          $bind_token = ['user_login' => $this->user_login, 'pwd_hash' => $hashed_password, 'selector_hash' => $hashed_selector, 'expired_date' => $expiry_date];
         
           $this->userToken->createUserToken($bind_token);
 
       } else {
 
-          $this->clearAuthCookies($account_login);
+          $this->clearAuthCookies($this->user_login);
 
       }
 
@@ -362,8 +373,6 @@ public function logout()
   $this->getUserAuthSession();
   
   Session::getInstance()->startSession();
-
-  $_SESSION = array();
 
   $this->removeCookies();
 
@@ -654,21 +663,15 @@ public function userAccessControl($control = null)
 private function getUserAuthSession()
 {
   
- $ip_address = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : get_ip_address();
- $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
- $accept_charset = isset($_SERVER['HTTP_ACCEPT_CHARSET']) ? $_SERVER['HTTP_ACCEPT_CHARSET'] : '';
- $accept_encoding = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
- $accept_language = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
- 
- if(Session::getInstance()->scriptlog_session_ip !== $ip_address 
-    || Session::getInstance()->scriptlog_session_agent !== sha1($accept_charset.$accept_encoding.$accept_language.$user_agent)) {
+ if(Session::getInstance()->scriptlog_session_ip !== $this->ip_address || Session::getInstance()->scriptlog_session_agent !== sha1($this->accept_charset.$this->accept_encoding.$this->accept_language.$this->agent)) {
 
-      session_unset();
-      session_destroy();
-      session_regenerate_id(true);
+    session_unset();
+    session_destroy();
+    session_start();
+    session_regenerate_id(true);
       
-      Session::getInstance()->scriptlog_session_agent = $user_agent;
-      Session::getInstance()->scriptlog_session_ip = $ip_address;
+    Session::getInstance()->scriptlog_session_agent = $this->agent;
+    Session::getInstance()->scriptlog_session_ip = $this->ip_address;
         
   }
 
