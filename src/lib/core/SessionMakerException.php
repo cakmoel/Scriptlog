@@ -8,7 +8,7 @@
  * @version 1.0
  * 
  */
-class SessionMakerException extends CoreException
+class SessionMakerException extends Exception implements ISessionThrowable
 {
 
 }
