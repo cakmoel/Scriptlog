@@ -45,15 +45,36 @@ class View
    * @param string $modulePath
    * @param string $file
    */
-  public function __construct($eventPath, $uiPath, $modulePath, $file = null)
+  public function __construct($eventPath, $uiPath, $modulePath = null, $file = null)
   {
     
     // make sure event path for administrator in admin folder
     if ($eventPath == 'admin') {
-      $this->dir = APP_ROOT . APP_ADMIN . DS . $uiPath . DS .$modulePath . DS;
+
+      $this->dir = APP_ROOT.APP_ADMIN.DS.$uiPath.DS.$modulePath.DS;
+
+    } 
+    
+    // make sure event path for common weblog visitor in active theme folder
+    if ($eventPath == 'public') {
+      
+       if (is_dir(APP_ROOT.APP_THEME.$uiPath.DS.$modulePath.DS) && file_exists(APP_ROOT.APP_THEME.$uiPath.DS.$modulePath.DS)) {
+
+          $this->dir = APP_ROOT.APP_THEME.$uiPath.DS.$modulePath.DS;
+
+       } else {
+
+          $this->dir = APP_ROOT.APP_THEME.$uiPath.DS;
+
+       }
+
     }
    
-    if (!is_null($file)) $this->file = $file;
+    if (!is_null($file)) {
+
+       $this->file = $file;
+
+    };
     
   }
   
@@ -82,6 +103,7 @@ class View
   
   /**
    * render
+   * 
    * output view or content
    * 
    * @method public render()
@@ -92,24 +114,36 @@ class View
      
     try {
         
-        if (!is_dir($this->dir) && !file_exists($this->dir. $this->file . '.php')) {
-            header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+        if ((!is_dir($this->dir)) && (!file_exists($this->dir. $this->file . '.php'))) {
+
+            http_response_code(404);
             throw new ViewException('View '.$this->file.'.php'. ' does not exists');
+
         }
         
         unreg_globals();
+
         extract($this->data, EXTR_SKIP);
+        
         ob_start();
-        require $this->dir.basename($this->file).'.php';
+
+        include_once $this->dir.basename($this->file).'.php';
+        
         $render = ob_get_contents();
+        
         ob_end_clean();
+        
         echo $render;
         
+    } catch (Throwable $th) {
+
+      $this->errors = LogError::setStatusCode(http_response_code());
+      $this->errors = LogError::exceptionHandler($th);
+
     } catch (ViewException $e) {
         
-        $this->errors = LogError::setStatusCode(http_response_code());
-        $this->errors = LogError::newMessage($e);
-        $this->errors = LogError::customErrorMessage('admin');
+      $this->errors = LogError::setStatusCode(http_response_code());
+      $this->errors = LogError::exceptionHandler($e);
         
     } 
     
