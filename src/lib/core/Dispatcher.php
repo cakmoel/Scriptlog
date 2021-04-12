@@ -304,4 +304,4 @@ class Dispatcher
     return ['/', '//', 'post', 'page', 'blog', 'category', 'archive'];
   }
 
-} // End of class Dispatcher
+}
