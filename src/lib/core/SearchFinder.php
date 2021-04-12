@@ -16,18 +16,18 @@ class SearchFinder
 /**
  * Database connection
  * 
- * @var string
+ * @var object
  * 
  */
  private $dbc;
  
 /**
- * Errors
+ * errorss
  * 
- * @var string
+ * @var object
  * 
  */
- private $errors;
+ protected $errors;
 
 /**
  * SQL
@@ -57,14 +57,26 @@ class SearchFinder
  * Initialize object properties and method
  * and an instance of database connection
  * 
- * @param string $dbc
+ * @param object $dbc
  * 
  */
- public function __construct($dbc)
+ public function __construct()
  {
-  $this->dbc = $dbc;
+	
+  if (Registry::isKeySet('dbc')) {
+
+	$this->dbc = Registry::get('dbc');
+  
+  }
+
  }
  
+ public function __destruct()
+ {
+	Registry::set('dbc', null);
+	session_write_close();
+ }
+
 /**
  * Clean Up
  * 
@@ -109,10 +121,15 @@ class SearchFinder
   		
   	}
   	
-  } catch (PDOException $e) {
+  } catch (Throwable $th) {
+
+	$this->errors = LogError::setStatusCode(http_response_code(500));
+	$this->errors = LogError::exceptionHandler($th);
+
+  } catch (DbException $e) {
   	
-  	$this->errors = LogError::newMessage($e);
-  	$this->errors = LogError::customErrorMessage();
+  	$this->errors = LogError::setStatusCode(http_response_code(500));
+  	$this->errors = LogError::exceptionHandler($e);
   	
   }
   
@@ -140,14 +157,19 @@ class SearchFinder
   	 
   	} else {
   		
-  		$this->results = $this->query($sql);
+  		$this->results = $this->dbc->query($sql);
   		return $this->results;
   	}
   	
+  } catch (Throwable $th) {
+
+	$this->errors = LogError::setStatusCode(http_response_code());
+	$this->errors = LogError::exceptionHandler($th);
+
   } catch (PDOException $e) {
   	
-  	$this->error = LogError::newMessage($e);
-  	$this->error = LogError::customErrorMessage();
+  	$this->errors = LogError::setStatusCode(http_response_code());
+  	$this->errors = Logerror::exceptionHandler($e);
   	
   }
   
@@ -185,12 +207,12 @@ class SearchFinder
  	
  	$sth = $this->dbc->prepare($this->sql);
  	$keyword = '%'.$data.'%';
- 	$sth -> bindValue(':keyword1', $keyword, PDO::PARAM_STR);
- 	$sth -> bindValue(':keyword2', $keyword, PDO::PARAM_STR);
- 	$sth -> execute();
- 	$totalRows = $sth -> rowCount();
+ 	$sth->bindValue(':keyword1', $keyword, PDO::PARAM_STR);
+ 	$sth->bindValue(':keyword2', $keyword, PDO::PARAM_STR);
+ 	$sth->execute();
+ 	$totalRows = $sth->rowCount();
  	
- 	return (array("results" => $results, "totalRows" => $totalRows));
+ 	return array("results" => $results, "totalRows" => $totalRows);
  	
  }
  
