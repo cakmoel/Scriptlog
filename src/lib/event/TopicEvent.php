@@ -110,7 +110,7 @@ class TopicEvent
     
     $this->validator->sanitize($this->topic_id, 'int');
     
-    if (!$data_topic = $this->topicDao->findTopicById($this->topic_id, $this->sanitizer)) {
+    if (!$this->topicDao->findTopicById($this->topic_id, $this->sanitizer)) {
         direct_page('index.php?load=topics&error=topicNotFound', 404);
     }
     
