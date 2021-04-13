@@ -70,30 +70,6 @@ class TopicDao extends Dao
     
   }
   
-  /**
-   * Find Topic by Slug
-   * 
-   * @param string $slug
-   * @param object $sanitize
-   * @param static $fetchMode
-   * @return boolean|array|object
-   */
-  public function findTopicBySlug($slug, $sanitize, $fetchMode = null)
-  {
-      $sql = "SELECT ID, topic_title
-              FROM tbl_topics 
-              WHERE topic_slug = ? AND topic_status = 'Y'";
-      
-      $slug_sanitized = $this->filteringId($sanitize, $slug, 'xss');
-      
-      $this->setSQL($sql);
-     
-      $topicBySlug = (is_null($fetchMode)) ? $this->findRow([$slug_sanitized]) : $this->findRow([$slug_sanitized], $fetchMode);
-
-      return (empty($topicBySlug)) ?: $topicBySlug;
-      
-  }
-  
 /**
   * findPostTopic
   * 
@@ -103,16 +79,14 @@ class TopicDao extends Dao
   */
   public function findPostTopic($topicId, $postId)
   {
-      $sql = "SELECT topic_id 
-              FROM tbl_post_topic
-              WHERE topic_id = :topic_id 
-              AND post_id = :post_id";
       
-      $this->setSQL($sql);
+    $sql = "SELECT topic_id FROM tbl_post_topic WHERE topic_id = :topic_id AND post_id = :post_id";
       
-      $post_topic = $this->findRow([':topic_id' => $topicId, ':post_id' => $postId]);
+    $this->setSQL($sql);
       
-      return (empty($post_topic)) ?: $post_topic;
+    $post_topic = $this->findRow([':topic_id' => $topicId, ':post_id' => $postId]);
+      
+    return (empty($post_topic)) ?: $post_topic;
       
   }
 
@@ -146,12 +120,12 @@ class TopicDao extends Dao
   public function updateTopic($sanitize, $bind, $ID)
   {
       
-   $id_sanitized = $this->filteringId($sanitize, $ID, 'sql'); 
+   $cleanId = $this->filteringId($sanitize, $ID, 'sql'); 
    $this->modify("tbl_topics", [
        'topic_title' => $bind['topic_title'],
        'topic_slug' => $bind['topic_slug'],
        'topic_status' => $bind['topic_status']
-   ], "ID = {$id_sanitized}");
+   ], "ID = ".(int)$cleanId);
    
   }
 
@@ -247,11 +221,11 @@ class TopicDao extends Dao
               
             }
                
-               $html .= '<div class="checkbox">';
-               $html .= '<label>';
-               $html .= '<input type="checkbox" name="catID[]" value="'.$item['ID'].'" '.$checked.'>'.$item['topic_title'];
-               $html .= '</label>';
-               $html .= '</div>';
+              $html .= '<div class="checkbox">';
+              $html .= '<label>';
+              $html .= '<input type="checkbox" name="catID[]" value="'.$item['ID'].'" '.$checked.'>'.$item['topic_title'];
+              $html .= '</label>';
+              $html .= '</div>';
                
            }
 
