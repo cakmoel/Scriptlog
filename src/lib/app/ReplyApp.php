@@ -46,11 +46,15 @@ class ReplyApp extends BaseApp
 
      
 
+    } catch (Throwable $th) {
+
+      LogError::setStatusCode(http_response_code());
+      LogError::exceptionHandler($th);
+      
     } catch (AppException $e) {
 
       LogError::setStatusCode(http_response_code());
-      LogError::newMessage($e);
-      LogError::customErrorMessage('admin');
+      LogError::exceptionHandler($e);
 
     }
 
