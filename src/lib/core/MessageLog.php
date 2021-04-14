@@ -76,7 +76,7 @@ public static function messageException($exception, $logPath)
     $messages = $exception->getMessage();
     $file = $exception->getFile();
     $line = $exception->getLine();
-    $responseCode = http_response_code(500);
+    $responseCode = http_response_code();
 
     if (APP_DEVELOPMENT == true) {
 
