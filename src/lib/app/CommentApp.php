@@ -160,11 +160,15 @@ class CommentApp extends BaseApp
                 
             }
             
+        } catch (Throwable $th) {
+
+          LogError::setStatusCode(http_response_code());
+          LogError::exceptionHandler($th);
+
         } catch (AppException $e) {
             
-            LogError::setStatusCode(http_response_code());
-            LogError::newMessage($e);
-            LogError::customErrorMessage();
+          LogError::setStatusCode(http_response_code());
+          LogError::exceptionHandler($e);
             
         }
         
@@ -187,9 +191,65 @@ class CommentApp extends BaseApp
   
   public function remove($id)
   {
-     $this->commentEvent->setCommentId($id);
-     $this->commentEvent->removeComment();
-     direct_page('index.php?load=comments&status=commentDeleted', 200);
+
+    $checkError = true;
+    $errors = array();
+
+    if (isset($_GET['Id'])) {
+
+      $getComment = $this->commentEvent->grabComment($id);
+
+      try {
+          
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+            throw new AppException("Sorry, unpleasant attempt detected!");
+    
+        }
+        
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+    
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+            throw new AppException("Sorry, unpleasant attempt detected!");
+    
+        }
+
+        if (!$getComment) {
+
+            $checkError = false;
+            array_push($errors, 'Error: Comment not found');
+
+        }
+
+        if (!$checkError) {
+
+            $this->setView('all-comments');
+            $this->setPageTitle('Comment not found');
+            $this->view->set('pageTitle', $this->getPageTitle());
+            $this->view->set('errors', $errors);
+            
+        } else {
+
+         $this->commentEvent->setCommentId($id);
+         $this->commentEvent->removeComment();
+         direct_page('index.php?load=comments&status=commentDeleted', 200);
+
+        }
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+
+      } catch (AppException $e) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($e);
+
+      }
+
+    }
+     
   }
   
   protected function setView($viewName)
