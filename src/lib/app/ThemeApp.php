@@ -115,14 +115,12 @@ class ThemeApp extends BaseApp
       } catch (Throwable $th) {
 
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($th);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($th);
 
       } catch (AppException $e) {
 
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($e);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($e);
 
       }
 
@@ -288,14 +286,12 @@ class ThemeApp extends BaseApp
       } catch (Throwable $th) {
 
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($th);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($th);
 
       } catch (AppException $e) {
 
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($e);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($e);
 
       }
 
@@ -377,26 +373,24 @@ class ThemeApp extends BaseApp
       } catch (Throwable $th) {
 
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($th);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($th);
 
       } catch (AppException $e) {
         
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($e);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($e);
         
       }
 
     } else {
        
-       $this->setView('edit-template');
-       $this->setPageTitle('Edit Theme');
-       $this->setFormAction(ActionConst::EDITTHEME);
-       $this->view->set('pageTitle', $this->getPageTitle());
-       $this->view->set('formAction', $this->getFormAction());
-       $this->view->set('themeData', $data_theme);
-       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+      $this->setView('edit-template');
+      $this->setPageTitle('Edit Theme');
+      $this->setFormAction(ActionConst::EDITTHEME);
+      $this->view->set('pageTitle', $this->getPageTitle());
+      $this->view->set('formAction', $this->getFormAction());
+      $this->view->set('themeData', $data_theme);
+      $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
     }
 
@@ -458,14 +452,12 @@ class ThemeApp extends BaseApp
       } catch (Throwable $th) {
         
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($th);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($th);
         
       } catch (AppException $e) {
 
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($e);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($e);
 
       }
 
@@ -527,14 +519,12 @@ class ThemeApp extends BaseApp
       } catch (Throwable $th) {
       
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($th);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($th);
 
       } catch (AppException $e) {
 
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($e);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($e);
 
       }
 
