@@ -11,8 +11,21 @@
  */
 class ConfigurationApp extends BaseApp
 {
+
+/**
+ * view
+ *
+ * @var object
+ * 
+ */
   private $view;
 
+/**
+ * configEvent
+ *
+ * @var object
+ * 
+ */
   private $configEvent;
 
   public function __construct(ConfigurationEvent $configEvent)
@@ -109,11 +122,15 @@ class ConfigurationApp extends BaseApp
 
         }
 
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+
       } catch (AppException $e) {
         
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($e);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($e);
 
       }
 
@@ -214,11 +231,15 @@ class ConfigurationApp extends BaseApp
            
         }
 
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+
       } catch (AppException $e) {
         
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($e);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($e);
         
       }
       
@@ -258,10 +279,8 @@ class ConfigurationApp extends BaseApp
   }
   
   public function remove($id)
-  {
-    $this->configEvent->setConfigId($id);
-    $this->configEvent->removeSetting();
-    direct_page('index.php?load=settings&status=configDeleted', 200);
+  { 
+
   }
 
   protected function setView($viewName)
