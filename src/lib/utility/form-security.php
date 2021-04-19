@@ -112,9 +112,11 @@ function check_form_request($data, array $whitelist)
 }
 
 /**
- * scriptpot validate function
+ * scriptpot_validate
+ * 
  * checking if a honeypot field was filled on the form
  * 
+ * @category function
  * @param array $req $_REQUEST superglobal
  * @return boolean 
  * 
@@ -131,7 +133,7 @@ function scriptpot_validate($req)
 
           if ((isset($req[$field])) && (!empty($req[$field]))) {
 
-               return false;
+              return false;
 
           }
 
