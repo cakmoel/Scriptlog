@@ -81,7 +81,7 @@ function review_login_attempt($ip)
 function human_login_request($base, array $data)
 {
 
-$html = [];
+$form = [];
 
 $action = (is_array($data) && array_key_exists(0, $data)) ? rawurlencode($data[0]) : '';
 $id = (is_array($data) && array_key_exists(1, $data)) ? urlencode($data[1]) : null;
@@ -95,9 +95,9 @@ $query_data = array(
 
 );
 
-$html['doLogin'] = build_query($base, $query_data);
+$form['doLogin'] = build_query($base, $query_data);
 
-return Sanitize::severeSanitizer($html);
+return Sanitize::severeSanitizer($form);
 
 }
 
@@ -125,7 +125,7 @@ if( check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'script
      header(APP_PROTOCOL.' 413 Payload Too Large', true, 413);
      header('Status: 413 Payload Too Large');
      header('Retry-After: 3600');
-     die("413 Payload Too Large");
+     exit("413 Payload Too Large");
 
 }
 
@@ -152,6 +152,8 @@ if ( review_login_attempt($ip) === true ) {
 }
 
 if ( midfielder() === true) {
+
+   sleep(20);
 
    defender();
    
