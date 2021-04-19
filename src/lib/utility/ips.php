@@ -15,16 +15,16 @@
 function defender()
 {
 
-if (file_exists(basename(__DIR__ . DS . '.guard'. DS . '10G.gzip'))) {
+if (file_exists(basename(__DIR__ . DS . '.guard'. DS . 'fortres.gzip'))) {
 
     header("Content-Encoding: gzip");
-    header("Content-Length:".filesize(basename(__DIR__ . DS . '.guard' . DS . '10G.gzip')));
+    header("Content-Length:".filesize(basename(__DIR__ . DS . '.guard' . DS . 'fortres.gzip')));
 
     if (ob_get_level()) {
 
         ob_end_clean();
 
-        readfile(basename(__DIR__ . DS . '.guard' . DS . '10G.gzip'));
+        readfile(basename(__DIR__ . DS . '.guard' . DS . 'fortres.gzip'));
         
     }
 
@@ -65,10 +65,27 @@ return $is_scanner;
 /**
  * starts_with
  * 
+ * Checking if a text starts with an given string.
+ * 
+ * @category function
+ * @license MIT
+ * @version 1.0
  * @return string
  * 
  */
 function starts_with($haystack, $needle)
 {
-return (substr($haystack, 0, strlen($needle)) === $needle);
+  return strpos($haystack, $needle) === 0;
+}
+
+/**
+ * ends_with
+ *
+ * @param [type] $haystack
+ * @param [type] $needle
+ * @return void
+ */
+function ends_with($haystack, $needle)
+{
+    return strrpos($haystack, $needle) === strlen($haystack)-strlen($needle);
 }
