@@ -11,12 +11,12 @@
 function get_login_attempt($ip)
 {
  
-  $sql = "SELECT count(ip_address) AS failed_login_attempt 
-          FROM tbl_login_attempt 
-          WHERE ip_address = ? 
-          AND login_date BETWEEN DATE_SUB( NOW() , INTERVAL 1 DAY ) AND NOW()";
+ $sql = "SELECT count(ip_address) AS failed_login_attempt 
+         FROM tbl_login_attempt 
+         WHERE ip_address = ? 
+         AND login_date BETWEEN DATE_SUB( NOW() , INTERVAL 1 DAY ) AND NOW()";
 
-  return db_prepared_query($sql, [$ip], "s")->get_result()->fetch_assoc();
+ return db_prepared_query($sql, [$ip], "s")->get_result()->fetch_assoc();
 
 }
 
