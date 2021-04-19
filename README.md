@@ -18,7 +18,7 @@ Scriptlog is not a replacement for a full Content Management System. Do not plan
 
 Before you install Scriptlog on your host, make sure Scriptlog can work correctly in your
 environment. Scritplog need the following
-*system requirements*
+*system requirements.*
 
 **Requirements:**
 
