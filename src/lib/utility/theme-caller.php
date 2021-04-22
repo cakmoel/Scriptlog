@@ -1,5 +1,25 @@
 <?php
 /**
+ * Theme dir function
+ * checking which theme actived and 
+ * return it with application URL
+ * 
+ * @category Function
+ * @return string
+ * 
+ */
+function theme_dir()
+{
+    
+  $active_theme = theme_identifier();
+
+  $folder = $active_theme['theme_directory'].DS;
+
+  return app_info()['app_url'].DS.APP_THEME.$folder;
+
+}
+
+/**
  * Theme Caller
  * 
  * @category functions
@@ -14,81 +34,74 @@ function theme_identifier()
   
   $theme_init = new ThemeDao();
   
-  if($theme_init->totalThemeRecords() > 0) {
-
-    return $theme_init->loadTheme('Y');
-
-  }
+  return $theme_init->loadTheme('Y');
   
 }
 
-// call theme header
+/**
+ * call_theme_header
+ * 
+ * @category Function
+ * @return void
+ * 
+ */
 function call_theme_header()
 {
-  
-  if(!theme_identifier()) {
 
-     scriptlog_error("Theme is not found!", E_USER_ERROR);
+if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php')) {
 
-  } else {
-
-    if(file_exists(APP_ROOT.APP_PUBLIC.DS.theme_identifier()['theme_directory'].DS.'header.php')) {
-
-      include(APP_ROOT.APP_PUBLIC.DS.theme_identifier()['theme_directory'].DS.'header.php');
-
-    } else {
-
-       scriptlog_error("file header.php not found", E_USER_NOTICE);
-
-    }
+  include(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php');
      
-  }
+} else {
+
+  scriptlog_error("File header not found");
 
 }
 
-// call theme content
+}
+
+/**
+ * call_theme_content
+ *
+ * @category Function
+ * @param string $content
+ * @return void
+ * 
+ */
 function call_theme_content($content)
 {
 
-  if(!theme_identifier()) {
+  if(file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php'))) {
 
-    scriptlog_error("Theme is not found!", E_USER_ERROR);
-
+    include(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php'));
+   
   } else {
 
-    if(file_exists(APP_ROOT.APP_PUBLIC.DS.theme_identifier()['theme_directory'].DS.basename($content.'.php'))) {
-
-      include(APP_ROOT.APP_PUBLIC.DS.theme_identifier()['theme_directory'].DS.basename($content.'.php'));
-     
-    } else {
-
-      scriptlog_error("file content not found", E_USER_NOTICE);
-
-    }
+    scriptlog_error("file content not found");
 
   }
 
 }
 
-// call theme footer
+/**
+ * call_theme_footer
+ *
+ * @category Function
+ * @return void
+ * 
+ */
 function call_theme_footer()
 {
 
-  if(!theme_identifier()) {
+  if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php')) {
 
-    scriptlog_error("Theme is not found!", E_USER_ERROR);
+    include(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php');
 
   } else {
 
-    if(file_exists(APP_ROOT.APP_PUBLIC.DS.theme_identifier()['theme_directory'].DS.'footer.php')) {
+    scriptlog_error("File footer not found");  
 
-      include(APP_ROOT.APP_PUBLIC.DS.theme_identifier()['theme_directory'].DS.'footer.php');
-
-    } else {
-
-      scriptlog_error("file footer.php not found", E_USER_NOTICE);
-    }
-     
   }
 
 }
+
