@@ -47,12 +47,6 @@ class Dao
    }
  }
 
- public function __desctruct()
- {
-   Registry::set('dbc', null);
-   session_write_close();
- }
-
 /**
  * setSQL
  *
@@ -156,7 +150,7 @@ class Dao
   
   $stmt = $this->dbc->dbQuery($this->sql, $data);
   
-  return $stmt->rowCount();
+  return ($stmt->rowCount() > 0) ? $stmt->rowCount() : null;
      
  }
  
@@ -308,6 +302,12 @@ protected function lastId()
       
        }
 
+ }
+
+ public function __desctruct()
+ {
+   Registry::set('dbc', null);
+   session_write_close();
  }
 
 }
