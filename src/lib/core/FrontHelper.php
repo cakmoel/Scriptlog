@@ -2,97 +2,65 @@
 /**
  * FrontHelper Class
  * FrontHelper class will be useful for theme functionality
- * to retrieve some particular content needed on theme layout 
- * 
+ * to retrieve particular content needed on theme layout
+ *
  * @category Core Class
- * @author M.Noermoehammad
+ * @author MNoermoehammad
  * @license MIT
  * @version 1.0
  * @since Since Release 1.0
+ *
+ */
+class FrontHelper
+{
+
+/**
+ * frontPermalinks
+ *
+ * @param int $id
+ * @return mixed|bool
  * 
  */
-class FrontHelper 
-{
-  
-protected static $sanitize;
-
-protected static $paginator; 
-
-protected static $postDao;  
-
-protected static $pageDao; 
-
-protected static $topicDao;
-
-protected static $navigation;
-
-private static $dispatcher;
-
-const PER_PAGE = 10;
-
-const QUERY_PAGE = 'p';
-
-public static function frontNavigation(MenuDao $navigation)
-{
-
-  self::$navigation = $navigation;
-
-  return self::$navigation->findFrontNavigation(find_request()[0]);
-
-}
-
 public static function frontPermalinks($id)
 {
 
   $url = false;
 
-  $idsanitized = self::frontSanitizer(prevent_injection(db_instance()->real_escape_string((int)$id)), 'sql');
-  
+  $id = prevent_injection(db_instance()->real_escape_string((int)$id));
+
   if (app_info()['permalink_setting'] == 'yes') {
-  
-      $query = db_simple_query("SELECT post_slug FROM tbl_posts WHERE ID = '$idsanitized'")->fetch_object();
-       
+
+      $query = db_simple_query("SELECT post_slug FROM tbl_posts WHERE ID = '$id'")->fetch_object();
+
       $url = $query->post_slug;
-  
+
       return $url;
-  
+
   } else {
-  
+
     $url = false;
-  
+
     return $url;
-  
+
   }
 
 }
 
-public static function frontHeadlines($start, $limit)
-{
-
-$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
-        p.post_title, p.post_content, p.post_slug, p.post_status, p.post_type,
-        m.ID, m.media_filename, m.media_caption, m.media_target, m.media_access
-        FROM tbl_posts AS p
-        INNER JOIN tbl_media AS m ON p.media_id = m.ID
-        WHERE p.post_status = 'publish' AND p.post_type = 'blog'
-        AND m.media_target = 'blog' AND m.media_access = 'public'
-        ORDER BY p.ID LIMIT ?, ?";
-
-$statement = db_prepared_query($sql, [(int)$start, (int)$limit], 'ii');
-
-$result = get_result($statement);
-
-return $result;
-    
-}
-
+/**
+ * frontGalleries
+ *
+ * @param int $start
+ * @param int $limit
+ * @return mixed
+ * 
+ */
 public static function frontGalleris($start, $limit)
 {
 
 $sql = "SELECT ID, media_filename, media_caption FROM tbl_media WHERE media_target = 'gallery'
        ORDER BY ID LIMIT ?, ?";
 
-$statement = db_prepared_query($sql, [(int)$start, (int)$limit], 'ii');
+$statement = db_prepared_query($sql, [$start, $limit], 'ii');
 
 $result = get_result($statement);
 
@@ -100,120 +68,101 @@ return $result;
 
 }
 
-public static function frontNextPost($post_id, PostDao $postDao, Sanitize $sanitize, $fetchMode = null)
+/**
+ * frontPostById
+ *
+ * @param int $id
+ * @return mixed
+ * 
+ */
+public static function frontPostById($id)
 {
-  self::$postDao = $postDao;
-  self::$sanitize = $sanitize;
 
-  return self::$postDao->showNextPost($post_id, self::$sanitize, $fetchMode);
+$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
+               p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_sticky, 
+               p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, 
+               m.media_access, u.user_fullname
+        FROM tbl_posts AS p
+        INNER JOIN tbl_media AS m ON p.media_id = m.ID
+        INNER JOIN tbl_users AS u ON p.post_author = u.ID
+        WHERE p.ID = ? AND p.post_status = 'publish'
+AND p.post_type = 'blog' AND m.media_target = 'blog'
+AND m.media_access = 'public' AND m.media_status = '1'";
+
+$idsanitized = self::frontSanitizer($id, 'sql');
+
+$statement = db_prepared_query($sql, [$idsanitized], 'i');
+
+$result = get_result($statement);
+
+return (empty($result)) ?: $result;
 
 }
 
-public static function frontPrevPost($post_id, PostDao $postDao, Sanitize $sanitize, $fetchMode = null)
-{
- self::$postDao = $postDao;
- self::$sanitize = $sanitize;
-
- return self::$postDao->showPrevPost($post_id, self::$sanitize, $fetchMode);
- 
-}
-
-public static function frontRecentPosts(PostDao $postDao, Sanitize $sanitize)
+/**
+ * frontPageBySlug
+ *
+ * @param string $slug
+ * @return mixed
+ * 
+ */
+public static function frontPageBySlug($slug)
 {
 
-  self::$postDao = $postDao;
-  self::$sanitize = $sanitize;
+$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
+               p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_sticky, 
+               p.post_type, p.comment_status,
+               m.ID, m.media_filename, m.media_caption, m.media_access, u.ID, u.user_fullname
+  FROM tbl_posts AS p
+  INNER JOIN tbl_media AS m ON p.media_id = m.ID
+  INNER JOIN tbl_users AS u ON p.post_author = u.ID
+  WHERE p.post_slug = ?
+  AND p.post_status = 'publish' AND p.post_type = 'page' 
+  AND m.media_access = 'public' AND m.media_status = '1'";
 
-  return self::$postDao->showPostsPublished(self::frontPaginator(), self::$sanitize);
+$slug_sanitized = self::frontSanitizer($slug, 'xss'); 
 
-}
+$statement = db_prepared_query($sql, [$slug_sanitized], 's');
 
-public static function frontTotalPosts(PostDao $postDao)
-{
-  
-  self::$postDao = $postDao;
+$result = get_result($statement);
 
-  return self::$postDao->totalPostRecords();
-
-}
-
-public static function frontReadPost($id, PostDao $postDao, Sanitize $sanitize)
-{
-
- self::$postDao = $postDao;
- self::$sanitize = $sanitize;
-
- return self::$postDao->showPostById($id, self::$sanitize);
+return (empty($result)) ?: $result;
 
 }
 
-public static function frontReadPage($slug, PageDao $pageDao, Sanitize $sanitize)
+/**
+ * frontTopicBySlug
+ *
+ * @param string $slug
+ * @return mixed
+ * 
+ */
+public static function frontTopicBySlug($slug)
 {
 
-self::$pageDao = $pageDao;
-self::$sanitize = $sanitize;
+ $sql = "SELECT ID, topic_title FROM tbl_topics WHERE topic_slug = ? AND topic_status = 'Y'";
 
-return self::$pageDao->findPageBySlug($slug, self::$sanitize);
+ $slug_sanitized = self::frontSanitizer($slug, 'xss');
+
+ $statement = db_prepared_query($sql, [$slug_sanitized], 's');
+
+ $result = get_result($statement);
+
+ return (empty($result)) ?: $result;
 
 }
 
-public static function frontSidebarTopics(TopicDao $topicDao)
-{
-  
- self::$topicDao = $topicDao;
-
- return self::$topicDao->showAllActiveTopics();
-
-}
-
-public static function frontSidebarPosts(PostDao $postDao, $status, $start, $limit)
-{
-
-  self::$postDao = $postDao;
-
-  return self::$postDao->showPostsOnSidebar($status, $start, $limit);
-
-}
-
-public function frontSidebarArchives()
-{
-
-  $sql = "SELECT MONTH(post_data) AS month, YEAR(post_date) AS year FROM tbl_posts GROUP BY month, year ORDER BY month DESC";
-
-  $statement = db_simple_query($sql)->fetch_all(MYSQL_ASSOC);
-
-  return $statement;
-
-}
-
-public static function frontRequestParam(Dispatcher $dispatcher)
-{
-  
-  self::$dispatcher = $dispatcher;
-
-  return self::$dispatcher->findRequestParam();
-
-}
-
-public static function frontRequestPath($args, Dispatcher $dispatcher)
-{
-  self::$dispatcher = $dispatcher;
-
-  return self::$dispatcher->findRequestPath($args);
-
-}
-
-public static function frontPaginator()
-{
-  self::$paginator = new Paginator(self::PER_PAGE, self::QUERY_PAGE);
-
-  return self::$paginator;
-  
-}
-
+/**
+ * frontSanitizer
+ *
+ * @param string $str
+ * @param string $type
+ * @return string
+ * 
+ */
 private static function frontSanitizer($str, $type)
-{
-  return sanitizer($str, $type);
+{ 
+ return sanitizer($str, $type);
 }
 
 }
