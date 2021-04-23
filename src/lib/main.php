@@ -27,51 +27,13 @@ ini_set('session.gc_probability',1);
 
 require __DIR__ . '/common.php';
 
-if (!defined('PHP_EOL')) {
-
-  if (strtoupper(substr(PHP_OS,0,3) == 'WIN')) {
-        
-    define('PHP_EOL',"\r\n");
-
-  } elseif (strtoupper(substr(PHP_OS,0,3) == 'MAC')) {
-        
-    define('PHP_EOL',"\r");
-    
-  } elseif (strtoupper(substr(PHP_OS,0,3) == 'DAR')) {
-        
-    define('PHP_EOL',"\n");
-      
-  } else {
-        
-    define('PHP_EOL',"\n");
-      
-  }
-
-} 
-
-$is_secure = false;
-
-if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
-
- $is_secure = true;
-
-} elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on') {
-    
- $is_secure = true;
-    
-}
-
-if (!defined('APP_PROTOCOL')) define('APP_PROTOCOL', $protocol = $is_secure ? 'https' : 'http');
-
-if (!defined('APP_HOSTNAME')) define('APP_HOSTNAME', isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
-
 $config = null;
 
-if (is_readable(APP_ROOT.'config.php')) {
+if ( is_readable(APP_ROOT.'config.php') ) {
     
-    $config = require __DIR__ . '/../config.php';
+  $config = require __DIR__ . '/../config.php';
     
- } else {
+} else {
      
     if (is_dir(APP_ROOT . 'install')) {
 
@@ -79,7 +41,7 @@ if (is_readable(APP_ROOT.'config.php')) {
         exit();
          
     }
-         
+    
 }
 
 #================================== call functions in directory lib/utility ===========================================
@@ -222,10 +184,10 @@ $userToken = new UserTokenDao();
 $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);
 $ubench = new Ubench();
+$dispatcher = new Dispatcher();
 
 session_set_save_handler($sessionMaker, true);
 session_save_path(__DIR__ . '/utility/.sessions'.DS);
-
 register_shutdown_function('session_write_close');
 
 if (!start_session_on_site($sessionMaker)) {
