@@ -1,10 +1,10 @@
 <?php
 /**
- * Theme dir function
- * checking which theme actived and 
- * return it with application URL
+ * Theme_dir()
  * 
- * @category Function
+ * checking which is theme actived and return it with app's URL
+ * 
+ * @category function
  * @return string
  * 
  */
@@ -20,15 +20,14 @@ function theme_dir()
 }
 
 /**
- * Theme Caller
+ * theme_identifier()
+ * 
+ * initialize theme actived
  * 
  * @category functions
- * @author   M.Noermoehammad
- * @license  MIT
- * @version  1.0
+ * @return mixed
  * 
  */
-
 function theme_identifier()
 {
   
@@ -104,4 +103,3 @@ function call_theme_footer()
   }
 
 }
-
