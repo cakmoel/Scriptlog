@@ -13,7 +13,7 @@
  * @return void
  * 
  */
-function content_security_policy()
+function content_security_policy($app_url)
 {
 
 if (is_ssl() === false) {
@@ -22,7 +22,7 @@ $csp_non_ssl = "Content-Security-Policy: ".
     "connect-src 'self' http:; ". 
     "default-src 'self' http:; ". 
     "font-src 'unsafe-inline' data: http:; ". 
-    "form-action 'self' ".app_url()."; ". 
+    "form-action 'self' ".$app_url."; ". 
     "img-src data: http:; ".
     "frame-ancestors 'none' ; ". 
     "frame-src 'none'; ". 
@@ -41,7 +41,7 @@ $csp_ssl = "Content-Security-Policy:".
     "connect-src 'self' https:; ". 
     "default-src 'self' https:; ". 
     "font-src 'unsafe-inline' data: https:; ". 
-    "form-action 'self' ".app_url()."; ". 
+    "form-action 'self' ".$app_url."; ". 
     "img-src data: https:; ".
     "frame-ancestors 'none'; ". 
     "frame-src 'none; ". 
