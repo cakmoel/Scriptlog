@@ -282,9 +282,9 @@ class Authentication
  public function login(array $values)
  {
     
-    $login = (isset($values['login'])) ? $values['login'] : null;
-    $password = (isset($values['user_pass'])) ? $values['user_pass'] : null;
-    $remember_me = (isset($values['remember'])) ? $values['remember'] : null;
+    $login = ( isset($values['login']) ? $values['login'] : null ) ;
+    $password = ( isset($values['user_pass']) ? $values['user_pass'] : null );
+    $remember_me = ( isset($values['remember']) ? $values['remember'] : null ) ;
 
     if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
         
@@ -480,7 +480,9 @@ public function removeCookies()
 }
 
 /**
- * Clear authentication cookies
+ * clearAuthCookies
+ * 
+ * @param string $user_login
  *
  */
 public function clearAuthCookies($user_login)
