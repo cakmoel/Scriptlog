@@ -90,8 +90,6 @@ if (file_exists(APP_ROOT.APP_LIBRARY.DS.'Autoloader.php')) {
 
 }
 
-get_server_load();
-
 Autoloader::setBaseDir(APP_ROOT);
 // load libraries necessary by system
 Autoloader::addClassDir(array(
@@ -103,6 +101,12 @@ Autoloader::addClassDir(array(
 )); 
 
 call_htmlpurifier();
+
+get_server_load();
+
+whoops_error();
+
+content_security_policy($config['app']['url']);
 
 #===================== RULES ==========================
 
@@ -162,10 +166,6 @@ $uri = new RequestPath();
 // Register rules of routes, an instance of database connection, cipher key for cryptography and uri requested
 Registry::setAll(array('dbc' => $dbc,  'key' => $key, 'route' => $rules, 'uri'=>$uri));
 
-whoops_error();
-
-content_security_policy();
-
 /* an instances of class that necessary for the system
  * please do not change this below variable 
  * these are collection of objects or instances of classes 
@@ -176,7 +176,7 @@ content_security_policy();
  * @var $userDao, $validator, $authenticator, $ubench --
  * 
  */
-$sessionMaker = new SessionMaker(set_session_cookies_key());
+$sessionMaker = new SessionMaker(set_session_cookies_key($config['app']['email'], $config['app']['key']));
 $searchPost = new SearchFinder();
 $sanitizer = new Sanitize();
 $userDao = new UserDao();
