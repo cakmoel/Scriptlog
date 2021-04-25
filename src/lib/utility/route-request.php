@@ -14,15 +14,5 @@
  */
 function route_request($dispatcher)
 {
-
-  if (is_object($dispatcher)) {
-
-    $dispatcher->dispatch();
-    
-  } else {
-    
-    throw new ErrorException("$dispatcher is not object");
-
-  }
- 
+  (is_object($dispatcher) ? $dispatcher->dispatch() : trigger_error("Scriptlog's internal server not working") ); 
 }
