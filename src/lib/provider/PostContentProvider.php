@@ -149,14 +149,12 @@ public static function retrivePost()
   } catch (Throwable $th) {
     
     LogError::setStatusCode(http_response_code());
-    LogError::newMessage($th);
-    LogError::customErrorMessage();
+    LogError::exceptionHandler($th);
 
   } catch (ProviderException $e) {
 
     LogError::setStatusCode(http_response_code());
-    LogError::newMessage($e);
-    LogError::customErrorMessage();
+    LogError::exceptionHandler($e);
 
   }
 
