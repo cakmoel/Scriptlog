@@ -1,9 +1,15 @@
 <?php
 /**
- * is_cookies_secured function
+ * is_cookies_secured()
+ * 
  * checking whether a secure HTTPS connection enabled 
  *
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @return boolean
+ * 
  */
 function is_cookies_secured()
 {
@@ -21,30 +27,40 @@ function is_cookies_secured()
 }
 
 /**
- * set_session_cookies_key
+ * set_session_cookies_key()
  *
- * @category Function
+ * generating session cookies key
+ * 
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @return string
  * 
  */
-function set_session_cookies_key()
+function set_session_cookies_key($app_email, $app_key)
 {
 
-  $session_cookies_key = hash_hmac('sha384', app_info()['site_email'], hash('sha384', app_key().zend_ip_address(), true));
+  $session_cookies_key = hash_hmac('sha384', $app_email.$app_key.get_ip_address(), hash('sha384', $app_email.$app_key.get_ip_address(), true));
   
   return $session_cookies_key;
 
 }
 
 /**
- * is_cookies
+ * is_cookies()
  * 
- * @category Function
- * @param string $cookies
- * @return boolean
+ * checking set array cookies that have array elements
+ * 
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
+ * @param array $cookies
+ * @return string
  * 
  */
-function is_cookies($cookies)
+function is_cookies(array $cookies)
 {
 
   if (isset($_COOKIE[$cookies])) {
@@ -53,6 +69,8 @@ function is_cookies($cookies)
 
         if (!empty($name)) {
 
+            $name = safe_html($name);
+            
             return $name;
 
         }
@@ -61,30 +79,42 @@ function is_cookies($cookies)
      
   }
 
+  return false;
+  
 }
 
 /**
- * set_cookie_path
+ * set_cookie_path()
  *
- * @category Function
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @return string
  * 
  */
 function set_cookies_path()
 { 
  
-  $root_path = isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : "";
-  $admin_path = dirname(__FILE__).'/../../admin/';
-  $cookies_path = str_replace($root_path, '', $admin_path);
-  return $cookies_path;
+ $root_path = isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : "";
+ 
+ $admin_path = dirname(__FILE__).'/../../'.APP_ADMIN;
+ 
+ $cookies_path = str_replace($root_path, '', $admin_path);
+ 
+ return $cookies_path;
   
 }
 
 /**
- * set_cookies_scl
- * Support samesite cookie flag
+ * set_cookies_scl()
  * 
- * @category Function
+ * Supporting samesite cookie flag
+ * 
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @see https://github.com/GoogleChromeLabs/samesite-examples/blob/master/php.md 
  * @see https://stackoverflow.com/a/46971326/2308553 
  * @see https://stackoverflow.com/questions/39750906/php-setcookie-samesite-strict
@@ -92,9 +122,12 @@ function set_cookies_path()
  * @see https://www.php.net/manual/en/function.session-set-cookie-params.php
  * @see https://stackoverflow.com/questions/36877/how-do-you-set-up-use-httponly-cookies-in-php
  * @see https://www.php.net/manual/en/session.configuration.php#ini.session.cookie-samesite
+ * @see https://stackoverflow.com/a/46971326/2308553 
  * @see https://www.php.net/manual/en/function.setcookie.php
  * @see https://www.php.net/setcookie
  * @see https://www.php.net/manual/en/features.cookies.php
+ * @see https://scotthelme.co.uk/csrf-is-really-dead/
+ * @see https://stackoverflow.com/questions/1354999/keep-me-logged-in-the-best-approach/17266448#17266448
  * @param string $name
  * @param string $value
  * @param string $expire
