@@ -41,7 +41,7 @@ class CacheMemcached
   {
      try {
 
-       $item = self::$caching->writeCache(set_cache_key($key), $data);
+       $item = self::$caching->writeCache(set_cache_key($key, $data), $data);
     
        if (false === $item) {
 
@@ -51,9 +51,8 @@ class CacheMemcached
 
      } catch(CacheException $e) {
 
-       LogError::setStatusCode();
-       LogError::newMessage($e);
-       LogError::customErrorMessage();
+      LogError::setStatusCode(http_response_code(500));
+      LogError::exceptionHandler($e);
        
      }
 
@@ -73,16 +72,15 @@ class CacheMemcached
 
       if (false === $item) {
 
-         throw new CacheException("Memcached delete failure. Key: $key");
+        throw new CacheException("Memcached delete failure. Key: $key");
 
       }
 
     } catch(CacheException $e) {
 
-      LogError::setStatusCode();
-      LogError::newMessage($e);
-      LogError::customErrorMessage();
-      
+      LogError::setStatusCode(http_response_code(500));
+      LogError::exceptionHandler($e);
+
     }
 
   }
