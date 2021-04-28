@@ -119,28 +119,28 @@ public static function retrivePost()
 
     if (Registry::isKeySet('uri')) {
 
-      (is_object(Registry::get('uri'))) ? self::$uri = Registry::get('uri') : null;
+      ( is_object(Registry::get('uri') ) ? self::$uri = Registry::get('uri') : null ) ;
     
       self::$parameters['matched'] = self::$uri->matched;
       self::$parameters['param1'] = self::$uri->param1;
       self::$parameters['param2'] = self::$uri->param2;
       self::$parameters['param3'] = self::$uri->param3;
     
-      if ( (empty(self::$parameters['param3'])) && (empty(self::$parameters['[param2'])) ) {
+      if ( ( empty(self::$parameters['param3']) ) && ( empty(self::$parameters['[param2']) ) ) {
     
-          return self::invokeAllPosts();
+        return self::invokeAllPosts();
     
       } else {
     
-         if (!check_integer(self::$parameters['param2'])) {
+        if (!check_integer(self::$parameters['param2'])) {
     
           throw new ProviderException("Invalid parameter ID");
     
-         } else {
+        } else {
 
           return self::invokeDetailPost(self::$parameters['param2']);
 
-         }
+        }
     
       }
     
