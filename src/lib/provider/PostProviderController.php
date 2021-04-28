@@ -82,26 +82,35 @@ public function getItems()
   $errors = array();
   $checkError = true;
 
-  $this->setupView('blog');
-  $this->setFrontTitle($this->uri->param1." &raquo; ". app_info()['site_name']);
-  $this->content->set('frontTitle', $this->getFrontTitle());
+  if ( ( ! empty($this->uri->param1 ) ) || ( $this->uri->param1 === 'blog' ) ) {
 
-  if (!is_array($this->postProviderService->showRandomStickyPosts())) {
+    $this->setupView('blog');
+    $this->setFrontTitle($this->uri->param1." &raquo; ". app_info()['site_name']);
+    $this->content->set('frontTitle', $this->getFrontTitle());
+    $this->content->set('postsPublished', $this->postProviderService->showPostsPublished(self::frontPaginator()));
 
-     $checkError = false;
-     array_push($errors, "You have not any post yet");
+  } else {
+
+    $this->setupView('home');
+    $this->setFrontTitle($this->uri->matched." &raquo; ". app_info()['site_name']);
+    $this->content->set('frontTitle', $this->getFrontTitle());
+    $this->content->set('stickyPost', $this->postProviderService->showRandomStickyPosts());
+    $this->content->set('randomPosts', $this->postProviderService->showRandomPosts(5));
+
+    if (!is_array($this->postProviderService->showRandomStickyPosts())) {
+
+      $checkError = false;
+      array_push($errors, "You have not any post yet");
+ 
+    }
 
   }
-
+  
   if (!$checkError) {
 
     $this->content->set('errors', $errors);
     
   }
-  
-  $this->content->set('stickyPost', $this->postProviderService->showRandomStickyPosts());
-  $this->content->set('postsPublished', $this->postProviderService->showPostsPublished(self::frontPaginator()));
-  $this->content->set('randomPosts', $this->postProviderService->showRandomPosts(5));
    
   return $this->content->render();
   
@@ -111,7 +120,7 @@ public function getItems()
  * getItemById
  *
  * @param integer|num $id
- * @return void
+ * @return array
  * 
  */
 public function getItemById($id)
