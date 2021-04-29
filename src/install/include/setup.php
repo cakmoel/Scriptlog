@@ -22,11 +22,12 @@ function current_url()
 }
 
 /**
- * function makeConnection
+ * make_connection()
  * 
  * @param string $host
  * @param string $username
  * @param string $passwd
+ * 
  */
 function make_connection($host, $username, $passwd, $dbname)
 {
@@ -49,7 +50,8 @@ function make_connection($host, $username, $passwd, $dbname)
 }
 
 /**
- * function closeConnection
+ * close_connection()
+ * 
  * closing database connection
  * 
  * @param object $link
@@ -259,9 +261,9 @@ if ($link->insert_id && $createAdmin->affected_rows > 0) {
 
     if ($recordAppKey -> affected_rows > 0) {
 
-        $link->close();
+      $link->close();
         
-     } 
+    } 
  
 }
 
@@ -496,6 +498,8 @@ function convert_memory_used($size)
 }
 
 /**
+ * setup_base_url()
+ * 
  * Setup base URL
  *
  * @param string $protocol
@@ -520,7 +524,8 @@ function setup_base_url($protocol, $server_host)
 }
 
 /**
- * purge_installation
+ * purge_installation()
+ * 
  * Clean up installation procedure
  * 
  */
