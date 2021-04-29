@@ -250,13 +250,13 @@ class Authentication
   
   if (!$getUser = $this->findUserByLogin($this->session_cookies)) {
 
-      return false;
+    return false;
 
   }
 
   if (isset($_COOKIE['scriptlog_auth'])) {
 
-     return $getUser['user_level'];
+    return $getUser['user_level'];
 
   }
 
@@ -434,7 +434,8 @@ public function resetUserPassword($user_email)
 }
 
 /**
- * Update new password
+ * UpdateNewPassword
+ * 
  * Recovering user password
  * 
  * @param string $user_pass
@@ -451,7 +452,7 @@ public function updateNewPassword($user_pass, $user_id)
   $bind = ['user_pass' => $user_pass, 'user_reset_complete' => 'Yes'];
 
   if ($this->userDao->recoverNewPassword($bind, $user_id)) {
-      recover_password($user_pass);
+    recover_password($user_pass);
   }
 
 }
@@ -467,13 +468,13 @@ public function removeCookies()
 
   if ((isset($_COOKIE['scriptlog_auth'])) && (isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector'])) ) {
 
-     unset($_COOKIE['scriptlog_auth']);
-     unset($_COOKIE['scriptlog_validator']);
-     unset($_COOKIE['scriptlog_selector']);
+    unset($_COOKIE['scriptlog_auth']);
+    unset($_COOKIE['scriptlog_validator']);
+    unset($_COOKIE['scriptlog_selector']);
 
-     set_cookies_scl('scriptlog_auth', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
-     set_cookies_scl('scriptlog_validator', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);  
-     set_cookies_scl('scriptlog_selector', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+    set_cookies_scl('scriptlog_auth', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
+    set_cookies_scl('scriptlog_validator', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);  
+    set_cookies_scl('scriptlog_selector', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
     
   }
 
