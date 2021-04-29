@@ -398,6 +398,8 @@ function remove_bad_characters($str_words, $host, $user, $password, $database, $
 /** 
  * Escape HTML Function
  * 
+ * @see https://www.taniarascia.com/create-a-simple-database-app-connecting-to-mysql-with-php/
+ * @see https://ilovephp.jondh.me.uk/en/tutorial/make-your-own-blog
  * @param string $html
  * @return string
  * 
@@ -432,7 +434,7 @@ function generate_license($suffix = null)
     
   }
   
-  $tokens = 'ABCDEFGHJKLMNPQRSTUVWXYZ123456789';
+  $tokens = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   $license_string = '';
     
   // Build Default License String
@@ -498,7 +500,7 @@ function convert_memory_used($size)
  *
  * @param string $protocol
  * @param string $server_host
- * @return void
+ * @return string
  * 
  */
 function setup_base_url($protocol, $server_host)
