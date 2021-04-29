@@ -50,20 +50,19 @@ function check_mysql_version($link, $min)
 }
 
 /**
+ * check_os()
+ * 
  * Checking Operating System
+ * 
  */
 function check_os()
 {
    $os = new Os();
    
-   if (($os -> getName() === Os::LINUX) || 
-       ($os -> getName() === Os::FREEBSD) || 
-       ($os -> getName() === Os::NETBSD) ||
-       ($os -> getName() === Os::OPENBSD) ||
-       ($os -> getName() === Os::OPENSOLARIS) ||
-       ($os -> getName() === Os::CHROME_OS) ||
-       ($os -> getName() === Os::WINDOWS) || 
-       ($os -> getName() === Os::OSX)) {
+   if (($os -> getName() === Os::LINUX) || ($os -> getName() === Os::FREEBSD) || 
+       ($os -> getName() === Os::NETBSD) || ($os -> getName() === Os::OPENBSD) || 
+       ($os -> getName() === Os::OPENSOLARIS) || ($os -> getName() === Os::CHROME_OS) ||
+       ($os -> getName() === Os::WINDOWS) || ($os -> getName() === Os::OSX) ) {
        
     return(array("Operating_system" => $os -> getName()));
         
@@ -72,7 +71,10 @@ function check_os()
 }
 
 /**
- * Checking Browser
+ * grab_browser()
+ * 
+ * instantiate browser object
+ * 
  */
 function grab_browser()
 {
@@ -82,6 +84,12 @@ function grab_browser()
  
 }
 
+/**
+ * check_browser()
+ *
+ * @return string
+ * 
+ */
 function check_browser()
 {
    
@@ -92,7 +100,10 @@ function check_browser()
 }
 
 /**
+ * check_browser_version()
+ * 
  * Checking Browser Version
+ * 
  */
 function check_browser_version()
 {
@@ -135,7 +146,9 @@ function check_browser_version()
 }
 
 /**
- * get_browser version
+ * get_browser_version()
+ * 
+ * retrieving browser version
  * 
  */
 function get_browser_Version()
@@ -146,7 +159,10 @@ function get_browser_Version()
 }
 
 /**
+ * check_web_server()
+ * 
  * Checking Web Server
+ * 
  */
 function check_web_server()
 {
@@ -182,14 +198,15 @@ function check_main_dir()
 }
 
 /**
- * Checking Load Engine
+ * check_loader()
  * 
+ * Checking Load Engine
  * 
  */
 function check_loader()
 {
     
-  if (is_dir(APP_PATH) && is_file(APP_PATH . '../lib/Scriptloader.php')) {
+  if (is_dir(APP_PATH) && is_file(APP_PATH . '../lib/Autoloader.php')) {
         
     return true;
      
@@ -275,6 +292,8 @@ function check_cache_dir()
 }
 
 /**
+ * check_plugin_dir()
+ * 
  * Checking lib Plugin Directory. It is writeable or not
  * 
  */
@@ -510,19 +529,19 @@ function check_gd_enabled()
  */
 function check_modrewrite()
 {
-  $apache_modules = (function_exists('apache_get_modules')) ? apache_get_modules() : exit;
+  $apache_modules = ( function_exists('apache_get_modules')  ? apache_get_modules() : exit() ) ;
   
-  if((check_web_server()['WebServer'] == 'Apache')) {
+  if( ( check_web_server()['WebServer'] == 'Apache') && ( check_web_server()['Version'] >= '2.2' ) ) {
 
-    if((check_web_server()['Version'] >= '2.2')) {
-
-        if(in_array('mod_rewrite', $apache_modules)) {
-            return true;
-        }
-       
+    if(in_array('mod_rewrite', $apache_modules)) {
+      
+      return true;
+    
     }
 
-  } elseif ((check_web_server()['WebServer'] == 'LiteSpeed')) {
+  } 
+  
+  if ( check_web_server()['WebServer'] == 'LiteSpeed' ) {
       
     if(in_array('mod_rewrite', $apache_modules)) {
         return true;
