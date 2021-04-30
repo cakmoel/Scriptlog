@@ -274,9 +274,9 @@ function required_settings()
                 
           ?>
                 
-        <small class="<?=(isset($filter_passed)) ? $filter_passed : 'text-danger'; ?>"><?=(isset($filter_passed)) ? 'Pass' : $errors['errorChecking'] = 'The filter extension is either not loaded or compiled in'; ?></small>
+        <small class="<?=(isset($filter_passed) ? $filter_passed : 'text-danger');  ?>"><?=(isset($filter_passed) ? 'Pass' : $errors['errorChecking'] = 'The filter extension is either not loaded or compiled in') ; ?></small>
         </div>
-      <span class="<?=(isset($spl_passed)) ? $spl_passed : 'text-danger'; ?>"><i class="<?=(isset($spl_checked)) ? $spl_checked : 'fa fa-close fa-lg'; ?>"></i></span>
+      <span class="<?=(isset($filter_passed) ? $filter_passed : 'text-danger'); ?>"><i class="<?=(isset($filter_checked) ? $spl_checked : 'fa fa-close fa-lg' ) ; ?>"></i></span>
             
 </li>
 
@@ -297,7 +297,7 @@ function required_settings()
                 
             ?>
 
-      <small class="<?=(isset($iconv_passed)) ? $iconv_passed : 'text-danger'; ?>"><?=(isset($iconv_passed)) ? 'Pass' : $errors['errorChecking'] = 'The Iconv extension is not loaded'; ?></small>
+      <small class="<?=(isset($iconv_passed)) ? $iconv_passed : 'text-danger'; ?>"><?=(isset($iconv_passed)) ? 'Pass' : $errors['errorChecking'] = 'Scriptlog requires the Iconv extension'; ?></small>
       </div>
       <span class="<?=(isset($iconv_passed)) ? $iconv_passed : 'text-danger'; ?>"><i class="<?=(isset($iconv_checked)) ? $iconv_checked : 'fa fa-close fa-lg'; ?>"></i></span>
             
@@ -320,7 +320,7 @@ function required_settings()
                 
             ?>
 
-      <small class="<?=(isset($mbstring_passed)) ? $mbstring_passed : 'text-danger'; ?>"><?=(isset($mbstring_passed)) ? 'Pass' : $errors['errorChecking'] = 'The Mbstring extension is not loaded'; ?></small>
+      <small class="<?=(isset($mbstring_passed)) ? $mbstring_passed : 'text-danger'; ?>"><?=(isset($mbstring_passed)) ? 'Pass' : $errors['errorChecking'] = 'Scriptlog requires the Multibyte String extension'; ?></small>
       </div>
       <span class="<?=(isset($mbstring_passed)) ? $mbstring_passed : 'text-danger'; ?>"><i class="<?=(isset($mbstring_checked)) ? $mbstring_checked : 'fa fa-close fa-lg'; ?>"></i></span>
             
@@ -343,7 +343,7 @@ function required_settings()
                 
             ?>
 
-      <small class="<?=(isset($fileinfo_passed)) ? $fileinfo_passed : 'text-danger'; ?>"><?=(isset($fileinfo_passed)) ? 'Pass' : $errors['errorChecking'] = 'The Fileinfo extension is not loaded'; ?></small>
+      <small class="<?=(isset($fileinfo_passed)) ? $fileinfo_passed : 'text-danger'; ?>"><?=(isset($fileinfo_passed)) ? 'Pass' : $errors['errorChecking'] = 'Scriptlog requires the fileinfo extension'; ?></small>
       </div>
       <span class="<?=(isset($fileinfo_passed)) ? $fileinfo_passed : 'text-danger'; ?>"><i class="<?=(isset($fileinfo_checked)) ? $fileinfo_checked : 'fa fa-close fa-lg'; ?>"></i></span>
             
@@ -504,9 +504,9 @@ function check_dir_file()
 
             ?>
 
-          <small class="<?=(isset($main_passed)) ? $main_passed : 'text-danger'; ?>"><?=(isset($main_passed)) ? 'Pass' : $errors['errorChecking'] = 'Required file not found'; ?></small>
+          <small class="<?=( isset($main_passed) ? $main_passed : 'text-danger'); ?>"><?=( isset($main_passed) ? 'Pass' : $errors['errorChecking'] = 'Required file not found'); ?></small>
           </div>
-          <span class="<?=(isset($main_passed)) ? $main_passed : 'text-danger' ?>"><i class="<?=(isset($main_checked)) ? $main_checked : 'fa fa-close fa-lg'; ?>"></i></span>
+          <span class="<?=( isset($main_passed) ? $main_passed : 'text-danger' ); ?>"><i class="<?=( isset($main_checked) ? $main_checked : 'fa fa-close fa-lg') ; ?>"></i></span>
      </li>
             
       <li class="list-group-item d-flex justify-content-between lh-condensed" >
