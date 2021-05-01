@@ -32,7 +32,7 @@ require __DIR__ . '/common.php';
 
 $config = null;
 
-if (is_readable(APP_ROOT.'config.php')) {
+if ( file_exists(APP_ROOT.'config.php')) {
     
     $config = require __DIR__ . '/../config.php';
     
@@ -81,19 +81,17 @@ foreach ($files_dir_iterator as $file) {
 #====================End of call functions in directory lib/utility=====================================================
 
 // check if loader is exists
-if (is_readable(APP_ROOT.APP_LIBRARY.DS.'vendor/autoload.php')) {
-
-    require_once __DIR__ . DS . 'vendor/autoload.php';
-    
-}
-
 if (file_exists(APP_ROOT.APP_LIBRARY.DS.'Autoloader.php')) {
 
     require __DIR__ . DS . 'Autoloader.php';
 
 }
 
-get_server_load();
+if (is_readable(APP_ROOT.APP_LIBRARY.DS.'vendor/autoload.php')) {
+
+    require_once __DIR__ . DS . 'vendor/autoload.php';
+    
+}
 
 Autoloader::setBaseDir(APP_ROOT);
 // load libraries necessary by system
@@ -106,11 +104,8 @@ Autoloader::addClassDir(array(
 )); 
 
 call_htmlpurifier();
-
 get_server_load();
-
 whoops_error();
-
 content_security_policy($config['app']['url']);
 
 #===================== RULES ==========================
