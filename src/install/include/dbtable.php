@@ -11,7 +11,7 @@ user_pass VARCHAR(255) NOT NULL,
 user_level VARCHAR(20) NOT NULL,
 user_fullname VARCHAR(120) DEFAULT NULL,
 user_url VARCHAR(100) DEFAULT NULL,
-user_registered datetime NOT NULL DEFAULT '1987-11-20 12:00:00',
+user_registered datetime NOT NULL DEFAULT '1988-07-01 08:00:00',
 user_activation_key varchar(255) NOT NULL DEFAULT '',
 user_reset_key varchar(255) DEFAULT NULL,
 user_reset_complete VARCHAR(3) DEFAULT 'No',
@@ -35,7 +35,7 @@ PRIMARY KEY (ID)
 
 $tblLoginAttempt = "CREATE TABLE IF NOT EXISTS tbl_login_attempt (
 ip_address VARCHAR(255) NOT NULL,
-login_date datetime NOT NULL DEFAULT '1987-11-20 12:00:00'
+login_date datetime NOT NULL DEFAULT '1945-11-10 12:00:00'
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
 $tblPost = "CREATE TABLE IF NOT EXISTS tbl_posts (
