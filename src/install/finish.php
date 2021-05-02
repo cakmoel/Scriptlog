@@ -58,5 +58,7 @@ install_header($current_path, $protocol, $server_host);
 
 <?php
 
-if (isset($_SESSION['token'])) purge_installation();
+( isset($_SESSION['token']) ? purge_installation() : session_destroy() );
 install_footer($current_path, $protocol, $server_host);
+
+?>
