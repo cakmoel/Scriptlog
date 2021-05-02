@@ -180,12 +180,17 @@ function check_web_server()
 }
 
 /**
+ * check_main_dir()
+ * 
  * Checking Main Engine
+ * 
+ * @return bool
+ * 
  */
 function check_main_dir()
 {
     
-  if (is_dir(APP_PATH) && is_file(APP_PATH . '../lib/main.php')) {
+  if ( is_file(APP_PATH . '../lib/main.php')) {
         
     return true;
        
@@ -202,11 +207,13 @@ function check_main_dir()
  * 
  * Checking Load Engine
  * 
+ * @return  bool
+ * 
  */
 function check_loader()
 {
     
-  if (is_dir(APP_PATH) && is_file(APP_PATH . '../lib/Autoloader.php')) {
+  if ( file_exists(APP_PATH . '../lib/Autoloader.php') ) {
         
     return true;
      
@@ -226,7 +233,7 @@ function check_log_dir()
 
   $perms = fileperms(APP_PATH . '../public/log');
 
-  if ( is_dir(APP_PATH ) && is_dir(APP_PATH . '../public/log') ) {
+  if ( is_dir(APP_PATH . '../public/log') ) {
         
     return true;
         
@@ -250,7 +257,7 @@ function check_theme_dir()
 
  $perms = fileperms(APP_PATH . '../public/themes');
 
- if (is_dir(APP_PATH ) && is_dir(APP_PATH . '../public/themes') ) {
+ if (is_dir(APP_PATH . '../public/themes') ) {
         
     return true;
         
@@ -275,7 +282,7 @@ function check_cache_dir()
    
  $perms = fileperms(APP_PATH . '../public/cache/');
 
- if (is_dir(APP_PATH) && is_dir(APP_PATH . '../public/cache')  ) {
+ if (is_dir(APP_PATH . '../public/cache')  ) {
         
    return true;
         
@@ -302,7 +309,7 @@ function check_plugin_dir()
 
   $perms = fileperms(APP_PATH . '../admin/plugins');
 
-  if (is_dir(APP_PATH) && is_dir(APP_PATH . '../admin/plugins')  ) {
+  if ( is_dir(APP_PATH . '../admin/plugins')  ) {
         
     return true;
         
@@ -525,20 +532,21 @@ function check_gd_enabled()
 }
 
 /**
+ * check_modrewrite()
+ * 
  * Checking mod_rewrite functionality
+ * 
+ * @return bool
+ * 
  */
 function check_modrewrite()
 {
   $apache_modules = ( function_exists('apache_get_modules')  ? apache_get_modules() : exit() ) ;
   
-  if( ( check_web_server()['WebServer'] == 'Apache') && ( check_web_server()['Version'] >= '2.2' ) ) {
+  if( ( check_web_server()['WebServer'] == 'Apache') && ( in_array('mod_rewrite', $apache_modules ) ) ) {
 
-    if(in_array('mod_rewrite', $apache_modules)) {
-      
-      return true;
+    return true;
     
-    }
-
   } 
   
   if ( check_web_server()['WebServer'] == 'LiteSpeed' ) {
