@@ -11,11 +11,6 @@
  */
 class DbFactory
 {
-  /**
-   * Error
-   * @var string
-   */
-  protected static $error;
   
   /**
    * Connect
@@ -28,6 +23,7 @@ class DbFactory
    */
   public static function connect($connection, $options = [])
   {
+
      try {
          
          # hard code database factory's name
@@ -45,13 +41,13 @@ class DbFactory
          
      } catch (Throwable $th) {
         
-        static::$error = LogError::setStatusCode(http_response_code(500));
-        static::$error = LogError::exceptionHandler($th);
+        LogError::setStatusCode(http_response_code(500));
+        LogError::exceptionHandler($th);
          
      } catch (DbException $e) {
 
-        static::$error = LogError::setStatusCode(http_response_code(500));
-        static::$error = LogError::exceptionHandler($e);
+        LogError::setStatusCode(http_response_code(500));
+        LogError::exceptionHandler($e);
 
      }
 
