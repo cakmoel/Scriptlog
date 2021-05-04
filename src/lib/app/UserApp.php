@@ -540,8 +540,9 @@ class UserApp extends BaseApp
 /**
  * updateProfile 
  *
- * @param [integer] $id
- * @return void
+ * @param string $user_login
+ * @return mixed
+ * 
  */
   public function updateProfile($user_login)
   {
