@@ -33,7 +33,7 @@ function theme_identifier()
   
   $theme_init = new ThemeDao();
   
-  return (empty($theme_init->loadTheme('Y') ) ) ?: $theme_init->loadTheme('Y');
+  return ( empty($theme_init->loadTheme('Y') ) ?: $theme_init->loadTheme('Y') );
 
 }
 
