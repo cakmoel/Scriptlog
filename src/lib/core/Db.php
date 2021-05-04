@@ -28,13 +28,6 @@ class Db implements DbInterface
  */
  private static $cache;
  
- /**
-  * error
-  * @var object
-  *
-  */
- private $error;
-
 /**
  * Initializing an object property and method
  * 
@@ -74,14 +67,14 @@ class Db implements DbInterface
    } catch (Throwable $th) {
        
       $this->closeDbConnection();
-      $this->error = LogError::setStatusCode(http_response_code(500));
-      $this->error = LogError::exceptionHandler($th);
+      LogError::setStatusCode(http_response_code(500));
+      LogError::exceptionHandler($th);
       
    } catch (DbException $e) {
 
       $this->closeDbConnection();
-      $this->error = LogError::setStatusCode(http_response_code(500));
-      $this->error = LogError::exceptionHandler($e);
+      LogError::setStatusCode(http_response_code(500));
+      LogError::exceptionHandler($e);
 
    }
    
@@ -108,7 +101,7 @@ class Db implements DbInterface
 
   if (!$args) {
     return $this->dbc->query($sql);
-  }
+  } 
  
   $stmt = $this->dbc->prepare($sql);
 
