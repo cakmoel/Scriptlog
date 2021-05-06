@@ -2,7 +2,10 @@
 /**
  * Function invoke webp image format
  *
- * @param [type] $media_filename
+ * @category functions
+ * @author M.Noermoehammad
+ * @license MIT
+ * @param string $media_filename
  * @param boolean $image_thumb
  * @return string | false if no string returned
  * 
