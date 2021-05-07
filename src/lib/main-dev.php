@@ -124,7 +124,7 @@ content_security_policy($config['app']['url']);
     'category' => "/category/(?'category'[\w\-]+)", 
     
      ### 'archive/12/2017
-     'archive' => "/archive/[0-9]{2}/[0-9]{2}/[0-9]{4}",
+     'archive' => "/archive/[0-9]{2}/[0-9]{4}",
 
      ### '/blog?p=255'
     'blog' => "/blog([^/]*)",                       
@@ -144,7 +144,7 @@ $rules = array(
     
     'home'     => "/",                               
     'category' => "/category/(?'category'[\w\-]+)",
-    'archive'  => "/archive/[0-9]{2}/[0-9]{2}/[0-9]{4}",
+    'archive'  => "/archive/[0-9]{2}/[0-9]{4}",
     'blog'     => "/blog([^/]*)",
     'page'     => "/page/(?'page'[^/]+)",
     'single'   => "/post/(?'id'\d+)/(?'post'[\w\-]+)",
