@@ -15,7 +15,7 @@ abstract class Dashboard implements BoardInterface
 /**
  * View
  * 
- * @var string
+ * @var object
  * 
  */
  protected $view;
