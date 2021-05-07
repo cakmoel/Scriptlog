@@ -81,6 +81,14 @@ function theme_meta()
 
       case 'archive':
 
+        if (!empty($uri->param1)) {
+
+          $theme_meta['site_title'] = title_tag(ucfirst(trim(escape_html($uri->param1)) .' '. escape_html($uri->param3)) . ' &#8211; ' . escape_html(app_info()['site_name']));
+        
+          $theme_meta['meta_tag'] = meta_tag();
+
+        }
+
         break;
 
       default:
@@ -131,8 +139,8 @@ $meta_tag = <<<_META
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="$meta_desc">
-<meta name="keywords" content="$meta_key">
+<meta name="description" content="$meta_title, $meta_desc">
+<meta name="keywords" content="$meta_key, $meta_tagline">
 
 _META;
 
