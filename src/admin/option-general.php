@@ -1,7 +1,7 @@
 <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
 
-$action = (isset($_GET['action'])) ? htmlentities(strip_tags($_GET['action'])) : "";
-$params = (isset($_GET['Id'])) ? intval($_GET['Id']) : null;
+$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
+$params = isset($_GET['Id'])  ? intval($_GET['Id']) : null ;
 $configDao = new ConfigurationDao();
 $configEvent = new ConfigurationEvent($configDao, $validator, $sanitizer);
 $configApp = new ConfigurationApp($configEvent);
