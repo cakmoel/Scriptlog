@@ -9,7 +9,7 @@
  * @since     Since Release 1.0
  *
  */
-class ConfigurationApp extends BaseApp
+class ConfigurationApp
 {
 
 /**
@@ -28,24 +28,45 @@ class ConfigurationApp extends BaseApp
  */
   private $configEvent;
 
+  /**
+   * pageTitle
+   *
+   * @var string
+   * 
+   */
+  protected $pageTitle;
+
+  /**
+   * formAction
+   * 
+   * @var string
+   * 
+   */
+  protected $formAction;
+
   public function __construct(ConfigurationEvent $configEvent)
   {
     $this->configEvent = $configEvent;
   }
 
-  public function ListItems()
+  public function setPageTitle($pageTitle)
   {
-    
+    $this->pageTitle = $pageTitle;
   }
 
-  public function insert()
+  public function getPageTitle()
   {
-   
+    return $this->pageTitle;
   }
 
-  public function update($id)
+  public function setFormAction($formAction)
   {
-  
+    $this->formAction = $formAction;
+  }
+
+  public function getFormAction()
+  {
+    return $this->formAction;
   }
 
   /**
@@ -77,7 +98,7 @@ class ConfigurationApp extends BaseApp
 
        ];
 
-      $size = (!empty($_POST['setting_value'])) ? count($_POST['setting_value']) : null;
+      $size = ( !empty($_POST['setting_value']) ? count($_POST['setting_value']) : null )  ;
        
       try {
         
@@ -136,14 +157,14 @@ class ConfigurationApp extends BaseApp
 
     } else {
 
-       if(isset($_GET['error'])) {
+       if( ( isset($_GET['error']) ) && ( $_GET['error'] == 'configTampered') ) {
          $checkError = false;
-         if($_GET['error'] == 'configTampered') array_push($errors, "Error: Attempt to tampered with our parameters!");
+         array_push($errors, "Error: Attempt to tampered with our parameters!");
        }
   
-       if (isset($_GET['status'])) {
+       if ( ( isset($_GET['status']) ) && ( $_GET['status'] == 'generalConfigUpdated') ) {
          $checkStatus = true;
-         if ($_GET['status'] == 'generalConfigUpdated') array_push($status, "General setting has been updated");
+         array_push($status, "General setting has been updated");
        }
 
        $this->setView('general-setting');
