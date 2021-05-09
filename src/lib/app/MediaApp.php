@@ -216,7 +216,7 @@ public function insert()
         
       }
 
-      if((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
+      if( (!empty($file_location)) && (false === check_mime_type(mime_type_dictionary(), $file_location)) && (false === check_file_extension($file_name))) {
 
         $checkError = false;
         array_push($errors, "Invalid file format");
