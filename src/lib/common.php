@@ -58,7 +58,7 @@ $is_secure = true;
 
 if (!defined('APP_PROTOCOL')) {
 
-  define('APP_PROTOCOL', $protocol = $is_secure ? 'https' : 'http');
+  define('APP_PROTOCOL', $protocol = ( $is_secure ) ? 'https' : 'http');
 
 }
 
@@ -66,4 +66,8 @@ if (!defined('APP_HOSTNAME')) {
 
   define('APP_HOSTNAME', isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
 
+}
+
+if (ini_get("date.timezone") === "" && function_exists("date_default_timezone_set")) {
+  date_default_timezone_set("UTC");
 }
