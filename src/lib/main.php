@@ -23,7 +23,8 @@ ini_set('session.gc_divisor', 100);
 ini_set('session.gc_maxlifetime', 1440);
 ini_set('session.gc_probability',1);
 
-#date_default_timezone_set("GMT");
+// Opt out of FLoC
+header("Permissions-Policy: interest-cohort=()");
 
 require __DIR__ . '/common.php';
 
