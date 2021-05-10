@@ -216,13 +216,6 @@ public function insert()
         
       }
 
-      if( (!empty($file_location)) && (false === check_mime_type(mime_type_dictionary(), $file_location)) && (false === check_file_extension($file_name))) {
-
-        $checkError = false;
-        array_push($errors, "Invalid file format");
-
-      }
-
       if ($file_extension === "jpeg" || $file_extension === "jpg" || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp" || $file_extension === "bmp" ) {
 
          list($width, $height) = ($file_location) ? getimagesize($file_location) : null;
@@ -249,8 +242,17 @@ public function insert()
        // upload file
       if (is_uploaded_file($file_location)) {
 
-        upload_media($file_location, $file_type, $file_size, basename($new_filename));
-          
+        if ( (false === check_file_extension($file_name) ) || ( false === check_mime_type(mime_type_dictionary(), $file_location) ) ) {
+
+           $checkError = false;
+           array_push($errors, "Invalid file format");
+
+        } else {
+
+          upload_media($file_location, $file_type, $file_size, basename($new_filename));
+
+        }
+  
       }
 
       if (!$checkError) {
