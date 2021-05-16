@@ -1,4 +1,4 @@
-<?php  if(!defined('SCRIPTLOG')) die("Direct Access Not Allowed");
+<?php  defined('SCRIPTLOG') || die("Direct access not permitted");
 if ((isset($_GET['notfound']) && ($_GET['notfound'] === md5(app_key().get_ip_address())))) :
 ?>
   <!-- Content Wrapper. Contains page content -->
