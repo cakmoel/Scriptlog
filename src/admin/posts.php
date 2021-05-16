@@ -1,4 +1,4 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $postId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
