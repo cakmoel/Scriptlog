@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed");
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $userId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
@@ -43,7 +43,7 @@ try {
             
             if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
     
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                 throw new AppException("Invalid ID data type!");
     
             }
@@ -86,7 +86,7 @@ try {
     
                 if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
     
-                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                     throw new AppException("Invalid ID data type!");
         
                 }
