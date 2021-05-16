@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class ConfigurationApp 
  *
@@ -70,7 +70,7 @@ class ConfigurationApp
   }
 
   /**
-   * Update Common setting
+   * UpdateGeneralSetting
    *
    * @param string $args
    * @return void
@@ -190,6 +190,25 @@ class ConfigurationApp
 
   }
 
+  public function updateReadingSetting()
+  {
+    $errors = array();
+    $status = array();
+    $checkError = true;
+    $checkStatus = false;
+
+    if (isset($_POST['configFormSubmit'])) {
+
+
+    } else {
+
+      
+
+    }
+
+    return $this->view->render();
+
+  }
   public function updatePermalinkConfig()
   {
 
@@ -225,8 +244,8 @@ class ConfigurationApp
 
         if(false === sanitize_selection_box(distill_post_request($filters)['permalinks'], ['yes', 'no'])) {
 
-           $checkError = false;
-           array_push($errors, "Please choose the available value provided!");
+          $checkError = false;
+          array_push($errors, "Please choose the available value provided!");
 
         }
 
@@ -299,11 +318,6 @@ class ConfigurationApp
 
   }
   
-  public function remove($id)
-  { 
-
-  }
-
   protected function setView($viewName)
   {
     $this->view = new View('admin', 'ui', 'setting', $viewName);
