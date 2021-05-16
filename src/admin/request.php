@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed");
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 
 $load = null;
 $current_request = current_request_method();
@@ -14,9 +14,9 @@ try {
         $load = filter_var($load, FILTER_VALIDATE_URL, ['flags' => FILTER_FLAG_QUERY_REQUIRED]);
         $load = filter_input(INPUT_GET, 'load', FILTER_SANITIZE_STRING);
         $load = escape_null_byte($load);
-        $load = preg_replace( '/[^a-z0-9,_-]+/i', '', $load );
+        $load = preg_replace( '/[^a-z0-9,_-]+/i', '', $load);
         $load = htmlspecialchars(strtolower($load), ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');
-       
+        
         // checking if the string contains parent directory
         if (strpos($load, '..') !== false) {
 
