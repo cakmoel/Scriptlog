@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 
 $action = isset($_GET['action']) ? safe_html($_GET['action']) : "";
 $logOutId =  isset($_GET['logOutId']) ? safe_html($_GET['logOutId']): null;
@@ -59,4 +59,3 @@ try {
     LogError::exceptionHandler($e);
     
 }
-
