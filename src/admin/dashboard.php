@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
+<?php defined('SCRIPTLOG') || die("Direct access not permitted"); 
 
 $action = isset($_GET['action']) ? safe_html($_GET['action']) : "";
 $displayWall = new Wall();
