@@ -1,9 +1,10 @@
-<?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * File authenticator.php
+ * 
  * checking whether session or cookies exists
  * 
- * @category checking whether cookies or session exists or not
+ * @category authenticator.php checking whether cookies or session exists or not
  * @author M.Noermoehammad scriptlog@yandex.com
  * @author Vincy vincy@gmail.com
  * @license MIT
@@ -12,7 +13,7 @@
  * @see https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string
  * @see https://paragonie.com/blog/2015/04/secure-authentication-php-with-long-term-persistence
  * @see https://en.wikibooks.org/wiki/PHP_Programming/Sessions#Avoiding_Session_Fixation
- * @see https://stackoverflow.com/questions/1354999/keep-me-logged-in-the-best-approach/17266448#17266448
+ * @see https://stackoverflow.com/a/17266448/6667699
  * 
  */
 $timeout = Authentication::COOKIE_EXPIRE;
@@ -49,13 +50,13 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
 
     if(!function_exists('hash_equals')) {
 
-        if((timing_safe_equals($expected_validator, $correct_validator) == 0) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']))) {
+        if((timing_safe_equals($expected_validator, $correct_validator) == 0) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash'] ) ) ) {
 
             $validator_verified = true;
 
         }
 
-        if ((timing_safe_equals($expected_selector, $correct_selector) == 0) && (Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret))) {
+        if ((timing_safe_equals($expected_selector, $correct_selector) == 0) && (Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret ) ) ) {
 
             $selector_verified = true;
 
@@ -63,20 +64,19 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
 
     } else {
 
-        if((hash_equals($expected_validator, $correct_validator)) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']) ) ) {
+        if( ( hash_equals($expected_validator, $correct_validator) ) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash'] ) ) ) {
 
             $validator_verified = true;
 
         }
 
-        if ( (hash_equals($expected_selector, $correct_selector)) && (Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret) ) ) {
+        if ( ( hash_equals($expected_selector, $correct_selector) ) && (Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret ) ) ) {
 
             $selector_verified = true;
 
         }
 
     }
-
 
     if ($token_info['expired_date'] >= $current_date) {
 
