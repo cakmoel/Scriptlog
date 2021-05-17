@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * The collection of actions constant 
  * 
@@ -17,6 +17,7 @@ class ActionConst
  const CONFIGURATION = "configuration";
  const GENERAL_CONFIG = "generalConfig";
  const PERMALINK_CONFIG = "permalinkConfig";
+ const READING_CONFIG = "readingConfig";
 
  // action constant for post functionality
  
