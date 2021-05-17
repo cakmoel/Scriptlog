@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class DbMySQLi
  * 
@@ -322,16 +322,16 @@ public function cleanOutputDisplay($data)
 public function isTableExists($table_name)
 {
   $database = $this->dbname;
-  $check_table = yield $this->dbc->query("SHOW TABLES LIKE '$table_name'");
-  $check_table_schema = yield $this->dbc->query("SELECT table_name FROM information_schema.tables WHERE table_schema = '$database' AND table_name = '$table_name'");
+  $check_table = $this->dbc->query("SHOW TABLES LIKE '$table_name'");
+  $check_table_schema = $this->dbc->query("SELECT table_name FROM information_schema.tables WHERE table_schema = '$database' AND table_name = '$table_name'");
  
   if (($check_table->num_rows > 0) || ($check_table_schema->num_rows == 1)) {
 
-    yield true;
+    return true;
 
   } else {
 
-    yield false;
+    return false;
 
   }
 
