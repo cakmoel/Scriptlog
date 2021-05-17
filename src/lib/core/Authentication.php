@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class Authentication
  *
@@ -115,7 +115,7 @@ class Authentication
    * @var const|numeric
    * 
    */
-  const COOKIE_EXPIRE =  2592000;  
+  const COOKIE_EXPIRE = 2592000;  
 
   /**
    * Constant COOKIE_PATH
