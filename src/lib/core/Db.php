@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Db implements DbInterface
  * This Class DB uses PDO-MySQL functionality 
