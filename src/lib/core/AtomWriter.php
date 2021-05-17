@@ -1,11 +1,18 @@
-<?php
-
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+/**
+ * Class AtomWriter extends DOMDocument
+ * 
+ * @category Core Class
+ * @license MIT
+ * @version 1.0
+ * 
+ */
 class AtomWriter extends DOMDocument
 {
     
 private $name_space; // namespace
 
-public function __conamespacetruct($title, $href, $name, $id)
+public function __contruct($title, $href, $name, $id)
 {
  parent::__construct();
 
