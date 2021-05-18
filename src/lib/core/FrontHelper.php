@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * FrontHelper Class
  * FrontHelper class will be useful for theme functionality
@@ -150,6 +150,12 @@ public static function frontTopicBySlug($slug)
 
  return (empty($result)) ?: $result;
 
+}
+
+public static function frontPostByArchive($from, $to)
+{
+
+  
 }
 
 /**
