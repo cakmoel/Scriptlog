@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * EventException Class extends Exception implements IEventThrowable
  *
@@ -21,12 +21,19 @@ public function __construct($message = null, $code = 0, Exception $previous = nu
   $code = $this->getCode();
 
   if (!$message) {
+
     throw new $this('Unknown'.get_class($this));
     
   }
 
   parent::__construct($message, $code, $previous);
 
+  if (!is_null($previous)) {
+
+    $this->previous = $previous;
+    
+  }
+  
 }
 
 public function __toString()
