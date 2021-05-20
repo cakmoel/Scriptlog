@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * @link http://ogp.me/#type_video.episode Video episode
  * 
