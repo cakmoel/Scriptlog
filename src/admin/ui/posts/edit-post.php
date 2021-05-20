@@ -53,6 +53,8 @@ $post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
 <?=(isset($formData['post_title'])) ? safe_html($formData['post_title']) : ""; ?>" maxlength="200" required>
 </div>
 
+<?=(isset($topics)) ? $topics : ""; ?>
+
 <div class="form-group">
 <label for="meta_desc">Meta Description</label>
 <textarea class="form-control" id="meta_desc" rows="3" placeholder="Enter ..." name="post_summary" maxlength="320" >
@@ -71,17 +73,9 @@ $post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
 <p class="help-block">Maximum 200 characters</p>
 </div>
 
-<div class="form-group">
-<label for="tag">Tags</label>
-<input type="text" class="form-control" id="tag" name="post_tags" placeholder="Enter tags here" value="
-<?=(isset($postData['post_tags'])) ? safe_html($postData['post_tags']) : ""; ?>
-<?=(isset($formData['post_tags'])) ? safe_html($formData['post_tags']) : ""; ?>" maxlength="400">
-<p class="help-block">Comma separated</p>
-</div>
-
 <div class="checkbox">
 <label for="sticky">
-  <input type="checkbox" id="sticky" name="post_sticky" <?=(isset($postData['post_sticky']) && $postData['post_sticky'] == '1') ? "checked='checked'" : "";?>> Stick to the top of the blog
+<input type="checkbox" id="sticky" name="post_sticky" <?=(isset($postData['post_sticky']) && $postData['post_sticky'] == '1') ? "checked='checked'" : "";?>> Stick to the top of the blog
 </label>
 </div>
 
@@ -93,7 +87,13 @@ $post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
 </textarea>
 </div>
 
-<?=(isset($topics)) ? $topics : ""; ?>
+<div class="form-group">
+<label for="tag">Tags</label>
+<input type="text" class="form-control" id="tag" name="post_tags" placeholder="Enter tags here" value="
+<?=(isset($postData['post_tags'])) ? safe_html($postData['post_tags']) : ""; ?>
+<?=(isset($formData['post_tags'])) ? safe_html($formData['post_tags']) : ""; ?>" maxlength="400">
+<p class="help-block">Comma separated</p>
+</div>
 
 <div class="form-group">
 <label for="post_status">Post status</label>
