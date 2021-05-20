@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Video movie, TV show, and other all share the same properies.
  * Video episode extends this class to associate with a TV show 

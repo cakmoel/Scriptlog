@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Page Cache Class
  * 
@@ -41,6 +41,7 @@ class PageCache
  public function isCached() 
  {
      $modified = (file_exists($this->cache_file)) ? filemtime($this->cache_file) : 0;
+     
      return ((time() - $this->cache_expires) < $modified);
  }
  
@@ -50,7 +51,7 @@ class PageCache
   */
  public function fetchCache() 
  {
-     return file_get_contents($this->cache_file);
+    return file_get_contents($this->cache_file);
  }
  
  /**
@@ -60,8 +61,7 @@ class PageCache
   */
  public function storeCache($contents) 
  {
-     return file_put_contents($this->cache_file, $contents);
-
+    return file_put_contents($this->cache_file, $contents);
  }
  
  public function __destruct()
