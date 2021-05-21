@@ -13,7 +13,15 @@
 function get_ip_address()
 {
 
+ if ( true === detect_proxy_by_headers() ) {
+
+  return (getenv('REMOTE_ADDR', true) ? getenv('REMOTE_ADDR') : zend_ip_address() );
+
+ } else {
+
   return Util::get_client_ip();
+
+ }
     
 }
 
