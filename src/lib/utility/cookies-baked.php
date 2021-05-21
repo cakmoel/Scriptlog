@@ -136,7 +136,7 @@ function set_cookies_path()
  * @param bool $secure
  * @param bool $httponly
  * @param string $samesite
- * @return void
+ * @return bool
  * 
  */
 function set_cookies_scl($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite="Strict")
