@@ -16,7 +16,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
     
   include __DIR__ . '/../lib/main.php';
  
-  $ip = getenv('REMOTE_ADDR', true) ?: zend_ip_address();
+  $ip = get_ip_address();
   
   require __DIR__ . '/authenticator.php';
   include __DIR__ . '/login-layout.php';
