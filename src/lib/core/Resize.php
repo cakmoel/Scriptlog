@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Resize
  * Purpose: Resizing and save image
@@ -16,13 +16,36 @@
 class Resize
 {
 
-    // *** Class variables
+    /**
+     * image
+     *
+     * @var object
+     * 
+     */
     private $image;
 
+    /**
+     * width
+     * 
+     * @var num|int
+     * 
+     */
     private $width;
 
+    /**
+     * height
+     *
+     * @var num|int
+     * 
+     */
     private $height;
 
+    /**
+     * imageResized
+     *
+     * @var GdImage|resources
+     * 
+     */
     private $imageResized;
 
     function __construct($fileName)
@@ -208,20 +231,28 @@ class Resize
         $extension = strtolower($extension);
         
         switch ($extension) {
+
             case '.jpg':
             case '.jpeg':
+
                 if (imagetypes() & IMG_JPG) {
                     imagejpeg($this->imageResized, $savePath, $imageQuality);
                 }
+
                 break;
             
             case '.gif':
+
                 if (imagetypes() & IMG_GIF) {
+
                     imagegif($this->imageResized, $savePath);
+
                 }
+
                 break;
             
             case '.png':
+
                 // *** Scale quality from 0-100 to 0-9
                 $scaleQuality = round(($imageQuality / 100) * 9);
                 
@@ -231,11 +262,12 @@ class Resize
                 if (imagetypes() & IMG_PNG) {
                     imagepng($this->imageResized, $savePath, $invertScaleQuality);
                 }
+                
                 break;
             
             case '.webp':
 
-                if (imagetypes() && IMG_WEBP) {
+                if (imagetypes() & IMG_WEBP) {
 
                     imagewebp($this->imageResized, $savePath);
 
