@@ -1,5 +1,4 @@
-<?php
-
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * sanitize.class.php
  * Sanitizing  input and output
