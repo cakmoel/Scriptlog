@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class ScriptlogCryptonize
  * 
@@ -229,7 +229,7 @@ private static function defaultSecretKey()
 
  } else {
 
-   $key = ircmaxell_random_compat(16);
+   $key = ircmaxell_random_generator(16);
 
  }
 
