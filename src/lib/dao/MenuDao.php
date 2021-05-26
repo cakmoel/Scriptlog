@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Menu extends Dao 
  *
@@ -300,7 +300,7 @@ class MenuDao extends Dao
 
     while ($p = $stmt -> fetch()) {
       
-      if ($uri == $r['menu_label'])  { 
+      if ($uri == $p['menu_label'])  { 
         $active = "active"; 
       }
 
@@ -316,7 +316,7 @@ class MenuDao extends Dao
                         mp.menu_sort, mp.menu_status
                  FROM tbl_menu_child AS mc
                  INNER JOIN tbl_menu AS mp ON mc.menu_id = mp.ID
-                 AND mc.menu_id = {$r['ID']}
+                 AND mc.menu_id = {$p['ID']}
                  AND mc.menu_sub_child = 0 
                  AND mc.menu_child_status = 'Y'";
 
