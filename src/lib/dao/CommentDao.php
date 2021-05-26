@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Comment extends Dao
  * 
@@ -108,7 +108,7 @@ class CommentDao extends Dao
        'comment_author_name' => $bind['comment_author_name'],
        'comment_content' => purify_dirty_html($bind['comment_content']),
        'comment_status' => $bind['comment_status']
-   ], "`ID` = {$cleanId}");
+   ], " ID = ".(int)$cleanId);
    
  }
  
