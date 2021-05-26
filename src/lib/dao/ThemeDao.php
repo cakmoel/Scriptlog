@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Theme class extends Dao
  *
@@ -12,11 +12,10 @@
  */
 class ThemeDao extends Dao
 {
+
   public function __construct()
   {
-    
     parent::__construct();
-    
   }
   
   /**
@@ -257,5 +256,5 @@ class ThemeDao extends Dao
     return (empty($activeTheme)) ?: $activeTheme;
     
   }
-  
+ 
 }
