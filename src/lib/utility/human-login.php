@@ -60,7 +60,7 @@ return true;
 function review_login_attempt($ip)
 {
 
- return (alert_login_attempt($ip)['alert_login_attempt'] >= 20) ? true : false;
+ return ( alert_login_attempt($ip)['alert_login_attempt'] >= 20 ? true : false );
 
 }                                                    
 
@@ -83,9 +83,9 @@ function human_login_request($base, array $data)
 
 $form = [];
 
-$action = (is_array($data) && array_key_exists(0, $data)) ? rawurlencode($data[0]) : '';
-$id = (is_array($data) && array_key_exists(1, $data)) ? urlencode($data[1]) : null;
-$uniqueKey =  (is_array($data) && array_key_exists(2, $data)) ? urlencode($data[2]) : null;
+$action = ( is_array($data) && array_key_exists(0, $data) ? rawurlencode($data[0]) : '' );
+$id = ( is_array($data) && array_key_exists(1, $data) ? urlencode($data[1]) : null );
+$uniqueKey =  ( is_array($data) && array_key_exists(2, $data) ? urlencode($data[2]) : null );
 
 $query_data = array(
 
@@ -179,9 +179,9 @@ if ( midfielder() === true) {
 function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, array $values)
 {
 
-   $login = (isset($values['login']) && $values['login'] == $_POST['login']) ? prevent_injection($values['login']) : null;
-   $user_pass = (isset($values['user_pass']) && $values['user_pass'] == $_POST['user_pass']) ? prevent_injection($values['user_pass']) : null;
-   $csrf = (isset($values['csrf']) && $values['csrf'] == $_POST['csrf']) ? $values['csrf'] : '';
+   $login = ( isset($values['login']) && $values['login'] == $_POST['login'] ? prevent_injection($values['login']) : null );
+   $user_pass = ( isset($values['user_pass']) && $values['user_pass'] == $_POST['user_pass'] ? prevent_injection($values['user_pass']) : null );
+   $csrf = ( isset($values['csrf']) && $values['csrf'] == $_POST['csrf']  ? $values['csrf'] : '' );
       
    $captcha_verified = true;
       
@@ -204,8 +204,8 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
       
    $failed_login_attempt = get_login_attempt($ip)['failed_login_attempt'];
    $data = get_user_signin($login);
-   $datetime = (!empty($data['user_locked_until'])) ? strtotime($data['user_locked_until']) : null;
-   $signin = (!empty($data['user_signin_count'])) ? $data['user_signin_count'] : 0;
+   $datetime = ( !empty($data['user_locked_until']) ? strtotime($data['user_locked_until']) : null );
+   $signin = ( !empty($data['user_signin_count']) ? $data['user_signin_count'] : 0 );
    
  if ( !empty($values) && $captcha_verified === true ) {
        
