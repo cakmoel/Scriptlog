@@ -1,7 +1,6 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Configuration extends Dao
- * 
  * 
  * @category  Dao Class
  * @author    Maoelana Noermoehammad
@@ -23,24 +22,6 @@ public function __construct()
 
 }
 
-/**
- * Create configuration
- * 
- * @method public createConfig()
- * @param array $bind
- * 
- */
-public function createConfig($bind)
-{
-  // insert into settings
-  $this->create("tbl_settings", [
-              
-       'setting_name' => $bind['setting_name'],
-       'setting_value' => $bind['setting_value']
-
-  ]);
-
-}
 
 /**
  * Update configuration
@@ -58,7 +39,7 @@ public function updateConfig($sanitize, $bind, $ID)
   $this->modify("tbl_settings", [
 	  'setting_name' => $bind['setting_name'],
 	  'setting_value' => $bind['setting_value']
-  ], "`ID` = {$cleanId}");
+  ], " ID = ".(int)$cleanId);
 
 }
 
@@ -85,15 +66,16 @@ public function deleteConfig($ID, $sanitize)
  * @return array
  * 
  */
-public function findConfigs($orderBy = 'ID')
+public function findConfigs($orderBy = 'ID', $fetchMode = null)
 {
+  
   $sql = "SELECT ID, setting_name, setting_value 
           FROM tbl_settings 
           ORDER BY :orderBy DESC";
 
 	$this->setSQL($sql);
 
-	$configs = $this->findAll([':orderBy' => $orderBy]);
+	$configs = (!is_null($fetchMode)) ? $this->findAll([':orderBy' => $orderBy], $fetchMode) : $this->findAll([':orderBy' => $orderBy]);
 
 	return (empty($configs)) ?: $configs;
 	
@@ -119,6 +101,10 @@ public function findGeneralConfigs($orderBy = 'ID', $limit = 7)
 
 }
 
+public function findReadingConfigs()
+{
+  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings B";
+}
 /**
  * Find Configuration
  * 
