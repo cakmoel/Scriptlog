@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Post class extends Dao
  *
@@ -281,8 +281,8 @@ try {
   $post_id = $this->findColumn([$cleanId]);
 
   // delete post_topic
-  $this->deleteRecord("tbl_post_topic", "post_id = '{$post_id['ID']}'");
-
+  (!empty($post_id['ID'])) ? $this->deleteRecord("tbl_post_topic", "post_id = {$post_id['ID']}") : "";
+  
   if (is_array($topicId)) {
 
   	 foreach ($_POST['catID'] as $topicId) {
