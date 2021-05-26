@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted"); 
 /**
  * Class TopicDao extends Dao
  * 
@@ -154,7 +154,6 @@ class TopicDao extends Dao
  public function setCheckBoxTopic($postId = '', $checked = null)
  {
                   
-   
    if (is_null($checked)) {
       $checked = "checked='checked'";
    }
