@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class PostProviderController extends FrontProviderController
  * 
@@ -73,7 +73,7 @@ public function __construct(PostProviderService $postProviderService)
 /**
  * getItems
  *
- * @return void
+ * @return mixed
  * 
  */
 public function getItems()
@@ -82,10 +82,18 @@ public function getItems()
   $errors = array();
   $checkError = true;
 
+  if ( ( ! is_array( $this->postProviderService->showPostsPublished(self::frontPaginator()) ) ) ||  ( ! is_array($this->postProviderService->showRandomStickyPosts()) ) ) {
+
+    $checkError = false;
+    array_push($errors, "You have not any post yet");
+     
+  }
+
   if ( ( ! empty($this->uri->param1 ) ) || ( $this->uri->param1 === 'blog' ) ) {
 
     $this->setupView('blog');
     $this->setFrontTitle($this->uri->param1." &raquo; ". app_info()['site_name']);
+    
     $this->content->set('frontTitle', $this->getFrontTitle());
     $this->content->set('postsPublished', $this->postProviderService->showPostsPublished(self::frontPaginator()));
 
@@ -93,16 +101,10 @@ public function getItems()
 
     $this->setupView('home');
     $this->setFrontTitle($this->uri->matched." &raquo; ". app_info()['site_name']);
+    
     $this->content->set('frontTitle', $this->getFrontTitle());
     $this->content->set('stickyPost', $this->postProviderService->showRandomStickyPosts());
-    $this->content->set('randomPosts', $this->postProviderService->showRandomPosts(5));
-
-    if (!is_array($this->postProviderService->showRandomStickyPosts())) {
-
-      $checkError = false;
-      array_push($errors, "You have not any post yet");
- 
-    }
+    $this->content->set('randomPosts', $this->postProviderService->showRandomPosts(3));
 
   }
   
@@ -207,7 +209,7 @@ $data_post = array(
 );
 
 $this->setupView('single');
-$this->setFrontTitle($detailPost['post_title']);
+$this->setFrontTitle(escape_html($detailPost['post_title']));
 $this->content->set('frontTitle', $this->getFrontTitle());
 
 if (!$checkError) {
