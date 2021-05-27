@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class PostProviderService
  * 
@@ -71,7 +71,7 @@ class PostProviderService
    * showPostBySlug
    *
    * @param string $slug
-   * @return void
+   * @return array
    * 
    */
   public function showPostBySlug($slug)
@@ -83,7 +83,7 @@ class PostProviderService
    * ShowPostsPublished
    *
    * @param object $paginator
-   * @return void
+   * @return mixec
    * 
    */
   public function showPostsPublished($paginator)
@@ -99,7 +99,7 @@ class PostProviderService
   /**
    * showRandomStickyPosts
    *
-   * @return void
+   * @return array
    * 
    */
   public function showRandomStickyPosts()
