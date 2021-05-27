@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Autoloading Classes
  *
@@ -7,7 +7,45 @@
  * @author Shay Anderson 1.12
  * @link http://www.shayanderson.com/php/autoloading-classes-in-php-with-autoloader-class.htm
  * @license MIT License <http://www.opensource.org/licenses/mit-license.php>
+ * @example Here is the example directory structure:
  * 
+ * /var/www/example
+ * |-- index.php
+ * |-- lib
+ * |      `--Autoloader.php
+ * |      `--controller
+ * |            `--IndexController.php
+ * |      `--model
+ * |            `--Document
+ * |                  `--Document.php
+ * |                  `--TaskDocument.php
+ * |            `--User
+ * |                  `--User.php description
+ * 
+ * // include Autoloader class
+ * require './lib/Autoloader.php';
+ * // set the base directory where your project is located
+ * Autoloader::setBaseDir('/var/www/example');
+ * // add class directories (without the base directory)
+ * Autoloader::addClassDir(array(
+ *    'lib/controller',
+ *     'lib/model/Document',
+ *     'lib/model/User'
+ * ));
+ * 
+ * ############can be useful when debugging ##################:
+ * // set directories that Autoloader
+ * // will load classes from
+ * $load_dirs = Autoloader::getLoadDirs();
+ * // print array
+ * print_r($load_dirs); 
+ * 
+ * // set class files that Autoloader
+ * // has successfully loaded
+ * $loaded_files = Autoloader::getLoadedFiles();
+ * // print array
+ * print_r($loaded_files);
+ *  
  */
 final class Autoloader {
 	/**
