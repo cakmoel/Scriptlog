@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class TopicProviderController extend FrontProviderController
  * 
@@ -89,8 +89,9 @@ if (!$checkError) {
   
 }
 
-$this->content->set('postPublishedByTopic');
+$this->content->set('postsPublishedByTopic', $this->topicProviderService->showAllPublishedPostsByTopic($getTopicPosts['ID'], self::frontPaginator()));
 
+return $this->content->render();
 
 }
 
