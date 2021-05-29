@@ -157,14 +157,14 @@ class UserDao extends Dao
   * @return mixed
   *  
   */
- public function getUserByResetKey($reset_key)
+ public function getUserByResetKey($reset_key, $fetchMode = null)
  {
    $sql = "SELECT ID, user_email, user_reset_key, user_reset_complete FROM tbl_users 
            WHERE user_reset_key = :reset_key AND user_banned = '0' LIMIT 1";
    
    $this->setSQL($sql);
    
-   $resetKeyDetails = $this->findRow([':reset_key' => $reset_key]);
+   $resetKeyDetails = (is_null($fetchMode)) ? $this->findRow([':reset_key' => $reset_key]) : $this->findRow([':reset_key' => $reset_key], $fetchMode);
 
    return (empty($resetKeyDetails)) ?: $resetKeyDetails;
    
