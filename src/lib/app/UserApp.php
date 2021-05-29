@@ -415,7 +415,7 @@ class UserApp extends BaseApp
             
         }
 
-        if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
+        if ( ( !empty($_POST['user_url']) ) && ( !url_validation($_POST['user_url']) ) ) {
                  
             $checkError = false;
             array_push($errors, "Please enter a valid URL");
