@@ -20,7 +20,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
 $stop = null;
 
 $tempKey = isset($_GET['tempKey']) ? escape_html($_GET['tempKey']) : "";
-$user = $userDao -> getUserByResetKey($tempKey);
+$user = $userDao->getUserByResetKey($tempKey);
 
 if (!$user) {
     $stop = "Temporary key is not valid.";
@@ -45,24 +45,24 @@ if (isset($_POST['Change']) && $_POST['Change'] == 'Change Password') {
     
   if (empty($password) || empty($confirmPass)) {
 
-      $errors['errorMessage'] = "All column must be filled";
-
-  } elseif (!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
-
-      $errors['errorMessage'] = "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters";
-
-  } elseif (strlen($password) < 8) {
-
-      $errors['errorMessage'] = "Password must consist of least 8 characters";
+    $errors['errorMessage'] = "All column must be filled";
 
   } elseif ($password !== $confirmPass) {
 
-      $errors['errorMessage'] = "Password does not match";
+    $errors['errorMessage'] = "Password does not match";
+
+  } elseif ( check_common_password($password) === true ) {
+
+    $errors['errorMessage'] = "Your password seems to be the most hacked password, please try another";
+
+  } elseif ( false === check_pwd_strength($password) ) { 
+
+    $errors['errorMessage'] = "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters";
 
   } else {
 
-      $authenticator -> updateNewPassword($password, abs((int)$user['ID']));
-      direct_page('login.php?status=changed', 200);
+    $authenticator->updateNewPassword($password, abs((int)$user['ID']), $user['user_email']);
+    direct_page('login.php?status=changed', 302);
 
   }
 
@@ -71,7 +71,7 @@ if (isset($_POST['Change']) && $_POST['Change'] == 'Change Password') {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
