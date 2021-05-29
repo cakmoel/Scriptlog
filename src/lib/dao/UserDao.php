@@ -159,7 +159,7 @@ class UserDao extends Dao
   */
  public function getUserByResetKey($reset_key)
  {
-   $sql = "SELECT ID, user_reset_key, user_reset_complete FROM tbl_users 
+   $sql = "SELECT ID, user_email, user_reset_key, user_reset_complete FROM tbl_users 
            WHERE user_reset_key = :reset_key AND user_banned = '0' LIMIT 1";
    
    $this->setSQL($sql);
