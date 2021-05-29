@@ -225,13 +225,14 @@ class Authentication
    * 
    * @param string  $email
    * @return boolean
+   * 
    */
   public function checkEmailExists($email)
   {
 
     if ($this->userDao->checkUserEmail($email) > 0) {
 
-       return true;
+      return true;
 
     }
 
@@ -353,7 +354,7 @@ class Authentication
 
       } else {
 
-          $this->clearAuthCookies($this->user_login);
+        $this->clearAuthCookies($this->user_login);
 
       }
 
@@ -424,7 +425,7 @@ public function resetUserPassword($user_email)
     
     if ($this->userDao->updateResetKey($bind, $user_email)) {
       
-      # send notification to user email account
+      // send notification to user email account
       reset_password($user_email, $reset_key);
     
     }
@@ -442,7 +443,7 @@ public function resetUserPassword($user_email)
  * @param integer $user_id
  * 
  */
-public function updateNewPassword($user_pass, $user_id)
+public function updateNewPassword($user_pass, $user_id, $user_email)
 {
 
   $this->validator->sanitize($user_id, 'int');
@@ -451,8 +452,11 @@ public function updateNewPassword($user_pass, $user_id)
 
   $bind = ['user_pass' => $user_pass, 'user_reset_complete' => 'Yes'];
 
-  if ($this->userDao->recoverNewPassword($bind, $user_id)) {
-    recover_password($user_pass);
+  if ( ( $this->userDao->recoverNewPassword($bind, $user_id) ) && ( is_ssl() === true ) ) {
+    
+    // send email notification to user
+    recover_password($user_pass, $user_email);
+     
   }
 
 }
