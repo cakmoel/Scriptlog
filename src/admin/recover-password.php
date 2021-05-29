@@ -8,7 +8,7 @@
  */
 if (file_exists(__DIR__ . '/../config.php')) {
     
-    include(dirname(dirname(__FILE__)).'/lib/main.php');
+  include(dirname(dirname(__FILE__)).'/lib/main.php');
   
 } else {
 
@@ -22,11 +22,11 @@ $stop = null;
 $tempKey = isset($_GET['tempKey']) ? escape_html($_GET['tempKey']) : "";
 $user = $userDao->getUserByResetKey($tempKey);
 
-if (!$user) {
-    $stop = "Temporary key is not valid.";
-}
+if (empty($user['user_reset_key'])) {
+    
+  $stop = "Temporary key is not valid.";
 
-if ($user['user_reset_complete'] == 'Yes') {
+} elseif ($user['user_reset_complete'] == 'Yes') {
     $stop = "Your password has been changed";
 }
 
