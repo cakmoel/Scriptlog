@@ -71,18 +71,21 @@ if($image_src || $webp_src) :
 
 <div class="form-group">
 <a href="<?=$webp_src;?>" title="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
-<picture class="thumbnail">
+<picture class="img-responsive pad">
 <source srcset="<?= $webp_src_thumb; ?>" type="image/webp">
 <img src="<?= $image_src_thumb;?>" class="img-responsive pad" width="320" alt="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
 </picture>
 </a>
-<div id="image-preview">
+</div>
+
+<div class="form-group">
+<div class="img-responsive pad" id="image-preview">
   <label for="image-upload" id="image-label">Change picture</label>
   <input type="file" name="media" id="image-upload" accept="image/*" maxlength="512" >
 </div>
 <p class="help-block">Maximum upload file size: <?= format_size_unit(APP_FILE_SIZE); ?>.</p>
-</div>
-  
+</div>  
+
 <?php else: ?>
 
 <div class="form-group">
@@ -91,21 +94,21 @@ if($image_src || $webp_src) :
 if ($mediaData['media_type'] == "video/webm" || $mediaData['media_type'] == "video/mp4" || $mediaData['media_type'] == "video/ogg") :
 ?>
 
-<video class="thumbnail"controls width="600" height="320">
+<video class="img-responsive pad" controls width="600" height="320">
 <source src="<?=$video_src; ?>" type="<?=$mediaData['media_type']; ?>">
 Sorry, your browser doesn't support embedded <code>videos</code>
 </video>
 
 <?php  elseif($mediaData['media_type'] == "audio/mpeg" || $mediaData['media_type'] == "audio/wav" || $mediaData['media_type'] == "audio/ogg") : ?>
 
-<audio class="thumbnail" controls>
+<audio class="img-responsive pad" controls>
 <source src="<?=$audio_src; ?>" type="<?=$mediaData['media_type']; ?>">
 Your browser does not support the <code>audio</code> element. 
 </audio>
 
 <?php else :?>
 
-<a href="#" class="thumbnail"><?=invoke_fileicon($mediaData['media_type']);?></a>
+<a href="#" class="img-responsive pad"><?=invoke_fileicon($mediaData['media_type']);?></a>
 
 <?php endif; ?>
 
@@ -134,13 +137,13 @@ Your browser does not support the <code>audio</code> element.
 </div>
 
 <div class="form-group">
-<label for="media_target">Display on</label>
+<label for="media_target">Display on</label><br>
 <?=(isset($mediaTarget)) ? $mediaTarget : ""; ?>
 </div>
 <!-- media target -->
 
 <div class="form-group">
-<label for="media_access">Access</label>
+<label for="media_access">Access</label><br>
 <?=(isset($mediaAccess)) ? $mediaAccess : ""; ?>
 </div>
 <!-- media access -->
