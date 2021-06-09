@@ -183,5 +183,7 @@ $saveSiteTagline = "INSERT INTO tbl_settings (setting_name, setting_value) VALUE
 $saveSiteDescription = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
 $saveSiteKeywords = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
 $saveSiteEmail = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
+$savePostPerPage = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
+$savePostPerRSS = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
 $savePermalinks = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
 $saveTheme   = "INSERT INTO tbl_themes (theme_title, theme_desc, theme_designer, theme_directory, theme_status) VALUES (?, ?, ?, ?, ?)";
