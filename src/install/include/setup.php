@@ -178,6 +178,14 @@ $site_keywords_value = "Weblog, Personal blog, Blogware";
 // Setting Site_Email
 $site_email = "site_email";
 
+// setting post per page
+$post_per_page = "post_per_page";
+$post_per_page_value = "10";
+
+// setting post per rss
+$post_per_rss = "post_per_rss";
+$post_per_rss_value = "10";
+
 // Setting Permalink
 $permalink_key = "permalink_setting";
 $permalink_value = "yes";
@@ -249,6 +257,16 @@ if ($link->insert_id && $createAdmin->affected_rows > 0) {
     $recordAppSiteEmail->bind_param('ss', $site_email, $user_email);
     $recordAppSiteEmail->execute();
 
+    // insert configuration - posts per page 
+    $recordPostPerPage = $link->prepare($savePostPerPage);
+    $recordPostPerPage->bind_param('ss', $post_per_page, $post_per_page_value);
+    $recordPostPerPage->execute();
+
+    // insert configuration post per rss
+    $recordPostPerRSS = $link->prepare($savePostPerRSS);
+    $recordPostPerRSS->bind_param('ss', $post_per_rss, $post_per_rss_value);
+    $recordPostPerRSS->execute();
+
     // insert configuration - permalinks
     $recordPermalinks = $link->prepare($savePermalinks);
     $recordPermalinks->bind_param('ss', $permalink_key, $permalink_value);
@@ -270,6 +288,8 @@ if ($link->insert_id && $createAdmin->affected_rows > 0) {
 }
 
 /**
+ * write_config_file
+ * 
  * Write Config File Function
  * 
  * @param string $protocol
@@ -352,6 +372,8 @@ if (isset($_SESSION['install']) && $_SESSION['install'] == true) {
 }
 
 /**
+ * remove_bad_characters()
+ * 
  * Remove Bad Characters
  * 
  * @link https://stackoverflow.com/questions/14114411/remove-all-special-characters-from-a-string#14114419
@@ -484,6 +506,8 @@ function generate_license($suffix = null)
 }
 
 /**
+ * convert_memory_used()
+ * 
  * Convert Memory Used Function
  * Format size memory usage onto b, kb, mb, gb, tb and pb
  * 
