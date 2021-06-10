@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * RssFeed Class
  *
@@ -14,7 +14,7 @@ class RSSFeed
 /**
  * RSS Writer
  * 
- * @var string
+ * @var obj
  * 
  */
  private $rsswriter;
@@ -23,7 +23,8 @@ class RSSFeed
  * postdao 
  * post database access object 
  *
- * @var string
+ * @var obj
+ * 
  */
  private $postDao;
  
@@ -65,9 +66,7 @@ class RSSFeed
  public function generatePostFeed($title, $link, $description, $attribs, $limit = 5)
  {
 
-  $data_posts = $this->grabPostFeed($limit);
-  
-   $dataPosts = $this->getPostFeed();
+  $dataPosts = $this->grabPostFeed($limit);
    
    $rssFile = $this->setFileXML('rss.xml', 'w');
    
