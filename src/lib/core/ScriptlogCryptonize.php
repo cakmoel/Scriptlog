@@ -150,7 +150,7 @@ try {
  *
  * @param string $ciphertext
  * @param string $key
- * @return void
+ * @return string
  * 
  */
 public static function decipherMessage($ciphertext, $key)
