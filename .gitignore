@@ -3,6 +3,7 @@
 public/*
 !public/themes/
 lib/utility/.lts/
+lib/utility/.guard/
 
 #Ignore log files and database
 *.log
