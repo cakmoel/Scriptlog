@@ -98,7 +98,7 @@ class ConfigurationApp
 
        ];
 
-      $size = ( !empty($_POST['setting_value']) ? count($_POST['setting_value']) : null )  ;
+      $size = ( !empty($_POST['setting_value']) ? count($_POST['setting_value']) : null );
        
       try {
         
@@ -122,9 +122,9 @@ class ConfigurationApp
            $this->setPageTitle('General Settings');
            $this->setFormAction(ActionConst::GENERAL_CONFIG);
            $this->view->set('pageTitle', $this->getPageTitle());
+           $this->view->set('formAction', $this->getFormAction());
            $this->view->set('settings',  $this->configEvent->grabGeneralSettings('ID', 7));
            $this->view->set('errors', $errors);
-           $this->view->set('formAction', $this->getFormAction());
            $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
            
         } else {
@@ -190,6 +190,12 @@ class ConfigurationApp
 
   }
 
+  /**
+   * updateReadingSetting
+   *
+   * @return array|mixed
+   * 
+   */
   public function updateReadingSetting()
   {
     $errors = array();
@@ -199,16 +205,131 @@ class ConfigurationApp
 
     if (isset($_POST['configFormSubmit'])) {
 
+      $filters = [
+
+        'setting_id' => [
+              'filter' => FILTER_VALIDATE_INT, 
+              'flags' => FILTER_REQUIRE_ARRAY],
+
+        'setting_value' => [
+              'filter' => FILTER_FLAG_NO_ENCODE_QUOTES, 
+              'flags' => FILTER_REQUIRE_ARRAY]
+
+     ];
+
+     $size = ( !empty($_POST['setting_value']) ? count($_POST['setting_value']) : null );
+     
+    try {
+       
+      if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
+                
+        header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+        throw new AppException("Sorry, unpleasant attempt detected!");
+
+      }
+
+      if (isset($_POST['setting_value']['8']) && is_numeric($_POST['setting_value']['8']) === false) {
+
+        $checkError = false;
+        array_push($errors, "Invalid post per page value");
+          
+      }
+      
+      if ( isset($_POST['setting_value']['9']) && is_numeric($_POST['setting_value']['9']) === false) {
+
+        $checkError = false;
+        array_push($errors, 'Invalid post per rss value');
+         
+      }
+
+      if ( !$checkError) {
+
+         $this->setView('reading-setting');
+         $this->setPageTitle('Reading Settings');
+         $this->setFormAction(ActionConst::READING_CONFIG);
+         $this->view->set('pageTitle', $this->getPageTitle());
+         $this->view->set('formAction', $this->getFormAction());
+         $this->view->set('errors', $errors);
+         $this->view->set('settings', $this->configEvent->grabReadingSettings());
+         $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+
+      } else {
+
+        for ($i=0; $i<$size; $i++) { 
+
+          $setting_value = purify_dirty_html(distill_post_request($filters)['setting_value'][$i]);
+          $setting_id = distill_post_request($filters)['setting_id'][$i];
+
+          $sql = sprintf( "UPDATE tbl_settings SET setting_value = '$setting_value' WHERE ID = %d", (int)$setting_id );
+          db_simple_query($sql);
+
+        }
+
+        direct_page('index.php?load=option-reading&status=readingConfigUpdated', 200);
+
+      }
+      
+    } catch (\Throwable $th) {
+       
+       LogError::setStatusCode(http_response_code());
+       LogError::exceptionHandler($th);
+
+    } catch (AppException $e) {
+
+       LogError::setStatusCode(http_response_code());
+       LogError::exceptionHandler($e);
+
+     }
 
     } else {
 
-      
+      if ( ( isset($_GET['status']) ) && ( $_GET['status'] == 'readingConfigUpdated') ) {
 
+        $checkStatus = true;
+        array_push($status, "Reading setting has been updated");
+         
+      }
+
+      if ( (isset($_GET['error']) ) && ($_GET['error'] == 'configTampered') ) {
+
+        $checkError = false;
+        array_push($errors, "Error: Attempt to tampered with our parameters!");
+
+      }
+
+      $this->setView('reading-setting');
+      $this->setPageTitle('Reading Settings');
+      $this->setFormAction(ActionConst::READING_CONFIG);
+      
+      if (!$checkError) {
+        
+        $this->view->set('errors', $errors);
+       
+      }
+  
+      if ($checkStatus) {
+        
+        $this->view->set('status', $status);
+       
+      }
+
+      $this->view->set('pageTitle', $this->getPageTitle());
+      $this->view->set('settings', $this->configEvent->grabReadingSettings());
+      $this->view->set('formAction', $this->getFormAction());
+      $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+      
     }
 
     return $this->view->render();
 
   }
+
+  /**
+   * updatePermalinkConfig
+   *
+   * @return void
+   * 
+   */
   public function updatePermalinkConfig()
   {
 
