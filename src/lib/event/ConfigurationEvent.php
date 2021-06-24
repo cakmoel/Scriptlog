@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class ConfigurationEvent
  *
@@ -88,6 +88,11 @@ class ConfigurationEvent
     return $this->configDao->findGeneralConfigs($orderBy, $limit);
   }
 
+  public function grabReadingSettings($orderBy = 'ID')
+  {
+    return $this->configDao->findReadingConfigs($orderBy);
+  }
+  
   public function grabSettingByName($setting_name)
   {
     return $this->configDao->findConfigByName($setting_name, $this->sanitizer);
@@ -126,6 +131,7 @@ class ConfigurationEvent
   
   public function removeSetting()
   {
+    
     $this->validator->sanitize($this->setting_id, 'int');
 
     if (!$data_config = $this->configDao->findConfig($this->setting_id, $this->sanitizer)) {
