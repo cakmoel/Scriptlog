@@ -22,7 +22,6 @@ public function __construct()
 
 }
 
-
 /**
  * Update configuration
  * 
@@ -86,7 +85,7 @@ public function findConfigs($orderBy = 'ID', $fetchMode = null)
  *
  * @param string $orderBy
  * @param integer $limit
- * @return void
+ * @return array
  * 
  */
 public function findGeneralConfigs($orderBy = 'ID', $limit = 7)
@@ -101,10 +100,25 @@ public function findGeneralConfigs($orderBy = 'ID', $limit = 7)
 
 }
 
-public function findReadingConfigs()
+/**
+ * findReadingConfigs
+ *
+ * @param string $orderBy
+ * @return array
+ * 
+ */
+public function findReadingConfigs($orderBy = 'ID')
 {
-  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings B";
+  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE ID BETWEEN 8 AND 9 ORDER BY :orderBy ";
+
+  $this->setSQL($sql);
+
+  $reading_configs = $this->findAll([':orderBy' => $orderBy]);
+
+  return ( empty($reading_configs) ) ?: $reading_configs;
+
 }
+
 /**
  * Find Configuration
  * 
@@ -130,6 +144,14 @@ public function findConfig($id, $sanitize)
   
 }
 
+/**
+ * findConfigByName
+ *
+ * @param string $setting_name
+ * @param object $sanitize
+ * @return array
+ * 
+ */
 public function findConfigByName($setting_name, $sanitize)
 {
   
