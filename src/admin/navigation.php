@@ -1,4 +1,4 @@
- <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
+ <?php defined('SCRIPTLOG') || die("Direct access not permitted");
 
  require __DIR__ . '/sidebar-nav.php';
  
