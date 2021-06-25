@@ -1,6 +1,8 @@
 <?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * class HandleRequest
+ * final class HandleRequest
+ * 
+ * this class used by Dispatcher to check allowed path requested
  * 
  * @category Core Class
  * @author M.Noermoehammad
