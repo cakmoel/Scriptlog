@@ -81,8 +81,8 @@ function starts_with($haystack, $needle)
 /**
  * ends_with
  *
- * @param [type] $haystack
- * @param [type] $needle
+ * @param string $haystack
+ * @param string $needle
  * @return void
  */
 function ends_with($haystack, $needle)
