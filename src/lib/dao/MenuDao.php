@@ -30,7 +30,7 @@ class MenuDao extends Dao
  */
  public function findMenus($orderBy = 'ID')
  {
-    $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_sort, menu_status
+    $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_sort, menu_status, menu_position
             FROM tbl_menu ORDER BY :orderBy DESC";
 
     $this->setSQL($sql);
@@ -53,7 +53,7 @@ class MenuDao extends Dao
  public function findMenu($menuId, $sanitizing)
  {
      
-     $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_sort, menu_status
+     $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_sort, menu_status, menu_position
              FROM tbl_menu WHERE ID = ?";
      
      $idsanitized = $this->filteringId($sanitizing, $menuId, 'sql');
@@ -106,7 +106,7 @@ class MenuDao extends Dao
 
    if ($link['menu_link'] == '') {
      
-       $this->modify("tbl_menu", ['menu_link' => '#'], "ID = {$link['ID']}");
+      $this->modify("tbl_menu", ['menu_link' => '#'], "ID = {$link['ID']}");
        
    }
    
@@ -127,7 +127,8 @@ class MenuDao extends Dao
       'menu_label' => $bind['menu_label'],
       'menu_link' => $bind['menu_link'],
       'menu_sort' => $bind['menu_sort'],
-      'menu_status' => $bind['menu_status']
+      'menu_status' => $bind['menu_status'], 
+      'menu_position' => $bind['menu_position']
   ], "ID = {$cleanId}");
   
  }
@@ -219,7 +220,8 @@ class MenuDao extends Dao
  }
 
 /**
- * dropDownMenu
+ * dropDownMenuParent
+ * 
  * Retrieving menu ID to drop down menu parent
  *
  * @param string $selected
@@ -268,6 +270,29 @@ class MenuDao extends Dao
  }
 
 /**
+ * dropDownMenuPosition
+ *
+ * @param string $selected
+ * @return string
+ * 
+ */
+public function dropDownMenuPosition($selected = '')
+{
+
+$name = 'menu_position';
+$menu_position = array('header'=>'Header', 'footer'=> 'Footer');
+
+if ($selected != '') {
+
+  $selected = $selected;
+
+}
+
+return dropdown($name, $menu_position, $selected);
+
+}
+
+/**
  * Total menu records
  * 
  * @method public totalMenuRecords()
@@ -290,7 +315,7 @@ class MenuDao extends Dao
  public function findFrontNavigation($uri)
  {
   
-    $parent = "SELECT ID, menu_label, menu_link, menu_sort, menu_status 
+    $parent = "SELECT ID, menu_label, menu_link, menu_sort, menu_status, menu_position
                FROM tbl_menu WHERE menu_status = 'Y'";
                
     $stmt = $this->dbc->dbQuery($parent);
