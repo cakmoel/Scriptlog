@@ -141,6 +141,7 @@ menu_label VARCHAR(200) NOT NULL,
 menu_link VARCHAR(255) DEFAULT NULL,
 menu_sort INT(5) NOT NULL,
 menu_status enum('Y','N') NOT NULL DEFAULT 'Y',
+menu_position varchar(20) DEFAULT NULL,
 PRIMARY KEY(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
                 
