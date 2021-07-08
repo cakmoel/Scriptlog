@@ -238,6 +238,13 @@ class UserApp extends BaseApp
                 
             }
             
+            if ( false === sanitize_selection_box(distill_post_request($filters)['user_level'], ['manager'=>'Manager', 'editor'=>'Editor', 'author'=>'Author', 'contributor'=>'Contributor'] ) ) {
+
+                $checkError = false;
+                array_push($errors, "Please choose the available value provided!");
+
+            }
+
             if (!$checkError) {
                 
                 $this->setView('edit-user');
@@ -342,11 +349,13 @@ class UserApp extends BaseApp
     
     if (isset($_POST['userFormSubmit'])) {
        
-        $filters = ['user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 
+        $filters = ['user_fullname' => FILTER_SANITIZE_STRING, 
+                    'user_email' => FILTER_SANITIZE_EMAIL, 
                     'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 
                     'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                     'current_pwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                    'user_url' => FILTER_SANITIZE_URL, 'user_level' => FILTER_SANITIZE_STRING, 
+                    'user_url' => FILTER_SANITIZE_URL, 
+                    'user_level' => FILTER_SANITIZE_STRING, 
                     'user_id' => FILTER_SANITIZE_NUMBER_INT, 
                     'user_banned' => FILTER_SANITIZE_NUMBER_INT
                 ];
@@ -372,7 +381,7 @@ class UserApp extends BaseApp
             if (check_common_password($_POST['user_pass']) === true) {
 
                 $checkError = false;
-                array_push($errors, "Your password seems to be the most hacked password, please try another.");
+                array_push($errors, "Your password seems to be the most hacked password, please try another");
 
             }
 
@@ -401,6 +410,13 @@ class UserApp extends BaseApp
                 
             }
             
+        }
+
+        if ( false === sanitize_selection_box(distill_post_request($filters)['user_level'], ['manager'=>'Manager', 'editor'=>'Editor', 'author'=>'Author', 'contributor'=>'Contributor'] ) ) {
+
+            $checkError = false;
+            array_push($errors, "Please choose the available value provided!");
+
         }
 
         if (!email_validation($_POST['user_email'], new RFCValidation())) {
