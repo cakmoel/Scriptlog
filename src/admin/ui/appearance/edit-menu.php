@@ -104,6 +104,11 @@ $menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
 endif;
 ?>
 
+<div class="form-group">
+<label for="menu_position">Position</label>
+<?=(isset($position)) ? $position : ""; ?>
+</div>
+
 </div>
 <!-- /.box-body -->
 
