@@ -81,7 +81,7 @@ class MenuApp extends BaseApp
 
     if (isset($_POST['menuFormSubmit'])) {
       
-      $filters = ['parent_id' => FILTER_SANITIZE_NUMBER_INT, 'menu_label' => FILTER_SANITIZE_STRING, 'menu_link' => FILTER_SANITIZE_URL];
+      $filters = ['parent_id' => FILTER_SANITIZE_NUMBER_INT, 'menu_label' => FILTER_SANITIZE_STRING, 'menu_link' => FILTER_SANITIZE_URL, 'menu_position'=>FILTER_SANITIZE_STRING];
 
       try {
 
@@ -106,6 +106,13 @@ class MenuApp extends BaseApp
           
         }
 
+        if ( false === sanitize_selection_box(distill_post_request($filters)['menu_position'], ['header'=>'Header', 'footer'=>'Footer'] ) ) {
+
+          $checkError = false;
+          array_push($errors, "Please choose the available value provided!");
+
+        }
+
         if (!$checkError) {
 
           $this->setView('edit-menu');
@@ -116,6 +123,7 @@ class MenuApp extends BaseApp
           $this->view->set('errors', $errors);
           $this->view->set('formData', $_POST);
           $this->view->set('parent', $this->menuEvent->parentDropDown());
+          $this->view->set('position', $this->menuEvent->positionDropDown());
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
         } else {
@@ -123,6 +131,7 @@ class MenuApp extends BaseApp
            $this->menuEvent->setParentId((int)distill_post_request($filters)['parent_id']);
            $this->menuEvent->setMenuLabel(prevent_injection(distill_post_request($filters)['menu_label']));
            $this->menuEvent->setMenuLink(escape_html(trim(distill_post_request($filters)['menu_link'])));
+           $this->menuEvent->setMenuPosition(prevent_injection(distill_post_request($filters)['menu_position']));
            $this->menuEvent->addMenu();
            direct_page('index.php?load=menu&status=menuAdded', 200);
 
@@ -148,6 +157,7 @@ class MenuApp extends BaseApp
       $this->view->set('pageTitle', $this->getPageTitle());
       $this->view->set('formAction', $this->getFormAction());
       $this->view->set('parent', $this->menuEvent->parentDropDown());
+      $this->view->set('position', $this->menuEvent->positionDropDown());
       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
     }
@@ -176,7 +186,8 @@ class MenuApp extends BaseApp
     if (isset($_POST['menuFormSubmit'])) {
 
       $filters = ['parent_id' => FILTER_SANITIZE_NUMBER_INT, 'menu_label' => FILTER_SANITIZE_STRING, 'menu_link' => FILTER_SANITIZE_URL, 
-                  'menu_sort' => FILTER_SANITIZE_NUMBER_INT, 'menu_status' => FILTER_SANITIZE_STRING, 'menu_id' => FILTER_SANITIZE_NUMBER_INT];
+                  'menu_sort' => FILTER_SANITIZE_NUMBER_INT, 'menu_status' => FILTER_SANITIZE_STRING, 'menu_id' => FILTER_SANITIZE_NUMBER_INT, 
+                  'menu_position' => FILTER_SANITIZE_STRING];
 
       try {
 
@@ -201,6 +212,13 @@ class MenuApp extends BaseApp
 
         }
 
+        if (false === sanitize_selection_box(distill_post_request($filters)['menu_position'], ['header'=>'Header', 'footer'=>'Footer'] ) ) {
+
+          $checkError = false;
+          array_push($errors, "Please choose the available value provided!");
+          
+        }
+
         if (!$checkError) {
 
           $this->setView('edit-menu');
@@ -211,6 +229,7 @@ class MenuApp extends BaseApp
           $this->view->set('errors', $errors);
           $this->view->set('menuData', $data_menu);
           $this->view->set('parent', $this->menuEvent->parentDropDown($getMenu['parent_id']));
+          $this->view->set('position', $this->menuEvent->positionDropDown($getMenu['menu_position']));
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
         } else {
