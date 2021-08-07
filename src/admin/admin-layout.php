@@ -1,6 +1,6 @@
 <?php 
 
-function admin_header($stylePath, $breadcrumb = null, $allowedQuery = null) 
+function admin_header($stylePath, $breadcrumb = null) 
 {
   
 ?>
@@ -11,7 +11,7 @@ function admin_header($stylePath, $breadcrumb = null, $allowedQuery = null)
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-<title><?= admin_tag_title($breadcrumb, $allowedQuery); ?></title>
+<title><?= admin_tag_title($breadcrumb); ?></title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width" name="viewport">
   <!-- Bootstrap 3.3.7 -->
@@ -25,6 +25,8 @@ function admin_header($stylePath, $breadcrumb = null, $allowedQuery = null)
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/datatables.net-bs/css/dataTables.bootstrap.min.css">
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/datatables.net/css/responsive.bootstrap.min.css">
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/datatables.net/css/responsive.dataTables.min.css">
+  <!-- Datetimepicker -->
+  <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/datetimepicker/css/datetimepicker.css">
   <!-- select2 -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/select2/css/select2.min.css">
   <!-- Theme style -->
@@ -115,6 +117,7 @@ function admin_footer($stylePath, $ubench = null)
 <script src="<?= $stylePath; ?>/assets/components/jquery/dist/jquery.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/bootstrap/dist/js/bootstrap-select.js"></script>
+<script src="<?= $stylePath; ?>/assets/components/datetimepicker/js/datetimepicker.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/datatables.net/js/responsive.bootstrap.min.js"></script>
@@ -171,6 +174,12 @@ $(document).ready(function() {
     $('.select2').select2()
 
   })
+</script>
+<script>
+jQuery('#datetimepicker').datetimepicker({
+  timepicker: false,
+  format: 'Y-m-d'
+});
 </script>
 </html>
 <?php 
