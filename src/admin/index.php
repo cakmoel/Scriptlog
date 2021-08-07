@@ -51,7 +51,7 @@ $current_url =  preg_replace("/\/index\.php.*$/i", "", app_url().DS.APP_ADMIN);
 
 include dirname(__FILE__) . DS .'admin-layout.php';
 
-admin_header($current_url, $breadcrumb, admin_query());
+admin_header($current_url, $breadcrumb);
 
 include dirname(__FILE__) . DS .'navigation.php';
  
