@@ -133,7 +133,7 @@
   {
 	  if (confirm("Are you sure want to delete Post '" + title + "'"))
 	  {
-	  	window.location.href = 'index.php?load=posts&action=deletePost&tId=' + id;
+	  	window.location.href = 'index.php?load=posts&action=deletePost&Id=' + id;
 	  }
   }
 </script>
