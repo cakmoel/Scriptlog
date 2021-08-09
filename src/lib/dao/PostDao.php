@@ -159,10 +159,13 @@ public function findPost($id, $sanitize, $author = null)
 }
 
 /**
+ * createPost
+ * 
  * insert new post
  *
  * @param array $bind
  * @param integer $topicId
+ * 
  */
 public function createPost($bind, $topicId)
 {
@@ -206,7 +209,8 @@ public function createPost($bind, $topicId)
 
  if ((is_array($topicId)) && (!empty($postId))) {
 
-  	foreach ($_POST['topic_id'] as $topicId) {
+
+  	foreach ($_POST['catID'] as $topicId) {
 
   	  $this->create("tbl_post_topic", [
   	    'post_id' => $postId,
