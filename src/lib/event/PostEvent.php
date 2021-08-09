@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * PostEvent Class
  *
@@ -28,6 +28,12 @@ class PostEvent
    * @var string
    */
   private $author;
+
+  /**
+   * post_date
+   * @var string
+   */
+  private $post_date;
   
   /**
    * post's title 
@@ -175,6 +181,17 @@ class PostEvent
   }
 
   /**
+   * setPostDate
+   *
+   * @param string $date
+   * 
+   */
+  public function setPostDate($date)
+  {
+    $this->post_date = $date;
+  }
+
+  /**
    * set post's title
    * 
    * @param string $title
@@ -311,6 +328,7 @@ class PostEvent
    * Insert new post
    * 
    * @return integer
+   * 
    */
   public function addPost()
   {
@@ -336,7 +354,7 @@ class PostEvent
       return $this->postDao->createPost([
           'media_id' => $this->post_image,
           'post_author' => $this->author,
-          'post_date' => date("Y-m-d H:i:s"),
+          'post_date' => date_for_database($this->post_date),
           'post_title' => $this->title,
           'post_slug'  => $this->slug,
           'post_content' => $this->content,
@@ -353,7 +371,7 @@ class PostEvent
        return $this->postDao->createPost([
             'media_id' => $this->post_image,
             'post_author' => $this->author,
-            'post_date' => date("Y-m-d H:i:s"),
+            'post_date' => date_for_database($this->post_date),
             'post_title' => $this->title,
             'post_slug'  => $this->slug,
             'post_content' => $this->content,
@@ -369,6 +387,12 @@ class PostEvent
   
   }
   
+/**
+ * modifyPost
+ *
+ * @return integer
+ * 
+ */
   public function modifyPost()
   {
     
@@ -387,7 +411,7 @@ class PostEvent
           
         return $this->postDao->updatePost($this->sanitizer, [
             'post_author' => $this->author,
-            'post_modified' => date("Y-m-d H:i:s"),
+            'post_modified' => date_for_database($this->post_date),
             'post_title' => $this->title,
             'post_slug' => $this->slug,
             'post_content' => $this->content,
@@ -404,7 +428,7 @@ class PostEvent
         return $this->postDao->updatePost($this->sanitizer, [
             'media_id' => $this->post_image,
             'post_author' => $this->author,
-            'post_modified' => date("Y-m-d H:i:s"),
+            'post_modified' => date_for_database($this->post_date),
             'post_title' => $this->title,
             'post_slug' => $this->slug,
             'post_content' => $this->content,
@@ -423,6 +447,8 @@ class PostEvent
   public function removePost()
   {
     
+    $media_data = [];
+
     $this->validator->sanitize($this->postId, 'int');
     
     if (!$data_post = $this->postDao->findPost($this->postId, $this->sanitizer)) {
@@ -435,9 +461,9 @@ class PostEvent
     
     $medialib = new MediaDao();
     $media_data = $medialib->findMediaBlog((int)$media_id);
-    $post_image = basename($media_data['media_filename']);
+    $post_image = isset( $media_data['media_filename'] )  ? basename($media_data['media_filename']) : "";
 
-    if ($post_image !== '') {
+    if ( isset($post_image) && $post_image !== '') {
         
        if (is_readable(__DIR__ . '/../../'.APP_IMAGE.$post_image)) {
            
@@ -505,7 +531,7 @@ class PostEvent
  * postAuthorLevel
  * Checking whether author cookie_level or session_level exists
  *
- * @return void
+ * @return void|bool return bool if return false elsewhere return void
  * 
  */
  public function postAuthorLevel()
