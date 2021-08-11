@@ -28,7 +28,7 @@ environment. Scritplog need the following
 
 - MySQL version 5.6 or greater.
 
-- PHP version 7.2 or greater is recommended.
+- PHP version 7.4 or greater is recommended.
 
 - PDO.
 
