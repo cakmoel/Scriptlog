@@ -513,8 +513,8 @@ public function imageUploadHandler($mediaId = null)
      if ($image_src) {
 
        $mediablog .= '<a class="thumbnail" href="'.$image_src.'" ><img src="'.$image_src_thumb.'" class="img-responsive pad"></a>';
-       $mediablog .= '<label>Change picture:</label>';
-       $mediablog .= '<input type="file" name="image" id="file" accept="image/*" onchange="loadFile(event)" maxlength="512" >';
+       $mediablog .= '<label for="file">Replace image:</label>';
+       $mediablog .= '<input type="file" name="image" class="form-control" id="file" accept="image/*" onchange="loadFile(event)" maxlength="512" >';
        $mediablog .= '<input type="hidden" name="image_id"  value="'.$mediaId.'">';
        $mediablog .= '<img id="output" class="img-responsive pad">';
        $mediablog .= '<p class="help-block>Maximum file size: '.format_size_unit(APP_FILE_SIZE).'</p>';
@@ -522,8 +522,8 @@ public function imageUploadHandler($mediaId = null)
      } else {
 
         $mediablog .= '<br><img src="'.$image_src_thumb.'" class="img-responsive pad"><br>';
-        $mediablog .= '<label>Change picture:</label>';
-        $mediablog .= '<input type="file" name="image" id="file" accept="image/*" onchange="loadFile(event)"  maxlength="512" >';
+        $mediablog .= '<label for="file">Replace image:</label>';
+        $mediablog .= '<input type="file" name="image" class="form-control" id="file" accept="image/*" onchange="loadFile(event)"  maxlength="512" >';
         $mediablog .= '<input type="hidden" name="image_id"  value="'.$mediaId.'">';
         $mediablog .= '<img id="output" class="img-responsive pad">';
         $mediablog .= '<p class="help-block">Maximum file size:'.format_size_unit(APP_FILE_SIZE).'</p>';
@@ -532,9 +532,9 @@ public function imageUploadHandler($mediaId = null)
 
   } else {
 
-    $mediablog .= '<div id="image-preview">';
-    $mediablog .= '<label for="image-upload" id="image-label">Choose picture</label>';
-    $mediablog .= '<input type="file" name="media" id="image-upload" accept="image/*" maxlength="512" >';
+    $mediablog .= '<div class="img-responsive pad" id="image-preview">';
+    $mediablog .= '<label for="image-upload" id="image-label">Featured image</label>';
+    $mediablog .= '<input type="file" name="media" id="image-upload" accept="image/*" class="form-control" maxlength="512">';
     $mediablog .= '</div>';
     $mediablog .= '<p class="help-block"> Maximum file size: '.format_size_unit(APP_FILE_SIZE).'</p>'; 
   
