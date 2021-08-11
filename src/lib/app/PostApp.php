@@ -120,6 +120,7 @@ class PostApp extends BaseApp
         $filters = [
           'post_title' => FILTER_SANITIZE_SPECIAL_CHARS,
           'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+          'post_date' => FILTER_SANITIZE_STRING,
           'image_id' => FILTER_SANITIZE_NUMBER_INT,
           'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
           'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -144,7 +145,7 @@ class PostApp extends BaseApp
              
         } 
         
-         if ( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'comment_status']) == false) {
+         if ( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_date', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'comment_status']) == false) {
 
             header($_SERVER["SERVER_PROTOCOL"].' 413 Payload Too Large');
             header('Status: 413 Payload Too Large');
@@ -153,7 +154,7 @@ class PostApp extends BaseApp
 
          }
 
-         if ((empty($_POST['post_title'])) || (empty($_POST['post_content']))) {
+         if ( ( empty($_POST['post_title']) ) || ( empty($_POST['post_content'] ) ) ) {
            
             $checkError = false;
             array_push($errors, "Please enter a required field");
@@ -181,6 +182,13 @@ class PostApp extends BaseApp
 
          }
          
+         if (!empty($_POST['post_date']) && validate_date($_POST['post_date']) === false) {
+
+           $checkError = false;
+           array_push($errors, "Please fix your date format");
+           
+         }
+
          if( !empty($file_location) ) {
 
             if (!isset($file_error) || is_array($file_error)) {
@@ -341,6 +349,17 @@ class PostApp extends BaseApp
             }
 
             $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
+            
+            if ( empty($_POST['post_date']) ) {
+
+                $this->postEvent->setPostDate(date("Y-m-d H:i:s"));
+
+            } else {
+
+                $this->postEvent->setPostDate(date_conversion(distill_post_request($filters)['post_date']));
+
+            }
+
             $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
             $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
             $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
@@ -423,6 +442,8 @@ class PostApp extends BaseApp
     $data_post = array(
         'ID' => $getPost['ID'],
         'media_id' => $getPost['media_id'],
+        'post_date' => $getPost['post_date'],
+        'post_modified' => $getPost['post_modified'],
         'post_title' => $getPost['post_title'],
         'post_content' => $getPost['post_content'],
         'post_summary' => $getPost['post_summary'],
@@ -445,6 +466,7 @@ class PostApp extends BaseApp
         'post_id' => FILTER_SANITIZE_NUMBER_INT,
         'post_title' => FILTER_SANITIZE_SPECIAL_CHARS,
         'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'post_modified' => FILTER_SANITIZE_STRING,
         'image_id' => FILTER_SANITIZE_NUMBER_INT,
         'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
         'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -485,24 +507,31 @@ class PostApp extends BaseApp
               
             }
             
-            if(true === form_size_validation($form_fields)) {
+            if( true === form_size_validation($form_fields)) {
 
               $checkError = false;
               array_push($errors, "Form data is longer than allowed");
   
             }
 
-            if (false === sanitize_selection_box(distill_post_request($filters)['post_status'], ['publish' => 'Publish', 'draft' => 'Draft'])) {
+            if ( false === sanitize_selection_box(distill_post_request($filters)['post_status'], ['publish' => 'Publish', 'draft' => 'Draft'])) {
 
               $checkError = false;
               array_push($errors, "Please choose the available value provided");
   
             }
   
-            if (false === sanitize_selection_box(distill_post_request($filters)['comment_status'], ['open' => 'Open', 'closed' => 'Closed'])) {
+            if ( false === sanitize_selection_box(distill_post_request($filters)['comment_status'], ['open' => 'Open', 'closed' => 'Closed'])) {
   
               $checkError = false;
               array_push($errors, "Please choose the available value provided");
+              
+            }
+
+            if (!empty($_POST['post_modfied']) && validate_date($_POST['post_modified']) === false) {
+
+              $checkError = false;
+              array_push($errors, "Please fix your date format");
               
             }
             
@@ -660,6 +689,17 @@ class PostApp extends BaseApp
             
               $this->postEvent->setPostId((int)distill_post_request($filters)['post_id']);
               $this->postEvent->setTopics(distill_post_request($filters)['catID']);
+              
+              if ( empty($_POST['post_modified']) ) {
+
+                $this->postEvent->setPostModified(date("Y-m-d H:i:s"));
+
+              } else {
+
+                $this->postEvent->setPostModified(distill_post_request($filters)['post_modified']);
+                 
+              }
+
               $this->postEvent->setPostAuthor($this->postEvent->postAuthorId());
               $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
               $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
