@@ -86,7 +86,7 @@
                        <td><?= $no; ?></td>
                        <td><?= safe_html($post['post_title']); ?></td>
                        <td><?= safe_html($post['user_login']); ?></td>
-                       <td><?= safe_html(make_date($post['post_date'])); ?></td>
+                       <td><?= isset($post['post_modified']) ? safe_html(make_date($post['post_modified'])) : safe_html(make_date($post['post_date'])); ?></td>
                       
                        <td>
                        <a href="<?=generate_request("index.php", 'get', ['posts', 'editPost', $post['ID']])['link']; ?>" class="btn btn-warning" title="Edit post">
