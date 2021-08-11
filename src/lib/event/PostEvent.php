@@ -34,6 +34,14 @@ class PostEvent
    * @var string
    */
   private $post_date;
+
+  /**
+   * post_modified
+   *
+   * @var string
+   * 
+   */
+  private $post_modified;
   
   /**
    * post's title 
@@ -183,12 +191,23 @@ class PostEvent
   /**
    * setPostDate
    *
-   * @param string $date
+   * @param string $date_created
    * 
    */
-  public function setPostDate($date)
+  public function setPostDate($date_created)
   {
-    $this->post_date = $date;
+    $this->post_date = $date_created;
+  }
+
+  /**
+   * setPostModified
+   *
+   * @param string $date_modified
+   * 
+   */
+  public function setPostModified($date_modified)
+  {
+    $this->post_modified = $date_modified;
   }
 
   /**
@@ -411,7 +430,7 @@ class PostEvent
           
         return $this->postDao->updatePost($this->sanitizer, [
             'post_author' => $this->author,
-            'post_modified' => date_for_database($this->post_date),
+            'post_modified' => date_for_database($this->post_modified),
             'post_title' => $this->title,
             'post_slug' => $this->slug,
             'post_content' => $this->content,
@@ -428,7 +447,7 @@ class PostEvent
         return $this->postDao->updatePost($this->sanitizer, [
             'media_id' => $this->post_image,
             'post_author' => $this->author,
-            'post_modified' => date_for_database($this->post_date),
+            'post_modified' => date_for_database($this->post_modified),
             'post_title' => $this->title,
             'post_slug' => $this->slug,
             'post_content' => $this->content,
