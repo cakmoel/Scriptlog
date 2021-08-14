@@ -356,7 +356,7 @@ class PostApp extends BaseApp
 
             } else {
 
-                $this->postEvent->setPostDate(date_conversion(distill_post_request($filters)['post_date']));
+                $this->postEvent->setPostDate(distill_post_request($filters)['post_date']);
 
             }
 
