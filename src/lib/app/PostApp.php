@@ -364,7 +364,13 @@ class PostApp extends BaseApp
             $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
             $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
             $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
-            $this->postEvent->setSticky(distill_post_request($filters)['post_sticky']);
+
+            if (isset($_POST['post_sticky']) && $_POST['post_sticky'] === '0') {
+            
+              $this->postEvent->setSticky('1');
+
+            }
+            
             $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
             $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
             $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
@@ -705,6 +711,17 @@ class PostApp extends BaseApp
               $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
               $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
               $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
+
+              if (isset($_POST['post_sticky']) && $_POST['post_sticky'] === '0') {
+
+                $this->postEvent->setSticky('1');
+
+              } else {
+
+                $this->postEvent->setSticky('0');
+
+              }
+              
               $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
               $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
               $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
