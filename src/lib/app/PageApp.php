@@ -283,6 +283,13 @@ class PageApp extends BaseApp
               $this->pageEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
               $this->pageEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
               $this->pageEvent->setPublish(distill_post_request($filters)['post_status']);
+
+              if (isset($_POST['post_sticky']) && $_POST['post_sticky'] == '0') {
+
+                 $this->pageEvent->setSticky('1');
+
+              }
+
               $this->pageEvent->setSticky(distill_post_request($filters)['post_sticky']);
               $this->pageEvent->setComment(distill_post_request($filters)['comment_status']);
               $this->pageEvent->setPostType('page');
@@ -536,6 +543,16 @@ class PageApp extends BaseApp
                 $this->pageEvent->setPublish(distill_post_request($filters)['post_status']);
                 $this->pageEvent->setPostType('page');
                 $this->pageEvent->setComment(distill_post_request($filters)['comment_status']);
+
+                if (isset($_POST['post_sticky']) && $_POST['post_sticky'] == '0') {
+
+                  $this->postEvent->setSticky('1');
+  
+                } else {
+  
+                  $this->postEvent->setSticky('0');
+  
+                }
 
                $this->pageEvent->modifyPage();
                direct_page('index.php?load=pages&status=pageUpdated', 200);
