@@ -365,7 +365,7 @@ class PostApp extends BaseApp
             $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
             $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
 
-            if (isset($_POST['post_sticky']) && $_POST['post_sticky'] === '0') {
+            if (isset($_POST['post_sticky']) && $_POST['post_sticky'] == '0') {
             
               $this->postEvent->setSticky('1');
 
@@ -712,7 +712,7 @@ class PostApp extends BaseApp
               $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
               $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
 
-              if (isset($_POST['post_sticky']) && $_POST['post_sticky'] === '0') {
+              if (isset($_POST['post_sticky']) && $_POST['post_sticky'] == '0') {
 
                 $this->postEvent->setSticky('1');
 
