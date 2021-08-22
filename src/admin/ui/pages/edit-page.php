@@ -71,10 +71,14 @@ $page_id = isset($pageData['ID']) ? (int)$pageData['ID'] : 0;
 </textarea>
 </div>
 
+<div class="form-group">
 <div class="checkbox">
 <label for="sticky">
-  <input type="checkbox" id="sticky" name="post_sticky" <?=(isset($pageData['post_sticky']) && $pageData['post_sticky'] == '1') ? "checked='checked'" : "";?>> Stick to the top of the blog
+  <input type="checkbox" id="sticky" name="post_sticky" value="<?=(isset($postData['post_sticky']) && $postData['post_sticky'] == '1') ? '1' : '0'; ?>"
+<?=(isset($postData['post_sticky']) && $postData['post_sticky'] == '1') ? "checked='checked'" : "";?>
+<?=(isset($formData['post_sticky']) ? safe_html($formData['post_sticky']) : ""); ?>> Stick to the top of the blog
 </label>
+</div>
 </div>
 
 <div class="form-group">
