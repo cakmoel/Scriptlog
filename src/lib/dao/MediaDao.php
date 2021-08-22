@@ -506,7 +506,7 @@ public function imageUploadHandler($mediaId = null)
 
      if (!$image_src_thumb) {
          
-         $image_src_thumb = app_url().'/public/files/pictures/thumbs/nophoto.jpg';
+         $image_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
 
      }
 
