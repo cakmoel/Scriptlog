@@ -21,7 +21,8 @@ try {
 
                 if((!check_integer($replyId)) && (gettype($replyId) != "integer")) {
     
-                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                    header("Status: 400 Bad Request");
                     throw new AppException("Invalid ID data type");
     
                 }
