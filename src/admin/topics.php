@@ -20,7 +20,8 @@ try {
     
                 if((!check_integer($topicId)) && (gettype($topicId) != "integer")) {
     
-                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                    header("Status: 400 Bad Request");
                     throw new AppException("Invalid ID data type");
     
                 }
@@ -50,7 +51,8 @@ try {
     
                 if ((!check_integer($topicId)) && (gettype($topicId) !== "integer")) {
     
-                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                    header("Status: 400 Bad Request");
                     throw new AppException("Invalid ID data type");
     
                 }
@@ -73,7 +75,8 @@ try {
     
             if ((!check_integer($topicId)) && (gettype($topicId) !== "integer")) {
     
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                header("Status: 400 Bad Request");
                 throw new AppException("Invalid ID data type");
     
             }
