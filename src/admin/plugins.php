@@ -20,10 +20,12 @@ try {
     
                 if ((!check_integer($pluginId)) && (gettype($pluginId))) {
     
-                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                    header("Status: 400 Bad Request");
                     throw new AppException("Invalid ID data type!");
     
                 }
+
                 if ($pluginId == 0) {
     
                     $pluginApp->installPlugin();
@@ -92,7 +94,8 @@ try {
     
                 if ((!check_integer($pluginId)) && (gettype($pluginId) !== "integer")) {
     
-                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                    header("Status: 400 Bad Request");
                     throw new AppException("Invalid ID data type!");
         
                 }
