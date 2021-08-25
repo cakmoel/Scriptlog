@@ -1,7 +1,7 @@
 <?php defined('SCRIPTLOG') || die("Direct access not permitted");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$params = isset($_GET['Id'])  ? intval($_GET['Id']) : null ;
+$params = isset($_GET['Id']) ? intval($_GET['Id']) : null ;
 $configDao = new ConfigurationDao();
 $configEvent = new ConfigurationEvent($configDao, $validator, $sanitizer);
 $configApp = new ConfigurationApp($configEvent);
@@ -20,7 +20,8 @@ try {
     
                 if((!check_integer($params)) && (gettype($params) !== "integer")) {
     
-                    header($_SERVER["SERVER_PROTOCOL"]." 403 Forbidden");
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                    header("Status: 400 Bad Request");
                     throw new AppException("Invalid ID data type");
     
                 }
@@ -43,11 +44,11 @@ try {
     
            if(false === $authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
     
-               direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+             direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
            } else {
     
-              $configApp->updateGeneralSetting();
+             $configApp->updateGeneralSetting();
     
            }
     
