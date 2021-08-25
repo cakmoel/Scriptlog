@@ -20,7 +20,8 @@ try {
     
                if ((!check_integer($mediaId)) && (gettype($mediaId) !== "integer")) {
     
-                   header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                   header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                   header("Status: 400 Bad Request");
                    throw new AppException("Invalid ID data type!");
     
                }
@@ -49,18 +50,19 @@ try {
     
              if ((!check_integer($mediaId)) && (gettype($mediaId) !== "integer")) {
     
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                header("Status: 400 Bad Request");
                 throw new AppException("Invalid ID data type!");
     
              }
     
              if ($mediaDao->checkMediaId($mediaId, $sanitizer)) {
     
-                 $mediaLib->update((int)$mediaId);
+                $mediaLib->update((int)$mediaId);
      
              } else {
      
-                 direct_page('index.php?load=medialib&error=mediaNotFound', 404);
+                direct_page('index.php?load=medialib&error=mediaNotFound', 404);
                  
              }
               
@@ -78,7 +80,8 @@ try {
     
              if ((!check_integer($mediaId)) && (gettype($mediaId) !== "integer")) {
     
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                header("Status: 400 Bad Request");
                 throw new AppException("Invalid ID data type!");
        
               }
