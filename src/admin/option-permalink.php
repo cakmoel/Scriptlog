@@ -20,7 +20,8 @@ try {
     
                 if((!check_integer($params)) && (gettype($params) !== "integer")) {
     
-                    header($_SERVER["SERVER_PROTOCOL"]." 403 Forbidden");
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                    header("Status: 400 Bad Request");
                     throw new AppException("Invalid ID data type");
     
                 }
