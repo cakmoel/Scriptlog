@@ -122,15 +122,15 @@ $large_path_uploaded = $large_path . $large_thumb_name;
 
 if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exists('finfo'))) {
 
-  if (resize_image($current_width, $current_height, $medium_size, $medium_path_uploaded, $img_source, 80, $file_type)) {
+  if ( resize_image($current_width, $current_height, $medium_size, $medium_path_uploaded, $img_source, 80, $file_type) ) {
 
-    if (!crop_image($current_width, $current_height, $small_size, $small_path_uploaded, $img_source, 80, $file_type)) {
+    if ( ! crop_image($current_width, $current_height, $small_size, $small_path_uploaded, $img_source, 80, $file_type) ) {
 
         scriptlog_error("Error Creating small size of thumbnail!");
 
     }
     
-    if (! move_uploaded_file($temp_src, $origin_path_uploaded)) {
+    if (! move_uploaded_file($temp_src, $origin_path_uploaded) ) {
 
       scriptlog_error("Error uploading picture");
       
@@ -145,7 +145,7 @@ if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exi
 
 } else {
 
-  if(($img_ext == "jpeg" || $img_ext == "jpg" || $img_ext == "png" || $img_ext == "gif") ) {
+  if( $img_ext == "jpeg" || $img_ext == "jpg" || $img_ext == "png" || $img_ext == "gif" || $img_ext == "bmp" ) {
 
     if (false === set_webp_origin($current_width, $current_height, $file_location, $file_size, $origin_path_uploaded, $origin_path, $file_name)) {
 
@@ -353,6 +353,17 @@ function set_regular_photo($current_width, $current_height, $file_path_uploaded,
       }
 
       break;
+
+    case "image/bmp":
+
+      if ( $regular_photo->save($file_path_thumb.'large_'.$file_name, 80, 'bmp') ) {
+
+        $regular_photo->destroy();
+        return true;
+
+      }
+
+      break;
     
     case "image/webp":
 
@@ -470,6 +481,17 @@ switch ($file_type) {
   
    break;
 
+  case "image/bmp":
+
+    if ( $medium_photo->save($file_path_thumb . 'medium_'.$file_name, 80, 'bmp') ) {
+
+      $medium_photo->destroy();
+      return true;
+
+    }
+
+    break;
+
   case "image/webp":
 
     if ($medium_photo->save($file_path_thumb.'medium_'.$file_name, 80, 'webp')) {
@@ -575,11 +597,23 @@ switch ($file_type) {
     
     }
 
+
+    break;
+
+  case "image/bmp":  
+
+    if ( $small_photo->save($file_path_thumb.'small_'.$file_name, 80, 'bmp') ) {
+
+      $small_photo->destroy();
+      return true;
+
+    }
+
     break;
 
   case "image/webp":
 
-    if($small_photo->save($file_path_thumb.'small_'.$file_name, 80, 'webp')) {
+    if( $small_photo->save($file_path_thumb.'small_'.$file_name, 80, 'webp') ) {
 
       $small_photo->destroy();
       return true;
