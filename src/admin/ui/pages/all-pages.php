@@ -87,8 +87,7 @@
                        <td><?= $no; ?></td>
                        <td><?= htmlspecialchars($page['post_title']); ?></td>
                        <td><?= htmlspecialchars($page['user_login']); ?></td>
-                       <td><?= htmlspecialchars(make_date($page['post_date'])); ?></td>
-                       
+                       <td><?= (isset($page['post_modified'])) ? htmlspecialchars(make_date($page['post_modified'])) : htmlspecialchars(make_date($page['post_date'])); ?></td>
                        <td>
                        <a href="<?=generate_request('index.php', 'get', ['pages', 'editPage', $page['ID']])['link']; ?>" class="btn btn-warning" title="Edit page">
                        <i class="fa fa-pencil fa-fw"></i> </a>
