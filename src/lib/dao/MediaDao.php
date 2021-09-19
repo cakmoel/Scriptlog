@@ -167,7 +167,7 @@ public function findAllMediaBlog($orderBy = 'ID')
 {
   
  $sql = "SELECT ID, media_filename, media_caption, media_type, media_target
-         FROM tbl_media  WHERE media_target = 'blog' 
+         FROM tbl_media  WHERE media_target = 'blog'
          AND media_access = 'public' AND media_status = '1'
          ORDER BY :orderBy DESC";
 
@@ -202,6 +202,52 @@ public function findMediaBlog($mediaId)
   $item = $this->findRow([':ID' => (int)$mediaId]);
 
   return (empty($item)) ?: $item;
+
+}
+
+/**
+ * findAllMediaPage
+ *
+ * @param string $orderBy
+ * @return mixed
+ * 
+ */
+public function findAllMediaPage($orderBy = 'ID')
+{
+
+  $sql = "SELECT ID, media_filename, media_caption, media_type, media_target
+  FROM tbl_media  WHERE media_target = 'page'
+  AND media_access = 'public' AND media_status = '1'
+  ORDER BY :orderBy DESC";
+
+  $this->setSQL($sql);
+
+  $items = $this->findAll([':orderBy' => $orderBy]);
+
+  return (empty($items)) ?: $items;
+
+}
+
+/**
+ * findMediaPage
+ *
+ * @param integer $mediaId
+ * @return mixed
+ * 
+ */
+public function findMediaPage($mediaId)
+{
+
+  $sql = "SELECT ID, media_filename, media_caption, media_type, media_target, 
+          media_user, media_access, media_status 
+          FROM tbl_media
+          WHERE ID = :ID AND media_target = 'page' AND media_access = 'public' AND media_status = '1'";
+
+$this->setSQL($sql);
+
+$item = $this->findRow([':ID' => (int)$mediaId]);
+
+return (empty($item)) ?: $item;
 
 }
 
@@ -382,7 +428,8 @@ public function dropDownMediaAccess($selected = "")
 }
 
 /**
- * drop down media target
+ * dropDownMediaTarget()
+ * 
  * set media target
  * 
  * @param string $selected
@@ -393,7 +440,7 @@ public function dropDownMediaTarget($selected = "")
 {
  $name = 'media_target';
 
- $media_target = array('blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery');
+ $media_target = array('blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery', 'page' => 'Page');
 
  if($selected != '') {
 
@@ -406,7 +453,7 @@ public function dropDownMediaTarget($selected = "")
 }
 
 /**
- * Drop down media status
+ * dropDownMediaStatus
  * 
  * @param int $selected
  * @return int
@@ -454,7 +501,7 @@ public function dropDownMediaSelect($selected = null)
 
   $sanitizer = new Sanitize;
 
-  $picture_bucket_list = ["image/jpeg", "image/pjpeg", "image/png", "image/gif", "image/webp", "image/tiff"];
+  $picture_bucket_list = ["image/jpeg", "image/pjpeg", "image/jpg", "image/png", "image/gif", "image/webp", "image/bmp"];
 
   if (is_array($media_ids)) {
 
@@ -487,17 +534,89 @@ public function dropDownMediaSelect($selected = null)
 }
 
 /**
+ * imageRadioButton
+ *
+ * @param int $checked
+ * @return mixed
+ * 
+ */
+public function imageRadioButton($checked = null)
+{
+
+$imgradio = '<div class="form-group">'."\n";
+
+$imgradio .= '<label>Featured image</label>'."\n";
+$imgradio .= '<div class="radio">'."\n";
+
+if (is_null($checked)) {
+
+  $checked = "";
+
+}
+
+$media_ids = [];
+
+$media_ids = $this->findAllMediaPage();
+
+$sanitizer = new Sanitize();
+
+if (is_array($media_ids)) {
+
+  foreach ($media_ids as $media) {
+
+    $media_meta = isset($media['ID']) ? $this->findMediaMetaValue($media['ID'], $media['media_filename'], $sanitizer) : null;
+
+    $media_properties = isset($media_meta['meta_value']) ? media_properties($media_meta['meta_value']) : null;
+
+    $imgradio .= '<div class="col-xs-4 col-sm-3 col-md-2 nopad text-center">'."\n";
+    
+    $imgradio .= '<label for="image_id" class="image-radio" >'."\n";
+    
+    $imgradio .= '<img class="img-responsive" alt="'.safe_html($media_properties['Origin']).'" src="'.app_url().DS.APP_IMAGE_SMALL.'small_'.rawurlencode(basename(safe_html($media['media_filename']))).'" >'."\n";
+
+    if ( $checked === $media['ID']) {
+
+      $check = ' checked';
+
+    } else {
+
+      $check = ' ';
+
+    }
+
+    $imgradio .= '<input type="radio" id="image_id" name="image_id" value="'.$media['ID'].'"'.$check.'>'."\n";
+    $imgradio .= '<i class="glyphicon glyphicon-ok hidden"></i>'."\n";
+    $imgradio .= '</label>';
+    $imgradio .= '</div>'."\n";
+
+  }
+   
+} else {
+
+  $imgradio .= '<p class="help-block"><strong><a href="'.generate_request('index.php', 'get', ['medialib', ActionConst::NEWMEDIA, 0])['link'].'" >Add new media</a></strong></p>';
+   
+}
+
+$imgradio .= '</div>';
+$imgradio .= '</div>';
+
+return $imgradio;
+
+}
+
+/**
  * imageUploadHandler
  *
  * @param int|num $mediaId
- * @return void
+ * @return mixed
+ * 
  */
 public function imageUploadHandler($mediaId = null) 
 {
 
   $mediablog  = '<div class="form-group">';
 
-  if (!empty($mediaId) && $mediaId != 0) {
+  if ( ( !is_null($mediaId) ) && ( $mediaId !== 0 ) ) {
 
     $data_media = $this->findMediaBlog((int)$mediaId);
 
