@@ -17,10 +17,13 @@ function admin_header($stylePath, $breadcrumb = null)
   <!-- Bootstrap 3.3.7 -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/bootstrap/dist/css/bootstrap-select.css">
+  <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/img-radio.css">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/font-awesome/css/font-awesome.min.css">
   <!-- Ionicons -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/Ionicons/css/ionicons.min.css">
+  <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/iCheck/all.css">
   <!-- DataTables -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/datatables.net-bs/css/dataTables.bootstrap.min.css">
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/datatables.net/css/responsive.bootstrap.min.css">
@@ -38,6 +41,7 @@ function admin_header($stylePath, $breadcrumb = null)
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/imagePreview.css">
   <!-- Audio Preview -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/audioPreview.css">
+  
    <!-- wysiwyg editor-->
   <link href="<?= $stylePath; ?>/wysiwyg/summernote/summernote.min.css" rel="stylesheet">
 
@@ -124,6 +128,7 @@ function admin_footer($stylePath, $ubench = null)
 <script src="<?= $stylePath; ?>/assets/components/datatables.net/js/responsive.dataTables.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/select2/js/select2.full.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/dist/js/adminlte.min.js"></script>
+<script src="<?= $stylePath; ?>/assets/components/iCheck/icheck.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/dist/js/ie10-viewport-bug-workaround.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/components/fastclick/lib/fastclick.js"></script>
@@ -133,6 +138,8 @@ function admin_footer($stylePath, $ubench = null)
 <script src="<?= $stylePath; ?>/assets/dist/js/imagevalidation.js"></script>
 <script src="<?= $stylePath; ?>/wysiwyg/summernote/summernote.min.js"></script>
 <script type="text/javascript" src="<?= $stylePath; ?>/assets/dist/js/jquery.uploadPreview.min.js"></script>
+<script src="<?= $stylePath; ?>/assets/dist/js/img-radio.js"></script>
+
 <script>
 $(document).ready(function(){
 	$('#scriptlog-table').DataTable({
@@ -147,6 +154,7 @@ $(document).ready(function(){
    });
 });
 </script>
+
 <script type="text/javascript">
 $(document).ready(function() {
   $.uploadPreview({
@@ -156,9 +164,7 @@ $(document).ready(function() {
   });
 });
 </script>
-<script>
-$('img').bind('contextmenu',function(e){return false;}); 
-</script>
+
 <script>
 $(document).ready(function() {
   $('#summernote').summernote({
@@ -168,18 +174,30 @@ $(document).ready(function() {
   });
 });
 </script>
+
 <script>
-  $(function () {
+$(function () {
+    
     //Initialize Select2 Elements
     $('.select2').select2()
 
+    //disable contextmenu
+    $('img').bind('contextmenu',function(e){return false;}); 
+
+    //datetimepicker
+    jQuery('#datetimepicker').datetimepicker({
+     timepicker: false,
+     format: 'Y-m-d'
+    });
+    
+    //icheck
+    $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
+      checkboxClass: 'icheckbox_flat-green',
+      radioClass   : 'iradio_flat-green'
+    })
+    
   })
-</script>
-<script>
-jQuery('#datetimepicker').datetimepicker({
-  timepicker: false,
-  format: 'Y-m-d'
-});
+
 </script>
 </html>
 <?php 
