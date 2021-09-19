@@ -13,7 +13,7 @@ try {
          
       default:
           
-         if (false === $authenticator->userAccessControl()) {
+         if (false === $authenticator->userAccessControl(ActionConst::DASHBOARD)) {
   
             direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
   
