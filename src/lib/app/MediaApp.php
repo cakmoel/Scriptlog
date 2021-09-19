@@ -308,7 +308,7 @@ public function insert()
   } else {
 
      $this->setView('edit-media');
-     $this->setPageTitle('Media Library');
+     $this->setPageTitle('Upload New Media');
      $this->setFormAction(ActionConst::NEWMEDIA);
      $this->view->set('pageTitle', $this->getPageTitle());
      $this->view->set('formAction', $this->getFormAction());
@@ -525,7 +525,7 @@ public function update($id)
           // upload file
         if (is_uploaded_file($file_location)) {
 
-          if ((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
+          if ( ( false === check_mime_type(mime_type_dictionary(), $file_location)) || ( false === check_file_extension($file_name))) {
 
             $checkError = false;
             array_push($errors, "Invalid file format");
