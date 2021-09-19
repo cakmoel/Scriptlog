@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class PageEvent
  *
@@ -19,13 +19,13 @@ class PageEvent
    * 
    */
   private $pageId;
- 
+
   /**
    * page's image
    * @var integer
    * 
    */
-  private $page_image;
+  private $post_image;
 
   /**
    * Author
@@ -34,6 +34,22 @@ class PageEvent
    * 
    */
   private $author;
+
+  /**
+   * post_date
+   *
+   * @var string
+   * 
+   */
+  private $post_date;
+
+  /**
+   * post_modified
+   *
+   * @var string
+   * 
+   */
+  private $post_modified;
 
   /**
    * page's title
@@ -75,7 +91,15 @@ class PageEvent
    * 
    */
   private $meta_key;
- 
+
+  /**
+   * post's tags
+   *
+   * @var string
+   * 
+   */
+  private $post_tags;
+
   /**
    * Page's status
    * 
@@ -153,20 +177,51 @@ class PageEvent
     $this->pageId = $pageId;
   }
 
+  /**
+   * setPageAuthor
+   *
+   * @param string $author
+   * @return string
+   * 
+   */
   public function setPageAuthor($author)
   {
     $this->author = $author;
   }
 
-/**
- * set page's image
- *
- * @param number|interger $post_image
- * 
- */
-  public function setPageImage($page_image)
+  /**
+   * setPostDate
+   *
+   * @param string $date_created
+   * @return string
+   * 
+   */
+  public function setPostDate($date_created)
   {
-    $this->page_image = $page_image;
+    $this->post_date = $date_created;
+  }
+
+  /**
+   * setPostModified
+   *
+   * @param string $date_modified
+   * @return string
+   * 
+   */
+  public function setPostModified($date_modified)
+  {
+    $this->post_modified = $date_modified;
+  }
+
+  /**
+   * SetPageImage
+   *
+   * @param interger $post_image
+   * @return integer
+   */
+  public function setPageImage($post_image)
+  {
+    $this->post_image = $post_image;
   }
 
   /**
@@ -190,13 +245,13 @@ class PageEvent
   {
     $this->slug = make_slug($slug);
   }
-  
-/**
- * set page content
- * 
- * @param string $content
- * 
- */
+
+  /**
+   * set page content
+   * 
+   * @param string $content
+   * 
+   */
   public function setPageContent($content)
   {
     $this->content = purify_dirty_html($content);
@@ -223,7 +278,7 @@ class PageEvent
   {
     $this->meta_key = prevent_injection($meta_keys);
   }
-  
+
   /**
    * set page status
    * 
@@ -234,7 +289,18 @@ class PageEvent
   {
     $this->page_status = $page_status;
   }
-  
+
+  /**
+   * setPostTags
+   *
+   * @param string $post_tags
+   * 
+   */
+  public function setPageTags($post_tags)
+  {
+    $this->post_tags = $post_tags;
+  }
+
   /**
    * Set post type
    *
@@ -244,9 +310,9 @@ class PageEvent
    */
   public function setPostType($post_type)
   {
-    $this->post_type = $post_type;    
+    $this->post_type = $post_type;
   }
-  
+
   /**
    * setSticky
    * 
@@ -257,157 +323,192 @@ class PageEvent
    */
   public function setSticky($page_sticky)
   {
-    $this->page_sticky = $page_sticky; 
+    $this->page_sticky = $page_sticky;
   }
 
+  /**
+   * setComment
+   *
+   * @param string $comment_status
+   * 
+   */
   public function setComment($comment_status)
   {
-   $this->comment_status = $comment_status;
+    $this->comment_status = $comment_status;
   }
- 
-  public function grabPages($type)
+
+  /**
+   * grabPages
+   *
+   * @param string $type
+   * @return mixed
+   * 
+   */
+  public function grabPages($type, $orderBy = 'ID', $author = null)
   {
-    return $this->pageDao->findPages($type);
+    return $this->pageDao->findPages($type, $orderBy, $author);
   }
-  
-  public function grabPage($id, $type)
+
+  /**
+   * grabPage
+   *
+   * @param int|number $id
+   * @param string $type
+   * @return mixed
+   * 
+   */
+  public function grabPage($id)
   {
-    return $this->pageDao->findPageById($id, $type, $this->sanitizer);
+    return $this->pageDao->findPageById($id, $this->sanitizer);
   }
-  
+
+  /**
+   * addPage
+   *
+   * insert new page record
+   * 
+   * @method public addPage()
+   */
   public function addPage()
   {
-     
+
     $this->validator->sanitize($this->author, 'int');
     $this->validator->sanitize($this->title, 'string');
     $this->validator->sanitize($this->post_image, 'int');
-   
-    if ((!empty($this->meta_desc)) || (!empty($this->meta_key))) {
+
+    if ((!empty($this->meta_desc)) || (!empty($this->meta_key)) || (!empty($this->post_tags))) {
       $this->validator->sanitize($this->meta_desc, 'string');
       $this->validator->sanitize($this->meta_key, 'string');
+      $this->validator->sanitize($this->post_tags, 'string');
     }
-    
+
     if (!empty($this->post_image)) {
 
       return $this->pageDao->createPage([
-           'media_id' => $this->post_image,
-           'post_author' => $this->author,
-           'post_date' => date("Y-m-d H:i:s"),
-           'post_title' => $this->title,
-           'post_slug' => $this->slug,
-           'post_content' => $this->content,
-           'post_summary' => $this->meta_desc,
-           'post_keyword' => $this->meta_key,
-           'post_status' => $this->page_status,
-           'post_sticky' => $this->page_sticky,
-           'post_type' => $this->post_type,
-           'comment_status' => $this->comment_status
+        'media_id' => $this->post_image,
+        'post_author' => $this->author,
+        'post_date' => date_for_database($this->post_date),
+        'post_title' => $this->title,
+        'post_slug' => $this->slug,
+        'post_content' => $this->content,
+        'post_summary' => $this->meta_desc,
+        'post_keyword' => $this->meta_key,
+        'post_tags' => $this->post_tags,
+        'post_status' => $this->page_status,
+        'post_sticky' => $this->page_sticky,
+        'post_type' => $this->post_type,
+        'comment_status' => $this->comment_status
       ]);
-        
+
     } else {
 
       return $this->pageDao->createPage([
-          'post_author' => $this->author,
-          'post_date' => date("Y-m-d H:i:s"),
-          'post_title' => $this->title,
-          'post_slug' => $this->slug,
-          'post_content' => $this->content,
-          'post_summary' => $this->meta_desc,
-          'post_keyword' => $this->meta_key,
-          'post_status' => $this->page_status,
-          'post_sticky' => $this->page_sticky,
-          'post_type' => $this->post_type,
-          'comment_status' => $this->comment_status
+        'post_author' => $this->author,
+        'post_date' => date_for_database($this->post_date),
+        'post_title' => $this->title,
+        'post_slug' => $this->slug,
+        'post_content' => $this->content,
+        'post_summary' => $this->meta_desc,
+        'post_keyword' => $this->meta_key,
+        'post_tags' => $this->post_tags,
+        'post_status' => $this->page_status,
+        'post_sticky' => $this->page_sticky,
+        'post_type' => $this->post_type,
+        'comment_status' => $this->comment_status
       ]);
-       
     }
-  
   }
-  
+
+  /**
+   * modifyPage
+   *
+   * Updating an existing page record
+   * 
+   */
   public function modifyPage()
   {
-    
+
     $this->validator->sanitize($this->pageId, 'int');
     $this->validator->sanitize($this->author, 'int');
+    $this->validator->sanitize($this->post_image, 'int');
     $this->validator->sanitize($this->title, 'string');
-   
-    if( ( !empty( $this->meta_desc ) )  || ( !empty( $this->meta_key ) ) ) {
-        $this->validator->sanitize($this->meta_desc, 'string');
-        $this->validator->sanitize($this->meta_key, 'string');
+
+    if ((!empty($this->meta_desc))  || (!empty($this->meta_key)) || (!empty($this->post_tags))) {
+      $this->validator->sanitize($this->meta_desc, 'string');
+      $this->validator->sanitize($this->meta_key, 'string');
+      $this->validator->sanitize($this->post_tags, 'string');
     }
-    
-    if(empty($this->post_image)) {
-        
+
+    if (empty($this->post_image)) {
+
       return $this->pageDao->updatePage($this->sanitizer, [
-          'post_author' => $this->author,
-          'date_modified' => date("Y-m-d H:i:s"),
-          'post_title' => $this->title,
-          'post_slug' => $this->slug,
-          'post_content' => $this->content,
-          'post_summary' => $this->meta_desc,
-          'post_keyword' => $this->meta_key,
-          'post_type' => $this->post_type,
-          'post_status' => $this->page_status,
-          'post_sticky' => $this->page_sticky,
-          'comment_status' => $this->comment_status
+        'post_author' => $this->author,
+        'post_modified' => date_for_database($this->post_modified),
+        'post_title' => $this->title,
+        'post_slug' => $this->slug,
+        'post_content' => $this->content,
+        'post_summary' => $this->meta_desc,
+        'post_keyword' => $this->meta_key,
+        'post_tags' => $this->post_tags,
+        'post_status' => $this->page_status,
+        'post_sticky' => $this->page_sticky,
+        'post_type' => $this->post_type,
+        'comment_status' => $this->comment_status
       ], $this->pageId);
-      
+
     } else {
-        
-       return $this->pageDao->updatePage($this->sanitizer, [
-           'post_image' => $this->post_image,
-           'date_modified' => date("Y-m-d H:i:s"),
-           'post_title' => $this->title,
-           'post_slug' => $this->slug,
-           'post_content' => $this->content,
-           'post_summary' => $this->meta_desc,
-           'post_keyword' => $this->meta_key,
-           'post_type' => $this->post_type,
-           'post_status' => $this->page_status,
-           'post_sticky' => $this->page_sticky,
-           'comment_status' => $this->comment_status
-       ], $this->pageId);
-       
+
+      return $this->pageDao->updatePage($this->sanitizer, [
+        'media_id' => $this->post_image,
+        'post_author' => $this->author,
+        'post_modified' => date_for_database($this->post_modified),
+        'post_title' => $this->title,
+        'post_slug' => $this->slug,
+        'post_content' => $this->content,
+        'post_summary' => $this->meta_desc,
+        'post_keyword' => $this->meta_key,
+        'post_tags' => $this->post_tags,
+        'post_status' => $this->page_status,
+        'post_sticky' => $this->page_sticky,
+        'post_type' => $this->post_type,
+        'comment_status' => $this->comment_status
+      ], $this->pageId);
+
     }
-      
   }
-  
+
   public function removePage()
   {
-    
+
     $this->validator->sanitize($this->pageId, 'int');
-     
+
     if (!$data_page = $this->pageDao->findPageById($this->pageId, $this->post_type, $this->sanitizer)) {
-        direct_page('index.php?load=pages&error=pageNotFound', 404);
+      direct_page('index.php?load=pages&error=pageNotFound', 404);
     }
-    
+
     $media_id = $data_page['media_id'];
 
     $medialib = new MediaDao();
     $media_data = $medialib->findMediaById((int)$media_id, $this->sanitizer);
-    $page_image = basename($media_data['media_filename']);
+    $page_image = isset($media_data['media_filename']) ? basename($media_data['media_filename']) : "";
 
     if ($page_image !== '') {
-        
-        if (is_readable(__DIR__ . '/../../'.APP_IMAGE.$page_image)) {
 
-            unlink(__DIR__ . '/../../'.APP_IMAGE.$page_image);
-            unlink(__DIR__ . '/../../'.APP_IMAGE_LARGE.'large_'.$page_image);
-            unlink(__DIR__ . '/../../'.APP_IMAGE_MEDIUM.'medium_'.$page_image);
-            unlink(__DIR__ . '/../../'.APP_IMAGE_SMALL.'small_'.$page_image);
-            
-        }
-        
-        return $this->pageDao->deletePage($this->pageId, $this->sanitizer, $this->post_type);
-        
+      if (is_readable(__DIR__ . '/../../' . APP_IMAGE . $page_image)) {
+
+        unlink(__DIR__ . '/../../' . APP_IMAGE . $page_image);
+        unlink(__DIR__ . '/../../' . APP_IMAGE_LARGE . 'large_' . $page_image);
+        unlink(__DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_' . $page_image);
+        unlink(__DIR__ . '/../../' . APP_IMAGE_SMALL . 'small_' . $page_image);
+      }
+
+      return $this->pageDao->deletePage($this->pageId, $this->sanitizer, $this->post_type);
     } else {
-        
-        return $this->pageDao->deletePage($this->pageId, $this->sanitizer, $this->post_type);
-        
+
+      return $this->pageDao->deletePage($this->pageId, $this->sanitizer, $this->post_type);
     }
-    
   }
-  
+
   /**
    * postStatusDropDown()
    *
@@ -417,7 +518,7 @@ class PageEvent
    * @return void
    * 
    */
-  public function postStatusDropDown($selected = "") 
+  public function postStatusDropDown($selected = "")
   {
     return $this->pageDao->dropDownPostStatus($selected);
   }
@@ -432,23 +533,50 @@ class PageEvent
   {
     return $this->pageDao->dropDownCommentStatus($selected);
   }
-  
+
+  /**
+   * pageAuthorId
+   * 
+   * @return void|bool if true it will be return session otherwise it will be false
+   * 
+   */
   public function pageAuthorId()
   {
 
-    if(isset(Session::getInstance()->scriptlog_session_id)) {
+    if (isset(Session::getInstance()->scriptlog_session_id)) {
 
       return Session::getInstance()->scriptlog_session_id;
-
     }
 
     return false;
-
   }
-  
+
+  /**
+   * pageAuthorLevel
+   *
+   * @return void|bool - return bool - false if it is not session
+   * 
+   */
+  public function pageAuthorLevel()
+  {
+
+    if (isset($_COOKIE['scriptlog_auth'])) {
+
+      Authorization::setAuthInstance(new Authentication(new UserDao, new UserTokenDao, $this->validator));
+
+      return Authorization::authorizeLevel();
+    }
+
+    if (isset(Session::getInstance()->scriptlog_session_level)) {
+
+      return Session::getInstance()->scriptlog_session_level;
+    }
+
+    return false;
+  }
+
   public function totalPages($data = null)
   {
     return $this->pageDao->totalPageRecords($data);
   }
-  
 }
