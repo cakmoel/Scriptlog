@@ -644,16 +644,29 @@ public function userAccessControl($control = null)
 
           break;
 
+      case ActionConst::DASHBOARD:
+
+        if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
+            && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author') 
+            && ($this->accessLevel() !== 'contributor')) {
+
+          return false;
+    
+        }
+
+        break;
+
       default:
           
-          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
-              && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author') && ($this->accessLevel() !== 'contributor')) {
+        if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
+            && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author') 
+            && ($this->accessLevel() !== 'contributor')) {
 
             return false;
             
-          }
+        }
 
-          break;
+        break;
 
   }
 
