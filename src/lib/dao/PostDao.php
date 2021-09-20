@@ -161,7 +161,7 @@ public function findPost($id, $sanitize, $author = null)
 /**
  * createPost
  * 
- * insert new post
+ * insert new post record
  *
  * @param array $bind
  * @param integer $topicId
@@ -229,8 +229,10 @@ public function createPost($bind, $topicId)
 }
 
 /**
- * modify post
+ * updatePost
  *
+ * updating an existing post record
+ * 
  * @param array $bind
  * @param integer $id
  * @param integer $topicId
@@ -409,11 +411,11 @@ public function totalPostRecords($data = array())
 
   if (!empty($data)) {
 
-     $sql = "SELECT ID FROM tbl_posts WHERE post_author = ?";
+    $sql = "SELECT ID FROM tbl_posts WHERE post_author = ? AND post_type = 'blog'";
 
   } else {
 
-     $sql = "SELECT ID FROM tbl_posts";
+    $sql = "SELECT ID FROM tbl_posts WHERE post_type = 'blog'";
 
   }
 
