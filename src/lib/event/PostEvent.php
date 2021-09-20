@@ -462,7 +462,13 @@ class PostEvent
     }
     
   }
-  
+
+  /**
+   * removePost
+   *
+   * removing an existing post record
+   * 
+   */
   public function removePost()
   {
     
@@ -508,6 +514,7 @@ class PostEvent
    * 
    * @param string $selected
    * @return string
+   * 
    */
   public static function postStatusDropDown($selected = "")
   {
@@ -548,6 +555,7 @@ class PostEvent
 
 /**
  * postAuthorLevel
+ * 
  * Checking whether author cookie_level or session_level exists
  *
  * @return void|bool return bool if return false elsewhere return void
