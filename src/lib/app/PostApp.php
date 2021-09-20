@@ -138,16 +138,17 @@ class PostApp extends BaseApp
        
       try {
 
-        if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
+         if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
          
-             header($_SERVER["SERVER_PROTOCOL"].' 400 Bad Request');
-             throw new AppException("Sorry, unpleasant attempt detected!");
+            header($_SERVER["SERVER_PROTOCOL"].' 400 Bad Request', true, 400);
+            header('Status: 400 Bad Request');
+            throw new AppException("Sorry, unpleasant attempt detected!");
              
-        } 
+         } 
         
-         if ( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_date', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'comment_status']) == false) {
+         if ( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_date', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_tags', 'post_status', 'post_sticky', 'comment_status']) == false) {
 
-            header($_SERVER["SERVER_PROTOCOL"].' 413 Payload Too Large');
+            header($_SERVER["SERVER_PROTOCOL"].' 413 Payload Too Large', true, 413);
             header('Status: 413 Payload Too Large');
             header('Retry-After: 3600');
             throw new AppException("Sorry, Unpleasant attempt detected");
@@ -285,9 +286,9 @@ class PostApp extends BaseApp
 
               }
 
-            } else {
+           } else {
 
-              list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
+              list($width, $height) = ( !empty($file_location) ) ? getimagesize($file_location) : null;
        
               if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
        
@@ -316,7 +317,7 @@ class PostApp extends BaseApp
 
               $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
        
-               $bind_media = [
+              $bind_media = [
                  'media_filename' => $new_filename, 
                  'media_caption' => prevent_injection(distill_post_request($filters)['post_title']), 
                  'media_type' => $file_type, 
@@ -336,7 +337,7 @@ class PostApp extends BaseApp
 
                $this->postEvent->setPostImage($append_media);
 
-            }
+          }
 
             if(isset($_POST['catID']) && $_POST['catID'] == 0) {
 
@@ -365,9 +366,13 @@ class PostApp extends BaseApp
             $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
             $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
 
-            if (isset($_POST['post_sticky']) && $_POST['post_sticky'] == '0') {
+            if ( empty($_POST['post_sticky']) ) {
             
-              $this->postEvent->setSticky('1');
+              $this->postEvent->setSticky(0);
+
+            } else {
+
+              $this->postEvent->setSticky(distill_post_request($filters)['post_sticky']);
 
             }
             
@@ -497,9 +502,9 @@ class PostApp extends BaseApp
                 
             } 
             
-            if( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'comment_status']) == false) {
+            if( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_modified', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'post_sticky', 'comment_status']) == false) {
 
-                header($_SERVER["SERVER_PROTOCOL"]." 413 Payload Too Large");
+                header($_SERVER["SERVER_PROTOCOL"]." 413 Payload Too Large", true, 413);
                 header('Status: 413 Payload Too Large');
                 header('Retry-After: 3600');
                 throw new AppException("Sorry, Unpleasant attempt detected");
@@ -712,13 +717,13 @@ class PostApp extends BaseApp
               $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
               $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
 
-              if (isset($_POST['post_sticky']) && $_POST['post_sticky'] == '0') {
+              if ( empty($_POST['post_sticky']) ) {
 
-                $this->postEvent->setSticky('1');
+                $this->postEvent->setSticky(0);
 
               } else {
 
-                $this->postEvent->setSticky('0');
+                $this->postEvent->setSticky(distill_post_request($filters)['post_sticky']);
 
               }
               
