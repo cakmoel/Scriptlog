@@ -68,21 +68,21 @@ $post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
 </div>
                 
 <div class="form-group">
-<label>Stick to the top of the blog</label>
+<label>Featured post</label>
 
 <div class="radio">
-<label for="sticky">
-<input type="radio" id="sticky" name="post_sticky" class="flat-red" value="1" 
-<?=(isset($postData['post_sticky']) && $postData['post_sticky'] === 1 ? " checked" : ""); ?>
-<?=(isset($formData['post_sticky']) && $formData['post_sticky'] === 1 ? " checked" : ""); ?>> Yes
+<label for="headlines">
+<input type="radio" id="headlines" name="post_headlines" class="flat-red" value="1" 
+<?=(isset($postData['post_headlines']) && $postData['post_headlines'] === 1 ? " checked" : ""); ?>
+<?=(isset($formData['post_headlines']) && $formData['post_headlines'] === 1 ? " checked" : ""); ?>> Yes
 </label>
 </div>
 
 <div class="radio">
 <label for="sticky">
-<input type="radio" id="sticky" name="post_sticky" class="flat-red" value="0" 
-<?=(isset($postData['post_sticky']) && $postData['post_sticky'] === 0 ? " checked" : ""); ?>
-<?=(isset($formData['post_sticky']) && $formData['post_sticky'] === 0 ? " checked" : ""); ?>> No
+<input type="radio" id="sticky" name="post_headlines" class="flat-red" value="0" 
+<?=(isset($postData['post_headlines']) && $postData['post_headlines'] === 0 ? " checked" : ""); ?>
+<?=(isset($formData['post_headlines']) && $formData['post_headlines'] === 0 ? " checked" : ""); ?>> No
 </label>
 </div>
 
