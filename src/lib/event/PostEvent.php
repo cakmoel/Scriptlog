@@ -95,12 +95,12 @@ class PostEvent
   private $post_status;
   
   /**
-   * post_sticky
+   * post_headlines
    *
    * @var integer
    * 
    */
-  private $post_sticky;
+  private $post_headlines;
 
   /**
    * comment's status
@@ -286,14 +286,14 @@ class PostEvent
   }
 
   /**
-   * set sticky post
+   * setHeadlines
    *
-   * @param int $post_sticky
+   * @param int $post_headlines
    * 
    */
-  public function setSticky($post_sticky)
+  public function setHeadlines($post_headlines)
   {
-    $this->post_sticky = $post_sticky;
+    $this->post_headlines = $post_headlines;
   }
   
   /**
@@ -381,7 +381,7 @@ class PostEvent
           'post_keyword' => $this->meta_key,
           'post_tags' => $this->post_tags,
           'post_status' => $this->post_status,
-          'post_sticky' => $this->post_sticky,
+          'post_headlines' => $this->post_headlines,
           'comment_status' => $this->comment_status
       ], $getCategory['ID']);
       
@@ -398,7 +398,7 @@ class PostEvent
             'post_keyword' => $this->meta_key,
             'post_tags' => $this->post_tags,
             'post_status' => $this->post_status,
-            'post_sticky' => $this->post_sticky,
+            'post_headlines' => $this->post_headlines,
             'comment_status' => $this->comment_status
           ], $this->topics);
       
@@ -438,7 +438,7 @@ class PostEvent
             'post_keyword' => $this->meta_key,
             'post_tags' => $this->post_tags,
             'post_status' => $this->post_status,
-            'post_sticky' => $this->post_sticky,
+            'post_headlines' => $this->post_headlines,
             'comment_status' => $this->comment_status
         ], $this->postId, $this->topics);
          
@@ -455,7 +455,7 @@ class PostEvent
             'post_keyword' => $this->meta_key,
             'post_tags' => $this->post_tags,
             'post_status' => $this->post_status,
-            'post_sticky' => $this->post_sticky,
+            'post_headlines' => $this->post_headlines,
             'comment_status' => $this->comment_status
         ], $this->postId, $this->topics);
         
