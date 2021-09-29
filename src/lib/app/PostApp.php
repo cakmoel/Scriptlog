@@ -127,7 +127,7 @@ class PostApp extends BaseApp
           'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
           'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
           'post_status' => FILTER_SANITIZE_STRING,
-          'post_sticky' => FILTER_SANITIZE_NUMBER_INT,
+          'post_headlines' => FILTER_SANITIZE_NUMBER_INT,
           'comment_status' => FILTER_SANITIZE_STRING
        ];
 
@@ -146,7 +146,7 @@ class PostApp extends BaseApp
              
          } 
         
-         if ( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_date', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_tags', 'post_status', 'post_sticky', 'comment_status']) == false) {
+         if ( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_date', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_tags', 'post_status', 'post_headlines', 'comment_status']) == false) {
 
             header($_SERVER["SERVER_PROTOCOL"].' 413 Payload Too Large', true, 413);
             header('Status: 413 Payload Too Large');
@@ -366,13 +366,13 @@ class PostApp extends BaseApp
             $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
             $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
 
-            if ( empty($_POST['post_sticky']) ) {
+            if ( empty($_POST['post_headlines']) ) {
             
-              $this->postEvent->setSticky(0);
+              $this->postEvent->setHeadlines(0);
 
             } else {
 
-              $this->postEvent->setSticky(distill_post_request($filters)['post_sticky']);
+              $this->postEvent->setHeadlines(distill_post_request($filters)['post_headlines']);
 
             }
             
@@ -461,7 +461,7 @@ class PostApp extends BaseApp
         'post_keyword' => $getPost['post_keyword'],
         'post_tags' => $getPost['post_tags'],
         'post_status' => $getPost['post_status'], 
-        'post_sticky' => $getPost['post_sticky'],
+        'post_headlines' => $getPost['post_headlines'],
         'comment_status' => $getPost['comment_status']
     );
 
@@ -484,7 +484,7 @@ class PostApp extends BaseApp
         'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_status' => FILTER_SANITIZE_STRING,
-        'post_sticky' => FILTER_SANITIZE_NUMBER_INT,
+        'post_headlines' => FILTER_SANITIZE_NUMBER_INT,
         'comment_status' => FILTER_SANITIZE_STRING
       ];
 
@@ -502,7 +502,7 @@ class PostApp extends BaseApp
                 
             } 
             
-            if( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_modified', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'post_sticky', 'comment_status']) == false) {
+            if( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_modified', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'post_headlines', 'comment_status']) == false) {
 
                 header($_SERVER["SERVER_PROTOCOL"]." 413 Payload Too Large", true, 413);
                 header('Status: 413 Payload Too Large');
@@ -717,13 +717,13 @@ class PostApp extends BaseApp
               $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
               $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
 
-              if ( empty($_POST['post_sticky']) ) {
+              if ( empty($_POST['post_headlines']) ) {
 
-                $this->postEvent->setSticky(0);
+                $this->postEvent->setHeadlines(0);
 
               } else {
 
-                $this->postEvent->setSticky(distill_post_request($filters)['post_sticky']);
+                $this->postEvent->setHeadlines(distill_post_request($filters)['post_headlines']);
 
               }
               
