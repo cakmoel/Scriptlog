@@ -30,7 +30,7 @@ public static function check($key, $origin, $throwException = false, $timespan =
 
         if ($throwException) {
 
-            if (version_compare(phpversion(), '5.6.40', '<=')) {
+            if (version_compare(phpversion(), '7.4.24', '<=')) {
 
                 http_response_code(400);
 
@@ -50,7 +50,7 @@ public static function check($key, $origin, $throwException = false, $timespan =
 
         if ($throwException) {
 
-            if (version_compare(phpversion(), '5.6.40', '<=')) {
+            if (version_compare(phpversion(), '7.4.24', '<=')) {
 
                 http_response_code(400);
 
@@ -78,7 +78,7 @@ public static function check($key, $origin, $throwException = false, $timespan =
 
         if ($throwException) {
 
-            if (version_compare(phpversion(), '5.6.40', '<=')) {
+            if (version_compare(phpversion(), '7.4.24', '<=')) {
 
                 http_response_code(400);
 
@@ -96,7 +96,7 @@ public static function check($key, $origin, $throwException = false, $timespan =
 
         if ($throwException) {
 
-            if (version_compare(phpversion(), '5.6.40', '<=')) {
+            if (version_compare(phpversion(), '7.4.24', '<=')) {
 
                 http_response_code(400);
 
@@ -114,7 +114,7 @@ public static function check($key, $origin, $throwException = false, $timespan =
 
         if ($throwException) {
 
-            if (version_compare(phpversion(), '5.6.40', '<=')) {
+            if (version_compare(phpversion(), '7.4.24', '<=')) {
 
                 http_response_code(400);
 
