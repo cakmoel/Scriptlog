@@ -278,7 +278,7 @@ protected function lastId()
               
           } else {
               
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
             throw new DbException("ERROR: this - $str - Id is considered invalid.");
               
           }
@@ -293,7 +293,7 @@ protected function lastId()
               
           } else {
               
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
             throw new DbException("ERROR: this - $str - is considered invalid.");
 
           }
