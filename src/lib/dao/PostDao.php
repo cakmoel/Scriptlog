@@ -311,11 +311,17 @@ try {
 
   $this->callCommit();
 
+} catch (Throwable $th) {
+
+  $this->callRollBack();
+  $this->error = LogError::setStatusCode(http_response_code(500));
+  $this->error = LogError::exceptionHandler($th);
+
 } catch (DbException $e) {
 
-   $this->callRollBack();
-   $this->error = LogError::newMessage($e);
-   $this->error = LogError::customErrorMessage('admin');
+  $this->callRollBack();
+  $this->error = LogError::setStatusCode(http_response_code(500));
+  $this->error = LogError::exceptionHandler($e);
 
 }
 
