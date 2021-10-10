@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class MediaEvent
  * 
@@ -92,6 +92,30 @@ class MediaEvent
  */
  private $meta_value;
 
+/**
+ * media_identifier
+ *
+ * @var string
+ * 
+ */
+ private $media_identifier;
+
+/**
+ * before_expired
+ *
+ * @var string
+ * 
+ */
+ private $before_expired;
+
+/**
+ * ip_address
+ *
+ * @var string
+ * 
+ */
+ private $ip_address;
+
  /**
   * mediaDao
   *
@@ -114,6 +138,14 @@ class MediaEvent
  private $sanitizer;
 
 /**
+ * downloadProvider
+ *
+ * @var object
+ * 
+ */
+ private $downloadProvider;
+
+/**
  * Initialize an intanciates of class properties or method
  * 
  * @param object $mediaDao
@@ -121,12 +153,13 @@ class MediaEvent
  * @param object $sanitizer
  * 
  */
- public function __construct(MediaDao $mediaDao, FormValidator $validator, Sanitize $sanitizer)
+ public function __construct(MediaDao $mediaDao, DownloadProviderModel $downloadProvider, FormValidator $validator, Sanitize $sanitizer)
  {
 
    $this->mediaDao  = $mediaDao;
    $this->validator = $validator;
    $this->sanitizer = $sanitizer;
+   $this->downloadProvider = $downloadProvider;
 
  }
 
@@ -241,6 +274,39 @@ class MediaEvent
  }
 
 /**
+ * setMediaIdentifier
+ *
+ * @param string $media_identifier
+ * 
+ */
+ public function setMediaIdentifier($media_identifier)
+ {
+   $this->media_identifier = $media_identifier;
+ }
+
+/**
+ * setBeforeExpired
+ *
+ * @param string $before_expired
+ * 
+ */
+ public function setBeforeExpired($before_expired)
+ {
+   $this->before_expired = $before_expired;
+ }
+
+/**
+ * setIpAddress
+ *
+ * @param string $ip_address
+ * 
+ */
+ public function setIpAddress($ip_address)
+ {
+   $this->ip_address = $ip_address;
+ }
+
+/**
  * Grab all media
  * retrieve all media records
  * 
@@ -249,7 +315,8 @@ class MediaEvent
  */
  public function grabAllMedia($orderBy = 'ID', $user_level = null)
  {
-   return $this->mediaDao->findAllMedia($orderBy, $user_level);
+   $orderBySanitized = sanitize_sql_orderby($orderBy);
+   return $this->mediaDao->findAllMedia($orderBySanitized, $user_level);
  }
 
 /**
@@ -304,7 +371,7 @@ class MediaEvent
  }
 
 /**
- * Add media meta
+ * AddMediaMeta
  * 
  * @return mixed
  * 
@@ -319,6 +386,24 @@ class MediaEvent
      'media_id' => $this->mediaId,
      'meta_key' => $this->meta_key,
      'meta_value' => $this->meta_value
+   ]);
+
+ }
+
+/**
+ * addMediaDownload
+ *
+ */
+ public function addMediaDownload()
+ {
+   
+  $this->validator->sanitize($this->mediaId, 'int');
+
+  return $this->downloadProvider->createMediaDownload([
+     'media_id' => $this->mediaId,
+     'media_identifier' => $this->media_identifier,
+     'before_expired' => $this->before_expired,
+     'ip_address' => $this->ip_address
    ]);
 
  }
@@ -432,7 +517,7 @@ public function modifyMediaMeta()
 
           if(is_readable(__DIR__ . '/../../public/files/docs/'.$filename)) {
 
-             unlink(__DIR__ . '/../../public/files/docs/'.$filename);
+            unlink(__DIR__ . '/../../public/files/docs/'.$filename);
 
           } 
 
@@ -457,7 +542,7 @@ public function modifyMediaMeta()
 
           if(is_readable(__DIR__ . '/../../public/files/pictures/'.$filename)) {
             
-            // get filename for remove webp image format
+            // get file basename for remove webp image format
             $file_basename = substr($filename, 0, strripos($filename, '.'));
 
             unlink(__DIR__ . '/../../'.APP_IMAGE.$filename);
