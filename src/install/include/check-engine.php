@@ -445,20 +445,42 @@ function check_fileinfo_enabled()
 }
 
 /**
- * Checking ctype_digit function 
- * exists or not
+ * check_gmp_enabled
+ *
+ * @return boolean
+ * 
+ */
+function check_gmp_enabled()
+{
+  if (extension_loaded('gmp')) {
+
+    return true;
+
+  } else {
+
+    return false;
+
+  }
+
+}
+
+/**
+ * check_character_type()
+ * 
+ * Checking ctype_digit function exists or not
+ * 
  */
 function check_character_type()
 {
-    if (!function_exists('ctype_digit')) {
+  if (!function_exists('ctype_digit')) {
         
-        return true;
+    return true;
         
-    } else {
+  } else {
         
-        return false;
+    return false;
         
-    }
+  }
     
 }
 
@@ -552,7 +574,9 @@ function check_modrewrite()
   if ( check_web_server()['WebServer'] == 'LiteSpeed' ) {
       
     if(in_array('mod_rewrite', $apache_modules)) {
-        return true;
+
+      return true;
+      
     }
     
   } 
