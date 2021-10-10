@@ -132,29 +132,13 @@ public function updateMediaDownload($sanitize, $bind, $mediaId)
   if (!empty($bind['media_id'])) {
 
       $this->modify("tbl_media_download", [
-        'media_id' => $bind['media_id'],
         'media_identifier' => $bind['media_identifier'],
         'before_expired' => $bind['before_expired'],
         'ip_address' => $bind['ip_address']
       ], 
-        "ID = {$idsanitized}");
+        "media_id = {$idsanitized}");
 
   } 
-
-}
-
-/**
- * deleteMediaDownload
- *
- * @param int|num $mediaId
- * @param object $sanitize
- * 
- */
-public function deleteMediaDownload($mediaId, $sanitize)
-{
-  $idsanitized = $this->filteringId($sanitize, $mediaId, 'sql');
-  
-  $this->deleteRecord("tbl_media_download", "media_id = ".(int)$idsanitized);
 
 }
 
