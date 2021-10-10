@@ -303,13 +303,13 @@ public function createMediaMeta($bind)
  * @method public updateMedia()
  * @param object $sanitize
  * @param array $bind
- * @param integer $ID
+ * @param integer $mediaId
  * 
  */
-public function updateMedia($sanitize, $bind, $ID)
+public function updateMedia($sanitize, $bind, $mediaId)
 {
   
-  $id_sanitized = $this->filteringId($sanitize, $ID, 'sql');
+  $id_sanitized = $this->filteringId($sanitize, $mediaId, 'sql');
  
   if(!empty($bind['media_filename'])) {
 
@@ -340,17 +340,17 @@ public function updateMedia($sanitize, $bind, $ID)
 }
 
 /**
- * Update media meta
+ * updateMediaMeta
  *
  * @param object $sanitize
  * @param array $bind
- * @param integer $ID
+ * @param integer $mediaId
  * @return void
  * 
  */
-public function updateMediaMeta($sanitize, $bind, $ID)
+public function updateMediaMeta($sanitize, $bind, $mediaId)
 {
-  $idsanitized = $this->filteringId($sanitize, $ID, 'sql');
+  $idsanitized = $this->filteringId($sanitize, $mediaId, 'sql');
 
   if (!empty($bind['meta_key'])) {
 
@@ -373,13 +373,14 @@ public function updateMediaMeta($sanitize, $bind, $ID)
  * @param object $sanitize
  * 
  */
-public function deleteMedia($ID, $sanitize)
+public function deleteMedia($mediaId, $sanitize)
 {
   
-  $clean_id = $this->filteringId($sanitize, $ID, 'sql');
+  $idsanitized = $this->filteringId($sanitize, $mediaId, 'sql');
   
-  $this->deleteRecord("tbl_media", "ID = ".(int)$clean_id, 1);
-  $this->deleteRecord("tbl_mediameta", "media_id = ".(int)$clean_id, 1);
+  $this->deleteRecord("tbl_media", "ID = ".(int)$idsanitized, 1);
+  $this->deleteRecord("tbl_mediameta", "media_id = ".(int)$idsanitized, 1);
+  $this->deleteRecord("tbl_media_download", "media_id".(int)$idsanitized, 1);
 
 }
 
