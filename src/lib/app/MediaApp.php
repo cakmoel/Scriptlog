@@ -28,6 +28,8 @@ private $view;
  */
 private $mediaEvent;
 
+const TIME_BEFORE_EXPIRED = 8;
+
 /**
  * Initialize object properties
  * 
@@ -129,7 +131,7 @@ public function insert()
 
       if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
               
-         header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+         header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
          $checkError = false;
          array_push($errors, "Sorry, unpleasant attempt detected!");
        
@@ -146,7 +148,7 @@ public function insert()
 
       }
 
-      if (false === sanitize_selection_box(distill_post_request($filters)['media_target'], ['blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery'])) {
+      if (false === sanitize_selection_box(distill_post_request($filters)['media_target'], ['blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery', 'page' => 'Page'])) {
 
           $checkError = false;
           array_push($errors, "Please choose the available value provided!");
@@ -242,7 +244,7 @@ public function insert()
        // upload file
       if (is_uploaded_file($file_location)) {
 
-        if ( (false === check_file_extension($file_name) ) || ( false === check_mime_type(mime_type_dictionary(), $file_location) ) ) {
+        if ( ( false === check_file_extension($file_name) ) || ( false === check_mime_type(mime_type_dictionary(), $file_location) ) ) {
 
            $checkError = false;
            array_push($errors, "Invalid file format");
@@ -283,10 +285,21 @@ public function insert()
          if($media_id) {
             
            $this->mediaEvent->setMediaId($media_id);
+           
            $this->mediaEvent->setMediaKey($new_filename);
            $this->mediaEvent->setMediaValue(json_encode($media_metavalue));
            $this->mediaEvent->addMediaMeta();
- 
+           
+           if (isset($_POST['media_target']) && $_POST['media_target'] == 'download') {
+             
+            $this->mediaEvent->setMediaId($media_id);
+            $this->mediaEvent->setMediaIdentifier(generate_media_identifier());
+            $this->mediaEvent->setBeforeExpired(time() + self::TIME_BEFORE_EXPIRED * 60 * 60);
+            $this->mediaEvent->setIpAddress(get_ip_address());
+            $this->mediaEvent->addMediaDownload();
+             
+           }
+           
          }
 
          direct_page('index.php?load=medialib&status=mediaAdded', 200);
@@ -409,7 +422,7 @@ public function update($id)
 
       }
 
-      if (false === sanitize_selection_box(distill_post_request($filters)['media_target'], ['blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery'])) {
+      if (false === sanitize_selection_box(distill_post_request($filters)['media_target'], ['blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery', 'page' => 'Page'])) {
 
         $checkError = false;
         array_push($errors, "Please choose the available value provided!");
@@ -499,7 +512,7 @@ public function update($id)
           
          }
   
-         if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
+         if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp" || $file_extension === "bmp" ) {
 
             list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
             
@@ -549,6 +562,16 @@ public function update($id)
          $this->mediaEvent->setMediaKey($new_filename);
          $this->mediaEvent->setMediaValue(json_encode($media_metavalue));
          $this->mediaEvent->modifyMediaMeta();
+
+        if (isset($_POST['media_target']) && $_POST['media_target'] == 'download') {
+
+          $this->mediaEvent->setMediaId(distill_post_request($filters)['media_id']);
+          $this->mediaEvent->setMediaIdentifier(generate_media_identifier());
+          $this->mediaEvent->setBeforeExpired(time() + self::TIME_BEFORE_EXPIRED * 60 * 60);
+          $this->mediaEvent->setIpAddress(get_ip_address());
+          $this->mediaEvent->modifyMediaDownload();
+            
+        }
 
       } else {
 
