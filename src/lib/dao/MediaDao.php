@@ -380,7 +380,7 @@ public function deleteMedia($mediaId, $sanitize)
   
   $this->deleteRecord("tbl_media", "ID = ".(int)$idsanitized, 1);
   $this->deleteRecord("tbl_mediameta", "media_id = ".(int)$idsanitized, 1);
-  $this->deleteRecord("tbl_media_download", "media_id".(int)$idsanitized, 1);
+  $this->deleteRecord("tbl_media_download", "media_id = ".(int)$idsanitized, 1);
 
 }
 
