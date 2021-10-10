@@ -3,7 +3,8 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $mediaId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $mediaDao = new MediaDao();
-$mediaEvent = new MediaEvent($mediaDao, $validator, $sanitizer);
+$downloadProvider = new DownloadProviderModel();
+$mediaEvent = new MediaEvent($mediaDao, $downloadProvider, $validator, $sanitizer);
 $mediaLib = new MediaApp($mediaEvent);
 
 try {
