@@ -445,7 +445,7 @@ class MediaEvent
  }
 
 /**
- * Modify meta media
+ * ModifyMetaMedia()
  *
  * @return void
  * 
@@ -462,6 +462,22 @@ public function modifyMediaMeta()
     ], $this->mediaId);
 
   }
+
+}
+
+/**
+ * modifyMediaDownload
+ *
+ */
+public function modifyMediaDownload()
+{
+  $this->validator->sanitize($this->mediaId, 'int');
+
+  return $this->downloadProvider->updateMediaDownload($this->sanitizer, [
+    'media_identifier' => $this->media_identifier,
+    'before_expired' => $this->before_expired,
+    'ip_address' => $this->ip_address
+  ], $this->mediaId);
 
 }
 
