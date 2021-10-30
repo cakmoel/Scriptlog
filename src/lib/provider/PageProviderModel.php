@@ -57,10 +57,11 @@ return (empty($postById)) ?: $postById;
  */
 public function getPageBySlug($slug, $sanitize)
 {
-	$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
-    p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_sticky, 
-	p.post_type, p.comment_status,
-    m.ID, m.media_filename, m.media_caption, m.media_access, u.ID, u.user_fullname
+
+$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
+        p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_sticky, 
+	    p.post_type, p.comment_status,
+        m.ID, m.media_filename, m.media_caption, m.media_access, u.ID, u.user_fullname
     FROM tbl_posts AS p
     INNER JOIN tbl_media AS m ON p.media_id = m.ID
     INNER JOIN tbl_users AS u ON p.post_author = u.ID
@@ -87,18 +88,10 @@ public function getPageBySlug($slug, $sanitize)
 public function getRandomStickyPages()
 {
 
-$sql = "SELECT p.ID, p.media_id, p.post_author,
-    p.post_date, p.post_modified, p.post_title,
-    p.post_slug, p.post_content, p.post_summary,
-    p.post_keyword, p.post_tags, p.post_sticky,
-    p.post_type, p.post_status, u.user_login, u.user_fullname,
-    m.media_filename, m.media_caption, m.media_target, m.media_access
-FROM tbl_posts AS p
-NOT IN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 1) AS p2 ON p.ID = p2.ID 
-INNER JOIN tbl_users AS u ON p.post_author = u.ID
-INNER JOIN tbl_media AS m ON p.media_id = m.ID
-WHERE p.post_type = 'page' AND p.post_status = 'publish' 
-AND p.post_sticky = '1' ";
+$sql = "SELECT ID, post_title, post_content FROM tbl_posts 
+WHERE post_sticky = '1' 
+AND post_status = 'publish' 
+AND post_type = 'page' ORDER BY RAND() LIMIT 1 ";
 
 $this->setSQL($sql);
 
