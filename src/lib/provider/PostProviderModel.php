@@ -48,6 +48,37 @@ public function getPostFeeds($limit = 5)
 }
 
 /**
+ * getLatesetPosts
+ *
+ * @param int|numeric $position
+ * @param int|num $limit
+ * @param PDO::FETCH_MODE static $fetchMode = null
+ * @return mixed
+ * 
+ */
+public function getLatestPosts($position, $limit, $fetchMode = null)
+{
+
+$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
+  p.post_title, p.post_slug, p.post_content, p.post_summary, 
+  p.post_keyword, p.post_tags, p.post_status, p.post_type, p.comment_status, 
+  m.media_filename, m.media_caption, m.media_access, u.user_fullname
+FROM tbl_posts AS p 
+INNER JOIN tbl_media AS m ON p.media_id = m.ID
+INNER JOIN tbl_users AS u ON p.post_author = u.ID
+WHERE p.post_status = 'publish'
+AND p.post_type = 'blog' 
+ORDER BY p.ID DESC LIMIT :position, :limit";
+
+$this->setSQL($sql);
+
+$latestPosts = (is_null($fetchMode) ) ? $this->findAll([':position' => $position, ':limit' => $limit]) : $this->findAll([':position' => $position, ':limit' => $limit], $fetchMode);
+
+return ( empty($latestPosts) ) ?: $latestPosts;
+
+}
+
+/**
  * getPostById
  * 
  * retrieving detail post record by Id
@@ -57,7 +88,7 @@ public function getPostFeeds($limit = 5)
  * @return boolean|array|object
  *
  */
-public function getPostById($id, $sanitize, $post_type, $media_target, $fetchMode = null)
+public function getPostById($id, $sanitize, $fetchMode = null)
 {
     $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
             p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_sticky, p.post_type, 
@@ -67,14 +98,14 @@ public function getPostById($id, $sanitize, $post_type, $media_target, $fetchMod
     INNER JOIN tbl_media AS m ON p.media_id = m.ID
     INNER JOIN tbl_users AS u ON p.post_author = u.ID
     WHERE p.ID = :ID AND p.post_status = 'publish'
-    AND p.post_type = ':post_type' AND m.media_target = ':media_target'
+    AND p.post_type = 'blog' AND m.media_target = 'blog'
     AND m.media_access = 'public' AND m.media_status = '1'";
 
     $sanitized_id = $this->filteringId($sanitize, $id, 'sql');
 
     $this->setSQL($sql);
 
-    $postById = (is_null($fetchMode)) ? $this->findRow([':ID' => (int)$sanitized_id, ':post_type'=>$post_type, ':media_target'=>$media_target]) : $this->findRow([':ID' => (int)$sanitized_id, ':post_type' => $post_type, ':media_target' => $media_target], $fetchMode);
+    $postById = (is_null($fetchMode)) ? $this->findRow([':ID' => (int)$sanitized_id]) : $this->findRow([':ID' => (int)$sanitized_id], $fetchMode);
 
     return (empty($postById)) ?: $postById;
 
@@ -88,7 +119,7 @@ public function getPostById($id, $sanitize, $post_type, $media_target, $fetchMod
  * @return mixed
  *
  */
-public function getPostBySlug($slug, $post_type, $media_target, $sanitize)
+public function getPostBySlug($slug, $sanitize)
 {
 
   $sql = "SELECT p.ID, p.media_id, p.post_author,
@@ -103,14 +134,14 @@ public function getPostBySlug($slug, $post_type, $media_target, $sanitize)
           INNER JOIN tbl_users AS u ON p.post_author = u.ID
           INNER JOIN tbl_media AS m ON p.media_id = m.ID
           WHERE p.post_slug = :slug AND p.post_status = 'publish'
-          AND p.post_type = ':post_type' AND m.media_target = ':media_target'
+          AND p.post_type = 'blog' AND m.media_target = 'blog'
           AND m.media_access = 'public' AND m.media_status = '1'";
 
   $this->setSQL($sql);
 
   $slug_sanitized = $this->filteringId($sanitize, $slug, 'xss');
 
-  $postBySlug = $this->findRow([':slug' => $slug_sanitized, ':post_type' => $post_type, ':media_target' => $media_target]);
+  $postBySlug = $this->findRow([':slug' => $slug_sanitized]);
 
   return (empty($postBySlug)) ?: $postBySlug;
 
@@ -125,7 +156,7 @@ public function getPostBySlug($slug, $post_type, $media_target, $sanitize)
  * @return mixed
  * 
  */
-public function getPostByAuthor($author, $post_type, $media_target)
+public function getPostByAuthor($author)
 {
   
   $sql = "SELECT p.ID, p.media_id, p.post_author,
@@ -139,13 +170,13 @@ public function getPostByAuthor($author, $post_type, $media_target)
           FROM tbl_posts AS p
           INNER JOIN tbl_user AS u ON p.post_author = u.ID
           INNER JOIN tbl_media AS m ON p.media_id = m.ID
-          WHERE p.post_author = :author AND p.post_status = 'publish'
-          AND p.post_type = 'post_type' AND m.media_target = ':media_target'
+          WHERE u.user_fullname = :author AND p.post_status = 'publish'
+          AND p.post_type = 'blog' AND m.media_target = 'blog'
           AND m.media_access = 'public' AND m.media_status = '1'";
 
   $this->setSQL($sql);
 
-  $postByAuthor = $this->findRow([':author' => $author, ':post_type' => $post_type, ':media_target' => $media_target]);
+  $postByAuthor = $this->findRow([':author' => $author]);
 
   return (empty($postByAuthor)) ?: $postByAuthor;
 
@@ -154,7 +185,8 @@ public function getPostByAuthor($author, $post_type, $media_target)
 /**
  * getPostsPublished
  * 
- * retrieving all records published
+ * retrieving all records published 
+ * and display it on blog
  *
  * @param Paginator $perPage
  * @param object $sanitize
@@ -214,9 +246,9 @@ $sql = "SELECT p.ID, p.media_id, p.post_author,
         p.post_slug, p.post_content, p.post_summary,
         p.post_keyword, p.post_tags, p.post_sticky,
         p.post_type, p.post_status, u.user_login, u.user_fullname,
-        m.media_filename, m.media_caption, m.media_target, m.media_access
+        m.media_filename, m.media_caption, m.media_type, m.media_target, m.media_access
 FROM tbl_posts AS p
-INNER JOIN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 1) AS p2 ON p.ID = p2.ID 
+INNER JOIN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 5) AS p2 ON p.ID = p2.ID 
 INNER JOIN tbl_users AS u ON p.post_author = u.ID
 INNER JOIN tbl_media AS m ON p.media_id = m.ID
 WHERE p.post_type = 'blog'
@@ -260,10 +292,10 @@ public function getRelatedPosts($post_title)
 /**
  * getRandomPosts
  *
- * retrieving random posts
+ * retrieving random posts and display it on homepage
  * 
  * @param int $limit
- * @return array
+ * @return mixed
  *
  */
 public function getRandomPosts($limit)
@@ -271,12 +303,15 @@ public function getRandomPosts($limit)
 
   $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
           p.post_title, p.post_slug, p.post_content, p.post_tags,
-          m.media_filename, m.media_caption
+          m.media_filename, m.media_caption, u.user_fullname
           FROM tbl_posts AS p
+          INNER JOIN tbl_users AS u ON p.post_author = u.ID
           INNER JOIN tbl_media AS m
           INNER JOIN
             (SELECT ROUND(RAND() * (SELECT MAX(ID) FROM tbl_media )) AS id ) AS m2
           WHERE p.media_id >= m2.ID
+          AND p.post_status = 'publish'
+          AND p.post_type = 'blog'
           LIMIT :limit";
 
   $this->setSQL($sql);
@@ -372,6 +407,25 @@ $this->setSQL($sql);
 $sidebar_posts = $this->findAll([':status' => $status, ':position'=> $start, ':limit' => $limit]);
 
 return (empty($sidebar_posts)) ?: ['sidebarPosts' => $sidebar_posts];
+
+}
+
+/**
+ * getArchivesPosts
+ * 
+ * @return mixed
+ */
+public function getArchivesPosts()
+{
+
+$sql = "SELECT MONTH(post_date) AS month, YEAR(post_date) AS year 
+        FROM tbl_posts GROUP BY month, year ORDER BY month DESC";
+
+$this->setSQL($sql);
+
+$archives = $this->findAll();
+
+return (empty($archives)) ?: $archives;
 
 }
 
