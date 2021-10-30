@@ -1,6 +1,7 @@
 <?php
 /**
- * the collection of paragraph function
+ * paragraph_l2br()
+ * 
  * handle text on paragraph as a post content
  * Example: paragraph_l2br(htmlspecialchars(paragraph_trim($post_content)))
  * 
@@ -15,20 +16,32 @@
 function paragraph_l2br($content)
 {
   
-  if(version_compare(phpversion(), '5.6.40', '<')) {
+  if(version_compare(phpversion(), '7.4.25', '<')) {
 
       return str_replace(paragraph_newline_checker(), '<br>', $content);
 
   }
 
-  return nl2br(htmlspecialchars(paragraph_trim($content)), false);
+  return nl2br(paragraph_trim($content), false);
 
 }
 
-function paragraph_trim($content, $limit = 500, $schr="\n", $scnt=2)
+/**
+ * paragraph_trim()
+ *
+ * @param string $content
+ * @param integer $limit
+ * @param string $schr
+ * @param integer $scnt
+ * 
+ */
+function paragraph_trim($content, $limit = 320, $schr="\n", $scnt=2)
 {
+  
   $post = 0;
+  
   $trimmed = false;
+
   for($i = 1; $i <= $scnt; $i++) {
 
     if($tmp = strpos($content, $schr, $post+1)) {
@@ -44,20 +57,27 @@ function paragraph_trim($content, $limit = 500, $schr="\n", $scnt=2)
 
   $content = substr($content, 0, $post);
 
-  if(strlen($content) > $limit) {
+  if(strlen($content) >= $limit) {
+
     $content = substr($content, 0, $limit);
-    $content = substr($content, 0, strrpos($content,' '));
+    $content = substr($content, 0, strrpos($content, ' '));
     $trimmed = true;
+
   }
 
   if($trimmed) $content .= '...';
 
-  return $content;
+  return safe_html($content);
 
 }
 
+/**
+ * paragraph_newline_checker
+ *
+ */
 function paragraph_newline_checker()
 {
+
   if(defined('PHP_EOL')) {
 
       return PHP_EOL;
