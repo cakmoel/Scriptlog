@@ -1,23 +1,32 @@
 <?php
-#######################################################################
-#   File Setup.php 
-#   These collections of functions to setup installation 
-#   and write config.php file
-#
-#   @category   Installation file
-#   @author     M.Noermoehammad
-#   @license    MIT
-#   @version    1.0
-#   @since      Since Release 1.0
-#######################################################################
+/**
+ * File setup.php
+ * 
+ * These collections of functions to setup installation and write config.php file
+ * 
+ * @category Installation file
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
+ * 
+ */
 
+/**
+ * current_url()
+ * 
+ * returning current URL
+ *
+ * @return mixed
+ * 
+ */
 function current_url()
 {
-   $scheme = (!empty($_SERVER['HTTPS']) and $_SERVER['HTTPS'] !== "off") ? "https" : "http" ;
+
+  $scheme = (!empty($_SERVER['HTTPS']) and $_SERVER['HTTPS'] !== "off") ? "https" : "http" ;
    
-   $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] ;
+  $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] ;
    
-   return $scheme."://".$host.dirname($_SERVER['PHP_SELF']) . "/";
+  return $scheme."://".$host.dirname($_SERVER['PHP_SELF']) . "/";
 
 }
 
@@ -188,7 +197,8 @@ $post_per_rss_value = "10";
 
 // Setting Permalink
 $permalink_key = "permalink_setting";
-$permalink_value = "yes";
+$permalink_value = array('rewrite' => 'no', 'server_software' => check_web_server()['WebServer']);
+$store_permalink_value = json_encode($permalink_value);
 
 if ($link instanceof mysqli) 
 #create users table
@@ -269,7 +279,7 @@ if ($link->insert_id && $createAdmin->affected_rows > 0) {
 
     // insert configuration - permalinks
     $recordPermalinks = $link->prepare($savePermalinks);
-    $recordPermalinks->bind_param('ss', $permalink_key, $permalink_value);
+    $recordPermalinks->bind_param('ss', $permalink_key, $store_permalink_value);
     $recordPermalinks->execute();
 
     // insert default theme
