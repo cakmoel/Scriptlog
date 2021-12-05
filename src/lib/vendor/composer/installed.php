@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '04e1209d2798c1c6281fd8741ff465ff6dad1c47',
+    'reference' => '9051b7c6aa33aa7f6b7c83405615fb23868b6f54',
     'name' => '__root__',
   ),
   'versions' => 
@@ -18,7 +18,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '04e1209d2798c1c6281fd8741ff465ff6dad1c47',
+      'reference' => '9051b7c6aa33aa7f6b7c83405615fb23868b6f54',
     ),
     'doctrine/lexer' => 
     array (
@@ -31,12 +31,12 @@
     ),
     'egulias/email-validator' => 
     array (
-      'pretty_version' => '3.1.1',
-      'version' => '3.1.1.0',
+      'pretty_version' => '3.1.2',
+      'version' => '3.1.2.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'c81f18a3efb941d8c4d2e025f6183b5c6d697307',
+      'reference' => 'ee0db30118f661fb166bcffbf5d82032df484697',
     ),
     'filp/whoops' => 
     array (
@@ -216,12 +216,12 @@
     ),
     'voku/anti-xss' => 
     array (
-      'pretty_version' => '4.1.33',
-      'version' => '4.1.33.0',
+      'pretty_version' => '4.1.34',
+      'version' => '4.1.34.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'dcd44ad3726e97e3ea924e4c7257cb33976b71a5',
+      'reference' => 'a8b061eb2e01f6f57fd135dc519343564fb658ff',
     ),
     'voku/portable-ascii' => 
     array (
