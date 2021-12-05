@@ -9,7 +9,6 @@
  * @since     Since Release 0.1
  * 
  */
-
 require dirname(__FILE__) . '/include/settings.php';
 require dirname(__FILE__) . '/include/setup.php';
 require dirname(__FILE__) . '/install-layout.php';
@@ -29,14 +28,14 @@ if((check_dbtable($dbconnect, 'tbl_users') == true) || (check_dbtable($dbconnect
 || (check_dbtable($dbconnect, 'tbl_media') == true) || (check_dbtable($dbconnect, 'tbl_media_download') == true) 
 || (check_dbtable($dbconnect, 'tbl_comments') == true) || (check_dbtable($dbconnect, 'tbl_comment_reply') == true)) {
 
-  $create_db = $protocol . '://' . $server_host . dirname($_SERVER['PHP_SELF']) . DIRECTORY_SEPARATOR .'install.php';
+  $create_db = $protocol . '://' . $server_host . dirname($_SERVER['PHP_SELF']) . DIRECTORY_SEPARATOR .'setup-db.php';
 
-  header("Location: $create_db");
+  header("Location: $create_db", true, 302);
 
 } else {
 
-   header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-   exit("Database has been installed!");
+  header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+  exit("Database has been installed!");
 
 }
 
@@ -52,21 +51,13 @@ if((check_dbtable($dbconnect, 'tbl_users') == true) || (check_dbtable($dbconnect
 
 if ($install != 'install') {
     
-    if (version_compare(PHP_VERSION, '5.6', '>=')) {
+  (version_compare(PHP_VERSION, '7.4', '>=') ) ? clearstatcache() : clearstatcache(true);
 
-        clearstatcache();
+  $_SESSION['install'] = false;
 
-    } else {
-
-        clearstatcache(true);
-        
-    }
+  header($installation_path, true, 302);
     
-    $_SESSION['install'] = false;
-
-    header($installation_path);
-    
-  } else {
+} else {
     
     $dbhost = isset($_POST['db_host']) ? escapeHTML($_POST['db_host']) : "";
     $dbname = filter_input(INPUT_POST, 'db_name', FILTER_SANITIZE_STRING);
@@ -266,15 +257,15 @@ if ($install != 'install') {
 
               if (true === write_config_file($protocol, $server_host, $dbhost, $dbuser, $dbpass, $dbname, $email, $key)) {
 
-                header("Location:".$protocol."://".$server_host.dirname($_SERVER['PHP_SELF']).DIRECTORY_SEPARATOR."finish.php?status=success&token={$key}");
+                header("Location:".$protocol."://".$server_host.dirname($_SERVER['PHP_SELF']).DIRECTORY_SEPARATOR."finish.php?status=success&token={$key}", true, 302);
 
-            }       
+              }       
         
           }
 
         } catch(mysqli_sql_exception $e) {
 
-           throw $e;
+          throw $e;
            
         }
         
@@ -309,7 +300,7 @@ install_header($current_path, $protocol, $server_host);
 
     <?= required_settings(); ?>
 
-    <?php if(check_web_server()['WebServer'] == 'nginx') : ?>
+    <?php if( strtolower(check_web_server()['WebServer']) == 'nginx') : ?>
       
       <h4 class="d-flex justify-content-between align-items-center mb-3">
       <span class="text-muted">Directories and Files</span>
@@ -429,7 +420,7 @@ install_header($current_path, $protocol, $server_host);
     
   </div>
 
-  </div>
+  </div>  
 
 <?php
 
@@ -437,4 +428,4 @@ install_footer($current_path, $protocol, $server_host);
 
 ob_end_flush();
 
-} 
+}
