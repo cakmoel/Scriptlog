@@ -17,7 +17,7 @@ use Sinergi\BrowserDetector\Browser;
 function check_php_version()
 {
    
-  if (version_compare(PHP_VERSION, '5.6', '>=')) {
+  if (version_compare(PHP_VERSION, '7.4', '>=')) {
         
     return true;
         
@@ -30,7 +30,13 @@ function check_php_version()
 }
 
 /**
- * Checking MySQL Server Version Function
+ * check_mysql_version()
+ * 
+ * Checking mysql version
+ * 
+ * @category installation file
+ * @param string $link
+ * 
  */
 function check_mysql_version($link, $min)
 {
@@ -227,6 +233,9 @@ function check_loader()
 
 /**
  * Checking Log Directory. It is writable or not
+ * 
+ * @return bool
+ * 
  */
 function check_log_dir()
 {
@@ -386,7 +395,7 @@ function check_filter_enabled()
 /**
  * Checking extension iconv
  * 
- * @return bool
+ * @return boolean
  * 
  */
 function check_iconv_enabled()
@@ -563,7 +572,7 @@ function check_gd_enabled()
  */
 function check_modrewrite()
 {
-  $apache_modules = ( function_exists('apache_get_modules')  ? apache_get_modules() : exit() ) ;
+  $apache_modules = ( function_exists('apache_get_modules')  ? apache_get_modules() : exit() );
   
   if( ( check_web_server()['WebServer'] == 'Apache') && ( in_array('mod_rewrite', $apache_modules ) ) ) {
 
@@ -573,7 +582,7 @@ function check_modrewrite()
   
   if ( check_web_server()['WebServer'] == 'LiteSpeed' ) {
       
-    if(in_array('mod_rewrite', $apache_modules)) {
+    if( in_array('mod_rewrite', $apache_modules)) {
 
       return true;
       
