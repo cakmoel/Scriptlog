@@ -2,9 +2,14 @@
 /**
  * File dbtable.php
  * 
+ * @category Installation file
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
+ * 
  */
 $tblUser = "CREATE TABLE IF NOT EXISTS tbl_users (
-ID BIGINT(20) unsigned NOT NULL auto_increment,
+ID BIGINT(20) unsigned NOT NULL AUTO_INCREMENT,
 user_login VARCHAR(60) NOT NULL UNIQUE,
 user_email VARCHAR(100) NOT NULL UNIQUE,
 user_pass VARCHAR(255) NOT NULL,
@@ -159,12 +164,12 @@ PRIMARY KEY(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
         
 $tblSetting = "CREATE TABLE IF NOT EXISTS tbl_settings (
-ID INT(5) unsigned NOT NULL AUTO_INCREMENT,
-setting_name VARCHAR(100) NOT NULL,
-setting_value VARCHAR(255) NOT NULL,
+ID INT(11) unsigned NOT NULL AUTO_INCREMENT,
+setting_name VARCHAR(255) NOT NULL,
+setting_value TEXT DEFAULT NULL,
 PRIMARY KEY(ID),
-KEY (setting_name),
-KEY (setting_value)
+KEY setting_name(setting_name(191)),
+KEY setting_value(setting_value(191))
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
         
 $tblTheme = "CREATE TABLE IF NOT EXISTS tbl_themes (
