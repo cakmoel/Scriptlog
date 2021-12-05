@@ -379,7 +379,6 @@ function required_settings()
                   $gmp_passed = 'text-success';
                   $gmp_checked = 'fa fa-check fa-lg';
               }
-                
           ?>
 
     <small class="<?=(isset($gmp_passed)) ? $gmp_passed : 'text-danger'; ?>"><?=(isset($gmp_passed)) ? 'Pass' : $errors['errorChecking'] = 'Scriptlog requires the GNU Multiple Precision extension'; ?></small>
