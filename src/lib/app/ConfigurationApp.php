@@ -350,6 +350,8 @@ class ConfigurationApp
       'setting_value' => $getPermalinkValue['setting_value']
     );
 
+    $server_software = json_decode($data_permalink['setting_value'], true);
+
     $filters = ['permalinks' => FILTER_SANITIZE_STRING, 'setting_id' => FILTER_SANITIZE_NUMBER_INT, 'setting_name' => FILTER_SANITIZE_STRING];
     
     if(isset($_POST['configFormSubmit'])) {
@@ -358,7 +360,7 @@ class ConfigurationApp
         
         if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
 
-          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
           throw new AppException("Sorry, unpleasant attempt detected!");
         
         }
@@ -382,10 +384,28 @@ class ConfigurationApp
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
         } else {
-
+        
           $this->configEvent->setConfigId((int)distill_post_request($filters)['setting_id']);
+
           $this->configEvent->setConfigName(prevent_injection(distill_post_request($filters)['setting_name']));
-          $this->configEvent->setConfigValue(distill_post_request($filters)['permalinks']);
+
+          $permalink_value = array(
+
+            'rewrite' => distill_post_request($filters)['permalinks'],
+            'server_software' => find_webserver_name()['WebServer'],
+      
+          );
+
+          $updated_permalink_value = json_encode($permalink_value);
+          
+          $this->configEvent->setConfigValue($updated_permalink_value);
+
+          if ( ( $server_software['server_software'] == 'Apache' ) || ( $server_software['server_software'] == 'LiteSpeed' ) ) {
+
+            write_htaccess( distill_post_request($filters)['permalinks'], Session::getInstance()->scriptlog_session_level, read_htaccess_config(distill_post_request($filters)['permalinks'] ) );
+
+          }
+           
           $this->configEvent->modifySetting();
 
           direct_page('index.php?load=option-permalink&status=permalinkConfigUpdated', 200);
@@ -429,8 +449,8 @@ class ConfigurationApp
       }
 
       $this->view->set('pageTitle', $this->getPageTitle());
-      $this->view->set('settingData', $data_permalink);
       $this->view->set('formAction', $this->getFormAction());
+      $this->view->set('permalinkData', $data_permalink);
       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
     }
