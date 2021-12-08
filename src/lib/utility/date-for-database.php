@@ -8,11 +8,20 @@
  * @return string
  * 
  */
-function date_for_database($date)
+function date_for_database($date = null)
 {
 
-$timestamp = strtotime($date);
-$date_formated = date('Y-m-d H:i:s', $timestamp);
+if ( ! is_null($date) ) {
+
+ $timestamp = strtotime($date);
+ $date_formated = date("Y-m-d H:i:s", $timestamp);
+
+} else {
+
+ $date_formated = date("Y-m-d H:i:s");
+
+}
+
 return $date_formated;
 
 }
