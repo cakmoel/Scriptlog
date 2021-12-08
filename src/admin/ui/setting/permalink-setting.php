@@ -56,20 +56,27 @@ endif;
 endif;
 
 $action = (isset($formAction)) ? $formAction : null;
-$paramId = (isset($settingData['ID'])) ? abs((int)$settingData['ID']) : 0;
+$paramId = (isset($permalinkData['ID'])) ? abs((int)$permalinkData['ID']) : 0;
+
 ?>
 
 <div class="box-body">
   
      <form method="post" action="<?= generate_request('index.php', 'get', ['option-permalink', $action, 0])['link']; ?>" role="form">
         <input type="hidden" name="setting_id" value="<?= $paramId; ?>">
-        <input type="hidden" name="setting_name" value="<?=(!isset($settingData['setting_name']) ?: safe_html($settingData['setting_name'])); ?>">
+        <input type="hidden" name="setting_name" value="<?=(!isset($permalinkData['setting_name']) ?: safe_html($permalinkData['setting_name'])); ?>">
         <div class="form-group">
           <label for="permalink">Enable SEO-Friendly URL</label>
           <select class="form-control select2" style="width: 100%;" name="permalinks" id="permalink">
             
             <?php 
-              if(isset($settingData['setting_value']) && $settingData['setting_value'] == 'yes'):
+              
+              if ( isset($permalinkData['setting_value']) ) :
+                
+                $permalink_value = json_decode($permalinkData['setting_value'], true);
+
+                if ($permalink_value['rewrite'] == 'yes') :
+
             ?>
               <option value="yes" selected="selected">Yes</option>
               <option value="no" >No</option>
@@ -78,7 +85,7 @@ $paramId = (isset($settingData['ID'])) ? abs((int)$settingData['ID']) : 0;
             ?>
             <option value="no" selected="selected">No</option>
             <option value="yes">Yes</option>
-              <?php endif; ?>
+            <?php endif; endif; ?>
           </select>
         </div>
         <div class="box-footer">
