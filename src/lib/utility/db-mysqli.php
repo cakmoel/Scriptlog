@@ -91,33 +91,33 @@ function is_table_exists($table)
 function check_table()
 {
 
+$dbscheme = false;
+
+if ( ( APP_DEVELOPMENT === true ) && ( !(is_table_exists('tbl_comments') 
+|| is_table_exists('tbl_comment_reply') 
+|| is_table_exists('tbl_login_attempt')
+|| is_table_exists('tbl_media') 
+|| is_table_exists('tbl_mediameta') 
+|| is_table_exists('tbl_media_download') 
+|| is_table_exists('tbl_menu') 
+|| is_table_exists('tbl_plugin') 
+|| is_table_exists('tbl_posts') 
+|| is_table_exists('tbl_post_topic') 
+|| is_table_exists('tbl_settings') 
+|| is_table_exists('tbl_themes') 
+|| is_table_exists('tbl_topics') 
+|| is_table_exists('tbl_users') 
+|| is_table_exists('tbl_user_token'))) ) {
+
   $dbscheme = false;
 
-  if (!(is_table_exists('tbl_comments') 
-      || is_table_exists('tbl_comment_reply') 
-      || is_table_exists('tbl_login_attempt')
-      || is_table_exists('tbl_media') 
-      || is_table_exists('tbl_mediameta') 
-      || is_table_exists('tbl_media_download') 
-      || is_table_exists('tbl_menu') 
-      || is_table_exists('tbl_plugin') 
-      || is_table_exists('tbl_posts') 
-      || is_table_exists('tbl_post_topic') 
-      || is_table_exists('tbl_settings') 
-      || is_table_exists('tbl_themes') 
-      || is_table_exists('tbl_topics') 
-      || is_table_exists('tbl_users') 
-      || is_table_exists('tbl_user_token'))) {
+} else {
 
-        $dbscheme = false;
+  $dbscheme = true;
 
-  } else {
-
-      $dbscheme = true;
-
-  }
-
-  yield $dbscheme;
+}
+ 
+return $dbscheme;
 
 }
 
