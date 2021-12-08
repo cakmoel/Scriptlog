@@ -83,7 +83,7 @@ function theme_meta()
 
         if (!empty($uri->param1)) {
 
-          $theme_meta['site_title'] = title_tag(ucfirst(trim(escape_html($uri->param1)) .' '. escape_html($uri->param3)) . ' &#8211; ' . escape_html(app_info()['site_name']));
+          $theme_meta['site_title'] = title_tag(ucfirst(trim(escape_html(grab_month($uri->param2)).' '. escape_html($uri->param3)))  . ' &#8211; ' . escape_html(app_info()['site_name']));
         
           $theme_meta['meta_tag'] = meta_tag();
 
