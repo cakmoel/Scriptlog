@@ -23,8 +23,7 @@ ini_set('session.gc_divisor', 100);
 ini_set('session.gc_maxlifetime', 1440);
 ini_set('session.gc_probability',1);
 
-// Opt out of FLoC
-header("Permissions-Policy: interest-cohort=()");
+#header("Permissions-Policy: interest-cohort=()"); // Opt out of FLoC
 
 require __DIR__ . '/common.php';
 
@@ -94,13 +93,17 @@ if (is_readable(APP_ROOT.APP_LIBRARY.DS.'vendor/autoload.php')) {
 Autoloader::setBaseDir(APP_ROOT);
 // load libraries necessary by system
 Autoloader::addClassDir(array(
-  APP_ROOT . APP_LIBRARY . DS . 'core'    . DS,
+  APP_ROOT . APP_LIBRARY . DS . 'core'    . DS,  
   APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
   APP_ROOT . APP_LIBRARY . DS . 'event'   . DS,
   APP_ROOT . APP_LIBRARY . DS . 'app'     . DS,
   APP_ROOT . APP_LIBRARY . DS . 'provider'. DS
-)); 
+));
 
+x_frame_option();
+x_content_type_options();
+x_xss_protection();
+strict_transport_security();
 call_htmlpurifier();
 get_server_load();
 whoops_error();
