@@ -31,15 +31,21 @@ public function __construct()
  * @param integer $ID
  * 
  */
-public function updateConfig($sanitize, $bind, $ID)
+public function updateConfig($sanitize, $bind, $configId)
 {
-  $cleanId = $this->filteringId($sanitize, $ID, 'sql');
+  $cleanId = $this->filteringId($sanitize, $configId, 'sql');
 
-  $this->modify("tbl_settings", [
-	  'setting_name' => $bind['setting_name'],
-	  'setting_value' => $bind['setting_value']
-  ], " ID = ".(int)$cleanId);
+  if ( !empty($bind['setting_name'])) {
 
+    $this->modify("tbl_settings", [
+
+      'setting_name' => $bind['setting_name'],
+      'setting_value' => $bind['setting_value']
+      
+    ], " ID = ".(int)$cleanId);
+  
+  }
+ 
 }
 
 /**
@@ -49,9 +55,9 @@ public function updateConfig($sanitize, $bind, $ID)
  * @param integer $ID
  * 
  */
-public function deleteConfig($ID, $sanitize)
+public function deleteConfig($configId, $sanitize)
 {
-  $clean_id = $this->filteringId($sanitize, $ID, 'sql');
+  $clean_id = $this->filteringId($sanitize, $configId, 'sql');
 
   $this->deleteRecord("tbl_settings", "ID = ".(int)$clean_id);
 
@@ -161,7 +167,7 @@ public function findConfigByName($setting_name, $sanitize)
 
   $this->setSQL($sql);
 
-  $detailConfig = $this->findRow([':setting_name' => $setting_name]);
+  $detailConfig = $this->findRow([':setting_name' => $name_sanitized]);
 
   return (empty($detailConfig)) ?: $detailConfig;
 
