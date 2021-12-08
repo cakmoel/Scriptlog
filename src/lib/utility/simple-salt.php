@@ -1,8 +1,14 @@
 <?php
 /**
- * simple salt function
+ * simple_salt
+ * 
  * generating simple salt
  * 
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
+ * @param int|number $num_chars
  * @return string
  * 
  */
@@ -11,9 +17,9 @@ function simple_salt($num_chars)
   
  if((is_numeric($num_chars)) && ($num_chars > 0) && (!is_null($num_chars))) {
 
-     $salt = '';
+     $salt = null;
      
-     $accepted_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890/+';
+     $accepted_chars = ircmaxell_generator_string('low', $num_chars);
 
      srand(((int)((double)microtime()*1000003)));
 
@@ -26,7 +32,7 @@ function simple_salt($num_chars)
      }
 
      return $salt;
-
+     
  }
   
 }
