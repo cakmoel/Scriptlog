@@ -75,7 +75,7 @@ class ConfigurationEvent
 
   public function setConfigValue($setting_value)
   {
-    $this->setting_value = prevent_injection($setting_value);
+    $this->setting_value = $setting_value;
   }
 
   public function grabSettings($orderBy = 'ID')
@@ -120,12 +120,17 @@ class ConfigurationEvent
   {
     
     $this->validator->sanitize($this->setting_name, 'string');
-    $this->validator->sanitize($this->setting_value, 'string');
-  
-    return $this->configDao->updateConfig($this->sanitizer, [
-       'setting_name' => $this->setting_name,
-       'setting_value' => $this->setting_value
-    ], $this->setting_id);
+    
+    if ( !empty($this->setting_name)) {
+
+      return $this->configDao->updateConfig($this->sanitizer, [
+
+        'setting_name' => $this->setting_name,
+        'setting_value' => $this->setting_value
+
+     ], $this->setting_id);
+
+    }
     
   }
   
