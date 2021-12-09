@@ -1,171 +1,245 @@
- <!-- Hero Section-->
- <section style="background: url(img/hero.jpg); background-size: cover; background-position: center center" class="hero">
+ <?php 
+ 
+$hero_headlines = featured_post();
+
+if ( is_array($hero_headlines) ) :
+
+   foreach ($hero_headlines as $hero_headline) {
+     
+     $featured_hero_img = isset($hero_headline['media_filename']) ? safe_html($hero_headline['media_filename']) : "";
+     $featured_hero_title = isset($hero_headline['post_title']) ? safe_html($hero_headline['post_title']) : "";
+
+   }
+
+?>
+
+<!-- Hero Section--> 
+<section style="background: url('<?= isset($featured_hero_img) ? invoke_webp_image($featured_hero_img, false) : "https://via.placeholder.com/1920x1438";?>'); background-size: cover; background-position: center center" class="hero transparent">
       <div class="container">
         <div class="row">
           <div class="col-lg-7">
-            <h1>Bootstrap 4 Blog - A free template by Bootstrap Temple</h1><a href="#" class="hero-link">Discover More</a>
+            <h1 style="color: #379392;"><?=isset($featured_hero_title) ? $featured_hero_title : ""; ?></h1>
+            <a href="#" class="hero-link">Discover More</a>
           </div>
         </div><a href=".intro" class="continue link-scroll"><i class="fa fa-long-arrow-down"></i> Scroll Down</a>
       </div>
-    </section>
- <!-- Intro Section-->
- <section class="intro">
+</section>
+
+<?php 
+else:
+
+  echo nothing_found();
+
+endif;
+?>
+
+<?php 
+
+$sticky_page = sticky_page();
+
+ if ( is_array($sticky_page) ) :
+
+   foreach ($sticky_page as $sticky) :
+     
+    $sticky_title = isset($sticky['post_title']) ? safe_html($sticky['post_title']) : "";
+    $sticky_content = isset($sticky['post_content']) ? safe_html($sticky['post_content']) : "";
+     
+   endforeach; 
+
+?>
+
+<!-- Intro Section-->
+<section class="intro">
       <div class="container">
         <div class="row">
           <div class="col-lg-8">
-            <h2 class="h3">Some great intro here</h2>
+         
+  <h2 class="h3"><?= isset($sticky_title) ? $sticky_title : ""; ?></h2>
             <p class="text-big">
-           
-<?php
-
-echo "<pre>";
-$requestPath = new RequestPath();
-echo "Request matched: {$requestPath->matched} <br>";
-echo "Request param1: {$requestPath->param1} <br>";
-echo "Request param2: {$requestPath->param2} <br>";
-echo "Request param3: {$requestPath->param3} <br>";
-echo "</pre>";
-
-echo "<pre>";
-echo "<b>Server Request URI:</b>".$_SERVER['REQUEST_URI'];
-echo "</pre>";
-
-echo "<pre>";
-echo "<pre>Server Request Path Info:</pre>" . var_dump($_SERVER);
-echo "<br>Page executed in: ".$time = (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']);
-echo '</pre>';
-
-?>
+              <?= isset($sticky_content) ? $sticky_content : ""; ?>
             </p>
+          
           </div>
-        </div>
-      </div>
-    </section>
-    <section class="featured-posts no-padding-top">
-      <div class="container">
-        <!-- Post-->
-        <div class="row d-flex align-items-stretch">
-          <div class="text col-lg-7">
-            <div class="text-inner d-flex align-items-center">
-              <div class="content">
-                <header class="post-header">
-                  <div class="category"><a href="#">Business</a><a href="#">Technology</a></div><a href="post.html">
-                    <h2 class="h4">Alberto Savoia Can Teach You About Interior</h2></a>
-                </header>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrude consectetur adipisicing elit, sed do eiusmod tempor incididunt.</p>
-                <footer class="post-footer d-flex align-items-center"><a href="#" class="author d-flex align-items-center flex-wrap">
-                    <div class="avatar"><img src="<?=theme_dir(); ?>assets/img/avatar-1.jpg" alt="..." class="img-fluid"></div>
-                    <div class="title"><span>John Doe</span></div></a>
-                  <div class="date"><i class="icon-clock"></i> 2 months ago</div>
-                  <div class="comments"><i class="icon-comment"></i>12</div>
-                </footer>
-              </div>
-            </div>
-          </div>
-          <div class="image col-lg-5"><img src="<?= theme_dir();?>assets/img/featured-pic-1.jpeg" alt="..."></div>
-        </div>
-        <!-- Post        -->
-        <div class="row d-flex align-items-stretch">
-          <div class="image col-lg-5"><img src="img/featured-pic-2.jpeg" alt="..."></div>
-          <div class="text col-lg-7">
-            <div class="text-inner d-flex align-items-center">
-              <div class="content">
-                <header class="post-header">
-                  <div class="category"><a href="#">Business</a><a href="#">Technology</a></div><a href="post.html">
-                    <h2 class="h4">Alberto Savoia Can Teach You About Interior</h2></a>
-                </header>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrude consectetur adipisicing elit, sed do eiusmod tempor incididunt.</p>
-                <footer class="post-footer d-flex align-items-center"><a href="#" class="author d-flex align-items-center flex-wrap">
-                    <div class="avatar"><img src="img/avatar-2.jpg" alt="..." class="img-fluid"></div>
-                    <div class="title"><span>John Doe</span></div></a>
-                  <div class="date"><i class="icon-clock"></i> 2 months ago</div>
-                  <div class="comments"><i class="icon-comment"></i>12</div>
-                </footer>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Post                            -->
-        <div class="row d-flex align-items-stretch">
-          <div class="text col-lg-7">
-            <div class="text-inner d-flex align-items-center">
-              <div class="content">
-                <header class="post-header">
-                  <div class="category"><a href="#">Business</a><a href="#">Technology</a></div><a href="post.html">
-                    <h2 class="h4">Alberto Savoia Can Teach You About Interior</h2></a>
-                </header>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrude consectetur adipisicing elit, sed do eiusmod tempor incididunt.</p>
-                <footer class="post-footer d-flex align-items-center"><a href="#" class="author d-flex align-items-center flex-wrap">
-                    <div class="avatar"><img src="img/avatar-3.jpg" alt="..." class="img-fluid"></div>
-                    <div class="title"><span>John Doe</span></div></a>
-                  <div class="date"><i class="icon-clock"></i> 2 months ago</div>
-                  <div class="comments"><i class="icon-comment"></i>12</div>
-                </footer>
-              </div>
-            </div>
-          </div>
-          <div class="image col-lg-5"><img src="img/featured-pic-3.jpeg" alt="..."></div>
         </div>
       </div>
 </section>
-<!-- divider  -->
-<section style="background: url(img/divider-bg.jpg); background-size: cover; background-position: center bottom" class="divider">
+
+<?php 
+else :
+
+  echo nothing_found();
+
+endif; 
+?>
+
+<!-- random post/featured post -->
+<section class="featured-posts no-padding-top">
+  <div class="container">
+        
+<?php 
+    
+$random_posts = random_posts(3);
+
+if ( is_array($random_posts) ) :
+
+    $r = 0;
+
+  foreach ($random_posts as $random_post) :
+
+    $r++;
+
+    if ( $r++ % 2 == 1) :
+
+?>
+
+<!-- Random Post-->
+        <div class="row d-flex align-items-stretch">
+          <div class="text col-lg-7">
+            <div class="text-inner d-flex align-items-center">
+              <div class="content">
+
+        <?php 
+              
+        $post_topics = retrieve_post_topic(isset($random_post['ID']) ? (int)$random_post['ID'] : "");
+
+        if (is_array($post_topics)) :
+
+            $topic_links = [];
+           
+            foreach ( $post_topics as $post_topic ) :
+     
+              $random_post_img = isset($post_topic['media_filename']) ? safe_html($post_topic['media_filename']) : "";
+              $random_post_author = (isset($post_topic['user_fullname']) || isset($post_topic['user_login']) ) ? safe_html($post_topic['user_fullname']) : safe_html($post_topic['user_login']);
+              $topic_slug = isset($post_topic['topic_slug']) ? safe_html($post_topic['topic_slug']) : "";
+              $topic_title = isset($post_topic['topic  title']) ? safe_html($post_topic['topic_title']) : "";
+
+              $topic_links[] = "<a href='".app_url().DS."category'".DS."$topic_slug.'>".$topic_title."</a>";
+
+           endforeach;
+
+        endif;
+              
+       ?>
+              
+          <header class="post-header">
+              <div class="category">
+                    <?= isset($topic_links) ? implode(", ", $topic_links) : "";?>
+                  </div>
+                  <a href="#">
+                    <h2 class="h4"> 
+                       <?=isset($random_post['post_title']) ? safe_html($random_post['post_title']) : ""; ?> 
+                    </h2>
+                  </a>
+                </header>
+
+                <p><?= isset($random_post['post_content']) ? paragraph_l2br($random_post['post_content']) : ""; ?></p></p>
+                <footer class="post-footer d-flex align-items-center">
+                  <a href="#" class="author d-flex align-items-center flex-wrap">
+                    <div class="avatar"><i class="fa fa-user-circle"></i></div>
+                    <div class="title"><span><?= isset($random_post_author) ? $random_post_author : ""; ?></span></div>
+                  </a>
+                  <div class="date"><i class="icon-clock"></i> <?= isset($random_post['post_modified']) ? safe_html(make_date($random_post['post_modified'])) : safe_html(make_date($random_post['post_date'])); ?></div>
+                </footer>
+              </div>
+            </div>
+          </div>
+          <div class="image col-lg-5"><img src="<?=isset($random_post_img) ? invoke_webp_image($random_post_img) : "https://via.placeholder.com/516x344"; ?>" alt="<?= isset($random_post['post_title']) ? safe_html($random_post['post_title']) : ""; ?>"></div>
+        </div>
+            
+<?php  
+     endif;
+   endforeach; 
+  else:
+     echo nothing_found();
+  endif;   
+?>
+  </div>
+      <!--.container-->
+</section>
+
+<!-- divider section -->
+
+<?php 
+$divider_contents = featured_post();
+
+if ( is_array( $divider_contents ) ) :
+
+  foreach ($divider_contents as $divider_content) {
+    
+    $featured_divider_img = isset($divider_content['media_filename']) ? safe_html($divider_content['media_filename']) : "";
+     
+  }
+
+?>
+
+<section style="background: url(https://via.placeholder.com/1920x1280); background-size: cover; background-position: center bottom" class="divider">
       <div class="container">
         <div class="row">
           <div class="col-md-7">
-            <h2>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</h2><a href="#" class="hero-link">View More</a>
+            <h2></h2><a href="#" class="hero-link">View More</a>
           </div>
         </div>
       </div>
-    </section>
+</section>
+
+<?php 
+else :
+
+  echo nothing_found();
+
+endif;
+?>
+
 <!-- Latest Post -->
 <section class="latest-posts"> 
       <div class="container">
         <header> 
           <h2>Latest from the blog</h2>
-          <p class="text-big">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+          <p class="text-big"></p>
         </header>
         <div class="row">
+          
+<?php 
+
+$latest_posts = latest_posts(0, 3);
+
+if ( is_array($latest_posts) ) :
+
+    foreach ( $latest_posts as $latest_post ) :
+
+      $latest_img = isset($latest_post['media_filename']) ? safe_html($latest_post['media_filename']) : "";
+      $latest_title = isset($latest_post['post_title']) ? safe_html($latest_post['post_title']) : "";
+
+?>
           <div class="post col-md-4">
-            <div class="post-thumbnail"><a href="post.html"><img src="img/blog-1.jpg" alt="..." class="img-fluid"></a></div>
+            <div class="post-thumbnail">
+              <a href="">
+                <img src="<?= isset($latest_img) ? $latest_img : "https:via.placeholder.com/640x450"?>" alt="<?=isset($latest_title) ? $latest_title : ""; ?>" class="img-fluid">
+              </a>
+            </div>
             <div class="post-details">
               <div class="post-meta d-flex justify-content-between">
-                <div class="date">20 May | 2016</div>
+                <div class="date">  </div>
                 <div class="category"><a href="#">Business</a></div>
               </div><a href="post.html">
                 <h3 class="h4">Ways to remember your important ideas</h3></a>
               <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore.</p>
             </div>
           </div>
-          <div class="post col-md-4">
-            <div class="post-thumbnail"><a href="post.html"><img src="img/blog-2.jpg" alt="..." class="img-fluid"></a></div>
-            <div class="post-details">
-              <div class="post-meta d-flex justify-content-between">
-                <div class="date">20 May | 2016</div>
-                <div class="category"><a href="#">Technology</a></div>
-              </div><a href="post.html">
-                <h3 class="h4">Diversity in Engineering: Effect on Questions</h3></a>
-              <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore.</p>
-            </div>
-          </div>
-          <div class="post col-md-4">
-            <div class="post-thumbnail"><a href="post.html"><img src="img/blog-3.jpg" alt="..." class="img-fluid"></a></div>
-            <div class="post-details">
-              <div class="post-meta d-flex justify-content-between">
-                <div class="date">20 May | 2016</div>
-                <div class="category"><a href="#">Financial</a></div>
-              </div><a href="post.html">
-                <h3 class="h4">Alberto Savoia Can Teach You About Interior</h3></a>
-              <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore.</p>
-            </div>
-          </div>
+          
+<?php 
+ endforeach;
+endif;
+?>         
+
         </div>
       </div>
 </section>
     
-<!-- Newsletter -->
+<!-- Newsletter Section -->
 <section class="newsletter no-padding-top">    
       <div class="container">
+        <!-- 
         <div class="row">
           <div class="col-md-6">
             <h2>Subscribe to Newsletter</h2>
@@ -181,7 +255,7 @@ echo '</pre>';
               </form>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
 </section>
 
