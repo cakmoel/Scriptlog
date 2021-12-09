@@ -392,7 +392,7 @@ class ConfigurationApp
           $permalink_value = array(
 
             'rewrite' => distill_post_request($filters)['permalinks'],
-            'server_software' => find_webserver_name()['WebServer'],
+            'server_software' => find_webserver_name(),
       
           );
 
@@ -402,10 +402,10 @@ class ConfigurationApp
 
           if ( ( $server_software['server_software'] == 'Apache' ) || ( $server_software['server_software'] == 'LiteSpeed' ) ) {
 
-            write_htaccess( distill_post_request($filters)['permalinks'], Session::getInstance()->scriptlog_session_level, read_htaccess_config(distill_post_request($filters)['permalinks'] ) );
+            write_htaccess( distill_post_request($filters)['permalinks'], Session::getInstance()->scriptlog_session_level, read_htaccess_config( distill_post_request($filters)['permalinks'] ) );
 
           }
-           
+          
           $this->configEvent->modifySetting();
 
           direct_page('index.php?load=option-permalink&status=permalinkConfigUpdated', 200);
