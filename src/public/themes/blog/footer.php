@@ -1,4 +1,3 @@
-
 <footer class="main-footer">
       <div class="container">
         <!--
@@ -39,15 +38,15 @@
           <div class="col-md-4">
             <div class="latest-posts"><a href="#">
                 <div class="post d-flex align-items-center">
-                  <div class="image"><img src="<?= theme_dir(); ?>/img/small-thumbnail-1.jpg" alt="..." class="img-fluid"></div>
+                  <div class="image"><img src="/img/small-thumbnail-1.jpg" alt="..." class="img-fluid"></div>
                   <div class="title"><strong>Hotels for all budgets</strong><span class="date last-meta">October 26, 2016</span></div>
                 </div></a><a href="#">
                 <div class="post d-flex align-items-center">
-                  <div class="image"><img src="<?= theme_dir(); ?>/img/small-thumbnail-2.jpg" alt="..." class="img-fluid"></div>
+                  <div class="image"><img src="/img/small-thumbnail-2.jpg" alt="..." class="img-fluid"></div>
                   <div class="title"><strong>Great street atrs in London</strong><span class="date last-meta">October 26, 2016</span></div>
                 </div></a><a href="#">
                 <div class="post d-flex align-items-center">
-                  <div class="image"><img src="<?= theme_dir(); ?>/img/small-thumbnail-3.jpg" alt="..." class="img-fluid"></div>
+                  <div class="image"><img src="/img/small-thumbnail-3.jpg" alt="..." class="img-fluid"></div>
                   <div class="title"><strong>Best coffee shops in Sydney</strong><span class="date last-meta">October 26, 2016</span></div>
                 </div></a></div>
           </div>
@@ -72,9 +71,9 @@
     </footer>
     <!-- JavaScript files-->
     <script src="<?= theme_dir(); ?>assets/vendor/jquery/jquery.min.js"></script>
-    <script src="<?= theme_dir(); ?>assets/vendor/popper.js/umd/popper.min.js"> </script>
+    <script src="<?= theme_dir(); ?>assets/vendor/popper.js/umd/popper.min.js"></script>
     <script src="<?= theme_dir(); ?>assets/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="<?= theme_dir(); ?>assets/vendor/jquery.cookie/jquery.cookie.js"> </script>
+    <script src="<?= theme_dir(); ?>assets/vendor/jquery.cookie/jquery.cookie.js"></script>
     <script src="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.js"></script>
     <script src="<?= theme_dir(); ?>assets/js/front.js"></script>
     <script src="<?= theme_dir(); ?>assets/js/multidropdown.js"></script>
