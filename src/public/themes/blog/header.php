@@ -19,20 +19,25 @@ require dirname(__FILE__) . '/functions.php';
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/dropdown.css">
 <link rel="shortcut icon" href="<?= app_url() . '/favicon.ico'; ?>">
 
-
-  <!-- Tweaks for older IEs--><!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
-
+<!-- Tweaks for older IEs--><!--[if lt IE 9]>
+<script src="<?= theme_dir(); ?>assets/js/html5shiv.min.js"></script>
+<script src="<?= theme_dir(); ?>assets/js/respond.min.js"></script><![endif]-->
+<style>
+.transparent {
+	zoom: 1;
+	filter: alpha(opacity=50);
+	opacity: 0.5;
+}
+</style>
 </head>
   
 <body>
 <header class="header">
-      <!-- Main Navbar-->
-      <nav class="navbar navbar-expand-md navbar-light bg-light btco-hover-menu">
-        <div class="search-area">
-          <div class="search-area-inner d-flex align-items-center justify-content-center">
-            <div class="close-btn"><i class="icon-close"></i></div>
+  <!-- Main Navbar-->
+  <nav class="navbar navbar-expand-md navbar-light bg-light btco-hover-menu">
+  <div class="search-area">
+    <div class="search-area-inner d-flex align-items-center justify-content-center">
+    <div class="close-btn"><i class="icon-close"></i></div>
             <div class="row d-flex justify-content-center">
               <div class="col-md-8">
                 <form action="#">
@@ -121,4 +126,4 @@ require dirname(__FILE__) . '/functions.php';
           </div>
         </div>
       </nav>
-    </header>
+</header>
