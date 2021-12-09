@@ -11,13 +11,17 @@ echo "Request param3: {$requestPath->param3} <br>";
 echo "</pre>";
 
 echo "<pre>";
-echo "<b>Server Request URI:</b>".$_SERVER['REQUEST_URI'];
+echo "<b>Server Request URI:</b>".trim($_SERVER['REQUEST_URI'], '/')."<br>";
+
+
+
 echo "</pre>";
 
 echo "<pre>";
-echo "<pre>Server Request Path Info:</pre>" . var_dump($_SERVER);
+print_r($_SERVER);
 echo "<br>Page executed in: ".$time = (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']);
 echo '</pre>';
+
 ?>
 
 </p>
