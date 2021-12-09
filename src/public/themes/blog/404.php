@@ -33,9 +33,7 @@ function hideURLbar(){ window.scrollTo(0,1); }
 		<h2>404</h2>
 		<p><span class="sub-agileinfo">Whoops! </span>That page can't be found.</p>
 		<!--form-->
-			<form class="newsletter" action="#" method="post">
-				
-			</form>
+			<form class="newsletter" action="#" method="post"></form>
 
 		<!--//form-->
 	</div>
