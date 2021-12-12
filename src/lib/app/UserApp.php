@@ -24,6 +24,13 @@ class UserApp extends BaseApp
     $this->userEvent = $userEvent;       
   }
   
+/**
+ * listItems()
+ * 
+ * retrieves all of users record and display it
+ *
+ * @return mixed
+ */
   public function listItems()
   {
    
@@ -31,21 +38,26 @@ class UserApp extends BaseApp
     $status = array();
     $checkError = true;
     $checkStatus = false;
-     
-    if (isset($_GET['error'])) {
-        $checkError = false;
-        if ($_GET['error'] == 'userNotFound') array_push($errors, "Error: User Not Found!");
-        if ($_GET['error'] == 'adminDeletedNotified') array_push($errors, "Error: Administrator could not be deleted");
-    }
-    
-    if (isset($_GET['status'])) {
+
+    if (isset($_SESSION['status'])) {
+        
         $checkStatus = true;
-        if ($_GET['status'] == 'userAdded') array_push($status, "New user added");
-        if ($_GET['status'] == 'userUpdated') array_push($status, "User has been updated");
-        if ($_GET['status'] == 'userDeleted') array_push($status, "User deleted");
+        if ($_SESSION['status'] == 'userAdded') array_push($status, "New user added");
+        if ($_SESSION['status'] == 'userUpdated') array_push($status, "User has been updated");
+        if ($_SESSION['status'] == 'userDeleted') array_push($status, "User deleted");
+        unset($_SESSION['status']);
+
     }
-    
-     
+   
+   if (isset($_SESSION['error'])) {
+
+      $checkError = false;
+      if ($_SESSION['error'] == 'userNotFound') array_push($errors, "Error: User Not Found"); 
+      if ($_SESSION['error'] == 'adminDeletedNotified') array_push($errors, "Error: Administrator could not be deleted");
+      unset($_SESSION['error']);
+
+   }
+
     $this->setView('all-users');
     
     if (!$checkError) {
@@ -70,6 +82,8 @@ class UserApp extends BaseApp
   }
 
   /**
+   * showProfile()
+   * 
    * Show individual user profile (except:administrator)
    * retrieve individual user profile based on their user login
    * 
@@ -83,15 +97,22 @@ class UserApp extends BaseApp
     $status = array();
     $checkError = true;
     $checkStatus = false;
-     
-    if (isset($_GET['error'])) {
+   
+    if (isset($_SESSION['error'])) {
+        
         $checkError = false;
-        if ($_GET['error'] == 'profileNotFound') array_push($errors, "Error: Profile Not Found!");
+        if ($_SESSION['error'] == 'profileNotFound') array_push($errors, "Error: Profile Not Found!");
+        unset($_SESSION['error']);
+
     }
     
-    if (isset($_GET['status'])) {
+    if (isset($_SESSION['status'])) {
+        
         $checkStatus = true;
-        if ($_GET['status'] == 'profilUpdated') array_push($status, "Profile has been updated");
+        if ($_SESSION['status'] == 'profilUpdated') array_push($status, "Profile has been updated");
+        unset($_SESSION['status']);
+
+
     }
     
     if (!$getUser = $this->userEvent->grabUserByLogin($user_login)) {
@@ -150,7 +171,7 @@ class UserApp extends BaseApp
    
     $errors = array();
     $checkError = true;
-    
+   
     if (isset($_POST['userFormSubmit'])) {
        
         $filters = ['user_login' => FILTER_SANITIZE_STRING, 'user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 
@@ -278,10 +299,10 @@ class UserApp extends BaseApp
                 } else {
                 
                     $this->userEvent->addUser();
-                                        
+                    $_SESSION['status'] = "userAdded";
                 }
                 
-                direct_page('index.php?load=users&status=userAdded', 200);
+                direct_page('index.php?load=users&status=userAdded', 302);
                 
             }
             
@@ -329,6 +350,7 @@ class UserApp extends BaseApp
 
     if (!$getUser = $this->userEvent->grabUser($id)) {
         
+       $_SESSION['error'] = "userNotFound";
        direct_page('index.php?load=users&error=userNotFound', 404);
         
     }
@@ -434,7 +456,7 @@ class UserApp extends BaseApp
         if ( ( !empty($_POST['user_url']) ) && ( !url_validation($_POST['user_url']) ) ) {
                  
             $checkError = false;
-            array_push($errors, "Please enter a valid URL");
+            array_push($errors, "Please enter a valid URL Website");
             
         }
 
@@ -509,8 +531,8 @@ class UserApp extends BaseApp
             }
  
               $this->userEvent->modifyUser();
-
-              direct_page('index.php?load=users&status=userUpdated', 200);
+              $_SESSION['status'] = "userUpdated";
+              direct_page('index.php?load=users&status=userUpdated', 302);
                       
           }
           
@@ -569,7 +591,8 @@ class UserApp extends BaseApp
 
     if(!$getProfile = $this->userEvent->grabUserByLogin($user_login)) {
 
-        direct_page('index.php?load=404&notfound='.notfound_id(), 404);
+        $_SESSION['error'] = "profilNotFound";
+        direct_page('index.php?load=users&error=profilNotFound', 404);
 
     }
 
@@ -713,8 +736,8 @@ class UserApp extends BaseApp
             }
 
             $this->userEvent->modifyUser();
-
-            direct_page('index.php?load=users&status=userUpdated', 200);
+            $_SESSION['status'] = "profilUpdated";
+            direct_page('index.php?load=users&status=profilUpdated', 200);
 
         }
             
@@ -799,7 +822,8 @@ class UserApp extends BaseApp
 
            $this->userEvent->setUserId($id);
            $this->userEvent->removeUser();
-           direct_page('index.php?load=users&status=userDeleted', 200);
+           $_SESSION['status'] = "userDeleted";
+           direct_page('index.php?load=users&status=userDeleted', 302);
 
         }
 
