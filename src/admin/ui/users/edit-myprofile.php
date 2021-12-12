@@ -5,22 +5,22 @@
 <section class="content-header">
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
+        <small>Control Panel</small>
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
         <li><a href="#">User</a></li>
         <li class="active">Profile</li>
       </ol>
-    </section>
+</section>
 
-    <!-- Main content -->
-    <section class="content">
+<!-- Main content -->
+<section class="content">
+<div class="row">
+  <div class="col-md-3">
 
-      <div class="row">
-        <div class="col-md-3">
-
-          <!-- Profile Image -->
-          <div class="box box-primary">
+      <!-- Profile Image -->
+      <div class="box box-primary">
             <div class="box-body box-profile">
 
               <img class="profile-user-img img-responsive img-circle" src="<?=app_url().DS.APP_ADMIN.DS.'assets/dist/img/profilepict.png'?>" alt="User profile picture">
@@ -51,26 +51,25 @@
 
             </div>
             <!-- /.box-body -->
-          </div>
-          <!-- /.box -->
+      </div>
+      <!-- /.box -->
 
-          <!-- About Me Box -->
-          <div class="box box-primary">
-            <div class="box-header with-border">
-              <h3 class="box-title">My profile</h3>
-            </div>
-            <!-- /.box-header -->
-            <div class="box-body">
+<!-- About Me Box -->
+<div class="box box-primary">
+  <div class="box-header with-border">
+    <h2 class="box-title">My profile</h2>
+  </div>
+  <!-- /.box-header -->
+  <div class="box-body">
               
-              <strong><i class="fa fa-user margin-r-5"></i> Role</strong>
+    <strong><i class="fa fa-user margin-r-5"></i> Role</strong>
 
-              <p class="text-muted">
-                <?=(isset($userData['user_level'])) ? safe_html($userData['user_level']) : ""; ?>
-              </p>
+      <p class="text-muted">
+          <?=(isset($userData['user_level'])) ? safe_html($userData['user_level']) : ""; ?>
+      </p>
+      <hr>
 
-              <hr>
-
-              <strong><i class="fa fa-envelope margin-r-5"></i> Email Address</strong>
+        <strong><i class="fa fa-envelope margin-r-5"></i> Email Address</strong>
 
               <p class="text-muted"><?=(isset($userData['user_email'])) ? safe_html( $userData['user_email']) : ""; ?></p>
 
@@ -83,14 +82,14 @@
 </p>
 
 
-            </div>
-            <!-- /.box-body -->
-          </div>
+  </div>
+    <!-- /.box-body -->
+  </div>
           <!-- /.box -->
-        </div>
-        <!-- /.col -->
-        <div class="col-md-9">
-        <div class="box box-primary">
+  </div>
+        <!-- /.col md-3-->
+<div class="col-md-9">
+<div class="box box-primary">
 <div class="box-header with-border"></div>
 <!-- /.box-header -->
 
@@ -99,7 +98,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
+<h4><i class="icon fa fa-warning"></i> Invalid form data!</h4>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -115,7 +114,7 @@ if (isset($status)) :
 ?>
 <div class="alert alert-success alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-check"></i> Your  data has been updated!</h4>
+<h4><i class="icon fa fa-check"></i> 
 <?php 
     foreach ($status as $s) :
                 
@@ -123,17 +122,18 @@ if (isset($status)) :
               
     endforeach;
            
-?>          
+?>
+</h4>          
 </div>
+
 <?php 
   endif;
-?>
 
-<?php
 $action = isset($formAction) ? $formAction : null;
 $user_id = isset($userData['ID']) ? safe_html((int)$userData['ID']) : 0;
 $session_id = isset($userData['user_session']) ? safe_html($userData['user_session']) : null;
 ?>
+
 <form name="scriptlogForm" method="post" action="<?=generate_request('index.php', 'post', ['users', $action, $user_id, $session_id])['link']; ?>" role="form" autocomplete="off">
 <input type="hidden" name="user_id" value="<?= $user_id; ?>" />
 <input type="hidden" name="session_id" value="<?= $session_id; ?>" />
@@ -202,11 +202,11 @@ if ((isset($userData['user_login'])) && ($userData['user_login'] != '')) :
             
 </div>
 <!-- /.box -->
-        </div>
+</div>
         <!-- /.col -->
       </div>
       <!-- /.row -->
 
-    </section>
+</section>
     <!-- /.content -->
 </div>
