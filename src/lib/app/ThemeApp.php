@@ -27,16 +27,18 @@ class ThemeApp extends BaseApp
     $checkError = true;
     $checkStatus = false;
 
-    if (isset($_GET['error'])) {
-       if ($_GET['error'] == "themeNotFound") array_push($errors, "Error: Theme is not found");
+    if (isset($_SESSION['error'])) {
+       if ($_SESSION['error'] == "themeNotFound") array_push($errors, "Error: Theme is not found");
+       unset($_SESSION['error']);
     }
 
-    if (isset($_GET['status'])) {
-        if ($_GET['status'] == "themeAdded") array_push($errors, "New theme added");
-        if ($_GET['status'] == "themeInstalled") array_push($errors, "Theme installation process is successful, please activate it first to see it works!");
-        if ($_GET['status'] == "themeUpdated") array_push($errors, "Theme updated");
-        if ($_GET['status'] == "themeActivated") array_push($status, "Theme activated");
-        if ($_GET['status'] == "themeDeleted") array_push($status, "Theme deleted");
+    if (isset($_SESSION['status'])) {
+        if ($_SESSION['status'] == "themeAdded") array_push($errors, "New theme added");
+        if ($_SESSION['status'] == "themeInstalled") array_push($errors, "Theme installation process is successful, please activate it first to see it works!");
+        if ($_SESSION['status'] == "themeUpdated") array_push($errors, "Theme updated");
+        if ($_SESSION['status'] == "themeActivated") array_push($status, "Theme activated");
+        if ($_SESSION['status'] == "themeDeleted") array_push($status, "Theme deleted");
+        unset($_SESSION['status']);
     }
 
     $this->setView('all-templates');
@@ -108,7 +110,8 @@ class ThemeApp extends BaseApp
           $this->themeEvent->setThemeDesigner(prevent_injection(distill_post_request($filters)['theme_designer']));
           $this->themeEvent->setThemeDirectory(prevent_injection(distill_post_request($filters)['theme_directory']));
           $this->themeEvent->addTheme();
-          direct_page('index.php?load=templates&status=themeAdded', 200);
+          $_SESSION['status'] = "themeAdded";
+          direct_page('index.php?load=templates&status=themeAdded', 302);
 
         }
 
@@ -126,12 +129,12 @@ class ThemeApp extends BaseApp
 
     } else {
        
-       $this->setView('edit-template');
-       $this->setPageTitle('Add New Theme');
-       $this->setFormAction(ActionConst::NEWTHEME);
-       $this->view->set('pageTitle', $this->getPageTitle());
-       $this->view->set('formAction', $this->getFormAction());
-       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+      $this->setView('edit-template');
+      $this->setPageTitle('Add New Theme');
+      $this->setFormAction(ActionConst::NEWTHEME);
+      $this->view->set('pageTitle', $this->getPageTitle());
+      $this->view->set('formAction', $this->getFormAction());
+      $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
        
     }
 
@@ -269,7 +272,7 @@ class ThemeApp extends BaseApp
 
           if (file_exists(APP_ROOT.'public/themes/'.$theme_title.'/theme.ini')) {
 
-             $theme_ini = parse_ini_file(APP_ROOT.'public/themes/'.$theme_title.'/theme.ini');
+            $theme_ini = parse_ini_file(APP_ROOT.'public/themes/'.$theme_title.'/theme.ini');
 
           }
 
@@ -278,7 +281,7 @@ class ThemeApp extends BaseApp
           $this->themeEvent->setThemeDesigner($theme_ini['theme_designer']);
           $this->themeEvent->setThemeDirectory($theme_dir);
           $this->themeEvent->addTheme();
-            
+          $_SESSION['status'] = "themeAdded";
           direct_page('index.php?load=templates&status=themeAdded', 200);
               
         }
@@ -312,11 +315,15 @@ class ThemeApp extends BaseApp
 
   public function update($id)
   {
+
     $errors = array();
     $checkError = true;
     
     if (!($getTheme = $this->themeEvent->grabTheme($id))) {
+      
+      $_SESSION['error'] = "themeNotFound";
       direct_page('index.php?load=templates&error=themeNotFound', 404);
+
     }
 
     $data_theme = array(
@@ -366,7 +373,8 @@ class ThemeApp extends BaseApp
           $this->themeEvent->setThemeDesigner(distill_post_request($filters)['theme_designer']);
           $this->themeEvent->setThemeDirectory(prevent_injection(distill_post_request($filters)['theme_directory']));
           $this->themeEvent->modifyTheme();
-          direct_page('index.php?load=templates&status=themeUpdated', 200);
+          $_SESSION['status'] = "themeUpdated";
+          direct_page('index.php?load=templates&status=themeUpdated', 302);
 
         }
 
@@ -445,7 +453,8 @@ class ThemeApp extends BaseApp
 
           $this->themeEvent->setThemeId($id);
           $this->themeEvent->removeTheme();
-          direct_page('index.php?load=templates&status=themeDeleted', 200);
+          $_SESSION['status'] = "themeDeleted";
+          direct_page('index.php?load=templates&status=themeDeleted', 302);
 
         }
 
@@ -512,7 +521,8 @@ class ThemeApp extends BaseApp
 
           $this->themeEvent->setThemeId($id);
           $this->themeEvent->activateInstalledTheme();
-          direct_page('index.php?load=templates&status=themeActived', 200);
+          $_SESSION['status'] = "themeActived";
+          direct_page('index.php?load=templates&status=themeActived', 302);
 
         }
 
