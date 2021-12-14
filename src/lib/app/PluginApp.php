@@ -41,23 +41,25 @@ class PluginApp extends BaseApp
     $checkError = true;
     $checkStatus = false;
 
-    if (isset($_GET['error'])) {
+    if (isset($_SESSION['error'])) {
        
        $checkError = false;
-       if ($_GET['error'] == 'pluginNotFound') array_push($errors, "Error: Plugin Not Found!");
-       if ($_GET['error'] == 'tableNotFound') array_push($errors, "Error: Table Plugin Not Found");
+       if ($_SESSION['error'] == 'pluginNotFound') array_push($errors, "Error: Plugin Not Found!");
+       if ($_SESSION['error'] == 'tableNotFound') array_push($errors, "Error: Table Plugin Not Found");
+       unset($_SESSION['error']);
 
     }
 
-    if (isset($_GET['status'])) {
+    if (isset($_SESSION['status'])) {
 
       $checkStatus = true;
-      if ($_GET['status'] == 'pluginAdded') array_push($status, "New plugin added");
-      if ($_GET['status'] == 'pluginInstalled') array_push($status, "New plugin installed");
-      if ($_GET['status'] == 'pluginUpdated') array_push($status, "Plugin updated");
-      if ($_GET['status'] == 'pluginActivated') array_push($status, "Plugin actived");
-      if ($_GET['status'] == 'pluginDeactivated') array_push($status, "Plugin deactivated");
-      if ($_GET['status'] == 'pluginDeleted') array_push($status, "Plugin deleted");
+      if ($_SESSION['status'] == 'pluginAdded') array_push($status, "New plugin added");
+      if ($_SESSION['status'] == 'pluginInstalled') array_push($status, "New plugin installed");
+      if ($_SESSION['status'] == 'pluginUpdated') array_push($status, "Plugin updated");
+      if ($_SESSION['status'] == 'pluginActivated') array_push($status, "Plugin actived");
+      if ($_SESSION['status'] == 'pluginDeactivated') array_push($status, "Plugin deactivated");
+      if ($_SESSION['status'] == 'pluginDeleted') array_push($status, "Plugin deleted");
+      unset($_SESSION['status']);
       
     }
 
@@ -228,7 +230,8 @@ class PluginApp extends BaseApp
             $this->pluginEvent->setPluginLevel($plugin_ini['plugin_level']);
             $this->pluginEvent->addPlugin();
 
-            direct_page("index.php?load=plugins&status=pluginInstalled", 200);
+            $_SESSION['status'] = "pluginInstalled";
+            direct_page("index.php?load=plugins&status=pluginInstalled", 302);
 
           } else {
 
@@ -278,9 +281,9 @@ class PluginApp extends BaseApp
 
     if (isset($_GET['Id'])) {
 
-       $getPlugin = $this->pluginEvent->grabPlugin($id);
+      $getPlugin = $this->pluginEvent->grabPlugin($id);
 
-       try {
+      try {
          
         if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
 
@@ -319,7 +322,8 @@ class PluginApp extends BaseApp
     
           if ( $this->pluginEvent->activateInstalledPlugin() === true ) {
 
-          direct_page('index.php?load=plugins&status=pluginActivated', 200);
+            $_SESSION['status'] = "pluginActivated";
+            direct_page('index.php?load=plugins&status=pluginActivated', 302);
 
           }
 
@@ -387,7 +391,8 @@ class PluginApp extends BaseApp
 
           $this->pluginEvent->setPluginId($id);
           $this->pluginEvent->deactivateInstalledPlugin();
-          direct_page('index.php?load=plugins&status=pluginDeactivated', 200);
+          $_SESSION['status'] = "pluginDeactivated";
+          direct_page('index.php?load=plugins&status=pluginDeactivated', 302);
 
         }
         
@@ -455,7 +460,8 @@ class PluginApp extends BaseApp
 
           $this->pluginEvent->setPluginId($id);
           $this->pluginEvent->removePlugin();
-          direct_page('index.php?load=plugins&status=pluginDeleted', 200);
+          $_SESSION['status'] = "pluginDeleted";
+          direct_page('index.php?load=plugins&status=pluginDeleted', 302);
 
         }
 
