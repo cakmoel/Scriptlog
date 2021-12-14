@@ -47,17 +47,19 @@ class PageApp extends BaseApp
     $checkError = true;
     $checkStatus = false;
 
-    if (isset($_GET['error'])) {
+    if (isset($_SESSION['error'])) {
 
       $checkError = false;
-      if ($_GET['error'] == 'pageNotFound') array_push($errors, "Error: Page Not Found");
+      if ($_SESSION['error'] == 'pageNotFound') array_push($errors, "Error: Page Not Found");
+      unset($_SESSION['error']);
     }
 
-    if (isset($_GET['status'])) {
+    if (isset($_SESSION['status'])) {
       $checkStatus = true;
-      if ($_GET['status'] == 'pageAdded') array_push($status, "New page added");
-      if ($_GET['status'] == 'pageUpdated') array_push($status, "Page has been updated");
-      if ($_GET['status'] == 'pageDeleted') array_push($status, "Page deleted");
+      if ($_SESSION['status'] == 'pageAdded') array_push($status, "New page added");
+      if ($_SESSION['status'] == 'pageUpdated') array_push($status, "Page has been updated");
+      if ($_SESSION['status'] == 'pageDeleted') array_push($status, "Page deleted");
+      unset($_SESSION['status']);
     }
 
     $this->setView('all-pages');
@@ -209,7 +211,7 @@ class PageApp extends BaseApp
           }
           
           $this->pageEvent->addPage();
-
+          $_SESSION['status'] = "pageAdded";
           direct_page('index.php?load=pages&status=pageAdded', 200);
 
         }
@@ -257,6 +259,7 @@ class PageApp extends BaseApp
     $checkError = true;
 
     if (!$getPage = $this->pageEvent->grabPage($id)) {
+      $_SESSION['error'] = "pageNotFound";
       direct_page('index.php?load=pages&error=pageNotFound', 404);
     }
 
@@ -392,8 +395,8 @@ class PageApp extends BaseApp
           }
  
           $this->pageEvent->modifyPage();
-
-          direct_page('index.php?load=pages&status=pageUpdated', 200);
+          $_SESSION['status'] = "pageUpdated";
+          direct_page('index.php?load=pages&status=pageUpdated', 302);
 
         }
 
@@ -476,7 +479,9 @@ class PageApp extends BaseApp
 
           $this->pageEvent->setPageId($id);
           $this->pageEvent->removePage();
-          direct_page('index.php?load=pages&status=pageDeleted', 200);
+          $_SESSION['status'] = "pageDeleted";
+          direct_page('index.php?load=pages&status=pageDeleted', 302);
+          
         }
       } catch (Throwable $th) {
 
@@ -490,14 +495,9 @@ class PageApp extends BaseApp
     }
   }
 
-  /**
-   * setView
-   *
-   * @param string $viewName
-   * 
-   */
   protected function setView($viewName)
   {
     $this->view = new View('admin', 'ui', 'pages', $viewName);
   }
+
 }
