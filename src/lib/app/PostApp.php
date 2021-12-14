@@ -45,7 +45,7 @@ class PostApp extends BaseApp
    * Retrieve all posts
    *  
    * {@inheritDoc}
-   * @see BaseApp::listItems()
+   * @uses BaseApp::listItems()
    */
   public function listItems()
   {
@@ -54,16 +54,18 @@ class PostApp extends BaseApp
     $checkError = true;
     $checkStatus = false;
     
-    if (isset($_GET['error'])) {
+    if (isset($_SESSION['error'])) {
         $checkError = false;
-        if ($_GET['error'] == 'postNotFound') array_push($errors, "Error: Post Not Found!");
+        if ($_SESSION['error'] == 'postNotFound') array_push($errors, "Error: Post Not Found!");
+        unset($_SESSION['error']);
     }
     
-    if (isset($_GET['status'])) {
+    if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        if ($_GET['status'] == 'postAdded') array_push($status, "New post added");
-        if ($_GET['status'] == 'postUpdated') array_push($status, "Post updated");
-        if ($_GET['status'] == 'postDeleted') array_push($status, "Post deleted");
+        if ($_SESSION['status'] == 'postAdded') array_push($status, "New post added");
+        if ($_SESSION['status'] == 'postUpdated') array_push($status, "Post updated");
+        if ($_SESSION['status'] == 'postDeleted') array_push($status, "Post deleted");
+        unset($_SESSION['status']);
     }
    
     $this->setView('all-posts');
@@ -382,7 +384,7 @@ class PostApp extends BaseApp
             $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
 
             $this->postEvent->addPost();
-      
+            $_SESSION['status'] = "postAdded";     
             direct_page('index.php?load=posts&status=postAdded', 200);
 
         }
@@ -446,7 +448,8 @@ class PostApp extends BaseApp
     
     if (!$getPost = $this->postEvent->grabPost($id)) {
         
-        direct_page('index.php?load=posts&error=postNotFound', 404);
+      $_SESSION['error'] = "postNotFound";
+      direct_page('index.php?load=posts&error=postNotFound', 404);
         
     }
     
@@ -497,17 +500,17 @@ class PostApp extends BaseApp
 
             if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                 
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-                throw new AppException("Sorry, unpleasant attempt detected!");
+              header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+              throw new AppException("Sorry, unpleasant attempt detected!");
                 
             } 
             
             if( check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_modified', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'post_headlines', 'comment_status']) == false) {
 
-                header($_SERVER["SERVER_PROTOCOL"]." 413 Payload Too Large", true, 413);
-                header('Status: 413 Payload Too Large');
-                header('Retry-After: 3600');
-                throw new AppException("Sorry, Unpleasant attempt detected");
+              header($_SERVER["SERVER_PROTOCOL"]." 413 Payload Too Large", true, 413);
+              header('Status: 413 Payload Too Large');
+              header('Retry-After: 3600');
+              throw new AppException("Sorry, Unpleasant attempt detected");
 
             }
             
@@ -733,7 +736,7 @@ class PostApp extends BaseApp
               $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
                
               $this->postEvent->modifyPost();
-                
+              $_SESSION['status'] = "postUpdated";  
               direct_page('index.php?load=posts&status=postUpdated', 200);
                 
             }
@@ -844,6 +847,7 @@ class PostApp extends BaseApp
 
           $this->postEvent->setPostId($id);
           $this->postEvent->removePost();  
+          $_SESSION['status'] = "postDeleted";
           direct_page('index.php?load=posts&status=postDeleted', 200);
            
         }
