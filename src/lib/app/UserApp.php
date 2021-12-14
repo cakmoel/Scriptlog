@@ -112,7 +112,6 @@ class UserApp extends BaseApp
         if ($_SESSION['status'] == 'profilUpdated') array_push($status, "Profile has been updated");
         unset($_SESSION['status']);
 
-
     }
     
     if (!$getUser = $this->userEvent->grabUserByLogin($user_login)) {
@@ -299,9 +298,10 @@ class UserApp extends BaseApp
                 } else {
                 
                     $this->userEvent->addUser();
-                    $_SESSION['status'] = "userAdded";
+                   
                 }
                 
+                $_SESSION['status'] = "userAdded";
                 direct_page('index.php?load=users&status=userAdded', 302);
                 
             }
