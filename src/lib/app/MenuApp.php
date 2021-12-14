@@ -40,19 +40,21 @@ class MenuApp extends BaseApp
     $checkError = true;
     $checkStatus = false;
     
-    if (isset($_GET['error'])) {
+    if (isset($_SESSION['error'])) {
       
-       $checkError = false;
-       if ($_GET['error'] == 'menuNotFound') array_push($errors, "Error: Menu not found");
+      $checkError = false;
+      if ($_SESSION['error'] == 'menuNotFound') array_push($errors, "Error: Menu not found");
+      unset($_SESSION['error']);
 
     }
 
-    if (isset($_GET['status'])) {
+    if (isset($_SESSION['status'])) {
       
-       $checkStatus = true;
-       if ($_GET['status'] == 'menuAdded') array_push($status, "New menu added");
-       if ($_GET['status'] == 'menuUpdated') array_push($status, "Menu updated");
-       if ($_GET['status'] == 'menuDeleted') array_push($status, "Menu deleted");
+      $checkStatus = true;
+      if ($_SESSION['status'] == 'menuAdded') array_push($status, "New menu added");
+      if ($_SESSION['status'] == 'menuUpdated') array_push($status, "Menu updated");
+      if ($_SESSION['status'] == 'menuDeleted') array_push($status, "Menu deleted");
+      unset($_SESSION['status']);
 
     }
 
@@ -133,7 +135,8 @@ class MenuApp extends BaseApp
            $this->menuEvent->setMenuLink(escape_html(trim(distill_post_request($filters)['menu_link'])));
            $this->menuEvent->setMenuPosition(prevent_injection(distill_post_request($filters)['menu_position']));
            $this->menuEvent->addMenu();
-           direct_page('index.php?load=menu&status=menuAdded', 200);
+           $_SESSION['status'] = "menuAdded";
+           direct_page('index.php?load=menu&status=menuAdded', 302);
 
         }
 
@@ -172,7 +175,10 @@ class MenuApp extends BaseApp
     $checkError = true;
 
     if (!$getMenu = $this->menuEvent->grabMenu($id)) {
-       direct_page('index.php?load=menu&error=menuNotFound', 404);
+
+      $_SESSION['error'] = "menuNotFound";
+      direct_page('index.php?load=menu&error=menuNotFound', 404);
+
     }
 
     $data_menu = array(
@@ -241,6 +247,7 @@ class MenuApp extends BaseApp
           $this->menuEvent->setMenuOrder((is_int($_POST['menu_sort']) ? distill_post_request($filters)['menu_sort'] : 0 ));
           $this->menuEvent->setMenuStatus(distill_post_request($filters)['menu_status']);
           $this->menuEvent->modifyMenu();
+          $_SESSION['status'] = "menuUpdated";
           direct_page('index.php?load=menu&status=menuUpdated', 200);
 
         }
@@ -321,6 +328,7 @@ class MenuApp extends BaseApp
 
           $this->menuEvent->setMenuId($id);
           $this->menuEvent->removeMenu();
+          $_SESSION['status'] = "menuDeleted";
           direct_page('index.php?load=menu&status=menuDeleted', 200);
 
         }
