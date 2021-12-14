@@ -104,7 +104,7 @@ class ConfigurationApp
         
         if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                 
-          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
           throw new AppException("Sorry, unpleasant attempt detected!");
 
         }
@@ -139,7 +139,8 @@ class ConfigurationApp
 
            }
 
-           direct_page('index.php?load=option-general&status=generalConfigUpdated', 200);
+           $_SESSION['status'] = "generalConfigUpdated";
+           direct_page('index.php?load=option-general&status=generalConfigUpdated', 302);
 
         }
 
@@ -157,14 +158,10 @@ class ConfigurationApp
 
     } else {
 
-       if( ( isset($_GET['error']) ) && ( $_GET['error'] == 'configTampered') ) {
-         $checkError = false;
-         array_push($errors, "Error: Attempt to tampered with our parameters!");
-       }
-  
-       if ( ( isset($_GET['status']) ) && ( $_GET['status'] == 'generalConfigUpdated') ) {
+       if ( ( isset($_SESSION['status']) ) && ( $_SESSION['status'] == 'generalConfigUpdated') ) {
          $checkStatus = true;
          array_push($status, "General setting has been updated");
+         unset($_SESSION['status']);
        }
 
        $this->setView('general-setting');
@@ -265,7 +262,8 @@ class ConfigurationApp
 
         }
 
-        direct_page('index.php?load=option-reading&status=readingConfigUpdated', 200);
+        $_SESSION['status'] = "readingConfigUpdated";
+        direct_page('index.php?load=option-reading&status=readingConfigUpdated', 302);
 
       }
       
@@ -283,18 +281,12 @@ class ConfigurationApp
 
     } else {
 
-      if ( ( isset($_GET['status']) ) && ( $_GET['status'] == 'readingConfigUpdated') ) {
+      if ( ( isset($_SESSION['status']) ) && ( $_SESSION['status'] == 'readingConfigUpdated') ) {
 
         $checkStatus = true;
         array_push($status, "Reading setting has been updated");
+        unset($_SESSION['status']);
          
-      }
-
-      if ( (isset($_GET['error']) ) && ($_GET['error'] == 'configTampered') ) {
-
-        $checkError = false;
-        array_push($errors, "Error: Attempt to tampered with our parameters!");
-
       }
 
       $this->setView('reading-setting');
@@ -340,6 +332,7 @@ class ConfigurationApp
 
     if(!$getPermalinkValue = $this->configEvent->grabSettingByName('permalink_setting')) {
 
+      $_SESSION['error'] = "permalinkValueNotFound";
       direct_page('index.php?load=option-permalink&error=permalinkValueNotFound', 404);
       
     }
@@ -407,7 +400,7 @@ class ConfigurationApp
           }
           
           $this->configEvent->modifySetting();
-
+          $_SESSION['status'] = "permalinkConfigUpdated";
           direct_page('index.php?load=option-permalink&status=permalinkConfigUpdated', 200);
            
         }
@@ -426,14 +419,16 @@ class ConfigurationApp
       
     } else {
 
-      if(isset($_GET['error'])) {
+      if(isset($_SESSION['error'])) {
         $checkError = false;
-        if($_GET['error'] == 'permalinkValueNotFound') array_push($errors, "Error: Permalink value not found!");
+        if($_SESSION['error'] == 'permalinkValueNotFound') array_push($errors, "Error: Permalink value not found!");
+        unset($_SESSION['error']);
       }
  
-      if (isset($_GET['status'])) {
+      if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        if ($_GET['status'] == 'permalinkConfigUpdated') array_push($status, "Permalink setting has been updated");
+        if ($_SESSION['status'] == 'permalinkConfigUpdated') array_push($status, "Permalink setting has been updated");
+        unset($_SESSION['status']);
       }
 
       $this->setView('permalink-setting');
