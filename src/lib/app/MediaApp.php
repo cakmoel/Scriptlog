@@ -56,18 +56,22 @@ public function listItems()
   $checkError = true;
   $checkStatus = false;
 
-  if (isset($_GET['error'])) {
+  if (isset($_SESSION['error'])) {
 
-     $checkError = false;
-     if ($_GET['error'] == 'mediaNotFound') array_push($errors, "Error: Media Not Found");
+    $checkError = false;
+    if ($_SESSION['error'] == 'mediaNotFound') array_push($errors, "Error: Media Not Found");
+    unset($_SESSION['error']);
 
   }
 
-  if (isset($_GET['status'])) {
-      $checkStatus = true;
-      if ($_GET['status'] == 'mediaAdded') array_push($status, "New media added");
-      if ($_GET['status'] == 'mediaUpdated') array_push($status, "Media has been updated");
-      if ($_GET['status'] == 'mediaDeleted') array_push($status, "Media deleted");
+  if (isset($_SESSION['status'])) {
+    
+    $checkStatus = true;
+    if ($_SESSION['status'] == 'mediaAdded') array_push($status, "New media added");
+    if ($_SESSION['status'] == 'mediaUpdated') array_push($status, "Media has been updated");
+    if ($_SESSION['status'] == 'mediaDeleted') array_push($status, "Media deleted");
+    unset($_SESSION['status']);
+
   }
 
   $this->setView('all-media');
@@ -246,8 +250,8 @@ public function insert()
 
         if ( ( false === check_file_extension($file_name) ) || ( false === check_mime_type(mime_type_dictionary(), $file_location) ) ) {
 
-           $checkError = false;
-           array_push($errors, "Invalid file format");
+          $checkError = false;
+          array_push($errors, "Invalid file format");
 
         } else {
 
@@ -285,7 +289,6 @@ public function insert()
          if($media_id) {
             
            $this->mediaEvent->setMediaId($media_id);
-           
            $this->mediaEvent->setMediaKey($new_filename);
            $this->mediaEvent->setMediaValue(json_encode($media_metavalue));
            $this->mediaEvent->addMediaMeta();
@@ -302,7 +305,8 @@ public function insert()
            
          }
 
-         direct_page('index.php?load=medialib&status=mediaAdded', 200);
+        $_SESSION['status'] = "mediaAdded";
+        direct_page('index.php?load=medialib&status=mediaAdded', 302);
 
       }
       
@@ -352,7 +356,8 @@ public function update($id)
 
   if (!$getMedia = $this->mediaEvent->grabMedia($id)) {
 
-     direct_page('index.php?load=medialib&error=mediaNotFound', 404);
+    $_SESSION['error'] = "mediaNotFound";
+    direct_page('index.php?load=medialib&error=mediaNotFound', 404);
 
   }
 
@@ -406,7 +411,7 @@ public function update($id)
 
       if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                 
-        header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+        header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
         throw new AppException("Sorry, unpleasant attempt detected!");
         
       }
@@ -431,15 +436,15 @@ public function update($id)
 
       if (false === sanitize_selection_box(distill_post_request($filters)['media_access'], ['public' => 'Public', 'private' => 'Private'])) {
 
-         $checkError = false;
-         array_push($errors, "Please choose the available value provided!");
+        $checkError = false;
+        array_push($errors, "Please choose the available value provided!");
 
       }
 
       if (false === sanitize_selection_box(distill_post_request($filters)['media_status'], ['Enabled', 'Disabled'])) {
 
-         $checkError = false;
-         array_push($errors, "Please choose the available value provided!");
+        $checkError = false;
+        array_push($errors, "Please choose the available value provided!");
          
       }
 
@@ -518,20 +523,20 @@ public function update($id)
             
             $media_metavalue = array(
 
-                        'Origin' => rename_file($file_name), 
-                        'File type' => $file_type, 
-                        'File size' => format_size_unit($file_size), 
-                        'Uploaded on' => date("Y-m-d H:i:s"), 
-                        'Dimension' => $width.'x'.$height);
+              'Origin' => rename_file($file_name), 
+              'File type' => $file_type, 
+              'File size' => format_size_unit($file_size), 
+              'Uploaded on' => date("Y-m-d H:i:s"), 
+              'Dimension' => $width.'x'.$height);
  
           } else {
  
             $media_metavalue = array(
               
-                  'Origin' => rename_file($file_name), 
-                  'File type' => $file_type, 
-                  'File size' => format_size_unit($file_size), 
-                  'Uploaded on' => date("Y-m-d H:i:s"));
+              'Origin' => rename_file($file_name), 
+              'File type' => $file_type, 
+              'File size' => format_size_unit($file_size), 
+              'Uploaded on' => date("Y-m-d H:i:s"));
  
           }
           
@@ -584,8 +589,8 @@ public function update($id)
       }
 
        $this->mediaEvent->modifyMedia();
-      
-       direct_page('index.php?load=medialib&status=mediaUpdated', 200);
+       $_SESSION['status'] = "mediaUpdated";
+       direct_page('index.php?load=medialib&status=mediaUpdated', 302);
 
      }
      
@@ -638,7 +643,7 @@ public function remove($id)
 
   if (isset($_GET['Id'])) {
 
-     $getMedia = $this->mediaEvent->grabMedia($id);
+    $getMedia = $this->mediaEvent->grabMedia($id);
      
     try {
       
@@ -689,7 +694,8 @@ public function remove($id)
 
         $this->mediaEvent->setMediaId($id);
         $this->mediaEvent->removeMedia();
-        direct_page('index.php?load=medialib&status=mediaDeleted', 200);
+        $_SESSION['status'] = "mediaDeleted";
+        direct_page('index.php?load=medialib&status=mediaDeleted', 302);
 
       }
 
