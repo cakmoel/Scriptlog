@@ -19,7 +19,14 @@ class TopicApp extends BaseApp
   {
     $this->topicEvent = $topicEvent;
   }
-  
+
+/**
+ * listItems
+ *
+ * @inheritDoc
+ * @uses BaseApp::listItems
+ * 
+ */
   public function listItems()
   {
     
@@ -28,16 +35,18 @@ class TopicApp extends BaseApp
     $checkError = true;
     $checkStatus = false;
     
-    if (isset($_GET['error'])) {
+    if (isset($_SESSION['error'])) {
         $checkError = false;
-        if ($_GET['error'] == 'topicNotFound') array_push($errors, "Error: Topic Not Found!");
+        if ($_SESSION['error'] == 'topicNotFound') array_push($errors, "Error: Topic Not Found!");
+        unset($_SESSION['error']);
     }
     
-    if (isset($_GET['status'])) {
+    if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        if ($_GET['status'] == 'topicAdded') array_push($status, "New topic added");
-        if ($_GET['status'] == 'topicUpdated') array_push($status, "Topic has been updated");
-        if ($_GET['status'] == 'topicDeleted') array_push($status, "Topic deleted");
+        if ($_SESSION['status'] == 'topicAdded') array_push($status, "New topic added");
+        if ($_SESSION['status'] == 'topicUpdated') array_push($status, "Topic has been updated");
+        if ($_SESSION['status'] == 'topicDeleted') array_push($status, "Topic deleted");
+        unset($_SESSION['status']);
     }
     
     $this->setView('all-topics');
@@ -100,7 +109,8 @@ class TopicApp extends BaseApp
              $this->topicEvent->setTopicTitle(prevent_injection(trim(distill_post_request($filters)['topic_title'])));
              $this->topicEvent->setTopicSlug(make_slug(distill_post_request($filters)['topic_title']));
              $this->topicEvent->addTopic();
-             direct_page('index.php?load=topics&status=topicAdded', 200);
+             $_SESSION['status'] = "topicAdded";
+             direct_page('index.php?load=topics&status=topicAdded', 302);
              
           }
           
@@ -138,8 +148,9 @@ class TopicApp extends BaseApp
     $checkError = true;
     
     if (!$getCategory = $this->topicEvent->grabTopic($id)) {
-        
-        direct_page('index.php?load=topics&error=topicNotFound', 404);
+      
+      $_SESSION['error'] = "topicNotFound";
+      direct_page('index.php?load=topics&error=topicNotFound', 404);
         
     }
     
@@ -195,7 +206,8 @@ class TopicApp extends BaseApp
                 $this->topicEvent->setTopicSlug(make_slug(distill_post_request($filters)['topic_title']));
                 $this->topicEvent->setTopicStatus(distill_post_request($filters)['topic_status']);
                 $this->topicEvent->modifyTopic();
-                direct_page('index.php?load=topics&status=topicUpdated', 200);
+                $_SESSION['status'] = "topicUpdated";
+                direct_page('index.php?load=topics&status=topicUpdated', 302);
                 
             }
             
@@ -274,7 +286,8 @@ class TopicApp extends BaseApp
 
           $this->topicEvent->setTopicId($id);
           $this->topicEvent->removeTopic();
-          direct_page('index.php?load=topics&status=topicDeleted', 200);
+          $_SESSION['status'] = "topicDeleted";
+          direct_page('index.php?load=topics&status=topicDeleted', 302);
 
         }
 
