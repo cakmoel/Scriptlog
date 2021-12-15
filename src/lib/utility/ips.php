@@ -68,6 +68,7 @@ return $is_scanner;
  * Checking if a text starts with an given string.
  * 
  * @category function
+ * @see https://stackoverflow.com/questions/834303/startswith-and-endswith-functions-in-php
  * @license MIT
  * @version 1.0
  * @return string
@@ -75,17 +76,39 @@ return $is_scanner;
  */
 function starts_with($haystack, $needle)
 {
-  return strpos($haystack, $needle) === 0;
+
+  if ( version_compare(PHP_VERSION, '8.0', '>=') ) {
+
+    return str_starts_with($haystack, $needle);
+
+  } else {
+
+    return substr_compare($haystack, $needle, 0, strlen($needle)) === 0;
+
+  }
+
 }
 
 /**
  * ends_with
  *
+ * @category function
+ * @see https://stackoverflow.com/questions/834303/startswith-and-endswith-functions-in-php 
  * @param string $haystack
  * @param string $needle
  * @return void
  */
 function ends_with($haystack, $needle)
 {
-    return strrpos($haystack, $needle) === strlen($haystack)-strlen($needle);
+
+  if ( version_compare(PHP_VERSION, '8.0', '>=') ) {
+
+    return str_ends_with($haystack, $needle);
+
+  } else {
+
+    return substr_compare($haystack, $needle, -strlen($needle)) === 0;
+     
+  }
+  
 }
