@@ -54,7 +54,7 @@ try {
     
                 } else {
     
-                    direct_page('index.php?load=plugins&error=pluginNotFound', 404);
+                    direct_page('index.php?load=404&notfound='.notfound_id(), 404);
     
                 }
     
@@ -76,7 +76,7 @@ try {
     
                 } else {
     
-                    direct_page('index.php?load=plugins&error=pluginNotFound', 404);
+                    direct_page('index.php?load=404&notfound='.notfound_id(), 404);
     
                 }
                 
@@ -106,7 +106,7 @@ try {
     
                 } else {
     
-                    direct_page('index.php?load-plugin&error=pluginNotFound', 404);
+                    direct_page('index.php?load=404&notfound='.notfound_id(), 404);
     
                 }
             }
