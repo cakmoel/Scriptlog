@@ -47,16 +47,18 @@ class CommentApp extends BaseApp
     $checkError = true;
     $checkStatus = false;
     
-    if (isset($_GET['error'])) {
+    if (isset($_SESSION['error'])) {
         $checkError = false;
-        if ($_GET['error'] == 'commentNotFound') array_push($errors, "Error: Comment Not Found!"); 
+        if ($_SESSION['error'] == 'commentNotFound') array_push($errors, "Error: Comment Not Found!"); 
+        unset($_SESSION['error']);
     }
     
-    if (isset($_GET['status'])) {
+    if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        if ($_GET['status'] == 'commentAdded') array_push($status, "New comment added");
-        if ($_GET['status'] == 'commentUpdated') array_push($status, "Comment has been updated");
-        if ($_GET['status'] == 'commentDeleted') array_push($status, "Comment deleted");
+        if ($_SESSION['status'] == 'commentAdded') array_push($status, "New comment added");
+        if ($_SESSION['status'] == 'commentUpdated') array_push($status, "Comment has been updated");
+        if ($_SESSION['status'] == 'commentDeleted') array_push($status, "Comment deleted");
+        unset($_SESSION['status']);
     }
     
     $this->setView('all-comments');
@@ -89,8 +91,9 @@ class CommentApp extends BaseApp
     $checkError = true;
     
     if (!$getComment = $this->commentEvent->grabComment($id)) {
-        
-        direct_page('index.php?load=comments&error=commentNotFound', 404);
+      
+      $_SESSION['error'] = "commentNotFound";
+      direct_page('index.php?load=comments&error=commentNotFound', 404);
         
     }
     
@@ -156,6 +159,7 @@ class CommentApp extends BaseApp
                 $this->commentEvent->setCommentContent($comment_content);
                 $this->commentEvent->setCommentStatus($comment_status);
                 $this->commentEvent->modifyComment();
+                $_SESSION['status'] = "commentUpdated";
                 direct_page('index.php?load=comments&status=commentUpdated', 200);
                 
             }
@@ -233,6 +237,7 @@ class CommentApp extends BaseApp
 
          $this->commentEvent->setCommentId($id);
          $this->commentEvent->removeComment();
+         $_SESSION['status'] = "commentDeleted";
          direct_page('index.php?load=comments&status=commentDeleted', 200);
 
         }
