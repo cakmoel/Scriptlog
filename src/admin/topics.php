@@ -63,7 +63,7 @@ try {
                     
                 } else {
         
-                    direct_page('index.php?load=topics&error=topicNotFound', 404);
+                    direct_page('index.php?load=404&notfound='.notfound_id(), 404);
                     
                 }
                 
@@ -83,7 +83,7 @@ try {
             
             if(false === $authenticator->userAccessControl(ActionConst::TOPICS)) {
     
-                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+              direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
             } else {
     
@@ -93,7 +93,7 @@ try {
     
                  } else {
     
-                     direct_page('index.php?load=topics&error=topicNotFound', 404);
+                    direct_page('index.php?load=404&notfound='.notfound_id(), 404);
     
                  }
                  
