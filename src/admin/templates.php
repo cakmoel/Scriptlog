@@ -86,11 +86,11 @@ try {
     
                 if ($themeDao->checkThemeId($themeId, $sanitizer)) {
     
-                     $themeApp->update((int)$themeId);
+                    $themeApp->update((int)$themeId);
     
                 } else {
     
-                    direct_page('index.php?load=templates&error=themeNotFound', 404);
+                    direct_page('index.php?load=404&notfound='.notfound_id(), 404);
     
                 }
     
@@ -120,8 +120,8 @@ try {
     
                 } else {
     
-                    direct_page('index.php?load=templates&error=themeNotFound', 404);
-    
+                    direct_page('index.php?load=404&notfound='.notfound_id(), 404);
+
                 }
                 
             }
@@ -150,7 +150,7 @@ try {
     
                 } else {
     
-                    direct_page('index.php?load=templates&error=themeNotFound', 404);
+                    direct_page('index.php?load=404&notfound='.notfound_id(), 404);
     
                 }
     
