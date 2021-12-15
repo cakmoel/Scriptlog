@@ -43,7 +43,7 @@ $user_level = isset($_SESSION['scriptlog_session_level']) ? Session::getInstance
 $user_id = isset($_SESSION['scriptlog_session_id']) ? Session::getInstance()->scriptlog_session_id : user_info($authenticator, $user_login)['ID'];
 $user_session = isset(user_info($authenticator, $user_login)['user_session']) ? user_info($authenticator, $user_login)['user_session'] : do_logout($authenticator);
 
-// Breadcrumb
+// module accessed or path to link accessed by request
 $breadcrumb = isset($_GET['load']) ? htmlentities(sanitize_urls($_GET['load']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : http_response_code();
 
 // Current URL
