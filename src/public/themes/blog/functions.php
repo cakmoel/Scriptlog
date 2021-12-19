@@ -1,28 +1,5 @@
 <?php
 /**
- * initialize_uri_request() 
- *
- * @category themes function
- * @return object
- * 
- */
-function initialize_request()
-{
-return new RequestPath();
-}
-
-/**
- * initialize_sanitizer
- *
- * @return object
- * 
- */
-function initialize_sanitizer()
-{
- return new Sanitize();
-}
-
-/**
  * initialize_post()
  *
  * @return object
@@ -66,15 +43,8 @@ function initialize_topic()
  */
 function featured_post()
 {
-
-   if ( trim($_SERVER['REQUEST_URI'], DIRECTORY_SEPARATOR) === initialize_request()->matched ) {
-
-      $headlines = FrontContentProvider::frontRandomHeadlines(initialize_post());
-
-      return $headlines;
-
-   }
-
+  $headlines = FrontContentProvider::frontRandomHeadlines(initialize_post());
+  return $headlines;
 }
 
 /**
@@ -86,15 +56,8 @@ function featured_post()
  */
 function sticky_page()
 {
-
- if ( trim($_SERVER['REQUEST_URI'], DIRECTORY_SEPARATOR) === initialize_request()->matched ) {
-
-   $sticky_page = FrontContentProvider::frontRandomStickyPage(initialize_page());
-
-   return $sticky_page;
-
- }
-
+  $sticky_page = FrontContentProvider::frontRandomStickyPage(initialize_page());
+  return $sticky_page;
 }
 
 /**
@@ -107,15 +70,8 @@ function sticky_page()
  */
 function random_posts($limit)
 {
-
- if ( trim($_SERVER['REQUEST_URI'], DIRECTORY_SEPARATOR) === initialize_request()->matched ) {
-
-   $random_posts = FrontContentProvider::frontRandomPosts($limit, initialize_post());
-
-   return $random_posts;
-
- }
-
+  $random_posts = FrontContentProvider::frontRandomPosts($limit, initialize_post());
+  return $random_posts;
 }
 
 /**
@@ -128,13 +84,8 @@ function random_posts($limit)
  */
 function latest_posts($position, $limit)
 {
-  if ( trim($_SERVER['REQUEST_URI'], DIRECTORY_SEPARATOR) === initialize_request()->matched ) {
-
-    $latest_posts = FrontContentProvider::frontLatestPosts($position, $limit, initialize_post());
-
-    return $latest_posts;
-
-  }
+  $latest_posts = FrontContentProvider::frontLatestPosts($position, $limit, initialize_post());
+  return $latest_posts;
 }
 
 /**
