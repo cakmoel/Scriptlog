@@ -15,6 +15,14 @@ final class HandleRequest
 {
 
 /**
+ * requestPathURI
+ *
+ * @var object
+ * 
+ */
+private static $requestPathURI;
+
+/**
  * findRequestToRules
  *
  * @param array $rules
@@ -103,6 +111,35 @@ private static function isRequestToPathValid($args)
 }
 
 /**
+ * isMatchedUriRequested()
+ *
+ * @return mixed
+ * 
+ */
+public static function isMatchedUriRequested()
+{
+  $matched_uri = (isset($_SERVER['REQUEST_URI'])) ? trim($_SERVER['REQUEST_URI'], DIRECTORY_SEPARATOR) : "";
+  $slice_matched = explode(DIRECTORY_SEPARATOR, $matched_uri);
+  $get_matched = isset($slice_matched[0]) ? $slice_matched[0] : "";
+  return $get_matched;
+}
+
+/**
+ * isQueryStringRequested()
+ *
+ * @return mixed
+ * 
+ */
+public static function isQueryStringRequested()
+{
+  $query_string = (isset($_SERVER['QUERY_STRING'])) ? $_SERVER['QUERY_STRING'] : "";
+  $slice_query = explode('=', $query_string);
+  $get_key = isset($slice_query[0]) ? $slice_query[0] : "";
+  $get_value = isset($slice_query[1]) ? $slice_query[1] : "";
+  return array('key' => $get_key, 'value'=>$get_value);
+}
+
+/**
  * allowedPathRequested
  * 
  * Checking whether URI requested match the rules and allowed to be executed
@@ -121,13 +158,36 @@ public static function allowedPathRequested(array $path, array $rules)
 
  if ( ! (in_array(self::isRequestToPathValid(0), $path, true) || (in_array($is_valid_requested, $path, true ) ) ) ) {
 
-    return false;
+  return false;
 
  } else {
 
-    return true;
+  return true;
 
  }
+
+}
+
+/**
+ * checkMatchUriRequested()
+ *
+ * @return bool
+ * 
+ */
+public static function checkMatchUriRequested()
+{
+  
+  self::$requestPathURI = new RequestPath();
+
+  if ( self::isMatchedUriRequested() === self::$requestPathURI->matched ) {
+    
+    return true;
+
+  } else {
+
+    return false;
+
+  }
 
 }
 
