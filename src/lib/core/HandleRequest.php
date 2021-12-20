@@ -116,7 +116,7 @@ private static function isRequestToPathValid($args)
  * @return mixed
  * 
  */
-public static function isMatchedUriRequested()
+private static function isMatchedUriRequested()
 {
   $matched_uri = (isset($_SERVER['REQUEST_URI'])) ? trim($_SERVER['REQUEST_URI'], DIRECTORY_SEPARATOR) : "";
   $slice_matched = explode(DIRECTORY_SEPARATOR, $matched_uri);
@@ -130,7 +130,7 @@ public static function isMatchedUriRequested()
  * @return mixed
  * 
  */
-public static function isQueryStringRequested()
+private static function isQueryStringRequested()
 {
   $query_string = (isset($_SERVER['QUERY_STRING'])) ? $_SERVER['QUERY_STRING'] : "";
   $slice_query = explode('=', $query_string);
@@ -186,6 +186,93 @@ public static function checkMatchUriRequested()
   } else {
 
     return false;
+
+  }
+
+}
+
+/**
+ * deliverQueryString
+ *
+ */
+public static function deliverQueryString()
+{
+
+  switch (static::isQueryStringRequested()['key']) {
+
+    case 'p':
+      // Deliver request to a single post entry
+      if ( ! empty(static::isQueryStringRequested()['value']) ) {
+
+        call_theme_content('single');
+
+      } else {
+
+        direct_page('', 302);
+
+      }
+
+      break;
+    
+    case 'cat':
+      // Deliver request to a single category or topic
+      if ( ! empty(static::isQueryStringRequested()['value']) ) {
+
+        call_theme_content('category');
+
+      } else {
+
+        direct_page('', 302);
+
+      }
+
+      break;
+
+    case 'page':
+      // Deliver request to a single page
+      if ( ! empty(static::isQueryStringRequested()['value']) ) {
+
+        call_theme_content('page');
+
+      } else {
+
+        direct_page('', 302);
+      }
+
+      break;
+
+    case 'm':
+      // Deliver request to an archives
+      if ( ! empty(static::isQueryStringRequested()['value']) ) {
+
+        call_theme_content('archive');
+
+      } else {
+
+         direct_page('', 302);
+      }
+      
+      break;
+
+    case 'blog':
+      // Deliver request to blog
+      call_theme_content('blog');
+      
+      break;
+
+    default:
+      # default request will be delivered
+      if ( true === static::checkMatchUriRequested() ) {
+
+        call_theme_content('home');
+
+      } else {
+
+        direct_page('', 505);
+
+      }
+
+      break;
 
   }
 
