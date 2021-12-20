@@ -1,4 +1,8 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+use Whoops\Handler\Handler;
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Dispatcher
  * 
@@ -60,32 +64,42 @@ final class Dispatcher
 
     $this->theme_dir = APP_ROOT.APP_THEME.escape_html($this->invokeTheme()['theme_directory']).DS;
 
-    if (false === HandleRequest::allowedPathRequested($this->whiteListPathRequested(), $this->route)) {
+    if ( rewrite_status() === 'yes' ) {
 
-         $this->errorNotFound($this->theme_dir);
+      if (false === HandleRequest::allowedPathRequested($this->whiteListPathRequested(), $this->route)) {
+
+        $this->errorNotFound($this->theme_dir);
+  
+      } else {
+  
+        foreach ($this->route as $action => $routes) {
+  
+          if (preg_match( '~^'.$routes.'$~i', $this->requestURI(), $matches)) {
+           
+            http_response_code(200);
+            call_theme_header(); 
+            call_theme_content($action);
+            call_theme_footer();
+    
+            exit();  // avoid the 404 message 
+     
+          }
+        
+        }
+  
+        // nothing is found so handle the error page 404
+        $this->errorNotFound($this->theme_dir);
+  
+      }
 
     } else {
 
-      foreach ($this->route as $action => $routes) {
-      
-       if (preg_match( '~^'.$routes.'$~i', $this->requestURI(), $matches)) {
-         
-        http_response_code(200);
-        call_theme_header(); 
-        call_theme_content($action);
-        call_theme_footer();
-
-        exit();  // avoid the 404 message 
- 
-       } 
-      
-      }
-
-    // nothing is found so handle the error page 404
-    $this->errorNotFound($this->theme_dir);
+      call_theme_header();
+      HandleRequest::deliverQueryString();
+      call_theme_footer();
 
     }
-    
+
   }
 
   /**
@@ -114,7 +128,18 @@ final class Dispatcher
     return theme_identifier();
   }
   
-  /**
+/**
+   * whiteListPathRequested
+   *
+   * @return array
+   * 
+   */
+  private function whiteListPathRequested()
+  {
+    return ['/', '//', 'post', 'page', 'blog', 'category', 'archive'];
+  }
+
+/**
    * Error not found 404
    * set 404 error page
    * 
@@ -125,17 +150,6 @@ final class Dispatcher
   {
     http_response_code(404);
     include($theme_dir.'404.php');
-  }
-
-  /**
-   * whiteListPathRequested
-   *
-   * @return array
-   * 
-   */
-  private function whiteListPathRequested()
-  {
-    return ['/', '//', 'post', 'page', 'blog', 'category', 'archive'];
   }
 
 }
