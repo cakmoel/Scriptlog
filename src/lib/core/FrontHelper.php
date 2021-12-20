@@ -1,11 +1,12 @@
 <?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * FrontHelper Class
+ * class FrontHelper
+ * 
  * FrontHelper class will be useful for theme functionality
  * to retrieve particular content needed on theme layout
  *
  * @category Core Class
- * @author MNoermoehammad
+ * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
  * @since Since Release 1.0
@@ -24,25 +25,23 @@ class FrontHelper
 public static function frontPermalinks($id)
 {
 
-  $url = false;
+  $url = null;
 
   $id = prevent_injection(db_instance()->real_escape_string((int)$id));
 
   if (app_info()['permalink_setting'] == 'yes') {
 
-      $query = db_simple_query("SELECT post_slug FROM tbl_posts WHERE ID = '$id'")->fetch_object();
+    $query = db_simple_query("SELECT post_slug FROM tbl_posts WHERE ID = '$id'")->fetch_object();
 
-      $url = $query->post_slug;
-
-      return $url;
+    $url = $query->post_slug;
 
   } else {
 
-    $url = false;
-
-    return $url;
-
+    $url = '?p='. abs((int)(int)$id);
+    
   }
+
+  return $url;
 
 }
 
@@ -54,7 +53,7 @@ public static function frontPermalinks($id)
  * @return mixed
  * 
  */
-public static function frontGalleris($start, $limit)
+public static function frontGalleries($start, $limit)
 {
 
 $sql = "SELECT ID, media_filename, media_caption FROM tbl_media WHERE media_target = 'gallery'
@@ -150,12 +149,6 @@ public static function frontTopicBySlug($slug)
 
  return (empty($result)) ?: $result;
 
-}
-
-public static function frontPostByArchive($from, $to)
-{
-
-  
 }
 
 /**
