@@ -2,19 +2,13 @@
 
 <?php
 
+
 echo "<pre>";
 $requestPath = new RequestPath();
 echo "Request matched: {$requestPath->matched} <br>";
 echo "Request param1: {$requestPath->param1} <br>";
 echo "Request param2: {$requestPath->param2} <br>";
 echo "Request param3: {$requestPath->param3} <br>";
-echo "</pre>";
-
-echo "<pre>";
-echo "<b>Server Request URI:</b>".trim($_SERVER['REQUEST_URI'], '/')."<br>";
-
-
-
 echo "</pre>";
 
 echo "<pre>";
