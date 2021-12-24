@@ -49,7 +49,7 @@ function db_simple_query($sql)
  * @return object
  * 
  */
-function db_prepared_query($sql, $params, $types)
+function db_prepared_query($sql, $params = [], $types = null)
 {
   
   return db_instance()->preparedQuery($sql, $params, $types);
