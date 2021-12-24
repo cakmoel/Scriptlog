@@ -1,9 +1,11 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class FrontHelper
  * 
  * FrontHelper class will be useful for theme functionality
  * to retrieve particular content needed on theme layout
+ * and theme meta
  *
  * @category Core Class
  * @author M.Noermoehammad
@@ -22,27 +24,21 @@ class FrontHelper
  * @return mixed|bool
  * 
  */
-public static function frontPermalinks($id)
+public static function frontPostSlug($id)
 {
 
-  $url = null;
+  $idsanitized = static::frontSanitizer($id, 'sql');
 
-  $id = prevent_injection(db_instance()->real_escape_string((int)$id));
+  $query = db_simple_query('SELECT ID, post_slug FROM tbl_posts WHERE ID = ' . $idsanitized);
+  
+  $results = $query->fetch_assoc();
 
-  if (app_info()['permalink_setting'] == 'yes') {
+  if ( isset($results) ) {
 
-    $query = db_simple_query("SELECT post_slug FROM tbl_posts WHERE ID = '$id'")->fetch_object();
+    return $results;
 
-    $url = $query->post_slug;
-
-  } else {
-
-    $url = '?p='. abs((int)(int)$id);
-    
   }
-
-  return $url;
-
+             
 }
 
 /**
@@ -56,14 +52,30 @@ public static function frontPermalinks($id)
 public static function frontGalleries($start, $limit)
 {
 
+$front = [];
+
 $sql = "SELECT ID, media_filename, media_caption FROM tbl_media WHERE media_target = 'gallery'
        ORDER BY ID LIMIT ?, ?";
 
 $statement = db_prepared_query($sql, [$start, $limit], 'ii');
 
-$result = get_result($statement);
+$results = get_result($statement);
 
-return $result;
+if ( isset($results) ) {
+
+foreach ($results as $result) {
+
+  $media_filename = $result['media_filename'];
+  $media_caption = $result['media_caption'];
+  $media_id = $result['ID'];
+
+}   
+
+$front = ['media_filename' => $media_filename, 'media_caption' => $media_caption, 'media_id' => $media_id];
+
+return $front;
+
+}
 
 }
 
@@ -163,5 +175,6 @@ private static function frontSanitizer($str, $type)
 { 
  return sanitizer($str, $type);
 }
+
 
 }
