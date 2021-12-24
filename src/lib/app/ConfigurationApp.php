@@ -371,7 +371,7 @@ class ConfigurationApp
           $this->setPageTitle('Permalink Setting');
           $this->setFormAction(ActionConst::PERMALINK_CONFIG);
           $this->view->set('pageTitle', $this->getPageTitle());
-          $this->view->set('settingData', $data_permalink);
+          $this->view->set('permalinkData', $data_permalink);
           $this->view->set('errors', $errors);
           $this->view->set('formAction', $this->getFormAction());
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));

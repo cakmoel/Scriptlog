@@ -30,7 +30,7 @@ final class Dispatcher
    * 
    */
   private $route;
-  
+
   /**
    * Theme's Directory
    *
@@ -116,18 +116,6 @@ final class Dispatcher
     return $uri_requested;
   }
 
-  /**
-   * InvokeTheme
-   * 
-   * invoking theme actived
-   * @return mixed
-   * 
-   */
-  private function invokeTheme()
-  {
-    return theme_identifier();
-  }
-  
 /**
    * whiteListPathRequested
    *
@@ -139,17 +127,27 @@ final class Dispatcher
     return ['/', '//', 'post', 'page', 'blog', 'category', 'archive'];
   }
 
-/**
-   * Error not found 404
-   * set 404 error page
+  /* InvokeTheme
    * 
-   * @param string $theme_dir
+   * invoking theme actived
+   * @return mixed
    * 
    */
-  private function errorNotFound($theme_dir)
+  private function invokeTheme()
   {
-    http_response_code(404);
-    include($theme_dir.'404.php');
+    return theme_identifier();
   }
+
+  /* Error not found 404
+  * set 404 error page
+  * 
+  * @param string $theme_dir
+  * 
+  */
+ private function errorNotFound($theme_dir)
+ {
+   http_response_code(404);
+   include($theme_dir.'404.php');
+ }
 
 }
