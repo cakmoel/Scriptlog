@@ -47,7 +47,7 @@ public function __construct()
    
     if ($this->dbc->connect_errno) {
 
-      throw new mysqli_sql_exception("Error Processing Request", 1);
+      throw new mysqli_sql_exception("Error Processing Connection", 1);
       
     }
     
@@ -74,7 +74,7 @@ public function __destruct()
   
   if ($this->dbc) {
 
-      $this->disconnect();
+    $this->disconnect();
 
   }
 
@@ -165,7 +165,7 @@ public function simpleQuery($sql)
  * @return object
  * 
  */
-public function preparedQuery($sql, $params = [], $types = "")
+public function preparedQuery($sql, array $params, $types = null)
 {
   
   $types = $types ?: str_repeat("s", count($params));
@@ -174,8 +174,8 @@ public function preparedQuery($sql, $params = [], $types = "")
 
   $stmt->bind_param($types, ...$params);
   
-  $stmt->execute();
-  
+  if ( ! $stmt->execute() ) return false;
+
   return $stmt;
 
 }
