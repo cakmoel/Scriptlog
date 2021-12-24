@@ -116,7 +116,7 @@ private static function isRequestToPathValid($args)
  * @return mixed
  * 
  */
-private static function isMatchedUriRequested()
+public static function isMatchedUriRequested()
 {
   $matched_uri = (isset($_SERVER['REQUEST_URI'])) ? trim($_SERVER['REQUEST_URI'], DIRECTORY_SEPARATOR) : "";
   $slice_matched = explode(DIRECTORY_SEPARATOR, $matched_uri);
@@ -130,13 +130,36 @@ private static function isMatchedUriRequested()
  * @return mixed
  * 
  */
-private static function isQueryStringRequested()
+public static function isQueryStringRequested()
 {
   $query_string = (isset($_SERVER['QUERY_STRING'])) ? $_SERVER['QUERY_STRING'] : "";
   $slice_query = explode('=', $query_string);
   $get_key = isset($slice_query[0]) ? $slice_query[0] : "";
   $get_value = isset($slice_query[1]) ? $slice_query[1] : "";
   return array('key' => $get_key, 'value'=>$get_value);
+}
+
+/**
+ * checkMatchUriRequested()
+ *
+ * @return bool
+ * 
+ */
+public static function checkMatchUriRequested()
+{
+  
+  self::$requestPathURI = new RequestPath();
+
+  if ( self::isMatchedUriRequested() === self::$requestPathURI->matched ) {
+    
+    return true;
+
+  } else {
+
+    return false;
+
+  }
+
 }
 
 /**
@@ -165,29 +188,6 @@ public static function allowedPathRequested(array $path, array $rules)
   return true;
 
  }
-
-}
-
-/**
- * checkMatchUriRequested()
- *
- * @return bool
- * 
- */
-public static function checkMatchUriRequested()
-{
-  
-  self::$requestPathURI = new RequestPath();
-
-  if ( self::isMatchedUriRequested() === self::$requestPathURI->matched ) {
-    
-    return true;
-
-  } else {
-
-    return false;
-
-  }
 
 }
 
@@ -228,7 +228,7 @@ public static function deliverQueryString()
 
       break;
 
-    case 'page':
+    case 'pg':
       // Deliver request to a single page
       if ( ! empty(static::isQueryStringRequested()['value']) ) {
 
@@ -236,12 +236,13 @@ public static function deliverQueryString()
 
       } else {
 
-        direct_page('', 302);
+        direct_page('404.php', 302);
+
       }
 
       break;
 
-    case 'm':
+    case 'a':
       // Deliver request to an archives
       if ( ! empty(static::isQueryStringRequested()['value']) ) {
 
@@ -261,20 +262,22 @@ public static function deliverQueryString()
       break;
 
     default:
+      
       # default request will be delivered
-      if ( true === static::checkMatchUriRequested() ) {
-
-        call_theme_content('home');
-
-      } else {
+      if ( false === static::checkMatchUriRequested() ) {
 
         direct_page('', 505);
 
-      }
+      } else {
 
+        call_theme_content('home');
+
+      }
+      
       break;
 
   }
+  
 
 }
 
