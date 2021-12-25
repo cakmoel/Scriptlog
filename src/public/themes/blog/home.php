@@ -2,12 +2,13 @@
  
 $hero_headlines = featured_post();
 
-if ( is_array($hero_headlines) ) :
+if ( isset($hero_headlines) ) :
 
    foreach ($hero_headlines as $hero_headline) {
      
-     $featured_hero_img = isset($hero_headline['media_filename']) ? safe_html($hero_headline['media_filename']) : "";
-     $featured_hero_title = isset($hero_headline['post_title']) ? safe_html($hero_headline['post_title']) : "";
+    $featured_hero_id = isset($hero_headline['ID']) ? safe_html((int)$hero_headline['ID']) : ""; 
+    $featured_hero_img = isset($hero_headline['media_filename']) ? safe_html($hero_headline['media_filename']) : "";
+    $featured_hero_title = isset($hero_headline['post_title']) ? safe_html($hero_headline['post_title']) : "";
 
    }
 
@@ -19,7 +20,7 @@ if ( is_array($hero_headlines) ) :
         <div class="row">
           <div class="col-lg-7">
             <h1 style="color: #379392;"><?=isset($featured_hero_title) ? $featured_hero_title : ""; ?></h1>
-            <a href="#" class="hero-link">Discover More</a>
+            <a href="<?= permalinks($featured_hero_id)['post']; ?>" class="hero-link">Discover More</a>
           </div>
         </div><a href=".intro" class="continue link-scroll"><i class="fa fa-long-arrow-down"></i> Scroll Down</a>
       </div>
@@ -108,8 +109,8 @@ if ( is_array($random_posts) ) :
            
             foreach ( $post_topics as $post_topic ) :
      
-              $random_post_img = isset($post_topic['media_filename']) ? safe_html($post_topic['media_filename']) : "";
-              $random_post_author = (isset($post_topic['user_fullname']) || isset($post_topic['user_login']) ) ? safe_html($post_topic['user_fullname']) : safe_html($post_topic['user_login']);
+              $random_post_img = isset($random_post['media_filename']) ? safe_html($random_post['media_filename']) : "";
+              $random_post_author = (isset($random_post['user_fullname']) || isset($random_post['user_login']) ) ? safe_html($random_post['user_fullname']) : safe_html($random_post['user_login']);
               $topic_slug = isset($post_topic['topic_slug']) ? safe_html($post_topic['topic_slug']) : "";
               $topic_title = isset($post_topic['topic  title']) ? safe_html($post_topic['topic_title']) : "";
 
