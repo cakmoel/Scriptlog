@@ -1,6 +1,9 @@
  <?php 
  
 $hero_headlines = featured_post();
+$sticky_page = is_array(sticky_page()) ? sticky_page() : "";
+$random_posts = random_posts(3);
+$divider_contents = featured_post();
 
 if ( isset($hero_headlines) ) :
 
@@ -22,7 +25,8 @@ if ( isset($hero_headlines) ) :
             <h1 style="color: #379392;"><?=isset($featured_hero_title) ? $featured_hero_title : ""; ?></h1>
             <a href="<?= permalinks($featured_hero_id)['post']; ?>" class="hero-link">Discover More</a>
           </div>
-        </div><a href=".intro" class="continue link-scroll"><i class="fa fa-long-arrow-down"></i> Scroll Down</a>
+        
+        </div><a href="<?= (empty($sticky_page) ) ? "#" : ".intro"; ?>" class="continue link-scroll"><i class="fa fa-long-arrow-down"></i> Scroll Down</a>
       </div>
 </section>
 
@@ -35,8 +39,6 @@ endif;
 ?>
 
 <?php 
-
-$sticky_page = sticky_page();
 
  if ( is_array($sticky_page) ) :
 
@@ -79,8 +81,6 @@ endif;
         
 <?php 
     
-$random_posts = random_posts(3);
-
 if ( is_array($random_posts) ) :
 
     $r = 0;
@@ -161,7 +161,6 @@ if ( is_array($random_posts) ) :
 <!-- divider section -->
 
 <?php 
-$divider_contents = featured_post();
 
 if ( is_array( $divider_contents ) ) :
 
