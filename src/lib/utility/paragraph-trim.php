@@ -16,13 +16,13 @@
 function paragraph_l2br($content)
 {
   
-  if(version_compare(phpversion(), '7.4.25', '<')) {
+  if(version_compare(phpversion(), '7.4.25', '<=')) {
 
-      return str_replace(paragraph_newline_checker(), '<br>', $content);
+    return str_replace(paragraph_newline_checker(), '<br>', $content);
 
   }
 
-  return nl2br(paragraph_trim($content), false);
+  return html_entity_decode(nl2br(paragraph_trim($content), false));
 
 }
 
@@ -55,7 +55,7 @@ function paragraph_trim($content, $limit = 320, $schr="\n", $scnt=2)
 
   }
 
-  $content = substr($content, 0, $post);
+  $content = substr($content, 0, escape_html($post));
 
   if(strlen($content) >= $limit) {
 
