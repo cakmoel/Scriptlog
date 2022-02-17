@@ -38,7 +38,7 @@ final class AntiXSS
     private $_never_allowed_regex = [];
 
     /**
-     * List of html tags that will not closed automatically.
+     * List of html tags that will not close automatically.
      *
      * @var string[]
      */
@@ -46,10 +46,25 @@ final class AntiXSS
 
     /**
      * List of never allowed call statements.
+     * 
+     * @var string[] 
+     */
+    private $_never_allowed_js_callback_regex = [
+        '\(?window\)?\.',
+        '\(?history\)?\.',
+        '\(?location\)?\.',
+        '\(?document\)?\.',
+        '\(?cookie\)?\.',
+        '\(?ScriptElement\)?\.',
+        'd\s*a\s*t\s*a\s*:',
+    ];
+    
+    /**
+     * List of simple never allowed call statements.
      *
      * @var string[]
      */
-    private static $_never_allowed_call = [
+    private $_never_allowed_call_strings = [
         // default javascript
         'javascript',
         // Java: jar-protocol is an XSS hazard
@@ -537,7 +552,7 @@ final class AntiXSS
         if (\strpos($str, '=') !== false) {
             $strCopy = $str;
             $matchesTmp = [];
-            while (\preg_match("/[?|&]?[\p{L}0-9_\-\[\]]+\s*=\s*([\"'])(?<attr>[^\1]*?)\\1/u", $strCopy, $matches)) {
+            while (\preg_match("/[?|&]?[\p{L}\d_\-\[\]]+\s*=\s*([\"'])(?<attr>[^\1]*?)\\1/u", $strCopy, $matches)) {
                 $matchesTmp[] = $matches;
                 $strCopy = \str_replace($matches[0], '', $strCopy);
 
@@ -546,9 +561,7 @@ final class AntiXSS
                 }
             }
 
-            if ($strCopy === $str) {
-                $needProtection = true;
-            } else {
+            if ($strCopy !== $str) {
                 $needProtection = false;
                 foreach ($matchesTmp as $matches) {
                     if (isset($matches['attr'])) {
@@ -716,7 +729,7 @@ final class AntiXSS
         // ---
 
         $replaceNeverAllowedCall = [];
-        foreach (self::$_never_allowed_call as $call) {
+        foreach ($this->_never_allowed_call_strings as $call) {
             if (\stripos($str, $call) !== false) {
                 $replaceNeverAllowedCall[] = $call;
             }
@@ -847,7 +860,7 @@ final class AntiXSS
         if (
             \strpos($str, '&') !== false
             &&
-            \preg_match_all('/(?<html_entity>&[A-Za-z]{2,}[;]{0})/', $str, $matches)
+            \preg_match_all('/(?<html_entity>&[A-Za-z]{2,};{0})/', $str, $matches)
         ) {
             if ($HTML_ENTITIES_CACHE === null) {
 
@@ -953,7 +966,7 @@ final class AntiXSS
 
         if (\strpos($str, '=') !== false) {
             $matchesTmp = [];
-            while (\preg_match('#\s*[\p{L}0-9_\-\[\]]+\s*=\s*(["\'])(?:[^\1]*?)\\1#u', $str, $matches)) {
+            while (\preg_match('#\s*[\p{L}\d_\-\[\]]+\s*=\s*(["\'])(?:[^\1]*?)\\1#u', $str, $matches)) {
                 $matchesTmp[] = $matches[0];
                 $str = \str_replace($matches[0], '', $str);
 
@@ -1082,7 +1095,6 @@ final class AntiXSS
                 $needProtection = true;
                 $matchInner['link'] = \str_replace(' ', '%20', $matchInner['link']);
 
-                /** @noinspection BypassedUrlValidationInspection */
                 if (
                     \strpos($matchInner[0], 'script') === false
                     &&
@@ -1100,7 +1112,6 @@ final class AntiXSS
                 if ($needProtection) {
                     $tmpAntiXss = clone $this;
 
-                    /** @noinspection UnusedFunctionResultInspection */
                     $tmpAntiXss->xss_clean((string) $matchInner[0]);
 
                     if ($tmpAntiXss->isXssFound() === true) {
@@ -1119,12 +1130,12 @@ final class AntiXSS
             if (!$foundSomethingBad) {
                 // filter for javascript
                 $patternTmp = '';
-                foreach (self::$_never_allowed_call as $callTmp) {
+                foreach ($this->_never_allowed_call_strings as $callTmp) {
                     if (\stripos($match[0], $callTmp) !== false) {
                         $patternTmp .= $callTmp . ':|';
                     }
                 }
-                $pattern = '#' . $search . '=.*(?:' . $patternTmp . '\(?window\)?\.|\(?history\)?\.|\(?location\)?\.|\(?document\)?\.|\(?cookie\)?\.|\(?ScriptElement\)?\.|d\s*a\s*t\s*a\s*:)#ius';
+                $pattern = '#' . $search . '=.*(?:' . $patternTmp . \implode('|', $this->_never_allowed_js_callback_regex) . ')#ius';
                 $matchInner = [];
                 if (\preg_match($pattern, $match[1], $matchInner)) {
                     $replacer = (string) \preg_replace(
@@ -1427,7 +1438,7 @@ final class AntiXSS
         }
 
         return (string) \preg_replace_callback(
-            '#\+([\p{L}0-9]+)-#iu',
+            '#\+([\p{L}\d]+)-#iu',
             function ($matches) {
                 return $this->_repack_utf7_callback($matches);
             },
@@ -1625,7 +1636,7 @@ final class AntiXSS
                 \stripos($fullMatch, '<' . $matches['tagName'] . '<') !== 0
             )
             ||
-            \preg_match('/<[\/]?' . $matches['tagName'] . '\p{L}+>/ius', $fullMatch) === 1
+            \preg_match('/<\/?' . $matches['tagName'] . '\p{L}+>/ius', $fullMatch) === 1
         ) {
             return $fullMatch;
         }
@@ -1880,6 +1891,48 @@ final class AntiXSS
     }
 
     /**
+     * Add some strings to the "_never_allowed_js_callback_regex"-array.
+     *
+     * @param string[] $strings
+     *
+     * @return $this
+     */
+    public function addNeverAllowedJsCallbackRegex(array $strings): self
+    {
+        if ($strings === []) {
+            return $this;
+        }
+
+        $this->_never_allowed_js_callback_regex = \array_merge(
+            $strings,
+            $this->_never_allowed_js_callback_regex
+        );
+
+        return $this;
+    }
+    
+    /**
+     * Add some strings to the "_never_allowed_call_strings"-array.
+     *
+     * @param string[] $strings
+     *
+     * @return $this
+     */
+    public function addNeverAllowedCallStrings(array $strings): self
+    {
+        if ($strings === []) {
+            return $this;
+        }
+
+        $this->_never_allowed_call_strings = \array_merge(
+            $strings,
+            $this->_never_allowed_call_strings
+        );
+
+        return $this;
+    }
+
+    /**
      * Remove some strings from the "_do_not_close_html_tags"-array.
      *
      * <p>
@@ -2030,6 +2083,58 @@ final class AntiXSS
     }
 
     /**
+     * Remove some strings from the "_never_allowed_call_strings"-array.
+     *
+     * <p>
+     * <br />
+     * WARNING: Use this method only if you have a really good reason.
+     * </p>
+     *
+     * @param string[] $strings
+     *
+     * @return $this
+     */
+    public function removeNeverAllowedCallStrings(array $strings): self
+    {
+        if ($strings === []) {
+            return $this;
+        }
+
+        $this->_never_allowed_call_strings = \array_diff(
+            $this->_never_allowed_call_strings,
+            \array_intersect($strings, $this->_never_allowed_call_strings)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Remove some strings from the "_never_allowed_js_callback_regex"-array.
+     *
+     * <p>
+     * <br />
+     * WARNING: Use this method only if you have a really good reason.
+     * </p>
+     *
+     * @param string[] $strings
+     *
+     * @return $this
+     */
+    public function removeNeverAllowedJsCallbackRegex(array $strings): self
+    {
+        if ($strings === []) {
+            return $this;
+        }
+
+        $this->_never_allowed_js_callback_regex = \array_diff(
+            $this->_never_allowed_js_callback_regex,
+            \array_intersect($strings, $this->_never_allowed_js_callback_regex)
+        );
+
+        return $this;
+    }
+
+    /**
      * Set the replacement-string for not allowed strings.
      *
      * @param string $string
@@ -2096,7 +2201,7 @@ final class AntiXSS
      *
      * @return string|string[]
      *
-     * @template TXssCleanInput
+     * @template TXssCleanInput as string|string[]
      * @phpstan-param TXssCleanInput $str
      * @phpstan-return TXssCleanInput
      */
@@ -2108,6 +2213,7 @@ final class AntiXSS
         // check for an array of strings
         if (\is_array($str)) {
             foreach ($str as &$value) {
+                /* @phpstan-ignore-next-line | _xss_found is maybe changed via "xss_clean" */
                 if ($this->_xss_found === true) {
                     $alreadyFoundXss = true;
                 } else {
@@ -2115,7 +2221,8 @@ final class AntiXSS
                 }
                 
                 $value = $this->xss_clean($value);
-                
+
+                /* @phpstan-ignore-next-line | _xss_found is maybe changed via "xss_clean" */
                 if ($alreadyFoundXss === true) {
                     $this->_xss_found = true;
                 }
