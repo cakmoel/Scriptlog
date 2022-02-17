@@ -1,5 +1,18 @@
 # Changelog
 
+### 6.0.3 (2022-01-30)
+
+- optimize phpdocs
+
+### 6.0.2 (2022-01-24)
+
+- update vendor (ASCII) lib
+
+### 6.0.1 (2022-01-24)
+
+- add "UTF8::levenshtein()" | thanks @NewEXE
+- update vendor (ASCII) lib
+
 ### 6.0.0 (2021-12-08)
 
 Removed:
