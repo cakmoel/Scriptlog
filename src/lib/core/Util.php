@@ -2041,12 +2041,15 @@ class Util
      * @param  string $number The number to append an ordinal suffix to
      * @return string
      */
-    public static function ordinal($number)
+    public static function ordinal($number, $locale)
     {
-        $test_c = abs($number) % 10;
-        $ext = ((abs($number) % 100 < 21 && abs($number) % 100 > 4) ? 'th' : (($test_c < 4) ? ($test_c < 3) ? ($test_c < 2) ? ($test_c < 1) ? 'th' : 'st' : 'nd' : 'rd' : 'th'));
+        
+        $numberFormat = new NumberFormatter($locale, NumberFormatter::ORDINAL);
 
-        return $number . $ext;
+        $display_ordinal = $numberFormat->format($number);
+
+        return $display_ordinal;
+
     }
 
     /**
