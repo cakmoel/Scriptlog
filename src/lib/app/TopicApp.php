@@ -75,7 +75,7 @@ class TopicApp extends BaseApp
     
     if (isset($_POST['topicFormSubmit'])) {
        
-      $filters = ['topic_title' => FILTER_SANITIZE_STRING];
+      $filters = ['topic_title' => isset($_POST['topic_title']) ? Sanitize::severeSanitizer($_POST['topic_title']) : ""];
      
       try {
           
@@ -163,7 +163,9 @@ class TopicApp extends BaseApp
     
     if (isset($_POST['topicFormSubmit'])) {
         
-        $filters = ['topic_title' => FILTER_SANITIZE_STRING, 'topic_status' => FILTER_SANITIZE_STRING, 'topic_id' => FILTER_SANITIZE_NUMBER_INT];
+        $filters = ['topic_title' => isset($_POST['topic_title']) ? Sanitize::severeSanitizer($_POST['topic_title']) : "", 
+                    'topic_status' => isset($_POST['topic_status']) ? Sanitize::mildSanitizer($_POST['topic_status']) : "", 
+                    'topic_id' => FILTER_SANITIZE_NUMBER_INT];
  
         try {
             
