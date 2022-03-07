@@ -345,7 +345,10 @@ class ConfigurationApp
 
     $server_software = json_decode($data_permalink['setting_value'], true);
 
-    $filters = ['permalinks' => FILTER_SANITIZE_STRING, 'setting_id' => FILTER_SANITIZE_NUMBER_INT, 'setting_name' => FILTER_SANITIZE_STRING];
+    $filters = ['permalinks' => isset($_POST['permalinks']) ? Sanitize::severeSanitizer($_POST['permalinks']) : "", 
+                'setting_id' => FILTER_SANITIZE_NUMBER_INT, 
+                'setting_name' => isset($_POST['setting_name']) ? Sanitize::severeSanitizer($_POST['setting_name']) : ""
+              ];
     
     if(isset($_POST['configFormSubmit'])) {
 
@@ -358,7 +361,7 @@ class ConfigurationApp
         
         }
 
-        if(false === sanitize_selection_box(distill_post_request($filters)['permalinks'], ['yes', 'no'])) {
+        if( false === sanitize_selection_box(distill_post_request($filters)['permalinks'], ['yes', 'no']) ) {
 
           $checkError = false;
           array_push($errors, "Please choose the available value provided!");
