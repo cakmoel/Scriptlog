@@ -83,7 +83,11 @@ class MenuApp extends BaseApp
 
     if (isset($_POST['menuFormSubmit'])) {
       
-      $filters = ['parent_id' => FILTER_SANITIZE_NUMBER_INT, 'menu_label' => FILTER_SANITIZE_STRING, 'menu_link' => FILTER_SANITIZE_URL, 'menu_position'=>FILTER_SANITIZE_STRING];
+      $filters = ['parent_id' => FILTER_SANITIZE_NUMBER_INT, 
+                  'menu_label' => isset($_POST['menu_label']) ? Sanitize::severeSanitizer($_POST['menu_label']) : "", 
+                  'menu_link' => FILTER_SANITIZE_URL, 
+                  'menu_position'=> isset($_POST['menu_position']) ? Sanitize::mildSanitizer($_POST['menu_position']) : ""
+                ];
 
       try {
 
@@ -191,9 +195,14 @@ class MenuApp extends BaseApp
 
     if (isset($_POST['menuFormSubmit'])) {
 
-      $filters = ['parent_id' => FILTER_SANITIZE_NUMBER_INT, 'menu_label' => FILTER_SANITIZE_STRING, 'menu_link' => FILTER_SANITIZE_URL, 
-                  'menu_sort' => FILTER_SANITIZE_NUMBER_INT, 'menu_status' => FILTER_SANITIZE_STRING, 'menu_id' => FILTER_SANITIZE_NUMBER_INT, 
-                  'menu_position' => FILTER_SANITIZE_STRING];
+      $filters = ['parent_id' => FILTER_SANITIZE_NUMBER_INT, 
+                  'menu_label' => isset($_POST['menu_label']) ? Sanitize::severeSanitizer($_POST['menu_label']) : "", 
+                  'menu_link' => FILTER_SANITIZE_URL, 
+                  'menu_sort' => FILTER_SANITIZE_NUMBER_INT, 
+                  'menu_status' => isset($_POST['menu_status']) ? Sanitize::mildSanitizer($_POST['menu_status']) : "", 
+                  'menu_id' => FILTER_SANITIZE_NUMBER_INT, 
+                  'menu_position' => isset($_POST['menu_position']) ? Sanitize::mildSanitizer($_POST['menu_position']) : ""
+                ];
 
       try {
 
