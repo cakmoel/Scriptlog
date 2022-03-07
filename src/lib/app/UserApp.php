@@ -15,8 +15,20 @@ use Egulias\EmailValidator\Validation\RFCValidation;
 class UserApp extends BaseApp
 {
 
+/**
+ * an instance of view
+ *
+ * @var object
+ * 
+ */
   private $view;
 
+/**
+ * an instance of userEvent
+ *
+ * @var object
+ * 
+ */
   private $userEvent;
 
   public function __construct(UserEvent $userEvent)
@@ -28,8 +40,11 @@ class UserApp extends BaseApp
  * listItems()
  * 
  * retrieves all of users record and display it
- *
+ * 
+ * {@inheritDoc}
+ * @uses BaseApp::listItems() BaseApp::listItems
  * @return mixed
+ * 
  */
   public function listItems()
   {
@@ -173,9 +188,14 @@ class UserApp extends BaseApp
    
     if (isset($_POST['userFormSubmit'])) {
        
-        $filters = ['user_login' => FILTER_SANITIZE_STRING, 'user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 
-                    'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'user_url' => FILTER_SANITIZE_URL, 'user_level' => FILTER_SANITIZE_STRING, 
-                    'session_id' => FILTER_SANITIZE_ENCODED, 'send_user_notification' => FILTER_SANITIZE_NUMBER_INT];
+        $filters = ['user_login' => isset($_POST['user_login']) ? Sanitize::severeSanitizer($_POST['user_login']) : "", 
+                    'user_fullname' => isset($_POST['user_fullname']) ? Sanitize::severeSanitizer($_POST['user_fullname']) : "", 
+                    'user_email' => FILTER_SANITIZE_EMAIL, 
+                    'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 
+                    'user_url' => FILTER_SANITIZE_URL, 
+                    'user_level' => isset($_POST['user_level']) ? Sanitize::mildSanitizer($_POST['user_level']) : "", 
+                    'session_id' => FILTER_SANITIZE_ENCODED, 
+                    'send_user_notification' => FILTER_SANITIZE_NUMBER_INT];
 
         try {
         
@@ -205,7 +225,7 @@ class UserApp extends BaseApp
                 
             }
             
-            if ((isset($_POST['user_email'])) && (!email_validation($_POST['user_email'], new RFCValidation()))) {
+            if ( ( isset( $_POST['user_email'] ) ) && ( !email_validation( $_POST['user_email'], new RFCValidation() ) ) ) {
                 
                 $checkError = false;
                 array_push($errors, "Please enter a valid email address");
@@ -335,7 +355,9 @@ class UserApp extends BaseApp
   }
   
   /**
-   * Update user
+   * Update
+   * 
+   * Updating user record by administrator
    * 
    * {@inheritDoc}
    * @see BaseApp::update()
@@ -371,13 +393,13 @@ class UserApp extends BaseApp
     
     if (isset($_POST['userFormSubmit'])) {
        
-        $filters = ['user_fullname' => FILTER_SANITIZE_STRING, 
+        $filters = ['user_fullname' => isset($_POST['user_fullname']) ? Sanitize::severeSanitizer($_POST['user_fullname']) : "", 
                     'user_email' => FILTER_SANITIZE_EMAIL, 
                     'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 
                     'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                     'current_pwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                     'user_url' => FILTER_SANITIZE_URL, 
-                    'user_level' => FILTER_SANITIZE_STRING, 
+                    'user_level' => isset($_POST['user_level']) ? Sanitize::mildSanitizer($_POST['user_level']) : "", 
                     'user_id' => FILTER_SANITIZE_NUMBER_INT, 
                     'user_banned' => FILTER_SANITIZE_NUMBER_INT
                 ];
@@ -386,12 +408,12 @@ class UserApp extends BaseApp
       
         if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
               
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
             throw new AppException("Sorry, unpleasant attempt detected!");
               
         }
 
-        if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass'])) || (!empty($_POST['current_pwd']))) {
+        if ( ( !empty($_POST['user_pass2']) ) || ( !empty($_POST['user_pass']) ) || ( !empty($_POST['current_pwd']) ) ) {
  
             if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
 
@@ -492,17 +514,17 @@ class UserApp extends BaseApp
 
               if ((isset($_POST['user_id'])) && ($_POST['user_id'] == 1) && ($this->userEvent->isUserLevel() == 'administrator')) {
 
-                  $this->userEvent->setUserLevel($getUser['user_level']);
+                $this->userEvent->setUserLevel($getUser['user_level']);
 
               } else {
 
-                  $this->userEvent->setUserLevel(distill_post_request($filters)['user_level']);
+                $this->userEvent->setUserLevel(distill_post_request($filters)['user_level']);
 
               }
               
               if (!empty($_POST['user_pass'])) {
                       
-                  $this->userEvent->setUserPass(prevent_injection(distill_post_request($filters)['user_pass']));
+                $this->userEvent->setUserPass(prevent_injection(distill_post_request($filters)['user_pass']));
 
               }
 
@@ -611,8 +633,10 @@ class UserApp extends BaseApp
 
     if(isset($_POST['userFormSubmit'])) {
 
-        $filters = ['user_fullname' => FILTER_SANITIZE_STRING, 'user_email' => FILTER_SANITIZE_EMAIL, 
-                    'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        $filters = ['user_fullname' => isset($_POST['user_fullname']) ? Sanitize::severeSanitizer($_POST['user_fullname']) : "", 
+                    'user_email' => FILTER_SANITIZE_EMAIL, 
+                    'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 
+                    'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                     'current_pwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                     'user_url' => FILTER_SANITIZE_URL, 'user_id' => FILTER_SANITIZE_NUMBER_INT];
 
@@ -770,6 +794,7 @@ class UserApp extends BaseApp
   }
 
   /**
+   * remove
    * 
    * {@inheritDoc}
    * @see BaseApp::delete()
@@ -842,7 +867,14 @@ class UserApp extends BaseApp
     } 
 
   }
-  
+
+  /**
+   * setView
+   *
+   * @param string $viewName
+   * @return object
+   * 
+   */
   protected function setView($viewName)
   {
      $this->view = new View('admin', 'ui', 'users', $viewName);
