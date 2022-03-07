@@ -120,17 +120,17 @@ class PostApp extends BaseApp
         $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
 
         $filters = [
-          'post_title' => FILTER_SANITIZE_SPECIAL_CHARS,
+          'post_title' => isset($_POST['post_title']) ? Sanitize::severeSanitizer($_POST['post_title']) : "",
           'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-          'post_date' => FILTER_SANITIZE_STRING,
+          'post_date' => isset($_POST['post_date']) ? Sanitize::mildSanitizer($_POST['post_date']) : "",
           'image_id' => FILTER_SANITIZE_NUMBER_INT,
           'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
           'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
           'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
           'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-          'post_status' => FILTER_SANITIZE_STRING,
+          'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
           'post_headlines' => FILTER_SANITIZE_NUMBER_INT,
-          'comment_status' => FILTER_SANITIZE_STRING
+          'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : ""
        ];
 
        $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 50000];
@@ -480,15 +480,15 @@ class PostApp extends BaseApp
         'post_id' => FILTER_SANITIZE_NUMBER_INT,
         'post_title' => FILTER_SANITIZE_SPECIAL_CHARS,
         'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'post_modified' => FILTER_SANITIZE_STRING,
+        'post_modified' => isset($_POST['post_modified']) ? Sanitize::mildSanitizer($_POST['post_modified']) : "",
         'image_id' => FILTER_SANITIZE_NUMBER_INT,
         'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
         'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'post_status' => FILTER_SANITIZE_STRING,
+        'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
         'post_headlines' => FILTER_SANITIZE_NUMBER_INT,
-        'comment_status' => FILTER_SANITIZE_STRING
+        'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : ""
       ];
 
       $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 50000];
