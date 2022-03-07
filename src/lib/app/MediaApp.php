@@ -123,7 +123,10 @@ public function insert()
     $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : null;
     $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : null;
 
-    $filters = ['media_caption' => FILTER_SANITIZE_SPECIAL_CHARS, 'media_target' => FILTER_SANITIZE_STRING, 'media_access' => FILTER_SANITIZE_STRING];
+    $filters = ['media_caption' => FILTER_SANITIZE_SPECIAL_CHARS, 
+                'media_target' => isset($_POST['media_target']) ? Sanitize::mildSanitizer($_POST['media_target']) : "", 
+                'media_access' => isset($_POST['media_access']) ? Sanitize::mildSanitizer($_POST['media_access']) : ""
+              ];
 
     $form_fields = ['media_caption' => 200];
 
@@ -395,8 +398,8 @@ public function update($id)
 
     $filters = [
       'media_caption' => FILTER_SANITIZE_SPECIAL_CHARS,
-      'media_target' => FILTER_SANITIZE_STRING,
-      'media_access' => FILTER_SANITIZE_STRING,
+      'media_target' => isset($_POST['media_target']) ? Sanitize::mildSanitizer($_POST['media_target']) : "",
+      'media_access' => isset($_POST['media_access']) ? Sanitize::mildSanitizer($_POST['media_access']) : "",
       'media_status' => FILTER_SANITIZE_NUMBER_INT,
       'media_id' => FILTER_SANITIZE_NUMBER_INT
     ];
@@ -543,7 +546,7 @@ public function update($id)
           // upload file
         if (is_uploaded_file($file_location)) {
 
-          if ( ( false === check_mime_type(mime_type_dictionary(), $file_location)) || ( false === check_file_extension($file_name))) {
+          if ( ( false === check_mime_type(mime_type_dictionary(), $file_location)) || ( false === check_file_extension($file_name) ) ) {
 
             $checkError = false;
             array_push($errors, "Invalid file format");
