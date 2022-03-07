@@ -114,9 +114,9 @@ class CommentApp extends BaseApp
         $post_id = isset($_POST['post_id']) ? abs((int)$_POST['post_id']) : 0;
         $author_name = isset($_POST['author_name']) ? trim(htmlspecialchars($_POST['author_name'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8")) : "";
         $author_ip = get_ip_address();
-        $comment_content = isset($_POST['comment_content']) ? $_POST['comment_content'] : "";
+        $comment_content = isset($_POST['comment_content']) ? Sanitize::severeSanitizer($_POST['comment_status']) : "";
         $comment_id = isset($_POST['comment_id']) ? abs((int)$_POST['comment_id']) : 0;
-        $comment_status = $_POST['comment_status'];
+        $comment_status = isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : "";
         
         try {
             
