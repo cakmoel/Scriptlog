@@ -8,11 +8,11 @@ try {
 
    $protocol = current_http_version();
 
-   if ((isset($_GET['load'])) || (array_key_exists('load', $_GET))) {
+   if ( ( isset($_GET['load']) ) || ( array_key_exists('load', $_GET) ) ) {
      
         $load = is_array($_GET['load']) ? implode('', $_GET['load']) : $_GET['load'];
         $load = filter_var($load, FILTER_VALIDATE_URL, ['flags' => FILTER_FLAG_QUERY_REQUIRED]);
-        $load = filter_input(INPUT_GET, 'load', FILTER_SANITIZE_STRING);
+        $load = filter_input(INPUT_GET, 'load', FILTER_SANITIZE_URL);
         $load = escape_null_byte($load);
         $load = preg_replace( '/[^a-z0-9,_-]+/i', '', $load);
         $load = htmlspecialchars(strtolower($load), ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');
@@ -88,8 +88,8 @@ try {
 
             if (true === block_request_type($current_request, $method_allowed)) {
 
-                 http_response_code(405);
-                 throw new AppException("405 - Method Not Allowed");
+                http_response_code(405);
+                throw new AppException("405 - Method Not Allowed");
 
             } else {
 
