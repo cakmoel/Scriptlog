@@ -13,7 +13,7 @@ $random_alpha = Util::secure_random_string(16);
 
 $captcha_code = substr(str_shuffle($random_alpha), 0, 6);
     
-Session::getInstance()->scriptlog_reset_pwd = $captcha_code;
+Session::getInstance()->forgot_pwd = $captcha_code;
  
 $layer = imagecreatetruecolor(70,30);
 $background = imagecolorallocate($layer, 127, 255, 0);
