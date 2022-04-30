@@ -112,7 +112,7 @@ endif;
 </div>
 
 <div class="form-group">
-<label for="user_level">Role</label>
+<label for="select2">Role</label>
 <?=(isset($userRole)) ? $userRole : ""; ?>
 </div>
 
