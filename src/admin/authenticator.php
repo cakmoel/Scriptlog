@@ -48,7 +48,7 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
     $expected_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
     $correct_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
 
-    if(!function_exists('hash_equals')) {
+    if ( ! function_exists('hash_equals') ) {
 
         if((timing_safe_equals($expected_validator, $correct_validator) == 0) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash'] ) ) ) {
 
