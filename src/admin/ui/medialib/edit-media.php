@@ -2,7 +2,7 @@
 
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
-    <section class="content-header">
+  <section class="content-header">
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
         <small>Control Panel</small>
@@ -12,7 +12,7 @@
         <li><a href="index.php?load=medialib">Media</a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
-    </section>
+  </section>
 
  <!-- Main content -->
 <section class="content">
@@ -35,9 +35,7 @@ endforeach;
 </div>
 <?php 
 endif;
-?>
 
-<?php 
 $action = isset($formAction) ? $formAction : null;
 $media_id = isset($mediaData['ID']) ? $mediaData['ID'] : 0;
 ?>
@@ -53,19 +51,19 @@ if (isset($mediaData['media_filename']) && isset($mediaData['media_type'])) :
 
   $webp_src = invoke_webp_image($mediaData['media_filename'], false);
   $image_src = invoke_image_uploaded($mediaData['media_filename'], false);
-  $webp_src_thumb = invoke_webp_image($mediaData['media_filename']);
-  $image_src_thumb = invoke_image_uploaded($mediaData['media_filename']);
+  $webp_src_thumb = invoke_webp_image($mediaData['media_filename'], true);
+  $image_src_thumb = invoke_image_uploaded($mediaData['media_filename'], true);
   $video_src = invoke_video_uploaded($mediaData['media_filename']);
   $audio_src = invoke_audio_uploaded($mediaData['media_filename']);
   
-     if( ! ($image_src_thumb || $webp_src_thumb)) :
+    if( ! ($image_src_thumb || $webp_src_thumb)) :
       
-       $webp_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
-       $image_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
+      $webp_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
+      $image_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
 
-     endif;
+    endif;
 
-if($image_src || $webp_src) :
+if ($image_src || $webp_src) :
 
 ?>
 
@@ -73,7 +71,7 @@ if($image_src || $webp_src) :
 <a href="<?=$webp_src;?>" title="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
 <picture class="img-responsive pad">
 <source srcset="<?= $webp_src_thumb; ?>" type="image/webp">
-<img src="<?= $image_src_thumb;?>" class="img-responsive pad" width="320" alt="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
+<img src="<?= $image_src_thumb;?>" class="img-responsive pad" alt="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
 </picture>
 </a>
 </div>
@@ -226,11 +224,11 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
                  endif;
               ?>
               
-              </dl>
-            </div>
-            <!-- /.box-body -->
-          </div>
-          <!-- /.box -->
+  </dl>
+  </div>
+  <!-- /.box-body -->
+</div>
+<!-- /.box box-solid-->
 </div>
 <!--/.col-md-6 -->
 <?php endif; ?>
