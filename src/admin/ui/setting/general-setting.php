@@ -16,9 +16,9 @@
 <!-- Main content -->
 <section class="content">
 <div class="row">
- <div class="col-md-8">
-   <div class="box box-primary">
-      <div class="box-header with-border"></div>
+<div class="col-md-8">
+<div class="box box-primary">
+<div class="box-header with-border"></div>
       <!-- /.box-header -->
 <?php
 if (isset($errors)) :
@@ -62,9 +62,8 @@ $action = (isset($formAction)) ? $formAction : null;
 ?>
 
 <div class="box-body">
-  
-     <form method="post" action="<?= generate_request('index.php', 'get', ['option-general', $action, 0])['link']; ?>" role="form">
-        <table class="table table-bordered table-striped">
+  <form method="post" action="<?= generate_request('index.php', 'get', ['option-general', $action, 0])['link']; ?>" role="form">
+    <table class="table table-bordered table-striped">
           <tbody>
           <?php 
             if (is_array($settings)) :
@@ -118,13 +117,15 @@ $action = (isset($formAction)) ? $formAction : null;
                 }
 
           ?>
-             <tr>
-              <th><label for="<?=(isset($s['setting_name'])) ? safe_html($s['setting_name']) : ""; ?>"> <?=(isset($setting_name) ? safe_html($setting_name) : ""); ?></label></th>
+            <tr>
+              <th>
+              <label for="<?=(isset($s['setting_name'])) ? safe_html($s['setting_name']) : ""; ?>"> <?=(isset($setting_name) ? safe_html($setting_name) : ""); ?></label>
+              </th>
               <td>
-              <input type="hidden" name="<?= 'setting_id['.$s['ID'].']'; ?>" value="<?= safe_html((int)$s['ID']);?>">
-              <input type="text" name="<?= 'setting_value['.$s['ID'].']' ?>" class="form-control" id="<?=(isset($s['setting_name'])) ? safe_html($s['setting_name']) : ""; ?>" value="<?= safe_html($s['setting_value']); ?>" maxlength="255" >
+                <input type="hidden" name="<?= 'setting_id['.$s['ID'].']'; ?>" value="<?= safe_html((int)$s['ID']);?>">
+                <input type="text" name="<?= 'setting_value['.$s['ID'].']' ?>" class="form-control" id="<?=(isset($s['setting_name'])) ? safe_html($s['setting_name']) : ""; ?>" value="<?= safe_html($s['setting_value']); ?>" maxlength="255" >
               </td>
-             </tr>
+            </tr>
              
           <?php
                 $i++;
