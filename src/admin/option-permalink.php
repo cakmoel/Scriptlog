@@ -18,7 +18,7 @@ try {
     
             } else {
     
-                if((!check_integer($params)) && (gettype($params) !== "integer")) {
+                if( ( !check_integer($params)) && (gettype($params) !== "integer") ) {
     
                     header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                     header("Status: 400 Bad Request");
@@ -42,7 +42,7 @@ try {
         
         default:
             
-            if(false === $authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
+            if ( false === $authenticator->userAccessControl(ActionConst::CONFIGURATION) ) {
     
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
