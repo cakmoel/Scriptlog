@@ -96,6 +96,7 @@ $post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
 </div>
 
 <input type="text" id="datetimepicker" name="<?=(isset($postData['post_modified']) ? "post_modified" : "post_date"); ?>" class="form-control" placeholder="Date" value="
+
 <?php 
 if (isset($postData['post_modified']) || isset($postData['post_date']) ) {
 
@@ -132,7 +133,7 @@ if (isset($postData['post_modified']) || isset($postData['post_date']) ) {
 <div class="box-body">
 <!-- text input -->
 
-<?=(isset($topics)) ? $topics : ""; ?>
+<?= ( isset($topics) ) ? $topics : ""; ?>
 
 <div class="form-group">
 <label for="meta_desc">Meta Description</label>
