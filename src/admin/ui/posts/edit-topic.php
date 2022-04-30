@@ -54,10 +54,12 @@ $topic_id = (isset($topicData)) ? abs((int)$topicData['ID']) : 0;
 </div>
 
 <?php if (isset($topicData['topic_status'])) : ?>
+  
 <div class="form-group">
 <label>Actived</label>
+
 <div class="radio">
-<label>
+<label for="optionsRadios1">
 <input type="radio" name="topic_status" id="optionsRadios1" value="Y" 
 <?=(isset($topicData['topic_status']) && $topicData['topic_status'] === 'Y') ? 'checked="checked"' : "";  ?>
 <?=(isset($formData['topic_status']) && $formData['topic_status'] === 'Y') ? 'checked="checked"' : "" ?>>
@@ -66,15 +68,16 @@ $topic_id = (isset($topicData)) ? abs((int)$topicData['ID']) : 0;
 </div>
 
 <div class="radio">
-<label>
-<input type="radio" name="topic_status" id="optionsRadios1" value="N" 
+<label for="optionsRadios2">
+<input type="radio" name="topic_status" id="optionsRadios2" value="N" 
 <?=(isset($topicData['topic_status']) && $topicData['topic_status'] === 'N') ? 'checked="checked"' : ""; ?>
-<?=(isset($formData['topic_status']) && $formData['topic_status'] == 'N') ? 'checked="checked"' : ""; ?>>
+<?=(isset($formData['topic_status']) && $formData['topic_status'] === 'N') ? 'checked="checked"' : ""; ?>>
    No
  </label>
 </div>
 
 </div>
+
 <?php 
 endif;
 ?>
