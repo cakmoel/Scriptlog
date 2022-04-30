@@ -42,7 +42,7 @@ try {
             
         case ActionConst::EDITUSER:
             
-            if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
+            if ( ( !check_integer($userId) ) && ( gettype($userId) !== "integer" ) ) {
     
                 header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                 header("Status: 400 Bad Request");
@@ -50,7 +50,7 @@ try {
     
             }
 
-            if ((!$userDao->checkUserId($userId, $sanitizer))) {
+            if ( ! $userDao->checkUserId($userId, $sanitizer) ) {
     
                 if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
     
@@ -80,13 +80,13 @@ try {
             
         case ActionConst::DELETEUSER:
      
-            if(false === $authenticator->userAccessControl(ActionConst::USERS)) {
+            if( false === $authenticator->userAccessControl(ActionConst::USERS) ) {
     
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
             } else {
     
-                if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
+                if ( ( !check_integer($userId) ) && ( gettype($userId) !== "integer" ) ) {
     
                     header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                     header("Status: 400 Bad Request");
