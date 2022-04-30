@@ -1,4 +1,4 @@
-//JavaScript Document
+// JavaScript Document
 function validasi(form){
 if (formlogin.login.value == ""){
 alert("Please enter username or email address");

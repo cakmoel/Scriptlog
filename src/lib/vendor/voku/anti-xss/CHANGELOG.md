@@ -1,5 +1,14 @@
 # Changelog
 
+### 4.1.39 (2022-03-08)
+
+- "To people of Russia": There is a war in Ukraine right now. The forces of the Russian Federation are attacking civilians.
+
+### 4.1.38 (2022-03-07)
+
+- optimize "_sanitize_naughty_javascript" (issue 99 | thx @Fahl-Design)
+- optimize "_do_never_allowed_afterwards", at least for strings in tags
+
 ### 4.1.37 (2022-02-15)
 
 - move more static data into the object
