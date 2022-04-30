@@ -18,7 +18,7 @@ try {
     
             } else {
     
-                if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
+                if ( ( !check_integer($postId) ) && ( gettype($postId) !== "integer" ) ) {
     
                     header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                     header("Status: 400 Bad Request");
@@ -42,7 +42,7 @@ try {
             
         case ActionConst::EDITPOST:
             
-            if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
+            if ( ( !check_integer($postId) ) && ( gettype($postId) !== "integer" ) ) {
     
                 header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                 header("Status: 400 Bad Request");
@@ -72,7 +72,7 @@ try {
             
         case ActionConst::DELETEPOST:
             
-            if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
+            if ( ( !check_integer($postId) ) && ( gettype($postId) !== "integer") ) {
     
                 header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                 header("Status: 400 Bad Request");
