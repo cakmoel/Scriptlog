@@ -21,15 +21,15 @@ if (file_exists(__DIR__ . '/../config.php')) {
 
 $userActivationKey = isset($_GET['key']) ? escape_html($_GET['key']) : '';
 
+// activation key not found then direct page to web root
 if (empty($userActivationKey)) {
 
-  // activation key not found direct page to web root
   direct_page();
 
 } else {
 
   // activate user
-  $authenticator -> activateUserAccount($userActivationKey);
+  $authenticator->activateUserAccount($userActivationKey);
 
 }
 
