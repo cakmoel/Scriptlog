@@ -17,7 +17,7 @@
 <!-- Main Content -->
 <section class="content">
 <div class="row">
-<div class="col-md-8">
+<div class="col-md-6">
 <div class="box box-primary">
   <!-- box-header -->
   <div class="box-header with-border"></div>
@@ -79,13 +79,19 @@ if (is_array($settings)) :
 
       case 'post_per_page':
          
-        $setting_name = "Post to display on frontpage";
+        $setting_name = "Posts to display on frontpage";
          
         break;
 
       case 'post_per_rss';
 
-        $setting_name = "Post to display in Feeds";
+        $setting_name = "Posts to display in Feeds";
+
+        break;
+
+      case 'post_per_archive':
+
+        $setting_name = "Posts to display in Archives";
 
         break;
        
