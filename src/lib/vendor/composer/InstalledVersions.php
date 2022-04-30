@@ -19,7 +19,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '1af1ec82613e0849f814087d79675a5b7962011f',
+    'reference' => '6eb60f1d35e48cf4798e8433b8d611c21d08e6c5',
     'name' => '__root__',
   ),
   'versions' => 
@@ -31,7 +31,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '1af1ec82613e0849f814087d79675a5b7962011f',
+      'reference' => '6eb60f1d35e48cf4798e8433b8d611c21d08e6c5',
     ),
     'doctrine/lexer' => 
     array (
@@ -62,12 +62,12 @@ private static $installed = array (
     ),
     'guzzlehttp/psr7' => 
     array (
-      'pretty_version' => '2.1.0',
-      'version' => '2.1.0.0',
+      'pretty_version' => '2.2.1',
+      'version' => '2.2.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => '089edd38f5b8abba6cb01567c2a8aaa47cec4c72',
+      'reference' => 'c94a94f120803a18554c1805ef2e539f8285f9a2',
     ),
     'intervention/image' => 
     array (
@@ -98,12 +98,12 @@ private static $installed = array (
     ),
     'laminas/laminas-escaper' => 
     array (
-      'pretty_version' => '2.9.0',
-      'version' => '2.9.0.0',
+      'pretty_version' => '2.10.0',
+      'version' => '2.10.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => '891ad70986729e20ed2e86355fcf93c9dc238a5f',
+      'reference' => '58af67282db37d24e584a837a94ee55b9c7552be',
     ),
     'psr/http-factory' => 
     array (
@@ -229,30 +229,30 @@ private static $installed = array (
     ),
     'voku/anti-xss' => 
     array (
-      'pretty_version' => '4.1.37',
-      'version' => '4.1.37.0',
+      'pretty_version' => '4.1.39',
+      'version' => '4.1.39.0',
       'aliases' => 
       array (
       ),
-      'reference' => '728e158427a263917f33b0a29eb75d866bd18d17',
+      'reference' => '64a59ba4744e6722866ff3440d93561da9e85cd0',
     ),
     'voku/portable-ascii' => 
     array (
-      'pretty_version' => '2.0.0',
-      'version' => '2.0.0.0',
+      'pretty_version' => '2.0.1',
+      'version' => '2.0.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => '9bd89e83cecdf8c37b64909454249eaed98b2c89',
+      'reference' => 'b56450eed252f6801410d810c8e1727224ae0743',
     ),
     'voku/portable-utf8' => 
     array (
-      'pretty_version' => '6.0.3',
-      'version' => '6.0.3.0',
+      'pretty_version' => '6.0.4',
+      'version' => '6.0.4.0',
       'aliases' => 
       array (
       ),
-      'reference' => '82a714b5a4973974c1113e97b11c1044a8b8cb85',
+      'reference' => 'f6c78e492520115bb2d947c3a0d90a2c6b7a60a8',
     ),
   ),
 );

@@ -20,3 +20,5 @@ public/*
 *.log
 *.sql
 >>>>>>> 5dab94b44702b58a3c8110945f2c35a6eb7834eb
+
+src/admin/assets/dist/img/
