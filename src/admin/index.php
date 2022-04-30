@@ -1,6 +1,6 @@
 <?php 
 /**
- * File index.php
+ * index.php
  * 
  * @category admin/index.php file
  * @author   M.Noermoehammad 
