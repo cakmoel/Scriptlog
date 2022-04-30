@@ -1,6 +1,7 @@
 <?php
 /**
  * login.php
+ * 
  * login functionality 
  * to access control panel or administrator page
  * 
@@ -25,8 +26,8 @@ if (file_exists(__DIR__ . '/../config.php')) {
  
 } else {
 
-   header("Location: ../install");
-   exit();
+  header("Location: ../install");
+  exit();
   
 }
 
