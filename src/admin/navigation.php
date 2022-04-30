@@ -6,7 +6,7 @@
  
 <header class="main-header">
     <!-- Logo -->
-    <a href="<?= app_url().DS.APP_ADMIN.'/index.php?load=dashboard'?>" class="logo">
+    <a href="<?= app_url().DS.APP_ADMIN.'/index.php?load=dashboard'; ?>" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
       <span class="logo-mini"><b>S</b></span>
       <!-- logo for regular state and mobile devices -->
