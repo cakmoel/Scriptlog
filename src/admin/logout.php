@@ -19,7 +19,7 @@ try {
 
               if (!$valid_logout) {
                   
-                  header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                  header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                   throw new AppException("URL Redirection to Untrusted Site");
 
               } else {
