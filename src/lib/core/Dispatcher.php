@@ -1,7 +1,4 @@
 <?php
-
-use Whoops\Handler\Handler;
-
 defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Dispatcher
