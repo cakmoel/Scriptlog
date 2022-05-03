@@ -47,21 +47,21 @@ public function __construct()
    
     if ($this->dbc->connect_errno) {
 
+      $this->disconnect();
       throw new mysqli_sql_exception("Error Processing Connection", 1);
       
     }
     
     self::activateReportMode();
+    $this->dbc->set_charset('utf8mb4');
 
   } catch (Throwable $th) {
 
-    $this->disconnect();
     $this->errors = LogError::setStatusCode(http_response_code(500));
     $this->errors = LogError::exceptionHandler($th);
 
   } catch (mysqli_sql_exception $e) {
         
-    $this->disconnect();
     $this->errors = LogError::setStatusCode(http_response_code(500));
     $this->errors = LogError::exceptionHandler($e);
 
@@ -91,7 +91,7 @@ public static function activateReportMode()
   
   if (self::$report_mode[] = new mysqli_driver()) {
 
-      self::$report_mode[] =  MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+    self::$report_mode[] =  MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
 
   }
 
@@ -121,6 +121,12 @@ public function disconnect()
   $this->dbc->close();
 }
 
+/**
+ * simpleQuery
+ *
+ * @param string $sql
+ * 
+ */
 public function simpleQuery($sql)
 {
 
@@ -260,7 +266,7 @@ $this->preparedQuery($sql, array_values($data));
  * escape_string
  *
  * @param string $field
- * @return void
+ * @return string
  * 
  */
 public function escape_string($field)
@@ -287,7 +293,7 @@ public function filterData($data)
 
  if (!is_array($data)) {
 
-    $data = trim($this->dbc->real_escape_string($data));
+    $data = trim($this->escape_string($data));
     $data = purify_dirty_html($data);
     
  } else {
@@ -416,11 +422,8 @@ $Statement->store_result();
  */
 private function getConfiguration()
 {
-
   $config = AppConfig::readConfiguration(invoke_config());
-
   return $config;
-  
 }
 
 }
