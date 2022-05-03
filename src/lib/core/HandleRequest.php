@@ -57,14 +57,13 @@ if (is_array($rules)) {
 /**
  * findRequestToPath()
  *
- * @return mixed
+ * @return string
  * 
  */
 private static function findRequestToPath()
 {
-
- $request_uri = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
- $script_name = explode('/', trim($_SERVER['SCRIPT_NAME'], '/'));
+ $request_uri = isset($_SERVER['REQUEST_URI']) ? explode('/', trim(escape_html($_SERVER['REQUEST_URI']), '/')) : NULL;
+ $script_name = isset($_SERVER['SCRIPT_NAME']) ? explode('/', trim(escape_html($_SERVER['SCRIPT_NAME']), '/')) : NULL;
  $parts = array_diff_assoc($request_uri, $script_name);
      
  if (empty($parts)) {
@@ -90,7 +89,7 @@ private static function findRequestToPath()
  *
  * @param int $args
  * @uses HandleRequest::findRequestPath 
- * @return boolean
+ * @return string|boolean return string if return true otherwise will return false
  * 
  */
 private static function isRequestToPathValid($args)
@@ -132,7 +131,7 @@ public static function isMatchedUriRequested()
  */
 public static function isQueryStringRequested()
 {
-  $query_string = (isset($_SERVER['QUERY_STRING'])) ? $_SERVER['QUERY_STRING'] : "";
+  $query_string = (isset($_SERVER['QUERY_STRING'])) ? escape_html($_SERVER['QUERY_STRING']) : NULL;
   $slice_query = explode('=', $query_string);
   $get_key = isset($slice_query[0]) ? $slice_query[0] : "";
   $get_value = isset($slice_query[1]) ? $slice_query[1] : "";
@@ -179,7 +178,7 @@ public static function allowedPathRequested(array $path, array $rules)
 
  $is_valid_requested = ( is_array($rule_requested) && array_key_exists(0, $rule_requested) ) ? $rule_requested[0] : null;
 
- if ( ! (in_array(self::isRequestToPathValid(0), $path, true) || (in_array($is_valid_requested, $path, true ) ) ) ) {
+ if ( ! ( in_array( self::isRequestToPathValid(0), $path, true ) || ( in_array($is_valid_requested, $path, true ) ) ) ) {
 
   return false;
 
@@ -250,7 +249,8 @@ public static function deliverQueryString()
 
       } else {
 
-         direct_page('', 302);
+        direct_page('', 302);
+
       }
       
       break;
@@ -278,7 +278,6 @@ public static function deliverQueryString()
 
   }
   
-
 }
 
 }
