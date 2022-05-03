@@ -220,7 +220,7 @@ class ConfigurationApp
        
       if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                 
-        header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+        header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
         throw new AppException("Sorry, unpleasant attempt detected!");
 
       }
@@ -319,7 +319,7 @@ class ConfigurationApp
   /**
    * updatePermalinkConfig
    *
-   * @return void
+   * @return mixed
    * 
    */
   public function updatePermalinkConfig()
