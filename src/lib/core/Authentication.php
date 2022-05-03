@@ -112,7 +112,7 @@ class Authentication
    * Constant COOKIE_EXPIRE
    * default 1 month
    * 
-   * @var const|numeric
+   * @var null|int|numeric
    * 
    */
   const COOKIE_EXPIRE = 2592000;  
@@ -129,7 +129,7 @@ class Authentication
 
     if (Registry::isKeySet('key')) {
 
-       $this->key = Registry::get('key');
+      $this->key = Registry::get('key');
 
     }
 
@@ -384,7 +384,7 @@ public function logout()
 }
   
 /**
- * Validate User Account
+ * validateUserAccount
  *
  * @method public validateUserAccount()
  * @param string $login
