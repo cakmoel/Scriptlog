@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * UserEvent Class
  *
@@ -98,7 +98,7 @@ class UserEvent
  private $user_banned;
 
 /**
- * userDao, userToken, vaidator and sanitize of the instance of their classes
+ * userDao
  *
  * @var object
  * 
@@ -618,7 +618,7 @@ public function reAuthenticateUserPrivilege($login, $password)
  */
  public function totalUsers($data = null)
  {
-   return $this->userDao->totalUserRecords($data);
+  return $this->userDao->totalUserRecords($data);
  }
  
 }
