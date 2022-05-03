@@ -475,6 +475,7 @@ class PageApp extends BaseApp
           $this->view->set('pagesTotal', $this->pageEvent->totalPages());
           $this->view->set('pages', $this->pageEvent->grabPages('page'));
           return $this->view->render();
+          
         } else {
 
           $this->pageEvent->setPageId($id);
