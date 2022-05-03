@@ -369,12 +369,13 @@ class UserDao extends Dao
 	 
  }
  
- /**
-  * set user level
-  * 
-  * @param string $selected
-  * @return string
-  */
+/**
+ * dropDownUserLevel
+ *
+ * @param string $selected
+ * @return string
+ * 
+ */
  public function dropDownUserLevel($selected = '')
  {
   
