@@ -209,7 +209,6 @@ public function createPost($bind, $topicId)
 
  if ((is_array($topicId)) && (!empty($postId))) {
 
-
   	foreach ($_POST['catID'] as $topicId) {
 
   	  $this->create("tbl_post_topic", [
@@ -250,8 +249,8 @@ try {
   if (!empty($bind['media_id'])) {
 
   	$this->modify("tbl_posts", [
+
   	    'media_id' => $bind['media_id'],
-  	    'post_author' => $bind['post_author'],
   	    'post_modified' => $bind['post_modified'],
   	    'post_title' => $bind['post_title'],
   	    'post_slug' => $bind['post_slug'],
@@ -262,12 +261,13 @@ try {
         'post_status' => $bind['post_status'],
         'post_headlines' => $bind['post_headlines'],
   	    'comment_status' => $bind['comment_status']
+
   	], "ID = {$cleanId}");
 
   } else {
 
       $this->modify("tbl_posts", [
-          'post_author' => $bind['post_author'],
+
           'post_modified' => $bind['post_modified'],
           'post_title' => $bind['post_title'],
           'post_slug' => $bind['post_slug'],
@@ -278,18 +278,15 @@ try {
           'post_status' => $bind['post_status'],
           'post_headlines' => $bind['post_headlines'],
           'comment_status' => $bind['comment_status']
+          
       ], "ID = {$cleanId}");
 
   }
 
-  // query Id
-  $this->setSQL("SELECT ID FROM tbl_posts WHERE ID = ?");
-  $post_id = $this->findColumn([$cleanId]);
+  // delete all post_topic by post_id
+  $this->deleteRecord("tbl_post_topic", "post_id = $cleanId");
 
-  // delete post_topic
-  (!empty($post_id['ID'])) ? $this->deleteRecord("tbl_post_topic", "post_id = {$post_id['ID']}") : "";
-  
-  if (is_array($topicId)) {
+  if ( ( is_array($topicId) ) && (isset($_POST['catID']) ) ) {
 
   	 foreach ($_POST['catID'] as $topicId) {
 
@@ -298,16 +295,9 @@ try {
   	        'topic_id' => $topicId
   	    ]);
 
-  	 }
+  	  }
 
-  } else {
-
-      $this->create("tbl_post_topic", [
-          'post_id' => $cleanId,
-          'topic_id' => $topicId
-      ]);
-
-  }
+  } 
 
   $this->callCommit();
 
@@ -337,7 +327,7 @@ try {
 public function deletePost($id, $sanitize)
 {
  $clean_id = $this->filteringId($sanitize, $id, 'sql');
- $this->deleteRecord("tbl_posts", "ID = ".(int)$clean_id);
+ $this->deleteRecord("tbl_posts", "ID = $clean_id");
 }
 
 /**
