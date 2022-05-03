@@ -341,7 +341,7 @@ class PostApp extends BaseApp
 
           }
 
-            if(isset($_POST['catID']) && $_POST['catID'] == 0) {
+            if ( isset($_POST['catID']) && $_POST['catID'] == 0) {
 
               $this->postEvent->setTopics(0);
               
@@ -514,7 +514,7 @@ class PostApp extends BaseApp
 
             }
             
-            if ((empty($_POST['post_title'])) || (empty($_POST['post_content']))) {
+            if ( ( empty($_POST['post_title']) ) || ( empty($_POST['post_content']) ) ) {
            
                $checkError = false;
                array_push($errors, "Please enter a required field");
@@ -551,7 +551,7 @@ class PostApp extends BaseApp
             
             if( !empty($file_location) ) {
 
-               if (!isset($file_error) || is_array($file_error)) {
+               if ( ( !isset($file_error) ) || ( is_array($file_error) ) ) {
               
                  $checkError = false;
                  array_push($errors, "Invalid paramenter");
@@ -601,21 +601,13 @@ class PostApp extends BaseApp
         
                 }
 
-                if (is_uploaded_file($file_location)) {
-
-                  if ((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
+                if ( ( false === check_mime_type(mime_type_dictionary(), $file_location)) || ( false === check_file_extension($file_name) ) ) {
            
-                    $checkError = false;
-                    array_push($errors, "Invalid file format");
-                   
-                  } else {
-  
-                    upload_media($file_location, $file_type, $file_size, basename($new_filename));
-
-                  }
-
+                  $checkError = false;
+                  array_push($errors, "Invalid file format");
+                 
                 }
-                
+ 
             }
 
             if (!$checkError) {
@@ -629,7 +621,7 @@ class PostApp extends BaseApp
                 $this->view->set('postData', $data_post);
                 $this->view->set('topics', $topics->setCheckBoxTopic($getPost['ID']));
 
-                if ($this->postEvent->postAuthorLevel() == 'contributor') {
+                if ( $this->postEvent->postAuthorLevel() == 'contributor') {
 
                   $this->view->set('medialibs', $medialib->dropDownMediaSelect($getPost['media_id']));
        
@@ -645,9 +637,9 @@ class PostApp extends BaseApp
                 
             } else {
               
-              if( empty($file_location) ) {
+              if ( empty($file_location) ) {
 
-                 if (  (isset($_POST['image_id'])) && (!empty($_POST['image_id'])) ) {
+                 if ( ( isset($_POST['image_id']) ) && ( !empty($_POST['image_id']) ) ) {
 
                     $this->postEvent->setPostImage((int)distill_post_request($filters)['image_id']);
    
@@ -655,7 +647,7 @@ class PostApp extends BaseApp
 
               } else {
 
-                list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
+                list($width, $height) = ( !empty($file_location)) ? getimagesize($file_location) : null;
 
                 if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
 
@@ -676,7 +668,13 @@ class PostApp extends BaseApp
 
                 }
 
-               $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
+                if (is_uploaded_file($file_location)) {
+
+                  upload_media($file_location, $file_type, $file_size, basename($new_filename));
+
+                }
+
+               $media_access = ( isset($_POST['post_status']) && ($_POST['post_status'] == 'publish') ) ? 'public' : 'private';
 
                $bind_media = [
                   'media_filename' => $new_filename, 
@@ -696,7 +694,7 @@ class PostApp extends BaseApp
                 ];
 
                 $medialib->createMediaMeta($mediameta);
-
+                
                 $this->postEvent->setPostImage($append_media);
                
               }
