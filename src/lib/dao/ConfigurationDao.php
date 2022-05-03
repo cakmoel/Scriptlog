@@ -115,7 +115,7 @@ public function findGeneralConfigs($orderBy = 'ID', $limit = 7)
  */
 public function findReadingConfigs($orderBy = 'ID')
 {
-  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE ID BETWEEN 8 AND 9 ORDER BY :orderBy ";
+  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE ID BETWEEN 8 AND 10 ORDER BY :orderBy ";
 
   $this->setSQL($sql);
 
