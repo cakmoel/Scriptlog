@@ -615,53 +615,68 @@ return $imgradio;
 public function imageUploadHandler($mediaId = null) 
 {
 
-  $mediablog  = '<div class="form-group">';
-
   if ( ( !is_null($mediaId) ) && ( $mediaId !== 0 ) ) {
 
     $data_media = $this->findMediaBlog((int)$mediaId);
 
     $image_src = invoke_image_uploaded($data_media['media_filename'], false);
-    $image_src_thumb = invoke_image_uploaded($data_media['media_filename']);
+    $webp_src = invoke_webp_image($data_media['media_filename'], false);
+    $image_src_thumb = invoke_image_uploaded($data_media['media_filename'], true);
+    $webp_src_thumb = invoke_webp_image($data_media['media_filename'], true);
+    $media_caption = isset($data_media['media_caption']) ? safe_html($data_media['media_caption']) : "";
 
-     if (!$image_src_thumb) {
+     if (! ($image_src_thumb || $webp_src_thumb)) {
          
-         $image_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
+      $image_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
+      $webp_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
 
      }
 
-     if ($image_src) {
+     if ( $image_src || $webp_src) {
 
-       $mediablog .= '<a class="thumbnail" href="'.$image_src.'" ><img src="'.$image_src_thumb.'" class="img-responsive pad"></a>';
-       $mediablog .= '<label for="file">Replace image:</label>';
-       $mediablog .= '<input type="file" name="image" class="form-control" id="file" accept="image/*" onchange="loadFile(event)" maxlength="512" >';
-       $mediablog .= '<input type="hidden" name="image_id"  value="'.$mediaId.'">';
-       $mediablog .= '<img id="output" class="img-responsive pad">';
-       $mediablog .= '<p class="help-block>Maximum file size: '.format_size_unit(APP_FILE_SIZE).'</p>';
+       $mediablog  = '<div class="form-group">';
+       $mediablog .= '<a href="'.$webp_src.'" title="'.$media_caption.'" >
+                      <picture class="img-responsive pad">';
+       $mediablog .= '<source srcset="'.$webp_src_thumb.'" type="image/webp">';
+       $mediablog .= '<img src="'.$image_src_thumb.'" class="img-responsive pad" alt="'.$media_caption.'">';
+       $mediablog .= '</picture></a>';
+       $mediablog .= '<div class="img-responsive pad" id="image-preview">';
+       $mediablog .= '<label for="image-upload" id="image-label">Replace image</label>';
+       $mediablog .= '<input type="file" name="media" id="image-upload" accept="image/*" class="form-control" maxlength="512">';
+       $mediablog .= '</div>';
+       $mediablog .= '<p class="help-block"> Maximum file size: '.format_size_unit(APP_FILE_SIZE).'</p>';
+       $mediablog .= '<input type="hidden" name="image_id" value="'.$mediaId.'">';
+       $mediablog .= '</div>';
         
      } else {
-
-        $mediablog .= '<br><img src="'.$image_src_thumb.'" class="img-responsive pad"><br>';
-        $mediablog .= '<label for="file">Replace image:</label>';
-        $mediablog .= '<input type="file" name="image" class="form-control" id="file" accept="image/*" onchange="loadFile(event)"  maxlength="512" >';
-        $mediablog .= '<input type="hidden" name="image_id"  value="'.$mediaId.'">';
-        $mediablog .= '<img id="output" class="img-responsive pad">';
+        
+        $mediablog  = '<div class="form-group">';
+        $mediablog .= '<a href="'.$webp_src.'" title="'.$media_caption.'">';
+        $mediablog .= '<picture class="img-responsive pad">';
+        $mediablog .= '<source srcset="'.$webp_src_thumb.'" type="image/webp">';
+        $mediablog .= '<img src="'.$image_src_thumb.'" class="img-responsive pad" alt="'.$media_caption.'">';
+        $mediablog .= '</picture></a>';
+        $mediablog .= '<div class="img-responsive pad" id="image-preview">';
+        $mediablog .= '<label for="image-upload" id="image-label">Replace image</label>';
+        $mediablog .= '<input type="file" name="media" id="image-upload" accept="image/*" class="form-control" maxlength="512">';
+        $mediablog .= '</div>';
         $mediablog .= '<p class="help-block">Maximum file size:'.format_size_unit(APP_FILE_SIZE).'</p>';
-
+        $mediablog .= '<input type="hidden" name="image_id" value="'.$mediaId.'">';
+        $mediablog .= '</div>';
      }
 
   } else {
 
+    $mediablog  = '<div class="form-group">';
     $mediablog .= '<div class="img-responsive pad" id="image-preview">';
     $mediablog .= '<label for="image-upload" id="image-label">Featured image</label>';
     $mediablog .= '<input type="file" name="media" id="image-upload" accept="image/*" class="form-control" maxlength="512">';
     $mediablog .= '</div>';
     $mediablog .= '<p class="help-block"> Maximum file size: '.format_size_unit(APP_FILE_SIZE).'</p>'; 
+    $mediablog . '</div>';
   
   }
  
-  $mediablog .= '</div>';
-
   return $mediablog;
 
 }
