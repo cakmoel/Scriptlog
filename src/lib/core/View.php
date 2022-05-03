@@ -116,8 +116,8 @@ class View
         
         if ((!is_dir($this->dir)) && (!file_exists($this->dir. $this->file . '.php'))) {
 
-            http_response_code(404);
-            throw new ViewException('View '.$this->file.'.php'. ' does not exists');
+          http_response_code(404);
+          throw new ViewException('View '.$this->file.'.php'. ' does not exists');
 
         }
         
@@ -127,9 +127,15 @@ class View
         
         ob_start();
 
-        include_once $this->dir.basename($this->file).'.php';
+        require $this->dir.basename($this->file).'.php';
         
         $render = ob_get_contents();
+      
+        if ($render === false) {
+
+          throw new RuntimeException('failed getting output');
+
+        }
         
         ob_end_clean();
         
