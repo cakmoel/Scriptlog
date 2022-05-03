@@ -32,12 +32,7 @@ class TopicDao extends Dao
    */
   public function findTopics($orderBy = 'ID')
   {
-    $sql = "SELECT ID, 
-            topic_title, 
-            topic_slug, 
-            topic_status
-            FROM tbl_topics 
-            ORDER BY :orderBy DESC";
+    $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status FROM tbl_topics ORDER BY :orderBy DESC";
 
     $this->setSQL($sql);
     
@@ -151,7 +146,7 @@ class TopicDao extends Dao
   * @param array $checked
   * @return string
   */
- public function setCheckBoxTopic($postId = '', $checked = null)
+ public function setCheckBoxTopic($postId = null, $checked = null)
  {
                   
    if (is_null($checked)) {
@@ -163,7 +158,9 @@ class TopicDao extends Dao
 
    $items = $this->findTopics('topic_title');
  
-   if (empty($postId)) {
+   $checked = "";
+
+  if (empty($postId)) {
        
      if (is_array($items)) {
          
@@ -173,7 +170,7 @@ class TopicDao extends Dao
                  
                  if (in_array($item['ID'], $_POST['catID'])) {
                      
-                    $checked="checked='checked'";
+                    $checked = "checked='checked'";
                      
                  } else {
                      
@@ -191,7 +188,7 @@ class TopicDao extends Dao
              
          }
          
-     } else {
+      } else {
          
          $html .= '<div class="checkbox">';
          $html .= '<label>';
@@ -199,14 +196,14 @@ class TopicDao extends Dao
          $html .= '</label>';
          $html .= '</div>';
          
-     }
+      }
     
     
   } else {
      
      if (is_array($items)) {
 
-        foreach ($items as $item) {
+        foreach ($items as $i => $item) {
          
             $post_topic = $this->findPostTopic($item['ID'], $postId);
                
