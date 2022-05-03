@@ -83,7 +83,7 @@ class LogError
     }
 
     /**
-     * exception handler
+     * exceptionHandler
      *
      * @method exceptionHandler
      * @param object $e
