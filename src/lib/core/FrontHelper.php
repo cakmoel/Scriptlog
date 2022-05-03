@@ -18,13 +18,13 @@ class FrontHelper
 {
 
 /**
- * frontPermalinks
+ * grabSimpleFrontPost
  *
  * @param int $id
  * @return mixed|bool
  * 
  */
-public static function frontPostSlug($id)
+public static function grabSimpleFrontPost($id)
 {
 
   $idsanitized = static::frontSanitizer($id, 'sql');
@@ -42,51 +42,13 @@ public static function frontPostSlug($id)
 }
 
 /**
- * frontGalleries
- *
- * @param int $start
- * @param int $limit
- * @return mixed
- * 
- */
-public static function frontGalleries($start, $limit)
-{
-
-$front = [];
-
-$sql = "SELECT ID, media_filename, media_caption FROM tbl_media WHERE media_target = 'gallery'
-       ORDER BY ID LIMIT ?, ?";
-
-$statement = db_prepared_query($sql, [$start, $limit], 'ii');
-
-$results = get_result($statement);
-
-if ( isset($results) ) {
-
-foreach ($results as $result) {
-
-  $media_filename = $result['media_filename'];
-  $media_caption = $result['media_caption'];
-  $media_id = $result['ID'];
-
-}   
-
-$front = ['media_filename' => $media_filename, 'media_caption' => $media_caption, 'media_id' => $media_id];
-
-return $front;
-
-}
-
-}
-
-/**
  * frontPostById
  *
  * @param int $id
  * @return mixed
  * 
  */
-public static function frontPostById($id)
+public static function grabPreparedFrontPostById($id)
 {
 
 $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
@@ -120,8 +82,10 @@ return (empty($result)) ?: $result;
 public static function frontPageBySlug($slug)
 {
 
-$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
-               p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_sticky, 
+$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
+               p.post_title, p.post_slug,
+               p.post_content, p.post_summary, p.post_keyword, 
+               p.post_tags, p.post_status, p.post_sticky, 
                p.post_type, p.comment_status,
                m.ID, m.media_filename, m.media_caption, m.media_access, u.ID, u.user_fullname
   FROM tbl_posts AS p
@@ -164,6 +128,44 @@ public static function frontTopicBySlug($slug)
 }
 
 /**
+ * frontGalleries
+ *
+ * @param int $start
+ * @param int $limit
+ * @return mixed
+ * 
+ */
+public static function grabPreparedFrontGalleries($start, $limit)
+{
+
+$front = [];
+
+$sql = "SELECT ID, media_filename, media_caption FROM tbl_media WHERE media_target = 'gallery'
+       ORDER BY ID LIMIT ?, ?";
+
+$statement = db_prepared_query($sql, [$start, $limit], 'ii');
+
+$results = get_result($statement);
+
+if ( isset($results) ) {
+
+foreach ($results as $result) {
+
+  $media_filename = $result['media_filename'];
+  $media_caption = $result['media_caption'];
+  $media_id = $result['ID'];
+
+}   
+
+$front = ['media_filename' => $media_filename, 'media_caption' => $media_caption, 'media_id' => $media_id];
+
+return $front;
+
+}
+
+}
+
+/**
  * frontSanitizer
  *
  * @param string $str
@@ -175,6 +177,5 @@ private static function frontSanitizer($str, $type)
 { 
  return sanitizer($str, $type);
 }
-
 
 }
