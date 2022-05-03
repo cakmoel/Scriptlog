@@ -4,7 +4,7 @@
  * Initialize main engine, define constants, and object instantiated
  * include functions needed by application
  * 
- * @category main.php file
+ * @category main-dev.php file
  * @author   M.Noermoehammad
  * @license  https://opensource.org/licenses/MIT MIT License
  * @version  1.0
@@ -25,9 +25,6 @@ ini_set('session.save_handler', 'files');
 ini_set('session.gc_divisor', 100);
 ini_set('session.gc_maxlifetime', 1440);
 ini_set('session.gc_probability',1);
-
-// Opt out of FLoC
-header("Permissions-Policy: interest-cohort=()");
 
 require __DIR__ . '/common.php';
 
@@ -104,6 +101,10 @@ Autoloader::addClassDir(array(
   APP_ROOT . APP_LIBRARY . DS . 'provider'. DS
 )); 
 
+x_frame_option();
+x_content_type_options();
+x_xss_protection();
+strict_transport_security();
 call_htmlpurifier();
 get_server_load();
 whoops_error();
