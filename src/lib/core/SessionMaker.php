@@ -173,7 +173,7 @@ public function forget()
 
  if ($this->isSessionStarted() === false) {
 
-     return false;
+   return false;
 
  }
 
@@ -227,7 +227,9 @@ public function read($id)
 public function write($id, $data)
 {
  
- return parent::write($id, $this->encrypt($data, $this->key));
+ $data = $this->encrypt($data, $this->key);
+
+ return parent::write($id, $data);
 
 }
 
@@ -297,7 +299,7 @@ public function isValid($ttl = 60)
  *
  * @param string $data
  * @param string $key
- * @return void
+ * @return string
  * 
  */
 protected function encrypt($data, $key)
