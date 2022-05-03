@@ -14,6 +14,15 @@ final class MessageLog
 
 private static $display_errors;
 
+/**
+ * contentMessage
+ *
+ * @param int $responseCode
+ * @param string $contentMessage
+ * @param string $privilege
+ * @return string
+ * 
+ */
 public static function contentMessage($responseCode, $contentMessage = null, $privilege = null)
 {
  
@@ -63,6 +72,14 @@ MSG;
   
 }
 
+/**
+ * messageException
+ *
+ * @param object $exception
+ * @param string $logPath
+ * @return string|void -- return string or void
+ * 
+ */
 public static function messageException($exception, $logPath)
 {
 
@@ -78,7 +95,7 @@ public static function messageException($exception, $logPath)
     $line = $exception->getLine();
     $responseCode = http_response_code();
 
-    if (APP_DEVELOPMENT == true) {
+    if ( APP_DEVELOPMENT === true) {
 
     $msg = <<<MSG
         <div class="content-wrapper">
@@ -118,6 +135,16 @@ MSG;
 
 }
 
+/**
+ * messageError
+ *
+ * @param num|int $code
+ * @param string $description
+ * @param string $logPath
+ * @param string $file
+ * @param string $line
+ * 
+ */
 public static function messageError($code, $description, $logPath, $file = null, $line = null)
 {
 
