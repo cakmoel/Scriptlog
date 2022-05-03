@@ -1,5 +1,4 @@
 <?php
-
 define('DS', DIRECTORY_SEPARATOR);
 define('APP_TITLE', 'Scriptlog');
 define('APP_CODENAME', 'Maleo Senkawor');
