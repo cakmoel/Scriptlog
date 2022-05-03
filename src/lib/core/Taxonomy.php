@@ -2,6 +2,8 @@
 /**
  * Class Taxonomy 
  * 
+ * @category Core Class
+ * 
  */
 class Taxonomy
 {
@@ -69,7 +71,7 @@ if (isset(self::$item[$parent])) {
                 
         }
                 
-        $html .= $row['label'];
+        $html .= $i['label'];
                 
         if ($child) {
                     
