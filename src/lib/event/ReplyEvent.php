@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * ReplyEvent Class
  * 
@@ -88,12 +88,12 @@ class ReplyEvent
 
   public function setCommentId($commentId)
   {
-    $this->comment_id = $comment_id;
+    $this->comment_id = $commentId;
   }
 
   public function setUserId($userId)
   {
-    $this->user_d = $user_id;
+    $this->user_d = $userId;
   }
 
   public function setReplyContent($replyContent)
