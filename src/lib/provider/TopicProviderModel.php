@@ -78,9 +78,11 @@ return (empty($topicBySlug)) ?: $topicBySlug;
 public function getPostTopic($postId, $sanitize, $fetchMode = null)
 {
  
-$sql = "SELECT topic_title, topic_slug FROM tbl_topics, tbl_post_topic 
+$sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status, 
+        FROM tbl_topics, tbl_post_topic 
         WHERE tbl_topics.ID = tbl_post_topic.topic_id 
-        AND tbl_post_topic.post_id = :postId";
+        AND tbl_post_topic.post_id = :postId
+        AND tbl_topics.topic_status = 'Y'";
 
 $idsanitized = $this->filteringId($sanitize, $postId, 'sql');
 
@@ -138,7 +140,9 @@ $pagination = null;
 $this->linkPosts = $perPage;
 
 // get number records
-$count_topic = "SELECT tbl_posts.ID FROM tbl_posts, tbl_post_topic WHERE tbl_posts.ID = tbl_post_topic.post_id = tbl_post_topic.topic_id = :topicId";
+$count_topic = "SELECT tbl_posts.ID 
+                FROM tbl_posts, tbl_post_topic 
+                WHERE tbl_posts.ID = tbl_post_topic.post_id = tbl_post_topic.topic_id = :topicId";
 
 $this->setSQL($count_topic);
 
@@ -153,8 +157,10 @@ $sql = "SELECT tbl_posts.ID, tbl_posts.post_author, tbl_posts.post_date, tbl_pos
     WHERE tbl_posts.ID = tbl_post_topic.post_id 
     AND tbl_post_topic.topic_id = :topic_id
     AND tbl_posts.post_author = tbl_users.ID
-    AND tbl_posts.post_status = 'publish' AND tbl_posts.post_type = 'blog'
-    AND tbl_users.user_banned = '0' ORDER BY tbl_posts.ID DESC " . $this->linkPosts->get_limit($sanitize);
+    AND tbl_posts.post_status = 'publish' 
+    AND tbl_posts.post_type = 'blog'
+    AND tbl_users.user_banned = '0' 
+    ORDER BY tbl_posts.ID DESC " . $this->linkPosts->get_limit($sanitize);
 
 $this->setSQL($sql);
 
