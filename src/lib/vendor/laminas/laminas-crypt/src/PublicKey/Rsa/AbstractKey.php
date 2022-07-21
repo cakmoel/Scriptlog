@@ -1,30 +1,24 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-crypt for the canonical source repository
- * @copyright https://github.com/laminas/laminas-crypt/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-crypt/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Crypt\PublicKey\Rsa;
 
 abstract class AbstractKey
 {
-    const DEFAULT_KEY_SIZE = 2048;
+    public const DEFAULT_KEY_SIZE = 2048;
 
     /**
      * PEM formatted key
      *
      * @var string
      */
-    protected $pemString = null;
+    protected $pemString;
 
     /**
      * Key Resource
      *
      * @var resource
      */
-    protected $opensslKeyResource = null;
+    protected $opensslKeyResource;
 
     /**
      * Openssl details array

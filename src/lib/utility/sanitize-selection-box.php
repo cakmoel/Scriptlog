@@ -2,9 +2,14 @@
 /**
  * Sanitize select dropdown list function
  *
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param array $values
  * @param array $white_args
- * @return void
+ * @return boolean
+ * 
  */
 function sanitize_selection_box($values, $white_args)
 {
@@ -15,7 +20,7 @@ function sanitize_selection_box($values, $white_args)
 
               if (empty($values['post_status']) || !in_array($values['post_status'], $white_args)) {
 
-                  return false;
+                return false;
 
               }
 
@@ -63,6 +68,46 @@ function sanitize_selection_box($values, $white_args)
         case 'media_status':
 
             if (empty($values['media_status']) || !in_array($values['media_status'], $white_args)) {
+
+                return false;
+
+            }
+
+            break;
+    
+        case 'menu_status':
+
+            if (empty($values['menu_status']) || !in_array($values['menu_status'], $white_args)) {
+
+                return false;
+
+            }
+
+            break;
+
+        case 'topic_status':
+
+            if (empty($values['topic_status']) || !in_array($values['topic_status'], $white_args)) {
+
+                return false;
+
+            }
+
+            break;
+
+        case 'plugin_level':
+
+            if (empty($values['plugin_level']) || !in_array($values['plugin_level'], $white_args)) {
+
+                return false;
+
+            }
+            
+           break;
+
+        case 'user_level':
+
+            if ( empty($values['user_level']) || !in_array($values['user_level'], $white_args) ) {
 
                 return false;
 

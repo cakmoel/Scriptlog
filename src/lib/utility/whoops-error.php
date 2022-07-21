@@ -3,8 +3,11 @@
  * whoops_error()
  * 
  * @category function
+ * @version 1.0
+ * @license MIT
  * @uses \Whoops\Run
  * @uses \Whoops\Handler\PrettyPageHandler
+ * @since Since Release 1.0
  * @return void
  * 
  */

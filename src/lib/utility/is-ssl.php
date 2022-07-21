@@ -1,8 +1,10 @@
 <?php
 /**
- * is_ssl function
+ * is_ssl
+ * 
  * a universal https detection method
  *
+ * @category function
  * @see https://www.zigpress.com/detecting-https-in-php-the-definitive-guide/
  * @see https://stackoverflow.com/questions/7304182/detecting-ssl-with-php
  * @see https://stackoverflow.com/questions/1175096/how-to-find-out-if-youre-using-https-without-serverhttps

@@ -1,10 +1,14 @@
 <?php
 /**
- * Function app_info
+ * app_info
+ * 
  * Retrieving site setting info
  * 
  * @category function
- * @return array[][]
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
+ * @return array
  * 
  */
 function app_info()
@@ -12,7 +16,7 @@ function app_info()
 
  $configurations = new ConfigurationDao();
  $app_info = array();
- $results = $configurations -> findConfigs();
+ $results = $configurations->findConfigs();
 
  if (is_array($results)) {
 
@@ -62,10 +66,20 @@ function app_info()
 
           break;
 
+        case 'permalink_setting':
+
+          $app_info['permalink_setting'] = $data['setting_value'];
+
+          break;
+
     }
     
   }
  
+ } else {
+
+  $app_info = AppConfig::readConfiguration(invoke_config());
+
  }
  
  return $app_info;

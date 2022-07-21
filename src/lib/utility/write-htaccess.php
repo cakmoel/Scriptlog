@@ -19,12 +19,13 @@ function write_htaccess($permalink_status, $user_level, $data)
 
 $privilege = (isset($user_level) ) ? Session::getInstance()->scriptlog_session_level : "";
 
-if ( $privilege == 'administrator' || $privilege == 'manager' ) {
+if ( $privilege === 'administrator' || $privilege === 'manager' ) {
 
    $fp = fopen(__DIR__ . '/../../.htaccess', 'w');
 
-   if($permalink_status == 'yes') {
+   if($permalink_status === 'yes') {
 
+      sleep(5);
       fwrite($fp, $data);
       fclose($fp);
    

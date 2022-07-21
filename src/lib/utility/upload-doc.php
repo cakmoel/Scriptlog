@@ -10,7 +10,7 @@ function upload_doc($file_location, $file_name)
 {
   // Doc directory
   $doc_path = __DIR__ . '/../../'.APP_DOCUMENT;
-  $doc_uploaded = $doc_path . $file_name;
+  $doc_uploaded = $doc_path . basename($file_name);
 
   if (move_uploaded_file($file_location, $doc_uploaded)) {
 

@@ -47,9 +47,9 @@ function theme_identifier()
 function call_theme_header()
 {
 
-if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php')) {
+if ( file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php')) {
 
-  include(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php');
+  include ( APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php');
      
 } else {
 
@@ -67,16 +67,16 @@ if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'hea
  * @return void
  * 
  */
-function call_theme_content($content)
+function call_theme_content($content = null)
 {
 
-  if(file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php'))) {
+  if ( file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php') ) ) {
 
-    include(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php'));
+    include ( APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php') );
    
   } else {
 
-    scriptlog_error("file content not found");
+    scriptlog_error("File content not found");
 
   }
 
@@ -92,9 +92,9 @@ function call_theme_content($content)
 function call_theme_footer()
 {
 
-  if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php')) {
+  if ( file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php') ) {
 
-    include(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php');
+    include ( APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php');
 
   } else {
 

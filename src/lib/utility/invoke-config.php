@@ -4,6 +4,8 @@
  * checking whether configuration file exists
  *
  * @category Function
+ * @version 1.0
+ * @license MIT
  * @return void
  * 
  */
@@ -12,16 +14,25 @@ function check_config_file($filename)
 
  if (file_exists($filename)) {
 
-     return true;
+    return true;
 
  } else {
 
-     return false;
+    return false;
 
  }
 
 }
 
+/**
+ * invoke_config()
+ * 
+ * invoking configuration file
+ *
+ * @category function
+ * @return void
+ * 
+ */
 function invoke_config()
 {
 

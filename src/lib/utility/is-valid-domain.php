@@ -1,6 +1,11 @@
 <?php
 /**
+ * is_valid_domain()
+ * 
  * a function to validate the domain name
+ * 
+ * @category Function
+ * @param string $url
  * @see https://www.w3schools.in/php-script/check-domain-name-is-valid/
  * @param string $url
  * @return boolean
@@ -9,7 +14,7 @@
 function is_valid_domain($url)
 {
 
- $validation = FALSE;
+ $validation = false;
     
  $urlparts = parse_url(filter_var($url, FILTER_SANITIZE_URL));
     
@@ -53,9 +58,10 @@ function is_valid_domain($url)
 }
 
 /**
- * domain name function
+ * domain_name
  * returning server http host where website hosted
  *
+ * @category Function
  * @return string
  * 
  */

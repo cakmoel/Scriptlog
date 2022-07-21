@@ -35,7 +35,7 @@ function paragraph_l2br($content)
  * @param integer $scnt
  * 
  */
-function paragraph_trim($content, $limit = 320, $schr="\n", $scnt=2)
+function paragraph_trim($content, $limit = 200, $schr="\n", $scnt=2)
 {
   
   $post = 0;

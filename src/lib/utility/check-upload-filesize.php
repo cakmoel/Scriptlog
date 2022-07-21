@@ -1,9 +1,15 @@
 <?php
 /**
- * check_upload_filesize
- *
- * @category Function
- * @return void
+ * check_upload_filesize()
+ * 
+ * checking upload_max_filesize compared with current file uploaded
+ * return true if current file uploaded larger than php.ini -- upload_max_filesize
+ * 
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
+ * @return boolean
  * 
  */
 function check_upload_filesize()

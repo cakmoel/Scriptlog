@@ -1,10 +1,14 @@
 <?php
 /**
 * htmLawed 1.2.5, 24 September 2019
-* @copyright  Santosh Patnaik
-* @license Dual licensed with LGPL 3 and GPL 2+
 * A PHP Labware internal utility - www.bioinformatics.org/phplabware/internal_utilities/htmLawed
 * See htmLawed_README.txt/htm
+* 
+* @category Function
+* @see www.bioinformatics.org/phplabware/internal_utilities/htmLawed
+* @copyright  Santosh Patnaik
+* @license Dual licensed with LGPL 3 and GPL 2+
+* 
 */
 function htmLawed($t, $C=1, $S=array()){
 $C = is_array($C) ? $C : array();

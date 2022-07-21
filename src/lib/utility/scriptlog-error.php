@@ -1,6 +1,7 @@
 <?php
 /**
- * Scriptlog Error Function
+ * scriptlog_error()
+ * 
  * Generates user-level error/warning/notice message
  * 
  * @category function
@@ -12,7 +13,7 @@
 function scriptlog_error($error_message, $error_type = E_USER_NOTICE, $context = 1)
 {
 
-  if (version_compare(phpversion(), "5.6", "==")) {
+  if (version_compare(phpversion(), "7.4", "==")) {
 
     $stack = debug_backtrace();
 
@@ -40,7 +41,7 @@ function scriptlog_error($error_message, $error_type = E_USER_NOTICE, $context =
   
   } else {
 
-     throw new EventException($error_message);
+    throw new ErrorException($error_message);
      
   }
   

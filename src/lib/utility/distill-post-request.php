@@ -1,8 +1,13 @@
 <?php
 /**
- * Distill post request function
+ * distill_post_request()
+ * 
  * filtering optionally external variable
  * 
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param array $refine
  * @return mixed
  * 

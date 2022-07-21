@@ -1,9 +1,13 @@
 <?php
 /**
- * Convert to Paragraph function
+ * convert_to_paragraph
  * To display text retrieved from database as genuine paragraphs
  * 
- * @param [type] $text
+ * @category function
+ * @author Contributors
+ * @license MIT
+ * @version 1.0
+ * @param string $text
  * @return void
  */
 function convert_to_paragraph($text)
