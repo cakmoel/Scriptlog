@@ -13,6 +13,8 @@ class PostProviderModel extends Dao
  
 private $linkPosts;
 
+private $pagination = null;
+
 public function __construct()
 {
   parent::__construct();
@@ -50,29 +52,31 @@ public function getPostFeeds($limit = 5)
 /**
  * getLatesetPosts
  *
+ * retrieves latest posts and display it on homepage
+ * 
  * @param int|numeric $position
  * @param int|num $limit
  * @param PDO::FETCH_MODE static $fetchMode = null
  * @return mixed
  * 
  */
-public function getLatestPosts($position, $limit, $fetchMode = null)
+public function getLatestPosts($limit)
 {
 
 $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
-  p.post_title, p.post_slug, p.post_content, p.post_summary, 
-  p.post_keyword, p.post_tags, p.post_status, p.post_type, p.comment_status, 
-  m.media_filename, m.media_caption, m.media_access, u.user_fullname
+            p.post_title, p.post_slug, p.post_content, p.post_summary, 
+            p.post_keyword, p.post_tags, p.post_status, p.post_type, p.comment_status, 
+  m.media_filename, m.media_caption, m.media_access, u.user_fullname, u.user_login
 FROM tbl_posts AS p 
 INNER JOIN tbl_media AS m ON p.media_id = m.ID
 INNER JOIN tbl_users AS u ON p.post_author = u.ID
 WHERE p.post_status = 'publish'
 AND p.post_type = 'blog' 
-ORDER BY p.ID DESC LIMIT :position, :limit";
+ORDER BY p.ID DESC LIMIT :limit";
 
 $this->setSQL($sql);
 
-$latestPosts = (is_null($fetchMode) ) ? $this->findAll([':position' => $position, ':limit' => $limit]) : $this->findAll([':position' => $position, ':limit' => $limit], $fetchMode);
+$latestPosts = isset($limit) ? $this->findAll([':limit' => $limit]) : null;
 
 return ( empty($latestPosts) ) ?: $latestPosts;
 
@@ -90,8 +94,9 @@ return ( empty($latestPosts) ) ?: $latestPosts;
  */
 public function getPostById($id, $sanitize, $fetchMode = null)
 {
-    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
-            p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_sticky, p.post_type, 
+    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
+            p.post_title, p.post_slug, p.post_content, p.post_summary, 
+            p.post_keyword, p.post_tags, p.post_status, p.post_sticky, p.post_type, 
             p.comment_status, m.media_filename, m.media_caption, m.media_target, m.media_access, 
             u.user_fullname
     FROM tbl_posts AS p
@@ -113,6 +118,7 @@ public function getPostById($id, $sanitize, $fetchMode = null)
 
 /**
  * getPostBySlug
+ * 
  * retrieving post record by slug
  *
  * @param string $slug
@@ -166,7 +172,7 @@ public function getPostByAuthor($author)
                  p.post_status, p.post_sticky, 
                  p.post_type, p.comment_status, 
                  m.media_filename, m.media_caption, m.media_target, m.media_access,
-                 u.user_fullname
+                 u.user_fullname, u.user_login
           FROM tbl_posts AS p
           INNER JOIN tbl_user AS u ON p.post_author = u.ID
           INNER JOIN tbl_media AS m ON p.media_id = m.ID
@@ -196,15 +202,13 @@ public function getPostByAuthor($author)
 public function getPostsPublished(Paginator $perPage, $sanitize)
 {
 
-    $pagination = null;
+  $this->linkPosts = $perPage;
 
-    $this->linkPosts = $perPage;
+  $stmt = $this->dbc->dbQuery("SELECT ID FROM tbl_posts WHERE post_status = 'publish' AND post_type = 'blog'");
 
-    $stmt = $this->dbc->dbQuery("SELECT ID FROM tbl_posts WHERE post_status = 'publish' AND post_type = 'blog'");
+  $this->linkPosts->set_total($stmt->rowCount());
 
-    $this->linkPosts->set_total($stmt->rowCount());
-
-    $sql = "SELECT p.ID, p.media_id, p.post_author,
+  $sql = "SELECT p.ID, p.media_id, p.post_author,
                      p.post_date, p.post_modified, p.post_title,
                      p.post_slug, p.post_content, p.post_summary,
                      p.post_keyword, p.post_tags,
@@ -217,13 +221,13 @@ public function getPostsPublished(Paginator $perPage, $sanitize)
   			WHERE p.post_type = 'blog' AND p.post_status = 'publish'
   			ORDER BY p.ID DESC " . $this->linkPosts->get_limit($sanitize);
 
-    $this->setSQL($sql);
+  $this->setSQL($sql);
 
-    $postsPublished = $this->findAll();
+  $postsPublished = $this->findAll();
 
-    $pagination = $this->linkPosts->page_links($sanitize);
+  $this->pagination = $this->linkPosts->page_links($sanitize);
 
-    return (empty($postsPublished)) ?: ['postsPublished' => $postsPublished, 'paginationLink' => $pagination];
+  return (empty($postsPublished)) ?: ['postsPublished' => $postsPublished, 'paginationLink' => $this->pagination];
 
 }
 
@@ -238,7 +242,7 @@ public function getPostsPublished(Paginator $perPage, $sanitize)
  * @return mixed
  * 
  */
-public function getRandomHeadlinesPosts()
+public function getRandomHeadlines()
 {
 
 $sql = "SELECT p.ID, p.media_id, p.post_author,
@@ -266,6 +270,7 @@ return (empty($headlines)) ?: $headlines;
 
 /**
  * getRelatedPosts
+ * 
  * retrieving related post records
  *
  * @param string $post_title
@@ -298,25 +303,24 @@ public function getRelatedPosts($post_title)
  * @return mixed
  *
  */
-public function getRandomPosts($limit)
+public function getRandomPosts($start, $end)
 {
 
   $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
           p.post_title, p.post_slug, p.post_content, p.post_tags,
-          m.media_filename, m.media_caption, u.user_fullname
+          m.media_filename, m.media_caption, u.user_login, u.user_fullname
           FROM tbl_posts AS p
+          INNER JOIN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 5) AS p2 ON p.ID = p2.ID
           INNER JOIN tbl_users AS u ON p.post_author = u.ID
-          INNER JOIN tbl_media AS m
-          INNER JOIN
-            (SELECT ROUND(RAND() * (SELECT MAX(ID) FROM tbl_media )) AS id ) AS m2
-          WHERE p.media_id >= m2.ID
+          INNER JOIN tbl_media AS m ON p.media_id = m.ID
+          WHERE p.post_type = 'blog'
           AND p.post_status = 'publish'
-          AND p.post_type = 'blog'
-          LIMIT :limit";
+          AND m.media_target = 'blog' 
+          LIMIT :position, :limit                                                                                                                                                                                       ";
 
   $this->setSQL($sql);
 
-  $data = array(':limit' => (int)$limit);
+  $data = array(':position' => $start, ':limit' => $end);
 
   $randomPosts = $this->findAll($data);
 
@@ -407,25 +411,6 @@ $this->setSQL($sql);
 $sidebar_posts = $this->findAll([':status' => $status, ':position'=> $start, ':limit' => $limit]);
 
 return (empty($sidebar_posts)) ?: ['sidebarPosts' => $sidebar_posts];
-
-}
-
-/**
- * getArchivesPosts
- * 
- * @return mixed
- */
-public function getArchivesPosts()
-{
-
-$sql = "SELECT MONTH(post_date) AS month, YEAR(post_date) AS year 
-        FROM tbl_posts GROUP BY month, year ORDER BY month DESC";
-
-$this->setSQL($sql);
-
-$archives = $this->findAll();
-
-return (empty($archives)) ?: $archives;
 
 }
 
