@@ -1,6 +1,6 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * Class MediaProviderModel 
+ * Class GalleryProviderModel extends Dao
  * 
  * @category Provider Class
  * @author M.Noermoehammad
@@ -16,6 +16,13 @@ public function __construct()
   parent::__construct();
 }
 
+/**
+ * getGalleries
+ *
+ * @param int|num $start
+ * @param int|num $limit
+ * 
+ */
 public function getGalleries($start, $limit)
 {
 
