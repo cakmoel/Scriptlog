@@ -12,7 +12,7 @@
  * @return bool
  * 
  */
-function validate_date($date, $format = 'm/d/Y')
+function validate_date($date, $format = 'Y-m-d')
 {
 
 $d = DateTime::createFromFormat($format, $date);

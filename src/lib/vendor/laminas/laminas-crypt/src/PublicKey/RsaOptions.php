@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-crypt for the canonical source repository
- * @copyright https://github.com/laminas/laminas-crypt/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-crypt/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Crypt\PublicKey;
 
 use Laminas\Crypt\PublicKey\Rsa\Exception;
@@ -28,19 +22,13 @@ use const OPENSSL_KEYTYPE_RSA;
  */
 class RsaOptions extends AbstractOptions
 {
-    /**
-     * @var Rsa\PrivateKey
-     */
-    protected $privateKey = null;
+    /** @var Rsa\PrivateKey */
+    protected $privateKey;
 
-    /**
-     * @var Rsa\PublicKey
-     */
-    protected $publicKey = null;
+    /** @var Rsa\PublicKey */
+    protected $publicKey;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $hashAlgorithm = 'sha1';
 
     /**
@@ -48,12 +36,10 @@ class RsaOptions extends AbstractOptions
      *
      * @var int
      */
-    protected $opensslSignatureAlgorithm = null;
+    protected $opensslSignatureAlgorithm;
 
-    /**
-     * @var string
-     */
-    protected $passPhrase = null;
+    /** @var string */
+    protected $passPhrase;
 
     /**
      * Output is binary
@@ -72,7 +58,6 @@ class RsaOptions extends AbstractOptions
     /**
      * Set private key
      *
-     * @param  Rsa\PrivateKey $key
      * @return RsaOptions Provides a fluent interface
      */
     public function setPrivateKey(Rsa\PrivateKey $key)
@@ -95,7 +80,6 @@ class RsaOptions extends AbstractOptions
     /**
      * Set public key
      *
-     * @param  Rsa\PublicKey $key
      * @return RsaOptions Provides a fluent interface
      */
     public function setPublicKey(Rsa\PublicKey $key)
@@ -153,7 +137,7 @@ class RsaOptions extends AbstractOptions
             );
         }
 
-        $this->hashAlgorithm = strtolower($hash);
+        $this->hashAlgorithm             = strtolower($hash);
         $this->opensslSignatureAlgorithm = constant('OPENSSL_ALGO_' . $hashUpper);
         return $this;
     }
@@ -168,6 +152,7 @@ class RsaOptions extends AbstractOptions
         return $this->hashAlgorithm;
     }
 
+    /** @return string */
     public function getOpensslSignatureAlgorithm()
     {
         if (! isset($this->opensslSignatureAlgorithm)) {
@@ -233,7 +218,7 @@ class RsaOptions extends AbstractOptions
             [
                 'private_key_type' => OPENSSL_KEYTYPE_RSA,
                 'private_key_bits' => Rsa\PrivateKey::DEFAULT_KEY_SIZE,
-                'digest_alg'       => $this->getHashAlgorithm()
+                'digest_alg'       => $this->getHashAlgorithm(),
             ],
             $opensslConfig
         );

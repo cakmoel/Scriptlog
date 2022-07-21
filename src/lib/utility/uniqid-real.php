@@ -1,6 +1,6 @@
 <?php
 /**
- * Uniqid Real Function
+ * uniqid_real
  * to cretate randomm unique ID or Key
  * 
  * @param number $length

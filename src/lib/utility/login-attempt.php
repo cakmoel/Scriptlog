@@ -157,7 +157,7 @@ return db_prepared_query($sql, [$login], 's');
 }
 
 /**
- * locked_until_to_null
+ * locked_down_to_null
  *
  * @param string $login
  * @return void

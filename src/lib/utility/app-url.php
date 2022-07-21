@@ -1,9 +1,13 @@
 <?php
 /**
- * Function app_url
+ * app_url
+ * 
  * Retrieving URL configuration from database
  * 
  * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @return string
  * 
  */
@@ -15,11 +19,11 @@ function app_url()
           
         if(substr(app_info()['app_url'], -1) == DIRECTORY_SEPARATOR) {
 
-             return rtrim(app_info()['app_url'], DIRECTORY_SEPARATOR);
+          return rtrim(app_info()['app_url'], DIRECTORY_SEPARATOR);
 
         } else {
 
-             return app_info()['app_url'];
+          return app_info()['app_url'];
 
         }
         

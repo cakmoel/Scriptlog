@@ -122,10 +122,10 @@ function safe_human_login($ip, $loginId, $uniqueKey, array $values)
 
 if( check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'scriptpot_email', 'captcha_login', 'remember', 'csrf', 'LogIn']) === false )  {
 
-     header(APP_PROTOCOL.' 413 Payload Too Large', true, 413);
-     header('Status: 413 Payload Too Large');
-     header('Retry-After: 3600');
-     exit("413 Payload Too Large");
+   header(APP_PROTOCOL.' 413 Payload Too Large', true, 413);
+   header('Status: 413 Payload Too Large');
+   header('Retry-After: 3600');
+   exit("413 Payload Too Large");
 
 }
 
@@ -151,7 +151,7 @@ if ( review_login_attempt($ip) === true ) {
 
 }
 
-if ( midfielder() === true) {
+if ( midfielder() === true ) {
 
    sleep(20);
 
@@ -173,7 +173,7 @@ if ( midfielder() === true) {
  * @param integer|number $loginId
  * @param string $uniqueKey
  * @param array $values
- * @return void
+ * @return array
  * 
  */
 function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, array $values)
@@ -191,7 +191,7 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
       
    if(!$valid) {
       
-      $errors['errorMessage'] = "Sorry, attack detected!";
+     $errors['errorMessage'] = "Sorry, attack detected!";
       
    }
    

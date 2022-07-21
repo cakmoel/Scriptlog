@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-crypt for the canonical source repository
- * @copyright https://github.com/laminas/laminas-crypt/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-crypt/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Crypt;
 
 use Laminas\Crypt\PublicKey\Rsa\PrivateKey;
@@ -30,26 +24,19 @@ use function sprintf;
  */
 class Hybrid
 {
-    /**
-     * @var BlockCipher
-     */
+    /** @var BlockCipher */
     protected $bCipher;
 
-    /**
-     * @var PublicKey\Rsa
-     */
+    /** @var PublicKey\Rsa */
     protected $rsa;
 
     /**
      * Constructor
-     *
-     * @param BlockCipher $bCipher
-     * @param PublicKey\Rsa $rsa
      */
-    public function __construct(BlockCipher $bCipher = null, PublicKey\Rsa $rsa = null)
+    public function __construct(?BlockCipher $bCipher = null, ?PublicKey\Rsa $rsa = null)
     {
-        $this->bCipher = (null === $bCipher ) ? BlockCipher::factory('openssl') : $bCipher;
-        $this->rsa     = (null === $rsa ) ? new PublicKey\Rsa() : $rsa;
+        $this->bCipher = $bCipher ?? BlockCipher::factory('openssl');
+        $this->rsa     = $rsa ?? new PublicKey\Rsa();
     }
 
     /**
@@ -82,7 +69,7 @@ class Hybrid
                     PubKey::class
                 ));
             }
-            $pubkey = is_string($pubkey) ? new PubKey($pubkey) : $pubkey;
+            $pubkey   = is_string($pubkey) ? new PubKey($pubkey) : $pubkey;
             $encKeys .= sprintf(
                 "%s:%s:",
                 base64_encode($id),
@@ -102,10 +89,10 @@ class Hybrid
      * @return string
      * @throws RuntimeException
      */
-    public function decrypt($msg, $privateKey = null, $passPhrase = null, $id = null)
+    public function decrypt($msg, $privateKey = null, $passPhrase = null, $id = "")
     {
         // get the session key
-        list($encKeys, $ciphertext) = explode(';', $msg, 2);
+        [$encKeys, $ciphertext] = explode(';', $msg, 2);
 
         $keys = explode(':', $encKeys);
         $pos  = array_search(base64_encode($id), $keys);
@@ -116,7 +103,7 @@ class Hybrid
         }
 
         if (! $privateKey instanceof PrivateKey && ! is_string($privateKey)) {
-            throw new Exception\RuntimeException(\sprintf(
+            throw new Exception\RuntimeException(sprintf(
                 "The private key must be a string in PEM format or an instance of %s",
                 PrivateKey::class
             ));

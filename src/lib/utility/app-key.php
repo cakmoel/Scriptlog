@@ -1,10 +1,13 @@
 <?php
 /**
- * Function app_key
+ * app_key
  * checking if application key is recognized and equal 
  * between application key on database and configuration file
  * 
  * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @return string
  * 
  */
@@ -22,7 +25,7 @@ function app_key()
 
   } else {
 
-     return false;
+    return false;
 
   }
   

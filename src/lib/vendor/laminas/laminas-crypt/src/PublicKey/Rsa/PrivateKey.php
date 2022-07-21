@@ -1,15 +1,10 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-crypt for the canonical source repository
- * @copyright https://github.com/laminas/laminas-crypt/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-crypt/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Crypt\PublicKey\Rsa;
 
 use function file_get_contents;
 use function is_readable;
+use function is_string;
 use function openssl_error_string;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
@@ -29,7 +24,7 @@ class PrivateKey extends AbstractKey
      *
      * @var PublicKey
      */
-    protected $publicKey = null;
+    protected $publicKey;
 
     /**
      * Create private key instance from PEM formatted key file
@@ -101,7 +96,7 @@ class PrivateKey extends AbstractKey
         }
 
         $encrypted = '';
-        $result = openssl_private_encrypt($data, $encrypted, $this->getOpensslKeyResource(), $padding);
+        $result    = openssl_private_encrypt($data, $encrypted, $this->getOpensslKeyResource(), $padding);
         if (false === $result) {
             throw new Exception\RuntimeException(
                 'Can not encrypt; openssl ' . openssl_error_string()
@@ -119,6 +114,7 @@ class PrivateKey extends AbstractKey
      * attack.
      *
      * @see http://archiv.infsec.ethz.ch/education/fs08/secsem/bleichenbacher98.pdf
+     *
      * @param  string $data
      * @param  integer $padding
      * @return string
@@ -135,7 +131,7 @@ class PrivateKey extends AbstractKey
         }
 
         $decrypted = '';
-        $result = openssl_private_decrypt($data, $decrypted, $this->getOpensslKeyResource(), $padding);
+        $result    = openssl_private_decrypt($data, $decrypted, $this->getOpensslKeyResource(), $padding);
         if (false === $result) {
             throw new Exception\RuntimeException(
                 'Can not decrypt; openssl ' . openssl_error_string()

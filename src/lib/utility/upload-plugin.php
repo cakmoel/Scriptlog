@@ -35,7 +35,7 @@ $fileNameUnique = $slug . "-" . $rename_file . "-scriptlog" . $file_extension;
 
 $path = __DIR__ . '/../../' . APP_PLUGIN;
 
-$zip_path_uploaded = $path.$fileNameUnique;
+$zip_path_uploaded = $path.basename($fileNameUnique);
 
 $plugin_path_uploaded = $path.current(explode(".",$file_name));
 

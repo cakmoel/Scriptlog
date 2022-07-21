@@ -1,6 +1,6 @@
 <?php
 /**
- * Make Slug Function 
+ * make_slug 
  * to create URL SEO Friendly
  * 
  * @category  Function

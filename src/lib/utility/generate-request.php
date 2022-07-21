@@ -1,10 +1,12 @@
 <?php
 /**
  * generate_request function
+ * 
  * build http query for requesting in order 
  * to act CRUD functionality especially in administrator page.
  * 
  * @category Function
+ * @author M.Noermoehammad
  * @param string $value
  * @param string $type
  * @return array
@@ -111,31 +113,6 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
        
  }
 
-   return $html;
-
-}
-
-/**
- * check_request_generated
- *
- * @category Function
- * @return void
- * 
- */
-function check_request_generated()
-{
-
-$method = ['GET', 'POST'];
-
-if(true === block_request_type(current_request_method(), $method)) {
-
-   http_response_code(405);
-   scriptlog_error("405 - Method Not Allowed");
-
-} else {
-
-    unset($method);
-
-}
+ return $html;
 
 }

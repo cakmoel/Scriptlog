@@ -23,7 +23,7 @@ if(is_readable($image_dir)) {
 
     if($image_thumb) {
 
-        $image_src =  app_url().DS.APP_IMAGE_SMALL.'small_'.rawurlencode($file_basename.'.webp');
+        $image_src =  app_url().DS.APP_IMAGE_MEDIUM.'medium_'.rawurlencode($file_basename.'.webp');
         
     } else {
 

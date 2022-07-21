@@ -1,7 +1,10 @@
 <?php
 /**
- * Upload Theme Function
+ * upload_theme()
  * 
+ * uploading theme with zip format
+ * 
+ * @category function
  * @param string $file_name
  * 
  */
@@ -15,7 +18,7 @@ function upload_theme($file_name, $file_location, array $blacklist)
   // rename file
   $rename_file = rename_file(md5(rand(000,999).$file_basename));
   $slug = make_slug($file_basename);
-  $fileNameUnique = $slug . "-" . $rename_file . "-scriptlog" . $file_extension;
+  $fileNameUnique = $slug . "-" . $rename_file . "-scriptlog" . '.' . $file_extension;
   $pathFile = __DIR__ . '/../../'.APP_THEME.$fileNameUnique;
 
   foreach ($blacklist as $item) {
@@ -30,6 +33,7 @@ function upload_theme($file_name, $file_location, array $blacklist)
     $x = $zip -> open($pathFile);
 
     if ($x === true) {
+      
       $zip -> extractTo(APP_ROOT.'public/themes/');
       $zip -> close();
 

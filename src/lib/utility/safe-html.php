@@ -1,6 +1,7 @@
 <?php
 /**
  * safe_html
+ * 
  * Sanitizing text results from database
  * 
  * @category function

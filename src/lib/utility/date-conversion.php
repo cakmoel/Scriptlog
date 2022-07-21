@@ -30,6 +30,7 @@ function date_conversion($date, $locale = 'en')
 /**
  * grab_month()
  *
+ * @category function
  * @param string $month
  * @return string
  */

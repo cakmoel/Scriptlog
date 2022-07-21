@@ -13,7 +13,7 @@ function sanitize_sql_orderby($orderby)
   
  if (preg_match('/^\s*(([a-z0-9_]+|`[a-z0-9_]+`)(\s+(ASC|DESC))?\s*(,\s*(?=[a-z0-9_`])|$))+$/i', $orderby ) || preg_match( '/^\s*RAND\(\s*\)\s*$/i', $orderby )) {
  
-      return $orderby;
+   return $orderby;
       
  }
 
