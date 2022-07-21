@@ -14,5 +14,5 @@
  */
 function route_request($dispatcher)
 {
-  (is_object($dispatcher) ? $dispatcher->dispatch() : trigger_error("Scriptlog's internal server not working") ); 
+  ( is_object($dispatcher) ? $dispatcher->dispatch() : trigger_error("Scriptlog's internal server not working") ); 
 }

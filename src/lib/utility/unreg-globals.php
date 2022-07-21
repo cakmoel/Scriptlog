@@ -1,9 +1,12 @@
 <?php
 /**
- * unreg_globals function
+ * unreg_globals()
+ * 
  * Emulate register_globals off
  *
+ * @category function
  * @return void
+ * 
  */
 function unreg_globals()
 {
@@ -23,18 +26,15 @@ if(isset($_REQUEST['GLOBALS']) || isset($_FILES['GLOBALS'])) {
 // variable that should not be unset
 $no_unset = array('GLOBALS', '_GET', '_POST', '_COOKIE', '_REQUEST', '_SERVER', '_ENV', '_FILES');
 
-$input = array_merge($_GET, $_POST, $_COOKIE, $_SERVER, 
-                    $_ENV, $_FILES, 
-                    isset($_SESSION) && is_array($_SESSION) ? $_SESSION : array());
-
+$input = array_merge($_GET, $_POST, $_COOKIE, $_SERVER, $_ENV, $_FILES, isset($_SESSION) && is_array($_SESSION) ? $_SESSION : array());
 
 foreach($input as $k => $v) {
 
-    if(!in_array($k, $no_unset) && isset($GLOBALS[$k])) {
+  if(!in_array($k, $no_unset) && isset($GLOBALS[$k])) {
 
-        unset($GLOBALS[$k]);
+      unset($GLOBALS[$k]);
 
-    }
+  }
 
 }
 

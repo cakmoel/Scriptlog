@@ -1,6 +1,6 @@
 <?php
 /**
- * Function check uploaded filename
+ * check_file_name
  * 
  * @category function
  * @see https://www.php.net/manual/en/function.move-uploaded-file.php#111412
@@ -10,5 +10,5 @@
  */
 function check_file_name($filename)
 {
-  return ((preg_match("`^[-0-9A-Z_\.]+$`i", basename($filename)) ? true : false));
+  return ( ( preg_match("`^[-0-9A-Z_\.]+$`i", basename($filename) ) ? true : false ) );
 }

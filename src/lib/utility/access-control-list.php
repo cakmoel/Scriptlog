@@ -1,10 +1,13 @@
 <?php
 /**
- * Access Control list Function
+ * access_control_list
  * Checking users's action privilege 
  * on admin directory wherein navigation menu
  * 
- * @category Function
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param string $action
  * @return bool
  * 

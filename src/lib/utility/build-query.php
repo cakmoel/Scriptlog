@@ -1,8 +1,11 @@
 <?php
 /**
- * Function build query
+ * build_query
  * 
- * @category Function
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param string $base
  * @param array $query_data
  * @return string

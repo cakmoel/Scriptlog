@@ -1,8 +1,8 @@
 <?php
 /**
- * Dropdown Function
+ * dropdown
  * 
- * @category Function
+ * @category function
  * @see   https://www.phpro.org/tutorials/Dropdown-Select-With-PHP-and-MySQL.html
  * @param  string $name
  * @param  array  $options
@@ -13,7 +13,7 @@
 function dropdown($name, array $options, $selected=null)
 {
     
-    $dropdown = '<select class="form-control select2" name="'.$name.'" id="'.$name.'">'."\n";
+    $dropdown = '<select class="form-control select2" name="'.$name.'" id="'.$name.'">'. PHP_EOL;
 
     $selected = $selected;
 
@@ -24,12 +24,12 @@ function dropdown($name, array $options, $selected=null)
           $select = $selected === $key ? '  selected' : null;
         
           /*** add each option to the dropdown ***/
-          $dropdown .= '<option value="'.$key.'"'.$select.'>'.$option.'</option>'."\n";
+          $dropdown .= '<option value="'.$key.'"'.$select.'>'.$option.'</option>'. PHP_EOL;
         
     }
 
     /*** close the select ***/
-    $dropdown .= '</select>'."\n";
+    $dropdown .= '</select>'. PHP_EOL;
     
     /*** and return the completed dropdown ***/
     return $dropdown;

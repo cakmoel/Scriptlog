@@ -4,6 +4,7 @@
  * Read datetime field from MySQL Database
  * 
  * @param string $datetime
+ * @uses DateGenerator::getExternalData 
  * @return string
  * 
  */

@@ -1,7 +1,8 @@
 <?php
 
 /**
- * regenerate_session
+ * regenerate_session()
+ * 
  * Session ID must be regenerated when
  * User logged in
  * Certain period has passed
@@ -38,7 +39,7 @@ function regenerate_session()
 }
 
 /**
- * clear_duplicate_cookies
+ * clear_duplicate_cookies()
  * 
  * @category function
  * @see https://www.php.net/manual/en/function.session-start.php#117157

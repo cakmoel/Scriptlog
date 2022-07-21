@@ -55,7 +55,7 @@ function invoke_fileicon($media_type)
 
         break;
      
-    case "audio/mp3":
+    case "audio/mpeg":
     case "audio/wav":
     case "audio/ogg":
       

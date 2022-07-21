@@ -1,15 +1,9 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-crypt for the canonical source repository
- * @copyright https://github.com/laminas/laminas-crypt/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-crypt/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Crypt\Symmetric;
 
-use Interop\Container\ContainerInterface;
 use Laminas\Stdlib\ArrayUtils;
+use Psr\Container\ContainerInterface;
 use Traversable;
 
 use function array_key_exists;
@@ -36,6 +30,7 @@ use function sprintf;
 use function strtolower;
 use function trigger_error;
 
+use const E_USER_DEPRECATED;
 use const PHP_VERSION_ID;
 
 /**
@@ -47,7 +42,7 @@ use const PHP_VERSION_ID;
  */
 class Mcrypt implements SymmetricInterface
 {
-    const DEFAULT_PADDING = 'pkcs7';
+    public const DEFAULT_PADDING = 'pkcs7';
 
     /**
      * Key
@@ -87,9 +82,9 @@ class Mcrypt implements SymmetricInterface
     /**
      * Padding plugins
      *
-     * @var Interop\Container\ContainerInterface
+     * @var ContainerInterface
      */
-    protected static $paddingPlugins = null;
+    protected static $paddingPlugins;
 
     /**
      * Supported cipher algorithms
@@ -109,7 +104,7 @@ class Mcrypt implements SymmetricInterface
         'rijndael-256' => 'rijndael-256',
         'saferplus'    => 'saferplus',
         'serpent'      => 'serpent',
-        'twofish'      => 'twofish'
+        'twofish'      => 'twofish',
     ];
 
     /**
@@ -123,7 +118,7 @@ class Mcrypt implements SymmetricInterface
         'ctr'  => 'ctr',
         'ofb'  => 'ofb',
         'nofb' => 'nofb',
-        'ncfb' => 'ncfb'
+        'ncfb' => 'ncfb',
     ];
 
     /**
@@ -145,7 +140,7 @@ class Mcrypt implements SymmetricInterface
         if (! extension_loaded('mcrypt')) {
             throw new Exception\RuntimeException(sprintf(
                 'You cannot use %s without the Mcrypt extension',
-                __CLASS__
+                self::class
             ));
         }
         $this->setOptions($options);
@@ -244,7 +239,7 @@ class Mcrypt implements SymmetricInterface
         }
         if (! $plugins instanceof ContainerInterface) {
             throw new Exception\InvalidArgumentException(sprintf(
-                'Padding plugins must implements Interop\Container\ContainerInterface; received "%s"',
+                'Padding plugins must implements Psr\Container\ContainerInterface; received "%s"',
                 is_object($plugins) ? get_class($plugins) : gettype($plugins)
             ));
         }
@@ -277,7 +272,7 @@ class Mcrypt implements SymmetricInterface
             throw new Exception\InvalidArgumentException('The key cannot be empty');
         }
         $keySizes = mcrypt_module_get_supported_key_sizes($this->supportedAlgos[$this->algo]);
-        $maxKey = $this->getKeySize();
+        $maxKey   = $this->getKeySize();
 
         /*
          * blowfish has $keySizes empty, meaning it can have arbitrary key length.
@@ -322,7 +317,7 @@ class Mcrypt implements SymmetricInterface
             throw new Exception\InvalidArgumentException(sprintf(
                 'The algorithm %s is not supported by %s',
                 $algo,
-                __CLASS__
+                self::class
             ));
         }
         $this->algo = $algo;
@@ -343,7 +338,6 @@ class Mcrypt implements SymmetricInterface
     /**
      * Set the padding object
      *
-     * @param  Padding\PaddingInterface $padding
      * @return Mcrypt Provides a fluent interface
      */
     public function setPadding(Padding\PaddingInterface $padding)

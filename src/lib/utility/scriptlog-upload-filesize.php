@@ -3,8 +3,11 @@
  * scriptlog_upload_filesize
  * Determine upload max filesize for theme and plugin
  * 
- * @category description
- * @return void
+ * @category Function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
+ * @return numeric|int
  * 
  */
 function scriptlog_upload_filesize()
@@ -12,18 +15,18 @@ function scriptlog_upload_filesize()
 
 $current_upload_filesize = ini_get('upload_max_filesize');
 
-$theme_size = null;
+$file_size = null;
 
 if (check_upload_filesize()) {
 
-    $theme_size = (intval($current_upload_filesize) * 10485760)/10.29;
+    $file_size = (intval($current_upload_filesize) * 10485760)/10.29;
 
 } else {
 
-    $theme_size = APP_FILE_SIZE;
+    $file_size = APP_FILE_SIZE;
 
 }
 
-return $theme_size;
+return $file_size;
 
 }

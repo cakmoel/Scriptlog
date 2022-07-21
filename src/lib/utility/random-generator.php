@@ -1,11 +1,12 @@
 <?php
 /**
- * Random Generator Function
+ * random_generator()
+ * 
  * A funtion for generating random strings and numbers
  * 
- * @category function Random generator 
- * @param number $digits
- * @return string|number
+ * @category function
+ * @param int $digits
+ * @return string
  * 
  */
 function random_generator($digits)
@@ -34,14 +35,16 @@ function random_generator($digits)
 }
 
 /**
- * ircmaxel generator string function
+ * ircmaxel_generator_string()
+ * 
  * A function for generating random string of various strength
  * 
+ * @category function
  * @see https://github.com/ircmaxell/RandomLib
  * @param string $strength
  * @param integer $length
  * @param string $character_list
- * @return void
+ * @return string
  * 
  */
 function ircmaxell_generator_string($strength, $length = 32, $character_list = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/')
@@ -80,12 +83,14 @@ function ircmaxell_generator_string($strength, $length = 32, $character_list = '
 }
 
 /**
- * ircmaxell generator numbers function
+ * ircmaxell_generator_numbers()
+ * 
  * A function for generating random numbers 
  * 
+ * @category function
  * @param number|integer $min
  * @param number|integer $max
- * @return void
+ * @return number
  */
 function ircmaxell_generator_numbers($min, $max)
 {
@@ -101,11 +106,14 @@ return $random_int;
 }
 
 /**
- * irc_random_generantor function
- *
+ * ircmaxell_random_generator()
+ * 
+ * generating simple random bytes string
+ * 
+ * @category function
  * @param int $length
  * @see https://github.com/ircmaxell/RandomLib
- * @return void
+ * @return string
  * 
  */
 function ircmaxell_random_generator($length)
@@ -122,17 +130,45 @@ return $bytes;
 }
 
 /**
- * ircmaxell_random_compat
+ * ircmaxell_random_compat()
  *
+ * @category function
  * https://github.com/ircmaxell/random_compat
  * @return string
  * 
  */
-function ircmaxell_random_compat($length = 16)
+function ircmaxell_random_compat($length = 64)
 {
 
   $random_compat = new Random();
 
   return bin2hex($random_compat->bytes($length));
+
+}
+
+/**
+ * random_password function
+ * generates random characters that can be used as insecure password
+ * never use this function for storing your password
+ * 
+ * @see https://thisinterestsme.com/php-random-password/
+ * @param integer $length
+ * @return string
+ * 
+ */
+function random_password($length)
+{
+
+ //A list of characters that can be used in our random password.
+$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!-.[]?*()';
+//Create a blank string.
+$password = '';
+//Get the index of the last character in our $characters string.
+$characterListLength = mb_strlen($characters, '8bit') - 1;
+//Loop from 1 to the $length that was specified.
+foreach(range(1, $length) as $i){
+    $password .= $characters[random_int(0, $characterListLength)];
+}
+return $password;
 
 }

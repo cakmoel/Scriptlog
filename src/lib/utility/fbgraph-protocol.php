@@ -1,9 +1,11 @@
 <?php
 /**
- * Facebook graph protocol function
+ * fbgraph_protocol
  * 
- * @category Function
+ * @category function
  * @author   M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * 
  */
 function fbgraph_protocol($locale, $site_name, $id, $post_image, $title, $desc, $type, $post_url, $width, $height)

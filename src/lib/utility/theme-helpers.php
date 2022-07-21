@@ -1,24 +1,39 @@
 <?php
 /**
+ * html()
+ *
+ * @param string $text
+ * @return string
  * 
  */
-
 function html($text)
 {
   return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
 }
 
+/**
+ * htmlout()
+ *
+ * @param string $text
+ * 
+ */
 function htmlout($text)
 {
-  echo html($text);
+  echo escape_html(html($text));
 }
 
+/**
+ * markdown_html()
+ *
+ * @param string $text
+ * 
+ */
 function markdown_html($text)
 {
 
   // strong emphasis
   $text = preg_replace('/__(.+?)__/s', '<strong>$1</strong>', $text);
-  $text = preg_replace('/\*\*(.+?)\*\*/s'. '<strong>$1</strong>', $text);
+  $text = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $text);
 
   // emphasis
   $text = preg_replace('/_([^_]+)_/', '<em>$1</em>', $text);
@@ -41,7 +56,45 @@ function markdown_html($text)
   
 }
 
+/**
+ * markdown_html_out
+ *
+ * @param string $text
+ * 
+ */
 function markdown_html_out($text)
 {
   echo markdown_html($text);
+}
+
+function copyright()
+{
+  
+  $copyright = '&copy;';
+
+  return $copyright;
+
+}
+
+/**
+ * year_on_footer
+ *
+ * @param string $start_year
+ * 
+ */
+function year_on_footer($start_year)
+{
+  
+  $this_year = date ( "Y" );
+  
+  if ($start_year == $this_year) {
+     
+    echo $start_year;
+     
+  } else {
+      
+    echo " {$start_year} &#8211; {$this_year} ";
+
+  }
+             
 }

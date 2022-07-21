@@ -1,14 +1,14 @@
 <?php 
 /**
- * check password strength function
+ * check_pwd_strength()
  *
  * @category function
  * @author M.Noermoehammad
  * @license MIT
- * @since 1.0
+ * @version 1.0
  * @param string $password
  * 
- * Path to research, learn and code:
+ * Resources to research, learn and code:
  * 
  * @see https://www.the-art-of-web.com/javascript/validate-password/
  * @see https://www.the-art-of-web.com/php/password-strength/
@@ -38,7 +38,7 @@ function check_pwd_strength($password, $strong_type = 'standard')
             
             if (!preg_match('/^(?=(?:.*[A-Z]){2,})(?=(?:.*[a-z]){2,})(?=(?:.*\d){2,})(?=(?:.*[!@#$%^&*()\-_=+{};:,<.>]){2,})(.{8,})$/', $password)) {
 
-                $strength = false;
+              $strength = false;
 
             }
 

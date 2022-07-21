@@ -1,22 +1,25 @@
 <?php
 /**
- * the worst password function
- * these are the most hacked password on the list
+ * worst_passwords()
+ * 
+ * these are the most common leaked password on the list
  * 
  * @category function
  * @author M.Noermoehammad
  * @license MIT
+ * @version 1.0
  * @see https://en.wikipedia.org/wiki/List_of_the_most_common_passwords#cite_note-keeper2016list-14
+ * @see https://en.wikipedia.org/wiki/List_of_the_most_common_passwords
  * @see https://www.forbes.com/sites/kateoflahertyuk/2018/12/14/these-are-the-top-20-worst-passwords-of-2018/#2d5af4af4541
  * @see https://www.forbes.com/sites/kateoflahertyuk/2019/04/21/these-are-the-worlds-most-hacked-passwords-is-yours-on-the-list/#793adaf3289c
- * @see https://mozilla.github.io/application-services/docs/accounts/50000-most-common-passwords.html
+ * @see https://mozilla.github.io/application-services/docs/accounts/50000-most-common-passwords.html (404 not found)
  * @return array
  * 
  */
 function worst_passwords()
 {
   
-  $most_common_passwords = ['password', '12345678', '123456789', 'baseball', 'football', 'qwertyuiop', '1234567890', 'superman', 
+  $common_passwords = ['password', '12345678', '123456789', 'baseball', 'football', 'qwertyuiop', '1234567890', 'superman', 
   '1qaz2wsx', 'trustno1', 'jennifer', 'sunshine', 'iloveyou', 'starwars', 'computer', 'michelle', '11111111', 'princess', '987654321', 
   'corvette', '1234qwer', '88888888', 'q1w2e3r4t5', 'internet', 'samantha', 'whatever', 'maverick', 'steelers', 'mercedes', 
   '123123123', 'qwer1234', 'hardcore', 'q1w2e3r4', 'midnight', 'bigdaddy', 'victoria', '1q2w3e4r', 'cocacola', 'marlboro', 'asdfasdf', 
@@ -44,18 +47,24 @@ function worst_passwords()
   'deftones', 'cadillac', 'blahblah', 'birthday', '1234abcd', '01011990', 'cavalier', 'veronika', 'qazwsx123', 'mustang1', 'goldberg', 
   '12345678910', 'wolfgang', 'savannah', 'leonardo', 'basketba', 'cristina', 'aardvark', 'sweetpea', '13131313', 'freedom1', 'fredfred', 'manchester', 
   'kathleen', 'hamilton', 'fuckyou2', 'renegade', 'drpepper', 'bigboobs', '1qaz2wsx3edc', 'christia', 'buckeyes', '0123456789', 'stephani',
-  'enterpri', 'diamonds', 'wetpussy', 'morpheus', '66666666', 'pornstar', 'thuglife', 'napoleon'];    
+  'enterpri', 'diamonds', 'wetpussy', 'morpheus', '66666666', 'pornstar', 'thuglife', 'napoleon', 'highland', 'chandler', 'trfnthbyf', 'consumer', 'welcome1', 
+  '123qwe123', 'wrinkle1', '51505150', '11235813', 'butterfl', 'elizabeth', 'sherlock', 'marathon', 'access14', 'overlord', 'trombone', 'isabelle', 'barcelona', 
+  'babylon5', 'ultimate', 'yankees1', 'superfly', 'campbell', 'geronimo', 'concrete', 'q1w2e3r4t5y6', 'jessica1', '123454321', 'portugal', 'sundance', 
+  'pleasure', 'seminole', 'isabella', '14789632', 'qazxswedc', 'kingkong', 'adgjmptw', 'ncc1701e', 'mongoose', 'alejandr', '1123581321', 
+  'margaret', 'bluemoon', 'ghbdtnbr', 'bonehead', 'stallion', 'personal', 'morrison', 'super123', 'anything', 'aleksandr', 'rhbcnbyf', 'dietcoke', 'cooldude'];    
 
-  return $most_common_passwords;
+  return $common_passwords;
 
 }
 
 /**
- * check common password function
+ * check_common_password
  * checking top most hacked password
  *
  * @category function
  * @author  M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param string $password
  * @return bool
  * 

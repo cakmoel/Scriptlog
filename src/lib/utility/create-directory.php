@@ -2,7 +2,10 @@
 /**
  * create_directory function
  *
- * @category Function
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param string $path
  * @return void
  * 

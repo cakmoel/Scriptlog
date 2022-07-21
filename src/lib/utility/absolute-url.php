@@ -1,13 +1,16 @@
 <?php
 /**
- * Absolute URL function
+ * absolute_url
  * takes the URL of web page, along with a link from within that page, 
  * and then return an absolute URL.
  *
  * @category function
+ * @author M.Noermoehammad
  * @param string $page A web page URL, including http:// preface and domain name
  * @param string $url A link extracted from $page 
- * @return void
+ * @license MIT
+ * @version 1.0
+ * @return string
  * 
  */
 function absolute_url($page, $url)

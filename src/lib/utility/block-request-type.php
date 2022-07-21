@@ -1,23 +1,27 @@
 <?php
 /**
- * block request type function
+ * block_request_type
  *
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param string $current_request
- * @return void
+ * @return bool
  * 
  */
 function block_request_type($current_request, array $method_allowed)
 {
 
- $block = false;
+ $block = true;
 
  if (!in_array($current_request, $method_allowed)) {
 
-     $block = true;
+    $block = true;
 
  } else {
 
-     $block = false;
+    $block = false;
 
  }
 

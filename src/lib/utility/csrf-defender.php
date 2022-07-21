@@ -1,8 +1,11 @@
 <?php
 /**
- * CSRF Check Token Function
+ * csrf_check_token
  * 
  * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param string $key
  * @param string $origin
  * @param string $timespan
@@ -11,7 +14,7 @@
  */
 function csrf_check_token($key, $origin, $timespan = null)
 {
-  $check_csrf = NoCSRF::check($key, $origin, true, $timespan, false);
+  $check_csrf = CSRFGuard::check($key, $origin, true, $timespan, false);
   
   if ($check_csrf) {
 
@@ -26,16 +29,18 @@ function csrf_check_token($key, $origin, $timespan = null)
 }
 
 /**
- * CSRF Generate Token Function
+ * csrf_generate_token
  * 
  * @category function
- * @package  SCRIPTLOG/LIB/UTILITY
+ * @author M.Noermoehammad
+ * @license 
+ * @version 1.0
  * @param string $key
  * @return string
  * 
  */
 function csrf_generate_token($key)
 {
-  $token = NoCSRF::generate($key);
+  $token = CSRFGuard::generate($key);
   return $token;
 }

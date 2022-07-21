@@ -20,13 +20,13 @@ function write_log($ip, $where)
 
 $logging = <<<LOG
 << Start of Message >>\n
-	There was a hacking attempt on your login form:
-  Date of Attack: {$date_attacked}
-  Time of Attack: {$time_attacked}
-  IP-Adress: {$ip} 
-  Operating System: {$os}
-	Host of Attacker: {$host}
-	Point of Attack: {$where}\n
+There was a hacking attempt on your login form:
+Date of Attack: {$date_attacked}
+Time of Attack: {$time_attacked}
+IP-Adress: {$ip} 
+Operating System: {$os}
+Host of Attacker: {$host}
+Point of Attack: {$where}\n
 << End of Message >>\n
 LOG;
 

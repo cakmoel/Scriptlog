@@ -28,6 +28,22 @@ function sanitize_urls($string, $force_lowercase = true, $anal = false)
 
     $clean = ($anal ? preg_replace("/[^a-zA-Z0-9]/", "", $clean) : $clean);
 
-    return ($force_lowercase) ? (function_exists('mb_strtolower')) ? mb_strtolower($clean, 'UTF-8') : strtolower($clean) : $clean;
+    if ( $force_lowercase ) {
+
+      if ( version_compare(PHP_VERSION, '7.4', '<=') && function_exists('mb_strtolower') ) {
+
+        return mb_strtolower($clean, 'UTF-8');
+
+      } else {
+
+        return strtolower($clean);
+
+      }
+
+    } else {
+
+      return $clean;
+
+    }
 
 }

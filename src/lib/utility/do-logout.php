@@ -1,24 +1,34 @@
 <?php 
 /**
- * do_logut function
+ * do_logout()
  *
+ * logging out session and cookies
+ * 
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param object $authenticator
  * @return void
  */
 function do_logout($authenticator)
 {
 
- if(is_object($authenticator)) {
+ if(is_a($authenticator, 'Authentication')) {
 
-    return $authenticator->logout();
+   return $authenticator->logout();
 
  }
 
 }
 
 /**
- * do_logout_id
+ * do_logout_id()
  *
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @return string
  * 
  */
@@ -42,10 +52,15 @@ return $id_logout;
 }
 
 /**
- * verify_logout_id
+ * verify_logout_id()
  *
- * @param [type] $logOutId
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
+ * @param string $id_logout
  * @return boolean
+ * 
  */
 function verify_logout_id($id_logout)
 {
@@ -53,6 +68,7 @@ function verify_logout_id($id_logout)
 if(isset($_SESSION['loggingOut'][$id_logout])) {
 
    unset($_SESSION['loggingOut'][$id_logout]);
+   
    return true;
   
 }

@@ -1,6 +1,6 @@
 <?php 
 /**
- * Write a to an INI file
+ * write_ini()
  * 
  * ===== Example usage: =====
  * // load ini file values into array
@@ -15,16 +15,21 @@
  * 
  * ===== write ini file =====
  * call function: 
- * write_ini('config.ini', $config);
+ * write_ini('config.ini', $theme);
  * 
  * @author  Lawrence Cherone
- * @link https://stackoverflow.com/questions/5695145/how-to-read-and-write-to-an-ini-file-with-php
+ * @see https://stackoverflow.com/questions/5695145/how-to-read-and-write-to-an-ini-file-with-php
  * @param string $file
  * @param array $data
  * 
  */
 function write_ini($file, $array = []) 
 {
+
+  if (!is_readable($file)) {
+      scriptlog_error("$file is not exists or not writeable");
+  }
+  
   if (!is_string($file)) {
       scriptlog_error("Function argument 1 must be a string");
   }
