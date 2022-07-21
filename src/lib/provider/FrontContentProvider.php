@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class FrontContentProvider
  * 
@@ -11,7 +11,7 @@
 final class FrontContentProvider
 {
 /**
- * postProviderMpde;
+ * postProviderModel;
  *
  * @var object
  * 
@@ -25,6 +25,13 @@ private static $postProviderModel;
  * 
  */
 private static $topicProviderModel;
+
+/**
+ * archivesProviderModel
+ *
+ * @var object
+ */
+private static $archivesProviderModel;
 
 /**
  * pageProviderModel
@@ -49,9 +56,9 @@ private static $galleryProviderModel;
  * @return boolean|object return false if not return object
  * 
  */
-public static function frontPermalinks($id)
+public static function frontPermalinks($args)
 {
- return permalinks($id);
+ return permalinks($args);
 }
 
 /**
@@ -61,26 +68,26 @@ public static function frontPermalinks($id)
  * @return mixed
  * 
  */
-public static function frontRandomHeadlinesPosts(PostProviderModel $postProviderModel)
+public static function frontRandomHeadlines(PostProviderModel $postProviderModel)
 {
  self::$postProviderModel = $postProviderModel;
- return self::$postProviderModel->getRandomHeadlinesPosts();
+ return self::$postProviderModel->getRandomHeadlines();
 }
 
 /**
  * frontLatestPosts
  *
- * @param int|num $position
+ * @param int|num $position 
  * @param int|num $limit
  * @param PostProviderModel $postProviderModel
  * @param PDO::FETCH_MODE static $fetchMode = null
  * @return mixed
  * 
  */
-public static function frontLatestPosts($position, $limit, PostProviderModel $postProviderModel, $fetchMode = null)
+public static function frontLatestPosts($limit, PostProviderModel $postProviderModel)
 {
  self::$postProviderModel = $postProviderModel;
- return self::$postProviderModel->getLatestPosts($position, $limit, $fetchMode);
+ return self::$postProviderModel->getLatestPosts($limit);
 }
 
 /**
@@ -91,10 +98,10 @@ public static function frontLatestPosts($position, $limit, PostProviderModel $po
  * @return mixed
  *  
  */
-public static function frontRandomPosts($limit, PostProviderModel $postProviderModel)
+public static function frontRandomPosts($start, $end, PostProviderModel $postProviderModel)
 {
  self::$postProviderModel = $postProviderModel;
- return self::$postProviderModel->getRandomPosts($limit);
+ return self::$postProviderModel->getRandomPosts($start, $end);
 }
 
 /**
@@ -108,7 +115,7 @@ public static function frontRandomPosts($limit, PostProviderModel $postProviderM
 public static function frontPostById($postId, PostProviderModel $postProviderModel)
 {  
  self::$postProviderModel = $postProviderModel;
- return self::$postProviderModel->getPostById($postId, new Sanitize);
+ return self::$postProviderModel->getPostById($postId, self::frontSanitizer());
 }
 
 /**
@@ -137,7 +144,7 @@ public static function frontRandomStickyPage(PageProviderModel $pageProviderMode
 public static function frontPageBySlug($slug, PageProviderModel $pageProviderModel)
 {
  self::$pageProviderModel = $pageProviderModel;
- return self::$pageProviderModel->getPageBySlug($slug, new Sanitize);
+ return self::$pageProviderModel->getPageBySlug($slug, self::frontSanitizer());
 }
 
 /**
@@ -159,6 +166,7 @@ public static function frontGalleries(GalleryProviderModel $galleryProviderModel
  *
  * @param TopicProviderModel $topicProviderModel
  * @return mixed
+ * 
  */
 public static function frontSidebarTopics(TopicProviderModel $topicProviderModel)
 {
@@ -175,7 +183,7 @@ public static function frontSidebarTopics(TopicProviderModel $topicProviderModel
 public static function frontTopicBySlug($slug, TopicProviderModel $topicProviderModel)
 {
  self::$topicProviderModel = $topicProviderModel;
- return self::$topicProviderModel->getTopicBySlug($slug, new Sanitize);
+ return self::$topicProviderModel->getTopicBySlug($slug, self::frontSanitizer());
 }
 
 /**
@@ -189,8 +197,49 @@ public static function frontTopicBySlug($slug, TopicProviderModel $topicProvider
 public static function frontPostTopic($postId, TopicProviderModel $topicProviderModel)
 {
  self::$topicProviderModel = $topicProviderModel;
- return self::$topicProviderModel->getPostTopic($postId, new Sanitize);
+ return self::$topicProviderModel->getPostTopic($postId, self::frontSanitizer());
 }
 
+/**
+ * frontArchivesPublished
+ *
+ * @param array $arguments
+ * @param ArchivesProviderModel $archivesProviderModel
+ * @return mixed
+ * 
+ */
+public static function frontArchivesPublished(array $arguments, ArchivesProviderModel $archivesProviderModel)
+{
+ self::$archivesProviderModel = $archivesProviderModel;
+ return self::$archivesProviderModel->getArchivesPublished(self::frontPaginator(app_reading_setting()['post_per_archive'], 'p'), self::frontSanitizer(), $arguments);
+}
+
+/**
+ * frontSanitizer
+ * 
+ * @return object
+ * 
+ */
+private static function frontSanitizer()
+{
+
+$front_sanitizer = new Sanitize();
+return $front_sanitizer;
+
+}
+
+/**
+ * frontPaginator
+ *
+ * @param int|num $perPage
+ * @param string $instance
+ * @return object
+ * 
+ */
+private static function frontPaginator($perPage, $instance)
+{
+ $front_paginator = new Paginator($perPage, $instance);
+ return $front_paginator;
+}
 
 }
