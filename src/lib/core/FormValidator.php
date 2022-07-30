@@ -197,7 +197,7 @@ public static function sanatizeItem($var, $type)
             break;
             case 'string':
             default:
-                    $filter = FILTER_SANITIZE_STRING;
+                    $filter = FILTER_SANITIZE_SPECIAL_CHARS;
                     $flags = FILTER_FLAG_NO_ENCODE_QUOTES;
             break;
 

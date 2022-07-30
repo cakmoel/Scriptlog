@@ -43,14 +43,14 @@ class TopicApp extends BaseApp
     
     if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        if ($_SESSION['status'] == 'topicAdded') array_push($status, "New topic added");
-        if ($_SESSION['status'] == 'topicUpdated') array_push($status, "Topic has been updated");
-        if ($_SESSION['status'] == 'topicDeleted') array_push($status, "Topic deleted");
+        if ($_SESSION['status'] == 'topicAdded') array_push($status, "New cateogory added");
+        if ($_SESSION['status'] == 'topicUpdated') array_push($status, "Category has been updated");
+        if ($_SESSION['status'] == 'topicDeleted') array_push($status, "Category deleted");
         unset($_SESSION['status']);
     }
     
     $this->setView('all-topics');
-    $this->setPageTitle('Topics');
+    $this->setPageTitle('Categories');
     
     if (!$checkError) {
        $this->view->set('error', $errors);
@@ -62,11 +62,19 @@ class TopicApp extends BaseApp
     
     $this->view->set('pageTitle', $this->getPageTitle());
     $this->view->set('topicsTotal', $this->topicEvent->totalTopics());
-    $this->view->set('topics', $this->topicEvent->grabTopics());
+    $this->view->set('categories', $this->topicEvent->grabTopics());
     return $this->view->render();
     
   }
   
+/**
+ * insert
+ * 
+ * @inheritDoc
+ * @uses BaseApp::insert
+ *
+ * @return void
+ */
   public function insert()
   {
     
@@ -81,7 +89,7 @@ class TopicApp extends BaseApp
           
           if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
               
-              header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+              header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
               throw new AppException("Sorry, unpleasant attempt detected!");
               
           }
@@ -96,7 +104,7 @@ class TopicApp extends BaseApp
           if (!$checkError) {
               
              $this->setView('edit-topic');
-             $this->setPageTitle('Add New Topic');
+             $this->setPageTitle('Add New Category');
              $this->setFormAction(ActionConst::NEWTOPIC);
              $this->view->set('pageTitle', $this->getPageTitle());
              $this->view->set('formAction', $this->getFormAction());
@@ -129,7 +137,7 @@ class TopicApp extends BaseApp
     } else {
       
        $this->setView('edit-topic');
-       $this->setPageTitle('Add New Topic');
+       $this->setPageTitle('Add New Category');
        $this->setFormAction(ActionConst::NEWTOPIC);
        $this->view->set('pageTitle', $this->getPageTitle());
        $this->view->set('formAction', $this->getFormAction());
@@ -171,7 +179,7 @@ class TopicApp extends BaseApp
             
             if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                 
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                 throw new AppException("Sorry, unpleasant attempt detected!");
                 
             }

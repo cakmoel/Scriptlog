@@ -38,6 +38,12 @@ class ActionConst
  const EDITTOPIC   = "editTopic";
  const DELETETOPIC = "deleteTopic";
 
+ // action constant for tag functionality
+ const TAGS = "tags";
+ const NEWTAG = "newTag";
+ const EDITTAG = "editTag";
+ const DELETETAG = "deleteTag";
+
 // action constant for comment functionality
  const COMMENTS      = "comments";
  const EDITCOMMENT   = "editComment";

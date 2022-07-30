@@ -18,7 +18,7 @@ private static $filter = [];
 private static function clearScanStatus()
 {
 
-  if (version_compare(PHP_VERSION, '5.6', '>=')) {
+  if (version_compare(PHP_VERSION, '7.4', '>=')) {
 
       clearstatcache();
 

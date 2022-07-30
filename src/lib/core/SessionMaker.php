@@ -203,16 +203,16 @@ public function refresh()
  * read
  *
  * @see https://www.php.net/manual/en/function.session-start.php#120589
- * @param string $id
- * @return string
+ * @param string|false $id
+ * @return string|false
  * 
  */
-public function read($id)
+public function read($id): string
 {
   
  $data = parent::read($id);
 
- return empty($data) ? '' : $this->decrypt($data, $this->key);
+ return ( empty($data)  ) ? "" : $this->decrypt($data, $this->key);
  
 }
 
@@ -224,7 +224,7 @@ public function read($id)
  * @return boolean
  * 
  */
-public function write($id, $data)
+public function write($id, $data): bool
 {
  
  $data = $this->encrypt($data, $this->key);

@@ -1,5 +1,4 @@
-<?php
-defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class FrontHelper
  * 
@@ -17,41 +16,125 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 class FrontHelper
 {
 
+  /**
+   * grabSimpleFrontPost
+   *
+   * @param int $id
+   * @return array|null|false
+   * 
+   */
+  public static function grabSimpleFrontPost($id)
+  {
+
+    $idsanitized = static::frontSanitizer($id, 'sql');
+
+    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
+           p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_sticky, 
+           p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, 
+           m.media_access, u.user_login, u.user_fullname
+           FROM tbl_posts AS p
+           INNER JOIN tbl_media AS m ON p.media_id = m.ID
+           INNER JOIN tbl_users AS u ON p.post_author = u.ID
+           WHERE p.ID = '$idsanitized' AND p.post_status = 'publish'
+           AND p.post_type = 'blog' AND m.media_target = 'blog'
+           AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
+
+    $query = db_simple_query($sql);
+
+    $result = $query->fetch_assoc();
+
+    return (empty($result)) ?: $result;
+  }
+
+  /**
+   * grabSimpleFrontTopic
+   *
+   * @param int|numeric $id
+   * @return array|null|false
+   * 
+   */
+  public static function grabSimpleFrontTopic($id)
+  {
+
+    $idsanitized = static::frontSanitizer($id, 'sql');
+
+    $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status 
+FROM tbl_topics, tbl_post_topic  
+WHERE tbl_topics.ID = tbl_post_topic.topic_id 
+AND tbl_topics.topic_status = 'Y' 
+AND tbl_post_topic.post_id = '$idsanitized' ";
+
+    $query = db_simple_query($sql);
+
+    $result = $query->fetch_assoc();
+
+    return (empty($result)) ?: $result;
+  }
+
 /**
- * grabSimpleFrontPost
+ * grabSimpleFrontTag
  *
- * @param int $id
- * @return mixed|bool
+ * @param int|numeric $id
+ * @return array|null|false
  * 
  */
-public static function grabSimpleFrontPost($id)
+public static function grabSimpleFrontTag($id)
 {
-
-  $idsanitized = static::frontSanitizer($id, 'sql');
-
-  $query = db_simple_query('SELECT ID, post_slug FROM tbl_posts WHERE ID = ' . $idsanitized);
+  $idsanitized = static::frontSanitizer($id,'sql');
   
-  $results = $query->fetch_assoc();
+  $sql = "SELECT tbl_tags.ID, tbl_tags.tag_name, tbl_tags.tag_slug, FROM tbl_tags, tbl_post_tag WHERE tbl_tags.ID =  tbl_post_tag.tag_id
+  AND tbl_post_tag.post_id = '$idsanitized'";
 
-  if ( isset($results) ) {
+  $query = db_simple_query($sql);
 
-    return $results;
+  $result = $query->fetch_assoc();
 
-  }
-             
+  return (empty($result)) ?: $result;
+
 }
 
-/**
- * frontPostById
- *
- * @param int $id
- * @return mixed
- * 
- */
-public static function grabPreparedFrontPostById($id)
-{
+  /**
+   * grabSimpleFrontPage
+   *
+   * @param int|num $id
+   * @return array|null|false
+   * 
+   */
+  public static function grabSimpleFrontPage($id)
+  {
+    $idsanitized = static::frontSanitizer($id, 'sql');
 
-$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
+$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
+    p.post_title, p.post_slug,
+    p.post_content, p.post_summary, p.post_keyword, 
+    p.post_tags, p.post_status, p.post_sticky, 
+    p.post_type, p.comment_status,
+    m.ID, m.media_filename, m.media_caption, m.media_access, u.ID, u.user_login, u.user_fullname
+FROM tbl_posts AS p
+INNER JOIN tbl_media AS m ON p.media_id = m.ID
+INNER JOIN tbl_users AS u ON p.post_author = u.ID
+WHERE p.ID = '$idsanitized'
+AND p.post_status = 'publish' AND p.post_type = 'page' 
+AND m.media_access = 'public' AND m.media_status = '1'";
+
+    $query = db_simple_query($sql);
+
+    $result = $query->fetch_assoc();
+
+    return (empty($result)) ?: $result;
+  }
+
+  /**
+   * grabPreparedFrontPostById
+   *
+   * @param int $id
+   * @return array
+   * 
+   */
+  public static function grabPreparedFrontPostById($id)
+  {
+
+    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
                p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_sticky, 
                p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, 
                m.media_access, u.user_fullname
@@ -60,29 +143,28 @@ $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.
         INNER JOIN tbl_users AS u ON p.post_author = u.ID
         WHERE p.ID = ? AND p.post_status = 'publish'
 AND p.post_type = 'blog' AND m.media_target = 'blog'
-AND m.media_access = 'public' AND m.media_status = '1'";
+AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
-$idsanitized = self::frontSanitizer($id, 'sql');
+    $idsanitized = self::frontSanitizer($id, 'sql');
 
-$statement = db_prepared_query($sql, [$idsanitized], 'i');
+    $statement = db_prepared_query($sql, [$idsanitized], 'i');
 
-$result = get_result($statement);
+    $result = get_result($statement);
 
-return (empty($result)) ?: $result;
+    return (empty($result)) ?: $result;
+  }
 
-}
+  /**
+   * frontPageBySlug
+   *
+   * @param string $slug
+   * @return mixed
+   * 
+   */
+  public static function grabPreparedFrontPageBySlug($slug)
+  {
 
-/**
- * frontPageBySlug
- *
- * @param string $slug
- * @return mixed
- * 
- */
-public static function frontPageBySlug($slug)
-{
-
-$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
+    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
                p.post_title, p.post_slug,
                p.post_content, p.post_summary, p.post_keyword, 
                p.post_tags, p.post_status, p.post_sticky, 
@@ -95,87 +177,82 @@ $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
   AND p.post_status = 'publish' AND p.post_type = 'page' 
   AND m.media_access = 'public' AND m.media_status = '1'";
 
-$slug_sanitized = self::frontSanitizer($slug, 'xss'); 
+    $slug_sanitized = self::frontSanitizer($slug, 'xss');
 
-$statement = db_prepared_query($sql, [$slug_sanitized], 's');
+    $statement = db_prepared_query($sql, [$slug_sanitized], 's');
 
-$result = get_result($statement);
+    $result = get_result($statement);
 
-return (empty($result)) ?: $result;
+    return (empty($result)) ?: $result;
+  }
 
-}
+  /**
+   * frontTopicBySlug
+   *
+   * @param string $slug
+   * @return mixed
+   * 
+   */
+  public static function grabPreparedFrontTopicBySlug($slug)
+  {
 
-/**
- * frontTopicBySlug
- *
- * @param string $slug
- * @return mixed
- * 
- */
-public static function frontTopicBySlug($slug)
-{
+    $sql = "SELECT ID, topic_title FROM tbl_topics WHERE topic_slug = ? AND topic_status = 'Y'";
 
- $sql = "SELECT ID, topic_title FROM tbl_topics WHERE topic_slug = ? AND topic_status = 'Y'";
+    $slug_sanitized = self::frontSanitizer($slug, 'xss');
 
- $slug_sanitized = self::frontSanitizer($slug, 'xss');
+    $statement = db_prepared_query($sql, [$slug_sanitized], 's');
 
- $statement = db_prepared_query($sql, [$slug_sanitized], 's');
+    $result = get_result($statement);
 
- $result = get_result($statement);
+    return (empty($result)) ?: $result;
+  }
 
- return (empty($result)) ?: $result;
+  /**
+   * frontGalleries
+   *
+   * @param int $start
+   * @param int $limit
+   * @return mixed
+   * 
+   */
+  public static function grabPreparedFrontGalleries($start, $limit)
+  {
 
-}
+    $front = [];
 
-/**
- * frontGalleries
- *
- * @param int $start
- * @param int $limit
- * @return mixed
- * 
- */
-public static function grabPreparedFrontGalleries($start, $limit)
-{
-
-$front = [];
-
-$sql = "SELECT ID, media_filename, media_caption FROM tbl_media WHERE media_target = 'gallery'
+    $sql = "SELECT ID, media_filename, media_caption FROM tbl_media WHERE media_target = 'gallery'
        ORDER BY ID LIMIT ?, ?";
 
-$statement = db_prepared_query($sql, [$start, $limit], 'ii');
+    $statement = db_prepared_query($sql, [$start, $limit], 'ii');
 
-$results = get_result($statement);
+    $results = get_result($statement);
 
-if ( isset($results) ) {
+    if (isset($results)) {
 
-foreach ($results as $result) {
+      foreach ($results as $result) {
 
-  $media_filename = $result['media_filename'];
-  $media_caption = $result['media_caption'];
-  $media_id = $result['ID'];
+        $media_filename = $result['media_filename'];
+        $media_caption = $result['media_caption'];
+        $media_id = $result['ID'];
+      }
 
-}   
+      $front = ['media_filename' => $media_filename, 'media_caption' => $media_caption, 'media_id' => $media_id];
 
-$front = ['media_filename' => $media_filename, 'media_caption' => $media_caption, 'media_id' => $media_id];
+      return $front;
+    }
+  }
 
-return $front;
-
-}
-
-}
-
-/**
- * frontSanitizer
- *
- * @param string $str
- * @param string $type
- * @return string
- * 
- */
-private static function frontSanitizer($str, $type)
-{ 
- return sanitizer($str, $type);
-}
+  /**
+   * frontSanitizer
+   *
+   * @param string $str
+   * @param string $type
+   * @return string
+   * 
+   */
+  private static function frontSanitizer($str, $type)
+  {
+    return sanitizer($str, $type);
+  }
 
 }

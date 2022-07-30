@@ -1,6 +1,6 @@
 <?php
 /**
- * autoloader - Simple class autoloading function (PHP 5.4+)
+ * autoloader - Simple autoloading function (PHP 5.4+)
  *
  * @author Shay Anderson 05.13
  * @copyright 2013 Shay Anderson <http://www.shayanderson.com>

@@ -78,15 +78,6 @@ class PostEvent
   private $meta_key;
 
   /**
-   * post's tags
-   * the tags will be added to the posts
-   * 
-   * @var string
-   * 
-   */
-  private $post_tags;
-
-  /**
    * post's status
    * published or save as draft
    * 
@@ -116,6 +107,14 @@ class PostEvent
    * @var integer
    */
   private $topics;
+
+  /**
+   * post's tags
+   * 
+   * @var integer
+   *  
+   */
+  private $tags;
 
   /**
    * postDao
@@ -261,19 +260,6 @@ class PostEvent
   }
 
   /**
-   * set post's tag
-   * adding tag to the posts
-   * 
-   * @param string $tags
-   * @return void
-   * 
-   */
-  public function setPostTags($tags)
-  {
-    $this->post_tags = prevent_injection($tags);
-  }
-
-  /**
    * set post's status
    * published or save as draft
    * 
@@ -310,10 +296,22 @@ class PostEvent
    * set post's topic
    * 
    * @param integer $topics
+   * 
    */
   public function setTopics($topics)
   {
     $this->topics = $topics;
+  }
+
+  /**
+   * setPostTags
+   *
+   * @param string $tags
+   * 
+   */
+  public function setPostTags($tags)
+  {
+    $this->tags = $tags;
   }
 
   /**
@@ -357,10 +355,9 @@ class PostEvent
     $this->validator->sanitize($this->post_image, 'int');
     $this->validator->sanitize($this->title, 'string');
 
-    if ((!empty($this->meta_desc)) || (!empty($this->meta_key)) || (!empty($this->post_tags))) {
+    if ((!empty($this->meta_desc)) || (!empty($this->meta_key)) || (!empty($this->tags))) {
       $this->validator->sanitize($this->meta_desc, 'string');
       $this->validator->sanitize($this->meta_key, 'string');
-      $this->validator->sanitize($this->post_tags, 'string');
     }
 
     if ($this->topics == 0) {
@@ -369,37 +366,42 @@ class PostEvent
 
       $getCategory = $category->findTopicById($categoryId, $this->sanitizer, PDO::FETCH_ASSOC);
 
-      return $this->postDao->createPost([
-        'media_id' => $this->post_image,
-        'post_author' => $this->author,
-        'post_date' => date_for_database($this->post_date),
-        'post_title' => $this->title,
-        'post_slug'  => $this->slug,
-        'post_content' => $this->content,
-        'post_summary' => $this->meta_desc,
-        'post_keyword' => $this->meta_key,
-        'post_tags' => $this->post_tags,
-        'post_status' => $this->post_status,
-        'post_headlines' => $this->post_headlines,
-        'comment_status' => $this->comment_status
-      ], $getCategory['ID']);
+      $new_post = ['media_id' => $this->post_image,
+      'post_author' => $this->author,
+      'post_date' => date_for_database($this->post_date),
+      'post_title' => $this->title,
+      'post_slug'  => $this->slug,
+      'post_content' => $this->content,
+      'post_summary' => $this->meta_desc,
+      'post_keyword' => $this->meta_key,
+      'post_status' => $this->post_status,
+      'post_tags' => $this->tags,
+      'post_headlines' => $this->post_headlines,
+      'comment_status' => $this->comment_status];
+      
+      $topic_id = isset($getCategory['ID']) ? abs((int)$getCategory['ID']) : 0;
+
     } else {
 
-      return $this->postDao->createPost([
-        'media_id' => $this->post_image,
-        'post_author' => $this->author,
-        'post_date' => date_for_database($this->post_date),
-        'post_title' => $this->title,
-        'post_slug'  => $this->slug,
-        'post_content' => $this->content,
-        'post_summary' => $this->meta_desc,
-        'post_keyword' => $this->meta_key,
-        'post_tags' => $this->post_tags,
-        'post_status' => $this->post_status,
-        'post_headlines' => $this->post_headlines,
-        'comment_status' => $this->comment_status
-      ], $this->topics);
+      $new_post = [ 'media_id' => $this->post_image,
+      'post_author' => $this->author,
+      'post_date' => date_for_database($this->post_date),
+      'post_title' => $this->title,
+      'post_slug'  => $this->slug,
+      'post_content' => $this->content,
+      'post_summary' => $this->meta_desc,
+      'post_keyword' => $this->meta_key,
+      'post_status' => $this->post_status,
+      'post_tags' => $this->tags,
+      'post_headlines' => $this->post_headlines,
+      'comment_status' => $this->comment_status];
+
+      $topic_id = $this->topics;
+
     }
+
+    return $this->postDao->createPost($new_post, $topic_id);
+
   }
 
   /**
@@ -421,7 +423,7 @@ class PostEvent
     if ( ( !empty($this->meta_desc) ) || ( !empty($this->meta_key) ) || ( !empty($this->post_tags) ) ) {
       $this->validator->sanitize($this->meta_desc, 'string');
       $this->validator->sanitize($this->meta_key, 'string');
-      $this->validator->sanitize($this->post_tags, 'string');
+      $this->validator->sanitize($this->tags, 'string');
     }
 
     if ( !empty( $this->post_image ) ) {
@@ -435,8 +437,8 @@ class PostEvent
         'post_content' => $this->content,
         'post_summary' => $this->meta_desc,
         'post_keyword' => $this->meta_key,
-        'post_tags' => $this->post_tags,
         'post_status' => $this->post_status,
+        'post_tags' => $this->tags,
         'post_headlines' => $this->post_headlines,
         'comment_status' => $this->comment_status
 
@@ -452,8 +454,8 @@ class PostEvent
         'post_content' => $this->content,
         'post_summary' => $this->meta_desc,
         'post_keyword' => $this->meta_key,
-        'post_tags' => $this->post_tags,
         'post_status' => $this->post_status,
+        'post_tags' => $this->tags,
         'post_headlines' => $this->post_headlines,
         'comment_status' => $this->comment_status
 
@@ -498,6 +500,7 @@ class PostEvent
         unlink(__DIR__ . '/../../' . APP_IMAGE_LARGE . 'large_' . $post_image);
         unlink(__DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_' . $post_image);
         unlink(__DIR__ . '/../../' . APP_IMAGE_SMALL . 'small_' . $post_image);
+        
       }
 
       return  $this->postDao->deletePost($this->postId, $this->sanitizer);

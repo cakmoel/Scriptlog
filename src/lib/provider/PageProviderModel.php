@@ -29,7 +29,7 @@ public function getPageById($id, $sanitize, $fetchMode = null)
 {
 
 $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
-    p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_sticky, p.post_type, 
+    p.post_content, p.post_summary, p.post_keyword, p.post_status, p.post_sticky, p.post_type, 
     p.comment_status, m.media_filename, m.media_caption, m.media_target, m.media_access, 
     u.user_fullname
 FROM tbl_posts AS p
@@ -59,7 +59,7 @@ public function getPageBySlug($slug, $sanitize)
 {
 
 $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
-        p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_sticky, 
+        p.post_content, p.post_summary, p.post_keyword, p.post_status, p.post_sticky, 
 	    p.post_type, p.comment_status,
         m.ID, m.media_filename, m.media_caption, m.media_access, u.ID, u.user_fullname
     FROM tbl_posts AS p
