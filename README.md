@@ -40,8 +40,6 @@ environment. Scritplog need the following
 
 - Gd.
 
-- gmp.
-
 - iconv.
 
 - fileinfo.
