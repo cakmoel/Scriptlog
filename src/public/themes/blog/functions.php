@@ -1,4 +1,16 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+/**
+ * request_path()
+ *
+ * @return object
+ * 
+ */
+function request_path()
+{
+  $request_path = new RequestPath();
+  return $request_path;
+} 
+
 /**
  * initialize_post()
  *
@@ -22,6 +34,18 @@ function initialize_page()
 }
 
 /**
+ * initialize_archive
+ *
+ * @return object
+ * 
+ */
+function initialize_archive()
+{
+  $frontArchiveContent = new ArchivesProviderModel();
+  return $frontArchiveContent;
+}
+
+/**
  * initialize_topic()
  *
  * @return object
@@ -30,6 +54,18 @@ function initialize_topic()
 {
  $frontTopicContent = new TopicProviderModel();
  return $frontTopicContent;
+}
+
+/**
+ * initialize_gallery
+ *
+ * @return object
+ * 
+ */
+function initialize_gallery()
+{
+$frontGalleries = new GalleryProviderModel();
+return $frontGalleries;
 }
 
 /**
@@ -68,9 +104,9 @@ function sticky_page()
  * @return mixed
  * 
  */
-function random_posts($limit)
+function random_posts($start, $end)
 {
-  $random_posts = FrontContentProvider::frontRandomPosts($limit, initialize_post());
+  $random_posts = FrontContentProvider::frontRandomPosts($start, $end, initialize_post());
   return $random_posts;
 }
 
@@ -82,23 +118,132 @@ function random_posts($limit)
  * @return mixed
  * 
  */
-function latest_posts($position, $limit)
+function latest_posts($limit)
 {
-  $latest_posts = FrontContentProvider::frontLatestPosts($position, $limit, initialize_post());
+  $latest_posts = FrontContentProvider::frontLatestPosts($limit, initialize_post());
   return $latest_posts;
+}
+
+/**
+ * retrieves_topic()
+ *
+ * @return string
+ * 
+ */
+function retrieves_topic($postId)
+{
+ 
+ $categories = array();
+
+ $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status 
+         FROM tbl_topics, tbl_post_topic  
+         WHERE tbl_topics.ID = tbl_post_topic.topic_id 
+         AND tbl_topics.topic_status = 'Y' 
+         AND tbl_post_topic.post_id = '$postId' ";
+
+ $results = db_simple_query($sql);
+
+ foreach ( $results as $result) {
+
+   $categories[] = "<a href='".permalinks($result['ID'])['cat']."'>".$result['topic_title']."</a>";
+
+ }
+
+ return implode("", $categories);
+
 }
 
 /**
  * retrieve_post_topic
  * 
- * @param int $postId
- * @return 
+ * @param int|num $postId
+ * @return string
  * 
  */
 function retrieve_post_topic($postId)
 {
- $post_topic = FrontContentProvider::frontPostTopic($postId, initialize_topic());
- return $post_topic;
+  
+  $topics = array(); 
+
+  $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status 
+          FROM tbl_topics, tbl_post_topic
+          WHERE tbl_topics.ID = tbl_post_topic.topic_id 
+          AND tbl_topics.topic_status = 'Y' 
+          AND tbl_post_topic.post_id = ? ";
+
+  $items = db_prepared_query($sql, [$postId], 'i')->get_result()->fetch_all(MYSQLI_ASSOC);
+
+ foreach ( (array) $items as $item) {
+
+    $topic_id = ( !empty($item['ID']) ? abs((int)$item['ID']) : null);
+  
+    $topics[] = "<a href='".permalinks($topic_id)['cat']."'>".$item['topic_title']."</a>";
+  
+ }
+  
+  return implode("", $topics);
+
+}
+
+/**
+ * retrieve_tags()
+ * 
+ */
+function retrieve_tags()
+{
+  return outputting_tags();
+}
+
+/**
+ * link_topic
+ *
+ * @param num|int $postId
+ * @return mixed
+ * 
+ */
+function link_topic($postId)
+{
+ $linkTopic = FrontContentProvider::frontLinkTopic($postId, initialize_topic());
+ return $linkTopic;
+}
+
+/**
+ * display_galleries
+ * 
+ * @category theme function
+ * @param int|num $start
+ * @param int|num $limit
+ * 
+ */
+function display_galleries($start, $limit)
+{
+$showcase = FrontContentProvider::frontGalleries(initialize_gallery(), $start, $limit);
+return $showcase;
+}
+
+/**
+ * retrieve_detail_post
+ *
+ * @param int $id
+ * @return mixed
+ */
+function retrieve_detail_post($id)
+{
+  $detail_post = FrontContentProvider::frontPostById($id, initialize_post());
+  return $detail_post;
+}
+
+/**
+ * retrieve_archives()
+ *
+ * @param array $arguments
+ * @return mixed
+ * 
+ */
+function retrieve_archives(array $arguments)
+{
+  $archives = FrontContentProvider::frontArchivesPublished($arguments, initialize_archive());
+  return $archives;
 }
 
 /**

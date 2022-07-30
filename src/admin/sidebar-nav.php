@@ -34,10 +34,10 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
             <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['posts'], false)['link']; ?>">All Posts</a></li>
             <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['posts', ActionConst::NEWPOST, 0])['link']; ?>">Add New</a></li>
             
-            <?php if (access_control_list(ActionConst::TOPICS)) : ?>
+            <?php if (access_control_list(ActionConst::TOPICS) || access_control_list(ActionConst::TAGS)) : ?>
             
-              <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['topics'], false)['link']; ?>">Topics</a></li>
-
+              <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['topics'], false)['link']; ?>">Categories</a></li>
+              
             <?php endif; ?>
 
           </ul>

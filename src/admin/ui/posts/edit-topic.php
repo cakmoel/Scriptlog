@@ -9,7 +9,7 @@
       </h1>
       <ol class="breadcrumb">
         <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="index.php?load=topics">Topics</a></li>
+        <li><a href="index.php?load=topics">Categories</a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
     </section>
@@ -87,7 +87,7 @@ endif;
 
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
-<input type="submit" name="topicFormSubmit" class="btn btn-primary" value="<?=(($topic_id) && ($topic_id != '')) ? "Update" : "Add New Topic" ?>">
+<input type="submit" name="topicFormSubmit" class="btn btn-primary" value="<?=(($topic_id) && ($topic_id != '')) ? "Update" : "Add New Category" ?>">
 </div>
 </form>
             

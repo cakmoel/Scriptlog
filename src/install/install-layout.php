@@ -370,24 +370,6 @@ function required_settings()
 </li>
 
 <li class="list-group-item d-flex justify-content-between lh-condensed">
-    <div>
-      
-      <h6 class="my-0">GMP Extension Loaded</h6>
-                
-          <?php 
-              if (check_gmp_enabled()) {
-                  $gmp_passed = 'text-success';
-                  $gmp_checked = 'fa fa-check fa-lg';
-              }
-          ?>
-
-    <small class="<?=(isset($gmp_passed)) ? $gmp_passed : 'text-danger'; ?>"><?=(isset($gmp_passed)) ? 'Pass' : $errors['errorChecking'] = 'Scriptlog requires the GNU Multiple Precision extension'; ?></small>
-    </div>
-    <span class="<?=(isset($gmp_passed)) ? $gmp_passed : 'text-danger' ; ?>"><i class="<?=(isset($gmp_checked)) ?  $gmp_checked :  'fa fa-close fa-lg'; ?>"></i></span>
-            
-</li>
-
-<li class="list-group-item d-flex justify-content-between lh-condensed">
               
     <div>
                 

@@ -15,8 +15,6 @@ require dirname(__FILE__) . '/include/settings.php';
 require dirname(__FILE__) . '/include/setup.php';
 require dirname(__FILE__) . '/install-layout.php';
 
-use Sinergi\BrowserDetector\Browser;
-
 if (!file_exists(__DIR__ . '/../config.php')) {
 
     header("Location: ".$protocol . '://' . $server_host . dirname($_SERVER['PHP_SELF']) . DIRECTORY_SEPARATOR);
@@ -31,6 +29,7 @@ $dbconnect = make_connection($set_config['db']['host'], $set_config['db']['user'
 if ((check_dbtable($dbconnect, 'tbl_users') == false) || (check_dbtable($dbconnect, 'tbl_user_token') == false)
 || (check_dbtable($dbconnect, 'tbl_topics') == false) || (check_dbtable($dbconnect, 'tbl_themes') == false)
 || (check_dbtable($dbconnect, 'tbl_settings') == false) || (check_dbtable($dbconnect, 'tbl_posts') == false)
+|| (check_dbtable($dbconnect, 'tbl_tags') == false) || (check_dbtable($dbconnect, 'tbl_post_tag') == false)
 || (check_dbtable($dbconnect, 'tbl_post_topic') == false) || (check_dbtable($dbconnect, 'tbl_plugin') == false)
 || (check_dbtable($dbconnect, 'tbl_menu') == false) || (check_dbtable($dbconnect, 'tbl_mediameta') == false) 
 || (check_dbtable($dbconnect, 'tbl_media') == false) || (check_dbtable($dbconnect, 'tbl_media_download') == false) 
@@ -122,7 +121,7 @@ if($setup != 'install') {
 
     if(false === check_php_version()) {
 
-       $errors['errorInstall'] = 'Requires PHP 5.6 or newer';
+       $errors['errorInstall'] = 'Requires PHP 7.4 or newer';
 
     }
 

@@ -195,6 +195,10 @@ $post_per_page_value = "10";
 $post_per_rss = "post_per_rss";
 $post_per_rss_value = "10";
 
+// setting post per archive
+$post_per_archive = "post_per_archive";
+$post_per_archive_value = "10";
+
 // Setting Permalink
 $permalink_key = "permalink_setting";
 $permalink_value = array('rewrite' => 'no', 'server_software' => check_web_server()['WebServer']);
@@ -276,6 +280,11 @@ if ($link->insert_id && $createAdmin->affected_rows > 0) {
     $recordPostPerRSS = $link->prepare($savePostPerRSS);
     $recordPostPerRSS->bind_param('ss', $post_per_rss, $post_per_rss_value);
     $recordPostPerRSS->execute();
+
+    // insert configuration post per archive
+    $recordPostPerArchive = $link->prepare($savePostPerArchive);
+    $recordPostPerArchive->bind_param('ss', $post_per_archive, $post_per_archive_value);
+    $recordPostPerArchive->execute();
 
     // insert configuration - permalinks
     $recordPermalinks = $link->prepare($savePermalinks);

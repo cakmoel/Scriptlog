@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -152,14 +152,6 @@ if (isset($pageData['post_modified']) || isset($pageData['post_date']) ) {
 <?=(isset($formData['post_keyword'])) ? safe_html($formData['post_keyword']) : ""; ?>
 </textarea>
 <p class="help-block">Maximum 200 characters</p>
-</div>
-
-<div class="form-group">
-<label for="tag">Tags</label>
-<input type="text" class="form-control" id="tag" name="post_tags" placeholder="Enter tags here" value="
-<?=(isset($pageData['post_tags'])) ? safe_html($pageData['post_tags']) : ""; ?>
-<?=(isset($formData['post_tags'])) ? safe_html($formData['post_tags']) : ""; ?>" maxlength="400">
-<p class="help-block">Comma separated</p>
 </div>
 
 <div class="form-group">
