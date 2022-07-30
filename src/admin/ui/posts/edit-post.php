@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -154,11 +154,13 @@ if (isset($postData['post_modified']) || isset($postData['post_date']) ) {
 </div>
 
 <div class="form-group">
-<label for="tag">Tags</label>
-<input type="text" class="form-control" id="tag" name="post_tags" placeholder="Enter tags here" value="
+<label for="tags">Tags</label>
+<textarea class="form-control" id="tags" rows="3" placeholder="Add New Tag" name="post_tags" maxlength="400">
 <?=(isset($postData['post_tags'])) ? safe_html($postData['post_tags']) : ""; ?>
-<?=(isset($formData['post_tags'])) ? safe_html($formData['post_tags']) : ""; ?>" maxlength="400">
-<p class="help-block">Comma separated</p>
+<?=(isset($formData['post_tags'])) ? safe_html($formData['post_tags']) : ""; ?>
+</textarea>
+<div id="suggesstion-box"></div>
+<p class="help-block">Separate with commas or the Enter key.</p>
 </div>
 
 <?=(isset($medialibs)) ? $medialibs : "Media Not Found"; ?>

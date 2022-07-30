@@ -44,25 +44,26 @@ login_date datetime NOT NULL DEFAULT '1945-11-10 12:00:00'
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
 $tblPost = "CREATE TABLE IF NOT EXISTS tbl_posts (
-ID BIGINT(20) unsigned NOT NULL auto_increment,
+ID BIGINT(20) unsigned NOT NULL auto_increment PRIMARY KEY,
 media_id BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
 post_author BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
 post_date datetime NOT NULL DEFAULT '1945-11-10 12:00:00',
 post_modified datetime DEFAULT NULL,
-post_title text NOT NULL,
-post_slug tinytext NOT NULL,
+post_title tinytext NOT NULL,
+post_slug text NOT NULL,
 post_content longtext NOT NULL,    
-post_summary tinytext DEFAULT NULL,    
-post_keyword text DEFAULT NULL,  
-post_tags varchar(255) DEFAULT NULL,  
+post_summary mediumtext DEFAULT NULL,    
+post_keyword text DEFAULT NULL,   
 post_status varchar(20) NOT NULL DEFAULT 'publish',
+post_tags varchar(255) DEFAULT NULL, 
 post_headlines INT(5) NOT NULL DEFAULT '0',
 post_sticky INT(5) NOT NULL DEFAULT '0',   
 post_type varchar(120) NOT NULL DEFAULT 'blog',   
 comment_status varchar(20) NOT NULL DEFAULT 'open',
-PRIMARY KEY (ID),    
 FOREIGN KEY (post_author) REFERENCES tbl_users(ID),    
-KEY (media_id)    
+KEY (media_id),    
+UNIQUE (post_tags),
+FULLTEXT KEY (post_tags, post_title, post_content)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
 $tblMedia = "CREATE TABLE IF NOT EXISTS tbl_media (    
@@ -109,8 +110,8 @@ PRIMARY KEY (ID)
         
 $tblPostTopic = "CREATE TABLE IF NOT EXISTS tbl_post_topic (
 ID BIGINT(20) unsigned NOT NULL auto_increment,    
-post_id BIGINT(20) unsigned DEFAULT NULL,    
-topic_id BIGINT(20) unsigned DEFAULT NULL,
+post_id BIGINT(20) unsigned NOT NULL,    
+topic_id BIGINT(20) unsigned NOT NULL,
 PRIMARY KEY(ID),
 FOREIGN KEY (post_id) REFERENCES tbl_posts(ID) ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (topic_id) REFERENCES tbl_topics(ID) ON DELETE CASCADE ON UPDATE CASCADE
@@ -192,5 +193,6 @@ $saveSiteKeywords = "INSERT INTO tbl_settings (setting_name, setting_value) VALU
 $saveSiteEmail = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
 $savePostPerPage = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
 $savePostPerRSS = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
+$savePostPerArchive = "INSERT INTO tbl_settings(setting_name, setting_value) VALUES(?, ?)";
 $savePermalinks = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
 $saveTheme   = "INSERT INTO tbl_themes (theme_title, theme_desc, theme_designer, theme_directory, theme_status) VALUES (?, ?, ?, ?, ?)";

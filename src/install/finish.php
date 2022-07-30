@@ -47,7 +47,7 @@ install_header($current_path, $protocol, $server_host);
         <p class="lead">
         Installation is complete. Your blog is ready for population.
             Please 
-        <a href="<?= $protocol."://".$server_host.dirname(dirname($_SERVER['PHP_SELF']))."/admin/login.php"; ?>">log in</a>
+        <a href="<?= $protocol."://".$server_host.dirname(dirname(htmlspecialchars($_SERVER['PHP_SELF'])))."/admin/login.php"; ?>">log in</a>
         </p>
         <?php
         endif;

@@ -1,13 +1,11 @@
 <?php 
 require dirname(__FILE__) . '/functions.php';
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
-<?= theme_meta()['site_title']; ?>
-<?= theme_meta()['meta_tag']; ?>
+
+<?= theme_meta()['site_meta_tags']; ?>
 
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css">
@@ -17,18 +15,15 @@ require dirname(__FILE__) . '/functions.php';
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/style.sea.css" id="theme-stylesheet">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/dropdown.css">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.css">
 <link rel="shortcut icon" href="<?= app_url() . '/favicon.ico'; ?>">
+
+<?= theme_meta()['site_schema']; ?>
 
 <!-- Tweaks for older IEs--><!--[if lt IE 9]>
 <script src="<?= theme_dir(); ?>assets/js/html5shiv.min.js"></script>
 <script src="<?= theme_dir(); ?>assets/js/respond.min.js"></script><![endif]-->
-<style>
-.transparent {
-	zoom: 1;
-	filter: alpha(opacity=50);
-	opacity: 0.5;
-}
-</style>
+
 </head>
   
 <body>

@@ -10,13 +10,10 @@ echo "Request param3: {$requestPath->param3} <br>";
 echo "</pre>";
 
 echo "<pre>";
-echo "<b>Server Request URI:</b>".$_SERVER['REQUEST_URI'];
-echo "</pre>";
-
-echo "<pre>";
 print_r($_SERVER);
-echo "<br>Page executed in: ".$time = (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']);
 echo '</pre>';
+
+echo "<br>Page executed in: ".$time = (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']);
 
 ?>
 </p>

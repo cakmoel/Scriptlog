@@ -23,6 +23,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
 if((check_dbtable($dbconnect, 'tbl_users') == true) || (check_dbtable($dbconnect, 'tbl_user_token') == true)
 || (check_dbtable($dbconnect, 'tbl_topics') == true) || (check_dbtable($dbconnect, 'tbl_themes') == true)
 || (check_dbtable($dbconnect, 'tbl_settings') == true) || (check_dbtable($dbconnect, 'tbl_posts') == true)
+|| (check_dbtable($dbconnect, 'tbl_tags') == true) || (check_dbtable($dbconnect, 'tbl_post_tag') == true)
 || (check_dbtable($dbconnect, 'tbl_post_topic') == true) || (check_dbtable($dbconnect, 'tbl_plugin') == true)
 || (check_dbtable($dbconnect, 'tbl_menu') == true) || (check_dbtable($dbconnect, 'tbl_mediameta') == true) 
 || (check_dbtable($dbconnect, 'tbl_media') == true) || (check_dbtable($dbconnect, 'tbl_media_download') == true) 

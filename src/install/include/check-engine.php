@@ -65,10 +65,10 @@ function check_os()
 {
    $os = new Os();
    
-   if (($os -> getName() === Os::LINUX) || ($os -> getName() === Os::FREEBSD) || 
-       ($os -> getName() === Os::NETBSD) || ($os -> getName() === Os::OPENBSD) || 
-       ($os -> getName() === Os::OPENSOLARIS) || ($os -> getName() === Os::CHROME_OS) ||
-       ($os -> getName() === Os::WINDOWS) || ($os -> getName() === Os::OSX) ) {
+   if (($os->getName() === Os::LINUX) || ($os->getName() === Os::FREEBSD) || 
+       ($os->getName() === Os::NETBSD) || ($os->getName() === Os::OPENBSD) || 
+       ($os->getName() === Os::OPENSOLARIS) || ($os->getName() === Os::CHROME_OS) ||
+       ($os->getName() === Os::WINDOWS) || ($os->getName() === Os::OSX) ) {
        
     return(array("Operating_system" => $os -> getName()));
         
@@ -454,26 +454,6 @@ function check_fileinfo_enabled()
 }
 
 /**
- * check_gmp_enabled
- *
- * @return boolean
- * 
- */
-function check_gmp_enabled()
-{
-  if (extension_loaded('gmp')) {
-
-    return true;
-
-  } else {
-
-    return false;
-
-  }
-
-}
-
-/**
  * check_character_type()
  * 
  * Checking ctype_digit function exists or not
@@ -515,16 +495,16 @@ function check_uri_determination()
 function check_pdo_mysql()
 {
     
-    if(extension_loaded('pdo_mysql') && class_exists('PDO')){
+  if(extension_loaded('pdo_mysql') && class_exists('PDO')){
         
-        return true;
-        exit();
+    return true;
+    exit();
         
-    } else {
+  } else {
         
-        return false;
+    return false;
         
-    }
+  }
     
 }
 
