@@ -149,7 +149,8 @@ $rules = array(
     'blog'     => "/blog([^/]*)",
     'page'     => "/page/(?'page'[^/]+)",
     'single'   => "/post/(?'id'\d+)/(?'post'[\w\-]+)",
-    'search'   => "(?'search'[\w\-]+)"
+    'search'   => "(?'search'[\w\-]+)",
+    'tag'      => "/tag/(?'tag'[\w\-]+)"
     
 );
 

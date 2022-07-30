@@ -32,8 +32,9 @@ public function getPostFeeds($limit = 5)
 {
   $sql =  "SELECT p.ID, p.media_id, p.post_author,
                   p.post_date, p.post_modified, p.post_title,
-                  p.post_slug, p.post_content, p.post_tags, p.post_type,
-                  p.post_status, p.post_sticky, u.user_login
+                  p.post_slug, p.post_content, p.post_type,
+                  p.post_status, p.post_tags, 
+                  p.post_sticky, u.user_login
             FROM tbl_posts AS p
             INNER JOIN tbl_users AS u ON p.post_author = u.ID
             WHERE p.post_type = 'blog' AND p.post_status = 'publish'
@@ -65,7 +66,8 @@ public function getLatestPosts($limit)
 
 $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
             p.post_title, p.post_slug, p.post_content, p.post_summary, 
-            p.post_keyword, p.post_tags, p.post_status, p.post_type, p.comment_status, 
+            p.post_keyword, p.post_status, p.post_tags, 
+            p.post_type, p.comment_status, 
   m.media_filename, m.media_caption, m.media_access, u.user_fullname, u.user_login
 FROM tbl_posts AS p 
 INNER JOIN tbl_media AS m ON p.media_id = m.ID
@@ -87,32 +89,33 @@ return ( empty($latestPosts) ) ?: $latestPosts;
  * 
  * retrieving detail post record by Id
  *
- * @param integer $id
+ * @param int|num $id
  * @param object $sanitize
  * @return boolean|array|object
  *
  */
-public function getPostById($id, $sanitize, $fetchMode = null)
+public function getPostById($id, $sanitize)
 {
-    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
-            p.post_title, p.post_slug, p.post_content, p.post_summary, 
-            p.post_keyword, p.post_tags, p.post_status, p.post_sticky, p.post_type, 
-            p.comment_status, m.media_filename, m.media_caption, m.media_target, m.media_access, 
-            u.user_fullname
-    FROM tbl_posts AS p
-    INNER JOIN tbl_media AS m ON p.media_id = m.ID
-    INNER JOIN tbl_users AS u ON p.post_author = u.ID
-    WHERE p.ID = :ID AND p.post_status = 'publish'
-    AND p.post_type = 'blog' AND m.media_target = 'blog'
-    AND m.media_access = 'public' AND m.media_status = '1'";
+   
+$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, 
+p.post_slug, p.post_content, p.post_summary, p.post_keyword, p.post_status, p.post_sticky, 
+p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, m.media_access, 
+u.user_login, u.user_fullname
+FROM tbl_posts AS p
+INNER JOIN tbl_media AS m ON p.media_id = m.ID
+INNER JOIN tbl_users AS u ON p.post_author = u.ID
+WHERE p.post_status = 'publish'
+AND p.post_type = 'blog' AND m.media_target = 'blog'
+AND m.media_access = 'public' AND m.media_status = '1' 
+AND p.ID = :ID ";
 
-    $sanitized_id = $this->filteringId($sanitize, $id, 'sql');
+$sanitized_id = $this->filteringId($sanitize, $id, 'sql');
 
-    $this->setSQL($sql);
+$this->setSQL($sql);
 
-    $postById = (is_null($fetchMode)) ? $this->findRow([':ID' => (int)$sanitized_id]) : $this->findRow([':ID' => (int)$sanitized_id], $fetchMode);
+$item = $this->findRow([':ID' => $sanitized_id]);
 
-    return (empty($postById)) ?: $postById;
+return (empty($item)) ?: $item;
 
 }
 
@@ -131,8 +134,7 @@ public function getPostBySlug($slug, $sanitize)
   $sql = "SELECT p.ID, p.media_id, p.post_author,
                  p.post_date, p.post_modified, p.post_title,
                  p.post_slug, p.post_content, p.post_summary,
-                 p.post_keyword, p.post_tags,
-                 p.post_status, p.post_sticky, 
+                 p.post_keyword, p.post_status, p.post_sticky, 
                  p.post_type, p.comment_status, 
                  m.media_filename, m.media_caption, m.media_target, m.media_access,
                  u.user_fullname
@@ -168,7 +170,7 @@ public function getPostByAuthor($author)
   $sql = "SELECT p.ID, p.media_id, p.post_author,
                  p.post_date, p.post_modified, p.post_title,
                  p.post_slug, p.post_content, p.post_summary,
-                 p.post_keyword, p.post_tags,
+                 p.post_keyword, 
                  p.post_status, p.post_sticky, 
                  p.post_type, p.comment_status, 
                  m.media_filename, m.media_caption, m.media_target, m.media_access,
@@ -211,7 +213,7 @@ public function getPostsPublished(Paginator $perPage, $sanitize)
   $sql = "SELECT p.ID, p.media_id, p.post_author,
                      p.post_date, p.post_modified, p.post_title,
                      p.post_slug, p.post_content, p.post_summary,
-                     p.post_keyword, p.post_tags,
+                     p.post_keyword, 
                      p.post_type, p.post_status, p.post_sticky, 
                      u.user_login, u.user_fullname,
                      m.media_filename, m.media_caption
@@ -248,8 +250,8 @@ public function getRandomHeadlines()
 $sql = "SELECT p.ID, p.media_id, p.post_author,
         p.post_date, p.post_modified, p.post_title,
         p.post_slug, p.post_content, p.post_summary,
-        p.post_keyword, p.post_tags, p.post_sticky,
-        p.post_type, p.post_status, u.user_login, u.user_fullname,
+        p.post_keyword, p.post_sticky, p.post_type, p.post_status, 
+        p.post_tags, u.user_login, u.user_fullname,
         m.media_filename, m.media_caption, m.media_type, m.media_target, m.media_access
 FROM tbl_posts AS p
 INNER JOIN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 5) AS p2 ON p.ID = p2.ID 
@@ -281,7 +283,7 @@ public function getRelatedPosts($post_title)
 {
 
   $sql = "SELECT ID, media_id, post_author, post_date, post_modified,
-                 post_title, post_slug, post_content, post_tags, MATCH(post_title, post_content, post_tags)
+                 post_title, post_slug, post_content, MATCH(post_title, post_content, post_tags)
                  AGAINST(?) AS score
           FROM tbl_posts WHERE MATCH(post_title, post_content) AGAINTS(?)
           ORDER BY score ASC LIMIT 3";
@@ -307,7 +309,7 @@ public function getRandomPosts($start, $end)
 {
 
   $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
-          p.post_title, p.post_slug, p.post_content, p.post_tags,
+          p.post_title, p.post_slug, p.post_content, 
           m.media_filename, m.media_caption, u.user_login, u.user_fullname
           FROM tbl_posts AS p
           INNER JOIN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 5) AS p2 ON p.ID = p2.ID
@@ -397,7 +399,7 @@ public function getPostsOnSidebar($status, $start, $limit)
 $sql = "SELECT p.ID, p.media_id, p.post_author,
                p.post_date, p.post_modified, p.post_title,
                p.post_slug, p.post_content, p.post_summary,
-               p.post_keyword, p.post_tags, p.post_sticky,
+               p.post_keyword, p.post_sticky,
                p.post_type, p.post_status, u.user_login, u.user_fullname,
                m.ID, m.media_filename, m.media_caption
   FROM tbl_posts AS p

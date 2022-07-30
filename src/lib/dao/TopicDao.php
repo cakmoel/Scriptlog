@@ -17,9 +17,7 @@ class TopicDao extends Dao
    */
   public function __construct()
   {
-	
-	parent::__construct();
-	
+    parent::__construct();
   }
 
   /**
@@ -110,12 +108,13 @@ class TopicDao extends Dao
    * @param string $title
    * @param string $slug
    * @param string $status
-   * @param integer $ID
+   * @param integer $topicId
    */
-  public function updateTopic($sanitize, $bind, $ID)
+  public function updateTopic($sanitize, $bind, $topicId)
   {
       
-   $cleanId = $this->filteringId($sanitize, $ID, 'sql'); 
+   $cleanId = $this->filteringId($sanitize, $topicId, 'sql'); 
+
    $this->modify("tbl_topics", [
        'topic_title' => $bind['topic_title'],
        'topic_slug' => $bind['topic_slug'],
@@ -127,14 +126,14 @@ class TopicDao extends Dao
   /**
    * Delete an existing records
    * 
-   * @param integer $ID
+   * @param integer $topicId
    * @param string $sanitizing
    */
- public function deleteTopic($ID, $sanitize)
+ public function deleteTopic($topicId, $sanitize)
  {  	
-   $clean_id = $this->filteringId($sanitize, $ID, 'sql');
+   $cleanId = $this->filteringId($sanitize, $topicId, 'sql');
   
-   $this->deleteRecord("tbl_topics", "ID = ".(int)$clean_id);
+   $this->deleteRecord("tbl_topics", "ID = ".(int)$cleanId);
    
  }
 
@@ -174,7 +173,7 @@ class TopicDao extends Dao
                      
                  } else {
                      
-                     $checked = null;
+                    $checked = null;
                      
                  }
                  
@@ -262,9 +261,9 @@ class TopicDao extends Dao
   */
  public function totalTopicRecords($data = array())
  {
-    $sql = "SELECT ID FROM tbl_topics";
-    $this->setSQL($sql);
-    return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
+  $sql = "SELECT ID FROM tbl_topics";
+  $this->setSQL($sql);
+  return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
  }
 
 }

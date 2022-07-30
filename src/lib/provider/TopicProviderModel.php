@@ -75,49 +75,33 @@ return (empty($topicBySlug)) ?: $topicBySlug;
  * @return array
  * 
  */
-public function getPostTopic($postId, $sanitize, $fetchMode = null)
+public function createLinkTopic($postId, $sanitize)
 {
  
-$sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status, 
-        FROM tbl_topics, tbl_post_topic 
-        WHERE tbl_topics.ID = tbl_post_topic.topic_id 
-        AND tbl_post_topic.post_id = :postId
-        AND tbl_topics.topic_status = 'Y'";
+$link = array();
 
 $idsanitized = $this->filteringId($sanitize, $postId, 'sql');
 
+$sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, 
+               tbl_topics.topic_slug, tbl_topics.topic_status
+        FROM tbl_topics, tbl_post_topic 
+        WHERE tbl_topics.ID = tbl_post_topic.topic_id
+        AND tbl_topics.topic_status = 'Y' 
+        AND tbl_post_topic.post_id = :post_id ";
+
 $this->setSQL($sql);
 
-$post_topic =  (is_null($fetchMode)) ? $this->findRow([':postId' => $idsanitized]) : $this->findRow([':postId' => $idsanitized], $fetchMode);
+$data = array(':post_id'=>$idsanitized);
 
-return (empty($post_topic)) ?: $post_topic;
+$topics =  $this->findAll($data);
 
-}
+foreach ((array)$topics as $topic) {
 
-/**
- * createLinkTopic 
- * 
- * creates ahref html attribute for link topic
- *
- * @param int $postId
- * @param object $sanitize
- * @return string
- * 
- */
-public function createLinkTopic($postId, $sanitize)
-{
-
-$html = array();
-
-$linkTopics = $this->getPostTopic($postId, $sanitize);
-
-foreach ($linkTopics as $linkTopic) {
-
-$html[] = '<a href="'.app_url().DS.'category'.DS.escape_html($linkTopic['topic_slug']).'" title="'.escape_html($linkTopic['topic_title']).'">'.escape_html($linkTopic['topic_title']).'</a>';
+ $link[] = '<a href="'.permalinks($topic['ID'])['cat'].'" title="'.escape_html($topic['topic_title']).'">'.escape_html($topic['topic_title']).'</a>';
 
 }
 
-return implode(", ", $html);
+return implode("", $link);
 
 }
 

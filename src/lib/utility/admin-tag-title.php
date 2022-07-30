@@ -63,7 +63,7 @@ function admin_tag_title($value)
 
             return $title;
 
-             break;
+            break;
 
          case 'users':
 
@@ -71,16 +71,24 @@ function admin_tag_title($value)
 
             return $title;
 
-             break;
+            break;
         
          case 'topics':
+
+            $title .= safe_html(ucfirst("categories"))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+
+            return $title;
+
+            break;
+          
+          case 'tags':
 
             $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
 
             return $title;
 
-             break;
-         
+            break;
+            
          case 'option-general':
 
              $title .= safe_html("General settings")." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;

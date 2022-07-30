@@ -23,6 +23,26 @@ final class HandleRequest
 private static $requestPathURI;
 
 /**
+ * frontHelper
+ *
+ * @var object
+ * 
+ */
+private static $frontHelper;
+
+/**
+ * handleFrontHelper
+ *
+ * @return object
+ * 
+ */
+public static function handleFrontHelper()
+{
+  self::$frontHelper = new FrontHelper();
+  return self::$frontHelper;
+}
+
+/**
  * findRequestToRules
  *
  * @param array $rules
@@ -200,11 +220,23 @@ public static function deliverQueryString()
   switch (static::isQueryStringRequested()['key']) {
 
     case 'p':
+
       // Deliver request to a single post entry
       if ( ! empty(static::isQueryStringRequested()['value']) ) {
 
-        call_theme_content('single');
+        $query_post = self::handleFrontHelper()->grabSimpleFrontPost(static::isQueryStringRequested()['value']);
 
+        if (empty($query_post['ID']) ) {
+
+          http_response_code(404);
+          call_theme_content('404');
+
+        } else {
+
+          call_theme_content('single');
+
+        }
+      
       } else {
 
         direct_page('', 302);
@@ -217,8 +249,19 @@ public static function deliverQueryString()
       // Deliver request to a single category or topic
       if ( ! empty(static::isQueryStringRequested()['value']) ) {
 
-        call_theme_content('category');
+        $query_cat = self::handleFrontHelper()->grabSimpleFrontTopic(static::isQueryStringRequested()['value']);
 
+        if (empty($query_cat['ID'])) {
+
+           http_response_code(404);
+           call_theme_content('404');
+
+        } else {
+
+          call_theme_content('category');
+
+        }
+        
       } else {
 
         direct_page('', 302);
@@ -231,8 +274,19 @@ public static function deliverQueryString()
       // Deliver request to a single page
       if ( ! empty(static::isQueryStringRequested()['value']) ) {
 
-        call_theme_content('page');
+        $query_page = self::handleFrontHelper()->grabSimpleFrontPage(static::isQueryStringRequested()['value']);
 
+        if (empty($query_page['ID'])) {
+
+          http_response_code(404);
+          call_theme_content('404');
+
+        } else {
+
+          call_theme_content('page');
+
+        }
+       
       } else {
 
         direct_page('404.php', 302);
@@ -266,7 +320,7 @@ public static function deliverQueryString()
       # default request will be delivered
       if ( false === static::checkMatchUriRequested() ) {
 
-        direct_page('', 505);
+        direct_page('', 500);
 
       } else {
 

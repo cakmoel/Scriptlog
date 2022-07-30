@@ -7,7 +7,7 @@
  * @license MIT
  * @version 1.0
  * @param string $plugin_directory
- * @return void
+ * @return mixed
  * 
  */
 function read_plugin_ini($plugin_directory)
@@ -93,11 +93,12 @@ if (file_exists(__DIR__ . '/../../'.APP_ADMIN.DS.$plugin_loader)) {
  * Scanning plugin directory selected
  * 
  * @category function
+ * @uses ScriptlogScanner::setDirectory
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
  * @param string $plugin_directory
- * @return void
+ * @return array
  * 
  */
 function plugin_scanner($plugin_directory)

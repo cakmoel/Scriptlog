@@ -20,9 +20,11 @@ function medialib_link($media_type, $media_filename)
   switch ($media_type) {
 
       case "image/jpeg":
-      case "image/jpg":  
+      case "image/jpg":
+      case "image/pjpeg":  
       case "image/gif":
       case "image/png":
+      case "image/bmp":
       case "image/webp":
 
         $image_dir =  __DIR__ . '/../../'.APP_IMAGE_MEDIUM.'medium_'.$media_filename;

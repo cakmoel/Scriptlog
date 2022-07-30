@@ -17,16 +17,16 @@ function defender()
 
 if (file_exists(basename(__DIR__ . DS . '.guard'. DS . 'fortres.gzip'))) {
 
-    header("Content-Encoding: gzip");
-    header("Content-Length:".filesize(basename(__DIR__ . DS . '.guard' . DS . 'fortres.gzip')));
+  header("Content-Encoding: gzip");
+  header("Content-Length:".filesize(basename(__DIR__ . DS . '.guard' . DS . 'fortres.gzip')));
 
-    if (ob_get_level()) {
+  if (ob_get_level()) {
 
-        ob_end_clean();
+    ob_end_clean();
 
-        readfile(basename(__DIR__ . DS . '.guard' . DS . 'fortres.gzip'));
+    readfile(basename(__DIR__ . DS . '.guard' . DS . 'fortres.gzip'));
         
-    }
+  }
 
 }
 
@@ -77,7 +77,7 @@ return $is_scanner;
 function starts_with($haystack, $needle)
 {
 
-  if ( version_compare(PHP_VERSION, '8.0', '>=') ) {
+  if ( version_compare(PHP_VERSION, '7.4', '>=') ) {
 
     return str_starts_with($haystack, $needle);
 
@@ -101,7 +101,7 @@ function starts_with($haystack, $needle)
 function ends_with($haystack, $needle)
 {
 
-  if ( version_compare(PHP_VERSION, '8.0', '>=') ) {
+  if ( version_compare(PHP_VERSION, '7.4', '>=') ) {
 
     return str_ends_with($haystack, $needle);
 
