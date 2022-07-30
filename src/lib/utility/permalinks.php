@@ -1,14 +1,11 @@
-<?php
-
-use Whoops\Handler\Handler;
-
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * permalinks
  *
  * @category Function
  * @author M.Noermoehammad
- * @param object $requestPath
- * @return mixed
+ * @param int|num|string
+ * @return string
  * 
  */
 function permalinks($id)
@@ -63,37 +60,35 @@ function listen_query_string($id, $app_url)
 
    $link = [];
 
+   $post_id = $app_url . DS . '?p=' . abs((int)$id);
+   $page_id = $app_url . DS . '?pg' . abs((int)$id);
+   $cat_id = $app_url . DS . '?cat=' . abs((int)$id);
+   $tag_id = $app_url . DS . '?tag=' . strval($id);
+   $archive = $app_url . DS . '?a=' . prevent_injection($id);
+
    switch (HandleRequest::isQueryStringRequested()['key']) {
 
       case 'p':
-         # Deliver request to single entry post
-         if ( ( ! empty(HandleRequest::isQueryStringRequested()['value'] ) ) && ( $id === HandleRequest::isQueryStringRequested()['value'] ) ) {
+         # Deliver request to single entry post         
+         if ( ( ! empty(HandleRequest::isQueryStringRequested()['value'] ) ) && ( HandleRequest::isQueryStringRequested()['value'] == $id) ) {
     
-            $link = $app_url . DS . '?p=' . abs((int)$id);
-             
-         } else {
-   
-            scriptlog_error("param requested not recognized");
-   
-         }
-   
-         return $link;
-   
+            $entry_post = FrontHelper::grabSimpleFrontPost($id);
+
+            $post_id = $app_url . DS . '?p=' . (isset($entry_post['ID']) ) ? escape_html((int)$entry_post['ID']) : "";
+
+         } 
+
          break;
    
       case 'pg':
          // Deliver request to single entry page
          if ( ( ! empty(HandleRequest::isQueryStringRequested()['value'] ) ) && ( $id === HandleRequest::isQueryStringRequested()['value'] ) ) {
 
-            $link = $app_url . DS . '?pg='. abs((int)$id);
+            $entry_page = FrontHelper::grabSimpleFrontPage($id);
+
+            $page_id = $app_url . DS . '?pg='. (isset($entry_page['ID']) ) ? escape_html((int)$entry_page['ID']) : 0;
              
-         } else {
-
-            scriptlog_error("param requested not recogniezed");
-
-         }
-
-         return $link;
+         } 
 
          break;
    
@@ -101,23 +96,32 @@ function listen_query_string($id, $app_url)
    
          if ( ( ! empty(HandleRequest::isQueryStringRequested()['value'] ) ) && ( $id === HandleRequest::isQueryStringRequested()['value'] ) ) {
 
-             $link = $app_url . DS . '?cat='. abs((int)$id);
+            $entry_cat = FrontHelper::grabSimpleFrontTopic($id);
 
-         } else {
+            $cat_id = $app_url . DS . '?cat='. ( isset($entry_cat['ID'])) ? escape_html($entry_cat['ID']) : "";
 
-            scriptlog_error("param requested not recognized");
-
-         }
-         
-         return $link;
+         } 
          
          break;
-   
+
+      case 'tag':
+
+         if ( ( ! empty(HandleRequest::isQueryStringRequested()['value'] ) )  && ( $id === HandleRequest::isQueryStringRequested()['value'] ) ) {
+
+            $entry_tag = FrontHelper::grabSimpleFrontTag($id);
+
+            $tag_id = $app_url . DS . '?tag=' . ( isset($entry_tag['ID'])) ? escape_html($entry_tag['ID']) : "";
+            
+            
+         }
+         
+         break;
+         
       case 'a':
 
          if ( ( ! empty(HandleRequest::isQueryStringRequested()['value'] ) ) && ( $id === HandleRequest::isQueryStringRequested()['value'] ) ) {
 
-            $link = $app_url . DS . '?a=';
+            $archive = $app_url . DS . '?a=';
          }
    
          break;
@@ -125,21 +129,20 @@ function listen_query_string($id, $app_url)
       case 'blog':
    
          break;
-   
+
       default:
+
+         $link = ['post' => $post_id, 'page' => $page_id, 'cat' => $cat_id, 'tag'=>$tag_id, 'archive'=>$archive];  
+
+         return $link;
          
-      $post_id = $app_url . DS . '?p=' . abs((int)$id);
-      $page_id = $app_url . DS . '?pg' . abs((int)$id);
-      $cat_id = $app_url . DS . '?cat=' . abs((int)$id);
-      $archive = $app_url . DS . '?a=' . prevent_injection($id);
-   
-      $link = ['post' => $post_id, 'page' => $page_id, 'cat' => $cat_id, 'archive'=>$archive];  
-   
-      return $link;
-   
-      break;
-   
+        break;
+      
    }
+
+   $link = ['post' => $post_id, 'page' => $page_id, 'cat' => $cat_id, 'tag' => $tag_id, 'archive'=>$archive];  
+
+   return $link;
 
 }
 
@@ -179,9 +182,9 @@ if ( true === HandleRequest::checkMatchUriRequested() ) {
 
          if ( ! empty( $request_path->param2) ) {
 
-            $page_slug = FrontHelper::frontPageBySlug($id);
+            $page_slug = FrontHelper::grabPreparedfrontPageBySlug($id);
 
-            $link = $app_url . DS . 'page' . DS . $id;
+            $link = $app_url . DS . 'page' . DS . (isset($page_slug['post_slug'])) ? safe_html($page_slug['post_slug']) : "";
 
          } else {
 
@@ -196,7 +199,7 @@ if ( true === HandleRequest::checkMatchUriRequested() ) {
 
             $post_slug = FrontHelper::grabSimpleFrontPost($id);
             
-            $link = $app_url . DS . 'post' . DS . $id . DS . $post_slug['post_slug'];
+            $link = $app_url . DS . 'post' . DS . $id . DS . (isset($post_slug['post_slug']) ) ? $post_slug['post_slug'] : "";
 
          } else {
 

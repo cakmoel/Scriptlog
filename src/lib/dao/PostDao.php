@@ -43,8 +43,8 @@ public function findPosts($orderBy = 'ID', $author = null)
                 p.post_title,
                 p.post_slug,
                 p.post_content,
-                p.post_tags,
                 p.post_status,
+                p.post_tags,
                 p.post_headlines,
                 p.post_type,
                 u.user_login
@@ -66,8 +66,8 @@ public function findPosts($orderBy = 'ID', $author = null)
                 p.post_title,
                 p.post_slug,
                 p.post_content,
-                p.post_tags,
                 p.post_status,
+                p.post_tags,
                 p.post_headlines,
                 p.post_type,
                 u.user_login
@@ -115,8 +115,8 @@ public function findPost($id, $sanitize, $author = null)
                   post_content,
                   post_summary,
                   post_keyword,
-                  post_tags,
                   post_status,
+                  post_tags,
                   post_headlines,
   	  		        post_type,
                   comment_status
@@ -138,8 +138,8 @@ public function findPost($id, $sanitize, $author = null)
               post_content,
               post_summary,
               post_keyword,
-              post_tags,
               post_status,
+              post_tags,
               post_headlines,
   	  		    post_type,
               comment_status
@@ -165,10 +165,13 @@ public function findPost($id, $sanitize, $author = null)
  *
  * @param array $bind
  * @param integer $topicId
+ * @param string $tagId
  * 
  */
 public function createPost($bind, $topicId)
 {
+ 
+ $tags = [];
 
  if (!empty($bind['media_id'])) {
 
@@ -181,8 +184,8 @@ public function createPost($bind, $topicId)
        'post_content' => $bind['post_content'],
        'post_summary' => $bind['post_summary'],
        'post_keyword' => $bind['post_keyword'],
-       'post_tags' => $bind['post_tags'],
        'post_status' => $bind['post_status'],
+       'post_tags' => $bind['post_tags'],
        'post_headlines' => $bind['post_headlines'],
        'comment_status' => $bind['comment_status']
    ]);
@@ -197,8 +200,8 @@ public function createPost($bind, $topicId)
       'post_content' => $bind['post_content'],
       'post_summary' => $bind['post_summary'],
       'post_keyword' => $bind['post_keyword'],
-      'post_tags' => $bind['post_tags'],
       'post_status' => $bind['post_status'],
+      'post_tags' => $bind['post_tags'],
       'post_headlines' => $bind['post_headlines'],
       'comment_status' => $bind['comment_status']
    ]);
@@ -215,8 +218,8 @@ public function createPost($bind, $topicId)
   	    'post_id' => $postId,
   	    'topic_id' => $topicId]);
 
-   }
-
+    }
+   
  } else {
 
     $this->create("tbl_post_topic", [
@@ -224,7 +227,7 @@ public function createPost($bind, $topicId)
       'topic_id' => $topicId]);
 
  }
-
+  
 }
 
 /**
@@ -257,8 +260,8 @@ try {
   	    'post_content' => $bind['post_content'],
   	    'post_summary' => $bind['post_summary'],
         'post_keyword' => $bind['post_keyword'],
-        'post_tags' => $bind['post_tags'],
         'post_status' => $bind['post_status'],
+        'post_tags' => $bind['post_tags'],
         'post_headlines' => $bind['post_headlines'],
   	    'comment_status' => $bind['comment_status']
 
@@ -274,8 +277,8 @@ try {
           'post_content' => $bind['post_content'],
           'post_summary' => $bind['post_summary'],
           'post_keyword' => $bind['post_keyword'],
-          'post_tags' => $bind['post_tags'],
           'post_status' => $bind['post_status'],
+          'post_tags' => $bind['post_tags'],
           'post_headlines' => $bind['post_headlines'],
           'comment_status' => $bind['comment_status']
           

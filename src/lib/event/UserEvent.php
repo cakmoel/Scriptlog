@@ -460,6 +460,7 @@ class UserEvent
 
    if (!$this->userDao->getUserById($this->user_id, $this->sanitize)) {
        
+      $_SESSION['error'] = "userNotFound";
       direct_page('index.php?load=users&error=userNotFound', 404);
    
    }

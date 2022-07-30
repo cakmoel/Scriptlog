@@ -1,5 +1,4 @@
-<?php
-defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Dispatcher
  * 

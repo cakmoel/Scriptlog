@@ -32,7 +32,7 @@ function regenerate_session()
 
  unset($_SESSION['deleted_time']);
 
- $newid = session_id();
+ $newid = (isset($oldid)) ?: session_id();
 
  return $newid;
 
@@ -51,7 +51,7 @@ function clear_duplicate_cookies()
 
  if (headers_sent()) {
 
-    return;
+   return;
 
  }
 
@@ -59,11 +59,11 @@ function clear_duplicate_cookies()
 
  foreach (headers_list() as $header) {
 
-    if (strpos($header, 'Set-Cookie:') === 0) {
+   if (strpos($header, 'Set-Cookie:') === 0) {
 
-        $cookies[] = $header;
+      $cookies[] = $header;
 
-    }
+   }
 
  }
 
@@ -71,7 +71,7 @@ function clear_duplicate_cookies()
 
  foreach (array_unique($cookies) as $cookie) {
 
-    header($cookie, false);
+   header($cookie, false);
 
  }
  

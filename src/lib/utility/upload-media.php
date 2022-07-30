@@ -44,12 +44,12 @@ function upload_media($file_location, $file_type, $file_size, $file_name)
       
      case 'image/jpeg' :
      case 'image/pjpeg':
-     case 'image/jpg':
+     case 'image/jpg'  :
      case 'image/png'  :
      case 'image/gif'  :
      case 'image/webp' :
      case 'image/bmp'  :
-    
+          
        upload_photo($file_location, $file_size, $file_type, $file_name);
 
        break;

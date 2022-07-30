@@ -133,7 +133,7 @@ class PostApp extends BaseApp
           'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : ""
        ];
 
-       $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 50000];
+       $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_tags' => 400, 'post_content' => 50000];
 
        $new_filename = generate_filename($file_name)['new_filename'];
        $file_extension = generate_filename($file_name)['file_extension'];
@@ -381,7 +381,12 @@ class PostApp extends BaseApp
             $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
             $this->postEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
             $this->postEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
-            $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
+            
+            if (isset($_POST['post_tags'])) {
+
+              $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
+              
+            }
 
             $this->postEvent->addPost();
             $_SESSION['status'] = "postAdded";     
@@ -456,14 +461,15 @@ class PostApp extends BaseApp
     $data_post = array(
         'ID' => $getPost['ID'],
         'media_id' => $getPost['media_id'],
+        'post_author' => $getPost['post_author'],
         'post_date' => $getPost['post_date'],
         'post_modified' => $getPost['post_modified'],
         'post_title' => $getPost['post_title'],
         'post_content' => $getPost['post_content'],
         'post_summary' => $getPost['post_summary'],
         'post_keyword' => $getPost['post_keyword'],
-        'post_tags' => $getPost['post_tags'],
         'post_status' => $getPost['post_status'], 
+        'post_tags' => $getPost['post_tags'],
         'post_headlines' => $getPost['post_headlines'],
         'comment_status' => $getPost['comment_status']
     );
@@ -485,13 +491,13 @@ class PostApp extends BaseApp
         'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
         'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
+        'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_headlines' => FILTER_SANITIZE_NUMBER_INT,
         'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : ""
       ];
 
-      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 50000];
+      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_tags' => 400, 'post_content' => 50000];
 
       $new_filename = generate_filename($file_name)['new_filename'];
       $file_extension = generate_filename($file_name)['file_extension'];
@@ -681,7 +687,7 @@ class PostApp extends BaseApp
                   'media_caption' => prevent_injection(distill_post_request($filters)['post_title']), 
                   'media_type' => $file_type, 
                   'media_target' => 'blog', 
-                  'media_user' => $this->postEvent->postAuthorId(), 
+                  'media_user' => $getPost['post_author'], 
                   'media_access' => $media_access, 
                   'media_status' => '1'];
   

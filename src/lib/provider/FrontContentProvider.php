@@ -50,18 +50,6 @@ private static $pageProviderModel;
 private static $galleryProviderModel;
 
 /**
- * frontPermalinks
- *
- * @param int|num $id
- * @return boolean|object return false if not return object
- * 
- */
-public static function frontPermalinks($args)
-{
- return permalinks($args);
-}
-
-/**
  * frontRandomHeadlinesPosts
  *
  * @param PostProviderModel $postProviderModel
@@ -194,10 +182,10 @@ public static function frontTopicBySlug($slug, TopicProviderModel $topicProvider
  * @return mixed
  * 
  */
-public static function frontPostTopic($postId, TopicProviderModel $topicProviderModel)
+public static function frontLinkTopic($postId, TopicProviderModel $topicProviderModel)
 {
  self::$topicProviderModel = $topicProviderModel;
- return self::$topicProviderModel->getPostTopic($postId, self::frontSanitizer());
+ return self::$topicProviderModel->createLinkTopic($postId, self::frontSanitizer());
 }
 
 /**
@@ -220,7 +208,7 @@ public static function frontArchivesPublished(array $arguments, ArchivesProvider
  * @return object
  * 
  */
-private static function frontSanitizer()
+public static function frontSanitizer()
 {
 
 $front_sanitizer = new Sanitize();

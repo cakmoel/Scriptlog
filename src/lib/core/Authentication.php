@@ -554,34 +554,18 @@ public function userAccessControl($control = null)
           break;
 
       case ActionConst::PLUGINS:
-           
-          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
-
-            return false;
-
-          }
-
-          break;
-
       case ActionConst::THEMES:
-
-          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
-
-            return false;
-
-          }
-
-          break;
-
       case ActionConst::CONFIGURATION:
-      
-          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
+      case ActionConst::PAGES:
+      case ActionConst::NAVIGATION:
+           
+        if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
 
-            return false;
+          return false;
 
-          }
+        }
 
-          break;
+        break;
 
       case ActionConst::MEDIALIB:
 
@@ -595,6 +579,7 @@ public function userAccessControl($control = null)
           break;
 
       case ActionConst::TOPICS:
+      case ActionConst::TAGS:
 
           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') && ($this->accessLevel() !== 'editor')) {
 
@@ -604,16 +589,6 @@ public function userAccessControl($control = null)
 
           break;
           
-      case ActionConst::PAGES:
-
-          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
-
-            return false;
-
-          }
-
-          break;
-  
       case ActionConst::COMMENTS:
           
           if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'author') && ($this->accessLevel() !== 'contributor')) {
@@ -634,27 +609,7 @@ public function userAccessControl($control = null)
 
           break;
 
-      case ActionConst::NAVIGATION:
-
-          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
-
-              return false;
-
-          }
-
-          break;
-
       case ActionConst::DASHBOARD:
-
-        if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
-            && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author') 
-            && ($this->accessLevel() !== 'contributor')) {
-
-          return false;
-    
-        }
-
-        break;
 
       default:
           
@@ -670,7 +625,7 @@ public function userAccessControl($control = null)
 
   }
 
-    return true;
+  return true;
 
 }
 

@@ -19,6 +19,35 @@ function db_instance()
 }
 
 /**
+ * db_begin_transaction
+ *
+ * @return bool
+ * 
+ */
+function db_begin_transaction()
+{
+  return db_instance()->dbMySQLTransaction();
+}
+
+/**
+ * db_commit
+ *
+ */
+function db_commit()
+{
+  return db_instance()->dbMySQLCommit();
+}
+
+/**
+ * db_insert_id()
+ *
+ */
+function db_insert_id()
+{
+  return db_instance()->dbMySQLInsertId();
+}
+
+/**
  * db_simple_query
  * 
  * @category function
@@ -93,7 +122,8 @@ function check_table()
 
 $dbscheme = false;
 
-if ( ( APP_DEVELOPMENT === true ) && ( !(is_table_exists('tbl_comments') 
+if ( ( APP_DEVELOPMENT === true ) && 
+( !(is_table_exists('tbl_comments') 
 || is_table_exists('tbl_comment_reply') 
 || is_table_exists('tbl_login_attempt')
 || is_table_exists('tbl_media') 
@@ -105,7 +135,9 @@ if ( ( APP_DEVELOPMENT === true ) && ( !(is_table_exists('tbl_comments')
 || is_table_exists('tbl_post_topic') 
 || is_table_exists('tbl_settings') 
 || is_table_exists('tbl_themes') 
-|| is_table_exists('tbl_topics') 
+|| is_table_exists('tbl_topics')
+|| is_table_exists('tbl_tags') 
+|| is_table_exists('tbl_post_tag') 
 || is_table_exists('tbl_users') 
 || is_table_exists('tbl_user_token'))) ) {
 

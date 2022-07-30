@@ -116,6 +116,39 @@ public static function getInstance()
     
 }
 
+/**
+ * dbMySQLiTransaction()
+ *
+ * @return bol
+ * 
+ */
+public function dbMySQLTransaction()
+{
+  $this->dbc->begin_transaction();
+}
+
+/**
+ * dbMySQLiCommit()
+ *
+ */
+public function dbMySQLCommit()
+{
+  $this->dbc->commit();
+}
+
+/**
+ * dbMySQLiLastInsertId
+ *
+ */
+public function dbMySQLInsertId()
+{
+  $this->dbc->insert_id;
+}
+
+/**
+ * disconnect()
+ *
+ */
 public function disconnect()
 {
   $this->dbc->close();
