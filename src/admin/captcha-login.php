@@ -3,6 +3,7 @@
  * captcha-login.php
  * 
  * @category generate captcha code when login attempt failed
+ * @author M.Noermoehammad <scriptlog@yandex.com>
  * @license MIT
  * @version 1.0
  * 

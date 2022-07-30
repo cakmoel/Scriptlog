@@ -3,6 +3,7 @@
  * captcha-forgot-pwd.php
  * 
  * @category generate captcha code on reset password form
+ * @author M.Noermoehammad <scriptlog@yandex.com>
  * @license MIT
  * @version 1.0
  * 

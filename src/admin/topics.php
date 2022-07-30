@@ -44,10 +44,9 @@ try {
             
             if( false === $authenticator->userAccessControl(ActionConst::TOPICS)) {
     
-                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
             } else {
-    
     
                 if ((!check_integer($topicId)) && (gettype($topicId) !== "integer")) {
     
@@ -81,21 +80,21 @@ try {
     
             }
             
-            if(false === $authenticator->userAccessControl(ActionConst::TOPICS)) {
+            if (false === $authenticator->userAccessControl(ActionConst::TOPICS)) {
     
               direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
             } else {
     
-                 if($topicDao->checkTopicId($topicId, $sanitizer)) {
+                if($topicDao->checkTopicId($topicId, $sanitizer)) {
     
-                    $topicApp->remove((int)$topicId);
+                  $topicApp->remove((int)$topicId);
     
-                 } else {
+                } else {
     
-                    direct_page('index.php?load=404&notfound='.notfound_id(), 404);
+                  direct_page('index.php?load=404&notfound='.notfound_id(), 404);
     
-                 }
+                }
                  
             }
             

@@ -58,7 +58,7 @@
         <div class="container">
           <div class="row">
             <div class="col-md-6">
-              <p>&copy; 2017. All rights reserved. Your great site.</p>
+              <p><?= copyright()."\r"; ?><?= year_on_footer(date("Y"));?>. All rights reserved. <?= app_info()['site_name'];?> </p>
             </div>
             <div class="col-md-6 text-right">
               <p>Template By <a href="https://bootstrapious.com" class="text-white">Ondrej Svetska</a>
@@ -77,5 +77,9 @@
     <script src="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.js"></script>
     <script src="<?= theme_dir(); ?>assets/js/front.js"></script>
     <script src="<?= theme_dir(); ?>assets/js/multidropdown.js"></script>
+    <script src="<?= theme_dir(); ?>assets/js/jquery.marquee.js"></script>
+    <script src="<?= theme_dir(); ?>assets/js/jquery.pause.min.js"></script>
+    <script src="<?= theme_dir(); ?>assets/js/jquery.easing.min.js"></script>
+    
   </body>
 </html>

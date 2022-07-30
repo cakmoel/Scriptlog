@@ -5,15 +5,15 @@
     <section class="content-header">
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
-        <small><a href="index.php?load=topics&action=newTopic&Id=0"
+        <small><a href="index.php?load=tags&action=newTag&Id=0"
 					class="btn btn-primary"> <i
 					class="fa fa-plus-circle"></i> Add New
 				</a></small>
       </h1>
       <ol class="breadcrumb">
         <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="index.php?load=topics">All Topics</a></li>
-        <li class="active">Data Topics</li>
+        <li><a href="index.php?load=tags">All Tags</a></li>
+        <li class="active">Data Tags</li>
       </ol>
     </section>
 
@@ -56,8 +56,8 @@
             <div class="box box-primary">
                <div class="box-header with-border">
                  <h2 class="box-title">
-                   <?=(isset($topicsTotal)) ? $topicsTotal : 0; ?>
-                   <?=($topicsTotal != 1) ? 'Categories' : 'Category'; ?>
+                   <?=(isset($tagsTotal)) ? $tagsTotal : 0; ?>
+                   <?=($tagsTotal != 1) ? 'Tags' : 'Tag'; ?>
                    in Total  
                  </h2>
                </div>
@@ -70,30 +70,27 @@
                   <th>#</th>
                   <th>Name</th>
                   <th>Slug</th>
-                  <th>Status</th>
                   <th>Edit</th>
                   <th>Delete</th>
                 </tr>
                 </thead>
                 <tbody>
                   <?php 
-                    if(is_array($categories)) :
+                    if(is_array($tags)) :
                       $no = 0;
-                      foreach($categories as $topic) :
+                      foreach($tags as $tag) :
                         $no++;
                   ?>
                      <tr>
                       <td><?= $no; ?></td>
-                      <td><?= safe_html($topic['topic_title']); ?></td>
-                      <td><?= safe_html($topic['topic_slug']); ?></td>
-                      <td><?= safe_html($topic['topic_status']); ?></td>
-
+                      <td><?= safe_html($tag['tag_name']); ?></td>
+                      <td><?= safe_html($tag['tag_slug']); ?></td>
                       <td>
-                       <a href="<?=generate_request("index.php", 'get', ['topics', 'editTopic', $topic['ID']])['link']; ?>" class="btn btn-warning" title="Edit topic">
+                       <a href="<?=generate_request("index.php", 'get', ['tags', 'editTag', $tag['ID']])['link']; ?>" class="btn btn-warning" title="Edit topic">
                        <i class="fa fa-pencil fa-fw"></i> </a>
                        </td>
                        <td>
-                       <a href="javascript:deleteTopic('<?= abs((int)$topic['ID']); ?>', '<?= safe_html($topic['topic_title']); ?>')" class="btn btn-danger" title="Delete topic">
+                       <a href="javascript:deleteTag('<?= abs((int)$tag['ID']); ?>', '<?= safe_html($tag['tag_name']); ?>')" class="btn btn-danger" title="Delete topic">
                        <i class="fa fa-trash-o fa-fw"></i> </a>
                        </td>
 
@@ -109,7 +106,6 @@
                   <th>#</th>
                   <th>Name</th>
                   <th>Slug</th>
-                  <th>Status</th>
                   <th>Edit</th>
                   <th>Delete</th>
                 </tr>
@@ -128,11 +124,11 @@
   </div>
   <!-- /.content-wrapper -->
 <script type="text/javascript">
-  function deleteTopic(id, title)
+  function deleteTag(id, name)
   {
-	  if (confirm("Are you sure want to delete Topic '" + title + "'"))
+	  if (confirm("Are you sure want to delete Tag '" + name + "'"))
 	  {
-	  	window.location.href = 'index.php?load=topics&action=deleteTopic&Id=' + id;
+	  	window.location.href = 'index.php?load=tags&action=deleteTag&Id=' + id;
 	  }
   }
 </script>
