@@ -57,7 +57,19 @@ function initialize_topic()
 }
 
 /**
- * initialize_gallery
+ * initialize_tag()
+ *
+ * @return object
+ * 
+ */
+function initialize_tag()
+{
+  $frontTagContent = new TagProviderModel();
+  return $frontTagContent;
+}
+
+/**
+ * initialize_gallery()
  *
  * @return object
  * 
@@ -80,7 +92,7 @@ return $frontGalleries;
 function featured_post()
 {
   $headlines = FrontContentProvider::frontRandomHeadlines(initialize_post());
-  return $headlines;
+  return is_iterable($headlines) ? $headlines : array();
 }
 
 /**
@@ -93,7 +105,7 @@ function featured_post()
 function sticky_page()
 {
   $sticky_page = FrontContentProvider::frontRandomStickyPage(initialize_page());
-  return $sticky_page;
+  return is_iterable($sticky_page) ? $sticky_page : array();
 }
 
 /**
@@ -107,7 +119,7 @@ function sticky_page()
 function random_posts($start, $end)
 {
   $random_posts = FrontContentProvider::frontRandomPosts($start, $end, initialize_post());
-  return $random_posts;
+  return is_iterable($random_posts) ? $random_posts : array();
 }
 
 /**
@@ -115,13 +127,13 @@ function random_posts($start, $end)
  *
  * @param int|numeric $position
  * @param int|numeric $limit
- * @return mixed
+ * @return array
  * 
  */
 function latest_posts($limit)
 {
   $latest_posts = FrontContentProvider::frontLatestPosts($limit, initialize_post());
-  return $latest_posts;
+  return is_iterable($latest_posts) ? $latest_posts : array();
 }
 
 /**
@@ -194,6 +206,12 @@ function retrieve_tags()
   return outputting_tags();
 }
 
+function link_tag($postId)
+{
+ $linkTag = FrontContentProvider::frontLinkTag($postId, initialize_tag());
+ return $linkTag;
+}
+
 /**
  * link_topic
  *
@@ -218,7 +236,7 @@ function link_topic($postId)
 function display_galleries($start, $limit)
 {
 $showcase = FrontContentProvider::frontGalleries(initialize_gallery(), $start, $limit);
-return $showcase;
+return is_iterable($showcase) ? $showcase : array();
 }
 
 /**
@@ -230,7 +248,7 @@ return $showcase;
 function retrieve_detail_post($id)
 {
   $detail_post = FrontContentProvider::frontPostById($id, initialize_post());
-  return $detail_post;
+  return is_iterable($detail_post) ? $detail_post : array();
 }
 
 /**
@@ -243,7 +261,7 @@ function retrieve_detail_post($id)
 function retrieve_archives(array $arguments)
 {
   $archives = FrontContentProvider::frontArchivesPublished($arguments, initialize_archive());
-  return $archives;
+  return is_iterable($archives) ? $archives : array();
 }
 
 /**
