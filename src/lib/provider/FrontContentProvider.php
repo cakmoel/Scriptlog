@@ -27,9 +27,18 @@ private static $postProviderModel;
 private static $topicProviderModel;
 
 /**
+ * tagProviderModel
+ *
+ * @var object
+ * 
+ */
+private static $tagProviderModel;
+
+/**
  * archivesProviderModel
  *
  * @var object
+ * 
  */
 private static $archivesProviderModel;
 
@@ -178,14 +187,27 @@ public static function frontTopicBySlug($slug, TopicProviderModel $topicProvider
  * FrontPostTopic
  *
  * @param int|numeric $postId
- * @param object $sanitize
+ * @param TopicProviderModel $topicProviderModel
  * @return mixed
  * 
  */
 public static function frontLinkTopic($postId, TopicProviderModel $topicProviderModel)
 {
  self::$topicProviderModel = $topicProviderModel;
- return self::$topicProviderModel->createLinkTopic($postId, self::frontSanitizer());
+ return self::$topicProviderModel->getLinkTopic($postId, self::frontSanitizer());
+}
+
+/**
+ * frontLinkTag
+ *
+ * @param int|numeric $postId
+ * @param TagProviderModel $tagProviderModel
+ * @return mixed
+ */
+public static function frontLinkTag($postId, TagProviderModel $tagProviderModel)
+{
+ self::$tagProviderModel = $tagProviderModel;
+ return self::$tagProviderModel->getLinkTag($postId, self::frontSanitizer());
 }
 
 /**
