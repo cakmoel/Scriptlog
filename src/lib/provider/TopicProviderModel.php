@@ -75,7 +75,7 @@ return (empty($topicBySlug)) ?: $topicBySlug;
  * @return array
  * 
  */
-public function createLinkTopic($postId, $sanitize)
+public function getLinkTopic($postId, $sanitize)
 {
  
 $link = array();
