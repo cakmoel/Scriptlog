@@ -23,28 +23,37 @@ public function __construct()
  * @see https://snook.ca/archives/php/how_i_added_tag
  * 
  */
-public function getTagCloud($postId, $sanitize) 
+public function getLinkTag($postId, $sanitize) 
 {
+
+$items = [];
 
 $idsanitized = $this->filteringId($sanitize, $postId, 'sql');
 
-$sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_status, COUNT(tbl_posts.ID) 
-        AS totalPosts FROM tbl_posts, tbl_topics, tbl_post_topic 
-        WHERE tbl_topics.ID = tbl_post_topic.topic_id
-        AND tbl_topics.topic_status = 'Y'
-        AND tbl_post_topic.post_id = :post_id";
+$sql = "SELECT tbl_posts.post_tags FROM tbl_posts WHERE tbl_posts.ID = :post_id";
 
 $this->setSQL($sql);
 
 $data = array(':post_id' => $idsanitized);
 
-$tags = $this->findAll($data);
+$html = '<div class="post-tags">';
 
-foreach ((array)$tags as $tag) {
+while ( $tags = $this->findRow($data)) {
 
-  
-  
+  $items = array_merge($items, explode(" ",$tags[0]));
 }
+
+$items = array_unique_compact($items);
+
+for ($i = 0; $i < count($items); $i++) {
+
+  $html .= "<a href='".permalinks($items[$i])['tag']."'>".$items[$i]."</a>";
+
+}
+
+$html .= '</div>';
+
+return $html;
 
 }
 
