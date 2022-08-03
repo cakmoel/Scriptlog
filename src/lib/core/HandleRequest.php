@@ -309,6 +309,22 @@ public static function deliverQueryString()
       
       break;
 
+    case 'tag':
+      
+        // Deliver request to a tag
+        if ( ! empty(static::isQueryStringRequested()['value']) ) {
+
+          $query_tag = self::handleFrontHelper()->grabSimpleFrontTag();
+          call_theme_content('tag');
+           
+        } else {
+
+        direct_page('', 302);
+
+      }
+
+      break;
+
     case 'blog':
       // Deliver request to blog
       call_theme_content('blog');
