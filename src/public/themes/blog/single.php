@@ -1,12 +1,13 @@
 <?php 
 
 $retrieve_post = (rewrite_status() === 'yes') ? retrieve_detail_post(request_path()->param2) : retrieve_detail_post(HandleRequest::isQueryStringRequested()['value']);
-$post_img = isset($retrieve_post['media_filename']) ? escape_html($retrieve_post['media_filename']) : '';
-$post_id = isset($retrieve_post['ID']) ? (int)$retrieve_post['ID'] : '';
-$post_title = isset($retrieve_post['post_title']) ? escape_html($retrieve_post['post_title']) : '';
+$post_img = isset($retrieve_post['media_filename']) ? escape_html($retrieve_post['media_filename']) : "";
+$post_id = isset($retrieve_post['ID']) ? (int)$retrieve_post['ID'] : "";
+$post_title = isset($retrieve_post['post_title']) ? escape_html($retrieve_post['post_title']) : "";
 $post_author = ( isset($retrieve_post['user_login']) ) ? escape_html($retrieve_post['user_login']) : escape_html($retrieve_post['user_fullname']);
 $img_alt = isset($retrieve_post['media_caption']) ? escape_html($retrieve_post['media_caption']) : "";
 $post_content = isset($retrieve_post['post_content']) ? html_entity_decode(htmLawed($retrieve_post['post_content'])) : "";
+$post_created = isset($retrieve_post['post_modified']) || isset($retrieve_post['post_created']) ? safe_html(make_date($retrieve_post['post_modified'])) : safe_html(make_date($retrieve_post['post_created']));
 
 ?>
 
@@ -22,14 +23,15 @@ $post_content = isset($retrieve_post['post_content']) ? html_entity_decode(htmLa
               <div class="post-details">
                 <div class="post-meta d-flex justify-content-between">
                   <div class="category">
-                    <?= link_topic($post_id) ?>
+                    <?= isset($post_id) ? link_topic((int)$post_id) : ""; ?>
                   </div>
                 </div>
-                <h1><?= $post_title; ?><a href="<?= permalinks($post_id)['post']; ?>"><i class="fa fa-external-link"></i></a></h1>
+                <h1><?= isset($post_title) ? $post_title : ""; ?><a href="<?= isset($post_id) ? permalinks($post_id)['post'] : "#"; ?>"><i class="fa fa-external-link"></i></a></h1>
                 <div class="post-footer d-flex align-items-center flex-column flex-sm-row"><a href="#" class="author d-flex align-items-center flex-wrap">
-                    <div class="title"><span><i class="fa fa-user-circle"></i> <?= $post_author; ?> </span></div>
+                    <div class="title"><span><i class="fa fa-user-circle"></i> <?= $post_author; ?> </span></div></a>
                   <div class="d-flex align-items-center flex-wrap">       
-                    <div class="date"><i class="fa fa-calendar"></i> <?= isset($retrieve_post['post_modified']) ? safe_html(make_date($retrieve_post['post_modified'])) : safe_html(make_date($retrieve_post['post_date'])); ?> </div>
+                    <div class="date"><i class="fa fa-calendar"></i> 
+                    <?= isset($retrieve_post['post_modified']) ? safe_html(make_date($retrieve_post['post_modified'])) : safe_html(make_date($retrieve_post['post_date'])); ?> </div>
                     <div class="comments meta-last"><i class="icon-comment"></i>12</div>
                   </div>
                 </div>
