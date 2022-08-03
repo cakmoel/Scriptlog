@@ -70,7 +70,7 @@ function listen_query_string($id, $app_url)
 
       case 'p':
          # Deliver request to single entry post         
-         if ( ( ! empty(HandleRequest::isQueryStringRequested()['value'] ) ) && ( HandleRequest::isQueryStringRequested()['value'] == $id) ) {
+         if ( ( ! empty(HandleRequest::isQueryStringRequested()['value'] ) ) && ( $id === HandleRequest::isQueryStringRequested()['value']) ) {
     
             $entry_post = FrontHelper::grabSimpleFrontPost($id);
 
@@ -111,7 +111,6 @@ function listen_query_string($id, $app_url)
             $entry_tag = FrontHelper::grabSimpleFrontTag($id);
 
             $tag_id = $app_url . DS . '?tag=' . ( isset($entry_tag['ID'])) ? escape_html($entry_tag['ID']) : "";
-            
             
          }
          
