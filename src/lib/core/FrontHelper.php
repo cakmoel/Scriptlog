@@ -58,11 +58,8 @@ class FrontHelper
 
     $idsanitized = static::frontSanitizer($id, 'sql');
 
-    $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status 
-FROM tbl_topics, tbl_post_topic  
-WHERE tbl_topics.ID = tbl_post_topic.topic_id 
-AND tbl_topics.topic_status = 'Y' 
-AND tbl_post_topic.post_id = '$idsanitized' ";
+    $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status FROM tbl_topics, tbl_post_topic WHERE tbl_topics.ID = tbl_post_topic.topic_id 
+            AND tbl_topics.topic_status = 'Y' AND tbl_post_topic.post_id = '$idsanitized' ";
 
     $query = db_simple_query($sql);
 
@@ -74,16 +71,15 @@ AND tbl_post_topic.post_id = '$idsanitized' ";
 /**
  * grabSimpleFrontTag
  *
- * @param int|numeric $id
+ * @param string $param
  * @return array|null|false
  * 
  */
-public static function grabSimpleFrontTag($id)
+public static function grabSimpleFrontTag($param)
 {
-  $idsanitized = static::frontSanitizer($id,'sql');
+  $idsanitized = static::frontSanitizer($param,'xss');
   
-  $sql = "SELECT tbl_tags.ID, tbl_tags.tag_name, tbl_tags.tag_slug, FROM tbl_tags, tbl_post_tag WHERE tbl_tags.ID =  tbl_post_tag.tag_id
-  AND tbl_post_tag.post_id = '$idsanitized'";
+  $sql = "SELECT tbl_posts.post_tags FROM tbl_posts WHERE tbl_posts.ID = '$idsanitized'";
 
   $query = db_simple_query($sql);
 
