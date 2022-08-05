@@ -1,7 +1,7 @@
 <?php
   
-  $latest_posts = is_iterable(latest_posts(app_reading_setting()['post_per_page'])) ? latest_posts(app_reading_setting()['post_per_page']) : [];
-  $galleries = is_iterable(display_galleries(0,4)) ? display_galleries(0,4) : [];
+  $latest_posts = latest_posts(app_reading_setting()['post_per_page']);
+  $galleries = display_galleries(0,4);
 
     foreach (featured_post() as $hero_headline) {
 
@@ -14,7 +14,7 @@
 ?>
 
    <!-- Hero Section-->
-   <section style="background: url('<?= isset($featured_hero_img) ? invoke_webp_image($featured_hero_img, false) : "https://via.placeholder.com/1920x1438"; ?>'); background-size: cover; background-position: center center" class="hero">
+   <section style="background: url('<?= isset($featured_hero_img) ? invoke_webp_image($featured_hero_img, false) : "https://picsum.photos/1920/1438"; ?>'); background-size: cover; background-position: center center" class="hero">
      <div class="container">
        <div class="row">
          <div class="col-lg-7">
@@ -163,7 +163,7 @@
     <?php 
        else:
       ?>       
-      style="background: url(https://via.placeholder.com/1920x1280); background-size: cover; background-position: center bottom"
+      style="background: url( https://picsum.photos/1920/1280); background-size: cover; background-position: center bottom"
       <?php 
         endif; 
       ?> 
