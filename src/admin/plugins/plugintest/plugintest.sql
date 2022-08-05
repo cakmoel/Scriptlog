@@ -1,5 +1,0 @@
-DROP TABLE IF EXISTS plugintest;
-
-CREATE TABLE IF NOT EXISTS plugintest(
-
-)
