@@ -31,14 +31,18 @@ $post_created = isset($retrieve_post['post_modified']) || isset($retrieve_post['
                     <div class="title"><span><i class="fa fa-user-circle"></i> <?= $post_author; ?> </span></div></a>
                   <div class="d-flex align-items-center flex-wrap">       
                     <div class="date"><i class="fa fa-calendar"></i> 
-                    <?= isset($retrieve_post['post_modified']) ? safe_html(make_date($retrieve_post['post_modified'])) : safe_html(make_date($retrieve_post['post_date'])); ?> </div>
+                    <?= $post_created; ?> </div>
                     <div class="comments meta-last"><i class="icon-comment"></i>12</div>
                   </div>
                 </div>
                 <div class="post-body">
                    <?= $post_content; ?>
                 </div>
-                <div class="post-tags"><a href="#" class="tag">#Business</a><a href="#" class="tag">#Tricks</a><a href="#" class="tag">#Financial</a><a href="#" class="tag">#Economy</a></div>
+                
+                <div class="post-tags">
+                <?= link_tag($post_id); ?>
+                </div>
+                
                 <div class="posts-nav d-flex justify-content-between align-items-stretch flex-column flex-md-row"><a href="#" class="prev-post text-left d-flex align-items-center">
                     <div class="icon prev"><i class="fa fa-angle-left"></i></div>
                     <div class="text"><strong class="text-primary">Previous Post </strong>
