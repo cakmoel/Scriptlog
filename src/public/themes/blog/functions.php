@@ -200,12 +200,21 @@ function retrieve_post_topic($postId)
 /**
  * retrieve_tags()
  * 
+ * retrieving tags records and display it on sidebar
+ * 
  */
 function retrieve_tags()
 {
   return outputting_tags();
 }
 
+/**
+ * link_tag()
+ *
+ * @param num|int $postId
+ * @return mixed
+ * 
+ */
 function link_tag($postId)
 {
  $linkTag = FrontContentProvider::frontLinkTag($postId, initialize_tag());
