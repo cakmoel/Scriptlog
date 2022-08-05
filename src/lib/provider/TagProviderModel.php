@@ -26,34 +26,27 @@ public function __construct()
 public function getLinkTag($postId, $sanitize) 
 {
 
-$items = [];
+$html = [];
 
 $idsanitized = $this->filteringId($sanitize, $postId, 'sql');
 
-$sql = "SELECT tbl_posts.post_tags FROM tbl_posts WHERE tbl_posts.ID = :post_id";
+$sql = "SELECT DISTINCT tbl_posts.post_tags FROM tbl_posts WHERE tbl_posts.ID = :post_id LIMIT 1";
 
 $this->setSQL($sql);
 
 $data = array(':post_id' => $idsanitized);
 
-$html = '<div class="post-tags">';
+$tags = $this->findColumn($data);
 
-while ( $tags = $this->findRow($data)) {
+$tag_exploaded = explode(',', strtolower($tags));
 
-  $items = array_merge($items, explode(" ",$tags[0]));
-}
+foreach ((array) $tag_exploaded as $tag ) {
 
-$items = array_unique_compact($items);
-
-for ($i = 0; $i < count($items); $i++) {
-
-  $html .= "<a href='".permalinks($items[$i])['tag']."'>".$items[$i]."</a>";
+  $html[] = '<a href="'.permalinks($tag)['tag'].'" class="tag" title="'.escape_html($tag).'">#'.escape_html($tag).'</a>';
 
 }
 
-$html .= '</div>';
-
-return $html;
+return implode(" ", $html);
 
 }
 
