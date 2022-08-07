@@ -188,10 +188,8 @@ function retrieve_post_topic($postId)
  foreach ( (array) $items as $item) {
 
     $topic_id = ( !empty($item['ID']) ? abs((int)$item['ID']) : null);
-  
     $topics[] = "<a href='".permalinks($topic_id)['cat']."'>".$item['topic_title']."</a>";
-  
- }
+  }
   
   return implode("", $topics);
 
@@ -199,9 +197,7 @@ function retrieve_post_topic($postId)
 
 /**
  * retrieve_tags()
- * 
  * retrieving tags records and display it on sidebar
- * 
  */
 function retrieve_tags()
 {
@@ -215,9 +211,9 @@ function retrieve_tags()
  * @return mixed
  * 
  */
-function link_tag($postId)
+function link_tag($id)
 {
- $linkTag = FrontContentProvider::frontLinkTag($postId, initialize_tag());
+ $linkTag = FrontContentProvider::frontLinkTag($id, initialize_tag());
  return $linkTag;
 }
 
@@ -228,10 +224,83 @@ function link_tag($postId)
  * @return mixed
  * 
  */
-function link_topic($postId)
+function link_topic($id)
 {
- $linkTopic = FrontContentProvider::frontLinkTopic($postId, initialize_topic());
+ $linkTopic = FrontContentProvider::frontLinkTopic($id, initialize_topic());
  return $linkTopic;
+}
+
+/**
+ * previous_post
+ *
+ * @param int|number $id
+ * @return mixed
+ */
+function previous_post($id)
+{
+ $idsanitized = sanitizer($id, 'sql');
+
+ $html = null;
+
+ $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID < '$idsanitized'
+         AND post_status = 'publish' AND post_type = 'blog'
+         ORDER BY ID LIMIT 1";
+
+ $stmt = db_simple_query($sql);
+
+ if ($stmt->num_rows > 0) {
+
+  while ($rows = $stmt->fetch_array(MYSQLI_ASSOC)) {
+
+      $html .= '<a href="'.permalinks($rows['ID'])['post'].'" class="prev-post text-left d-flex align-items-center">';
+      $html .= '<div class="icon prev"><i class="fa fa-angle-left"></i></div>';
+      $html .= '<div class="text"><strong class="text-primary">Previous Post </strong>';
+      $html .= '<h6>'.escape_html($rows['post_title']).'</h6>';
+      $html .= '</div>';
+      $html .= '</a>';
+
+  }
+   
+  return $html;
+
+ }
+
+}
+
+/**
+ * next_post()
+ *
+ * @param int|num $id
+ */
+function next_post($id)
+{
+$idsanitized = sanitizer($id,'sql');
+
+$html = null;
+
+$sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID > '$idsanitized'
+AND post_status = 'publish' AND post_type = 'blog'
+ORDER BY ID LIMIT 1";
+
+$stmt = db_simple_query($sql);
+
+if ($stmt->num_rows > 0) {
+
+   while ( $rows = $stmt->fetch_array(MYSQLI_ASSOC) ) {
+
+    $html .= '<a href="'.permalinks($rows['ID'])['post'].'"  class="next-post text-right d-flex align-items-center justify-content-end">';
+    $html .= '<div class="text"><strong class="text-primary">Next Post </strong>';
+    $html .= '<h6>'.escape_html($rows['post_title']).'</h6>';
+    $html .= '</div>';
+    $html .= '<div class="icon next"><i class="fa fa-angle-right"></i></div>';
+    $html .= '</a>';
+
+  }
+
+  return $html;
+
+}
+
 }
 
 /**
