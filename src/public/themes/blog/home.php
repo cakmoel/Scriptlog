@@ -14,7 +14,7 @@
 ?>
 
    <!-- Hero Section-->
-   <section style="background: url('<?= isset($featured_hero_img) ? invoke_webp_image($featured_hero_img, false) : "https://picsum.photos/1920/1438"; ?>'); background-size: cover; background-position: center center" class="hero">
+   <section style="background: url('<?= isset($featured_hero_img) ? invoke_webp_image($featured_hero_img, false) : "https://picsum.photos/1920/1438 "; ?>'); background-size: cover; background-position: center center" class="hero">
      <div class="container">
        <div class="row">
          <div class="col-lg-7">
@@ -163,7 +163,7 @@
     <?php 
        else:
       ?>       
-      style="background: url( https://picsum.photos/1920/1280); background-size: cover; background-position: center bottom"
+      style="background: url( https://picsum.photos/1920/1280 ); background-size: cover; background-position: center bottom"
       <?php 
         endif; 
       ?> 
@@ -265,26 +265,26 @@
       else:
       ?>
       <div class="mix col-lg-3 col-md-3 col-sm-6">
-           <div class="item"><a href="https://via.placeholder.com/640x450" data-fancybox="gallery" class="image">
-             <img src="https://via.placeholder.com/640x450" alt="This is a gallery" class="img-fluid">
+           <div class="item"><a href="https://picsum.photos/640/450" data-fancybox="gallery" class="image">
+             <img src="https://picsum.photos/640/450" alt="This is a gallery" class="img-fluid">
                <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"></i></div>
              </a></div>
       </div>
       <div class="mix col-lg-3 col-md-3 col-sm-6">
-           <div class="item"><a href="https://via.placeholder.com/640x450" data-fancybox="gallery" class="image">
-             <img src="https://via.placeholder.com/640x450" alt="This is a gallery" class="img-fluid">
+           <div class="item"><a href="https://picsum.photos/640/450" data-fancybox="gallery" class="image">
+             <img src="https://picsum.photos/640/450" alt="This is a gallery" class="img-fluid">
                <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"></i></div>
              </a></div>
       </div>
       <div class="mix col-lg-3 col-md-3 col-sm-6">
-           <div class="item"><a href="https://via.placeholder.com/640x450" data-fancybox="gallery" class="image">
-             <img src="https://via.placeholder.com/640x450" alt="" class="img-fluid">
+           <div class="item"><a href="https://picsum.photos/640/450" data-fancybox="gallery" class="image">
+             <img src="https://picsum.photos/640/450" alt="" class="img-fluid">
                <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"></i></div>
              </a></div>
       </div>
       <div class="mix col-lg-3 col-md-3 col-sm-6">
-           <div class="item"><a href="https://via.placeholder.com/640x450" data-fancybox="gallery" class="image">
-             <img src="https://via.placeholder.com/640x450" alt="" class="img-fluid">
+           <div class="item"><a href="https://picsum.photos/640/450" data-fancybox="gallery" class="image">
+             <img src="https://picsum.photos/640/450" alt="" class="img-fluid">
                <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"></i></div>
              </a></div>
       </div>
