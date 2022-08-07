@@ -139,19 +139,22 @@ function latest_posts($limit)
 /**
  * retrieves_topic()
  *
+ * @param int|num $id
  * @return string
  * 
  */
-function retrieves_topic($postId)
+function retrieves_topic($id)
 {
  
  $categories = array();
+
+ $idsanitized = sanitizer($id, 'sql');
 
  $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status 
          FROM tbl_topics, tbl_post_topic  
          WHERE tbl_topics.ID = tbl_post_topic.topic_id 
          AND tbl_topics.topic_status = 'Y' 
-         AND tbl_post_topic.post_id = '$postId' ";
+         AND tbl_post_topic.post_id = '$idsanitized' ";
 
  $results = db_simple_query($sql);
 
@@ -168,11 +171,11 @@ function retrieves_topic($postId)
 /**
  * retrieve_post_topic
  * 
- * @param int|num $postId
+ * @param int|num $id
  * @return string
  * 
  */
-function retrieve_post_topic($postId)
+function retrieve_post_topic($id)
 {
   
   $topics = array(); 
@@ -183,7 +186,7 @@ function retrieve_post_topic($postId)
           AND tbl_topics.topic_status = 'Y' 
           AND tbl_post_topic.post_id = ? ";
 
-  $items = db_prepared_query($sql, [$postId], 'i')->get_result()->fetch_all(MYSQLI_ASSOC);
+  $items = db_prepared_query($sql, [$id], 'i')->get_result()->fetch_all(MYSQLI_ASSOC);
 
  foreach ( (array) $items as $item) {
 
@@ -207,7 +210,7 @@ function retrieve_tags()
 /**
  * link_tag()
  *
- * @param num|int $postId
+ * @param num|int $id
  * @return mixed
  * 
  */
@@ -220,7 +223,7 @@ function link_tag($id)
 /**
  * link_topic
  *
- * @param num|int $postId
+ * @param num|int $id
  * @return mixed
  * 
  */
@@ -252,12 +255,12 @@ function previous_post($id)
 
   while ($rows = $stmt->fetch_array(MYSQLI_ASSOC)) {
 
-      $html .= '<a href="'.permalinks($rows['ID'])['post'].'" class="prev-post text-left d-flex align-items-center">';
-      $html .= '<div class="icon prev"><i class="fa fa-angle-left"></i></div>';
-      $html .= '<div class="text"><strong class="text-primary">Previous Post </strong>';
-      $html .= '<h6>'.escape_html($rows['post_title']).'</h6>';
-      $html .= '</div>';
-      $html .= '</a>';
+    $html .= '<a href="'.permalinks($rows['ID'])['post'].'" class="prev-post text-left d-flex align-items-center">';
+    $html .= '<div class="icon prev"><i class="fa fa-angle-left"></i></div>';
+    $html .= '<div class="text"><strong class="text-primary">Previous Post </strong>';
+    $html .= '<h6>'.escape_html($rows['post_title']).'</h6>';
+    $html .= '</div>';
+    $html .= '</a>';
 
   }
    
