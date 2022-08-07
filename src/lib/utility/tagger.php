@@ -78,4 +78,3 @@ function array_unique_compact($items)
   return $newarr;
 
 }
-
