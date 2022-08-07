@@ -331,60 +331,6 @@ public function getRandomPosts($start, $end)
 }
 
 /**
- * getNextPost
- *
- * @param int $postId
- * @param object $sanitize
- * @param string $fetchMode
- * @return void
- * 
- */
-public function getNextPost($postId, $sanitize, $fetchMode = null)
-{
-
-  $id_sanitized = $this->filteringId($sanitize, $postId, 'sql');
-
-  $sql = "SELECT ID, post_title, post_slug, post_type
-          FROM tbl_posts WHERE ID > :ID
-          AND post_status = 'publish' AND post_type = 'blog'
-          ORDER BY ID LIMIT 1";
-
-  $this->setSQL($sql);
-
-  $nextPost = (is_null($fetchMode)) ? $this->findRow([':ID' => $id_sanitized]) : $this->findRow([':ID' => $id_sanitized], $fetchMode);
-
-  return (empty($nextPost)) ?: $nextPost;
-
-}
-
-/**
- * getPrevPost
- * 
- * @param int $postId
- * @param object $sanitize
- * @param string $fetchMode
- * @return void
- * 
- */
-public function getPrevPost($postId, $sanitize, $fetchMode = null)
-{
-  
-  $id_sanitized = $this->filteringId($sanitize, $postId, 'sql');
-
-  $sql = "SELECT ID, post_title, post_slug, post_type
-          FROM tbl_posts WHERE ID < :ID
-          AND post_status = 'publish' AND post_type = 'blog'
-          ORDER BY ID LIMIT 1";
-
-  $this->setSQL($sql);
-
-  $prevPost = (is_null($fetchMode)) ? $this->findRow([':ID' => $id_sanitized]) : $this->findRow([':ID' => $id_sanitized], $fetchMode);
-
-  return (empty($prevPost)) ?: $prevPost;
-
-}
-
-/**
  * getPostsOnSidebar
  *
  * @param string $status
