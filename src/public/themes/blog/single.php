@@ -26,7 +26,7 @@ $post_created = isset($retrieve_post['post_modified']) || isset($retrieve_post['
                     <?= isset($post_id) ? link_topic((int)$post_id) : ""; ?>
                   </div>
                 </div>
-                <h1><?= isset($post_title) ? $post_title : ""; ?><a href="<?= isset($post_id) ? permalinks($post_id)['post'] : "#"; ?>"><i class="fa fa-external-link"></i></a></h1>
+                <h1><?= $post_title; ?><a href="<?= isset($post_id) ? permalinks($post_id)['post'] : "#"; ?>" title="<?= $post_title; ?>"><i class="fa fa-external-link"></i></a></h1>
                 <div class="post-footer d-flex align-items-center flex-column flex-sm-row"><a href="#" class="author d-flex align-items-center flex-wrap">
                     <div class="title"><span><i class="fa fa-user-circle"></i> <?= $post_author; ?> </span></div></a>
                   <div class="d-flex align-items-center flex-wrap">       
@@ -40,18 +40,14 @@ $post_created = isset($retrieve_post['post_modified']) || isset($retrieve_post['
                 </div>
                 
                 <div class="post-tags">
-                <?= link_tag($post_id); ?>
+                <?= isset($post_id) ? link_tag($post_id) : ""; ?>
                 </div>
                 
-                <div class="posts-nav d-flex justify-content-between align-items-stretch flex-column flex-md-row"><a href="#" class="prev-post text-left d-flex align-items-center">
-                    <div class="icon prev"><i class="fa fa-angle-left"></i></div>
-                    <div class="text"><strong class="text-primary">Previous Post </strong>
-                      <h6>I Bought a Wedding Dress.</h6>
-                    </div></a><a href="#" class="next-post text-right d-flex align-items-center justify-content-end">
-                    <div class="text"><strong class="text-primary">Next Post </strong>
-                      <h6>I Bought a Wedding Dress.</h6>
-                    </div>
-                    <div class="icon next"><i class="fa fa-angle-right">   </i></div></a></div>
+                <div class="posts-nav d-flex justify-content-between align-items-stretch flex-column flex-md-row">
+                  <?= previous_post($post_id); ?>
+                  <?= next_post($post_id); ?>
+                </div>
+
                 <div class="post-comments">
                   <header>
                     <h3 class="h6">Post Comments<span class="no-of-comments">(3)</span></h3>
