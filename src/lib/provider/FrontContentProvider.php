@@ -77,14 +77,25 @@ public static function frontRandomHeadlines(PostProviderModel $postProviderModel
  * @param int|num $position 
  * @param int|num $limit
  * @param PostProviderModel $postProviderModel
- * @param PDO::FETCH_MODE static $fetchMode = null
+ * @param null|string $position
  * @return mixed
  * 
  */
-public static function frontLatestPosts($limit, PostProviderModel $postProviderModel)
+public static function frontLatestPosts($limit, PostProviderModel $postProviderModel, $position = null)
 {
+
  self::$postProviderModel = $postProviderModel;
- return self::$postProviderModel->getLatestPosts($limit);
+
+ if ( $position == 'sidebar') {
+
+  return self::$postProviderModel->getPostsOnSidebar('publish', 0, 3);
+
+ } else {
+
+  return self::$postProviderModel->getLatestPosts($limit);
+
+ }
+ 
 }
 
 /**
@@ -184,7 +195,7 @@ public static function frontTopicBySlug($slug, TopicProviderModel $topicProvider
 }
 
 /**
- * FrontPostTopic
+ * FrontLinkTopic
  *
  * @param int|numeric $postId
  * @param TopicProviderModel $topicProviderModel
@@ -228,14 +239,11 @@ public static function frontArchivesPublished(array $arguments, ArchivesProvider
  * frontSanitizer
  * 
  * @return object
- * 
  */
 public static function frontSanitizer()
 {
-
 $front_sanitizer = new Sanitize();
 return $front_sanitizer;
-
 }
 
 /**
