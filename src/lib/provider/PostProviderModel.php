@@ -109,11 +109,11 @@ AND p.post_type = 'blog' AND m.media_target = 'blog'
 AND m.media_access = 'public' AND m.media_status = '1' 
 AND p.ID = :ID ";
 
-$sanitized_id = $this->filteringId($sanitize, $id, 'sql');
+$sanitizeid = $this->filteringId($sanitize, $id, 'sql');
 
 $this->setSQL($sql);
 
-$item = $this->findRow([':ID' => $sanitized_id]);
+$item = $this->findRow([':ID' => $sanitizeid]);
 
 return (empty($item)) ?: $item;
 
@@ -194,7 +194,7 @@ public function getPostByAuthor($author)
  * getPostsPublished
  * 
  * retrieving all records published 
- * and display it on blog
+ * and display it on blog section
  *
  * @param Paginator $perPage
  * @param object $sanitize
