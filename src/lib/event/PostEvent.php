@@ -562,21 +562,7 @@ class PostEvent
    */
   public function postAuthorLevel()
   {
-
-    if (isset($_COOKIE['scriptlog_auth'])) {
-
-      Authorization::setAuthInstance(new Authentication(new UserDao, new UserTokenDao, $this->validator));
-
-      return Authorization::authorizeLevel();
-      
-    }
-
-    if (isset(Session::getInstance()->scriptlog_session_level)) {
-
-      return Session::getInstance()->scriptlog_session_level;
-    }
-
-    return false;
+    return user_privilege();
   }
 
   /**
