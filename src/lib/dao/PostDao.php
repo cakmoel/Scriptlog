@@ -171,8 +171,6 @@ public function findPost($id, $sanitize, $author = null)
 public function createPost($bind, $topicId)
 {
  
- $tags = [];
-
  if (!empty($bind['media_id'])) {
 
    $this->create("tbl_posts", [
