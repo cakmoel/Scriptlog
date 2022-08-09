@@ -19,7 +19,7 @@ $post_created = isset($retrieve_post['post_modified']) || isset($retrieve_post['
         <main class="post blog-post col-lg-8"> 
           <div class="container">
             <div class="post-single">
-              <div class="post-thumbnail"><img src="<?= isset($post_img) ? invoke_webp_image($post_img) : "https://vai.placeholder.com/730x486"; ?>" alt="<?= isset($img_alt) ? $img_alt : $post_title; ?>" class="img-fluid"></div>
+              <div class="post-thumbnail"><img src="<?= isset($post_img) ? invoke_webp_image($post_img) : "https://picsum.photos/730/486"; ?>" alt="<?= isset($img_alt) ? $img_alt : $post_title; ?>" class="img-fluid"></div>
               <div class="post-details">
                 <div class="post-meta d-flex justify-content-between">
                   <div class="category">
@@ -27,8 +27,10 @@ $post_created = isset($retrieve_post['post_modified']) || isset($retrieve_post['
                   </div>
                 </div>
                 <h1><?= $post_title; ?><a href="<?= isset($post_id) ? permalinks($post_id)['post'] : "#"; ?>" title="<?= $post_title; ?>"><i class="fa fa-external-link"></i></a></h1>
-                <div class="post-footer d-flex align-items-center flex-column flex-sm-row"><a href="#" class="author d-flex align-items-center flex-wrap">
-                    <div class="title"><span><i class="fa fa-user-circle"></i> <?= $post_author; ?> </span></div></a>
+                <div class="post-footer d-flex align-items-center flex-column flex-sm-row">
+                  <a href="#" class="author d-flex align-items-center flex-wrap">
+                    <div class="title"><span><i class="fa fa-user-circle"></i> <?= $post_author; ?> </span></div>
+                  </a>
                   <div class="d-flex align-items-center flex-wrap">       
                     <div class="date"><i class="fa fa-calendar"></i> 
                     <?= $post_created; ?> </div>
