@@ -3,7 +3,7 @@
  * class FrontHelper
  * 
  * FrontHelper class will be useful for theme functionality
- * to retrieve particular content needed on theme layout
+ * to retrieves particular content needed on theme layout
  * and theme meta
  *
  * @category Core Class
@@ -68,26 +68,25 @@ class FrontHelper
     return (empty($result)) ?: $result;
   }
 
-/**
- * grabSimpleFrontTag
- *
- * @param string $param
- * @return array|null|false
- * 
- */
-public static function grabSimpleFrontTag($param)
-{
-  $idsanitized = static::frontSanitizer($param,'xss');
-  
-  $sql = "SELECT tbl_posts.post_tags FROM tbl_posts WHERE tbl_posts.ID = '$idsanitized'";
+  /**
+   * grabSimpleFrontTag
+   *
+   * @param string $param
+   * @return array|null|false
+   * 
+   */
+  public static function grabSimpleFrontTag($param)
+  {
+    $idsanitized = static::frontSanitizer($param, 'xss');
 
-  $query = db_simple_query($sql);
+    $sql = "SELECT tbl_posts.post_tags FROM tbl_posts WHERE tbl_posts.ID = '$idsanitized'";
 
-  $result = $query->fetch_assoc();
+    $query = db_simple_query($sql);
 
-  return (empty($result)) ?: $result;
+    $result = $query->fetch_assoc();
 
-}
+    return (empty($result)) ?: $result;
+  }
 
   /**
    * grabSimpleFrontPage
@@ -100,7 +99,7 @@ public static function grabSimpleFrontTag($param)
   {
     $idsanitized = static::frontSanitizer($id, 'sql');
 
-$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
+    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
     p.post_title, p.post_slug,
     p.post_content, p.post_summary, p.post_keyword, 
     p.post_tags, p.post_status, p.post_sticky, 
@@ -250,5 +249,4 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
   {
     return sanitizer($str, $type);
   }
-
 }
