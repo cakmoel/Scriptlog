@@ -110,7 +110,8 @@ class PostApp extends BaseApp
     $medialib = new MediaDao();
     $errors = array();
     $checkError = true;
-    
+    $user_level = $this->postEvent->postAuthorLevel();
+
     if (isset($_POST['postFormSubmit'])) {
 
         $file_location = isset($_FILES['media']['tmp_name']) ? $_FILES['media']['tmp_name'] : '';
@@ -264,7 +265,7 @@ class PostApp extends BaseApp
           $this->view->set('formData', $_POST);
           $this->view->set('topics', $topics->setCheckBoxTopic());
        
-         if ($this->postEvent->postAuthorLevel() == 'contributor') {
+         if ($user_level == 'contributor') {
 
            $this->view->set('medialibs', $medialib->dropDownMediaSelect());
 
@@ -324,7 +325,7 @@ class PostApp extends BaseApp
                  'media_caption' => prevent_injection(distill_post_request($filters)['post_title']), 
                  'media_type' => $file_type, 
                  'media_target' => 'blog', 
-                 'media_user' => $this->postEvent->postAuthorLevel(), 
+                 'media_user' => $user_level, 
                  'media_access' => $media_access, 
                  'media_status' => '1'];
        
@@ -415,13 +416,13 @@ class PostApp extends BaseApp
         $this->view->set('formAction', $this->getFormAction());
         $this->view->set('topics', $topics->setCheckBoxTopic());
         
-        if ($this->postEvent->postAuthorLevel() == 'contributor') { 
+        if ($user_level == 'contributor') { 
 
-            $this->view->set('medialibs', $medialib->dropDownMediaSelect());
+          $this->view->set('medialibs', $medialib->dropDownMediaSelect());
 
         } else {
 
-            $this->view->set('medialibs', $medialib->imageUploadHandler());
+          $this->view->set('medialibs', $medialib->imageUploadHandler());
 
         }
         
@@ -450,7 +451,8 @@ class PostApp extends BaseApp
     $medialib = new MediaDao();
     $errors = array();
     $checkError = true;
-    
+    $user_level = $this->postEvent->postAuthorLevel();
+
     if (!$getPost = $this->postEvent->grabPost($id)) {
         
       $_SESSION['error'] = "postNotFound";
@@ -627,7 +629,7 @@ class PostApp extends BaseApp
                 $this->view->set('postData', $data_post);
                 $this->view->set('topics', $topics->setCheckBoxTopic($getPost['ID']));
 
-                if ( $this->postEvent->postAuthorLevel() == 'contributor') {
+                if ( $user_level == 'contributor') {
 
                   $this->view->set('medialibs', $medialib->dropDownMediaSelect($getPost['media_id']));
        
@@ -687,7 +689,7 @@ class PostApp extends BaseApp
                   'media_caption' => prevent_injection(distill_post_request($filters)['post_title']), 
                   'media_type' => $file_type, 
                   'media_target' => 'blog', 
-                  'media_user' => $getPost['post_author'], 
+                  'media_user' => $user_level, 
                   'media_access' => $media_access, 
                   'media_status' => '1'];
   
@@ -767,7 +769,7 @@ class PostApp extends BaseApp
         $this->view->set('postData', $data_post);
         $this->view->set('topics', $topics->setCheckBoxTopic($getPost['ID']));
 
-        if ($this->postEvent->postAuthorLevel() == 'contributor') {
+        if ( $user_level == 'contributor') {
 
           $this->view->set('medialibs', $medialib->dropDownMediaSelect($getPost['media_id']));
 
