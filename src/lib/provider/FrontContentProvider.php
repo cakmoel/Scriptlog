@@ -88,7 +88,7 @@ public static function frontLatestPosts($limit, PostProviderModel $postProviderM
 
  if ( $position == 'sidebar') {
 
-  return self::$postProviderModel->getPostsOnSidebar('publish', 0, 3);
+  return self::$postProviderModel->getPostsOnSidebar(5);
 
  } else {
 
