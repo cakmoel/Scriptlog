@@ -130,9 +130,9 @@ function random_posts($start, $end)
  * @return array
  * 
  */
-function latest_posts($limit)
+function latest_posts($limit, $position = null)
 {
-  $latest_posts = FrontContentProvider::frontLatestPosts($limit, initialize_post());
+  $latest_posts = FrontContentProvider::frontLatestPosts($limit, initialize_post(), $position);
   return is_iterable($latest_posts) ? $latest_posts : array();
 }
 
@@ -140,10 +140,8 @@ function latest_posts($limit)
  * retrieves_topic()
  *
  * @param int|num $id
- * @return string
- * 
  */
-function retrieves_topic($id)
+function retrieves_topic_simple($id)
 {
  
  $categories = array();
@@ -172,10 +170,8 @@ function retrieves_topic($id)
  * retrieve_post_topic
  * 
  * @param int|num $id
- * @return string
- * 
  */
-function retrieve_post_topic($id)
+function retrieves_topic_prepared($id)
 {
   
   $topics = array(); 
@@ -196,6 +192,18 @@ function retrieve_post_topic($id)
   
   return implode("", $topics);
 
+}
+
+/**
+ * sidebarTopics()
+ * retrieving categories and display it on sidebar
+ *
+ * @return mixed
+ */
+function sidebarTopics()
+{
+ $sidebar_topics = FrontContentProvider::frontSidebarTopics(initialize_topic());
+ return (is_iterable($sidebar_topics)) ? $sidebar_topics : array();
 }
 
 /**
@@ -237,7 +245,6 @@ function link_topic($id)
  * previous_post
  *
  * @param int|number $id
- * @return mixed
  */
 function previous_post($id)
 {
@@ -316,8 +323,8 @@ if ($stmt->num_rows > 0) {
  */
 function display_galleries($start, $limit)
 {
-$showcase = FrontContentProvider::frontGalleries(initialize_gallery(), $start, $limit);
-return is_iterable($showcase) ? $showcase : array();
+ $showcase = FrontContentProvider::frontGalleries(initialize_gallery(), $start, $limit);
+ return is_iterable($showcase) ? $showcase : array();
 }
 
 /**
@@ -339,7 +346,7 @@ function retrieve_detail_post($id)
  * @return mixed
  * 
  */
-function retrieve_archives(array $arguments)
+function retrieves_archives(array $arguments)
 {
   $archives = FrontContentProvider::frontArchivesPublished($arguments, initialize_archive());
   return is_iterable($archives) ? $archives : array();
