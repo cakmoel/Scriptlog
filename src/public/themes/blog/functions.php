@@ -7,8 +7,7 @@
  */
 function request_path()
 {
-  $request_path = new RequestPath();
-  return $request_path;
+  return new RequestPath();
 } 
 
 /**
@@ -18,8 +17,7 @@ function request_path()
  */
 function initialize_post()
 {
- $frontPostContent = new PostProviderModel();
- return $frontPostContent;
+ return new PostProviderModel();
 }
 
 /**
@@ -29,8 +27,7 @@ function initialize_post()
  */
 function initialize_page()
 {
- $frontPageContent = new PageProviderModel();
- return $frontPageContent;
+ return new PageProviderModel();
 }
 
 /**
@@ -41,8 +38,7 @@ function initialize_page()
  */
 function initialize_archive()
 {
-  $frontArchiveContent = new ArchivesProviderModel();
-  return $frontArchiveContent;
+  return new ArchivesProviderModel();
 }
 
 /**
@@ -52,8 +48,7 @@ function initialize_archive()
  */
 function initialize_topic()
 {
- $frontTopicContent = new TopicProviderModel();
- return $frontTopicContent;
+  return new TopicProviderModel();
 }
 
 /**
@@ -64,8 +59,7 @@ function initialize_topic()
  */
 function initialize_tag()
 {
-  $frontTagContent = new TagProviderModel();
-  return $frontTagContent;
+  return new TagProviderModel();
 }
 
 /**
@@ -76,8 +70,7 @@ function initialize_tag()
  */
 function initialize_gallery()
 {
-$frontGalleries = new GalleryProviderModel();
-return $frontGalleries;
+return new GalleryProviderModel();
 }
 
 /**
