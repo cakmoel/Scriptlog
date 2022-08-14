@@ -199,6 +199,7 @@
             $latest_post_title = isset($latest_post['post_title']) ? safe_html($latest_post['post_title']) : "";
             $latest_post_img = (isset($latest_post['media_filename']) && $latest_post['media_filename'] !== "" ) ? safe_html($latest_post['media_filename']) : "";
             $latest_img_caption = isset($latest_post['media_caption']) ? safe_html($latest_post['media_caption']) : "";
+            $latest_post_created = ( isset($latest_post['post_modified']) || isset($latest_post['post_date']) ) ? safe_html($latest_post['post_modified']) : safe_html($latest_post['post_date']);
 
         ?>
 
@@ -207,10 +208,10 @@
              <img src="<?= isset($latest_post_img) ? invoke_webp_image($latest_post_img) : "https://via.placeholder.com/640x450"; ?>" alt="<?= isset($latest_img_caption) ? $latest_img_caption : $latest_post_title; ?>" class="img-fluid"></a></div>
              <div class="post-details">
                <div class="post-meta d-flex justify-content-between">
-                 <div class="date"><?= isset($latest_post['post_modified']) ? safe_html(make_date($latest_post['post_modified'])) : safe_html(make_date($latest_post['post_date'])); ?></div>
+                 <div class="date"><?= $latest_post_created; ?></div>
                  <div class="category"><?= retrieves_topic_simple($latest_post_id); ?></div>
                </div>
-               <a href="<?= permalinks($latest_post_id)['post']; ?>" title="<?= $latest_post_title; ?>">
+               <a href="<?= isset($latest_post_id) ? permalinks($latest_post_id)['post'] : "#"; ?>" title="<?= $latest_post_title; ?>">
                  <h3 class="h4"><?= $latest_post_title; ?></h3>
                </a>
                <p class="text-muted"><?= isset($latest_post['post_content']) ? paragraph_l2br($latest_post['post_content']) : ""; ?> </p>
