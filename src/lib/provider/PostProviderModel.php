@@ -339,24 +339,23 @@ public function getRandomPosts($start, $end)
  * @return array
  * 
  */
-public function getPostsOnSidebar($status, $start, $limit)
+public function getPostsOnSidebar($limit)
 {
 
 $sql = "SELECT p.ID, p.media_id, p.post_author,
                p.post_date, p.post_modified, p.post_title,
                p.post_slug, p.post_content, p.post_summary,
                p.post_keyword, p.post_sticky,
-               p.post_type, p.post_status, u.user_login, u.user_fullname,
-               m.ID, m.media_filename, m.media_caption
+               p.post_type, p.post_status, u.user_login, u.user_fullname
   FROM tbl_posts AS p
   INNER JOIN tbl_users AS u ON p.post_author = u.ID
-  INNER JOIN tbl_media AS m ON p.media_id = m.ID
-  WHERE p.post_type = 'blog' AND p.post_status = :status
-  ORDER BY p.ID DESC LIMIT :position, :limit ";
+  WHERE p.post_type = 'blog' 
+  AND p.post_status = 'publish'
+  ORDER BY p.post_date DESC LIMIT :limit ";
 
 $this->setSQL($sql);
 
-$sidebar_posts = $this->findAll([':status' => $status, ':position'=> $start, ':limit' => $limit]);
+$sidebar_posts = $this->findAll([':limit' => $limit]);
 
 return (empty($sidebar_posts)) ?: ['sidebarPosts' => $sidebar_posts];
 
