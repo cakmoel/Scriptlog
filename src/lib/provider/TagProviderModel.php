@@ -15,7 +15,7 @@ public function __construct()
 }
 
 /**
- * getTagCloud()
+ * getLinkTag()
  * 
  * @see https://www.longren.io/how-to-build-a-tag-cloud-with-php-mysql-and-css/
  * @see http://howto.philippkeller.com/2005/04/24/Tags-Database-schemas/
