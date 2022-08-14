@@ -44,7 +44,7 @@ login_date datetime NOT NULL DEFAULT '1945-11-10 12:00:00'
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
 $tblPost = "CREATE TABLE IF NOT EXISTS tbl_posts (
-ID BIGINT(20) unsigned NOT NULL auto_increment PRIMARY KEY,
+ID BIGINT(20) unsigned NOT NULL auto_increment,
 media_id BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
 post_author BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
 post_date datetime NOT NULL DEFAULT '1945-11-10 12:00:00',
@@ -60,6 +60,7 @@ post_headlines INT(5) NOT NULL DEFAULT '0',
 post_sticky INT(5) NOT NULL DEFAULT '0',   
 post_type varchar(120) NOT NULL DEFAULT 'blog',   
 comment_status varchar(20) NOT NULL DEFAULT 'open',
+PRIMARY KEY (ID),
 FOREIGN KEY (post_author) REFERENCES tbl_users(ID),    
 KEY (media_id),    
 UNIQUE (post_tags),
@@ -108,11 +109,10 @@ topic_status enum('Y','N') NOT NULL DEFAULT 'Y',
 PRIMARY KEY (ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
         
-$tblPostTopic = "CREATE TABLE IF NOT EXISTS tbl_post_topic (
-ID BIGINT(20) unsigned NOT NULL auto_increment,    
+$tblPostTopic = "CREATE TABLE IF NOT EXISTS tbl_post_topic ( 
 post_id BIGINT(20) unsigned NOT NULL,    
 topic_id BIGINT(20) unsigned NOT NULL,
-PRIMARY KEY(ID),
+PRIMARY KEY(post_id, topic_id),
 FOREIGN KEY (post_id) REFERENCES tbl_posts(ID) ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (topic_id) REFERENCES tbl_topics(ID) ON DELETE CASCADE ON UPDATE CASCADE
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
