@@ -29,15 +29,20 @@ public function __construct()
 public function getActiveTopicsOnSidebar()
 {
  
- $sql = "SELECT ID, topic_title, topic_slug, topic_status FROM  tbl_topics 
-         WHERE topic_status = 'Y' ORDER BY topic_title DESC";
+ $sql = "SELECT t.ID, t.topic_title, t.topic_slug, t.topic_status, 
+                COUNT(p.ID) AS total_posts
+         FROM  
+             tbl_topics t, 
+             tbl_posts p, tbl_post_topic pt  
+         WHERE t.ID = pt.topic_id AND p.ID = pt.post_id
+         GROUP BY t.ID, t.topic_title";
 
  $this->setSQL($sql);
 
  $active_topics = $this->findAll();
 
  return (empty($active_topics)) ?: $active_topics;
-
+ 
 }
 
 /**
@@ -67,7 +72,7 @@ return (empty($topicBySlug)) ?: $topicBySlug;
 }
 
 /**
- * getPostTopic
+ * getLinkTopic
  *
  * @param int $postId
  * @param object $sanitize
