@@ -217,8 +217,7 @@ function retrieve_tags()
  */
 function link_tag($id)
 {
- $linkTag = FrontContentProvider::frontLinkTag($id, initialize_tag());
- return $linkTag;
+ return FrontContentProvider::frontLinkTag($id, initialize_tag());
 }
 
 /**
@@ -230,8 +229,7 @@ function link_tag($id)
  */
 function link_topic($id)
 {
- $linkTopic = FrontContentProvider::frontLinkTopic($id, initialize_topic());
- return $linkTopic;
+ return FrontContentProvider::frontLinkTopic($id, initialize_topic());
 }
 
 /**
@@ -356,7 +354,7 @@ function nothing_found()
 
 $site_url = app_info()['app_url'];
 
-$nothing_found = <<<_NOTHING_FOUND
+return <<<_NOTHING_FOUND
 
 <div class="alert alert-warning" role="alert">
   <h4 class="alert-heading">Whoops !</h4>
@@ -366,7 +364,5 @@ $nothing_found = <<<_NOTHING_FOUND
 </div>
 
 _NOTHING_FOUND;
-
-return $nothing_found;
 
 }
