@@ -7,7 +7,7 @@ $post_title = isset($retrieve_post['post_title']) ? escape_html($retrieve_post['
 $post_author = ( isset($retrieve_post['user_login']) ) ? escape_html($retrieve_post['user_login']) : escape_html($retrieve_post['user_fullname']);
 $img_alt = isset($retrieve_post['media_caption']) ? escape_html($retrieve_post['media_caption']) : "";
 $post_content = isset($retrieve_post['post_content']) ? html_entity_decode(htmLawed($retrieve_post['post_content'])) : "";
-$post_created = isset($retrieve_post['post_modified']) || isset($retrieve_post['post_created']) ? safe_html(make_date($retrieve_post['post_modified'])) : safe_html(make_date($retrieve_post['post_created']));
+$post_created = isset($retrieve_post['post_modified']) || isset($retrieve_post['post_date']) ? safe_html(make_date($retrieve_post['post_modified'])) : safe_html(make_date($retrieve_post['post_date']));
 
 ?>
 
