@@ -32,8 +32,7 @@ $post_created = isset($retrieve_post['post_modified']) || isset($retrieve_post['
                     <div class="title"><span><i class="fa fa-user-circle"></i> <?= $post_author; ?> </span></div>
                   </a>
                   <div class="d-flex align-items-center flex-wrap">       
-                    <div class="date"><i class="fa fa-calendar"></i> 
-                    <?= $post_created; ?> </div>
+                    <div class="date"><i class="fa fa-calendar"></i> <?= $post_created; ?> </div>
                     <div class="comments meta-last"><i class="icon-comment"></i>12</div>
                   </div>
                 </div>
