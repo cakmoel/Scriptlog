@@ -81,7 +81,7 @@
 
                    <header class="post-header">
                      <div class="category">
-                       <?= isset($random_post_id) ? retrieve_post_topic($random_post_id) : ""; ?>
+                       <?= isset($random_post_id) ? retrieves_topic_prepared($random_post_id) : ""; ?>
                      </div>
                      <a href="<?= isset($random_post_id) ? permalinks($random_post_id)['post'] : "#"; ?>" title="<?= isset($random_post_title) ? $random_post_title : ""; ?>">
                        <h2 class="h4"><?= isset($random_post_title) ? $random_post_title : ""; ?></h2>
@@ -115,7 +115,7 @@
 
                    <header class="post-header">
                      <div class="category">
-                       <?= isset($random_post_id) ? retrieve_post_topic($random_post_id) : ""; ?>
+                       <?= isset($random_post_id) ? retrieves_topic_prepared($random_post_id) : ""; ?>
                      </div>
                      <a href="<?= isset($random_post_id) ? permalinks($random_post_id)['post'] : "#"; ?>">
                        <h2 class="h4"><?= isset($random_post_title) ? $random_post_title : ""; ?></h2>
@@ -208,7 +208,7 @@
              <div class="post-details">
                <div class="post-meta d-flex justify-content-between">
                  <div class="date"><?= isset($latest_post['post_modified']) ? safe_html(make_date($latest_post['post_modified'])) : safe_html(make_date($latest_post['post_date'])); ?></div>
-                 <div class="category"><?= retrieves_topic($latest_post_id); ?></div>
+                 <div class="category"><?= retrieves_topic_simple($latest_post_id); ?></div>
                </div>
                <a href="<?= permalinks($latest_post_id)['post']; ?>" title="<?= $latest_post_title; ?>">
                  <h3 class="h4"><?= $latest_post_title; ?></h3>
