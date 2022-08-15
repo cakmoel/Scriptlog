@@ -56,15 +56,15 @@ class PostApp extends BaseApp
     
     if (isset($_SESSION['error'])) {
         $checkError = false;
-        if ($_SESSION['error'] == 'postNotFound') array_push($errors, "Error: Post Not Found!");
+        ( $_SESSION['error'] == 'postNotFound') ?: array_push($errors, "Error: Post Not Found!"); 
         unset($_SESSION['error']);
     }
     
     if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        if ($_SESSION['status'] == 'postAdded') array_push($status, "New post added");
-        if ($_SESSION['status'] == 'postUpdated') array_push($status, "Post updated");
-        if ($_SESSION['status'] == 'postDeleted') array_push($status, "Post deleted");
+        ($_SESSION['status'] == 'postAdded') ?: array_push($status, "New post added");
+        ($_SESSION['status'] == 'postUpdated') ?: array_push($status, "Post updated");
+        ($_SESSION['status'] == 'postDeleted') ?: array_push($status, "Post deleted");
         unset($_SESSION['status']);
     }
    
@@ -275,8 +275,8 @@ class PostApp extends BaseApp
 
           }
 
-          $this->view->set('postStatus', PostEvent::postStatusDropDown());
-          $this->view->set('commentStatus', PostEvent::commentStatusDropDown());
+          $this->view->set('postStatus', $this->postEvent->postStatusDropDown());
+          $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown());
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
         
         } else {
@@ -426,8 +426,8 @@ class PostApp extends BaseApp
 
         }
         
-        $this->view->set('postStatus', PostEvent::postStatusDropDown());
-        $this->view->set('commentStatus', PostEvent::commentStatusDropDown());
+        $this->view->set('postStatus', $this->postEvent->postStatusDropDown());
+        $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown());
         $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
         
     }
@@ -639,8 +639,8 @@ class PostApp extends BaseApp
        
                 }
 
-                $this->view->set('postStatus', PostEvent::postStatusDropDown($getPost['post_status']));
-                $this->view->set('commentStatus', PostEvent::commentStatusDropDown($getPost['comment_status']));
+                $this->view->set('postStatus', $this->postEvent->postStatusDropDown($getPost['post_status']));
+                $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown($getPost['comment_status']));
                 $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
                 
             } else {
@@ -779,8 +779,8 @@ class PostApp extends BaseApp
 
         }
 
-        $this->view->set('postStatus', PostEvent::postStatusDropDown($getPost['post_status']));
-        $this->view->set('commentStatus', PostEvent::commentStatusDropDown($getPost['comment_status']));
+        $this->view->set('postStatus', $this->postEvent->postStatusDropDown($getPost['post_status']));
+        $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown($getPost['comment_status']));
         $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
         
     }
@@ -876,9 +876,7 @@ class PostApp extends BaseApp
     
 /**
  * Set View
- * 
  * @param object $viewName
- * 
  */
   protected function setView($viewName)
   {
