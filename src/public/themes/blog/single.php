@@ -7,7 +7,7 @@ $post_title = isset($retrieve_post['post_title']) ? escape_html($retrieve_post['
 $post_author = ( isset($retrieve_post['user_login']) ) ? escape_html($retrieve_post['user_login']) : escape_html($retrieve_post['user_fullname']);
 $img_alt = isset($retrieve_post['media_caption']) ? escape_html($retrieve_post['media_caption']) : "";
 $post_content = isset($retrieve_post['post_content']) ? html_entity_decode(htmLawed($retrieve_post['post_content'])) : "";
-$post_created = isset($retrieve_post['post_modified']) || isset($retrieve_post['post_date']) ? safe_html(make_date($retrieve_post['post_modified'])) : safe_html(make_date($retrieve_post['post_date']));
+$post_created = isset($retrieve_post['post_modified']) ? safe_html(make_date($retrieve_post['post_modified'])) : safe_html(make_date($retrieve_post['post_date']));
 
 ?>
 
@@ -29,11 +29,11 @@ $post_created = isset($retrieve_post['post_modified']) || isset($retrieve_post['
                 <h1><?= $post_title; ?><a href="<?= isset($post_id) ? permalinks($post_id)['post'] : "#"; ?>" title="<?= $post_title; ?>"><i class="fa fa-external-link"></i></a></h1>
                 <div class="post-footer d-flex align-items-center flex-column flex-sm-row">
                   <a href="#" class="author d-flex align-items-center flex-wrap">
-                    <div class="title"><span><i class="fa fa-user-circle"></i> <?= $post_author; ?> </span></div>
+                    <div class="title"><span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= $post_author; ?> </span></div>
                   </a>
                   <div class="d-flex align-items-center flex-wrap">       
-                    <div class="date"><i class="fa fa-calendar"></i> <?= $post_created; ?> </div>
-                    <div class="comments meta-last"><i class="icon-comment"></i>12</div>
+                    <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i> <?= $post_created; ?> </div>
+                    <div class="comments meta-last"><i class="icon-comment" aria-hidden="true"></i>12</div>
                   </div>
                 </div>
                 <div class="post-body">
