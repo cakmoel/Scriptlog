@@ -26,8 +26,8 @@
                 <div class="item d-flex align-items-center">
                   <div class="title"><strong><?= isset($latest_post['post_title']) ? escape_html($latest_post['post_title']) : ""; ?></strong>
                     <div class="d-flex align-items-center">
-                      <div class="views"><i class="fa fa-user-circle"></i> <?= $author; ?></div>
-                      <div class="comments"><i class="fa fa-calendar"></i> <?= $post_created; ?> </div>
+                      <div class="views"><i class="fa fa-user-circle" aria-hidden="true"></i> <?= $author; ?></div>
+                      <div class="comments"><i class="fa fa-calendar" aria-hidden="true"></i> <?= $post_created; ?> </div>
                     </div>
                   </div>
                 </div>
