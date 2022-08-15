@@ -517,9 +517,9 @@ class PostEvent
    * @return string
    * 
    */
-  public static function postStatusDropDown($selected = "")
+  public function postStatusDropDown($selected = "")
   {
-    return PostDao::dropDownPostStatus($selected);
+    return $this->postDao->dropDownPostStatus($selected);
   }
 
   /**
@@ -529,9 +529,9 @@ class PostEvent
    * @return string
    * 
    */
-  public static function commentStatusDropDown($selected = "")
+  public function commentStatusDropDown($selected = "")
   {
-    return PostDao::dropDownCommentStatus($selected);
+    return $this->postDao->dropDownCommentStatus($selected);
   }
 
   /**
