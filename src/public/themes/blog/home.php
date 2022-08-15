@@ -67,7 +67,7 @@
           $random_post_author = (isset($random_post['user_login']) || isset($random_post['user_fullname']) ? safe_html($random_post['user_login']) : safe_html($random_post['user_fullname']));
           $random_post_title = isset($random_post['post_title']) ? escape_html($random_post['post_title']) : "";
           $random_post_content = isset($random_post['post_content']) ? paragraph_l2br($random_post['post_content']) : "";
-          $random_post_created = isset($random_post['post_modified']) || isset($random_post['post_date']) ? safe_html(make_date($random_post['post_modified'])) : safe_html(make_date($random_post['post_date'])); 
+          $random_post_created = isset($random_post['post_modified'])  ? safe_html(make_date($random_post['post_modified'])) : safe_html(make_date($random_post['post_date'])); 
 
           if ($r % 2 == 1) :
 
@@ -91,9 +91,9 @@
                    <p><?= isset($random_post_content) ? $random_post_content : ""; ?></p>
                    <footer class="post-footer d-flex align-items-center">
                      <a href="#" class="author d-flex align-items-center flex-wrap">
-                       <div class="title"><span><i class="fa fa-user-circle"></i> <?= isset($random_post_author) ? $random_post_author : ""; ?> </span></div>
+                       <div class="title"><span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= isset($random_post_author) ? $random_post_author : ""; ?> </span></div>
                      </a>
-                     <div class="date"><i class="fa fa-calendar"></i>
+                     <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i>
                        <?= isset($random_post_created) ? $random_post_created : ""; ?>
                      </div>
                    </footer>
@@ -105,8 +105,9 @@
            </div>
 
          <?php
-          else :
+          else:
           ?>
+
            <div class="row d-flex align-items-stretch">
            <div class="image col-lg-5"><img src="<?= isset($random_post_img) ? invoke_webp_image($random_post_img) : "https://via.placeholder.com/516x344"; ?>" alt="<?= isset($random_post['media_caption']) ? safe_html($random_post['media_caption']) : safe_html($random_post['post_title']); ?>"></div>
              <div class="text col-lg-7">
@@ -125,9 +126,9 @@
                    <p><?= isset($random_post_content) ? $random_post_content : ""; ?></p>
                    <footer class="post-footer d-flex align-items-center">
                      <a href="#" class="author d-flex align-items-center flex-wrap">
-                       <div class="title"><span><i class="fa fa-user-circle"></i> <?= $random_post_author; ?> </span></div>
+                       <div class="title"><span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= $random_post_author; ?> </span></div>
                      </a>
-                     <div class="date"><i class="fa fa-calendar"></i>
+                     <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i>
                        <?= isset($random_post_created) ? $random_post_created : ""; ?>
                      </div>
 
@@ -199,7 +200,7 @@
             $latest_post_title = isset($latest_post['post_title']) ? safe_html($latest_post['post_title']) : "";
             $latest_post_img = (isset($latest_post['media_filename']) && $latest_post['media_filename'] !== "" ) ? safe_html($latest_post['media_filename']) : "";
             $latest_img_caption = isset($latest_post['media_caption']) ? safe_html($latest_post['media_caption']) : "";
-            $latest_post_created = ( isset($latest_post['post_modified']) || isset($latest_post['post_date']) ) ? safe_html($latest_post['post_modified']) : safe_html($latest_post['post_date']);
+            $latest_post_created = isset($latest_post['post_modified']) ? safe_html($latest_post['post_modified']) : safe_html($latest_post['post_date']);
 
         ?>
 
