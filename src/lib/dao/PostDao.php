@@ -13,7 +13,7 @@
 class PostDao extends Dao
 {
 
-protected static $selected;
+private $selected;
 
 public function __construct()
 {
@@ -356,7 +356,7 @@ public function checkPostId($id, $sanitizing)
  * @return string
  *
  */
-public static function dropDownPostStatus($selected = "")
+public function dropDownPostStatus($selected = "")
 {
 
   $name = 'post_status';
@@ -365,11 +365,11 @@ public static function dropDownPostStatus($selected = "")
 
   if ($selected !== '') {
 
-    self::$selected = $selected;
+    $this->selected = $selected;
 
   }
 
-  return dropdown($name, $posts_status, self::$selected);
+  return dropdown($name, $posts_status, $this->selected);
 
 }
 
@@ -381,7 +381,7 @@ public static function dropDownPostStatus($selected = "")
  * @return string
  *
  */
-public static function dropDownCommentStatus($selected = "")
+public function dropDownCommentStatus($selected = "")
 {
 
   $name = 'comment_status';
@@ -389,10 +389,10 @@ public static function dropDownCommentStatus($selected = "")
  	$comment_status = array('open' => 'Open', 'closed' => 'Closed');
 
  	if ($selected !== '') {
- 	    self::$selected = $selected;
+ 	    $this->selected = $selected;
  	}
 
- 	return dropdown($name, $comment_status, self::$selected);
+ 	return dropdown($name, $comment_status, $this->selected);
 
 }
 
