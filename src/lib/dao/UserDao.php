@@ -14,6 +14,8 @@
 class UserDao extends Dao
 {
  
+ protected static $selected;
+
  // overrides Dao constructor
  public function __construct()
  {
@@ -362,11 +364,8 @@ class UserDao extends Dao
   */
  public function deleteUser($ID, $sanitize)
  {
-  
-  $cleanID = $this->filteringId($sanitize, $ID, 'sql');
-   
-  $this->deleteRecord("tbl_users", "ID = ".(int)$cleanID);
-	 
+   $cleanID = $this->filteringId($sanitize, $ID, 'sql'); 
+   $this->deleteRecord("tbl_users", "ID = {$cleanID}");
  }
  
 /**
@@ -386,10 +385,10 @@ class UserDao extends Dao
                   'contributor'=>'Contributor');
   
   if ($selected != '') {
-      $selected = $selected;
+      self::$selected = $selected;
   } 
   
-  return dropdown($name, $levels, $selected);
+  return dropdown($name, $levels, self::$selected);
   
  }
 
@@ -407,16 +406,7 @@ class UserDao extends Dao
    $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_login = ? AND user_banned = '0' LIMIT 1";
    $this->setSQL($sql);
    $stmt = $this->findColumn([$user_login]);
-     
-   if ($stmt == 1) {
-      
-      return true;
-   
-   } else {
-      
-      return false;
-       
-   }
+   return ($stmt === 1) ? true : false;
 	
  }
 	 
@@ -462,7 +452,7 @@ class UserDao extends Dao
  * Checking user password
  * 
  * @method public checkUserPassword()
- * @param string $email
+ * @param string $login
  * @param string $password
  * @return bool
  * 
@@ -472,92 +462,17 @@ class UserDao extends Dao
     
     if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
 
-        $sql = "SELECT user_pass FROM tbl_users WHERE user_email = :user_email AND user_banned = '0' LIMIT 1";
-        $this->setSQL($sql);
-        $stmt = $this->checkCountValue([':user_email' => $login]);
-
-        if ($stmt > 0) {
-        
-            $row = $this->findRow([':user_email' => $login]);
-            
-            $expected = crypt($password, $row['user_pass']);
-            $correct = crypt($password, $row['user_pass']);
-    
-            if(!function_exists('hash_equals')) {
-    
-                if(timing_safe_equals($expected, $correct) == 0) {
-    
-                    if(scriptlog_verify_password($password, $row['user_pass'])) {
-    
-                        return true;
-    
-                    }
-    
-                }
-    
-            } else {
-    
-                if(hash_equals($expected, $correct)) {
-    
-                    if (scriptlog_verify_password($password, $row['user_pass'])) {
-    
-                        return true;
-    
-                    }
-    
-                }
-                
-            }
-            
-        }
+        return ( $this->checkUserPasswordByEmail($login, $password) ) ?: false;
     
     } else {
 
-        $sql = "SELECT user_pass FROM tbl_users WHERE user_login = :user_login AND user_banned = '0' LIMIT 1";
-        $this->setSQL($sql);
-        $stmt = $this->checkCountValue([':user_login' => $login]);
-
-        if ($stmt > 0) {
-        
-            $row = $this->findRow([':user_login' => $login]);
-            
-            $expected = crypt($password, $row['user_pass']);
-            $correct = crypt($password, $row['user_pass']);
-    
-            if(!function_exists('hash_equals')) {
-    
-                if(timing_safe_equals($expected, $correct) == 0) {
-    
-                    if(scriptlog_verify_password($password, $row['user_pass'])) {
-    
-                        return true;
-    
-                    }
-    
-                }
-    
-            } else {
-    
-                if(hash_equals($expected, $correct)) {
-    
-                    if (scriptlog_verify_password($password, $row['user_pass'])) {
-    
-                        return true;
-    
-                    }
-    
-                }
-                
-            }
-            
-        }
+        return ( $this->checkUserPasswordByLogin($login, $password) ) ?: false;
 
     }
     
-    return false;
-    
  }
  
+
 /**
  * checkUserId
  *
@@ -598,6 +513,88 @@ class UserDao extends Dao
      
  }
  
+/**
+ * checkUserPasswordByEmail
+ *
+ * @param  string $login
+ * @param string $password
+ * @return bool
+ */
+ private function checkUserPasswordByEmail($login, $password)
+ {
+    $sql = "SELECT user_pass FROM tbl_users WHERE user_email = :user_email AND user_banned = '0' LIMIT 1";
+        $this->setSQL($sql);
+        $stmt = $this->checkCountValue([':user_email' => $login]);
+
+        if ($stmt > 0) {
+        
+            $row = $this->findRow([':user_email' => $login]);
+            
+            $expected = crypt($password, $row['user_pass']);
+            $correct = crypt($password, $row['user_pass']);
+    
+            if(!function_exists('hash_equals')) {
+    
+                if ( ( timing_safe_equals($expected, $correct) === 0 ) && ( scriptlog_verify_password($password, $row['user_pass']) ) ) {
+
+                    return true;
+
+                }
+                
+            } else {
+    
+                if ( hash_equals($expected, $correct)  && (  scriptlog_verify_password($password, $row['user_pass'] ) ) ) {
+
+                    return true;
+
+                }
+                
+            }
+            
+        }
+
+ }
+
+/**
+ * checkUserPasswordByLogin
+ *
+ * @param string $login
+ * @param string $password
+ * @return bool
+ */
+ private function checkUserPasswordByLogin($login, $password)
+ {
+    $sql = "SELECT user_pass FROM tbl_users WHERE user_login = :user_login AND user_banned = '0' LIMIT 1";
+    $this->setSQL($sql);
+    $stmt = $this->checkCountValue([':user_login' => $login]);
+
+    if ($stmt > 0) {
+    
+        $row = $this->findRow([':user_login' => $login]);
+        
+        $expected = crypt($password, $row['user_pass']);
+        $correct = crypt($password, $row['user_pass']);
+
+        if(!function_exists('hash_equals')) {
+
+            if ( (  timing_safe_equals($expected, $correct) === 0 ) && ( scriptlog_verify_password($password, $row['user_pass']) ) ) {
+
+                return true;
+            }
+            
+    
+        } else {
+
+            if ( ( hash_equals($expected, $correct) )  && ( scriptlog_verify_password($password, $row['user_pass']) ) ) {
+
+                return true;
+            }
+            
+        }
+        
+    }
+ }
+
  /**
   * Check Activation Key
   * 
