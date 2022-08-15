@@ -570,23 +570,14 @@ public function reAuthenticateUserPrivilege($login, $password)
       $expected_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
       $correct_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
 
-      if ( hash_equals($expected_validator, $correct_validator) ) {
+      if ( hash_equals($expected_validator, $correct_validator) && ( Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']) ) ) {
 
-          if ( Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']) ) {
-
-            $this->validator_verified = true;
-
-          }
-
+        $this->validator_verified = true;
       } 
 
-      if ( hash_equals($expected_selector, $correct_selector) ) {
+      if ( hash_equals($expected_selector, $correct_selector) && ( Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret) ) ) {
 
-          if ( Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret) ) {
-
-            $this->selector_verified = true;
-
-          }
+        $this->selector_verified = true;
 
       }
 
@@ -596,15 +587,7 @@ public function reAuthenticateUserPrivilege($login, $password)
 
       }
 
-      if ((!empty($token_info['ID'])) && $this->validator_verified && $this->selector_verified && $this->expired_verified ) {
-
-           return true;
-
-      } else {
-
-          return false;
-
-      }
+      return ( !empty($token_info['ID']) ) && $this->validator_verified && $this->selector_verified && $this->expired_verified ? true : false;
       
    }
 
