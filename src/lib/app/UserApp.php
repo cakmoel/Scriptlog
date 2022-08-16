@@ -57,9 +57,9 @@ class UserApp extends BaseApp
     if (isset($_SESSION['status'])) {
         
         $checkStatus = true;
-        if ($_SESSION['status'] == 'userAdded') array_push($status, "New user added");
-        if ($_SESSION['status'] == 'userUpdated') array_push($status, "User has been updated");
-        if ($_SESSION['status'] == 'userDeleted') array_push($status, "User deleted");
+        ($_SESSION['status'] == 'userAdded') ?: array_push($status, "New user added");
+        ($_SESSION['status'] == 'userUpdated') ?: array_push($status, "User has been updated");
+        ($_SESSION['status'] == 'userDeleted') ?: array_push($status, "User deleted");
         unset($_SESSION['status']);
 
     }
@@ -67,8 +67,8 @@ class UserApp extends BaseApp
    if (isset($_SESSION['error'])) {
 
       $checkError = false;
-      if ($_SESSION['error'] == 'userNotFound') array_push($errors, "Error: User Not Found"); 
-      if ($_SESSION['error'] == 'adminDeletedNotified') array_push($errors, "Error: Administrator could not be deleted");
+      ($_SESSION['error'] == 'userNotFound') ?: array_push($errors, "Error: User Not Found"); 
+      ($_SESSION['error'] == 'adminDeletedNotified') ?: array_push($errors, "Error: Administrator could not be deleted");
       unset($_SESSION['error']);
 
    }
@@ -116,7 +116,7 @@ class UserApp extends BaseApp
     if (isset($_SESSION['error'])) {
         
         $checkError = false;
-        if ($_SESSION['error'] == 'profileNotFound') array_push($errors, "Error: Profile Not Found!");
+        ($_SESSION['error'] == 'profileNotFound') ?: array_push($errors, "Error: Profile Not Found!");
         unset($_SESSION['error']);
 
     }
@@ -124,7 +124,7 @@ class UserApp extends BaseApp
     if (isset($_SESSION['status'])) {
         
         $checkStatus = true;
-        if ($_SESSION['status'] == 'profilUpdated') array_push($status, "Profile has been updated");
+        ($_SESSION['status'] == 'profilUpdated') ?: array_push($status, "Profile has been updated");
         unset($_SESSION['status']);
 
     }
@@ -201,8 +201,8 @@ class UserApp extends BaseApp
         
             if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                 
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
-                throw new AppException("Sorry, unpleasant attempt detected!");
+                header($_SERVER["SERVER_PROTOCOL"].MESSAGE_BADREQUEST, true, 400);
+                throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
                 
             }
             
@@ -228,12 +228,12 @@ class UserApp extends BaseApp
             if ( ( isset( $_POST['user_email'] ) ) && ( !email_validation( $_POST['user_email'], new RFCValidation() ) ) ) {
                 
                 $checkError = false;
-                array_push($errors, "Please enter a valid email address");
+                array_push($errors, MESSAGE_INVALID_EMAILADDRESS);
                 
             } elseif (!email_multiple_validation($_POST['user_email'])) {
 
                 $checkError = false;
-                array_push($errors, "Unknown DNS records that signal the server accepts emails");
+                array_push($errors, MESSAGE_UNKNOWN_DNS);
                 
             } elseif ($this->userEvent->isEmailExists($_POST['user_email'])) {
                 
@@ -254,27 +254,23 @@ class UserApp extends BaseApp
                 if (false === check_pwd_strength($_POST['user_pass'])) {
 
                     $checkError = false;
-                    array_push($errors, "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters");
+                    array_push($errors, MESSAGE_WEAK_PASSWORD);
                     
                 }
 
             }
 
-            if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
+            if ( ( !empty($_POST['user_url']) ) && ( !url_validation($_POST['user_url']) ) ) {
                 
                 $checkError = false;
                 array_push($errors, "Please enter a valid URL.");
                 
             }
             
-            if (!empty($_POST['user_fullname'])) {
+            if ( ( !empty($_POST['user_fullname']) ) && ( !preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']) ) ) {
                 
-                if (!preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname'])) {
-                    
-                    $checkError = false;
-                    array_push($errors, "Please enter a valid fullname");
-                    
-                }
+                $checkError = false;
+                array_push($errors, MESSAGE_INVALID_FULLNAME);
                 
             }
             
@@ -408,8 +404,8 @@ class UserApp extends BaseApp
       
         if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
               
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
-            throw new AppException("Sorry, unpleasant attempt detected!");
+            header($_SERVER["SERVER_PROTOCOL"].MESSAGE_BADREQUEST, true, 400);
+            throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
               
         }
 
@@ -432,7 +428,7 @@ class UserApp extends BaseApp
             if (false === check_pwd_strength($_POST['user_pass'])) {
 
                 $checkError = false;
-                array_push($errors, "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters");
+                array_push($errors, MESSAGE_WEAK_PASSWORD);
 
             }
 
@@ -445,14 +441,10 @@ class UserApp extends BaseApp
             
         }
 
-        if (!empty($_POST['user_fullname'])) {
+        if ( ( !empty($_POST['user_fullname']) ) && ( !preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']) ) ) {
             
-            if (!preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname'])) {
-                
-                $checkError = false;
-                array_push($errors, "Please enter a valid fullname");
-                
-            }
+            $checkError = false;
+            array_push($errors, MESSAGE_INVALID_FULLNAME);
             
         }
 
@@ -466,12 +458,12 @@ class UserApp extends BaseApp
         if (!email_validation($_POST['user_email'], new RFCValidation())) {
 
             $checkError = false;
-            array_push($errors, "Please enter a valid email address");
+            array_push($errors, MESSAGE_INVALID_EMAILADDRESS);
 
         } elseif (!email_multiple_validation($_POST['user_email'])) {
 
             $checkError = false;
-            array_push($errors, "Unknown DNS records that signal the server accepts emails");
+            array_push($errors, MESSAGE_UNKNOWN_DNS);
             
         }
 
@@ -528,27 +520,23 @@ class UserApp extends BaseApp
 
               }
 
-              if($this->userEvent->identifyCookieToken($secret) == true) {
+              if ( ( $this->userEvent->identifyCookieToken($secret) ) && ( !empty( $_POST['user_pass']) ) ) {
  
-                if(!empty($_POST['user_pass'])) {
+                $random_password = Tokenizer::createToken(128);
+                set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+                
+                $random_selector = Tokenizer::createToken(128);
+                set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+                
+                $hashed_password = Tokenizer::setRandomPasswordProtected($random_password);
+                $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
+            
+                $this->userEvent->setPwdHash($hashed_password);
+                $this->userEvent->setSelectorHash($hashed_selector);
+                $this->userEvent->setUserLogin($getUser['user_login']);
 
-                  $random_password = Tokenizer::createToken(128);
-                  set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-                  
-                  $random_selector = Tokenizer::createToken(128);
-                  set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-                  
-                  $hashed_password = Tokenizer::setRandomPasswordProtected($random_password);
-                  $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
-              
-                  $this->userEvent->setPwdHash($hashed_password);
-                  $this->userEvent->setSelectorHash($hashed_selector);
-                  $this->userEvent->setUserLogin($getUser['user_login']);
-
-                  $expiry_date = date("Y-m-d H:i:s", time() + Authentication::COOKIE_EXPIRE);
-                  $this->userEvent->setCookieExpireDate($expiry_date); 
-
-                }
+                $expiry_date = date("Y-m-d H:i:s", time() + Authentication::COOKIE_EXPIRE);
+                $this->userEvent->setCookieExpireDate($expiry_date); 
                 
             }
  
@@ -579,7 +567,7 @@ class UserApp extends BaseApp
         $this->view->set('formAction', $this->getFormAction());
         $this->view->set('userData', $data_user);
 
-        if ($getUser['ID'] == 1 && $this->userEvent->isUserLevel() == 'administrator') {
+        if ( ( $getUser['ID'] == 1 )  && ( $this->userEvent->isUserLevel() == 'administrator') ) {
 
             $this->view->set('userRole', $this->userEvent->isUserLevel());
 
@@ -644,12 +632,12 @@ class UserApp extends BaseApp
             
         if(!csrf_check_token('csrfToken', $_POST, 60*10)) {
 
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-            throw new AppException("Sorry, unpleasant attempt detected!");
+            header($_SERVER["SERVER_PROTOCOL"].MESSAGE_BADREQUEST, true, 400);
+            throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
 
         }
             
-        if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass'])) || (!empty($_POST['current_pwd']))) {
+        if ( ( ! empty($_POST['user_pass2']) ) || ( ! empty($_POST['user_pass']) ) || ( ! empty($_POST['current_pwd']) ) ) {
 
             if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
 
@@ -668,7 +656,7 @@ class UserApp extends BaseApp
             if (false === check_pwd_strength($_POST['user_pass'])) {
 
                 $checkError = false;
-                array_push($errors, "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters");
+                array_push($errors, MESSAGE_WEAK_PASSWORD);
 
             }
 
@@ -684,30 +672,26 @@ class UserApp extends BaseApp
         if (!email_validation($_POST['user_email'], new RFCValidation())) {
 
             $checkError = false;
-            array_push($errors, "Please enter a valid email address");
+            array_push($errors, MESSAGE_INVALID_EMAILADDRESS);
 
         } elseif (!email_multiple_validation($_POST['user_email'])) {
 
             $checkError = false;
-            array_push($errors, "Unknown DNS records that signal the server accepts emails");
+            array_push($errors, MESSAGE_UNKNOWN_DNS);
                 
         }
 
-        if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
+        if ( ( ! empty($_POST['user_url']) ) && ( ! url_validation($_POST['user_url']) ) ) {
                  
             $checkError = false;
             array_push($errors, "Please enter a valid URL");
                 
         }
 
-        if(!empty($_POST['user_fullname'])) {
+        if( ( ! empty($_POST['user_fullname']) ) && ( ! preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']) ) ) {
                 
-            if(!preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname'])) {
-
-                $checkError = false;
-                array_push($errors, "Please enter a valid fullname");
-
-            }
+            $checkError = false;
+            array_push($errors, MESSAGE_INVALID_FULLNAME);
 
         }
 
@@ -729,33 +713,29 @@ class UserApp extends BaseApp
             $this->userEvent->setUserUrl((isset($_POST['user_url']) ? escape_html(distill_post_request($filters)['user_url'], 'url') : ""));
             $this->userEvent->setUserId((isset($_POST['user_id']) ? abs((int)distill_post_request($filters)['user_id']) : 0));
 
-            if(!empty($_POST['user_pass'])) {
+            if ( !empty($_POST['user_pass']) ) {
 
                 $this->userEvent->setUserPass(purify_dirty_html(distill_post_request($filters)['user_pass']));
 
             }
 
-            if ($this->userEvent->identifyCookieToken($secret) == true) {
+            if ( ( $this->userEvent->identifyCookieToken($secret) ) && ( !empty($_POST['user_pass']) ) ) {
 
-                if(!empty($_POST['user_pass'])) {
+                $random_password = Tokenizer::createToken(128);
+                set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+            
+                $random_selector = Tokenizer::createToken(128);
+                set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+            
+                $hashed_password = Tokenizer::setRandomPasswordProtected($random_password);
+                $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
+            
+                $this->userEvent->setPwdHash($hashed_password);
+                $this->userEvent->setSelectorHash($hashed_selector);
+                $this->userEvent->setUserLogin($getProfile['user_login']);
 
-                    $random_password = Tokenizer::createToken(128);
-                    set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-                
-                    $random_selector = Tokenizer::createToken(128);
-                    set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-                
-                    $hashed_password = Tokenizer::setRandomPasswordProtected($random_password);
-                    $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
-                
-                    $this->userEvent->setPwdHash($hashed_password);
-                    $this->userEvent->setSelectorHash($hashed_selector);
-                    $this->userEvent->setUserLogin($getProfile['user_login']);
-
-                    $expiry_date = date("Y-m-d H:i:s", time() + Authentication::COOKIE_EXPIRE);
-                    $this->userEvent->setCookieExpireDate($expiry_date);
-
-                }
+                $expiry_date = date("Y-m-d H:i:s", time() + Authentication::COOKIE_EXPIRE);
+                $this->userEvent->setCookieExpireDate($expiry_date);
               
             }
 
