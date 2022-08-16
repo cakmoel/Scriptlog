@@ -23,10 +23,11 @@ define('SCRIPTLOG', hash_hmac('sha256', APP_TITLE.':'.APP_CODENAME.mt_rand(1, 10
 
 define('MESSAGE_BADREQUEST', "400 Bad Request");
 define('MESSAGE_UNPLEASANT_ATTEMPT', "Sorry, unpleasant attempt detected");
-define('MESSAGE_INVALID_EMAILADDRESS', "Please enter a valid email address");
 define('MESSAGE_UNKNOWN_DNS', "Unknown DNS records that signal the server accepts emails");
 define('MESSAGE_WEAK_PASSWORD', "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters");
 define('MESSAGE_INVALID_FULLNAME', "Please enter a valid fullname");
+define('MESSAGE_INVALID_SELECTBOX', "Please choose the available value provided");
+define('MESSAGE_INVALID_EMAILADDRESS', "Please enter a valid email address");
 
 if (!defined('PHP_EOL')) {
 
