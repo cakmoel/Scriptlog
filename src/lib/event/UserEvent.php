@@ -450,8 +450,7 @@ class UserEvent
 
 /**
  * removeUser
- * remove user from record on user table
- * 
+ * remove user from record
  */
  public function removeUser()
  {
@@ -547,7 +546,8 @@ public function reAuthenticateUserPrivilege($login, $password)
 
 /**
  * identifyCookieToken
- * Check whether session cookies defined or not
+ * 
+ * Checking whether a session cookies defined or not
  * if defined then return it
  *
  * @method public identifyUserLogin()
