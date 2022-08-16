@@ -213,7 +213,7 @@ class UserApp extends BaseApp
                
             }
             
-            if ((isset($_POST['user_login'])) && (!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $_POST['user_login']))) {
+            if ( ( isset($_POST['user_login'])) && ( ! preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $_POST['user_login']))) {
                 
                 $checkError = false;
                 array_push($errors, "Username requires only alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20");
@@ -277,7 +277,7 @@ class UserApp extends BaseApp
             if ( false === sanitize_selection_box(distill_post_request($filters)['user_level'], ['manager'=>'Manager', 'editor'=>'Editor', 'author'=>'Author', 'contributor'=>'Contributor'] ) ) {
 
                 $checkError = false;
-                array_push($errors, "Please choose the available value provided!");
+                array_push($errors, MESSAGE_INVALID_SELECTBOX);
 
             }
 
@@ -451,7 +451,7 @@ class UserApp extends BaseApp
         if ( false === sanitize_selection_box(distill_post_request($filters)['user_level'], ['manager'=>'Manager', 'editor'=>'Editor', 'author'=>'Author', 'contributor'=>'Contributor'] ) ) {
 
             $checkError = false;
-            array_push($errors, "Please choose the available value provided!");
+            array_push($errors, MESSAGE_INVALID_SELECTBOX);
 
         }
 
@@ -794,15 +794,15 @@ class UserApp extends BaseApp
         
         if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
 
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
-            throw new AppException("Sorry, unpleasant attempt detected!");
+            header($_SERVER["SERVER_PROTOCOL"].MESSAGE_BADREQUEST, true, 400);
+            throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
 
         }
         
         if (!filter_var($id, FILTER_VALIDATE_INT)) {
 
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
-            throw new AppException("Sorry, unpleasant attempt detected!");
+            header($_SERVER["SERVER_PROTOCOL"].MESSAGE_BADREQUEST, true, 400);
+            throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
 
         }
 
