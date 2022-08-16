@@ -143,9 +143,9 @@ class PostApp extends BaseApp
 
          if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
          
-            header($_SERVER["SERVER_PROTOCOL"].' 400 Bad Request', true, 400);
+            header($_SERVER["SERVER_PROTOCOL"].MESSAGE_BADREQUEST, true, 400);
             header('Status: 400 Bad Request');
-            throw new AppException("Sorry, unpleasant attempt detected!");
+            throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
              
          } 
         
@@ -154,7 +154,7 @@ class PostApp extends BaseApp
             header($_SERVER["SERVER_PROTOCOL"].' 413 Payload Too Large', true, 413);
             header('Status: 413 Payload Too Large');
             header('Retry-After: 3600');
-            throw new AppException("Sorry, Unpleasant attempt detected");
+            throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
 
          }
 
@@ -175,14 +175,14 @@ class PostApp extends BaseApp
          if (false === sanitize_selection_box(distill_post_request($filters)['post_status'], ['publish' => 'Publish', 'draft' => 'Draft'])) {
 
             $checkError = false;
-            array_push($errors, "Please choose the available value provided");
+            array_push($errors, MESSAGE_INVALID_SELECTBOX);
 
          }
 
          if (false === sanitize_selection_box(distill_post_request($filters)['comment_status'], ['open' => 'Open', 'closed' => 'Closed'])) {
 
             $checkError = false;
-            array_push($errors, "Please choose the available value provided");
+            array_push($errors, MESSAGE_INVALID_SELECTBOX);
 
          }
          
@@ -508,8 +508,8 @@ class PostApp extends BaseApp
 
             if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                 
-              header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-              throw new AppException("Sorry, unpleasant attempt detected!");
+              header($_SERVER["SERVER_PROTOCOL"].MESSAGE_BADREQUEST, true, 400);
+              throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
                 
             } 
             
@@ -518,7 +518,7 @@ class PostApp extends BaseApp
               header($_SERVER["SERVER_PROTOCOL"]." 413 Payload Too Large", true, 413);
               header('Status: 413 Payload Too Large');
               header('Retry-After: 3600');
-              throw new AppException("Sorry, Unpleasant attempt detected");
+              throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
 
             }
             
@@ -539,14 +539,14 @@ class PostApp extends BaseApp
             if ( false === sanitize_selection_box(distill_post_request($filters)['post_status'], ['publish' => 'Publish', 'draft' => 'Draft'])) {
 
               $checkError = false;
-              array_push($errors, "Please choose the available value provided");
+              array_push($errors, MESSAGE_INVALID_SELECTBOX);
   
             }
   
             if ( false === sanitize_selection_box(distill_post_request($filters)['comment_status'], ['open' => 'Open', 'closed' => 'Closed'])) {
   
               $checkError = false;
-              array_push($errors, "Please choose the available value provided");
+              array_push($errors, MESSAGE_INVALID_SELECTBOX);
               
             }
 
@@ -809,15 +809,15 @@ class PostApp extends BaseApp
         
         if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
 
-          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
-          throw new AppException("Sorry, unpleasant attempt detected!");
+          header($_SERVER["SERVER_PROTOCOL"].MESSAGE_BADREQUEST, true, 400);
+          throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
 
         }
       
         if (!filter_var($id, FILTER_VALIDATE_INT)) {
 
-          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
-          throw new AppException("Sorry, unpleasant attempt detected!");
+          header($_SERVER["SERVER_PROTOCOL"].MESSAGE_BADREQUEST, true, 400);
+          throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
 
         }
 
