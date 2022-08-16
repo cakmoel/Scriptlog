@@ -14,7 +14,7 @@
 class UserDao extends Dao
 {
  
- protected static $selected;
+ private $selected;
 
  // overrides Dao constructor
  public function __construct()
@@ -385,10 +385,10 @@ class UserDao extends Dao
                   'contributor'=>'Contributor');
   
   if ($selected != '') {
-      self::$selected = $selected;
+      $this->selected = $selected;
   } 
   
-  return dropdown($name, $levels, self::$selected);
+  return dropdown($name, $levels, $this->selected);
   
  }
 
@@ -428,7 +428,7 @@ class UserDao extends Dao
     
     $stmt = $this->findColumn([':user_session' => $user_session]);     
     
-    return ($stmt == 1) ? true : false;
+    return ($stmt === 1) ? true : false;
  
  }
 
@@ -455,44 +455,41 @@ class UserDao extends Dao
  * @param string $login
  * @param string $password
  * @return bool
- * 
  */
  public function checkUserPassword($login, $password)
  {
     
     if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
 
-        return ( $this->checkUserPasswordByEmail($login, $password) ) ?: false;
+      return ( $this->checkUserPasswordByEmail($login, $password) ) ?: false;
     
     } else {
 
-        return ( $this->checkUserPasswordByLogin($login, $password) ) ?: false;
+      return ( $this->checkUserPasswordByLogin($login, $password) ) ?: false;
 
     }
     
  }
  
-
 /**
  * checkUserId
  *
  * @param integer $userID
  * @param object $sanitize
- * @return numeric
- * 
+ * @return numeric 
  */
  public function checkUserId($userID, $sanitize)
  {
      
-     $sql = "SELECT ID FROM tbl_users WHERE ID = ?";
+    $sql = "SELECT ID FROM tbl_users WHERE ID = ?";
 
-     $idsanitized = $this->filteringId($sanitize, $userID, 'sql');
+    $idsanitized = $this->filteringId($sanitize, $userID, 'sql');
 
-     $this->setSQL($sql);
+    $this->setSQL($sql);
 
-     $stmt = $this->checkCountValue([$idsanitized]);
+    $stmt = $this->checkCountValue([$idsanitized]);
 
-     return($stmt > 0);
+    return($stmt > 0);
 
  }
  
