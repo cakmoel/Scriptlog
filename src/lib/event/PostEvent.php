@@ -490,16 +490,16 @@ class PostEvent
 
     $medialib = new MediaDao();
     $media_data = $medialib->findMediaBlog((int)$media_id);
-    $post_image = isset($media_data['media_filename'])  ? basename($media_data['media_filename']) : "";
+    $media_filename = isset($media_data['media_filename'])  ? basename($media_data['media_filename']) : "";
 
-    if (isset($post_image) && $post_image !== '') {
+    if (isset($media_filename) && $media_filename !== '') {
 
-      if (is_readable(__DIR__ . '/../../' . APP_IMAGE . $post_image)) {
+      if (is_readable(__DIR__ . '/../../' . APP_IMAGE . $media_filename)) {
 
-        unlink(__DIR__ . '/../../' . APP_IMAGE . $post_image);
-        unlink(__DIR__ . '/../../' . APP_IMAGE_LARGE . 'large_' . $post_image);
-        unlink(__DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_' . $post_image);
-        unlink(__DIR__ . '/../../' . APP_IMAGE_SMALL . 'small_' . $post_image);
+        unlink(__DIR__ . '/../../' . APP_IMAGE . $media_filename);
+        unlink(__DIR__ . '/../../' . APP_IMAGE_LARGE . 'large_' . $media_filename);
+        unlink(__DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_' . $media_filename);
+        unlink(__DIR__ . '/../../' . APP_IMAGE_SMALL . 'small_' . $media_filename);
         
       }
 
