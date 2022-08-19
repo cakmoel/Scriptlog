@@ -10,6 +10,8 @@ echo "Request param2: {$requestPath->param2} <br>";
 echo "Request param3: {$requestPath->param3} <br>";
 echo "</pre>";
 
+echo "<pre>Query string requested: a=".HandleRequest::isQueryStringRequested()['value']."</pre>";
+
 echo "<pre>";
 print_r($_SERVER);
 echo '</pre>';
