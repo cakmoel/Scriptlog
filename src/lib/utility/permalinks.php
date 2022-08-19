@@ -55,16 +55,14 @@ function is_permalink_enabled()
  * @param string $app_url
  * 
  */
-function listen_query_string($id, $app_url)
+function listen_query_string($id = null, $app_url = null)
 {
-
-   $link = [];
 
    $post_id = $app_url . DS . '?p=' . abs((int)$id);
    $page_id = $app_url . DS . '?pg' . abs((int)$id);
    $cat_id = $app_url . DS . '?cat=' . abs((int)$id);
    $tag_id = $app_url . DS . '?tag=' . strval($id);
-   $archive = $app_url . DS . '?a=' . prevent_injection($id);
+   $archive = $app_url . DS . '?a=' . $id;
 
    switch (HandleRequest::isQueryStringRequested()['key']) {
 
@@ -77,7 +75,7 @@ function listen_query_string($id, $app_url)
             $post_id = $app_url . DS . '?p=' . (isset($entry_post['ID']) ) ? escape_html((int)$entry_post['ID']) : "";
 
          } 
-
+         
          break;
    
       case 'pg':
@@ -110,7 +108,7 @@ function listen_query_string($id, $app_url)
 
             $entry_tag = FrontHelper::grabSimpleFrontTag($id);
 
-            $tag_id = $app_url . DS . '?tag=' . ( isset($entry_tag['ID'])) ? escape_html($entry_tag['ID']) : "";
+            $tag_id = $app_url . DS . '?tag=' . ( isset($entry_tag['post_tags'])) ? escape_html($entry_tag['post_tags']) : "";
             
          }
          
@@ -120,9 +118,18 @@ function listen_query_string($id, $app_url)
 
          if ( ( ! empty(HandleRequest::isQueryStringRequested()['value'] ) ) && ( $id === HandleRequest::isQueryStringRequested()['value'] ) ) {
 
-            $archive = $app_url . DS . '?a=';
+            $entry_archives = FrontHelper::grabSimpleFrontArchive();
+
+            foreach ($entry_archives as $entry_archive) {
+                
+               $month = isset($entry_archive['month']) ? $entry_archive['month'] : "";
+               $year = isset($entry_archive['year']) ? $entry_archive['year'] : "";
+            }
+ 
+            $archive = $app_url . DS . '?a=' . $month.$year;
+
          }
-   
+ 
          break;
       
       case 'blog':
@@ -131,17 +138,13 @@ function listen_query_string($id, $app_url)
 
       default:
 
-         $link = ['post' => $post_id, 'page' => $page_id, 'cat' => $cat_id, 'tag'=>$tag_id, 'archive'=>$archive];  
-
-         return $link;
-         
+         return ['post' => $post_id, 'page' => $page_id, 'cat' => $cat_id, 'tag' => $tag_id, 'archive' => $archive];  
+ 
         break;
       
    }
 
-   $link = ['post' => $post_id, 'page' => $page_id, 'cat' => $cat_id, 'tag' => $tag_id, 'archive'=>$archive];  
-
-   return $link;
+   return ['post' => $post_id, 'page' => $page_id, 'cat' => $cat_id, 'tag' => $tag_id, 'archive' => $archive];  
 
 }
 
@@ -187,8 +190,10 @@ if ( true === HandleRequest::checkMatchUriRequested() ) {
 
          } else {
 
-            
+            scriptlog_error("param requested not recognized");
          }
+
+         return $link;
 
          break;
 
@@ -216,9 +221,7 @@ if ( true === HandleRequest::checkMatchUriRequested() ) {
          
          $post_rewrite = $app_url . DS . 'post' . DS . safe_html((int)$post_slug['ID']). DS . safe_html($post_slug['post_slug']);
          
-         $link = ['post' => $post_rewrite];
-
-         return $link;
+         return ['post' => $post_rewrite];
 
          break;
 
