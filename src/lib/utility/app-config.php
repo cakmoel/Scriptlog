@@ -12,9 +12,7 @@
 function read_config($filename)
 {
   
- $read_configuration = AppConfig::readConfiguration($filename);
-
- return $read_configuration;
+ return AppConfig::readConfiguration($filename);
 
 }
 
@@ -32,8 +30,6 @@ function read_config($filename)
 function write_config($filename, array $configuration)
 {
 
-  $write_configuration = AppConfig::writeConfiguration($filename, $configuration);
+  return AppConfig::writeConfiguration($filename, $configuration);
   
-  return $write_configuration;
-
 }
