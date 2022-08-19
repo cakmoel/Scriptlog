@@ -26,7 +26,7 @@ $post_created = isset($retrieve_post['post_modified']) ? safe_html(make_date($re
                     <?= isset($post_id) ? link_topic((int)$post_id) : ""; ?>
                   </div>
                 </div>
-                <h1><?= $post_title; ?><a href="<?= isset($post_id) ? permalinks($post_id)['post'] : "#"; ?>" title="<?= $post_title; ?>"><i class="fa fa-external-link"></i></a></h1>
+                <h1><?= $post_title; ?><a href="<?= isset($post_id) ? permalinks($post_id)['post'] : "#"; ?>" title="<?= $post_title; ?>"><i class="fa fa-external-link" aria-hidden="true"></i></a></h1>
                 <div class="post-footer d-flex align-items-center flex-column flex-sm-row">
                   <a href="#" class="author d-flex align-items-center flex-wrap">
                     <div class="title"><span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= $post_author; ?> </span></div>
