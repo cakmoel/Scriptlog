@@ -331,15 +331,30 @@ function retrieve_detail_post($id)
 }
 
 /**
- * retrieve_archives()
+ * posts_by_archive
  *
- * @param array $arguments
+ * retrieving posts by archive requested
+ * @param array $values
  * @return mixed
  * 
  */
-function retrieves_archives(array $arguments)
+function posts_by_archive(array $values)
 {
-  $archives = FrontContentProvider::frontArchivesPublished($arguments, initialize_archive());
+  $archives = FrontContentProvider::frontPostsByArchive($values, initialize_archive());
+  return is_iterable($archives) ? $archives : array();
+}
+
+/**
+ * retrieve_archives()
+ *
+ * retrieving list of archives 
+ * and display it on sidebar theme
+ * 
+ * @return mixed
+ */
+function retrieve_archives()
+{
+  $archives = FrontContentProvider::frontSidebarArchives(initialize_archive());
   return is_iterable($archives) ? $archives : array();
 }
 
