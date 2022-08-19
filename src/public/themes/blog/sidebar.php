@@ -51,7 +51,7 @@
               foreach (sidebarTopics() as $category) :
             ?>
             
-              <div class="item d-flex justify-content-between"><a href="#"><?= isset($category['topic_title']) ? escape_html($category['topic_title']) : ""; ?></a><span><?= isset($category['total_posts']) ? $category['total_posts'] : ""?></span></div>
+              <div class="item d-flex justify-content-between"><a href="<?= isset($category['ID']) ? permalinks($category['ID'])['cat'] : "#"; ?>"><?= isset($category['topic_title']) ? escape_html($category['topic_title']) : ""; ?></a><span><?= isset($category['total_posts']) ? $category['total_posts'] : ""?></span></div>
             
             <?php 
               endforeach;
@@ -64,11 +64,14 @@
             <header>
               <h3 class="h6">Archives</h3>
             </header>
-            <div class="item d-flex justify-content-between"><a href="#">Growth</a><span>12</span></div>
-            <div class="item d-flex justify-content-between"><a href="#">Local</a><span>25</span></div>
-            <div class="item d-flex justify-content-between"><a href="#">Sales</a><span>8</span></div>
-            <div class="item d-flex justify-content-between"><a href="#">Tips</a><span>17</span></div>
-            <div class="item d-flex justify-content-between"><a href="#">Local</a><span>25</span></div>
+            <?php 
+              foreach (retrieve_archives() as $archives) :
+                $month_name = isset($archives['month']) ? date("F Y", mktime(0, 0, 0, intval( $archives['month']), 7, intval($archives['year']))) : "";
+            ?>
+            <div class="item d-flex justify-content-between"><a href="<?= permalinks($archives['month'].$archives['year'])['archive']; ?>" title="<?= $month_name; ?>"><?= $month_name; ?></a><span><?= isset($archives['total']) ? $archives['total'] : ""; ?></span></div>
+            <?php 
+              endforeach;
+            ?>
           </div>
           <!-- Widget [Tags Cloud Widget]-->
 
