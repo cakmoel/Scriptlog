@@ -107,8 +107,9 @@ require dirname(__FILE__) . '/functions.php';
                        </ul> <!-- ./dropdown-menu -->
                    </li><!-- #Submenu 2 -->
 
-                   </ul><!-- ./dropdown-menu aria-labelledby="navbarDropdownMenuLink" -->
-               </li><!-- ./nav-item dropdown -->
+                   </ul>
+               </li>
+               <!-- ./nav-item dropdown -->
 
 
               <li class="nav-item"><a href="post.html" class="nav-link ">Post</a>
