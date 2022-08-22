@@ -33,7 +33,7 @@ if ((check_dbtable($dbconnect, 'tbl_users') == false) || (check_dbtable($dbconne
 || (check_dbtable($dbconnect, 'tbl_post_topic') == false) || (check_dbtable($dbconnect, 'tbl_plugin') == false)
 || (check_dbtable($dbconnect, 'tbl_menu') == false) || (check_dbtable($dbconnect, 'tbl_mediameta') == false) 
 || (check_dbtable($dbconnect, 'tbl_media') == false) || (check_dbtable($dbconnect, 'tbl_media_download') == false) 
-|| (check_dbtable($dbconnect, 'tbl_comments') == false) || (check_dbtable($dbconnect, 'tbl_comment_reply') == false)) {
+|| (check_dbtable($dbconnect, 'tbl_comments') == false)) {
 
   header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
   exit("Database has been installed!");
