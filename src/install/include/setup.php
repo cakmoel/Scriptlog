@@ -36,6 +36,7 @@ function current_url()
  * @param string $host
  * @param string $username
  * @param string $passwd
+ * @return object
  * 
  */
 function make_connection($host, $username, $passwd, $dbname)
@@ -82,30 +83,17 @@ function close_connection($link)
  */
 function table_exists($link, $table, $counter = 0)
 {
-    if ($link instanceof mysqli) 
-    
+
+  if ($link instanceof mysqli) {
+
     $counter++;
 
     $check = $link->query( "SHOW TABLES LIKE '".$table."'");
     
-    if($check !== false) {
-
-        if( $check->num_rows > 0 ) {
-
-            return true;
-
-        } else {
-
-            return false;
-
-        }
-
-    } else {
-
-        return false;
-        
-    }
-
+    ( ($check) && ($check->num_rows > 0) ) ? true : false;
+    
+  }
+    
 }
 
 /**
@@ -204,7 +192,7 @@ $permalink_key = "permalink_setting";
 $permalink_value = array('rewrite' => 'no', 'server_software' => check_web_server()['WebServer']);
 $store_permalink_value = json_encode($permalink_value);
 
-if ($link instanceof mysqli) 
+if ($link instanceof mysqli) {
 #create users table
 $link->query($tblUser);
 
@@ -226,7 +214,6 @@ if ($link->insert_id && $createAdmin->affected_rows > 0) {
     $link->query($tblTopic);
     $link->query($tblPostTopic);
     $link->query($tblComment);
-    $link->query($tblReply);
     $link->query($tblLoginAttempt);
     $link->query($tblMenu);
     $link->query($tblMedia);
@@ -302,6 +289,8 @@ if ($link->insert_id && $createAdmin->affected_rows > 0) {
         
     } 
  
+}
+
 }
 
 }
