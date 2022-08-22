@@ -11,6 +11,8 @@
  * 
  */
 
+use Egulias\EmailValidator\Warning\TLD;
+
 /**
  * current_url()
  * 
@@ -81,7 +83,7 @@ function close_connection($link)
  * @param numeric $counter
  * 
  */
-function table_exists($link, $table, $counter = 0)
+function is_table_exists($link, $table, $counter = 0)
 {
 
   if ($link instanceof mysqli) {
@@ -90,7 +92,7 @@ function table_exists($link, $table, $counter = 0)
 
     $check = $link->query( "SHOW TABLES LIKE '".$table."'");
     
-    ( ($check) && ($check->num_rows > 0) ) ? true : false;
+    return ( ($check) && ($check->num_rows > 0) ) ? true : false;
     
   }
     
@@ -107,7 +109,7 @@ function check_dbtable($link, $table)
 {
   $install = false;
 
-  if(!table_exists($link, $table)) {
+  if(! is_table_exists($link, $table)) {
       
     $install = true;
 
