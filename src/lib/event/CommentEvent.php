@@ -35,6 +35,13 @@ class CommentEvent
    * @var string
    */
   private $author_ip;
+
+  /**
+   * Author's Email address
+   *
+   * @var string
+   */
+  private $author_email;
   
   /**
    * Comment content
@@ -97,6 +104,11 @@ class CommentEvent
   {
     $this->author_ip = $author_ip;
   }
+
+  public function setAuthorEmail($author_email)
+  {
+    $this->author_email = $author_email;
+  }
   
   public function setCommentContent($content)
   {
@@ -127,6 +139,7 @@ class CommentEvent
        'comment_post_id' => $this->post_id,
        'comment_author_name' => $this->author_name,
        'comment_author_ip' => $this->author_ip,
+       'comment_author_email' => $this->author_email,
        'comment_content' => $this->content,
        'comment_date' => date("Y-m-d H:i:s")
    ]);
@@ -157,8 +170,10 @@ class CommentEvent
      
     $this->validator->sanitize($this->comment_id, 'int');
     
-    if (!$data_comment = $this->commentDao->findComment($this->comment_id, $this->sanitizer)) {
-        direct_page('index.php?load=comments&error=commentNotFound', 404);
+    if ( ! $this->commentDao->findComment($this->comment_id, $this->sanitizer)) {
+
+      $_SESSION['error'] = "commentNotFound";
+      direct_page('index.php?load=comments&error=commentNotFound', 404);
     }
     
     return $this->commentDao->deleteComment($this->comment_id, $this->sanitizer);
