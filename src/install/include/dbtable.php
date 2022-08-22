@@ -40,14 +40,14 @@ PRIMARY KEY (ID)
 
 $tblLoginAttempt = "CREATE TABLE IF NOT EXISTS tbl_login_attempt (
 ip_address VARCHAR(255) NOT NULL,
-login_date datetime NOT NULL DEFAULT '1945-11-10 12:00:00'
+login_date datetime NOT NULL DEFAULT '1989-06-12 12:00:00'
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
 $tblPost = "CREATE TABLE IF NOT EXISTS tbl_posts (
 ID BIGINT(20) unsigned NOT NULL auto_increment,
 media_id BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
 post_author BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
-post_date datetime NOT NULL DEFAULT '1945-11-10 12:00:00',
+post_date datetime NOT NULL DEFAULT '1989-06-12 12:00:00',
 post_modified datetime DEFAULT NULL,
 post_title tinytext NOT NULL,
 post_slug text NOT NULL,
@@ -128,19 +128,7 @@ comment_date datetime NOT NULL DEFAULT '1988-07-01 08:00:00',
 PRIMARY KEY (ID),
 FOREIGN KEY (comment_post_id) REFERENCES tbl_posts(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
-    
-$tblReply = "CREATE TABLE IF NOT EXISTS tbl_comment_reply (
-ID BIGINT(20) unsigned NOT NULL auto_increment,    
-comment_id BIGINT(20)unsigned NOT NULL,
-user_id BIGINT(20) unsigned NOT NULL,
-reply_content text NOT NULL,
-reply_status VARCHAR(20) NOT NULL DEFAULT 'activated',
-reply_date datetime NOT NULL DEFAULT '1988-07-01 08:00:00',
-PRIMARY KEY (ID, comment_id),
-FOREIGN KEY (comment_id) REFERENCES tbl_comments(ID),
-FOREIGN KEY (user_id) REFERENCES tbl_users(ID)
-)Engine=InnoDB DEFAULT CHARSET=utf8mb4";
-        
+            
 $tblMenu = "CREATE TABLE IF NOT EXISTS tbl_menu (
 ID INT(5) unsigned NOT NULL auto_increment,
 parent_id INT(5) unsigned NOT NULL DEFAULT '0',
