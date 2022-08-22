@@ -95,9 +95,9 @@ if ($install != 'install') {
     
     } 
     
-    if ((!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $username))) {
+    if ( ! preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $username)) {
 
-      $errors['errorSetup'] = 'username for admin requires only alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
+      $errors['errorSetup'] = 'username Undocumented variable variablefor admin requires only alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
       
     }
 
@@ -115,7 +115,7 @@ if ($install != 'install') {
 
         $errors['errorSetup'] = 'Admin password should both be equal';
 
-    } elseif (!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
+    } elseif ( ! preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
 
         $errors['errorSetup'] = 'Admin password requires at least 8 characters, uppercase and lowercase letters, numbers and special characters';
 
