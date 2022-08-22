@@ -56,7 +56,7 @@ $post_created = isset($retrieve_post['post_modified']) ? safe_html(make_date($re
                   <div class="comment">
                     <div class="comment-header d-flex justify-content-between">
                       <div class="user d-flex align-items-center">
-                        <div class="image"><img src="img/user.svg" alt="..." class="img-fluid rounded-circle"></div>
+                        <div class="image"><img src="<?= app_url(); ?>/public/themes/blog/assets/img/user.svg" alt="..." class="img-fluid rounded-circle"></div>
                         <div class="title"><strong>Jabi Hernandiz</strong><span class="date">May 2016</span></div>
                       </div>
                     </div>
@@ -67,7 +67,7 @@ $post_created = isset($retrieve_post['post_modified']) ? safe_html(make_date($re
                   <div class="comment">
                     <div class="comment-header d-flex justify-content-between">
                       <div class="user d-flex align-items-center">
-                        <div class="image"><img src="img/user.svg" alt="..." class="img-fluid rounded-circle"></div>
+                        <div class="image"><img src="<?= app_url(); ?>/public/themes/blog/assets/img/user.svg" alt="..." class="img-fluid rounded-circle"></div>
                         <div class="title"><strong>Nikolas</strong><span class="date">May 2016</span></div>
                       </div>
                     </div>
@@ -78,7 +78,7 @@ $post_created = isset($retrieve_post['post_modified']) ? safe_html(make_date($re
                   <div class="comment">
                     <div class="comment-header d-flex justify-content-between">
                       <div class="user d-flex align-items-center">
-                        <div class="image"><img src="img/user.svg" alt="..." class="img-fluid rounded-circle"></div>
+                        <div class="image"><img src="<?= app_url(); ?>/public/themes/blog/assets/img/user.svg" alt="..." class="img-fluid rounded-circle"></div>
                         <div class="title"><strong>John Doe</strong><span class="date">May 2016</span></div>
                       </div>
                     </div>
