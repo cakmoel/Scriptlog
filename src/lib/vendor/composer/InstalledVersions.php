@@ -14,24 +14,24 @@ class InstalledVersions
 private static $installed = array (
   'root' => 
   array (
-    'pretty_version' => '1.0.0+no-version-set',
-    'version' => '1.0.0.0',
+    'pretty_version' => 'dev-master',
+    'version' => 'dev-master',
     'aliases' => 
     array (
     ),
-    'reference' => NULL,
+    'reference' => 'ad57682ca8fffd07cef7c15eedfea9277cd84d7c',
     'name' => '__root__',
   ),
   'versions' => 
   array (
     '__root__' => 
     array (
-      'pretty_version' => '1.0.0+no-version-set',
-      'version' => '1.0.0.0',
+      'pretty_version' => 'dev-master',
+      'version' => 'dev-master',
       'aliases' => 
       array (
       ),
-      'reference' => NULL,
+      'reference' => 'ad57682ca8fffd07cef7c15eedfea9277cd84d7c',
     ),
     'container-interop/container-interop' => 
     array (
@@ -159,21 +159,21 @@ private static $installed = array (
     ),
     'laminas/laminas-servicemanager' => 
     array (
-      'pretty_version' => '3.14.0',
-      'version' => '3.14.0.0',
+      'pretty_version' => '3.16.0',
+      'version' => '3.16.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => '918de970b2c3d42acebff3d431d76db52b6a32a2',
+      'reference' => '863c66733740cd36ebf5e700f4258ef2c68a2a24',
     ),
     'laminas/laminas-stdlib' => 
     array (
-      'pretty_version' => '3.10.1',
-      'version' => '3.10.1.0',
+      'pretty_version' => '3.11.0',
+      'version' => '3.11.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => '0d669074845fc80a99add0f64025192f143ef836',
+      'reference' => 'aad7d2b11ba0069ba0d9b40f6dde3c2fa664b57f',
     ),
     'melbahja/seo' => 
     array (
@@ -304,12 +304,12 @@ private static $installed = array (
     ),
     'symfony/finder' => 
     array (
-      'pretty_version' => 'v5.4.8',
-      'version' => '5.4.8.0',
+      'pretty_version' => 'v5.4.11',
+      'version' => '5.4.11.0',
       'aliases' => 
       array (
       ),
-      'reference' => '9b630f3427f3ebe7cd346c277a1408b00249dad9',
+      'reference' => '7872a66f57caffa2916a584db1aa7f12adc76f8c',
     ),
     'symfony/polyfill-iconv' => 
     array (
@@ -394,12 +394,12 @@ private static $installed = array (
     ),
     'voku/portable-utf8' => 
     array (
-      'pretty_version' => '6.0.4',
-      'version' => '6.0.4.0',
+      'pretty_version' => '6.0.5',
+      'version' => '6.0.5.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'f6c78e492520115bb2d947c3a0d90a2c6b7a60a8',
+      'reference' => '6c764c2c4fcad451a0f6622260a4934cfea08aa4',
     ),
   ),
 );
