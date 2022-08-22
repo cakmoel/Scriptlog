@@ -12,6 +12,8 @@
 class CommentDao extends Dao
 {
 
+private $selected;
+
 /**
  * Constructor
  * 
@@ -31,8 +33,9 @@ class CommentDao extends Dao
  */
  public function findComments($orderBy = 'ID')
  {
-   $sql = "SELECT c.ID, c.comment_post_id, c.comment_author_name,  
-                  c.comment_author_ip, c.comment_content, c.comment_status, 
+   $sql = "SELECT c.ID, c.comment_post_id, c.comment_author_name, 
+                  c.comment_author_ip, c.comment_author_email, 
+                  c.comment_content, c.comment_status, 
                   c.comment_date, p.post_title 
            FROM tbl_comments AS c 
            INNER JOIN tbl_posts AS p 
@@ -59,9 +62,10 @@ class CommentDao extends Dao
  {
    $id_sanitized = $this->filteringId($sanitize, $id, 'sql');
    
-   $sql = "SELECT ID, comment_post_id, comment_author_name, 
-           comment_author_ip, comment_content, comment_status, 
-           comment_date FROM tbl_comments WHERE ID = ? ";
+   $sql = "SELECT ID, comment_post_id, comment_author_name,
+           comment_author_ip, comment_author_email, 
+           comment_content, comment_status, comment_date 
+           FROM tbl_comments WHERE ID = ? ";
    
    $this->setSQL($sql);
    
@@ -85,6 +89,7 @@ class CommentDao extends Dao
         'comment_post_id' => $bind['comment_post_id'],
         'comment_author_name' => $bind['comment_author_name'],
         'comment_author_ip' => $bind['comment_author_ip'],
+        'comment_author_email' => $bind['comment_author_email'],
         'comment_content' => purify_dirty_html($bind['comment_content']),
         'comment_date' => $bind['comment_date']
    ]); 
@@ -103,12 +108,12 @@ class CommentDao extends Dao
  public function updateComment($sanitize, $bind, $ID)
  {
    
-   $cleanId = $this->filteringId($sanitize, $ID, 'sql');
+   $idsanitized = $this->filteringId($sanitize, $ID, 'sql');
    $this->modify("tbl_comments", [
        'comment_author_name' => $bind['comment_author_name'],
        'comment_content' => purify_dirty_html($bind['comment_content']),
        'comment_status' => $bind['comment_status']
-   ], " ID = ".(int)$cleanId);
+   ], " ID = {$idsanitized}");
    
  }
  
@@ -122,8 +127,8 @@ class CommentDao extends Dao
  */
  public function deleteComment($id, $sanitize)
  {
-   $clean_id = $this->filteringId($sanitize, $id, 'sql');
-   $this->deleteRecord("tbl_comments", "ID = ".(int)$clean_id);
+   $idsanitized = $this->filteringId($sanitize, $id, 'sql');
+   $this->deleteRecord("tbl_comments", "ID = {$idsanitized}");
  }
  
 /**
@@ -138,9 +143,9 @@ class CommentDao extends Dao
  public function checkCommentId($id, $sanitize)
  {
    $sql = "SELECT ID FROM tbl_comments WHERE ID = ?";
-   $id_sanitized = $this->filteringId($sanitize, $id, 'sql');
+   $idsanitized = $this->filteringId($sanitize, $id, 'sql');
    $this->setSQL($sql);
-   $stmt = $this->checkCountValue([$id_sanitized]);
+   $stmt = $this->checkCountValue([$idsanitized]);
    return $stmt > 0;
  }
  
@@ -160,10 +165,10 @@ class CommentDao extends Dao
      $comment_status = array('approved' => 'Approved', 'pending' => 'Pending', 'spam' => 'Spam');
      
      if ($selected != '') {
-         $selected = $selected;
+         $this->selected = $selected;
      }
      
-     return dropdown($name, $comment_status, $selected);
+     return dropdown($name, $comment_status, $this->selected);
      
  }
 
