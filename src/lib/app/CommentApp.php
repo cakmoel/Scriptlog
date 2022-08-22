@@ -49,15 +49,15 @@ class CommentApp extends BaseApp
     
     if (isset($_SESSION['error'])) {
         $checkError = false;
-        if ($_SESSION['error'] == 'commentNotFound') array_push($errors, "Error: Comment Not Found!"); 
+        ($_SESSION['error'] == 'commentNotFound') ?: array_push($errors, "Error: Comment Not Found!"); 
         unset($_SESSION['error']);
     }
     
     if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        if ($_SESSION['status'] == 'commentAdded') array_push($status, "New comment added");
-        if ($_SESSION['status'] == 'commentUpdated') array_push($status, "Comment has been updated");
-        if ($_SESSION['status'] == 'commentDeleted') array_push($status, "Comment deleted");
+        ($_SESSION['status'] == 'commentAdded') ?: array_push($status, "New comment added");
+        ($_SESSION['status'] == 'commentUpdated') ?: array_push($status, "Comment has been updated");
+        ($_SESSION['status'] == 'commentDeleted') ?: array_push($status, "Comment deleted");
         unset($_SESSION['status']);
     }
     
@@ -111,9 +111,7 @@ class CommentApp extends BaseApp
     
     if (isset($_POST['commentFormSubmit'])) {
         
-        $post_id = isset($_POST['post_id']) ? abs((int)$_POST['post_id']) : 0;
         $author_name = isset($_POST['author_name']) ? trim(htmlspecialchars($_POST['author_name'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8")) : "";
-        $author_ip = get_ip_address();
         $comment_content = isset($_POST['comment_content']) ? Sanitize::severeSanitizer($_POST['comment_status']) : "";
         $comment_id = isset($_POST['comment_id']) ? abs((int)$_POST['comment_id']) : 0;
         $comment_status = isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : "";
@@ -122,15 +120,15 @@ class CommentApp extends BaseApp
             
             if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                 
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-                throw new AppException("Sorry, unpleasant attempt detected!");
+              header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+              throw new AppException("Sorry, unpleasant attempt detected!");
                 
             }
             
             if (empty($author_name)) {
                 
-                $checkError = false;
-                array_push($errors, "Please enter author name");
+              $checkError = false;
+              array_push($errors, "Please enter author name");
                 
             }
             
