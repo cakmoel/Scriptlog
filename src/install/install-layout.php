@@ -1,10 +1,8 @@
 <?php
-
-function install_header($stylePath, $protocol, $server_host)
+function install_header($stylePath)
 {
 
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,7 +26,7 @@ function install_header($stylePath, $protocol, $server_host)
 <?php
 }
 
-function install_footer($stylePath, $protocol, $server_host)
+function install_footer($stylePath)
 {
 
 ?>
@@ -37,7 +35,7 @@ function install_footer($stylePath, $protocol, $server_host)
     <p class="mb-1">&copy; 
        <?php 
                
-          $starYear = 2013;
+          $starYear = 2021;
           $thisYear = date ( "Y" );
           if ($starYear == $thisYear) {
              
@@ -57,7 +55,7 @@ function install_footer($stylePath, $protocol, $server_host)
 <ul class="list-inline">
           <li class="list-inline-item"><a href="../license.txt" target="_blank" rel="noopener noreferrer" title="license.txt" >License</a></li>
           <li class="list-inline-item"><a href="#"><?= 'Memory used: <strong>'. convert_memory_used(memory_get_usage()).'</strong>'; ?></a></li>
-          <li class="list-inline-item"><a href="#"><?= 'Execution time: <strong>'.$time = (microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]). ' seconds</strong>'; ?></a></li>
+          <li class="list-inline-item"><a href="#"><?= 'Execution time: <strong>'.(microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]). ' seconds</strong>'; ?></a></li>
           <li class="list-inline-item"><a href="../readme.html" target="_blank" rel="noopener noreferrer" title="readme.html">ReadMe</a></li>
         </ul>
       </footer>
@@ -117,7 +115,7 @@ function get_sisfo()
                 ?>
                 <small class="<?=(isset($php_passed)) ? $php_passed : 'text-danger'; ?>"><?=(isset($php_passed)) ? PHP_VERSION : $errors['errorChecking'] = 'Requires PHP 5.6 or newer'; ?></small>
               </div>
-              <span class="<?=(isset($php_passed)) ? $php_passed : 'text-danger'; ?>"><i class="<?=(isset($php_checked)) ? $php_checked : 'fa fa-close fa-lg'; ?>"></i></span>
+              <span class="<?=(isset($php_passed)) ? $php_passed : 'text-danger'; ?>"><i class="<?=(isset($php_checked)) ? $php_checked : 'fa fa-close fa-lg'; ?>" aria-hidden="true"></i></span>
                
             </li>
             
