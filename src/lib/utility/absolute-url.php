@@ -15,8 +15,7 @@
  */
 function absolute_url($page, $url)
 {
- 
- if (substr($page, 0, 7) !== APP_PROTOCOL . '://') return $url;
+   checking_page_url($page, $url);
 
     $parse = parse_url($page);
     $root = $parse['scheme'] . '://' . $parse['host'];
@@ -42,8 +41,23 @@ function absolute_url($page, $url)
 
     }
 
-    $url_sanitized = sanitize_urls($url);
-
-    return $url_sanitized;
+    return sanitize_urls($url);
     
+}
+
+/**
+ * checking_page_url
+ *
+ * @param string $page
+ * @param string $url
+ */
+function checking_page_url($page, $url)
+{
+
+ if ( substr($page, 0, 7) !== APP_PROTOCOL . '://') {
+
+    return $url;
+
+ }
+
 }
