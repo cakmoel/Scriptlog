@@ -3,6 +3,8 @@
  * detect_origin
  * 
  * get origin of request with php
+ * @category function
+ * @version 1.0
  * @see https://stackoverflow.com/questions/41326257/how-i-can-get-origin-of-request-with-php
  * @return string
  * 
