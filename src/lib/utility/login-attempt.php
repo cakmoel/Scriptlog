@@ -1,6 +1,6 @@
 <?php
 /**
- * get_login_attempt
+ * get_login_attempt()
  *
  * @category function
  * @author M.Noermoehammad
@@ -39,7 +39,7 @@ function create_login_attempt($ip)
 }
 
 /**
- * Delete login attempt
+ * Delete login attempt()
  *
  * @param string $ip
  * @return void
@@ -55,7 +55,7 @@ function delete_login_attempt($ip)
 }
 
 /**
- * get_user_signin
+ * get_user_signin()
  *
  * @param string $user_login
  * @return array
@@ -83,7 +83,7 @@ return db_prepared_query($sql, [$user_login], "s")->get_result()->fetch_assoc();
 }
 
 /**
- * sign_in_count
+ * sign_in_count()
  *
  * @param int|numeric $sign_in_count
  * @param string $login
@@ -109,7 +109,7 @@ return db_prepared_query($sql, [$sign_in_count, $login], "is");
 }
 
 /**
- * locked_down_until
+ * locked_down_until()
  *
  * @param int|numeric $sign_in_count
  * @param string $locked_until
@@ -135,7 +135,7 @@ return db_prepared_query($sql, [$sign_in_count, $locked_until, $login], "iss");
 }
 
 /**
- * signin_count_to_zero
+ * signin_count_to_zero()
  *
  * @param string $login
  * @return void
@@ -159,7 +159,7 @@ return db_prepared_query($sql, [$login], 's');
 }
 
 /**
- * locked_down_to_null
+ * locked_down_to_null()
  *
  * @param string $login
  * @return void
@@ -183,7 +183,7 @@ return db_prepared_query($sql, [$login], 's');
 }
 
 /**
- * alert_login_attempt
+ * alert_login_attempt()
  *
  * @category function
  * @author M.Noermoehammad
