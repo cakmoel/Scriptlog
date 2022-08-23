@@ -23,8 +23,6 @@ function access_control_list($action = null)
   
   $authenticator = new Authentication($user_dao, $user_token, $form_validator);
   
-  $access_control = $authenticator->userAccessControl($action);
-
-  return $access_control;
+  return $authenticator->userAccessControl($action);
 
 }
