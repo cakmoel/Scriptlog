@@ -69,7 +69,7 @@ if (imagecopyresampled($new_canves, $img_src, 0, 0, 0, 0, $new_width, $new_heigh
         
     }
 
-    if (is_resource($new_canves)) {
+    if (is_resource($new_canves) || $new_canves instanceof \GdImage) {
 
         imagedestroy($new_canves);
 
@@ -160,7 +160,7 @@ if (imagecopyresampled($new_canves, $img_src, 0, 0, $x_offset, $y_offset, $new_s
 
     }
 
-    if (is_resource($new_canves)) {
+    if (is_resource($new_canves) || $new_canves instanceof \GdImage) {
 
         imagedestroy($new_canves);
 
