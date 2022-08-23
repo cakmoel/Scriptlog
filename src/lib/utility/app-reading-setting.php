@@ -20,6 +20,7 @@ if (is_array($results)) {
 
         switch ($data['setting_name']) {
 
+            default:
             case 'post_per_page':
                 
                  $reading_settings['post_per_page'] = $data['setting_value'];
