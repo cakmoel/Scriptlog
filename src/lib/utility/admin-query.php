@@ -13,15 +13,14 @@
 function admin_query()
 {
 
-$whitelist = array(
+return array(
     
-'dashboard'=>'dashboard.php', 'posts'=>'posts.php', 'medialib'=>'medialib.php',
-'pages'=>'pages.php', 'topics'=>'topics.php', 'tags'=>'tags.php', 'comments'=>'comments.php', 
-'reply'=>'reply.php', 'templates'=>'templates.php', 'menu'=>'menu.php', 
-'users'=>'users.php', 'option-general'=>'option-general.php', 'option-permalink'=>'option-permalink.php', 
-'option-reading'=>'option-reading.php','plugins'=>'plugins.php', 'logout'=>'logout.php', 
-'403'=>'403.php', '404'=>'404.php');
-
-return $whitelist;
+    'dashboard'=>'dashboard.php', 'posts'=>'posts.php', 'medialib'=>'medialib.php',
+    'pages'=>'pages.php', 'topics'=>'topics.php', 'tags'=>'tags.php', 'comments'=>'comments.php', 
+    'reply'=>'reply.php', 'templates'=>'templates.php', 'menu'=>'menu.php', 
+    'users'=>'users.php', 'option-general'=>'option-general.php', 'option-permalink'=>'option-permalink.php', 
+    'option-reading'=>'option-reading.php','plugins'=>'plugins.php', 'logout'=>'logout.php', 
+    '403'=>'403.php', '404'=>'404.php'
+);
 
 }
