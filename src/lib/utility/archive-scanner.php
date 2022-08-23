@@ -37,11 +37,11 @@ $result = $scanner->scanFile($file);
 
 if ($result->isBomb()) {
 
-    $is_bomb = true;
+   $is_bomb = true;
 
 } else {
 
-    $is_bomb = false;
+   $is_bomb = false;
 
 }
 
