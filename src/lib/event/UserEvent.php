@@ -513,21 +513,7 @@ class UserEvent
  public function isUserLevel()
  {
 
-   if (isset($_COOKIE['scriptlog_auth'])) {
-
-      Authorization::setAuthInstance(new Authentication($this->userDao, $this->userToken, $this->validator));
-
-      return Authorization::authorizeLevel();
-
-   }
-   
-   if (isset(Session::getInstance()->scriptlog_session_level)) {
-
-      return Session::getInstance()->scriptlog_session_level;
-  
-   }
-  
-   return false;
+  return user_privilege();
 
  }
 
