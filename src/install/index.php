@@ -97,7 +97,7 @@ if ($install != 'install') {
     
     if ( ! preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $username)) {
 
-      $errors['errorSetup'] = 'username Undocumented variable variablefor admin requires only alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
+      $errors['errorSetup'] = 'username for admin requires only alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
       
     }
 
