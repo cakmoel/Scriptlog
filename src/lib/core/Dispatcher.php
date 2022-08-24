@@ -108,8 +108,7 @@ final class Dispatcher
   {
     $script_name = rtrim(dirname($_SERVER["SCRIPT_NAME"]), '/' );
     $request_uri = '/' . trim(str_replace( $script_name, '', $_SERVER['REQUEST_URI'] ), '/' );
-    $uri_requested = urldecode( $request_uri );
-    return $uri_requested;
+    return urldecode( $request_uri );
   }
 
 /**
