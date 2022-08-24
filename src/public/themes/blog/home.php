@@ -6,8 +6,8 @@
     foreach (featured_post() as $hero_headline) {
 
       $featured_hero_id = isset($hero_headline['ID']) ? (int)$hero_headline['ID'] : "";
-      $featured_hero_img = (isset($hero_headline['media_filename']) && $hero_headline['media_filename'] !== "") ? safe_html($hero_headline['media_filename']) : "";
-      $featured_hero_title = isset($hero_headline['post_title']) ? safe_html($hero_headline['post_title']) : "";
+      $featured_hero_img = (isset($hero_headline['media_filename']) && $hero_headline['media_filename'] !== "") ? htmlout($hero_headline['media_filename']) : "";
+      $featured_hero_title = isset($hero_headline['post_title']) ? htmlout($hero_headline['post_title']) : "";
       
     }
 
@@ -28,8 +28,8 @@
 
  <?php
     foreach (sticky_page() as $sticky) :
-      $sticky_title = isset($sticky['post_title']) ? safe_html($sticky['post_title']) : "";
-      $sticky_content = isset($sticky['post_content']) ? safe_html($sticky['post_content']) : "";
+      $sticky_title = isset($sticky['post_title']) ? htmlout($sticky['post_title']) : "";
+      $sticky_content = isset($sticky['post_content']) ? htmlout($sticky['post_content']) : "";
     endforeach;
   ?>
 
@@ -63,11 +63,11 @@
 
           $random_post_id = isset($random_post['ID']) ? (int)$random_post['ID'] : "";
           $random_image_id = (isset($random_post['media_id']) && $random_post['media_id'] !== 0) ? (int)$random_post['media_id'] : ""; 
-          $random_post_img = (isset($random_post['media_filename']) && $random_post['media_filename'] != "") ? safe_html($random_post['media_filename']) : "";
-          $random_post_author = (isset($random_post['user_login']) || isset($random_post['user_fullname']) ? safe_html($random_post['user_login']) : safe_html($random_post['user_fullname']));
-          $random_post_title = isset($random_post['post_title']) ? escape_html($random_post['post_title']) : "";
+          $random_post_img = (isset($random_post['media_filename']) && $random_post['media_filename'] != "") ? htmlout($random_post['media_filename']) : "";
+          $random_post_author = (isset($random_post['user_login']) || isset($random_post['user_fullname']) ? htmlout($random_post['user_login']) : htmlout($random_post['user_fullname']));
+          $random_post_title = isset($random_post['post_title']) ? htmlout($random_post['post_title']) : "";
           $random_post_content = isset($random_post['post_content']) ? paragraph_l2br($random_post['post_content']) : "";
-          $random_post_created = isset($random_post['post_modified'])  ? safe_html(make_date($random_post['post_modified'])) : safe_html(make_date($random_post['post_date'])); 
+          $random_post_created = isset($random_post['post_modified'])  ? htmlout(make_date($random_post['post_modified'])) : htmlout(make_date($random_post['post_date'])); 
 
           if ($r % 2 == 1) :
 
@@ -100,7 +100,7 @@
                  </div>
                </div>
              </div>
-             <div class="image col-lg-5"><img src="<?= isset($random_post_img) ? invoke_webp_image($random_post_img) : "https://via.placeholder.com/516x344"; ?>" alt="<?= isset($random_post['media_caption']) ? safe_html($random_post['media_caption']) : safe_html($random_post['post_title']); ?>"></div>
+             <div class="image col-lg-5"><img src="<?= isset($random_post_img) ? invoke_webp_image($random_post_img) : "https://via.placeholder.com/516x344"; ?>" alt="<?= isset($random_post['media_caption']) ? htmlout($random_post['media_caption']) : htmlout($random_post['post_title']); ?>"></div>
 
            </div>
 
@@ -109,7 +109,7 @@
           ?>
 
            <div class="row d-flex align-items-stretch">
-           <div class="image col-lg-5"><img src="<?= isset($random_post_img) ? invoke_webp_image($random_post_img) : "https://via.placeholder.com/516x344"; ?>" alt="<?= isset($random_post['media_caption']) ? safe_html($random_post['media_caption']) : safe_html($random_post['post_title']); ?>"></div>
+           <div class="image col-lg-5"><img src="<?= isset($random_post_img) ? invoke_webp_image($random_post_img) : "https://via.placeholder.com/516x344"; ?>" alt="<?= isset($random_post['media_caption']) ? htmlout($random_post['media_caption']) : htmlout($random_post['post_title']); ?>"></div>
              <div class="text col-lg-7">
                <div class="text-inner d-flex align-items-center">
                  <div class="content">
@@ -154,8 +154,8 @@
     foreach (featured_post() as $divider_content) {
 
       $featured_divider_id = isset($divider_content['ID']) ? (int)$divider_content['ID'] : "";
-      $featured_divider_img = (isset($divider_content['media_filename']) && $divider_content['media_filename'] != "") ? safe_html($divider_content['media_filename']) : "";
-      $featured_divider_title = isset($divider_content['post_title']) ? safe_html($divider_content['post_title']) : "";
+      $featured_divider_img = (isset($divider_content['media_filename']) && $divider_content['media_filename'] != "") ? htmlout($divider_content['media_filename']) : "";
+      $featured_divider_title = isset($divider_content['post_title']) ? htmlout($divider_content['post_title']) : "";
     }
 
   ?>
@@ -197,10 +197,10 @@
           foreach ($latest_posts as $latest_post) :
 
             $latest_post_id = isset($latest_post['ID']) ? (int)$latest_post['ID'] : "";
-            $latest_post_title = isset($latest_post['post_title']) ? safe_html($latest_post['post_title']) : "";
-            $latest_post_img = (isset($latest_post['media_filename']) && $latest_post['media_filename'] !== "" ) ? safe_html($latest_post['media_filename']) : "";
-            $latest_img_caption = isset($latest_post['media_caption']) ? safe_html($latest_post['media_caption']) : "";
-            $latest_post_created = isset($latest_post['post_modified']) ? safe_html($latest_post['post_modified']) : safe_html($latest_post['post_date']);
+            $latest_post_title = isset($latest_post['post_title']) ? htmlout($latest_post['post_title']) : "";
+            $latest_post_img = (isset($latest_post['media_filename']) && $latest_post['media_filename'] !== "" ) ? htmlout($latest_post['media_filename']) : "";
+            $latest_img_caption = isset($latest_post['media_caption']) ? htmlout($latest_post['media_caption']) : "";
+            $latest_post_created = isset($latest_post['post_modified']) ? htmlout($latest_post['post_modified']) : htmlout($latest_post['post_date']);
 
         ?>
 
@@ -251,8 +251,8 @@
 
         foreach ($galleries as $gallery) :
 
-          $img_filename = isset($gallery['media_filename']) ? safe_html($gallery['media_filename']) : "";
-          $img_alt = isset($gallery['media_caption']) ? safe_html($gallery['media_caption']) : "";
+          $img_filename = isset($gallery['media_filename']) ? htmlout($gallery['media_filename']) : "";
+          $img_alt = isset($gallery['media_caption']) ? htmlout($gallery['media_caption']) : "";
 
       ?>
       
