@@ -8,7 +8,7 @@
  */
 function html($text)
 {
-  return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+  return safe_html($text);
 }
 
 /**
@@ -19,7 +19,7 @@ function html($text)
  */
 function htmlout($text)
 {
-  echo escape_html(html($text));
+  return escape_html(html($text));
 }
 
 /**
@@ -70,9 +70,7 @@ function markdown_html_out($text)
 function copyright()
 {
   
-  $copyright = '&copy;';
-
-  return $copyright;
+  return '&copy;';
 
 }
 
