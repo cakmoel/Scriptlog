@@ -27,14 +27,6 @@ $response = curl_exec($curlInit);
  
 curl_close($curlInit);
 
-if ($response) {
-
-    return true;
-
-} else {
-
-    return false;
-
-}
+return ( $response ) ? true : false;
 
 }
