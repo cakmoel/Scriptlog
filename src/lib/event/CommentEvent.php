@@ -151,13 +151,13 @@ class CommentEvent
     $this->validator->sanitize($this->comment_id, 'int');
     $this->validator->sanitize($this->author_name, 'string');
     
-    $id_sanitized = $this->sanitizer->sanitasi($this->comment_id, 'sql');
+    $idsanitized = $this->sanitizer->sanitasi($this->comment_id, 'sql');
     
     return $this->commentDao->updateComment($this->sanitizer, [
         'comment_author_name' => $this->author_name,
         'comment_content' => $this->content,
         'comment_status' => $this->status
-    ], $this->comment_id);
+    ], $idsanitized);
     
   }
   
