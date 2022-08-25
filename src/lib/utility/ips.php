@@ -15,7 +15,7 @@
 function defender()
 {
 
-if (file_exists(basename(__DIR__ . DS . '.guard'. DS . 'fortres.gzip'))) {
+if ( file_exists(basename(__DIR__ . DS . '.guard'. DS . 'fortres.gzip') ) ) {
 
   header("Content-Encoding: gzip");
   header("Content-Length:".filesize(basename(__DIR__ . DS . '.guard' . DS . 'fortres.gzip')));
