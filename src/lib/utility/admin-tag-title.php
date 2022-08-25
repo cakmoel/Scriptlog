@@ -21,15 +21,11 @@ function admin_tag_title($value)
 
              $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
 
-             return $title;
-
             break;
 
          case 'medialib':
 
              $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
-
-             return $title;
 
              break;
 
@@ -37,15 +33,11 @@ function admin_tag_title($value)
             
              $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
 
-             return $title;
-
              break;
 
          case 'menu':
 
              $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
-
-             return $title;
 
              break;
 
@@ -53,15 +45,11 @@ function admin_tag_title($value)
 
             $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
 
-            return $title;
-
              break;
 
          case 'plugins':
 
             $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
-
-            return $title;
 
             break;
 
@@ -69,15 +57,11 @@ function admin_tag_title($value)
 
             $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
 
-            return $title;
-
             break;
         
          case 'topics':
 
             $title .= safe_html(ucfirst("categories"))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
-
-            return $title;
 
             break;
           
@@ -85,15 +69,11 @@ function admin_tag_title($value)
 
             $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
 
-            return $title;
-
             break;
             
          case 'option-general':
 
              $title .= safe_html("General settings")." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
-
-             return $title;
 
              break;
 
@@ -101,15 +81,11 @@ function admin_tag_title($value)
 
             $title .= safe_html("Permalink settings")." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
 
-            return $title;
-
            break;
 
          case 'option-reading':
 
             $title .= safe_html("Reading settings")." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
-
-            return $title;
 
            break;
         
@@ -117,15 +93,11 @@ function admin_tag_title($value)
 
             $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
 
-            return $title;
-
           break;
 
          case 'dashboard':
 
             $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
-
-             return $title;
 
            break;
          
