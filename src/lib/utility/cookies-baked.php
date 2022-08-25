@@ -13,17 +13,7 @@
  */
 function is_cookies_secured()
 {
-  
-  if(is_ssl() == true) {
-
-      return true;
-
-  } else {
-
-      return false;
-
-  }
-
+  return ( is_ssl() === true ) ? true : false;
 }
 
 /**
@@ -40,11 +30,7 @@ function is_cookies_secured()
  */
 function set_session_cookies_key($app_email, $app_key)
 {
-
-  $session_cookies_key = hash_hmac('sha384', $app_email.$app_key.get_ip_address(), hash('sha384', $app_email.$app_key.get_ip_address(), true));
-  
-  return $session_cookies_key;
-
+  return hash_hmac('sha384', $app_email.$app_key.get_ip_address(), hash('sha384', $app_email.$app_key.get_ip_address(), true));
 }
 
 /**
@@ -100,9 +86,7 @@ function set_cookies_path()
  
  $admin_path = dirname(__FILE__).'/../../'.APP_ADMIN;
  
- $cookies_path = str_replace($root_path, '', $admin_path);
- 
- return $cookies_path;
+ return str_replace($root_path, '', $admin_path);
   
 }
 
@@ -142,7 +126,7 @@ function set_cookies_path()
 function set_cookies_scl($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite="Strict")
 {
   
-  if(PHP_VERSION_ID <= 70300) {
+  if ( PHP_VERSION_ID <= 70300 ) {
 
     setcookie($name, $value, $expire, "$path; samesite=$samesite", $domain, $secure, $httponly);
      
