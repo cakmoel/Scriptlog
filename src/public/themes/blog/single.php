@@ -1,13 +1,13 @@
 <?php 
 
 $retrieve_post = (rewrite_status() === 'yes') ? retrieve_detail_post(request_path()->param2) : retrieve_detail_post(HandleRequest::isQueryStringRequested()['value']);
-$post_img = isset($retrieve_post['media_filename']) ? escape_html($retrieve_post['media_filename']) : "";
+$post_img = isset($retrieve_post['media_filename']) ? htmlout($retrieve_post['media_filename']) : "";
 $post_id = isset($retrieve_post['ID']) ? (int)$retrieve_post['ID'] : "";
-$post_title = isset($retrieve_post['post_title']) ? escape_html($retrieve_post['post_title']) : "";
-$post_author = ( isset($retrieve_post['user_login']) ) ? escape_html($retrieve_post['user_login']) : escape_html($retrieve_post['user_fullname']);
-$img_alt = isset($retrieve_post['media_caption']) ? escape_html($retrieve_post['media_caption']) : "";
+$post_title = isset($retrieve_post['post_title']) ? htmlout($retrieve_post['post_title']) : "";
+$post_author = ( isset($retrieve_post['user_login']) ) ? htmlout($retrieve_post['user_login']) : htmlout($retrieve_post['user_fullname']);
+$img_alt = isset($retrieve_post['media_caption']) ? htmlout($retrieve_post['media_caption']) : "";
 $post_content = isset($retrieve_post['post_content']) ? html_entity_decode(htmLawed($retrieve_post['post_content'])) : "";
-$post_created = isset($retrieve_post['post_modified']) ? safe_html(make_date($retrieve_post['post_modified'])) : safe_html(make_date($retrieve_post['post_date']));
+$post_created = isset($retrieve_post['post_modified']) ? htmlout(make_date($retrieve_post['post_modified'])) : htmlout(make_date($retrieve_post['post_date']));
 
 ?>
 
@@ -50,43 +50,9 @@ $post_created = isset($retrieve_post['post_modified']) ? safe_html(make_date($re
                 </div>
 
                 <div class="post-comments">
-                  <header>
-                    <h3 class="h6">Post Comments<span class="no-of-comments">(3)</span></h3>
-                  </header>
-                  <div class="comment">
-                    <div class="comment-header d-flex justify-content-between">
-                      <div class="user d-flex align-items-center">
-                        <div class="image"><img src="<?= app_url(); ?>/public/themes/blog/assets/img/user.svg" alt="..." class="img-fluid rounded-circle"></div>
-                        <div class="title"><strong>Jabi Hernandiz</strong><span class="date">May 2016</span></div>
-                      </div>
-                    </div>
-                    <div class="comment-body">
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
-                    </div>
-                  </div>
-                  <div class="comment">
-                    <div class="comment-header d-flex justify-content-between">
-                      <div class="user d-flex align-items-center">
-                        <div class="image"><img src="<?= app_url(); ?>/public/themes/blog/assets/img/user.svg" alt="..." class="img-fluid rounded-circle"></div>
-                        <div class="title"><strong>Nikolas</strong><span class="date">May 2016</span></div>
-                      </div>
-                    </div>
-                    <div class="comment-body">
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
-                    </div>
-                  </div>
-                  <div class="comment">
-                    <div class="comment-header d-flex justify-content-between">
-                      <div class="user d-flex align-items-center">
-                        <div class="image"><img src="<?= app_url(); ?>/public/themes/blog/assets/img/user.svg" alt="..." class="img-fluid rounded-circle"></div>
-                        <div class="title"><strong>John Doe</strong><span class="date">May 2016</span></div>
-                      </div>
-                    </div>
-                    <div class="comment-body">
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
-                    </div>
-                  </div>
+                  
                 </div>
+
                 <div class="add-comment">
                   <header>
                     <h3 class="h6">Leave a reply</h3>
@@ -108,6 +74,7 @@ $post_created = isset($retrieve_post['post_modified']) ? safe_html(make_date($re
                     </div>
                   </form>
                 </div>
+
               </div>
             </div>
           </div>
