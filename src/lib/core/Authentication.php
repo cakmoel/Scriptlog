@@ -545,7 +545,7 @@ public function userAccessControl($control = null)
 
       case ActionConst::USERS:
             
-          if($this->accessLevel() !== 'administrator') {
+          if ( $this->accessLevel() !== 'administrator') {
 
             return false;
 
