@@ -10,5 +10,5 @@
  */
 function check_file_name($filename)
 {
-  return ( ( preg_match("`^[-0-9A-Z_\.]+$`i", basename($filename) ) ? true : false ) );
+  return ( preg_match("`^[-0-9A-Z_\.]+$`i", basename($filename) ) ) ? true : false  ;
 }
