@@ -28,11 +28,7 @@ use Egulias\EmailValidator\Validation\RFCValidation;
  */
 function validator_email_instance()
 {
-  
-  $validator_email = new EmailValidator();
-  
-  return $validator_email;
-
+ return new EmailValidator();
 }
 
 /**
@@ -70,6 +66,5 @@ function email_validation($email, $validation_type)
 function email_multiple_validation($email)
 {
   $multiple_validations = new MultipleValidationWithAnd([new RFCValidation(), new DNSCheckValidation()]);
-
   return validator_email_instance()->isValid($email, $multiple_validations);
 }
