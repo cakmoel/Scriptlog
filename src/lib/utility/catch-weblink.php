@@ -10,17 +10,17 @@
  * @license MIT
  * @version 1.0
  * @param string $web_page
- * @return string
+ * @return array
  * 
  */
 function catch_weblink($web_page)
 {
 
+ $links = [];
+
  $contents = file_get_contents($web_page);
 
-if (!$contents) return null;
-
- $links = [];
+if (!$contents)  { return null; }
 
  $dom_doc = new DOMDocument();
 
