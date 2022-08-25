@@ -16,6 +16,7 @@ require dirname(__FILE__) . '/functions.php';
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/dropdown.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.css">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.css">
 <link rel="shortcut icon" href="<?= app_url() . '/favicon.ico'; ?>">
 
 <?= theme_meta()['site_schema']; ?>
@@ -32,13 +33,13 @@ require dirname(__FILE__) . '/functions.php';
   <nav class="navbar navbar-expand-md navbar-light bg-light btco-hover-menu">
   <div class="search-area">
     <div class="search-area-inner d-flex align-items-center justify-content-center">
-    <div class="close-btn"><i class="icon-close"></i></div>
+    <div class="close-btn"><i class="icon-close" aria-hidden="true"></i></div>
             <div class="row d-flex justify-content-center">
               <div class="col-md-8">
                 <form action="#">
                   <div class="form-group">
                     <input type="search" name="search" id="search" placeholder="What are you looking for?">
-                    <button type="submit" class="submit"><i class="icon-search-1"></i></button>
+                    <button type="submit" class="submit"><i class="icon-search-1" aria-hidden="true"></i></button>
                   </div>
                 </form>
               </div>
@@ -117,7 +118,7 @@ require dirname(__FILE__) . '/functions.php';
               <li class="nav-item"><a href="#" class="nav-link ">Contact</a>
               </li>
             </ul>
-            <div class="navbar-text"><a href="#" class="search-btn"><i class="icon-search-1"></i></a></div>
+            <div class="navbar-text"><a href="#" class="search-btn"><i class="icon-search-1" aria-hidden="true"></i></a></div>
             <ul class="langs navbar-text"></ul>
           </div>
         </div>
