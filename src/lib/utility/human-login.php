@@ -38,7 +38,7 @@ function human_login_id()
 function verify_human_login_id($loginId)
 {
 
-if( ( !isset($_SESSION['human_login_id']) ) || ( !isset($loginId) ) || ( $_SESSION['human_login_id'] !== $loginId ) ) { 
+if( ( ! isset($_SESSION['human_login_id']) ) || ( ! isset($loginId) ) || ( $_SESSION['human_login_id'] !== $loginId ) ) { 
      
    return false;
    
@@ -136,7 +136,7 @@ if( false === verify_human_login_id($loginId)) {
 
 }
 
-if(!isset($uniqueKey) && ($uniqueKey !== md5(app_key().$ip))) {
+if( ! isset($uniqueKey) && ( $uniqueKey !== md5(app_key().$ip) ) ) {
 
    http_response_code(400);
    exit("400 Bad Request ");
@@ -204,16 +204,16 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
       
    $failed_login_attempt = get_login_attempt($ip)['failed_login_attempt'];
    $data = get_user_signin($login);
-   $datetime = ( !empty($data['user_locked_until']) ? strtotime($data['user_locked_until']) : null );
-   $signin = ( !empty($data['user_signin_count']) ? $data['user_signin_count'] : 0 );
+   $datetime = ( ! empty($data['user_locked_until'] ) ? strtotime($data['user_locked_until']) : null );
+   $signin = ( ! empty($data['user_signin_count'] ) ? $data['user_signin_count'] : 0 );
    
- if ( !empty($values) && $captcha_verified === true ) {
+ if ( ( ! empty($values) ) && ( $captcha_verified === true ) ) {
        
-   $authenticate_user = is_a($authenticator, 'Authentication') ? $authenticator->validateUserAccount($login, $user_pass) : "";
+   $authenticate_user = is_a( $authenticator, 'Authentication' ) ?: $authenticator->validateUserAccount($login, $user_pass);
    
-   if (time() > $datetime) {
+   if ( time() > $datetime ) {
    
-      if ($authenticate_user === false) {
+      if ( $authenticate_user === false ) {
    
          http_response_code(403);
          $errors['errorMessage'] = "Check your login details";
@@ -293,7 +293,7 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
              
       }
       
-      if (scriptpot_validate($values) === false) {
+      if ( scriptpot_validate($values) === false ) {
          
          http_response_code(403);
          $errors['errorMessage'] = "anomaly behaviour detected!";
