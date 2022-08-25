@@ -26,7 +26,7 @@ function check_weblink($page, $timeout, $runtime)
 ini_set('max_execution_time', $runtime);
 
 $contents = file_get_contents($page);
-if (!$contents) return array(1, array($page));
+if (!$contents) { return array(1, array($page) ) ; }
 
 $checked = array();
 $failed = array();
@@ -41,7 +41,7 @@ for ($i=0; $i < count($urls); $i++) {
 
           $checked[] = $urls[$i];
 
-          if (!file_get_contents($urls[$i], 0, $context, 0, 256)) $failed[$fail++] = $urls[$i];
+          if (!file_get_contents($urls[$i], 0, $context, 0, 256)) { $failed[$fail++] = $urls[$i]; }
 
      }
 
