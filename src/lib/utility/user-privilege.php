@@ -13,15 +13,15 @@ function user_privilege()
     
  if (isset($_COOKIE['scriptlog_auth'])) {
   
-    Authorization::setAuthInstance(new Authentication(new UserDao, new UserTokenDao, new FormValidator));
+   Authorization::setAuthInstance(new Authentication(new UserDao, new UserTokenDao, new FormValidator));
           
-    return Authorization::authorizeLevel();
+   return Authorization::authorizeLevel();
   
  }
   
  if (isset(Session::getInstance()->scriptlog_session_level)) {
   
-    return Session::getInstance()->scriptlog_session_level;
+   return Session::getInstance()->scriptlog_session_level;
       
  }
 
