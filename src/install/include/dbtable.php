@@ -120,11 +120,12 @@ FOREIGN KEY (topic_id) REFERENCES tbl_topics(ID) ON DELETE CASCADE ON UPDATE CAS
 $tblComment = "CREATE TABLE IF NOT EXISTS tbl_comments (
 ID BIGINT(20) unsigned NOT NULL auto_increment,
 comment_post_id BIGINT(20) unsigned NOT NULL,
+comment_parent_id BIGINT(20) DEFAULT NULL,
 comment_author_name VARCHAR(60) NOT NULL,
 comment_author_ip VARCHAR(100) NOT NULL,
 comment_author_email VARCHAR(100) DEFAULT NULL,
 comment_content text NOT NULL,
-comment_status VARCHAR(20) NOT NULL DEFAULT 'approved',
+comment_status VARCHAR(20) NOT NULL DEFAULT 'pending',
 comment_date datetime NOT NULL DEFAULT '1988-07-01 08:00:00',
 PRIMARY KEY (ID),
 FOREIGN KEY (comment_post_id) REFERENCES tbl_posts(ID)
