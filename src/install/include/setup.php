@@ -455,18 +455,8 @@ function escapeHTML($html)
 function generate_license($suffix = null) 
 {
     
-  // Default tokens contain no "ambiguous" characters: 1,i,0,o
-  if(isset($suffix)){
-           
-     $num_segments = 3;
-     $segment_chars = 6;
-     
-  } else {
-      
-     $num_segments = 3;
-     $segment_chars = 6;
-    
-  }
+  $num_segments = 3;
+  $segment_chars = 6;
   
   $tokens = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   $license_string = '';
@@ -572,35 +562,31 @@ function purge_installation()
      
     if (function_exists("random_bytes")) {
              
-        $bytes = random_bytes(ceil($length / 2));
+      $bytes = random_bytes(ceil($length / 2));
         
     } elseif (function_exists("openssl_random_pseudo_bytes")) {
         
-        $bytes = openssl_random_pseudo_bytes(ceil($length / 2));
+      $bytes = openssl_random_pseudo_bytes(ceil($length / 2));
         
     } else {
         
-        trigger_error("no cryptographically secure random function available", E_USER_NOTICE);
+      trigger_error("no cryptographically secure random function available", E_USER_NOTICE);
         
     }
 
     $disabled = APP_PATH . substr(bin2hex($bytes), 0, $length).'.log';
 
-    if (is_writable(APP_PATH)) {
+    if ( ( is_writable( APP_PATH ) ) && ( rename(__DIR__ . '/../index.php', $disabled ) ) ) {
 
-        if(rename(__DIR__ . '/../index.php', $disabled)) {
+      $clean_installation = '<?php ';
+     
+      file_put_contents(__DIR__ . '/../index.php', $clean_installation);
 
-            $clean_installation = '<?php ';
-     
-            file_put_contents(__DIR__ . '/../index.php', $clean_installation);
+      unset($_SESSION['token']);
 
-            unset($_SESSION['token']);
-     
-            $_SESSION = array();
-     
-            session_destroy();
-            
-        }
+      $_SESSION = array();
+
+      session_destroy();
         
     } 
 

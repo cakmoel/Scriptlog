@@ -109,21 +109,21 @@ if ($install != 'install') {
     
     if (empty($password) && (empty($confirm))) { 
 
-        $errors['errorSetup'] = 'Admin password should not be empty';
+      $errors['errorSetup'] = 'Admin password should not be empty';
 
     } elseif ($password != $confirm) {
 
-        $errors['errorSetup'] = 'Admin password should both be equal';
+      $errors['errorSetup'] = 'Admin password should both be equal';
 
     } elseif ( ! preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
 
-        $errors['errorSetup'] = 'Admin password requires at least 8 characters, uppercase and lowercase letters, numbers and special characters';
+      $errors['errorSetup'] = 'Admin password requires at least 8 characters, uppercase and lowercase letters, numbers and special characters';
 
     }
     
     if (!is_writable(__DIR__ . '/index.php')) {
        
-       $errors['errorSetup'] = 'Permission denied. Directory installation is not writable';
+      $errors['errorSetup'] = 'Permission denied. Directory installation is not writable';
        
     }
 
@@ -141,13 +141,13 @@ if ($install != 'install') {
 
     if (false === check_spl_enabled('spl_autoload_register')) {
 
-        $errors['errorSetup'] = 'spl autoload register is either not loaded or compiled in';
+      $errors['errorSetup'] = 'spl autoload register is either not loaded or compiled in';
 
     }
 
     if (false === check_filter_enabled()) {
 
-       $errors['errorSetup'] = 'The filter extension is either not loaded or compiled in';
+      $errors['errorSetup'] = 'The filter extension is either not loaded or compiled in';
 
     }
 
