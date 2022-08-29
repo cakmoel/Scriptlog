@@ -364,15 +364,7 @@ public function isTableExists($table_name)
   $check_table = $this->dbc->query("SHOW TABLES LIKE '$table_name'");
   $check_table_schema = $this->dbc->query("SELECT table_name FROM information_schema.tables WHERE table_schema = '$database' AND table_name = '$table_name'");
  
-  if (($check_table->num_rows > 0) || ($check_table_schema->num_rows == 1)) {
-
-    return true;
-
-  } else {
-
-    return false;
-
-  }
+   ( ( $check_table->num_rows > 0) || ( $check_table_schema->num_rows == 1 ) ? true : false ); 
 
   if (is_resource($check_table) || is_resource($check_table_schema)) {
 
