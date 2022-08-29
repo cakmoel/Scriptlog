@@ -1,7 +1,7 @@
 <?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * sanitize.class.php
- * Sanitizing  input and output
+ * Sanitizing input and output
  * 
  * @category   Core Class
  * @author     Khairu a.k.a wenkhairu
