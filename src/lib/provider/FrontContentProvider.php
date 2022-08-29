@@ -229,10 +229,22 @@ public static function frontLinkTag($postId, TagProviderModel $tagProviderModel)
  * @return mixed
  * 
  */
-public static function frontArchivesPublished(array $arguments, ArchivesProviderModel $archivesProviderModel)
+public static function frontPostsByArchive(array $values, ArchivesProviderModel $archivesProviderModel)
 {
  self::$archivesProviderModel = $archivesProviderModel;
- return self::$archivesProviderModel->getArchivesPublished(self::frontPaginator(app_reading_setting()['post_per_archive'], 'p'), self::frontSanitizer(), $arguments);
+ return self::$archivesProviderModel->getPostsByArchive(self::frontPaginator(app_reading_setting()['post_per_archive'], 'p'), self::frontSanitizer(), $values);
+}
+
+/**
+ * frontSidebarArchives
+ *
+ * @param ArchivesProviderModel $archivesProviderModel
+ * @return mixed
+ */
+public static function frontSidebarArchives(ArchivesProviderModel $archivesProviderModel)
+{
+ self::$archivesProviderModel = $archivesProviderModel;
+ return self::$archivesProviderModel->getArchivesOnSidebar();
 }
 
 /**
@@ -242,8 +254,8 @@ public static function frontArchivesPublished(array $arguments, ArchivesProvider
  */
 public static function frontSanitizer()
 {
-$front_sanitizer = new Sanitize();
-return $front_sanitizer;
+ return new Sanitize();
+
 }
 
 /**
@@ -256,8 +268,9 @@ return $front_sanitizer;
  */
 private static function frontPaginator($perPage, $instance)
 {
- $front_paginator = new Paginator($perPage, $instance);
- return $front_paginator;
+ 
+ return new Paginator($perPage, $instance);
+ 
 }
 
 }
