@@ -76,10 +76,8 @@ class Dao
 
   }
 
-  $findAll = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchAll($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchAll();
-  
-  return $findAll;
-    
+  return ( ! is_null($fetchMode) ) ? $this->dbc->dbQuery($this->sql, $data)->fetchAll($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchAll();
+      
  }
  
 /**
@@ -100,10 +98,8 @@ class Dao
     throw new DbException("No SQL Query!");
   }
   
-  $findRow = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetch();
+  return ( ! is_null($fetchMode) ) ? $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetch();
 
-  return $findRow;
-  
  }
  
  /**
@@ -125,9 +121,7 @@ class Dao
      
   }
  
-  $findColumn = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchColumn($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
-
-  return $findColumn;
+  return ( ! is_null($fetchMode) ) ? $this->dbc->dbQuery($this->sql, $data)->fetchColumn($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
      
  }
  
@@ -270,6 +264,7 @@ protected function lastId()
 	 	
    switch ($type) {
       
+      default:
       case 'sql':
         
           if (filter_var($str, FILTER_SANITIZE_NUMBER_INT)) {
