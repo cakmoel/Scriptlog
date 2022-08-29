@@ -1,4 +1,8 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+use PharIo\Version\UnsupportedVersionConstraintException;
+
+ defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class PluginApp
  * 
@@ -44,8 +48,8 @@ class PluginApp extends BaseApp
     if (isset($_SESSION['error'])) {
        
        $checkError = false;
-       if ($_SESSION['error'] == 'pluginNotFound') array_push($errors, "Error: Plugin Not Found!");
-       if ($_SESSION['error'] == 'tableNotFound') array_push($errors, "Error: Table Plugin Not Found");
+       ($_SESSION['error'] == 'pluginNotFound') ?: array_push($errors, "Error: Plugin Not Found!");
+       ($_SESSION['error'] == 'tableNotFound') ?: array_push($errors, "Error: Table Plugin Not Found");
        unset($_SESSION['error']);
 
     }
@@ -53,12 +57,12 @@ class PluginApp extends BaseApp
     if (isset($_SESSION['status'])) {
 
       $checkStatus = true;
-      if ($_SESSION['status'] == 'pluginAdded') array_push($status, "New plugin added");
-      if ($_SESSION['status'] == 'pluginInstalled') array_push($status, "New plugin installed");
-      if ($_SESSION['status'] == 'pluginUpdated') array_push($status, "Plugin updated");
-      if ($_SESSION['status'] == 'pluginActivated') array_push($status, "Plugin actived");
-      if ($_SESSION['status'] == 'pluginDeactivated') array_push($status, "Plugin deactivated");
-      if ($_SESSION['status'] == 'pluginDeleted') array_push($status, "Plugin deleted");
+      ($_SESSION['status'] == 'pluginAdded') ?: array_push($status, "New plugin added");
+      ($_SESSION['status'] == 'pluginInstalled') ?: array_push($status, "New plugin installed");
+      ($_SESSION['status'] == 'pluginUpdated') ?: array_push($status, "Plugin updated");
+      ($_SESSION['status'] == 'pluginActivated') ?: array_push($status, "Plugin actived");
+      ($_SESSION['status'] == 'pluginDeactivated') ?:array_push($status, "Plugin deactivated");
+      ($_SESSION['status'] == 'pluginDeleted') ?: array_push($status, "Plugin deleted");
       unset($_SESSION['status']);
       
     }
@@ -81,9 +85,9 @@ class PluginApp extends BaseApp
 
   }
 
-  public function insert()
-  {
-
+  public function insert() 
+  { 
+    // leave empty 
   }
 
   public function installPlugin()
@@ -270,7 +274,7 @@ class PluginApp extends BaseApp
 
   public function update($id)
   {
-    
+    // leave empty
   }
 
   public function enablePlugin($id)
