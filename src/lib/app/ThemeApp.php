@@ -29,16 +29,16 @@ class ThemeApp extends BaseApp
     $checkStatus = false;
 
     if (isset($_SESSION['error'])) {
-       if ($_SESSION['error'] == "themeNotFound") array_push($errors, "Error: Theme is not found");
+       ($_SESSION['error'] == "themeNotFound") ?: array_push($errors, "Error: Theme is not found");
        unset($_SESSION['error']);
     }
 
     if (isset($_SESSION['status'])) {
-        if ($_SESSION['status'] == "themeAdded") array_push($errors, "New theme added");
-        if ($_SESSION['status'] == "themeInstalled") array_push($errors, "Theme installation process is successful, please activate it first to see it works!");
-        if ($_SESSION['status'] == "themeUpdated") array_push($errors, "Theme updated");
-        if ($_SESSION['status'] == "themeActivated") array_push($status, "Theme activated");
-        if ($_SESSION['status'] == "themeDeleted") array_push($status, "Theme deleted");
+        ($_SESSION['status'] == "themeAdded") ?: array_push($errors, "New theme added");
+        ($_SESSION['status'] == "themeInstalled") ?: array_push($errors, "Theme installation process is successful, please activate it first to see it works!");
+        ($_SESSION['status'] == "themeUpdated") ?: array_push($errors, "Theme updated");
+        ($_SESSION['status'] == "themeActivated") ?: array_push($status, "Theme activated");
+        ($_SESSION['status'] == "themeDeleted") ?: array_push($status, "Theme deleted");
         unset($_SESSION['status']);
     }
 
@@ -60,6 +60,12 @@ class ThemeApp extends BaseApp
 
   }
 
+/**
+ * insert()
+ * 
+ * @inheritDoc
+ * @uses BaseApp::insert Name
+ */
   public function insert()
   {
     $errors = array();
@@ -352,7 +358,7 @@ class ThemeApp extends BaseApp
           
         }
 
-        if (empty($theme_title) || empty($theme_designer) || empty($theme_dir)) {
+        if (empty($_POST['theme_title']) || empty($_POST['theme_designer']) || empty($_POST['theme_directory'])) {
           $checkError = false;
           array_push($errors, "All columns required must be filled");
         }
