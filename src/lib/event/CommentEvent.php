@@ -56,6 +56,13 @@ class CommentEvent
   private $status;
 
 /**
+ * comment creation date
+ *
+ * @var string
+ */
+  private $created_at;
+
+/**
  * An instance of CommentDao
  *
  * @var object
@@ -119,6 +126,11 @@ class CommentEvent
   {
    $this->status = $status;
   }
+
+  public function setCommentDate($created_at)
+  {
+    $this->created_at = $created_at;
+  }
   
   public function grabComments($orderBy = 'ID')
   {
@@ -141,7 +153,7 @@ class CommentEvent
        'comment_author_ip' => $this->author_ip,
        'comment_author_email' => $this->author_email,
        'comment_content' => $this->content,
-       'comment_date' => date("Y-m-d H:i:s")
+       'comment_date' => date_for_database($this->created_at)
    ]);
    
   }

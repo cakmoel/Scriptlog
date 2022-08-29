@@ -199,7 +199,7 @@ class UserApp extends BaseApp
 
         try {
         
-            if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
+            if ( ! csrf_check_token('csrfToken', $_POST, 60*10) ) {
                 
                 header($_SERVER["SERVER_PROTOCOL"].MESSAGE_BADREQUEST, true, 400);
                 throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
@@ -225,12 +225,12 @@ class UserApp extends BaseApp
                 
             }
             
-            if ( ( isset( $_POST['user_email'] ) ) && ( !email_validation( $_POST['user_email'], new RFCValidation() ) ) ) {
+            if ( ( isset( $_POST['user_email'] ) ) && ( ! email_validation( $_POST['user_email'], new RFCValidation() ) ) ) {
                 
                 $checkError = false;
                 array_push($errors, MESSAGE_INVALID_EMAILADDRESS);
                 
-            } elseif (!email_multiple_validation($_POST['user_email'])) {
+            } elseif (! email_multiple_validation($_POST['user_email'])) {
 
                 $checkError = false;
                 array_push($errors, MESSAGE_UNKNOWN_DNS);
@@ -244,7 +244,7 @@ class UserApp extends BaseApp
             
             if (isset($_POST['user_pass'])) {
 
-                if (check_common_password($_POST['user_pass']) === true) {
+                if ( check_common_password($_POST['user_pass']) === true) {
 
                     $checkError = false;
                     array_push($errors, "Your password seems to be the most hacked password, please try another");
@@ -260,14 +260,14 @@ class UserApp extends BaseApp
 
             }
 
-            if ( ( !empty($_POST['user_url']) ) && ( !url_validation($_POST['user_url']) ) ) {
+            if ( ( ! empty($_POST['user_url']) ) && ( ! url_validation($_POST['user_url']) ) ) {
                 
                 $checkError = false;
                 array_push($errors, "Please enter a valid URL.");
                 
             }
             
-            if ( ( !empty($_POST['user_fullname']) ) && ( !preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']) ) ) {
+            if ( ( ! empty($_POST['user_fullname']) ) && ( ! preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']) ) ) {
                 
                 $checkError = false;
                 array_push($errors, MESSAGE_INVALID_FULLNAME);
@@ -538,7 +538,7 @@ class UserApp extends BaseApp
                 $expiry_date = date("Y-m-d H:i:s", time() + Authentication::COOKIE_EXPIRE);
                 $this->userEvent->setCookieExpireDate($expiry_date); 
                 
-            }
+             }
  
               $this->userEvent->modifyUser();
               $_SESSION['status'] = "userUpdated";

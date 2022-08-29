@@ -33,7 +33,7 @@ private $selected;
  */
  public function findComments($orderBy = 'ID')
  {
-   $sql = "SELECT c.ID, c.comment_post_id, c.comment_author_name, 
+   $sql = "SELECT c.ID, c.comment_post_id, c.comment_parent_id, c.comment_author_name, 
                   c.comment_author_ip, c.comment_author_email, 
                   c.comment_content, c.comment_status, 
                   c.comment_date, p.post_title 
@@ -62,7 +62,7 @@ private $selected;
  {
    $id_sanitized = $this->filteringId($sanitize, $id, 'sql');
    
-   $sql = "SELECT ID, comment_post_id, comment_author_name,
+   $sql = "SELECT ID, comment_post_id, comment_parent_id, comment_author_name,
            comment_author_ip, comment_author_email, 
            comment_content, comment_status, comment_date 
            FROM tbl_comments WHERE ID = ? ";
