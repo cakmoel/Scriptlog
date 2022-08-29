@@ -88,7 +88,7 @@ private static function findRequestToPath()
      
  if (empty($parts)) {
     
-    return '/';
+  return '/';
       
  }
      
@@ -166,19 +166,8 @@ public static function isQueryStringRequested()
  */
 public static function checkMatchUriRequested()
 {
-  
   self::$requestPathURI = new RequestPath();
-
-  if ( self::isMatchedUriRequested() === self::$requestPathURI->matched ) {
-    
-    return true;
-
-  } else {
-
-    return false;
-
-  }
-
+  return ( self::isMatchedUriRequested() === self::$requestPathURI->matched) ? true : false;
 }
 
 /**
@@ -198,15 +187,7 @@ public static function allowedPathRequested(array $path, array $rules)
 
  $is_valid_requested = ( is_array($rule_requested) && array_key_exists(0, $rule_requested) ) ? $rule_requested[0] : null;
 
- if ( ! ( in_array( self::isRequestToPathValid(0), $path, true ) || ( in_array($is_valid_requested, $path, true ) ) ) ) {
-
-  return false;
-
- } else {
-
-  return true;
-
- }
+ return ( ! ( in_array( self::isRequestToPathValid(0), $path, true ) || ( in_array($is_valid_requested, $path, true ) ) ) ) ? false : true;
 
 }
 
@@ -226,7 +207,7 @@ public static function deliverQueryString()
 
         $query_post = self::handleFrontHelper()->grabSimpleFrontPost(static::isQueryStringRequested()['value']);
 
-        if (empty($query_post['ID']) ) {
+        if ( empty($query_post['ID']) ) {
 
           http_response_code(404);
           call_theme_content('404');
@@ -276,7 +257,7 @@ public static function deliverQueryString()
 
         $query_page = self::handleFrontHelper()->grabSimpleFrontPage(static::isQueryStringRequested()['value']);
 
-        if (empty($query_page['ID'])) {
+        if ( empty($query_page['ID']) ) {
 
           http_response_code(404);
           call_theme_content('404');
@@ -315,7 +296,17 @@ public static function deliverQueryString()
         if ( ! empty(static::isQueryStringRequested()['value']) ) {
 
           $query_tag = self::handleFrontHelper()->grabSimpleFrontTag();
-          call_theme_content('tag');
+
+          if ( empty($query_tag['ID']) ) {
+
+            http_response_code(404);
+            call_theme_content('404');
+
+          } else {
+
+            call_theme_content('tag');
+
+          }
            
         } else {
 
