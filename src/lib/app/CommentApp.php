@@ -82,7 +82,23 @@ class CommentApp extends BaseApp
   
   public function insert()
   {
-    #leave empty  
+    if ( isset($_POST['commentFormSubmit']) ) {
+
+       $filters = [
+          'post_id' => isset($_POST['post_id']) ? abs((int)$_POST['post_id']) : 0,
+          'author_name' => isset($_POST['author_name']) ? Sanitize::severeSanitizer($_POST['author_name']) : "",
+          'author_email' => isset($_POST['author_email']) ? Sanitize::severeSanitizer($_POST['author_email']) : "",
+          'comment_content' => isset($_POST['comment_content']) ? Sanitize::severeSanitizer($_POST['comment_content']) : ""
+       ];
+
+       $this->commentEvent->setPostId(distill_post_request($filters)['post_id']);
+       $this->commentEvent->setAuthorName(distill_post_request($filters)['author_name']);
+       $this->commentEvent->setAuthorIP(get_ip_address());
+       $this->commentEvent->setCommentContent(distill_post_request($filters)['comment_content']);
+       $this->commentEvent->setCommentDate(date("Y-m-d H:i:s"));
+       $this->commentEvent->addComment();
+       
+    }
   }
   
   public function update($id)
