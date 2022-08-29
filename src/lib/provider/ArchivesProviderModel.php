@@ -21,15 +21,14 @@ class ArchivesProviderModel extends Dao
  }
 
  /**
- * getArchivesByMonthYear
+ * getArchivesOnSidebar
  * 
  * retrieves archives of posts by month and year
  * and list it on sidebar
- * 
  * @return mixed
  * 
  */
-public function getArchivesByMonthYear()
+public function getArchivesOnSidebar()
 {
 
 $sql = "SELECT MONTH(p.post_date) AS month, YEAR(p.post_date) AS year, COUNT(p.ID) AS total
@@ -45,14 +44,14 @@ return (empty($archives)) ?: $archives;
 }
 
 /**
- * getArchivesPublished
+ * getPostsByArchive
  * 
  * @param object $perPage
  * @param object $sanitize
  * @param array $values
  * 
  */
-public function getArchivesPublished(Paginator $perPage, Sanitize $sanitize, array $values)
+public function getPostsByArchive(Paginator $perPage, Sanitize $sanitize, array $values)
 {
  
  // collect month and year

@@ -77,9 +77,9 @@ class FrontHelper
    */
   public static function grabSimpleFrontTag($param)
   {
-    $idsanitized = static::frontSanitizer($param, 'xss');
+    $param_sanitized = static::frontSanitizer($param, 'xss');
 
-    $sql = "SELECT tbl_posts.post_tags FROM tbl_posts WHERE tbl_posts.ID = '$idsanitized'";
+    $sql = "SELECT tbl_posts.post_tags FROM tbl_posts WHERE tbl_posts.post_tags = '$param_sanitized'";
 
     $query = db_simple_query($sql);
 
@@ -88,6 +88,25 @@ class FrontHelper
     return (empty($result)) ?: $result;
   }
 
+  /**
+   * grabSimpleFrontArchive
+   * 
+   */
+  public static function grabSimpleFrontArchive()
+  {
+    
+    $sql = "SELECT MONTH(p.post_date) AS month, YEAR(p.post_date) AS year, COUNT(p.ID) AS total
+        FROM tbl_posts p GROUP BY month, year 
+        ORDER BY month DESC";
+
+    $query = db_simple_query($sql);
+
+    $result = $query->fetch_assoc();
+
+    return ( empty($result) ) ?: $result;
+   
+  }
+  
   /**
    * grabSimpleFrontPage
    *

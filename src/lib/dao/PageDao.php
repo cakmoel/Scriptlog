@@ -13,6 +13,8 @@
 class PageDao extends Dao
 {
 
+private $selected;
+
 public function __construct()
 {
   parent::__construct();
@@ -266,10 +268,10 @@ public function dropDownPostStatus($selected = "")
     
  if ($selected != '') {
 	
-	 $selected = $selected;
+	 $this->selected = $selected;
  }
     
- return dropdown($name, $posts_status, $selected);
+ return dropdown($name, $posts_status, $this->selected);
     
 }
 
@@ -287,10 +289,10 @@ public function dropDownCommentStatus($selected = '')
  $comment_status = array('open' => 'Open', 'close' => 'Close');
     
  if ($selected != '') {
-    $selected = $selected;
+    $this->selected = $selected;
  }
     
- return dropdown($name, $comment_status, $selected);
+ return dropdown($name, $comment_status, $this->selected);
     
 }
 
