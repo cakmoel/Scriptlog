@@ -283,9 +283,9 @@ class PostApp extends BaseApp
 
            if (empty($file_location)) {
 
-              if ( (isset($_POST['image_id'])) && (!empty($_POST['image_id'])) ) {
+              if ( ( isset($_POST['image_id']) ) && ( ! empty($_POST['image_id']) ) ) {
 
-                  $this->postEvent->setPostImage((int)distill_post_request($filters)['image_id']);
+                $this->postEvent->setPostImage((int)distill_post_request($filters)['image_id']);
 
               }
 
