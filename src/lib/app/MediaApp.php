@@ -59,7 +59,7 @@ public function listItems()
   if (isset($_SESSION['error'])) {
 
     $checkError = false;
-    if ($_SESSION['error'] == 'mediaNotFound') array_push($errors, "Error: Media Not Found");
+    ($_SESSION['error'] == 'mediaNotFound') ?: array_push($errors, "Error: Media Not Found");
     unset($_SESSION['error']);
 
   }
@@ -67,9 +67,9 @@ public function listItems()
   if (isset($_SESSION['status'])) {
     
     $checkStatus = true;
-    if ($_SESSION['status'] == 'mediaAdded') array_push($status, "New media added");
-    if ($_SESSION['status'] == 'mediaUpdated') array_push($status, "Media has been updated");
-    if ($_SESSION['status'] == 'mediaDeleted') array_push($status, "Media deleted");
+    ($_SESSION['status'] == 'mediaAdded') ?: array_push($status, "New media added");
+    ($_SESSION['status'] == 'mediaUpdated') ?: array_push($status, "Media has been updated");
+    ($_SESSION['status'] == 'mediaDeleted') ?: array_push($status, "Media deleted");
     unset($_SESSION['status']);
 
   }
@@ -144,14 +144,10 @@ public function insert()
        
       }
 
-      if (!empty($_POST['media_caption'])) {
+      if ( ( ! empty($_POST['media_caption']) ) && ( true === form_size_validation($form_fields) )) {
 
-          if(true === form_size_validation($form_fields)) {
-
-             $checkError = false;
-             array_push($errors, "Form data is longer than allowed");
-
-          }
+        $checkError = false;
+        array_push($errors, "Form data is longer than allowed");
 
       }
 
@@ -419,14 +415,10 @@ public function update($id)
         
       }
 
-      if (!empty($_POST['media_caption'])) {
+      if ( ( ! empty($_POST['media_caption']) ) && ( true === form_size_validation($form_fields) ) ) {
 
-         if(true === form_size_validation($form_fields)) {
-
-           $checkError = false;
-           array_push($errors, "Form data is longer than allowed");
-
-         }
+        $checkError = false;
+        array_push($errors, "Form data is longer than allowed");
 
       }
 
