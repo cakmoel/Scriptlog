@@ -424,13 +424,13 @@ class ConfigurationApp
 
       if(isset($_SESSION['error'])) {
         $checkError = false;
-        if($_SESSION['error'] == 'permalinkValueNotFound') array_push($errors, "Error: Permalink value not found!");
+        ($_SESSION['error'] == 'permalinkValueNotFound') ?: array_push($errors, "Error: Permalink value not found!");
         unset($_SESSION['error']);
       }
  
       if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        if ($_SESSION['status'] == 'permalinkConfigUpdated') array_push($status, "Permalink setting has been updated");
+        ($_SESSION['status'] == 'permalinkConfigUpdated') ?: array_push($status, "Permalink setting has been updated");
         unset($_SESSION['status']);
       }
 
