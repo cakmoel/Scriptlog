@@ -5,7 +5,7 @@
  * 
  * 
  * @category Function
- * @param string $date
+ * @param object $date
  * @param string $format
  * @return string
  * 
