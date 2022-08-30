@@ -15,8 +15,6 @@
  */
 function check_mime_type($accepted_type, $tmp_name)
 {
-
- $mime_type = false;
   
  if (class_exists('finfo')) {
 
@@ -47,7 +45,7 @@ function check_mime_type($accepted_type, $tmp_name)
      
       if (!in_array($detected_image_type, $allowed_image_type)) {
          
-        $mime_type = false;
+        return false;
 
       } 
       
@@ -55,7 +53,7 @@ function check_mime_type($accepted_type, $tmp_name)
 
     } else {
 
-       $type = get_mime($tmp_name);
+      $type = get_mime($tmp_name);
 
     }
 
@@ -63,15 +61,6 @@ function check_mime_type($accepted_type, $tmp_name)
  
  $extension = array_search($type, $accepted_type, true);
 
- if(false === $extension) {
-
-    $mime_type = false;
-
- } else {
-
-    $mime_type = true;
- }
-
- return $mime_type;
+ return ( false === $extension ) ? false : true;
 
 }
