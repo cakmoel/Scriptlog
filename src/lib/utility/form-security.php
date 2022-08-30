@@ -97,15 +97,7 @@ function check_form_request($data, array $whitelist)
   
   foreach($data as $key => $value) {
 
-    if (!in_array($key, $whitelist)) {
-
-      return false;
-
-    } else {
-
-      return true;
-
-    }
+    return ( ! in_array($key, $whitelist) ) ? false : true;
 
   }
 
@@ -133,7 +125,7 @@ function scriptpot_validate($req)
 
           if ((isset($req[$field])) && (!empty($req[$field]))) {
 
-              return false;
+            return false;
 
           }
 
