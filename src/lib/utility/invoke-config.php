@@ -12,15 +12,7 @@
 function check_config_file($filename)
 {
 
- if (file_exists($filename)) {
-
-    return true;
-
- } else {
-
-    return false;
-
- }
+return (file_exists($filename) ) ? true : false;
 
 }
 
@@ -42,11 +34,11 @@ function invoke_config()
  
   if (!check_config_file($configuration_file)) {
 
-      return $sample_file;
+    return $sample_file;
 
   } else {
 
-      return $configuration_file;
+    return $configuration_file;
 
   }
   

@@ -13,13 +13,7 @@
  */
 function human_login_id()
 {
- 
- $random_int = ircmaxell_generator_numbers(0, 999);
- 
- $_SESSION['human_login_id'] = $random_int;
- 
- return $random_int;
-
+ return form_id("login");
 }
 
 /**
@@ -38,8 +32,8 @@ function human_login_id()
 function verify_human_login_id($loginId)
 {
 
-if( ( ! isset($_SESSION['human_login_id']) ) || ( ! isset($loginId) ) || ( $_SESSION['human_login_id'] !== $loginId ) ) { 
-     
+if ( ( ! isset($_SESSION['human_login_id']) ) || ( ! isset($loginId) ) || ( $_SESSION['human_login_id'] !== $loginId ) ) {     
+   
    return false;
    
 }
@@ -65,43 +59,6 @@ function review_login_attempt($ip)
 }                                                    
 
 /**
- * human_login_request()
- * 
- * generate login query string parameters
- *
- * @category function
- * @author M.Noermooehammad
- * @license MIT
- * @version 1.0
- * @param string $base
- * @param array $data
- * @return mixed
- * 
- */
-function human_login_request($base, array $data)
-{
-
-$form = [];
-
-$action = ( is_array($data) && array_key_exists(0, $data) ? rawurlencode($data[0]) : '' );
-$id = ( is_array($data) && array_key_exists(1, $data) ? urlencode($data[1]) : null );
-$uniqueKey =  ( is_array($data) && array_key_exists(2, $data) ? urlencode($data[2]) : null );
-
-$query_data = array(
-
-   'action' => $action,
-   'Id' => abs((int)$id),
-   'uniqueKey'=> sanitize_urls($uniqueKey),
-
-);
-
-$form['doLogin'] = build_query($base, $query_data);
-
-return Sanitize::severeSanitizer($form);
-
-}
-
-/**
  * safe_human_login()
  *
  * checking form login security
@@ -120,7 +77,7 @@ return Sanitize::severeSanitizer($form);
 function safe_human_login($ip, $loginId, $uniqueKey, array $values)
 {
 
-if( check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'scriptpot_email', 'captcha_login', 'remember', 'csrf', 'LogIn']) === false )  {
+if ( check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'scriptpot_email', 'captcha_login', 'remember', 'csrf', 'LogIn']) === false )  {
 
    header(APP_PROTOCOL.' 413 Payload Too Large', true, 413);
    header('Status: 413 Payload Too Large');
@@ -129,14 +86,14 @@ if( check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'script
 
 }
 
-if( false === verify_human_login_id($loginId)) {
+if ( false === verify_human_login_id($loginId)) {
 
    http_response_code(400);
    exit("400 Bad Request");
 
 }
 
-if( ! isset($uniqueKey) && ( $uniqueKey !== md5(app_key().$ip) ) ) {
+if ( ! isset($uniqueKey) && ( $uniqueKey !== md5(app_key().$ip) ) ) {
 
    http_response_code(400);
    exit("400 Bad Request ");
@@ -195,7 +152,7 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
       
    }
    
-   if ( ( !empty($values) ) && ( isset( $values['captcha_login'] ) && $values['captcha_login'] == $_POST['captcha_login'] ) && ( $values['captcha_login'] != Session::getInstance()->captcha_login)) {
+   if ( ( !empty($values) ) && ( isset( $values['captcha_login'] ) && $values['captcha_login'] == $_POST['captcha_login'] ) && ( $values['captcha_login'] !== Session::getInstance()->captcha_login) ) {
       
       $captcha_verified = false;
       $errors['errorMessage'] = "Enter captcha code correctly";
