@@ -3,7 +3,7 @@
  * Format size unit function
  * 
  * @category  Function
- * @param number $bytes
+ * @param null|bool|int|float|string $bytes
  * @return string
  * 
  */
