@@ -32,7 +32,7 @@ foreach($input as $k => $v) {
 
   if(!in_array($k, $no_unset) && isset($GLOBALS[$k])) {
 
-      unset($GLOBALS[$k]);
+    unset($GLOBALS[$k]);
 
   }
 
