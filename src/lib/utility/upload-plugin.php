@@ -20,8 +20,6 @@
 function upload_plugin($file_location, $file_name)
 {
  
-$plugin_extracted = false;
-
 // get file basename
 $file_basename = substr($file_name, 0, strripos($file_name, '.'));
 // get file extension
@@ -39,54 +37,57 @@ $zip_path_uploaded = $path.basename($fileNameUnique);
 
 $plugin_path_uploaded = $path.current(explode(".",$file_name));
 
-if (is_dir(__DIR__ . '/../../'.APP_PLUGIN.basename($file_name, '.zip'))) remove_dir_recursive(__DIR__ . '/../../'.APP_PLUGIN.basename($file_name, '.zip'));
+( is_dir(__DIR__ . '/../../'.APP_PLUGIN.basename($file_name, '.zip') ) ) ?: remove_dir_recursive(__DIR__ . '/../../'.APP_PLUGIN.basename($file_name, '.zip'));
 
 create_directory($plugin_path_uploaded);
 
-if (move_uploaded_file($file_location, $zip_path_uploaded)) {
-
-    $zip = new ZipArchive();
-
-    $opened = $zip->open($zip_path_uploaded);
-
-    if ( $opened === true) {
-
-      $file_count = (version_compare(phpversion(), "7.2.0", ">=")) ? $zip->count() : $zip->numFiles;
-
-      for ($i = 0; $i < $file_count; $i++) {
-
-          $file_index = $zip->getNameIndex($i);
-
-          preg_match('/(.*)(phpinfo|system|php_uname|chmod|fopen|eval|flclose|readfile|base64_decode|passthru)(.*)/Us', $file_index, $matches);
-
-          if (count($matches) > 0) {
-
-             $zip->deleteName($file_index);
-
-          }
-
-       }
-
-      $zip->extractTo($plugin_path_uploaded);
-
-      $zip->close();
-
-      unlink($zip_path_uploaded);
-
-      $plugin_extracted = true;
-
-    } else {
-
-       $plugin_extracted = false;
-
-    }
-    
-} else {
-
-    $plugin_extracted = false;
+return ( move_uploaded_file($file_location, $zip_path_uploaded) ) ? open_plugin_uploaded($zip_path_uploaded) : false;
 
 }
 
-return $plugin_extracted;
+/**
+ * open_plugin_uploaded
+ *
+ * @param string $zip_path_uploaded
+ * 
+ */
+function open_plugin_uploaded($zip_path_uploaded)
+{
+
+ $zip = new ZipArchive();
+
+ $opened = $zip->open($zip_path_uploaded);
+
+ if ( $opened === true) {
+
+      $file_count = (version_compare(phpversion(), "7.4.30", ">=")) ? $zip->count() : $zip->numFiles;
+
+    for ($i = 0; $i < $file_count; $i++) {
+
+        $file_index = $zip->getNameIndex($i);
+
+        preg_match('/(.*)(phpinfo|system|php_uname|chmod|fopen|eval|flclose|readfile|base64_decode|passthru)(.*)/Us', $file_index, $matches);
+
+        if (count($matches) > 0) {
+
+         $zip->deleteName($file_index);
+
+        }
+
+    }
+
+    $zip->extractTo($zip_path_uploaded);
+
+    $zip->close();
+
+    unlink($zip_path_uploaded);
+
+    return true;
+
+} else {
+
+    return false;
+
+}
 
 }
