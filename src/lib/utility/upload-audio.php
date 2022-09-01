@@ -1,6 +1,6 @@
 <?php
 /**
- * upload_audio function
+ * upload_audio()
  *
  * @param string $file_location
  * @param string $file_size
