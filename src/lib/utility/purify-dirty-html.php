@@ -19,9 +19,7 @@ function purify_dirty_html($dirty_html)
   
   $purifier = new HTMLPurifier($config);
   
-  $sanitized = $purifier->purify($dirty_html);
-
-  return $sanitized;
+  return $purifier->purify($dirty_html);
 
 }
 
