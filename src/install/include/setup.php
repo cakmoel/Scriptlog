@@ -24,7 +24,7 @@ use Egulias\EmailValidator\Warning\TLD;
 function current_url()
 {
 
-  $scheme = (!empty($_SERVER['HTTPS']) and $_SERVER['HTTPS'] !== "off") ? "https" : "http" ;
+  $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== "off") ? "https" : "http" ;
    
   $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] ;
    
