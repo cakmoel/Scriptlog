@@ -281,7 +281,7 @@ install_header($current_path);
 <div class="container">
 
       <div class="py-5 text-center">
-        <img class="d-block mx-auto mb-4" src="assets/img/icon612x612.png" alt="Scriptlog Installation Procedure" width="72" height="72">
+        <img class="d-block mx-auto mb-4" src="<?= $current_path; ?>assets/img/icon612x612.png" alt="Scriptlog Installation Procedure" width="72" height="72">
         <h2>Scriptlog</h2>
         <p class="lead">Installation procedure</p>
       </div>
