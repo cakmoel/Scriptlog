@@ -19,7 +19,7 @@ function admin_tag_title($value)
 
          case 'posts':
 
-             $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
+            $title .= safe_html(ucfirst($value))." &raquo; ".APP_TITLE." &raquo; ".APP_CODENAME;
 
             break;
 
@@ -135,10 +135,10 @@ function admin_tag_title($value)
 
            }
 
-           return $title;
-
            break;
 
     }
+
+    return $title;
     
 }
