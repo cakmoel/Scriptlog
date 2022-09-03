@@ -33,11 +33,11 @@ function absolute_url($page, $url)
 
     if (substr($url, 0, 1) === '/') {
 
-         $url = $root . $url;
+        $url = $root . $url;
 
     } elseif (substr($url, 0, 7) !== APP_PROTOCOL . '://') {
 
-         $url = $base . $url;
+        $url = $base . $url;
 
     }
 
