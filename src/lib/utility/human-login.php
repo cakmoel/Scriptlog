@@ -166,7 +166,7 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
    
  if ( ( ! empty($values) ) && ( $captcha_verified === true ) ) {
        
-   $authenticate_user = is_a( $authenticator, 'Authentication' ) ?: $authenticator->validateUserAccount($login, $user_pass);
+   $authenticate_user = is_a( $authenticator, 'Authentication' ) ? $authenticator->validateUserAccount($login, $user_pass) : "";
    
    if ( time() > $datetime ) {
    
