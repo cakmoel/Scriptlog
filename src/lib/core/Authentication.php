@@ -257,7 +257,7 @@ class Authentication
 
   if (isset($_COOKIE['scriptlog_auth'])) {
 
-    return $getUser['user_level'];
+    return (isset($getUser['user_level'])) ?: $getUser['user_level'];
 
   }
 
@@ -540,93 +540,7 @@ public function activateUserAccount($key)
  */
 public function userAccessControl($control = null)
 {
-
-  switch ($control) {
-
-      case ActionConst::USERS:
-            
-          if ( $this->accessLevel() !== 'administrator') {
-
-            return false;
-
-          }
-
-          break;
-
-      case ActionConst::PLUGINS:
-      case ActionConst::THEMES:
-      case ActionConst::CONFIGURATION:
-      case ActionConst::PAGES:
-      case ActionConst::NAVIGATION:
-           
-        if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
-
-          return false;
-
-        }
-
-        break;
-
-      case ActionConst::MEDIALIB:
-
-          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
-              && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author')) {
-
-            return false;
-
-          }
-
-          break;
-
-      case ActionConst::TOPICS:
-      case ActionConst::TAGS:
-
-          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') && ($this->accessLevel() !== 'editor')) {
-
-            return false;
-
-          }
-
-          break;
-          
-      case ActionConst::COMMENTS:
-          
-          if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'author') && ($this->accessLevel() !== 'contributor')) {
-
-            return false;
-
-          }
-
-          break;
-
-      case ActionConst::REPLY:
-
-          if (($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author')) {
-
-            return false;
-
-          }
-
-          break;
-
-      case ActionConst::DASHBOARD:
-
-      default:
-          
-        if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
-            && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author') 
-            && ($this->accessLevel() !== 'contributor')) {
-
-            return false;
-            
-        }
-
-        break;
-
-  }
-
-  return true;
-
+ return AccessControl::accessPrivilege($control);
 }
 
 /**
