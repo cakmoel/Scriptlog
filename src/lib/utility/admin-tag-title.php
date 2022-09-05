@@ -121,9 +121,9 @@ function admin_tag_title($value)
 
            if ( ( strstr($value, 'php://input') ) || ( strstr($value, 'php://filter') ) || ( strstr($value, 'data:') ) || ( strstr($value, 'zip://') ) ) {
 
-             http_response_code(400);
+             http_response_code(405);
 
-             $title .= 'Bad Request - ERROR: ' . http_response_code(400);
+             $title .= 'Method Not Allowed - ERROR: ' . http_response_code(400);
              
            }
            
