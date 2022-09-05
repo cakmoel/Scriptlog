@@ -43,7 +43,7 @@ class MenuApp extends BaseApp
     if (isset($_SESSION['error'])) {
       
       $checkError = false;
-      ($_SESSION['error'] == 'menuNotFound') ?: array_push($errors, "Error: Menu not found");
+      ($_SESSION['error'] == 'menuNotFound') ? array_push($errors, "Error: Menu not found") : "";
       unset($_SESSION['error']);
 
     }
@@ -51,9 +51,9 @@ class MenuApp extends BaseApp
     if (isset($_SESSION['status'])) {
       
       $checkStatus = true;
-      ($_SESSION['status'] == 'menuAdded') ?: array_push($status, "New menu added");
-      ($_SESSION['status'] == 'menuUpdated') ?: array_push($status, "Menu updated");
-      ($_SESSION['status'] == 'menuDeleted') ?: array_push($status, "Menu deleted");
+      ($_SESSION['status'] == 'menuAdded') ? array_push($status, "New menu added") : "";
+      ($_SESSION['status'] == 'menuUpdated') ? array_push($status, "Menu updated") : "";
+      ($_SESSION['status'] == 'menuDeleted') ? array_push($status, "Menu deleted") : "";
       unset($_SESSION['status']);
 
     }
