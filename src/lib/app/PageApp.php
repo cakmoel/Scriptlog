@@ -50,15 +50,15 @@ class PageApp extends BaseApp
     if (isset($_SESSION['error'])) {
 
       $checkError = false;
-      if ($_SESSION['error'] == 'pageNotFound') array_push($errors, "Error: Page Not Found");
+      ($_SESSION['error'] == 'pageNotFound') ? array_push($errors, "Error: Page Not Found") : "";
       unset($_SESSION['error']);
     }
 
     if (isset($_SESSION['status'])) {
       $checkStatus = true;
-      if ($_SESSION['status'] == 'pageAdded') array_push($status, "New page added");
-      if ($_SESSION['status'] == 'pageUpdated') array_push($status, "Page has been updated");
-      if ($_SESSION['status'] == 'pageDeleted') array_push($status, "Page deleted");
+      ($_SESSION['status'] == 'pageAdded') ? array_push($status, "New page added") : "";
+      ($_SESSION['status'] == 'pageUpdated') ? array_push($status, "Page has been updated") : "";
+      ($_SESSION['status'] == 'pageDeleted') ? array_push($status, "Page deleted") : "";
       unset($_SESSION['status']);
     }
 
