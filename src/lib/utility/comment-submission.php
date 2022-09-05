@@ -84,58 +84,6 @@ function checking_comment_request()
 }
 
 /**
- * human_comment_id
- *
- * @return void
- */
-function human_comment_id()
-{
-   return form_id("comment");
-}
-
-/**
- * verify_human_comment_id
- *
- * @return bool
- */
-function verify_human_comment_id($submitId)
-{
-
-   if ((!isset($_SESSION['human_comment_id'])) || (!isset($submitId)) || ($_SESSION['human_comment_id'] !== $submitId)) {
-
-      return false;
-   }
-
-   return true;
-}
-
-/**
- * safe_human_comment
- *
- * @param string $ip
- * @param int|num $submitId
- * @param string $uniqueKey
- * @param array $values
- */
-function safe_human_comment($ip, $submitId, $uniqueKey, array $values)
-{
-
-   checking_form_payload($values); //checking form payload
-
-   if (false === verify_human_comment_id($submitId)) {
-
-      http_response_code(400);
-      exit("400 Bad Request");
-   }
-
-   if (!isset($uniqueKey) && ($uniqueKey !== md5(app_key() . $ip))) {
-
-      http_response_code(400);
-      exit("400 Bad Request ");
-   }
-}
-
-/**
  * checking_block_csrf
  *
  * @param string $csrf
@@ -192,50 +140,12 @@ function checking_form_input($author_name, $author_email, $comment_content)
 }
 
 /**
- * add_new_comment
- *
- * @param int|num $postId
- * @param string $author_name
- * @param string $author_email
- * @param string $comment_content
- * @param string $ip
- * 
- */
-function add_new_comment($postId, $author_name, $comment_content, $ip, $author_email = null)
-{
-
- if (isset($author_email)) {
-
-   $sql = "INSERT INTO tbl_comments (comment_post_id, comment_author_name, comment_author_ip, comment_author_email, comment_content, comment_date) VALUES (?, ?, ?, ?, ?, NOW()";
-
-   $data = [$postId, $author_name, $ip, $author_email, $comment_content];
-
-   $type = "issss";
-
- } else {
-
-   $sql = "INSERT INTO tbl_comments (comment_post_id, comment_author_name, comment_author_ip, comment_content, comment_date) VALUES (?, ?, ?, ?, NOW()";
-
-   $data = [$postId, $author_name, $ip, $comment_content];
-
-   $type = "isss";
- }
- 
-return db_prepared_query($sql, $data, $type);
-
-}
-
-/**
  * processing_comment
  *
- * @param string $ip
- * @param int|num $submitId
- * @param string $uniqueKey
- * @param array $errors
  * @param array $values
  * 
  */
-function processing_comment($ip, $submitId, $uniqueKey, array $values)
+function processing_comment(array $values)
 {
 
    $postId = ( isset($values['post_id']) && $values['post_id'] == $_POST['post_id'] ? abs((int)$_POST['post_id']) : 0);
@@ -243,15 +153,29 @@ function processing_comment($ip, $submitId, $uniqueKey, array $values)
    $author_email = (isset($values['author_email']) && $values['author_email'] == $_POST['author_email'] ? prevent_injection($values['author_email']) : null);
    $comment_content = (isset($values['comment_content']) && $values['comment_content'] == $_POST['comment_content'] ? prevent_injection($values['comment_content']) : null);
    $csrf = (isset($values['csrf']) && $values['csrf'] == $_POST['csrf'] ? $values['csrf'] : "");
+   $comment_at = date("Y-m-d H:i:s");
+   
+   $commentProvider = new CommentProviderModel();
 
    checking_comment_request();
 
-   safe_human_comment($ip, $submitId, $uniqueKey, $values);
+   checking_form_payload($values);
 
    checking_block_csrf($csrf);
 
    checking_form_input($author_name, $author_email, $comment_content);
 
-   add_new_comment($postId, $author_name, $comment_content, $ip, $author_email);
+   $bind = [
+
+      'comment_post_id' => $postId,
+      'comment_author_name' => $author_name,
+      'comment_author_ip' => get_ip_address(),
+      'comment_author_email' => $author_email,
+      'comment_content' => $comment_content,
+      'comment_date' => $comment_at 
+    ];
+    
+    FrontContentProvider::frontNewCommentByPost($bind, $commentProvider);
+    
 
 }
