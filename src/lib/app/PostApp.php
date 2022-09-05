@@ -56,15 +56,15 @@ class PostApp extends BaseApp
     
     if (isset($_SESSION['error'])) {
         $checkError = false;
-        ( $_SESSION['error'] == 'postNotFound') ?: array_push($errors, "Error: Post Not Found!"); 
+        ( $_SESSION['error'] == 'postNotFound') ? array_push($errors, "Error: Post Not Found!") : ""; 
         unset($_SESSION['error']);
     }
     
     if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        ($_SESSION['status'] == 'postAdded') ?: array_push($status, "New post added");
-        ($_SESSION['status'] == 'postUpdated') ?: array_push($status, "Post updated");
-        ($_SESSION['status'] == 'postDeleted') ?: array_push($status, "Post deleted");
+        ($_SESSION['status'] == 'postAdded') ? array_push($status, "New post added") : "";
+        ($_SESSION['status'] == 'postUpdated') ? array_push($status, "Post updated") : "";
+        ($_SESSION['status'] == 'postDeleted') ? array_push($status, "Post deleted") : "";
         unset($_SESSION['status']);
     }
    
