@@ -26,5 +26,5 @@ function user_privilege()
  }
 
  return false;
-
+ 
 }
