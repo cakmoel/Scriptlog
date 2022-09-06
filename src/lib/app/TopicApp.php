@@ -37,15 +37,15 @@ class TopicApp extends BaseApp
     
     if (isset($_SESSION['error'])) {
         $checkError = false;
-        ($_SESSION['error'] == 'topicNotFound') ?: array_push($errors, "Error: Topic Not Found!");
+        ($_SESSION['error'] == 'topicNotFound') ? array_push($errors, "Error: Topic Not Found!") : "";
         unset($_SESSION['error']);
     }
     
     if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        ($_SESSION['status'] == 'topicAdded') ?: array_push($status, "New cateogory added");
-        ($_SESSION['status'] == 'topicUpdated') ?: array_push($status, "Category has been updated");
-        ($_SESSION['status'] == 'topicDeleted') ?: array_push($status, "Category deleted");
+        ($_SESSION['status'] == 'topicAdded') ? array_push($status, "New cateogory added") : "";
+        ($_SESSION['status'] == 'topicUpdated') ? array_push($status, "Category has been updated") : "";
+        ($_SESSION['status'] == 'topicDeleted') ? array_push($status, "Category deleted") : "";
         unset($_SESSION['status']);
     }
     
