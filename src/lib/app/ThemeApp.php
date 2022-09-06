@@ -29,16 +29,16 @@ class ThemeApp extends BaseApp
     $checkStatus = false;
 
     if (isset($_SESSION['error'])) {
-       ($_SESSION['error'] == "themeNotFound") ?: array_push($errors, "Error: Theme is not found");
+       ($_SESSION['error'] == "themeNotFound") ? array_push($errors, "Error: Theme is not found") : "";
        unset($_SESSION['error']);
     }
 
     if (isset($_SESSION['status'])) {
-        ($_SESSION['status'] == "themeAdded") ?: array_push($errors, "New theme added");
-        ($_SESSION['status'] == "themeInstalled") ?: array_push($errors, "Theme installation process is successful, please activate it first to see it works!");
-        ($_SESSION['status'] == "themeUpdated") ?: array_push($errors, "Theme updated");
-        ($_SESSION['status'] == "themeActivated") ?: array_push($status, "Theme activated");
-        ($_SESSION['status'] == "themeDeleted") ?: array_push($status, "Theme deleted");
+        ($_SESSION['status'] == "themeAdded") ? array_push($errors, "New theme added") : "";
+        ($_SESSION['status'] == "themeInstalled") ? array_push($errors, "Theme installation process is successful, please activate it first to see it works!") : "";
+        ($_SESSION['status'] == "themeUpdated") ? array_push($errors, "Theme updated") : "";
+        ($_SESSION['status'] == "themeActivated") ? array_push($status, "Theme activated") : "";
+        ($_SESSION['status'] == "themeDeleted") ? array_push($status, "Theme deleted") : "";
         unset($_SESSION['status']);
     }
 
