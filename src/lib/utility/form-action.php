@@ -37,6 +37,8 @@ function form_action($base, array $data, $type = "ordinary")
 
         $form['doComment'] = build_query($base, $query_data);
 
+        break;
+
     default:
         
         $form['ordinary'] = isset($_SERVER["PHP_SELF"]) ? $_SERVER["PHP_SELF"] : "";
