@@ -57,9 +57,9 @@ class UserApp extends BaseApp
     if (isset($_SESSION['status'])) {
         
         $checkStatus = true;
-        ($_SESSION['status'] == 'userAdded') ?: array_push($status, "New user added");
-        ($_SESSION['status'] == 'userUpdated') ?: array_push($status, "User has been updated");
-        ($_SESSION['status'] == 'userDeleted') ?: array_push($status, "User deleted");
+        ($_SESSION['status'] == 'userAdded') ? array_push($status, "New user added") : "";
+        ($_SESSION['status'] == 'userUpdated') ? array_push($status, "User has been updated") : "";
+        ($_SESSION['status'] == 'userDeleted') ? array_push($status, "User deleted") : "";
         unset($_SESSION['status']);
 
     }
@@ -67,8 +67,8 @@ class UserApp extends BaseApp
    if (isset($_SESSION['error'])) {
 
       $checkError = false;
-      ($_SESSION['error'] == 'userNotFound') ?: array_push($errors, "Error: User Not Found"); 
-      ($_SESSION['error'] == 'adminDeletedNotified') ?: array_push($errors, "Error: Administrator could not be deleted");
+      ($_SESSION['error'] == 'userNotFound') ? array_push($errors, "Error: User Not Found") : ""; 
+      ($_SESSION['error'] == 'adminDeletedNotified') ? array_push($errors, "Error: Administrator could not be deleted") : "";
       unset($_SESSION['error']);
 
    }
