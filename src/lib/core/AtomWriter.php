@@ -3,6 +3,7 @@
  * Class AtomWriter extends DOMDocument
  * 
  * @category Core Class
+ * @author David Sklar & Adam Trachtenberg
  * @license MIT
  * @version 1.0
  * 
