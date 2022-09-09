@@ -146,6 +146,13 @@ public static function check($key, $origin, $throwException = false, $timespan =
 
 }
 
+/**
+ * generate
+ *
+ * @method static generate()
+ * @param string $key
+ * @return string
+ */
 public static function generate($key)
 {
 
@@ -159,6 +166,11 @@ public static function generate($key)
 
 }
 
+/**
+ * enableOriginCheck
+ *
+ * @return bool
+ */
 private static function enableOriginCheck()
 {
  
