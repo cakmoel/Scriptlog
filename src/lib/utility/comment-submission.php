@@ -175,7 +175,6 @@ function processing_comment(array $values)
       'comment_date' => $comment_at 
     ];
     
-    FrontContentProvider::frontNewCommentByPost($bind, $commentProvider);
+   FrontContentProvider::frontNewCommentByPost($bind, $commentProvider);
     
-
 }
