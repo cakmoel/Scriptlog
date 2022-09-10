@@ -38,6 +38,12 @@ if (is_array($results)) {
                 $reading_settings['post_per_archive'] = $data['setting_value'];
 
                 break;
+            
+            case 'comment_per_post':
+
+                $reading_settings['comment_per_post'] = $data['setting_value'];
+
+                break;
 
         }
 
