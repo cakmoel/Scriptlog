@@ -24,6 +24,7 @@ function app_info()
 
     switch ($data['setting_name']) {
       
+        default:
         case 'app_key':
 
           $app_info['app_key'] = $data['setting_value'];
