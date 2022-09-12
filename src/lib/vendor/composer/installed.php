@@ -1,24 +1,24 @@
 <?php return array (
   'root' => 
   array (
-    'pretty_version' => 'dev-master',
-    'version' => 'dev-master',
+    'pretty_version' => 'dev-main',
+    'version' => 'dev-main',
     'aliases' => 
     array (
     ),
-    'reference' => 'ad57682ca8fffd07cef7c15eedfea9277cd84d7c',
+    'reference' => 'd279af713fb5d19dd6fb78d4eaeace061690a36d',
     'name' => '__root__',
   ),
   'versions' => 
   array (
     '__root__' => 
     array (
-      'pretty_version' => 'dev-master',
-      'version' => 'dev-master',
+      'pretty_version' => 'dev-main',
+      'version' => 'dev-main',
       'aliases' => 
       array (
       ),
-      'reference' => 'ad57682ca8fffd07cef7c15eedfea9277cd84d7c',
+      'reference' => 'd279af713fb5d19dd6fb78d4eaeace061690a36d',
     ),
     'container-interop/container-interop' => 
     array (
@@ -65,30 +65,30 @@
     ),
     'guzzlehttp/guzzle' => 
     array (
-      'pretty_version' => '7.4.5',
-      'version' => '7.4.5.0',
+      'pretty_version' => '7.5.0',
+      'version' => '7.5.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => '1dd98b0564cb3f6bd16ce683cb755f94c10fbd82',
+      'reference' => 'b50a2a1251152e43f6a37f0fa053e730a67d25ba',
     ),
     'guzzlehttp/promises' => 
     array (
-      'pretty_version' => '1.5.1',
-      'version' => '1.5.1.0',
+      'pretty_version' => '1.5.2',
+      'version' => '1.5.2.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'fe752aedc9fd8fcca3fe7ad05d419d32998a06da',
+      'reference' => 'b94b2807d85443f9719887892882d0329d1e2598',
     ),
     'guzzlehttp/psr7' => 
     array (
-      'pretty_version' => '2.4.0',
-      'version' => '2.4.0.0',
+      'pretty_version' => '2.4.1',
+      'version' => '2.4.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => '13388f00956b1503577598873fffb5ae994b5737',
+      'reference' => '69568e4293f4fa993f3b0e51c9723e1e17c41379',
     ),
     'intervention/image' => 
     array (
@@ -135,6 +135,15 @@
       ),
       'reference' => '58af67282db37d24e584a837a94ee55b9c7552be',
     ),
+    'laminas/laminas-feed' => 
+    array (
+      'pretty_version' => '2.18.2',
+      'version' => '2.18.2.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => 'a57fdb9df42950d5b7f052509fbdab0d081c6b6d',
+    ),
     'laminas/laminas-math' => 
     array (
       'pretty_version' => '3.5.0',
@@ -155,21 +164,21 @@
     ),
     'laminas/laminas-stdlib' => 
     array (
-      'pretty_version' => '3.11.0',
-      'version' => '3.11.0.0',
+      'pretty_version' => '3.13.0',
+      'version' => '3.13.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'aad7d2b11ba0069ba0d9b40f6dde3c2fa664b57f',
+      'reference' => '66a6d03c381f6c9f1dd988bf8244f9afb9380d76',
     ),
     'melbahja/seo' => 
     array (
-      'pretty_version' => 'v2.1.0',
-      'version' => '2.1.0.0',
+      'pretty_version' => 'v2.1.1',
+      'version' => '2.1.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => '0ef0a7c2b7191a3ec034a3291d76401880e28492',
+      'reference' => '22b0b3273bf9c8867cadf018e4daa3e426525929',
     ),
     'paragonie/random_compat' => 
     array (
@@ -381,12 +390,12 @@
     ),
     'voku/portable-utf8' => 
     array (
-      'pretty_version' => '6.0.5',
-      'version' => '6.0.5.0',
+      'pretty_version' => '6.0.9',
+      'version' => '6.0.9.0',
       'aliases' => 
       array (
       ),
-      'reference' => '6c764c2c4fcad451a0f6622260a4934cfea08aa4',
+      'reference' => 'eb2861c34203a9c2a7c275cba7014d6816604e89',
     ),
   ),
 );
