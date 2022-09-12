@@ -1,60 +1,106 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
 /**
- * Class AtomWriter extends DOMDocument
+ * class AtomWriter
  * 
  * @category Core Class
- * @author David Sklar & Adam Trachtenberg
+ * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
  * 
  */
-class AtomWriter extends DOMDocument
+
+use Laminas\Feed\Writer\Feed;
+
+class AtomWriter
 {
-    
-private $name_space; // namespace
 
-public function __contruct($title, $href, $name, $id)
-{
- parent::__construct();
+  private $frontContentProvider;
 
- $this->formatOutput = true;
+  private $atomFeed;
 
- $this->name_space = 'http://www.w3.org/2005/Atom';
+  private $entry;
 
- $root = $this->appendChild($this->createElementNS($this->name_space, 'feed'));
+  private function grabPostFeed($limit)
+  {
 
- $root->appendChild($this->createElementNS($this->name_space, 'title', $title));
+    $postProviderModel = new PostProviderModel();
 
- $link = $root->appendChild($this->createElementNS($this->name_space, 'link'));
- 
- $link->setAttribute('href', $href);
+    $this->frontContentProvider = FrontContentProvider::frontPostsFeed($limit, $postProviderModel);
 
- $root->appendChild($this->createElementNS($this->name_space, 'updated', date(DATE_ATOM)));
+    return $this->frontContentProvider;
+  }
 
- $author = $root->appendChild($this->createElementNS($this->name_space, 'author'));
+  private function initializeFeed()
+  {
+    $this->atomFeed = new Feed();
 
- $author->appendChild($this->createElementNS($this->name_space, 'name', $name));
+    return $this->atomFeed;
+  }
 
- $root->appendChild($this->createElementNS($this->name_space, 'id', $id));
+  private function setHeaderFeed($title, $uri, $feed_link)
+  {
+    $feed = $this->initializeFeed();
 
-}
+    $feed->setTitle($title);
+    $feed->setLink($uri);
+    $feed->setFeedLink($feed_link, 'atom');
+    $feed->addAuthor([
+      'name' => app_info()['site_name'],
+      'email' => app_info()['site_email'],
+      'uri' => app_info()['app_url'],
+    ]);
 
-public function addEntry($title, $link, $summary, $id)
-{
- $entry = $this->createElementNS($this->name_space, 'entry');
+    $feed->setDateModified(time());
 
- $entry->appendChild($this->createElementNS($this->name_space, 'title', $title));
- 
- $entry->appendChild($this->createElementNS($this->name_space, 'link', $link));
+    return $feed;
 
- $entry->appendChild($this->createElementNS($this->name_space, 'id', $id));
+  }
 
- $entry->appendChild($this->createElementNS($this->name_space, 'updated', date(DATE_ATOM)));
+  public function generateAtomFeed($title, $uri, $feed_link, $limit)
+  {
 
- $entry->appendChild($this->createElementNS($this->name_space, 'summary', $summary));
+    $this->entries = is_iterable($this->grabPostFeed($limit)) ? $this->grabPostFeed($limit) : "";
 
- $this->documentElement->appendChild($entry);
- 
-}
+    $feed = $this->setHeaderFeed($title, $uri, $feed_link);
 
+    $this->entry = $feed->createEntry();
+
+    foreach ($this->entries as $entry) {
+
+      $feed_id = isset($entry['ID']) ? intval((int)$entry['ID']) : "";
+      $feed_title = isset($entry['post_title']) ? htmlout($entry['post_title']) : "";
+      $feed_created = isset($entry['post_date']) ? htmlout(strtotime($entry['post_date'] )): "";
+      $feed_created = new DateTime("@$feed_created");
+      $feed_created->format('d-m-Y H:i:s');
+      
+      $feed_modified = isset($entry['post_modified']) ? htmlout(strtotime($entry['post_modified'])) : "";
+      $feed_modified = new DateTime("@$feed_modified");
+      $feed_modified->format('d-m-Y H:i:s');
+      
+      $feed_permalinks = isset($entry['ID']) ? permalinks($feed_id)['post'] : "";
+      $feed_author = (isset($entry['user_login']) || isset($entry['user_fullname']) ? htmlout($entry['user_login']) : htmlout($entry['user_fullname']));
+      $feed_content = isset($entry['post_content']) ? htmlout(strip_tags(nl2br(html_entity_decode($entry['post_content'])))) : "";
+      $feed_description = substr($feed_content, 0, 220);
+      $feed_description = substr($feed_content, 0, strrpos($feed_description, " "));
+
+      $this->entry->setTitle($feed_title);
+      $this->entry->setLink($feed_permalinks);
+      $this->entry->addAuthor([
+
+        'name' => $feed_author,
+        'email' => app_info()['site_email'],
+        'uri' => app_info()['app_url'],
+
+      ]);
+
+      $this->entry->setDateModified($feed_modified);
+      $this->entry->setDateCreated($feed_created);
+      $this->entry->setDescription($feed_description);
+
+      $feed->addEntry($this->entry);
+
+      return $feed->export('atom');
+
+    }
+  }
 }

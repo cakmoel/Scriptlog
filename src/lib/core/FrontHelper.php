@@ -250,9 +250,8 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
         $media_id = $result['ID'];
       }
 
-      $front = ['media_filename' => $media_filename, 'media_caption' => $media_caption, 'media_id' => $media_id];
+      return ['media_filename' => $media_filename, 'media_caption' => $media_caption, 'media_id' => $media_id];
 
-      return $front;
     }
   }
 
