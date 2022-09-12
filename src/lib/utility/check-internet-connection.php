@@ -18,37 +18,21 @@ function check_internet()
     case CONNECTION_NORMAL:
          
         $connect_status = true;
-
-        return $connect_status;
-         
+    
         break;
      
-    case CONNECTION_ABORTED:
-
-        $connect_status = false;
-
-        return $connect_status;
-
-        break;
-
+    case CONNECTION_ABORTED :
     case (CONNECTION_ABORTED & CONNECTION_TIMEOUT) :
-
-        $connect_status = false;
-
-        return $connect_status;
-
-        break;
-
-     default:
+    default:
         
         $connect_status = false;
-        
-        return $connect_status;
 
         break;
 
  }
 
+ return $connect_status;
+ 
 }
 
 /**

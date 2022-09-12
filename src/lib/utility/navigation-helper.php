@@ -14,9 +14,7 @@ $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_sort, menu_status, men
 
 $statement = db_prepared_query($sql, [(int)$parent_id], 'i');
 
-$results = get_result($statement);
-
-return $results;
+return get_result($statement);
 
 }
 
