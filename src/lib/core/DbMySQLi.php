@@ -204,17 +204,25 @@ public function simpleQuery($sql)
  * @return object
  * 
  */
-public function preparedQuery($sql, array $params, $types = null)
+public function preparedQuery($sql, $params, $types = "")
 {
   
   $types = $types ?: str_repeat("s", count($params));
 
   $stmt = $this->dbc->prepare($sql);
 
-  $stmt->bind_param($types, ...$params);
-  
-  if ( ! $stmt->execute() ) return false;
+  if ( !$stmt ) {
 
+    return false;
+
+  } else {
+
+    $stmt->bind_param($types, ...$params);
+  
+    $stmt->execute();
+
+  }
+  
   return $stmt;
 
 }
