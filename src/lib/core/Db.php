@@ -20,13 +20,6 @@ class Db implements DbInterface
   *
   */
  private $dbc;
-
-/**
- * cache
- * @var object
- * 
- */
- private static $cache;
  
 /**
  * Initializing an object property and method
