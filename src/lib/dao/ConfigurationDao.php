@@ -71,7 +71,7 @@ public function deleteConfig($configId, $sanitize)
  * @return array
  * 
  */
-public function findConfigs($orderBy = 'ID')
+public function findConfigs($orderBy = 'ID', $fetchMode = null)
 {
   
   $sql = "SELECT ID, setting_name, setting_value 
@@ -80,7 +80,7 @@ public function findConfigs($orderBy = 'ID')
 
 	$this->setSQL($sql);
 
-	$configs = $this->findAll([':orderBy' => $orderBy]);
+	$configs = (!is_null($fetchMode)) ? $this->findAll([':orderBy' => $orderBy], $fetchMode) : $this->findAll([':orderBy' => $orderBy]);
 
 	return (empty($configs)) ?: $configs;
 	
@@ -115,7 +115,7 @@ public function findGeneralConfigs($orderBy = 'ID', $limit = 7)
  */
 public function findReadingConfigs($orderBy = 'ID')
 {
-  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE ID BETWEEN 8 AND 11 ORDER BY :orderBy ";
+  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE ID BETWEEN 8 AND 10 ORDER BY :orderBy ";
 
   $this->setSQL($sql);
 
