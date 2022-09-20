@@ -13,7 +13,7 @@ class ArchivesProviderModel extends Dao
 
  private $linkArchives;
 
- private $pagination;
+ private $pagination = null;
 
  public function __construct()
  {

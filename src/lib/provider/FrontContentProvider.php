@@ -59,14 +59,6 @@ private static $pageProviderModel;
 private static $galleryProviderModel;
 
 /**
- * commentProviderModel
- *
- * @var object
- * 
- */
-private static $commentProviderModel;
-
-/**
  * frontRandomHeadlinesPosts
  *
  * @param PostProviderModel $postProviderModel
@@ -132,19 +124,6 @@ public static function frontPostById($postId, PostProviderModel $postProviderMod
 {  
  self::$postProviderModel = $postProviderModel;
  return self::$postProviderModel->getPostById($postId, self::frontSanitizer());
-}
-
-/**
- * frontPostFeeds
- *
- * @param int|num $limit
- * @param PostProviderModel $postProviderModel
- * @return mixed
- */
-public static function frontPostsFeed($limit, PostProviderModel $postProviderModel)
-{
- self::$postProviderModel = $postProviderModel;
- return self::$postProviderModel->getPostFeeds($limit);
 }
 
 /**
@@ -269,45 +248,6 @@ public static function frontSidebarArchives(ArchivesProviderModel $archivesProvi
 }
 
 /**
- * frontCommentsByPost
- *
- * @param int|num $postId
- * @param CommentProviderModel $commentProviderModel
- * @return mixed
- */
-public static function frontCommentsByPost($postId, CommentProviderModel $commentProviderModel)
-{
- self::$commentProviderModel = $commentProviderModel;
- return self::$commentProviderModel->getCommentsByPost($postId, self::frontSanitizer(), self::frontPaginator(app_reading_setting()['comment_per_post'], 'p'));
-}
-
-/**
- * frontNewCommentByPost
- *
- * @param array $bind
- * @param CommentProviderModel $commentProviderModel
- * 
- */
-public static function frontNewCommentByPost($bind, CommentProviderModel $commentProviderModel)
-{
- self::$commentProviderModel = $commentProviderModel;
- return self::$commentProviderModel->addComment($bind);
-}
-
-/**
- * frontTotalCommentByPost
- *
- * @param int|num $postId
- * @param CommentProviderModel $commentProviderModel
- * 
- */
-public static function frontTotalCommentByPost($postId, CommentProviderModel $commentProviderModel)
-{
- self::$commentProviderModel = $commentProviderModel;
- return self::$commentProviderModel->totalCommentsByPost($postId, self::frontSanitizer());
-}
-
-/**
  * frontSanitizer
  * 
  * @return object
@@ -328,7 +268,9 @@ public static function frontSanitizer()
  */
 private static function frontPaginator($perPage, $instance)
 {
+ 
  return new Paginator($perPage, $instance);
+ 
 }
 
 }

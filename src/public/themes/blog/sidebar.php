@@ -20,14 +20,14 @@
               <?php 
                 foreach ( (array)$latest_posts['sidebarPosts'] as $latest_post) :
                   $author = (isset($latest_post['user_login'])) ? escape_html($latest_post['user_login']) : escape_html($latest_post['user_fullname']);
-              ?>
 
+              ?>
              <a href="<?= isset($latest_post['ID']) ? permalinks($latest_post['ID'])['post'] : "#"?>">
                 <div class="item d-flex align-items-center">
                   <div class="title"><strong><?= isset($latest_post['post_title']) ? escape_html($latest_post['post_title']) : ""; ?></strong>
                     <div class="d-flex align-items-center">
                       <div class="views"><i class="fa fa-user-circle" aria-hidden="true"></i> <?= $author; ?></div>
-                      <div class="comments"><i class="icon-comment" aria-hidden="true"></i> <?= $total_comment; ?> </div>
+                      <div class="comments"><i class="fa fa-calendar" aria-hidden="true"></i> <?= $post_created; ?> </div>
                     </div>
                   </div>
                 </div>
@@ -48,7 +48,7 @@
             </header>
 
             <?php 
-              foreach (sidebar_topics() as $category) :
+              foreach (sidebarTopics() as $category) :
             ?>
             
               <div class="item d-flex justify-content-between"><a href="<?= isset($category['ID']) ? permalinks($category['ID'])['cat'] : "#"; ?>"><?= isset($category['topic_title']) ? escape_html($category['topic_title']) : ""; ?></a><span><?= isset($category['total_posts']) ? $category['total_posts'] : ""?></span></div>

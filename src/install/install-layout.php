@@ -9,7 +9,7 @@ function install_header($stylePath)
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Scriptlog Installation">
-    <link href="<?= $stylePath; ?>assets/img/favicon.ico" rel="Shorcut Icon" >
+    <link rel="Shorcut Icon" href="<?= $stylePath; ?>assets/img/favicon.ico">
 
     <title>Scriptlog Installation</title>
 
