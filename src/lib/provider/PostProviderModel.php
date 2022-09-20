@@ -13,7 +13,7 @@ class PostProviderModel extends Dao
  
 private $linkPosts;
 
-private $pagination;
+private $pagination = null;
 
 public function __construct()
 {
@@ -28,13 +28,13 @@ public function __construct()
  * @param integer $limit
  * @return void
  */
-public function getPostFeeds($limit)
+public function getPostFeeds($limit = 5)
 {
   $sql =  "SELECT p.ID, p.media_id, p.post_author,
                   p.post_date, p.post_modified, p.post_title,
                   p.post_slug, p.post_content, p.post_type,
                   p.post_status, p.post_tags, 
-                  p.post_sticky, u.user_fullname, u.user_login
+                  p.post_sticky, u.user_login
             FROM tbl_posts AS p
             INNER JOIN tbl_users AS u ON p.post_author = u.ID
             WHERE p.post_type = 'blog' AND p.post_status = 'publish'
