@@ -197,7 +197,7 @@ class UserDao extends Dao
 	          'user_fullname' => $bind['user_fullname'],
 	          'user_url'   => $user_url,
 	          'user_activation_key' => $bind['user_activation_key'],
-              'user_session' => $bind['user_session'],
+            'user_session' => $bind['user_session']
 	          
 	      ]);
 	      
