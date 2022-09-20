@@ -22,7 +22,7 @@
            <a href="<?= isset($featured_hero_id) ? permalinks($featured_hero_id)['post'] : "#"; ?>" class="hero-link">Discover More</a>
          </div>
 
-       </div><a href="<?= (empty($sticky_page)) ? "#" : ".intro"; ?>" class="continue link-scroll"><i class="fa fa-long-arrow-down"></i> Scroll Down</a>
+       </div><a href="<?= (empty($sticky_page)) ? "#" : ".intro"; ?>" class="continue link-scroll"><i class="fa fa-long-arrow-down" aria-hidden="true"></i> Scroll Down</a>
      </div>
    </section>
 
@@ -200,7 +200,7 @@
             $latest_post_title = isset($latest_post['post_title']) ? htmlout($latest_post['post_title']) : "";
             $latest_post_img = (isset($latest_post['media_filename']) && $latest_post['media_filename'] !== "" ) ? htmlout($latest_post['media_filename']) : "";
             $latest_img_caption = isset($latest_post['media_caption']) ? htmlout($latest_post['media_caption']) : "";
-            $latest_post_created = isset($latest_post['post_modified']) ? htmlout($latest_post['post_modified']) : htmlout($latest_post['post_date']);
+            $latest_post_created = isset($latest_post['post_modified']) ? htmlout(make_date($latest_post['post_modified'])) : htmlout(make_date($latest_post['post_date']));
 
         ?>
 
