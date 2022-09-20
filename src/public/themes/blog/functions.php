@@ -1,4 +1,4 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
 /**
  * request_path()
  *
@@ -28,6 +28,17 @@ function initialize_post()
 function initialize_page()
 {
  return new PageProviderModel();
+}
+
+/**
+ * initialize_comment
+ *
+ * @return object
+ * 
+ */
+function initialize_comment()
+{
+  return new CommentProviderModel();
 }
 
 /**
@@ -186,14 +197,14 @@ function retrieves_topic_prepared($id)
   return implode("", $topics);
 
 }
-
+  
 /**
  * sidebarTopics()
  * retrieving categories and display it on sidebar
  *
  * @return mixed
  */
-function sidebarTopics()
+function sidebar_topics()
 {
  $sidebar_topics = FrontContentProvider::frontSidebarTopics(initialize_topic());
  return (is_iterable($sidebar_topics)) ? $sidebar_topics : array();
@@ -254,7 +265,7 @@ function previous_post($id)
   while ($rows = $stmt->fetch_array(MYSQLI_ASSOC)) {
 
     $html .= '<a href="'.permalinks($rows['ID'])['post'].'" class="prev-post text-left d-flex align-items-center">';
-    $html .= '<div class="icon prev"><i class="fa fa-angle-left"></i></div>';
+    $html .= '<div class="icon prev"><i class="fa fa-angle-left" aria-hidden="true"></i></div>';
     $html .= '<div class="text"><strong class="text-primary">Previous Post </strong>';
     $html .= '<h6>'.escape_html($rows['post_title']).'</h6>';
     $html .= '</div>';
@@ -287,13 +298,13 @@ $stmt = db_simple_query($sql);
 
 if ($stmt->num_rows > 0) {
 
-   while ( $rows = $stmt->fetch_array(MYSQLI_ASSOC) ) {
+  while ( $rows = $stmt->fetch_array(MYSQLI_ASSOC) ) {
 
     $html .= '<a href="'.permalinks($rows['ID'])['post'].'"  class="next-post text-right d-flex align-items-center justify-content-end">';
     $html .= '<div class="text"><strong class="text-primary">Next Post </strong>';
     $html .= '<h6>'.escape_html($rows['post_title']).'</h6>';
     $html .= '</div>';
-    $html .= '<div class="icon next"><i class="fa fa-angle-right"></i></div>';
+    $html .= '<div class="icon next"><i class="fa fa-angle-right" aria-hidden="true"></i></div>';
     $html .= '</a>';
 
   }
@@ -356,6 +367,43 @@ function retrieve_archives()
 {
   $archives = FrontContentProvider::frontSidebarArchives(initialize_archive());
   return is_iterable($archives) ? $archives : array();
+}
+
+/**
+ * comments_by_post
+ *
+ * retrieves list of comments by detail post requested
+ * 
+ * @param int|num $id
+ *
+ */
+function comments_by_post($id)
+{
+  $comments = FrontContentProvider::frontCommentsByPost($id, initialize_comment());
+  return is_iterable($comments) ? $comments : array();
+}
+
+/**
+ * total_comment
+ *
+ * @param int| $id
+ * 
+ */
+function total_comment($id)
+{
+ return FrontContentProvider::frontTotalCommentByPost($id, initialize_comment());
+}
+
+/**
+ * block_csrf
+ * 
+ * generating string token 
+ * 
+ * @return string
+ */
+function block_csrf()
+{
+  return generate_form_token('comment_form', 40);
 }
 
 /**

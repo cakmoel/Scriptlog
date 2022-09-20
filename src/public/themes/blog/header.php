@@ -17,7 +17,8 @@ require dirname(__FILE__) . '/functions.php';
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/dropdown.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.css">
-<link rel="shortcut icon" href="<?= app_url() . '/favicon.ico'; ?>">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css">
+<link rel="shortcut icon" href="<?= theme_dir(); ?>assets/img/favicon.ico">
 
 <?= theme_meta()['site_schema']; ?>
 
