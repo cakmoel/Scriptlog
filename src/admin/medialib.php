@@ -33,7 +33,7 @@ try {
       
                 } else {
       
-                     direct_page('index.php?load=dashboard', 302);
+                    direct_page('index.php?load=dashboard', 302);
                 
                 }
               
@@ -103,7 +103,7 @@ try {
     
         default:
     
-            if( false === $authenticator->userAccessControl(ActionConst::MEDIALIB)) {
+            if (false === $authenticator->userAccessControl(ActionConst::MEDIALIB)) {
     
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
