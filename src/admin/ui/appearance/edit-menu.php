@@ -8,7 +8,7 @@
         <small>Control Panel</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
         <li><a href="index.php?load=menu">Menu</a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
@@ -26,7 +26,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
+<h4><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h4>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
