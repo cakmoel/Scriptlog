@@ -7,7 +7,7 @@
   <small>Control Panel</small>
 </h1>
   <ol class="breadcrumb">
-      <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
       <li><a href="index.php?load=posts">Posts</a></li>
       <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
    </ol>
@@ -27,7 +27,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
+<h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
 
 <?php 
 foreach ($errors as $e) :
@@ -92,11 +92,11 @@ $post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
 <label for="datepicker">Date</label>
 <div class="input-group date">
 <div class="input-group-addon">
-<i class="fa fa-calendar"></i>
+<i class="fa fa-calendar" aria-hidden="true"></i>
 </div>
 
-<input type="text" id="datetimepicker" name="<?=(isset($postData['post_modified']) ? "post_modified" : "post_date"); ?>" class="form-control" placeholder="Date" value="
-
+<input type="text" id="datetimepicker" name="<?=(isset($postData['post_modified']) ? "post_modified" : "post_date"); ?>" class="form-control" placeholder="Date" 
+value="
 <?php 
 if (isset($postData['post_modified']) || isset($postData['post_date']) ) {
 
