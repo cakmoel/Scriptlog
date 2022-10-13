@@ -12,7 +12,6 @@
  * @since    Since Release 1.0
  * 
  */
-
 if (file_exists(__DIR__ . '/../config.php')) {
     
   include __DIR__ . '/../lib/main.php';
@@ -41,7 +40,7 @@ $action = isset($_GET['action']) ? safe_html($_GET['action']) : "";
 $loginId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $uniqueKey = isset($_GET['uniqueKey']) ? safe_html($_GET['uniqueKey']) : null;
 
-if ( ($action == 'LogIn') && (block_request_type(current_request_method(), ['POST']) === false ) ) {
+if ( ( $action == 'LogIn' ) && ( block_request_type(current_request_method(), ['POST']) === false ) ) {
 
   list($errors, $failed_login) = processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, $_POST);
    
@@ -88,7 +87,7 @@ login_header($stylePath);
 
 ?>
 
-<form name="formlogin" action="<?= human_login_request('login.php', ['LogIn', human_login_id(), md5(app_key().$ip)])['doLogin']; ?>" method="post" onSubmit="return validasi(this)" role="form" autocomplete="off">
+<form name="formlogin" action="<?= form_action('login.php', ['LogIn', human_login_id(), md5(app_key().$ip)], "login")['doLogin']; ?>" method="post" onSubmit="return validasi(this)" role="form" autocomplete="off">
 <div class="form-group has-feedback">
 <label for="inputLogin">Username or Email Address</label>
 <input type="text"  class="form-control" id="inputLogin" placeholder="username or email" name="login" maxlength="186" value="
@@ -135,7 +134,7 @@ login_header($stylePath);
 ?>
     
 <input type="hidden" name="csrf" value="<?= $block_csrf; ?>">
-  <input type="submit" class="btn btn-primary btn-block btn-flat" name="LogIn" value="Login">
+<input type="submit" class="btn btn-primary btn-block btn-flat" name="LogIn" value="Login">
 </div>
 </div>
 </form>
