@@ -8,7 +8,7 @@
         <small>Control Panel</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
         <li><a href="index.php?load=comments">Comments</a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
@@ -26,7 +26,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
+<h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -86,11 +86,11 @@ $comment_id = isset($commentData['ID']) ? (int)$commentData['ID'] : 0;
         </div>
         <div class="box-body">
             <div class="form-group">
-                <label><i class="fa fa-calendar"></i> Submited On</label>
-                <p class="text-aqua"><?=(isset($commentData['comment_date'])) ? human_readable_datetime(read_datetime($commentData['comment_date']), 'g:ia \o\n l jS F Y') : ""; ?></p>
+                <label><i class="fa fa-calendar" aria-hidden="true"></i> Submited On</label>
+                <p class="text-aqua"><?=(isset($commentData['comment_date'])) ? human_readable_datetime(new DateTime($commentData['comment_date']), 'g:i a  \o\n l jS F Y') : ""; ?></p>
             </div>
             <div class="form-group">
-                <a href="<?= generate_request("index.php", 'get', ['reply', ActionConst::NEWREPLY, 0])['link']; ?>" class="btn btn-primary"></a>
+                <a href="<?= generate_request("index.php", 'get', ['reply', ActionConst::NEWREPLY, 0])['link']; ?>" class="btn btn-primary"><i class="fa fa-reply fa-fw" aria-hidden="true"></i> </a>
             </div>
         </div>
             <!-- /.box-body -->
