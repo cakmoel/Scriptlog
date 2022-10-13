@@ -62,7 +62,7 @@
           </li>
           <!-- Control Sidebar Toggle Button -->
           <li>
-            <a href="<?= app_url(); ?>" target="_blank" rel="noopener noreferrer" title="Visit Site" ><i class="fa fa-home"></i></a>
+            <a href="<?= app_url(); ?>" target="_blank" rel="noopener noreferrer" title="Visit Site" ><i class="fa fa-home" aria-hidden="true"></i></a>
           </li>
         </ul>
       </div>
