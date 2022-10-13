@@ -8,7 +8,7 @@ try {
 
    $protocol = current_http_version();
 
-   if ( ( isset($_GET['load']) ) || ( array_key_exists('load', $_GET) ) ) {
+   if ((isset($_GET['load'])) || (array_key_exists('load', $_GET))) {
      
         $load = is_array($_GET['load']) ? implode('', $_GET['load']) : $_GET['load'];
         $load = filter_var($load, FILTER_VALIDATE_URL, ['flags' => FILTER_FLAG_QUERY_REQUIRED]);
@@ -20,7 +20,7 @@ try {
         // checking if the string contains parent directory
         if (strpos($load, '..') !== false) {
 
-            header($protocol." 400 Bad Request", true, 400);
+            header($protocol.MESSAGE_BADREQUEST, true, 400);
             throw new AppException("Directory traversal attempt!");
             
         }
@@ -28,14 +28,14 @@ try {
         // checking remote file inclusions
         if (strstr($load, '../') || strstr($load, 'http://') || strstr($load, 'file://') || strstr($load, 'data:') || strstr($load, 'zip://')) {
             
-            header($protocol." 400 Bad Request", true, 400);
+            header($protocol.MESSAGE_BADREQUEST, true, 400);
             throw new AppException("Remote file inclusion attempt!");
             
         }  
         
         if (strstr($load, 'php://input') || strstr($load, 'php://filter')) {
 
-            header($protocol." 400 Bad Request", true, 400);
+            header($protocol.MESSAGE_BADREQUEST, true, 400);
             throw new AppException("Remote file inclusion attempt!");
 
         } 
@@ -113,4 +113,4 @@ try {
     
 } 
 
-(isset($ubench) && (true == APP_DEVELOPMENT)) ? $ubench->end() : null;
+(isset($ubench) && (true === APP_DEVELOPMENT)) ? $ubench->end() : null;
