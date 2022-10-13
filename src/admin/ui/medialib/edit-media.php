@@ -26,7 +26,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
+<h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -213,7 +213,7 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
                 <dt>Uploaded by</dt>
                 <dd><?=(isset($mediaData['media_user'])) ? safe_html($mediaData['media_user']) : ""; ?></dd>
                 <dt>Uploaded on</dt>
-                <dd><?= safe_html($media_properties['Uploaded on']); ?></dd>
+                <dd><?= safe_html($media_properties['Uploaded at']); ?></dd>
                 <dt>Dimension</dt>
                 <dd><?=(isset($mediaData['media_type']) && $mediaData['media_type'] != "image/jpeg" && $mediaData['media_type'] != "image/png" 
                       && $mediaData['media_type'] != "image/webp" 
