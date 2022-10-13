@@ -7,7 +7,7 @@
         <small>Control Panel</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
         <li><a href="index.php?load=option-general">General Settings</a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
@@ -25,7 +25,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
+<h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -43,7 +43,7 @@ if (isset($status)) :
 
 <div class="alert alert-success alert-dismissible">
   <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-  <h2><i class="icon fa fa-check"></i> Success!</h2>
+  <h2><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h2>
     
     <?php 
         foreach ($status as $s) :
@@ -63,7 +63,7 @@ $action = (isset($formAction)) ? $formAction : null;
 
 <div class="box-body">
   <form method="post" action="<?= generate_request('index.php', 'get', ['option-general', $action, 0])['link']; ?>" role="form">
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped" aria-describedby="general-setting">
           <tbody>
           <?php 
             if (is_array($settings)) :
