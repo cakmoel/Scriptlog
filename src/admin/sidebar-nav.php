@@ -16,18 +16,18 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">MAIN NAVIGATION</li>
         <!-- Optionally, you can add icons to the links -->
-        <li <?=($module == 'dashboard') ? 'class="active"' : 'class=""'; ?>>
-          <a href="<?= $url.'/'.generate_request('index.php', 'get', ['dashboard'], false)['link']; ?>"><i class="fa fa-dashboard"></i> 
+        <li <?= ($module === 'dashboard') ? 'class="active"' : 'class=""'; ?>>
+          <a href="<?= $url.'/'.generate_request('index.php', 'get', ['dashboard'], false)['link']; ?>"><i class="fa fa-dashboard" aria-hidden="true"></i> 
           <span>Dashboard</span></a>
           </li>
         
 <?php if (access_control_list()) : ?>
 
-    <li <?=($module == 'posts' || $module == 'topics') ? 'class="treeview active"' : 'class="treeview"'; ?>>
-          <a href="#"><i class="fa fa-thumb-tack"></i> 
+    <li <?=($module === 'posts' || $module === 'topics') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+          <a href="#"><i class="fa fa-thumb-tack" aria-hidden="true"></i> 
           <span>Posts</span>
             <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
+                <i class="fa fa-angle-left pull-right" aria-hidden="true"></i>
               </span>
           </a>
           <ul class="treeview-menu">
@@ -45,10 +45,10 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
 
 <?php endif; if (access_control_list(ActionConst::MEDIALIB)) : ?>
 
-        <li <?=($module == 'medialib') ? 'class="treeview active"' : 'class="treeview"'; ?>>
-          <a href="#"><i class="fa fa-image"></i> <span>Media</span>
+        <li <?=($module === 'medialib') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+          <a href="#"><i class="fa fa-image" aria-hidden="true"></i> <span>Media</span>
             <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
+                <i class="fa fa-angle-left pull-right" aria-hidden="true"></i>
               </span>
           </a>
           
@@ -63,11 +63,11 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
 
 <?php endif; if (access_control_list(ActionConst::PAGES)) : ?>
 
-         <li <?=($module == 'pages') ? 'class="treeview active"' : 'class="treeview"'; ?>>
-          <a href="#"><i class="fa fa-file"></i> 
+         <li <?=($module === 'pages') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+          <a href="#"><i class="fa fa-file" aria-hidden="true"></i> 
           <span>Pages</span>
             <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
+                <i class="fa fa-angle-left pull-right" aria-hidden="true"></i>
               </span>
           </a>
           <ul class="treeview-menu">
@@ -78,18 +78,18 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
         
 <?php endif; if (access_control_list(ActionConst::COMMENTS)) : ?>
 
-        <li <?=($module == 'comments') ? 'class="active"' : 'class=""'; ?>>
-        <a href="<?= $url.'/'.generate_request('index.php', 'get', ['comments', ActionConst::COMMENTS], false)['link']; ?>"><i class="fa fa-comments"></i> 
+        <li <?=($module === 'comments') ? 'class="active"' : 'class=""'; ?>>
+        <a href="<?= $url.'/'.generate_request('index.php', 'get', ['comments', ActionConst::COMMENTS], false)['link']; ?>"><i class="fa fa-comments" aria-hidden="true"></i> 
         <span>Comments</span></a>
         </li>
 
 <?php endif; if(access_control_list(ActionConst::USERS)) : ?>
 
-       <li <?=($module == 'users') ? 'class="treeview active"' : 'class="treeview"'; ?>>
-          <a href="#"><i class="fa fa-user"></i> 
+       <li <?=($module === 'users') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+          <a href="#"><i class="fa fa-user" aria-hidden="true"></i> 
           <span>Users</span>
             <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
+                <i class="fa fa-angle-left pull-right" aria-hidden="true"></i>
               </span>
           </a>
           <ul class="treeview-menu">
@@ -100,18 +100,18 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
 
 <?php else : ?>
 
-<li <?=($module == 'users') ? 'class="active"' : 'class=""'; ?>>
-<a href="<?= generate_request('index.php', 'get', ['users', 'editUser', $user_id, $user_session])['link']; ?>"><i class="fa fa-user"></i> 
+<li <?=($module === 'users') ? 'class="active"' : 'class=""'; ?>>
+<a href="<?= generate_request('index.php', 'get', ['users', 'editUser', $user_id, $user_session])['link']; ?>"><i class="fa fa-user" aria-hidden="true"></i> 
 <span>My Profile</span></a>
 </li>
 
 <?php endif; if(access_control_list(ActionConst::THEMES)) : ?>
 
-        <li <?=($module == 'templates' || $module == 'menu') ? 'class="treeview active"' : 'class="treeview"'; ?>>
-          <a href="#"><i class="fa fa-paint-brush"></i> 
+        <li <?=($module === 'templates' || $module === 'menu') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+          <a href="#"><i class="fa fa-paint-brush" aria-hidden="true"></i> 
           <span>Appearance</span>
             <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
+                <i class="fa fa-angle-left pull-right" aria-hidden="true"></i>
               </span>
           </a>
           <ul class="treeview-menu">
@@ -127,9 +127,9 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
 
 <?php endif; if(access_control_list(ActionConst::CONFIGURATION)): ?>
 
-<li <?=($module == 'option-general' || $module == 'option-permalink' || $module == 'option-reading') ? 'class="treeview active"' : 'class="treeview"'; ?>>
-<a href="#"><i class="fa fa-sliders"></i> <span>Settings</span>
-<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+<li <?=($module === 'option-general' || $module === 'option-permalink' || $module === 'option-reading') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+<a href="#"><i class="fa fa-sliders" aria-hidden="true"></i> <span>Settings</span>
+<span class="pull-right-container"><i class="fa fa-angle-left pull-right" aria-hidden="true"></i></span>
 </a>
 <ul class="treeview-menu">
 <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['option-general', ActionConst::GENERAL_CONFIG, 0])['link']; ?>">General</a></li>
@@ -140,9 +140,9 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
 
 <?php endif; if(access_control_list(ActionConst::PLUGINS)) : ?>
 
-<li <?=($module == 'plugins') ? 'class="active"' : 'class=""'; ?>>
+<li <?=($module === 'plugins') ? 'class="active"' : 'class=""'; ?>>
 <a href="<?= $url.'/'.generate_request('index.php', 'get', ['plugins', ActionConst::PLUGINS], false)['link']; ?>">
-<i class="fa fa-plug"></i> <span>Plugins</span>
+<i class="fa fa-plug" aria-hidden="true"></i> <span>Plugins</span>
 </a>
 </li>
         
