@@ -47,7 +47,8 @@
  * print_r($loaded_files);
  *  
  */
-final class Autoloader {
+final class Autoloader 
+{
 	/**
 	 * Base directory
 	 *
@@ -95,7 +96,8 @@ final class Autoloader {
 	 *
 	 * @param string $class_dir
 	 */
-	public function __construct($class_dir) {
+	public function __construct($class_dir) 
+	{
 		$this->_class_dir = $class_dir;
 	}
 
@@ -117,15 +119,16 @@ final class Autoloader {
 	 * @param bool $use_base_dir
 	 * @return string
 	 */
-	private static function _formatDir($dir = null, $use_base_dir = true) {
+	private static function _formatDir($dir = null, $use_base_dir = true) 
+	{
 		$dir = trim($dir);
 
 		// add base dir
-		if($use_base_dir && self::$_base_dir && strpos($dir, self::$_base_dir) === false) {
+		if ($use_base_dir && self::$_base_dir && strpos($dir, self::$_base_dir) === false) {
 			$dir = self::$_base_dir . $dir;
 		}
 
-		if(substr($dir, -1) !== '/') {
+		if (substr($dir, -1) !== '/') {
 			$dir .= '/';
 		}
 
@@ -137,11 +140,12 @@ final class Autoloader {
 	 *
 	 * @param mixed $class_dir (string|array)
 	 */
-	public static function addClassDir($class_dir) {
+	public static function addClassDir($class_dir) 
+	{
 		// multiple dirs
-		if(is_array($class_dir)) {
-			if(count($class_dir) > 0) {
-				foreach($class_dir as $v) {
+		if (is_array($class_dir)) {
+			if (count($class_dir) > 0) {
+				foreach ($class_dir as $v) {
 					self::addClassDir($v);
 				}
 			}
@@ -149,10 +153,8 @@ final class Autoloader {
 		} else {
 			self::__init();
 			$class_dir = self::_formatDir($class_dir);
-			if(!in_array($class_dir, self::$_load_dirs)) {
-				if(spl_autoload_register(array(new self($class_dir), 'autoload'))) {
-					self::$_load_dirs[] = $class_dir;
-				}
+			if ((!in_array($class_dir, self::$_load_dirs) ) && ( spl_autoload_register(array(new self($class_dir), 'autoload') ) )) {
+				self::$_load_dirs[] = $class_dir;
 			}
 		}
 	}
@@ -163,7 +165,8 @@ final class Autoloader {
 	 * @param string $class_name
 	 * @return bool
 	 */
-	public function autoload($class_name) {
+	public function autoload($class_name) 
+	{
 		$class_file = $this->_class_dir . $class_name . self::$_file_ext;
 		if(!file_exists($class_file)) {
 			return false;
@@ -178,7 +181,8 @@ final class Autoloader {
 	 *
 	 * @return array
 	 */
-	public static function getLoadDirs() {
+	public static function getLoadDirs() 
+	{
 		return self::$_load_dirs;
 	}
 
@@ -187,7 +191,8 @@ final class Autoloader {
 	 *
 	 * @return array
 	 */
-	public static function getLoadedFiles() {
+	public static function getLoadedFiles() 
+	{
 		return self::$_loaded_files;
 	}
 
@@ -196,7 +201,8 @@ final class Autoloader {
 	 *
 	 * @param string $base_dir
 	 */
-	public static function setBaseDir($base_dir) {
+	public static function setBaseDir($base_dir) 
+	{
 		self::$_base_dir = self::_formatDir($base_dir, false);
 	}
 
@@ -205,7 +211,8 @@ final class Autoloader {
 	 *
 	 * @param string $class_file_extension
 	 */
-	public static function setClassExtension($class_file_extension = '.php') {
+	public static function setClassExtension($class_file_extension = '.php') 
+	{
 		self::$_file_ext = $class_file_extension;
 	}
 }
