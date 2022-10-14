@@ -116,7 +116,7 @@ class UserApp extends BaseApp
     if (isset($_SESSION['error'])) {
         
         $checkError = false;
-        ($_SESSION['error'] == 'profileNotFound') ?: array_push($errors, "Error: Profile Not Found!");
+        ($_SESSION['error'] == 'profileNotFound') ? array_push($errors, "Error: Profile Not Found!") : "";
         unset($_SESSION['error']);
 
     }
@@ -124,7 +124,7 @@ class UserApp extends BaseApp
     if (isset($_SESSION['status'])) {
         
         $checkStatus = true;
-        ($_SESSION['status'] == 'profilUpdated') ?: array_push($status, "Profile has been updated");
+        ($_SESSION['status'] == 'profilUpdated') ? array_push($status, "Profile has been updated") : "";
         unset($_SESSION['status']);
 
     }
