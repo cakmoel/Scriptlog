@@ -90,10 +90,8 @@ final class Dispatcher
 
     } else {
 
-      call_theme_header();
       HandleRequest::deliverQueryString();
-      call_theme_footer();
-
+      
     }
 
   }
