@@ -1,7 +1,16 @@
 <?php
+/**
+ * comments-posts.php
+ * 
+ * @category commetns-post.php file -- processing comment form submission
+ * @author M.Noermoehammad
+ * @license https://opensource.org/licenses/MIT MIT License
+ * @version 1.0
+ * 
+ */
 require __DIR__ . '/lib/main.php';
 
-if ( isset($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] === 'POST') {
+if (isset($_SERVER["REQUEST_METHOD"]) && strtolower($_SERVER["REQUEST_METHOD"]) === 'post') {
 
 processing_comment($_POST);
 
