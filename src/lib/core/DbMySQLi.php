@@ -106,7 +106,7 @@ public static function activateReportMode()
 public static function getInstance()
 {
 
-  if( self::$inst == null ) {
+  if (self::$inst == null ) {
 
       self::$inst = new DbMySQLi();
 
@@ -211,7 +211,7 @@ public function preparedQuery($sql, $params, $types = "")
 
   $stmt = $this->dbc->prepare($sql);
 
-  if ( !$stmt ) {
+  if (!$stmt) {
 
     return false;
 
@@ -372,7 +372,7 @@ public function isTableExists($table_name)
   $check_table = $this->dbc->query("SHOW TABLES LIKE '$table_name'");
   $check_table_schema = $this->dbc->query("SELECT table_name FROM information_schema.tables WHERE table_schema = '$database' AND table_name = '$table_name'");
  
-   ( ( $check_table->num_rows > 0) || ( $check_table_schema->num_rows == 1 ) ? true : false ); 
+  (($check_table->num_rows > 0) || ($check_table_schema->num_rows == 1) ? true : false); 
 
   if (is_resource($check_table) || is_resource($check_table_schema)) {
 
@@ -386,13 +386,12 @@ public function isTableExists($table_name)
  * getNumRows
  *
  * @param string $sql
- * @return void
- * 
+ * @return int|string
  */
-public function getNumRows($sql)
+public function getNumRows($results)
 {
   
-  $result = $this->dbc->query($sql);
+ if ($results) {
 
   if ($this->dbc->error) {
 
@@ -400,13 +399,16 @@ public function getNumRows($sql)
 
   } else {
 
-    if ($row_count = $result->num_rows) {
+    if ($row_count = $results->num_rows) {
 
       return $row_count;
         
     }
 
   }
+
+ }
+  
 
 }
 
@@ -425,13 +427,13 @@ $result = array();
 
 $Statement->store_result();
     
-  for ( $i = 0; $i < $Statement->num_rows; $i++ ) {
+  for ($i = 0; $i < $Statement->num_rows; $i++) {
         
      $Metadata = $Statement->result_metadata();
         
      $params = array();
         
-    while ( $Field = $Metadata->fetch_field() ) {
+    while ($Field = $Metadata->fetch_field() ) {
             
       $params[] = &$result[ $i ][ $Field->name ];
         
