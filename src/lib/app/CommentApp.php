@@ -55,9 +55,9 @@ class CommentApp extends BaseApp
     
     if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        ($_SESSION['status'] == 'commentAdded') ?: array_push($status, "New comment added");
-        ($_SESSION['status'] == 'commentUpdated') ?: array_push($status, "Comment has been updated");
-        ($_SESSION['status'] == 'commentDeleted') ?: array_push($status, "Comment deleted");
+        ($_SESSION['status'] == 'commentAdded') ? array_push($status, "New comment added") : "";
+        ($_SESSION['status'] == 'commentUpdated') ? array_push($status, "Comment has been updated") : "";
+        ($_SESSION['status'] == 'commentDeleted') ? array_push($status, "Comment deleted") : "";
         unset($_SESSION['status']);
     }
     
