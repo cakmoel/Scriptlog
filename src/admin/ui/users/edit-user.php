@@ -28,7 +28,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h3><i class="icon fa fa-warning"></i> Invalid form data!</h3>
+<h3><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid form data!</h3>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
