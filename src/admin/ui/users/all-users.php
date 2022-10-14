@@ -28,7 +28,7 @@
          ?>
          <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h4><i class="icon fa fa-ban"></i> Error!</h4>
+                <h4><i class="icon fa fa-ban" aria-hidden="true"></i> Error!</h4>
            
            <?php 
               foreach ($errors as $e) :
@@ -46,7 +46,7 @@
          ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h4><i class="icon fa fa-check"></i> Success!</h4>
+                <h4><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h4>
            <?php 
               foreach ($status as $s) :
                 echo $s;
@@ -68,7 +68,7 @@
               <!-- /.box-header -->
              
               <div class="box-body">
-                <table id="scriptlog-table" class="table table-bordered table-striped table-responsive">
+                <table id="scriptlog-table" class="table table-bordered table-striped table-responsive" aria-describedby="all users">
                 <thead>
                 <tr>
                   <th>#</th>
@@ -82,23 +82,23 @@
                 <tbody>
                    <?php 
                      if (is_array($users)) : 
-                       $no = 0;
-                       foreach ($users as $user) :
-                        $no++;
+                       
+                      foreach ($users as $key => $user) :
+                        
                    ?>
                    
                      <tr>
-                       <td><?= $no; ?></td>
+                       <td><?= $key + 1; ?></td>
                        <td><?= safe_html($user['user_login']); ?></td>
                        <td><?= safe_html($user['user_email']); ?></td>
                        <td><?= safe_html($user['user_level']); ?></td>
                        <td>
                        <a href="<?=generate_request('index.php', 'get', ['users', ActionConst::EDITUSER, $user['ID'], $user['user_session']])['link']; ?>" class="btn btn-warning" title="Edit user">
-                       <i class="fa fa-pencil fa-fw"></i></a>
+                       <i class="fa fa-pencil fa-fw" aria-hidden="true"></i></a>
                        </td>
                        <td>
                        <a href="javascript:deleteUser('<?= abs((int)$user['ID']); ?>', '<?= safe_html($user['user_login']); ?>')" class="btn btn-danger" title="Delete user">
-                       <i class="fa fa-trash-o fa-fw"></i></a>
+                       <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i></a>
                        </td>
                      </tr>
                   
