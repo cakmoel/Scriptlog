@@ -191,15 +191,15 @@ class PluginApp extends BaseApp
 
           if ( (!$validate_ext) || (false === check_mime_type(['application/zip', 'application/x-zip-compressed', 'multipart/x-zip', 'application/x-compressed'], $file_location))) {
 
-               $checkError = false;
-               array_push($errors, "Invalid file format");
+            $checkError = false;
+            array_push($errors, "Invalid file format");
 
           } else {
 
             if (upload_plugin($file_location, basename($file_name)) === false) {
 
-                $checkError = false;
-                array_push($errors, "Zip file corrupted");
+              $checkError = false;
+              array_push($errors, "Zip file corrupted");
 
             }
 
