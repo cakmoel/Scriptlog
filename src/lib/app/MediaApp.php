@@ -67,9 +67,9 @@ public function listItems()
   if (isset($_SESSION['status'])) {
     
     $checkStatus = true;
-    ($_SESSION['status'] == 'mediaAdded') ?: array_push($status, "New media added");
-    ($_SESSION['status'] == 'mediaUpdated') ?: array_push($status, "Media has been updated");
-    ($_SESSION['status'] == 'mediaDeleted') ?: array_push($status, "Media deleted");
+    ($_SESSION['status'] == 'mediaAdded') ? array_push($status, "New media added") : "";
+    ($_SESSION['status'] == 'mediaUpdated') ? array_push($status, "Media has been updated") : "";
+    ($_SESSION['status'] == 'mediaDeleted') ? array_push($status, "Media deleted") : "";
     unset($_SESSION['status']);
 
   }
@@ -229,7 +229,7 @@ public function insert()
               'Origin' => rename_file($file_name), 
               'File type' => $file_type, 
               'File size' => format_size_unit($file_size), 
-              'Uploaded on' => date("Y-m-d H:i:s"), 
+              'Uploaded at' => date("Y-m-d H:i:s"), 
               'Dimension' => $width.'x'.$height
             );
 
@@ -239,7 +239,7 @@ public function insert()
             'Origin' => rename_file($file_name), 
             'File type' => $file_type, 
             'File size' => format_size_unit($file_size), 
-            'Uploaded on' => date("Y-m-d H:i:s"
+            'Uploaded at' => date("Y-m-d H:i:s"
         ));
 
       }
@@ -314,7 +314,7 @@ public function insert()
       LogError::setStatusCode(http_response_code());
       LogError::exceptionHandler($th);
 
-    } catch(AppException $e) {
+    } catch (AppException $e) {
 
       LogError::setStatusCode(http_response_code());
       LogError::exceptionHandler($e);
@@ -521,7 +521,7 @@ public function update($id)
               'Origin' => rename_file($file_name), 
               'File type' => $file_type, 
               'File size' => format_size_unit($file_size), 
-              'Uploaded on' => date("Y-m-d H:i:s"), 
+              'Uploaded at' => date("Y-m-d H:i:s"), 
               'Dimension' => $width.'x'.$height);
  
           } else {
@@ -531,14 +531,14 @@ public function update($id)
               'Origin' => rename_file($file_name), 
               'File type' => $file_type, 
               'File size' => format_size_unit($file_size), 
-              'Uploaded on' => date("Y-m-d H:i:s"));
+              'Uploaded at' => date("Y-m-d H:i:s"));
  
           }
           
           // upload file
         if (is_uploaded_file($file_location)) {
 
-          if ( ( false === check_mime_type(mime_type_dictionary(), $file_location)) || ( false === check_file_extension($file_name) ) ) {
+          if ((false === check_mime_type(mime_type_dictionary(), $file_location)) || ( false === check_file_extension($file_name) ) ) {
 
             $checkError = false;
             array_push($errors, "Invalid file format");
@@ -595,7 +595,7 @@ public function update($id)
       LogError::setStatusCode(http_response_code());
       LogError::exceptionHandler($th);
 
-    } catch(AppException $e) {
+    } catch (AppException $e) {
 
       LogError::setStatusCode(http_response_code());
       LogError::exceptionHandler($e);
@@ -642,7 +642,6 @@ public function remove($id)
      
     try {
       
-    
       if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
 
         header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
@@ -664,7 +663,7 @@ public function remove($id)
 
       }
       
-      if(!$checkError) {
+      if (!$checkError) {
 
         $this->setView('all-media');
         $this->setPageTitle('Media not found');
