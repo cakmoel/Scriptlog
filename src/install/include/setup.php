@@ -189,6 +189,10 @@ $post_per_rss_value = "10";
 $post_per_archive = "post_per_archive";
 $post_per_archive_value = "10";
 
+// setting comment per post
+$comment_per_post = "comment_per_post";
+$comment_per_post_value = "10";
+
 // Setting Permalink
 $permalink_key = "permalink_setting";
 $permalink_value = array('rewrite' => 'no', 'server_software' => check_web_server()['WebServer']);
@@ -275,6 +279,11 @@ if ($link->insert_id && $createAdmin->affected_rows > 0) {
     $recordPostPerArchive->bind_param('ss', $post_per_archive, $post_per_archive_value);
     $recordPostPerArchive->execute();
 
+    // insert configuration comment per post
+    $recordCommentPerPost = $link->prepare($saveCommentPerPost);
+    $recordCommentPerPost->bind_param('ss', $comment_per_post, $comment_per_post_value);
+    $recordCommentPerPost->execute();
+    
     // insert configuration - permalinks
     $recordPermalinks = $link->prepare($savePermalinks);
     $recordPermalinks->bind_param('ss', $permalink_key, $store_permalink_value);
@@ -327,7 +336,7 @@ if (mysqli_connect_errno()) {
 
 $configuration = false;
 
-if (isset($_SESSION['install']) && $_SESSION['install'] == true) {
+if (isset($_SESSION['install']) && $_SESSION['install'] === true) {
    
    $getAppKey = "SELECT ID, setting_name, setting_value 
                  FROM tbl_settings USE INDEX(setting_value) 
@@ -396,13 +405,14 @@ if (isset($_SESSION['install']) && $_SESSION['install'] == true) {
  */
 function remove_bad_characters($str_words, $host, $user, $password, $database, $escape = false, $level = 'high')
 {
-    $found = false;
+    
     $str_words = escapeHTML(strip_tags($str_words));
-    if($level == 'low') {
+
+    if ($level == 'low') {
         
         $bad_string = array('drop', '--', 'insert', 'xp_', '%20union%20', '/*', '*/union/*', '+union+', 'load_file', 'outfile', 'document.cookie', 'onmouse', '<script', '<iframe', '<applet', '<meta', '<style', '<form', '<body', '<link', '_GLOBALS', '_REQUEST', '_GET', '_POST', 'include_path', 'prefix', 'ftp://', 'smb://', 'onmouseover=', 'onmouseout=');
     
-    } elseif($level == 'medium') {
+    } elseif ($level == 'medium') {
         
         $bad_string = array('select', 'drop', '--', 'insert', 'xp_', '%20union%20', '/*', '*/union/*', '+union+', 'load_file', 'outfile', 'document.cookie', 'onmouse', '<script', '<iframe', '<applet', '<meta', '<style', '<form', '<body', '<link', '_GLOBALS', '_REQUEST', '_GET', '_POST', 'include_path', 'prefix', 'ftp://', 'smb://', 'onmouseover=', 'onmouseout=');
     
@@ -412,13 +422,13 @@ function remove_bad_characters($str_words, $host, $user, $password, $database, $
     
     }
     
-    for($i = 0; $i < count($bad_string); $i++) {
+    for ($i = 0; $i < count($bad_string); $i++) {
         
         $str_words = str_replace($bad_string[$i], '', $str_words);
     
     }
     
-    if($escape) {
+    if ($escape) {
         
       $link = mysqli_connect($host, $user, $password, $database);
       $str_words = mysqli_real_escape_string($link, $str_words);
@@ -477,9 +487,9 @@ function generate_license($suffix = null)
   }
     
    // If provided, convert Suffix
-    if(isset($suffix)){
+    if (isset($suffix)){
         
-        if(is_numeric($suffix)) {   // Userid provided
+        if (is_numeric($suffix)) {   // Userid provided
             
             $license_string .= '-'.strtoupper(base_convert($suffix,10,36));
         
@@ -487,7 +497,7 @@ function generate_license($suffix = null)
             
             $long = sprintf("%u\n", ip2long($suffix), true);
 
-            if($suffix === long2ip($long) ) {
+            if ($suffix === long2ip($long) ) {
                 
                 $license_string .= '-'.strtoupper(base_convert($long,10,36));
             
@@ -535,7 +545,7 @@ function setup_base_url($protocol, $server_host)
 {
   $base_url = $protocol . '://' . $server_host . dirname(dirname($_SERVER['PHP_SELF']));
 
-  if(substr($base_url, -1) == DIRECTORY_SEPARATOR) {
+  if (substr($base_url, -1) === DIRECTORY_SEPARATOR) {
 
     return rtrim($base_url, DIRECTORY_SEPARATOR);
 
@@ -576,7 +586,7 @@ function purge_installation()
 
     $disabled = APP_PATH . substr(bin2hex($bytes), 0, $length).'.log';
 
-    if ( ( is_writable( APP_PATH ) ) && ( rename(__DIR__ . '/../index.php', $disabled ) ) ) {
+    if ((is_writable(APP_PATH)) && (rename(__DIR__ . '/../index.php', $disabled))) {
 
       $clean_installation = '<?php ';
      
