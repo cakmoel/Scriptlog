@@ -322,7 +322,7 @@ class Authentication
       $this->userDao->updateUserSession($bind_session, (int)$this->account_info['ID']);
       
       // Set Auth Cookies if 'Remember Me' checked
-      if ($remember_me == true) {
+      if ($remember_me === true) {
 
           $encrypt_auth = ScriptlogCryptonize::scriptlogCipher($this->user_login, $this->key);
           set_cookies_scl('scriptlog_auth', $encrypt_auth, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true); 
@@ -452,7 +452,7 @@ public function updateNewPassword($user_pass, $user_id, $user_email)
 
   $bind = ['user_pass' => $user_pass, 'user_reset_complete' => 'Yes'];
 
-  if ( ( $this->userDao->recoverNewPassword($bind, $user_id) ) && ( is_ssl() === true ) ) {
+  if (($this->userDao->recoverNewPassword($bind, $user_id) ) && (is_ssl() === true)) {
     
     // send email notification to user
     recover_password($user_pass, $user_email);
@@ -544,7 +544,7 @@ public function userAccessControl($control = null)
 
     case ActionConst::USERS:
           
-        if ( $this->accessLevel() !== 'administrator') {
+        if ($this->accessLevel() !== 'administrator') {
 
           return false;
 
@@ -558,7 +558,7 @@ public function userAccessControl($control = null)
     case ActionConst::PAGES:
     case ActionConst::NAVIGATION:
          
-      if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
+      if (($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')) {
 
         return false;
 
@@ -568,7 +568,7 @@ public function userAccessControl($control = null)
 
     case ActionConst::MEDIALIB:
 
-        if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
+        if (($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
             && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author')) {
 
           return false;
@@ -580,7 +580,7 @@ public function userAccessControl($control = null)
     case ActionConst::TOPICS:
     case ActionConst::TAGS:
 
-        if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') && ($this->accessLevel() !== 'editor')) {
+        if (($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') && ($this->accessLevel() !== 'editor')) {
 
           return false;
 
@@ -590,7 +590,7 @@ public function userAccessControl($control = null)
         
     case ActionConst::COMMENTS:
         
-        if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'author') && ($this->accessLevel() !== 'contributor')) {
+        if (($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'author') && ($this->accessLevel() !== 'contributor')) {
 
           return false;
 
@@ -612,7 +612,7 @@ public function userAccessControl($control = null)
 
     default:
         
-      if(($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
+      if (($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') 
           && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author') 
           && ($this->accessLevel() !== 'contributor')) {
 
@@ -637,7 +637,7 @@ return true;
 private function getUserAuthSession()
 {
   
- if(Session::getInstance()->scriptlog_session_ip !== $this->ip_address || Session::getInstance()->scriptlog_session_agent !== sha1($this->accept_charset.$this->accept_encoding.$this->accept_language.$this->agent)) {
+ if (Session::getInstance()->scriptlog_session_ip !== $this->ip_address || Session::getInstance()->scriptlog_session_agent !== sha1($this->accept_charset.$this->accept_encoding.$this->accept_language.$this->agent)) {
 
     session_unset();
     session_destroy();
