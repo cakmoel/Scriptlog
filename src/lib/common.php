@@ -29,6 +29,11 @@ define('MESSAGE_INVALID_FULLNAME', "Please enter a valid fullname");
 define('MESSAGE_INVALID_SELECTBOX', "Please choose the available value provided");
 define('MESSAGE_INVALID_EMAILADDRESS', "Please enter a valid email address");
 
+define('MAX_FILES', 10000);
+define('MAX_SIZE', 1000000000); // 1 GB
+define('MAX_RATIO', 10);
+define('READ_LENGTH', 1024);
+
 if (!defined('PHP_EOL')) {
 
   if (strtoupper(substr(PHP_OS,0,3) == 'WIN')) {
