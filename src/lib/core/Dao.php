@@ -76,7 +76,7 @@ class Dao
 
   }
 
-  return ( ! is_null($fetchMode) ) ? $this->dbc->dbQuery($this->sql, $data)->fetchAll($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchAll();
+  return (! is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchAll($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchAll();
       
  }
  
