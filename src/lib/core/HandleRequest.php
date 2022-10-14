@@ -139,8 +139,7 @@ public static function isMatchedUriRequested()
 {
   $matched_uri = (isset($_SERVER['REQUEST_URI'])) ? trim($_SERVER['REQUEST_URI'], DIRECTORY_SEPARATOR) : "";
   $slice_matched = explode(DIRECTORY_SEPARATOR, $matched_uri);
-  $get_matched = isset($slice_matched[0]) ? $slice_matched[0] : "";
-  return $get_matched;
+  return isset($slice_matched[0]) ? $slice_matched[0] : "";
 }
 
 /**
@@ -203,18 +202,23 @@ public static function deliverQueryString()
     case 'p':
 
       // Deliver request to a single post entry
-      if ( ! empty(static::isQueryStringRequested()['value']) ) {
+      if (! empty(static::isQueryStringRequested()['value'])) {
 
         $query_post = self::handleFrontHelper()->grabSimpleFrontPost(static::isQueryStringRequested()['value']);
 
-        if ( empty($query_post['ID']) ) {
+        if (empty($query_post['ID']) ) {
 
           http_response_code(404);
+          call_theme_header();
           call_theme_content('404');
+          call_theme_footer();
 
         } else {
 
+          http_response_code(200);
+          call_theme_header();
           call_theme_content('single');
+          call_theme_footer();
 
         }
       
@@ -228,18 +232,23 @@ public static function deliverQueryString()
     
     case 'cat':
       // Deliver request to a single category or topic
-      if ( ! empty(static::isQueryStringRequested()['value']) ) {
+      if (! empty(static::isQueryStringRequested()['value'])) {
 
         $query_cat = self::handleFrontHelper()->grabSimpleFrontTopic(static::isQueryStringRequested()['value']);
 
         if (empty($query_cat['ID'])) {
 
            http_response_code(404);
+           call_theme_header();
            call_theme_content('404');
+           call_theme_footer();
 
         } else {
 
+          http_response_code(200);
+          call_theme_header();
           call_theme_content('category');
+          call_theme_footer();
 
         }
         
@@ -253,24 +262,29 @@ public static function deliverQueryString()
 
     case 'pg':
       // Deliver request to a single page
-      if ( ! empty(static::isQueryStringRequested()['value']) ) {
+      if (! empty(static::isQueryStringRequested()['value']) ) {
 
         $query_page = self::handleFrontHelper()->grabSimpleFrontPage(static::isQueryStringRequested()['value']);
 
         if ( empty($query_page['ID']) ) {
 
           http_response_code(404);
+          call_theme_header();
           call_theme_content('404');
+          call_theme_footer();
 
         } else {
 
+          http_response_code(200);
+          call_theme_header();
           call_theme_content('page');
+          call_theme_footer();
 
         }
        
       } else {
 
-        direct_page('404.php', 302);
+        direct_page('', 302);
 
       }
 
@@ -278,9 +292,12 @@ public static function deliverQueryString()
 
     case 'a':
       // Deliver request to an archives
-      if ( ! empty(static::isQueryStringRequested()['value']) ) {
+      if (! empty(static::isQueryStringRequested()['value'])) {
 
+        http_response_code(200);
+        call_theme_header();
         call_theme_content('archive');
+        call_theme_footer();
 
       } else {
 
@@ -293,18 +310,23 @@ public static function deliverQueryString()
     case 'tag':
       
         // Deliver request to a tag
-        if ( ! empty(static::isQueryStringRequested()['value']) ) {
+        if (! empty(static::isQueryStringRequested()['value'])) {
 
           $query_tag = self::handleFrontHelper()->grabSimpleFrontTag();
 
-          if ( empty($query_tag['ID']) ) {
+          if (empty($query_tag['ID']) ) {
 
             http_response_code(404);
+            call_theme_header();
             call_theme_content('404');
+            call_theme_footer();
 
           } else {
 
+            http_response_code(200);
+            call_theme_header();
             call_theme_content('tag');
+            call_theme_footer();
 
           }
            
@@ -318,20 +340,25 @@ public static function deliverQueryString()
 
     case 'blog':
       // Deliver request to blog
+      http_response_code(200);
+      call_theme_header();
       call_theme_content('blog');
-      
+      call_theme_footer();
+
       break;
 
-    default:
-      
-      # default request will be delivered
-      if ( false === static::checkMatchUriRequested() ) {
+    default:  # default request will be delivered
+     
+      if (false === static::checkMatchUriRequested() ) {
 
         direct_page('', 500);
 
       } else {
 
+        http_response_code(200);
+        call_theme_header();
         call_theme_content('home');
+        call_theme_footer();
 
       }
       
