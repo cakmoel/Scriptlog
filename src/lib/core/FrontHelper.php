@@ -32,9 +32,9 @@ class FrontHelper
            p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_sticky, 
            p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, 
            m.media_access, u.user_login, u.user_fullname
-           FROM tbl_posts AS p
-           INNER JOIN tbl_media AS m ON p.media_id = m.ID
-           INNER JOIN tbl_users AS u ON p.post_author = u.ID
+           FROM tbl_posts p
+           INNER JOIN tbl_media m ON p.media_id = m.ID
+           INNER JOIN tbl_users u ON p.post_author = u.ID
            WHERE p.ID = '$idsanitized' AND p.post_status = 'publish'
            AND p.post_type = 'blog' AND m.media_target = 'blog'
            AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
