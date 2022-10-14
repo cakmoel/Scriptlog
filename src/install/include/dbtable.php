@@ -63,7 +63,6 @@ comment_status varchar(20) NOT NULL DEFAULT 'open',
 PRIMARY KEY (ID),
 FOREIGN KEY (post_author) REFERENCES tbl_users(ID),    
 KEY (media_id),    
-UNIQUE (post_tags),
 FULLTEXT KEY (post_tags, post_title, post_content)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
@@ -136,8 +135,7 @@ ID INT(5) unsigned NOT NULL auto_increment,
 parent_id INT(5) unsigned NOT NULL DEFAULT '0',
 menu_label VARCHAR(200) NOT NULL,
 menu_link VARCHAR(255) DEFAULT NULL,
-menu_sort INT(5) NOT NULL,
-menu_status enum('Y','N') NOT NULL DEFAULT 'Y',
+menu_status enum('Y','N') NOT NULL DEFAULT 'N',
 menu_position varchar(20) DEFAULT NULL,
 PRIMARY KEY(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
@@ -184,5 +182,6 @@ $saveSiteEmail = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(
 $savePostPerPage = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
 $savePostPerRSS = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
 $savePostPerArchive = "INSERT INTO tbl_settings(setting_name, setting_value) VALUES(?, ?)";
+$saveCommentPerPost = "INSERT INTO tbl_settings(setting_name, setting_value) VALUES(?, ?)";
 $savePermalinks = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
 $saveTheme   = "INSERT INTO tbl_themes (theme_title, theme_desc, theme_designer, theme_directory, theme_status) VALUES (?, ?, ?, ?, ?)";
