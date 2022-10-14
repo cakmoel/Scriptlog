@@ -26,13 +26,13 @@ $set_config = require __DIR__ . '/../config.php';
 
 $dbconnect = make_connection($set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name']);
 
-if ((check_dbtable($dbconnect, 'tbl_users') == false) || (check_dbtable($dbconnect, 'tbl_user_token') == false)
-|| (check_dbtable($dbconnect, 'tbl_topics') == false) || (check_dbtable($dbconnect, 'tbl_themes') == false)
-|| (check_dbtable($dbconnect, 'tbl_settings') == false) || (check_dbtable($dbconnect, 'tbl_posts') == false)
-|| (check_dbtable($dbconnect, 'tbl_post_topic') == false) || (check_dbtable($dbconnect, 'tbl_plugin') == false)
-|| (check_dbtable($dbconnect, 'tbl_menu') == false) || (check_dbtable($dbconnect, 'tbl_mediameta') == false) 
-|| (check_dbtable($dbconnect, 'tbl_media') == false) || (check_dbtable($dbconnect, 'tbl_media_download') == false) 
-|| (check_dbtable($dbconnect, 'tbl_comments') == false)) {
+if ((check_dbtable($dbconnect, 'tbl_users') === false) || (check_dbtable($dbconnect, 'tbl_user_token') === false)
+|| (check_dbtable($dbconnect, 'tbl_topics') === false) || (check_dbtable($dbconnect, 'tbl_themes') === false)
+|| (check_dbtable($dbconnect, 'tbl_settings') === false) || (check_dbtable($dbconnect, 'tbl_posts') === false)
+|| (check_dbtable($dbconnect, 'tbl_post_topic') === false) || (check_dbtable($dbconnect, 'tbl_plugin') === false)
+|| (check_dbtable($dbconnect, 'tbl_menu') === false) || (check_dbtable($dbconnect, 'tbl_mediameta') === false) 
+|| (check_dbtable($dbconnect, 'tbl_media') === false) || (check_dbtable($dbconnect, 'tbl_media_download') === false) 
+|| (check_dbtable($dbconnect, 'tbl_comments') === false)) {
 
   header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
   exit("Database has been installed!");
@@ -45,15 +45,15 @@ install_header($install_path, $protocol, $server_host);
 
 $setup = isset($_POST['setup']) ? stripcslashes($_POST['setup']) : '';
 
-if($setup != 'install') {
+if ($setup != 'install') {
 
     if (version_compare(PHP_VERSION, '5.6', '>=')) {
         
-        clearstatcache();
+      clearstatcache();
         
     } else {
         
-        clearstatcache(true);
+      clearstatcache(true);
         
     }
     
@@ -92,33 +92,33 @@ if($setup != 'install') {
       
     }
 
-    if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
         $errors['errorInstall'] = 'Please enter a valid email address';
 
     }
 
-    if(empty($password) && (empty($confirm))) {
+    if (empty($password) && (empty($confirm))) {
 
         $errors['errorInstall'] = 'Admin password should not be empty';
 
-    } elseif($password != $confirm) {
+    } elseif ($password != $confirm) {
 
         $errors['errorInstall'] = 'Admin password should be equal';
 
-    } elseif(!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
+    } elseif (!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
 
         $errors['errorInstall'] = 'Admin password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters';
 
     }
 
-    if(!is_writable(__DIR__ . '/index.php')) {
+    if (!is_writable(__DIR__ . '/index.php')) {
 
-        $errors['errorInstall'] = 'Permission denied. Directory installation is not writable';
+      $errors['errorInstall'] = 'Permission denied. Directory installation is not writable';
 
     }
 
-    if(false === check_php_version()) {
+    if (false === check_php_version()) {
 
        $errors['errorInstall'] = 'Requires PHP 7.4 or newer';
 
@@ -132,7 +132,7 @@ if($setup != 'install') {
 
    if (false === check_spl_enabled('spl_autoload_register')) {
 
-       $errors['errorInstall'] = 'spl autoload register is either not loaded or compiled in';
+      $errors['errorInstall'] = 'spl autoload register is either not loaded or compiled in';
 
    }
 
@@ -202,7 +202,7 @@ if($setup != 'install') {
      
    }
 
-   if(empty($errors['errorInstall']) == true) {
+   if (empty($errors['errorInstall']) == true) {
 
         try {
 
@@ -212,11 +212,11 @@ if($setup != 'install') {
 
           $_SESSION['install'] = true;
 
-          if(function_exists("random_bytes")) {
+          if (function_exists("random_bytes")) {
 
             $token = random_bytes(ceil($length / 2));
 
-          } elseif(function_exists("openssl_random_pseudo_bytes")) {
+          } elseif (function_exists("openssl_random_pseudo_bytes")) {
 
             $token = openssl_random_pseudo_bytes(ceil($length/2));
 
@@ -230,7 +230,7 @@ if($setup != 'install') {
 
            $_SESSION['token'] = $key;
 
-          if(check_mysql_version($dbconnect, "5.6")) {
+          if (check_mysql_version($dbconnect, "5.6")) {
 
              install_database_table($dbconnect, $protocol, $server_host, $username, $password, $email, $key);
 
@@ -238,8 +238,9 @@ if($setup != 'install') {
 
           }
 
-        } catch(mysqli_sql_exception $e) {
+        } catch (mysqli_sql_exception $e) {
 
+          $e->getMessage();
           throw $e;
 
         }
