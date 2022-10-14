@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php ( !defined('SCRIPTLOG') ) ? exit() : ""; ?>
  <!-- Content Wrapper. Contains page content -->
  <div class="content-wrapper">
  <!-- Content Header (Page header) -->
@@ -8,7 +8,7 @@
      <small>Control Panel</small>
    </h1>
    <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
         <li><a href="index.php?load=option-reading">Reading Settings</a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
    </ol>
@@ -28,7 +28,7 @@ if (isset($errors)) :
 
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
+<h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -46,7 +46,7 @@ if (isset($status)) :
 
 <div class="alert alert-success alert-dismissible">
   <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-  <h2><i class="icon fa fa-check"></i> Success!</h2>
+  <h2><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h2>
     <?php 
         foreach ($status as $s) :
           echo $s;
@@ -65,7 +65,7 @@ $action = (isset($formAction)) ? $formAction : null;
 <div class="box-body">
 <form method="post" action="<?= generate_request('index.php', 'get', ['option-reading', $action, 0])['link']; ?>" role="form">
 
-<table class="table table-bordered table-striped">
+<table class="table table-bordered table-striped" aria-describedby = "reading setting">
 <tbody>
 <?php 
 
@@ -77,6 +77,7 @@ if (is_array($settings)) :
      
     switch ($s['setting_name']) {
 
+      default:
       case 'post_per_page':
          
         $setting_name = "Posts to display on frontpage";
@@ -95,6 +96,12 @@ if (is_array($settings)) :
 
         break;
        
+      case 'comment_per_post':
+
+        $setting_name = "Comments to display in post";
+
+        break;
+
      }
 
 ?>
