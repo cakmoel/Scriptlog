@@ -504,6 +504,7 @@ class PostEvent
       }
 
       return  $this->postDao->deletePost($this->postId, $this->sanitizer);
+      
     } else {
 
       return $this->postDao->deletePost($this->postId, $this->sanitizer);
