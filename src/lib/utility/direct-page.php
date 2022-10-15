@@ -55,7 +55,7 @@ function direct_page($page = '', $http_status_code = null)
     );
     
  // defining url
- $url = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname($_SERVER['PHP_SELF']);
+ $url = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname(htmlspecialchars($_SERVER['PHP_SELF']));
     
  // remove any trailing slashes
  $url = rtrim($url, '/\\');
@@ -63,11 +63,11 @@ function direct_page($page = '', $http_status_code = null)
  // add the page
  $url .= DIRECTORY_SEPARATOR . $page;
  
- if (!is_null($http_status_code)) header($http[$http_status_code]);
+ if (!is_null($http_status_code)) {
+    header($http[$http_status_code]);
+ };
  
  // redirect the user
  header("Location: $url");
- 
- return;
  
 }
