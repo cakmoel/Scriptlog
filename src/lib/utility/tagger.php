@@ -78,3 +78,21 @@ function array_unique_compact($items)
   return $newarr;
 
 }
+
+/**
+ * checking_duplicate_tags
+ *
+ * @return bool
+ * 
+ */
+function checking_duplicate_tags()
+{
+
+ $sql  = "SELECT post_tags, COUNT(post_tags) as totalTag 
+ FROM tbl_posts GROUP BY post_tags HAVING COUNT(post_tags) > 1 ORDER BY totalTag DESC";
+
+ $stmt = db_simple_query($sql);
+
+ return ($stmt) ? false : true;
+
+}
