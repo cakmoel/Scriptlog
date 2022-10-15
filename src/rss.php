@@ -17,11 +17,11 @@ $app_description = app_info()['site_description'];
 $postProviderModel = new PostProviderModel();
 $feeds = FrontContentProvider::frontPostsFeed(app_reading_setting()['post_per_rss'], $postProviderModel);
 
-if ( is_iterable($feeds)) {
+if (is_iterable($feeds)) {
 
   $rss = new RSSWriter($app_title, $app_link, $app_description);
 
-  foreach ( $feeds as $feed) {
+  foreach ($feeds as $feed) {
 
     $feed_title = isset($feed['post_title']) ? htmlout($feed['post_title']) : "";
     $feed_link = isset($feed['ID']) ? permalinks($feed['ID'])['post'] : "";
