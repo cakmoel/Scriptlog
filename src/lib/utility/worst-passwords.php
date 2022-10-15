@@ -19,7 +19,7 @@
 function worst_passwords()
 {
   
-  $common_passwords = ['password', '12345678', '123456789', 'baseball', 'football', 'qwertyuiop', '1234567890', 'superman', 
+  return ['password', '12345678', '123456789', 'baseball', 'football', 'qwertyuiop', '1234567890', 'superman', 
   '1qaz2wsx', 'trustno1', 'jennifer', 'sunshine', 'iloveyou', 'starwars', 'computer', 'michelle', '11111111', 'princess', '987654321', 
   'corvette', '1234qwer', '88888888', 'q1w2e3r4t5', 'internet', 'samantha', 'whatever', 'maverick', 'steelers', 'mercedes', 
   '123123123', 'qwer1234', 'hardcore', 'q1w2e3r4', 'midnight', 'bigdaddy', 'victoria', '1q2w3e4r', 'cocacola', 'marlboro', 'asdfasdf', 
@@ -52,8 +52,6 @@ function worst_passwords()
   'babylon5', 'ultimate', 'yankees1', 'superfly', 'campbell', 'geronimo', 'concrete', 'q1w2e3r4t5y6', 'jessica1', '123454321', 'portugal', 'sundance', 
   'pleasure', 'seminole', 'isabella', '14789632', 'qazxswedc', 'kingkong', 'adgjmptw', 'ncc1701e', 'mongoose', 'alejandr', '1123581321', 
   'margaret', 'bluemoon', 'ghbdtnbr', 'bonehead', 'stallion', 'personal', 'morrison', 'super123', 'anything', 'aleksandr', 'rhbcnbyf', 'dietcoke', 'cooldude'];    
-
-  return $common_passwords;
 
 }
 
