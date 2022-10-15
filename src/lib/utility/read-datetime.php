@@ -10,9 +10,6 @@
  */
 function read_datetime($datetime)
 {
-  
   $dateGenerator = new DateGenerator();
-
-  return $dateGenerator -> getExternalDate($datetime);
-
+  return $dateGenerator->getExternalDate($datetime);
 }
