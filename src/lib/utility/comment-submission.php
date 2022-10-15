@@ -8,7 +8,6 @@
  * @return bool|false
  * 
  */
-
 use Egulias\EmailValidator\Validation\RFCValidation;
 
 function checking_author_email($email)
@@ -51,7 +50,7 @@ function checking_comment_size($fields)
 function checking_form_payload(array $values)
 {
 
-   if (check_form_request($values, ['post_id', 'author_name', 'author_email', 'comment_content', 'csrf']) === false) {
+   if (check_form_request($values, ['post_id', 'name', 'email', 'comment', 'csrf']) === false) {
 
       header(APP_PROTOCOL . ' 413 Payload Too Large', true, 413);
       header('Status: 413 Payload Too Large');
@@ -70,7 +69,7 @@ function checking_comment_request()
 
    if ('POST' !== $_SERVER['REQUEST_METHOD']) {
 
-      $protocol = isset($_SERVER['SERVER_PROTOCOL']) ?:  $_SERVER['SERVER_PROTOCOL'];
+      $protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : "";
 
       if (!in_array($protocol, array('HTTP/1.1', 'HTTP/2', 'HTTP/2.0', 'HTTP/3'), true)) {
          $protocol = 'HTTP/1.0';
@@ -84,9 +83,10 @@ function checking_comment_request()
 }
 
 /**
- * checking_block_csrf
+ * checking_form_input
  *
  * @param string $csrf
+ * 
  */
 function checking_block_csrf($csrf)
 {
@@ -100,20 +100,12 @@ function checking_block_csrf($csrf)
 
 }
 
-/**
- * checking_form_input()
- *
- * @param string $author_name
- * @param string $author_email
- * @param string $comment_content
- * 
- */
 function checking_form_input($author_name, $author_email, $comment_content)
 {
 
    $errors = [];
 
-   $form_fields = ['author_name' => 90, 'author_email' => 120, 'comment_content' => 320];
+   $form_fields = ['name' => 90, 'email' => 120, 'comment' => 320];
 
    if (checking_comment_size($form_fields) === false) {
 
@@ -140,18 +132,20 @@ function checking_form_input($author_name, $author_email, $comment_content)
 }
 
 /**
- * processing_comment
+ * processing_comment()
  *
  * @param array $values
- * 
  */
 function processing_comment(array $values)
 {
 
+   $errors = array();
+   $form_data = array();
+
    $postId = ( isset($values['post_id']) && $values['post_id'] == $_POST['post_id'] ? abs((int)$_POST['post_id']) : 0);
-   $author_name = (isset($values['author_name']) && $values['author_name'] == $_POST['author_name'] ? prevent_injection($values['author_name']) : null);
-   $author_email = (isset($values['author_email']) && $values['author_email'] == $_POST['author_email'] ? prevent_injection($values['author_email']) : null);
-   $comment_content = (isset($values['comment_content']) && $values['comment_content'] == $_POST['comment_content'] ? prevent_injection($values['comment_content']) : null);
+   $author_name = (isset($values['name']) && $values['name'] == $_POST['name'] ? prevent_injection($values['name']) : null);
+   $author_email = (isset($values['email']) && $values['email'] == $_POST['email'] ? prevent_injection($values['email']) : null);
+   $comment_content = (isset($values['comment']) && $values['comment'] == $_POST['comment'] ? prevent_injection($values['comment']) : null);
    $csrf = (isset($values['csrf']) && $values['csrf'] == $_POST['csrf'] ? $values['csrf'] : "");
    $comment_at = date("Y-m-d H:i:s");
    
@@ -163,7 +157,7 @@ function processing_comment(array $values)
 
    checking_block_csrf($csrf);
 
-   checking_form_input($author_name, $author_email, $comment_content);
+   list($errors) = checking_form_input($author_name, $author_email, $comment_content);
 
    $bind = [
 
@@ -176,5 +170,19 @@ function processing_comment(array $values)
     ];
     
    FrontContentProvider::frontNewCommentByPost($bind, $commentProvider);
-    
+
+   if ( ! empty($errors)) {
+
+      $form_data['success'] = false;
+      $form_data['errors'] = $errors;
+
+   } else {
+
+      $form_data['success'] = true;
+      $form_data['success_message'] = 'Comment was submitted successfully';
+
+   }
+   
+   echo json_encode($form_data, JSON_PRETTY_PRINT);
+
 }
