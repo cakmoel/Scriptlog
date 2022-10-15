@@ -55,7 +55,7 @@ LOG;
 
   } else {
 
-      scriptlog_error("Permission denied. Check your permission for writing on {$logfile} ");
+    scriptlog_error("Permission denied. Check your permission for writing on {$logfile} ");
 
   }
   
