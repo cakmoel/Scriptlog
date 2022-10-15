@@ -74,28 +74,7 @@ private $selected;
    return (empty($commentDetails)) ?: $commentDetails;
    
  }
- 
-/**
- * Add Comment
- * 
- * @method public addComment()
- * @param array $bind
- * 
- */
- public function addComment($bind)
- {
-    
-   $this->create("tbl_comments", [
-        'comment_post_id' => $bind['comment_post_id'],
-        'comment_author_name' => $bind['comment_author_name'],
-        'comment_author_ip' => $bind['comment_author_ip'],
-        'comment_author_email' => $bind['comment_author_email'],
-        'comment_content' => purify_dirty_html($bind['comment_content']),
-        'comment_date' => $bind['comment_date']
-   ]); 
-    
- }
- 
+  
 /**
  * Update Comment
  * 
@@ -159,16 +138,17 @@ private $selected;
  */
  public function dropDownCommentStatement($selected = '')
  {
-     $name = 'comment_status';
      
-     // list position in array
-     $comment_status = array('approved' => 'Approved', 'pending' => 'Pending', 'spam' => 'Spam');
+   $name = 'comment_status';
+  
+   // list position in array
+   $comment_status = array('approved' => 'Approved', 'pending' => 'Pending', 'spam' => 'Spam');
+  
+   if ($selected != '') {
+      $this->selected = $selected;
+   }
      
-     if ($selected != '') {
-         $this->selected = $selected;
-     }
-     
-     return dropdown($name, $comment_status, $this->selected);
+   return dropdown($name, $comment_status, $this->selected);
      
  }
 
