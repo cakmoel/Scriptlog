@@ -60,9 +60,7 @@ function db_insert_id()
  */
 function db_simple_query($sql)
 {
-  
-  return db_instance()->simpleQuery($sql);
-
+ return db_instance()->simpleQuery($sql);
 }
 
 /**
@@ -80,9 +78,7 @@ function db_simple_query($sql)
  */
 function db_prepared_query($sql, array $params, $types = "")
 {
-  
   return db_instance()->preparedQuery($sql, $params, $types);
-  
 }
 
 /**
@@ -107,6 +103,15 @@ function is_table_exists($table)
 }
 
 /**
+ * db_num_rows()
+ * @return int|string
+ */
+function db_num_rows($results)
+{
+  return db_instance()->getNumRows($results);
+}
+
+/**
  * check_table 
  * This function will check all of tables needed for your weblog 
  * 
@@ -122,8 +127,8 @@ function check_table()
 
 $dbscheme = false;
 
-if ( ( APP_DEVELOPMENT === true ) && 
-( !(is_table_exists('tbl_comments') 
+if ((APP_DEVELOPMENT === true ) && 
+(! (is_table_exists('tbl_comments') 
 || is_table_exists('tbl_comment_reply') 
 || is_table_exists('tbl_login_attempt')
 || is_table_exists('tbl_media') 
@@ -139,7 +144,7 @@ if ( ( APP_DEVELOPMENT === true ) &&
 || is_table_exists('tbl_tags') 
 || is_table_exists('tbl_post_tag') 
 || is_table_exists('tbl_users') 
-|| is_table_exists('tbl_user_token'))) ) {
+|| is_table_exists('tbl_user_token')))) {
 
   $dbscheme = false;
 
@@ -179,13 +184,13 @@ function get_result($Statement)
 
 $result = array();
 $Statement->store_result();
-    for ( $i = 0; $i < $Statement->num_rows; $i++ ) {
+    for ($i = 0; $i < $Statement->num_rows; $i++) {
         $Metadata = $Statement->result_metadata();
         $params = array();
-        while ( $Field = $Metadata->fetch_field() ) {
+        while ($Field = $Metadata->fetch_field()) {
             $params[] = &$result[ $i ][ $Field->name ];
         }
-        call_user_func_array( array( $Statement, 'bind_result' ), $params );
+        call_user_func_array(array($Statement, 'bind_result'), $params);
         $Statement->fetch();
     }
     
