@@ -21,12 +21,12 @@ $absolutes = array();
     
 foreach ($parts as $part) {
         
-  if ('.' == $part ) { 
+  if ('.' === $part) { 
     
     continue; 
   }
         
-  if ('..' == $part) {
+  if ('..' === $part) {
             
     array_pop($absolutes);
         
