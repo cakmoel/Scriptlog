@@ -19,9 +19,9 @@ $image_dir =  __DIR__ . '/../../'.APP_IMAGE_SMALL.'small_'.$file_basename.'.webp
 
 $image_src = null;
 
-if(is_readable($image_dir)) {
+if (is_readable($image_dir)) {
 
-    if($image_thumb) {
+    if ($image_thumb === true) {
 
         $image_src =  app_url().DS.APP_IMAGE_MEDIUM.'medium_'.rawurlencode($file_basename.'.webp');
         
