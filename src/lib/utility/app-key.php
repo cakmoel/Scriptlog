@@ -15,11 +15,11 @@ function app_key()
 {
   global $config;
 
-  if($config['app']['key'] === app_info()['app_key']) {
+  if ($config['app']['key'] === app_info()['app_key']) {
 
     return app_info()['app_key'];
 
-  } elseif(strcmp($config['app']['key'], app_info()['app_key']) == 0) { 
+  } elseif (strcmp($config['app']['key'], app_info()['app_key']) == 0) { 
   
     return app_info()['app_key'];
 
