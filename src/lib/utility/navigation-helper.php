@@ -2,23 +2,32 @@
 /**
  * nav_parent
  * 
+ * @category function
+ * @author M.Noermoehammad
  * @param int|number $parent_id
- * @return mixed
  * 
  */
 function nav_parent($parent_id)
 {
     
-$sql = "SELECT ID, parent_id, menu_label, menu_link, menu_sort, menu_status, menu_position
-        FROM tbl_menu WHERE ID = ?";
+$sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_position
+        FROM tbl_menu WHERE ID = '$parent_id' ";
 
-$statement = db_prepared_query($sql, [(int)$parent_id], 'i');
-
-return get_result($statement);
+return db_simple_query($sql);
 
 }
 
-function nav_nested()
+/**
+ * nav_nested
+ *
+ * @category function
+ * @author M.Noermoehammad
+ */
+function nav_nested($parent)
 {
-    
+
+ $row = (is_object($parent)) ? $parent->fetch_array(MYSQLI_ASSOC) : "";
+
+ return (is_iterable($row)) ? $row : [];
+
 }
