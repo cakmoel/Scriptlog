@@ -21,16 +21,16 @@ function get_server_load()
 
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 
-        if( ( win_architecture() == 'x86') && ( class_exists('COM') ) )  {
+        if ((win_architecture() == 'x86') && (class_exists('COM')))  {
 
             // Win CPU
             $wmi = new COM('WinMgmts:\\\\.');
             $server = $wmi->InstancesOf('Win32_Processor');
-            $server = $wmi->execquery("SELECT LoadPercentage FROM Win32_Processor");  
+            $server += $wmi->execquery("SELECT LoadPercentage FROM Win32_Processor");  
             $cpu_num = 0;
             $load_total = 0;
 
-            foreach($server as $cpu) {
+            foreach ($server as $cpu) {
                $load_total += $cpu->loadpercentage;
                $cpu_num++;
                break;
@@ -40,7 +40,7 @@ function get_server_load()
 
         } else {
 
-          throw new Exception("class COM does not exists");
+          throw new InvalidArgumentException("class COM does not exists");
 
         }
        
@@ -73,31 +73,40 @@ function get_server_load()
 function win_architecture()
 {
  
-    if ( strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ) {
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ) {
 
       $wmi = ( class_exists('COM') ? new COM('winmgmts:{impersonationLevel=impersonate}//./root/cimv2') : null );
 
       if (!is_object($wmi)) {
 
-        throw new Exception('No access to WMI. Please enable DCOM in php.ini and allow the current user to access the WMI DCOM object.');
+        throw new InvalidArgumentException('No access to WMI. Please enable DCOM in php.ini and allow the current user to access the WMI DCOM object.');
 
       }
 
-      foreach($wmi->ExecQuery("SELECT Architecture FROM Win32_Processor") as $cpu) {
+      foreach ($wmi->ExecQuery("SELECT Architecture FROM Win32_Processor") as $cpu) {
          # only need to check the first one (if there is more than one cpu at all)
-         switch($cpu->Architecture) {
+         switch ($cpu->Architecture) {
            case 0:
              return "x86";
+             break;
            case 1:
              return "MIPS";
+             break;
            case 2:
              return "Alpha";
+             break;
            case 3:
              return "PowerPC";
+             break;
            case 6:
              return "Itanium-based system";
+             break;
            case 9:
             return "x64";
+            break;
+           default:
+            scriptlog_error("Unknown architecture");
+            break;
 
          }
 
