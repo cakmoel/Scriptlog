@@ -197,7 +197,7 @@ class UserDao extends Dao
 	          'user_fullname' => $bind['user_fullname'],
 	          'user_url'   => $user_url,
 	          'user_activation_key' => $bind['user_activation_key'],
-              'user_session' => $bind['user_session'],
+            'user_session' => $bind['user_session']
 	          
 	      ]);
 	      
@@ -345,9 +345,9 @@ class UserDao extends Dao
        
    } else {
        
-       $bind = ['user_activation_key' => '1', 'user_registered' => date("Y-m-d H:i:s")];
-       $this->modify("tbl_users", $bind, "user_activation_key = {$key}");
-       $userAccount = true;
+      $bind = ['user_activation_key' => '1', 'user_registered' => date("Y-m-d H:i:s")];
+      $this->modify("tbl_users", $bind, "user_activation_key = {$key}");
+      $userAccount = true;
        
    }
    
