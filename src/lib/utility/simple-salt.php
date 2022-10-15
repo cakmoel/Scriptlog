@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * simple_salt
  * 
@@ -15,7 +16,7 @@
 function simple_salt($num_chars)
 {
   
- if((is_numeric($num_chars)) && ($num_chars > 0) && (!is_null($num_chars))) {
+ if ((is_int($num_chars)) && ($num_chars > 0) && (!is_null($num_chars))) {
 
      $salt = null;
      
@@ -23,7 +24,7 @@ function simple_salt($num_chars)
 
      srand(((int)((double)microtime()*1000003)));
 
-     for($i=0; $i<=$num_chars; $i++) {
+     for ($i=0; $i<=$num_chars; $i++) {
 
          $random_number = rand(0, (strlen($accepted_chars)-1));
 
