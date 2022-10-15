@@ -13,7 +13,7 @@
  */
 function is_cookies_secured()
 {
-  return ( is_ssl() === true ) ? true : false;
+  return (is_ssl() === true) ? true : false;
 }
 
 /**
@@ -126,7 +126,7 @@ function set_cookies_path()
 function set_cookies_scl($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite="Strict")
 {
   
-  if ( PHP_VERSION_ID <= 70300 ) {
+  if (PHP_VERSION_ID <= 70300) {
 
     setcookie($name, $value, $expire, "$path; samesite=$samesite", $domain, $secure, $httponly);
      
