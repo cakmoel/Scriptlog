@@ -9,29 +9,15 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  * @version  1.0
  * @since    Since Release 1.0
- * 
  */
-#ini_set("session.cookie_secure", 1);  
-#ini_set("session.cookie_lifetime", 604800);  
-ini_set("session.cookie_httponly", 1);
-#ini_set("session.use_cookies", 1);
-ini_set("session.use_only_cookies", 1);
-#ini_set("session.use_strict_mode", 1);
-#ini_set("session.use_trans_sid", 0);
-ini_set('session.save_handler', 'files');
-ini_set('session.gc_divisor', 100);
-ini_set('session.gc_maxlifetime', 1440);
-ini_set('session.gc_probability',1);
-
-#header("Permissions-Policy: interest-cohort=()"); // Opt out of FLoC
-
+require __DIR__ . '/options.php';
 require __DIR__ . '/common.php';
 
 $config = null;
 
 if ( file_exists(APP_ROOT.'config.php') ) {
     
-  $config = require __DIR__ . '/../config.php';
+  $config = include __DIR__ . '/../config.php';
     
 } else {
      
@@ -80,13 +66,13 @@ foreach ($files_dir_iterator as $file) {
 // check if loader is exists
 if (file_exists(APP_ROOT.APP_LIBRARY.DS.'Autoloader.php')) {
 
-    require __DIR__ . DS . 'Autoloader.php';
+    include __DIR__ . DS . 'Autoloader.php';
 
 }
 
 if (is_readable(APP_ROOT.APP_LIBRARY.DS.'vendor/autoload.php')) {
 
-    require_once __DIR__ . DS . 'vendor/autoload.php';
+    include_once __DIR__ . DS . 'vendor/autoload.php';
     
 }
 
@@ -160,13 +146,13 @@ $rules = array(
 $dbc = DbFactory::connect(['mysql:host='.$config['db']['host'].';dbname='.$config['db']['name'], $config['db']['user'], $config['db']['pass']]);
 
 #====== an instantiation of scriptlog cipher key =========
-$key = ScriptlogCryptonize::scriptlogCipherKey();
+$cipher_key = ScriptlogCryptonize::scriptlogCipherKey();
 
 #====== an instantiation of scriptlog request path =======
 $uri = new RequestPath();
 
 // Register rules of routes, an instance of database connection, cipher key for cryptography and uri requested
-Registry::setAll(array('dbc' => $dbc,  'key' => $key, 'route' => $rules, 'uri'=>$uri));
+Registry::setAll(array('dbc' => $dbc,  'key' => $cipher_key, 'route' => $rules, 'uri'=>$uri));
 
 /* an instances of class that necessary for the system
  * please do not change this below variable 
