@@ -13,7 +13,7 @@ class PostProviderModel extends Dao
  
 private $linkPosts;
 
-private $pagination = null;
+private $pagination;
 
 public function __construct()
 {
@@ -28,13 +28,13 @@ public function __construct()
  * @param integer $limit
  * @return void
  */
-public function getPostFeeds($limit = 5)
+public function getPostFeeds($limit)
 {
   $sql =  "SELECT p.ID, p.media_id, p.post_author,
                   p.post_date, p.post_modified, p.post_title,
                   p.post_slug, p.post_content, p.post_type,
                   p.post_status, p.post_tags, 
-                  p.post_sticky, u.user_login
+                  p.post_sticky, u.user_fullname, u.user_login
             FROM tbl_posts AS p
             INNER JOIN tbl_users AS u ON p.post_author = u.ID
             WHERE p.post_type = 'blog' AND p.post_status = 'publish'
@@ -68,19 +68,21 @@ $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
             p.post_title, p.post_slug, p.post_content, p.post_summary, 
             p.post_keyword, p.post_status, p.post_tags, 
             p.post_type, p.comment_status, 
-  m.media_filename, m.media_caption, m.media_access, u.user_fullname, u.user_login
+            m.media_filename, m.media_caption, m.media_access, 
+            u.user_fullname, u.user_login
 FROM tbl_posts AS p 
 INNER JOIN tbl_media AS m ON p.media_id = m.ID
 INNER JOIN tbl_users AS u ON p.post_author = u.ID
 WHERE p.post_status = 'publish'
-AND p.post_type = 'blog' 
+AND p.post_type = 'blog' AND m.media_target = 'blog'
+AND m.media_access = 'public' AND m.media_status = '1'
 ORDER BY p.ID DESC LIMIT :limit";
 
 $this->setSQL($sql);
 
 $latestPosts = isset($limit) ? $this->findAll([':limit' => $limit]) : null;
 
-return ( empty($latestPosts) ) ?: $latestPosts;
+return (empty($latestPosts) ) ?: $latestPosts;
 
 }
 
@@ -91,7 +93,7 @@ return ( empty($latestPosts) ) ?: $latestPosts;
  *
  * @param int|num $id
  * @param object $sanitize
- * @return boolean|array|object
+ * @return boolean|array|object|mixed
  *
  */
 public function getPostById($id, $sanitize)
@@ -99,11 +101,11 @@ public function getPostById($id, $sanitize)
    
 $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, 
 p.post_slug, p.post_content, p.post_summary, p.post_keyword, p.post_status, p.post_sticky, 
-p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, m.media_access, 
-u.user_login, u.user_fullname
-FROM tbl_posts AS p
-INNER JOIN tbl_media AS m ON p.media_id = m.ID
-INNER JOIN tbl_users AS u ON p.post_author = u.ID
+p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, 
+m.media_access, u.user_login, u.user_fullname
+FROM tbl_posts p
+INNER JOIN tbl_media m ON p.media_id = m.ID
+INNER JOIN tbl_users u ON p.post_author = u.ID
 WHERE p.post_status = 'publish'
 AND p.post_type = 'blog' AND m.media_target = 'blog'
 AND m.media_access = 'public' AND m.media_status = '1' 
@@ -137,7 +139,7 @@ public function getPostBySlug($slug, $sanitize)
                  p.post_keyword, p.post_status, p.post_sticky, 
                  p.post_type, p.comment_status, 
                  m.media_filename, m.media_caption, m.media_target, m.media_access,
-                 u.user_fullname
+                 u.user_login, u.user_fullname
           FROM tbl_posts AS p
           INNER JOIN tbl_users AS u ON p.post_author = u.ID
           INNER JOIN tbl_media AS m ON p.media_id = m.ID
@@ -204,19 +206,19 @@ public function getPostByAuthor($author)
 public function getPostsPublished(Paginator $perPage, $sanitize)
 {
 
+  $entries = [];
+
   $this->linkPosts = $perPage;
 
   $stmt = $this->dbc->dbQuery("SELECT ID FROM tbl_posts WHERE post_status = 'publish' AND post_type = 'blog'");
 
   $this->linkPosts->set_total($stmt->rowCount());
 
-  $sql = "SELECT p.ID, p.media_id, p.post_author,
-                     p.post_date, p.post_modified, p.post_title,
-                     p.post_slug, p.post_content, p.post_summary,
-                     p.post_keyword, 
-                     p.post_type, p.post_status, p.post_sticky, 
-                     u.user_login, u.user_fullname,
-                     m.media_filename, m.media_caption
+  $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title,
+                 p.post_slug, p.post_content, p.post_summary,
+                 p.post_keyword, p.post_type, p.post_status, p.post_sticky, 
+                 u.user_login, u.user_fullname,
+                 m.media_filename, m.media_caption
   			FROM tbl_posts AS p
   			INNER JOIN tbl_users AS u ON p.post_author = u.ID
         INNER JOIN tbl_media AS m ON p.media_id = m.ID
@@ -225,11 +227,11 @@ public function getPostsPublished(Paginator $perPage, $sanitize)
 
   $this->setSQL($sql);
 
-  $postsPublished = $this->findAll();
+  $entries = $this->findAll();
 
   $this->pagination = $this->linkPosts->page_links($sanitize);
 
-  return (empty($postsPublished)) ?: ['postsPublished' => $postsPublished, 'paginationLink' => $this->pagination];
+  return (empty($entries)) ?: ['postsPublished' => $entries, 'paginationLink' => $this->pagination];
 
 }
 
