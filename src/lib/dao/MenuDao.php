@@ -13,6 +13,7 @@
 class MenuDao extends Dao
 {
  
+  private $selected;
 /**
  * 
  */
@@ -30,8 +31,8 @@ class MenuDao extends Dao
  */
  public function findMenus($orderBy = 'ID')
  {
-    $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_sort, menu_status, menu_position
-            FROM tbl_menu ORDER BY :orderBy DESC";
+    $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_position
+            FROM tbl_menu ORDER BY :orderBy";
 
     $this->setSQL($sql);
 
@@ -53,7 +54,7 @@ class MenuDao extends Dao
  public function findMenu($menuId, $sanitizing)
  {
      
-     $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_sort, menu_status, menu_position
+     $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_position
              FROM tbl_menu WHERE ID = ?";
      
      $idsanitized = $this->filteringId($sanitizing, $menuId, 'sql');
@@ -93,7 +94,7 @@ class MenuDao extends Dao
        'parent_id' => $bind['parent_id'],
        'menu_label' => $bind['menu_label'],
        'menu_link' => $bind['menu_link'],
-       'menu_sort' => $this->findSortMenu()
+       'menu_position' => $bind['menu_position']
    ]);
    
    $menu_id = $this->lastId();
@@ -104,7 +105,7 @@ class MenuDao extends Dao
 
    $link = $this->findRow([$menu_id]);
 
-   if ($link['menu_link'] == '') {
+   if ($link['menu_link'] === '') {
      
       $this->modify("tbl_menu", ['menu_link' => '#'], "ID = {$link['ID']}");
        
@@ -126,7 +127,6 @@ class MenuDao extends Dao
       'parent_id' => $bind['parent_id'],
       'menu_label' => $bind['menu_label'],
       'menu_link' => $bind['menu_link'],
-      'menu_sort' => $bind['menu_sort'],
       'menu_status' => $bind['menu_status'], 
       'menu_position' => $bind['menu_position']
   ], "ID = {$cleanId}");
@@ -168,8 +168,8 @@ class MenuDao extends Dao
   */
  public function deleteMenu($id, $sanitize)
  {
-  $clean_id = $this->filteringId($sanitize, $id, 'sql');
-  $this->deleteRecord("tbl_menu", "ID = ".(int)$clean_id);
+  $cleanid = $this->filteringId($sanitize, $id, 'sql');
+  $this->deleteRecord("tbl_menu", "ID = $cleanid");
  }
 
  /**
@@ -203,20 +203,12 @@ class MenuDao extends Dao
  */
  public function menuExists($menu_label)
  {
-   $sql = "SELECT COUNT(ID) FROM tbl_menu WHERE menu_label = ?";
-   $this->setSQL($sql);
-   $stmt = $this->findColumn([$menu_label]);
+  $sql = "SELECT COUNT(ID) FROM tbl_menu WHERE menu_label = ?";
+  $this->setSQL($sql);
+  $stmt = $this->findColumn([$menu_label]);
 
-   if ($stmt == 1) {
-
-      return true;
-
-   } else {
-
-      return false;
-
-   }
-
+  return ($stmt === 1) ? true : false;
+   
  }
 
 /**
@@ -241,7 +233,7 @@ class MenuDao extends Dao
    
    $dropDown = '<select class="form-control" name="parent_id" id="parent">'."\n"; 
 
-   if (is_array($menus)) {
+   if (is_iterable($menus)) {
 
    foreach ($menus as $menu) {
       
@@ -280,15 +272,16 @@ public function dropDownMenuPosition($selected = '')
 {
 
 $name = 'menu_position';
+
 $menu_position = array('header'=>'Header', 'footer'=> 'Footer');
 
-if ($selected != '') {
+if ($selected !== '') {
 
-  $selected = $selected;
+  $this->selected = $selected;
 
 }
 
-return dropdown($name, $menu_position, $selected);
+return dropdown($name, $menu_position, $this->selected);
 
 }
 
@@ -307,22 +300,4 @@ return dropdown($name, $menu_position, $selected);
    return $this->checkCountValue($data);
  }
  
- /**
-  * Find menu sorted
-  * 
-  * @return number
-  */
- private function findSortMenu()
- {
- 
-  $sql = "SELECT menu_sort FROM tbl_menu ORDER BY menu_sort DESC";
- 
-  $this->setSQL($sql);
-  
-  $field = $this->findColumn();
-  
-  return $field['menu_sort'] + 1;
-  
- }
-
 }
