@@ -25,7 +25,7 @@ $scanner->addEngine(new ZipBombEngine());
 
 $result = $scanner->scanFile($file);
 
-return ( $result->isBomb() ) ? true : false;
+return ($result->isBomb()) ? true : false;
 
 }
 
@@ -49,6 +49,6 @@ $scanner->addEngine(new RarBombEngine());
 
 $result = $scanner->scanFile($file);
 
-return ( $result->isBomb() ) ? true : false;
+return ($result->isBomb()) ? true : false;
 
 }
