@@ -10,10 +10,8 @@
  * 
  */
 function safe_html($data)
-{
-    
-  return htmlspecialchars(stripslashes(trim($data)), ENT_QUOTES|ENT_HTML5, 'UTF-8', false);
-
+{   
+ return htmlspecialchars(stripslashes(trim($data)), ENT_QUOTES|ENT_HTML5, 'UTF-8', false);
 }
 
 /**
@@ -25,9 +23,6 @@ function safe_html($data)
  */
 function safe_filter_html($data)
 {
- 
-  $html_filter = new Html();
-
-  return $html_filter->filter($data);
-  
+ $html_filter = new Html();
+ return $html_filter->filter($data); 
 }
