@@ -12,7 +12,7 @@
  * @return array
  * 
  */
-function generate_request($base, $type, $data = array(), $string_encoded = true )
+function generate_request($base, $type, $data = array(), $string_encoded = true)
 {
  
  $html = array();
@@ -24,6 +24,7 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
 
  switch ($type) {
 
+   default:
    case 'get':
 
       check_request_generated();
@@ -41,7 +42,7 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
 
                );
 
-           } elseif($load === 'logout') {
+           } elseif ($load === 'logout') {
 
              $query_data = array(
               
@@ -82,7 +83,7 @@ function generate_request($base, $type, $data = array(), $string_encoded = true 
 
          if ($string_encoded) {
 
-            if($load === 'users') {
+            if ($load === 'users') {
 
                $query_data = array(
   
