@@ -48,23 +48,67 @@ return ( move_uploaded_file($file_location, $zip_path_uploaded) ) ? open_plugin_
 /**
  * open_plugin_uploaded
  *
+ * @category function
+ * @see https://rules.sonarsource.com/php/type/Security%20Hotspot/RSPEC-5042
  * @param string $zip_path_uploaded
  * 
  */
 function open_plugin_uploaded($zip_path_uploaded)
 {
 
+ $file_count = 0;
+ $total_size = 0;
  $zip = new ZipArchive();
 
- $opened = $zip->open($zip_path_uploaded);
-
- if ( $opened === true) {
-
-      $file_count = (version_compare(phpversion(), "7.4.30", ">=")) ? $zip->count() : $zip->numFiles;
+ if ($zip->open($zip_path_uploaded) === true) {
+  
+    $file_count = (version_compare(phpversion(), "7.4.30", ">=")) ? $zip->count() : $zip->numFiles;
 
     for ($i = 0; $i < $file_count; $i++) {
 
         $file_index = $zip->getNameIndex($i);
+        $stats = $zip->statIndex($i);
+
+        // Preventing zip slip path traversal
+        if (strpos($file_index, '../') !== false || substr($file_index, 0, 1) === '/') {
+            throw new InvalidArgumentException();
+        }
+
+        if (substr($file_index, -1) !== '/') {
+
+            $file_count++;
+            if ($file_count > MAX_FILES) {
+                throw new InvalidArgumentException();
+            }
+
+            $fp = $zip->getStream($file_index);
+            $current_size = 0;
+            while (!feof($fp)) {
+                $current_size += READ_LENGTH;
+                $total_size += READ_LENGTH;
+
+                if ($total_size > MAX_SIZE) {
+                    throw new InvalidArgumentException();
+                }
+
+                // Additional protection: checking compression ration
+                if ($stats['comp_size'] > 0) {
+                    $ratio = $current_size / $stats['com_size'];
+                    if ($ratio > MAX_RATIO) {
+                        throw new InvalidArgumentException();
+                    }
+                }
+
+                file_put_contents($file_index, fread($fp, READ_LENGTH), FILE_APPEND);
+
+            }
+
+            fclose($fp);
+
+        } else {
+
+            mkdir($file_index);
+        }
 
         preg_match('/(.*)(phpinfo|system|php_uname|chmod|fopen|eval|flclose|readfile|base64_decode|passthru)(.*)/Us', $file_index, $matches);
 
