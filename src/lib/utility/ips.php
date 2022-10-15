@@ -49,7 +49,7 @@ $agent = filter_input(INPUT_SERVER, 'HTTP_USER_AGENT');
 $url = current_load_url();
 
 if (strpos($agent, 'sqlmap') !== false || strpos($agent, 'nikto') !== false 
-    || starts_with($url, 'wp-') || starts_with($url, 'wordpress') || starts_with($url, 'wp/'))  {
+    || starts_with($url, 'wp-') || starts_with($url, 'wordpress') || starts_with($url, 'wp/')) {
 
     $is_scanner = true;
 
