@@ -14,7 +14,7 @@
 ?>
 
    <!-- Hero Section-->
-   <section style="background: url('<?= isset($featured_hero_img) ? invoke_webp_image($featured_hero_img, false) : "https://picsum.photos/1920/1438 "; ?>'); background-size: cover; background-position: center center" class="hero">
+   <section style="background: url('<?= isset($featured_hero_img) ? invoke_frontimg($featured_hero_img, false) : "https://picsum.photos/1920/1438 "; ?>'); background-size: cover; background-position: center center" class="hero">
      <div class="container">
        <div class="row">
          <div class="col-lg-7">
@@ -61,13 +61,13 @@
 
           $r++;
 
-          $random_post_id = isset($random_post['ID']) ? (int)$random_post['ID'] : "";
-          $random_image_id = (isset($random_post['media_id']) && $random_post['media_id'] !== 0) ? (int)$random_post['media_id'] : ""; 
+          $random_post_id = isset($random_post['ID']) ? (int)$random_post['ID'] : ""; 
           $random_post_img = (isset($random_post['media_filename']) && $random_post['media_filename'] != "") ? htmlout($random_post['media_filename']) : "";
           $random_post_author = (isset($random_post['user_login']) || isset($random_post['user_fullname']) ? htmlout($random_post['user_login']) : htmlout($random_post['user_fullname']));
           $random_post_title = isset($random_post['post_title']) ? htmlout($random_post['post_title']) : "";
           $random_post_content = isset($random_post['post_content']) ? paragraph_l2br($random_post['post_content']) : "";
           $random_post_created = isset($random_post['post_modified'])  ? htmlout(make_date($random_post['post_modified'])) : htmlout(make_date($random_post['post_date'])); 
+          $total_comment = (total_comment($random_post_id) > 0) ? total_comment($random_post_id) : 0;
 
           if ($r % 2 == 1) :
 
@@ -96,11 +96,12 @@
                      <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i>
                        <?= isset($random_post_created) ? $random_post_created : ""; ?>
                      </div>
+                     <div class="comments"><i class="icon-comment" aria-hidden="true"></i><?= $total_comment; ?></div>
                    </footer>
                  </div>
                </div>
              </div>
-             <div class="image col-lg-5"><img src="<?= isset($random_post_img) ? invoke_webp_image($random_post_img) : "https://via.placeholder.com/516x344"; ?>" alt="<?= isset($random_post['media_caption']) ? htmlout($random_post['media_caption']) : htmlout($random_post['post_title']); ?>"></div>
+             <div class="image col-lg-5"><img src="<?= isset($random_post_img) ? invoke_frontimg($random_post_img) : "https://via.placeholder.com/516x344"; ?>" alt="<?= isset($random_post['media_caption']) ? htmlout($random_post['media_caption']) : htmlout($random_post['post_title']); ?>"></div>
 
            </div>
 
@@ -109,7 +110,7 @@
           ?>
 
            <div class="row d-flex align-items-stretch">
-           <div class="image col-lg-5"><img src="<?= isset($random_post_img) ? invoke_webp_image($random_post_img) : "https://via.placeholder.com/516x344"; ?>" alt="<?= isset($random_post['media_caption']) ? htmlout($random_post['media_caption']) : htmlout($random_post['post_title']); ?>"></div>
+           <div class="image col-lg-5"><img src="<?= isset($random_post_img) ? invoke_frontimg($random_post_img) : "https://via.placeholder.com/516x344"; ?>" alt="<?= isset($random_post['media_caption']) ? htmlout($random_post['media_caption']) : htmlout($random_post['post_title']); ?>"></div>
              <div class="text col-lg-7">
                <div class="text-inner d-flex align-items-center">
                  <div class="content">
@@ -206,7 +207,7 @@
 
            <div class="post col-md-4">
              <div class="post-thumbnail"><a href="<?= isset($latest_post_id) ? permalinks($latest_post_id)['post'] : "#"; ?>" title="<?= $latest_post_title; ?>">
-             <img src="<?= isset($latest_post_img) ? invoke_webp_image($latest_post_img) : "https://via.placeholder.com/640x450"; ?>" alt="<?= isset($latest_img_caption) ? $latest_img_caption : $latest_post_title; ?>" class="img-fluid"></a></div>
+             <img src="<?= isset($latest_post_img) ? invoke_frontimg($latest_post_img) : "https://via.placeholder.com/640x450"; ?>" alt="<?= isset($latest_img_caption) ? $latest_img_caption : $latest_post_title; ?>" class="img-fluid"></a></div>
              <div class="post-details">
                <div class="post-meta d-flex justify-content-between">
                  <div class="date"><?= $latest_post_created; ?></div>
@@ -258,7 +259,7 @@
       
          <div class="mix col-lg-3 col-md-3 col-sm-6">
            <div class="item"><a href="<?= isset($img_filename) ? invoke_webp_image($img_filename) : "https://via.placeholder.com/640x450"; ?>" data-fancybox="gallery" class="image"><img src="<?= isset($img_filename) ? invoke_webp_image($img_filename) : "https://via.placeholder.com/640x450"; ?>" alt="<?= isset($img_alt) ? $img_alt : ""; ?>" class="img-fluid">
-               <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"></i></div>
+               <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search" aria-hidden="true"></i></div>
              </a></div>
          </div>
 
@@ -269,7 +270,7 @@
       <div class="mix col-lg-3 col-md-3 col-sm-6">
            <div class="item"><a href="https://picsum.photos/640/450" data-fancybox="gallery" class="image">
              <img src="https://picsum.photos/640/450" alt="This is a gallery" class="img-fluid">
-               <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"></i></div>
+               <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search" aria-hidden="true"></i></div>
              </a></div>
       </div>
       <div class="mix col-lg-3 col-md-3 col-sm-6">
