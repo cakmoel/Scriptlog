@@ -4,9 +4,9 @@ require dirname(__FILE__) . '/functions.php';
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-<?= theme_meta()['site_meta_tags']; ?>
-
+<?= 
+theme_meta()['site_meta_tags']; 
+?>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/fontastic.css">
@@ -17,14 +17,14 @@ require dirname(__FILE__) . '/functions.php';
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/dropdown.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.css">
-<link rel="shortcut icon" href="<?= app_url() . '/favicon.ico'; ?>">
-
-<?= theme_meta()['site_schema']; ?>
-
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css">
+<link rel="shortcut icon" href="<?= theme_dir(); ?>assets/img/favicon.ico">
+<?= 
+theme_meta()['site_schema']; 
+?>
 <!-- Tweaks for older IEs--><!--[if lt IE 9]>
 <script src="<?= theme_dir(); ?>assets/js/html5shiv.min.js"></script>
 <script src="<?= theme_dir(); ?>assets/js/respond.min.js"></script><![endif]-->
-
 </head>
   
 <body>
@@ -53,6 +53,7 @@ require dirname(__FILE__) . '/functions.php';
             <!-- Toggle Button-->
             <button type="button" data-toggle="collapse" data-target="#navbarcollapse" aria-controls="navbarcollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"><span></span><span></span><span></span></button>
           </div>
+          
           <!-- Navbar Menu -->
           <div id="navbarcollapse" class="collapse navbar-collapse">
             <ul class="navbar-nav ml-auto">
