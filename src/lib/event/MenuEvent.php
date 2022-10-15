@@ -44,14 +44,6 @@ class MenuEvent
   private $link;
   
   /**
-   * order
-   *
-   * @var int|string
-   * 
-   */
-  private $order;
-  
-  /**
    * status
    *
    * @var string
@@ -159,18 +151,6 @@ class MenuEvent
   }
 
   /**
-   * setMenuOrder
-   *
-   * @param string|int $menu_order
-   * @return int|string
-   * 
-   */
-  public function setMenuOrder($menu_order)
-  {
-    $this->order = $menu_order;
-  }
-
-  /**
    * setMenuStatus
    * 
    * @param string $menu_status
@@ -238,7 +218,8 @@ class MenuEvent
     return $this->menuDao->insertMenu([
       'parent_id' => $this->parent_id,
       'menu_label' => $this->label,
-      'menu_link' => $this->link
+      'menu_link' => $this->link,
+      'menu_position' => $this->position
     ]);
 
   }
@@ -259,7 +240,6 @@ class MenuEvent
           'parent_id' => $this->parent_id,
           'menu_label' => $this->label,
           'menu_link' => $this->link,
-          'menu_sort' => $this->order,
           'menu_status' => $this->status,
           'menu_position' => $this->position
     
@@ -310,7 +290,7 @@ class MenuEvent
   {
     $this->validator->sanitize($this->menu_id, 'int');
 
-    if (!$data_menu = $this->menuDao->findMenu($this->menu_id, $this->sanitize)) {
+    if (!$this->menuDao->findMenu($this->menu_id, $this->sanitize)) {
        direct_page('index.php?load=menu&error=menuNotFound', 404);
     }
 
