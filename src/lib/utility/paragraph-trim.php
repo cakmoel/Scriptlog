@@ -55,7 +55,7 @@ function paragraph_trim($content, $limit = 200, $schr="\n", $scnt=2)
 
   }
 
-  $content = substr($content, 0, escape_html($post));
+  $content = substr($content, 0, $post);
 
   if(strlen($content) >= $limit) {
 
@@ -65,7 +65,9 @@ function paragraph_trim($content, $limit = 200, $schr="\n", $scnt=2)
 
   }
 
-  if($trimmed) $content .= '...';
+  if ($trimmed) { 
+    $content .= '...'; 
+  }
 
   return safe_html($content);
 
@@ -80,23 +82,21 @@ function paragraph_newline_checker()
 
   if(defined('PHP_EOL')) {
 
-      return PHP_EOL;
+    return PHP_EOL;
 
   }
 
-  $new_line = "\r\n";
-
   if(isset($_SERVER["HTTP_USER_AGENT"]) && strstr(strtolower($_SERVER["HTTP_USER_AGENT"]), 'win')) {
 
-     $new_line = "\r\n";
+    $new_line = "\r\n";
 
   } elseif(isset($_SERVER["HTTP_USER_AGENT"]) && strstr(strtolower($_SERVER["HTTP_USER_AGENT"]), 'mac')) {
 
-     $new_line = "\r";
+    $new_line = "\r";
 
   } else {
 
-      $new_line = "\n";
+    $new_line = "\n";
 
   }
 
