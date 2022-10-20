@@ -171,7 +171,7 @@ function processing_comment(array $values)
     
    FrontContentProvider::frontNewCommentByPost($bind, $commentProvider);
 
-   if ( ! empty($errors)) {
+   if (! empty($errors)) {
 
       $form_data['success'] = false;
       $form_data['errors'] = $errors;
