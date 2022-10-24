@@ -27,7 +27,7 @@ if (is_iterable($feeds)) {
     $feed_link = isset($feed['ID']) ? permalinks($feed['ID'])['post'] : "";
     $description = isset($feed['post_content']) ? htmlout(strip_tags(nl2br(html_entity_decode($feed['post_content'])))) : "";
     $feed_description = substr($description, 0, 220);
-    $feed_description = substr($description, 0, strrpos($feed_description," "));
+    $feed_description = substr($description, 0, strrpos($feed_description, " "));
 
     $rss->addItem($feed_title, $feed_link, $feed_description);
 
