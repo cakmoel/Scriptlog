@@ -95,4 +95,3 @@ function write_ini($file, $array = [])
   return true;
 
 }
-    
