@@ -84,14 +84,14 @@ class MenuApp extends BaseApp
         'parent_id' => FILTER_SANITIZE_NUMBER_INT,
         'menu_label' => isset($_POST['menu_label']) ? Sanitize::severeSanitizer($_POST['menu_label']) : "",
         'menu_link' => FILTER_SANITIZE_URL,
-        'menu_position' => isset($_POST['menu_position']) ? Sanitize::mildSanitizer($_POST['menu_position']) : ""
+        'menu_visibility' => isset($_POST['menu_visibility']) ? Sanitize::mildSanitizer($_POST['menu_visibility']) : ""
       ];
 
       try {
 
         if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
 
-          header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request");
+          header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
           throw new AppException("Sorry, unpleasant attempt detected!.");
         }
 
@@ -107,7 +107,7 @@ class MenuApp extends BaseApp
           array_push($errors, "Menu has been used");
         }
 
-        if (false === sanitize_selection_box(distill_post_request($filters)['menu_position'], ['header' => 'Header', 'footer' => 'Footer'])) {
+        if (false === sanitize_selection_box(distill_post_request($filters)['menu_visibility'], ['header' => 'Header', 'footer' => 'Footer'])) {
 
           $checkError = false;
           array_push($errors, "Please choose the available value provided!");
@@ -130,7 +130,7 @@ class MenuApp extends BaseApp
           $this->menuEvent->setParentId((int)distill_post_request($filters)['parent_id']);
           $this->menuEvent->setMenuLabel(prevent_injection(distill_post_request($filters)['menu_label']));
           $this->menuEvent->setMenuLink(escape_html(trim(distill_post_request($filters)['menu_link'])));
-          $this->menuEvent->setMenuPosition(prevent_injection(distill_post_request($filters)['menu_position']));
+          $this->menuEvent->setMenuVisibility(prevent_injection(distill_post_request($filters)['menu_visibility']));
           $this->menuEvent->addMenu();
           $_SESSION['status'] = "menuAdded";
           direct_page('index.php?load=menu&status=menuAdded', 302);
@@ -152,7 +152,7 @@ class MenuApp extends BaseApp
       $this->view->set('pageTitle', $this->getPageTitle());
       $this->view->set('formAction', $this->getFormAction());
       $this->view->set('parent', $this->menuEvent->parentDropDown());
-      $this->view->set('position', $this->menuEvent->positionDropDown());
+      $this->view->set('visibility', $this->menuEvent->visibilityDropDown());
       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
     }
 
@@ -175,7 +175,7 @@ class MenuApp extends BaseApp
       'menu_label' => $getMenu['menu_label'],
       'menu_link' => $getMenu['menu_link'],
       'menu_status' => $getMenu['menu_status'],
-      'menu_position' => $getMenu['menu_position']
+      'menu_visibility' => $getMenu['menu_visibility']
     );
 
     if (isset($_POST['menuFormSubmit'])) {
@@ -186,14 +186,14 @@ class MenuApp extends BaseApp
         'menu_link' => FILTER_SANITIZE_URL,
         'menu_status' => isset($_POST['menu_status']) ? Sanitize::mildSanitizer($_POST['menu_status']) : "",
         'menu_id' => FILTER_SANITIZE_NUMBER_INT,
-        'menu_position' => isset($_POST['menu_position']) ? Sanitize::mildSanitizer($_POST['menu_position']) : ""
+        'menu_visibility' => isset($_POST['menu_visibility']) ? Sanitize::mildSanitizer($_POST['menu_visibility']) : ""
       ];
 
       try {
 
         if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
 
-          header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request");
+          header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
           throw new AppException("Sorry, unpleasant attempt detected!.");
         }
 
@@ -209,7 +209,7 @@ class MenuApp extends BaseApp
           array_push($errors, "Please choose the available value provided!");
         }
 
-        if (false === sanitize_selection_box(distill_post_request($filters)['menu_position'], ['header' => 'Header', 'footer' => 'Footer'])) {
+        if (false === sanitize_selection_box(distill_post_request($filters)['menu_visibility'], ['header' => 'Header', 'footer' => 'Footer'])) {
 
           $checkError = false;
           array_push($errors, "Please choose the available value provided!");
@@ -225,7 +225,7 @@ class MenuApp extends BaseApp
           $this->view->set('errors', $errors);
           $this->view->set('menuData', $data_menu);
           $this->view->set('parent', $this->menuEvent->parentDropDown($getMenu['parent_id']));
-          $this->view->set('position', $this->menuEvent->positionDropDown($getMenu['menu_position']));
+          $this->view->set('visibility', $this->menuEvent->visibilityDropDown($getMenu['menu_visibility']));
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
         } else {
 
@@ -234,7 +234,7 @@ class MenuApp extends BaseApp
           $this->menuEvent->setMenuLabel(prevent_injection(distill_post_request($filters)['menu_label']));
           $this->menuEvent->setMenuLink(escape_html(distill_post_request($filters)['menu_link']));
           $this->menuEvent->setMenuStatus(distill_post_request($filters)['menu_status']);
-          $this->menuEvent->setMenuPosition(distill_post_request($filters)['menu_position']);
+          $this->menuEvent->setMenuVisibility(distill_post_request($filters)['menu_visibility']);
           $this->menuEvent->modifyMenu();
           $_SESSION['status'] = "menuUpdated";
           direct_page('index.php?load=menu&status=menuUpdated', 200);
@@ -257,7 +257,7 @@ class MenuApp extends BaseApp
       $this->view->set('formAction', $this->getFormAction());
       $this->view->set('menuData', $data_menu);
       $this->view->set('parent', $this->menuEvent->parentDropDown($getMenu['parent_id']));
-      $this->view->set('position', $this->menuEvent->positionDropDown($getMenu['menu_position']));
+      $this->view->set('visibility', $this->menuEvent->visibilityDropDown($getMenu['menu_visibility']));
       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
     }
 
