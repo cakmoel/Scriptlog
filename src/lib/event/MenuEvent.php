@@ -52,12 +52,12 @@ class MenuEvent
   private $status;
 
   /**
-   * position
+   * visibility
    *
    * @var string
    * 
    */
-  private $position;
+  private $visibility;
 
   /**
    * menuDao
@@ -139,15 +139,15 @@ class MenuEvent
   }
 
   /**
-   * setMenuPosition
+   * setMenuVisibility
    *
-   * @param string $menu_position
+   * @param string $menu_visibility
    * @return string
    * 
    */
-  public function setMenuPosition($menu_position)
+  public function setMenuVisibility($menu_visibility)
   {
-    $this->position = $menu_position;
+    $this->visibility = $menu_visibility;
   }
 
   /**
@@ -219,7 +219,7 @@ class MenuEvent
       'parent_id' => $this->parent_id,
       'menu_label' => $this->label,
       'menu_link' => $this->link,
-      'menu_position' => $this->position
+      'menu_visibility' => $this->visibility
     ]);
 
   }
@@ -241,7 +241,7 @@ class MenuEvent
           'menu_label' => $this->label,
           'menu_link' => $this->link,
           'menu_status' => $this->status,
-          'menu_position' => $this->position
+          'menu_visibility' => $this->visibility
     
         ], $this->menu_id);
 
@@ -310,14 +310,14 @@ class MenuEvent
   }
 
   /**
-   * positionDropDown()
+   * visibilityDropDown()
    * 
    * @param string $selected
    * 
    */
-  public function positionDropDown($selected = "")
+  public function visibilityDropDown($selected = "")
   {
-    return $this->menuDao->dropDownMenuPosition($selected);
+    return $this->menuDao->dropDownMenuVisibility($selected);
   }
 
   /**
