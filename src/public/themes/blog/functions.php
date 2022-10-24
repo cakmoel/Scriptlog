@@ -1,4 +1,5 @@
 <?php
+
 /**
  * request_path()
  *
@@ -8,7 +9,7 @@
 function request_path()
 {
   return new RequestPath();
-} 
+}
 
 /**
  * initialize_post()
@@ -17,7 +18,7 @@ function request_path()
  */
 function initialize_post()
 {
- return new PostProviderModel();
+  return new PostProviderModel();
 }
 
 /**
@@ -27,7 +28,7 @@ function initialize_post()
  */
 function initialize_page()
 {
- return new PageProviderModel();
+  return new PageProviderModel();
 }
 
 /**
@@ -81,7 +82,7 @@ function initialize_tag()
  */
 function initialize_gallery()
 {
-return new GalleryProviderModel();
+  return new GalleryProviderModel();
 }
 
 /**
@@ -147,27 +148,25 @@ function latest_posts($limit, $position = null)
  */
 function retrieves_topic_simple($id)
 {
- 
- $categories = array();
 
- $idsanitized = sanitizer($id, 'sql');
+  $categories = array();
 
- $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status 
+  $idsanitized = sanitizer($id, 'sql');
+
+  $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status 
          FROM tbl_topics, tbl_post_topic  
          WHERE tbl_topics.ID = tbl_post_topic.topic_id 
          AND tbl_topics.topic_status = 'Y' 
          AND tbl_post_topic.post_id = '$idsanitized' ";
 
- $results = db_simple_query($sql);
+  $results = db_simple_query($sql);
 
- foreach ( $results as $result) {
+  foreach ($results as $result) {
 
-   $categories[] = "<a href='".permalinks($result['ID'])['cat']."'>".$result['topic_title']."</a>";
+    $categories[] = "<a href='" . permalinks($result['ID'])['cat'] . "'>" . $result['topic_title'] . "</a>";
+  }
 
- }
-
- return implode("", $categories);
-
+  return implode("", $categories);
 }
 
 /**
@@ -177,8 +176,8 @@ function retrieves_topic_simple($id)
  */
 function retrieves_topic_prepared($id)
 {
-  
-  $topics = array(); 
+
+  $topics = array();
 
   $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status 
           FROM tbl_topics, tbl_post_topic
@@ -188,16 +187,15 @@ function retrieves_topic_prepared($id)
 
   $items = db_prepared_query($sql, [$id], 'i')->get_result()->fetch_all(MYSQLI_ASSOC);
 
- foreach ( (array) $items as $item) {
+  foreach ((array) $items as $item) {
 
-    $topic_id = ( !empty($item['ID']) ? abs((int)$item['ID']) : null);
-    $topics[] = "<a href='".permalinks($topic_id)['cat']."'>".$item['topic_title']."</a>";
+    $topic_id = (!empty($item['ID']) ? abs((int)$item['ID']) : null);
+    $topics[] = "<a href='" . permalinks($topic_id)['cat'] . "'>" . $item['topic_title'] . "</a>";
   }
-  
-  return implode("", $topics);
 
+  return implode("", $topics);
 }
-  
+
 /**
  * sidebarTopics()
  * retrieving categories and display it on sidebar
@@ -206,8 +204,8 @@ function retrieves_topic_prepared($id)
  */
 function sidebar_topics()
 {
- $sidebar_topics = FrontContentProvider::frontSidebarTopics(initialize_topic());
- return (is_iterable($sidebar_topics)) ? $sidebar_topics : array();
+  $sidebar_topics = FrontContentProvider::frontSidebarTopics(initialize_topic());
+  return (is_iterable($sidebar_topics)) ? $sidebar_topics : array();
 }
 
 /**
@@ -228,7 +226,7 @@ function retrieve_tags()
  */
 function link_tag($id)
 {
- return FrontContentProvider::frontLinkTag($id, initialize_tag());
+  return FrontContentProvider::frontLinkTag($id, initialize_tag());
 }
 
 /**
@@ -240,7 +238,7 @@ function link_tag($id)
  */
 function link_topic($id)
 {
- return FrontContentProvider::frontLinkTopic($id, initialize_topic());
+  return FrontContentProvider::frontLinkTopic($id, initialize_topic());
 }
 
 /**
@@ -250,33 +248,30 @@ function link_topic($id)
  */
 function previous_post($id)
 {
- $idsanitized = sanitizer($id, 'sql');
+  $idsanitized = sanitizer($id, 'sql');
 
- $html = null;
+  $html = null;
 
- $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID < '$idsanitized'
+  $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID < '$idsanitized'
          AND post_status = 'publish' AND post_type = 'blog'
          ORDER BY ID LIMIT 1";
 
- $stmt = db_simple_query($sql);
+  $stmt = db_simple_query($sql);
 
- if ($stmt->num_rows > 0) {
+  if ($stmt->num_rows > 0) {
 
-  while ($rows = $stmt->fetch_array(MYSQLI_ASSOC)) {
+    while ($rows = $stmt->fetch_array(MYSQLI_ASSOC)) {
 
-    $html .= '<a href="'.permalinks($rows['ID'])['post'].'" class="prev-post text-left d-flex align-items-center">';
-    $html .= '<div class="icon prev"><i class="fa fa-angle-left" aria-hidden="true"></i></div>';
-    $html .= '<div class="text"><strong class="text-primary">Previous Post </strong>';
-    $html .= '<h6>'.escape_html($rows['post_title']).'</h6>';
-    $html .= '</div>';
-    $html .= '</a>';
+      $html .= '<a href="' . permalinks($rows['ID'])['post'] . '" class="prev-post text-left d-flex align-items-center">';
+      $html .= '<div class="icon prev"><i class="fa fa-angle-left" aria-hidden="true"></i></div>';
+      $html .= '<div class="text"><strong class="text-primary">Previous Post </strong>';
+      $html .= '<h6>' . escape_html($rows['post_title']) . '</h6>';
+      $html .= '</div>';
+      $html .= '</a>';
+    }
 
+    return $html;
   }
-   
-  return $html;
-
- }
-
 }
 
 /**
@@ -286,33 +281,30 @@ function previous_post($id)
  */
 function next_post($id)
 {
-$idsanitized = sanitizer($id,'sql');
+  $idsanitized = sanitizer($id, 'sql');
 
-$html = null;
+  $html = null;
 
-$sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID > '$idsanitized'
+  $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID > '$idsanitized'
 AND post_status = 'publish' AND post_type = 'blog'
 ORDER BY ID LIMIT 1";
 
-$stmt = db_simple_query($sql);
+  $stmt = db_simple_query($sql);
 
-if ($stmt->num_rows > 0) {
+  if ($stmt->num_rows > 0) {
 
-  while ( $rows = $stmt->fetch_array(MYSQLI_ASSOC) ) {
+    while ($rows = $stmt->fetch_array(MYSQLI_ASSOC)) {
 
-    $html .= '<a href="'.permalinks($rows['ID'])['post'].'"  class="next-post text-right d-flex align-items-center justify-content-end">';
-    $html .= '<div class="text"><strong class="text-primary">Next Post </strong>';
-    $html .= '<h6>'.escape_html($rows['post_title']).'</h6>';
-    $html .= '</div>';
-    $html .= '<div class="icon next"><i class="fa fa-angle-right" aria-hidden="true"></i></div>';
-    $html .= '</a>';
+      $html .= '<a href="' . permalinks($rows['ID'])['post'] . '"  class="next-post text-right d-flex align-items-center justify-content-end">';
+      $html .= '<div class="text"><strong class="text-primary">Next Post </strong>';
+      $html .= '<h6>' . escape_html($rows['post_title']) . '</h6>';
+      $html .= '</div>';
+      $html .= '<div class="icon next"><i class="fa fa-angle-right" aria-hidden="true"></i></div>';
+      $html .= '</a>';
+    }
 
+    return $html;
   }
-
-  return $html;
-
-}
-
 }
 
 /**
@@ -325,8 +317,8 @@ if ($stmt->num_rows > 0) {
  */
 function display_galleries($start, $limit)
 {
- $showcase = FrontContentProvider::frontGalleries(initialize_gallery(), $start, $limit);
- return is_iterable($showcase) ? $showcase : array();
+  $showcase = FrontContentProvider::frontGalleries(initialize_gallery(), $start, $limit);
+  return is_iterable($showcase) ? $showcase : array();
 }
 
 /**
@@ -404,7 +396,7 @@ function comments_by_post($id)
  */
 function total_comment($id)
 {
- return FrontContentProvider::frontTotalCommentByPost($id, initialize_comment());
+  return FrontContentProvider::frontTotalCommentByPost($id, initialize_comment());
 }
 
 /**
@@ -419,7 +411,54 @@ function block_csrf()
   return generate_form_token('comment_form', 40);
 }
 
-function front_navigation()
+function retrieves_navigation($position)
 {
+
+  $menus = array(
+    'items' => array(),
+    'parents' => array()
+  );
+
+  $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_position 
+         FROM tbl_menu 
+         WHERE menu_status = 'Y' 
+         AND menu_position = '$position' 
+         ORDER BY ID";
+  $stmt = db_simple_query($sql);
+
+  if ($stmt->num_rows > 0) {
+
+    while ($items = $stmt->fetch_array(MYSQLI_ASSOC)) {
+
+      $menus['items'][$items['ID']] = $items; // Create current menus item id into array
+
+      $menus['parents'][$items['parent_id']][] = $items['ID']; // Create list of all items with child
+
+    }
+
+    return $menus;
+  }
+}
+
+function header_navigation($parent, $menu)
+{
+
+ $html = "";
+
+ if (isset($menu['parents'][$parent])) {
   
+  foreach ($menu['parents'][$parent] as $itemId) {
+
+     if (! isset($menu['parents'][$itemId])) {
+      $html .= '<li class="nav-item"><a href="'.$menu['items'][$itemId]['menu_link'].'" class="nav-link"></a></li>';
+     }
+
+     if (isset($menu['parents'][$itemId])) {
+      $html .= '<li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="'.$menu.'"></a>';
+       
+     }
+  }
+ }
+
 }
