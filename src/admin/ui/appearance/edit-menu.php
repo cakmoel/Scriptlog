@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
 
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -65,26 +65,12 @@ $menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
 <?=(isset($formData['menu_link'])) ? htmlspecialchars($formData['menu_link'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" >
 </div>
 
-<?php
-  if (!empty($menuData['menu_sort'])) :
-?>
-<div class="form-group">
-<label>Order</label>
-<input type="text" class="form-control" name="menu_sort" placeholder="" value="
-<?=(isset($menuData['menu_sort'])) ? htmlspecialchars($menuData['menu_sort']) : ""; ?>
-<?=(isset($formData['menu_sort'])) ? htmlspecialchars($formData['menu_sort'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" required>
-</div>
-<?php 
-  endif;
-?>
-
 <?php if (isset($menuData['menu_status'])) : ?>
 <div class="form-group">
 <label>Actived</label>
 <div class="radio">
 <label for="optionRadios1">
 <input type="radio" name="menu_status" id="optionsRadios1" value="Y" 
-<?=(isset($menuData['menu_status']) && $menuData['menu_status'] === 'Y') ? 'checked="checked"' : ""; ?>
 <?=(isset($formData['menu_status']) && $formData['menu_status'] === 'Y') ? 'checked="checked"' : "" ?> >
    Yes
  </label>
@@ -93,7 +79,6 @@ $menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
 <div class="radio">
 <label for="optionRadios2">
 <input type="radio" name="menu_status" id="optionsRadios2" value="N" 
-<?=(isset($menuData['menu_status']) && $menuData['menu_status'] === 'N') ? 'checked="checked"' : ""; ?>
 <?=(isset($formData['menu_status']) && $formData['menu_status'] == 'N') ? 'checked="checked"' : ""; ?> >
    No
  </label>
@@ -105,8 +90,8 @@ endif;
 ?>
 
 <div class="form-group">
-<label for="menu_position">Position</label>
-<?=(isset($position)) ? $position : ""; ?>
+<label for="menu_visibility">Visibility</label>
+<?=(isset($visibility)) ? $visibility : ""; ?>
 </div>
 
 </div>
@@ -121,7 +106,8 @@ endif;
 </div>
 <!-- /.box -->
 </div>
-<!-- /.col-md-12 -->
+<!-- /.col-md-6 -->
+
 </div>
 <!-- /.row --> 
 </section>
