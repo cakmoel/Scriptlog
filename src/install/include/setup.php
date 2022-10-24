@@ -28,7 +28,7 @@ function current_url()
    
   $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] ;
    
-  return $scheme."://".$host.dirname($_SERVER['PHP_SELF']) . "/";
+  return $scheme."://".$host.dirname($_SERVER['PHP_SELF']) . DIRECTORY_SEPARATOR;
 
 }
 
@@ -109,7 +109,7 @@ function check_dbtable($link, $table)
 {
   $install = false;
 
-  if(! is_table_exists($link, $table)) {
+  if (! is_table_exists($link, $table)) {
       
     $install = true;
 
@@ -168,7 +168,7 @@ $site_tagline_value = "Just another personal weblog";
 
 // Setting Site_Description
 $site_description = "site_description";
-$site_description_value = "Scriptlog power you blog";
+$site_description_value = "Scriptlog power your blog";
 
 // Setting Site_Keywords
 $site_keywords = "site_keywords";
