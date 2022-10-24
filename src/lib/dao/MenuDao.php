@@ -14,6 +14,7 @@ class MenuDao extends Dao
 {
  
   private $selected;
+
 /**
  * 
  */
@@ -31,7 +32,7 @@ class MenuDao extends Dao
  */
  public function findMenus($orderBy = 'ID')
  {
-    $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_position
+    $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_visibility
             FROM tbl_menu ORDER BY :orderBy";
 
     $this->setSQL($sql);
@@ -54,7 +55,7 @@ class MenuDao extends Dao
  public function findMenu($menuId, $sanitizing)
  {
      
-     $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_position
+     $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_visibility
              FROM tbl_menu WHERE ID = ?";
      
      $idsanitized = $this->filteringId($sanitizing, $menuId, 'sql');
@@ -94,7 +95,7 @@ class MenuDao extends Dao
        'parent_id' => $bind['parent_id'],
        'menu_label' => $bind['menu_label'],
        'menu_link' => $bind['menu_link'],
-       'menu_position' => $bind['menu_position']
+       'menu_visibility' => $bind['menu_visibility']
    ]);
    
    $menu_id = $this->lastId();
@@ -119,17 +120,17 @@ class MenuDao extends Dao
   * @param integer $id
   * @param array $bind
   */
- public function updateMenu($sanitize, $bind, $ID)
+ public function updateMenu($sanitize, $bind, $id)
  {
   
-  $cleanId = $this->filteringId($sanitize, $ID, 'sql');
+  $cleanid = $this->filteringId($sanitize, $id, 'sql');
   $this->modify("tbl_menu", [
       'parent_id' => $bind['parent_id'],
       'menu_label' => $bind['menu_label'],
       'menu_link' => $bind['menu_link'],
       'menu_status' => $bind['menu_status'], 
-      'menu_position' => $bind['menu_position']
-  ], "ID = {$cleanId}");
+      'menu_visibility' => $bind['menu_visibility']
+  ], "id = {$cleanid}");
   
  }
  
@@ -268,12 +269,12 @@ class MenuDao extends Dao
  * @return string
  * 
  */
-public function dropDownMenuPosition($selected = '')
+public function dropDownMenuVisibility($selected = '')
 {
 
-$name = 'menu_position';
+$name = 'menu_visibility';
 
-$menu_position = array('header'=>'Header', 'footer'=> 'Footer');
+$menu_visibility = array('public'=>'Public', 'private' => 'Private');
 
 if ($selected !== '') {
 
@@ -281,7 +282,7 @@ if ($selected !== '') {
 
 }
 
-return dropdown($name, $menu_position, $this->selected);
+return dropdown($name, $menu_visibility, $this->selected);
 
 }
 
