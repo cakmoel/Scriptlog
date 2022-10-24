@@ -35,5 +35,5 @@ function add_http($url)
  */
 function add_scheme($url, $scheme = 'http://')
 {
-    return parse_url($url, PHP_URL_SCHEME) === null ? $scheme . $url : $url;
+  return parse_url($url, PHP_URL_SCHEME) === null ? $scheme . $url : $url;
 }
