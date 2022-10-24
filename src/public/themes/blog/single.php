@@ -73,7 +73,7 @@ $total_comment = (total_comment($post_id) > 0) ? total_comment($post_id) : 0;
             </div>
 
 <?php 
-if ( $comment_status !== 'closed') :
+if ($comment_status !== 'closed') :
 ?>
 
             <div class="post-comments">
