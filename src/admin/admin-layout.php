@@ -215,6 +215,7 @@ $(function() {
     });
 </script>
 
+</body>
 </html>
 <?php 
 }
