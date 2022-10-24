@@ -15,7 +15,7 @@ require __DIR__ . '/common.php';
 
 $config = null;
 
-if ( file_exists(APP_ROOT.'config.php') ) {
+if (file_exists(APP_ROOT.'config.php')) {
     
   $config = include __DIR__ . '/../config.php';
     
@@ -31,9 +31,14 @@ if ( file_exists(APP_ROOT.'config.php') ) {
 }
 
 #================================== call functions in directory lib/utility ===========================================
-$function_directory = new RecursiveDirectoryIterator(__DIR__ . DS .'utility'. DS, FilesystemIterator::FOLLOW_SYMLINKS);
-$filter_iterator = new RecursiveCallbackFilterIterator($function_directory, function ($current, $key, $iterator){
+$directory = new RecursiveDirectoryIterator(__DIR__ . DS .'utility'. DS, FilesystemIterator::FOLLOW_SYMLINKS);
+$filter = new RecursiveCallbackFilterIterator($directory, function ($current, $key, $iterator) {
     
+    // Allow recursion
+    if ($iterator->hasChildren()) {
+        return true;
+    }
+
     // skip hidden files and directories
     if ($current->getFilename()[0] === '.') {
         return false;
@@ -53,9 +58,9 @@ $filter_iterator = new RecursiveCallbackFilterIterator($function_directory, func
     
 });
     
-$files_dir_iterator = new RecursiveIteratorIterator($filter_iterator); 
+$iterator = new RecursiveIteratorIterator($filter); 
 
-foreach ($files_dir_iterator as $file) {
+foreach ($iterator as $file) {
     
     include $file->getPathname();
     
