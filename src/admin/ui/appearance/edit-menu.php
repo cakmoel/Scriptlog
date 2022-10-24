@@ -71,6 +71,7 @@ $menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
 <div class="radio">
 <label for="optionRadios1">
 <input type="radio" name="menu_status" id="optionsRadios1" value="Y" 
+<?=(isset($menuData['menu_status']) && $menuData['menu_status'] === 'Y') ? 'checked="checked"' : ""; ?>
 <?=(isset($formData['menu_status']) && $formData['menu_status'] === 'Y') ? 'checked="checked"' : "" ?> >
    Yes
  </label>
@@ -79,7 +80,8 @@ $menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
 <div class="radio">
 <label for="optionRadios2">
 <input type="radio" name="menu_status" id="optionsRadios2" value="N" 
-<?=(isset($formData['menu_status']) && $formData['menu_status'] == 'N') ? 'checked="checked"' : ""; ?> >
+<?=(isset($menuData['menu_status']) && $menuData['menu_status'] === 'N') ? 'checked="checked"' : ""; ?>
+<?=(isset($formData['menu_status']) && $formData['menu_status'] === 'N') ? 'checked="checked"' : ""; ?> >
    No
  </label>
 </div>
