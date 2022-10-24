@@ -40,7 +40,7 @@ $action = isset($_GET['action']) ? safe_html($_GET['action']) : "";
 $loginId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $uniqueKey = isset($_GET['uniqueKey']) ? safe_html($_GET['uniqueKey']) : null;
 
-if ( ( $action == 'LogIn' ) && ( block_request_type(current_request_method(), ['POST']) === false ) ) {
+if (($action == 'LogIn') && (block_request_type(current_request_method(), ['POST']) === false)) {
 
   list($errors, $failed_login) = processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, $_POST);
    
