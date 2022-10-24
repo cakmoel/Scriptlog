@@ -6,12 +6,11 @@
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
         <small><a href="index.php?load=topics&action=newTopic&Id=0"
-					class="btn btn-primary"> <i
-					class="fa fa-plus-circle"></i> Add New
+					class="btn btn-primary"> <i class="fa fa-plus-circle" aria-hidden="true"></i> Add New
 				</a></small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
         <li><a href="index.php?load=topics">All Topics</a></li>
         <li class="active">Data Topics</li>
       </ol>
@@ -69,7 +68,7 @@
                 <tr>
                   <th>#</th>
                   <th>Name</th>
-                  <th>Slug</th>
+                  <th>Link</th>
                   <th>Status</th>
                   <th>Edit</th>
                   <th>Delete</th>
@@ -90,11 +89,11 @@
 
                       <td>
                        <a href="<?=generate_request("index.php", 'get', ['topics', 'editTopic', $topic['ID']])['link']; ?>" class="btn btn-warning" title="Edit topic">
-                       <i class="fa fa-pencil fa-fw"></i> </a>
+                       <i class="fa fa-pencil fa-fw" aria-hidden="true"></i> </a>
                        </td>
                        <td>
                        <a href="javascript:deleteTopic('<?= abs((int)$topic['ID']); ?>', '<?= safe_html($topic['topic_title']); ?>')" class="btn btn-danger" title="Delete topic">
-                       <i class="fa fa-trash-o fa-fw"></i> </a>
+                       <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> </a>
                        </td>
 
                      </tr>
@@ -108,7 +107,7 @@
                 <tr>
                   <th>#</th>
                   <th>Name</th>
-                  <th>Slug</th>
+                  <th>Link</th>
                   <th>Status</th>
                   <th>Edit</th>
                   <th>Delete</th>
