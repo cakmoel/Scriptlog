@@ -142,7 +142,7 @@ function processing_comment(array $values)
    $errors = array();
    $form_data = array();
 
-   $postId = ( isset($values['post_id']) && $values['post_id'] == $_POST['post_id'] ? abs((int)$_POST['post_id']) : 0);
+   $postId = (isset($values['post_id']) && $values['post_id'] == $_POST['post_id'] ? abs((int)$_POST['post_id']) : 0);
    $author_name = (isset($values['name']) && $values['name'] == $_POST['name'] ? prevent_injection($values['name']) : null);
    $author_email = (isset($values['email']) && $values['email'] == $_POST['email'] ? prevent_injection($values['email']) : null);
    $comment_content = (isset($values['comment']) && $values['comment'] == $_POST['comment'] ? prevent_injection($values['comment']) : null);
