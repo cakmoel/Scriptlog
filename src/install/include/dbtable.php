@@ -132,11 +132,11 @@ FOREIGN KEY (comment_post_id) REFERENCES tbl_posts(ID)
             
 $tblMenu = "CREATE TABLE IF NOT EXISTS tbl_menu (
 ID INT(5) unsigned NOT NULL auto_increment,
-parent_id INT(5) unsigned NOT NULL DEFAULT '0',
+parent_id INT(5) UNSIGNED NOT NULL DEFAULT '0',
 menu_label VARCHAR(200) NOT NULL,
 menu_link VARCHAR(255) DEFAULT NULL,
 menu_status enum('Y','N') NOT NULL DEFAULT 'N',
-menu_position varchar(20) DEFAULT NULL,
+menu_visibility VARCHAR(20) NOT NULL DEFAULT 'public',
 PRIMARY KEY(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
                 
