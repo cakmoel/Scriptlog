@@ -14,7 +14,7 @@ function permalinks($id)
 $config_file = read_config(invoke_config());
 $app_url = $config_file['app']['url'];
 
-if ( is_permalink_enabled() === 'yes' ) {
+if (is_permalink_enabled() === 'yes' ) {
 
    return listen_request_path($id, $app_url);
 
@@ -68,11 +68,11 @@ function listen_query_string($id = null, $app_url = null)
 
       case 'p':
          # Deliver request to single entry post         
-         if ( ( ! empty(HandleRequest::isQueryStringRequested()['value'] ) ) && ( $id === HandleRequest::isQueryStringRequested()['value']) ) {
+         if ((! empty(HandleRequest::isQueryStringRequested()['value'])) && ($id === HandleRequest::isQueryStringRequested()['value'])) {
     
             $entry_post = FrontHelper::grabSimpleFrontPost($id);
 
-            $post_id = $app_url . DS . '?p=' . (isset($entry_post['ID']) ) ? escape_html((int)$entry_post['ID']) : "";
+            $post_id = $app_url . DS . '?p=' . (isset($entry_post['ID'])) ? escape_html((int)$entry_post['ID']) : "";
 
          } 
          
@@ -80,11 +80,11 @@ function listen_query_string($id = null, $app_url = null)
    
       case 'pg':
          // Deliver request to single entry page
-         if ( ( ! empty(HandleRequest::isQueryStringRequested()['value'] ) ) && ( $id === HandleRequest::isQueryStringRequested()['value'] ) ) {
+         if ((! empty(HandleRequest::isQueryStringRequested()['value'])) && ($id === HandleRequest::isQueryStringRequested()['value'])) {
 
             $entry_page = FrontHelper::grabSimpleFrontPage($id);
 
-            $page_id = $app_url . DS . '?pg='. (isset($entry_page['ID']) ) ? escape_html((int)$entry_page['ID']) : 0;
+            $page_id = $app_url . DS . '?pg='. (isset($entry_page['ID'])) ? escape_html((int)$entry_page['ID']) : 0;
              
          } 
 
@@ -92,11 +92,11 @@ function listen_query_string($id = null, $app_url = null)
    
       case 'cat':
    
-         if ( ( ! empty(HandleRequest::isQueryStringRequested()['value'] ) ) && ( $id === HandleRequest::isQueryStringRequested()['value'] ) ) {
+         if ((! empty(HandleRequest::isQueryStringRequested()['value'])) && ($id === HandleRequest::isQueryStringRequested()['value'])) {
 
             $entry_cat = FrontHelper::grabSimpleFrontTopic($id);
 
-            $cat_id = $app_url . DS . '?cat='. ( isset($entry_cat['ID'])) ? escape_html($entry_cat['ID']) : "";
+            $cat_id = $app_url . DS . '?cat='. (isset($entry_cat['ID'])) ? escape_html($entry_cat['ID']) : "";
 
          } 
          
@@ -104,11 +104,11 @@ function listen_query_string($id = null, $app_url = null)
 
       case 'tag':
 
-         if ( ( ! empty(HandleRequest::isQueryStringRequested()['value'] ) )  && ( $id === HandleRequest::isQueryStringRequested()['value'] ) ) {
+         if ((! empty(HandleRequest::isQueryStringRequested()['value'])) && ($id === HandleRequest::isQueryStringRequested()['value'])) {
 
             $entry_tag = FrontHelper::grabSimpleFrontTag($id);
 
-            $tag_id = $app_url . DS . '?tag=' . ( isset($entry_tag['post_tags'])) ? escape_html($entry_tag['post_tags']) : "";
+            $tag_id = $app_url . DS . '?tag=' . (isset($entry_tag['post_tags'])) ? escape_html($entry_tag['post_tags']) : "";
             
          }
          
@@ -116,7 +116,7 @@ function listen_query_string($id = null, $app_url = null)
          
       case 'a':
 
-         if ( ( ! empty(HandleRequest::isQueryStringRequested()['value'] ) ) && ( $id === HandleRequest::isQueryStringRequested()['value'] ) ) {
+         if ((! empty(HandleRequest::isQueryStringRequested()['value'])) && ($id === HandleRequest::isQueryStringRequested()['value'])) {
 
             $entry_archives = FrontHelper::grabSimpleFrontArchive();
 
@@ -162,7 +162,7 @@ function listen_request_path($id, $app_url)
 
 $request_path = new RequestPath();
 
-if ( true === HandleRequest::checkMatchUriRequested() ) {
+if (true === HandleRequest::checkMatchUriRequested()) {
 
    $link = [];
 
@@ -182,7 +182,7 @@ if ( true === HandleRequest::checkMatchUriRequested() ) {
 
       case 'page':
 
-         if ( ! empty( $request_path->param2) ) {
+         if (! empty( $request_path->param2) ) {
 
             $page_slug = FrontHelper::grabPreparedfrontPageBySlug($id);
 
@@ -199,11 +199,11 @@ if ( true === HandleRequest::checkMatchUriRequested() ) {
 
       case 'post':
 
-         if ( ( ! empty( $request_path->param2) ) && ( $id === $request_path->param2 ) ) {
+         if ((! empty( $request_path->param2)) && ($id === $request_path->param2)) {
 
             $post_slug = FrontHelper::grabSimpleFrontPost($id);
             
-            $link = $app_url . DS . 'post' . DS . $id . DS . (isset($post_slug['post_slug']) ) ? $post_slug['post_slug'] : "";
+            $link = $app_url . DS . 'post' . DS . $id . DS . (isset($post_slug['post_slug'])) ? $post_slug['post_slug'] : "";
 
          } else {
 
@@ -213,6 +213,10 @@ if ( true === HandleRequest::checkMatchUriRequested() ) {
 
          return $link;
 
+         break;
+      
+      case 'tag':
+         
          break;
       
       default:
