@@ -2,7 +2,7 @@
 /**
  * comments-posts.php
  * 
- * @category commetns-post.php file -- processing comment form submission
+ * @category comments-post.php file -- processing comment form submission
  * @author M.Noermoehammad
  * @license https://opensource.org/licenses/MIT MIT License
  * @version 1.0
