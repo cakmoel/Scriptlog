@@ -13,6 +13,6 @@ ini_set("session.use_only_cookies", 1);
 ini_set('session.save_handler', 'files');
 ini_set('session.gc_divisor', 100);
 ini_set('session.gc_maxlifetime', 1440);
-ini_set('session.gc_probability',1);
+ini_set('session.gc_probability', 1);
 
 #header("Permissions-Policy: interest-cohort=()"); // Opt out of FLoC
