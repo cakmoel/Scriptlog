@@ -4,9 +4,7 @@ require dirname(__FILE__) . '/functions.php';
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<?= 
-theme_meta()['site_meta_tags']; 
-?>
+<?= theme_meta()['site_meta_tags']; ?>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/fontastic.css">
@@ -19,14 +17,11 @@ theme_meta()['site_meta_tags'];
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css">
 <link rel="shortcut icon" href="<?= theme_dir(); ?>assets/img/favicon.ico">
-<?= 
-theme_meta()['site_schema']; 
-?>
+<?= theme_meta()['site_schema']; ?>
 <!-- Tweaks for older IEs--><!--[if lt IE 9]>
 <script src="<?= theme_dir(); ?>assets/js/html5shiv.min.js"></script>
 <script src="<?= theme_dir(); ?>assets/js/respond.min.js"></script><![endif]-->
 </head>
-  
 <body>
 <header class="header">
   <!-- Main Navbar-->
