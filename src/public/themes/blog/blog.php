@@ -16,7 +16,7 @@ $entries = (function_exists('rewrite_status') && rewrite_status() === 'yes') ?: 
 
                   $post_id = isset($entry['ID']) ? (int)$entry['ID'] : "";
                   $post_title = isset($entry['post_title']) ? htmlout($entry['post_title']) : "";
-                  $post_img = (isset($entry['media_filename']) && $entry['media_filename'] !== "") ? htmlout($entry['media_filename']) : "";
+                  $post_img = isset($entry['media_filename']) ? htmlout($entry['media_filename']) : "";
                   
               ?>
 
