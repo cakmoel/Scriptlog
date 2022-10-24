@@ -170,14 +170,7 @@ function check_web_server()
  */
 function check_main_dir()
 {
-
-  if (is_file(APP_PATH . '../lib/main.php')) {
-
-    return true;
-  } else {
-
-    return false;
-  }
+  return (is_file(APP_PATH . '../lib/main.php')) ? true : false; 
 }
 
 /**
@@ -190,14 +183,7 @@ function check_main_dir()
  */
 function check_loader()
 {
-
-  if (file_exists(APP_PATH . '../lib/Autoloader.php')) {
-
-    return true;
-  } else {
-
-    return false;
-  }
+  return (file_exists(APP_PATH . '../lib/Autoloader.php')) ? true : false;
 }
 
 /**
@@ -311,13 +297,7 @@ function check_pcre_utf8()
  */
 function check_spl_enabled($value)
 {
-  if (function_exists($value)) {
-
-    return true;
-  } else {
-
-    return false;
-  }
+  return (function_exists($value)) ? true : false;
 }
 
 /**
@@ -326,13 +306,7 @@ function check_spl_enabled($value)
  */
 function check_filter_enabled()
 {
-  if (function_exists('filter_list')) {
-
-    return true;
-  } else {
-
-    return false;
-  }
+  return (function_exists('filter_list')) ? true : false;
 }
 
 /**
@@ -343,13 +317,7 @@ function check_filter_enabled()
  */
 function check_iconv_enabled()
 {
-  if (extension_loaded('iconv')) {
-
-    return true;
-  } else {
-
-    return false;
-  }
+  return (extension_loaded('iconv')) ? true : false;
 }
 
 /**
@@ -360,14 +328,7 @@ function check_iconv_enabled()
  */
 function check_mbstring_enabled()
 {
-
-  if (extension_loaded('mbstring')) {
-
-    return true;
-  } else {
-
-    return false;
-  }
+  return (extension_loaded('mbstring')) ? true : false;
 }
 
 /**
@@ -378,13 +339,7 @@ function check_mbstring_enabled()
 function check_fileinfo_enabled()
 {
 
-  if (extension_loaded('fileinfo')) {
-
-    return true;
-  } else {
-
-    return false;
-  }
+  return (extension_loaded('fileinfo')) ? true : false;
 }
 
 /**
@@ -395,13 +350,7 @@ function check_fileinfo_enabled()
  */
 function check_character_type()
 {
-  if (!function_exists('ctype_digit')) {
-
-    return true;
-  } else {
-
-    return false;
-  }
+  return (!function_exists('ctype_digit')) ? true : false;
 }
 
 /**
