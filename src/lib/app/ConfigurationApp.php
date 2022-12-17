@@ -158,7 +158,7 @@ class ConfigurationApp
 
     } else {
 
-       if ( ( isset($_SESSION['status']) ) && ( $_SESSION['status'] == 'generalConfigUpdated') ) {
+       if ((isset($_SESSION['status'])) && ($_SESSION['status'] == 'generalConfigUpdated')) {
          $checkStatus = true;
          array_push($status, "General setting has been updated");
          unset($_SESSION['status']);
