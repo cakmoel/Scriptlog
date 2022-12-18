@@ -98,7 +98,7 @@ class Dao
     throw new DbException("No SQL Query!");
   }
   
-  return ( ! is_null($fetchMode) ) ? $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetch();
+  return (! is_null($fetchMode) ) ? $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetch();
 
  }
  
