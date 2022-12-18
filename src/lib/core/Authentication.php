@@ -283,9 +283,9 @@ class Authentication
  public function login(array $values)
  {
     
-    $login = ( isset($values['login']) ? $values['login'] : null ) ;
-    $password = ( isset($values['user_pass']) ? $values['user_pass'] : null );
-    $remember_me = ( isset($values['remember']) ? $values['remember'] : null ) ;
+    $login = (isset($values['login']) ? $values['login'] : null) ;
+    $password = (isset($values['user_pass']) ? $values['user_pass'] : null);
+    $remember_me = (isset($values['remember']) ? $values['remember'] : null) ;
 
     if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
         
@@ -419,7 +419,7 @@ public function resetUserPassword($user_email)
   
   $reset_key = ircmaxell_random_generator(32);
   
-  if(filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
+  if (filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
 
     $bind = ['user_reset_key' => $reset_key, 'user_reset_complete' => 'No'];
     
@@ -476,7 +476,7 @@ public function removeCookies()
     unset($_COOKIE['scriptlog_validator']);
     unset($_COOKIE['scriptlog_selector']);
 
-    set_cookies_scl('scriptlog_auth', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
+    set_cookies_scl('scriptlog_auth', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
     set_cookies_scl('scriptlog_validator', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);  
     set_cookies_scl('scriptlog_selector', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
     
@@ -501,7 +501,7 @@ public function clearAuthCookies($user_login)
     unset($_COOKIE['scriptlog_validator']);
     unset($_COOKIE['scriptlog_selector']);
 
-    set_cookies_scl('scriptlog_auth', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH,  domain_name(), is_cookies_secured(), true);
+    set_cookies_scl('scriptlog_auth', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
     set_cookies_scl('scriptlog_validator', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);  
     set_cookies_scl('scriptlog_selector', " ", time() - self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
    
