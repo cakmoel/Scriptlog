@@ -17,7 +17,7 @@
  * @since    Since Release 0.1
  * 
  */
-final class Dispatcher
+class Dispatcher
 {
   /**
    * route
@@ -42,7 +42,7 @@ final class Dispatcher
   public function __construct()
   {
     
-    if ( Registry::isKeySet('route') ) {
+    if (Registry::isKeySet('route')) {
 
       $this->route = Registry::get('route');
 
@@ -60,7 +60,7 @@ final class Dispatcher
 
     $this->theme_dir = APP_ROOT.APP_THEME.escape_html($this->invokeTheme()['theme_directory']).DS;
 
-    if ( rewrite_status() === 'yes' ) {
+    if (rewrite_status() === 'yes') {
 
       if (false === HandleRequest::allowedPathRequested($this->whiteListPathRequested(), $this->route)) {
 
@@ -70,7 +70,7 @@ final class Dispatcher
   
         foreach ($this->route as $action => $routes) {
   
-          if (preg_match( '~^'.$routes.'$~i', $this->requestURI(), $matches)) {
+          if (preg_match('~^'.$routes.'$~i', $this->requestURI(), $matches)) {
            
             http_response_code(200);
             call_theme_header(); 
@@ -105,8 +105,8 @@ final class Dispatcher
   private function requestURI()
   {
     $script_name = rtrim(dirname($_SERVER["SCRIPT_NAME"]), '/' );
-    $request_uri = '/' . trim(str_replace( $script_name, '', $_SERVER['REQUEST_URI'] ), '/' );
-    return urldecode( $request_uri );
+    $request_uri = '/' . trim(str_replace($script_name, '', $_SERVER['REQUEST_URI']), '/');
+    return urldecode($request_uri);
   }
 
 /**
