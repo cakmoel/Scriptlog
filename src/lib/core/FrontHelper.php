@@ -58,7 +58,8 @@ class FrontHelper
 
     $idsanitized = static::frontSanitizer($id, 'sql');
 
-    $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status FROM tbl_topics, tbl_post_topic WHERE tbl_topics.ID = tbl_post_topic.topic_id 
+    $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status 
+    FROM tbl_topics, tbl_post_topic WHERE tbl_topics.ID = tbl_post_topic.topic_id 
             AND tbl_topics.topic_status = 'Y' AND tbl_post_topic.post_id = '$idsanitized' ";
 
     $query = db_simple_query($sql);
@@ -77,15 +78,8 @@ class FrontHelper
    */
   public static function grabSimpleFrontTag($param)
   {
-    $param_sanitized = static::frontSanitizer($param, 'xss');
-
-    $sql = "SELECT tbl_posts.post_tags FROM tbl_posts WHERE tbl_posts.post_tags = '$param_sanitized'";
-
-    $query = db_simple_query($sql);
-
-    $result = $query->fetch_assoc();
-
-    return (empty($result)) ?: $result;
+    $sql = "SELECT post_tags FROM tbl_posts WHERE post_tags LIKE '%$param%' ";
+    
   }
 
   /**
@@ -94,19 +88,18 @@ class FrontHelper
    */
   public static function grabSimpleFrontArchive()
   {
-    
-    $sql = "SELECT MONTH(p.post_date) AS month, YEAR(p.post_date) AS year, COUNT(p.ID) AS total
-        FROM tbl_posts p GROUP BY month, year 
-        ORDER BY month DESC";
+
+    $sql = "SELECT MONTH(DATE(tbl_posts.post_date)) AS month_archive, YEAR(DATE(tbl_posts.post_date)) AS year_archive, COUNT(tbl_posts.ID) AS total
+        FROM tbl_posts GROUP BY month_archive, year_archive 
+        ORDER BY month_archive DESC";
 
     $query = db_simple_query($sql);
 
     $result = $query->fetch_assoc();
 
-    return ( empty($result) ) ?: $result;
-   
+    return (empty($result)) ?: $result;
   }
-  
+
   /**
    * grabSimpleFrontPage
    *
@@ -156,16 +149,10 @@ AND m.media_access = 'public' AND m.media_status = '1'";
         INNER JOIN tbl_media AS m ON p.media_id = m.ID
         INNER JOIN tbl_users AS u ON p.post_author = u.ID
         WHERE p.ID = ? AND p.post_status = 'publish'
-AND p.post_type = 'blog' AND m.media_target = 'blog'
-AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
+        AND p.post_type = 'blog' AND m.media_target = 'blog' 
+        AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
-    $idsanitized = self::frontSanitizer($id, 'sql');
-
-    $statement = db_prepared_query($sql, [$idsanitized], 'i');
-
-    $result = get_result($statement);
-
-    return (empty($result)) ?: $result;
+    return db_prepared_query($sql, [$id], 'i')->get_result()->fetch_assoc();
   }
 
   /**
@@ -191,13 +178,7 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
   AND p.post_status = 'publish' AND p.post_type = 'page' 
   AND m.media_access = 'public' AND m.media_status = '1'";
 
-    $slug_sanitized = self::frontSanitizer($slug, 'xss');
-
-    $statement = db_prepared_query($sql, [$slug_sanitized], 's');
-
-    $result = get_result($statement);
-
-    return (empty($result)) ?: $result;
+    return db_prepared_query($sql, [$slug], 's')->get_result()->fetch_assoc();
   }
 
   /**
@@ -210,15 +191,41 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
   public static function grabPreparedFrontTopicBySlug($slug)
   {
 
-    $sql = "SELECT ID, topic_title FROM tbl_topics WHERE topic_slug = ? AND topic_status = 'Y'";
+    $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE topic_slug = ? AND topic_status = 'Y'";
 
-    $slug_sanitized = self::frontSanitizer($slug, 'xss');
+    return db_prepared_query($sql, [$slug], 's')->get_result()->fetch_assoc();
+  }
 
-    $statement = db_prepared_query($sql, [$slug_sanitized], 's');
+  /**
+   * grabPreparedFrontArchive
+   *
+   * @param array $values
+   * @return mixed
+   * 
+   */
+  public static function grabPreparedFrontArchive($values)
+  {
 
-    $result = get_result($statement);
+    $month = isset($values['month'])  ? Sanitize::mildSanitizer($values['month']) : null;
+    $year = isset($values['year'])  ? Sanitize::mildSanitizer($values['year']) : null;
 
-    return (empty($result)) ?: $result;
+    // set from and to dates
+    $from = date('Y-m-01 00:00:00', strtotime("$year-$month"));
+    $to = date('Y-m-31 23:59:59', strtotime("$year-$month"));
+
+    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug, 
+    p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_type, p.post_status, 
+    p.post_sticky, u.user_login, u.user_fullname,
+    m.media_filename, m.media_caption
+  FROM tbl_posts AS p
+  INNER JOIN tbl_users AS u ON p.post_author = u.ID
+  INNER JOIN tbl_media AS m ON p.media_id = m.ID
+  WHERE DATE(p.post_date) BETWEEN ? AND ? 
+  AND p.post_type = 'blog' AND p.post_status = 'publish'
+  ORDER BY DATE(p.post_date) DESC ";
+
+  return db_prepared_query($sql, [$from, $to], 'ss')->get_result()->fetch_assoc();
+
   }
 
   /**
@@ -232,10 +239,7 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
   public static function grabPreparedFrontGalleries($start, $limit)
   {
 
-    $front = [];
-
-    $sql = "SELECT ID, media_filename, media_caption FROM tbl_media WHERE media_target = 'gallery'
-       ORDER BY ID LIMIT ?, ?";
+    $sql = "SELECT ID, media_filename, media_caption FROM tbl_media WHERE media_target = 'gallery' ORDER BY ID LIMIT ?, ?";
 
     $statement = db_prepared_query($sql, [$start, $limit], 'ii');
 
@@ -251,7 +255,6 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
       }
 
       return ['media_filename' => $media_filename, 'media_caption' => $media_caption, 'media_id' => $media_id];
-
     }
   }
 
