@@ -2,9 +2,9 @@
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $pluginId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
-$pluginDao = new PluginDao();
-$pluginEvent = new PluginEvent($pluginDao, $validator, $sanitizer);
-$pluginApp = new PluginApp($pluginEvent);
+$pluginDao = class_exists('PluginDao') ? new PluginDao() : "";
+$pluginEvent = class_exists('PluginEvent') ? new PluginEvent($pluginDao, $validator, $sanitizer) : "";
+$pluginApp = class_exists('PluginApp') ? new PluginApp($pluginEvent) : "";
 
 try {
     
@@ -132,8 +132,10 @@ try {
 
 } catch (Throwable $th) {
     
-    LogError::setStatusCode(http_response_code());
-    LogError::exceptionHandler($th);
+    if (class_exists('LogError')) {
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+    }
 
 } catch (AppException $e) {
 
