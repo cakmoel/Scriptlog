@@ -2,9 +2,9 @@
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $pageId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
-$pageDao = new PageDao();
-$pageEvent = new PageEvent($pageDao, $validator, $sanitizer);
-$pageApp = new PageApp($pageEvent);
+$pageDao = class_exists('PageDao') ? new PageDao() : "";
+$pageEvent = class_exists('PageEvent') ? new PageEvent($pageDao, $validator, $sanitizer) : "";
+$pageApp = class_exists('PageApp') ? new PageApp($pageEvent) : "";
 
 try {
 
@@ -118,8 +118,10 @@ try {
 
 } catch (Throwable $th) {
     
-    LogError::setStatusCode(http_response_code());
-    LogError::exceptionHandler($th);
+    if (class_exists('LogError')) {
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+    }
 
 } catch (AppException $e) {
 
