@@ -1,8 +1,6 @@
 <?php
-
 function login_header($stylePath)
 {
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
