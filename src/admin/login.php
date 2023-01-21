@@ -138,11 +138,7 @@ login_header($stylePath);
 </div>
 </div>
 </form>
-  <a href="reset-password.php" class="text-center">Lost your password?</a>    
+  <a href="reset-password.php" class="text-center" rel="noopener" aria-label="Reset your password">Lost your password?</a>    
 </div>
   
-<?php 
-
-login_footer($stylePath); 
-
-?>
+<?php login_footer($stylePath); ?>
