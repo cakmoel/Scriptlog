@@ -16,7 +16,7 @@
  * @see https://stackoverflow.com/a/17266448/6667699
  * 
  */
-$timeout = Authentication::COOKIE_EXPIRE;
+$timeout = class_exists('Authentication') ? Authentication::COOKIE_EXPIRE : 2592000;
 $current_date = date("Y-m-d H:i:s", time()); 
 $fingerprint  = hash_hmac('sha256', $_SERVER['HTTP_USER_AGENT'], hash('sha256', $ip, true));
 $loggedIn = false;
