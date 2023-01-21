@@ -2,9 +2,9 @@
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";  
 $commentId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
-$commentDao = new CommentDao();
-$commentEvent = new CommentEvent($commentDao, $validator, $sanitizer);
-$commentApp = new CommentApp($commentEvent);
+$commentDao = class_exists('CommentDao') ? new CommentDao() : "";
+$commentEvent = class_exists('CommentEvent') ? new CommentEvent($commentDao, $validator, $sanitizer) : "";
+$commentApp = class_exists('CommentApp') ?new CommentApp($commentEvent) : "";
     
 try {
 
