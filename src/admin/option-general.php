@@ -2,9 +2,9 @@
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $params = isset($_GET['Id']) ? intval($_GET['Id']) : null ;
-$configDao = new ConfigurationDao();
-$configEvent = new ConfigurationEvent($configDao, $validator, $sanitizer);
-$configApp = new ConfigurationApp($configEvent);
+$configDao = class_exists('ConfigurationDao') ? new ConfigurationDao() : "";
+$configEvent = class_exists('ConfigurationEvent') ? new ConfigurationEvent($configDao, $validator, $sanitizer) : "";
+$configApp = class_exists('ConfigurationApp') ? new ConfigurationApp($configEvent) : "";
 
 try {
     
@@ -12,13 +12,13 @@ try {
 
         case ActionConst::GENERAL_CONFIG:
         
-            if(false === $authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
+            if (false === $authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
     
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
             } else {
     
-                if((!check_integer($params)) && (gettype($params) !== "integer")) {
+                if ((!check_integer($params)) && (gettype($params) !== "integer")) {
     
                     header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                     header("Status: 400 Bad Request");
@@ -26,7 +26,7 @@ try {
     
                 }
     
-                if($params == 0) {
+                if ($params == 0) {
     
                     $configApp->updateGeneralSetting();
     
@@ -42,7 +42,7 @@ try {
     
         default:
     
-           if(false === $authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
+           if (false === $authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
     
              direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
@@ -58,8 +58,10 @@ try {
 
 } catch (Throwable $th) {
     
-    LogError::setStatusCode(http_response_code());
-    LogError::exceptionHandler($th);
+    if (class_exists('LogError')) {
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+    }
 
 } catch (AppException $e) {
 
