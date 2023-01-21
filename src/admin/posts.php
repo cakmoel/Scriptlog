@@ -2,9 +2,9 @@
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $postId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
-$postDao = new PostDao();
-$postEvent = new PostEvent($postDao, $validator, $sanitizer);
-$postApp = new PostApp($postEvent);
+$postDao = class_exists('PostDao') ? new PostDao() : "";
+$postEvent = class_exists('PostEvent') ? new PostEvent($postDao, $validator, $sanitizer) : "";
+$postApp = class_exists('PostApp') ? new PostApp($postEvent) : "";
 
 try {
 
@@ -18,7 +18,7 @@ try {
     
             } else {
     
-                if ( ( !check_integer($postId) ) && ( gettype($postId) !== "integer" ) ) {
+                if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
     
                     header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                     header("Status: 400 Bad Request");
@@ -42,7 +42,7 @@ try {
             
         case ActionConst::EDITPOST:
             
-            if ( ( !check_integer($postId) ) && ( gettype($postId) !== "integer" ) ) {
+            if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
     
                 header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                 header("Status: 400 Bad Request");
@@ -118,8 +118,10 @@ try {
 
 } catch (Throwable $th) {
 
-    LogError::setStatusCode(http_response_code());
-    LogError::exceptionHandler($th);
+    if (class_exists('LogError')) {
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+    }
     
 } catch (AppException $e) {
     
