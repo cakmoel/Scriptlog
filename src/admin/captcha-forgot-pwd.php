@@ -33,5 +33,3 @@ header("Pragma: no-cache");
     
 imagejpeg($layer);
 imagedestroy($layer);
-
- 
