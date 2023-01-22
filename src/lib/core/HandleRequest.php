@@ -49,7 +49,7 @@ public static function handleFrontHelper()
  * @return array
  * 
  */
-private static function findRequestToRules(array $rules)
+private static function findRequestToRules($rules)
 {
 
 $script_name = rtrim(dirname($_SERVER["SCRIPT_NAME"]), '/' );
@@ -82,8 +82,8 @@ if (is_array($rules)) {
  */
 private static function findRequestToPath()
 {
- $request_uri = isset($_SERVER['REQUEST_URI']) ? explode('/', trim(escape_html($_SERVER['REQUEST_URI']), '/')) : NULL;
- $script_name = isset($_SERVER['SCRIPT_NAME']) ? explode('/', trim(escape_html($_SERVER['SCRIPT_NAME']), '/')) : NULL;
+ $request_uri = isset($_SERVER['REQUEST_URI']) ? explode('/', trim(escape_html($_SERVER['REQUEST_URI']), '/')) : null;
+ $script_name = isset($_SERVER['SCRIPT_NAME']) ? explode('/', trim(escape_html($_SERVER['SCRIPT_NAME']), '/')) : null;
  $parts = array_diff_assoc($request_uri, $script_name);
      
  if (empty($parts)) {
@@ -94,7 +94,7 @@ private static function findRequestToPath()
      
  $path = implode('/', $parts);
     
- if (($position = strpos($path, '?')) !== FALSE) {
+ if (($position = strpos($path, '?')) !== false) {
     
     $path = substr($path, 0, $position);
     
@@ -137,7 +137,7 @@ private static function isRequestToPathValid($args)
  */
 public static function isMatchedUriRequested()
 {
-  $matched_uri = (isset($_SERVER['REQUEST_URI'])) ? trim($_SERVER['REQUEST_URI'], DIRECTORY_SEPARATOR) : "";
+  $matched_uri = isset($_SERVER['REQUEST_URI']) ? trim($_SERVER['REQUEST_URI'], DIRECTORY_SEPARATOR) : "";
   $slice_matched = explode(DIRECTORY_SEPARATOR, $matched_uri);
   return isset($slice_matched[0]) ? $slice_matched[0] : "";
 }
@@ -150,8 +150,8 @@ public static function isMatchedUriRequested()
  */
 public static function isQueryStringRequested()
 {
-  $query_string = (isset($_SERVER['QUERY_STRING'])) ? escape_html($_SERVER['QUERY_STRING']) : NULL;
-  $slice_query = explode('=', $query_string);
+  $string_requested = isset($_SERVER['QUERY_STRING']) ? escape_html($_SERVER['QUERY_STRING']) : null;
+  $slice_query = explode('=', $string_requested);
   $get_key = isset($slice_query[0]) ? $slice_query[0] : "";
   $get_value = isset($slice_query[1]) ? $slice_query[1] : "";
   return array('key' => $get_key, 'value'=>$get_value);
@@ -166,27 +166,22 @@ public static function isQueryStringRequested()
 public static function checkMatchUriRequested()
 {
   self::$requestPathURI = new RequestPath();
-  return ( self::isMatchedUriRequested() === self::$requestPathURI->matched) ? true : false;
+  return (self::isMatchedUriRequested() === self::$requestPathURI->matched) ? true : false;
 }
 
 /**
  * allowedPathRequested
  * 
- * Checking whether URI requested match the rules and allowed to be executed
- *
- * @param array $path
- * @param array $rules
- * @return bool
- * 
+ * Checking whether URI requested match the rules and allowed to be executed 
  */
-public static function allowedPathRequested(array $path, array $rules)
+public static function allowedPathRequested($path, $rules)
 {
 
  $rule_requested = self::findRequestToRules($rules);
 
- $is_valid_requested = ( is_array($rule_requested) && array_key_exists(0, $rule_requested) ) ? $rule_requested[0] : null;
+ $is_valid_requested = (is_array($rule_requested) && array_key_exists(0, $rule_requested)) ? $rule_requested[0] : null;
 
- return ( ! ( in_array( self::isRequestToPathValid(0), $path, true ) || ( in_array($is_valid_requested, $path, true ) ) ) ) ? false : true;
+ return (!(in_array(self::isRequestToPathValid(0), $path, true) || (in_array($is_valid_requested, $path, true)))) ? false : true;
 
 }
 
@@ -206,7 +201,7 @@ public static function deliverQueryString()
 
         $query_post = self::handleFrontHelper()->grabSimpleFrontPost(static::isQueryStringRequested()['value']);
 
-        if (empty($query_post['ID']) ) {
+        if (empty($query_post['ID'])) {
 
           http_response_code(404);
           call_theme_header();
@@ -262,11 +257,11 @@ public static function deliverQueryString()
 
     case 'pg':
       // Deliver request to a single page
-      if (! empty(static::isQueryStringRequested()['value']) ) {
+      if (! empty(static::isQueryStringRequested()['value'])) {
 
         $query_page = self::handleFrontHelper()->grabSimpleFrontPage(static::isQueryStringRequested()['value']);
 
-        if ( empty($query_page['ID']) ) {
+        if (empty($query_page['ID'])) {
 
           http_response_code(404);
           call_theme_header();
@@ -291,6 +286,7 @@ public static function deliverQueryString()
       break;
 
     case 'a':
+
       // Deliver request to an archives
       if (! empty(static::isQueryStringRequested()['value'])) {
 
@@ -310,27 +306,37 @@ public static function deliverQueryString()
     case 'tag':
       
         // Deliver request to a tag
-        if (! empty(static::isQueryStringRequested()['value'])) {
+      if (! empty(static::isQueryStringRequested()['value'])) {
 
-          $query_tag = self::handleFrontHelper()->grabSimpleFrontTag();
+          $query_tags = self::handleFrontHelper()->grabFrontTag(static::isQueryStringRequested()['value']);
 
-          if (empty($query_tag['ID']) ) {
+          if (is_iterable($query_tags)) {
 
-            http_response_code(404);
-            call_theme_header();
-            call_theme_content('404');
-            call_theme_footer();
+            foreach ($query_tags as $tag) {
 
-          } else {
+              $post_id = isset($tag['ID']) ? escape_html($tag['ID']) : 0;
+              
+            }
 
-            http_response_code(200);
-            call_theme_header();
-            call_theme_content('tag');
-            call_theme_footer();
+            if (empty($post_id)) {
 
-          }
-           
-        } else {
+              http_response_code(404);
+              call_theme_header();
+              call_theme_content('404');
+              call_theme_footer();
+    
+            } else {
+
+              http_response_code(200);
+              call_theme_header();
+              call_theme_content('tag');
+              call_theme_footer();
+
+            }
+            
+          } 
+
+      } else {
 
         direct_page('', 302);
 
@@ -349,7 +355,7 @@ public static function deliverQueryString()
 
     default:  # default request will be delivered
      
-      if (false === static::checkMatchUriRequested() ) {
+      if (false === static::checkMatchUriRequested()) {
 
         direct_page('', 500);
 
