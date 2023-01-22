@@ -64,28 +64,26 @@ class Dispatcher
 
       if (false === HandleRequest::allowedPathRequested($this->whiteListPathRequested(), $this->route)) {
 
+        // nothing is found so handle the error page 404
         $this->errorNotFound($this->theme_dir);
-  
+
       } else {
   
-        foreach ($this->route as $action => $routes) {
+        foreach ($this->route as $key => $value) {
   
-          if (preg_match('~^'.$routes.'$~i', $this->requestURI(), $matches)) {
+          if (preg_match('~^'.$value.'$~i', $this->requestURI(), $matches)) {
            
             http_response_code(200);
             call_theme_header(); 
-            call_theme_content($action);
+            call_theme_content($key);
             call_theme_footer();
     
-            exit();  // avoid the 404 message 
-     
-          }
-        
+            exit();
+             
+          } 
+
         }
-  
-        // nothing is found so handle the error page 404
-        $this->errorNotFound($this->theme_dir);
-  
+
       }
 
     } else {
@@ -117,7 +115,7 @@ class Dispatcher
    */
   private function whiteListPathRequested()
   {
-    return ['/', '//', 'post', 'page', 'blog', 'category', 'archive'];
+    return ['/', '//', 'post', 'page', 'blog', 'category', 'archive', 'tag'];
   }
 
   /* InvokeTheme
