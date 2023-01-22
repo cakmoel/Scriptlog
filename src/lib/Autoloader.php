@@ -105,9 +105,9 @@ final class Autoloader
 	 * Init
 	 */
 	private static function __init() {
-		if(!self::$_is_init) {
+		if (!self::$_is_init) {
 			// flush existing autoloads
-			spl_autoload_register(null, false);
+			(version_compare(PHP_VERSION, '8.0.0', '<=')) ? spl_autoload_register(null, false) : spl_autoload_register(null);
 			self::$_is_init = true;
 		}
 	}
@@ -119,7 +119,7 @@ final class Autoloader
 	 * @param bool $use_base_dir
 	 * @return string
 	 */
-	private static function _formatDir($dir = null, $use_base_dir = true) 
+	private static function _formatDir($dir, $use_base_dir = true) 
 	{
 		$dir = trim($dir);
 
@@ -153,7 +153,7 @@ final class Autoloader
 		} else {
 			self::__init();
 			$class_dir = self::_formatDir($class_dir);
-			if ((!in_array($class_dir, self::$_load_dirs) ) && ( spl_autoload_register(array(new self($class_dir), 'autoload') ) )) {
+			if ((!in_array($class_dir, self::$_load_dirs)) && (spl_autoload_register(array(new self($class_dir), 'autoload') ) )) {
 				self::$_load_dirs[] = $class_dir;
 			}
 		}
@@ -168,7 +168,7 @@ final class Autoloader
 	public function autoload($class_name) 
 	{
 		$class_file = $this->_class_dir . $class_name . self::$_file_ext;
-		if(!file_exists($class_file)) {
+		if (!file_exists($class_file)) {
 			return false;
 		}
 		include $class_file;
