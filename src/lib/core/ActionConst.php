@@ -20,6 +20,7 @@ class ActionConst
  const GENERAL_CONFIG = "generalConfig";
  const PERMALINK_CONFIG = "permalinkConfig";
  const READING_CONFIG = "readingConfig";
+ const TIMEZONE_CONFIG = "timezoneConfig";
 
  // action constant for post functionality 
  const NEWPOST     = "newPost";
