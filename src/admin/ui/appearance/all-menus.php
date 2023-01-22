@@ -6,7 +6,7 @@
     <h1>
       <?= (isset($pageTitle)) ? $pageTitle : ""; ?>
       <small>
-        <a href="index.php?load=menu&action=newMenu&Id=0" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Add New</a>
+        <a href="index.php?load=menu&action=newMenu&Id=0" class="btn btn-primary"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add New</a>
       </small>
     </h1>
     <ol class="breadcrumb">
@@ -95,7 +95,7 @@
 
                           while ($data_parent = nav_nested($parent)) {
 
-                            echo $data_parent['menu_label'];
+                            echo htmlout(strtolower($data_parent['menu_label']));
 
                           }
                         } else {
