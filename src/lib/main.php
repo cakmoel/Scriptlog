@@ -9,26 +9,27 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  * @version  1.0
  * @since    Since Release 1.0
+ * 
  */
 require __DIR__ . '/options.php';
 require __DIR__ . '/common.php';
 
-$config = null;
+(version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
 
-if (file_exists(APP_ROOT.'config.php')) {
+$config = array();
+
+if (! file_exists(APP_ROOT.'config.php')) {
     
-  $config = include __DIR__ . '/../config.php';
-    
-} else {
-     
     if (is_dir(APP_ROOT . 'install')) {
 
-        header("Location: ".APP_PROTOCOL."://".APP_HOSTNAME.dirname($_SERVER['PHP_SELF']).DS.'install');
+        header("Location: ".APP_PROTOCOL."://".APP_HOSTNAME.dirname(htmlspecialchars($_SERVER['PHP_SELF'])).DS.'install');
         exit();
          
     }
-    
-}
+
+} else {
+
+$config = include __DIR__ . '/../config.php';
 
 #================================== call functions in directory lib/utility ===========================================
 $directory = new RecursiveDirectoryIterator(__DIR__ . DS .'utility'. DS, FilesystemIterator::FOLLOW_SYMLINKS);
@@ -98,7 +99,7 @@ strict_transport_security();
 call_htmlpurifier();
 get_server_load();
 whoops_error();
-content_security_policy($config['app']['url']);
+content_security_policy(isset($config['app']['url']) ? $config['app']['url'] : "");
 
 #===================== RULES ==========================
 
@@ -117,6 +118,9 @@ content_security_policy($config['app']['url']);
     
      ### 'archive/12/2017
      'archive' => "/archive/[0-9]{2}/[0-9]{4}",
+
+     ### 'tag/tag-slug'
+     'tag' => "/tag/(?'tag'[\w\-]+)"
 
      ### '/blog?p=255'
     'blog' => "/blog([^/]*)",                       
@@ -148,7 +152,7 @@ $rules = array(
 #==================== END OF RULES =======================
 
 #====== an instantiation of Database connection ==========
-$dbc = DbFactory::connect(['mysql:host='.$config['db']['host'].';dbname='.$config['db']['name'], $config['db']['user'], $config['db']['pass']]);
+$dbc = (isset($config['db']['host']) || isset($config['db']['name']) || isset($config['db']['user']) || isset($config['db']['pass'])) ? DbFactory::connect(['mysql:host='.$config['db']['host'].';dbname='.$config['db']['name'], $config['db']['user'], $config['db']['pass']]) : "";
 
 #====== an instantiation of scriptlog cipher key =========
 $cipher_key = ScriptlogCryptonize::scriptlogCipherKey();
@@ -169,7 +173,7 @@ Registry::setAll(array('dbc' => $dbc,  'key' => $cipher_key, 'route' => $rules, 
  * @var $userDao, $validator, $authenticator, $ubench --
  * 
  */
-$sessionMaker = new SessionMaker(set_session_cookies_key($config['app']['email'], $config['app']['key']));
+$sessionMaker = new SessionMaker(set_session_cookies_key((isset($config['app']['email']) ? $config['app']['email'] : ""), (isset($config['app']['key']) ? $config['app']['key'] : "")));
 $searchPost = new SearchFinder();
 $sanitizer = new Sanitize();
 $userDao = new UserDao();
@@ -178,6 +182,8 @@ $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);
 $ubench = new Ubench();
 $dispatcher = new Dispatcher();
+
+}
 
 session_set_save_handler($sessionMaker, true);
 session_save_path(__DIR__ . '/utility/.sessions'.DS);
