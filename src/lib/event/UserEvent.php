@@ -424,7 +424,7 @@ class UserEvent
        
    }
 
-   if($this->identifyCookieToken($secret)) {
+   if ($this->identifyCookieToken($secret)) {
  
       $bind_meta = ['pwd_hash' => $this->pwd_hash, 'selector_hash' => $this->selector_hash, 'expired_date' => $this->cookie_expired_date];
 
@@ -450,7 +450,9 @@ class UserEvent
 
 /**
  * removeUser
+ * 
  * remove user from record
+ * 
  */
  public function removeUser()
  {
