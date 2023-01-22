@@ -257,7 +257,7 @@ class Authentication
 
   if (isset($_COOKIE['scriptlog_auth'])) {
 
-    return ( isset($getUser['user_level']) ) ? $getUser['user_level'] : "";
+    return (isset($getUser['user_level'])) ? $getUser['user_level'] : "";
 
   }
 
@@ -296,7 +296,6 @@ class Authentication
     } else {
 
       $this->validator->sanitize($login, 'string');
-    
       $this->account_info = $this->findUserByLogin($login);
 
     }
