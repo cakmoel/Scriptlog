@@ -107,7 +107,7 @@ class SearchFinder
   	
   	$sth = $this->dbc->prepare($this->sql);
   	
-  	if ( $sth -> execute($this->bind) !== false ) {
+  	if ($sth -> execute($this->bind) !== false ) {
   		
   		if (preg_match("/^(" . implode("|", array ("select", "describe", "pragma")) . ") /i", $this->sql)) {
 
@@ -187,7 +187,7 @@ class SearchFinder
  public function searchPost($data)
  {
     
-    $bind = array(":keyword1" => "%$data%", ":keyword2" => "%$data%");
+    $bind = array(":keyword1" => "%$data%", ":keyword2" => "%$data%", ":keyword3" => "%$data%");
      
  	$this->sql = "SELECT 
                      ID,
@@ -200,6 +200,7 @@ class SearchFinder
                  WHERE 
                     post_title LIKE :keyword1 
 					OR post_content LIKE :keyword2
+					OR post_tags LIKE :keyword3
                     AND post_status = 'publish' AND post_type = 'blog' ";
  	             
  	
@@ -209,6 +210,7 @@ class SearchFinder
  	$keyword = '%'.$data.'%';
  	$sth->bindValue(':keyword1', $keyword, PDO::PARAM_STR);
  	$sth->bindValue(':keyword2', $keyword, PDO::PARAM_STR);
+	$sth->bindValue(':keyword3', $keyword, PDO::PARAM_STR);
  	$sth->execute();
  	$totalRows = $sth->rowCount();
  	
