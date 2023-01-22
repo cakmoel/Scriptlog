@@ -457,8 +457,7 @@ $Statement->store_result();
  */
 private function getConfiguration()
 {
-  $config = AppConfig::readConfiguration(invoke_config());
-  return $config;
+  return AppConfig::readConfiguration(invoke_config());
 }
 
 }
