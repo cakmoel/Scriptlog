@@ -26,7 +26,7 @@ public static function check($key, $origin, $throwException = false, $timespan =
 
  try {
 
-    if ( ! isset($_SESSION['csrf_'.$key])) {
+    if (! isset($_SESSION['csrf_'.$key])) {
 
         if ($throwException) {
 
@@ -46,7 +46,7 @@ public static function check($key, $origin, $throwException = false, $timespan =
    
     }
 
-    if ( ! isset($origin[$key])) {
+    if (! isset($origin[$key])) {
 
         if ($throwException) {
 
@@ -74,7 +74,7 @@ public static function check($key, $origin, $throwException = false, $timespan =
 
     }
 
-    if ( self::$checkOrigin && sha1($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']) != substr(base64_decode($hash), 10, 40)) {
+    if (self::$checkOrigin && sha1($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']) != substr(base64_decode($hash), 10, 40)) {
 
         if ($throwException) {
 
@@ -110,7 +110,7 @@ public static function check($key, $origin, $throwException = false, $timespan =
 
         }
 
-    } elseif ( $timespan != null && is_int($timespan) && intval(substr(base64_decode($hash), 0, 10)) + $timespan < time() ) {
+    } elseif ($timespan != null && is_int($timespan) && intval(substr(base64_decode($hash), 0, 10)) + $timespan < time() ) {
 
         if ($throwException) {
 
