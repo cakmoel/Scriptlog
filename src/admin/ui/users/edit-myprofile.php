@@ -8,7 +8,7 @@
       <small>Control Panel</small>
     </h1>
     <ol class="breadcrumb">
-      <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
       <li><a href="index.php?load=users">User</a></li>
       <li class="active">Profile</li>
     </ol>
