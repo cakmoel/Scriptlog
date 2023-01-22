@@ -3,8 +3,8 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $userId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $sessionId = isset($_GET['sessionId']) ? safe_html($_GET['sessionId']): null;
-$userEvent = new UserEvent($userDao, $validator, $userToken, $sanitizer);
-$userApp = new UserApp($userEvent);
+$userEvent = class_exists('UserEvent') ? new UserEvent($userDao, $validator, $userToken, $sanitizer) : "";
+$userApp = class_exists('UserApp') ? new UserApp($userEvent) : "";
 
 try {
 
@@ -26,7 +26,7 @@ try {
     
             } 
     
-            if ($userId == 0) {
+            if ($userId === 0) {
     
                 $userApp->insert();
     
@@ -124,10 +124,13 @@ try {
             
     }
 
-} catch (Throwable $th) {
+} catch (\Throwable $th) {
 
-    LogError::setStatusCode(http_response_code());
-    LogError::exceptionHandler($th);
+    if (class_exists('LogError')) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+    }
     
 } catch (AppException $e) {
 
