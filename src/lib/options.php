@@ -1,6 +1,6 @@
 <?php
 /**
- * configuration-option.php
+ * options.php
  * 
  */
 #ini_set("session.cookie_secure", 1);  
