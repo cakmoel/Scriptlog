@@ -10,90 +10,72 @@
  * @license    MIT
  *
  */
-class Sanitize 
+class Sanitize
 {
 
- public function sanitasi($str, $tipe)
- {
-	
-	switch($tipe){
-			
-		default:
-			
-		   case'sql':
+	public function sanitasi($str, $tipe)
+	{
 
-				$d = array('-','/','\\',',','#',':',';','\'','"','[',']','{','}',')','(','|','`','~','!','%','$','^','&','*','=','?','+');
+		switch ($tipe) {
+
+			default:
+
+			case 'sql':
+
+				$d = array('-', '/', '\\', ',', '#', ':', ';', '\'', '"', '[', ']', '{', '}', ')', '(', '|', '`', '~', '!', '%', '$', '^', '&', '*', '=', '?', '+');
 				$str = str_replace($d, '', $str);
 				$str = stripcslashes($str);
 				$str = htmlspecialchars($str);
-				$str = preg_replace('/[^A-Za-z0-9]/','',$str);
+				$str = preg_replace('/[^A-Za-z0-9]/', '', $str);
 				return intval($str);
 				break;
-			
-			case'xss':
-				
-				$d = array('\\','#',';','\'','"','[',']','{','}',')','(','|','`','~','!','%','$','^','&','*','=','?','+');
+
+			case 'xss':
+
+				$d = array('\\', '#', ';', '\'', '"', '[', ']', '{', '}', ')', '(', '|', '`', '~', '!', '%', '$', '^', '&', '*', '=', '?', '+');
 				$str = str_replace($d, '', $str);
 				$str = stripcslashes($str);
 				$str = htmlspecialchars($str);
-				$str = preg_replace('/[\W]/','', $str);
+				$str = preg_replace('/[\W]/', '', $str);
 				$str = prevent_injection($str);
 				return $str;
 				break;
 		}
+	}
 
- }
+	/**
+	 * mildSanitizer
+	 *
+	 * @param string $str
+	 * @return string
+	 * 
+	 */
+	public static function mildSanitizer($str)
+	{
+		return simple_remove_xss($str);
+	}
 
-/**
- * mildSanitizer
- *
- * @param string $str
- * @return string
- * 
- */
- public static function mildSanitizer($str)
- {
-   return simple_remove_xss($str);
- }
+	/**
+	 * severeSanitizer
+	 *
+	 * @param string $str
+	 * @return string
+	 * 
+	 */
+	public static function severeSanitizer($str)
+	{
+		return remove_xss($str);
+	}
 
-/**
- * severeSanitizer
- *
- * @param string $str
- * @return string
- * 
- */
- public static function severeSanitizer($str)
- {
-   return remove_xss($str);
- }
-
-/**
- * strictSanitizer
- *
- * @param string $str
- * @return string
- * 
- */
- public static function strictSanitizer($str)
- {
-   return purify_dirty_html($str);
- }
-
-/**
- * checkFileBase
- *
- * @param string $path
- * @return string
- * 
- */
- public static function checkFileBase($path)
- {
-	 $file = pathinfo($path, PATHINFO_BASENAME);
-	 if(file_exists($file['dirname'].DIRECTORY_SEPARATOR.$file['basename'])){
-		return $file['basename'];
-	 }
-
- }
-
+	/**
+	 * strictSanitizer
+	 *
+	 * @param string $str
+	 * @return string
+	 * 
+	 */
+	public static function strictSanitizer($str)
+	{
+		return purify_dirty_html($str);
+	}
 }
