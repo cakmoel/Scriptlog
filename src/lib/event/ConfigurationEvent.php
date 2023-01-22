@@ -102,7 +102,11 @@ class ConfigurationEvent
   {
     return $this->configDao->findConfig($id, $this->sanitizer);
   }
-  
+
+  /**
+   * addSetting
+   * 
+   */
   public function addSetting()
   {
     
@@ -116,12 +120,16 @@ class ConfigurationEvent
 
   }
 
+  /**
+   * modifySetting
+   *
+   */
   public function modifySetting()
   {
     
     $this->validator->sanitize($this->setting_name, 'string');
     
-    if ( !empty($this->setting_name)) {
+    if (!empty($this->setting_name)) {
 
       return $this->configDao->updateConfig($this->sanitizer, [
 
@@ -133,13 +141,17 @@ class ConfigurationEvent
     }
     
   }
-  
+
+  /**
+   * removeSetting
+   *
+   */
   public function removeSetting()
   {
     
     $this->validator->sanitize($this->setting_id, 'int');
 
-    if (!$data_config = $this->configDao->findConfig($this->setting_id, $this->sanitizer)) {
+    if (!$this->configDao->findConfig($this->setting_id, $this->sanitizer)) {
       direct_page('index.php?load=settings&error=configNotFound', 404);
     }
 
@@ -147,6 +159,23 @@ class ConfigurationEvent
 
   }
 
+  /**
+   * timezoneIdentifierDropDown
+   *
+   * @param string $selected
+   * 
+   */
+  public function timezoneIdentifierDropDown($selected = "")
+  {
+    return $this->configDao->dropDownTimezone($selected);
+  }
+
+  /**
+   * totalSettings
+   *
+   * @param array|mixed $data
+   * 
+   */
   public function totalSettings($data = null)
   {
     return $this->configDao->totalConfigRecords($data);
