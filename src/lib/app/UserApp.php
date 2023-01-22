@@ -409,7 +409,7 @@ class UserApp extends BaseApp
               
         }
 
-        if ( ( !empty($_POST['user_pass2']) ) || ( !empty($_POST['user_pass']) ) || ( !empty($_POST['current_pwd']) ) ) {
+        if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass'])) || (!empty($_POST['current_pwd']))) {
  
             if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
 
@@ -441,14 +441,14 @@ class UserApp extends BaseApp
             
         }
 
-        if ( ( !empty($_POST['user_fullname']) ) && ( !preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']) ) ) {
+        if ((!empty($_POST['user_fullname'])) && (!preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']))) {
             
             $checkError = false;
             array_push($errors, MESSAGE_INVALID_FULLNAME);
             
         }
 
-        if ( false === sanitize_selection_box(distill_post_request($filters)['user_level'], ['manager'=>'Manager', 'editor'=>'Editor', 'author'=>'Author', 'contributor'=>'Contributor'] ) ) {
+        if (false === sanitize_selection_box(distill_post_request($filters)['user_level'], ['manager'=>'Manager', 'editor'=>'Editor', 'author'=>'Author', 'contributor'=>'Contributor'])) {
 
             $checkError = false;
             array_push($errors, MESSAGE_INVALID_SELECTBOX);
@@ -467,7 +467,7 @@ class UserApp extends BaseApp
             
         }
 
-        if ( ( !empty($_POST['user_url']) ) && ( !url_validation($_POST['user_url']) ) ) {
+        if ((! empty($_POST['user_url'])) && (! url_validation($_POST['user_url']))) {
                  
             $checkError = false;
             array_push($errors, "Please enter a valid URL Website");
@@ -567,7 +567,7 @@ class UserApp extends BaseApp
         $this->view->set('formAction', $this->getFormAction());
         $this->view->set('userData', $data_user);
 
-        if ( ( $getUser['ID'] == 1 )  && ( $this->userEvent->isUserLevel() == 'administrator') ) {
+        if (($getUser['ID'] == 1)  && ($this->userEvent->isUserLevel() == 'administrator')) {
 
             $this->view->set('userRole', $this->userEvent->isUserLevel());
 
@@ -599,7 +599,7 @@ class UserApp extends BaseApp
     $checkError = true;
     $secret = ScriptlogCryptonize::generateSecretKey();
 
-    if(!$getProfile = $this->userEvent->grabUserByLogin($user_login)) {
+    if (!$getProfile = $this->userEvent->grabUserByLogin($user_login)) {
 
         $_SESSION['error'] = "profilNotFound";
         direct_page('index.php?load=users&error=profilNotFound', 404);
@@ -619,7 +619,7 @@ class UserApp extends BaseApp
         
     );
 
-    if(isset($_POST['userFormSubmit'])) {
+    if (isset($_POST['userFormSubmit'])) {
 
         $filters = ['user_fullname' => isset($_POST['user_fullname']) ? Sanitize::severeSanitizer($_POST['user_fullname']) : "", 
                     'user_email' => FILTER_SANITIZE_EMAIL, 
@@ -630,14 +630,14 @@ class UserApp extends BaseApp
 
     try {
             
-        if(!csrf_check_token('csrfToken', $_POST, 60*10)) {
+        if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
 
             header($_SERVER["SERVER_PROTOCOL"].MESSAGE_BADREQUEST, true, 400);
             throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
 
         }
             
-        if ( ( ! empty($_POST['user_pass2']) ) || ( ! empty($_POST['user_pass']) ) || ( ! empty($_POST['current_pwd']) ) ) {
+        if ((! empty($_POST['user_pass2'])) || (! empty($_POST['user_pass'])) || (! empty($_POST['current_pwd']))) {
 
             if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
 
@@ -681,14 +681,14 @@ class UserApp extends BaseApp
                 
         }
 
-        if ( ( ! empty($_POST['user_url']) ) && ( ! url_validation($_POST['user_url']) ) ) {
+        if ((! empty($_POST['user_url'])) && (! url_validation($_POST['user_url']))) {
                  
             $checkError = false;
             array_push($errors, "Please enter a valid URL");
                 
         }
 
-        if( ( ! empty($_POST['user_fullname']) ) && ( ! preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']) ) ) {
+        if ((! empty($_POST['user_fullname'])) && (! preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']))) {
                 
             $checkError = false;
             array_push($errors, MESSAGE_INVALID_FULLNAME);
@@ -713,13 +713,13 @@ class UserApp extends BaseApp
             $this->userEvent->setUserUrl((isset($_POST['user_url']) ? escape_html(distill_post_request($filters)['user_url'], 'url') : ""));
             $this->userEvent->setUserId((isset($_POST['user_id']) ? abs((int)distill_post_request($filters)['user_id']) : 0));
 
-            if ( !empty($_POST['user_pass']) ) {
+            if (!empty($_POST['user_pass'])) {
 
                 $this->userEvent->setUserPass(purify_dirty_html(distill_post_request($filters)['user_pass']));
 
             }
 
-            if ( ( $this->userEvent->identifyCookieToken($secret) ) && ( !empty($_POST['user_pass']) ) ) {
+            if (($this->userEvent->identifyCookieToken($secret)) && (! empty($_POST['user_pass']))) {
 
                 $random_password = Tokenizer::createToken(128);
                 set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
