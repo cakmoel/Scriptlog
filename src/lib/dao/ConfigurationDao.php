@@ -12,6 +12,8 @@
 class ConfigurationDao extends Dao
 {
 
+ private $selected;
+
 /**
  * 
  */
@@ -58,9 +60,7 @@ public function updateConfig($sanitize, $bind, $configId)
 public function deleteConfig($configId, $sanitize)
 {
   $clean_id = $this->filteringId($sanitize, $configId, 'sql');
-
   $this->deleteRecord("tbl_settings", "ID = ".(int)$clean_id);
-
 }
 
 /**
@@ -121,7 +121,7 @@ public function findReadingConfigs($orderBy = 'ID')
 
   $reading_configs = $this->findAll([':orderBy' => $orderBy]);
 
-  return ( empty($reading_configs) ) ?: $reading_configs;
+  return (empty($reading_configs)) ?: $reading_configs;
 
 }
 
@@ -200,6 +200,44 @@ public function checkToSetup()
 	$this->setSQL($sql);
 	$stmt = $this->checkCountValue();
 	return $stmt < 1;
+}
+
+/**
+ * dropDownTimezone
+ *
+ * @param string $selected
+ * 
+ */
+public function dropDownTimezone($selected = null)
+{
+
+  $name = 'timezone';
+
+  $dropdown = '<div class="form-group">'. PHP_EOL;
+  $dropdown .= '<label for="timezone">Timezone</label>'. PHP_EOL;
+  $dropdown .= '<select class="form-control select2" style="width: 100%;" name="'.$name.'" id="'.$name.'">'. PHP_EOL;
+  $dropdown .= '<option disabled selected>Please Select Timezone</option>' . PHP_EOL;
+
+  $this->selected = $selected;
+
+  $timezone_list = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
+  
+  foreach ($timezone_list as $option) {
+    
+    $select = $this->selected === $option ? '  selected' : null;
+
+    /*** add each option to the dropdown ***/
+    $dropdown .= '<option value="'.$option.'"'.$select.'>'.$option.'</option>'. PHP_EOL;
+
+  }
+
+  /*** close the select ***/
+  $dropdown .= '</select>'. PHP_EOL;
+  $dropdown .= '</div>';
+    
+  /*** and return the completed dropdown ***/
+  return $dropdown;
+  
 }
 
 /**
