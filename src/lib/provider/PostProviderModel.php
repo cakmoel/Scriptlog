@@ -8,29 +8,29 @@
  * @version 1.0
  * 
  */
-class PostProviderModel extends Dao 
+class PostProviderModel extends Dao
 {
- 
-private $linkPosts;
 
-private $pagination;
+  private $linkPosts;
 
-public function __construct()
-{
-  parent::__construct();
-}
+  private $pagination;
 
-/**
- * getPostFeeds
- * 
- * Retrieve posts records for sharing post on post feeds
- *
- * @param integer $limit
- * @return void
- */
-public function getPostFeeds($limit)
-{
-  $sql =  "SELECT p.ID, p.media_id, p.post_author,
+  public function __construct()
+  {
+    parent::__construct();
+  }
+
+  /**
+   * getPostFeeds
+   * 
+   * Retrieve posts records for sharing post on post feeds
+   *
+   * @param integer $limit
+   * @return void
+   */
+  public function getPostFeeds($limit)
+  {
+    $sql =  "SELECT p.ID, p.media_id, p.post_author,
                   p.post_date, p.post_modified, p.post_title,
                   p.post_slug, p.post_content, p.post_type,
                   p.post_status, p.post_tags, 
@@ -40,66 +40,65 @@ public function getPostFeeds($limit)
             WHERE p.post_type = 'blog' AND p.post_status = 'publish'
             ORDER BY p.ID DESC LIMIT :limit";
 
-  $data = array(':limit' => $limit);
+    $data = array(':limit' => $limit);
 
-  $this->setSQL($sql);
+    $this->setSQL($sql);
 
-  $feeds = $this->findAll($data);
+    $feeds = $this->findAll($data);
 
-  return (empty($feeds)) ?: $feeds;
+    return (empty($feeds)) ?: $feeds;
+  }
 
-}
+  /**
+   * getLatesetPosts
+   *
+   * retrieves latest posts and display it on homepage
+   * 
+   * @param int|numeric $position
+   * @param int|num $limit
+   * @param PDO::FETCH_MODE static $fetchMode = null
+   * @return mixed
+   * 
+   */
+  public function getLatestPosts($limit)
+  {
 
-/**
- * getLatesetPosts
- *
- * retrieves latest posts and display it on homepage
- * 
- * @param int|numeric $position
- * @param int|num $limit
- * @param PDO::FETCH_MODE static $fetchMode = null
- * @return mixed
- * 
- */
-public function getLatestPosts($limit)
-{
-
-$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
+    $sql = "SELECT p.ID, p.media_id, p.post_author, 
+            p.post_date AS created_at, p.post_modified AS modified_at,
             p.post_title, p.post_slug, p.post_content, p.post_summary, 
             p.post_keyword, p.post_status, p.post_tags, 
             p.post_type, p.comment_status, 
             m.media_filename, m.media_caption, m.media_access, 
             u.user_fullname, u.user_login
-FROM tbl_posts AS p 
-INNER JOIN tbl_media AS m ON p.media_id = m.ID
-INNER JOIN tbl_users AS u ON p.post_author = u.ID
-WHERE p.post_status = 'publish'
-AND p.post_type = 'blog' AND m.media_target = 'blog'
-AND m.media_access = 'public' AND m.media_status = '1'
-ORDER BY p.ID DESC LIMIT :limit";
+            FROM tbl_posts AS p 
+            INNER JOIN tbl_media AS m ON p.media_id = m.ID
+            INNER JOIN tbl_users AS u ON p.post_author = u.ID
+            WHERE p.post_status = 'publish'
+            AND p.post_type = 'blog' AND m.media_target = 'blog'
+            AND m.media_access = 'public' AND m.media_status = '1'
+            ORDER BY p.post_date DESC LIMIT :limit";
 
-$this->setSQL($sql);
+    $this->setSQL($sql);
 
-$latestPosts = isset($limit) ? $this->findAll([':limit' => $limit]) : null;
+    $latestPosts = isset($limit) ? $this->findAll([':limit' => $limit]) : null;
 
-return (empty($latestPosts) ) ?: $latestPosts;
+    return (empty($latestPosts)) ?: $latestPosts;
+  }
 
-}
+  /**
+   * getPostById
+   * 
+   * retrieving detail post record by Id
+   *
+   * @param int|num $id
+   * @param object $sanitize
+   * @return boolean|array|object|mixed
+   *
+   */
+  public function getPostById($id, $sanitize)
+  {
 
-/**
- * getPostById
- * 
- * retrieving detail post record by Id
- *
- * @param int|num $id
- * @param object $sanitize
- * @return boolean|array|object|mixed
- *
- */
-public function getPostById($id, $sanitize)
-{
-   
-$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, 
+    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, 
 p.post_slug, p.post_content, p.post_summary, p.post_keyword, p.post_status, p.post_sticky, 
 p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, 
 m.media_access, u.user_login, u.user_fullname
@@ -111,29 +110,28 @@ AND p.post_type = 'blog' AND m.media_target = 'blog'
 AND m.media_access = 'public' AND m.media_status = '1' 
 AND p.ID = :ID ";
 
-$sanitizeid = $this->filteringId($sanitize, $id, 'sql');
+    $sanitizeid = $this->filteringId($sanitize, $id, 'sql');
 
-$this->setSQL($sql);
+    $this->setSQL($sql);
 
-$item = $this->findRow([':ID' => $sanitizeid]);
+    $item = $this->findRow([':ID' => $sanitizeid]);
 
-return (empty($item)) ?: $item;
+    return (empty($item)) ?: $item;
+  }
 
-}
+  /**
+   * getPostBySlug
+   * 
+   * retrieving post record by slug
+   *
+   * @param string $slug
+   * @return mixed
+   *
+   */
+  public function getPostBySlug($slug, $sanitize)
+  {
 
-/**
- * getPostBySlug
- * 
- * retrieving post record by slug
- *
- * @param string $slug
- * @return mixed
- *
- */
-public function getPostBySlug($slug, $sanitize)
-{
-
-  $sql = "SELECT p.ID, p.media_id, p.post_author,
+    $sql = "SELECT p.ID, p.media_id, p.post_author,
                  p.post_date, p.post_modified, p.post_title,
                  p.post_slug, p.post_content, p.post_summary,
                  p.post_keyword, p.post_status, p.post_sticky, 
@@ -147,29 +145,28 @@ public function getPostBySlug($slug, $sanitize)
           AND p.post_type = 'blog' AND m.media_target = 'blog'
           AND m.media_access = 'public' AND m.media_status = '1'";
 
-  $this->setSQL($sql);
+    $this->setSQL($sql);
 
-  $slug_sanitized = $this->filteringId($sanitize, $slug, 'xss');
+    $slug_sanitized = $this->filteringId($sanitize, $slug, 'xss');
 
-  $postBySlug = $this->findRow([':slug' => $slug_sanitized]);
+    $postBySlug = $this->findRow([':slug' => $slug_sanitized]);
 
-  return (empty($postBySlug)) ?: $postBySlug;
+    return (empty($postBySlug)) ?: $postBySlug;
+  }
 
-}
+  /**
+   * getPostByAuthor
+   *
+   * retrieving post records based on author
+   * 
+   * @param string $author
+   * @return mixed
+   * 
+   */
+  public function getPostByAuthor($author)
+  {
 
-/**
- * getPostByAuthor
- *
- * retrieving post records based on author
- * 
- * @param string $author
- * @return mixed
- * 
- */
-public function getPostByAuthor($author)
-{
-  
-  $sql = "SELECT p.ID, p.media_id, p.post_author,
+    $sql = "SELECT p.ID, p.media_id, p.post_author,
                  p.post_date, p.post_modified, p.post_title,
                  p.post_slug, p.post_content, p.post_summary,
                  p.post_keyword, 
@@ -184,72 +181,72 @@ public function getPostByAuthor($author)
           AND p.post_type = 'blog' AND m.media_target = 'blog'
           AND m.media_access = 'public' AND m.media_status = '1'";
 
-  $this->setSQL($sql);
+    $this->setSQL($sql);
 
-  $postByAuthor = $this->findRow([':author' => $author]);
+    $postByAuthor = $this->findRow([':author' => $author]);
 
-  return (empty($postByAuthor)) ?: $postByAuthor;
+    return (empty($postByAuthor)) ?: $postByAuthor;
+  }
 
-}
+  /**
+   * getPostsPublished
+   * 
+   * retrieving all records published 
+   * and display it on blog section
+   *
+   * @param Paginator $perPage
+   * @param object $sanitize
+   * @return boolean|array[]|object[]|string[]
+   *
+   */
+  public function getPostsPublished(Paginator $perPage, $sanitize)
+  {
 
-/**
- * getPostsPublished
- * 
- * retrieving all records published 
- * and display it on blog section
- *
- * @param Paginator $perPage
- * @param object $sanitize
- * @return boolean|array[]|object[]|string[]
- *
- */
-public function getPostsPublished(Paginator $perPage, $sanitize)
-{
+    $entries = [];
 
-  $entries = [];
+    $this->linkPosts = $perPage;
 
-  $this->linkPosts = $perPage;
+    $stmt = $this->dbc->dbQuery("SELECT ID FROM tbl_posts WHERE post_status = 'publish' AND post_type = 'blog'");
 
-  $stmt = $this->dbc->dbQuery("SELECT ID FROM tbl_posts WHERE post_status = 'publish' AND post_type = 'blog'");
+    $this->linkPosts->set_total($stmt->rowCount());
 
-  $this->linkPosts->set_total($stmt->rowCount());
-
-  $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title,
-                 p.post_slug, p.post_content, p.post_summary,
-                 p.post_keyword, p.post_type, p.post_status, p.post_sticky, 
-                 u.user_login, u.user_fullname,
-                 m.media_filename, m.media_caption
+    $sql = "SELECT p.ID, p.media_id, p.post_author, 
+            p.post_date AS created_at, 
+            p.post_modified AS modified_at, 
+                p.post_title, p.post_slug, p.post_content, p.post_summary,
+                p.post_keyword, p.post_type, p.post_status, p.post_sticky, 
+                u.user_login, u.user_fullname,
+                m.media_filename, m.media_caption
   			FROM tbl_posts AS p
   			INNER JOIN tbl_users AS u ON p.post_author = u.ID
         INNER JOIN tbl_media AS m ON p.media_id = m.ID
   			WHERE p.post_type = 'blog' AND p.post_status = 'publish'
-  			ORDER BY p.ID DESC " . $this->linkPosts->get_limit($sanitize);
+  			ORDER BY p.post_date DESC " . $this->linkPosts->get_limit($sanitize);
 
-  $this->setSQL($sql);
+    $this->setSQL($sql);
 
-  $entries = $this->findAll();
+    $entries = $this->findAll();
 
-  $this->pagination = $this->linkPosts->page_links($sanitize);
+    $this->pagination = $this->linkPosts->page_links($sanitize);
 
-  return (empty($entries)) ?: ['postsPublished' => $entries, 'paginationLink' => $this->pagination];
+    return (empty($entries)) ?: ['postsPublished' => $entries, 'paginationLink' => $this->pagination];
+  }
 
-}
+  /**
+   * getRandomHeadlinesPosts
+   * 
+   * retrieving random headlines 
+   * 
+   * @method public getRandomHeadlinesPosts()
+   * @param int $start
+   * @param int $limit
+   * @return mixed
+   * 
+   */
+  public function getRandomHeadlines()
+  {
 
-/**
- * getRandomHeadlinesPosts
- * 
- * retrieving random headlines 
- * 
- * @method public getRandomHeadlinesPosts()
- * @param int $start
- * @param int $limit
- * @return mixed
- * 
- */
-public function getRandomHeadlines()
-{
-
-$sql = "SELECT p.ID, p.media_id, p.post_author,
+    $sql = "SELECT p.ID, p.media_id, p.post_author,
         p.post_date, p.post_modified, p.post_title,
         p.post_slug, p.post_content, p.post_summary,
         p.post_keyword, p.post_sticky, p.post_type, p.post_status, 
@@ -264,53 +261,51 @@ AND m.media_target = 'blog'
 AND p.post_status = 'publish' 
 AND p.post_headlines = '1' ";
 
-$this->setSQL($sql);
+    $this->setSQL($sql);
 
-$headlines = $this->findAll();
+    $headlines = $this->findAll();
 
-return (empty($headlines)) ?: $headlines;
+    return (empty($headlines)) ?: $headlines;
+  }
 
-}
+  /**
+   * getRelatedPosts
+   * 
+   * retrieving related post records
+   *
+   * @param string $post_title
+   * @return mixed
+   *
+   */
+  public function getRelatedPosts($post_title)
+  {
 
-/**
- * getRelatedPosts
- * 
- * retrieving related post records
- *
- * @param string $post_title
- * @return mixed
- *
- */
-public function getRelatedPosts($post_title)
-{
-
-  $sql = "SELECT ID, media_id, post_author, post_date, post_modified,
+    $sql = "SELECT ID, media_id, post_author, post_date, post_modified,
                  post_title, post_slug, post_content, MATCH(post_title, post_content, post_tags)
                  AGAINST(?) AS score
           FROM tbl_posts WHERE MATCH(post_title, post_content) AGAINTS(?)
           ORDER BY score ASC LIMIT 3";
 
-  $this->setSQL($sql);
+    $this->setSQL($sql);
 
-  $relatedPosts = $this->findRow([$post_title]);
+    $relatedPosts = $this->findRow([$post_title]);
 
-  return (empty($relatedPosts)) ?: $relatedPosts;
+    return (empty($relatedPosts)) ?: $relatedPosts;
+  }
 
-}
+  /**
+   * getRandomPosts
+   *
+   * retrieving random posts and display it on homepage
+   * 
+   * @param int $limit
+   * @return mixed
+   *
+   */
+  public function getRandomPosts($start, $end)
+  {
 
-/**
- * getRandomPosts
- *
- * retrieving random posts and display it on homepage
- * 
- * @param int $limit
- * @return mixed
- *
- */
-public function getRandomPosts($start, $end)
-{
-
-  $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
+    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
           p.post_title, p.post_slug, p.post_content, 
           m.media_filename, m.media_caption, u.user_login, u.user_fullname
           FROM tbl_posts AS p
@@ -322,30 +317,28 @@ public function getRandomPosts($start, $end)
           AND m.media_target = 'blog' 
           LIMIT :position, :limit                                                                                                                                                                                       ";
 
-  $this->setSQL($sql);
+    $this->setSQL($sql);
 
-  $data = array(':position' => $start, ':limit' => $end);
+    $data = array(':position' => $start, ':limit' => $end);
 
-  $randomPosts = $this->findAll($data);
+    $randomPosts = $this->findAll($data);
 
-  return (empty($randomPosts)) ?: $randomPosts;
+    return (empty($randomPosts)) ?: $randomPosts;
+  }
 
-}
+  /**
+   * getPostsOnSidebar
+   *
+   * @param string $status
+   * @param int|num $start
+   * @param int|num $limit
+   * @return array
+   * 
+   */
+  public function getPostsOnSidebar($limit)
+  {
 
-/**
- * getPostsOnSidebar
- *
- * @param string $status
- * @param int|num $start
- * @param int|num $limit
- * @return array
- * 
- */
-public function getPostsOnSidebar($limit)
-{
-
-$sql = "SELECT p.ID, p.media_id, p.post_author,
-               p.post_date, p.post_modified, p.post_title,
+    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title,
                p.post_slug, p.post_content, p.post_summary,
                p.post_keyword, p.post_sticky,
                p.post_type, p.post_status, u.user_login, u.user_fullname
@@ -355,12 +348,10 @@ $sql = "SELECT p.ID, p.media_id, p.post_author,
   AND p.post_status = 'publish'
   ORDER BY p.post_date DESC LIMIT :limit ";
 
-$this->setSQL($sql);
+    $this->setSQL($sql);
 
-$sidebar_posts = $this->findAll([':limit' => $limit]);
+    $sidebar_posts = $this->findAll([':limit' => $limit]);
 
-return (empty($sidebar_posts)) ?: ['sidebarPosts' => $sidebar_posts];
-
-}
-
+    return (empty($sidebar_posts)) ?: ['sidebarPosts' => $sidebar_posts];
+  }
 }
