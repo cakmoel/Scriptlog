@@ -58,28 +58,13 @@ class FrontHelper
 
     $idsanitized = static::frontSanitizer($id, 'sql');
 
-    $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status 
-    FROM tbl_topics, tbl_post_topic WHERE tbl_topics.ID = tbl_post_topic.topic_id 
-            AND tbl_topics.topic_status = 'Y' AND tbl_post_topic.post_id = '$idsanitized' ";
+    $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE ID = '$idsanitized'";
 
     $query = db_simple_query($sql);
 
     $result = $query->fetch_assoc();
 
     return (empty($result)) ?: $result;
-  }
-
-  /**
-   * grabSimpleFrontTag
-   *
-   * @param string $param
-   * @return array|null|false
-   * 
-   */
-  public static function grabSimpleFrontTag($param)
-  {
-    $sql = "SELECT post_tags FROM tbl_posts WHERE post_tags LIKE '%$param%' ";
-    
   }
 
   /**
@@ -98,6 +83,7 @@ class FrontHelper
     $result = $query->fetch_assoc();
 
     return (empty($result)) ?: $result;
+    
   }
 
   /**
@@ -176,9 +162,10 @@ AND m.media_access = 'public' AND m.media_status = '1'";
   INNER JOIN tbl_users AS u ON p.post_author = u.ID
   WHERE p.post_slug = ?
   AND p.post_status = 'publish' AND p.post_type = 'page' 
-  AND m.media_access = 'public' AND m.media_status = '1'";
+  AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
-    return db_prepared_query($sql, [$slug], 's')->get_result()->fetch_assoc();
+  return db_prepared_query($sql, [$slug], 's')->get_result()->fetch_assoc();
+
   }
 
   /**
@@ -213,7 +200,8 @@ AND m.media_access = 'public' AND m.media_status = '1'";
     $from = date('Y-m-01 00:00:00', strtotime("$year-$month"));
     $to = date('Y-m-31 23:59:59', strtotime("$year-$month"));
 
-    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug, 
+    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, 
+    p.post_modified, p.post_title, p.post_slug, 
     p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_type, p.post_status, 
     p.post_sticky, u.user_login, u.user_fullname,
     m.media_filename, m.media_caption
@@ -256,6 +244,28 @@ AND m.media_access = 'public' AND m.media_status = '1'";
 
       return ['media_filename' => $media_filename, 'media_caption' => $media_caption, 'media_id' => $media_id];
     }
+  }
+
+  /**
+   * grabFrontTag
+   *
+   * implementing a simple MySQL full-text searching
+   *  
+   * @param string $tag
+   * @return mixed
+   * 
+   */
+  public static function grabFrontTag($tag)
+  {
+    
+   $medoo_init = medoo_init();
+   return $medoo_init->select("tbl_posts", ["ID", "post_title", "post_content", "post_summary", "post_keyword", "@post_tags"], [
+       "MATCH" => [
+         "columns" => ["post_tags", "post_title", "post_content"],
+         "keyword" => $tag, 
+       ]
+    ]);
+
   }
 
   /**
