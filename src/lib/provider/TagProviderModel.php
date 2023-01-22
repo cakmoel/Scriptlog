@@ -1,9 +1,11 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class TagProviderModel extends Dao
  * 
  * @category Provider Class
- * 
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * 
  */
 class TagProviderModel extends Dao
@@ -40,7 +42,7 @@ $tags = $this->findColumn($data);
 
 $tag_exploaded = explode(',', strtolower($tags));
 
-foreach ((array) $tag_exploaded as $tag ) {
+foreach ((array) $tag_exploaded as $tag) {
 
   $html[] = '<a href="'.permalinks($tag)['tag'].'" class="tag" title="'.escape_html($tag).'">#'.escape_html($tag).'</a>';
 
