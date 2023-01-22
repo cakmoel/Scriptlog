@@ -19,7 +19,7 @@ define('APP_DOCUMENT', APP_PUBLIC . DS . 'files' . DS . 'docs' . DS);
 define('APP_THEME', APP_PUBLIC . DS . 'themes' . DS);
 define('APP_PLUGIN', APP_ADMIN . DS . 'plugins' . DS);
 define('APP_DEVELOPMENT', true);
-define('SCRIPTLOG', hash_hmac('sha256', APP_TITLE.':'.APP_CODENAME.mt_rand(1, 1000), hash('sha256', uniqid().'M4Le053Nk4WoR!@#{>}>01[:+]-07|=_$%^&*(id)')));
+define('SCRIPTLOG', hash_hmac('sha256', APP_TITLE . ':'. APP_CODENAME.mt_rand(1, 1000), hash('sha256', uniqid().'M4Le053Nk4WoR!@#{>}>01[:+]-07|=_$%^&*(id)')));
 
 define('MESSAGE_BADREQUEST', "400 Bad Request");
 define('MESSAGE_UNPLEASANT_ATTEMPT', "Sorry, unpleasant attempt detected");
@@ -36,21 +36,21 @@ define('READ_LENGTH', 1024);
 
 if (!defined('PHP_EOL')) {
 
-  if (strtoupper(substr(PHP_OS,0,3) == 'WIN')) {
+  if (strtoupper(substr(PHP_OS, 0, 3) == 'WIN')) {
         
-    define('PHP_EOL',"\r\n");
+    define('PHP_EOL', "\r\n");
 
-  } elseif (strtoupper(substr(PHP_OS,0,3) == 'MAC')) {
+  } elseif (strtoupper(substr(PHP_OS, 0, 3) == 'MAC')) {
         
-    define('PHP_EOL',"\r");
+    define('PHP_EOL', "\r");
     
-  } elseif (strtoupper(substr(PHP_OS,0,3) == 'DAR')) {
+  } elseif (strtoupper(substr(PHP_OS, 0, 3) == 'DAR')) {
         
-    define('PHP_EOL',"\n");
+    define('PHP_EOL', "\n");
       
   } else {
         
-    define('PHP_EOL',"\n");
+    define('PHP_EOL', "\n");
       
   }
 
@@ -58,9 +58,9 @@ if (!defined('PHP_EOL')) {
 
 $is_secure = false;
 
-if ( ( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || ( !empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) 
-     && ( $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') || ( !empty($_SERVER['HTTP_X_FORWARDED_SSL']) ) 
-     && ( $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on') ) {
+if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) 
+     && ($_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) ) 
+     && ($_SERVER['HTTP_X_FORWARDED_SSL'] == 'on')) {
 
 $is_secure = true;
 
@@ -68,13 +68,20 @@ $is_secure = true;
 
 if (!defined('APP_PROTOCOL')) {
 
-  define('APP_PROTOCOL', $protocol = ( $is_secure ) ? 'https' : 'http');
+  define('APP_PROTOCOL', $protocol = ($is_secure) ? 'https' : 'http');
 
 }
 
-if (!defined('APP_HOSTNAME')) {
+if (! defined('APP_HOSTNAME')) {
 
-  define('APP_HOSTNAME', isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
+  if (isset($_SERVER['HTTP_HOST'])) {
+
+    define('APP_HOSTNAME', $_SERVER['HTTP_HOST']);
+  
+  } elseif (isset($_SERVER['SERVER_NAME'])) {
+
+    define('APP_HOSTNAME', $_SERVER['SERVER_NAME']);
+  }
 
 }
 
