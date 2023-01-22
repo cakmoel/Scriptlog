@@ -96,7 +96,7 @@ public static function frontLatestPosts($limit, PostProviderModel $postProviderM
 
  if ($position === 'sidebar') {
 
-  return self::$postProviderModel->getPostsOnSidebar(5);
+  return self::$postProviderModel->getPostsOnSidebar($limit);
 
  } else {
 
@@ -135,8 +135,11 @@ public static function frontPostById($postId, PostProviderModel $postProviderMod
 }
 
 /**
- * frontPostFeeds
+ * frontPostsFeed()
  *
+ * retrieve all posts records 
+ * and display it on rss page
+ * 
  * @param int|num $limit
  * @param PostProviderModel $postProviderModel
  * @return mixed
@@ -243,9 +246,9 @@ public static function frontLinkTag($postId, TagProviderModel $tagProviderModel)
 }
 
 /**
- * frontArchivesPublished
+ * frontPostsByArchive
  *
- * @param array $arguments
+ * @param array $values
  * @param ArchivesProviderModel $archivesProviderModel
  * @return mixed
  * 
