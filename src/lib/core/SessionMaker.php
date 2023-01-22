@@ -105,7 +105,7 @@ private function setup()
  
  if (PHP_VERSION_ID < 70300) {
 
-   session_set_cookie_params($this->cookie['lifetime'],  $this->cookie['path'], $this->cookie['domain'], $this->cookie['secure'], $this->cookie['httponly']);
+   session_set_cookie_params($this->cookie['lifetime'], $this->cookie['path'], $this->cookie['domain'], $this->cookie['secure'], $this->cookie['httponly']);
 
  } else {
 
@@ -137,13 +137,13 @@ if ((!isset($_COOKIE[session_name()])) || ($this->isSessionStarted() === false))
 
    if (version_compare(PHP_VERSION, '5.6.0', '<')) {
       
-      if(session_id() == '') {
+      if (session_id() == '') {
          
          session_start();
          
       }
    
-   } else  {
+   } else {
      
        if (session_status() == PHP_SESSION_NONE) {
           
@@ -212,7 +212,7 @@ public function read($id): string
   
  $data = parent::read($id);
 
- return ( empty($data)  ) ? "" : $this->decrypt($data, $this->key);
+ return (empty($data)) ? "" : $this->decrypt($data, $this->key);
  
 }
 
