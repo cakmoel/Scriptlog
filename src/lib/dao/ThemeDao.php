@@ -240,9 +240,6 @@ class ThemeDao extends Dao
    * Load theme function
    * 
    * @method loadTheme()
-   * @param string $theme_status
-   * @return array
-   * 
    */
   public function loadTheme($theme_status)
   {
