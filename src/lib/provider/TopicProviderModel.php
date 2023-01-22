@@ -13,6 +13,8 @@ class TopicProviderModel extends Dao
 
 private $linkPosts;
 
+private $pagination;
+
 public function __construct()
 {
  parent::__construct();
@@ -72,6 +74,28 @@ return (empty($topicBySlug)) ?: $topicBySlug;
 }
 
 /**
+ * getTopicById
+ *
+ * @param int|num $id
+ * @param object $sanitize
+ * @param PDO::FETCH_ASSOC|PDO::FETCH_OBJECT $fetchMode
+ * @return mixed
+ */
+public function getTopicById($id, $sanitize, $fetchMode = null)
+{
+    $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE ID = :topic_id AND topic_status = 'Y'";
+    
+    $idsanitized = $this->filteringId($sanitize, $id, 'sql');
+
+    $this->setSQL($sql);
+
+    $topicById = (is_null($fetchMode)) ? $this->findRow([':topic_id' => $idsanitized]) : $this->findRow([':topic_id' => $idsanitized], $fetchMode);
+
+    return (empty($topicById)) ?: $topicById;
+
+}
+
+/**
  * getLinkTopic
  *
  * @param int $postId
@@ -111,9 +135,10 @@ return implode("", $link);
 }
 
 /**
- * getAllPublishPostsByTopic
+ * getAllPublishedPostsByTopic
  *
- * retrieves all posts published based topic
+ * retrieves all posts published based on topic
+ * requested and display it on category section
  * 
  * @param int $topicId
  * @param object $sanitize
@@ -121,10 +146,10 @@ return implode("", $link);
  * @return array
  * 
  */
-public function getAllPublishedPostsByTopic($topicId, $sanitize, Paginator $perPage)
+public function getPostsPublishedByTopicId($topicId, $sanitize, Paginator $perPage)
 {
 
-$pagination = null;
+$entries = [];
 
 $this->linkPosts = $perPage;
 
@@ -137,28 +162,48 @@ $this->setSQL($count_topic);
 
 $this->linkPosts->set_total($this->checkCountValue([':topicId' => $topicId]));
 
-$sql = "SELECT tbl_posts.ID, tbl_posts.post_author, tbl_posts.post_date, tbl_posts.post_modified, 
+$sql = "SELECT tbl_posts.ID, tbl_posts.media_id, tbl_posts.post_author, 
+        DATE_FORMAT(tbl_posts.post_date, '%e %b %Y at %H:%i') AS created_at, 
+        DATE_FORMAT(tbl_posts.post_modified, '%e %b %Y at %H:%i') AS modified_at, 
                tbl_posts.post_title, tbl_posts.post_slug, tbl_posts.post_content, tbl_posts.post_summary, 
                tbl_posts.post_keyword, tbl_posts.post_tags, tbl_posts.post_status, tbl_posts.post_sticky, 
                tbl_posts.post_type, tbl_posts.comment_status, tbl_users.user_fullname, 
-               tbl_users.user_login, tbl_users.user_level
-    FROM tbl_posts, tbl_post_topic, tbl_users
+               tbl_users.user_login, tbl_users.user_level,
+               tbl_media.media_filename, tbl_media.media_caption
+    FROM tbl_posts, tbl_post_topic, tbl_users, tbl_media
     WHERE tbl_posts.ID = tbl_post_topic.post_id 
     AND tbl_post_topic.topic_id = :topic_id
     AND tbl_posts.post_author = tbl_users.ID
     AND tbl_posts.post_status = 'publish' 
     AND tbl_posts.post_type = 'blog'
-    AND tbl_users.user_banned = '0' 
-    ORDER BY tbl_posts.ID DESC " . $this->linkPosts->get_limit($sanitize);
+    AND tbl_users.user_banned = '0',
+    AND tbl_posts.media_id = tbl_media.ID
+    ORDER BY tbl_posts.post_date DESC " . $this->linkPosts->get_limit($sanitize);
 
 $this->setSQL($sql);
 
-$postsByTopic = $this->findAll([':topic_id' => $topicId]);
+$entries = $this->findAll([':topic_id' => $topicId]);
 
-$pagination = $this->linkPosts->page_links($sanitize);
+$this->pagination = $this->linkPosts->page_links($sanitize);
 
-return (empty($postsByTopic)) ?: ['postsByTopic' => $postsByTopic, 'paginationLink' => $pagination];
+return (empty($entries)) ?: ['postsByTopic' => $entries, 'paginationLink' => $this->pagination];
 
+}
+
+public function getPostsPublishedByTopicSlug($topicSlug, $sanitize, Paginator $perPage)
+{
+
+ $entries = [];
+
+ $this->linkPosts = $perPage;
+
+ // get number records
+$count_topic = "SELECT tbl_posts.ID 
+                FROM tbl_posts, tbl_post_topic 
+                WHERE tbl_posts.ID = tbl_post_topic.post_id = tbl_post_topic.topic_id = :topicId";
+
+
+ 
 }
 
 }
