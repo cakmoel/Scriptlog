@@ -11,9 +11,7 @@
  */
 function read_config($filename)
 {
-  
  return AppConfig::readConfiguration($filename);
-
 }
 
 /**
@@ -27,9 +25,7 @@ function read_config($filename)
  * @return void
  * 
  */
-function write_config($filename, array $configuration)
+function write_config($filename, $configuration)
 {
-
-  return AppConfig::writeConfiguration($filename, $configuration);
-  
+  return AppConfig::writeConfiguration($filename, $configuration); 
 }
