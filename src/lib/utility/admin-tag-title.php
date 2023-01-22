@@ -15,7 +15,7 @@ function admin_tag_title($value)
 {
     $title = null;
 
-    switch($value) {
+    switch ($value) {
 
          case 'posts':
 
@@ -111,7 +111,7 @@ function admin_tag_title($value)
 
            }
 
-           if ( ( strstr($value, '../') !== false) || ( strstr($value, 'file://') !== false) || ( strstr($value, 'http://') !== false) ) {
+           if ((strstr($value, '../') !== false) || (strstr($value, 'file://') !== false) || (strstr($value, 'http://') !== false)) {
 
               http_response_code(400);
               
@@ -119,7 +119,7 @@ function admin_tag_title($value)
 
            }
 
-           if ( ( strstr($value, 'php://input') ) || ( strstr($value, 'php://filter') ) || ( strstr($value, 'data:') ) || ( strstr($value, 'zip://') ) ) {
+           if ((strstr($value, 'php://input')) || (strstr($value, 'php://filter')) || (strstr($value, 'data:')) || (strstr($value, 'zip://'))) {
 
              http_response_code(405);
 
@@ -127,7 +127,7 @@ function admin_tag_title($value)
              
            }
            
-           if( ( empty($value) ) || ( !in_array($value, array_keys( admin_query() ) ) ) ) {
+           if ((empty($value)) || (!in_array($value, array_keys(admin_query())))) {
 
               http_response_code(404);
             
