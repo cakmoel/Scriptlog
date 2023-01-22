@@ -74,7 +74,7 @@ class View
 
        $this->file = $file;
 
-    };
+    }
     
   }
   
@@ -133,7 +133,7 @@ class View
       
         if ($render === false) {
 
-          throw new RuntimeException('failed getting output');
+          throw new InvalidArgumentException('failed getting output');
 
         }
         
