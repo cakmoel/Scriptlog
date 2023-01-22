@@ -4,7 +4,7 @@
  * digunakan untuk paging
  * 
  * @category Core Class
- * @author   Lukmanul Hakim - Bukulokomedia 
+ * @author   Lukmanul Hakim @lokomedia
  * 
  */
 class Pagination
@@ -17,12 +17,11 @@ class Pagination
 	 */
 	public function getPosition($limit)
 	{
-		if (empty($_GET['order']))
-		{
+		if (empty($_GET['order'])) {
+		
 			$position = 0;
 			$_GET['order'] = 1;
-		}
-		else {
+		} else {
 			$position = ($_GET['order']-1) * $limit;
 		}
 
@@ -40,9 +39,7 @@ class Pagination
 	 */
 	public function totalPage($totalData, $limit)
 	{
-		$totalPage = ceil($totalData/$limit);
-
-		return $totalPage;
+		return ceil($totalData/$limit);
 	}
 
 
@@ -52,37 +49,31 @@ class Pagination
 		$page_link = '';
 
 		// Link ke halaman pertama (Awal) dan sebelumnya (Sebelumnya)
-		if ($activePage > 1)
-		{
+		if ($activePage > 1) {
 			$Sebelumnya = $activePage-1;
-			$page_link .= "<span class=disabled><a href=$_SERVER[PHP_SELF]?module=$_GET[module]&order=".abs((int)1).">Awal</a></span>
-			<span class=disabled><a href=$_SERVER[PHP_SELF]?module=$_GET[module]&order=".abs((int)$Sebelumnya).">Sebelumnya</a></span> ";
+			$page_link .= "<span class=disabled><a href=".escape_html($_SERVER['PHP_SELF'])."?load=$_GET[load]&order=".abs((int)1).">Awal</a></span>
+			<span class=disabled><a href=".htmlspecialchars($_SERVER['PHP_SELF'])."?load=$_GET[load]&order=".abs((int)$Sebelumnya).">Sebelumnya</a></span> ";
 				
-		}
-		else 
-		{
+		} else {
 				
 			$page_link .= "<span class=disabled> Awal</span>";
 		}
 
-
 		//Page link number 1, 2, 3, ... dst
 		$number = ($activePage > 3 ? " ... " : " ");
 
-		for ($i=$activePage-2; $i<$activePage; $i++)
-		{
-			if ( $i < 1 )
+		for ($i=$activePage-2; $i<$activePage; $i++) {
+			if ($i < 1 ) {
 				continue;
+			}
 			$number .= "<span class=disabled><a href=$_SERVER[PHP_SELF]?module=$_GET[module]&order=". abs((int)$i).">$i</a></span> ";
 		}
 
 		//active page
 		$number .= " <span class=current> $activePage </span>  ";
 		 
-		for ($i=$activePage+1; $i<($activePage + 3); $i++)
-		{
-			if ( $i > $totalPage )
-			{
+		for ($i=$activePage+1; $i<($activePage + 3); $i++) {
+			if ($i > $totalPage) {
 				break;
 			}
 				
@@ -94,19 +85,14 @@ class Pagination
 		$page_link .= "$number";
 			
 		//Link ke halaman berikutnya (Next) dan halaman terakhir(Terakhir)
-		if ($activePage < $totalPage)
-		{
+		if ($activePage < $totalPage) {
 			$berikutnya= $activePage + 1;
 
 			$page_link .= " <span class=disabled><a href=$_SERVER[PHP_SELF]?module=$_GET[module]&order=$berikutnya>Berikutnya</a></span>
 			<span class=disabled><a href=$_SERVER[PHP_SELF]?module=$_GET[module]&order=$totalPage>Terakhir</a></span> ";
-		}
-		elseif ( $activePage > $totalPage)
-		{
+		} elseif ($activePage > $totalPage) {
 			$page_link .= $this->setErrorPage();
-		}
-		else 
-		{
+		} else {
 
 			$page_link .= "<span class=disabled>Terakhir</span> ";
 		}
