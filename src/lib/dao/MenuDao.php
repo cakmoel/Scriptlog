@@ -12,26 +12,26 @@
  */
 class MenuDao extends Dao
 {
- 
+
   private $selected;
 
-/**
- * 
- */
- public function __construct()
- {
-	parent::__construct();	
- }
+  /**
+   * 
+   */
+  public function __construct()
+  {
+    parent::__construct();
+  }
 
-/**
- * Find all menus
- * 
- * @method public findMenus()
- * @param integer $orderBy
- * 
- */
- public function findMenus($orderBy = 'ID')
- {
+  /**
+   * Find all menus
+   * 
+   * @method public findMenus()
+   * @param integer $orderBy
+   * 
+   */
+  public function findMenus($orderBy = 'ID')
+  {
     $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_visibility
             FROM tbl_menu ORDER BY :orderBy";
 
@@ -40,265 +40,250 @@ class MenuDao extends Dao
     $allMenu = $this->findAll([':orderBy' => $orderBy]);
 
     return (empty($allMenu)) ?: $allMenu;
-     
- }
+  }
 
- /**
-  * Find Menu
-  * 
-  * @param integer $menuId
-  * @param object $sanitizing
-  * @param static $fetchMode
-  * @return boolean|array|object
-  *
-  */
- public function findMenu($menuId, $sanitizing)
- {
-     
-     $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_visibility
+  /**
+   * Find Menu
+   * 
+   * @param integer $menuId
+   * @param object $sanitizing
+   * @param static $fetchMode
+   * @return boolean|array|object
+   *
+   */
+  public function findMenu($menuId, $sanitizing)
+  {
+
+    $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_visibility
              FROM tbl_menu WHERE ID = ?";
-     
-     $idsanitized = $this->filteringId($sanitizing, $menuId, 'sql');
-     
-     $this->setSQL($sql);
-     
-     $menuDetail = $this->findRow([$idsanitized]);
-     
-     return (empty($menuDetail)) ?: $menuDetail;
-     
- }
- 
- public function findMenuParent($parentId, $sanitizing)
- {
-   
-   $sql = "SELECT ID, parent_id, menu_label FROM tbl_menu WHERE ID = :parent_id";
-   
-   $idsanitized = $this->filteringId($sanitizing, $parentId, 'sql');
 
-   $this->setSQL($sql);
+    $idsanitized = $this->filteringId($sanitizing, $menuId, 'sql');
 
-   $menuParent = $this->findRow([':parent_id' => $idsanitized]);
+    $this->setSQL($sql);
 
-   return (empty($menuParent)) ?: $menuParent;
+    $menuDetail = $this->findRow([$idsanitized]);
 
- }
+    return (empty($menuDetail)) ?: $menuDetail;
+  }
 
- /**
-  * Insert new menu
-  * 
-  * @param array $bind
-  */
- public function insertMenu($bind)
- {
-     
-   $this->create("tbl_menu", [
-       'parent_id' => $bind['parent_id'],
-       'menu_label' => $bind['menu_label'],
-       'menu_link' => $bind['menu_link'],
-       'menu_visibility' => $bind['menu_visibility']
-   ]);
-   
-   $menu_id = $this->lastId();
+  public function findMenuParent($parentId, $sanitizing)
+  {
 
-   $getLink = "SELECT ID, menu_link FROM tbl_menu WHERE ID = ?";
+    $sql = "SELECT ID, parent_id, menu_label FROM tbl_menu WHERE ID = :parent_id";
 
-   $this->setSQL($getLink);
+    $idsanitized = $this->filteringId($sanitizing, $parentId, 'sql');
 
-   $link = $this->findRow([$menu_id]);
+    $this->setSQL($sql);
 
-   if ($link['menu_link'] === '') {
-     
-      $this->modify("tbl_menu", ['menu_link' => '#'], "ID = {$link['ID']}");
-       
-   }
-   
- }
- 
- /**
-  * Update menu
-  * 
-  * @param integer $id
-  * @param array $bind
-  */
- public function updateMenu($sanitize, $bind, $id)
- {
-  
-  $cleanid = $this->filteringId($sanitize, $id, 'sql');
-  $this->modify("tbl_menu", [
+    $menuParent = $this->findRow([':parent_id' => $idsanitized]);
+
+    return (empty($menuParent)) ?: $menuParent;
+  }
+
+  /**
+   * Insert new menu
+   * 
+   * @param array $bind
+   */
+  public function insertMenu($bind)
+  {
+
+    $this->create("tbl_menu", [
       'parent_id' => $bind['parent_id'],
       'menu_label' => $bind['menu_label'],
       'menu_link' => $bind['menu_link'],
-      'menu_status' => $bind['menu_status'], 
       'menu_visibility' => $bind['menu_visibility']
-  ], "id = {$cleanid}");
-  
- }
- 
- /**
-  * Activate menu
-  * 
-  * @param integer $id
-  * @param object $sanitize
-  *
-  */
- public function activateMenu($id, $sanitize)
- {
-   $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-   $this->modify("tbl_menu", ['menu_status' => 'Y'], "ID => {$idsanitized}");
- }
+    ]);
 
- /**
-  * Deactivate menu
-  *
-  * @param integer $id
-  * @param object $sanitize
-  *
-  */
- public function deactivateMenu($id, $sanitize)
- {
-  $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-  $this->modify("tbl_menu", ['menu_status' => 'N'], "ID => {$idsanitized}");
- }
+    $menu_id = $this->lastId();
 
- /**
-  * Delete menu
-  * 
-  * @param integer $id
-  * @param object $sanitizing
-  *
-  */
- public function deleteMenu($id, $sanitize)
- {
-  $cleanid = $this->filteringId($sanitize, $id, 'sql');
-  $this->deleteRecord("tbl_menu", "ID = $cleanid");
- }
+    $getLink = "SELECT ID, menu_link FROM tbl_menu WHERE ID = ?";
 
- /**
-  * Check menu id
-  * 
-  * @param integer $id
-  * @param object $sanitizing
-  * @return numeric
-  *
-  */
- public function checkMenuId($id, $sanitizing)
- {
-  
-  $sql = "SELECT ID FROM tbl_menu WHERE ID = ?";
-  
-  $idsanitized = $this->filteringId($sanitizing, $id, 'sql');
-  
-  $this->setSQL($sql);
-  
-  $stmt = $this->checkCountValue([$idsanitized]);
-  
-  return($stmt > 0);
-  
- }
+    $this->setSQL($getLink);
 
-/**
- * Menu parent does exists or not
- * 
- * @method public menuExists()
- * @param string $menu_label
- */
- public function menuExists($menu_label)
- {
-  $sql = "SELECT COUNT(ID) FROM tbl_menu WHERE menu_label = ?";
-  $this->setSQL($sql);
-  $stmt = $this->findColumn([$menu_label]);
+    $link = $this->findRow([$menu_id]);
 
-  return ($stmt === 1) ? true : false;
-   
- }
+    if ($link['menu_link'] === '') {
 
-/**
- * dropDownMenuParent
- * 
- * Retrieving menu ID to drop down menu parent
- *
- * @param string $selected
- * @return void
- * 
- */
- public function dropDownMenuParent($selected = '')
- {
-
-   $option_selected = '';
-
-   if (!$selected) {
-     $option_selected = ' selected="selected"';
-   }
-
-   $menus = $this->findMenus();
-   
-   $dropDown = '<select class="form-control" name="parent_id" id="parent">'."\n"; 
-
-   if (is_iterable($menus)) {
-
-   foreach ($menus as $menu) {
-      
-      if ((int)$selected === (int)$menu['ID']) {
-
-          $option_selected = ' selected="selected"';
-          
-      }
-
-      $dropDown .= '<option value="'.$menu['ID'].'"'.$option_selected.'>'.$menu['menu_label'].'</option>'."\n";
-
-      $option_selected = '';
-
-   }
-
+      $this->modify("tbl_menu", ['menu_link' => '#'], "ID = {$link['ID']}");
+    }
   }
 
-   if (empty($selected) || empty($menu['ID'])) {
+  /**
+   * Update menu
+   * 
+   * @param integer $id
+   * @param array $bind
+   */
+  public function updateMenu($sanitize, $bind, $id)
+  {
+
+    $cleanid = $this->filteringId($sanitize, $id, 'sql');
+    $this->modify("tbl_menu", [
+      'parent_id' => $bind['parent_id'],
+      'menu_label' => $bind['menu_label'],
+      'menu_link' => $bind['menu_link'],
+      'menu_status' => $bind['menu_status'],
+      'menu_visibility' => $bind['menu_visibility']
+    ], "id = {$cleanid}");
+  }
+
+  /**
+   * Activate menu
+   * 
+   * @param integer $id
+   * @param object $sanitize
+   *
+   */
+  public function activateMenu($id, $sanitize)
+  {
+    $idsanitized = $this->filteringId($sanitize, $id, 'sql');
+    $this->modify("tbl_menu", ['menu_status' => 'Y'], "ID => {$idsanitized}");
+  }
+
+  /**
+   * Deactivate menu
+   *
+   * @param integer $id
+   * @param object $sanitize
+   *
+   */
+  public function deactivateMenu($id, $sanitize)
+  {
+    $idsanitized = $this->filteringId($sanitize, $id, 'sql');
+    $this->modify("tbl_menu", ['menu_status' => 'N'], "ID => {$idsanitized}");
+  }
+
+  /**
+   * Delete menu
+   * 
+   * @param integer $id
+   * @param object $sanitizing
+   *
+   */
+  public function deleteMenu($id, $sanitize)
+  {
+    $cleanid = $this->filteringId($sanitize, $id, 'sql');
+    $this->deleteRecord("tbl_menu", "ID = $cleanid");
+  }
+
+  /**
+   * Check menu id
+   * 
+   * @param integer $id
+   * @param object $sanitizing
+   * @return numeric
+   *
+   */
+  public function checkMenuId($id, $sanitizing)
+  {
+
+    $sql = "SELECT ID FROM tbl_menu WHERE ID = ?";
+
+    $idsanitized = $this->filteringId($sanitizing, $id, 'sql');
+
+    $this->setSQL($sql);
+
+    $stmt = $this->checkCountValue([$idsanitized]);
+
+    return ($stmt > 0);
+  }
+
+  /**
+   * Menu parent does exists or not
+   * 
+   * @method public menuExists()
+   * @param string $menu_label
+   */
+  public function menuExists($menu_label)
+  {
+    $sql = "SELECT COUNT(ID) FROM tbl_menu WHERE menu_label = ?";
+    $this->setSQL($sql);
+    $stmt = $this->findColumn([$menu_label]);
+
+    return ($stmt === 1) ? true : false;
+  }
+
+  /**
+   * dropDownMenuParent
+   * 
+   * Retrieving menu ID to drop down menu parent
+   *
+   * @param string $selected
+   * @return void
+   * 
+   */
+  public function dropDownMenuParent($selected = '')
+  {
+
+    $option_selected = '';
+
+    if (!$selected) {
+      $option_selected = ' selected="selected"';
+    }
+
+    $menus = $this->findMenus();
+
+    $dropDown = '<select class="form-control" name="parent_id" id="parent">' . "\n";
+
+    if (is_iterable($menus)) {
+
+      foreach ($menus as $menu) {
+
+        if ((int)$selected === (int)$menu['ID']) {
+
+          $option_selected = ' selected="selected"';
+        }
+
+        $dropDown .= '<option value="' . $menu['ID'] . '"' . $option_selected . '>' . $menu['menu_label'] . '</option>' . "\n";
+
+        $option_selected = '';
+      }
+    }
+
+    if (empty($selected) || empty($menu['ID'])) {
       $dropDown .= '<option value="0" selected>--Parent--</option>';
-   }
-   
-   $dropDown .= '</select>'."\n";
+    }
 
-   return $dropDown;
-   
- }
+    $dropDown .= '</select>' . "\n";
 
-/**
- * dropDownMenuPosition
- *
- * @param string $selected
- * @return string
- * 
- */
-public function dropDownMenuVisibility($selected = '')
-{
+    return $dropDown;
+  }
 
-$name = 'menu_visibility';
+  /**
+   * dropDownMenuPosition
+   *
+   * @param string $selected
+   * @return string
+   * 
+   */
+  public function dropDownMenuVisibility($selected = '')
+  {
 
-$menu_visibility = array('public'=>'Public', 'private' => 'Private');
+    $name = 'menu_visibility';
 
-if ($selected !== '') {
+    $menu_visibility = array('public' => 'Public', 'private' => 'Private');
 
-  $this->selected = $selected;
+    if ($selected !== '') {
 
-}
+      $this->selected = $selected;
+    }
 
-return dropdown($name, $menu_visibility, $this->selected);
+    return dropdown($name, $menu_visibility, $this->selected);
+  }
 
-}
-
-/**
- * Total menu records
- * 
- * @method public totalMenuRecords()
- * @param array $data = null
- * @return integer|numeric
- * 
- */
- public function totalMenuRecords($data = null)
- {
-   $sql = "SELECT ID FROM tbl_menu";
-   $this->setSQL($sql);
-   return $this->checkCountValue($data);
- }
- 
+  /**
+   * Total menu records
+   * 
+   * @method public totalMenuRecords()
+   * @param array $data = null
+   * @return integer|numeric
+   * 
+   */
+  public function totalMenuRecords($data = null)
+  {
+    $sql = "SELECT ID FROM tbl_menu";
+    $this->setSQL($sql);
+    return $this->checkCountValue($data);
+  }
 }
