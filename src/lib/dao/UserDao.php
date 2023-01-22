@@ -461,11 +461,11 @@ class UserDao extends Dao
     
     if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
 
-      return ( $this->checkUserPasswordByEmail($login, $password) ) ?: false;
+      return ($this->checkUserPasswordByEmail($login, $password)) ?: false;
     
     } else {
 
-      return ( $this->checkUserPasswordByLogin($login, $password) ) ?: false;
+      return ($this->checkUserPasswordByLogin($login, $password)) ?: false;
 
     }
     
@@ -530,19 +530,19 @@ class UserDao extends Dao
             $expected = crypt($password, $row['user_pass']);
             $correct = crypt($password, $row['user_pass']);
     
-            if(!function_exists('hash_equals')) {
+            if (!function_exists('hash_equals')) {
     
-                if ( ( timing_safe_equals($expected, $correct) === 0 ) && ( scriptlog_verify_password($password, $row['user_pass']) ) ) {
+                if ((timing_safe_equals($expected, $correct) === 0) && (scriptlog_verify_password($password, $row['user_pass']) ) ) {
 
-                    return true;
+                  return true;
 
                 }
                 
             } else {
     
-                if ( hash_equals($expected, $correct)  && (  scriptlog_verify_password($password, $row['user_pass'] ) ) ) {
+                if (hash_equals($expected, $correct)  && (scriptlog_verify_password($password, $row['user_pass']))) {
 
-                    return true;
+                  return true;
 
                 }
                 
@@ -572,9 +572,9 @@ class UserDao extends Dao
         $expected = crypt($password, $row['user_pass']);
         $correct = crypt($password, $row['user_pass']);
 
-        if(!function_exists('hash_equals')) {
+        if (!function_exists('hash_equals')) {
 
-            if ( (  timing_safe_equals($expected, $correct) === 0 ) && ( scriptlog_verify_password($password, $row['user_pass']) ) ) {
+            if ((timing_safe_equals($expected, $correct) === 0) && (scriptlog_verify_password($password, $row['user_pass']))) {
 
                 return true;
             }
@@ -582,7 +582,7 @@ class UserDao extends Dao
     
         } else {
 
-            if ( ( hash_equals($expected, $correct) )  && ( scriptlog_verify_password($password, $row['user_pass']) ) ) {
+            if ((hash_equals($expected, $correct))  && (scriptlog_verify_password($password, $row['user_pass']))) {
 
                 return true;
             }
