@@ -27,7 +27,7 @@ function check_mime_type($accepted_type, $tmp_name)
    $finfo = finfo_open(FILEINFO_MIME_TYPE);
    $type = finfo_file($finfo, $tmp_name);
 
-   (is_resource($finfo)) ? finfo_close($finfo) : "";
+   is_resource($finfo) ? finfo_close($finfo) : "";
    
  } elseif (function_exists('mime_content_type')) {
 
@@ -61,6 +61,6 @@ function check_mime_type($accepted_type, $tmp_name)
  
  $extension = array_search($type, $accepted_type, true);
 
- return ( false === $extension ) ? false : true;
+ return (false === $extension) ? false : true;
 
 }
