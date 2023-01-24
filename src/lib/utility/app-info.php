@@ -1,4 +1,5 @@
 <?php
+
 /**
  * app_info
  * 
@@ -14,75 +15,59 @@
 function app_info()
 {
 
- $configurations = new ConfigurationDao();
- $app_info = array();
- $results = $configurations->findConfigs();
+    $configurations = new ConfigurationDao();
+    $app_info = array();
+    $results = $configurations->findConfigs();
 
- if (is_array($results)) {
+    if (is_array($results)) {
 
-  foreach ($results as $data) {
+        foreach ($results as $data) {
 
-    switch ($data['setting_name']) {
-      
-        default:
-        case 'app_key':
+            if ($data['setting_name'] === 'app_key') {
 
-          $app_info['app_key'] = $data['setting_value'];
+                $app_info['app_key'] = $data['setting_value'];
+            } elseif ($data['setting_name'] === 'app_url') {
 
-          break;
+                $app_info['app_url'] = $data['setting_value'];
+            } elseif ($data['setting_name'] === 'site_name') {
 
-        case 'app_url':
+                $app_info['site_name'] = $data['setting_value'];
+            } elseif ($data['setting_name'] === 'site_tagline') {
 
-          $app_info['app_url'] = $data['setting_value'];
+                $app_info['site_tagline'] = $data['setting_value'];
+            } elseif ($data['setting_name'] === 'site_description') {
 
-          break;
+                $app_info['site_description'] = $data['setting_value'];
+            } elseif ($data['setting_name'] === 'site_keywords') {
 
-        case 'site_name':
+                $app_info['site_keywords'] = $data['setting_value'];
+            } elseif ($data['setting_name'] === 'site_email') {
 
-          $app_info['site_name'] = $data['setting_value'];
+                $app_info['site_email'] = $data['setting_value'];
+            } elseif ($data['setting_name'] === 'post_per_page') {
 
-           break;
+                $app_info['post_per_page'] = $data['setting_value'];
+            } elseif ($data['setting_name'] === 'post_per_rss') {
 
-        case 'site_tagline':
+                $app_info['post_per_rss'] = $data['setting_value'];
+            } elseif ($data['setting_name'] === 'post_per_archive') {
 
-           $app_info['site_tagline'] = $data['setting_value'];
+                $app_info['post_per_archive'] = $data['setting_value'];
+            } elseif ($data['setting_name'] === 'comment_per_post') {
 
-           break;
+                $app_info['comment_per_post'] = $data['setting_value'];
+            } elseif ($data['setting_name'] === 'permalink_setting') {
 
-        case 'site_description':
+                $app_info['permalink_setting'] = $data['setting_value'];
+            } elseif ($data['setting_name'] === 'timezone_setting') {
 
-          $app_info['site_description'] = $data['setting_value'];
+                $app_info['timezone_setting'] = $data['setting_value'];
+            }
+        }
 
-          break;
+        return $app_info;
+    } else {
 
-        case 'site_keywords':
-
-          $app_info['site_keywords'] = $data['setting_value'];
-
-          break;
-
-        case 'site_email':
-
-          $app_info['site_email'] = $data['setting_value'];
-
-          break;
-
-        case 'permalink_setting':
-
-          $app_info['permalink_setting'] = $data['setting_value'];
-
-          break;
-
+        return AppConfig::readConfiguration(invoke_config());
     }
-    
-  }
- 
- } else {
-
-  $app_info = AppConfig::readConfiguration(invoke_config());
-
- }
- 
- return $app_info;
-
 }
