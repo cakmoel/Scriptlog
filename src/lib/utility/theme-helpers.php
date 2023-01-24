@@ -67,6 +67,11 @@ function markdown_html_out($text)
   echo markdown_html($text);
 }
 
+/**
+ * copyright
+ *
+ * @return string
+ */
 function copyright()
 {
   
