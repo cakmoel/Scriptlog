@@ -14,5 +14,8 @@
  */
 function route_request($dispatcher)
 {
+
+  assert($dispatcher instanceof Dispatcher);
   (is_object($dispatcher) ? $dispatcher->dispatch() : trigger_error("Scriptlog's internal server not working")); 
+  
 }
