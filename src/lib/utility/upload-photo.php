@@ -17,7 +17,6 @@ function photo_instance()
 {
   // Currently you can choose between gd and imagick
   return new ImageManager(['driver' => 'gd']);
-
 }
 
 /**
@@ -114,9 +113,9 @@ $large_path_uploaded = $large_path . $large_thumb_name;
 
 if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exists('finfo'))) {
 
-  if (resize_image($current_width, $current_height, $medium_size, $medium_path_uploaded, $img_source, 80, $file_type) ) {
+  if (resize_image($current_width, $current_height, $medium_size, $medium_path_uploaded, $img_source, 80, $file_type)) {
 
-    if (! crop_image($current_width, $current_height, $small_size, $small_path_uploaded, $img_source, 80, $file_type) ) {
+    if (! crop_image($current_width, $current_height, $small_size, $small_path_uploaded, $img_source, 80, $file_type)) {
 
       scriptlog_error("Error Creating small size of thumbnail!");
 
@@ -137,7 +136,7 @@ if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exi
 
 } else {
 
-  if ($img_ext == "jpeg" || $img_ext == "jpg" || $img_ext == "png" || $img_ext == "gif" || $img_ext == "bmp" ) {
+  if ($img_ext == "jpeg" || $img_ext == "jpg" || $img_ext == "png" || $img_ext == "gif" || $img_ext == "bmp") {
 
     if (false === set_webp_origin($current_width, $current_height, $file_location, $file_size, $origin_path_uploaded, $origin_path, $file_name)) {
 
@@ -168,7 +167,7 @@ if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exi
 }
 
  // save origin picture
- if (false === set_origin_photo( $current_width, $current_height, $file_location, $file_size, $origin_path_uploaded) ) {
+ if (false === set_origin_photo($current_width, $current_height, $file_location, $file_size, $origin_path_uploaded)) {
 
   scriptlog_error("Error uploading picture", E_USER_WARNING);
  
@@ -251,7 +250,7 @@ if (!move_uploaded_file($file_location, $origin_path_uploaded)) {
 
 }
 
-if (filesize($origin_path_uploaded) !== $file_size ) {
+if (filesize($origin_path_uploaded) !== $file_size) {
 
   unlink($origin_path_uploaded);
   return false;
@@ -262,7 +261,7 @@ if (filesize($origin_path_uploaded) !== $file_size ) {
 $file_basename = substr($file_name, 0, strripos($file_name, '.'));
     
 $origin_webp = photo_instance()->make($origin_path_uploaded);
-if ($origin_webp->save($origin_path.$file_basename.'.webp', 80, 'webp')){
+if ($origin_webp->save($origin_path.$file_basename.'.webp', 80, 'webp')) {
 
    $origin_webp->destroy();
    return true;

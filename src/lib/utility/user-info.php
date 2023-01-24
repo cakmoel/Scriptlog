@@ -18,7 +18,7 @@ function user_info($authenticator, $user_login)
 
   $user_info = array();
 
-  if ( is_object($authenticator) ) {
+  if (is_object($authenticator) ) {
 
     $user_info = $authenticator->findUserByLogin($user_login);
 
