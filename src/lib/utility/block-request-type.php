@@ -10,7 +10,7 @@
  * @return bool
  * 
  */
-function block_request_type($current_request, array $method_allowed)
+function block_request_type($current_request, $method_allowed)
 {
 
  $block = true;
