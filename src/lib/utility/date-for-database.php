@@ -11,7 +11,7 @@
 function date_for_database($date = null)
 {
 
-if ( ! is_null($date) ) {
+if (! is_null($date) ) {
 
  $timestamp = strtotime($date);
  $date_formated = date("Y-m-d H:i:s", $timestamp);
