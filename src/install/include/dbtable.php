@@ -55,6 +55,8 @@ post_content longtext NOT NULL,
 post_summary mediumtext DEFAULT NULL,    
 post_keyword text DEFAULT NULL,   
 post_status varchar(20) NOT NULL DEFAULT 'publish',
+post_visibility varchar(20) NOT NULL DEFAULT 'public',
+post_password varchar(255) DEFAULT NULL,
 post_tags varchar(255) DEFAULT NULL, 
 post_headlines INT(5) NOT NULL DEFAULT '0',
 post_sticky INT(5) NOT NULL DEFAULT '0',   
@@ -184,4 +186,5 @@ $savePostPerRSS = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES
 $savePostPerArchive = "INSERT INTO tbl_settings(setting_name, setting_value) VALUES(?, ?)";
 $saveCommentPerPost = "INSERT INTO tbl_settings(setting_name, setting_value) VALUES(?, ?)";
 $savePermalinks = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
+$saveTimezone = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
 $saveTheme   = "INSERT INTO tbl_themes (theme_title, theme_desc, theme_designer, theme_directory, theme_status) VALUES (?, ?, ?, ?, ?)";
