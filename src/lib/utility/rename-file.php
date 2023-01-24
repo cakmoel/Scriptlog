@@ -36,7 +36,9 @@ $filename = preg_replace('~[<>:"/\\|?*]|[\x00-\x1F]|[\x7F\xA0\xAD]|[#\[\]@!$&\'(
 // avoids ".", ".." or ".hiddenFiles"
 $filename = ltrim($filename, '.-');
 // optional beautification
-if ($beautify) $filename = beautify_filename($filename);
+if ($beautify) {
+  $filename = beautify_filename($filename);
+}
 
 // maximize filename length to 255 bytes http://serverfault.com/a/9548/44086
 
