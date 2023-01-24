@@ -1,4 +1,5 @@
 <?php
+
 /**
  * paragraph_l2br()
  * 
@@ -15,8 +16,7 @@
 
 function paragraph_l2br($content)
 {
-  
-  if(version_compare(phpversion(), '7.4.25', '<=')) {
+  if (version_compare(phpversion(), '7.4.25', '<=')) {
 
     return str_replace(paragraph_newline_checker(), '<br>', $content);
 
@@ -35,42 +35,39 @@ function paragraph_l2br($content)
  * @param integer $scnt
  * 
  */
-function paragraph_trim($content, $limit = 200, $schr="\n", $scnt=2)
+function paragraph_trim($content, $limit = 200, $schr = "\n", $scnt = 2)
 {
-  
+
   $post = 0;
-  
+
   $trimmed = false;
 
-  for($i = 1; $i <= $scnt; $i++) {
+  for ($i = 1; $i <= $scnt; $i++) {
 
-    if($tmp = strpos($content, $schr, $post+1)) {
-        $post = $tmp;
-        $trimmed = true;
+    if ($tmp = strpos($content, $schr, $post + 1)) {
+      $post = $tmp;
+      $trimmed = true;
     } else {
-        $post = strlen($content) - 1;
-        $trimmed = false;
-        break;
+      $post = strlen($content) - 1;
+      $trimmed = false;
+      break;
     }
-
   }
 
   $content = substr($content, 0, $post);
 
-  if(strlen($content) >= $limit) {
+  if (strlen($content) >= $limit) {
 
     $content = substr($content, 0, $limit);
     $content = substr($content, 0, strrpos($content, ' '));
     $trimmed = true;
-
   }
 
-  if ($trimmed) { 
-    $content .= '...'; 
+  if ($trimmed) {
+    $content .= '...';
   }
 
   return safe_html($content);
-
 }
 
 /**
@@ -80,26 +77,21 @@ function paragraph_trim($content, $limit = 200, $schr="\n", $scnt=2)
 function paragraph_newline_checker()
 {
 
-  if(defined('PHP_EOL')) {
+  if (defined('PHP_EOL')) {
 
     return PHP_EOL;
-
   }
 
-  if(isset($_SERVER["HTTP_USER_AGENT"]) && strstr(strtolower($_SERVER["HTTP_USER_AGENT"]), 'win')) {
+  if (isset($_SERVER["HTTP_USER_AGENT"]) && strstr(strtolower($_SERVER["HTTP_USER_AGENT"]), 'win')) {
 
     $new_line = "\r\n";
-
-  } elseif(isset($_SERVER["HTTP_USER_AGENT"]) && strstr(strtolower($_SERVER["HTTP_USER_AGENT"]), 'mac')) {
+  } elseif (isset($_SERVER["HTTP_USER_AGENT"]) && strstr(strtolower($_SERVER["HTTP_USER_AGENT"]), 'mac')) {
 
     $new_line = "\r";
-
   } else {
 
     $new_line = "\n";
-
   }
 
   return $new_line;
-
 }

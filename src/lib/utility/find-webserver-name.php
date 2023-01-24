@@ -17,8 +17,7 @@ $server = isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : $_S
 
 $slice = explode("/", $server);
 
-$server_name = isset($slice[0]) ? $slice[0] : '';
+return (isset($slice[0])) ? $slice[0] : '';
 
-return $server_name;
 
 }
