@@ -1,5 +1,4 @@
 <?php
-
 use Selective\ArchiveBomb\Scanner\BombScanner;
 use Selective\ArchiveBomb\Engine\ZipBombEngine;
 use Selective\ArchiveBomb\Engine\RarBombEngine;
@@ -21,7 +20,7 @@ $scanner = new BombScanner();
 
 $scanner->addEngine(new ZipBombEngine());
 
-( version_compare(PHP_VERSION, '7.4', '>=') ) ? clearstatcache() : clearstatcache(true);
+(version_compare(PHP_VERSION, '7.4', '>=') ) ? clearstatcache() : clearstatcache(true);
 
 $result = $scanner->scanFile($file);
 
