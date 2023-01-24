@@ -35,11 +35,11 @@ function reset_password($recipient, $reset_key)
                   'X-Priority: 1'. "\r\n".
                   'X-Sender:'.$sanitize_sender."\r\n";
 
-    if ( ( filter_var($recipient, FILTER_SANITIZE_EMAIL) ) && ( filter_var($recipient, FILTER_VALIDATE_EMAIL) ) ) {
+    if ((filter_var($recipient, FILTER_SANITIZE_EMAIL)) && (filter_var($recipient, FILTER_VALIDATE_EMAIL))) {
         
-        if ( ! mail( $recipient, $subject, $content, $email_headers) ) {
+        if (! mail($recipient, $subject, $content, $email_headers)) {
 
-            scriptlog_error( "E-mail notification fail to sent" );
+            scriptlog_error("E-mail notification fail to sent");
 
         } 
         
@@ -84,9 +84,9 @@ function recover_password($user_pass, $user_email)
                      'X-Priority: 1'. "\r\n".
                      'X-Sender:'.$sanitize_sender."\r\n";
 
-   if ( ( filter_var( $user_email, FILTER_SANITIZE_EMAIL) ) && ( filter_var( $user_email, FILTER_VALIDATE_EMAIL) ) ) {
+   if ((filter_var( $user_email, FILTER_SANITIZE_EMAIL)) && (filter_var($user_email, FILTER_VALIDATE_EMAIL))) {
 
-      if ( ! mail($user_email, $subject, $content, $email_headers) ) {
+      if (! mail($user_email, $subject, $content, $email_headers)) {
 
         scriptlog_error( "E-mail notification fail to sent" );
 
