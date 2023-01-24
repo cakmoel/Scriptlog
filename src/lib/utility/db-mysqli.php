@@ -13,9 +13,7 @@
  */
 function db_instance()
 {
-
   return DbMySQLi::getInstance();
-
 }
 
 /**
