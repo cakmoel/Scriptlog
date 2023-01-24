@@ -35,7 +35,7 @@ if (!$loggedIn) {
    
 } else {
 
-$decrypt_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $key) : "";
+$decrypt_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $cipher_key) : "";
     
 $user_login = isset($_COOKIE['scriptlog_auth']) ? user_info($authenticator, $decrypt_login)['user_login'] : Session::getInstance()->scriptlog_session_login;
 $user_email = isset($_SESSION['scriptlog_session_email']) ? Session::getInstance()->scriptlog_session_email : user_info($authenticator, $user_login)['user_email'];
