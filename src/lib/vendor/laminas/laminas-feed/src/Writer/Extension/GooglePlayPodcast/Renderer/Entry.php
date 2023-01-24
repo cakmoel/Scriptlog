@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Laminas\Feed\Writer\Extension\GooglePlayPodcast\Renderer;
 
 use DOMDocument;
@@ -61,7 +59,7 @@ class Entry extends Extension\AbstractRenderer
             return;
         }
         $el   = $dom->createElement('googleplay:block');
-        $text = $dom->createTextNode((string) $block);
+        $text = $dom->createTextNode($block);
         $el->appendChild($text);
         $root->appendChild($el);
         $this->called = true;
@@ -79,7 +77,7 @@ class Entry extends Extension\AbstractRenderer
             return;
         }
         $el   = $dom->createElement('googleplay:explicit');
-        $text = $dom->createTextNode((string) $explicit);
+        $text = $dom->createTextNode($explicit);
         $el->appendChild($text);
         $root->appendChild($el);
         $this->called = true;
@@ -97,7 +95,7 @@ class Entry extends Extension\AbstractRenderer
             return;
         }
         $el   = $dom->createElement('googleplay:description');
-        $text = $dom->createTextNode((string) $description);
+        $text = $dom->createTextNode($description);
         $el->appendChild($text);
         $root->appendChild($el);
         $this->called = true;

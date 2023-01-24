@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Laminas\Feed\Writer\Extension\Atom\Renderer;
 
 use DOMDocument;

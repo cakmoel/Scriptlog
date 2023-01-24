@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Laminas\Feed\Writer\Renderer\Entry;
 
 use DateTime;
@@ -74,18 +72,18 @@ class AtomDeleted extends Renderer\AbstractRenderer implements Renderer\Renderer
         $name   = $this->dom->createElement('name');
         $author->appendChild($name);
         $root->appendChild($author);
-        $text = $dom->createTextNode((string) $data['name']);
+        $text = $dom->createTextNode($data['name']);
         $name->appendChild($text);
         if (array_key_exists('email', $data)) {
             $email = $this->dom->createElement('email');
             $author->appendChild($email);
-            $text = $dom->createTextNode((string) $data['email']);
+            $text = $dom->createTextNode($data['email']);
             $email->appendChild($text);
         }
         if (array_key_exists('uri', $data)) {
             $uri = $this->dom->createElement('uri');
             $author->appendChild($uri);
-            $text = $dom->createTextNode((string) $data['uri']);
+            $text = $dom->createTextNode($data['uri']);
             $uri->appendChild($text);
         }
     }
