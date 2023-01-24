@@ -1,5 +1,4 @@
 <?php
-
 /**
  * checking_comment_author_email
  * 
@@ -8,6 +7,7 @@
  * @return bool|false
  * 
  */
+
 use Egulias\EmailValidator\Validation\RFCValidation;
 
 function checking_author_email($email)
@@ -57,7 +57,6 @@ function checking_form_payload(array $values)
       header('Retry-After: 3600');
       exit("413 Payload Too Large");
    }
-   
 }
 
 /**
@@ -76,7 +75,7 @@ function checking_comment_request()
       }
 
       header('Allow: POST');
-      header("$protocol 405 Method Not Allowed");
+      header("$protocol 405 Method Not Allowed", true, 405);
       header('Content-Type: text/plain');
       exit;
    }
@@ -97,9 +96,15 @@ function checking_block_csrf($csrf)
       http_response_code(405);
       exit("405 Method Not Allowed");
    }
-
 }
 
+/**
+ * checking_form_input
+ *
+ * @param string $author_name
+ * @param string $author_email
+ * @param string $comment_content
+ */
 function checking_form_input($author_name, $author_email, $comment_content)
 {
 
@@ -128,7 +133,6 @@ function checking_form_input($author_name, $author_email, $comment_content)
    }
 
    return array($errors);
-
 }
 
 /**
@@ -142,16 +146,14 @@ function processing_comment(array $values)
    $errors = array();
    $form_data = array();
 
+   checking_comment_request();
+   
    $postId = (isset($values['post_id']) && $values['post_id'] == $_POST['post_id'] ? abs((int)$_POST['post_id']) : 0);
    $author_name = (isset($values['name']) && $values['name'] == $_POST['name'] ? prevent_injection($values['name']) : null);
    $author_email = (isset($values['email']) && $values['email'] == $_POST['email'] ? prevent_injection($values['email']) : null);
    $comment_content = (isset($values['comment']) && $values['comment'] == $_POST['comment'] ? prevent_injection($values['comment']) : null);
    $csrf = (isset($values['csrf']) && $values['csrf'] == $_POST['csrf'] ? $values['csrf'] : "");
    $comment_at = date("Y-m-d H:i:s");
-   
-   $commentProvider = new CommentProviderModel();
-
-   checking_comment_request();
 
    checking_form_payload($values);
 
@@ -166,23 +168,21 @@ function processing_comment(array $values)
       'comment_author_ip' => get_ip_address(),
       'comment_author_email' => $author_email,
       'comment_content' => $comment_content,
-      'comment_date' => $comment_at 
-    ];
-    
+      'comment_date' => $comment_at
+   ];
+
+   $commentProvider = new CommentProviderModel();
    FrontContentProvider::frontNewCommentByPost($bind, $commentProvider);
 
-   if (! empty($errors)) {
+   if (!empty($errors)) {
 
       $form_data['success'] = false;
       $form_data['errors'] = $errors;
-
    } else {
 
       $form_data['success'] = true;
       $form_data['success_message'] = 'Comment was submitted successfully';
-
    }
-   
-   echo json_encode($form_data, JSON_PRETTY_PRINT);
 
+   echo json_encode($form_data, JSON_PRETTY_PRINT);
 }
