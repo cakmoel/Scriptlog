@@ -2,9 +2,12 @@
 /**
  * Theme_dir()
  * 
- * checking which is theme actived and return it with app's URL
+ * checking which is theme actived and return it directory with app's URL
  * 
- * @category function
+ * @category function theme_dir checking active theme and return it directory with app's URL
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @return string
  * 
  */
@@ -13,9 +16,7 @@ function theme_dir()
     
   $active_theme = theme_identifier();
 
-  $folder = $active_theme['theme_directory'].DS;
-
-  return app_info()['app_url'].DS.APP_THEME.$folder;
+  return app_info()['app_url'].DS.APP_THEME.$active_theme['theme_directory'].DS;
 
 }
 
@@ -25,7 +26,7 @@ function theme_dir()
  * initialize theme actived
  * 
  * @category functions
- * @return mixed
+ * @author M.Noermoehammad
  * 
  */
 function theme_identifier()
@@ -33,23 +34,25 @@ function theme_identifier()
   
   $theme_init = new ThemeDao();
   
-  return ( empty($theme_init->loadTheme('Y') ) ?: $theme_init->loadTheme('Y') );
+  return (empty($theme_init->loadTheme('Y')) ?: $theme_init->loadTheme('Y'));
 
 }
 
 /**
  * call_theme_header
  * 
- * @category Function
- * @return void
+ * @category functions
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * 
  */
 function call_theme_header()
 {
 
-if ( file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php')) {
+if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php')) {
 
-  include ( APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php');
+  include_once (APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php');
      
 } else {
 
@@ -62,17 +65,19 @@ if ( file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'he
 /**
  * call_theme_content
  *
- * @category Function
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param string $content
- * @return void
  * 
  */
 function call_theme_content($content = null)
 {
 
-  if ( file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php') ) ) {
+  if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php'))) {
 
-    include ( APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php') );
+    include_once (APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php'));
    
   } else {
 
@@ -85,16 +90,18 @@ function call_theme_content($content = null)
 /**
  * call_theme_footer
  *
- * @category Function
- * @return void
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * 
  */
 function call_theme_footer()
 {
 
-  if ( file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php') ) {
+  if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php')) {
 
-    include ( APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php');
+    include_once (APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php');
 
   } else {
 
