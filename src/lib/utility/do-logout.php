@@ -14,7 +14,7 @@
 function do_logout($authenticator)
 {
 
- if(is_a($authenticator, 'Authentication')) {
+ if (is_a($authenticator, 'Authentication')) {
 
    return $authenticator->logout();
 
@@ -39,7 +39,7 @@ $prefix = Session::getInstance()->scriptlog_fingerprint;
 
 $id_logout = uniqid($prefix, true);
 
-if(empty($_SESSION['loggingOut'])) {
+if (empty($_SESSION['loggingOut'])) {
 
    $_SESSION['loggingOut'] = array();
 
@@ -65,7 +65,7 @@ return $id_logout;
 function verify_logout_id($id_logout)
 {
 
-if(isset($_SESSION['loggingOut'][$id_logout])) {
+if (isset($_SESSION['loggingOut'][$id_logout])) {
 
    unset($_SESSION['loggingOut'][$id_logout]);
    

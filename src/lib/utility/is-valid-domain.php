@@ -18,42 +18,34 @@ function is_valid_domain($url)
     
  $urlparts = parse_url(filter_var($url, FILTER_SANITIZE_URL));
     
-  if(!isset($urlparts['host'])){
+  if (!isset($urlparts['host'])) {
         
     $urlparts['host'] = $urlparts['path'];
 
   }
 
-  if($urlparts['host']!=''){
+  if ($urlparts['host']!='') {
     
-    if (!isset($urlparts['scheme'])){
+    if (!isset($urlparts['scheme'])) {
          
-        $urlparts['scheme'] = 'http';
+      $urlparts['scheme'] = 'http';
     
     }
     
-    if(checkdnsrr($urlparts['host'], 'A') && in_array($urlparts['scheme'],array('http','https')) && ip2long($urlparts['host']) === FALSE){ 
+    if (checkdnsrr($urlparts['host'], 'A') && in_array($urlparts['scheme'],array('http','https')) && ip2long($urlparts['host']) === FALSE){ 
          
        $urlparts['host'] = preg_replace('/^www\./', '', $urlparts['host']);
        $url = $urlparts['scheme'].'://'.$urlparts['host']. "/";            
          
         if (filter_var($url, FILTER_VALIDATE_URL) !== false && @get_headers($url)) {
-             $validation = TRUE;
+             $validation = true;
         }
 
     }
 
   }
 
-  if(!$validation){
-
-    return false;
-
-  } else {
-
-    return true;
-
-  }
+  return (!$validation) ? false : true;
 
 }
 
@@ -67,7 +59,5 @@ function is_valid_domain($url)
  */
 function domain_name()
 {
-  $domain = (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] != 'localhost') ? $_SERVER['HTTP_HOST'] : "";
-
-  return $domain;
+  return (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] != 'localhost') ? $_SERVER['HTTP_HOST'] : "";
 }

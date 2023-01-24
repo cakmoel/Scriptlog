@@ -11,9 +11,7 @@
  */
 function check_config_file($filename)
 {
-
-return (file_exists($filename) ) ? true : false;
-
+ return (file_exists($filename)) ? true : false;
 }
 
 /**

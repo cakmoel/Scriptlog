@@ -14,21 +14,21 @@ function form_id($type = null)
 
  $form_id = null;
 
- if ( $type == "login" ) {
+ if ($type == "login") {
 
-    $form_id = ircmaxell_generator_numbers(0, 999);
+    $form_id = random_int(0, 666);
 
     $_SESSION['human_login_id'] = $form_id;
 
- } elseif ( $type == "comment") {
+ } elseif ($type == "comment") {
 
-    $form_id = ircmaxell_generator_numbers(5, 797);
+    $form_id = random_int(0, 767);
 
     $_SESSION['human_comment_id'] = $form_id;
 
  } else {
 
-    $form_id = ircmaxell_generator_numbers(1, 100);
+    $form_id = random_int(1, 100);
     
     $_SESSION['human_form_id'] = $form_id;
 

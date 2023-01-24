@@ -40,7 +40,7 @@ function generate_schema_org($name = null, $url = null, $image = null, $descript
 
 $contentReferenceTime = date(DATE_ATOM);
 
-$schema = new Schema(
+return new Schema(
     new Thing('Blog', [
 
         'abstract' => $description,
@@ -56,8 +56,6 @@ $schema = new Schema(
         'maintainer' => APP_TITLE
         
     ]));
-
- return $schema;
 
 }
 

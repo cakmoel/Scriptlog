@@ -32,7 +32,7 @@ function human_login_id()
 function verify_human_login_id($loginId)
 {
 
-if ( ( ! isset($_SESSION['human_login_id']) ) || ( ! isset($loginId) ) || ( $_SESSION['human_login_id'] !== $loginId ) ) {     
+if ((! isset($_SESSION['human_login_id'])) || (! isset($loginId)) || ($_SESSION['human_login_id'] !== $loginId)) {     
    
    return false;
    
@@ -54,7 +54,7 @@ return true;
 function review_login_attempt($ip)
 {
 
- return ( alert_login_attempt($ip)['alert_login_attempt'] >= 20 ? true : false );
+ return (alert_login_attempt($ip)['alert_login_attempt'] >= 20 ? true : false);
 
 }                                                    
 
@@ -77,7 +77,7 @@ function review_login_attempt($ip)
 function safe_human_login($ip, $loginId, $uniqueKey, array $values)
 {
 
-if ( check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'scriptpot_email', 'captcha_login', 'remember', 'csrf', 'LogIn']) === false )  {
+if (check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'scriptpot_email', 'captcha_login', 'remember', 'csrf', 'LogIn']) === false)  {
 
    header(APP_PROTOCOL.' 413 Payload Too Large', true, 413);
    header('Status: 413 Payload Too Large');
@@ -86,21 +86,21 @@ if ( check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'scrip
 
 }
 
-if ( false === verify_human_login_id($loginId)) {
+if (false === verify_human_login_id($loginId)) {
 
    http_response_code(400);
    exit("400 Bad Request");
 
 }
 
-if ( ! isset($uniqueKey) && ( $uniqueKey !== md5(app_key().$ip) ) ) {
+if (! isset($uniqueKey) && ($uniqueKey !== md5(app_key().$ip))) {
 
    http_response_code(400);
    exit("400 Bad Request ");
    
 }
 
-if ( review_login_attempt($ip) === true ) {
+if (review_login_attempt($ip) === true) {
 
    write_log($ip, 'unpleasant login attempt!');
    
@@ -108,7 +108,7 @@ if ( review_login_attempt($ip) === true ) {
 
 }
 
-if ( midfielder() === true ) {
+if (midfielder() === true) {
 
    sleep(20);
 
@@ -136,9 +136,9 @@ if ( midfielder() === true ) {
 function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, array $values)
 {
 
-   $login = ( isset($values['login']) && $values['login'] == $_POST['login'] ? prevent_injection($values['login']) : null );
-   $user_pass = ( isset($values['user_pass']) && $values['user_pass'] == $_POST['user_pass'] ? prevent_injection($values['user_pass']) : null );
-   $csrf = ( isset($values['csrf']) && $values['csrf'] == $_POST['csrf']  ? $values['csrf'] : '' );
+   $login = (isset($values['login']) && $values['login'] == $_POST['login'] ? prevent_injection($values['login']) : null);
+   $user_pass = (isset($values['user_pass']) && $values['user_pass'] == $_POST['user_pass'] ? prevent_injection($values['user_pass']) : null);
+   $csrf = (isset($values['csrf']) && $values['csrf'] == $_POST['csrf']  ? $values['csrf'] : '');
       
    $captcha_verified = true;
       
@@ -146,13 +146,13 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
    safe_human_login($ip, $loginId, $uniqueKey, $values);
    $valid = !empty($csrf) && verify_form_token('login_form', $csrf);
       
-   if(!$valid) {
+   if (!$valid) {
       
      $errors['errorMessage'] = "Sorry, attack detected!";
       
    }
    
-   if ( ( !empty($values) ) && ( isset( $values['captcha_login'] ) && $values['captcha_login'] == $_POST['captcha_login'] ) && ( $values['captcha_login'] !== Session::getInstance()->captcha_login) ) {
+   if ((!empty($values) ) && (isset($values['captcha_login']) && $values['captcha_login'] == $_POST['captcha_login']) && ($values['captcha_login'] !== Session::getInstance()->captcha_login)) {
       
       $captcha_verified = false;
       $errors['errorMessage'] = "Enter captcha code correctly";
@@ -161,23 +161,23 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
       
    $failed_login_attempt = get_login_attempt($ip)['failed_login_attempt'];
    $data = get_user_signin($login);
-   $datetime = ( ! empty($data['user_locked_until'] ) ? strtotime($data['user_locked_until']) : null );
-   $signin = ( ! empty($data['user_signin_count'] ) ? $data['user_signin_count'] : 0 );
+   $datetime = (! empty($data['user_locked_until']) ? strtotime($data['user_locked_until']) : null);
+   $signin = (! empty($data['user_signin_count']) ? $data['user_signin_count'] : 0);
    
- if ( ( ! empty($values) ) && ( $captcha_verified === true ) ) {
+ if ((! empty($values)) && ($captcha_verified === true)) {
        
-   $authenticate_user = is_a( $authenticator, 'Authentication' ) ? $authenticator->validateUserAccount($login, $user_pass) : "";
+   $authenticate_user = is_a($authenticator, 'Authentication') ? $authenticator->validateUserAccount($login, $user_pass) : "";
    
-   if ( time() > $datetime ) {
+   if (time() > $datetime) {
    
-      if ( $authenticate_user === false ) {
+      if ($authenticate_user === false) {
    
          http_response_code(403);
          $errors['errorMessage'] = "Check your login details";
       
          $signin++;
       
-         if ( ($failed_login_attempt < 5) || ( $signin % 15 ) ) {
+         if (($failed_login_attempt < 5) || ($signin % 15)) {
            
             create_login_attempt($ip);
       
@@ -250,7 +250,7 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
              
       }
       
-      if ( scriptpot_validate($values) === false ) {
+      if (scriptpot_validate($values) === false) {
          
          http_response_code(403);
          $errors['errorMessage'] = "anomaly behaviour detected!";

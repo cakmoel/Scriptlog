@@ -10,8 +10,9 @@
 function nav_parent($parent_id)
 {
     
-$sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_position
-        FROM tbl_menu WHERE ID = '$parent_id' ";
+$idsanitized = sanitizer($parent_id, 'sql');
+$sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_visibility
+        FROM tbl_menu WHERE ID = '$idsanitized' ";
 
 return db_simple_query($sql);
 
