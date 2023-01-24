@@ -1,6 +1,6 @@
 <?php
 /**
- * dropdown
+ * dropdown()
  * 
  * @category function
  * @see   https://www.phpro.org/tutorials/Dropdown-Select-With-PHP-and-MySQL.html
@@ -18,7 +18,7 @@ function dropdown($name, array $options, $selected=null)
     $selected = $selected;
 
     /*** loop over the options ***/
-    foreach( $options as $key=>$option ) {
+    foreach ($options as $key => $option) {
       
           /*** assign a selected value ***/
           $select = $selected === $key ? '  selected' : null;
