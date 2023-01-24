@@ -15,15 +15,15 @@
 function write_htaccess($permalink_status, $user_level, $data)
 {
 
-(version_compare(PHP_VERSION, '7.4', '>=') ) ? clearstatcache() : clearstatcache(true);
+(version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
 
-$privilege = (isset($user_level) ) ? user_privilege() : "";
+$privilege = (isset($user_level)) ? user_privilege() : "";
 
-if ( $privilege === 'administrator' || $privilege === 'manager' ) {
+if ($privilege === 'administrator' || $privilege === 'manager') {
 
    $fp = fopen(__DIR__ . '/../../.htaccess', 'w');
 
-   if ( $permalink_status === 'yes') {
+   if ($permalink_status === 'yes') {
 
      $sleep_timer = 10; 
    
@@ -62,7 +62,7 @@ $content .= '# The directives (lines) between "START ScriptLog" and "FINISH Scri
 $content .= '# dynamically generated, and should only be modified if you know what you are doing.' . PHP_EOL;
 $content .= '# Any changes to these lines will be overwritten by scriptlog herself on setting permalink.' . PHP_EOL;
    
-if ( $permalink_status === 'yes') {
+if ($permalink_status === 'yes') {
 
    $content .= '<IfModule mod_rewrite.c>' . PHP_EOL;
    $content .= 'RewriteEngine On'. PHP_EOL; 
