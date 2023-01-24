@@ -21,7 +21,7 @@ function uniqid_real($length = 13)
 
     } else {
 
-        throw new Exception("no cryptographically secure random function available");
+        throw new InvalidArgumentException("no cryptographically secure random function available");
 
     }
 
