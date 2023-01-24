@@ -15,13 +15,8 @@ use voku\helper\AntiXSS;
 
 function remove_xss($dirty_string)
 {
-  
-$antiXss = new AntiXSS();
-
-$harmless_string = $antiXss->xss_clean($dirty_string); 
-
-return $harmless_string;
-
+ $antiXss = new AntiXSS();
+ return $antiXss->xss_clean($dirty_string); 
 }
 
 /**
