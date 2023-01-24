@@ -51,7 +51,7 @@
  *
  */
 
-function autoloader($class_paths = NULL, $use_base_dir = true)
+function autoloader($class_paths = null, $use_base_dir = true)
 {
 	static $is_init = false;
 
@@ -65,17 +65,16 @@ function autoloader($class_paths = NULL, $use_base_dir = true)
 
 	static $paths = [];
 
-	if(\is_null($class_paths)) // autoloader(); returns paths (for debugging)
-	{
+	// autoloader(); returns paths (for debugging)
+	if (\is_null($class_paths)) {
 		return $paths;
 	}
 
-	if(\is_array($class_paths) && isset($class_paths[0]) && \is_array($class_paths[0])) // conf settings
-	{
-		foreach($class_paths[0] as $k => $v)
-		{
-			if(isset($conf[$k]) || \array_key_exists($k, $conf))
-			{
+	// conf settings
+	if (\is_array($class_paths) && isset($class_paths[0]) && \is_array($class_paths[0]))  {
+		foreach ($class_paths[0] as $k => $v) {
+
+			if (isset($conf[$k]) || \array_key_exists($k, $conf)) {
 				$conf[$k] = $v; // set conf setting
 			}
 		}
@@ -83,15 +82,14 @@ function autoloader($class_paths = NULL, $use_base_dir = true)
 		unset($class_paths[0]); // rm conf from class paths
 	}
 
-	if(!$is_init) // init autoloader
-	{
+	// init autoloader
+	if (!$is_init) {
 		\spl_autoload_extensions(implode(',', $conf['extensions']));
-		\spl_autoload_register(NULL, false); // flush existing autoloads
+		\spl_autoload_register(null, false); // flush existing autoloads
 		$is_init = true;
 	}
 
-	if($conf['debug'])
-	{
+	if ($conf['debug']) {
 		$paths['conf'] = $conf; // add conf for debugging
 	}
 
