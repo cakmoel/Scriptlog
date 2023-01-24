@@ -20,7 +20,7 @@ function catch_weblink($web_page)
 
  $contents = file_get_contents($web_page);
 
-if (!$contents)  { return null; }
+if (!$contents) { return null; }
 
  $dom_doc = new DOMDocument();
 
