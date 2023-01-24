@@ -33,7 +33,7 @@ function validate_time_login()
     
   } else {
         
-      unset( $_SESSION['timeOut'] );
+      unset($_SESSION['timeOut']);
         
       return false;
       
