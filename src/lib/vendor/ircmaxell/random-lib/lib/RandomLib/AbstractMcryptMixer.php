@@ -72,9 +72,9 @@ abstract class AbstractMcryptMixer extends AbstractMixer
      */
     public function __construct()
     {
-        $this->mcrypt    = mcrypt_module_open($this->getCipher(), '', MCRYPT_MODE_ECB, '');
-        $this->blockSize = mcrypt_enc_get_block_size($this->mcrypt);
-        $this->initv     = str_repeat(chr(0), mcrypt_enc_get_iv_size($this->mcrypt));
+        $this->mcrypt    = @mcrypt_module_open($this->getCipher(), '', MCRYPT_MODE_ECB, '');
+        $this->blockSize = @mcrypt_enc_get_block_size($this->mcrypt);
+        $this->initv     = str_repeat(chr(0), @mcrypt_enc_get_iv_size($this->mcrypt));
     }
 
     /**
@@ -83,7 +83,7 @@ abstract class AbstractMcryptMixer extends AbstractMixer
     public function __destruct()
     {
         if ($this->mcrypt) {
-            mcrypt_module_close($this->mcrypt);
+            @mcrypt_module_close($this->mcrypt);
         }
     }
 
@@ -133,8 +133,8 @@ abstract class AbstractMcryptMixer extends AbstractMixer
         }
 
         $this->prepareCipher($key);
-        $result = mcrypt_generic($this->mcrypt, $input);
-        mcrypt_generic_deinit($this->mcrypt);
+        $result = @mcrypt_generic($this->mcrypt, $input);
+        @mcrypt_generic_deinit($this->mcrypt);
 
         return $result;
     }
@@ -154,8 +154,8 @@ abstract class AbstractMcryptMixer extends AbstractMixer
         }
 
         $this->prepareCipher($key);
-        $result = mdecrypt_generic($this->mcrypt, $input);
-        mcrypt_generic_deinit($this->mcrypt);
+        $result = @mdecrypt_generic($this->mcrypt, $input);
+        @mcrypt_generic_deinit($this->mcrypt);
 
         return $result;
     }
@@ -169,7 +169,7 @@ abstract class AbstractMcryptMixer extends AbstractMixer
      */
     private function prepareCipher($key)
     {
-        if (0 !== mcrypt_generic_init($this->mcrypt, $key, $this->initv)) {
+        if (0 !== @mcrypt_generic_init($this->mcrypt, $key, $this->initv)) {
             throw new \RuntimeException('Failed to prepare mcrypt module');
         }
     }

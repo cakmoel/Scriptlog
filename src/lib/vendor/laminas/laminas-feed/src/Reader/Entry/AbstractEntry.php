@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Laminas\Feed\Reader\Entry;
 
 use DOMDocument;
@@ -14,6 +12,9 @@ use function call_user_func_array;
 use function in_array;
 use function method_exists;
 use function sprintf;
+use function version_compare;
+
+use const PHP_VERSION;
 
 abstract class AbstractEntry
 {
@@ -120,7 +121,8 @@ abstract class AbstractEntry
     public function saveXml()
     {
         $dom   = new DOMDocument('1.0', $this->getEncoding());
-        $entry = $dom->importNode($this->getElement(), true);
+        $deep  = version_compare(PHP_VERSION, '7', 'ge') ? 1 : true;
+        $entry = $dom->importNode($this->getElement(), $deep);
         $dom->appendChild($entry);
         return $dom->saveXML();
     }

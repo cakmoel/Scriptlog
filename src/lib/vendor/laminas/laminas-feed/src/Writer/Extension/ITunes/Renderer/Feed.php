@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Laminas\Feed\Writer\Extension\ITunes\Renderer;
 
 use DOMDocument;
@@ -75,7 +73,7 @@ class Feed extends Extension\AbstractRenderer
         }
         foreach ($authors as $author) {
             $el   = $dom->createElement('itunes:author');
-            $text = $dom->createTextNode((string) $author);
+            $text = $dom->createTextNode($author);
             $el->appendChild($text);
             $root->appendChild($el);
         }
@@ -94,7 +92,7 @@ class Feed extends Extension\AbstractRenderer
             return;
         }
         $el   = $dom->createElement('itunes:block');
-        $text = $dom->createTextNode((string) $block);
+        $text = $dom->createTextNode($block);
         $el->appendChild($text);
         $root->appendChild($el);
         $this->called = true;
@@ -159,7 +157,7 @@ class Feed extends Extension\AbstractRenderer
             return;
         }
         $el   = $dom->createElement('itunes:duration');
-        $text = $dom->createTextNode((string) $duration);
+        $text = $dom->createTextNode($duration);
         $el->appendChild($text);
         $root->appendChild($el);
         $this->called = true;
@@ -177,7 +175,7 @@ class Feed extends Extension\AbstractRenderer
             return;
         }
         $el   = $dom->createElement('itunes:explicit');
-        $text = $dom->createTextNode((string) $explicit);
+        $text = $dom->createTextNode($explicit);
         $el->appendChild($text);
         $root->appendChild($el);
         $this->called = true;
@@ -213,7 +211,7 @@ class Feed extends Extension\AbstractRenderer
             return;
         }
         $el   = $dom->createElement('itunes:new-feed-url');
-        $text = $dom->createTextNode((string) $url);
+        $text = $dom->createTextNode($url);
         $el->appendChild($text);
         $root->appendChild($el);
         $this->called = true;
@@ -233,10 +231,10 @@ class Feed extends Extension\AbstractRenderer
         foreach ($owners as $owner) {
             $el   = $dom->createElement('itunes:owner');
             $name = $dom->createElement('itunes:name');
-            $text = $dom->createTextNode((string) $owner['name']);
+            $text = $dom->createTextNode($owner['name']);
             $name->appendChild($text);
             $email = $dom->createElement('itunes:email');
-            $text  = $dom->createTextNode((string) $owner['email']);
+            $text  = $dom->createTextNode($owner['email']);
             $email->appendChild($text);
             $root->appendChild($el);
             $el->appendChild($name);
@@ -257,7 +255,7 @@ class Feed extends Extension\AbstractRenderer
             return;
         }
         $el   = $dom->createElement('itunes:subtitle');
-        $text = $dom->createTextNode((string) $subtitle);
+        $text = $dom->createTextNode($subtitle);
         $el->appendChild($text);
         $root->appendChild($el);
         $this->called = true;
@@ -275,7 +273,7 @@ class Feed extends Extension\AbstractRenderer
             return;
         }
         $el   = $dom->createElement('itunes:summary');
-        $text = $dom->createTextNode((string) $summary);
+        $text = $dom->createTextNode($summary);
         $el->appendChild($text);
         $root->appendChild($el);
         $this->called = true;
@@ -293,7 +291,7 @@ class Feed extends Extension\AbstractRenderer
             return;
         }
         $el   = $dom->createElement('itunes:type');
-        $text = $dom->createTextNode((string) $type);
+        $text = $dom->createTextNode($type);
         $el->appendChild($text);
         $root->appendChild($el);
         $this->called = true;
