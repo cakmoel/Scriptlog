@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Laminas\Feed\Writer\Extension\PodcastIndex\Renderer;
 
 use DOMDocument;
@@ -57,7 +55,7 @@ class Feed extends Extension\AbstractRenderer
             return;
         }
         $el   = $dom->createElement('podcast:locked');
-        $text = $dom->createTextNode((string) $locked['value']);
+        $text = $dom->createTextNode($locked['value']);
         $el->appendChild($text);
         $el->setAttribute('owner', $locked['owner']);
         $root->appendChild($el);
@@ -75,7 +73,7 @@ class Feed extends Extension\AbstractRenderer
             return;
         }
         $el   = $dom->createElement('podcast:locked');
-        $text = $dom->createTextNode((string) $funding['title']);
+        $text = $dom->createTextNode($funding['title']);
         $el->appendChild($text);
         $el->setAttribute('url', $funding['url']);
         $root->appendChild($el);

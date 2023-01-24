@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Laminas\Feed\Writer\Extension\DublinCore\Renderer;
 
 use DOMDocument;
@@ -67,7 +65,7 @@ class Feed extends Extension\AbstractRenderer
         foreach ($authors as $data) {
             $author = $this->dom->createElement('dc:creator');
             if (array_key_exists('name', $data)) {
-                $text = $dom->createTextNode((string) $data['name']);
+                $text = $dom->createTextNode($data['name']);
                 $author->appendChild($text);
                 $root->appendChild($author);
             }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Laminas\Feed\Writer\Renderer\Feed\Atom;
 
 use DateTime;
@@ -60,7 +58,7 @@ class AbstractAtom extends Feed\Writer\Renderer\AbstractRenderer
         $title = $dom->createElement('title');
         $root->appendChild($title);
         $title->setAttribute('type', 'text');
-        $text = $dom->createTextNode((string) $this->getDataContainer()->getTitle());
+        $text = $dom->createTextNode($this->getDataContainer()->getTitle());
         $title->appendChild($text);
     }
 
@@ -77,7 +75,7 @@ class AbstractAtom extends Feed\Writer\Renderer\AbstractRenderer
         $subtitle = $dom->createElement('subtitle');
         $root->appendChild($subtitle);
         $subtitle->setAttribute('type', 'text');
-        $text = $dom->createTextNode((string) $this->getDataContainer()->getDescription());
+        $text = $dom->createTextNode($this->getDataContainer()->getDescription());
         $subtitle->appendChild($text);
     }
 
@@ -127,7 +125,7 @@ class AbstractAtom extends Feed\Writer\Renderer\AbstractRenderer
         $gdata     = $this->getDataContainer()->getGenerator();
         $generator = $dom->createElement('generator');
         $root->appendChild($generator);
-        $text = $dom->createTextNode((string) $gdata['name']);
+        $text = $dom->createTextNode($gdata['name']);
         $generator->appendChild($text);
         if (array_key_exists('uri', $gdata)) {
             $generator->setAttribute('uri', $gdata['uri']);
@@ -208,18 +206,18 @@ class AbstractAtom extends Feed\Writer\Renderer\AbstractRenderer
             $name   = $this->dom->createElement('name');
             $author->appendChild($name);
             $root->appendChild($author);
-            $text = $dom->createTextNode((string) $data['name']);
+            $text = $dom->createTextNode($data['name']);
             $name->appendChild($text);
             if (array_key_exists('email', $data)) {
                 $email = $this->dom->createElement('email');
                 $author->appendChild($email);
-                $text = $dom->createTextNode((string) $data['email']);
+                $text = $dom->createTextNode($data['email']);
                 $email->appendChild($text);
             }
             if (array_key_exists('uri', $data)) {
                 $uri = $this->dom->createElement('uri');
                 $author->appendChild($uri);
-                $text = $dom->createTextNode((string) $data['uri']);
+                $text = $dom->createTextNode($data['uri']);
                 $uri->appendChild($text);
             }
         }
@@ -257,7 +255,7 @@ class AbstractAtom extends Feed\Writer\Renderer\AbstractRenderer
         }
         $id = $dom->createElement('id');
         $root->appendChild($id);
-        $text = $dom->createTextNode((string) $this->getDataContainer()->getId());
+        $text = $dom->createTextNode($this->getDataContainer()->getId());
         $id->appendChild($text);
     }
 
@@ -291,7 +289,7 @@ class AbstractAtom extends Feed\Writer\Renderer\AbstractRenderer
         }
         $img = $dom->createElement('logo');
         $root->appendChild($img);
-        $text = $dom->createTextNode((string) $image['uri']);
+        $text = $dom->createTextNode($image['uri']);
         $img->appendChild($text);
     }
 

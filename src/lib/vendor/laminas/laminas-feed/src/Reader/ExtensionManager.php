@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Laminas\Feed\Reader;
 
 use function call_user_func_array;
@@ -12,9 +10,6 @@ use function sprintf;
  * Default implementation of ExtensionManagerInterface
  *
  * Decorator of ExtensionPluginManager.
- *
- * @final this class wasn't designed to be inherited from, but we can't assume that consumers haven't already
- *        extended it, therefore we cannot add the final marker without a new major release.
  */
 class ExtensionManager implements ExtensionManagerInterface
 {
@@ -70,8 +65,9 @@ class ExtensionManager implements ExtensionManagerInterface
      * Do we have the named extension?
      *
      * @param  string $extension
+     * @return bool
      */
-    public function has($extension): bool
+    public function has($extension)
     {
         return $this->pluginManager->has($extension);
     }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Laminas\Feed\Writer\Renderer\Feed\Atom;
 
 use DOMDocument;
@@ -71,7 +69,7 @@ class Source extends AbstractAtom implements Renderer\RendererInterface
         $gdata     = $this->getDataContainer()->getGenerator();
         $generator = $dom->createElement('generator');
         $root->appendChild($generator);
-        $text = $dom->createTextNode((string) $gdata['name']);
+        $text = $dom->createTextNode($gdata['name']);
         $generator->appendChild($text);
         if (array_key_exists('uri', $gdata)) {
             $generator->setAttribute('uri', $gdata['uri']);

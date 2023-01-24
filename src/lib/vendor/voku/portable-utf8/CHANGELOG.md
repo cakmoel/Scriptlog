@@ -1,5 +1,14 @@
 # Changelog
 
+### 6.0.11 (2022-12-16)
+
+- test with PHP 8.2
+- added "UTF8::getUrlParamFromArray()": Get data from an array via array like string.
+
+### 6.0.10 (2022-10-06)
+
+- optimize phpdocs (use positive-int)
+
 ### 6.0.9 (2022-09-01)
 
 - optimize phpdocs (use int-range)

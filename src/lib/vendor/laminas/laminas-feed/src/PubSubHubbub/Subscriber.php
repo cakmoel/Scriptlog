@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Laminas\Feed\PubSubHubbub;
 
 use DateInterval;
@@ -782,7 +780,7 @@ class Subscriber
         if (! empty($this->testStaticToken)) {
             return $this->testStaticToken;
         }
-        return uniqid((string) rand(), true) . time();
+        return uniqid(rand(), true) . time();
     }
 
     /**
