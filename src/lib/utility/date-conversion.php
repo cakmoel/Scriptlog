@@ -84,5 +84,47 @@ function grab_month($month = null)
    }
    
    break;
+
  }
+ 
+}
+
+/**
+ * convert_to_timestamp
+ *
+ * converting date to timestamp
+ * 
+ * @category function convert_to_timestamp
+ * @see https://stackoverflow.com/questions/113829/how-to-convert-date-to-timestamp-in-php
+ * @see https://stackoverflow.com/questions/7950854/convert-datetime-to-timestamp-php
+ * @param string $datetime
+ * 
+ */
+function convert_to_timestamp($datetime)
+{
+  $d = DateTime::createFromFormat('Y-m-d H:i:s', $datetime, new DateTimeZone(timezone_identifier()));
+
+  if (false === $d) {
+    
+    scriptlog_error("Incorrect date string");
+
+  } else {
+
+    return $d->getTimestamp();
+
+  }
+
+}
+
+/**
+ * convert_to_atom
+ *
+ * @category function convert_to_atom
+ * @see https://stackoverflow.com/questions/1677373/how-to-format-atom-date-time
+ * @param ?int $timestamp
+ * 
+ */
+function convert_to_atom($timestamp)
+{
+  return date(DATE_ATOM, $timestamp);
 }
