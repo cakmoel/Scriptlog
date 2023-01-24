@@ -2,3 +2,5 @@
 src/lib/composer.json
 
 src/lib/composer.lock
+
+src/lib/vendor/bin/generate-defuse-key
