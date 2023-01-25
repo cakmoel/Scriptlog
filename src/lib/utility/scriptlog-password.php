@@ -1,6 +1,7 @@
 <?php
 /**
- * Scriptlog Password
+ * scriptlog_password
+ * 
  * Encrypt user password
  *  
  * @param string $password

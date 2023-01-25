@@ -11,81 +11,35 @@
  * @since    Since Release 1.0
  * 
  */
-#ini_set("session.cookie_secure", 1);  
-#ini_set("session.cookie_lifetime", 86400);  
-ini_set("session.cookie_httponly", 1);
-#ini_set("session.use_cookies", 1);
-ini_set("session.use_only_cookies", 1);
-#ini_set("session.use_strict_mode", 1);
-#ini_set("session.use_trans_sid", 0);
-ini_set('session.save_handler', 'files');
-ini_set('session.gc_divisor', 100);
-ini_set('session.gc_maxlifetime', 1440);
-ini_set('session.gc_probability',1);
-
-#date_default_timezone_set("GMT");
-
+require __DIR__ . '/options.php';
 require __DIR__ . '/common.php';
 
-if (!defined('PHP_EOL')) {
+(version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
 
-  if (strtoupper(substr(PHP_OS,0,3) == 'WIN')) {
-        
-    define('PHP_EOL',"\r\n");
+$config = array();
 
-  } elseif (strtoupper(substr(PHP_OS,0,3) == 'MAC')) {
-        
-    define('PHP_EOL',"\r");
+if (! file_exists(APP_ROOT.'config.php')) {
     
-  } elseif (strtoupper(substr(PHP_OS,0,3) == 'DAR')) {
-        
-    define('PHP_EOL',"\n");
-      
-  } else {
-        
-    define('PHP_EOL',"\n");
-      
-  }
-
-} 
-
-$is_secure = false;
-
-if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
-
- $is_secure = true;
-
-} elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on') {
-    
- $is_secure = true;
-    
-}
-
-if (!defined('APP_PROTOCOL')) define('APP_PROTOCOL', $protocol = $is_secure ? 'https' : 'http');
-
-if (!defined('APP_HOSTNAME')) define('APP_HOSTNAME', isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
-
-$config = null;
-
-if (is_readable(APP_ROOT.'config.php')) {
-    
-    $config = require __DIR__ . '/../config.php';
-    
- } else {
-     
     if (is_dir(APP_ROOT . 'install')) {
 
-        header("Location: ".APP_PROTOCOL."://".APP_HOSTNAME.dirname($_SERVER['PHP_SELF']).DS.'install');
+        header("Location: ".APP_PROTOCOL."://".APP_HOSTNAME.dirname(htmlspecialchars($_SERVER['PHP_SELF'])).DS.'install');
         exit();
          
     }
-         
-}
+
+} else {
+
+$config = include __DIR__ . '/../config.php';
 
 #================================== call functions in directory lib/utility ===========================================
-$function_directory = new RecursiveDirectoryIterator(__DIR__ . DS .'utility'. DS, FilesystemIterator::FOLLOW_SYMLINKS);
-$filter_iterator = new RecursiveCallbackFilterIterator($function_directory, function ($current, $key, $iterator){
+$directory = new RecursiveDirectoryIterator(__DIR__ . DS .'utility'. DS, FilesystemIterator::FOLLOW_SYMLINKS);
+$filter = new RecursiveCallbackFilterIterator($directory, function ($current, $key, $iterator) {
     
+    // Allow recursion
+    if ($iterator->hasChildren()) {
+        return true;
+    }
+
     // skip hidden files and directories
     if ($current->getFilename()[0] === '.') {
         return false;
@@ -105,9 +59,9 @@ $filter_iterator = new RecursiveCallbackFilterIterator($function_directory, func
     
 });
     
-$files_dir_iterator = new RecursiveIteratorIterator($filter_iterator); 
+$iterator = new RecursiveIteratorIterator($filter); 
 
-foreach ($files_dir_iterator as $file) {
+foreach ($iterator as $file) {
     
     include $file->getPathname();
     
@@ -116,32 +70,36 @@ foreach ($files_dir_iterator as $file) {
 #====================End of call functions in directory lib/utility=====================================================
 
 // check if loader is exists
+if (file_exists(APP_ROOT.APP_LIBRARY.DS.'Autoloader.php')) {
+
+    include __DIR__ . DS . 'Autoloader.php';
+
+}
+
 if (is_readable(APP_ROOT.APP_LIBRARY.DS.'vendor/autoload.php')) {
 
-    require_once __DIR__ . DS . 'vendor/autoload.php';
+    include_once __DIR__ . DS . 'vendor/autoload.php';
     
 }
 
-if (is_dir(APP_ROOT . APP_LIBRARY) && is_file(APP_ROOT . APP_LIBRARY . DS . 'Scriptloader.php')) {
- 
-    require __DIR__ . DS . 'Scriptloader.php';
-      
-}
+Autoloader::setBaseDir(APP_ROOT);
+// load libraries necessary by system
+Autoloader::addClassDir(array(
+  APP_ROOT . APP_LIBRARY . DS . 'core'    . DS,  
+  APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
+  APP_ROOT . APP_LIBRARY . DS . 'event'   . DS,
+  APP_ROOT . APP_LIBRARY . DS . 'app'     . DS,
+  APP_ROOT . APP_LIBRARY . DS . 'provider'. DS
+));
 
-// load all libraries 
-$library = array(
-    APP_ROOT . APP_LIBRARY . DS . 'core'    . DS,
-    APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
-    APP_ROOT . APP_LIBRARY . DS . 'event'   . DS,
-    APP_ROOT . APP_LIBRARY . DS . 'app'     . DS,
-    APP_ROOT . APP_LIBRARY . DS . 'provider'. DS
-);
-
-get_server_load();
-
-load_engine($library);
-
+x_frame_option();
+x_content_type_options();
+x_xss_protection();
+strict_transport_security();
 call_htmlpurifier();
+get_server_load();
+whoops_error();
+content_security_policy(isset($config['app']['url']) ? $config['app']['url'] : "");
 
 #===================== RULES ==========================
 
@@ -159,7 +117,10 @@ call_htmlpurifier();
     'category' => "/category/(?'category'[\w\-]+)", 
     
      ### 'archive/12/2017
-     'archive' => "/archive/[0-9]{2}/[0-9]{2}/[0-9]{4}",
+     'archive' => "/archive/[0-9]{2}/[0-9]{4}",
+
+     ### 'tag/tag-slug'
+     'tag' => "/tag/(?'tag'[\w\-]+)"
 
      ### '/blog?p=255'
     'blog' => "/blog([^/]*)",                       
@@ -179,25 +140,28 @@ $rules = array(
     
     'home'     => "/",                               
     'category' => "/category/(?'category'[\w\-]+)",
-    'archive'  => "/archive/[0-9]{2}/[0-9]{2}/[0-9]{4}",
+    'archive'  => "/archive/[0-9]{2}/[0-9]{4}",
     'blog'     => "/blog([^/]*)",
     'page'     => "/page/(?'page'[^/]+)",
     'single'   => "/post/(?'id'\d+)/(?'post'[\w\-]+)",
-    'search'   => "(?'search'[\w\-]+)"
+    'search'   => "(?'search'[\w\-]+)",
+    'tag'      => "/tag/(?'tag'[\w\-]+)"
     
 );
 
-#==================== END OF RULES ======================
+#==================== END OF RULES =======================
 
-#====== an instantiation of Database connection =========
-$dbc = DbFactory::connect(['mysql:host='.$config['db']['host'].';dbname='.$config['db']['name'], $config['db']['user'], $config['db']['pass']]);
+#====== an instantiation of Database connection ==========
+$dbc = (isset($config['db']['host']) || isset($config['db']['name']) || isset($config['db']['user']) || isset($config['db']['pass'])) ? DbFactory::connect(['mysql:host='.$config['db']['host'].';dbname='.$config['db']['name'], $config['db']['user'], $config['db']['pass']]) : "";
 
-$key = ScriptlogCryptonize::scriptlogCipherKey();
+#====== an instantiation of scriptlog cipher key =========
+$cipher_key = ScriptlogCryptonize::scriptlogCipherKey();
 
-// Register rules of routes, an instance of database connection and key for cryptography
-Registry::setAll(array('dbc' => $dbc, 'route' => $rules, 'key' => $key));
+#====== an instantiation of scriptlog request path =======
+$uri = new RequestPath();
 
-whoops_error();
+// Register rules of routes, an instance of database connection, cipher key for cryptography and uri requested
+Registry::setAll(array('dbc' => $dbc,  'key' => $cipher_key, 'route' => $rules, 'uri'=>$uri));
 
 /* an instances of class that necessary for the system
  * please do not change this below variable 
@@ -209,21 +173,20 @@ whoops_error();
  * @var $userDao, $validator, $authenticator, $ubench --
  * 
  */
-
-content_security_policy();
-
-$sessionMaker = new SessionMaker(set_session_cookies_key());
-$searchPost = new SearchFinder($dbc);
+$sessionMaker = new SessionMaker(set_session_cookies_key((isset($config['app']['email']) ? $config['app']['email'] : ""), (isset($config['app']['key']) ? $config['app']['key'] : "")));
+$searchPost = new SearchFinder();
 $sanitizer = new Sanitize();
 $userDao = new UserDao();
 $userToken = new UserTokenDao();
 $validator = new FormValidator();
 $authenticator = new Authentication($userDao, $userToken, $validator);
 $ubench = new Ubench();
+$dispatcher = new Dispatcher();
+
+}
 
 session_set_save_handler($sessionMaker, true);
 session_save_path(__DIR__ . '/utility/.sessions'.DS);
-
 register_shutdown_function('session_write_close');
 
 if (!start_session_on_site($sessionMaker)) {

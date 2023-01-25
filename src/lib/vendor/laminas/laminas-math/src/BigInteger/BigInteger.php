@@ -1,13 +1,15 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-math for the canonical source repository
- * @copyright https://github.com/laminas/laminas-math/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-math/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Math\BigInteger;
 
+use function call_user_func_array;
+use function class_exists;
+use function extension_loaded;
+use function is_subclass_of;
+use function sprintf;
+use function ucfirst;
+
+// phpcs:ignore WebimpressCodingStandard.NamingConventions.AbstractClass.Prefix
 abstract class BigInteger
 {
     /**
@@ -15,7 +17,7 @@ abstract class BigInteger
      *
      * @var Adapter\AdapterInterface
      */
-    protected static $defaultAdapter = null;
+    protected static $defaultAdapter;
 
     /**
      * Create a BigInteger adapter instance
@@ -30,7 +32,8 @@ abstract class BigInteger
         }
 
         $adapterName = sprintf('%s\\Adapter\\%s', __NAMESPACE__, ucfirst($adapterName));
-        if (! class_exists($adapterName)
+        if (
+            ! class_exists($adapterName)
             || ! is_subclass_of($adapterName, Adapter\AdapterInterface::class)
         ) {
             throw new Exception\InvalidArgumentException(sprintf(

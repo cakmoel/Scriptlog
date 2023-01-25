@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Mailer
  * Send e-mail via mail php function  
@@ -88,7 +88,6 @@ class Mailer
 		$this->textBody = '';
 		$this->sendHTML = false;
 		$this->HTMLBody = '';
-
 	}
 
 	/**
@@ -186,56 +185,44 @@ class Mailer
 	 */
 	public function send($to = null, $subject = null, $message = null, $headers = null)
 	{
-		$success = false;
 
-		if (!is_null($to) && !is_null($subject) && !is_null($message))
-		{
-			$success = mail($to, $subject, $message, $headers);
-			return $success;
-		}
-		else
-		{
+		if (!is_null($to) && !is_null($subject) && !is_null($message)) {
+
+			return mail($to, $subject, $message, $headers);
+		
+		} else {
+
 			$headers = array();
-				
+
 			$eol = PHP_EOL;
-				
-			if (!empty($this->from))
-			{
+
+			if (!empty($this->from)) {
 				$headers[] = 'From: ' . $this->from;
 			}
 
-			if (!empty($this->cc))
-			{
+			if (!empty($this->cc)) {
 				$headers[] = 'CC: ' . $this->cc;
 			}
 
-			if (!empty($this->bcc))
-			{
+			if (!empty($this->bcc)) {
 				$headers[] = 'BCC: ' . $this->bcc;
 			}
 
-			if ($this->sendText && !$this->sendHTML)
-			{
+			if ($this->sendText && !$this->sendHTML) {
 				$message = $this->textBody;
-			}
-
-			elseif (!$this->sendText && $this->sendHTML)
-			{
+			} elseif (!$this->sendText && $this->sendHTML) {
 				$headers[] = 'MIME-Version: 1.0';
 				$headers[] = 'Content-Type: text/html; charset="utf-8"';
-				$headers[] = 'From: <'.APP_EMAIL.'>';
-				$headers[] = 'Reply-To: '.APP_EMAIL;
+				$headers[] = 'From: <' . self::getAppEmail() . '>';
+				$headers[] = 'Reply-To: ' . self::getAppEmail();
 
 				$message = $this->HTMLBody;
-				
-			}
-			//Multipart Message in MIME format
-			elseif ($this->sendText && $this->sendHTML)
-			{
+
+			} elseif ($this->sendText && $this->sendHTML) { //Multipart Message in MIME format
 
 				$headers[] = 'MIME-Version: 1.0';
-				$headers[] = "From: <".APP_EMAIL.">";
-				$headers[] = "Reply-To:".APP_EMAIL;
+				$headers[] = "From: <" . self::getAppEmail() . ">";
+				$headers[] = "Reply-To:" . self::getAppEmail();
 
 				$message .= 'Content-Type: text/plain; charset="utf-8"';
 				$message .= 'Content-Transfer-Encoding: 7bit';
@@ -244,15 +231,27 @@ class Mailer
 				$message .= 'Content-Type: text/html; charset="utf-8"' . "\n";
 				$message .= 'Content-Transfer-Encoding: 7bit' . "\n";
 				$message .= $this->HTMLBody . "\n";
-
 			}
 
-			$success = mail($this->to, $this->subject, $message, implode($eol, $headers));
-				
-			return $success;
+			return mail($this->to, $this->subject, $message, implode($eol, $headers));
 
 		}
-		
 	}
 
+	/**
+	 * getAppEmail
+	 *
+	 * @method private static getAppEmail()
+	 * 
+	 * @return string
+	 * 
+	 */
+	private static function getAppEmail()
+	{
+
+		$email_config = AppConfig::readConfiguration(invoke_config());
+
+		return $email_config['app']['email'];
+
+	}
 }

@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * TopicEvent Class
  *
@@ -39,6 +39,12 @@ class TopicEvent
    */
   private $topic_status;
 
+  /**
+   * TopicDao
+   *
+   * @var object
+   * 
+   */
   private $topicDao;
 
   private $validator;
@@ -110,8 +116,11 @@ class TopicEvent
     
     $this->validator->sanitize($this->topic_id, 'int');
     
-    if (!$data_topic = $this->topicDao->findTopicById($this->topic_id, $this->sanitizer)) {
-        direct_page('index.php?load=topics&error=topicNotFound', 404);
+    if (!$this->topicDao->findTopicById($this->topic_id, $this->sanitizer)) {
+
+      $_SESSION['error'] = "topicNotFound";  
+      direct_page('index.php?load=topics&error=topicNotFound', 404);
+      
     }
     
     return $this->topicDao->deleteTopic($this->topic_id, $this->sanitizer);

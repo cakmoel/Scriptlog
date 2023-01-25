@@ -1,10 +1,9 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 // *****************************************************************************
 // Copyright 2003-2011 by A J Marston <http://www.tonymarston.net>
 // Amended 2011 by A J Marston to replace ereg* functions with preg* functions
-// Distributed under the GNU General Public Licence
-// @package SCRIPTLOG/LIB/CORE/DateGenerator
 // @category Core Class
+// @license  the GNU General Public Licence
 // *****************************************************************************
 class DateGenerator 
 {

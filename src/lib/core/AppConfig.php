@@ -1,19 +1,19 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * AppConfig Class
  * 
- * @category Core Class
- * @author M.Noermoehammad
- * @license MIT
- * @version 1.0
- * 
- * How to use this class :
- * 
+ * Example:
  * AppConfig::writeConfiguration('config.php', array( 'dbhost' => 'foo' ));
  * $config = AppConfig::readConfiguration('config.php');
  * $config['dbhost'] = '127.0.0.1';
  * $config['dbuser'] = 'scriptlog';
  * AppConfig::writeConfiguration('config.php', $config);
+ * 
+ * @category Core Class
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
+ * @since Since Release 1.0
  * 
  */
 class AppConfig

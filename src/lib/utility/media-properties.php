@@ -2,8 +2,8 @@
 /**
  * Function media properties
  *
- * @param [type] $json_data
- * @return void
+ * @param string $json_data
+ * @return mixed
  * 
  */
 function media_properties($json_data = array())

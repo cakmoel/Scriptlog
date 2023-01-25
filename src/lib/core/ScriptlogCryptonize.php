@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class ScriptlogCryptonize
  * 
@@ -150,7 +150,7 @@ try {
  *
  * @param string $ciphertext
  * @param string $key
- * @return void
+ * @return string
  * 
  */
 public static function decipherMessage($ciphertext, $key)
@@ -229,7 +229,7 @@ private static function defaultSecretKey()
 
  } else {
 
-   $key = ircmaxell_random_compat(16);
+   $key = ircmaxell_random_generator(16);
 
  }
 

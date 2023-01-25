@@ -1,6 +1,11 @@
 <?php
 /**
- * Time Keeper Function
+ * time_keeper
+ * 
+ * @category function
+ * @version 1.0
+ * @license MIT
+ * 
  */
 function time_keeper()
 {
@@ -9,8 +14,11 @@ function time_keeper()
 }
 
 /**
- * Validate Time Login
+ * validate_time_login
  * 
+ * @category function
+ * @version 1.0
+ * @license MIT
  * @return boolean
  */
 function validate_time_login()
@@ -25,7 +33,7 @@ function validate_time_login()
     
   } else {
         
-      unset( $_SESSION['timeOut'] );
+      unset($_SESSION['timeOut']);
         
       return false;
       

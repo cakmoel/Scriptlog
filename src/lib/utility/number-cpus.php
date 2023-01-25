@@ -5,7 +5,7 @@
  *
  * @see https://stackoverflow.com/questions/36970270/how-to-calculate-number-of-processor-cores-in-php-script-linux
  * @see https://gist.github.com/ezzatron/1321581
- * @return void
+ * @return null|bool|int|float|string
  * 
  */
 function number_cpus()

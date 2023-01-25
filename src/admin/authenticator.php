@@ -1,9 +1,10 @@
-<?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * File authorizer.php
+ * File authenticator.php
+ * 
  * checking whether session or cookies exists
  * 
- * @category checking whether cookies or session exists or not
+ * @category authenticator.php checking whether cookies or session exists or not
  * @author M.Noermoehammad scriptlog@yandex.com
  * @author Vincy vincy@gmail.com
  * @license MIT
@@ -12,16 +13,16 @@
  * @see https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string
  * @see https://paragonie.com/blog/2015/04/secure-authentication-php-with-long-term-persistence
  * @see https://en.wikibooks.org/wiki/PHP_Programming/Sessions#Avoiding_Session_Fixation
- * @see https://stackoverflow.com/questions/1354999/keep-me-logged-in-the-best-approach/17266448#17266448
+ * @see https://stackoverflow.com/a/17266448/6667699
  * 
  */
-$timeout = Authentication::COOKIE_EXPIRE;
+$timeout = class_exists('Authentication') ? Authentication::COOKIE_EXPIRE : 2592000;
 $current_date = date("Y-m-d H:i:s", time()); 
 $fingerprint  = hash_hmac('sha256', $_SERVER['HTTP_USER_AGENT'], hash('sha256', $ip, true));
 $loggedIn = false;
 
-if ( ( isset(Session::getInstance()->scriptlog_last_active) && Session::getInstance()->scriptlog_last_active < time()-$timeout  ) 
-    || ( isset(Session::getInstance()->scriptlog_fingerprint)  && Session::getInstance()->scriptlog_fingerprint != $fingerprint ) ) {
+if ((isset(Session::getInstance()->scriptlog_last_active) && Session::getInstance()->scriptlog_last_active < time()-$timeout) 
+    || (isset(Session::getInstance()->scriptlog_fingerprint)  && Session::getInstance()->scriptlog_fingerprint != $fingerprint)) {
         
     do_logout($authenticator);
         
@@ -39,53 +40,46 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
     $selector_verified  = false;
     $expired_verified   = false;
  
-    $decrypt_auth = ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $key);
+    $decrypt_auth = ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $cipher_key);
     $token_info = $authenticator->findTokenByLogin($decrypt_auth, 0);
 
     $expected_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
     $correct_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
-
     $expected_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
     $correct_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
 
-    if(!function_exists('hash_equals')) {
+    if (! function_exists('hash_equals') ) {
 
-        if((timing_safe_equals($expected_validator, $correct_validator) == 0) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']))) {
+        if ((timing_safe_equals($expected_validator, $correct_validator) == 0) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']))) {
 
             $validator_verified = true;
-
         }
 
         if ((timing_safe_equals($expected_selector, $correct_selector) == 0) && (Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret))) {
 
             $selector_verified = true;
-
         }
 
     } else {
 
-        if((hash_equals($expected_validator, $correct_validator)) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']) ) ) {
+        if ((hash_equals($expected_validator, $correct_validator)) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']))) {
 
             $validator_verified = true;
-
         }
 
-        if ( (hash_equals($expected_selector, $correct_selector)) && (Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret) ) ) {
+        if ((hash_equals($expected_selector, $correct_selector)) && (Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret))) {
 
             $selector_verified = true;
-
         }
 
     }
-
 
     if ($token_info['expired_date'] >= $current_date) {
 
         $expired_verified = true;
-
     }
 
-    if ((!empty($token_info['ID'])) && $validator_verified && $selector_verified && $expired_verified ) {
+    if ((!empty($token_info['ID'])) && $validator_verified && $selector_verified && $expired_verified) {
 
         $loggedIn = true;
     

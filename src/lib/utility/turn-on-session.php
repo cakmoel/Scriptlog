@@ -8,8 +8,13 @@
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * @param number $life_time
  * @param string $session_name
+ * @param int|numeric $lifetime
+ * @param string $cookies_name
+ * @param string $path
+ * @param string $domain
+ * @param bool $secure
+ * @param bool $httponly
  * @see https://www.php.net/manual/en/function.session-create-id.php
  * @return void
  * 

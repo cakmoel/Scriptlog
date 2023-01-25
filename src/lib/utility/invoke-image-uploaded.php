@@ -12,7 +12,6 @@
 function invoke_image_uploaded($media_filename, $image_thumb = true)
 {
 
-  
    $image_dir =  __DIR__ . '/../../'.APP_IMAGE_SMALL.'small_'.$media_filename;
    
    $image_src = null;

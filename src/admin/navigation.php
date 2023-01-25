@@ -1,4 +1,4 @@
- <?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
+ <?php defined('SCRIPTLOG') || die("Direct access not permitted");
 
  require __DIR__ . '/sidebar-nav.php';
  
@@ -6,11 +6,11 @@
  
 <header class="main-header">
     <!-- Logo -->
-    <a href="<?= app_url().DS.APP_ADMIN.'/index.php?load=dashboard'?>" class="logo">
+    <a href="<?= app_url().DS.APP_ADMIN.'/index.php?load=dashboard'; ?>" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
-      <span class="logo-mini"><b>S</b></span>
+      <span class="logo-mini"><strong>S</strong></span>
       <!-- logo for regular state and mobile devices -->
-      <span class="logo-lg"><b>Script</b>Log</span>
+      <span class="logo-lg"><strong>Script</strong>Log</span>
     </a>
 
     <!-- Header Navbar -->
@@ -28,7 +28,7 @@
             <!-- Menu Toggle Button -->
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <!-- The user image in the navbar-->
-              <i class="fa fa-user-o"></i>
+              <i class="fa fa-user-o fa-fw" aria-hidden="true"></i>&nbsp;
               <!-- hidden-xs hides the username on small devices so only the image appears. -->
               <span class="hidden-xs"><?=(isset($user_level) && $user_level == 'administrator') ? $user_level : $user_login; ?></span>
             </a>
@@ -52,17 +52,17 @@
               <!-- Menu Footer-->
               <li class="user-footer">
                 <div class="pull-left">
-                  <a href="<?=generate_request('index.php', 'get', ['users', ActionConst::EDITUSER, $user_id, $user_session])['link']; ?>" class="btn btn-default btn-flat"><i class="fa fa-user fa-fw"></i>Profile</a>
+                  <a href="<?=generate_request('index.php', 'get', ['users', ActionConst::EDITUSER, $user_id, $user_session])['link']; ?>" class="btn btn-default btn-flat" rel="noopener"><i class="fa fa-user fa-fw" aria-hidden="true"></i>&nbsp; Profile</a>
                 </div>
                 <div class="pull-right">
-                  <a href="<?=generate_request('index.php', 'get', ['logout', ActionConst::LOGOUT, do_logout_id()])['link'];?>" class="btn btn-default btn-flat"><i class="fa fa-sign-out fa-fw"></i>Sign out</a>
+                  <a href="<?=generate_request('index.php', 'get', ['logout', ActionConst::LOGOUT, do_logout_id()])['link'];?>" class="btn btn-default btn-flat" rel="noopener"><i class="fa fa-sign-out fa-fw" aria-hidden="true"></i>&nbsp; Sign out</a>
                 </div>
               </li>
             </ul>
           </li>
           <!-- Control Sidebar Toggle Button -->
           <li>
-            <a href="<?= app_url(); ?>" target="_blank" rel="noopener noreferrer" title="Visit Site" ><i class="fa fa-home"></i></a>
+            <a href="<?= app_url(); ?>" target="_blank" rel="noopener noreferrer" title="Visit Site" ><i class="fa fa-home" aria-hidden="true"></i></a>
           </li>
         </ul>
       </div>

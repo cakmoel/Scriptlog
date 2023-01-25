@@ -4,14 +4,12 @@
  * Read datetime field from MySQL Database
  * 
  * @param string $datetime
+ * @uses DateGenerator::getExternalData 
  * @return string
  * 
  */
 function read_datetime($datetime)
 {
-  
   $dateGenerator = new DateGenerator();
-
-  return $dateGenerator -> getExternalDate($datetime);
-
+  return $dateGenerator->getExternalDate($datetime);
 }

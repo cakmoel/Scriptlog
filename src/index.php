@@ -6,10 +6,9 @@
  * @author   M.Noermoehammad
  * @license  https://opensource.org/licenses/MIT MIT License
  * @version  1.0
+ * @since    Since Release 1.0
  * 
  */
 require __DIR__ . '/lib/main.php'; 
 
-route_request();
-
-
+route_request($dispatcher);

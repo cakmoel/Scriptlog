@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted"); 
 /**
  * Class TopicDao extends Dao
  * 
@@ -17,9 +17,7 @@ class TopicDao extends Dao
    */
   public function __construct()
   {
-	
-	parent::__construct();
-	
+    parent::__construct();
   }
 
   /**
@@ -32,12 +30,7 @@ class TopicDao extends Dao
    */
   public function findTopics($orderBy = 'ID')
   {
-    $sql = "SELECT ID, 
-            topic_title, 
-            topic_slug, 
-            topic_status
-            FROM tbl_topics 
-            ORDER BY :orderBy DESC";
+    $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status FROM tbl_topics ORDER BY :orderBy DESC";
 
     $this->setSQL($sql);
     
@@ -70,30 +63,6 @@ class TopicDao extends Dao
     
   }
   
-  /**
-   * Find Topic by Slug
-   * 
-   * @param string $slug
-   * @param object $sanitize
-   * @param static $fetchMode
-   * @return boolean|array|object
-   */
-  public function findTopicBySlug($slug, $sanitize, $fetchMode = null)
-  {
-      $sql = "SELECT ID, topic_title
-              FROM tbl_topics 
-              WHERE topic_slug = ? AND topic_status = 'Y'";
-      
-      $slug_sanitized = $this->filteringId($sanitize, $slug, 'xss');
-      
-      $this->setSQL($sql);
-     
-      $topicBySlug = (is_null($fetchMode)) ? $this->findRow([$slug_sanitized]) : $this->findRow([$slug_sanitized], $fetchMode);
-
-      return (empty($topicBySlug)) ?: $topicBySlug;
-      
-  }
-  
 /**
   * findPostTopic
   * 
@@ -103,16 +72,14 @@ class TopicDao extends Dao
   */
   public function findPostTopic($topicId, $postId)
   {
-      $sql = "SELECT topic_id 
-              FROM tbl_post_topic
-              WHERE topic_id = :topic_id 
-              AND post_id = :post_id";
       
-      $this->setSQL($sql);
+    $sql = "SELECT topic_id FROM tbl_post_topic WHERE topic_id = :topic_id AND post_id = :post_id";
       
-      $post_topic = $this->findRow([':topic_id' => $topicId, ':post_id' => $postId]);
+    $this->setSQL($sql);
       
-      return (empty($post_topic)) ?: $post_topic;
+    $post_topic = $this->findRow([':topic_id' => $topicId, ':post_id' => $postId]);
+      
+    return (empty($post_topic)) ?: $post_topic;
       
   }
 
@@ -141,31 +108,32 @@ class TopicDao extends Dao
    * @param string $title
    * @param string $slug
    * @param string $status
-   * @param integer $ID
+   * @param integer $topicId
    */
-  public function updateTopic($sanitize, $bind, $ID)
+  public function updateTopic($sanitize, $bind, $topicId)
   {
       
-   $id_sanitized = $this->filteringId($sanitize, $ID, 'sql'); 
+   $cleanId = $this->filteringId($sanitize, $topicId, 'sql'); 
+
    $this->modify("tbl_topics", [
        'topic_title' => $bind['topic_title'],
        'topic_slug' => $bind['topic_slug'],
        'topic_status' => $bind['topic_status']
-   ], "ID = {$id_sanitized}");
+   ], "ID = ".(int)$cleanId);
    
   }
 
   /**
    * Delete an existing records
    * 
-   * @param integer $ID
+   * @param integer $topicId
    * @param string $sanitizing
    */
- public function deleteTopic($ID, $sanitize)
+ public function deleteTopic($topicId, $sanitize)
  {  	
-   $clean_id = $this->filteringId($sanitize, $ID, 'sql');
+   $cleanId = $this->filteringId($sanitize, $topicId, 'sql');
   
-   $this->deleteRecord("tbl_topics", "ID = ".(int)$clean_id);
+   $this->deleteRecord("tbl_topics", "ID = ".(int)$cleanId);
    
  }
 
@@ -177,10 +145,9 @@ class TopicDao extends Dao
   * @param array $checked
   * @return string
   */
- public function setCheckBoxTopic($postId = '', $checked = null)
+ public function setCheckBoxTopic($postId = null, $checked = null)
  {
                   
-   
    if (is_null($checked)) {
       $checked = "checked='checked'";
    }
@@ -190,7 +157,9 @@ class TopicDao extends Dao
 
    $items = $this->findTopics('topic_title');
  
-   if (empty($postId)) {
+   $checked = "";
+
+  if (empty($postId)) {
        
      if (is_array($items)) {
          
@@ -200,11 +169,11 @@ class TopicDao extends Dao
                  
                  if (in_array($item['ID'], $_POST['catID'])) {
                      
-                    $checked="checked='checked'";
+                    $checked = "checked='checked'";
                      
                  } else {
                      
-                     $checked = null;
+                    $checked = null;
                      
                  }
                  
@@ -218,7 +187,7 @@ class TopicDao extends Dao
              
          }
          
-     } else {
+      } else {
          
          $html .= '<div class="checkbox">';
          $html .= '<label>';
@@ -226,18 +195,18 @@ class TopicDao extends Dao
          $html .= '</label>';
          $html .= '</div>';
          
-     }
+      }
     
     
   } else {
      
      if (is_array($items)) {
 
-        foreach ($items as $item) {
+        foreach ($items as $i => $item) {
          
             $post_topic = $this->findPostTopic($item['ID'], $postId);
                
-            if ($post_topic['topic_id'] == $item['ID']) {
+            if (isset($post_topic['topic_id']) && $post_topic['topic_id'] == $item['ID']) {
               
               $checked = "checked='checked'";
             
@@ -247,11 +216,11 @@ class TopicDao extends Dao
               
             }
                
-               $html .= '<div class="checkbox">';
-               $html .= '<label>';
-               $html .= '<input type="checkbox" name="catID[]" value="'.$item['ID'].'" '.$checked.'>'.$item['topic_title'];
-               $html .= '</label>';
-               $html .= '</div>';
+              $html .= '<div class="checkbox">';
+              $html .= '<label>';
+              $html .= '<input type="checkbox" name="catID[]" value="'.$item['ID'].'" '.$checked.'>'.$item['topic_title'];
+              $html .= '</label>';
+              $html .= '</div>';
                
            }
 
@@ -292,9 +261,9 @@ class TopicDao extends Dao
   */
  public function totalTopicRecords($data = array())
  {
-    $sql = "SELECT ID FROM tbl_topics";
-    $this->setSQL($sql);
-    return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
+  $sql = "SELECT ID FROM tbl_topics";
+  $this->setSQL($sql);
+  return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
  }
 
 }

@@ -15,10 +15,8 @@ function set_plugin_navigation($plugin_name)
   
   $plugin = new PluginDao();
   
-  $plugin_actived = $plugin->setMenuPlugin($plugin_name, plugin_authorizer());
-  
-  return $plugin_actived;
-  
+  return $plugin->setMenuPlugin($plugin_name, plugin_authorizer());
+   
 }
 
 /**
@@ -53,13 +51,11 @@ function invoke_plugin($plugin_name, $args)
 
    clip('clip_'.$plugin_name, null, function($plugin_name) { return $plugin_name; });
 
-   $invoke_plugin = clip('clip_'.$plugin_name, $args);
-
-   return $invoke_plugin;
+   return clip('clip_'.$plugin_name, $args);
 
  } else {
 
-    return false;
+   return false;
 
  }
  
@@ -79,9 +75,7 @@ function is_plugin_exist($plugin_name)
 
   $is_plugin_exists = $plugin->pluginExists($plugin_name);
 
-  $is_exists = ($is_plugin_exists) ? true : false;
-
-  return $is_exists;
+  return ($is_plugin_exists) ? true : false;
 
 }
 
@@ -100,8 +94,6 @@ function is_plugin_enabled($plugin_name)
 
   $is_plugin_actived = $plugin->isPluginActived($plugin_name);
 
-  $is_enabled = ($is_plugin_actived) ? true : false;
-
-  return $is_enabled;
+  return ($is_plugin_actived) ? true : false;
 
 }

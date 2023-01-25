@@ -1,10 +1,11 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Random Class
  * 
  * @category Core Class
  * @author Anthony Ferrara me@ircmaxell.com
  * @see https://github.com/ircmaxell/random_compat
+ * @see https://timoh6.github.io/2013/11/05/Secure-random-numbers-for-PHP-developers.html
  * 
  */
 class Random {
@@ -191,8 +192,8 @@ class Random {
      */
     private function genNormal() {
         $buffer = '';
-        if (function_exists('mcrypt_create_iv')) {
-            $buffer = mcrypt_create_iv($this::BLOCK_SIZE, \MCRYPT_DEV_URANDOM);
+        if (function_exists('random_bytes')) {
+            $buffer = $this->mergeBuffers($buffer, random_bytes($this::BLOCK_SIZE));
         }
         if (function_exists('openssl_random_pseudo_bytes')) {
             $strength = true;
@@ -218,8 +219,8 @@ class Random {
      */
     private function genSecure() {
         $buffer = '';
-        if (function_exists('mcrypt_create_iv')) {
-            $buffer = mcrypt_create_iv($this::BLOCK_SIZE, \MCRYPT_DEV_RANDOM);
+        if (function_exists('random_bytes')) {
+            $buffer = $this->mergeBuffers($buffer, random_bytes($this::BLOCK_SIZE));
         }
         if (function_exists('openssl_random_pseudo_bytes')) {
             $strength = true;

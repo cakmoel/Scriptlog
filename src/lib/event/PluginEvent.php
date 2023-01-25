@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * PluginEvent Class
  *
@@ -76,6 +76,12 @@ class PluginEvent
    */
   private $pluginDao;
 
+/**
+ * $validator
+ *
+ * @var object
+ * 
+ */
   private $validator;
 
   private $sanitize;

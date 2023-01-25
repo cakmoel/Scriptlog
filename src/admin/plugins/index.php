@@ -1,3 +1,0 @@
-<?php
-
-// HELP MALEO SENKAWOR

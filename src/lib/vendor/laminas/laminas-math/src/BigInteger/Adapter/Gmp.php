@@ -1,14 +1,25 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-math for the canonical source repository
- * @copyright https://github.com/laminas/laminas-math/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-math/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Math\BigInteger\Adapter;
 
 use Laminas\Math\BigInteger\Exception;
+use TypeError;
+use ValueError;
+
+use function bin2hex;
+use function chr;
+use function ltrim;
+use function mb_strlen;
+use function ord;
+use function pack;
+use function preg_match;
+use function restore_error_handler;
+use function set_error_handler;
+use function str_pad;
+use function strpos;
+
+use const E_WARNING;
+use const STR_PAD_RIGHT;
 
 /**
  * GMP extension adapter
@@ -24,7 +35,7 @@ class Gmp implements AdapterInterface
      */
     public function init($operand, $base = null)
     {
-        $sign    = (strpos($operand, '-') === 0) ? '-' : '';
+        $sign    = strpos($operand, '-') === 0 ? '-' : '';
         $operand = ltrim($operand, '-+');
 
         if (null === $base) {
@@ -37,7 +48,7 @@ class Gmp implements AdapterInterface
                 } else {
                     $m[1] = '';
                 }
-                $operand = str_pad(($m[1] . $m[2]), ($m[3] + 1), '0', STR_PAD_RIGHT);
+                $operand = str_pad($m[1] . $m[2], $m[3] + 1, '0', STR_PAD_RIGHT);
             } else {
                 // let GMP guess base
                 $base = 0;
@@ -46,9 +57,18 @@ class Gmp implements AdapterInterface
 
         set_error_handler(function () {
  /* Do nothing */
-        }, \E_WARNING);
-        $res = gmp_init($sign . $operand, $base);
+        }, E_WARNING);
+
+        try {
+            $res = gmp_init($sign . $operand, $base);
+        } catch (TypeError $e) {
+            $res = false;
+        } catch (ValueError $e) {
+            $res = false;
+        }
+
         restore_error_handler();
+
         if ($res === false) {
             return false;
         }
@@ -106,6 +126,7 @@ class Gmp implements AdapterInterface
      */
     public function div($leftOperand, $rightOperand)
     {
+        // phpcs:ignore SlevomatCodingStandard.Operators.DisallowEqualOperators.DisallowedEqualOperator
         if ($rightOperand == 0) {
             throw new Exception\DivisionByZeroException(
                 "Division by zero; divisor = {$rightOperand}"
@@ -204,7 +225,7 @@ class Gmp implements AdapterInterface
     public function intToBin($int, $twoc = false)
     {
         $nb         = chr(0);
-        $isNegative = (strpos($int, '-') === 0);
+        $isNegative = strpos($int, '-') === 0;
         $int        = ltrim($int, '+-0');
 
         if (empty($int)) {
@@ -215,7 +236,7 @@ class Gmp implements AdapterInterface
             $int = gmp_sub($int, '1');
         }
 
-        $hex  = gmp_strval($int, 16);
+        $hex = gmp_strval($int, 16);
         if (mb_strlen($hex, '8bit') & 1) {
             $hex = '0' . $hex;
         }
@@ -242,7 +263,7 @@ class Gmp implements AdapterInterface
      */
     public function binToInt($bytes, $twoc = false)
     {
-        $isNegative = ((ord($bytes[0]) & 0x80) && $twoc);
+        $isNegative = (ord($bytes[0]) & 0x80) && $twoc;
 
         $sign = '';
         if ($isNegative) {
@@ -270,6 +291,7 @@ class Gmp implements AdapterInterface
      */
     public function baseConvert($operand, $fromBase, $toBase = 10)
     {
+        // phpcs:ignore SlevomatCodingStandard.Operators.DisallowEqualOperators.DisallowedEqualOperator
         if ($fromBase == $toBase) {
             return $operand;
         }
@@ -289,7 +311,7 @@ class Gmp implements AdapterInterface
             return gmp_strval(gmp_init($operand, $fromBase), $toBase);
         }
 
-        $sign    = (strpos($operand, '-') === 0) ? '-' : '';
+        $sign    = strpos($operand, '-') === 0 ? '-' : '';
         $operand = ltrim($operand, '-+');
 
         $chars = self::BASE62_ALPHABET;
@@ -305,6 +327,7 @@ class Gmp implements AdapterInterface
             $decimal = gmp_init($operand);
         }
 
+        // phpcs:ignore SlevomatCodingStandard.Operators.DisallowEqualOperators.DisallowedEqualOperator
         if ($toBase == 10) {
             return gmp_strval($decimal);
         }
@@ -312,9 +335,9 @@ class Gmp implements AdapterInterface
         // convert decimal to base
         $result = '';
         do {
-            list($decimal, $remainder) = gmp_div_qr($decimal, $toBase);
-            $pos    = gmp_strval($remainder);
-            $result = $chars[$pos] . $result;
+            [$decimal, $remainder] = gmp_div_qr($decimal, $toBase);
+            $pos                   = gmp_strval($remainder);
+            $result                = $chars[$pos] . $result;
         } while (gmp_cmp($decimal, '0'));
 
         return $sign . $result;

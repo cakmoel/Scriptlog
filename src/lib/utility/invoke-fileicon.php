@@ -14,54 +14,42 @@ function invoke_fileicon($media_type)
 
     case "application/pdf":
      
-       $pdf_icon = '<i class="fa fa-file-pdf-o fa-3x"></i>';
+       return '<i class="fa fa-file-pdf-o fa-3x" aria-hidden="true"></i>';
   
-       return $pdf_icon;
-
        break;
 
     case "application/vnd.ms-excel":
     case "application/vnd.oasis.opendocument.spreadsheet":  
     
-       $msexcel_icon = '<i class="fa fa-file-excel-o fa-3x"></i>'; 
+       return '<i class="fa fa-file-excel-o fa-3x" aria-hidden="true"></i>'; 
     
-       return $msexcel_icon;
-
        break;
 
     case "application/msword":
     case "application/vnd.oasis.opendocument.text":  
 
-        $msword_icon = '<i class="fa fa-file-word-o fa-3x"></i>';
-
-        return $msword_icon;
+        return '<i class="fa fa-file-word-o fa-3x" aria-hidden="true"></i>';
 
         break;
 
     case "application/vnd.ms-powerpoint":
 
-        $mspwrpoint_icon = '<i class="fa fa-file-powerpoint-o fa-3x"></i>';
-
-        return $mspwrpoint_icon;
+        return '<i class="fa fa-file-powerpoint-o fa-3x" aria-hidden="true"></i>';
 
         break;
 
     case "application/zip":
     case "application/x-rar-compressed":
         
-        $archive_icon = '<i class="fa fa-file-zip-o fa-3x"></i>';
-
-        return $archive_icon;
+        return '<i class="fa fa-file-zip-o fa-3x" aria-hidden="true"></i>';
 
         break;
      
-    case "audio/mp3":
+    case "audio/mpeg":
     case "audio/wav":
     case "audio/ogg":
       
-        $audio_icon = '<i class="fa fa-file-audio-o fa-3x"></i>';
-
-        return $audio_icon;
+        return '<i class="fa fa-file-audio-o fa-3x" aria-hidden="true"></i>';
 
         break;
 
@@ -69,9 +57,7 @@ function invoke_fileicon($media_type)
     case "video/webm":
     case "video/ogg":  
       
-        $video_icon = '<i class="fa fa-file-video-o fa-3x"></i>';
-
-        return $video_icon;
+        return '<i class="fa fa-file-video-o fa-3x" aria-hidden="true"></i>';
 
         break;
 
@@ -80,18 +66,14 @@ function invoke_fileicon($media_type)
     case "image/gif":
     case "image/webp":
         
-        $image_icon = '<i class="fa fa-file-image-o fa-3x"></i>';
-
-        return $image_icon;
+        return '<i class="fa fa-file-image-o fa-3x" aria-hidden="true"></i>';
 
         break;
 
    default:
      
-      $file_icon = '<i class="fa fa-file-o fa-3x"></i>';
+      return '<i class="fa fa-file-o fa-3x" aria-hidden="true"></i>';
  
-      return $file_icon;
-
      break;
 
  }

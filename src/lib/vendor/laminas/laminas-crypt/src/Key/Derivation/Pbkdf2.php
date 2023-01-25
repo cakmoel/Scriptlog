@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-crypt for the canonical source repository
- * @copyright https://github.com/laminas/laminas-crypt/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-crypt/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Crypt\Key\Derivation;
 
 use Laminas\Crypt\Hmac;
@@ -34,7 +28,7 @@ class Pbkdf2
     public static function calc($hash, $password, $salt, $iterations, $length)
     {
         if (! Hmac::isSupported($hash)) {
-            throw new Exception\InvalidArgumentException("The hash algorithm $hash is not supported by " . __CLASS__);
+            throw new Exception\InvalidArgumentException("The hash algorithm $hash is not supported by " . self::class);
         }
 
         $num    = ceil($length / Hmac::getOutputSize($hash, Hmac::OUTPUT_BINARY));

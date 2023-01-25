@@ -1,53 +1,56 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
  <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
     <section class="content-header">
-      <h1>
-        <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
-        <small></small>
+      <h1><?=(isset($pageTitle) ? $pageTitle : "") ; ?>
+        <small>Control Panel</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
         <li><a href="index.php?load=option-general">General Settings</a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
     </section>
 
-    <!-- Main content -->
+<!-- Main content -->
 <section class="content">
 <div class="row">
- <div class="col-md-8">
-   <div class="box box-primary">
-      <div class="box-header with-border"></div>
+<div class="col-md-8">
+<div class="box box-primary">
+<div class="box-header with-border"></div>
       <!-- /.box-header -->
 <?php
 if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
+<h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
 endforeach;
 ?>
 </div>
-<?php 
-endif;
-?>
 
 <?php 
-  if (isset($status)) :
-?>
+
+endif;
+
+if (isset($status)) :
+
+?>  
+
 <div class="alert alert-success alert-dismissible">
-    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-    <h2><i class="icon fa fa-check"></i> Success!</h2>
+  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+  <h2><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h2>
+    
     <?php 
         foreach ($status as $s) :
           echo $s;
         endforeach;
     ?>
+    
 </div>
 
 <?php
@@ -59,16 +62,15 @@ $action = (isset($formAction)) ? $formAction : null;
 ?>
 
 <div class="box-body">
-  
-     <form method="post" action="<?= generate_request('index.php', 'get', ['option-general', $action, 0])['link']; ?>" role="form">
-        <table class="table table-bordered table-striped">
+  <form method="post" action="<?= generate_request('index.php', 'get', ['option-general', $action, 0])['link']; ?>" role="form">
+    <table class="table table-bordered table-striped" aria-describedby="general-setting">
           <tbody>
           <?php 
             if (is_array($settings)) :
               $i = 0;
               foreach ($settings as $s) :
 
-                 switch ($s['setting_name']) {
+                switch ($s['setting_name']) {
 
                    case 'app_key':
                      
@@ -112,16 +114,18 @@ $action = (isset($formAction)) ? $formAction : null;
                      
                    break;
                    
-                 }
+                }
 
           ?>
-             <tr>
-              <th><label for="<?=(isset($s['setting_name'])) ? safe_html($s['setting_name']) : ""; ?>"> <?= safe_html($setting_name); ?></label></th>
+            <tr>
+              <th>
+              <label for="<?=(isset($s['setting_name'])) ? safe_html($s['setting_name']) : ""; ?>"> <?=(isset($setting_name) ? safe_html($setting_name) : ""); ?></label>
+              </th>
               <td>
-              <input type="hidden" name="<?= 'setting_id['.$s['ID'].']'; ?>" value="<?= safe_html((int)$s['ID']);?>">
-              <input type="text" name="<?= 'setting_value['.$s['ID'].']' ?>" class="form-control" id="<?=(isset($s['setting_name'])) ? safe_html($s['setting_name']) : ""; ?>" value="<?= safe_html($s['setting_value']); ?>" maxlength="255" >
+                <input type="hidden" name="<?= 'setting_id['.$s['ID'].']'; ?>" value="<?= safe_html((int)$s['ID']);?>">
+                <input type="text" name="<?= 'setting_value['.$s['ID'].']' ?>" class="form-control" id="<?=(isset($s['setting_name'])) ? safe_html($s['setting_name']) : ""; ?>" value="<?= safe_html($s['setting_value']); ?>" maxlength="255" >
               </td>
-             </tr>
+            </tr>
              
           <?php
                 $i++;
@@ -143,5 +147,5 @@ $action = (isset($formAction)) ? $formAction : null;
 </div>     
 </section>
     <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
+</div>
+<!-- /.content-wrapper -->

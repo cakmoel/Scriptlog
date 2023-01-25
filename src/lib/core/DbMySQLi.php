@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class DbMySQLi
  * 
@@ -8,7 +8,6 @@
  * @version 1.0
  * 
  */
-
 class DbMySQLi
 {
 
@@ -45,20 +44,26 @@ public function __construct()
     $this->dbname = self::$config['db']['name'];
 
     $this->dbc = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->dbname);
-      
+   
     if ($this->dbc->connect_errno) {
 
-       throw new mysqli_sql_exception("Error Processing Request", 1);
-       
+      $this->disconnect();
+      throw new mysqli_sql_exception("Error Processing Connection", 1);
+      
     }
-
+    
     self::activateReportMode();
+    $this->dbc->set_charset('utf8mb4');
+
+  } catch (Throwable $th) {
+
+    $this->errors = LogError::setStatusCode(http_response_code(500));
+    $this->errors = LogError::exceptionHandler($th);
 
   } catch (mysqli_sql_exception $e) {
-      
-      $this->disconnect();
-      $this->errors = LogError::newMessage($e);
-      $this->errors = LogError::customErrorMessage('admin');
+        
+    $this->errors = LogError::setStatusCode(http_response_code(500));
+    $this->errors = LogError::exceptionHandler($e);
 
   }
 
@@ -69,14 +74,14 @@ public function __destruct()
   
   if ($this->dbc) {
 
-      $this->disconnect();
+    $this->disconnect();
 
   }
 
 }
 
 /**
- * Unable active report mode on MySQLi Driver
+ * activate report mode on MySQLi Driver
  *
  * @return void
  * 
@@ -86,7 +91,7 @@ public static function activateReportMode()
   
   if (self::$report_mode[] = new mysqli_driver()) {
 
-      self::$report_mode[] =  MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+    self::$report_mode[] =  MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
 
   }
 
@@ -101,7 +106,7 @@ public static function activateReportMode()
 public static function getInstance()
 {
 
-  if( self::$inst == null ) {
+  if (self::$inst == null ) {
 
       self::$inst = new DbMySQLi();
 
@@ -111,11 +116,50 @@ public static function getInstance()
     
 }
 
+/**
+ * dbMySQLiTransaction()
+ *
+ * @return bol
+ * 
+ */
+public function dbMySQLTransaction()
+{
+  $this->dbc->begin_transaction();
+}
+
+/**
+ * dbMySQLiCommit()
+ *
+ */
+public function dbMySQLCommit()
+{
+  $this->dbc->commit();
+}
+
+/**
+ * dbMySQLiLastInsertId
+ *
+ */
+public function dbMySQLInsertId()
+{
+  $this->dbc->insert_id;
+}
+
+/**
+ * disconnect()
+ *
+ */
 public function disconnect()
 {
   $this->dbc->close();
 }
 
+/**
+ * simpleQuery
+ *
+ * @param string $sql
+ * 
+ */
 public function simpleQuery($sql)
 {
 
@@ -126,8 +170,8 @@ public function simpleQuery($sql)
   } catch (mysqli_sql_exception $e) {
     
      $this->disconnect();
-     $this->errors = LogError::newMessage($e);
-     $this->errors = LogError::customErrorMessage();
+     $this->errors = LogError::setStatusCode(http_response_code(500));
+     $this->errors = LogError::exceptionHandler($e);
 
   }
 
@@ -160,16 +204,24 @@ public function simpleQuery($sql)
  * @return object
  * 
  */
-public function preparedQuery($sql, $params = [], $types = "")
+public function preparedQuery($sql, $params, $types = "")
 {
   
   $types = $types ?: str_repeat("s", count($params));
 
   $stmt = $this->dbc->prepare($sql);
 
-  $stmt->bind_param($types, ...$params);
+  if (!$stmt) {
+
+    return false;
+
+  } else {
+
+    $stmt->bind_param($types, ...$params);
   
-  $stmt->execute();
+    $stmt->execute();
+
+  }
   
   return $stmt;
 
@@ -255,7 +307,7 @@ $this->preparedQuery($sql, array_values($data));
  * escape_string
  *
  * @param string $field
- * @return void
+ * @return string
  * 
  */
 public function escape_string($field)
@@ -282,7 +334,7 @@ public function filterData($data)
 
  if (!is_array($data)) {
 
-    $data = trim($this->dbc->real_escape_string($data));
+    $data = trim($this->escape_string($data));
     $data = purify_dirty_html($data);
     
  } else {
@@ -316,31 +368,17 @@ public function cleanOutputDisplay($data)
  */
 public function isTableExists($table_name)
 {
-  
- try {
-   
   $database = $this->dbname;
   $check_table = $this->dbc->query("SHOW TABLES LIKE '$table_name'");
   $check_table_schema = $this->dbc->query("SELECT table_name FROM information_schema.tables WHERE table_schema = '$database' AND table_name = '$table_name'");
  
-  if (($check_table->num_rows > 0) || ($check_table_schema->num_rows == 1)) {
+  (($check_table->num_rows > 0) || ($check_table_schema->num_rows == 1) ? true : false); 
 
-    return true;
+  if (is_resource($check_table) || is_resource($check_table_schema)) {
 
-  } else {
-
-    return false;
+    $check_table->free();
 
   }
-
-  $check_table->free();
-
- } catch (mysqli_sql_exception $e) {
-   
-    $this->errors = LogError::newMessage($e);
-    $this->errors = LogError::customErrorMessage();
-
- }
   
 }
 
@@ -348,41 +386,36 @@ public function isTableExists($table_name)
  * getNumRows
  *
  * @param string $sql
- * @return void
- * 
+ * @return int|string
  */
-public function getNumRows($sql)
+public function getNumRows($results)
 {
   
- try {
-   
-  self::$counter++;
-
-  $num_rows = $this->dbc->query($sql);
+ if ($results) {
 
   if ($this->dbc->error) {
 
-     throw new mysqli_sql_exception($this->dbc->error);
+    throw new mysqli_sql_exception($this->dbc->error);
 
   } else {
 
-      return $num_rows->num_rows;
+    if ($row_count = $results->num_rows) {
+
+      return $row_count;
+        
+    }
 
   }
 
- } catch (mysqli_sql_exception $e) {
-   
-    $this->errors = LogError::newMessage($e);
-    $this->errors = LogError::customErrorMessage();
-
  }
+  
 
 }
 
 /**
  * getResult
  * 
- * @param string $Statement
+ * @param object $Statement
  * @see https://stackoverflow.com/questions/10752815/mysqli-get-result-alternative
  * @return array
  * 
@@ -394,13 +427,13 @@ $result = array();
 
 $Statement->store_result();
     
-  for ( $i = 0; $i < $Statement->num_rows; $i++ ) {
+  for ($i = 0; $i < $Statement->num_rows; $i++) {
         
      $Metadata = $Statement->result_metadata();
         
      $params = array();
         
-    while ( $Field = $Metadata->fetch_field() ) {
+    while ($Field = $Metadata->fetch_field() ) {
             
       $params[] = &$result[ $i ][ $Field->name ];
         
@@ -424,11 +457,7 @@ $Statement->store_result();
  */
 private function getConfiguration()
 {
-
-  $config = AppConfig::readConfiguration(invoke_config());
-
-  return $config;
-  
+  return AppConfig::readConfiguration(invoke_config());
 }
 
 }

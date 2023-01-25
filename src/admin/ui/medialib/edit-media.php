@@ -1,8 +1,8 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
-
+<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
-    <section class="content-header">
+  <section class="content-header">
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
         <small>Control Panel</small>
@@ -12,7 +12,7 @@
         <li><a href="index.php?load=medialib">Media</a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
-    </section>
+  </section>
 
  <!-- Main content -->
 <section class="content">
@@ -26,7 +26,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
+<h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -35,9 +35,7 @@ endforeach;
 </div>
 <?php 
 endif;
-?>
 
-<?php 
 $action = isset($formAction) ? $formAction : null;
 $media_id = isset($mediaData['ID']) ? $mediaData['ID'] : 0;
 ?>
@@ -53,36 +51,39 @@ if (isset($mediaData['media_filename']) && isset($mediaData['media_type'])) :
 
   $webp_src = invoke_webp_image($mediaData['media_filename'], false);
   $image_src = invoke_image_uploaded($mediaData['media_filename'], false);
-  $webp_src_thumb = invoke_webp_image($mediaData['media_filename']);
-  $image_src_thumb = invoke_image_uploaded($mediaData['media_filename']);
+  $webp_src_thumb = invoke_webp_image($mediaData['media_filename'], true);
+  $image_src_thumb = invoke_image_uploaded($mediaData['media_filename'], true);
   $video_src = invoke_video_uploaded($mediaData['media_filename']);
   $audio_src = invoke_audio_uploaded($mediaData['media_filename']);
   
-     if( ! ($image_src_thumb || $webp_src_thumb)) :
+    if( ! ($image_src_thumb || $webp_src_thumb)) :
       
-       $webp_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
-       $image_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
+      $webp_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
+      $image_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
 
-     endif;
+    endif;
 
-if($image_src || $webp_src) :
+if ($image_src || $webp_src) :
 
 ?>
 
 <div class="form-group">
 <a href="<?=$webp_src;?>" title="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
-<picture class="thumbnail">
+<picture class="img-responsive pad">
 <source srcset="<?= $webp_src_thumb; ?>" type="image/webp">
-<img src="<?= $image_src_thumb;?>" class="img-responsive pad" width="320" alt="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
+<img src="<?= $image_src_thumb;?>" class="img-responsive pad" alt="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
 </picture>
 </a>
-<div id="image-preview">
+</div>
+
+<div class="form-group">
+<div class="img-responsive pad" id="image-preview">
   <label for="image-upload" id="image-label">Change picture</label>
   <input type="file" name="media" id="image-upload" accept="image/*" maxlength="512" >
 </div>
 <p class="help-block">Maximum upload file size: <?= format_size_unit(APP_FILE_SIZE); ?>.</p>
-</div>
-  
+</div>  
+
 <?php else: ?>
 
 <div class="form-group">
@@ -91,21 +92,21 @@ if($image_src || $webp_src) :
 if ($mediaData['media_type'] == "video/webm" || $mediaData['media_type'] == "video/mp4" || $mediaData['media_type'] == "video/ogg") :
 ?>
 
-<video class="thumbnail"controls width="600" height="320">
+<video class="img-responsive pad" controls width="600" height="320">
 <source src="<?=$video_src; ?>" type="<?=$mediaData['media_type']; ?>">
 Sorry, your browser doesn't support embedded <code>videos</code>
 </video>
 
 <?php  elseif($mediaData['media_type'] == "audio/mpeg" || $mediaData['media_type'] == "audio/wav" || $mediaData['media_type'] == "audio/ogg") : ?>
 
-<audio class="thumbnail" controls>
+<audio class="img-responsive pad" controls>
 <source src="<?=$audio_src; ?>" type="<?=$mediaData['media_type']; ?>">
 Your browser does not support the <code>audio</code> element. 
 </audio>
 
 <?php else :?>
 
-<a href="#" class="thumbnail"><?=invoke_fileicon($mediaData['media_type']);?></a>
+<a href="#" class="img-responsive pad"><?=invoke_fileicon($mediaData['media_type']);?></a>
 
 <?php endif; ?>
 
@@ -128,19 +129,19 @@ Your browser does not support the <code>audio</code> element.
 
 <div class="form-group">
 <label for="caption">Caption </label>
-<input type="text" class="form-control" id="caption" name="media_caption" placeholder="type media caption" value="
-<?=(isset($mediaData['media_caption'])) ? purify_dirty_html($mediaData['media_caption']) : ""; ?>
-<?=(isset($formData['media_caption'])) ? safe_html($formData['media_caption']) : ""; ?>" maxlength="200" >
+<input type="text" class="form-control" id="caption" name="media_caption" placeholder="enter media caption" value="
+<?=(isset($mediaData['media_caption'])) ? safe_html($mediaData['media_caption']) : ""; ?>
+<?=(isset($formData['media_caption'])) ? purify_dirty_html($formData['media_caption']) : ""; ?>" maxlength="200" >
 </div>
 
 <div class="form-group">
-<label for="media_target">Display on</label>
+<label for="media_target">Display on</label><br>
 <?=(isset($mediaTarget)) ? $mediaTarget : ""; ?>
 </div>
 <!-- media target -->
 
 <div class="form-group">
-<label for="media_access">Access</label>
+<label for="media_access">Access</label><br>
 <?=(isset($mediaAccess)) ? $mediaAccess : ""; ?>
 </div>
 <!-- media access -->
@@ -204,7 +205,7 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
     ?>
 
                 <dt>File name</dt>
-                <dd><?= purify_dirty_html($media_properties['Origin']); ?></dd>
+                <dd><?= safe_html($media_properties['Origin']); ?></dd>
                 <dt>MIME type</dt>
                 <dd><?= safe_html($media_properties['File type']); ?></dd>
                 <dt>File size</dt>
@@ -212,7 +213,7 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
                 <dt>Uploaded by</dt>
                 <dd><?=(isset($mediaData['media_user'])) ? safe_html($mediaData['media_user']) : ""; ?></dd>
                 <dt>Uploaded on</dt>
-                <dd><?= safe_html($media_properties['Uploaded on']); ?></dd>
+                <dd><?= safe_html($media_properties['Uploaded at']); ?></dd>
                 <dt>Dimension</dt>
                 <dd><?=(isset($mediaData['media_type']) && $mediaData['media_type'] != "image/jpeg" && $mediaData['media_type'] != "image/png" 
                       && $mediaData['media_type'] != "image/webp" 
@@ -223,11 +224,11 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
                  endif;
               ?>
               
-              </dl>
-            </div>
-            <!-- /.box-body -->
-          </div>
-          <!-- /.box -->
+  </dl>
+  </div>
+  <!-- /.box-body -->
+</div>
+<!-- /.box box-solid-->
 </div>
 <!--/.col-md-6 -->
 <?php endif; ?>

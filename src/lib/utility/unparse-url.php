@@ -1,6 +1,7 @@
 <?php
 /**
- * Unparse URL
+ * unparse_url
+ * 
  * Simple conversion back to string from a parsed URL
  * 
  * @param string $parsed_url

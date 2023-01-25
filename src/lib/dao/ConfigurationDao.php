@@ -1,7 +1,6 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Configuration extends Dao
- * 
  * 
  * @category  Dao Class
  * @author    Maoelana Noermoehammad
@@ -12,6 +11,8 @@
  */
 class ConfigurationDao extends Dao
 {
+
+ private $selected;
 
 /**
  * 
@@ -24,25 +25,6 @@ public function __construct()
 }
 
 /**
- * Create configuration
- * 
- * @method public createConfig()
- * @param array $bind
- * 
- */
-public function createConfig($bind)
-{
-  // insert into settings
-  $this->create("tbl_settings", [
-              
-       'setting_name' => $bind['setting_name'],
-       'setting_value' => $bind['setting_value']
-
-  ]);
-
-}
-
-/**
  * Update configuration
  * 
  * @method public updateConfig()
@@ -51,15 +33,21 @@ public function createConfig($bind)
  * @param integer $ID
  * 
  */
-public function updateConfig($sanitize, $bind, $ID)
+public function updateConfig($sanitize, $bind, $configId)
 {
-  $cleanId = $this->filteringId($sanitize, $ID, 'sql');
+  $cleanId = $this->filteringId($sanitize, $configId, 'sql');
 
-  $this->modify("tbl_settings", [
-	  'setting_name' => $bind['setting_name'],
-	  'setting_value' => $bind['setting_value']
-  ], "`ID` = {$cleanId}");
+  if ( !empty($bind['setting_name'])) {
 
+    $this->modify("tbl_settings", [
+
+      'setting_name' => $bind['setting_name'],
+      'setting_value' => $bind['setting_value']
+      
+    ], " ID = ".(int)$cleanId);
+  
+  }
+ 
 }
 
 /**
@@ -69,12 +57,10 @@ public function updateConfig($sanitize, $bind, $ID)
  * @param integer $ID
  * 
  */
-public function deleteConfig($ID, $sanitize)
+public function deleteConfig($configId, $sanitize)
 {
-  $clean_id = $this->filteringId($sanitize, $ID, 'sql');
-
+  $clean_id = $this->filteringId($sanitize, $configId, 'sql');
   $this->deleteRecord("tbl_settings", "ID = ".(int)$clean_id);
-
 }
 
 /**
@@ -87,6 +73,7 @@ public function deleteConfig($ID, $sanitize)
  */
 public function findConfigs($orderBy = 'ID')
 {
+  
   $sql = "SELECT ID, setting_name, setting_value 
           FROM tbl_settings 
           ORDER BY :orderBy DESC";
@@ -104,7 +91,7 @@ public function findConfigs($orderBy = 'ID')
  *
  * @param string $orderBy
  * @param integer $limit
- * @return void
+ * @return array
  * 
  */
 public function findGeneralConfigs($orderBy = 'ID', $limit = 7)
@@ -116,6 +103,25 @@ public function findGeneralConfigs($orderBy = 'ID', $limit = 7)
  $general_configs = $this->findAll([':orderBy' => $orderBy, ':limit' => $limit]);
 
  return (empty($general_configs)) ?: $general_configs;
+
+}
+
+/**
+ * findReadingConfigs
+ *
+ * @param string $orderBy
+ * @return array
+ * 
+ */
+public function findReadingConfigs($orderBy = 'ID')
+{
+  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE ID BETWEEN 8 AND 11 ORDER BY :orderBy ";
+
+  $this->setSQL($sql);
+
+  $reading_configs = $this->findAll([':orderBy' => $orderBy]);
+
+  return (empty($reading_configs)) ?: $reading_configs;
 
 }
 
@@ -144,6 +150,14 @@ public function findConfig($id, $sanitize)
   
 }
 
+/**
+ * findConfigByName
+ *
+ * @param string $setting_name
+ * @param object $sanitize
+ * @return array
+ * 
+ */
 public function findConfigByName($setting_name, $sanitize)
 {
   
@@ -153,7 +167,7 @@ public function findConfigByName($setting_name, $sanitize)
 
   $this->setSQL($sql);
 
-  $detailConfig = $this->findRow([':setting_name' => $setting_name]);
+  $detailConfig = $this->findRow([':setting_name' => $name_sanitized]);
 
   return (empty($detailConfig)) ?: $detailConfig;
 
@@ -186,6 +200,44 @@ public function checkToSetup()
 	$this->setSQL($sql);
 	$stmt = $this->checkCountValue();
 	return $stmt < 1;
+}
+
+/**
+ * dropDownTimezone
+ *
+ * @param string $selected
+ * 
+ */
+public function dropDownTimezone($selected = null)
+{
+
+  $name = 'timezone';
+
+  $dropdown = '<div class="form-group">'. PHP_EOL;
+  $dropdown .= '<label for="timezone">Timezone</label>'. PHP_EOL;
+  $dropdown .= '<select class="form-control select2" style="width: 100%;" name="'.$name.'" id="'.$name.'">'. PHP_EOL;
+  $dropdown .= '<option disabled selected>Please Select Timezone</option>' . PHP_EOL;
+
+  $this->selected = $selected;
+
+  $timezone_list = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
+  
+  foreach ($timezone_list as $option) {
+    
+    $select = $this->selected === $option ? '  selected' : null;
+
+    /*** add each option to the dropdown ***/
+    $dropdown .= '<option value="'.$option.'"'.$select.'>'.$option.'</option>'. PHP_EOL;
+
+  }
+
+  /*** close the select ***/
+  $dropdown .= '</select>'. PHP_EOL;
+  $dropdown .= '</div>';
+    
+  /*** and return the completed dropdown ***/
+  return $dropdown;
+  
 }
 
 /**

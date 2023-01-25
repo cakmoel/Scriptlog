@@ -28,7 +28,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h3><i class="icon fa fa-warning"></i> Invalid Form Data!</h3>
+<h3><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid form data!</h3>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -112,7 +112,7 @@ endif;
 </div>
 
 <div class="form-group">
-<label for="user_level">Role</label>
+<label for="select2">Role</label>
 <?=(isset($userRole)) ? $userRole : ""; ?>
 </div>
 
@@ -124,9 +124,24 @@ if (empty($userData['user_email'])) :
 <input id="1" type="checkbox" name="send_user_notification" value="1"> Send the new user an email about their account 
 </label>
 </div>
+
 <?php 
 endif;
 ?>
+
+<?php 
+if (!empty($userData['user_level']) && $userData['user_level'] != 'administrator') :
+?>
+<div class="checkbox">
+<label for="user_banned">
+<input id="user_banned" type="checkbox" name="user_banned" value="1" <?=(isset($userData['user_banned']) && $userData['user_banned'] == 1) ? "checked='checked'" : ""; ?>> 
+banned user
+</label>
+</div>
+<?php 
+endif;
+?>
+
 </div>
 <!-- /.box-body -->
 

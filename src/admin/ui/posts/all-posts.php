@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
  <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -6,12 +6,11 @@
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
         <small><a href="index.php?load=posts&action=newPost&Id=0"
-					class="btn btn-primary"> <i
-					class="fa fa-plus-circle"></i> Add New
+					class="btn btn-primary"> <i class="fa fa-plus-circle" aria-hidden="true"></i> Add New
 				</a></small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
         <li><a href="index.php?load=posts">All Posts</a></li>
         <li class="active">Data Posts</li>
       </ol>
@@ -26,7 +25,7 @@
          ?>
          <div class="alert alert-danger alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            <h2><i class="icon fa fa-ban"></i> Error!</h2>
+            <h2><i class="icon fa fa-ban" aria-hidden="true"></i> Error!</h2>
            <?php 
               foreach ($errors as $e) :
                 echo $e;
@@ -42,7 +41,7 @@
          ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h2><i class="icon fa fa-check"></i> Success!</h2>
+                <h2><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h2>
            <?php 
               foreach ($status as $s) :
                 echo $s;
@@ -63,7 +62,7 @@
               <!-- /.box-header -->
               
               <div class="box-body">
-               <table id="scriptlog-table" class="table table-bordered table-striped">
+               <table id="scriptlog-table" class="table table-bordered table-striped" aria-describedby="all posts">
                 <thead>
                 <tr>
                   <th>#</th>
@@ -86,11 +85,11 @@
                        <td><?= $no; ?></td>
                        <td><?= safe_html($post['post_title']); ?></td>
                        <td><?= safe_html($post['user_login']); ?></td>
-                       <td><?= safe_html(make_date($post['post_date'])); ?></td>
+                       <td><?= isset($post['post_modified']) ? safe_html(make_date($post['post_modified'])) : safe_html(make_date($post['post_date'])); ?></td>
                       
                        <td>
-                       <a href="<?=generate_request("index.php", 'get', ['posts', 'editPost', $post['ID']])['link']; ?>" class="btn btn-warning" title="Edit post">
-                       <i class="fa fa-pencil fa-fw"></i> </a>
+                       <a href="<?=generate_request("index.php", 'get', ['posts', ActionConst::EDITPOST, $post['ID']])['link']; ?>" class="btn btn-warning" title="Edit post">
+                       <i class="fa fa-pencil fa-fw" aria-hidden="true"></i> </a>
                        </td>
                        <td>
                        <a href="javascript:deletePost('<?= abs((int)$post['ID']); ?>', '<?= safe_html($post['post_title']); ?>')" class="btn btn-danger" title="Delete post">
@@ -133,7 +132,7 @@
   {
 	  if (confirm("Are you sure want to delete Post '" + title + "'"))
 	  {
-	  	window.location.href = 'index.php?load=posts&action=deletePost&tId=' + id;
+	  	window.location.href = 'index.php?load=posts&action=deletePost&Id=' + id;
 	  }
   }
 </script>

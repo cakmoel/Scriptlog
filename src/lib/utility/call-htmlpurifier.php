@@ -1,8 +1,11 @@
 <?php
 /**
- * Function Call HTMLPurifier
+ * call_htmlpurifier
  * 
  * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @return string
  * 
  */

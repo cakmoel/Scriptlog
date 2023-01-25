@@ -1,9 +1,10 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Dispatcher
  * 
  * @category Core Class
  * @author   M.Noermoehammad
+ * @uses HandleRequest::allowedPathRequested
  * @license  MIT
  * @see https://stackoverflow.com/questions/11696718/htaccess-rewrite-book-phpid-1234-to-book-1234
  * @see https://stackoverflow.com/questions/1039725/how-to-do-url-re-writing-in-php
@@ -19,32 +20,33 @@
 class Dispatcher
 {
   /**
-   * routes 
+   * route
    * 
-   * @var object
+   * @var mixed
    * 
    */
-  private static $route;
+  private $route;
 
   /**
-   * errors
-   * 
+   * Theme's Directory
+   *
    * @var string
    * 
    */
-  private $errors;
-
+  private $theme_dir;
+  
   /**
    * Constructor
    * Registry route and Initialize an instantiate of theme
    */
   public function __construct()
   {
-     if (Registry::isKeySet('route')) {
+    
+    if (Registry::isKeySet('route')) {
 
-      self::$route = Registry::get('route');
+      $this->route = Registry::get('route');
 
-     }
+    }
 
   }
 
@@ -56,252 +58,87 @@ class Dispatcher
   public function dispatch()
   {
 
-    if (!$themeActived = $this->invokeTheme()) {
-        
-        include(APP_ROOT.APP_THEME.'themes'.DS.'maintenance.php');
-      
-    } else {
+    $this->theme_dir = APP_ROOT.APP_THEME.escape_html($this->invokeTheme()['theme_directory']).DS;
 
-      $theme_dir = APP_ROOT.APP_THEME.safe_html($themeActived['theme_directory']).DS;
+    if (rewrite_status() === 'yes') {
 
-      if (false === self::allowedPath(self::whiteListPathRequested())) {
+      if (false === HandleRequest::allowedPathRequested($this->whiteListPathRequested(), $this->route)) {
 
         // nothing is found so handle the error page 404
-        $this->errorNotFound($theme_dir);
+        $this->errorNotFound($this->theme_dir);
 
       } else {
-
-        foreach (self::$route as $action => $routes) {
-        
-          if (preg_match( '~^'.$routes.'$~i', self::requestURI(), $matches)) {
+  
+        foreach ($this->route as $key => $value) {
+  
+          if (preg_match('~^'.$value.'$~i', $this->requestURI(), $matches)) {
+           
+            http_response_code(200);
+            call_theme_header(); 
+            call_theme_content($key);
+            call_theme_footer();
+    
+            exit();
              
-              if (is_dir($theme_dir)) {
-
-                 call_theme_header(); 
-                 call_theme_content($action);
-                 call_theme_footer();
-                
-              }
-  
-             exit();  // avoid the 404 message 
-     
           } 
-     
+
         }
-  
-        // nothing is found so handle the error page 404
-        $this->errorNotFound($theme_dir);
-  
+
       }
-      
-    }
-    
-  }
-
-  /**
-   * Find route defined by rules
-   * 
-   * @return mixed
-   * 
-   */
-  public function findRules()
-  {
-    $keys = array();
-    $values = array();
-  
-    foreach (self::$route as $key => $value) {
-      
-      $keys[] = $key; 
-      $values[] = $value;    
-      
-   }
-  
-   return array("keys" => $keys, "values" => $values);
-  
-  }
-
-  /**
-   * Find request path
-   * 
-   * @param int $args
-   * @return mixed if true $var path return array
-   * @return bool|false if $var path does not return path
-   * 
-   */
-  public static function findRequestPath($args)
-  {
-    
-    $path = explode('/', self::requestPath());
-
-    if (isset($path[$args])) {
-
-      return basename($path[$args]);
 
     } else {
-       
-       return false;
 
-    }
-    
-  }
-
-  /**
-   * Find Request Parameters
-   * 
-   * @return mixed
-   * 
-   */
-  public static function findRequestParam()
-  {
-    
-    $parameters = [];
-
-    if (is_array(self::$route)) {
-
-      foreach (self::$route as $key => $value) {
-      
-        if (preg_match('~^'.$value.'$~i', self::requestURI(), $matches)) {
- 
-          return $parameters[] = $matches;
- 
-        }
- 
-     }
-
-    }
-    
-  }
-
-  /**
-   * parseQuery from URL requested
-   * 
-   * @return mixed
-   * 
-   */
-  public function parseQuery($var)
-  {
-    $var  = parse_url($var, PHP_URL_QUERY);
-    $var  = html_entity_decode($var);
-    $var  = explode('&', $var);
-    $queries  = array();
-    
-    foreach($var as $val) {
-
-      $x = explode('=', $val);
-      $queries[$x[0]] = $x[1];
-
-    }
-    
-    unset($val, $x, $var);
-    
-    return $queries;
-    
-  }
-
-  /**
-   * RequestPath
-   * 
-   * @return mixed;
-   * 
-   */
-  private static function requestPath()
-  {
-    
-    $request_uri = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
-    $script_name = explode('/', trim($_SERVER['SCRIPT_NAME'], '/'));
-    $parts = array_diff_assoc($request_uri, $script_name);
-     
-    if (empty($parts)) {
-
-      return '/';
+      HandleRequest::deliverQueryString();
       
     }
-     
-    $path = implode('/', $parts);
-   
-    if (($position = strpos($path, '?')) !== FALSE) {
 
-     $path = substr($path, 0, $position);
-
-    }
-     
-    return $path;
-   
   }
 
   /**
-   * Request URI
+   * RequestURI()
    * 
    * @return mixed
    * 
    */
-  private static function requestURI()
+  private function requestURI()
   {
-    $uri = rtrim(dirname($_SERVER["SCRIPT_NAME"]), '/' );
-    $uri = '/' . trim(str_replace( $uri, '', $_SERVER['REQUEST_URI'] ), '/' );
-    $uri = urldecode( $uri );
-    return $uri;
+    $script_name = rtrim(dirname($_SERVER["SCRIPT_NAME"]), '/' );
+    $request_uri = '/' . trim(str_replace($script_name, '', $_SERVER['REQUEST_URI']), '/');
+    return urldecode($request_uri);
   }
 
-  /**
-   * Grab active theme
+/**
+   * whiteListPathRequested
+   *
+   * @return array
+   * 
+   */
+  private function whiteListPathRequested()
+  {
+    return ['/', '//', 'post', 'page', 'blog', 'category', 'archive', 'tag'];
+  }
+
+  /* InvokeTheme
+   * 
+   * invoking theme actived
+   * @return mixed
+   * 
    */
   private function invokeTheme()
   {
     return theme_identifier();
   }
-  
-  /**
-   * allowed path
-   * Checking whether URI requested match the rules and allowed to be executed
-   * 
-   * @param string $theme_dir
-   * @param array $path
-   * @return bool|true|false
-   * 
-   */
-  private static function allowedPath(array $path)
-  {
-    
-    $findParam = self::findRequestParam();
-    
-    $param1 = (is_array($findParam) && array_key_exists(0, $findParam)) ? $findParam[0] : '';
-    
-    if (!(in_array(self::findRequestPath(0), $path, true) || (in_array($param1, $path, true)))) {
 
-      return false; 
-       
-    } else {
+  /* Error not found 404
+  * set 404 error page
+  * 
+  * @param string $theme_dir
+  * 
+  */
+ private function errorNotFound($theme_dir)
+ {
+   http_response_code(404);
+   include($theme_dir.'404.php');
+ }
 
-      return true;
-
-    }
-
-  }
-
-  /**
-   * Error not found 404
-   * set 404 error page
-   * 
-   * @param string $theme_dir
-   * 
-   */
-  private function errorNotFound($theme_dir)
-  {
-    header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found", true, 404);
-    include($theme_dir.'404.php');
-  }
-
-/**
- * whiteListPathRequested
- * whitelist allowed path that being requested on the common visitor-side (not admin dir)
- * 
- * @return array
- * 
- */
-  private static function whiteListPathRequested()
-  {
-    return ['/', '//', 'post', 'page', 'blog', 'category', 'archive'];
-  }
-
-} // End of class Dispatcher
+}

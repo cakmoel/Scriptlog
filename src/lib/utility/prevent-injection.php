@@ -1,9 +1,14 @@
 <?php
 /**
- * Prevent Injection Function
+ * prevent_injection()
  * 
- * @category Function
- * @see  http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed 
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
+ * @uses htmLawed()
+ * @see http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed 
+ * @see https://paragonie.com/blog/2015/06/preventing-xss-vulnerabilities-in-php-everything-you-need-know
  * @see https://github.com/tgalopin/html-sanitizer/blob/master/docs/1-getting-started.md
  * @param string $data
  * @return string

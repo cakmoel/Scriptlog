@@ -1,8 +1,8 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * Abstract Class BaseApp 
+ * Abstract Class BaseApp implements AppInterface
  *
- * @category  Abstract Class BaseApp implements AppInterface
+ * @category  Core Class
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0

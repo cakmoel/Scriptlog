@@ -1,36 +1,41 @@
 <?php
 /**
- * Catch weblink function
+ * catch_weblink
+ * 
  * to extract HTML link from a web page founded within it
  * and return all link on it.
  * 
+ * @category function
+ * @author Contributors
+ * @license MIT
+ * @version 1.0
  * @param string $web_page
- * @return string
+ * @return array
  * 
  */
 function catch_weblink($web_page)
 {
 
-    $contents = file_get_contents($web_page);
+ $links = [];
 
-    if (!$contents) return null;
+ $contents = file_get_contents($web_page);
 
-    $links = [];
+if (!$contents) { return null; }
 
-    $dom_doc = new DOMDocument();
+ $dom_doc = new DOMDocument();
 
-    $dom_doc->loadHTML($contents);
+ $dom_doc->loadHTML($contents);
 
-    $xpath = new DOMXPath($dom_doc);
+ $xpath = new DOMXPath($dom_doc);
 
-    $hrefs = $xpath->evaluate("/html/body//a");
+ $hrefs = $xpath->evaluate("/html/body//a");
 
-    for ($i=0; $i < $hrefs->length; $i++) { 
+ for ($i=0; $i < $hrefs->length; $i++) { 
    
-        $links[$i] = absolute_url($web_page, $hrefs->$item($i)->getAttribute('href'));
+    $links[$i] = absolute_url($web_page, $hrefs->item($i)->getAttribute('href'));
         
-    }
+  }
 
-    return $links;
+  return $links;
 
 }
