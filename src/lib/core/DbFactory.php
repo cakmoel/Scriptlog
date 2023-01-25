@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * DbFactory Class
  *  
@@ -11,11 +11,6 @@
  */
 class DbFactory
 {
-  /**
-   * Error
-   * @var string
-   */
-  private static $error;
   
   /**
    * Connect
@@ -28,6 +23,7 @@ class DbFactory
    */
   public static function connect($connection, $options = [])
   {
+
      try {
          
          # hard code database factory's name
@@ -43,17 +39,15 @@ class DbFactory
 
          }
          
-     } catch (DbException $e) {
+     } catch (Throwable $th) {
         
-        self::$error = LogError::setStatusCode(http_response_code(500));
-        self::$error = LogError::newMessage($e);
-        self::$error = LogError::customErrorMessage();
+        LogError::setStatusCode(http_response_code(500));
+        LogError::exceptionHandler($th);
          
-     } catch (PDOException $e) {
+     } catch (DbException $e) {
 
-        self::$error = LogError::setStatusCode(http_response_code(500));
-        self::$error = LogError::newMessage($e);
-        self::$error = LogError::customErrorMessage();
+        LogError::setStatusCode(http_response_code(500));
+        LogError::exceptionHandler($e);
 
      }
 

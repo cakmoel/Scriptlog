@@ -1,9 +1,10 @@
 <?php
 /**
- * Get browser name function
+ * get_browser_name()
  * 
+ * @category Function
  * @see https://www.256kilobytes.com/content/show/1922/how-to-parse-a-user-agent-in-php-with-minimal-effort
- * @return void
+ * @return string
  * 
  */
 function get_browser_name()

@@ -1,55 +1,55 @@
 <?php
-#######################################################################
-#   File Setup.php 
-#   These collections of functions to setup installation 
-#   and write config.php file
-#
-#   @category   Installation file
-#   @author     M.Noermoehammad
-#   @license    MIT
-#   @version    1.0
-#   @since      Since Release 1.0
-#######################################################################
-
-function current_url()
+/**
+ * File setup.php
+ * 
+ * These collections of functions to setup installation and write config.php file
+ * 
+ * @category Installation file
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
+ * 
+ */
+function current_url() // returning current url
 {
-   $scheme = (!empty($_SERVER['HTTPS']) and $_SERVER['HTTPS'] !== "off") ? "https" : "http" ;
-   
-   $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] ;
-   
-   return $scheme."://".$host.dirname($_SERVER['PHP_SELF']) . "/";
 
+  $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== "off") ? "https" : "http";
+
+  $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
+
+  return $scheme . "://" . $host . dirname($_SERVER['PHP_SELF']) . DIRECTORY_SEPARATOR;
 }
 
 /**
- * function makeConnection
+ * make_connection()
  * 
  * @param string $host
  * @param string $username
  * @param string $passwd
+ * @return object
+ * 
  */
 function make_connection($host, $username, $passwd, $dbname)
 {
 
   $connect = new mysqli($host, $username, $passwd, $dbname);
-  
+
   if ($connect->connect_errno) {
 
     printf("Failed to connect to MySQL: (" . $connect->connect_errno . ") " . $connect->connect_error, E_USER_ERROR);
     exit();
-
   }
 
   $driver = new mysqli_driver();
-  
-  $driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
-  
-  return $connect;
 
+  $driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+
+  return $connect;
 }
 
 /**
- * function closeConnection
+ * close_connection()
+ * 
  * closing database connection
  * 
  * @param object $link
@@ -69,32 +69,17 @@ function close_connection($link)
  * @param numeric $counter
  * 
  */
-function table_exists($link, $table, $counter = 0)
+function is_table_exists($link, $table, $counter = 0)
 {
-    if ($link instanceof mysqli) 
-    
+
+  if ($link instanceof mysqli) {
+
     $counter++;
 
-    $check = $link->query( "SHOW TABLES LIKE '".$table."'");
-    
-    if($check !== false) {
+    $check = $link->query("SHOW TABLES LIKE '" . $table . "'");
 
-        if( $check->num_rows > 0 ) {
-
-            return true;
-
-        } else {
-
-            return false;
-
-        }
-
-    } else {
-
-        return false;
-        
-    }
-
+    return (($check) && ($check->num_rows > 0)) ? true : false;
+  }
 }
 
 /**
@@ -108,18 +93,15 @@ function check_dbtable($link, $table)
 {
   $install = false;
 
-  if(!table_exists($link, $table)) {
-      
-    $install = true;
+  if (!is_table_exists($link, $table)) {
 
+    $install = true;
   } else {
 
     $install = false;
-
   }
 
   return $install;
-
 }
 
 /**
@@ -135,139 +117,184 @@ function check_dbtable($link, $table)
 function install_database_table($link, $protocol, $server_host, $user_login, $user_pass, $user_email, $key)
 {
 
-require __DIR__ . '/dbtable.php';
+  require __DIR__ . '/dbtable.php';
 
-// Users  
-$date_registered = date('Y-m-d H:i:s');
-$user_session    = md5(uniqid());
-$shield_pass     = password_hash(base64_encode(hash('sha384', $user_pass, true)), PASSWORD_DEFAULT);
-$user_level      = 'administrator';
+  // Users  
+  $date_registered = date('Y-m-d H:i:s');
+  $user_session    = md5(uniqid());
+  $shield_pass     = password_hash(base64_encode(hash('sha384', $user_pass, true)), PASSWORD_DEFAULT);
+  $user_level      = 'administrator';
 
-// Theme 
-$theme_title     = "Bootstrap Blog";
-$theme_desc      = "Simple yet clean design for personal blog";
-$theme_designer  = "Ondrej - bootstrapious";
-$theme_directory = "blog";
-$theme_status    = "Y";
+  // Theme 
+  $theme_title     = "Bootstrap Blog";
+  $theme_desc      = "Simple yet clean design for personal blog";
+  $theme_designer  = "Ondrej - bootstrapious";
+  $theme_directory = "blog";
+  $theme_status    = "Y";
 
-// Setting App Key
-$setting_name_key = "app_key";
+  // Setting App Key
+  $setting_name_key = "app_key";
 
-// Setting App URL
-$setting_name_url  = "app_url";
-$setting_value_url = setup_base_url($protocol, $server_host);
+  // Setting App URL
+  $setting_name_url  = "app_url";
+  $setting_value_url = setup_base_url($protocol, $server_host);
 
-// Setting Site_Name
-$site_name  = "site_name";
-$site_name_value = "Scriptlog 1.0";
+  // Setting Site_Name
+  $site_name  = "site_name";
+  $site_name_value = "Scriptlog 1.0";
 
-// Setting Site_Tagline
-$site_tagline = "site_tagline";
-$site_tagline_value = "Just another personal weblog";
+  // Setting Site_Tagline
+  $site_tagline = "site_tagline";
+  $site_tagline_value = "Just another personal weblog";
 
-// Setting Site_Description
-$site_description = "site_description";
-$site_description_value = "Scriptlog power you blog";
+  // Setting Site_Description
+  $site_description = "site_description";
+  $site_description_value = "Scriptlog power your blog";
 
-// Setting Site_Keywords
-$site_keywords = "site_keywords";
-$site_keywords_value = "Weblog, Personal blog, Blogware";
+  // Setting Site_Keywords
+  $site_keywords = "site_keywords";
+  $site_keywords_value = "Weblog, Personal blog, Blogware";
 
-// Setting Site_Email
-$site_email = "site_email";
+  // Setting Site_Email
+  $site_email = "site_email";
 
-// Setting Permalink
-$permalink_key = "permalink_setting";
-$permalink_value = "yes";
+  // setting post per page
+  $post_per_page = "post_per_page";
+  $post_per_page_value = "10";
 
-if ($link instanceof mysqli) 
-#create users table
-$createUser = $link->query($tblUser);
+  // setting post per rss
+  $post_per_rss = "post_per_rss";
+  $post_per_rss_value = "10";
 
-#save administrator
-$createAdmin = $link->prepare($saveAdmin);
+  // setting post per archive
+  $post_per_archive = "post_per_archive";
+  $post_per_archive_value = "10";
 
-if (false !== $createAdmin) {
-   
-  $createAdmin->bind_param("ssssss", $user_login, $user_email, $shield_pass, $user_level, $date_registered, $user_session);
-  $createAdmin->execute();
+  // setting comment per post
+  $comment_per_post = "comment_per_post";
+  $comment_per_post_value = "10";
 
-}
+  // Setting Permalink
+  $permalink_key = "permalink_setting";
+  $permalink_value = array('rewrite' => 'no', 'server_software' => check_web_server()['WebServer']);
+  $store_permalink_value = json_encode($permalink_value);
 
-if ($link->insert_id && $createAdmin->affected_rows > 0) {
-    
-    // create other database tables
-    $link->query($tblUserToken);
-    $link->query($tblPost);
-    $link->query($tblTopic);
-    $link->query($tblPostTopic);
-    $link->query($tblComment);
-    $link->query($tblReply);
-    $link->query($tblLoginAttempt);
-    $link->query($tblMenu);
-    $link->query($tblMedia);
-    $link->query($tblMediaMeta);
-    $link->query($tblMediaDownload);
-    $link->query($tblPlugin);
-    $link->query($tblSetting);
-    $link->query($tblTheme);
-    
-    // insert configuration - app_key
-    $recordAppKey = $link->prepare($saveAppKey);
-    $recordAppKey->bind_param('ss', $setting_name_key, $key);
-    $recordAppKey->execute();
+  // Setting Timezone
+  $timezone_key = "timezone_setting";
+  $timezone_value = array('timezone_identifier' => date_default_timezone_get());
+  $store_timezone_value = json_encode($timezone_value);
 
-    // insert configuration - app_url
-    $recordAppURL = $link->prepare($saveAppURL);
-    $recordAppURL->bind_param('ss', $setting_name_url, $setting_value_url);
-    $recordAppURL->execute();
-    
-    // insert configuration - site_name
-    $recordAppSiteName = $link->prepare($saveSiteName);
-    $recordAppSiteName->bind_param('ss', $site_name, $site_name_value);
-    $recordAppSiteName->execute();
+  if ($link instanceof mysqli) {
+    #create users table
+    $link->query($tblUser);
 
-    // insert configuration - site_tagline
-    $recordAppSiteTagline = $link->prepare($saveSiteTagline);
-    $recordAppSiteTagline->bind_param('ss', $site_tagline, $site_tagline_value);
-    $recordAppSiteTagline->execute();
+    #save administrator
+    $createAdmin = $link->prepare($saveAdmin);
 
-    // insert configuration - site_description
-    $recordAppSiteDescription = $link->prepare($saveSiteDescription);
-    $recordAppSiteDescription->bind_param('ss', $site_description, $site_description_value);
-    $recordAppSiteDescription->execute();
+    if (false !== $createAdmin) {
 
-    // insert configuration - site_keywords
-    $recordAppSiteKeywords = $link->prepare($saveSiteKeywords);
-    $recordAppSiteKeywords->bind_param('ss', $site_keywords, $site_keywords_value);
-    $recordAppSiteKeywords->execute();
+      $createAdmin->bind_param("ssssss", $user_login, $user_email, $shield_pass, $user_level, $date_registered, $user_session);
+      $createAdmin->execute();
+    }
 
-    // insert configuration - site_email
-    $recordAppSiteEmail = $link->prepare($saveSiteEmail);
-    $recordAppSiteEmail->bind_param('ss', $site_email, $user_email);
-    $recordAppSiteEmail->execute();
+    if ($link->insert_id && $createAdmin->affected_rows > 0) {
 
-    // insert configuration - permalinks
-    $recordPermalinks = $link->prepare($savePermalinks);
-    $recordPermalinks->bind_param('ss', $permalink_key, $permalink_value);
-    $recordPermalinks->execute();
+      // create other database tables
+      $link->query($tblUserToken);
+      $link->query($tblPost);
+      $link->query($tblTopic);
+      $link->query($tblPostTopic);
+      $link->query($tblComment);
+      $link->query($tblLoginAttempt);
+      $link->query($tblMenu);
+      $link->query($tblMedia);
+      $link->query($tblMediaMeta);
+      $link->query($tblMediaDownload);
+      $link->query($tblPlugin);
+      $link->query($tblSetting);
+      $link->query($tblTheme);
 
-    // insert default theme
-    $recordTheme = $link->prepare($saveTheme);
-    $recordTheme->bind_param('sssss', $theme_title, $theme_desc, $theme_designer, $theme_directory, $theme_status);
-    $recordTheme->execute();
+      // insert configuration - app_key
+      $recordAppKey = $link->prepare($saveAppKey);
+      $recordAppKey->bind_param('ss', $setting_name_key, $key);
+      $recordAppKey->execute();
 
-    if ($recordAppKey -> affected_rows > 0) {
+      // insert configuration - app_url
+      $recordAppURL = $link->prepare($saveAppURL);
+      $recordAppURL->bind_param('ss', $setting_name_url, $setting_value_url);
+      $recordAppURL->execute();
+
+      // insert configuration - site_name
+      $recordAppSiteName = $link->prepare($saveSiteName);
+      $recordAppSiteName->bind_param('ss', $site_name, $site_name_value);
+      $recordAppSiteName->execute();
+
+      // insert configuration - site_tagline
+      $recordAppSiteTagline = $link->prepare($saveSiteTagline);
+      $recordAppSiteTagline->bind_param('ss', $site_tagline, $site_tagline_value);
+      $recordAppSiteTagline->execute();
+
+      // insert configuration - site_description
+      $recordAppSiteDescription = $link->prepare($saveSiteDescription);
+      $recordAppSiteDescription->bind_param('ss', $site_description, $site_description_value);
+      $recordAppSiteDescription->execute();
+
+      // insert configuration - site_keywords
+      $recordAppSiteKeywords = $link->prepare($saveSiteKeywords);
+      $recordAppSiteKeywords->bind_param('ss', $site_keywords, $site_keywords_value);
+      $recordAppSiteKeywords->execute();
+
+      // insert configuration - site_email
+      $recordAppSiteEmail = $link->prepare($saveSiteEmail);
+      $recordAppSiteEmail->bind_param('ss', $site_email, $user_email);
+      $recordAppSiteEmail->execute();
+
+      // insert configuration - posts per page 
+      $recordPostPerPage = $link->prepare($savePostPerPage);
+      $recordPostPerPage->bind_param('ss', $post_per_page, $post_per_page_value);
+      $recordPostPerPage->execute();
+
+      // insert configuration post per rss
+      $recordPostPerRSS = $link->prepare($savePostPerRSS);
+      $recordPostPerRSS->bind_param('ss', $post_per_rss, $post_per_rss_value);
+      $recordPostPerRSS->execute();
+
+      // insert configuration post per archive
+      $recordPostPerArchive = $link->prepare($savePostPerArchive);
+      $recordPostPerArchive->bind_param('ss', $post_per_archive, $post_per_archive_value);
+      $recordPostPerArchive->execute();
+
+      // insert configuration comment per post
+      $recordCommentPerPost = $link->prepare($saveCommentPerPost);
+      $recordCommentPerPost->bind_param('ss', $comment_per_post, $comment_per_post_value);
+      $recordCommentPerPost->execute();
+
+      // insert configuration - permalinks
+      $recordPermalinks = $link->prepare($savePermalinks);
+      $recordPermalinks->bind_param('ss', $permalink_key, $store_permalink_value);
+      $recordPermalinks->execute();
+
+      // insert configuration - timezone
+      $recordTimezone = $link->prepare($saveTimezone);
+      $recordTimezone->bind_param('ss', $timezone_key, $store_timezone_value);
+      $recordTimezone->execute();
+
+      // insert default theme
+      $recordTheme = $link->prepare($saveTheme);
+      $recordTheme->bind_param('sssss', $theme_title, $theme_desc, $theme_designer, $theme_directory, $theme_status);
+      $recordTheme->execute();
+
+      if ($recordAppKey->affected_rows > 0) {
 
         $link->close();
-        
-     } 
- 
-}
-
+      }
+    }
+  }
 }
 
 /**
+ * write_config_file
+ * 
  * Write Config File Function
  * 
  * @param string $protocol
@@ -284,72 +311,71 @@ if ($link->insert_id && $createAdmin->affected_rows > 0) {
 function write_config_file($protocol, $server_name, $dbhost, $dbuser, $dbpassword, $dbname, $email, $key)
 {
 
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+  mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-$link = mysqli_connect($dbhost, $dbuser, $dbpassword, $dbname);
+  $link = mysqli_connect($dbhost, $dbuser, $dbpassword, $dbname);
 
-if (mysqli_connect_errno()) {
+  if (mysqli_connect_errno()) {
     printf("Connect failed: %s\n", mysqli_connect_error(), E_USER_ERROR);
     exit();
-}
+  }
 
-$configuration = false;
+  $configuration = false;
 
-if (isset($_SESSION['install']) && $_SESSION['install'] == true) {
-   
-   $getAppKey = "SELECT ID, setting_name, setting_value 
+  if (isset($_SESSION['install']) && $_SESSION['install'] === true) {
+
+    $getAppKey = "SELECT ID, setting_name, setting_value 
                  FROM tbl_settings USE INDEX(setting_value) 
                  WHERE setting_value = '$key'";
-   
-   $row = mysqli_fetch_assoc(mysqli_query($link, $getAppKey));
 
-   $app_key = generate_license(substr($row['setting_value'], 0, 5));
+    $row = mysqli_fetch_assoc(mysqli_query($link, $getAppKey));
 
-   $updateAppKey = "UPDATE tbl_settings SET setting_value = '$app_key'
+    $app_key = generate_license(substr($row['setting_value'], 0, 6));
+
+    $updateAppKey = "UPDATE tbl_settings SET setting_value = '$app_key'
                     WHERE setting_name = 'app_key' 
                     AND ID = {$row['ID']} LIMIT 1";
 
     mysqli_query($link, $updateAppKey);
     mysqli_close($link);
-    
+
     $configFile = '<?php  
     
-    return ['."
+    return [' . "
                     
             'db' => [
 
-                  'host' => '".addslashes($dbhost)."',
-                  'user' => '".addslashes($dbuser)."',
-                  'pass' => '".addslashes($dbpassword)."',
-                  'name' => '".addslashes($dbname)."'
+                  'host' => '" . addslashes($dbhost) . "',
+                  'user' => '" . addslashes($dbuser) . "',
+                  'pass' => '" . addslashes($dbpassword) . "',
+                  'name' => '" . addslashes($dbname) . "'
                   
                 ],
         
             'app' => [
 
-                   'url'   => '".addslashes(setup_base_url($protocol, $server_name))."',
-                   'email' => '".addslashes($email)."',
-                   'key'   => '".addslashes($app_key)."'
+                   'url'   => '" . addslashes(setup_base_url($protocol, $server_name)) . "',
+                   'email' => '" . addslashes($email) . "',
+                   'key'   => '" . addslashes($app_key) . "'
                    
                 ]
 
         ];";
-     
+
     if (isset($_SESSION['token'])) {
 
-        file_put_contents(__DIR__ . '/../../config.php', $configFile);
-        
-        $configuration = true;
+      file_put_contents(__DIR__ . '/../../config.php', $configFile);
 
+      $configuration = true;
     }
-      
- }
+  }
 
- return $configuration;
-
+  return $configuration;
 }
 
 /**
+ * remove_bad_characters()
+ * 
  * Remove Bad Characters
  * 
  * @link https://stackoverflow.com/questions/14114411/remove-all-special-characters-from-a-string#14114419
@@ -362,42 +388,39 @@ if (isset($_SESSION['install']) && $_SESSION['install'] == true) {
  */
 function remove_bad_characters($str_words, $host, $user, $password, $database, $escape = false, $level = 'high')
 {
-    $found = false;
-    $str_words = escapeHTML(strip_tags($str_words));
-    if($level == 'low') {
-        
-        $bad_string = array('drop', '--', 'insert', 'xp_', '%20union%20', '/*', '*/union/*', '+union+', 'load_file', 'outfile', 'document.cookie', 'onmouse', '<script', '<iframe', '<applet', '<meta', '<style', '<form', '<body', '<link', '_GLOBALS', '_REQUEST', '_GET', '_POST', 'include_path', 'prefix', 'ftp://', 'smb://', 'onmouseover=', 'onmouseout=');
-    
-    } elseif($level == 'medium') {
-        
-        $bad_string = array('select', 'drop', '--', 'insert', 'xp_', '%20union%20', '/*', '*/union/*', '+union+', 'load_file', 'outfile', 'document.cookie', 'onmouse', '<script', '<iframe', '<applet', '<meta', '<style', '<form', '<body', '<link', '_GLOBALS', '_REQUEST', '_GET', '_POST', 'include_path', 'prefix', 'ftp://', 'smb://', 'onmouseover=', 'onmouseout=');
-    
-    } else {
-        
-        $bad_string = array('select', 'drop', '--', 'insert', 'xp_', '%20union%20', '/*', '*/union/*', '+union+', 'load_file', 'outfile', 'document.cookie', 'onmouse', '<script', '<iframe', '<applet', '<meta', '<style', '<form', '<img', '<body', '<link', '_GLOBALS', '_REQUEST', '_GET', '_POST', 'include_path', 'prefix', 'http://', 'https://', 'ftp://', 'smb://', 'onmouseover=', 'onmouseout=');
-    
-    }
-    
-    for($i = 0; $i < count($bad_string); $i++) {
-        
-        $str_words = str_replace($bad_string[$i], '', $str_words);
-    
-    }
-    
-    if($escape) {
-        
-      $link = mysqli_connect($host, $user, $password, $database);
-      $str_words = mysqli_real_escape_string($link, $str_words);
-    
-    }
-    
-    return $str_words;
-    
+
+  $str_words = escapeHTML(strip_tags($str_words));
+
+  if ($level == 'low') {
+
+    $bad_string = array('drop', '--', 'insert', 'xp_', '%20union%20', '/*', '*/union/*', '+union+', 'load_file', 'outfile', 'document.cookie', 'onmouse', '<script', '<iframe', '<applet', '<meta', '<style', '<form', '<body', '<link', '_GLOBALS', '_REQUEST', '_GET', '_POST', 'include_path', 'prefix', 'ftp://', 'smb://', 'onmouseover=', 'onmouseout=');
+  } elseif ($level == 'medium') {
+
+    $bad_string = array('select', 'drop', '--', 'insert', 'xp_', '%20union%20', '/*', '*/union/*', '+union+', 'load_file', 'outfile', 'document.cookie', 'onmouse', '<script', '<iframe', '<applet', '<meta', '<style', '<form', '<body', '<link', '_GLOBALS', '_REQUEST', '_GET', '_POST', 'include_path', 'prefix', 'ftp://', 'smb://', 'onmouseover=', 'onmouseout=');
+  } else {
+
+    $bad_string = array('select', 'drop', '--', 'insert', 'xp_', '%20union%20', '/*', '*/union/*', '+union+', 'load_file', 'outfile', 'document.cookie', 'onmouse', '<script', '<iframe', '<applet', '<meta', '<style', '<form', '<img', '<body', '<link', '_GLOBALS', '_REQUEST', '_GET', '_POST', 'include_path', 'prefix', 'http://', 'https://', 'ftp://', 'smb://', 'onmouseover=', 'onmouseout=');
+  }
+
+  for ($i = 0; $i < count($bad_string); $i++) {
+
+    $str_words = str_replace($bad_string[$i], '', $str_words);
+  }
+
+  if ($escape) {
+
+    $link = mysqli_connect($host, $user, $password, $database);
+    $str_words = mysqli_real_escape_string($link, $str_words);
+  }
+
+  return $str_words;
 }
 
 /** 
  * Escape HTML Function
  * 
+ * @see https://www.taniarascia.com/create-a-simple-database-app-connecting-to-mysql-with-php/
+ * @see https://ilovephp.jondh.me.uk/en/tutorial/make-your-own-blog
  * @param string $html
  * @return string
  * 
@@ -416,153 +439,135 @@ function escapeHTML($html)
  * @return string
  * 
  */
-function generate_license($suffix = null) 
+function generate_license($suffix = null)
 {
-    
+
   // Default tokens contain no "ambiguous" characters: 1,i,0,o
-  if(isset($suffix)){
-           
-     $num_segments = 3;
-     $segment_chars = 6;
-     
+  if (isset($suffix)) {
+    // Fewer segments if appending suffix
+    $num_segments = 3;
+    $segment_chars = 6;
   } else {
-      
-     $num_segments = 4;
-     $segment_chars = 5;
-    
+    $num_segments = 4;
+    $segment_chars = 5;
   }
-  
-  $tokens = 'ABCDEFGHJKLMNPQRSTUVWXYZ123456789';
+
+  $tokens = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   $license_string = '';
-    
+
   // Build Default License String
   for ($i = 0; $i < $num_segments; $i++) {
-        
+
     $segment = '';
     for ($j = 0; $j < $segment_chars; $j++) {
-        $segment .= $tokens[rand(0, strlen($tokens)-1)];
+      $segment .= $tokens[rand(0, strlen($tokens) - 1)];
     }
-        
+
     $license_string .= $segment;
     if ($i < ($num_segments - 1)) {
-        $license_string .= '-';
+      $license_string .= '-';
     }
-        
   }
-    
-   // If provided, convert Suffix
-    if(isset($suffix)){
-        
-        if(is_numeric($suffix)) {   // Userid provided
-            
-            $license_string .= '-'.strtoupper(base_convert($suffix,10,36));
-        
-        } else {
-            
-            $long = sprintf("%u\n", ip2long($suffix), true);
 
-            if($suffix === long2ip($long) ) {
-                
-                $license_string .= '-'.strtoupper(base_convert($long,10,36));
-            
-            } else {
-                
-                $license_string .= '-'.strtoupper(str_ireplace(' ','-',$suffix));
-                
-            }
-            
-        } 
-        
+  // If provided, convert Suffix
+  if (isset($suffix)) {
+
+    if (is_numeric($suffix)) {   // Userid provided
+
+      $license_string .= '-' . strtoupper(base_convert($suffix, 10, 36));
+    } else {
+
+      $long = sprintf("%u\n", ip2long($suffix), true);
+
+      if ($suffix === long2ip($long)) {
+
+        $license_string .= '-' . strtoupper(base_convert($long, 10, 36));
+      } else {
+
+        $license_string .= '-' . strtoupper(str_ireplace(' ', '-', $suffix));
+      }
     }
-    
-    return $license_string;
-    
+  }
+
+  return $license_string;
 }
 
 /**
+ * convert_memory_used()
+ * 
  * Convert Memory Used Function
  * Format size memory usage onto b, kb, mb, gb, tb and pb
  * 
- * @param number $size
+ * @param int|float $size
  * @return mixed
  * 
  */
 function convert_memory_used($size)
 {
-  $unit=array('b','kb','mb','gb','tb','pb');
-  return round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+  $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+  return round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
 }
 
 /**
+ * setup_base_url()
+ * 
  * Setup base URL
  *
  * @param string $protocol
  * @param string $server_host
- * @return void
+ * @return string
  * 
  */
 function setup_base_url($protocol, $server_host)
 {
   $base_url = $protocol . '://' . $server_host . dirname(dirname($_SERVER['PHP_SELF']));
 
-  if(substr($base_url, -1) == DIRECTORY_SEPARATOR) {
+  if (substr($base_url, -1) === DIRECTORY_SEPARATOR) {
 
     return rtrim($base_url, DIRECTORY_SEPARATOR);
-
   } else {
 
     return $base_url;
-
   }
-  
 }
 
 /**
- * purge_installation
+ * purge_installation()
+ * 
  * Clean up installation procedure
  * 
  */
 function purge_installation()
 {
-   
- $length = 16;
- 
- if (is_readable(__DIR__ . '/../../config.php')) {
-     
+
+  $length = 16;
+
+  if (is_readable(__DIR__ . '/../../config.php')) {
+
     if (function_exists("random_bytes")) {
-             
-        $bytes = random_bytes(ceil($length / 2));
-        
+
+      $bytes = random_bytes(ceil($length / 2));
     } elseif (function_exists("openssl_random_pseudo_bytes")) {
-        
-        $bytes = openssl_random_pseudo_bytes(ceil($length / 2));
-        
+
+      $bytes = openssl_random_pseudo_bytes(ceil($length / 2));
     } else {
-        
-        trigger_error("no cryptographically secure random function available", E_USER_NOTICE);
-        
+
+      trigger_error("no cryptographically secure random function available", E_USER_NOTICE);
     }
 
-    $disabled = APP_PATH . substr(bin2hex($bytes), 0, $length).'.log';
+    $disabled = APP_PATH . substr(bin2hex($bytes), 0, $length) . '.log';
 
-    if (is_writable(APP_PATH)) {
+    if ((is_writable(APP_PATH)) && (rename(__DIR__ . '/../index.php', $disabled))) {
 
-        if(rename(__DIR__ . '/../index.php', $disabled)) {
+      $clean_installation = '<?php ';
 
-            $clean_installation = '<?php ';
-     
-            file_put_contents(__DIR__ . '/../index.php', $clean_installation);
+      file_put_contents(__DIR__ . '/../index.php', $clean_installation);
 
-            unset($_SESSION['token']);
-     
-            $_SESSION = array();
-     
-            session_destroy();
-            
-        }
-        
-    } 
+      unset($_SESSION['token']);
 
+      $_SESSION = array();
+
+      session_destroy();
+    }
   }
-    
 }

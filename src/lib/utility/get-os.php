@@ -1,18 +1,23 @@
 <?php 
 /**
- * get operating system function
+ * get_os
  *
  * @see https://stackoverflow.com/questions/18070154/get-operating-system-info
  * @return string
  * 
  */
+
 function get_os()
 {
+    
  $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
 
- $unknown_os = "Unknown Operting System Platform";
+ $os = new \Sinergi\BrowserDetector\Os();
+
+ $unknown_os = $os->getName();
 
  $os_array     = array(
+
     '/windows nt 10/i'      =>  'Windows 10',
     '/windows nt 6.3/i'     =>  'Windows 8.1',
     '/windows nt 6.2/i'     =>  'Windows 8',
@@ -35,13 +40,17 @@ function get_os()
     '/ipad/i'               =>  'iPad',
     '/android/i'            =>  'Android',
     '/blackberry/i'         =>  'BlackBerry',
-    '/webos/i'              =>  'Mobile'
+    '/webos/i'              =>  'Mobile',
+    
 );
 
 foreach ($os_array as $regex => $value) {
 
-    if (preg_match($regex, $user_agent))
-          $unknown_os = $value;
+    if (preg_match($regex, $user_agent)) {
+
+        $unknown_os = $value;
+
+    }
 
 }
    

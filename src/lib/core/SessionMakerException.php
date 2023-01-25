@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class SessionMakerException extends CoreException
  * 
@@ -8,7 +8,7 @@
  * @version 1.0
  * 
  */
-class SessionMakerException extends CoreException
+class SessionMakerException extends Exception implements ISessionThrowable
 {
 
 }

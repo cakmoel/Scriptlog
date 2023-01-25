@@ -1,17 +1,15 @@
 <?php
-
-function install_header($stylePath, $protocol, $server_host)
+function install_header($stylePath)
 {
 
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Scriptlog Installation">
-    <link rel="Shorcut Icon" href=" ../favicon.ico">
+    <link href="<?= $stylePath; ?>assets/img/favicon.ico" rel="Shorcut Icon" >
 
     <title>Scriptlog Installation</title>
 
@@ -28,7 +26,7 @@ function install_header($stylePath, $protocol, $server_host)
 <?php
 }
 
-function install_footer($stylePath, $protocol, $server_host)
+function install_footer($stylePath)
 {
 
 ?>
@@ -37,7 +35,7 @@ function install_footer($stylePath, $protocol, $server_host)
     <p class="mb-1">&copy; 
        <?php 
                
-          $starYear = 2013;
+          $starYear = 2021;
           $thisYear = date ( "Y" );
           if ($starYear == $thisYear) {
              
@@ -55,10 +53,10 @@ function install_footer($stylePath, $protocol, $server_host)
         </p>
         
 <ul class="list-inline">
-          <li class="list-inline-item"><a href="../license.txt" target="_blank" title="license.txt" >License</a></li>
+          <li class="list-inline-item"><a href="../license.txt" target="_blank" rel="noopener noreferrer" title="license.txt" >License</a></li>
           <li class="list-inline-item"><a href="#"><?= 'Memory used: <strong>'. convert_memory_used(memory_get_usage()).'</strong>'; ?></a></li>
-          <li class="list-inline-item"><a href="#"><?= 'Execution time: <strong>'.$time = (microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]). ' seconds</strong>'; ?></a></li>
-          <li class="list-inline-item"><a href="../readme.html" target="_blank" title="readme.html">ReadMe</a></li>
+          <li class="list-inline-item"><a href="#"><?= 'Execution time: <strong>'.(microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]). ' seconds</strong>'; ?></a></li>
+          <li class="list-inline-item"><a href="../readme.html" target="_blank" rel="noopener noreferrer" title="readme.html">ReadMe</a></li>
         </ul>
       </footer>
 </div>
@@ -117,7 +115,7 @@ function get_sisfo()
                 ?>
                 <small class="<?=(isset($php_passed)) ? $php_passed : 'text-danger'; ?>"><?=(isset($php_passed)) ? PHP_VERSION : $errors['errorChecking'] = 'Requires PHP 5.6 or newer'; ?></small>
               </div>
-              <span class="<?=(isset($php_passed)) ? $php_passed : 'text-danger'; ?>"><i class="<?=(isset($php_checked)) ? $php_checked : 'fa fa-close fa-lg'; ?>"></i></span>
+              <span class="<?=(isset($php_passed)) ? $php_passed : 'text-danger'; ?>"><i class="<?=(isset($php_checked)) ? $php_checked : 'fa fa-close fa-lg'; ?>" aria-hidden="true"></i></span>
                
             </li>
             
@@ -213,6 +211,7 @@ function get_sisfo()
 <?php
 }
 
+// required settings
 function required_settings()
 {
 ?>
@@ -274,9 +273,9 @@ function required_settings()
                 
           ?>
                 
-        <small class="<?=(isset($filter_passed)) ? $filter_passed : 'text-danger'; ?>"><?=(isset($filter_passed)) ? 'Pass' : $errors['errorChecking'] = 'The filter extension is either not loaded or compiled in'; ?></small>
+        <small class="<?=(isset($filter_passed) ? $filter_passed : 'text-danger');  ?>"><?=(isset($filter_passed) ? 'Pass' : $errors['errorChecking'] = 'The filter extension is either not loaded or compiled in') ; ?></small>
         </div>
-      <span class="<?=(isset($spl_passed)) ? $spl_passed : 'text-danger'; ?>"><i class="<?=(isset($spl_checked)) ? $spl_checked : 'fa fa-close fa-lg'; ?>"></i></span>
+      <span class="<?=(isset($filter_passed) ? $filter_passed : 'text-danger'); ?>"><i class="<?=(isset($filter_checked) ? $spl_checked : 'fa fa-close fa-lg' ) ; ?>"></i></span>
             
 </li>
 
@@ -297,7 +296,7 @@ function required_settings()
                 
             ?>
 
-      <small class="<?=(isset($iconv_passed)) ? $iconv_passed : 'text-danger'; ?>"><?=(isset($iconv_passed)) ? 'Pass' : $errors['errorChecking'] = 'The Iconv extension is not loaded'; ?></small>
+      <small class="<?=(isset($iconv_passed)) ? $iconv_passed : 'text-danger'; ?>"><?=(isset($iconv_passed)) ? 'Pass' : $errors['errorChecking'] = 'Scriptlog requires the Iconv extension'; ?></small>
       </div>
       <span class="<?=(isset($iconv_passed)) ? $iconv_passed : 'text-danger'; ?>"><i class="<?=(isset($iconv_checked)) ? $iconv_checked : 'fa fa-close fa-lg'; ?>"></i></span>
             
@@ -320,7 +319,7 @@ function required_settings()
                 
             ?>
 
-      <small class="<?=(isset($mbstring_passed)) ? $mbstring_passed : 'text-danger'; ?>"><?=(isset($mbstring_passed)) ? 'Pass' : $errors['errorChecking'] = 'The Mbstring extension is not loaded'; ?></small>
+      <small class="<?=(isset($mbstring_passed)) ? $mbstring_passed : 'text-danger'; ?>"><?=(isset($mbstring_passed)) ? 'Pass' : $errors['errorChecking'] = 'Scriptlog requires the Multibyte String extension'; ?></small>
       </div>
       <span class="<?=(isset($mbstring_passed)) ? $mbstring_passed : 'text-danger'; ?>"><i class="<?=(isset($mbstring_checked)) ? $mbstring_checked : 'fa fa-close fa-lg'; ?>"></i></span>
             
@@ -343,7 +342,7 @@ function required_settings()
                 
             ?>
 
-      <small class="<?=(isset($fileinfo_passed)) ? $fileinfo_passed : 'text-danger'; ?>"><?=(isset($fileinfo_passed)) ? 'Pass' : $errors['errorChecking'] = 'The Fileinfo extension is not loaded'; ?></small>
+      <small class="<?=(isset($fileinfo_passed)) ? $fileinfo_passed : 'text-danger'; ?>"><?=(isset($fileinfo_passed)) ? 'Pass' : $errors['errorChecking'] = 'Scriptlog requires the fileinfo extension'; ?></small>
       </div>
       <span class="<?=(isset($fileinfo_passed)) ? $fileinfo_passed : 'text-danger'; ?>"><i class="<?=(isset($fileinfo_checked)) ? $fileinfo_checked : 'fa fa-close fa-lg'; ?>"></i></span>
             
@@ -372,7 +371,7 @@ function required_settings()
               
     <div>
                 
-        <h6 class="my-0">GD Enabled</h6>
+        <h6 class="my-0">GD Extension Loaded</h6>
                 
             <?php 
                 
@@ -504,9 +503,9 @@ function check_dir_file()
 
             ?>
 
-          <small class="<?=(isset($main_passed)) ? $main_passed : 'text-danger'; ?>"><?=(isset($main_passed)) ? 'Pass' : $errors['errorChecking'] = 'Required file not found'; ?></small>
+          <small class="<?=( isset($main_passed) ? $main_passed : 'text-danger'); ?>"><?=( isset($main_passed) ? 'Pass' : $errors['errorChecking'] = 'Required file not found'); ?></small>
           </div>
-          <span class="<?=(isset($main_passed)) ? $main_passed : 'text-danger' ?>"><i class="<?=(isset($main_checked)) ? $main_checked : 'fa fa-close fa-lg'; ?>"></i></span>
+          <span class="<?=( isset($main_passed) ? $main_passed : 'text-danger' ); ?>"><i class="<?=( isset($main_checked) ? $main_checked : 'fa fa-close fa-lg') ; ?>"></i></span>
      </li>
             
       <li class="list-group-item d-flex justify-content-between lh-condensed" >

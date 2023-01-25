@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class CommentApp
  *
@@ -47,16 +47,18 @@ class CommentApp extends BaseApp
     $checkError = true;
     $checkStatus = false;
     
-    if (isset($_GET['error'])) {
+    if (isset($_SESSION['error'])) {
         $checkError = false;
-        if ($_GET['error'] == 'commentNotFound') array_push($errors, "Error: Comment Not Found!"); 
+        ($_SESSION['error'] == 'commentNotFound') ?: array_push($errors, "Error: Comment Not Found!"); 
+        unset($_SESSION['error']);
     }
     
-    if (isset($_GET['status'])) {
+    if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        if ($_GET['status'] == 'commentAdded') array_push($status, "New comment added");
-        if ($_GET['status'] == 'commentUpdated') array_push($status, "Comment has been updated");
-        if ($_GET['status'] == 'commentDeleted') array_push($status, "Comment deleted");
+        ($_SESSION['status'] == 'commentAdded') ? array_push($status, "New comment added") : "";
+        ($_SESSION['status'] == 'commentUpdated') ? array_push($status, "Comment has been updated") : "";
+        ($_SESSION['status'] == 'commentDeleted') ? array_push($status, "Comment deleted") : "";
+        unset($_SESSION['status']);
     }
     
     $this->setView('all-comments');
@@ -80,7 +82,23 @@ class CommentApp extends BaseApp
   
   public function insert()
   {
-    #leave empty  
+    if ( isset($_POST['commentFormSubmit']) ) {
+
+       $filters = [
+          'post_id' => isset($_POST['post_id']) ? abs((int)$_POST['post_id']) : 0,
+          'author_name' => isset($_POST['author_name']) ? Sanitize::severeSanitizer($_POST['author_name']) : "",
+          'author_email' => isset($_POST['author_email']) ? Sanitize::severeSanitizer($_POST['author_email']) : "",
+          'comment_content' => isset($_POST['comment_content']) ? Sanitize::severeSanitizer($_POST['comment_content']) : ""
+       ];
+
+       $this->commentEvent->setPostId(distill_post_request($filters)['post_id']);
+       $this->commentEvent->setAuthorName(distill_post_request($filters)['author_name']);
+       $this->commentEvent->setAuthorIP(get_ip_address());
+       $this->commentEvent->setCommentContent(distill_post_request($filters)['comment_content']);
+       $this->commentEvent->setCommentDate(date("Y-m-d H:i:s"));
+       $this->commentEvent->addComment();
+       
+    }
   }
   
   public function update($id)
@@ -89,8 +107,9 @@ class CommentApp extends BaseApp
     $checkError = true;
     
     if (!$getComment = $this->commentEvent->grabComment($id)) {
-        
-        direct_page('index.php?load=comments&error=commentNotFound', 404);
+      
+      $_SESSION['error'] = "commentNotFound";
+      direct_page('index.php?load=comments&error=commentNotFound', 404);
         
     }
     
@@ -108,26 +127,24 @@ class CommentApp extends BaseApp
     
     if (isset($_POST['commentFormSubmit'])) {
         
-        $post_id = isset($_POST['post_id']) ? abs((int)$_POST['post_id']) : 0;
         $author_name = isset($_POST['author_name']) ? trim(htmlspecialchars($_POST['author_name'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8")) : "";
-        $author_ip = get_ip_address();
-        $comment_content = isset($_POST['comment_content']) ? $_POST['comment_content'] : "";
+        $comment_content = isset($_POST['comment_content']) ? Sanitize::severeSanitizer($_POST['comment_status']) : "";
         $comment_id = isset($_POST['comment_id']) ? abs((int)$_POST['comment_id']) : 0;
-        $comment_status = $_POST['comment_status'];
+        $comment_status = isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : "";
         
         try {
             
             if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                 
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-                throw new AppException("Sorry, unpleasant attempt detected!");
+              header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+              throw new AppException("Sorry, unpleasant attempt detected!");
                 
             }
             
             if (empty($author_name)) {
                 
-                $checkError = false;
-                array_push($errors, "Please enter author name");
+              $checkError = false;
+              array_push($errors, "Please enter author name");
                 
             }
             
@@ -156,15 +173,20 @@ class CommentApp extends BaseApp
                 $this->commentEvent->setCommentContent($comment_content);
                 $this->commentEvent->setCommentStatus($comment_status);
                 $this->commentEvent->modifyComment();
+                $_SESSION['status'] = "commentUpdated";
                 direct_page('index.php?load=comments&status=commentUpdated', 200);
                 
             }
             
+        } catch (Throwable $th) {
+
+          LogError::setStatusCode(http_response_code());
+          LogError::exceptionHandler($th);
+
         } catch (AppException $e) {
             
-            LogError::setStatusCode(http_response_code());
-            LogError::newMessage($e);
-            LogError::customErrorMessage();
+          LogError::setStatusCode(http_response_code());
+          LogError::exceptionHandler($e);
             
         }
         
@@ -187,9 +209,66 @@ class CommentApp extends BaseApp
   
   public function remove($id)
   {
-     $this->commentEvent->setCommentId($id);
-     $this->commentEvent->removeComment();
-     direct_page('index.php?load=comments&status=commentDeleted', 200);
+
+    $checkError = true;
+    $errors = array();
+
+    if (isset($_GET['Id'])) {
+
+      $getComment = $this->commentEvent->grabComment($id);
+
+      try {
+          
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+            throw new AppException("Sorry, unpleasant attempt detected!");
+    
+        }
+        
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+    
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+            throw new AppException("Sorry, unpleasant attempt detected!");
+    
+        }
+
+        if (!$getComment) {
+
+            $checkError = false;
+            array_push($errors, 'Error: Comment not found');
+
+        }
+
+        if (!$checkError) {
+
+            $this->setView('all-comments');
+            $this->setPageTitle('Comment not found');
+            $this->view->set('pageTitle', $this->getPageTitle());
+            $this->view->set('errors', $errors);
+            
+        } else {
+
+         $this->commentEvent->setCommentId($id);
+         $this->commentEvent->removeComment();
+         $_SESSION['status'] = "commentDeleted";
+         direct_page('index.php?load=comments&status=commentDeleted', 200);
+
+        }
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+
+      } catch (AppException $e) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($e);
+
+      }
+
+    }
+     
   }
   
   protected function setView($viewName)

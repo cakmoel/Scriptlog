@@ -1,6 +1,7 @@
 <?php
 /**
- * Generate Token
+ * generate_token()
+ * 
  * this will generate token for user reset password 
  * that send random string to user
  * 
@@ -11,18 +12,19 @@
  */
 function generate_token($length = 20)
 {
-    if (function_exists("random_bytes")) {
+    
+ if (function_exists("random_bytes")) {
         
-        return bin2hex(random_bytes($length));
+     return bin2hex(random_bytes($length));
         
-    } elseif (function_exists("openssl_random_pseudo_bytes")) {
+ } elseif (function_exists("openssl_random_pseudo_bytes")) {
         
-        return bin2hex(openssl_random_pseudo_bytes($length));
+     return bin2hex(openssl_random_pseudo_bytes($length));
         
-    } else {
+ } else {
         
-        return generate_hash($length);
+    return bin2hex(ircmaxell_random_generator($length));
         
-    }
+ }
     
 }

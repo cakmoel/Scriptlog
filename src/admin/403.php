@@ -1,4 +1,4 @@
-<?php  if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed");
+<?php  defined('SCRIPTLOG') || die("Direct access not permitted");
 if ((isset($_GET['forbidden']) && ($_GET['forbidden'] === md5(APP_HOSTNAME.get_ip_address())))) :
 ?>
   <!-- Content Wrapper. Contains page content -->

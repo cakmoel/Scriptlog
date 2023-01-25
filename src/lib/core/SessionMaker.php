@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class SessionMaker extends SessionHandler
  * 
@@ -53,7 +53,7 @@ public function __construct($key, $name = '_scriptlog', $cookie = [])
  
  if (ini_get('session.use_cookies')) {
 
-    $current_cookie_params = session_get_cookie_params();
+   $current_cookie_params = session_get_cookie_params();
 
  }
 
@@ -105,7 +105,7 @@ private function setup()
  
  if (PHP_VERSION_ID < 70300) {
 
-   session_set_cookie_params($this->cookie['lifetime'],  $this->cookie['path'], $this->cookie['domain'], $this->cookie['secure'], $this->cookie['httponly']);
+   session_set_cookie_params($this->cookie['lifetime'], $this->cookie['path'], $this->cookie['domain'], $this->cookie['secure'], $this->cookie['httponly']);
 
  } else {
 
@@ -133,17 +133,17 @@ private function setup()
 public function start()
 {
 
-if ((!isset($_COOKIE[session_name()])) || (self::isSessionStarted() === false)) {
+if ((!isset($_COOKIE[session_name()])) || ($this->isSessionStarted() === false)) {
 
    if (version_compare(PHP_VERSION, '5.6.0', '<')) {
       
-      if(session_id() == '') {
+      if (session_id() == '') {
          
          session_start();
          
       }
    
-   } else  {
+   } else {
      
        if (session_status() == PHP_SESSION_NONE) {
           
@@ -171,9 +171,9 @@ return false;
 public function forget()
 {
 
- if (self::isSessionStarted() === false) {
+ if ($this->isSessionStarted() === false) {
 
-     return false;
+   return false;
 
  }
 
@@ -203,16 +203,16 @@ public function refresh()
  * read
  *
  * @see https://www.php.net/manual/en/function.session-start.php#120589
- * @param string $id
- * @return string
+ * @param string|false $id
+ * @return string|false
  * 
  */
-public function read($id)
+public function read($id): string
 {
   
  $data = parent::read($id);
 
- return empty($data) ? '' : $this->decrypt($data, $this->key);
+ return (empty($data)) ? "" : $this->decrypt($data, $this->key);
  
 }
 
@@ -224,10 +224,12 @@ public function read($id)
  * @return boolean
  * 
  */
-public function write($id, $data)
+public function write($id, $data): bool
 {
  
- return parent::write($id, $this->encrypt($data, $this->key));
+ $data = $this->encrypt($data, $this->key);
+
+ return parent::write($id, $data);
 
 }
 
@@ -270,7 +272,7 @@ public function isGenuine()
 
  if (isset($_SESSION['_genuine'])) {
 
-     return $_SESSION['_genuine'] === $hash;
+   return $_SESSION['_genuine'] === $hash;
 
  }
 
@@ -297,7 +299,7 @@ public function isValid($ttl = 60)
  *
  * @param string $data
  * @param string $key
- * @return void
+ * @return string
  * 
  */
 protected function encrypt($data, $key)
@@ -329,7 +331,7 @@ return ScriptlogCryptonize::decryptAES($data, $key);
  * @return boolean
  * 
  */
-private static function isSessionStarted()
+private function isSessionStarted()
 {
 
    if(!headers_sent() && php_sapi_name() !== 'cli') {

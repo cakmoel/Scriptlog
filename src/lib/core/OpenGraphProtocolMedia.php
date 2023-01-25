@@ -1,5 +1,4 @@
-<?php
-
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Structured properties representations of Open Graph protocol media: image, video, audio
  *

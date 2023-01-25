@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Abstract Class Dashboard implement BoardInterface
  * 
@@ -15,7 +15,7 @@ abstract class Dashboard implements BoardInterface
 /**
  * View
  * 
- * @var string
+ * @var object
  * 
  */
  protected $view;

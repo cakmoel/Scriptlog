@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-crypt for the canonical source repository
- * @copyright https://github.com/laminas/laminas-crypt/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-crypt/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Crypt;
 
 use function hash;
@@ -16,8 +10,8 @@ use function strtolower;
 
 class Hash
 {
-    const OUTPUT_STRING = false;
-    const OUTPUT_BINARY = true;
+    public const OUTPUT_STRING = false;
+    public const OUTPUT_BINARY = true;
 
     /**
      * Last algorithm supported

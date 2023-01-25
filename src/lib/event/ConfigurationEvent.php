@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class ConfigurationEvent
  *
@@ -75,7 +75,7 @@ class ConfigurationEvent
 
   public function setConfigValue($setting_value)
   {
-    $this->setting_value = prevent_injection($setting_value);
+    $this->setting_value = $setting_value;
   }
 
   public function grabSettings($orderBy = 'ID')
@@ -88,6 +88,11 @@ class ConfigurationEvent
     return $this->configDao->findGeneralConfigs($orderBy, $limit);
   }
 
+  public function grabReadingSettings($orderBy = 'ID')
+  {
+    return $this->configDao->findReadingConfigs($orderBy);
+  }
+  
   public function grabSettingByName($setting_name)
   {
     return $this->configDao->findConfigByName($setting_name, $this->sanitizer);
@@ -97,7 +102,11 @@ class ConfigurationEvent
   {
     return $this->configDao->findConfig($id, $this->sanitizer);
   }
-  
+
+  /**
+   * addSetting
+   * 
+   */
   public function addSetting()
   {
     
@@ -111,24 +120,38 @@ class ConfigurationEvent
 
   }
 
+  /**
+   * modifySetting
+   *
+   */
   public function modifySetting()
   {
     
     $this->validator->sanitize($this->setting_name, 'string');
-    $this->validator->sanitize($this->setting_value, 'string');
-  
-    return $this->configDao->updateConfig($this->sanitizer, [
-       'setting_name' => $this->setting_name,
-       'setting_value' => $this->setting_value
-    ], $this->setting_id);
+    
+    if (!empty($this->setting_name)) {
+
+      return $this->configDao->updateConfig($this->sanitizer, [
+
+        'setting_name' => $this->setting_name,
+        'setting_value' => $this->setting_value
+
+     ], $this->setting_id);
+
+    }
     
   }
-  
+
+  /**
+   * removeSetting
+   *
+   */
   public function removeSetting()
   {
+    
     $this->validator->sanitize($this->setting_id, 'int');
 
-    if (!$data_config = $this->configDao->findConfig($this->setting_id, $this->sanitizer)) {
+    if (!$this->configDao->findConfig($this->setting_id, $this->sanitizer)) {
       direct_page('index.php?load=settings&error=configNotFound', 404);
     }
 
@@ -136,6 +159,23 @@ class ConfigurationEvent
 
   }
 
+  /**
+   * timezoneIdentifierDropDown
+   *
+   * @param string $selected
+   * 
+   */
+  public function timezoneIdentifierDropDown($selected = "")
+  {
+    return $this->configDao->dropDownTimezone($selected);
+  }
+
+  /**
+   * totalSettings
+   *
+   * @param array|mixed $data
+   * 
+   */
   public function totalSettings($data = null)
   {
     return $this->configDao->totalConfigRecords($data);

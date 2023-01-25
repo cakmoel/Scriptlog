@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-crypt for the canonical source repository
- * @copyright https://github.com/laminas/laminas-crypt/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-crypt/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Crypt\Symmetric;
 
 use Interop\Container\ContainerInterface;
@@ -22,6 +16,7 @@ use function sprintf;
  */
 class PaddingPluginManager implements ContainerInterface
 {
+    /** @var array<string, string> */
     private $paddings = [
         'pkcs7'     => Padding\Pkcs7::class,
         'nopadding' => Padding\NoPadding::class,
@@ -54,6 +49,6 @@ class PaddingPluginManager implements ContainerInterface
             ));
         }
         $class = $this->paddings[$id];
-        return new $class;
+        return new $class();
     }
 }

@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted"); 
 /**
  * User class extends Dao
  * insert, update, delete 
@@ -14,6 +14,8 @@
 class UserDao extends Dao
 {
  
+ private $selected;
+
  // overrides Dao constructor
  public function __construct()
  {
@@ -57,6 +59,7 @@ class UserDao extends Dao
  */
  public function getUserById($userID, $sanitize, $fetchMode = null)
  {
+
    $cleanID = $this->filteringId($sanitize, $userID, 'sql');
    
    $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
@@ -72,7 +75,7 @@ class UserDao extends Dao
  }
 
  /**
-  * get user by email
+  * getUserByEmail()
   * 
   * @param string $user_email
   * @param static PDO::FETCH_MODE $fetchMode
@@ -83,8 +86,10 @@ class UserDao extends Dao
  {
      
    $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
-             user_session, user_banned, user_signin_count, user_locked_until, login_time 
-           FROM tbl_users WHERE user_email = :user_email LIMIT 1";
+                  user_session, user_banned, user_signin_count, user_locked_until, login_time 
+           FROM tbl_users 
+           WHERE user_email = :user_email 
+           AND user_banned = '0' LIMIT 1";
    
    $this->setSQL($sql);
    
@@ -109,7 +114,8 @@ class UserDao extends Dao
 
    $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
                 user_session, user_banned, user_signin_count, user_locked_until, login_time
-           FROM tbl_users WHERE user_login = :user_login LIMIT 1";
+           FROM tbl_users WHERE user_login = :user_login 
+           AND user_banned = '0' LIMIT 1";
 
    $this->setSQL($sql);
 
@@ -136,8 +142,7 @@ class UserDao extends Dao
                    user_session, user_banned, user_signin_count, user_locked_until, login_time
             FROM tbl_users 
             WHERE user_session = :user_session
-            AND (login_time >= (NOW() - INTERVAL 7 DAY)) AND user_banned = 0; 
-            LIMIT 1";
+            AND (login_time >= (NOW() - INTERVAL 7 DAY)) AND user_banned = '0' LIMIT 1";
 
     $this->setSQL($sql);
 
@@ -154,14 +159,14 @@ class UserDao extends Dao
   * @return mixed
   *  
   */
- public function getUserByResetKey($reset_key)
+ public function getUserByResetKey($reset_key, $fetchMode = null)
  {
-   $sql = "SELECT ID, user_reset_key, user_reset_complete FROM tbl_users 
-           WHERE user_reset_key = :reset_key LIMIT 1";
+   $sql = "SELECT ID, user_email, user_reset_key, user_reset_complete FROM tbl_users 
+           WHERE user_reset_key = :reset_key AND user_banned = '0' LIMIT 1";
    
    $this->setSQL($sql);
    
-   $resetKeyDetails = $this->findRow([':reset_key' => $reset_key]);
+   $resetKeyDetails = (is_null($fetchMode)) ? $this->findRow([':reset_key' => $reset_key]) : $this->findRow([':reset_key' => $reset_key], $fetchMode);
 
    return (empty($resetKeyDetails)) ?: $resetKeyDetails;
    
@@ -192,7 +197,7 @@ class UserDao extends Dao
 	          'user_fullname' => $bind['user_fullname'],
 	          'user_url'   => $user_url,
 	          'user_activation_key' => $bind['user_activation_key'],
-	          'user_session' => $bind['user_session']
+            'user_session' => $bind['user_session']
 	          
 	      ]);
 	      
@@ -228,7 +233,7 @@ class UserDao extends Dao
   
     $cleanID = $this->filteringId($sanitize, $userID, 'sql');
   
-    $hash_password = scriptlog_password($bind['user_pass']);
+    $hash_password = (!empty($bind['user_pass'])) ? scriptlog_password($bind['user_pass']) : "";
   
      if ($accessLevel != 'administrator') {
          
@@ -237,7 +242,7 @@ class UserDao extends Dao
              $bind = array(
                 'user_email' => $bind['user_email'],
                 'user_fullname' => $bind['user_fullname'],
-                'user_url' => $bind['user_url'] 
+                'user_url' => $bind['user_url']
              );
              
          } else {
@@ -259,7 +264,8 @@ class UserDao extends Dao
                  'user_email' => $bind['user_email'],
                  'user_level' => $bind['user_level'],
                  'user_fullname' => $bind['user_fullname'],
-                 'user_url'=> $bind['user_url']
+                 'user_url'=> $bind['user_url'],
+                 'user_banned' => $bind['user_banned']
              );
              
          } else {
@@ -269,7 +275,8 @@ class UserDao extends Dao
                  'user_pass' => $hash_password,
                  'user_level' => $bind['user_level'],
                  'user_fullname' => $bind['user_fullname'],
-                 'user_url' => $bind['user_url']
+                 'user_url' => $bind['user_url'],
+                 'user_banned' => $bind['user_banned']
              );
              
          }
@@ -317,8 +324,7 @@ class UserDao extends Dao
  public function recoverNewPassword($bind, $userID)
  {
    $recoverPassword = scriptlog_password($bind['user_pass']);
-   $this->modify("tbl_users", ['user_pass' => $recoverPassword, 'user_reset_complete' => $bind['user_reset_complete']], "ID = '{$userID}'");
-          
+   $this->modify("tbl_users", ['user_pass' => $recoverPassword, 'user_reset_complete' => $bind['user_reset_complete']], "ID = '{$userID}'");          
  }
 
  /**
@@ -339,9 +345,9 @@ class UserDao extends Dao
        
    } else {
        
-       $bind = ['user_activation_key' => '1', 'user_registered' => date("Y-m-d H:i:s")];
-       $this->modify("tbl_users", $bind, "user_activation_key = {$key}");
-       $userAccount = true;
+      $bind = ['user_activation_key' => '1', 'user_registered' => date("Y-m-d H:i:s")];
+      $this->modify("tbl_users", $bind, "user_activation_key = {$key}");
+      $userAccount = true;
        
    }
    
@@ -358,19 +364,17 @@ class UserDao extends Dao
   */
  public function deleteUser($ID, $sanitize)
  {
-  
-  $cleanID = $this->filteringId($sanitize, $ID, 'sql');
-   
-  $this->deleteRecord("tbl_users", "ID = ".(int)$cleanID);
-	 
+   $cleanID = $this->filteringId($sanitize, $ID, 'sql'); 
+   $this->deleteRecord("tbl_users", "ID = {$cleanID}");
  }
  
- /**
-  * set user level
-  * 
-  * @param string $selected
-  * @return string
-  */
+/**
+ * dropDownUserLevel
+ *
+ * @param string $selected
+ * @return string
+ * 
+ */
  public function dropDownUserLevel($selected = '')
  {
   
@@ -381,17 +385,17 @@ class UserDao extends Dao
                   'contributor'=>'Contributor');
   
   if ($selected != '') {
-      $selected = $selected;
+      $this->selected = $selected;
   } 
   
-  return dropdown($name, $levels, $selected);
+  return dropdown($name, $levels, $this->selected);
   
  }
 
 /**
  * isUserLoginExists
  *
- * checkign whether user_login availability
+ * checking whether user_login record does exists
  * 
  * @param [type] $user_login
  * @return boolean
@@ -399,19 +403,10 @@ class UserDao extends Dao
  public function isUserLoginExists($user_login)
  {
    
-   $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_login = ?";
+   $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_login = ? AND user_banned = '0' LIMIT 1";
    $this->setSQL($sql);
    $stmt = $this->findColumn([$user_login]);
-     
-   if ($stmt == 1) {
-      
-      return true;
-   
-   } else {
-      
-      return false;
-       
-   }
+   return ($stmt === 1) ? true : false;
 	
  }
 	 
@@ -427,13 +422,13 @@ class UserDao extends Dao
  public function checkUserSession($user_session)
  {
 
-    $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_session = :user_session ";
+    $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_session = :user_session AND user_banned = '0' LIMIT 1";
     
     $this->setSQL($sql);
     
     $stmt = $this->findColumn([':user_session' => $user_session]);     
     
-    return ($stmt == 1) ? true : false;
+    return ($stmt === 1) ? true : false;
  
  }
 
@@ -445,109 +440,34 @@ class UserDao extends Dao
   */
  public function checkUserEmail($email)
  {
-    $sql = "SELECT ID FROM tbl_users WHERE user_email = :email LIMIT 1";
+    $sql = "SELECT ID FROM tbl_users WHERE user_email = :email AND user_banned = '0' LIMIT 1";
     $this->setSQL($sql);
     $stmt = $this->checkCountValue([':email' => $email]);
     return($stmt > 0);
  }
 
 /**
+ * checkUserPassword
+ * 
  * Checking user password
  * 
  * @method public checkUserPassword()
- * @param string $email
+ * @param string $login
  * @param string $password
  * @return bool
- * 
  */
  public function checkUserPassword($login, $password)
  {
     
     if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
 
-        $sql = "SELECT user_pass FROM tbl_users WHERE user_email = :user_email LIMIT 1";
-        $this->setSQL($sql);
-        $stmt = $this->checkCountValue([':user_email' => $login]);
-
-        if ($stmt > 0) {
-        
-            $row = $this->findRow([':user_email' => $login]);
-            
-            $expected = crypt($password, $row['user_pass']);
-            $correct = crypt($password, $row['user_pass']);
-    
-            if(!function_exists('hash_equals')) {
-    
-                if(timing_safe_equals($expected, $correct) == 0) {
-    
-                    if(scriptlog_verify_password($password, $row['user_pass'])) {
-    
-                        return true;
-    
-                    }
-    
-                }
-    
-            } else {
-    
-                if(hash_equals($expected, $correct)) {
-    
-                    if (scriptlog_verify_password($password, $row['user_pass'])) {
-    
-                        return true;
-    
-                    }
-    
-                }
-                
-            }
-            
-        }
+      return ($this->checkUserPasswordByEmail($login, $password)) ?: false;
     
     } else {
 
-        $sql = "SELECT user_pass FROM tbl_users WHERE user_login = :user_login LIMIT 1";
-        $this->setSQL($sql);
-        $stmt = $this->checkCountValue([':user_login' => $login]);
-
-        if ($stmt > 0) {
-        
-            $row = $this->findRow([':user_login' => $login]);
-            
-            $expected = crypt($password, $row['user_pass']);
-            $correct = crypt($password, $row['user_pass']);
-    
-            if(!function_exists('hash_equals')) {
-    
-                if(timing_safe_equals($expected, $correct) == 0) {
-    
-                    if(scriptlog_verify_password($password, $row['user_pass'])) {
-    
-                        return true;
-    
-                    }
-    
-                }
-    
-            } else {
-    
-                if(hash_equals($expected, $correct)) {
-    
-                    if (scriptlog_verify_password($password, $row['user_pass'])) {
-    
-                        return true;
-    
-                    }
-    
-                }
-                
-            }
-            
-        }
+      return ($this->checkUserPasswordByLogin($login, $password)) ?: false;
 
     }
-    
-    return false;
     
  }
  
@@ -556,21 +476,20 @@ class UserDao extends Dao
  *
  * @param integer $userID
  * @param object $sanitize
- * @return numeric
- * 
+ * @return numeric 
  */
  public function checkUserId($userID, $sanitize)
  {
      
-     $sql = "SELECT ID FROM tbl_users WHERE ID = ?";
+    $sql = "SELECT ID FROM tbl_users WHERE ID = ?";
 
-     $idsanitized = $this->filteringId($sanitize, $userID, 'sql');
+    $idsanitized = $this->filteringId($sanitize, $userID, 'sql');
 
-     $this->setSQL($sql);
+    $this->setSQL($sql);
 
-     $stmt = $this->checkCountValue([$idsanitized]);
+    $stmt = $this->checkCountValue([$idsanitized]);
 
-     return($stmt > 0);
+    return($stmt > 0);
 
  }
  
@@ -591,6 +510,88 @@ class UserDao extends Dao
      
  }
  
+/**
+ * checkUserPasswordByEmail
+ *
+ * @param  string $login
+ * @param string $password
+ * @return bool
+ */
+ private function checkUserPasswordByEmail($login, $password)
+ {
+    $sql = "SELECT user_pass FROM tbl_users WHERE user_email = :user_email AND user_banned = '0' LIMIT 1";
+        $this->setSQL($sql);
+        $stmt = $this->checkCountValue([':user_email' => $login]);
+
+        if ($stmt > 0) {
+        
+            $row = $this->findRow([':user_email' => $login]);
+            
+            $expected = crypt($password, $row['user_pass']);
+            $correct = crypt($password, $row['user_pass']);
+    
+            if (!function_exists('hash_equals')) {
+    
+                if ((timing_safe_equals($expected, $correct) === 0) && (scriptlog_verify_password($password, $row['user_pass']) ) ) {
+
+                  return true;
+
+                }
+                
+            } else {
+    
+                if (hash_equals($expected, $correct)  && (scriptlog_verify_password($password, $row['user_pass']))) {
+
+                  return true;
+
+                }
+                
+            }
+            
+        }
+
+ }
+
+/**
+ * checkUserPasswordByLogin
+ *
+ * @param string $login
+ * @param string $password
+ * @return bool
+ */
+ private function checkUserPasswordByLogin($login, $password)
+ {
+    $sql = "SELECT user_pass FROM tbl_users WHERE user_login = :user_login AND user_banned = '0' LIMIT 1";
+    $this->setSQL($sql);
+    $stmt = $this->checkCountValue([':user_login' => $login]);
+
+    if ($stmt > 0) {
+    
+        $row = $this->findRow([':user_login' => $login]);
+        
+        $expected = crypt($password, $row['user_pass']);
+        $correct = crypt($password, $row['user_pass']);
+
+        if (!function_exists('hash_equals')) {
+
+            if ((timing_safe_equals($expected, $correct) === 0) && (scriptlog_verify_password($password, $row['user_pass']))) {
+
+                return true;
+            }
+            
+    
+        } else {
+
+            if ((hash_equals($expected, $correct))  && (scriptlog_verify_password($password, $row['user_pass']))) {
+
+                return true;
+            }
+            
+        }
+        
+    }
+ }
+
  /**
   * Check Activation Key
   * 
@@ -612,5 +613,3 @@ class UserDao extends Dao
  }
  
 }
-
-

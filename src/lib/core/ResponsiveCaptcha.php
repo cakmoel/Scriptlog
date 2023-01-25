@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Generate random text-based CAPTCHAs with simple arithmetic and logic questions
  * Website: https://github.com/theodorejb/responsive-Captcha

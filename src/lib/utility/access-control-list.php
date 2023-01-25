@@ -1,10 +1,13 @@
 <?php
 /**
- * Access Control list Function
+ * access_control_list
  * Checking users's action privilege 
  * on admin directory wherein navigation menu
  * 
- * @category Function
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param string $action
  * @return bool
  * 
@@ -20,8 +23,6 @@ function access_control_list($action = null)
   
   $authenticator = new Authentication($user_dao, $user_token, $form_validator);
   
-  $access_control = $authenticator->userAccessControl($action);
-
-  return $access_control;
+  return $authenticator->userAccessControl($action);
 
 }

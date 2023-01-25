@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Post class extends Dao
  *
@@ -13,7 +13,7 @@
 class PostDao extends Dao
 {
 
-protected $linkPosts;
+private $selected;
 
 public function __construct()
 {
@@ -43,8 +43,9 @@ public function findPosts($orderBy = 'ID', $author = null)
                 p.post_title,
                 p.post_slug,
                 p.post_content,
-                p.post_tags,
                 p.post_status,
+                p.post_tags,
+                p.post_headlines,
                 p.post_type,
                 u.user_login
   			FROM tbl_posts AS p
@@ -65,8 +66,9 @@ public function findPosts($orderBy = 'ID', $author = null)
                 p.post_title,
                 p.post_slug,
                 p.post_content,
-                p.post_tags,
                 p.post_status,
+                p.post_tags,
+                p.post_headlines,
                 p.post_type,
                 u.user_login
   		  FROM tbl_posts AS p
@@ -113,8 +115,9 @@ public function findPost($id, $sanitize, $author = null)
                   post_content,
                   post_summary,
                   post_keyword,
-                  post_tags,
                   post_status,
+                  post_tags,
+                  post_headlines,
   	  		        post_type,
                   comment_status
   	  		  FROM tbl_posts
@@ -135,8 +138,9 @@ public function findPost($id, $sanitize, $author = null)
               post_content,
               post_summary,
               post_keyword,
-              post_tags,
               post_status,
+              post_tags,
+              post_headlines,
   	  		    post_type,
               comment_status
   	  		  FROM tbl_posts
@@ -155,14 +159,18 @@ public function findPost($id, $sanitize, $author = null)
 }
 
 /**
- * insert new post
+ * createPost
+ * 
+ * insert new post record
  *
  * @param array $bind
  * @param integer $topicId
+ * @param string $tagId
+ * 
  */
 public function createPost($bind, $topicId)
 {
-
+ 
  if (!empty($bind['media_id'])) {
 
    $this->create("tbl_posts", [
@@ -174,8 +182,9 @@ public function createPost($bind, $topicId)
        'post_content' => $bind['post_content'],
        'post_summary' => $bind['post_summary'],
        'post_keyword' => $bind['post_keyword'],
-       'post_tags' => $bind['post_tags'],
        'post_status' => $bind['post_status'],
+       'post_tags' => $bind['post_tags'],
+       'post_headlines' => $bind['post_headlines'],
        'comment_status' => $bind['comment_status']
    ]);
 
@@ -189,8 +198,9 @@ public function createPost($bind, $topicId)
       'post_content' => $bind['post_content'],
       'post_summary' => $bind['post_summary'],
       'post_keyword' => $bind['post_keyword'],
-      'post_tags' => $bind['post_tags'],
       'post_status' => $bind['post_status'],
+      'post_tags' => $bind['post_tags'],
+      'post_headlines' => $bind['post_headlines'],
       'comment_status' => $bind['comment_status']
    ]);
 
@@ -200,14 +210,14 @@ public function createPost($bind, $topicId)
 
  if ((is_array($topicId)) && (!empty($postId))) {
 
-  	foreach ($_POST['topic_id'] as $topicId) {
+  	foreach ($_POST['catID'] as $topicId) {
 
   	  $this->create("tbl_post_topic", [
   	    'post_id' => $postId,
   	    'topic_id' => $topicId]);
 
-   }
-
+    }
+   
  } else {
 
     $this->create("tbl_post_topic", [
@@ -215,12 +225,14 @@ public function createPost($bind, $topicId)
       'topic_id' => $topicId]);
 
  }
-
+  
 }
 
 /**
- * modify post
+ * updatePost
  *
+ * updating an existing post record
+ * 
  * @param array $bind
  * @param integer $id
  * @param integer $topicId
@@ -238,44 +250,44 @@ try {
   if (!empty($bind['media_id'])) {
 
   	$this->modify("tbl_posts", [
+
   	    'media_id' => $bind['media_id'],
-  	    'post_author' => $bind['post_author'],
   	    'post_modified' => $bind['post_modified'],
   	    'post_title' => $bind['post_title'],
   	    'post_slug' => $bind['post_slug'],
   	    'post_content' => $bind['post_content'],
   	    'post_summary' => $bind['post_summary'],
         'post_keyword' => $bind['post_keyword'],
+        'post_status' => $bind['post_status'],
         'post_tags' => $bind['post_tags'],
-  	    'post_status' => $bind['post_status'],
+        'post_headlines' => $bind['post_headlines'],
   	    'comment_status' => $bind['comment_status']
+
   	], "ID = {$cleanId}");
 
   } else {
 
       $this->modify("tbl_posts", [
-          'post_author' => $bind['post_author'],
+
           'post_modified' => $bind['post_modified'],
           'post_title' => $bind['post_title'],
           'post_slug' => $bind['post_slug'],
           'post_content' => $bind['post_content'],
           'post_summary' => $bind['post_summary'],
           'post_keyword' => $bind['post_keyword'],
-          'post_tags' => $bind['post_tags'],
           'post_status' => $bind['post_status'],
+          'post_tags' => $bind['post_tags'],
+          'post_headlines' => $bind['post_headlines'],
           'comment_status' => $bind['comment_status']
+          
       ], "ID = {$cleanId}");
 
   }
 
-  // query Id
-  $this->setSQL("SELECT ID FROM tbl_posts WHERE ID = ?");
-  $post_id = $this->findColumn([$cleanId]);
+  // delete all post_topic by post_id
+  $this->deleteRecord("tbl_post_topic", "post_id = $cleanId");
 
-  // delete post_topic
-  $this->deleteRecord("tbl_post_topic", "post_id = '{$post_id['ID']}'");
-
-  if (is_array($topicId)) {
+  if ( ( is_array($topicId) ) && (isset($_POST['catID']) ) ) {
 
   	 foreach ($_POST['catID'] as $topicId) {
 
@@ -284,24 +296,23 @@ try {
   	        'topic_id' => $topicId
   	    ]);
 
-  	 }
+  	  }
 
-  } else {
-
-      $this->create("tbl_post_topic", [
-          'post_id' => $cleanId,
-          'topic_id' => $topicId
-      ]);
-
-  }
+  } 
 
   $this->callCommit();
 
+} catch (Throwable $th) {
+
+  $this->callRollBack();
+  $this->error = LogError::setStatusCode(http_response_code(500));
+  $this->error = LogError::exceptionHandler($th);
+
 } catch (DbException $e) {
 
-   $this->callRollBack();
-   $this->error = LogError::newMessage($e);
-   $this->error = LogError::customErrorMessage('admin');
+  $this->callRollBack();
+  $this->error = LogError::setStatusCode(http_response_code(500));
+  $this->error = LogError::exceptionHandler($e);
 
 }
 
@@ -317,7 +328,7 @@ try {
 public function deletePost($id, $sanitize)
 {
  $clean_id = $this->filteringId($sanitize, $id, 'sql');
- $this->deleteRecord("tbl_posts", "ID = ".(int)$clean_id);
+ $this->deleteRecord("tbl_posts", "ID = $clean_id");
 }
 
 /**
@@ -345,20 +356,20 @@ public function checkPostId($id, $sanitizing)
  * @return string
  *
  */
-public static function dropDownPostStatus($selected = "")
+public function dropDownPostStatus($selected = "")
 {
 
   $name = 'post_status';
 
   $posts_status = array('publish' => 'Publish', 'draft' => 'Draft');
 
-  if ($selected != '') {
+  if ($selected !== '') {
 
-    $selected = $selected;
+    $this->selected = $selected;
 
   }
 
-  return dropdown($name, $posts_status, $selected);
+  return dropdown($name, $posts_status, $this->selected);
 
 }
 
@@ -370,18 +381,18 @@ public static function dropDownPostStatus($selected = "")
  * @return string
  *
  */
-public static function dropDownCommentStatus($selected = "")
+public function dropDownCommentStatus($selected = "")
 {
 
   $name = 'comment_status';
 
  	$comment_status = array('open' => 'Open', 'closed' => 'Closed');
 
- 	if ($selected != '') {
- 	    $selected = $selected;
+ 	if ($selected !== '') {
+ 	    $this->selected = $selected;
  	}
 
- 	return dropdown($name, $comment_status, $selected);
+ 	return dropdown($name, $comment_status, $this->selected);
 
 }
 
@@ -397,11 +408,11 @@ public function totalPostRecords($data = array())
 
   if (!empty($data)) {
 
-     $sql = "SELECT ID FROM tbl_posts WHERE post_author = ?";
+    $sql = "SELECT ID FROM tbl_posts WHERE post_author = ? AND post_type = 'blog'";
 
   } else {
 
-     $sql = "SELECT ID FROM tbl_posts";
+    $sql = "SELECT ID FROM tbl_posts WHERE post_type = 'blog'";
 
   }
 

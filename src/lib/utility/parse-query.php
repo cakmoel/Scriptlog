@@ -1,8 +1,8 @@
 <?php
 /**
- * Parse Query Function 
+ * parse_query()
  * 
- * @category Function
+ * @category function
  * @source PHP.Net to parse out the query element from the output of parse_url()
  * @see   https://secure.php.net/manual/en/function.parse-url.php#95304
  * 

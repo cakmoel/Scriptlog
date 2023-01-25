@@ -1,6 +1,6 @@
 <?php
 /**
- * Uniqid Real Function
+ * uniqid_real
  * to cretate randomm unique ID or Key
  * 
  * @param number $length
@@ -21,7 +21,7 @@ function uniqid_real($length = 13)
 
     } else {
 
-        throw new Exception("no cryptographically secure random function available");
+        throw new InvalidArgumentException("no cryptographically secure random function available");
 
     }
 

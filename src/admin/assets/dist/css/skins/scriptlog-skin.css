@@ -44,7 +44,7 @@
 }
 .skin-scriptlog .main-header .logo {
   background-color: #122430;
-  color: #8aCa2b;
+  color: #7fff00;
   border-bottom: 0 solid transparent;
 }
 .skin-scriptlog .main-header .logo:hover {
@@ -76,7 +76,7 @@
 .skin-scriptlog .sidebar-menu > li.active > a,
 .skin-scriptlog .sidebar-menu > li.menu-open > a {
   color: #122430;
-  background: #8aCa2b;
+  background: #7fff00;
 }
 .skin-scriptlog .sidebar-menu > li.active > a {
   border-left-color: #122430;
@@ -100,13 +100,13 @@
 }
 .skin-scriptlog .sidebar-form {
   border-radius: 3px;
-  border: 1px solid #8aCa2b;
+  border: 1px solid #7fff00;
   margin: 10px 10px;
 }
 .skin-scriptlog .sidebar-form input[type="text"],
 .skin-scriptlog .sidebar-form .btn {
   box-shadow: none;
-  background-color: #8aCa2b;
+  background-color: #7fff00;
   border: 1px solid transparent;
   height: 35px;
 }

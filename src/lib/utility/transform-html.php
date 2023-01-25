@@ -6,7 +6,7 @@
  * @param integer $length
  * 
  */
-function transform_html($string, $length = null)
+function transform_html($string, $length)
 {
   $string = trim($string);
   

@@ -18,9 +18,6 @@ function mime_type_dictionary()
         'jpg'  => 'image/jpeg',
         'gif'  => 'image/gif',
         'bmp'  => 'image/bmp',
-        'ico'  => 'image/vnd.microsoft.icon',
-        'tiff' => 'image/tiff',
-        'tif'  => 'image/tiff',
         'webp' => 'image/webp',
       
         // archives

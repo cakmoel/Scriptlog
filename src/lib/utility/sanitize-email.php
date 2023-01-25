@@ -10,5 +10,5 @@
  */
 function sanitize_email($email)
 {
-    return preg_replace('((?:\n|\r|\t|%0A|%0D|%08|%09)+)i', '', $email);
+ return preg_replace('((?:\n|\r|\t|%0A|%0D|%08|%09)+)i', '', $email);
 }

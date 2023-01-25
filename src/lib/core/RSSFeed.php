@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * RssFeed Class
  *
@@ -11,34 +11,16 @@
  */
 class RSSFeed
 {
-/**
- * RSS Writer
- * 
- * @var string
- * 
- */
- private $rsswriter;
 
 /**
  * postdao 
  * post database access object 
  *
- * @var string
+ * @var obj
+ * 
  */
- private $postDao;
+ private $frontContentProvider;
  
-/**
- * Initialize an object properties
- * Constructor
- * 
- * @param string $dbc
- * 
- */
- public function __construct(PostDao $postDao, RSSWriter $rsswriter)
- {
-  $this->postDao = $postDao;
-  $this->rsswriter = $rsswriter;
- }
  
 /**
  * Get posts records from database
@@ -47,13 +29,29 @@ class RSSFeed
  * @return array
  * 
  */
- protected function grabPostFeed($limit)
+ private function grabPostFeed($limit)
  {
 
-  return $this->postDao->showPostFeeds($limit);
+  $postProviderModel = new PostProviderModel();
 
+  $this->frontContentProvider = FrontContentProvider::frontPostsFeed($limit, $postProviderModel);
+
+  return $this->frontContentProvider;
+  
  }
   
+/**
+ * setFileXML
+ *
+ * @param string $filename
+ * @param string $mode
+ * 
+ */
+ private function setFileXML($filename, $mode)
+ {
+   return fopen($filename, $mode);
+ }
+
 /**
  * Generate Feeds
  * 
@@ -62,19 +60,17 @@ class RSSFeed
  * @param string $description
  * 
  */
- public function generatePostFeed($title, $link, $description, $attribs, $limit = 5)
+ public function generatePostFeed($title, $link, $description, $limit)
  {
 
-  $data_posts = $this->grabPostFeed($limit);
-  
-   $dataPosts = $this->getPostFeed();
+   $dataPosts = is_iterable($this->grabPostFeed($limit)) ? $this->grabPostFeed($limit) : "";
    
    $rssFile = $this->setFileXML('rss.xml', 'w');
    
    $headerInit = '<?xml version="1.0" encoding="UTF-8"?> 
                   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"> 
                   <channel>
-                  <atom:link href="'.$link.'rss.xml" rel="self" type="application/rss+xml" /> 
+                  <atom:link href="'.$link.'/rss.xml" rel="self" type="application/rss+xml" /> 
                   <title>'.$title.'</title> 
                   <link>'.$link.'</link> 
                   <description>'.$description.'</description> 
@@ -85,13 +81,14 @@ class RSSFeed
    foreach ($dataPosts as $dataPost) {
        
      //build the full URL to the post
-     $url = APP_PROTOCOL . '://'. APP_HOSTNAME . dirname($_SERVER['PHP_SELF']) . '/post/'.(int)$dataPost['ID'].'/'.$dataPost['post_slug'];
-     
+     //$url = APP_PROTOCOL . '://'. APP_HOSTNAME . dirname($_SERVER['PHP_SELF']) . '/post/'.(int)$dataPost['ID'].'/'.$dataPost['post_slug'];
+     $url = permalinks((int)$dataPost['ID'])['post'].DS.'';
+
      // date post created
      $published = date(DATE_RSS, strtotime($dataPost['post_date']));
      
      // paragraf
-     $content = htmlentities(strip_tags(nl2br(html_entity_decode($dataPost['post_content']))));
+     $content = htmlout(strip_tags(nl2br(html_entity_decode($dataPost['post_content']))));
      $paragraph = substr($content, 0, 220);
      $paragraph = substr($content, 0, strrpos($paragraph," "));
      

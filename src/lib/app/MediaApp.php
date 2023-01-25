@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class MediaApp
  * 
@@ -28,6 +28,8 @@ private $view;
  */
 private $mediaEvent;
 
+const TIME_BEFORE_EXPIRED = 8;
+
 /**
  * Initialize object properties
  * 
@@ -54,18 +56,22 @@ public function listItems()
   $checkError = true;
   $checkStatus = false;
 
-  if (isset($_GET['error'])) {
+  if (isset($_SESSION['error'])) {
 
-     $checkError = false;
-     if ($_GET['error'] == 'mediaNotFound') array_push($errors, "Error: Media Not Found");
+    $checkError = false;
+    ($_SESSION['error'] == 'mediaNotFound') ?: array_push($errors, "Error: Media Not Found");
+    unset($_SESSION['error']);
 
   }
 
-  if (isset($_GET['status'])) {
-      $checkStatus = true;
-      if ($_GET['status'] == 'mediaAdded') array_push($status, "New media added");
-      if ($_GET['status'] == 'mediaUpdated') array_push($status, "Media has been updated");
-      if ($_GET['status'] == 'mediaDeleted') array_push($status, "Media deleted");
+  if (isset($_SESSION['status'])) {
+    
+    $checkStatus = true;
+    ($_SESSION['status'] == 'mediaAdded') ? array_push($status, "New media added") : "";
+    ($_SESSION['status'] == 'mediaUpdated') ? array_push($status, "Media has been updated") : "";
+    ($_SESSION['status'] == 'mediaDeleted') ? array_push($status, "Media deleted") : "";
+    unset($_SESSION['status']);
+
   }
 
   $this->setView('all-media');
@@ -117,32 +123,35 @@ public function insert()
     $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : null;
     $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : null;
 
-    $filters = ['media_caption' => FILTER_SANITIZE_SPECIAL_CHARS, 'media_target' => FILTER_SANITIZE_STRING, 'media_access' => FILTER_SANITIZE_STRING];
+    $filters = ['media_caption' => FILTER_SANITIZE_SPECIAL_CHARS, 
+                'media_target' => isset($_POST['media_target']) ? Sanitize::mildSanitizer($_POST['media_target']) : "", 
+                'media_access' => isset($_POST['media_access']) ? Sanitize::mildSanitizer($_POST['media_access']) : ""
+              ];
 
     $form_fields = ['media_caption' => 200];
+
+    // get new filename and extension
+    $new_filename = generate_filename($file_name)['new_filename'];
+    $file_extension = generate_filename($file_name)['file_extension'];
 
     try {
 
       if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
               
-         header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+         header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
          $checkError = false;
          array_push($errors, "Sorry, unpleasant attempt detected!");
        
       }
 
-      if (!empty($_POST['media_caption'])) {
+      if ( ( ! empty($_POST['media_caption']) ) && ( true === form_size_validation($form_fields) )) {
 
-          if(true === form_size_validation($form_fields)) {
-
-             $checkError = false;
-             array_push($errors, "Form data is longer than allowed");
-
-          }
+        $checkError = false;
+        array_push($errors, "Form data is longer than allowed");
 
       }
 
-      if (false === sanitize_selection_box(distill_post_request($filters)['media_target'], ['blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery'])) {
+      if (false === sanitize_selection_box(distill_post_request($filters)['media_target'], ['blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery', 'page' => 'Page'])) {
 
           $checkError = false;
           array_push($errors, "Please choose the available value provided!");
@@ -212,11 +221,7 @@ public function insert()
         
       }
 
-      // get new filename and extension
-      $new_filename = generate_filename($file_name)['new_filename'];
-      $file_extension = generate_filename($file_name)['file_extension'];
-
-      if ($file_extension === "jpeg" || $file_extension === "jpg" || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp" || $file_extension === "bmp" || $file_extension === 'tiff' || $file_extension === 'tif' || $file_extension === 'ico') {
+      if ($file_extension === "jpeg" || $file_extension === "jpg" || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp" || $file_extension === "bmp" ) {
 
          list($width, $height) = ($file_location) ? getimagesize($file_location) : null;
 
@@ -224,7 +229,7 @@ public function insert()
               'Origin' => rename_file($file_name), 
               'File type' => $file_type, 
               'File size' => format_size_unit($file_size), 
-              'Uploaded on' => date("Y-m-d H:i:s"), 
+              'Uploaded at' => date("Y-m-d H:i:s"), 
               'Dimension' => $width.'x'.$height
             );
 
@@ -234,7 +239,7 @@ public function insert()
             'Origin' => rename_file($file_name), 
             'File type' => $file_type, 
             'File size' => format_size_unit($file_size), 
-            'Uploaded on' => date("Y-m-d H:i:s"
+            'Uploaded at' => date("Y-m-d H:i:s"
         ));
 
       }
@@ -242,17 +247,17 @@ public function insert()
        // upload file
       if (is_uploaded_file($file_location)) {
 
-         if((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
+        if ( ( false === check_file_extension($file_name) ) || ( false === check_mime_type(mime_type_dictionary(), $file_location) ) ) {
 
-           $checkError = false;
-           array_push($errors, "Invalid file format");
+          $checkError = false;
+          array_push($errors, "Invalid file format");
+
+        } else {
+
+          upload_media($file_location, $file_type, $file_size, basename($new_filename));
+
+        }
   
-          } else {
-
-           upload_media($file_location, $file_type, $file_size, basename($new_filename));
-
-         }
-         
       }
 
       if (!$checkError) {
@@ -286,25 +291,40 @@ public function insert()
            $this->mediaEvent->setMediaKey($new_filename);
            $this->mediaEvent->setMediaValue(json_encode($media_metavalue));
            $this->mediaEvent->addMediaMeta();
- 
+           
+           if (isset($_POST['media_target']) && $_POST['media_target'] == 'download') {
+             
+            $this->mediaEvent->setMediaId($media_id);
+            $this->mediaEvent->setMediaIdentifier(generate_media_identifier());
+            $this->mediaEvent->setBeforeExpired(time() + self::TIME_BEFORE_EXPIRED * 60 * 60);
+            $this->mediaEvent->setIpAddress(get_ip_address());
+            $this->mediaEvent->addMediaDownload();
+             
+           }
+           
          }
 
-         direct_page('index.php?load=medialib&status=mediaAdded', 200);
+        $_SESSION['status'] = "mediaAdded";
+        direct_page('index.php?load=medialib&status=mediaAdded', 302);
 
       }
       
-    } catch(AppException $e) {
+    } catch (Throwable $th) {
 
-       LogError::setStatusCode(http_response_code());
-       LogError::newMessage($e);
-       LogError::customErrorMessage('admin');
+      LogError::setStatusCode(http_response_code());
+      LogError::exceptionHandler($th);
+
+    } catch (AppException $e) {
+
+      LogError::setStatusCode(http_response_code());
+      LogError::exceptionHandler($e);
        
     }
 
   } else {
 
      $this->setView('edit-media');
-     $this->setPageTitle('Media Library');
+     $this->setPageTitle('Upload New Media');
      $this->setFormAction(ActionConst::NEWMEDIA);
      $this->view->set('pageTitle', $this->getPageTitle());
      $this->view->set('formAction', $this->getFormAction());
@@ -335,7 +355,8 @@ public function update($id)
 
   if (!$getMedia = $this->mediaEvent->grabMedia($id)) {
 
-     direct_page('index.php?load=medialib&error=mediaNotFound', 404);
+    $_SESSION['error'] = "mediaNotFound";
+    direct_page('index.php?load=medialib&error=mediaNotFound', 404);
 
   }
 
@@ -373,35 +394,35 @@ public function update($id)
 
     $filters = [
       'media_caption' => FILTER_SANITIZE_SPECIAL_CHARS,
-      'media_target' => FILTER_SANITIZE_STRING,
-      'media_access' => FILTER_SANITIZE_STRING,
+      'media_target' => isset($_POST['media_target']) ? Sanitize::mildSanitizer($_POST['media_target']) : "",
+      'media_access' => isset($_POST['media_access']) ? Sanitize::mildSanitizer($_POST['media_access']) : "",
       'media_status' => FILTER_SANITIZE_NUMBER_INT,
       'media_id' => FILTER_SANITIZE_NUMBER_INT
     ];
 
     $form_fields = ['media_caption' => 200];
 
+    // get new filename
+    $new_filename = generate_filename($file_name)['new_filename'];
+    $file_extension = generate_filename($file_name)['file_extension'];
+
     try {
 
       if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                 
-        header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+        header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
         throw new AppException("Sorry, unpleasant attempt detected!");
         
       }
 
-      if (!empty($_POST['media_caption'])) {
+      if ( ( ! empty($_POST['media_caption']) ) && ( true === form_size_validation($form_fields) ) ) {
 
-         if(true === form_size_validation($form_fields)) {
-
-           $checkError = false;
-           array_push($errors, "Form data is longer than allowed");
-
-         }
+        $checkError = false;
+        array_push($errors, "Form data is longer than allowed");
 
       }
 
-      if (false === sanitize_selection_box(distill_post_request($filters)['media_target'], ['blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery'])) {
+      if (false === sanitize_selection_box(distill_post_request($filters)['media_target'], ['blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery', 'page' => 'Page'])) {
 
         $checkError = false;
         array_push($errors, "Please choose the available value provided!");
@@ -410,15 +431,15 @@ public function update($id)
 
       if (false === sanitize_selection_box(distill_post_request($filters)['media_access'], ['public' => 'Public', 'private' => 'Private'])) {
 
-         $checkError = false;
-         array_push($errors, "Please choose the available value provided!");
+        $checkError = false;
+        array_push($errors, "Please choose the available value provided!");
 
       }
 
       if (false === sanitize_selection_box(distill_post_request($filters)['media_status'], ['Enabled', 'Disabled'])) {
 
-         $checkError = false;
-         array_push($errors, "Please choose the available value provided!");
+        $checkError = false;
+        array_push($errors, "Please choose the available value provided!");
          
       }
 
@@ -491,37 +512,33 @@ public function update($id)
           
          }
   
-         // get new filename
-         $new_filename = generate_filename($file_name)['new_filename'];
-         $file_extension = generate_filename($file_name)['file_extension'];
-    
-         if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp") {
+         if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp" || $file_extension === "bmp" ) {
 
             list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
             
             $media_metavalue = array(
 
-                        'Origin' => rename_file($file_name), 
-                        'File type' => $file_type, 
-                        'File size' => format_size_unit($file_size), 
-                        'Uploaded on' => date("Y-m-d H:i:s"), 
-                        'Dimension' => $width.'x'.$height);
+              'Origin' => rename_file($file_name), 
+              'File type' => $file_type, 
+              'File size' => format_size_unit($file_size), 
+              'Uploaded at' => date("Y-m-d H:i:s"), 
+              'Dimension' => $width.'x'.$height);
  
           } else {
  
             $media_metavalue = array(
               
-                  'Origin' => rename_file($file_name), 
-                  'File type' => $file_type, 
-                  'File size' => format_size_unit($file_size), 
-                  'Uploaded on' => date("Y-m-d H:i:s"));
+              'Origin' => rename_file($file_name), 
+              'File type' => $file_type, 
+              'File size' => format_size_unit($file_size), 
+              'Uploaded at' => date("Y-m-d H:i:s"));
  
           }
           
           // upload file
         if (is_uploaded_file($file_location)) {
 
-          if ((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
+          if ((false === check_mime_type(mime_type_dictionary(), $file_location)) || ( false === check_file_extension($file_name) ) ) {
 
             $checkError = false;
             array_push($errors, "Invalid file format");
@@ -546,6 +563,16 @@ public function update($id)
          $this->mediaEvent->setMediaValue(json_encode($media_metavalue));
          $this->mediaEvent->modifyMediaMeta();
 
+        if (isset($_POST['media_target']) && $_POST['media_target'] == 'download') {
+
+          $this->mediaEvent->setMediaId(distill_post_request($filters)['media_id']);
+          $this->mediaEvent->setMediaIdentifier(generate_media_identifier());
+          $this->mediaEvent->setBeforeExpired(time() + self::TIME_BEFORE_EXPIRED * 60 * 60);
+          $this->mediaEvent->setIpAddress(get_ip_address());
+          $this->mediaEvent->modifyMediaDownload();
+            
+        }
+
       } else {
 
          $this->mediaEvent->setMediaCaption(prevent_injection(distill_post_request($filters)['media_caption']));
@@ -557,17 +584,21 @@ public function update($id)
       }
 
        $this->mediaEvent->modifyMedia();
-      
-       direct_page('index.php?load=medialib&status=mediaUpdated', 200);
+       $_SESSION['status'] = "mediaUpdated";
+       direct_page('index.php?load=medialib&status=mediaUpdated', 302);
 
      }
      
 
-    } catch(AppException $e) {
+    } catch (Throwable $th) {
 
       LogError::setStatusCode(http_response_code());
-      LogError::newMessage($e);
-      LogError::customErrorMessage('admin');
+      LogError::exceptionHandler($th);
+
+    } catch (AppException $e) {
+
+      LogError::setStatusCode(http_response_code());
+      LogError::exceptionHandler($e);
 
     }
 
@@ -601,9 +632,81 @@ public function update($id)
  */
 public function remove($id)
 {
-  $this->mediaEvent->setMediaId($id);
-  $this->mediaEvent->removeMedia();
-  direct_page('index.php?load=medialib&status=mediaDeleted', 200);
+
+  $checkError = true;
+  $errors = array();
+
+  if (isset($_GET['Id'])) {
+
+    $getMedia = $this->mediaEvent->grabMedia($id);
+     
+    try {
+      
+      if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+        header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+        throw new AppException("Sorry, unpleasant attempt detected!");
+
+      }
+    
+      if (!filter_var($id, FILTER_VALIDATE_INT)) {
+
+        header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+        throw new AppException("Sorry, unpleasant attempt detected!");
+
+      }
+
+      if (!$getMedia) {
+
+        $checkError = false;
+        array_push($errors, 'Error: Media not found');
+
+      }
+      
+      if (!$checkError) {
+
+        $this->setView('all-media');
+        $this->setPageTitle('Media not found');
+        $this->view->set('pageTitle', $this->getPageTitle());
+        $this->view->set('errors', $errors);
+
+        if ($this->mediaEvent->isMediaUser() == 'administrator') {
+
+          $this->view->set('mediaTotal', $this->mediaEvent->totalMedia());
+          $this->view->set('mediaLib', $this->mediaEvent->grabAllMedia());
+          
+        } else {
+           
+          $this->view->set('mediaTotal', $this->mediaEvent->totalMedia([$this->mediaEvent->isMediaUser()]));
+          $this->view->set('mediaLib', $this->mediaEvent->grabAllMedia('ID', $this->mediaEvent->isMediaUser()));
+      
+        }
+         
+        return $this->view->render();
+        
+      } else {
+
+        $this->mediaEvent->setMediaId($id);
+        $this->mediaEvent->removeMedia();
+        $_SESSION['status'] = "mediaDeleted";
+        direct_page('index.php?load=medialib&status=mediaDeleted', 302);
+
+      }
+
+     } catch (Throwable $th) {
+       
+      LogError::setStatusCode(http_response_code());
+      LogError::exceptionHandler($th);
+
+     } catch (AppException $e) {
+
+      LogError::setStatusCode(http_response_code());
+      LogError::exceptionHandler($e);
+
+     }
+
+  }
+  
 }
 
 protected function setView($viewName)

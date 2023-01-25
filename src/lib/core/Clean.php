@@ -1,5 +1,4 @@
-<?php
-
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Clean class.
  *
@@ -33,7 +32,7 @@
  *   
  * @author     Ľuboš Beran
  * @copyright  (c) 2012-2014 Detroit Studio s.r.o.
- * @web        http://www.detroit.sk
+ * @link        http://www.detroit.sk
  * @license    MIT
  * @version    1.2
  */

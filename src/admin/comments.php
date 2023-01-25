@@ -1,10 +1,10 @@
-<?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed");
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";  
 $commentId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
-$commentDao = new CommentDao();
-$commentEvent = new CommentEvent($commentDao, $validator, $sanitizer);
-$commentApp = new CommentApp($commentEvent);
+$commentDao = class_exists('CommentDao') ? new CommentDao() : "";
+$commentEvent = class_exists('CommentEvent') ? new CommentEvent($commentDao, $validator, $sanitizer) : "";
+$commentApp = class_exists('CommentApp') ?new CommentApp($commentEvent) : "";
     
 try {
 
@@ -24,7 +24,7 @@ try {
                     
                 } else {
                     
-                    direct_page('index.php?load=comments&error=commentNotFound', 404);
+                    direct_page('index.php?load=404&notfound='.notfound_id(), 404);
                     
                 }
                 
@@ -42,7 +42,8 @@ try {
 
                 if ((!check_integer($commentId)) && (gettype($commentId) !== "integer")) {
 
-                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                    header("Status: 400 Bad Request");
                     throw new AppException("Invalid ID data type!");
 
                 }
@@ -53,7 +54,7 @@ try {
 
                 } else {
 
-                    direct_page('index.php?load=comments&error=commentNotFound', 404);
+                    direct_page('index.php?load=404&notfound='.notfound_id(), 404);
 
                 }
 
@@ -77,10 +78,14 @@ try {
         
 }
 
+} catch (Throwable $th) {
+
+    LogError::setStatusCode(http_response_code());
+    LogError::exceptionHandler($th);
+
 } catch (AppException $e) {
 
     LogError::setStatusCode(http_response_code());
-    LogError::newMessage($e);
-    LogError::customErrorMessage('admin');
+    LogError::exceptionHandler($e);
     
 }
