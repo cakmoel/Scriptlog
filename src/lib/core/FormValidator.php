@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class FormValidator
  * 
@@ -12,7 +12,7 @@
 class FormValidator
 {
 
-public static $regexes = Array(
+public static $regexes = array(
             'date' => "^[0-9]{4}[-/][0-9]{1,2}[-/][0-9]{1,2}\$",
             'amount' => "^[-]?[0-9]+\$",
             'number' => "^[-]?[0-9,]+\$",
@@ -29,12 +29,24 @@ public static $regexes = Array(
             'username' => "^[\w]{3,32}\$"
 );
 
-private $validations, $sanatations, $mandatories, $equal, $errors, $corrects, $fields;
+private $validations; 
 
-public function __construct($validations=array(), $mandatories = array(), $sanatations = array(), $equal=array())
+private $sanitations; 
+
+private $mandatories; 
+
+private $equal; 
+
+private $errors; 
+
+private $corrects; 
+
+private $fields;
+
+public function __construct($validations=array(), $mandatories = array(), $sanitations = array(), $equal=array())
 {
     $this->validations = $validations;
-    $this->sanatations = $sanatations;
+    $this->sanitations = $sanitations;
     $this->mandatories = $mandatories;
     $this->equal = $equal;
     $this->errors = array();
@@ -54,58 +66,50 @@ public function validate($items)
     $havefailures = false;
 
     //Check for mandatories
-    foreach($this->mandatories as $key=>$val)
-    {
-        if(!array_key_exists($val,$items))
-        {
+    foreach ($this->mandatories as $key=>$val) {
+        
+        if (!array_key_exists($val,$items)) {
             $havefailures = true;
             $this->addError($val);
         }
     }
 
     //Check for equal fields
-    foreach($this->equal as $key=>$val)
-    {
+    foreach ($this->equal as $key=>$val) {
+
         //check that the equals field exists
-        if(!array_key_exists($key,$items))
-        {
+        if (!array_key_exists($key,$items)) {
             $havefailures = true;
             $this->addError($val);
         }
 
         //check that the field it's supposed to equal exists
-        if(!array_key_exists($val,$items))
-        {
+        if (!array_key_exists($val,$items)) {
             $havefailures = true;
             $this->addError($val);
         }
 
         //Check that the two fields are equal
-        if($items[$key] != $items[$val])
-        {
+        if ($items[$key] != $items[$val]) {
             $havefailures = true;
             $this->addError($key);
         }
     }
 
-    foreach($this->validations as $key=>$val)
-    {
+    foreach ($this->validations as $key=>$val) {
             //An empty value or one that is not in the list of validations or one that is not in our list of mandatories
-            if(!array_key_exists($key,$items)) 
-            {
-                    $this->addError($key, $val);
-                    continue;
+            if (!array_key_exists($key,$items)) {
+                $this->addError($key, $val);
+                continue;
             }
 
             $result = self::validateItem($items[$key], $val);
 
-            if($result === false) {
-                    $havefailures = true;
-                    $this->addError($key, $val);
-            }
-            else
-            {
-                    $this->corrects[] = $key;
+            if ($result === false) {
+                $havefailures = true;
+                $this->addError($key, $val);
+            } else {
+                $this->corrects[] = $key;
             }
     }
 
@@ -121,14 +125,12 @@ public function getJSON() {
 
     $correct = array();
 
-    if(!empty($this->errors))
-    {            
-        foreach($this->errors as $key=>$val) { $errors[$key] = $val; }            
+    if (!empty($this->errors)) {            
+        foreach ($this->errors as $key=>$val) { $errors[$key] = $val; }            
     }
 
-    if(!empty($this->corrects))
-    {
-        foreach($this->corrects as $key=>$val) { $correct[$key] = $val; }                
+    if (!empty($this->corrects)) {
+        foreach ($this->corrects as $key=>$val) { $correct[$key] = $val; }                
     }
 
     $output = array('errors' => $errors, 'correct' => $correct);
@@ -140,25 +142,27 @@ public function getJSON() {
 
 /**
  *
- * Sanatizes an array of items according to the $this->sanatations
- * sanatations will be standard of type string, but can also be specified.
+ * Sanatizes an array of items according to the $this->sanitations
+ * sanitations will be standard of type string, but can also be specified.
  * For ease of use, this syntax is accepted:
- * $sanatations = array('fieldname', 'otherfieldname'=>'float');
+ * $sanitations = array('fieldname', 'otherfieldname'=>'float');
  */
 public function sanitize($items)
 {
 
-  foreach((array) $items as $key=>$val) {
+  foreach ((array) $items as $key => $val) {
 
-     if(array_search($key, $this->sanatations) === false && !array_key_exists($key, $this->sanatations)) 
-      
+    if ((array_search($key, $this->sanitations) === false) && (!array_key_exists($key, $this->sanitations))) {
+
         continue;
-                         
-        $items[$key] = self::sanatizeItem($val, $this->validations[$key]);
-                     
-   }
+                        
+    }
+
+    $items[$key] = self::sanitizeItem($val, $this->validations[$key]);
+                   
+  }
              
-   return($items);
+ return($items);
 
 }
 
@@ -176,11 +180,11 @@ private function addError($field, $type='string')
  * Sanatize a single var according to $type.
  * Allows for static calling to allow simple sanatization
  */
-public static function sanatizeItem($var, $type)
+private static function sanitizeItem($var, $type)
 {
-    $flags = NULL;
-    switch($type)
-    {
+    $flags = null;
+    switch ($type) {
+
             case 'url':
                     $filter = FILTER_SANITIZE_URL;
             break;
@@ -197,7 +201,7 @@ public static function sanatizeItem($var, $type)
             break;
             case 'string':
             default:
-                    $filter = FILTER_SANITIZE_STRING;
+                    $filter = FILTER_SANITIZE_SPECIAL_CHARS;
                     $flags = FILTER_FLAG_NO_ENCODE_QUOTES;
             break;
 
@@ -217,7 +221,7 @@ public static function sanatizeItem($var, $type)
  */
 public static function validateItem($var, $type)
 {
-    if(array_key_exists($type, self::$regexes)) {
+    if (array_key_exists($type, self::$regexes)) {
 
         $returnval =  filter_var($var, FILTER_VALIDATE_REGEXP, array("options"=> array("regexp"=>'!'.self::$regexes[$type].'!i'))) !== false;
         
@@ -226,8 +230,9 @@ public static function validateItem($var, $type)
     }
 
     $filter = false;
-    switch($type)
-    {
+    switch ($type) {
+
+            default:
             case 'email':
                     $var = substr($var, 0, 254);
                     $filter = FILTER_VALIDATE_EMAIL;        

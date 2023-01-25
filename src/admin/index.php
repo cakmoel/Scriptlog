@@ -1,6 +1,6 @@
 <?php 
 /**
- * File index.php
+ * index.php
  * 
  * @category admin/index.php file
  * @author   M.Noermoehammad 
@@ -35,26 +35,23 @@ if (!$loggedIn) {
    
 } else {
 
-$decrypt_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $key) : "";
+$decrypt_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $cipher_key) : "";
     
 $user_login = isset($_COOKIE['scriptlog_auth']) ? user_info($authenticator, $decrypt_login)['user_login'] : Session::getInstance()->scriptlog_session_login;
 $user_email = isset($_SESSION['scriptlog_session_email']) ? Session::getInstance()->scriptlog_session_email : user_info($authenticator, $user_login)['user_email'];
 $user_level = isset($_SESSION['scriptlog_session_level']) ? Session::getInstance()->scriptlog_session_level : user_info($authenticator, $user_login)['user_level'];
 $user_id = isset($_SESSION['scriptlog_session_id']) ? Session::getInstance()->scriptlog_session_id : user_info($authenticator, $user_login)['ID'];
-$user_session = user_info($authenticator, $user_login)['user_session'];
+$user_session = isset(user_info($authenticator, $user_login)['user_session']) ? user_info($authenticator, $user_login)['user_session'] : do_logout($authenticator);
 
-// Breadcrumb
+// module accessed or path to link accessed by request
 $breadcrumb = isset($_GET['load']) ? htmlentities(sanitize_urls($_GET['load']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : http_response_code();
 
 // Current URL
 $current_url =  preg_replace("/\/index\.php.*$/i", "", app_url().DS.APP_ADMIN);
 
-// retrieve plugin actived -- for administrator
-if ( $user_level == 'administrator') { $plugin_navigation = setplugin($user_level, 'private'); }
-
 include dirname(__FILE__) . DS .'admin-layout.php';
 
-admin_header($current_url, $breadcrumb, admin_query());
+admin_header($current_url, $breadcrumb);
 
 include dirname(__FILE__) . DS .'navigation.php';
  

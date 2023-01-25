@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-crypt for the canonical source repository
- * @copyright https://github.com/laminas/laminas-crypt/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-crypt/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Crypt;
 
 use Interop\Container\ContainerInterface;
@@ -51,7 +45,7 @@ class BlockCipher
      *
      * @var SymmetricPluginManager
      */
-    protected static $symmetricPlugins = null;
+    protected static $symmetricPlugins;
 
     /**
      * Hash algorithm for HMAC
@@ -90,8 +84,6 @@ class BlockCipher
 
     /**
      * Constructor
-     *
-     * @param  SymmetricInterface $cipher
      */
     public function __construct(SymmetricInterface $cipher)
     {
@@ -164,7 +156,6 @@ class BlockCipher
     /**
      * Set the symmetric cipher
      *
-     * @param  SymmetricInterface $cipher
      * @return BlockCipher Provides a fluent interface
      */
     public function setCipher(SymmetricInterface $cipher)
@@ -402,7 +393,8 @@ class BlockCipher
     {
         // 0 (as integer), 0.0 (as float) & '0' (as string) will return false, though these should be allowed
         // Must be a string, integer, or float in order to encrypt
-        if ((is_string($data) && $data === '')
+        if (
+            (is_string($data) && $data === '')
             || is_array($data)
             || is_object($data)
         ) {
@@ -504,9 +496,7 @@ class BlockCipher
      *
      * @param string $data
      * @param int    $keySize
-     *
      * @return string
-     *
      * @throws Exception\InvalidArgumentException
      */
     private function encryptViaCcmOrGcm($data, $keySize)
@@ -529,9 +519,7 @@ class BlockCipher
      *
      * @param string $data
      * @param int    $keySize
-     *
      * @return string
-     *
      * @throws Exception\InvalidArgumentException
      */
     private function decryptViaCcmOrGcm($data, $keySize)

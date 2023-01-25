@@ -20,7 +20,7 @@ function start_session_on_site($session_handler)
 
   $session_name = session_name();
   
- if(ini_get('session.use_cookies')) {
+ if (ini_get('session.use_cookies')) {
 
     $current_cookie_params = session_get_cookie_params();
 
@@ -42,7 +42,7 @@ function start_session_on_site($session_handler)
    
  }
 
- if(!session_valid_id($session_id)) {
+ if (!session_valid_id($session_id)) {
 
    return false;
 
@@ -84,7 +84,7 @@ function session_valid_id($session_id)
                 $characterClass = '0-9a-f';
                 break;
             default:
-                throw new \RuntimeException('Unknown value in session.sid_bits_per_character.');
+              throw new InvalidArgumentException('Unknown value in session.sid_bits_per_character.');
         }
       
         $pattern = '/^[' . $characterClass . ']{' . $sidLength . '}$/';

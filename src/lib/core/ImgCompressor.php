@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /***********************************************************
 * #### PHP Image Compressor Class ####
 * Coded by Ican Bachors 2016.

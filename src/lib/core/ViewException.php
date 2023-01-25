@@ -1,6 +1,6 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * ViewException Class
+ * ViewException Class extends Exception implements IViewThrowable
  *
  * @category  Core Class
  * @author    M.Noermoehammad
@@ -9,7 +9,7 @@
  * @since     Since Release 1.0
  *
  */
-class ViewException extends CoreException
+class ViewException extends Exception implements IViewThrowable
 {
   
 }

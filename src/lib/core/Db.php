@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Db implements DbInterface
  * This Class DB uses PDO-MySQL functionality 
@@ -20,21 +20,7 @@ class Db implements DbInterface
   *
   */
  private $dbc;
-
-/**
- * cache
- * @var object
- * 
- */
- private static $cache;
  
- /**
-  * error
-  * @var object
-  *
-  */
- private $error;
-
 /**
  * Initializing an object property and method
  * 
@@ -71,21 +57,17 @@ class Db implements DbInterface
       
       $this->dbc = new PDO($dsn, $dbUser, $dbPass, $options);
        
-   } catch (DbException $e) {
+   } catch (Throwable $th) {
        
       $this->closeDbConnection();
-      $this->error = LogError::setStatusCode(http_response_code(500));
-      $this->error = LogError::newMessage($e);
-      $this->error = LogError::customErrorMessage();
+      LogError::setStatusCode(http_response_code(500));
+      LogError::exceptionHandler($th);
       
-   } catch (PDOException $e) {
-
-      throw new PDOException("Error Database Connection");
+   } catch (DbException $e) {
 
       $this->closeDbConnection();
-      $this->error = LogError::setStatusCode(http_response_code(500));
-      $this->error = LogError::newMessage($e);
-      $this->error = LogError::customErrorMessage();
+      LogError::setStatusCode(http_response_code(500));
+      LogError::exceptionHandler($e);
 
    }
    
@@ -109,31 +91,17 @@ class Db implements DbInterface
   */
  public function dbQuery($sql, $args = array())
  {
-     
-  try {
-      
-    if (!$args) {
-         
-        return $this->dbc->query($sql);
-         
-     }
-     
-     $stmt = $this->dbc->prepare($sql);
 
-     
-     $stmt->execute($args);
-     
-     return $stmt;
+  if (!$args) {
+    return $this->dbc->query($sql);
+  } 
+ 
+  $stmt = $this->dbc->prepare($sql);
 
-  } catch (DbException $e) {
-     
-    $this->closeDbConnection();
-    $this->error = LogError::setStatusCode(http_response_code(500));
-    $this->error = LogError::newMessage($e);
-    $this->error = LogError::customErrorMessage();
-     
-  }
-     
+  $stmt->execute($args);
+  
+  return $stmt;   
+
  }
  
  /**
@@ -147,37 +115,34 @@ class Db implements DbInterface
     
     $clean_table = Sanitize::mildSanitizer($tablename);
 
-    try {
+    $sql = "INSERT INTO $clean_table ";
         
-        $sql = "INSERT INTO $clean_table ";
-        $fields = array_keys($params);
-        $values = array_values($params);
-
-        $sql .= '('.implode(',', $fields).') ';
-
-        $args = [];
-        foreach ($fields as $f) {
-            $args[] = '?';
-        }
-        $sql .= 'VALUES ('.implode(',', $args).') ';
-
-        $statement = $this->dbc->prepare($sql);
+    $fields = array_keys($params);
         
-        foreach ($values as $i => $v) {
-            $statement->bindValue($i+1, $v);
-        }
+    $values = array_values($params);
 
-        return $statement->execute();
+    $sql .= '('.implode(',', $fields).') ';
 
-    } catch (DbException $e) {
+    $args = [];
         
-       $this->closeDbConnection();
-       $this->error = LogError::setStatusCode(http_response_code(500));
-       $this->error = LogError::newMessage($e);
-       $this->error = LogError::customErrorMessage();
-       
+    foreach ($fields as $f) {
+            
+      $args[] = '?';
+        
     }
-    
+        
+    $sql .= 'VALUES ('.implode(',', $args).') ';
+
+    $statement = $this->dbc->prepare($sql);
+        
+    foreach ($values as $i => $v) {
+            
+      $statement->bindValue($i+1, $v);
+        
+    }
+
+    return $statement->execute();
+
  }
  
  /**
@@ -201,40 +166,24 @@ class Db implements DbInterface
     
    $clean_table = Sanitize::mildSanitizer($tablename);
    $clean_where = Sanitize::severeSanitizer($where);
-   
-   try {
-       
-       ksort($params);
 
-       $columns = null;
+   ksort($params);
+   $columns = null;
+    
+   foreach ((array)$params as $key => $value) {
+      $columns .= "$key = :$key,";     
+   }
        
-       foreach ((array)$params as $key => $value) {
-           
-           $columns .= "$key = :$key,";
-           
-       }
-       
-       $columns = rtrim($columns, ',');
-       
-       $stmt = $this->dbc->prepare("UPDATE $clean_table SET $columns WHERE $clean_where");
+   $columns = rtrim($columns, ',');
+   $stmt = $this->dbc->prepare("UPDATE $clean_table SET $columns WHERE $clean_where");
 
-       foreach ((array)$params as $key => $value) {
-           $stmt->bindValue(":$key", $value);
-       }
-       
-       $stmt->execute();
-       
-       return $stmt->rowCount();
-       
-   } catch (DbException $e) {
-       
-       $this->closeDbConnection();
-       $this->error = LogError::setStatusCode(http_response_code(500));
-       $this->error = LogError::newMessage($e);
-       $this->error = LogError::customErrorMessage();
-       
+   foreach ((array)$params as $key => $value) {
+     $stmt->bindValue(":$key", $value);
    }   
-   
+       
+   $stmt->execute();
+   return $stmt->rowCount();
+    
  }
  
 /**
@@ -249,71 +198,60 @@ class Db implements DbInterface
 
   $clean_table = Sanitize::mildSanitizer($tablename);
 
-  try {
+  switch ($to) {
+
+    case 'update':
+
+      ksort($params);
+
+      $columns = null;
     
-    switch ($to) {
+      foreach ((array)$params as $key => $value) {
+        
+        $columns .= "$key = :$key,";
+        
+      }
+    
+      $columns = rtrim($columns, ',');
+    
+      $stmt = $this->dbc->prepare(" REPLACE INTO $clean_table SET $columns ");
 
-      case 'update':
-
-        ksort($params);
-
-        $columns = null;
-      
-        foreach ((array)$params as $key => $value) {
-          
-          $columns .= "$key = :$key,";
-          
-        }
-      
-        $columns = rtrim($columns, ',');
-      
-        $stmt = $this->dbc->prepare(" REPLACE INTO $clean_table SET $columns ");
-
-        foreach ((array)$params as $key => $value) {
-          
-             $stmt->bindValue(":$key", $value);
-        }
-      
-        $stmt->execute();
-      
-        return $stmt->rowCount();
-
-        break;
-      
-      case 'insert':
-
-        $sql = " REPLACE INTO $clean_table ";
-        $fields = array_keys($params);
-        $values = array_values($params);
-
-        $sql .= '('.implode(',', $fields).') ';
-
-        $args = [];
-       
-        foreach ($fields as $f) {
-          $args[] = '?';
-        }
-
-       $sql .= 'VALUES ('.implode(',', $args).') ';
-
-       $statement = $this->dbc->prepare($sql);
-      
-       foreach ($values as $i => $v) {
-          $statement->bindValue($i+1, $v);
-       }
-
-       return $statement->execute();
+      foreach ((array)$params as $key => $value) {
+        
+           $stmt->bindValue(":$key", $value);
+      }
+    
+      $stmt->execute();
+    
+      return $stmt->rowCount();
 
       break;
+    
+    case 'insert':
 
-    }
+      $sql = " REPLACE INTO $clean_table ";
+      $fields = array_keys($params);
+      $values = array_values($params);
+
+      $sql .= '('.implode(',', $fields).') ';
+
+      $args = [];
+     
+      foreach ($fields as $f) {
+        $args[] = '?';
+      }
+
+     $sql .= 'VALUES ('.implode(',', $args).') ';
+
+     $statement = $this->dbc->prepare($sql);
     
-  } catch (DbException $e) {
-    
-    $this->closeDbConnection();
-    $this->error = LogError::setStatusCode(http_response_code(500));
-    $this->error = LogError::newMessage($e);
-    $this->error = LogError::customErrorMessage();
+     foreach ($values as $i => $v) {
+        $statement->bindValue($i+1, $v);
+     }
+
+     return $statement->execute();
+
+    break;
 
   }
 
@@ -330,31 +268,21 @@ class Db implements DbInterface
     $clean_table = Sanitize::mildSanitizer($tablename);
     $clean_where = Sanitize::severeSanitizer($where);
 
-    try {
-        
-        if (!is_null($limit)) {
+    if (!is_null($limit)) {
             
-            $sql = "DELETE FROM $clean_table WHERE $clean_where LIMIT $limit";
-        
-        } else {
-            
-            $sql = "DELETE FROM $clean_table WHERE $clean_where";
-        }
-        
-        $stmt = $this->dbc->prepare($sql);
-        
-        $stmt->execute();
+      $sql = "DELETE FROM $clean_table WHERE $clean_where LIMIT $limit";
+  
+    } else {
+      
+      $sql = "DELETE FROM $clean_table WHERE $clean_where";
 
-        return $stmt->rowCount();
-        
-    } catch (DbException $e) {
-        
-        $this->closeDbConnection();
-        $this->error = LogError::setStatusCode(http_response_code(500));
-        $this->error = LogError::newMessage($e);
-        $this->error = LogError::customErrorMessage();
-        
     }
+  
+    $stmt = $this->dbc->prepare($sql);
+  
+    $stmt->execute();
+
+    return $stmt->rowCount();
     
  }
 

@@ -1,7 +1,8 @@
 <?php
 /**
- * is_non_administrator function
- * Class Wall will use this class to check user's access level
+ * is_non_administrator
+ * 
+ * this function will be checking user's access level
  * 
  * @category function
  * @return string
@@ -16,9 +17,9 @@ function is_non_administrator()
   $validator = new FormValidator();
   $authenticator = new Authentication($userDao, $userToken, $validator);
 
-  $accessLevel = $authenticator -> accessLevel();
+  $accessLevel = $authenticator->accessLevel();
 
-  if(($accessLevel != 'administrator')) {
+  if (($accessLevel !== 'administrator')) {
      
      $user_level = true;
 

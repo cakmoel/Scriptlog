@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Generic Syntax Highlighting with Regular Expressions
  * 
@@ -80,7 +80,7 @@ class SyntaxHighlight
         $id = "##r".uniqid()."##";
 
         // String or Comment?
-        if( $match{0} == '/' || $match{0} == '#' ) {
+        if ($match[0] == '/' || $match[0] == '#' ) {
             $a[$id] = '<span class="C">'.$match.'</span>';
         } else {
             $a[$id] = '<span class="S">'.$match.'</span>';

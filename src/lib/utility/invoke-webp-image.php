@@ -2,7 +2,10 @@
 /**
  * Function invoke webp image format
  *
- * @param [type] $media_filename
+ * @category functions
+ * @author M.Noermoehammad
+ * @license MIT
+ * @param string $media_filename
  * @param boolean $image_thumb
  * @return string | false if no string returned
  * 
@@ -16,11 +19,11 @@ $image_dir =  __DIR__ . '/../../'.APP_IMAGE_SMALL.'small_'.$file_basename.'.webp
 
 $image_src = null;
 
-if(is_readable($image_dir)) {
+if (is_readable($image_dir)) {
 
-    if($image_thumb) {
+    if ($image_thumb === true) {
 
-        $image_src =  app_url().DS.APP_IMAGE_SMALL.'small_'.rawurlencode($file_basename.'.webp');
+        $image_src =  app_url().DS.APP_IMAGE_MEDIUM.'medium_'.rawurlencode($file_basename.'.webp');
         
     } else {
 

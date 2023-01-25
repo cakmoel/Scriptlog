@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * UserEvent Class
  *
@@ -91,7 +91,14 @@ class UserEvent
  private $user_session;
 
 /**
- * userDao, userToken, vaidator and sanitize of the instance of their classes
+ * user_banned
+ *
+ * @var int|numeric
+ */
+ private $user_banned;
+
+/**
+ * userDao
  *
  * @var object
  * 
@@ -114,6 +121,12 @@ class UserEvent
  */
  private $validator; 
  
+/**
+ * sanitize
+ *
+ * @var object
+ * 
+ */
  private $sanitize;
 
  private $key;
@@ -140,17 +153,20 @@ class UserEvent
 
     if ( Registry::isKeySet('key') ) {
 
-       $this->key = Registry::get('key');
+      $this->key = Registry::get('key');
 
     }
 
  }
 
- /**
-  * Set user id
-  * @param integer $userId
-  *
-  */
+/**
+ * set user Id
+ *
+ * @method public setUserId()
+ * @param int $userId
+ * @return void
+ * 
+ */
  public function setUserId($userId)
  {
    $this->user_id = $userId;   
@@ -236,8 +252,11 @@ class UserEvent
  }
 
 /**
- * Set user website - url
+ * SetUserUrl
+ * 
+ * @method public setUserUrl()
  * @param string $user_url
+ * 
  */
  public function setUserUrl($user_url)
  {
@@ -245,8 +264,11 @@ class UserEvent
  }
 
 /**
- * Set user activation key
+ * SetUserActivationKey
+ * 
+ * @method public setUserActivationKey($activation_key)
  * @param string $activation_key
+ * 
  */
  public function setUserActivationKey($activation_key)
  {
@@ -254,17 +276,39 @@ class UserEvent
  }
  
 /**
- * Set user session
+ * SetUserSession()
  * @param string $user_session
+ * 
  */
  public function setUserSession($user_session)
  {
    $this->user_session = $user_session;
  }
  
+/**
+ * setUserBanned
+ *
+ * @param [type] $user_banned
+ * @return void
+ */
+ public function setUserBanned($user_banned)
+ {
+   $this->user_banned = $user_banned;
+ }
+
+/**
+ * Retrieving All records from table users
+ *
+ * @method public grabUsers()
+ * @param string $orderBy
+ * @param [type] $fetchMode
+ * @return array
+ * 
+ */
  public function grabUsers($orderBy = 'ID', $fetchMode = null)
  {
-   return $this->userDao->getUsers($orderBy, $fetchMode);    
+   $orderBySanitized = sanitize_sql_orderby($orderBy);
+   return $this->userDao->getUsers($orderBySanitized, $fetchMode);    
  }
  
  public function grabUser($userId, $fetchMode = null)
@@ -362,7 +406,8 @@ class UserEvent
                'user_pass' => $this->user_pass,
                'user_level' => $this->user_level,
                'user_fullname' => $this->user_fullname,
-               'user_url' => $this->user_url
+               'user_url' => $this->user_url,
+               'user_banned' => $this->user_banned
            ];
            
        } else {
@@ -371,14 +416,15 @@ class UserEvent
                'user_email' => $this->user_email,
                'user_level' => $this->user_level,
                'user_fullname' => $this->user_fullname,
-               'user_url' => $this->user_url
+               'user_url' => $this->user_url,
+               'user_banned' => $this->user_banned
            ];
            
        }
        
    }
 
-   if($this->identifyCookieToken($secret)) {
+   if ($this->identifyCookieToken($secret)) {
  
       $bind_meta = ['pwd_hash' => $this->pwd_hash, 'selector_hash' => $this->selector_hash, 'expired_date' => $this->cookie_expired_date];
 
@@ -404,7 +450,8 @@ class UserEvent
 
 /**
  * removeUser
- * remove user from record on user table
+ * 
+ * remove user from record
  * 
  */
  public function removeUser()
@@ -414,6 +461,7 @@ class UserEvent
 
    if (!$this->userDao->getUserById($this->user_id, $this->sanitize)) {
        
+      $_SESSION['error'] = "userNotFound";
       direct_page('index.php?load=users&error=userNotFound', 404);
    
    }
@@ -467,21 +515,7 @@ class UserEvent
  public function isUserLevel()
  {
 
-   if (isset($_COOKIE['scriptlog_auth'])) {
-
-      Authorization::setAuthInstance(new Authentication($this->userDao, $this->userToken, $this->validator));
-
-      return Authorization::authorizeLevel();
-
-   }
-   
-   if (isset(Session::getInstance()->scriptlog_session_level)) {
-
-       return Session::getInstance()->scriptlog_session_level;
-  
-   }
-  
-   return false;
+  return user_privilege();
 
  }
 
@@ -500,7 +534,8 @@ public function reAuthenticateUserPrivilege($login, $password)
 
 /**
  * identifyCookieToken
- * Check whether session cookies defined or not
+ * 
+ * Checking whether a session cookies defined or not
  * if defined then return it
  *
  * @method public identifyUserLogin()
@@ -523,23 +558,14 @@ public function reAuthenticateUserPrivilege($login, $password)
       $expected_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
       $correct_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
 
-      if ( hash_equals($expected_validator, $correct_validator) ) {
+      if ( hash_equals($expected_validator, $correct_validator) && ( Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']) ) ) {
 
-          if ( Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']) ) {
-
-            $this->validator_verified = true;
-
-          }
-
+        $this->validator_verified = true;
       } 
 
-      if ( hash_equals($expected_selector, $correct_selector) ) {
+      if ( hash_equals($expected_selector, $correct_selector) && ( Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret) ) ) {
 
-          if ( Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret) ) {
-
-            $this->selector_verified = true;
-
-          }
+        $this->selector_verified = true;
 
       }
 
@@ -549,15 +575,7 @@ public function reAuthenticateUserPrivilege($login, $password)
 
       }
 
-      if ((!empty($token_info['ID'])) && $this->validator_verified && $this->selector_verified && $this->expired_verified ) {
-
-           return true;
-
-      } else {
-
-          return false;
-
-      }
+      return ( !empty($token_info['ID']) ) && $this->validator_verified && $this->selector_verified && $this->expired_verified ? true : false;
       
    }
 
@@ -572,7 +590,7 @@ public function reAuthenticateUserPrivilege($login, $password)
  */
  public function totalUsers($data = null)
  {
-   return $this->userDao->totalUserRecords($data);
+  return $this->userDao->totalUserRecords($data);
  }
  
 }

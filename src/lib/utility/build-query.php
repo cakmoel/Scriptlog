@@ -1,8 +1,11 @@
 <?php
 /**
- * Function build query
+ * build_query
  * 
- * @category Function
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param string $base
  * @param array $query_data
  * @return string
@@ -10,11 +13,6 @@
  */
 function build_query($base, $query_data)
 {
-  
   $url = basename($base) . "?". http_build_query($query_data);
-  
-  $safe_url = escape_html($url);
-
-  return $safe_url;
-  
+  return escape_html($url);
 }

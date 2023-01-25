@@ -5,13 +5,10 @@
     <section class="content-header">
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
-        <small><a href="index.php?load=pages&action=newPage&Id=0"
-					class="btn btn-primary"> <i
-					class="fa fa-plus-circle"></i> Add New
-				</a></small>
+        <small><a href="index.php?load=pages&action=newPage&Id=0" class="btn btn-primary"> <i class="fa fa-plus-circle" aria-hidden="true"></i> Add New </a></small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
         <li><a href="index.php?load=pages">All Pages</a></li>
         <li class="active">Data Pages</li>
       </ol>
@@ -26,7 +23,7 @@
          ?>
          <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h2><i class="icon fa fa-ban"></i> Alert!</h2>
+                <h2><i class="icon fa fa-ban" aria-hidden="true"></i> Alert!</h2>
            <?php 
               foreach ($errors as $e) :
                 echo $e;
@@ -87,8 +84,7 @@
                        <td><?= $no; ?></td>
                        <td><?= htmlspecialchars($page['post_title']); ?></td>
                        <td><?= htmlspecialchars($page['user_login']); ?></td>
-                       <td><?= htmlspecialchars(make_date($page['post_date'])); ?></td>
-                       
+                       <td><?= (isset($page['post_modified'])) ? htmlspecialchars(make_date($page['post_modified'])) : htmlspecialchars(make_date($page['post_date'])); ?></td>
                        <td>
                        <a href="<?=generate_request('index.php', 'get', ['pages', 'editPage', $page['ID']])['link']; ?>" class="btn btn-warning" title="Edit page">
                        <i class="fa fa-pencil fa-fw"></i> </a>

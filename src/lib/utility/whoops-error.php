@@ -3,8 +3,11 @@
  * whoops_error()
  * 
  * @category function
+ * @version 1.0
+ * @license MIT
  * @uses \Whoops\Run
  * @uses \Whoops\Handler\PrettyPageHandler
+ * @since Since Release 1.0
  * @return void
  * 
  */
@@ -29,7 +32,16 @@ $whoops->register();
 } else {
 
 set_exception_handler('LogError::exceptionHandler');
+
 set_error_handler('LogError::errorHandler');
+
+register_shutdown_function(function () {
+    $error = error_get_last();
+    if ($error !== null) {
+        $e = new ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']);
+     LogError::exceptionHandler($e);
+    }
+});
 
 }
 

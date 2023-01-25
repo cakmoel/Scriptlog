@@ -2,15 +2,18 @@
 /**
  * resize_image
  *
- * @category Function 
+ * @category function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param int|num $current_width
  * @param int|num $current_height
  * @param int|num $max_size
  * @param string $destination
- * @param string $img_src
+ * @param GdImage|Obj $img_src
  * @param int $quality
  * @param string $img_type
- * @return void
+ * @return bool
  * 
  */
 function resize_image($current_width, $current_height, $max_size, $destination, $img_src, $quality, $img_type)
@@ -66,7 +69,7 @@ if (imagecopyresampled($new_canves, $img_src, 0, 0, 0, 0, $new_width, $new_heigh
         
     }
 
-    if (is_resource($new_canves)) {
+    if (is_resource($new_canves) || $new_canves instanceof \GdImage) {
 
         imagedestroy($new_canves);
 
@@ -81,14 +84,18 @@ if (imagecopyresampled($new_canves, $img_src, 0, 0, 0, 0, $new_width, $new_heigh
 /**
  * crop_image
  *
+ * @category functioin
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param int|num $current_width
  * @param int|num $current_height
  * @param int|num $new_size
- * @param [type] $destination
- * @param [type] $img_src
- * @param [type] $quality
- * @param [type] $img_type
- * @return void
+ * @param string $destination
+ * @param GdImage|Obj $img_src
+ * @param int|num $quality
+ * @param string $img_type
+ * @return bool
  */
 function crop_image($current_width, $current_height, $new_size, $destination, $img_src, $quality, $img_type)
 {
@@ -153,7 +160,7 @@ if (imagecopyresampled($new_canves, $img_src, 0, 0, $x_offset, $y_offset, $new_s
 
     }
 
-    if (is_resource($new_canves)) {
+    if (is_resource($new_canves) || $new_canves instanceof \GdImage) {
 
         imagedestroy($new_canves);
 

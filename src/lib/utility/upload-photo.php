@@ -1,35 +1,27 @@
 <?php
 /**
  * photo_instance()
- * 
  * if fileinfo enabled then Intervention Image works properly else will implement non-secure approach
- * 
  * @category function
- * @author  Oliver Vogel the author of Intervention Image 
+ * @author  Oliver Vogel
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
  * @see http://image.intervention.io/
  * @see https://anchetawern.github.io/blog/2016/02/18/using-the-intervention-image-library-in-php/
  * @see https://www.tutmecode.com/php/create-thumbnail-from-big-size-image-in-php-or-laravel/
- * 
  */
 use Intervention\Image\ImageManager;
 
 function photo_instance()
 {
   // Currently you can choose between gd and imagick
-  $manager = new ImageManager(['driver' => 'gd']);
-
-  return $manager;
-
+  return new ImageManager(['driver' => 'gd']);
 }
 
 /**
  * upload_photo()
- * 
  * uploading picture
- *
  * @category function
  * @author M.Noermoehammad
  * @license MIT
@@ -39,7 +31,6 @@ function photo_instance()
  * @param string $file_type
  * @param string $file_name
  * @return void
- * 
  */
 function upload_photo($file_location, $file_size, $file_type, $file_name)
 {
@@ -48,12 +39,11 @@ $small_size = 320;
 $medium_size = 640;
 $large_size = 770; 
 $temp_src = $file_location;
-$img_ext = pathinfo($file_name, PATHINFO_EXTENSION);
+$img_ext = get_file_extension($file_name);
 $img_name = pathinfo($file_name, PATHINFO_BASENAME);
-$img_type = $file_type;
 $img_source = null;
 
-switch (strtolower($img_type)) {
+switch (strtolower($file_type)) {
 
   case 'image/png':
     
@@ -78,6 +68,18 @@ switch (strtolower($img_type)) {
     
     break;
 
+  case 'image/webp':
+
+    $img_source = imagecreatefromwebp($file_location);
+
+    break;
+  
+  case 'image/bmp':
+
+    $img_source = imagecreatefrombmp($file_location);
+
+    break;
+
   default:
     
     scriptlog_error("Unsupported File!");
@@ -86,7 +88,7 @@ switch (strtolower($img_type)) {
 
 }
 
-list($current_width, $current_height) = getimagesize($temp_src);
+list($current_width, $current_height) = isset($temp_src) ? getimagesize($temp_src) : "";
 
 // construct new name
 $large_thumb_name = 'large_'.$img_name;
@@ -111,32 +113,30 @@ $large_path_uploaded = $large_path . $large_thumb_name;
 
 if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exists('finfo'))) {
 
-  if (resize_image($current_width, $current_height, $medium_size, $medium_path_uploaded, $img_source, 80, $img_type)) {
+  if (resize_image($current_width, $current_height, $medium_size, $medium_path_uploaded, $img_source, 80, $file_type)) {
 
-    if (!crop_image($current_width, $current_height, $small_size, $small_path_uploaded, $img_source, 80, $img_type)) {
+    if (! crop_image($current_width, $current_height, $small_size, $small_path_uploaded, $img_source, 80, $file_type)) {
 
-        scriptlog_error("Error Creating small size of thumbnail!");
+      scriptlog_error("Error Creating small size of thumbnail!");
 
     }
     
-    if (move_uploaded_file($temp_src, $origin_path_uploaded)) {
+    if (! move_uploaded_file($temp_src, $origin_path_uploaded) ) {
 
-      // creating large size thumbnail
-      $large_size_thumb = new Resize($origin_path_uploaded);
-      $large_size_thumb ->resizeImage($large_size, 400, "crop");
-      $large_size_thumb -> saveImage($large_path_uploaded, 80);
-  
-    } else {
-  
       scriptlog_error("Error uploading picture");
-  
-    }
+      
+    } 
+
+    // creating large size thumbnail
+    $large_size_thumb = new Resize($origin_path_uploaded);
+    $large_size_thumb->resizeImage($large_size, 400, "crop");
+    $large_size_thumb->saveImage($large_path_uploaded, 80);
 
   }
 
 } else {
 
-  if($file_type == "image/jpeg" || $file_type == "image/jpg" || $file_type == "image/png" || $file_type == "image/gif") {
+  if ($img_ext == "jpeg" || $img_ext == "jpg" || $img_ext == "png" || $img_ext == "gif" || $img_ext == "bmp") {
 
     if (false === set_webp_origin($current_width, $current_height, $file_location, $file_size, $origin_path_uploaded, $origin_path, $file_name)) {
 
@@ -144,54 +144,52 @@ if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exi
        
     }
 
-    if(false === set_webp_regular($current_width, $current_height, $origin_path_uploaded, $large_path, $file_name)) {
+    if (false === set_webp_regular($current_width, $current_height, $origin_path_uploaded, $large_path, $file_name)) {
   
        scriptlog_error("Error creating regular size of webp image format", E_USER_WARNING);
   
     }
   
-    if(false === set_webp_medium($current_width, $current_height, $origin_path_uploaded, $medium_path, $file_name)) {
+    if (false === set_webp_medium($current_width, $current_height, $origin_path_uploaded, $medium_path, $file_name)) {
   
        scriptlog_error("Error creating medium size of webp image format", E_USER_WARNING);
   
     }
   
-    if(false === set_webp_small($current_width, $current_height, $origin_path_uploaded, $small_path, $file_name)) {
+    if (false === set_webp_small($current_width, $current_height, $origin_path_uploaded, $small_path, $file_name)) {
   
        scriptlog_error("Error creating small of webp image format", E_USER_WARNING);
   
     }
   
-  }
-
-// save origin picture
-if (false === set_origin_photo( $current_width, $current_height, $file_location, $file_size, $origin_path_uploaded) ) {
-
-  scriptlog_error("Error uploading picture", E_USER_WARNING);
+  } 
 
 }
 
-// crop to regular size
+ // save origin picture
+ if (false === set_origin_photo($current_width, $current_height, $file_location, $file_size, $origin_path_uploaded)) {
+
+  scriptlog_error("Error uploading picture", E_USER_WARNING);
+ 
+ }
+
+ // crop to regular size
 if (false === set_regular_photo($current_width, $current_height, $origin_path_uploaded, $large_path, $file_name, $file_type)) {
 
-  scriptlog_error("Error creating regular size of picture", E_USER_WARNING);
+ scriptlog_error("Error creating regular size of picture", E_USER_WARNING);
 
 }
 
 // crop to medium size
-if( false === set_medium_photo($current_width, $current_height, $origin_path_uploaded, $medium_path, $file_name, $file_type) ) {
+if (false === set_medium_photo($current_width, $current_height, $origin_path_uploaded, $medium_path, $file_name, $file_type) ) {
 
- scriptlog_error("Error creating medium size of picture", E_USER_WARNING);
+scriptlog_error("Error creating medium size of picture", E_USER_WARNING);
 
 }
 
 // crop to smaller size
-if( false === set_small_photo($current_width, $current_height, $origin_path_uploaded, $small_path, $file_name, $file_type ) ) {
-
-scriptlog_error("Error creating smaller size of picture", E_USER_WARNING);
-
-}
-
+if (false === set_small_photo($current_width, $current_height, $origin_path_uploaded, $small_path, $file_name, $file_type ) ) {
+  scriptlog_error("Error creating smaller size of picture", E_USER_WARNING);
 }
 
 }
@@ -208,29 +206,19 @@ scriptlog_error("Error creating smaller size of picture", E_USER_WARNING);
  * @param string $file_path_uploaded
  * @param string $file_type
  * @return void
- * 
  */
 function set_origin_photo( $current_width, $current_height, $file_location, $file_size, $file_path_uploaded) {
 
-if($current_width <= 0 || $current_height <= 0) {
+if ($current_width <= 0 || $current_height <= 0) {
 
   return false;
 
 }
 
-if( !move_uploaded_file($file_location, $file_path_uploaded) ) {
-
-  return false;
-
-} 
-
-if( filesize($file_path_uploaded) !== $file_size ) {
-
-    unlink($file_path_uploaded);
-    return false;
-
+if (move_uploaded_file($file_location, $file_path_uploaded) && filesize($file_path_uploaded) !== $file_size) {
+  unlink($file_path_uploaded);
 }
-
+ 
 }
 
 /**
@@ -250,19 +238,19 @@ if( filesize($file_path_uploaded) !== $file_size ) {
 function set_webp_origin($current_width, $current_height, $file_location, $file_size, $origin_path_uploaded, $origin_path, $file_name)
 {
 
-if($current_width <= 0 || $current_height <= 0) {
+if ($current_width <= 0 || $current_height <= 0) {
 
   return false;
 
 }
 
-if( !move_uploaded_file($file_location, $origin_path_uploaded) ) {
+if (!move_uploaded_file($file_location, $origin_path_uploaded)) {
 
   return false;
 
 }
 
-if( filesize($origin_path_uploaded) !== $file_size ) {
+if (filesize($origin_path_uploaded) !== $file_size) {
 
   unlink($origin_path_uploaded);
   return false;
@@ -273,7 +261,7 @@ if( filesize($origin_path_uploaded) !== $file_size ) {
 $file_basename = substr($file_name, 0, strripos($file_name, '.'));
     
 $origin_webp = photo_instance()->make($origin_path_uploaded);
-if($origin_webp->save($origin_path.$file_basename.'.webp', 80, 'webp')){
+if ($origin_webp->save($origin_path.$file_basename.'.webp', 80, 'webp')) {
 
    $origin_webp->destroy();
    return true;
@@ -301,7 +289,7 @@ function set_regular_photo($current_width, $current_height, $file_path_uploaded,
 
   if ($current_width <= 0 || $current_height <= 0) {
   
-      return false;
+    return false;
   
   }
   
@@ -317,7 +305,7 @@ function set_regular_photo($current_width, $current_height, $file_path_uploaded,
     case "image/jpeg":
     case "image/jpg":
   
-      if( $regular_photo->save($file_path_thumb .'large_'.$file_name, 80, 'jpg') ) {
+      if ($regular_photo->save($file_path_thumb .'large_'.$file_name, 80, 'jpg') ) {
   
         $regular_photo->destroy();
         return true;
@@ -328,7 +316,7 @@ function set_regular_photo($current_width, $current_height, $file_path_uploaded,
     
     case "image/png":
   
-      if( $regular_photo->save($file_path_thumb .'large_'.$file_name, 80, 'png') ) {
+      if ($regular_photo->save($file_path_thumb .'large_'.$file_name, 80, 'png') ) {
   
         $regular_photo->destroy();
         return true;
@@ -339,7 +327,7 @@ function set_regular_photo($current_width, $current_height, $file_path_uploaded,
   
     case "image/gif":
   
-      if( $regular_photo->save($file_path_thumb .'large_'.$file_name, 80, 'gif') ) {
+      if ($regular_photo->save($file_path_thumb .'large_'.$file_name, 80, 'gif') ) {
   
         $regular_photo->destroy();
         return true;
@@ -347,10 +335,21 @@ function set_regular_photo($current_width, $current_height, $file_path_uploaded,
       }
 
       break;
+
+    case "image/bmp":
+
+      if ($regular_photo->save($file_path_thumb.'large_'.$file_name, 80, 'bmp') ) {
+
+        $regular_photo->destroy();
+        return true;
+
+      }
+
+      break;
     
     case "image/webp":
 
-      if( $regular_photo->save($file_path_thumb.'large_'.$file_name, 80, 'webp')) {
+      if ($regular_photo->save($file_path_thumb.'large_'.$file_name, 80, 'webp')) {
 
          $regular_photo->destroy();
          return true;
@@ -400,7 +399,7 @@ function set_webp_regular($current_width, $current_height, $file_path_uploaded, 
   
   $regular_webp = photo_instance()->make($file_path_uploaded);
   $regular_webp->fit($new_width, $new_height);
-  if($regular_webp->save($file_path_thumb.'large_'.$file_basename.'.webp', 80, 'webp')) {
+  if ($regular_webp->save($file_path_thumb.'large_'.$file_basename.'.webp', 80, 'webp')) {
   
      $regular_webp->destroy();
      return true;
@@ -410,7 +409,7 @@ function set_webp_regular($current_width, $current_height, $file_path_uploaded, 
 }
 
 // setting medium size of picture
-function set_medium_photo( $current_width, $current_height, $file_path_uploaded, $file_path_thumb, $file_name, $file_type )
+function set_medium_photo($current_width, $current_height, $file_path_uploaded, $file_path_thumb, $file_name, $file_type )
 {
 
 $medium_size = 640;
@@ -433,7 +432,7 @@ switch ($file_type) {
   case "image/jpeg":
   case "image/jpg":
 
-    if( $medium_photo->save($file_path_thumb .'medium_'.$file_name, 80, 'jpg') ) {
+    if ($medium_photo->save($file_path_thumb .'medium_'.$file_name, 80, 'jpg') ) {
 
       $medium_photo->destroy();
       return true;
@@ -444,7 +443,7 @@ switch ($file_type) {
   
   case "image/png":
 
-    if( $medium_photo->save($file_path_thumb .'medium_'.$file_name, 80, 'png') ) {
+    if ($medium_photo->save($file_path_thumb .'medium_'.$file_name, 80, 'png') ) {
 
       $medium_photo->destroy();
       return true;
@@ -455,7 +454,7 @@ switch ($file_type) {
 
   case "image/gif":
 
-    if( $medium_photo->save($file_path_thumb .'medium_'.$file_name, 80, 'gif') ) {
+    if ($medium_photo->save($file_path_thumb .'medium_'.$file_name, 80, 'gif') ) {
 
       $medium_photo->destroy();
       return true;
@@ -463,6 +462,17 @@ switch ($file_type) {
     }
   
    break;
+
+  case "image/bmp":
+
+    if ($medium_photo->save($file_path_thumb . 'medium_'.$file_name, 80, 'bmp') ) {
+
+      $medium_photo->destroy();
+      return true;
+
+    }
+
+    break;
 
   case "image/webp":
 
@@ -507,7 +517,7 @@ $new_height = ceil($medium_scaled*$current_height);
 
 $medium_webp = photo_instance()->make($file_path_uploaded);
 $medium_webp->fit($new_width, $new_height);
-if($medium_webp->save($file_path_thumb.'medium_'.$file_basename.'.webp', 80, 'webp')) {
+if ($medium_webp->save($file_path_thumb.'medium_'.$file_basename.'.webp', 80, 'webp')) {
 
    $medium_webp->destroy();
    return true;
@@ -540,7 +550,7 @@ switch ($file_type) {
   case "image/jpeg":
   case "image/jpg":
 
-    if( $small_photo->save($file_path_thumb.'small_'.$file_name, 80, 'jpg' ) ) {
+    if ($small_photo->save($file_path_thumb.'small_'.$file_name, 80, 'jpg' ) ) {
 
       $small_photo->destroy();
       return true;
@@ -551,7 +561,7 @@ switch ($file_type) {
   
   case "image/png":
 
-    if( $small_photo->save($file_path_thumb.'small_'.$file_name, 80, 'png' ) ) {
+    if ($small_photo->save($file_path_thumb.'small_'.$file_name, 80, 'png' ) ) {
 
       $small_photo->destroy();
       return true;
@@ -562,18 +572,30 @@ switch ($file_type) {
   
   case "image/gif":
 
-    if( $small_photo->save($file_path_thumb.'small_'.$file_name, 80, 'gif' ) ) {
+    if ($small_photo->save($file_path_thumb.'small_'.$file_name, 80, 'gif' ) ) {
 
       $small_photo->destroy();
       return true;
     
     }
 
+
+    break;
+
+  case "image/bmp":  
+
+    if ($small_photo->save($file_path_thumb.'small_'.$file_name, 80, 'bmp') ) {
+
+      $small_photo->destroy();
+      return true;
+
+    }
+
     break;
 
   case "image/webp":
 
-    if($small_photo->save($file_path_thumb.'small_'.$file_name, 80, 'webp')) {
+    if ($small_photo->save($file_path_thumb.'small_'.$file_name, 80, 'webp') ) {
 
       $small_photo->destroy();
       return true;
@@ -613,7 +635,7 @@ $new_height = ceil($small_scaled*$current_height);
 
 $small_webp = photo_instance()->make($file_path_uploaded);
 $small_webp->fit($new_width, $new_height);
-if($small_webp->save($file_path_thumb.'small_'.$file_basename.'.webp', 80, 'webp')) {
+if ($small_webp->save($file_path_thumb.'small_'.$file_basename.'.webp', 80, 'webp')) {
 
   $small_webp->destroy();
   return true;

@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Dao Class
  * Data Access Object
@@ -47,12 +47,6 @@ class Dao
    }
  }
 
- public function __desctruct()
- {
-   Registry::set('dbc', null);
-   session_write_close();
- }
-
 /**
  * setSQL
  *
@@ -75,32 +69,15 @@ class Dao
   */
  protected function findAll(array $data = array(), $fetchMode = null)
  {
-     
-   try {
-        
-        if (!$this->sql) {
+   
+  if (!$this->sql) {
 
-            throw new DbException("No SQL Query");
+    throw new DbException("No SQL Query");
 
-        }
-        
-        $findAll = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchAll($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchAll();
+  }
 
-        return $findAll;
-        
-    } catch (DbException $e) {
-    
-        $this->closeConnection();
-        $this->error = LogError::newMessage($e);
-        $this->error = LogError::customErrorMessage('admin');
-        
-    } catch (PDOException $e) {
-
-        throw new PDOException("Error on SQL Query: " .$e->getMessage());
-        $this->closeConnection();
-
-    }
-    
+  return (! is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchAll($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchAll();
+      
  }
  
 /**
@@ -116,24 +93,13 @@ class Dao
  protected function findRow(array $data = array(), $fetchMode = null)
  {
      
-  try {
+  if (!$this->sql) {
     
-    if (!$this->sql) {
-    
-        throw new DbException("No SQL Query!");
-    }
-     
-    $findRow = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetch();
-
-    return $findRow;
-
-  } catch (DbException $e) {
-     
-      $this->closeConnection();
-      $this->error = LogError::newMessage($e);
-      $this->error = LogError::customErrorMessage('admin');
-  }   
+    throw new DbException("No SQL Query!");
+  }
   
+  return (! is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetch();
+
  }
  
  /**
@@ -149,25 +115,13 @@ class Dao
  protected function findColumn(array $data = array(), $fetchMode = null)
  {
      
-   try {
-    
-       if (!$this->sql) {
+  if (!$this->sql) {
            
-          throw new DbException("No SQL Query!");
-           
-       }
-       
-       $findColumn = (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchColumn($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
-
-       return $findColumn;
-
-   } catch (DbException $e) {
-       
-       $this->closeConnection();
-       $this->error = LogError::newMessage($e);
-       $this->error = LogError::customErrorMessage('admin');
-       
-   }
+    throw new DbException("No SQL Query!");
+     
+  }
+ 
+  return ( ! is_null($fetchMode) ) ? $this->dbc->dbQuery($this->sql, $data)->fetchColumn($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
      
  }
  
@@ -182,25 +136,15 @@ class Dao
  public function checkCountValue($data = array())
  {
      
-   try {
-         
-        if (!$this->sql) {
+  if (!$this->sql) {
              
-           throw new DbException("No SQL Query!");
-           
-        }
-         
-        $stmt = $this->dbc->dbQuery($this->sql, $data);
-         
-        return $stmt->rowCount();
-              
-     } catch (DbException $e) {
-         
-        $this->closeConnection();
-        $this->error = LogError::newMessage($e);
-        $this->error = LogError::customErrorMessage('admin');
-         
-     }
+    throw new DbException("No SQL Query!");
+    
+  }
+  
+  $stmt = $this->dbc->dbQuery($this->sql, $data);
+  
+  return ($stmt->rowCount() > 0) ? $stmt->rowCount() : null;
      
  }
  
@@ -316,12 +260,11 @@ protected function lastId()
  protected function filteringId(Sanitize $sanitize, $str, $type)
  {
 
- try {
-
-   $this->sanitizing = $sanitize;
+  $this->sanitizing = $sanitize;
 	 	
    switch ($type) {
       
+      default:
       case 'sql':
         
           if (filter_var($str, FILTER_SANITIZE_NUMBER_INT)) {
@@ -330,7 +273,7 @@ protected function lastId()
               
           } else {
               
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
             throw new DbException("ERROR: this - $str - Id is considered invalid.");
               
           }
@@ -345,23 +288,21 @@ protected function lastId()
               
           } else {
               
-              header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
-              throw new DbException("ERROR: this - $str - is considered invalid.");
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+            throw new DbException("ERROR: this - $str - is considered invalid.");
 
           }
           
           break;
       
        }
-	 	
-      } catch (DbException $e) {
-	 	
-        $this->error = LogError::setStatusCode(http_response_code());
-        $this->error = LogError::newMessage($e);
-        $this->error = LogError::customErrorMessage();
-          
-      }
-			
-}
-	
+
+ }
+
+ public function __desctruct()
+ {
+   Registry::set('dbc', null);
+   session_write_close();
+ }
+
 }

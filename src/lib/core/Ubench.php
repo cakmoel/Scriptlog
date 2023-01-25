@@ -1,10 +1,12 @@
-<?php
-
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /*
  * Class Ubench
  * 
  * @category Core Class
  * @author Jeremy Perret
+ * @license MIT
+ * 
+ * The MIT License (MIT)
  * Copyright (c) 2012 Jeremy Perret
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy

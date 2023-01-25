@@ -1,4 +1,4 @@
-<?php 
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class TopicApp
  *
@@ -19,7 +19,14 @@ class TopicApp extends BaseApp
   {
     $this->topicEvent = $topicEvent;
   }
-  
+
+/**
+ * listItems
+ *
+ * @inheritDoc
+ * @uses BaseApp::listItems
+ * 
+ */
   public function listItems()
   {
     
@@ -28,20 +35,22 @@ class TopicApp extends BaseApp
     $checkError = true;
     $checkStatus = false;
     
-    if (isset($_GET['error'])) {
+    if (isset($_SESSION['error'])) {
         $checkError = false;
-        if ($_GET['error'] == 'topicNotFound') array_push($errors, "Error: Topic Not Found!");
+        ($_SESSION['error'] == 'topicNotFound') ? array_push($errors, "Error: Topic Not Found!") : "";
+        unset($_SESSION['error']);
     }
     
-    if (isset($_GET['status'])) {
+    if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        if ($_GET['status'] == 'topicAdded') array_push($status, "New topic added");
-        if ($_GET['status'] == 'topicUpdated') array_push($status, "Topic has been updated");
-        if ($_GET['status'] == 'topicDeleted') array_push($status, "Topic deleted");
+        ($_SESSION['status'] == 'topicAdded') ? array_push($status, "New cateogory added") : "";
+        ($_SESSION['status'] == 'topicUpdated') ? array_push($status, "Category has been updated") : "";
+        ($_SESSION['status'] == 'topicDeleted') ? array_push($status, "Category deleted") : "";
+        unset($_SESSION['status']);
     }
     
     $this->setView('all-topics');
-    $this->setPageTitle('Topics');
+    $this->setPageTitle('Categories');
     
     if (!$checkError) {
        $this->view->set('error', $errors);
@@ -53,11 +62,19 @@ class TopicApp extends BaseApp
     
     $this->view->set('pageTitle', $this->getPageTitle());
     $this->view->set('topicsTotal', $this->topicEvent->totalTopics());
-    $this->view->set('topics', $this->topicEvent->grabTopics());
+    $this->view->set('categories', $this->topicEvent->grabTopics());
     return $this->view->render();
     
   }
   
+/**
+ * insert
+ * 
+ * @inheritDoc
+ * @uses BaseApp::insert
+ *
+ * @return void
+ */
   public function insert()
   {
     
@@ -66,13 +83,13 @@ class TopicApp extends BaseApp
     
     if (isset($_POST['topicFormSubmit'])) {
        
-      $filters = ['topic_title' => FILTER_SANITIZE_STRING];
+      $filters = ['topic_title' => isset($_POST['topic_title']) ? Sanitize::severeSanitizer($_POST['topic_title']) : ""];
      
       try {
           
           if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
               
-              header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+              header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
               throw new AppException("Sorry, unpleasant attempt detected!");
               
           }
@@ -87,7 +104,7 @@ class TopicApp extends BaseApp
           if (!$checkError) {
               
              $this->setView('edit-topic');
-             $this->setPageTitle('Add New Topic');
+             $this->setPageTitle('Add New Category');
              $this->setFormAction(ActionConst::NEWTOPIC);
              $this->view->set('pageTitle', $this->getPageTitle());
              $this->view->set('formAction', $this->getFormAction());
@@ -100,22 +117,27 @@ class TopicApp extends BaseApp
              $this->topicEvent->setTopicTitle(prevent_injection(trim(distill_post_request($filters)['topic_title'])));
              $this->topicEvent->setTopicSlug(make_slug(distill_post_request($filters)['topic_title']));
              $this->topicEvent->addTopic();
-             direct_page('index.php?load=topics&status=topicAdded', 200);
+             $_SESSION['status'] = "topicAdded";
+             direct_page('index.php?load=topics&status=topicAdded', 302);
              
           }
           
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+
       } catch (AppException $e) {
          
-          LogError::setStatusCode(http_response_code());
-          LogError::newMessage($e);
-          LogError::customErrorMessage('admin');
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($e);
 
       }
       
     } else {
       
        $this->setView('edit-topic');
-       $this->setPageTitle('Add New Topic');
+       $this->setPageTitle('Add New Category');
        $this->setFormAction(ActionConst::NEWTOPIC);
        $this->view->set('pageTitle', $this->getPageTitle());
        $this->view->set('formAction', $this->getFormAction());
@@ -127,6 +149,12 @@ class TopicApp extends BaseApp
     
   }
   
+/**
+ * update
+ *
+ * @inheritDoc
+ * @param int|num $id
+ */
   public function update($id)
   {
       
@@ -134,8 +162,9 @@ class TopicApp extends BaseApp
     $checkError = true;
     
     if (!$getCategory = $this->topicEvent->grabTopic($id)) {
-        
-        direct_page('index.php?load=topics&error=topicNotFound', 404);
+      
+      $_SESSION['error'] = "topicNotFound";
+      direct_page('index.php?load=topics&error=topicNotFound', 404);
         
     }
     
@@ -148,13 +177,15 @@ class TopicApp extends BaseApp
     
     if (isset($_POST['topicFormSubmit'])) {
         
-        $filters = ['topic_title' => FILTER_SANITIZE_STRING, 'topic_status' => FILTER_SANITIZE_STRING, 'topic_id' => FILTER_SANITIZE_NUMBER_INT];
+        $filters = ['topic_title' => isset($_POST['topic_title']) ? Sanitize::severeSanitizer($_POST['topic_title']) : "", 
+                    'topic_status' => isset($_POST['topic_status']) ? Sanitize::mildSanitizer($_POST['topic_status']) : "", 
+                    'topic_id' => FILTER_SANITIZE_NUMBER_INT];
  
         try {
             
             if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
                 
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
                 throw new AppException("Sorry, unpleasant attempt detected!");
                 
             }
@@ -191,15 +222,20 @@ class TopicApp extends BaseApp
                 $this->topicEvent->setTopicSlug(make_slug(distill_post_request($filters)['topic_title']));
                 $this->topicEvent->setTopicStatus(distill_post_request($filters)['topic_status']);
                 $this->topicEvent->modifyTopic();
-                direct_page('index.php?load=topics&status=topicUpdated', 200);
+                $_SESSION['status'] = "topicUpdated";
+                direct_page('index.php?load=topics&status=topicUpdated', 302);
                 
             }
             
+        } catch (Throwable $th) {
+
+          LogError::setStatusCode(http_response_code());
+          LogError::exceptionHandler($th);
+          
         } catch (AppException $e) {
             
-            LogError::setStatusCode(http_response_code());
-            LogError::newMessage($e);
-            LogError::customErrorMessage('admin');
+          LogError::setStatusCode(http_response_code());
+          LogError::exceptionHandler($e);
             
         }
         
@@ -218,12 +254,80 @@ class TopicApp extends BaseApp
     return $this->view->render();
     
   }
-  
+
+/**
+ * remove
+ *
+ * @inheritDoc
+ * @uses BaseApp::remove 
+ * @param int|num $id
+ */
   public function remove($id)
   {
-    $this->topicEvent->setTopicId($id);
-    $this->topicEvent->removeTopic();
-    direct_page('index.php?load=topics&status=topicDeleted', 200);
+
+    $checkError = true;
+    $errors = array();
+
+    if (isset($_GET['Id'])) {
+
+      $getTopic = $this->topicEvent->grabTopic($id);
+
+      try {
+        
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+      
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+
+        if (!$getTopic) {
+
+            $checkError = false;
+            array_push($errors, 'Error: Topic not found');
+
+        }
+
+        if (!$checkError) {
+
+          $this->setView('all-topics');
+          $this->setPageTitle('Topic not found');
+          $this->view->set('pageTitle', $this->getPageTitle());
+          $this->view->set('errors', $errors);
+          $this->view->set('topicsTotal', $this->topicEvent->totalTopics());
+          $this->view->set('topics', $this->topicEvent->grabTopics());
+          return $this->view->render();
+
+        } else {
+
+          $this->topicEvent->setTopicId($id);
+          $this->topicEvent->removeTopic();
+          $_SESSION['status'] = "topicDeleted";
+          direct_page('index.php?load=topics&status=topicDeleted', 302);
+
+        }
+
+      } catch (Throwable $th) {
+        
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+
+      } catch (AppException $e) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($e);
+
+      }
+
+    }
+
   }
   
   protected function setView($viewName)

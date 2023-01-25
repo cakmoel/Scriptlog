@@ -1,11 +1,14 @@
 <?php
 /**
- * Upload Theme Function
+ * upload_theme()
  * 
+ * uploading theme with zip format
+ * 
+ * @category function
  * @param string $file_name
  * 
  */
-function upload_theme($file_name, $file_location, array $blacklist)
+function upload_theme($file_name, $file_location, $blacklist)
 {
   
   // get file basename
@@ -13,9 +16,9 @@ function upload_theme($file_name, $file_location, array $blacklist)
   // get file extension
   $file_extension = substr($file_name, strripos($file_name, '.'));
   // rename file
-  $rename_file = rename_file(md5(rand(000,999).$file_basename));
+  $rename_file = rename_file(md5(rand(000, 999).$file_basename));
   $slug = make_slug($file_basename);
-  $fileNameUnique = $slug . "-" . $rename_file . "-scriptlog" . $file_extension;
+  $fileNameUnique = $slug . "-" . $rename_file . "-scriptlog" . '.' . $file_extension;
   $pathFile = __DIR__ . '/../../'.APP_THEME.$fileNameUnique;
 
   foreach ($blacklist as $item) {
@@ -27,11 +30,12 @@ function upload_theme($file_name, $file_location, array $blacklist)
   if (move_uploaded_file($file_location, $pathFile)) {
     
     $zip = new ZipArchive();
-    $x = $zip -> open($pathFile);
+    $x = $zip->open($pathFile);
 
     if ($x === true) {
-      $zip -> extractTo(APP_ROOT.'public/themes/');
-      $zip -> close();
+      
+      $zip->extractTo(APP_ROOT.'public/themes/');
+      $zip->close();
 
       unlink($pathFile);
 

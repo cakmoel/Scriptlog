@@ -1,6 +1,6 @@
 <?php
 /**
- * Function check_integer
+ * check_integer()
  * 
  * @category function
  * @param integer $input

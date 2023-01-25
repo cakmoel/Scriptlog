@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * HTML parsing, filtering and sanitization
  * This class depends on Tidy which is included in the core since PHP 5.3
@@ -462,7 +462,7 @@ final class Html
          $out = false;
           
          if ( filter_var( $v, 
-             FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED ) ) {
+             FILTER_VALIDATE_URL ) ) {
               
              /**
               * PHP's native filter isn't restrictive enough.
@@ -551,7 +551,7 @@ final class Html
      public static function utfdecode( $v ) {
          $v = urldecode( $v );
          $v = preg_replace( '/%u([0-9a-f]{3,4})/i', '&#x\\1;', $v );
-         return html_entity_decode( $v, null, 'UTF-8' );
+         return html_entity_decode( $v, ENT_QUOTES, 'UTF-8' );
      }
       
       

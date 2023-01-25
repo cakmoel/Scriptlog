@@ -1,5 +1,4 @@
 <?php
-
 define('DS', DIRECTORY_SEPARATOR);
 define('APP_TITLE', 'Scriptlog');
 define('APP_CODENAME', 'Maleo Senkawor');
@@ -20,4 +19,72 @@ define('APP_DOCUMENT', APP_PUBLIC . DS . 'files' . DS . 'docs' . DS);
 define('APP_THEME', APP_PUBLIC . DS . 'themes' . DS);
 define('APP_PLUGIN', APP_ADMIN . DS . 'plugins' . DS);
 define('APP_DEVELOPMENT', true);
-define('SCRIPTLOG', sha1(mt_rand(1, 1000).'M4Le053Nk4Wo12!@#'));
+define('SCRIPTLOG', hash_hmac('sha256', APP_TITLE . ':'. APP_CODENAME.mt_rand(1, 1000), hash('sha256', uniqid().'M4Le053Nk4WoR!@#{>}>01[:+]-07|=_$%^&*(id)')));
+
+define('MESSAGE_BADREQUEST', "400 Bad Request");
+define('MESSAGE_UNPLEASANT_ATTEMPT', "Sorry, unpleasant attempt detected");
+define('MESSAGE_UNKNOWN_DNS', "Unknown DNS records that signal the server accepts emails");
+define('MESSAGE_WEAK_PASSWORD', "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters");
+define('MESSAGE_INVALID_FULLNAME', "Please enter a valid fullname");
+define('MESSAGE_INVALID_SELECTBOX', "Please choose the available value provided");
+define('MESSAGE_INVALID_EMAILADDRESS', "Please enter a valid email address");
+
+define('MAX_FILES', 10000);
+define('MAX_SIZE', 1000000000); // 1 GB
+define('MAX_RATIO', 10);
+define('READ_LENGTH', 1024);
+
+if (!defined('PHP_EOL')) {
+
+  if (strtoupper(substr(PHP_OS, 0, 3) == 'WIN')) {
+        
+    define('PHP_EOL', "\r\n");
+
+  } elseif (strtoupper(substr(PHP_OS, 0, 3) == 'MAC')) {
+        
+    define('PHP_EOL', "\r");
+    
+  } elseif (strtoupper(substr(PHP_OS, 0, 3) == 'DAR')) {
+        
+    define('PHP_EOL', "\n");
+      
+  } else {
+        
+    define('PHP_EOL', "\n");
+      
+  }
+
+}
+
+$is_secure = false;
+
+if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) 
+     && ($_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) ) 
+     && ($_SERVER['HTTP_X_FORWARDED_SSL'] == 'on')) {
+
+$is_secure = true;
+
+} 
+
+if (!defined('APP_PROTOCOL')) {
+
+  define('APP_PROTOCOL', $protocol = ($is_secure) ? 'https' : 'http');
+
+}
+
+if (! defined('APP_HOSTNAME')) {
+
+  if (isset($_SERVER['HTTP_HOST'])) {
+
+    define('APP_HOSTNAME', $_SERVER['HTTP_HOST']);
+  
+  } elseif (isset($_SERVER['SERVER_NAME'])) {
+
+    define('APP_HOSTNAME', $_SERVER['SERVER_NAME']);
+  }
+
+}
+
+if (ini_get("date.timezone") === "" && function_exists("date_default_timezone_set")) {
+  date_default_timezone_set("UTC");
+}

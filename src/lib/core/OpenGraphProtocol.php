@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Open Graph Protocol data class. Define and validate OGP values.
  *

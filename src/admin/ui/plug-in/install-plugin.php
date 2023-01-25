@@ -45,22 +45,9 @@ $action = isset($formAction) ? $formAction : null;
 
 <div class="form-group">
 <label for="pluginUploaded">Upload Plugin (required)</label>
-<input type="file" name="zip_file" id="pluginUploaded" accept="application/zip,application/octet-stream,application/x-zip,application/x-zip-compressed" required>
+<input type="file" name="zip_file" id="pluginUploaded" accept="application/zip,application/x-zip,application/x-zip-compressed" required>
 <p class="help-block">If you have a plugin in a .zip format, you may install it by uploading it here.</p>
 </div>
-
-<div class="form-group">
-<label for="description">Description (required)</label>
-<textarea class="form-control" id="description" name="description" rows="3" maxlength="500" required>
-<?=(isset($formData['description'])) ? $formData['description'] : ""; ?>
-</textarea>
-</div>
-
-<div class="form-group">
-<label for="plugin_level">Access</label>
-<?=(isset($pluginLevel)) ? $pluginLevel : ""; ?>
-</div>
-<!-- /.plugin level -->
 
 </div>
 <!-- /.box-body -->
@@ -92,12 +79,12 @@ function checkFile(e) {
         var sFileName = file.name;
         var sFileExtension = sFileName.split('.')[sFileName.split('.').length - 1].toLowerCase();
         var iFileSize = file.size;
-        var iConvert = (file.size / 10485760).toFixed(2);
+        var iConvert = (file.size / <?= scriptlog_upload_filesize(); ?>).toFixed(2);
 
-        if (!(sFileExtension === "zip") || iFileSize > 10485760) {
+        if (!(sFileExtension === "zip") || iFileSize > <?= scriptlog_upload_filesize();?>) {
             txt = "File type : " + sFileExtension + "\n\n";
-            txt += "Size: " + iConvert + " MB \n\n";
-            txt += "Please make sure your file is in .zip format and less than <?= format_size_unit(10485760); ?>.\n\n";
+            txt += "Best size: " + iConvert + " MB \n\n";
+            txt += "Please make sure your file is in .zip format and less than <?= format_size_unit(scriptlog_upload_filesize());?>.\n\n";
             alert(txt);
         }
     }

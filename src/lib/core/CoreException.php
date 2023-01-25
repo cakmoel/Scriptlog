@@ -1,42 +1,44 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * CoreException Class extends Exception implements IException
+ * CoreException Class extends Exception implements ICoreThrowable
  *
  * @category  Core Class
  * @link      https://secure.php.net/manual/en/language.exceptions.php#91159
+ * @see       https://www.php.net/manual/en/language.exceptions.extending.php
  * @version   1.0
  * @since     Since Release 1.0
  *
  */
-abstract class CoreException extends Exception implements IException
+class CoreException extends Exception implements ICoreThrowable
 {
   
-  protected $message = 'Unknown Exception';
+protected $message = 'Unknown Exception';
 
-  protected $code = 0;
+public function __construct($message = null, $code = 0, Exception $previous = null)
+{
 
-  protected $file;
+  ( isset($code) ) ? $this->getCode() : 0;
 
-  protected $line; 
+  if (!$message) {
 
-  private $string;
+    throw new $this('Unknown'.get_class($this));
+    
+  }
 
-  private $trace;
+  parent::__construct($message, $code, $previous);
 
-  public function __construct($message = null, $code = 0)
-  {
-    if (!$message) {
-      throw new $this('Unknown'.get_class($this));
-    }
+  if (!is_null($previous)) {
 
-    parent::__construct($message, $code);
+   $this->previous = $previous;
 
   }
 
-  public function __toString()
-  {
-    return get_class($this) . "'{$this->message}' in {$this->file}({$this->line})\n"
+}
+
+public function __toString()
+{
+  return get_class($this) . "'{$this->message}' in {$this->getFile()}({$this->getLine()})\n"
                             . "{$this->getTraceAsString()}";
-  }
+}
   
 }

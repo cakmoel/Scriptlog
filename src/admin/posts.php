@@ -1,10 +1,10 @@
-<?php if (!defined('SCRIPTLOG')) die("Direct Access Not Allowed!");
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $postId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
-$postDao = new PostDao();
-$postEvent = new PostEvent($postDao, $validator, $sanitizer);
-$postApp = new PostApp($postEvent);
+$postDao = class_exists('PostDao') ? new PostDao() : "";
+$postEvent = class_exists('PostEvent') ? new PostEvent($postDao, $validator, $sanitizer) : "";
+$postApp = class_exists('PostApp') ? new PostApp($postEvent) : "";
 
 try {
 
@@ -20,7 +20,8 @@ try {
     
                 if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
     
-                    header($_SERVER["SERVER_PROTOCOL"]." 403");
+                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                    header("Status: 400 Bad Request");
                     throw new AppException("Invalid ID data type");
     
                 }
@@ -43,7 +44,8 @@ try {
             
             if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
     
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                header("Status: 400 Bad Request");
                 throw new AppException("Invalid ID data type!");
     
             }
@@ -60,7 +62,7 @@ try {
                     
                 } else {
                     
-                   direct_page('index.php?load=posts&error=postNotFound', 404);
+                   direct_page('index.php?load=404&notfound='.notfound_id(), 404);
                     
                 }
     
@@ -70,9 +72,10 @@ try {
             
         case ActionConst::DELETEPOST:
             
-            if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
+            if ( ( !check_integer($postId) ) && ( gettype($postId) !== "integer") ) {
     
-                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                header("Status: 400 Bad Request");
                 throw new AppException("Invalid ID data type!");
     
             }
@@ -89,7 +92,7 @@ try {
     
                 } else {
     
-                    direct_page('index.php?load=posts&error=postNotFound', 404);
+                    direct_page('index.php?load=404&notfound='.notfound_id(), 404);
     
                 }
                        
@@ -113,10 +116,16 @@ try {
             
     }
 
+} catch (Throwable $th) {
+
+    if (class_exists('LogError')) {
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+    }
+    
 } catch (AppException $e) {
     
     LogError::setStatusCode(http_response_code());
-    LogError::newMessage($e);
-    LogError::customErrorMessage('admin');
+    LogError::exceptionHandler($e);
     
 }

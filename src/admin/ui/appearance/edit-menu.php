@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
 
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -8,7 +8,7 @@
         <small>Control Panel</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
         <li><a href="index.php?load=menu">Menu</a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
@@ -26,7 +26,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
+<h4><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h4>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -65,24 +65,11 @@ $menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
 <?=(isset($formData['menu_link'])) ? htmlspecialchars($formData['menu_link'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" >
 </div>
 
-<?php
-  if (!empty($menuData['menu_sort'])) :
-?>
-<div class="form-group">
-<label>Order</label>
-<input type="text" class="form-control" name="menu_sort" placeholder="" value="
-<?=(isset($menuData['menu_sort'])) ? htmlspecialchars($menuData['menu_sort']) : ""; ?>
-<?=(isset($formData['menu_sort'])) ? htmlspecialchars($formData['menu_sort'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" required>
-</div>
-<?php 
-  endif;
-?>
-
 <?php if (isset($menuData['menu_status'])) : ?>
 <div class="form-group">
 <label>Actived</label>
 <div class="radio">
-<label>
+<label for="optionRadios1">
 <input type="radio" name="menu_status" id="optionsRadios1" value="Y" 
 <?=(isset($menuData['menu_status']) && $menuData['menu_status'] === 'Y') ? 'checked="checked"' : ""; ?>
 <?=(isset($formData['menu_status']) && $formData['menu_status'] === 'Y') ? 'checked="checked"' : "" ?> >
@@ -91,10 +78,10 @@ $menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
 </div>
 
 <div class="radio">
-<label>
-<input type="radio" name="menu_status" id="optionsRadios1" value="N" 
+<label for="optionRadios2">
+<input type="radio" name="menu_status" id="optionsRadios2" value="N" 
 <?=(isset($menuData['menu_status']) && $menuData['menu_status'] === 'N') ? 'checked="checked"' : ""; ?>
-<?=(isset($formData['menu_status']) && $formData['menu_status'] == 'N') ? 'checked="checked"' : ""; ?> >
+<?=(isset($formData['menu_status']) && $formData['menu_status'] === 'N') ? 'checked="checked"' : ""; ?> >
    No
  </label>
 </div>
@@ -103,6 +90,11 @@ $menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
 <?php 
 endif;
 ?>
+
+<div class="form-group">
+<label for="menu_visibility">Visibility</label>
+<?=(isset($visibility)) ? $visibility : ""; ?>
+</div>
 
 </div>
 <!-- /.box-body -->
@@ -116,7 +108,8 @@ endif;
 </div>
 <!-- /.box -->
 </div>
-<!-- /.col-md-12 -->
+<!-- /.col-md-6 -->
+
 </div>
 <!-- /.row --> 
 </section>

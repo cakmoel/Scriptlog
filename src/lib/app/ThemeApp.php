@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class ThemeApp
  * 
@@ -11,6 +11,7 @@
  */
 class ThemeApp extends BaseApp
 {
+  
   private $view;
 
   private $themeEvent;
@@ -27,16 +28,18 @@ class ThemeApp extends BaseApp
     $checkError = true;
     $checkStatus = false;
 
-    if (isset($_GET['error'])) {
-       if ($_GET['error'] == "themeNotFound") array_push($errors, "Error: Theme is not found");
+    if (isset($_SESSION['error'])) {
+       ($_SESSION['error'] == "themeNotFound") ? array_push($errors, "Error: Theme is not found") : "";
+       unset($_SESSION['error']);
     }
 
-    if (isset($_GET['status'])) {
-        if ($_GET['status'] == "themeAdded") array_push($errors, "New theme added");
-        if ($_GET['status'] == "themeInstalled") array_push($errors, "Theme installation process is successful, please activate it first to see it works!");
-        if ($_GET['status'] == "themeUpdated") array_push($errors, "Theme updated");
-        if ($_GET['status'] == "themeActivated") array_push($status, "Theme activated");
-        if ($_GET['status'] == "themeDeleted") array_push($status, "Theme deleted");
+    if (isset($_SESSION['status'])) {
+        ($_SESSION['status'] == "themeAdded") ? array_push($errors, "New theme added") : "";
+        ($_SESSION['status'] == "themeInstalled") ? array_push($errors, "Theme installation process is successful, please activate it first to see it works!") : "";
+        ($_SESSION['status'] == "themeUpdated") ? array_push($errors, "Theme updated") : "";
+        ($_SESSION['status'] == "themeActivated") ? array_push($status, "Theme activated") : "";
+        ($_SESSION['status'] == "themeDeleted") ? array_push($status, "Theme deleted") : "";
+        unset($_SESSION['status']);
     }
 
     $this->setView('all-templates');
@@ -57,6 +60,12 @@ class ThemeApp extends BaseApp
 
   }
 
+/**
+ * insert()
+ * 
+ * @inheritDoc
+ * @uses BaseApp::insert Name
+ */
   public function insert()
   {
     $errors = array();
@@ -65,10 +74,10 @@ class ThemeApp extends BaseApp
     if (isset($_POST['themeFormSubmit'])) {
 
       $filters = [
-        'theme_title' => FILTER_SANITIZE_STRING, 
+        'theme_title' => isset($_POST['theme_title']) ? Sanitize::severeSanitizer($_POST['theme_title']) : "", 
         'theme_description' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 
-        'theme_designer' => FILTER_SANITIZE_STRING, 
-        'theme_directory' => FILTER_SANITIZE_STRING
+        'theme_designer' => isset($_POST['theme_designer']) ? Sanitize::severeSanitizer($_POST['theme_designer']) : "", 
+        'theme_directory' => isset($_POST['theme_directory']) ? Sanitize::severeSanitizer($_POST['theme_directory']) : ""
       ];
       
       try {
@@ -108,26 +117,31 @@ class ThemeApp extends BaseApp
           $this->themeEvent->setThemeDesigner(prevent_injection(distill_post_request($filters)['theme_designer']));
           $this->themeEvent->setThemeDirectory(prevent_injection(distill_post_request($filters)['theme_directory']));
           $this->themeEvent->addTheme();
-          direct_page('index.php?load=templates&status=themeAdded', 200);
+          $_SESSION['status'] = "themeAdded";
+          direct_page('index.php?load=templates&status=themeAdded', 302);
 
         }
+
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
 
       } catch (AppException $e) {
 
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($e);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($e);
 
       }
 
     } else {
        
-       $this->setView('edit-template');
-       $this->setPageTitle('Add New Theme');
-       $this->setFormAction(ActionConst::NEWTHEME);
-       $this->view->set('pageTitle', $this->getPageTitle());
-       $this->view->set('formAction', $this->getFormAction());
-       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+      $this->setView('edit-template');
+      $this->setPageTitle('Add New Theme');
+      $this->setFormAction(ActionConst::NEWTHEME);
+      $this->view->set('pageTitle', $this->getPageTitle());
+      $this->view->set('formAction', $this->getFormAction());
+      $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
        
     }
 
@@ -160,7 +174,7 @@ class ThemeApp extends BaseApp
 
         if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
          
-          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request");
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
           throw new AppException("Sorry, unpleasant attempt detected!");
           
         }
@@ -265,7 +279,7 @@ class ThemeApp extends BaseApp
 
           if (file_exists(APP_ROOT.'public/themes/'.$theme_title.'/theme.ini')) {
 
-             $theme_ini = parse_ini_file(APP_ROOT.'public/themes/'.$theme_title.'/theme.ini');
+            $theme_ini = parse_ini_file(APP_ROOT.'public/themes/'.$theme_title.'/theme.ini');
 
           }
 
@@ -274,16 +288,20 @@ class ThemeApp extends BaseApp
           $this->themeEvent->setThemeDesigner($theme_ini['theme_designer']);
           $this->themeEvent->setThemeDirectory($theme_dir);
           $this->themeEvent->addTheme();
-            
+          $_SESSION['status'] = "themeAdded";
           direct_page('index.php?load=templates&status=themeAdded', 200);
               
         }
 
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+
       } catch (AppException $e) {
 
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($e);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($e);
 
       }
 
@@ -304,11 +322,15 @@ class ThemeApp extends BaseApp
 
   public function update($id)
   {
+
     $errors = array();
     $checkError = true;
     
     if (!($getTheme = $this->themeEvent->grabTheme($id))) {
+      
+      $_SESSION['error'] = "themeNotFound";
       direct_page('index.php?load=templates&error=themeNotFound', 404);
+
     }
 
     $data_theme = array(
@@ -322,9 +344,11 @@ class ThemeApp extends BaseApp
 
     if (isset($_POST['themeFormSubmit'])) {
 
-      $filters = ['theme_title' => FILTER_SANITIZE_STRING, 'theme_description' => FILTER_SANITIZE_SPECIAL_CHARS, 
-                  'theme_designer' => FILTER_SANITIZE_STRING, 
-                  'theme_directory' => FILTER_SANITIZE_STRING, 'theme_id' => FILTER_SANITIZE_NUMBER_INT];
+      $filters = ['theme_title' => isset($_POST['theme_title']) ? Sanitize::severeSanitizer($_POST['theme_title']) : "", 
+                  'theme_description' => FILTER_SANITIZE_SPECIAL_CHARS, 
+                  'theme_designer' => isset($_POST['theme_designer']) ? Sanitize::severeSanitizer($_POST['theme_designer']) : "", 
+                  'theme_directory' => isset($_POST['theme_directory']) ? Sanitize::severeSanitizer($_POST['theme_directory']) : "", 
+                  'theme_id' => FILTER_SANITIZE_NUMBER_INT];
       try {
 
         if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
@@ -334,7 +358,7 @@ class ThemeApp extends BaseApp
           
         }
 
-        if (empty($theme_title) || empty($theme_designer) || empty($theme_dir)) {
+        if (empty($_POST['theme_title']) || empty($_POST['theme_designer']) || empty($_POST['theme_directory'])) {
           $checkError = false;
           array_push($errors, "All columns required must be filled");
         }
@@ -358,27 +382,32 @@ class ThemeApp extends BaseApp
           $this->themeEvent->setThemeDesigner(distill_post_request($filters)['theme_designer']);
           $this->themeEvent->setThemeDirectory(prevent_injection(distill_post_request($filters)['theme_directory']));
           $this->themeEvent->modifyTheme();
-          direct_page('index.php?load=templates&status=themeUpdated', 200);
+          $_SESSION['status'] = "themeUpdated";
+          direct_page('index.php?load=templates&status=themeUpdated', 302);
 
         }
+
+      } catch (Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
 
       } catch (AppException $e) {
         
         LogError::setStatusCode(http_response_code());
-        LogError::newMessage($e);
-        LogError::customErrorMessage('admin');
+        LogError::exceptionHandler($e);
         
       }
 
     } else {
        
-       $this->setView('edit-template');
-       $this->setPageTitle('Edit Theme');
-       $this->setFormAction(ActionConst::EDITTHEME);
-       $this->view->set('pageTitle', $this->getPageTitle());
-       $this->view->set('formAction', $this->getFormAction());
-       $this->view->set('themeData', $data_theme);
-       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+      $this->setView('edit-template');
+      $this->setPageTitle('Edit Theme');
+      $this->setFormAction(ActionConst::EDITTHEME);
+      $this->view->set('pageTitle', $this->getPageTitle());
+      $this->view->set('formAction', $this->getFormAction());
+      $this->view->set('themeData', $data_theme);
+      $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
     }
 
@@ -388,16 +417,138 @@ class ThemeApp extends BaseApp
 
   public function remove($id)
   {
-    $this->themeEvent->setThemeId($id);
-    $this->themeEvent->removeTheme();
-    direct_page('index.php?load=templates&status=themeDeleted', 200);
+
+    $checkError = true;
+    $errors = array();
+
+    if (isset($_GET['Id'])) {
+
+       $getTheme = $this->themeEvent->grabTheme($id);
+
+      try {
+        
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+      
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+
+        if (!$getTheme) {
+
+          $checkError = false;
+          array_push($errors, 'Error: Theme not found');
+
+        }
+
+        if (!$checkError) {
+
+          $this->setView('all-templates');
+          $this->setPageTitle('Theme not found');
+          $this->view->set('pageTitle', $this->getPageTitle());
+          $this->view->set('errors', $errors);
+          $this->view->set('themesTotal', $this->themeEvent->totalThemes());
+          $this->view->set('themes', $this->themeEvent->grabThemes());
+          return $this->view->render();
+
+        } else {
+
+          $this->themeEvent->setThemeId($id);
+          $this->themeEvent->removeTheme();
+          $_SESSION['status'] = "themeDeleted";
+          direct_page('index.php?load=templates&status=themeDeleted', 302);
+
+        }
+
+      } catch (Throwable $th) {
+        
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+        
+      } catch (AppException $e) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($e);
+
+      }
+
+    }
+    
   }
 
   public function enableTheme($id)
   {
-    $this->themeEvent->setThemeId($id);
-    $this->themeEvent->activateInstalledTheme();
-    direct_page('index.php?load=templates&status=themeActived', 200);
+
+    $checkError = true;
+    $errors = array();
+
+    if (isset($_GET['Id'])) {
+
+      $getTheme = $this->themeEvent->grabTheme($id);
+
+      try {
+        
+        if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+      
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+
+        }
+
+        if (!$getTheme) {
+
+           $checkError = false;
+           array_push($errors, 'Error: Theme not found');
+
+        }
+
+        if (!$checkError) {
+
+          $this->setView('all-templates');
+          $this->setPageTitle('Theme not found');
+          $this->view->set('pageTitle', $this->getPageTitle());
+          $this->view->set('errors', $errors);
+          $this->view->set('themesTotal', $this->themeEvent->totalThemes());
+          $this->view->set('themes', $this->themeEvent->grabThemes());
+          return $this->view->render();
+           
+        } else {
+
+          $this->themeEvent->setThemeId($id);
+          $this->themeEvent->activateInstalledTheme();
+          $_SESSION['status'] = "themeActived";
+          direct_page('index.php?load=templates&status=themeActived', 302);
+
+        }
+
+      } catch (Throwable $th) {
+      
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+
+      } catch (AppException $e) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($e);
+
+      }
+
+    }
+   
   }
 
   protected function setView($viewName)

@@ -35,7 +35,7 @@ if (isset($_POST['Reset'])) {
   
   }
 
-  if (count($_POST)> 0 && $captcha_code != $_SESSION['scriptlog_reset_pwd']) {
+  if (count($_POST)> 0 && $captcha_code !== Session::getInstance()->forgot_pwd) {
 
       $captcha = false;
       $errors['errorMessage'] = "Please enter correct captcha code";
@@ -50,7 +50,7 @@ if (isset($_POST['Reset'])) {
 
      $errors['errorMessage'] = "Please enter a valid email address";
 
-  } elseif ($authenticator -> checkEmailExists($user_email) == false) {
+  } elseif ($authenticator->checkEmailExists($user_email) == false) {
 
      $errors['errorMessage'] = "No user account was found with the email address you entered";
 
@@ -58,7 +58,7 @@ if (isset($_POST['Reset'])) {
     
     if($captcha == true) {
 
-      $authenticator -> resetUserPassword($user_email);
+      $authenticator->resetUserPassword($user_email);
 
       direct_page('reset-password.php?status=reset', 200);
        
@@ -143,7 +143,7 @@ if (isset($_POST['Reset'])) {
   else :
 ?>
 
-<p class="login-box-msg">Enter your email address. You will receive a link to create a new password via email.</p>  
+<p class="login-box-msg">Enter your email address. You will receive an email message with instructions on how to reset your password.</p>  
 <form name="formlogin" action="reset-password.php" method="post" onSubmit="return validasi(this)" role="form" autocomplete="off">
       
 <div class="form-group has-feedback">
@@ -217,6 +217,9 @@ document.onkeydown=function(e){if(e.ctrlKey&&(e.keyCode===67||e.keyCode===86||e.
 {return false;}
 else
 {return true;}});
+</script>
+<script>
+$(document).keydown(function(event){if(event.keyCode==123){return false}else if(event.ctrlKey&&event.shiftKey&&event.keyCode==73){return false}});
 </script>
 </body>
 </html>
