@@ -40,7 +40,7 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
     $selector_verified  = false;
     $expired_verified   = false;
  
-    $decrypt_auth = ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $key);
+    $decrypt_auth = ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $cipher_key);
     $token_info = $authenticator->findTokenByLogin($decrypt_auth, 0);
 
     $expected_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
