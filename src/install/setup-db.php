@@ -17,7 +17,7 @@ require dirname(__FILE__) . '/install-layout.php';
 
 if (!file_exists(__DIR__ . '/../config.php')) {
 
-    header("Location: ".$protocol . '://' . $server_host . dirname($_SERVER['PHP_SELF']) . DIRECTORY_SEPARATOR);
+    header("Location: ".$protocol . '://' . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR);
     exit();
 
 } else {
@@ -45,21 +45,13 @@ install_header($install_path, $protocol, $server_host);
 
 $setup = isset($_POST['setup']) ? stripcslashes($_POST['setup']) : '';
 
-if ($setup != 'install') {
+if ($setup !== 'install') {
 
-    if (version_compare(PHP_VERSION, '5.6', '>=')) {
-        
-      clearstatcache();
-        
-    } else {
-        
-      clearstatcache(true);
-        
-    }
+  (version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
     
-    $_SESSION['install'] = false;
+  $_SESSION['install'] = false;
     
-    header($install_path);
+  header($install_path);
 
 } else {
 
@@ -234,7 +226,7 @@ if ($setup != 'install') {
 
              install_database_table($dbconnect, $protocol, $server_host, $username, $password, $email, $key);
 
-             header("Location:".$protocol."://".$server_host.dirname($_SERVER['PHP_SELF']).DIRECTORY_SEPARATOR."finish.php?status=success&token={$key}");
+             header("Location:".$protocol."://".$server_host.dirname(htmlspecialchars($_SERVER['PHP_SELF'])).DIRECTORY_SEPARATOR."finish.php?status=success&token={$key}");
 
           }
 
