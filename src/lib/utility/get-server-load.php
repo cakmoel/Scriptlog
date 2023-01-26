@@ -6,6 +6,7 @@
  * @see https://stackoverflow.com/questions/5588616/how-do-you-calculate-server-load-in-php
  * @see https://stackoverflow.com/questions/4705759/how-to-get-cpu-usage-and-ram-usage-without-exec
  * @see https://helloacm.com/how-to-respond-with-503-service-busy-to-requests-when-server-load-average-is-high/
+ * @see https://helloacm.com/using-sys_getloadavg-and-num_cpus-in-php-to-throttle-api/
  * @see https://www.php.net/manual/en/function.sys-getloadavg.php
  * @return void
  * 
@@ -21,7 +22,7 @@ function get_server_load()
 
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 
-        if ((win_architecture() == 'x86') && (class_exists('COM')))  {
+        if ((win_architecture() == 'x86') && (class_exists('COM'))) {
 
             // Win CPU
             $wmi = new COM('WinMgmts:\\\\.');
@@ -50,7 +51,7 @@ function get_server_load()
         
     }
      
-    if ( isset($load[0]) && $load[0] >= $threshold ) {
+    if (isset($load[0]) && $load[0] > $threshold) {
      
       header(APP_PROTOCOL.' 503 Service Temporarily Unavailable', true, 503);
       header('Status: 503 Service Temporarily Unavailable');
@@ -75,7 +76,7 @@ function win_architecture()
  
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ) {
 
-      $wmi = ( class_exists('COM') ? new COM('winmgmts:{impersonationLevel=impersonate}//./root/cimv2') : null );
+      $wmi = class_exists('COM') ? new COM('winmgmts:{impersonationLevel=impersonate}//./root/cimv2') : null;
 
       if (!is_object($wmi)) {
 
