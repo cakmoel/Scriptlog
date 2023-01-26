@@ -33,9 +33,9 @@ class AppConfig
  public static function writeConfiguration($filename, array $config)
  {
 
-    self::$config = var_export($config, true);
+   self::$config = var_export($config, true);
 
-    file_put_contents($filename, "<?php return self::$config; ");
+   file_put_contents($filename, "<?php return self::$config; ");
 
  }
 
