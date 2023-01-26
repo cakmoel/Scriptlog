@@ -1,7 +1,6 @@
 <?php
 function install_header($stylePath)
 {
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -137,7 +136,7 @@ function get_sisfo()
                   
                   foreach ($oslist as $operating_system) :
                   
-                   if ($osname == $operating_system) {
+                   if ($osname === $operating_system) {
                       
                        $os_passed = 'text-success';
                        $os_checked = 'fa fa-check fa-lg';
@@ -161,14 +160,11 @@ function get_sisfo()
                   
                   foreach ($browserslist as $browser_name) :
                       
-                      if (check_browser() == $browser_name) {
+                      if ((check_browser() == $browser_name) && (check_browser_version() === true)) {
                      
-                          if (check_browser_version() === true) {
-                              
-                              $browser_failed = "text-danger";
-                              $fabrowser_close = "fa fa-close fa-lg";
-                          }
-                         
+                        $browser_failed = "text-danger";
+                        $fabrowser_close = "fa fa-close fa-lg";
+                          
                       }
                       
                   endforeach;
@@ -225,7 +221,7 @@ function required_settings()
                 
             <?php 
                 
-                if ( check_pcre_utf8() == true ) {
+                if (check_pcre_utf8() === true ) {
                     $pcre_failed = 'text-danger';
                     $pcre_close = 'fa fa-close fa-lg';
                 }
