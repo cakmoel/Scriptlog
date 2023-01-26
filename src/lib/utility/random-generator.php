@@ -158,6 +158,7 @@ function ircmaxell_random_compat($length = 64)
  * never use this function for storing your password
  * 
  * @see https://thisinterestsme.com/php-random-password/
+ * @see https://stackoverflow.com/questions/4356289/php-random-string-generator
  * @param integer $length
  * @return string
  * 
@@ -176,4 +177,18 @@ function random_password($length)
         $password .= $characters[random_int(0, $characterListLength)];
     }
     return $password;
+}
+
+/**
+ * str_rand
+ *
+ * @param integer $length
+ * @see https://www.php.net/manual/en/function.random-bytes.php
+ * @return string
+ * 
+ */
+function str_rand($length = 64)
+{
+    $length = ($length < 4) ? 4 : $length;
+    return bin2hex(random_bytes(($length-($length%2))/2));
 }
