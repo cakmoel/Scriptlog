@@ -255,12 +255,6 @@ if ($setup !== 'install') {
 <div class="col-md-4 order-md-2 mb-4">
 
 <h4 class="d-flex justify-content-between align-items-center mb-3">
-<span class="text-muted">Getting System Info</span>
-</h4>
-
-<?= get_sisfo(); ?>
-
-<h4 class="d-flex justify-content-between align-items-center mb-3">
 <span class="text-muted">Required PHP Settings</span>
 </h4>
 
