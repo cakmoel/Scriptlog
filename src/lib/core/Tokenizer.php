@@ -42,9 +42,7 @@ final class  Tokenizer
      
     $generator = (new \RandomLib\Factory())->getMediumStrengthGenerator();
     
-    $token = $generator->generateString($length);
-
-    return $token;
+    return $generator->generateString($length);
 
   }
 
