@@ -66,7 +66,7 @@ public static function check($key, $origin, $throwException = false, $timespan =
 
     }
 
-    $hash = $_SESSION['csrf_'.$key];
+    $hash = isset($_SESSION['csrf_'.$key]) ? $_SESSION['csrf_'.$key] : "";
 
     if (!$multiple) {
 
@@ -132,7 +132,7 @@ public static function check($key, $origin, $throwException = false, $timespan =
 
     return true;
     
- } catch (Throwable $th) {
+ } catch (\Throwable $th) {
      
     LogError::setStatusCode(http_response_code());
     LogError::exceptionHandler($th);
