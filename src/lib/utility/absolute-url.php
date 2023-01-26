@@ -54,7 +54,7 @@ function absolute_url($page, $url)
 function checking_page_url($page, $url)
 {
 
- if ( substr($page, 0, 7) !== APP_PROTOCOL . '://') {
+ if (substr($page, 0, 7) !== APP_PROTOCOL . '://') {
 
     return $url;
 
