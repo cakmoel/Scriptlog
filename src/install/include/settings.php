@@ -24,17 +24,17 @@ if (file_exists(__DIR__ . '/../../lib/vendor/autoload.php')) {
   
 if (!ini_get('date.timezone')) {
 
-  date_default_timezone_set('GMT');
+  date_default_timezone_set('UTC');
 
 }
 
-if(false === is_ssl()) {
+if (false === is_ssl()) {
 
-  $protocol = strpos(strtolower($_SERVER['SERVER_PROTOCOL']),'https') === false ? 'http' : 'https';
+  $protocol = strpos(strtolower($_SERVER['SERVER_PROTOCOL']), 'https') === false ? 'http' : 'https';
  
 } else {
 
-  $protocol = strpos(strtolower($_SERVER['SERVER_PROTOCOL']),'https') === false ? 'https' : 'http';
+  $protocol = strpos(strtolower($_SERVER['SERVER_PROTOCOL']), 'https') === false ? 'https' : 'http';
 
 }
 
