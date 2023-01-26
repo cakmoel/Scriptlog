@@ -14,6 +14,8 @@ class DbException extends PDOException implements IDaoThrowable
   
 protected $message = 'Unknown Exception';
 
+protected $previous;
+
 public function __construct($message = null, $code = 0, Exception $previous = null)
 {
 
@@ -37,9 +39,7 @@ public function __construct($message = null, $code = 0, Exception $previous = nu
 
 public function __toString()
 {
-    return get_class($this) . "'{$this->message}' in {$this->getFile()}({$this->getLine()})\n"
-                            . "{$this->getTraceAsString()}";
+   return get_class($this) . "'{$this->message}' in {$this->getFile()}({$this->getLine()})\n" . "{$this->getTraceAsString()}";
 }
-
 
 }
