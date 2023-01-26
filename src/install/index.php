@@ -29,7 +29,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
         || (check_dbtable($dbconnect, 'tbl_comments') === true)
     ) {
 
-        $create_db = $protocol . '://' . $server_host . dirname($_SERVER['PHP_SELF']) . DIRECTORY_SEPARATOR . 'setup-db.php';
+        $create_db = $protocol . '://' . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR . 'setup-db.php';
 
         header("Location: $create_db", true, 302);
     } else {
@@ -41,7 +41,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
 
     $current_path = preg_replace("/\/index\.php.*$/i", "", current_url());
 
-    $installation_path = $protocol . '://' . $server_host . dirname($_SERVER['PHP_SELF']) . DIRECTORY_SEPARATOR;
+    $installation_path = $protocol . '://' . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR;
 
     $completed = false;
 
@@ -54,6 +54,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
         $_SESSION['install'] = false;
 
         header($installation_path, true, 302);
+        
     } else {
 
         $dbhost = isset($_POST['db_host']) ? escapeHTML($_POST['db_host']) : "";
@@ -101,9 +102,11 @@ if (file_exists(__DIR__ . '/../config.php')) {
         if (empty($password) && (empty($confirm))) {
 
             $errors['errorSetup'] = 'Admin password should not be empty';
+
         } elseif ($password != $confirm) {
 
             $errors['errorSetup'] = 'Admin password should both be equal';
+            
         } elseif (!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
 
             $errors['errorSetup'] = 'Admin password requires at least 8 characters, uppercase and lowercase letters, numbers and special characters';
@@ -116,7 +119,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
 
         if (false === check_php_version()) {
 
-            $errors['errorSetup'] = 'Requires PHP 5.6 or newer';
+            $errors['errorSetup'] = 'Requires PHP 7.4 or newer';
         }
 
         if (true === check_pcre_utf8()) {
@@ -250,12 +253,6 @@ if (file_exists(__DIR__ . '/../config.php')) {
 
         <div class="row">
             <div class="col-md-4 order-md-2 mb-4">
-
-                <h4 class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="text-muted">Getting System Info</span>
-                </h4>
-
-                <?= get_sisfo(); ?>
 
                 <h4 class="d-flex justify-content-between align-items-center mb-3">
                     <span class="text-muted">Required PHP Settings</span>
