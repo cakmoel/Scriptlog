@@ -1,9 +1,8 @@
-<?php
-
-$retrieve_post = (function_exists('rewrite_status') && rewrite_status() === 'yes') ? retrieve_detail_post(request_path()->param2) : retrieve_detail_post(HandleRequest::isQueryStringRequested()['value']);
+<?php 
+$retrieve_post = (function_exists('rewrite_status') && rewrite_status() === 'yes') ? retrieve_detail_post(request_path()->param1) : retrieve_detail_post(HandleRequest::isQueryStringRequested()['value']);
 
 $post_img = isset($retrieve_post['media_filename']) ? htmlout($retrieve_post['media_filename']) : "";
-$post_id = isset($retrieve_post['ID']) ? intval((int)$retrieve_post['ID']) : "";
+$post_id = isset($retrieve_post['ID']) ? (int)$retrieve_post['ID'] : "";
 $post_title = isset($retrieve_post['post_title']) ? htmlout($retrieve_post['post_title']) : "";
 
 if (isset($retrieve_post['user_fullname'])) {

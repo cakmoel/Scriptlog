@@ -4,6 +4,9 @@ require dirname(__FILE__) . '/functions.php';
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <?= theme_meta()['site_meta_tags']; ?>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css">
@@ -12,10 +15,10 @@ require dirname(__FILE__) . '/functions.php';
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/style.sea.css" id="theme-stylesheet">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/dropdown.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/sina-nav.css">
 <link rel="shortcut icon" href="<?= theme_dir(); ?>assets/img/favicon.ico">
 <?= theme_meta()['site_schema']; ?>
 <!-- Tweaks for older IEs--><!--[if lt IE 9]>
@@ -23,100 +26,30 @@ require dirname(__FILE__) . '/functions.php';
 <script src="<?= theme_dir(); ?>assets/js/respond.min.js"></script><![endif]-->
 </head>
 <body>
-<header class="header">
-  <!-- Main Navbar-->
-  <nav class="navbar navbar-expand-md navbar-light bg-light btco-hover-menu">
-  <div class="search-area">
-    <div class="search-area-inner d-flex align-items-center justify-content-center">
-    <div class="close-btn"><i class="icon-close" aria-hidden="true"></i></div>
-            <div class="row d-flex justify-content-center">
-              <div class="col-md-8">
-                <form action="#">
-                  <div class="form-group">
-                    <input type="search" name="search" id="search" placeholder="What are you looking for?">
-                    <button type="submit" class="submit"><i class="icon-search-1" aria-hidden="true"></i></button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
+<nav class="sina-nav mobile-sidebar navbar-fixed" data-top="0">
         <div class="container">
-          <!-- Navbar Brand -->
-          <div class="navbar-header d-flex align-items-center justify-content-between">
-            <!-- Navbar Brand --><a href="index.html" class="navbar-brand">Bootstrap Blog</a>
-            <!-- Toggle Button-->
-            <button type="button" data-toggle="collapse" data-target="#navbarcollapse" aria-controls="navbarcollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"><span></span><span></span><span></span></button>
-          </div>
-          
-          <!-- Navbar Menu -->
-          <div id="navbarcollapse" class="collapse navbar-collapse">
-            <ul class="navbar-nav ml-auto">
-              <li class="nav-item"><a href="index.html" class="nav-link active ">Home</a>
-              </li>
-              <li class="nav-item"><a href="blog.html" class="nav-link ">Blog</a>
-              </li>
 
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="https://bootstrapthemes.co" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Dropdown link
+            <div class="sina-nav-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-menu">
+                    <i class="fa fa-bars fa-fw" aria-hidden="true"></i>
+                </button>
+                <a class="sina-brand" href="<?= app_url(); ?>">
+                    <h2>
+                        <?= app_info()['site_name'];?>
+                    </h2>
+                    <p><?= app_info()['site_tagline']; ?></p>
                 </a>
-               <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                 <li><a class="dropdown-item" href="#">Action</a></li>
-                 <li><a class="dropdown-item" href="#">Another action</a></li>
-                 <li><a class="dropdown-item dropdown-toggle" href="#">Submenu</a>
-                     <ul class="dropdown-menu">
-                       <li><a class="dropdown-item" href="#">Submenu action</a></li>
-                       <li><a class="dropdown-item" href="#">Another submenu action</a></li>
-
-                       <li><a class="dropdown-item dropdown-toggle" href="#">Subsubmenu</a>
-                           <ul class="dropdown-menu">
-                               <li><a class="dropdown-item" href="#">Subsubmenu action aa</a></li>
-                               <li><a class="dropdown-item" href="#">Another subsubmenu action</a></li>
-                           </ul>
-                       </li> <!-- Subsubmenu-->
-                       <li><a class="dropdown-item dropdown-toggle" href="#">Second subsubmenu</a>
-                           <ul class="dropdown-menu">
-                               <li><a class="dropdown-item" href="#">Subsubmenu action bb</a></li>
-                               <li><a class="dropdown-item" href="#">Another subsubmenu action</a></li>
-                           </ul>
-                       </li> <!-- Second subsubmenu -->
-                     </ul><!-- ./dropdown-menu -->                      
-                 </li> <!-- #Submenu -->
-                               
-                 <li><a class="dropdown-item dropdown-toggle" href="#">Submenu 2</a>
-                       <ul class="dropdown-menu">
-                          <li><a class="dropdown-item" href="#">Submenu action 2</a></li>
-                          <li><a class="dropdown-item" href="#">Another submenu action 2</a></li>
-
-                       <li><a class="dropdown-item dropdown-toggle" href="#">Subsubmenu</a>
-                           <ul class="dropdown-menu">
-                              <li><a class="dropdown-item" href="#">Subsubmenu action 1 3</a></li>
-                              <li><a class="dropdown-item" href="#">Another subsubmenu action 2 3</a></li>
-                           </ul>
-                       </li> <!-- Subsubmenu -->
-                       <li><a class="dropdown-item dropdown-toggle" href="#">Second subsubmenu 3</a>
-                           <ul class="dropdown-menu">
-                               <li><a class="dropdown-item" href="#">Subsubmenu action 3 </a></li>
-                               <li><a class="dropdown-item" href="#">Another subsubmenu action 3</a></li>
-                           </ul>
-                       </li> <!-- Second subsubmenu 3 -->
-                       </ul> <!-- ./dropdown-menu -->
-                   </li><!-- #Submenu 2 -->
-
-                   </ul>
-               </li>
-               <!-- ./nav-item dropdown -->
+            </div><!-- .sina-nav-header -->
 
 
-              <li class="nav-item"><a href="post.html" class="nav-link ">Post</a>
-              </li>
-              <li class="nav-item"><a href="#" class="nav-link ">Contact</a>
-              </li>
-            </ul>
-            <div class="navbar-text"><a href="#" class="search-btn"><i class="icon-search-1" aria-hidden="true"></i></a></div>
-            <ul class="langs navbar-text"></ul>
-          </div>
-        </div>
-      </nav>
-</header>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="navbar-menu">
+                <ul class="sina-menu sina-menu-right" data-in="fadeInLeft" data-out="fadeInOut">
+                    <?php 
+                    $menus = retrieves_navigation('public');
+                    echo  front_navigation(0, $menus); 
+                    ?>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- .container -->
+    </nav>
