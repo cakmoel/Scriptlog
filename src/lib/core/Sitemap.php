@@ -11,7 +11,8 @@
  * @license    http://opensource.org/licenses/MIT MIT License
  * @link       http://github.com/evert/sitemap-php
  */
-class Sitemap {
+class Sitemap
+{
 
 	/**
 	 *
@@ -35,7 +36,8 @@ class Sitemap {
 	 *
 	 * @param string $domain
 	 */
-	public function __construct($domain) {
+	public function __construct($domain)
+	{
 		$this->setDomain($domain);
 	}
 
@@ -44,7 +46,8 @@ class Sitemap {
 	 *
 	 * @param string $domain
 	 */
-	public function setDomain($domain) {
+	public function setDomain($domain)
+	{
 		$this->domain = $domain;
 		return $this;
 	}
@@ -54,7 +57,8 @@ class Sitemap {
 	 *
 	 * @return string
 	 */
-	private function getDomain() {
+	private function getDomain()
+	{
 		return $this->domain;
 	}
 
@@ -63,7 +67,8 @@ class Sitemap {
 	 *
 	 * @return \XMLWriter
 	 */
-	private function getWriter() {
+	private function getWriter()
+	{
 		return $this->writer;
 	}
 
@@ -72,7 +77,8 @@ class Sitemap {
 	 *
 	 * @param \XMLWriter $writer 
 	 */
-	private function setWriter(\XMLWriter $writer) {
+	private function setWriter(\XMLWriter $writer)
+	{
 		$this->writer = $writer;
 	}
 
@@ -81,7 +87,8 @@ class Sitemap {
 	 * 
 	 * @return string
 	 */
-	private function getPath() {
+	private function getPath()
+	{
 		return $this->path;
 	}
 
@@ -91,7 +98,8 @@ class Sitemap {
 	 * @param string $path
 	 * @return Sitemap
 	 */
-	public function setPath($path) {
+	public function setPath($path)
+	{
 		$this->path = $path;
 		return $this;
 	}
@@ -101,7 +109,8 @@ class Sitemap {
 	 * 
 	 * @return string
 	 */
-	private function getFilename() {
+	private function getFilename()
+	{
 		return $this->filename;
 	}
 
@@ -111,7 +120,8 @@ class Sitemap {
 	 * @param string $filename
 	 * @return Sitemap
 	 */
-	public function setFilename($filename) {
+	public function setFilename($filename)
+	{
 		$this->filename = $filename;
 		return $this;
 	}
@@ -121,7 +131,8 @@ class Sitemap {
 	 *
 	 * @return int
 	 */
-	private function getCurrentItem() {
+	private function getCurrentItem()
+	{
 		return $this->current_item;
 	}
 
@@ -129,7 +140,8 @@ class Sitemap {
 	 * Increases item counter
 	 * 
 	 */
-	private function incCurrentItem() {
+	private function incCurrentItem()
+	{
 		$this->current_item = $this->current_item + 1;
 	}
 
@@ -138,7 +150,8 @@ class Sitemap {
 	 *
 	 * @return int
 	 */
-	private function getCurrentSitemap() {
+	private function getCurrentSitemap()
+	{
 		return $this->current_sitemap;
 	}
 
@@ -146,7 +159,8 @@ class Sitemap {
 	 * Increases sitemap file count
 	 * 
 	 */
-	private function incCurrentSitemap() {
+	private function incCurrentSitemap()
+	{
 		$this->current_sitemap = $this->current_sitemap + 1;
 	}
 
@@ -154,7 +168,8 @@ class Sitemap {
 	 * Prepares sitemap XML document
 	 * 
 	 */
-	private function startSitemap() {
+	private function startSitemap()
+	{
 		$this->setWriter(new \XMLWriter());
 		if ($this->getCurrentSitemap()) {
 			$this->getWriter()->openURI($this->getPath() . $this->getFilename() . self::SEPERATOR . $this->getCurrentSitemap() . self::EXT);
@@ -176,7 +191,8 @@ class Sitemap {
 	 * @param string|int|null $lastmod The date of last modification of url. Unix timestamp or any English textual datetime description.
 	 * @return Sitemap
 	 */
-	public function addItem($loc, $priority = self::DEFAULT_PRIORITY, $changefreq = NULL, $lastmod = NULL) {
+	public function addItem($loc, $priority = self::DEFAULT_PRIORITY, $changefreq = NULL, $lastmod = NULL)
+	{
 		if (($this->getCurrentItem() % self::ITEM_PER_SITEMAP) == 0) {
 			if ($this->getWriter() instanceof \XMLWriter) {
 				$this->endSitemap();
@@ -187,7 +203,7 @@ class Sitemap {
 		$this->incCurrentItem();
 		$this->getWriter()->startElement('url');
 		$this->getWriter()->writeElement('loc', $this->getDomain() . $loc);
-		if($priority !== null)
+		if ($priority !== null)
 			$this->getWriter()->writeElement('priority', $priority);
 		if ($changefreq)
 			$this->getWriter()->writeElement('changefreq', $changefreq);
@@ -203,7 +219,8 @@ class Sitemap {
 	 * @param string $date Unix timestamp or any English textual datetime description
 	 * @return string Year-Month-Day formatted date.
 	 */
-	private function getLastModifiedDate($date) {
+	private function getLastModifiedDate($date)
+	{
 		if (ctype_digit($date)) {
 			return date('Y-m-d', $date);
 		} else {
@@ -216,7 +233,8 @@ class Sitemap {
 	 * Finalizes tags of sitemap XML document.
 	 *
 	 */
-	private function endSitemap() {
+	private function endSitemap()
+	{
 		if (!$this->getWriter()) {
 			$this->startSitemap();
 		}
@@ -230,7 +248,8 @@ class Sitemap {
 	 * @param string $loc Accessible URL path of sitemaps
 	 * @param string|int $lastmod The date of last modification of sitemap. Unix timestamp or any English textual datetime description.
 	 */
-	public function createSitemapIndex($loc, $lastmod = 'Today') {
+	public function createSitemapIndex($loc, $lastmod = 'Today')
+	{
 		$this->endSitemap();
 		$indexwriter = new \XMLWriter();
 		$indexwriter->openURI($this->getPath() . $this->getFilename() . self::SEPERATOR . self::INDEX_SUFFIX . self::EXT);
@@ -247,5 +266,4 @@ class Sitemap {
 		$indexwriter->endElement();
 		$indexwriter->endDocument();
 	}
-
 }
