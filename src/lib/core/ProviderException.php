@@ -14,6 +14,8 @@ class ProviderException extends Exception implements IProviderThrowable
     
 protected $message = 'Unknown Exception';
 
+protected $previous;
+
 public function __construct($message = null, $code = 0, Exception $previous = null)
 {
 
