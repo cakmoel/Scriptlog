@@ -1,5 +1,4 @@
 <?php
-
 /**
  * request_path()
  *
@@ -151,22 +150,27 @@ function retrieves_topic_simple($id)
 
   $categories = array();
 
-  $idsanitized = sanitizer($id, 'sql');
-
-  $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status 
+  $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug
          FROM tbl_topics, tbl_post_topic  
-         WHERE tbl_topics.ID = tbl_post_topic.topic_id 
-         AND tbl_topics.topic_status = 'Y' 
-         AND tbl_post_topic.post_id = '$idsanitized' ";
+         WHERE tbl_topics.ID = tbl_post_topic.topic_id
+         AND tbl_topics.topic_status = 'Y'   
+         AND tbl_post_topic.post_id = '$id'";
 
-  $results = db_simple_query($sql);
+  $stmt = db_simple_query($sql);
 
-  foreach ($results as $result) {
+  if ($stmt->num_rows > 0) {
 
-    $categories[] = "<a href='" . permalinks($result['ID'])['cat'] . "'>" . $result['topic_title'] . "</a>";
+    while ($result = $stmt->fetch_array(MYSQLI_ASSOC)) {
+
+      $permalinks = ((function_exists('rewrite_status')) && (rewrite_status() === 'yes') ? permalinks($result['topic_slug'])['cat'] : permalinks($result['ID'])['cat']);
+      $categories[] = "<a href='" .$permalinks. "'>" . $result['topic_title'] . "</a>";
+
+    }
+
   }
-
+  
   return implode("", $categories);
+
 }
 
 /**
@@ -177,23 +181,29 @@ function retrieves_topic_simple($id)
 function retrieves_topic_prepared($id)
 {
 
-  $topics = array();
-
-  $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status 
+  $topics = null;
+  $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status
           FROM tbl_topics, tbl_post_topic
           WHERE tbl_topics.ID = tbl_post_topic.topic_id 
           AND tbl_topics.topic_status = 'Y' 
           AND tbl_post_topic.post_id = ? ";
 
-  $items = db_prepared_query($sql, [$id], 'i')->get_result()->fetch_all(MYSQLI_ASSOC);
+  $items = db_prepared_query($sql, [$id], 'i')->get_result();
+  $count_items = db_num_rows($items);
 
-  foreach ((array) $items as $item) {
+  if ($count_items > 0) {
 
-    $topic_id = (!empty($item['ID']) ? abs((int)$item['ID']) : null);
-    $topics[] = "<a href='" . permalinks($topic_id)['cat'] . "'>" . $item['topic_title'] . "</a>";
+    while ($item = $items->fetch_assoc()) {
+
+      $permalinks = ((function_exists('rewrite_status')) && (rewrite_status() === 'yes') ? permalinks($item['topic_slug'])['cat'] : permalinks($item['ID'])['cat']);
+      $topics[] = "<a href='" .$permalinks. "'>" . $item['topic_title'] . "</a>";
+
+    }
+  
   }
 
   return implode("", $topics);
+
 }
 
 /**
@@ -252,9 +262,7 @@ function previous_post($id)
 
   $html = null;
 
-  $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID < '$idsanitized'
-         AND post_status = 'publish' AND post_type = 'blog'
-         ORDER BY ID LIMIT 1";
+  $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID < '$idsanitized' AND post_status = 'publish' AND post_type = 'blog' ORDER BY ID LIMIT 1";
 
   $stmt = db_simple_query($sql);
 
@@ -285,9 +293,7 @@ function next_post($id)
 
   $html = null;
 
-  $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID > '$idsanitized'
-AND post_status = 'publish' AND post_type = 'blog'
-ORDER BY ID LIMIT 1";
+  $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID > '$idsanitized' AND post_status = 'publish' AND post_type = 'blog' ORDER BY ID LIMIT 1";
 
   $stmt = db_simple_query($sql);
 
@@ -361,6 +367,20 @@ function posts_by_archive(array $values)
 }
 
 /**
+ * Full-Text searching for posts based on
+ * tag requested
+ * 
+ *
+ * @param [type] $tag
+ * @return void
+ */
+function posts_by_tag($tag)
+{
+  $tags = FrontHelper::grabFrontTag($tag);
+  return is_iterable($tags) ? $tags : array();
+}
+
+/**
  * retrieve_archives()
  *
  * retrieving list of archives 
@@ -411,7 +431,12 @@ function block_csrf()
   return generate_form_token('comment_form', 40);
 }
 
-function retrieves_navigation($position)
+/**
+ * retrieves_navigation
+ *
+ * @param string $visibility
+ */
+function retrieves_navigation($visibility)
 {
 
   $menus = array(
@@ -419,11 +444,10 @@ function retrieves_navigation($position)
     'parents' => array()
   );
 
-  $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_position 
-         FROM tbl_menu 
-         WHERE menu_status = 'Y' 
-         AND menu_position = '$position' 
+  $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_visibility 
+         FROM tbl_menu WHERE menu_status = 'Y' AND menu_visibility = '$visibility' 
          ORDER BY ID";
+
   $stmt = db_simple_query($sql);
 
   if ($stmt->num_rows > 0) {
@@ -435,30 +459,60 @@ function retrieves_navigation($position)
       $menus['parents'][$items['parent_id']][] = $items['ID']; // Create list of all items with child
 
     }
-
-    return $menus;
   }
+  return $menus;
 }
 
-function header_navigation($parent, $menu)
+/**
+ * front_navigation
+ *
+ * @param int|num| $parent
+ * @param array $menu
+ */
+function front_navigation($parent, $menu)
 {
 
- $html = "";
+  $html = "";
 
- if (isset($menu['parents'][$parent])) {
-  
-  foreach ($menu['parents'][$parent] as $itemId) {
+  if (isset($menu['parents'][$parent])) {
 
-     if (! isset($menu['parents'][$itemId])) {
-      $html .= '<li class="nav-item"><a href="'.$menu['items'][$itemId]['menu_link'].'" class="nav-link"></a></li>';
-     }
+    foreach ($menu['parents'][$parent] as $itemId) {
 
-     if (isset($menu['parents'][$itemId])) {
-      $html .= '<li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="'.$menu.'"></a>';
-       
-     }
+      if (!isset($menu['parents'][$itemId])) {
+        $html .= "<li><a  href='" . $menu['items'][$itemId]['menu_link'] . "'>" . $menu['items'][$itemId]['menu_label'] . "</a></li>";
+      }
+      if (isset($menu['parents'][$itemId])) {
+        $html .= "<li class='dropdown'><a class='dropdown-toggle' data-toggle='dropdown' href='" . $menu['items'][$itemId]['menu_link'] . "'>" . $menu['items'][$itemId]['menu_label'] . "</a>";
+        $html .= '<ul class="dropdown-menu">';
+        $html .= front_navigation($itemId, $menu);
+        $html .= '</ul>';
+        $html .= "</li>";
+      }
+    }
   }
- }
 
+  return $html;
+}
+
+/**
+ * nothing_found
+ *
+ * @return string
+ * 
+ */
+function nothing_found()
+{
+
+  $site_url = app_info()['app_url'];
+
+  return <<<_NOTHING_FOUND
+
+<div class="alert alert-warning" role="alert">
+  <h4 class="alert-heading">Whoops !</h4>
+  <p>I haven't posted to my blog yet!</p>
+  <hr>
+  <p class="mb-0">Please go to <a href="$site_url/admin/login.php" target="_blank" rel="noopener noreferrer" title="administrator panel">administrator panel</a> to populate your blog.</p>
+</div>
+
+_NOTHING_FOUND;
 }
