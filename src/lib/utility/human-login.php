@@ -152,7 +152,7 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
       
    }
    
-   if ((!empty($values) ) && (isset($values['captcha_login']) && $values['captcha_login'] == $_POST['captcha_login']) && ($values['captcha_login'] !== Session::getInstance()->captcha_login)) {
+   if ((!empty($values)) && (isset($values['captcha_login']) && $values['captcha_login'] == $_POST['captcha_login']) && ($values['captcha_login'] !== Session::getInstance()->captcha_login)) {
       
       $captcha_verified = false;
       $errors['errorMessage'] = "Enter captcha code correctly";
