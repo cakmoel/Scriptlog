@@ -283,9 +283,9 @@ class Authentication
  public function login(array $values)
  {
     
-    $login = (isset($values['login']) ? $values['login'] : null) ;
-    $password = (isset($values['user_pass']) ? $values['user_pass'] : null);
-    $remember_me = (isset($values['remember']) ? $values['remember'] : null) ;
+    $login = isset($values['login']) ? $values['login'] : null ;
+    $password = isset($values['user_pass']) ? $values['user_pass'] : null;
+    $remember_me = isset($values['remember']) ? $values['remember'] : null;
 
     if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
         
@@ -321,7 +321,7 @@ class Authentication
       $this->userDao->updateUserSession($bind_session, (int)$this->account_info['ID']);
       
       // Set Auth Cookies if 'Remember Me' checked
-      if ($remember_me === true) {
+      if ($remember_me) {
 
           $encrypt_auth = ScriptlogCryptonize::scriptlogCipher($this->user_login, $this->key);
           set_cookies_scl('scriptlog_auth', $encrypt_auth, time() + self::COOKIE_EXPIRE, self::COOKIE_PATH, domain_name(), is_cookies_secured(), true); 
