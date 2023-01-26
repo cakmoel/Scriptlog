@@ -46,9 +46,7 @@ public static function cipherMessage($message, $key)
 
   $cipher->setKey($key);
 
-  $ciphertext = $cipher->encrypt($message);
-
-  return $ciphertext;
+  return $cipher->encrypt($message);
 
 }
 
@@ -63,9 +61,7 @@ public static function cipherMessage($message, $key)
 public static function scriptlogCipher($message, $key)
 {
 
-$ciphertext = Crypto::encrypt($message, $key);
-
-return $ciphertext;
+  return Crypto::encrypt($message, $key);
 
 }
 
