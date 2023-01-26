@@ -1,4 +1,4 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class AtomWriter
  * 
@@ -14,12 +14,34 @@ use Laminas\Feed\Writer\Feed;
 class AtomWriter
 {
 
+  /**
+   * frontContentProvider
+   *
+   * @var object
+   */
   private $frontContentProvider;
 
+  /**
+   * atommFeed
+   *
+   * @var object
+   * 
+   */
   private $atomFeed;
 
+  /**
+   * entry
+   *
+   * @var object
+   */
   private $entry;
 
+  /**
+   * grabPostFeed
+   *
+   * @param int|num $limit
+   * @return mixed
+   */
   private function grabPostFeed($limit)
   {
 
@@ -30,6 +52,10 @@ class AtomWriter
     return $this->frontContentProvider;
   }
 
+  /**
+   * initializedFeed
+   *
+   */
   private function initializeFeed()
   {
     $this->atomFeed = new Feed();
@@ -56,30 +82,39 @@ class AtomWriter
 
   }
 
+  /**
+   * generateAtomFeed
+   *
+   * @param string $title
+   * @param string $uri
+   * @param string $feed_link
+   * @param int|num $limit
+   * 
+   */
   public function generateAtomFeed($title, $uri, $feed_link, $limit)
   {
 
-    $this->entries = is_iterable($this->grabPostFeed($limit)) ? $this->grabPostFeed($limit) : "";
+    $entries = is_iterable($this->grabPostFeed($limit)) ? $this->grabPostFeed($limit) : "";
 
     $feed = $this->setHeaderFeed($title, $uri, $feed_link);
 
     $this->entry = $feed->createEntry();
 
-    foreach ($this->entries as $entry) {
+    foreach ($entries as $feed_post) {
 
-      $feed_id = isset($entry['ID']) ? intval((int)$entry['ID']) : "";
-      $feed_title = isset($entry['post_title']) ? htmlout($entry['post_title']) : "";
-      $feed_created = isset($entry['post_date']) ? htmlout(strtotime($entry['post_date'] )): "";
+      $feed_id = isset($feed_post['ID']) ? intval((int)$feed_post['ID']) : "";
+      $feed_title = isset($feed_post['post_title']) ? htmlout($feed_post['post_title']) : "";
+      $feed_created = isset($feed_post['post_date']) ? htmlout(strtotime($feed_post['post_date'] )): "";
       $feed_created = new DateTime("@$feed_created");
       $feed_created->format('d-m-Y H:i:s');
       
-      $feed_modified = isset($entry['post_modified']) ? htmlout(strtotime($entry['post_modified'])) : "";
+      $feed_modified = isset($feed_post['post_modified']) ? htmlout(strtotime($feed_post['post_modified'])) : "";
       $feed_modified = new DateTime("@$feed_modified");
       $feed_modified->format('d-m-Y H:i:s');
       
-      $feed_permalinks = isset($entry['ID']) ? permalinks($feed_id)['post'] : "";
-      $feed_author = (isset($entry['user_login']) || isset($entry['user_fullname']) ? htmlout($entry['user_login']) : htmlout($entry['user_fullname']));
-      $feed_content = isset($entry['post_content']) ? htmlout(strip_tags(nl2br(html_entity_decode($entry['post_content'])))) : "";
+      $feed_permalinks = isset($feed_post['ID']) ? permalinks($feed_id)['post'] : "";
+      $feed_author = (isset($feed_post['user_login']) || isset($feed_post['user_fullname']) ? htmlout($feed_post['user_login']) : htmlout($feed_post['user_fullname']));
+      $feed_content = isset($feed_post['post_content']) ? htmlout(strip_tags(nl2br(html_entity_decode($feed_post['post_content'])))) : "";
       $feed_description = substr($feed_content, 0, 220);
       $feed_description = substr($feed_content, 0, strrpos($feed_description, " "));
 
