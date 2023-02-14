@@ -6,7 +6,7 @@
 
 **Scriptlog** is a free and an open source PHP blog software. We're refactoring our legacy weblog code. Making it more simple, secure, modular, fast and robust personal blogging system. Scriptlog runs on PHP 7.4 or higher and uses MySQL.
 
-Scriptlog's base original code was forked from **Piluscart 1.4.1**. We took her out from her weblog engine that support blog functionality on Piluscart 1.4.1. Obviously Scriptlog is Piluscart's little sister. She was being refactored to help her siblings going further on next generation of Piluscart development which is undefined yet.
+Scriptlog's base original code was forked from **Piluscart 1.4.1**. We split her out from her weblog engine that support blog functionality on Piluscart 1.4.1. Obviously Scriptlog is Piluscart's little sister. She was being refactored to help her siblings going further on next generation of Piluscart development which is undefined yet.
 
 Scriptlog is not a replacement for a full Content Management System. Do not plan on building the next CMS Framework with it! However, it is meticulously engineered for several reasons.
 
