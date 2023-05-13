@@ -13,9 +13,9 @@
  * 
  */
 if (file_exists(__DIR__ . '/../config.php')) {
-    
+   
   include __DIR__ . '/../lib/main.php';
- 
+  
   $ip = get_ip_address();
   
   require __DIR__ . '/authenticator.php';
@@ -87,11 +87,11 @@ login_header($stylePath);
 
 ?>
 
-<form name="formlogin" action="<?= form_action('login.php', ['LogIn', human_login_id(), md5(app_key().$ip)], "login")['doLogin']; ?>" method="post" onSubmit="return validasi(this)" role="form" autocomplete="off">
+<form name="formlogin" action="<?= form_action('login.php', ['LogIn', human_login_id(), md5(app_key().$ip)], "login")['doLogin']; ?>" method="post" onSubmit="return validasi(this)" autocomplete="off">
 <div class="form-group has-feedback">
 <label for="inputLogin">Username or Email Address</label>
 <input type="text"  class="form-control" id="inputLogin" placeholder="username or email" name="login" maxlength="186" value="
-<?= isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $key) : ""; ?>" autocomplete="off" autocapitalize="off" autofocus required>
+<?= isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $cipher_key) : ""; ?>" autocomplete="off" autocapitalize="off" autofocus required>
 <span class="glyphicon glyphicon-user form-control-feedback"></span>
 </div>
 
@@ -123,7 +123,7 @@ login_header($stylePath);
   <div class="col-xs-8">
     <div class="checkbox icheck">
       <label for="remember-me">
-<input type="checkbox" name="remember" id="remember-me" <?php if (isset($_COOKIE['scriptlog_auth'])) : ?> checked<?php endif; ?>>  Remember Me
+      <input type="checkbox" aria-checked="false" name="remember" aria-selected="false" id="remember-me" <?php if (isset($_COOKIE['scriptlog_auth'])) : ?> checked<?php endif; ?>>   Remember Me
       </label>
     </div>
 </div>          
@@ -134,11 +134,11 @@ login_header($stylePath);
 ?>
     
 <input type="hidden" name="csrf" value="<?= $block_csrf; ?>">
-<input type="submit" class="btn btn-primary btn-block btn-flat" name="LogIn" value="Login">
+<input type="submit" class="btn btn-primary btn-block btn-flat" name="LogIn" value="Log In">
 </div>
 </div>
 </form>
-  <a href="reset-password.php" class="text-center" rel="noopener" aria-label="Reset your password">Lost your password?</a>    
+  <a href="reset-password.php" class="text-center" rel="noopener" aria-label="Lost your password">Lost your password?</a>    
 </div>
   
 <?php login_footer($stylePath); ?>

@@ -32,7 +32,7 @@ function human_login_id()
 function verify_human_login_id($loginId)
 {
 
-if ((! isset($_SESSION['human_login_id'])) || (! isset($loginId)) || ($_SESSION['human_login_id'] !== $loginId)) {     
+if ((! isset($_SESSION['human_login_id'], $loginId)) || ($_SESSION['human_login_id'] !== $loginId)) {     
    
    return false;
    

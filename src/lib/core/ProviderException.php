@@ -1,6 +1,6 @@
 <?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * Class AppException extends Exception implements IAppThrowable
+ * Class ProviderException extends Exception implements IAppThrowable
  * 
  * @category Core Class
  * @author   M.Noermoehammad

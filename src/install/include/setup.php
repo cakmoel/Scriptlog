@@ -1,4 +1,5 @@
 <?php
+
 /**
  * File setup.php
  * 
@@ -61,9 +62,10 @@ function close_connection($link)
 }
 
 /**
- * function table_exists
+ * is_table_exists
  * checking whether table exists or not
  * 
+ * @category installation functionality
  * @param object $link
  * @param string $table
  * @param numeric $counter
@@ -78,7 +80,7 @@ function is_table_exists($link, $table, $counter = 0)
 
     $check = $link->query("SHOW TABLES LIKE '" . $table . "'");
 
-    return (($check) && ($check->num_rows > 0)) ? true : false;
+    return (($check) && ($check->num_rows > 0) ? true : false);
   }
 }
 
@@ -91,17 +93,9 @@ function is_table_exists($link, $table, $counter = 0)
  */
 function check_dbtable($link, $table)
 {
-  $install = false;
-
-  if (!is_table_exists($link, $table)) {
-
-    $install = true;
-  } else {
-
-    $install = false;
+  if (isset($link) && isset($table)) {
+    return (!is_table_exists($link, $table)) ? true : false;
   }
-
-  return $install;
 }
 
 /**
@@ -364,7 +358,7 @@ function write_config_file($protocol, $server_name, $dbhost, $dbuser, $dbpasswor
 
     if (isset($_SESSION['token'])) {
 
-      file_put_contents(__DIR__ . '/../../config.php', $configFile);
+      file_put_contents(__DIR__ . '/../../config.php', $configFile, FILE_APPEND | LOCK_EX);
 
       $configuration = true;
     }
@@ -561,13 +555,15 @@ function purge_installation()
 
       $clean_installation = '<?php ';
 
-      file_put_contents(__DIR__ . '/../index.php', $clean_installation);
+      file_put_contents(__DIR__ . '/../index.php', $clean_installation, LOCK_EX);
 
-      unset($_SESSION['token']);
-
-      $_SESSION = array();
-
+      session_start();
+      session_unset();
       session_destroy();
+      session_write_close();
+      setcookie(session_name(), '', 0, '/');
+      session_regenerate_id(true);
+      
     }
   }
 }

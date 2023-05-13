@@ -10,8 +10,8 @@
         <?php endif; ?>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="index.php?load=templates">Themes</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home </a></li>
+        <li><a href="index.php?load=templates">Themes </a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
     </section>
@@ -85,8 +85,7 @@ $theme_id = (isset($themeData['ID'])) ? safe_html((int)$themeData['ID']) : 0;
  if(!empty($themeData['ID'])) :
 ?>
 <a href="javascript:deleteTheme('<?=(isset($themeData['ID']) ?  safe_html((int)$themeData['ID']) : 0); ?>', '<?=(isset($themeData['theme_title']) ? safe_html($themeData['theme_title']) : ""); ?>')"
-title="Delete Theme" class="btn btn-danger pull-right"> <i
-class="fa fa-exclamation-circle fa-fw"></i> Delete
+title="Delete Theme" class="btn btn-danger pull-right"> <i class="fa fa-exclamation-circle fa-fw"></i> Delete
 </a>
 <?php 
  endif;

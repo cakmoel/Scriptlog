@@ -11,7 +11,6 @@
  * @return void
  * 
  */
-
 function get_server_load()
 {
     $load = array();

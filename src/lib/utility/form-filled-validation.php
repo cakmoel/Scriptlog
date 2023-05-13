@@ -17,10 +17,10 @@
 function form_filled_validation($vars)
 {
 
-foreach ( $vars as $key => $value) {
+foreach ($vars as $key => $value) {
 
      if ((!isset($key)) || ($value == '')) {
-         return false;
+        return false;
      }
 
 }

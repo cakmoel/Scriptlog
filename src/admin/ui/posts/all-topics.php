@@ -10,8 +10,8 @@
 				</a></small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
-        <li><a href="index.php?load=topics">All Topics</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home </a></li>
+        <li><a href="index.php?load=topics">Topics </a></li>
         <li class="active">Data Topics</li>
       </ol>
     </section>
@@ -62,8 +62,8 @@
                </div>
               <!-- /.box-header -->
               
-              <div class="box-body">
-                  <table id="scriptlog-table" class="table table-bordered table-striped">
+              <div class="box-body table-responsive">
+                  <table id="scriptlog-table" class="table table-bordered table-striped" aria-describedby="all topics">
                 <thead>
                 <tr>
                   <th>#</th>

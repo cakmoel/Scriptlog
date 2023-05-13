@@ -35,7 +35,7 @@ function do_logout($authenticator)
 function do_logout_id()
 {
 
-$prefix = Session::getInstance()->scriptlog_fingerprint;
+$prefix = isset(Session::getInstance()->scriptlog_fingerprint) ? Session::getInstance()->scriptlog_fingerprint : hash_hmac('sha256', $_SERVER['HTTP_USER_AGENT'], hash('sha256', get_ip_address(), true));
 
 $id_logout = uniqid($prefix, true);
 

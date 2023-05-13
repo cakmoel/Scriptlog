@@ -1,9 +1,13 @@
 /*!
- *   AdminLTE v2.4.2
+ *   AdminLTE v2.4.0
  *   Author: Almsaeed Studio
  *	 Website: Almsaeed Studio <https://adminlte.io>
  *   License: Open source - MIT
- *           Please visit http://opensource.org/licenses/MIT for more information
+ *   Please visit http://opensource.org/licenses/MIT for more information
+ */
+/*
+ * Core: General Layout Style
+ * -------------------------
  */
  html,
  body {
@@ -122,10 +126,12 @@
  .hold-transition .main-header .navbar,
  .hold-transition .main-header .logo,
  .hold-transition .menu-open .fa-angle-left {
+    /* Fix for IE */
      -webkit-transition: none;
      -o-transition: none;
      transition: none;
  }
+ /* Content */
  .content {
      min-height: 250px;
      padding: 15px;
@@ -134,6 +140,7 @@
      padding-left: 15px;
      padding-right: 15px;
  }
+ /* H1 - H6 font */
  h1,
  h2,
  h3,

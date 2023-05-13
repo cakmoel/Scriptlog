@@ -15,15 +15,12 @@ function admin_query()
 {
 
 return array(
-    
     'dashboard'=>'dashboard.php', 
     'posts'=>'posts.php', 
     'medialib'=>'medialib.php',
     'pages'=>'pages.php', 
     'topics'=>'topics.php', 
-    'tags'=>'tags.php', 
     'comments'=>'comments.php', 
-    'reply'=>'reply.php', 
     'templates'=>'templates.php', 
     'menu'=>'menu.php', 
     'users'=>'users.php', 

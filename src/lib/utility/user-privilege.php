@@ -6,7 +6,7 @@
  * @author M.Noermoehammad <scriptlog@yandex.com>
  * @license MIT
  * @version 1.0
- * @return void
+ * 
  */
 function user_privilege()
 {

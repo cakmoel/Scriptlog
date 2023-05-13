@@ -4,6 +4,9 @@
  * retrieve file icon (font awesome icon) and check it media type
  * 
  * @category  Function
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @return string
  * 
  */
@@ -60,7 +63,8 @@ function invoke_fileicon($media_type)
         return '<i class="fa fa-file-video-o fa-3x" aria-hidden="true"></i>';
 
         break;
-
+    
+    case "image/jpg":
     case "image/jpeg":
     case "image/png":
     case "image/gif":

@@ -14,13 +14,11 @@ error_reporting(E_ALL);
 define('APP_PATH', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
 define('APP_INC', 'include');
 
-if (file_exists(__DIR__ . '/../../lib/vendor/autoload.php')) {
-    
-  require(__DIR__ . '/../../lib/vendor/autoload.php');
-  require(__DIR__ . '/../../lib/utility/is-ssl.php');
-  require(__DIR__ . '/check-engine.php');
+require_once __DIR__ . '/../../lib/vendor/autoload.php';  
+require_once __DIR__ . '/../../lib/utility/is-ssl.php';
+require_once __DIR__ . '/../../lib/utility/get-browser-name.php';
+require_once __DIR__ . '/check-engine.php';
 
-}
   
 if (!ini_get('date.timezone')) {
 

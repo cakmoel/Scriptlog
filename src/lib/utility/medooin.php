@@ -27,6 +27,7 @@ function medoo_init()
 
 /**
  * medoo_columns
+ * select data from the table
  *
  * @param string $select
  * @param string|array $columns
@@ -89,6 +90,7 @@ function medoo_fetch_callback($table, $columns, $where)
  * @param string $table
  * @param string|array $columns
  * @param optional|array $where
+ * @see https://medoo.in/api/get
  * 
  */
 function medoo_get_where($table, $columns, $where)
@@ -103,7 +105,7 @@ function medoo_get_where($table, $columns, $where)
  * @param string $table
  * @param array $join
  * @param string|array $columns
- * @param [type] $where
+ * @param array $where
  * @return void
  */
 function medoo_get_join($table, $join, $columns, $where)
@@ -123,4 +125,31 @@ function medoo_insert($table, $values)
 {
   $database = medoo_init();
   return $database->insert($table, $values);
+}
+
+/**
+ * medoo_update
+ *
+ * @param string $table
+ * @param array $data
+ * @param array $where
+ * @return object PDOStatement
+ */
+function medoo_update($table, $data, $where)
+{
+  $database = medoo_init();
+  return $database->update($table, $data, $where);
+}
+
+/**
+ * medoo_delete
+ *
+ * @param string $table
+ * @param array $where
+ * @return object PDOStatement
+ */
+function medoo_delete($table, $where)
+{
+  $database = medoo_init();
+  return $database->delete($table, $where);
 }

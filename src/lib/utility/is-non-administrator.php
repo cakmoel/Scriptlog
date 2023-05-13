@@ -19,7 +19,7 @@ function is_non_administrator()
 
   $accessLevel = $authenticator->accessLevel();
 
-  if (($accessLevel !== 'administrator')) {
+  if ($accessLevel !== 'administrator') {
      
      $user_level = true;
 

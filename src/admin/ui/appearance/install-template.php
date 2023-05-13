@@ -8,8 +8,8 @@
         <small>Control Panel</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i>Home</a></li>
-        <li><a href="index.php?load=templates">Themes</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home </a></li>
+        <li><a href="index.php?load=templates">Themes </a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
     </section>

@@ -2,7 +2,7 @@
 /**
  * File authenticator.php
  * 
- * checking whether session or cookies exists
+ * checking whether session cookies exists
  * 
  * @category authenticator.php checking whether cookies or session exists or not
  * @author M.Noermoehammad scriptlog@yandex.com
@@ -48,7 +48,7 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
     $expected_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
     $correct_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
 
-    if (! function_exists('hash_equals') ) {
+    if (! function_exists('hash_equals')) {
 
         if ((timing_safe_equals($expected_validator, $correct_validator) == 0) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']))) {
 
@@ -85,7 +85,7 @@ if (!empty(Session::getInstance()->scriptlog_session_id)) {
     
         Session::getInstance()->scriptlog_session_login = $token_info['user_login'];
 
-        $encrypt_auth = ScriptlogCryptonize::scriptlogCipher($decrypt_auth, $key);
+        $encrypt_auth = ScriptlogCryptonize::scriptlogCipher($decrypt_auth, $cipher_key);
         set_cookies_scl('scriptlog_auth', $encrypt_auth, time() + $timeout, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true); 
         
         $random_password = Tokenizer::createToken(128);

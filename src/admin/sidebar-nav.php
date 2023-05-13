@@ -1,12 +1,9 @@
 <?php 
-function sidebar_navigation($module, $url, $user_id = null, $user_session = null)
-{  
+function sidebar_navigation($module, $url, $user_id = null, $user_session = null) 
+{
 ?>
+<aside class="main-sidebar">
 
-<!-- Left side column. contains the logo and sidebar -->
-  <aside class="main-sidebar">
-
-    <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
 
       <!-- Sidebar user panel (optional) -->
@@ -15,26 +12,23 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
       <!-- Sidebar Menu -->
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">MAIN NAVIGATION</li>
-        <!-- Optionally, you can add icons to the links -->
-        <li <?= ($module === 'dashboard') ? 'class="active"' : 'class=""'; ?>>
+        
+        <li <?= ($module === 'dashboard') ? 'class="active"' : ''; ?>>
           <a href="<?= $url.'/'.generate_request('index.php', 'get', ['dashboard'], false)['link']; ?>"><i class="fa fa-dashboard fa-fw" aria-hidden="true"></i> 
           <span>Dashboard</span></a>
-          </li>
+        </li>
         
-<?php if (access_control_list()) : ?>
+<?php if (access_control_list(ActionConst::POSTS)) : ?>
 
     <li <?=($module === 'posts' || $module === 'topics') ? 'class="treeview active"' : 'class="treeview"'; ?>>
-          <a href="#"><i class="fa fa-thumb-tack fa-fw" aria-hidden="true"></i> 
-          <span>Posts</span>
-            <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right fa-fw" aria-hidden="true"></i>
-              </span>
+          <a href="#"><i class="fa fa-thumb-tack fa-fw" aria-hidden="true"></i> <span>Posts</span>
+            <span class="pull-right-container"><i class="fa fa-angle-left pull-right fa-fw" aria-hidden="true"></i></span>
           </a>
           <ul class="treeview-menu">
             <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['posts'], false)['link']; ?>">All Posts</a></li>
             <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['posts', ActionConst::NEWPOST, 0])['link']; ?>">Add New</a></li>
             
-            <?php if (access_control_list(ActionConst::TOPICS) || access_control_list(ActionConst::TAGS)) : ?>
+            <?php if (access_control_list(ActionConst::TOPICS)) : ?>
             
               <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['topics'], false)['link']; ?>">Categories</a></li>
               
@@ -43,13 +37,13 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
           </ul>
     </li>
 
-<?php endif; if (access_control_list(ActionConst::MEDIALIB)) : ?>
+<?php endif; ?>
+
+<?php if (access_control_list(ActionConst::MEDIALIB)) :  ?>
 
         <li <?=($module === 'medialib') ? 'class="treeview active"' : 'class="treeview"'; ?>>
           <a href="#"><i class="fa fa-image fa-fw" aria-hidden="true"></i> <span>Media</span>
-            <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right fa-fw" aria-hidden="true"></i>
-              </span>
+            <span class="pull-right-container"><i class="fa fa-angle-left pull-right fa-fw" aria-hidden="true"></i></span>
           </a>
           
           <ul class="treeview-menu">
@@ -78,7 +72,7 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
         
 <?php endif; if (access_control_list(ActionConst::COMMENTS)) : ?>
 
-        <li <?=($module === 'comments') ? 'class="active"' : 'class=""'; ?>>
+        <li <?=($module === 'comments') ? 'class="active"' : ''; ?>>
         <a href="<?= $url.'/'.generate_request('index.php', 'get', ['comments', ActionConst::COMMENTS], false)['link']; ?>"><i class="fa fa-comments" aria-hidden="true"></i> 
         <span>Comments</span></a>
         </li>
@@ -100,7 +94,7 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
 
 <?php else : ?>
 
-<li <?=($module === 'users') ? 'class="active"' : 'class=""'; ?>>
+<li <?=($module === 'users') ? 'class="active"' : ''; ?>>
 <a href="<?= generate_request('index.php', 'get', ['users', 'editUser', $user_id, $user_session])['link']; ?>"><i class="fa fa-user" aria-hidden="true"></i> 
 <span>My Profile</span></a>
 </li>
@@ -141,7 +135,7 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
 
 <?php endif; if(access_control_list(ActionConst::PLUGINS)) : ?>
 
-<li <?=($module === 'plugins') ? 'class="active"' : 'class=""'; ?>>
+<li <?=($module === 'plugins') ? 'class="active"' : ''; ?>>
 <a href="<?= $url.'/'.generate_request('index.php', 'get', ['plugins', ActionConst::PLUGINS], false)['link']; ?>">
 <i class="fa fa-plug fa-fw" aria-hidden="true"></i> <span>Plugins</span>
 </a>
@@ -150,9 +144,11 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
 <?php endif; ?>
 
 </ul>
-<!-- /.sidebar-menu -->
+
 </section>
-    <!-- /.sidebar -->
+
 </aside>
 
-<?php } // end of sidebar_navigation function ?>
+<?php 
+}
+?>

@@ -65,23 +65,8 @@ function worst_passwords()
  * @version 1.0
  * @param string $password
  * @return bool
- * 
  */
 function check_common_password($password)
 {
-
-  $common_password = false;
-
-   if (in_array(strtolower($password), worst_passwords())) {
-
-     $common_password = true;
-      
-   } else {
-
-      $common_password = false;
-
-   }
-
-   return $common_password;
-
+  return (in_array(strtolower($password), worst_passwords())) ? true : false;
 }

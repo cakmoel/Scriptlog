@@ -8,8 +8,8 @@
         <small>Control Panel</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="index.php?load=topics">Categories</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home </a></li>
+        <li><a href="index.php?load=topics">Categories </a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
     </section>
@@ -42,7 +42,8 @@ endif;
 $action = (isset($formAction)) ? $formAction : null;
 $topic_id = (isset($topicData)) ? abs((int)$topicData['ID']) : 0;
 ?>
-<form method="post" action="<?=generate_request('index.php', 'post', ['topics', $action, $topic_id])['link']?>" role="form">
+
+<form method="post" action="<?=generate_request('index.php', 'post', ['topics', $action, $topic_id])['link']?>">
 <input type="hidden" name="topic_id" value="<?=$topic_id; ?>">
 
 <div class="box-body">

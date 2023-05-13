@@ -1,8 +1,4 @@
- <?php defined('SCRIPTLOG') || die("Direct access not permitted");
-
- require __DIR__ . '/sidebar-nav.php';
- 
- ?>
+ <?php defined('SCRIPTLOG') || die("Direct access not permitted");?>
  
 <header class="main-header">
     <!-- Logo -->
@@ -30,7 +26,9 @@
               <!-- The user image in the navbar-->
               <i class="fa fa-user-o fa-fw" aria-hidden="true"></i>&nbsp;
               <!-- hidden-xs hides the username on small devices so only the image appears. -->
-              <span class="hidden-xs"><?=(isset($user_level) && $user_level == 'administrator') ? $user_level : $user_login; ?></span>
+              <span class="hidden-xs">
+                <?= ((isset($user_level) && $user_level == 'administrator') && (isset($user_login)) ? $user_level : $user_login);?>
+              </span>
             </a>
             <ul class="dropdown-menu">
              
@@ -55,7 +53,7 @@
                   <a href="<?=generate_request('index.php', 'get', ['users', ActionConst::EDITUSER, $user_id, $user_session])['link']; ?>" class="btn btn-default btn-flat" rel="noopener"><i class="fa fa-user fa-fw" aria-hidden="true"></i>&nbsp; Profile</a>
                 </div>
                 <div class="pull-right">
-                  <a href="<?=generate_request('index.php', 'get', ['logout', ActionConst::LOGOUT, do_logout_id()])['link'];?>" class="btn btn-default btn-flat" rel="noopener"><i class="fa fa-sign-out fa-fw" aria-hidden="true"></i>&nbsp; Sign out</a>
+                  <a href="<?=generate_request('index.php', 'get', ['logout', ActionConst::LOGOUT, do_logout_id()])['link'];?>" class="btn btn-default btn-flat" rel="noopener"><i class="fa fa-sign-out fa-fw" aria-hidden="true"></i>&nbsp; Log Out</a>
                 </div>
               </li>
             </ul>
@@ -70,7 +68,3 @@
 
 </header>  
 <!-- .Main Header -->
-  
-<?php 
-  echo sidebar_navigation($breadcrumb, $current_url, $user_id, $user_session);
-?>

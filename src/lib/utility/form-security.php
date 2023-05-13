@@ -47,7 +47,7 @@ function generate_form_token($form, $length)
 
   }
 
-  if(empty($_SESSION[$form.'_csrf'])) {
+  if (empty($_SESSION[$form.'_csrf'])) {
 
       $_SESSION[$form.'_csrf'] = array();
 
@@ -71,7 +71,7 @@ function generate_form_token($form, $length)
 function verify_form_token($form, $token)
 {
 
- if(isset($_SESSION[$form.'_csrf'][$token])) {
+ if (isset($_SESSION[$form.'_csrf'][$token])) {
 
     unset($_SESSION[$form.'_csrf'][$token]);
     return true;
@@ -95,9 +95,9 @@ function verify_form_token($form, $token)
 function check_form_request($data, array $whitelist)
 {
   
-  foreach($data as $key => $value) {
+  foreach ($data as $key => $value) {
 
-    return ( ! in_array($key, $whitelist) ) ? false : true;
+    return (! in_array($key, $whitelist)) ? false : true;
 
   }
 
@@ -121,7 +121,7 @@ function scriptpot_validate($req)
           "scriptpot_name", "scriptpot_email"
       ];
 
-      foreach($scriptpot_field as $field) {
+      foreach ($scriptpot_field as $field) {
 
           if ((isset($req[$field])) && (!empty($req[$field]))) {
 

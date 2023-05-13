@@ -41,22 +41,14 @@ $filter = new RecursiveCallbackFilterIterator($directory, function ($current, $k
     }
 
     // skip hidden files and directories
-    if ($current->getFilename()[0] === '.') {
+    if ($current->getFilename()[0] == '.') {
         return false;
     }
     
-    if ($current->isDir()) {
-        
-        # only recurse into intended subdirectories
-        return $current->getFilename() === __DIR__ . DS .'utility'. DS;
-        
-    } else {
-        
-        # only invoke files of interest
-        return strpos($current->getFilename(), '.php');
-        
-    }
-    
+    $subdir = $current->getFilename() == __DIR__ . DS . 'utility' . DS;
+
+    return ($current->isDir()) ? $subdir : strpos($current->getFilename(), '.php');
+
 });
     
 $iterator = new RecursiveIteratorIterator($filter); 

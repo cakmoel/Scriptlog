@@ -23,19 +23,16 @@ function timezone_list()
  $utcTime = new DateTime('now', new DateTimeZone('UTC'));
  $tempTimezones = array();
     
- foreach ($timezoneIdentifiers as $timezoneIdentifier){
+ foreach ($timezoneIdentifiers as $timezoneIdentifier) {
         
     $currentTimezone = new DateTimeZone($timezoneIdentifier);
     $tempTimezones[] = array('offset' => (int)$currentTimezone->getOffset($utcTime), 'identifier' => $timezoneIdentifier);
 
  }
 
- function sort_list($a, $b) 
- {
-   return ($a['offset'] == $b['offset']) ? strcmp($a['identifier'], $b['identifier']) : $a['offset'] - $b['offset'];
- }
-
-  usort($tempTimezones, "sort_list");
+  usort($tempTimezones, function ($a, $b){
+    return ($a['offset'] == $b['offset']) ? strcmp($a['identifier'], $b['identifier']) : $a['offset'] - $b['offset'];
+  });
     
   $timezoneList = array();
     

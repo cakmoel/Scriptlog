@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
 
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -8,8 +8,8 @@
         <small>Control Panel</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
-        <li><a href="index.php?load=comments">Comments</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home<strong><?= ">"?></strong></a></li>
+        <li><a href="index.php?load=comments">Comments<strong><?= ">"?></strong></a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
     </section>

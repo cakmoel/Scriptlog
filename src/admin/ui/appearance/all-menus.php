@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
@@ -10,8 +10,8 @@
       </small>
     </h1>
     <ol class="breadcrumb">
-      <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
-      <li><a href="index.php?load=menu">All Menus</a></li>
+      <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home </a></li>
+      <li><a href="index.php?load=menu">All Menus </a></li>
       <li class="active">Data Menu</li>
     </ol>
   </section>
@@ -62,7 +62,7 @@
           </div>
           <!-- /.box-header -->
 
-          <div class="box-body">
+          <div class="box-body table-responsive">
             <table id="scriptlog-table" class="table table-bordered table-striped" aria-describedby="all menus">
               <thead>
                 <tr>

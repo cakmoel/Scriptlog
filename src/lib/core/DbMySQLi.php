@@ -106,7 +106,7 @@ public static function activateReportMode()
 public static function getInstance()
 {
 
-  if (self::$inst == null ) {
+  if (self::$inst == null) {
 
       self::$inst = new DbMySQLi();
 
@@ -350,10 +350,10 @@ public function filterData($data)
 public function cleanOutputDisplay($data)
 {
 
-  $data = stripslashes( $data );
-  $data = html_entity_decode( $data, ENT_QUOTES, 'UTF-8' );
-  $data = nl2br( $data );
-  $data = urldecode( $data );
+  $data = stripslashes($data);
+  $data = html_entity_decode($data, ENT_QUOTES, 'UTF-8');
+  $data = nl2br($data);
+  $data = urldecode($data);
   return $data;
 
 }

@@ -86,9 +86,7 @@ function grab_browser()
 function check_browser()
 {
 
-  $browser = grab_browser()->getName();
-
-  return $browser;
+  return grab_browser()->getName();
 }
 
 /**
@@ -122,11 +120,15 @@ function check_browser_version()
   } elseif (($browser->getName() === Browser::EDGE) && ($browser->getVersion() < 75)) {
 
     return true;
+  } elseif ($browser->getName() === 'Brave') {
+
+    return true;
   } else {
 
     return false;
   }
 }
+
 
 /**
  * get_browser_version()
@@ -170,7 +172,7 @@ function check_web_server()
  */
 function check_main_dir()
 {
-  return (is_file(APP_PATH . '../lib/main.php')) ? true : false; 
+  return (is_file(APP_PATH . '../lib/main.php')) ? true : false;
 }
 
 /**
@@ -358,13 +360,8 @@ function check_character_type()
  */
 function check_uri_determination()
 {
-  if (isset($_SERVER['REQUEST_URI']) || isset($_SERVER['PHP_SELF']) || isset($_SERVER['PHP_INFO'])) {
 
-    return true;
-  } else {
-
-    return false;
-  }
+  return (isset($_SERVER['REQUEST_URI']) || isset($_SERVER['PHP_SELF']) || isset($_SERVER['PHP_INFO'])) ? true : false;
 }
 
 /**
@@ -372,15 +369,7 @@ function check_uri_determination()
  */
 function check_pdo_mysql()
 {
-
-  if (extension_loaded('pdo_mysql') && class_exists('PDO')) {
-
-    return true;
-    exit();
-  } else {
-
-    return false;
-  }
+  return (extension_loaded('pdo_mysql') && class_exists('PDO')) ? true : false;
 }
 
 /**
@@ -388,13 +377,7 @@ function check_pdo_mysql()
  */
 function check_mysqli_enabled()
 {
-  if (function_exists('mysqli_connect')) {
-
-    return true;
-  } else {
-
-    return false;
-  }
+  return (function_exists('mysqli_connect')) ? true : false;
 }
 
 /**
@@ -402,13 +385,7 @@ function check_mysqli_enabled()
  */
 function check_gd_enabled()
 {
-  if (function_exists('gd_info')) {
-
-    return true;
-  } else {
-
-    return false;
-  }
+  return (function_exists('gd_info')) ? true : false;
 }
 
 /**
@@ -421,16 +398,17 @@ function check_gd_enabled()
  */
 function check_modrewrite()
 {
-  $apache_modules = (function_exists('apache_get_modules')  ? apache_get_modules() : exit());
 
-  if ((check_web_server()['WebServer'] == 'Apache') && (in_array('mod_rewrite', $apache_modules))) {
+  if (php_sapi_name() == 'apache' || php_sapi_name() == 'apache2handler' || php_sapi_name() == 'litespeed') {
 
-    return true;
-  }
+    $apache_modules = (function_exists('apache_get_modules')  ? apache_get_modules() : []);
 
-  if (check_web_server()['WebServer'] == 'LiteSpeed') {
+    if ((check_web_server()['WebServer'] == 'Apache') && (in_array('mod_rewrite', $apache_modules))) {
 
-    if (in_array('mod_rewrite', $apache_modules)) {
+      return true;
+    }
+
+    if ((check_web_server()['WebServer'] == 'LiteSpeed') && (in_array('mod_rewrite', $apache_modules))) {
 
       return true;
     }

@@ -153,7 +153,7 @@ class TopicDao extends Dao
    }
       
    $html = '<div class="form-group">';
-   $html .= '<label>Category : </label>';
+   $html .= '<label for="category">Category</label>';
 
    $items = $this->findTopics('topic_title');
  
