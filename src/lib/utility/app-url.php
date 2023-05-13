@@ -25,8 +25,8 @@ function app_url()
 
         return app_info()['app_url'];
 
-      }
-      
     }
+      
+  }
  
 }

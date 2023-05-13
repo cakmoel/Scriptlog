@@ -129,12 +129,32 @@ class UserEvent
  */
  private $sanitize;
 
+ /**
+  * key
+  *
+  * @var string
+  */
  private $key;
 
+ /**
+  * validator_verified
+  *
+  * @var boolean
+  */
  private $validator_verified = false;
 
+ /**
+  * selector_verified
+  *
+  * @var boolean
+  */
  private $selector_verified = false;
 
+ /**
+  * expired_verified
+  *
+  * @var boolean
+  */
  private $expired_verified = false;
 
  /**
@@ -151,7 +171,7 @@ class UserEvent
     
     $this->sanitize = $sanitize;
 
-    if ( Registry::isKeySet('key') ) {
+    if (Registry::isKeySet('key')) {
 
       $this->key = Registry::get('key');
 
@@ -301,7 +321,7 @@ class UserEvent
  *
  * @method public grabUsers()
  * @param string $orderBy
- * @param [type] $fetchMode
+ * @param static PDO::FETCH_MODE $fetchMode
  * @return array
  * 
  */
@@ -311,21 +331,48 @@ class UserEvent
    return $this->userDao->getUsers($orderBySanitized, $fetchMode);    
  }
  
+ /**
+  * grabUser
+  *
+  * @param string $userId
+  * @param static PDO::FETCH_MODE $fetchMode
+  * @return void
+  */
  public function grabUser($userId, $fetchMode = null)
  {
    return $this->userDao->getUserById($userId, $this->sanitize, $fetchMode);
  }
 
+ /**
+  * grabUserByLogin
+  *
+  * @param string $user_login
+  * @param static PDO::FETCH_MODE $fetchMode 
+  * @return void
+  */
  public function grabUserByLogin($user_login, $fetchMode = null)
  {
    return $this->userDao->getUserByLogin($user_login, $fetchMode);
  }
- 
+
+ /**
+  * grabTokenByLogin
+  *
+  * @param string $login
+  * @param string $expired
+  * @param static PDO::FETCH_MODE $fetchMode
+  * @return void
+  */
  public function grabTokenByLogin($login, $expired, $fetchMode = null)
  {
    return $this->userToken->getTokenByLogin($login, $expired, $fetchMode);
  }
 
+ /**
+  * addUser
+  *
+  * @return void
+  */
  public function addUser()
  {
    
@@ -366,7 +413,12 @@ class UserEvent
     }
     
  }
- 
+
+ /**
+  * modifyUser
+  *
+  * @return void
+  */
  public function modifyUser()
  {
   
@@ -457,16 +509,9 @@ class UserEvent
  public function removeUser()
  {
    
-   $this->validator->sanitize($this->user_id, 'int');
+  $this->validator->sanitize($this->user_id, 'int');
 
-   if (!$this->userDao->getUserById($this->user_id, $this->sanitize)) {
-       
-      $_SESSION['error'] = "userNotFound";
-      direct_page('index.php?load=users&error=userNotFound', 404);
-   
-   }
-   
-   return $this->userDao->deleteUser($this->user_id, $this->sanitize);
+  return $this->userDao->deleteUser($this->user_id, $this->sanitize);
    
  }
  
@@ -514,9 +559,7 @@ class UserEvent
  */ 
  public function isUserLevel()
  {
-
   return user_privilege();
-
  }
 
 /**
@@ -547,7 +590,7 @@ public function reAuthenticateUserPrivilege($login, $password)
 
    $this->user_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $this->key) : Session::getInstance()->scriptlog_session_login;
 
-   if ( ( isset($_COOKIE['scriptlog_validator']) ) && ( isset($_COOKIE['scriptlog_selector']) ) ) {
+   if ((isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector']))) {
 
       //retrieve user token info
       $token_info = $this->grabTokenByLogin($this->user_login, 0);
@@ -558,24 +601,24 @@ public function reAuthenticateUserPrivilege($login, $password)
       $expected_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
       $correct_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
 
-      if ( hash_equals($expected_validator, $correct_validator) && ( Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']) ) ) {
+      if (hash_equals($expected_validator, $correct_validator) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']))) {
 
         $this->validator_verified = true;
       } 
 
-      if ( hash_equals($expected_selector, $correct_selector) && ( Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret) ) ) {
+      if (hash_equals($expected_selector, $correct_selector) && (Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret))) {
 
         $this->selector_verified = true;
 
       }
 
-      if ( $token_info['expired_date'] >= date("Y-m-d H:i:s", time())) {
+      if ($token_info['expired_date'] >= date("Y-m-d H:i:s", time())) {
 
-          $this->expired_verified = true;
+        $this->expired_verified = true;
 
       }
 
-      return ( !empty($token_info['ID']) ) && $this->validator_verified && $this->selector_verified && $this->expired_verified ? true : false;
+      return (!empty($token_info['ID'])) && $this->validator_verified && $this->selector_verified && $this->expired_verified ? true : false;
       
    }
 

@@ -10,7 +10,6 @@
  * @return string
  * 
  */
-
 function add_http($url)
 {
 

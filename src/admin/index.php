@@ -44,7 +44,7 @@ $user_id = isset($_SESSION['scriptlog_session_id']) ? Session::getInstance()->sc
 $user_session = isset(user_info($authenticator, $user_login)['user_session']) ? user_info($authenticator, $user_login)['user_session'] : do_logout($authenticator);
 
 // module accessed or path to link accessed by request
-$breadcrumb = isset($_GET['load']) ? htmlentities(sanitize_urls($_GET['load']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : http_response_code();
+$breadcrumb = isset($_GET['load']) ? htmlspecialchars(sanitize_urls($_GET['load']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : http_response_code();
 
 // Current URL
 $current_url =  preg_replace("/\/index\.php.*$/i", "", app_url().DS.APP_ADMIN);
@@ -55,6 +55,10 @@ admin_header($current_url, $breadcrumb);
 
 include dirname(__FILE__) . DS .'navigation.php';
  
+include dirname(__FILE__) . DS . 'sidebar-nav.php';
+
+echo sidebar_navigation($breadcrumb, $current_url, $user_id, $user_session);
+
 include dirname(__FILE__) . DS .'request.php';
 
 admin_footer($current_url, $ubench);

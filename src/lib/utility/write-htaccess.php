@@ -23,15 +23,7 @@ if ($privilege === 'administrator' || $privilege === 'manager') {
 
    $fp = fopen(__DIR__ . '/../../.htaccess', 'w');
 
-   if ($permalink_status === 'yes') {
-
-     $sleep_timer = 10; 
-   
-   } else {
-      
-     $sleep_timer = 5;
-
-   }
+   $sleep_timer = ($permalink_status === 'yes') ? 10 : 5;
 
    sleep($sleep_timer);
    fwrite($fp, $data);
@@ -50,6 +42,8 @@ if ($privilege === 'administrator' || $privilege === 'manager') {
  *
  * @category function
  * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
  * @param string $permalink_status
  * @return string
  * 

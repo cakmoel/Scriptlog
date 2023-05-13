@@ -1,4 +1,5 @@
 <?php
+
 /**
  * File index.php 
  * 
@@ -12,6 +13,8 @@
 require dirname(__FILE__) . '/include/settings.php';
 require dirname(__FILE__) . '/include/setup.php';
 require dirname(__FILE__) . '/install-layout.php';
+
+(version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
 
 if (file_exists(__DIR__ . '/../config.php')) {
 
@@ -49,12 +52,9 @@ if (file_exists(__DIR__ . '/../config.php')) {
 
     if ($install != 'install') {
 
-        (version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
-
         $_SESSION['install'] = false;
 
         header($installation_path, true, 302);
-        
     } else {
 
         $dbhost = isset($_POST['db_host']) ? escapeHTML($_POST['db_host']) : "";
@@ -102,11 +102,9 @@ if (file_exists(__DIR__ . '/../config.php')) {
         if (empty($password) && (empty($confirm))) {
 
             $errors['errorSetup'] = 'Admin password should not be empty';
-
         } elseif ($password != $confirm) {
 
             $errors['errorSetup'] = 'Admin password should both be equal';
-            
         } elseif (!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
 
             $errors['errorSetup'] = 'Admin password requires at least 8 characters, uppercase and lowercase letters, numbers and special characters';
@@ -210,9 +208,11 @@ if (file_exists(__DIR__ . '/../config.php')) {
                 if (function_exists("random_bytes")) {
 
                     $token = random_bytes(ceil($length / 2));
+
                 } elseif (function_exists("openssl_random_pseudo_bytes")) {
 
                     $token = openssl_random_pseudo_bytes(ceil($length / 2));
+
                 } else {
 
                     trigger_error("No cryptographically secure random function available", E_USER_ERROR);
@@ -231,6 +231,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
                         header("Location:" . $protocol . "://" . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR . "finish.php?status=success&token={$key}", true, 302);
                     }
                 }
+                
             } catch (mysqli_sql_exception $e) {
 
                 $e->getMessage();
@@ -254,6 +255,12 @@ if (file_exists(__DIR__ . '/../config.php')) {
         <div class="row">
             <div class="col-md-4 order-md-2 mb-4">
 
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">Getting System Info</span>
+                </h4>
+
+                <?= get_sisfo(); ?>
+                
                 <h4 class="d-flex justify-content-between align-items-center mb-3">
                     <span class="text-muted">Required PHP Settings</span>
                 </h4>

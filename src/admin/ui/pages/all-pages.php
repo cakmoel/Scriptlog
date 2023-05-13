@@ -1,15 +1,15 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
  <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
-        <small><a href="index.php?load=pages&action=newPage&Id=0" class="btn btn-primary"> <i class="fa fa-plus-circle" aria-hidden="true"></i> Add New </a></small>
+        <small><a href="<?= generate_request('index.php', 'get', ['pages', ActionConst::NEWPAGE, 0])['link'] ?>" class="btn btn-primary"> <i class="fa fa-plus-circle" aria-hidden="true"></i> Add New</a></small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
-        <li><a href="index.php?load=pages">All Pages</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home </a></li>
+        <li><a href="index.php?load=pages">Pages </a></li>
         <li class="active">Data Pages</li>
       </ol>
     </section>
@@ -22,8 +22,8 @@
          if (isset($errors)) :
          ?>
          <div class="alert alert-danger alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h2><i class="icon fa fa-ban" aria-hidden="true"></i> Alert!</h2>
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <h2><i class="icon fa fa-ban" aria-hidden="true"></i> Alert!</h2>
            <?php 
               foreach ($errors as $e) :
                 echo $e;
@@ -54,14 +54,14 @@
                <div class="box-header with-border">
                    <h2 class="box-title">
                     <?=(isset($pagesTotal)) ? $pagesTotal : 0; ?> 
-                    Page<?=($pagesTotal != 1) ? 's' : ''; ?>
+                    Page<?=($pagesTotal !== 1) ? 's' : ''; ?>
                     in Total  
                   </h2>
                </div>
               <!-- /.box-header -->
               
-              <div class="box-body">
-                  <table id="scriptlog-table" class="table table-bordered table-striped">
+              <div class="box-body table-responsive">
+                  <table id="scriptlog-table" class="table table-bordered table-striped" aria-describedby="all pages">
                 <thead>
                 <tr>
                   <th>#</th>

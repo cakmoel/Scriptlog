@@ -11,11 +11,8 @@
  */
 function sanitizer($str, $type)
 {
-  
   $sanitizer = new Sanitize();
-
   return $sanitizer->sanitasi(sanitize_string($str), $type);
-
 }
 
 /**
@@ -32,6 +29,6 @@ function sanitize_string($str)
 
   $mysqli = new DbMySQLi();
   
- return $mysqli->filterData($str);
+  return $mysqli->filterData($str);
   
 }

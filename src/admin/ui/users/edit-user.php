@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) {  exit(); } ?>
 
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -8,8 +8,8 @@
         <small>Control Panel</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="index.php?load=users">Users</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home </a></li>
+        <li><a href="index.php?load=users">Users </a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
     </section>
@@ -45,7 +45,7 @@ $user_id = (isset($userData['ID'])) ? safe_html((int)$userData['ID']) : 0;
 $session_id = (isset($userData['user_session'])) ? safe_html($userData['user_session']) : sha1(app_key());
 ?>
 
-<form method="post" action="<?=generate_request('index.php', 'post', ['users', $action, $user_id, $session_id])['link']; ?>" role="form">
+<form method="post" action="<?=generate_request('index.php', 'post', ['users', $action, $user_id, $session_id])['link']; ?>" >
 <input type="hidden" name="session_id" value="<?=$session_id; ?>" >
 <input type="hidden" name="user_id" value="<?=$user_id; ?>" >
 <div class="box-body">

@@ -14,7 +14,7 @@ try {
         
           if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
     
-              direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+            direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
           } else {
     
@@ -80,30 +80,38 @@ try {
             
         case ActionConst::DELETEUSER:
      
-            if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
+            if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
     
-                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+                header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+                header("Status: 400 Bad Request");
+                throw new AppException("Invalid ID data type!");
     
-            } else {
-    
-                if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
-    
-                    header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
-                    header("Status: 400 Bad Request");
-                    throw new AppException("Invalid ID data type!");
-        
-                }
-                
-                if ($userDao->checkUserId($userId, $sanitizer)) {
-    
-                    $userApp->remove((int)$userId);
-                
-                } else {
+            }
 
+            if (!$userDao->checkUserId($userId, $sanitizer)) {
+
+                if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
+    
+                    direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
+    
+                } else {
+    
                     direct_page('index.php?load=404&notfound='.notfound_id(), 404);
     
                 }
-                
+
+            } else {
+
+                if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
+
+                    $userApp->removeProfile($user_login, $authenticator);
+
+                } else {
+
+                    $userApp->remove((int)$userId);
+
+                }
+
             }
             
             break;

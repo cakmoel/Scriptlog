@@ -1,6 +1,6 @@
 <?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * EventException Class extends Exception implements IEventThrowable
+ * class EventException extends Exception implements IEventThrowable
  *
  * @category  Core Class
  * @link      https://secure.php.net/manual/en/language.exceptions.php#91159
@@ -14,6 +14,8 @@ class EventException extends Exception implements IEventThrowable
   
   
 protected $message = 'Unknown Exception';
+
+protected $previous;
 
 public function __construct($message = null, $code = 0, Exception $previous = null)
 {

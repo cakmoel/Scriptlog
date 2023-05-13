@@ -29,13 +29,13 @@ if (isset($_POST['Reset'])) {
   $captcha_code = isset($_POST['captcha_code']) ? $_POST['captcha_code'] : '';
   $captcha = true;
 
-  if( !$valid ) {
+  if (!$valid) {
      
     $errors['errorMessage'] = "Sorry, there was a security issue";
   
   }
 
-  if (count($_POST)> 0 && $captcha_code !== Session::getInstance()->forgot_pwd) {
+  if (count($_POST) > 0 && $captcha_code !== Session::getInstance()->forgot_pwd) {
 
       $captcha = false;
       $errors['errorMessage'] = "Please enter correct captcha code";
@@ -56,7 +56,7 @@ if (isset($_POST['Reset'])) {
 
   } else {
     
-    if($captcha == true) {
+    if ($captcha === true) {
 
       $authenticator->resetUserPassword($user_email);
 
@@ -66,7 +66,7 @@ if (isset($_POST['Reset'])) {
     
   }
   
-  if (scriptpot_validate($_POST) == false) {
+  if (scriptpot_validate($_POST) === false) {
 
     $errors['errorMessage'] = "anomaly behaviour detected!";
 

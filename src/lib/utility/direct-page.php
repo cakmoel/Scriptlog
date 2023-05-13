@@ -65,7 +65,7 @@ function direct_page($page = '', $http_status_code = null)
  
  if (!is_null($http_status_code)) {
     header($http[$http_status_code]);
- };
+ }
  
  // redirect the user
  header("Location: $url");

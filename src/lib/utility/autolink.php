@@ -10,7 +10,7 @@
  */
 function autolink($text) {
     $pattern = '/(((http[s]?:\/\/(.+(:.+)?@)?)|(www\.))[a-z0-9](([-a-z0-9]+\.)*\.[a-z]{2,})?\/?[a-z0-9.,_\/~#&=:;%+!?-]+)/is';
-    $replace = preg_replace($pattern, ' <a href="$1">$1</a>', $text);
-    return preg_replace('/href="www/', 'href="https://www', $replace);
+    $replace = str_replace($pattern, ' <a href="$1">$1</a>', $text);
+    return str_replace('/href="www/', 'href="https://www', $replace);
    
 }

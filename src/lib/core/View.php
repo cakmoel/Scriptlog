@@ -141,7 +141,7 @@ class View
         
         echo $render;
         
-    } catch (Throwable $th) {
+    } catch (\Throwable $th) {
 
       $this->errors = LogError::setStatusCode(http_response_code());
       $this->errors = LogError::exceptionHandler($th);

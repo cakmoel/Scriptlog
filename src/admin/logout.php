@@ -12,6 +12,7 @@ try {
             if (false === $authenticator->userAccessControl()) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
+
             } else {
 
                 $valid_logout = !empty($logOutId) && verify_logout_id($logOutId);
@@ -20,6 +21,7 @@ try {
 
                     header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
                     throw new AppException("URL Redirection to Untrusted Site");
+                    
                 } else {
 
                     $authenticator->logout();
@@ -33,6 +35,7 @@ try {
             if (false === $authenticator->userAccessControl()) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
+
             } else {
 
                 direct_page('index.php?load=dashboard', 302);
@@ -40,7 +43,8 @@ try {
 
             break;
     }
-} catch (Throwable $th) {
+    
+} catch (\Throwable $th) {
 
     if (class_exists('LogError')) {
         LogError::setStatusCode(http_response_code());

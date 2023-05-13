@@ -3,6 +3,7 @@
  * whoops_error()
  * 
  * @category function
+ * @author M.Noermoehammad
  * @version 1.0
  * @license MIT
  * @uses \Whoops\Run

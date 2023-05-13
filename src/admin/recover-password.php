@@ -4,6 +4,8 @@
  * 
  * @category  recovering user password
  * @author    M.Noermoehammad
+ * @license   MIT
+ * @version   1.0
  * 
  */
 if (file_exists(__DIR__ . '/../config.php')) {
@@ -37,7 +39,7 @@ if (isset($_POST['Change']) && $_POST['Change'] == 'Change Password') {
   $csrf = isset($_POST['csrf']) ? $_POST['csrf'] : '';
   $valid = !empty($csrf) && verify_form_token('recover_pwd', $csrf);
 
-  if(!$valid) {
+  if (!$valid) {
 
     $errors['errorMessage'] = "Sorry, there was a security issue";
 
@@ -51,11 +53,11 @@ if (isset($_POST['Change']) && $_POST['Change'] == 'Change Password') {
 
     $errors['errorMessage'] = "Password does not match";
 
-  } elseif ( check_common_password($password) === true ) {
+  } elseif (check_common_password($password) === true ) {
 
     $errors['errorMessage'] = "Your password seems to be the most hacked password, please try another";
 
-  } elseif ( false === check_pwd_strength($password) ) { 
+  } elseif (false === check_pwd_strength($password) ) { 
 
     $errors['errorMessage'] = "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters";
 

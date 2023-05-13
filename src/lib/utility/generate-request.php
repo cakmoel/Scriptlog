@@ -1,4 +1,5 @@
-<?php
+<?php 
+declare(strict_types=1);
 /**
  * generate_request function
  * 
@@ -7,7 +8,7 @@
  * 
  * @category Function
  * @author M.Noermoehammad
- * @param string $value
+ * @param string $base
  * @param string $type
  * @return array
  * 
@@ -17,10 +18,10 @@ function generate_request($base, $type, $data = array(), $string_encoded = true)
  
  $html = array();
 
- $load = (is_array($data) && array_key_exists(0, $data)) ? rawurlencode($data[0]) : '';
- $action = (is_array($data) && array_key_exists(1, $data)) ? urlencode($data[1]) : null;
- $id = (is_array($data) && array_key_exists(2, $data)) ? urlencode($data[2]) : 0;
- $unique_id = (is_array($data) && array_key_exists(3, $data)) ? urlencode($data[3]) : '';
+ $load = (isset($data) && array_key_exists(0, $data)) ? rawurlencode((string)$data[0]) : null;
+ $action = (isset($data) && array_key_exists(1, $data)) ? urlencode((string)$data[1]) : null;
+ $id = (isset($data) && array_key_exists(2, $data)) ? urlencode((string)$data[2]) : null;
+ $unique_id = (isset($data) && array_key_exists(3, $data)) ? urlencode((string)$data[3]) : null;
 
  switch ($type) {
 

@@ -1,19 +1,15 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
  <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
-        <small>	<a href="<?= generate_request('index.php', 'get', ['users', ActionConst::NEWUSER, 0, sha1(app_key())])['link']; ?>"
-					class="btn btn-primary"> <i
-					class="fa fa-plus-circle"></i> Add New
-				</a>
-		    </small>
+        <small><a href="<?= generate_request('index.php', 'get', ['users', ActionConst::NEWUSER, 0, sha1(app_key())])['link']; ?>" class="btn btn-primary"> <i class="fa fa-plus-circle" aria-hidden="true"></i> Add New</a></small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="index.php?load=users">All Users</a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home </a></li>
+        <li><a href="index.php?load=users">Users </a></li>
         <li class="active">Data Users</li>
       </ol>
     </section>
@@ -67,8 +63,8 @@
             </div>
               <!-- /.box-header -->
              
-              <div class="box-body">
-                <table id="scriptlog-table" class="table table-bordered table-striped table-responsive" aria-describedby="all users">
+              <div class="box-body table-responsive">
+                <table id="scriptlog-table" class="table table-bordered table-striped" aria-describedby="all users">
                 <thead>
                 <tr>
                   <th>#</th>

@@ -1,6 +1,7 @@
 <?php
 /**
  * app_key
+ * 
  * checking if application key is recognized and equal 
  * between application key on database and configuration file
  * 

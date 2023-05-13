@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) {  exit(); } ?>
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -9,7 +9,7 @@
         <small>13 new messages</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home <strong><?= ">"?></strong></a></li>
         <li class="active">Mailbox</li>
       </ol>
     </section>

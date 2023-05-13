@@ -8,9 +8,8 @@
             <small>Control Panel</small>
         </h1>
         <ol class="breadcrumb">
-            <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-            <li class="active"><a href="index.php?load=option-timezone"><?= (isset($pageTitle)) ? $pageTitle : ""; ?></a></li>
-            
+            <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home </a></li>
+            <li class="active"><a href="index.php?load=option-timezone"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></a></li>   
         </ol>
     </section>
 
@@ -60,7 +59,7 @@
                     ?>
 
                     <div class="box-body">
-                        <form method="post" action="<?= generate_request('index.php', 'get', ['option-timezone', $action, 0])['link']; ?>" role="form">
+                        <form method="post" action="<?= generate_request('index.php', 'get', ['option-timezone', $action, 0])['link']; ?>" >
                             <input type="hidden" name="setting_id" value="<?= $paramId; ?>">
                             <input type="hidden" name="setting_name" value="<?= (!isset($timezoneData['setting_name']) ?: safe_html($timezoneData['setting_name'])); ?>">
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * uniqid_real
- * to cretate randomm unique ID or Key
+ * to cretate random unique ID or Key
  * 
  * @param number $length
  * @throws Exception

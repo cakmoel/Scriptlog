@@ -15,5 +15,5 @@
 function user_activation_key($value)
 {
     $salt = simple_salt(64);
-    return sha1( mt_rand( 10000, 99999 ) . time() . $value . $salt);
+    return sha1(mt_rand(10000, 99999) . time() . $value . $salt);
 }

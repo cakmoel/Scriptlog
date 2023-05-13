@@ -1,6 +1,6 @@
 <?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * PostEvent Class
+ * class PostEvent
  *
  * @category  Event Class
  * @author    M.Noermoehammad
@@ -86,6 +86,20 @@ class PostEvent
   private $post_status;
 
   /**
+   * post's visibility
+   * visibility as public, private or protected
+   * @var string
+   */
+  private $post_visibility;
+
+  /**
+   * post's password
+   *
+   * @var string
+   */
+  private $post_password;
+
+  /**
    * post_headlines
    *
    * @var integer
@@ -100,6 +114,13 @@ class PostEvent
    * @var string
    */
   private $comment_status;
+
+  /**
+   * passphrase key
+   *
+   * @var string
+   */
+  private $passphrase;
 
   /**
    * post's topic
@@ -139,6 +160,13 @@ class PostEvent
    * 
    */
   private $sanitizer;
+
+  /**
+   * credentials
+   *
+   * @var array
+   */
+  private $credentials = [];
 
   /**
    * Constructor
@@ -271,6 +299,32 @@ class PostEvent
   }
 
   /**
+   * setVisibility()
+   * setup post visibility whether is public, private or protected with password
+   *
+   * @param string $post_visibility
+   * 
+   */
+  public function setVisibility($post_visibility)
+  {
+    $this->post_visibility = $post_visibility;
+  }
+
+  /**
+   * setProtected()
+   * 
+   * Post published with visibility protected will be created with it's own password
+   * someone know its password only can read whole post protected
+   * 
+   * @param string $post_password
+   * 
+   */
+  public function setProtected($post_password)
+  {
+    $this->post_password = $post_password;
+  }
+
+  /**
    * setHeadlines
    *
    * @param int $post_headlines
@@ -290,6 +344,17 @@ class PostEvent
   public function setComment($comment_status)
   {
     $this->comment_status = $comment_status;
+  }
+
+  /**
+   * setPassPhraseKey
+   *
+   * @param string $passphrase
+   * 
+   */
+  public function setPassPhrase($passphrase)
+  {
+    $this->passphrase = $passphrase;
   }
 
   /**
@@ -366,42 +431,66 @@ class PostEvent
 
       $getCategory = $category->findTopicById($categoryId, $this->sanitizer, PDO::FETCH_ASSOC);
 
-      $new_post = ['media_id' => $this->post_image,
-      'post_author' => $this->author,
-      'post_date' => date_for_database($this->post_date),
-      'post_title' => $this->title,
-      'post_slug'  => $this->slug,
-      'post_content' => $this->content,
-      'post_summary' => $this->meta_desc,
-      'post_keyword' => $this->meta_key,
-      'post_status' => $this->post_status,
-      'post_tags' => $this->tags,
-      'post_headlines' => $this->post_headlines,
-      'comment_status' => $this->comment_status];
-      
+      $new_post = [
+        'media_id' => $this->post_image,
+        'post_author' => $this->author,
+        'post_date' => date_for_database($this->post_date),
+        'post_title' => $this->title,
+        'post_slug'  => $this->slug,
+        'post_content' => $this->content,
+        'post_summary' => $this->meta_desc,
+        'post_keyword' => $this->meta_key,
+        'post_status' => $this->post_status,
+        'post_visibility' => $this->post_visibility,
+        'post_password' => $this->post_password,
+        'post_tags' => $this->tags,
+        'post_headlines' => $this->post_headlines,
+        'comment_status' => $this->comment_status,
+        'passphrase' => $this->passphrase
+      ];
+
       $topic_id = isset($getCategory['ID']) ? abs((int)$getCategory['ID']) : 0;
 
     } else {
 
-      $new_post = [ 'media_id' => $this->post_image,
-      'post_author' => $this->author,
-      'post_date' => date_for_database($this->post_date),
-      'post_title' => $this->title,
-      'post_slug'  => $this->slug,
-      'post_content' => $this->content,
-      'post_summary' => $this->meta_desc,
-      'post_keyword' => $this->meta_key,
-      'post_status' => $this->post_status,
-      'post_tags' => $this->tags,
-      'post_headlines' => $this->post_headlines,
-      'comment_status' => $this->comment_status];
+      $new_post = [
+        'media_id' => $this->post_image,
+        'post_author' => $this->author,
+        'post_date' => date_for_database($this->post_date),
+        'post_title' => $this->title,
+        'post_slug'  => $this->slug,
+        'post_content' => $this->content,
+        'post_summary' => $this->meta_desc,
+        'post_keyword' => $this->meta_key,
+        'post_status' => $this->post_status,
+        'post_visibility' => $this->post_visibility,
+        'post_password' => $this->post_password,
+        'post_tags' => $this->tags,
+        'post_headlines' => $this->post_headlines,
+        'comment_status' => $this->comment_status,
+        'passphrase' => $this->passphrase
+      ];
 
       $topic_id = $this->topics;
-
     }
 
-    return $this->postDao->createPost($new_post, $topic_id);
+    $postId = $this->postDao->createPost($new_post, $topic_id); 
+    
+    if ($this->post_visibility == 'protected') {
 
+      $this->credentials = [
+        'post_id' => $postId,
+        'post_author' => $this->author,
+        'post_date' => date_for_database($this->post_date),
+        'post_password' => $this->post_password,
+        'passphrase' => $this->passphrase
+      ];
+      
+     (isset($postId) && $postId > 0) ? save_post_protected($postId, $this->author, $this->credentials) : "";
+ 
+    }
+    
+    return $postId;
   }
 
   /**
@@ -420,16 +509,15 @@ class PostEvent
 
     $post_updated = array();
 
-    if ( ( !empty($this->meta_desc) ) || ( !empty($this->meta_key) ) || ( !empty($this->post_tags) ) ) {
+    if ((!empty($this->meta_desc)) || (!empty($this->meta_key)) || (!empty($this->tags))) {
       $this->validator->sanitize($this->meta_desc, 'string');
       $this->validator->sanitize($this->meta_key, 'string');
       $this->validator->sanitize($this->tags, 'string');
     }
 
-    if ( !empty( $this->post_image ) ) {
+    if (!empty($this->post_image)) {
 
       $post_updated = [
-        
         'media_id' => $this->post_image,
         'post_modified' => date_for_database($this->post_modified),
         'post_title' => $this->title,
@@ -438,16 +526,17 @@ class PostEvent
         'post_summary' => $this->meta_desc,
         'post_keyword' => $this->meta_key,
         'post_status' => $this->post_status,
+        'post_visibility' => $this->post_visibility,
+        'post_password' => $this->post_password,
         'post_tags' => $this->tags,
         'post_headlines' => $this->post_headlines,
-        'comment_status' => $this->comment_status
-
+        'comment_status' => $this->comment_status,
+        'passphrase' => $this->passphrase
       ];
 
     } else {
 
       $post_updated = [
-
         'post_modified' => date_for_database($this->post_modified),
         'post_title' => $this->title,
         'post_slug' => $this->slug,
@@ -455,21 +544,22 @@ class PostEvent
         'post_summary' => $this->meta_desc,
         'post_keyword' => $this->meta_key,
         'post_status' => $this->post_status,
+        'post_visibility' => $this->post_visibility,
+        'post_password' => $this->post_password,
         'post_tags' => $this->tags,
         'post_headlines' => $this->post_headlines,
-        'comment_status' => $this->comment_status
-
+        'comment_status' => $this->comment_status,
+        'passphrase' => $this->passphrase
       ];
-      
+
     }
 
     return $this->postDao->updatePost($this->sanitizer, $post_updated, $this->postId, $this->topics);
-
+    
   }
 
   /**
    * removePost
-   *
    * removing an existing post record
    * 
    */
@@ -483,14 +573,13 @@ class PostEvent
     if (!$data_post = $this->postDao->findPost($this->postId, $this->sanitizer)) {
 
       direct_page('index.php?load=posts&error=postNotFound', 404);
-
     }
 
-    $media_id = $data_post['media_id'];
+    $media_id = isset($data_post['media_id']) ? $data_post['media_id'] : 0;
 
     $medialib = new MediaDao();
     $media_data = $medialib->findMediaBlog((int)$media_id);
-    $media_filename = isset($media_data['media_filename'])  ? basename($media_data['media_filename']) : "";
+    $media_filename = isset($media_data['media_filename']) ? basename($media_data['media_filename']) : "";
 
     if (isset($media_filename) && $media_filename !== '') {
 
@@ -500,11 +589,9 @@ class PostEvent
         unlink(__DIR__ . '/../../' . APP_IMAGE_LARGE . 'large_' . $media_filename);
         unlink(__DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_' . $media_filename);
         unlink(__DIR__ . '/../../' . APP_IMAGE_SMALL . 'small_' . $media_filename);
-        
       }
 
       return  $this->postDao->deletePost($this->postId, $this->sanitizer);
-      
     } else {
 
       return $this->postDao->deletePost($this->postId, $this->sanitizer);
@@ -536,6 +623,18 @@ class PostEvent
   }
 
   /**
+   * visibilityDropDown
+   *
+   * @param string $selected
+   * @return string
+   * 
+   */
+  public function visibilityDropDown($selected = "")
+  {
+    return $this->postDao->dropDownVisibility($selected);
+  }
+
+  /**
    * postAuthorId
    * Checking whether author cookie_id or session_id exists
    * 
@@ -548,9 +647,11 @@ class PostEvent
     if (isset(Session::getInstance()->scriptlog_session_id)) {
 
       return Session::getInstance()->scriptlog_session_id;
+
     }
 
     return false;
+
   }
 
   /**
