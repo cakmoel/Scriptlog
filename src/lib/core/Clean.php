@@ -70,7 +70,7 @@ class Clean
 
     // Remove namespaced elements (we do not need them)
     $data = preg_replace('#</*\w+:\w[^>]*+>#i', '', $data);
-    if($addslashes){
+    if ($addslashes){
       $data = addslashes($data);
     }
     do
