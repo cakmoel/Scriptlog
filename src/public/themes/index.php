@@ -1,2 +1,2 @@
 <?php
-
+// Powering your blog
