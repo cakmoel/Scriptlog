@@ -1,6 +1,6 @@
 <?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * Registry Class
+ * class Registry
  * 
  * @category  Core Class
  * @author    M.Noermoehammad
@@ -12,103 +12,118 @@
 class Registry
 {
 
-/**
- * objects
- *
- * @var array of objects
- * 
- */
-private static $objects;
+  /**
+   * objects
+   *
+   * @var array of objects
+   * 
+   */
+  private static $objects;
 
-/**
- * Data registered
- * 
- * @property array $_data
- * @static
- * @var array
- */
- private static $data = [];
- 
-public function __construct() {}
+  /**
+   * Data registered
+   * 
+   * @property array $_data
+   * @static
+   * @var array
+   */
+  private static $data = [];
 
-/**
- * get
- * 
- * @method get()
- * @static
- * @param string $key
- */
- public static function get($key)
- {
-   
-  return isset(self::$data[$key]) ? self::$data[$key] : null;
+  /**
+   * constructor
+   */
+  public function __construct()
+  {
+  }
 
- }
- 
-/**
- * set
- * 
- * @method public set()
- * @static
- * @param string $key
- * @param string $value
- * 
- */
- public static function set($key, $value)
- {
-   self::$data[$key] = $value;
- }
- 
-/**
- * set All
- * 
- * @method public setAll()
- * @static
- * @param array $key
- * 
- */
- public static function setAll(array $key = []) 
- {
-   self::$data = $key;
- }
- 
-/**
- * Is key set
- * Checking whether key set or not
- * 
- * @method public isKeySet()
- * @static
- * @param string $key
- * @return array
- * 
- */
- public static function isKeySet($key)
- {
-   return isset(self::$data[$key]);  
- }
- 
-/**
- * registryObject
- *
- * @return void
- */
- public static function registerObject( $object, $key )
- {
+  /**
+   * get
+   * 
+   * @method get()
+   * @static
+   * @param string $key
+   */
+  public static function get($key)
+  {
+    // Check if the key exists
+    if (!isset(self::$data[$key])) {
+      // If the key does not exist, return null
+      return null;
+    }
 
-   self::$objects[$key] = new $object(self::$objects);
+    return self::$data[$key];
+  }
 
- }
+  /**
+   * set
+   * 
+   * @method public set()
+   * @static
+   * @param string $key
+   * @param string $value
+   * 
+   */
+  public static function set($key, $value)
+  {
+    // Set the value of the key
+    self::$data[$key] = $value;
+  }
 
-/**
- * getObjectRegistered
- *
- * @param string $key
- * @return Object
- * 
- */
- public static function getObjectRegistered( $key )
- {
-   return self::$objects[ $key ];
- }
+  /**
+   * setAll
+   * 
+   * @method public setAll()
+   * @static
+   * @param array $key
+   * 
+   */
+  public static function setAll(array $key = [])
+  {
+    // Set all the values in the array
+    self::$data = $key;
+  }
 
+  /**
+   * Is key set
+   * Checking whether key set or not
+   * 
+   * @method public isKeySet()
+   * @static
+   * @param string $key
+   * @return array
+   * 
+   */
+  public static function isKeySet($key)
+  {
+    // Checking if the key exists
+    return isset(self::$data[$key]);
+  }
+
+  /**
+   * registryObject
+   *
+   * @return void
+   */
+  public static function registerObject($object, $key)
+  {
+    // Create a new instance of the object
+    $newObject = new $object(self::$objects);
+
+    // Set the object int the registry
+    self::$objects[$key] = $newObject;
+
+  }
+
+  /**
+   * getObjectRegistered
+   *
+   * @param string $key
+   * @return Object
+   * 
+   */
+  public static function getObjectRegistered($key)
+  {
+    // Get the object from the registry
+    return self::$objects[$key];
+  }
 }

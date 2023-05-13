@@ -44,15 +44,7 @@ $proxy_headers = [
 
 foreach ($proxy_headers as $header) {
     
-    if( ( isset($_SERVER[$header]) ) && ( !empty($_SERVER[$header]) ) ) {
-
-         return true;
-
-    } else {
-
-         return false;
-         
-    }
+    return ((isset($_SERVER[$header])) && (! empty($_SERVER[$header]))) ? true : false;
 
 }
 

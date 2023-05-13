@@ -7,9 +7,8 @@
         <small>Control Panel</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
-        <li><a href="index.php?load=option-general">General Settings</a></li>
-        <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home </a></li>
+        <li class="active"><a href="index.php?load=option-general"><?=(isset($pageTitle)) ? $pageTitle : ""; ?> </a></li>
       </ol>
     </section>
 
@@ -62,7 +61,7 @@ $action = (isset($formAction)) ? $formAction : null;
 ?>
 
 <div class="box-body">
-  <form method="post" action="<?= generate_request('index.php', 'get', ['option-general', $action, 0])['link']; ?>" role="form">
+  <form method="post" action="<?= generate_request('index.php', 'get', ['option-general', $action, 0])['link']; ?>" >
     <table class="table table-bordered table-striped" aria-describedby="general-setting">
           <tbody>
           <?php 

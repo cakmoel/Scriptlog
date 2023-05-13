@@ -1,4 +1,5 @@
-<?php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+
 use Medoo\Medoo;
 
 /**

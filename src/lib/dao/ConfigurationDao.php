@@ -37,7 +37,7 @@ public function updateConfig($sanitize, $bind, $configId)
 {
   $cleanId = $this->filteringId($sanitize, $configId, 'sql');
 
-  if ( !empty($bind['setting_name'])) {
+  if (!empty($bind['setting_name'])) {
 
     $this->modify("tbl_settings", [
 

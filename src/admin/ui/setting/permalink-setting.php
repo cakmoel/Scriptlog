@@ -8,9 +8,8 @@
       <small>Control Panel</small>
     </h1>
     <ol class="breadcrumb">
-      <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-      <li><a href="index.php?load=option-permalink">Permalink setting</a></li>
-      <li class="active"><?= (isset($pageTitle)) ? $pageTitle : ""; ?></li>
+      <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home </a></li>
+      <li class="active"><a href="index.php?load=option-permalink"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></a></li>
     </ol>
   </section>
 
@@ -61,7 +60,7 @@
 
           <div class="box-body">
 
-            <form method="post" action="<?= generate_request('index.php', 'get', ['option-permalink', $action, 0])['link']; ?>" role="form">
+            <form method="post" action="<?= generate_request('index.php', 'get', ['option-permalink', $action, 0])['link']; ?>" >
               <input type="hidden" name="setting_id" value="<?= $paramId; ?>">
               <input type="hidden" name="setting_name" value="<?= (!isset($permalinkData['setting_name']) ?: safe_html($permalinkData['setting_name'])); ?>">
               <div class="form-group">

@@ -2,12 +2,12 @@
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2014 - 2016
  * @version 1.3.4
  *
- * Date formatter utility library that allows formatting date/time variables or Date objects using PHP DateTime format.
+ * Date formatter utility library that allows formatting date/time letiables or Date objects using PHP DateTime format.
  * @see http://php.net/manual/en/function.date.php
  *
  * For more JQuery plugins visit http://plugins.krajee.com
  * For more Yii related demos visit http://demos.krajee.com
- */var DateFormatter;!function(){"use strict";var t,e,r,n,a,u,i;u=864e5,i=3600,t=function(t,e){return"string"==typeof t&&"string"==typeof e&&t.toLowerCase()===e.toLowerCase()},e=function(t,r,n){var a=n||"0",u=t.toString();return u.length<r?e(a+u,r):u},r=function(t){var e,n;for(t=t||{},e=1;e<arguments.length;e++)if(n=arguments[e])for(var a in n)n.hasOwnProperty(a)&&("object"==typeof n[a]?r(t[a],n[a]):t[a]=n[a]);return t},n=function(t,e){for(var r=0;r<e.length;r++)if(e[r].toLowerCase()===t.toLowerCase())return r;return-1},a={dateSettings:{days:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],daysShort:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],months:["January","February","March","April","May","June","July","August","September","October","November","December"],monthsShort:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],meridiem:["AM","PM"],ordinal:function(t){var e=t%10,r={1:"st",2:"nd",3:"rd"};return 1!==Math.floor(t%100/10)&&r[e]?r[e]:"th"}},separators:/[ \-+\/\.T:@]/g,validParts:/[dDjlNSwzWFmMntLoYyaABgGhHisueTIOPZcrU]/g,intParts:/[djwNzmnyYhHgGis]/g,tzParts:/\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,tzClip:/[^-+\dA-Z]/g},DateFormatter=function(t){var e=this,n=r(a,t);e.dateSettings=n.dateSettings,e.separators=n.separators,e.validParts=n.validParts,e.intParts=n.intParts,e.tzParts=n.tzParts,e.tzClip=n.tzClip},DateFormatter.prototype={constructor:DateFormatter,getMonth:function(t){var e,r=this;return e=n(t,r.dateSettings.monthsShort)+1,0===e&&(e=n(t,r.dateSettings.months)+1),e},parseDate:function(e,r){var n,a,u,i,s,o,c,f,l,h,d=this,g=!1,m=!1,p=d.dateSettings,y={date:null,year:null,month:null,day:null,hour:0,min:0,sec:0};if(!e)return null;if(e instanceof Date)return e;if("U"===r)return u=parseInt(e),u?new Date(1e3*u):e;switch(typeof e){case"number":return new Date(e);case"string":break;default:return null}if(n=r.match(d.validParts),!n||0===n.length)throw new Error("Invalid date format definition.");for(a=e.replace(d.separators,"\x00").split("\x00"),u=0;u<a.length;u++)switch(i=a[u],s=parseInt(i),n[u]){case"y":case"Y":if(!s)return null;l=i.length,y.year=2===l?parseInt((70>s?"20":"19")+i):s,g=!0;break;case"m":case"n":case"M":case"F":if(isNaN(s)){if(o=d.getMonth(i),!(o>0))return null;y.month=o}else{if(!(s>=1&&12>=s))return null;y.month=s}g=!0;break;case"d":case"j":if(!(s>=1&&31>=s))return null;y.day=s,g=!0;break;case"g":case"h":if(c=n.indexOf("a")>-1?n.indexOf("a"):n.indexOf("A")>-1?n.indexOf("A"):-1,h=a[c],c>-1)f=t(h,p.meridiem[0])?0:t(h,p.meridiem[1])?12:-1,s>=1&&12>=s&&f>-1?y.hour=s+f-1:s>=0&&23>=s&&(y.hour=s);else{if(!(s>=0&&23>=s))return null;y.hour=s}m=!0;break;case"G":case"H":if(!(s>=0&&23>=s))return null;y.hour=s,m=!0;break;case"i":if(!(s>=0&&59>=s))return null;y.min=s,m=!0;break;case"s":if(!(s>=0&&59>=s))return null;y.sec=s,m=!0}if(g===!0&&y.year&&y.month&&y.day)y.date=new Date(y.year,y.month-1,y.day,y.hour,y.min,y.sec,0);else{if(m!==!0)return null;y.date=new Date(0,0,0,y.hour,y.min,y.sec,0)}return y.date},guessDate:function(t,e){if("string"!=typeof t)return t;var r,n,a,u,i,s,o=this,c=t.replace(o.separators,"\x00").split("\x00"),f=/^[djmn]/g,l=e.match(o.validParts),h=new Date,d=0;if(!f.test(l[0]))return t;for(a=0;a<c.length;a++){if(d=2,i=c[a],s=parseInt(i.substr(0,2)),isNaN(s))return null;switch(a){case 0:"m"===l[0]||"n"===l[0]?h.setMonth(s-1):h.setDate(s);break;case 1:"m"===l[0]||"n"===l[0]?h.setDate(s):h.setMonth(s-1);break;case 2:if(n=h.getFullYear(),r=i.length,d=4>r?r:4,n=parseInt(4>r?n.toString().substr(0,4-r)+i:i.substr(0,4)),!n)return null;h.setFullYear(n);break;case 3:h.setHours(s);break;case 4:h.setMinutes(s);break;case 5:h.setSeconds(s)}u=i.substr(d),u.length>0&&c.splice(a+1,0,u)}return h},parseFormat:function(t,r){var n,a=this,s=a.dateSettings,o=/\\?(.?)/gi,c=function(t,e){return n[t]?n[t]():e};return n={d:function(){return e(n.j(),2)},D:function(){return s.daysShort[n.w()]},j:function(){return r.getDate()},l:function(){return s.days[n.w()]},N:function(){return n.w()||7},w:function(){return r.getDay()},z:function(){var t=new Date(n.Y(),n.n()-1,n.j()),e=new Date(n.Y(),0,1);return Math.round((t-e)/u)},W:function(){var t=new Date(n.Y(),n.n()-1,n.j()-n.N()+3),r=new Date(t.getFullYear(),0,4);return e(1+Math.round((t-r)/u/7),2)},F:function(){return s.months[r.getMonth()]},m:function(){return e(n.n(),2)},M:function(){return s.monthsShort[r.getMonth()]},n:function(){return r.getMonth()+1},t:function(){return new Date(n.Y(),n.n(),0).getDate()},L:function(){var t=n.Y();return t%4===0&&t%100!==0||t%400===0?1:0},o:function(){var t=n.n(),e=n.W(),r=n.Y();return r+(12===t&&9>e?1:1===t&&e>9?-1:0)},Y:function(){return r.getFullYear()},y:function(){return n.Y().toString().slice(-2)},a:function(){return n.A().toLowerCase()},A:function(){var t=n.G()<12?0:1;return s.meridiem[t]},B:function(){var t=r.getUTCHours()*i,n=60*r.getUTCMinutes(),a=r.getUTCSeconds();return e(Math.floor((t+n+a+i)/86.4)%1e3,3)},g:function(){return n.G()%12||12},G:function(){return r.getHours()},h:function(){return e(n.g(),2)},H:function(){return e(n.G(),2)},i:function(){return e(r.getMinutes(),2)},s:function(){return e(r.getSeconds(),2)},u:function(){return e(1e3*r.getMilliseconds(),6)},e:function(){var t=/\((.*)\)/.exec(String(r))[1];return t||"Coordinated Universal Time"},I:function(){var t=new Date(n.Y(),0),e=Date.UTC(n.Y(),0),r=new Date(n.Y(),6),a=Date.UTC(n.Y(),6);return t-e!==r-a?1:0},O:function(){var t=r.getTimezoneOffset(),n=Math.abs(t);return(t>0?"-":"+")+e(100*Math.floor(n/60)+n%60,4)},P:function(){var t=n.O();return t.substr(0,3)+":"+t.substr(3,2)},T:function(){var t=(String(r).match(a.tzParts)||[""]).pop().replace(a.tzClip,"");return t||"UTC"},Z:function(){return 60*-r.getTimezoneOffset()},c:function(){return"Y-m-d\\TH:i:sP".replace(o,c)},r:function(){return"D, d M Y H:i:s O".replace(o,c)},U:function(){return r.getTime()/1e3||0}},c(t,t)},formatDate:function(t,e){var r,n,a,u,i,s=this,o="",c="\\";if("string"==typeof t&&(t=s.parseDate(t,e),!t))return null;if(t instanceof Date){for(a=e.length,r=0;a>r;r++)i=e.charAt(r),"S"!==i&&i!==c&&(r>0&&e.charAt(r-1)===c?o+=i:(u=s.parseFormat(i,t),r!==a-1&&s.intParts.test(i)&&"S"===e.charAt(r+1)&&(n=parseInt(u)||0,u+=s.dateSettings.ordinal(n)),o+=u));return o}return""}}}();
+ */let DateFormatter;!function(){"use strict";let t,e,r,n,a,u,i;u=864e5,i=3600,t=function(t,e){return"string"==typeof t&&"string"==typeof e&&t.toLowerCase()===e.toLowerCase()},e=function(t,r,n){let a=n||"0",u=t.toString();return u.length<r?e(a+u,r):u},r=function(t){let e,n;for(t=t||{},e=1;e<arguments.length;e++)if(n=arguments[e])for(let a in n)n.hasOwnProperty(a)&&("object"==typeof n[a]?r(t[a],n[a]):t[a]=n[a]);return t},n=function(t,e){for(let r=0;r<e.length;r++)if(e[r].toLowerCase()===t.toLowerCase())return r;return-1},a={dateSettings:{days:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],daysShort:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],months:["January","February","March","April","May","June","July","August","September","October","November","December"],monthsShort:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],meridiem:["AM","PM"],ordinal:function(t){let e=t%10,r={1:"st",2:"nd",3:"rd"};return 1!==Math.floor(t%100/10)&&r[e]?r[e]:"th"}},separators:/[ \-+\/\.T:@]/g,validParts:/[dDjlNSwzWFmMntLoYyaABgGhHisueTIOPZcrU]/g,intParts:/[djwNzmnyYhHgGis]/g,tzParts:/\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,tzClip:/[^-+\dA-Z]/g},DateFormatter=function(t){let e=this,n=r(a,t);e.dateSettings=n.dateSettings,e.separators=n.separators,e.validParts=n.validParts,e.intParts=n.intParts,e.tzParts=n.tzParts,e.tzClip=n.tzClip},DateFormatter.prototype={constructor:DateFormatter,getMonth:function(t){let e,r=this;return e=n(t,r.dateSettings.monthsShort)+1,0===e&&(e=n(t,r.dateSettings.months)+1),e},parseDate:function(e,r){let n,a,u,i,s,o,c,f,l,h,d=this,g=!1,m=!1,p=d.dateSettings,y={date:null,year:null,month:null,day:null,hour:0,min:0,sec:0};if(!e)return null;if(e instanceof Date)return e;if("U"===r)return u=parseInt(e),u?new Date(1e3*u):e;switch(typeof e){case"number":return new Date(e);case"string":break;default:return null}if(n=r.match(d.validParts),!n||0===n.length)throw new Error("Invalid date format definition.");for(a=e.replace(d.separators,"\x00").split("\x00"),u=0;u<a.length;u++)switch(i=a[u],s=parseInt(i),n[u]){case"y":case"Y":if(!s)return null;l=i.length,y.year=2===l?parseInt((70>s?"20":"19")+i):s,g=!0;break;case"m":case"n":case"M":case"F":if(isNaN(s)){if(o=d.getMonth(i),!(o>0))return null;y.month=o}else{if(!(s>=1&&12>=s))return null;y.month=s}g=!0;break;case"d":case"j":if(!(s>=1&&31>=s))return null;y.day=s,g=!0;break;case"g":case"h":if(c=n.indexOf("a")>-1?n.indexOf("a"):n.indexOf("A")>-1?n.indexOf("A"):-1,h=a[c],c>-1)f=t(h,p.meridiem[0])?0:t(h,p.meridiem[1])?12:-1,s>=1&&12>=s&&f>-1?y.hour=s+f-1:s>=0&&23>=s&&(y.hour=s);else{if(!(s>=0&&23>=s))return null;y.hour=s}m=!0;break;case"G":case"H":if(!(s>=0&&23>=s))return null;y.hour=s,m=!0;break;case"i":if(!(s>=0&&59>=s))return null;y.min=s,m=!0;break;case"s":if(!(s>=0&&59>=s))return null;y.sec=s,m=!0}if(g===!0&&y.year&&y.month&&y.day)y.date=new Date(y.year,y.month-1,y.day,y.hour,y.min,y.sec,0);else{if(m!==!0)return null;y.date=new Date(0,0,0,y.hour,y.min,y.sec,0)}return y.date},guessDate:function(t,e){if("string"!=typeof t)return t;let r,n,a,u,i,s,o=this,c=t.replace(o.separators,"\x00").split("\x00"),f=/^[djmn]/g,l=e.match(o.validParts),h=new Date,d=0;if(!f.test(l[0]))return t;for(a=0;a<c.length;a++){if(d=2,i=c[a],s=parseInt(i.substr(0,2)),isNaN(s))return null;switch(a){case 0:"m"===l[0]||"n"===l[0]?h.setMonth(s-1):h.setDate(s);break;case 1:"m"===l[0]||"n"===l[0]?h.setDate(s):h.setMonth(s-1);break;case 2:if(n=h.getFullYear(),r=i.length,d=4>r?r:4,n=parseInt(4>r?n.toString().substr(0,4-r)+i:i.substr(0,4)),!n)return null;h.setFullYear(n);break;case 3:h.setHours(s);break;case 4:h.setMinutes(s);break;case 5:h.setSeconds(s)}u=i.substr(d),u.length>0&&c.splice(a+1,0,u)}return h},parseFormat:function(t,r){let n,a=this,s=a.dateSettings,o=/\\?(.?)/gi,c=function(t,e){return n[t]?n[t]():e};return n={d:function(){return e(n.j(),2)},D:function(){return s.daysShort[n.w()]},j:function(){return r.getDate()},l:function(){return s.days[n.w()]},N:function(){return n.w()||7},w:function(){return r.getDay()},z:function(){let t=new Date(n.Y(),n.n()-1,n.j()),e=new Date(n.Y(),0,1);return Math.round((t-e)/u)},W:function(){let t=new Date(n.Y(),n.n()-1,n.j()-n.N()+3),r=new Date(t.getFullYear(),0,4);return e(1+Math.round((t-r)/u/7),2)},F:function(){return s.months[r.getMonth()]},m:function(){return e(n.n(),2)},M:function(){return s.monthsShort[r.getMonth()]},n:function(){return r.getMonth()+1},t:function(){return new Date(n.Y(),n.n(),0).getDate()},L:function(){let t=n.Y();return t%4===0&&t%100!==0||t%400===0?1:0},o:function(){let t=n.n(),e=n.W(),r=n.Y();return r+(12===t&&9>e?1:1===t&&e>9?-1:0)},Y:function(){return r.getFullYear()},y:function(){return n.Y().toString().slice(-2)},a:function(){return n.A().toLowerCase()},A:function(){let t=n.G()<12?0:1;return s.meridiem[t]},B:function(){let t=r.getUTCHours()*i,n=60*r.getUTCMinutes(),a=r.getUTCSeconds();return e(Math.floor((t+n+a+i)/86.4)%1e3,3)},g:function(){return n.G()%12||12},G:function(){return r.getHours()},h:function(){return e(n.g(),2)},H:function(){return e(n.G(),2)},i:function(){return e(r.getMinutes(),2)},s:function(){return e(r.getSeconds(),2)},u:function(){return e(1e3*r.getMilliseconds(),6)},e:function(){let t=/\((.*)\)/.exec(String(r))[1];return t||"Coordinated Universal Time"},I:function(){let t=new Date(n.Y(),0),e=Date.UTC(n.Y(),0),r=new Date(n.Y(),6),a=Date.UTC(n.Y(),6);return t-e!==r-a?1:0},O:function(){let t=r.getTimezoneOffset(),n=Math.abs(t);return(t>0?"-":"+")+e(100*Math.floor(n/60)+n%60,4)},P:function(){let t=n.O();return t.substr(0,3)+":"+t.substr(3,2)},T:function(){let t=(String(r).match(a.tzParts)||[""]).pop().replace(a.tzClip,"");return t||"UTC"},Z:function(){return 60*-r.getTimezoneOffset()},c:function(){return"Y-m-d\\TH:i:sP".replace(o,c)},r:function(){return"D, d M Y H:i:s O".replace(o,c)},U:function(){return r.getTime()/1e3||0}},c(t,t)},formatDate:function(t,e){let r,n,a,u,i,s=this,o="",c="\\";if("string"==typeof t&&(t=s.parseDate(t,e),!t))return null;if(t instanceof Date){for(a=e.length,r=0;a>r;r++)i=e.charAt(r),"S"!==i&&i!==c&&(r>0&&e.charAt(r-1)===c?o+=i:(u=s.parseFormat(i,t),r!==a-1&&s.intParts.test(i)&&"S"===e.charAt(r+1)&&(n=parseInt(u)||0,u+=s.dateSettings.ordinal(n)),o+=u));return o}return""}}}();
 /**
  * @preserve jQuery DateTimePicker
  * @homepage http://xdsoft.net/jqplugins/datetimepicker/
@@ -17,10 +17,10 @@
 /**
  * @param {jQuery} $
  */
-var datetimepickerFactory = function ($) {
+let datetimepickerFactory = function ($) {
 	'use strict';
 
-	var default_options  = {
+	let default_options  = {
 		i18n: {
 			ar: { // Arabic
 				months: [
@@ -289,7 +289,7 @@ var datetimepickerFactory = function ($) {
 			},
 			az: { //Azerbaijanian (Azeri)
 				months: [
-					"Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"
+					"Yanlet", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"
 				],
 				dayOfWeekShort: [
 					"B", "Be", "Ça", "Ç", "Ca", "C", "Ş"
@@ -640,16 +640,16 @@ var datetimepickerFactory = function ($) {
 		showApplyButton: false
 	};
 
-	var dateHelper = null,
+	let dateHelper = null,
 		globalLocaleDefault = 'en',
 		globalLocale = 'en';
 
-	var dateFormatterOptionsDefault = {
+	let dateFormatterOptionsDefault = {
 		meridiem: ['AM', 'PM']
 	};
 
-	var initDateFormatter = function(){
-		var locale = default_options.i18n[globalLocale],
+	let initDateFormatter = function(){
+		let locale = default_options.i18n[globalLocale],
 			opts = {
 				days: locale.dayOfWeek,
 				daysShort: locale.dayOfWeekShort,
@@ -667,7 +667,7 @@ var datetimepickerFactory = function ($) {
 	// for locale settings
 	$.datetimepicker = {
 		setLocale: function(locale){
-			var newLocale = default_options.i18n[locale] ? locale : globalLocaleDefault;
+			let newLocale = default_options.i18n[locale] ? locale : globalLocaleDefault;
 			if (globalLocale !== newLocale) {
 				globalLocale = newLocale;
 				// reinit date formatter
@@ -698,7 +698,7 @@ var datetimepickerFactory = function ($) {
 		window.getComputedStyle = function (el) {
 			this.el = el;
 			this.getPropertyValue = function (prop) {
-				var re = /(-([a-z]))/g;
+				let re = /(-([a-z]))/g;
 				if (prop === 'float') {
 					prop = 'styleFloat';
 				}
@@ -714,7 +714,7 @@ var datetimepickerFactory = function ($) {
 	}
 	if (!Array.prototype.indexOf) {
 		Array.prototype.indexOf = function (obj, start) {
-			var i, j;
+			let i, j;
 			for (i = (start || 0), j = this.length; i < j; i += 1) {
 				if (this[i] === obj) { return i; }
 			}
@@ -728,9 +728,9 @@ var datetimepickerFactory = function ($) {
 
 	$.fn.xdsoftScroller = function (options, percent) {
 		return this.each(function () {
-			var timeboxparent = $(this),
+			let timeboxparent = $(this),
 				pointerEventToXY = function (e) {
-					var out = {x: 0, y: 0},
+					let out = {x: 0, y: 0},
 						touch;
 					if (e.type === 'touchstart' || e.type === 'touchmove' || e.type === 'touchend' || e.type === 'touchcancel') {
 						touch  = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
@@ -771,7 +771,7 @@ var datetimepickerFactory = function ($) {
 
 				timeboxparent.addClass('xdsoft_scroller_box').append(scrollbar);
 				calcOffset = function calcOffset(event) {
-					var offset = pointerEventToXY(event).y - startY + startTopScroll;
+					let offset = pointerEventToXY(event).y - startY + startTopScroll;
 					if (offset < 0) {
 						offset = 0;
 					}
@@ -832,7 +832,7 @@ var datetimepickerFactory = function ($) {
 						}, 10);
 					})
 					.on('resize_scroll.xdsoft_scroller', function (event, percentage, noTriggerScroll) {
-						var percent, sh;
+						let percent, sh;
 						parentHeight = timeboxparent[0].clientHeight;
 						height = timebox[0].offsetHeight;
 						percent = parentHeight / height;
@@ -850,7 +850,7 @@ var datetimepickerFactory = function ($) {
 					});
 
 				timeboxparent.on('mousewheel', function (event) {
-					var top = Math.abs(parseInt(timebox.css('marginTop'), 10));
+					let top = Math.abs(parseInt(timebox.css('marginTop'), 10));
 
 					top = top - (event.deltaY * 20);
 					if (top < 0) {
@@ -870,7 +870,7 @@ var datetimepickerFactory = function ($) {
 				timeboxparent.on('touchmove', function (event) {
 					if (start) {
 						event.preventDefault();
-						var coord = pointerEventToXY(event);
+						let coord = pointerEventToXY(event);
 						timeboxparent.trigger('scroll_element.xdsoft_scroller', [(startTop - (coord.y - start.y)) / (height - parentHeight)]);
 					}
 				});
@@ -885,7 +885,7 @@ var datetimepickerFactory = function ($) {
 	};
 
 	$.fn.datetimepicker = function (opt, opt2) {
-		var result = this,
+		let result = this,
 			KEY0 = 48,
 			KEY9 = 57,
 			_KEY0 = 96,
@@ -933,7 +933,7 @@ var datetimepickerFactory = function ($) {
 			};
 
 		createDateTimePicker = function (input) {
-			var datetimepicker = $('<div class="xdsoft_datetimepicker xdsoft_noselect"></div>'),
+			let datetimepicker = $('<div class="xdsoft_datetimepicker xdsoft_noselect"></div>'),
 				xdsoft_copyright = $('<div class="xdsoft_copyright"><a target="_blank" href="http://xdsoft.net/jqplugins/datetimepicker/">xdsoft.net</a></div>'),
 				datepicker = $('<div class="xdsoft_datepicker active"></div>'),
 				month_picker = $('<div class="xdsoft_monthpicker"><button type="button" class="xdsoft_prev"></button><button type="button" class="xdsoft_today_button"></button>' +
@@ -943,7 +943,7 @@ var datetimepickerFactory = function ($) {
 				calendar = $('<div class="xdsoft_calendar"></div>'),
 				timepicker = $('<div class="xdsoft_timepicker active"><button type="button" class="xdsoft_prev"></button><div class="xdsoft_time_box"></div><button type="button" class="xdsoft_next"></button></div>'),
 				timeboxparent = timepicker.find('.xdsoft_time_box').eq(0),
-				timebox = $('<div class="xdsoft_time_variant"></div>'),
+				timebox = $('<div class="xdsoft_time_letiant"></div>'),
 				applyButton = $('<button type="button" class="xdsoft_save_selected blue-gradient-button">Save Selected</button>'),
 
 				monthselect = $('<div class="xdsoft_select xdsoft_monthselect"><div></div></div>'),
@@ -985,7 +985,7 @@ var datetimepickerFactory = function ($) {
 			month_picker
 				.find('.xdsoft_month,.xdsoft_year')
 				.on('touchstart mousedown.xdsoft', function (event) {
-					var select = $(this).find('.xdsoft_select').eq(0),
+					let select = $(this).find('.xdsoft_select').eq(0),
 						val = 0,
 						top = 0,
 						visible = select.is(':visible'),
@@ -1025,7 +1025,7 @@ var datetimepickerFactory = function ($) {
 						_xdsoft_datetime.currentTime = _xdsoft_datetime.now();
 					}
 
-					var year = _xdsoft_datetime.currentTime.getFullYear();
+					let year = _xdsoft_datetime.currentTime.getFullYear();
 					if (_xdsoft_datetime && _xdsoft_datetime.currentTime) {
 						_xdsoft_datetime.currentTime[$(this).parent().parent().hasClass('xdsoft_monthselect') ? 'setMonth' : 'setFullYear']($(this).data('value'));
 					}
@@ -1047,7 +1047,7 @@ var datetimepickerFactory = function ($) {
 			};
 
 			datetimepicker.setOptions = function (_options) {
-				var highlightedDates = {};
+				let highlightedDates = {};
 
 				options = $.extend(true, {}, options, _options);
 
@@ -1069,7 +1069,7 @@ var datetimepickerFactory = function ($) {
 
 				if (_options.highlightedDates && $.isArray(_options.highlightedDates) && _options.highlightedDates.length) {
 					$.each(_options.highlightedDates, function (index, value) {
-						var splitData = $.map(value.split(','), $.trim),
+						let splitData = $.map(value.split(','), $.trim),
 							exDesc,
 							hDate = new HighlightedDate(dateHelper.parseDate(splitData[0], options.formatDate), splitData[1], splitData[2]), // date, desc, style
 							keyDate = dateHelper.formatDate(hDate.date, options.formatDate);
@@ -1089,7 +1089,7 @@ var datetimepickerFactory = function ($) {
 				if (_options.highlightedPeriods && $.isArray(_options.highlightedPeriods) && _options.highlightedPeriods.length) {
 					highlightedDates = $.extend(true, [], options.highlightedDates);
 					$.each(_options.highlightedPeriods, function (index, value) {
-						var dateTest, // start date
+						let dateTest, // start date
 							dateEnd,
 							desc,
 							hDate,
@@ -1103,7 +1103,7 @@ var datetimepickerFactory = function ($) {
 							style = value[3];
 						}
 						else {
-							var splitData = $.map(value.split(','), $.trim);
+							let splitData = $.map(value.split(','), $.trim);
 							dateTest = dateHelper.parseDate(splitData[0], options.formatDate);
 							dateEnd = dateHelper.parseDate(splitData[1], options.formatDate);
 							desc = splitData[2];
@@ -1217,11 +1217,11 @@ var datetimepickerFactory = function ($) {
 								$(this).val(null);
 								datetimepicker.data('xdsoft_datetime').empty();
 							} else {
-								var d = dateHelper.parseDate($(this).val(), options.format);
+								let d = dateHelper.parseDate($(this).val(), options.format);
 								if (d) { // parseDate() may skip some invalid parts like date or time, so make it clear for user: show parsed date/time
 									$(this).val(dateHelper.formatDate(d, options.format));
 								} else {
-									var splittedHours   = +([$(this).val()[0], $(this).val()[1]].join('')),
+									let splittedHours   = +([$(this).val()[0], $(this).val()[1]].join('')),
 										splittedMinutes = +([$(this).val()[2], $(this).val()[3]].join(''));
 
 									// parse the numbers as 0312 => 03:12
@@ -1283,9 +1283,9 @@ var datetimepickerFactory = function ($) {
 				.append(datetimepicker);
 
 			XDSoft_datetime = function () {
-				var _this = this;
+				let _this = this;
 				_this.now = function (norecursion) {
-					var d = new Date(),
+					let d = new Date(),
 						date,
 						time;
 
@@ -1346,7 +1346,7 @@ var datetimepickerFactory = function ($) {
 						_this.currentTime = _this.now();
 					}
 
-					var month = _this.currentTime.getMonth() + 1,
+					let month = _this.currentTime.getMonth() + 1,
 						year;
 					if (month === 12) {
 						_this.currentTime.setFullYear(_this.currentTime.getFullYear() + 1);
@@ -1381,7 +1381,7 @@ var datetimepickerFactory = function ($) {
 						_this.currentTime = _this.now();
 					}
 
-					var month = _this.currentTime.getMonth() - 1;
+					let month = _this.currentTime.getMonth() - 1;
 					if (month === -1) {
 						_this.currentTime.setFullYear(_this.currentTime.getFullYear() - 1);
 						month = 11;
@@ -1402,12 +1402,12 @@ var datetimepickerFactory = function ($) {
 
 				_this.getWeekOfYear = function (datetime) {
 					if (options.onGetWeekOfYear && $.isFunction(options.onGetWeekOfYear)) {
-						var week = options.onGetWeekOfYear.call(datetimepicker, datetime);
+						let week = options.onGetWeekOfYear.call(datetimepicker, datetime);
 						if (typeof week !== 'undefined') {
 							return week;
 						}
 					}
-					var onejan = new Date(datetime.getFullYear(), 0, 1);
+					let onejan = new Date(datetime.getFullYear(), 0, 1);
 
 					//First week of the year is th one with the first Thursday according to ISO8601
 					if (onejan.getDay() !== 4) {
@@ -1418,7 +1418,7 @@ var datetimepickerFactory = function ($) {
 				};
 
 				_this.strToDateTime = function (sDateTime) {
-					var tmpDate = [], timeOffset, currentTime;
+					let tmpDate = [], timeOffset, currentTime;
 
 					if (sDateTime && sDateTime instanceof Date && _this.isValidDate(sDateTime)) {
 						return sDateTime;
@@ -1449,7 +1449,7 @@ var datetimepickerFactory = function ($) {
 						return sDate;
 					}
 
-					var currentTime = sDate ? dateHelper.parseDate(sDate, options.formatDate) : _this.now(true);
+					let currentTime = sDate ? dateHelper.parseDate(sDate, options.formatDate) : _this.now(true);
 					if (!_this.isValidDate(currentTime)) {
 						currentTime = _this.now(true);
 					}
@@ -1460,7 +1460,7 @@ var datetimepickerFactory = function ($) {
 					if (sTime && sTime instanceof Date && _this.isValidDate(sTime)) {
 						return sTime;
 					}
-					var currentTime = sTime ? dateHelper.parseDate(sTime, options.formatTime) : _this.now(true);
+					let currentTime = sTime ? dateHelper.parseDate(sTime, options.formatTime) : _this.now(true);
 					if (!_this.isValidDate(currentTime)) {
 						currentTime = _this.now(true);
 					}
@@ -1489,7 +1489,7 @@ var datetimepickerFactory = function ($) {
 					_xdsoft_datetime.setCurrentTime(0, true);
 					datetimepicker.trigger('afterOpen.xdsoft');
 				}).on('dblclick.xdsoft', function () {
-				var currentDate = _xdsoft_datetime.getCurrentTime(), minDate, maxDate;
+				let currentDate = _xdsoft_datetime.getCurrentTime(), minDate, maxDate;
 				currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
 				minDate = _xdsoft_datetime.strToDate(options.minDate);
 				minDate = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate());
@@ -1508,7 +1508,7 @@ var datetimepickerFactory = function ($) {
 			month_picker
 				.find('.xdsoft_prev,.xdsoft_next')
 				.on('touchend mousedown.xdsoft', function () {
-					var $this = $(this),
+					let $this = $(this),
 						timer = 0,
 						stop = false;
 
@@ -1535,12 +1535,12 @@ var datetimepickerFactory = function ($) {
 			timepicker
 				.find('.xdsoft_prev,.xdsoft_next')
 				.on('touchend mousedown.xdsoft', function () {
-					var $this = $(this),
+					let $this = $(this),
 						timer = 0,
 						stop = false,
 						period = 110;
 					(function arguments_callee4(v) {
-						var pheight = timeboxparent[0].clientHeight,
+						let pheight = timeboxparent[0].clientHeight,
 							height = timebox[0].offsetHeight,
 							top = Math.abs(parseInt(timebox.css('marginTop'), 10));
 						if ($this.hasClass(options.next) && (height - pheight) - options.timeHeightInTimePicker >= top) {
@@ -1586,7 +1586,7 @@ var datetimepickerFactory = function ($) {
 							_xdsoft_datetime.currentTime = _xdsoft_datetime.now();
 						}
 
-						var table =	'',
+						let table =	'',
 							start = new Date(_xdsoft_datetime.currentTime.getFullYear(), _xdsoft_datetime.currentTime.getMonth(), 1, 12, 0, 0),
 							i = 0,
 							j,
@@ -1739,7 +1739,7 @@ var datetimepickerFactory = function ($) {
 						m = '';
 
 						line_time = function line_time(h, m) {
-							var now = _xdsoft_datetime.now(), optionDateTime, current_time,
+							let now = _xdsoft_datetime.now(), optionDateTime, current_time,
 								isALlowTimesInit = options.allowTimes && $.isArray(options.allowTimes) && options.allowTimes.length;
 							now.setHours(h);
 							h = parseInt(now.getHours(), 10);
@@ -1814,7 +1814,7 @@ var datetimepickerFactory = function ($) {
 				})
 				.on('afterOpen.xdsoft', function () {
 					if (options.timepicker) {
-						var classType, pheight, height, top;
+						let classType, pheight, height, top;
 						if (timebox.find('.xdsoft_current').length) {
 							classType = '.xdsoft_current';
 						} else if (timebox.find('.xdsoft_init_time').length) {
@@ -1839,7 +1839,7 @@ var datetimepickerFactory = function ($) {
 				.on('touchend click.xdsoft', 'td', function (xdevent) {
 					xdevent.stopPropagation();  // Prevents closing of Pop-ups, Modals and Flyouts in Bootstrap
 					timerclick += 1;
-					var $this = $(this),
+					let $this = $(this),
 						currentTime = _xdsoft_datetime.currentTime;
 
 					if (currentTime === undefined || currentTime === null) {
@@ -1878,7 +1878,7 @@ var datetimepickerFactory = function ($) {
 			timebox
 				.on('touchend click.xdsoft', 'div', function (xdevent) {
 					xdevent.stopPropagation();
-					var $this = $(this),
+					let $this = $(this),
 						currentTime = _xdsoft_datetime.currentTime;
 
 					if (currentTime === undefined || currentTime === null) {
@@ -1947,7 +1947,7 @@ var datetimepickerFactory = function ($) {
 			datetimepicker
 				.on('changedatetime.xdsoft', function (event) {
 					if (options.onChangeDateTime && $.isFunction(options.onChangeDateTime)) {
-						var $input = datetimepicker.data('input');
+						let $input = datetimepicker.data('input');
 						options.onChangeDateTime.call(datetimepicker, _xdsoft_datetime.currentTime, $input, event);
 						delete options.value;
 						$input.trigger('change');
@@ -1993,7 +1993,7 @@ var datetimepickerFactory = function ($) {
 			 * @returns {undefined}
 			 */
 			setPos = function () {
-				var dateInputOffset,
+				let dateInputOffset,
 					dateInputElem,
 					verticalPosition,
 					left,
@@ -2021,7 +2021,7 @@ var datetimepickerFactory = function ($) {
 				windowScrollTop = $(options.contentWindow).scrollTop();
 
 				if ((options.ownerDocument.documentElement.clientWidth - dateInputOffset.left) < datepicker.parent().outerWidth(true)) {
-					var diff = datepicker.parent().outerWidth(true) - dateInputElem.offsetWidth;
+					let diff = datepicker.parent().outerWidth(true) - dateInputElem.offsetWidth;
 					left = left - diff;
 				}
 
@@ -2075,7 +2075,7 @@ var datetimepickerFactory = function ($) {
 				datetimepickerElem = datetimepicker[0];
 
 				forEachAncestorOf(datetimepickerElem, function (ancestorNode) {
-					var ancestorNodePosition;
+					let ancestorNodePosition;
 
 					ancestorNodePosition = options.contentWindow.getComputedStyle(ancestorNode).getPropertyValue('position');
 
@@ -2099,7 +2099,7 @@ var datetimepickerFactory = function ($) {
 
 			datetimepicker
 				.on('open.xdsoft', function (event) {
-					var onShow = true;
+					let onShow = true;
 					if (options.onShow && $.isFunction(options.onShow)) {
 						onShow = options.onShow.call(datetimepicker, _xdsoft_datetime.currentTime, datetimepicker.data('input'), event);
 					}
@@ -2119,7 +2119,7 @@ var datetimepickerFactory = function ($) {
 					}
 				})
 				.on('close.xdsoft', function (event) {
-					var onClose = true;
+					let onClose = true;
 					month_picker
 						.find('.xdsoft_month,.xdsoft_year')
 						.find('.xdsoft_select')
@@ -2147,7 +2147,7 @@ var datetimepickerFactory = function ($) {
 			datetimepicker.setOptions(options);
 
 			function getCurrentValue() {
-				var ct = false, time;
+				let ct = false, time;
 
 				if (options.startDate) {
 					ct = _xdsoft_datetime.strToDate(options.startDate);
@@ -2176,8 +2176,8 @@ var datetimepickerFactory = function ($) {
 
 			function setMask(options) {
 
-				var isValidValue = function (mask, value) {
-						var reg = mask
+				let isValidValue = function (mask, value) {
+						let reg = mask
 							.replace(/([\[\]\/\{\}\(\)\-\.\+]{1})/g, '\\$1')
 							.replace(/_/g, '{digit+}')
 							.replace(/([0-9]{1})/g, '{digit$1}')
@@ -2188,7 +2188,7 @@ var datetimepickerFactory = function ($) {
 					getCaretPos = function (input) {
 						try {
 							if (options.ownerDocument.selection && options.ownerDocument.selection.createRange) {
-								var range = options.ownerDocument.selection.createRange();
+								let range = options.ownerDocument.selection.createRange();
 								return range.getBookmark().charCodeAt(2) - 2;
 							}
 							if (input.setSelectionRange) {
@@ -2204,7 +2204,7 @@ var datetimepickerFactory = function ($) {
 							return false;
 						}
 						if (node.createTextRange) {
-							var textRange = node.createTextRange();
+							let textRange = node.createTextRange();
 							textRange.collapse(true);
 							textRange.moveEnd('character', pos);
 							textRange.moveStart('character', pos);
@@ -2251,7 +2251,7 @@ var datetimepickerFactory = function ($) {
 					}
 
 					input.on('keydown.xdsoft', function (event) {
-						var val = this.value,
+						let val = this.value,
 							key = event.which,
 							pos,
 							digit;
@@ -2328,7 +2328,7 @@ var datetimepickerFactory = function ($) {
 					}, 100);
 				})
 				.on('keydown.xdsoft', function (event) {
-					var elementSelector,
+					let elementSelector,
 						key = event.which;
 					if ([ENTER].indexOf(key) !== -1 && options.enterLikeTab) {
 						elementSelector = $("input:visible,textarea:visible,button:visible,a:visible");
@@ -2346,7 +2346,7 @@ var datetimepickerFactory = function ($) {
 				});
 		};
 		destroyDateTimePicker = function (input) {
-			var datetimepicker = input.data('xdsoft_datetimepicker');
+			let datetimepicker = input.data('xdsoft_datetimepicker');
 			if (datetimepicker) {
 				datetimepicker.data('xdsoft_datetime', null);
 				datetimepicker.remove();
@@ -2374,7 +2374,7 @@ var datetimepickerFactory = function ($) {
 			});
 
 		this.each(function () {
-			var datetimepicker = $(this).data('xdsoft_datetimepicker'), $input;
+			let datetimepicker = $(this).data('xdsoft_datetimepicker'), $input;
 			if (datetimepicker) {
 				if ($.type(opt) === 'string') {
 					switch (opt) {
@@ -2470,24 +2470,24 @@ var datetimepickerFactory = function ($) {
     }
 }(function ($) {
 
-    var toFix  = ['wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'],
+    let toFix  = ['wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'],
         toBind = ( 'onwheel' in document || document.documentMode >= 9 ) ?
                     ['wheel'] : ['mousewheel', 'DomMouseScroll', 'MozMousePixelScroll'],
         slice  = Array.prototype.slice,
         nullLowestDeltaTimeout, lowestDelta;
 
     if ( $.event.fixHooks ) {
-        for ( var i = toFix.length; i; ) {
+        for ( let i = toFix.length; i; ) {
             $.event.fixHooks[ toFix[--i] ] = $.event.mouseHooks;
         }
     }
 
-    var special = $.event.special.mousewheel = {
+    let special = $.event.special.mousewheel = {
         version: '3.1.12',
 
         setup: function() {
             if ( this.addEventListener ) {
-                for ( var i = toBind.length; i; ) {
+                for ( let i = toBind.length; i; ) {
                     this.addEventListener( toBind[--i], handler, false );
                 }
             } else {
@@ -2500,7 +2500,7 @@ var datetimepickerFactory = function ($) {
 
         teardown: function() {
             if ( this.removeEventListener ) {
-                for ( var i = toBind.length; i; ) {
+                for ( let i = toBind.length; i; ) {
                     this.removeEventListener( toBind[--i], handler, false );
                 }
             } else {
@@ -2512,7 +2512,7 @@ var datetimepickerFactory = function ($) {
         },
 
         getLineHeight: function(elem) {
-            var $elem = $(elem),
+            let $elem = $(elem),
                 $parent = $elem['offsetParent' in $.fn ? 'offsetParent' : 'parent']();
             if (!$parent.length) {
                 $parent = $('body');
@@ -2542,7 +2542,7 @@ var datetimepickerFactory = function ($) {
 
 
     function handler(event) {
-        var orgEvent   = event || window.event,
+        let orgEvent   = event || window.event,
             args       = slice.call(arguments, 1),
             delta      = 0,
             deltaX     = 0,
@@ -2587,12 +2587,12 @@ var datetimepickerFactory = function ($) {
         //   * deltaMode 1 is by lines
         //   * deltaMode 2 is by pages
         if ( orgEvent.deltaMode === 1 ) {
-            var lineHeight = $.data(this, 'mousewheel-line-height');
+            let lineHeight = $.data(this, 'mousewheel-line-height');
             delta  *= lineHeight;
             deltaY *= lineHeight;
             deltaX *= lineHeight;
         } else if ( orgEvent.deltaMode === 2 ) {
-            var pageHeight = $.data(this, 'mousewheel-page-height');
+            let pageHeight = $.data(this, 'mousewheel-page-height');
             delta  *= pageHeight;
             deltaY *= pageHeight;
             deltaX *= pageHeight;
@@ -2625,7 +2625,7 @@ var datetimepickerFactory = function ($) {
 
         // Normalise offsetX and offsetY properties
         if ( special.settings.normalizeOffset && this.getBoundingClientRect ) {
-            var boundingRect = this.getBoundingClientRect();
+            let boundingRect = this.getBoundingClientRect();
             offsetX = event.clientX - boundingRect.left;
             offsetY = event.clientY - boundingRect.top;
         }

@@ -3,13 +3,11 @@
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
 <section class="content-header">
-<h1><?=(isset($pageTitle)) ? $pageTitle : ""; ?>
-  <small>Control Panel</small>
-</h1>
+<h1><?=(isset($pageTitle)) ? $pageTitle : ""; ?> <small>Control Panel</small></h1>
   <ol class="breadcrumb">
-      <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
-      <li><a href="index.php?load=pages">Pages</a></li>
-      <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
+      <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"  aria-hidden="true"></i>Home </a></li>
+      <li><a href="index.php?load=pages">Pages </a></li>
+      <li class="active"> <?= (isset($pageTitle)) ? $pageTitle : ""; ?></li>
    </ol>
 </section>
 
@@ -27,7 +25,7 @@ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
+<h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
 
 <?php 
 foreach ($errors as $e) :
@@ -166,7 +164,7 @@ if (isset($pageData['post_modified']) || isset($pageData['post_date']) ) {
 
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
-<input type="submit" class="btn btn-primary" name="pageFormSubmit" value="<?=(isset($page_id) && ($page_id != '')) ? "Update" : "Publish"; ?>" >
+<input type="submit" class="btn btn-primary" name="pageFormSubmit" value="<?=((isset($page_id)) && ($page_id === 0) ? "Publish" : "Update") ; ?>" >
 </div>
              
 </form>

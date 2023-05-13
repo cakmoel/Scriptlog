@@ -19,11 +19,11 @@
 function generate_media_identifier($data = null)
 {
 
-  if ( function_exists("random_bytes") ) {
+  if (function_exists("random_bytes")) {
 
     $data = random_bytes(16);
 
-  } elseif ( function_exists("openssl_random_pseudo_bytes") ) {
+  } elseif (function_exists("openssl_random_pseudo_bytes")) {
 
     $data = openssl_random_pseudo_bytes(16);
 

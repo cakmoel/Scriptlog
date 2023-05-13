@@ -26,8 +26,7 @@ class DbFactory
 
      try {
          
-         # hard code database factory's name
-         $database = "Db";
+         $database = "Db";  // hard code database factory's name
          
          if (class_exists($database)) {
              
@@ -39,7 +38,7 @@ class DbFactory
 
          }
          
-     } catch (Throwable $th) {
+     } catch (\Throwable $th) {
         
         LogError::setStatusCode(http_response_code(500));
         LogError::exceptionHandler($th);

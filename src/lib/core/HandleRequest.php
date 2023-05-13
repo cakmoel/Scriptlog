@@ -53,8 +53,8 @@ private static function findRequestToRules($rules)
 {
 
 $script_name = rtrim(dirname($_SERVER["SCRIPT_NAME"]), '/' );
-$request_uri = '/' . trim(str_replace( $script_name, '', $_SERVER['REQUEST_URI'] ), '/' );
-$uri = urldecode( $request_uri );
+$request_uri = '/' . trim(str_replace($script_name, '', $_SERVER['REQUEST_URI']), '/');
+$uri = urldecode($request_uri);
 
 $parameters = [];
 
@@ -96,7 +96,7 @@ private static function findRequestToPath()
     
  if (($position = strpos($path, '?')) !== false) {
     
-    $path = substr($path, 0, $position);
+  $path = substr($path, 0, $position);
     
  }
 

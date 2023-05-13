@@ -1,39 +1,4 @@
 <?php
-/**
- * check_internet
- *
- * @category function
- * @see https://www.codespeedy.com/check-internet-connection-in-php/
- * @see https://stackoverflow.com/questions/20348706/checking-internet-status-using-php
- * @return bool
- * 
- */
-function check_internet()
-{
-
- $connect_status = false;
-
- switch (connection_status()) {
-
-    case CONNECTION_NORMAL:
-         
-        $connect_status = true;
-    
-        break;
-     
-    case CONNECTION_ABORTED :
-    case (CONNECTION_ABORTED & CONNECTION_TIMEOUT) :
-    default:
-        
-        $connect_status = false;
-
-        break;
-
- }
-
- return $connect_status;
- 
-}
 
 /**
  * check_internet_fsockopen
@@ -41,17 +6,47 @@ function check_internet()
  * @category function
  * @see https://www.codespeedy.com/check-internet-connection-in-php/
  * @see https://stackoverflow.com/questions/4860365/determine-in-php-script-if-connected-to-internet
- * @param string $domain
+ * @param string $hostname
  * @return bool
  * 
  */
-function check_internet_fsockopen($domain = 'www.google.com')
+function checking_connection_with_fsockopen($hostname)
 {
-    if (function_exists('fsockopen')) {
+    $file = @fsockopen($hostname, 80);//@fsockopen is used to connect to a socket
     
-        return (bool) @fsockopen($domain, 80, $errorNum,$errorMessage, 5);
+    return ($file);
+}
+
+/**
+ * checking_connection_with_fopen($ip)
+ *
+ * @param string $ip
+ * 
+ */
+function checking_connection_with_fopen($hostname)
+{
+    return (bool) (@fopen($hostname, "r")) ? true : false;
+}
+
+/**
+ * checking_internet_connection
+ *
+ * @param string $hostname
+ * @return void
+ */
+function checking_internet_connection()
+{
+
+    $hostname = '216.239.38.120';
+
+    if (function_exists('fsockopen')) {
+
+        return checking_connection_with_fsockopen($hostname);
+
+    } else {
+
+        return checking_connection_with_fopen($hostname);
 
     }
     
 }
-

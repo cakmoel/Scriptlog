@@ -38,6 +38,7 @@ class PostProviderModel extends Dao
             FROM tbl_posts AS p
             INNER JOIN tbl_users AS u ON p.post_author = u.ID
             WHERE p.post_type = 'blog' AND p.post_status = 'publish'
+            AND p.post_visibility = 'public'
             ORDER BY p.ID DESC LIMIT :limit";
 
     $data = array(':limit' => $limit);

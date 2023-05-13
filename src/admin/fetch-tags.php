@@ -1,9 +1,9 @@
-<?php
+<?php 
 include __DIR__ . '/../lib/main.php';
 
 $result = [];
 
-if (isset($_GET['term'])) {
+if (isset($_GET['term']) && access_control_list(ActionConst::POSTS)) {
 
   $term = escape_html($_GET['term']);
  

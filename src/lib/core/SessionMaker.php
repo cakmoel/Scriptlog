@@ -268,7 +268,7 @@ public function isGenuine()
 
  $ip_client = getenv('REMOTE_ADDR', true) ? get_ip_address() : getenv('REMOTE_ADDR');
 
- $hash = md5( $agent . (ip2long($ip_client) & ip2long('255.255.0.0')));
+ $hash = md5($agent . (ip2long($ip_client) & ip2long('255.255.0.0')));
 
  if (isset($_SESSION['_genuine'])) {
 
@@ -334,9 +334,9 @@ return ScriptlogCryptonize::decryptAES($data, $key);
 private function isSessionStarted()
 {
 
-   if(!headers_sent() && php_sapi_name() !== 'cli') {
+   if (!headers_sent() && php_sapi_name() !== 'cli') {
 
-      if(version_compare(phpversion(), '5.6.0', '>=')) {
+      if (version_compare(phpversion(), '5.6.0', '>=')) {
   
          return (session_status() === PHP_SESSION_ACTIVE) ? true : false;
   

@@ -2,6 +2,8 @@
 /**
  * check_online
  *
+ * getting the website status whether it is up or down
+ * 
  * @category function
  * @see https://stackoverflow.com/questions/9817046/get-the-site-status-up-or-down
  * @param string $domain

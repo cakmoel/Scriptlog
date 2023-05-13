@@ -1,7 +1,6 @@
 <?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * Post class extends Dao
- *
+ * class PostDao extends Dao
  *
  * @category  Dao Class
  * @author    M.Noermoehammad
@@ -44,9 +43,12 @@ public function findPosts($orderBy = 'ID', $author = null)
                 p.post_slug,
                 p.post_content,
                 p.post_status,
+                p.post_visibility,
+                p.post_password,
                 p.post_tags,
                 p.post_headlines,
                 p.post_type,
+                p.passphrase,
                 u.user_login
   			FROM tbl_posts AS p
   			INNER JOIN tbl_users AS u ON p.post_author = u.ID
@@ -67,9 +69,12 @@ public function findPosts($orderBy = 'ID', $author = null)
                 p.post_slug,
                 p.post_content,
                 p.post_status,
+                p.post_visibility,
+                p.post_password,
                 p.post_tags,
                 p.post_headlines,
                 p.post_type,
+                p.passphrase,
                 u.user_login
   		  FROM tbl_posts AS p
   		  INNER JOIN tbl_users AS u ON p.post_author = u.ID
@@ -116,12 +121,16 @@ public function findPost($id, $sanitize, $author = null)
                   post_summary,
                   post_keyword,
                   post_status,
+                  post_visibility,
+                  post_password,
                   post_tags,
                   post_headlines,
   	  		        post_type,
-                  comment_status
+                  comment_status, 
+                  passphrase
   	  		  FROM tbl_posts
-  	  		  WHERE ID = :ID AND post_author = :author
+  	  		  WHERE ID = :ID 
+            AND post_author = :author
   			  AND post_type = 'blog'";
 
         $data = array(':ID' => $idsanitized, ':author' => $author);
@@ -139,10 +148,13 @@ public function findPost($id, $sanitize, $author = null)
               post_summary,
               post_keyword,
               post_status,
+              post_visibility,
+              post_password,
               post_tags,
               post_headlines,
   	  		    post_type,
-              comment_status
+              comment_status, 
+              passphrase
   	  		  FROM tbl_posts
   	  		  WHERE ID = :ID AND post_type = 'blog'";
 
@@ -183,10 +195,13 @@ public function createPost($bind, $topicId)
        'post_summary' => $bind['post_summary'],
        'post_keyword' => $bind['post_keyword'],
        'post_status' => $bind['post_status'],
+       'post_visibility' => $bind['post_visibility'],
+       'post_password' => $bind['post_password'],
        'post_tags' => $bind['post_tags'],
-       'post_headlines' => $bind['post_headlines'],
-       'comment_status' => $bind['comment_status']
-   ]);
+       'post_headlines' => $bind['post_headlines'], 
+       'comment_status' => $bind['comment_status'], 
+       'passphrase' => $bind['passphrase']
+       ]);
 
  } else {
 
@@ -199,9 +214,12 @@ public function createPost($bind, $topicId)
       'post_summary' => $bind['post_summary'],
       'post_keyword' => $bind['post_keyword'],
       'post_status' => $bind['post_status'],
+      'post_visibility' => $bind['post_visibility'],
+      'post_password' => $bind['post_password'],
       'post_tags' => $bind['post_tags'],
       'post_headlines' => $bind['post_headlines'],
-      'comment_status' => $bind['comment_status']
+      'comment_status' => $bind['comment_status'],
+      'passphrase' => $bind['passphrase']
    ]);
 
  }
@@ -225,7 +243,9 @@ public function createPost($bind, $topicId)
       'topic_id' => $topicId]);
 
  }
-  
+ 
+ return $postId;
+
 }
 
 /**
@@ -259,9 +279,12 @@ try {
   	    'post_summary' => $bind['post_summary'],
         'post_keyword' => $bind['post_keyword'],
         'post_status' => $bind['post_status'],
+        'post_visibility' => $bind['post_visibility'],
+        'post_password' => $bind['post_password'],
         'post_tags' => $bind['post_tags'],
         'post_headlines' => $bind['post_headlines'],
-  	    'comment_status' => $bind['comment_status']
+  	    'comment_status' => $bind['comment_status'],
+        'passphrase' => $bind['passphrase']
 
   	], "ID = {$cleanId}");
 
@@ -276,9 +299,12 @@ try {
           'post_summary' => $bind['post_summary'],
           'post_keyword' => $bind['post_keyword'],
           'post_status' => $bind['post_status'],
+          'post_visibility' => $bind['post_visibility'],
+          'post_password' => $bind['post_password'],
           'post_tags' => $bind['post_tags'],
           'post_headlines' => $bind['post_headlines'],
-          'comment_status' => $bind['comment_status']
+          'comment_status' => $bind['comment_status'],
+          'passphrase' => $bind['passphrase']
           
       ], "ID = {$cleanId}");
 
@@ -287,7 +313,7 @@ try {
   // delete all post_topic by post_id
   $this->deleteRecord("tbl_post_topic", "post_id = $cleanId");
 
-  if ( ( is_array($topicId) ) && (isset($_POST['catID']) ) ) {
+  if ((is_array($topicId)) && (isset($_POST['catID']))) {
 
   	 foreach ($_POST['catID'] as $topicId) {
 
@@ -302,7 +328,7 @@ try {
 
   $this->callCommit();
 
-} catch (Throwable $th) {
+} catch (\Throwable $th) {
 
   $this->callRollBack();
   $this->error = LogError::setStatusCode(http_response_code(500));
@@ -319,7 +345,7 @@ try {
 }
 
 /**
- * Delete post record
+ * DeletePost
  *
  * @param integer $id
  * @param object $sanitizing
@@ -332,7 +358,7 @@ public function deletePost($id, $sanitize)
 }
 
 /**
- * check post id
+ * checkPostId
  *
  * @param integer $id
  * @param object $sanitizing
@@ -353,7 +379,6 @@ public function checkPostId($id, $sanitizing)
  * set post status
  *
  * @param string $selected
- * @return string
  *
  */
 public function dropDownPostStatus($selected = "")
@@ -378,7 +403,6 @@ public function dropDownPostStatus($selected = "")
  * set comment status
  *
  * @param string $name
- * @return string
  *
  */
 public function dropDownCommentStatus($selected = "")
@@ -393,6 +417,49 @@ public function dropDownCommentStatus($selected = "")
  	}
 
  	return dropdown($name, $comment_status, $this->selected);
+
+}
+
+/**
+ * dropDownVisibility
+ *
+ * @param string $selected
+ * 
+ */
+public function dropDownVisibility($selected = null)
+{
+
+  $dropdown = null;
+
+  $name = "visibility";
+
+  $dropdown .= '<div class="form-group">';
+  $dropdown .= '<label for="visibility">Post visibility</label>';
+  $dropdown .= '<select name="'.$name.'" class="form-control" onchange="checkVisibilitySelection();" id="visibility.system">'. PHP_EOL;
+  $dropdown .= '<option disabled selected>Select Visibility</option>'. PHP_EOL;
+  
+  $this->selected = $selected;
+
+  $visibility_list = ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'];
+
+  foreach ($visibility_list as $key => $visibility) {
+
+    $select = $this->selected === $key ? ' selected' : null;
+
+    $dropdown .= '<option value="'.$key.'"'.$select.'>'.$visibility.'</option>'. PHP_EOL;
+    
+  }
+
+  $dropdown .= '</select>'. PHP_EOL;
+  $dropdown .= '<div id="protected" style="display:none">';
+  $dropdown .= '<br />';
+  $dropdown .= '<label for="protected">Password:</label>';
+  $dropdown .= '<input type="text" class="form-control" name="post_password" value="" placeholder="Use a secure password">';
+  $dropdown .= '<p class="help-block">Protected with a password you choose. Only those with the password can view this post.</p>';
+  $dropdown .= '</div>';
+  $dropdown .= '</div>';
+
+  return $dropdown;
 
 }
 

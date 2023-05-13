@@ -1,4 +1,4 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {exit(); } ?>
 
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
@@ -8,8 +8,7 @@
       <small>Control Panel</small>
     </h1>
     <ol class="breadcrumb">
-      <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home</a></li>
-      <li><a href="index.php?load=users">User</a></li>
+      <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home </a></li>
       <li class="active">Profile</li>
     </ol>
   </section>
@@ -134,9 +133,9 @@
           $session_id = isset($userData['user_session']) ? safe_html($userData['user_session']) : null;
           ?>
 
-          <form name="scriptlogForm" method="post" action="<?= generate_request('index.php', 'post', ['users', $action, $user_id, $session_id])['link']; ?>" role="form" autocomplete="off">
-            <input type="hidden" name="user_id" value="<?= $user_id; ?>" />
-            <input type="hidden" name="session_id" value="<?= $session_id; ?>" />
+          <form name="scriptlogForm" method="post" action="<?= generate_request('index.php', 'post', ['users', $action, $user_id, $session_id])['link']; ?>" autocomplete="off">
+            <input type="hidden" name="user_id" value="<?= $user_id; ?>">
+            <input type="hidden" name="session_id" value="<?= $session_id; ?>">
 
             <div class="box-body">
               <?php
@@ -195,6 +194,7 @@
             <div class="box-footer">
               <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
               <input type="submit" name="userFormSubmit" class="btn btn-primary" value="<?= (($user_id) && ($user_id != '')) ? "Update Profile" : "Save Changes"; ?>">
+              <a href="<?= generate_request('index.php', 'get', ['users', ActionConst::DELETEUSER, $user_id, $session_id])['link']; ?>" class="btn btn-danger pull-right" title="This action cannot be undone. This will permanently delete your profile"><i class="fa fa-exclamation-circle fa-fw"></i>Delete this profile</a>
             </div>
 
           </form>
@@ -205,7 +205,6 @@
       <!-- /.col -->
     </div>
     <!-- /.row -->
-
   </section>
   <!-- /.content -->
 </div>

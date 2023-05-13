@@ -16,7 +16,6 @@ class UserDao extends Dao
  
  private $selected;
 
- // overrides Dao constructor
  public function __construct()
  {
 	parent::__construct();
@@ -131,7 +130,7 @@ class UserDao extends Dao
  * retrieving user record based on user_session
  * 
  * @param string $user_session
- * @param static PDO::FETCH_MODE $fetchMode $fetchMode
+ * @param static PDO::FETCH_MODE $fetchMode
  * @return void
  * 
  */
@@ -362,9 +361,9 @@ class UserDao extends Dao
   * @param integer $ID
   * @param object $sanitizing
   */
- public function deleteUser($ID, $sanitize)
+ public function deleteUser($userID, $sanitize)
  {
-   $cleanID = $this->filteringId($sanitize, $ID, 'sql'); 
+   $cleanID = $this->filteringId($sanitize, $userID, 'sql'); 
    $this->deleteRecord("tbl_users", "ID = {$cleanID}");
  }
  
@@ -379,10 +378,12 @@ class UserDao extends Dao
  {
   
   $name = 'user_level';
-  $levels = array('manager'=>'Manager', 
-                  'editor' => 'Editor', 
-                  'author'=>'Author', 
-                  'contributor'=>'Contributor');
+  $levels = array('author'      => 'Author', 
+                  'contributor' => 'Contributor', 
+                  'editor'      => 'Editor', 
+                  'subscriber'  => 'Subscriber',
+                  'manager'     => 'Manager'
+                );
   
   if ($selected != '') {
       $this->selected = $selected;
@@ -520,35 +521,32 @@ class UserDao extends Dao
  private function checkUserPasswordByEmail($login, $password)
  {
     $sql = "SELECT user_pass FROM tbl_users WHERE user_email = :user_email AND user_banned = '0' LIMIT 1";
-        $this->setSQL($sql);
-        $stmt = $this->checkCountValue([':user_email' => $login]);
+    $this->setSQL($sql);
+    $stmt = $this->checkCountValue([':user_email' => $login]);
 
-        if ($stmt > 0) {
+    if ($stmt > 0) {
         
-            $row = $this->findRow([':user_email' => $login]);
-            
-            $expected = crypt($password, $row['user_pass']);
-            $correct = crypt($password, $row['user_pass']);
+      $row = $this->findRow([':user_email' => $login]);      
+      $expected = crypt($password, $row['user_pass']);
+      $correct = crypt($password, $row['user_pass']);
     
-            if (!function_exists('hash_equals')) {
+      if (!function_exists('hash_equals')) {
     
-                if ((timing_safe_equals($expected, $correct) === 0) && (scriptlog_verify_password($password, $row['user_pass']) ) ) {
+        if ((timing_safe_equals($expected, $correct) === 0) && (scriptlog_verify_password($password, $row['user_pass']))) {
 
-                  return true;
-
-                }
-                
-            } else {
-    
-                if (hash_equals($expected, $correct)  && (scriptlog_verify_password($password, $row['user_pass']))) {
-
-                  return true;
-
-                }
-                
-            }
-            
+          return true;
         }
+                
+      } else {
+    
+        if (hash_equals($expected, $correct)  && (scriptlog_verify_password($password, $row['user_pass']))) {
+
+          return true;
+        }
+                
+      }
+            
+    }
 
  }
 
@@ -576,15 +574,14 @@ class UserDao extends Dao
 
             if ((timing_safe_equals($expected, $correct) === 0) && (scriptlog_verify_password($password, $row['user_pass']))) {
 
-                return true;
+              return true;
             }
             
-    
         } else {
 
             if ((hash_equals($expected, $correct))  && (scriptlog_verify_password($password, $row['user_pass']))) {
 
-                return true;
+              return true;
             }
             
         }

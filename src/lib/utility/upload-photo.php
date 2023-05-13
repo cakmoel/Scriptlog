@@ -2,6 +2,7 @@
 /**
  * photo_instance()
  * if fileinfo enabled then Intervention Image works properly else will implement non-secure approach
+ * 
  * @category function
  * @author  Oliver Vogel
  * @author M.Noermoehammad
@@ -10,6 +11,7 @@
  * @see http://image.intervention.io/
  * @see https://anchetawern.github.io/blog/2016/02/18/using-the-intervention-image-library-in-php/
  * @see https://www.tutmecode.com/php/create-thumbnail-from-big-size-image-in-php-or-laravel/
+ * 
  */
 use Intervention\Image\ImageManager;
 

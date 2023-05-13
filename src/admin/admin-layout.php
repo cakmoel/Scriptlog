@@ -8,7 +8,7 @@ function admin_header($stylePath, $breadcrumb = null)
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <!-- Tell the browser to be responsive to screen width -->
-<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<meta content="width=device-width, initial-scale=1, maximum-scale=2" name="viewport">
 <title><?= admin_tag_title($breadcrumb); ?></title>
   <!-- Bootstrap 3.3.7 -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/bootstrap/dist/css/bootstrap.min.css">
@@ -67,15 +67,15 @@ function admin_header($stylePath, $breadcrumb = null)
 <link rel="icon" type="image/png" sizes="96x96" href="<?= $stylePath; ?>/assets/dist/img/favicon-96x96.png">
 <link rel="icon" type="image/png" sizes="16x16" href="<?= $stylePath; ?>/assets/dist/img/favicon-16x16.png">
 <link rel="manifest" href="<?= $stylePath; ?>/manifest.json">
-<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileColor" content="#fff">
 <meta name="msapplication-TileImage" content="<?= $stylePath; ?>/ms-icon-144x144.png">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#fff">
 
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>
-<script src="<?= $stylePath; ?>/assets/dist/js/html5shiv.js"></script>
-<script src="<?= $stylePath; ?>/assets/dist/js/respond.min.js"></script>
+<script src="assets/dist/js/html5shiv.js"></script>
+<script src="assets/dist/js/respond.min.js"></script>
 <![endif]-->
 
 <!-- Google Font -->
@@ -85,7 +85,7 @@ function admin_header($stylePath, $breadcrumb = null)
 <style>
   .avatar {
   vertical-align: middle;
-  width: 50px;
+  width: 50px;  
   height: 50px;
   border-radius: 50%;
 }
@@ -113,7 +113,7 @@ function admin_footer($stylePath, $ubench = null)
     </div>
     
     <strong>Thank you for creating with 
-    <a href="https://scriptlog.my.id" target="_blank" rel="noopener noreferrer" title="Personal Blogware Platform">Scriptlog</a>
+    <a href="https://scriptlog.my.id" target="_blank" rel="noopener noreferrer" title="PHP Blog Software">Scriptlog</a>
      <?php echo APP_VERSION; ?></strong>
      <strong><?=((true === APP_DEVELOPMENT) && (isset($ubench))) ? " Page generated in: ". $ubench->getTime() . " Memory usage: ".$ubench->getMemoryUsage() : "" ?></strong>
 </footer>
@@ -216,5 +216,4 @@ $(function() {
 
 </body>
 </html>
-<?php 
-}
+<?php } ?>

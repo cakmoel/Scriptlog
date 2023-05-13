@@ -1,4 +1,5 @@
 <?php
+
 use Selective\ArchiveBomb\Scanner\BombScanner;
 use Selective\ArchiveBomb\Engine\ZipBombEngine;
 use Selective\ArchiveBomb\Engine\RarBombEngine;
@@ -14,18 +15,17 @@ use Selective\ArchiveBomb\Engine\RarBombEngine;
 function zip_file_scanner($filename)
 {
 
-$file = new SplFileObject($filename);
+    (version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
 
-$scanner = new BombScanner();
+    $file = new SplFileObject($filename);
 
-$scanner->addEngine(new ZipBombEngine());
+    $scanner = new BombScanner();
 
-(version_compare(PHP_VERSION, '7.4', '>=') ) ? clearstatcache() : clearstatcache(true);
+    $scanner->addEngine(new ZipBombEngine());
 
-$result = $scanner->scanFile($file);
+    $result = $scanner->scanFile($file);
 
-return ($result->isBomb()) ? true : false;
-
+    return ($result->isBomb()) ? true : false;
 }
 
 /**
@@ -38,16 +38,15 @@ return ($result->isBomb()) ? true : false;
 function rar_file_scanner($filename)
 {
 
-$file = new SplFileObject($filename);
+    (version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
 
-$scanner = new BombScanner();
+    $file = new SplFileObject($filename);
 
-$scanner->addEngine(new RarBombEngine());
+    $scanner = new BombScanner();
 
-( version_compare(PHP_VERSION, '7.4', '>=') ) ? clearstatcache() : clearstatcache(true);
+    $scanner->addEngine(new RarBombEngine());
 
-$result = $scanner->scanFile($file);
+    $result = $scanner->scanFile($file);
 
-return ($result->isBomb()) ? true : false;
-
+    return ($result->isBomb()) ? true : false;
 }

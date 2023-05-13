@@ -1,8 +1,12 @@
 <?php
 /**
- * Generate Session Key Function
+ * generate_session_key()
+ * 
+ * generating session key
  * 
  * @category Function
+ * @author M.Noermoehammad
+ * @license MIT
  * @param string $value
  * @return string
  * 

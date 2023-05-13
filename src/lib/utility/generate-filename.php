@@ -17,7 +17,6 @@ $file_ext = pathinfo($file_name, PATHINFO_EXTENSION);
     
 $new_filename = rename_file(md5(generate_hash(13).$file_basename)).'.'.$file_ext;
 
-
 return ['new_filename' => $new_filename, 'file_extension' => $file_ext ];
 
 }

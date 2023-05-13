@@ -84,7 +84,7 @@ function recover_password($user_pass, $user_email)
                      'X-Priority: 1'. "\r\n".
                      'X-Sender:'.$sanitize_sender."\r\n";
 
-   if ((filter_var( $user_email, FILTER_SANITIZE_EMAIL)) && (filter_var($user_email, FILTER_VALIDATE_EMAIL))) {
+   if ((filter_var($user_email, FILTER_SANITIZE_EMAIL)) && (filter_var($user_email, FILTER_VALIDATE_EMAIL))) {
 
       if (! mail($user_email, $subject, $content, $email_headers)) {
 

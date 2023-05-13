@@ -2,6 +2,11 @@
 /**
  * options.php
  * 
+ * @category File options.php will be place to Sets the value of a configuration option
+ * @author M.Noermoehammmad
+ * @license MIT
+ * @version 1.0
+ * 
  */
 #ini_set("session.cookie_secure", 1);  
 #ini_set("session.cookie_lifetime", 604800);  

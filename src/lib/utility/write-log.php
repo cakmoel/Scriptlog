@@ -41,7 +41,7 @@ LOG;
 
     } else {
 
-        $to = 'scriptlog@yandex.com';
+        $to = 'mnoermoehammad@outlook.com';
         $subject = 'Hack Attempt';
         $header = 'From:'. sanitize_email(app_info()['site_email']);
         
