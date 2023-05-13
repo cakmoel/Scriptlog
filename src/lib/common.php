@@ -19,7 +19,6 @@ define('APP_DOCUMENT', APP_PUBLIC . DS . 'files' . DS . 'docs' . DS);
 define('APP_THEME', APP_PUBLIC . DS . 'themes' . DS);
 define('APP_PLUGIN', APP_ADMIN . DS . 'plugins' . DS);
 define('APP_DEVELOPMENT', true);
-define('SCRIPTLOG', hash_hmac('sha256', APP_TITLE . ':'. APP_CODENAME.mt_rand(1, 1000), hash('sha256', uniqid().'M4Le053Nk4WoR!@#{>}>01[:+]-07|=_$%^&*(id)')));
 
 define('MESSAGE_BADREQUEST', "400 Bad Request");
 define('MESSAGE_UNPLEASANT_ATTEMPT', "Sorry, unpleasant attempt detected");
@@ -28,11 +27,11 @@ define('MESSAGE_WEAK_PASSWORD', "Password requires at least 8 characters with lo
 define('MESSAGE_INVALID_FULLNAME', "Please enter a valid fullname");
 define('MESSAGE_INVALID_SELECTBOX', "Please choose the available value provided");
 define('MESSAGE_INVALID_EMAILADDRESS', "Please enter a valid email address");
-
 define('MAX_FILES', 10000);
 define('MAX_SIZE', 1000000000); // 1 GB
 define('MAX_RATIO', 10);
 define('READ_LENGTH', 1024);
+define('SCRIPTLOG', hash_hmac('sha256', APP_TITLE . ':'. APP_CODENAME.mt_rand(1, 1000), hash('sha256', uniqid().'M4Le053Nk4WoR!@#{>}>01[:+]-07|=_$%^&*(id)')));
 
 if (!defined('PHP_EOL')) {
 
@@ -59,7 +58,7 @@ if (!defined('PHP_EOL')) {
 $is_secure = false;
 
 if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) 
-     && ($_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) ) 
+     && ($_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') || (!empty($_SERVER['HTTP_X_FORWARDED_SSL'])) 
      && ($_SERVER['HTTP_X_FORWARDED_SSL'] == 'on')) {
 
 $is_secure = true;
