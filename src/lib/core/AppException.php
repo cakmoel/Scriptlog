@@ -14,6 +14,8 @@ class AppException extends Exception implements IAppThrowable
     
 protected $message = 'Unknown Exception';
 
+protected $previous;
+
 public function __construct($message = null, $code = 0, Exception $previous = null)
 {
 
