@@ -13,16 +13,18 @@ class ActionConst
 {
 
  // action constand for dashboard
- const DASHBOARD = "dashboard";
+ const DASHBOARD  = "dashboard";
+ const DETAILITEM = "detailItem";
 
  // action constant for configuration functionality
- const CONFIGURATION = "configuration";
- const GENERAL_CONFIG = "generalConfig";
+ const CONFIGURATION    = "configuration";
+ const GENERAL_CONFIG   = "generalConfig";
  const PERMALINK_CONFIG = "permalinkConfig";
- const READING_CONFIG = "readingConfig";
- const TIMEZONE_CONFIG = "timezoneConfig";
+ const READING_CONFIG   = "readingConfig";
+ const TIMEZONE_CONFIG  = "timezoneConfig";
 
  // action constant for post functionality 
+ const POSTS       = "posts";
  const NEWPOST     = "newPost";
  const EDITPOST    = "editPost";
  const DELETEPOST  = "deletePost";
@@ -38,12 +40,6 @@ class ActionConst
  const NEWTOPIC    = "newTopic";
  const EDITTOPIC   = "editTopic";
  const DELETETOPIC = "deleteTopic";
-
- // action constant for tag functionality
- const TAGS = "tags";
- const NEWTAG = "newTag";
- const EDITTAG = "editTag";
- const DELETETAG = "deleteTag";
 
 // action constant for comment functionality
  const COMMENTS      = "comments";
@@ -91,7 +87,7 @@ class ActionConst
  const NEWUSER    = "newUser";
  const EDITUSER   = "editUser";
  const DELETEUSER = "deleteUser";
-
+ 
 // action const for logging out from admin panel
  const LOGOUT = "doLogOut";
 
