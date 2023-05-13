@@ -1,6 +1,7 @@
 <?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Dao Class
+ * 
  * Data Access Object
  * 
  * @category  Core Class
@@ -76,7 +77,7 @@ class Dao
 
   }
 
-  return (! is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchAll($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchAll();
+  return (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchAll($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchAll();
       
  }
  
@@ -98,7 +99,7 @@ class Dao
     throw new DbException("No SQL Query!");
   }
   
-  return (! is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetch();
+  return (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetch();
 
  }
  
@@ -121,7 +122,7 @@ class Dao
      
   }
  
-  return ( ! is_null($fetchMode) ) ? $this->dbc->dbQuery($this->sql, $data)->fetchColumn($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
+  return (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchColumn($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
      
  }
  
