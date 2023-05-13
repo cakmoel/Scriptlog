@@ -1,6 +1,6 @@
 <?php defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * Class PostApp
+ * Class PostApp extends BaseApp
  *
  * @category  Class PostApp extends BaseApp
  * @author    M.Noermoehammad
@@ -57,7 +57,13 @@ class PostApp extends BaseApp
       ($_SESSION['status'] == 'postAdded') ? array_push($status, "New post added") : "";
       ($_SESSION['status'] == 'postUpdated') ? array_push($status, "Post updated") : "";
       ($_SESSION['status'] == 'postDeleted') ? array_push($status, "Post deleted") : "";
+      
       unset($_SESSION['status']);
+
+      if (isset($_SESSION['post_protected'])) {
+        unset($_SESSION['post_protected']);
+      }
+      
     }
 
     $this->setView('all-posts');
@@ -72,10 +78,11 @@ class PostApp extends BaseApp
       $this->view->set('status', $status);
     }
 
-    if ($this->postEvent->postAuthorLevel() === 'administrator') {
+    if ($this->postEvent->postAuthorLevel() == 'administrator') {
 
       $this->view->set('postsTotal', $this->postEvent->totalPosts());
       $this->view->set('posts', $this->postEvent->grabPosts());
+      
     } else {
 
       $this->view->set('postsTotal', $this->postEvent->totalPosts([$this->postEvent->postAuthorId()]));
@@ -98,7 +105,7 @@ class PostApp extends BaseApp
     $errors = array();
     $checkError = true;
     $user_level = $this->postEvent->postAuthorLevel();
-
+  
     if (isset($_POST['postFormSubmit'])) {
 
       $file_location = isset($_FILES['media']['tmp_name']) ? $_FILES['media']['tmp_name'] : '';
@@ -117,11 +124,13 @@ class PostApp extends BaseApp
         'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
+        'visibility' => isset($_POST['visibility']) ? Sanitize::mildSanitizer($_POST['visibility']) : "",
+        'post_password' => isset($_POST['post_password']) ? FILTER_SANITIZE_FULL_SPECIAL_CHARS : "",
         'post_headlines' => FILTER_SANITIZE_NUMBER_INT,
         'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : ""
       ];
 
-      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_tags' => 400, 'post_content' => 50000];
+      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_tags' => 200, 'post_content' => 50000];
 
       $new_filename = generate_filename($file_name)['new_filename'];
       $file_extension = generate_filename($file_name)['file_extension'];
@@ -163,6 +172,11 @@ class PostApp extends BaseApp
 
         if (false === sanitize_selection_box(distill_post_request($filters)['comment_status'], ['open' => 'Open', 'closed' => 'Closed'])) {
 
+          $checkError = false;
+          array_push($errors, MESSAGE_INVALID_SELECTBOX);
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['visibility'], ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'])) {
           $checkError = false;
           array_push($errors, MESSAGE_INVALID_SELECTBOX);
         }
@@ -221,6 +235,23 @@ class PostApp extends BaseApp
           }
         }
 
+        if (isset($_POST['post_password'])) {
+          
+          if (check_common_password($_POST['post_password']) === true) {
+
+            $checkError = false;
+            array_push($errors, "Your password seems to be the most hacked password, please try another");
+          }
+
+          if (false === check_pwd_strength($_POST['post_password'])) {
+
+            $checkError = false;
+            array_push($errors, MESSAGE_WEAK_PASSWORD);
+
+          }
+
+        }
+
         if (!$checkError) {
 
           $this->setView('edit-post');
@@ -235,13 +266,16 @@ class PostApp extends BaseApp
           if ($user_level === 'contributor') {
 
             $this->view->set('medialibs', $medialib->dropDownMediaSelect());
+
           } else {
 
             $this->view->set('medialibs', $medialib->imageUploadHandler());
+
           }
 
           $this->view->set('postStatus', $this->postEvent->postStatusDropDown());
           $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown());
+          $this->view->set('postVisibility', $this->postEvent->visibilityDropDown());
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
           
         } else {
@@ -260,7 +294,7 @@ class PostApp extends BaseApp
 
               $media_metavalue = array(
                 'Origin' => "nophoto.jpg",
-                'File type' => "jpg",
+                'File type' => "image/jpg",
                 'File size' => "Unknown",
                 'Uploaded at' => date("Y-m-d H:i:s"),
                 'Dimension' => $width . 'x' . $height
@@ -269,7 +303,7 @@ class PostApp extends BaseApp
               $bind_media = [
                 'media_filename' => "nophoto.jpg",
                 'media_caption' => prevent_injection(distill_post_request($filters)['post_title']),
-                'media_type' => "jpg",
+                'media_type' => "image/jpg",
                 'media_target' => 'blog',
                 'media_user' => $user_level,
                 'media_access' => $media_access,
@@ -352,8 +386,24 @@ class PostApp extends BaseApp
 
           $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
           $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
-          $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
+
+          if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
+
+            (! empty($_POST['post_password'])) ? $this->postEvent->setProtected(protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password'])['post_password']) : "";
+
+            $this->postEvent->setPostContent(protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password'])['post_content']);
+            $this->postEvent->setPassPhrase(distill_post_request($filters)['post_password']);
+            
+            $_SESSION['post_protected'] = (!isset($_SESSION['post_protected'])) ? distill_post_request($filters)['post_password'] : "";
+           
+          } else {
+
+            $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
+
+          }
+
           $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
+          $this->postEvent->setVisibility(distill_post_request($filters)['visibility']);
 
           if (empty($_POST['post_headlines'])) {
 
@@ -373,10 +423,13 @@ class PostApp extends BaseApp
           }
 
           $this->postEvent->addPost();
+          
           $_SESSION['status'] = "postAdded";
           direct_page('index.php?load=posts&status=postAdded', 200);
+
         }
-      } catch (Throwable $th) {
+
+      } catch (\Throwable $th) {
 
         LogError::setStatusCode(http_response_code());
         LogError::exceptionHandler($th);
@@ -388,7 +441,7 @@ class PostApp extends BaseApp
     } else {
 
       $this->setView('edit-post');
-      $this->setPageTitle('Add New Post');
+      $this->setPageTitle('Add new post');
       $this->setFormAction(ActionConst::NEWPOST);
       $this->view->set('pageTitle', $this->getPageTitle());
       $this->view->set('formAction', $this->getFormAction());
@@ -404,6 +457,7 @@ class PostApp extends BaseApp
 
       $this->view->set('postStatus', $this->postEvent->postStatusDropDown());
       $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown());
+      $this->view->set('postVisibility', $this->postEvent->visibilityDropDown());
       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
     }
 
@@ -444,9 +498,12 @@ class PostApp extends BaseApp
       'post_summary' => $getPost['post_summary'],
       'post_keyword' => $getPost['post_keyword'],
       'post_status' => $getPost['post_status'],
+      'post_visibility' => $getPost['post_visibility'],
+      'post_password' => $getPost['post_password'],
       'post_tags' => $getPost['post_tags'],
       'post_headlines' => $getPost['post_headlines'],
-      'comment_status' => $getPost['comment_status']
+      'comment_status' => $getPost['comment_status'],
+      'passphrase' => $getPost['passphrase']
     );
 
     if (isset($_POST['postFormSubmit'])) {
@@ -467,12 +524,14 @@ class PostApp extends BaseApp
         'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
+        'visibility' => isset($_POST['visibility']) ?  Sanitize::mildSanitizer($_POST['visibility']) : "",
+        'post_password' => isset($_POST['post_password']) ? FILTER_SANITIZE_FULL_SPECIAL_CHARS : "",
         'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_headlines' => FILTER_SANITIZE_NUMBER_INT,
-        'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : ""
+        'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : "",
       ];
 
-      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_tags' => 400, 'post_content' => 50000];
+      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_tags' => 200, 'post_content' => 50000];
 
       $new_filename = generate_filename($file_name)['new_filename'];
       $file_extension = generate_filename($file_name)['file_extension'];
@@ -512,6 +571,12 @@ class PostApp extends BaseApp
         }
 
         if (false === sanitize_selection_box(distill_post_request($filters)['comment_status'], ['open' => 'Open', 'closed' => 'Closed'])) {
+
+          $checkError = false;
+          array_push($errors, MESSAGE_INVALID_SELECTBOX);
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['visibility'], ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'])) {
 
           $checkError = false;
           array_push($errors, MESSAGE_INVALID_SELECTBOX);
@@ -577,6 +642,23 @@ class PostApp extends BaseApp
           }
         }
 
+        if (isset($_POST['post_password'])) {
+          
+          if (check_common_password($_POST['post_password']) === true) {
+
+            $checkError = false;
+            array_push($errors, "Your password seems to be the most hacked password, please try another");
+          }
+
+          if (false === check_pwd_strength($_POST['post_password'])) {
+
+            $checkError = false;
+            array_push($errors, MESSAGE_WEAK_PASSWORD);
+
+          }
+
+        }
+
         if (!$checkError) {
 
           $this->setView('edit-post');
@@ -598,6 +680,7 @@ class PostApp extends BaseApp
 
           $this->view->set('postStatus', $this->postEvent->postStatusDropDown($getPost['post_status']));
           $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown($getPost['comment_status']));
+          $this->view->set('postVisibility', $this->postEvent->visibilityDropDown($getPost['post_visibility']));
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
         } else {
 
@@ -615,7 +698,7 @@ class PostApp extends BaseApp
               
               $media_metavalue = array(
                 'Origin' => "nophoto.jpg",
-                'File type' => "jpg",
+                'File type' => "image/jpg",
                 'File size' => "Unknown",
                 'Uploaded at' => date("Y-m-d H:i:s"),
                 'Dimension' => $width . 'x' . $height
@@ -624,7 +707,7 @@ class PostApp extends BaseApp
               $bind_media = [
                 'media_filename' => "nophoto.jpg",
                 'media_caption' => prevent_injection(distill_post_request($filters)['post_title']),
-                'media_type' => "jpg",
+                'media_type' => "image/jpg",
                 'media_target' => 'blog',
                 'media_user' => $user_level,
                 'media_access' => $media_access,
@@ -703,7 +786,22 @@ class PostApp extends BaseApp
           $this->postEvent->setPostAuthor($this->postEvent->postAuthorId());
           $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
           $this->postEvent->setPostSlug(distill_post_request($filters)['post_title']);
-          $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
+          
+          if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
+
+            (! empty($_POST['post_password'])) ? $this->postEvent->setProtected(protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password'])['post_password']) : "";
+
+            $this->postEvent->setPostContent(protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password'])['post_content']);
+            $this->postEvent->setPassPhrase(distill_post_request($filters)['post_password']);
+
+            $_SESSION['post_protected'] = (!isset($_SESSION['post_protected'])) ? distill_post_request($filters)['post_password'] : "";
+            
+          } else {
+
+            $this->postEvent->setPostContent(distill_post_request($filters)['post_content']);
+
+          }
+
           $this->postEvent->setPublish(distill_post_request($filters)['post_status']);
 
           if (empty($_POST['post_headlines'])) {
@@ -747,14 +845,27 @@ class PostApp extends BaseApp
       if ($user_level === 'contributor') {
 
         $this->view->set('medialibs', $medialib->dropDownMediaSelect($getPost['media_id']));
+
       } else {
 
         $this->view->set('medialibs', $medialib->imageUploadHandler($getPost['media_id']));
       }
 
+      if ($data_post['post_visibility'] == 'protected') {
+
+        $this->view->set('postContent', decrypt_post($getPost['ID'], $getPost['post_password']));
+
+      } else {
+
+        $this->view->set('postContent', $data_post['post_content']);
+
+      }
+
       $this->view->set('postStatus', $this->postEvent->postStatusDropDown($getPost['post_status']));
       $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown($getPost['comment_status']));
+      $this->view->set('postVisibility', $this->postEvent->visibilityDropDown($getPost['post_visibility']));
       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+
     }
 
     return $this->view->render();
@@ -821,7 +932,7 @@ class PostApp extends BaseApp
           $_SESSION['status'] = "postDeleted";
           direct_page('index.php?load=posts&status=postDeleted', 200);
         }
-      } catch (Throwable $th) {
+      } catch (\Throwable $th) {
 
         LogError::setStatusCode(http_response_code());
         LogError::exceptionHandler($th);
