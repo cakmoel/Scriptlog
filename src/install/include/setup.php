@@ -557,12 +557,11 @@ function purge_installation()
 
       file_put_contents(__DIR__ . '/../index.php', $clean_installation, LOCK_EX);
 
-      session_start();
-      session_unset();
+      unset($_SESSION['token']);
+
+      $_SESSION = array();
+
       session_destroy();
-      session_write_close();
-      setcookie(session_name(), '', 0, '/');
-      session_regenerate_id(true);
       
     }
   }
