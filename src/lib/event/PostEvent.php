@@ -162,13 +162,6 @@ class PostEvent
   private $sanitizer;
 
   /**
-   * credentials
-   *
-   * @var array
-   */
-  private $credentials = [];
-
-  /**
    * Constructor
    * 
    * @param object $postDao
@@ -354,7 +347,7 @@ class PostEvent
    */
   public function setPassPhrase($passphrase)
   {
-    $this->passphrase = $passphrase;
+    $this->passphrase = md5(app_key().$passphrase);
   }
 
   /**
@@ -474,23 +467,8 @@ class PostEvent
       $topic_id = $this->topics;
     }
 
-    $postId = $this->postDao->createPost($new_post, $topic_id); 
-    
-    if ($this->post_visibility == 'protected') {
-
-      $this->credentials = [
-        'post_id' => $postId,
-        'post_author' => $this->author,
-        'post_date' => date_for_database($this->post_date),
-        'post_password' => $this->post_password,
-        'passphrase' => $this->passphrase
-      ];
-      
-     (isset($postId) && $postId > 0) ? save_post_protected($postId, $this->author, $this->credentials) : "";
- 
-    }
-    
-    return $postId;
+    return $this->postDao->createPost($new_post, $topic_id); 
+     
   }
 
   /**

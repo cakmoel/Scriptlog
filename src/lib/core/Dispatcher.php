@@ -139,7 +139,7 @@ class Dispatcher
  private function errorNotFound($theme_dir)
  {
    http_response_code(404);
-   include($theme_dir.'404.php');
+   include $theme_dir.'404.php';
  }
 
 }

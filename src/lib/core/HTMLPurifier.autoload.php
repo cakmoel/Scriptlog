@@ -13,8 +13,11 @@ if (function_exists('spl_autoload_register') && function_exists('spl_autoload_un
         // Be polite and ensure that userland autoload gets retained
         spl_autoload_register('__autoload');
     }
-} 
+} elseif (!function_exists('__autoload')) {
+    require dirname(__FILE__) . '/HTMLPurifier.autoload-legacy.php';
+}
 
+// phpcs:ignore PHPCompatibility.IniDirectives.RemovedIniDirectives.zend_ze1_compatibility_modeRemoved
 if (ini_get('zend.ze1_compatibility_mode')) {
     trigger_error("HTML Purifier is not compatible with zend.ze1_compatibility_mode; please turn it off", E_USER_ERROR);
 }

@@ -63,6 +63,19 @@ $menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
 <input type="text" class="form-control" id="menu_url" name="menu_link" placeholder="ex:about-us" value="
 <?=(isset($menuData['menu_link'])) ? htmlspecialchars($menuData['menu_link']) : ""; ?>
 <?=(isset($formData['menu_link'])) ? htmlspecialchars($formData['menu_link'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" >
+<p class="help-block">
+<?php 
+  if (function_exists('is_permalink_enabled') && is_permalink_enabled() === 'yes'):
+?>
+Please check out <a href="https://scriptlog.my.id/doc/" target="_blank" rel="noopener noreferrer">documentation</a> for more information.
+<?php
+ else:
+?>
+You can implement link with query string. <i>ex: ?p=1</i>. More detail check out <a href="https://scriptlog.my.id/doc/" target="_blank" rel="noopener noreferrer">documentation</a>.
+<?php 
+endif;
+?>
+</p>
 </div>
 
 <?php if (isset($menuData['menu_status'])) : ?>
