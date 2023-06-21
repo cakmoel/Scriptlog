@@ -48,7 +48,6 @@ function metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri)
   $page_id = null;
   $post_title = null;
   $page_title = null;
-  $tag = null;
   $author = null;
   $keyword = null;
   $description = null;
@@ -239,7 +238,7 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
         $page_id = (!empty($read_page['ID'])) ? $read_page['ID'] : null;
         $page_title = (!empty($read_page['post_title'])) ? escape_html($read_page['post_title']) . " | " . app_info()['site_name'] : app_info()['site_name'];
         $keyword = (!empty($read_page['post_keyword'])) ? escape_html($read_page['post_keyword']) : app_info()['site_keywords'];
-        $description = (!empty($read_page['post_summary'])) ? escape_html($read_page['$post_summary']) : app_info()['site_description'];
+        $description = (!empty($read_page['post_summary'])) ? escape_html($read_page['post_summary']) : app_info()['site_description'];
         $author = (!empty($read_page['user_login'])) ? escape_html($read_page['user_login']) : APP_TITLE;
         $image = (!empty($read_page['media_filename'])) ? invoke_webp_image(escape_html($read_page['media_filename'])) : app_url() . DS . APP_IMAGE . 'scriptlog-612x221.jpg';
         $canonical = (!empty($read_page['post_slug'])) ? app_url() . DS . '?pg=' . $page_id : app_url();
