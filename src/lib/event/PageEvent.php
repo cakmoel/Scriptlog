@@ -291,17 +291,6 @@ class PageEvent
   }
 
   /**
-   * setPostTags
-   *
-   * @param string $post_tags
-   * 
-   */
-  public function setPageTags($post_tags)
-  {
-    $this->post_tags = $post_tags;
-  }
-
-  /**
    * Set post type
    *
    * @param string $post_type
@@ -393,7 +382,6 @@ class PageEvent
         'post_content' => $this->content,
         'post_summary' => $this->meta_desc,
         'post_keyword' => $this->meta_key,
-        'post_tags' => $this->post_tags,
         'post_status' => $this->page_status,
         'post_sticky' => $this->page_sticky,
         'post_type' => $this->post_type,
@@ -410,7 +398,6 @@ class PageEvent
         'post_content' => $this->content,
         'post_summary' => $this->meta_desc,
         'post_keyword' => $this->meta_key,
-        'post_tags' => $this->post_tags,
         'post_status' => $this->page_status,
         'post_sticky' => $this->page_sticky,
         'post_type' => $this->post_type,
@@ -559,20 +546,7 @@ class PageEvent
    */
   public function pageAuthorLevel()
   {
-
-    if (isset($_COOKIE['scriptlog_auth'])) {
-
-      Authorization::setAuthInstance(new Authentication(new UserDao, new UserTokenDao, $this->validator));
-
-      return Authorization::authorizeLevel();
-    }
-
-    if (isset(Session::getInstance()->scriptlog_session_level)) {
-
-      return Session::getInstance()->scriptlog_session_level;
-    }
-
-    return false;
+    return user_privilege();
   }
 
   public function totalPages($data = null)

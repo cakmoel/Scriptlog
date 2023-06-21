@@ -47,7 +47,7 @@ install_header($current_path, $protocol, $server_host);
         <p class="lead">
         Installation is complete. Your blog is ready for population.
             Please 
-        <a href="<?php echo addslashes(setup_base_url($protocol, $server_host).DIRECTORY_SEPARATOR.'admin/login.php')?>">log in</a>
+        <a href="<?php echo addslashes(setup_base_url($protocol, $server_host).DIRECTORY_SEPARATOR.'admin/login.php'); ?>">log in</a>
         </p>
         <?php
         endif;

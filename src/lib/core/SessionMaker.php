@@ -8,7 +8,6 @@
  * @version 1.0
  * 
  */
-
 class SessionMaker extends SessionHandler
 {
 

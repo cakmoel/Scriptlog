@@ -64,8 +64,8 @@ post_type varchar(120) NOT NULL DEFAULT 'blog',
 comment_status varchar(20) NOT NULL DEFAULT 'open',
 passphrase varchar(255) DEFAULT NULL,
 PRIMARY KEY (ID),
-FOREIGN KEY (post_author) REFERENCES tbl_users(ID),    
-KEY (media_id),    
+KEY author_id(post_author),
+KEY post_media(media_id),    
 FULLTEXT KEY (post_tags, post_title, post_content)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
@@ -99,8 +99,8 @@ before_expired VARCHAR(50) NOT NULL,
 ip_address VARCHAR(50) NOT NULL,
 created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 PRIMARY KEY (ID),
-UNIQUE KEY media_identifier(media_identifier),
-FOREIGN KEY (media_id) REFERENCES tbl_media(ID) ON DELETE CASCADE ON UPDATE CASCADE
+KEY id_media(media_id),
+UNIQUE KEY media_identifier(media_identifier)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
 $tblTopic = "CREATE TABLE IF NOT EXISTS tbl_topics (
@@ -114,9 +114,7 @@ PRIMARY KEY (ID)
 $tblPostTopic = "CREATE TABLE IF NOT EXISTS tbl_post_topic ( 
 post_id BIGINT(20) unsigned NOT NULL,    
 topic_id BIGINT(20) unsigned NOT NULL,
-PRIMARY KEY(post_id, topic_id),
-FOREIGN KEY (post_id) REFERENCES tbl_posts(ID) ON DELETE CASCADE ON UPDATE CASCADE,
-FOREIGN KEY (topic_id) REFERENCES tbl_topics(ID) ON DELETE CASCADE ON UPDATE CASCADE
+PRIMARY KEY(post_id, topic_id)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
         
 $tblComment = "CREATE TABLE IF NOT EXISTS tbl_comments (
@@ -130,7 +128,7 @@ comment_content text NOT NULL,
 comment_status VARCHAR(20) NOT NULL DEFAULT 'pending',
 comment_date datetime NOT NULL DEFAULT '1988-07-01 08:00:00',
 PRIMARY KEY (ID),
-FOREIGN KEY (comment_post_id) REFERENCES tbl_posts(ID)
+KEY id_comment_post(comment_post_id)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
             
 $tblMenu = "CREATE TABLE IF NOT EXISTS tbl_menu (

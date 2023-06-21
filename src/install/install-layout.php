@@ -155,21 +155,27 @@ function get_sisfo()
               <div>
                 <h6 class="my-0">Browser</h6>
                 <?php 
-                   if ((get_browser_name($_SERVER['HTTP_USER_AGENT'])['name'] != check_browser()) 
-                          && (check_browser_version() === true)) {
-                     
-                    $browser_undetected = "text-danger";
-                    $fabrowser_close = "fa fa-close fa-lg";
+                   
+                   $browserslist = array('Chrome', 'Firefox', 'Internet Explorer', 'Opera', 'Vivaldi');
+                  
+                   foreach ($browserslist as $browser_name) :
+                       
+                       if (check_browser() == $browser_name) {
                       
-                  } else {
-                    $browser_detected = "text-success";
-                    $fabrowser_checked = "fa fa-check fa-lg";
-                  }
+                           if (check_browser_version() === true) {
+                               
+                               $browser_failed = "text-danger";
+                               $fabrowser_close = "fa fa-close fa-lg";
+                           }
+                          
+                       }
+                       
+                   endforeach;
                   
                 ?>
-                   <small class="<?=(isset($browser_undetected)) ? $browser_undetected : $browser_detected; ?>"><?=(isset($browser_undetected)) ? $errors['errorChecking'] = 'Browser is not supported' : check_browser(). ' ' .get_browser_version(); ?></small>
+                  <small class="<?=(isset($browser_failed)) ? $browser_failed : 'text-success'; ?>"><?=(isset($browser_failed)) ? $errors['errorChecking'] = 'Browser is not supported' : check_browser(). ' ' .get_browser_version(); ?></small>
                 </div>
-                <span class="<?=(isset($browser_undetected)) ? $browser_undetected : $browser_detected; ?>"><i class="<?=(isset($fabrowser_close)) ? $fabrowser_close : $fabrowser_checked; ?> ?>"></i></span>
+                <span class="<?=(isset($browser_failed)) ? $browser_failed : 'text-success'; ?>"><i class="<?=(isset($fabrowser_close)) ? $fabrowser_close : 'fa fa-check fa-lg'; ?> ?>"></i></span>
              
             </li>
            

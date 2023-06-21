@@ -3,6 +3,7 @@
  * interface IEventThrowable extends IThrowable
  * 
  * @category Core Class
+ * @author M.Noermoehammad
  * 
  */
 interface IEventThrowable extends IThrowable

@@ -3,6 +3,7 @@
  * interface IDaoThrowable extends IThrowable
  * 
  * @category Core Class
+ * @author M.Noermoehammad
  * 
  */
 interface IDaoThrowable extends IThrowable
