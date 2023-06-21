@@ -111,7 +111,7 @@
                               <i class="fa fa-calendar" aria-hidden="true"></i>
                            </div>
 
-                           <input type="text" id="datetimepicker" name="<?= (isset($postData['post_modified']) ? "post_modified" : "post_date"); ?>" class="form-control" placeholder="Date" value="
+               <input type="text" id="datetimepicker" name="<?= (isset($postData['post_modified']) ? "post_modified" : "post_date"); ?>" class="form-control" placeholder="Date" value="
 <?php
 if (isset($postData['post_modified']) || isset($postData['post_date'])) {
 
@@ -129,7 +129,8 @@ if (isset($postData['post_modified']) || isset($postData['post_date'])) {
                      </div>
                      <!-- /.Date -->
 
-                     <?= isset($postVisibility) ? $postVisibility : ""; ?>
+                <?= (isset($postVisibility)) ? $postVisibility : ""; ?> 
+                <!-- /.post-visiblity -->
 
                   </div>
                   <!-- /.box-body -->
@@ -199,10 +200,11 @@ if (isset($postData['post_modified']) || isset($postData['post_date'])) {
 <script>
    function checkVisibilitySelection() {
       a = document.getElementById("visibility.system");
-      if (a.value == "protected")
+      if (a.value == "protected") {
          document.getElementById("protected").setAttribute("style", "display:inline");
-      else
+      } else {
          document.getElementById("protected").setAttribute("style", "display:none");
+      }
       return a.value;
    }
 </script>

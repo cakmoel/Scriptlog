@@ -144,7 +144,7 @@ public function insert()
        
       }
 
-      if ( ( ! empty($_POST['media_caption']) ) && ( true === form_size_validation($form_fields) )) {
+      if ((! empty($_POST['media_caption']) ) && (true === form_size_validation($form_fields))) {
 
         $checkError = false;
         array_push($errors, "Form data is longer than allowed");
@@ -207,14 +207,14 @@ public function insert()
 
       }
 
-      if(false === check_file_name($file_location)) {
+      if (false === check_file_name($file_location)) {
 
         $checkError = false;
         array_push($errors, "file name is not valid");
 
       }
 
-      if(true === check_file_length($file_location)) {
+      if (true === check_file_length($file_location)) {
 
         $checkError = false;
         array_push($errors, "file name is too long");
@@ -247,7 +247,7 @@ public function insert()
        // upload file
       if (is_uploaded_file($file_location)) {
 
-        if ( ( false === check_file_extension($file_name) ) || ( false === check_mime_type(mime_type_dictionary(), $file_location) ) ) {
+        if ((false === check_file_extension($file_name)) || (false === check_mime_type(mime_type_dictionary(), $file_location))) {
 
           $checkError = false;
           array_push($errors, "Invalid file format");
@@ -285,7 +285,7 @@ public function insert()
         
          $media_id = $this->mediaEvent->addMedia();
 
-         if($media_id) {
+         if ($media_id) {
             
            $this->mediaEvent->setMediaId($media_id);
            $this->mediaEvent->setMediaKey($new_filename);

@@ -25,6 +25,13 @@ class PostApp extends BaseApp
   private $postEvent;
 
   /**
+   * Credential
+   *
+   * @var array
+   */
+  private $crendential = [];
+
+  /**
    * Initialize instance of object properties and method
    * @param object $postEvent
    */
@@ -235,7 +242,7 @@ class PostApp extends BaseApp
           }
         }
 
-        if (isset($_POST['post_password'])) {
+        if (isset($_POST['post_visibility']) && $_POST['post_visibility'] == 'protected') {
           
           if (check_common_password($_POST['post_password']) === true) {
 
@@ -292,10 +299,12 @@ class PostApp extends BaseApp
 
             } else {
 
+              clearstatcache();
+
               $media_metavalue = array(
                 'Origin' => "nophoto.jpg",
                 'File type' => "image/jpg",
-                'File size' => "Unknown",
+                'File size' => format_size_unit(filesize(__DIR__ . '/../../'.APP_IMAGE."nophoto.jpg")),
                 'Uploaded at' => date("Y-m-d H:i:s"),
                 'Dimension' => $width . 'x' . $height
               );
@@ -364,6 +373,7 @@ class PostApp extends BaseApp
             $medialib->createMediaMeta($mediameta);
 
             $this->postEvent->setPostImage($append_media);
+            
           }
 
           if (isset($_POST['catID']) && $_POST['catID'] == 0) {
@@ -389,7 +399,7 @@ class PostApp extends BaseApp
 
           if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
 
-            (! empty($_POST['post_password'])) ? $this->postEvent->setProtected(protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password'])['post_password']) : "";
+            (!empty($_POST['post_password'])) ? $this->postEvent->setProtected(protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password'])['post_password']) : "";
 
             $this->postEvent->setPostContent(protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password'])['post_content']);
             $this->postEvent->setPassPhrase(distill_post_request($filters)['post_password']);
@@ -408,9 +418,11 @@ class PostApp extends BaseApp
           if (empty($_POST['post_headlines'])) {
 
             $this->postEvent->setHeadlines(0);
+
           } else {
 
             $this->postEvent->setHeadlines(distill_post_request($filters)['post_headlines']);
+
           }
 
           $this->postEvent->setComment(distill_post_request($filters)['comment_status']);
@@ -422,8 +434,21 @@ class PostApp extends BaseApp
             $this->postEvent->setPostTags(distill_post_request($filters)['post_tags']);
           }
 
-          $this->postEvent->addPost();
-          
+          $postId = $this->postEvent->addPost();
+
+          if (isset($_SESSION['post_protected']) && $postId > 0) {
+
+            $values = [
+              'post_id' => $postId,
+              'post_author' => $this->postEvent->postAuthorId(),
+              'post_date' => date_for_database(distill_post_request($filters)['post_date']),
+              'post_password' => distill_post_request($filters)['post_password'],
+              'passpharse' => distill_post_request($filters)['post_password']
+            ];
+            
+            save_post_protected($this->setCredential($values));
+          }
+
           $_SESSION['status'] = "postAdded";
           direct_page('index.php?load=posts&status=postAdded', 200);
 
@@ -642,7 +667,7 @@ class PostApp extends BaseApp
           }
         }
 
-        if (isset($_POST['post_password'])) {
+        if (isset($_POST['post_visibility']) && $_POST['post_visibility'] == 'protected') {
           
           if (check_common_password($_POST['post_password']) === true) {
 
@@ -682,6 +707,7 @@ class PostApp extends BaseApp
           $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown($getPost['comment_status']));
           $this->view->set('postVisibility', $this->postEvent->visibilityDropDown($getPost['post_visibility']));
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+
         } else {
 
           list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : getimagesize(app_url().'/public/files/pictures/nophoto.jpg');
@@ -696,10 +722,12 @@ class PostApp extends BaseApp
 
             } else {
               
+              clearstatcache();
+            
               $media_metavalue = array(
                 'Origin' => "nophoto.jpg",
                 'File type' => "image/jpg",
-                'File size' => "Unknown",
+                'File size' => format_size_unit(filesize(__DIR__ . '/../../'.APP_IMAGE."nophoto.jpg")),
                 'Uploaded at' => date("Y-m-d H:i:s"),
                 'Dimension' => $width . 'x' . $height
               );
@@ -789,7 +817,7 @@ class PostApp extends BaseApp
           
           if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
 
-            (! empty($_POST['post_password'])) ? $this->postEvent->setProtected(protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password'])['post_password']) : "";
+            (!empty($_POST['post_password'])) ? $this->postEvent->setProtected(protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password'])['post_password']) : "";
 
             $this->postEvent->setPostContent(protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password'])['post_content']);
             $this->postEvent->setPassPhrase(distill_post_request($filters)['post_password']);
@@ -945,11 +973,34 @@ class PostApp extends BaseApp
   }
 
   /**
-   * Set View
+   * setView
+   * 
    * @param object $viewName
+   * 
    */
   protected function setView($viewName)
   {
     $this->view = new View('admin', 'ui', 'posts', $viewName);
   }
+
+  /**
+   * setCredential
+   *
+   * @param array $values
+   * 
+   */
+  private function setCredential(array $values)
+  {
+    $this->crendential = [
+      'post_id' => $values['post_id'],
+      'post_author' => $values['post_author'],
+      'post_date' => $values['post_date'],
+      'post_password' => $values['post_password'],
+      'passphrase' => $values['post_password']
+    ];
+
+    return $this->crendential;
+
+  }
+
 }

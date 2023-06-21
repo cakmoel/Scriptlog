@@ -413,7 +413,7 @@ public function dropDownCommentStatus($selected = "")
  	$comment_status = array('open' => 'Open', 'closed' => 'Closed');
 
  	if ($selected !== '') {
- 	    $this->selected = $selected;
+ 	  $this->selected = $selected;
  	}
 
  	return dropdown($name, $comment_status, $this->selected);
@@ -426,7 +426,7 @@ public function dropDownCommentStatus($selected = "")
  * @param string $selected
  * 
  */
-public function dropDownVisibility($selected = null)
+public function dropDownVisibility($selected = null, $postId = null)
 {
 
   $dropdown = null;
@@ -436,7 +436,6 @@ public function dropDownVisibility($selected = null)
   $dropdown .= '<div class="form-group">';
   $dropdown .= '<label for="visibility">Post visibility</label>';
   $dropdown .= '<select name="'.$name.'" class="form-control" onchange="checkVisibilitySelection();" id="visibility.system">'. PHP_EOL;
-  $dropdown .= '<option disabled selected>Select Visibility</option>'. PHP_EOL;
   
   $this->selected = $selected;
 
@@ -451,13 +450,43 @@ public function dropDownVisibility($selected = null)
   }
 
   $dropdown .= '</select>'. PHP_EOL;
-  $dropdown .= '<div id="protected" style="display:none">';
-  $dropdown .= '<br />';
-  $dropdown .= '<label for="protected">Password:</label>';
-  $dropdown .= '<input type="text" class="form-control" name="post_password" value="" placeholder="Use a secure password">';
-  $dropdown .= '<p class="help-block">Protected with a password you choose. Only those with the password can view this post.</p>';
+
+  if (!is_null($postId)) {
+
+    $idsanitized = sanitizer($postId, 'sql');
+    $grab_post = medoo_column_where('tbl_posts', ['post_visibility', 'post_password'], ['ID' => $idsanitized]);
+
+    $post_visibility = isset($grab_post['post_visibility']) ? safe_html($grab_post['post_visibility']) : "";
+    $post_pwd = isset($grab_post['post_password']) ? safe_html($grab_post['post_password']) : "";
+
+    $dropdown .= '<div id="'.$post_visibility.'" style="display:inline">';
+    $dropdown .= '<br>';
+    $dropdown .= '<label for="protected">Password:</label>';
+    $dropdown .= '<input type="password" class="form-control" name="post_password" value="'.$post_pwd.'" placeholder="Use a secure password">';
+    $dropdown .= '<p class="help-block">Protected with a password you choose. Only those with the password can view this post.</p>';
+
+  } else {
+
+    $dropdown .= '<div id="protected" style="display:none">';
+    $dropdown .= '<br />';
+    $dropdown .= '<label for="protected">Password:</label>';
+    $dropdown .= '<input type="password" class="form-control" name="post_password" value="" placeholder="Use a secure password">';
+    $dropdown .= '<p class="help-block">Protected with a password you choose. Only those with the password can view this post.</p>';
+  
+  }
+
   $dropdown .= '</div>';
   $dropdown .= '</div>';
+  $dropdown .= '<script>';
+  $dropdown .= 'function checkVisibilitySelection() {'.PHP_EOL;
+  $dropdown .= 'a = document.getElementById("visibility.system");'.PHP_EOL;
+  $dropdown .= 'if (a.value == "protected")'.PHP_EOL;
+  $dropdown .= 'document.getElementById("protected").setAttribute("style", "display:inline");'.PHP_EOL;
+  $dropdown .= 'else'.PHP_EOL;
+  $dropdown .= 'document.getElementById("protected").setAttribute("style", "display:none");'.PHP_EOL;
+  $dropdown .= 'return a.value;'.PHP_EOL;
+  $dropdown .= '}'.PHP_EOL;
+  $dropdown .= '</script>';
 
   return $dropdown;
 

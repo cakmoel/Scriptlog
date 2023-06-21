@@ -91,6 +91,7 @@ class PageApp extends BaseApp
     $medialib = new MediaDao();
     $errors = array();
     $checkError = true;
+    $user_level = $this->pageEvent->pageAuthorLevel();
 
     if (isset($_POST['pageFormSubmit'])) {
 
@@ -101,7 +102,6 @@ class PageApp extends BaseApp
         'image_id' => FILTER_SANITIZE_NUMBER_INT,
         'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
         'post_sticky' => FILTER_SANITIZE_NUMBER_INT,
         'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : ""
@@ -118,7 +118,7 @@ class PageApp extends BaseApp
           throw new AppException("Sorry, unpleasant attempt detected!");
         }
 
-        if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_keyword', 'post_tags', 'post_status', 'post_sticky', 'comment_status']) == false) {
+        if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_keyword', 'post_status', 'post_sticky', 'comment_status']) == false) {
 
           header($_SERVER["SERVER_PROTOCOL"] . ' 413 Payload Too Large', true, 413);
           header('Status: 413 Payload Too Large');
@@ -172,9 +172,51 @@ class PageApp extends BaseApp
 
         } else {
 
-          if ( ( isset($_POST['image_id']) ) && ( !empty($_POST['image_id']) ) ) {
+          list($width, $height) = (empty($_POST['image'])) ? getimagesize(app_url().'/public/files/pictures/nophoto.jpg') : "";
 
-            $this->pageEvent->setPageImage((int)distill_post_request($filters)['image_id']);
+          $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] === 'publish')) ? 'public' : 'private';
+
+          if (empty($_POST['image_id'])) {
+
+            clearstatcache();
+
+            $media_metavalue = array(
+              'Origin' => "nophoto.jpg",
+              'File type' => "image/jpg",
+              'File size' => format_size_unit(filesize(__DIR__ . '/../../'.APP_IMAGE."nophoto.jpg")),
+              'Uploaded at' => date("Y-m-d H:i:s"),
+              'Dimension' => $width . 'x' . $height
+            );
+
+            $bind_media = [
+              'media_filename' => "nophoto.jpg",
+              'media_caption' => prevent_injection(distill_post_request($filters)['post_title']),
+              'media_type' => "image/jpg",
+              'media_target' => 'page',
+              'media_user' => $user_level,
+              'media_access' => $media_access,
+              'media_status' => '1'
+            ];
+
+            $append_media = $medialib->createMedia($bind_media);
+
+            $mediameta = [
+              'media_id' => $append_media,
+              'meta_key' => "nophoto.jpg",
+              'meta_value' => json_encode($media_metavalue)
+            ];
+
+            $medialib->createMediaMeta($mediameta);
+
+            $this->pageEvent->setPageImage($append_media);
+
+          } else {
+
+            if ((isset($_POST['image_id'])) && (!empty($_POST['image_id']))) {
+
+              $this->pageEvent->setPageImage((int)distill_post_request($filters)['image_id']);
+  
+            }
 
           }
 
@@ -198,9 +240,8 @@ class PageApp extends BaseApp
           $this->pageEvent->setPublish(distill_post_request($filters)['post_status']);
           $this->pageEvent->setComment(distill_post_request($filters)['comment_status']);
           $this->pageEvent->setPostType('page');
-          $this->pageEvent->setPageTags(distill_post_request($filters)['post_tags']);
 
-          if ( empty($_POST['post_sticky']) ) {
+          if (empty($_POST['post_sticky'])) {
 
             $this->pageEvent->setSticky(0);
 
@@ -216,7 +257,7 @@ class PageApp extends BaseApp
 
         }
 
-      } catch (Throwable $th) {
+      } catch (\Throwable $th) {
 
         LogError::setStatusCode(http_response_code());
         LogError::exceptionHandler($th);
@@ -257,7 +298,8 @@ class PageApp extends BaseApp
     $medialib = new MediaDao();
     $errors = array();
     $checkError = true;
-
+    $user_level = $this->pageEvent->pageAuthorLevel();
+    
     if (!$getPage = $this->pageEvent->grabPage($id)) {
       $_SESSION['error'] = "pageNotFound";
       direct_page('index.php?load=pages&error=pageNotFound', 404);
@@ -272,7 +314,6 @@ class PageApp extends BaseApp
       'post_content' => $getPage['post_content'],
       'post_summary' => $getPage['post_summary'],
       'post_keyword' => $getPage['post_keyword'],
-      'post_tags' => $getPage['post_tags'],
       'post_status' => $getPage['post_status'],
       'post_sticky' => $getPage['post_sticky'],
       'comment_status' => $getPage['comment_status']
@@ -288,7 +329,6 @@ class PageApp extends BaseApp
         'post_modified' => isset($_POST['post_modified']) ? Sanitize::mildSanitizer($_POST['post_modified']) : "",
         'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
         'post_sticky' => FILTER_SANITIZE_NUMBER_INT,
         'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : ""
@@ -305,7 +345,7 @@ class PageApp extends BaseApp
           throw new AppException("Sorry, unpleasant attempt detected!");
         }
 
-        if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_keyword', 'post_tags', 'post_status', 'post_sticky', 'comment_status']) === false) {
+        if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_keyword', 'post_status', 'post_sticky', 'comment_status']) === false) {
 
           header(APP_PROTOCOL . ' 413 Payload Too Large', true, 413);
           header('Status: 413 Payload Too Large');
@@ -359,15 +399,57 @@ class PageApp extends BaseApp
 
         } else {
 
-          if ( ( isset($_POST['image_id']) ) && ( !empty($_POST['image_id']) ) ) {
+          list($width, $height) = (empty($_POST['image'])) ? getimagesize(app_url().'/public/files/pictures/nophoto.jpg') : "";
 
-            $this->pageEvent->setPageImage((int)distill_post_request($filters)['image_id']);
+          $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] === 'publish')) ? 'public' : 'private';
+
+          if ((isset($getPage['media_id'])) && ($getPage['media_id'] === 0)) {
+
+            clearstatcache();
+            
+            $media_metavalue = array(
+              'Origin' => "nophoto.jpg",
+              'File type' => "image/jpg",
+              'File size' => format_size_unit(filesize(__DIR__ . '/../../'.APP_IMAGE."nophoto.jpg")),
+              'Uploaded at' => date("Y-m-d H:i:s"),
+              'Dimension' => $width . 'x' . $height
+            );
+
+            $bind_media = [
+              'media_filename' => "nophoto.jpg",
+              'media_caption' => prevent_injection(distill_post_request($filters)['post_title']),
+              'media_type' => "image/jpg",
+              'media_target' => 'page',
+              'media_user' => $user_level,
+              'media_access' => $media_access,
+              'media_status' => '1'
+            ];
+
+            $append_media = $medialib->createMedia($bind_media);
+
+            $mediameta = [
+              'media_id' => $append_media,
+              'meta_key' => "nophoto.jpg",
+              'meta_value' => json_encode($media_metavalue)
+            ];
+
+            $medialib->createMediaMeta($mediameta);
+
+            $this->pageEvent->setPageImage($append_media);
+              
+          } else {
+
+            if ((isset($_POST['image_id'])) && (!empty($_POST['image_id']))) {
+
+              $this->pageEvent->setPageImage((int)distill_post_request($filters)['image_id']);
+  
+            }
 
           }
-
+          
           $this->pageEvent->setPageId((int)distill_post_request($filters)['page_id']);
           
-          if ( empty($_POST['post_modified']) ) {
+          if (empty($_POST['post_modified'])) {
 
             $this->pageEvent->setPostModified(date("Y-m-d H:i:s"));
 
@@ -386,12 +468,15 @@ class PageApp extends BaseApp
           $this->pageEvent->setPublish(distill_post_request($filters)['post_status']);
           $this->pageEvent->setComment(distill_post_request($filters)['comment_status']);
           $this->pageEvent->setPostType('page');
-          $this->pageEvent->setPageTags(distill_post_request($filters)['post_tags']);
           
-          if ( empty($_POST['post_sticky']) ) { 
+          if (empty($_POST['post_sticky'])) {
+
             $this->pageEvent->setSticky(0);
+
           } else {
+
             $this->pageEvent->setSticky(distill_post_request($filters)['post_sticky']);
+
           }
  
           $this->pageEvent->modifyPage();
@@ -400,7 +485,7 @@ class PageApp extends BaseApp
 
         }
 
-      } catch (Throwable $th) {
+      } catch (\Throwable $th) {
 
         LogError::setStatusCode(http_response_code());
         LogError::exceptionHandler($th);

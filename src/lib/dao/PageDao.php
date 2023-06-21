@@ -42,6 +42,8 @@ public function findPages($type, $orderBy = 'ID', $author = null)
                 p.post_title,
                 p.post_slug,
                 p.post_content,
+				p.post_summary,
+				p.post_keyword,
                 p.post_status,
                 p.post_sticky,
                 p.post_type,
@@ -64,6 +66,8 @@ public function findPages($type, $orderBy = 'ID', $author = null)
                 p.post_title,
                 p.post_slug,
                 p.post_content,
+				p.post_summary,
+				p.post_keyword,
                 p.post_status,
                 p.post_sticky,
                 p.post_type,
@@ -250,7 +254,7 @@ public function checkPageId($id, $sanitizing)
    $sql = "SELECT ID FROM tbl_posts WHERE ID = ?";
    $this->setSQL($sql);
    $stmt = $this->checkCountValue([$cleanId]);
-   return($stmt > 0);
+   return ($stmt > 0);
 }
  
 /**

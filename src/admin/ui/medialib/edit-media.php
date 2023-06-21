@@ -92,9 +92,10 @@ if ($image_src || $webp_src) :
 if ($mediaData['media_type'] == "video/webm" || $mediaData['media_type'] == "video/mp4" || $mediaData['media_type'] == "video/ogg") :
 ?>
 
-<video class="img-responsive pad" controls width="600" height="320">
+<video class="img-responsive pad" controls width="600" height="320" preload="metadata">
 <source src="<?=$video_src; ?>" type="<?=$mediaData['media_type']; ?>">
 Sorry, your browser doesn't support embedded <code>videos</code>
+<track label="English" kind="captions" srclang="en">
 </video>
 
 <?php  elseif($mediaData['media_type'] == "audio/mpeg" || $mediaData['media_type'] == "audio/wav" || $mediaData['media_type'] == "audio/ogg") : ?>

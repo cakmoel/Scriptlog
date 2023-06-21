@@ -12,12 +12,12 @@
  * @version 1.0
  * 
  */
-final class Session
+class Session
 {
 
-const SESSION_STARTED = FALSE;
+const SESSION_STARTED = false;
 
-const SESSION_NOT_STARTED = TRUE;
+const SESSION_NOT_STARTED = true;
 
 private $session_state = self::SESSION_NOT_STARTED;
 
