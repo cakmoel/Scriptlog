@@ -222,7 +222,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
 
                 $_SESSION['token'] = $key;
 
-                if (check_mysql_version($link, "5.6")) {
+                if (check_mysql_version($link, "5.7")) {
 
                     install_database_table($link, $protocol, $server_host, $username, $password, $email, $key);
 

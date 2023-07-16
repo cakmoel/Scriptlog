@@ -1,4 +1,5 @@
 <?php
+
 /**
  * File dbtable.php
  * 
@@ -80,7 +81,7 @@ media_access VARCHAR(10) NOT NULL DEFAULT 'public',
 media_status INT(11) NOT NULL DEFAULT '0',
 PRIMARY KEY (ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
-    
+
 $tblMediaMeta = "CREATE TABLE IF NOT EXISTS tbl_mediameta (
 ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,    
 media_id BIGINT(20) UNSIGNED NOT NULL DEFAULT '0', 
@@ -110,13 +111,13 @@ topic_slug varchar(255) NOT NULL,
 topic_status enum('Y','N') NOT NULL DEFAULT 'Y',
 PRIMARY KEY (ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
-        
+
 $tblPostTopic = "CREATE TABLE IF NOT EXISTS tbl_post_topic ( 
 post_id BIGINT(20) unsigned NOT NULL,    
 topic_id BIGINT(20) unsigned NOT NULL,
 PRIMARY KEY(post_id, topic_id)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
-        
+
 $tblComment = "CREATE TABLE IF NOT EXISTS tbl_comments (
 ID BIGINT(20) unsigned NOT NULL auto_increment,
 comment_post_id BIGINT(20) unsigned NOT NULL,
@@ -130,17 +131,18 @@ comment_date datetime NOT NULL DEFAULT '1988-07-01 08:00:00',
 PRIMARY KEY (ID),
 KEY id_comment_post(comment_post_id)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
-            
+
 $tblMenu = "CREATE TABLE IF NOT EXISTS tbl_menu (
-ID INT(5) unsigned NOT NULL auto_increment,
-parent_id INT(5) UNSIGNED NOT NULL DEFAULT '0',
-menu_label VARCHAR(200) NOT NULL,
-menu_link VARCHAR(255) DEFAULT NULL,
-menu_status enum('Y','N') NOT NULL DEFAULT 'N',
-menu_visibility VARCHAR(20) NOT NULL DEFAULT 'public',
-PRIMARY KEY(ID)
+ ID INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+ menu_label VARCHAR(200) NOT NULL,
+ menu_link VARCHAR(255) DEFAULT NULL,
+ menu_status ENUM('Y', 'N') NOT NULL DEFAULT 'N',
+ menu_visibility VARCHAR(20) NOT NULL DEFAULT 'public',
+ parent_id INT(11) UNSIGNED NOT NULL DEFAULT '0',
+ menu_sort INT(11) UNSIGNED NOT NULL DEFAULT '0',
+ PRIMARY KEY (ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
-                
+
 $tblPlugin = "CREATE TABLE IF NOT EXISTS tbl_plugin (
 ID BIGINT(20) unsigned NOT NULL auto_increment,
 plugin_name VARCHAR(100) NOT NULL,
@@ -152,7 +154,7 @@ plugin_level VARCHAR(20) NOT NULL,
 plugin_sort INT(5) DEFAULT NULL,
 PRIMARY KEY(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
-        
+
 $tblSetting = "CREATE TABLE IF NOT EXISTS tbl_settings (
 ID INT(11) unsigned NOT NULL AUTO_INCREMENT,
 setting_name VARCHAR(255) NOT NULL,
@@ -161,7 +163,7 @@ PRIMARY KEY(ID),
 KEY setting_name(setting_name(191)),
 KEY setting_value(setting_value(191))
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
-        
+
 $tblTheme = "CREATE TABLE IF NOT EXISTS tbl_themes (
 ID INT(11) unsigned NOT NULL auto_increment,
 theme_title VARCHAR(100) NOT NULL,

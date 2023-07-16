@@ -46,7 +46,7 @@ require dirname(__FILE__) . '/functions.php';
             <div class="collapse navbar-collapse" id="navbar-menu">
                 <ul class="sina-menu sina-menu-right" data-in="fadeInLeft" data-out="fadeInOut">
                     <?php 
-                    $menus = retrieves_navigation('public');
+                    $menus = theme_navigation('public');
                     echo  front_navigation(0, $menus); 
                     ?>
                 </ul>

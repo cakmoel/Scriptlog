@@ -54,7 +54,7 @@ return true;
 function review_login_attempt($ip)
 {
 
- return (alert_login_attempt($ip)['alert_login_attempt'] >= 20 ? true : false);
+ return alert_login_attempt($ip)['alert_login_attempt'] >= 20 ? true : false;
 
 }                                                    
 
@@ -110,7 +110,7 @@ if (review_login_attempt($ip) === true) {
 
 if (midfielder() === true) {
 
-   sleep(20);
+   (function_exists('sleep')) ? sleep(20) : "";
 
    defender();
    

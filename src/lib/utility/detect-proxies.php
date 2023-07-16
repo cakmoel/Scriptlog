@@ -33,13 +33,20 @@ $proxy_headers = [
 	'X_FORWARDED_FOR',
 	'FORWARDED_FOR',
 	'X_FORWARDED',
+	'X-Forwarded-Proto',
+	'X-Forwarded-Host',
+	'X-Forwarded-Port',
 	'FORWARDED',
 	'CLIENT-IP',
 	'CLIENT_IP',
 	'PROXY-AGENT',
 	'HTTP_X_CLUSTER_CLIENT_IP',
 	'FORWARDED_FOR_IP',
-	'HTTP_PROXY_CONNECTION'
+	'HTTP_PROXY_CONNECTION',
+	'HTTP_CF_CONNECTING_IP',
+	'HTTP_CF_IPCOUNTRY',
+	'HTTP_CF_RAY',
+	'HTTP_CF_VISITOR'
 ];
 
 foreach ($proxy_headers as $header) {

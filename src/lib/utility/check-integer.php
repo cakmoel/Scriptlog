@@ -10,5 +10,5 @@
  */
 function check_integer($input)
 {
-  return (ctype_digit(strval($input)));
+  return ctype_digit(strval($input));
 }

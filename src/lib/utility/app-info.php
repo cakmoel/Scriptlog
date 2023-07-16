@@ -15,7 +15,7 @@
 function app_info()
 {
 
-    $configurations = new ConfigurationDao();
+    $configurations = class_exists('ConfigurationDao') ? new ConfigurationDao() : "";
     $app_info = array();
     $results = $configurations->findConfigs();
 
@@ -66,6 +66,7 @@ function app_info()
         }
 
         return $app_info;
+
     } else {
 
         return AppConfig::readConfiguration(invoke_config());

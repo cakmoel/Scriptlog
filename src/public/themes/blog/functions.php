@@ -85,7 +85,7 @@ function initialize_gallery()
 }
 
 /**
- * featured_post
+ * featured_post()
  * 
  * retrieving random headlines
  *
@@ -100,7 +100,7 @@ function featured_post()
 }
 
 /**
- * sticky_page
+ * sticky_page()
  * 
  * @category theme function
  * @return mixed
@@ -113,7 +113,7 @@ function sticky_page()
 }
 
 /**
- * random_posts
+ * random_posts()
  *
  * @category theme function
  * @param int|num $limit
@@ -127,7 +127,7 @@ function random_posts($start, $end)
 }
 
 /**
- * latest_posts
+ * latest_posts()
  *
  * @param int|numeric $position
  * @param int|numeric $limit
@@ -141,9 +141,10 @@ function latest_posts($limit, $position = null)
 }
 
 /**
- * retrieves_topic()
+ * retrieves_topic_simple()
  *
  * @param int|num $id
+ * 
  */
 function retrieves_topic_simple($id)
 {
@@ -174,9 +175,10 @@ function retrieves_topic_simple($id)
 }
 
 /**
- * retrieve_post_topic
+ * retrieves_topic_prepared()
  * 
  * @param int|num $id
+ * 
  */
 function retrieves_topic_prepared($id)
 {
@@ -207,10 +209,12 @@ function retrieves_topic_prepared($id)
 }
 
 /**
- * sidebarTopics()
+ * sidebar_topics()
+ * 
  * retrieving categories and display it on sidebar
  *
  * @return mixed
+ * 
  */
 function sidebar_topics()
 {
@@ -220,7 +224,9 @@ function sidebar_topics()
 
 /**
  * retrieve_tags()
+ * 
  * retrieving tags records and display it on sidebar
+ * 
  */
 function retrieve_tags()
 {
@@ -240,7 +246,7 @@ function link_tag($id)
 }
 
 /**
- * link_topic
+ * link_topic()
  *
  * @param num|int $id
  * @return mixed
@@ -252,9 +258,10 @@ function link_topic($id)
 }
 
 /**
- * previous_post
+ * previous_post()
  *
- * @param int|number $id
+ * @param int|num $id
+ * 
  */
 function previous_post($id)
 {
@@ -286,6 +293,7 @@ function previous_post($id)
  * next_post()
  *
  * @param int|num $id
+ * 
  */
 function next_post($id)
 {
@@ -314,7 +322,7 @@ function next_post($id)
 }
 
 /**
- * display_galleries
+ * display_galleries()
  * 
  * @category theme function
  * @param int|num $start
@@ -328,11 +336,12 @@ function display_galleries($start, $limit)
 }
 
 /**
- * retrieves_posts_published
- * retrieving all posts published 
- * and display it on blog
+ * retrieves_posts_published()
+ * 
+ * retrieving all posts published and display it on blog
  *
  * @return mixed
+ * 
  */
 function retrieves_posts_published()
 {
@@ -341,10 +350,11 @@ function retrieves_posts_published()
 }
 
 /**
- * retrieve_detail_post
+ * retrieve_detail_post()
  *
  * @param int $id
  * @return mixed
+ * 
  */
 function retrieve_detail_post($id)
 {
@@ -356,6 +366,7 @@ function retrieve_detail_post($id)
  * posts_by_archive
  *
  * retrieving posts by archive requested
+ * 
  * @param array $values
  * @return mixed
  * 
@@ -367,12 +378,13 @@ function posts_by_archive(array $values)
 }
 
 /**
- * Full-Text searching for posts based on
- * tag requested
+ * posts_by_tag()
  * 
+ * Full-Text searching for posts based on tag requested
  *
  * @param [type] $tag
- * @return void
+ * @return mixed
+ * 
  */
 function posts_by_tag($tag)
 {
@@ -383,10 +395,10 @@ function posts_by_tag($tag)
 /**
  * retrieve_archives()
  *
- * retrieving list of archives 
- * and display it on sidebar theme
+ * retrieving list of archives and display it on sidebar theme
  * 
  * @return mixed
+ * 
  */
 function retrieve_archives()
 {
@@ -423,8 +435,8 @@ function total_comment($id)
  * block_csrf
  * 
  * generating string token 
- * 
  * @return string
+ * 
  */
 function block_csrf()
 {
@@ -432,46 +444,14 @@ function block_csrf()
 }
 
 /**
- * retrieves_navigation
- *
- * @param string $visibility
- */
-function retrieves_navigation($visibility)
-{
-
-  $menus = array(
-    'items' => array(),
-    'parents' => array()
-  );
-
-  $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_visibility 
-         FROM tbl_menu WHERE menu_status = 'Y' AND menu_visibility = '$visibility' 
-         ORDER BY ID";
-
-  $stmt = db_simple_query($sql);
-
-  if ($stmt->num_rows > 0) {
-
-    while ($items = $stmt->fetch_array(MYSQLI_ASSOC)) {
-
-      $menus['items'][$items['ID']] = $items; // Create current menus item id into array
-
-      $menus['parents'][$items['parent_id']][] = $items['ID']; // Create list of all items with child
-
-    }
-  }
-  return $menus;
-}
-
-/**
  * front_navigation
  *
  * @param int|num| $parent
  * @param array $menu
+ * 
  */
 function front_navigation($parent, $menu)
 {
-
   $html = "";
 
   if (isset($menu['parents'][$parent])) {
@@ -494,6 +474,24 @@ function front_navigation($parent, $menu)
   return $html;
 }
 
+/**
+ * retrieve_page
+ *
+ * @param int|string|numeric $arg
+ * @param string $rewrite
+ * @return mixed
+ * 
+ */
+function retrieve_page($arg, $rewrite)
+{
+  if ($rewrite == 'no') {
+    $page = FrontContentProvider::frontPageById($arg, initialize_page()); 
+    return is_iterable($page) ? $page : [];
+  } else {
+    $page = FrontContentProvider::frontPageBySlug($arg, initialize_page());
+    return is_iterable($page) ? $page : [];
+  }
+}
 /**
  * nothing_found
  *

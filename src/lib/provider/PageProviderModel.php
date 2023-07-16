@@ -29,15 +29,17 @@ public function getPageById($id, $sanitize, $fetchMode = null)
 {
 
 $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
-    p.post_content, p.post_summary, p.post_keyword, p.post_status, p.post_sticky, p.post_type, 
+    p.post_content, p.post_summary, p.post_keyword, p.post_status, p.post_visibility, 
+    p.post_sticky, p.post_type, 
     p.comment_status, m.media_filename, m.media_caption, m.media_target, m.media_access, 
     u.user_fullname
 FROM tbl_posts AS p
 INNER JOIN tbl_media AS m ON p.media_id = m.ID
 INNER JOIN tbl_users AS u ON p.post_author = u.ID
-WHERE p.ID = :ID AND p.post_status = 'publish'
+WHERE p.post_status = 'publish'
 AND p.post_type = 'page' AND m.media_target = 'page'
-AND m.media_access = 'public' AND m.media_status = '1'";
+AND m.media_access = 'public' AND m.media_status = '1'
+AND p.ID = :ID";
 
 $sanitized_id = $this->filteringId($sanitize, $id, 'sql');
 
@@ -48,8 +50,9 @@ $postById = (is_null($fetchMode)) ? $this->findRow([':ID' => (int)$sanitized_id]
 return (empty($postById)) ?: $postById;
 
 }
+
 /**
- * Find page by slug title
+ * getPageBySlug
  * 
  * @param string $slug
  * @return boolean|array|object
@@ -65,9 +68,9 @@ $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.
     FROM tbl_posts AS p
     INNER JOIN tbl_media AS m ON p.media_id = m.ID
     INNER JOIN tbl_users AS u ON p.post_author = u.ID
-    WHERE p.post_slug = :slug 
-	AND p.post_status = 'publish' AND p.post_type = 'page' 
-	AND m.media_access = 'public' AND m.media_status = '1'";
+    WHERE p.post_status = 'publish' AND p.post_type = 'page' 
+	AND m.media_access = 'public' AND m.media_status = '1'
+    AND p.post_slug = :slug";
 	
 	$this->setSQL($sql);
 	

@@ -168,10 +168,10 @@ public function simpleQuery($sql)
     return $this->dbc->query($sql);
 
   } catch (mysqli_sql_exception $e) {
-    
-     $this->disconnect();
-     $this->errors = LogError::setStatusCode(http_response_code(500));
-     $this->errors = LogError::exceptionHandler($e);
+     
+    $this->errors = LogError::setStatusCode(http_response_code(500));
+    $this->errors = LogError::exceptionHandler($e);
+    $this->disconnect();
 
   }
 

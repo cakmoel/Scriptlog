@@ -22,18 +22,39 @@ class ComposerAutoloaderInit65d8d43f7e5871d489681098837a6b70
             return self::$loader;
         }
 
-        require __DIR__ . '/platform_check.php';
-
         spl_autoload_register(array('ComposerAutoloaderInit65d8d43f7e5871d489681098837a6b70', 'loadClassLoader'), true, true);
-        self::$loader = $loader = new \Composer\Autoload\ClassLoader(\dirname(__DIR__));
+        self::$loader = $loader = new \Composer\Autoload\ClassLoader(\dirname(\dirname(__FILE__)));
         spl_autoload_unregister(array('ComposerAutoloaderInit65d8d43f7e5871d489681098837a6b70', 'loadClassLoader'));
 
-        require __DIR__ . '/autoload_static.php';
-        call_user_func(\Composer\Autoload\ComposerStaticInit65d8d43f7e5871d489681098837a6b70::getInitializer($loader));
+        $useStaticLoader = PHP_VERSION_ID >= 50600 && !defined('HHVM_VERSION') && (!function_exists('zend_loader_file_encoded') || !zend_loader_file_encoded());
+        if ($useStaticLoader) {
+            require __DIR__ . '/autoload_static.php';
+
+            call_user_func(\Composer\Autoload\ComposerStaticInit65d8d43f7e5871d489681098837a6b70::getInitializer($loader));
+        } else {
+            $map = require __DIR__ . '/autoload_namespaces.php';
+            foreach ($map as $namespace => $path) {
+                $loader->set($namespace, $path);
+            }
+
+            $map = require __DIR__ . '/autoload_psr4.php';
+            foreach ($map as $namespace => $path) {
+                $loader->setPsr4($namespace, $path);
+            }
+
+            $classMap = require __DIR__ . '/autoload_classmap.php';
+            if ($classMap) {
+                $loader->addClassMap($classMap);
+            }
+        }
 
         $loader->register(true);
 
-        $includeFiles = \Composer\Autoload\ComposerStaticInit65d8d43f7e5871d489681098837a6b70::$files;
+        if ($useStaticLoader) {
+            $includeFiles = Composer\Autoload\ComposerStaticInit65d8d43f7e5871d489681098837a6b70::$files;
+        } else {
+            $includeFiles = require __DIR__ . '/autoload_files.php';
+        }
         foreach ($includeFiles as $fileIdentifier => $file) {
             composerRequire65d8d43f7e5871d489681098837a6b70($fileIdentifier, $file);
         }

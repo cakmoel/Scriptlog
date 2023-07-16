@@ -59,7 +59,7 @@ public function listItems()
   if (isset($_SESSION['error'])) {
 
     $checkError = false;
-    ($_SESSION['error'] == 'mediaNotFound') ?: array_push($errors, "Error: Media Not Found");
+    ($_SESSION['error'] == 'mediaNotFound') ? array_push($errors, "Error: Media Not Found") : "";
     unset($_SESSION['error']);
 
   }

@@ -136,94 +136,13 @@ function listen_query_string($id = null, $app_url = null)
    return ['post' => $post_id, 'page' => $page_id, 'cat' => $cat_id, 'tag' => $tag_id, 'archive' => $archive];
 }
 
-/*
-function listen_request_path($id, $app_url)
-{
-
-$request_path = new RequestPath();
-
-if (true === HandleRequest::checkMatchUriRequested()) {
-
-   $link = [];
-
-   switch ($request_path->param1) {
-
-      case 'archive':
-         
-         break;
-
-      case 'category':
-
-         if (! empty($request_path->param1)) {
-
-            $cat_slug = FrontHelper::grabPreparedFrontTopicBySlug($request_path->param1);
-
-            $link = $app_url . DS . 'category' . DS . (isset($cat_slug)) ? escape_html($cat_slug['topic_slug']) : "";
-
-         } else {
-
-            scriptlog_error("param requested not recognized");
-         }
-
-         return $link;
-
-         break;
-
-      case 'page':
-
-         if (! empty($request_path->param2)) {
-
-            $page_slug = FrontHelper::grabPreparedfrontPageBySlug($id);
-
-            $link = $app_url . DS . 'page' . DS . (isset($page_slug['post_slug'])) ? safe_html($page_slug['post_slug']) : "";
-
-         } else {
-
-            scriptlog_error("param requested not recognized");
-         }
-
-         return $link;
-
-         break;
-
-      case 'post':
-
-         if ((! empty($request_path->param2)) && ($id === $request_path->param2)) {
-
-            $post_slug = FrontHelper::grabSimpleFrontPost($id);
-            
-            $link = $app_url . DS . 'post' . DS . $id . DS . (isset($post_slug['post_slug']) ) ? $post_slug['post_slug'] : "";
-
-         } else {
-
-            scriptlog_error("param requested not recognized");
-
-         }
-
-         return $link;
-
-         break;
-      
-      default:
-         
-      $post_slug = FrontHelper::grabSimpleFrontPost($id);
-         
-      $post_rewrite = $app_url . DS . 'post' . DS . safe_html((int)$post_slug['ID']). DS . safe_html($post_slug['post_slug']);
-      
-      $cat_slug = FrontHelper::grabPreparedFrontTopicBySlug($id);
-
-      $cat_rewrite = $app_url . DS . 'category' . DS . escape_html($cat_slug['topic_slug']);
-
-      return ['post' => $post_rewrite, 'cat' => $cat_rewrite];
-
-         break;
-
-   }
-
-}
-
-} */
-
+/**
+ * listen_request_path
+ *
+ * @param num|int $id
+ * @param string $app_url
+ * @return void
+ */
 function listen_request_path($id = null, $app_url = null)
 {
 

@@ -11,7 +11,7 @@
 function medoo_init()
 {
 
-  $read_config = AppConfig::readConfiguration(invoke_config());
+  $read_config = class_exists('AppConfig') ? AppConfig::readConfiguration(invoke_config()) : null;
 
   $configuration = [
     'type' => 'mysql',
@@ -135,10 +135,25 @@ function medoo_insert($table, $values)
  * @param array $where
  * @return object PDOStatement
  */
-function medoo_update($table, $data, $where)
+function medoo_update($table, $column, $where)
 {
   $database = medoo_init();
-  return $database->update($table, $data, $where);
+  return $database->update($table, $column, $where);
+}
+
+/**
+ * medoo_replace
+ *
+ * @param string $table
+ * @param array $column
+ * @param array $where
+ * @return object PDOStatement
+ * 
+ */
+function medoo_replace($table, $column, $where)
+{
+  $database = medoo_init();
+  return $database->replace($table, $column, $where);
 }
 
 /**

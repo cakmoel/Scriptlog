@@ -87,7 +87,6 @@ function copyright()
  */
 function year_on_footer($start_year)
 {
-  
   $this_year = date("Y");
   
   if ($start_year == $this_year) {
@@ -98,6 +97,5 @@ function year_on_footer($start_year)
       
     echo " {$start_year} &#8211; {$this_year} ";
 
-  }
-             
+  }         
 }

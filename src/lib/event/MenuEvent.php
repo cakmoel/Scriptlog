@@ -60,6 +60,14 @@ class MenuEvent
   private $visibility;
 
   /**
+   * Sort or order of menu navigation
+   *
+   * @var string
+   * 
+   */
+  private $sort;
+
+  /**
    * menuDao
    *
    * @var object
@@ -151,6 +159,17 @@ class MenuEvent
   }
 
   /**
+   * setMenuOrder
+   *
+   * @param int|num $sort
+   * 
+   */
+  public function setMenuOrder($sort)
+  {
+    $this->sort = $sort;
+  }
+
+  /**
    * setMenuStatus
    * 
    * @param string $menu_status
@@ -207,6 +226,8 @@ class MenuEvent
   public function addMenu()
   {
     
+    $this->validator->sanitize($this->parent_id, 'int');
+    $this->validator->sanitize($this->sort, 'int');
     $this->validator->sanitize($this->label, 'string');
     
     if (!empty($this->link)) {
@@ -216,10 +237,11 @@ class MenuEvent
     }
     
     return $this->menuDao->insertMenu([
-      'parent_id' => $this->parent_id,
       'menu_label' => $this->label,
       'menu_link' => $this->link,
-      'menu_visibility' => $this->visibility
+      'menu_visibility' => $this->visibility,
+      'parent_id' => $this->parent_id,
+      'menu_sort' => $this->sort
     ]);
 
   }
@@ -237,11 +259,12 @@ class MenuEvent
 
     return $this->menuDao->updateMenu($this->sanitize, [
 
-          'parent_id' => $this->parent_id,
           'menu_label' => $this->label,
           'menu_link' => $this->link,
           'menu_status' => $this->status,
-          'menu_visibility' => $this->visibility
+          'menu_visibility' => $this->visibility,
+          'parent_id' => $this->parent_id,
+          'menu_sort' => $this->sort
     
         ], $this->menu_id);
 

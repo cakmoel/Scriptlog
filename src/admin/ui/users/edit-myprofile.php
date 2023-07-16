@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) {exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+  exit();
+} ?>
 
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->

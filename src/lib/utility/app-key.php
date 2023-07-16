@@ -4,6 +4,7 @@
  * 
  * checking if application key is recognized and equal 
  * between application key on database and configuration file
+ * then return it otherwise will be false
  * 
  * @category function
  * @author M.Noermoehammad
