@@ -31,12 +31,15 @@
               </span>
             </a>
             <ul class="dropdown-menu">
-             
+             <li class="user-header">
+             <img src="<?= app_url() . DS . APP_ADMIN . DS . 'assets/dist/img/profilepict.png' ?>" class="img-circle" alt="user image">
+             <p id="checkOnline"></p>
+             </li>
               <!-- Menu Body -->
            <li class="user-body">
                 <div class="row">
                   <div class="col-xs-4 text-center">
-                    
+                 
                   </div>
                   <div class="col-xs-4 text-center">
                     

@@ -15,13 +15,13 @@
 function access_control_list($action = null)
 {
   
-  $user_dao = new UserDao();
+  $user_dao = class_exists('UserDao') ? new UserDao() : "";
   
-  $user_token = new UserTokenDao();
+  $user_token = class_exists('UserTokenDao') ? new UserTokenDao() : "";
   
-  $form_validator = new FormValidator();
+  $form_validator = class_exists('FormValidator') ? new FormValidator() : "";
   
-  $authenticator = new Authentication($user_dao, $user_token, $form_validator);
+  $authenticator = class_exists('Authentication') ? new Authentication($user_dao, $user_token, $form_validator) : "";
   
   return $authenticator->userAccessControl($action);
 

@@ -35,7 +35,7 @@ install_header($current_path, $protocol, $server_host);
         
          <script>
          function leave() {
-             window.location = "../admin/login.php";
+            window.location = "../admin/login.php";
          }
          
          setTimeout("leave()", 5000);

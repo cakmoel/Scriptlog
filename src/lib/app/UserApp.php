@@ -869,7 +869,9 @@ class UserApp extends BaseApp
 
                 } else {
 
-                    (true === terminator($getProfile['ID'])) ? sleep(10) : sleep(5); 
+                  if (true === terminator($getProfile['ID'])) {
+
+                    (function_exists('sleep')) ? sleep(10) : "";
 
                     session_unset();
                     session_destroy();
@@ -882,7 +884,9 @@ class UserApp extends BaseApp
                     $this->userEvent->setUserId(sanitizer(distill_post_request($filters)['user_id'], 'sql'));
                     $this->userEvent->removeUser();
                     direct_page('login.php', 302);
-                    
+
+                  }
+                      
                 }
 
             } catch (Throwable $th) {

@@ -71,6 +71,7 @@ $action = (isset($formAction)) ? $formAction : null;
 
                 switch ($s['setting_name']) {
 
+                   default:
                    case 'app_key':
                      
                      $setting_name = "Application Key";

@@ -261,7 +261,7 @@ public function createPost($bind, $topicId)
 public function updatePost($sanitize, $bind, $ID, $topicId)
 {
 
- $cleanId = $this->filteringId($sanitize, $ID, 'sql');
+$cleanId = $this->filteringId($sanitize, $ID, 'sql');
 
 try {
 

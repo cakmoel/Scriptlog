@@ -125,9 +125,8 @@ function check_table()
 
 $dbscheme = false;
 
-if ((APP_DEVELOPMENT === true ) && 
+if ((APP_DEVELOPMENT === true) && 
 (! (is_table_exists('tbl_comments') 
-|| is_table_exists('tbl_comment_reply') 
 || is_table_exists('tbl_login_attempt')
 || is_table_exists('tbl_media') 
 || is_table_exists('tbl_mediameta') 
@@ -138,9 +137,7 @@ if ((APP_DEVELOPMENT === true ) &&
 || is_table_exists('tbl_post_topic') 
 || is_table_exists('tbl_settings') 
 || is_table_exists('tbl_themes') 
-|| is_table_exists('tbl_topics')
-|| is_table_exists('tbl_tags') 
-|| is_table_exists('tbl_post_tag') 
+|| is_table_exists('tbl_topics') 
 || is_table_exists('tbl_users') 
 || is_table_exists('tbl_user_token')))) {
 

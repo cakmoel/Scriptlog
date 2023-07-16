@@ -508,11 +508,9 @@ class UserEvent
  */
  public function removeUser()
  {
-   
   $this->validator->sanitize($this->user_id, 'int');
 
-  return $this->userDao->deleteUser($this->user_id, $this->sanitize);
-   
+  return $this->userDao->deleteUser($this->user_id, $this->sanitize); 
  }
  
  /**

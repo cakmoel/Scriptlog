@@ -66,7 +66,7 @@ return new Schema(
  * @param string|null $description
  *
  */
-function generate_meta_tags($title = null, $description = null, $keywords = null, $author = null, $image = null, $canonical = null)
+function generate_meta_tags($title = null, $description = "", $keywords = "", $author = "", $image = "", $canonical = "")
 {
 
 $metatags = new MetaTags();

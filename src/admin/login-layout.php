@@ -2,7 +2,7 @@
 function login_header($stylePath)
 {
 ?>
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">

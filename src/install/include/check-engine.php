@@ -40,9 +40,9 @@ function check_mysql_version($link, $min)
 
     preg_match("/^[0-9\.]+/", $mysql_version, $match);
 
-    $mysql_version = $match[0];
+    $mysql_version = isset($match[0]) ? $match[0] : "";
 
-    return (version_compare($mysql_version, $min) >= 0);
+    return version_compare($mysql_version, $min) >= 0;
   }
 }
 
@@ -62,7 +62,7 @@ function check_os()
     ($os->getName() === Os::WINDOWS) || ($os->getName() === Os::OSX)
   ) {
 
-    return (array("Operating_system" => $os->getName()));
+    return array("Operating_system" => $os->getName());
   }
 }
 

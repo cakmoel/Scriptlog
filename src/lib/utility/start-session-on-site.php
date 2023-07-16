@@ -16,7 +16,7 @@
 function start_session_on_site($session_handler)
 {
   
-  $life_time = Authentication::COOKIE_EXPIRE;
+  $life_time = class_exists('Authentication') ? Authentication::COOKIE_EXPIRE : null;
 
   $session_name = session_name();
   

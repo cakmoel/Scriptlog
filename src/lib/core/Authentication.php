@@ -138,7 +138,7 @@ class Authentication
 
     $this->session_cookies = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $this->key) : Session::getInstance()->scriptlog_session_login;
     $this->agent =  isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
-    $this->ip_address = get_ip_address();
+    $this->ip_address = function_exists('get_ip_address') ? get_ip_address() : '';
     $this->accept_charset = isset($_SERVER['HTTP_ACCEPT_CHARSET']) ? $_SERVER['HTTP_ACCEPT_CHARSET'] : '';
     $this->accept_encoding = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
     $this->accept_language = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
@@ -337,13 +337,10 @@ class Authentication
 
       $bind_token = ['user_login' => $this->user_login, 'pwd_hash' => $hashed_password, 'selector_hash' => $hashed_selector, 'expired_date' => $expiry_date];
       $this->userToken->createUserToken($bind_token);
-
     } else {
 
       $this->clearAuthCookies($this->user_login);
-
     }
-    
   }
 
   /**
@@ -496,7 +493,6 @@ class Authentication
     if ($this->userDao->activateUser($key) === false) {
 
       direct_page();
-      
     } else {
 
       $actived = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname($_SERVER['PHP_SELF']) . '/login.php?status=actived';
@@ -608,12 +604,12 @@ class Authentication
    * getUserAuthSession()
    *
    * @see https://www.php.net/manual/en/function.session-unset.php#107089
+   * 
    * @return void
    * 
    */
   private function getUserAuthSession()
   {
-
     if (Session::getInstance()->scriptlog_session_ip !== $this->ip_address || Session::getInstance()->scriptlog_session_agent !== sha1($this->accept_charset . $this->accept_encoding . $this->accept_language . $this->agent)) {
 
       session_unset();

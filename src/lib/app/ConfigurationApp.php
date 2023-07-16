@@ -281,10 +281,10 @@ class ConfigurationApp
 
     } else {
 
-      if ((isset($_SESSION['status']) ) && ($_SESSION['status'] == 'readingConfigUpdated')) {
+      if (isset($_SESSION['status'])) {
 
         $checkStatus = true;
-        array_push($status, "Reading setting has been updated");
+        ($_SESSION['status'] == 'readingConfigUpdated') ? array_push($status, "Reading setting has been updated") : "";
         unset($_SESSION['status']);
          
       }
@@ -422,13 +422,13 @@ class ConfigurationApp
 
       if (isset($_SESSION['error'])) {
         $checkError = false;
-        ($_SESSION['error'] == 'permalinkValueNotFound') ?: array_push($errors, "Error: Permalink value not found!");
+        ($_SESSION['error'] == 'permalinkValueNotFound') ? array_push($errors, "Error: Permalink value not found!") : "";
         unset($_SESSION['error']);
       }
  
       if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        ($_SESSION['status'] == 'permalinkConfigUpdated') ?: array_push($status, "Permalink setting has been updated");
+        ($_SESSION['status'] == 'permalinkConfigUpdated') ? array_push($status, "Permalink setting has been updated") : "";
         unset($_SESSION['status']);
       }
 
@@ -554,13 +554,13 @@ class ConfigurationApp
 
       if (isset($_SESSION['error'])) {
         $checkError = false;
-        ($_SESSION['error'] == 'timezoneValueNotFound') ?: array_push($errors, "Error: Timezone value not found!");
+        ($_SESSION['error'] == 'timezoneValueNotFound') ? array_push($errors, "Error: Timezone value not found!") : "";
         unset($_SESSION['error']);
       }
  
       if (isset($_SESSION['status'])) {
         $checkStatus = true;
-        ($_SESSION['status'] == 'timezoneConfigUpdated') ?: array_push($status, "Timezone setting has been updated");
+        ($_SESSION['status'] == 'timezoneConfigUpdated') ? array_push($status, "Timezone setting has been updated") : "";
         unset($_SESSION['status']);
       }
 

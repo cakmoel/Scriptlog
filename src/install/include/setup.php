@@ -34,7 +34,7 @@ function make_connection($host, $username, $passwd, $dbname)
 {
 
   $connect = new mysqli($host, $username, $passwd, $dbname);
-
+  
   if ($connect->connect_errno) {
 
     printf("Failed to connect to MySQL: (" . $connect->connect_errno . ") " . $connect->connect_error, E_USER_ERROR);
@@ -44,7 +44,7 @@ function make_connection($host, $username, $passwd, $dbname)
   $driver = new mysqli_driver();
 
   $driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
-
+  
   return $connect;
 }
 
@@ -80,7 +80,7 @@ function is_table_exists($link, $table, $counter = 0)
 
     $check = $link->query("SHOW TABLES LIKE '" . $table . "'");
 
-    return (($check) && ($check->num_rows > 0) ? true : false);
+    return ($check) && ($check->num_rows > 0) ? true : false;
   }
 }
 

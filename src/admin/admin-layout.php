@@ -2,7 +2,7 @@
 function admin_header($stylePath, $breadcrumb = null) 
 {  
 ?>
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -113,7 +113,7 @@ function admin_footer($stylePath, $ubench = null)
     </div>
     
     <strong>Thank you for creating with 
-    <a href="https://scriptlog.my.id" target="_blank" rel="noopener noreferrer" title="PHP Blog Software">Scriptlog</a>
+    <a href="https://scriptlog.sourceforge.io" target="_blank" rel="noopener noreferrer" title="PHP Blog Software">Scriptlog</a>
      <?php echo APP_VERSION; ?></strong>
      <strong><?=((true === APP_DEVELOPMENT) && (isset($ubench))) ? " Page generated in: ". $ubench->getTime() . " Memory usage: ".$ubench->getMemoryUsage() : "" ?></strong>
 </footer>
@@ -140,6 +140,7 @@ function admin_footer($stylePath, $ubench = null)
 <script src="<?= $stylePath; ?>/assets/dist/js/mandatory-plugin-upload.js"></script>
 <script src="<?= $stylePath; ?>/assets/dist/js/mandatory-theme-upload.js"></script>
 <script src="<?= $stylePath; ?>/assets/dist/js/imagevalidation.js"></script>
+<script src="<?= $stylePath; ?>/assets/dist/js/isonline.js"></script>
 <script src="<?= $stylePath; ?>/wysiwyg/summernote/summernote.min.js"></script>
 <script type="text/javascript" src="<?= $stylePath; ?>/assets/dist/js/jquery.uploadPreview.min.js"></script>
 <script src="<?= $stylePath; ?>/assets/dist/js/img-radio.js"></script>

@@ -1,7 +1,6 @@
 <?php
 /**
  * photo_instance()
- * if fileinfo enabled then Intervention Image works properly else will implement non-secure approach
  * 
  * @category function
  * @author  Oliver Vogel
@@ -23,7 +22,10 @@ function photo_instance()
 
 /**
  * upload_photo()
+ * 
  * uploading picture
+ * if fileinfo enabled then Intervention Image works properly else will implement non-secure approach
+ * 
  * @category function
  * @author M.Noermoehammad
  * @license MIT
@@ -33,6 +35,7 @@ function photo_instance()
  * @param string $file_type
  * @param string $file_name
  * @return void
+ * 
  */
 function upload_photo($file_location, $file_size, $file_type, $file_name)
 {
@@ -148,19 +151,19 @@ if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exi
 
     if (false === set_webp_regular($current_width, $current_height, $origin_path_uploaded, $large_path, $file_name)) {
   
-       scriptlog_error("Error creating regular size of webp image format", E_USER_WARNING);
+      scriptlog_error("Error creating regular size of webp image format", E_USER_WARNING);
   
     }
   
     if (false === set_webp_medium($current_width, $current_height, $origin_path_uploaded, $medium_path, $file_name)) {
   
-       scriptlog_error("Error creating medium size of webp image format", E_USER_WARNING);
+      scriptlog_error("Error creating medium size of webp image format", E_USER_WARNING);
   
     }
   
     if (false === set_webp_small($current_width, $current_height, $origin_path_uploaded, $small_path, $file_name)) {
   
-       scriptlog_error("Error creating small of webp image format", E_USER_WARNING);
+      scriptlog_error("Error creating small of webp image format", E_USER_WARNING);
   
     }
   
@@ -209,12 +212,11 @@ if (false === set_small_photo($current_width, $current_height, $origin_path_uplo
  * @param string $file_type
  * @return void
  */
-function set_origin_photo( $current_width, $current_height, $file_location, $file_size, $file_path_uploaded) {
+function set_origin_photo($current_width, $current_height, $file_location, $file_size, $file_path_uploaded) 
+{
 
 if ($current_width <= 0 || $current_height <= 0) {
-
   return false;
-
 }
 
 if (move_uploaded_file($file_location, $file_path_uploaded) && filesize($file_path_uploaded) !== $file_size) {
@@ -307,7 +309,7 @@ function set_regular_photo($current_width, $current_height, $file_path_uploaded,
     case "image/jpeg":
     case "image/jpg":
   
-      if ($regular_photo->save($file_path_thumb .'large_'.$file_name, 80, 'jpg') ) {
+      if ($regular_photo->save($file_path_thumb .'large_'.$file_name, 80, 'jpg')) {
   
         $regular_photo->destroy();
         return true;
@@ -318,7 +320,7 @@ function set_regular_photo($current_width, $current_height, $file_path_uploaded,
     
     case "image/png":
   
-      if ($regular_photo->save($file_path_thumb .'large_'.$file_name, 80, 'png') ) {
+      if ($regular_photo->save($file_path_thumb .'large_'.$file_name, 80, 'png')) {
   
         $regular_photo->destroy();
         return true;
@@ -329,7 +331,7 @@ function set_regular_photo($current_width, $current_height, $file_path_uploaded,
   
     case "image/gif":
   
-      if ($regular_photo->save($file_path_thumb .'large_'.$file_name, 80, 'gif') ) {
+      if ($regular_photo->save($file_path_thumb .'large_'.$file_name, 80, 'gif')) {
   
         $regular_photo->destroy();
         return true;
@@ -340,7 +342,7 @@ function set_regular_photo($current_width, $current_height, $file_path_uploaded,
 
     case "image/bmp":
 
-      if ($regular_photo->save($file_path_thumb.'large_'.$file_name, 80, 'bmp') ) {
+      if ($regular_photo->save($file_path_thumb.'large_'.$file_name, 80, 'bmp')) {
 
         $regular_photo->destroy();
         return true;
@@ -403,8 +405,8 @@ function set_webp_regular($current_width, $current_height, $file_path_uploaded, 
   $regular_webp->fit($new_width, $new_height);
   if ($regular_webp->save($file_path_thumb.'large_'.$file_basename.'.webp', 80, 'webp')) {
   
-     $regular_webp->destroy();
-     return true;
+    $regular_webp->destroy();
+    return true;
   
   }
 
@@ -418,7 +420,7 @@ $medium_size = 640;
 
 if ($current_width <= 0 || $current_height <= 0) {
 
-    return false;
+  return false;
 
 }
 
@@ -495,7 +497,6 @@ switch ($file_type) {
 
 }
 
-
 }
 
 // setting medium size of webp image format
@@ -521,8 +522,8 @@ $medium_webp = photo_instance()->make($file_path_uploaded);
 $medium_webp->fit($new_width, $new_height);
 if ($medium_webp->save($file_path_thumb.'medium_'.$file_basename.'.webp', 80, 'webp')) {
 
-   $medium_webp->destroy();
-   return true;
+  $medium_webp->destroy();
+  return true;
 
 }
 

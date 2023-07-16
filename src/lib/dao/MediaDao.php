@@ -544,11 +544,23 @@ class MediaDao extends Dao
 
         $imgradio .= '<label for="image_id" class="image-radio" >' . "\n";
 
-        $imgradio .= '<img class="img-responsive" alt="' . safe_html($media_properties['Origin']) . '" src="' . app_url() . DS . APP_IMAGE_SMALL . 'small_' . rawurlencode(basename(safe_html($media['media_filename']))) . '" >' . "\n";
+        // get filename
+        $file_basename = substr($media['media_filename'], 0, strripos($media['media_filename'], '.'));
+
+        if ($file_basename == 'nophoto') {
+
+          $imgradio .= '<img class="img-responsive" alt="nophoto" src="https://s6.imgcdn.dev/vsWDK.th.jpg" alt="nophoto" border="0">';
+
+        } else {
+
+          $imgradio .= '<img class="img-responsive" alt="' . safe_html($media_properties['Origin']) . '" src="' . app_url() . DS . APP_IMAGE_SMALL . 'small_' . rawurlencode(basename(safe_html($media['media_filename']))) . '" >' . "\n";
+
+        }
 
         if ($checked === $media['ID']) {
 
           $check = ' checked';
+          
         } else {
 
           $check = ' ';
@@ -559,9 +571,13 @@ class MediaDao extends Dao
         $imgradio .= '</label>';
         $imgradio .= '</div>' . "\n";
       }
+
+      $imgradio .= '<p class="help-block"><strong><a href="' . generate_request('index.php', 'get', ['medialib', ActionConst::NEWMEDIA, 0])['link'] . '" >Add new media</a></strong></p>';
+
     } else {
 
       $imgradio .= '<p class="help-block"><strong><a href="' . generate_request('index.php', 'get', ['medialib', ActionConst::NEWMEDIA, 0])['link'] . '" >Add new media</a></strong></p>';
+
     }
 
     $imgradio .= '</div>';

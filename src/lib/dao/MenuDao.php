@@ -30,9 +30,9 @@ class MenuDao extends Dao
    * @param integer $orderBy
    * 
    */
-  public function findMenus($orderBy = 'ID')
+  public function findMenus($orderBy = 'menu_sort')
   {
-    $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_visibility
+    $sql = "SELECT ID, menu_label, menu_link, menu_status, menu_visibility, parent_id, menu_sort
             FROM tbl_menu ORDER BY :orderBy";
 
     $this->setSQL($sql);
@@ -43,7 +43,7 @@ class MenuDao extends Dao
   }
 
   /**
-   * Find Menu
+   * findMenu
    * 
    * @param integer $menuId
    * @param object $sanitizing
@@ -54,8 +54,8 @@ class MenuDao extends Dao
   public function findMenu($menuId, $sanitizing)
   {
 
-    $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_visibility
-             FROM tbl_menu WHERE ID = ?";
+    $sql = "SELECT ID, menu_label, menu_link, menu_status, menu_visibility, parent_id, menu_sort
+            FROM tbl_menu WHERE ID = ?";
 
     $idsanitized = $this->filteringId($sanitizing, $menuId, 'sql');
 
@@ -66,6 +66,13 @@ class MenuDao extends Dao
     return (empty($menuDetail)) ?: $menuDetail;
   }
 
+  /**
+   * findMenuParent
+   *
+   * @param num|int $parentId
+   * @param object $sanitizing
+   * 
+   */
   public function findMenuParent($parentId, $sanitizing)
   {
 
@@ -81,25 +88,39 @@ class MenuDao extends Dao
   }
 
   /**
-   * Insert new menu
+   * insertMenu()
    * 
    * @param array $bind
+   * 
    */
   public function insertMenu($bind)
   {
 
+    // checking sort is empty or not
+    $sorted = isset($bind['menu_sort']) ? abs((int)$bind['menu_sort']) : "0";
+    
+    // first update all menu_sort greater than or equal to $sorted
+    // UPDATE tbl_menu SET menu_sort = menu_sort + 1 WHERE menu_sort >= $sorted
+
+    medoo_update("tbl_menu", [
+      "menu_sort[+]" => 1
+    ], [
+      "menu_sort[>=]" => $sorted
+    ]);
+
     $this->create("tbl_menu", [
-      'parent_id' => $bind['parent_id'],
       'menu_label' => $bind['menu_label'],
       'menu_link' => $bind['menu_link'],
-      'menu_visibility' => $bind['menu_visibility']
+      'menu_visibility' => $bind['menu_visibility'],
+      'parent_id' => $bind['parent_id'],
+      'menu_sort' => $sorted
     ]);
 
     $menu_id = $this->lastId();
 
-    $getLink = "SELECT ID, menu_link FROM tbl_menu WHERE ID = ?";
+    $grablink =  "SELECT ID, menu_link FROM tbl_menu WHERE ID = ?";
 
-    $this->setSQL($getLink);
+    $this->setSQL($grablink);
 
     $link = $this->findRow([$menu_id]);
 
@@ -107,6 +128,9 @@ class MenuDao extends Dao
 
       $this->modify("tbl_menu", ['menu_link' => '#'], "ID = {$link['ID']}");
     }
+
+    return $menu_id;
+
   }
 
   /**
@@ -119,13 +143,22 @@ class MenuDao extends Dao
   {
 
     $cleanid = $this->filteringId($sanitize, $id, 'sql');
+
+    $grab_current_sort = "SELECT ID, menu_sort FROM tbl_menu WHERE ID = :ID";
+    $this->setSQL($grab_current_sort);
+    $current_sort = $this->findRow([':ID' => $cleanid]);
+
+    // update all menu_sort between $old_sort and $new_sort
+    $temp_id = $this->updateMenuSort($current_sort['menu_sort'], $bind['menu_sort']);
+
     $this->modify("tbl_menu", [
-      'parent_id' => $bind['parent_id'],
       'menu_label' => $bind['menu_label'],
       'menu_link' => $bind['menu_link'],
       'menu_status' => $bind['menu_status'],
-      'menu_visibility' => $bind['menu_visibility']
-    ], "id = {$cleanid}");
+      'menu_visibility' => $bind['menu_visibility'],
+      'parent_id' => $bind['parent_id'],
+      'menu_sort' => $bind['menu_sort']
+    ], "ID = $temp_id");
   }
 
   /**
@@ -186,7 +219,7 @@ class MenuDao extends Dao
 
     $stmt = $this->checkCountValue([$idsanitized]);
 
-    return ($stmt > 0);
+    return $stmt > 0;
   }
 
   /**
@@ -285,5 +318,38 @@ class MenuDao extends Dao
     $sql = "SELECT ID FROM tbl_menu";
     $this->setSQL($sql);
     return $this->checkCountValue($data);
+  }
+
+  /**
+   * updateMenuSort
+   *
+   * @param object $sanitize
+   * @param num|int $old_sort
+   * @param num|int $new_sort
+   * 
+   */
+  private function updateMenuSort($old_sort, $new_sort)
+  {
+    $grab_menu = "SELECT ID, menu_sort FROM tbl_menu WHERE menu_sort = ?";
+    $this->setSQL($grab_menu);
+    $temp_data = $this->findRow([$old_sort]);
+    $temp_id = isset($temp_data['ID']) ? (int)$temp_data['ID'] : "";
+    $temp_sort = isset($temp_data['menu_sort']) ? (int)$temp_data['menu_sort'] : "";
+
+    if ($temp_sort < $new_sort) {
+
+      $sclause = " menu_sort = menu_sort - 1";
+      $wclause = " menu_sort > $temp_sort AND menu_sort <= $new_sort";
+
+    } else {
+
+      $sclause = " menu_sort = menu_sort + 1";
+      $wclause = " menu_sort < $temp_sort AND menu_sort >= $new_sort";
+
+    }
+
+    db_simple_query("UPDATE tbl_menu SET $sclause WHERE $wclause");
+
+    return $temp_id;
   }
 }

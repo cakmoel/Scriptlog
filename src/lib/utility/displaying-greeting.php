@@ -2,6 +2,8 @@
 /**
  * displaying_greeting
  *
+ * @category functions
+ * @author M.Noermoehammad
  * @return string
  * 
  */
@@ -15,14 +17,14 @@ function displaying_greeting()
 
  if ($h >= 5 && $h <= 11) {
 
-    return "<strong>Good morning</strong>";
+   return "<strong>Good morning</strong>";
 
  } elseif ($h >= 12 && $h <= 15) {
 
-    return "<strong>Good afternoon</strong>";
+   return "<strong>Good afternoon</strong>";
 
  } else {
-    return "<strong>Good evening</strong>";
+   return "<strong>Good evening</strong>";
  }
 
 }
