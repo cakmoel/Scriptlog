@@ -83,10 +83,12 @@ function verify_form_token($form, $token)
 }
 
 /**
- * Check form request function
+ * Check_form_request()
+ * 
  * checking whether form data request as same as form field 
  * whitelisting form field
  *
+ * @category function
  * @param array $data
  * @param array $whitelist
  * @return bool
