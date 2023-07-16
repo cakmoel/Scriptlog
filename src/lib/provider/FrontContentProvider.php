@@ -180,6 +180,20 @@ public static function frontPageBySlug($slug, PageProviderModel $pageProviderMod
 }
 
 /**
+ * frontPageById
+ *
+ * @param int|num $id
+ * @param PageProviderModel $pageProviderModel
+ * @return mixed
+ * 
+ */
+public static function frontPageById($id, PageProviderModel $pageProviderModel)
+{
+ self::$pageProviderModel = $pageProviderModel;
+ return self::$pageProviderModel->getPageById($id, self::frontSanitizer());
+}
+
+/**
  * frontGalleries()
  * 
  * @param GalleryProviderModel $galleryProviderModel

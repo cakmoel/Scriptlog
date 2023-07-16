@@ -31,17 +31,24 @@ function protect_post($post_content, $visibility, $password)
  */
 function grab_post_protected($post_id)
 {
+
+ $grab_post = null;
+
  $idsanitized = sanitizer($post_id, 'sql');
 
  $grab_post = medoo_column_where("tbl_posts", ["ID", "post_content", "post_visibility"], ["ID" => $idsanitized]);
  
+ $postId = isset($grab_post['ID']) ? abs((int)$grab_post['ID']) : 0;
+ $content = isset($grab_post['post_content']) ? safe_html($grab_post['post_content']) : "";
+ $visibility = isset($grab_post['post_visibility']) ? safe_html($grab_post['post_visibility']) : "";
+
  if (! $grab_post) {
 
     scriptlog_error("Post protected not found");
 
  }
 
- return array('post_id' => $grab_post['ID'], "post_content" => $grab_post['post_content'], "visibility" => $grab_post['post_visibility']);
+ return array('post_id' => $postId, "post_content" => $content, "visibility" => $visibility);
 
 }
 
@@ -108,12 +115,10 @@ function decrypt_post($post_id, $post_password)
 /**
  * save_post_protected
  *
- * @param int|num $post_id
- * @param string $post_author
  * @param array $credentials
  * 
  */
-function save_post_protected($post_id, $post_author, $credentials)
+function save_post_protected($credentials)
 {
 
 $path = __DIR__ . '/../../admin/ui/posts/.credential' . DIRECTORY_SEPARATOR;
@@ -126,20 +131,15 @@ if (! in_array(user_privilege(), $action_allowed)) {
 
 } else {
 
-  $grab_post = medoo_column_where('tbl_posts', ['ID', 'post_author', 'post_visibility'], ['ID' => $post_id]);
-
   if (is_dir($path) === false) {
 
     create_directory($path);
 
   }
 
-  if ($grab_post['post_visibility'] == 'protected' && $grab_post['post_author'] == $post_author && isset($_SESSION['post_protected'])) {
+   // create file for post protected to keep its credentials detail
+   generate_post_credentials($path, $credentials);
 
-    // create file for post protected to keep its credentials detail
-    return generate_post_credentials($path, $credentials);
-
-  } 
 }
 
 }
@@ -147,16 +147,18 @@ if (! in_array(user_privilege(), $action_allowed)) {
 /**
  * generate_post_credentials
  *
+ * @param string $path
  * @param array $data
  * @return bool
+ * 
  */
 function generate_post_credentials($path, $data)
 {
 
   $created_at = isset($data['post_date']) ? $data['post_date'] : null;
-  $modified_at = isset($data['post_modified']) ? $data['post_modified'] : null;
+  $modified_at = isset($data['post_modified']) ?? $data['post_modified'];
   $passphrase = isset($data['passphrase']) ? md5(app_key().$data['passphrase']) : null;
-  $credential_path = basename($path . DIRECTORY_SEPARATOR . $passphrase . '.php');
+  $credential_path = $path . DIRECTORY_SEPARATOR . $passphrase . '.php';
 
   $file = '<?php  
     

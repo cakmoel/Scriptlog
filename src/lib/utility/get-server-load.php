@@ -46,7 +46,7 @@ function get_server_load()
        
     } else {
 
-       $load = sys_getloadavg();
+      $load = sys_getloadavg();
         
     }
      
@@ -73,7 +73,7 @@ function get_server_load()
 function win_architecture()
 {
  
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ) {
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 
       $wmi = class_exists('COM') ? new COM('winmgmts:{impersonationLevel=impersonate}//./root/cimv2') : null;
 

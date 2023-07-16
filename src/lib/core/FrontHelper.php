@@ -83,7 +83,6 @@ class FrontHelper
     $result = $query->fetch_assoc();
 
     return (empty($result)) ?: $result;
-    
   }
 
   /**
@@ -97,12 +96,10 @@ class FrontHelper
   {
     $idsanitized = static::frontSanitizer($id, 'sql');
 
-    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
-    p.post_title, p.post_slug,
+    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
     p.post_content, p.post_summary, p.post_keyword, 
     p.post_status, p.post_visibility, p.post_tags,  p.post_sticky, 
-    p.post_type, p.comment_status,
-    m.ID, m.media_filename, m.media_caption, m.media_access, 
+    p.post_type, p.comment_status, m.ID, m.media_filename, m.media_caption, m.media_access, 
     u.ID, u.user_login, u.user_fullname
 FROM tbl_posts AS p
 INNER JOIN tbl_media AS m ON p.media_id = m.ID
@@ -113,9 +110,9 @@ AND p.post_visibility = 'public'
 AND p.post_type = 'page' 
 AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
-   $results = db_simple_query($sql)->fetch_assoc();
+    $results = db_simple_query($sql)->fetch_assoc();
 
-   return (empty($results)) ?: $results;
+    return (empty($results)) ?: $results;
   }
 
   /**
@@ -168,8 +165,7 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
   AND p.post_type = 'page' 
   AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
-  return db_prepared_query($sql, [$slug], 's')->get_result()->fetch_assoc();
-
+    return db_prepared_query($sql, [$slug], 's')->get_result()->fetch_assoc();
   }
 
   /**
@@ -216,8 +212,7 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
   AND p.post_type = 'blog' AND p.post_status = 'publish'
   ORDER BY DATE(p.post_date) DESC ";
 
-  return db_prepared_query($sql, [$from, $to], 'ss')->get_result()->fetch_assoc();
-
+    return db_prepared_query($sql, [$from, $to], 'ss')->get_result()->fetch_assoc();
   }
 
   /**
@@ -261,15 +256,14 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
    */
   public static function grabFrontTag($tag)
   {
-    
-   $medoo_init = medoo_init();
-   return $medoo_init->select("tbl_posts", ["ID", "post_title", "post_content", "post_summary", "post_keyword", "@post_tags"], [
-       "MATCH" => [
-         "columns" => ["post_tags", "post_title", "post_content"],
-         "keyword" => $tag, 
-       ]
-    ]);
 
+    $medoo_init = medoo_init();
+    return $medoo_init->select("tbl_posts", ["ID", "post_title", "post_content", "post_summary", "post_keyword", "@post_tags"], [
+      "MATCH" => [
+        "columns" => ["post_tags", "post_title", "post_content"],
+        "keyword" => $tag,
+      ]
+    ]);
   }
 
   /**

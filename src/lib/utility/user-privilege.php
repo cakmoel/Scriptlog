@@ -3,7 +3,7 @@
  * user_privilege()
  *
  * @category function
- * @author M.Noermoehammad <scriptlog@yandex.com>
+ * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
  * 

@@ -33,6 +33,12 @@ class MenuApp extends BaseApp
     $this->menuEvent = $menuEvent;
   }
 
+  /**
+   * listItems()
+   *
+   * retrieving items from table menu
+   * 
+   */
   public function listItems()
   {
     $errors = array();
@@ -73,6 +79,12 @@ class MenuApp extends BaseApp
     return $this->view->render();
   }
 
+  /**
+   * insert()
+   *
+   * inserting new record into table
+   * 
+   */
   public function insert()
   {
     $errors = array();
@@ -81,10 +93,11 @@ class MenuApp extends BaseApp
     if (isset($_POST['menuFormSubmit'])) {
 
       $filters = [
-        'parent_id' => FILTER_SANITIZE_NUMBER_INT,
+        'parent_id' => isset($_POST['parent_id']) ? abs((int)$_POST['parent_id']) : '0',
         'menu_label' => isset($_POST['menu_label']) ? Sanitize::severeSanitizer($_POST['menu_label']) : "",
         'menu_link' => FILTER_SANITIZE_URL,
-        'menu_visibility' => isset($_POST['menu_visibility']) ? Sanitize::mildSanitizer($_POST['menu_visibility']) : ""
+        'menu_visibility' => isset($_POST['menu_visibility']) ? Sanitize::mildSanitizer($_POST['menu_visibility']) : "",
+        'menu_sort' => isset($_POST['menu_sort']) ? abs((int)$_POST['menu_sort']) : '0'
       ];
 
       try {
@@ -125,17 +138,19 @@ class MenuApp extends BaseApp
           $this->view->set('parent', $this->menuEvent->parentDropDown());
           $this->view->set('position', $this->menuEvent->positionDropDown());
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+
         } else {
 
           $this->menuEvent->setParentId((int)distill_post_request($filters)['parent_id']);
           $this->menuEvent->setMenuLabel(prevent_injection(distill_post_request($filters)['menu_label']));
           $this->menuEvent->setMenuLink(escape_html(trim(distill_post_request($filters)['menu_link'])));
           $this->menuEvent->setMenuVisibility(prevent_injection(distill_post_request($filters)['menu_visibility']));
+          $this->menuEvent->setMenuOrder(abs((int)distill_post_request($filters)['menu_sort']));
           $this->menuEvent->addMenu();
           $_SESSION['status'] = "menuAdded";
           direct_page('index.php?load=menu&status=menuAdded', 302);
         }
-      } catch (Throwable $th) {
+      } catch (\Throwable $th) {
 
         LogError::setStatusCode(http_response_code());
         LogError::exceptionHandler($th);
@@ -159,6 +174,12 @@ class MenuApp extends BaseApp
     return $this->view->render();
   }
 
+  /**
+   * update()
+   *
+   * @param int|num $id
+   * 
+   */
   public function update($id)
   {
     $errors = array();
@@ -175,18 +196,21 @@ class MenuApp extends BaseApp
       'menu_label' => $getMenu['menu_label'],
       'menu_link' => $getMenu['menu_link'],
       'menu_status' => $getMenu['menu_status'],
-      'menu_visibility' => $getMenu['menu_visibility']
+      'menu_visibility' => $getMenu['menu_visibility'],
+      'paret_id' => $getMenu['parent_id'],
+      'menu_sort' => $getMenu['menu_sort']
     );
 
     if (isset($_POST['menuFormSubmit'])) {
 
       $filters = [
-        'parent_id' => FILTER_SANITIZE_NUMBER_INT,
         'menu_label' => isset($_POST['menu_label']) ? Sanitize::severeSanitizer($_POST['menu_label']) : "",
         'menu_link' => FILTER_SANITIZE_URL,
         'menu_status' => isset($_POST['menu_status']) ? Sanitize::mildSanitizer($_POST['menu_status']) : "",
         'menu_id' => FILTER_SANITIZE_NUMBER_INT,
-        'menu_visibility' => isset($_POST['menu_visibility']) ? Sanitize::mildSanitizer($_POST['menu_visibility']) : ""
+        'menu_visibility' => isset($_POST['menu_visibility']) ? Sanitize::mildSanitizer($_POST['menu_visibility']) : "",
+        'parent_id' => FILTER_SANITIZE_NUMBER_INT,
+        'menu_sort' => FILTER_SANITIZE_NUMBER_INT
       ];
 
       try {
@@ -235,6 +259,7 @@ class MenuApp extends BaseApp
           $this->menuEvent->setMenuLink(escape_html(distill_post_request($filters)['menu_link']));
           $this->menuEvent->setMenuStatus(distill_post_request($filters)['menu_status']);
           $this->menuEvent->setMenuVisibility(distill_post_request($filters)['menu_visibility']);
+          $this->menuEvent->setMenuOrder(abs((int)distill_post_request($filters)['menu_sort']));
           $this->menuEvent->modifyMenu();
           $_SESSION['status'] = "menuUpdated";
           direct_page('index.php?load=menu&status=menuUpdated', 200);
@@ -264,6 +289,12 @@ class MenuApp extends BaseApp
     return $this->view->render();
   }
 
+  /**
+   * remove()
+   *
+   * @param int|num $id
+   * @return void
+   */
   public function remove($id)
   {
 

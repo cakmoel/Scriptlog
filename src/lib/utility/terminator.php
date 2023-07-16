@@ -1,7 +1,9 @@
 <?php
 /**
- * terminator
+ * terminator()
  *
+ * terminating user's related content (ex: post, comment)
+ * 
  * @category function
  * @author Nirmala Adiba Khanza
  * @param int|numeric $userID
@@ -33,6 +35,6 @@ function terminator($userID)
         // remove post
         $remove_post = medoo_delete('tbl_posts', ['post_author' => $userID]);
 
-        return (($remove_comments > 0) && ($remove_post > 0)) ? true : false;
+        return $remove_comments && $remove_post ? true : false;
     }
 }

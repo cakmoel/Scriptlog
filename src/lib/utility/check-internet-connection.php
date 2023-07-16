@@ -12,9 +12,19 @@
  */
 function checking_connection_with_fsockopen($hostname)
 {
-    $file = @fsockopen($hostname, 80);//@fsockopen is used to connect to a socket
-    
-    return ($file);
+    //@fsockopen is used to connect to a socket
+    if (function_exists('fsockopen')) {
+
+        $connected = @fsockopen($hostname, 80);
+        if ($connected) {
+            $is_conn = true;
+            fclose($connected);
+        } else {
+            $is_conn = false;
+        }
+
+        return $is_conn;
+    }
 }
 
 /**
@@ -25,28 +35,64 @@ function checking_connection_with_fsockopen($hostname)
  */
 function checking_connection_with_fopen($hostname)
 {
-    return (bool) (@fopen($hostname, "r")) ? true : false;
+    if (function_exists('fopen')) {
+
+        return (bool) (@fopen($hostname, "r")) ? true : false;
+    }
 }
 
 /**
  * checking_internet_connection
  *
  * @param string $hostname
- * @return void
+ * 
  */
 function checking_internet_connection()
 {
+  $hostname = '216.239.38.120';
+                
+  if (true === check_disabled_functions('fsockopen')) {
+     
+    switch (connection_status()) {
+        case CONNECTION_NORMAL:
+            $msg = 'connected';
+            break;
+        case CONNECTION_ABORTED:
+            $msg = 'Not connected';
+            break;
+        case CONNECTION_TIMEOUT:
+            $msg = 'Time-out';
+            break;
+        case CONNECTION_ABORTED & CONNECTION_TIMEOUT:
+            $msg = 'Time-out and aborted';
+            break;
+        default:
+            $msg = 'Undefined state';
+            break;
+    }
 
-    $hostname = '216.239.38.120';
+    return ($msg == 'Not connected') ? false : true;
 
-    if (function_exists('fsockopen')) {
+  } else {
 
-        return checking_connection_with_fsockopen($hostname);
+    return checking_connection_with_fsockopen($hostname);
+  }
+}
 
+/**
+ * is_online
+ *
+ * @see https://stackoverflow.com/questions/1696202/check-if-host-computer-is-online-with-php
+ * @return boolean
+ */
+function is_online()
+{
+    if (function_exists('checkdnsrr')) {
+
+        return checkdnsrr('google.com', 'ANY') && checkdnsrr('yahoo.com', 'ANY') && checkdnsrr('microsoft.com', 'ANY');
     } else {
 
-        return checking_connection_with_fopen($hostname);
-
+        return check_online('google.com');
     }
-    
 }
+

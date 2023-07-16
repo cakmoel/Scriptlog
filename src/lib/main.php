@@ -16,8 +16,6 @@ require __DIR__ . '/common.php';
 
 (version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
 
-$config = array();
-
 if (! file_exists(APP_ROOT.'config.php')) {
     
     if (is_dir(APP_ROOT . 'install')) {
@@ -30,6 +28,15 @@ if (! file_exists(APP_ROOT.'config.php')) {
 } else {
 
 $config = include __DIR__ . '/../config.php';
+
+$db_host = isset($config['db']['host']) ? $config['db']['host'] : "";
+$db_user = isset($config['db']['user']) ? $config['db']['user'] : "";
+$db_pwd  = isset($config['db']['pass']) ? $config['db']['pass'] : "";
+$db_name = isset($config['db']['name']) ? $config['db']['name'] : "";
+
+$app_email = isset($config['app']['emamil']) ? $config['app']['email'] : "";
+$app_url   = isset($config['app']['url']) ? $config['app']['url'] : "";
+$app_key   = isset($config['app']['key']) ? $config['app']['key'] : "";   
 
 #================================== call functions in directory lib/utility ===========================================
 $directory = new RecursiveDirectoryIterator(__DIR__ . DS .'utility'. DS, FilesystemIterator::FOLLOW_SYMLINKS);
@@ -91,7 +98,7 @@ strict_transport_security();
 call_htmlpurifier();
 get_server_load();
 whoops_error();
-content_security_policy(isset($config['app']['url']) ? $config['app']['url'] : "");
+content_security_policy($app_url);
 
 #===================== RULES ==========================
 
@@ -144,16 +151,16 @@ $rules = array(
 #==================== END OF RULES =======================
 
 #====== an instantiation of Database connection ==========
-$dbc = (isset($config['db']['host']) || isset($config['db']['name']) || isset($config['db']['user']) || isset($config['db']['pass'])) ? DbFactory::connect(['mysql:host='.$config['db']['host'].';dbname='.$config['db']['name'], $config['db']['user'], $config['db']['pass']]) : "";
+$dbc = class_exists('DbFactory') ? DbFactory::connect(['mysql:host='.$db_host.';dbname='.$db_name, $db_user, $db_pwd]) : "";
 
 #====== an instantiation of scriptlog cipher key =========
-$cipher_key = ScriptlogCryptonize::scriptlogCipherKey();
+$cipher_key = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::scriptlogCipherKey() : "";
 
 #====== an instantiation of scriptlog request path =======
-$uri = new RequestPath();
+$uri = class_exists('RequestPath') ? new RequestPath() : "";
 
 // Register rules of routes, an instance of database connection, cipher key for cryptography and uri requested
-Registry::setAll(array('dbc' => $dbc,  'key' => $cipher_key, 'route' => $rules, 'uri'=>$uri));
+class_exists('Registry') ? Registry::setAll(array('dbc' => $dbc,  'key' => $cipher_key, 'route' => $rules, 'uri'=>$uri)) : "";
 
 /* an instances of class that necessary for the system
  * please do not change this below variable 
@@ -165,19 +172,19 @@ Registry::setAll(array('dbc' => $dbc,  'key' => $cipher_key, 'route' => $rules, 
  * @var $userDao, $validator, $authenticator, $ubench --
  * 
  */
-$sessionMaker = new SessionMaker(set_session_cookies_key((isset($config['app']['email']) ? $config['app']['email'] : ""), (isset($config['app']['key']) ? $config['app']['key'] : "")));
-$searchPost = new SearchFinder();
-$sanitizer = new Sanitize();
-$userDao = new UserDao();
-$userToken = new UserTokenDao();
-$validator = new FormValidator();
-$authenticator = new Authentication($userDao, $userToken, $validator);
-$ubench = new Ubench();
-$dispatcher = new Dispatcher();
+$sessionMaker = class_exists('SessionMaker') ? new SessionMaker(set_session_cookies_key($app_email, $app_key)) : "";
+$searchPost = class_exists('SearchFinder') ? new SearchFinder() : "";
+$sanitizer = class_exists('Sanitize') ? new Sanitize() : "";
+$userDao = class_exists('UserDao') ? new UserDao() : "";
+$userToken = class_exists('UserTokenDao') ? new UserTokenDao() : "";
+$validator = class_exists('FormValidator') ? new FormValidator() : "";
+$authenticator = class_exists('Authentication') ? new Authentication($userDao, $userToken, $validator) : "";
+$ubench = class_exists('Ubench') ? new Ubench() : "";
+$dispatcher = class_exists('Dispatcher') ? new Dispatcher() : "";
 
 }
 
-session_set_save_handler($sessionMaker, true);
+is_a($sessionMaker, 'SessionMaker') ? session_set_save_handler($sessionMaker, true) : "";
 session_save_path(__DIR__ . '/utility/.sessions'.DS);
 register_shutdown_function('session_write_close');
 

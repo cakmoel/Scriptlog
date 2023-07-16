@@ -18,10 +18,11 @@
  */
 $timeout = class_exists('Authentication') ? Authentication::COOKIE_EXPIRE : 2592000;
 $current_date = date("Y-m-d H:i:s", time()); 
-$fingerprint  = hash_hmac('sha256', $_SERVER['HTTP_USER_AGENT'], hash('sha256', $ip, true));
+$uagent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : "";
+$fingerprint  = hash_hmac('sha256', $uagent, hash('sha256', $ip, true));
 $loggedIn = false;
 
-if ((isset(Session::getInstance()->scriptlog_last_active) && Session::getInstance()->scriptlog_last_active < time()-$timeout) 
+if ((isset(Session::getInstance()->scriptlog_last_active) && Session::getInstance()->scriptlog_last_active < time() - $timeout) 
     || (isset(Session::getInstance()->scriptlog_fingerprint)  && Session::getInstance()->scriptlog_fingerprint != $fingerprint)) {
         
     do_logout($authenticator);

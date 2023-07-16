@@ -100,16 +100,16 @@ class PostProviderModel extends Dao
   {
 
     $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, 
-p.post_slug, p.post_content, p.post_summary, p.post_keyword, p.post_status, p.post_sticky, 
-p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, 
-m.media_access, u.user_login, u.user_fullname
-FROM tbl_posts p
-INNER JOIN tbl_media m ON p.media_id = m.ID
-INNER JOIN tbl_users u ON p.post_author = u.ID
-WHERE p.post_status = 'publish'
-AND p.post_type = 'blog' AND m.media_target = 'blog'
-AND m.media_access = 'public' AND m.media_status = '1' 
-AND p.ID = :ID ";
+          p.post_slug, p.post_content, p.post_summary, p.post_keyword, p.post_status, p.post_sticky, 
+          p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, 
+          m.media_access, u.user_login, u.user_fullname
+          FROM tbl_posts p
+          INNER JOIN tbl_media m ON p.media_id = m.ID
+          INNER JOIN tbl_users u ON p.post_author = u.ID
+          WHERE p.post_status = 'publish'
+          AND p.post_type = 'blog' AND m.media_target = 'blog'
+          AND m.media_access = 'public' AND m.media_status = '1' 
+          AND p.ID = :ID ";
 
     $sanitizeid = $this->filteringId($sanitize, $id, 'sql');
 
@@ -142,9 +142,10 @@ AND p.ID = :ID ";
           FROM tbl_posts AS p
           INNER JOIN tbl_users AS u ON p.post_author = u.ID
           INNER JOIN tbl_media AS m ON p.media_id = m.ID
-          WHERE p.post_slug = :slug AND p.post_status = 'publish'
+          WHERE  p.post_status = 'publish'
           AND p.post_type = 'blog' AND m.media_target = 'blog'
-          AND m.media_access = 'public' AND m.media_status = '1'";
+          AND m.media_access = 'public' AND m.media_status = '1'
+          AND p.post_slug = :slug";
 
     $this->setSQL($sql);
 

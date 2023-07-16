@@ -93,7 +93,7 @@ function autoloader($class_paths = null, $use_base_dir = true)
 		$paths['conf'] = $conf; // add conf for debugging
 	}
 
-	if(!\is_array($class_paths)) // autoload class
+	if (!\is_array($class_paths)) // autoload class
 	{
 		// class with namespaces, ex: 'MyPack\MyClass' => 'MyPack/MyClass' (directories)
 		$class_path = \str_replace('\\', \DIRECTORY_SEPARATOR, $class_paths);

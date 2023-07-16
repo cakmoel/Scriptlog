@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * defender
  * 
@@ -36,7 +37,6 @@ if (file_exists(basename(__DIR__ . DS . '.guard'. DS . 'fortres.gzip'))) {
  * midfielder
  * 
  * @category function
- * 
  * @return bool
  * 
  */
@@ -45,10 +45,10 @@ function midfielder()
 
 $is_scanner = true;
 
-$agent = filter_input(INPUT_SERVER, 'HTTP_USER_AGENT');
+$agent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_input(INPUT_SERVER, 'HTTP_USER_AGENT') : null;
 $url = current_load_url();
 
-if (strpos($agent, 'sqlmap') !== false || strpos($agent, 'nikto') !== false 
+if ($agent !== null || strpos((string)$agent, 'sqlmap') !== false || strpos((string)$agent, 'nikto') !== false 
     || starts_with($url, 'wp-') || starts_with($url, 'wordpress') || starts_with($url, 'wp/')) {
 
     $is_scanner = true;
@@ -97,6 +97,7 @@ function starts_with($haystack, $needle)
  * @param string $haystack
  * @param string $needle
  * @return void
+ * 
  */
 function ends_with($haystack, $needle)
 {

@@ -56,7 +56,7 @@ if (isset($mediaData['media_filename']) && isset($mediaData['media_type'])) :
   $video_src = invoke_video_uploaded($mediaData['media_filename']);
   $audio_src = invoke_audio_uploaded($mediaData['media_filename']);
   
-    if( ! ($image_src_thumb || $webp_src_thumb)) :
+    if(! ($image_src_thumb || $webp_src_thumb)) :
       
       $webp_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
       $image_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';

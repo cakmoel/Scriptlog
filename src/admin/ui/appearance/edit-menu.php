@@ -17,7 +17,7 @@
  <!-- Main content -->
 <section class="content">
 <div class="row">
-<div class="col-md-6">
+<div class="col-md-4">
 <div class="box box-primary">
 <div class="box-header with-border"></div>
 <!-- /.box-header -->
@@ -46,10 +46,10 @@ $menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
 
 <div class="box-body">
 <div class="form-group">
-<label for="menu_name">Menu name</label>
+<label for="menu_name">Menu name (required)</label>
 <input type="text" class="form-control" id="menu_name" name="menu_label" placeholder="Enter menu name here" value="
-<?=(isset($menuData['menu_label'])) ? htmlspecialchars($menuData['menu_label']) : ""; ?>
-<?=(isset($formData['menu_label'])) ? htmlspecialchars($formData['menu_label'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" required>
+<?=(isset($menuData['menu_label'])) ? safe_html($menuData['menu_label']) : ""; ?>
+<?=(isset($formData['menu_label'])) ? safe_html($formData['menu_label']) : ""; ?>" required>
 </div>
 
 <div class="form-group">
@@ -67,11 +67,11 @@ $menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
 <?php 
   if (function_exists('is_permalink_enabled') && is_permalink_enabled() === 'yes'):
 ?>
-Please check out <a href="https://scriptlog.my.id/doc/" target="_blank" rel="noopener noreferrer">documentation</a> for more information.
+<i>ex: /post/id/your-friendly-neighborhood</i>.Please check out <a href="https://scriptlog.sourceforge.io/doc/" target="_blank" rel="noopener noreferrer">documentation</a> for more information.
 <?php
  else:
 ?>
-You can implement link with query string. <i>ex: ?p=1</i>. More detail check out <a href="https://scriptlog.my.id/doc/" target="_blank" rel="noopener noreferrer">documentation</a>.
+<i>ex: ?p=1</i>. Please check out <a href="https://scriptlog.sourceforge.io/doc/" target="_blank" rel="noopener noreferrer">documentation</a>.
 <?php 
 endif;
 ?>
@@ -109,6 +109,13 @@ endif;
 <?=(isset($visibility)) ? $visibility : ""; ?>
 </div>
 
+<div class="form-group">
+<label for="menu_sort">Order</label>
+<input type="number" class="form-control" name="menu_sort" id="menu_sort" value="
+<?=(isset($menuData['menu_sort']) && $menuData['menu_sort'] === '0' ) ? intval(0) : safe_html(intval($menuData['menu_sort'])); ?>
+<?=(isset($formData['menu_sort'])) ? safe_html($formData['menu_sort']) : 0; ?>" min="0" >
+</div>
+
 </div>
 <!-- /.box-body -->
 
@@ -123,6 +130,9 @@ endif;
 </div>
 <!-- /.col-md-6 -->
 
+<div class="col-md-6">
+  
+</div>
 </div>
 <!-- /.row --> 
 </section>

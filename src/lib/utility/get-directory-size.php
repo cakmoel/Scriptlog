@@ -22,7 +22,7 @@ foreach ($directories_scanned as $key => $file_name) {
 
             $total_size = $total_size + get_directory_size_scandir($directory.DIRECTORY_SEPARATOR.$file_name);
 
-        } elseif ( is_file($directory.DIRECTORY_SEPARATOR.$file_name)) {
+        } elseif (is_file($directory.DIRECTORY_SEPARATOR.$file_name)) {
 
             $total_size = $total_size + filesize($directory.DIRECTORY_SEPARATOR.$file_name);
 
