@@ -253,7 +253,7 @@ class UserApp extends BaseApp
                     array_push($errors, MESSAGE_INVALID_FULLNAME);
                 }
 
-                if (false === sanitize_selection_box(distill_post_request($filters)['user_level'], ['manager' => 'Manager', 'editor' => 'Editor', 'author' => 'Author', 'contributor' => 'Contributor'])) {
+                if (sanitize_selection_box(distill_post_request($filters)['user_level'], ['manager' => 'Manager', 'editor' => 'Editor', 'author' => 'Author', 'contributor' => 'Contributor', 'subscriber' => 'Subscriber']) === false) {
 
                     $checkError = false;
                     array_push($errors, MESSAGE_INVALID_SELECTBOX);
