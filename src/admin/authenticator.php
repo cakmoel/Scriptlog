@@ -23,7 +23,7 @@ $fingerprint  = hash_hmac('sha256', $uagent, hash('sha256', $ip, true));
 $loggedIn = false;
 
 if ((isset(Session::getInstance()->scriptlog_last_active) && Session::getInstance()->scriptlog_last_active < time() - $timeout) 
-    || (isset(Session::getInstance()->scriptlog_fingerprint)  && Session::getInstance()->scriptlog_fingerprint != $fingerprint)) {
+    || (isset(Session::getInstance()->scriptlog_fingerprint)  && Session::getInstance()->scriptlog_fingerprint !== $fingerprint)) {
         
     do_logout($authenticator);
         
