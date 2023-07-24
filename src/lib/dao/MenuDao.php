@@ -53,17 +53,13 @@ class MenuDao extends Dao
    */
   public function findMenu($menuId, $sanitizing)
   {
-
-    $sql = "SELECT ID, menu_label, menu_link, menu_status, menu_visibility, parent_id, menu_sort
-            FROM tbl_menu WHERE ID = ?";
-
     $idsanitized = $this->filteringId($sanitizing, $menuId, 'sql');
 
-    $this->setSQL($sql);
+    $grab_menu = medoo_column_where("tbl_menu", [
+      "ID", "menu_label", "menu_status", "menu_visibility", "parent_id", "menu_sort"
+    ], ["ID" => $idsanitized]);
 
-    $menuDetail = $this->findRow([$idsanitized]);
-
-    return (empty($menuDetail)) ?: $menuDetail;
+    return (empty($grab_menu)) ?: $grab_menu; 
   }
 
   /**
