@@ -26,11 +26,14 @@ function medoo_init()
 }
 
 /**
- * medoo_columns
+ * medoo_column()
+ * 
  * select data from the table
  *
+ * @category function
  * @param string $select
  * @param string|array $columns
+ * @return array|mixed
  * 
  */
 function medoo_column($table, $columns)
@@ -40,11 +43,13 @@ function medoo_column($table, $columns)
 }
 
 /**
- * medoo_column_where
+ * medoo_column_where()
  *
+ * @category function
  * @param string $table
  * @param string|array $column
  * @param array|option $where
+ * @return mixed|array
  * 
  */
 function medoo_column_where($table, $columns, $where)
