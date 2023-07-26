@@ -9,6 +9,6 @@
  * @since    Since Release 1.0
  * 
  */
-require __DIR__ . '/lib/main.php'; 
+require dirname(__FILE__) . '/lib/main.php';
 
 route_request($dispatcher);

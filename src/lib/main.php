@@ -1,4 +1,7 @@
 <?php
+
+(version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
+
 /**
  * Main.php file
  * Initialize main engine, define constants, and object instantiated
@@ -13,8 +16,6 @@
  */
 require __DIR__ . '/options.php';
 require __DIR__ . '/common.php';
-
-(version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
 
 if (! file_exists(APP_ROOT.'config.php')) {
     
@@ -33,6 +34,7 @@ $db_host = isset($config['db']['host']) ? $config['db']['host'] : "";
 $db_user = isset($config['db']['user']) ? $config['db']['user'] : "";
 $db_pwd  = isset($config['db']['pass']) ? $config['db']['pass'] : "";
 $db_name = isset($config['db']['name']) ? $config['db']['name'] : "";
+$db_port = isset($config['db']['port']) ? $config['db']['port'] : "";
 
 $app_email = isset($config['app']['emamil']) ? $config['app']['email'] : "";
 $app_url   = isset($config['app']['url']) ? $config['app']['url'] : "";
@@ -151,7 +153,7 @@ $rules = array(
 #==================== END OF RULES =======================
 
 #====== an instantiation of Database connection ==========
-$dbc = class_exists('DbFactory') ? DbFactory::connect(['mysql:host='.$db_host.';dbname='.$db_name, $db_user, $db_pwd]) : "";
+$dbc = class_exists('DbFactory') ? DbFactory::connect(['mysql:host='.$db_host.';port='.$db_port.';dbname='.$db_name, $db_user, $db_pwd]) : "";
 
 #====== an instantiation of scriptlog cipher key =========
 $cipher_key = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::scriptlogCipherKey() : "";

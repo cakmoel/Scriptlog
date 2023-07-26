@@ -1,4 +1,5 @@
 <?php
+
 /**
  * db_instance
  * An instance of DbMySQLi Class
@@ -177,8 +178,8 @@ return $dbscheme;
 function get_result($Statement)
 {
 
-$result = array();
-$Statement->store_result();
+  $result = array();
+  $Statement->store_result();
     for ($i = 0; $i < $Statement->num_rows; $i++) {
         $Metadata = $Statement->result_metadata();
         $params = array();
@@ -190,5 +191,4 @@ $Statement->store_result();
     }
     
   return $result;
-
 }

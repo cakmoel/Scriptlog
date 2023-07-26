@@ -12,6 +12,5 @@ require __DIR__ . '/lib/main.php';
 
 if (isset($_SERVER["REQUEST_METHOD"]) && strtolower($_SERVER["REQUEST_METHOD"]) === 'post') {
 
-processing_comment($_POST);
-
+    processing_comment($_POST);
 }
