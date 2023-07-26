@@ -21,7 +21,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
   require __DIR__ . '/authenticator.php';
   include __DIR__ . '/login-layout.php';
 
-  $stylePath =  preg_replace("/\/login\.php.*$/i", "", app_url().DS.APP_ADMIN);
+  $stylePath =  preg_replace("/\/login\.php.*$/i", "", current_load_url());
  
 } else {
 
@@ -87,7 +87,7 @@ login_header($stylePath);
 
 ?>
 
-<form name="formlogin" action="<?= form_action('login.php', ['LogIn', human_login_id(), md5(app_key().$ip)], "login")['doLogin']; ?>" method="post" onSubmit="return validasi(this)" autocomplete="off">
+<form name="formlogin" action="<?= form_action('login.php', ['LogIn', human_login_id(), md5(app_key().$ip)], 'login')['doLogin']; ?>" method="post" onSubmit="return validasi(this)" autocomplete="off">
 <div class="form-group has-feedback">
 <label for="inputLogin">Username or Email Address</label>
 <input type="text"  class="form-control" id="inputLogin" placeholder="username or email" name="login" maxlength="186" value="
