@@ -159,7 +159,7 @@ function check_web_server()
 
   $version = isset($slice[1]) ? $slice[1] : '';
 
-  return (array('WebServer' => $webServer, 'Version' => $version));
+  return array('WebServer' => $webServer, 'Version' => $version);
 }
 
 /**
