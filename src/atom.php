@@ -1,4 +1,5 @@
 <?php
+
 /**
  * atom.php
  * 
@@ -13,7 +14,7 @@ require __DIR__ . '/lib/main.php';
 $app_title = app_info()['site_name'];
 $app_link = app_info()['app_url'];
 $app_description = app_info()['site_description'];
-$feed_link = app_url().DS.'atom.php';
+$feed_link = app_url() . DS . 'atom.php';
 
 $atom_feed = new AtomWriter();
 

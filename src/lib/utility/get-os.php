@@ -1,5 +1,7 @@
 <?php
 
+use Sinergi\BrowserDetector\Os;
+
 /**
  * get_os
  *
@@ -13,7 +15,7 @@ function get_os()
 
     $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
 
-    $os = new \Sinergi\BrowserDetector\Os();
+    $os = new Os();
 
     $unknown_os = $os->getName();
 
@@ -37,6 +39,20 @@ function get_os()
         '/linux/i'              =>  'Linux',
         '/ubuntu/i'             =>  'Ubuntu',
         '/debian/i'             =>  'Debian',
+        '/gentoo/i'             =>  'Gentoo',
+        '/arch/i'               =>  'Arch',
+        '/slackware/i'          =>  'Slackware',
+        '/redhat/i'             =>  'RedHat',
+        '/fedora/i'             =>  'Fedora',
+        '/centos/i'             =>  'CentOS',
+        '/mageia/i'             =>  'Mageia',
+        '/vercel/i'             =>  'Vercel',
+        '/netlify/i'            =>  'Netlify',
+        '/alpine/i'             =>  'Alpine',
+        '/opensuse/i'           =>  'OpenSUSE',
+        '/macos/i'              =>  'MacOS',
+        '/freebsd/i'            =>  'FreeBSD',
+        '/openbsd/i'            =>  'OpenBSD',
         '/iphone/i'             =>  'iPhone',
         '/ipod/i'               =>  'iPod',
         '/ipad/i'               =>  'iPad',
@@ -47,6 +63,7 @@ function get_os()
     );
 
     if ($user_agent) {
+
         foreach ($os_array as $regex => $value) {
 
             if (preg_match($regex, $user_agent)) {
@@ -103,4 +120,49 @@ function get_operating_system()
     }
 
     return $operating_system;
+}
+
+/**
+ * get_linux_distro
+ *
+ * @category function
+ * @see https://stackoverflow.com/questions/26862978/get-the-linux-distribution-name-in-php
+ * @return mixed
+ * 
+ */
+function get_linux_distro()
+{
+
+if (strtolower(substr(PHP_OS, 0, 5)) == 'linux') {
+
+    $vars = array();
+    $files = function_exists('glob') ? glob('/etc/*-release') : "";
+  
+    foreach ($files as $file) {
+
+        $lines = array_filter(array_map(function($line) {
+  
+            // split value from key
+            $parts = explode('=', $line);
+  
+            // makes sure that "useless" lines are ignored (together with array_filter)
+            if (count($parts) !== 2) {
+                return false;
+            }
+  
+            // remove quotes, if the value is quoted
+            $parts[1] = str_replace(array('"', "'"), '', $parts[1]);
+            return $parts;
+  
+        }, file($file)));
+  
+        foreach ($lines as $line) {
+          $vars[$line[0]] = $line[1];
+        }
+            
+    }
+
+    return $vars;
+}
+
 }

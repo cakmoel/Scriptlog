@@ -32,7 +32,5 @@ if (is_iterable($feeds)) {
     $rss->addItem($feed_title, $feed_link, $feed_description);
 
     print $rss->saveXML();
-
   }
-
 }

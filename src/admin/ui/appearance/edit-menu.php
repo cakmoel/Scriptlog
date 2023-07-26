@@ -111,9 +111,9 @@ endif;
 
 <div class="form-group">
 <label for="menu_sort">Order</label>
-<input type="number" class="form-control" name="menu_sort" id="menu_sort" value="
-<?=(isset($menuData['menu_sort'])) ? safe_html(intval($menuData['menu_sort'])) : ''; ?>
-<?=(isset($formData['menu_sort'])) ? safe_html($formData['menu_sort']) : ''; ?>" min="0" oninput="this.value = Math.abs(this.value)">
+<input type="number" class="form-control" name="menu_sort" id="menu_sort" min="0" oninput="this.value = Math.abs(this.value)" value="
+<?=(isset($menuData['menu_sort'])) ? $menuData['menu_sort'] : ''; ?>
+<?=(isset($formData['menu_sort'])) ? safe_html($formData['menu_sort']) : ''; ?>" >
 </div>
 
 </div>
