@@ -20,8 +20,9 @@ if (file_exists(__DIR__ . '/../config.php') && is_file(__DIR__ . '/../config.php
 
     if ((isset($ubench)) && (true === APP_DEVELOPMENT)) {
 
-        $ubench->start();
+        (method_exists($ubench, 'start')) ? $ubench->start() : "";
     }
+    
 } else {
 
     header("Location: ../install");
@@ -45,7 +46,7 @@ if (!$loggedIn) {
     $breadcrumb = isset($_GET['load']) ? htmlspecialchars(sanitize_urls($_GET['load']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : http_response_code();
 
     // Current URL
-    $current_url =  preg_replace("/\/index\.php.*$/i", "", app_url() . DS . APP_ADMIN);
+    $current_url =  preg_replace("/\/index\.php.*$/i", "", current_load_url());
 
     include dirname(__FILE__) . DS . 'admin-layout.php';
 
