@@ -17,9 +17,9 @@ define('APP_INC', 'include');
 require_once __DIR__ . '/../../lib/vendor/autoload.php';  
 require_once __DIR__ . '/../../lib/utility/is-ssl.php';
 require_once __DIR__ . '/../../lib/utility/get-browser-name.php';
+require_once __DIR__ . '/../../lib/utility/get-os.php';
 require_once __DIR__ . '/check-engine.php';
 
-  
 if (!ini_get('date.timezone')) {
 
   date_default_timezone_set('UTC');
