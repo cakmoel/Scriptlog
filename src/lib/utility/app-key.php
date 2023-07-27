@@ -1,6 +1,6 @@
 <?php
 /**
- * app_key
+ * app_key()
  * 
  * checking if application key is recognized and equal 
  * between application key on database and configuration file
@@ -17,18 +17,48 @@ function app_key()
 {
   global $config;
 
-  if ($config['app']['key'] === app_info()['app_key']) {
-
-    return app_info()['app_key'];
-
-  } elseif (strcmp($config['app']['key'], app_info()['app_key']) == 0) { 
+  $configKey = isset($config['app']['key']) ? $config['app']['key'] : "";
   
-    return app_info()['app_key'];
+  return (!empty($configKey)) ? $configKey : "";
+}
 
+/**
+ * check_app_key()
+ *
+ * @category function
+ * @param string $key
+ * @return bool
+ * 
+ */
+function check_app_key($key)
+{
+  $appKey = false;
+  $grabKey = grab_data_key();
+
+  if ($key === $grabKey) {
+      
+    $appKey = true;
+
+  } elseif (strcmp($key, $grabKey) === 0) {
+
+    $appKey = true;
   } else {
 
-    return false;
-
+    $appKey = false;
   }
-  
+
+  return $appKey;
+}
+
+/**
+ * grab_data_key()
+ *
+ * @return mixed
+ * 
+ */
+function grab_data_key()
+{
+  return medoo_get_where("tbl_settings", "setting_value", [
+    "setting_name" => "app_key"
+  ]);
 }
