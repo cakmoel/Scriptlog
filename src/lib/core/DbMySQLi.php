@@ -21,6 +21,8 @@ private $dbpass;
 
 private $dbname;
 
+private $dbport;
+
 private static $report_mode = [];
 
 private static $config = [];
@@ -42,8 +44,9 @@ public function __construct()
     $this->dbuser = self::$config['db']['user'];
     $this->dbpass = self::$config['db']['pass'];
     $this->dbname = self::$config['db']['name'];
+    $this->dbport = self::$config['db']['port'];
 
-    $this->dbc = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->dbname);
+    $this->dbc = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->dbname, $this->dbport);
    
     if ($this->dbc->connect_errno) {
 
