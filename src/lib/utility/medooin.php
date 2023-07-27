@@ -14,14 +14,17 @@ function medoo_init()
   $read_config = class_exists('AppConfig') ? AppConfig::readConfiguration(invoke_config()) : null;
 
   $configuration = [
-    'type' => 'mysql',
-    'host' => $read_config['db']['host'],
-    'database' => $read_config['db']['name'],
-    'username' => $read_config['db']['user'],
-    'password' => $read_config['db']['pass']
+    'type'     => 'mysql',
+    'host'     => isset($read_config['db']['host']) ? $read_config['db']['host'] : "",
+    'database' => isset($read_config['db']['name']) ? $read_config['db']['name'] : "",
+    'username' => isset($read_config['db']['user']) ? $read_config['db']['user'] : "",
+    'password' => isset($read_config['db']['pass']) ? $read_config['db']['pass'] : "",
+    'charset'  => 'utf8mb4',
+    'collation'=> 'utf8mb4_general_ci',
+    'port'     => isset($read_config['db']['port']) ? $read_config['db']['port'] : ""
   ];
 
-  return MedooInit::connect($configuration);
+  return (class_exists('MedooInit')) ? MedooInit::connect($configuration) : "";
 
 }
 
@@ -84,9 +87,15 @@ function medoo_join($table, $join, $columns, $where)
 function medoo_fetch_callback($table, $columns, $where)
 {
   $database = medoo_init();
-  return $database->select($table, $columns, $where, function ($data) {
-    return $data;
-  });
+
+  if (method_exists($database, 'select')) {
+
+    return $database->select($table, $columns, $where, function ($data) {
+      return $data;
+    });
+    
+  }
+  
 }
 
 /**
@@ -101,7 +110,7 @@ function medoo_fetch_callback($table, $columns, $where)
 function medoo_get_where($table, $columns, $where)
 {
  $database = medoo_init();
- return $database->get($table, $columns, $where);
+ return (method_exists($database, 'get')) ? $database->get($table, $columns, $where) : "";
 }
 
 /**
@@ -143,7 +152,7 @@ function medoo_insert($table, $values)
 function medoo_update($table, $column, $where)
 {
   $database = medoo_init();
-  return $database->update($table, $column, $where);
+  return (method_exists($database, 'update')) ? $database->update($table, $column, $where) : "";
 }
 
 /**
@@ -158,7 +167,7 @@ function medoo_update($table, $column, $where)
 function medoo_replace($table, $column, $where)
 {
   $database = medoo_init();
-  return $database->replace($table, $column, $where);
+  return (method_exists($database, 'replace')) ? $database->replace($table, $column, $where) : "";
 }
 
 /**
@@ -171,5 +180,5 @@ function medoo_replace($table, $column, $where)
 function medoo_delete($table, $where)
 {
   $database = medoo_init();
-  return $database->delete($table, $where);
+  return (method_exists($database, 'delete')) ? $database->delete($table, $where) : "";
 }
