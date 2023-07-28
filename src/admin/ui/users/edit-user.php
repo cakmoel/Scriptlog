@@ -44,7 +44,7 @@
           <?php
           $action = (isset($formAction)) ? $formAction : null;
           $user_id = (isset($userData['ID'])) ? safe_html((int)$userData['ID']) : 0;
-          $session_id = (isset($userData['user_session'])) ? safe_html($userData['user_session']) : sha1(app_key());
+          $session_id = (isset($userData['user_session'])) ? safe_html($userData['user_session']) : substr(hash('sha256', bin2hex(openssl_random_pseudo_bytes(ceil(32 / 2)))), 0, 32);
           ?>
 
           <form method="post" action="<?= generate_request('index.php', 'post', ['users', $action, $user_id, $session_id])['link']; ?>">
