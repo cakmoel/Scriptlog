@@ -21,9 +21,8 @@ if (! file_exists(APP_ROOT.'config.php')) {
     
     if (is_dir(APP_ROOT . 'install')) {
 
-        header("Location: ".APP_PROTOCOL."://".APP_HOSTNAME.dirname(htmlspecialchars($_SERVER['PHP_SELF'])).DS.'install');
+        header("Location: ".APP_PROTOCOL."://".APP_HOSTNAME.dirname(dirname(htmlspecialchars($_SERVER['PHP_SELF']))).DS.'install');
         exit();
-         
     }
 
 } else {
