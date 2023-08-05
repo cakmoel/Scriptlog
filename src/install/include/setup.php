@@ -23,28 +23,66 @@ function current_url() // returning current url
 
 /**
  * make_connection()
- * 
+ *
  * @param string $host
  * @param string $username
  * @param string $passwd
+ * @param string $dbname
+ * @param int $port
  * @return object
  * 
  */
-function make_connection($host, $username, $passwd, $dbname)
+function make_connection($host, $username, $passwd, $dbname, $dbport)
 {
-
-  $connect = new mysqli($host, $username, $passwd, $dbname);
-  
-  if ($connect->connect_errno) {
-
-    printf("Failed to connect to MySQL: (" . $connect->connect_errno . ") " . $connect->connect_error, E_USER_ERROR);
-    exit();
-  }
 
   $driver = new mysqli_driver();
 
   $driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+
+  $connect = new mysqli($host, $username, $passwd, $dbname, $dbport);
   
+  if ($connect->connect_errno) {
+
+    printf("Failed to connect to MySQL: (" . $connect->connect_errno . ") " . $connect->connect_error, E_USER_ERROR);
+    
+    close_connection($connect);
+
+    exit();
+  }
+
+  return $connect;  
+}
+
+/**
+ * make_secure_connection()
+ * 
+ * @param string $host
+ * @param string $username
+ * @param string $passwd
+ * @param string $dbname
+ * @param int $dbport
+ * @param string $ca
+ * @return object
+ * 
+ */
+function make_secure_connection($host, $username, $passwd, $dbname, $dbport, $ca)
+{
+
+  mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+  $connect = mysqli_init();
+  $connect->ssl_set(null, null, $ca, null, null);
+  $connect->real_connect($host, $username, $passwd, $dbname, $dbport);
+  
+  if ($connect->connect_errno) {
+
+    printf("Failed to connect to MySQL: (" . $connect->connect_errno . ") " . $connect->connect_error, E_USER_ERROR);
+    
+    close_connection($connect);
+
+    exit();
+  }
+
   return $connect;
 }
 
@@ -99,8 +137,9 @@ function check_dbtable($link, $table)
 }
 
 /**
- * Install Database Table Function
+ * install_database_table()
  * 
+ * @category installation setup function for database installation
  * @param object $link
  * @param string $user_login
  * @param string $user_pass
@@ -115,7 +154,7 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
 
   // Users  
   $date_registered = date('Y-m-d H:i:s');
-  $user_session    = md5(uniqid());
+  $user_session    = substr(hash('sha256', $key), 0, 32);
   $shield_pass     = password_hash(base64_encode(hash('sha384', $user_pass, true)), PASSWORD_DEFAULT);
   $user_level      = 'administrator';
 
@@ -279,11 +318,47 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
       $recordTheme->execute();
 
       if ($recordAppKey->affected_rows > 0) {
-
         $link->close();
       }
     }
   }
+}
+
+/**
+ * grab_app_key()
+ *
+ * @param object $mysqli
+ * @param string $key
+ * @return string
+ * 
+ */
+function grab_app_key($mysqli, $key)
+{
+  $sql = "SELECT ID, setting_name, setting_value 
+          FROM tbl_settings USE INDEX(setting_value) WHERE setting_value = '$key'";
+  
+  $row = mysqli_fetch_assoc($mysqli->query($sql));
+
+  $app_key = isset($row['setting_value']) ? htmlspecialchars($row['setting_value']) : "";
+  $id = isset($row['ID']) ? abs((int)$row['ID']) : "";
+
+  return array('app_key' => generate_license(substr($app_key, 0, 6)), 'ID' => $id);
+}
+
+/**
+ * update_app_key()
+ *
+ * @param object $mysqli
+ * @param string $app_key
+ * @param int|num $id
+ * @return void
+ * 
+ */
+function update_app_key($mysqli, $app_key, $id)
+{
+  $sql = "UPDATE tbl_settings SET setting_value = '$app_key'
+          WHERE setting_name = 'app_key' AND ID = {$id} LIMIT 1";
+  return $mysqli->query($sql);
 }
 
 /**
@@ -297,40 +372,30 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
  * @param string $dbuser
  * @param string $dbpassword
  * @param string $dbname
+ * @param int $dbport
  * @param string $email
  * @param string $key
  * @throws Exception
  * 
  */
-function write_config_file($protocol, $server_name, $dbhost, $dbuser, $dbpassword, $dbname, $email, $key)
+function write_config_file($protocol, $server_name, $dbhost, $dbuser, $dbpassword, $dbname, $dbport, $email, $key, $ca = false)
 {
 
   mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-  $link = mysqli_connect($dbhost, $dbuser, $dbpassword, $dbname);
-
-  if (mysqli_connect_errno()) {
-    printf("Connect failed: %s\n", mysqli_connect_error(), E_USER_ERROR);
-    exit();
-  }
-
+  $link = ($ca !== false) ? make_secure_connection($dbhost, $dbuser, $dbpassword, $dbname, $dbport, $ca) : make_connection($dbhost, $dbuser, $dbpassword, $dbname, $dbport);
+ 
   $configuration = false;
 
   if (isset($_SESSION['install']) && $_SESSION['install'] === true) {
 
-    $getAppKey = "SELECT ID, setting_name, setting_value 
-                 FROM tbl_settings USE INDEX(setting_value) 
-                 WHERE setting_value = '$key'";
+    $distro = isset(get_linux_distro()['NAME']) ? get_linux_distro()['NAME'] : "";
 
-    $row = mysqli_fetch_assoc(mysqli_query($link, $getAppKey));
+    $app_key = isset(grab_app_key($link, $key)['app_key']) ? grab_app_key($link, $key)['app_key'] : "";
+    $app_id = isset(grab_app_key($link, $key)['ID']) ? grab_app_key($link, $key)['ID'] : "";
 
-    $app_key = generate_license(substr($row['setting_value'], 0, 6));
+    update_app_key($link, $app_key, $app_id);
 
-    $updateAppKey = "UPDATE tbl_settings SET setting_value = '$app_key'
-                    WHERE setting_name = 'app_key' 
-                    AND ID = {$row['ID']} LIMIT 1";
-
-    mysqli_query($link, $updateAppKey);
     mysqli_close($link);
 
     $configFile = '<?php  
@@ -342,19 +407,24 @@ function write_config_file($protocol, $server_name, $dbhost, $dbuser, $dbpasswor
                   'host' => '" . addslashes($dbhost) . "',
                   'user' => '" . addslashes($dbuser) . "',
                   'pass' => '" . addslashes($dbpassword) . "',
-                  'name' => '" . addslashes($dbname) . "'
-                  
+                  'name' => '" . addslashes($dbname) . "',
+                  'port' => '" . addslashes($dbport) . "'
                 ],
         
             'app' => [
 
-                   'url'   => '" . addslashes(setup_base_url($protocol, $server_name)) . "',
-                   'email' => '" . addslashes($email) . "',
-                   'key'   => '" . addslashes($app_key) . "'
-                   
-                ]
+                  'url'   => '" . addslashes(setup_base_url($protocol, $server_name)) . "',
+                  'email' => '" . addslashes($email) . "',
+                  'key'   => '" . addslashes($app_key) . "'
+                ],
 
-        ];";
+            'os' => [
+                  
+                  'system_software' => '" . addslashes(check_os()['Operating_system']) . "',
+                  'distrib_name'    => '" . trim($distro) . "'
+                ],
+
+        ];".PHP_EOL;
 
     if (isset($_SESSION['token'])) {
 
@@ -380,7 +450,7 @@ function write_config_file($protocol, $server_name, $dbhost, $dbuser, $dbpasswor
  * @return string
  * 
  */
-function remove_bad_characters($str_words, $host, $user, $password, $database, $escape = false, $level = 'high')
+function remove_bad_characters($str_words, $host, $user, $password, $database, $port, $escape = false, $level = 'high')
 {
 
   $str_words = escapeHTML(strip_tags($str_words));
@@ -403,7 +473,7 @@ function remove_bad_characters($str_words, $host, $user, $password, $database, $
 
   if ($escape) {
 
-    $link = mysqli_connect($host, $user, $password, $database);
+    $link = mysqli_connect($host, $user, $password, $database, $port);
     $str_words = mysqli_real_escape_string($link, $str_words);
   }
 
