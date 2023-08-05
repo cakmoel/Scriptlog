@@ -2,7 +2,7 @@
 function install_header($stylePath)
 {
 ?>
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -138,8 +138,8 @@ function get_sisfo()
                   
                    if ($osname === $operating_system) {
                       
-                       $os_passed = 'text-success';
-                       $os_checked = 'fa fa-check fa-lg';
+                      $os_passed = 'text-success';
+                      $os_checked = 'fa fa-check fa-lg';
                        
                    }
                     
@@ -160,14 +160,9 @@ function get_sisfo()
                   
                    foreach ($browserslist as $browser_name) :
                        
-                       if (check_browser() == $browser_name) {
-                      
-                           if (check_browser_version() === true) {
-                               
-                               $browser_failed = "text-danger";
-                               $fabrowser_close = "fa fa-close fa-lg";
-                           }
-                          
+                       if ((check_browser() == $browser_name) && (check_browser_version() === true)) {
+                        $browser_failed = "text-danger";
+                        $fabrowser_close = "fa fa-close fa-lg";      
                        }
                        
                    endforeach;
@@ -187,7 +182,7 @@ function get_sisfo()
                  $server_name = $web_server['WebServer'];
                  $server_version = $web_server['Version'];
                  
-                 $serverList = array('Apache', 'LiteSpeed', 'nginx');
+                 $serverList = array('Apache', 'LiteSpeed', 'nginx', 'Microsoft-IIS');
                  
                  foreach ($serverList as $server) :
 
