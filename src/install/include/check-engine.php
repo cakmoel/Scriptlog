@@ -28,7 +28,7 @@ function check_php_version()
  * Checking mysql version
  * 
  * @category installation file
- * @param string $link
+ * @param object|int $link
  * 
  */
 function check_mysql_version($link, $min)
@@ -38,12 +38,17 @@ function check_mysql_version($link, $min)
 
     $mysql_version = $link->server_version;
 
-    preg_match("/^[0-9\.]+/", $mysql_version, $match);
+  } else {
 
-    $mysql_version = isset($match[0]) ? $match[0] : "";
-
-    return version_compare($mysql_version, $min) >= 0;
+    $mysql_version = mysqli_get_server_version($link);
   }
+
+  preg_match("/^[0-9\.]+/", $mysql_version, $match);
+
+  $mysql_version = isset($match[0]) ? $match[0] : "";
+
+  return version_compare($mysql_version, $min) >= 0;
+
 }
 
 /**
