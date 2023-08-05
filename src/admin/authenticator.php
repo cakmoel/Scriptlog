@@ -28,7 +28,7 @@ if (class_exists('Session')) {
         || (isset(Session::getInstance()->scriptlog_fingerprint)  && Session::getInstance()->scriptlog_fingerprint !== $fingerprint)
     ) {
 
-        do_logout($authenticator);
+        do_logout(is_a($authenticator, 'Authentication') ? $authenticator : "");
 
     }
 
@@ -38,13 +38,13 @@ if (class_exists('Session')) {
         
     } elseif ((!empty($_COOKIE['scriptlog_auth'])) && (!empty($_COOKIE['scriptlog_validator'])) && (!empty($_COOKIE['scriptlog_selector']))) {
 
-        $secret = ScriptlogCryptonize::generateSecretKey();
+        $secret = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::generateSecretKey() : "";
 
         $validator_verified = false;
         $selector_verified  = false;
         $expired_verified   = false;
 
-        $decrypt_auth = ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $cipher_key);
+        $decrypt_auth = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $cipher_key) : "";
         $token_info = $authenticator->findTokenByLogin($decrypt_auth, 0);
 
         $expected_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
@@ -106,16 +106,16 @@ if (class_exists('Session')) {
 
             $bind_token = ['user_login' => $decrypt_auth, 'pwd_hash' => $hashed_password, 'selector_hash' => $hashed_selector, 'is_expired' => 0, 'expired_date' => $expiry_date];
 
-            $authenticator->renewPersistentLogin($bind_token, $token_info['user_login']);
+            is_a($authenticator, 'Authentication') ? $authenticator->renewPersistentLogin($bind_token, $token_info['user_login']) : "";
 
         } else {
 
             if (!empty($token_info['ID'])) {
 
-                $authenticator->markCookieAsExpired($token_info['ID']);
+                is_a($authenticator, 'Authentication') ? $authenticator->markCookieAsExpired($token_info['ID']) : "";
             }
 
-            $authenticator->clearAuthCookies($token_info['user_login']);
+            is_a($authenticator, 'Authentication') ? $authenticator->clearAuthCookies($token_info['user_login']) : "";
         }
     }
 }
