@@ -492,6 +492,7 @@ function retrieve_page($arg, $rewrite)
     return is_iterable($page) ? $page : [];
   }
 }
+
 /**
  * nothing_found
  *
