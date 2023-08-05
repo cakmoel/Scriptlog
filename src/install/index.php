@@ -1,5 +1,7 @@
 <?php
 
+(version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
+
 /**
  * File index.php 
  * 
@@ -14,13 +16,13 @@ require dirname(__FILE__) . '/include/settings.php';
 require dirname(__FILE__) . '/include/setup.php';
 require dirname(__FILE__) . '/install-layout.php';
 
-(version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
+$ca = false;
 
 if (file_exists(__DIR__ . '/../config.php')) {
 
     $set_config = require __DIR__ . '/../config.php';
 
-    $dbconnect = make_connection($set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name']);
+    $dbconnect = make_connection($set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name'], $set_config['db']['port']);
 
     // check if database table exists or not
     if ((check_dbtable($dbconnect, 'tbl_users') === true) || (check_dbtable($dbconnect, 'tbl_user_token') === true)
@@ -53,16 +55,17 @@ if (file_exists(__DIR__ . '/../config.php')) {
     if ($install != 'install') {
 
         $_SESSION['install'] = false;
-
         header($installation_path, true, 302);
+        
     } else {
 
         $dbhost = isset($_POST['db_host']) ? escapeHTML($_POST['db_host']) : "";
         $dbname = isset($_POST['db_name']) ? escapeHTML($_POST['db_name']) : "";
+        $dbport = isset($_POST['db_port']) ? escapeHTML($_POST['db_port']) : "";
         $dbpass = isset($_POST['db_pass']) ? escapeHTML($_POST['db_pass']) : "";
-        $dbuser = isset($_POST['db_user']) ? remove_bad_characters($_POST['db_user'], $dbhost, $_POST['db_user'], $dbpass, $dbname) : "";
+        $dbuser = isset($_POST['db_user']) ? remove_bad_characters($_POST['db_user'], $dbhost, $_POST['db_user'], $dbpass, $dbname, $dbport) : "";
 
-        $username = isset($_POST['user_login']) ? remove_bad_characters($_POST['user_login'], $dbhost, $dbuser, $dbpass, $dbname) : "";
+        $username = isset($_POST['user_login']) ? remove_bad_characters($_POST['user_login'], $dbhost, $dbuser, $dbpass, $dbname, $dbport) : "";
         $password = isset($_POST['user_pass1']) ? escapeHTML($_POST['user_pass1']) : "";
         $confirm = isset($_POST['user_pass2']) ? escapeHTML($_POST['user_pass2']) : "";
         $email = filter_input(INPUT_POST, 'user_email', FILTER_SANITIZE_EMAIL);
@@ -72,7 +75,11 @@ if (file_exists(__DIR__ . '/../config.php')) {
             $errors['errorSetup'] = "database: requires name, hostname, user and password";
         }
 
-        $link = make_connection($dbhost, $dbuser, $dbpass, $dbname);
+        if (!ctype_digit(strval($dbport))) {
+            $errors['errorSetup'] = "your port is not an integer";
+        }
+        
+        $link = make_connection($dbhost, $dbuser, $dbpass, $dbname, $dbport);
 
         if (strlen($username) < 8) {
 
@@ -208,11 +215,9 @@ if (file_exists(__DIR__ . '/../config.php')) {
                 if (function_exists("random_bytes")) {
 
                     $token = random_bytes(ceil($length / 2));
-
                 } elseif (function_exists("openssl_random_pseudo_bytes")) {
 
                     $token = openssl_random_pseudo_bytes(ceil($length / 2));
-
                 } else {
 
                     trigger_error("No cryptographically secure random function available", E_USER_ERROR);
@@ -226,12 +231,11 @@ if (file_exists(__DIR__ . '/../config.php')) {
 
                     install_database_table($link, $protocol, $server_host, $username, $password, $email, $key);
 
-                    if (true === write_config_file($protocol, $server_host, $dbhost, $dbuser, $dbpass, $dbname, $email, $key)) {
+                    if (true === write_config_file($protocol, $server_host, $dbhost, $dbuser, $dbpass, $dbname, $dbport, $email, $key)) {
 
                         header("Location:" . $protocol . "://" . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR . "finish.php?status=success&token={$key}", true, 302);
                     }
                 }
-                
             } catch (mysqli_sql_exception $e) {
 
                 $e->getMessage();
@@ -260,7 +264,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
                 </h4>
 
                 <?= get_sisfo(); ?>
-                
+
                 <h4 class="d-flex justify-content-between align-items-center mb-3">
                     <span class="text-muted">Required PHP Settings</span>
                 </h4>
@@ -310,39 +314,45 @@ if (file_exists(__DIR__ . '/../config.php')) {
 
                     <h4 class="mb-3">Database Settings</h4>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="databaseHost">Database Host</label>
-                            <input type="text" class="form-control" id="databaseHost" name="db_host" placeholder="Database host" value="<?= (isset($_POST['db_host'])) ? escapeHTML($_POST['db_host'])  : ""; ?>" required>
-                            <div class="invalid-feedback">
-                                Valid database host is required.
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="lastName">Database Name</label>
-                            <input type="text" class="form-control" id="databaseName" name="db_name" placeholder="Database name" value="<?= (isset($_POST['db_name'])) ? escapeHTML($_POST['db_name']) : "";  ?>" required>
-                            <div class="invalid-feedback">
-                                Valid database name is required.
-                            </div>
+                    <div class="mb-3">
+                        <label for="databaseHost">Host</label>
+                        <input type="text" class="form-control" id="databaseHost" name="db_host" placeholder="database host" value="<?= (isset($_POST['db_host'])) ? escapeHTML($_POST['db_host'])  : ""; ?>" required>
+                        <div class="invalid-feedback">
+                            Valid database host is required.
                         </div>
                     </div>
-
+                    
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="databaseUser">MySQL Username</label>
-                            <input type="text" class="form-control" id="databaseUser" name="db_user" placeholder="Database user" value="<?= (isset($_POST['db_user'])) ? escapeHTML($_POST['db_user']) : ""; ?>" required>
-                            <div class="invalid-feedback">
-                                Valid database username is required.
-                            </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="databaseName">Database</label>
+                        <input type="text" class="form-control" id="databaseName" name="db_name" placeholder="database name" value="<?= (isset($_POST['db_name'])) ? escapeHTML($_POST['db_name']) : "";  ?>" required>
+                        <div class="invalid-feedback">
+                            Valid database name is required.
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="databasePass">MySQL Password</label>
-                            <input type="password" class="form-control" id="databasePass" name="db_pass" placeholder="Database password" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="databaseUser">User</label>
+                        <input type="text" class="form-control" id="databaseUser" name="db_user" placeholder="database user" value="<?= (isset($_POST['db_name'])) ? escapeHTML($_POST['db_name']) : "";  ?>" required>
+                        <div class="invalid-feedback">
+                            Valid database name is required.
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="databasePort">Port</label>
+                        <input type="text" class="form-control" id="databasePort" name="db_port" placeholder="3306" aria-invalid="false" value="<?= (isset($_POST['db_port'])) ? escapeHTML($_POST['db_port']) : "3306";  ?>" >
+                        <div class="invalid-feedback">
+                            Valid database name is required.
+                        </div>
+                    </div>
+                    </div>
+
+                    <div class="mb-3">
+                            <label for="databasePass">Password</label>
+                            <input type="password" class="form-control" id="databasePass" name="db_pass" placeholder="database password" required>
                             <div class="invalid-feedback">
                                 Valid database password is required.
                             </div>
                         </div>
-                    </div>
 
                     <hr class="mb-4">
 
