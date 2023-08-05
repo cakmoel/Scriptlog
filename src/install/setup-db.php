@@ -1,7 +1,10 @@
 <?php
 
+(version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
+
 /**
  * File install.php
+ * 
  * this file will be used when file config.php exists and  
  * successfully created but database tables has not been installed yet
  *
@@ -16,8 +19,6 @@ require dirname(__FILE__) . '/include/settings.php';
 require dirname(__FILE__) . '/include/setup.php';
 require dirname(__FILE__) . '/install-layout.php';
 
-(version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
-
 if (!file_exists(__DIR__ . '/../config.php')) {
 
   header("Location: " . $protocol . '://' . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR, true, 302);
@@ -26,7 +27,7 @@ if (!file_exists(__DIR__ . '/../config.php')) {
 
   $set_config = require __DIR__ . '/../config.php';
 
-  $dbconnect = make_connection($set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name']);
+  $dbconnect = make_connection($set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name'], $set_config['db']['port']);
 
   if ((check_dbtable($dbconnect, 'tbl_users') === false) || (check_dbtable($dbconnect, 'tbl_user_token') === false)
     || (check_dbtable($dbconnect, 'tbl_topics') === false) || (check_dbtable($dbconnect, 'tbl_themes') === false)
@@ -50,11 +51,11 @@ if (!file_exists(__DIR__ . '/../config.php')) {
   if ($setup !== 'install') {
 
     $_SESSION['install'] = false;
-
     header($install_path, true, 302);
+    
   } else {
 
-    $username = isset($_POST['user_login']) ? remove_bad_characters($_POST['user_login'], $set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $dbname) : "";
+    $username = isset($_POST['user_login']) ? remove_bad_characters($_POST['user_login'], $set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name'], $set_config['db']['port']) : "";
     $password = isset($_POST['user_pass1']) ? escapeHTML($_POST['user_pass1']) : "";
     $confirm = isset($_POST['user_pass2']) ? escapeHTML($_POST['user_pass2']) : "";
     $email = filter_input(INPUT_POST, 'user_email', FILTER_SANITIZE_EMAIL);
