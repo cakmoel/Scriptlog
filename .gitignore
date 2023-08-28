@@ -8,3 +8,5 @@ src/lib/vendor/bin/generate-defuse-key
 src/admin/assets/components/Ionicons/composer.json
 
 *.json
+
+src/tests/
