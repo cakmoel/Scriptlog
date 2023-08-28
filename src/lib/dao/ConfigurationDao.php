@@ -59,8 +59,7 @@ public function updateConfig($sanitize, $bind, $configId)
  */
 public function deleteConfig($configId, $sanitize)
 {
-  $clean_id = $this->filteringId($sanitize, $configId, 'sql');
-  $this->deleteRecord("tbl_settings", "ID = ".(int)$clean_id);
+  $this->deleteRecord("tbl_settings", "ID = ".$this->filteringId($sanitize, $configId, 'sql'));
 }
 
 /**
@@ -74,9 +73,7 @@ public function deleteConfig($configId, $sanitize)
 public function findConfigs($orderBy = 'ID')
 {
   
-  $sql = "SELECT ID, setting_name, setting_value 
-          FROM tbl_settings 
-          ORDER BY :orderBy DESC";
+  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings ORDER BY ':orderBy' ";
 
 	$this->setSQL($sql);
 
@@ -96,11 +93,11 @@ public function findConfigs($orderBy = 'ID')
  */
 public function findGeneralConfigs($orderBy = 'ID', $limit = 7)
 {
- $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings ORDER BY :orderBy DESC LIMIT :limit";
+ $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings ORDER BY '$orderBy' DESC LIMIT :limit ";
 
  $this->setSQL($sql);
 
- $general_configs = $this->findAll([':orderBy' => $orderBy, ':limit' => $limit]);
+ $general_configs = $this->findAll([':limit' => $limit]);
 
  return (empty($general_configs)) ?: $general_configs;
 
@@ -115,11 +112,11 @@ public function findGeneralConfigs($orderBy = 'ID', $limit = 7)
  */
 public function findReadingConfigs($orderBy = 'ID')
 {
-  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE ID BETWEEN 8 AND 11 ORDER BY :orderBy ";
+  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE ID BETWEEN 8 AND 11 ORDER BY '$orderBy' ";
 
   $this->setSQL($sql);
 
-  $reading_configs = $this->findAll([':orderBy' => $orderBy]);
+  $reading_configs = $this->findAll([]);
 
   return (empty($reading_configs)) ?: $reading_configs;
 
@@ -137,8 +134,7 @@ public function findReadingConfigs($orderBy = 'ID')
 public function findConfig($id, $sanitize)
 {
   
-  $sql = "SELECT ID, setting_name, setting_value
-		      FROM tbl_settings WHERE ID = :ID ";
+  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE ID = ':ID' ";
    
   $id_sanitized = $this->filteringId($sanitize, $id, 'sql');
 
@@ -161,13 +157,13 @@ public function findConfig($id, $sanitize)
 public function findConfigByName($setting_name, $sanitize)
 {
   
-  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE setting_name = :setting_name LIMIT 1";
+  $sql = "SELECT ID, setting_name, setting_value FROM tbl_settings WHERE setting_name = ? LIMIT 1";
 
   $name_sanitized = $this->filteringId($sanitize, $setting_name, 'xss');
 
   $this->setSQL($sql);
 
-  $detailConfig = $this->findRow([':setting_name' => $name_sanitized]);
+  $detailConfig = $this->findRow([$name_sanitized]);
 
   return (empty($detailConfig)) ?: $detailConfig;
 

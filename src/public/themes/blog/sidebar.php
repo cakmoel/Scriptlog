@@ -13,7 +13,7 @@
   </div>
   
   <?php
-  $latest_posts = latest_posts(5, 'sidebar');
+  $latest_posts = function_exists('latest_posts') ? latest_posts(5, 'sidebar') : "";
   ?>
 
   <!-- Widget [Latest Posts Widget] -->
@@ -62,16 +62,18 @@
       <h3 class="h6">Categories</h3>
     </header>
 
-    <?php
+   <?php
+    if (function_exists('sidebar_topics')) :
     foreach (sidebar_topics() as $category) :
-      
-    ?>
+   ?>
 
       <div class="item d-flex justify-content-between"><a href="<?= isset($category['ID']) ? permalinks($category['ID'])['cat'] : "#"; ?>"><?= isset($category['topic_title']) ? escape_html($category['topic_title']) : ""; ?></a><span><?= isset($category['total_posts']) ? $category['total_posts'] : "" ?></span></div>
 
-    <?php
+   <?php
     endforeach;
-    ?>
+    endif;
+   ?>
+
   </div>
 
 
@@ -80,14 +82,20 @@
     <header>
       <h3 class="h6">Archives</h3>
     </header>
+
     <?php
+    if (function_exists('retrieve_archives')) :
     foreach (retrieve_archives() as $archives) :
       $month_name = isset($archives['month_archive']) ? date("F Y", mktime(0, 0, 0, intval($archives['month_archive']), 7, intval($archives['year_archive']))) : "";
     ?>
+
       <div class="item d-flex justify-content-between"><a href="<?= permalinks($archives['month_archive'] . $archives['year_archive'])['archive']; ?>" title="<?= $month_name; ?>"><?= $month_name; ?></a><span><?= isset($archives['total']) ? $archives['total'] : ""; ?></span></div>
+    
     <?php
     endforeach;
+    endif;
     ?>
+    
   </div>
   <!-- Widget [Tags Cloud Widget]-->
 
@@ -96,7 +104,7 @@
       <h3 class="h6">Tags</h3>
     </header>
     <ul class="list-inline">
-      <?= outputting_tags(); ?>
+      <?= function_exists('outputting_tags') ? outputting_tags() : ""; ?>
     </ul>
   </div>
 </aside>

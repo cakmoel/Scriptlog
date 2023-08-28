@@ -52,11 +52,11 @@ public function findPosts($orderBy = 'ID', $author = null)
                 u.user_login
   			FROM tbl_posts AS p
   			INNER JOIN tbl_users AS u ON p.post_author = u.ID
-  			WHERE p.post_author = :author
+  			WHERE p.post_author = ?
   			AND p.post_type = 'blog'
-  			ORDER BY :orderBy DESC";
+  			ORDER BY '$orderBy' DESC";
 
-        $data = array(':author' => $author, ':orderBy' => $orderBy);
+        $data = array($author);
 
     } else {
 
@@ -79,9 +79,9 @@ public function findPosts($orderBy = 'ID', $author = null)
   		  FROM tbl_posts AS p
   		  INNER JOIN tbl_users AS u ON p.post_author = u.ID
   		  WHERE p.post_type = 'blog'
-  			ORDER BY :orderBy DESC";
+  			ORDER BY '$orderBy' DESC";
 
-        $data = array(':orderBy' => $orderBy);
+        $data = array();
 
     }
 
@@ -94,7 +94,8 @@ public function findPosts($orderBy = 'ID', $author = null)
 }
 
 /**
- * findPost
+ * findPost()
+ * 
  * Retrieving a single post records by it's Id 
  * 
  * @param integer $postId
@@ -108,7 +109,7 @@ public function findPost($id, $sanitize, $author = null)
 
    $idsanitized = $this->filteringId($sanitize, $id, 'sql');
 
-   if (!empty($author)) {
+   if (!is_null($author)) {
 
         $sql = "SELECT ID,
                   media_id,
@@ -125,15 +126,12 @@ public function findPost($id, $sanitize, $author = null)
                   post_password,
                   post_tags,
                   post_headlines,
-  	  		        post_type,
                   comment_status, 
                   passphrase
   	  		  FROM tbl_posts
-  	  		  WHERE ID = :ID 
-            AND post_author = :author
-  			  AND post_type = 'blog'";
-
-        $data = array(':ID' => $idsanitized, ':author' => $author);
+  	  		  WHERE ID = ? 
+            AND post_author = ?
+  			  AND post_type = 'blog' ";
 
    } else {
 
@@ -152,19 +150,16 @@ public function findPost($id, $sanitize, $author = null)
               post_password,
               post_tags,
               post_headlines,
-  	  		    post_type,
               comment_status, 
               passphrase
   	  		  FROM tbl_posts
-  	  		  WHERE ID = :ID AND post_type = 'blog'";
-
-       $data = array(':ID' => $idsanitized);
+  	  		  WHERE ID = ? AND post_type = 'blog' ";
 
   }
 
   $this->setSQL($sql);
 
-  $postDetail = $this->findRow($data);
+  $postDetail = is_null($author) ? $this->findRow([$idsanitized]) : $this->findRow([$idsanitized, $author]);
 
   return (empty($postDetail)) ?: $postDetail;
 
@@ -192,13 +187,10 @@ public function createPost($bind, $topicId)
        'post_title' => $bind['post_title'],
        'post_slug' => $bind['post_slug'],
        'post_content' => $bind['post_content'],
-       'post_summary' => $bind['post_summary'],
-       'post_keyword' => $bind['post_keyword'],
+       'post_summary' => $bind['post_summary'], 'post_keyword' => $bind['post_keyword'],
        'post_status' => $bind['post_status'],
-       'post_visibility' => $bind['post_visibility'],
-       'post_password' => $bind['post_password'],
-       'post_tags' => $bind['post_tags'],
-       'post_headlines' => $bind['post_headlines'], 
+       'post_visibility' => $bind['post_visibility'], 'post_password' => $bind['post_password'],
+       'post_tags' => $bind['post_tags'], 'post_headlines' => $bind['post_headlines'], 
        'comment_status' => $bind['comment_status'], 
        'passphrase' => $bind['passphrase']
        ]);
@@ -265,13 +257,15 @@ $cleanId = $this->filteringId($sanitize, $ID, 'sql');
 
 try {
 
-  $this->callTransaction(); // transaction
+  // transaction
+  $this->callTransaction(); 
 
   if (!empty($bind['media_id'])) {
 
   	$this->modify("tbl_posts", [
 
   	    'media_id' => $bind['media_id'],
+        'post_author' => $bind['post_author'],
   	    'post_modified' => $bind['post_modified'],
   	    'post_title' => $bind['post_title'],
   	    'post_slug' => $bind['post_slug'],
@@ -291,7 +285,7 @@ try {
   } else {
 
       $this->modify("tbl_posts", [
-
+          'post_author' => $bind['post_author'],
           'post_modified' => $bind['post_modified'],
           'post_title' => $bind['post_title'],
           'post_slug' => $bind['post_slug'],
@@ -311,7 +305,7 @@ try {
   }
 
   // delete all post_topic by post_id
-  $this->deleteRecord("tbl_post_topic", "post_id = $cleanId");
+  $this->deleteRecord("tbl_post_topic", "post_id = {$cleanId}");
 
   if ((is_array($topicId)) && (isset($_POST['catID']))) {
 
@@ -371,7 +365,7 @@ public function checkPostId($id, $sanitizing)
   $idsanitized = $this->filteringId($sanitizing, $id, 'sql');
   $this->setSQL($sql);
   $stmt = $this->checkCountValue([$idsanitized]);
-  return($stmt > 0);
+  return $stmt > 0;
 }
 
 /**

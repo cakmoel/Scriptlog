@@ -126,10 +126,14 @@ class MenuApp extends BaseApp
           array_push($errors, MESSAGE_INVALID_SELECTBOX);
         }
 
-        if (isset($_POST['menu_sort']) && (is_numeric($_POST['menu_sort']) === false)) {
+        if ((!empty($_POST['menu_sort'])) || ($_POST['menu_sort'] !== '')) {
 
-          $checkError = false;
-          array_push($errors, "Order must be a number");
+          if (is_numeric($_POST['menu_sort']) === false) {
+
+            $checkError = false;
+            array_push($errors, "Order must be a number");
+          }
+          
         }
 
         if (!$checkError) {

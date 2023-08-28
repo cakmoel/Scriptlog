@@ -58,8 +58,8 @@ if (!defined('PHP_EOL')) {
 $is_secure = false;
 
 if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) 
-     && ($_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') || (!empty($_SERVER['HTTP_X_FORWARDED_SSL'])) 
-     && ($_SERVER['HTTP_X_FORWARDED_SSL'] == 'on')) {
+    && ($_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') || (!empty($_SERVER['HTTP_X_FORWARDED_SSL'])) 
+    && ($_SERVER['HTTP_X_FORWARDED_SSL'] == 'on')) {
 
 $is_secure = true;
 

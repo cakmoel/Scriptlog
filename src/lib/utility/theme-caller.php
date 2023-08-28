@@ -16,8 +16,7 @@ function theme_dir()
     
   $active_theme = theme_identifier();
 
-  return app_info()['app_url'].DS.APP_THEME.$active_theme['theme_directory'].DS;
-
+  return (isset($active_theme['theme_directory'])) ? app_url().DS.APP_THEME.$active_theme['theme_directory']. DS : "";
 }
 
 /**

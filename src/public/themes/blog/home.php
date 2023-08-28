@@ -1,9 +1,12 @@
 <?php
+if (function_exists('latest_posts') && function_exists('app_reading_setting')) {
+  $latest_posts = isset(app_reading_setting()['post_per_page']) ? latest_posts(app_reading_setting()['post_per_page']) : "";
+}
 
-$latest_posts = latest_posts(app_reading_setting()['post_per_page']);
-$galleries = display_galleries(0, 4);
+$galleries = function_exists('display_galleries') ? display_galleries(0, 4) : "";
+$nothing_found = function_exists('nothing_found') ? nothing_found() : "";
 
-if (featured_post()) :
+if (function_exists('featured_post')) :
   foreach (featured_post() as $hero_headline) {
 
     $featured_hero_id = isset($hero_headline['ID']) ? (int)$hero_headline['ID'] : "";
@@ -28,17 +31,17 @@ if (featured_post()) :
 
 <?php
 else :
-
-  echo nothing_found();
-
+ echo $nothing_found;
 endif;
 ?>
 
 <?php
+if (function_exists('sticky_page')) :
 foreach (sticky_page() as $sticky) :
   $sticky_title = isset($sticky['post_title']) ? htmlout($sticky['post_title']) : "";
   $sticky_content = isset($sticky['post_content']) ? htmlout($sticky['post_content']) : "";
 endforeach;
+endif;
 ?>
 
 <!-- Intro Section-->
@@ -63,7 +66,7 @@ endforeach;
 
     <?php
 
-    if (random_posts(0, 3)) :
+    if (function_exists('random_posts')) :
 
       $r = 0;
 
@@ -117,7 +120,7 @@ endforeach;
           </div>
 
         <?php
-        else :
+         else :
         ?>
 
           <div class="row d-flex align-items-stretch">
@@ -156,7 +159,7 @@ endforeach;
 
     else :
 
-      echo nothing_found();
+      echo $nothing_found;
 
     endif;
     ?>
@@ -168,14 +171,14 @@ endforeach;
 <!-- divider section -->
 
 <?php
-
+if (function_exists('featured_post')) {
 foreach (featured_post() as $divider_content) {
 
   $featured_divider_id = isset($divider_content['ID']) ? (int)$divider_content['ID'] : "";
   $featured_divider_img = (isset($divider_content['media_filename']) && $divider_content['media_filename'] != "") ? htmlout($divider_content['media_filename']) : "";
   $featured_divider_title = isset($divider_content['post_title']) ? htmlout($divider_content['post_title']) : "";
 }
-
+}
 ?>
 
 <section 
@@ -242,7 +245,7 @@ endif;
         endforeach;
 
       else :
-        echo nothing_found();
+        echo $nothing_found;
       endif;
     ?>
 

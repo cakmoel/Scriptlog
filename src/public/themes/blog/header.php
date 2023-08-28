@@ -35,9 +35,9 @@ require dirname(__FILE__) . '/functions.php';
                 </button>
                 <a class="sina-brand" href="<?= app_url(); ?>">
                     <h2>
-                        <?= app_info()['site_name'];?>
+                        <?= htmlout(app_sitename());?>
                     </h2>
-                    <p><?= app_info()['site_tagline']; ?></p>
+                    <p><?= htmlout(app_tagline()) ?></p>
                 </a>
             </div><!-- .sina-nav-header -->
 

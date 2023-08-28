@@ -35,6 +35,6 @@ if ($type === 'login') {
 
 }
 
-return Sanitize::severeSanitizer($form);
+return $form;
 
 }

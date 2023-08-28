@@ -11,7 +11,7 @@
  */
 function read_config($filename)
 {
- return AppConfig::readConfiguration($filename);
+ return (class_exists('AppConfig')) ? AppConfig::readConfiguration($filename) : "";
 }
 
 /**
@@ -27,5 +27,5 @@ function read_config($filename)
  */
 function write_config($filename, $configuration)
 {
-  return AppConfig::writeConfiguration($filename, $configuration); 
+  return (class_exists('AppConfig')) ? AppConfig::writeConfiguration($filename, $configuration) : ""; 
 }

@@ -1,24 +1,25 @@
 <?php
 if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
 
-    $grab_month = request_path()->param1;
-    $grab_year = request_path()->param2;
+    $grab_month = function_exists('request_path') ? request_path()->param1 : "";
+    $grab_year = function_exists('request_path') ? request_path()->param2 : "";
 
     $values = ['month' => $grab_month, 'year' => $grab_year];
 
-    $archives = posts_by_archive($values);
+    $archives = function_exists('posts_by_archive') ? posts_by_archive($values) : "";
     $entries = (!empty($archives)) ? $archives['archivesPublished'] : "";
+    
 } else {
 
     $archive_requested = preg_split("//", HandleRequest::isQueryStringRequested()['value'], -1, PREG_SPLIT_NO_EMPTY);
 
     $grab_month = $archive_requested[0] . $archive_requested[1];
     $grab_year = $archive_requested[2] . $archive_requested[3] . $archive_requested[4] . $archive_requested[5];
-    
+
     $values = ['month' => $grab_month, 'year' => $grab_year];
 
-    $posts_by_archive = posts_by_archive($values);
-    $entries = (isset($posts_by_archive)) ? $posts_by_archive['archivesPublished'] : "";
+    $archives = posts_by_archive($values);
+    $entries = (isset($archives)) ? $archives['archivesPublished'] : "";
 }
 ?>
 <div class="container">
@@ -49,11 +50,12 @@ if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
                                 <div class="post-meta d-flex justify-content-between">
                                     <div class="date meta-last"> <?= isset($entry_created) ? $entry_created : ""; ?> </div>
                                     <div class="category"><?= retrieves_topic_simple($entry_id); ?></div>
-                                </div><a href="<?= isset($entry_id) ? permalinks($entry_id)['post'] : "#"; ?>" title="<?= isset($entry_title) ? $entry_title : ""; ?>">
+                                </div><a href="<?= isset($entry_id) ? permalinks($entry_id)['post'] : "javascript:void(0)"; ?>" title="<?= isset($entry_title) ? $entry_title : ""; ?>">
                                     <h3 class="h4"> <?= isset($entry_title) ? $entry_title : ""; ?> </h3>
                                 </a>
                                 <p class="text-muted"><?= isset($entry['post_content']) ? paragraph_l2br($entry['post_content']) : ""; ?></p>
-                                <footer class="post-footer d-flex align-items-center"><a href="#" class="author d-flex align-items-center flex-wrap">
+                                <footer class="post-footer d-flex align-items-center">
+                                    <a href="javascript:void(0)" class="author d-flex align-items-center flex-wrap">
                                         <div class="title"><span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= isset($entry_author) ? $entry_author : ""; ?></span></div>
                                     </a>
                                     <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i> <?= isset($entry_created) ? $entry_created : ""; ?></div>

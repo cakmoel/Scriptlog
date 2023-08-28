@@ -146,7 +146,7 @@ return implode("", $link);
  * @return array
  * 
  */
-public function getPostsPublishedByTopicId($topicId, $sanitize, Paginator $perPage)
+public function getPostsPublishedByTopic($topicId, $sanitize, Paginator $perPage)
 {
 
 $entries = [];
@@ -176,7 +176,7 @@ $sql = "SELECT tbl_posts.ID, tbl_posts.media_id, tbl_posts.post_author,
     AND tbl_posts.post_author = tbl_users.ID
     AND tbl_posts.post_status = 'publish' 
     AND tbl_posts.post_type = 'blog'
-    AND tbl_users.user_banned = '0',
+    AND tbl_users.user_banned = '0'
     AND tbl_posts.media_id = tbl_media.ID
     ORDER BY tbl_posts.post_date DESC " . $this->linkPosts->get_limit($sanitize);
 
@@ -188,22 +188,6 @@ $this->pagination = $this->linkPosts->page_links($sanitize);
 
 return (empty($entries)) ?: ['postsByTopic' => $entries, 'paginationLink' => $this->pagination];
 
-}
-
-public function getPostsPublishedByTopicSlug($topicSlug, $sanitize, Paginator $perPage)
-{
-
- $entries = [];
-
- $this->linkPosts = $perPage;
-
- // get number records
-$count_topic = "SELECT tbl_posts.ID 
-                FROM tbl_posts, tbl_post_topic 
-                WHERE tbl_posts.ID = tbl_post_topic.post_id = tbl_post_topic.topic_id = :topicId";
-
-
- 
 }
 
 }

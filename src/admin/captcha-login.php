@@ -10,11 +10,11 @@
  */
 require __DIR__ . '/../lib/main.php';
 
-$random_alpha =  ircmaxell_generator_string('medium');
+$random_alpha =  function_exists('ircmaxell_generator_string') ? ircmaxell_generator_string('medium') : "";
 
 $captcha_code = substr($random_alpha, 0, 6);
     
-Session::getInstance()->captcha_login = $captcha_code;
+class_exists('Session') ? Session::getInstance()->captcha_login = $captcha_code : "";
     
 $layer = imagecreatetruecolor(70,30);
 $background = imagecolorallocate($layer, 127, 255, 0);

@@ -64,9 +64,9 @@
                      <div class="form-group">
                         <label for="summernote">Content (required)</label>
                         <textarea class="form-control" id="summernote" name="post_content" rows="10" cols="80" maxlength="50000" required>
-<?= (isset($postContent['post_content']) ? safe_html($postContent['post_content']) : ""); ?>
+<?= (isset($postData['post_content']) ? safe_html($postData['post_content']) : ""); ?>
 <?= (isset($formData['post_content']) ? safe_html($formData['post_content']) : ""); ?>
-</textarea>
+                      </textarea>
                      </div>
 
                      <div class="form-group">

@@ -32,13 +32,13 @@ class PostTopicDao extends Dao
     $sql = "SELECT topic_title, topic_slug 
             FROM tbl_topics, tbl_post_topic
             WHERE tbl_topics.ID = tbl_post_topic.topic_id
-            AND tbl_post_topic.post_id = :post_id";
+            AND tbl_post_topic.post_id = ? ";
     
     $cleanId = $this->filteringId($sanitize, $postId, 'sql');
     
     $this->setSQL($sql);
     
-    $post_topics = $this->findRow([':post_id' => (int)$cleanId]);
+    $post_topics = $this->findRow([(int)$cleanId]);
     
     return (empty($post_topics)) ?: $post_topics;
     
@@ -99,7 +99,7 @@ class PostTopicDao extends Dao
            WHERE
                 tbl_posts.ID = tbl_post_topic.post_id
            
-           AND tbl_post_topic.topic_id = :topic_id
+           AND tbl_post_topic.topic_id = ?
            AND tbl_posts.post_author = tbl_users.ID
            AND tbl_posts.post_status = 'publish' AND tbl_posts.post_type = 'blog'
            
@@ -107,7 +107,7 @@ class PostTopicDao extends Dao
       
       $this -> setSQL($sql);
       
-      $postByTopics = $this->findAll([':topic_id' => (int)$cleanId]);
+      $postByTopics = $this->findAll([(int)$cleanId]);
       
       return (empty($postByTopics)) ?: $postByTopics;
       

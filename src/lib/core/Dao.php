@@ -77,7 +77,15 @@ class Dao
 
   }
 
-  return (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchAll($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchAll();
+  if (!is_null($fetchMode)) {
+
+    return $this->dbc->dbQuery($this->dbc, $data)->fetchAll($fetchMode);
+
+  } else {
+
+    return $this->dbc->dbQuery($this->sql, $data)->fetchAll();
+
+  }
       
  }
  
@@ -99,8 +107,16 @@ class Dao
     throw new DbException("No SQL Query!");
   }
   
-  return (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetch();
+  if (!is_null($fetchMode)) {
 
+    return $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode);
+
+  } else {
+
+    return $this->dbc->dbQuery($this->sql, $data)->fetch();
+    
+  }
+  
  }
  
  /**
@@ -122,8 +138,12 @@ class Dao
      
   }
  
-  return (!is_null($fetchMode)) ? $this->dbc->dbQuery($this->sql, $data)->fetchColumn($fetchMode) : $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
-     
+  if (!is_null($fetchMode)) {
+    return $this->dbc->dbQuery($this->sql, $data)->fetchColumn($fetchMode);
+  } else {
+    return $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
+  }
+   
  }
  
  /**

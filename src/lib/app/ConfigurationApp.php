@@ -588,6 +588,13 @@ class ConfigurationApp
 
   }
 
+  /**
+   * setView
+   *
+   * @param string $viewName
+   * @return object
+   * 
+   */
   protected function setView($viewName)
   {
     $this->view = new View('admin', 'ui', 'setting', $viewName);

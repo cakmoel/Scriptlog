@@ -21,6 +21,13 @@ class AppConfig
 
  private static $config;
 
+/**
+ * readConfiguration
+ *
+ * @param string $filename
+ * @return mixed
+ * 
+ */
  public static function readConfiguration($filename)
  {
  
@@ -30,6 +37,14 @@ class AppConfig
 
  }
 
+/**
+ * writeConfiguration
+ *
+ * @param string $filename
+ * @param array $config
+ * @return mixed
+ * 
+ */
  public static function writeConfiguration($filename, array $config)
  {
 

@@ -10,9 +10,9 @@
 function app_reading_setting()
 {
 
-$configurations = new ConfigurationDao();
+$configurations = class_exists('ConfigurationDao') ? new ConfigurationDao() : "";
 $reading_settings = array();
-$results = $configurations->findReadingConfigs();
+$results = method_exists($configurations, 'findReadingConfigs') ? $configurations->findReadingConfigs() : "";
 
 if (is_array($results)) {
 

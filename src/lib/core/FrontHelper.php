@@ -33,8 +33,8 @@ class FrontHelper
            p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, 
            m.media_access, u.user_login, u.user_fullname
            FROM tbl_posts p
-           INNER JOIN tbl_media m ON p.media_id = m.ID
-           INNER JOIN tbl_users u ON p.post_author = u.ID
+           LEFT JOIN tbl_media m ON p.media_id = m.ID
+           LEFT JOIN tbl_users u ON p.post_author = u.ID
            WHERE p.ID = '$idsanitized' AND p.post_status = 'publish'
            AND p.post_type = 'blog' AND m.media_target = 'blog'
            AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
@@ -75,8 +75,7 @@ class FrontHelper
   {
 
     $sql = "SELECT MONTH(DATE(tbl_posts.post_date)) AS month_archive, YEAR(DATE(tbl_posts.post_date)) AS year_archive, COUNT(tbl_posts.ID) AS total
-        FROM tbl_posts GROUP BY month_archive, year_archive 
-        ORDER BY month_archive DESC";
+            FROM tbl_posts GROUP BY month_archive, year_archive ORDER BY month_archive DESC";
 
     $query = db_simple_query($sql);
 
@@ -102,8 +101,8 @@ class FrontHelper
     p.post_type, p.comment_status, m.ID, m.media_filename, m.media_caption, m.media_access, 
     u.ID, u.user_login, u.user_fullname
 FROM tbl_posts AS p
-INNER JOIN tbl_media AS m ON p.media_id = m.ID
-INNER JOIN tbl_users AS u ON p.post_author = u.ID
+LEFT JOIN tbl_media AS m ON p.media_id = m.ID
+LEFT JOIN tbl_users AS u ON p.post_author = u.ID
 WHERE p.ID = '$idsanitized'
 AND p.post_status = 'publish' 
 AND p.post_visibility = 'public'
@@ -130,8 +129,8 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
                p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, 
                m.media_access, u.user_fullname
         FROM tbl_posts AS p
-        INNER JOIN tbl_media AS m ON p.media_id = m.ID
-        INNER JOIN tbl_users AS u ON p.post_author = u.ID
+        LEFT JOIN tbl_media AS m ON p.media_id = m.ID
+        LEFT JOIN tbl_users AS u ON p.post_author = u.ID
         WHERE p.ID = ? AND p.post_status = 'publish'
         AND p.post_visibility = 'public'
         AND p.post_type = 'blog' AND m.media_target = 'blog' 
@@ -157,8 +156,8 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
                p.post_type, p.comment_status,
                m.ID, m.media_filename, m.media_caption, m.media_access, u.ID, u.user_fullname
   FROM tbl_posts AS p
-  INNER JOIN tbl_media AS m ON p.media_id = m.ID
-  INNER JOIN tbl_users AS u ON p.post_author = u.ID
+  LEFT JOIN tbl_media AS m ON p.media_id = m.ID
+  LEFT JOIN tbl_users AS u ON p.post_author = u.ID
   WHERE p.post_slug = ?
   AND p.post_status = 'publish' 
   AND p.post_visibility = 'public'
@@ -206,8 +205,8 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
     p.post_sticky, u.user_login, u.user_fullname,
     m.media_filename, m.media_caption
   FROM tbl_posts AS p
-  INNER JOIN tbl_users AS u ON p.post_author = u.ID
-  INNER JOIN tbl_media AS m ON p.media_id = m.ID
+  LEFT JOIN tbl_users AS u ON p.post_author = u.ID
+  LEFT JOIN tbl_media AS m ON p.media_id = m.ID
   WHERE DATE(p.post_date) BETWEEN ? AND ? 
   AND p.post_type = 'blog' AND p.post_status = 'publish'
   ORDER BY DATE(p.post_date) DESC ";
