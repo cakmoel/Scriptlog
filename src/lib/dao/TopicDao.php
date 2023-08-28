@@ -30,11 +30,11 @@ class TopicDao extends Dao
    */
   public function findTopics($orderBy = 'ID')
   {
-    $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status FROM tbl_topics ORDER BY :orderBy DESC";
+    $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status FROM tbl_topics ORDER BY '$orderBy' DESC";
 
     $this->setSQL($sql);
     
-    $topics = $this->findAll([':orderBy' => $orderBy]);
+    $topics = $this->findAll([]);
   
     return (empty($topics)) ?: $topics;
       
@@ -73,11 +73,11 @@ class TopicDao extends Dao
   public function findPostTopic($topicId, $postId)
   {
       
-    $sql = "SELECT topic_id FROM tbl_post_topic WHERE topic_id = :topic_id AND post_id = :post_id";
+    $sql = "SELECT topic_id FROM tbl_post_topic WHERE topic_id = ? AND post_id = ?";
       
     $this->setSQL($sql);
       
-    $post_topic = $this->findRow([':topic_id' => $topicId, ':post_id' => $postId]);
+    $post_topic = $this->findRow([$topicId, $postId]);
       
     return (empty($post_topic)) ?: $post_topic;
       

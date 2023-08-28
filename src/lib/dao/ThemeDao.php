@@ -31,11 +31,11 @@ class ThemeDao extends Dao
   public function findThemes($orderBy = "ID")
   {
     $sql = "SELECT ID, theme_title, theme_desc, theme_designer, theme_directory, 
-            theme_status FROM tbl_themes ORDER BY :orderBy DESC";
+            theme_status FROM tbl_themes ORDER BY '$orderBy' DESC";
     
     $this->setSQL($sql);
     
-    $themes = $this->findAll([':orderBy' => $orderBy]);
+    $themes = $this->findAll([]);
 
     return (empty($themes)) ?: $themes;
     
@@ -224,16 +224,7 @@ class ThemeDao extends Dao
     $this->setSQL($sql);
     $stmt = $this->findColumn([$theme_title]);
     
-    if ($stmt == 1) {
-       
-       return true;
-    
-    } else {
-       
-       return false;
-        
-    }
-    
+    return ($stmt === 1) ? true : false;
   }
 
   /**

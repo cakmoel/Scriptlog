@@ -13,313 +13,328 @@
  */
 class Db implements DbInterface
 {
- 
- /**
-  * database connection
-  * @var object
-  *
-  */
- private $dbc;
- 
-/**
- * Initializing an object property and method
- * 
- */
- public function __construct($values, $options)
- {
+
+  /**
+   * database connection
+   * @var object
+   *
+   */
+  private $dbc;
+
+  /**
+   * Certificate Authority
+   *
+   * @var boolean
+   */
+  private $ca = false;
+
+  /**
+   * Initializing an object property and method
+   * 
+   */
+  public function __construct($values, $options)
+  {
     $this->setDbConnection($values, $options);
- }
- 
- /**
-  * set database connection
-  * {@inheritDoc}
-  * @see DbInterface::setDbConnection()
-  * @return object
-  * 
-  */
- public function setDbConnection($values = [], $options = [])
- {
-     
-   try {
-       
+  }
+
+  /**
+   * set database connection
+   * {@inheritDoc}
+   * @see DbInterface::setDbConnection()
+   * @return object
+   * 
+   */
+  public function setDbConnection($values = [], $options = [])
+  {
+
+    try {
+
       $dsn = $values[0];
       $dbUser = $values[1];
       $dbPass = $values[2];
-      
-      $default_options = [
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_general_ci"
-      ];
-      
+
+      if ($this->ca !== false) {
+
+        $default_options = [
+          PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+          PDO::ATTR_EMULATE_PREPARES => false,
+          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+          PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_general_ci",
+          PDO::MYSQL_ATTR_SSL_CA => $this->invokePathCA($this->ca),
+        ];
+
+      } else {
+
+        $default_options = [
+          PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+          PDO::ATTR_EMULATE_PREPARES => false,
+          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+          PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_general_ci",
+        ];
+      }
+    
       $options = array_replace($default_options, $options);
-      
       $this->dbc = new PDO($dsn, $dbUser, $dbPass, $options);
-       
-   } catch (Throwable $th) {
-       
+
+    } catch (Throwable $th) {
+
       $this->closeDbConnection();
       LogError::setStatusCode(http_response_code(500));
       LogError::exceptionHandler($th);
-      
-   } catch (DbException $e) {
+    } catch (DbException $e) {
 
       $this->closeDbConnection();
       LogError::setStatusCode(http_response_code(500));
       LogError::exceptionHandler($e);
+    }
 
-   }
-   
- }
- 
- /**
-  * close database connection
-  */
- public function closeDbConnection()
- {
-   $this->dbc = null;
- }
- 
- /**
-  * SQL - Query
-  * 
-  * {@inheritDoc}
-  * @see DbInterface::dbQuery()
-  * @return object
-  *
-  */
- public function dbQuery($sql, $args = array())
- {
+    return $this->dbc;
+  }
 
-  if (!$args) {
-    return $this->dbc->query($sql);
-  } 
- 
-  $stmt = $this->dbc->prepare($sql);
+  /**
+   * close database connection
+   */
+  public function closeDbConnection()
+  {
+    $this->dbc = null;
+  }
 
-  $stmt->execute($args);
-  
-  return $stmt;   
+  /**
+   * SQL - Query
+   * 
+   * {@inheritDoc}
+   * @see DbInterface::dbQuery()
+   * @return object
+   *
+   */
+  public function dbQuery($sql, $args = array())
+  {
 
- }
- 
- /**
-  * Insert record
-  * 
-  * {@inheritDoc}
-  * @see DbInterface::dbInsert()
-  */
- public function dbInsert($tablename, array $params)
- {
-    
+    if (!$args) {
+      
+      return $this->dbc->query($sql);
+
+    }
+
+    $stmt = $this->dbc->prepare($sql);
+    $stmt->execute($args);
+    return $stmt;
+  }
+
+  /**
+   * Insert record
+   * 
+   * {@inheritDoc}
+   * @see DbInterface::dbInsert()
+   */
+  public function dbInsert($tablename, array $params)
+  {
+
     $clean_table = Sanitize::mildSanitizer($tablename);
 
     $sql = "INSERT INTO $clean_table ";
-        
+
     $fields = array_keys($params);
-        
+
     $values = array_values($params);
 
-    $sql .= '('.implode(',', $fields).') ';
+    $sql .= '(' . implode(',', $fields) . ') ';
 
     $args = [];
-        
+
     foreach ($fields as $f) {
-            
+
       $args[] = '?';
-        
     }
-        
-    $sql .= 'VALUES ('.implode(',', $args).') ';
+
+    $sql .= 'VALUES (' . implode(',', $args) . ') ';
 
     $statement = $this->dbc->prepare($sql);
-        
+
     foreach ($values as $i => $v) {
-            
-      $statement->bindValue($i+1, $v);
-        
+
+      $statement->bindValue($i + 1, $v);
     }
 
     return $statement->execute();
+  }
 
- }
- 
- /**
-  * last insert id
-  * 
-  * {@inheritDoc}
-  * @see DbInterface::dbLastInsertId()
-  */
- public function dbLastInsertId()
- {
+  /**
+   * last insert id
+   * 
+   * {@inheritDoc}
+   * @see DbInterface::dbLastInsertId()
+   */
+  public function dbLastInsertId()
+  {
     return $this->dbc->lastInsertId();
- }
- 
- /**
-  * Update record
-  * {@inheritDoc}
-  * @see DbInterface::dbUpdate()
-  */
- public function dbUpdate($tablename, $params, $where)
- {
-    
-   $clean_table = Sanitize::mildSanitizer($tablename);
-   $clean_where = Sanitize::severeSanitizer($where);
+  }
 
-   ksort($params);
-   $columns = null;
-    
-   foreach ((array)$params as $key => $value) {
-      $columns .= "$key = :$key,";     
-   }
-       
-   $columns = rtrim($columns, ',');
-   $stmt = $this->dbc->prepare("UPDATE $clean_table SET $columns WHERE $clean_where");
+  /**
+   * Update record
+   * {@inheritDoc}
+   * @see DbInterface::dbUpdate()
+   */
+  public function dbUpdate($tablename, $params, $where)
+  {
 
-   foreach ((array)$params as $key => $value) {
-     $stmt->bindValue(":$key", $value);
-   }   
-       
-   $stmt->execute();
-   return $stmt->rowCount();
-    
- }
- 
-/**
- * dbReplace()
- *
- * {@inheritDoc}
- * @uses DbInterface::dbReplace
- * 
- */
- public function dbReplace($tablename, $params, $to)
- {
+    $clean_table = Sanitize::mildSanitizer($tablename);
+    $clean_where = Sanitize::severeSanitizer($where);
 
-  $clean_table = Sanitize::mildSanitizer($tablename);
+    ksort($params);
+    $columns = null;
 
-  switch ($to) {
+    foreach ((array)$params as $key => $value) {
+      $columns .= "$key = :$key,";
+    }
 
-    case 'update':
+    $columns = rtrim($columns, ',');
+    $stmt = $this->dbc->prepare("UPDATE $clean_table SET $columns WHERE $clean_where");
+
+    foreach ((array)$params as $key => $value) {
+      $stmt->bindValue(":$key", $value);
+    }
+
+    $stmt->execute();
+    return $stmt->rowCount();
+  }
+
+  /**
+   * dbReplace()
+   *
+   * {@inheritDoc}
+   * @uses DbInterface::dbReplace
+   * 
+   */
+  public function dbReplace($tablename, $params, $to)
+  {
+
+    $clean_table = Sanitize::mildSanitizer($tablename);
+
+    if ($to == 'update') {
 
       ksort($params);
 
       $columns = null;
-    
+
       foreach ((array)$params as $key => $value) {
-        
+
         $columns .= "$key = :$key,";
-        
       }
-    
+
       $columns = rtrim($columns, ',');
-    
+
       $stmt = $this->dbc->prepare(" REPLACE INTO $clean_table SET $columns ");
 
       foreach ((array)$params as $key => $value) {
-        
-           $stmt->bindValue(":$key", $value);
-      }
-    
-      $stmt->execute();
-    
-      return $stmt->rowCount();
 
-      break;
-    
-    case 'insert':
+        $stmt->bindValue(":$key", $value);
+      }
+
+      $stmt->execute();
+
+      return $stmt->rowCount();
+    } elseif ($to == 'insert') {
 
       $sql = " REPLACE INTO $clean_table ";
       $fields = array_keys($params);
       $values = array_values($params);
 
-      $sql .= '('.implode(',', $fields).') ';
+      $sql .= '(' . implode(',', $fields) . ') ';
 
       $args = [];
-     
+
       foreach ($fields as $f) {
         $args[] = '?';
       }
 
-     $sql .= 'VALUES ('.implode(',', $args).') ';
+      $sql .= 'VALUES (' . implode(',', $args) . ') ';
 
-     $statement = $this->dbc->prepare($sql);
-    
-     foreach ($values as $i => $v) {
-        $statement->bindValue($i+1, $v);
-     }
+      $statement = $this->dbc->prepare($sql);
 
-     return $statement->execute();
+      foreach ($values as $i => $v) {
+        $statement->bindValue($i + 1, $v);
+      }
 
-      break;
-
+      return $statement->execute();
+    } else {
+      $this->closeDbConnection();
+    }
   }
 
- }
-
- /**
-  * delete record
-  * 
-  * {@inheritDoc}
-  * @see DbInterface::dbDelete()
-  */
- public function dbDelete($tablename, $where, $limit = null)
- {
+  /**
+   * delete record
+   * 
+   * {@inheritDoc}
+   * @see DbInterface::dbDelete()
+   */
+  public function dbDelete($tablename, $where, $limit = null)
+  {
     $clean_table = Sanitize::mildSanitizer($tablename);
     $clean_where = Sanitize::severeSanitizer($where);
 
     if (!is_null($limit)) {
-            
-      $sql = "DELETE FROM $clean_table WHERE $clean_where LIMIT $limit";
-  
-    } else {
-      
-      $sql = "DELETE FROM $clean_table WHERE $clean_where";
 
+      $sql = "DELETE FROM $clean_table WHERE $clean_where LIMIT $limit";
+    } else {
+
+      $sql = "DELETE FROM $clean_table WHERE $clean_where";
     }
-  
+
     $stmt = $this->dbc->prepare($sql);
-  
+
     $stmt->execute();
 
     return $stmt->rowCount();
-    
- }
+  }
 
-/**
- * database transaction
- * 
- * {@inheritDoc}
- * @see DbInterface::dbTransaction
- * 
- */
-public function dbTransaction()
-{
-  return $this->dbc->BeginTransaction();
-}
+  /**
+   * database transaction
+   * 
+   * {@inheritDoc}
+   * @see DbInterface::dbTransaction
+   * 
+   */
+  public function dbTransaction()
+  {
+    return $this->dbc->BeginTransaction();
+  }
 
-/**
- * database commit
- * 
- * @inheritDoc
- * @see DbInterface::dbCommit
- *
- */
-public function dbCommit()
-{
-  return $this->dbc->commit();
-}
+  /**
+   * database commit
+   * 
+   * @inheritDoc
+   * @see DbInterface::dbCommit
+   *
+   */
+  public function dbCommit()
+  {
+    return $this->dbc->commit();
+  }
 
-/**
- * database rollback
- * 
- * @inheritDoc
- * @see DbInterface::dbRollBack
- * 
- */
-public function dbRollBack()
-{
-  return $this->dbc->rollBack();
-}
+  /**
+   * database rollback
+   * 
+   * @inheritDoc
+   * @see DbInterface::dbRollBack
+   * 
+   */
+  public function dbRollBack()
+  {
+    return $this->dbc->rollBack();
+  }
 
+  /**
+   * invokePathCA()
+   *
+   * @param bool $ca
+   * @return void
+   * 
+   */
+  private function invokePathCA($ca = false)
+  {
+    if (($ca !== false) && (certificate_authority(distrib_name()) !== null)) {
+      return certificate_authority(distrib_name());
+    }
+  }
 }

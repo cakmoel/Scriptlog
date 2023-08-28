@@ -35,12 +35,13 @@ class UserDao extends Dao
  {
     
  $sql = "SELECT ID, user_login, user_email, user_fullname,
-				user_level, user_session, user_banned, user_signin_count, user_locked_until, login_time
-		FROM tbl_users ORDER BY :orderBy ";
+				 user_level, user_session, user_banned, user_signin_count, user_locked_until, login_time
+		     FROM tbl_users 
+         ORDER BY '$orderBy' DESC";
      
  $this->setSQL($sql);
      
- $users = (is_null($fetchMode)) ? $this->findAll([':orderBy' => $orderBy]) : $this->findAll([':orderBy' => $orderBy], $fetchMode);
+ $users = (is_null($fetchMode)) ? $this->findAll([]) : $this->findAll([], $fetchMode);
 
  return (empty($users)) ?: $users;
     
@@ -63,11 +64,11 @@ class UserDao extends Dao
    
    $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
                 user_session, user_banned, user_signin_count, user_locked_until, login_time
-           FROM tbl_users WHERE ID = :ID LIMIT 1";
+           FROM tbl_users WHERE ID = ? LIMIT 1";
    
    $this->setSQL($sql);
 
-   $userById = (is_null($fetchMode)) ? $this->findRow([':ID' => (int)$cleanID]) : $this->findRow([':ID' => (int)$cleanID], $fetchMode);
+   $userById = (is_null($fetchMode)) ? $this->findRow([(int)$cleanID]) : $this->findRow([(int)$cleanID], $fetchMode);
 
    return (empty($userById)) ?: $userById;
 
@@ -87,12 +88,12 @@ class UserDao extends Dao
    $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
                   user_session, user_banned, user_signin_count, user_locked_until, login_time 
            FROM tbl_users 
-           WHERE user_email = :user_email 
+           WHERE user_email = ? 
            AND user_banned = '0' LIMIT 1";
    
    $this->setSQL($sql);
    
-   $userByEmail = (is_null($fetchMode)) ? $this->findRow([':user_email' => $user_email]) : $this->findRow([':user_email' => $user_email], $fetchMode);
+   $userByEmail = (is_null($fetchMode)) ? $this->findRow([$user_email]) : $this->findRow([$user_email], $fetchMode);
    
    return (empty($userByEmail)) ?: $userByEmail;
 
@@ -113,12 +114,12 @@ class UserDao extends Dao
 
    $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
                 user_session, user_banned, user_signin_count, user_locked_until, login_time
-           FROM tbl_users WHERE user_login = :user_login 
+           FROM tbl_users WHERE user_login = ?
            AND user_banned = '0' LIMIT 1";
 
    $this->setSQL($sql);
 
-   $userByLogin = (is_null($fetchMode)) ? $this->findRow([':user_login' => $user_login]) : $this->findRow([':user_login' => $user_login], $fetchMode);
+   $userByLogin = (is_null($fetchMode)) ? $this->findRow([$user_login]) : $this->findRow([$user_login], $fetchMode);
 
    return (empty($userByLogin)) ?: $userByLogin;
 
@@ -140,12 +141,12 @@ class UserDao extends Dao
     $sql = "SELECT ID, user_login, user_email, user_pass, user_level, user_fullname, user_url, user_registered, 
                    user_session, user_banned, user_signin_count, user_locked_until, login_time
             FROM tbl_users 
-            WHERE user_session = :user_session
+            WHERE user_session = ?
             AND (login_time >= (NOW() - INTERVAL 7 DAY)) AND user_banned = '0' LIMIT 1";
 
     $this->setSQL($sql);
 
-    $userBySession = (is_null($fetchMode)) ? $this->findRow([':user_session' => $user_session]) : $this->findRow([':user_session' => $user_session], $fetchMode);
+    $userBySession = (is_null($fetchMode)) ? $this->findRow([$user_session]) : $this->findRow([$user_session], $fetchMode);
 
     return (empty($userBySession)) ?: $userBySession;
 
@@ -161,11 +162,11 @@ class UserDao extends Dao
  public function getUserByResetKey($reset_key, $fetchMode = null)
  {
    $sql = "SELECT ID, user_email, user_reset_key, user_reset_complete FROM tbl_users 
-           WHERE user_reset_key = :reset_key AND user_banned = '0' LIMIT 1";
+           WHERE user_reset_key = ? AND user_banned = '0' LIMIT 1";
    
    $this->setSQL($sql);
    
-   $resetKeyDetails = (is_null($fetchMode)) ? $this->findRow([':reset_key' => $reset_key]) : $this->findRow([':reset_key' => $reset_key], $fetchMode);
+   $resetKeyDetails = (is_null($fetchMode)) ? $this->findRow([$reset_key]) : $this->findRow([$reset_key], $fetchMode);
 
    return (empty($resetKeyDetails)) ?: $resetKeyDetails;
    
@@ -423,11 +424,11 @@ class UserDao extends Dao
  public function checkUserSession($user_session)
  {
 
-    $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_session = :user_session AND user_banned = '0' LIMIT 1";
+    $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_session = ? AND user_banned = '0' LIMIT 1";
     
     $this->setSQL($sql);
     
-    $stmt = $this->findColumn([':user_session' => $user_session]);     
+    $stmt = $this->findColumn([$user_session]);     
     
     return ($stmt === 1) ? true : false;
  
@@ -441,10 +442,10 @@ class UserDao extends Dao
   */
  public function checkUserEmail($email)
  {
-    $sql = "SELECT ID FROM tbl_users WHERE user_email = :email AND user_banned = '0' LIMIT 1";
+    $sql = "SELECT ID FROM tbl_users WHERE user_email = ? AND user_banned = '0' LIMIT 1";
     $this->setSQL($sql);
-    $stmt = $this->checkCountValue([':email' => $email]);
-    return($stmt > 0);
+    $stmt = $this->checkCountValue([$email]);
+    return $stmt > 0;
  }
 
 /**
@@ -490,7 +491,7 @@ class UserDao extends Dao
 
     $stmt = $this->checkCountValue([$idsanitized]);
 
-    return($stmt > 0);
+    return $stmt > 0;
 
  }
  
@@ -522,7 +523,7 @@ class UserDao extends Dao
  {
     $sql = "SELECT user_pass FROM tbl_users WHERE user_email = :user_email AND user_banned = '0' LIMIT 1";
     $this->setSQL($sql);
-    $stmt = $this->checkCountValue([':user_email' => $login]);
+    $stmt = $this->checkCountValue([$login]);
 
     if ($stmt > 0) {
         
@@ -561,7 +562,7 @@ class UserDao extends Dao
  {
     $sql = "SELECT user_pass FROM tbl_users WHERE user_login = :user_login AND user_banned = '0' LIMIT 1";
     $this->setSQL($sql);
-    $stmt = $this->checkCountValue([':user_login' => $login]);
+    $stmt = $this->checkCountValue([$login]);
 
     if ($stmt > 0) {
     
@@ -597,11 +598,11 @@ class UserDao extends Dao
   */
  private function checkActivationKey($key)
  {
-    $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_activation_key = :user_activation_key";
+    $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_activation_key = ?";
     
     $this->setSQL($sql);
      
-    if (!($this->findColumn([':user_activation_key' => $key])) == 1) {
+    if (!($this->findColumn([$key])) == 1) {
          
        return false;
          

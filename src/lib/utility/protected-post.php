@@ -118,7 +118,7 @@ function decrypt_post($post_id, $post_password)
  * @param array $credentials
  * 
  */
-function save_post_protected($credentials)
+function save_post_protected(array $credentials): bool
 {
 
 $path = __DIR__ . '/../../admin/ui/posts/.credential' . DIRECTORY_SEPARATOR;
@@ -138,7 +138,7 @@ if (! in_array(user_privilege(), $action_allowed)) {
   }
 
    // create file for post protected to keep its credentials detail
-   generate_post_credentials($path, $credentials);
+   return generate_post_credentials($path, $credentials);
 
 }
 

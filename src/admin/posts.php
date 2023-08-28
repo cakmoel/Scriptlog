@@ -38,21 +38,23 @@ try {
 
         case ActionConst::EDITPOST:
 
-            if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
-
-                header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                header("Status: 400 Bad Request");
-                throw new AppException("Invalid ID data type!");
-            }
-
             if (false === $authenticator->userAccessControl(ActionConst::POSTS)) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
+
             } else {
 
+                if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
+
+                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header("Status: 400 Bad Request");
+                    throw new AppException("Invalid ID data type!");
+                }
+                
                 if ($postDao->checkPostId($postId, $sanitizer)) {
 
                     $postApp->update((int)$postId);
+
                 } else {
 
                     direct_page('index.php?load=404&notfound=' . notfound_id(), 404);

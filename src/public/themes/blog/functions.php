@@ -7,7 +7,7 @@
  */
 function request_path()
 {
-  return new RequestPath();
+  return (class_exists('RequestPath')) ? new RequestPath() : "";
 }
 
 /**
@@ -17,7 +17,7 @@ function request_path()
  */
 function initialize_post()
 {
-  return new PostProviderModel();
+  return (class_exists('PostProviderModel')) ? new PostProviderModel() : "";
 }
 
 /**
@@ -27,7 +27,7 @@ function initialize_post()
  */
 function initialize_page()
 {
-  return new PageProviderModel();
+  return (class_exists('PageProviderModel')) ? new PageProviderModel() : "";
 }
 
 /**
@@ -38,7 +38,7 @@ function initialize_page()
  */
 function initialize_comment()
 {
-  return new CommentProviderModel();
+  return (class_exists('CommentProviderModel')) ? new CommentProviderModel() : "";
 }
 
 /**
@@ -49,7 +49,7 @@ function initialize_comment()
  */
 function initialize_archive()
 {
-  return new ArchivesProviderModel();
+  return (class_exists('ArchivesProviderModel')) ? new ArchivesProviderModel() : "";
 }
 
 /**
@@ -59,7 +59,7 @@ function initialize_archive()
  */
 function initialize_topic()
 {
-  return new TopicProviderModel();
+  return (class_exists('TopicProviderModel')) ? new TopicProviderModel() : "";
 }
 
 /**
@@ -70,7 +70,7 @@ function initialize_topic()
  */
 function initialize_tag()
 {
-  return new TagProviderModel();
+  return (class_exists('TagProviderModel')) ? new TagProviderModel() : "";
 }
 
 /**
@@ -81,7 +81,7 @@ function initialize_tag()
  */
 function initialize_gallery()
 {
-  return new GalleryProviderModel();
+  return (class_exists('GalleryProviderModel')) ? new GalleryProviderModel() : "";
 }
 
 /**
@@ -95,7 +95,7 @@ function initialize_gallery()
  */
 function featured_post()
 {
-  $headlines = FrontContentProvider::frontRandomHeadlines(initialize_post());
+  $headlines = class_exists('FrontContentProvider') ? FrontContentProvider::frontRandomHeadlines(initialize_post()) : "";
   return is_iterable($headlines) ? $headlines : array();
 }
 
@@ -108,7 +108,7 @@ function featured_post()
  */
 function sticky_page()
 {
-  $sticky_page = FrontContentProvider::frontRandomStickyPage(initialize_page());
+  $sticky_page = class_exists('FrontContentProvider') ? FrontContentProvider::frontRandomStickyPage(initialize_page()) : "";
   return is_iterable($sticky_page) ? $sticky_page : array();
 }
 
@@ -122,7 +122,7 @@ function sticky_page()
  */
 function random_posts($start, $end)
 {
-  $random_posts = FrontContentProvider::frontRandomPosts($start, $end, initialize_post());
+  $random_posts = class_exists('FrontContentProvider') ? FrontContentProvider::frontRandomPosts($start, $end, initialize_post()) : "";
   return is_iterable($random_posts) ? $random_posts : array();
 }
 
@@ -136,7 +136,7 @@ function random_posts($start, $end)
  */
 function latest_posts($limit, $position = null)
 {
-  $latest_posts = FrontContentProvider::frontLatestPosts($limit, initialize_post(), $position);
+  $latest_posts = class_exists('FrontContentProvider') ? FrontContentProvider::frontLatestPosts($limit, initialize_post(), $position) : "";
   return is_iterable($latest_posts) ? $latest_posts : array();
 }
 
@@ -171,7 +171,6 @@ function retrieves_topic_simple($id)
   }
   
   return implode("", $categories);
-
 }
 
 /**
@@ -218,7 +217,7 @@ function retrieves_topic_prepared($id)
  */
 function sidebar_topics()
 {
-  $sidebar_topics = FrontContentProvider::frontSidebarTopics(initialize_topic());
+  $sidebar_topics = class_exists('FrontContentProvider') ? FrontContentProvider::frontSidebarTopics(initialize_topic()) : "";
   return (is_iterable($sidebar_topics)) ? $sidebar_topics : array();
 }
 
@@ -230,7 +229,7 @@ function sidebar_topics()
  */
 function retrieve_tags()
 {
-  return outputting_tags();
+  return (function_exists('outputting_tags')) ? outputting_tags() : "";
 }
 
 /**
@@ -242,7 +241,7 @@ function retrieve_tags()
  */
 function link_tag($id)
 {
-  return FrontContentProvider::frontLinkTag($id, initialize_tag());
+  return (class_exists('FrontContentProvider')) ? FrontContentProvider::frontLinkTag($id, initialize_tag()) : "";
 }
 
 /**
@@ -254,7 +253,7 @@ function link_tag($id)
  */
 function link_topic($id)
 {
-  return FrontContentProvider::frontLinkTopic($id, initialize_topic());
+  return (class_exists('FrontContentProvider')) ? FrontContentProvider::frontLinkTopic($id, initialize_topic()) : "";
 }
 
 /**
@@ -331,7 +330,7 @@ function next_post($id)
  */
 function display_galleries($start, $limit)
 {
-  $showcase = FrontContentProvider::frontGalleries(initialize_gallery(), $start, $limit);
+  $showcase = class_exists('FrontContentProvider') ? FrontContentProvider::frontGalleries(initialize_gallery(), $start, $limit) : "";
   return is_iterable($showcase) ? $showcase : array();
 }
 
@@ -345,7 +344,7 @@ function display_galleries($start, $limit)
  */
 function retrieves_posts_published()
 {
-  $posts = FrontContentProvider::frontPostsPublished(initialize_post());
+  $posts = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostsPublished(initialize_post()) : "";
   return is_iterable($posts) ? $posts : array();
 }
 
@@ -358,7 +357,7 @@ function retrieves_posts_published()
  */
 function retrieve_detail_post($id)
 {
-  $detail_post = FrontContentProvider::frontPostById($id, initialize_post());
+  $detail_post = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostById($id, initialize_post()) : "";
   return is_iterable($detail_post) ? $detail_post : array();
 }
 
@@ -373,7 +372,7 @@ function retrieve_detail_post($id)
  */
 function posts_by_archive(array $values)
 {
-  $archives = FrontContentProvider::frontPostsByArchive($values, initialize_archive());
+  $archives = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostsByArchive($values, initialize_archive()) : "";
   return is_iterable($archives) ? $archives : array();
 }
 
@@ -388,8 +387,34 @@ function posts_by_archive(array $values)
  */
 function posts_by_tag($tag)
 {
-  $tags = FrontHelper::grabFrontTag($tag);
+  $tags = class_exists('FrontHelper') ? FrontHelper::grabFrontTag($tag) : "";
   return is_iterable($tags) ? $tags : array();
+}
+
+/**
+ * posts_by_category
+ *
+ * @param string|num|int $category
+ * @param string $rewrite
+ * @return mixed
+ */
+function posts_by_category($category, $rewrite = 'no')
+{
+  if ($rewrite !== 'no') {
+    
+    $topic = class_exists('FrontContentProvider') ? FrontContentProvider::frontTopicBySlug($category, initialize_topic()) : "";
+    $topicId = isset($topic['ID']) ? $topic['ID'] : "";
+    $posts = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostsByTopic($topicId, initialize_topic()) : "";
+
+  } else {
+
+    $topic = class_exists('FrontContentProvider') ? FrontContentProvider::frontTopicById($category, initialize_topic()) : "";
+    $topicId = isset($topic['ID']) ? $topic['ID'] : "";
+    $posts = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostsByTopic($topicId, initialize_topic()) : "";
+
+  }
+
+  return is_iterable($posts) ? $posts : array();
 }
 
 /**
@@ -402,8 +427,27 @@ function posts_by_tag($tag)
  */
 function retrieve_archives()
 {
-  $archives = FrontContentProvider::frontSidebarArchives(initialize_archive());
+  $archives = class_exists('FrontContentProvider') ? FrontContentProvider::frontSidebarArchives(initialize_archive()) : "";
   return is_iterable($archives) ? $archives : array();
+}
+
+/**
+ * retrieve_page
+ *
+ * @param int|string|numeric $arg
+ * @param string $rewrite
+ * @return mixed
+ * 
+ */
+function retrieve_page($arg, $rewrite)
+{
+  if ($rewrite == 'no') {
+    $page = class_exists('FrontContentProvider') ? FrontContentProvider::frontPageById($arg, initialize_page()) : ""; 
+    return is_iterable($page) ? $page : [];
+  } else {
+    $page = class_exists('FrontContentProvider') ? FrontContentProvider::frontPageBySlug($arg, initialize_page()) : "";
+    return is_iterable($page) ? $page : [];
+  }
 }
 
 /**
@@ -416,7 +460,7 @@ function retrieve_archives()
  */
 function comments_by_post($id)
 {
-  $comments = FrontContentProvider::frontCommentsByPost($id, initialize_comment());
+  $comments = class_exists('FrontContentProvider') ? FrontContentProvider::frontCommentsByPost($id, initialize_comment()) : "";
   return is_iterable($comments) ? $comments : array();
 }
 
@@ -428,7 +472,7 @@ function comments_by_post($id)
  */
 function total_comment($id)
 {
-  return FrontContentProvider::frontTotalCommentByPost($id, initialize_comment());
+  return (class_exists('FrontContentProvider')) ? FrontContentProvider::frontTotalCommentByPost($id, initialize_comment()) : "";
 }
 
 /**
@@ -440,7 +484,7 @@ function total_comment($id)
  */
 function block_csrf()
 {
-  return generate_form_token('comment_form', 40);
+  return (function_exists('generate_form_token')) ? generate_form_token('comment_form', 40) : "";
 }
 
 /**
@@ -475,25 +519,6 @@ function front_navigation($parent, $menu)
 }
 
 /**
- * retrieve_page
- *
- * @param int|string|numeric $arg
- * @param string $rewrite
- * @return mixed
- * 
- */
-function retrieve_page($arg, $rewrite)
-{
-  if ($rewrite == 'no') {
-    $page = FrontContentProvider::frontPageById($arg, initialize_page()); 
-    return is_iterable($page) ? $page : [];
-  } else {
-    $page = FrontContentProvider::frontPageBySlug($arg, initialize_page());
-    return is_iterable($page) ? $page : [];
-  }
-}
-
-/**
  * nothing_found
  *
  * @return string
@@ -502,7 +527,7 @@ function retrieve_page($arg, $rewrite)
 function nothing_found()
 {
 
-  $site_url = app_info()['app_url'];
+  $site_url = function_exists('app_url') ? app_url() . "/admin/login.php" : "";
 
   return <<<_NOTHING_FOUND
 
@@ -510,7 +535,7 @@ function nothing_found()
   <h4 class="alert-heading">Whoops !</h4>
   <p>I haven't posted to my blog yet!</p>
   <hr>
-  <p class="mb-0">Please go to <a href="$site_url/admin/login.php" target="_blank" rel="noopener noreferrer" title="administrator panel">administrator panel</a> to populate your blog.</p>
+  <p class="mb-0">Please go to <a href="$site_url" target="_blank" rel="noopener noreferrer" title="administrator panel">administrator panel</a> to populate your blog.</p>
 </div>
 
 _NOTHING_FOUND;
