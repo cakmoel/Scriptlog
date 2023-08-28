@@ -33,11 +33,11 @@ class MenuDao extends Dao
   public function findMenus($orderBy = 'menu_sort')
   {
     $sql = "SELECT ID, menu_label, menu_link, menu_status, menu_visibility, parent_id, menu_sort
-            FROM tbl_menu ORDER BY :orderBy";
+            FROM tbl_menu ORDER BY '$orderBy' ";
 
     $this->setSQL($sql);
 
-    $allMenu = $this->findAll([':orderBy' => $orderBy]);
+    $allMenu = $this->findAll([]);
 
     return (empty($allMenu)) ?: $allMenu;
   }
@@ -72,13 +72,13 @@ class MenuDao extends Dao
   public function findMenuParent($parentId, $sanitizing)
   {
 
-    $sql = "SELECT ID, parent_id, menu_label FROM tbl_menu WHERE ID = :parent_id";
+    $sql = "SELECT ID, parent_id, menu_label FROM tbl_menu WHERE ID = ? ";
 
     $idsanitized = $this->filteringId($sanitizing, $parentId, 'sql');
 
     $this->setSQL($sql);
 
-    $menuParent = $this->findRow([':parent_id' => $idsanitized]);
+    $menuParent = $this->findRow([$idsanitized]);
 
     return (empty($menuParent)) ?: $menuParent;
   }
@@ -140,9 +140,9 @@ class MenuDao extends Dao
 
     $cleanid = $this->filteringId($sanitize, $id, 'sql');
 
-    $grab_current_sort = "SELECT ID, menu_sort FROM tbl_menu WHERE ID = :ID";
+    $grab_current_sort = "SELECT ID, menu_sort FROM tbl_menu WHERE ID = ?";
     $this->setSQL($grab_current_sort);
-    $current_sort = $this->findRow([':ID' => $cleanid]);
+    $current_sort = $this->findRow([$cleanid]);
 
     // update all menu_sort between $old_sort and $new_sort
     $temp_id = $this->updateMenuSort($current_sort['menu_sort'], $bind['menu_sort']);

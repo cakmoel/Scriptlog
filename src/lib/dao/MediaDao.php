@@ -43,12 +43,12 @@ class MediaDao extends Dao
                  u.user_level
          FROM tbl_media AS m
          INNER JOIN tbl_users AS u ON m.media_user = u.user_level
-         WHERE m.media_user = :user_level
-         ORDER BY :orderBy DESC";
+         WHERE m.media_user = ?
+         ORDER BY '$orderBy' DESC";
 
       $this->setSQL($sql);
 
-      $allMedia = $this->findAll([':user_level' => $user_level, ':orderBy' => $orderBy]);
+      $allMedia = $this->findAll([$user_level]);
     } else {
 
       $sql = "SELECT ID, 
@@ -60,11 +60,11 @@ class MediaDao extends Dao
                     media_access,
                     media_status
             FROM tbl_media
-            ORDER BY :orderBy DESC";
+            ORDER BY '$orderBy' DESC";
 
       $this->setSQL($sql);
 
-      $allMedia = $this->findAll([':orderBy' => $orderBy]);
+      $allMedia = $this->findAll([]);
     }
 
     return (empty($allMedia)) ?: $allMedia;
@@ -91,11 +91,11 @@ class MediaDao extends Dao
             media_access,
             media_status
           FROM tbl_media
-          WHERE ID = :ID";
+          WHERE ID = ?";
 
     $this->setSQL($sql);
 
-    $mediaById = $this->findRow([':ID' => $idsanitized]);
+    $mediaById = $this->findRow([$idsanitized]);
 
     return (empty($mediaById)) ?: $mediaById;
   }
@@ -119,12 +119,12 @@ class MediaDao extends Dao
                  media_access,
                  media_status
           FROM tbl_media
-          WHERE media_type = :media_type 
+          WHERE media_type = ?
           AND media_status = '1'";
 
     $this->setSQL($sql);
 
-    $mediaByType = $this->findRow([':media_type' => $type]);
+    $mediaByType = $this->findRow([$type]);
 
     return (empty($mediaByType)) ?: $mediaByType;
   }
@@ -143,11 +143,11 @@ class MediaDao extends Dao
     $idsanitized = $this->filteringId($sanitize, $mediaId, 'sql');
 
     $sql = "SELECT ID, media_id, meta_key, meta_value FROM tbl_mediameta 
-         WHERE media_id = :media_id AND meta_key = :meta_key";
+         WHERE media_id = ? AND meta_key = ? ";
 
     $this->setSQL($sql);
 
-    $mediameta = $this->findRow([':media_id' => $idsanitized, ':meta_key' => $media_filename]);
+    $mediameta = $this->findRow([$idsanitized, $media_filename]);
 
     return (empty($mediameta)) ?: $mediameta;
   }
@@ -165,11 +165,11 @@ class MediaDao extends Dao
     $sql = "SELECT ID, media_filename, media_caption, media_type, media_target
          FROM tbl_media  WHERE media_target = 'blog'
          AND media_access = 'public' AND media_status = '1'
-         ORDER BY :orderBy DESC";
+         ORDER BY '$orderBy' DESC";
 
     $this->setSQL($sql);
 
-    $items = $this->findAll([':orderBy' => $orderBy]);
+    $items = $this->findAll([]);
 
     return (empty($items)) ?: $items;
   }
@@ -187,14 +187,14 @@ class MediaDao extends Dao
     $sql = "SELECT ID, media_filename, media_caption, media_type, media_target, 
                 media_user, media_access, media_status 
          FROM tbl_media
-         WHERE ID = :ID 
+         WHERE ID = ?
          AND media_target = 'blog'
          AND media_access = 'public'
          AND media_status = '1'";
 
     $this->setSQL($sql);
 
-    $item = $this->findRow([':ID' => (int)$mediaId]);
+    $item = $this->findRow([(int)$mediaId]);
 
     return (empty($item)) ?: $item;
   }
@@ -212,11 +212,11 @@ class MediaDao extends Dao
     $sql = "SELECT ID, media_filename, media_caption, media_type, media_target
   FROM tbl_media  WHERE media_target = 'page'
   AND media_access = 'public' AND media_status = '1'
-  ORDER BY :orderBy DESC";
+  ORDER BY '$orderBy' DESC";
 
     $this->setSQL($sql);
 
-    $items = $this->findAll([':orderBy' => $orderBy]);
+    $items = $this->findAll([]);
 
     return (empty($items)) ?: $items;
   }
@@ -234,11 +234,11 @@ class MediaDao extends Dao
     $sql = "SELECT ID, media_filename, media_caption, media_type, media_target, 
           media_user, media_access, media_status 
           FROM tbl_media
-          WHERE ID = :ID AND media_target = 'page' AND media_access = 'public' AND media_status = '1'";
+          WHERE ID = ? AND media_target = 'page' AND media_access = 'public' AND media_status = '1'";
 
     $this->setSQL($sql);
 
-    $item = $this->findRow([':ID' => (int)$mediaId]);
+    $item = $this->findRow([(int)$mediaId]);
 
     return (empty($item)) ?: $item;
   }
@@ -384,7 +384,7 @@ class MediaDao extends Dao
     $id_sanitized = $this->filteringId($sanitize, $id, 'sql');
     $this->setSQL($sql);
     $stmt = $this->checkCountValue([$id_sanitized]);
-    return ($stmt > 0);
+    return $stmt > 0;
   }
 
   /**

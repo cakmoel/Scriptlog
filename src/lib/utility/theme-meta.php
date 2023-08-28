@@ -344,8 +344,8 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
 
     default:
 
-      $theme_meta['site_schema'] = generate_schema_org(app_info()['site_name'], app_url(), $scriptlog_image, app_info()['site_description'], app_info()['site_tagline'], $scriptlog_imgthumb, date(DATE_ATOM));
-      $theme_meta['site_meta_tags'] = generate_meta_tags(app_info()['site_name'], app_info()['site_description'], app_info()['site_keywords'], APP_TITLE, $scriptlog_image, app_url());
+      $theme_meta['site_schema'] = isset(app_info()['site_name']) ? generate_schema_org(app_info()['site_name'], app_url(), $scriptlog_image, app_info()['site_description'], app_info()['site_tagline'], $scriptlog_imgthumb, date(DATE_ATOM)) : "";
+      $theme_meta['site_meta_tags'] = isset(app_info()['site_name']) ? generate_meta_tags(app_info()['site_name'], app_info()['site_description'], app_info()['site_keywords'], APP_TITLE, $scriptlog_image, app_url()) : "";
 
       break;
   }

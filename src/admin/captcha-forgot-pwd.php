@@ -10,11 +10,11 @@
  */
 require __DIR__ . '/../lib/main.php';
 
-$random_alpha = Util::secure_random_string(16);
+$random_alpha = class_exists('Util') ? Util::secure_random_string(16) : "";
 
 $captcha_code = substr(str_shuffle($random_alpha), 0, 6);
     
-Session::getInstance()->forgot_pwd = $captcha_code;
+class_exists('Session') ? Session::getInstance()->forgot_pwd = $captcha_code : "";
  
 $layer = imagecreatetruecolor(70,30);
 $background = imagecolorallocate($layer, 127, 255, 0);

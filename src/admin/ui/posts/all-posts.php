@@ -39,6 +39,7 @@
         <?php
         if (isset($status)) {
         ?>
+        
           <div class="alert alert-success alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h2><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h2>
@@ -48,6 +49,7 @@
             endforeach;
             ?>
           </div>
+
         <?php
         }
         ?>

@@ -7,7 +7,7 @@
  * within configuration file
  * 
  * @category function
- * @author nirmalakhanza
+ * @author Nirmala Khanza
  * @license MIT
  * @version 1.0
  * @return mixed

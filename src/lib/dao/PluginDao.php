@@ -13,8 +13,10 @@
 class PluginDao extends Dao
 {
 
-  protected $accessLevel;
+  private $accessLevel;
   
+  private $selected;
+
   public function __construct()
   {
      parent::__construct();
@@ -34,11 +36,11 @@ class PluginDao extends Dao
      
     $sql = "SELECT ID, plugin_name, plugin_link, plugin_directory, plugin_desc, 
             plugin_status, plugin_level,
-            plugin_sort FROM tbl_plugin ORDER BY :orderBy DESC";
+            plugin_sort FROM tbl_plugin ORDER BY '$orderBy' DESC";
    
     $this->setSQL($sql);
     
-    $plugins = $this->findAll([':orderBy' => $orderBy]);
+    $plugins = $this->findAll([]);
   
     return (empty($plugins)) ?: $plugins;
     
@@ -59,11 +61,11 @@ class PluginDao extends Dao
      
      $sql = "SELECT ID, plugin_name, plugin_link, plugin_directory, plugin_desc, 
              plugin_status, plugin_level, plugin_sort 
-             FROM tbl_plugin WHERE ID = :ID"; 
+             FROM tbl_plugin WHERE ID = ?"; 
      
      $this->setSQL($sql);
      
-     $pluginDetail = $this->findRow([':ID' => $idsanitized]);
+     $pluginDetail = $this->findRow([$idsanitized]);
      
      return (empty($pluginDetail)) ?: $pluginDetail;
      
@@ -188,7 +190,7 @@ class PluginDao extends Dao
 
     $stmt = $this->checkCountValue([$idsanitized]);
 
-    return($stmt > 0);
+    return $stmt > 0;
 
   }
   
@@ -280,13 +282,11 @@ class PluginDao extends Dao
 
      $plugin_level = array('administrator' => 'Administrator', 'manager' => 'Manager');
 
-     if ($selected != '') {
-
-         $selected = $selected;
-         
+     if ($selected !== '') {
+        $this->selected = $selected;   
      }
 
-     return dropdown($name, $plugin_level, $selected);
+     return dropdown($name, $plugin_level, $this->selected);
  
   }
   
@@ -315,12 +315,12 @@ class PluginDao extends Dao
     $sql = "SELECT ID, plugin_name, plugin_link, plugin_directory, plugin_desc, 
             plugin_status, plugin_level, plugin_sort
             FROM tbl_plugin 
-            WHERE plugin_level = :plugin_level 
+            WHERE plugin_level = ?
             AND plugin_status = 'Y' ORDER BY plugin_name";
     
     $this->setSQL($sql);
     
-    $privatePlugins = $this->findAll([':plugin_level' => $plugin_level]);
+    $privatePlugins = $this->findAll([$plugin_level]);
     
     return (empty($privatePlugins)) ?: $privatePlugins;
     
@@ -340,16 +340,8 @@ class PluginDao extends Dao
     $this->setSQL($sql);
     $stmt = $this->findColumn([$plugin_name]);
     
-    if ($stmt == 1) {
-        
-        return true;
-        
-    } else {
-        
-        return false;
-        
-    }
-    
+    return ($stmt == 1) ? true : false;
+   
   }
 
 }

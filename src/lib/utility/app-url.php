@@ -1,6 +1,6 @@
 <?php
 /**
- * app_url
+ * app_url()
  * 
  * Retrieving URL configuration from database
  * 
@@ -13,19 +13,6 @@
  */
 function app_url()
 {
-  
-  if (isset(app_info()['app_url'])) {
-      
-    if (filter_var(app_info()['app_url'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) && filter_var(app_info()['app_url'], FILTER_VALIDATE_URL) && substr(app_info()['app_url'], -1) == DIRECTORY_SEPARATOR) {
-        
-      return rtrim(app_info()['app_url'], DIRECTORY_SEPARATOR);
-
-    } else {
-
-      return app_info()['app_url'];
-
-    }
-      
-  }
- 
+  $appURL = medoo_get_where("tbl_settings", ['ID', 'setting_name', 'setting_value'], ['setting_name' => 'app_url']);
+  return (is_array($appURL) && isset($appURL['setting_value'])) ? $appURL['setting_value'] : "";
 }

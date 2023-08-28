@@ -1,6 +1,7 @@
 <?php
 /**
- * access_control_list
+ * access_control_list()
+ * 
  * Checking users's action privilege 
  * on admin directory wherein navigation menu
  * 

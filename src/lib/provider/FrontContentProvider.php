@@ -224,12 +224,28 @@ public static function frontSidebarTopics(TopicProviderModel $topicProviderModel
  * frontTopicBySlug()
  *
  * @param string $slug
+ * @param TopicProviderModel $topicProviderModel
+ * @return mixed
  * 
  */
 public static function frontTopicBySlug($slug, TopicProviderModel $topicProviderModel)
 {
  self::$topicProviderModel = $topicProviderModel;
  return self::$topicProviderModel->getTopicBySlug($slug, self::frontSanitizer());
+}
+
+/**
+ * frontTopicById
+ *
+ * @param num|int $topicId
+ * @param TopicProviderModel $topicProviderModel
+ * @return mixed
+ * 
+ */
+public static function frontTopicById($topicId, TopicProviderModel $topicProviderModel)
+{
+ self::$topicProviderModel = $topicProviderModel;
+ return self::$topicProviderModel->getTopicById($topicId, self::frontSanitizer());
 }
 
 /**
@@ -271,6 +287,19 @@ public static function frontPostsByArchive(array $values, ArchivesProviderModel 
 {
  self::$archivesProviderModel = $archivesProviderModel;
  return self::$archivesProviderModel->getPostsByArchive(self::frontPaginator(app_reading_setting()['post_per_archive'], 'p'), self::frontSanitizer(), $values);
+}
+
+/**
+ * frontPostsByTopic
+ *
+ * @param num|int $topicId
+ * @param TopicProviderModel $topicProviderModel
+ * @return mixed
+ */
+public static function frontPostsByTopic($topicId, TopicProviderModel $topicProviderModel)
+{
+ self::$topicProviderModel = $topicProviderModel;
+ return self::$topicProviderModel->getPostsPublishedByTopic($topicId, self::frontSanitizer(), self::frontPaginator(app_reading_setting()['post_per_page'], 'p'));
 }
 
 /**
@@ -343,7 +372,7 @@ public static function frontTotalCommentByPost($postId, CommentProviderModel $co
  */
 public static function frontSanitizer()
 {
- return new Sanitize();
+ return (class_exists('Sanitize')) ? new Sanitize() : "";
 }
 
 /**

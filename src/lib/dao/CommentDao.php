@@ -39,11 +39,11 @@ private $selected;
                   c.comment_date, p.post_title 
            FROM tbl_comments AS c 
            INNER JOIN tbl_posts AS p 
-           ON c.comment_post_id = p.ID ORDER BY :orderBy DESC ";
+           ON c.comment_post_id = p.ID ORDER BY '$orderBy' DESC ";
    
    $this->setSQL($sql);
 
-   $comments = $this->findAll([':orderBy' => $orderBy]);
+   $comments = $this->findAll([]);
    
    return (empty($comments)) ?: $comments;
 

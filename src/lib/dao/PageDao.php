@@ -50,11 +50,11 @@ public function findPages($type, $orderBy = 'ID', $author = null)
                 u.user_login
   			FROM tbl_posts AS p
   			INNER JOIN tbl_users AS u ON p.post_author = u.ID
-  			WHERE p.post_author = :author
-  			AND p.post_type = :variant
-  			ORDER BY :orderBy DESC";
+  			WHERE p.post_author = ?
+  			AND p.post_type = ?
+  			ORDER BY '$orderBy' DESC";
 
-        $data = array(':author' => $author, ':variant' => $type, ':orderBy' => $orderBy);
+        $data = array($author, $type);
 
     } else {
 
@@ -74,10 +74,10 @@ public function findPages($type, $orderBy = 'ID', $author = null)
                 u.user_login
   		  FROM tbl_posts AS p
   		  INNER JOIN tbl_users AS u ON p.post_author = u.ID
-  		  WHERE p.post_type = :variant
-  		  ORDER BY :orderBy DESC";
+  		  WHERE p.post_type = ?
+  		  ORDER BY '$orderBy' DESC";
 
-        $data = array(':variant' => $type, ':orderBy' => $orderBy);
+        $data = array($type);
 
     }
 
@@ -117,11 +117,11 @@ public function findPageById($pageId, $sanitize)
 				   post_type, 
 				   comment_status
   	  	   FROM tbl_posts
-  	  	   WHERE ID = :ID AND post_type = 'page' ";
+  	  	   WHERE ID = ? AND post_type = 'page' ";
      
     $this->setSQL($sql);
     
-    $pageById = $this->findRow([':ID'=>$idsanitized]);
+    $pageById = $this->findRow([$idsanitized]);
     
     return (empty($pageById)) ?: $pageById;
     
@@ -254,7 +254,7 @@ public function checkPageId($id, $sanitizing)
    $sql = "SELECT ID FROM tbl_posts WHERE ID = ?";
    $this->setSQL($sql);
    $stmt = $this->checkCountValue([$cleanId]);
-   return ($stmt > 0);
+   return $stmt > 0;
 }
  
 /**

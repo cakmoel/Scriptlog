@@ -13,7 +13,7 @@
 function rewrite_status()
 {
 
-$rewrite_status = json_decode(app_info()['permalink_setting'], true);
-return $rewrite_status['rewrite'];
+$rewrite_status = isset(app_info()['permalink_setting']) ? json_decode(app_info()['permalink_setting'], true) : "";
+return (is_array($rewrite_status) && isset($rewrite_status['rewrite'])) ? $rewrite_status['rewrite'] : [];
 
 }

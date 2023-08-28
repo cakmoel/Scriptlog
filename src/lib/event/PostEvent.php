@@ -485,18 +485,16 @@ class PostEvent
     $this->validator->sanitize($this->post_image, 'int');
     $this->validator->sanitize($this->title, 'string');
 
-    $post_updated = array();
-
     if ((!empty($this->meta_desc)) || (!empty($this->meta_key)) || (!empty($this->tags))) {
       $this->validator->sanitize($this->meta_desc, 'string');
       $this->validator->sanitize($this->meta_key, 'string');
       $this->validator->sanitize($this->tags, 'string');
     }
 
-    if (!empty($this->post_image)) {
+    if (empty($this->post_image)) {
 
-      $post_updated = [
-        'media_id' => $this->post_image,
+      return $this->postDao->updatePost($this->sanitizer, [
+        'post_author' => $this->author,
         'post_modified' => date_for_database($this->post_modified),
         'post_title' => $this->title,
         'post_slug' => $this->slug,
@@ -510,11 +508,13 @@ class PostEvent
         'post_headlines' => $this->post_headlines,
         'comment_status' => $this->comment_status,
         'passphrase' => $this->passphrase
-      ];
+    ], $this->postId, $this->topics);
 
     } else {
 
-      $post_updated = [
+      return $this->postDao->updatePost($this->sanitizer, [
+        'media_id' => $this->post_image,
+        'post_author' => $this->author,
         'post_modified' => date_for_database($this->post_modified),
         'post_title' => $this->title,
         'post_slug' => $this->slug,
@@ -528,12 +528,10 @@ class PostEvent
         'post_headlines' => $this->post_headlines,
         'comment_status' => $this->comment_status,
         'passphrase' => $this->passphrase
-      ];
+    ], $this->postId, $this->topics);
 
     }
 
-    return $this->postDao->updatePost($this->sanitizer, $post_updated, $this->postId, $this->topics);
-    
   }
 
   /**
@@ -563,13 +561,14 @@ class PostEvent
 
       if (is_readable(__DIR__ . '/../../' . APP_IMAGE . $media_filename)) {
 
-        unlink(__DIR__ . '/../../' . APP_IMAGE . $media_filename);
+        ($media_filename !== 'nophoto.jpg') ? unlink(__DIR__ . '/../../' . APP_IMAGE . $media_filename) : "";
         unlink(__DIR__ . '/../../' . APP_IMAGE_LARGE . 'large_' . $media_filename);
         unlink(__DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_' . $media_filename);
         unlink(__DIR__ . '/../../' . APP_IMAGE_SMALL . 'small_' . $media_filename);
       }
 
       return  $this->postDao->deletePost($this->postId, $this->sanitizer);
+
     } else {
 
       return $this->postDao->deletePost($this->postId, $this->sanitizer);

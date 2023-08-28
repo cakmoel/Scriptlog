@@ -58,7 +58,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6">
-          <p><?= copyright() . "\r"; ?><?= year_on_footer(date("Y")); ?>. All rights reserved. <?= app_info()['site_name']; ?> </p>
+          <p><?= copyright() . "\r"; ?><?= year_on_footer(date("Y")); ?>. All rights reserved. <?= function_exists('app_sitename') ? app_sitename() : ""; ?> </p>
         </div>
         <div class="col-md-6 text-right">
           <p>Template By <a href="https://bootstrapious.com" class="text-white">Ondrej Svetska</a>

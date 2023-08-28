@@ -27,6 +27,7 @@ class PostProviderModel extends Dao
    *
    * @param integer $limit
    * @return void
+   * 
    */
   public function getPostFeeds($limit)
   {
@@ -81,7 +82,7 @@ class PostProviderModel extends Dao
 
     $this->setSQL($sql);
 
-    $latestPosts = isset($limit) ? $this->findAll([':limit' => $limit]) : null;
+    $latestPosts = isset($limit) ? $this->findAll([':limit' => $limit]) : 0;
 
     return (empty($latestPosts)) ?: $latestPosts;
   }
@@ -215,10 +216,10 @@ class PostProviderModel extends Dao
     $sql = "SELECT p.ID, p.media_id, p.post_author, 
             p.post_date AS created_at, 
             p.post_modified AS modified_at, 
-                p.post_title, p.post_slug, p.post_content, p.post_summary,
-                p.post_keyword, p.post_type, p.post_status, p.post_sticky, 
-                u.user_login, u.user_fullname,
-                m.media_filename, m.media_caption
+            p.post_title, p.post_slug, p.post_content, p.post_summary,
+            p.post_keyword, p.post_type, p.post_status, p.post_sticky, 
+            u.user_login, u.user_fullname,
+            m.media_filename, m.media_caption
   			FROM tbl_posts AS p
   			INNER JOIN tbl_users AS u ON p.post_author = u.ID
         INNER JOIN tbl_media AS m ON p.media_id = m.ID
@@ -227,7 +228,7 @@ class PostProviderModel extends Dao
 
     $this->setSQL($sql);
 
-    $entries = $this->findAll();
+    $entries = $this->findAll([]);
 
     $this->pagination = $this->linkPosts->page_links($sanitize);
 
@@ -254,14 +255,14 @@ class PostProviderModel extends Dao
         p.post_keyword, p.post_sticky, p.post_type, p.post_status, 
         p.post_tags, u.user_login, u.user_fullname,
         m.media_filename, m.media_caption, m.media_type, m.media_target, m.media_access
-FROM tbl_posts AS p
-INNER JOIN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 5) AS p2 ON p.ID = p2.ID 
-INNER JOIN tbl_users AS u ON p.post_author = u.ID
-INNER JOIN tbl_media AS m ON p.media_id = m.ID
-WHERE p.post_type = 'blog'
-AND m.media_target = 'blog' 
-AND p.post_status = 'publish' 
-AND p.post_headlines = '1' ";
+        FROM tbl_posts AS p
+        INNER JOIN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 5) AS p2 ON p.ID = p2.ID 
+        INNER JOIN tbl_users AS u ON p.post_author = u.ID
+        INNER JOIN tbl_media AS m ON p.media_id = m.ID
+        WHERE p.post_type = 'blog'
+        AND m.media_target = 'blog' 
+        AND p.post_status = 'publish' 
+        AND p.post_headlines = '1' ";
 
     $this->setSQL($sql);
 
@@ -344,11 +345,11 @@ AND p.post_headlines = '1' ";
                p.post_slug, p.post_content, p.post_summary,
                p.post_keyword, p.post_sticky,
                p.post_type, p.post_status, u.user_login, u.user_fullname
-  FROM tbl_posts AS p
-  INNER JOIN tbl_users AS u ON p.post_author = u.ID
-  WHERE p.post_type = 'blog' 
-  AND p.post_status = 'publish'
-  ORDER BY p.post_date DESC LIMIT :limit ";
+            FROM tbl_posts AS p
+            INNER JOIN tbl_users AS u ON p.post_author = u.ID
+            WHERE p.post_type = 'blog' 
+            AND p.post_status = 'publish'
+            ORDER BY p.post_date DESC LIMIT :limit ";
 
     $this->setSQL($sql);
 
