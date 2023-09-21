@@ -118,6 +118,7 @@ if (isset($postData['post_modified']) || isset($postData['post_date'])) {
    if ($postData['post_modified'] === null) {
 
       echo make_date(safe_html($postData['post_date']));
+      
    } else {
 
       echo make_date(safe_html($postData['post_modified']));

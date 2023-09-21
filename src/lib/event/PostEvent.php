@@ -427,7 +427,7 @@ class PostEvent
       $new_post = [
         'media_id' => $this->post_image,
         'post_author' => $this->author,
-        'post_date' => date_for_database($this->post_date),
+        'post_date' => $this->post_date,
         'post_title' => $this->title,
         'post_slug'  => $this->slug,
         'post_content' => $this->content,
@@ -449,7 +449,7 @@ class PostEvent
       $new_post = [
         'media_id' => $this->post_image,
         'post_author' => $this->author,
-        'post_date' => date_for_database($this->post_date),
+        'post_date' => $this->post_date,
         'post_title' => $this->title,
         'post_slug'  => $this->slug,
         'post_content' => $this->content,
@@ -495,7 +495,7 @@ class PostEvent
 
       return $this->postDao->updatePost($this->sanitizer, [
         'post_author' => $this->author,
-        'post_modified' => date_for_database($this->post_modified),
+        'post_modified' => $this->post_modified,
         'post_title' => $this->title,
         'post_slug' => $this->slug,
         'post_content' => $this->content,
@@ -515,7 +515,7 @@ class PostEvent
       return $this->postDao->updatePost($this->sanitizer, [
         'media_id' => $this->post_image,
         'post_author' => $this->author,
-        'post_modified' => date_for_database($this->post_modified),
+        'post_modified' => $this->post_modified,
         'post_title' => $this->title,
         'post_slug' => $this->slug,
         'post_content' => $this->content,
@@ -553,15 +553,15 @@ class PostEvent
 
     $media_id = isset($data_post['media_id']) ? $data_post['media_id'] : 0;
 
-    $medialib = new MediaDao();
-    $media_data = $medialib->findMediaBlog((int)$media_id);
+    $medialib = class_exists('MediaDao') ? new MediaDao() : "";
+    $media_data = method_exists($medialib, 'findMediaBlog') ? $medialib->findMediaBlog((int)$media_id) : "";
     $media_filename = isset($media_data['media_filename']) ? basename($media_data['media_filename']) : "";
 
     if (isset($media_filename) && $media_filename !== '') {
 
       if (is_readable(__DIR__ . '/../../' . APP_IMAGE . $media_filename)) {
 
-        ($media_filename !== 'nophoto.jpg') ? unlink(__DIR__ . '/../../' . APP_IMAGE . $media_filename) : "";
+        ($media_filename !== 'nophoto.jpg') ?: unlink(__DIR__ . '/../../' . APP_IMAGE . $media_filename);
         unlink(__DIR__ . '/../../' . APP_IMAGE_LARGE . 'large_' . $media_filename);
         unlink(__DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_' . $media_filename);
         unlink(__DIR__ . '/../../' . APP_IMAGE_SMALL . 'small_' . $media_filename);

@@ -318,6 +318,8 @@ public static function frontPostsPublished(PostProviderModel $postProviderModel)
  * frontSidebarArchives
  *
  * @param ArchivesProviderModel $archivesProviderModel
+ * @method mixed frontSidebarArchives()
+ * @uses archivesProviderModel::getArchivesOnSidebar
  * @return mixed
  */
 public static function frontSidebarArchives(ArchivesProviderModel $archivesProviderModel)

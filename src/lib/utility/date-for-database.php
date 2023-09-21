@@ -8,8 +8,11 @@
  * @return string
  * 
  */
-function date_for_database($date = null)
+function date_for_database($date = null): string
 {
+
+$timezone = function_exists('timezone_identifier') ? timezone_identifier() : "";
+date_default_timezone_set($timezone);
 
 if (! is_null($date) ) {
 
@@ -18,7 +21,7 @@ if (! is_null($date) ) {
 
 } else {
 
- $date_formated = date("Y-m-d H:i:s");
+ $date_formated = date_create()->format('Y-m-d H:i:s');
 
 }
 

@@ -41,7 +41,7 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
 
 <?php if (access_control_list(ActionConst::MEDIALIB)) :  ?>
 
-        <li <?=($module === 'medialib') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+        <li <?=($module === 'medialib') ? 'class="treeview active"' : 'class="treeview"'; ?> >
           <a href="#"><i class="fa fa-image fa-fw" aria-hidden="true"></i> <span>Media</span>
             <span class="pull-right-container"><i class="fa fa-angle-left pull-right fa-fw" aria-hidden="true"></i></span>
           </a>
