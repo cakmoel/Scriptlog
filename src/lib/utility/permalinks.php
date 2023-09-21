@@ -51,6 +51,7 @@ function is_permalink_enabled()
  * @author M.Noermoehammad
  * @param mixed $id
  * @param string $app_url
+ * @uses FrontHelper::methodName()
  * 
  */
 function listen_query_string($id = null, $app_url = null)
@@ -111,13 +112,17 @@ function listen_query_string($id = null, $app_url = null)
 
             $entry_archives = FrontHelper::grabSimpleFrontArchive();
 
-            foreach ($entry_archives as $entry_archive) {
+            $archive_requested = preg_split("//", $id, -1, PREG_SPLIT_NO_EMPTY);
 
-               $month = isset($entry_archive['month']) ? $entry_archive['month'] : "";
-               $year = isset($entry_archive['year']) ? $entry_archive['year'] : "";
+            $year = (isset($archive_requested[0]) || isset($archive_requested[1]) || isset($archive_requested[2]) || isset($archive_requested[3])) ? $archive_requested[0] . $archive_requested[1] . $archive_requested[2] . $archive_requested[3] : null;
+            $month = isset($archive_requested[4]) ? $archive_requested[4] : null;
+
+            foreach ($entry_archives as $entry_archive) {
+               $_SESSION['month_archive'] = isset($entry_archive['month_archive']) ? $entry_archive['month_archive'] : $month;
+               $_SESSION['year_archive'] = isset($entry_archive['year_archive']) ? $entry_archive['year_archive'] : $year;
             }
 
-            $archive = $app_url . DS . '?a=' . $month . $year;
+            $archive = $app_url . DS . '?a=' . $_SESSION['year_archive'] . $_SESSION['month_archive'];
          }
 
          break;

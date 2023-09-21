@@ -10,7 +10,7 @@
 function displaying_greeting()
 {
  
- $timezoneid = timezone_identifier();
+ $timezoneid = function_exists('timezone_identifier') ? timezone_identifier() : "";
  date_default_timezone_set($timezoneid);
 
  $h = date('G');

@@ -110,7 +110,7 @@ class PostApp extends BaseApp
     $errors = array();
     $checkError = true;
     $user_level = $this->postEvent->postAuthorLevel();
-
+   
     if (isset($_POST['postFormSubmit'])) {
 
       $file_location = isset($_FILES['media']['tmp_name']) ? $_FILES['media']['tmp_name'] : '';
@@ -278,6 +278,7 @@ class PostApp extends BaseApp
           $this->view->set('commentStatus', $this->postEvent->commentStatusDropDown());
           $this->view->set('postVisibility', $this->postEvent->visibilityDropDown());
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+
         } else {
 
           list($width, $height) = ($file_location) ? getimagesize($file_location) : getimagesize(app_url() . '/public/files/pictures/nophoto.jpg');
@@ -324,6 +325,7 @@ class PostApp extends BaseApp
 
               $this->postEvent->setPostImage($append_media);
             }
+            
           } else {
 
             if ($file_extension === "jpeg" || $file_extension === "jpg" || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp" || $file_extension === "bmp") {
@@ -376,11 +378,11 @@ class PostApp extends BaseApp
           $this->postEvent->setPostAuthor((int)$this->postEvent->postAuthorId());
 
           if (empty($_POST['post_date'])) {
-
-            $this->postEvent->setPostDate(date("Y-m-d H:i:s"));
+             
+            $this->postEvent->setPostDate(date_for_database());
           } else {
 
-            $this->postEvent->setPostDate(distill_post_request($filters)['post_date']);
+            $this->postEvent->setPostDate(date_for_database(distill_post_request($filters)['post_date']));
           }
 
           $this->postEvent->setPostTitle(distill_post_request($filters)['post_title']);
@@ -513,6 +515,10 @@ class PostApp extends BaseApp
     );
     
     $postId = isset($getPost['ID']) ? $getPost['ID'] : 0;
+
+    $timezone = function_exists('timezone_identifier') ? timezone_identifier() : "";
+    
+    (function_exists('date_default_timezone_set')) ? date_default_timezone_set($timezone) : "";
 
     if (isset($_POST['postFormSubmit'])) {
 
@@ -789,11 +795,11 @@ class PostApp extends BaseApp
          
           if (empty($_POST['post_modified'])) {
 
-            $this->postEvent->setPostModified(date("Y-m-d H:i:s"));
+            $this->postEvent->setPostModified(date_for_database());
 
           } else {
 
-            $this->postEvent->setPostModified(distill_post_request($filters)['post_modified']);
+            $this->postEvent->setPostModified(date_for_database(distill_post_request($filters)['post_modified']));
           }
 
           if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {

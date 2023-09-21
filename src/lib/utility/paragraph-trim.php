@@ -80,18 +80,23 @@ function paragraph_newline_checker()
   if (defined('PHP_EOL')) {
 
     return PHP_EOL;
-  }
-
-  if (isset($_SERVER["HTTP_USER_AGENT"]) && strstr(strtolower($_SERVER["HTTP_USER_AGENT"]), 'win')) {
-
-    $new_line = "\r\n";
-  } elseif (isset($_SERVER["HTTP_USER_AGENT"]) && strstr(strtolower($_SERVER["HTTP_USER_AGENT"]), 'mac')) {
-
-    $new_line = "\r";
+  
   } else {
 
-    $new_line = "\n";
+    if (isset($_SERVER["HTTP_USER_AGENT"]) && strstr(strtolower($_SERVER["HTTP_USER_AGENT"]), 'win')) {
+
+      $new_line = "\r\n";
+  
+    } elseif (isset($_SERVER["HTTP_USER_AGENT"]) && strstr(strtolower($_SERVER["HTTP_USER_AGENT"]), 'mac')) {
+  
+      $new_line = "\r";
+    } else {
+  
+      $new_line = "\n";
+    }
+  
+    return $new_line;
+
   }
 
-  return $new_line;
 }

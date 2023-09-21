@@ -178,6 +178,8 @@ public function findPost($id, $sanitize, $author = null)
 public function createPost($bind, $topicId)
 {
  
+ $this->setSQL("SET SQL_MODE='ALLOW_INVALID_DATE'");
+ 
  if (!empty($bind['media_id'])) {
 
    $this->create("tbl_posts", [
@@ -187,10 +189,13 @@ public function createPost($bind, $topicId)
        'post_title' => $bind['post_title'],
        'post_slug' => $bind['post_slug'],
        'post_content' => $bind['post_content'],
-       'post_summary' => $bind['post_summary'], 'post_keyword' => $bind['post_keyword'],
+       'post_summary' => $bind['post_summary'], 
+       'post_keyword' => $bind['post_keyword'],
        'post_status' => $bind['post_status'],
-       'post_visibility' => $bind['post_visibility'], 'post_password' => $bind['post_password'],
-       'post_tags' => $bind['post_tags'], 'post_headlines' => $bind['post_headlines'], 
+       'post_visibility' => $bind['post_visibility'], 
+       'post_password' => $bind['post_password'],
+       'post_tags' => $bind['post_tags'], 
+       'post_headlines' => $bind['post_headlines'], 
        'comment_status' => $bind['comment_status'], 
        'passphrase' => $bind['passphrase']
        ]);
@@ -203,10 +208,10 @@ public function createPost($bind, $topicId)
       'post_title' => $bind['post_title'],
       'post_slug' => $bind['post_slug'],
       'post_content' => $bind['post_content'],
-      'post_summary' => $bind['post_summary'],
+      'post_summary' => $bind['post_summary'], 
       'post_keyword' => $bind['post_keyword'],
       'post_status' => $bind['post_status'],
-      'post_visibility' => $bind['post_visibility'],
+      'post_visibility' => $bind['post_visibility'], 
       'post_password' => $bind['post_password'],
       'post_tags' => $bind['post_tags'],
       'post_headlines' => $bind['post_headlines'],
@@ -280,7 +285,7 @@ try {
   	    'comment_status' => $bind['comment_status'],
         'passphrase' => $bind['passphrase']
 
-  	], "ID = {$cleanId}");
+  	], "ID = {$cleanId} ");
 
   } else {
 
@@ -348,7 +353,7 @@ try {
 public function deletePost($id, $sanitize)
 {
  $clean_id = $this->filteringId($sanitize, $id, 'sql');
- $this->deleteRecord("tbl_posts", "ID = $clean_id");
+ $this->deleteRecord("tbl_posts", "ID = {$clean_id}");
 }
 
 /**

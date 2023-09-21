@@ -15,9 +15,9 @@
 function purify_dirty_html($dirty_html)
 {
 
-  $config = HTMLPurifier_Config::createDefault();
+  $config = class_exists('HTMLPurifier_Config') ? HTMLPurifier_Config::createDefault() : "";
   
-  $purifier = new HTMLPurifier($config);
+  $purifier = class_exists('HTMLPurifier') ? new HTMLPurifier($config) : "";
   
   return $purifier->purify($dirty_html);
 

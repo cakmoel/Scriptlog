@@ -10,6 +10,6 @@
  */
 function read_datetime($datetime)
 {
-  $dateGenerator = new DateGenerator();
-  return $dateGenerator->getExternalDate($datetime);
+  $dateGenerator = class_exists('DateGenerator') ? new DateGenerator() : "";
+  return (method_exists($dateGenerator, 'getExternalDate')) ? $dateGenerator->getExternalDate($datetime) : "";
 }

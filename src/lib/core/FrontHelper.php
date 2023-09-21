@@ -69,13 +69,14 @@ class FrontHelper
 
   /**
    * grabSimpleFrontArchive
-   * 
+   *  
    */
   public static function grabSimpleFrontArchive()
   {
 
-    $sql = "SELECT MONTH(DATE(tbl_posts.post_date)) AS month_archive, YEAR(DATE(tbl_posts.post_date)) AS year_archive, COUNT(tbl_posts.ID) AS total
-            FROM tbl_posts GROUP BY month_archive, year_archive ORDER BY month_archive DESC";
+    $sql = "SELECT YEAR(tbl_posts.post_date) AS year_archive, MONTH(tbl_posts.post_date) AS month_archive
+            FROM tbl_posts GROUP BY MONTH(tbl_posts.post_date), YEAR(tbl_posts.post_date) 
+            ORDER BY MONTH(tbl_posts.post_date) DESC";
 
     $query = db_simple_query($sql);
 

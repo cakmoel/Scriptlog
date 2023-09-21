@@ -14,18 +14,10 @@
  */
 function csrf_check_token($key, $origin, $timespan = null)
 {
-  $check_csrf = CSRFGuard::check($key, $origin, true, $timespan, false);
+  $check_csrf = class_exists('CSRFGuard') ? CSRFGuard::check($key, $origin, true, $timespan, false) : "";
   
-  if ($check_csrf) {
+  return ($check_csrf) ? true : false;
 
-    return true;
-
-  } else {
-
-    return false;
-
-  }
-  
 }
 
 /**
@@ -41,6 +33,5 @@ function csrf_check_token($key, $origin, $timespan = null)
  */
 function csrf_generate_token($key)
 {
-  $token = CSRFGuard::generate($key);
-  return $token;
+  return (class_exists('CSRFGuard')) ? CSRFGuard::generate($key) : "";
 }
