@@ -18,7 +18,7 @@ function theme_meta()
 
   if (is_permalink_enabled() === 'yes') {
 
-    $uri = new RequestPath();
+    $uri = class_exists('RequestPath') ? new RequestPath() : "";
     return metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri);
 
   } else {
@@ -289,11 +289,12 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
 
         $archive_requested = preg_split("//", $value, -1, PREG_SPLIT_NO_EMPTY);
 
-        $month = (isset($archive_requested)) ? $archive_requested[0] . $archive_requested[1] : null;
-        $year = (isset($archive_requested)) ? $archive_requested[2] . $archive_requested[3] . $archive_requested[4] . $archive_requested[5] : null;
+        $year = (isset($archive_requested[0]) || isset($archive_requested[1]) || isset($archive_requested[2]) || isset($archive_requested[3])) ? $archive_requested[0] . $archive_requested[1] . $archive_requested[2] . $archive_requested[3] : null;
+        $month = isset($archive_requested[4]) ? $archive_requested[4] : null;
 
         $canonical = (!empty($month)) ? app_url() . DS . '?a=' . $month . $year : app_url();
-        $month_name = date("F Y", mktime(0, 0, 0, intval($month), 7, intval($year)));
+        $month_name = date("F ", mktime(0, 0, 0, intval($month)));
+
       } else {
 
         http_response_code(404);
@@ -302,7 +303,7 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
 
       $theme_meta['site_schema'] = (is_null($month)) ? generate_schema_org(ucfirst(trim('page not found')) . '|' . app_info()['site_name']) : generate_schema_org(ucfirst(trim(app_info()['site_name'] . '|' . $month . $year)), $canonical, $scriptlog_image, app_info()['site_description'], app_info()['site_keywords'], $scriptlog_imgthumb, date(DATE_ATOM));
       $theme_meta['site_meta_tags'] = (is_null($month)) ? generate_meta_tags(ucfirst(trim('page not found')), app_info()['site_description'], app_info()['site_keywords'], APP_TITLE, $scriptlog_image, app_url()) : generate_meta_tags($month_name . ' - ' . app_info()['site_name'], app_info()['site_description'], app_info()['site_keywords'], APP_TITLE, $scriptlog_image, $canonical);
-
+      
       break;
 
     case 'tag':
@@ -323,7 +324,9 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
             $description = isset($tag['post_content']) ? escape_html($tag['post_content']) : "";
             $keyword = isset($tag['post_summary']) ? escape_html($tag['post_summary']) : "";
           }
+
         }
+        
       } else {
 
         http_response_code(404);
