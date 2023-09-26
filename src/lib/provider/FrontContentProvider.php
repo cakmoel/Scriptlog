@@ -374,7 +374,7 @@ public static function frontTotalCommentByPost($postId, CommentProviderModel $co
  */
 public static function frontSanitizer()
 {
- return (class_exists('Sanitize')) ? new Sanitize() : "";
+ return (function_exists('front_sanitizer')) ? front_sanitizer() : "";
 }
 
 /**
@@ -387,7 +387,7 @@ public static function frontSanitizer()
  */
 private static function frontPaginator($perPage, $instance)
 {
- return new Paginator($perPage, $instance);
+ return (function_exists('front_paginator')) ? front_paginator($perPage, $instance) : "";
 }
 
 }
