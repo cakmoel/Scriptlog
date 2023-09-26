@@ -1,10 +1,11 @@
 <?php
+
 if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
 
     $grab_month = function_exists('request_path') ? request_path()->param1 : "";
     $grab_year = function_exists('request_path') ? request_path()->param2 : "";
 
-    $values = ['month' => $grab_month, 'year' => $grab_year];
+    $values = ['month_archive' => $grab_month, 'year_archive' => $grab_year];
 
     $archives = function_exists('posts_by_archive') ? posts_by_archive($values) : "";
     $entries = (!empty($archives)) ? $archives['archivesPublished'] : "";
@@ -13,15 +14,17 @@ if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
 
     $archive_requested = preg_split("//", HandleRequest::isQueryStringRequested()['value'], -1, PREG_SPLIT_NO_EMPTY);
 
-    $grab_month = $archive_requested[0] . $archive_requested[1];
-    $grab_year = $archive_requested[2] . $archive_requested[3] . $archive_requested[4] . $archive_requested[5];
+    $grab_month = isset($archive_requested[4]) ? $archive_requested[4] : $_SESSION['month_archive'];
+    $grab_year = (isset($archive_requested[0]) || isset($archive_requested[1]) || isset($archive_requested[2]) || isset($archive_requested[3])) ? $archive_requested[0] . $archive_requested[1] . $archive_requested[2] . $archive_requested[3] : $_SESSION['year_archive'];
 
-    $values = ['month' => $grab_month, 'year' => $grab_year];
+    $values = ['month_archive' => $grab_month, 'year_archive' => $grab_year];
 
     $archives = posts_by_archive($values);
     $entries = (isset($archives)) ? $archives['archivesPublished'] : "";
 }
+
 ?>
+
 <div class="container">
     <div class="row">
         <!-- Latest Posts -->
@@ -73,9 +76,7 @@ if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
                 <!-- Pagination -->
                 <nav aria-label="Page navigation example">
                     <ul class="pagination pagination-template d-flex justify-content-center">
-                        <?php
-                        ($total_comment > 0) ? $entries_pagination : "";
-                        ?>
+                        
                     </ul>
                 </nav>
             </div>
