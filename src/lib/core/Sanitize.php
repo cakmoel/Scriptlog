@@ -52,7 +52,7 @@ class Sanitize
 	 */
 	public static function mildSanitizer($str)
 	{
-		return simple_remove_xss($str);
+	  return (function_exists('simple_remove_xss')) ? simple_remove_xss($str) : "";
 	}
 
 	/**
@@ -64,7 +64,7 @@ class Sanitize
 	 */
 	public static function severeSanitizer($str)
 	{
-		return remove_xss($str);
+	  return (function_exists('remove_xss') ) ? remove_xss($str) : "";
 	}
 
 	/**
@@ -76,6 +76,6 @@ class Sanitize
 	 */
 	public static function strictSanitizer($str)
 	{
-		return purify_dirty_html($str);
+	  return (function_exists('purify_dirty_html')) ? purify_dirty_html($str) : "";
 	}
 }
