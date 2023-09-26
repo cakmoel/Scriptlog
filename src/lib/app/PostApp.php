@@ -909,6 +909,7 @@ class PostApp extends BaseApp
    */
   public function remove($id)
   {
+
     $checkError = true;
     $errors = array();
 
@@ -921,12 +922,14 @@ class PostApp extends BaseApp
         if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
 
           header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
+          header("Status: 400 Bad Request");
           throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
         }
 
         if (!filter_var($id, FILTER_VALIDATE_INT)) {
 
           header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
+          header("Status: 400 Bad Request");
           throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
         }
 
