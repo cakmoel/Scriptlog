@@ -107,7 +107,7 @@ login_header($stylePath);
 <label for="inputCaptcha">Enter captcha code</label>
 <input type="text" class="form-control" id="inputCaptcha" placeholder="Please type a captcha code here" name="captcha_login" required>
 <span class="glyphicon glyphicon-hand-down form-control-feedback"></span>
-<img src="<?=app_url().'/admin/captcha-login.php'; ?>" alt="image_captcha">
+<img src="<?= app_url().'/admin/captcha-login.php'; ?>" alt="image_captcha">
 </div>
 
 <?php endif; ?>
