@@ -57,16 +57,12 @@ class ArchivesProviderModel extends Dao
   {
 
     // collect month and year
-    $month = isset($values['month_archive'])  ? $values['month_archive'] : $_SESSION['month_archive'];
-    $year = isset($values['year_archive'])  ? $values['year_archive'] : $_SESSION['year_archive'];
-
-    // set from and to dates
-    $from = date('Y-m-01 00:00:00', strtotime("$year-$month"));
-    $to = date('Y-m-31 23:59:59', strtotime("$year-$month"));
+    $month = isset($values['month_archive'])  ? prevent_injection($values['month_archive']) : "";
+    $year = isset($values['year_archive'])  ? prevent_injection($values['year_archive']) : "";
 
     $this->linkArchives = $perPage;
 
-    $this->linkArchives->set_total($this->totalPostsByArchives([$from, $to]));
+    $this->linkArchives->set_total($this->totalPostsByArchives([$month, $year]));
 
     $sql = "SELECT p.ID, p.media_id, p.post_author, 
             p.post_date AS created_at, 
@@ -78,7 +74,7 @@ class ArchivesProviderModel extends Dao
             FROM tbl_posts AS p
             INNER JOIN tbl_users AS u ON p.post_author = u.ID
             INNER JOIN tbl_media AS m ON p.media_id = m.ID
-            WHERE DATE(p.post_date) BETWEEN '$from' AND '$to' 
+            WHERE MONTH(p.post_date) = '$month' AND YEAR(p.post_date) = '$year'
             AND p.post_type = 'blog' AND p.post_status = 'publish' 
             ORDER BY DATE(p.post_date) DESC " . $this->linkArchives->get_limit($sanitize);
     
@@ -97,7 +93,7 @@ class ArchivesProviderModel extends Dao
    */
   private function totalPostsByArchives($data)
   {
-    $sql = "SELECT ID FROM tbl_posts WHERE post_date >= ? AND  post_date <= ? ";
+    $sql = "SELECT ID FROM tbl_posts WHERE MONTH(post_date) = ? AND YEAR(post_date) = ? ";
     $this->setSQL($sql);
     return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
   }
