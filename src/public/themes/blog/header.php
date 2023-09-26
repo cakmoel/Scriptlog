@@ -1,5 +1,5 @@
 <?php 
-require dirname(__FILE__) . '/functions.php';
+require_once dirname(__FILE__) . '/functions.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -7,7 +7,7 @@ require dirname(__FILE__) . '/functions.php';
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<?= theme_meta()['site_meta_tags']; ?>
+<?= function_exists('theme_meta') ?  theme_meta()['site_meta_tags'] : ""; ?>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/fontastic.css">
