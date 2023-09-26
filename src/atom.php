@@ -16,6 +16,9 @@ $app_link = isset(app_info()['app_url']) ? app_info()['app_url'] : "";
 $app_description = isset(app_info()['site_description']) ? app_info()['site_description'] : "";
 $feed_link = current_load_url() . 'atom.php';
 
-$atom_feed = new AtomWriter();
+$atom_feed = class_exists('AtomWriter') ? new AtomWriter() : "";
 
-print $atom_feed->generateAtomFeed($app_title, $app_link, $feed_link, app_reading_setting()['post_per_rss']);
+if (method_exists($atom_feed, 'generateAtomFeed')) {
+
+    print $atom_feed->generateAtomFeed($app_title, $app_link, $feed_link, app_reading_setting()['post_per_rss']);
+}
