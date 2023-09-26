@@ -10,16 +10,16 @@
  */
 require __DIR__ . '/lib/main.php';
 
-$app_title = app_info()['site_name'];
-$app_link = app_info()['app_url'];
-$app_description = app_info()['site_description'];
+$app_title = isset(app_info()['site_name']) ?  app_info()['site_name'] : "";
+$app_link = isset(app_info()['app_url']) ? app_info()['app_url'] : "";
+$app_description = isset(app_info()['site_description']) ? app_info()['site_description'] : "";
 
-$postProviderModel = new PostProviderModel();
-$feeds = FrontContentProvider::frontPostsFeed(app_reading_setting()['post_per_rss'], $postProviderModel);
+$postProviderModel = class_exists('PostProviderModel') ? new PostProviderModel() : "";
+$feeds = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostsFeed(app_reading_setting()['post_per_rss'], $postProviderModel) : "";
 
 if (is_iterable($feeds)) {
 
-  $rss = new RSSWriter($app_title, $app_link, $app_description);
+  $rss = class_exists('RSSWriter') ? new RSSWriter($app_title, $app_link, $app_description) : "";
 
   foreach ($feeds as $feed) {
 
