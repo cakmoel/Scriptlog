@@ -14,7 +14,7 @@
  */
 function app_info()
 {
-    $conn = medoo_init();
+    $conn = function_exists('medoo_init') ? medoo_init() : "";
 
     $results = $conn->select("tbl_settings", ["setting_name", "setting_value"]);
     
