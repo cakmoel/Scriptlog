@@ -548,6 +548,7 @@ class PostEvent
 
     if (!$data_post = $this->postDao->findPost($this->postId, $this->sanitizer)) {
 
+      $_SESSION['error'] = "postNotFound";
       direct_page('index.php?load=posts&error=postNotFound', 404);
     }
 
@@ -561,10 +562,13 @@ class PostEvent
 
       if (is_readable(__DIR__ . '/../../' . APP_IMAGE . $media_filename)) {
 
-        ($media_filename !== 'nophoto.jpg') ?: unlink(__DIR__ . '/../../' . APP_IMAGE . $media_filename);
-        unlink(__DIR__ . '/../../' . APP_IMAGE_LARGE . 'large_' . $media_filename);
-        unlink(__DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_' . $media_filename);
-        unlink(__DIR__ . '/../../' . APP_IMAGE_SMALL . 'small_' . $media_filename);
+        ($media_filename !== 'nophoto.jpg') ? unlink(__DIR__ . '/../../' . APP_IMAGE . $media_filename) : "";
+        is_readable(__DIR__ . '/../../'.APP_IMAGE_LARGE . 'large_' . $media_filename) ? unlink(__DIR__ . '/../../' . APP_IMAGE_LARGE . 'large_' . $media_filename) : "";
+        is_readable(__DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_'. $media_filename) ? unlink(__DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_' . $media_filename) : "";
+        is_readable(__DIR__ . '/../../' . APP_IMAGE_SMALL . 'small_' . $media_filename) ? unlink(__DIR__ . '/../../' . APP_IMAGE_SMALL . 'small_' . $media_filename) : "";
+
+        (method_exists($medialib, 'deleteMedia')) ? $medialib->deleteMedia((int)$media_id, $this->sanitizer) : "";
+
       }
 
       return  $this->postDao->deletePost($this->postId, $this->sanitizer);
