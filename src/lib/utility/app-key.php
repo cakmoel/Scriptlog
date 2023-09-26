@@ -58,7 +58,9 @@ function check_app_key($key)
  */
 function grab_data_key()
 {
-  return medoo_get_where("tbl_settings", "setting_value", [
-    "setting_name" => "app_key"
-  ]);
+  if (function_exists('medoo_get_where')) {
+    return medoo_get_where("tbl_settings", "setting_value", [
+      "setting_name" => "app_key"
+    ]);
+  }
 }
