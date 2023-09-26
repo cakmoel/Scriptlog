@@ -20,7 +20,7 @@ function checking_author_email($email)
 }
 
 /**
- * checking_comment_author_name
+ * checking_author_name
  *
  * @category function
  * @param string $name
@@ -153,11 +153,12 @@ function processing_comment(array $values)
    $author_email = (isset($values['email']) && $values['email'] == $_POST['email'] ? prevent_injection($values['email']) : null);
    $comment_content = (isset($values['comment']) && $values['comment'] == $_POST['comment'] ? prevent_injection($values['comment']) : null);
    $csrf = (isset($values['csrf']) && $values['csrf'] == $_POST['csrf'] ? $values['csrf'] : "");
-   $comment_at = date("Y-m-d H:i:s");
+   $comment_at = function_exists('date_for_database') ? date_for_database() : "";
 
    checking_form_payload($values);
-
    checking_block_csrf($csrf);
+
+   $author_ip = function_exists('get_ip_address') ? get_ip_address() : "";
 
    list($errors) = checking_form_input($author_name, $author_email, $comment_content);
 
@@ -165,14 +166,14 @@ function processing_comment(array $values)
 
       'comment_post_id' => $postId,
       'comment_author_name' => $author_name,
-      'comment_author_ip' => get_ip_address(),
+      'comment_author_ip' => $author_ip,
       'comment_author_email' => $author_email,
       'comment_content' => $comment_content,
       'comment_date' => $comment_at
    ];
 
-   $commentProvider = new CommentProviderModel();
-   FrontContentProvider::frontNewCommentByPost($bind, $commentProvider);
+   $commentProvider = class_exists('CommentProviderModel') ? new CommentProviderModel() : "";
+   (class_exists('FrontContentProvider')) ? FrontContentProvider::frontNewCommentByPost($bind, $commentProvider) : "";
 
    if (!empty($errors)) {
 
