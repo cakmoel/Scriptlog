@@ -28,7 +28,7 @@ function outputting_tags()
 
 $taglink = [];
 
-$get_tags = db_simple_query("SELECT post_tags FROM tbl_posts");
+$get_tags = function_exists('db_simple_query') ? db_simple_query("SELECT post_tags FROM tbl_posts") : "";
 
 $tags = [];
 
@@ -91,7 +91,7 @@ function checking_duplicate_tags()
  $sql  = "SELECT post_tags, COUNT(post_tags) as totalTag 
  FROM tbl_posts GROUP BY post_tags HAVING COUNT(post_tags) > 1 ORDER BY totalTag DESC";
 
- $stmt = db_simple_query($sql);
+ $stmt = function_exists('db_simple_query') ? db_simple_query($sql) : ""; 
 
  return ($stmt) ? false : true;
 
