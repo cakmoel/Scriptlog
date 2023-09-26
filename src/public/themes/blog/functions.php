@@ -152,10 +152,8 @@ function retrieves_topic_simple($id)
   $categories = array();
 
   $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug
-         FROM tbl_topics, tbl_post_topic  
-         WHERE tbl_topics.ID = tbl_post_topic.topic_id
-         AND tbl_topics.topic_status = 'Y'   
-         AND tbl_post_topic.post_id = '$id'";
+          FROM tbl_topics, tbl_post_topic WHERE tbl_topics.ID = tbl_post_topic.topic_id
+          AND tbl_topics.topic_status = 'Y' AND tbl_post_topic.post_id = '$id'";
 
   $stmt = db_simple_query($sql);
 
