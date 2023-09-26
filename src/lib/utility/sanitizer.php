@@ -11,7 +11,7 @@
  */
 function sanitizer($str, $type)
 {
-  $sanitizer = new Sanitize();
+  $sanitizer = class_exists('Sanitize') ? new Sanitize() : "";
   return $sanitizer->sanitasi(sanitize_string($str), $type);
 }
 
@@ -25,9 +25,9 @@ function sanitizer($str, $type)
  */
 function sanitize_string($str)
 {
-  $str = Sanitize::mildSanitizer($str);  
+  $str = class_exists('Sanitize') ? Sanitize::mildSanitizer($str) : "";  
 
-  $mysqli = new DbMySQLi();
+  $mysqli = class_exists('DbMySQLi') ? new DbMySQLi() : "";
   
   return $mysqli->filterData($str);
   
