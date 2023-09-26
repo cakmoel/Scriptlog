@@ -17,14 +17,14 @@ function get_server_load()
 
     $factor = 15780543;
 
-    $threshold = number_cpus() * $factor . PHP_EOL;
+    $threshold = function_exists('number_cpus') ? number_cpus() * $factor . PHP_EOL : "";
 
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 
-        if ((win_architecture() == 'x86') && (class_exists('COM'))) {
+        if (win_architecture() == 'x86') {
 
             // Win CPU
-            $wmi = new COM('WinMgmts:\\\\.');
+            $wmi = class_exists('COM') ? new COM('WinMgmts:\\\\.') : "";
             $server = $wmi->InstancesOf('Win32_Processor');
             $server += $wmi->execquery("SELECT LoadPercentage FROM Win32_Processor");  
             $cpu_num = 0;
@@ -40,12 +40,13 @@ function get_server_load()
 
         } else {
 
-          throw new InvalidArgumentException("class COM does not exists");
+          goto sysload;
 
         }
        
     } else {
 
+      sysload:
       $load = sys_getloadavg();
         
     }
