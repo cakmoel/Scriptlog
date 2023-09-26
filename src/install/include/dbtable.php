@@ -175,17 +175,5 @@ PRIMARY KEY(ID)
 )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
 $saveAdmin    = "INSERT INTO tbl_users (user_login, user_email, user_pass, user_level, user_registered, `user_session`) VALUES (?, ?, ?, ?, ?, ?)";
-$saveAppKey   = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
-$saveAppURL   = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
-$saveSiteName = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
-$saveSiteTagline = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
-$saveSiteDescription = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
-$saveSiteKeywords = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
-$saveSiteEmail = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
-$savePostPerPage = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
-$savePostPerRSS = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
-$savePostPerArchive = "INSERT INTO tbl_settings(setting_name, setting_value) VALUES(?, ?)";
-$saveCommentPerPost = "INSERT INTO tbl_settings(setting_name, setting_value) VALUES(?, ?)";
-$savePermalinks = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
-$saveTimezone = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
+$saveSettings = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES(?, ?)";
 $saveTheme   = "INSERT INTO tbl_themes (theme_title, theme_desc, theme_designer, theme_directory, theme_status) VALUES (?, ?, ?, ?, ?)";
