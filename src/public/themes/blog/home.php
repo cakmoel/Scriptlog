@@ -39,7 +39,7 @@ endif;
 if (function_exists('sticky_page')) :
 foreach (sticky_page() as $sticky) :
   $sticky_title = isset($sticky['post_title']) ? htmlout($sticky['post_title']) : "";
-  $sticky_content = isset($sticky['post_content']) ? htmlout($sticky['post_content']) : "";
+  $sticky_content = isset($sticky['post_content']) ? paragraph_l2br(htmlout($sticky['post_content'])) : "";
 endforeach;
 endif;
 ?>
@@ -52,7 +52,7 @@ endif;
 
         <h2 class="h3"><?= isset($sticky_title) ? $sticky_title : ""; ?></h2>
         <p class="text-big">
-          <?= isset($sticky_content) ? $sticky_content : ""; ?>
+          <?= isset($sticky_content) ? html_entity_decode($sticky_content) : ""; ?>
         </p>
 
       </div>
@@ -78,7 +78,7 @@ endif;
         $random_post_img = ((isset($random_post['media_filename'])) && ($random_post['media_filename'] !== "") ? htmlout($random_post['media_filename']) : "");
         $random_post_author = (isset($random_post['user_login']) || isset($random_post['user_fullname']) ? htmlout($random_post['user_login']) : htmlout($random_post['user_fullname']));
         $random_post_title = isset($random_post['post_title']) ? htmlout($random_post['post_title']) : "";
-        $random_post_content = isset($random_post['post_content']) ? paragraph_l2br($random_post['post_content']) : "";
+        $random_post_content = isset($random_post['post_content']) ? html_entity_decode(paragraph_l2br(htmlout($random_post['post_content']))) : "";
         $random_post_created = isset($random_post['post_modified'])  ? htmlout(make_date($random_post['post_modified'])) : htmlout(make_date($random_post['post_date']));
         $total_comment = (total_comment($random_post_id) > 0) ? total_comment($random_post_id) : 0;
 
@@ -220,6 +220,7 @@ endif;
 
           $latest_post_id = isset($latest_post['ID']) ? (int)$latest_post['ID'] : "";
           $latest_post_title = isset($latest_post['post_title']) ? htmlout($latest_post['post_title']) : "";
+          $latest_post_content = isset($latest_post['post_content']) ? html_entity_decode(paragraph_l2br(htmlout($latest_post['post_content']))) : "";
           $latest_post_img = ((isset($latest_post['media_filename'])) && ($latest_post['media_filename'] !== "")  ? htmlout($latest_post['media_filename']) : "");
           $latest_img_caption = isset($latest_post['media_caption']) ? htmlout($latest_post['media_caption']) : "";
           $latest_post_created = isset($latest_post['modified_at']) ? htmlout(make_date($latest_post['modified_at'])) : htmlout(make_date($latest_post['created_at']));
@@ -237,7 +238,7 @@ endif;
             <a href="<?= isset($latest_post_id) ? permalinks($latest_post_id)['post'] : "#"; ?>" title="<?= $latest_post_title; ?>">
               <h3 class="h4"><?= $latest_post_title; ?></h3>
             </a>
-            <p class="text-muted"><?= isset($latest_post['post_content']) ? paragraph_l2br($latest_post['post_content']) : ""; ?> </p>
+            <p class="text-muted"><?= isset($latest_post_content) ? $latest_post_content : ""; ?> </p>
           </div>
         </div>
 
