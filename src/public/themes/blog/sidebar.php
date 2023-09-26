@@ -1,4 +1,5 @@
 <aside class="col-lg-4">
+  
   <!-- Widget [Search Bar Widget]-->
   <div class="widget search">
     <header>
@@ -76,7 +77,6 @@
 
   </div>
 
-
   <!-- Widget [Archives Widget]-->
   <div class="widget categories">
     <header>
@@ -84,16 +84,22 @@
     </header>
 
     <?php
-    if (function_exists('retrieve_archives')) :
+    
+    if (function_exists('retrieve_archives')) {
+      
     foreach (retrieve_archives() as $archives) :
-      $month_name = isset($archives['month_archive']) ? date("F Y", mktime(0, 0, 0, intval($archives['month_archive']), 7, intval($archives['year_archive']))) : "";
+
+      $month_name = isset($archives['month_archive']) ? safe_html(date('F', mktime(0, 0, 0, $archives['month_archive']))) : "";
+      $year = isset($archives['year_archive']) ? safe_html($archives['year_archive']) : "";
+      $total = isset($archives['total_archive']) ? safe_html($archives['total_archive']) : "";
+      
     ?>
 
-      <div class="item d-flex justify-content-between"><a href="<?= permalinks($archives['month_archive'] . $archives['year_archive'])['archive']; ?>" title="<?= $month_name; ?>"><?= $month_name; ?></a><span><?= isset($archives['total']) ? $archives['total'] : ""; ?></span></div>
+      <div class="item d-flex justify-content-between"><a href="<?= permalinks($archives['year_archive'].$archives['month_archive'])['archive']; ?>" title="<?= $month_name; ?>"><?= $month_name . ' ' . $year; ?></a><span><?= $total; ?></span></div>
     
     <?php
     endforeach;
-    endif;
+    }
     ?>
     
   </div>
