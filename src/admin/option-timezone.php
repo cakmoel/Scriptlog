@@ -10,7 +10,7 @@ try {
     
     switch ($action) {
     
-        case ActionConst::PERMALINK_CONFIG:
+        case ActionConst::TIMEZONE_CONFIG:
             
             if (false === $authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
     
@@ -56,7 +56,7 @@ try {
             
     }    
 
-} catch (Throwable $th) {
+} catch (\Throwable $th) {
     
     if (class_exists('LogError')) {
         LogError::setStatusCode(http_response_code());
