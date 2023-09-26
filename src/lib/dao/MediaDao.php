@@ -184,6 +184,8 @@ class MediaDao extends Dao
   public function findMediaBlog($mediaId)
   {
 
+    $idsanitized = function_exists('sanitizer') ? sanitizer($mediaId, 'sql') : "";
+
     $sql = "SELECT ID, media_filename, media_caption, media_type, media_target, 
                 media_user, media_access, media_status 
          FROM tbl_media
@@ -194,7 +196,7 @@ class MediaDao extends Dao
 
     $this->setSQL($sql);
 
-    $item = $this->findRow([(int)$mediaId]);
+    $item = $this->findRow([$idsanitized]);
 
     return (empty($item)) ?: $item;
   }
@@ -363,9 +365,9 @@ class MediaDao extends Dao
 
     $idsanitized = $this->filteringId($sanitize, $mediaId, 'sql');
 
-    $this->deleteRecord("tbl_media", "ID = " . (int)$idsanitized, 1);
-    $this->deleteRecord("tbl_mediameta", "media_id = " . (int)$idsanitized, 1);
-    $this->deleteRecord("tbl_media_download", "media_id = " . (int)$idsanitized, 1);
+    $this->deleteRecord("tbl_media", "ID = {$idsanitized}", 1);
+    $this->deleteRecord("tbl_mediameta", "media_id = {$idsanitized}", 1);
+    $this->deleteRecord("tbl_media_download", "media_id = {$idsanitized}", 1);
   }
 
   /**
@@ -476,7 +478,7 @@ class MediaDao extends Dao
 
     $media_ids = $this->findAllMediaBlog();
 
-    $sanitizer = new Sanitize;
+    $sanitizer = class_exists('Sanitize') ? new Sanitize : "";
 
     $picture_bucket_list = ["image/jpeg", "image/pjpeg", "image/jpg", "image/png", "image/gif", "image/webp", "image/bmp"];
 
@@ -530,7 +532,7 @@ class MediaDao extends Dao
 
     $media_ids = $this->findAllMediaPage();
 
-    $sanitizer = new Sanitize();
+    $sanitizer = class_exists('Sanitize') ? new Sanitize() : "";
 
     if (is_array($media_ids)) {
 
