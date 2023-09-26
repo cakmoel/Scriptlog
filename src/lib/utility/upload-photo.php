@@ -120,13 +120,13 @@ if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exi
 
   if (resize_image($current_width, $current_height, $medium_size, $medium_path_uploaded, $img_source, 80, $file_type)) {
 
-    if (! crop_image($current_width, $current_height, $small_size, $small_path_uploaded, $img_source, 80, $file_type)) {
+    if (!crop_image($current_width, $current_height, $small_size, $small_path_uploaded, $img_source, 80, $file_type)) {
 
       scriptlog_error("Error Creating small size of thumbnail!");
 
     }
     
-    if (! move_uploaded_file($temp_src, $origin_path_uploaded) ) {
+    if (!move_uploaded_file($temp_src, $origin_path_uploaded) ) {
 
       scriptlog_error("Error uploading picture");
       
