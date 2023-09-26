@@ -248,67 +248,67 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
       $link->query($tblTheme);
 
       // insert configuration - app_key
-      $recordAppKey = $link->prepare($saveAppKey);
+      $recordAppKey = $link->prepare($saveSettings);
       $recordAppKey->bind_param('ss', $setting_name_key, $key);
       $recordAppKey->execute();
 
       // insert configuration - app_url
-      $recordAppURL = $link->prepare($saveAppURL);
+      $recordAppURL = $link->prepare($saveSettings);
       $recordAppURL->bind_param('ss', $setting_name_url, $setting_value_url);
       $recordAppURL->execute();
 
       // insert configuration - site_name
-      $recordAppSiteName = $link->prepare($saveSiteName);
+      $recordAppSiteName = $link->prepare($saveSettings);
       $recordAppSiteName->bind_param('ss', $site_name, $site_name_value);
       $recordAppSiteName->execute();
 
       // insert configuration - site_tagline
-      $recordAppSiteTagline = $link->prepare($saveSiteTagline);
+      $recordAppSiteTagline = $link->prepare($saveSettings);
       $recordAppSiteTagline->bind_param('ss', $site_tagline, $site_tagline_value);
       $recordAppSiteTagline->execute();
 
       // insert configuration - site_description
-      $recordAppSiteDescription = $link->prepare($saveSiteDescription);
+      $recordAppSiteDescription = $link->prepare($saveSettings);
       $recordAppSiteDescription->bind_param('ss', $site_description, $site_description_value);
       $recordAppSiteDescription->execute();
 
       // insert configuration - site_keywords
-      $recordAppSiteKeywords = $link->prepare($saveSiteKeywords);
+      $recordAppSiteKeywords = $link->prepare($saveSettings);
       $recordAppSiteKeywords->bind_param('ss', $site_keywords, $site_keywords_value);
       $recordAppSiteKeywords->execute();
 
       // insert configuration - site_email
-      $recordAppSiteEmail = $link->prepare($saveSiteEmail);
+      $recordAppSiteEmail = $link->prepare($saveSettings);
       $recordAppSiteEmail->bind_param('ss', $site_email, $user_email);
       $recordAppSiteEmail->execute();
 
       // insert configuration - posts per page 
-      $recordPostPerPage = $link->prepare($savePostPerPage);
+      $recordPostPerPage = $link->prepare($saveSettings);
       $recordPostPerPage->bind_param('ss', $post_per_page, $post_per_page_value);
       $recordPostPerPage->execute();
 
       // insert configuration post per rss
-      $recordPostPerRSS = $link->prepare($savePostPerRSS);
+      $recordPostPerRSS = $link->prepare($saveSettings);
       $recordPostPerRSS->bind_param('ss', $post_per_rss, $post_per_rss_value);
       $recordPostPerRSS->execute();
 
       // insert configuration post per archive
-      $recordPostPerArchive = $link->prepare($savePostPerArchive);
+      $recordPostPerArchive = $link->prepare($saveSettings);
       $recordPostPerArchive->bind_param('ss', $post_per_archive, $post_per_archive_value);
       $recordPostPerArchive->execute();
 
       // insert configuration comment per post
-      $recordCommentPerPost = $link->prepare($saveCommentPerPost);
+      $recordCommentPerPost = $link->prepare($saveSettings);
       $recordCommentPerPost->bind_param('ss', $comment_per_post, $comment_per_post_value);
       $recordCommentPerPost->execute();
 
       // insert configuration - permalinks
-      $recordPermalinks = $link->prepare($savePermalinks);
+      $recordPermalinks = $link->prepare($saveSettings);
       $recordPermalinks->bind_param('ss', $permalink_key, $store_permalink_value);
       $recordPermalinks->execute();
 
       // insert configuration - timezone
-      $recordTimezone = $link->prepare($saveTimezone);
+      $recordTimezone = $link->prepare($saveSettings);
       $recordTimezone->bind_param('ss', $timezone_key, $store_timezone_value);
       $recordTimezone->execute();
 
