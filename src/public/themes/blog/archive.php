@@ -12,11 +12,9 @@ if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
     
 } else {
 
-    $archive_requested = preg_split("//", HandleRequest::isQueryStringRequested()['value'], -1, PREG_SPLIT_NO_EMPTY);
-
-    $grab_month = isset($archive_requested[4]) ? $archive_requested[4] : $_SESSION['month_archive'];
-    $grab_year = (isset($archive_requested[0]) || isset($archive_requested[1]) || isset($archive_requested[2]) || isset($archive_requested[3])) ? $archive_requested[0] . $archive_requested[1] . $archive_requested[2] . $archive_requested[3] : $_SESSION['year_archive'];
-
+    $archive_requested = class_exists('HandleRequest') ? preg_split("//", HandleRequest::isQueryStringRequested()['value'], -1, PREG_SPLIT_NO_EMPTY) : "";
+    $grab_year = (isset($archive_requested[0]) && isset($archive_requested[1]) && isset($archive_requested[2]) && isset($archive_requested[3])) ? $archive_requested[0] . $archive_requested[1] . $archive_requested[2] . $archive_requested[3] : $_SESSION['year_archive'];
+    $grab_month = (isset($archive_requested[4]) && isset($archive_requested[5]))  ? $archive_requested[4].$archive_requested[5] : $archive_requested[4] . "";
     $values = ['month_archive' => $grab_month, 'year_archive' => $grab_year];
 
     $archives = posts_by_archive($values);

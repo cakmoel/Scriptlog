@@ -21,7 +21,7 @@
   <div class="widget latest-posts">
 
     <?php
-    if ($latest_posts) :
+     if ($latest_posts) :
     ?>
 
       <header>
@@ -31,10 +31,10 @@
       <div class="blog-posts">
 
         <?php
-        foreach ((array)$latest_posts['sidebarPosts'] as $latest_post) :
-          $author = (isset($latest_post['user_login'])) ? escape_html($latest_post['user_login']) : escape_html($latest_post['user_fullname']);
-          $latest_post_id = (isset($latest_post['ID'])) ? abs((int)$latest_post['ID']) : "";
-          $total_comment = (total_comment($latest_post_id) > 0) ? total_comment($latest_post_id) : 0;
+         foreach ((array)$latest_posts['sidebarPosts'] as $latest_post) :
+           $author = (isset($latest_post['user_login'])) ? escape_html($latest_post['user_login']) : escape_html($latest_post['user_fullname']);
+           $latest_post_id = (isset($latest_post['ID'])) ? abs((int)$latest_post['ID']) : "";
+           $total_comment = (total_comment($latest_post_id) > 0) ? total_comment($latest_post_id) : 0;
           
         ?>
 
@@ -50,11 +50,11 @@
           </a>
 
         <?php
-        endforeach;
+          endforeach;
         ?>
       </div>
     <?php
-    endif;
+      endif;
     ?>
   </div>
   <!-- Widget [Categories Widget]-->
@@ -65,13 +65,13 @@
 
    <?php
     if (function_exists('sidebar_topics')) :
-    foreach (sidebar_topics() as $category) :
+     foreach (sidebar_topics() as $category) :
    ?>
 
       <div class="item d-flex justify-content-between"><a href="<?= isset($category['ID']) ? permalinks($category['ID'])['cat'] : "#"; ?>"><?= isset($category['topic_title']) ? escape_html($category['topic_title']) : ""; ?></a><span><?= isset($category['total_posts']) ? $category['total_posts'] : "" ?></span></div>
 
    <?php
-    endforeach;
+     endforeach;
     endif;
    ?>
 
@@ -87,9 +87,12 @@
     
     if (function_exists('retrieve_archives')) {
       
-    foreach (retrieve_archives() as $archives) :
+     foreach (retrieve_archives() as $archives) :
 
-      $month_name = isset($archives['month_archive']) ? safe_html(date('F', mktime(0, 0, 0, $archives['month_archive']))) : "";
+      $month_num = isset($archives['month_archive']) ? safe_html($archives['month_archive']) : "";
+      $monthObj = class_exists('DateTime') ? DateTime::createFromFormat('!m', $month_num) : "";
+      $month_name = method_exists($monthObj, 'format') ? $monthObj->format('F') : "";
+      $month_name = isset($month_name) ? $month_name : date('F', mktime(0, 0, 0, $archives['month_archive'], 10));
       $year = isset($archives['year_archive']) ? safe_html($archives['year_archive']) : "";
       $total = isset($archives['total_archive']) ? safe_html($archives['total_archive']) : "";
       
@@ -98,7 +101,7 @@
       <div class="item d-flex justify-content-between"><a href="<?= permalinks($archives['year_archive'].$archives['month_archive'])['archive']; ?>" title="<?= $month_name; ?>"><?= $month_name . ' ' . $year; ?></a><span><?= $total; ?></span></div>
     
     <?php
-    endforeach;
+      endforeach;
     }
     ?>
     
