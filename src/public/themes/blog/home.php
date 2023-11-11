@@ -1,5 +1,6 @@
 <?php
-if (function_exists('latest_posts') && function_exists('app_reading_setting')) {
+
+if ((function_exists('latest_posts')) && (function_exists('app_reading_setting'))) {
   $latest_posts = isset(app_reading_setting()['post_per_page']) ? latest_posts(app_reading_setting()['post_per_page']) : "";
 }
 
@@ -7,6 +8,7 @@ $galleries = function_exists('display_galleries') ? display_galleries(0, 4) : ""
 $nothing_found = function_exists('nothing_found') ? nothing_found() : "";
 
 if (function_exists('featured_post')) :
+
   foreach (featured_post() as $hero_headline) {
 
     $featured_hero_id = isset($hero_headline['ID']) ? (int)$hero_headline['ID'] : "";
@@ -36,12 +38,12 @@ endif;
 ?>
 
 <?php
-if (function_exists('sticky_page')) :
-foreach (sticky_page() as $sticky) :
+ if (function_exists('sticky_page')) :
+   foreach (sticky_page() as $sticky) :
   $sticky_title = isset($sticky['post_title']) ? htmlout($sticky['post_title']) : "";
   $sticky_content = isset($sticky['post_content']) ? paragraph_l2br(htmlout($sticky['post_content'])) : "";
-endforeach;
-endif;
+   endforeach;
+ endif;
 ?>
 
 <!-- Intro Section-->
@@ -70,7 +72,7 @@ endif;
 
       $r = 0;
 
-      foreach (random_posts(0, 3) as $random_post) :
+      foreach (random_posts(0, 6) as $random_post) :
 
         $r++;
 
@@ -208,7 +210,7 @@ endif;
     <header>
 
       <?php
-      if ($latest_posts) :
+       if ($latest_posts) :
       ?>
 
         <h2>Latest from the blog</h2>

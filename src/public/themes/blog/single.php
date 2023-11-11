@@ -70,7 +70,7 @@ $total_comment = (total_comment($post_id) > 0) ? total_comment($post_id) : 0;
             </div>
 
             <?php
-            if ($comment_status !== 'closed') :
+             if ($comment_status !== 'closed') :
             ?>
 
               <div class="post-comments">
@@ -79,7 +79,7 @@ $total_comment = (total_comment($post_id) > 0) ? total_comment($post_id) : 0;
                 </header>
 
                 <?php
-                foreach (comments_by_post($post_id) as $comment) :
+                 foreach (comments_by_post($post_id) as $comment) :
 
                   $comment_id = isset($comment['ID']) ? intval((int)$comment['ID']) : 0;
                   $comment_author_name = isset($comment['comment_author_name']) ? htmlout($comment['comment_author_name']) : "";
@@ -100,7 +100,7 @@ $total_comment = (total_comment($post_id) > 0) ? total_comment($post_id) : 0;
                     </div>
                   </div>
                 <?php
-                endforeach;
+                 endforeach;
                 ?>
 
               </div>
@@ -138,7 +138,7 @@ $total_comment = (total_comment($post_id) > 0) ? total_comment($post_id) : 0;
               </div>
 
             <?php
-            endif;
+              endif;
             ?>
 
           </div>
