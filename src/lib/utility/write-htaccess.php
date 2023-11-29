@@ -25,7 +25,8 @@ if ($privilege === 'administrator' || $privilege === 'manager') {
 
    $sleep_timer = ($permalink_status === 'yes') ? 10 : 5;
 
-   sleep($sleep_timer);
+   (function_exists('sleep')) ? sleep($sleep_timer) : "";
+   
    fwrite($fp, $data);
    fclose($fp);
 
