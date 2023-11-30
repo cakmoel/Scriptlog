@@ -130,7 +130,7 @@ try {
     }
 
 
-} catch (Throwable $th) {
+} catch (\Throwable $th) {
     
     if (class_exists('LogError')) {
         LogError::setStatusCode(http_response_code());
