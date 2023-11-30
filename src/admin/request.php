@@ -72,9 +72,11 @@ try {
                     if (!function_exists('realpath')) {
 
                         include dirname(__FILE__) . DS . basename(absolute_path($load . '.php'));
+
                     } else {
 
                         include dirname(__FILE__) . DS . basename(realpath($load . '.php'));
+                        
                     }
                 }
             }
