@@ -31,9 +31,9 @@ function theme_dir()
 function theme_identifier()
 {
   
-  $theme_init = new ThemeDao();
+  $theme_init = class_exists('ThemeDao') ? new ThemeDao() : "";
   
-  return (empty($theme_init->loadTheme('Y')) ?: $theme_init->loadTheme('Y'));
+  return empty($theme_init->loadTheme('Y')) ?: $theme_init->loadTheme('Y');
 
 }
 
