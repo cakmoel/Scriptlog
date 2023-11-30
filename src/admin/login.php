@@ -42,7 +42,7 @@ $uniqueKey = isset($_GET['uniqueKey']) ? safe_html($_GET['uniqueKey']) : null;
 
 if (($action == 'LogIn') && (block_request_type(current_request_method(), ['POST']) === false)) {
 
-  list($errors, $failed_login) = processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, $_POST);
+  list($errors, $failed_login_attempt) = processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, $_POST);
    
 }
 
@@ -57,6 +57,7 @@ login_header($stylePath);
   </a>
   </h1> 
 </div>
+
 <div class="login-box-body">  
 
 <?php 
@@ -101,7 +102,7 @@ login_header($stylePath);
 <span class="glyphicon glyphicon-lock form-control-feedback"></span>  
 </div>
 
-<?php if (isset($failed_login) && $failed_login >= 5) : ?> 
+<?php if (isset($failed_login_attempt) && $failed_login_attempt >= 5) : ?> 
 
 <div class="form-group has-feedback">
 <label for="inputCaptcha">Enter captcha code</label>
@@ -130,7 +131,7 @@ login_header($stylePath);
 <div class="col-xs-4">
 
 <?php 
-  $block_csrf = generate_form_token('login_form', 40);
+  $block_csrf = function_exists('generate_form_token') ? generate_form_token('login_form', 40) : '';
 ?>
     
 <input type="hidden" name="csrf" value="<?= $block_csrf; ?>">
@@ -138,7 +139,15 @@ login_header($stylePath);
 </div>
 </div>
 </form>
-  <a href="reset-password.php" class="text-center" rel="noopener" aria-label="Lost your password">Lost your password?</a>    
+<?php 
+     if (is_registration_unable() === true):
+  ?>   
+    <a href="<?= app_url() . '/admin/signup.php'; ?>" class="text-center" aria-label="Register">Register |</a>
+  <?php 
+     endif;
+  ?>
+
+  <a href="<?= app_url() . '/admin/reset-password.php'; ?>" class="text-center" aria-label="Lost your password">Lost your password?</a> 
 </div>
   
 <?php login_footer($stylePath); ?>
