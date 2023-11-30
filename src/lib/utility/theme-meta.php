@@ -109,7 +109,7 @@ function metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri)
     case 'blog':
 
       $date_published = date(DATE_ATOM);
-      $data_modified = date(DATE_ATOM);
+      $date_modified = date(DATE_ATOM);
       $theme_meta['site_schema'] = generate_schema_org(app_info()['site_name'] . ' | ' . app_info()['site_tagline'], app_url(), $scriptlog_image, app_info()['site_description'], app_info()['site_keywords'], $scriptlog_imgthumb, $date_published, $date_modified);
       $theme_meta['site_meta_tags'] = generate_meta_tags(ucfirst(trim(app_info()['site_name'] . ' | ' . app_info()['site_tagline'])), 'Blog', app_info()['site_description'], APP_TITLE, $scriptlog_image, app_url() . DS . 'blog');
 
@@ -151,6 +151,7 @@ function metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri)
 
     case 'tag':
 
+      
       $theme_meta['site_schema'] = generate_schema_org();
       $theme_meta['site_meta_tags'] = generate_meta_tags();
 
@@ -208,7 +209,7 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
         throw new InvalidArgumentException("Argument passed must be of the type string, numeric or integer, null given");
       } else {
 
-        $read_post = FrontHelper::grabSimpleFrontPost($value);
+        $read_post = class_exists('FrontHelper') ? FrontHelper::grabSimpleFrontPost($value) : "";
 
         $post_id = (!empty($read_post['ID'])) ? abs((int)$read_post['ID']) : null;
         $post_title = (!empty($read_post['post_title'])) ? escape_html($read_post['post_title'])  . " | " . app_info()['site_name'] : app_info()['site_name'];
@@ -233,7 +234,7 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
 
       if (!empty($value)) {
 
-        $read_page = FrontHelper::grabSimpleFrontPage($value);
+        $read_page = class_exists('FrontHelper') ? FrontHelper::grabSimpleFrontPage($value) : "";
 
         $page_id = (!empty($read_page['ID'])) ? $read_page['ID'] : null;
         $page_title = (!empty($read_page['post_title'])) ? escape_html($read_page['post_title']) . " | " . app_info()['site_name'] : app_info()['site_name'];
@@ -262,7 +263,7 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
 
       if (!empty($value)) {
 
-        $read_category = FrontHelper::grabSimpleFrontTopic($value);
+        $read_category = class_exists('FrontHelper') ? FrontHelper::grabSimpleFrontTopic($value) : "";
 
         $category_id = (!empty($read_category['ID'])) ? $read_category['ID'] : null;
         $category_title = (!empty($read_category['topic_title'])) ? escape_html($read_category['topic_title']) : app_info()['site_name'];
@@ -287,13 +288,17 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
 
       if (!empty($value)) {
 
-        $archive_requested = preg_split("//", $value, -1, PREG_SPLIT_NO_EMPTY);
+        $archive_requested = class_exists('HandleRequest') ? preg_split("//", HandleRequest::isQueryStringRequested()['value'], -1, PREG_SPLIT_NO_EMPTY) : preg_split("//", $value, -1, PREG_SPLIT_NO_EMPTY);
 
-        $year = (isset($archive_requested[0]) || isset($archive_requested[1]) || isset($archive_requested[2]) || isset($archive_requested[3])) ? $archive_requested[0] . $archive_requested[1] . $archive_requested[2] . $archive_requested[3] : null;
-        $month = isset($archive_requested[4]) ? $archive_requested[4] : null;
+        $year = (isset($archive_requested[0]) && isset($archive_requested[1]) && isset($archive_requested[2]) && isset($archive_requested[3])) ? $archive_requested[0] . $archive_requested[1] . $archive_requested[2] . $archive_requested[3] : null;
+        $month = (isset($archive_requested[4]) && isset($archive_requested[5])) ? $archive_requested[4] . $archive_requested[5] : $archive_requested[4] . "";
 
-        $canonical = (!empty($month)) ? app_url() . DS . '?a=' . $month . $year : app_url();
-        $month_name = date("F ", mktime(0, 0, 0, intval($month)));
+      
+        $canonical = (!empty($month)) ? app_url() . DS . '?a=' .$year.$month : app_url();
+        $month_num = isset($month) ? safe_html($month) : "";
+        $monthObj = class_exists('DateTime') ? DateTime::createFromFormat('!m', $month_num) : "";
+        $month_name = method_exists($monthObj, 'format') ? $monthObj->format('F') : "";
+        $month_name = isset($month_name) ? $month_name : date("F", mktime(0, 0, 0, $month, 10)); 
 
       } else {
 
@@ -310,22 +315,14 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
 
       if (!empty($value)) {
 
-        $get_tag = strtolower(trim(escape_html($value)));
-        $tags = FrontHelper::grabFrontTag($get_tag);
+        $tag_requested = class_exists('HandleRequest') ? HandleRequest::isQueryStringRequested()['value'] : escape_html($value);
+        $tag = class_exists('FrontHelper') ? FrontHelper::simpleSearchingTag($tag_requested) : "";
 
-        $canonical = app_url() . DS . '?tag=' . $get_tag;
-
-        if (is_iterable($tags)) {
-
-          foreach ($tags as $tag) {
-
-            $tag_id = isset($tag['ID']) ? escape_html($tag['ID']) : 0;
-            $tag_title = isset($tag['post_tags']) ? explode(", ", escape_html($tag['post_tags'])) : "";
-            $description = isset($tag['post_content']) ? escape_html($tag['post_content']) : "";
-            $keyword = isset($tag['post_summary']) ? escape_html($tag['post_summary']) : "";
-          }
-
-        }
+        $canonical = app_url() . DS . '?tag=' . $tag_requested;
+        $tag_id = isset($tag['ID']) ? intval($tag['ID']) : null;
+        $tag_title = isset($tag_requested) ? $tag_requested : null;
+        $description = isset($tag['post_content']) ? html_entity_decode(paragraph_l2br(htmlout($tag['post_content']))) : null;
+        $keyword = isset($tag['post_summary']) ? htmlout($tag['post_summary']) : null;
         
       } else {
 
@@ -333,8 +330,8 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
         throw new InvalidArgumentException("Argument passed must be of the type string, numeric or integer, null given");
       }
 
-      $theme_meta['site_schema'] = (empty($tag_id)) ? generate_schema_org(ucfirst(trim('page not found')) . '' . app_info()['site_name']) : generate_schema_org(strtolower(trim($value)), $canonical, $scriptlog_image, $description, $tag_title, $scriptlog_imgthumb, date(DATE_ATOM));
-      $theme_meta['site_meta_tags'] = (empty($tag_title)) ? generate_meta_tags(ucfirst(trim('page not found')), app_info()['site_description'], app_info()['site_keywords'], APP_TITLE, $scriptlog_image, app_url()) . '' . app_info()['site_name'] : generate_meta_tags(strtolower(trim($value)), $description, $keyword, app_info()['site_name'], $scriptlog_image, $canonical);
+      $theme_meta['site_schema'] = (is_null($tag_id)) ? generate_schema_org(ucfirst(trim('page not found')) . '' . app_info()['site_name']) : generate_schema_org(strtolower(trim(app_info()['site_name'])), $canonical, $scriptlog_image, $description, $tag_title, $scriptlog_imgthumb, date(DATE_ATOM));
+      $theme_meta['site_meta_tags'] = (is_null($tag_title)) ? generate_meta_tags(ucfirst(trim('page not found')), app_info()['site_description'], app_info()['site_keywords'], APP_TITLE, $scriptlog_image, app_url()) . '' . app_info()['site_name'] : generate_meta_tags(strtolower(trim(str_replace('-', ' ', $value))), $description, $keyword, app_info()['site_name'], $scriptlog_image, $canonical);
 
       break;
 
