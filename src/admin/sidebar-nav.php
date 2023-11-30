@@ -121,7 +121,7 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
 
 <?php endif; if(access_control_list(ActionConst::CONFIGURATION)): ?>
 
-<li <?=($module === 'option-general' || $module === 'option-permalink' || $module === 'option-reading' || $module === 'option-timezone') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+<li <?=($module === 'option-general' || $module === 'option-permalink' || $module === 'option-reading' || $module === 'option-timezone' || $module === 'option-memberships') ? 'class="treeview active"' : 'class="treeview"'; ?>>
 <a href="#"><i class="fa fa-sliders fa-fw" aria-hidden="true"></i> <span>Settings</span>
 <span class="pull-right-container"><i class="fa fa-angle-left pull-right fa-fw" aria-hidden="true"></i></span>
 </a>
@@ -130,6 +130,7 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
 <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['option-reading', ActionConst::READING_CONFIG, 0])['link']; ?>">Reading</a></li>
 <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['option-permalink', ActionConst::PERMALINK_CONFIG, 0])['link']; ?>">Permalink</a></li>
 <li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['option-timezone', ActionConst::TIMEZONE_CONFIG, 0])['link']; ?>">Timezone</a></li>
+<li><a href="<?= $url.'/'.generate_request('index.php', 'get', ['option-memberships', ActionConst::MEMBERSHIP_CONFIG, 0])['link']; ?>">Membership</a></li>
 </ul>
 </li>
 
