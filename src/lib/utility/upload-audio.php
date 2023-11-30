@@ -18,7 +18,7 @@ function upload_audio($file_location, $file_name)
   
   if (!move_uploaded_file($file_location, $audio_uploaded)) {
 
-   scriptlog_error("Audio file uploaded failure");
+    scriptlog_error("Audio file uploaded failure");
 
   }
   
