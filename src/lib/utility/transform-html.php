@@ -1,16 +1,19 @@
 <?php
 /**
- * Transform HTML Function
+ * transform_html
+ * 
+ * Converts a string from UTF-8 to ISO-8859-1, replacing invalid or unrepresentable characters 
  * 
  * @param string $string
  * @param integer $length
+ * @return string
  * 
  */
 function transform_html($string, $length)
 {
   $string = trim($string);
   
-  $string = utf8_decode($string);
+  $string = function_exists('mb_convert_encoding') ? mb_convert_encoding($string, ' ISO-8859-1', 'UTF-8') : "";
   
   $string = htmlentities($string, ENT_QUOTES, 'UTF-8');
   
