@@ -11,7 +11,7 @@
 
 if (file_exists(__DIR__ . '/../config.php')) {
     
-  include(dirname(dirname(__FILE__)).'/lib/main.php');
+  include dirname(dirname(__FILE__)).'/lib/main.php';
 
 } else {
 
@@ -75,7 +75,6 @@ if (isset($_POST['Reset'])) {
 }
 
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -181,8 +180,15 @@ if (isset($_POST['Reset'])) {
 </div>
 </form>
 
+<a href="<?= app_url() . '/admin/login.php' ?>" class="text-center" aria-label="Log In">Log in</a>
+<?php
+     if (is_registration_unable() === true) :
+    ?>
+      <a href="<?= app_url() . '/admin/signup.php'; ?>" class="text-center" aria-label="Sign Up">| Register</a>
+    <?php
+    endif;
+    ?>
 <div class="social-auth-links text-center"></div>
-<a href="login.php" class="text-center">Log In</a>
     
 <?php 
   endif;
