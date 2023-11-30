@@ -154,7 +154,7 @@ if (isset($postData['post_modified']) || isset($postData['post_date'])) {
 
                   <div class="form-group">
                      <label for="tags">Tags</label>
-                     <textarea class="form-control" id="tags" rows="3" name="post_tags" maxlength="200">
+<textarea class="form-control" id="tags" rows="3" name="post_tags" maxlength="200">
 <?= (isset($postData['post_tags'])) ? safe_html($postData['post_tags']) : ""; ?>
 <?= (isset($formData['post_tags'])) ? safe_html($formData['post_tags']) : ""; ?>   
 </textarea>
