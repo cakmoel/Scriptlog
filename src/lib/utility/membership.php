@@ -5,7 +5,7 @@
  * @category function
  * @author Nirmala Khanza <nirmala.adiba.khanza@email.com>
  * @param int|num $id
- * @return boolean
+ * @return bool|true|false
  * 
  */
 function is_registration_unable()
@@ -24,7 +24,6 @@ function is_registration_unable()
     $can_register = json_decode($is_registration_unabled, true);
 
     return ($can_register['user_can_register'] == '1') ? true : false;
-
   } 
 }
 
@@ -58,7 +57,7 @@ function membership_default_role()
  * is_membership_setting_available
  *
  * @category function
- * @author Nirmala Khanza nirmala.adiba.khanza@gmail.com
+ * @author Nirmala Khanza <nirmala.adiba.khanza@gmail.com>
  * @return mixed
  * 
  */
@@ -69,6 +68,5 @@ function is_membership_setting_available()
     $grab_setting = medoo_get_where("tbl_settings", ["ID", "setting_name", "setting_value"], ["setting_name" => "membership_setting"]);
 
     return is_iterable($grab_setting) ? $grab_setting : array();
-
   }
 }
