@@ -42,6 +42,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
         header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
         exit("Database has been installed!");
     }
+    
 } else {
 
     $current_path = preg_replace("/\/index\.php.*$/i", "", current_url());
@@ -295,7 +296,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
 
             <div class="col-md-8 order-md-1">
                 <?php
-                if (isset($errors['errorSetup']) && (!$completed)) :
+                 if (isset($errors['errorSetup']) && (!$completed)) :
                 ?>
                     <div class="alert alert-danger" role="alert">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;
@@ -303,7 +304,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
                         <?= $errors['errorSetup']; ?>
                     </div>
                 <?php
-                endif;
+                 endif;
                 ?>
                 <div class="alert alert-success" role="alert">
                     We are going to use this information to create a config.php file.
