@@ -406,7 +406,7 @@ class ConfigurationApp
            
         }
 
-      } catch (Throwable $th) {
+      } catch (\Throwable $th) {
 
         LogError::setStatusCode(http_response_code());
         LogError::exceptionHandler($th);
@@ -512,9 +512,9 @@ class ConfigurationApp
           $this->setPageTitle('Timezone Setting');
           $this->setFormAction(ActionConst::TIMEZONE_CONFIG);
           $this->view->set('pageTitle', $this->getPageTitle());
+          $this->view->set('formAction', $this->getFormAction());
           $this->view->set('timezoneData', $data_timezone);
           $this->view->set('errors', $errors);
-          $this->view->set('formAction', $this->getFormAction());
           $this->view->set('timezoneIdentifier', $this->configEvent->timezoneIdentifierDropDown($timezone_identifier['timezone_identifier']));
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
@@ -589,10 +589,145 @@ class ConfigurationApp
   }
 
   /**
+   * updateMembershipConfig
+   *
+   * @return mixed
+   * 
+   */
+  public function updateMembershipConfig()
+  {
+
+    $errors = array();
+    $status = array();
+    $checkError = true;
+    $checkStatus = false;
+    
+    if (!$getMembershipValue = $this->configEvent->grabSettingByName('membership_setting')) {
+
+      $_SESSION['error'] = "membershipValueNotFound";
+      direct_page('index.php?load=option-memberships&error=membershipValueNotFound');
+
+    }
+
+    $data_memberships = array(
+      'ID' => $getMembershipValue['ID'],
+      'setting_name' => $getMembershipValue['setting_name'],
+      'setting_value' => $getMembershipValue['setting_value']
+    );
+
+    $membership_default_role = json_decode($data_memberships['setting_value'], true);
+
+    $filters = [
+      'setting_id' => FILTER_SANITIZE_NUMBER_INT,
+      'setting_name' => isset($_POST['setting_name']) ? Sanitize::severeSanitizer($_POST['setting_name']) : "",
+      'user_can_register' => isset($_POST['user_can_register']) ? FILTER_SANITIZE_NUMBER_INT : 0,
+      'user_level' => isset($_POST['user_level']) ? Sanitize::mildSanitizer($_POST['user_level']) : "",
+    ];
+
+    if (isset($_POST['configFormSubmit'])) {
+
+      try {
+
+        if (!csrf_check_token('csrfToken', $_POST, 60*10)) {
+
+          header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
+          throw new AppException("Sorry, unpleasant attempt detected!");
+        
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['user_level'], ['manager' => 'Manager', 'editor' => 'Editor', 'author' => 'Author', 'contributor' => 'Contributor'])) {
+
+          $checkError = false;
+          array_push($errors, MESSAGE_INVALID_SELECTBOX);
+
+        }
+
+        if (!$checkError) {
+
+          $this->setView('membership-setting');
+          $this->setPageTitle('Membership');
+          $this->setFormAction(ActionConst::MEMBERSHIP_CONFIG);
+          $this->view->set('pageTitle', $this->getPageTitle());
+          $this->view->set('membershipData', $data_memberships);
+          $this->view->set('errors', $errors);
+          $this->view->set('formAction', $this->getFormAction());
+          $this->view->set('membershipDefaultRole', $this->configEvent->membershipDefaultRoleDropDown($membership_default_role['default_role']));
+          $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+
+        } else {
+
+          $this->configEvent->setConfigId(distill_post_request($filters)['setting_id']);
+          $this->configEvent->setConfigName(distill_post_request($filters)['setting_name']);
+
+          $membership_value = array(
+            'user_can_register' => distill_post_request($filters)['user_can_register'],
+            'default_role' => distill_post_request($filters)['user_level']
+          );
+
+          $updated_membership_value = json_encode($membership_value);
+
+          $this->configEvent->setConfigValue($updated_membership_value);
+
+          $this->configEvent->modifySetting();
+
+          $_SESSION['status'] = "membershipConfigUpdated";
+          direct_page('index.php?load=option-memberships&status=membershipConfigUpdated', 200);
+
+        }
+
+      } catch (\Throwable $th) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+
+      } catch (AppException $e) {
+
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($e);
+
+      }
+
+    } else {
+
+      if (isset($_SESSION['error'])) {
+        $checkError = false;
+        ($_SESSION['error'] == 'membershipValueNotFound') ? array_push($errors, "Error: Membership value not found!") : "";
+        unset($_SESSION['error']);
+      }
+ 
+      if (isset($_SESSION['status'])) {
+        $checkStatus = true;
+        ($_SESSION['status'] == 'membershipConfigUpdated') ? array_push($status, "Membership setting has been updated") : "";
+        unset($_SESSION['status']);
+      }
+
+      $this->setView('membership-setting');
+      $this->setPageTitle('Membership');
+      $this->setFormAction(ActionConst::MEMBERSHIP_CONFIG);
+
+      if (!$checkError) {
+       $this->view->set('errors', $errors);
+      }
+ 
+      if ($checkStatus) {
+       $this->view->set('status', $status);
+      }
+
+      $this->view->set('pageTitle', $this->getPageTitle());
+      $this->view->set('formAction', $this->getFormAction());
+      $this->view->set('membershipData', $data_memberships);
+      $this->view->set('membershipDefaultRole', $this->configEvent->membershipDefaultRoleDropDown($membership_default_role['default_role']));
+      $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+
+    }
+
+    return $this->view->render();
+  }
+
+  /**
    * setView
    *
    * @param string $viewName
-   * @return object
    * 
    */
   protected function setView($viewName)
