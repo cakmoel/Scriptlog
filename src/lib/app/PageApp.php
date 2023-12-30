@@ -581,6 +581,12 @@ class PageApp extends BaseApp
     }
   }
 
+  /**
+   * setView
+   *
+   * @param string $viewName
+   * 
+   */
   protected function setView($viewName)
   {
     $this->view = new View('admin', 'ui', 'pages', $viewName);
