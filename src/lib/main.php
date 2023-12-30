@@ -1,7 +1,8 @@
 <?php
 
-(version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
+declare(strict_types=1);
 
+(version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
 /**
  * Main.php file
  * Initialize main engine, define constants, and object instantiated
@@ -24,6 +25,7 @@ if (!file_exists(APP_ROOT . 'config.php')) {
         header("Location: " . APP_PROTOCOL . "://" . APP_HOSTNAME . dirname(dirname(htmlspecialchars($_SERVER['PHP_SELF']))) . DS . 'install');
         exit();
     }
+    
 } else {
 
     $config = include __DIR__ . '/../config.php';
@@ -39,7 +41,7 @@ if (!file_exists(APP_ROOT . 'config.php')) {
     $app_key   = isset($config['app']['key']) ? $config['app']['key'] : "";
 
     #================================== call functions in directory lib/utility ===========================================
-    $directory = new RecursiveDirectoryIterator(__DIR__ . DS . 'utility' . DS, FilesystemIterator::FOLLOW_SYMLINKS);
+    $directory = new RecursiveDirectoryIterator(__DIR__ . DIRECTORY_SEPARATOR . 'utility' . DIRECTORY_SEPARATOR, FilesystemIterator::FOLLOW_SYMLINKS);
     $filter = new RecursiveCallbackFilterIterator($directory, function ($current, $key, $iterator) {
 
         // Allow recursion
@@ -52,7 +54,7 @@ if (!file_exists(APP_ROOT . 'config.php')) {
             return false;
         }
 
-        $subdir = $current->getFilename() == __DIR__ . DS . 'utility' . DS;
+        $subdir = $current->getFilename() == __DIR__ . DIRECTORY_SEPARATOR . 'utility' . DIRECTORY_SEPARATOR;
 
         return ($current->isDir()) ? $subdir : strpos($current->getFilename(), '.php');
     });
@@ -67,24 +69,24 @@ if (!file_exists(APP_ROOT . 'config.php')) {
     #====================End of call functions in directory lib/utility=====================================================
 
     // check if loader is exists
-    if (file_exists(APP_ROOT . APP_LIBRARY . DS . 'Autoloader.php')) {
+    if (file_exists(APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'Autoloader.php')) {
 
-        include __DIR__ . DS . 'Autoloader.php';
+        include __DIR__ . DIRECTORY_SEPARATOR . 'Autoloader.php';
     }
 
-    if (is_readable(APP_ROOT . APP_LIBRARY . DS . 'vendor/autoload.php')) {
+    if (is_readable(APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'vendor/autoload.php')) {
 
-        include_once __DIR__ . DS . 'vendor/autoload.php';
+        include_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
     }
 
     Autoloader::setBaseDir(APP_ROOT);
     // load libraries necessary by system
     Autoloader::addClassDir(array(
-        APP_ROOT . APP_LIBRARY . DS . 'core'    . DS,
-        APP_ROOT . APP_LIBRARY . DS . 'dao'     . DS,
-        APP_ROOT . APP_LIBRARY . DS . 'event'   . DS,
-        APP_ROOT . APP_LIBRARY . DS . 'app'     . DS,
-        APP_ROOT . APP_LIBRARY . DS . 'provider' . DS
+        APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'core'    . DIRECTORY_SEPARATOR,
+        APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'dao'     . DIRECTORY_SEPARATOR,
+        APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'event'   . DIRECTORY_SEPARATOR,
+        APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'app'     . DIRECTORY_SEPARATOR,
+        APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'provider'. DIRECTORY_SEPARATOR
     ));
 
     x_frame_option();
@@ -166,7 +168,8 @@ if (!file_exists(APP_ROOT . 'config.php')) {
  * @var $sessionMaker invoked by Session Cookies
  * @var $searchPost invoked by search functionality
  * @var $sanitizer adapted by sanitize functionality
- * @var $userDao, $validator, $authenticator, $ubench, $dispatcher
+ * @var $userDao, $userToken, $validator, $authenticator invoked by login and authentication systems
+ * 
  */
     $sessionMaker = class_exists('SessionMaker') ? new SessionMaker(set_session_cookies_key($app_email, $app_key)) : "";
     $searchPost = class_exists('SearchFinder') ? new SearchFinder() : "";
@@ -177,13 +180,14 @@ if (!file_exists(APP_ROOT . 'config.php')) {
     $authenticator = class_exists('Authentication') ? new Authentication($userDao, $userToken, $validator) : "";
     $ubench = class_exists('Ubench') ? new Ubench() : "";
     $dispatcher = class_exists('Dispatcher') ? new Dispatcher() : "";
+
 }
 
 is_a($sessionMaker, 'SessionMaker') ? session_set_save_handler($sessionMaker, true) : "";
 session_save_path(__DIR__ . '/utility/.sessions' . DS);
 register_shutdown_function('session_write_close');
 
-if (!start_session_on_site($sessionMaker)) {
+if (function_exists('start_session_on_site') && (!start_session_on_site($sessionMaker))) {
 
     ob_start();
 }
