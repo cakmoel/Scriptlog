@@ -344,7 +344,6 @@ public function insert()
  * @inheritDoc
  * @uses BaseApp::update()
  * @param int $id
- * @return void
  * 
  */
 public function update($id)
@@ -709,6 +708,12 @@ public function remove($id)
   
 }
 
+/**
+ * setView
+ *
+ * @param string $viewName
+ *
+ */
 protected function setView($viewName)
 {
   $this->view = new View('admin', 'ui', 'medialib', $viewName);
