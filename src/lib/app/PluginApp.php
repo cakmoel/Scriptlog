@@ -273,6 +273,12 @@ class PluginApp extends BaseApp
     // leave empty
   }
 
+  /**
+   * enablePlugin
+   *
+   * @param int|num $id
+   * 
+   */
   public function enablePlugin($id)
   {
 
@@ -344,6 +350,12 @@ class PluginApp extends BaseApp
     
   }
 
+  /**
+   * disablePlugin
+   *
+   * @param int|num $id
+   * 
+   */
   public function disablePlugin($id)
   {
 
@@ -413,6 +425,12 @@ class PluginApp extends BaseApp
    
   }
 
+  /**
+   * remove
+   *
+   * @param int|num $id
+   * 
+   */
   public function remove($id)
   {
 
@@ -481,6 +499,12 @@ class PluginApp extends BaseApp
     
   }
 
+  /**
+   * setView
+   *
+   * @param string $viewName
+   * 
+   */
   protected function setView($viewName)
   {
     $this->view = new View('admin', 'ui', 'plug-in', $viewName);
