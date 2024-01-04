@@ -979,7 +979,7 @@ class PostApp extends BaseApp
   /**
    * setView
    * 
-   * @param object $viewName
+   * @param string $viewName
    * 
    */
   protected function setView($viewName)
