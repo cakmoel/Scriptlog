@@ -58,7 +58,7 @@ class FrontHelper
 
     $idsanitized = static::frontSanitizer($id, 'sql');
 
-    $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE ID = '$idsanitized'";
+    $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE topic_status = 'Y' AND ID = '$idsanitized'";
 
     $query = db_simple_query($sql);
 
@@ -115,6 +115,61 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
     return (empty($results)) ?: $results;
   }
 
+ /**
+   * grabFrontTag
+   *
+   * implementing a simple MySQL full-text searching
+   *  
+   * @param string $tag
+   * @return mixed
+   * 
+   */
+  public static function simpleSearchingTag($tag)
+  {
+     $sql = "SELECT ID, post_title, post_content, post_summary, post_tags FROM tbl_posts WHERE MATCH(post_title, post_content, post_tags) AGAINST('$tag' IN BOOLEAN MODE )";
+
+     $results = db_simple_query($sql)->fetch_assoc();
+
+     return (empty($results)) ?: $results;
+  }
+
+  /**
+   * grabTagLists()
+   *
+   * @return mixed
+   * 
+   */
+  public static function grabTagLists()
+  {
+
+    $taglink = [];
+    $tagArrays = [];
+
+    $sql = 'SELECT DISTINCT LOWER(post_tags) AS postTags FROM tbl_posts WHERE post_tags != "" GROUP BY postTags';
+
+    $results = db_simple_query($sql);
+
+    if ($results->num_rows > 0) {
+
+      while ($row = $results->fetch_array(MYSQLI_ASSOC)) {
+
+        $parts = explode(',', $row['postTags']);
+
+        foreach ($parts as $part) {
+          $tagArrays[] = $part;
+        }
+        
+      }
+
+      $finalTags = array_unique($tagArrays);
+      foreach ($finalTags as $tag) {
+        $taglink[] = trim($tag);
+      }
+
+      return $taglink;
+    }
+  }
+
   /**
    * grabPreparedFrontPostById
    *
@@ -125,7 +180,7 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
   public static function grabPreparedFrontPostById($id)
   {
 
-    $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
+    $sql = "SELECT p.ID, p.media_id, p.post_author, YEAR(p.post_date) AS year_archive, MONTH(p.post_date) AS month_archive, p.post_modified, p.post_title, p.post_slug,
                p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_status, p.post_visibility, p.post_sticky, 
                p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, 
                m.media_access, u.user_fullname
@@ -169,7 +224,7 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
   }
 
   /**
-   * frontTopicBySlug
+   * grabPreparedFrontTopicBySlug
    *
    * @param string $slug
    * @return mixed
@@ -181,6 +236,21 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
     $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE topic_slug = ? AND topic_status = 'Y'";
 
     return db_prepared_query($sql, [$slug], 's')->get_result()->fetch_assoc();
+  }
+
+  /**
+   * grabPreparedFrontTopicByID
+   *
+   * @param int|num $id
+   * @return mixed
+   * 
+   */
+  public static function grabPreparedFrontTopicByID($id)
+  {
+
+    $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE ID = ? AND topic_status = 'Y'";
+
+    return db_prepared_query($sql, [$id], 'i')->get_result()->fetch_assoc();
   }
 
   /**
@@ -204,7 +274,7 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
     p.post_modified, p.post_title, p.post_slug, 
     p.post_content, p.post_summary, p.post_keyword, p.post_tags, p.post_type, p.post_status, 
     p.post_sticky, u.user_login, u.user_fullname,
-    m.media_filename, m.media_caption
+    m.media_filename, m.media_captionh
   FROM tbl_posts AS p
   LEFT JOIN tbl_users AS u ON p.post_author = u.ID
   LEFT JOIN tbl_media AS m ON p.media_id = m.ID
@@ -243,27 +313,6 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
       return ['media_filename' => $media_filename, 'media_caption' => $media_caption, 'media_id' => $media_id];
     }
-  }
-
-  /**
-   * grabFrontTag
-   *
-   * implementing a simple MySQL full-text searching
-   *  
-   * @param string $tag
-   * @return mixed
-   * 
-   */
-  public static function grabFrontTag($tag)
-  {
-
-    $medoo_init = medoo_init();
-    return $medoo_init->select("tbl_posts", ["ID", "post_title", "post_content", "post_summary", "post_keyword", "@post_tags"], [
-      "MATCH" => [
-        "columns" => ["post_tags", "post_title", "post_content"],
-        "keyword" => $tag,
-      ]
-    ]);
   }
 
   /**
