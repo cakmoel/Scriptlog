@@ -18,7 +18,6 @@ class DbFactory
    * @param string $connection
    * @param array $options
    * @throws DbException
-   * @return object
    * 
    */
   public static function connect($connection, $options = [])
