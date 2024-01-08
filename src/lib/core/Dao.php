@@ -96,7 +96,7 @@ class Dao
   * @param array $data
   * @param PDO::FETCH_MODE static $fetchMode
   * @throws DbException
-  * @return array|object
+  * @return mixed
   *
   */
  protected function findRow(array $data = array(), $fetchMode = null)
