@@ -89,7 +89,7 @@ class Dispatcher
 
     } else {
 
-      HandleRequest::deliverQueryString();
+      (class_exists('HandleRequest')) ? HandleRequest::deliverQueryString() : "";
       
     }
 
