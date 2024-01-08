@@ -17,11 +17,12 @@ class ActionConst
  const DETAILITEM = "detailItem";
 
  // action constant for configuration functionality
- const CONFIGURATION    = "configuration";
- const GENERAL_CONFIG   = "generalConfig";
- const PERMALINK_CONFIG = "permalinkConfig";
- const READING_CONFIG   = "readingConfig";
- const TIMEZONE_CONFIG  = "timezoneConfig";
+ const CONFIGURATION     = "configuration";
+ const GENERAL_CONFIG    = "generalConfig";
+ const PERMALINK_CONFIG  = "permalinkConfig";
+ const READING_CONFIG    = "readingConfig";
+ const TIMEZONE_CONFIG   = "timezoneConfig";
+ const MEMBERSHIP_CONFIG = "membershipConfig";
 
  // action constant for post functionality 
  const POSTS       = "posts";
