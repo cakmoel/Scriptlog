@@ -45,9 +45,9 @@ class AtomWriter
   private function grabPostFeed($limit)
   {
 
-    $postProviderModel = new PostProviderModel();
+    $postProviderModel = class_exists('PostProviderModel') ? new PostProviderModel() : "";
 
-    $this->frontContentProvider = FrontContentProvider::frontPostsFeed($limit, $postProviderModel);
+    $this->frontContentProvider = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostsFeed($limit, $postProviderModel) : "";
 
     return $this->frontContentProvider;
   }
@@ -58,7 +58,7 @@ class AtomWriter
    */
   private function initializeFeed()
   {
-    $this->atomFeed = new Feed();
+    $this->atomFeed = class_exists('Feed') ? new Feed() : "";
 
     return $this->atomFeed;
   }
