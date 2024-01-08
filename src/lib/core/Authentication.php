@@ -172,7 +172,7 @@ class Authentication
    * findUserByLogin()
    *
    * @param string $user_login
-   * @return void
+   * @return mixed
    * 
    */
   public function findUserByLogin($user_login)
@@ -185,7 +185,7 @@ class Authentication
    *
    * @param string $login
    * @param string $expired
-   * @return void
+   * @return mixed
    * 
    */
   public function findTokenByLogin($login, $expired)
@@ -222,7 +222,7 @@ class Authentication
    * Is Email Exists
    * 
    * @param string  $email
-   * @return boolean
+   * @return true|false
    * 
    */
   public function checkEmailExists($email)
@@ -239,7 +239,7 @@ class Authentication
   /**
    * Checking access level
    * 
-   * @return boolean 
+   * @return bool|string|void
    * 
    */
   public function accessLevel()
@@ -293,7 +293,7 @@ class Authentication
     $this->validator->sanitize($password, 'string');
     $this->user_login = $this->account_info['user_login'];
 
-    clear_duplicate_cookies();
+    (function_exists('clear_duplicate_cookies')) ? clear_duplicate_cookies() : '';
 
     Session::getInstance()->scriptlog_session_id = intval($this->account_info['ID']);
     Session::getInstance()->scriptlog_session_email = $this->account_info['user_email'];
@@ -496,7 +496,7 @@ class Authentication
     } else {
 
       $actived = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname($_SERVER['PHP_SELF']) . '/login.php?status=actived';
-      header("Location: $actived");
+      header("Location: $actived", true, 302);
       exit();
     }
   }
