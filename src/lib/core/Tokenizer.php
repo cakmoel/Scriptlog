@@ -51,7 +51,7 @@ final class  Tokenizer
  *
  * @param string $password
  * @param string $key
- * @return void
+ * @return string
  * 
  */
   public static function setRandomPasswordProtected($password)
@@ -69,7 +69,7 @@ final class  Tokenizer
  * @param string $cipher_data
  * @param string $password
  * @param string $key
- * @return void
+ * @return bool
  * 
  */
   public static function getRandomPasswordProtected($password, $hash)
@@ -84,7 +84,7 @@ final class  Tokenizer
  *
  * @param string $selector
  * @param string $key
- * @return void
+ * @return string
  * 
  */
   public static function setRandomSelectorProtected($selector, $key)
@@ -122,7 +122,7 @@ final class  Tokenizer
  * @param string $cipher_data
  * @param string $selector
  * @param string $key
- * @return void
+ * @return bool
  * 
  */
   public static function getRandomSelectorProtected($cipher_data, $selector, $key)
