@@ -38,7 +38,7 @@ private static $frontHelper;
  */
 public static function handleFrontHelper()
 {
-  self::$frontHelper = new FrontHelper();
+  self::$frontHelper = class_exists('FrontHelper') ? new FrontHelper() : '';
   return self::$frontHelper;
 }
 
@@ -52,7 +52,7 @@ public static function handleFrontHelper()
 private static function findRequestToRules($rules)
 {
 
-$script_name = rtrim(dirname($_SERVER["SCRIPT_NAME"]), '/' );
+$script_name = isset($_SERVER['SCRIPT_NAME']) ? rtrim(dirname($_SERVER['SCRIPT_NAME']), '/' ) : '';
 $request_uri = '/' . trim(str_replace($script_name, '', $_SERVER['REQUEST_URI']), '/');
 $uri = urldecode($request_uri);
 
@@ -65,7 +65,6 @@ if (is_array($rules)) {
       if (preg_match('~^'.$value.'$~i', $uri, $matches)) {
  
         return $parameters[] = $matches;
- 
       }
  
     }
@@ -165,7 +164,7 @@ public static function isQueryStringRequested()
  */
 public static function checkMatchUriRequested()
 {
-  self::$requestPathURI = new RequestPath();
+  self::$requestPathURI = class_exists('RequestPath') ? new RequestPath() : '';
   return (self::isMatchedUriRequested() === self::$requestPathURI->matched) ? true : false;
 }
 
@@ -308,34 +307,26 @@ public static function deliverQueryString()
         // Deliver request to a tag
       if (! empty(static::isQueryStringRequested()['value'])) {
 
-          $query_tags = self::handleFrontHelper()->grabFrontTag(static::isQueryStringRequested()['value']);
+          $query_tags = self::handleFrontHelper()->simpleSearchingTag(static::isQueryStringRequested()['value']);
 
-          if (is_iterable($query_tags)) {
+          $post_id = isset($query_tags['ID']) ? htmlout($query_tags['ID']) : 0;
+          
+          if (empty($post_id)) {
 
-            foreach ($query_tags as $tag) {
+            http_response_code(404);
+            call_theme_header();
+            call_theme_content('404');
+            call_theme_footer();
+  
+          } else {
 
-              $post_id = isset($tag['ID']) ? escape_html($tag['ID']) : 0;
-              
-            }
+            http_response_code(200);
+            call_theme_header();
+            call_theme_content('tag');
+            call_theme_footer();
 
-            if (empty($post_id)) {
-
-              http_response_code(404);
-              call_theme_header();
-              call_theme_content('404');
-              call_theme_footer();
-    
-            } else {
-
-              http_response_code(200);
-              call_theme_header();
-              call_theme_content('tag');
-              call_theme_footer();
-
-            }
-            
-          } 
-
+          }
+        
       } else {
 
         direct_page('', 302);
