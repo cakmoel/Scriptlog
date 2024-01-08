@@ -289,7 +289,6 @@ class UserApp extends BaseApp
                     } else {
 
                         $this->userEvent->addUser();
-
                     }
 
                     $_SESSION['status'] = "userAdded";
@@ -332,7 +331,7 @@ class UserApp extends BaseApp
 
         $errors = array();
         $checkError = true;
-        $secret = ScriptlogCryptonize::generateSecretKey();
+        $secret = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::generateSecretKey() : '';
 
         if (!$getUser = $this->userEvent->grabUser($id)) {
 
@@ -458,6 +457,7 @@ class UserApp extends BaseApp
                     }
 
                     $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+                    
                 } else {
 
                     $this->userEvent->setUserEmail(distill_post_request($filters)['user_email']);
@@ -916,11 +916,11 @@ class UserApp extends BaseApp
      * setView
      *
      * @param string $viewName
-     * @return object
      * 
      */
     protected function setView($viewName)
     {
-        $this->view = new View('admin', 'ui', 'users', $viewName);
+       $this->view = new View('admin', 'ui', 'users', $viewName);
     }
+
 }
