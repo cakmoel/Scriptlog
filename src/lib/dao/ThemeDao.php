@@ -141,7 +141,7 @@ class ThemeDao extends Dao
     $sql = "SELECT ID FROM tbl_themes WHERE ID = ?";
     $this->setSQL($sql);
     $stmt = $this->checkCountValue([$idsanitized]);
-    return($stmt > 0);
+    return $stmt > 0;
   }
 
   /**
@@ -175,7 +175,7 @@ class ThemeDao extends Dao
    * 
    * @method mixed activateTheme()
    * @param integer $id
-   * @param object $
+   * @param object $sanitize
    * 
    */
   public function activateTheme($id, $sanitize)
@@ -231,6 +231,7 @@ class ThemeDao extends Dao
    * Load theme function
    * 
    * @method loadTheme()
+   * @return mixed
    */
   public function loadTheme($theme_status)
   {
