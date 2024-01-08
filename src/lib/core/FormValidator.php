@@ -41,7 +41,7 @@ private $errors;
 
 private $corrects; 
 
-private $fields;
+protected $fields;
 
 public function __construct($validations=array(), $mandatories = array(), $sanitations = array(), $equal=array())
 {
