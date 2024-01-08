@@ -48,7 +48,7 @@ class Paginator
 
 	/**
 	 * sanitize
-	 * @var string
+	 * @var object
 	 */
 	private $_sanitize;
 
@@ -114,7 +114,6 @@ class Paginator
 	 *
 	 * returns the limit for the data source, calling the get_start method and passing in the number of items perp page
 	 *
-	 * @return string
 	 */
 	public function get_limit(Sanitize $sanitize)
 	{
