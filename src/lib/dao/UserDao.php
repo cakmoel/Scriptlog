@@ -132,7 +132,7 @@ class UserDao extends Dao
  * 
  * @param string $user_session
  * @param static PDO::FETCH_MODE $fetchMode
- * @return void
+ * @return mixed
  * 
  */
  public function getUserBySession($user_session, $fetchMode = null)
@@ -404,12 +404,11 @@ class UserDao extends Dao
  */
  public function isUserLoginExists($user_login)
  {
-   
+  
    $sql = "SELECT COUNT(ID) FROM tbl_users WHERE user_login = ? AND user_banned = '0' LIMIT 1";
    $this->setSQL($sql);
    $stmt = $this->findColumn([$user_login]);
    return ($stmt === 1) ? true : false;
-	
  }
 	 
 /**
@@ -517,7 +516,7 @@ class UserDao extends Dao
  *
  * @param  string $login
  * @param string $password
- * @return bool
+ * @return true
  */
  private function checkUserPasswordByEmail($login, $password)
  {
@@ -556,7 +555,7 @@ class UserDao extends Dao
  *
  * @param string $login
  * @param string $password
- * @return bool
+ * @return true
  */
  private function checkUserPasswordByLogin($login, $password)
  {
@@ -594,7 +593,7 @@ class UserDao extends Dao
   * Check Activation Key
   * 
   * @param string $key
-  * @return boolean
+  * @return false
   */
  private function checkActivationKey($key)
  {
@@ -604,7 +603,7 @@ class UserDao extends Dao
      
     if (!($this->findColumn([$key])) == 1) {
          
-       return false;
+      return false;
          
     } 
     
