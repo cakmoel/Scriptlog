@@ -58,7 +58,7 @@ public static function getAuthInstance()
  * authorizeRole
  *
  * @param string $role
- * @return void
+ * @return false|true
  * 
  */
 public static function authorizeRole($role)
@@ -70,9 +70,7 @@ public static function authorizeRole($role)
 
 /**
  * authorizeLevel
- *
- * @return void
- * 
+ * @return  string 
  */
 public static function authorizeLevel()
 {
