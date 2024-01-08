@@ -12,7 +12,9 @@
 class CoreException extends Exception implements ICoreThrowable
 {
   
-protected $message = 'Unknown Exception';
+ protected $previous;
+ 
+ protected $message = 'Unknown Exception';
 
 public function __construct($message = null, $code = 0, Exception $previous = null)
 {
