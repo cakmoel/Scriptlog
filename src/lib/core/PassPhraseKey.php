@@ -48,7 +48,7 @@ private static $filename;
  *
  * @param string $passphrase
  * @param string $filename
- * @return void
+ * 
  */
 public static function savePassPhraseKey($passphrase, $filename)
 {
@@ -119,7 +119,6 @@ private static function checkingUserLevel()
 /**
  * grabUserLevel
  *
- * @return void
  */
 private  static function grabUserLevel()
 {
@@ -129,7 +128,6 @@ private  static function grabUserLevel()
 /**
  * grabDirectoryKey
  *
- * 
  */
 private static function grabDirectoryKey()
 {
