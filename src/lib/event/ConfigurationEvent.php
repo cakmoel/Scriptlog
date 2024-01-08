@@ -171,6 +171,19 @@ class ConfigurationEvent
   }
 
   /**
+   * membershipDefaultRole
+   *
+   * @param string $selected
+   * @return mixed
+   * 
+   */
+  public function membershipDefaultRoleDropDown($selected = "")
+  {
+    $membershipDefaultRole = class_exists('UserDao') ? new UserDao : "";
+    return $membershipDefaultRole->dropDownUserLevel($selected);
+  }
+
+  /**
    * totalSettings
    *
    * @param array|mixed $data
