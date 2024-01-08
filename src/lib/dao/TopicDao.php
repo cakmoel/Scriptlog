@@ -197,7 +197,6 @@ class TopicDao extends Dao
          
       }
     
-    
   } else {
      
      if (is_array($items)) {
@@ -222,7 +221,7 @@ class TopicDao extends Dao
               $html .= '</label>';
               $html .= '</div>';
                
-           }
+        }
 
     } 
      
@@ -249,7 +248,7 @@ class TopicDao extends Dao
    $cleanId = $this->filteringId($sanitizing, $id, 'sql');
    $this->setSQL($sql);
    $stmt = $this->checkCountValue([$cleanId]);
-   return($stmt > 0);
+   return $stmt > 0;
  }
 
  /**
