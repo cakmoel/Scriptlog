@@ -82,7 +82,6 @@ class UserTokenDao extends Dao
  * @param object $sanitize
  * @param array $bind
  * @param string $user_login
- * @return void
  * 
  */
 public function updateUserToken($bind, $user_login)
@@ -108,7 +107,6 @@ public function updateTokenExpired($userTokenId)
  * deleting user token when logout from app
  *
  * @param string $user_login
- * @return void
  * 
  */
 public function deleteUserToken($user_login)
