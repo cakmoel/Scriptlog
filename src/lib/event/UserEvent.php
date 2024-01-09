@@ -184,7 +184,6 @@ class UserEvent
  *
  * @method public setUserId()
  * @param int $userId
- * @return void
  * 
  */
  public function setUserId($userId)
@@ -227,7 +226,6 @@ class UserEvent
  * set password hash validator for cookies
  * 
  * @param string $pwd_hash
- * @return void
  * 
  */
  public function setPwdHash($pwd_hash)
@@ -240,7 +238,6 @@ class UserEvent
  * set selector hash validator for cookies
  *
  * @param string $selector_hash
- * @return void
  * 
  */
  public function setSelectorHash($selector_hash)
@@ -308,8 +305,7 @@ class UserEvent
 /**
  * setUserBanned
  *
- * @param [type] $user_banned
- * @return void
+ * @param strin $user_banned
  */
  public function setUserBanned($user_banned)
  {
@@ -327,7 +323,7 @@ class UserEvent
  */
  public function grabUsers($orderBy = 'ID', $fetchMode = null)
  {
-   $orderBySanitized = sanitize_sql_orderby($orderBy);
+   $orderBySanitized = function_exists('sanitize_sql_orderby') ? sanitize_sql_orderby($orderBy) : ""; 
    return $this->userDao->getUsers($orderBySanitized, $fetchMode);    
  }
  
@@ -336,7 +332,7 @@ class UserEvent
   *
   * @param string $userId
   * @param static PDO::FETCH_MODE $fetchMode
-  * @return void
+  * @return array
   */
  public function grabUser($userId, $fetchMode = null)
  {
@@ -348,7 +344,7 @@ class UserEvent
   *
   * @param string $user_login
   * @param static PDO::FETCH_MODE $fetchMode 
-  * @return void
+  * @return array
   */
  public function grabUserByLogin($user_login, $fetchMode = null)
  {
@@ -361,18 +357,17 @@ class UserEvent
   * @param string $login
   * @param string $expired
   * @param static PDO::FETCH_MODE $fetchMode
-  * @return void
+  * @return array
   */
  public function grabTokenByLogin($login, $expired, $fetchMode = null)
  {
    return $this->userToken->getTokenByLogin($login, $expired, $fetchMode);
  }
 
- /**
-  * addUser
-  *
-  * @return void
-  */
+/**
+ * addUser
+ *
+ */
  public function addUser()
  {
    
@@ -414,11 +409,10 @@ class UserEvent
     
  }
 
- /**
-  * modifyUser
-  *
-  * @return void
-  */
+/**
+ * modifyUser
+ * 
+ */
  public function modifyUser()
  {
   
@@ -489,10 +483,9 @@ class UserEvent
  }
  
 /**
- * Update token expired
+ * modifyTokenExpired
  *
  * @param integer $userTokenId
- * @return void
  * 
  */
  public function modifyTokenExpired($userTokenId)
@@ -509,7 +502,6 @@ class UserEvent
  public function removeUser()
  {
   $this->validator->sanitize($this->user_id, 'int');
-
   return $this->userDao->deleteUser($this->user_id, $this->sanitize); 
  }
  
@@ -580,7 +572,7 @@ public function reAuthenticateUserPrivilege($login, $password)
  * if defined then return it
  *
  * @method public identifyUserLogin()
- * @return void
+ * @return bool
  * 
  */
  public function identifyCookieToken($secret)
