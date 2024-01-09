@@ -57,7 +57,7 @@
       endif;
     ?>
   </div>
-  <!-- Widget [Categories Widget]-->
+  <!-- Categories-->
   <div class="widget categories">
     <header>
       <h3 class="h6">Categories</h3>
@@ -83,26 +83,33 @@
       <h3 class="h6">Archives</h3>
     </header>
 
-    <?php
+  <?php
     
-    if (function_exists('retrieve_archives')) {
+    if (function_exists('retrieve_archives')) :
       
      foreach (retrieve_archives() as $archives) :
 
       $month_num = isset($archives['month_archive']) ? safe_html($archives['month_archive']) : "";
       $monthObj = class_exists('DateTime') ? DateTime::createFromFormat('!m', $month_num) : "";
       $month_name = method_exists($monthObj, 'format') ? $monthObj->format('F') : "";
+      $monthDate = method_exists($monthObj, 'format') ? $monthObj->format('m') : "";
       $month_name = isset($month_name) ? $month_name : date('F', mktime(0, 0, 0, $archives['month_archive'], 10));
       $year = isset($archives['year_archive']) ? safe_html($archives['year_archive']) : "";
       $total = isset($archives['total_archive']) ? safe_html($archives['total_archive']) : "";
       
-    ?>
+      if (rewrite_status() === 'yes'):
+  ?>
 
-      <div class="item d-flex justify-content-between"><a href="<?= permalinks($archives['year_archive'].$archives['month_archive'])['archive']; ?>" title="<?= $month_name; ?>"><?= $month_name . ' ' . $year; ?></a><span><?= $total; ?></span></div>
+      <div class="item d-flex justify-content-between"><a href="<?= permalinks($monthDate.DS.$year)['archive']; ?>" title="<?= $month_name; ?>"><?= $month_name . ' ' . $year; ?></a><span><?= $total; ?></span></div>
     
     <?php
+      else :
+    ?>
+    <div class="item d-flex justify-content-between"><a href="<?= permalinks($archives['year_archive'].$archives['month_archive'])['archive'] ?>" title="<?= $month_name; ?>"><?= $month_name . ' ' . $year; ?></a><span><?= $total; ?></span></div>
+    <?php
+      endif;
       endforeach;
-    }
+    endif;
     ?>
     
   </div>
@@ -113,7 +120,11 @@
       <h3 class="h6">Tags</h3>
     </header>
     <ul class="list-inline">
-      <?= function_exists('outputting_tags') ? outputting_tags() : ""; ?>
+      <?php 
+         if (function_exists('outputting_tags')) {
+            echo outputting_tags();
+         } 
+        ?>
     </ul>
   </div>
 </aside>
