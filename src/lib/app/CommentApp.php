@@ -73,7 +73,7 @@ class CommentApp extends BaseApp
 
     $this->setPageTitle('Comments');
     $this->view->set('pageTitle', $this->getPageTitle());
-    $this->view->set('commentsTotal', $this->commentEvent->totalComments());
+    $this->view->set('totalComments', $this->commentEvent->totalComments());
     $this->view->set('comments', $this->commentEvent->grabComments());
     
     return $this->view->render();
@@ -82,23 +82,7 @@ class CommentApp extends BaseApp
   
   public function insert()
   {
-    if ( isset($_POST['commentFormSubmit']) ) {
-
-       $filters = [
-          'post_id' => isset($_POST['post_id']) ? abs((int)$_POST['post_id']) : 0,
-          'author_name' => isset($_POST['author_name']) ? Sanitize::severeSanitizer($_POST['author_name']) : "",
-          'author_email' => isset($_POST['author_email']) ? Sanitize::severeSanitizer($_POST['author_email']) : "",
-          'comment_content' => isset($_POST['comment_content']) ? Sanitize::severeSanitizer($_POST['comment_content']) : ""
-       ];
-
-       $this->commentEvent->setPostId(distill_post_request($filters)['post_id']);
-       $this->commentEvent->setAuthorName(distill_post_request($filters)['author_name']);
-       $this->commentEvent->setAuthorIP(get_ip_address());
-       $this->commentEvent->setCommentContent(distill_post_request($filters)['comment_content']);
-       $this->commentEvent->setCommentDate(date("Y-m-d H:i:s"));
-       $this->commentEvent->addComment();
-       
-    }
+    
   }
   
   public function update($id)
@@ -128,7 +112,7 @@ class CommentApp extends BaseApp
     if (isset($_POST['commentFormSubmit'])) {
         
         $author_name = isset($_POST['author_name']) ? trim(htmlspecialchars($_POST['author_name'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8")) : "";
-        $comment_content = isset($_POST['comment_content']) ? Sanitize::severeSanitizer($_POST['comment_status']) : "";
+        $comment_content = isset($_POST['comment_content']) ? Sanitize::severeSanitizer($_POST['comment_content']) : "";
         $comment_id = isset($_POST['comment_id']) ? abs((int)$_POST['comment_id']) : 0;
         $comment_status = isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : "";
         
@@ -172,6 +156,7 @@ class CommentApp extends BaseApp
                 $this->commentEvent->setCommentId($comment_id);
                 $this->commentEvent->setCommentContent($comment_content);
                 $this->commentEvent->setCommentStatus($comment_status);
+                $this->commentEvent->setAuthorName($author_name);
                 $this->commentEvent->modifyComment();
                 $_SESSION['status'] = "commentUpdated";
                 direct_page('index.php?load=comments&status=commentUpdated', 200);
