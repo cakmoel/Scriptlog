@@ -78,15 +78,16 @@ $total_comment = (total_comment($post_id) > 0) ? total_comment($post_id) : 0;
                   <h3 class="h6">Post Comments<span class="no-of-comments">(<?= $total_comment; ?>)</span></h3>
                 </header>
 
-                <?php
-                 foreach (comments_by_post($post_id) as $comment) :
+              <?php
+                if (function_exists('comments_by_post')) :
+                 foreach (comments_by_post($post_id)['commentsApproved'] as $comment) :
 
                   $comment_id = isset($comment['ID']) ? intval((int)$comment['ID']) : 0;
                   $comment_author_name = isset($comment['comment_author_name']) ? htmlout($comment['comment_author_name']) : "";
-                  $comment_content = isset($comment['comment_content']) ? html_entity_decode(htmlout($comment['comment_content'])) : "";
+                  $comment_content = isset($comment['comment_content']) ? html_entity_decode(htmLawed(html($comment['comment_content']))) : "";
                   $comment_at = isset($comment['comment_date']) ? htmlout(make_date($comment['comment_date'])) : "";
 
-                ?>
+              ?>
 
                   <div class="comment">
                     <div class="comment-header d-flex justify-content-between">
@@ -99,16 +100,17 @@ $total_comment = (total_comment($post_id) > 0) ? total_comment($post_id) : 0;
                       <p><?= $comment_content; ?></p>
                     </div>
                   </div>
-                <?php
+              <?php
                  endforeach;
-                ?>
+                endif;
+              ?>
 
               </div>
 
               <div class="comment-form-wrap pt-5">
                 <h3 class="mb-5">Leave a comment</h3>
 
-                <form role="form" method="post" action="<?= app_url() . DS . basename('comments-post.php'); ?>" id="commentForm" class="p-5 bg-light">
+                <form role="form" method="post" action="<?= retrieve_site_url() . DS . basename('comments-post.php'); ?>"  id="commentForm" class="p-5 bg-light">
 
                   <div class="form-group">
                     <label for="comment">Type your comment*</label>
@@ -147,7 +149,7 @@ $total_comment = (total_comment($post_id) > 0) ? total_comment($post_id) : 0;
     </main>
 
     <?php
-    include __DIR__ . '/sidebar.php';
+    include dirname(__FILE__) . '/sidebar.php';
     ?>
 
   </div>
