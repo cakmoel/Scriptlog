@@ -76,7 +76,7 @@ class MediaDao extends Dao
    * @method public findMediaById()
    * @param integer $mediaId
    * @param object $sanitize
-   * 
+   * @return mixed
    */
   public function findMediaById($mediaId, $sanitize)
   {
@@ -236,7 +236,9 @@ class MediaDao extends Dao
     $sql = "SELECT ID, media_filename, media_caption, media_type, media_target, 
           media_user, media_access, media_status 
           FROM tbl_media
-          WHERE ID = ? AND media_target = 'page' AND media_access = 'public' AND media_status = '1'";
+          WHERE ID = ? 
+          AND media_target = 'page' 
+          AND media_access = 'public' AND media_status = '1'";
 
     $this->setSQL($sql);
 
@@ -551,7 +553,7 @@ class MediaDao extends Dao
 
         if ($file_basename == 'nophoto') {
 
-          $imgradio .= '<img class="img-responsive" alt="nophoto" src="https://s6.imgcdn.dev/vsWDK.th.jpg" alt="nophoto" border="0">';
+          $imgradio .= '<img class="img-responsive" src="https://s6.imgcdn.dev/vsWDK.th.jpg" alt="nophoto" border="0">';
 
         } else {
 
@@ -612,6 +614,7 @@ class MediaDao extends Dao
 
         $image_src_thumb = app_url() . '/public/files/pictures/nophoto.jpg';
         $webp_src_thumb = app_url() . '/public/files/pictures/nophoto.jpg';
+
       }
 
       if ($image_src || $webp_src) {
@@ -629,6 +632,7 @@ class MediaDao extends Dao
         $mediablog .= '<p class="help-block"> Maximum file size: ' . format_size_unit(APP_FILE_SIZE) . '</p>';
         $mediablog .= '<input type="hidden" name="image_id" value="' . $mediaId . '">';
         $mediablog .= '</div>';
+
       } else {
 
         $mediablog  = '<div class="form-group">';
@@ -644,7 +648,9 @@ class MediaDao extends Dao
         $mediablog .= '<p class="help-block">Maximum file size:' . format_size_unit(APP_FILE_SIZE) . '</p>';
         $mediablog .= '<input type="hidden" name="image_id" value="' . $mediaId . '">';
         $mediablog .= '</div>';
+
       }
+
     } else {
 
       $mediablog  = '<div class="form-group">';
@@ -654,6 +660,7 @@ class MediaDao extends Dao
       $mediablog .= '</div>';
       $mediablog .= '<p class="help-block"> Maximum file size: ' . format_size_unit(APP_FILE_SIZE) . '</p>';
       $mediablog .= '</div>';
+      
     }
 
     return $mediablog;
