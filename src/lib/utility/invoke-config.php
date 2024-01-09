@@ -6,7 +6,7 @@
  * @category Function
  * @version 1.0
  * @license MIT
- * @return void
+ * @return bool
  * 
  */
 function check_config_file($filename)
@@ -20,7 +20,6 @@ function check_config_file($filename)
  * invoking configuration file
  *
  * @category function
- * @return void
  * 
  */
 function invoke_config()
