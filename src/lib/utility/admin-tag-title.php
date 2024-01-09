@@ -97,6 +97,12 @@ function admin_tag_title($value)
          $title .= safe_html("Timezone settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
          break;
+         
+      case 'option-memberships':
+
+         $title .= safe_html("Membership settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+   
+         break;
 
       case 'templates':
 
