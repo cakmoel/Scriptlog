@@ -210,7 +210,7 @@ if (false === set_small_photo($current_width, $current_height, $origin_path_uplo
  * @param string $file_name
  * @param string $file_path_uploaded
  * @param string $file_type
- * @return void
+ * 
  */
 function set_origin_photo($current_width, $current_height, $file_location, $file_size, $file_path_uploaded) 
 {
@@ -236,7 +236,7 @@ if (move_uploaded_file($file_location, $file_path_uploaded) && filesize($file_pa
  * @param string $origin_path_uploaded
  * @param string $origin_path
  * @param string $file_name
- * @return void
+ * @return false|true
  * 
  */
 function set_webp_origin($current_width, $current_height, $file_location, $file_size, $origin_path_uploaded, $origin_path, $file_name)
@@ -283,7 +283,6 @@ if ($origin_webp->save($origin_path.$file_basename.'.webp', 80, 'webp')) {
  * @param string $file_path_thumb
  * @param string $file_name
  * @param string $file_type
- * @return void
  * 
  */
 function set_regular_photo($current_width, $current_height, $file_path_uploaded, $file_path_thumb, $file_name, $file_type)
@@ -381,7 +380,6 @@ function set_regular_photo($current_width, $current_height, $file_path_uploaded,
  * @param string $file_path_uploaded
  * @param string $file_path_thumb
  * @param string $file_name
- * @return void
  * 
  */
 function set_webp_regular($current_width, $current_height, $file_path_uploaded, $file_path_thumb, $file_name )
