@@ -17,11 +17,11 @@ function block_request_type($current_request, $method_allowed)
 
  if (!in_array($current_request, $method_allowed)) {
 
-    $block = true;
+   $block = true;
 
  } else {
 
-    $block = false;
+   $block = false;
 
  }
 
