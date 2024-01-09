@@ -7,7 +7,7 @@
  * @category function
  * @author M.Noermoehammad
  * @param string|null $type
- * @return void
+ * @return int|num
  */
 function form_id($type = null)
 {
@@ -20,6 +20,12 @@ function form_id($type = null)
 
     $_SESSION['human_login_id'] = $form_id;
 
+ } elseif ($type == "signup") {
+
+   $form_id = random_int(0, 979);
+
+   $_SESSION['human_signup_id'] = $form_id;
+   
  } elseif ($type == "comment") {
 
     $form_id = random_int(0, 767);
