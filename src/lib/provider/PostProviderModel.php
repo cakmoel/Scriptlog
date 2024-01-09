@@ -31,6 +31,7 @@ class PostProviderModel extends Dao
    */
   public function getPostFeeds($limit)
   {
+    
     $sql =  "SELECT p.ID, p.media_id, p.post_author,
                   p.post_date, p.post_modified, p.post_title,
                   p.post_slug, p.post_content, p.post_type,
@@ -76,8 +77,11 @@ class PostProviderModel extends Dao
             INNER JOIN tbl_media AS m ON p.media_id = m.ID
             INNER JOIN tbl_users AS u ON p.post_author = u.ID
             WHERE p.post_status = 'publish'
-            AND p.post_type = 'blog' AND m.media_target = 'blog'
-            AND m.media_access = 'public' AND m.media_status = '1'
+            AND p.post_type = 'blog' 
+            AND m.media_target = 'blog'
+            AND m.media_access = 'public' 
+            AND m.media_status = '1'
+            AND u.user_banned = '0'
             ORDER BY p.post_date DESC LIMIT :limit";
 
     $this->setSQL($sql);
@@ -85,6 +89,50 @@ class PostProviderModel extends Dao
     $latestPosts = isset($limit) ? $this->findAll([':limit' => $limit]) : 0;
 
     return (empty($latestPosts)) ?: $latestPosts;
+  }
+
+  /**
+   * getAllBlogPosts
+   *
+   * @param object $sanitize
+   * @param Paginator $perPage
+   * @return void
+   * 
+   */
+  public function getAllBlogPosts($sanitize, Paginator $perPage)
+  {
+    $entries = [];
+
+    $this->linkPosts = $perPage;
+
+    $stmt = $this->dbc->dbQuery("SELECT ID FROM tbl_posts WHERE post_type = 'blog'");
+
+    $this->linkPosts->set_total($stmt->rowCount());
+
+    $sql = "SELECT p.ID, p.media_id, p.post_author, 
+            p.post_date AS created_at, 
+            p.post_modified AS modified_at, 
+            p.post_title, p.post_slug, p.post_content, p.post_summary,
+            p.post_keyword, p.post_type, p.post_status, p.post_sticky, 
+            u.user_login, u.user_fullname,
+            m.media_filename, m.media_caption
+  			FROM tbl_posts AS p
+  			INNER JOIN tbl_users AS u ON p.post_author = u.ID
+        INNER JOIN tbl_media AS m ON p.media_id = m.ID
+  			WHERE p.post_type = 'blog' 
+        AND p.post_status = 'publish'
+        AND m.media_target = 'blog'
+        AND m.media_status = '1'  
+        AND u.user_banned = '0'
+  			ORDER BY p.ID DESC " . $this->linkPosts->get_limit($sanitize);
+
+    $this->setSQL($sql);
+
+    $entries = $this->findAll([]);
+
+    $this->pagination = $this->linkPosts->page_links($sanitize);
+
+    return (empty($entries)) ?: ['blogPosts' => $entries, 'paginationLink' => $this->pagination];
   }
 
   /**
@@ -192,50 +240,6 @@ class PostProviderModel extends Dao
   }
 
   /**
-   * getPostsPublished
-   * 
-   * retrieving all records published 
-   * and display it on blog section
-   *
-   * @param Paginator $perPage
-   * @param object $sanitize
-   * @return boolean|array[]|object[]|string[]
-   *
-   */
-  public function getPostsPublished(Paginator $perPage, $sanitize)
-  {
-
-    $entries = [];
-
-    $this->linkPosts = $perPage;
-
-    $stmt = $this->dbc->dbQuery("SELECT ID FROM tbl_posts WHERE post_status = 'publish' AND post_type = 'blog'");
-
-    $this->linkPosts->set_total($stmt->rowCount());
-
-    $sql = "SELECT p.ID, p.media_id, p.post_author, 
-            p.post_date AS created_at, 
-            p.post_modified AS modified_at, 
-            p.post_title, p.post_slug, p.post_content, p.post_summary,
-            p.post_keyword, p.post_type, p.post_status, p.post_sticky, 
-            u.user_login, u.user_fullname,
-            m.media_filename, m.media_caption
-  			FROM tbl_posts AS p
-  			INNER JOIN tbl_users AS u ON p.post_author = u.ID
-        INNER JOIN tbl_media AS m ON p.media_id = m.ID
-  			WHERE p.post_type = 'blog' AND p.post_status = 'publish'
-  			ORDER BY p.post_date DESC " . $this->linkPosts->get_limit($sanitize);
-
-    $this->setSQL($sql);
-
-    $entries = $this->findAll([]);
-
-    $this->pagination = $this->linkPosts->page_links($sanitize);
-
-    return (empty($entries)) ?: ['postsPublished' => $entries, 'paginationLink' => $this->pagination];
-  }
-
-  /**
    * getRandomHeadlinesPosts
    * 
    * retrieving random headlines 
@@ -266,7 +270,7 @@ class PostProviderModel extends Dao
 
     $this->setSQL($sql);
 
-    $headlines = $this->findAll();
+    $headlines = $this->findAll([]);
 
     return (empty($headlines)) ?: $headlines;
   }
@@ -309,20 +313,20 @@ class PostProviderModel extends Dao
   {
 
     $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
-          p.post_title, p.post_slug, p.post_content, 
-          m.media_filename, m.media_caption, u.user_login, u.user_fullname
+                   p.post_title, p.post_slug, p.post_content, 
+                   m.media_filename, m.media_caption, u.user_login, u.user_fullname
           FROM tbl_posts AS p
-          INNER JOIN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 5) AS p2 ON p.ID = p2.ID
+          INNER JOIN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 3) AS p2 ON p.ID = p2.ID
           INNER JOIN tbl_users AS u ON p.post_author = u.ID
           INNER JOIN tbl_media AS m ON p.media_id = m.ID
           WHERE p.post_type = 'blog'
           AND p.post_status = 'publish'
           AND m.media_target = 'blog' 
-          LIMIT :position, :limit                                                                                                                                                                                       ";
+          LIMIT :position, :end                                                                                                                                                                                       ";
 
     $this->setSQL($sql);
 
-    $data = array(':position' => $start, ':limit' => $end);
+    $data = array(':position' => $start, ':end' => $end);
 
     $randomPosts = $this->findAll($data);
 
