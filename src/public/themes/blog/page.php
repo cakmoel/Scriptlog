@@ -62,7 +62,7 @@ $total_comment = (total_comment($page_id) > 0) ? $total_comment : 0;
                         </div>
 
                         <?php
-                        if ($comment_status !== 'closed') :
+                          if ($comment_status !== 'closed') :
                         ?>
 
                             <div class="post-comments">
@@ -71,7 +71,7 @@ $total_comment = (total_comment($page_id) > 0) ? $total_comment : 0;
                                 </header>
 
                                 <?php
-                                foreach (comments_by_post($page_id) as $comment) :
+                                  foreach (comments_by_post($page_id) as $comment) :
 
                                     $comment_id = isset($comment['ID']) ? intval((int)$comment['ID']) : 0;
                                     $comment_author_name = isset($comment['comment_author_name']) ? htmlout($comment['comment_author_name']) : "";
@@ -92,7 +92,7 @@ $total_comment = (total_comment($page_id) > 0) ? $total_comment : 0;
                                         </div>
                                     </div>
                                 <?php
-                                endforeach;
+                                  endforeach;
                                 ?>
 
                             </div>
@@ -100,7 +100,7 @@ $total_comment = (total_comment($page_id) > 0) ? $total_comment : 0;
                             <div class="comment-form-wrap pt-5">
                                 <h3 class="mb-5">Leave a comment</h3>
 
-                                <form role="form" method="post" action="<?= app_url() . DS . basename('comments-post.php'); ?>" id="commentForm" class="p-5 bg-light">
+                                <form role="form" method="post" action="<?= retrieve_site_url() . DS . basename('comments-post.php'); ?>" id="commentForm" class="p-5 bg-light">
 
                                     <div class="form-group">
                                         <label for="comment">Type your comment*</label>
@@ -130,7 +130,7 @@ $total_comment = (total_comment($page_id) > 0) ? $total_comment : 0;
                             </div>
 
                         <?php
-                        endif;
+                          endif;
                         ?>
 
                     </div>
@@ -139,7 +139,7 @@ $total_comment = (total_comment($page_id) > 0) ? $total_comment : 0;
         </main>
 
         <?php
-        include __DIR__ . '/sidebar.php';
+          include __DIR__ . '/sidebar.php';
         ?>
 
     </div>
