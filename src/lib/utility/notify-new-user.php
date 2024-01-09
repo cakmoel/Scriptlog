@@ -7,20 +7,19 @@
  * @param string $recipient
  * @param string $subject
  * @param string $content
- * @return boolean
  * 
  */
 function notify_new_user($recipient, $user_pass)
 {
   
-  $site_info = app_info();
-  $app_url = $site_info['app_url'];
-  $site_name = $site_info['site_name'];
-  $activation_key = user_activation_key($recipient.get_ip_address());
-  $sender = $site_info['email_address'];
-  $sanitize_sender = sanitize_email($sender);
+  $site_info = function_exists('app_info') ? app_info() : "";
+  $app_url = isset($site_info['app_url']) ? $site_info['app_url'] : "";
+  $site_name = isset($site_info['site_name']) ? $site_info['site_name'] : "";
+  $activation_key = function_exists('') ? user_activation_key($recipient.get_ip_address()) : "";
+  $sender = isset($site_info['email_address']) ? $site_info['email_address'] : "";
+  $sanitize_sender = function_exists('sanitize_email') ? sanitize_email($sender) : "";
   
-  $postman = new Mailer();
+  $mailer = class_exists('Mailer') ? new Mailer() : "";
 
   $subject = "Join for The Best Team in Town!";
   $content = "<html><body>
@@ -48,13 +47,9 @@ function notify_new_user($recipient, $user_pass)
    
     if (filter_var($recipient, FILTER_SANITIZE_EMAIL)) {
         
-        if (filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+        if ((filter_var($recipient, FILTER_VALIDATE_EMAIL)) && (false === $mailer->send($recipient, $subject, $content, $email_headers))) {
 
-            if (false === $postman->send($recipient, $subject, $content, $email_headers)) {
-
-                scriptlog_error("E-mail notification fail to sent", E_USER_ERROR);
-
-            }
+            scriptlog_error("E-mail notification fail to sent", E_USER_ERROR);
             
         }
         
