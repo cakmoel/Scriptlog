@@ -65,7 +65,7 @@ function generate_form_token($form, $length)
  * verifying token from form
  *
  * @param string $form
- * @return void
+ * @return bool
  * 
  */
 function verify_form_token($form, $token)
