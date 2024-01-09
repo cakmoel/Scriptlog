@@ -1,5 +1,5 @@
 <?php 
-require_once dirname(__FILE__) . '/functions.php';
+include_once dirname(__FILE__) . '/functions.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -7,7 +7,11 @@ require_once dirname(__FILE__) . '/functions.php';
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<?= function_exists('theme_meta') ? theme_meta()['site_meta_tags'] : ""; ?>
+<?= function_exists('theme_meta') ? theme_meta()['site_meta_tags'] . PHP_EOL : ""; ?>
+
+<?php 
+ if (function_exists('theme_dir')) :
+?>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/fontastic.css">
@@ -20,7 +24,11 @@ require_once dirname(__FILE__) . '/functions.php';
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css">
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/sina-nav.css">
 <link rel="shortcut icon" href="<?= theme_dir(); ?>assets/img/favicon.ico">
-<?= theme_meta()['site_schema']; ?>
+<?php 
+endif;
+?>
+
+<?= function_exists('theme_meta') ? theme_meta()['site_schema'] . PHP_EOL : ""; ?>
 <!-- Tweaks for older IEs--><!--[if lt IE 9]>
 <script src="<?= theme_dir(); ?>assets/js/html5shiv.min.js"></script>
 <script src="<?= theme_dir(); ?>assets/js/respond.min.js"></script><![endif]-->
