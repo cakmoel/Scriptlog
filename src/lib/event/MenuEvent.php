@@ -102,7 +102,6 @@ class MenuEvent
    * setMenuId
    *
    * @param int $menu_id
-   * @return int
    * 
    */
   public function setMenuId($menu_id)
@@ -114,7 +113,6 @@ class MenuEvent
    * setParentId
    *
    * @param int $parent_id
-   * @return int
    * 
    */
   public function setParentId($parent_id)
@@ -126,7 +124,6 @@ class MenuEvent
    * setMenuLabel
    *
    * @param string $menu_label
-   * @return int
    * 
    */
   public function setMenuLabel($menu_label)
@@ -138,7 +135,6 @@ class MenuEvent
    * setMenuLink
    *
    * @param string $menu_link
-   * @return string
    * 
    */
   public function setMenuLink($menu_link)
@@ -150,7 +146,6 @@ class MenuEvent
    * setMenuVisibility
    *
    * @param string $menu_visibility
-   * @return string
    * 
    */
   public function setMenuVisibility($menu_visibility)
@@ -173,7 +168,6 @@ class MenuEvent
    * setMenuStatus
    * 
    * @param string $menu_status
-   * @return string
    * 
    */
   public function setMenuStatus($menu_status)
