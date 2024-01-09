@@ -10,5 +10,5 @@
  */
 function check_file_length($filename)
 {
- return ((mb_strlen(basename($filename), "UTF-8") > 225) ? true : false);
+ return (mb_strlen(basename($filename), "UTF-8") > 225) ? true : false;
 }
