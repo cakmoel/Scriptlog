@@ -181,7 +181,6 @@ class PageEvent
    * setPageAuthor
    *
    * @param string $author
-   * @return string
    * 
    */
   public function setPageAuthor($author)
@@ -193,7 +192,6 @@ class PageEvent
    * setPostDate
    *
    * @param string $date_created
-   * @return string
    * 
    */
   public function setPostDate($date_created)
@@ -205,7 +203,7 @@ class PageEvent
    * setPostModified
    *
    * @param string $date_modified
-   * @return string
+   * 
    * 
    */
   public function setPostModified($date_modified)
@@ -217,7 +215,7 @@ class PageEvent
    * SetPageImage
    *
    * @param interger $post_image
-   * @return integer
+   * 
    */
   public function setPageImage($post_image)
   {
@@ -294,7 +292,6 @@ class PageEvent
    * Set post type
    *
    * @param string $post_type
-   * @return void
    * 
    */
   public function setPostType($post_type)
@@ -354,9 +351,6 @@ class PageEvent
   /**
    * addPage
    *
-   * insert new page record
-   * 
-   * @method public addPage()
    */
   public function addPage()
   {
@@ -464,6 +458,10 @@ class PageEvent
     }
   }
 
+  /**
+   * removePage
+   * 
+   */
   public function removePage()
   {
 
@@ -502,7 +500,7 @@ class PageEvent
    * select box post status
    * 
    * @param string $selected
-   * @return void
+   * @return string
    * 
    */
   public function postStatusDropDown($selected = "")
@@ -514,6 +512,7 @@ class PageEvent
    * commentStatusDropDown()
    *
    * @param string $selected
+   * @return string
    * 
    */
   public function commentStatusDropDown($selected = "")
