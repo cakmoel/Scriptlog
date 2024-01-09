@@ -59,9 +59,10 @@ function review_login_attempt($ip)
 }                                                    
 
 /**
- * safe_human_login()
+ * checking_login_request()
  *
- * checking form login security
+ * checking form login request whether 
+ * it is valid login requested or not
  * 
  * @category function
  * @author M.Noermoehammad
@@ -74,10 +75,10 @@ function review_login_attempt($ip)
  * @return void
  * 
  */
-function safe_human_login($ip, $loginId, $uniqueKey, array $values)
+function checking_login_request($ip, $loginId, $uniqueKey, array $values)
 {
 
-if (check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'scriptpot_email', 'captcha_login', 'remember', 'csrf', 'LogIn']) === false)  {
+if (function_exists('check_form_request') && check_form_request($values, ['login', 'user_pass', 'scriptpot_name', 'scriptpot_email', 'captcha_login', 'remember', 'csrf', 'LogIn']) === false)  {
 
    header(APP_PROTOCOL.' 413 Payload Too Large', true, 413);
    header('Status: 413 Payload Too Large');
@@ -143,7 +144,7 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
    $captcha_verified = true;
       
    // validate form
-   safe_human_login($ip, $loginId, $uniqueKey, $values);
+   checking_login_request($ip, $loginId, $uniqueKey, $values);
    $valid = !empty($csrf) && verify_form_token('login_form', $csrf);
       
    if (!$valid) {
@@ -159,10 +160,10 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
        
    }
       
-   $failed_login_attempt = get_login_attempt($ip)['failed_login_attempt'];
-   $data = get_user_signin($login);
-   $datetime = (! empty($data['user_locked_until']) ? strtotime($data['user_locked_until']) : null);
-   $signin = (! empty($data['user_signin_count']) ? $data['user_signin_count'] : 0);
+   $failed_login_attempt = function_exists('get_login_attempt') ? get_login_attempt($ip)['failed_login_attempt'] : '';
+   $data = function_exists('get_user_signin') ? get_user_signin($login) : '';
+   $datetime = (!empty($data['user_locked_until']) ? strtotime($data['user_locked_until']) : null);
+   $signin = (!empty($data['user_signin_count']) ? $data['user_signin_count'] : 0);
    
  if ((! empty($values)) && ($captcha_verified === true)) {
        
