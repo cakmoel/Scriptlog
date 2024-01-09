@@ -299,19 +299,37 @@ public static function frontPostsByArchive(array $values, ArchivesProviderModel 
 public static function frontPostsByTopic($topicId, TopicProviderModel $topicProviderModel)
 {
  self::$topicProviderModel = $topicProviderModel;
- return self::$topicProviderModel->getPostsPublishedByTopic($topicId, self::frontSanitizer(), self::frontPaginator(app_reading_setting()['post_per_page'], 'p'));
+
+ $entries = self::$topicProviderModel->getPostsPublishedByTopic($topicId, self::frontSanitizer(), self::frontPaginator(app_reading_setting()['post_per_page'], 'p'))['entries'];
+ $pagination = self::$topicProviderModel->getPostsPublishedByTopic($topicId, self::frontSanitizer(), self::frontPaginator(app_reading_setting()['post_per_page'], 'p'))['paginationLink']; 
+ return array('entries' => $entries, 'pagination' => $pagination);
 }
 
 /**
- * frontPostsPublished
+ * frontBlogPosts
  *
  * @param PostProviderModel $postProviderModel
  * @return mixed
+ * 
  */
-public static function frontPostsPublished(PostProviderModel $postProviderModel)
+public static function frontBlogPosts(PostProviderModel $postProviderModel) 
 {
  self::$postProviderModel = $postProviderModel;
- return self::$postProviderModel->getPostsPublished(self::frontPaginator(app_reading_setting()['post_per_page'], 'p'), self::frontSanitizer());
+ return self::$postProviderModel->getAllBlogPosts(self::frontSanitizer(), self::frontPaginator(app_reading_setting()['post_per_page'], 'p'));
+}
+
+/**
+ * frontPostsByTag
+ *
+ * @param string $tag
+ * @param TagProviderModel $tagProviderModel
+ * @return mixed
+ * 
+ */
+public static function frontPostsByTag($tag, TagProviderModel $tagProviderModel)
+{
+  self::$tagProviderModel = $tagProviderModel;
+  return self::$tagProviderModel->getPostsPublishedByTag($tag, self::frontSanitizer(), self::frontPaginator(app_reading_setting()['post_per_page'], 'p'));
 }
 
 /**
