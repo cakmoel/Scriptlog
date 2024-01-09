@@ -41,18 +41,19 @@ $this->linkComments->set_total($stmt->rowCount());
 
 $sql = "SELECT  comment_post_id, comment_author_name, comment_author_ip, comment_author_email, 
                 comment_content, comment_status, comment_date
-        FROM tbl_comments WHERE comment_status = 'approved' AND comment_post_id = :post_id 
+        FROM tbl_comments 
+        WHERE comment_status = 'approved' AND comment_post_id = :post_id 
         ORDER BY ID DESC ".$this->linkComments->get_limit($sanitize);
 
 $idsanitized = $this->filteringId($sanitize, $postId, 'sql');
 
 $this->setSQL($sql);
 
-$commentsApproved = $this->findAll(['post_id' => $idsanitized]);
+$commentsApproved = $this->findAll([':post_id' => $idsanitized]);
 
 $this->pagination = $this->linkComments->page_links($sanitize);
 
-return ( empty($commentsApproved) ) ?: ['commentsApproved' => $commentsApproved, 'paginationLink' => $this->pagination];
+return (is_iterable($commentsApproved)) ?  ['commentsApproved' => $commentsApproved, 'paginationLink' => $this->pagination] : "";
 
 }
 
