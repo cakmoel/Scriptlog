@@ -35,7 +35,7 @@ class ArchivesProviderModel extends Dao
                    MONTH(tbl_posts.post_date) AS month_archive,
                    COUNT(*) AS total_archive
             FROM tbl_posts 
-            GROUP BY year_archive, month_archive 
+            GROUP BY year_archive, month_archive
             ORDER BY year_archive DESC, month_archive";
 
     $this->setSQL($sql);
@@ -50,7 +50,14 @@ class ArchivesProviderModel extends Dao
    * 
    * @param object $perPage
    * @param object $sanitize
-   * @param mixed $values
+   * @param array $values
+   * @see https://learnsql.com/cookbook/how-to-get-the-year-and-the-month-from-a-date-in-mysql/
+   * @see https://stackoverflow.com/questions/21451199/get-records-in-database-by-year-and-month
+   * @see https://stackoverflow.com/questions/9104704/select-mysql-based-only-on-month-and-year
+   * @see https://stackoverflow.com/questions/26106362/fetch-records-from-specific-month-and-year-in-php-and-mysql
+   * @see https://www.geeksforgeeks.org/php-date-format-when-inserting-into-datetime-in-mysql/
+   * @see https://stackoverflow.com/questions/1440318/comparing-dates-in-php-and-mysql
+   * @return mixed
    * 
    */
   public function getPostsByArchive(Paginator $perPage, Sanitize $sanitize, $values)
@@ -64,7 +71,7 @@ class ArchivesProviderModel extends Dao
 
     $this->linkArchives->set_total($this->totalPostsByArchives([$month, $year]));
 
-    $sql = "SELECT p.ID, p.media_id, p.post_author, 
+   $sql = "SELECT p.ID, p.media_id, p.post_author, 
             p.post_date AS created_at, 
             p.post_modified AS modified_at, 
             p.post_title, p.post_slug, p.post_content, 
@@ -76,8 +83,8 @@ class ArchivesProviderModel extends Dao
             INNER JOIN tbl_media AS m ON p.media_id = m.ID
             WHERE MONTH(p.post_date) = '$month' AND YEAR(p.post_date) = '$year'
             AND p.post_type = 'blog' AND p.post_status = 'publish' 
-            ORDER BY DATE(p.post_date) DESC " . $this->linkArchives->get_limit($sanitize);
-    
+            ORDER BY DATE(p.post_date) DESC " . $this->linkArchives->get_limit($sanitize); 
+
     $this->setSQL($sql);
 
     $archivesPublished = $this->findAll([]);
@@ -97,4 +104,5 @@ class ArchivesProviderModel extends Dao
     $this->setSQL($sql);
     return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
   }
+
 }
