@@ -16,7 +16,7 @@ function get_ip_address()
 
   if (true === detect_proxy_by_headers()) {
 
-    return zend_ip_address(); 
+    return request_ip_address();
 
   } else {
 
