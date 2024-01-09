@@ -542,6 +542,8 @@ class PostEvent
   public function removePost()
   {
 
+    (version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
+    
     $media_data = [];
 
     $this->validator->sanitize($this->postId, 'int');
@@ -563,9 +565,9 @@ class PostEvent
       if (is_readable(__DIR__ . '/../../' . APP_IMAGE . $media_filename)) {
 
         ($media_filename !== 'nophoto.jpg') ? unlink(__DIR__ . '/../../' . APP_IMAGE . $media_filename) : "";
-        is_readable(__DIR__ . '/../../'.APP_IMAGE_LARGE . 'large_' . $media_filename) ? unlink(__DIR__ . '/../../' . APP_IMAGE_LARGE . 'large_' . $media_filename) : "";
-        is_readable(__DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_'. $media_filename) ? unlink(__DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_' . $media_filename) : "";
-        is_readable(__DIR__ . '/../../' . APP_IMAGE_SMALL . 'small_' . $media_filename) ? unlink(__DIR__ . '/../../' . APP_IMAGE_SMALL . 'small_' . $media_filename) : "";
+        unlink(__DIR__ . '/../../' . APP_IMAGE_LARGE . 'large_' . $media_filename);
+        unlink(__DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_' . $media_filename);
+        unlink(__DIR__ . '/../../' . APP_IMAGE_SMALL . 'small_' . $media_filename);
 
         (method_exists($medialib, 'deleteMedia')) ? $medialib->deleteMedia((int)$media_id, $this->sanitizer) : "";
 
