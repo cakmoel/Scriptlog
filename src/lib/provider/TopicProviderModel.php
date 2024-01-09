@@ -37,6 +37,7 @@ public function getActiveTopicsOnSidebar()
              tbl_topics t, 
              tbl_posts p, tbl_post_topic pt  
          WHERE t.ID = pt.topic_id AND p.ID = pt.post_id
+         AND t.topic_status = 'Y'
          GROUP BY t.ID, t.topic_title";
 
  $this->setSQL($sql);
@@ -53,21 +54,20 @@ public function getActiveTopicsOnSidebar()
  * retrieves topic record by it slug record
  * 
  * @param string $slug
- * @param object $sanitize
  * @param PDO::FETCH_ASSOC|PDO::FETCH_OBJECT $fetchMode
- * @return array
+ * @return mixed
  * 
  */
-public function getTopicBySlug($slug, $sanitize, $fetchMode = null)
+public function getTopicBySlug($slug, $fetchMode = null)
 {
 
-$sql = "SELECT ID, topic_title FROM tbl_topics WHERE topic_slug = :topic_slug AND topic_status = 'Y'";
+$sql = "SELECT ID, topic_title, topic_slug, topic_status FROM tbl_topics WHERE topic_slug = :topic_slug AND topic_status = 'Y'";
 
-$slug_sanitized = $this->filteringId($sanitize, $slug, 'xss');
+$slug_sanitized = Sanitize::severeSanitizer($slug);
 
 $this->setSQL($sql);
 
-$topicBySlug = (is_null($fetchMode)) ? $this->findRow([':topic_slug' => $slug_sanitized]) : $this->findRow([':topic_slug' => $slug_sanitized], $fetchMode);
+$topicBySlug = is_null($fetchMode) ? $this->findRow([':topic_slug' => $slug_sanitized]) : $this->findRow([':topic_slug' => $slug_sanitized], $fetchMode);
 
 return (empty($topicBySlug)) ?: $topicBySlug;
 
@@ -81,11 +81,11 @@ return (empty($topicBySlug)) ?: $topicBySlug;
  * @param PDO::FETCH_ASSOC|PDO::FETCH_OBJECT $fetchMode
  * @return mixed
  */
-public function getTopicById($id, $sanitize, $fetchMode = null)
+public function getTopicById($id, $fetchMode = null)
 {
-    $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE ID = :topic_id AND topic_status = 'Y'";
+    $sql = "SELECT ID, topic_title, topic_slug, topic_status FROM tbl_topics WHERE ID = :topic_id AND topic_status = 'Y'";
     
-    $idsanitized = $this->filteringId($sanitize, $id, 'sql');
+    $idsanitized = Sanitize::severeSanitizer($id);
 
     $this->setSQL($sql);
 
@@ -156,23 +156,23 @@ $this->linkPosts = $perPage;
 // get number records
 $count_topic = "SELECT tbl_posts.ID 
                 FROM tbl_posts, tbl_post_topic 
-                WHERE tbl_posts.ID = tbl_post_topic.post_id = tbl_post_topic.topic_id = :topicId";
+                WHERE tbl_posts.ID = tbl_post_topic.post_id AND tbl_post_topic.topic_id = :topicId";
 
 $this->setSQL($count_topic);
 
 $this->linkPosts->set_total($this->checkCountValue([':topicId' => $topicId]));
 
 $sql = "SELECT tbl_posts.ID, tbl_posts.media_id, tbl_posts.post_author, 
-        DATE_FORMAT(tbl_posts.post_date, '%e %b %Y at %H:%i') AS created_at, 
-        DATE_FORMAT(tbl_posts.post_modified, '%e %b %Y at %H:%i') AS modified_at, 
-               tbl_posts.post_title, tbl_posts.post_slug, tbl_posts.post_content, tbl_posts.post_summary, 
-               tbl_posts.post_keyword, tbl_posts.post_tags, tbl_posts.post_status, tbl_posts.post_sticky, 
-               tbl_posts.post_type, tbl_posts.comment_status, tbl_users.user_fullname, 
-               tbl_users.user_login, tbl_users.user_level,
-               tbl_media.media_filename, tbl_media.media_caption
+        tbl_posts.post_date AS created_at, 
+        tbl_posts.post_modified AS modified_at, 
+        tbl_posts.post_title, tbl_posts.post_slug, tbl_posts.post_content, tbl_posts.post_summary, 
+        tbl_posts.post_keyword, tbl_posts.post_tags, tbl_posts.post_status, tbl_posts.post_sticky, 
+        tbl_posts.post_type, tbl_posts.comment_status, tbl_users.user_fullname, 
+        tbl_users.user_login, tbl_users.user_level,
+        tbl_media.media_filename, tbl_media.media_caption
     FROM tbl_posts, tbl_post_topic, tbl_users, tbl_media
     WHERE tbl_posts.ID = tbl_post_topic.post_id 
-    AND tbl_post_topic.topic_id = :topic_id
+    AND tbl_post_topic.topic_id = :topicId
     AND tbl_posts.post_author = tbl_users.ID
     AND tbl_posts.post_status = 'publish' 
     AND tbl_posts.post_type = 'blog'
@@ -182,11 +182,11 @@ $sql = "SELECT tbl_posts.ID, tbl_posts.media_id, tbl_posts.post_author,
 
 $this->setSQL($sql);
 
-$entries = $this->findAll([':topic_id' => $topicId]);
+$entries = $this->findAll([':topicId' => $topicId]);
 
 $this->pagination = $this->linkPosts->page_links($sanitize);
 
-return (empty($entries)) ?: ['postsByTopic' => $entries, 'paginationLink' => $this->pagination];
+return ['entries' => $entries, 'paginationLink' => $this->pagination];
 
 }
 
