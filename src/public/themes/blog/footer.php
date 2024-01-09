@@ -80,11 +80,11 @@
 <script src="<?= theme_dir(); ?>assets/js/jquery.pause.min.js"></script>
 <script src="<?= theme_dir(); ?>assets/js/jquery.easing.min.js"></script>
 <script src="<?= theme_dir(); ?>assets/js/comment.js"></script>
-<script type="text/javascript" src="<?= theme_dir(); ?>assets/js/validator.min.js"></script>
+<script src="<?= theme_dir(); ?>assets/js/validator.min.js"></script>
 <script src="<?= theme_dir(); ?>assets/js/wow.min.js"></script>
 <script src="<?= theme_dir(); ?>assets/js/sina-nav.js"></script>
 
- <!-- For All Plug-in Activation & Others -->
+<!-- For All Plug-in Activation & Others -->
  <script type="text/javascript">
         $(document).ready(function() {
             // WOW animation initialize
