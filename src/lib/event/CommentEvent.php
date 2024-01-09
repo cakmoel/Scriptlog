@@ -142,34 +142,16 @@ class CommentEvent
     return $this->commentDao->findComment($id, $this->sanitizer);
   }
   
-  public function addComment()
-  {
-   $this->validator->sanitize($this->post_id, 'int');
-   $this->validator->sanitize($this->author_name, 'string');
-   
-   return $this->commentDao->addComment([
-       'comment_post_id' => $this->post_id,
-       'comment_author_name' => $this->author_name,
-       'comment_author_ip' => $this->author_ip,
-       'comment_author_email' => $this->author_email,
-       'comment_content' => $this->content,
-       'comment_date' => date_for_database($this->created_at)
-   ]);
-   
-  }
-  
   public function modifyComment()
   {
     $this->validator->sanitize($this->comment_id, 'int');
     $this->validator->sanitize($this->author_name, 'string');
-    
-    $idsanitized = $this->sanitizer->sanitasi($this->comment_id, 'sql');
-    
+     
     return $this->commentDao->updateComment($this->sanitizer, [
         'comment_author_name' => $this->author_name,
         'comment_content' => $this->content,
         'comment_status' => $this->status
-    ], $idsanitized);
+    ], $this->comment_id);
     
   }
   
