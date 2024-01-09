@@ -29,6 +29,10 @@ if ($type === 'login') {
 
     $form['doLogin'] = build_query($base, $query_data);
 
+} elseif ($type == 'signup') {
+
+    $form['doSignup'] = build_query($base, $query_data);
+    
 } else {
 
     $form['ordinary'] = isset($_SERVER["PHP_SELF"]) ? purify_dirty_html($_SERVER["PHP_SELF"]) : "";
