@@ -315,7 +315,7 @@ class MediaEvent
  */
  public function grabAllMedia($orderBy = 'ID', $user_level = null)
  {
-   $orderBySanitized = sanitize_sql_orderby($orderBy);
+   $orderBySanitized = function_exists('sanitize_sql_orderby') ? sanitize_sql_orderby($orderBy) : "";
    return $this->mediaDao->findAllMedia($orderBySanitized, $user_level);
  }
 
@@ -324,6 +324,7 @@ class MediaEvent
  * retrieve a single record of media
  * 
  * @param integer $id
+ * @return mixed
  * 
  */
  public function grabMedia($id)
@@ -483,8 +484,6 @@ public function modifyMediaDownload()
  * Removes media record
  * if there is a file inside media directory, delete it
  * 
- * @return object
- * 
  */
  public function removeMedia()
  {
@@ -574,9 +573,9 @@ public function modifyMediaDownload()
 
       }
 
-      return $this->mediaDao->deleteMedia($this->mediaId, $this->sanitizer);
-
    }
+
+  return $this->mediaDao->deleteMedia($this->mediaId, $this->sanitizer);
 
  }
 
