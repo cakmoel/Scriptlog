@@ -156,17 +156,14 @@ private $selected;
  * TotalCommentRecords
  * 
  * @param array $data
- * @return integer
+ * @return numeric|int
  * 
  */
  public function totalCommentRecords($data = null)
  {
    $sql = "SELECT ID FROM tbl_comments";
-
    $this->setSQL($sql);
-
-   return $this->checkCountValue($data);
-
+   return (empty($data)) ?  $this->checkCountValue([]) : $this->checkCountValue($data);
  }
  
 }
