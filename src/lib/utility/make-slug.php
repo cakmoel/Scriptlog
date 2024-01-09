@@ -30,7 +30,9 @@ function make_slug($slug)
     
     $slug = preg_replace('/[^-a-z0-9_]+/', '', $slug);
 
-    if (empty($slug)) return 'n-a';
+    if (empty($slug)) {
+        return 'n-a';
+    } 
     
     return $slug;
 
