@@ -45,7 +45,7 @@ function is_email_exists($userEmail)
  * @author Nirmala Khanza <nirmala.adiba.khanza@email.com>
  * @license MIT
  * @version 1.0
- * @return bool
+ * @return int|num
  * 
  */
 function signup_id()
@@ -108,7 +108,7 @@ function checking_signup_request($ip, $signupId, $uniqueKey, array $values)
  * @param string $uniqueKey
  * @param mixed $errors
  * @param array $values
- * @return void
+ * @return mixed
  * 
  */
 function processing_signup($ip, $signupId, $uniqueKey, $errors, array $values)
@@ -204,7 +204,7 @@ function processing_signup($ip, $signupId, $uniqueKey, $errors, array $values)
   } else {
 
     $checkError = false;
-    $errors['errorMessage'] = "Please checked terms of use !";
+    $errors['errorMessage'] = "Please checked terms of use!";
   }
 
   return array($errors, $signup_success);
