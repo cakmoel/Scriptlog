@@ -17,7 +17,7 @@ if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
     $grab_month = (isset($archive_requested[4]) && isset($archive_requested[5]))  ? $archive_requested[4].$archive_requested[5] : $archive_requested[4] . "";
     $values = ['month_archive' => $grab_month, 'year_archive' => $grab_year];
 
-    $archives = posts_by_archive($values);
+    $archives = function_exists('posts_by_archive') ? posts_by_archive($values) : "";
     $entries = (isset($archives)) ? $archives['archivesPublished'] : "";
 }
 
@@ -37,6 +37,7 @@ if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
 
                         $entry_id = isset($entry['ID']) ? (int)$entry['ID'] : "";
                         $entry_title = isset($entry['post_title']) ? htmlout($entry['post_title']) : "";
+                        $entry_content = isset($entry['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($entry['post_content']))) : "";
                         $entry_img = ((isset($entry['media_filename'])) && ($entry['media_filename'] !== '') ? htmlout($entry['media_filename']) : "");
                         $entry_img_caption = isset($entry['media_caption']) ? htmlout($entry['media_caption']) : "";
                         $entry_created = isset($entry['modified_at']) ? htmlout(make_date($entry['modified_at'])) : htmlout(make_date($entry['created_at']));
@@ -54,7 +55,7 @@ if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
                                 </div><a href="<?= isset($entry_id) ? permalinks($entry_id)['post'] : "javascript:void(0)"; ?>" title="<?= isset($entry_title) ? $entry_title : ""; ?>">
                                     <h3 class="h4"> <?= isset($entry_title) ? $entry_title : ""; ?> </h3>
                                 </a>
-                                <p class="text-muted"><?= isset($entry['post_content']) ? paragraph_l2br($entry['post_content']) : ""; ?></p>
+                                <p class="text-muted"><?= isset($entry_content) ? $entry_content : ""; ?></p>
                                 <footer class="post-footer d-flex align-items-center">
                                     <a href="javascript:void(0)" class="author d-flex align-items-center flex-wrap">
                                         <div class="title"><span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= isset($entry_author) ? $entry_author : ""; ?></span></div>
@@ -81,7 +82,7 @@ if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
         </main>
 
         <?php
-        include __DIR__ . '/sidebar.php';
+        include dirname(__FILE__) . '/sidebar.php';
         ?>
 
     </div>
