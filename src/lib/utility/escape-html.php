@@ -61,11 +61,11 @@ function base_escape($input, $type, $escaper)
 
  if ($type === 'html_attributes') {
 
-  return (is_object($escaper) ? $escaper->escapeHtmlAttr($input) : "");
+  return is_object($escaper) ? $escaper->escapeHtmlAttr($input) : "";
 
  } elseif ($type === 'html') {
 
-  return (is_object($escaper) ? $escaper->escapeHtml($input) : "") ;
+  return is_object($escaper) ? $escaper->escapeHtml($input) : "";
 
  }
 
@@ -83,15 +83,15 @@ function various_escape($input, $type, $escaper)
 
   if ($type === 'js') {
     
-    return (is_object($escaper) ? $escaper->escapeJs($input) : "");
+    return is_object($escaper) ? $escaper->escapeJs($input) : "";
 
   } elseif ($type === 'css') {
 
-    return (is_object($escaper) ? $escaper->escapeCss($input) : "");
+    return is_object($escaper) ? $escaper->escapeCss($input) : "";
   
   } elseif ($type === 'url') {
 
-    return (is_object($escaper) ? $escaper->escapeUrl($input) : "");
+    return is_object($escaper) ? $escaper->escapeUrl($input) : "";
 
   } 
 
