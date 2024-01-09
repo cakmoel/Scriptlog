@@ -44,7 +44,7 @@ public function updateConfig($sanitize, $bind, $configId)
       'setting_name' => $bind['setting_name'],
       'setting_value' => $bind['setting_value']
       
-    ], " ID = ".(int)$cleanId);
+    ], " ID = {$cleanId}");
   
   }
  
