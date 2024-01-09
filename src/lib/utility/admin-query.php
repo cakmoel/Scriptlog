@@ -28,6 +28,7 @@ return array(
     'option-permalink'=>'option-permalink.php', 
     'option-reading'=>'option-reading.php', 
     'option-timezone' => 'option-timezone.php',
+    'option-memberships' => 'option-memberships.php',
     'plugins'=>'plugins.php', 
     'logout'=>'logout.php', 
     '403'=>'403.php', 
