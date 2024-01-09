@@ -4,7 +4,7 @@
             <div class="col-md-12 text-center">
                 <span class="display-1 d-block">404</span>
                 <div class="mb-4 lead">The page you are looking for was not found.</div>
-                <a href="<?= function_exists('app_url') ? app_url() : ""; ?>" class="btn btn-link">Back to Home</a>
+                <a href="<?= function_exists('retrieve_site_url') ? retrieve_site_url() : ""; ?>" class="btn btn-link">Back to Home</a>
             </div>
         </div>
     </div>
