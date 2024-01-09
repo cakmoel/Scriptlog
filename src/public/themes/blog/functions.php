@@ -161,7 +161,13 @@ function retrieves_topic_simple($id)
 
     while ($result = $stmt->fetch_array(MYSQLI_ASSOC)) {
 
-      $permalinks = ((function_exists('rewrite_status')) && (rewrite_status() === 'yes') ? permalinks($result['topic_slug'])['cat'] : permalinks($result['ID'])['cat']);
+      if (rewrite_status() === 'yes') {
+        $permalinks = permalinks($result['topic_slug'])['cat'];
+      } else {
+        $permalinks = permalinks($result['ID'])['cat'];
+
+      }
+      
       $categories[] = "<a href='" .$permalinks. "'>" . $result['topic_title'] . "</a>";
 
     }
@@ -347,41 +353,6 @@ function retrieve_blog_posts()
 }
 
 /**
- * retrieve_all_posts
- *
- * @return mixed
- * 
- */
-function retrieve_all_posts()
-{
-  $html = null;
-  $pages = class_exists('Paginator') ? new Paginator(app_reading_setting()['post_per_page'], 'p') : ""; 
-  $grabPostId  = db_simple_query("SELECT ID FROM tbl_posts");
-
-  $pages->set_total($grabPostId->num_rows);
-
-  $sql = "SELECT tbl_posts.ID, tbl_posts.post_date, tbl_posts.post_modified, tbl_posts.post_title, tbl_posts.post_content 
-          FROM tbl_posts ORDER BY tbl_posts>ID DESC " . $pages->get_limit(front_sanitizer());
-
-  $stmt = db_simple_query($sql);
-  
-  if ($stmt->num_rows > 0) {
-
-    while ($row = $stmt->fetch_array(MYSQLI_ASSOC)) {
-      
-      $stmt2 = db_prepared_query("SELECT topic_title, topic_slug FROM tbl_topics, tbl_");
-      $html .= '<div class="post col-xl-6">';
-      $html .= '<div class="post-details">';
-      $html .= '<div class="post-meta d-flex justify-content-between">';
-      $html .= '<div class="date meta-last">';
-      $html .= '</div>';
-    }
-     
-  }
-  
-}
-
-/**
  * retrieve_detail_post()
  *
  * @param int $id
@@ -410,17 +381,30 @@ function posts_by_archive(array $values)
 }
 
 /**
- * posts_by_tag()
- * 
- * Full-Text searching for posts based on tag requested
+ * posts_by_tag
  *
- * @param [type] $tag
+ * @param string $tag
  * @return mixed
  * 
  */
 function posts_by_tag($tag)
 {
-  $tags = class_exists('FrontHelper') ? FrontHelper::grabFrontTag($tag) : "";
+  $tags = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostsByTag($tag, initialize_tag()) : "";
+  return is_iterable($tags) ? $tags : array();
+}
+
+/**
+ * posts_by_tag()
+ * 
+ * Full-Text searching for posts based on tag requested
+ *
+ * @param string $tag
+ * @return mixed
+ * 
+ */
+function searching_by_tag($tag)
+{
+  $tags = class_exists('FrontHelper') ? FrontHelper::simpleSearchingTag($tag) : "";
   return is_iterable($tags) ? $tags : array();
 }
 
@@ -431,23 +415,14 @@ function posts_by_tag($tag)
  * @param string $rewrite
  * @return mixed
  */
-function posts_by_category($category, $rewrite = 'no')
+function posts_by_category($topicId)
 {
-  if ($rewrite !== 'no') {
-    
-    $topic = class_exists('FrontContentProvider') ? FrontContentProvider::frontTopicBySlug($category, initialize_topic()) : "";
-    $topicId = isset($topic['ID']) ? $topic['ID'] : "";
-    $posts = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostsByTopic($topicId, initialize_topic()) : "";
 
-  } else {
+  $entries = FrontContentProvider::frontPostsByTopic($topicId, initialize_topic())['entries'];
+  $pagination = FrontContentProvider::frontPostsByTopic($topicId, initialize_topic())['pagination'];
 
-    $topic = class_exists('FrontContentProvider') ? FrontContentProvider::frontTopicById($category, initialize_topic()) : "";
-    $topicId = isset($topic['ID']) ? $topic['ID'] : "";
-    $posts = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostsByTopic($topicId, initialize_topic()) : "";
+  return is_iterable($entries) ? array('entries' => $entries, 'pagination' => $pagination) : array();
 
-  }
-
-  return is_iterable($posts) ? $posts : array();
 }
 
 /**
@@ -549,6 +524,18 @@ function front_navigation($parent, $menu)
   }
 
   return $html;
+}
+
+/**
+ * retrieve_site_url
+ *
+ * @return mixed
+ * 
+ */
+function retrieve_site_url()
+{
+  $config_file = read_config(invoke_config());
+  return isset($config_file['app']['url']) ? $config_file['app']['url'] : "";
 }
 
 /**
