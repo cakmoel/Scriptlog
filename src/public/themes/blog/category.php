@@ -1,16 +1,31 @@
 <?php
 
-if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
+$topicProvider = class_exists('TopicProviderModel') ? new TopicProviderModel() : "";
 
-    $category = function_exists('request_path') ? request_path()->param1 : "";
-    $entries = function_exists('posts_by_category') ? posts_by_category($category, 'yes')['postsByTopic'] : "";
-    $entries_pagination = ($entries) ? posts_by_category($category, 'yes')['paginationLink'] : "";
-} else {
+if ($topicProvider instanceof TopicProviderModel) {
 
-    $category = class_exists('HandleRequest') ? HandleRequest::isQueryStringRequested()['value'] : "";
-    $entries = function_exists('posts_by_category') ? posts_by_category($category, 'no')['postsByTopic'] : "";
-    $entries_pagination = ($entries) ? posts_by_category($category, 'no')['paginationLink'] : "";
+    if (function_exists('rewrite_status') && rewrite_status() == 'yes' && function_exists('request_path') && request_path()->param1 !== '') {
+    
+        $slug = request_path()->param1;
+        $slug_sanitized = class_exists('Sanitize') ? Sanitize::severeSanitizer($slug) : ""; 
+
+        $topic = method_exists($topicProvider, 'getTopicBySlug') ? $topicProvider->getTopicBySlug($slug_sanitized) : "";
+        $topicID = isset($topic['ID']) ? (int)$topic['ID'] : "";
+        
+    } else {
+
+        $query_param = class_exists('HandleRequest') ? HandleRequest::isQueryStringRequested()['value'] : "";
+        $paramSanitized = Sanitize::severeSanitizer($query_param);
+        
+        $topic = $topicProvider->getTopicById($paramSanitized);
+        $topicID = isset($topic['ID']) ? (int)$topic['ID'] : "";
+        
+    }
+
 }
+
+$entries = function_exists('posts_by_category') ? posts_by_category($topicID)['entries'] : "";
+$pagination = function_exists('posts_by_category') ? posts_by_category($topicID) ['pagination'] : ""; 
 
 ?>
 
@@ -22,16 +37,16 @@ if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
                     <!-- post -->
                     <?php
 
-                    if (is_array($entries)) :
+                      if (is_array($entries)) :
                         foreach ($entries as $entry) :
                             $entry_id = isset($entry['ID']) ? (int)$entry['ID'] : "";
                             $entry_title = isset($entry['post_title']) ? htmlout($entry['post_title']) : "";
-                            $entry_content = isset($entry['post_content']) ? paragraph_l2br(htmlout($entry['post_content'])) : "";
+                            $entry_content = isset($entry['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($entry['post_content']))) : "";
                             $entry_img = ((isset($entry['media_filename'])) && ($entry['media_filename'] !== '') ? htmlout($entry['media_filename']) : "");
                             $entry_img_caption = isset($entry['media_caption']) ? htmlout($entry['media_caption']) : "";
                             $entry_created = isset($entry['modified_at']) ? htmlout(make_date($entry['modified_at'])) : htmlout(make_date($entry['created_at']));
                             $entry_author = (isset($entry['user_login']) || isset($entry['user_fullname']) ? htmlout($entry['user_login']) : htmlout($entry['user_fullname']));
-                            $total_comment = (total_comment($entry_id) > 0) ? total_comment($entry_id) : 0;
+                            $total_comment = (function_exists('total_comment') && total_comment($entry_id) > 0) ? total_comment($entry_id) : 0;
 
                     ?>
 
@@ -58,7 +73,7 @@ if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
 
                     <?php
                         endforeach;
-                    endif;
+                      endif;
                     ?>
 
                 </div>
@@ -67,7 +82,7 @@ if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
                 <nav aria-label="Page navigation example">
                     <ul class="pagination pagination-template d-flex justify-content-center">
                         <?php
-                        ($total_comment > 0) ? $entries_pagination : "";
+                        (isset($total_comment) && $total_comment > 0) ? $pagination : "";
                         ?>
                     </ul>
                 </nav>
@@ -75,7 +90,7 @@ if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
         </main>
 
         <?php
-          include __DIR__ . '/sidebar.php';
+          include dirname(__FILE__) . '/sidebar.php';
         ?>
 
     </div>
