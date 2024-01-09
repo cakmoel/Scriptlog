@@ -1,6 +1,6 @@
 <?php
 /**
- * checking_comment_author_email
+ * checking_author_email
  * 
  * @category function
  * @param string $email
@@ -28,7 +28,7 @@ function checking_author_email($email)
  */
 function checking_author_name($name)
 {
-   return (!preg_match("/^[a-zA-Z-' ]*$/", $name)) ? false : true;
+   return (!preg_match('/^[A-Z \'.-]{2,90}$/i', $name)) ? false : true;
 }
 
 /**
@@ -153,12 +153,12 @@ function processing_comment(array $values)
    $author_email = (isset($values['email']) && $values['email'] == $_POST['email'] ? prevent_injection($values['email']) : null);
    $comment_content = (isset($values['comment']) && $values['comment'] == $_POST['comment'] ? prevent_injection($values['comment']) : null);
    $csrf = (isset($values['csrf']) && $values['csrf'] == $_POST['csrf'] ? $values['csrf'] : "");
-   $comment_at = function_exists('date_for_database') ? date_for_database() : "";
+   $comment_at = date_for_database();
 
    checking_form_payload($values);
    checking_block_csrf($csrf);
 
-   $author_ip = function_exists('get_ip_address') ? get_ip_address() : "";
+   $author_ip = get_ip_address();
 
    list($errors) = checking_form_input($author_name, $author_email, $comment_content);
 
@@ -172,9 +172,13 @@ function processing_comment(array $values)
       'comment_date' => $comment_at
    ];
 
-   $commentProvider = class_exists('CommentProviderModel') ? new CommentProviderModel() : "";
-   (class_exists('FrontContentProvider')) ? FrontContentProvider::frontNewCommentByPost($bind, $commentProvider) : "";
+   $commentProvider = new CommentProviderModel();
+   
+   if ($commentProvider instanceof CommentProviderModel) {
 
+      FrontContentProvider::frontNewCommentByPost($bind, $commentProvider);
+   }
+   
    if (!empty($errors)) {
 
       $form_data['success'] = false;
