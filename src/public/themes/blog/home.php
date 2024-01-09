@@ -24,10 +24,10 @@ if (function_exists('featured_post')) :
       <div class="row">
         <div class="col-lg-7">
           <h1 class="h1"><?= isset($featured_hero_title) ? $featured_hero_title : ""; ?></h1>
-          <a href="<?= isset($featured_hero_id) ? permalinks($featured_hero_id)['post'] : "#"; ?>" class="hero-link">Discover More</a>
+          <a href="<?= isset($featured_hero_id) ? permalinks($featured_hero_id)['post'] : "javascript:void(0)"; ?>" class="hero-link">Discover More</a>
         </div>
 
-      </div><a href="<?= (empty($sticky_page)) ? "#" : ".intro"; ?>" class="continue link-scroll"><i class="fa fa-long-arrow-down" aria-hidden="true"></i> Scroll Down</a>
+      </div><a href="<?= (empty($sticky_page)) ? "javascript:void(0)" : ".intro"; ?>" class="continue link-scroll"><i class="fa fa-long-arrow-down" aria-hidden="true"></i> Scroll Down</a>
     </div>
   </section>
 
@@ -41,7 +41,7 @@ endif;
  if (function_exists('sticky_page')) :
    foreach (sticky_page() as $sticky) :
   $sticky_title = isset($sticky['post_title']) ? htmlout($sticky['post_title']) : "";
-  $sticky_content = isset($sticky['post_content']) ? paragraph_l2br(htmlout($sticky['post_content'])) : "";
+  $sticky_content = isset($sticky['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($sticky['post_content']))) : "";
    endforeach;
  endif;
 ?>
@@ -54,7 +54,7 @@ endif;
 
         <h2 class="h3"><?= isset($sticky_title) ? $sticky_title : ""; ?></h2>
         <p class="text-big">
-          <?= isset($sticky_content) ? html_entity_decode($sticky_content) : ""; ?>
+          <?= isset($sticky_content) ? $sticky_content : ""; ?>
         </p>
 
       </div>
@@ -80,7 +80,7 @@ endif;
         $random_post_img = ((isset($random_post['media_filename'])) && ($random_post['media_filename'] !== "") ? htmlout($random_post['media_filename']) : "");
         $random_post_author = (isset($random_post['user_login']) || isset($random_post['user_fullname']) ? htmlout($random_post['user_login']) : htmlout($random_post['user_fullname']));
         $random_post_title = isset($random_post['post_title']) ? htmlout($random_post['post_title']) : "";
-        $random_post_content = isset($random_post['post_content']) ? html_entity_decode(paragraph_l2br(htmlout($random_post['post_content']))) : "";
+        $random_post_content = isset($random_post['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($random_post['post_content']))) : "";
         $random_post_created = isset($random_post['post_modified'])  ? htmlout(make_date($random_post['post_modified'])) : htmlout(make_date($random_post['post_date']));
         $total_comment = (total_comment($random_post_id) > 0) ? total_comment($random_post_id) : 0;
 
@@ -99,14 +99,14 @@ endif;
                       <?= isset($random_post_id) ? retrieves_topic_simple($random_post_id) : ""; ?>
                      
                     </div>
-                    <a href="<?= isset($random_post_id) ? permalinks($random_post_id)['post'] : "#"; ?>" title="<?= isset($random_post_title) ? $random_post_title : ""; ?>">
+                    <a href="<?= isset($random_post_id) ? permalinks($random_post_id)['post'] : "javascript:void(0)"; ?>" title="<?= isset($random_post_title) ? $random_post_title : ""; ?>">
                       <h2 class="h4"><?= isset($random_post_title) ? $random_post_title : ""; ?></h2>
                     </a>
                   </header>
 
                   <p><?= isset($random_post_content) ? $random_post_content : ""; ?></p>
                   <footer class="post-footer d-flex align-items-center">
-                    <a href="#" class="author d-flex align-items-center flex-wrap">
+                    <a href="javascript:void(0)" class="author d-flex align-items-center flex-wrap">
                       <div class="title"><span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= isset($random_post_author) ? $random_post_author : ""; ?> </span></div>
                     </a>
                     <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i>
@@ -135,14 +135,14 @@ endif;
                     <div class="category">
                       <?= isset($random_post_id) ? retrieves_topic_prepared($random_post_id) : ""; ?>
                     </div>
-                    <a href="<?= isset($random_post_id) ? permalinks($random_post_id)['post'] : "#"; ?>">
+                    <a href="<?= isset($random_post_id) ? permalinks($random_post_id)['post'] : "javascript:void(0)"; ?>">
                       <h2 class="h4"><?= isset($random_post_title) ? $random_post_title : ""; ?></h2>
                     </a>
                   </header>
 
                   <p><?= isset($random_post_content) ? $random_post_content : ""; ?></p>
                   <footer class="post-footer d-flex align-items-center">
-                    <a href="#" class="author d-flex align-items-center flex-wrap">
+                    <a href="javascript:void(0)" class="author d-flex align-items-center flex-wrap">
                       <div class="title"><span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= $random_post_author; ?> </span></div>
                     </a>
                     <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i>
@@ -197,7 +197,8 @@ endif;
   <div class="container">
     <div class="row">
       <div class="col-md-7">
-        <h2 class="h2"><?= isset($featured_divider_title) ? $featured_divider_title : ""; ?> </h2><a href="<?= isset($featured_divider_id) ? permalinks($featured_divider_id)['post'] : ""; ?>" class="hero-link">View More</a>
+        <h2 class="h2"><?= isset($featured_divider_title) ? $featured_divider_title : ""; ?> </h2>
+        <a href="<?= isset($featured_divider_id) ? permalinks($featured_divider_id)['post'] : "javascript:void(0)"; ?>" class="hero-link">View More</a>
       </div>
     </div>
   </div>
@@ -222,7 +223,7 @@ endif;
 
           $latest_post_id = isset($latest_post['ID']) ? (int)$latest_post['ID'] : "";
           $latest_post_title = isset($latest_post['post_title']) ? htmlout($latest_post['post_title']) : "";
-          $latest_post_content = isset($latest_post['post_content']) ? html_entity_decode(paragraph_l2br(htmlout($latest_post['post_content']))) : "";
+          $latest_post_content = isset($latest_post['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($latest_post['post_content']))) : "";
           $latest_post_img = ((isset($latest_post['media_filename'])) && ($latest_post['media_filename'] !== "")  ? htmlout($latest_post['media_filename']) : "");
           $latest_img_caption = isset($latest_post['media_caption']) ? htmlout($latest_post['media_caption']) : "";
           $latest_post_created = isset($latest_post['modified_at']) ? htmlout(make_date($latest_post['modified_at'])) : htmlout(make_date($latest_post['created_at']));
@@ -230,14 +231,14 @@ endif;
       ?>
 
         <div class="post col-md-4">
-          <div class="post-thumbnail"><a href="<?= isset($latest_post_id) ? permalinks($latest_post_id)['post'] : "#"; ?>" title="<?= $latest_post_title; ?>">
+          <div class="post-thumbnail"><a href="<?= isset($latest_post_id) ? permalinks($latest_post_id)['post'] : "javascript:void(0)"; ?>" title="<?= $latest_post_title; ?>">
               <img src="<?= isset($latest_post_img) ? invoke_frontimg($latest_post_img) : "https://via.placeholder.com/640x450"; ?>" alt="<?= isset($latest_img_caption) ? $latest_img_caption : $latest_post_title; ?>" class="img-fluid"></a></div>
           <div class="post-details">
             <div class="post-meta d-flex justify-content-between">
               <div class="date"><?= $latest_post_created; ?></div>
               <div class="category"><?= retrieves_topic_simple($latest_post_id); ?></div>
             </div>
-            <a href="<?= isset($latest_post_id) ? permalinks($latest_post_id)['post'] : "#"; ?>" title="<?= $latest_post_title; ?>">
+            <a href="<?= isset($latest_post_id) ? permalinks($latest_post_id)['post'] : "javascript:void(0)"; ?>" title="<?= $latest_post_title; ?>">
               <h3 class="h4"><?= $latest_post_title; ?></h3>
             </a>
             <p class="text-muted"><?= isset($latest_post_content) ? $latest_post_content : ""; ?> </p>
@@ -284,9 +285,11 @@ endif;
     ?>
 
         <div class="mix col-lg-3 col-md-3 col-sm-6">
-          <div class="item"><a href="<?= isset($img_filename) ? invoke_webp_image($img_filename) : "https://via.placeholder.com/640x450"; ?>" data-fancybox="gallery" class="image"><img src="<?= isset($img_filename) ? invoke_webp_image($img_filename) : "https://via.placeholder.com/640x450"; ?>" alt="<?= isset($img_alt) ? $img_alt : ""; ?>" class="img-fluid">
+          <div class="item">
+            <a href="<?= isset($img_filename) ? invoke_webp_image($img_filename) : "https://via.placeholder.com/640x450"; ?>" data-fancybox="gallery" class="image"><img src="<?= isset($img_filename) ? invoke_webp_image($img_filename) : "https://via.placeholder.com/640x450"; ?>" alt="<?= isset($img_alt) ? $img_alt : ""; ?>" class="img-fluid">
               <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search" aria-hidden="true"></i></div>
-            </a></div>
+            </a>
+          </div>
         </div>
 
       <?php
