@@ -1,8 +1,3 @@
-<?php
-
-
-?>
-
 <div class="container">
 <div class="row">
     <main class="posts-listing col-lg-8">
@@ -19,7 +14,7 @@
     <?php
 
     echo "<pre>";
-    $requestPath = new RequestPath();
+    $requestPath = class_exists('RequestPath') ? new RequestPath() : "";
     echo "Request matched: {$requestPath->matched} <br>";
     echo "Request param1: {$requestPath->param1} <br>";
     echo "Request param2: {$requestPath->param2} <br>";
