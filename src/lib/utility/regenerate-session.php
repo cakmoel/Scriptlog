@@ -1,5 +1,4 @@
 <?php
-
 /**
  * regenerate_session()
  * 
@@ -18,9 +17,13 @@
 function regenerate_session()
 {
 
- if (isset($_SESSION['deleted_time']) && $_SESSION['deleted_time'] < time() - Authentication::COOKIE_EXPIRE) {
+ if (class_exists('Authentication')) {
+
+  if (isset($_SESSION['deleted_time']) && $_SESSION['deleted_time'] < time() - Authentication::COOKIE_EXPIRE) {
   
-   unset($_SESSION['user_login']);
+    unset($_SESSION['user_login']);
+ 
+  }
 
  }
  
@@ -32,7 +35,7 @@ function regenerate_session()
 
  unset($_SESSION['deleted_time']);
 
- $newid = (isset($oldid)) ?: session_id();
+ $newid = isset($oldid) ?: session_id();
 
  return $newid;
 
