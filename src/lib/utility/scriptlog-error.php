@@ -21,17 +21,13 @@ function scriptlog_error($error_message, $error_type = E_USER_NOTICE, $context =
 
     for ($i = 0; $i < $context; $i++) {
 
-      if (false === ($frame = next($stack))) { 
-          
-        if (isset($frame['function']) || isset($frame['file']) || isset($frame['line'])) {
+      if ((false === ($frame = next($stack))) || isset($frame['function']) || isset($frame['file']) || isset($frame['line'])) { 
           
         $error_message .= "<p>";
         $error_message .= " in: " . $frame['function'] . '() function called from: ' . $frame['file'] . ' on line ' . $frame['line'] .' '."\n ";
         $error_message .= '</p>';
   
         break;
-
-        }
 
       }
 
@@ -41,7 +37,7 @@ function scriptlog_error($error_message, $error_type = E_USER_NOTICE, $context =
   
   } else {
 
-    throw new ErrorException($error_message);
+    throw new InvalidArgumentException($error_message);
      
   }
   
