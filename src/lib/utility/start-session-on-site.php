@@ -61,7 +61,7 @@ return turn_on_session($session_handler, $life_time, $session_name, $current_coo
  * @see https://www.php.net/manual/en/function.session-id.php
  * @see https://akrabat.com/validating-default-php-session-id-values/
  * @param string $session_id
- * @return void
+ * @return int|false
  * 
  */
 function session_valid_id($session_id)
