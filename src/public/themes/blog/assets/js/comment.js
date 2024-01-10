@@ -1,23 +1,3 @@
-$(function(){
-	$("#commentForm").on('submit', function(event){
-
-		let post_url = $(this).attr("action"); //get form action url
-		let request_method = $(this).attr("method"); //get form GET/POST method
-		let form_data = $(this).serialize(); //Encode form elements for submission
-	
-		if (event.isDefaultPrevented()) {
-			// handle the invalid form...
-			$("#error_message").show().html("All Fields are Required");
-	
-		} else {
-			// everything looks good!
-			event.preventDefault();
-			submitComment(post_url, request_method, form_data);
-		}
-	
-	});
-});
-
 function submitComment(post_url, request_method, form_data){
 
 	$.ajax({
@@ -52,6 +32,25 @@ function formError() {
 	
 	$("#commentForm").html(
 		'<div class="alert alert-danger">Could not reach server, please try again later.</div>'
-	  );
-	
+	);
 }
+
+$(function() {
+	$("#commentForm").on('submit', function(event){
+	
+		let post_url = $(this).attr("action"); //get form action url
+		let request_method = $(this).attr("method"); //get form GET/POST method
+		let form_data = $(this).serialize(); //Encode form elements for submission
+	
+		if (event.isDefaultPrevented()) {
+			// handle the invalid form...
+			$("#error_message").show().html("All Fields are Required");
+	
+		} else {
+			submitComment(post_url, request_method, form_data);
+		}
+	
+		event.preventDefault(); // Prevent the form from submitting via browser	
+		
+	});
+});
