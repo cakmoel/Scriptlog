@@ -59,7 +59,6 @@ function make_seed()
  * @param string $strength
  * @param integer $length
  * @param string $character_list
- * @return string
  * 
  */
 function ircmaxell_generator_string($strength, $length = 32, $character_list = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/')
@@ -91,6 +90,11 @@ function ircmaxell_generator_string($strength, $length = 32, $character_list = '
 
             return $generator->generateString($length, $character_list) . "\n";
 
+            break;
+        
+        default:
+
+            scriptlog_error("Unknown strength, generator string failed");
             break;
     }
 }
