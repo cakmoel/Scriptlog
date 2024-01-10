@@ -25,7 +25,7 @@ if (is_file('/proc/cpuinfo')) {
 
 } elseif ('WIN' === strtoupper(substr(PHP_OS, 0, 3))) {
 
-   $process = @popen('wmic cpu get NumberOfCores', 'rb');
+   $process = function_exists('popen') ? @popen('wmic cpu get NumberOfCores', 'rb') : "";
    
    if (false !== $process) {
 
@@ -39,7 +39,7 @@ if (is_file('/proc/cpuinfo')) {
 
 } else {
 
-   $process = @popen('sysctl -a', 'rb');
+   $process = function_exists('popen') ? @popen('sysctl -a', 'rb') : "";
 
    if (false !== $process) {
 
