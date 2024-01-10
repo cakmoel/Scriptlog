@@ -39,7 +39,7 @@ function theme_meta()
 function metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri)
 {
 
-  $uri = (is_a($uri, 'RequestPath')) ? $uri : null;
+  $uri = is_a($uri, 'RequestPath') ? $uri : null;
 
   $theme_meta = array();
   $post_id = null;
@@ -138,14 +138,14 @@ function metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri)
       $month = (isset($uri->param1)) ? $uri->param1 : null;
       $year = (isset($uri->param2)) ? $uri->param2 : null;
 
-      $canonical = ((isset($month)) || (isset($year)) ? app_url() . DS . 'archive' . DS . $month . DS . $year : app_url());
+      $canonical = ((isset($month)) || (isset($year)) ? app_url() . DS . 'archive ' . DS . $month . DS . $year : app_url());
       $description = 'Archive: ' . ' - ' . $month  . ' ' . $year;
       $keyword = escape_html(app_info()['site_keywords']);
       $month_name = date("F Y", mktime(0, 0, 0, intval($month), 7, intval($year)));
       $date_published = date(DATE_ATOM);
 
       $theme_meta['site_schema'] = (is_null($month)) ? generate_schema_org(ucfirst(trim('page not found')) . ' | ' . escape_html(app_info()['site_name']))  : generate_schema_org(ucfirst(trim(escape_html($month_name))) . ' | ' . escape_html(app_info()['site_name']), $canonical, $scriptlog_image, $description, $keyword, $scriptlog_imgthumb, $date_published);
-      $theme_meta['site_meta_tags'] = (is_null($month)) ? generate_meta_tags(ucfirst(trim('page not found')).' | ' . escape_html(app_info()['site_name'])) : generate_meta_tags( 'Archive' . ucfirst(trim($month_name)), $description, $keyword, APP_TITLE, $scriptlog_image, $canonical);
+      $theme_meta['site_meta_tags'] = (is_null($month)) ? generate_meta_tags(ucfirst(trim('page not found')).' | ' . escape_html(app_info()['site_name'])) : generate_meta_tags( 'Archive  '.  ucfirst(trim($month_name)), $description, $keyword, APP_TITLE, $scriptlog_image, $canonical);
 
       break;
 
