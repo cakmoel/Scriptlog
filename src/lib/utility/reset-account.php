@@ -2,7 +2,7 @@
 /**
  * reset_password()
  * 
- * sending reset key to user
+ * sending reset key to the user's email
  * 
  * @param string $recipient
  * @param string $reset_key
@@ -11,11 +11,11 @@
 function reset_password($recipient, $reset_key)
 {
     
- $site_info = app_info();
- $app_url = $site_info['app_url'];
- $site_name = $site_info['site_name'];
- $sender = $site_info['email_address'];
- $sanitize_sender = sanitize_email($sender);
+ $site_info = function_exists('app_info') ? app_info() : "";
+ $app_url = isset($site_info['app_url']) ? $site_info['app_url'] : "";
+ $site_name = isset($site_info['site_name']) ? $site_info['site_name'] : "";
+ $sender = isset($site_info['email_address']) ? $site_info['email_address'] : "";
+ $sanitize_sender = function_exists('sanitize_email') ? sanitize_email($sender) : "";
  $subject = "Password Reset";
  $content = "<html><body>
             If you have never requested an information message about forgotten passwords, please feel free to ignore this email.<br />
@@ -50,18 +50,18 @@ function reset_password($recipient, $reset_key)
 /**
  * recover_password
  * 
- * changing password
+ * sending an email notification to the user's email.
  * 
  * @param string $user_pass
  * 
  */
 function recover_password($user_pass, $user_email)
 {
-    $site_info = app_info();
-    $app_url = $site_info['app_url'];
-    $site_name = $site_info['site_name'];
-    $sender = $site_info['email_address'];
-    $sanitize_sender = sanitize_email($sender);
+    $site_info = function_exists('app_info') ? app_info() : "";
+    $app_url = isset($site_info['app_url']) ? $site_info['app_url']  : "";
+    $site_name = isset($site_info['site_name']) ? $site_info['site_name'] : "";
+    $sender = isset($site_info['email_address']) ? $site_info['email_address'] : "";
+    $sanitize_sender = function_exists('sanitize_email') ? sanitize_email($sender) : "";
 
     $subject = "Password Changed";
     $content = "<html><body>
