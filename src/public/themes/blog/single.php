@@ -6,6 +6,8 @@ $post_img = isset($retrieve_post['media_filename']) ? htmlout($retrieve_post['me
 $post_id = isset($retrieve_post['ID']) ? (int)$retrieve_post['ID'] : "";
 $post_title = isset($retrieve_post['post_title']) ? htmlout($retrieve_post['post_title']) : "";
 
+if (!empty($post_id) || $post_id !== '') {
+
 if (isset($retrieve_post['user_fullname'])) {
 
   $post_author = htmlout($retrieve_post['user_fullname']);
@@ -155,3 +157,14 @@ $total_comment = (total_comment($post_id) > 0) ? total_comment($post_id) : 0;
   </div>
 
 </div>
+
+<?php 
+  
+} else {
+    
+  http_response_code(404);
+  include dirname(__FILE__) . '/404.php';
+
+}
+
+?>
