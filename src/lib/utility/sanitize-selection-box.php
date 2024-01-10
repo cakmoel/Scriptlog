@@ -8,7 +8,6 @@
  * @version 1.0
  * @param array $values
  * @param array $white_args
- * @return boolean
  * 
  */
 function sanitize_selection_box($values, $white_args)
