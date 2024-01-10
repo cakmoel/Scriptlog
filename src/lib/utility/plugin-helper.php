@@ -71,6 +71,13 @@ return $enabled;
 
 }
 
+/**
+ * disable_plugin
+ *
+ * @param string $plugin_directory
+ * @return bool
+ * 
+ */
 function disable_plugin($plugin_directory) 
 {
 
@@ -80,10 +87,17 @@ $plugin_ini = read_plugin_ini($plugin_directory);
 
 $plugin_loader = $plugin_ini['plugin_loader'];
 
-if (file_exists(__DIR__ . '/../../'.APP_ADMIN.DS.$plugin_loader)) {
+if (file_exists(__DIR__ . '/../../'.APP_ADMIN.DS.basename($plugin_loader))) {
 
+  $disabled = true;
    
+} else {
+
+  $disabled = false;
+
 }
+
+return $disabled;
 
 }
 
