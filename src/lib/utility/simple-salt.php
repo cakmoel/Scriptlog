@@ -16,10 +16,10 @@ declare(strict_types=1);
 function simple_salt($num_chars)
 {
   
+ $salt = null;
+ 
  if ((is_int($num_chars)) && ($num_chars > 0) && (!is_null($num_chars))) {
 
-     $salt = null;
-     
      $accepted_chars = (version_compare(PHP_VERSION, '7.0', '<=')) ? ircmaxell_generator_string('low', $num_chars) : random_bytes($num_chars);
 
      srand(((int)((double)microtime()*1000003)));
@@ -31,9 +31,9 @@ function simple_salt($num_chars)
         $salt .= $accepted_chars[$random_number];
 
      }
-
-     return $salt;
      
  }
+
+ return $salt;
   
 }
