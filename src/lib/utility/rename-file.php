@@ -19,7 +19,7 @@ function rename_file($filename)
  * @see https://stackoverflow.com/questions/2021624/string-sanitizer-for-filename
  * @param string $filename
  * @param boolean $beautify
- * @return void
+ * @return string
  * 
  */
 function filter_filename($filename, $beautify = true)
@@ -55,7 +55,7 @@ return $filename;
  *
  * @see https://stackoverflow.com/questions/2021624/string-sanitizer-for-filename
  * @category Function
- * @return void
+ * @return string
  * 
  */
 function beautify_filename($filename)
