@@ -121,8 +121,8 @@
     </header>
     <ul class="list-inline">
       <?php 
-         if (function_exists('outputting_tags')) {
-            echo outputting_tags();
+         if (function_exists('retrieve_tags')) {
+            echo retrieve_tags();
          } 
         ?>
     </ul>
