@@ -1,4 +1,5 @@
 <?php
+
 /**
  * outputting_tags()
  * 
@@ -9,7 +10,6 @@
  * @see http://howto.philippkeller.com/2005/04/24/Tags-Database-schemas/
  * @see http://howto.philippkeller.com/2005/05/05/Tags-with-MySQL-fulltext/
  * @see https://snook.ca/archives/php/how_i_added_tag
- * @see https://stackoverflow.com/questions/549292/id-for-tags-in-tag-systems?noredirect=1&lq=1
  * @see https://stackoverflow.com/questions/1854886/php-mysql-how-to-add-multiple-tags
  * @see https://stackoverflow.com/questions/4202375/how-to-build-tagging-system-like-stackoverflow
  * @see https://stackoverflow.com/questions/1838801/how-to-store-tags-in-a-database-using-mysql-and-php
@@ -26,32 +26,15 @@
 function outputting_tags()
 {
 
-$taglink = [];
+  if (rewrite_status() === 'yes') {
 
-$get_tags = function_exists('db_simple_query') ? db_simple_query("SELECT post_tags FROM tbl_posts") : "";
+    return tag_path();
 
-$tags = [];
+  } else {
 
-if ($get_tags->num_rows > 0) {
-
-  while ($rows = $get_tags->fetch_array(MYSQLI_ASSOC)) {
-
-    $tags = array_merge($tags, explode(",", strtolower($rows['post_tags'])));
-  
+    return tag_query();
   }
-
-  $tags = array_unique_compact($tags);
-
-  for ($t = 0; $t < count($tags); $t++) {
-
-    $taglink[] = '<li class="list-inline-item"><a href="'.permalinks($tags[$t])['tag'].'" class="tag" title="'.$tags[$t].'">#'.$tags[$t].'</a></li>';
-
-  }
-
-  return implode(" ", $taglink);
-
-}
-
+   
 }
 
 /**
@@ -61,22 +44,20 @@ if ($get_tags->num_rows > 0) {
  * @return array
  * 
  */
-function array_unique_compact($items) 
+function array_unique_compact($items)
 {
-
+ 
   $temp_array = array_unique($items);
 
   $i = 0;
 
   foreach ($temp_array as $v) {
-    
+
     $newarr[$i] = $v;
     $i++;
-
   }
-  
-  return $newarr;
 
+  return is_iterable($newarr) ? $newarr : array();
 }
 
 /**
@@ -88,11 +69,135 @@ function array_unique_compact($items)
 function checking_duplicate_tags()
 {
 
- $sql  = "SELECT post_tags, COUNT(post_tags) as totalTag 
+  $sql  = "SELECT post_tags, COUNT(post_tags) as totalTag 
  FROM tbl_posts GROUP BY post_tags HAVING COUNT(post_tags) > 1 ORDER BY totalTag DESC";
 
- $stmt = function_exists('db_simple_query') ? db_simple_query($sql) : ""; 
+  $stmt = function_exists('db_simple_query') ? db_simple_query($sql) : "";
 
- return ($stmt) ? false : true;
+  return ($stmt) ? false : true;
+}
 
+/**
+ * tag_slug
+ *
+ * @category function
+ * @author Reza Lavarian
+ * @param string $tag
+ * @see https://www.decodingweb.dev/php-replace-space-with-dash
+ * @see https://stackoverflow.com/questions/8425521/put-dash-between-every-third-character
+ * @return string
+ * 
+ */
+function tag_slug($tag)
+{
+  $tag = preg_replace('![\s]+!u', '-', strtolower($tag));
+  $tag = preg_replace('![^-\pL\pN\s]+!u', '', $tag);
+  $tag = preg_replace('![-\s]+!u', '-', $tag);
+
+  return trim($tag, '-');
+}
+
+/**
+ * truncate_tags()
+ *
+ * @category function
+ * @param string $tags
+ * @param integer $limit
+ * @see https://stackoverflow.com/questions/1161708/php-detect-whitespace-between-strings
+ * @see https://stackoverflow.com/questions/965235/how-can-i-truncate-a-string-to-the-first-20-words-in-php
+ * @return string|array|null
+ */
+function truncate_tags($tags, $limit = 1)
+{
+  
+  if (preg_match('/\s/', $tags)) {
+    
+    $truncated = purify_dirty_html($tags);
+    $truncated = preg_replace('/((\w+\W*){' . ($limit - 1) . '}(\w+))(.*)/', '${1}', $truncated);
+    $truncated = implode(", ", preg_split("/[\s]+/", $truncated));
+    
+  } else {
+    $truncated = purify_dirty_html($tags);
+  }
+  
+  return $truncated;
+}
+
+/**
+ * tag_query()
+ *
+ * @return mixed
+ * 
+ */
+function tag_query()
+{
+
+  $taglink = [];
+
+  $get_tags = function_exists('db_simple_query') ? db_simple_query("SELECT DISTINCT LOWER(post_tags) AS postTags FROM tbl_posts") : "";
+
+  $tags = [];
+
+  if ($get_tags->num_rows > 0) {
+
+    while ($rows = $get_tags->fetch_array(MYSQLI_ASSOC)) {
+
+      if (isset($rows['postTags'])) {
+
+        $tags = array_merge($tags, explode(",", strtolower(trim($rows['postTags']))));
+
+      }
+      
+    }
+
+    if (checking_duplicate_tags() === false) {
+
+      $tags = array_unique_compact($tags);
+
+    }
+    
+    for ($t = 0; $t < count($tags); $t++) {
+
+      $taglink[] = '<li class="list-inline-item"><a href="' . permalinks(tag_slug($tags[$t]))['tag'] . '" class="tag" title="' . $tags[$t] . '">#' . $tags[$t] . '</a></li>';
+    }
+
+    return is_iterable($taglink) ? implode(" ", $taglink) : array();
+  }
+}
+
+/**
+ * tag_path
+ * 
+ * @return mixed
+ * 
+ */
+function tag_path()
+{
+  $taglink = [];
+  $tagArrays = [];
+
+  $get_tags = function_exists('db_simple_query') ? db_simple_query('SELECT DISTINCT LOWER(post_tags) AS postTags FROM tbl_posts WHERE post_tags != "" GROUP BY postTags') : "";
+
+  if ($get_tags->num_rows > 0) {
+
+    while ($row = $get_tags->fetch_array(MYSQLI_ASSOC)) {
+
+      if (isset($row['postTags'])) {
+        $parts = explode(',', $row['postTags']);
+      }
+     
+      foreach ($parts as $part) {
+        $tagArrays[] = $part;
+      }
+       
+    }
+
+    $finalTags = array_unique($tagArrays);
+    foreach ($finalTags as $tag) {
+
+      $taglink[] = '<li class="list-inline-item"><a href="javascript:void(0)" class="tag" title="' .trim($tag ). '">#' .trim($tag). '</a></li>';
+    }
+    
+    return is_iterable($taglink) ? implode(" ", $taglink) : array();
+  }
 }
