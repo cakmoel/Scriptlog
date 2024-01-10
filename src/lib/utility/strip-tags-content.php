@@ -1,8 +1,13 @@
 <?php
 /**
+ * strip_tags_content
+ * 
  * Remove the HTML tags
  * 
+ * @param string $text
+ * @param string $string
  * @param bool $invert
+ * @return 
  * 
  */
 function strip_tags_content($text, $tags, $invert = false)
