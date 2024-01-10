@@ -118,7 +118,7 @@ function decrypt_post($post_id, $post_password)
  * @param array $credentials
  * 
  */
-function save_post_protected(array $credentials): bool
+function save_post_protected(array $credentials)
 {
 
 $path = __DIR__ . '/../../admin/ui/posts/.credential' . DIRECTORY_SEPARATOR;
