@@ -16,14 +16,14 @@
 
 function paragraph_l2br($content)
 {
-  if (version_compare(phpversion(), '7.4.25', '<=')) {
+  if (version_compare(phpversion(), '7.4', '<=')) {
 
     return str_replace(paragraph_newline_checker(), '<br>', $content);
 
   }
 
-  return html_entity_decode(nl2br(paragraph_trim($content), false));
-
+  return nl2br($content, false);
+  
 }
 
 /**
@@ -35,11 +35,11 @@ function paragraph_l2br($content)
  * @param integer $scnt
  * 
  */
-function paragraph_trim($content, $limit = 200, $schr = "\n", $scnt = 2)
+function paragraph_trim($content, $limit = 200, $schr = PHP_EOL, $scnt = 2)
 {
 
   $post = 0;
-
+  $entry = null;
   $trimmed = false;
 
   for ($i = 1; $i <= $scnt; $i++) {
@@ -54,20 +54,25 @@ function paragraph_trim($content, $limit = 200, $schr = "\n", $scnt = 2)
     }
   }
 
-  $content = substr($content, 0, $post);
+  $entry = html_entity_decode($content);
+  $entry = strip_tags($entry);
+  $entry = purify_dirty_html($entry);
+  $content = substr($entry, 0, $post);
 
   if (strlen($content) >= $limit) {
 
-    $content = substr($content, 0, $limit);
-    $content = substr($content, 0, strrpos($content, ' '));
+    
+    $content = substr($entry, 0, $limit);
+    $content = substr($entry, 0, strrpos($content, " "));
     $trimmed = true;
+
   }
 
   if ($trimmed) {
-    $content .= '...';
+    $content .= "...";
   }
 
-  return safe_html($content);
+  return $content;
 }
 
 /**
