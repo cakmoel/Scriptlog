@@ -7,7 +7,6 @@
  * @param string $file_type
  * @param string $file_name
  * @category function
- * @return bool
  * 
  */
 function upload_audio($file_location, $file_name)
