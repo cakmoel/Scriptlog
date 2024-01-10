@@ -16,7 +16,6 @@
  * @param bool $secure
  * @param bool $httponly
  * @see https://www.php.net/manual/en/function.session-create-id.php
- * @return void
  * 
  */
 function turn_on_session($session_handler, $life_time, $cookies_name, $path, $domain, $secure, $httponly)
