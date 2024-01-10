@@ -51,7 +51,7 @@ function call_theme_header()
 
 if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php')) {
 
-  include_once (APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php');
+  include_once APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php';
      
 } else {
 
@@ -76,7 +76,7 @@ function call_theme_content($content = null)
 
   if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php'))) {
 
-    include_once (APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php'));
+    include_once APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php');
    
   } else {
 
@@ -100,7 +100,7 @@ function call_theme_footer()
 
   if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php')) {
 
-    include_once (APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php');
+    include_once APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php';
 
   } else {
 
