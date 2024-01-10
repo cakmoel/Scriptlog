@@ -6,7 +6,6 @@
  * @author M.Noermoehammad
  * @param string $str
  * @param string $type
- * @return void
  * 
  */
 function sanitizer($str, $type)
@@ -20,7 +19,6 @@ function sanitizer($str, $type)
  *
  * @category Function
  * @param string $str
- * @return void
  * 
  */
 function sanitize_string($str)
