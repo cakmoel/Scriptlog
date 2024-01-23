@@ -58,20 +58,6 @@ return (is_iterable($commentsApproved)) ?  ['commentsApproved' => $commentsAppro
 }
 
 /**
- * totalCommentsByPost
- *
- * @param int|num $postId
- */
-public function totalCommentsByPost($postId, $sanitize)
-{
-$sql = "SELECT ID FROM tbl_comments WHERE comment_status = 'approved' AND comment_post_id = ?";
-$idsanitized = $this->filteringId($sanitize, $postId, 'sql');
-$this->setSQL($sql);
-$stmt = $this->checkCountValue([$idsanitized]);
-return $stmt > 0;
-}
-
-/**
  * Add Comment
  * 
  * @method public addComment()
