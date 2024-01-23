@@ -373,19 +373,6 @@ public static function frontNewCommentByPost($bind, CommentProviderModel $commen
 }
 
 /**
- * frontTotalCommentByPost
- *
- * @param int|num $postId
- * @param CommentProviderModel $commentProviderModel
- * 
- */
-public static function frontTotalCommentByPost($postId, CommentProviderModel $commentProviderModel)
-{
- self::$commentProviderModel = $commentProviderModel;
- return self::$commentProviderModel->totalCommentsByPost($postId, self::frontSanitizer());
-}
-
-/**
  * frontSanitizer
  * 
  * @return object
