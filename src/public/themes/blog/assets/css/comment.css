@@ -63,18 +63,32 @@
   background: #e3e3e3;
 }
 
-#error_message{
+#error_message {
   background: #ec6c6c;
+  display: none;
 }
-#success_message{
+
+#success_message {
   background: #acfaa2;
+  display: none;
 }
+
 .ajax_response {
   padding: 10px 20px;
   border: 0;
   display: inline-block;
   margin-top: 20px;
   cursor: pointer;
-display:none;
-color:#555;
+  color: #555;
+}
+
+.is-invalid {
+  border: 1px solid #dc3545; /* Red border for invalid fields */
+  background-color: #f5f2f2; /* Slightly lighter background */
+}
+
+.invalid-feedback {
+  color: #dc3545; /* Red text for error messages */
+  font-size: 12px;
+  margin-top: 5px;
 }
