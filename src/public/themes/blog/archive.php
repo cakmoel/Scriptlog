@@ -82,7 +82,7 @@ if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
         </main>
 
         <?php
-        include dirname(__FILE__) . '/sidebar.php';
+          include dirname(__FILE__) . '/sidebar.php';
         ?>
 
     </div>
