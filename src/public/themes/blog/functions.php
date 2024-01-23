@@ -480,7 +480,14 @@ function comments_by_post($id)
  */
 function total_comment($id)
 {
-  return (class_exists('FrontContentProvider')) ? FrontContentProvider::frontTotalCommentByPost($id, initialize_comment()) : "";
+  $sql = "SELECT COUNT(1) AS comment_count FROM tbl_comments WHERE comment_post_id = ? AND comment_status = 'approved'";
+  $result = db_prepared_query($sql, [$id], "i")->get_result();
+  $row = $result->fetch_assoc();
+  
+  if (isset($row['comment_count'])) {
+    return $row['comment_count'];
+  }
+  
 }
 
 /**
@@ -492,7 +499,7 @@ function total_comment($id)
  */
 function block_csrf()
 {
-  return (function_exists('generate_form_token')) ? generate_form_token('comment_form', 40) : "";
+  return (function_exists('generate_form_token')) ? generate_form_token('comment_form', 32) : "";
 }
 
 /**
