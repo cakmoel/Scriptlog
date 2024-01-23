@@ -28,7 +28,7 @@ function checking_author_email($email)
  */
 function checking_author_name($name)
 {
-   return (!preg_match('/^[A-Z \'.-]{2,90}$/i', $name)) ? false : true;
+   return preg_match('/^[A-Z \'.-]{2,90}$/i', $name); // Return true for valid names
 }
 
 /**
@@ -89,13 +89,16 @@ function checking_comment_request()
  */
 function checking_block_csrf($csrf)
 {
+   $errors = [];
+
    $valid = !empty($csrf) && verify_form_token('comment_form', $csrf);
 
    if (!$valid) {
 
-      http_response_code(405);
-      exit("405 Method Not Allowed");
+      $errors['error_message'] = 'Invalid CSRF token.';
    }
+
+
 }
 
 /**
@@ -114,22 +117,22 @@ function checking_form_input($author_name, $author_email, $comment_content)
 
    if (checking_comment_size($form_fields) === false) {
 
-      $errors['errorMessage'] = "Form data is longer than allowed";
+      $errors['error_message'] = "Form data is longer than allowed";
    }
 
    if ((!empty($author_email)) && (checking_author_email($author_email) === false)) {
 
-      $errors['errorMessage'] = MESSAGE_INVALID_EMAILADDRESS;
+      $errors['error_message'] = MESSAGE_INVALID_EMAILADDRESS;
    }
 
    if (empty($author_name) || empty($comment_content)) {
 
-      $errors['errorMessage'] = "All column required must be filled";
+      $errors['error_message'] = "All column required must be filled";
    }
 
-   if (checking_author_name($author_name) === false) {
+   if (!checking_author_name($author_name)) {
 
-      $errors['errorMessage'] = "Please enter a valid name";
+      $errors['error_message'] = "Please enter a valid name";
    }
 
    return array($errors);
@@ -149,9 +152,9 @@ function processing_comment(array $values)
    checking_comment_request();
    
    $postId = (isset($values['post_id']) && $values['post_id'] == $_POST['post_id'] ? abs((int)$_POST['post_id']) : 0);
-   $author_name = (isset($values['name']) && $values['name'] == $_POST['name'] ? prevent_injection($values['name']) : null);
-   $author_email = (isset($values['email']) && $values['email'] == $_POST['email'] ? prevent_injection($values['email']) : null);
-   $comment_content = (isset($values['comment']) && $values['comment'] == $_POST['comment'] ? prevent_injection($values['comment']) : null);
+   $author_name = (isset($values['name']) && $values['name'] == filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS) ? prevent_injection($values['name']) : null);
+   $author_email = (isset($values['email']) && $values['email'] == filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL) ? prevent_injection($values['email']) : null);
+   $comment_content = (isset($values['comment']) && $values['comment'] == filter_input(INPUT_POST, 'comment', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ? prevent_injection($values['comment']) : null);
    $csrf = (isset($values['csrf']) && $values['csrf'] == $_POST['csrf'] ? $values['csrf'] : "");
    $comment_at = date_for_database();
 
@@ -182,7 +185,7 @@ function processing_comment(array $values)
    if (!empty($errors)) {
 
       $form_data['success'] = false;
-      $form_data['errors'] = $errors;
+      $form_data['error_message'] = $errors;
    } else {
 
       $form_data['success'] = true;
@@ -190,4 +193,5 @@ function processing_comment(array $values)
    }
 
    echo json_encode($form_data, JSON_PRETTY_PRINT);
+   return;
 }
