@@ -148,7 +148,7 @@ endif;
                     <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i>
                       <?= isset($random_post_created) ? $random_post_created : ""; ?>
                     </div>
-
+                    <div class="comments"><i class="icon-comment" aria-hidden="true"></i><?= $total_comment; ?></div>
                   </footer>
                 </div>
               </div>
