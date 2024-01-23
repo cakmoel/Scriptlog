@@ -111,7 +111,6 @@ $total_comment = (total_comment($post_id) > 0) ? total_comment($post_id) : 0;
 
               <div class="comment-form-wrap pt-5">
                 <h3 class="mb-5">Leave a comment</h3>
-
                 <form role="form" method="post" action="<?= retrieve_site_url() . DS . basename('comments-post.php'); ?>"  id="commentForm" class="p-5 bg-light">
 
                   <div class="form-group">
