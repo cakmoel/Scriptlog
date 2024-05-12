@@ -73,8 +73,6 @@ try {
                 $commentApp->listItems();
 
             }
-            
-        break;
         
 }
 

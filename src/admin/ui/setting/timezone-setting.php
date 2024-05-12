@@ -16,7 +16,7 @@
     <!-- Main Content -->
     <section class="content">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="box box-primary">
                     <div class="box-header with-border"></div>
                     <!-- /.box-header -->
@@ -58,20 +58,23 @@
 
                     ?>
 
+                <form method="post" action="<?= generate_request('index.php', 'get', ['option-timezone', $action, 0])['link']; ?>"  >
+
                     <div class="box-body">
-                        <form method="post" action="<?= generate_request('index.php', 'get', ['option-timezone', $action, 0])['link']; ?>" >
+                        
                             <input type="hidden" name="setting_id" value="<?= $paramId; ?>">
-                            <input type="hidden" name="setting_name" value="<?= (!isset($timezoneData['setting_name']) ?: safe_html($timezoneData['setting_name'])); ?>">
+                            <input type="hidden" name="setting_name" value="<?= isset($timezoneData['setting_name']) ? safe_html($timezoneData['setting_name']) : ""; ?>">
 
                            <?= (isset($timezoneIdentifier)) ? $timezoneIdentifier : ""; ?>
 
-                            <div class="box-footer">
-                                <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
-                                <input type="submit" name="configFormSubmit" class="btn btn-primary" value="Update">
-                            </div>
-                        </form>
                     </div>
                     <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
+                        <input type="submit" name="configFormSubmit" class="btn btn-primary" value="Update">
+                    </div>
+                </form>
                 </div>
             </div>
         </div>

@@ -15,9 +15,9 @@ define('APP_PATH', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
 define('APP_INC', 'include');
 
 require_once __DIR__ . '/../../lib/vendor/autoload.php';  
-require_once __DIR__ . '/../../lib/utility/is-ssl.php';
-require_once __DIR__ . '/../../lib/utility/get-browser-name.php';
-require_once __DIR__ . '/../../lib/utility/get-os.php';
+include_once __DIR__ . '/../../lib/utility/is-ssl.php';
+include_once __DIR__ . '/../../lib/utility/get-browser-name.php';
+include_once __DIR__ . '/../../lib/utility/get-os.php';
 require_once __DIR__ . '/check-engine.php';
 
 if (!ini_get('date.timezone')) {

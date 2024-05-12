@@ -1,5 +1,15 @@
 <?php 
-include __DIR__ . '/../lib/main.php';
+/**
+ *  fetch-tags.php
+ * 
+ * @category retrieve tags from tabel topics
+ * @author   M.Noermoehammad
+ * @license  MIT
+ * @version  1.0
+ * 
+ */
+
+require __DIR__ . '/../lib/main.php';
 
 $result = [];
 
@@ -15,7 +25,7 @@ if (isset($_GET['term']) && access_control_list(ActionConst::POSTS)) {
 
     while ($row = $stmt->fetch_assoc()) {
   
-      $result[] = prevent_injection($row['topic_title']);
+      $result[] = isset($row['topic_title']) ? prevent_injection($row['topic_title']) : '';
 
     }
 

@@ -15,7 +15,7 @@ declare(strict_types=1);
  * @since    Since Release 1.0
  * 
  */
-require __DIR__ . '/options.php';
+include __DIR__ . '/options.php';
 require __DIR__ . '/common.php';
 
 if (!file_exists(APP_ROOT . 'config.php')) {
@@ -28,7 +28,7 @@ if (!file_exists(APP_ROOT . 'config.php')) {
     
 } else {
 
-    $config = include __DIR__ . '/../config.php';
+    $config = require __DIR__ . '/../config.php';
 
     $db_host = isset($config['db']['host']) ? $config['db']['host'] : "";
     $db_user = isset($config['db']['user']) ? $config['db']['user'] : "";
@@ -71,12 +71,12 @@ if (!file_exists(APP_ROOT . 'config.php')) {
     // check if loader is exists
     if (file_exists(APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'Autoloader.php')) {
 
-        include __DIR__ . DIRECTORY_SEPARATOR . 'Autoloader.php';
+        require __DIR__ . DIRECTORY_SEPARATOR . 'Autoloader.php';
     }
 
     if (is_readable(APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'vendor/autoload.php')) {
 
-        include_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
+        require __DIR__ . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
     }
 
     Autoloader::setBaseDir(APP_ROOT);
@@ -128,11 +128,15 @@ if (!file_exists(APP_ROOT . 'config.php')) {
      
     ### '/post/60/post-slug'
     'single' => "/post/(?'id'\d+)/(?'post'[\w\-]+)",     
-    
+
+    ### '/post/74/post-slug/comments/3'
+    'comment' => "/post/(?'id'\d+)/(?'post'[\w\-]+)/comment/(?'comment'\d+)",
+
      ### '/'
     'home' => "/"                                        
 
      ******************************************************/
+
     $rules = array(
 
         'home'     => "/",
@@ -180,7 +184,7 @@ if (!file_exists(APP_ROOT . 'config.php')) {
     $authenticator = class_exists('Authentication') ? new Authentication($userDao, $userToken, $validator) : "";
     $ubench = class_exists('Ubench') ? new Ubench() : "";
     $dispatcher = class_exists('Dispatcher') ? new Dispatcher() : "";
-
+    
 }
 
 is_a($sessionMaker, 'SessionMaker') ? session_set_save_handler($sessionMaker, true) : "";

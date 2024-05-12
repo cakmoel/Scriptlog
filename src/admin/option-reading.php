@@ -51,8 +51,6 @@ try {
             $configApp->updateReadingSetting();
 
            }
-            
-           break;
 
     }
 

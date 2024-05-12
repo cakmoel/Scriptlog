@@ -433,8 +433,7 @@ class PageEvent
         'post_tags' => $this->post_tags,
         'post_status' => $this->page_status,
         'post_sticky' => $this->page_sticky,
-        'post_type' => $this->post_type,
-        'comment_status' => $this->comment_status
+        'post_type' => $this->post_type
       ], $this->pageId);
 
     } else {
@@ -451,8 +450,7 @@ class PageEvent
         'post_tags' => $this->post_tags,
         'post_status' => $this->page_status,
         'post_sticky' => $this->page_sticky,
-        'post_type' => $this->post_type,
-        'comment_status' => $this->comment_status
+        'post_type' => $this->post_type
       ], $this->pageId);
 
     }

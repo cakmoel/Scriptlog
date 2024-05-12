@@ -25,7 +25,7 @@ class DbFactory
 
      try {
          
-         $database = "Db";  // hard code database factory's name
+         $database = "Db";  
          
          if (class_exists($database)) {
              

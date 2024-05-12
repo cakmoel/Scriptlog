@@ -25,6 +25,13 @@ return [
          'key'   => 'application key'           # Application key
 
     ]
+
+     'os' => [
+                  
+          'system_software' => 'operating system',
+          'distrib_name'    => 'variant or distribution name'
+                
+    ],
     
 ];
 

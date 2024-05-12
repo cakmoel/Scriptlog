@@ -18,7 +18,7 @@
       <div class="row">
          <div class="col-xs-12">
          <?php 
-         if (isset($errors)) :
+            if (isset($errors)) :
          ?>
          <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -38,7 +38,7 @@
          ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h2><i class="icon fa fa-check" aria-hidden="true"></i> Alert!</h2>
+                <h2><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h2>
            <?php 
               foreach ($status as $s) :
                 echo $s;
@@ -52,15 +52,15 @@
             <div class="box box-primary">
                <div class="box-header with-border">
                 <h2 class="box-title">
-              <?=(isset($commmentsTotal)) ? $commentsTotal : 0; ?> 
-               Comment<?=($commentsTotal != 1) ? 's' : ''; ?>
+              <?= (isset($totalComments)) ? $totalComments : 0; ?> 
+               <?=($totalComments !== 1) ? 'Comments' : 'Comment'; ?>
                in Total  
               </h2>
                </div>
               <!-- /.box-header -->
               
               <div class="box-body table-responsive">
-                  <table id="scriptlog-table" class="table table-bordered table-striped" aria-describedby="all comment">
+                  <table id="scriptlog-table" class="table table-bordered table-striped responsive" aria-describedby="all comment">
                 <thead>
                 <tr>
                   <th>#</th>
@@ -80,9 +80,9 @@
                    ?>
                        <tr>
                          <td><?= $no; ?></td>
-                         <td><a href="<?= generate_request("index.php", 'get', ['reply', ActionConst::NEWREPLY, 0])['link']; ?>"><?= htmlspecialchars($comment['comment_content']); ?></a></td>
-                         <td><?= htmlspecialchars($comment['post_title']); ?></td>
-                         <td><?= human_readable_datetime(new DateTime($comment['comment_date']), 'g:i a \o\n  l j S F Y'); ?></td>
+                         <td><a href="<?= generate_request("index.php", 'get', ['reply', ActionConst::RESPONSETO, 0])['link']; ?>"><?= htmlspecialchars($comment['comment_content']); ?></a></td>
+                         <td><?= safe_html($comment['post_title']); ?></td>
+                         <td><?= time_elapsed_string($comment['comment_date']); ?></td>
 
                          <td>
                           <a href="<?= generate_request("index.php", 'get', ['comments', ActionConst::EDITCOMMENT, $comment['ID']])['link']; ?>" class="btn btn-warning" title="Edit comment">

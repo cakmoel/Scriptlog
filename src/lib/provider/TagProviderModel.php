@@ -48,7 +48,7 @@ $tag_exploaded = explode(',', strtolower($tags));
 
 foreach ((array) $tag_exploaded as $tag) {
 
-  $html[] = '<a href="javascript:void(0)" class="tag" title="'.escape_html($tag).'">#'.escape_html($tag).'</a>';
+  $html[] = '<a href="'.permalinks($postId)['post'].'" class="tag" title="'.escape_html($tag).'">#'.escape_html($tag).'</a>';
 
 }
 

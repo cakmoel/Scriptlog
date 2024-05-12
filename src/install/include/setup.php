@@ -35,7 +35,7 @@ function current_url() // returning current url
 function make_connection($host, $username, $passwd, $dbname, $dbport)
 {
 
-  $driver = new mysqli_driver();
+  $driver = class_exists('mysqli_driver') ? new mysqli_driver() : "";
 
   $driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
 
@@ -217,6 +217,11 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
   $timezone_value = array('timezone_identifier' => date_default_timezone_get());
   $store_timezone_value = json_encode($timezone_value);
 
+  // setting memberships
+  $membership_key = "membership_setting";
+  $membership_value = array('user_can_register' => 0, 'default_role' => 'subscriber');
+  $store_membership_value = json_encode($membership_value);
+
   if ($link instanceof mysqli) {
     #create users table
     $link->query($tblUser);
@@ -311,6 +316,11 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
       $recordTimezone = $link->prepare($saveSettings);
       $recordTimezone->bind_param('ss', $timezone_key, $store_timezone_value);
       $recordTimezone->execute();
+
+      // insert configuration - memberships
+      $recordMemberships = $link->prepare($saveSettings);
+      $recordMemberships->bind_param('ss', $membership_key, $store_membership_value);
+      $recordMemberships->execute();
 
       // insert default theme
       $recordTheme = $link->prepare($saveTheme);

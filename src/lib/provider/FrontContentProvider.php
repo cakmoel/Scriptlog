@@ -347,19 +347,6 @@ public static function frontSidebarArchives(ArchivesProviderModel $archivesProvi
 }
 
 /**
- * frontCommentsByPost
- *
- * @param int|num $postId
- * @param CommentProviderModel $commentProviderModel
- * @return mixed
- */
-public static function frontCommentsByPost($postId, CommentProviderModel $commentProviderModel)
-{
- self::$commentProviderModel = $commentProviderModel;
- return self::$commentProviderModel->getCommentsByPost($postId, self::frontSanitizer(), self::frontPaginator(app_reading_setting()['comment_per_post'], 'p'));
-}
-
-/**
  * frontNewCommentByPost
  *
  * @param array $bind
@@ -374,7 +361,7 @@ public static function frontNewCommentByPost($bind, CommentProviderModel $commen
 
 /**
  * frontSanitizer
- * 
+ * a
  * @return object
  */
 public static function frontSanitizer()

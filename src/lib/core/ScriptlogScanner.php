@@ -17,9 +17,7 @@ private static $filter = [];
 
 private static function clearScanStatus()
 {
-
   (version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
-
 }
 
 public static function setDirectory($directory)

@@ -52,8 +52,8 @@ public static function handleFrontHelper()
 private static function findRequestToRules($rules)
 {
 
-$script_name = isset($_SERVER['SCRIPT_NAME']) ? rtrim(dirname($_SERVER['SCRIPT_NAME']), '/' ) : '';
-$request_uri = '/' . trim(str_replace($script_name, '', $_SERVER['REQUEST_URI']), '/');
+$script_name = isset($_SERVER['SCRIPT_NAME']) ? rtrim(dirname($_SERVER['SCRIPT_NAME']), DIRECTORY_SEPARATOR ) : '';
+$request_uri = DIRECTORY_SEPARATOR . trim(str_replace($script_name, '', $_SERVER['REQUEST_URI']), DIRECTORY_SEPARATOR);
 $uri = urldecode($request_uri);
 
 $parameters = [];
@@ -81,17 +81,17 @@ if (is_array($rules)) {
  */
 private static function findRequestToPath()
 {
- $request_uri = isset($_SERVER['REQUEST_URI']) ? explode('/', trim(escape_html($_SERVER['REQUEST_URI']), '/')) : null;
- $script_name = isset($_SERVER['SCRIPT_NAME']) ? explode('/', trim(escape_html($_SERVER['SCRIPT_NAME']), '/')) : null;
+ $request_uri = isset($_SERVER['REQUEST_URI']) ? explode(DIRECTORY_SEPARATOR, trim(escape_html($_SERVER['REQUEST_URI']), DIRECTORY_SEPARATOR)) : null;
+ $script_name = isset($_SERVER['SCRIPT_NAME']) ? explode(DIRECTORY_SEPARATOR, trim(escape_html($_SERVER['SCRIPT_NAME']), DIRECTORY_SEPARATOR)) : null;
  $parts = array_diff_assoc($request_uri, $script_name);
      
  if (empty($parts)) {
     
-  return '/';
+  return DIRECTORY_SEPARATOR;
       
  }
      
- $path = implode('/', $parts);
+ $path = implode(DIRECTORY_SEPARATOR, $parts);
     
  if (($position = strpos($path, '?')) !== false) {
     
@@ -114,7 +114,7 @@ private static function findRequestToPath()
 private static function isRequestToPathValid($args)
 {
 
- $path = explode('/', self::findRequestToPath());
+ $path = explode(DIRECTORY_SEPARATOR, self::findRequestToPath());
 
  if (isset($path[$args])) {
 

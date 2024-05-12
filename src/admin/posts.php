@@ -98,7 +98,6 @@ try {
                 $postApp->listItems();
             }
 
-            break;
     }
 } catch (\Throwable $th) {
 

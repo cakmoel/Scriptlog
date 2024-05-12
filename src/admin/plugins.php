@@ -124,8 +124,6 @@ try {
                 $pluginApp->listItems();
     
             }
-            
-            break;
     
     }
 

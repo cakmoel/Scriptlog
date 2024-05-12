@@ -169,14 +169,14 @@ class PluginApp extends BaseApp
 
         }
 
-        if ((is_dir(__DIR__ .'/../../'.APP_PLUGIN.current(explode(".",$file_name)).DS))) {
+        if (is_dir(__DIR__ .'/../../'.APP_PLUGIN.current(explode(".",$file_name)).DS)) {
            
           $checkError = false;
           array_push($errors, "Sorry you have installed this plugin before.");
 
         } 
        
-        if ($this->pluginEvent->isPluginExists(current(explode(".",$file_name))) == true) {
+        if ($this->pluginEvent->isPluginExists(current(explode(".",$file_name))) === true) {
 
           $checkError = false;
           array_push($errors, "Sorry you have installed this plugin before.");

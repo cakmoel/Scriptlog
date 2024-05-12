@@ -114,8 +114,7 @@ public function findPageById($pageId, $sanitize)
 				   post_keyword,
 			       post_status, 
 				   post_sticky, 
-				   post_type, 
-				   comment_status
+				   post_type
   	  	   FROM tbl_posts
   	  	   WHERE ID = ? AND post_type = 'page' ";
      
@@ -202,8 +201,7 @@ public function updatePage($sanitize, $bind, $ID)
 		'post_keyword' => $bind['post_keyword'],
 		'post_status' => $bind['post_status'],
 		'post_sticky' => $bind['post_sticky'], 
-		'post_type' => $bind['post_type'],
- 	    'comment_status' => $bind['comment_status']
+		'post_type' => $bind['post_type']
  	    ], "ID = {$cleanId}");
  	
  } else {
@@ -218,8 +216,7 @@ public function updatePage($sanitize, $bind, $ID)
 		'post_keyword' => $bind['post_keyword'], 
 		'post_status' => $bind['post_status'],
 		'post_sticky' => $bind['post_sticky'],
-		'post_type' => $bind['post_type'],
- 	    'comment_status' => $bind['comment_status']
+		'post_type' => $bind['post_type']
  	    ], "ID = {$cleanId}");
  	
  }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * request_path()
  *
@@ -165,15 +166,12 @@ function retrieves_topic_simple($id)
         $permalinks = permalinks($result['topic_slug'])['cat'];
       } else {
         $permalinks = permalinks($result['ID'])['cat'];
-
       }
-      
-      $categories[] = "<a href='" .$permalinks. "'>" . $result['topic_title'] . "</a>";
 
+      $categories[] = "<a href='" . $permalinks . "'>" . $result['topic_title'] . "</a>";
     }
-
   }
-  
+
   return implode("", $categories);
 }
 
@@ -201,14 +199,11 @@ function retrieves_topic_prepared($id)
     while ($item = $items->fetch_assoc()) {
 
       $permalinks = ((function_exists('rewrite_status')) && (rewrite_status() === 'yes') ? permalinks($item['topic_slug'])['cat'] : permalinks($item['ID'])['cat']);
-      $topics[] = "<a href='" .$permalinks. "'>" . $item['topic_title'] . "</a>";
-
+      $topics[] = "<a href='" . $permalinks . "'>" . $item['topic_title'] . "</a>";
     }
-  
   }
 
   return implode("", $topics);
-
 }
 
 /**
@@ -422,7 +417,6 @@ function posts_by_category($topicId)
   $pagination = FrontContentProvider::frontPostsByTopic($topicId, initialize_topic())['pagination'];
 
   return is_iterable($entries) ? array('entries' => $entries, 'pagination' => $pagination) : array();
-
 }
 
 /**
@@ -450,7 +444,7 @@ function retrieve_archives()
 function retrieve_page($arg, $rewrite)
 {
   if ($rewrite == 'no') {
-    $page = class_exists('FrontContentProvider') ? FrontContentProvider::frontPageById($arg, initialize_page()) : ""; 
+    $page = class_exists('FrontContentProvider') ? FrontContentProvider::frontPageById($arg, initialize_page()) : "";
     return is_iterable($page) ? $page : [];
   } else {
     $page = class_exists('FrontContentProvider') ? FrontContentProvider::frontPageBySlug($arg, initialize_page()) : "";
@@ -458,18 +452,46 @@ function retrieve_page($arg, $rewrite)
   }
 }
 
-/**
- * comments_by_post
- *
- * retrieves list of comments by detail post requested
- * 
- * @param int|num $id
- *
- */
-function comments_by_post($id)
+
+function retrieve_comments($id, $cpage)
 {
-  $comments = class_exists('FrontContentProvider') ? FrontContentProvider::frontCommentsByPost($id, initialize_comment()) : "";
-  return is_iterable($comments) ? $comments : array();
+  $html = '';
+
+  $idsanitized = Sanitize::severeSanitizer($id);
+
+  $limit = isset(app_reading_setting()['comment_per_post']) ? app_reading_setting()['comment_per_post'] : 5;
+
+  $paginationStart = ($cpage > 1) ? ($cpage * $limit) - $limit : 0;
+
+  // get comments
+  $getComments = db_simple_query("SELECT ID, comment_post_id, comment_parent_id, comment_author_name, comment_content, comment_status, comment_date 
+                   FROM tbl_comments WHERE comment_post_id = '$idsanitized' AND comment_status = 'approved' 
+                   ORDER BY comment_date DESC LIMIT $paginationStart, $limit");
+
+  $comments = $getComments->fetch_all(MYSQLI_ASSOC);
+
+  // get total comments
+  $allRecords = isset(total_comment($id)['total']) ? total_comment($id)['total'] : 0;
+
+  // calculate total page
+  $totalPages = ceil($allRecords / $limit);
+
+  // Prev + Next
+  $prev = $cpage - 1;
+  $next = $cpage + 1;
+
+  $html .= '<div class="post-comments">';
+  $html .= '<header><h3 class="h6">Post Comments<span class="no-of-comments">(' . $allRecords . ')</span></h3></header>';
+
+  // display comments
+  $html .= display_comments($comments);
+
+  $html .= '</div>';
+
+  // display pagination
+  $html .= display_pagination($id, $totalPages, $cpage, $prev, $next);
+
+  return $html;
 }
 
 /**
@@ -480,14 +502,129 @@ function comments_by_post($id)
  */
 function total_comment($id)
 {
-  $sql = "SELECT COUNT(1) AS comment_count FROM tbl_comments WHERE comment_post_id = ? AND comment_status = 'approved'";
+  $sql = "SELECT COUNT(1) AS total_comments FROM tbl_comments WHERE comment_post_id = ? AND comment_status = 'approved'";
   $result = db_prepared_query($sql, [$id], "i")->get_result();
-  $row = $result->fetch_assoc();
-  
-  if (isset($row['comment_count'])) {
-    return $row['comment_count'];
+  $row = $result->fetch_assoc()['total_comments'];
+
+  return  isset($row) ? ['total' => $row] : array('total' => 0);
+}
+
+/**
+ * display_comments
+ *
+ * @param array $comments
+ * @return string
+ * 
+ */
+function display_comments($comments)
+{
+  $html = '';
+
+  if (isset($comments) && is_iterable($comments)) {
+    foreach ($comments as $comment) {
+
+      $comment_author_name = htmlout($comment['comment_author_name'] ?? '');
+      $comment_content = html_entity_decode(htmLawed(html($comment['comment_content'] ?? '')));
+      $comment_at = isset($comment['comment_date']) ? htmlout(make_date($comment['comment_date'])) : "";
+
+      $html .= '<div class="comment">
+               <div class="comment-header d-flex justify-content-between">
+               <div class="user d-flex align-items-center">
+               <div class="image"><img src="' . theme_dir() . 'assets/img/user.svg" alt="' . $comment_author_name . '" class="img-fluid rounded-circle"></div>';
+
+      $html .= '<div class="title"><strong>' . $comment_author_name . '</strong><span class="date">' . $comment_at . '</span></div>';
+      $html .= '</div>';
+      $html .= '</div>';
+      $html .= '<div class="comment-body">';
+      $html .= '<p>' . $comment_content . '</p>';
+      $html .= '</div>';
+      $html .= '</div>';
+    }
+  } else {
+
+    $html .= '<div class="comment">';
+    $html .= '<div class="comment-body">';
+    $html .= '<p>No comments found</p>';
+    $html .= '</div>';
+    $html .= '</div>';
   }
+
+  return $html;
+}
+
+function display_pagination($id, $totalPages, $cpage, $prev, $next)
+{
+
+  $html = '';
+  $html .= '<nav aria-label="Page navigation example mt-5">';
+  $html .= ' <ul class="pagination justify-content-center">';
+
+  // Get current URL
+  $script_name = rtrim(dirname($_SERVER["SCRIPT_NAME"]), DIRECTORY_SEPARATOR);
+  $request_uri = DIRECTORY_SEPARATOR . trim(str_replace($script_name, '', $_SERVER['REQUEST_URI']), DIRECTORY_SEPARATOR);
+
   
+
+  $html .= '</ul>';
+  $html .= '</nav>';
+
+  return $html;
+}
+
+function display_pagination_leg($id, $totalPages, $cpage, $prev, $next)
+{
+
+  $html = '';
+  $html .= '<nav aria-label="Page navigation example mt-5">';
+  $html .= ' <ul class="pagination justify-content-center">';
+
+  if (rewrite_status() === 'yes') {
+
+    $url = isset($_SERVER['REQUEST_URI']) ? strtok($_SERVER["REQUEST_URI"], '?') : "";
+
+    if ($cpage > 1) {
+      $html .= '<li class="page-item"><a class="page-link" href="' . $url . '/' . $prev . '">Previous</a></li>';
+    } else {
+      $html .= '<li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>';
+    }
+
+    // Page links
+    for ($i = 1; $i <= $totalPages; $i++) {
+      $html .= '<li class="page-item ';
+      $html .= ($cpage == $i) ? 'active' : '';
+      $html .= '"><a class="page-link" href="' . $url  . '/' . $i . '">' . $i . '</a></li>';
+    }
+
+    // Next page link
+    if ($cpage < $totalPages) {
+      $html .= '<li class="page-item"><a class="page-link" href="' . $url  . '/' . $next . '">Next</a></li>';
+    } else {
+      $html .= '<li class="page-item disabled"><a class="page-link">Next</a></li>';
+    }
+  } else {
+
+    // Previous link
+    $html .= '<li class="page-item ' . (($cpage <= 1) ? 'disabled' : '') . '">';
+    $html .= '<a class="page-link" href="?p=' . $id . (($cpage <= 1) ? '#' : '&cpage=' . $prev) . '">Previous</a>';
+    $html .= '</li>';
+
+    for ($i = 1; $i <= $totalPages; $i++) {
+
+      $html .= '<li class="page-item ' . (($cpage == $i) ? 'active' : '') . '">';
+      $html .= '<a class="page-link" href="?p=' . $id . '&cpage=' . $i . '" title="' . $i . '" aria-hidden>' . $i . '</a>';
+      $html .= '</li>';
+    }
+
+    // Next link
+    $html .= '<li class="page-item ' . (($cpage >= $totalPages) ? 'disabled' : '') . '">';
+    $html .= '<a class="page-link" href="?p=' . $id . (($cpage >= $totalPages) ? '#' : '&cpage=' . $next) . '">Next</a>';
+    $html .= '</li>';
+  }
+
+  $html .= '</ul>';
+  $html .= '</nav>';
+
+  return $html;
 }
 
 /**

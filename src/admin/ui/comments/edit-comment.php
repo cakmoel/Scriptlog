@@ -8,8 +8,8 @@
         <small>Control Panel</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home<strong><?= ">"?></strong></a></li>
-        <li><a href="index.php?load=comments">Comments<strong><?= ">"?></strong></a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home </a></li>
+        <li><a href="index.php?load=comments">Comments </a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
     </section>
@@ -22,19 +22,19 @@
 <div class="box-header with-border"></div>
 <!-- /.box-header -->
 <?php
-if (isset($errors)) :
+ if (isset($errors)) :
 ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 <h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
 <?php 
-foreach ($errors as $e) :
-echo '<p>' . $e . '</p>';
-endforeach;
+ foreach ($errors as $e) :
+  echo '<p>' . $e . '</p>';
+ endforeach;
 ?>
 </div>
 <?php 
-endif;
+ endif;
 
 $action = isset($formAction) ? $formAction : null;
 $comment_id = isset($commentData['ID']) ? (int)$commentData['ID'] : 0;
@@ -69,7 +69,7 @@ $comment_id = isset($commentData['ID']) ? (int)$commentData['ID'] : 0;
 
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
-<input type="submit" name="postFormSubmit" class="btn btn-primary" value="<?=(isset($commentData['ID']) && $commentData['ID'] != '') ? "Update" : ""; ?>">
+<input type="submit" name="commentFormSubmit" class="btn btn-primary" value="<?=(isset($commentData['ID']) && $commentData['ID'] != '') ? "Update" : ""; ?>">
 </div>
 </form>
             
@@ -87,10 +87,10 @@ $comment_id = isset($commentData['ID']) ? (int)$commentData['ID'] : 0;
         <div class="box-body">
             <div class="form-group">
                 <label><i class="fa fa-calendar" aria-hidden="true"></i> Submited On</label>
-                <p class="text-aqua"><?=(isset($commentData['comment_date'])) ? human_readable_datetime(new DateTime($commentData['comment_date']), 'g:i a  \o\n l jS F Y') : ""; ?></p>
+                <p class="text-aqua"><?=(isset($commentData['comment_date'])) ? human_readable_datetime(new DateTime($commentData['comment_date']), 'g:i a  \o\n l jS F Y') . "<br>" . time_elapsed_string($commentData['comment_date']) : ""; ?>  </p>
             </div>
             <div class="form-group">
-                <a href="<?= generate_request("index.php", 'get', ['reply', ActionConst::NEWREPLY, 0])['link']; ?>" class="btn btn-primary"><i class="fa fa-reply fa-fw" aria-hidden="true"></i> </a>
+                <a href="<?= generate_request("index.php", 'get', ['reply', ActionConst::RESPONSETO, 0])['link']; ?>" class="btn btn-primary"><i class="fa fa-reply fa-fw" aria-hidden="true"></i> </a>
             </div>
         </div>
             <!-- /.box-body -->

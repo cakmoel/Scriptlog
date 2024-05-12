@@ -44,7 +44,7 @@ class Paginator
 	 *
 	 * @var integer $_totalRows
 	 */
-	private $_totalRows = 0;
+	private $_totalRows = 10;
 
 	/**
 	 * sanitize
