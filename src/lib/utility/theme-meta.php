@@ -145,17 +145,22 @@ function metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri)
       $date_published = date(DATE_ATOM);
 
       $theme_meta['site_schema'] = (is_null($month)) ? generate_schema_org(ucfirst(trim('page not found')) . ' | ' . escape_html(app_info()['site_name']))  : generate_schema_org(ucfirst(trim(escape_html($month_name))) . ' | ' . escape_html(app_info()['site_name']), $canonical, $scriptlog_image, $description, $keyword, $scriptlog_imgthumb, $date_published);
-      $theme_meta['site_meta_tags'] = (is_null($month)) ? generate_meta_tags(ucfirst(trim('page not found')).' | ' . escape_html(app_info()['site_name'])) : generate_meta_tags( 'Archive  '.  ucfirst(trim($month_name)), $description, $keyword, APP_TITLE, $scriptlog_image, $canonical);
+      $theme_meta['site_meta_tags'] = (is_null($month)) ? generate_meta_tags(ucfirst(trim('page not found')).' | ' . escape_html(app_info()['site_name'])) : generate_meta_tags( 'Archive:  '.  ucfirst(trim($month_name)), $description, $keyword, APP_TITLE, $scriptlog_image, $canonical);
 
       break;
 
     case 'tag':
 
+      $tag_item = isset($uri->param1) ? $uri->param1 : null;
       
-      $theme_meta['site_schema'] = generate_schema_org();
-      $theme_meta['site_meta_tags'] = generate_meta_tags();
+      $canonical = ((isset($tag)) || (isset($tag_item)) ? app_url() . DS . 'tag' . DS . $tag_item : app_url());
+      $description = 'Tag:' . ' - ' . $tag_item;  
+      $keyword = escape_html(app_info()['site_keywords']);
+      $theme_meta['site_schema'] = (is_null($tag_item)) ? generate_schema_org(ucfirst(trim('page not found')) . ' | ' . escape_html(app_info()['site_name'])) : generate_schema_org(ucfirst(trim(escape_html($tag_item))) . ' | ' . escape_html(app_info()['site_name']), $canonical, $scriptlog_image, $description, $keyword, $scriptlog_imgthumb);
+      $theme_meta['site_meta_tags'] = (is_null($tag_item)) ? generate_meta_tags(ucfirst(trim('page not found')) . ' | ' . escape_html(app_info()['site_name'])) : generate_meta_tags('Tag: '.ucfirst(trim($tag_item)), $description, $keyword, APP_TITLE, $scriptlog_image, $canonical);
 
       break;
+      
     default:
 
       $theme_meta['site_schema'] = generate_schema_org(app_info()['site_name'], app_url(), $scriptlog_image, app_info()['site_description'], app_info()['site_tagline'], $scriptlog_imgthumb, date(DATE_ATOM));

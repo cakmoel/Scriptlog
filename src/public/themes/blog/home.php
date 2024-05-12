@@ -82,7 +82,7 @@ endif;
         $random_post_title = isset($random_post['post_title']) ? htmlout($random_post['post_title']) : "";
         $random_post_content = isset($random_post['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($random_post['post_content']))) : "";
         $random_post_created = isset($random_post['post_modified'])  ? htmlout(make_date($random_post['post_modified'])) : htmlout(make_date($random_post['post_date']));
-        $total_comment = (total_comment($random_post_id) > 0) ? total_comment($random_post_id) : 0;
+        $total_comment = (total_comment($random_post_id)['total'] > 0) ? total_comment($random_post_id)['total'] : 0;
 
         if ($r % 2 == 1) :
 

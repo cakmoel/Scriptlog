@@ -7,6 +7,7 @@ declare(strict_types=1);
  * on production stage.
  *
  * @category function
+ * @author M.Noermoehammad
  * @see https://blog.haschek.at/2017/how-to-defend-your-website-with-zip-bombs.html
  * @see https://www.sitepoint.com/how-to-defend-your-website-with-zip-bombs/
  * @see https://news.ycombinator.com/item?id=14707674

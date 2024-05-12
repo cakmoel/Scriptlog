@@ -1,5 +1,5 @@
 <?php 
-include_once dirname(__FILE__) . '/functions.php';
+require dirname(__FILE__) . '/functions.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">

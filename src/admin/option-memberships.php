@@ -52,8 +52,6 @@ try {
 
           }
 
-          break;
-
     }
 
 } catch (\Throwable $th) {

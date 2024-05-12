@@ -47,6 +47,9 @@ public function __construct()
  $parsed['param3'] = array_shift($bits);
  $parsed[] = $parsed['param3'];
 
+ $parsed['param4'] = array_shift($bits);
+ $parsed[] = $parsed['param4'];
+
  $parts_size = sizeof($bits);
 
  if ($parts_size % 2 != 0) {

@@ -51,8 +51,6 @@ try {
                 $configApp->updatePermalinkConfig();
     
             }
-    
-            break;
             
     }    
 

@@ -15,7 +15,7 @@
  */
 if (file_exists(__DIR__ . '/../config.php')) {
 
-  include __DIR__ . '/../lib/main.php';
+  require __DIR__ . '/../lib/main.php';
 
   $ip = get_ip_address();
 

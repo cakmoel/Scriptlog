@@ -95,17 +95,6 @@ function listen_query_string($id = null, $app_url = null)
 
          break;
 
-      case 'tag':
-
-         if ((!empty(HandleRequest::isQueryStringRequested()['value'])) && ($id === HandleRequest::isQueryStringRequested()['value'])) {
-
-            $entry_tag = FrontHelper::grabTagLists($id);
-            (isset($entry_tag['ID'])) ? intval($entry_tag['ID']) : 0;
-            $tag_id = $app_url . DS . '?tag=' . $id;
-         }
-
-         break;
-
       case 'a':
 
          if ((!empty(HandleRequest::isQueryStringRequested()['value'])) && ($id === HandleRequest::isQueryStringRequested()['value'])) {
@@ -133,12 +122,12 @@ function listen_query_string($id = null, $app_url = null)
 
       default:
 
-         return ['post' => $post_id, 'page' => $page_id, 'cat' => $cat_id, 'tag' => $tag_id, 'archive' => $archive];
+         return ['post' => $post_id, 'page' => $page_id, 'cat' => $cat_id, 'archive' => $archive];
 
          break;
    }
 
-   return ['post' => $post_id, 'page' => $page_id, 'cat' => $cat_id, 'tag' => $tag_id, 'archive' => $archive];
+   return ['post' => $post_id, 'page' => $page_id, 'cat' => $cat_id, 'archive' => $archive];
 }
 
 /**
@@ -174,12 +163,6 @@ function listen_request_path($id = null, $app_url = null)
       $category_slug = isset($getCategory['topic_slug']) ? escape_html($getCategory['topic_slug']) : "";
       $rewrite['cat'] = $app_url . DS . 'category' . DS . $category_slug;
 
-   } elseif (($request_path->matched == 'tag') && ($id === $request_path->param1)) {
-
-      $getTag = FrontHelper::grabTagLists();
-      (isset($getTag['ID'])) ? abs((int)$getTag['ID']) : 0;
-      $rewrite['tag'] = $app_url . DS . 'tag' . DS . $id;
-      
    } elseif (($request_path->matched == 'archive') && ($id === $request_path->param1 . $request_path->param2)) {
       
       $month = isset($request_path->param1) ? escape_html($request_path->param1) : null;
@@ -202,10 +185,6 @@ function listen_request_path($id = null, $app_url = null)
       $getCategory = FrontHelper::grabPreparedFrontTopicByID($id);
       $category_slug = isset($getCategory['topic_slug']) ? escape_html($getCategory['topic_slug']) : $id;
       $rewrite['cat'] = $app_url . DS . 'category' . DS . $category_slug;
-
-      $getTag = FrontHelper::grabTagLists();
-      $tag = isset($getTag['post_tags']) ? escape_html($getTag['post_tags']) : "";
-      $rewrite['tag'] = $app_url . DS . 'tag' . DS . $tag;
 
       $rewrite['archive'] = $app_url . DS . 'archive' . DS .$id;
 

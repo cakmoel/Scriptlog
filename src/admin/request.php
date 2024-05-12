@@ -35,7 +35,8 @@ try {
         }
 
         // checking remote file inclusions
-        if (strstr($load, '../') || strstr($load, 'http://') || strstr($load, 'file://') || strstr($load, 'data:') || strstr($load, 'zip://')) {
+        if (strstr($load, '../') || strstr($load, 'http://') || strstr($load, 'file://') 
+            || strstr($load, 'data:') || strstr($load, 'zip://')) {
 
             header($protocol . MESSAGE_BADREQUEST, true, 400);
             throw new AppException("Remote file inclusion attempt!");
@@ -71,11 +72,11 @@ try {
 
                     if (!function_exists('realpath')) {
 
-                        include dirname(__FILE__) . DS . basename(absolute_path($load . '.php'));
+                        require dirname(__FILE__) . DS . basename(absolute_path($load . '.php'));
 
                     } else {
 
-                        include dirname(__FILE__) . DS . basename(realpath($load . '.php'));
+                        require dirname(__FILE__) . DS . basename(realpath($load . '.php'));
                         
                     }
                 }

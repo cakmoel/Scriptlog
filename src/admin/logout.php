@@ -40,8 +40,6 @@ try {
 
                 direct_page('index.php?load=dashboard', 302);
             }
-
-            break;
     }
     
 } catch (\Throwable $th) {

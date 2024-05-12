@@ -26,7 +26,7 @@ class Dispatcher
    * @var mixed
    * 
    */
-  private $route;
+  private $route = [];
 
   /**
    * Theme's Directory
@@ -35,20 +35,18 @@ class Dispatcher
    * 
    */
   private $theme_dir;
-  
+
   /**
    * Constructor
    * Registry route and Initialize an instantiate of theme
    */
   public function __construct()
   {
-    
+
     if (Registry::isKeySet('route')) {
 
       $this->route = Registry::get('route');
-
     }
-
   }
 
   /**
@@ -59,7 +57,7 @@ class Dispatcher
   public function dispatch()
   {
 
-    $this->theme_dir = APP_ROOT.APP_THEME.escape_html($this->invokeTheme()['theme_directory']).DS;
+    $this->theme_dir = APP_ROOT.APP_THEME.escape_html($this->invokeTheme()['theme_directory']).DIRECTORY_SEPARATOR;
 
     if (rewrite_status() === 'yes') {
 
@@ -72,16 +70,22 @@ class Dispatcher
   
         foreach ($this->route as $key => $value) {
   
-          if (preg_match('~^'.$value.'$~i', $this->requestURI(), $matches)) {
+          // Add delimiters to the regex pattern
+          $pattern = '~^' . $value . '$~i';
+
+          if (preg_match($pattern, $this->requestURI(), $matches)) {
            
             http_response_code(200);
+            
             call_theme_header(); 
             call_theme_content($key);
             call_theme_footer();
-    
-            exit();
-             
+            
+            return;
+
           } 
+
+          direct_page('404.php', 404);  
 
         }
 
@@ -103,12 +107,12 @@ class Dispatcher
    */
   private function requestURI()
   {
-    $script_name = rtrim(dirname($_SERVER["SCRIPT_NAME"]), '/' );
-    $request_uri = '/' . trim(str_replace($script_name, '', $_SERVER['REQUEST_URI']), '/');
+    $script_name = rtrim(dirname($_SERVER["SCRIPT_NAME"]), DIRECTORY_SEPARATOR);
+    $request_uri = DIRECTORY_SEPARATOR . trim(str_replace($script_name, '', $_SERVER['REQUEST_URI']), DIRECTORY_SEPARATOR);
     return urldecode($request_uri);
   }
 
-/**
+  /**
    * whiteListPathRequested
    *
    * @return array
@@ -136,12 +140,11 @@ class Dispatcher
   * @param string $theme_dir
   * 
   */
- private function errorNotFound($theme_dir)
- {
-   http_response_code(404);
-   include $theme_dir.'header.php';
-   include $theme_dir.'404.php';
-   include $theme_dir.'footer.php';
- }
-
+  private function errorNotFound($theme_dir)
+  {
+    http_response_code(404);
+    include $theme_dir . 'header.php';
+    include $theme_dir . '404.php';
+    include $theme_dir . 'footer.php';
+  }
 }

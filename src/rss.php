@@ -15,7 +15,7 @@ $app_link = isset(app_info()['app_url']) ? app_info()['app_url'] : "";
 $app_description = isset(app_info()['site_description']) ? app_info()['site_description'] : "";
 
 $postProviderModel = class_exists('PostProviderModel') ? new PostProviderModel() : "";
-$feeds = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostsFeed(app_reading_setting()['post_per_rss'], $postProviderModel) : "";
+$feeds = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostsFeed(app_reading_setting()['post_per_rss'], $postProviderModel) : [];
 
 if (is_iterable($feeds)) {
 

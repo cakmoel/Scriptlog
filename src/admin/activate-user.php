@@ -10,7 +10,7 @@
  */
 if (file_exists(__DIR__ . '/../config.php')) {
     
-  include dirname(dirname(__FILE__)).'/lib/main.php';
+  require dirname(dirname(__FILE__)).'/lib/main.php';
   
 } else {
   
@@ -29,7 +29,7 @@ if (empty($userActivationKey)) {
 } else {
 
   // activate user
-  $authenticator->activateUserAccount($userActivationKey);
+ is_a($authenticator, 'Authentication') ?  $authenticator->activateUserAccount($userActivationKey) : "";
 
 }
 

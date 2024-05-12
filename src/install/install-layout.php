@@ -55,7 +55,7 @@ function install_footer($stylePath)
           <li class="list-inline-item"><a href="../license.txt" target="_blank" rel="noopener noreferrer" title="license.txt" >License</a></li>
           <li class="list-inline-item"><a href="#"><?= 'Memory used: <strong>'. convert_memory_used(memory_get_usage()).'</strong>'; ?></a></li>
           <li class="list-inline-item"><a href="#"><?= 'Execution time: <strong>'.(microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]). ' seconds</strong>'; ?></a></li>
-          <li class="list-inline-item"><a href="../readme.html" target="_blank" rel="noopener noreferrer" title="readme.html">ReadMe</a></li>
+          <li class="list-inline-item"><a href="../readme.html" target="_blank" rel="noopener noreferrer" title="readme.html" >ReadMe</a></li>
         </ul>
       </footer>
 </div>

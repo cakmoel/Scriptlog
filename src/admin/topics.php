@@ -95,7 +95,6 @@ try {
                 $topicApp->listItems();
             }
 
-            break;
     }
 } catch (\Throwable $th) {
 

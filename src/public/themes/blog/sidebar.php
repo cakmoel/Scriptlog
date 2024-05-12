@@ -34,7 +34,7 @@
          foreach ((array)$latest_posts['sidebarPosts'] as $latest_post) :
            $author = (isset($latest_post['user_login'])) ? escape_html($latest_post['user_login']) : escape_html($latest_post['user_fullname']);
            $latest_post_id = (isset($latest_post['ID'])) ? abs((int)$latest_post['ID']) : "";
-           $total_comment = (total_comment($latest_post_id) > 0) ? total_comment($latest_post_id) : 0;
+           $total_comment = (total_comment($latest_post_id)['total'] > 0) ? total_comment($latest_post_id)['total'] : 0;
           
         ?>
 

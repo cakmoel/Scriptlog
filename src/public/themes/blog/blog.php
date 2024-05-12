@@ -13,8 +13,7 @@
 
       <?php
 
-        if (is_array($entries)) :
-          
+        if (!empty($entries)) :
           foreach ($entries as $entry) :
 
             $entry_id = isset($entry['ID']) ? (int)$entry['ID'] : "";
@@ -24,7 +23,7 @@
             $entry_img_caption = isset($entry['media_caption']) ? htmlout($entry['media_caption']) : "";
             $entry_created = isset($entry['modified_at']) ? htmlout(make_date($entry['modified_at'])) : htmlout(make_date($entry['created_at']));
             $entry_author = (isset($entry['user_login']) || isset($entry['user_fullname']) ? htmlout($entry['user_login']) : htmlout($entry['user_fullname']));
-            $total_comment = (total_comment($entry_id) > 0) ? total_comment($entry_id) : 0;
+            $total_comment = (total_comment($entry_id)['total'] > 0) ? total_comment($entry_id)['total'] : 0;
 
       ?>
 

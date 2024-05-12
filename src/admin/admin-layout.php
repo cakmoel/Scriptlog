@@ -2,7 +2,7 @@
 function admin_header($stylePath, $breadcrumb = null) 
 {  
 ?>
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -69,7 +69,7 @@ function admin_header($stylePath, $breadcrumb = null)
 <link rel="manifest" href="<?= $stylePath; ?>/manifest.json">
 <meta name="msapplication-TileColor" content="#fff">
 <meta name="msapplication-TileImage" content="<?= $stylePath; ?>/ms-icon-144x144.png">
-<meta name="theme-color" content="#fff">
+<meta name="theme-color" content="#ffffff">
 
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -81,7 +81,7 @@ function admin_header($stylePath, $breadcrumb = null)
 <!-- Google Font -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 <!-- Icon -->
-<link href="<?= $stylePath; ?>/favicon.ico" rel="Shortcut Icon">
+<link href="<?= $stylePath; ?>/favicon.ico" rel="alternate icon" type="image/vnd.microsoft.icon">
 <style>
   .avatar {
   vertical-align: middle;
@@ -114,8 +114,11 @@ function admin_footer($stylePath, $ubench = null)
     
     <strong>Thank you for creating with 
     <a href="https://scriptlog.sourceforge.io" target="_blank" rel="noopener noreferrer" title="PHP Blog Software">Scriptlog</a>
-     <?php echo APP_VERSION; ?></strong>
-     <strong><?=((true === APP_DEVELOPMENT) && (isset($ubench))) ? " Page generated in: ". $ubench->getTime() . " Memory usage: ".$ubench->getMemoryUsage() : "" ?></strong>
+     <?php echo APP_VERSION; ?>
+    </strong>
+    <strong>
+      <?=((true === APP_DEVELOPMENT) && (isset($ubench))) ? " Page generated in: ". $ubench->getTime() . " Memory usage: ".$ubench->getMemoryUsage() : "" ?>
+    </strong>
 </footer>
   
   <div class="control-sidebar-bg"></div>  
@@ -150,6 +153,7 @@ function admin_footer($stylePath, $ubench = null)
 <script>
 $(document).ready(function(){
 	$('#scriptlog-table').DataTable({
+    "responsive": true,
 		"order": [],
 		"columnDefs":[
 			{

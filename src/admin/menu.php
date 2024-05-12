@@ -94,8 +94,6 @@ try {
 
                 $menuApp->listItems();
             }
-
-            break;
     }
 } catch (Throwable $th) {
 
