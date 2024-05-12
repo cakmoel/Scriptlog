@@ -103,8 +103,7 @@ class PageApp extends BaseApp
         'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
-        'post_sticky' => FILTER_SANITIZE_NUMBER_INT,
-        'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : ""
+        'post_sticky' => FILTER_SANITIZE_NUMBER_INT
       ];
 
       $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 50000];
@@ -118,7 +117,7 @@ class PageApp extends BaseApp
           throw new AppException("Sorry, unpleasant attempt detected!");
         }
 
-        if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_keyword', 'post_status', 'post_sticky', 'comment_status']) == false) {
+        if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_keyword', 'post_status', 'post_sticky']) == false) {
 
           header($_SERVER["SERVER_PROTOCOL"] . ' 413 Payload Too Large', true, 413);
           header('Status: 413 Payload Too Large');
@@ -144,12 +143,6 @@ class PageApp extends BaseApp
           array_push($errors, "Please choose the available value provided");
         }
 
-        if (false === sanitize_selection_box(distill_post_request($filters)['comment_status'], ['open' => 'Open', 'closed' => 'Closed'])) {
-
-          $checkError = false;
-          array_push($errors, "Please choose the available value provided");
-        }
-
         if (!empty($_POST['post_date']) && validate_date($_POST['post_date']) === false) {
 
           $checkError = false;
@@ -167,7 +160,6 @@ class PageApp extends BaseApp
           $this->view->set('formData', $_POST);
           $this->view->set('medialibs', $medialib->imageRadioButton());
           $this->view->set('postStatus', $this->pageEvent->postStatusDropDown());
-          $this->view->set('commentStatus', $this->pageEvent->commentStatusDropDown());
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
         } else {
@@ -238,7 +230,7 @@ class PageApp extends BaseApp
           $this->pageEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
           $this->pageEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
           $this->pageEvent->setPublish(distill_post_request($filters)['post_status']);
-          $this->pageEvent->setComment(distill_post_request($filters)['comment_status']);
+          $this->pageEvent->setComment('close');
           $this->pageEvent->setPostType('page');
 
           if (empty($_POST['post_sticky'])) {
@@ -277,7 +269,6 @@ class PageApp extends BaseApp
       $this->view->set('formAction', $this->getFormAction());
       $this->view->set('medialibs', $medialib->imageRadioButton());
       $this->view->set('postStatus', $this->pageEvent->postStatusDropDown());
-      $this->view->set('commentStatus', $this->pageEvent->commentStatusDropDown());
       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
     }
 
@@ -315,8 +306,7 @@ class PageApp extends BaseApp
       'post_summary' => $getPage['post_summary'],
       'post_keyword' => $getPage['post_keyword'],
       'post_status' => $getPage['post_status'],
-      'post_sticky' => $getPage['post_sticky'],
-      'comment_status' => $getPage['comment_status']
+      'post_sticky' => $getPage['post_sticky']
     );
 
     if (isset($_POST['pageFormSubmit'])) {
@@ -330,8 +320,7 @@ class PageApp extends BaseApp
         'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
-        'post_sticky' => FILTER_SANITIZE_NUMBER_INT,
-        'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : ""
+        'post_sticky' => FILTER_SANITIZE_NUMBER_INT
       ];
 
       $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 50000];
@@ -345,7 +334,7 @@ class PageApp extends BaseApp
           throw new AppException("Sorry, unpleasant attempt detected!");
         }
 
-        if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_keyword', 'post_status', 'post_sticky', 'comment_status']) === false) {
+        if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_keyword', 'post_status', 'post_sticky']) === false) {
 
           header(APP_PROTOCOL . ' 413 Payload Too Large', true, 413);
           header('Status: 413 Payload Too Large');
@@ -371,12 +360,6 @@ class PageApp extends BaseApp
           array_push($errors, "Please choose the available value provided");
         }
 
-        if (false === sanitize_selection_box(distill_post_request($filters)['comment_status'], ['open' => 'Open', 'closed' => 'Closed'])) {
-
-          $checkError = false;
-          array_push($errors, "Please choose the available value provided");
-        }
-
         if (!empty($_POST['post_modfied']) && validate_date($_POST['post_modified']) === false) {
 
           $checkError = false;
@@ -394,7 +377,6 @@ class PageApp extends BaseApp
           $this->view->set('pageData', $data_page);
           $this->view->set('medialibs', $medialib->imageRadioButton($getPage['media_id']));
           $this->view->set('postStatus', $this->pageEvent->postStatusDropDown($getPage['post_status']));
-          $this->view->set('commentStatus', $this->pageEvent->commentStatusDropDown($getPage['comment_status']));
           $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
         } else {
@@ -466,7 +448,6 @@ class PageApp extends BaseApp
           $this->pageEvent->setMetaDesc(distill_post_request($filters)['post_summary']);
           $this->pageEvent->setMetaKeys(distill_post_request($filters)['post_keyword']);
           $this->pageEvent->setPublish(distill_post_request($filters)['post_status']);
-          $this->pageEvent->setComment(distill_post_request($filters)['comment_status']);
           $this->pageEvent->setPostType('page');
           
           if (empty($_POST['post_sticky'])) {
@@ -504,7 +485,6 @@ class PageApp extends BaseApp
       $this->view->set('pageData', $data_page);
       $this->view->set('medialibs', $medialib->imageRadioButton($getPage['media_id']));
       $this->view->set('postStatus', $this->pageEvent->postStatusDropDown($getPage['post_status']));
-      $this->view->set('commentStatus', $this->pageEvent->commentStatusDropDown($getPage['comment_status']));
       $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
     }
 

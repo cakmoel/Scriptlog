@@ -152,6 +152,7 @@ function processing_comment(array $values)
    checking_comment_request();
    
    $postId = (isset($values['post_id']) && $values['post_id'] == $_POST['post_id'] ? abs((int)$_POST['post_id']) : 0);
+   $parent_id = (isset($values['parent_id']) && $values['parent_id'] == $_POST['parent_id'] ? (int)$_POST['parent_id'] : 0);
    $author_name = (isset($values['name']) && $values['name'] == filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS) ? prevent_injection($values['name']) : null);
    $author_email = (isset($values['email']) && $values['email'] == filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL) ? prevent_injection($values['email']) : null);
    $comment_content = (isset($values['comment']) && $values['comment'] == filter_input(INPUT_POST, 'comment', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ? prevent_injection($values['comment']) : null);
@@ -168,6 +169,7 @@ function processing_comment(array $values)
    $bind = [
 
       'comment_post_id' => $postId,
+      'comment_parent_id' => $parent_id,
       'comment_author_name' => $author_name,
       'comment_author_ip' => $author_ip,
       'comment_author_email' => $author_email,
@@ -193,5 +195,5 @@ function processing_comment(array $values)
    }
 
    echo json_encode($form_data, JSON_PRETTY_PRINT);
-   return;
+   
 }

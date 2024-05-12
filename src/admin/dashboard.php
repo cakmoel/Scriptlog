@@ -21,7 +21,6 @@ try {
             $displayWall->listItems($authenticator, $user_login);
          }
 
-         break;
    }
 } catch (\Throwable $th) {
 

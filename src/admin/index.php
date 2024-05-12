@@ -12,11 +12,11 @@
 
 if (file_exists(__DIR__ . '/../config.php') && is_file(__DIR__ . '/../config.php')) {
 
-    include __DIR__ . '/../lib/main.php';
+    require __DIR__ . '/../lib/main.php';
 
     $ip = (function_exists('get_ip_address')) ? get_ip_address() : "";
 
-    include __DIR__ . '/authenticator.php';
+    require __DIR__ . '/authenticator.php';
 
     if ((isset($ubench)) && (true === APP_DEVELOPMENT)) {
 
@@ -58,7 +58,7 @@ if (!$loggedIn) {
 
     echo sidebar_navigation($breadcrumb, $current_url, $user_id, $user_session);
 
-    include dirname(__FILE__) . DS . 'request.php';
+    require dirname(__FILE__) . DS . 'request.php';
 
     admin_footer($current_url, $ubench);
 

@@ -111,8 +111,6 @@ try {
                 $pageApp->listItems();
     
             }
-            
-        break;
         
     }
 

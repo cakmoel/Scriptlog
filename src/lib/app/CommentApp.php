@@ -82,7 +82,7 @@ class CommentApp extends BaseApp
   
   public function insert()
   {
-    
+    // left empty
   }
   
   public function update($id)

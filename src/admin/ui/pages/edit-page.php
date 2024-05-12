@@ -157,11 +157,6 @@ if (isset($pageData['post_modified']) || isset($pageData['post_date']) ) {
 <?=(isset($postStatus)) ? $postStatus : ""; ?>
 </div>
 
-<div class="form-group">
-<label for="comment_status">Comment status</label>
-<?=(isset($commentStatus)) ? $commentStatus : ""; ?>
-</div>
-
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
 <input type="submit" class="btn btn-primary" name="pageFormSubmit" value="<?=((isset($page_id)) && ($page_id === 0) ? "Publish" : "Update") ; ?>" >

@@ -127,8 +127,6 @@ try {
              $userApp->listItems();
     
            }
-        
-          break;
             
     }
 

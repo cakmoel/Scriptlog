@@ -113,7 +113,7 @@ public function validate($items)
             }
     }
 
-    return(!$havefailures);
+    return !$havefailures;
 }
 
 /* JP
@@ -162,7 +162,7 @@ public function sanitize($items)
                    
   }
              
- return($items);
+ return $items;
 
 }
 
@@ -209,7 +209,7 @@ private static function sanitizeItem($var, $type)
     
     $output = filter_var($var, $filter, $flags); 
 
-    return($output);
+    return $output;
 
 }
 
@@ -225,7 +225,7 @@ public static function validateItem($var, $type)
 
         $returnval =  filter_var($var, FILTER_VALIDATE_REGEXP, array("options"=> array("regexp"=>'!'.self::$regexes[$type].'!i'))) !== false;
         
-        return($returnval);
+        return $returnval;
 
     }
 

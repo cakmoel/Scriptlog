@@ -1,6 +1,6 @@
 <?php
 
-if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
+if (function_exists('rewrite_status') && rewrite_status() == 'yes') {
 
     $grab_month = function_exists('request_path') ? request_path()->param1 : "";
     $grab_year = function_exists('request_path') ? request_path()->param2 : "";
@@ -42,7 +42,7 @@ if (function_exists('rewrite_status') && rewrite_status() === 'yes') {
                         $entry_img_caption = isset($entry['media_caption']) ? htmlout($entry['media_caption']) : "";
                         $entry_created = isset($entry['modified_at']) ? htmlout(make_date($entry['modified_at'])) : htmlout(make_date($entry['created_at']));
                         $entry_author = (isset($entry['user_login']) || isset($entry['user_fullname']) ? htmlout($entry['user_login']) : htmlout($entry['user_fullname']));
-                        $total_comment = (total_comment($entry_id) > 0) ? total_comment($entry_id) : 0;
+                        $total_comment = (total_comment($entry_id)['total'] > 0) ? total_comment($entry_id)['total'] : 0;
 
                     ?>
 

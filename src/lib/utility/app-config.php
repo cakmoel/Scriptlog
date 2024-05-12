@@ -22,7 +22,7 @@ function read_config($filename)
  * @category function
  * @param string $filename
  * @param array $configuration
- * @return void
+ * @return mixed
  * 
  */
 function write_config($filename, $configuration)

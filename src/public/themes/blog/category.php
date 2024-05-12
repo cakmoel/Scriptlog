@@ -7,25 +7,25 @@ if ($topicProvider instanceof TopicProviderModel) {
     if (function_exists('rewrite_status') && rewrite_status() == 'yes' && function_exists('request_path') && request_path()->param1 !== '') {
     
         $slug = request_path()->param1;
-        $slug_sanitized = class_exists('Sanitize') ? Sanitize::severeSanitizer($slug) : ""; 
+        $sanitizedSlug = class_exists('Sanitize') ? Sanitize::severeSanitizer($slug) : ""; 
 
-        $topic = method_exists($topicProvider, 'getTopicBySlug') ? $topicProvider->getTopicBySlug($slug_sanitized) : "";
-        $topicID = isset($topic['ID']) ? (int)$topic['ID'] : "";
+        $topic = method_exists($topicProvider, 'getTopicBySlug') ? $topicProvider->getTopicBySlug($sanitizedSlug) : "";
+        $topicId = isset($topic['ID']) ? (int)$topic['ID'] : "";
         
     } else {
 
         $query_param = class_exists('HandleRequest') ? HandleRequest::isQueryStringRequested()['value'] : "";
-        $paramSanitized = Sanitize::severeSanitizer($query_param);
+        $sanitizedQueryParameter = Sanitize::severeSanitizer($query_param);
         
-        $topic = $topicProvider->getTopicById($paramSanitized);
-        $topicID = isset($topic['ID']) ? (int)$topic['ID'] : "";
+        $topic = $topicProvider->getTopicById($sanitizedQueryParameter);
+        $topicId = isset($topic['ID']) ? (int)$topic['ID'] : "";
         
     }
 
 }
 
-$entries = function_exists('posts_by_category') ? posts_by_category($topicID)['entries'] : "";
-$pagination = function_exists('posts_by_category') ? posts_by_category($topicID) ['pagination'] : ""; 
+$entries = function_exists('posts_by_category') ? posts_by_category($topicId)['entries'] : "";
+$pagination = function_exists('posts_by_category') ? posts_by_category($topicId) ['pagination'] : ""; 
 
 ?>
 
@@ -37,7 +37,7 @@ $pagination = function_exists('posts_by_category') ? posts_by_category($topicID)
                     <!-- post -->
                     <?php
 
-                      if (is_array($entries)) :
+                      if (!empty($entries)) :
                         foreach ($entries as $entry) :
                             $entry_id = isset($entry['ID']) ? (int)$entry['ID'] : "";
                             $entry_title = isset($entry['post_title']) ? htmlout($entry['post_title']) : "";
@@ -46,7 +46,7 @@ $pagination = function_exists('posts_by_category') ? posts_by_category($topicID)
                             $entry_img_caption = isset($entry['media_caption']) ? htmlout($entry['media_caption']) : "";
                             $entry_created = isset($entry['modified_at']) ? htmlout(make_date($entry['modified_at'])) : htmlout(make_date($entry['created_at']));
                             $entry_author = (isset($entry['user_login']) || isset($entry['user_fullname']) ? htmlout($entry['user_login']) : htmlout($entry['user_fullname']));
-                            $total_comment = (function_exists('total_comment') && total_comment($entry_id) > 0) ? total_comment($entry_id) : 0;
+                            $total_comment = (function_exists('total_comment') && total_comment($entry_id)['total'] > 0) ? total_comment($entry_id)['total'] : 0;
 
                     ?>
 

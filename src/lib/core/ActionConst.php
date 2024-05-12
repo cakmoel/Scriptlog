@@ -48,9 +48,9 @@ class ActionConst
  const DELETECOMMENT = "deleteComment";
 
 // action constant for reply functionality
- const REPLY       = "reply";
- const NEWREPLY    = "newReply";
- const DELETEREPLY = "deleteReply";
+ const REPLY         = "reply";
+ const RESPONSETO    = "responseTo";
+ const DELETEREPLY   = "deleteReply";
 
 // action constant for navigation or menu functionality
  const NAVIGATION  = "navigation";

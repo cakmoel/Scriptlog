@@ -163,7 +163,7 @@ if (isset($_POST['Reset'])) {
   <label for="inputCaptcha">Enter captcha code</label>
   <input type="text" class="form-control" id="inputCaptcha" placeholder="Please type a captcha code here" name="captcha_code">
 <span class="glyphicon glyphicon-hand-down form-control-feedback"></span>
-<img src="<?=app_url().'/admin/captcha-forgot-pwd.php'; ?>" alt="image_captcha">
+<img src="<?=app_url(). DIRECTORY_SEPARATOR.'admin'.DIRECTORY_SEPARATOR.'captcha-forgot-pwd.php'; ?>" alt="image_captcha">
 </div>
       
 <div class="row">
