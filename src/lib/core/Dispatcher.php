@@ -85,9 +85,9 @@ class Dispatcher
 
           } 
 
-          direct_page('404.php', 404);  
-
         }
+
+        direct_page('404.php', 404);  
 
       }
 
