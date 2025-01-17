@@ -2,7 +2,8 @@
 
 /**
  * request_path()
- *
+ * 
+ * @category theme function
  * @return object
  * 
  */
@@ -13,65 +14,73 @@ function request_path()
 
 /**
  * initialize_post()
- *
+ * 
+ * @category theme function
  * @return object
+ * 
  */
 function initialize_post()
 {
-  return class_exists('PostProviderModel') ? new PostProviderModel() : "";
+  return class_exists('PostModel') ? new PostModel() : "";
 }
 
 /**
  * initialize_page()
- *
+ * 
+ * @category theme function
  * @return object
+ * 
  */
 function initialize_page()
 {
-  return class_exists('PageProviderModel') ? new PageProviderModel() : "";
+  return class_exists('PageModel') ? new PageModel() : "";
 }
 
 /**
  * initialize_comment
- *
+ * 
+ * @category theme function
  * @return object
  * 
  */
 function initialize_comment()
 {
-  return class_exists('CommentProviderModel') ? new CommentProviderModel() : "";
+  return class_exists('CommentModel') ? new CommentModel() : "";
 }
 
 /**
- * initialize_archive
+ * initialize_archive()
  *
+ * @category theme function
  * @return object
  * 
  */
 function initialize_archive()
 {
-  return class_exists('ArchivesProviderModel') ? new ArchivesProviderModel() : "";
+  return class_exists('ArchivesModel') ? new ArchivesModel() : "";
 }
 
 /**
  * initialize_topic()
- *
+ * 
+ * @category theme function
  * @return object
  */
 function initialize_topic()
 {
-  return class_exists('TopicProviderModel') ? new TopicProviderModel() : "";
+  return class_exists('TopicModel') ? new TopicModel() : "";
 }
 
 /**
  * initialize_tag()
  *
+ * @category theme function
  * @return object
  * 
  */
 function initialize_tag()
 {
-  return class_exists('TagProviderModel') ? new TagProviderModel() : "";
+  return class_exists('TagModel') ? new TagModel() : "";
 }
 
 /**
@@ -82,7 +91,7 @@ function initialize_tag()
  */
 function initialize_gallery()
 {
-  return (class_exists('GalleryProviderModel')) ? new GalleryProviderModel() : "";
+  return (class_exists('GalleryModel')) ? new GalleryModel() : "";
 }
 
 /**
@@ -96,7 +105,7 @@ function initialize_gallery()
  */
 function featured_post()
 {
-  $headlines = class_exists('FrontContentProvider') ? FrontContentProvider::frontRandomHeadlines(initialize_post()) : "";
+  $headlines = class_exists('FrontContentModel') ? FrontContentModel::frontRandomHeadlines(initialize_post()) : "";
   return is_iterable($headlines) ? $headlines : array();
 }
 
@@ -109,7 +118,7 @@ function featured_post()
  */
 function sticky_page()
 {
-  $sticky_page = class_exists('FrontContentProvider') ? FrontContentProvider::frontRandomStickyPage(initialize_page()) : "";
+  $sticky_page = class_exists('FrontContentModel') ? FrontContentModel::frontRandomStickyPage(initialize_page()) : "";
   return is_iterable($sticky_page) ? $sticky_page : array();
 }
 
@@ -123,13 +132,14 @@ function sticky_page()
  */
 function random_posts($start, $end)
 {
-  $random_posts = class_exists('FrontContentProvider') ? FrontContentProvider::frontRandomPosts($start, $end, initialize_post()) : "";
+  $random_posts = class_exists('FrontContentModel') ? FrontContentModel::frontRandomPosts($start, $end, initialize_post()) : "";
   return is_iterable($random_posts) ? $random_posts : array();
 }
 
 /**
  * latest_posts()
  *
+ * @category theme function
  * @param int|numeric $position
  * @param int|numeric $limit
  * @return array
@@ -137,13 +147,14 @@ function random_posts($start, $end)
  */
 function latest_posts($limit, $position = null)
 {
-  $latest_posts = class_exists('FrontContentProvider') ? FrontContentProvider::frontLatestPosts($limit, initialize_post(), $position) : "";
+  $latest_posts = class_exists('FrontContentModel') ? FrontContentModel::frontLatestPosts($limit, initialize_post(), $position) : "";
   return is_iterable($latest_posts) ? $latest_posts : array();
 }
 
 /**
  * retrieves_topic_simple()
- *
+ * 
+ * @category theme function
  * @param int|num $id
  * 
  */
@@ -178,6 +189,7 @@ function retrieves_topic_simple($id)
 /**
  * retrieves_topic_prepared()
  * 
+ * @category theme function
  * @param int|num $id
  * 
  */
@@ -216,7 +228,7 @@ function retrieves_topic_prepared($id)
  */
 function sidebar_topics()
 {
-  $sidebar_topics = class_exists('FrontContentProvider') ? FrontContentProvider::frontSidebarTopics(initialize_topic()) : "";
+  $sidebar_topics = class_exists('FrontContentModel') ? FrontContentModel::frontSidebarTopics(initialize_topic()) : "";
   return is_iterable($sidebar_topics) ? $sidebar_topics : array();
 }
 
@@ -240,7 +252,7 @@ function retrieve_tags()
  */
 function link_tag($id)
 {
-  return (class_exists('FrontContentProvider')) ? FrontContentProvider::frontLinkTag($id, initialize_tag()) : "";
+  return (class_exists('FrontContentModel')) ? FrontContentModel::frontLinkTag($id, initialize_tag()) : "";
 }
 
 /**
@@ -252,7 +264,7 @@ function link_tag($id)
  */
 function link_topic($id)
 {
-  return (class_exists('FrontContentProvider')) ? FrontContentProvider::frontLinkTopic($id, initialize_topic()) : "";
+  return (class_exists('FrontContentModel')) ? FrontContentModel::frontLinkTopic($id, initialize_topic()) : "";
 }
 
 /**
@@ -267,7 +279,7 @@ function previous_post($id)
 
   $html = null;
 
-  $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID < '$idsanitized' AND post_status = 'publish' AND post_type = 'blog' ORDER BY ID LIMIT 1";
+  $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID < '$idsanitized' AND post_status = 'publish' AND post_type = 'blog' ORDER BY ID DESC LIMIT 1";
 
   $stmt = db_simple_query($sql);
 
@@ -289,6 +301,8 @@ function previous_post($id)
 
 /**
  * next_post()
+ * 
+ * @category theme function
  *
  * @param int|num $id
  * 
@@ -299,7 +313,7 @@ function next_post($id)
 
   $html = null;
 
-  $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID > '$idsanitized' AND post_status = 'publish' AND post_type = 'blog' ORDER BY ID LIMIT 1";
+  $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID > '$idsanitized' AND post_status = 'publish' AND post_type = 'blog' ORDER BY ID ASC LIMIT 1";
 
   $stmt = db_simple_query($sql);
 
@@ -329,34 +343,36 @@ function next_post($id)
  */
 function display_galleries($start, $limit)
 {
-  $showcase = class_exists('FrontContentProvider') ? FrontContentProvider::frontGalleries(initialize_gallery(), $start, $limit) : "";
+  $showcase = class_exists('FrontContentModel') ? FrontContentModel::frontGalleries(initialize_gallery(), $start, $limit) : "";
   return is_iterable($showcase) ? $showcase : array();
 }
 
 /**
- * retrieves_posts_published()
+ * retrieve_blog_posts()
  * 
  * retrieving all posts published and display it on blog
- *
+ * 
+ * @category theme function
  * @return mixed
  * 
  */
 function retrieve_blog_posts()
 {
-  $posts = class_exists('FrontContentProvider') ? FrontContentProvider::frontBlogPosts(initialize_post()) : "";
+  $posts = class_exists('FrontContentModel') ? FrontContentModel::frontBlogPosts(initialize_post()) : "";
   return is_iterable($posts) ? $posts : array();
 }
 
 /**
  * retrieve_detail_post()
  *
+ * @category theme function
  * @param int $id
  * @return mixed
  * 
  */
 function retrieve_detail_post($id)
 {
-  $detail_post = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostById($id, initialize_post()) : "";
+  $detail_post = class_exists('FrontContentModel') ? FrontContentModel::frontPostById($id, initialize_post()) : "";
   return is_iterable($detail_post) ? $detail_post : array();
 }
 
@@ -365,26 +381,28 @@ function retrieve_detail_post($id)
  *
  * retrieving posts by archive requested
  * 
+ * @category theme function
  * @param array $values
  * @return mixed
  * 
  */
 function posts_by_archive(array $values)
 {
-  $archives = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostsByArchive($values, initialize_archive()) : "";
+  $archives = class_exists('FrontContentModel') ? FrontContentModel::frontPostsByArchive($values, initialize_archive()) : "";
   return is_iterable($archives) ? $archives : array();
 }
 
 /**
  * posts_by_tag
  *
+ * @category theme function
  * @param string $tag
  * @return mixed
  * 
  */
 function posts_by_tag($tag)
 {
-  $tags = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostsByTag($tag, initialize_tag()) : "";
+  $tags = class_exists('FrontContentModel') ? FrontContentModel::frontPostsByTag($tag, initialize_tag()) : "";
   return is_iterable($tags) ? $tags : array();
 }
 
@@ -393,6 +411,7 @@ function posts_by_tag($tag)
  * 
  * Full-Text searching for posts based on tag requested
  *
+ * @category theme function
  * @param string $tag
  * @return mixed
  * 
@@ -406,15 +425,16 @@ function searching_by_tag($tag)
 /**
  * posts_by_category
  *
- * @param string|num|int $category
+ * @category theme function
+ * @param numeric|int $category
  * @param string $rewrite
  * @return mixed
  */
 function posts_by_category($topicId)
 {
 
-  $entries = FrontContentProvider::frontPostsByTopic($topicId, initialize_topic())['entries'];
-  $pagination = FrontContentProvider::frontPostsByTopic($topicId, initialize_topic())['pagination'];
+  $entries = FrontContentModel::frontPostsByTopic($topicId, initialize_topic())['entries'];
+  $pagination = FrontContentModel::frontPostsByTopic($topicId, initialize_topic())['pagination'];
 
   return is_iterable($entries) ? array('entries' => $entries, 'pagination' => $pagination) : array();
 }
@@ -424,18 +444,20 @@ function posts_by_category($topicId)
  *
  * retrieving list of archives and display it on sidebar theme
  * 
+ * @category theme function
  * @return mixed
  * 
  */
 function retrieve_archives()
 {
-  $archives = class_exists('FrontContentProvider') ? FrontContentProvider::frontSidebarArchives(initialize_archive()) : "";
+  $archives = class_exists('FrontContentModel') ? FrontContentModel::frontSidebarArchives(initialize_archive()) : "";
   return is_iterable($archives) ? $archives : array();
 }
 
 /**
  * retrieve_page
  *
+ * @category theme function
  * @param int|string|numeric $arg
  * @param string $rewrite
  * @return mixed
@@ -444,54 +466,102 @@ function retrieve_archives()
 function retrieve_page($arg, $rewrite)
 {
   if ($rewrite == 'no') {
-    $page = class_exists('FrontContentProvider') ? FrontContentProvider::frontPageById($arg, initialize_page()) : "";
+    $page = class_exists('FrontContentModel') ? FrontContentModel::frontPageById($arg, initialize_page()) : "";
     return is_iterable($page) ? $page : [];
   } else {
-    $page = class_exists('FrontContentProvider') ? FrontContentProvider::frontPageBySlug($arg, initialize_page()) : "";
+    $page = class_exists('FrontContentModel') ? FrontContentModel::frontPageBySlug($arg, initialize_page()) : "";
     return is_iterable($page) ? $page : [];
   }
 }
 
+/**
+ * fetch_comments()
+ *
+ * @category theme function
+ * @param int|numeric $postId
+ * @param integer $offset
+ * 
+ */
+function fetch_comments($postId, $offset = 0)
+{
 
-function retrieve_comments($id, $cpage)
+  $idsanitized = Sanitize::severeSanitizer((int)$postId);
+
+  $limit = isset(app_reading_setting()['comment_per_post']) ? app_reading_setting()['comment_per_post'] : 3;
+
+  // get comments
+  $sql = "SELECT ID, comment_post_id, comment_parent_id, comment_author_name, comment_content, comment_status, comment_date 
+          FROM tbl_comments WHERE comment_status = 'approved' AND comment_post_id = ?  
+          ORDER BY comment_date DESC LIMIT ?, ?";
+  
+  $getComments = db_prepared_query($sql, [$idsanitized, $offset, $limit], "iii")->get_result();
+  $count_items = db_num_rows($getComments);
+
+  $comments = array();
+
+  if ($count_items > 0) {
+
+     while ($row = $getComments->fetch_assoc()) {
+       $comments[] = $row;
+     }
+  }
+
+  return is_iterable($comments) ? $comments : array();
+
+}
+
+/**
+ * retrieve_comments
+ *
+ * @param int|numeric $id
+ * @param integer $offset
+ * 
+ */
+function retrieve_comments($id, $offset = 0)
 {
   $html = '';
 
-  $idsanitized = Sanitize::severeSanitizer($id);
-
-  $limit = isset(app_reading_setting()['comment_per_post']) ? app_reading_setting()['comment_per_post'] : 5;
-
-  $paginationStart = ($cpage > 1) ? ($cpage * $limit) - $limit : 0;
-
-  // get comments
-  $getComments = db_simple_query("SELECT ID, comment_post_id, comment_parent_id, comment_author_name, comment_content, comment_status, comment_date 
-                   FROM tbl_comments WHERE comment_post_id = '$idsanitized' AND comment_status = 'approved' 
-                   ORDER BY comment_date DESC LIMIT $paginationStart, $limit");
-
-  $comments = $getComments->fetch_all(MYSQLI_ASSOC);
-
   // get total comments
-  $allRecords = isset(total_comment($id)['total']) ? total_comment($id)['total'] : 0;
+  $totalRecords = isset(total_comment($id)['total']) ? total_comment($id)['total'] : 0;
 
-  // calculate total page
-  $totalPages = ceil($allRecords / $limit);
+  $html .= '<div id="comments-section" class="post-comments" >';
 
-  // Prev + Next
-  $prev = $cpage - 1;
-  $next = $cpage + 1;
+  if ($offset == 0) {
 
-  $html .= '<div class="post-comments">';
-  $html .= '<header><h3 class="h6">Post Comments<span class="no-of-comments">(' . $allRecords . ')</span></h3></header>';
+    $html .= '<header><h3 class="h6">Post Comments<span class="no-of-comments">(' . htmlspecialchars($totalRecords) . ')</span></h3></header>';
+
+  }
 
   // display comments
-  $html .= display_comments($comments);
+  $getComments = fetch_comments($id, $offset);
+
+  if (is_array($getComments)) {
+
+    $html .= '<button id="load-more" class="btn btn-secondary btn-sm btn-block">View More Comments</button>';
+    
+  }
 
   $html .= '</div>';
 
-  // display pagination
-  $html .= display_pagination($id, $totalPages, $cpage, $prev, $next);
+  return $html;
+}
+
+/**
+ * display_comments
+ *
+ * @param int|num $postId
+ * @return void
+ */
+function display_comments($postId)
+{
+
+  $html = '<script>';
+  $html .= '';
+
+  $html .= '</script>';
 
   return $html;
+
 }
 
 /**
@@ -506,7 +576,7 @@ function total_comment($id)
   $result = db_prepared_query($sql, [$id], "i")->get_result();
   $row = $result->fetch_assoc()['total_comments'];
 
-  return  isset($row) ? ['total' => $row] : array('total' => 0);
+  return isset($row) ? ['total' => $row] : array('total' => 0);
 }
 
 /**
@@ -516,7 +586,7 @@ function total_comment($id)
  * @return string
  * 
  */
-function display_comments($comments)
+function display_comments_leg($comments, $offset, $totalComments)
 {
   $html = '';
 
@@ -527,7 +597,7 @@ function display_comments($comments)
       $comment_content = html_entity_decode(htmLawed(html($comment['comment_content'] ?? '')));
       $comment_at = isset($comment['comment_date']) ? htmlout(make_date($comment['comment_date'])) : "";
 
-      $html .= '<div class="comment">
+      $html .= '<div id="comments-section" class="comment">
                <div class="comment-header d-flex justify-content-between">
                <div class="user d-flex align-items-center">
                <div class="image"><img src="' . theme_dir() . 'assets/img/user.svg" alt="' . $comment_author_name . '" class="img-fluid rounded-circle"></div>';
@@ -535,10 +605,59 @@ function display_comments($comments)
       $html .= '<div class="title"><strong>' . $comment_author_name . '</strong><span class="date">' . $comment_at . '</span></div>';
       $html .= '</div>';
       $html .= '</div>';
-      $html .= '<div class="comment-body">';
+      $html .= '<div id="comments" class="comment-body">';
       $html .= '<p>' . $comment_content . '</p>';
       $html .= '</div>';
+      $html .= '<button id="load-more-button" class="btn btn-primary btn-sm btn-block">View More Comments</button>';
       $html .= '</div>';
+      $html .= '<script>';
+      $html .= '$(document).ready(function() {
+            let offset = 0;
+          
+            const urlParams = new URLSearchParams(window.location.search);
+            const post_id = urlParams.get("post_id");
+
+            if (!post_id) {
+                alert("Post ID not provided in the URL.");
+                return;
+            }
+
+            function loadComments() {
+                $.ajax({
+                    url: "fetch-comments.php",
+                    type: "GET",
+                    data: { post_id: post_id, offset: offset },
+                    success: function(response) {
+                        const comments = JSON.parse(response);
+                        if (comments.length > 0) {
+                            comments.forEach(comment => {
+                                $("#comments").append(`
+                                    <div id="comment-section" class="comment">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${comment.comment_author_name}</h5>
+                                            <p class="card-text">${comment.comment_content}</p>
+                                            <p class="card-text"><small class="text-muted">${comment.comment_date}</small></p>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                            offset += comments.length;
+                        } else {
+                            $("#load-more").text("No More Comments").attr("disabled", true);
+                        }
+                    }
+                });
+            }
+
+            $("#load-more").click(function() {
+                loadComments();
+            });
+
+            loadComments();
+        });';
+
+      $html .= '</scrip>';
+
     }
   } else {
 
@@ -563,7 +682,7 @@ function display_pagination($id, $totalPages, $cpage, $prev, $next)
   $script_name = rtrim(dirname($_SERVER["SCRIPT_NAME"]), DIRECTORY_SEPARATOR);
   $request_uri = DIRECTORY_SEPARATOR . trim(str_replace($script_name, '', $_SERVER['REQUEST_URI']), DIRECTORY_SEPARATOR);
 
-  
+
 
   $html .= '</ul>';
   $html .= '</nav>';
@@ -592,12 +711,12 @@ function display_pagination_leg($id, $totalPages, $cpage, $prev, $next)
     for ($i = 1; $i <= $totalPages; $i++) {
       $html .= '<li class="page-item ';
       $html .= ($cpage == $i) ? 'active' : '';
-      $html .= '"><a class="page-link" href="' . $url  . '/' . $i . '">' . $i . '</a></li>';
+      $html .= '"><a class="page-link" href="' . $url . '/' . $i . '">' . $i . '</a></li>';
     }
 
     // Next page link
     if ($cpage < $totalPages) {
-      $html .= '<li class="page-item"><a class="page-link" href="' . $url  . '/' . $next . '">Next</a></li>';
+      $html .= '<li class="page-item"><a class="page-link" href="' . $url . '/' . $next . '">Next</a></li>';
     } else {
       $html .= '<li class="page-item disabled"><a class="page-link">Next</a></li>';
     }
@@ -682,6 +801,10 @@ function retrieve_site_url()
   return isset($config_file['app']['url']) ? $config_file['app']['url'] : "";
 }
 
+function load_more_comments()
+{
+  
+}
 /**
  * nothing_found
  *
@@ -704,3 +827,4 @@ function nothing_found()
 
 _NOTHING_FOUND;
 }
+
