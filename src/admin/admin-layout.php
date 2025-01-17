@@ -113,7 +113,7 @@ function admin_footer($stylePath, $ubench = null)
     </div>
     
     <strong>Thank you for creating with 
-    <a href="https://scriptlog.sourceforge.io" target="_blank" rel="noopener noreferrer" title="PHP Blog Software">Scriptlog</a>
+    <a href="https://scriptlog.my.id" target="_blank" rel="noopener noreferrer" title="PHP Blog Software">Scriptlog</a>
      <?php echo APP_VERSION; ?>
     </strong>
     <strong>
