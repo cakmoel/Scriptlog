@@ -2,7 +2,7 @@
 
 $retrieve_post = (rewrite_status() == 'yes') ? retrieve_detail_post(request_path()->param1) : retrieve_detail_post(HandleRequest::isQueryStringRequested()['value']);
 
-$post_id = isset($retrieve_post['ID']) ? (int)$retrieve_post['ID'] : "";
+$post_id = isset($retrieve_post['ID']) ? intval((int)$retrieve_post['ID']) : "";
 $post_img = isset($retrieve_post['media_filename']) ? htmlout($retrieve_post['media_filename']) : "";
 $img_alt = isset($retrieve_post['media_caption']) ? htmlout($retrieve_post['media_caption']) : "";
 $post_title = isset($retrieve_post['post_title']) ? htmlout($retrieve_post['post_title']) : "";
@@ -27,8 +27,6 @@ if (isset($retrieve_post['post_date'])) {
 if (isset($retrieve_post['post_modified'])) {
     $post_created = htmlout(make_date($retrieve_post['post_modified']));
 }
-
-$cpage = (isset($_GET['cpage']) && is_numeric($_GET['cpage'])) ? (int)$_GET['cpage'] : 1;
 
 ?>
 
@@ -60,10 +58,25 @@ $cpage = (isset($_GET['cpage']) && is_numeric($_GET['cpage'])) ? (int)$_GET['cpa
                             </div>
                             <div class="post-body">
                                 <?php 
-                                   if (class_exists('DebugRoute')) {
-                                     DebugRoute::debugging();
+
+                                   if (rewrite_status() == 'yes' && class_exists('DebugRoute')) {
+                                      
+                                      DebugRoute::debugging();
+
+                                   } else {
+                                     echo $post_content;
                                    }
+
+                                   echo "<br>";
+
+                                   $postId = parse_post_id();
+                                                                      
+                                   echo "post ID : " . $postId;
+
+                                   echo "<br>";
+
                                 ?>
+                                
                             </div>
 
                             <div class="post-tags">
@@ -77,12 +90,13 @@ $cpage = (isset($_GET['cpage']) && is_numeric($_GET['cpage'])) ? (int)$_GET['cpa
 
                             <?php
                               if ($comment_permit == 'open') :
-                                echo retrieve_comments($post_id, $cpage);
+                                echo retrieve_comments($post_id);
+                              
                             ?>
 
                                 <div class="comment-form-wrap pt-5">
                                     <h3 class="h6 mb-5">Leave a comment</h3>
-                                    <form role="form" method="post" action="<?= retrieve_site_url() . DS . basename('comments-post.php'); ?>" id="commentForm" class="p-5 bg-light">
+                                    <form method="post" action="<?= retrieve_site_url() . DS . basename('comments-post.php'); ?>" id="commentForm" class="p-5 bg-light">
 
                                         <div class="form-group">
                                             <label for="comment">Type your comment*</label>
@@ -105,7 +119,7 @@ $cpage = (isset($_GET['cpage']) && is_numeric($_GET['cpage'])) ? (int)$_GET['cpa
                                             <input type="hidden" id="csrf" class="form-control" name="csrf" value="<?= block_csrf(); ?>">
                                             <input type="hidden" id="post_id" class="form-control" name="post_id" value="<?= abs((int)$post_id); ?>">
                                             <input type="hidden" id="parent_id" class="form-control" name="parent_id" value="0">
-                                            <button type="submit" class="btn btn-primary">Submit Comment</button>
+                                            <button type="submit" class="btn btn-secondary">Submit Comment</button>
                                         </div>
                                         <div id="error_message" class="ajax_response"></div>
                                         <div id="success_message" class="ajax_response"></div>
@@ -124,7 +138,7 @@ $cpage = (isset($_GET['cpage']) && is_numeric($_GET['cpage'])) ? (int)$_GET['cpa
             ?>
         </div>
     </div>
-
+  
 <?php
 
 } else {
