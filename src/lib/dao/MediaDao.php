@@ -164,7 +164,6 @@ class MediaDao extends Dao
 
     $sql = "SELECT ID, media_filename, media_caption, media_type, media_target
          FROM tbl_media  WHERE media_target = 'blog'
-         AND media_access = 'public' AND media_status = '1'
          ORDER BY '$orderBy' DESC";
 
     $this->setSQL($sql);
@@ -190,9 +189,7 @@ class MediaDao extends Dao
                 media_user, media_access, media_status 
          FROM tbl_media
          WHERE ID = ?
-         AND media_target = 'blog'
-         AND media_access = 'public'
-         AND media_status = '1'";
+         AND media_target = 'blog' ";
 
     $this->setSQL($sql);
 
