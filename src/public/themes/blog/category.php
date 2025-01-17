@@ -1,8 +1,8 @@
 <?php
 
-$topicProvider = class_exists('TopicProviderModel') ? new TopicProviderModel() : "";
+$topicProvider = class_exists('TopicProviderModel') ? new TopicModel() : "";
 
-if ($topicProvider instanceof TopicProviderModel) {
+if ($topicProvider instanceof TopicModel) {
 
     if (function_exists('rewrite_status') && rewrite_status() == 'yes' && function_exists('request_path') && request_path()->param1 !== '') {
     
