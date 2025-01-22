@@ -6,8 +6,6 @@ $page_img = isset($retrieve_page['media_filename']) ? htmlout($retrieve_page['me
 $page_id = isset($retrieve_page['ID']) ? (int)$retrieve_page['ID'] : "";
 $page_title = isset($retrieve_page['post_title']) ? htmlout($retrieve_page['post_title']) : "";
 
-$retrieve_comments = comments_by_post($page_id)['comments'];
-
 if (!empty($page_id) || $page_id !== '') {
 
 if (isset($retrieve_page['user_fullname'])) {
@@ -54,7 +52,6 @@ if (isset($retrieve_page['post_date'])) {
                             </a>
                             <div class="d-flex align-items-center flex-wrap">
                                 <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i> <?= $page_created; ?> </div>
-                                <div class="comments meta-last"><i class="icon-comment" aria-hidden="true"></i><?= $total_comment; ?></div>
                             </div>
                         </div>
 

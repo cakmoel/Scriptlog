@@ -4,7 +4,7 @@
  * 
  * @category Core Class
  * @author   M.Noermoehammad
- * @uses HandleRequest::allowedPathRequested if rewrite url enabled otherwise then 
+ * @uses HandleRequest::allowedPathRequested if SEO-Friendly URL enabled otherwise then 
  * @uses HandleRequest::deliverQueryString when it disabled
  * @license  MIT
  * @see https://stackoverflow.com/questions/11696718/htaccess-rewrite-book-phpid-1234-to-book-1234
