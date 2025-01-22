@@ -42,7 +42,20 @@ $uniqueKey = isset($_GET['uniqueKey']) ? safe_html($_GET['uniqueKey']) : null;
 
 if (($action == 'LogIn') && (block_request_type(current_request_method(), ['POST']) === false)) {
 
-  list($errors, $failed_login_attempt) = processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, $_POST);
+  // Sanitize and validate input
+  $login_data = filter_input_array(INPUT_POST, [
+    'login' => FILTER_SANITIZE_SPECIAL_CHARS,
+    'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'csrf' => FILTER_SANITIZE_SPECIAL_CHARS
+  ]);
+
+  // Ensure data is valid 
+  if ($login_data && !in_array(false, $login_data, true)) {
+
+    list($errors, $failed_login_attempt) = processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, $login_data);
+  } else {
+    scriptlog_error("Invalid login data received.");
+  }
    
 }
 
@@ -65,7 +78,7 @@ login_header($stylePath);
 ?>
 
 <div class="alert alert-danger alert-dismissable">
-<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+<button type="button" class="close" data-dismiss="alert">&times;</button>
   <?= $errors['errorMessage']; ?>
 </div>
 
@@ -108,7 +121,7 @@ login_header($stylePath);
 <label for="inputCaptcha">Enter captcha code</label>
 <input type="text" class="form-control" id="inputCaptcha" placeholder="Please type a captcha code here" name="captcha_login" required>
 <span class="glyphicon glyphicon-hand-down form-control-feedback"></span>
-<img src="<?= app_url().'/admin/captcha-login.php'; ?>" alt="image_captcha">
+<img src="<?= app_url().'/admin/captcha-login.php'; ?>" alt="captcha">
 </div>
 
 <?php endif; ?>
@@ -124,7 +137,7 @@ login_header($stylePath);
   <div class="col-xs-8">
     <div class="checkbox icheck">
       <label for="remember-me">
-      <input type="checkbox" aria-checked="false" name="remember" aria-selected="false" id="remember-me" <?php if (isset($_COOKIE['scriptlog_auth'])) : ?> checked<?php endif; ?>>   Remember Me
+      <input type="checkbox" aria-checked="false" name="remember" id="remember-me" <?php if (isset($_COOKIE['scriptlog_auth'])) : ?> checked<?php endif; ?>>   Remember Me
       </label>
     </div>
 </div>          
