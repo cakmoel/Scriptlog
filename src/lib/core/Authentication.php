@@ -495,7 +495,7 @@ class Authentication
       direct_page();
     } else {
 
-      $actived = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname($_SERVER['PHP_SELF']) . '/login.php?status=actived';
+      $actived = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR . 'login.php?status=actived';
       header("Location: $actived", true, 302);
       exit();
     }
@@ -533,17 +533,6 @@ class Authentication
 
         break;
 
-      case ActionConst::MEDIALIB:
-
-        if (($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager')
-          && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author')
-        ) {
-
-          return false;
-        }
-
-        break;
-
       case ActionConst::TOPICS:
 
         if (($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') && ($this->accessLevel() !== 'editor')) {
@@ -554,17 +543,10 @@ class Authentication
         break;
 
       case ActionConst::COMMENTS:
-
-        if (($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'author') && ($this->accessLevel() !== 'contributor')) {
-
-          return false;
-        }
-
-        break;
-
+      case ActionConst::MEDIALIB:
       case ActionConst::REPLY:
 
-        if (($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'editor') && ($this->accessLevel() !== 'author')) {
+        if (($this->accessLevel() !== 'administrator') && ($this->accessLevel() !== 'manager') && ($this->accessLevel() !== 'author')) {
 
           return false;
         }
