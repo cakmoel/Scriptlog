@@ -3,8 +3,8 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";  
 $commentId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $commentDao = class_exists('CommentDao') ? new CommentDao() : "";
-$commentEvent = class_exists('CommentEvent') ? new CommentEvent($commentDao, $validator, $sanitizer) : "";
-$commentApp = class_exists('CommentApp') ?new CommentApp($commentEvent) : "";
+$commentService = class_exists('CommentService') ? new CommentService($commentDao, $validator, $sanitizer) : "";
+$commentController = class_exists('CommentController') ?new CommentController($commentService) : "";
     
 try {
 
@@ -20,7 +20,7 @@ try {
 
                 if ($commentDao->checkCommentId($commentId, $sanitizer)) {
                 
-                    $commentApp->update((int)$commentId);
+                    $commentController->update((int)$commentId);
                     
                 } else {
                     
@@ -50,7 +50,7 @@ try {
 
                 if ($commentDao->checkCommentId($commentId, $sanitizer)) {
 
-                    $commentApp->remove((int)$commentId);
+                    $commentController->remove((int)$commentId);
 
                 } else {
 
@@ -70,7 +70,7 @@ try {
 
             } else {
 
-                $commentApp->listItems();
+                $commentController->listItems();
 
             }
         
