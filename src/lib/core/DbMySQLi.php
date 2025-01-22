@@ -25,7 +25,7 @@ class DbMySQLi
 
   private $ca = false;
 
-  private static $report_mode = [];
+  private static $report_mode;
 
   private static $config = [];
 
@@ -70,11 +70,16 @@ class DbMySQLi
    */
   public static function activateReportMode()
   {
+    if (version_compare(PHP_VERSION, '8.1', '>=')) { 
+        
+      mysqli_report(MYSQLI_REPORT_ERROR|MYSQLI_REPORT_STRICT);
 
-    if (self::$report_mode[] = new mysqli_driver()) {
+    } else {
 
-      self::$report_mode[] =  MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+      mysqli_report(MYSQLI_REPORT_OFF);
+
     }
+   
   }
 
   /**
