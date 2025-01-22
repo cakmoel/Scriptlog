@@ -3,8 +3,8 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $menuId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $menuDao = class_exists('MenuDao') ? new MenuDao() : "";
-$menuEvent = class_exists('MenuEvent') ? new MenuEvent($menuDao, $validator, $sanitizer) : "";
-$menuApp = class_exists('MenuApp') ? new MenuApp($menuEvent) : "";
+$menuService = class_exists('MenuService') ? new MenuService($menuDao, $validator, $sanitizer) : "";
+$menuController = class_exists('MenuController') ? new MenuController($menuService) : "";
 
 try {
 
@@ -26,7 +26,7 @@ try {
 
                 if ($menuId == 0) {
 
-                    $menuApp->insert();
+                    $menuController->insert();
                 } else {
 
                     direct_page('index.php?load=dashboard', 302);
@@ -51,7 +51,7 @@ try {
 
                 if ($menuDao->checkMenuId($menuId, $sanitizer)) {
 
-                    $menuApp->update((int)$menuId);
+                    $menuController->update((int)$menuId);
                 } else {
 
                     direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
@@ -76,7 +76,7 @@ try {
 
                 if ($menuDao->checkMenuId($menuId, $sanitizer)) {
 
-                    $menuApp->remove((int)$menuId);
+                    $menuController->remove((int)$menuId);
                 } else {
 
                     direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
@@ -92,7 +92,7 @@ try {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
 
-                $menuApp->listItems();
+                $menuController->listItems();
             }
     }
 } catch (Throwable $th) {
