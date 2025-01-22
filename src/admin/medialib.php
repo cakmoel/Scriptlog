@@ -3,9 +3,9 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $mediaId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $mediaDao = class_exists('MediaDao') ?  new MediaDao() : "";
-$downloadProvider = class_exists('DownloadProviderModel') ? new DownloadProviderModel() : "";
-$mediaEvent = new MediaEvent($mediaDao, $downloadProvider, $validator, $sanitizer);
-$mediaLib = new MediaApp($mediaEvent);
+$downloadModel = class_exists('DownloadModel') ? new DownloadModel() : "";
+$mediaService = class_exists('MediaService') ? new MediaService($mediaDao, $downloadModel, $validator, $sanitizer) : "";
+$mediaController = class_exists('MediaController') ? new MediaController($mediaService) : "";
 
 try {
 
@@ -29,7 +29,7 @@ try {
                
                if ($mediaId == 0) {
     
-                    $mediaLib->insert();
+                    $mediaController->insert();
       
                 } else {
       
@@ -59,7 +59,7 @@ try {
     
              if ($mediaDao->checkMediaId($mediaId, $sanitizer)) {
     
-                $mediaLib->update((int)$mediaId);
+                $mediaController->update((int)$mediaId);
      
              } else {
      
@@ -89,7 +89,7 @@ try {
               
               if ($mediaDao->checkMediaId($mediaId, $sanitizer)) {
        
-                  $mediaLib->remove((int)$mediaId);
+                  $mediaController->remove((int)$mediaId);
        
               } else {
        
@@ -109,7 +109,7 @@ try {
     
             } else {
     
-               $mediaLib->listItems();
+               $mediaController->listItems();
     
             }
             
