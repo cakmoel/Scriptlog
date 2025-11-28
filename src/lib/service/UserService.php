@@ -621,7 +621,7 @@ public function reAuthenticateUserPrivilege($login, $password)
  * @return integer
  * 
  */
- public function totalUsers($data = null)
+ public function totalUsers(array $data = []): ?int
  {
   return $this->userDao->totalUserRecords($data);
  }

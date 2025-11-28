@@ -6,10 +6,10 @@ declare(strict_types=1);
  *
  * The Lightweight PHP Database Framework to Accelerate Development.
  *
- * @version 2.1.7
+ * @version 2.1.12
  * @author Angel Lai
  * @package Medoo
- * @copyright Copyright 2022 Medoo Project, Angel Lai.
+ * @copyright Copyright 2024 Medoo Project, Angel Lai.
  * @license https://opensource.org/licenses/MIT
  * @link https://medoo.in
  */
@@ -43,22 +43,30 @@ class Raw
 }
 
 /**
+ * @method array select(string $table, array $columns)
+ * @method mixed select(string $table, string $column)
  * @method array select(string $table, array $columns, array $where)
+ * @method mixed select(string $table, string $column, array $where)
+ * @method array select(string $table, array $join, array $columns)
+ * @method mixed select(string $table, array $join, string $column)
  * @method null select(string $table, array $columns, callable $callback)
+ * @method null select(string $table, string $column, callable $callback)
  * @method null select(string $table, array $columns, array $where, callable $callback)
+ * @method null select(string $table, string $column, array $where, callable $callback)
  * @method null select(string $table, array $join, array $columns, array $where, callable $callback)
+ * @method null select(string $table, array $join, string $column, array $where, callable $callback)
  * @method mixed get(string $table, array|string $columns, array $where)
  * @method bool has(string $table, array $where)
  * @method mixed rand(string $table, array|string $column, array $where)
  * @method int count(string $table, array $where)
- * @method int max(string $table, string $column)
- * @method int min(string $table, string $column)
- * @method int avg(string $table, string $column)
- * @method int sum(string $table, string $column)
- * @method int max(string $table, string $column, array $where)
- * @method int min(string $table, string $column, array $where)
- * @method int avg(string $table, string $column, array $where)
- * @method int sum(string $table, string $column, array $where)
+ * @method string max(string $table, string $column)
+ * @method string min(string $table, string $column)
+ * @method string avg(string $table, string $column)
+ * @method string sum(string $table, string $column)
+ * @method string max(string $table, string $column, array $where)
+ * @method string min(string $table, string $column, array $where)
+ * @method string avg(string $table, string $column, array $where)
+ * @method string sum(string $table, string $column, array $where)
  */
 class Medoo
 {
@@ -173,6 +181,27 @@ class Medoo
      * @var array|null
      */
     public $errorInfo = null;
+
+    /**
+     * Regular expression pattern for valid table names.
+     *
+     * @var string
+     */
+    protected const TABLE_PATTERN = "[\p{L}_][\p{L}\p{N}@$#\-_]*";
+
+    /**
+     * Regular expression pattern for valid column names.
+     *
+     * @var string
+     */
+    protected const COLUMN_PATTERN = "[\p{L}_][\p{L}\p{N}@$#\-_\.]*";
+
+    /**
+     * Regular expression pattern for valid alias names.
+     *
+     * @var string
+     */
+    protected const ALIAS_PATTERN = "[\p{L}_][\p{L}\p{N}@$#\-_]*";
 
     /**
      * Connect the database.
@@ -512,7 +541,7 @@ class Medoo
      * @codeCoverageIgnore
      * @return \PDOStatement|null
      */
-    public function exec(string $statement, array $map = [], callable $callback = null): ?PDOStatement
+    public function exec(string $statement, array $map = [], ?callable $callback = null): ?PDOStatement
     {
         $this->statement = null;
         $this->errorInfo = null;
@@ -604,7 +633,7 @@ class Medoo
 
         foreach ($map as $key => $value) {
             if ($value[1] === PDO::PARAM_STR) {
-                $replace = $this->quote($value[0]);
+                $replace = $this->quote("{$value[0]}");
             } elseif ($value[1] === PDO::PARAM_NULL) {
                 $replace = 'NULL';
             } elseif ($value[1] === PDO::PARAM_LOB) {
@@ -661,7 +690,7 @@ class Medoo
         }
 
         $query = preg_replace_callback(
-            '/(([`\']).*?)?((FROM|TABLE|INTO|UPDATE|JOIN|TABLE IF EXISTS)\s*)?\<(([\p{L}_][\p{L}\p{N}@$#\-_]*)(\.[\p{L}_][\p{L}\p{N}@$#\-_]*)?)\>([^,]*?\2)?/u',
+            '/(([`\'])[\<]*?)?((FROM|TABLE|TABLES LIKE|INTO|UPDATE|JOIN|TABLE IF EXISTS)\s*)?\<((' . $this::TABLE_PATTERN . ')(\.' . $this::COLUMN_PATTERN . ')?)\>([^,]*?\2)?/',
             function ($matches) {
                 if (!empty($matches[2]) && isset($matches[8])) {
                     return $matches[0];
@@ -710,7 +739,7 @@ class Medoo
      */
     public function tableQuote(string $table): string
     {
-        if (preg_match('/^[\p{L}_][\p{L}\p{N}@$#\-_]*$/u', $table)) {
+        if (preg_match("/^" . $this::TABLE_PATTERN . "$/u", $table)) {
             return '"' . $this->prefix . $table . '"';
         }
 
@@ -725,7 +754,7 @@ class Medoo
      */
     public function columnQuote(string $column): string
     {
-        if (preg_match('/^[\p{L}_][\p{L}\p{N}@$#\-_]*(\.?[\p{L}_][\p{L}\p{N}@$#\-_]*)?$/u', $column)) {
+        if (preg_match("/^" . $this::TABLE_PATTERN . "(\.?" . $this::ALIAS_PATTERN . ")?$/u", $column)) {
             return strpos($column, '.') !== false ?
                 '"' . $this->prefix . str_replace('.', '"."', $column) . '"' :
                 '"' . $column . '"';
@@ -794,14 +823,14 @@ class Medoo
             } elseif ($isArrayValue) {
                 $stack[] = $this->columnPush($value, $map, false, $isJoin);
             } elseif (!$isIntKey && $raw = $this->buildRaw($value, $map)) {
-                preg_match('/(?<column>[\p{L}_][\p{L}\p{N}@$#\-_\.]*)(\s*\[(?<type>(String|Bool|Int|Number))\])?/u', $key, $match);
+                preg_match("/(?<column>" . $this::COLUMN_PATTERN . ")(\s*\[(?<type>(String|Bool|Int|Number))\])?/u", $key, $match);
                 $stack[] = "{$raw} AS {$this->columnQuote($match['column'])}";
             } elseif ($isIntKey && is_string($value)) {
                 if ($isJoin && strpos($value, '*') !== false) {
                     throw new InvalidArgumentException('Cannot use table.* to select all columns while joining table.');
                 }
 
-                preg_match('/(?<column>[\p{L}_][\p{L}\p{N}@$#\-_\.]*)(?:\s*\((?<alias>[\p{L}_][\p{L}\p{N}@$#\-_]*)\))?(?:\s*\[(?<type>(?:String|Bool|Int|Number|Object|JSON))\])?/u', $value, $match);
+                preg_match("/(?<column>" . $this::COLUMN_PATTERN . ")(?:\s*\((?<alias>" . $this::ALIAS_PATTERN . ")\))?(?:\s*\[(?<type>(?:String|Bool|Int|Number|Object|JSON))\])?/u", $value, $match);
 
                 $columnString = '';
 
@@ -858,20 +887,20 @@ class Medoo
             $isIndex = is_int($key);
 
             preg_match(
-                '/([\p{L}_][\p{L}\p{N}@$#\-_\.]*)(\[(?<operator>.*)\])?([\p{L}_][\p{L}\p{N}@$#\-_\.]*)?/u',
+                "/(?<column>" . $this::COLUMN_PATTERN . ")(\[(?<operator>.*)\])?(?<comparison>" . $this::COLUMN_PATTERN . ")?/u",
                 $isIndex ? $value : $key,
                 $match
             );
 
-            $column = $this->columnQuote($match[1]);
+            $column = $this->columnQuote($match['column']);
             $operator = $match['operator'] ?? null;
 
-            if ($isIndex && isset($match[4]) && in_array($operator, ['>', '>=', '<', '<=', '=', '!='])) {
-                $stack[] = "${column} ${operator} " . $this->columnQuote($match[4]);
+            if ($isIndex && isset($match['comparison']) && in_array($operator, ['>', '>=', '<', '<=', '=', '!='])) {
+                $stack[] = "{$column} {$operator} " . $this->columnQuote($match['comparison']);
                 continue;
             }
 
-            if ($operator && $operator != '=') {
+            if ($operator && $operator !== '=') {
                 if (in_array($operator, ['>', '>=', '<', '<='])) {
                     $condition = "{$column} {$operator} ";
 
@@ -894,15 +923,20 @@ class Medoo
                             break;
 
                         case 'array':
-                            $placeholders = [];
+                            $values = [];
 
                             foreach ($value as $index => $item) {
-                                $stackKey = $mapKey . $index . '_i';
-                                $placeholders[] = $stackKey;
-                                $map[$stackKey] = $this->typeMap($item, gettype($item));
+                                if ($raw = $this->buildRaw($item, $map)) {
+                                    $values[] = $raw;
+                                } else {
+                                    $stackKey = $mapKey . $index . '_i';
+
+                                    $values[] = $stackKey;
+                                    $map[$stackKey] = $this->typeMap($item, gettype($item));
+                                }
                             }
 
-                            $stack[] = $column . ' NOT IN (' . implode(', ', $placeholders) . ')';
+                            $stack[] = $column . ' NOT IN (' . implode(', ', $values) . ')';
                             break;
 
                         case 'object':
@@ -937,14 +971,15 @@ class Medoo
                     $likeClauses = [];
 
                     foreach ($value as $index => $item) {
+                        $likeKey = "{$mapKey}_{$index}_i";
                         $item = strval($item);
 
                         if (!preg_match('/((?<!\\\)\[.+(?<!\\\)\]|(?<!\\\)[\*\?\!\%#^_]|%.+|.+%)/', $item)) {
                             $item = '%' . $item . '%';
                         }
 
-                        $likeClauses[] = $column . ($operator === '!~' ? ' NOT' : '') . " LIKE {$mapKey}L{$index}";
-                        $map["{$mapKey}L{$index}"] = [$item, PDO::PARAM_STR];
+                        $likeClauses[] = $column . ($operator === '!~' ? ' NOT' : '') . " LIKE {$likeKey}";
+                        $map[$likeKey] = [$item, PDO::PARAM_STR];
                     }
 
                     $stack[] = '(' . implode($connector, $likeClauses) . ')';
@@ -981,16 +1016,20 @@ class Medoo
                     break;
 
                 case 'array':
-                    $placeholders = [];
+                    $values = [];
 
                     foreach ($value as $index => $item) {
-                        $stackKey = $mapKey . $index . '_i';
+                        if ($raw = $this->buildRaw($item, $map)) {
+                            $values[] = $raw;
+                        } else {
+                            $stackKey = $mapKey . $index . '_i';
 
-                        $placeholders[] = $stackKey;
-                        $map[$stackKey] = $this->typeMap($item, gettype($item));
+                            $values[] = $stackKey;
+                            $map[$stackKey] = $this->typeMap($item, gettype($item));
+                        }
                     }
 
-                    $stack[] = $column . ' IN (' . implode(', ', $placeholders) . ')';
+                    $stack[] = $column . ' IN (' . implode(', ', $values) . ')';
                     break;
 
                 case 'object':
@@ -1172,7 +1211,7 @@ class Medoo
         $where = null,
         $columnFn = null
     ): string {
-        preg_match('/(?<table>[\p{L}_][\p{L}\p{N}@$#\-_]*)\s*\((?<alias>[\p{L}_][\p{L}\p{N}@$#\-_]*)\)/u', $table, $tableMatch);
+        preg_match("/(?<table>" . $this::TABLE_PATTERN . ")\s*\((?<alias>" . $this::ALIAS_PATTERN . ")\)/u", $table, $tableMatch);
 
         if (isset($tableMatch['table'], $tableMatch['alias'])) {
             $table = $this->tableQuote($tableMatch['table']);
@@ -1273,7 +1312,7 @@ class Medoo
         ];
 
         foreach ($join as $subtable => $relation) {
-            preg_match('/(\[(?<join>\<\>?|\>\<?)\])?(?<table>[\p{L}_][\p{L}\p{N}@$#\-_]*)\s?(\((?<alias>[\p{L}_][\p{L}\p{N}@$#\-_]*)\))?/u', $subtable, $match);
+            preg_match("/(\[(?<join>\<\>?|\>\<?)\])?(?<table>" . $this::TABLE_PATTERN . ")\s?(\((?<alias>" . $this::ALIAS_PATTERN . ")\))?/u", $subtable, $match);
 
             if ($match['join'] === '' || $match['table'] === '') {
                 continue;
@@ -1318,7 +1357,7 @@ class Medoo
                 $tableName .= ' AS ' . $this->tableQuote($match['alias']);
             }
 
-            $tableJoin[] = $type[$match['join']] . " JOIN ${tableName} ${relation}";
+            $tableJoin[] = $type[$match['join']] . " JOIN {$tableName} {$relation}";
         }
 
         return implode(' ', $tableJoin);
@@ -1340,7 +1379,7 @@ class Medoo
 
         foreach ($columns as $key => $value) {
             if (is_int($key)) {
-                preg_match('/([\p{L}_][\p{L}\p{N}@$#\-_]*\.)?(?<column>[\p{L}_][\p{L}\p{N}@$#\-_]*)(?:\s*\((?<alias>[\p{L}_][\p{L}\p{N}@$#\-_]*)\))?(?:\s*\[(?<type>(?:String|Bool|Int|Number|Object|JSON))\])?/u', $value, $keyMatch);
+                preg_match("/(" . $this::TABLE_PATTERN . "\.)?(?<column>" . $this::COLUMN_PATTERN . ")(?:\s*\((?<alias>" . $this::ALIAS_PATTERN . ")\))?(?:\s*\[(?<type>(?:String|Bool|Int|Number|Object|JSON))\])?/u", $value, $keyMatch);
 
                 $columnKey = !empty($keyMatch['alias']) ?
                     $keyMatch['alias'] :
@@ -1348,14 +1387,14 @@ class Medoo
 
                 $stack[$value] = isset($keyMatch['type']) ?
                     [$columnKey, $keyMatch['type']] :
-                    [$columnKey, 'String'];
+                    [$columnKey];
             } elseif ($this->isRaw($value)) {
-                preg_match('/([\p{L}_][\p{L}\p{N}@$#\-_]*\.)?(?<column>[\p{L}_][\p{L}\p{N}@$#\-_]*)(\s*\[(?<type>(String|Bool|Int|Number))\])?/u', $key, $keyMatch);
+                preg_match("/(" . $this::TABLE_PATTERN . "\.)?(?<column>" . $this::COLUMN_PATTERN . ")(\s*\[(?<type>(String|Bool|Int|Number))\])?/u", $key, $keyMatch);
                 $columnKey = $keyMatch['column'];
 
                 $stack[$key] = isset($keyMatch['type']) ?
                     [$columnKey, $keyMatch['type']] :
-                    [$columnKey, 'String'];
+                    [$columnKey];
             } elseif (!is_int($key) && is_array($value)) {
                 if ($root && count(array_keys($columns)) === 1) {
                     $stack[$key] = [$key, 'String'];
@@ -1386,14 +1425,14 @@ class Medoo
         array $columnMap,
         array &$stack,
         bool $root,
-        array &$result = null
+        ?array &$result = null
     ): void {
         if ($root) {
             $columnsKey = array_keys($columns);
 
             if (count($columnsKey) === 1 && is_array($columns[$columnsKey[0]])) {
                 $indexKey = array_keys($columns)[0];
-                $dataKey = preg_replace("/^[\p{L}_][\p{L}\p{N}@$#\-_]*\./u", '', $indexKey);
+                $dataKey = preg_replace("/^" . $this::COLUMN_PATTERN . "\./u", '', $indexKey);
                 $currentStack = [];
 
                 foreach ($data as $item) {
@@ -1461,7 +1500,7 @@ class Medoo
                             break;
 
                         case 'String':
-                            $stack[$columnKey] = $item;
+                            $stack[$columnKey] = (string) $item;
                             break;
                     }
                 } else {
@@ -1527,7 +1566,7 @@ class Medoo
 
         foreach ($columns as $name => $definition) {
             if (is_int($name)) {
-                $stack[] = preg_replace('/\<([\p{L}_][\p{L}\p{N}@$#\-_]*)\>/u', '"$1"', $definition);
+                $stack[] = preg_replace("/\<(" . $this::COLUMN_PATTERN . ")\>/u", '"$1"', $definition);
             } elseif (is_array($definition)) {
                 $stack[] = $this->columnQuote($name) . ' ' . implode(' ', $definition);
             } elseif (is_string($definition)) {
@@ -1658,7 +1697,7 @@ class Medoo
      * @param string $primaryKey
      * @return \PDOStatement|null
      */
-    public function insert(string $table, array $values, string $primaryKey = null): ?PDOStatement
+    public function insert(string $table, array $values, ?string $primaryKey = null): ?PDOStatement
     {
         $stack = [];
         $columns = [];
@@ -1782,7 +1821,7 @@ class Medoo
                 continue;
             }
 
-            preg_match('/(?<column>[\p{L}_][\p{L}\p{N}@$#\-_]*)(\[(?<operator>\+|\-|\*|\/)\])?/u', $key, $match);
+            preg_match("/" . $this::COLUMN_PATTERN . "(\[(?<operator>\+|\-|\*|\/)\])?/u", $key, $match);
 
             if (isset($match['operator'])) {
                 if (is_numeric($value)) {
@@ -2121,7 +2160,7 @@ class Medoo
      * @codeCoverageIgnore
      * @return string|null
      */
-    public function id(string $name = null): ?string
+    public function id(?string $name = null): ?string
     {
         $type = $this->type;
 

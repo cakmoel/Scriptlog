@@ -12,7 +12,7 @@
  * @see https://en.wikipedia.org/wiki/List_of_the_most_common_passwords
  * @see https://www.forbes.com/sites/kateoflahertyuk/2018/12/14/these-are-the-top-20-worst-passwords-of-2018/#2d5af4af4541
  * @see https://www.forbes.com/sites/kateoflahertyuk/2019/04/21/these-are-the-worlds-most-hacked-passwords-is-yours-on-the-list/#793adaf3289c
- * @see https://mozilla.github.io/application-services/docs/accounts/50000-most-common-passwords.html (404 not found)
+ * @see https://nordpass.com/most-common-passwords-list/
  * @return array
  * 
  */

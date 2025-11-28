@@ -283,7 +283,7 @@ class UserDao extends Dao
           
      }
      
-     $this->modify("tbl_users", $bind, "ID = ".(int)$cleanID);
+     $this->modify("tbl_users", $bind, ['ID' => (int)$cleanID]);
      
  }
 
@@ -297,7 +297,7 @@ class UserDao extends Dao
   */
  public function updateUserSession($bind, $userID)
  { 
-   $this->modify("tbl_users", ['user_session' => generate_session_key($bind['user_session'], 32), 'login_time' => date('Y-m-d H:i:s')], "ID = {$userID}");
+   $this->modify("tbl_users", ['user_session' => generate_session_key($bind['user_session'], 32), 'login_time' => date('Y-m-d H:i:s')], ["ID" => $userID]);
  }
 
  /**
@@ -311,7 +311,7 @@ class UserDao extends Dao
   */
  public function updateResetKey($bind, $user_email)
  {
-   $this->modify("tbl_users", ['user_reset_key' => $bind['user_reset_key'], 'user_reset_complete' => $bind['user_reset_complete']], "user_email = '{$user_email}'");
+   $this->modify("tbl_users", ['user_reset_key' => $bind['user_reset_key'], 'user_reset_complete' => $bind['user_reset_complete']], ["user_email" => $user_email]);
  }
 
  /**
@@ -324,7 +324,7 @@ class UserDao extends Dao
  public function recoverNewPassword($bind, $userID)
  {
    $recoverPassword = scriptlog_password($bind['user_pass']);
-   $this->modify("tbl_users", ['user_pass' => $recoverPassword, 'user_reset_complete' => $bind['user_reset_complete']], "ID = '{$userID}'");          
+   $this->modify("tbl_users", ['user_pass' => $recoverPassword, 'user_reset_complete' => $bind['user_reset_complete']], ["ID" => $userID]);          
  }
 
  /**
@@ -346,7 +346,7 @@ class UserDao extends Dao
    } else {
        
       $bind = ['user_activation_key' => '1', 'user_registered' => date("Y-m-d H:i:s")];
-      $this->modify("tbl_users", $bind, "user_activation_key = {$key}");
+      $this->modify("tbl_users", $bind, ["user_activation_key" => $key]);
       $userAccount = true;
        
    }
@@ -365,7 +365,7 @@ class UserDao extends Dao
  public function deleteUser($userID, $sanitize)
  {
    $cleanID = $this->filteringId($sanitize, $userID, 'sql'); 
-   $this->deleteRecord("tbl_users", "ID = {$cleanID}");
+   $this->deleteRecord("tbl_users", ["ID" => $cleanID]);
  }
  
 /**
@@ -501,13 +501,13 @@ class UserDao extends Dao
  * @return integer
  *  
  */
- public function totalUserRecords($data = array())
+ public function totalUserRecords(array $data = []): ?int
  {
     $sql = "SELECT ID FROM tbl_users";
      
     $this->setSQL($sql);
      
-    return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
+    return $this->checkCountValue($data) ?? 0;
      
  }
  

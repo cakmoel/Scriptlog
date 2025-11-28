@@ -3,8 +3,8 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $userId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $sessionId = isset($_GET['sessionId']) ? safe_html($_GET['sessionId']): null;
-$userEvent = class_exists('UserEvent') ? new UserEvent($userDao, $validator, $userToken, $sanitizer) : "";
-$userApp = class_exists('UserApp') ? new UserApp($userEvent) : "";
+$userService = class_exists('UserService') ? new UserService($userDao, $validator, $userToken, $sanitizer) : "";
+$userController = class_exists('UserController') ? new UserController($userService) : "";
 
 try {
 
@@ -15,7 +15,6 @@ try {
           if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
     
             direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
-    
           } else {
     
             if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
@@ -28,7 +27,7 @@ try {
     
             if ($userId === 0) {
     
-                $userApp->insert();
+                $userController->insert();
     
             } else {
     
@@ -66,11 +65,11 @@ try {
     
                 if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
     
-                    $userApp->updateProfile($user_login);
+                    $userController->updateProfile($user_login);
         
                 } else {
         
-                    $userApp->update((int)$userId);
+                    $userController->update((int)$userId);
         
                 }
     
@@ -104,11 +103,11 @@ try {
 
                 if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
 
-                    $userApp->removeProfile($user_login, $authenticator);
+                    $userController->removeProfile($user_login, $authenticator);
 
                 } else {
 
-                    $userApp->remove((int)$userId);
+                    $userController->remove((int)$userId);
 
                 }
 
@@ -120,11 +119,11 @@ try {
             
            if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
     
-             $userApp->showProfile($user_login);
+             $userController->showProfile($user_login);
     
            } else {
     
-             $userApp->listItems();
+             $userController->listItems();
     
            }
             

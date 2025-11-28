@@ -3,8 +3,8 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $replyId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $replyDao = class_exists('ReplyDao') ? new ReplyDao() : "";
-$replyEvent = class_exists('ReplyEvent') ? new ReplyEvent($replyDao, $validator, $sanitizer) : "";
-$replyApp = class_exists('ReplyApp') ? new ReplyApp($replyEvent)  : "";
+$replyService = class_exists('ReplyEvent') ? new ReplyService($replyDao, $validator, $sanitizer) : "";
+$replyController = class_exists('ReplyApp') ? new ReplyController($replyEvent)  : "";
 
 try {
 
@@ -28,7 +28,7 @@ try {
 
                 if ($replyId === 0) {
 
-                    $replyApp->insert();
+                    $replyController->insert();
 
                 } else {
 

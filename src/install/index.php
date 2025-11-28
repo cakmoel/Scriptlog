@@ -45,7 +45,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
     }
 
     if ($tables_exist) {
-        // Redirect to setup-db.php if tables exist
+        // Redirect to setup-db.php
         $create_db = $protocol . '://' . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR . 'setup-db.php';
         header("Location: $create_db", true, 302);
     } else {

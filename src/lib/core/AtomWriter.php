@@ -45,9 +45,9 @@ class AtomWriter
   private function grabPostFeed($limit)
   {
 
-    $postProviderModel = class_exists('PostProviderModel') ? new PostProviderModel() : "";
+    $postProviderModel = class_exists('PostModel') ? new PostModel() : "";
 
-    $this->frontContentProvider = class_exists('FrontContentProvider') ? FrontContentProvider::frontPostsFeed($limit, $postProviderModel) : "";
+    $this->frontContentProvider = class_exists('FrontContentModel') ? FrontContentModel::frontPostsFeed($limit, $postProviderModel) : "";
 
     return $this->frontContentProvider;
   }

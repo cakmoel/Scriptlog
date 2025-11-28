@@ -23,7 +23,7 @@
  * @param array $data
  * 
  */
-function write_ini($file, $array = []) 
+function write_ini(string $file, array $array = []) 
 {
 
   if (!is_readable($file)) {

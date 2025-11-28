@@ -3,8 +3,8 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $themeId = isset($_GET['Id']) ? abs((int)$_GET['Id']) : 0;
 $themeDao = class_exists('ThemeDao') ? new ThemeDao() : "";
-$themeEvent = class_exists('ThemeEvent') ? new ThemeEvent($themeDao, $validator, $sanitizer) : "";
-$themeApp = class_exists('ThemeApp') ? new ThemeApp($themeEvent) : "";
+$themeService = class_exists('ThemeService') ? new ThemeService($themeDao, $validator, $sanitizer) : "";
+$themeController = class_exists('ThemeController') ? new ThemeController($themeService) : "";
 
 try {
 
@@ -26,7 +26,7 @@ try {
 
                 if ($themeId == 0) {
 
-                    $themeApp->insert();
+                    $themeController->insert();
                 } else {
 
                     direct_page('index.php?load=dashboard', 302);
@@ -51,7 +51,7 @@ try {
 
                     if ($themeId == 0) {
 
-                        $themeApp->setupTheme();
+                        $themeController->setupTheme();
                     }
                 }
             }
@@ -74,7 +74,7 @@ try {
 
                 if ($themeDao->checkThemeId($themeId, $sanitizer)) {
 
-                    $themeApp->update((int)$themeId);
+                    $themeController->update((int)$themeId);
                 } else {
 
                     direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
@@ -99,7 +99,7 @@ try {
 
                 if ($themeDao->checkThemeId($themeId, $sanitizer)) {
 
-                    $themeApp->remove((int)$themeId);
+                    $themeController->remove((int)$themeId);
                 } else {
 
                     direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
@@ -124,7 +124,7 @@ try {
 
                 if ($themeDao->checkThemeId($themeId, $sanitizer)) {
 
-                    $themeApp->enableTheme((int)$themeId);
+                    $themeController->enableTheme((int)$themeId);
                 } else {
 
                     direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
@@ -140,7 +140,7 @@ try {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
 
-                $themeApp->listItems(); // show list of all themes
+                $themeController->listItems(); // show list of all themes
 
             }
 

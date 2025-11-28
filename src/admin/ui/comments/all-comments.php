@@ -80,7 +80,7 @@
                    ?>
                        <tr>
                          <td><?= $no; ?></td>
-                         <td><a href="<?= generate_request("index.php", 'get', ['reply', ActionConst::RESPONSETO, 0])['link']; ?>"><?= htmlspecialchars($comment['comment_content']); ?></a></td>
+                         <td><a href="<?= generate_request("index.php", 'get', ['comments', ActionConst::EDITCOMMENT, $comment['ID']])['link']; ?>"><?= htmlspecialchars($comment['comment_content']); ?></a></td>
                          <td><?= safe_html($comment['post_title']); ?></td>
                          <td><?= time_elapsed_string($comment['comment_date']); ?></td>
 

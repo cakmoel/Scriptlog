@@ -32,9 +32,9 @@ class RSSFeed
  private function grabPostFeed($limit)
  {
 
-  $postProviderModel = new PostProviderModel();
+  $postProviderModel = new PostModel();
 
-  $this->frontContentProvider = FrontContentProvider::frontPostsFeed($limit, $postProviderModel);
+  $this->frontContentProvider = FrontContentModel::frontPostsFeed($limit, $postProviderModel);
 
   return $this->frontContentProvider;
   
@@ -81,7 +81,6 @@ class RSSFeed
    foreach ($dataPosts as $dataPost) {
        
      //build the full URL to the post
-     //$url = APP_PROTOCOL . '://'. APP_HOSTNAME . dirname($_SERVER['PHP_SELF']) . '/post/'.(int)$dataPost['ID'].'/'.$dataPost['post_slug'];
      $url = permalinks((int)$dataPost['ID'])['post'].DS.'';
 
      // date post created

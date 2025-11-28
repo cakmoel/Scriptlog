@@ -3,8 +3,8 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $postId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $postDao = class_exists('PostDao') ? new PostDao() : "";
-$postEvent = class_exists('PostEvent') ? new PostEvent($postDao, $validator, $sanitizer) : "";
-$postApp = class_exists('PostApp') ? new PostApp($postEvent) : "";
+$postService = class_exists('PostService') ? new PostService($postDao, $validator, $sanitizer) : "";
+$postController = class_exists('PostController') ? new PostController($postService) : "";
 
 try {
 
@@ -27,7 +27,7 @@ try {
 
                 if ($postId == 0) {
 
-                    $postApp->insert();
+                    $postController->insert();
                 } else {
 
                     direct_page('index.php?load=dashboard', 302);
@@ -53,7 +53,7 @@ try {
                 
                 if ($postDao->checkPostId($postId, $sanitizer)) {
 
-                    $postApp->update((int)$postId);
+                    $postController->update((int)$postId);
 
                 } else {
 
@@ -79,7 +79,7 @@ try {
 
                 if ($postDao->checkPostId($postId, $sanitizer)) {
 
-                    $postApp->remove((int)$postId);
+                    $postController->remove((int)$postId);
                 } else {
 
                     direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
@@ -95,7 +95,7 @@ try {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
 
-                $postApp->listItems();
+                $postController->listItems();
             }
 
     }

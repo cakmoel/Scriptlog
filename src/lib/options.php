@@ -1,4 +1,5 @@
 <?php
+
 /**
  * options.php
  * 
@@ -8,6 +9,7 @@
  * @version 1.0
  * 
  */
+
 #ini_set("session.cookie_secure", 1);  
 #ini_set("session.cookie_lifetime", 604800);  
 ini_set("session.cookie_httponly", 1);
@@ -18,6 +20,6 @@ ini_set("session.use_only_cookies", 1);
 ini_set('session.save_handler', 'files');
 ini_set('session.gc_divisor', 100);
 ini_set('session.gc_maxlifetime', 1440);
-ini_set('session.gc_probability', 1);
+ini_set('session.gc_probability', 0);
 
 #header("Permissions-Policy: interest-cohort=()"); // Opt out of FLoC

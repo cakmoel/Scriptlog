@@ -2,43 +2,45 @@
 /**
  * File authenticator.php
  * 
- * checking whether session cookies exists
+ * *checking whether session cookies exists
  * 
  * @category authenticator.php checking whether cookies or session exists or not
  * @author M.Noermoehammad scriptlog@yandex.com
  * @author Vincy vincy@gmail.com
  * @license MIT
  * @version 1.0
- * @see https://phppot.com/php/secure-remember-me-for-login-using-php-session-and-cookies/
- * @see https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string
- * @see https://paragonie.com/blog/2015/04/secure-authentication-php-with-long-term-persistence
- * @see https://en.wikibooks.org/wiki/PHP_Programming/Sessions#Avoiding_Session_Fixation
- * @see https://stackoverflow.com/a/17266448/6667699
- * 
- */
+ * @link https://phppot.com/php/secure-remember-me-for-login-using-php-session-and-cookies/
+ * @link https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string
+ * @link https://paragonie.com/blog/2015/04/secure-authentication-php-with-long-term-persistence
+ * @link https://en.wikibooks.org/wiki/PHP_Programming/Sessions#Avoiding_Session_Fixation
+ * @link https://stackoverflow.com/a/17266448/6667699
+ * */
 $timeout = class_exists('Authentication') ? Authentication::COOKIE_EXPIRE : 2592000;
 $current_date = date("Y-m-d H:i:s", time());
 $uagent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : "";
-$fingerprint  = hash_hmac('sha256', $uagent, hash('sha256', $ip, true));
+
+$ip_for_hash = $ip ?? ''; 
+
+$fingerprint  = hash_hmac('sha256', $uagent, hash('sha256', $ip_for_hash, true));
 $loggedIn = false;
 
 if (class_exists('Session')) {
 
+    // Session Timeout and Fingerprint Check (Anti-Hijacking)
     if ((isset(Session::getInstance()->scriptlog_last_active) && Session::getInstance()->scriptlog_last_active < time() - $timeout)
         || (isset(Session::getInstance()->scriptlog_fingerprint)  && Session::getInstance()->scriptlog_fingerprint !== $fingerprint)
     ) {
 
         do_logout(is_a($authenticator, 'Authentication') ? $authenticator : "");
-
     }
 
+    // Path 1: Session Active
     if (!empty(Session::getInstance()->scriptlog_session_id)) {
 
         $loggedIn = true;
-        
-    } elseif ((!empty($_COOKIE['scriptlog_auth'])) && (!empty($_COOKIE['scriptlog_validator'])) && (!empty($_COOKIE['scriptlog_selector']))) {
 
-        $secret = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::generateSecretKey() : "";
+    // Path 2: Persistent Login (Remember Me) Check
+    } elseif ((!empty($_COOKIE['scriptlog_auth'])) && (!empty($_COOKIE['scriptlog_validator'])) && (!empty($_COOKIE['scriptlog_selector']))) {
 
         $validator_verified = false;
         $selector_verified  = false;
@@ -47,45 +49,36 @@ if (class_exists('Session')) {
         $decrypt_auth = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $cipher_key) : "";
         $token_info = $authenticator->findTokenByLogin($decrypt_auth, 0);
 
-        $expected_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
-        $correct_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
-        $expected_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
-        $correct_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
+        // Check 1: Token Found (proceed only if a matching token record was found)
+        if (!empty($token_info['ID'])) {
 
-        if (!function_exists('hash_equals')) {
-
-            if ((timing_safe_equals($expected_validator, $correct_validator) == 0) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']))) {
+            // Check 2: Validator Hash Comparison (SECURE FIX: Using hash_equals for constant-time comparison)
+            if (hash_equals($token_info['pwd_hash'], Tokenizer::setRandomPasswordProtected($_COOKIE['scriptlog_validator']))) {
 
                 $validator_verified = true;
             }
 
-            if ((timing_safe_equals($expected_selector, $correct_selector) == 0) && (Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret))) {
+            // Check 3: Selector Hash Comparison (SECURE FIX: Using hash_equals)
+            $secret = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::generateSecretKey() : "";
+            if (hash_equals($token_info['selector_hash'], Tokenizer::setRandomSelectorProtected($_COOKIE['scriptlog_selector'], $secret))) {
 
                 $selector_verified = true;
             }
 
-        } else {
+            // Check 4: Expiry Date
+            if ($token_info['expired_date'] >= $current_date) {
 
-            if ((hash_equals($expected_validator, $correct_validator)) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']))) {
-
-                $validator_verified = true;
+                $expired_verified = true;
             }
+        } 
 
-            if ((hash_equals($expected_selector, $correct_selector)) && (Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret))) {
-
-                $selector_verified = true;
-            }
-        }
-
-        if ($token_info['expired_date'] >= $current_date) {
-
-            $expired_verified = true;
-        }
-
-        if ((!empty($token_info['ID'])) && $validator_verified && $selector_verified && $expired_verified) {
+        // --- Core Authentication Decision ---
+        // Success Path (Token Found AND All checks passed)
+        if (!empty($token_info['ID']) && $validator_verified && $selector_verified && $expired_verified) {
 
             $loggedIn = true;
 
+            // 2. TOKEN RENEWAL (Same original logic)
             Session::getInstance()->scriptlog_session_login = $token_info['user_login'];
 
             $encrypt_auth = ScriptlogCryptonize::scriptlogCipher($decrypt_auth, $cipher_key);
@@ -108,14 +101,21 @@ if (class_exists('Session')) {
 
             is_a($authenticator, 'Authentication') ? $authenticator->renewPersistentLogin($bind_token, $token_info['user_login']) : "";
 
-        } else {
+        // Failure Path (Token not found, validation failed, or expired)
+        } else { 
+            
+            // 3. FAILURE/INVALIDATION (Corrected flow logic)
 
+            // Only mark as expired if we found a record to begin with (prevents unnecessary DB calls)
             if (!empty($token_info['ID'])) {
-
                 is_a($authenticator, 'Authentication') ? $authenticator->markCookieAsExpired($token_info['ID']) : "";
             }
-
-            is_a($authenticator, 'Authentication') ? $authenticator->clearAuthCookies($token_info['user_login']) : "";
+            
+            // Clear the browser cookies using the user login value (must be present to clear cookies)
+            if (!empty($decrypt_auth)) {
+                is_a($authenticator, 'Authentication') ? $authenticator->clearAuthCookies($decrypt_auth) : "";
+            }
         }
+       
     }
 }

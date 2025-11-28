@@ -70,14 +70,6 @@ class PostService
   private $meta_desc;
 
   /**
-   * post's keyword
-   * it will be used for meta_keyword tag
-   * 
-   * @var string
-   */
-  private $meta_key;
-
-  /**
    * post's status
    * published or save as draft
    * 
@@ -271,16 +263,6 @@ class PostService
   }
 
   /**
-   * set post's keyword as meta_keyword tag
-   * 
-   * @param string $meta_keys
-   */
-  public function setMetaKeys($meta_keys)
-  {
-    $this->meta_key = prevent_injection($meta_keys);
-  }
-
-  /**
    * set post's status
    * published or save as draft
    * 
@@ -413,9 +395,8 @@ class PostService
     $this->validator->sanitize($this->post_image, 'int');
     $this->validator->sanitize($this->title, 'string');
 
-    if ((!empty($this->meta_desc)) || (!empty($this->meta_key)) || (!empty($this->tags))) {
+    if ((!empty($this->meta_desc)) || (!empty($this->tags))) {
       $this->validator->sanitize($this->meta_desc, 'string');
-      $this->validator->sanitize($this->meta_key, 'string');
     }
 
     if ($this->topics == 0) {
@@ -432,7 +413,6 @@ class PostService
         'post_slug'  => $this->slug,
         'post_content' => $this->content,
         'post_summary' => $this->meta_desc,
-        'post_keyword' => $this->meta_key,
         'post_status' => $this->post_status,
         'post_visibility' => $this->post_visibility,
         'post_password' => $this->post_password,
@@ -454,7 +434,6 @@ class PostService
         'post_slug'  => $this->slug,
         'post_content' => $this->content,
         'post_summary' => $this->meta_desc,
-        'post_keyword' => $this->meta_key,
         'post_status' => $this->post_status,
         'post_visibility' => $this->post_visibility,
         'post_password' => $this->post_password,
@@ -485,9 +464,8 @@ class PostService
     $this->validator->sanitize($this->post_image, 'int');
     $this->validator->sanitize($this->title, 'string');
 
-    if ((!empty($this->meta_desc)) || (!empty($this->meta_key)) || (!empty($this->tags))) {
+    if ((!empty($this->meta_desc)) || (!empty($this->tags))) {
       $this->validator->sanitize($this->meta_desc, 'string');
-      $this->validator->sanitize($this->meta_key, 'string');
       $this->validator->sanitize($this->tags, 'string');
     }
 
@@ -500,7 +478,6 @@ class PostService
         'post_slug' => $this->slug,
         'post_content' => $this->content,
         'post_summary' => $this->meta_desc,
-        'post_keyword' => $this->meta_key,
         'post_status' => $this->post_status,
         'post_visibility' => $this->post_visibility,
         'post_password' => $this->post_password,
@@ -520,7 +497,6 @@ class PostService
         'post_slug' => $this->slug,
         'post_content' => $this->content,
         'post_summary' => $this->meta_desc,
-        'post_keyword' => $this->meta_key,
         'post_status' => $this->post_status,
         'post_visibility' => $this->post_visibility,
         'post_password' => $this->post_password,
@@ -564,9 +540,7 @@ class PostService
        if (method_exists($medialib, 'findMediaBlog') && $media_id) {
          
          $media_data = $medialib->findMediaBlog((int)$media_id);
-         $media_filename = isset($media_data['media_filename']) && preg_match('/^[a-zA-Z0-9_\-\.]+$/', $media_data['media_filename']) 
-                        ? basename($media_data['media_filename']) 
-                        : '';
+         $media_filename = isset($media_data['media_filename']) && preg_match('/^[a-zA-Z0-9_\-\.]+$/', $media_data['media_filename']) ? basename($media_data['media_filename']) : '';
 
           if (!empty($media_filename)) {
               // define file path
@@ -589,7 +563,7 @@ class PostService
               if (method_exists($medialib, 'deleteMedia')) {
                   $medialib->deleteMedia((int) $media_id, $this->sanitizer);
               }
-
+              
           }
         
        }
@@ -676,7 +650,7 @@ class PostService
    * @return integer
    * 
    */
-  public function totalPosts($data = null)
+  public function totalPosts(array $data = []): ?int
   {
     return $this->postDao->totalPostRecords($data);
   }

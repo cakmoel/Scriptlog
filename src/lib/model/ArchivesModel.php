@@ -1,4 +1,5 @@
 <?php defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class ArchivesModel extends Dao
  * 
@@ -8,6 +9,7 @@
  * @version 1.0
  * 
  */
+
 class ArchivesModel extends Dao
 {
 

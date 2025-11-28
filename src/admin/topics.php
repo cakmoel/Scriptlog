@@ -3,8 +3,8 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $topicId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $topicDao = class_exists('TopicDao') ? new TopicDao() : "";
-$topicEvent = class_exists('TopicEvent') ? new TopicEvent($topicDao, $validator, $sanitizer) : "";
-$topicApp = class_exists('TopicApp') ? new TopicApp($topicEvent) : "";
+$topicService = class_exists('TopicService') ? new TopicService($topicDao, $validator, $sanitizer) : "";
+$topicController = class_exists('TopicController') ? new TopicController($topicService) : "";
 
 try {
 
@@ -26,7 +26,7 @@ try {
 
                 if ($topicId == 0) {
 
-                    $topicApp->insert();
+                    $topicController->insert();
                 } else {
 
                     direct_page('index.php?load=dashboard', 302);
@@ -51,7 +51,7 @@ try {
 
                 if ($topicDao->checkTopicId($topicId, $sanitizer)) {
 
-                    $topicApp->update((int)$topicId);
+                    $topicController->update((int)$topicId);
                 } else {
 
                     direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
@@ -76,7 +76,7 @@ try {
 
                 if ($topicDao->checkTopicId($topicId, $sanitizer)) {
 
-                    $topicApp->remove((int)$topicId);
+                    $topicController->remove((int)$topicId);
                 } else {
 
                     direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
@@ -92,7 +92,7 @@ try {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
 
-                $topicApp->listItems();
+                $topicController->listItems();
             }
 
     }

@@ -14,16 +14,13 @@
 function get_ip_address()
 {
 
-  if (true === detect_proxy_by_headers()) {
+  if (is_cloudflare()) {
 
-    return request_ip_address();
+    return $_SERVER['HTTP_CF_CONNECTING_IP'];
+  } 
 
-  } else {
-
-    return (class_exists('Util')) ? Util::get_client_ip() : "";
-
-  }
-  
+  $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+  return class_exists('Util') ? Util::get_client_ip() : $ip;
 }
 
 /**
@@ -78,7 +75,6 @@ function ip_range($ip, $range)
       $netmask_dec = ip2long($netmask);
 
       return (ip2long($ip) & $netmask_dec) == (ip2long($range) & $netmask_dec);
-
     } else {
       // $netmask is a CIDR size block
       // fix the range argument
@@ -86,20 +82,19 @@ function ip_range($ip, $range)
       while (count($x) < 4) {
         $x[] = '0';
       }
-        list($a, $b, $c, $d) = $x;
-        $range = sprintf("%u.%u.%u.%u", empty($a) ? '0' : $a, empty($b) ? '0' : $b, empty($c) ? '0' : $c, empty($d) ? '0' : $d);
-        $range_dec = ip2long($range);
-        $ip_dec = ip2long($ip);
+      list($a, $b, $c, $d) = $x;
+      $range = sprintf("%u.%u.%u.%u", empty($a) ? '0' : $a, empty($b) ? '0' : $b, empty($c) ? '0' : $c, empty($d) ? '0' : $d);
+      $range_dec = ip2long($range);
+      $ip_dec = ip2long($ip);
 
       # Strategy 1 - Create the netmask with 'netmask' 1s and then fill it to 32 with 0s
       #$netmask_dec = bindec(str_pad('', $netmask, '1') . str_pad('', 32-$netmask, '0'));
 
       # Strategy 2 - Use math to create it
-        $wildcard_dec = pow(2, (32 - $netmask)) - 1;
-        $netmask_dec = ~$wildcard_dec;
+      $wildcard_dec = pow(2, (32 - $netmask)) - 1;
+      $netmask_dec = ~$wildcard_dec;
 
       return ($ip_dec & $netmask_dec) == ($range_dec & $netmask_dec);
-
     }
   } else {
     // range might be 255.255.*.* or 1.2.3.0-1.2.3.255
@@ -115,7 +110,7 @@ function ip_range($ip, $range)
       $lower_dec = (float)sprintf("%u", ip2long($lower));
       $upper_dec = (float)sprintf("%u", ip2long($upper));
       $ip_dec = (float)sprintf("%u", ip2long($ip));
-      
+
       return ($ip_dec >= $lower_dec) && ($ip_dec <= $upper_dec);
     }
     return false;
@@ -127,22 +122,15 @@ function ip_range($ip, $range)
  * @param string $ip
  * 
  */
-function cloudflare_checkIP($ip)
+function cloudflare_checkIP(string $ip): bool
 {
 
-  $is_cloudflare_ip = false;
-
-  if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
-
-    foreach (cloudflare_ipranges() as $range) {
-      if (ip_range($ip, $range)) {
-        $is_cloudflare_ip = true;
-        break;
-      }
+  foreach (cloudflare_ipranges() as $range) {
+    if (ip_range($ip, $range)) {
+      return true;
     }
   }
-
-  return $is_cloudflare_ip;
+  return false;
 }
 
 /**
@@ -204,11 +192,9 @@ function cloudflare_request_check()
 /**
  * is_cloudflare
  */
-function is_cloudflare()
+function is_cloudflare(): bool
 {
-  $ip_check = cloudflare_checkIP($_SERVER['REMOTE_ADDR']);
-  $request_check = cloudflare_request_check();
-  return $ip_check && $request_check;
+  return isset($_SERVER['HTTP_CF_CONNECTING_IP']) && cloudflare_checkIP($_SERVER['REMOTE_ADDR']);
 }
 
 /**
@@ -216,15 +202,11 @@ function is_cloudflare()
  */
 function request_ip_address()
 {
-  
-  $check = is_cloudflare();
 
-  if ($check) {
+  if (is_cloudflare()) {
+    // Use Cloudflare's connecting IP if available
+    return $_SERVER['HTTP_CF_CONNECTING_IP'];
+  } 
 
-    return $_SERVER['REMOTE_ADDR'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
-  } else {
-
-    return zend_ip_address();
-  }
-
+  return zend_ip_address();
 }

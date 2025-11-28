@@ -1,4 +1,5 @@
 <?php
+
 /**
  * on-page-optimization.php
  * 
@@ -10,6 +11,7 @@
  * @version 1.0
  * 
  */
+
 use Melbahja\Seo\Schema;
 use Melbahja\Seo\Schema\Thing;
 use Melbahja\Seo\MetaTags;
@@ -35,30 +37,31 @@ use Melbahja\Seo\MetaTags;
  * @version 1.0
  * 
  */
-function generate_schema_org($name = null, $url = null, $image = null, $description = null, $text = null, $thumbnailUrl = null, $datePublished = null, $dateModified = null)
+function generate_schema_org($name = "", $url = "", $image = "", $text = "", $description = "", $thumbnailUrl = "", $datePublished = "", $dateModified = "")
 {
 
-$contentReferenceTime = date(DATE_ATOM);
+    $contentReferenceTime = date(DATE_ATOM);
 
-return new Schema(
-    new Thing('Blog', [
+    return new Schema(
+        new Thing('Blog', [
 
-        'abstract' => $description,
-        'url' => $url,
-        'name' => $name,
-        'image' => $image,
-        'description' => $description,
-        'text' => $text, 
-        'thumbnailUrl' => $thumbnailUrl,
-        'datePublished' => $datePublished,
-        'dateModified' => $dateModified,
-        'contentReferenceTime' => $contentReferenceTime,
-        'maintainer' => APP_TITLE
-        
-    ]));
+            'abstract' => $description,
+            'url' => $url,
+            'name' => $name,
+            'image' => $image,
+            'description' => $description,
+            'text' => $text,
+            'thumbnailUrl' => $thumbnailUrl,
+            'datePublished' => $datePublished,
+            'dateModified' => $dateModified,
+            'contentReferenceTime' => $contentReferenceTime,
+            'maintainer' => APP_TITLE
 
+        ])
+    );
+    
 }
-
+ 
 /**
  * generate_meta_tags
  * 
@@ -66,19 +69,42 @@ return new Schema(
  * @param string|null $description
  *
  */
-function generate_meta_tags($title = null, $description = "", $keywords = "", $author = "", $image = "", $canonical = "")
+function generate_meta_tags($title = "", $description = "", $author = "", $image = "", $canonical = "", $robots = false)
 {
 
-$metatags = new MetaTags();
+    $metatags = new MetaTags();
 
-$metatags
-    ->title($title)
-    ->description($description)
-    ->meta('keywords', $keywords)
-    ->meta('author', $author)
-    ->image($image)
-    ->canonical($canonical);
+    // standard SEO Tags 
+    if ($robots === true) {
 
-return $metatags;
+        $metatags->title($title)
+                 ->description($description)
+                 ->meta('author', $author)
+                 ->meta('keywords', app_info()['site_keywords'])
+                 ->meta('robots', "index, follow")
+                 ->canonical($canonical);
+    } else {
 
+        $metatags->title($title) 
+                 ->description($description)
+                 ->meta('author', $author)
+                 ->meta('keywords', app_info()['site_keywords'])
+                 ->meta('robots', "index, nofollow")
+                 ->canonical($canonical);
+    }
+    
+    // Open graph (og) Facebook
+    $metatags->og('type', 'website')
+        ->og('url', $canonical)
+        ->og('image', $image)
+        ->og('site_name', app_info()['site_name']);
+
+    // Twitter card Tags - X.com  
+    $metatags->twitter('card', 'summary_large_image')
+        ->twitter('site', '@getscriptlog')
+        ->twitter('creator', $author)
+        ->twitter('image', $image)
+        ->twitter('image:alt', $title);
+
+    return $metatags;
 }

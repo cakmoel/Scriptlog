@@ -120,7 +120,6 @@ public function findPost($id, $sanitize, $author = null)
   	  		        post_slug,
                   post_content,
                   post_summary,
-                  post_keyword,
                   post_status,
                   post_visibility,
                   post_password,
@@ -144,7 +143,6 @@ public function findPost($id, $sanitize, $author = null)
   	  		    post_slug,
               post_content,
               post_summary,
-              post_keyword,
               post_status,
               post_visibility,
               post_password,
@@ -190,7 +188,6 @@ public function createPost($bind, $topicId)
        'post_slug' => $bind['post_slug'],
        'post_content' => $bind['post_content'],
        'post_summary' => $bind['post_summary'], 
-       'post_keyword' => $bind['post_keyword'],
        'post_status' => $bind['post_status'],
        'post_visibility' => $bind['post_visibility'], 
        'post_password' => $bind['post_password'],
@@ -208,8 +205,7 @@ public function createPost($bind, $topicId)
       'post_title' => $bind['post_title'],
       'post_slug' => $bind['post_slug'],
       'post_content' => $bind['post_content'],
-      'post_summary' => $bind['post_summary'], 
-      'post_keyword' => $bind['post_keyword'],
+      'post_summary' => $bind['post_summary'],
       'post_status' => $bind['post_status'],
       'post_visibility' => $bind['post_visibility'], 
       'post_password' => $bind['post_password'],
@@ -276,7 +272,6 @@ try {
   	    'post_slug' => $bind['post_slug'],
   	    'post_content' => $bind['post_content'],
   	    'post_summary' => $bind['post_summary'],
-        'post_keyword' => $bind['post_keyword'],
         'post_status' => $bind['post_status'],
         'post_visibility' => $bind['post_visibility'],
         'post_password' => $bind['post_password'],
@@ -285,7 +280,7 @@ try {
   	    'comment_status' => $bind['comment_status'],
         'passphrase' => $bind['passphrase']
 
-  	], "ID = {$cleanId} ");
+  	], ['ID' => (int)$cleanId]);
 
   } else {
 
@@ -296,7 +291,6 @@ try {
           'post_slug' => $bind['post_slug'],
           'post_content' => $bind['post_content'],
           'post_summary' => $bind['post_summary'],
-          'post_keyword' => $bind['post_keyword'],
           'post_status' => $bind['post_status'],
           'post_visibility' => $bind['post_visibility'],
           'post_password' => $bind['post_password'],
@@ -305,12 +299,14 @@ try {
           'comment_status' => $bind['comment_status'],
           'passphrase' => $bind['passphrase']
           
-      ], "ID = {$cleanId}");
+      ], ['ID' => (int)$cleanId]);
 
   }
 
   // delete all post_topic by post_id
-  $this->deleteRecord("tbl_post_topic", "post_id = {$cleanId}");
+  $post_id = isset($ID) ? purify_dirty_html((int)$ID) : "";
+
+  $this->deleteRecord("tbl_post_topic", ['post_id' => $post_id]);
 
   if ((is_array($topicId)) && (isset($_POST['catID']))) {
 
@@ -352,8 +348,8 @@ try {
  */
 public function deletePost($id, $sanitize)
 {
- $clean_id = $this->filteringId($sanitize, $id, 'sql');
- $this->deleteRecord("tbl_posts", "ID = {$clean_id}");
+ $cleanId = $this->filteringId($sanitize, $id, 'sql');
+ $this->deleteRecord("tbl_posts", ['ID' => $cleanId]);
 }
 
 /**
@@ -498,7 +494,7 @@ public function dropDownVisibility($selected = null, $postId = null)
  * @return numeric
  *
  */
-public function totalPostRecords($data = array())
+public function totalPostRecords(array $data = []): ?int
 {
 
   if (!empty($data)) {
@@ -513,7 +509,7 @@ public function totalPostRecords($data = array())
 
   $this->setSQL($sql);
 
-  return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
+  return $this->checkCountValue($data) ?? 0;
 
 }
 
