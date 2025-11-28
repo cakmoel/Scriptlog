@@ -354,7 +354,7 @@ class MenuService
    * @param mixed|array $data
    *  
    */
-  public function totalMenus($data = null)
+  public function totalMenus(array $data = []): ?int
   {
     return $this->menuDao->totalMenuRecords($data);
   }

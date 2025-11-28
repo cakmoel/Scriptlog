@@ -133,7 +133,7 @@ class View
       
         if ($render === false) {
 
-          throw new InvalidArgumentException('failed getting output');
+          throw new ViewException('failed getting output');
 
         }
         

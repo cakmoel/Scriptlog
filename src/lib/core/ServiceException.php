@@ -1,4 +1,8 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php 
+
+namespace Scriptlog\Core;
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class ServiceException extends Exception implements IEventThrowable
  *
@@ -9,6 +13,10 @@
  * @since     Since Release 1.0
  *
  */
+
+use Exception;
+use Scriptlog\Core\IEventThrowable;
+
 class ServiceException extends Exception implements IEventThrowable
 {
   

@@ -75,7 +75,7 @@ MSG;
 /**
  * messageException
  *
- * @param object $exception
+ * @param Exception|Throwable $exception
  * @param string $logPath
  * @return string|void -- return string or void
  * 

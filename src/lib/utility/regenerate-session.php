@@ -31,7 +31,7 @@ function regenerate_session()
 
  $_SESSION['deleted_time'] = time();
 
- session_regenerate_id();
+ session_regenerate_id(true);
 
  unset($_SESSION['deleted_time']);
 

@@ -50,9 +50,9 @@ function x_xss_protection()
  * @return void
  * 
  */
-function x_content_type_options()
+function x_content_type_options($options = "nosniff")
 {
-  header("X-Content-Type-Options: nosniff");
+  header("X-Content-Type-Options: $options");
 }
 
 /**
@@ -64,6 +64,16 @@ function x_content_type_options()
 function strict_transport_security()
 {
   header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
+}
+
+/**
+ * remove_x_powered_by
+ *
+ * @return void
+ */
+function remove_x_powered_by()
+{
+  header_remove("X-Powered-By");
 }
 
 /**

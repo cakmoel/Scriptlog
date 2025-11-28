@@ -6,6 +6,7 @@ $post_id = isset($retrieve_post['ID']) ? intval((int)$retrieve_post['ID']) : "";
 $post_img = isset($retrieve_post['media_filename']) ? htmlout($retrieve_post['media_filename']) : "";
 $img_alt = isset($retrieve_post['media_caption']) ? htmlout($retrieve_post['media_caption']) : "";
 $post_title = isset($retrieve_post['post_title']) ? htmlout($retrieve_post['post_title']) : "";
+$post_slug = isset($retrieve_post['post_slug']) ? htmlout($retrieve_post['post_slug']) : "";
 $post_content = isset($retrieve_post['post_content']) ? html_entity_decode(htmLawed(html($retrieve_post['post_content']))) : "";
 $comment_permit = isset($retrieve_post['comment_permit']) ? htmlout($retrieve_post['comment_permit']) : "";
 $total_comment = (total_comment($post_id)['total'] > 0) ? total_comment($post_id)['total'] : 0;
@@ -48,39 +49,20 @@ if (isset($retrieve_post['post_modified'])) {
                             </div>
                             <h1><?= isset($post_title) ? $post_title : ""; ?><a href="<?= isset($post_id) ? permalinks($post_id)['post'] : "#"; ?>" title="<?= isset($post_title) ? $post_title : ""; ?>"><i class="fa fa-external-link" aria-hidden="true"></i></a></h1>
                             <div class="post-footer d-flex align-items-center flex-column flex-sm-row">
-                                <a href="#" class="author d-flex align-items-center flex-wrap">
+                                <div class="author d-flex align-items-center flex-wrap">
                                     <div class="title"><span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= $post_author; ?> </span></div>
-                                </a>
+                                </div>
                                 <div class="d-flex align-items-center flex-wrap">
                                     <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i> <?= $post_created; ?> </div>
                                     <div class="comments meta-last"><i class="icon-comment" aria-hidden="true"></i><?= $total_comment; ?></div>
                                 </div>
                             </div>
                             <div class="post-body">
-                                <?php 
-
-                                   if (rewrite_status() == 'yes' && class_exists('DebugRoute')) {
-                                      
-                                      DebugRoute::debugging();
-
-                                   } else {
-                                     echo $post_content;
-                                   }
-
-                                   echo "<br>";
-
-                                   $postId = parse_post_id();
-                                                                      
-                                   echo "post ID : " . $postId;
-
-                                   echo "<br>";
-
-                                ?>
-                                
+                                <?= $post_content; ?>
                             </div>
 
                             <div class="post-tags">
-                                <?= isset($post_id) ? link_tag($post_id) : ""; ?>
+                                <?= link_tag($post_id) ?? ""; ?>
                             </div>
 
                             <div class="posts-nav d-flex justify-content-between align-items-stretch flex-column flex-md-row">
@@ -90,7 +72,7 @@ if (isset($retrieve_post['post_modified'])) {
 
                             <?php
                               if ($comment_permit == 'open') :
-                                echo retrieve_comments($post_id);
+                                echo render_comments_section($post_id);
                               
                             ?>
 
@@ -140,6 +122,11 @@ if (isset($retrieve_post['post_modified'])) {
     </div>
   
 <?php
+
+} elseif (!filter_var($post_id, FILTER_VALIDATE_INT)) { 
+
+    http_response_code(404);
+    include dirname(__FILE__) . '/404.php';
 
 } else {
 

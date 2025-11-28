@@ -52,9 +52,10 @@ function is_permalink_enabled()
  * @param mixed $id
  * @param string $app_url
  * @uses FrontHelper::methodName()
+ * @return mixed|array
  * 
  */
-function listen_query_string($id = null, $app_url = null)
+function listen_query_string($id, $app_url)
 {
 
    $post_id = $app_url . DS . '?p=' . abs((int)$id);
@@ -133,11 +134,14 @@ function listen_query_string($id = null, $app_url = null)
 /**
  * listen_request_path
  *
+ * @category Function 
+ * @author M.Noermoehammad
  * @param num|int $id
  * @param string $app_url
- * @return void
+ * @return mixed|array
  */
-function listen_request_path($id = null, $app_url = null)
+
+function listen_request_path($id, $app_url)
 {
 
    $request_path = class_exists('RequestPath') ? new RequestPath() : "";

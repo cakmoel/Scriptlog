@@ -13,317 +13,302 @@
  */
 class Dao
 {
- /**
-  * Database connection 
-  * @var object
-  *
-  */
- protected $dbc;
- 
- /**
-  * SQL
-  * @var string
-  */
- protected $sql;
- 
- /**
-  * Error
-  * @var string
-  */
- protected $error;
- 
- /**
-  * Sanitize
-  * @var object
-  *
-  */
- protected $sanitizing;
+  /**
+   * Database connection 
+   * @var object
+   *
+   */
+  protected $dbc;
 
- public function __construct() 
- {
-   if (Registry::isKeySet('dbc')) {
+  /**
+   * SQL
+   * @var string
+   */
+  protected $sql;
+
+  /**
+   * Error
+   * @var string
+   */
+  protected $error;
+
+  /**
+   * Sanitize
+   * @var object
+   *
+   */
+  protected $sanitizing;
+
+  public function __construct()
+  {
+    if (Registry::isKeySet('dbc')) {
 
       $this->dbc = Registry::get('dbc');
+      
+      if ($this->dbc === null) {
+        
+        throw new DbException("Database connection (dbc) is null in the Registry");
+      }
+    } else {
+      
+      throw new DbException("Database connection (dbc) is not set in the Registry ");
+    }
+  }
 
-   }
- }
-
-/**
- * setSQL
- *
- * @param string $sql
- * 
- */
- protected function setSQL($sql)
- {
+  /**
+   * setSQL
+   *
+   * @param string $sql
+   * 
+   */
+  protected function setSQL($sql)
+  {
     $this->sql = $sql;
- }
- 
- /**
-  * Find All records
-  * getting array of rows
-  * 
-  * @param array $data
-  * @param PDO::FETCH_MODE static $fetchMode
-  * @throws DbException
-  * @return array|object
-  */
- protected function findAll(array $data = array(), $fetchMode = null)
- {
-   
-  if (!$this->sql) {
-
-    throw new DbException("No SQL Query");
-
   }
 
-  if (!is_null($fetchMode)) {
+  /**
+   * Find All records
+   * getting array of rows
+   * 
+   * @param array $data
+   * @param PDO::FETCH_MODE static $fetchMode
+   * @throws DbException
+   * @return array|object
+   */
+  protected function findAll(array $data = array(), $fetchMode = null)
+  {
 
-    return $this->dbc->dbQuery($this->dbc, $data)->fetchAll($fetchMode);
+    if (!$this->sql) {
 
-  } else {
+      throw new DbException("No SQL Query");
+    }
 
-    return $this->dbc->dbQuery($this->sql, $data)->fetchAll();
+    if (!is_null($fetchMode)) {
 
+      return $this->dbc->dbQuery($this->dbc, $data)->fetchAll($fetchMode);
+    } else {
+
+      return $this->dbc->dbQuery($this->sql, $data)->fetchAll();
+    }
   }
-      
- }
- 
-/**
-  * Find Single row record
-  * getting one row
-  * 
-  * @param array $data
-  * @param PDO::FETCH_MODE static $fetchMode
-  * @throws DbException
-  * @return mixed
-  *
-  */
- protected function findRow(array $data = array(), $fetchMode = null)
- {
-     
-  if (!$this->sql) {
-    
-    throw new DbException("No SQL Query!");
-  }
-  
-  if (!is_null($fetchMode)) {
 
-    return $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode);
+  /**
+   * Find Single row record
+   * getting one row
+   * 
+   * @param array $data
+   * @param PDO::FETCH_MODE static $fetchMode
+   * @throws DbException
+   * @return mixed
+   *
+   */
+  protected function findRow(array $data = array(), $fetchMode = null)
+  {
 
-  } else {
+    if (!$this->sql) {
 
-    return $this->dbc->dbQuery($this->sql, $data)->fetch();
-    
+      throw new DbException("No SQL Query!");
+    }
+
+    if (!is_null($fetchMode)) {
+
+      return $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode);
+    } else {
+
+      return $this->dbc->dbQuery($this->sql, $data)->fetch();
+    }
   }
-  
- }
- 
- /**
-  * Find Column
-  * return a single column from the next row of results set
-  * getting single field value
-  * 
-  * @param array $data
-  * @param PDO::FETCH_MODE static $fetchMode
-  * @throws DbException
-  * @return boolean false if no more rows
-  */
- protected function findColumn(array $data = array(), $fetchMode = null)
- {
-     
-  if (!$this->sql) {
-           
-    throw new DbException("No SQL Query!");
-     
+
+  /**
+   * Find Column
+   * return a single column from the next row of results set
+   * getting single field value
+   * 
+   * @param array $data
+   * @param PDO::FETCH_MODE static $fetchMode
+   * @throws DbException
+   * @return boolean false if no more rows
+   */
+  protected function findColumn(array $data = array(), $fetchMode = null)
+  {
+
+    if (!$this->sql) {
+
+      throw new DbException("No SQL Query!");
+    }
+
+    if (!is_null($fetchMode)) {
+      return $this->dbc->dbQuery($this->sql, $data)->fetchColumn($fetchMode);
+    } else {
+      return $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
+    }
   }
- 
-  if (!is_null($fetchMode)) {
-    return $this->dbc->dbQuery($this->sql, $data)->fetchColumn($fetchMode);
-  } else {
-    return $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
+
+  /**
+   * CheckCountValue function
+   *
+   * @param array $data
+   * @throws DbException
+   * @return integer|numeric|null
+   *
+   */
+  public function checkCountValue(array $data = []): ?int
+  {
+
+    if (!$this->sql) {
+
+      throw new DbException("No SQL Query!");
+    }
+
+    $stmt = $this->dbc->dbQuery($this->sql, $data);
+
+    $rowCount = $stmt->rowCount();
+
+    return $rowCount > 0 ? $rowCount : 0;
   }
-   
- }
- 
- /**
-  * CheckCountValue function
-  *
-  * @param array $data
-  * @throws DbException
-  * @return integer|numeric
-  *
-  */
- public function checkCountValue($data = array())
- {
-     
-  if (!$this->sql) {
-             
-    throw new DbException("No SQL Query!");
-    
-  }
-  
-  $stmt = $this->dbc->dbQuery($this->sql, $data);
-  
-  return ($stmt->rowCount() > 0) ? $stmt->rowCount() : null;
-     
- }
- 
- /**
-  * Create records
-  * 
-  * @param string $table
-  * @param array $params
-  *
-  */
- protected function create($table, $params)
- {
+
+  /**
+   * Create records
+   * 
+   * @param string $table
+   * @param array $params
+   *
+   */
+  protected function create($table, $params)
+  {
     $this->dbc->dbInsert($table, $params);
- }
- 
- /**
-  * Modify record
-  * 
-  * @param string $table
-  * @param array $params
-  * @param integer|string $where
-  *
-  */
- protected function modify($table, $params, $where)
- {
+  }
+
+  /**
+   * Modify record
+   * 
+   * @param string $table
+   * @param array $params
+   * @param array $where
+   *
+   */
+  protected function modify($table, $params, $where)
+  {
     $this->dbc->dbUpdate($table, $params, $where);
- }
- 
- /**
-  * deleteRecord()
-  * 
-  * @param string $table
-  * @param integer $where
-  * @param integer $limit
-  */
- protected function deleteRecord($table, $where, $limit = null)
- {
-    (!is_null($limit)) ? $this->dbc->dbDelete($table, $where, $limit) : $this->dbc->dbDelete($table, $where);
- }
- 
-/**
- * replaceRecord()
- *
- * @param string $table
- * @param array $params
- * @param string $to
- * 
- */
- protected function replaceRecord($table, $params, $to)
- {
-   $this->dbc->dbReplace($table, $params, $to);
- }
+  }
 
- /**
- * callTransaction
- * begin transaction for multiple queries as a unified block 
- * 
- */
-protected function callTransaction()
-{
-  $this->dbc->dbTransaction();
-}
+  /**
+   * deleteRecord()
+   * 
+   * @param string $table
+   * @param array $where
+   * @param integer $limit
+   */
+  protected function deleteRecord($table, $where, $limit = 1)
+  {
+    (is_numeric($limit)) ? $this->dbc->dbDelete($table, $where, $limit) : $this->dbc->dbDelete($table, $where);
+  }
 
-/**
- * callCommit
- * commit the transaction if no problems have been encountered
- * 
- */
-protected function callCommit()
-{
-  $this->dbc->dbCommit();
-}
+  /**
+   * replaceRecord()
+   *
+   * @param string $table
+   * @param array $params
+   * @param string $to
+   * 
+   */
+  protected function replaceRecord($table, $params, $to)
+  {
+    $this->dbc->dbReplace($table, $params, $to);
+  }
 
-/**
- * callRollBack
- * to roll back the tables to their original state.
- * 
- */
-protected function callRollBack()
-{
-  $this->dbc->dbRollBack();
-}
+  /**
+   * callTransaction
+   * begin transaction for multiple queries as a unified block 
+   * 
+   */
+  protected function callTransaction()
+  {
+    $this->dbc->dbTransaction();
+  }
 
-/**
- * closeConnection
- *
- */
-protected function closeConnection()
-{
-  $this->dbc->closeDbConnection();
-}
- 
-/**
- * lastId
- *
- * @return integer
- * 
- */
-protected function lastId()
-{
-  return $this->dbc->dbLastInsertId();
-}
- 
-/**
- * Filtering Id passed by HTTP request
- *  
- * @param object $sanitize
- * @param string $str
- * @param string $type
- * @return string|integer
- * 
- */
- protected function filteringId(Sanitize $sanitize, $str, $type)
- {
+  /**
+   * callCommit
+   * commit the transaction if no problems have been encountered
+   * 
+   */
+  protected function callCommit()
+  {
+    $this->dbc->dbCommit();
+  }
 
-  $this->sanitizing = $sanitize;
-	 	
-   switch ($type) {
-      
+  /**
+   * callRollBack
+   * to roll back the tables to their original state.
+   * 
+   */
+  protected function callRollBack()
+  {
+    $this->dbc->dbRollBack();
+  }
+
+  /**
+   * closeConnection
+   *
+   */
+  protected function closeConnection()
+  {
+    $this->dbc->closeDbConnection();
+  }
+
+  /**
+   * lastId
+   *
+   * @return integer
+   * 
+   */
+  protected function lastId()
+  {
+    return $this->dbc->dbLastInsertId();
+  }
+
+  /**
+   * Filtering Id passed by HTTP request
+   *  
+   * @param object $sanitize
+   * @param string $str
+   * @param string $type
+   * @return string|integer
+   * 
+   */
+  protected function filteringId(Sanitize $sanitize, $str, $type)
+  {
+
+    $this->sanitizing = $sanitize;
+
+    switch ($type) {
+
       default:
       case 'sql':
-        
-          if (filter_var($str, FILTER_SANITIZE_NUMBER_INT)) {
-              
-            return $this->sanitizing->sanitasi($str, 'sql');
-              
-          } else {
-              
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
-            throw new DbException("ERROR: this - $str - Id is considered invalid.");
-              
-          }
-          
-          break;
-      
+
+        if (filter_var($str, FILTER_SANITIZE_NUMBER_INT)) {
+
+          return $this->sanitizing->sanitasi($str, 'sql');
+        } else {
+
+          header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+          throw new DbException("ERROR: this - $str - Id is considered invalid.");
+        }
+
+        break;
+
       case 'xss':
-            
-          if (filter_var($str, FILTER_SANITIZE_FULL_SPECIAL_CHARS)) {
-              
-            return $this->sanitizing->sanitasi(prevent_injection($str), 'xss');
-              
-          } else {
-              
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad Request", true, 400);
-            throw new DbException("ERROR: this - $str - is considered invalid.");
 
-          }
-          
-          break;
-      
-       }
+        if (filter_var($str, FILTER_SANITIZE_FULL_SPECIAL_CHARS)) {
 
- }
+          return $this->sanitizing->sanitasi(prevent_injection($str), 'xss');
+        } else {
 
- public function __desctruct()
- {
-   Registry::set('dbc', null);
-   session_write_close();
- }
+          header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+          throw new DbException("ERROR: this - $str - is considered invalid.");
+        }
 
+        break;
+    }
+  }
 }

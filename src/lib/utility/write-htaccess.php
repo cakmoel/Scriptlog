@@ -65,7 +65,8 @@ if ($permalink_status === 'yes') {
    $content .= '#RewriteRule .* – [F,L]'. PHP_EOL;
    $content .= '# The RewriteBase of the system (change if you are using this system in a sub-folder)' . PHP_EOL;
    $content .= '#RewriteBase /'. PHP_EOL;
-   $content .= '# This will make the site only accessible without the -www- ' . PHP_EOL; 
+   $content .= '# Force HTTPS and remove www (canonical: https://yourdomain.TLD) ' . PHP_EOL; 
+   $content .= '#RewriteCond %{HTTPS} off [OR]' . PHP_EOL;
    $content .= '#RewriteCond %{HTTP_HOST} ^www\.yourdomain\.TLD$'. PHP_EOL;
    $content .= '#RewriteRule ^/?$ "https\:\/\/yourdomain\.TLD\/" [R=301, L]' . PHP_EOL;
    $content .= '# Ensure all front-end UI-UX files readable'. PHP_EOL;

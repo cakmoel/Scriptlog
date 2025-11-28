@@ -635,7 +635,7 @@ public function modifyMediaDownload()
  * @return integer|number
  * 
  */
- public function totalMedia($data = null)
+ public function totalMedia(array $data = [])
  {
    return $this->mediaDao->totalMediaRecords($data);
  }

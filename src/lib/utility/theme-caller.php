@@ -16,7 +16,7 @@ function theme_dir()
     
   $active_theme = theme_identifier();
 
-  return (isset($active_theme['theme_directory'])) ? app_url().DS.APP_THEME.$active_theme['theme_directory']. DS : "";
+  return (isset($active_theme['theme_directory'])) ? app_url().DIRECTORY_SEPARATOR.APP_THEME.$active_theme['theme_directory']. DIRECTORY_SEPARATOR : "";
 }
 
 /**
@@ -49,9 +49,9 @@ function theme_identifier()
 function call_theme_header()
 {
 
-if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php')) {
+if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DIRECTORY_SEPARATOR.'header.php')) {
 
-  include_once APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'header.php';
+  include_once APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DIRECTORY_SEPARATOR.'header.php';
      
 } else {
 
@@ -74,9 +74,9 @@ if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'hea
 function call_theme_content($content = null)
 {
 
-  if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php'))) {
+  if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DIRECTORY_SEPARATOR.basename($content.'.php'))) {
 
-    include_once APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.basename($content.'.php');
+    include_once APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DIRECTORY_SEPARATOR.basename($content.'.php');
    
   } else {
 
@@ -98,9 +98,9 @@ function call_theme_content($content = null)
 function call_theme_footer()
 {
 
-  if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php')) {
+  if (file_exists(APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DIRECTORY_SEPARATOR.'footer.php')) {
 
-    include_once APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DS.'footer.php';
+    include_once APP_ROOT.APP_THEME.theme_identifier()['theme_directory'].DIRECTORY_SEPARATOR.'footer.php';
 
   } else {
 

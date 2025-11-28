@@ -1,6 +1,11 @@
 <?php
+/**
+ * login-layout.php - Refactored
+ */
 function login_header($stylePath)
 {
+    // Define a version identifier for cache busting (change this value when assets are updated)
+    $version = '1.0.1';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -8,19 +13,19 @@ function login_header($stylePath)
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="robots" content="noindex,noarchive" />
-  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  
+  <meta name="referrer" content="no-referrer" /> 
   <title>Log In</title>
-  <meta content="width=device-width" name="viewport">
-  <!-- Bootstrap 3.3.7 -->
-  <link rel="stylesheet" href="<?=$stylePath; ?>/assets/components/bootstrap/dist/css/bootstrap.min.css">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="<?=$stylePath; ?>/assets/components/font-awesome/css/font-awesome.min.css">
-  <!-- Ionicons -->
-  <link rel="stylesheet" href="<?=$stylePath; ?>/assets/components/Ionicons/css/ionicons.min.css">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="<?=$stylePath; ?>/assets/dist/css/AdminLTE.min.css">
-  <!-- iCheck -->
-  <link rel="stylesheet" href="<?=$stylePath; ?>/assets/components/iCheck/square/blue.css">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link rel="stylesheet" href="<?=$stylePath; ?>/assets/components/bootstrap/dist/css/bootstrap.min.css?v=<?=$version; ?>">
+  <link rel="stylesheet" href="<?=$stylePath; ?>/assets/components/font-awesome/css/font-awesome.min.css?v=<?=$version; ?>">
+  <link rel="stylesheet" href="<?=$stylePath; ?>/assets/components/Ionicons/css/ionicons.min.css?v=<?=$version; ?>">
+  <link rel="stylesheet" href="<?=$stylePath; ?>/assets/dist/css/AdminLTE.min.css?v=<?=$version; ?>">
+  <link rel="stylesheet" href="<?=$stylePath; ?>/assets/components/iCheck/square/blue.css?v=<?=$version; ?>">
   
 <link rel="apple-touch-icon" sizes="57x57" href="<?= $stylePath; ?>/assets/dist/img/apple-icon-57x57.png">
 <link rel="apple-touch-icon" sizes="60x60" href="<?= $stylePath; ?>/assets/dist/img/apple-icon-60x60.png">
@@ -40,18 +45,11 @@ function login_header($stylePath)
 <meta name="msapplication-TileImage" content="<?= $stylePath; ?>/ms-icon-144x144.png">
 <meta name="theme-color" content="#ffffff">
 
-  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
-  <script src="assets/dist/js/html5shiv.js"></script>
-  <script src="assets/dist/js/respond.min.js"></script>
-  <![endif]-->
-  
-<!-- Google Font -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
   
 <link href="<?= $stylePath; ?>/favicon.ico" rel="Shortcut Icon">
 <style>
+/* Honeypot field CSS is retained */
 .scriptpot{opacity:0;position:absolute;top:0;left:0;height:0;width:0;z-index:-1}
 </style>
 </head>
@@ -63,15 +61,15 @@ function login_header($stylePath)
 
 function login_footer($stylePath)
 {
-
+    $version = '1.0.1';
 ?>
 
 </div>
   
-<script src="<?= $stylePath; ?>/assets/components/jquery/dist/jquery.min.js"></script>
-<script src="<?= $stylePath; ?>/assets/components/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="<?= $stylePath; ?>/assets/components/iCheck/icheck.min.js"></script>
-<script src="<?= $stylePath; ?>/assets/dist/js/checklogin.js"></script>
+<script src="<?= $stylePath; ?>/assets/components/jquery/dist/jquery.min.js?v=<?=$version; ?>"></script>
+<script src="<?= $stylePath; ?>/assets/components/bootstrap/dist/js/bootstrap.min.js?v=<?=$version; ?>"></script>
+<script src="<?= $stylePath; ?>/assets/components/iCheck/icheck.min.js?v=<?=$version; ?>"></script>
+<script src="<?= $stylePath; ?>/assets/dist/js/checklogin.js?v=<?=$version; ?>"></script>
 <script>
     $(function () {
       $('input').iCheck({
@@ -80,21 +78,6 @@ function login_footer($stylePath)
         increaseArea: '20%' 
       });
     });
-</script>
-<script>
-$('img').bind('contextmenu',function(e){return false;}); 
-</script>
-<script>
-$(document).bind("contextmenu",function(e){return false;});
-</script>
-<script>
-document.onkeydown=function(e){if(e.ctrlKey&&(e.keyCode===67||e.keyCode===86||e.keyCode===85||e.keyCode===117)){return false;}else{return true;}};$(document).keypress("u",function(e){if(e.ctrlKey)
-{return false;}
-else
-{return true;}});
-</script>
-<script>
-$(document).keydown(function(event){if(event.keyCode==123){return false}else if(event.ctrlKey&&event.shiftKey&&event.keyCode==73){return false}});
 </script>
 </body>
 </html>

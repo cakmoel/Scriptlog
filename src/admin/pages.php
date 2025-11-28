@@ -3,8 +3,8 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $pageId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $pageDao = class_exists('PageDao') ? new PageDao() : "";
-$pageEvent = class_exists('PageEvent') ? new PageEvent($pageDao, $validator, $sanitizer) : "";
-$pageApp = class_exists('PageApp') ? new PageApp($pageEvent) : "";
+$pageService = class_exists('PageService') ? new PageService($pageDao, $validator, $sanitizer) : "";
+$pageController = class_exists('PageController') ? new PageController($pageService) : "";
 
 try {
 
@@ -28,7 +28,7 @@ try {
     
                 if ($pageId == 0) {
                 
-                    $pageApp->insert();
+                    $pageController->insert();
                     
                 } else {
     
@@ -58,7 +58,7 @@ try {
     
                 if ($pageDao->checkPageId($pageId, $sanitizer)) {
                 
-                    $pageApp->update((int)$pageId);
+                    $pageController->update((int)$pageId);
                     
                 } else {
                     
@@ -88,7 +88,7 @@ try {
     
                 if ($pageDao->checkPageId($pageId, $sanitizer)) {
     
-                    $pageApp->remove((int)$pageId);
+                    $pageController->remove((int)$pageId);
     
                 } else {
     
@@ -108,7 +108,7 @@ try {
     
             } else {
     
-                $pageApp->listItems();
+                $pageController->listItems();
     
             }
         

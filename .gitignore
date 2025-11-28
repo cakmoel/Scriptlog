@@ -1,12 +1,10 @@
-
-src/lib/composer.json
-
-src/lib/composer.lock
-
-src/lib/vendor/bin/generate-defuse-key
-
-src/admin/assets/components/Ionicons/composer.json
-
-*.json
-
-src/tests/
+# Image files (if you want to ignore all images)
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.svg
+*.webp
+# Session files
+sess_*

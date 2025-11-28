@@ -26,7 +26,7 @@ class TopicDao extends Dao
    * @param integer $position
    * @param integer $limit
    * @param string $orderBy
-   * @return boolean|array|object
+   * @return mixed
    */
   public function findTopics($orderBy = 'ID')
   {
@@ -46,7 +46,7 @@ class TopicDao extends Dao
    * @param integer $topicId
    * @param object $sanitize
    * @param static $fetchMode
-   * @return boolean|array|object
+   * @return mixed
    */
   public function findTopicById($topicId, $sanitize, $fetchMode = null)
   {
@@ -119,7 +119,7 @@ class TopicDao extends Dao
        'topic_title' => $bind['topic_title'],
        'topic_slug' => $bind['topic_slug'],
        'topic_status' => $bind['topic_status']
-   ], "ID = ".(int)$cleanId);
+   ], ["ID" => (int)$cleanId]);
    
   }
 
@@ -133,7 +133,7 @@ class TopicDao extends Dao
  {  	
    $cleanId = $this->filteringId($sanitize, $topicId, 'sql');
   
-   $this->deleteRecord("tbl_topics", "ID = ".(int)$cleanId);
+   $this->deleteRecord("tbl_topics", ["ID" => (int)$cleanId]);
    
  }
 
@@ -255,14 +255,14 @@ class TopicDao extends Dao
   * Total topic records
   * 
   * @param array $data
-  * @return numeric
+  * @return numeric|int|null
   *
   */
- public function totalTopicRecords($data = array())
+ public function totalTopicRecords(array $data = []): ?int
  {
   $sql = "SELECT ID FROM tbl_topics";
   $this->setSQL($sql);
-  return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
+  return $this->checkCountValue($data) ?? 0;
  }
 
 }

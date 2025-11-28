@@ -47,8 +47,18 @@ class TopicService
    */
   private $topicDao;
 
+  /**
+   * validator
+   *
+   * @var object
+   */
   private $validator;
 
+  /**
+   * sanitizer
+   *
+   * @var object 
+   */
   private $sanitizer;
   
   public function __construct(TopicDao $topicDao, FormValidator $validator, Sanitize $sanitizer)
@@ -58,36 +68,76 @@ class TopicService
     $this->sanitizer = $sanitizer;
   }
   
+  /**
+   * setTopicId
+   *
+   * @param int $topic_id
+   * 
+   */
   public function setTopicId($topic_id)
   {
     $this->topic_id = $topic_id;
   }
   
+  /**
+   * setTopicTitle
+   *
+   * @param string $topic_title
+   *
+   */
   public function setTopicTitle($topic_title)
   {
     $this->topic_title = prevent_injection($topic_title);
   }
   
+  /**
+   * setTopicSlug
+   *
+   * @param string $topic_slug
+   * 
+   */
   public function setTopicSlug($topic_slug)
   {
     $this->topic_slug = $topic_slug;
   }
   
+  /**
+   * setTopicStatus
+   *
+   * @param string $topic_status
+   * 
+   */
   public function setTopicStatus($topic_status)
   {
     $this->topic_status = $topic_status;
   }
   
+  /**
+   * grabTopics
+   *
+   * @param string $orderBy
+   * 
+   */
   public function grabTopics($orderBy = 'ID')
   {
     return $this->topicDao->findTopics($orderBy);
   }
   
+  /**
+   * grabTopic
+   *
+   * @param int|numeric $id
+   * 
+   */
   public function grabTopic($id)
   {
     return $this->topicDao->findTopicById($id, $this->sanitizer);
   }
   
+  /**
+   * addTopic
+   *
+   */
   public function addTopic()
   {
     
@@ -99,6 +149,10 @@ class TopicService
         
   }
   
+  /**
+   * modifyTopic
+   *
+   */
   public function modifyTopic()
   {
     $this->validator->sanitize($this->topic_id, 'int');
@@ -111,6 +165,10 @@ class TopicService
         ], $this->topic_id);
   }
   
+  /**
+   * removeTopic
+   * 
+   */
   public function removeTopic()
   {
     
@@ -126,8 +184,14 @@ class TopicService
     return $this->topicDao->deleteTopic($this->topic_id, $this->sanitizer);
     
   }
-  
-  public function totalTopics($data = null)
+
+  /**
+   * totalTopics
+   *
+   * @param array $data
+   * @return integer|numeric|null
+   */
+  public function totalTopics(array $data = []): ?int
   {
     return $this->topicDao->totalTopicRecords($data);
   }

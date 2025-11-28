@@ -150,7 +150,8 @@ class PostModel extends Dao
 
     $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, 
           p.post_slug, p.post_content, p.post_summary, p.post_keyword, p.post_status, p.post_sticky, 
-          p.post_type, p.comment_status AS comment_permit, m.media_filename, m.media_caption, m.media_target, 
+          p.post_type, p.comment_status AS comment_permit, m.media_filename, 
+          m.media_caption, m.media_target, 
           m.media_access, m.media_status, u.user_login, u.user_fullname
           FROM tbl_posts p
           INNER JOIN tbl_media m ON p.media_id = m.ID

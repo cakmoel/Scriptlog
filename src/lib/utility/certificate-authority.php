@@ -14,7 +14,7 @@
 function certificate_authority($distro)
 {
 
-  $ca_path = null;
+  $ca_path = '';
 
   if ($distro == 'Debian' || $distro == 'Ubuntu' || $distro == 'Gentoo' || $distro == 'Arch' || $distro == 'Slackware') {
 
@@ -38,7 +38,7 @@ function certificate_authority($distro)
 
   } else {
 
-    $ca_path = null;
+    $ca_path = 'Unknown';
   }
 
   return $ca_path;

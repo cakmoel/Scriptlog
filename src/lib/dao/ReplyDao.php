@@ -1,5 +1,12 @@
-<?php
-
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+/**
+ * class ReplyDao extends Dao 
+ * 
+ * @category Dao class
+ * @author M.Noermoehammad
+ * @license MIT
+ * 
+ */
 class ReplyDao extends Dao
 {
 
@@ -12,7 +19,7 @@ public function __construct()
 
 public function replyComment($commmentId)
 {
-
+  
 }
 
 public function dropDownReplyStatement($selected = '')

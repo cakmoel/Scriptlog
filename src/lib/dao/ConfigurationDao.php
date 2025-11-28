@@ -44,7 +44,7 @@ public function updateConfig($sanitize, $bind, $configId)
       'setting_name' => $bind['setting_name'],
       'setting_value' => $bind['setting_value']
       
-    ], " ID = {$cleanId}");
+    ], ['ID' => $cleanId]);
   
   }
  
@@ -59,7 +59,8 @@ public function updateConfig($sanitize, $bind, $configId)
  */
 public function deleteConfig($configId, $sanitize)
 {
-  $this->deleteRecord("tbl_settings", "ID = ".$this->filteringId($sanitize, $configId, 'sql'));
+  $idsanitized = $this->filteringId($sanitize, $configId, 'sql');
+  $this->deleteRecord("tbl_settings", ['ID' => $idsanitized]);
 }
 
 /**

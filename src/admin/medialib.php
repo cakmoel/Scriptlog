@@ -110,7 +110,6 @@ try {
             } else {
     
                $mediaController->listItems();
-    
             }
             
             break;

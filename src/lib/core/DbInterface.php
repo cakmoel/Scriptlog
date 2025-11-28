@@ -1,130 +1,105 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php defined('SCRIPTLOG') || die("Direct access not permitted.");
 /**
- * DbInterface interface
+ * interface DbInterface
  * Describe the functionality
  * that any database adapter will need.
  *
  * @category  Core Class
  * @author    M.Noermoehammad
- * @license   MIT
+ * @license   MIT 
  * @version   1.0
  * @since     Since Release 1.0
  *
  */
 interface DbInterface
 {
- 
-/**
- * set database connection
- * 
- * @method public setDbConnection()
- * @param array $values
- * @param array $options
- * 
- */
- public function setDbConnection($values = [], $options = []);
- 
-/**
- * Close database connection
- * 
- * @method public closeDbConnection()
- * 
- */
- public function closeDbConnection();
- 
-/**
- * Query
- * 
- * @method public dbQuery()
- * @param string $sql
- * @param string $parameters default NULL
- * 
- */
- public function dbQuery($sql, $parameters = array());
- 
-/**
- * dbInsert
- * 
- * insert new record
- * 
- * @method public dbInsert()
- * @param string $tablename
- * @param array $params
- * 
- */
- public function dbInsert($tablename, array $params);
- 
-/**
- * dbUpdate()
- * 
- * update existing record
- * 
- * @method public dbUpdate()
- * @param string $tablename
- * @param array $params
- * @param string $where
- * 
- */
- public function dbUpdate($tablename, $params, $where);
+    /**
+     * Set database connection.
+     * 
+     * @param array $config
+     * @param array $options 
+     * @return void
+     */
+    public function setDbConnection(array $config, array $options = []): void;
 
-/**
- * dbReplace()
- * 
- * replace statement to insert or update row
- * 
- * @param string $tablename
- * @param array $params
- * @param string $to
- * @return void
- * 
- */
- public function dbReplace($tablename, $params, $to);
+    /**
+     * Close database connection.
+     */
+    public function closeDbConnection(): void;
 
-/**
- * Delete record
- * 
- * @method public dbDelete()
- * @param string $tablename
- * @param string $where
- * @param numeric|integer $limit default null
- * 
- */
- public function dbDelete($tablename, $where, $limit = null);
- 
-/**
- * Last insert Id
- * 
- * @method public dbLastInsertId()
- * 
- */
- public function dbLastInsertId();
+    /**
+     * Execute an SQL query.
+     * 
+     * @param string $sql 
+     * @param array $parameters
+     * @return mixed
+     */
+    public function dbQuery(string $sql, array $parameters = []): mixed;
 
-/**
- * dbTransaction
- * begin transaction for multiple queries as a unified block 
- *
- * @method public dbTransaction()
- * 
- */
- public function dbTransaction();
+    /**
+     * Insert a new record.
+     * 
+     * @param string $tablename
+     * @param array $params 
+     * @return boolean
+     * 
+     */
+    public function dbInsert(string $tablename, array $params): bool;
 
-/**
- * dbCommit
- * commit the transaction if no problems have been encountered
- *
- * @method public dbCommit()
- * 
- */
- public function dbCommit();
+    /**
+     * Insert ... On Duplicate Key Update.
+     * 
+     * Replace statement to Insert or Update row. The correct way to do REPLACE INTO 
+     * 
+     * @param string $tablename
+     * @param array $params
+     * @param array $updateParams
+     * @return boolean
+     */
+    public function dbReplace(string $tablename, array $params, array $updateParams): bool;
 
-/**
- * dbRollBack
- * If any errors are detected, you can roll back all tables to their 
- * original state at the end of the sequence.
- *
- * @method public dbRollBack()
- * 
- */
- public function dbRollBack();
+    /**
+     * Update an existing record.
+     * 
+     * @param string $tablename 
+     * @param array $params 
+     * @param array $where
+     * @return int 
+     */
+    public function dbUpdate(string $tablename, array $params, array $where): int;
 
+    /**
+     * Delete a record.
+     * 
+     * @param string $tablename
+     * @param array $where 
+     * @param int $limit default null 
+     * @return int
+     */
+    public function dbDelete(string $tablename, array $where, ?int $limit = null): int;
+
+    /**
+     * Get the last inserted ID.
+     */
+    public function dbLastInsertId(): string;
+
+    /**
+     * Start a transaction.
+     */
+    public function dbTransaction(): bool;
+
+    /**
+     * Commit the current transaction.
+     */
+    public function dbCommit(): bool;
+
+    /**
+     * Rollback the current transaction.
+     */
+    public function dbRollBack(): bool;
+
+    /**
+     * Check if a database connection is active.
+     */
+    public function isConnected(): bool;
 }

@@ -120,13 +120,12 @@ class PostController extends BaseApp
       $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
 
       $filters = [
-        'post_title' => isset($_POST['post_title']) ? Sanitize::severeSanitizer($_POST['post_title']) : "",
+        'post_title' => isset($_POST['post_title']) ? Sanitize::strictSanitizer($_POST['post_title']) : "",
         'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_date' => isset($_POST['post_date']) ? Sanitize::mildSanitizer($_POST['post_date']) : "",
         'image_id' => isset($_POST['image_id']) ? FILTER_SANITIZE_NUMBER_INT : "",
         'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
         'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
         'visibility' => isset($_POST['visibility']) ? Sanitize::mildSanitizer($_POST['visibility']) : "",
@@ -135,7 +134,7 @@ class PostController extends BaseApp
         'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : ""
       ];
 
-      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_tags' => 200, 'post_content' => 50000];
+      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_tags' => 200, 'post_content' => 50000];
 
       $new_filename = generate_filename($file_name)['new_filename'];
       $file_extension = generate_filename($file_name)['file_extension'];
@@ -149,7 +148,7 @@ class PostController extends BaseApp
           throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
         }
 
-        if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_date', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_tags', 'post_status', 'post_headlines', 'visibility', 'comment_status']) === false) {
+        if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_date', 'image_id', 'catID', 'post_summary', 'post_tags', 'post_status', 'post_headlines', 'visibility', 'comment_status']) === false) {
 
           header($_SERVER["SERVER_PROTOCOL"] . ' 413 Payload Too Large', true, 413);
           header('Status: 413 Payload Too Large');
@@ -414,8 +413,7 @@ class PostController extends BaseApp
 
           $this->postService->setComment(distill_post_request($filters)['comment_status']);
           $this->postService->setMetaDesc(distill_post_request($filters)['post_summary']);
-          $this->postService->setMetaKeys(distill_post_request($filters)['post_keyword']);
-
+        
           if (isset($_POST['post_tags'])) {
 
             $this->postService->setPostTags(distill_post_request($filters)['post_tags']);
@@ -504,7 +502,6 @@ class PostController extends BaseApp
       'post_title' => $getPost['post_title'],
       'post_content' => $getPost['post_content'],
       'post_summary' => $getPost['post_summary'],
-      'post_keyword' => $getPost['post_keyword'],
       'post_status' => $getPost['post_status'],
       'post_visibility' => $getPost['post_visibility'],
       'post_password' => $getPost['post_password'],
@@ -530,13 +527,12 @@ class PostController extends BaseApp
 
       $filters = [
         'post_id' => FILTER_SANITIZE_NUMBER_INT,
-        'post_title' => isset($_POST['post_title']) ? FILTER_SANITIZE_SPECIAL_CHARS : "",
+        'post_title' => isset($_POST['post_title']) ? Sanitize::strictSanitizer($_POST['post_title']) : "",
         'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_modified' => isset($_POST['post_modified']) ? Sanitize::mildSanitizer($_POST['post_modified']) : "",
         'image_id' => isset($_POST['image_id']) ? FILTER_SANITIZE_NUMBER_INT : "",
         'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
         'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
         'visibility' => isset($_POST['visibility']) ?  Sanitize::mildSanitizer($_POST['visibility']) : "",
         'post_password' => isset($_POST['post_password']) ? FILTER_SANITIZE_FULL_SPECIAL_CHARS : "",
@@ -545,7 +541,7 @@ class PostController extends BaseApp
         'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : "",
       ];
 
-      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_tags' => 200, 'post_content' => 50000];
+      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_tags' => 200, 'post_content' => 50000];
 
       $new_filename = generate_filename($file_name)['new_filename'];
       $file_extension = generate_filename($file_name)['file_extension'];
@@ -558,7 +554,7 @@ class PostController extends BaseApp
           throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
         }
 
-        if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_modified', 'image_id', 'catID', 'post_summary', 'post_keyword', 'post_status', 'post_headlines', 'visibility', 'comment_status']) === false) {
+        if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_modified', 'image_id', 'catID', 'post_summary', 'post_status', 'post_headlines', 'visibility', 'comment_status']) === false) {
 
           header($_SERVER["SERVER_PROTOCOL"] . " 413 Payload Too Large", true, 413);
           header('Status: 413 Payload Too Large');
@@ -790,7 +786,6 @@ class PostController extends BaseApp
 
           $this->postService->setComment(distill_post_request($filters)['comment_status']);
           $this->postService->setMetaDesc(distill_post_request($filters)['post_summary']);
-          $this->postService->setMetaKeys(distill_post_request($filters)['post_keyword']);
           $this->postService->setPostTags(distill_post_request($filters)['post_tags']);
          
           if (empty($_POST['post_modified'])) {

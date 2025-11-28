@@ -1959,7 +1959,7 @@ class Util
     public static function get_client_ip($trust_proxy_headers = false)
     {
         if (!$trust_proxy_headers) {
-            return $_SERVER['REMOTE_ADDR'];
+            return $_SERVER['REMOTE_ADDR'] ?? '';
         }
 
         if (!empty($_SERVER['HTTP_CLIENT_IP'])) {

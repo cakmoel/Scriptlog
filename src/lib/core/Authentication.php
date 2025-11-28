@@ -1,4 +1,8 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+use Defuse\Crypto\Key;
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class Authentication
  *
@@ -79,10 +83,10 @@ class Authentication
   /**
    * key
    *
-   * @var string
+   * @var object
    * 
    */
-  private $key;
+  private Key $key;
 
   /**
    * userDao
@@ -110,12 +114,12 @@ class Authentication
 
   /**
    * Constant COOKIE_EXPIRE
-   * default 1 month
+   * default 1 hour
    * 
    * @var null|int|numeric
    * 
    */
-  const COOKIE_EXPIRE = 2592000;
+  const COOKIE_EXPIRE = 3600;
 
   /**
    * Constant COOKIE_PATH

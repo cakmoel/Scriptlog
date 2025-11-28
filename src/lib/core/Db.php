@@ -1,340 +1,329 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php defined('SCRIPTLOG') || die("Direct access not permitted.");
 /**
  * Class Db implements DbInterface
- * This Class DB uses PDO-MySQL functionality 
- * and it's methods implemented from DbInterface
+ * 
+ * This class provides a database abstraction layer using PDO with MySQL functionality.
+ * It implements all methods defined in DbInterface for consistent database operations.
  * 
  * @category  Core Class
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0
+ * @see       DbInterface
  *
  */
+
 class Db implements DbInterface
 {
+    /**
+     * PDO database connection instance
+     * 
+     * @var PDO|null
+     */
+    private ?PDO $dbc = null;
 
-  /**
-   * database connection
-   * @var object
-   *
-   */
-  private $dbc;
+    /**
+     * Path to SSL CA certificate file for secure connections
+     * 
+     * @var string|null
+     */
+    private ?string $caPath = null;
 
-  /**
-   * Certificate Authority
-   *
-   * @var boolean
-   */
-  private $ca = false;
+    /**
+     * Constructor - Initializes the database connection if config is provided
+     * 
+     * @param array $config Database configuration [DSN, username, password]
+     * @param array $options Additional PDO connection options
+     */
+    public function __construct(array $config = [], array $options = [])
+    {
+        if (!empty($config)) {
+            $this->setDbConnection($config, $options);
+        }
+    }
 
-  /**
-   * Initializing an object property and method
-   * 
-   */
-  public function __construct($values, $options)
-  {
-    $this->setDbConnection($values, $options);
-  }
+    /**
+     * Establishes a database connection using PDO
+     * 
+     * @param array $config Database configuration [DSN, username, password]
+     * @param array $options Additional PDO connection options
+     * @return void
+     * @throws InvalidArgumentException If configuration is incomplete
+     * @throws RuntimeException If connection fails
+     */
+    public function setDbConnection(array $config = [], array $options = []): void
+    {
+        if (count($config) < 3) {
+            throw new InvalidArgumentException("Database configuration array must contain DSN, username, and password.");
+        }
 
-  /**
-   * set database connection
-   * {@inheritDoc}
-   * @see DbInterface::setDbConnection()
-   * @return object
-   * 
-   */
-  public function setDbConnection($values = [], $options = [])
-  {
+        [$dsn, $dbUser, $dbPass] = $config;
 
-    try {
-
-      $dsn = $values[0];
-      $dbUser = $values[1];
-      $dbPass = $values[2];
-
-      if ($this->ca !== false) {
-
-        $default_options = [
-          PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-          PDO::ATTR_EMULATE_PREPARES => false,
-          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-          PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_general_ci',
-          PDO::MYSQL_ATTR_SSL_CA => $this->invokePathCA($this->ca),
+        $defaultOptions = [
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_general_ci',
         ];
 
-      } else {
+        if ($this->caPath) {
+            $defaultOptions[PDO::MYSQL_ATTR_SSL_CA] = $this->caPath;
+        }
 
-        $default_options = [
-          PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-          PDO::ATTR_EMULATE_PREPARES => false,
-          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-          PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_general_ci',
-        ];
-      }
-    
-      $options = array_replace($default_options, $options);
-      $this->dbc = new PDO($dsn, $dbUser, $dbPass, $options);
-
-    } catch (Throwable $th) {
-
-      $this->closeDbConnection();
-      LogError::setStatusCode(http_response_code(500));
-      LogError::exceptionHandler($th);
-    } catch (DbException $e) {
-
-      $this->closeDbConnection();
-      LogError::setStatusCode(http_response_code(500));
-      LogError::exceptionHandler($e);
+        try {
+            $this->dbc = new PDO($dsn, $dbUser, $dbPass, array_replace($defaultOptions, $options));
+        } catch (PDOException $e) {
+            throw new RuntimeException("Database connection failed: " . $e->getMessage());
+        }
     }
 
-    return $this->dbc;
-  }
-
-  /**
-   * close database connection
-   */
-  public function closeDbConnection()
-  {
-    $this->dbc = null;
-  }
-
-  /**
-   * SQL - Query
-   * 
-   * {@inheritDoc}
-   * @see DbInterface::dbQuery()
-   * @return object
-   *
-   */
-  public function dbQuery($sql, $args = array())
-  {
-
-    if (!$args) {
-      
-      return $this->dbc->query($sql);
-
+    /**
+     * Checks if database connection is active
+     * 
+     * @return bool True if connected, false otherwise
+     */
+    public function isConnected(): bool
+    {
+        return $this->dbc !== null;
     }
 
-    $stmt = $this->dbc->prepare($sql);
-    $stmt->execute($args);
-    return $stmt;
-  }
-
-  /**
-   * Insert record
-   * 
-   * {@inheritDoc}
-   * @see DbInterface::dbInsert()
-   */
-  public function dbInsert($tablename, array $params)
-  {
-
-    $clean_table = Sanitize::mildSanitizer($tablename);
-
-    $sql = "INSERT INTO $clean_table ";
-
-    $fields = array_keys($params);
-
-    $values = array_values($params);
-
-    $sql .= '(' . implode(',', $fields) . ') ';
-
-    $args = [];
-
-    foreach ($fields as $f) {
-
-      $args[] = '?';
+    /**
+     * Closes the database connection
+     * 
+     * @return void
+     */
+    public function closeDbConnection(): void
+    {
+        $this->dbc = null;
     }
 
-    $sql .= 'VALUES (' . implode(',', $args) . ') ';
-
-    $statement = $this->dbc->prepare($sql);
-
-    foreach ($values as $i => $v) {
-
-      $statement->bindValue($i + 1, $v);
+    /**
+     * Ensures database connection is established before operations
+     * 
+     * @return void
+     * @throws RuntimeException If connection is not established
+     */
+    private function ensureConnection(): void
+    {
+        if (!$this->dbc) {
+            throw new RuntimeException("Database connection is not established.");
+        }
     }
 
-    return $statement->execute();
-  }
-
-  /**
-   * last insert id
-   * 
-   * {@inheritDoc}
-   * @see DbInterface::dbLastInsertId()
-   */
-  public function dbLastInsertId()
-  {
-    return $this->dbc->lastInsertId();
-  }
-
-  /**
-   * Update record
-   * {@inheritDoc}
-   * @see DbInterface::dbUpdate()
-   */
-  public function dbUpdate($tablename, $params, $where)
-  {
-
-    $clean_table = Sanitize::mildSanitizer($tablename);
-    $clean_where = Sanitize::severeSanitizer($where);
-
-    ksort($params);
-    $columns = null;
-
-    foreach ((array)$params as $key => $value) {
-      $columns .= "$key = :$key,";
+      /**
+     * Executes a database query and returns the statement
+     * 
+     * @param string $sql SQL query to execute
+     * @param array $args Parameters for prepared statement
+     * @return PDOStatement Executed statement
+     * @throws RuntimeException If connection is not established
+     */
+    public function dbQuery(string $sql, array $args = []): PDOStatement
+    {
+        $this->ensureConnection();
+        $stmt = $this->dbc->prepare($sql);
+        $stmt->execute($args);
+        return $stmt;
     }
 
-    $columns = rtrim($columns, ',');
-    $stmt = $this->dbc->prepare("UPDATE $clean_table SET $columns WHERE $clean_where");
+      /**
+     * Executes a SELECT query and returns results
+     * 
+     * @param string $sql SQL SELECT query
+     * @param array $parameters Query parameters
+     * @param int $fetchMode PDO fetch mode (default: PDO::FETCH_OBJ)
+     * @param string $class Class name for PDO::FETCH_CLASS mode
+     * @return array Fetched results
+     * @throws RuntimeException If connection is not established
+     */
+    public function dbSelect(string $sql, array $parameters = [], int $fetchMode = PDO::FETCH_OBJ, string $class = ''): array
+    {
+        $this->ensureConnection();
 
-    foreach ((array)$params as $key => $value) {
-      $stmt->bindValue(":$key", $value);
+        $stmt = $this->dbc->prepare($sql);
+        $stmt->execute($parameters);
+
+        return $fetchMode === PDO::FETCH_CLASS ?
+            $stmt->fetchAll($fetchMode, $class) :
+            $stmt->fetchAll($fetchMode);
     }
 
-    $stmt->execute();
-    return $stmt->rowCount();
-  }
+     /**
+     * Inserts a new record into the specified table
+     * 
+     * @param string $tablename Name of the table
+     * @param array $params Associative array of column => value pairs
+     * @return bool True on success, false on failure
+     * @throws InvalidArgumentException If parameters are empty
+     * @throws RuntimeException If connection is not established
+     */
+    public function dbInsert(string $tablename, array $params): bool
+    {
+        $this->ensureConnection();
 
-  /**
-   * dbReplace()
-   *
-   * {@inheritDoc}
-   * @uses DbInterface::dbReplace
-   * 
-   */
-  public function dbReplace($tablename, $params, $to)
-  {
+        if (empty($params)) {
+            throw new InvalidArgumentException("Insert parameters cannot be empty.");
+        }
 
-    $clean_table = Sanitize::mildSanitizer($tablename);
+        $fields = array_keys($params);
+        $placeholders = array_fill(0, count($fields), '?');
 
-    if ($to == 'update') {
+        $sql = sprintf(
+            "INSERT INTO `%s` (%s) VALUES (%s)",
+            $tablename,
+            implode(", ", $fields),
+            implode(", ", $placeholders)
+        );
 
-      ksort($params);
-
-      $columns = null;
-
-      foreach ((array)$params as $key => $value) {
-
-        $columns .= "$key = :$key,";
-      }
-
-      $columns = rtrim($columns, ',');
-
-      $stmt = $this->dbc->prepare(" REPLACE INTO $clean_table SET $columns ");
-
-      foreach ((array)$params as $key => $value) {
-
-        $stmt->bindValue(":$key", $value);
-      }
-
-      $stmt->execute();
-
-      return $stmt->rowCount();
-    } elseif ($to == 'insert') {
-
-      $sql = " REPLACE INTO $clean_table ";
-      $fields = array_keys($params);
-      $values = array_values($params);
-
-      $sql .= '(' . implode(',', $fields) . ') ';
-
-      $args = [];
-
-      foreach ($fields as $f) {
-        $args[] = '?';
-      }
-
-      $sql .= 'VALUES (' . implode(',', $args) . ') ';
-
-      $statement = $this->dbc->prepare($sql);
-
-      foreach ($values as $i => $v) {
-        $statement->bindValue($i + 1, $v);
-      }
-
-      return $statement->execute();
-    } else {
-      $this->closeDbConnection();
-    }
-  }
-
-  /**
-   * delete record
-   * 
-   * {@inheritDoc}
-   * @see DbInterface::dbDelete()
-   */
-  public function dbDelete($tablename, $where, $limit = null)
-  {
-    $clean_table = Sanitize::mildSanitizer($tablename);
-    $clean_where = Sanitize::severeSanitizer($where);
-
-    if (!is_null($limit)) {
-
-      $sql = "DELETE FROM $clean_table WHERE $clean_where LIMIT $limit";
-    } else {
-
-      $sql = "DELETE FROM $clean_table WHERE $clean_where";
+        $stmt = $this->dbc->prepare($sql);
+        return $stmt->execute(array_values($params));
     }
 
-    $stmt = $this->dbc->prepare($sql);
-
-    $stmt->execute();
-
-    return $stmt->rowCount();
-  }
-
-  /**
-   * database transaction
-   * 
-   * {@inheritDoc}
-   * @see DbInterface::dbTransaction
-   * 
-   */
-  public function dbTransaction()
-  {
-    return $this->dbc->BeginTransaction();
-  }
-
-  /**
-   * database commit
-   * 
-   * @inheritDoc
-   * @see DbInterface::dbCommit
-   *
-   */
-  public function dbCommit()
-  {
-    return $this->dbc->commit();
-  }
-
-  /**
-   * database rollback
-   * 
-   * @inheritDoc
-   * @see DbInterface::dbRollBack
-   * 
-   */
-  public function dbRollBack()
-  {
-    return $this->dbc->rollBack();
-  }
-
-  /**
-   * invokePathCA()
-   *
-   * @param bool $ca
-   * @return void
-   * 
-   */
-  private function invokePathCA($ca = false)
-  {
-    if (($ca !== false) && (certificate_authority(distrib_name()) !== null)) {
-      return certificate_authority(distrib_name());
+    /**
+     * Returns the last inserted ID
+     * 
+     * @return string Last inserted row ID
+     * @throws RuntimeException If connection is not established
+     */
+    public function dbLastInsertId(): string
+    {
+        $this->ensureConnection();
+        return $this->dbc->lastInsertId();
     }
-  }
+
+     /**
+     * Updates records in the specified table
+     * 
+     * @param string $tablename Name of the table
+     * @param array $params Associative array of column => value pairs to update
+     * @param array $where Associative array of conditions for WHERE clause
+     * @return int Number of affected rows
+     * @throws InvalidArgumentException If parameters or conditions are empty
+     * @throws RuntimeException If connection is not established
+     */
+    public function dbUpdate(string $tablename, array $params, array $where): int
+    {
+        $this->ensureConnection();
+
+        if (empty($params) || empty($where)) {
+            throw new InvalidArgumentException("Update parameters and conditions cannot be empty.");
+        }
+
+        $setClause = implode(", ", array_map(fn($key) => "$key = ?", array_keys($params)));
+        $whereClause = implode(" AND ", array_map(fn($key) => "$key = ?", array_keys($where)));
+
+        $sql = "UPDATE `$tablename` SET $setClause WHERE $whereClause";
+
+        $stmt = $this->dbc->prepare($sql);
+        $stmt->execute(array_merge(array_values($params), array_values($where)));
+
+        return $stmt->rowCount();
+    }
+
+   /**
+     * Performs an INSERT or UPDATE (upsert) operation
+     * 
+     * Inserts a new record or updates existing one if duplicate key exists
+     * 
+     * @param string $tablename Name of the table
+     * @param array $params Associative array of column => value pairs for insert
+     * @param array $updateParams Associative array of column => value pairs for update
+     * @return bool True on success, false on failure
+     * @throws InvalidArgumentException If parameters are empty
+     * @throws RuntimeException If connection is not established
+     */
+    public function dbReplace(string $tablename, array $params, array $updateParams): bool
+    {
+        $this->ensureConnection();
+
+        if (empty($params) || empty($updateParams)) {
+            throw new InvalidArgumentException("Upsert parameters cannot be empty.");
+        }
+
+        $fields = array_keys($params);
+        $placeholders = array_fill(0, count($fields), '?');
+
+        $updateFields = array_keys($updateParams);
+        $updateAssignments = implode(", ", array_map(fn($field) => "$field = ?", $updateFields));
+
+        $sql = sprintf(
+            "INSERT INTO `%s` (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s",
+            $tablename,
+            implode(", ", $fields),
+            implode(", ", $placeholders),
+            $updateAssignments
+        );
+
+        $stmt = $this->dbc->prepare($sql);
+        return $stmt->execute(array_merge(array_values($params), array_values($updateParams)));
+    }
+
+     /**
+     * Deletes records from the specified table
+     * 
+     * @param string $tablename Name of the table
+     * @param array $where Associative array of conditions for WHERE clause
+     * @param int|null $limit Optional maximum number of rows to delete
+     * @return int Number of affected rows
+     * @throws InvalidArgumentException If conditions are empty
+     * @throws RuntimeException If connection is not established
+     */
+    public function dbDelete(string $tablename, array $where, ?int $limit = null): int
+    {
+        $this->ensureConnection();
+
+        if (empty($where)) {
+            throw new InvalidArgumentException("Delete conditions cannot be empty.");
+        }
+
+        $whereClause = implode(" AND ", array_map(fn($key) => "$key = ?", array_keys($where)));
+
+        $sql = "DELETE FROM `$tablename` WHERE $whereClause";
+
+        if ($limit !== null) {
+            $sql .= " LIMIT $limit";
+        }
+
+        $stmt = $this->dbc->prepare($sql);
+        $stmt->execute(array_values($where));
+
+        return $stmt->rowCount();
+    }
+
+    /**
+     * Begins a transaction
+     * 
+     * @return bool True on success, false on failure
+     * @throws RuntimeException If connection is not established
+     */
+    public function dbTransaction(): bool
+    {
+        $this->ensureConnection();
+        return $this->dbc->beginTransaction();
+    }
+
+    /**
+     * Commits a transaction
+     * 
+     * @return bool True on success, false on failure
+     * @throws RuntimeException If connection is not established
+     */
+    public function dbCommit(): bool
+    {
+        $this->ensureConnection();
+        return $this->dbc->commit();
+    }
+
+     /**
+     * Rolls back a transaction
+     * 
+     * @return bool True on success, false on failure
+     * @throws RuntimeException If connection is not established
+     */
+    public function dbRollBack(): bool
+    {
+        $this->ensureConnection();
+        return $this->dbc->rollBack();
+    }
 }

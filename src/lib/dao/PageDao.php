@@ -43,7 +43,6 @@ public function findPages($type, $orderBy = 'ID', $author = null)
                 p.post_slug,
                 p.post_content,
 				p.post_summary,
-				p.post_keyword,
                 p.post_status,
                 p.post_sticky,
                 p.post_type,
@@ -67,7 +66,6 @@ public function findPages($type, $orderBy = 'ID', $author = null)
                 p.post_slug,
                 p.post_content,
 				p.post_summary,
-				p.post_keyword,
                 p.post_status,
                 p.post_sticky,
                 p.post_type,
@@ -111,7 +109,6 @@ public function findPageById($pageId, $sanitize)
   	  	           post_slug, 
 				   post_content, 
 				   post_summary, 
-				   post_keyword,
 			       post_status, 
 				   post_sticky, 
 				   post_type
@@ -147,7 +144,6 @@ public function createPage($bind)
 		'post_slug' => $bind['post_slug'],
 		'post_content' => $bind['post_content'],
 		'post_summary' => $bind['post_summary'],
-		'post_keyword' => $bind['post_keyword'], 
 		'post_status' => $bind['post_status'],
 		'post_sticky' => $bind['post_sticky'],
  	    'post_type' => $bind['post_type'],
@@ -163,7 +159,6 @@ public function createPage($bind)
 		'post_slug' => $bind['post_slug'],
 		'post_content' => $bind['post_content'],
 		'post_summary' => $bind['post_summary'],
-		'post_keyword' => $bind['post_keyword'], 
 		'post_status' => $bind['post_status'],
 		'post_sticky' => $bind['post_sticky'], 
  	    'post_type' => $bind['post_type'],
@@ -198,11 +193,10 @@ public function updatePage($sanitize, $bind, $ID)
 		'post_slug' => $bind['post_slug'],
 		'post_content' => $bind['post_content'], 
 		'post_summary' => $bind['post_summary'],
-		'post_keyword' => $bind['post_keyword'],
 		'post_status' => $bind['post_status'],
 		'post_sticky' => $bind['post_sticky'], 
 		'post_type' => $bind['post_type']
- 	    ], "ID = {$cleanId}");
+ 	    ], ["ID" => (int)$cleanId]);
  	
  } else {
  	
@@ -213,11 +207,10 @@ public function updatePage($sanitize, $bind, $ID)
 		'post_slug' => $bind['post_slug'],
 		'post_content' => $bind['post_content'],
 		'post_summary' => $bind['post_summary'],
-		'post_keyword' => $bind['post_keyword'], 
 		'post_status' => $bind['post_status'],
 		'post_sticky' => $bind['post_sticky'],
 		'post_type' => $bind['post_type']
- 	    ], "ID = {$cleanId}");
+ 	    ], ["ID" => (int)$cleanId]);
  	
  }
   	
@@ -234,8 +227,8 @@ public function updatePage($sanitize, $bind, $ID)
  */
 public function deletePage($ID, $sanitize, $type)
 {
- $clean_id = $this->filteringId($sanitize, $ID, 'sql');
- $this->deleteRecord("tbl_posts", "ID = ".(int)$clean_id." AND `post_type` = "."{$type}");  
+ $cleanId = $this->filteringId($sanitize, $ID, 'sql');  
+ $this->deleteRecord("tbl_posts", ["ID" => (int)$cleanId, "post_type" => $type]);
 }
 
 /**
@@ -303,11 +296,13 @@ public function dropDownCommentStatus($selected = '')
  * @param array $data
  * @return numeric
  */
-public function totalPageRecords($data = array())
+public function totalPageRecords(array $data = []): ?int
 {
    $sql = "SELECT ID FROM tbl_posts WHERE post_type = 'page'";
+
    $this->setSQL($sql);
-   return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
+   
+   return $this->checkCountValue($data) ?? 0;
 }
 
 }

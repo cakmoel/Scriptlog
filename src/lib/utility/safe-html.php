@@ -2,7 +2,7 @@
 /**
  * safe_html
  * 
- * Sanitizing text results from database
+ * Escaping output text results from database
  * 
  * @category function
  * @param string $text
@@ -11,7 +11,7 @@
  */
 function safe_html($data)
 {   
- return htmlspecialchars(stripslashes(trim($data)), ENT_QUOTES|ENT_HTML5, 'UTF-8', false);
+ return htmlspecialchars(stripslashes(trim(strip_tags($data))), ENT_QUOTES|ENT_HTML5, 'UTF-8', false);
 }
 
 /**

@@ -9,8 +9,6 @@
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * @return mixed
- * 
  */
 function route_request($dispatcher)
 {

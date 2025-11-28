@@ -9,38 +9,51 @@
  * @since    Since Release 1.0
  * 
  */
+
+use Exception;
+
 class AppException extends Exception implements IAppThrowable
 {
     
-protected $message = 'Unknown Exception';
+/**
+     * Previous exception
+     * @var Exception|null
+     */
+    protected ?Exception $previous = null;
 
-protected $previous;
+    /**
+     * CoreException constructor
+     *
+     * @param string|null $message
+     * @param int $code
+     * @param Exception|null $previous
+     */
+    public function __construct(?string $message = null, int $code = 0, ?Exception $previous = null)
+    {
+        if (is_null($message)) {
+            $message = 'Unknown ' . get_class($this);
+        }
 
-public function __construct($message = null, $code = 0, Exception $previous = null)
-{
+        parent::__construct($message, $code, $previous);
+        
+        $this->previous = $previous;
+    }
 
- $code = $this->getCode();
- 
- if (!$message) {
-      
-    throw new $this('Unknown'.get_class($this));
-    
- }
-
- parent::__construct($message, $code, $previous);
-
- if (!is_null($previous)) {
-
-   $this->previous = $previous;
-   
- }
- 
-}
-
-public function __toString()
-{
-    return get_class($this) . "'{$this->message}' in {$this->getFile()}({$this->getLine()})\n"
-                            . "{$this->getTraceAsString()}";
-}
+    /**
+     * Convert Exception to String
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return sprintf(
+            "%s: '%s' in %s(%d)\n%s",
+            get_class($this),
+            $this->getMessage(),
+            $this->getFile(),
+            $this->getLine(),
+            $this->getTraceAsString()
+        );
+    }
 
 }

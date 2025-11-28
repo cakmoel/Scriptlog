@@ -24,7 +24,7 @@ $errorPage->setPageTitle(APP_TITLE . " broken!");
 $errorPage->addDataTable(APP_TITLE, array(
     "version" => APP_VERSION,
     "codename" => APP_CODENAME,
-    "hostname" => APP_HOSTNAME
+    "hostname" => app_url()
 ));
 
 $whoops->pushHandler($errorPage);

@@ -110,6 +110,46 @@ function featured_post()
 }
 
 /**
+ * get_slideshow
+ *
+ * @category theme function
+ * @return mixed|array
+ */
+function get_slideshow($limit = 5)
+{
+  if (function_exists('medoo_init')) {
+      $database = medoo_init();
+  }
+
+  return $database->select('tbl_posts', [
+    '[>]tbl_media' => ['media_id' => 'ID'],
+    '[>]tbl_users' => ['post_author' => 'ID']
+], [
+    'tbl_posts.ID(post_id)',
+    'tbl_posts.post_title',
+    'tbl_posts.post_content',
+    'tbl_posts.post_slug',
+    'tbl_posts.post_summary',
+    'tbl_posts.post_date(created_at)',
+    'tbl_posts.post_modified(modified_at)',
+    'tbl_media.media_filename',
+    'tbl_media.media_caption',
+    'tbl_users.user_fullname',
+    'tbl_users.user_login'
+], [
+    'tbl_posts.post_status' => 'publish',
+    'tbl_posts.post_type' => 'blog',
+    'tbl_media.media_target' => 'blog',
+    'tbl_media.media_access' => 'public',
+    'tbl_media.media_status' => 1,
+    'tbl_users.user_banned' => 0,
+    'ORDER' => ['tbl_posts.post_date' => 'DESC'],
+    'LIMIT' => $limit
+]);
+
+}
+
+/**
  * sticky_page()
  * 
  * @category theme function
@@ -165,25 +205,57 @@ function retrieves_topic_simple($id)
 
   $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug
           FROM tbl_topics, tbl_post_topic WHERE tbl_topics.ID = tbl_post_topic.topic_id
-          AND tbl_topics.topic_status = 'Y' AND tbl_post_topic.post_id = '$id'";
+          AND tbl_topics.topic_status = 'Y' AND tbl_post_topic.post_id = ? ";
 
-  $stmt = db_simple_query($sql);
+  $stmt = db_prepared_query($sql, [$id], 'i');
+  
+  if ($stmt) {
+    // Get the result set
+    $result_set = $stmt->get_result();
 
-  if ($stmt->num_rows > 0) {
+    // Check if the result set has rows
+    if ($result_set && $result_set->num_rows > 0) {
+        while ($result = $result_set->fetch_array(MYSQLI_ASSOC)) {
+            // Determine permalinks based on rewrite status
+            $permalinks = (rewrite_status() === 'yes')
+                ? (permalinks($result['topic_slug'])['cat'] ?? '#')
+                : (permalinks($result['ID'])['cat'] ?? '#');
 
-    while ($result = $stmt->fetch_array(MYSQLI_ASSOC)) {
+            // Sanitize the topic title for HTML output
+            $topic_title = htmlspecialchars($result['topic_title'], ENT_QUOTES, 'UTF-8');
 
-      if (rewrite_status() === 'yes') {
-        $permalinks = permalinks($result['topic_slug'])['cat'];
-      } else {
-        $permalinks = permalinks($result['ID'])['cat'];
-      }
-
-      $categories[] = "<a href='" . $permalinks . "'>" . $result['topic_title'] . "</a>";
+            // Generate the HTML link
+            $categories[] = "<a href='{$permalinks}'>{$topic_title}</a>";
+        }
+    } else {
+        error_log("No topics found for post ID: " . $id);
     }
-  }
 
-  return implode("", $categories);
+    // Close the result set
+    $result_set->close();
+} else {
+    error_log("Database query failed for post ID: " . $id);
+}
+
+  // Check if the query returned any rows
+//   if ($results) {
+//     while ($result = $stmt->fetch_array(MYSQLI_ASSOC)) {
+//         // Determine permalinks based on rewrite status
+//         $permalinks = (rewrite_status() === 'yes')
+//             ? (permalinks($result['topic_slug'])['cat'] ?? '#')
+//             : (permalinks($result['ID'])['cat'] ?? '#');
+
+//         // Sanitize the topic title for HTML output
+//         $topic_title = htmlspecialchars($result['topic_title'], ENT_QUOTES, 'UTF-8');
+
+//         // Generate the HTML link
+//         $categories[] = "<a href='{$permalinks}'>{$topic_title}</a>";
+//     }
+// }
+
+// Return the concatenated HTML links
+return implode("", $categories);
+
 }
 
 /**
@@ -475,96 +547,6 @@ function retrieve_page($arg, $rewrite)
 }
 
 /**
- * fetch_comments()
- *
- * @category theme function
- * @param int|numeric $postId
- * @param integer $offset
- * 
- */
-function fetch_comments($postId, $offset = 0)
-{
-
-  $idsanitized = Sanitize::severeSanitizer((int)$postId);
-
-  $limit = isset(app_reading_setting()['comment_per_post']) ? app_reading_setting()['comment_per_post'] : 3;
-
-  // get comments
-  $sql = "SELECT ID, comment_post_id, comment_parent_id, comment_author_name, comment_content, comment_status, comment_date 
-          FROM tbl_comments WHERE comment_status = 'approved' AND comment_post_id = ?  
-          ORDER BY comment_date DESC LIMIT ?, ?";
-  
-  $getComments = db_prepared_query($sql, [$idsanitized, $offset, $limit], "iii")->get_result();
-  $count_items = db_num_rows($getComments);
-
-  $comments = array();
-
-  if ($count_items > 0) {
-
-     while ($row = $getComments->fetch_assoc()) {
-       $comments[] = $row;
-     }
-  }
-
-  return is_iterable($comments) ? $comments : array();
-
-}
-
-/**
- * retrieve_comments
- *
- * @param int|numeric $id
- * @param integer $offset
- * 
- */
-function retrieve_comments($id, $offset = 0)
-{
-  $html = '';
-
-  // get total comments
-  $totalRecords = isset(total_comment($id)['total']) ? total_comment($id)['total'] : 0;
-
-  $html .= '<div id="comments-section" class="post-comments" >';
-
-  if ($offset == 0) {
-
-    $html .= '<header><h3 class="h6">Post Comments<span class="no-of-comments">(' . htmlspecialchars($totalRecords) . ')</span></h3></header>';
-
-  }
-
-  // display comments
-  $getComments = fetch_comments($id, $offset);
-
-  if (is_array($getComments)) {
-
-    $html .= '<button id="load-more" class="btn btn-secondary btn-sm btn-block">View More Comments</button>';
-    
-  }
-
-  $html .= '</div>';
-
-  return $html;
-}
-
-/**
- * display_comments
- *
- * @param int|num $postId
- * @return void
- */
-function display_comments($postId)
-{
-
-  $html = '<script>';
-  $html .= '';
-
-  $html .= '</script>';
-
-  return $html;
-
-}
-
-/**
  * total_comment
  *
  * @param int| $id
@@ -576,174 +558,7 @@ function total_comment($id)
   $result = db_prepared_query($sql, [$id], "i")->get_result();
   $row = $result->fetch_assoc()['total_comments'];
 
-  return isset($row) ? ['total' => $row] : array('total' => 0);
-}
-
-/**
- * display_comments
- *
- * @param array $comments
- * @return string
- * 
- */
-function display_comments_leg($comments, $offset, $totalComments)
-{
-  $html = '';
-
-  if (isset($comments) && is_iterable($comments)) {
-    foreach ($comments as $comment) {
-
-      $comment_author_name = htmlout($comment['comment_author_name'] ?? '');
-      $comment_content = html_entity_decode(htmLawed(html($comment['comment_content'] ?? '')));
-      $comment_at = isset($comment['comment_date']) ? htmlout(make_date($comment['comment_date'])) : "";
-
-      $html .= '<div id="comments-section" class="comment">
-               <div class="comment-header d-flex justify-content-between">
-               <div class="user d-flex align-items-center">
-               <div class="image"><img src="' . theme_dir() . 'assets/img/user.svg" alt="' . $comment_author_name . '" class="img-fluid rounded-circle"></div>';
-
-      $html .= '<div class="title"><strong>' . $comment_author_name . '</strong><span class="date">' . $comment_at . '</span></div>';
-      $html .= '</div>';
-      $html .= '</div>';
-      $html .= '<div id="comments" class="comment-body">';
-      $html .= '<p>' . $comment_content . '</p>';
-      $html .= '</div>';
-      $html .= '<button id="load-more-button" class="btn btn-primary btn-sm btn-block">View More Comments</button>';
-      $html .= '</div>';
-      $html .= '<script>';
-      $html .= '$(document).ready(function() {
-            let offset = 0;
-          
-            const urlParams = new URLSearchParams(window.location.search);
-            const post_id = urlParams.get("post_id");
-
-            if (!post_id) {
-                alert("Post ID not provided in the URL.");
-                return;
-            }
-
-            function loadComments() {
-                $.ajax({
-                    url: "fetch-comments.php",
-                    type: "GET",
-                    data: { post_id: post_id, offset: offset },
-                    success: function(response) {
-                        const comments = JSON.parse(response);
-                        if (comments.length > 0) {
-                            comments.forEach(comment => {
-                                $("#comments").append(`
-                                    <div id="comment-section" class="comment">
-                                        <div class="card-body">
-                                            <h5 class="card-title">${comment.comment_author_name}</h5>
-                                            <p class="card-text">${comment.comment_content}</p>
-                                            <p class="card-text"><small class="text-muted">${comment.comment_date}</small></p>
-                                        </div>
-                                    </div>
-                                `);
-                            });
-                            offset += comments.length;
-                        } else {
-                            $("#load-more").text("No More Comments").attr("disabled", true);
-                        }
-                    }
-                });
-            }
-
-            $("#load-more").click(function() {
-                loadComments();
-            });
-
-            loadComments();
-        });';
-
-      $html .= '</scrip>';
-
-    }
-  } else {
-
-    $html .= '<div class="comment">';
-    $html .= '<div class="comment-body">';
-    $html .= '<p>No comments found</p>';
-    $html .= '</div>';
-    $html .= '</div>';
-  }
-
-  return $html;
-}
-
-function display_pagination($id, $totalPages, $cpage, $prev, $next)
-{
-
-  $html = '';
-  $html .= '<nav aria-label="Page navigation example mt-5">';
-  $html .= ' <ul class="pagination justify-content-center">';
-
-  // Get current URL
-  $script_name = rtrim(dirname($_SERVER["SCRIPT_NAME"]), DIRECTORY_SEPARATOR);
-  $request_uri = DIRECTORY_SEPARATOR . trim(str_replace($script_name, '', $_SERVER['REQUEST_URI']), DIRECTORY_SEPARATOR);
-
-
-
-  $html .= '</ul>';
-  $html .= '</nav>';
-
-  return $html;
-}
-
-function display_pagination_leg($id, $totalPages, $cpage, $prev, $next)
-{
-
-  $html = '';
-  $html .= '<nav aria-label="Page navigation example mt-5">';
-  $html .= ' <ul class="pagination justify-content-center">';
-
-  if (rewrite_status() === 'yes') {
-
-    $url = isset($_SERVER['REQUEST_URI']) ? strtok($_SERVER["REQUEST_URI"], '?') : "";
-
-    if ($cpage > 1) {
-      $html .= '<li class="page-item"><a class="page-link" href="' . $url . '/' . $prev . '">Previous</a></li>';
-    } else {
-      $html .= '<li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>';
-    }
-
-    // Page links
-    for ($i = 1; $i <= $totalPages; $i++) {
-      $html .= '<li class="page-item ';
-      $html .= ($cpage == $i) ? 'active' : '';
-      $html .= '"><a class="page-link" href="' . $url . '/' . $i . '">' . $i . '</a></li>';
-    }
-
-    // Next page link
-    if ($cpage < $totalPages) {
-      $html .= '<li class="page-item"><a class="page-link" href="' . $url . '/' . $next . '">Next</a></li>';
-    } else {
-      $html .= '<li class="page-item disabled"><a class="page-link">Next</a></li>';
-    }
-  } else {
-
-    // Previous link
-    $html .= '<li class="page-item ' . (($cpage <= 1) ? 'disabled' : '') . '">';
-    $html .= '<a class="page-link" href="?p=' . $id . (($cpage <= 1) ? '#' : '&cpage=' . $prev) . '">Previous</a>';
-    $html .= '</li>';
-
-    for ($i = 1; $i <= $totalPages; $i++) {
-
-      $html .= '<li class="page-item ' . (($cpage == $i) ? 'active' : '') . '">';
-      $html .= '<a class="page-link" href="?p=' . $id . '&cpage=' . $i . '" title="' . $i . '" aria-hidden>' . $i . '</a>';
-      $html .= '</li>';
-    }
-
-    // Next link
-    $html .= '<li class="page-item ' . (($cpage >= $totalPages) ? 'disabled' : '') . '">';
-    $html .= '<a class="page-link" href="?p=' . $id . (($cpage >= $totalPages) ? '#' : '&cpage=' . $next) . '">Next</a>';
-    $html .= '</li>';
-  }
-
-  $html .= '</ul>';
-  $html .= '</nav>';
-
-  return $html;
+  return isset($row) ? ['total' => $row] : 0;
 }
 
 /**
@@ -828,3 +643,44 @@ function nothing_found()
 _NOTHING_FOUND;
 }
 
+function render_comments_section(int $postId, int $offset = 0): string
+{
+    $totalRecords = isset(total_comment($postId)['total']) ? (int) total_comment($postId)['total'] : 0;
+    $commentLimit = isset(app_reading_setting()['comment_per_post']) ? (int) app_reading_setting()['comment_per_post'] : 3;
+
+    ob_start(); ?>
+
+    <div id="comments-section" class="post-comments container-fluid px-0">
+       <script>
+            window.CommentSettings = {
+                postId: <?= (int)$postId ?>,
+                limit: <?= (int)$commentLimit ?>
+            };
+        </script>
+
+    <?php if ($offset === 0): ?>
+        <div class="row">
+            <div class="col">
+                <header class="mb-3">
+                    <h3 class="h5 font-weight-bold">
+                        Post Comments
+                        <span class="badge badge-secondary"><?= htmlspecialchars($totalRecords) ?></span>
+                    </h3>
+                </header>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <div class="row">
+            <div class="col-12">
+                <div id="comments" data-post-id="<?= $postId ?>"></div>
+                <div class="text-center mt-3">
+                    <button id="load-more" class="btn btn-outline-primary">Load More Comments</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php
+    return ob_get_clean();
+}

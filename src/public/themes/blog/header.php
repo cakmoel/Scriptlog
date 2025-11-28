@@ -8,7 +8,6 @@ require dirname(__FILE__) . '/functions.php';
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <?= function_exists('theme_meta') ? theme_meta()['site_meta_tags'] . PHP_EOL : ""; ?>
-<meta property="og:type" content="website" />
 <?php 
  if (function_exists('theme_dir')) :
 ?>
@@ -38,7 +37,7 @@ endif;
         <div class="container">
 
             <div class="sina-nav-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-menu">
+                <button id="al" aria-label="Menu" type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-menu">
                     <i class="fa fa-bars fa-fw" aria-hidden="true"></i>
                 </button>
                 <a class="sina-brand" href="<?= app_url(); ?>">

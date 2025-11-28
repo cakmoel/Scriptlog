@@ -3,8 +3,8 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $params = isset($_GET['Id']) ? intval($_GET['Id']) : null ;
 $configDao = class_exists('ConfigurationDao') ? new ConfigurationDao() : "";
-$configEvent = class_exists('ConfigurationEvent') ? new ConfigurationEvent($configDao, $validator, $sanitizer) : "";
-$configApp = class_exists('ConfigurationApp') ? new ConfigurationApp($configEvent) : "";
+$configService = class_exists('ConfigurationService') ? new ConfigurationService($configDao, $validator, $sanitizer) : "";
+$configController = class_exists('ConfigurationController') ? new ConfigurationController($configService) : "";
 
 try {
 
@@ -28,7 +28,7 @@ try {
 
                 if ($params == 0) {
 
-                    $configApp->updateMembershipConfig();
+                    $configController->updateMembershipConfig();
 
                 } else {
 
@@ -48,7 +48,7 @@ try {
 
           } else {
 
-            $configApp->updateMembershipConfig();
+            $configController->updateMembershipConfig();
 
           }
 

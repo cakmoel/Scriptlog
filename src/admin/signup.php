@@ -1,5 +1,4 @@
 <?php
-
 /**
  * signup.php
  * 
@@ -13,6 +12,7 @@
  * @since   Since Release 1.0
  * 
  */
+
 if (file_exists(__DIR__ . '/../config.php')) {
 
   require __DIR__ . '/../lib/main.php';
@@ -34,7 +34,31 @@ $uniqueKey = isset($_GET['uniqueKey']) ? safe_html($_GET['uniqueKey']) : null;
 
 if (($action == 'SignUp') && (block_request_type(current_request_method(), ['POST']) === false)) {
 
-  list($errors, $signup_success) = function_exists('processing_signup') ? processing_signup($ip, $signupId, $uniqueKey, $errors, $_POST) : "";
+  if (function_exists('processing_signup')) {
+
+    // Sanitize and validate input
+    $signup_data = filter_input_array(INPUT_POST, [
+      'user_login' => FILTER_SANITIZE_SPECIAL_CHARS,
+      'user_email' => FILTER_VALIDATE_EMAIL,
+      'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+      'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+      'iagree' => FILTER_SANITIZE_NUMBER_INT,
+      'csrf' => FILTER_SANITIZE_SPECIAL_CHARS
+    ]);
+  
+    // Ensure data is valid
+    if ($signup_data && !in_array(false, $signup_data, true)) {
+
+      list($errors, $signup_success) = processing_signup($ip, $signupId, $uniqueKey, $errors, $signup_data);
+    } else {
+
+      scriptlog_error("Invalid signup data received.");
+    }
+    
+  } else {
+
+    scriptlog_error("Function processing_signup not found");
+  }
 }
 
 register_header($stylePath);
@@ -52,16 +76,16 @@ register_header($stylePath);
 <div class="register-box-body">
 
   <?php
-   if (isset($errors['errorMessage'])) :
+    if (isset($errors['errorMessage'])) :
   ?>
 
     <div class="alert alert-danger alert-dismissable">
-      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      <button type="button" class="close" data-dismiss="alert" >&times;</button>
       <?= $errors['errorMessage']; ?>
     </div>
 
   <?php
-   endif;
+     endif;
   ?>
 
 
@@ -126,7 +150,7 @@ register_header($stylePath);
         <div class="col-xs-8">
           <div class="checkbox icheck">
             <label for="iagree-to-terms">
-              <input type="checkbox" aria-checked="false" name="iagree" aria-selected="false" id="iagree-to-terms"> I agree to the <a href="terms-of-use.html" target="_blank" rel="noopener noreferrer" title="Terms of use" aria-label="Terms of Use">terms of use</a>
+              <input type="checkbox" aria-checked="false" name="iagree" id="iagree-to-terms" value="1" required> I agree to the <a href="<?= app_url() .'/admin/terms-of-use.html'?>" target="_blank" rel="noopener noreferrer" title="Terms of use" aria-label="Terms of Use">terms of use</a>
             </label>
           </div>
         </div>
@@ -144,11 +168,11 @@ register_header($stylePath);
     </form>
 
     <?php
-    if (is_registration_unable() === true) :
+      if (is_registration_unable() === true) :
     ?>
       <a href="<?= app_url() . '/admin/login.php'; ?>" class="text-center" aria-label="Log in">Log in |</a>
     <?php
-    endif;
+      endif;
     ?>
 
     <a href="<?= app_url() . '/admin/reset-password.php'; ?>" class="text-center" aria-label="Lost your password">Lost your password?</a>

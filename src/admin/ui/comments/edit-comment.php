@@ -82,15 +82,20 @@ $comment_id = isset($commentData['ID']) ? (int)$commentData['ID'] : 0;
 <!-- Form Element sizes -->
     <div class="box box-info">
         <div class="box-header with-border">
-              <h3 class="box-title">Response To: <?=(isset($commentData['post_title'])) ? $commentData['post_title'] : ""; ?></h3>
+              <h3 class="box-title">Response To: </h3>
         </div>
         <div class="box-body">
             <div class="form-group">
-                <label><i class="fa fa-calendar" aria-hidden="true"></i> Submited On</label>
-                <p class="text-aqua"><?=(isset($commentData['comment_date'])) ? human_readable_datetime(new DateTime($commentData['comment_date']), 'g:i a  \o\n l jS F Y') . "<br>" . time_elapsed_string($commentData['comment_date']) : ""; ?>  </p>
+              <p><?=(isset($commentData['post_title'])) ? $commentData['post_title'] : ""; ?></p>
             </div>
             <div class="form-group">
-                <a href="<?= generate_request("index.php", 'get', ['reply', ActionConst::RESPONSETO, 0])['link']; ?>" class="btn btn-primary"><i class="fa fa-reply fa-fw" aria-hidden="true"></i> </a>
+                <label><i class="fa fa-calendar" aria-hidden="true"></i> Submited On</label>
+                <p>
+                <?=(isset($commentData['comment_date'])) ? human_readable_datetime(new DateTime($commentData['comment_date']), 'g:i a  \o\n l jS F Y') . "<br>" . time_elapsed_string($commentData['comment_date']) : ""; ?>
+                </p>
+            </div>
+            <div class="form-group">
+                <a href="<?= generate_request("index.php", 'get', ['reply', ActionConst::RESPONSETO, $commentData['ID']])['link']; ?>" class="btn btn-primary" title="Reply"><i class="fa fa-reply fa-fw" aria-hidden="true"></i> Reply</a>
             </div>
         </div>
             <!-- /.box-body -->

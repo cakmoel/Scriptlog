@@ -502,7 +502,7 @@ class UserController extends BaseApp
                     $_SESSION['status'] = "userUpdated";
                     direct_page('index.php?load=users&status=userUpdated', 302);
                 }
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
 
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);

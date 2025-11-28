@@ -49,7 +49,7 @@ public static function handleFrontHelper()
  * @return array
  * 
  */
-private static function findRequestToRules($rules)
+public static function findRequestToRules($rules)
 {
 
 $script_name = isset($_SERVER['SCRIPT_NAME']) ? rtrim(dirname($_SERVER['SCRIPT_NAME']), DIRECTORY_SEPARATOR ) : '';
@@ -173,15 +173,39 @@ public static function checkMatchUriRequested()
  * 
  * Checking whether URI requested match the rules and allowed to be executed 
  */
+// public static function allowedPathRequested($path, $rules)
+// {
+
+//  $rule_requested = self::findRequestToRules($rules);
+
+//  $is_valid_requested = (is_array($rule_requested) && array_key_exists(0, $rule_requested)) ? $rule_requested[0] : null;
+
+//  return (!(in_array(self::isRequestToPathValid(0), $path, true) || (in_array($is_valid_requested, $path, true)))) ? false : true;
+
+// }
+
+
+// In lib/core/HandleRequest.php
+
+/**
+ * allowedPathRequested
+ * * Checking whether the first segment of the URI is in the whitelist.
+ */
 public static function allowedPathRequested($path, $rules)
 {
-
- $rule_requested = self::findRequestToRules($rules);
-
- $is_valid_requested = (is_array($rule_requested) && array_key_exists(0, $rule_requested)) ? $rule_requested[0] : null;
-
- return (!(in_array(self::isRequestToPathValid(0), $path, true) || (in_array($is_valid_requested, $path, true)))) ? false : true;
-
+    // Fix: We only check if the first path segment (e.g., 'post', 'category')
+    // is present in the simple $path whitelist. This allows the Dispatcher 
+    // to proceed to its full regex matching.
+    $first_segment = self::isRequestToPathValid(0);
+    
+    // Check if the first segment is an empty string (meaning root '/' request)
+    // or if it is present in the provided whitelist ($path).
+    if (empty($first_segment) || in_array($first_segment, $path, true)) {
+        return true;
+    }
+    
+    // If the first segment is not in the whitelist (e.g., 'admin', or 'images'), block it.
+    return false;
 }
 
 /**
@@ -225,6 +249,7 @@ public static function deliverQueryString()
       break;
     
     case 'cat':
+      
       // Deliver request to a single category or topic
       if (! empty(static::isQueryStringRequested()['value'])) {
 
@@ -348,7 +373,7 @@ public static function deliverQueryString()
      
       if (false === static::checkMatchUriRequested()) {
 
-        direct_page('', 500);
+        direct_page('', 404);
 
       } else {
 

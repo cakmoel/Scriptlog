@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Direct Page Function
  * 
@@ -12,7 +13,7 @@
  */
 function direct_page($page = '', $http_status_code = null)
 {
-    static $http = array (
+    static $http = array(
         100 => "HTTP/1.1 100 Continue",
         101 => "HTTP/1.1 101 Switching Protocols",
         200 => "HTTP/1.1 200 OK",
@@ -53,21 +54,27 @@ function direct_page($page = '', $http_status_code = null)
         503 => "HTTP/1.1 503 Service Unavailable",
         504 => "HTTP/1.1 504 Gateway Time-out"
     );
-    
- // defining url
- $url = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname(htmlspecialchars($_SERVER['PHP_SELF']));
-    
- // remove any trailing slashes
- $url = rtrim($url, '/\\');
-    
- // add the page
- $url .= DIRECTORY_SEPARATOR . $page;
- 
- if (!is_null($http_status_code)) {
-    header($http[$http_status_code]);
- }
- 
- // redirect the user
- header("Location: $url");
- 
+
+    // defining url
+    $url = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname(htmlspecialchars($_SERVER['PHP_SELF']));
+
+    // remove any trailing slashes
+    $url = rtrim($url, '/\\');
+
+    // add the page
+    $url .= DIRECTORY_SEPARATOR . $page;
+
+    if (headers_sent()) {
+        // Headers are already sent. Use JavaScript as a fallback to redirect.
+        echo "<script>window.location.href='" . $url . "';</script>";
+        echo "<noscript><meta http-equiv='refresh' content='0;url=" . $url . "'/></noscript>";
+        exit;
+    }
+    if (!is_null($http_status_code)) {
+        header($http[$http_status_code]);
+    }
+
+    // redirect the user
+    header("Location: $url");
+    exit;
 }

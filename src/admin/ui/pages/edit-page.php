@@ -144,15 +144,6 @@ if (isset($pageData['post_modified']) || isset($pageData['post_date']) ) {
 </div>
 
 <div class="form-group">
-<label for="meta_key">Meta Keywords</label>
-<textarea class="form-control" id="meta_key" rows="3" placeholder="Enter ..." name="post_keyword" maxlength="200" >
-<?=(isset($pageData['post_keyword'])) ? safe_html($pageData['post_keyword']) : ""; ?>
-<?=(isset($formData['post_keyword'])) ? safe_html($formData['post_keyword']) : ""; ?>
-</textarea>
-<p class="help-block">Maximum 200 characters</p>
-</div>
-
-<div class="form-group">
 <label for="post_status">Page status</label>
 <?=(isset($postStatus)) ? $postStatus : ""; ?>
 </div>

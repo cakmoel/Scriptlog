@@ -1,6 +1,6 @@
 <?php
 
-$topicProvider = class_exists('TopicProviderModel') ? new TopicModel() : "";
+$topicProvider = class_exists('TopicModel') ? new TopicModel() : "";
 
 if ($topicProvider instanceof TopicModel) {
 
