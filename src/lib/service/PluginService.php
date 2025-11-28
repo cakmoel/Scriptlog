@@ -303,7 +303,7 @@ class PluginService
    * @param array $data
    * @return integer
    */
-  public function totalPlugins($data = null)
+  public function totalPlugins(array $data = []): ?int
   {
     return $this->pluginDao->totalPluginRecords($data);
   }

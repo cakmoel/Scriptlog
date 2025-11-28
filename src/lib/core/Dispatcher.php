@@ -47,56 +47,104 @@ class Dispatcher
 
       $this->route = Registry::get('route');
     }
+
+    $theme = $this->invokeTheme();
+    $this->theme_dir = APP_ROOT . APP_THEME . escape_html($theme['theme_directory']) . DIRECTORY_SEPARATOR;
   }
 
   /**
-   * Dispacth route requested by rules
-   * and identify where should respond it in active theme
-   * 
+   * dispatch
+   *
    */
   public function dispatch()
   {
-
-    $this->theme_dir = APP_ROOT.APP_THEME.escape_html($this->invokeTheme()['theme_directory']).DIRECTORY_SEPARATOR;
-
     if (rewrite_status() === 'yes') {
 
-      if (false === HandleRequest::allowedPathRequested($this->whiteListPathRequested(), $this->route)) {
-
-        // nothing is found so handle the error page 404
-        $this->errorNotFound($this->theme_dir);
-
-      } else {
-  
-        foreach ($this->route as $key => $value) {
-  
-          // Add delimiters to the regex pattern
-          $pattern = '~^' . $value . '$~i';
-
-          if (preg_match($pattern, $this->requestURI(), $matches)) {
-           
-            http_response_code(200);
-            
-            call_theme_header(); 
-            call_theme_content($key);
-            call_theme_footer();
-            
-            return;
-
-          } 
-
-        }
-
-        direct_page('404.php', 404);  
-
-      }
-
+      $this->handleSeoFriendlyUrl();
     } else {
 
-      (class_exists('HandleRequest')) ? HandleRequest::deliverQueryString() : "";
-      
+      $this->handleQueryStringUrl();
+    }
+  }
+
+  /**
+   * handleSeoFriendlyUrl
+   * 
+   */
+  // public function handleSeoFriendlyUrl()
+  // {
+
+  //   if (!HandleRequest::allowedPathRequested($this->whiteListPathRequested(), $this->route)) {
+
+  //     $this->errorNotFound();
+  //     return;
+  //   }
+
+  //   $requestUri = $this->requestURI();
+
+  //   foreach ($this->route as $key => $pattern) {
+  //     if (preg_match('~^' . $pattern . '$~i', $requestUri)) {
+
+  //       $this->renderTheme($key);
+  //       return;
+  //     }
+  //   }
+
+  //   direct_page('404.php', 404);
+  // }
+
+  // In lib/core/Dispatcher.php
+
+  // In lib/core/Dispatcher.php
+
+  public function handleSeoFriendlyUrl()
+  {
+    // The simplified allowedPathRequested now lets the request pass if the first segment is valid.
+    if (!HandleRequest::allowedPathRequested($this->whiteListPathRequested(), $this->route)) {
+      $this->errorNotFound();
+      return;
     }
 
+    $requestUri = $this->requestURI();
+
+    // 1. Get RequestPath object from the Registry
+    $requestPath = class_exists('Registry') ? Registry::get('uri') : null;
+
+    foreach ($this->route as $key => $pattern) {
+
+      $matches = []; // Initialize $matches as an empty array for safety
+
+      // 2. Perform the regex match, capturing results into $matches
+      if (preg_match('~^' . $pattern . '$~i', $requestUri, $matches)) {
+
+        // Match found!
+
+        // 3. CRITICAL FIX: Ensure $matches is an array and the object is valid before calling the setter
+        if (is_object($requestPath) && method_exists($requestPath, 'setParameters') && is_array($matches)) {
+          // Line 120 (approx): This call is now safe because we verified $matches is an array.
+          $requestPath->setParameters($matches);
+        }
+
+        // 4. Render the found template
+        $this->renderTheme($key);
+        return;
+      }
+    }
+
+    // If the loop finishes without a match, then it's a true 404.
+    $this->errorNotFound();
+  }
+
+  /**
+   * handleQueryStringUrl
+   *
+   */
+  private function handleQueryStringUrl()
+  {
+    if (class_exists('HandleRequest')) {
+
+      HandleRequest::deliverQueryString();
+    }
   }
 
   /**
@@ -105,22 +153,33 @@ class Dispatcher
    * @return mixed
    * 
    */
+  // private function requestURI()
+  // {
+  //   $script_name = rtrim(dirname($_SERVER["SCRIPT_NAME"]), DIRECTORY_SEPARATOR);
+  //   $request_uri = DIRECTORY_SEPARATOR . trim(str_replace($script_name, '', $_SERVER['REQUEST_URI']), DIRECTORY_SEPARATOR);
+  //   return urldecode($request_uri);
+  // }
+
+  // In lib/core/Dispatcher.php
+
   private function requestURI()
   {
-    $script_name = rtrim(dirname($_SERVER["SCRIPT_NAME"]), DIRECTORY_SEPARATOR);
-    $request_uri = DIRECTORY_SEPARATOR . trim(str_replace($script_name, '', $_SERVER['REQUEST_URI']), DIRECTORY_SEPARATOR);
-    return urldecode($request_uri);
-  }
+    // Get the path part of the REQUEST_URI, ignoring the query string
+    $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 
-  /**
-   * whiteListPathRequested
-   *
-   * @return array
-   * 
-   */
-  private function whiteListPathRequested()
-  {
-    return ['/', '//', 'post', 'page', 'blog', 'category', 'archive', 'tag'];
+    // Determine the base path (if installed in a subdirectory)
+    $basePath = dirname($_SERVER['SCRIPT_NAME']);
+
+    // Remove the base path from the request path if it exists
+    if ($basePath !== '/' && str_starts_with($path, $basePath)) {
+      $path = substr($path, strlen($basePath));
+    }
+
+    // Normalize: Ensure single leading slash and no trailing slash
+    $path = '/' . trim($path, '/');
+
+    // The resulting string should be exactly: /post/1/lorem-ipsum
+    return urldecode($path);
   }
 
   /* InvokeTheme
@@ -134,17 +193,40 @@ class Dispatcher
     return theme_identifier();
   }
 
-  /* Error not found 404
+  /**
+   * renderTheme
+   *
+   * @param string $template
+   * 
+   */
+  private function renderTheme($template)
+  {
+    http_response_code(200);
+    call_theme_header();
+    call_theme_content($template);
+    call_theme_footer();
+  }
+
+  /* errorNotFound
+
   * set 404 error page
   * 
   * @param string $theme_dir
   * 
   */
-  private function errorNotFound($theme_dir)
+  private function errorNotFound()
   {
     http_response_code(404);
-    include $theme_dir . 'header.php';
-    include $theme_dir . '404.php';
-    include $theme_dir . 'footer.php';
+    include $this->theme_dir . 'header.php';
+    include $this->theme_dir . '404.php';
+    include $this->theme_dir . 'footer.php';
+  }
+
+  /**
+   * Get whitelisted paths
+   */
+  private function whiteListPathRequested()
+  {
+    return ['/', '//', 'post', 'page', 'blog', 'category', 'archive', 'tag'];
   }
 }

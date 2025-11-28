@@ -117,12 +117,12 @@ function processing_signup($ip, $signupId, $uniqueKey, $errors, array $values)
   $checkError = true;
   $signup_success = array();
 
-  $user_login = (isset($values['user_login']) && $values['user_login'] == $_POST['user_login'] ? prevent_injection($values['user_login']) : null);
-  $user_email = (isset($values['user_email']) && $values['user_email'] == $_POST['user_email'] ? prevent_injection($values['user_email']) : null);
-  $user_pass = (isset($values['user_pass']) && $values['user_pass'] == $_POST['user_pass'] ? prevent_injection($values['user_pass']) : null);
-  $confirm_pass = (isset($values['user_pass2']) && $values['user_pass2'] == $_POST['user_pass2'] ? prevent_injection($values['user_pass2']) : null);
-  $iagree = (isset($values['iagree']) && $values['iagree'] == $_POST['iagree'] ? $values['iagree'] : null);
-  $csrf = (isset($values['csrf']) && $values['csrf'] == $_POST['csrf']  ? $values['csrf'] : '');
+  $user_login = (!empty($values['user_login']) && $values['user_login'] == $_POST['user_login']) ? prevent_injection($values['user_login']) : '';
+  $user_email = (!empty($values['user_email']) && $values['user_email'] == $_POST['user_email']) ? prevent_injection($values['user_email']) : '';
+  $user_pass = (!empty($values['user_pass']) && $values['user_pass'] == $_POST['user_pass']) ? prevent_injection($values['user_pass']) : '';
+  $confirm_pass = (!empty($values['user_pass2']) && $values['user_pass2'] == $_POST['user_pass2']) ? prevent_injection($values['user_pass2']) : '';
+  $iagree = (isset($values['iagree']) && $values['iagree'] == $_POST['iagree']) ? $values['iagree'] : '';
+  $csrf = (isset($values['csrf']) && $values['csrf'] == $_POST['csrf'])  ? $values['csrf'] : '';
 
   $user_session = function_exists('openssl_random_pseudo_bytes') ? substr(hash('sha256', bin2hex(openssl_random_pseudo_bytes(ceil(32 / 2)))), 0, 32) : '';
   $hash_password = function_exists('scriptlog_password') ? scriptlog_password($user_pass) : '';

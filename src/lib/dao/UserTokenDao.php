@@ -87,7 +87,7 @@ class UserTokenDao extends Dao
 public function updateUserToken($bind, $user_login)
 {
   
-  $this->modify("tbl_user_token", ['pwd_hash' => $bind['pwd_hash'], 'selector_hash' => $bind['selector_hash'], 'is_expired'=> $bind['is_expired'], 'expired_date' => $bind['expired_date']], " user_login = '{$user_login}'");
+  $this->modify("tbl_user_token", ['pwd_hash' => $bind['pwd_hash'], 'selector_hash' => $bind['selector_hash'], 'is_expired'=> $bind['is_expired'], 'expired_date' => $bind['expired_date']], ['user_login' => $user_login]);
 
 }
 
@@ -99,7 +99,7 @@ public function updateUserToken($bind, $user_login)
  */
 public function updateTokenExpired($userTokenId)
 {
-  $this->modify("tbl_user_token", ['is_expired' => 1], "ID = {$userTokenId}");
+  $this->modify("tbl_user_token", ['is_expired' => 1], ['ID' => $userTokenId]);
 }
 
 /**
@@ -111,7 +111,7 @@ public function updateTokenExpired($userTokenId)
  */
 public function deleteUserToken($user_login)
 {
-  $this->deleteRecord("tbl_user_token", " user_login = '{$user_login}' AND is_expired = '1'");
+  $this->deleteRecord("tbl_user_token", ["user_login" => $user_login, "is_expired" => 1]);
 }
 
 }

@@ -192,3 +192,17 @@ function get_result($Statement)
     
   return $result;
 }
+
+/**
+ * db_close
+ * 
+ * @category function to close database connection
+ * @author M.Noermoehammad
+ * @license MIT
+ * @version 1.0
+ *
+ */
+function db_close()
+{
+  return db_instance()->disconnect();
+}

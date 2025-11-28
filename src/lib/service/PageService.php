@@ -85,14 +85,6 @@ class PageService
   private $meta_desc;
 
   /**
-   * Meta keywords
-   * 
-   * @var string
-   * 
-   */
-  private $meta_key;
-
-  /**
    * post's tags
    *
    * @var string
@@ -267,17 +259,6 @@ class PageService
   }
 
   /**
-   * set meta keywords
-   * 
-   * @param string $meta_keys
-   * 
-   */
-  public function setMetaKeys($meta_keys)
-  {
-    $this->meta_key = prevent_injection($meta_keys);
-  }
-
-  /**
    * set page status
    * 
    * @param string $page_status
@@ -359,9 +340,8 @@ class PageService
     $this->validator->sanitize($this->title, 'string');
     $this->validator->sanitize($this->post_image, 'int');
 
-    if ((!empty($this->meta_desc)) || (!empty($this->meta_key)) || (!empty($this->post_tags))) {
+    if ((!empty($this->meta_desc)) || (!empty($this->post_tags))) {
       $this->validator->sanitize($this->meta_desc, 'string');
-      $this->validator->sanitize($this->meta_key, 'string');
       $this->validator->sanitize($this->post_tags, 'string');
     }
 
@@ -375,7 +355,6 @@ class PageService
         'post_slug' => $this->slug,
         'post_content' => $this->content,
         'post_summary' => $this->meta_desc,
-        'post_keyword' => $this->meta_key,
         'post_status' => $this->page_status,
         'post_sticky' => $this->page_sticky,
         'post_type' => $this->post_type,
@@ -391,7 +370,6 @@ class PageService
         'post_slug' => $this->slug,
         'post_content' => $this->content,
         'post_summary' => $this->meta_desc,
-        'post_keyword' => $this->meta_key,
         'post_status' => $this->page_status,
         'post_sticky' => $this->page_sticky,
         'post_type' => $this->post_type,
@@ -414,9 +392,8 @@ class PageService
     $this->validator->sanitize($this->post_image, 'int');
     $this->validator->sanitize($this->title, 'string');
 
-    if ((!empty($this->meta_desc))  || (!empty($this->meta_key)) || (!empty($this->post_tags))) {
+    if ((!empty($this->meta_desc)) || (!empty($this->post_tags))) {
       $this->validator->sanitize($this->meta_desc, 'string');
-      $this->validator->sanitize($this->meta_key, 'string');
       $this->validator->sanitize($this->post_tags, 'string');
     }
 
@@ -429,7 +406,6 @@ class PageService
         'post_slug' => $this->slug,
         'post_content' => $this->content,
         'post_summary' => $this->meta_desc,
-        'post_keyword' => $this->meta_key,
         'post_tags' => $this->post_tags,
         'post_status' => $this->page_status,
         'post_sticky' => $this->page_sticky,
@@ -446,7 +422,6 @@ class PageService
         'post_slug' => $this->slug,
         'post_content' => $this->content,
         'post_summary' => $this->meta_desc,
-        'post_keyword' => $this->meta_key,
         'post_tags' => $this->post_tags,
         'post_status' => $this->page_status,
         'post_sticky' => $this->page_sticky,
@@ -466,30 +441,52 @@ class PageService
     $this->validator->sanitize($this->pageId, 'int');
 
     if (!$data_page = $this->pageDao->findPageById($this->pageId, $this->post_type, $this->sanitizer)) {
+      
       direct_page('index.php?load=pages&error=pageNotFound', 404);
     }
 
-    $media_id = $data_page['media_id'];
+    $media_id = $data_page['media_id'] ?? 0;
 
-    $medialib = new MediaDao();
-    $media_data = $medialib->findMediaById((int)$media_id, $this->sanitizer);
-    $page_image = isset($media_data['media_filename']) ? basename($media_data['media_filename']) : "";
+    if (class_exists('MediaDao')) {
 
-    if ($page_image !== '') {
+      $medialib = new MediaDao();
 
-      if (is_readable(__DIR__ . '/../../' . APP_IMAGE . $page_image)) {
+      if (method_exists($medialib, 'findMediaById') && $media_id) {
 
-        unlink(__DIR__ . '/../../' . APP_IMAGE . $page_image);
-        unlink(__DIR__ . '/../../' . APP_IMAGE_LARGE . 'large_' . $page_image);
-        unlink(__DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_' . $page_image);
-        unlink(__DIR__ . '/../../' . APP_IMAGE_SMALL . 'small_' . $page_image);
+        $media_data = $medialib->findMediaById((int)$media_id, $this->sanitizer);
+        $page_image = isset($media_data['media_filename']) && preg_match('/^[a-zA-Z0-9_\-\.]+$/', $media_data['media_filename']) ? basename($media_data['media_filename']) : '';
+
+        if (!empty($page_image)) {
+
+          // define image base path
+          $base_path = __DIR__ . '/../../'  . APP_IMAGE;
+
+          $files_to_delete = [
+            $base_path . $page_image,            
+            $base_path . APP_IMAGE_LARGE  . 'large_' . $page_image,
+            $base_path . APP_IMAGE_MEDIUM . 'medium_' . $page_image,
+            $base_path . APP_IMAGE_SMALL  . 'small_' . $page_image
+          ];
+
+          foreach ($files_to_delete as $file) {
+            if (file_exists($file) && is_writable($file)) {
+              unlink($file);
+            }
+          }
+
+          // Delete media record 
+          if (method_exists($medialib, 'deleteMedia')) {
+            $medialib->deleteMedia((int) $media_id, $this->sanitizer);
+          }
+
+        }
+
       }
 
-      return $this->pageDao->deletePage($this->pageId, $this->sanitizer, $this->post_type);
-    } else {
-
-      return $this->pageDao->deletePage($this->pageId, $this->sanitizer, $this->post_type);
     }
+
+    // Delete page 
+    return $this->pageDao->deletePage($this->pageId, $this->sanitizer, $this->post_type);
   }
 
   /**
@@ -546,7 +543,13 @@ class PageService
     return user_privilege();
   }
 
-  public function totalPages($data = null)
+  /**
+   * totalPages
+   *
+   * @param array $data
+   * @return integer|null
+   */
+  public function totalPages(array $data = []): ?int
   {
     return $this->pageDao->totalPageRecords($data);
   }

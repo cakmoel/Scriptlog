@@ -55,11 +55,21 @@ class MenuDao extends Dao
   {
     $idsanitized = $this->filteringId($sanitizing, $menuId, 'sql');
 
-    $grab_menu = medoo_column_where("tbl_menu", [
-      "ID", "menu_label", "menu_status", "menu_visibility", "parent_id", "menu_sort"
-    ], ["ID" => $idsanitized]);
+    $sql = "SELECT ID, 
+                  menu_label,
+                  menu_link, 
+                  menu_status, 
+                  menu_visibility, 
+                  parent_id, 
+                  menu_sort 
+             FROM tbl_menu 
+             WHERE ID = ? ";
 
-    return (empty($grab_menu)) ?: $grab_menu; 
+    $this->setSQL($sql);
+    
+    $menuDetail = $this->findRow([$idsanitized]);
+
+    return (empty($menuDetail)) ?: $menuDetail;
   }
 
   /**
@@ -122,7 +132,7 @@ class MenuDao extends Dao
 
     if ($link['menu_link'] === '') {
 
-      $this->modify("tbl_menu", ['menu_link' => '#'], "ID = {$link['ID']}");
+      $this->modify("tbl_menu", ['menu_link' => '#'], ['ID' => $link['ID']]);
     }
 
     return $menu_id;
@@ -154,7 +164,7 @@ class MenuDao extends Dao
       'menu_visibility' => $bind['menu_visibility'],
       'parent_id' => $bind['parent_id'],
       'menu_sort' => $bind['menu_sort']
-    ], "ID = $temp_id");
+    ], ['ID' => $temp_id]);
   }
 
   /**
@@ -167,7 +177,7 @@ class MenuDao extends Dao
   public function activateMenu($id, $sanitize)
   {
     $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-    $this->modify("tbl_menu", ['menu_status' => 'Y'], "ID => {$idsanitized}");
+    $this->modify("tbl_menu", ['menu_status' => 'Y'], ['ID' => $idsanitized]);
   }
 
   /**
@@ -180,7 +190,7 @@ class MenuDao extends Dao
   public function deactivateMenu($id, $sanitize)
   {
     $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-    $this->modify("tbl_menu", ['menu_status' => 'N'], "ID => {$idsanitized}");
+    $this->modify("tbl_menu", ['menu_status' => 'N'], ['ID' => $idsanitized]);
   }
 
   /**
@@ -193,7 +203,7 @@ class MenuDao extends Dao
   public function deleteMenu($id, $sanitize)
   {
     $cleanid = $this->filteringId($sanitize, $id, 'sql');
-    $this->deleteRecord("tbl_menu", "ID = $cleanid");
+    $this->deleteRecord("tbl_menu", ['ID' => $cleanid]);
   }
 
   /**
@@ -309,11 +319,11 @@ class MenuDao extends Dao
    * @return integer|numeric
    * 
    */
-  public function totalMenuRecords($data = null)
+  public function totalMenuRecords(array $data = []): ?int
   {
     $sql = "SELECT ID FROM tbl_menu";
     $this->setSQL($sql);
-    return $this->checkCountValue($data);
+    return $this->checkCountValue($data) ?? 0;
   }
 
   /**

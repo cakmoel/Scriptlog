@@ -25,10 +25,10 @@
                <div class="box-header with-border"></div>
                <!-- /.box-header -->
                <?php
-               if (isset($errors)) :
+                 if (isset($errors)) :
                ?>
                   <div class="alert alert-danger alert-dismissible">
-                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                     <button type="button" class="close" data-dismiss="alert" >&times;</button>
                      <h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
 
                      <?php
@@ -40,15 +40,15 @@
                   </div>
 
                <?php
-               endif;
+                 endif;
 
-               $action = isset($formAction) ? $formAction : null;
-               $post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
+                 $action = isset($formAction) ? $formAction : null;
+                 $post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
 
                ?>
 
                <!-- form start -->
-               <form method="post" action="<?= generate_request('index.php', 'post', ['posts', $action, $post_id])['link']; ?>" role="form" enctype="multipart/form-data">
+               <form method="post" action="<?= generate_request('index.php', 'post', ['posts', $action, $post_id])['link']; ?>" enctype="multipart/form-data">
                   <input type="hidden" name="post_id" value="<?= $post_id; ?>" />
                   <input type="hidden" name="MAX_FILE_SIZE" value="<?= APP_FILE_SIZE; ?>">
 
@@ -76,15 +76,6 @@
 <?= (isset($formData['post_summary'])) ? safe_html($formData['post_summary']) : ""; ?>
 </textarea>
                         <p class="help-block">Maximum 320 characters</p>
-                     </div>
-
-                     <div class="form-group">
-                        <label for="meta_key">Meta Keywords</label>
-                        <textarea class="form-control" id="meta_key" rows="3" placeholder="Enter ..." name="post_keyword" maxlength="200">
-<?= (isset($postData['post_keyword'])) ? safe_html($postData['post_keyword']) : ""; ?>
-<?= (isset($formData['post_keyword'])) ? safe_html($formData['post_keyword']) : ""; ?>
-</textarea>
-                        <p class="help-block">Maximum 200 characters</p>
                      </div>
 
                      <div class="form-group">

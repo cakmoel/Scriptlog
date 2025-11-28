@@ -15,52 +15,58 @@ if (function_exists('featured_post')) :
     $featured_hero_img = ((isset($hero_headline['media_filename'])) && ($hero_headline['media_filename'] !== "") ? htmlout($hero_headline['media_filename']) : "");
     $featured_hero_title = isset($hero_headline['post_title']) ? htmlout($hero_headline['post_title']) : "";
   }
-
 ?>
 
   <!-- Hero Section-->
-  <section style="background: url('<?= isset($featured_hero_img) ? invoke_frontimg($featured_hero_img, false) : " "; ?>'); background-size: cover; background-position: center center" class="hero">
+
+  <section style="background: url('<?= isset($featured_hero_img) ? invoke_frontimg($featured_hero_img, false) : theme_dir() . 'assets/img/hero.jpg'; ?>'); background-size: cover; background-position: center center" class="hero">
     <div class="container">
       <div class="row">
         <div class="col-lg-7">
-          <h1 class="h1"><?= isset($featured_hero_title) ? $featured_hero_title : ""; ?></h1>
-          <a href="<?= isset($featured_hero_id) ? permalinks($featured_hero_id)['post'] : "javascript:void(0)"; ?>" class="hero-link">Discover More</a>
+          <h1 <?= isset($featured_hero_id) ? 'class="h1"' : "";  ?>><?= isset($featured_hero_title) ? $featured_hero_title : "Featured post goes here"; ?></h1>
+          <a <?= (!empty($featured_hero_id)) ? 'href="'.permalinks($featured_hero_id)['post'].'" ' :  'href="'.app_url().'/admin/login.php"';  ?>  class="hero-link" >
+            <?= (!empty($featured_hero_id)) ? 'Discover More' : 'Go to administrator panel'; ?>
+          </a>
         </div>
-
-      </div><a href="<?= (empty($sticky_page)) ? "javascript:void(0)" : ".intro"; ?>" class="continue link-scroll"><i class="fa fa-long-arrow-down" aria-hidden="true"></i> Scroll Down</a>
+      </div>
+      <a <?= (!empty($featured_hero_id)) ? 'href=".intro"' : 'href="#intro"'; ?>  class="continue link-scroll" title="Scrol Down"><i class="fa fa-long-arrow-down" aria-hidden="true"></i> 
+        Scroll Down
+      </a>
     </div>
   </section>
 
 <?php
-else :
- echo $nothing_found;
-endif;
+  endif;
 ?>
 
 <?php
  if (function_exists('sticky_page')) :
-   foreach (sticky_page() as $sticky) :
-  $sticky_title = isset($sticky['post_title']) ? htmlout($sticky['post_title']) : "";
-  $sticky_content = isset($sticky['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($sticky['post_content']))) : "";
-   endforeach;
- endif;
+   foreach (sticky_page() as $sticky) {
+      $sticky_title = isset($sticky['post_title']) ? htmlout($sticky['post_title']) : "";
+      $sticky_content = isset($sticky['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($sticky['post_content']))) : "";
+   }
 ?>
 
 <!-- Intro Section-->
-<section class="intro">
+<section <?= (!empty($sticky)) ? 'class="intro"' : 'id="intro"' ?>>
   <div class="container">
     <div class="row">
       <div class="col-lg-8">
 
-        <h2 class="h3"><?= isset($sticky_title) ? $sticky_title : ""; ?></h2>
+        <h2 class="h3"><?= isset($sticky_title) ? $sticky_title : "Welcome to ScriptLog"; ?></h2>
         <p class="text-big">
-          <?= isset($sticky_content) ? $sticky_content : ""; ?>
+          <?= isset($sticky_content) ? $sticky_content : "Your entryway to a personal blog that lets you easily express, create, and share your ideas. 
+          Whether you're a creative writer, hobbyist, tech enthusiast, personal blogger, or someone who values digital independence, 
+          ScriptLog empowers you to craft your online presence."; ?>
         </p>
 
       </div>
     </div>
   </div>
 </section>
+<?php 
+  endif;
+?>
 
 <!-- random post/featured post -->
 <section class="featured-posts no-padding-top">
@@ -106,9 +112,11 @@ endif;
 
                   <p><?= isset($random_post_content) ? $random_post_content : ""; ?></p>
                   <footer class="post-footer d-flex align-items-center">
-                    <a href="javascript:void(0)" class="author d-flex align-items-center flex-wrap">
-                      <div class="title"><span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= isset($random_post_author) ? $random_post_author : ""; ?> </span></div>
-                    </a>
+                    <div class="author d-flex align-items-center flex-wrap">
+                      <div class="title">
+                        <span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= isset($random_post_author) ? $random_post_author : ""; ?> </span>
+                      </div>
+                    </div>
                     <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i>
                       <?= isset($random_post_created) ? $random_post_created : ""; ?>
                     </div>
@@ -142,9 +150,9 @@ endif;
 
                   <p><?= isset($random_post_content) ? $random_post_content : ""; ?></p>
                   <footer class="post-footer d-flex align-items-center">
-                    <a href="javascript:void(0)" class="author d-flex align-items-center flex-wrap">
+                    <div class="author d-flex align-items-center flex-wrap">
                       <div class="title"><span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= $random_post_author; ?> </span></div>
-                    </a>
+                    </div>
                     <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i>
                       <?= isset($random_post_created) ? $random_post_created : ""; ?>
                     </div>
@@ -159,11 +167,11 @@ endif;
         endif;
       endforeach;
 
-    else :
+      else :
 
-      echo $nothing_found;
+        echo $nothing_found;
 
-    endif;
+      endif;
     ?>
 
   </div>
@@ -171,39 +179,33 @@ endif;
 </section>
 
 <!-- divider section -->
-
 <?php
-if (function_exists('featured_post')) {
-foreach (featured_post() as $divider_content) {
+if (function_exists('featured_post')) :
+   foreach (featured_post() as $divider_content) {
 
-  $featured_divider_id = isset($divider_content['ID']) ? (int)$divider_content['ID'] : "";
-  $featured_divider_img = (isset($divider_content['media_filename']) && $divider_content['media_filename'] != "") ? htmlout($divider_content['media_filename']) : "";
-  $featured_divider_title = isset($divider_content['post_title']) ? htmlout($divider_content['post_title']) : "";
-}
-}
+     $featured_divider_id = isset($divider_content['ID']) ? (int)$divider_content['ID'] : "";
+     $featured_divider_img = (isset($divider_content['media_filename']) && $divider_content['media_filename'] != "") ? htmlout($divider_content['media_filename']) : "";
+     $featured_divider_title = isset($divider_content['post_title']) ? htmlout($divider_content['post_title']) : "";
+   }
 ?>
 
-<section 
-<?php if (isset($featured_divider_img)) : ?> style="background: url(<?= invoke_frontimg($featured_divider_img); ?>); 
-background-size: cover; background-position: center bottom" 
-<?php
-  else :
-?> 
-style="background: url( https://picsum.photos/1920/1280 ); background-size: cover; background-position: center bottom" 
-<?php
-endif;
-?> class="divider">
-
+<section style="background: url(<?= isset($featured_divider_img) ? invoke_frontimg($featured_divider_img) : 'https://picsum.photos/1920/1280'; ?>); background-size: cover; background-position: center bottom" class="divider">
   <div class="container">
     <div class="row">
       <div class="col-md-7">
         <h2 class="h2"><?= isset($featured_divider_title) ? $featured_divider_title : ""; ?> </h2>
-        <a href="<?= isset($featured_divider_id) ? permalinks($featured_divider_id)['post'] : "javascript:void(0)"; ?>" class="hero-link">View More</a>
+        <a <?= (!empty($featured_divider_id)) ? 'href="'.permalinks($featured_divider_id)['post'].'" ' :  'href="'.app_url().'/admin/login.php"';  ?> class="hero-link">
+           <?= (!empty($featured_divider_id)) ? 'View More' : 'Go to administrator panel'; ?>
+        </a>
       </div>
     </div>
   </div>
 
 </section>
+
+<?php 
+  endif;
+?>
 
 <!-- Latest Post -->
 <section class="latest-posts">
@@ -247,7 +249,6 @@ endif;
 
     <?php
         endforeach;
-
       else :
         echo $nothing_found;
       endif;

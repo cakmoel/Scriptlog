@@ -3,8 +3,8 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $pluginId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $pluginDao = class_exists('PluginDao') ? new PluginDao() : "";
-$pluginEvent = class_exists('PluginEvent') ? new PluginEvent($pluginDao, $validator, $sanitizer) : "";
-$pluginApp = class_exists('PluginApp') ? new PluginApp($pluginEvent) : "";
+$pluginService = class_exists('PluginService') ? new PluginService($pluginDao, $validator, $sanitizer) : "";
+$pluginController = class_exists('PluginController') ? new PluginController($pluginService) : "";
 
 try {
     
@@ -28,7 +28,7 @@ try {
 
                 if ($pluginId == 0) {
     
-                    $pluginApp->installPlugin();
+                    $pluginController->installPlugin();
     
                 } else {
     
@@ -50,7 +50,7 @@ try {
     
                 if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
                    
-                    $pluginApp->enablePlugin((int)$pluginId);
+                    $pluginController->enablePlugin((int)$pluginId);
     
                 } else {
     
@@ -72,7 +72,7 @@ try {
     
                 if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
     
-                    $pluginApp->disablePlugin((int)$pluginId);
+                    $pluginController->disablePlugin((int)$pluginId);
     
                 } else {
     
@@ -102,7 +102,7 @@ try {
     
                 if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
     
-                    $pluginApp->remove((int)$pluginId);
+                    $pluginController->remove((int)$pluginId);
     
                 } else {
     
@@ -121,7 +121,7 @@ try {
     
             } else {
     
-                $pluginApp->listItems();
+                $pluginController->listItems();
     
             }
     

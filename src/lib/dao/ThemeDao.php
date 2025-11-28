@@ -106,7 +106,7 @@ class ThemeDao extends Dao
        'theme_desc' => $bind['theme_desc'],
        'theme_designer' => $bind['theme_designer'],
        'theme_directory' => $bind['theme_directory']
-     ], "ID = ".(int)$cleanId);
+     ], ['ID' => (int)$cleanId]);
 
   }
   
@@ -121,8 +121,8 @@ class ThemeDao extends Dao
    */
   public function deleteTheme($id, $sanitize)
   {
-    $clean_id = $this->filteringId($sanitize, $id, 'sql');
-    $this->deleteRecord("tbl_themes", "ID = ".(int)$clean_id);
+    $cleanId = $this->filteringId($sanitize, $id, 'sql');
+    $this->deleteRecord("tbl_themes", ['ID' => (int)$cleanId]);
   }
   
   /**
@@ -185,12 +185,12 @@ class ThemeDao extends Dao
     // activate theme
     $stmt = $this->modify("tbl_themes", [
       'theme_status' => 'Y'
-    ], "`ID` = {$idsanitized}");
+    ], ['ID' => $idsanitized]);
     
   // non-activate the other table
     $stmt2 = $this->modify("tbl_themes", [
       'theme_status' => 'N'
-    ], "`ID` != {$idsanitized}");
+    ], ['ID' => $idsanitized]);
   
   }
   
@@ -199,14 +199,14 @@ class ThemeDao extends Dao
    * 
    * @method totalThemeRecords()
    * @param array $data
-   * @return numeric|integer
+   * @return numeric|integer|null
    * 
    */
-  public function totalThemeRecords($data = array())
+  public function totalThemeRecords(array $data = array()): ?int
   {
     $sql = "SELECT ID FROM tbl_themes";
     $this->setSQL($sql);
-    return (empty($data)) ? $this->checkCountValue([]) : $this->checkCountValue($data);
+    return $this->checkCountValue($data) ?? 0;
   }
 
   /**

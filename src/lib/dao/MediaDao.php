@@ -300,7 +300,7 @@ class MediaDao extends Dao
   public function updateMedia($sanitize, $bind, $mediaId)
   {
 
-    $id_sanitized = $this->filteringId($sanitize, $mediaId, 'sql');
+    $idsanitized = $this->filteringId($sanitize, $mediaId, 'sql');
 
     if (!empty($bind['media_filename'])) {
 
@@ -313,7 +313,7 @@ class MediaDao extends Dao
         'media_access'   => $bind['media_access'],
         'media_status'   => $bind['media_status']
 
-      ], "ID = {$id_sanitized}");
+      ], ['ID' => $idsanitized]);
     } else {
 
       $this->modify("tbl_media", [
@@ -323,7 +323,7 @@ class MediaDao extends Dao
         'media_access'  => $bind['media_access'],
         'media_status'  => $bind['media_status']
 
-      ], "ID = {$id_sanitized}");
+      ], ['ID' => $idsanitized]);
     }
   }
 
@@ -364,9 +364,11 @@ class MediaDao extends Dao
 
     $idsanitized = $this->filteringId($sanitize, $mediaId, 'sql');
 
-    $this->deleteRecord("tbl_media", "ID = {$idsanitized}", 1);
-    $this->deleteRecord("tbl_mediameta", "media_id = {$idsanitized}", 1);
-    $this->deleteRecord("tbl_media_download", "media_id = {$idsanitized}", 1);
+    if ($this->deleteRecord("tbl_media", ['ID' => $idsanitized])) {
+       medoo_delete('tbl_mediameta', ['media_id' => $idsanitized]);
+       medoo_delete('tbl_media_download', ['media_id' => $idsanitized]);
+    }
+    
   }
 
   /**
@@ -671,7 +673,7 @@ class MediaDao extends Dao
    * @return integer|numeric
    * 
    */
-  public function totalMediaRecords($data = null)
+  public function totalMediaRecords(array $data = []): ?int
   {
 
     if (!empty($data)) {

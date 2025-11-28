@@ -2,8 +2,7 @@
 /**
  * generate_token()
  * 
- * this will generate token for user reset password 
- * that send random string to user
+ * this will generate a random token string
  * 
  * @category Function
  * @param number $length

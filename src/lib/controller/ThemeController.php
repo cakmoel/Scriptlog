@@ -28,11 +28,6 @@ class ThemeController extends BaseApp
     $checkError = true;
     $checkStatus = false;
 
-    if (isset($_SESSION['error'])) {
-       ($_SESSION['error'] == "themeNotFound") ? array_push($errors, "Error: Theme is not found") : "";
-       unset($_SESSION['error']);
-    }
-
     if (isset($_SESSION['status'])) {
         ($_SESSION['status'] == "themeAdded") ? array_push($errors, "New theme added") : "";
         ($_SESSION['status'] == "themeInstalled") ? array_push($errors, "Theme installation process is successful, please activate it first to see it works!") : "";
@@ -40,6 +35,12 @@ class ThemeController extends BaseApp
         ($_SESSION['status'] == "themeActivated") ? array_push($status, "Theme activated") : "";
         ($_SESSION['status'] == "themeDeleted") ? array_push($status, "Theme deleted") : "";
         unset($_SESSION['status']);
+    }
+
+    if (isset($_SESSION['error'])) {
+      $checkError = false;
+      ($_SESSION['error'] == 'themeNotFound') ? array_push($errors, "Error: Theme Not Found!") : "";
+      unset($_SESSION['error']);
     }
 
     $this->setView('all-templates');
@@ -64,7 +65,7 @@ class ThemeController extends BaseApp
  * insert()
  * 
  * @inheritDoc
- * @uses BaseApp::insert Name
+ * @uses BaseApp::insert
  */
   public function insert()
   {
@@ -149,6 +150,10 @@ class ThemeController extends BaseApp
 
   }
 
+  /**
+   * setupTheme
+   *
+   */
   public function setupTheme()
   {
     $errors = array();

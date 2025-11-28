@@ -1,3 +1,11 @@
+/**
+ * Submits a comment to the specified post URL using the given request method and form data, including the CSRF token.
+ *
+ * @param {string} post_url - The URL to submit the comment to
+ * @param {string} request_method - The HTTP request method to use (e.g. 'GET', 'POST')
+ * @param {string} form_data - The data to include in the comment form
+ * @return {void} 
+ */
 function submitComment(post_url, request_method, form_data) {
 
 	let csrfToken = $('input[name="csrf"]').val(); // Get the token value
@@ -12,6 +20,12 @@ function submitComment(post_url, request_method, form_data) {
 	}).fail(formError); // Pass the AJAX error object to formError
 }
 
+/**
+ * Handle the success response from the form submission.
+ *
+ * @param {response} response - the response from the form submission
+ * @return {void} 
+ */
 function formSuccess(response) {
 	let msg = $.parseJSON(response);
 	$("#commentForm")[0].reset();
@@ -26,7 +40,7 @@ function formSuccess(response) {
 function formError(jqXHR, textStatus, errorThrown) {
 	try {
 		let msg = $.parseJSON(jqXHR.responseText);
-		
+
 		if (msg?.errors) { // Optional chaining to check for errors property
 			// Display specific error messages from the server
 			$.each(msg.errors, function (field, error) {
@@ -106,14 +120,20 @@ $(function () {
 		// 3. Email: non-empty, valid email format
 		if (email.trim() === "") {
 			$("#email").addClass("is-invalid");
-			$("#error_message").show().html("Please enter your email address.");
-			isValid = false;
-		} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { // Basic email validation
-			$("#email").addClass("is-invalid");
-			$("#error_message").show().html("Please enter a valid email address.");
+			$("#error_message").show().html("Please enter your email address");
 			isValid = false;
 		} else {
-			$("#email").removeClass("is-invalid");
+			
+			const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+			if (!emailRegex.test(email)) { // Basic email validation
+				$("#email").addClass("is-invalid");
+				$("#error_message").show().html("Please enter a valid email address.");
+				isValid = false;
+			} else {
+				$("#email").removeClass("is-invalid");
+			}
+
 		}
 
 		if (isValid) {

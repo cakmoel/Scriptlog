@@ -1,8 +1,8 @@
 <?php
 /**
  * detect_proxy_by_headers
- * Detect proxies with a simple PHP test to determine if a user is hiding behind a proxy connection. 
- * Quickly evaluate an IP address with PHP to detect proxy connections.
+ * 
+ * Detect proxies by checking for common proxy-related HTTP headers.
  * 
  * @category function
  * @author Contributors
@@ -14,45 +14,43 @@
  * @return bool
  * 
  */
-function detect_proxy_by_headers()
+function detect_proxy_by_headers(): bool
 {
+    // List of headers commonly associated with proxy servers
+    $proxy_headers = [
+        'HTTP_VIA',
+        'VIA',
+        'Proxy-Connection',
+        'HTTP_X_FORWARDED_FOR',
+        'HTTP_FORWARDED_FOR',
+        'HTTP_X_FORWARDED',
+        'HTTP_FORWARDED',
+        'HTTP_CLIENT_IP',
+        'HTTP_FORWARDED_FOR_IP',
+        'X-PROXY-ID',
+        'MT-PROXY-ID',
+        'X-TINYPROXY',
+        'X_FORWARDED_FOR',
+        'FORWARDED_FOR',
+        'X_FORWARDED',
+        'X-Forwarded-Proto',
+        'X-Forwarded-Host',
+        'X-Forwarded-Port',
+        'FORWARDED',
+        'CLIENT-IP',
+        'CLIENT_IP',
+        'PROXY-AGENT',
+        'HTTP_X_CLUSTER_CLIENT_IP',
+        'FORWARDED_FOR_IP',
+        'HTTP_PROXY_CONNECTION'
+    ];
 
-$proxy_headers = [
-    'HTTP_VIA',
-	'VIA',
-	'Proxy-Connection',
-	'HTTP_X_FORWARDED_FOR',  
-	'HTTP_FORWARDED_FOR',
-	'HTTP_X_FORWARDED',
-	'HTTP_FORWARDED',
-	'HTTP_CLIENT_IP',
-	'HTTP_FORWARDED_FOR_IP',
-	'X-PROXY-ID',
-	'MT-PROXY-ID',
-	'X-TINYPROXY',
-	'X_FORWARDED_FOR',
-	'FORWARDED_FOR',
-	'X_FORWARDED',
-	'X-Forwarded-Proto',
-	'X-Forwarded-Host',
-	'X-Forwarded-Port',
-	'FORWARDED',
-	'CLIENT-IP',
-	'CLIENT_IP',
-	'PROXY-AGENT',
-	'HTTP_X_CLUSTER_CLIENT_IP',
-	'FORWARDED_FOR_IP',
-	'HTTP_PROXY_CONNECTION',
-	'HTTP_CF_CONNECTING_IP',
-	'HTTP_CF_IPCOUNTRY',
-	'HTTP_CF_RAY',
-	'HTTP_CF_VISITOR'
-];
+    // Check each header
+    foreach ($proxy_headers as $header) {
+        if (isset($_SERVER[$header]) && !empty($_SERVER[$header])) {
+            return true; // Proxy header detected
+        }
+    }
 
-foreach ($proxy_headers as $header) {
-    
-    return ((isset($_SERVER[$header])) && (! empty($_SERVER[$header]))) ? true : false;
-
-}
-
+    return false; // No proxy headers detected
 }

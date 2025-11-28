@@ -101,12 +101,11 @@ class PageController extends BaseApp
         'post_date' => isset($_POST['post_date']) ? Sanitize::mildSanitizer($_POST['post_date']) : "",
         'image_id' => FILTER_SANITIZE_NUMBER_INT,
         'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
         'post_sticky' => FILTER_SANITIZE_NUMBER_INT
       ];
 
-      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 50000];
+      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_content' => 50000];
 
       try {
 
@@ -117,7 +116,7 @@ class PageController extends BaseApp
           throw new AppException("Sorry, unpleasant attempt detected!");
         }
 
-        if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_keyword', 'post_status', 'post_sticky']) == false) {
+        if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_status', 'post_sticky']) == false) {
 
           header($_SERVER["SERVER_PROTOCOL"] . ' 413 Payload Too Large', true, 413);
           header('Status: 413 Payload Too Large');
@@ -228,7 +227,6 @@ class PageController extends BaseApp
           $this->pageService->setPageSlug(distill_post_request($filters)['post_title']);
           $this->pageService->setPageContent(distill_post_request($filters)['post_content']);
           $this->pageService->setMetaDesc(distill_post_request($filters)['post_summary']);
-          $this->pageService->setMetaKeys(distill_post_request($filters)['post_keyword']);
           $this->pageService->setPublish(distill_post_request($filters)['post_status']);
           $this->pageService->setComment('close');
           $this->pageService->setPostType('page');
@@ -304,7 +302,6 @@ class PageController extends BaseApp
       'post_title' => $getPage['post_title'],
       'post_content' => $getPage['post_content'],
       'post_summary' => $getPage['post_summary'],
-      'post_keyword' => $getPage['post_keyword'],
       'post_status' => $getPage['post_status'],
       'post_sticky' => $getPage['post_sticky']
     );
@@ -318,12 +315,11 @@ class PageController extends BaseApp
         'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_modified' => isset($_POST['post_modified']) ? Sanitize::mildSanitizer($_POST['post_modified']) : "",
         'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'post_keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
         'post_sticky' => FILTER_SANITIZE_NUMBER_INT
       ];
 
-      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_keyword' => 200, 'post_content' => 50000];
+      $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_content' => 50000];
 
     try {
 
@@ -334,7 +330,7 @@ class PageController extends BaseApp
           throw new AppException("Sorry, unpleasant attempt detected!");
         }
 
-        if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_keyword', 'post_status', 'post_sticky']) === false) {
+        if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_status', 'post_sticky']) === false) {
 
           header(APP_PROTOCOL . ' 413 Payload Too Large', true, 413);
           header('Status: 413 Payload Too Large');
@@ -446,7 +442,6 @@ class PageController extends BaseApp
           $this->pageService->setPageSlug(distill_post_request($filters)['post_title']);
           $this->pageService->setPageContent(distill_post_request($filters)['post_content']);
           $this->pageService->setMetaDesc(distill_post_request($filters)['post_summary']);
-          $this->pageService->setMetaKeys(distill_post_request($filters)['post_keyword']);
           $this->pageService->setPublish(distill_post_request($filters)['post_status']);
           $this->pageService->setPostType('page');
           
