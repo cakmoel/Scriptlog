@@ -8,3 +8,5 @@
 *.webp
 # Session files
 sess_*
+# third party libraries
+/vendor/
