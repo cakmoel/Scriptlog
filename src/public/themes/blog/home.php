@@ -68,6 +68,13 @@ if (function_exists('featured_post')) :
   endif;
 ?>
 
+<?php 
+  // Call Hello World plugin
+  if (function_exists('invoke_plugin')) {
+      echo invoke_plugin('Hello World', "");
+  }
+?>
+
 <!-- random post/featured post -->
 <section class="featured-posts no-padding-top">
   <div class="container">
