@@ -137,24 +137,24 @@
 <script type="text/javascript">
   function activatePlugin(id, plugin)
   {
-	  if (confirm("Are you sure want to activate '" + plugin + "'?"))
-	  {
+  	  if (confirm("Are you sure want to activate '" + plugin + "'?"))
+  	  {
 	  	window.location.href = 'index.php?load=plugins&action=activatePlugin&Id=' + id;
 	  }
   }
 
   function deactivatePlugin(id, plugin)
   {
-	  if (confirm("Are you sure want to deactivate '" + plugin + "'?"))
-	  {
+  	  if (confirm("Are you sure want to deactivate '" + plugin + "'?"))
+  	  {
 	  	window.location.href = 'index.php?load=plugins&action=deactivatePlugin&Id=' + id;
 	  }
   }
   
   function deletePlugin(id, plugin)
   {
-	  if (confirm("Are you sure want to uninstall '" + plugin + "'?"))
-	  {
+  	  if (confirm("Are you sure want to uninstall '" + plugin + "'? This action cannot be undone."))
+  	  {
 	  	window.location.href = 'index.php?load=plugins&action=deletePlugin&Id=' + id;
 	  }
   }
