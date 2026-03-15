@@ -1,0 +1,15 @@
+#audio-preview {
+    background: #ffffff;
+    width: auto;
+    padding: 20px;
+    display: inline-block;
+  }
+  
+  #audio-upload {
+    cursor: pointer;
+    background-color: #bdc3c7;
+    color: #ecf0f1;
+    padding: 20px;
+    font-size: 20px;
+    text-transform: uppercase;
+  }
