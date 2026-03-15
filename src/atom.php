@@ -2,6 +2,9 @@
 /**
  * atom.php
  * 
+ * Atom feed generator - accessible at /atom.php
+ * Browsers auto-detect Atom feeds via link tag in header
+ * 
  * @category atom.php file to write atom feeds
  * @author M.Noermoehammad
  * @license https://opensource.org/licenses/MIT MIT License
@@ -9,6 +12,8 @@
  * 
  */
 require __DIR__ . '/lib/main.php';
+
+header('Content-Type: application/atom+xml; charset=UTF-8');
 
 $app_title = isset(app_info()['site_name']) ? app_info()['site_name'] : "";
 $app_link = isset(app_info()['app_url']) ? app_info()['app_url'] : "";
