@@ -14,7 +14,7 @@
  * @see https://stackoverflow.com/questions/26419426/htaccess-url-re-styling-image-url-to-seo-friendly
  * @see https://mediatemple.net/community/products/dv/204643270/using-htaccess-rewrite-rules
  * @see https://stackoverflow.com/questions/16388959/url-rewriting-with-php
- * @version  1.0
+ * @version  1.1
  * @since    Since Release 0.1
  * 
  */
@@ -71,32 +71,6 @@ class Dispatcher
    * handleSeoFriendlyUrl
    * 
    */
-  // public function handleSeoFriendlyUrl()
-  // {
-
-  //   if (!HandleRequest::allowedPathRequested($this->whiteListPathRequested(), $this->route)) {
-
-  //     $this->errorNotFound();
-  //     return;
-  //   }
-
-  //   $requestUri = $this->requestURI();
-
-  //   foreach ($this->route as $key => $pattern) {
-  //     if (preg_match('~^' . $pattern . '$~i', $requestUri)) {
-
-  //       $this->renderTheme($key);
-  //       return;
-  //     }
-  //   }
-
-  //   direct_page('404.php', 404);
-  // }
-
-  // In lib/core/Dispatcher.php
-
-  // In lib/core/Dispatcher.php
-
   public function handleSeoFriendlyUrl()
   {
     // The simplified allowedPathRequested now lets the request pass if the first segment is valid.
@@ -153,15 +127,6 @@ class Dispatcher
    * @return mixed
    * 
    */
-  // private function requestURI()
-  // {
-  //   $script_name = rtrim(dirname($_SERVER["SCRIPT_NAME"]), DIRECTORY_SEPARATOR);
-  //   $request_uri = DIRECTORY_SEPARATOR . trim(str_replace($script_name, '', $_SERVER['REQUEST_URI']), DIRECTORY_SEPARATOR);
-  //   return urldecode($request_uri);
-  // }
-
-  // In lib/core/Dispatcher.php
-
   private function requestURI()
   {
     // Get the path part of the REQUEST_URI, ignoring the query string

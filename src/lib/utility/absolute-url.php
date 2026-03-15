@@ -41,7 +41,7 @@ function absolute_url($page, $url)
 
     }
 
-    return sanitize_urls($url);
+    return rtrim(sanitize_urls($url), '/');
     
 }
 
@@ -61,3 +61,4 @@ function checking_page_url($page, $url)
  }
 
 }
+
