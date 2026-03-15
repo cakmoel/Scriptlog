@@ -1,0 +1,2098 @@
+Xdebug: [Step Debug] Could not connect to debugging client. Tried: localhost:9003 (through xdebug.client_host/xdebug.client_port).
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Blogware RESTful API",
+        "description": "RESTful API for Blogware content management system.\n\nThis API provides programmatic access to blog posts, categories, comments, and archives.\nIt follows OpenAPI 3.0 specification and supports both public and authenticated operations.\n\n## Authentication\n\nThe API supports two authentication methods:\n- **API Key**: Pass your API key in the `X-API-Key` header\n- **Bearer Token**: Pass a bearer token in the `Authorization` header\n\nExample:\n```\nX-API-Key: your-api-key-here\n```\nor\n```\nAuthorization: Bearer your-token-here\n```\n\n## Rate Limiting\n\nAPI requests are rate limited to ensure fair usage. The following headers are included in responses:\n- `X-RateLimit-Limit`: Maximum requests per minute\n- `X-RateLimit-Remaining`: Remaining requests in current window\n- `X-RateLimit-Reset`: Unix timestamp when the rate limit resets\n\n## Response Format\n\nAll responses are returned in JSON format with the following structure:\n\n### Success Response\n```json\n{\n  \"success\": true,\n  \"status\": 200,\n  \"message\": \"Operation description\",\n  \"data\": { ... }\n}\n```\n\n### Paginated Response\n```json\n{\n  \"success\": true,\n  \"status\": 200,\n  \"data\": [...],\n  \"pagination\": {\n    \"current_page\": 1,\n    \"per_page\": 10,\n    \"total_items\": 50,\n    \"total_pages\": 5,\n    \"has_next_page\": true,\n    \"has_previous_page\": false\n  }\n}\n```\n\n### Error Response\n```json\n{\n  \"success\": false,\n  \"status\": 400,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Error description\"\n  }\n}\n```\n\n## Filtering and Sorting\n\nQuery parameters for filtering and sorting:\n- `page`: Page number (default: 1)\n- `per_page`: Items per page (default: 10, max: 100)\n- `sort_by`: Field to sort by\n- `sort_order`: Sort direction (ASC or DESC)\n",
+        "version": "1.0.0",
+        "contact": {
+            "name": "Blogware Support",
+            "email": "alanmoehammad@gmail.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "x-logo": {
+            "url": "https://blogware.site/public/files/pictures/logo.png"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://blogware.site/api/v1",
+            "description": "Production server"
+        },
+        {
+            "url": "http://localhost/blogware/public_html/api/v1",
+            "description": "Development server"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Posts",
+            "description": "Blog posts operations"
+        },
+        {
+            "name": "Categories",
+            "description": "Category/topic operations"
+        },
+        {
+            "name": "Comments",
+            "description": "Comment operations"
+        },
+        {
+            "name": "Archives",
+            "description": "Archive by date operations"
+        },
+        {
+            "name": "API Info",
+            "description": "API information and metadata"
+        }
+    ],
+    "paths": {
+        "/": {
+            "get": {
+                "tags": [
+                    "API Info"
+                ],
+                "summary": "Get API information",
+                "description": "Returns API metadata, available endpoints, and usage information",
+                "operationId": "getApiInfo",
+                "responses": {
+                    "200": {
+                        "description": "API information retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiInfo"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/posts": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "List published posts",
+                "description": "Retrieves a paginated list of published blog posts.\nThis endpoint is public and does not require authentication.\n",
+                "operationId": "listPosts",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/PerPage"
+                    },
+                    {
+                        "$ref": "#/components/parameters/SortBy"
+                    },
+                    {
+                        "$ref": "#/components/parameters/SortOrder"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Posts retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PostListResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Create a new post",
+                "description": "Creates a new blog post.\nRequires authentication with administrator, editor, or author permissions.\n",
+                "operationId": "createPost",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PostCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Post created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PostResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/UnprocessableEntity"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            }
+        },
+        "/posts/{id}": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Get a single post",
+                "description": "Retrieves a single blog post by its ID.\nThis endpoint is public and does not require authentication.\n",
+                "operationId": "getPost",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/PostId"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Post retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PostDetailResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Update a post",
+                "description": "Updates an existing blog post.\nRequires authentication with administrator or editor permissions.\n",
+                "operationId": "updatePost",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/PostId"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PostUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Post updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PostResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Delete a post",
+                "description": "Deletes a blog post.\nRequires authentication with administrator permissions.\n",
+                "operationId": "deletePost",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/PostId"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Post deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeleteResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            }
+        },
+        "/posts/{id}/comments": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Get comments for a post",
+                "description": "Retrieves approved comments for a specific blog post.\nThis endpoint is public and does not require authentication.\n",
+                "operationId": "getPostComments",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/PostId"
+                    },
+                    {
+                        "$ref": "#/components/parameters/Page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/PerPage"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comments retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CommentListResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            }
+        },
+        "/categories": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "List all categories",
+                "description": "Retrieves a paginated list of all categories/topics.\nThis endpoint is public and does not require authentication.\n",
+                "operationId": "listCategories",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/PerPage"
+                    },
+                    {
+                        "$ref": "#/components/parameters/SortBy"
+                    },
+                    {
+                        "$ref": "#/components/parameters/SortOrder"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Categories retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CategoryListResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Create a new category",
+                "description": "Creates a new category/topic.\nRequires authentication with administrator or editor permissions.\n",
+                "operationId": "createCategory",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategoryCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Category created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CategoryResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "409": {
+                        "$ref": "#/components/responses/Conflict"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/UnprocessableEntity"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            }
+        },
+        "/categories/{id}": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Get a single category",
+                "description": "Retrieves a single category/topic by its ID.\nThis endpoint is public and does not require authentication.\n",
+                "operationId": "getCategory",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/CategoryId"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CategoryResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Update a category",
+                "description": "Updates an existing category/topic.\nRequires authentication with administrator or editor permissions.\n",
+                "operationId": "updateCategory",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/CategoryId"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategoryUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Category updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CategoryResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Delete a category",
+                "description": "Deletes a category/topic.\nRequires authentication with administrator permissions.\n",
+                "operationId": "deleteCategory",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/CategoryId"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeleteResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            }
+        },
+        "/categories/{id}/posts": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Get posts in a category",
+                "description": "Retrieves posts belonging to a specific category.\nThis endpoint is public and does not require authentication.\n",
+                "operationId": "getCategoryPosts",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/CategoryId"
+                    },
+                    {
+                        "$ref": "#/components/parameters/Page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/PerPage"
+                    },
+                    {
+                        "$ref": "#/components/parameters/SortBy"
+                    },
+                    {
+                        "$ref": "#/components/parameters/SortOrder"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Posts retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CategoryPostsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            }
+        },
+        "/comments": {
+            "get": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "List all approved comments",
+                "description": "Retrieves a paginated list of approved comments.\nThis endpoint is public and does not require authentication.\n",
+                "operationId": "listComments",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/PerPage"
+                    },
+                    {
+                        "$ref": "#/components/parameters/SortBy"
+                    },
+                    {
+                        "$ref": "#/components/parameters/SortOrder"
+                    },
+                    {
+                        "name": "post_id",
+                        "in": "query",
+                        "description": "Filter comments by post ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comments retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CommentListResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Create a new comment",
+                "description": "Creates a new comment on a blog post.\nThis endpoint is public and does not require authentication.\nComments are submitted with 'pending' status for moderation.\n",
+                "operationId": "createComment",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CommentCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Comment created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CommentResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/UnprocessableEntity"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            }
+        },
+        "/comments/{id}": {
+            "get": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Get a single comment",
+                "description": "Retrieves a single comment by its ID.\nThis endpoint is public for approved comments.\n",
+                "operationId": "getComment",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/CommentId"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comment retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CommentResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Update a comment",
+                "description": "Updates an existing comment.\nRequires authentication with administrator or editor permissions.\n",
+                "operationId": "updateComment",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/CommentId"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CommentUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Comment updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CommentResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Delete a comment",
+                "description": "Deletes a comment.\nRequires authentication with administrator or editor permissions.\n",
+                "operationId": "deleteComment",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/CommentId"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comment deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeleteResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            }
+        },
+        "/archives": {
+            "get": {
+                "tags": [
+                    "Archives"
+                ],
+                "summary": "List available archive dates",
+                "description": "Returns a list of years and months that have published posts.\nThis endpoint is public and does not require authentication.\n",
+                "operationId": "listArchives",
+                "responses": {
+                    "200": {
+                        "description": "Archives retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ArchiveListResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            }
+        },
+        "/archives/{year}": {
+            "get": {
+                "tags": [
+                    "Archives"
+                ],
+                "summary": "Get posts from a specific year",
+                "description": "Retrieves posts published in a specific year.\nThis endpoint is public and does not require authentication.\n",
+                "operationId": "getArchiveYear",
+                "parameters": [
+                    {
+                        "name": "year",
+                        "in": "path",
+                        "description": "Year (e.g., 2024)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1900,
+                            "maximum": 2030,
+                            "example": 2024
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/Page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/PerPage"
+                    },
+                    {
+                        "$ref": "#/components/parameters/SortBy"
+                    },
+                    {
+                        "$ref": "#/components/parameters/SortOrder"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Posts retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ArchiveYearResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            }
+        },
+        "/archives/{year}/{month}": {
+            "get": {
+                "tags": [
+                    "Archives"
+                ],
+                "summary": "Get posts from a specific month",
+                "description": "Retrieves posts published in a specific month and year.\nThis endpoint is public and does not require authentication.\n",
+                "operationId": "getArchiveMonth",
+                "parameters": [
+                    {
+                        "name": "year",
+                        "in": "path",
+                        "description": "Year (e.g., 2024)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1900,
+                            "maximum": 2030,
+                            "example": 2024
+                        }
+                    },
+                    {
+                        "name": "month",
+                        "in": "path",
+                        "description": "Month (1-12)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 12,
+                            "example": 6
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/Page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/PerPage"
+                    },
+                    {
+                        "$ref": "#/components/parameters/SortBy"
+                    },
+                    {
+                        "$ref": "#/components/parameters/SortOrder"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Posts retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ArchiveMonthResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "ApiKeyAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-API-Key",
+                "description": "API key authentication. Pass your API key in the X-API-Key header.\n"
+            },
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Bearer token authentication. Pass your bearer token in the Authorization header.\n"
+            }
+        },
+        "parameters": {
+            "Page": {
+                "name": "page",
+                "in": "query",
+                "description": "Page number for pagination",
+                "required": false,
+                "schema": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 1,
+                    "example": 1
+                }
+            },
+            "PerPage": {
+                "name": "per_page",
+                "in": "query",
+                "description": "Number of items per page",
+                "required": false,
+                "schema": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "default": 10,
+                    "example": 10
+                }
+            },
+            "SortBy": {
+                "name": "sort_by",
+                "in": "query",
+                "description": "Field to sort by",
+                "required": false,
+                "schema": {
+                    "type": "string",
+                    "default": "ID",
+                    "enum": [
+                        "ID",
+                        "post_date",
+                        "post_modified",
+                        "post_title",
+                        "topic_title",
+                        "comment_date"
+                    ]
+                }
+            },
+            "SortOrder": {
+                "name": "sort_order",
+                "in": "query",
+                "description": "Sort direction",
+                "required": false,
+                "schema": {
+                    "type": "string",
+                    "enum": [
+                        "ASC",
+                        "DESC"
+                    ],
+                    "default": "DESC"
+                }
+            },
+            "PostId": {
+                "name": "id",
+                "in": "path",
+                "description": "Post ID",
+                "required": true,
+                "schema": {
+                    "type": "integer",
+                    "example": 1
+                }
+            },
+            "CategoryId": {
+                "name": "id",
+                "in": "path",
+                "description": "Category ID",
+                "required": true,
+                "schema": {
+                    "type": "integer",
+                    "example": 1
+                }
+            },
+            "CommentId": {
+                "name": "id",
+                "in": "path",
+                "description": "Comment ID",
+                "required": true,
+                "schema": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "schemas": {
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "status": {
+                        "type": "integer",
+                        "example": 400
+                    },
+                    "error": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "string",
+                                "example": "BAD_REQUEST"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Error description"
+                            },
+                            "details": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "field": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "SuccessResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "status": {
+                        "type": "integer",
+                        "example": 200
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Operation successful"
+                    },
+                    "data": {
+                        "type": "object"
+                    }
+                }
+            },
+            "Post": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "My First Blog Post"
+                    },
+                    "slug": {
+                        "type": "string",
+                        "example": "my-first-blog-post"
+                    },
+                    "content": {
+                        "type": "string",
+                        "example": "Full post content here..."
+                    },
+                    "summary": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "Post summary for preview"
+                    },
+                    "excerpt": {
+                        "type": "string",
+                        "example": "Generated excerpt..."
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "publish",
+                            "draft",
+                            "pending",
+                            "private"
+                        ],
+                        "example": "publish"
+                    },
+                    "visibility": {
+                        "type": "string",
+                        "enum": [
+                            "public",
+                            "private",
+                            "protected"
+                        ],
+                        "example": "public"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "php",
+                            "rest-api"
+                        ]
+                    },
+                    "comment_status": {
+                        "type": "string",
+                        "enum": [
+                            "open",
+                            "closed"
+                        ],
+                        "example": "open"
+                    },
+                    "type": {
+                        "type": "string",
+                        "example": "blog"
+                    },
+                    "author": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "login": {
+                                "type": "string",
+                                "example": "admin"
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Administrator"
+                            }
+                        }
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15 10:30:00"
+                    },
+                    "modified": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true,
+                        "example": "2024-01-15 14:20:00"
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "http://blogware.site/post/1/my-first-blog-post"
+                    }
+                }
+            },
+            "PostCreate": {
+                "type": "object",
+                "required": [
+                    "post_title",
+                    "post_content"
+                ],
+                "properties": {
+                    "post_title": {
+                        "type": "string",
+                        "maxLength": 200,
+                        "example": "My First Blog Post"
+                    },
+                    "post_content": {
+                        "type": "string",
+                        "example": "Full post content here..."
+                    },
+                    "post_summary": {
+                        "type": "string",
+                        "maxLength": 320,
+                        "nullable": true,
+                        "example": "Post summary"
+                    },
+                    "post_status": {
+                        "type": "string",
+                        "enum": [
+                            "publish",
+                            "draft"
+                        ],
+                        "default": "draft"
+                    },
+                    "post_visibility": {
+                        "type": "string",
+                        "enum": [
+                            "public",
+                            "private",
+                            "protected"
+                        ],
+                        "default": "public"
+                    },
+                    "post_tags": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "php, api, rest"
+                    },
+                    "comment_status": {
+                        "type": "string",
+                        "enum": [
+                            "open",
+                            "closed"
+                        ],
+                        "default": "open"
+                    },
+                    "topics": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "example": [
+                            1,
+                            2
+                        ]
+                    }
+                }
+            },
+            "PostUpdate": {
+                "type": "object",
+                "properties": {
+                    "post_title": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "post_content": {
+                        "type": "string"
+                    },
+                    "post_summary": {
+                        "type": "string",
+                        "maxLength": 320,
+                        "nullable": true
+                    },
+                    "post_status": {
+                        "type": "string",
+                        "enum": [
+                            "publish",
+                            "draft",
+                            "pending",
+                            "private"
+                        ]
+                    },
+                    "post_visibility": {
+                        "type": "string",
+                        "enum": [
+                            "public",
+                            "private",
+                            "protected"
+                        ]
+                    },
+                    "post_tags": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "comment_status": {
+                        "type": "string",
+                        "enum": [
+                            "open",
+                            "closed"
+                        ]
+                    },
+                    "topics": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            },
+            "PostListResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Post"
+                                }
+                            },
+                            "pagination": {
+                                "$ref": "#/components/schemas/Pagination"
+                            }
+                        }
+                    }
+                ]
+            },
+            "PostDetailResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/components/schemas/Post"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "topics": {
+                                                "type": "array",
+                                                "items": {
+                                                    "$ref": "#/components/schemas/CategorySummary"
+                                                }
+                                            },
+                                            "featured_image": {
+                                                "type": "string",
+                                                "nullable": true,
+                                                "example": "http://blogware.site/public/files/pictures/featured.jpg"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "PostResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/Post"
+                            }
+                        }
+                    }
+                ]
+            },
+            "CategorySummary": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Technology"
+                    },
+                    "slug": {
+                        "type": "string",
+                        "example": "technology"
+                    }
+                }
+            },
+            "Category": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/CategorySummary"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "status": {
+                                "type": "string",
+                                "enum": [
+                                    true,
+                                    false
+                                ],
+                                "example": true
+                            },
+                            "post_count": {
+                                "type": "integer",
+                                "example": 15
+                            },
+                            "url": {
+                                "type": "string",
+                                "example": "http://blogware.site/category/technology"
+                            }
+                        }
+                    }
+                ]
+            },
+            "CategoryCreate": {
+                "type": "object",
+                "required": [
+                    "topic_title"
+                ],
+                "properties": {
+                    "topic_title": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Technology"
+                    },
+                    "topic_status": {
+                        "type": "string",
+                        "enum": [
+                            true,
+                            false
+                        ],
+                        "default": true
+                    }
+                }
+            },
+            "CategoryUpdate": {
+                "type": "object",
+                "properties": {
+                    "topic_title": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "topic_status": {
+                        "type": "string",
+                        "enum": [
+                            true,
+                            false
+                        ]
+                    }
+                }
+            },
+            "CategoryListResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Category"
+                                }
+                            },
+                            "pagination": {
+                                "$ref": "#/components/schemas/Pagination"
+                            }
+                        }
+                    }
+                ]
+            },
+            "CategoryResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/Category"
+                            }
+                        }
+                    }
+                ]
+            },
+            "CategoryPostsResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "category": {
+                                        "$ref": "#/components/schemas/CategorySummary"
+                                    },
+                                    "posts": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/Post"
+                                        }
+                                    }
+                                }
+                            },
+                            "pagination": {
+                                "$ref": "#/components/schemas/Pagination"
+                            }
+                        }
+                    }
+                ]
+            },
+            "Comment": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "post_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "parent_id": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "author": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "example": "John Doe"
+                            },
+                            "email": {
+                                "type": "string",
+                                "example": "john@example.com"
+                            }
+                        }
+                    },
+                    "content": {
+                        "type": "string",
+                        "example": "Great article!"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "approved",
+                            "pending",
+                            "spam"
+                        ],
+                        "example": "approved"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15 10:30:00"
+                    }
+                }
+            },
+            "CommentCreate": {
+                "type": "object",
+                "required": [
+                    "comment_author_name",
+                    "comment_content",
+                    "comment_post_id"
+                ],
+                "properties": {
+                    "comment_author_name": {
+                        "type": "string",
+                        "maxLength": 60,
+                        "example": "John Doe"
+                    },
+                    "comment_author_email": {
+                        "type": "string",
+                        "format": "email",
+                        "nullable": true,
+                        "example": "john@example.com"
+                    },
+                    "comment_content": {
+                        "type": "string",
+                        "example": "Great article!"
+                    },
+                    "comment_post_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "comment_parent_id": {
+                        "type": "integer",
+                        "default": 0,
+                        "example": 0
+                    }
+                }
+            },
+            "CommentUpdate": {
+                "type": "object",
+                "properties": {
+                    "comment_author_name": {
+                        "type": "string",
+                        "maxLength": 60
+                    },
+                    "comment_content": {
+                        "type": "string"
+                    },
+                    "comment_status": {
+                        "type": "string",
+                        "enum": [
+                            "approved",
+                            "pending",
+                            "spam"
+                        ]
+                    }
+                }
+            },
+            "CommentListResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Comment"
+                                }
+                            },
+                            "pagination": {
+                                "$ref": "#/components/schemas/Pagination"
+                            }
+                        }
+                    }
+                ]
+            },
+            "CommentResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/components/schemas/Comment"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "post": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string"
+                                                    },
+                                                    "url": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "nullable": true
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "ArchiveMonth": {
+                "type": "object",
+                "properties": {
+                    "month": {
+                        "type": "integer",
+                        "example": 6
+                    },
+                    "month_name": {
+                        "type": "string",
+                        "example": "June"
+                    },
+                    "post_count": {
+                        "type": "integer",
+                        "example": 5
+                    }
+                }
+            },
+            "ArchiveYear": {
+                "type": "object",
+                "properties": {
+                    "year": {
+                        "type": "integer",
+                        "example": 2024
+                    },
+                    "months": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ArchiveMonth"
+                        }
+                    },
+                    "total_posts": {
+                        "type": "integer",
+                        "example": 25
+                    }
+                }
+            },
+            "ArchiveListResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "archives": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/ArchiveYear"
+                                        }
+                                    },
+                                    "total_years": {
+                                        "type": "integer",
+                                        "example": 3
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "ArchiveYearResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "year": {
+                                        "type": "integer",
+                                        "example": 2024
+                                    },
+                                    "posts": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/Post"
+                                        }
+                                    }
+                                }
+                            },
+                            "pagination": {
+                                "$ref": "#/components/schemas/Pagination"
+                            }
+                        }
+                    }
+                ]
+            },
+            "ArchiveMonthResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "year": {
+                                        "type": "integer",
+                                        "example": 2024
+                                    },
+                                    "month": {
+                                        "type": "integer",
+                                        "example": 6
+                                    },
+                                    "month_name": {
+                                        "type": "string",
+                                        "example": "June"
+                                    },
+                                    "posts": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/Post"
+                                        }
+                                    }
+                                }
+                            },
+                            "pagination": {
+                                "$ref": "#/components/schemas/Pagination"
+                            }
+                        }
+                    }
+                ]
+            },
+            "Pagination": {
+                "type": "object",
+                "properties": {
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "total_items": {
+                        "type": "integer",
+                        "example": 50
+                    },
+                    "total_pages": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "has_next_page": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "has_previous_page": {
+                        "type": "boolean",
+                        "example": false
+                    }
+                }
+            },
+            "DeleteResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "type": null,
+                                "example": null
+                            }
+                        }
+                    }
+                ]
+            },
+            "ApiInfo": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Blogware RESTful API"
+                                    },
+                                    "version": {
+                                        "type": "string",
+                                        "example": "1.0.0"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "base_url": {
+                                        "type": "string",
+                                        "example": "/api/v1"
+                                    },
+                                    "authentication": {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {
+                                                "type": "string"
+                                            },
+                                            "header": {
+                                                "type": "string"
+                                            },
+                                            "required": {
+                                                "type": "boolean"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "responses": {
+            "BadRequest": {
+                "description": "Bad Request - Invalid parameters",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "Unauthorized": {
+                "description": "Unauthorized - Authentication required",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "Forbidden": {
+                "description": "Forbidden - Insufficient permissions",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "NotFound": {
+                "description": "Not Found - Resource does not exist",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "Conflict": {
+                "description": "Conflict - Resource already exists",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "UnprocessableEntity": {
+                "description": "Unprocessable Entity - Validation failed",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "InternalServerError": {
+                "description": "Internal Server Error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "externalDocs": {
+        "description": "Blogware Documentation",
+        "url": "https://blogware.site/docs"
+    },
+    "x-tagGroups": [
+        {
+            "name": "Core",
+            "tags": [
+                "API Info"
+            ]
+        },
+        {
+            "name": "Content",
+            "tags": [
+                "Posts",
+                "Categories",
+                "Comments",
+                "Archives"
+            ]
+        }
+    ]
+}
