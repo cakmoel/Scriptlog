@@ -29,11 +29,13 @@ if (!file_exists(__DIR__ . '/../config.php')) {
 
   $dbconnect = make_connection($set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name'], $set_config['db']['port']);
 
+  $prefix = isset($set_config['db']['prefix']) ? $set_config['db']['prefix'] : '';
+
   // required table 
   $required_tables = [
-    'tbl_users', 'tbl_user_token', 'tbl_topics', 'tbl_themes',
-    'tbl_settings', 'tbl_posts', 'tbl_post_topic', 'tbl_plugin',
-    'tbl_menu', 'tbl_mediameta', 'tbl_media', 'tbl_media_download', 'tbl_comments'
+    $prefix . 'tbl_users', $prefix . 'tbl_user_token', $prefix . 'tbl_topics', $prefix . 'tbl_themes',
+    $prefix . 'tbl_settings', $prefix . 'tbl_posts', $prefix . 'tbl_post_topic', $prefix . 'tbl_plugin',
+    $prefix . 'tbl_menu', $prefix . 'tbl_mediameta', $prefix . 'tbl_media', $prefix . 'tbl_media_download', $prefix . 'tbl_comments'
   ];
 
   foreach ($required_tables as $table) {
@@ -49,12 +51,9 @@ if (!file_exists(__DIR__ . '/../config.php')) {
 
   $setup = isset($_POST['setup']) ? stripcslashes($_POST['setup']) : '';
 
-  if ($setup !== 'install') {
+  $completed = false;
 
-    $_SESSION['install'] = false;
-    header($install_path, true, 302);
-    
-  } else {
+  if ($setup === 'install') {
 
     $username = isset($_POST['user_login']) ? remove_bad_characters($_POST['user_login'], $set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name'], $set_config['db']['port']) : "";
     $password = isset($_POST['user_pass1']) ? escapeHTML($_POST['user_pass1']) : "";
@@ -178,135 +177,98 @@ if (!file_exists(__DIR__ . '/../config.php')) {
 
         if (check_mysql_version($dbconnect, "5.7")) {
 
-          install_database_table($dbconnect, $protocol, $server_host, $username, $password, $email, $key);
+          install_database_table($dbconnect, $protocol, $server_host, $username, $password, $email, $key, $prefix);
 
           header("Location:" . $protocol . "://" . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR . "finish.php?status=success&token={$key}");
         }
       } catch (mysqli_sql_exception $e) {
 
-        $e->getMessage();
-        throw $e;
+        $errors['errorInstall'] = "Database error: " . $e->getMessage();
       }
     }
   }
 
 ?>
 
-  <div class="container">
+  <div class="container my-5">
 
-    <div class="py-5 text-center">
-      <img class="d-block mx-auto mb-4" src="assets/img/icon612x612.png" alt="Scriptlog Installation Procedure" width="72" height="72">
-      <h2>Scriptlog</h2>
-      <p class="lead">Installation procedure</p>
+    <div class="text-center mb-5">
+      <img class="install-icon" src="assets/img/icon612x612.png" alt="Scriptlog Logo">
+      <h1 class="h3 font-weight-bold">Scriptlog Installation</h1>
+      <p class="text-muted">Database setup already exists. Let's finish the installation.</p>
     </div>
 
     <div class="row">
-      <div class="col-md-4 order-md-2 mb-4">
+      <div class="col-lg-4 order-lg-2 mb-4">
+        <div class="card bg-transparent shadow-none border-0">
+            <?= get_sisfo(); ?>
+            <?= required_settings(); ?>
+            <?php if (strtolower(check_web_server()['WebServer']) != 'nginx') : ?>
+                <?= check_mod_rewrite(); ?>
+            <?php endif; ?>
+            <?= check_dir_file(); ?>
+        </div>
+      </div>
 
-        <h4 class="d-flex justify-content-between align-items-center mb-3">
-          <span class="text-muted">Getting System Info</span>
-        </h4>
-
-        <?= get_sisfo(); ?>
-
-        <h4 class="d-flex justify-content-between align-items-center mb-3">
-          <span class="text-muted">Required PHP Settings</span>
-        </h4>
-
-        <?= required_settings(); ?>
-
-        <?php if (strtolower(check_web_server()['WebServer']) == 'nginx') : ?>
-
-          <h4 class="d-flex justify-content-between align-items-center mb-3">
-            <span class="text-muted">Directories and Files</span>
-          </h4>
-
-          <?= check_dir_file(); ?>
-
-        <?php else : ?>
-
-          <?= check_mod_rewrite(); ?>
-
-          <h4 class="d-flex justify-content-between align-items-center mb-3">
-            <span class="text-muted">Directories and Files</span>
-          </h4>
-
-          <?= check_dir_file(); ?>
-
+      <div class="col-lg-8 order-lg-1">
+        <?php if (isset($errors['errorInstall']) && (!$completed)) : ?>
+          <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fa fa-exclamation-triangle mr-2"></i> <?= $errors['errorInstall']; ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
         <?php endif; ?>
 
-        <h4 class="d-flex justify-content-between align-items-center mb-3">
-          <span class="text-muted">Directories and Files</span>
-        </h4>
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-bottom-0 pt-4">
+                <h4 class="mb-0 text-primary"><i class="fa fa-user-circle mr-2"></i> Administrator Account</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success py-2 small shadow-none">
+                    <i class="fa fa-check-circle mr-1"></i> <code>config.php</code> found! Please create your administrator account to complete setup.
+                </div>
 
-        <?= check_dir_file(); ?>
+                <form method="post" action="<?= $install_path . 'setup-db.php'; ?>" class="needs-validation" novalidate>
 
-      </div>
+                  <div class="mb-3">
+                    <label for="username" class="font-weight-bold">Username</label>
+                    <input type="text" class="form-control" name="user_login" id="username" placeholder="Admin username" value="<?= (isset($_POST['user_login'])) ? escapeHTML($_POST['user_login']) : ""; ?>" required>
+                    <div class="invalid-feedback">Your username is required.</div>
+                  </div>
 
-      <div class="col-md-8 order-md-1">
-        <?php
-          if (isset($errors['errorInstall']) && (!$completed)) :
-        ?>
-          <div class="alert alert-danger" role="alert">
-            <button type="button" class="close" data-dismiss="alert">&times;
-            </button>
-            <?= $errors['errorInstall']; ?>
-          </div>
+                  <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label for="pass1" class="font-weight-bold">Password</label>
+                        <input type="password" class="form-control" name="user_pass1" id="pass1" placeholder="Admin password" required>
+                        <div class="invalid-feedback">Please enter your password.</div>
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="pass2" class="font-weight-bold">Confirm Password</label>
+                        <input type="password" class="form-control" name="user_pass2" id="pass2" placeholder="Confirm password" required>
+                        <div class="invalid-feedback">Please confirm your password.</div>
+                      </div>
+                  </div>
+                  <p class="small text-muted mb-3">8+ characters, including uppercase, lowercase, numbers, and symbols.</p>
 
-        <?php
-          endif;
+                  <div class="mb-4">
+                    <label for="email" class="font-weight-bold">Email Address</label>
+                    <input type="email" class="form-control" id="email" name="user_email" placeholder="admin@example.com" value="<?= (isset($_POST['user_email'])) ? escapeHTML($_POST['user_email']) : ""; ?>" required>
+                    <div class="invalid-feedback">Please enter a valid email address.</div>
+                  </div>
 
-        ?>
-
-        <div class="alert alert-success" role="alert">
-          We are going to use this information to setup database table.
-          You should enter your administrator account details.
+                  <hr class="my-4">
+                  <input type="hidden" name="setup" value="install">
+                  <button class="btn btn-success btn-lg btn-block shadow-sm" type="submit">
+                      <i class="fa fa-rocket mr-2"></i> Complete Installation
+                  </button>
+                </form>
+            </div>
         </div>
-
-        <form method="post" action="<?= $install_path . 'setup-db.php'; ?>" class="needs-validation" novalidate>
-
-          <h4 class="mb-3">Administrator Account</h4>
-
-          <div class="mb-3">
-            <label for="username">Username</label>
-            <input type="text" class="form-control" name="user_login" id="username" placeholder="username for administrator" value="<?= (isset($_POST['user_login'])) ? escapeHTML($_POST['user_login']) : ""; ?>" required>
-            <div class="invalid-feedback">
-              Your username is required.
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="pass">Password</label>
-            <input type="password" class="form-control" name="user_pass1" id="pass1" placeholder="Enter your password" required>
-            <div class="invalid-feedback">
-              Please enter your password.
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="pass2">Confirm password</label>
-            <input type="password" class="form-control" name="user_pass2" id="pass2" placeholder="Confirm your password" required>
-            <div class="invalid-feedback">
-              Please confirm your password.
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="email">Email <span class="text-muted">(Administrator's E-mail)</span></label>
-            <input type="email" class="form-control" id="email" name="user_email" placeholder="you@example.com" value="<?= (isset($_POST['user_email'])) ? escapeHTML($_POST['user_email']) : ""; ?>" required>
-            <div class="invalid-feedback">
-              Please enter a valid email address.
-            </div>
-          </div>
-          <div class="row"></div>
-          <hr class="mb-4">
-
-          <input type="hidden" name="setup" value="install">
-          <button class="btn btn-success btn-lg btn-block" type="submit">Install</button>
-        </form>
-
       </div>
-
     </div>
+  </div>
 
   <?php
-
   install_footer($install_path, $protocol, $server_host);
 }
