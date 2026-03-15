@@ -40,6 +40,7 @@ class Bootstrap
         $db_pwd  = self::$config['db']['pass'] ?? "";
         $db_name = self::$config['db']['name'] ?? "";
         $db_port = self::$config['db']['port'] ?? "";
+        $db_prefix = self::$config['db']['prefix'] ?? "";
 
         $app_email = self::$config['app']['email'] ?? "";
         $app_url   = self::$config['app']['url'] ?? "";
@@ -49,7 +50,7 @@ class Bootstrap
         $cipher_key = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::scriptlogCipherKey() : "";
 
         // Returns variables to be extracted into the global scope of main.php
-        return compact('db_host', 'db_user', 'db_pwd', 'db_name', 'db_port', 'app_email', 'app_url', 'app_key', 'cipher_key');
+        return compact('db_host', 'db_user', 'db_pwd', 'db_name', 'db_port', 'db_prefix', 'app_email', 'app_url', 'app_key', 'cipher_key');
     }
 
     private static function initializeServices(array $core_vars): array
@@ -60,6 +61,11 @@ class Bootstrap
             $core_vars['db_user'],
             $core_vars['db_pwd']
         ]) : "";
+
+        // Set table prefix if configured
+        if (isset($core_vars['db_prefix']) && !empty($core_vars['db_prefix']) && method_exists($dbc, 'setTablePrefix')) {
+            $dbc->setTablePrefix($core_vars['db_prefix']);
+        }
 
         // STEP 2: Define Rules (Needed for Registry)
         $rules = [

@@ -8,13 +8,8 @@
  * @version 1.0
  * 
  */
-class PageModel extends Dao
+class PageModel extends BaseModel
 {
-
-public function __construct()
-{
-  parent::__construct();
-}
 
 /**
  * getPageById
