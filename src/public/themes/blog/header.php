@@ -8,6 +8,10 @@ require dirname(__FILE__) . '/functions.php';
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <?= function_exists('theme_meta') ? theme_meta()['site_meta_tags'] . PHP_EOL : ""; ?>
+<?php if (function_exists('app_url')) : ?>
+<link rel="alternate" type="application/rss+xml" title="<?= function_exists('app_sitename') ? app_sitename() : ''; ?> RSS Feed" href="<?= app_url(); ?>/rss.php">
+<link rel="alternate" type="application/atom+xml" title="<?= function_exists('app_sitename') ? app_sitename() : ''; ?> Atom Feed" href="<?= app_url(); ?>/atom.php">
+<?php endif; ?>
 <?php 
  if (function_exists('theme_dir')) :
 ?>
