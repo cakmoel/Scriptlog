@@ -1,0 +1,11 @@
+/* your styles go here */
+.transparent {
+	zoom: 1;
+	filter: alpha(opacity=50);
+	opacity: 0.5;
+}
+
+/* not found page  wrap */
+.page-wrap {
+    min-height: 100vh;
+}
