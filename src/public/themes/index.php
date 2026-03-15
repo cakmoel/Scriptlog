@@ -1,2 +1,0 @@
-<?php
-// Powering your blog
