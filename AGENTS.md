@@ -15,26 +15,26 @@ Guidelines for agentic coding agents working on Scriptlog, a PHP-based blog engi
 
 ```bash
 # Run all tests
-cd src && php vendor/bin/phpunit
+php vendor/bin/phpunit
 
 # Run single test file
-cd src && php vendor/bin/phpunit tests/UrlValidationTest.php
+php vendor/bin/phpunit src/tests/UrlValidationTest.php
 
 # Run specific test method
-cd src && php vendor/bin/phpunit tests/UrlValidationTest.php --filter testUrlValidationWithValidUrl
+php vendor/bin/phpunit src/tests/UrlValidationTest.php --filter testUrlValidationWithValidUrl
 
 # Testdox output
-cd src && php vendor/bin/phpunit --testdox
+php vendor/bin/phpunit --testdox
 
 # Integration tests only
-cd src && php vendor/bin/phpunit tests/integration/
+php vendor/bin/phpunit src/tests/integration/
 ```
 
 ### Composer
 
 ```bash
-cd src && composer install
-cd src && composer dump-autoload
+composer install
+composer dump-autoload
 ```
 
 ---

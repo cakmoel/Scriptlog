@@ -1,0 +1,58 @@
+{
+    "$schema": "https://raw.githubusercontent.com/composer/composer/master/res/composer-schema.json",
+    "name": "cakmoel/scriptlog",
+    "type": "project",
+    "description": "A simple, secure, modular PHP blog engine",
+    "keywords": ["blog", "cms", "php", "blogging"],
+    "homepage": "https://github.com/cakmoel/scriptlog",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "M Noermoehammad",
+            "email": "alanmoehammad@gmail.com",
+            "homepage": "https://github.com/cakmoel",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/cakmoel/scriptlog/issues",
+        "source": "https://github.com/cakmoel/scriptlog"
+    },
+    "config": {
+        "platform": {
+            "php": "7.4.33"
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "require": {
+        "php": ">=7.4.33",
+        "sinergi/browser-detector": "^6.1",
+        "intervention/image": "^2.5",
+        "ircmaxell/random-lib": "^1.2",
+        "egulias/email-validator": "^2.1",
+        "voku/anti-xss": "^4.1",
+        "defuse/php-encryption": "^2.2",
+        "filp/whoops": "^2.9",
+        "psr/log": "^1.1",
+        "melbahja/seo": "^2.0",
+        "laminas/laminas-escaper": "^2.12",
+        "laminas/laminas-crypt": "^3.3",
+        "laminas/laminas-feed": "^2.17",
+        "catfan/medoo": "^2.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "classmap": ["src/lib/"]
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "suggest": {
+        "ext-pdo": "Required for database support",
+        "ext-mysqli": "Required for MySQL support",
+        "ext-gd": "Required for image manipulation",
+        "ext-curl": "Required for HTTP requests"
+    }
+}
