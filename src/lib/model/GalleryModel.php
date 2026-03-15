@@ -8,13 +8,8 @@
  * @version   1.0
  * 
  */
-class GalleryModel extends Dao
+class GalleryModel extends BaseModel
 {
-
-public function __construct()
-{
-  parent::__construct();
-}
 
 /**
  * getGalleries

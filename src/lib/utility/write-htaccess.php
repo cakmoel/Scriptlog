@@ -72,6 +72,9 @@ if ($permalink_status === 'yes') {
    $content .= '# Ensure all front-end UI-UX files readable'. PHP_EOL;
    $content .= 'RewriteCond %{REQUEST_FILENAME} !\.(ico|css|png|jpg|jpeg|webp|gif|js|txt|htm|html|eot|svg|ttf|woff|woff2|webm|ogg|mp4|wav|mp3|pdf)$ [NC]' . PHP_EOL;
    $content .= 'RewriteRule ^public/.*$ index.php'. PHP_EOL;
+   $content .= '# API routes' . PHP_EOL;
+   $content .= 'RewriteCond %{REQUEST_URI} ^/api [NC]' . PHP_EOL;
+   $content .= 'RewriteRule ^api/(.*)$ api/index.php [QSA,L]' . PHP_EOL;
    $content .= 'RewriteCond %{REQUEST_FILENAME} !-d ' . PHP_EOL;
    $content .= 'RewriteCond %{REQUEST_FILENAME} !-f ' . PHP_EOL;
    $content .= 'RewriteCond %{REQUEST_FILENAME} !-l ' . PHP_EOL; 

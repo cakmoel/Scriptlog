@@ -8,17 +8,16 @@
  * @version 1.0
  * 
  */
-class PostModel extends Dao
+class PostModel extends BaseModel
 {
 
+  /**
+   * linkPosts
+   * alias for link property from BaseModel
+   * 
+   * @var object
+   */
   private $linkPosts;
-
-  private $pagination;
-
-  public function __construct()
-  {
-    parent::__construct();
-  }
 
   /**
    * getPostFeeds

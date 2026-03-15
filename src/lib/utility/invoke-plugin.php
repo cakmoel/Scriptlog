@@ -49,7 +49,24 @@ function invoke_plugin($plugin_name, $args)
 
  if ((is_plugin_exist($plugin_name) == true) && (is_plugin_enabled($plugin_name) == true)) {
 
-   clip('clip_'.$plugin_name, null, function($plugin_name) { return $plugin_name; });
+   $plugin_dir = get_plugin_directory($plugin_name);
+   
+   if ($plugin_dir) {
+      $plugin_path = APP_ROOT . APP_PLUGIN . $plugin_dir;
+      enable_plugin($plugin_path);
+      
+      // Also ensure the plugin class is instantiated to register hooks
+      $plugin_ini = read_plugin_ini($plugin_path);
+      if (isset($plugin_ini['plugin_loader'])) {
+          $plugin_class = $plugin_ini['plugin_loader'];
+          if (class_exists($plugin_class)) {
+              new $plugin_class();
+          }
+      }
+   }
+
+   // Ensure the hook exists to return at least the original args
+   clip('clip_'.$plugin_name, null, function($val) { return $val; });
 
    return clip('clip_'.$plugin_name, $args);
 
@@ -90,10 +107,22 @@ function is_plugin_exist($plugin_name)
  */
 function is_plugin_enabled($plugin_name)
 {
-  $plugin = new PluginDao($plugin_name);
+  $plugin = new PluginDao();
 
   $is_plugin_actived = $plugin->isPluginActived($plugin_name);
 
-  return ($is_plugin_actived) ? true : false;
+  return ($is_plugin_actived == 'Y') ? true : false;
 
+}
+
+/**
+ * get_plugin_directory
+ * 
+ * @param string $plugin_name
+ * @return string|bool
+ */
+function get_plugin_directory($plugin_name)
+{
+  $plugin = new PluginDao();
+  return $plugin->getPluginDirectory($plugin_name);
 }

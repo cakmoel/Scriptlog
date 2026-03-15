@@ -8,7 +8,7 @@
  * @version 1.0
  * 
  */
-final class FrontContentModel
+final class FrontContentModel extends BaseModel
 {
 /**
  * postModel;
