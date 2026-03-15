@@ -1,4 +1,68 @@
-User-agent: *
+User-agent: HTTrack
 Disallow: /
 
-Sitemap: https://example.com/sitemap.xml
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: uptimerobot
+Disallow: /
+
+User-agent: viberbot
+Disallow: /
+
+User-agent: YaK
+Disallow: /
+
+User-agent: Yandex
+Disallow: /
+
+User-agent: Applebot
+Disallow: /admin/
+Disallow: /lib/
+Disallow: /public/
+Disallow: /login.php
+Allow: /
+
+User-agent: Bingbot
+Disallow: /admin/
+Disallow: /lib/
+Disallow: /public/
+Disallow: /login.php
+Allow: /
+
+User-agent: Twitterbot
+Disallow: /admin/
+Disallow: /lib/
+Disallow: /public/
+Disallow: /login.php
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-News
+Allow: /
+
+User-agent: *
+Disallow: /admin/
+Disallow: /lib/
+Disallow: /public/
+Disallow: /login.php
+Disallow: /cdn-cgi/email-protection/
+
+Sitemap: https://blogware.site/sitemap-index.xml
