@@ -2,6 +2,9 @@
 /** 
  * rss.php
  * 
+ * RSS feed generator - accessible at /rss.php
+ * Browsers auto-detect RSS feeds via link tag in header
+ * 
  * @category rss.php file to write RSS feeds
  * @author M.Noermoehammad
  * @license https://opensource.org/licenses/MIT MIT License
@@ -9,6 +12,8 @@
  * 
  */
 require __DIR__ . '/lib/main.php';
+
+header('Content-Type: application/rss+xml; charset=UTF-8');
 
 $app_title = isset(app_info()['site_name']) ?  app_info()['site_name'] : "";
 $app_link = isset(app_info()['app_url']) ? app_info()['app_url'] : "";
@@ -30,7 +35,7 @@ if (is_iterable($feeds)) {
     $feed_description = substr($description, 0, strrpos($feed_description, " "));
 
     $rss->addItem($feed_title, $feed_link, $feed_description);
-
-    print $rss->saveXML();
   }
+  
+  print $rss->saveXML();
 }

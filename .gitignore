@@ -1,10 +1,28 @@
-# Image files (if you want to ignore all images)
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.bmp
-*.svg
-*.webp
+# PHP dependencies
+/vendor/
+/src/vendor/
+composer.phar
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
 # Session files
 sess_*
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build
+node_modules/

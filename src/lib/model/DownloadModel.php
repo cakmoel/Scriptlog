@@ -8,13 +8,8 @@
  * @version 1.0
  * 
  */
-class DownloadModel extends Dao
+class DownloadModel extends BaseModel
 {
-
-public function __construct()
-{
-  parent::__construct();   
-}
 
 /**
  * getAllMediaDownload
