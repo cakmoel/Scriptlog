@@ -170,25 +170,6 @@ public static function checkMatchUriRequested()
 
 /**
  * allowedPathRequested
- * 
- * Checking whether URI requested match the rules and allowed to be executed 
- */
-// public static function allowedPathRequested($path, $rules)
-// {
-
-//  $rule_requested = self::findRequestToRules($rules);
-
-//  $is_valid_requested = (is_array($rule_requested) && array_key_exists(0, $rule_requested)) ? $rule_requested[0] : null;
-
-//  return (!(in_array(self::isRequestToPathValid(0), $path, true) || (in_array($is_valid_requested, $path, true)))) ? false : true;
-
-// }
-
-
-// In lib/core/HandleRequest.php
-
-/**
- * allowedPathRequested
  * * Checking whether the first segment of the URI is in the whitelist.
  */
 public static function allowedPathRequested($path, $rules)

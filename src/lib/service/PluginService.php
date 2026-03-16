@@ -188,7 +188,8 @@ class PluginService
 
     }
 
-    $sql_path = __DIR__ . '/../../'.APP_PLUGIN.basename($data_plugin['plugin_directory'].'sql');
+    $plugin_path = __DIR__ . '/../../' . APP_PLUGIN . basename($data_plugin['plugin_directory']);
+    $sql_path = $plugin_path . '/schema.sql';
 
     if(file_exists($sql_path)) {
 
@@ -196,6 +197,12 @@ class PluginService
       $sql_contents = explode(";", $sql_contents);
       
       foreach($sql_contents as $sql) {
+        
+        $sql = trim($sql);
+        
+        if (empty($sql) || strpos($sql, '--') === 0) {
+          continue;
+        }
 
         $result = '';
         $result = $this->pluginDao->setSQL($sql);
@@ -203,34 +210,19 @@ class PluginService
         if(!$result) {
 
           $activation = false;
-          
-          unlink($sql_path);
-
           direct_page('index.php?load=plugins&error=tableNotFound', 404);
-
-        } else {
-
-          $activation = true;
-
-          enable_plugin(__DIR__ . '/../../'.APP_PLUGIN.basename($data_plugin['plugin_directory']));
-          
-          $this->pluginDao->activatePlugin($this->plugin_id, $this->sanitize);
-          
-          unlink($sql_path);
 
         }
 
       }
 
-    } else {
-
-      $activation = true;
-
-      $this->pluginDao->activatePlugin($this->plugin_id, $this->sanitize);
-       
     }
 
-    return $activation;
+    enable_plugin($plugin_path);
+    
+    $this->pluginDao->activatePlugin($this->plugin_id, $this->sanitize);
+      
+    return $activation = true;
 
   }
 

@@ -10,17 +10,16 @@
  * 
  */
 
-class ArchivesModel extends Dao
+class ArchivesModel extends BaseModel
 {
 
+  /**
+   * linkArchives
+   * alias for link property from BaseModel
+   * 
+   * @var object
+   */
   private $linkArchives;
-
-  private $pagination;
-
-  public function __construct()
-  {
-    parent::__construct();
-  }
 
   /**
    * getArchivesOnSidebar

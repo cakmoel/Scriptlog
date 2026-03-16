@@ -8,15 +8,8 @@
  * @version 1.0
  * 
  */
-class CommentModel extends Dao
+class CommentModel extends BaseModel
 {
-
-  public $linkComments;
-
-  public function __construct()
-  {
-    parent::__construct();
-  }
 
   /**
    * addComment

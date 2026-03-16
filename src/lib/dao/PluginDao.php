@@ -222,6 +222,23 @@ class PluginDao extends Dao
       }
     
   }
+
+  /**
+   * getPluginDirectory
+   * 
+   * get plugin directory by name
+   * 
+   * @param string $plugin_name
+   * @return string|bool
+   * 
+   */
+  public function getPluginDirectory($plugin_name)
+  {
+    $sql = "SELECT plugin_directory FROM tbl_plugin WHERE plugin_name = ?";
+    $this->setSQL($sql);
+    $directory = $this->findColumn([$plugin_name]);
+    return (empty($directory)) ? false : $directory;
+  }
    
   /**
    * Set menu plugin

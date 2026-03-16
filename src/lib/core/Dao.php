@@ -39,6 +39,12 @@ class Dao
    */
   protected $sanitizing;
 
+  /**
+   * Table prefix
+   * @var string
+   */
+  protected $prefix;
+
   public function __construct()
   {
     if (Registry::isKeySet('dbc')) {
@@ -53,6 +59,19 @@ class Dao
       
       throw new DbException("Database connection (dbc) is not set in the Registry ");
     }
+
+    $this->prefix = get_table_prefix();
+  }
+
+  /**
+   * Get prefixed table name
+   * 
+   * @param string $table
+   * @return string
+   */
+  protected function table($table)
+  {
+    return $this->prefix . $table;
   }
 
   /**
