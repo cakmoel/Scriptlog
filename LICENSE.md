@@ -1,8 +1,6 @@
-# License
-
 MIT License
 
-Copyright (c) 2018 M.Noermoehammad
+Copyright (c) 2018 Scriptlog
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,29 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-## Third-Party Licenses
-
-Scriptlog uses third-party libraries that are distributed under their own licenses. Please refer to each library's documentation for specific license terms.
-
-### Dependencies
-
-| Package | License |
-|---------|---------|
-| sinergi/browser-detector | MIT |
-| intervention/image | MIT |
-| ircmaxell/random-lib | ISC |
-| egulias/email-validator | MIT |
-| voku/anti-xss | MIT |
-| defuse/php-encryption | MIT |
-| filp/whoops | MIT |
-| psr/log | MIT |
-| melbahja/seo | MIT |
-| laminas/laminas-escaper | BSD-3-Clause |
-| laminas/laminas-crypt | BSD-3-Clause |
-| laminas/laminas-feed | BSD-3-Clause |
-| catfan/medoo | MIT |
-
-For complete license information about dependencies, please refer to the `lib/vendor/` directory and each package's respective repository.
