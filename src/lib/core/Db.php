@@ -31,6 +31,34 @@ class Db implements DbInterface
     private ?string $caPath = null;
 
     /**
+     * Table name prefix
+     * 
+     * @var string
+     */
+    private string $tablePrefix = '';
+
+    /**
+     * Known table names for prefix replacement
+     * 
+     * @var array
+     */
+    private array $knownTables = [
+        'tbl_users',
+        'tbl_user_token',
+        'tbl_posts',
+        'tbl_topics',
+        'tbl_post_topic',
+        'tbl_comments',
+        'tbl_media',
+        'tbl_mediameta',
+        'tbl_media_download',
+        'tbl_menu',
+        'tbl_plugin',
+        'tbl_settings',
+        'tbl_themes'
+    ];
+
+    /**
      * Constructor - Initializes the database connection if config is provided
      * 
      * @param array $config Database configuration [DSN, username, password]
@@ -41,6 +69,26 @@ class Db implements DbInterface
         if (!empty($config)) {
             $this->setDbConnection($config, $options);
         }
+    }
+
+    /**
+     * Set table prefix
+     * 
+     * @param string $prefix
+     */
+    public function setTablePrefix(string $prefix): void
+    {
+        $this->tablePrefix = $prefix;
+    }
+
+    /**
+     * Get table prefix
+     * 
+     * @return string
+     */
+    public function getTablePrefix(): string
+    {
+        return $this->tablePrefix;
     }
 
     /**
@@ -111,7 +159,7 @@ class Db implements DbInterface
         }
     }
 
-      /**
+    /**
      * Executes a database query and returns the statement
      * 
      * @param string $sql SQL query to execute
@@ -122,12 +170,13 @@ class Db implements DbInterface
     public function dbQuery(string $sql, array $args = []): PDOStatement
     {
         $this->ensureConnection();
+        $sql = $this->applyTablePrefix($sql);
         $stmt = $this->dbc->prepare($sql);
         $stmt->execute($args);
         return $stmt;
     }
 
-      /**
+    /**
      * Executes a SELECT query and returns results
      * 
      * @param string $sql SQL SELECT query
@@ -140,6 +189,7 @@ class Db implements DbInterface
     public function dbSelect(string $sql, array $parameters = [], int $fetchMode = PDO::FETCH_OBJ, string $class = ''): array
     {
         $this->ensureConnection();
+        $sql = $this->applyTablePrefix($sql);
 
         $stmt = $this->dbc->prepare($sql);
         $stmt->execute($parameters);
@@ -149,7 +199,7 @@ class Db implements DbInterface
             $stmt->fetchAll($fetchMode);
     }
 
-     /**
+    /**
      * Inserts a new record into the specified table
      * 
      * @param string $tablename Name of the table
@@ -165,6 +215,9 @@ class Db implements DbInterface
         if (empty($params)) {
             throw new InvalidArgumentException("Insert parameters cannot be empty.");
         }
+
+        // Apply prefix to table name
+        $tablename = $this->applyTablePrefix($tablename);
 
         $fields = array_keys($params);
         $placeholders = array_fill(0, count($fields), '?');
@@ -192,7 +245,7 @@ class Db implements DbInterface
         return $this->dbc->lastInsertId();
     }
 
-     /**
+    /**
      * Updates records in the specified table
      * 
      * @param string $tablename Name of the table
@@ -210,6 +263,9 @@ class Db implements DbInterface
             throw new InvalidArgumentException("Update parameters and conditions cannot be empty.");
         }
 
+        // Apply prefix to table name
+        $tablename = $this->applyTablePrefix($tablename);
+
         $setClause = implode(", ", array_map(fn($key) => "$key = ?", array_keys($params)));
         $whereClause = implode(" AND ", array_map(fn($key) => "$key = ?", array_keys($where)));
 
@@ -221,7 +277,7 @@ class Db implements DbInterface
         return $stmt->rowCount();
     }
 
-   /**
+    /**
      * Performs an INSERT or UPDATE (upsert) operation
      * 
      * Inserts a new record or updates existing one if duplicate key exists
@@ -241,6 +297,9 @@ class Db implements DbInterface
             throw new InvalidArgumentException("Upsert parameters cannot be empty.");
         }
 
+        // Apply prefix to table name
+        $tablename = $this->applyTablePrefix($tablename);
+
         $fields = array_keys($params);
         $placeholders = array_fill(0, count($fields), '?');
 
@@ -259,7 +318,7 @@ class Db implements DbInterface
         return $stmt->execute(array_merge(array_values($params), array_values($updateParams)));
     }
 
-     /**
+    /**
      * Deletes records from the specified table
      * 
      * @param string $tablename Name of the table
@@ -276,6 +335,9 @@ class Db implements DbInterface
         if (empty($where)) {
             throw new InvalidArgumentException("Delete conditions cannot be empty.");
         }
+
+        // Apply prefix to table name
+        $tablename = $this->applyTablePrefix($tablename);
 
         $whereClause = implode(" AND ", array_map(fn($key) => "$key = ?", array_keys($where)));
 
@@ -315,7 +377,7 @@ class Db implements DbInterface
         return $this->dbc->commit();
     }
 
-     /**
+    /**
      * Rolls back a transaction
      * 
      * @return bool True on success, false on failure
@@ -325,5 +387,26 @@ class Db implements DbInterface
     {
         $this->ensureConnection();
         return $this->dbc->rollBack();
+    }
+
+    /**
+     * Apply table prefix to SQL query
+     * 
+     * @param string $sql
+     * @return string
+     */
+    private function applyTablePrefix(string $sql): string
+    {
+        if (empty($this->tablePrefix)) {
+            return $sql;
+        }
+
+        foreach ($this->knownTables as $table) {
+            // Match table name not already prefixed
+            $pattern = '/(?<![a-zA-Z_])' . preg_quote($table, '/') . '(?![a-zA-Z_])/';
+            $sql = preg_replace($pattern, $this->tablePrefix . $table, $sql);
+        }
+
+        return $sql;
     }
 }

@@ -145,12 +145,15 @@ function check_dbtable($link, $table)
  * @param string $user_pass
  * @param string $user_email
  * @param string $key
+ * @param string $prefix
  * 
  */
-function install_database_table($link, $protocol, $server_host, $user_login, $user_pass, $user_email, $key)
+function install_database_table($link, $protocol, $server_host, $user_login, $user_pass, $user_email, $key, $prefix = '')
 {
 
-  require __DIR__ . '/dbtable.php';
+  $tables = get_table_definitions($prefix);
+
+  extract($tables);
 
   // Users  
   $date_registered = date('Y-m-d H:i:s');
@@ -221,6 +224,10 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
   $membership_key = "membership_setting";
   $membership_value = array('user_can_register' => 0, 'default_role' => 'subscriber');
   $store_membership_value = json_encode($membership_value);
+
+  // Setting table prefix
+  $setting_prefix_key = "tbl_prefix";
+  $setting_prefix_value = $prefix;
 
   if ($link instanceof mysqli) {
     #create users table
@@ -322,9 +329,14 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
       $recordMemberships->bind_param('ss', $membership_key, $store_membership_value);
       $recordMemberships->execute();
 
+      // insert configuration - table prefix
+      $recordTblPrefix = $link->prepare($saveSettings);
+      $recordTblPrefix->bind_param('ss', $setting_prefix_key, $setting_prefix_value);
+      $recordTblPrefix->execute();
+
       // insert default theme
       $recordTheme = $link->prepare($saveTheme);
-      $recordTheme->bind_param('sssss', $theme_title, $theme_desc, $theme_designer, $theme_directory, $theme_status);
+      $recordTheme->bind_param("sssss", $theme_title, $theme_desc, $theme_designer, $theme_directory, $theme_status);
       $recordTheme->execute();
 
       if ($recordAppKey->affected_rows > 0) {
@@ -339,13 +351,14 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
  *
  * @param object $mysqli
  * @param string $key
+ * @param string $prefix
  * @return string
  * 
  */
-function grab_app_key($mysqli, $key)
+function grab_app_key($mysqli, $key, $prefix = '')
 {
   $sql = "SELECT ID, setting_name, setting_value 
-          FROM tbl_settings USE INDEX(setting_value) WHERE setting_value = '$key'";
+          FROM {$prefix}tbl_settings USE INDEX(setting_value) WHERE setting_value = '$key'";
 
   $row = mysqli_fetch_assoc($mysqli->query($sql));
 
@@ -361,12 +374,13 @@ function grab_app_key($mysqli, $key)
  * @param object $mysqli
  * @param string $app_key
  * @param int|num $id
+ * @param string $prefix
  * @return void
  * 
  */
-function update_app_key($mysqli, $app_key, $id)
+function update_app_key($mysqli, $app_key, $id, $prefix = '')
 {
-  $sql = "UPDATE tbl_settings SET setting_value = '$app_key'
+  $sql = "UPDATE {$prefix}tbl_settings SET setting_value = '$app_key'
           WHERE setting_name = 'app_key' AND ID = {$id} LIMIT 1";
   return $mysqli->query($sql);
 }
@@ -385,10 +399,12 @@ function update_app_key($mysqli, $app_key, $id)
  * @param int $dbport
  * @param string $email
  * @param string $key
+ * @param string $ca
+ * @param string $prefix
  * @throws Exception
  * 
  */
-function write_config_file($protocol, $server_name, $dbhost, $dbuser, $dbpassword, $dbname, $dbport, $email, $key, $ca)
+function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuser, $dbname, $dbport, $email, $key, $ca, $prefix = '')
 {
 
   mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
@@ -401,12 +417,15 @@ function write_config_file($protocol, $server_name, $dbhost, $dbuser, $dbpasswor
 
     $distro = isset(get_linux_distro()['NAME']) ? get_linux_distro()['NAME'] : "";
 
-    $app_key = isset(grab_app_key($link, $key)['app_key']) ? grab_app_key($link, $key)['app_key'] : "";
-    $app_id = isset(grab_app_key($link, $key)['ID']) ? grab_app_key($link, $key)['ID'] : "";
+    $grabbedKey = grab_app_key($link, $key, $prefix);
+    $app_key = isset($grabbedKey['app_key']) ? $grabbedKey['app_key'] : "";
+    $app_id = isset($grabbedKey['ID']) ? $grabbedKey['ID'] : "";
 
-    update_app_key($link, $app_key, $app_id);
+    update_app_key($link, $app_key, $app_id, $prefix);
 
     mysqli_close($link);
+
+    $prefixLine = (!empty($prefix)) ? "'prefix' => '" . addslashes($prefix) . "'," : "";
 
     $configFile = '<?php  
     
@@ -418,7 +437,8 @@ function write_config_file($protocol, $server_name, $dbhost, $dbuser, $dbpasswor
                   'user' => '" . addslashes($dbuser) . "',
                   'pass' => '" . addslashes($dbpassword) . "',
                   'name' => '" . addslashes($dbname) . "',
-                  'port' => '" . addslashes($dbport) . "'
+                  'port' => '" . addslashes($dbport) . "',
+                  " . $prefixLine . "
                 ],
         
             'app' => [
@@ -652,4 +672,28 @@ function purge_installation()
       session_destroy();
     }
   }
+}
+
+function generate_table_prefix($length = 6)
+{
+  $chars = 'abcdefghijklmnopqrstuvwxyz';
+  $prefix = '';
+  
+  if (function_exists("random_bytes")) {
+    $bytes = random_bytes($length);
+    for ($i = 0; $i < $length; $i++) {
+      $prefix .= $chars[ord($bytes[$i]) % strlen($chars)];
+    }
+  } elseif (function_exists("openssl_random_pseudo_bytes")) {
+    $bytes = openssl_random_pseudo_bytes($length);
+    for ($i = 0; $i < $length; $i++) {
+      $prefix .= $chars[ord($bytes[$i]) % strlen($chars)];
+    }
+  } else {
+    for ($i = 0; $i < $length; $i++) {
+      $prefix .= $chars[rand(0, strlen($chars) - 1)];
+    }
+  }
+  
+  return $prefix . '_';
 }

@@ -9,8 +9,6 @@
  * 
  */
 
-use Laminas\Feed\Writer\Feed;
-
 class AtomWriter
 {
 
@@ -58,7 +56,9 @@ class AtomWriter
    */
   private function initializeFeed()
   {
-    $this->atomFeed = class_exists('Feed') ? new Feed() : "";
+    if (!isset($this->atomFeed)) {
+      $this->atomFeed = new \Laminas\Feed\Writer\Feed();
+    }
 
     return $this->atomFeed;
   }
@@ -104,13 +104,16 @@ class AtomWriter
 
       $feed_id = isset($feed_post['ID']) ? intval((int)$feed_post['ID']) : "";
       $feed_title = isset($feed_post['post_title']) ? htmlout($feed_post['post_title']) : "";
-      $feed_created = isset($feed_post['post_date']) ? htmlout(strtotime($feed_post['post_date'] )): "";
-      $feed_created = new DateTime("@$feed_created");
-      $feed_created->format('d-m-Y H:i:s');
       
-      $feed_modified = isset($feed_post['post_modified']) ? htmlout(strtotime($feed_post['post_modified'])) : "";
-      $feed_modified = new DateTime("@$feed_modified");
-      $feed_modified->format('d-m-Y H:i:s');
+      $timestamp_created = isset($feed_post['post_date']) ? strtotime($feed_post['post_date']) : time();
+      $feed_created = new DateTime();
+      $feed_created->setTimestamp($timestamp_created);
+      
+      $timestamp_modified = isset($feed_post['post_modified']) && !empty($feed_post['post_modified']) 
+        ? strtotime($feed_post['post_modified']) 
+        : (isset($feed_post['post_date']) ? strtotime($feed_post['post_date']) : time());
+      $feed_modified = new DateTime();
+      $feed_modified->setTimestamp($timestamp_modified);
       
       $feed_permalinks = isset($feed_post['ID']) ? permalinks($feed_id)['post'] : "";
       $feed_author = (isset($feed_post['user_login']) || isset($feed_post['user_fullname']) ? htmlout($feed_post['user_login']) : htmlout($feed_post['user_fullname']));

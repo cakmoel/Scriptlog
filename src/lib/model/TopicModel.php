@@ -8,17 +8,16 @@
  * @version 1.0
  * 
  */
-class TopicModel extends Dao 
+class TopicModel extends BaseModel
 {
 
-private $linkPosts;
-
-private $pagination;
-
-public function __construct()
-{
- parent::__construct();
-}
+  /**
+   * linkPosts
+   * alias for link property from BaseModel
+   * 
+   * @var object
+   */
+  private $linkPosts;
 
 /**
  * getActiveTopicsOnSidebar
