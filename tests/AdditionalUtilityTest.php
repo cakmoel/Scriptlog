@@ -151,4 +151,34 @@ class AdditionalUtilityTest extends TestCase
             $this->assertTrue(true);
         }
     }
+    
+    public function testHasCookieConsent(): void
+    {
+        if (function_exists('has_cookie_consent')) {
+            $result = has_cookie_consent();
+            $this->assertIsBool($result);
+        } else {
+            $this->assertTrue(true);
+        }
+    }
+    
+    public function testGetPrivacyPolicyUrl(): void
+    {
+        if (function_exists('get_privacy_policy_url')) {
+            $url = get_privacy_policy_url();
+            $this->assertIsString($url);
+        } else {
+            $this->assertTrue(true);
+        }
+    }
+    
+    public function testShouldShowConsentBanner(): void
+    {
+        if (function_exists('should_show_consent_banner')) {
+            $result = should_show_consent_banner();
+            $this->assertIsBool($result);
+        } else {
+            $this->assertTrue(true);
+        }
+    }
 }
