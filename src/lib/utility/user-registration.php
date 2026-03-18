@@ -93,7 +93,7 @@ function checking_signup_request($ip, $signupId, $uniqueKey, array $values)
     exit("400 Bad Request");
   }
 
-  if (!isset($uniqueKey) && ($uniqueKey !== md5(app_key() . $ip))) {
+  if (!isset($uniqueKey) || ($uniqueKey !== md5(app_key() . $ip))) {
 
     http_response_code(400);
     exit("400 Bad Request ");
