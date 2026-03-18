@@ -2,7 +2,7 @@
 /**
  * Integration Test Bootstrap
  * 
- * Bootstrap file for Scriptlog Integration Tests
+ * Bootstrap file for Scriptlog Integration Tests with database
  */
 
 error_reporting(E_ALL);
@@ -10,10 +10,52 @@ ini_set('display_errors', 1);
 
 require_once __DIR__ . '/../lib/vendor/autoload.php';
 require_once __DIR__ . '/../lib/common.php';
-require_once __DIR__ . '/../lib/utility-loader.php';
+
+// Load only essential utilities for testing
+$essential_utilities = [
+    'access-control-list.php',
+    'admin-query.php',
+    'app-config.php',
+    'app-info.php',
+    'app-reading-setting.php',
+    'build-query.php',
+    'check-pwd-strength.php',
+    'form-id.php',
+    'generate-token.php',
+    'media-properties.php',
+    'mime-type-dictionary.php',
+    'random-generator.php',
+    'user-info.php',
+    'user-privilege.php',
+    'worst-passwords.php',
+];
+
+$utility_dir = __DIR__ . '/../lib/utility/';
+foreach ($essential_utilities as $file) {
+    if (file_exists($utility_dir . $file)) {
+        require_once $utility_dir . $file;
+    }
+}
+
+// Setup autoloader for DAO and Service classes
+if (file_exists(__DIR__ . '/../lib/Autoloader.php')) {
+    require_once __DIR__ . '/../lib/Autoloader.php';
+    
+    if (class_exists('Autoloader')) {
+        Autoloader::setBaseDir(__DIR__ . '/..');
+        Autoloader::addClassDir(array(
+            'lib/core'       . DIRECTORY_SEPARATOR,
+            'lib/dao'        . DIRECTORY_SEPARATOR,
+            'lib/service'    . DIRECTORY_SEPARATOR,
+            'lib/controller' . DIRECTORY_SEPARATOR,
+            'lib/model'      . DIRECTORY_SEPARATOR
+        ));
+    }
+}
 
 $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36';
+$_SERVER['SERVER_NAME'] = 'localhost';
 
 function get_test_config(): array 
 {
@@ -56,10 +98,12 @@ function set_test_database_connection(): void
         }
         
         if (class_exists('Db')) {
-            $db = new Db($config['db']);
-            if (method_exists($db, 'setConnection')) {
-                $db->setConnection($pdo);
-            }
+            $dbConfig = [
+                $dsn,
+                $config['db']['user'],
+                $config['db']['pass']
+            ];
+            $db = new Db($dbConfig);
             Registry::set('db', $db);
         }
         
@@ -68,4 +112,5 @@ function set_test_database_connection(): void
     }
 }
 
-set_test_database_connection();
+// Prevent TablePrefixTest.php from loading
+define('TEST_LOADING', true);
