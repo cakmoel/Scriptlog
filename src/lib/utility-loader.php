@@ -45,6 +45,7 @@ function load_core_utilities()
         'comment-submission.php',
         'convert-to-paragraph.php',
         'cookies-baked.php',
+        'cookie-consent.php',
         'create-directory.php',
         'create-thumbnail.php',
         'csrf-defender.php',
