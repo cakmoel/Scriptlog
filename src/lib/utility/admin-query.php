@@ -21,6 +21,7 @@ return array(
     'pages'=>'pages.php', 
     'topics'=>'topics.php', 
     'comments'=>'comments.php', 
+    'import'=>'import.php',
     'templates'=>'templates.php', 
     'menu'=>'menu.php', 
     'users'=>'users.php', 
@@ -30,6 +31,7 @@ return array(
     'option-timezone' => 'option-timezone.php',
     'option-memberships' => 'option-memberships.php',
     'plugins'=>'plugins.php', 
+    'privacy'=>'privacy.php',
     'logout'=>'logout.php', 
     '403'=>'403.php', 
     '404'=>'404.php'
