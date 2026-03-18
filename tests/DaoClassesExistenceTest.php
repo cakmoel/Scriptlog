@@ -71,4 +71,19 @@ class DaoClassesExistenceTest extends TestCase
     {
         $this->assertTrue(class_exists('PostTopicDao'));
     }
+    
+    public function testConsentDaoClassExists(): void
+    {
+        $this->assertTrue(class_exists('ConsentDao'));
+    }
+    
+    public function testDataRequestDaoClassExists(): void
+    {
+        $this->assertTrue(class_exists('DataRequestDao'));
+    }
+    
+    public function testPrivacyLogDaoClassExists(): void
+    {
+        $this->assertTrue(class_exists('PrivacyLogDao'));
+    }
 }
