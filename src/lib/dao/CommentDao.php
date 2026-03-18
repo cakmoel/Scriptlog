@@ -108,13 +108,60 @@ private $selected;
  * @param object $sanitize
  * 
  */
- public function deleteComment($id, $sanitize)
- {
-   $idsanitized = $this->filteringId($sanitize, $id, 'sql');
-   $this->deleteRecord("tbl_comments", ['ID' => $idsanitized]);
- }
- 
-/**
+  public function deleteComment($id, $sanitize)
+  {
+    $idsanitized = $this->filteringId($sanitize, $id, 'sql');
+    $this->deleteRecord("tbl_comments", ['ID' => $idsanitized]);
+  }
+
+  /**
+   * Anonymize comment by replacing author info
+   * Used for GDPR data deletion (Right to be Forgotten)
+   * 
+   * @param int $commentId
+   * @return bool
+   */
+  public function anonymizeComment($commentId)
+  {
+    $anonymousName = 'Anonymous User';
+    $anonymousEmail = 'deleted@user.local';
+    
+    $sql = "UPDATE tbl_comments SET 
+            comment_author_name = ?,
+            comment_author_email = ?,
+            comment_author_ip = '0.0.0.0'
+            WHERE ID = ?";
+    
+    $this->setSQL($sql);
+    $this->dbc->dbQuery($sql, [$anonymousName, $anonymousEmail, (int)$commentId]);
+    
+    return true;
+  }
+
+  /**
+   * Anonymize all comments by user email
+   * 
+   * @param string $email
+   * @return bool
+   */
+  public function anonymizeCommentsByEmail($email)
+  {
+    $anonymousName = 'Deleted User';
+    $anonymousEmail = 'deleted@user.local';
+    
+    $sql = "UPDATE tbl_comments SET 
+            comment_author_name = ?,
+            comment_author_email = ?,
+            comment_author_ip = '0.0.0.0'
+            WHERE comment_author_email = ?";
+    
+    $this->setSQL($sql);
+    $this->dbc->dbQuery($sql, [$anonymousName, $anonymousEmail, $email]);
+    
+    return true;
+  }
+  
+  /**
  * CheckCommentId
  * 
  * @method public checkCommentId()
