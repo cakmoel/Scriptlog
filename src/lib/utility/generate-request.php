@@ -15,7 +15,7 @@ declare(strict_types=1);
  */
 function generate_request($base, $type, $data = array(), $string_encoded = true)
 {
- 
+  
  $html = array();
 
  $load = (isset($data) && array_key_exists(0, $data)) ? rawurlencode((string)$data[0]) : null;
@@ -35,7 +35,7 @@ function generate_request($base, $type, $data = array(), $string_encoded = true)
            if ($load === 'users') {
 
                $query_data = array(
-              
+               
                    'load' => sanitize_urls($load),
                    'action'=> $action,
                    'Id'=> abs((int)$id),
@@ -46,7 +46,7 @@ function generate_request($base, $type, $data = array(), $string_encoded = true)
            } elseif ($load === 'logout') {
 
              $query_data = array(
-              
+               
                'load' => sanitize_urls($load),
                'action'=> $action,
                'logOutId'=> $id,
@@ -56,11 +56,11 @@ function generate_request($base, $type, $data = array(), $string_encoded = true)
            } else {
 
               $query_data = array(
-              
+               
                 'load' => sanitize_urls($load),
                 'action'=> $action,
                 'Id'=> abs((int)$id)
-         
+           
                );
            }
 
@@ -94,26 +94,26 @@ function generate_request($base, $type, $data = array(), $string_encoded = true)
                   'sessionId' => sanitize_urls($unique_id)
 
                );
-  
+   
             } else {
   
               $query_data = array(
-                
-                 'load' => $load,
-                 'action'=> $action,
-                 'Id'=> abs((int)$id)
-            
+               
+               'load' => $load,
+               'action'=> $action,
+               'Id'=> abs((int)$id)
+             
               );
-  
+   
             }
   
-        }
+         }
 
       $html['link'] = build_query($base, $query_data);
   
       break;
        
- }
+  }
 
  return $html;
 
