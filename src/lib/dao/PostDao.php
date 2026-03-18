@@ -353,6 +353,27 @@ public function deletePost($id, $sanitize)
 }
 
 /**
+ * Anonymize post author info
+ * Used for GDPR data deletion (Right to be Forgotten)
+ * 
+ * @param int $authorId
+ * @return bool
+ */
+public function anonymizePostAuthor($authorId)
+{
+ $anonymousAuthor = 1;
+ 
+ $sql = "UPDATE tbl_posts SET 
+         post_author = ?
+         WHERE post_author = ?";
+ 
+ $this->setSQL($sql);
+ $this->dbc->dbQuery($sql, [$anonymousAuthor, (int)$authorId]);
+ 
+ return true;
+}
+
+/**
  * checkPostId
  *
  * @param integer $id
