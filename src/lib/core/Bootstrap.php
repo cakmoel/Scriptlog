@@ -1,11 +1,37 @@
-<?php
-// lib/core/Bootstrap.php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
 
+/**
+ * Class Bootstrap
+ * * Central orchestrator for the MyBlogi framework. This class handles the 
+ * sequential loading of configurations, utility functions, core services, 
+ * and global security policies.
+ * * @category Core
+ * @package  Scriptlog\Core
+ * @author   M.Noermoehammad
+ * @license  MIT
+ * @version  1.0.0
+ * @since    1.0.0
+ */
 class Bootstrap
 {
+    /**
+     * @var array<string, mixed> Holds the raw configuration array from config.php.
+     */
     private static $config = [];
+
+    /**
+     * @var array<string, object|null> Container for instantiated application services.
+     */
     private static $services = [];
 
+    /**
+     * Initializes the application environment.
+     * * Performs the full bootstrap sequence: configuration, utilities, 
+     * service containerization, and security header enforcement.
+     *
+     * @param string $appRoot The absolute path to the application root directory.
+     * @return array<string, mixed> Merged collection of configuration variables and service instances.
+     */
     public static function initialize(string $appRoot): array
     {
         // 1. Load Configuration and get core variables
@@ -24,17 +50,20 @@ class Bootstrap
         return array_merge($core_vars, $services);
     }
 
+    /**
+     * Loads the configuration file and extracts required environment variables.
+     *
+     * @param string $appRoot Path to search for config.php.
+     * @return array<string, string> Array containing db_host, app_url, cipher_key, etc.
+     */
     private static function loadConfiguration(string $appRoot): array
     {
-        // Configuration loading is safe here because it returns data, not output.
         if (file_exists($appRoot . 'config.php')) {
             self::$config = require $appRoot . 'config.php';
         } else {
-            // Install redirect is handled by main.php
             return [];
         }
 
-        // Define core variables that were previously pulled directly from the config array
         $db_host = self::$config['db']['host'] ?? "";
         $db_user = self::$config['db']['user'] ?? "";
         $db_pwd  = self::$config['db']['pass'] ?? "";
@@ -46,28 +75,35 @@ class Bootstrap
         $app_url   = self::$config['app']['url'] ?? "";
         $app_key   = self::$config['app']['key'] ?? "";
 
-        // The cipher_key is instantiated via a utility function
         $cipher_key = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::scriptlogCipherKey() : "";
 
-        // Returns variables to be extracted into the global scope of main.php
         return compact('db_host', 'db_user', 'db_pwd', 'db_name', 'db_port', 'db_prefix', 'app_email', 'app_url', 'app_key', 'cipher_key');
     }
 
+    /**
+     * Orchestrates service instantiation and global registry setup.
+     * * Note: Registry must be populated before DAOs are instantiated to ensure
+     * data access objects have access to the active database connection.
+     *
+     * @param array<string, string> $core_vars Extracted configuration variables.
+     * @return array<string, object|null> Collection of ready-to-use services.
+     * @uses DbFactory::connect()
+     * @uses Registry::setAll()
+     */
     private static function initializeServices(array $core_vars): array
     {
-        // STEP 1: CREATE DATABASE CONNECTION (Must come first)
+        // STEP 1: CREATE DATABASE CONNECTION
         $dbc = class_exists('DbFactory') ? DbFactory::connect([
             'mysql:host=' . $core_vars['db_host'] . ';port=' . $core_vars['db_port'] . ';dbname=' . $core_vars['db_name'],
             $core_vars['db_user'],
             $core_vars['db_pwd']
         ]) : "";
 
-        // Set table prefix if configured
         if (isset($core_vars['db_prefix']) && !empty($core_vars['db_prefix']) && method_exists($dbc, 'setTablePrefix')) {
             $dbc->setTablePrefix($core_vars['db_prefix']);
         }
 
-        // STEP 2: Define Rules (Needed for Registry)
+        // STEP 2: Define Routing Rules
         $rules = [
             'home'     => "/",
             'category' => "/category/(?'category'[\w\-]+)",
@@ -76,19 +112,21 @@ class Bootstrap
             'page'     => "/page/(?'page'[^/]+)",
             'single'   => "/post/(?'id'\d+)/(?'post'[\w\-]+)",
             'search'   => "(?'search'[\w\-]+)",
-            'tag'      => "/tag/(?'tag'[\w\-]+)"
+            'tag'      => "/tag/(?'tag'[\w\-]+)",
+            'privacy'  => "/privacy"
         ];
 
-        // STEP 3: SET REGISTRY (Must come BEFORE instantiating Dao-dependent services)
+        // STEP 3: SET REGISTRY
         class_exists('Registry') ? Registry::setAll([
-            'dbc' => $dbc, // NOW THE DBC IS AVAILABLE
+            'dbc' => $dbc,
             'key' => $core_vars['cipher_key'],
             'route' => $rules,
             'uri' => class_exists('RequestPath') ? new RequestPath() : null
         ]) : "";
+
         // STEP 4: INSTANTIATE SERVICES
-        $userDao = class_exists('UserDao') ? new UserDao() : null; // Safe now
-        $userToken = class_exists('UserTokenDao') ? new UserTokenDao() : null; // Safe now
+        $userDao = class_exists('UserDao') ? new UserDao() : null;
+        $userToken = class_exists('UserTokenDao') ? new UserTokenDao() : null;
         $validator = class_exists('FormValidator') ? new FormValidator() : null;
 
         $sessionMaker = class_exists('SessionMaker') ? new SessionMaker(set_session_cookies_key($core_vars['app_email'], $core_vars['app_key'])) : null;
@@ -109,11 +147,13 @@ class Bootstrap
     }
 
     /**
-     * Calls global security functions.
+     * Configures HTTP response headers and global security handlers.
+     * * Uses utility functions to set CSP, XSS protection, and frame options.
+     * Also initializes error handling (Whoops) and HTML purification.
+     * * @return void
      */
     private static function applySecurity(): void
     {
-        // These global functions must be loaded via utility-loader.php
         if (!headers_sent()) {
             x_frame_option();
             x_content_type_options();
