@@ -1,6 +1,7 @@
 # PHP dependencies
 /vendor/
 /src/vendor/
+/src/lib/vendor/
 composer.phar
 
 # IDE
