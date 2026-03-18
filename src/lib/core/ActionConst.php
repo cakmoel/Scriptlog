@@ -90,6 +90,14 @@ class ActionConst
  const DELETEUSER = "deleteUser";
  
 // action const for logging out from admin panel
- const LOGOUT = "doLogOut";
+  const LOGOUT = "doLogOut";
+
+  // action const for import functionality
+  const IMPORT = "import";
+
+  // action constant for privacy functionality
+  const PRIVACY = "privacy";
+  const DATA_REQUESTS = "dataRequests";
+  const AUDIT_LOGS = "auditLogs";
 
 }
