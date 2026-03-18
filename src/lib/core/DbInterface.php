@@ -32,9 +32,9 @@ interface DbInterface
      * 
      * @param string $sql 
      * @param array $parameters
-     * @return mixed
+     * @return PDOStatement|false
      */
-    public function dbQuery(string $sql, array $parameters = []): mixed;
+    public function dbQuery(string $sql, array $parameters = []);
 
     /**
      * Insert a new record.
