@@ -501,8 +501,55 @@ class UserService
  */
  public function removeUser()
  {
-  $this->validator->sanitize($this->user_id, 'int');
-  return $this->userDao->deleteUser($this->user_id, $this->sanitize); 
+   $this->validator->sanitize($this->user_id, 'int');
+   return $this->userDao->deleteUser($this->user_id, $this->sanitize); 
+ }
+
+ /**
+  * removeUserWithAnonymization
+  * 
+  * Remove user and anonymize their data (GDPR compliance)
+  * This preserves data integrity while respecting Right to be Forgotten
+  * 
+  * @param int $userId
+  * @param string $userEmail
+  * @return bool
+  */
+ public function removeUserWithAnonymization($userId, $userEmail = null)
+ {
+     $this->validator->sanitize($userId, 'int');
+     
+     if ($userEmail) {
+         $commentDao = new CommentDao();
+         $commentDao->anonymizeCommentsByEmail($userEmail);
+         
+         $postDao = new PostDao();
+         $postDao->anonymizePostAuthor($userId);
+         
+         $this->anonymizeUserData($userId);
+     }
+     
+     return $this->userDao->deleteUser($userId, $this->sanitize);
+ }
+
+ /**
+  * Anonymize user record
+  * 
+  * @param int $userId
+  * @return bool
+  */
+ private function anonymizeUserData($userId)
+ {
+     $sql = "UPDATE tbl_users SET 
+             user_email = CONCAT('deleted_', ID, '@user.local'),
+             user_fullname = 'Deleted User',
+             user_url = '#'
+             WHERE ID = ?";
+     
+     $this->userDao->setSQL($sql);
+     $this->userDao->getDbc()->dbQuery($sql, [(int)$userId]);
+     
+     return true;
  }
  
  /**
