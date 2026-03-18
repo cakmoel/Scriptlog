@@ -768,8 +768,8 @@ class UserController extends BaseApp
 
                 } else {
 
-                    $this->userService->setUserId($sanitizeID);
-                    $this->userService->removeUser();
+                    $userEmail = $getUser['user_email'] ?? null;
+                    $this->userService->removeUserWithAnonymization($sanitizeID, $userEmail);
                     $_SESSION['status'] = "userDeleted";
                     direct_page('index.php?load=users&status=userDeleted', 302);
                 }
@@ -881,8 +881,15 @@ class UserController extends BaseApp
                     ((!empty($_POST['current_pwd'])) && (is_a($authenticator, 'Authentication'))) ?? $authenticator->removeCookies();
                     Session::getInstance()->destroy();
 
-                    $this->userService->setUserId(sanitizer(distill_post_request($filters)['user_id'], 'sql'));
-                    $this->userService->removeUser();
+                    $userId = sanitizer(distill_post_request($filters)['user_id'], 'sql');
+                    $userEmail = $getProfile['user_email'] ?? null;
+                    $this->userService->removeUserWithAnonymization($userId, $userEmail);
+                    
+                    if (class_exists('NotificationService')) {
+                        $notificationService = new NotificationService();
+                        $notificationService->sendProfileDeletionConfirmation($userEmail);
+                    }
+                    
                     direct_page('login.php', 302);
 
                   }
