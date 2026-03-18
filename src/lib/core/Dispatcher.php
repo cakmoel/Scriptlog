@@ -192,6 +192,6 @@ class Dispatcher
    */
   private function whiteListPathRequested()
   {
-    return ['/', '//', 'post', 'page', 'blog', 'category', 'archive', 'tag'];
+    return ['/', '//', 'post', 'page', 'blog', 'category', 'archive', 'tag', 'privacy'];
   }
 }
