@@ -55,14 +55,12 @@ if (!file_exists(APP_ROOT . 'config.php')) {
 
 // Session setup must remain here, using the $sessionMaker object extracted above.
 if (isset($sessionMaker)) {
-    is_a($sessionMaker, 'SessionMaker') ? session_set_save_handler($sessionMaker, true) : "";
-    session_save_path(__DIR__ . '/utility/.sessions' . DS);
+    session_save_path(sys_get_temp_dir());
+    
+    session_set_save_handler($sessionMaker, true);
     register_shutdown_function('session_write_close');
     
-    // Original conditional ob_start() block (now relying on admin/index.php for absolute safety)
-    if (function_exists('start_session_on_site') && (!start_session_on_site($sessionMaker))) {
-        // ob_start() is now in admin/index.php. This block can remain empty or be removed.
+    if (function_exists('start_session_on_site')) {
+        start_session_on_site($sessionMaker);
     }
 }
-
-$errors = [];
