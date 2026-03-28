@@ -1,4 +1,5 @@
 <?php
+
 /**
  * login.php - Revamped
  */
@@ -30,7 +31,7 @@ if (isset($loggedIn) && $loggedIn === true) {
 include __DIR__ . '/login-layout.php';
 // Optimized: Don't use regex if not strictly necessary. 
 // Assuming current_load_url gives full path, just strip filename.
-$stylePath = dirname(current_load_url()); 
+$stylePath = dirname(current_load_url());
 
 // 4. Input Handling
 $action = $_GET['action'] ?? '';
@@ -41,7 +42,7 @@ $failed_login_attempt = 0;
 
 // 5. Form Processing
 if ($action === 'LogIn' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    
+
     // Validate inputs exist before processing
     // NOTE: We do NOT sanitize 'user_pass' here. We pass raw to the processor.
     $login_data = [
@@ -54,7 +55,8 @@ if ($action === 'LogIn' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
 
     if ($login_data['login'] && $login_data['user_pass']) {
-        list($errors, $failed_login_attempt) = processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $errors, $login_data);
+        // New call using the secure $app object
+        list($errors, $failed_login_attempt) = processing_human_login($app->authenticator, $ip, $loginId, $uniqueKey, $errors, $login_data);
     } else {
         $errors['errorMessage'] = "Please fill in all required fields.";
     }
@@ -82,12 +84,12 @@ login_header($stylePath);
     <?php endif; ?>
 
     <?php if (isset($_GET['status'])): ?>
-        <?php 
-            $status_msg = '';
-            if ($_GET['status'] == 'changed') $status_msg = "The password has been changed. Please log in with your new password.";
-            if ($_GET['status'] == 'actived') $status_msg = "The account has been activated. Please log in.";
-            
-            if ($status_msg):
+        <?php
+        $status_msg = '';
+        if ($_GET['status'] == 'changed') $status_msg = "The password has been changed. Please log in with your new password.";
+        if ($_GET['status'] == 'actived') $status_msg = "The account has been activated. Please log in.";
+
+        if ($status_msg):
         ?>
             <div class="alert alert-info alert-dismissable">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -97,18 +99,18 @@ login_header($stylePath);
     <?php endif; ?>
 
     <?php
-        // Generate Form Action safely
-        $formActionParams = ['LogIn', human_login_id(), md5(app_key().$ip)];
-        $actionUrl = form_action('login.php', $formActionParams, 'login')['doLogin'];
+    // Generate Form Action safely
+    $formActionParams = ['LogIn', human_login_id(), md5(app_key() . $ip)];
+    $actionUrl = form_action('login.php', $formActionParams, 'login')['doLogin'];
     ?>
 
     <form name="formlogin" action="<?= $actionUrl; ?>" method="post" autocomplete="off">
-        
+
         <div class="form-group has-feedback">
             <label for="inputLogin">Username or Email Address</label>
-            <input type="text" class="form-control" id="inputLogin" name="login" maxlength="186" 
-                   value="<?= isset($_POST['login']) ? htmlspecialchars($_POST['login']) : (isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $cipher_key) : ""); ?>" 
-                   required autofocus>
+            <input type="text" class="form-control" id="inputLogin" name="login" maxlength="186"
+                value="<?= isset($_POST['login']) ? htmlspecialchars($_POST['login']) : (isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $app->cipher_key) : ""); ?>"
+                required autofocus>
             <span class="glyphicon glyphicon-user form-control-feedback"></span>
         </div>
 
@@ -124,7 +126,7 @@ login_header($stylePath);
                 <input type="text" class="form-control" id="inputCaptcha" name="captcha_login" required>
                 <span class="glyphicon glyphicon-hand-down form-control-feedback"></span>
                 <div class="mt-2">
-                    <img src="<?= app_url().'/admin/captcha-login.php'; ?>" alt="captcha" style="margin-top:5px;">
+                    <img src="<?= app_url() . '/admin/captcha-login.php'; ?>" alt="captcha" style="margin-top:5px;">
                 </div>
             </div>
         <?php endif; ?>

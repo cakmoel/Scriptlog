@@ -4,7 +4,7 @@ $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "
 $mediaId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $mediaDao = class_exists('MediaDao') ?  new MediaDao() : "";
 $downloadModel = class_exists('DownloadModel') ? new DownloadModel() : "";
-$mediaService = class_exists('MediaService') ? new MediaService($mediaDao, $downloadModel, $validator, $sanitizer) : "";
+$mediaService = class_exists('MediaService') ? new MediaService($mediaDao, $downloadModel, $app->validator, $app->sanitizer) : "";
 $mediaController = class_exists('MediaController') ? new MediaController($mediaService) : "";
 
 try {
@@ -13,7 +13,7 @@ try {
 
         case ActionConst::NEWMEDIA: // new media
     
-           if (false === $authenticator->userAccessControl(ActionConst::MEDIALIB)) {
+           if (false === $app->authenticator->userAccessControl(ActionConst::MEDIALIB)) {
     
                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
@@ -43,7 +43,7 @@ try {
     
         case ActionConst::EDITMEDIA:
     
-           if (false === $authenticator->userAccessControl(ActionConst::MEDIALIB)) {
+           if (false === $app->authenticator->userAccessControl(ActionConst::MEDIALIB)) {
     
                direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
@@ -57,7 +57,7 @@ try {
     
              }
     
-             if ($mediaDao->checkMediaId($mediaId, $sanitizer)) {
+             if ($mediaDao->checkMediaId($mediaId, $app->sanitizer)) {
     
                 $mediaController->update((int)$mediaId);
      
@@ -73,7 +73,7 @@ try {
     
         case ActionConst::DELETEMEDIA:
     
-          if (false === $authenticator->userAccessControl(ActionConst::MEDIALIB)) {
+          if (false === $app->authenticator->userAccessControl(ActionConst::MEDIALIB)) {
     
               direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
@@ -87,7 +87,7 @@ try {
        
               }
               
-              if ($mediaDao->checkMediaId($mediaId, $sanitizer)) {
+              if ($mediaDao->checkMediaId($mediaId, $app->sanitizer)) {
        
                   $mediaController->remove((int)$mediaId);
        
@@ -103,7 +103,7 @@ try {
     
         default:
     
-            if (false === $authenticator->userAccessControl(ActionConst::MEDIALIB)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::MEDIALIB)) {
     
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     

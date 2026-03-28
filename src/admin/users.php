@@ -3,7 +3,7 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $userId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $sessionId = isset($_GET['sessionId']) ? safe_html($_GET['sessionId']): null;
-$userService = class_exists('UserService') ? new UserService($userDao, $validator, $userToken, $sanitizer) : "";
+$userService = class_exists('UserService') ? new UserService($app->userDao, $app->validator, $app->userToken, $app->sanitizer) : "";
 $userController = class_exists('UserController') ? new UserController($userService) : "";
 
 try {
@@ -12,7 +12,7 @@ try {
     
         case ActionConst::NEWUSER:
         
-          if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
+          if (false === $app->authenticator->userAccessControl(ActionConst::USERS)) {
     
             direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
           } else {
@@ -49,9 +49,9 @@ try {
     
             }
 
-            if (!$userDao->checkUserId($userId, $sanitizer)) {
+            if (!$app->userDao->checkUserId($userId, $app->sanitizer)) {
     
-                if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
+                if (false === $app->authenticator->userAccessControl(ActionConst::USERS)) {
     
                     direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
@@ -63,7 +63,7 @@ try {
     
             } else {
     
-                if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
+                if (false === $app->authenticator->userAccessControl(ActionConst::USERS)) {
     
                     $userController->updateProfile($user_login);
         
@@ -87,9 +87,9 @@ try {
     
             }
 
-            if (!$userDao->checkUserId($userId, $sanitizer)) {
+            if (!$app->userDao->checkUserId($userId, $app->sanitizer)) {
 
-                if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
+                if (false === $app->authenticator->userAccessControl(ActionConst::USERS)) {
     
                     direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
@@ -101,9 +101,9 @@ try {
 
             } else {
 
-                if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
+                if (false === $app->authenticator->userAccessControl(ActionConst::USERS)) {
 
-                    $userController->removeProfile($user_login, $authenticator);
+                    $userController->removeProfile($user_login, $app->authenticator);
 
                 } else {
 
@@ -117,7 +117,7 @@ try {
                     
         default:
             
-           if (false === $authenticator->userAccessControl(ActionConst::USERS)) {
+           if (false === $app->authenticator->userAccessControl(ActionConst::USERS)) {
     
              $userController->showProfile($user_login);
     

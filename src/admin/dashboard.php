@@ -11,14 +11,14 @@ try {
          break;
          
       default:
-
-         if (false === $authenticator->userAccessControl(ActionConst::DASHBOARD)) {
+         
+         if (false === $app->authenticator->userAccessControl(ActionConst::DASHBOARD)) {
 
             direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
 
          } else {
-
-            $displayWall->listItems($authenticator, $user_login);
+            
+            $displayWall->listItems($app->authenticator, $user_login);
          }
 
    }

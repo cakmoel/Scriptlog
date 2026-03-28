@@ -9,7 +9,7 @@ try {
 
         case ActionConst::LOGOUT:
 
-            if (false === $authenticator->userAccessControl()) {
+            if (false === $app->authenticator->userAccessControl()) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
 
@@ -24,7 +24,7 @@ try {
                     
                 } else {
 
-                    $authenticator->logout();
+                    $app->authenticator->logout();
                 }
             }
 
@@ -32,7 +32,7 @@ try {
 
         default:
 
-            if (false === $authenticator->userAccessControl()) {
+            if (false === $app->authenticator->userAccessControl()) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
 

@@ -3,7 +3,7 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $pluginId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $pluginDao = class_exists('PluginDao') ? new PluginDao() : "";
-$pluginService = class_exists('PluginService') ? new PluginService($pluginDao, $validator, $sanitizer) : "";
+$pluginService = class_exists('PluginService') ? new PluginService($pluginDao, $app->validator, $app->sanitizer) : "";
 $pluginController = class_exists('PluginController') ? new PluginController($pluginService) : "";
 
 try {
@@ -12,7 +12,7 @@ try {
 
         case ActionConst::INSTALLPLUGIN:
             
-            if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::PLUGINS)) {
     
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
@@ -42,13 +42,13 @@ try {
         
         case ActionConst::ACTIVATEPLUGIN:
     
-            if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::PLUGINS)) {
     
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
             } else {
     
-                if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
+                if ($pluginDao->checkPluginId($pluginId, $app->sanitizer)) {
                    
                     $pluginController->enablePlugin((int)$pluginId);
     
@@ -64,13 +64,13 @@ try {
     
         case ActionConst::DEACTIVATEPLUGIN:
             
-            if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::PLUGINS)) {
     
                  direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
             } else {
     
-                if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
+                if ($pluginDao->checkPluginId($pluginId, $app->sanitizer)) {
     
                     $pluginController->disablePlugin((int)$pluginId);
     
@@ -86,7 +86,7 @@ try {
     
         case ActionConst::DELETEPLUGIN:
             
-            if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::PLUGINS)) {
     
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
@@ -100,7 +100,7 @@ try {
         
                 }
     
-                if ($pluginDao->checkPluginId($pluginId, $sanitizer)) {
+                if ($pluginDao->checkPluginId($pluginId, $app->sanitizer)) {
     
                     $pluginController->remove((int)$pluginId);
     
@@ -115,7 +115,7 @@ try {
     
         default:
             
-            if (false === $authenticator->userAccessControl(ActionConst::PLUGINS)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::PLUGINS)) {
     
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     

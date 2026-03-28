@@ -1,4 +1,10 @@
 <?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+
+<?php 
+$action = isset($formAction) ? $formAction : null;
+$media_id = isset($mediaData['ID']) ? $mediaData['ID'] : 0;
+?>
+
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -8,7 +14,7 @@
         <small>Control Panel</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home </a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home </a></li>
         <li><a href="index.php?load=medialib">Media </a></li>
         <li class="active"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></li>
       </ol>
@@ -19,14 +25,16 @@
 <div class="row">
 <div class="col-md-6">
 <div class="box box-primary">
-<div class="box-header with-border"></div>
+<div class="box-header with-border">
+  <h3 class="box-title">Media Details</h3>
+</div>
 <!-- /.box-header -->
 <?php
 if (isset($errors)) :
 ?>
-<div class="alert alert-danger alert-dismissible">
-<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
+<div class="alert alert-danger alert-dismissible" role="alert">
+<button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">&times;</button>
+<h4><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h4>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -35,9 +43,6 @@ endforeach;
 </div>
 <?php 
 endif;
-
-$action = isset($formAction) ? $formAction : null;
-$media_id = isset($mediaData['ID']) ? $mediaData['ID'] : 0;
 ?>
 
 <form method="post" action="<?=generate_request('index.php', 'post', ['medialib', $action, $media_id])['link'];?>" role="form" enctype="multipart/form-data" autocomplete="off" >
@@ -77,11 +82,9 @@ if ($image_src || $webp_src) :
 </div>
 
 <div class="form-group">
-<div class="img-responsive pad" id="image-preview">
-  <label for="image-upload" id="image-label">Change picture</label>
+  <label for="image-upload">Change picture</label>
   <input type="file" name="media" id="image-upload" accept="image/*" maxlength="512" >
-</div>
-<p class="help-block">Maximum upload file size: <?= format_size_unit(APP_FILE_SIZE); ?>.</p>
+  <p class="help-block">Maximum upload file size: <?= format_size_unit(APP_FILE_SIZE); ?>.</p>
 </div>  
 
 <?php else: ?>
@@ -107,7 +110,7 @@ Your browser does not support the <code>audio</code> element.
 
 <?php else :?>
 
-<a href="#" class="img-responsive pad"><?=invoke_fileicon($mediaData['media_type']);?></a>
+<a href="#" class="img-responsive pad" aria-hidden="true"><?=invoke_fileicon($mediaData['media_type']);?></a>
 
 <?php endif; ?>
 
@@ -121,18 +124,17 @@ Your browser does not support the <code>audio</code> element.
 <?php else: ?>
 
 <div class="form-group">
-<label for="mediaUploaded">Media</label>
-<input type="file" name="media" id="mediaUploaded" maxlength="512" required>
-<p class="help-block">Maximum upload file size: <?= format_size_unit(APP_FILE_SIZE); ?>.</p>
+<label for="mediaUploaded">Select Media File <span class="text-red" title="required">*</span></label>
+<input type="file" name="media" id="mediaUploaded" maxlength="512" required aria-required="true">
+<p class="help-block">Supported formats: Images, Audio, and Video. Max size: <?= format_size_unit(APP_FILE_SIZE); ?>.</p>
 </div>
 
 <?php endif; ?>
 
 <div class="form-group">
 <label for="caption">Caption </label>
-<input type="text" class="form-control" id="caption" name="media_caption" placeholder="enter media caption" value="
-<?=(isset($mediaData['media_caption'])) ? safe_html($mediaData['media_caption']) : ""; ?>
-<?=(isset($formData['media_caption'])) ? purify_dirty_html($formData['media_caption']) : ""; ?>" maxlength="200" >
+<input type="text" class="form-control" id="caption" name="media_caption" placeholder="Describe this media..." value="<?=(isset($mediaData['media_caption'])) ? safe_html($mediaData['media_caption']) : ""; ?><?=(isset($formData['media_caption'])) ? purify_dirty_html($formData['media_caption']) : ""; ?>" maxlength="200" aria-describedby="captionHelp">
+<p id="captionHelp" class="help-block">A brief description or title for the media.</p>
 </div>
 
 <div class="form-group">
@@ -142,7 +144,7 @@ Your browser does not support the <code>audio</code> element.
 <!-- media target -->
 
 <div class="form-group">
-<label for="media_access">Access</label><br>
+<label for="media_access">Access Visibility</label><br>
 <?=(isset($mediaAccess)) ? $mediaAccess : ""; ?>
 </div>
 <!-- media access -->
@@ -150,22 +152,22 @@ Your browser does not support the <code>audio</code> element.
 <?php if(isset($mediaData['media_status'])) : ?>
 
 <div class="form-group">
-<label>Actived</label>
+<label>Active Status</label>
 <div class="radio">
-<label>
+<label for="optionsRadios1">
 <input type="radio" name="media_status" id="optionsRadios1" value="1" 
 <?=(isset($mediaData['media_status']) && $mediaData['media_status'] === 1) ? 'checked="checked"' : "";  ?>
 <?=(isset($formData['media_status']) && $formData['media_status'] === 1) ? 'checked="checked"' : "" ?>>
-   Yes
+   Yes, keep this media active
  </label>
 </div>
 
 <div class="radio">
-<label>
+<label for="optionsRadios2">
 <input type="radio" name="media_status" id="optionsRadios2" value="0" 
 <?=(isset($mediaData['media_status']) && $mediaData['media_status'] === 0) ? 'checked="checked"' : ""; ?>
 <?=(isset($formData['media_status']) && $formData['media_status'] === 0) ? 'checked="checked"' : ""; ?>>
-   No
+   No, deactivate this media
  </label>
 </div>
 
@@ -177,8 +179,13 @@ Your browser does not support the <code>audio</code> element.
 <!-- /.box-body -->
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
-<input type="submit" name="mediaFormSubmit" class="btn btn-primary" value="<?=(isset($mediaData['ID']) && $mediaData['ID'] != '') ? "Update" : "Upload"; ?>">
-
+<a href="index.php?load=medialib" class="btn btn-default" role="button" aria-label="Cancel and return to media library">
+  <i class="fa fa-times" aria-hidden="true"></i> Cancel
+</a>
+<button type="submit" name="mediaFormSubmit" class="btn btn-primary pull-right" aria-label="<?=(isset($mediaData['ID']) && $mediaData['ID'] != '') ? "Update Media" : "Upload Media"; ?>">
+  <i class="fa <?= (isset($mediaData['ID']) && $mediaData['ID'] != '') ? "fa-save" : "fa-upload"; ?>" aria-hidden="true"></i> 
+  <?=(isset($mediaData['ID']) && $mediaData['ID'] != '') ? "Update" : "Upload"; ?>
+</button>
 </div>
 </form>
             

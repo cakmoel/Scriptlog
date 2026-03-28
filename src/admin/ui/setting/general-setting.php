@@ -137,6 +137,7 @@ $action = (isset($formAction)) ? $formAction : null;
         <div class="box-footer">
         <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
         <input type="submit" name="configFormSubmit" class="btn btn-primary" value="<?=(empty($s)) ?: "Update" ?>">
+        <input type="submit" name="clearCacheSubmit" class="btn btn-warning" value="Clear Page Cache">
         </div>
      </form>
    </div>

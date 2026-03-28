@@ -3,7 +3,7 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $menuId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $menuDao = class_exists('MenuDao') ? new MenuDao() : "";
-$menuService = class_exists('MenuService') ? new MenuService($menuDao, $validator, $sanitizer) : "";
+$menuService = class_exists('MenuService') ? new MenuService($menuDao, $app->validator, $app->sanitizer) : "";
 $menuController = class_exists('MenuController') ? new MenuController($menuService) : "";
 
 try {
@@ -12,7 +12,7 @@ try {
 
         case ActionConst::NEWMENU:
             # Add New Menu
-            if (false === $authenticator->userAccessControl(ActionConst::NAVIGATION)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::NAVIGATION)) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
@@ -44,7 +44,7 @@ try {
                 throw new AppException("Invalid ID data type!");
             }
 
-            if (false === $authenticator->userAccessControl(ActionConst::NAVIGATION)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::NAVIGATION)) {
 
                 direct_page('index.php?load=403&error=forbidden=' . forbidden_id(), 403);
             } else {
@@ -69,7 +69,7 @@ try {
                 throw new AppException("Invalid ID data type!");
             }
 
-            if (false === $authenticator->userAccessControl(ActionConst::NAVIGATION)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::NAVIGATION)) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
@@ -87,7 +87,7 @@ try {
 
         default:
 
-            if (false === $authenticator->userAccessControl(ActionConst::NAVIGATION)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::NAVIGATION)) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {

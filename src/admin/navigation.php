@@ -19,6 +19,33 @@
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
           
+          <!-- Language Switcher -->
+          <li class="dropdown notifications-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="Language">
+              <i class="fa fa-globe" aria-hidden="true"></i>
+              <span class="hidden-xs"><?= strtoupper(admin_get_locale()); ?></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li class="header"><?= admin_translate('languageSettings'); ?></li>
+              <li>
+                <ul class="menu">
+                  <?php foreach (admin_get_available_locales() as $code => $name): ?>
+                  <li>
+                    <a href="<?= app_url(); ?>/admin/index.php?switch-lang=<?= $code; ?>&redirect=<?= urlencode($_SERVER['REQUEST_URI'] ?? '/'); ?>">
+                      <?php if (admin_get_locale() === $code): ?>
+                      <i class="fa fa-check text-success"></i>
+                      <?php else: ?>
+                      <i class="fa fa-globe text-muted"></i>
+                      <?php endif; ?>
+                      &nbsp;<?= safe_html($name); ?>
+                    </a>
+                  </li>
+                  <?php endforeach; ?>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          
           <!-- User Account Menu -->
           <li class="dropdown user user-menu">
             <!-- Menu Toggle Button -->

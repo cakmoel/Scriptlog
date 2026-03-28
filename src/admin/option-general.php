@@ -3,7 +3,7 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $params = isset($_GET['Id']) ? intval($_GET['Id']) : null ;
 $configDao = class_exists('ConfigurationDao') ? new ConfigurationDao() : "";
-$configService = class_exists('ConfigurationService') ? new ConfigurationService($configDao, $validator, $sanitizer) : "";
+$configService = class_exists('ConfigurationService') ? new ConfigurationService($configDao, $app->validator, $app->sanitizer) : "";
 $configController = class_exists('ConfigurationController') ? new ConfigurationController($configService) : "";
 
 try {
@@ -12,7 +12,7 @@ try {
 
         case ActionConst::GENERAL_CONFIG:
         
-            if (false === $authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
     
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
@@ -42,7 +42,7 @@ try {
     
         default:
     
-           if (false === $authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
+           if (false === $app->authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
     
              direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     

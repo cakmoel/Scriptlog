@@ -29,7 +29,7 @@ if (empty($userActivationKey)) {
 } else {
 
   // activate user
- is_a($authenticator, 'Authentication') ?  $authenticator->activateUserAccount($userActivationKey) : "";
+ is_a($app->authenticator, 'Authentication') ?  $app->authenticator->activateUserAccount($userActivationKey) : "";
 
 }
 
