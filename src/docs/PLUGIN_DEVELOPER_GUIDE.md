@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Blogware/Scriptlog plugin system uses a hook-based architecture. Plugins register hooks using the `clip()` function, and those hooks are executed at specific points in the application.
+Scriptlog plugin system uses a hook-based architecture. Plugins register hooks using the `clip()` function, and those hooks are executed at specific points in the application.
 
 ## How Plugin Activation Works
 
