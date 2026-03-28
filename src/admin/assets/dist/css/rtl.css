@@ -1,0 +1,372 @@
+/**
+ * RTL (Right-to-Left) Support CSS for Admin Panel
+ * 
+ * This stylesheet provides RTL support for the admin interface
+ * when using languages like Arabic.
+ */
+
+body[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+}
+
+/* Main Layout */
+body[dir="rtl"] .main-sidebar {
+    right: 0;
+    left: auto;
+}
+
+body[dir="rtl"] .content-wrapper {
+    margin-right: 230px;
+    margin-left: 0;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+body[dir="rtl"] .main-footer {
+    text-align: right;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+/* Sidebar */
+body[dir="rtl"] .sidebar-menu > li > .treeview-menu {
+    padding-right: 15px;
+    padding-left: 0;
+}
+
+body[dir="rtl"] .sidebar-menu > li > a > .fa,
+body[dir="rtl"] .sidebar-menu > li > a > .glyphicon,
+body[dir="rtl"] .sidebar-menu > li > a > .ion {
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+body[dir="rtl"] .sidebar-menu li > .treeview-menu {
+    margin-right: 18px;
+    margin-left: 0;
+}
+
+body[dir="rtl"] .sidebar .sidebar-menu > li > a > .pull-right-container {
+    right: auto;
+    left: 10px;
+}
+
+/* Navbar */
+body[dir="rtl"] .navbar-custom-menu .nav > li {
+    float: right;
+}
+
+body[dir="rtl"] .navbar-custom-menu .dropdown-menu {
+    left: 0;
+    right: auto;
+    text-align: right;
+}
+
+body[dir="rtl"] .navbar .navbar-nav > li {
+    float: right;
+}
+
+body[dir="rtl"] .navbar .navbar-nav > li + li {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+body[dir="rtl"] .navbar .navbar-nav .open .dropdown-menu {
+    left: auto;
+    right: 0;
+}
+
+/* Boxes */
+body[dir="rtl"] .box .box-header .box-tools {
+    right: auto;
+    left: 10px;
+}
+
+body[dir="rtl"] .box .box-header .box-title {
+    float: right;
+}
+
+body[dir="rtl"] .box-body {
+    text-align: right;
+}
+
+/* Tables */
+body[dir="rtl"] .table > thead > tr > th,
+body[dir="rtl"] .table > tbody > tr > th,
+body[dir="rtl"] .table > tfoot > tr > th,
+body[dir="rtl"] .table > thead > tr > td,
+body[dir="rtl"] .table > tbody > tr > td,
+body[dir="rtl"] .table > tfoot > tr > td {
+    text-align: right;
+}
+
+body[dir="rtl"] .table.dataTable thead .sorting:after,
+body[dir="rtl"] .table.dataTable thead .sorting_asc:after,
+body[dir="rtl"] .table.dataTable thead .sorting_desc:after {
+    right: auto;
+    left: 8px;
+}
+
+/* Forms */
+body[dir="rtl"] .form-group label {
+    text-align: right;
+}
+
+body[dir="rtl"] .checkbox label,
+body[dir="rtl"] .radio label {
+    padding-right: 20px;
+    padding-left: 0;
+}
+
+body[dir="rtl"] .checkbox label::before,
+body[dir="rtl"] .radio label::before {
+    right: 0;
+    left: auto;
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+body[dir="rtl"] .has-feedback .form-control-feedback {
+    right: auto;
+    left: 0;
+}
+
+body[dir="rtl"] .input-group-addon {
+    border-left: 1px solid #d2d6de;
+    border-right: none;
+    border-radius: 0 4px 4px 0;
+}
+
+body[dir="rtl"] .input-group .form-control:first-child {
+    border-radius: 0 4px 4px 0;
+}
+
+body[dir="rtl"] .input-group-btn:first-child > .btn,
+body[dir="rtl"] .input-group-btn:first-child > .btn-group {
+    margin-right: 0;
+    margin-left: -1px;
+}
+
+body[dir="rtl"] .input-group-btn:last-child > .btn,
+body[dir="rtl"] .input-group-btn:last-child > .btn-group {
+    margin-left: 0;
+    margin-right: -1px;
+    border-radius: 4px 0 0 4px;
+}
+
+/* Buttons */
+body[dir="rtl"] .btn-group-vertical > .btn {
+    border-radius: 0;
+}
+
+body[dir="rtl"] .btn-group > .btn:first-child {
+    margin-right: 0;
+    margin-left: -1px;
+}
+
+body[dir="rtl"] .btn-group > .btn:last-child {
+    margin-left: 0;
+    margin-right: -1px;
+}
+
+body[dir="rtl"] .btn-group .btn + .btn {
+    margin-right: -1px;
+    margin-left: 0;
+}
+
+body[dir="rtl"] .fa {
+    direction: ltr;
+}
+
+/* Dropdown Menus */
+body[dir="rtl"] .dropdown-menu {
+    text-align: right;
+}
+
+body[dir="rtl"] .dropdown-menu > li > a {
+    text-align: right;
+}
+
+body[dir="rtl"] .dropdown-menu > li > a > .fa {
+    margin-right: 0;
+    margin-left: 5px;
+}
+
+/* Alerts */
+body[dir="rtl"] .alert-dismissable .close {
+    right: auto;
+    left: 10px;
+}
+
+/* Pagination */
+body[dir="rtl"] .pagination {
+    padding-right: 0;
+}
+
+body[dir="rtl"] .pagination > li:first-child > a,
+body[dir="rtl"] .pagination > li:first-child > span {
+    border-radius: 0 4px 4px 0;
+}
+
+body[dir="rtl"] .pagination > li:last-child > a,
+body[dir="rtl"] .pagination > li:last-child > span {
+    border-radius: 4px 0 0 4px;
+}
+
+/* Modal */
+body[dir="rtl"] .modal-header .close {
+    float: left;
+}
+
+body[dir="rtl"] .modal-footer {
+    text-align: left;
+}
+
+/* Breadcrumb */
+body[dir="rtl"] .breadcrumb {
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+body[dir="rtl"] .breadcrumb > li + li::before {
+    content: "\f104";
+    padding-right: 0;
+    padding-left: 8px;
+}
+
+/* User Panel */
+body[dir="rtl"] .user-panel > .image > img {
+    margin-left: 0;
+    margin-right: 10px;
+}
+
+body[dir="rtl"] .user-panel > .info {
+    padding-right: 10px;
+    padding-left: 0;
+}
+
+/* Control Sidebar */
+body[dir="rtl"] .control-sidebar {
+    left: 0;
+    right: auto;
+}
+
+body[dir="rtl"] .control-sidebar-bg {
+    left: 0;
+    right: auto;
+}
+
+body[dir="rtl"] .control-sidebar.control-sidebar-open,
+body[dir="rtl"] .control-sidebar.control-sidebar-open + .control-sidebar-bg {
+    left: 230px;
+    right: auto;
+}
+
+/* Tree View */
+body[dir="rtl"] .treeview-menu > li > a {
+    padding: 8px 45px 8px 8px;
+}
+
+body[dir="rtl"] .treeview > .treeview-menu {
+    padding-right: 20px;
+    padding-left: 0;
+    border-right: 3px solid;
+    border-left: none;
+}
+
+/* Content Header */
+body[dir="rtl"] .content-header .breadcrumb {
+    float: left;
+}
+
+/* Box Tools */
+body[dir="rtl"] .box-header .box-tools .btn {
+    margin-right: 0;
+    margin-left: 5px;
+}
+
+/* Callout */
+body[dir="rtl"] .callout.callout-info {
+    border-right-width: 0;
+    border-left: 4px solid #00c0ef;
+}
+
+/* Progress Bars */
+body[dir="rtl"] .progress-bar {
+    float: right;
+}
+
+/* Badges */
+body[dir="rtl"] .badge {
+    margin-left: 0;
+    margin-right: 5px;
+}
+
+/* Label */
+body[dir="rtl"] .label {
+    margin-left: 0;
+    margin-right: 3px;
+}
+
+/* Utilities */
+body[dir="rtl"] .pull-right {
+    float: left !important;
+}
+
+body[dir="rtl"] .pull-left {
+    float: right !important;
+}
+
+body[dir="rtl"] .text-right {
+    text-align: left !important;
+}
+
+body[dir="rtl"] .text-left {
+    text-align: right !important;
+}
+
+body[dir="rtl"] .mr-0,
+body[dir="rtl"] .ml-0 {
+    margin-left: 15px !important;
+    margin-right: 0 !important;
+}
+
+body[dir="rtl"] .pr-0,
+body[dir="rtl"] .pl-0 {
+    padding-right: 15px !important;
+    padding-left: 0 !important;
+}
+
+/* Small helper classes */
+body[dir="rtl"] .mar-r0 {
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+body[dir="rtl"] .mar-l0 {
+    margin-left: 0;
+    margin-right: 10px;
+}
+
+/* Select2 */
+body[dir="rtl"] .select2-container .select2-selection--single {
+    text-align: right;
+}
+
+body[dir="rtl"] .select2-container--default .select2-selection--single .select2-selection__arrow {
+    right: auto;
+    left: 5px;
+}
+
+/* iCheck */
+body[dir="rtl"] .icheckbox_flat-green,
+body[dir="rtl"] .iradio_flat-green {
+    margin-right: 0;
+    margin-left: 5px;
+}
+
+/* Bootbox overrides for RTL */
+body[dir="rtl"] .bootbox .modal-footer {
+    text-align: left;
+}

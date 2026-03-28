@@ -3,7 +3,7 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $topicId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $topicDao = class_exists('TopicDao') ? new TopicDao() : "";
-$topicService = class_exists('TopicService') ? new TopicService($topicDao, $validator, $sanitizer) : "";
+$topicService = class_exists('TopicService') ? new TopicService($topicDao, $app->validator, $app->sanitizer) : "";
 $topicController = class_exists('TopicController') ? new TopicController($topicService) : "";
 
 try {
@@ -12,7 +12,7 @@ try {
 
         case ActionConst::NEWTOPIC:
 
-            if (false === $authenticator->userAccessControl(ActionConst::TOPICS)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::TOPICS)) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
@@ -37,7 +37,7 @@ try {
 
         case ActionConst::EDITTOPIC:
 
-            if (false === $authenticator->userAccessControl(ActionConst::TOPICS)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::TOPICS)) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
@@ -49,7 +49,7 @@ try {
                     throw new AppException("Invalid ID data type");
                 }
 
-                if ($topicDao->checkTopicId($topicId, $sanitizer)) {
+                if ($topicDao->checkTopicId($topicId, $app->sanitizer)) {
 
                     $topicController->update((int)$topicId);
                 } else {
@@ -69,12 +69,12 @@ try {
                 throw new AppException("Invalid ID data type");
             }
 
-            if (false === $authenticator->userAccessControl(ActionConst::TOPICS)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::TOPICS)) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
 
-                if ($topicDao->checkTopicId($topicId, $sanitizer)) {
+                if ($topicDao->checkTopicId($topicId, $app->sanitizer)) {
 
                     $topicController->remove((int)$topicId);
                 } else {
@@ -87,7 +87,7 @@ try {
 
         default:
 
-            if (false === $authenticator->userAccessControl(ActionConst::TOPICS)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::TOPICS)) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {

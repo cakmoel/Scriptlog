@@ -3,7 +3,7 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";  
 $commentId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $commentDao = class_exists('CommentDao') ? new CommentDao() : "";
-$commentService = class_exists('CommentService') ? new CommentService($commentDao, $validator, $sanitizer) : "";
+$commentService = class_exists('CommentService') ? new CommentService($commentDao, $app->validator, $app->sanitizer) : "";
 $commentController = class_exists('CommentController') ?new CommentController($commentService) : "";
     
 try {
@@ -12,13 +12,13 @@ try {
         
         case ActionConst::EDITCOMMENT:
             
-            if (false === $authenticator->userAccessControl(ActionConst::COMMENTS)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::COMMENTS)) {
 
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 
             } else {
 
-                if ($commentDao->checkCommentId($commentId, $sanitizer)) {
+                if ($commentDao->checkCommentId($commentId, $app->sanitizer)) {
                 
                     $commentController->update((int)$commentId);
                     
@@ -34,7 +34,7 @@ try {
      
         case ActionConst::DELETECOMMENT:
             
-            if (false === $authenticator->userAccessControl(ActionConst::COMMENTS)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::COMMENTS)) {
 
                 direct_page('index.php?load=403&');
                 
@@ -48,7 +48,7 @@ try {
 
                 }
 
-                if ($commentDao->checkCommentId($commentId, $sanitizer)) {
+                if ($commentDao->checkCommentId($commentId, $app->sanitizer)) {
 
                     $commentController->remove((int)$commentId);
 
@@ -64,7 +64,7 @@ try {
             
         default:
             
-            if (false === $authenticator->userAccessControl(ActionConst::COMMENTS)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::COMMENTS)) {
 
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
 

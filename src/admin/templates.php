@@ -3,7 +3,7 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $themeId = isset($_GET['Id']) ? abs((int)$_GET['Id']) : 0;
 $themeDao = class_exists('ThemeDao') ? new ThemeDao() : "";
-$themeService = class_exists('ThemeService') ? new ThemeService($themeDao, $validator, $sanitizer) : "";
+$themeService = class_exists('ThemeService') ? new ThemeService($themeDao, $app->validator, $app->sanitizer) : "";
 $themeController = class_exists('ThemeController') ? new ThemeController($themeService) : "";
 
 try {
@@ -12,7 +12,7 @@ try {
 
         case ActionConst::NEWTHEME:
 
-            if (false === $authenticator->userAccessControl(ActionConst::THEMES)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::THEMES)) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
@@ -37,7 +37,7 @@ try {
 
         case ActionConst::INSTALLTHEME:
 
-            if (false === $authenticator->userAccessControl(ActionConst::THEMES)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::THEMES)) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
@@ -60,7 +60,7 @@ try {
 
         case ActionConst::EDITTHEME:
 
-            if (false === $authenticator->userAccessControl(ActionConst::THEMES)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::THEMES)) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
@@ -72,7 +72,7 @@ try {
                     throw new AppException("Invalid ID data type!");
                 }
 
-                if ($themeDao->checkThemeId($themeId, $sanitizer)) {
+                if ($themeDao->checkThemeId($themeId, $app->sanitizer)) {
 
                     $themeController->update((int)$themeId);
                 } else {
@@ -92,12 +92,12 @@ try {
                 throw new AppException("Invalid ID data type!");
             }
 
-            if (false === $authenticator->userAccessControl(ActionConst::THEMES)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::THEMES)) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
 
-                if ($themeDao->checkThemeId($themeId, $sanitizer)) {
+                if ($themeDao->checkThemeId($themeId, $app->sanitizer)) {
 
                     $themeController->remove((int)$themeId);
                 } else {
@@ -117,12 +117,12 @@ try {
                 throw new AppException("Invalid ID data type!");
             }
 
-            if (false === $authenticator->userAccessControl(ActionConst::THEMES)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::THEMES)) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
 
-                if ($themeDao->checkThemeId($themeId, $sanitizer)) {
+                if ($themeDao->checkThemeId($themeId, $app->sanitizer)) {
 
                     $themeController->enableTheme((int)$themeId);
                 } else {
@@ -135,7 +135,7 @@ try {
 
         default:
 
-            if (false === $authenticator->userAccessControl(ActionConst::THEMES)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::THEMES)) {
 
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {

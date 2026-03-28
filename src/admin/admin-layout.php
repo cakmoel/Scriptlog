@@ -1,9 +1,11 @@
 <?php  
 function admin_header($stylePath, $breadcrumb = null) 
 {  
+    $adminLocale = admin_get_locale();
+    $isRtl = admin_is_rtl();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= safe_html($adminLocale); ?>" dir="<?= $isRtl ? 'rtl' : 'ltr'; ?>">
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -31,6 +33,10 @@ function admin_header($stylePath, $breadcrumb = null)
   <!-- Theme style -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/AdminLTE.min.css">
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/skins/scriptlog-skin.css">
+  <?php if ($isRtl): ?>
+  <!-- RTL Support -->
+  <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/rtl.css">
+  <?php endif; ?>
   <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/ie10-viewport-bug-workaround.css">
   <!-- Image Preview -->

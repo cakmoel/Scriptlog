@@ -3,7 +3,7 @@
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $pageId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $pageDao = class_exists('PageDao') ? new PageDao() : "";
-$pageService = class_exists('PageService') ? new PageService($pageDao, $validator, $sanitizer) : "";
+$pageService = class_exists('PageService') ? new PageService($pageDao, $app->validator, $app->sanitizer) : "";
 $pageController = class_exists('PageController') ? new PageController($pageService) : "";
 
 try {
@@ -12,7 +12,7 @@ try {
     
         case ActionConst::NEWPAGE:
         
-            if (false === $authenticator->userAccessControl(ActionConst::PAGES)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::PAGES)) {
     
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
@@ -42,7 +42,7 @@ try {
         
         case ActionConst::EDITPAGE:
             
-            if (false === $authenticator->userAccessControl(ActionConst::PAGES)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::PAGES)) {
     
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
@@ -56,7 +56,7 @@ try {
        
                 }
     
-                if ($pageDao->checkPageId($pageId, $sanitizer)) {
+                if ($pageDao->checkPageId($pageId, $app->sanitizer)) {
                 
                     $pageController->update((int)$pageId);
                     
@@ -72,7 +72,7 @@ try {
             
         case ActionConst::DELETEPAGE:
             
-            if (false === $authenticator->userAccessControl(ActionConst::PAGES)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::PAGES)) {
     
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     
@@ -86,7 +86,7 @@ try {
     
                 }
     
-                if ($pageDao->checkPageId($pageId, $sanitizer)) {
+                if ($pageDao->checkPageId($pageId, $app->sanitizer)) {
     
                     $pageController->remove((int)$pageId);
     
@@ -102,7 +102,7 @@ try {
         
         default:
              
-            if (false === $authenticator->userAccessControl(ActionConst::PAGES)) {
+            if (false === $app->authenticator->userAccessControl(ActionConst::PAGES)) {
                 
                 direct_page('index.php?load=403&forbidden='.forbidden_id(), 403);
     

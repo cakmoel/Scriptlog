@@ -22,14 +22,16 @@
          <div class="col-md-8">
             <!-- general form elements -->
             <div class="box box-primary">
-               <div class="box-header with-border"></div>
+               <div class="box-header with-border">
+                  <h3 class="box-title">Post Content</h3>
+               </div>
                <!-- /.box-header -->
                <?php
                  if (isset($errors)) :
                ?>
-                  <div class="alert alert-danger alert-dismissible">
-                     <button type="button" class="close" data-dismiss="alert" >&times;</button>
-                     <h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
+                  <div class="alert alert-danger alert-dismissible" role="alert">
+                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">&times;</button>
+                     <h4><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h4>
 
                      <?php
                      foreach ($errors as $e) :
@@ -55,69 +57,57 @@
                   <div class="box-body">
 
                      <div class="form-group">
-                        <label for="title">Title (required)</label>
-                        <input type="text" class="form-control" id="title" name="post_title" placeholder="Enter title here" value="
-<?= (isset($postData['post_title'])) ? safe_html($postData['post_title']) : ""; ?>
-<?= (isset($formData['post_title'])) ? safe_html($formData['post_title']) : ""; ?>" maxlength="200" required>
+                        <label for="title">Title <span class="text-red" title="required">*</span></label>
+                        <input type="text" class="form-control" id="title" name="post_title" placeholder="Enter title here" value="<?= (isset($postData['post_title'])) ? safe_html($postData['post_title']) : ""; ?><?= (isset($formData['post_title'])) ? safe_html($formData['post_title']) : ""; ?>" maxlength="200" required aria-required="true">
                      </div>
 
                      <div class="form-group">
-                        <label for="summernote">Content (required)</label>
-                        <textarea class="form-control" id="summernote" name="post_content" rows="10" cols="80" maxlength="50000" required>
-<?= (isset($postData['post_content']) ? safe_html($postData['post_content']) : ""); ?>
-<?= (isset($formData['post_content']) ? safe_html($formData['post_content']) : ""); ?>
-                      </textarea>
+                        <label for="summernote">Content <span class="text-red" title="required">*</span></label>
+                        <textarea class="form-control" id="summernote" name="post_content" rows="10" cols="80" maxlength="50000" required aria-required="true"><?= (isset($postData['post_content']) ? safe_html($postData['post_content']) : ""); ?><?= (isset($formData['post_content']) ? safe_html($formData['post_content']) : ""); ?></textarea>
                      </div>
 
                      <div class="form-group">
                         <label for="meta_desc">Meta Description</label>
-                        <textarea class="form-control" id="meta_desc" rows="3" placeholder="Enter ..." name="post_summary" maxlength="320">
-<?= (isset($postData['post_summary'])) ? safe_html($postData['post_summary']) : ""; ?>
-<?= (isset($formData['post_summary'])) ? safe_html($formData['post_summary']) : ""; ?>
-</textarea>
-                        <p class="help-block">Maximum 320 characters</p>
+                        <textarea class="form-control" id="meta_desc" rows="3" placeholder="Brief summary for search engines..." name="post_summary" maxlength="320" aria-describedby="metaDescHelp"><?= (isset($postData['post_summary'])) ? safe_html($postData['post_summary']) : ""; ?><?= (isset($formData['post_summary'])) ? safe_html($formData['post_summary']) : ""; ?></textarea>
+                        <p id="metaDescHelp" class="help-block">Maximum 320 characters. This summary appears in search engine results.</p>
                      </div>
 
                      <div class="form-group">
                         <label>Featured post</label>
-
+                        <p class="help-block">Highlight this post as a headline or sticky content.</p>
                         <div class="radio">
                            <label for="headlines">
-                              <input type="radio" id="headlines" name="post_headlines" class="flat-red" value="1" <?= (isset($postData['post_headlines']) && $postData['post_headlines'] === 1 ? " checked" : ""); ?> <?= (isset($formData['post_headlines']) && $formData['post_headlines'] === 1 ? " checked" : ""); ?>> Yes
+                              <input type="radio" id="headlines" name="post_headlines" class="flat-red" value="1" <?= (isset($postData['post_headlines']) && $postData['post_headlines'] === 1 ? " checked" : ""); ?> <?= (isset($formData['post_headlines']) && $formData['post_headlines'] === 1 ? " checked" : ""); ?>> Yes, make this post featured
                            </label>
                         </div>
 
                         <div class="radio">
                            <label for="sticky">
-                              <input type="radio" id="sticky" name="post_headlines" class="flat-red" value="0" <?= (isset($postData['post_headlines']) && $postData['post_headlines'] === 0 ? " checked" : ""); ?> <?= (isset($formData['post_headlines']) && $formData['post_headlines'] === 0 ? " checked" : ""); ?>> No
+                              <input type="radio" id="sticky" name="post_headlines" class="flat-red" value="0" <?= (isset($postData['post_headlines']) && $postData['post_headlines'] === 0 ? " checked" : ""); ?> <?= (isset($formData['post_headlines']) && $formData['post_headlines'] === 0 ? " checked" : ""); ?>> No, standard post
                            </label>
                         </div>
 
                      </div>
 
                      <div class="form-group">
-                        <label for="datepicker">Date</label>
+                        <label for="datetimepicker">Publication Date</label>
                         <div class="input-group date">
                            <div class="input-group-addon">
                               <i class="fa fa-calendar" aria-hidden="true"></i>
                            </div>
 
-               <input type="text" id="datetimepicker" name="<?= (isset($postData['post_modified']) ? "post_modified" : "post_date"); ?>" class="form-control" placeholder="Date" value="
-<?php
+               <input type="text" id="datetimepicker" name="<?= (isset($postData['post_modified']) ? "post_modified" : "post_date"); ?>" class="form-control" placeholder="YYYY-MM-DD HH:MM:SS" value="<?php
 if (isset($postData['post_modified']) || isset($postData['post_date'])) {
-
    if ($postData['post_modified'] === null) {
-
       echo make_date(safe_html($postData['post_date']));
-      
    } else {
-
       echo make_date(safe_html($postData['post_modified']));
    }
 }
 ?>">
 
                         </div>
+                        <p class="help-block">Schedule or backdate your post if needed.</p>
                      </div>
                      <!-- /.Date -->
 
@@ -136,7 +126,9 @@ if (isset($postData['post_modified']) || isset($postData['post_date'])) {
 
             <!-- general form elements disabled -->
             <div class="box box-info">
-               <div class="box-header with-border"></div>
+               <div class="box-header with-border">
+                  <h3 class="box-title">Publishing Options</h3>
+               </div>
                <!-- /.box-header -->
                <div class="box-body">
                   <!-- text input -->
@@ -145,12 +137,9 @@ if (isset($postData['post_modified']) || isset($postData['post_date'])) {
 
                   <div class="form-group">
                      <label for="tags">Tags</label>
-<textarea class="form-control" id="tags" rows="3" name="post_tags" maxlength="200">
-<?= (isset($postData['post_tags'])) ? safe_html($postData['post_tags']) : ""; ?>
-<?= (isset($formData['post_tags'])) ? safe_html($formData['post_tags']) : ""; ?>   
-</textarea>
+<textarea class="form-control" id="tags" rows="3" name="post_tags" maxlength="200" placeholder="e.g. news, update, tutorial" aria-describedby="tagsHelp"><?= (isset($postData['post_tags'])) ? safe_html($postData['post_tags']) : ""; ?><?= (isset($formData['post_tags'])) ? safe_html($formData['post_tags']) : ""; ?></textarea>
                      <div id="suggesstion-box"></div>
-                     <p class="help-block">Separate with commas or the Enter key.</p>
+                     <p id="tagsHelp" class="help-block">Separate tags with commas or the Enter key.</p>
                   </div>
 
                   <?= (isset($medialibs)) ? $medialibs : "Media Not Found"; ?>
@@ -167,7 +156,13 @@ if (isset($postData['post_modified']) || isset($postData['post_date'])) {
 
                   <div class="box-footer">
                      <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
-                     <input type="submit" class="btn btn-primary" name="postFormSubmit" value="<?= ((isset($post_id)) && ($post_id === 0) ? "Publish" : "Update"); ?>">
+                     <a href="index.php?load=posts" class="btn btn-default" role="button" aria-label="Cancel and return to posts list">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                     </a>
+                     <button type="submit" class="btn btn-primary pull-right" name="postFormSubmit" aria-label="<?= ((isset($post_id)) && ($post_id === 0) ? "Publish Post" : "Update Post"); ?>">
+                        <i class="fa <?= ((isset($post_id)) && ($post_id === 0) ? "fa-paper-plane" : "fa-save"); ?>" aria-hidden="true"></i> 
+                        <?= ((isset($post_id)) && ($post_id === 0) ? "Publish" : "Update"); ?>
+                     </button>
                   </div>
 
                   </form>

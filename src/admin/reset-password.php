@@ -50,7 +50,7 @@ if (isset($_POST['Reset'])) {
 
      $errors['errorMessage'] = "Please enter a valid email address";
 
-  } elseif ($authenticator->checkEmailExists($user_email) == false) {
+  } elseif ($app->authenticator->checkEmailExists($user_email) == false) {
 
      $errors['errorMessage'] = "No user account was found with the email address you entered";
 
@@ -58,7 +58,7 @@ if (isset($_POST['Reset'])) {
     
     if ($captcha === true) {
 
-      $authenticator->resetUserPassword($user_email);
+      $app->authenticator->resetUserPassword($user_email);
 
       direct_page('reset-password.php?status=reset', 200);
        

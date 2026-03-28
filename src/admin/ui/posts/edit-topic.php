@@ -1,5 +1,10 @@
 <?php if (!defined('SCRIPTLOG')) exit(); ?>
 
+<?php
+$action = (isset($formAction)) ? $formAction : null;
+$topic_id = (isset($topicData)) ? abs((int)$topicData['ID']) : 0;
+?>
+
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
     <section class="content-header">
@@ -19,15 +24,17 @@
 <div class="row">
 <div class="col-md-6">
 <div class="box box-primary">
-<div class="box-header with-border"></div>
+<div class="box-header with-border">
+  <h3 class="box-title"><?=(($topic_id) && ($topic_id != '')) ? "Edit Category" : "Add New Category" ?></h3>
+</div>
 <!-- /.box-header -->
 
 <?php
 if (isset($errors)) :
 ?>
-<div class="alert alert-danger alert-dismissible">
-<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
+<div class="alert alert-danger alert-dismissible" role="alert">
+<button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">&times;</button>
+<h4><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h4>
 <?php 
 foreach ($errors as $e) :
 echo '<p>' . $e . '</p>';
@@ -38,33 +45,27 @@ endforeach;
 endif;
 ?>
 
-<?php
-$action = (isset($formAction)) ? $formAction : null;
-$topic_id = (isset($topicData)) ? abs((int)$topicData['ID']) : 0;
-?>
-
 <form method="post" action="<?=generate_request('index.php', 'post', ['topics', $action, $topic_id])['link']?>">
 <input type="hidden" name="topic_id" value="<?=$topic_id; ?>">
 
 <div class="box-body">
 <div class="form-group">
-<label for="title">Title (required)</label>
-<input type="text" class="form-control" id="title" name="topic_title" placeholder="Enter title here" value="
-<?=(isset($topicData['topic_title'])) ? safe_html($topicData['topic_title']) : ""; ?>
-<?=(isset($formData['topic_title'])) ? safe_html($formData['topic_title']) : ""; ?>" required>
+<label for="title">Title <span class="text-red" title="required">*</span></label>
+<input type="text" class="form-control" id="title" name="topic_title" placeholder="e.g. Technology, Lifestyle, News" value="<?=(isset($topicData['topic_title'])) ? safe_html($topicData['topic_title']) : ""; ?><?=(isset($formData['topic_title'])) ? safe_html($formData['topic_title']) : ""; ?>" required aria-required="true">
+<p class="help-block">Enter a unique and descriptive name for this category.</p>
 </div>
 
 <?php if (isset($topicData['topic_status'])) : ?>
   
 <div class="form-group">
-<label>Actived</label>
-
+<label>Active Status</label>
+<p class="help-block">Disable this to hide all posts in this category from the public view.</p>
 <div class="radio">
 <label for="optionsRadios1">
 <input type="radio" name="topic_status" id="optionsRadios1" value="Y" 
 <?=(isset($topicData['topic_status']) && $topicData['topic_status'] === 'Y') ? 'checked="checked"' : "";  ?>
 <?=(isset($formData['topic_status']) && $formData['topic_status'] === 'Y') ? 'checked="checked"' : "" ?>>
-   Yes
+   Yes, keep this category active
  </label>
 </div>
 
@@ -73,7 +74,7 @@ $topic_id = (isset($topicData)) ? abs((int)$topicData['ID']) : 0;
 <input type="radio" name="topic_status" id="optionsRadios2" value="N" 
 <?=(isset($topicData['topic_status']) && $topicData['topic_status'] === 'N') ? 'checked="checked"' : ""; ?>
 <?=(isset($formData['topic_status']) && $formData['topic_status'] === 'N') ? 'checked="checked"' : ""; ?>>
-   No
+   No, deactivate this category
  </label>
 </div>
 
@@ -88,7 +89,13 @@ endif;
 
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
-<input type="submit" name="topicFormSubmit" class="btn btn-primary" value="<?=(($topic_id) && ($topic_id != '')) ? "Update" : "Add New Category" ?>">
+<a href="index.php?load=topics" class="btn btn-default" role="button" aria-label="Cancel and return to categories list">
+  <i class="fa fa-times" aria-hidden="true"></i> Cancel
+</a>
+<button type="submit" name="topicFormSubmit" class="btn btn-primary pull-right" aria-label="<?=(($topic_id) && ($topic_id != '')) ? "Update Category" : "Add New Category" ?>">
+  <i class="fa <?= (($topic_id) && ($topic_id != '')) ? "fa-save" : "fa-plus"; ?>" aria-hidden="true"></i> 
+  <?=(($topic_id) && ($topic_id != '')) ? "Update" : "Add Category" ?>
+</button>
 </div>
 </form>
             

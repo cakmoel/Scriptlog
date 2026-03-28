@@ -23,7 +23,7 @@ if (file_exists(__DIR__ . '/../config.php')) {
 $stop = null;
 
 $tempKey = isset($_GET['tempKey']) ? escape_html($_GET['tempKey']) : "";
-$user = $userDao->getUserByResetKey($tempKey);
+$user = $app->userDao->getUserByResetKey($tempKey);
 
 if (empty($user['user_reset_key'])) {
     
@@ -64,7 +64,7 @@ if (isset($_POST['Change']) && $_POST['Change'] == 'Change Password') {
 
   } else {
 
-    $authenticator->updateNewPassword($password, abs((int)$user['ID']), $user['user_email']);
+    $app->authenticator->updateNewPassword($password, abs((int)$user['ID']), $user['user_email']);
     direct_page('login.php?status=changed', 302);
 
   }
