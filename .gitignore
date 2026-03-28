@@ -27,3 +27,6 @@ sess_*
 
 # Build
 node_modules/
+
+# lts
+*.txt
