@@ -136,6 +136,37 @@ try {
           theme_directory VARCHAR(100) NOT NULL,
           theme_status enum("Y","N") NOT NULL DEFAULT "N",
           PRIMARY KEY(ID)
+        )Engine=InnoDB DEFAULT CHARSET=utf8mb4',
+
+        'CREATE TABLE IF NOT EXISTS tbl_languages (
+          ID INT(11) unsigned NOT NULL AUTO_INCREMENT,
+          lang_code VARCHAR(10) NOT NULL,
+          lang_name VARCHAR(50) NOT NULL,
+          lang_native VARCHAR(50) NOT NULL,
+          lang_locale VARCHAR(10) DEFAULT NULL,
+          lang_direction ENUM("ltr","rtl") DEFAULT "ltr",
+          lang_sort INT(11) DEFAULT 0,
+          lang_is_default TINYINT(1) DEFAULT 0,
+          lang_is_active TINYINT(1) DEFAULT 1,
+          lang_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (ID),
+          UNIQUE KEY lang_code (lang_code)
+        )Engine=InnoDB DEFAULT CHARSET=utf8mb4',
+
+        'CREATE TABLE IF NOT EXISTS tbl_translations (
+          ID BIGINT(20) unsigned NOT NULL AUTO_INCREMENT,
+          lang_id INT(11) unsigned NOT NULL,
+          translation_key VARCHAR(255) NOT NULL,
+          translation_value TEXT NOT NULL,
+          translation_context VARCHAR(100) DEFAULT NULL,
+          translation_plurals VARCHAR(255) DEFAULT NULL,
+          is_html TINYINT(1) DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+          PRIMARY KEY (ID),
+          UNIQUE KEY lang_key (lang_id, translation_key),
+          KEY lang_id (lang_id),
+          KEY translation_key (translation_key(191))
         )Engine=InnoDB DEFAULT CHARSET=utf8mb4'
     ];
     

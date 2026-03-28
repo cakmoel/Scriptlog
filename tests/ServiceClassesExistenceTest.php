@@ -66,4 +66,9 @@ class ServiceClassesExistenceTest extends TestCase
     {
         $this->assertTrue(class_exists('ConsentService'));
     }
+    
+    public function testDownloadServiceClassExists(): void
+    {
+        $this->assertTrue(class_exists('DownloadService'));
+    }
 }
