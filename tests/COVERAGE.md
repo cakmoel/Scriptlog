@@ -2,7 +2,7 @@
 
 ## Summary
 
-**Date:** March 18, 2026  
+**Date:** March 28, 2026  
 **PHPUnit Version:** 9.6.34  
 **PHP Version:** 8.3.30 (running with 7.4.33 platform config)
 
@@ -12,11 +12,12 @@
 
 | Status | Count |
 |--------|-------|
-| Tests Passed | 438 |
-| Tests Total | 438 |
-| Assertions | ~500+ |
+| Tests Passed | 790 |
+| Tests Total | 790 |
+| Assertions | ~900+ |
 | Failures | 0 |
-| Errors | 0 (with bootstrap_integration.php) |
+| Errors | 0 |
+| Skipped | 2 (HTMLPurifier tests in CLI context) |
 
 ---
 
@@ -106,6 +107,19 @@ lib/vendor/bin/phpunit
 - GDPR data requests and consent management
 - Actual DAO layer execution
 
+### Service Tests (148 tests)
+- CommentService (10 tests)
+- ConfigurationService (10 tests)
+- MediaService (16 tests)
+- MenuService (14 tests)
+- NotificationService (14 tests)
+- PageService (16 tests)
+- PluginService (13 tests)
+- PostService (24 tests)
+- ThemeService (10 tests)
+- TopicService (7 tests)
+- UserService (18 tests)
+
 ### Unit Tests (~390 tests)
 - Utility function tests (106+ functions tested)
 - Core class existence tests
@@ -113,6 +127,7 @@ lib/vendor/bin/phpunit
 - DAO class existence tests
 - Controller class existence tests
 - Model class existence tests
+- Validation tests
 
 ---
 
