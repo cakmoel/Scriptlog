@@ -75,6 +75,7 @@ class CommentController extends BaseApp
     $this->view->set('pageTitle', $this->getPageTitle());
     $this->view->set('totalComments', $this->commentService->totalComments());
     $this->view->set('comments', $this->commentService->grabComments());
+    $this->view->set('commentService', $this->commentService);
     
     return $this->view->render();
     
