@@ -29,7 +29,18 @@ if (file_exists(__DIR__ . '/../config.php')) {
 }
 
 // Set CORS headers for cross-origin requests
-header('Access-Control-Allow-Origin: *');
+$allowed_origins = !empty($config['api']['allowed_origins']) ? $config['api']['allowed_origins'] : '';
+$request_origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$allowed_list = array_filter(array_map('trim', explode(',', $allowed_origins)));
+
+if (in_array($request_origin, $allowed_list, true)) {
+    header('Access-Control-Allow-Origin: ' . $request_origin);
+    header('Access-Control-Allow-Credentials: true');
+} elseif (!empty($allowed_list[0])) {
+    header('Access-Control-Allow-Origin: ' . $allowed_list[0]);
+    header('Access-Control-Allow-Credentials: true');
+}
+
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-API-Key, X-Requested-With');
 header('Access-Control-Max-Age: 3600');
@@ -43,22 +54,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Set error reporting for API (production should disable this)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+error_reporting(0);
+ini_set('display_errors', 0);
 
 // Start output buffering for clean JSON responses
 ob_start();
 
 // Load required core files
 require_once __DIR__ . '/../lib/main.php';
-require_once __DIR__ . '/lib/core/ApiAuth.php';
-require_once __DIR__ . '/lib/core/ApiResponse.php';
-require_once __DIR__ . '/lib/core/ApiRouter.php';
-require_once __DIR__ . '/lib/controller/ApiController.php';
-require_once __DIR__ . '/lib/controller/api/PostsApiController.php';
-require_once __DIR__ . '/lib/controller/api/CategoriesApiController.php';
-require_once __DIR__ . '/lib/controller/api/CommentsApiController.php';
-require_once __DIR__ . '/lib/controller/api/ArchivesApiController.php';
+require_once __DIR__ . '/../lib/core/ApiAuth.php';
+require_once __DIR__ . '/../lib/core/ApiResponse.php';
+require_once __DIR__ . '/../lib/core/ApiRouter.php';
+require_once __DIR__ . '/../lib/controller/ApiController.php';
+require_once __DIR__ . '/../lib/controller/api/PostsApiController.php';
+require_once __DIR__ . '/../lib/controller/api/CategoriesApiController.php';
+require_once __DIR__ . '/../lib/controller/api/CommentsApiController.php';
+require_once __DIR__ . '/../lib/controller/api/ArchivesApiController.php';
+require_once __DIR__ . '/../lib/controller/api/GdprApiController.php';
+require_once __DIR__ . '/../lib/controller/api/LanguagesApiController.php';
+require_once __DIR__ . '/../lib/controller/api/TranslationsApiController.php';
+require_once __DIR__ . '/../lib/controller/api/SearchApiController.php';
 
 // Initialize API
 try {
@@ -105,6 +120,35 @@ try {
     $router->get('archives', 'ArchivesApiController@index');
     $router->get('archives/([0-9]{4})', 'ArchivesApiController@year');
     $router->get('archives/([0-9]{4})/([0-9]{2})', 'ArchivesApiController@month');
+    
+    // Search API
+    $router->get('search', 'SearchApiController@index');
+    $router->get('search/posts', 'SearchApiController@posts');
+    $router->get('search/pages', 'SearchApiController@pages');
+    
+    // GDPR API
+    $router->post('gdpr/consent', 'GdprApiController@consent');
+    $router->get('gdpr/consent', 'GdprApiController@getConsentStatus');
+    
+    // Languages API
+    $router->get('languages', 'LanguagesApiController@index');
+    $router->get('languages/active', 'LanguagesApiController@index');
+    $router->get('languages/default', 'LanguagesApiController@default');
+    $router->get('languages/([a-z]{2})', 'LanguagesApiController@show');
+    $router->post('languages', 'LanguagesApiController@store');
+    $router->put('languages/([a-z]{2})', 'LanguagesApiController@update');
+    $router->delete('languages/([a-z]{2})', 'LanguagesApiController@destroy');
+    $router->post('languages/([a-z]{2})/default', 'LanguagesApiController@setDefault');
+    
+    // Translations API
+    $router->get('translations/([a-z]{2})', 'TranslationsApiController@index');
+    $router->get('translations/([a-z]{2})/([a-zA-Z0-9._-]+)', 'TranslationsApiController@show');
+    $router->post('translations/([a-z]{2})', 'TranslationsApiController@store');
+    $router->put('translations/([0-9]+)', 'TranslationsApiController@update');
+    $router->delete('translations/([0-9]+)', 'TranslationsApiController@destroy');
+    $router->get('translations/([a-z]{2})/export', 'TranslationsApiController@export');
+    $router->post('translations/([a-z]{2})/import', 'TranslationsApiController@import');
+    $router->post('translations/([a-z]{2})/cache', 'TranslationsApiController@cache');
     
     // API OpenAPI spec endpoint
     $router->get('openapi.json', function($params) {
