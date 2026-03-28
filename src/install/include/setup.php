@@ -229,6 +229,15 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
   $setting_prefix_key = "tbl_prefix";
   $setting_prefix_value = $prefix;
 
+  // SMTP Settings
+  $smtp_host = "smtp_host";
+  $smtp_port = "smtp_port";
+  $smtp_encryption = "smtp_encryption";
+  $smtp_username = "smtp_username";
+  $smtp_password = "smtp_password";
+  $smtp_from_email = "smtp_from_email";
+  $smtp_from_name = "smtp_from_name";
+
   if ($link instanceof mysqli) {
     #create users table
     $link->query($tblUser);
@@ -258,6 +267,11 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
       $link->query($tblPlugin);
       $link->query($tblSetting);
       $link->query($tblTheme);
+      $link->query($tblConsents);
+      $link->query($tblDataRequests);
+      $link->query($tblPrivacyLogs);
+      $link->query($tblLanguage);
+      $link->query($tblTranslation);
 
       // insert configuration - app_key
       $recordAppKey = $link->prepare($saveSettings);
@@ -334,16 +348,150 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
       $recordTblPrefix->bind_param('ss', $setting_prefix_key, $setting_prefix_value);
       $recordTblPrefix->execute();
 
+      // insert SMTP settings
+      $smtp_port_val = "587";
+      $smtp_enc_val = "tls";
+      $smtp_name_val = "Blogware";
+
+      $recordSmtpHost = $link->prepare($saveSettings);
+      $recordSmtpHost->bind_param('ss', $smtp_host, $dbhost); // default to localhost/dbhost or empty
+      $recordSmtpHost->execute();
+
+      $recordSmtpPort = $link->prepare($saveSettings);
+      $recordSmtpPort->bind_param('ss', $smtp_port, $smtp_port_val);
+      $recordSmtpPort->execute();
+
+      $recordSmtpEnc = $link->prepare($saveSettings);
+      $recordSmtpEnc->bind_param('ss', $smtp_encryption, $smtp_enc_val);
+      $recordSmtpEnc->execute();
+
+      $recordSmtpUser = $link->prepare($saveSettings);
+      $recordSmtpUser->bind_param('ss', $smtp_username, $user_email);
+      $recordSmtpUser->execute();
+
+      $recordSmtpPass = $link->prepare($saveSettings);
+      $empty_pass = "";
+      $recordSmtpPass->bind_param('ss', $smtp_password, $empty_pass);
+      $recordSmtpPass->execute();
+
+      $recordSmtpFromEmail = $link->prepare($saveSettings);
+      $recordSmtpFromEmail->bind_param('ss', $smtp_from_email, $user_email);
+      $recordSmtpFromEmail->execute();
+
+      $recordSmtpFromName = $link->prepare($saveSettings);
+      $recordSmtpFromName->bind_param('ss', $smtp_from_name, $smtp_name_val);
+      $recordSmtpFromName->execute();
+
+      // insert language settings
+      $link->query($insertLangSettings);
+
       // insert default theme
       $recordTheme = $link->prepare($saveTheme);
       $recordTheme->bind_param("sssss", $theme_title, $theme_desc, $theme_designer, $theme_directory, $theme_status);
       $recordTheme->execute();
 
       if ($recordAppKey->affected_rows > 0) {
+        
+        install_i18n_data($link, $prefix);
+        
         $link->close();
       }
     }
   }
+}
+
+/**
+ * install_i18n_data()
+ * 
+ * Populate languages and translations tables with initial data
+ * 
+ * @param object $link
+ * @param string $prefix
+ * @return void
+ */
+function install_i18n_data($link, $prefix = '')
+{
+  $languages = [
+    'en' => ['name' => 'English', 'native' => 'English', 'locale' => 'en_US', 'direction' => 'ltr', 'sort' => 1, 'is_default' => 1],
+    'ar' => ['name' => 'Arabic', 'native' => 'العربية', 'locale' => 'ar_SA', 'direction' => 'rtl', 'sort' => 2, 'is_default' => 0],
+    'zh' => ['name' => 'Chinese', 'native' => '中文', 'locale' => 'zh_CN', 'direction' => 'ltr', 'sort' => 3, 'is_default' => 0],
+    'fr' => ['name' => 'French', 'native' => 'Français', 'locale' => 'fr_FR', 'direction' => 'ltr', 'sort' => 4, 'is_default' => 0],
+    'ru' => ['name' => 'Russian', 'native' => 'Русский', 'locale' => 'ru_RU', 'direction' => 'ltr', 'sort' => 5, 'is_default' => 0],
+    'es' => ['name' => 'Spanish', 'native' => 'Español', 'locale' => 'es_ES', 'direction' => 'ltr', 'sort' => 6, 'is_default' => 0],
+    'id' => ['name' => 'Indonesian', 'native' => 'Bahasa Indonesia', 'locale' => 'id_ID', 'direction' => 'ltr', 'sort' => 7, 'is_default' => 0],
+  ];
+
+  $translations = [
+    'navigation' => [
+      'nav.dashboard' => ['Dashboard', 'لوحة القيادة', '仪表盘', 'Tableau de bord', 'Панель управления', 'Panel de control', 'Dasbor'],
+      'nav.posts' => ['Posts', 'المقالات', '文章', 'Articles', 'Записи', 'Entradas', 'Postingan'],
+      'nav.media' => ['Media', 'الوسائط', '媒体', 'Médias', 'Медиа', 'Medios', 'Media'],
+      'nav.pages' => ['Pages', 'الصفحات', '页面', 'Pages', 'Страницы', 'Páginas', 'Halaman'],
+      'nav.comments' => ['Comments', 'التعليقات', '评论', 'Commentaires', 'Комментарии', 'Comentarios', 'Komentar'],
+      'nav.users' => ['Users', 'المستخدمون', '用户', 'Utilisateurs', 'Пользователи', 'Usuarios', 'Pengguna'],
+      'nav.settings' => ['Settings', 'الإعدادات', '设置', 'Paramètres', 'Настройки', 'Configuración', 'Pengaturan'],
+      'nav.plugins' => ['Plugins', 'الإضافات', '插件', 'Extensions', 'Плагины', 'Complementos', 'Plugin'],
+      'nav.privacy' => ['Privacy', 'الخصوصية', '隐私', 'Confidentialité', 'Конфиденциальность', 'Privacidad', 'Privasi'],
+      'nav.languages' => ['Languages', 'اللغات', '语言', 'Langues', 'Языки', 'Idiomas', 'Bahasa'],
+    ],
+    'form' => [
+      'form.save' => ['Save', 'حفظ', '保存', 'Enregistrer', 'Сохранить', 'Guardar', 'Simpan'],
+      'form.cancel' => ['Cancel', 'إلغاء', '取消', 'Annuler', 'Отмена', 'Cancelar', 'Batal'],
+      'form.delete' => ['Delete', 'حذف', '删除', 'Supprimer', 'Удалить', 'Eliminar', 'Hapus'],
+      'form.edit' => ['Edit', 'تعديل', '编辑', 'Modifier', 'Редактировать', 'Editar', 'Edit'],
+      'form.submit' => ['Submit', 'إرسال', '提交', 'Soumettre', 'Отправить', 'Enviar', 'Kirim'],
+      'form.search' => ['Search', 'بحث', '搜索', 'Rechercher', 'Поиск', 'Buscar', 'Cari'],
+      'form.name' => ['Name', 'الاسم', '姓名', 'Nom', 'Имя', 'Nombre', 'Nama'],
+      'form.email' => ['Email', 'البريد الإلكتروني', '邮箱', 'Email', 'Email', 'Email', 'Email'],
+      'form.password' => ['Password', 'كلمة المرور', '密码', 'Mot de passe', 'Пароль', 'Contraseña', 'Kata sandi'],
+    ],
+    'button' => [
+      'button.add' => ['Add New', 'إضافة جديد', '新建', 'Ajouter', 'Добавить', 'Añadir nuevo', 'Tambah baru'],
+      'button.read_more' => ['Read More', 'اقرأ المزيد', '阅读更多', 'Lire la suite', 'Читать далее', 'Leer más', 'Baca selengkapnya'],
+      'button.subscribe' => ['Subscribe', 'اشترك', '订阅', "S'abonner", 'Подписаться', 'Suscribirse', 'Berlangganan'],
+    ],
+    'error' => [
+      'error.not_found' => ['Page not found', 'الصفحة غير موجودة', '页面未找到', 'Page non trouvée', 'Страница не найдена', 'Página no encontrada', 'Halaman tidak ditemukan'],
+    ],
+    'footer' => [
+      'footer.copyright' => ['All rights reserved', 'جميع الحقوق محفوظة', '版权所有', 'Tous droits réservés', 'Все права защищены', 'Todos los droits réservés', 'Semua hak dilindungi'],
+    ],
+    'admin' => [
+      'admin.all_languages' => ['All Languages', 'جميع اللغات', '所有语言', 'Toutes les langues', 'Все языки', 'Todos los idiomas', 'Semua Bahasa'],
+      'admin.translations' => ['Translations', 'الترجمات', '翻译', 'Traductions', 'Переводы', 'Traducciones', 'Terjemahan'],
+      'admin.add_language' => ['Add Language', 'إضافة لغة', '添加语言', 'Ajouter une langue', 'Добавить язык', 'Añadir idioma', 'Tambah Bahasa'],
+      'admin.edit_language' => ['Edit Language', 'تعديل اللغة', '编辑语言', 'Modifier la langue', 'Редактировать язык', 'Editar idioma', 'Edit Bahasa'],
+      'admin.delete_language' => ['Delete Language', 'حذف اللغة', '删除语言', 'Supprimer la langue', 'Удалить язык', 'Eliminar idioma', 'Hapus Bahasa'],
+    ],
+  ];
+
+  $langOrder = ['en', 'ar', 'zh', 'fr', 'ru', 'es', 'id'];
+  $langIds = [];
+
+  foreach ($langOrder as $index => $code) {
+    $lang = $languages[$code];
+    $stmt = $link->prepare("INSERT INTO {$prefix}tbl_languages (lang_code, lang_name, lang_native, lang_locale, lang_direction, lang_sort, lang_is_default, lang_is_active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
+    $stmt->bind_param("sssssii", $code, $lang['name'], $lang['native'], $lang['locale'], $lang['direction'], $lang['sort'], $lang['is_default']);
+    $stmt->execute();
+    $langIds[$code] = $link->insert_id;
+  }
+
+  $insertTrans = $link->prepare("INSERT INTO {$prefix}tbl_translations (lang_id, translation_key, translation_value, translation_context) VALUES (?, ?, ?, ?)");
+  
+  foreach ($translations as $context => $keys) {
+    foreach ($keys as $key => $values) {
+      foreach ($values as $index => $value) {
+        $code = $langOrder[$index];
+        $insertTrans->bind_param("isss", $langIds[$code], $key, $value, $context);
+        $insertTrans->execute();
+      }
+    }
+  }
+
+  $langCodes = implode(',', $langOrder);
+  $updateSettings = $link->prepare("UPDATE {$prefix}tbl_settings SET setting_value = ? WHERE setting_name = 'lang_available'");
+  $updateSettings->bind_param("s", $langCodes);
+  $updateSettings->execute();
 }
 
 /**
@@ -417,6 +565,9 @@ function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuse
 
     $distro = isset(get_linux_distro()['NAME']) ? get_linux_distro()['NAME'] : "";
 
+    // Generate Defuse encryption key for authentication
+    $defuse_key_path = generate_defuse_key();
+
     $grabbedKey = grab_app_key($link, $key, $prefix);
     $app_key = isset($grabbedKey['app_key']) ? $grabbedKey['app_key'] : "";
     $app_id = isset($grabbedKey['ID']) ? $grabbedKey['ID'] : "";
@@ -427,44 +578,111 @@ function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuse
 
     $prefixLine = (!empty($prefix)) ? "'prefix' => '" . addslashes($prefix) . "'," : "";
 
-    $configFile = '<?php  
-    
-    return [' . "
-                    
-            'db' => [
-
-                  'host' => '" . addslashes($dbhost) . "',
-                  'user' => '" . addslashes($dbuser) . "',
-                  'pass' => '" . addslashes($dbpassword) . "',
-                  'name' => '" . addslashes($dbname) . "',
-                  'port' => '" . addslashes($dbport) . "',
-                  " . $prefixLine . "
-                ],
-        
-            'app' => [
-
-                  'url'   => '" . addslashes(setup_base_url($protocol, $server_name)) . "',
-                  'email' => '" . addslashes($email) . "',
-                  'key'   => '" . addslashes($app_key) . "'
-                ],
-
-            'os' => [
-                  
-                  'system_software' => '" . addslashes(check_os()['Operating_system']) . "',
-                  'distrib_name'    => '" . trim($distro) . "'
-                ],
-
-        ];" . PHP_EOL;
+    // Build config.php using $_ENV pattern to support both .env and config.php
+    $configFile = '<?php' . PHP_EOL . PHP_EOL;
+    $configFile .= 'return [' . PHP_EOL;
+    $configFile .= '    \'db\' => [' . PHP_EOL;
+    $configFile .= '        \'host\' => $_ENV[\'DB_HOST\'] ?? \'' . addslashes($dbhost) . '\',' . PHP_EOL;
+    $configFile .= '        \'user\' => $_ENV[\'DB_USER\'] ?? \'' . addslashes($dbuser) . '\',' . PHP_EOL;
+    $configFile .= '        \'pass\' => $_ENV[\'DB_PASS\'] ?? \'' . addslashes($dbpassword) . '\',' . PHP_EOL;
+    $configFile .= '        \'name\' => $_ENV[\'DB_NAME\'] ?? \'' . addslashes($dbname) . '\',' . PHP_EOL;
+    $configFile .= '        \'port\' => $_ENV[\'DB_PORT\'] ?? \'' . addslashes($dbport) . '\',' . PHP_EOL;
+    $configFile .= '        \'prefix\' => $_ENV[\'DB_PREFIX\'] ?? \'' . addslashes($prefix) . '\',' . PHP_EOL;
+    $configFile .= '    ],' . PHP_EOL;
+    $configFile .= PHP_EOL;
+    $configFile .= '    \'app\' => [' . PHP_EOL;
+    $configFile .= '        \'url\'   => $_ENV[\'APP_URL\'] ?? \'' . addslashes(setup_base_url($protocol, $server_name)) . '\',' . PHP_EOL;
+    $configFile .= '        \'email\' => $_ENV[\'APP_EMAIL\'] ?? \'' . addslashes($email) . '\',' . PHP_EOL;
+    $configFile .= '        \'key\'   => $_ENV[\'APP_KEY\'] ?? \'' . addslashes($app_key) . '\',' . PHP_EOL;
+    $configFile .= '        \'defuse_key\' => \'lib/utility/.lts/lts.txt\',' . PHP_EOL;
+    $configFile .= '    ],' . PHP_EOL;
+    $configFile .= PHP_EOL;
+    $configFile .= '    \'mail\' => [' . PHP_EOL;
+    $configFile .= '        \'smtp\' => [' . PHP_EOL;
+    $configFile .= '            \'host\' => $_ENV[\'SMTP_HOST\'] ?? \'\',' . PHP_EOL;
+    $configFile .= '            \'port\' => $_ENV[\'SMTP_PORT\'] ?? 587,' . PHP_EOL;
+    $configFile .= '            \'encryption\' => $_ENV[\'SMTP_ENCRYPTION\'] ?? \'tls\',' . PHP_EOL;
+    $configFile .= '            \'username\' => $_ENV[\'SMTP_USER\'] ?? \'\',' . PHP_EOL;
+    $configFile .= '            \'password\' => $_ENV[\'SMTP_PASS\'] ?? \'\',' . PHP_EOL;
+    $configFile .= '        ],' . PHP_EOL;
+    $configFile .= '        \'from\' => [' . PHP_EOL;
+    $configFile .= '            \'email\' => $_ENV[\'MAIL_FROM_ADDRESS\'] ?? \'' . addslashes($email) . '\',' . PHP_EOL;
+    $configFile .= '            \'name\' => $_ENV[\'MAIL_FROM_NAME\'] ?? \'Blogware\'' . PHP_EOL;
+    $configFile .= '        ]' . PHP_EOL;
+    $configFile .= '    ],' . PHP_EOL;
+    $configFile .= PHP_EOL;
+    $configFile .= '    \'os\' => [' . PHP_EOL;
+    $configFile .= '        \'system_software\' => $_ENV[\'SYSTEM_OS\'] ?? \'' . addslashes(check_os()['Operating_system']) . '\',' . PHP_EOL;
+    $configFile .= '        \'distrib_name\'    => $_ENV[\'DISTRIB_NAME\'] ?? \'' . trim($distro) . '\'' . PHP_EOL;
+    $configFile .= '    ],' . PHP_EOL;
+    $configFile .= PHP_EOL;
+    $configFile .= '    \'api\' => [' . PHP_EOL;
+    $configFile .= '        \'allowed_origins\' => $_ENV[\'CORS_ALLOWED_ORIGINS\'] ?? \'' . addslashes(setup_base_url($protocol, $server_name)) . '\'' . PHP_EOL;
+    $configFile .= '    ],' . PHP_EOL;
+    $configFile .= '];' . PHP_EOL;
 
     if (isset($_SESSION['token'])) {
 
-      file_put_contents(__DIR__ . '/../../config.php', $configFile, FILE_APPEND | LOCK_EX);
+      // Write config.php
+      file_put_contents(__DIR__ . '/../../config.php', $configFile, LOCK_EX);
+
+      // Also generate .env file for environment variables
+      write_env_file($protocol, $server_name, $dbhost, $dbuser, $dbpassword, $dbname, $dbport, $prefix, $email, $app_key, $distro);
 
       $configuration = true;
     }
   }
 
   return $configuration;
+}
+
+/**
+ * Write .env file with environment variables
+ * 
+ * @param string $protocol
+ * @param string $server_name
+ * @param string $dbhost
+ * @param string $dbuser
+ * @param string $dbpass
+ * @param string $dbname
+ * @param string $dbport
+ * @param string $prefix
+ * @param string $email
+ * @param string $app_key
+ * @param string $distro
+ */
+function write_env_file($protocol, $server_name, $dbhost, $dbuser, $dbpass, $dbname, $dbport, $prefix, $email, $app_key, $distro)
+{
+    $envContent = "# --- DATABASE CONFIGURATION ---" . PHP_EOL;
+    $envContent .= "DB_HOST=" . addslashes($dbhost) . PHP_EOL;
+    $envContent .= "DB_USER=" . addslashes($dbuser) . PHP_EOL;
+    $envContent .= "DB_PASS=" . addslashes($dbpass) . PHP_EOL;
+    $envContent .= "DB_NAME=" . addslashes($dbname) . PHP_EOL;
+    $envContent .= "DB_PORT=" . addslashes($dbport) . PHP_EOL;
+    $envContent .= "DB_PREFIX=" . addslashes($prefix) . PHP_EOL;
+    $envContent .= PHP_EOL;
+    $envContent .= "# --- APPLICATION CONFIGURATION ---" . PHP_EOL;
+    $envContent .= "APP_URL=" . addslashes(setup_base_url($protocol, $server_name)) . PHP_EOL;
+    $envContent .= "APP_EMAIL=" . addslashes($email) . PHP_EOL;
+    $envContent .= "APP_KEY=" . addslashes($app_key) . PHP_EOL;
+    $envContent .= PHP_EOL;
+    $envContent .= "# --- MAIL / SMTP CONFIGURATION ---" . PHP_EOL;
+    $envContent .= "SMTP_HOST=" . PHP_EOL;
+    $envContent .= "SMTP_PORT=587" . PHP_EOL;
+    $envContent .= "SMTP_USER=" . PHP_EOL;
+    $envContent .= "SMTP_PASS=" . PHP_EOL;
+    $envContent .= "SMTP_ENCRYPTION=tls" . PHP_EOL;
+    $envContent .= "MAIL_FROM_ADDRESS=" . addslashes($email) . PHP_EOL;
+    $envContent .= "MAIL_FROM_NAME=Blogware" . PHP_EOL;
+    $envContent .= PHP_EOL;
+    $envContent .= "# --- SYSTEM ---" . PHP_EOL;
+    $envContent .= "SYSTEM_OS=" . addslashes(check_os()['Operating_system']) . PHP_EOL;
+    $envContent .= "DISTRIB_NAME=\"" . trim($distro) . "\"" . PHP_EOL;
+    $envContent .= PHP_EOL;
+    $envContent .= "# --- API SECURITY ---" . PHP_EOL;
+    $envContent .= "CORS_ALLOWED_ORIGINS=" . addslashes(setup_base_url($protocol, $server_name)) . PHP_EOL;
+
+    file_put_contents(__DIR__ . '/../../.env', $envContent, LOCK_EX);
 }
 
 /**
@@ -672,6 +890,27 @@ function purge_installation()
       session_destroy();
     }
   }
+}
+
+/**
+ * Generate and save Defuse encryption key
+ * 
+ * @return string The key in ASCII-safe format
+ * @throws Exception
+ */
+function generate_defuse_key()
+{
+    $keyFile = __DIR__ . '/../../lib/utility/.lts/lts.txt';
+    
+    if (!is_dir(dirname($keyFile))) {
+        mkdir(dirname($keyFile), 0755, true);
+    }
+    
+    $key = Defuse\Crypto\Key::createNewRandomKey();
+    $keyAscii = $key->saveToAsciiSafeString();
+    file_put_contents($keyFile, $keyAscii, LOCK_EX);
+    
+    return $keyAscii;
 }
 
 function generate_table_prefix($length = 6)
