@@ -187,7 +187,7 @@ install_header($current_path);
 
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white border-bottom-0 pt-4">
-                    <h4 class="mb-0 text-primary"><i class="fa fa-database mr-2"></i> Database Settings</h4>
+                    <h4 class="mb-0 text-muted"><i class="fa fa-database mr-2"></i> Database Settings</h4>
                 </div>
                 <div class="card-body">
                     <div class="alert alert-info py-2 small shadow-none">
@@ -239,7 +239,7 @@ install_header($current_path);
 
                         <hr class="my-4">
 
-                        <h4 class="mb-4 text-primary"><i class="fa fa-user-circle mr-2"></i> Administrator Account</h4>
+                        <h4 class="mb-4 text-muted"><i class="fa fa-user-circle mr-2"></i> Administrator Account</h4>
                         
                         <div class="mb-3">
                             <label for="username" class="font-weight-bold">Username</label>
@@ -270,7 +270,7 @@ install_header($current_path);
                         <hr class="my-4">
                         <input type="hidden" name="setup" value="install">
                         <button class="btn btn-success btn-lg btn-block shadow-sm" type="submit">
-                            <i class="fa fa-rocket mr-2"></i> Install Scriptlog
+                            <i class="fa fa-rocket mr-2"></i> Install
                         </button>
                     </form>
                 </div>
