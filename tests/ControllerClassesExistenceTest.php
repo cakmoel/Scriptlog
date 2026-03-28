@@ -61,4 +61,14 @@ class ControllerClassesExistenceTest extends TestCase
     {
         $this->assertTrue(class_exists('ConfigurationController'));
     }
+    
+    public function testDownloadControllerClassExists(): void
+    {
+        $this->assertTrue(class_exists('DownloadController'));
+    }
+    
+    public function testDownloadAdminControllerClassExists(): void
+    {
+        $this->assertTrue(class_exists('DownloadAdminController'));
+    }
 }
