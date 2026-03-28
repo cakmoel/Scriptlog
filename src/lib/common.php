@@ -9,6 +9,8 @@ define('APP_ADMIN', 'admin');
 define('APP_PUBLIC', 'public');
 define('APP_LIBRARY', 'lib');
 define('APP_CACHE', false);
+define('APP_CACHE_DIR', APP_ROOT . APP_PUBLIC . DS . 'cache' . DS);
+define('APP_CACHE_LIFETIME', 3600); // 1 hour in seconds
 define('APP_FILE_SIZE', 1048576);
 define('APP_IMAGE', APP_PUBLIC . DS . 'files' . DS . 'pictures' . DS);
 define('APP_IMAGE_LARGE', APP_IMAGE.'large'.DS);
