@@ -1,4 +1,4 @@
-# Blogware RESTful API Documentation
+# ScriptLog RESTful API Documentation
 
 ## Table of Contents
 
@@ -21,7 +21,7 @@
 
 ## Introduction
 
-The Blogware RESTful API provides programmatic access to your blog's content, allowing other platforms, operating systems, and devices to interact with your blog data. The API follows REST architectural principles and returns JSON responses.
+The ScriptLog RESTful API provides programmatic access to your blog's content, allowing other platforms, operating systems, and devices to interact with your blog data. The API follows REST architectural principles and returns JSON responses.
 
 **API Version:** 1.0.0  
 **Format:** JSON
