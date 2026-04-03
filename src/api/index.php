@@ -1,20 +1,21 @@
 <?php
+
 /**
  * API Entry Point
- * 
+ *
  * Blogware RESTful API
- * 
+ *
  * This is the entry point for all API requests.
  * It handles request routing, authentication, and response formatting.
- * 
+ *
  * API Version: 1.0
  * Base URL: /api/v1/
- * 
+ *
  * @author    Blogware Team
  * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0
- * 
+ *
  */
 
 // Prevent direct access to API
@@ -77,21 +78,20 @@ require_once __DIR__ . '/../lib/controller/api/SearchApiController.php';
 
 // Initialize API
 try {
-    
     // Get request method and URI
     $method = $_SERVER['REQUEST_METHOD'];
     $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    
+
     // Remove base path from URI
     $uri = str_replace(API_BASE_PATH, '', $uri);
     $uri = trim($uri, '/');
-    
+
     // Parse query string for pagination and filters
     parse_str(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY) ?? '', $queryParams);
-    
+
     // Initialize API Router
     $router = new ApiRouter();
-    
+
     // Register API routes
     // Posts API
     $router->get('posts', 'PostsApiController@index');
@@ -100,7 +100,7 @@ try {
     $router->post('posts', 'PostsApiController@store');
     $router->put('posts/([0-9]+)', 'PostsApiController@update');
     $router->delete('posts/([0-9]+)', 'PostsApiController@destroy');
-    
+
     // Categories/Topics API
     $router->get('categories', 'CategoriesApiController@index');
     $router->get('categories/([0-9]+)', 'CategoriesApiController@show');
@@ -108,28 +108,28 @@ try {
     $router->post('categories', 'CategoriesApiController@store');
     $router->put('categories/([0-9]+)', 'CategoriesApiController@update');
     $router->delete('categories/([0-9]+)', 'CategoriesApiController@destroy');
-    
+
     // Comments API
     $router->get('comments', 'CommentsApiController@index');
     $router->get('comments/([0-9]+)', 'CommentsApiController@show');
     $router->post('comments', 'CommentsApiController@store');
     $router->put('comments/([0-9]+)', 'CommentsApiController@update');
     $router->delete('comments/([0-9]+)', 'CommentsApiController@destroy');
-    
+
     // Archives API
     $router->get('archives', 'ArchivesApiController@index');
     $router->get('archives/([0-9]{4})', 'ArchivesApiController@year');
     $router->get('archives/([0-9]{4})/([0-9]{2})', 'ArchivesApiController@month');
-    
+
     // Search API
     $router->get('search', 'SearchApiController@index');
     $router->get('search/posts', 'SearchApiController@posts');
     $router->get('search/pages', 'SearchApiController@pages');
-    
+
     // GDPR API
     $router->post('gdpr/consent', 'GdprApiController@consent');
     $router->get('gdpr/consent', 'GdprApiController@getConsentStatus');
-    
+
     // Languages API
     $router->get('languages', 'LanguagesApiController@index');
     $router->get('languages/active', 'LanguagesApiController@index');
@@ -139,7 +139,7 @@ try {
     $router->put('languages/([a-z]{2})', 'LanguagesApiController@update');
     $router->delete('languages/([a-z]{2})', 'LanguagesApiController@destroy');
     $router->post('languages/([a-z]{2})/default', 'LanguagesApiController@setDefault');
-    
+
     // Translations API
     $router->get('translations/([a-z]{2})', 'TranslationsApiController@index');
     $router->get('translations/([a-z]{2})/([a-zA-Z0-9._-]+)', 'TranslationsApiController@show');
@@ -149,9 +149,9 @@ try {
     $router->get('translations/([a-z]{2})/export', 'TranslationsApiController@export');
     $router->post('translations/([a-z]{2})/import', 'TranslationsApiController@import');
     $router->post('translations/([a-z]{2})/cache', 'TranslationsApiController@cache');
-    
+
     // API OpenAPI spec endpoint
-    $router->get('openapi.json', function($params) {
+    $router->get('openapi.json', function ($params) {
         $specFile = __DIR__ . '/../docs/API_OPENAPI.json';
         if (file_exists($specFile)) {
             header('Content-Type: application/json');
@@ -161,14 +161,13 @@ try {
         }
         ApiResponse::notFound('OpenAPI specification not found');
     });
-    
+
     // API Info endpoint
     $router->get('', 'ApiController@info');
     $router->get('/', 'ApiController@info');
-    
+
     // Dispatch the request
     $router->dispatch($method, $uri, $queryParams);
-    
 } catch (\Throwable $e) {
     // Handle any uncaught exceptions
     ApiResponse::error($e->getMessage(), 500, 'INTERNAL_SERVER_ERROR');
