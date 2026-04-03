@@ -30,6 +30,8 @@
 22. [Content Export System](#22-content-export-system)
 23. [UI Asset Management](#23-ui-asset-management)
 24. [Dynamic SMTP System](#24-dynamic-smtp-system)
+25. [Search Functionality](#25-search-functionality)
+26. [Premium UI Standards](#26-premium-ui-standards)
 
 > **NOTE:** For comprehensive testing documentation including PHPStan setup and CI/CD integration, see [TESTING_GUIDE.md](TESTING_GUIDE.md).
 
@@ -184,6 +186,126 @@ During first-time installation, the system automatically:
 - Stores the key path in `config.php` under `app.defuse_key`
 - This key is used for authentication cookie encryption
 
+### Installation Fixes
+
+During development, the following bugs were discovered and fixed:
+
+#### 1. write_config_file() Argument Order Bug
+
+**Problem**: The `write_config_file()` function in `install/include/setup.php` has the signature:
+```php
+function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuser, $dbname, $dbport, ...)
+```
+
+But `install/index.php` was calling it with `$dbuser` and `$dbpass` in the wrong order, causing "Access denied" errors when creating config.php.
+
+**Fix**: In `install/index.php` line 168, corrected the argument order:
+```php
+// BEFORE (WRONG):
+write_config_file($protocol, $server_host, $dbhost, $dbuser, $dbpass, $dbname, ...)
+
+// AFTER (CORRECT):
+write_config_file($protocol, $server_host, $dbhost, $dbpass, $dbuser, $dbname, ...)
+```
+
+#### 2. popper.min.js Path Bug
+
+**Problem**: The install layout was loading popper.js from a non-existent path `assets/vendor/bootstrap/js/vendor/popper.min.js`.
+
+**Fix**: In `install/install-layout.php`, corrected the path to `assets/vendor/bootstrap/js/popper.min.js`.
+
+#### 3. Database Tables Created
+
+The installation now creates 21 tables:
+- Core: tbl_users, tbl_user_token, tbl_login_attempt, tbl_posts, tbl_topics, tbl_post_topic, tbl_comments
+- Media: tbl_media, tbl_mediameta, tbl_media_download
+- System: tbl_menu, tbl_plugin, tbl_settings, tbl_themes
+- GDPR: tbl_consents, tbl_data_requests, tbl_privacy_logs, tbl_privacy_policies
+- i18n: tbl_languages, tbl_translations
+- Downloads: tbl_download_log
+
+#### 4. Database Column Fixes
+
+**Problem**: The `PostModel` class references a `post_keyword` column that didn't exist in the database, causing errors when accessing post data.
+
+**Fix**: Added `post_keyword` column to `tbl_posts` in `install/include/dbtable.php`:
+```sql
+ALTER TABLE tbl_posts ADD COLUMN post_keyword VARCHAR(255) DEFAULT NULL AFTER post_tags;
+```
+
+#### 5. Db Class KnownTables Array
+
+**Problem**: The `Db` class (`lib/core/Db.php`) had an incomplete `knownTables` array, missing several tables that the application uses. This caused issues with prefix handling.
+
+**Fix**: Added all 21 tables to the `knownTables` array in `lib/core/Db.php`:
+```php
+private $knownTables = [
+    'users', 'user_token', 'login_attempt', 'posts', 'topics', 
+    'post_topic', 'comments', 'media', 'mediameta', 'media_download',
+    'menu', 'plugin', 'settings', 'themes', 'consents', 
+    'data_requests', 'privacy_logs', 'privacy_policies', 
+    'languages', 'translations', 'download_log'
+];
+```
+
+### Post-Installation Fixes
+
+After initial installation, several issues were discovered and fixed:
+
+#### 6. Table Prefix Compatibility
+
+**Problem**: The application uses table prefixes (e.g., `urmpnj_posts`) but utility functions using Medoo were creating new database connections without applying the prefix.
+
+**Fixes**:
+
+1. **medooin.php**: Modified to use the Registry connection (`Registry::get('dbc')`) instead of creating a new Medoo connection, ensuring table prefix is applied.
+
+2. **db-mysqli.php**: Updated to work with both PDO and mysqli connections - checks connection type and handles accordingly.
+
+#### 7. Null Safety and Compatibility Fixes
+
+The following utility functions were fixed for null safety and PDO/mysqli compatibility:
+
+1. **membership.php** (`lib/utility/membership.php`):
+   - Added null checks for `$user['user_fullname']` and `$user['user_login']`
+   - Fixed array access patterns
+
+2. **app-info.php** (`lib/utility/app-info.php`):
+   - Fixed array/object compatibility issues
+   - Added type checking for different return formats
+
+3. **theme-navigation.php** (`lib/utility/theme-navigation.php`):
+   - Added PDO/mysqli compatibility handling
+   - Fixed result fetching for both connection types
+
+4. **login-attempt.php** (`lib/utility/login-attempt.php`):
+   - Added PDO/mysqli compatibility handling
+   - Fixed result fetching patterns
+
+#### 8. Hello World Plugin Installation
+
+**Problem**: The sample Hello World plugin existed in `admin/plugins/hello-world/` but was not being added to the database during installation.
+
+**Fix**: Added the plugin to the installation process:
+
+1. **dbtable.php**: Added `savePlugin` SQL query:
+```php
+$savePlugin = "INSERT INTO {$prefix}tbl_plugin (plugin_name, plugin_link, plugin_directory, plugin_desc, plugin_status, plugin_level, plugin_sort) VALUES (?, ?, ?, ?, ?, ?, ?)";
+```
+
+2. **setup.php**: Added code to insert Hello World plugin during installation:
+```php
+$plugin_name = "Hello World";
+$plugin_link = "#";
+$plugin_directory = "hello-world";
+$plugin_desc = "A simple Hello World plugin to demonstrate the plugin system";
+$plugin_status = "N"; // disabled by default
+$plugin_level = "administrator";
+$plugin_sort = 1;
+```
+
+The plugin is inserted as disabled (`plugin_status = 'N'`) by default, allowing users to enable it from the admin panel after installation.
+
 ### Key Files
 
 | File | Location | Purpose |
@@ -264,6 +386,8 @@ All 404 handling is done in the Dispatcher, NOT in theme templates. This prevent
 - **Dispatcher** (`lib/core/Dispatcher.php`): Contains `validateContentExists()` method that checks if content exists in database before rendering
 - **Validation happens BEFORE header output**: Ensures proper 404 status code is set
 - **Route parameter names**: Use correct named parameters from route patterns (`id` for posts, `page` for pages, `category` for categories)
+- **Custom 404 template**: Uses theme's `404.php` template
+- **HandleRequest** (`lib/core/HandleRequest.php`): Handles query string URLs when permalinks are disabled, renders custom 404 template for invalid paths
 
 ```php
 // Example: validateContentExists in Dispatcher
@@ -290,6 +414,19 @@ private function validateContentExists($routeKey, $requestPath)
         // ... other cases
     }
 }
+```
+
+**Important**: A `.htaccess` file is required for Apache to route all requests to `index.php`. This ensures the PHP-based routing works regardless of permalink settings.
+
+```apache
+# .htaccess - Required for Apache
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [L,QSA]
+</IfModule>
 ```
 
 Do NOT add http_response_code() in theme templates - let the Dispatcher handle 404s.
@@ -1220,6 +1357,126 @@ Utility functions are loaded via `lib/utility-loader.php` and include:
 | **Media** | `invoke-frontimg.php`, `upload-video.php` |
 | **Session** | `turn-on-session.php`, `regenerate-session.php` |
 
+### Image Handling Functions
+
+The blog includes comprehensive image display functions with WebP support and responsive images.
+
+#### Image Storage Structure
+
+```
+public/files/pictures/
+├── small/           # Thumbnail images (640x450)
+│   └── small_*.jpg
+├── medium/         # Medium images (730x486)
+│   └── medium_*.jpg
+├── large/          # Large images (1200x630)
+│   └── large_*.jpg
+├── *.webp          # WebP versions (shared with main folder)
+└── *.jpg           # Original JPEG versions
+```
+
+#### Key Constants (lib/common.php)
+
+```php
+// Defined in lib/common.php:
+define('APP_IMAGE', APP_PUBLIC . DS . 'files' . DS . 'pictures' . DS);
+define('APP_IMAGE_LARGE', APP_IMAGE . 'large' . DS);
+define('APP_IMAGE_MEDIUM', APP_IMAGE . 'medium' . DS);
+define('APP_IMAGE_SMALL', APP_IMAGE . 'small' . DS);
+```
+
+#### Image Functions
+
+| Function | Purpose | Location |
+|----------|---------|----------|
+| `invoke_webp_image()` | Returns WebP URL if available, else returns original | `lib/utility/invoke-webp-image.php` |
+| `invoke_frontimg()` | Primary function for displaying featured images | `lib/utility/invoke-frontimg.php` |
+| `invoke_responsive_image()` | Generates `<picture>` element with WebP support | `lib/utility/invoke-responsive-image.php` |
+| `invoke_hero_image()` | Hero/LCP images with fetchpriority="high" | `lib/utility/invoke-responsive-image.php` |
+| `invoke_gallery_image()` | Gallery images with lazy loading | `lib/utility/invoke-responsive-image.php` |
+
+#### Function Signatures
+
+```php
+// Basic featured image
+invoke_frontimg(string $media_filename, bool $image_thumb = true): string
+
+// Responsive image with full options
+invoke_responsive_image(
+    string $media_filename,
+    string $size = 'thumbnail', // 'thumbnail', 'medium', 'large'
+    bool $image_thumb = true,
+    string $alt = '',
+    string $class = 'img-fluid',
+    bool $fetchpriority = false,
+    string $decoding = 'auto'
+): string
+```
+
+#### Image Dimensions
+
+| Size | Width | Height | Folder | Prefix |
+|------|-------|--------|--------|--------|
+| thumbnail | 640 | 450 | small/ | small_ |
+| medium | 730 | 486 | medium/ | medium_ |
+| large | 1200 | 630 | large/ | large_ |
+
+#### Usage Examples
+
+```php
+// Basic featured image
+echo invoke_frontimg('image123.jpg');
+
+// Responsive image with specific size
+echo invoke_responsive_image('image123.jpg', 'medium', true, 'My Image', 'img-fluid');
+
+// Hero image for LCP optimization
+echo invoke_hero_image('hero-image.jpg', '', 'Hero Title');
+
+// Gallery image with lazy loading
+echo invoke_gallery_image('gallery-1.jpg', 'Gallery Image');
+```
+
+#### Output Examples
+
+**With WebP support:**
+```html
+<picture>
+    <source srcset="https://example.com/public/files/pictures/image123.webp" type="image/webp">
+    <img src="https://example.com/public/files/pictures/medium/medium_image123.jpg" alt="My Image" width="730" height="486" class="img-fluid" decoding="auto">
+</picture>
+```
+
+**Without WebP (fallback):**
+```html
+<img src="https://example.com/public/files/pictures/medium/medium_image123.jpg" alt="My Image" width="730" height="486" class="img-fluid" decoding="auto">
+```
+
+#### Common Issues and Solutions
+
+**1. esc_attr() Not Defined**
+- Symptom: PHP error "Call to undefined function esc_attr()"
+- Cause: Using WordPress function in theme files
+- Solution: Replace with `htmlout()`
+
+```php
+// WRONG
+esc_attr($value);
+
+// CORRECT
+htmlout($value);
+```
+
+**2. Empty src Attributes**
+- Symptom: `<img src="">` in HTML output
+- Cause: Incorrect path construction
+- Solution: Always use APP_IMAGE constants or test path construction
+
+**IMPORTANT:** When modifying image functions:
+- Always use APP_IMAGE constants defined in lib/common.php
+- Test changes on live site before committing
+- Ask permission before changing existing working code
+
 ### Example: Using Utility Functions
 
 ```php
@@ -1929,26 +2186,66 @@ $router->delete('resources/([0-9]+)', 'MyResourceApiController@destroy');
 
 ## 15. Testing
 
-### Test Suite Overview
+> **NOTE:** For comprehensive testing documentation including PHPStan setup and CI/CD integration, see [TESTING_GUIDE.md](TESTING_GUIDE.md).
+
+### Testing Overview
+
+This project uses two complementary testing approaches:
+
+| Tool | Purpose | Coverage |
+|------|---------|----------|
+| **PHPUnit** | Unit and integration testing | Functional correctness |
+| **PHPStan** | Static code analysis | Type safety, code quality |
+
+### Test Suite Metrics
 
 | Metric | Value |
 |--------|-------|
-| **Total Tests** | 790 |
-| **Assertions** | ~900+ |
+| **Total Tests** | 868 |
+| **Assertions** | ~1000+ |
 | **PHPUnit Version** | 9.6.34 |
 | **Target Coverage** | 40% |
+| **Completed Tests** | 407+ |
 
-### Test Progress
+### Test Coverage Plan
 
-| Phase | Status | Tests |
-|-------|--------|-------|
-| Phase 1: DAO Integration | ✅ Complete | 92 |
-| Phase 2: Service Layer | ✅ Complete | 148 |
-| Phase 3: Core Classes | 🔄 Pending | 65 |
-| Phase 4: Controllers | 🔄 Pending | 34 |
-| Phase 5: Utilities | 🔄 Pending | 26 |
+The test coverage plan is organized into phases:
+
+#### Phase Status
+
+| Phase | Priority | Status | Tests |
+|-------|----------|--------|-------|
+| Phase 1: DAO Integration | HIGH | ✅ Complete | 92 |
+| Phase 2: Service Layer | HIGH | ✅ Complete | 148 |
+| Phase 3: Core Classes | MEDIUM | 🔄 Pending | 65 |
+| Phase 4: Controllers | MEDIUM | 🔄 Pending | 34 |
+| Phase 5: Utilities | LOW | ✅ Complete | 68 |
+
+### Test Categories
+
+| Category | Description |
+|----------|-------------|
+| **Unit Tests** | Utility function tests, class existence tests |
+| **Integration Tests** | Database CRUD operations using `blogware_test` database |
+
+### Security Testing
+
+PostDao security tests verify critical security features:
+
+| Test | Purpose |
+|------|---------|
+| `testFindPostsHasOnlyPublishedParameter` | Verifies default filters for published posts only |
+| `testFindPostHasOnlyPublishedParameter` | Verifies single post retrieval filters for published posts |
+| `testFindPostsHasAuthorParameter` | Verifies author filtering support |
+| `testFindPostsHasSanitizedOrderBy` | Verifies ORDER BY uses whitelist to prevent SQL injection |
+| `testFindPostsFiltersByStatusAndVisibility` | Verifies post_status and post_visibility filters |
+| `testFindPostFiltersByStatusAndVisibility` | Verifies single post respects status/visibility |
+
+**Location**: `tests/unit/PostDaoSecurityTest.php`
 
 ### Running Tests
+
+#### PHPUnit Commands
 
 ```bash
 # Run all tests
@@ -1958,35 +2255,48 @@ lib/vendor/bin/phpunit
 lib/vendor/bin/phpunit --coverage-html coverage
 
 # Run specific test file
-lib/vendor/bin/phpunit tests/service/PostServiceTest.php
+lib/vendor/bin/phpunit tests/EmailValidationTest.php
 
 # Run tests matching pattern
-lib/vendor/bin/phpunit --filter "Service"
+lib/vendor/bin/phpunit --filter "EmailValidation"
+```
 
-# Run service tests only
-lib/vendor/bin/phpunit tests/service/
+#### PHPStan Commands
+
+```bash
+# Run static analysis
+lib/vendor/bin/phpstan analyse
+
+# Run with specific config
+lib/vendor/bin/phpstan analyse --configuration=phpstan.neon
+
+# Run with memory limit (recommended)
+lib/vendor/bin/phpstan analyse --memory-limit=1G
+
+# Generate/update baseline
+lib/vendor/bin/phpstan analyse --generate-baseline=phpstan.baseline.neon
+
+# Increase analysis level for stricter checks
+lib/vendor/bin/phpstan analyse -l 5
 ```
 
 ### Static Analysis with PHPStan
 
-This project uses PHPStan for static code analysis to find bugs without running the code.
+PHPStan is a static analysis tool that finds bugs in your code without running it.
 
-```bash
-# Run static analysis
-vendor/bin/phpstan analyse
+#### Configuration Files
 
-# Run with specific config
-vendor/bin/phpstan analyse --configuration=phpstan.neon
-
-# Generate baseline (captures existing issues)
-vendor/bin/phpstan analyse --generate-baseline=phpstan.baseline.neon
-```
+| File | Purpose |
+|------|---------|
+| `phpstan.neon` | Main configuration |
+| `phpstan.baseline.neon` | Baseline of known issues to ignore |
 
 #### PHPStan Configuration
 
-The configuration is in `phpstan.neon`:
-
 ```neon
+includes:
+    - phpstan.baseline.neon
+
 parameters:
     phpVersion: 70400
     paths:
@@ -1998,37 +2308,27 @@ parameters:
     level: 0
 ```
 
+#### Key Settings
+
 - **phpVersion**: Set to `70400` for PHP 7.4 compatibility
-- **level**: Currently at level 0. Increase gradually for stricter type checking
-- **Baseline**: Use `phpstan.baseline.neon` to track known issues
+- **level**: Currently at level 0 (most lenient). Increase gradually for stricter checks
+- **excludePaths**: Excludes vendor and third-party code
 
-> **TIP:** Run PHPStan before committing to catch type errors early. For detailed testing guide, see [TESTING_GUIDE.md](TESTING_GUIDE.md).
+### Test Database Setup
 
-### Test Categories
+Tests use a separate database (`blogware_test`) to avoid affecting production data.
 
-| Category | Description |
-|----------|-------------|
-| **Unit Tests** | Utility function tests, class existence tests |
-| **Integration Tests** | Database CRUD operations using `blogware_test` database |
-| **Service Tests** | Business logic tests with mocked DAOs (148 tests) |
+```bash
+# Create test database
+php tests/setup_test_db.php
 
-#### Service Tests Coverage
+# Or manually
+mysql -u root -p -e "CREATE DATABASE blogware_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+```
 
-| Service | Tests |
-|---------|-------|
-| CommentService | 10 |
-| ConfigurationService | 10 |
-| MediaService | 16 |
-| MenuService | 14 |
-| NotificationService | 14 |
-| PageService | 16 |
-| PluginService | 13 |
-| PostService | 24 |
-| ThemeService | 10 |
-| TopicService | 7 |
-| UserService | 18 |
+### Writing Tests
 
-#### Writing Tests
+#### PHPUnit Test Structure
 
 ```php
 <?php
@@ -2053,12 +2353,77 @@ class MyTest extends TestCase
 }
 ```
 
-### Test Database Setup
+#### Best Practices
+
+1. **Test one thing per method** - Each test should verify a single behavior
+2. **Use descriptive names** - Method names should describe what is being tested
+3. **Arrange-Act-Assert** - Structure tests with clear setup, action, and verification phases
+4. **Mock external dependencies** - Use mocks for database, filesystem, etc.
+
+### CI/CD Integration
+
+#### GitHub Actions Example
+
+```yaml
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install dependencies
+        run: composer install --no-interaction --no-dev
+      
+      - name: Run PHPUnit
+        run: lib/vendor/bin/phpunit
+      
+      - name: Run PHPStan
+        run: lib/vendor/bin/phpstan analyse --memory-limit=1G
+```
+
+#### Pre-commit Hook
+
+Add to `.git/hooks/pre-commit`:
 
 ```bash
-# Create test database
-php tests/setup_test_db.php
+#!/bin/bash
+lib/vendor/bin/phpstan analyse --memory-limit=1G
+lib/vendor/bin/phpunit
 ```
+
+### Troubleshooting
+
+#### PHPUnit Issues
+
+| Issue | Solution |
+|-------|----------|
+| Tests fail with "Database not found" | Run `php tests/setup_test_db.php` |
+| Xdebug required for coverage | Install Xdebug or skip coverage |
+
+#### PHPStan Issues
+
+| Issue | Solution |
+|-------|----------|
+| Memory limit exceeded | Run with `--memory-limit=1G` |
+| Too many errors | Use baseline or increase level gradually |
+| False positives | Add to ignoreErrors in phpstan.neon |
+| Missing bleedingEdge.neon | Remove from includes in phpstan.neon |
+
+### Recently Added Tests
+
+#### Medoo and Membership Utilities Tests (April 2026)
+- `tests/unit/MedooinFunctionsTest.php` (26 tests) - Tests for `is_medoo_database()`, `is_db_database()`, `db_build_where()`, `medoo_select()`, `medoo_insert()`, `medoo_update()`, `medoo_delete()`
+- `tests/integration/MedooinIntegrationTest.php` (8+ tests) - Integration tests for database selection and operations
+- `tests/unit/MembershipFunctionsTest.php` (26 tests) - Tests for `is_registration_unable()`, `membership_default_role()`, `membership_get_role()`, `membership_get_role_name()`
+- `tests/integration/MembershipIntegrationTest.php` (8 tests) - Integration tests for membership settings
+
+#### PostDao Security Tests (April 2026)
+- `tests/unit/PostDaoSecurityTest.php` (6 tests) - Verifies SQL injection prevention and security filters
 
 ---
 
@@ -2619,26 +2984,171 @@ curl http://example.com/ar/ | grep 'dir="rtl"'
 
 ### Admin Panel Translations
 
-Admin panel uses a separate translation system via `lib/utility/admin-translations.php`:
+Admin panel uses a **hybrid translation system** via `lib/utility/admin-translations.php`:
+
+```
+Translation Request Flow:
+  admin_translate('key') 
+    → Check database (tbl_translations) first
+    → If found, return database value
+    → If not found, check hardcoded arrays
+    → Return fallback or key
+```
 
 ```php
 // Usage in admin views
-admin_translate('dashboard');      // "Dashboard"
-admin_translate('allLanguages');   // "All Languages"
-admin_translate('addLanguage');    // "Add Language"
+admin_translate('nav.dashboard');      // "Dashboard"
+admin_translate('form.save');          // "Save"
+admin_translate('status.publish');     // "Published"
+
+// With parameter interpolation
+admin_t('welcome_message', ['name' => 'John']); // "Welcome, John"
+
+// Locale management
+admin_get_locale();    // Get current locale
+admin_set_locale('ar'); // Set locale
+admin_is_rtl();        // Check RTL (true for Arabic)
 ```
 
-The function uses a static array for performance and scope safety.
+**Key format**: Dot-notation with underscore separators (e.g., `nav.dashboard`, `form.save`, `status.publish`)
+
+The hybrid approach allows translations to be:
+1. Managed via admin UI (Settings → Translations)
+2. Stored in database for easy editing
+3. Fallback to hardcoded arrays if not in database
+
+### Translation Editor
+
+The admin panel includes a translation editor at **Settings → Translations**:
+
+- **View**: Table listing all translations with filtering
+- **Add New**: Add new translation keys via modal form
+- **Edit**: Modify existing translations via modal form  
+- **Delete**: Remove translations (POST with CSRF protection)
+- **Export**: Download translations as JSON
+- **Import**: Upload translations from JSON
+- **Cache**: Regenerate translation cache
+- **Language Selector**: Switch between languages or view all
+
+### Common Issues and Fixes
+
+#### 1. Database Connection Charset (CRITICAL)
+
+The PDO database connection MUST use `charset=utf8mb4` in the DSN to properly load translations in non-English languages (Chinese, Arabic, etc.).
+
+**Files to check:**
+- `lib/core/Bootstrap.php` - Database DSN configuration
+- `lib/core/Db.php` - PDO connection options
+
+**Correct DSN format:**
+```php
+$dbc = DbFactory::connect([
+    'mysql:host=' . $host . ';port=' . $port . ';dbname=' . $dbname . ';charset=utf8mb4',
+    $user,
+    $pwd
+]);
+```
+
+**WRONG (will show "???" for Chinese/Arabic):**
+```php
+'mysql:host=...;dbname=...'
+```
+
+#### 2. Translation Value Standards
+
+**Human-readable first**: Translation values should be natural, complete phrases in the target language, not abbreviations or technical terms.
+
+```
+✅ Good:   "Choose your language", "Add New", "All Posts", "Error Server Error"
+❌ Bad:    "Language Settings", "addNew", "allPosts", "Error serverError"
+```
+
+**Example** - `nav.language_settings`:
+| Language | Value |
+|----------|-------|
+| en | Choose your language |
+| ar | اختر لغتك |
+| zh | 选择您的语言 |
+| fr | Choisissez votre langue |
+| ru | Выберите язык |
+| es | Elige tu idioma |
+| id | Pilih bahasa Anda |
+
+When updating translations in the database, always clear the cache:
+
+```php
+// Clear translation cache after database updates
+$cacheFile = 'public/files/cache/translations/' . $locale . '.json';
+@unlink($cacheFile);
+// System will regenerate on next request
+```
+
+#### 3. Translation Database Fixes
+
+When translations in the database show incorrect values (like "Nav addNew" instead of actual translations), fix directly via SQL:
+
+**Check broken translations:**
+```sql
+SELECT * FROM tbl_translations 
+WHERE translation_value LIKE 'Nav %'
+```
+
+#### 4. Language Selector Not Working
+
+The Translation Editor language dropdown must work with the session-based locale system:
+
+**Flow:**
+1. User selects language in dropdown → JavaScript redirects with `?switch-lang=id`
+2. `admin/index.php` processes `switch-lang` parameter → calls `admin_set_locale('id')`
+3. `admin_set_locale()` saves to `$_SESSION['admin_locale']` and cookie
+4. Translation Editor uses `admin_get_locale()` to determine which translations to show
+
+**Key files:**
+- `admin/index.php` - Handles `switch-lang` parameter
+- `lib/utility/admin-translations.php` - `admin_get_locale()` and `admin_set_locale()` functions
+- `lib/controller/TranslationController.php` - Uses `admin_get_locale()` when `$_GET['lang']` not set
+
+**TranslationController locale logic (CORRECT):**
+```php
+if (isset($_GET['lang']) && $_GET['lang'] === 'all') {
+    $langCode = 'all';
+} elseif (isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'ar', 'zh', 'fr', 'ru', 'es', 'id'])) {
+    $langCode = $_GET['lang'];
+} else {
+    // Fall back to session/cookie locale
+    $langCode = admin_get_locale();
+}
+```
+
+#### 5. Translation Editor URL Parameters
+
+The Translation Editor uses these URL parameters:
+- `?load=translations` - Main page
+- `?load=translations&lang=en` - Show English translations
+- `?load=translations&lang=id` - Show Indonesian translations  
+- `?load=translations&lang=all` - Show all languages (with pagination)
+- `?load=translations&action=update` - Update translation (POST)
+- `?load=translations&action=new-translation` - Create translation (POST)
+
+### Adding Content i18n Support
+
+To add locale support to a new content type:
+
+1. **Database**: Add `content_locale` column to table
+2. **Dao**: Add `dropDownLocale()` method
+3. **Service**: Add `setContentLocale()` method
+4. **Controller**: Add locale filters and setters
+5. **Admin UI**: Add locale dropdown to edit form
 
 ### Populating Languages and Translations
 
-Languages and translations are automatically populated during installation. No manual steps required.
-
-This creates:
+The system includes:
 - 7 languages (en, ar, zh, fr, ru, es, id)
-- 203 translations across 6 contexts
+- 111 translation keys with 819 total translations
+- Translation editor in admin panel (Settings → Translations)
+- Translation cache in `public/files/cache/translations/`
 
-Use the admin panel (Settings → Languages) to manage translations.
+Use the admin panel (Settings → Languages and Settings → Translations) to manage languages and translations.
 
 ### Configuration
 
@@ -3126,11 +3636,79 @@ ScriptLog manages UI assets (CSS, JavaScript, images) separately for the admin p
 ### Active Theme Assets
 
 **Blog Theme (public/themes/blog/assets/):**
-- `css/style.sea.css` - Main theme style
-- `css/sina-nav.css` - Navigation styles
-- `vendor/@fancyapps/fancybox/jquery.fancybox.min.css` - Lightbox
+- `css/style.sea.min.css` - Main theme style (minified)
+- `css/sina-nav.min.css` - Navigation styles (minified)
+- `js/front.min.js` - Main theme logic (minified)
+- `js/sina-nav.min.js` - Navigation logic (minified)
 - `vendor/bootstrap/css/bootstrap.min.css`
 - `vendor/font-awesome/css/font-awesome.min.css`
+
+### Asset Optimization (Performance)
+
+To maintain high performance (Target: 100/100 Lighthouse), follow these patterns:
+
+#### 1. Minification
+Always use minified versions of CSS and JS in production. A helper script `tmp/minify.php` can be used to generate `.min` versions of theme assets.
+
+**Theme Asset Minification Script:**
+
+| File | Purpose |
+|------|---------|
+| `tmp/minify.php` | Development utility to generate minified `.min.css` and `.min.js` files |
+
+**Usage:**
+```bash
+php tmp/minify.php
+```
+
+**What it does:**
+- Scans `public/themes/blog/assets/css/` for `.css` files (skips `.min.css`)
+- Scans `public/themes/blog/assets/js/` for `.js` files (skips `.min.js`)
+- Generates corresponding `.min.css` and `.min.js` versions
+- Removes comments, whitespace, and redundant characters
+
+**When to use:**
+- After modifying source CSS/JS files before deployment
+- During development when adding new non-minified assets
+- Before committing to ensure production uses optimized files
+
+**Workflow:**
+```bash
+# 1. Edit source files in public/themes/blog/assets/css/ or js/
+# 2. Run minification
+php tmp/minify.php
+
+# 3. Verify minified versions were created
+ls -la public/themes/blog/assets/css/*.min.css
+ls -la public/themes/blog/assets/js/*.min.js
+```
+
+> **Note:** Minified versions are already committed to the repository. This script is for development workflow when adding or modifying theme assets.
+
+#### 2. Critical CSS
+Inline above-the-fold CSS in `header.php` to prevent render-blocking. Essential layout, navigation, and hero styles should be inlined within `<style>` tags.
+
+#### 3. Asset Deferral
+Use the `defer` attribute for all non-critical scripts in `footer.php`. This allows the browser to continue parsing HTML while scripts are being downloaded.
+
+#### 4. Compression & Caching
+Server-side compression (Gzip) and browser caching are configured in `.htaccess`. Ensure these rules are moved to the web server configuration (Nginx/Apache) for maximum efficiency.
+
+### Performance Testing
+
+To ensure optimizations are maintained, the project includes specific performance-related tests in the test suite.
+
+#### 1. Page Cache Testing
+Unit tests in `tests/unit/PageCacheTest.php` verify the full-page caching logic, ensuring that cache keys are generated correctly and that sensitive pages (search, logged-in sessions) are never cached.
+
+#### 2. DAO Eager Loading
+Integration tests in `tests/integration/PostDaoIntegrationTest.php` verify that the DAO layer uses efficient `INNER JOIN` queries and database indexes. This ensures minimal Time to First Byte (TTFB) by reducing the number of database round-trips.
+
+#### 3. Running Performance Tests
+Run the specific performance test suite using:
+```bash
+lib/vendor/bin/phpunit --bootstrap tests/bootstrap_integration.php --filter "PostDaoIntegration|PageCache"
+```
 
 ### Asset Cleanup Guidelines
 
@@ -3157,11 +3735,14 @@ ScriptLog manages UI assets (CSS, JavaScript, images) separately for the admin p
 - Duplicate libraries in different formats
 - Reference documentation files (e.g., `icons-reference/`)
 - License files in vendor directories
+- SCSS/Less source files in vendor directories (not compiled)
+- Non-minified theme CSS when `.min.css` versions are loaded
 
 **Files to NEVER remove without verification:**
 - Files referenced in layout templates
 - Minified versions (they're typically what's used)
 - Skin files actively used by the theme
+- Development utilities (`tmp/minify.php`)
 
 ---
 
@@ -3354,10 +3935,120 @@ To add search to a custom theme:
 
 ---
 
+## 26. Premium UI Standards
+
+### Overview
+
+Scriptlog follows a specific design language for system interfaces (Installer, Admin Tools) and high-end frontend pages (e.g., Privacy Policy). This is known as the **Minimalist & Elegant Dashboard Pattern**.
+
+### Core Principles
+
+| Principle | Implementation |
+|-----------|----------------|
+| **Color Palette** | High-contrast **Navy Dark Blue (#000080)** and **Chartreuse (#7FFF00)**. |
+| **Typography** | Primary font: **'Outfit'** (Google Fonts). Use variable weights (300 to 800). |
+| **Glassmorphism** | Translucent cards with `backdrop-filter: blur(25px)` for depth. |
+| **Motion** | Subtle `fadeInUp` animations for entrance and hover state transitions. |
+| **Focus** | Single-column centered layouts for long-form content to maximize readability. |
+
+### Implementation Example (Frontend)
+
+When applying this pattern to a frontend page (like `privacy.php`), follow these structural rules:
+
+1.  **Dedicated Stylesheet**: Create a page-specific CSS file (e.g., `assets/css/privacy.css`) to avoid bloat in `style.sea.css`.
+2.  **Hero Section**: Use a gradient background (Navy) with Chartreuse accents for the page header.
+3.  **Glass Card**: Wrap the main content in a container with glassmorphism effects.
+4.  **Semantic Icons**: Enhance headings with FontAwesome icons.
+
+#### CSS Pattern
+
+```css
+.glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(0, 0, 128, 0.1);
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 128, 0.15);
+}
+
+.animate-up {
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+```
+
+### Best Practices
+
+*   **Preload Fonts**: Ensure 'Outfit' is preloaded in `header.php` to prevent FOUT (Flash of Unstyled Text).
+*   **Keep Logic Separate**: Do not mix premium UI markup with complex PHP logic; keep templates clean.
+*   **Mobile-First**: Test all glassmorphism effects on mobile; ensure borders and shadows don't create visual clutter on small screens.
+
+---
+
+## Important: Respect Existing Code
+
+This codebase belongs to the project owner/developer. As a developer working on this project, you must follow these rules:
+
+### Rules for Modifying Existing Code
+
+1. **NEVER rewrite existing working code** without explicit permission from the owner
+2. **ALWAYS propose changes first** before modifying any existing file:
+   - Explain what you want to change
+   - Show the proposed solution
+   - Wait for approval before implementing
+3. **NEVER remove or change constants, functions, or logic flow** that the owner created
+4. **If something works, DON'T fix it** - even if you think your approach is "better"
+5. **Ask before changing** - When in doubt, always ask for permission
+
+### Why This Matters
+
+The owner has specific reasons for their code structure:
+- Using `APP_IMAGE` constants instead of hardcoded paths
+- Specific function signatures and return values
+- Particular logic flow for business rules
+
+### Example of what NOT to do:
+```
+❌ WRONG: "I'm going to rewrite invoke-webp-image.php to use hardcoded paths"
+❌ WRONG: "I'll replace APP_IMAGE constants with direct strings"
+❌ WRONG: "Let me change the function logic to my approach"
+```
+
+### Example of what to do:
+```
+✅ CORRECT: "I noticed an issue with image display. Can I propose a fix using the existing APP_IMAGE constants?"
+✅ CORRECT: "Would you like me to enhance invoke-responsive-image.php while keeping APP_IMAGE constants?"
+✅ CORRECT: "Can I add a new function next to the existing ones?"
+```
+
+### Lesson: What Happens When You Don't Ask
+
+A developer once noticed images on the homepage had empty `src` attributes. Instead of asking the owner, they:
+1. Replaced APP_IMAGE constants with hardcoded paths
+2. Changed the function logic to their approach
+3. Didn't test properly before claiming it worked
+4. Broke the owner's existing working code
+
+**The actual fix was simple:** The issue was `esc_attr()` being used in theme files (WordPress function). The developer should have checked the theme files first instead of modifying working utility code.
+
+**What should have happened:**
+1. Identify the issue (empty src attributes)
+2. Propose a fix to the owner
+3. Wait for approval
+4. If approved, implement using existing constants/logic
+5. Test on live site
+6. Commit only after verification
+
+---
+
 ## License
 
 This project is licensed under the MIT License.
 
 ---
 
-*Last Updated: March 2026 | Version 1.0.1*
+*Last Updated: March 2026 | Version 1.0.2*
