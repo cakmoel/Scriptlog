@@ -1,4 +1,8 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php
+
+if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <div class="modal fade" id="downloadHistoryModal" tabindex="-1" role="dialog" aria-labelledby="downloadHistoryModalLabel">
   <div class="modal-dialog modal-lg" role="document">

@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <div class="content-wrapper">
     <section class="content-header">
@@ -24,7 +26,7 @@
 
                     <?php
                     if (isset($errors)) :
-                    ?>
+                        ?>
                         <div class="alert alert-danger alert-dismissible">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                             <h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
@@ -35,11 +37,11 @@
                             ?>
                         </div>
 
-                    <?php
+                        <?php
                     endif;
 
                     if (isset($status)) :
-                    ?>
+                        ?>
                         <div class="alert alert-success alert-dismissible">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                             <h4><i class="icon fa fa-check"></i> Success!</h4>
@@ -50,8 +52,7 @@
                             ?>
                         </div>
 
-                    <?php
-
+                        <?php
                     endif;
 
                     $action = (isset($formAction)) ? $formAction : null;
@@ -70,23 +71,21 @@
                                 <div class="checkbox">
                                     <label>
 
-                                       <?php 
-                                          $can_register = isset($membershipData['setting_value']) ? json_decode($membershipData['setting_value'], true) : "";
+                                       <?php
+                                        $can_register = isset($membershipData['setting_value']) ? json_decode($membershipData['setting_value'], true) : "";
 
-                                          if ($can_register['user_can_register'] == '1') :
-                                            
-                                       ?>
+                                        if ($can_register['user_can_register'] == '1') :
+                                            ?>
                                         
                                         <input type="checkbox" value="1" name="user_can_register" checked> Anyone can register
 
-                                        <?php 
-                                          else:
-                                        ?>
+                                        <?php else :
+                                            ?>
 
                                         <input type="checkbox" value="1" name="user_can_register"> Anyone can register 
 
-                                        <?php 
-                                           endif;
+                                                                                    <?php
+                                        endif;
                                         ?>
 
                                     </label>

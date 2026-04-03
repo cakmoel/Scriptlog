@@ -29,7 +29,7 @@ if (isset($loggedIn) && $loggedIn === true) {
 
 // 3. Layout Resources
 include __DIR__ . '/login-layout.php';
-// Optimized: Don't use regex if not strictly necessary. 
+// Optimized: Don't use regex if not strictly necessary.
 // Assuming current_load_url gives full path, just strip filename.
 $stylePath = dirname(current_load_url());
 
@@ -42,7 +42,6 @@ $failed_login_attempt = 0;
 
 // 5. Form Processing
 if ($action === 'LogIn' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-
     // Validate inputs exist before processing
     // NOTE: We do NOT sanitize 'user_pass' here. We pass raw to the processor.
     $login_data = [
@@ -83,14 +82,18 @@ login_header($stylePath);
         </div>
     <?php endif; ?>
 
-    <?php if (isset($_GET['status'])): ?>
+    <?php if (isset($_GET['status'])) : ?>
         <?php
         $status_msg = '';
-        if ($_GET['status'] == 'changed') $status_msg = "The password has been changed. Please log in with your new password.";
-        if ($_GET['status'] == 'actived') $status_msg = "The account has been activated. Please log in.";
+        if ($_GET['status'] == 'changed') {
+            $status_msg = "The password has been changed. Please log in with your new password.";
+        }
+        if ($_GET['status'] == 'actived') {
+            $status_msg = "The account has been activated. Please log in.";
+        }
 
-        if ($status_msg):
-        ?>
+        if ($status_msg) :
+            ?>
             <div class="alert alert-info alert-dismissable">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                 <?= htmlspecialchars($status_msg); ?>
@@ -152,7 +155,7 @@ login_header($stylePath);
         </div>
     </form>
 
-    <?php if (is_registration_unable() === true): ?>
+    <?php if (is_registration_unable() === true) : ?>
         <a href="<?= app_url() . '/admin/signup.php'; ?>" class="text-center">Register |</a>
     <?php endif; ?>
 

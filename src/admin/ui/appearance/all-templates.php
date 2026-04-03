@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -20,37 +22,37 @@
     <section class="content">
       <div class="row">
          <div class="col-xs-12">
-         <?php 
-         if (isset($errors)) :
-         ?>
+         <?php
+            if (isset($errors)) :
+                ?>
          <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                 <h4><i class="icon fa fa-ban"></i> Error!</h4>
-           <?php 
-              foreach ($errors as $e) :
-                echo $e;
-              endforeach;
-           ?>
+                <?php
+                foreach ($errors as $e) :
+                    echo $e;
+                endforeach;
+                ?>
           </div>
-         <?php 
-         endif;
-         ?>
+                <?php
+            endif;
+            ?>
          
-         <?php 
-         if (isset($status)) :
-         ?>
+         <?php
+            if (isset($status)) :
+                ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                 <h2><i class="icon fa fa-check"></i> Success!</h2>
-           <?php 
-              foreach ($status as $s) :
-                echo $s;
-              endforeach;
-           ?>
+                       <?php
+                        foreach ($status as $s) :
+                            echo $s;
+                        endforeach;
+                        ?>
           </div>
-         <?php 
-         endif;
-         ?>
+                <?php
+            endif;
+            ?>
          
             <div class="box box-primary">
                <div class="box-header with-border">
@@ -75,12 +77,12 @@
                 </tr>
                 </thead>
                 <tbody>
-                 <?php 
-                   if (is_array($themes)) : 
-                   $no = 0;
-                   foreach ($themes as $theme) :
-                   $no++;
-                  ?>
+                 <?php
+                    if (is_array($themes)) :
+                        $no = 0;
+                        foreach ($themes as $theme) :
+                            $no++;
+                            ?>
               
                     <tr>
                        <td><?= $no; ?></td>
@@ -95,21 +97,21 @@
                        <i class="fa fa-pencil fa-fw"></i> </a>
                        </td>
                        <td>
-                       <?php if($theme['theme_status'] == 'N') : ?>
+                            <?php if ($theme['theme_status'] == 'N') : ?>
                        <a href="javascript:activateTheme('<?= abs((int)$theme['ID']); ?>', '<?= safe_html($theme['theme_title']); ?>')" class="btn btn-success" title="Activate theme">
                        <i class="fa fa-check fa-fw"></i> </a>
-                       <?php else : ?>
+                            <?php else : ?>
                        <a href="javascript:deactivateTheme('<?= abs((int)$theme['ID']); ?>', '<?= safe_html($theme['theme_title']); ?>')" class="btn btn-danger" title="Deactivate theme">
                        <i class="fa fa-times-circle fa-fw"></i> </a>
-                       <?php endif; ?>
+                            <?php endif; ?>
                        </td>
                     
                     </tr>
                 
-                <?php 
-                endforeach;
-                endif; 
-                ?>
+                            <?php
+                        endforeach;
+                    endif;
+                    ?>
                 
                 </tbody>
                 <tfoot>
@@ -138,17 +140,17 @@
 <script type="text/javascript">
   function activateTheme(id, theme)
   {
-	  if (confirm("Are you sure want to activate Theme '" + theme + "'"))
-	  {
-	  	window.location.href = 'index.php?load=templates&action=activateTheme&Id=' + id;
-	  }
+      if (confirm("Are you sure want to activate Theme '" + theme + "'"))
+      {
+        window.location.href = 'index.php?load=templates&action=activateTheme&Id=' + id;
+      }
   }
 
   function deactivateTheme(id, theme)
   {
-	  if (confirm("Are you sure want to deactivate theme '" + theme + "'"))
-	  {
-	  	window.location.href = 'index.php?load=templates&action=deactivatTheme&Id=' + id;
-	  }
+      if (confirm("Are you sure want to deactivate theme '" + theme + "'"))
+      {
+        window.location.href = 'index.php?load=templates&action=deactivatTheme&Id=' + id;
+      }
   }
 </script>

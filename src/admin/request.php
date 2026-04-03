@@ -1,4 +1,6 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * request.php - Refactored for AppContext
  */
@@ -8,13 +10,12 @@ $current_request = current_request_method();
 $method_allowed = ['GET', 'POST'];
 
 try {
-    
     if (isset($_GET['load']) && !empty($_GET['load'])) {
         // Sanitize and validate input
         $load = filter_input(INPUT_GET, 'load', FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
-        $load = preg_replace('/[^a-z0-9,_-]/i', '', $load); 
+        $load = preg_replace('/[^a-z0-9,_-]/i', '', $load);
         $load = escape_null_byte($load);
-        
+
         if (empty($load)) {
             throw new AppException("Invalid request parameter");
         }
@@ -33,11 +34,8 @@ try {
         $file_path = dirname(dirname(__FILE__)) . DS . APP_ADMIN . DS . "{$load}.php";
 
         if (!is_readable($file_path) || !in_array($load, array_keys(admin_query()))) {
-            
             direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
         } else {
-            
-            
             if (!$app->authenticator->userAccessControl()) {
                 http_response_code(403);
                 throw new AppException("403 - Forbidden");
@@ -53,10 +51,8 @@ try {
             } else {
                 require basename(absolute_path($file_path));
             }
-            
         }
     } else {
-        
         if (!$app->authenticator->userAccessControl()) {
             http_response_code(403);
             throw new AppException("403 - Forbidden");

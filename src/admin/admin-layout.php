@@ -1,9 +1,9 @@
-<?php  
-function admin_header($stylePath, $breadcrumb = null) 
-{  
+<?php
+function admin_header($stylePath, $breadcrumb = null)
+{
     $adminLocale = admin_get_locale();
     $isRtl = admin_is_rtl();
-?>
+    ?>
 <!DOCTYPE html>
 <html lang="<?= safe_html($adminLocale); ?>" dir="<?= $isRtl ? 'rtl' : 'ltr'; ?>">
 <head>
@@ -33,10 +33,10 @@ function admin_header($stylePath, $breadcrumb = null)
   <!-- Theme style -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/AdminLTE.min.css">
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/skins/scriptlog-skin.css">
-  <?php if ($isRtl): ?>
+    <?php if ($isRtl) : ?>
   <!-- RTL Support -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/rtl.css">
-  <?php endif; ?>
+    <?php endif; ?>
   <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
   <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/ie10-viewport-bug-workaround.css">
   <!-- Image Preview -->
@@ -102,20 +102,20 @@ function admin_header($stylePath, $breadcrumb = null)
 <body class="hold-transition skin-scriptlog sidebar-mini">
 <div class="wrapper">
 
-<?php 
+    <?php
 }
 
 function admin_footer($stylePath, $ubench = null)
 {
-    
-?>
+
+    ?>
  
 <footer class="main-footer">
    
     <div class="pull-right hidden-xs">
-      <?php 
-        echo APP_CODENAME;
-       ?>
+      <?php
+            echo APP_CODENAME;
+        ?>
     </div>
     
     <strong>Thank you for creating with 
@@ -123,7 +123,7 @@ function admin_footer($stylePath, $ubench = null)
      <?php echo APP_VERSION; ?>
     </strong>
     <strong>
-      <?=((true === APP_DEVELOPMENT) && (isset($ubench))) ? " Page generated in: ". $ubench->getTime() . " Memory usage: ".$ubench->getMemoryUsage() : "" ?>
+      <?=((true === APP_DEVELOPMENT) && (isset($ubench))) ? " Page generated in: " . $ubench->getTime() . " Memory usage: " . $ubench->getMemoryUsage() : "" ?>
     </strong>
 </footer>
   
@@ -158,15 +158,15 @@ function admin_footer($stylePath, $ubench = null)
 
 <script>
 $(document).ready(function(){
-	$('#scriptlog-table').DataTable({
+    $('#scriptlog-table').DataTable({
     "responsive": true,
-		"order": [],
-		"columnDefs":[
-			{
-				"targets":[0, 4, 5],
-				"orderable":false,
-			},
-		],
+        "order": [],
+        "columnDefs":[
+            {
+                "targets":[0, 4, 5],
+                "orderable":false,
+            },
+        ],
 
    });
 });

@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); }?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+}?>
  <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -20,37 +22,37 @@
     <section class="content">
       <div class="row">
          <div class="col-xs-12">
-         <?php 
-         if (isset($errors)) :
-         ?>
+         <?php
+            if (isset($errors)) :
+                ?>
          <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                 <h4><i class="icon fa fa-ban"></i> Error!</h4>
-           <?php 
-              foreach ($errors as $e) :
-                echo $e;
-              endforeach;
-           ?>
+                <?php
+                foreach ($errors as $e) :
+                    echo $e;
+                endforeach;
+                ?>
           </div>
-         <?php 
-         endif;
-         ?>
+                <?php
+            endif;
+            ?>
          
-         <?php 
-         if (isset($status)) :
-         ?>
+         <?php
+            if (isset($status)) :
+                ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                 <h4><i class="icon fa fa-check"></i> Success!</h4>
-           <?php 
-              foreach ($status as $s) :
-                echo $s;
-              endforeach;
-           ?>
+                       <?php
+                        foreach ($status as $s) :
+                            echo $s;
+                        endforeach;
+                        ?>
           </div>
-         <?php 
-         endif;
-         ?>
+                <?php
+            endif;
+            ?>
          
             <div class="box box-primary">
                <div class="box-header with-border">
@@ -75,40 +77,40 @@
                 </tr>
                 </thead>
                 <tbody>
-                 <?php 
-                   if (is_array($plugins)) : 
-                   $no = 0;
-                   foreach ($plugins as $p => $plugin) :
-                   $no++;
-                  ?>
+                 <?php
+                    if (is_array($plugins)) :
+                        $no = 0;
+                        foreach ($plugins as $p => $plugin) :
+                            $no++;
+                            ?>
               
                     <tr>
                        <td><?= $no; ?></td>
                        <td>
-                       <?= safe_html($plugin['plugin_name']); ?>
+                            <?= safe_html($plugin['plugin_name']); ?>
                        </td>
                        <td><p><?= html_entity_decode($plugin['plugin_desc']); ?></p></td>
                        <td><?= safe_html($plugin['plugin_level']); ?></td>
                        <td>
-                       <a href="javascript:deletePlugin('<?=(isset($plugin['ID']) ?  safe_html((int)$plugin['ID']) : 0); ?>', '<?=(isset($plugin['plugin_name']) ? safe_html($plugin['plugin_name']) : ""); ?>')" title="Delete Plugin" class="btn btn-danger"> 
+                       <a href="javascript:deletePlugin('<?=(isset($plugin['ID']) ? safe_html((int)$plugin['ID']) : 0); ?>', '<?=(isset($plugin['plugin_name']) ? safe_html($plugin['plugin_name']) : ""); ?>')" title="Delete Plugin" class="btn btn-danger"> 
                        <i class="fa fa-remove fa-fw"></i> Delete</a>
                        </td>
                        <td>
-                       <?php if($plugin['plugin_status'] == 'N') : ?>
+                            <?php if ($plugin['plugin_status'] == 'N') : ?>
                        <a href="javascript:activatePlugin('<?= abs((int)$plugin['ID']); ?>', '<?= safe_html($plugin['plugin_name']); ?>')" class="btn btn-success" title="Enabled plugin">
                        <i class="fa fa-toggle-on fa-fw"></i> Enabled</a>
-                       <?php else : ?>
+                            <?php else : ?>
                        <a href="javascript:deactivatePlugin('<?= abs((int)$plugin['ID']); ?>', '<?= safe_html($plugin['plugin_name']); ?>')" class="btn btn-danger" title="Disabled plugin">
                        <i class="fa fa-toggle-off fa-fw"></i> Disabled</a>
-                       <?php endif; ?>
+                            <?php endif; ?>
                        </td>
                     
                     </tr>
                 
-                <?php 
-                endforeach;
-                endif; 
-                ?>
+                            <?php
+                        endforeach;
+                    endif;
+                    ?>
                 
                 </tbody>
                 <tfoot>
@@ -137,26 +139,26 @@
 <script type="text/javascript">
   function activatePlugin(id, plugin)
   {
-  	  if (confirm("Are you sure want to activate '" + plugin + "'?"))
-  	  {
-	  	window.location.href = 'index.php?load=plugins&action=activatePlugin&Id=' + id;
-	  }
+      if (confirm("Are you sure want to activate '" + plugin + "'?"))
+      {
+        window.location.href = 'index.php?load=plugins&action=activatePlugin&Id=' + id;
+      }
   }
 
   function deactivatePlugin(id, plugin)
   {
-  	  if (confirm("Are you sure want to deactivate '" + plugin + "'?"))
-  	  {
-	  	window.location.href = 'index.php?load=plugins&action=deactivatePlugin&Id=' + id;
-	  }
+      if (confirm("Are you sure want to deactivate '" + plugin + "'?"))
+      {
+        window.location.href = 'index.php?load=plugins&action=deactivatePlugin&Id=' + id;
+      }
   }
   
   function deletePlugin(id, plugin)
   {
-  	  if (confirm("Are you sure want to uninstall '" + plugin + "'? This action cannot be undone."))
-  	  {
-	  	window.location.href = 'index.php?load=plugins&action=deletePlugin&Id=' + id;
-	  }
+      if (confirm("Are you sure want to uninstall '" + plugin + "'? This action cannot be undone."))
+      {
+        window.location.href = 'index.php?load=plugins&action=deletePlugin&Id=' + id;
+      }
   }
 
 </script>

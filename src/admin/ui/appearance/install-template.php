@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -23,31 +25,31 @@
 <!-- /.box-header -->
 <?php
 if (isset($errors)) :
-?>
+    ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 <h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
-<?php 
-foreach ($errors as $e) :
-echo '<p>' . $e . '</p>';
-endforeach;
-?>
+    <?php
+    foreach ($errors as $e) :
+        echo '<p>' . $e . '</p>';
+    endforeach;
+    ?>
 </div>
-<?php 
+    <?php
 endif;
 ?>
 
 <?php
 if (isset($saveError)) :
-?>
+    ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 <h2><i class="icon fa fa-ban"></i> Alert!</h2>
-<?php 
-echo "Error saving data. Please try again." . $saveError;
-?>
+    <?php
+    echo "Error saving data. Please try again." . $saveError;
+    ?>
 </div>
-<?php 
+    <?php
 endif;
 
 $action = isset($formAction) ? $formAction : null;

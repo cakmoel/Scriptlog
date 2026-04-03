@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <div class="content-wrapper">
 
@@ -17,35 +19,35 @@
     <div class="row">
       <div class="col-md-12">
         
-        <?php 
+        <?php
         if (!empty($errors)) :
-        ?>
+            ?>
           <div class="alert alert-danger alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h2><i class="icon fa fa-ban" aria-hidden="true"></i> Error!</h2>
             <?php
             foreach ($errors as $e) :
-              echo '<p>' . $e . '</p>';
+                echo '<p>' . $e . '</p>';
             endforeach;
             ?>
           </div>
-        <?php
+            <?php
         endif;
         ?>
 
-        <?php 
+        <?php
         if (!empty($success)) :
-        ?>
+            ?>
           <div class="alert alert-success alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h2><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h2>
             <?php
             foreach ($success as $s) :
-              echo '<p>' . nl2br($s) . '</p>';
+                echo '<p>' . nl2br($s) . '</p>';
             endforeach;
             ?>
           </div>
-        <?php
+            <?php
         endif;
         ?>
 
@@ -85,9 +87,9 @@
                 <label for="author_id">Assign Content to Author</label>
                 <select name="author_id" id="author_id" class="form-control">
                   <?php if (!empty($users)) : ?>
-                    <?php foreach ($users as $user) : ?>
+                        <?php foreach ($users as $user) : ?>
                       <option value="<?= $user['ID']; ?>"><?= safe_html($user['user_fullname'] ?: $user['user_login']); ?> (<?= safe_html($user['user_level']); ?>)</option>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
                   <?php else : ?>
                     <option value="1">Admin</option>
                   <?php endif; ?>

@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -18,21 +20,21 @@
 <section class="content">
 <div class="row">
 <?php
- if (isset($errors)) :
-?>
+if (isset($errors)) :
+    ?>
 <div class="col-md-12">
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 <h4><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h4>
-<?php 
- foreach ($errors as $e) :
-  echo '<p>' . $e . '</p>';
- endforeach;
-?>
+    <?php
+    foreach ($errors as $e) :
+        echo '<p>' . $e . '</p>';
+    endforeach;
+    ?>
 </div>
 </div>
-<?php 
- endif;
+    <?php
+endif;
 ?>
 <div class="col-md-8">
 <div class="box box-primary">

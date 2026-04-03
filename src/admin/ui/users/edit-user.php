@@ -1,5 +1,5 @@
 <?php if (!defined('SCRIPTLOG')) {
-  exit();
+    exit();
 } ?>
 
 <div class="content-wrapper">
@@ -26,26 +26,26 @@
           </div>
           <!-- /.box-header -->
           <?php
-          if (isset($errors)) :
-          ?>
+            if (isset($errors)) :
+                ?>
             <div class="alert alert-danger alert-dismissible">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
               <h3><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid form data!</h3>
-              <?php
-              foreach ($errors as $e) :
-                echo '<p>' . $e . '</p>';
-              endforeach;
-              ?>
+                <?php
+                foreach ($errors as $e) :
+                    echo '<p>' . $e . '</p>';
+                endforeach;
+                ?>
             </div>
-          <?php
-          endif;
-          ?>
+                <?php
+            endif;
+            ?>
 
           <?php
-          $action = (isset($formAction)) ? $formAction : null;
-          $user_id = (isset($userData['ID'])) ? safe_html((int)$userData['ID']) : 0;
-          $session_id = (isset($userData['user_session'])) ? safe_html($userData['user_session']) : substr(hash('sha256', bin2hex(openssl_random_pseudo_bytes(ceil(32 / 2)))), 0, 32);
-          ?>
+            $action = (isset($formAction)) ? $formAction : null;
+            $user_id = (isset($userData['ID'])) ? safe_html((int)$userData['ID']) : 0;
+            $session_id = (isset($userData['user_session'])) ? safe_html($userData['user_session']) : substr(hash('sha256', bin2hex(openssl_random_pseudo_bytes(ceil(32 / 2)))), 0, 32);
+            ?>
 
           <form method="post" action="<?= generate_request('index.php', 'post', ['users', $action, $user_id, $session_id])['link']; ?>">
             <input type="hidden" name="session_id" value="<?= $session_id; ?>">
@@ -53,15 +53,15 @@
             <div class="box-body">
 
               <?php
-              if (isset($userData['user_registered'])) :
-              ?>
+                if (isset($userData['user_registered'])) :
+                    ?>
                 <div class="form-group">
                   <label>Registered</label>
-                  <?= read_datetime(safe_html($userData['user_registered'])); ?>
+                              <?= read_datetime(safe_html($userData['user_registered'])); ?>
                 </div>
-              <?php
-              endif;
-              ?>
+                    <?php
+                endif;
+                ?>
 
               <div class="form-group">
                 <label for="username">Username <?= (isset($userData['user_login'])) ? "" : "(required)" ?></label>
@@ -91,7 +91,6 @@
               </div>
 
               <?php if (!empty($userData['user_email'])) : ?>
-
                 <div class="form-group">
                   <label for="confirm_pwd"><?= (!empty($userData['user_email'])) ? "Confirm new password (required)" : ""; ?></label>
                   <input type="password" class="form-control" id="confirm_pwd" name="user_pass2" placeholder="Confirm new password" maxlength="50" autocomplete="off">
@@ -117,30 +116,30 @@
               </div>
 
               <?php
-              if (empty($userData['user_email'])) :
-              ?>
+                if (empty($userData['user_email'])) :
+                    ?>
                 <div class="checkbox">
                   <label for="1">
                     <input id="1" type="checkbox" name="send_user_notification" value="1"> Send the new user an email about their account
                   </label>
                 </div>
 
-              <?php
-              endif;
-              ?>
+                              <?php
+                endif;
+                ?>
 
               <?php
-              if (!empty($userData['user_level']) && $userData['user_level'] != 'administrator') :
-              ?>
+                if (!empty($userData['user_level']) && $userData['user_level'] != 'administrator') :
+                    ?>
                 <div class="checkbox">
                   <label for="user_banned">
                     <input id="user_banned" type="checkbox" name="user_banned" value="1" <?= (isset($userData['user_banned']) && $userData['user_banned'] == 1) ? "checked='checked'" : ""; ?>>
                     banned user
                   </label>
                 </div>
-              <?php
-              endif;
-              ?>
+                    <?php
+                endif;
+                ?>
 
             </div>
             <!-- /.box-body -->

@@ -1,6 +1,6 @@
 <?php  defined('SCRIPTLOG') || die("Direct access not permitted");
- if (isset($_GET['forbidden']) && ($_GET['forbidden'] === md5(APP_HOSTNAME.get_ip_address()))) :
-?>
+if (isset($_GET['forbidden']) && ($_GET['forbidden'] === md5(APP_HOSTNAME . get_ip_address()))) :
+    ?>
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -37,9 +37,7 @@
   </div>
   <!-- /.content-wrapper -->
 <script type="text/javascript">function leave() { window.location = "index.php?load=dashboard";} setTimeout("leave()", 5000);</script>
-<?php
- else:
-    
+<?php else :
     direct_page('index.php?load=dashboard', 307);
- endif;  
+endif;
 ?>

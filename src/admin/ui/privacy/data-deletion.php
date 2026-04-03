@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -18,37 +20,37 @@
       <div class="row">
          <div class="col-xs-12">
          
-         <?php 
-         if (isset($errors)) :
-         ?>
+         <?php
+            if (isset($errors)) :
+                ?>
          <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                 <h4><i class="icon fa fa-ban" aria-hidden="true"></i> Error!</h4>
-            <?php 
-               foreach ($errors as $e) :
-                 echo $e;
-               endforeach;
-            ?>
+                <?php
+                foreach ($errors as $e) :
+                    echo $e;
+                endforeach;
+                ?>
           </div>
-         <?php 
-         endif;
-         ?>
+                <?php
+            endif;
+            ?>
          
-         <?php 
-         if (isset($status)) :
-         ?>
+         <?php
+            if (isset($status)) :
+                ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                 <h4><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h4>
-          <?php 
-             foreach ($status as $s) :
-               echo $s;
-             endforeach;
-          ?>
+                      <?php
+                        foreach ($status as $s) :
+                            echo $s;
+                        endforeach;
+                        ?>
            </div>
-         <?php 
-         endif;
-         ?>
+                <?php
+            endif;
+            ?>
          
              <div class="box box-danger">
                 <div class="box-header with-border">

@@ -1,6 +1,8 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
-<?php 
+<?php
 $action = isset($formAction) ? $formAction : null;
 $media_id = isset($mediaData['ID']) ? $mediaData['ID'] : 0;
 ?>
@@ -31,17 +33,17 @@ $media_id = isset($mediaData['ID']) ? $mediaData['ID'] : 0;
 <!-- /.box-header -->
 <?php
 if (isset($errors)) :
-?>
+    ?>
 <div class="alert alert-danger alert-dismissible" role="alert">
 <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">&times;</button>
 <h4><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h4>
-<?php 
-foreach ($errors as $e) :
-echo '<p>' . $e . '</p>';
-endforeach;
-?>
+    <?php
+    foreach ($errors as $e) :
+        echo '<p>' . $e . '</p>';
+    endforeach;
+    ?>
 </div>
-<?php 
+    <?php
 endif;
 ?>
 
@@ -51,26 +53,22 @@ endif;
 
 <div class="box-body">
 
-<?php 
+<?php
 if (isset($mediaData['media_filename']) && isset($mediaData['media_type'])) :
+    $webp_src = invoke_webp_image($mediaData['media_filename'], false);
+    $image_src = invoke_image_uploaded($mediaData['media_filename'], false);
+    $webp_src_thumb = invoke_webp_image($mediaData['media_filename'], true);
+    $image_src_thumb = invoke_image_uploaded($mediaData['media_filename'], true);
+    $video_src = invoke_video_uploaded($mediaData['media_filename']);
+    $audio_src = invoke_audio_uploaded($mediaData['media_filename']);
 
-  $webp_src = invoke_webp_image($mediaData['media_filename'], false);
-  $image_src = invoke_image_uploaded($mediaData['media_filename'], false);
-  $webp_src_thumb = invoke_webp_image($mediaData['media_filename'], true);
-  $image_src_thumb = invoke_image_uploaded($mediaData['media_filename'], true);
-  $video_src = invoke_video_uploaded($mediaData['media_filename']);
-  $audio_src = invoke_audio_uploaded($mediaData['media_filename']);
-  
-    if(! ($image_src_thumb || $webp_src_thumb)) :
-      
-      $webp_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
-      $image_src_thumb = app_url().'/public/files/pictures/nophoto.jpg';
-
+    if (! ($image_src_thumb || $webp_src_thumb)) :
+        $webp_src_thumb = app_url() . '/public/files/pictures/nophoto.jpg';
+        $image_src_thumb = app_url() . '/public/files/pictures/nophoto.jpg';
     endif;
 
-if ($image_src || $webp_src) :
-
-?>
+    if ($image_src || $webp_src) :
+        ?>
 
 <div class="form-group">
 <a href="<?=$webp_src;?>" title="<?=(!isset($mediaData['media_caption']) ?: safe_html($mediaData['media_caption'])); ?>">
@@ -87,13 +85,12 @@ if ($image_src || $webp_src) :
   <p class="help-block">Maximum upload file size: <?= format_size_unit(APP_FILE_SIZE); ?>.</p>
 </div>  
 
-<?php else: ?>
-
+    <?php else : ?>
 <div class="form-group">
 
-<?php 
-if ($mediaData['media_type'] == "video/webm" || $mediaData['media_type'] == "video/mp4" || $mediaData['media_type'] == "video/ogg") :
-?>
+        <?php
+        if ($mediaData['media_type'] == "video/webm" || $mediaData['media_type'] == "video/mp4" || $mediaData['media_type'] == "video/ogg") :
+            ?>
 
 <video class="img-responsive pad" controls width="600" height="320" preload="metadata">
 <source src="<?=$video_src; ?>" type="<?=$mediaData['media_type']; ?>">
@@ -101,28 +98,25 @@ Sorry, your browser doesn't support embedded <code>videos</code>
 <track label="English" kind="captions" srclang="en">
 </video>
 
-<?php  elseif($mediaData['media_type'] == "audio/mpeg" || $mediaData['media_type'] == "audio/wav" || $mediaData['media_type'] == "audio/ogg") : ?>
-
+        <?php elseif ($mediaData['media_type'] == "audio/mpeg" || $mediaData['media_type'] == "audio/wav" || $mediaData['media_type'] == "audio/ogg") : ?>
 <audio class="img-responsive pad" controls>
 <source src="<?=$audio_src; ?>" type="<?=$mediaData['media_type']; ?>">
 Your browser does not support the <code>audio</code> element. 
 </audio>
 
-<?php else :?>
-
+        <?php else :?>
 <a href="#" class="img-responsive pad" aria-hidden="true"><?=invoke_fileicon($mediaData['media_type']);?></a>
 
-<?php endif; ?>
+        <?php endif; ?>
 
 <label for="mediaUploaded">Change file</label>
 <input type="file"  name="media" id="mediaUploaded" maxlength="512" >
 <p class="help-block">Maximum upload file size: <?= format_size_unit(APP_FILE_SIZE); ?>.</p>
 </div>
 
-<?php endif; ?>
+    <?php endif; ?>
 
-<?php else: ?>
-
+<?php else : ?>
 <div class="form-group">
 <label for="mediaUploaded">Select Media File <span class="text-red" title="required">*</span></label>
 <input type="file" name="media" id="mediaUploaded" maxlength="512" required aria-required="true">
@@ -149,15 +143,14 @@ Your browser does not support the <code>audio</code> element.
 </div>
 <!-- media access -->
 
-<?php if(isset($mediaData['media_status'])) : ?>
-
+<?php if (isset($mediaData['media_status'])) : ?>
 <div class="form-group">
 <label>Active Status</label>
 <div class="radio">
 <label for="optionsRadios1">
 <input type="radio" name="media_status" id="optionsRadios1" value="1" 
-<?=(isset($mediaData['media_status']) && $mediaData['media_status'] === 1) ? 'checked="checked"' : "";  ?>
-<?=(isset($formData['media_status']) && $formData['media_status'] === 1) ? 'checked="checked"' : "" ?>>
+    <?=(isset($mediaData['media_status']) && $mediaData['media_status'] === 1) ? 'checked="checked"' : "";  ?>
+    <?=(isset($formData['media_status']) && $formData['media_status'] === 1) ? 'checked="checked"' : "" ?>>
    Yes, keep this media active
  </label>
 </div>
@@ -165,8 +158,8 @@ Your browser does not support the <code>audio</code> element.
 <div class="radio">
 <label for="optionsRadios2">
 <input type="radio" name="media_status" id="optionsRadios2" value="0" 
-<?=(isset($mediaData['media_status']) && $mediaData['media_status'] === 0) ? 'checked="checked"' : ""; ?>
-<?=(isset($formData['media_status']) && $formData['media_status'] === 0) ? 'checked="checked"' : ""; ?>>
+    <?=(isset($mediaData['media_status']) && $mediaData['media_status'] === 0) ? 'checked="checked"' : ""; ?>
+    <?=(isset($formData['media_status']) && $formData['media_status'] === 0) ? 'checked="checked"' : ""; ?>>
    No, deactivate this media
  </label>
 </div>
@@ -194,9 +187,9 @@ Your browser does not support the <code>audio</code> element.
 </div>
 <!--/.col-md-6 -->
 
-<?php 
-if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
-?>
+<?php
+if ((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
+    ?>
 <div class="col-md-6">
 <div class="box box-solid">
 <div class="box-header with-border">
@@ -207,10 +200,10 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
             
 <div class="box-body">
   <dl class="dl-horizontal">            
-    <?php 
-       if (isset($mediaProperties['meta_value'])) :
-          $media_properties = media_properties($mediaProperties['meta_value']);
-    ?>
+    <?php
+    if (isset($mediaProperties['meta_value'])) :
+        $media_properties = media_properties($mediaProperties['meta_value']);
+        ?>
 
                 <dt>File name</dt>
                 <dd><?= safe_html($media_properties['Origin']); ?></dd>
@@ -223,14 +216,14 @@ if((isset($mediaData['ID'])) && (!empty($mediaData['ID']))) :
                 <dt>Uploaded on</dt>
                 <dd><?= safe_html($media_properties['Uploaded at']); ?></dd>
                 <dt>Dimension</dt>
-                <dd><?=(isset($mediaData['media_type']) && $mediaData['media_type'] != "image/jpeg" && $mediaData['media_type'] != "image/png" 
-                      && $mediaData['media_type'] != "image/webp" 
-                      && $mediaData['media_type'] != "image/gif") ? "Not specified" : safe_html($media_properties['Dimension']); ?> 
+                <dd><?=(isset($mediaData['media_type']) && $mediaData['media_type'] != "image/jpeg" && $mediaData['media_type'] != "image/png"
+                          && $mediaData['media_type'] != "image/webp"
+                          && $mediaData['media_type'] != "image/gif") ? "Not specified" : safe_html($media_properties['Dimension']); ?> 
                 </dd>
 
               <?php
-                 endif;
-              ?>
+    endif;
+    ?>
               
   </dl>
   </div>

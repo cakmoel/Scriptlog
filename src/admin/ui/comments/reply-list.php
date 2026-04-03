@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -18,39 +20,39 @@
     <section class="content">
       <div class="row">
         
-        <?php 
+        <?php
         if (isset($errors)) :
-        ?>
+            ?>
         <div class="col-md-12">
           <div class="alert alert-danger alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h4><i class="icon fa fa-ban" aria-hidden="true"></i> Alert!</h4>
-            <?php 
-              foreach ($errors as $e) :
+            <?php
+            foreach ($errors as $e) :
                 echo $e;
-              endforeach;
+            endforeach;
             ?>
           </div>
         </div>
-        <?php 
+            <?php
         endif;
         ?>
         
-        <?php 
+        <?php
         if (isset($status)) :
-        ?>
+            ?>
         <div class="col-md-12">
           <div class="alert alert-success alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h4><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h4>
-            <?php 
-              foreach ($status as $s) :
+            <?php
+            foreach ($status as $s) :
                 echo $s;
-              endforeach;
+            endforeach;
             ?>
           </div>
         </div>
-        <?php 
+            <?php
         endif;
         ?>
 
@@ -87,11 +89,11 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <?php 
-                      $no = 0;
-                      foreach($replies as $reply) :
+                    <?php
+                    $no = 0;
+                    foreach ($replies as $reply) :
                         $no++;
-                    ?>
+                        ?>
                       <tr>
                         <th scope="row"><?= $no; ?></th>
                         <td class="hidden-xs"><?= safe_html($reply['comment_author_name']); ?></td>
@@ -100,12 +102,16 @@
                         </td>
                         <td class="hidden-xs">
                           <?php
-                            $statusClass = 'default';
+                              $statusClass = 'default';
                             $statusLabel = ucfirst($reply['comment_status']);
-                            if ($reply['comment_status'] === 'approved') { $statusClass = 'success'; }
-                            elseif ($reply['comment_status'] === 'pending') { $statusClass = 'warning'; }
-                            elseif ($reply['comment_status'] === 'spam') { $statusClass = 'danger'; }
-                          ?>
+                            if ($reply['comment_status'] === 'approved') {
+                                  $statusClass = 'success';
+                            } elseif ($reply['comment_status'] === 'pending') {
+                                $statusClass = 'warning';
+                            } elseif ($reply['comment_status'] === 'spam') {
+                                $statusClass = 'danger';
+                            }
+                            ?>
                           <span class="label label-<?= $statusClass; ?>"><?= $statusLabel; ?></span>
                         </td>
                         <td class="hidden-xs"><?= time_elapsed_string($reply['comment_date']); ?></td>
@@ -120,8 +126,8 @@
                           </div>
                         </td>
                       </tr>
-                    <?php 
-                      endforeach;
+                        <?php
+                    endforeach;
                     ?>
                   </tbody>
                   <tfoot>
@@ -158,9 +164,9 @@
 <script type="text/javascript">
   function deleteReply(id, name)
   {
-	  if (confirm("Are you sure want to delete reply from '" + name + "'"))
-	  {
-	  	window.location.href = 'index.php?load=reply&action=deleteReply&Id=' + id;
-	  }
+      if (confirm("Are you sure want to delete reply from '" + name + "'"))
+      {
+        window.location.href = 'index.php?load=reply&action=deleteReply&Id=' + id;
+      }
   }
 </script>

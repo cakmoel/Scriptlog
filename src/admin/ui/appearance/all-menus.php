@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
@@ -22,33 +24,33 @@
       <div class="col-xs-12">
         <?php
         if (isset($errors)) :
-        ?>
+            ?>
           <div class="alert alert-danger alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h2><i class="icon fa fa-ban" aria-hidden="true"></i> Error!</h2>
             <?php
             foreach ($errors as $e) :
-              echo $e;
+                echo $e;
             endforeach;
             ?>
           </div>
-        <?php
+            <?php
         endif;
         ?>
 
         <?php
         if (isset($status)) :
-        ?>
+            ?>
           <div class="alert alert-success alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h2><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h2>
             <?php
             foreach ($status as $s) :
-              echo $s;
+                echo $s;
             endforeach;
             ?>
           </div>
-        <?php
+            <?php
         endif;
         ?>
 
@@ -77,10 +79,10 @@
               <tbody>
                 <?php
                 if (is_array($menus)) :
-                  $no = 0;
-                  $parents = null;
-                  while ($menu = array_shift($menus)) :
-                ?>
+                    $no = 0;
+                    $parents = null;
+                    while ($menu = array_shift($menus)) :
+                        ?>
 
                     <tr>
 
@@ -92,15 +94,11 @@
                         $total = $parent->num_rows;
 
                         if ($total > 0) {
-
-                          while ($data_parent = nav_nested($parent)) {
-
-                            echo htmlout(strtolower($data_parent['menu_label']));
-
-                          }
+                            while ($data_parent = nav_nested($parent)) {
+                                echo htmlout(strtolower($data_parent['menu_label']));
+                            }
                         } else {
-
-                          echo "parent";
+                            echo "parent";
                         }
 
                         ?>
@@ -110,9 +108,8 @@
                       <td>
                         <?php if ($menu['menu_status'] === 'N') : ?>
                           disabled
-                        <?php
-                        else :
-                        ?>
+                        <?php else :
+                            ?>
                           enabled
                         <?php endif; ?>
                       </td>
@@ -127,9 +124,9 @@
 
                     </tr>
 
-                <?php
-                    $no++;
-                  endwhile;
+                        <?php
+                            $no++;
+                    endwhile;
                 endif;
                 ?>
 

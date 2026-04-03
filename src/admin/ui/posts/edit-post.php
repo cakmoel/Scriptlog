@@ -1,5 +1,5 @@
 <?php if (!defined('SCRIPTLOG')) {
-   exit();
+    exit();
 } ?>
 
 <div class="content-wrapper">
@@ -27,27 +27,27 @@
                </div>
                <!-- /.box-header -->
                <?php
-                 if (isset($errors)) :
-               ?>
+                if (isset($errors)) :
+                    ?>
                   <div class="alert alert-danger alert-dismissible" role="alert">
                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">&times;</button>
                      <h4><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h4>
 
-                     <?php
-                     foreach ($errors as $e) :
+                    <?php
+                    foreach ($errors as $e) :
                         echo '<p>' . $e . '</p>';
-                     endforeach;
-                     ?>
+                    endforeach;
+                    ?>
 
                   </div>
 
-               <?php
-                 endif;
+                    <?php
+                endif;
 
-                 $action = isset($formAction) ? $formAction : null;
-                 $post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
+                $action = isset($formAction) ? $formAction : null;
+                $post_id = isset($postData['ID']) ? (int)$postData['ID'] : 0;
 
-               ?>
+                ?>
 
                <!-- form start -->
                <form method="post" action="<?= generate_request('index.php', 'post', ['posts', $action, $post_id])['link']; ?>" enctype="multipart/form-data">
@@ -97,24 +97,30 @@
                            </div>
 
                <input type="text" id="datetimepicker" name="<?= (isset($postData['post_modified']) ? "post_modified" : "post_date"); ?>" class="form-control" placeholder="YYYY-MM-DD HH:MM:SS" value="<?php
-if (isset($postData['post_modified']) || isset($postData['post_date'])) {
-   if ($postData['post_modified'] === null) {
-      echo make_date(safe_html($postData['post_date']));
-   } else {
-      echo make_date(safe_html($postData['post_modified']));
-   }
-}
-?>">
+                if (isset($postData['post_modified']) || isset($postData['post_date'])) {
+                    if ($postData['post_modified'] === null) {
+                        echo make_date(safe_html($postData['post_date']));
+                    } else {
+                        echo make_date(safe_html($postData['post_modified']));
+                    }
+                }
+                ?>">
 
                         </div>
                         <p class="help-block">Schedule or backdate your post if needed.</p>
                      </div>
                      <!-- /.Date -->
 
-                <?= (isset($postVisibility)) ? $postVisibility : ""; ?> 
-                <!-- /.post-visiblity -->
+                   <?= (isset($postVisibility)) ? $postVisibility : ""; ?> 
+                   <!-- /.post-visiblity -->
 
-                  </div>
+                   <div class="form-group">
+                      <label for="post_locale">Language</label>
+                      <?= (isset($postLocale)) ? $postLocale : ""; ?>
+                      <p class="help-block">Select the language for this post.</p>
+                   </div>
+
+                   </div>
                   <!-- /.box-body -->
             </div>
             <!-- /.box-primary -->

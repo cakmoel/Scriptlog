@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
  <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -18,37 +20,37 @@
     <section class="content">
       <div class="row">
          <div class="col-xs-12">
-         <?php 
-         if (isset($errors)) :
-         ?>
+         <?php
+            if (isset($errors)) :
+                ?>
          <div class="alert alert-danger alert-dismissible">
           <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
           <h2><i class="icon fa fa-ban" aria-hidden="true"></i> Alert!</h2>
-           <?php 
-              foreach ($errors as $e) :
-                echo $e;
-              endforeach;
-           ?>
+                <?php
+                foreach ($errors as $e) :
+                    echo $e;
+                endforeach;
+                ?>
           </div>
-         <?php 
-         endif;
-         ?>
+                <?php
+            endif;
+            ?>
          
-         <?php 
-         if (isset($status)) :
-         ?>
+         <?php
+            if (isset($status)) :
+                ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                 <h2><i class="icon fa fa-check"></i> Alert!</h2>
-           <?php 
-              foreach ($status as $s) :
-                echo $s;
-              endforeach;
-           ?>
+                       <?php
+                        foreach ($status as $s) :
+                            echo $s;
+                        endforeach;
+                        ?>
           </div>
-         <?php 
-         endif;
-         ?>
+                <?php
+            endif;
+            ?>
          
             <div class="box box-primary">
                <div class="box-header with-border">
@@ -73,12 +75,12 @@
                 </tr>
                 </thead>
                 <tbody>
-                <?php 
-                 if (is_array($pages)) :
-                   $no = 0;
-                   foreach ($pages as $p => $page) :
-                    $no++;
-                ?>
+                <?php
+                if (is_array($pages)) :
+                    $no = 0;
+                    foreach ($pages as $p => $page) :
+                        $no++;
+                        ?>
                     <tr>
                        
                        <td><?= $no; ?></td>
@@ -95,9 +97,9 @@
                        </td>
                        
                     </tr>
-                <?php 
-                 endforeach;
-                 endif;
+                        <?php
+                    endforeach;
+                endif;
                 ?>
                 </tbody>
                 <tfoot>
@@ -126,9 +128,9 @@
 <script type="text/javascript">
   function deletePage(id, title)
   {
-	  if (confirm("Are you sure want to delete Page '" + title + "'"))
-	  {
-	  	window.location.href = 'index.php?load=pages&action=deletePage&pageId=' + id;
-	  }
+      if (confirm("Are you sure want to delete Page '" + title + "'"))
+      {
+        window.location.href = 'index.php?load=pages&action=deletePage&pageId=' + id;
+      }
   }
 </script>

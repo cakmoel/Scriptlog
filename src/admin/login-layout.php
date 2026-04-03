@@ -6,7 +6,7 @@ function login_header($stylePath)
 {
     // Define a version identifier for cache busting (change this value when assets are updated)
     $version = '1.0.1';
-?>
+    ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,13 +56,13 @@ function login_header($stylePath)
 <body class="hold-transition login-page">
 <div class="login-box">
 
-<?php
+    <?php
 }
 
 function login_footer($stylePath)
 {
     $version = '1.0.1';
-?>
+    ?>
 
 </div>
   
@@ -82,5 +82,5 @@ function login_footer($stylePath)
 </body>
 </html>
 
-<?php
+    <?php
 }

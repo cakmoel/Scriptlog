@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <div class="content-wrapper">
 
@@ -29,26 +31,26 @@
           </div>
           <div class="box-body">
             
-            <?php if (!empty($preview['site_info'])): ?>
+            <?php if (!empty($preview['site_info'])) : ?>
             <table class="table table-bordered">
-              <?php if (!empty($preview['site_info']['title'])): ?>
+                <?php if (!empty($preview['site_info']['title'])) : ?>
               <tr>
                 <th style="width: 200px;">Title</th>
                 <td><?= safe_html($preview['site_info']['title']); ?></td>
               </tr>
-              <?php endif; ?>
-              <?php if (!empty($preview['site_info']['url'])): ?>
+                <?php endif; ?>
+                <?php if (!empty($preview['site_info']['url'])) : ?>
               <tr>
                 <th style="width: 200px;">URL</th>
                 <td><?= safe_html($preview['site_info']['url']); ?></td>
               </tr>
-              <?php endif; ?>
-              <?php if (!empty($preview['site_info']['site_url'])): ?>
+                <?php endif; ?>
+                <?php if (!empty($preview['site_info']['site_url'])) : ?>
               <tr>
                 <th style="width: 200px;">Site URL</th>
                 <td><?= safe_html($preview['site_info']['site_url']); ?></td>
               </tr>
-              <?php endif; ?>
+                <?php endif; ?>
               <tr>
                 <th>Platform</th>
                 <td><?= ucfirst(safe_html($source)); ?></td>
@@ -76,7 +78,7 @@
                 </div>
               </div>
               
-              <?php if (isset($preview['pages_count'])): ?>
+              <?php if (isset($preview['pages_count'])) : ?>
               <div class="col-md-3 col-sm-6 col-xs-12">
                 <div class="info-box">
                   <span class="info-box-icon bg-green"><i class="fa fa-file-text-o"></i></span>
@@ -98,7 +100,7 @@
                 </div>
               </div>
 
-              <?php if (isset($preview['tags_count'])): ?>
+              <?php if (isset($preview['tags_count'])) : ?>
               <div class="col-md-3 col-sm-6 col-xs-12">
                 <div class="info-box">
                   <span class="info-box-icon bg-red"><i class="fa fa-tags"></i></span>
@@ -114,7 +116,7 @@
           </div>
         </div>
 
-        <?php if (!empty($preview['posts'])): ?>
+        <?php if (!empty($preview['posts'])) : ?>
         <div class="box box-info">
           <div class="box-header with-border">
             <h3 class="box-title">Items to be Imported (Sample)</h3>
@@ -131,7 +133,7 @@
                 </tr>
               </thead>
               <tbody>
-                <?php foreach ($preview['posts'] as $post): ?>
+                <?php foreach ($preview['posts'] as $post) : ?>
                 <tr>
                   <td><?= safe_html($post['title']); ?></td>
                   <td><code><?= safe_html($post['slug']); ?></code></td>
@@ -142,7 +144,7 @@
                 <?php endforeach; ?>
               </tbody>
             </table>
-            <?php if ($preview['posts_count'] > 10): ?>
+            <?php if ($preview['posts_count'] > 10) : ?>
             <p class="text-muted text-center"><br>... and <?= $preview['posts_count'] - 10; ?> more items.</p>
             <?php endif; ?>
           </div>

@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -91,9 +93,9 @@
                         <div class="box-body">
                           <p>Manage cookie consent settings:</p>
                           <p><strong>Status:</strong> 
-                            <?php if(function_exists('has_cookie_consent')): ?>
+                            <?php if (function_exists('has_cookie_consent')) : ?>
                               <span class="label label-success">Active</span>
-                            <?php else: ?>
+                            <?php else : ?>
                               <span class="label label-default">Not Configured</span>
                             <?php endif; ?>
                           </p>
@@ -118,15 +120,15 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <?php if(isset($recentLogs) && is_array($recentLogs)): ?>
-                        <?php foreach($recentLogs as $log): ?>
+                      <?php if (isset($recentLogs) && is_array($recentLogs)) : ?>
+                            <?php foreach ($recentLogs as $log) : ?>
                         <tr>
                           <td><?= htmlout($log['log_action']); ?></td>
                           <td><?= htmlout($log['log_email'] ?? '-'); ?></td>
                           <td><?= htmlout(date('M j, Y H:i', strtotime($log['log_date']))); ?></td>
                         </tr>
-                        <?php endforeach; ?>
-                      <?php else: ?>
+                            <?php endforeach; ?>
+                      <?php else : ?>
                         <tr>
                           <td colspan="3" class="text-center">No recent activity</td>
                         </tr>

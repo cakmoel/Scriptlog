@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
  <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -6,8 +8,8 @@
       <h1>
         <?=(isset($pageTitle)) ? $pageTitle : ""; ?>
         <small><a href="index.php?load=topics&action=newTopic&Id=0"
-					class="btn btn-primary"> <i class="fa fa-plus-circle" aria-hidden="true"></i> Add New
-				</a></small>
+                    class="btn btn-primary"> <i class="fa fa-plus-circle" aria-hidden="true"></i> Add New
+                </a></small>
       </h1>
       <ol class="breadcrumb">
         <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home </a></li>
@@ -20,37 +22,37 @@
     <section class="content">
       <div class="row">
          <div class="col-xs-12">
-         <?php 
-         if (isset($errors)) :
-         ?>
+         <?php
+            if (isset($errors)) :
+                ?>
          <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                 <h4><i class="icon fa fa-ban"></i> Alert!</h4>
-           <?php 
-              foreach ($errors as $e) :
-                echo $e;
-              endforeach;
-           ?>
+                <?php
+                foreach ($errors as $e) :
+                    echo $e;
+                endforeach;
+                ?>
           </div>
-         <?php 
-         endif;
-         ?>
+                <?php
+            endif;
+            ?>
          
-         <?php 
-         if (isset($status)) :
-         ?>
+         <?php
+            if (isset($status)) :
+                ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                 <h2><i class="icon fa fa-check"></i> Success!</h2>
-           <?php 
-              foreach ($status as $s) :
-                echo $s;
-              endforeach;
-           ?>
+                       <?php
+                        foreach ($status as $s) :
+                            echo $s;
+                        endforeach;
+                        ?>
           </div>
-         <?php 
-         endif;
-         ?>
+                <?php
+            endif;
+            ?>
          
             <div class="box box-primary">
                <div class="box-header with-border">
@@ -75,12 +77,12 @@
                 </tr>
                 </thead>
                 <tbody>
-                  <?php 
-                    if(is_array($categories)) :
-                      $no = 0;
-                      foreach($categories as $topic) :
-                        $no++;
-                  ?>
+                  <?php
+                    if (is_array($categories)) :
+                        $no = 0;
+                        foreach ($categories as $topic) :
+                            $no++;
+                            ?>
                      <tr>
                       <td><?= $no; ?></td>
                       <td><?= safe_html($topic['topic_title']); ?></td>
@@ -97,10 +99,10 @@
                        </td>
 
                      </tr>
-                  <?php 
-                      endforeach; 
-                    endif; 
-                  ?>
+                            <?php
+                        endforeach;
+                    endif;
+                    ?>
 
                 </tbody>
                 <tfoot>
@@ -129,9 +131,9 @@
 <script type="text/javascript">
   function deleteTopic(id, title)
   {
-	  if (confirm("Are you sure want to delete Topic '" + title + "'"))
-	  {
-	  	window.location.href = 'index.php?load=topics&action=deleteTopic&Id=' + id;
-	  }
+      if (confirm("Are you sure want to delete Topic '" + title + "'"))
+      {
+        window.location.href = 'index.php?load=topics&action=deleteTopic&Id=' + id;
+      }
   }
 </script>

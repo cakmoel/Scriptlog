@@ -1,4 +1,6 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 
@@ -8,15 +10,12 @@ if (empty($action)) {
     }
 }
 
-$exportService = new ExportService($app->sanitizer);
+$exportService = new ExportService();
 $exportController = new ExportController($exportService);
 
 try {
-
     switch ($action) {
-
         case 'export':
-
             if (false === $app->authenticator->userAccessControl(ActionConst::PRIVACY)) {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
@@ -26,7 +25,6 @@ try {
             break;
 
         default:
-
             if (false === $app->authenticator->userAccessControl(ActionConst::PRIVACY)) {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
@@ -36,11 +34,9 @@ try {
             break;
     }
 } catch (\Throwable $e) {
-
     LogError::setStatusCode(http_response_code());
     LogError::exceptionHandler($e);
 } catch (AppException $e) {
-
     LogError::setStatusCode(http_response_code());
     LogError::exceptionHandler($e);
 }

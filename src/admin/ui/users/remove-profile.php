@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <div class="content-wrapper">
  <section class="content-header">
@@ -21,21 +23,21 @@
 
 <?php
 if (isset($errors)) :
-?>
+    ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 <h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
-<?php 
-foreach ($errors as $e) :
-echo '<p>' . $e . '</p>';
-endforeach;
-?>
+    <?php
+    foreach ($errors as $e) :
+        echo '<p>' . $e . '</p>';
+    endforeach;
+    ?>
 </div>
-<?php 
+    <?php
 endif;
 ?>
 
-<?php 
+<?php
 $action = isset($formAction) ? $formAction : null;
 $user_id = (isset($userData['ID'])) ? safe_html((int)$userData['ID']) : 0;
 $session_id = (isset($userData['user_session'])) ? safe_html($userData['user_session']) : sha1(app_key());
