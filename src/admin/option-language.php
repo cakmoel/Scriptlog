@@ -1,4 +1,6 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * option-language.php
  *
@@ -21,25 +23,19 @@ $configService = class_exists('ConfigurationService') ? new ConfigurationService
 $configController = class_exists('ConfigurationController') ? new ConfigurationController($configService) : null;
 
 try {
-
     if ($configController) {
         $configController->updateLanguageSetting();
     } else {
         throw new AppException("Configuration module could not be initialized.");
     }
-
 } catch (\Throwable $th) {
-
     if (class_exists('LogError')) {
         LogError::setStatusCode(http_response_code());
         LogError::exceptionHandler($th);
     }
-
 } catch (AppException $e) {
-
     if (class_exists('LogError')) {
         LogError::setStatusCode(http_response_code());
         LogError::exceptionHandler($e);
     }
-
 }

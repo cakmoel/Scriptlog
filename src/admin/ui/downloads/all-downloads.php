@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -23,11 +25,11 @@
           <div class="alert alert-success alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h4><i class="icon fa fa-check"></i> Success!</h4>
-            <?php 
-              foreach ($status as $s) :
-                echo $s;
-              endforeach;
-            ?>
+                <?php
+                foreach ($status as $s) :
+                    echo $s;
+                endforeach;
+                ?>
           </div>
           <?php endif; ?>
           
@@ -35,11 +37,11 @@
           <div class="alert alert-danger alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h4><i class="icon fa fa-ban"></i> Error!</h4>
-            <?php 
-              foreach ($errors as $e) :
-                echo $e;
-              endforeach;
-            ?>
+                <?php
+                foreach ($errors as $e) :
+                    echo $e;
+                endforeach;
+                ?>
           </div>
           <?php endif; ?>
           
@@ -79,17 +81,17 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <?php 
-                    $allDownloads = $allDownloads ?? [];
+                    <?php
+                      $allDownloads = $allDownloads ?? [];
                     $downloadService = $downloadService ?? null;
-                    
-                    if (is_array($allDownloads) && !empty($allDownloads)) : 
-                      $no = 0;
-                      foreach ($allDownloads as $download) :
-                        $no++;
-                        $isExpired = ($downloadService !== null) ? $downloadService->isDownloadExpired($download['media_identifier']) : false;
-                        $downloadCount = ($downloadService !== null) ? $downloadService->getDownloadCountByMedia($download['media_id']) : 0;
-                    ?>
+
+                    if (is_array($allDownloads) && !empty($allDownloads)) :
+                        $no = 0;
+                        foreach ($allDownloads as $download) :
+                            $no++;
+                            $isExpired = ($downloadService !== null) ? $downloadService->isDownloadExpired($download['media_identifier']) : false;
+                            $downloadCount = ($downloadService !== null) ? $downloadService->getDownloadCountByMedia($download['media_id']) : 0;
+                            ?>
                     <tr>
                       <td><input type="checkbox" name="downloads[]" value="<?= safe_html($download['media_identifier']); ?>"></td>
                       <td><?= $no; ?></td>
@@ -100,12 +102,12 @@
                       <td><?= safe_html($download['media_type']); ?></td>
                       <td><code><?= safe_html(substr($download['media_identifier'], 0, 8)); ?>...</code></td>
                       <td>
-                        <?php if ($isExpired) : ?>
+                            <?php if ($isExpired) : ?>
                           <span class="label label-danger">Expired</span>
-                        <?php else : ?>
+                            <?php else : ?>
                           <span class="label label-success">Active</span>
                           <br><small><?= date('M j, Y', $download['before_expired']); ?></small>
-                        <?php endif; ?>
+                            <?php endif; ?>
                       </td>
                       <td><?= date('M j, Y H:i', strtotime($download['created_at'])); ?></td>
                         <td>
@@ -120,8 +122,8 @@
                         </a>
                       </td>
                     </tr>
-                    <?php 
-                      endforeach;
+                            <?php
+                        endforeach;
                     else : ?>
                     <tr>
                       <td colspan="8" class="text-center">No download records found.</td>

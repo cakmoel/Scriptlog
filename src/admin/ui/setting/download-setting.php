@@ -1,6 +1,8 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
-<?php 
+<?php
 $currentSettings = $currentSettings ?? [];
 $defaultMimeTypes = $defaultMimeTypes ?? [];
 $status = $status ?? [];
@@ -27,7 +29,9 @@ $errors = $errors ?? [];
           <div class="alert alert-success alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h4><i class="icon fa fa-check"></i> Success!</h4>
-            <?php foreach ($status as $s) : echo $s; endforeach; ?>
+                <?php foreach ($status as $s) :
+                    echo $s;
+                endforeach; ?>
           </div>
           <?php endif; ?>
           
@@ -35,7 +39,9 @@ $errors = $errors ?? [];
           <div class="alert alert-danger alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h4><i class="icon fa fa-ban"></i> Error!</h4>
-            <?php foreach ($errors as $e) : echo $e; endforeach; ?>
+                <?php foreach ($errors as $e) :
+                    echo $e;
+                endforeach; ?>
           </div>
           <?php endif; ?>
           
@@ -49,22 +55,22 @@ $errors = $errors ?? [];
               <div class="box-body">
                 <p class="help-block">Select which MIME types are allowed for download.</p>
                 <div class="row">
-                  <?php 
+                  <?php
                     $chunks = array_chunk($defaultMimeTypes, 4);
                     foreach ($chunks as $chunk) :
-                  ?>
+                        ?>
                   <div class="col-md-3">
-                    <?php foreach ($chunk as $mime) : ?>
+                                        <?php foreach ($chunk as $mime) : ?>
                     <div class="checkbox">
                       <label>
                         <input type="checkbox" name="allowed_mime_types[]" value="<?= $mime; ?>"
-                        <?= in_array($mime, $currentSettings['allowed_mime_types'] ?? []) ? 'checked' : ''; ?>>
-                        <?= basename($mime); ?>
+                                            <?= in_array($mime, $currentSettings['allowed_mime_types'] ?? []) ? 'checked' : ''; ?>>
+                                            <?= basename($mime); ?>
                       </label>
                     </div>
-                    <?php endforeach; ?>
+                                        <?php endforeach; ?>
                   </div>
-                  <?php endforeach; ?>
+                    <?php endforeach; ?>
                 </div>
               </div>
             </div>

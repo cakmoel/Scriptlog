@@ -1,7 +1,7 @@
 <?php
 function register_header($stylePath)
 {
-?>
+    ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,13 +58,13 @@ function register_header($stylePath)
 <body class="hold-transition register-page">
 <div class="register-box">
 
-<?php
+    <?php
 }
 
-function register_footer($stylePath) 
+function register_footer($stylePath)
 {
 
-?>
+    ?>
 
 </div>
   
@@ -99,5 +99,5 @@ $(document).keydown(function(event){if(event.keyCode==123){return false}else if(
 </body>
 </html>
 
-<?php
+    <?php
 }

@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
@@ -22,41 +24,40 @@
           <!-- /.box-header -->
 
           <?php
-          if (isset($errors)) :
-          ?>
+            if (isset($errors)) :
+                ?>
             <div class="alert alert-danger alert-dismissible">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
               <h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
-              <?php
-              foreach ($errors as $e) :
-                echo '<p>' . $e . '</p>';
-              endforeach;
-              ?>
+                <?php
+                foreach ($errors as $e) :
+                    echo '<p>' . $e . '</p>';
+                endforeach;
+                ?>
             </div>
 
-          <?php
-          endif;
+                <?php
+            endif;
 
-          if (isset($status)) :
-          ?>
+            if (isset($status)) :
+                ?>
             <div class="alert alert-success alert-dismissible">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
               <h4><i class="icon fa fa-check"></i> Success!</h4>
-              <?php
-              foreach ($status as $s) :
-                echo $s;
-              endforeach;
-              ?>
+                          <?php
+                            foreach ($status as $s) :
+                                echo $s;
+                            endforeach;
+                            ?>
             </div>
 
-          <?php
+                      <?php
+            endif;
 
-          endif;
+            $action = (isset($formAction)) ? $formAction : null;
+            $paramId = (isset($permalinkData['ID'])) ? abs((int)$permalinkData['ID']) : 0;
 
-          $action = (isset($formAction)) ? $formAction : null;
-          $paramId = (isset($permalinkData['ID'])) ? abs((int)$permalinkData['ID']) : 0;
-
-          ?>
+            ?>
 
           <div class="box-body">
 
@@ -69,22 +70,19 @@
 
                   <?php
 
-                  if (isset($permalinkData['setting_value'])) :
+                    if (isset($permalinkData['setting_value'])) :
+                        $permalink_value = json_decode($permalinkData['setting_value'], true);
 
-                    $permalink_value = json_decode($permalinkData['setting_value'], true);
-
-                    if ($permalink_value['rewrite'] === 'yes') :
-
-                  ?>
+                        if ($permalink_value['rewrite'] === 'yes') :
+                            ?>
                       <option value="yes" selected="selected">Yes</option>
                       <option value="no">No</option>
-                    <?php
-                    else :
-                    ?>
+                        <?php else :
+                            ?>
                       <option value="no" selected="selected">No</option>
                       <option value="yes">Yes</option>
-                  <?php endif;
-                  endif; ?>
+                        <?php endif;
+                    endif; ?>
                 </select>
               </div>
               <div class="box-footer">

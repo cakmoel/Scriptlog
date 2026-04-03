@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <?php
 $action = isset($formAction) ? $formAction : null;
@@ -30,20 +32,20 @@ $page_id = isset($pageData['ID']) ? (int)$pageData['ID'] : 0;
 <!-- /.box-header -->
 <?php
 if (isset($errors)) :
-?>
+    ?>
 <div class="alert alert-danger alert-dismissible" role="alert">
 <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">&times;</button>
 <h4><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h4>
 
-<?php 
-foreach ($errors as $e) :
-echo '<p>' . $e . '</p>';
-endforeach;
-?>
+    <?php
+    foreach ($errors as $e) :
+        echo '<p>' . $e . '</p>';
+    endforeach;
+    ?>
 
 </div>
 
-<?php 
+    <?php
 endif;
 ?>
 
@@ -93,13 +95,13 @@ endif;
 <i class="fa fa-calendar" aria-hidden="true"></i>
 </div>
 
-<input type="text" id="datetimepicker" name="<?=(isset($pageData['post_modified']) ? "post_modified" : "post_date"); ?>" class="form-control" placeholder="YYYY-MM-DD HH:MM:SS" value="<?php 
-if (isset($pageData['post_modified']) || isset($pageData['post_date']) ) {
-   if ($pageData['post_modified'] === null ) {
-      echo make_date(safe_html($pageData['post_date']));
-   } else {
-      echo make_date(safe_html($pageData['post_modified']));
-   }
+<input type="text" id="datetimepicker" name="<?=(isset($pageData['post_modified']) ? "post_modified" : "post_date"); ?>" class="form-control" placeholder="YYYY-MM-DD HH:MM:SS" value="<?php
+if (isset($pageData['post_modified']) || isset($pageData['post_date'])) {
+    if ($pageData['post_modified'] === null) {
+        echo make_date(safe_html($pageData['post_date']));
+    } else {
+        echo make_date(safe_html($pageData['post_modified']));
+    }
 }
 ?>">
 
@@ -139,6 +141,12 @@ if (isset($pageData['post_modified']) || isset($pageData['post_date']) ) {
 <?=(isset($postStatus)) ? $postStatus : ""; ?>
 </div>
 
+<div class="form-group">
+<label for="post_locale">Language</label>
+<?=(isset($pageLocale)) ? $pageLocale : ""; ?>
+<p class="help-block">Select the language for this page.</p>
+</div>
+
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
 <a href="index.php?load=pages" class="btn btn-default" role="button" aria-label="Cancel and return to pages list">
@@ -165,7 +173,7 @@ if (isset($pageData['post_modified']) || isset($pageData['post_date']) ) {
 <!-- /.content-wrapper -->
 <script type="text/javascript">
   var loadFile = function(event) {
-	  var output = document.getElementById('output');
-	      output.src = URL.createObjectURL(event.target.files[0]);
-	  };
+      var output = document.getElementById('output');
+          output.src = URL.createObjectURL(event.target.files[0]);
+      };
 </script>

@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <div class="content-wrapper">
 
@@ -22,35 +24,35 @@
       <div class="col-xs-12">
         <?php
         if (isset($errors)) :
-        ?>
+            ?>
           <div class="alert alert-danger alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h2><i class="icon fa fa-ban" aria-hidden="true"></i> Error!</h2>
             <?php
             foreach ($errors as $e) :
-              echo $e;
+                echo $e;
             endforeach;
             ?>
           </div>
-        <?php
+            <?php
         endif;
         ?>
 
         <?php
         if (isset($status)) {
-        ?>
+            ?>
         
           <div class="alert alert-success alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h2><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h2>
             <?php
             foreach ($status as $s) :
-              echo $s;
+                echo $s;
             endforeach;
             ?>
           </div>
 
-        <?php
+            <?php
         }
         ?>
 
@@ -78,10 +80,10 @@
               <tbody>
                 <?php
                 if (is_array($posts)) :
-                  $no = 0;
-                  foreach ($posts as $p => $post) :
-                    $no++;
-                ?>
+                    $no = 0;
+                    foreach ($posts as $p => $post) :
+                        $no++;
+                        ?>
 
                     <tr>
                       <td><?= $no; ?></td>
@@ -100,8 +102,8 @@
 
                     </tr>
 
-                <?php
-                  endforeach;
+                        <?php
+                    endforeach;
                 endif;
                 ?>
 

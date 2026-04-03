@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -43,34 +45,34 @@
                 </tr>
                 </thead>
                 <tbody>
-                   <?php 
-                     if (is_array($privacyLogs)) : 
+                   <?php
+                    if (is_array($privacyLogs)) :
                         $no = 1;
-                        foreach($privacyLogs as $log) :
-                   ?>
+                        foreach ($privacyLogs as $log) :
+                            ?>
                    <tr>
                      <td><?= $no; ?></td>
                      <td>
-                        <?php 
-                        $actionLabel = '';
-                        $actionClass = 'label-default';
-                        if($log['log_action'] == 'consent_given') {
-                            $actionLabel = 'Consent';
-                            $actionClass = 'label-success';
-                        } elseif($log['log_action'] == 'data_access') {
-                            $actionLabel = 'Data Access';
-                            $actionClass = 'label-info';
-                        } elseif($log['log_action'] == 'data_export') {
-                            $actionLabel = 'Export';
-                            $actionClass = 'label-primary';
-                        } elseif($log['log_action'] == 'data_deletion') {
-                            $actionLabel = 'Deletion';
-                            $actionClass = 'label-danger';
-                        } elseif($log['log_action'] == 'data_rectification') {
-                            $actionLabel = 'Rectification';
-                            $actionClass = 'label-warning';
-                        }
-                        ?>
+                            <?php
+                                 $actionLabel = '';
+                            $actionClass = 'label-default';
+                            if ($log['log_action'] == 'consent_given') {
+                                $actionLabel = 'Consent';
+                                $actionClass = 'label-success';
+                            } elseif ($log['log_action'] == 'data_access') {
+                                $actionLabel = 'Data Access';
+                                $actionClass = 'label-info';
+                            } elseif ($log['log_action'] == 'data_export') {
+                                $actionLabel = 'Export';
+                                $actionClass = 'label-primary';
+                            } elseif ($log['log_action'] == 'data_deletion') {
+                                $actionLabel = 'Deletion';
+                                $actionClass = 'label-danger';
+                            } elseif ($log['log_action'] == 'data_rectification') {
+                                $actionLabel = 'Rectification';
+                                $actionClass = 'label-warning';
+                            }
+                            ?>
                         <span class="label <?= $actionClass; ?>"><?= $actionLabel; ?></span>
                      </td>
                      <td><?= isset($log['log_type']) ? htmlout($log['log_type']) : ""; ?></td>
@@ -80,11 +82,11 @@
                      <td><?= isset($log['log_date']) ? htmlout(date('M j, Y H:i', strtotime($log['log_date']))) : ""; ?></td>
                      <td><?= isset($log['log_details']) ? htmlout(mb_substr($log['log_details'], 0, 50)) . (mb_strlen($log['log_details']) > 50 ? '...' : '') : "-"; ?></td>
                    </tr>
-                   <?php 
-                        $no++;
+                            <?php
+                            $no++;
                         endforeach;
-                     endif;
-                   ?>
+                    endif;
+                    ?>
                 </tbody>
                 <tfoot>
                 <tr>

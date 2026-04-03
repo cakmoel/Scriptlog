@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <?php
 $action = (isset($formAction)) ? $formAction : null;
@@ -31,17 +33,17 @@ $topic_id = (isset($topicData)) ? abs((int)$topicData['ID']) : 0;
 
 <?php
 if (isset($errors)) :
-?>
+    ?>
 <div class="alert alert-danger alert-dismissible" role="alert">
 <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">&times;</button>
 <h4><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h4>
-<?php 
-foreach ($errors as $e) :
-echo '<p>' . $e . '</p>';
-endforeach;
-?>
+    <?php
+    foreach ($errors as $e) :
+        echo '<p>' . $e . '</p>';
+    endforeach;
+    ?>
 </div>
-<?php 
+    <?php
 endif;
 ?>
 
@@ -56,15 +58,14 @@ endif;
 </div>
 
 <?php if (isset($topicData['topic_status'])) : ?>
-  
 <div class="form-group">
 <label>Active Status</label>
 <p class="help-block">Disable this to hide all posts in this category from the public view.</p>
 <div class="radio">
 <label for="optionsRadios1">
 <input type="radio" name="topic_status" id="optionsRadios1" value="Y" 
-<?=(isset($topicData['topic_status']) && $topicData['topic_status'] === 'Y') ? 'checked="checked"' : "";  ?>
-<?=(isset($formData['topic_status']) && $formData['topic_status'] === 'Y') ? 'checked="checked"' : "" ?>>
+    <?=(isset($topicData['topic_status']) && $topicData['topic_status'] === 'Y') ? 'checked="checked"' : "";  ?>
+    <?=(isset($formData['topic_status']) && $formData['topic_status'] === 'Y') ? 'checked="checked"' : "" ?>>
    Yes, keep this category active
  </label>
 </div>
@@ -72,17 +73,23 @@ endif;
 <div class="radio">
 <label for="optionsRadios2">
 <input type="radio" name="topic_status" id="optionsRadios2" value="N" 
-<?=(isset($topicData['topic_status']) && $topicData['topic_status'] === 'N') ? 'checked="checked"' : ""; ?>
-<?=(isset($formData['topic_status']) && $formData['topic_status'] === 'N') ? 'checked="checked"' : ""; ?>>
+    <?=(isset($topicData['topic_status']) && $topicData['topic_status'] === 'N') ? 'checked="checked"' : ""; ?>
+    <?=(isset($formData['topic_status']) && $formData['topic_status'] === 'N') ? 'checked="checked"' : ""; ?>>
    No, deactivate this category
  </label>
 </div>
 
 </div>
 
-<?php 
+    <?php
 endif;
 ?>
+
+<div class="form-group">
+<label for="topic_locale">Language</label>
+<?=(isset($topicLocale)) ? $topicLocale : ""; ?>
+<p class="help-block">Select the language for this category.</p>
+</div>
 
 </div>
 <!-- /.box-body -->

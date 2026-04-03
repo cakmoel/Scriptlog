@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -18,39 +20,39 @@
     <section class="content">
       <div class="row">
         
-        <?php 
+        <?php
         if (isset($errors)) :
-        ?>
+            ?>
         <div class="col-md-12">
           <div class="alert alert-danger alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h4><i class="icon fa fa-ban" aria-hidden="true"></i> Alert!</h4>
-            <?php 
-              foreach ($errors as $e) :
+            <?php
+            foreach ($errors as $e) :
                 echo $e;
-              endforeach;
+            endforeach;
             ?>
           </div>
         </div>
-        <?php 
+            <?php
         endif;
         ?>
         
-        <?php 
+        <?php
         if (isset($status)) :
-        ?>
+            ?>
         <div class="col-md-12">
           <div class="alert alert-success alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h4><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h4>
-            <?php 
-              foreach ($status as $s) :
+            <?php
+            foreach ($status as $s) :
                 echo $s;
-              endforeach;
+            endforeach;
             ?>
           </div>
         </div>
-        <?php 
+            <?php
         endif;
         ?>
 
@@ -68,9 +70,9 @@
             <!-- /.box-header -->
             
             <?php
-              $action = isset($formAction) ? $formAction : ActionConst::REPLY;
-              $reply_id = isset($replyData['ID']) ? (int)$replyData['ID'] : 0;
-              $parent_comment_id = isset($parentComment['ID']) ? (int)$parentComment['ID'] : (isset($replyData['comment_parent_id']) ? (int)$replyData['comment_parent_id'] : 0);
+            $action = isset($formAction) ? $formAction : ActionConst::REPLY;
+            $reply_id = isset($replyData['ID']) ? (int)$replyData['ID'] : 0;
+            $parent_comment_id = isset($parentComment['ID']) ? (int)$parentComment['ID'] : (isset($replyData['comment_parent_id']) ? (int)$replyData['comment_parent_id'] : 0);
             ?>
 
             <form method="post" action="<?=generate_request('index.php', 'post', ['reply', $action, $reply_id])['link'];?>" role="form">

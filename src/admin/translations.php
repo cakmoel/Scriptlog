@@ -1,18 +1,25 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $translationId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 
 try {
-
     switch ($action) {
+        case 'set-lang':
+            $langCode = isset($_GET['lang']) ? preg_replace('/[^a-z]/', '', $_GET['lang']) : 'en';
+            $validLocales = ['en', 'ar', 'zh', 'fr', 'ru', 'es', 'id'];
+            if (in_array($langCode, $validLocales)) {
+                admin_set_locale($langCode);
+            }
+            echo json_encode(['success' => true]);
+            exit();
 
         case ActionConst::NEWTRANSLATION:
-
             if (false === $app->authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
-
                 $translationController = new TranslationController();
                 $translationController->create();
             }
@@ -20,11 +27,9 @@ try {
             break;
 
         case ActionConst::DELETETRANSLATION:
-
             if (false === $app->authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
-
                 if ((!check_integer($translationId)) && (gettype($translationId) !== "integer")) {
                     header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
                     header("Status: 400 Bad Request");
@@ -42,11 +47,9 @@ try {
             break;
 
         case 'export':
-
             if (false === $app->authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
-
                 $translationController = new TranslationController();
                 $translationController->export();
             }
@@ -54,11 +57,9 @@ try {
             break;
 
         case 'import':
-
             if (false === $app->authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
-
                 $translationController = new TranslationController();
                 $translationController->import();
             }
@@ -66,11 +67,9 @@ try {
             break;
 
         case 'regenerateCache':
-
             if (false === $app->authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
-
                 $translationController = new TranslationController();
                 $translationController->regenerateCache();
             }
@@ -78,12 +77,10 @@ try {
             break;
 
         case 'update':
-
             if (false === $app->authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
                 http_response_code(403);
                 echo json_encode(['error' => 'Forbidden']);
             } else {
-
                 $translationController = new TranslationController();
                 $translationController->update();
             }
@@ -91,25 +88,19 @@ try {
             break;
 
         default:
-
             if (false === $app->authenticator->userAccessControl(ActionConst::CONFIGURATION)) {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
                 $translationController = new TranslationController();
                 $translationController->index();
             }
-
     }
-
 } catch (\Throwable $th) {
-
     if (class_exists('LogError')) {
-
         LogError::setStatusCode(http_response_code());
         LogError::exceptionHandler($th);
     }
 } catch (AppException $e) {
-
     LogError::setStatusCode(http_response_code());
     LogError::exceptionHandler($e);
 }

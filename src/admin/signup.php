@@ -1,31 +1,30 @@
 <?php
+
 /**
  * signup.php
- * 
+ *
  * signup functionality
  * to access user registration for membership
- * 
+ *
  * @category signup.php file
  * @author Nirmala Khanza <nirmala.adiba.khanza@gmail.com>
  * @license MIT
  * @version 1.0
  * @since   Since Release 1.0
- * 
+ *
  */
 
 if (file_exists(__DIR__ . '/../config.php')) {
+    require __DIR__ . '/../lib/main.php';
 
-  require __DIR__ . '/../lib/main.php';
+    $ip = get_ip_address();
 
-  $ip = get_ip_address();
+    include __DIR__ . '/register-layout.php';
 
-  include __DIR__ . '/register-layout.php';
-
-  $stylePath =  preg_replace("/\/signup\.php.*$/i", "", current_load_url());
+    $stylePath =  preg_replace("/\/signup\.php.*$/i", "", current_load_url());
 } else {
-
-  header("Location: ../install");
-  exit();
+    header("Location: ../install");
+    exit();
 }
 
 $action = isset($_GET['action']) ? safe_html($_GET['action']) : "";
@@ -33,32 +32,26 @@ $signupId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $uniqueKey = isset($_GET['uniqueKey']) ? safe_html($_GET['uniqueKey']) : null;
 
 if (($action == 'SignUp') && (block_request_type(current_request_method(), ['POST']) === false)) {
+    if (function_exists('processing_signup')) {
+        // Sanitize and validate input
+        $signup_data = filter_input_array(INPUT_POST, [
+          'user_login' => FILTER_SANITIZE_SPECIAL_CHARS,
+          'user_email' => FILTER_VALIDATE_EMAIL,
+          'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+          'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+          'iagree' => FILTER_SANITIZE_NUMBER_INT,
+          'csrf' => FILTER_SANITIZE_SPECIAL_CHARS
+        ]);
 
-  if (function_exists('processing_signup')) {
-
-    // Sanitize and validate input
-    $signup_data = filter_input_array(INPUT_POST, [
-      'user_login' => FILTER_SANITIZE_SPECIAL_CHARS,
-      'user_email' => FILTER_VALIDATE_EMAIL,
-      'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-      'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-      'iagree' => FILTER_SANITIZE_NUMBER_INT,
-      'csrf' => FILTER_SANITIZE_SPECIAL_CHARS
-    ]);
-  
-    // Ensure data is valid
-    if ($signup_data && !in_array(false, $signup_data, true)) {
-
-      list($errors, $signup_success) = processing_signup($ip, $signupId, $uniqueKey, $errors, $signup_data);
+        // Ensure data is valid
+        if ($signup_data && !in_array(false, $signup_data, true)) {
+            list($errors, $signup_success) = processing_signup($ip, $signupId, $uniqueKey, $errors, $signup_data);
+        } else {
+            scriptlog_error("Invalid signup data received.");
+        }
     } else {
-
-      scriptlog_error("Invalid signup data received.");
+        scriptlog_error("Function processing_signup not found");
     }
-    
-  } else {
-
-    scriptlog_error("Function processing_signup not found");
-  }
 }
 
 register_header($stylePath);
@@ -77,21 +70,21 @@ register_header($stylePath);
 
   <?php
     if (isset($errors['errorMessage'])) :
-  ?>
+        ?>
 
     <div class="alert alert-danger alert-dismissable">
       <button type="button" class="close" data-dismiss="alert" >&times;</button>
-      <?= $errors['errorMessage']; ?>
+        <?= $errors['errorMessage']; ?>
     </div>
 
-  <?php
-     endif;
-  ?>
+        <?php
+    endif;
+    ?>
 
 
   <?php
-   if (is_registration_unable() === false) :
-  ?>
+    if (is_registration_unable() === false) :
+        ?>
 
     <div class="alert alert-danger alert-dismissible">
 
@@ -100,9 +93,8 @@ register_header($stylePath);
     </div>
     <a href="<?= app_url() . '/admin/login.php'; ?>" class="text-center" aria-label="Log In">Log In </a>
 
-  <?php
-   elseif (isset($signup_success['successMessage'])) :
-  ?>
+    <?php elseif (isset($signup_success['successMessage'])) :
+        ?>
 
     <div class="callout callout-success">
       <h4><?= $signup_success['successMessage']; ?></h4>
@@ -111,9 +103,8 @@ register_header($stylePath);
     </div>
     <a href="<?= app_url() . '/admin/login.php'; ?>" class="text-center" aria-label="Log In">Log In </a>
   
-  <?php
-    else :
-  ?>
+    <?php else :
+        ?>
 
     <p class="login-box-msg">Register For This Blog</p>
 
@@ -150,7 +141,7 @@ register_header($stylePath);
         <div class="col-xs-8">
           <div class="checkbox icheck">
             <label for="iagree-to-terms">
-              <input type="checkbox" aria-checked="false" name="iagree" id="iagree-to-terms" value="1" required> I agree to the <a href="<?= app_url() .'/admin/terms-of-use.html'?>" target="_blank" rel="noopener noreferrer" title="Terms of use" aria-label="Terms of Use">terms of use</a>
+              <input type="checkbox" aria-checked="false" name="iagree" id="iagree-to-terms" value="1" required> I agree to the <a href="<?= app_url() . '/admin/terms-of-use.html'?>" target="_blank" rel="noopener noreferrer" title="Terms of use" aria-label="Terms of Use">terms of use</a>
             </label>
           </div>
         </div>
@@ -158,8 +149,8 @@ register_header($stylePath);
         <div class="col-xs-4">
 
           <?php
-          $block_csrf = function_exists('generate_form_token') ? generate_form_token('signup_form', 40) : '';
-          ?>
+              $block_csrf = function_exists('generate_form_token') ? generate_form_token('signup_form', 40) : '';
+            ?>
           <input type="hidden" name="csrf" value="<?= $block_csrf; ?>">
           <input type="submit" class="btn btn-primary btn-block btn-flat" name="SignUp" value="Register">
         </div>
@@ -167,19 +158,19 @@ register_header($stylePath);
       </div>
     </form>
 
-    <?php
-      if (is_registration_unable() === true) :
-    ?>
+         <?php
+            if (is_registration_unable() === true) :
+                ?>
       <a href="<?= app_url() . '/admin/login.php'; ?>" class="text-center" aria-label="Log in">Log in |</a>
-    <?php
-      endif;
-    ?>
+                <?php
+            endif;
+            ?>
 
     <a href="<?= app_url() . '/admin/reset-password.php'; ?>" class="text-center" aria-label="Lost your password">Lost your password?</a>
 </div>
 
-<?php
-  endif;
+         <?php
+    endif;
 
-  register_footer($stylePath);
-?>
+     register_footer($stylePath);
+    ?>

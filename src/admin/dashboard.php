@@ -1,35 +1,28 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 
 $action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
 $displayWall = class_exists('Wall') ? new Wall() : "";
 
 try {
+    switch ($action) {
+        case ActionConst::DETAILITEM:
+            break;
 
-   switch ($action) {
-      
-      case ActionConst::DETAILITEM:
-         break;
-         
-      default:
-         
-         if (false === $app->authenticator->userAccessControl(ActionConst::DASHBOARD)) {
-
-            direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
-
-         } else {
-            
-            $displayWall->listItems($app->authenticator, $user_login);
-         }
-
-   }
+        default:
+            if (false === $app->authenticator->userAccessControl(ActionConst::DASHBOARD)) {
+                direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
+            } else {
+                $displayWall->listItems($app->authenticator, $user_login);
+            }
+    }
 } catch (\Throwable $th) {
-
-   if (class_exists('LogError')) {
-      LogError::setStatusCode(http_response_code());
-      LogError::exceptionHandler($th);
-   }
+    if (class_exists('LogError')) {
+        LogError::setStatusCode(http_response_code());
+        LogError::exceptionHandler($th);
+    }
 } catch (AppException $e) {
-
-   LogError::setStatusCode(http_response_code());
-   LogError::exceptionHandler($e);
+    LogError::setStatusCode(http_response_code());
+    LogError::exceptionHandler($e);
 }

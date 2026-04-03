@@ -1,6 +1,8 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
-<?php 
+<?php
 $statistics = $statistics ?? [];
 $fileDistribution = $fileDistribution ?? [];
 ?>
