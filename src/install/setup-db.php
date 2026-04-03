@@ -4,8 +4,8 @@
 
 /**
  * File install.php
- * 
- * this file will be used when the config.php file  exists and 
+ *
+ * this file will be used when the config.php file  exists and
  * successfully created but database tables have not been installed yet
  *
  * @category Installation file -- install.php
@@ -13,182 +13,169 @@
  * @license  MIT
  * @version  0.1
  * @since    Since Release 0.1
- * 
+ *
  */
 require dirname(__FILE__) . '/include/settings.php';
 require dirname(__FILE__) . '/include/setup.php';
 require dirname(__FILE__) . '/install-layout.php';
 
 if (!file_exists(__DIR__ . '/../config.php')) {
-
-  header("Location: " . $protocol . '://' . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR, true, 302);
-  exit();
+    header("Location: " . $protocol . '://' . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR, true, 302);
+    exit();
 } else {
+    $set_config = require __DIR__ . '/../config.php';
 
-  $set_config = require __DIR__ . '/../config.php';
+    $dbconnect = make_connection($set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name'], $set_config['db']['port']);
 
-  $dbconnect = make_connection($set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name'], $set_config['db']['port']);
+    $prefix = isset($set_config['db']['prefix']) ? $set_config['db']['prefix'] : '';
 
-  $prefix = isset($set_config['db']['prefix']) ? $set_config['db']['prefix'] : '';
+    // required table
+    $required_tables = [
+      $prefix . 'tbl_users', $prefix . 'tbl_user_token', $prefix . 'tbl_topics', $prefix . 'tbl_themes',
+      $prefix . 'tbl_settings', $prefix . 'tbl_posts', $prefix . 'tbl_post_topic', $prefix . 'tbl_plugin',
+      $prefix . 'tbl_menu', $prefix . 'tbl_mediameta', $prefix . 'tbl_media', $prefix . 'tbl_media_download', $prefix . 'tbl_comments'
+    ];
 
-  // required table 
-  $required_tables = [
-    $prefix . 'tbl_users', $prefix . 'tbl_user_token', $prefix . 'tbl_topics', $prefix . 'tbl_themes',
-    $prefix . 'tbl_settings', $prefix . 'tbl_posts', $prefix . 'tbl_post_topic', $prefix . 'tbl_plugin',
-    $prefix . 'tbl_menu', $prefix . 'tbl_mediameta', $prefix . 'tbl_media', $prefix . 'tbl_media_download', $prefix . 'tbl_comments'
-  ];
-
-  foreach ($required_tables as $table) {
-    if (!check_dbtable($dbconnect, $table)) {
-        header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-        exit("Database has been installed!");
-    }
-  }
-
-  $install_path = preg_replace("/\/install\.php.*$/i", "", current_url());
-
-  install_header($install_path, $protocol, $server_host);
-
-  $setup = isset($_POST['setup']) ? stripcslashes($_POST['setup']) : '';
-
-  $completed = false;
-
-  if ($setup === 'install') {
-
-    $username = isset($_POST['user_login']) ? remove_bad_characters($_POST['user_login'], $set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name'], $set_config['db']['port']) : "";
-    $password = isset($_POST['user_pass1']) ? escapeHTML($_POST['user_pass1']) : "";
-    $confirm = isset($_POST['user_pass2']) ? escapeHTML($_POST['user_pass2']) : "";
-    $email = filter_input(INPUT_POST, 'user_email', FILTER_SANITIZE_EMAIL);
-
-    if (strlen($username) < 8 || strlen($username) > 20) {
-
-      $errors['errorInstall'] = 'Username for admin must be between 8 and 20 characters.';
-    } elseif (preg_match('/^[0-9]*$/', $username)) {
-
-      $errors['errorInstall'] = 'Username for admin must include at least one letter.';
-    } elseif ((!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $username))) {
-
-      $errors['errorInstall'] = 'Username for admin only contain alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
-    }
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-
-      $errors['errorInstall'] = 'Please enter a valid email address';
-    }
-
-    if (empty($password) && (empty($confirm))) {
-
-      $errors['errorInstall'] = 'Admin password should not be empty';
-    } elseif ($password != $confirm) {
-
-      $errors['errorInstall'] = 'Admin password should be equal';
-    } elseif (!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
-
-      $errors['errorInstall'] = 'Admin password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters';
-    }
-
-    if (!is_writable(__DIR__ . '/index.php')) {
-
-      $errors['errorInstall'] = 'Permission denied. Directory installation is not writable';
-    }
-
-    if (false === check_php_version()) {
-
-      $errors['errorInstall'] = 'Requires PHP 7.4 or newer';
-    }
-
-    if (true === check_pcre_utf8()) {
-
-      $errors['errorInstall'] = 'PCRE has not been compiled with UTF-8 or Unicode property support';
-    }
-
-    if (false === check_spl_enabled('spl_autoload_register')) {
-
-      $errors['errorInstall'] = 'spl autoload register is either not loaded or compiled in';
-    }
-
-    if (false === check_filter_enabled()) {
-
-      $errors['errorInstall'] = 'The filter extension is either not loaded or compiled in';
-    }
-
-    if (false === check_iconv_enabled()) {
-
-      $errors['errorInstall'] = 'The Iconv extension is not loaded';
-    }
-
-    if (true === check_character_type()) {
-
-      $errors['errorInstall'] = 'The ctype extension is overloading PHP\'s native string functions';
-    }
-
-    if (false === check_gd_enabled()) {
-
-      $errors['errorInstall'] = 'requires GD v2 for the image manipulation';
-    }
-
-    if (false === check_pdo_mysql()) {
-
-      $errors['errorInstall'] = 'requires PDO MySQL enabled';
-    }
-
-    if (false === check_mysqli_enabled()) {
-
-      $errors['errorInstall'] = 'requires MySQLi enabled';
-    }
-
-    if (false === check_uri_determination()) {
-
-      $errors['errorInstall'] = 'Neither $_SERVER[REQUEST_URI], $_SERVER[PHP_SELF] or $_SERVER[PATH_INFO] is available';
-    }
-
-    if (false === check_log_dir()) {
-
-      $errors['errorInstall'] = 'requires log directory writeable';
-    }
-
-    if (false === check_cache_dir()) {
-
-      $errors['errorInstall'] = 'requires cache directory writeable';
-    }
-
-    if (false === check_theme_dir()) {
-
-      $errors['errorInstall'] = 'requires theme directory writeable';
-    }
-
-    if (false === check_plugin_dir()) {
-
-      $errors['errorInstall'] = 'requires plugin directory writeable';
-    }
-
-    if (empty($errors['errorInstall']) === true) {
-
-      try {
-
-        $completed = true;
-
-        $_SESSION['install'] = true;
-
-        // generate installation key 
-        $key = installation_key(32);
-
-        $_SESSION['token'] = $key;
-
-        if (check_mysql_version($dbconnect, "5.7")) {
-
-          install_database_table($dbconnect, $protocol, $server_host, $username, $password, $email, $key, $prefix);
-
-          header("Location:" . $protocol . "://" . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR . "finish.php?status=success&token={$key}");
+    foreach ($required_tables as $table) {
+        if (!check_dbtable($dbconnect, $table)) {
+            header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+            exit("Database has been installed!");
         }
-      } catch (mysqli_sql_exception $e) {
-
-        $errors['errorInstall'] = "Database error: " . $e->getMessage();
-      }
     }
-  }
 
-?>
+    $install_path = preg_replace("/\/install\.php.*$/i", "", current_url());
+
+    install_header($install_path, $protocol, $server_host);
+
+    $setup = isset($_POST['setup']) ? stripcslashes($_POST['setup']) : '';
+
+    $completed = false;
+
+    if ($setup === 'install') {
+        $username = isset($_POST['user_login']) ? remove_bad_characters($_POST['user_login'], $set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name'], $set_config['db']['port']) : "";
+        $password = isset($_POST['user_pass1']) ? escapeHTML($_POST['user_pass1']) : "";
+        $confirm = isset($_POST['user_pass2']) ? escapeHTML($_POST['user_pass2']) : "";
+        $email = filter_input(INPUT_POST, 'user_email', FILTER_SANITIZE_EMAIL);
+
+        if (strlen($username) < 8 || strlen($username) > 20) {
+            $errors['errorInstall'] = 'Username for admin must be between 8 and 20 characters.';
+        } elseif (preg_match('/^[0-9]*$/', $username)) {
+            $errors['errorInstall'] = 'Username for admin must include at least one letter.';
+        } elseif ((!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $username))) {
+            $errors['errorInstall'] = 'Username for admin only contain alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20';
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['errorInstall'] = 'Please enter a valid email address';
+        }
+
+        if (empty($password) && (empty($confirm))) {
+            $errors['errorInstall'] = 'Admin password should not be empty';
+        } elseif ($password != $confirm) {
+            $errors['errorInstall'] = 'Admin password should be equal';
+        } elseif (!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)) {
+            $errors['errorInstall'] = 'Admin password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters';
+        }
+
+        if (!is_writable(__DIR__ . '/index.php')) {
+            $errors['errorInstall'] = 'Permission denied. Directory installation is not writable';
+        }
+
+        if (false === check_php_version()) {
+            $errors['errorInstall'] = 'Requires PHP 7.4 or newer';
+        }
+
+        if (true === check_pcre_utf8()) {
+            $errors['errorInstall'] = 'PCRE has not been compiled with UTF-8 or Unicode property support';
+        }
+
+        if (false === check_spl_enabled('spl_autoload_register')) {
+            $errors['errorInstall'] = 'spl autoload register is either not loaded or compiled in';
+        }
+
+        if (false === check_filter_enabled()) {
+            $errors['errorInstall'] = 'The filter extension is either not loaded or compiled in';
+        }
+
+        if (false === check_iconv_enabled()) {
+            $errors['errorInstall'] = 'The Iconv extension is not loaded';
+        }
+
+        if (true === check_character_type()) {
+            $errors['errorInstall'] = 'The ctype extension is overloading PHP\'s native string functions';
+        }
+
+        if (false === check_gd_enabled()) {
+            $errors['errorInstall'] = 'requires GD v2 for the image manipulation';
+        }
+
+        if (false === check_pdo_mysql()) {
+            $errors['errorInstall'] = 'requires PDO MySQL enabled';
+        }
+
+        if (false === check_mysqli_enabled()) {
+            $errors['errorInstall'] = 'requires MySQLi enabled';
+        }
+
+        if (false === check_uri_determination()) {
+            $errors['errorInstall'] = 'Neither $_SERVER[REQUEST_URI], $_SERVER[PHP_SELF] or $_SERVER[PATH_INFO] is available';
+        }
+
+        if (false === check_log_dir()) {
+            $errors['errorInstall'] = 'requires log directory writeable';
+        }
+
+        if (false === check_cache_dir()) {
+            $errors['errorInstall'] = 'requires cache directory writeable';
+        }
+
+        if (false === check_theme_dir()) {
+            $errors['errorInstall'] = 'requires theme directory writeable';
+        }
+
+        if (false === check_plugin_dir()) {
+            $errors['errorInstall'] = 'requires plugin directory writeable';
+        }
+
+        if (empty($errors['errorInstall']) === true) {
+            try {
+                $completed = true;
+
+                $_SESSION['install'] = true;
+
+                // generate installation key
+                $key = installation_key(32);
+
+                $_SESSION['token'] = $key;
+
+                if (check_mysql_version($dbconnect, "5.7")) {
+                    // Default site language
+                    $site_language = 'en';
+
+                    // Generate encryption key before database installation
+                    $defuse_key_path = '';
+                    try {
+                        $defuse_key_path = generate_defuse_key();
+                    } catch (Exception $e) {
+                        error_log("Failed to generate defuse key: " . $e->getMessage());
+                        $defuse_key_path = dirname(__DIR__, 2) . '/lib/utility/.lts/lts.php';
+                    }
+
+                    install_database_table($dbconnect, $protocol, $server_host, $username, $password, $email, $key, $prefix, $site_language, $defuse_key_path);
+
+                    # Generate server config file based on web server
+                    $server_config = generate_server_config();
+                    $_SESSION['server_config'] = $server_config;
+
+                    header("Location:" . $protocol . "://" . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR . "finish.php?status=success&token={$key}");
+                }
+            } catch (mysqli_sql_exception $e) {
+                $errors['errorInstall'] = "Database error: " . $e->getMessage();
+            }
+        }
+    }
+
+    ?>
 
   <div class="container my-5">
 
@@ -269,6 +256,6 @@ if (!file_exists(__DIR__ . '/../config.php')) {
     </div>
   </div>
 
-  <?php
-  install_footer($install_path, $protocol, $server_host);
+    <?php
+      install_footer($install_path, $protocol, $server_host);
 }
