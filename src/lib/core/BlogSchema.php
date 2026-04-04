@@ -4,16 +4,15 @@ use Melbahja\Seo\Schema;
 use Melbahja\Seo\Schema\Thing;
 
 /**
- * class BlogSchema 
- * 
- * @category Core 
+ * class BlogSchema
+ *
+ * @category Core
  * @author M.Noermoehammad
  * @license MIT
- * 
+ *
  */
 class BlogSchema
 {
-
     /**
      * Generate schema.org structured data for a blog post.
      *
@@ -22,7 +21,7 @@ class BlogSchema
      */
     public static function generateBlogPostSchema(int $post)
     {
-         
+
         // Retrieve blog post content using FrontHelper
         $post = FrontHelper::grabPreparedFrontPostById($post);
 
@@ -34,7 +33,7 @@ class BlogSchema
 
         $singlePost = new Thing($type);
         $singlePost->headline = escape_html($post['post_title']);
-        $singlePost->description = escape_html($post['post_summary'])?? substr(strip_tags($post['post_content']), 0, 200);
+        $singlePost->description = escape_html($post['post_summary']) ?? substr(strip_tags($post['post_content']), 0, 200);
         $singlePost->url = self::baseURL() . DIRECTORY_SEPARATOR .  'post' . DIRECTORY_SEPARATOR . $post['ID'] . DS . $post['post_slug'];
         $singlePost->datePublished = isset($post['post_date']) ? escape_html($post['post_date']) : date(DATE_ATOM);
         $singlePost->dateModified = isset($post['post_modified']) ? escape_html($post['post_modified']) : escape_html($post['post_date']);
@@ -43,7 +42,7 @@ class BlogSchema
         $singlePost->isFamilyFriendly = $post['post_visibility'] == 'public' && empty($post['post_password']);
         $singlePost->keywords = $post['post_tags'] ? explode(',', $post['post_tags']) : [];
 
-        // Add author information 
+        // Add author information
         if (!empty($post['user_fullname'])) {
             $singlePost->author = new Thing('Person', [
                 '@id' => self::baseURL() . '/#author',
@@ -51,7 +50,7 @@ class BlogSchema
             ]);
         }
 
-        // Add image information 
+        // Add image information
         if (!empty($post['media_filename'])) {
             $singlePost->image = new Thing('ImageObject', [
                 '@id' => self::baseURL() . '/#image',
@@ -79,10 +78,9 @@ class BlogSchema
             'url' => self::baseURL() . DIRECTORY_SEPARATOR . 'post' . DIRECTORY_SEPARATOR . $post['ID'] . DS . $post['post_slug']
         ]);
 
-       $schema = new Schema($singlePost, $webpage);
-    
-       return $schema;
+        $schema = new Schema($singlePost, $webpage);
 
+        return $schema;
     }
 
     protected static function determineCreativeWorkType(string $postType): string
@@ -96,7 +94,7 @@ class BlogSchema
 
         return $mapping[$postType] ?? 'BlogPosting';
     }
-    
+
     private static function baseURL(): string
     {
         return rtrim(app_url(), '/');
