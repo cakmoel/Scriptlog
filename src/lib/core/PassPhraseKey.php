@@ -18,7 +18,7 @@ class PassPhraseKey
      * @var string
      *
      */
-    protected $passphrase;
+    protected static $passphrase;
 
     /**
      * directory

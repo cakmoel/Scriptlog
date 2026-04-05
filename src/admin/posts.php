@@ -14,12 +14,6 @@ try {
             if (false === $app->authenticator->userAccessControl(ActionConst::POSTS)) {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
-                if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                    header("Status: 400 Bad Request");
-                    throw new AppException("Invalid ID data type!");
-                }
-
                 if ($postId == 0) {
                     $postController->insert();
                 } else {
@@ -33,12 +27,6 @@ try {
             if (false === $app->authenticator->userAccessControl(ActionConst::POSTS)) {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
-                if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                    header("Status: 400 Bad Request");
-                    throw new AppException("Invalid ID data type!");
-                }
-
                 if ($postDao->checkPostId($postId, $app->sanitizer)) {
                     $postController->update((int)$postId);
                 } else {
@@ -49,7 +37,7 @@ try {
             break;
 
         case ActionConst::DELETEPOST:
-            if ((!check_integer($postId)) && (gettype($postId) !== "integer")) {
+            if ($postId <= 0) {
                 header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
                 header("Status: 400 Bad Request");
                 throw new AppException("Invalid ID data type!");

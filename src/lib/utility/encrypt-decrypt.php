@@ -29,7 +29,10 @@ function encrypt(string $data, string $key): string
 {
 
     $passphrase = base64_decode(create_encoded_key());
-    $second_passphrase = base64_decode($key);
+    
+    // For backward compatibility: if key is hex string from md5, convert to binary
+    // This ensures consistency between encrypt and decrypt
+    $second_passphrase = hex2bin($key);
 
     $cipher_method = 'aes-256-cbc';
 
@@ -71,10 +74,9 @@ function encrypt(string $data, string $key): string
  * @param string $key
  * @return string
  */
-function decrypt(string $data, string $key): string
+function decrypt(string $data, string $key)
 {
     $passphrase = base64_decode(create_encoded_key());
-    $second_passphrase = base64_decode($key);
     $data_decoded = base64_decode($data);
 
     $cipher_method = 'aes-256-cbc';
@@ -93,9 +95,23 @@ function decrypt(string $data, string $key): string
 
     if (! in_array('sha3-512', hash_algos())) {
         scriptlog_error("Hashing algorithm is not supported");
-    } else {
-        $hmac_key_new = hash_hmac('sha3-512', $hmac_key, $second_passphrase, true);
+    }
+    
+    // Try new approach first: hex2bin(key)
+    $second_passphrase_new = hex2bin($key);
+    $hmac_key_new = hash_hmac('sha3-512', $hmac_key, $second_passphrase_new, true);
+    
+    if (hash_equals($encrypt_key, $hmac_key_new)) {
+        return $data_decrypted;
+    }
+    
+    // Try old/buggy approach: base64_decode(key) for backward compatibility
+    $second_passphrase_old = base64_decode($key);
+    $hmac_key_old = hash_hmac('sha3-512', $hmac_key, $second_passphrase_old, true);
+    
+    if (hash_equals($encrypt_key, $hmac_key_old)) {
+        return $data_decrypted;
     }
 
-    return (hash_equals($encrypt_key, $hmac_key_new)) ? $data_decrypted : false;
+    return false;
 }

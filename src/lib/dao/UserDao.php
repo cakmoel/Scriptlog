@@ -479,7 +479,7 @@ class UserDao extends Dao
      *
      * @param  string $login
      * @param string $password
-     * @return true
+     * @return bool
      */
     private function checkUserPasswordByEmail($login, $password)
     {
@@ -502,6 +502,8 @@ class UserDao extends Dao
                 }
             }
         }
+
+        return false;
     }
 
     /**
@@ -509,7 +511,7 @@ class UserDao extends Dao
      *
      * @param string $login
      * @param string $password
-     * @return true
+     * @return bool
      */
     private function checkUserPasswordByLogin($login, $password)
     {
@@ -533,6 +535,8 @@ class UserDao extends Dao
                 }
             }
         }
+
+        return false;
     }
 
     /**
@@ -550,5 +554,7 @@ class UserDao extends Dao
         if (!($this->findColumn([$key])) == 1) {
             return false;
         }
+
+        return true;
     }
 }

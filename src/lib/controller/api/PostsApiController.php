@@ -40,6 +40,11 @@ class PostsApiController extends ApiController
     private $sanitizer;
 
     /**
+     * @var ApiHateoas
+     */
+    private $hateoas;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -51,6 +56,7 @@ class PostsApiController extends ApiController
         $this->topicDao = new TopicDao();
         $this->commentDao = new CommentDao();
         $this->sanitizer = new Sanitize();
+        $this->hateoas = new ApiHateoas();
 
         // Service requires validator - create minimal version
         $this->postService = null; // Will be initialized when needed
@@ -103,8 +109,21 @@ class PostsApiController extends ApiController
             // Transform posts for API response
             $transformedPosts = array_map([$this, 'transformPost'], $posts);
 
-            // Return paginated response
-            ApiResponse::paginated($transformedPosts, $pagination['page'], $pagination['per_page'], $total);
+            // Generate ETag from post count and page for cache validation
+            $etag = md5($total . '_' . $pagination['page'] . '_' . $pagination['per_page']);
+            ApiResponse::withEtag($etag);
+
+            // Check conditional request
+            if (ApiResponse::checkEtagMatch($etag)) {
+                ApiResponse::notModified();
+                return;
+            }
+
+            // Generate HATEOAS pagination links
+            $hateoasLinks = $this->hateoas->paginationLinks('posts', $pagination['page'], $pagination['per_page'], $total);
+
+            // Return paginated response with HATEOAS links
+            ApiResponse::paginated($transformedPosts, $pagination['page'], $pagination['per_page'], $total, $hateoasLinks);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to fetch posts: ' . $e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -158,6 +177,17 @@ class PostsApiController extends ApiController
             // Get categories/topics for this post
             $topics = $this->getPostTopics($postId);
 
+            // Generate ETag from post_modified for cache validation
+            $etag = md5($post['post_modified'] . $postId);
+            ApiResponse::withEtag($etag);
+            ApiResponse::withLastModified($post['post_modified']);
+
+            // Check conditional request
+            if (ApiResponse::checkEtagMatch($etag) || ApiResponse::checkModifiedSince($post['post_modified'])) {
+                ApiResponse::notModified();
+                return;
+            }
+
             // Transform post for API response
             $transformedPost = $this->transformPost($post);
             $transformedPost['topics'] = $topics;
@@ -167,7 +197,10 @@ class PostsApiController extends ApiController
                 $transformedPost['featured_image'] = $this->getMediaUrl($post['media_id']);
             }
 
-            ApiResponse::success($transformedPost);
+            // Generate HATEOAS links
+            $hateoasLinks = $this->hateoas->postLinks($postId, $post['post_slug']);
+
+            ApiResponse::success($transformedPost, 200, null, $hateoasLinks);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to fetch post: ' . $e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -223,7 +256,15 @@ class PostsApiController extends ApiController
             // Transform comments
             $transformedComments = array_map([$this, 'transformComment'], $comments);
 
-            ApiResponse::paginated($transformedComments, $pagination['page'], $pagination['per_page'], $total);
+            // Generate HATEOAS links
+            $hateoasLinks = $this->hateoas->paginationLinks('posts/' . $postId . '/comments', $pagination['page'], $pagination['per_page'], $total);
+            $hateoasLinks['post'] = [
+                'href' => $this->hateoas->postLinks($postId)['self']['href'],
+                'rel' => 'post',
+                'type' => 'GET'
+            ];
+
+            ApiResponse::paginated($transformedComments, $pagination['page'], $pagination['per_page'], $total, $hateoasLinks);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to fetch comments: ' . $e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -313,7 +354,7 @@ class PostsApiController extends ApiController
             $fetchStmt->execute([$postId]);
             $createdPost = $fetchStmt->fetch(PDO::FETCH_ASSOC);
 
-            ApiResponse::created($this->transformPost($createdPost), 'Post created successfully');
+            ApiResponse::created($this->transformPost($createdPost), 'Post created successfully', $this->hateoas->postLinks($postId, $slug), $this->getAppUrl() . '/api/v1/posts/' . $postId);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to create post: ' . $e->getMessage(), 500, 'CREATE_ERROR');
         }
@@ -490,7 +531,7 @@ class PostsApiController extends ApiController
             $deleteStmt = $dbc->prepare($deleteSql);
             $deleteStmt->execute([$postId]);
 
-            ApiResponse::success(null, 200, 'Post deleted successfully');
+            ApiResponse::noContent();
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to delete post: ' . $e->getMessage(), 500, 'DELETE_ERROR');
         }

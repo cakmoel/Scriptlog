@@ -306,15 +306,62 @@ function request_path()
 }
 
 /**
- * initialize_post()
+ * previous_post()
  *
  * @category theme function
- * @return object
+ * @param int|num $id
  *
  */
-function initialize_post()
+function previous_post($id)
 {
-    return class_exists('PostModel') ? new PostModel() : "";
+    $idsanitized = sanitizer($id, 'sql');
+
+    $html = null;
+
+    $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID < '$idsanitized' AND post_status = 'publish' AND post_type = 'blog' ORDER BY ID DESC LIMIT 1";
+
+    $stmt = db_simple_query($sql);
+
+    while ($rows = $stmt->fetch()) {
+        $html .= '<a href="' . permalinks($rows['ID'])['post'] . '" class="prev-post text-left d-flex align-items-center">';
+        $html .= '<div class="icon prev"><i class="fa fa-angle-left" aria-hidden="true"></i></div>';
+        $html .= '<div class="text"><strong class="text-primary">Previous Post </strong>';
+        $html .= '<h6>' . escape_html($rows['post_title']) . '</h6>';
+        $html .= '</div>';
+        $html .= '</a>';
+    }
+
+    return $html;
+}
+
+/**
+ * next_post()
+ *
+ * @category theme function
+ *
+ * @param int|num $id
+ *
+ */
+function next_post($id)
+{
+    $idsanitized = sanitizer($id, 'sql');
+
+    $html = null;
+
+    $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID > '$idsanitized' AND post_status = 'publish' AND post_type = 'blog' ORDER BY ID ASC LIMIT 1";
+
+    $stmt = db_simple_query($sql);
+
+    while ($rows = $stmt->fetch()) {
+        $html .= '<a href="' . permalinks($rows['ID'])['post'] . '"  class="next-post text-right d-flex align-items-center justify-content-end">';
+        $html .= '<div class="text"><strong class="text-primary">Next Post </strong>';
+        $html .= '<h6>' . escape_html($rows['post_title']) . '</h6>';
+        $html .= '</div>';
+        $html .= '<div class="icon next"><i class="fa fa-angle-right" aria-hidden="true"></i></div>';
+        $html .= '</a>';
+    }
+
+    return $html;
 }
 
 /**
@@ -327,6 +374,17 @@ function initialize_post()
 function initialize_page()
 {
     return class_exists('PageModel') ? new PageModel() : "";
+}
+
+/**
+ * initialize_post()
+ *
+ * @category theme function
+ * @return object
+ */
+function initialize_post()
+{
+    return class_exists('PostModel') ? new PostModel() : "";
 }
 
 /**
@@ -533,31 +591,15 @@ function retrieves_topic_simple($id)
     $stmt = db_prepared_query($sql, [$id], 'i');
 
     if ($stmt) {
-        // Get the result set
-        $result_set = $stmt->get_result();
+        while ($result = $stmt->fetch()) {
+            $permalinks = (rewrite_status() === 'yes')
+                ? (permalinks($result['topic_slug'])['cat'] ?? '#')
+                : (permalinks($result['ID'])['cat'] ?? '#');
 
-        // Check if the result set has rows
-        if ($result_set && $result_set->num_rows > 0) {
-            while ($result = $result_set->fetch_array(MYSQLI_ASSOC)) {
-                // Determine permalinks based on rewrite status
-                $permalinks = (rewrite_status() === 'yes')
-                    ? (permalinks($result['topic_slug'])['cat'] ?? '#')
-                    : (permalinks($result['ID'])['cat'] ?? '#');
+            $topic_title = htmlspecialchars($result['topic_title'], ENT_QUOTES, 'UTF-8');
 
-                // Sanitize the topic title for HTML output
-                $topic_title = htmlspecialchars($result['topic_title'], ENT_QUOTES, 'UTF-8');
-
-                // Generate the HTML link
-                $categories[] = "<a href='{$permalinks}'>{$topic_title}</a>";
-            }
-        } else {
-            error_log("No topics found for post ID: " . $id);
+            $categories[] = "<a href='{$permalinks}'>{$topic_title}</a>";
         }
-
-        // Close the result set
-        $result_set->close();
-    } else {
-        error_log("Database query failed for post ID: " . $id);
     }
 
     // Return the concatenated HTML links
@@ -581,17 +623,14 @@ function retrieves_topic_prepared($id)
           AND tbl_topics.topic_status = 'Y' 
           AND tbl_post_topic.post_id = ? ";
 
-    $items = db_prepared_query($sql, [$id], 'i')->get_result();
-    $count_items = db_num_rows($items);
+    $items = db_prepared_query($sql, [$id], 'i');
 
-    if ($count_items > 0) {
-        while ($item = $items->fetch_assoc()) {
-            $permalinks = ((function_exists('rewrite_status')) && (rewrite_status() === 'yes') ? permalinks($item['topic_slug'])['cat'] : permalinks($item['ID'])['cat']);
-            $topics[] = "<a href='" . $permalinks . "'>" . $item['topic_title'] . "</a>";
-        }
+    while ($item = $items->fetch()) {
+        $permalinks = ((function_exists('rewrite_status')) && (rewrite_status() === 'yes') ? permalinks($item['topic_slug'])['cat'] : permalinks($item['ID'])['cat']);
+        $topics[] = "<a href='" . $permalinks . "'>" . $item['topic_title'] . "</a>";
     }
 
-    return implode("", $topics);
+    return implode("", $topics ?? []);
 }
 
 /**
@@ -641,68 +680,6 @@ function link_tag($id)
 function link_topic($id)
 {
     return (class_exists('FrontContentModel')) ? FrontContentModel::frontLinkTopic($id, initialize_topic()) : "";
-}
-
-/**
- * previous_post()
- *
- * @param int|num $id
- *
- */
-function previous_post($id)
-{
-    $idsanitized = sanitizer($id, 'sql');
-
-    $html = null;
-
-    $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID < '$idsanitized' AND post_status = 'publish' AND post_type = 'blog' ORDER BY ID DESC LIMIT 1";
-
-    $stmt = db_simple_query($sql);
-
-    if ($stmt->num_rows > 0) {
-        while ($rows = $stmt->fetch_array(MYSQLI_ASSOC)) {
-            $html .= '<a href="' . permalinks($rows['ID'])['post'] . '" class="prev-post text-left d-flex align-items-center">';
-            $html .= '<div class="icon prev"><i class="fa fa-angle-left" aria-hidden="true"></i></div>';
-            $html .= '<div class="text"><strong class="text-primary">Previous Post </strong>';
-            $html .= '<h6>' . escape_html($rows['post_title']) . '</h6>';
-            $html .= '</div>';
-            $html .= '</a>';
-        }
-
-        return $html;
-    }
-}
-
-/**
- * next_post()
- *
- * @category theme function
- *
- * @param int|num $id
- *
- */
-function next_post($id)
-{
-    $idsanitized = sanitizer($id, 'sql');
-
-    $html = null;
-
-    $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID > '$idsanitized' AND post_status = 'publish' AND post_type = 'blog' ORDER BY ID ASC LIMIT 1";
-
-    $stmt = db_simple_query($sql);
-
-    if ($stmt->num_rows > 0) {
-        while ($rows = $stmt->fetch_array(MYSQLI_ASSOC)) {
-            $html .= '<a href="' . permalinks($rows['ID'])['post'] . '"  class="next-post text-right d-flex align-items-center justify-content-end">';
-            $html .= '<div class="text"><strong class="text-primary">Next Post </strong>';
-            $html .= '<h6>' . escape_html($rows['post_title']) . '</h6>';
-            $html .= '</div>';
-            $html .= '<div class="icon next"><i class="fa fa-angle-right" aria-hidden="true"></i></div>';
-            $html .= '</a>';
-        }
-
-        return $html;
-    }
 }
 
 /**
@@ -869,10 +846,10 @@ function retrieve_page($arg, $rewrite)
 function total_comment($id)
 {
     $sql = "SELECT COUNT(1) AS total_comments FROM tbl_comments WHERE comment_post_id = ? AND comment_status = 'approved'";
-    $result = db_prepared_query($sql, [$id], "i")->get_result();
-    $row = $result->fetch_assoc()['total_comments'];
+    $result = db_prepared_query($sql, [$id], "i");
+    $row = $result->fetch();
 
-    return isset($row) ? ['total' => $row] : 0;
+    return isset($row['total_comments']) ? ['total' => $row['total_comments']] : ['total' => 0];
 }
 
 /**

@@ -36,6 +36,7 @@ function admin_query()
         'option-memberships' => 'option-memberships.php',
         'option-downloads' => 'option-downloads.php',
         'option-mail' => 'option-mail.php',
+        'option-api' => 'option-api.php',
         'option-language' => 'option-language.php',
         'plugins' => 'plugins.php',
         'privacy' => 'privacy.php',

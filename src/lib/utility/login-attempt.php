@@ -166,6 +166,8 @@ function alert_login_attempt($ip)
         $result = db_prepared_query($sql, [$ip], "s");
         return fetch_assoc($result);
     }
+    
+    return [];
 }
 
 /**
@@ -175,8 +177,8 @@ function fetch_assoc($result)
 {
     if ($result instanceof PDOStatement) {
         return $result->fetch(PDO::FETCH_ASSOC) ?: [];
-    } elseif (method_exists($result, 'get_result')) {
-        return $result->get_result()->fetch_assoc() ?: [];
+    } elseif (method_exists($result, 'fetch')) {
+        return $result->fetch() ?: [];
     } elseif (method_exists($result, 'fetch_assoc')) {
         return $result->fetch_assoc() ?: [];
     }

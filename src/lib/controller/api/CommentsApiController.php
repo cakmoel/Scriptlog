@@ -25,6 +25,11 @@ class CommentsApiController extends ApiController
     private $sanitizer;
 
     /**
+     * @var ApiHateoas
+     */
+    private $hateoas;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -34,6 +39,7 @@ class CommentsApiController extends ApiController
         // Initialize DAO
         $this->commentDao = new CommentDao();
         $this->sanitizer = new Sanitize();
+        $this->hateoas = new ApiHateoas();
     }
 
     /**
@@ -95,7 +101,19 @@ class CommentsApiController extends ApiController
             // Transform comments
             $transformedComments = array_map([$this, 'transformComment'], $comments);
 
-            ApiResponse::paginated($transformedComments, $pagination['page'], $pagination['per_page'], $total);
+            // Generate HATEOAS pagination links
+            $hateoasLinks = $this->hateoas->paginationLinks('comments', $pagination['page'], $pagination['per_page'], $total);
+
+            // Add post filter link if post_id was provided
+            if ($postIdFilter) {
+                $hateoasLinks['post'] = [
+                    'href' => $this->hateoas->postLinks($postIdFilter)['self']['href'],
+                    'rel' => 'post',
+                    'type' => 'GET'
+                ];
+            }
+
+            ApiResponse::paginated($transformedComments, $pagination['page'], $pagination['per_page'], $total, $hateoasLinks);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to fetch comments: ' . $e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -238,7 +256,9 @@ class CommentsApiController extends ApiController
 
             ApiResponse::created(
                 $this->transformComment($createdComment),
-                'Comment submitted successfully. It will be visible after moderation.'
+                'Comment submitted successfully. It will be visible after moderation.',
+                $this->hateoas->commentLinks($commentId, $postId),
+                $this->getAppUrl() . '/api/v1/comments/' . $commentId
             );
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to create comment: ' . $e->getMessage(), 500, 'CREATE_ERROR');
@@ -384,7 +404,7 @@ class CommentsApiController extends ApiController
             $deleteStmt = $dbc->prepare($deleteSql);
             $deleteStmt->execute([$commentId]);
 
-            ApiResponse::success(null, 200, 'Comment deleted successfully');
+            ApiResponse::noContent();
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to delete comment: ' . $e->getMessage(), 500, 'DELETE_ERROR');
         }

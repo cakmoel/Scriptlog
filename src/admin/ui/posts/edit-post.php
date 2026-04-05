@@ -63,7 +63,7 @@
 
                      <div class="form-group">
                         <label for="summernote">Content <span class="text-red" title="required">*</span></label>
-                        <textarea class="form-control" id="summernote" name="post_content" rows="10" cols="80" maxlength="50000" required aria-required="true"><?= (isset($postData['post_content']) ? safe_html($postData['post_content']) : ""); ?><?= (isset($formData['post_content']) ? safe_html($formData['post_content']) : ""); ?></textarea>
+                        <textarea class="form-control" id="summernote" name="post_content" rows="10" cols="80" maxlength="50000" required aria-required="true"><?= (isset($postContent) ? $postContent : ""); ?><?= (isset($formData['post_content']) ? safe_html($formData['post_content']) : ""); ?></textarea>
                      </div>
 
                      <div class="form-group">

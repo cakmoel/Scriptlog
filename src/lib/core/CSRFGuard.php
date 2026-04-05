@@ -96,6 +96,8 @@ class CSRFGuard
             LogError::setStatusCode(http_response_code());
             LogError::exceptionHandler($e);
         }
+
+        return false;
     }
 
     /**

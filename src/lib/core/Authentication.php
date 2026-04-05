@@ -314,7 +314,8 @@ class Authentication
         Session::getInstance()->scriptlog_fingerprint = hash_hmac('sha256', $this->agent, hash('sha256', $this->ip_address, true));
         Session::getInstance()->scriptlog_last_active = time();
 
-        $bind_session = ['user_session' => regenerate_session()];
+        $session_key = regenerate_session();
+        $bind_session = ['user_session' => $session_key];
 
         $this->userDao->updateUserSession($bind_session, (int)$this->account_info['ID']);
 

@@ -197,7 +197,10 @@ class UserService
      */
     public function setUserLogin($user_login)
     {
-        $this->user_login = remove_accents($user_login);
+        if (function_exists('remove_accents')) {
+            remove_accents($user_login);
+        }
+        $this->user_login = $user_login;
     }
 
     /**
@@ -638,6 +641,8 @@ class UserService
 
             return (!empty($token_info['ID'])) && $this->validator_verified && $this->selector_verified && $this->expired_verified ? true : false;
         }
+
+        return false;
     }
 
     /**

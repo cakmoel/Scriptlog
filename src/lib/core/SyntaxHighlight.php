@@ -26,8 +26,8 @@ class SyntaxHighlight
                 \#.*?\n|
                 (?<!\\\)&quot;.*?(?<!\\\)&quot;|
                 (?<!\\\)\'(.*?)(?<!\\\)\'
-            )/isex'
-            => 'self::replaceId($tokens,\'$1\')',
+            )/isx'
+            => function ($matches) use (&$tokens) { return self::replaceId($tokens, $matches[1]); },
 
             // Numbers (also look for Hex)
             '/(?<!\w)(

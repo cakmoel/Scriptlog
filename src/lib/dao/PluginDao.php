@@ -254,8 +254,13 @@ class PluginDao extends Dao
 
                         $html .= '<li "' . $plugin_selected . '">';
 
-                        (isset($plugin['plugin_status']) && $plugin['plugin_status'] == 'Y') ? $html .= '<a href="' . safe_html($plugin['plugin_link']) . '">' . clip('clip_' . safe_html($plugin['plugin_name']), null, safe_html($plugin['plugin_name'])) . '</a>' :
-                        $html .= '<a href="#">' . clip('clip_' . safe_html($plugin['plugin_name']), null, false) . '</a>';
+                        if (isset($plugin['plugin_status']) && $plugin['plugin_status'] == 'Y') {
+                            clip('clip_' . safe_html($plugin['plugin_name']), null, safe_html($plugin['plugin_name']));
+                            $html .= '<a href="' . safe_html($plugin['plugin_link']) . '">' . safe_html($plugin['plugin_name']) . '</a>';
+                        } else {
+                            clip('clip_' . safe_html($plugin['plugin_name']), null, false);
+                            $html .= '<a href="#">' . safe_html($plugin['plugin_name']) . '</a>';
+                        }
 
                         $html .= '</li>';
                     }

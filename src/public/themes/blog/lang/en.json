@@ -71,6 +71,7 @@
     "error.not_found": "Page not found",
     "error.wrong_password": "Incorrect password. Please try again.",
     "error.server_error": "Server error",
+    "status.loading": "Loading...",
     "pagination.previous": "Previous",
     "pagination.next": "Next",
     "category.uncategorized": "Uncategorized",

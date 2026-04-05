@@ -41,6 +41,9 @@ function check_mime_type($accepted_type, $tmp_name)
             }
 
             $type = getimage_type($tmp_name);
+            if (empty($type)) {
+                $type = 'image/jpeg';
+            }
         } else {
             $type = get_mime($tmp_name);
         }

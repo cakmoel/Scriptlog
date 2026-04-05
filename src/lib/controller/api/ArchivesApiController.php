@@ -15,11 +15,17 @@
 class ArchivesApiController extends ApiController
 {
     /**
+     * @var ApiHateoas
+     */
+    private $hateoas;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         parent::__construct();
+        $this->hateoas = new ApiHateoas();
     }
 
     /**
@@ -81,9 +87,13 @@ class ArchivesApiController extends ApiController
             // Re-index array
             $archives = array_values($archives);
 
+            // Generate HATEOAS links
+            $hateoasLinks = $this->hateoas->rootLinks();
+
             ApiResponse::success([
                 'archives' => $archives,
-                'total_years' => count($archives)
+                'total_years' => count($archives),
+                '_links' => $hateoasLinks
             ]);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to fetch archives: ' . $e->getMessage(), 500, 'FETCH_ERROR');
@@ -156,13 +166,17 @@ class ArchivesApiController extends ApiController
             // Transform posts
             $transformedPosts = array_map([$this, 'transformPost'], $posts);
 
+            // Generate HATEOAS links
+            $hateoasLinks = $this->hateoas->archiveLinks($year);
+            $hateoasLinks = array_merge($hateoasLinks, $this->hateoas->paginationLinks('archives/' . $year, $pagination['page'], $pagination['per_page'], $total));
+
             // Build response
             $response = [
                 'year' => $year,
                 'posts' => $transformedPosts
             ];
 
-            ApiResponse::paginated($response, $pagination['page'], $pagination['per_page'], $total);
+            ApiResponse::paginated($response, $pagination['page'], $pagination['per_page'], $total, $hateoasLinks);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to fetch year archives: ' . $e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -242,6 +256,10 @@ class ArchivesApiController extends ApiController
             // Transform posts
             $transformedPosts = array_map([$this, 'transformPost'], $posts);
 
+            // Generate HATEOAS links
+            $hateoasLinks = $this->hateoas->archiveLinks($year, $month);
+            $hateoasLinks = array_merge($hateoasLinks, $this->hateoas->paginationLinks('archives/' . $year . '/' . $month, $pagination['page'], $pagination['per_page'], $total));
+
             // Build response
             $response = [
                 'year' => $year,
@@ -250,7 +268,7 @@ class ArchivesApiController extends ApiController
                 'posts' => $transformedPosts
             ];
 
-            ApiResponse::paginated($response, $pagination['page'], $pagination['per_page'], $total);
+            ApiResponse::paginated($response, $pagination['page'], $pagination['per_page'], $total, $hateoasLinks);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to fetch month archives: ' . $e->getMessage(), 500, 'FETCH_ERROR');
         }
