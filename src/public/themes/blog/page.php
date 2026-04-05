@@ -6,8 +6,6 @@ $page_img = isset($retrieve_page['media_filename']) ? htmlout($retrieve_page['me
 $page_id = isset($retrieve_page['ID']) ? (int)$retrieve_page['ID'] : "";
 $page_title = isset($retrieve_page['post_title']) ? htmlout($retrieve_page['post_title']) : "";
 
-if (!empty($page_id) || $page_id !== '') {
-
 if (isset($retrieve_page['user_fullname'])) {
     $page_author = htmlout($retrieve_page['user_fullname']);
 }
@@ -34,7 +32,7 @@ if (isset($retrieve_page['post_date'])) {
         <main class="post blog-post col-lg-8">
             <div class="container">
                 <div class="post-single">
-                    <div class="post-thumbnail"><img src="<?= isset($page_img) ? invoke_frontimg($page_img) : "https://picsum.photos/730/486"; ?>" alt="<?= isset($img_alt) ? $img_alt : ""; ?>"></div>
+                    <div class="post-thumbnail"><?= isset($page_img) ? invoke_responsive_image($page_img, 'medium', true, isset($img_alt) ? $img_alt : "", 'img-fluid') : '<img src="https://picsum.photos/730/486" alt="" width="730" height="486" class="img-fluid" loading="lazy" decoding="async">' ?></div>
                     <div class="post-details">
                         <div class="post-meta d-flex justify-content-between">
                             <div class="category">
@@ -75,13 +73,3 @@ if (isset($retrieve_page['post_date'])) {
     </div>
 
 </div>
-
-<?php 
-
-} else {
-
-    http_response_code(400);
-    include dirname(__FILE__) . '/404.php';
-}
-
-?>

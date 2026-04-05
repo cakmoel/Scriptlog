@@ -1,6 +1,6 @@
 <?php
- $entries = function_exists('retrieve_blog_posts') ? retrieve_blog_posts()['blogPosts'] : "";
- $entries_pagination = function_exists('retrieve_blog_posts') ? retrieve_blog_posts()['paginationLink'] : "";
+$entries = function_exists('retrieve_blog_posts') ? retrieve_blog_posts()['blogPosts'] : "";
+$entries_pagination = function_exists('retrieve_blog_posts') ? retrieve_blog_posts()['paginationLink'] : "";
 ?>
 
 <div class="container">
@@ -14,25 +14,24 @@
       <?php
 
         if (!empty($entries)) :
-          foreach ($entries as $entry) :
+            foreach ($entries as $entry) :
+                $entry_id = isset($entry['ID']) ? (int)$entry['ID'] : "";
+                $entry_title = isset($entry['post_title']) ? htmlout($entry['post_title']) : "";
+                $entry_content = isset($entry['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($entry['post_content']))) : "";
+                $entry_img = ((isset($entry['media_filename'])) && ($entry['media_filename'] !== '') ? htmlout($entry['media_filename']) : "");
+                $entry_img_caption = isset($entry['media_caption']) ? htmlout($entry['media_caption']) : "";
+                $entry_created = isset($entry['modified_at']) ? htmlout(make_date($entry['modified_at'])) : htmlout(make_date($entry['created_at']));
+                $entry_author = (isset($entry['user_login']) || isset($entry['user_fullname']) ? htmlout($entry['user_login']) : htmlout($entry['user_fullname']));
+                $total_comment = isset($entry['total_comments']) ? (int)$entry['total_comments'] : 0;
 
-            $entry_id = isset($entry['ID']) ? (int)$entry['ID'] : "";
-            $entry_title = isset($entry['post_title']) ? htmlout($entry['post_title']) : "";
-            $entry_content = isset($entry['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($entry['post_content']))) : "";
-            $entry_img = ((isset($entry['media_filename'])) && ($entry['media_filename'] !== '') ? htmlout($entry['media_filename']) : "");
-            $entry_img_caption = isset($entry['media_caption']) ? htmlout($entry['media_caption']) : "";
-            $entry_created = isset($entry['modified_at']) ? htmlout(make_date($entry['modified_at'])) : htmlout(make_date($entry['created_at']));
-            $entry_author = (isset($entry['user_login']) || isset($entry['user_fullname']) ? htmlout($entry['user_login']) : htmlout($entry['user_fullname']));
-            $total_comment = (total_comment($entry_id)['total'] > 0) ? total_comment($entry_id)['total'] : 0;
-
-      ?>
+                ?>
 
             <div class="post col-xl-6">
-              <div class="post-thumbnail"><a href="<?= isset($entry_id) ? permalinks($entry_id)['post'] : "#"; ?>"><img src="<?= isset($entry_img) ? invoke_frontimg($entry_img) : "https://via.placeholder.com/640x450"; ?>" alt="<?= isset($entry_img_caption) ? $entry_img_caption : $entry_title; ?>" class="img-fluid"></a></div>
+              <div class="post-thumbnail"><a href="<?= isset($entry_id) ? permalinks($entry_id)['post'] : "#"; ?>"><?= isset($entry_img) ? invoke_responsive_image($entry_img, 'thumbnail', true, isset($entry_img_caption) ? $entry_img_caption : $entry_title, 'img-fluid') : '<img src="https://via.placeholder.com/640x450" alt="" width="640" height="450" class="img-fluid" loading="lazy" decoding="async">' ?></a></div>
               <div class="post-details">
                 <div class="post-meta d-flex justify-content-between">
                   <div class="date meta-last"> <?= isset($entry_created) ? $entry_created : ""; ?> </div>
-                  <div class="category"><?= retrieves_topic_simple($entry_id); ?></div>
+                  <div class="category"><?= isset($entry['topics_data']) ? format_topics($entry['topics_data']) : ""; ?></div>
                 </div>
                 <a href="<?= isset($entry_id) ? permalinks($entry_id)['post'] : "javascript:void(0)"; ?>" title="<?= isset($entry_title) ? $entry_title : ""; ?>">
                   <h3 class="h4"> <?= isset($entry_title) ? $entry_title : ""; ?> </h3>
@@ -48,10 +47,10 @@
               </div>
             </div>
 
-      <?php
-          endforeach;
+                <?php
+            endforeach;
         endif;
-      ?>
+        ?>
 
         </div>
 
