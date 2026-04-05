@@ -1,39 +1,38 @@
 <?php
+
 /**
  * setplugin
  * Checking whether plugin actived then set it as plugin navigation on sidebar nav
- * 
+ *
  * @category Function
  * @author M.Noermoehammad
- * @license 
+ * @license
  * @version 1.0
  * @param string $access_level
- * 
+ *
  */
 function set_plugin_navigation($plugin_name)
 {
-  
-  $plugin = new PluginDao();
-  
-  return $plugin->setMenuPlugin($plugin_name, plugin_authorizer());
-   
+
+    $plugin = new PluginDao();
+
+    return $plugin->setMenuPlugin($plugin_name, plugin_authorizer());
 }
 
 /**
  * plugin_authorizer
  *
  * checking user_level and return it
- * 
+ *
  * @return string
- * 
+ *
  */
 function plugin_authorizer()
 {
 
-Authorization::setAuthInstance(new Authentication(new UserDao, new UserTokenDao, new FormValidator()));
+    Authorization::setAuthInstance(new Authentication(new UserDao(), new UserTokenDao(), new FormValidator()));
 
-return Authorization::authorizeLevel();
-
+    return Authorization::authorizeLevel();
 }
 
 /**
@@ -42,40 +41,37 @@ return Authorization::authorizeLevel();
  * @param string $plugin_name
  * @param string $args
  * @return string|bool -- return false if plugin does not exists
- * 
+ *
  */
 function invoke_plugin($plugin_name, $args)
 {
 
- if ((is_plugin_exist($plugin_name) == true) && (is_plugin_enabled($plugin_name) == true)) {
+    if ((is_plugin_exist($plugin_name) == true) && (is_plugin_enabled($plugin_name) == true)) {
+        $plugin_dir = get_plugin_directory($plugin_name);
 
-   $plugin_dir = get_plugin_directory($plugin_name);
-   
-   if ($plugin_dir) {
-      $plugin_path = APP_ROOT . APP_PLUGIN . $plugin_dir;
-      enable_plugin($plugin_path);
-      
-      // Also ensure the plugin class is instantiated to register hooks
-      $plugin_ini = read_plugin_ini($plugin_path);
-      if (isset($plugin_ini['plugin_loader'])) {
-          $plugin_class = $plugin_ini['plugin_loader'];
-          if (class_exists($plugin_class)) {
-              new $plugin_class();
-          }
-      }
-   }
+        if ($plugin_dir) {
+            $plugin_path = APP_ROOT . APP_PLUGIN . $plugin_dir;
+            enable_plugin($plugin_path);
 
-   // Ensure the hook exists to return at least the original args
-   clip('clip_'.$plugin_name, null, function($val) { return $val; });
+            // Also ensure the plugin class is instantiated to register hooks
+            $plugin_ini = read_plugin_ini($plugin_path);
+            if (isset($plugin_ini['plugin_loader'])) {
+                $plugin_class = $plugin_ini['plugin_loader'];
+                if (class_exists($plugin_class)) {
+                    new $plugin_class();
+                }
+            }
+        }
 
-   return clip('clip_'.$plugin_name, $args);
+        // Ensure the hook exists to return at least the original args
+        clip('clip_' . $plugin_name, null, function ($val) {
+            return $val;
+        });
 
- } else {
-
-   return false;
-
- }
- 
+        return clip('clip_' . $plugin_name, $args);
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -83,46 +79,44 @@ function invoke_plugin($plugin_name, $args)
  *
  * @param string $plugin_name
  * @return boolean
- * 
+ *
  */
 function is_plugin_exist($plugin_name)
 {
 
-  $plugin =  new PluginDao();
+    $plugin =  new PluginDao();
 
-  $is_plugin_exists = $plugin->pluginExists($plugin_name);
+    $is_plugin_exists = $plugin->pluginExists($plugin_name);
 
-  return ($is_plugin_exists) ? true : false;
-
+    return ($is_plugin_exists) ? true : false;
 }
 
 /**
  * is_plugin_enabled
  *
  * checking whether plugin enabled
- * 
+ *
  * @param string $plugin_name
  * @return boolean
- * 
+ *
  */
 function is_plugin_enabled($plugin_name)
 {
-  $plugin = new PluginDao();
+    $plugin = new PluginDao();
 
-  $is_plugin_actived = $plugin->isPluginActived($plugin_name);
+    $is_plugin_actived = $plugin->isPluginActived($plugin_name);
 
-  return ($is_plugin_actived == 'Y') ? true : false;
-
+    return ($is_plugin_actived == 'Y') ? true : false;
 }
 
 /**
  * get_plugin_directory
- * 
+ *
  * @param string $plugin_name
  * @return string|bool
  */
 function get_plugin_directory($plugin_name)
 {
-  $plugin = new PluginDao();
-  return $plugin->getPluginDirectory($plugin_name);
+    $plugin = new PluginDao();
+    return $plugin->getPluginDirectory($plugin_name);
 }

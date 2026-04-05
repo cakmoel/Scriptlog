@@ -1,42 +1,44 @@
 <?php
+
 /**
- * Function invoke webp image format
+ * invoke_webp_image()
+ * Returns WebP URL if available, otherwise returns original image URL
  *
- * @category functions
- * @author M.Noermoehammad
- * @license MIT
  * @param string $media_filename
  * @param boolean $image_thumb
- * @return string | false if no string returned
- * 
+ * @return string
  */
-function invoke_webp_image($media_filename, $image_thumb = true) 
+function invoke_webp_image($media_filename, $image_thumb = true)
 {
-
-$file_basename = substr($media_filename, 0, strripos($media_filename, '.'));
-
-$image_dir =  __DIR__ . '/../../'.APP_IMAGE_SMALL.'small_'.$file_basename.'.webp';
-
-$image_src = null;
-
-if (is_readable($image_dir)) {
-
-    if ($image_thumb === true) {
-
-        $image_src =  app_url().DS.APP_IMAGE_MEDIUM.'medium_'.rawurlencode($file_basename.'.webp');
-        
-    } else {
-
-        $image_src = app_url().DS.APP_IMAGE_LARGE.'large_'.rawurlencode(basename($file_basename.'.webp'));
-        
+    if (empty($media_filename)) {
+        return '';
     }
 
-    return $image_src;
+    $file_basename = substr($media_filename, 0, strripos($media_filename, '.'));
 
-} else {
+    $base_path = __DIR__ . '/../../public/files/pictures/';
+    
+    // Check for WebP in main folder
+    $webp_file = $base_path . $file_basename . '.webp';
+    $has_webp = is_readable($webp_file);
 
-    return false;
+    if ($has_webp) {
+        return app_url() . '/public/files/pictures/' . rawurlencode($file_basename . '.webp');
+    }
 
-}
+    // No WebP, return sized or original JPG
+    if ($image_thumb) {
+        $medium_file = $base_path . 'medium/medium_' . basename($media_filename);
+        if (is_readable($medium_file)) {
+            return app_url() . '/public/files/pictures/medium/medium_' . rawurlencode(basename($media_filename));
+        }
+    } else {
+        $large_file = $base_path . 'large/large_' . basename($media_filename);
+        if (is_readable($large_file)) {
+            return app_url() . '/public/files/pictures/large/large_' . rawurlencode(basename($media_filename));
+        }
+    }
 
+    // Return original
+    return app_url() . '/public/files/pictures/' . rawurlencode(basename($media_filename));
 }

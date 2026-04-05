@@ -1,11 +1,12 @@
 <?php
+
 /**
  * time_keeper
- * 
+ *
  * @category function
  * @version 1.0
  * @license MIT
- * 
+ *
  */
 function time_keeper()
 {
@@ -15,7 +16,7 @@ function time_keeper()
 
 /**
  * validate_time_login
- * 
+ *
  * @category function
  * @version 1.0
  * @license MIT
@@ -23,20 +24,15 @@ function time_keeper()
  */
 function validate_time_login()
 {
-    
-  $timeOut = $_SESSION['timeOut'];
-    
-  if (time() < $timeOut) {
-        
-     time_keeper();
-     return true;
-    
-  } else {
-        
-      unset($_SESSION['timeOut']);
-        
-      return false;
-      
-  }
-    
+
+    $timeOut = $_SESSION['timeOut'];
+
+    if (time() < $timeOut) {
+        time_keeper();
+        return true;
+    } else {
+        unset($_SESSION['timeOut']);
+
+        return false;
+    }
 }

@@ -1,12 +1,13 @@
 <?php
+
 /**
  * app_sitename()
- * 
+ *
  * @category function
- * @author nirmala khanza 
+ * @author nirmala khanza
  * @license MIT
  * @version 1.0
- * 
+ *
  */
 function app_sitename()
 {
