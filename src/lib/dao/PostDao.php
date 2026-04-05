@@ -1,4 +1,6 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class PostDao extends Dao
  *
@@ -11,527 +13,507 @@
  */
 class PostDao extends Dao
 {
+    private $selected;
 
-private $selected;
-
-public function __construct()
-{
-  parent::__construct();
-}
-
-/**
- * findPosts
- * Retrieving all records from table posts
- *
- * @param integer $position
- * @param integer $limit
- * @param string $orderBy
- * @param string $author
- * @return boolean|array|object
- *
- */
-public function findPosts($orderBy = 'ID', $author = null)
-{
-    if (!is_null($author)) {
-
-        $sql = "SELECT p.ID,
-                p.media_id,
-                p.post_author,
-                p.post_date,
-                p.post_modified,
-                p.post_title,
-                p.post_slug,
-                p.post_content,
-                p.post_status,
-                p.post_visibility,
-                p.post_password,
-                p.post_tags,
-                p.post_headlines,
-                p.post_type,
-                p.passphrase,
-                u.user_login
-  			FROM tbl_posts AS p
-  			INNER JOIN tbl_users AS u ON p.post_author = u.ID
-  			WHERE p.post_author = ?
-  			AND p.post_type = 'blog'
-  			ORDER BY '$orderBy' DESC";
-
-        $data = array($author);
-
-    } else {
-
-        $sql = "SELECT p.ID,
-                p.media_id,
-                p.post_author,
-                p.post_date,
-                p.post_modified,
-                p.post_title,
-                p.post_slug,
-                p.post_content,
-                p.post_status,
-                p.post_visibility,
-                p.post_password,
-                p.post_tags,
-                p.post_headlines,
-                p.post_type,
-                p.passphrase,
-                u.user_login
-  		  FROM tbl_posts AS p
-  		  INNER JOIN tbl_users AS u ON p.post_author = u.ID
-  		  WHERE p.post_type = 'blog'
-  			ORDER BY '$orderBy' DESC";
-
-        $data = array();
-
+    public function __construct()
+    {
+        parent::__construct();
     }
 
-    $this->setSQL($sql);
+    /**
+     * findPosts
+     * Retrieving all records from table posts
+     *
+     * @param string $orderBy
+     * @param integer|null $author
+     * @param bool $onlyPublished
+     * @return boolean|array|object
+     *
+     */
+    public function findPosts($orderBy = 'ID', $author = null, $onlyPublished = true)
+    {
+        $allowedColumns = ['ID', 'post_date', 'post_title', 'post_modified'];
+        $sortColumn = in_array($orderBy, $allowedColumns) ? $orderBy : 'ID';
 
-    $posts = $this->findAll($data);
+        $sql = "SELECT p.ID,
+            p.media_id,
+            p.post_author,
+            p.post_date,
+            p.post_modified,
+            p.post_title,
+            p.post_slug,
+            p.post_content,
+            p.post_status,
+            p.post_visibility,
+            p.post_password,
+            p.post_tags,
+            p.post_headlines,
+            p.post_type,
+            p.post_locale,
+            p.passphrase,
+            u.user_login
+FROM tbl_posts AS p
+INNER JOIN tbl_users AS u ON p.post_author = u.ID
+WHERE p.post_type = 'blog'";
 
-    return (empty($posts)) ?: $posts;
+        $data = [];
 
-}
+        if (!is_null($author)) {
+            $sql .= " AND p.post_author = ?";
+            $data[] = (int)$author;
+        }
 
-/**
- * findPost()
- * 
- * Retrieving a single post records by it's Id 
- * 
- * @param integer $postId
- * @param object $sanitize
- * @param string $author
- * @return boolean|array|object
- *
- */
-public function findPost($id, $sanitize, $author = null)
-{
+        if ($onlyPublished) {
+            $sql .= " AND p.post_status = 'publish' AND p.post_visibility = 'public'";
+        }
 
-   $idsanitized = $this->filteringId($sanitize, $id, 'sql');
+        $sql .= " ORDER BY p.$sortColumn DESC";
 
-   if (!is_null($author)) {
+        $this->setSQL($sql);
+
+        $posts = $this->findAll($data);
+
+        return (empty($posts)) ? [] : $posts;
+    }
+
+    /**
+     * findPost()
+     *
+     * Retrieving a single post records by it's Id
+     *
+     * @param integer $postId
+     * @param object $sanitize
+     * @param integer|null $author
+     * @param bool $onlyPublished
+     * @return boolean|array|object
+     *
+     */
+    public function findPost($id, $sanitize, $author = null, $onlyPublished = true)
+    {
+
+        $idsanitized = $this->filteringId($sanitize, $id, 'sql');
 
         $sql = "SELECT ID,
-                  media_id,
-                  post_author,
-  	  		        post_date,
-                  post_modified,
-                  post_title,
-  	  		        post_slug,
-                  post_content,
-                  post_summary,
-                  post_status,
-                  post_visibility,
-                  post_password,
-                  post_tags,
-                  post_headlines,
-                  comment_status, 
-                  passphrase
-  	  		  FROM tbl_posts
-  	  		  WHERE ID = ? 
-            AND post_author = ?
-  			  AND post_type = 'blog' ";
+            media_id,
+            post_author,
+                post_date,
+            post_modified,
+            post_title,
+                post_slug,
+            post_content,
+            post_summary,
+            post_status,
+            post_visibility,
+            post_password,
+            post_tags,
+            post_headlines,
+            post_locale,
+            comment_status, 
+            passphrase
+FROM tbl_posts
+WHERE ID = ? AND post_type = 'blog'";
 
-   } else {
+        $data = [$idsanitized];
 
-       $sql = "SELECT ID,
-              media_id,
-              post_author,
-  	  		    post_date,
-              post_modified,
-              post_title,
-  	  		    post_slug,
-              post_content,
-              post_summary,
-              post_status,
-              post_visibility,
-              post_password,
-              post_tags,
-              post_headlines,
-              comment_status, 
-              passphrase
-  	  		  FROM tbl_posts
-  	  		  WHERE ID = ? AND post_type = 'blog' ";
+        if (!is_null($author)) {
+            $sql .= " AND post_author = ?";
+            $data[] = (int)$author;
+        }
 
-  }
+        if ($onlyPublished) {
+            $sql .= " AND post_status = 'publish' AND post_visibility = 'public'";
+        }
 
-  $this->setSQL($sql);
+        $this->setSQL($sql);
 
-  $postDetail = is_null($author) ? $this->findRow([$idsanitized]) : $this->findRow([$idsanitized, $author]);
+        $postDetail = $this->findRow($data);
 
-  return (empty($postDetail)) ?: $postDetail;
-
-}
-
-/**
- * createPost
- * 
- * insert new post record
- *
- * @param array $bind
- * @param integer $topicId
- * @param string $tagId
- * 
- */
-public function createPost($bind, $topicId)
-{
- 
- $this->setSQL("SET SQL_MODE='ALLOW_INVALID_DATE'");
- 
- if (!empty($bind['media_id'])) {
-
-   $this->create("tbl_posts", [
-       'media_id' => $bind['media_id'],
-       'post_author' => $bind['post_author'],
-       'post_date' => $bind['post_date'],
-       'post_title' => $bind['post_title'],
-       'post_slug' => $bind['post_slug'],
-       'post_content' => $bind['post_content'],
-       'post_summary' => $bind['post_summary'], 
-       'post_status' => $bind['post_status'],
-       'post_visibility' => $bind['post_visibility'], 
-       'post_password' => $bind['post_password'],
-       'post_tags' => $bind['post_tags'], 
-       'post_headlines' => $bind['post_headlines'], 
-       'comment_status' => $bind['comment_status'], 
-       'passphrase' => $bind['passphrase']
-       ]);
-
- } else {
-
-   $this->create("tbl_posts", [
-      'post_author' => $bind['post_author'],
-      'post_date' => $bind['post_date'],
-      'post_title' => $bind['post_title'],
-      'post_slug' => $bind['post_slug'],
-      'post_content' => $bind['post_content'],
-      'post_summary' => $bind['post_summary'],
-      'post_status' => $bind['post_status'],
-      'post_visibility' => $bind['post_visibility'], 
-      'post_password' => $bind['post_password'],
-      'post_tags' => $bind['post_tags'],
-      'post_headlines' => $bind['post_headlines'],
-      'comment_status' => $bind['comment_status'],
-      'passphrase' => $bind['passphrase']
-   ]);
-
- }
-
- $postId = $this->lastId();
-
- if ((is_array($topicId)) && (!empty($postId))) {
-
-  	foreach ($_POST['catID'] as $topicId) {
-
-  	  $this->create("tbl_post_topic", [
-  	    'post_id' => $postId,
-  	    'topic_id' => $topicId]);
-
+        return (empty($postDetail)) ? false : $postDetail;
     }
-   
- } else {
 
-    $this->create("tbl_post_topic", [
-      'post_id' => $postId,
-      'topic_id' => $topicId]);
+    /**
+     * createPost
+     *
+     * insert new post record
+     *
+     * @param array $bind
+     * @param integer $topicId
+     * @param string $tagId
+     *
+     */
+    public function createPost($bind, $topicId)
+    {
 
- }
- 
- return $postId;
+        $this->setSQL("SET SQL_MODE='ALLOW_INVALID_DATE'");
 
-}
+        if (!empty($bind['media_id'])) {
+            $this->create("tbl_posts", [
+                'media_id' => $bind['media_id'],
+                'post_author' => $bind['post_author'],
+                'post_date' => $bind['post_date'],
+                'post_title' => $bind['post_title'],
+                'post_slug' => $bind['post_slug'],
+                'post_content' => $bind['post_content'],
+                'post_summary' => $bind['post_summary'],
+                'post_status' => $bind['post_status'],
+                'post_visibility' => $bind['post_visibility'],
+                'post_password' => $bind['post_password'],
+                'post_tags' => $bind['post_tags'],
+                'post_headlines' => $bind['post_headlines'],
+                'post_locale' => $bind['post_locale'] ?? 'en',
+                'comment_status' => $bind['comment_status'],
+                'passphrase' => $bind['passphrase']
+                ]);
+        } else {
+            $this->create("tbl_posts", [
+               'post_author' => $bind['post_author'],
+               'post_date' => $bind['post_date'],
+               'post_title' => $bind['post_title'],
+               'post_slug' => $bind['post_slug'],
+               'post_content' => $bind['post_content'],
+               'post_summary' => $bind['post_summary'],
+               'post_status' => $bind['post_status'],
+               'post_visibility' => $bind['post_visibility'],
+               'post_password' => $bind['post_password'],
+               'post_tags' => $bind['post_tags'],
+               'post_headlines' => $bind['post_headlines'],
+               'post_locale' => $bind['post_locale'] ?? 'en',
+               'comment_status' => $bind['comment_status'],
+               'passphrase' => $bind['passphrase']
+            ]);
+        }
 
-/**
- * updatePost
- *
- * updating an existing post record
- * 
- * @param array $bind
- * @param integer $id
- * @param integer $topicId
- *
- */
-public function updatePost($sanitize, $bind, $ID, $topicId)
-{
+        $postId = $this->lastId();
 
-$cleanId = $this->filteringId($sanitize, $ID, 'sql');
+        if (function_exists('page_cache_clear')) {
+            page_cache_clear();
+        }
 
-try {
+        if ((is_array($topicId)) && (!empty($postId))) {
+            foreach ($_POST['catID'] as $topicId) {
+                $this->create("tbl_post_topic", [
+                  'post_id' => $postId,
+                  'topic_id' => $topicId]);
+            }
+        } else {
+            $this->create("tbl_post_topic", [
+              'post_id' => $postId,
+              'topic_id' => $topicId]);
+        }
 
-  // transaction
-  $this->callTransaction(); 
+        return $postId;
+    }
 
-  if (!empty($bind['media_id'])) {
+    /**
+     * updatePost
+     *
+     * updating an existing post record
+     *
+     * @param array $bind
+     * @param integer $id
+     * @param integer $topicId
+     *
+     */
+    public function updatePost($sanitize, $bind, $ID, $topicId)
+    {
 
-  	$this->modify("tbl_posts", [
+        $cleanId = $this->filteringId($sanitize, $ID, 'sql');
 
-  	    'media_id' => $bind['media_id'],
-        'post_author' => $bind['post_author'],
-  	    'post_modified' => $bind['post_modified'],
-  	    'post_title' => $bind['post_title'],
-  	    'post_slug' => $bind['post_slug'],
-  	    'post_content' => $bind['post_content'],
-  	    'post_summary' => $bind['post_summary'],
-        'post_status' => $bind['post_status'],
-        'post_visibility' => $bind['post_visibility'],
-        'post_password' => $bind['post_password'],
-        'post_tags' => $bind['post_tags'],
-        'post_headlines' => $bind['post_headlines'],
-  	    'comment_status' => $bind['comment_status'],
-        'passphrase' => $bind['passphrase']
+        try {
+            // transaction
+            $this->callTransaction();
 
-  	], ['ID' => (int)$cleanId]);
+            if (!empty($bind['media_id'])) {
+                $this->modify("tbl_posts", [
 
-  } else {
+                    'media_id' => $bind['media_id'],
+                    'post_author' => $bind['post_author'],
+                    'post_modified' => $bind['post_modified'],
+                    'post_title' => $bind['post_title'],
+                    'post_slug' => $bind['post_slug'],
+                    'post_content' => $bind['post_content'],
+                    'post_summary' => $bind['post_summary'],
+                    'post_status' => $bind['post_status'],
+                    'post_visibility' => $bind['post_visibility'],
+                    'post_password' => $bind['post_password'],
+                    'post_tags' => $bind['post_tags'],
+                    'post_headlines' => $bind['post_headlines'],
+                    'post_locale' => $bind['post_locale'] ?? 'en',
+                    'comment_status' => $bind['comment_status'],
+                    'passphrase' => $bind['passphrase']
 
-      $this->modify("tbl_posts", [
-          'post_author' => $bind['post_author'],
-          'post_modified' => $bind['post_modified'],
-          'post_title' => $bind['post_title'],
-          'post_slug' => $bind['post_slug'],
-          'post_content' => $bind['post_content'],
-          'post_summary' => $bind['post_summary'],
-          'post_status' => $bind['post_status'],
-          'post_visibility' => $bind['post_visibility'],
-          'post_password' => $bind['post_password'],
-          'post_tags' => $bind['post_tags'],
-          'post_headlines' => $bind['post_headlines'],
-          'comment_status' => $bind['comment_status'],
-          'passphrase' => $bind['passphrase']
-          
-      ], ['ID' => (int)$cleanId]);
+                ], ['ID' => (int)$cleanId]);
+            } else {
+                $this->modify("tbl_posts", [
+                    'post_author' => $bind['post_author'],
+                    'post_modified' => $bind['post_modified'],
+                    'post_title' => $bind['post_title'],
+                    'post_slug' => $bind['post_slug'],
+                    'post_content' => $bind['post_content'],
+                    'post_summary' => $bind['post_summary'],
+                    'post_status' => $bind['post_status'],
+                    'post_visibility' => $bind['post_visibility'],
+                    'post_password' => $bind['post_password'],
+                    'post_tags' => $bind['post_tags'],
+                    'post_headlines' => $bind['post_headlines'],
+                    'post_locale' => $bind['post_locale'] ?? 'en',
+                    'comment_status' => $bind['comment_status'],
+                    'passphrase' => $bind['passphrase']
 
-  }
+                ], ['ID' => (int)$cleanId]);
+            }
 
-  // delete all post_topic by post_id
-  $post_id = isset($ID) ? purify_dirty_html((int)$ID) : "";
+            // delete all post_topic by post_id
+            $post_id = isset($ID) ? purify_dirty_html((int)$ID) : "";
 
-  $this->deleteRecord("tbl_post_topic", ['post_id' => $post_id]);
+            $this->deleteRecord("tbl_post_topic", ['post_id' => $post_id]);
 
-  if ((is_array($topicId)) && (isset($_POST['catID']))) {
+            if ((is_array($topicId)) && (isset($_POST['catID']))) {
+                foreach ($_POST['catID'] as $topicId) {
+                    $this->create("tbl_post_topic", [
+                        'post_id' => $cleanId,
+                        'topic_id' => $topicId
+                    ]);
+                }
+            }
 
-  	 foreach ($_POST['catID'] as $topicId) {
+            $this->callCommit();
 
-  	    $this->create("tbl_post_topic", [
-  	        'post_id' => $cleanId,
-  	        'topic_id' => $topicId
-  	    ]);
+            if (function_exists('page_cache_clear')) {
+                page_cache_clear();
+            }
+        } catch (\Throwable $th) {
+            $this->callRollBack();
+            $this->error = LogError::setStatusCode(http_response_code(500));
+            $this->error = LogError::exceptionHandler($th);
+        } catch (DbException $e) {
+            $this->callRollBack();
+            $this->error = LogError::setStatusCode(http_response_code(500));
+            $this->error = LogError::exceptionHandler($e);
+        }
+    }
 
-  	  }
+    /**
+     * DeletePost
+     *
+     * @param integer $id
+     * @param object $sanitizing
+     *
+     */
+    public function deletePost($id, $sanitize)
+    {
+        $cleanId = $this->filteringId($sanitize, $id, 'sql');
+        $this->deleteRecord("tbl_posts", ['ID' => $cleanId]);
 
-  } 
+        if (function_exists('page_cache_clear')) {
+            page_cache_clear();
+        }
+    }
 
-  $this->callCommit();
+    /**
+     * Anonymize post author info
+     * Used for GDPR data deletion (Right to be Forgotten)
+     *
+     * @param int $authorId
+     * @return bool
+     */
+    public function anonymizePostAuthor($authorId)
+    {
+        $anonymousAuthor = 1;
 
-} catch (\Throwable $th) {
-
-  $this->callRollBack();
-  $this->error = LogError::setStatusCode(http_response_code(500));
-  $this->error = LogError::exceptionHandler($th);
-
-} catch (DbException $e) {
-
-  $this->callRollBack();
-  $this->error = LogError::setStatusCode(http_response_code(500));
-  $this->error = LogError::exceptionHandler($e);
-
-}
-
-}
-
-/**
- * DeletePost
- *
- * @param integer $id
- * @param object $sanitizing
- *
- */
-public function deletePost($id, $sanitize)
-{
- $cleanId = $this->filteringId($sanitize, $id, 'sql');
- $this->deleteRecord("tbl_posts", ['ID' => $cleanId]);
-}
-
-/**
- * Anonymize post author info
- * Used for GDPR data deletion (Right to be Forgotten)
- * 
- * @param int $authorId
- * @return bool
- */
-public function anonymizePostAuthor($authorId)
-{
- $anonymousAuthor = 1;
- 
- $sql = "UPDATE tbl_posts SET 
+        $sql = "UPDATE tbl_posts SET 
          post_author = ?
          WHERE post_author = ?";
- 
- $this->setSQL($sql);
- $this->dbc->dbQuery($sql, [$anonymousAuthor, (int)$authorId]);
- 
- return true;
-}
 
-/**
- * checkPostId
- *
- * @param integer $id
- * @param object $sanitizing
- * @return numeric
- *
- */
-public function checkPostId($id, $sanitizing)
-{
-  $sql = "SELECT ID FROM tbl_posts WHERE ID = ? AND post_type = 'blog'";
-  $idsanitized = $this->filteringId($sanitizing, $id, 'sql');
-  $this->setSQL($sql);
-  $stmt = $this->checkCountValue([$idsanitized]);
-  return $stmt > 0;
-}
+        $this->setSQL($sql);
+        $this->dbc->dbQuery($sql, [$anonymousAuthor, (int)$authorId]);
 
-/**
- * Drop down post status
- * set post status
- *
- * @param string $selected
- *
- */
-public function dropDownPostStatus($selected = "")
-{
+        return true;
+    }
 
-  $name = 'post_status';
+    /**
+     * checkPostId
+     *
+     * @param integer $id
+     * @param object $sanitizing
+     * @return numeric
+     *
+     */
+    public function checkPostId($id, $sanitizing)
+    {
+        $sql = "SELECT ID FROM tbl_posts WHERE ID = ? AND post_type = 'blog'";
+        $idsanitized = $this->filteringId($sanitizing, $id, 'sql');
+        $this->setSQL($sql);
+        $stmt = $this->checkCountValue([$idsanitized]);
+        return $stmt > 0;
+    }
 
-  $posts_status = array('publish' => 'Publish', 'draft' => 'Draft');
+    /**
+     * Drop down post status
+     * set post status
+     *
+     * @param string $selected
+     *
+     */
+    public function dropDownPostStatus($selected = "")
+    {
 
-  if ($selected !== '') {
+        $name = 'post_status';
 
-    $this->selected = $selected;
+        $posts_status = array('publish' => 'Publish', 'draft' => 'Draft');
 
-  }
+        if ($selected !== '') {
+            $this->selected = $selected;
+        }
 
-  return dropdown($name, $posts_status, $this->selected);
+        return dropdown($name, $posts_status, $this->selected);
+    }
 
-}
+    /**
+     * Drop down Comment Status
+     * set comment status
+     *
+     * @param string $name
+     *
+     */
+    public function dropDownCommentStatus($selected = "")
+    {
 
-/**
- * Drop down Comment Status
- * set comment status
- *
- * @param string $name
- *
- */
-public function dropDownCommentStatus($selected = "")
-{
+        $name = 'comment_status';
 
-  $name = 'comment_status';
+        $comment_status = array('open' => 'Open', 'closed' => 'Closed');
 
- 	$comment_status = array('open' => 'Open', 'closed' => 'Closed');
+        if ($selected !== '') {
+            $this->selected = $selected;
+        }
 
- 	if ($selected !== '') {
- 	  $this->selected = $selected;
- 	}
+        return dropdown($name, $comment_status, $this->selected);
+    }
 
- 	return dropdown($name, $comment_status, $this->selected);
+    /**
+     * dropDownVisibility
+     *
+     * @param string $selected
+     *
+     */
+    public function dropDownVisibility($selected = null, $postId = null)
+    {
 
-}
+        $dropdown = null;
 
-/**
- * dropDownVisibility
- *
- * @param string $selected
- * 
- */
-public function dropDownVisibility($selected = null, $postId = null)
-{
+        $name = "visibility";
 
-  $dropdown = null;
+        $dropdown .= '<div class="form-group">';
+        $dropdown .= '<label for="visibility">Post visibility</label>';
+        $dropdown .= '<select name="' . $name . '" class="form-control" onchange="checkVisibilitySelection();" id="visibility.system">' . PHP_EOL;
 
-  $name = "visibility";
+        $this->selected = $selected;
 
-  $dropdown .= '<div class="form-group">';
-  $dropdown .= '<label for="visibility">Post visibility</label>';
-  $dropdown .= '<select name="'.$name.'" class="form-control" onchange="checkVisibilitySelection();" id="visibility.system">'. PHP_EOL;
-  
-  $this->selected = $selected;
+        $visibility_list = ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'];
 
-  $visibility_list = ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'];
+        foreach ($visibility_list as $key => $visibility) {
+            $select = $this->selected === $key ? ' selected' : null;
 
-  foreach ($visibility_list as $key => $visibility) {
+            $dropdown .= '<option value="' . $key . '"' . $select . '>' . $visibility . '</option>' . PHP_EOL;
+        }
 
-    $select = $this->selected === $key ? ' selected' : null;
+        $dropdown .= '</select>' . PHP_EOL;
 
-    $dropdown .= '<option value="'.$key.'"'.$select.'>'.$visibility.'</option>'. PHP_EOL;
-    
-  }
+        if (!is_null($postId)) {
+            $idsanitized = sanitizer($postId, 'sql');
+            $grab_post = medoo_column_where('tbl_posts', ['post_visibility', 'post_password'], ['ID' => $idsanitized]);
 
-  $dropdown .= '</select>'. PHP_EOL;
+            $post_visibility = isset($grab_post['post_visibility']) ? safe_html($grab_post['post_visibility']) : "";
+            $post_pwd = isset($grab_post['post_password']) ? safe_html($grab_post['post_password']) : "";
 
-  if (!is_null($postId)) {
+            $dropdown .= '<div id="' . $post_visibility . '" style="display:inline">';
+            $dropdown .= '<br>';
+            $dropdown .= '<label for="protected">Password:</label>';
+            $dropdown .= '<input type="password" class="form-control" name="post_password" value="' . $post_pwd . '" placeholder="Use a secure password">';
+            $dropdown .= '<p class="help-block">Protected with a password you choose. Only those with the password can view this post.</p>';
+        } else {
+            $dropdown .= '<div id="protected" style="display:none">';
+            $dropdown .= '<br />';
+            $dropdown .= '<label for="protected">Password:</label>';
+            $dropdown .= '<input type="password" class="form-control" name="post_password" value="" placeholder="Use a secure password">';
+            $dropdown .= '<p class="help-block">Protected with a password you choose. Only those with the password can view this post.</p>';
+        }
 
-    $idsanitized = sanitizer($postId, 'sql');
-    $grab_post = medoo_column_where('tbl_posts', ['post_visibility', 'post_password'], ['ID' => $idsanitized]);
+        $dropdown .= '</div>';
+        $dropdown .= '</div>';
+        $dropdown .= '<script>';
+        $dropdown .= 'function checkVisibilitySelection() {' . PHP_EOL;
+        $dropdown .= 'a = document.getElementById("visibility.system");' . PHP_EOL;
+        $dropdown .= 'if (a.value == "protected")' . PHP_EOL;
+        $dropdown .= 'document.getElementById("protected").setAttribute("style", "display:inline");' . PHP_EOL;
+        $dropdown .= 'else' . PHP_EOL;
+        $dropdown .= 'document.getElementById("protected").setAttribute("style", "display:none");' . PHP_EOL;
+        $dropdown .= 'return a.value;' . PHP_EOL;
+        $dropdown .= '}' . PHP_EOL;
+        $dropdown .= '</script>';
 
-    $post_visibility = isset($grab_post['post_visibility']) ? safe_html($grab_post['post_visibility']) : "";
-    $post_pwd = isset($grab_post['post_password']) ? safe_html($grab_post['post_password']) : "";
+        return $dropdown;
+    }
 
-    $dropdown .= '<div id="'.$post_visibility.'" style="display:inline">';
-    $dropdown .= '<br>';
-    $dropdown .= '<label for="protected">Password:</label>';
-    $dropdown .= '<input type="password" class="form-control" name="post_password" value="'.$post_pwd.'" placeholder="Use a secure password">';
-    $dropdown .= '<p class="help-block">Protected with a password you choose. Only those with the password can view this post.</p>';
+    /**
+     * Total posts records
+     *
+     * @param array $data
+     * @return numeric
+     *
+     */
+    public function totalPostRecords(array $data = []): ?int
+    {
 
-  } else {
+        if (!empty($data)) {
+            $sql = "SELECT ID FROM tbl_posts WHERE post_author = ? AND post_type = 'blog'";
+        } else {
+            $sql = "SELECT ID FROM tbl_posts WHERE post_type = 'blog'";
+        }
 
-    $dropdown .= '<div id="protected" style="display:none">';
-    $dropdown .= '<br />';
-    $dropdown .= '<label for="protected">Password:</label>';
-    $dropdown .= '<input type="password" class="form-control" name="post_password" value="" placeholder="Use a secure password">';
-    $dropdown .= '<p class="help-block">Protected with a password you choose. Only those with the password can view this post.</p>';
-  
-  }
+        $this->setSQL($sql);
 
-  $dropdown .= '</div>';
-  $dropdown .= '</div>';
-  $dropdown .= '<script>';
-  $dropdown .= 'function checkVisibilitySelection() {'.PHP_EOL;
-  $dropdown .= 'a = document.getElementById("visibility.system");'.PHP_EOL;
-  $dropdown .= 'if (a.value == "protected")'.PHP_EOL;
-  $dropdown .= 'document.getElementById("protected").setAttribute("style", "display:inline");'.PHP_EOL;
-  $dropdown .= 'else'.PHP_EOL;
-  $dropdown .= 'document.getElementById("protected").setAttribute("style", "display:none");'.PHP_EOL;
-  $dropdown .= 'return a.value;'.PHP_EOL;
-  $dropdown .= '}'.PHP_EOL;
-  $dropdown .= '</script>';
+        return $this->checkCountValue($data) ?? 0;
+    }
 
-  return $dropdown;
+    /**
+     * Drop down locale
+     *
+     * @param string $selected
+     * @return string
+     *
+     */
+    public function dropDownLocale($selected = "")
+    {
+        $name = 'post_locale';
 
-}
+        $locales = [
+          'en' => 'English',
+          'es' => 'Spanish',
+          'fr' => 'French',
+          'de' => 'German',
+          'it' => 'Italian',
+          'pt' => 'Portuguese',
+          'ru' => 'Russian',
+          'zh' => 'Chinese',
+          'ja' => 'Japanese',
+          'ko' => 'Korean',
+          'ar' => 'Arabic',
+          'hi' => 'Hindi',
+          'id' => 'Indonesian',
+          'ms' => 'Malay',
+          'tr' => 'Turkish',
+          'nl' => 'Dutch',
+          'pl' => 'Polish',
+          'vi' => 'Vietnamese',
+          'th' => 'Thai',
+          'he' => 'Hebrew'
+        ];
 
-/**
- * Total posts records
- *
- * @param array $data
- * @return numeric
- *
- */
-public function totalPostRecords(array $data = []): ?int
-{
+        if ($selected !== '') {
+            $this->selected = $selected;
+        }
 
-  if (!empty($data)) {
-
-    $sql = "SELECT ID FROM tbl_posts WHERE post_author = ? AND post_type = 'blog'";
-
-  } else {
-
-    $sql = "SELECT ID FROM tbl_posts WHERE post_type = 'blog'";
-
-  }
-
-  $this->setSQL($sql);
-
-  return $this->checkCountValue($data) ?? 0;
-
-}
-
+        return dropdown($name, $locales, $this->selected);
+    }
 }

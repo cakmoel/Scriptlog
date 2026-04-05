@@ -1,7 +1,9 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * DataRequestDao Class
- * 
+ *
  * Data Access Object for GDPR data requests (access, rectification, erasure)
  *
  * @category  Dao Class
@@ -13,7 +15,6 @@
  */
 class DataRequestDao extends Dao
 {
-
     /**
      * Constructor
      */
@@ -24,7 +25,7 @@ class DataRequestDao extends Dao
 
     /**
      * Create a new data request
-     * 
+     *
      * @param string $requestType
      * @param string $email
      * @param string $ipAddress
@@ -46,7 +47,7 @@ class DataRequestDao extends Dao
 
     /**
      * Update request status
-     * 
+     *
      * @param int $id
      * @param string $status
      * @param string $note
@@ -55,11 +56,11 @@ class DataRequestDao extends Dao
     public function updateRequestStatus($id, $status, $note = null)
     {
         $data = ['request_status' => $status];
-        
+
         if ($status === 'completed') {
             $data['request_completed_date'] = date('Y-m-d H:i:s');
         }
-        
+
         if ($note !== null) {
             $data['request_note'] = $note;
         }
@@ -71,7 +72,7 @@ class DataRequestDao extends Dao
 
     /**
      * Get request by ID
-     * 
+     *
      * @param int $id
      * @return array|bool
      */
@@ -84,7 +85,7 @@ class DataRequestDao extends Dao
 
     /**
      * Get request by email
-     * 
+     *
      * @param string $email
      * @return array|bool
      */
@@ -93,14 +94,14 @@ class DataRequestDao extends Dao
         $sql = "SELECT * FROM tbl_data_requests 
                 WHERE request_email = ? 
                 ORDER BY request_date DESC";
-        
+
         $this->setSQL($sql);
         return $this->findAll([$email]);
     }
 
     /**
      * Get all requests
-     * 
+     *
      * @param string $orderBy
      * @return array|bool
      */
@@ -113,7 +114,7 @@ class DataRequestDao extends Dao
 
     /**
      * Get requests by status
-     * 
+     *
      * @param string $status
      * @return array|bool
      */
@@ -122,14 +123,14 @@ class DataRequestDao extends Dao
         $sql = "SELECT * FROM tbl_data_requests 
                 WHERE request_status = ? 
                 ORDER BY request_date DESC";
-        
+
         $this->setSQL($sql);
         return $this->findAll([$status]);
     }
 
     /**
      * Delete request
-     * 
+     *
      * @param int $id
      * @return bool
      */
@@ -141,7 +142,7 @@ class DataRequestDao extends Dao
 
     /**
      * Total request records
-     * 
+     *
      * @return int
      */
     public function totalRequestRecords()
@@ -153,7 +154,7 @@ class DataRequestDao extends Dao
 
     /**
      * Get pending requests count
-     * 
+     *
      * @return int
      */
     public function getPendingCount()
