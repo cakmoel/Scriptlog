@@ -11,7 +11,6 @@
  */
 class HTMLPurifier_ChildDef_Chameleon extends HTMLPurifier_ChildDef
 {
-
     /**
      * Instance of the definition object to use when inline. Usually stricter.
      * @type HTMLPurifier_ChildDef_Optional

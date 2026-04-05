@@ -11,7 +11,6 @@
 
 class HTMLPurifier_AttrDef_HTML_ID extends HTMLPurifier_AttrDef
 {
-
     // selector is NOT a valid thing to use for IDREFs, because IDREFs
     // *must* target IDs that exist, whereas selector #ids do not.
 
@@ -64,7 +63,7 @@ class HTMLPurifier_AttrDef_HTML_ID extends HTMLPurifier_AttrDef
         }
 
         if (!$this->selector) {
-            $id_accumulator =& $context->get('IDAccumulator');
+            $id_accumulator = & $context->get('IDAccumulator');
             if (isset($id_accumulator->ids[$id])) {
                 return false;
             }

@@ -1,0 +1,211 @@
+/**
+ * Cookie Consent Banner Styles
+ *
+ * @category Theme Assets
+ * @author   Scriptlog
+ * @license  MIT
+ * @version  1.0
+ */
+
+/* Cookie Consent Banner Container */
+.cookie-consent-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 20px;
+    z-index: 9999;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+.cookie-consent-banner.show {
+    transform: translateY(0);
+}
+
+.cookie-consent-banner.hidden {
+    display: none;
+}
+
+/* Container */
+.cookie-consent-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+/* Content Section */
+.cookie-consent-content {
+    flex: 1;
+    min-width: 280px;
+}
+
+.cookie-consent-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cookie-consent-text {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #cccccc;
+    margin: 0;
+}
+
+.cookie-consent-text a {
+    color: #4dabf7;
+    text-decoration: underline;
+}
+
+.cookie-consent-text a:hover {
+    color: #74c0fc;
+}
+
+/* Button Group */
+.cookie-consent-buttons {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* Buttons */
+.cookie-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cookie-btn:focus {
+    outline: 2px solid #4dabf7;
+    outline-offset: 2px;
+}
+
+.cookie-btn-accept {
+    background-color: #28a745;
+    color: #ffffff;
+}
+
+.cookie-btn-accept:hover {
+    background-color: #218838;
+}
+
+.cookie-btn-accept:active {
+    background-color: #1e7e34;
+}
+
+.cookie-btn-reject {
+    background-color: #6c757d;
+    color: #ffffff;
+}
+
+.cookie-btn-reject:hover {
+    background-color: #5a6268;
+}
+
+.cookie-btn-reject:active {
+    background-color: #545b62;
+}
+
+.cookie-btn-learn-more {
+    background-color: transparent;
+    color: #4dabf7;
+    border: 1px solid #4dabf7;
+}
+
+.cookie-btn-learn-more:hover {
+    background-color: rgba(77, 171, 247, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cookie-consent-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .cookie-consent-content {
+        min-width: 100%;
+    }
+
+    .cookie-consent-buttons {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .cookie-btn {
+        flex: 1;
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cookie-consent-banner {
+        padding: 15px;
+    }
+
+    .cookie-consent-title {
+        font-size: 14px;
+    }
+
+    .cookie-consent-text {
+        font-size: 13px;
+    }
+
+    .cookie-btn {
+        padding: 8px 15px;
+        font-size: 12px;
+    }
+}
+
+/* Animation */
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.cookie-consent-banner.animate {
+    animation: slideUp 0.5s ease-out forwards;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .cookie-consent-banner {
+        background-color: #2d2d2d;
+    }
+
+    .cookie-consent-text {
+        color: #b0b0b0;
+    }
+
+    .cookie-btn-learn-more {
+        border-color: #74c0fc;
+        color: #74c0fc;
+    }
+
+    .cookie-btn-learn-more:hover {
+        background-color: rgba(116, 192, 252, 0.1);
+    }
+}

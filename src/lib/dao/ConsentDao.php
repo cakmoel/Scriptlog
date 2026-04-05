@@ -1,7 +1,9 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * ConsentDao Class
- * 
+ *
  * Data Access Object for consent records
  *
  * @category  Dao Class
@@ -13,7 +15,6 @@
  */
 class ConsentDao extends Dao
 {
-
     /**
      * Constructor
      */
@@ -24,7 +25,7 @@ class ConsentDao extends Dao
 
     /**
      * Record a new consent
-     * 
+     *
      * @param string $consentType
      * @param string $consentStatus
      * @param string $ipAddress
@@ -45,7 +46,7 @@ class ConsentDao extends Dao
 
     /**
      * Update existing consent record
-     * 
+     *
      * @param int $id
      * @param string $consentStatus
      * @return bool
@@ -62,7 +63,7 @@ class ConsentDao extends Dao
 
     /**
      * Get latest consent by type
-     * 
+     *
      * @param string $consentType
      * @return array|bool
      */
@@ -82,7 +83,7 @@ class ConsentDao extends Dao
 
     /**
      * Get all consent records
-     * 
+     *
      * @param string $orderBy
      * @return array|bool
      */
@@ -100,7 +101,7 @@ class ConsentDao extends Dao
 
     /**
      * Get consent history by IP
-     * 
+     *
      * @param string $ipAddress
      * @return array|bool
      */
@@ -119,7 +120,7 @@ class ConsentDao extends Dao
 
     /**
      * Check if user has given consent
-     * 
+     *
      * @param string $consentType
      * @return bool
      */
@@ -140,7 +141,7 @@ class ConsentDao extends Dao
 
     /**
      * Delete consent records older than specified days
-     * 
+     *
      * @param int $days
      * @return bool
      */
@@ -158,7 +159,7 @@ class ConsentDao extends Dao
 
     /**
      * Total consent records
-     * 
+     *
      * @return int
      */
     public function totalConsentRecords()

@@ -1,4 +1,6 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * ViewException Class extends Exception implements IViewThrowable
  *
@@ -11,5 +13,4 @@
  */
 class ViewException extends Exception implements IViewThrowable
 {
-  
 }

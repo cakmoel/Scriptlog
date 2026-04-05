@@ -1,29 +1,30 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class PageModel extends Dao
- * 
+ *
  * @category Model class
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * 
+ *
  */
 class PageModel extends BaseModel
 {
+    /**
+     * getPageById
+     *
+     * @param int|numeric $id
+     * @param object $sanitize
+     * @param object $fetchMode
+     * @return mixed
+     *
+     */
+    public function getPageById($id, $sanitize, $fetchMode = null)
+    {
 
-/**
- * getPageById
- *
- * @param int|numeric $id
- * @param object $sanitize
- * @param object $fetchMode
- * @return mixed
- * 
- */
-public function getPageById($id, $sanitize, $fetchMode = null)
-{
-
-$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
+        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
     p.post_content, p.post_summary, p.post_keyword, p.post_status, p.post_visibility, p.post_sticky, p.post_type, 
     m.media_filename, m.media_caption, m.media_target, m.media_access, 
     u.ID, u.user_fullname
@@ -34,27 +35,26 @@ WHERE p.ID = :ID AND p.post_status = 'publish'
 AND p.post_type = 'page' AND m.media_target = 'page'
 AND m.media_access = 'public' AND m.media_status = '1'";
 
-$sanitized_id = $this->filteringId($sanitize, $id, 'sql');
+        $sanitized_id = $this->filteringId($sanitize, $id, 'sql');
 
-$this->setSQL($sql);
+        $this->setSQL($sql);
 
-$postById = (is_null($fetchMode)) ? $this->findRow([':ID' => (int)$sanitized_id]) : $this->findRow([':ID' => (int)$sanitized_id], $fetchMode);
+        $postById = (is_null($fetchMode)) ? $this->findRow([':ID' => (int)$sanitized_id]) : $this->findRow([':ID' => (int)$sanitized_id], $fetchMode);
 
-return (empty($postById)) ?: $postById;
+        return (empty($postById)) ?: $postById;
+    }
 
-}
+    /**
+     * getPageBySlug
+     *
+     * @param string $slug
+     * @return boolean|array|object
+     *
+     */
+    public function getPageBySlug($slug, $sanitize)
+    {
 
-/**
- * getPageBySlug
- * 
- * @param string $slug
- * @return boolean|array|object
- * 
- */
-public function getPageBySlug($slug, $sanitize)
-{
-
-$sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
+        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
         p.post_content, p.post_summary, p.post_keyword, p.post_status, p.post_sticky, 
 	    p.post_type, m.media_filename, m.media_caption, m.media_target, m.media_access,  
         u.ID, u.user_fullname
@@ -65,37 +65,34 @@ $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.
     AND p.post_status = 'publish' AND p.post_type = 'page' 
     AND m.media_target = 'page' AND m.media_access = 'public' 
     AND m.media_status = '1'";
-	
-	$this->setSQL($sql);
-	
-	$slug_sanitized = $this->filteringId($sanitize, $slug, 'xss');
 
-    $pageBySlug = $this->findRow([':slug' => $slug_sanitized]);
-    
-    return (empty($pageBySlug)) ?: $pageBySlug;
-    
-}
+        $this->setSQL($sql);
 
-/**
- * getRandomStickyPages
- * 
- * @return mixed
- * 
- */
-public function getRandomStickyPages()
-{
+        $slug_sanitized = $this->filteringId($sanitize, $slug, 'xss');
 
-$sql = "SELECT ID, post_title, post_content FROM tbl_posts 
+        $pageBySlug = $this->findRow([':slug' => $slug_sanitized]);
+
+        return (empty($pageBySlug)) ?: $pageBySlug;
+    }
+
+    /**
+     * getRandomStickyPages
+     *
+     * @return mixed
+     *
+     */
+    public function getRandomStickyPages()
+    {
+
+        $sql = "SELECT ID, post_title, post_content FROM tbl_posts 
 WHERE post_sticky = '1' 
 AND post_status = 'publish' 
 AND post_type = 'page' ORDER BY RAND() LIMIT 1 ";
 
-$this->setSQL($sql);
+        $this->setSQL($sql);
 
-$sticky_pages = $this->findAll();
+        $sticky_pages = $this->findAll();
 
-return (empty($sticky_pages)) ?: $sticky_pages;
-
-}
-
+        return (empty($sticky_pages)) ?: $sticky_pages;
+    }
 }

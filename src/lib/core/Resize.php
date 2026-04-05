@@ -1,34 +1,35 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Resize
  * Purpose: Resizing and save image
  * Require PHP5+, GD library
- * 
+ *
  * Usage Example:
  * $resizeObj = new resize('images/cars/large/input.jpg');
  * $resizeObj -> resizeImage(150, 100, 0)
  * $resizeObj -> saveImage('images/cars/large/output.jpg', 100);
- * 
+ *
  * @category Core Class
  * @author   Jarrod Oberto
- * 
+ *
  */
 class Resize
 {
-
     /**
      * image
      *
      * @var object
-     * 
+     *
      */
     private $image;
 
     /**
      * width
-     * 
+     *
      * @var num|int
-     * 
+     *
      */
     private $width;
 
@@ -36,7 +37,7 @@ class Resize
      * height
      *
      * @var num|int
-     * 
+     *
      */
     private $height;
 
@@ -44,15 +45,15 @@ class Resize
      * imageResized
      *
      * @var GdImage|resources
-     * 
+     *
      */
     private $imageResized;
 
-    function __construct($fileName)
+    public function __construct($fileName)
     {
         // *** Open up the file
         $this->image = $this->openImage($fileName);
-        
+
         // *** Get width and height
         $this->width = imagesx($this->image);
         $this->height = imagesy($this->image);
@@ -63,7 +64,7 @@ class Resize
     {
         // *** Get extension
         $extension = strtolower(strrchr($file, '.'));
-        
+
         switch ($extension) {
             case '.jpg':
             case '.jpeg':
@@ -77,11 +78,12 @@ class Resize
                 break;
             case '.webp':
                 $img = imagecreatefromwebp($file);
+                // no break
             default:
                 $img = false;
                 break;
         }
-        
+
         return $img;
     }
 
@@ -90,14 +92,14 @@ class Resize
     {
         // *** Get optimal width and height - based on $option
         $optionArray = $this->getDimensions($newWidth, $newHeight, $option);
-        
+
         $optimalWidth = $optionArray['optimalWidth'];
         $optimalHeight = $optionArray['optimalHeight'];
-        
+
         // *** Resample - create image canvas of x, y size
         $this->imageResized = imagecreatetruecolor($optimalWidth, $optimalHeight);
         imagecopyresampled($this->imageResized, $this->image, 0, 0, 0, 0, $optimalWidth, $optimalHeight, $this->width, $this->height);
-        
+
         // *** if option is 'crop', then crop too
         if ($option == 'crop') {
             $this->crop($optimalWidth, $optimalHeight, $newWidth, $newHeight);
@@ -131,12 +133,11 @@ class Resize
                 $optimalHeight = $optionArray['optimalHeight'];
                 break;
         }
-        
+
         return array(
             'optimalWidth' => $optimalWidth,
             'optimalHeight' => $optimalHeight
         );
-
     }
 
     // # --------------------------------------------------------
@@ -156,22 +157,19 @@ class Resize
 
     private function getSizeByAuto($newWidth, $newHeight)
     {
-        if ($this->height < $this->width) 
-        // *** Image to be resized is wider (landscape)
-        {
+        if ($this->height < $this->width) {
+            // *** Image to be resized is wider (landscape)
             $optimalWidth = $newWidth;
             $optimalHeight = $this->getSizeByFixedWidth($newWidth);
-        } elseif ($this->height > $this->width) 
-        // *** Image to be resized is taller (portrait)
-        {
+        } elseif ($this->height > $this->width) {
+            // *** Image to be resized is taller (portrait)
             $optimalWidth = $this->getSizeByFixedHeight($newHeight);
             $optimalHeight = $newHeight;
-        } else        // *** Image to be resizerd is a square
-        {
+        } else { // *** Image to be resizerd is a square
             if ($newHeight < $newWidth) {
                 $optimalWidth = $newWidth;
                 $optimalHeight = $this->getSizeByFixedWidth($newWidth);
-            } else if ($newHeight > $newWidth) {
+            } elseif ($newHeight > $newWidth) {
                 $optimalWidth = $this->getSizeByFixedHeight($newHeight);
                 $optimalHeight = $newHeight;
             } else {
@@ -180,7 +178,7 @@ class Resize
                 $optimalHeight = $newHeight;
             }
         }
-        
+
         return array(
             'optimalWidth' => $optimalWidth,
             'optimalHeight' => $optimalHeight
@@ -192,16 +190,16 @@ class Resize
     {
         $heightRatio = $this->height / $newHeight;
         $widthRatio = $this->width / $newWidth;
-        
+
         if ($heightRatio < $widthRatio) {
             $optimalRatio = $heightRatio;
         } else {
             $optimalRatio = $widthRatio;
         }
-        
+
         $optimalHeight = $this->height / $optimalRatio;
         $optimalWidth = $this->width / $optimalRatio;
-        
+
         return array(
             'optimalWidth' => $optimalWidth,
             'optimalHeight' => $optimalHeight
@@ -214,10 +212,10 @@ class Resize
         // *** Find center - this will be used for the crop
         $cropStartX = ($optimalWidth / 2) - ($newWidth / 2);
         $cropStartY = ($optimalHeight / 2) - ($newHeight / 2);
-        
+
         $crop = $this->imageResized;
         // imagedestroy($this->imageResized);
-        
+
         // *** Now crop from center to exact requested size
         $this->imageResized = imagecreatetruecolor($newWidth, $newHeight);
         imagecopyresampled($this->imageResized, $crop, 0, 0, $cropStartX, $cropStartY, $newWidth, $newHeight, $newWidth, $newHeight);
@@ -229,64 +227,52 @@ class Resize
         // *** Get extension
         $extension = strrchr($savePath, '.');
         $extension = strtolower($extension);
-        
-        switch ($extension) {
 
+        switch ($extension) {
             case '.jpg':
             case '.jpeg':
-
                 if (imagetypes() & IMG_JPG) {
                     imagejpeg($this->imageResized, $savePath, $imageQuality);
                 }
 
                 break;
-            
+
             case '.gif':
-
                 if (imagetypes() & IMG_GIF) {
-
                     imagegif($this->imageResized, $savePath);
-
                 }
 
                 break;
-            
-            case '.png':
 
+            case '.png':
                 // *** Scale quality from 0-100 to 0-9
                 $scaleQuality = round(($imageQuality / 100) * 9);
-                
+
                 // *** Invert quality setting as 0 is best, not 9
                 $invertScaleQuality = 9 - $scaleQuality;
-                
+
                 if (imagetypes() & IMG_PNG) {
                     imagepng($this->imageResized, $savePath, $invertScaleQuality);
                 }
-                
+
                 break;
-            
+
             case '.webp':
-
                 if (imagetypes() & IMG_WEBP) {
-
                     imagewebp($this->imageResized, $savePath);
-
                 }
 
                 break;
-            // ... etc
+                // ... etc
             default:
                 // *** No extension - No save.
                 break;
         }
-        
-        if(is_resource($this->imageResized)) {
 
+        if (is_resource($this->imageResized)) {
             imagedestroy($this->imageResized);
-            
         }
-        
     }
-    
+
     // # --------------------------------------------------------
 }

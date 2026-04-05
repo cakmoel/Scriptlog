@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Check configuration file function
  * checking whether configuration file exists
@@ -7,36 +8,31 @@
  * @version 1.0
  * @license MIT
  * @return bool
- * 
+ *
  */
 function check_config_file($filename)
 {
- return (file_exists($filename)) ? true : false;
+    return (file_exists($filename)) ? true : false;
 }
 
 /**
  * invoke_config()
- * 
+ *
  * invoking configuration file
  *
  * @category function
- * 
+ *
  */
 function invoke_config()
 {
 
-  $configuration_file = __DIR__ . '/../../config.php';
+    $configuration_file = __DIR__ . '/../../config.php';
 
-  $sample_file = __DIR__ . '/../../config.sample.php';
- 
-  if (!check_config_file($configuration_file)) {
+    $sample_file = __DIR__ . '/../../config.sample.php';
 
-    return $sample_file;
-
-  } else {
-
-    return $configuration_file;
-
-  }
-  
+    if (!check_config_file($configuration_file)) {
+        return $sample_file;
+    } else {
+        return $configuration_file;
+    }
 }

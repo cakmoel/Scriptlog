@@ -6,7 +6,6 @@
 
 class HTMLPurifier_Strategy_ValidateAttributes extends HTMLPurifier_Strategy
 {
-
     /**
      * @param HTMLPurifier_Token[] $tokens
      * @param HTMLPurifier_Config $config

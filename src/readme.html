@@ -1,284 +1,304 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Scriptlog ReadMe</title>
-<style type="text/css">
-body {
-border-top: 0px solid #eee;
-background: #122430;
-font: 13px/19px verdana;
-text-align: left;
-margin: 0;
-padding:0;
-color: #fff;
-}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Scriptlog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code&display=swap" rel="stylesheet">
 
-a { text-decoration: none; color: #daffa9; }
-a:hover { text-decoration: underline; }
-b { color: #acfd69; }
-h2 {font: 28px/36px times new roman; color: #7fff00;}
-em {background: #01771f; }
-#main {
-margin: 0 auto 100px auto;
-padding: 0;
-width: 600px;
-}
+    <style>
+        :root {
+            --sl-green: #198754;
+            --sl-green-dark: #146c43;
+            --sl-light-bg: #f8f9fa;
+            --sl-dark-text: #212529;
+            --sl-light-text: #6c757d;
+            --sl-code-bg: #e9ecef;
+            --sl-border-color: #dee2e6;
+        }
 
-code {
-white-space:pre;
-border: 2px solid #ddd;
-margin: 5px;
-display: block;
-padding: 10px;
-}
-</style>
+        body {
+            background-color: var(--sl-light-bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: var(--sl-dark-text);
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
 
+        .main-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        #main {
+            background-color: #fff;
+            border-radius: 0.5rem;
+            padding: 2rem 3rem;
+            margin: 3rem auto;
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.07);
+            border: 1px solid var(--sl-border-color);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 1rem;
+            }
+            #main {
+                padding: 1.5rem;
+                margin: 1rem auto;
+            }
+        }
+
+        h1, h2, h3 {
+            font-weight: 700;
+            color: #343a40;
+            line-height: 1.3;
+        }
+
+        h1 {
+            font-size: 2.75rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--sl-light-text);
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--sl-border-color);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            color: #495057;
+        }
+
+        a {
+            color: var(--sl-green);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--sl-green-dark);
+            text-decoration: underline;
+        }
+
+        p, ul, ol {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code:not(pre > code) {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9em;
+            background-color: var(--sl-code-bg);
+            padding: .2em .4em;
+            border-radius: 3px;
+            color: #d63384;
+        }
+
+        pre {
+            background-color: #282c34;
+            color: #abb2bf;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            white-space: pre;
+        }
+
+        pre code {
+            padding: 0;
+            background: none;
+            color: inherit;
+            font-size: inherit;
+            border-radius: 0;
+        }
+
+        em {
+            background-color: #fff3cd;
+            padding: 0.1em 0.3em;
+            border-radius: 3px;
+            font-style: normal;
+            color: #664d03;
+        }
+
+        strong, b {
+            font-weight: 700;
+        }
+
+        hr {
+            margin: 3rem 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            color: var(--sl-light-text);
+            font-size: 0.9rem;
+        }
+
+        .footer p {
+            margin-bottom: 0.25rem;
+        }
+    </style>
 </head>
 <body>
 
-<div id="main">
+<div class="container main-container">
+    <div id="main">
+        <h1>Welcome to Scriptlog</h1>
+        <p class="tagline">A simple, secure, and robust personal blogging platform.</p>
 
-<h1>Welcome to Scriptlog</h1>
-<strong>Your personal blogware platform!</strong>
+        <p>Scriptlog is a free and open-source PHP blog software. It is a refactored fork of Piluscart 1.4.1, engineered to emphasize simplicity, privacy, and security without the overhead of a complex Content Management System.</p>
 
-<p>Scriptlog is free and open source PHP blog software. 
-  We're refactoring our legacy blog code. Making it a more simple, secure, modular, fast, and robust personal blogging system. 
-  Scriptlog are simple, secure, modular, fast, robust, 
-and easy of use personal blogging system. 
-Scriptlog runs on PHP 7.4 or higher and uses MySQL.</p>
+        <p>Scriptlog is not designed to replace full-scale CMS frameworks. Instead, it is meticulously engineered to:</p>
+        <ul>
+            <li>Power personal weblogs that do not require a heavy CMS.</li>
+            <li>Provide a secure foundation for blogging with modern security practices.</li>
+            <li>Run fast with minimal overhead.</li>
+        </ul>
 
-<p>Scriptlog's base original code was forked from 
-<a href="https://sourceforge.net/projects/pilus/"><u>Piluscart 1.4.1</u></a>.. We split her out from her weblog engine that support blog functionality on Piluscart 1.4.1. Obviously Scriptlog is Piluscart's little sister. 
-She was being refactored to help her siblings going further on next generation of Piluscart development which is undefined yet.
-</p>
+        <h2>Core Technologies</h2>
+        <ul>
+            <li><strong>Backend:</strong> PHP 7.4+ (PSR-12 compliant)</li>
+            <li><strong>Database:</strong> MySQL 5.7+ / MariaDB 10.3+</li>
+            <li><strong>Architecture:</strong> Multi-layered MVC-like (<code>Request</code> → <code>Controller</code> → <code>Service</code> → <code>DAO</code> → <code>Database</code>)</li>
+            <li><strong>Security:</strong> Laminas (Escaper, Crypt), Defuse PHP Encryption, voku Anti-XSS, HTMLPurifier.</li>
+        </ul>
 
-<p>Scriptlog is <em>not</em> a replacement for a full Content Management System. 
-Do not plan on building the next CMS Framework with it! 
-However, it is meticulously engineered for several reasons.</p>
+        <h2>Requirements</h2>
+        <p>Ensure your hosting environment meets the following requirements:</p>
+        <ul>
+            <li><strong>PHP:</strong> 7.4.33 or higher</li>
+            <li><strong>Web Server:</strong> Apache (with <code>mod_rewrite</code> enabled) or Nginx</li>
+            <li><strong>Database:</strong> MySQL 5.6+ or MariaDB 10.3+</li>
+            <li><strong>PHP Extensions:</strong> <code>pdo</code>, <code>mysqli</code>, <code>curl</code>, <code>gd</code>, <code>mbstring</code>, <code>fileinfo</code>, <code>zip</code>, <code>exif</code></li>
+            <li>HTTPS Support is recommended.</li>
+        </ul>
 
-<ul>
-<li>To power parts of weblog or personal website that did not need a full CMS.</li>
-<li>Runs small scripts and systems without a lot of overhead.</li>
-<li>Provides a base speed for your personal weblog day to day.</li>
-<li>To provide a secure foundation for your blog.</li>
-<li>Emphasizing simplicity, privacy and security for blog software.</li>
-</ul>
+        <h2>Installation</h2>
 
-<p>Before you install Scriptlog on your host, make sure Scriptlog can work correctly in your
-environment. Scritplog need the following 
-<b><i>system requirement.</i></b></p>
+        <h3>1. Download &amp; Extract</h3>
+        <p>Download the latest release and unzip the package into your web root directory.</p>
 
-<h2>Requirements:</h2>
+        <h3>2. Install Dependencies</h3>
+        <p>Scriptlog uses Composer to manage its dependencies. Run the following command in the root of your project:</p>
+        <pre><code>composer install</code></pre>
 
-<ul>
-<li>Apache with mod_rewrite enabled (.htaccess files) or nginx (rewrite configuration covered in Documentation)</li>
-<li>A minimum of 32MB of memory allocated to PHP</li>
-<li><a href="https://www.mysql.com"><u>MySQL</u></a> version 5.6 or greater 
-    or any version of <a href="https://mariadb.org"><u>MariaDB</u></a></li>
-<li><a href="https://secure.php.net"><u>PHP</u></a> version 7.4 or greater is recommended</li>
-<li>PDO</li>
-<li>mysqli</li>
-<li>mysqlnd</li>
-<li>curl</li>
-<li>Gd</li>
-<li>iconv</li>
-<li>fileinfo</li>
-<li>mbstring</li>
-<li>exif</li>
-<li>filter_list</li>
-<li>zip</li>
-<li>HTTPS Support</li>
-</ul>
+        <h3>3. Set Permissions</h3>
+        <p>Ensure the following directories are writeable by the web server user:</p>
+        <ul>
+            <li><code>install/</code></li>
+            <li><code>public/log/</code></li>
+            <li><code>public/cache/</code></li>
+            <li><code>public/themes/</code></li>
+            <li><code>admin/plugins/</code> (if present)</li>
+        </ul>
 
-<h2>Installation:</h2>
+        <h3>4. Database Setup</h3>
+        <p>Create a new empty database for Scriptlog. It is recommended to use the <code>utf8mb4_general_ci</code> collation.</p>
 
-<b>1) Download <a href="https://scriptlog.my.id/"><i>Scriptlog</i></a></b>
-<p>Every release of Scriptlog is available for download, whether the current stable release, 
-upcoming test-builds, or previous versions for historical intererst. 
-When you visit the download page you will find a link to each of the two main editions.</p>
+        <h3>5. Run the Installer</h3>
+        <p>Navigate to <code>/install/</code> in your web browser (e.g., <code>http://your-site.com/install/</code>) and follow the on-screen wizard to configure your site.</p>
 
-<p><em>Stable releases</em> of Scriptlog are intended to be used by general public, 
-so these would be the appropriate choice for the majority of users. The current Scriptlog release
-can always be downloaded from the  
-<a href="https://scriptlog.my.id/get-scriptlog/"><u>Get Scriptlog</u></a> page.<br />
-Older stable releases can also be downloaded from the Stable Release section of the 
-<a href="https://sourceforge.net/projects/scriptlog/files/release/"><u>Sourceforge website</u></a>.
-</p>
+        <h3>6. Cleanup (Critical)</h3>
+        <p>For security purposes, <strong>delete the <code>install/</code> directory</strong> immediately after the installation is complete.</p>
 
-<p><em>Test builds</em> of Scriptlog are intended to be used by developers 
-and testers to identify any bugs or issues during the development process.
-These are not suitable for use as a main blogging system by the general public.
-However, should you wish to try out a test build(preverably in local webhost), 
-each current release of the Test Builds can be downloaded on
-<a href="https://github.com/cakmoel/Scriptlog"><u>Scriptlog's repository</u></a>.</p>
-
-<b>2) Ensure you have the required system.</b>
-<p>if you have <i>not</i> the required system yet, 
-Scriptlog may <i>not</i> work properly in your host environment.</p>
-
-<b>3) Unzip the package downloaded</b>
-<p>Extract it in an empty directory. You will see the following files, folders or directories after you extract it
-
-<ul>
-<li>admin/</li>
-<li>install/</li>
-<li>lib/</li>
-<li>public/</li>
-<li>atom.php</li>
-<li>comments-post.php</li>
-<li>config.sample.php</li>
-<li>index.php</li>
-<li>license.txt</li>
-<li>readme.html</li>
-<li>robots.txt</li>
-<li>rss.php</li>                
-</ul>
-                
-</p>
-
-<b>4) Upload Scriptlog</b>
-<p>Upload all files, folders or directories above through FTP/SFTP or whatever upload method 
-you prefer to the public-facing directory of your site.</p>
-
-<b>5) Ensure that permission for :</b>
-<p><em>install</em>, <em>public/log</em>, <em>public/cache</em>, <em>public/themes</em> 
-and <em>library/plugins</em> folders are set to <em>writeable</em> 
-and that all files belong to the web user or is a part of the same group as the web user.</p>
-
-<b>6) Create database for Scriptlog</b>
-<p>You may name it anything you like. Choose <em>utf8mb4_general_ci</em> as it <b>collation</b>. 
-The method for database creation varies depending on your webhost but may require using adminer, PHPMyAdmin or etc. 
-If you are unsure how to createt this, ask your host.</p>
-
-<b>7) Follow the installation procedure</b>
-<p>Open <em>install/</em> in your browser. You will be asked to fill each column provided. 
-You should enter all database connection details and administrator account.
-These informations will help you through process to set up a <em>config.php</em> file.</p>
-
-<p>if some reason this does not work, don't worry. Open up <em>config.sample.php</em> with text editor  
-and change the following line:</p>
-<code>
-  return [
-
+        <h2>Configuration</h2>
+        <p>If the installer cannot write the configuration file, you can rename <code>config.sample.php</code> to <code>config.php</code> and update it manually with your details:</p>
+<pre><code class="language-php">return [
     'db' => [
-        
-         'host' => 'hostname', # database's hostname
-         'user' => 'username', # database's username
-         'pass' => 'password', # database's password
-         'name' => 'dbname'    # database's name
-
+         'host' => 'localhost',
+         'user' => 'your_db_user',
+         'pass' => 'your_db_password',
+         'name' => 'your_db_name'
       ],
-
     'app' => [
-
-         'url'   => 'http://yourservername',  # your server-name
-         'email' => 'email address',          # administrator's email 
-         'key'   => 'application key'         # optional
+         'url'   => 'http://your-site.com',
+         'email' => 'admin@example.com',
+         'key'   => 'generated-app-key'
      ]
+];
+</code></pre>
 
-  ];
-  
-</code>
+        <h2>Directory Structure</h2>
+        <ul>
+            <li><code>admin/</code>: Administrator panel logic and UI.</li>
+            <li><code>lib/</code>: Core application logic (Controllers, Services, DAOs).</li>
+            <li><code>public/</code>: Web root for assets, themes, and user uploads.</li>
+            <li><code>tests/</code>: PHPUnit test suite.</li>
+            <li><code>docs/</code>: Developer guides and API documentation.</li>
+        </ul>
 
-<p>fill in your database connection details, your server name and administrator's email.<br>
-Save the file as <em>config.php</em> and upload it.</p>
+        <h2>Usage</h2>
+        <p>After you finish the installation, you can populate your blog. To manage your blog content, go to the administrator panel in your web browser: <code>http://your-server-name/admin/</code>.</p>
 
-<p>Open <em>install/</em> in your browser. Once the configuration file is set up, 
-the installer will set up the tables needed for your blog. If there is an error, 
-double-check your <em>config.php</em> file, and try again. </p>
+        <h2>How the System Works</h2>
+        <p>When a request is sent to the folder where Scriptlog resides, the request is sent to <code>index.php</code>, which acts as a <em>front-controller</em>. The index file loads the core application, which then checks to see if a "cached" version of the page already exists. If not, it will continue to load the required system files.</p>
+        <p>After this, it will check with the <em>dispatcher</em> to figure out which route and rules to call.</p>
+        <ol>
+            <li>If a route matching the requested URL is found in <em>rules</em>, then the method given (either in the URL or config) is run and the output is returned.</li>
+            <li>If a requested route is <i>not</i> found, it will trigger a 404 error as the output.</li>
+        </ol>
+        <p>The output (whether an error or not) is then placed in the current active theme, and the final content is sent to the user's browser.</p>
 
+        <h2>Security Features</h2>
+        <ul>
+            <li><strong>Authentication:</strong> Custom secure session handler (<code>SessionMaker</code>).</li>
+            <li><strong>CSRF Protection:</strong> Protected via <code>CSRFGuard</code> and <code>csrf_defender</code>.</li>
+            <li><strong>XSS Prevention:</strong> Multi-layered prevention using <code>Anti-XSS</code> and <code>HTMLPurifier</code>.</li>
+            <li><strong>Encryption:</strong> Sensitive data encrypted using <code>defuse/php-encryption</code>.</li>
+        </ul>
 
-<b>8) Remove the installation directory</b>
-<p>For security purpose, delete the <em>install</em> folder when you are finish.</p>
+        <h2>Contributing</h2>
+        <p>Contributions are welcome! We encourage you to read our contribution guidelines before submitting pull requests. Please refer to the following resources in our repository:</p>
+        <ul>
+            <li><strong><a href="CONTRIBUTING.md">Contributing Guidelines</a></strong></li>
+            <li><strong><a href="CODE_OF_CONDUCT.md">Code of Conduct</a></strong></li>
+            <li>For security vulnerabilities, please review our <strong><a href="SECURITY.md">Security Policy</a></strong> for responsible disclosure.</li>
+        </ul>
 
-<h2>Usage</h2>
-<p>After you finish installation, you can populate your blog. To manage your blog content, go to
-administrator panel on web browser: <em>http://your-server-name/admin/</em>.
-</p>
+        <h2>Pass it on!</h2>
+        <p>Scriptlog has no marketing budget or corporate sponsors, but we believe in our community. If you enjoy Scriptlog, please consider telling your friends, family, and colleagues about it, setting it up for someone, or writing an article about your experience.</p>
 
+        <h2>License</h2>
+        <p>Scriptlog is <b>Open Source</b> and <b>Free</b> PHP Blog Software.</p>
+        <p><a href="http://www.opensource.org/licenses/mit-license.html">MIT License</a></p>
+        
+        <hr>
 
-<h2>How the System Works</h2>
-
-When a request is sent to the folder where Scriptlog resides, 
-the .htaccess file will send the request to <em>index.php</em> as <em>front-controller</em>. 
-The index will load the main engine files in "library" and
-then checks to see if a "cached" version of the page already exists. 
-If not, then it will continue to load the core system files.</p>
-
-<p>After this, it will check with <em>dispatcher</em> 
-to figure out what route and rules to call. </p>
-
-<ol>
-<li>If a route requested mattching the URL is found in <em>rules</em>, then the method given 
-(either in the URL or config) is run and the output is returned.</li>
-
-<li>If a route requested is <i>not</i> found, then it will trigger a 404 error as the output.</li>
-</ol>
-
-<p>The output (whether an error or not) is then placed in the current active theme and the final content is
-sent to the users browser</p>
-
-<h2>Contributing</h2>
-<p>Everyone is welcome to contributions. There are several ways to help out:</p>
-
-<b>Prerequisites</b>
-<p>All contributors need to have an account at 
-<em><a href="https://github.com">Github</a></em></p>
-
-<b>How To</b>
-<p>
-<ol>
-  <li>Reporting <em><a href="https://github.com/cakmoel/scriptlog/issues">issue</a></em> on Github if you have found a bug.</li>
-  <li>Contribute to the <em><a href="https://github.com/cakmoel/Scriptlog/wiki">Documentation</a></em></li>    
-</ol>
-</p>
-
-<b>Reporting Issues</b>
-<p>
-<ol>
-  <li>Before submitting one issue, <i><em>please search first</em></i> if the issue is already exist, and comment at the existing issue.</li>
-  <li>Every time you submit issue please include information as detail as possible. It to make us easy to solve the problem.</li>
-  <li>Create an <em><a href="https://github.com/cakmoel/scriptlog/issues">issue</a></em>on GitHub, if you have found a bug.</li>
-  <li>Write test cases for open bug issues.</li>
-  <li>Write patches for open bug/feature issues, preferably with test cases included.</li>
-  <li>If you have found a security related issues in Scriptlog, please don't open issue in Github. Instead contact us at <em>scriptlog@yandex.com</em>.</li>
-</ol>
-</p>
-
-<b>Contribute to the documentation</b>
-<p>
-  <ol>
-    <li>Make sure you have a <em><a href="https://github.com/signup/free">Github Account</a></em>.</li>
-    <li>Before submitting one page of documentation, please read documentation first.</li>
-    <li>Write description as detail as possible.</li>
-    <li> Write explaination with simple case or an example.</li>
-  </ol>
-</p>
-
-<h2>Online Resources</h2>
-<p>If you have any questions that aren't addressed in this document, 
-please take advantage of Scriptlog'numerous online resources:</p>
-
-
-<h2>Pass it on!</h2>
-<p>Scriptlog has no unlimited dollar marketing campaign or company sponsors, 
-but we believe in you as community that share this love. 
-If you enjoy Scriptlog please consider pass it on to your fiends, family and colleagues!, 
-setting it up for someone less knowledgable than yourself, install it on webhost, 
-or write it article about Scriptlog.</p>
-
-<h2>License</h2>
-<p>Scriptlog is <b>Open Source</b> and <b>Free</b> PHP Blog Software</p>
-<p><a href="http://www.opensource.org/licenses/mit-license.html">MIT License</a></p>
-
-<p>Please notice that Scriptlog uses third party libraries which might be distributed under other licenses.
-see <a href="license.txt" target="_blank" rel="noopener noreferrer" title="license" >license.txt</a></p><hr>
-
-<br /><br />
-<center><b>Thank you for creating with Scriptlog</b><br /> 
-<a href="https://scriptlog.my.id">M.Noermoehammad</a></center>
+        <div class="footer">
+            <p><strong>Thank you for creating with Scriptlog</strong></p>
+            <p><a href="https://scriptlog.my.id">M.Noermoehammad</a></p>
+        </div>
+    </div>
 </div>
+
 </body>
 </html>

@@ -7,7 +7,6 @@
  */
 class HTMLPurifier_AttrTransform_NameSync extends HTMLPurifier_AttrTransform
 {
-
     /**
      * @type HTMLPurifier_AttrDef_HTML_ID
      */

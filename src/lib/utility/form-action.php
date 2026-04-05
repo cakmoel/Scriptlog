@@ -1,4 +1,5 @@
 <?php
+
 /**
  * form_action
  *
@@ -11,34 +12,27 @@
  */
 function form_action($base, array $data, $type = "ordinary")
 {
-  $form = [];
+    $form = [];
 
-  $action = (is_array($data) && array_key_exists(0, $data) ? rawurlencode($data[0]) : '');
-  $id = (is_array($data) && array_key_exists(1, $data) ? urlencode($data[1]) : null);
-  $uniqueKey =  (is_array($data) && array_key_exists(2, $data) ? urlencode($data[2]) : null);
+    $action = (is_array($data) && array_key_exists(0, $data) ? rawurlencode($data[0]) : '');
+    $id = (is_array($data) && array_key_exists(1, $data) ? urlencode($data[1]) : null);
+    $uniqueKey =  (is_array($data) && array_key_exists(2, $data) ? urlencode($data[2]) : null);
 
-  $query_data = array(
-    
-       'action' => $action,
-       'Id' => abs((int)$id),
-       'uniqueKey'=> sanitize_urls($uniqueKey),
-    
-    );
-    
-if ($type === 'login') {
+    $query_data = array(
 
-    $form['doLogin'] = build_query($base, $query_data);
+         'action' => $action,
+         'Id' => abs((int)$id),
+         'uniqueKey' => sanitize_urls($uniqueKey),
 
-} elseif ($type == 'signup') {
+      );
 
-    $form['doSignup'] = build_query($base, $query_data);
-    
-} else {
+    if ($type === 'login') {
+        $form['doLogin'] = build_query($base, $query_data);
+    } elseif ($type == 'signup') {
+        $form['doSignup'] = build_query($base, $query_data);
+    } else {
+        $form['ordinary'] = isset($_SERVER["PHP_SELF"]) ? purify_dirty_html($_SERVER["PHP_SELF"]) : "";
+    }
 
-    $form['ordinary'] = isset($_SERVER["PHP_SELF"]) ? purify_dirty_html($_SERVER["PHP_SELF"]) : "";
-
-}
-
-return $form;
-
+    return $form;
 }

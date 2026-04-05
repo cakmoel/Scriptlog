@@ -2,14 +2,14 @@
 
 /**
  * on-page-optimization.php
- * 
+ *
  * This file contain functions generate on-page optimization for better SEO
  * generate_schema_org
  * @category Function
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * 
+ *
  */
 
 use Melbahja\Seo\Schema;
@@ -18,9 +18,9 @@ use Melbahja\Seo\MetaTags;
 
 /**
  * generate_schema_org()
- * 
+ *
  * generating schema.org tag for structured data on the internet
- * 
+ *
  * @category Function
  * @author M.Noermoehammad
  * @license MIT
@@ -35,7 +35,7 @@ use Melbahja\Seo\MetaTags;
  * @param string $datePublished
  * @param string $dateModified
  * @version 1.0
- * 
+ *
  */
 function generate_schema_org($name = "", $url = "", $image = "", $text = "", $description = "", $thumbnailUrl = "", $datePublished = "", $dateModified = "")
 {
@@ -59,12 +59,11 @@ function generate_schema_org($name = "", $url = "", $image = "", $text = "", $de
 
         ])
     );
-    
 }
- 
+
 /**
  * generate_meta_tags
- * 
+ *
  * @param string|null $title
  * @param string|null $description
  *
@@ -74,9 +73,8 @@ function generate_meta_tags($title = "", $description = "", $author = "", $image
 
     $metatags = new MetaTags();
 
-    // standard SEO Tags 
+    // standard SEO Tags
     if ($robots === true) {
-
         $metatags->title($title)
                  ->description($description)
                  ->meta('author', $author)
@@ -84,22 +82,21 @@ function generate_meta_tags($title = "", $description = "", $author = "", $image
                  ->meta('robots', "index, follow")
                  ->canonical($canonical);
     } else {
-
-        $metatags->title($title) 
+        $metatags->title($title)
                  ->description($description)
                  ->meta('author', $author)
                  ->meta('keywords', app_info()['site_keywords'])
                  ->meta('robots', "index, nofollow")
                  ->canonical($canonical);
     }
-    
+
     // Open graph (og) Facebook
     $metatags->og('type', 'website')
         ->og('url', $canonical)
         ->og('image', $image)
         ->og('site_name', app_info()['site_name']);
 
-    // Twitter card Tags - X.com  
+    // Twitter card Tags - X.com
     $metatags->twitter('card', 'summary_large_image')
         ->twitter('site', '@getscriptlog')
         ->twitter('creator', $author)

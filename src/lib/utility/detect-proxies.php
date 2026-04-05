@@ -1,9 +1,10 @@
 <?php
+
 /**
  * detect_proxy_by_headers
- * 
+ *
  * Detect proxies by checking for common proxy-related HTTP headers.
- * 
+ *
  * @category function
  * @author Contributors
  * @license MIT
@@ -12,7 +13,7 @@
  * @see https://stackoverflow.com/questions/33300877/how-do-you-detect-a-vpn-or-proxy-connection
  * @see https://stackoverflow.com/questions/858357/detect-clients-with-proxy-servers-via-php
  * @return bool
- * 
+ *
  */
 function detect_proxy_by_headers(): bool
 {

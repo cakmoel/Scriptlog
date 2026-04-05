@@ -2,14 +2,14 @@
 
 /**
  * Direct Page Function
- * 
+ *
  * @category function
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
  * @param string $page
  * @param number $http_status_code default null
- * 
+ *
  */
 function direct_page($page = '', $http_status_code = null)
 {

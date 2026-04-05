@@ -12,7 +12,6 @@
  */
 class HTMLPurifier_HTMLModule_Presentation extends HTMLPurifier_HTMLModule
 {
-
     /**
      * @type string
      */

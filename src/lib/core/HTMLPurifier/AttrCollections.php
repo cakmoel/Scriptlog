@@ -6,7 +6,6 @@
 
 class HTMLPurifier_AttrCollections
 {
-
     /**
      * Associative array of attribute collections, indexed by name.
      * @type array

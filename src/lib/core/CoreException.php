@@ -1,4 +1,6 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
  * CoreException Class extends Exception implements ICoreThrowable
@@ -9,8 +11,6 @@
  * @version   1.0
  * @since     Since Release 1.0
  */
-
-use Exception;
 
 class CoreException extends Exception implements ICoreThrowable
 {
@@ -34,7 +34,7 @@ class CoreException extends Exception implements ICoreThrowable
         }
 
         parent::__construct($message, $code, $previous);
-        
+
         $this->previous = $previous;
     }
 

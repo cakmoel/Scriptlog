@@ -1,359 +1,343 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class SessionMaker extends SessionHandler
- * 
+ *
  * @category Core Class
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * 
+ *
  */
 class SessionMaker extends SessionHandler
 {
+    /**
+     * key
+     *
+     * @var string
+     *
+     */
+    protected $key;
 
-   /**
-    * key
-    *
-    * @var string
-    * 
-    */
-   protected $key;
+    /**
+     * name
+     *
+     * @var string
+     *
+     */
+    protected $name;
 
-   /**
-    * name
-    *
-    * @var string
-    * 
-    */
-   protected $name;
+    /**
+     * cookie
+     *
+     * @var array
+     *
+     */
+    protected $cookie = [];
 
-   /**
-    * cookie
-    *
-    * @var array
-    * 
-    */
-   protected $cookie = [];
+    /**
+     * Instantiate session cookies
+     *
+     * @param string $key
+     * @param string $name
+     * @param array $cookie
+     *
+     */
+    public function __construct($key, $name = '_scriptlog', $cookie = [])
+    {
 
-   /**
-    * Instantiate session cookies
-    *
-    * @param string $key
-    * @param string $name
-    * @param array $cookie
-    * 
-    */
-   public function __construct($key, $name = '_scriptlog', $cookie = [])
-   {
+        $this->key = hash('sha512', $key, true); // 64 bytes raw binary for AES+HMAC
+        $this->name = $name;
+        $this->cookie = $cookie;
 
-      $this->key = hash('sha512', $key, true); // 64 bytes raw binary for AES+HMAC
-      $this->name = $name;
-      $this->cookie = $cookie;
+        if (ini_get('session.use_cookies')) {
+            $current_cookie_params = session_get_cookie_params();
+        }
 
-      if (ini_get('session.use_cookies')) {
+        $httponly = true;
 
-         $current_cookie_params = session_get_cookie_params();
-      }
+        if (PHP_VERSION_ID < 70300) {
+            $this->cookie += [
 
-      $httponly = true;
+               'lifetime' => $current_cookie_params['lifetime'],
+               'path'     => '/; samesite=lax',
+               'domain'   => $current_cookie_params['domain'],
+               'secure'   => is_cookies_secured(),
+               'httponly' => $httponly
 
-      if (PHP_VERSION_ID < 70300) {
+            ];
+        } else {
+            $this->cookie += [
 
-         $this->cookie += [
+               'lifetime' => $current_cookie_params['lifetime'],
+               'path'     => ini_get('session.cookies_path'),
+               'domain'   => $current_cookie_params['domain'],
+               'secure'   => is_cookies_secured(),
+               'httponly' => $httponly,
+               'samesite' => 'lax'
 
-            'lifetime' => $current_cookie_params['lifetime'],
-            'path'     => '/; samesite=lax',
-            'domain'   => $current_cookie_params['domain'],
-            'secure'   => is_cookies_secured(),
-            'httponly' => $httponly
+            ];
+        }
 
-         ];
-      } else {
+        $this->setup();
+    }
 
-         $this->cookie += [
+    /**
+     * setup
+     * set the session cookie parameters
+     *
+     * @method private setup()
+     * @return void
+     *
+     */
+    private function setup()
+    {
 
-            'lifetime' => $current_cookie_params['lifetime'],
-            'path'     => ini_get('session.cookies_path'),
-            'domain'   => $current_cookie_params['domain'],
-            'secure'   => is_cookies_secured(),
-            'httponly' => $httponly,
-            'samesite' => 'lax'
+        session_name($this->name);
 
-         ];
-      }
+        if (PHP_VERSION_ID < 70300) {
+            session_set_cookie_params($this->cookie['lifetime'], $this->cookie['path'], $this->cookie['domain'], $this->cookie['secure'], $this->cookie['httponly']);
+        } else {
+            session_set_cookie_params([
 
-      $this->setup();
-   }
+               'lifetime' => $this->cookie['lifetime'],
+               'path' => $this->cookie['path'],
+               'domain' => $this->cookie['domain'],
+               'secure' => $this->cookie['secure'],
+               'httponly' => $this->cookie['httponly'],
+               'samesite' => $this->cookie['samesite']
 
-   /**
-    * setup
-    * set the session cookie parameters
-    * 
-    * @method private setup()
-    * @return void
-    * 
-    */
-   private function setup()
-   {
+            ]);
+        }
+    }
 
-      session_name($this->name);
+    /**
+     * start
+     *
+     * @return bool
+     *
+     */
+    public function start()
+    {
 
-      if (PHP_VERSION_ID < 70300) {
-
-         session_set_cookie_params($this->cookie['lifetime'], $this->cookie['path'], $this->cookie['domain'], $this->cookie['secure'], $this->cookie['httponly']);
-      } else {
-
-         session_set_cookie_params([
-
-            'lifetime' => $this->cookie['lifetime'],
-            'path' => $this->cookie['path'],
-            'domain' => $this->cookie['domain'],
-            'secure' => $this->cookie['secure'],
-            'httponly' => $this->cookie['httponly'],
-            'samesite' => $this->cookie['samesite']
-
-         ]);
-      }
-   }
-
-   /**
-    * start
-    *
-    * @return bool 
-    * 
-    */
-   public function start()
-   {
-
-      if ((!isset($_COOKIE[session_name()])) || ($this->isSessionStarted() === false)) {
-
-         if (version_compare(PHP_VERSION, '5.6.0', '<')) {
-
-            if (session_id() == '') {
-
-               session_start();
+        if ((!isset($_COOKIE[session_name()])) || ($this->isSessionStarted() === false)) {
+            if (version_compare(PHP_VERSION, '5.6.0', '<')) {
+                if (session_id() == '') {
+                    session_start();
+                }
+            } else {
+                if (session_status() == PHP_SESSION_NONE) {
+                    session_start();
+                }
             }
-         } else {
 
-            if (session_status() == PHP_SESSION_NONE) {
+            return (mt_rand(0, 4) === 0) ? $this->refresh() : true;
+        }
 
-               session_start();
+        return false;
+    }
+
+    /**
+     * forget
+     * destroy session
+     *
+     * @return void
+     *
+     */
+    public function forget()
+    {
+
+        if ($this->isSessionStarted() === false) {
+            return false;
+        }
+
+        unset($_SESSION);
+
+        set_cookies_scl($this->name, '', time() - Authentication::COOKIE_EXPIRE, $this->cookie['path'], $this->cookie['domain'], $this->cookie['secure'], $this->cookie['httponly']);
+
+        session_unset();
+
+        return session_destroy();
+    }
+
+    /**
+     * refresh
+     *
+     * @return void
+     *
+     */
+    public function refresh()
+    {
+        return session_regenerate_id(true);
+    }
+
+    /**
+     * read
+     *
+     * @see https://www.php.net/manual/en/function.session-start.php#120589
+     * @param string $id
+     * @return string
+     */
+    public function read($id): string
+    {
+        try {
+            $data = parent::read($id);
+
+            if (empty($data)) {
+                return "";
             }
-         }
 
-         return (mt_rand(0, 4) === 0) ? $this->refresh() : true;
-      }
-
-      return false;
-   }
-
-   /**
-    * forget
-    * destroy session
-    * 
-    * @return void
-    * 
-    */
-   public function forget()
-   {
-
-      if ($this->isSessionStarted() === false) {
-
-         return false;
-      }
-
-      unset($_SESSION);
-
-      set_cookies_scl($this->name, '', time() - Authentication::COOKIE_EXPIRE, $this->cookie['path'], $this->cookie['domain'], $this->cookie['secure'], $this->cookie['httponly']);
-
-      session_unset();
-
-      return session_destroy();
-   }
-
-   /**
-    * refresh
-    *
-    * @return void
-    * 
-    */
-   public function refresh()
-   {
-      return session_regenerate_id(true);
-   }
-
-   /**
-    * read
-    *
-    * @see https://www.php.net/manual/en/function.session-start.php#120589
-    * @param string $id
-    * @return string
-    */
-   public function read($id): string
-   {
-      try {
-         $data = parent::read($id);
-
-         if (empty($data)) {
+            return $this->decrypt($data, $this->key);
+        } catch (Exception $e) {
+            error_log("Session read error for ID " . substr($id, 0, 10) . "...: " . $e->getMessage());
             return "";
-         }
+        }
+    }
 
-         return $this->decrypt($data, $this->key);
-      } catch (Exception $e) {
-         error_log("Session read error for ID " . substr($id, 0, 10) . "...: " . $e->getMessage());
-         return "";
-      }
-   }
+    /**
+     * write
+     *
+     * @param string $id
+     * @param string $data
+     * @return boolean
+     */
+    public function write($id, $data): bool
+    {
+        // Check if session was decrypted with old method and needs re-encryption
+        if (isset($_SESSION['_needs_reencryption'])) {
+            unset($_SESSION['_needs_reencryption']);
+            // Will be encrypted with new method below
+        }
 
-   /**
-    * write
-    *
-    * @param string $id
-    * @param string $data
-    * @return boolean
-    */
-   public function write($id, $data): bool
-   {
-      // Check if session was decrypted with old method and needs re-encryption
-      if (isset($_SESSION['_needs_reencryption'])) {
-         unset($_SESSION['_needs_reencryption']);
-         // Will be encrypted with new method below
-      }
+        $data = $this->encrypt($data, $this->key);
 
-      $data = $this->encrypt($data, $this->key);
-
-      return parent::write($id, $data);
-   }
+        return parent::write($id, $data);
+    }
 
 
-   /**
-    * isExpired
-    *
-    * @param integer $ttl
-    * @return boolean
-    */
-   public function isExpired($ttl = 60)
-   {
+    /**
+     * isExpired
+     *
+     * @param integer $ttl
+     * @return boolean
+     */
+    public function isExpired($ttl = 60)
+    {
 
-      $last_activity = isset($_SESSION['_last_activity']) ? $_SESSION['_last_activity'] : false;
+        $last_activity = isset($_SESSION['_last_activity']) ? $_SESSION['_last_activity'] : false;
 
-      if ($last_activity !== false && time() - $last_activity > $ttl * 3600) {
+        if ($last_activity !== false && time() - $last_activity > $ttl * 3600) {
+            return true;
+        }
 
-         return true;
-      }
+        $_SESSION['_last_activity'] = time();
 
-      $_SESSION['_last_activity'] = time();
+        return false;
+    }
 
-      return false;
-   }
+    /**
+     * isGenuine
+     *
+     * @return boolean
+     */
+    public function isGenuine()
+    {
 
-   /**
-    * isGenuine
-    *
-    * @return boolean
-    */
-   public function isGenuine()
-   {
+        $agent = getenv('HTTP_USER_AGENT', true) ?: getenv('HTTP_USER_AGENT');
 
-      $agent = getenv('HTTP_USER_AGENT', true) ?: getenv('HTTP_USER_AGENT');
+        $ip_client = getenv('REMOTE_ADDR', true) ? get_ip_address() : getenv('REMOTE_ADDR');
 
-      $ip_client = getenv('REMOTE_ADDR', true) ? get_ip_address() : getenv('REMOTE_ADDR');
+        $hash = md5($agent . (ip2long($ip_client) & ip2long('255.255.0.0')));
 
-      $hash = md5($agent . (ip2long($ip_client) & ip2long('255.255.0.0')));
+        if (isset($_SESSION['_genuine'])) {
+            return $_SESSION['_genuine'] === $hash;
+        }
 
-      if (isset($_SESSION['_genuine'])) {
+        $_SESSION['_genuine'] = $hash;
 
-         return $_SESSION['_genuine'] === $hash;
-      }
+        return true;
+    }
 
-      $_SESSION['_genuine'] = $hash;
+    /**
+     * isValid
+     *
+     * @param integer $ttl
+     * @return boolean
+     *
+     */
+    public function isValid($ttl = 60)
+    {
+        return ! $this->isExpired($ttl) && $this->isGenuine();
+    }
 
-      return true;
-   }
+    /**
+     * encrypy
+     *
+     * @param string $data
+     * @param string $key
+     * @return string
+     *
+     */
+    protected function encrypt($data, $key)
+    {
 
-   /**
-    * isValid
-    *
-    * @param integer $ttl
-    * @return boolean
-    * 
-    */
-   public function isValid($ttl = 60)
-   {
-      return ! $this->isExpired($ttl) && $this->isGenuine();
-   }
+        return ScriptlogCryptonize::encryptAES($data, $key);
+    }
 
-   /**
-    * encrypy
-    *
-    * @param string $data
-    * @param string $key
-    * @return string
-    * 
-    */
-   protected function encrypt($data, $key)
-   {
+    /**
+     * decrypt
+     *
+     * @param string $data
+     * @param string $key
+     * @return string
+     */
+    protected function decrypt($data, $key)
+    {
+        try {
+            // Try NEW method first (OpenSSL AES-256-CBC with HMAC)
+            return ScriptlogCryptonize::decryptAES($data, $key);
+        } catch (ScriptlogCryptonizeException $e) {
+            // If NEW method fails, try OLD method (Defuse\Crypto)
+            try {
+                $defuseKey = ScriptlogCryptonize::scriptlogCipherKey() ?? '';
+                $decrypted = ScriptlogCryptonize::scriptlogDecipher($data, $defuseKey);
 
-      return ScriptlogCryptonize::encryptAES($data, $key);
-   }
+                // Successfully decrypted with old method
+                // Mark session for re-encryption on next write
+                if (!isset($_SESSION['_needs_reencryption'])) {
+                    $_SESSION['_needs_reencryption'] = true;
+                }
 
-   /**
-    * decrypt
-    *
-    * @param string $data
-    * @param string $key
-    * @return string
-    */
-   protected function decrypt($data, $key)
-   {
-      try {
-         // Try NEW method first (OpenSSL AES-256-CBC with HMAC)
-         return ScriptlogCryptonize::decryptAES($data, $key);
-      } catch (ScriptlogCryptonizeException $e) {
+                return $decrypted;
+            } catch (Exception $defuseError) {
+                // Both methods failed - session is corrupted or invalid
+                error_log("Session decryption failed for both methods. OpenSSL error: " . $e->getMessage() . ", Defuse error: " . $defuseError->getMessage());
 
-         // If NEW method fails, try OLD method (Defuse\Crypto)
-         try {
-            $defuseKey = ScriptlogCryptonize::scriptlogCipherKey() ?? '';
-            $decrypted = ScriptlogCryptonize::scriptlogDecipher($data, $defuseKey);
-
-            // Successfully decrypted with old method
-            // Mark session for re-encryption on next write
-            if (!isset($_SESSION['_needs_reencryption'])) {
-               $_SESSION['_needs_reencryption'] = true;
+                // Return empty string to create fresh session
+                return '';
             }
+        }
+    }
 
-            return $decrypted;
-         } catch (Exception $defuseError) {
-            // Both methods failed - session is corrupted or invalid
-            error_log("Session decryption failed for both methods. OpenSSL error: " . $e->getMessage() . ", Defuse error: " . $defuseError->getMessage());
+    /**
+     * isSessionStarted
+     *
+     * @see https://www.php.net/manual/en/function.session-status.php#113468
+     * @return boolean
+     *
+     */
+    private function isSessionStarted()
+    {
 
-            // Return empty string to create fresh session
-            return '';
-         }
-      }
-   }
+        if (!headers_sent() && php_sapi_name() !== 'cli') {
+            if (version_compare(phpversion(), '5.6.0', '>=')) {
+                return (session_status() === PHP_SESSION_ACTIVE) ? true : false;
+            } else {
+                return (session_id() === '') ? false : true;
+            }
+        }
 
-   /**
-    * isSessionStarted
-    *
-    * @see https://www.php.net/manual/en/function.session-status.php#113468
-    * @return boolean
-    * 
-    */
-   private function isSessionStarted()
-   {
-
-      if (!headers_sent() && php_sapi_name() !== 'cli') {
-
-         if (version_compare(phpversion(), '5.6.0', '>=')) {
-
-            return (session_status() === PHP_SESSION_ACTIVE) ? true : false;
-         } else {
-
-            return (session_id() === '') ? false : true;
-         }
-      }
-
-      return false;
-   }
+        return false;
+    }
 }

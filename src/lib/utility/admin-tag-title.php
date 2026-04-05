@@ -2,152 +2,127 @@
 
 /**
  * admin_tag_title()
- * 
+ *
  * print control panel page title
- * 
+ *
  * @category function
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
  * @param string $value
- * 
+ *
  */
 function admin_tag_title($value)
 {
-   $title = null;
+    $title = null;
 
-   switch ($value) {
-
-      case 'posts':
-
-         $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
-
-         break;
-
-      case 'medialib':
-
-         $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
-
-         break;
-
-      case 'comments':
-
-         $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
-
-         break;
-
-      case 'menu':
-
-         $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
-
-         break;
-
-      case 'pages':
-
-         $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
-
-         break;
-
-      case 'plugins':
-
-         $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
-
-         break;
-
-      case 'users':
-
-         if (user_privilege() !== 'administrator') {
-
-            $title .= safe_html(ucfirst('profile')) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
-
-         } else {
-
+    switch ($value) {
+        case 'posts':
             $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
-         }
+            break;
 
-         break;
+        case 'medialib':
+            $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
-      case 'topics':
+            break;
 
-         $title .= safe_html(ucfirst("categories")) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+        case 'comments':
+            $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
-         break;
+            break;
 
-      case 'option-general':
+        case 'menu':
+            $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
-         $title .= safe_html("General settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+            break;
 
-         break;
+        case 'pages':
+            $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
-      case 'option-permalink':
+            break;
 
-         $title .= safe_html("Permalink settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+        case 'plugins':
+            $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
-         break;
+            break;
 
-      case 'option-reading':
+        case 'users':
+            if (user_privilege() !== 'administrator') {
+                $title .= safe_html(ucfirst('profile')) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+            } else {
+                $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+            }
 
-         $title .= safe_html("Reading settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+            break;
 
-         break;
+        case 'topics':
+            $title .= safe_html(ucfirst("categories")) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
-      case 'option-timezone':
+            break;
 
-         $title .= safe_html("Timezone settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+        case 'option-general':
+            $title .= safe_html("General settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
-         break;
-         
-      case 'option-memberships':
+            break;
 
-         $title .= safe_html("Membership settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
-   
-         break;
+        case 'option-permalink':
+            $title .= safe_html("Permalink settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
-      case 'templates':
+            break;
 
-         $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+        case 'option-reading':
+            $title .= safe_html("Reading settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
-         break;
+            break;
 
-      case 'dashboard':
+        case 'option-timezone':
+            $title .= safe_html("Timezone settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
-         $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+            break;
 
-         break;
+        case 'option-memberships':
+            $title .= safe_html("Membership settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
-      default:
+            break;
 
-         if (strpos($value, '..')) {
+        case 'templates':
+            $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
-            http_response_code(400);
+            break;
 
-            $title .= 'Bad Request - ERROR: ' . http_response_code(400);
-         }
+        case 'dashboard':
+            $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
-         if ((strstr($value, '../') !== false) || (strstr($value, 'file://') !== false) || (strstr($value, 'http://') !== false)) {
+            break;
 
-            http_response_code(400);
+        default:
+            if (strpos($value, '..')) {
+                http_response_code(400);
 
-            $title .= 'Bad Request - ERROR: ' . http_response_code(400);
-         }
+                $title .= 'Bad Request - ERROR: ' . http_response_code(400);
+            }
 
-         if ((strstr($value, 'php://input')) || (strstr($value, 'php://filter')) || (strstr($value, 'data:')) || (strstr($value, 'zip://'))) {
+            if ((strstr($value, '../') !== false) || (strstr($value, 'file://') !== false) || (strstr($value, 'http://') !== false)) {
+                http_response_code(400);
 
-            http_response_code(405);
+                $title .= 'Bad Request - ERROR: ' . http_response_code(400);
+            }
 
-            $title .= 'Method Not Allowed - ERROR: ' . http_response_code(400);
-         }
+            if ((strstr($value, 'php://input')) || (strstr($value, 'php://filter')) || (strstr($value, 'data:')) || (strstr($value, 'zip://'))) {
+                http_response_code(405);
 
-         if ((empty($value)) || (!in_array($value, array_keys(admin_query())))) {
+                $title .= 'Method Not Allowed - ERROR: ' . http_response_code(400);
+            }
 
-            http_response_code(404);
+            if ((empty($value)) || (!in_array($value, array_keys(admin_query())))) {
+                http_response_code(404);
 
-            $title .= 'Page Not Found - ERROR: ' . http_response_code(404);
-         }
+                $title .= 'Page Not Found - ERROR: ' . http_response_code(404);
+            }
 
-         break;
-   }
+            break;
+    }
 
-   return $title;
+    return $title;
 }

@@ -1,77 +1,56 @@
 <?php
+
 /**
  * file reset-password.php
- * 
+ *
  * @category resetting user password
  * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0
- * 
+ *
  */
 
 if (file_exists(__DIR__ . '/../config.php')) {
-    
-  include dirname(dirname(__FILE__)).'/lib/main.php';
-
+    include dirname(dirname(__FILE__)) . '/lib/main.php';
 } else {
-
-  header("Location: ../install");
-  exit();
-
+    header("Location: ../install");
+    exit();
 }
 
 if (isset($_POST['Reset'])) {
+    $csrf = isset($_POST['csrf']) ? $_POST['csrf'] : '';
+    $user_email = filter_input(INPUT_POST, 'user_email', FILTER_SANITIZE_EMAIL);
+    $valid = !empty($csrf) && verify_form_token('reset_pwd', $csrf);
 
-  $csrf = isset($_POST['csrf']) ? $_POST['csrf'] : '';
-  $user_email = filter_input(INPUT_POST, 'user_email', FILTER_SANITIZE_EMAIL);
-  $valid = !empty($csrf) && verify_form_token('reset_pwd', $csrf);
+    $captcha_code = isset($_POST['captcha_code']) ? $_POST['captcha_code'] : '';
+    $captcha = true;
 
-  $captcha_code = isset($_POST['captcha_code']) ? $_POST['captcha_code'] : '';
-  $captcha = true;
-
-  if (!$valid) {
-     
-    $errors['errorMessage'] = "Sorry, there was a security issue";
-  
-  }
-
-  if (count($_POST) > 0 && $captcha_code !== Session::getInstance()->forgot_pwd) {
-
-      $captcha = false;
-      $errors['errorMessage'] = "Please enter correct captcha code";
-
-  }
-
-  if (empty($user_email)) {
-
-     $errors['errorMessage'] = "Please enter email address";
-
-  } elseif (!filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
-
-     $errors['errorMessage'] = "Please enter a valid email address";
-
-  } elseif ($authenticator->checkEmailExists($user_email) == false) {
-
-     $errors['errorMessage'] = "No user account was found with the email address you entered";
-
-  } else {
-    
-    if ($captcha === true) {
-
-      $authenticator->resetUserPassword($user_email);
-
-      direct_page('reset-password.php?status=reset', 200);
-       
+    if (!$valid) {
+        $errors['errorMessage'] = "Sorry, there was a security issue";
     }
-    
-  }
-  
-  if (scriptpot_validate($_POST) === false) {
 
-    $errors['errorMessage'] = "anomaly behaviour detected!";
+    if (count($_POST) > 0 && $captcha_code !== Session::getInstance()->forgot_pwd) {
+        $captcha = false;
+        $errors['errorMessage'] = "Please enter correct captcha code";
+    }
 
-  } 
+    if (empty($user_email)) {
+        $errors['errorMessage'] = "Please enter email address";
+    } elseif (!filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
+        $errors['errorMessage'] = "Please enter a valid email address";
+    } elseif ($app->authenticator->checkEmailExists($user_email) == false) {
+        $errors['errorMessage'] = "No user account was found with the email address you entered";
+    } else {
+        if ($captcha === true) {
+            $app->authenticator->resetUserPassword($user_email);
 
+            direct_page('reset-password.php?status=reset', 200);
+        }
+    }
+
+    if (scriptpot_validate($_POST) === false) {
+        $errors['errorMessage'] = "anomaly behaviour detected!";
+    }
 }
 
 ?>
@@ -118,29 +97,28 @@ if (isset($_POST['Reset'])) {
 <!-- /.login-logo -->
 <div class="login-box-body">
   
-<?php 
-  if (isset($errors['errorMessage'])) : 
-?>
+<?php
+if (isset($errors['errorMessage'])) :
+    ?>
 
 <div class="alert alert-danger alert-dismissable">
   <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
     <?= $errors['errorMessage']; ?>
 </div>
   
-<?php 
-  endif; 
+    <?php
+endif;
 
-  if (isset($_GET['status']) && $_GET['status'] == 'reset') : ?>
-				<div class="alert alert-success alert-dismissable">
-					<button type="button" class="close" data-dismiss="alert"
-						aria-hidden="true">&times;</button>
-				 password has been <strong><?= safe_html($_GET['status']); ?> </strong>.
-					check your e-mail !
-				</div>
+if (isset($_GET['status']) && $_GET['status'] == 'reset') : ?>
+                <div class="alert alert-success alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert"
+                        aria-hidden="true">&times;</button>
+                 password has been <strong><?= safe_html($_GET['status']); ?> </strong>.
+                    check your e-mail !
+                </div>
 
-<?php 
-  else :
-?>
+<?php else :
+    ?>
 
 <p class="login-box-msg">Enter your email address. You will receive an email message with instructions on how to reset your password.</p>  
 <form name="formlogin" action="reset-password.php" method="post" onSubmit="return validasi(this)" role="form" autocomplete="off">
@@ -163,15 +141,15 @@ if (isset($_POST['Reset'])) {
   <label for="inputCaptcha">Enter captcha code</label>
   <input type="text" class="form-control" id="inputCaptcha" placeholder="Please type a captcha code here" name="captcha_code">
 <span class="glyphicon glyphicon-hand-down form-control-feedback"></span>
-<img src="<?=app_url(). DIRECTORY_SEPARATOR.'admin'.DIRECTORY_SEPARATOR.'captcha-forgot-pwd.php'; ?>" alt="image_captcha">
+<img src="<?=app_url() . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'captcha-forgot-pwd.php'; ?>" alt="image_captcha">
 </div>
       
 <div class="row">
   <div class="col-xs-8">
   
-<?php 
-  $block_csrf = generate_form_token('reset_pwd', 24); // prevent csrf
-?>
+    <?php
+      $block_csrf = generate_form_token('reset_pwd', 24); // prevent csrf
+    ?>
         
 <input type="hidden" name="csrf" value="<?= $block_csrf; ?>">
 <input type="submit" class="btn btn-primary btn-block btn-flat" name="Reset" value="Get New Password">
@@ -181,17 +159,17 @@ if (isset($_POST['Reset'])) {
 </form>
 
 <a href="<?= app_url() . '/admin/login.php' ?>" class="text-center" aria-label="Log In">Log in</a>
-<?php
-     if (is_registration_unable() === true) :
-    ?>
-      <a href="<?= app_url() . '/admin/signup.php'; ?>" class="text-center" aria-label="Sign Up">| Register</a>
     <?php
+    if (is_registration_unable() === true) :
+        ?>
+      <a href="<?= app_url() . '/admin/signup.php'; ?>" class="text-center" aria-label="Sign Up">| Register</a>
+        <?php
     endif;
     ?>
 <div class="social-auth-links text-center"></div>
     
-<?php 
-  endif;
+    <?php
+endif;
 ?>
 
 </div>

@@ -1,4 +1,6 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Cookie Consent Utility Functions
  *
@@ -75,7 +77,7 @@ function record_cookie_consent($status)
 function set_cookie_consent_cookie($status, $expiryDays = 365)
 {
     $expiry = time() + (86400 * $expiryDays); // 86400 = 1 day
-    
+
     return setcookie('cookie_consent', $status, [
         'expires' => $expiry,
         'path' => '/',
@@ -92,7 +94,10 @@ function set_cookie_consent_cookie($status, $expiryDays = 365)
  */
 function get_privacy_policy_url()
 {
-    return app_url() . '/privacy';
+    if (function_exists('is_permalink_enabled') && is_permalink_enabled() === 'yes') {
+        return app_url() . '/privacy';
+    }
+    return app_url() . '?privacy';
 }
 
 /**

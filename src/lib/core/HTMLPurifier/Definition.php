@@ -6,7 +6,6 @@
  */
 abstract class HTMLPurifier_Definition
 {
-
     /**
      * Has setup() been called yet?
      * @type bool

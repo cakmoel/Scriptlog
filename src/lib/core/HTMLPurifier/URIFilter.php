@@ -27,7 +27,6 @@
  */
 abstract class HTMLPurifier_URIFilter
 {
-
     /**
      * Unique identifier of filter.
      * @type string

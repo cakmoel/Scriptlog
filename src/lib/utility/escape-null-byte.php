@@ -1,4 +1,5 @@
 <?php
+
 /**
  * escape_null_byte
  *
@@ -8,13 +9,12 @@
  * @version 1.0
  * @param string $input
  * @return array|string
- * 
+ *
  */
 function escape_null_byte($input)
 {
 
- $input = str_replace(chr(0), '', $input);
+    $input = str_replace(chr(0), '', $input);
 
- return $input;
-
+    return $input;
 }

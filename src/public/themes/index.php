@@ -1,2 +1,3 @@
 <?php
+
 // Powering your blog

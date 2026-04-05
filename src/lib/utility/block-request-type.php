@@ -1,4 +1,5 @@
 <?php
+
 /**
  * block_request_type
  *
@@ -8,24 +9,18 @@
  * @version 1.0
  * @param string $current_request
  * @return bool
- * 
+ *
  */
 function block_request_type($current_request, $method_allowed)
 {
 
- $block = true;
+    $block = true;
 
- if (!in_array($current_request, $method_allowed)) {
+    if (!in_array($current_request, $method_allowed)) {
+        $block = true;
+    } else {
+        $block = false;
+    }
 
-   $block = true;
-
- } else {
-
-   $block = false;
-
- }
-
- return $block;
- 
+    return $block;
 }
-

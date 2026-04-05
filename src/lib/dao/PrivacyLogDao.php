@@ -1,7 +1,9 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * PrivacyLogDao Class
- * 
+ *
  * Data Access Object for privacy audit logs
  *
  * @category  Dao Class
@@ -13,7 +15,6 @@
  */
 class PrivacyLogDao extends Dao
 {
-
     /**
      * Constructor
      */
@@ -24,7 +25,7 @@ class PrivacyLogDao extends Dao
 
     /**
      * Create a privacy log entry
-     * 
+     *
      * @param string $action
      * @param string $type
      * @param int|null $userId
@@ -49,7 +50,7 @@ class PrivacyLogDao extends Dao
 
     /**
      * Get log by ID
-     * 
+     *
      * @param int $id
      * @return array|bool
      */
@@ -62,7 +63,7 @@ class PrivacyLogDao extends Dao
 
     /**
      * Get logs by user ID
-     * 
+     *
      * @param int $userId
      * @return array|bool
      */
@@ -71,14 +72,14 @@ class PrivacyLogDao extends Dao
         $sql = "SELECT * FROM tbl_privacy_logs 
                 WHERE log_user_id = ? 
                 ORDER BY log_date DESC";
-        
+
         $this->setSQL($sql);
         return $this->findAll([(int)$userId]);
     }
 
     /**
      * Get logs by email
-     * 
+     *
      * @param string $email
      * @return array|bool
      */
@@ -87,14 +88,14 @@ class PrivacyLogDao extends Dao
         $sql = "SELECT * FROM tbl_privacy_logs 
                 WHERE log_email = ? 
                 ORDER BY log_date DESC";
-        
+
         $this->setSQL($sql);
         return $this->findAll([$email]);
     }
 
     /**
      * Get logs by action
-     * 
+     *
      * @param string $action
      * @return array|bool
      */
@@ -103,14 +104,14 @@ class PrivacyLogDao extends Dao
         $sql = "SELECT * FROM tbl_privacy_logs 
                 WHERE log_action = ? 
                 ORDER BY log_date DESC";
-        
+
         $this->setSQL($sql);
         return $this->findAll([$action]);
     }
 
     /**
      * Get all logs
-     * 
+     *
      * @param string $orderBy
      * @return array|bool
      */
@@ -123,7 +124,7 @@ class PrivacyLogDao extends Dao
 
     /**
      * Get recent logs
-     * 
+     *
      * @param int $limit
      * @return array|bool
      */
@@ -132,14 +133,14 @@ class PrivacyLogDao extends Dao
         $sql = "SELECT * FROM tbl_privacy_logs 
                 ORDER BY log_date DESC 
                 LIMIT ?";
-        
+
         $this->setSQL($sql);
         return $this->findAll([(int)$limit]);
     }
 
     /**
      * Delete old logs
-     * 
+     *
      * @param int $days
      * @return bool
      */
@@ -157,7 +158,7 @@ class PrivacyLogDao extends Dao
 
     /**
      * Total log records
-     * 
+     *
      * @return int
      */
     public function totalLogRecords()

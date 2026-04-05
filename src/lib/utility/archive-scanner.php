@@ -10,7 +10,7 @@ use Selective\ArchiveBomb\Engine\RarBombEngine;
  * @see https://github.com/selective-php/archive-bomb-scanner
  * @param string $filename
  * @return boolean
- * 
+ *
  */
 function zip_file_scanner($filename)
 {
@@ -33,7 +33,7 @@ function zip_file_scanner($filename)
  *
  * @param string $filename
  * @return boolean
- * 
+ *
  */
 function rar_file_scanner($filename)
 {

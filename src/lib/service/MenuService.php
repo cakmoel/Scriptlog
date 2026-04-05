@@ -1,362 +1,389 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class MenuService
- * 
+ *
  * @category Service Class
  * @author  M.Noermoehammad
  * @license MIT
  * @version 1.0
  * @since   Since Release 1.0
- * 
+ *
  */
 class MenuService
 {
-  /**
-   * menu_id
-   *
-   * @var int
-   * 
-   */
-  private $menu_id;
-  
-  /**
-   * parent_id
-   *
-   * @var int
-   * 
-   */
-  private $parent_id;
-  
-  /**
-   * label
-   *
-   * @var string
-   * 
-   */
-  private $label;
-  
-  /**
-   * link
-   *
-   * @var string
-   * 
-   */
-  private $link;
-  
-  /**
-   * status
-   *
-   * @var string
-   * 
-   */
-  private $status;
+    /**
+     * menu_id
+     *
+     * @var int
+     *
+     */
+    private $menu_id;
 
-  /**
-   * visibility
-   *
-   * @var string
-   * 
-   */
-  private $visibility;
+    /**
+     * parent_id
+     *
+     * @var int
+     *
+     */
+    private $parent_id;
 
-  /**
-   * Sort or order of menu navigation
-   *
-   * @var string
-   * 
-   */
-  private $sort;
+    /**
+     * label
+     *
+     * @var string
+     *
+     */
+    private $label;
 
-  /**
-   * menuDao
-   *
-   * @var object
-   * 
-   */
-  private $menuDao;
+    /**
+     * link
+     *
+     * @var string
+     *
+     */
+    private $link;
 
-  /**
-   * validator
-   *
-   * @var object
-   * 
-   */
-  private $validator;
+    /**
+     * status
+     *
+     * @var string
+     *
+     */
+    private $status;
 
-  /**
-   * sanitize
-   *
-   * @var object
-   * 
-   */
-  private $sanitize;
- 
-  public function __construct(MenuDao $menuDao, FormValidator $validator, Sanitize $sanitize)
-  {
-    $this->menuDao = $menuDao;
-    $this->validator = $validator;
-    $this->sanitize = $sanitize;
-  }
+    /**
+     * visibility
+     *
+     * @var string
+     *
+     */
+    private $visibility;
 
-  /**
-   * setMenuId
-   *
-   * @param int $menu_id
-   * 
-   */
-  public function setMenuId($menu_id)
-  {
-    $this->menu_id = $menu_id;
-  }
+    /**
+     * Sort or order of menu navigation
+     *
+     * @var string
+     *
+     */
+    private $sort;
 
-  /**
-   * setParentId
-   *
-   * @param int $parent_id
-   * 
-   */
-  public function setParentId($parent_id)
-  {
-    $this->parent_id = $parent_id;
-  }
+    /**
+     * Locale for multilingual menu
+     *
+     * @var string
+     *
+     */
+    private $menu_locale;
 
-  /**
-   * setMenuLabel
-   *
-   * @param string $menu_label
-   * 
-   */
-  public function setMenuLabel($menu_label)
-  {
-    $this->label = $menu_label;
-  }
+    /**
+     * menuDao
+     *
+     * @var object
+     *
+     */
+    private $menuDao;
 
-  /**
-   * setMenuLink
-   *
-   * @param string $menu_link
-   * 
-   */
-  public function setMenuLink($menu_link)
-  {
-    $this->link = $menu_link;
-  }
+    /**
+     * validator
+     *
+     * @var object
+     *
+     */
+    private $validator;
 
-  /**
-   * setMenuVisibility
-   *
-   * @param string $menu_visibility
-   * 
-   */
-  public function setMenuVisibility($menu_visibility)
-  {
-    $this->visibility = $menu_visibility;
-  }
+    /**
+     * sanitize
+     *
+     * @var object
+     *
+     */
+    private $sanitize;
 
-  /**
-   * setMenuOrder
-   *
-   * @param int|num $sort
-   * 
-   */
-  public function setMenuOrder($sort)
-  {
-    $this->sort = $sort;
-  }
-
-  /**
-   * setMenuStatus
-   * 
-   * @param string $menu_status
-   * 
-   */
-  public function setMenuStatus($menu_status)
-  {
-    $this->status = $menu_status;
-  }
-
-  /**
-   * grabMenus
-   *
-   * @param string $orderBy
-   * @return mixed
-   * 
-   */
-  public function grabMenus($orderBy = "ID")
-  {
-    return $this->menuDao->findMenus($orderBy);
-  }
-
-  /**
-   * grabMenu
-   *
-   * @param int|string $id
-   * @return mixed
-   * 
-   */
-  public function grabMenu($id)
-  {
-    return $this->menuDao->findMenu($id, $this->sanitize);
-  }
-
-  /**
-   * grabMenuParent
-   *
-   * @param int|string $parent_id
-   * @return mixed
-   * 
-   */
-  public function grabMenuParent($parent_id)
-  {
-    return $this->menuDao->findMenuParent($parent_id, $this->sanitize);
-  }
-
-  /**
-   * addMenu
-   *
-   * @return mixed
-   * 
-   */
-  public function addMenu()
-  {
-    
-    $this->validator->sanitize($this->parent_id, 'int');
-    $this->validator->sanitize($this->sort, 'int');
-    $this->validator->sanitize($this->label, 'string');
-    
-    if (!empty($this->link)) {
-
-      $this->validator->sanitize($this->link, 'url');
-
+    public function __construct(MenuDao $menuDao, FormValidator $validator, Sanitize $sanitize)
+    {
+        $this->menuDao = $menuDao;
+        $this->validator = $validator;
+        $this->sanitize = $sanitize;
     }
-    
-    return $this->menuDao->insertMenu([
-      'menu_label' => $this->label,
-      'menu_link' => $this->link,
-      'menu_visibility' => $this->visibility,
-      'parent_id' => $this->parent_id,
-      'menu_sort' => $this->sort
-    ]);
 
-  }
+    /**
+     * setMenuId
+     *
+     * @param int $menu_id
+     *
+     */
+    public function setMenuId($menu_id)
+    {
+        $this->menu_id = $menu_id;
+    }
 
-  /**
-   * modifyMenu
-   *
-   */
-  public function modifyMenu()
-  {
-    $this->validator->sanitize($this->parent_id, 'int');
-    $this->validator->sanitize($this->menu_id, 'int');
-    $this->validator->sanitize($this->link, 'url');
-    $this->validator->sanitize($this->label, 'string');
+    /**
+     * setParentId
+     *
+     * @param int $parent_id
+     *
+     */
+    public function setParentId($parent_id)
+    {
+        $this->parent_id = $parent_id;
+    }
 
-    return $this->menuDao->updateMenu($this->sanitize, [
+    /**
+     * setMenuLabel
+     *
+     * @param string $menu_label
+     *
+     */
+    public function setMenuLabel($menu_label)
+    {
+        $this->label = $menu_label;
+    }
 
+    /**
+     * setMenuLink
+     *
+     * @param string $menu_link
+     *
+     */
+    public function setMenuLink($menu_link)
+    {
+        $this->link = $menu_link;
+    }
+
+    /**
+     * setMenuVisibility
+     *
+     * @param string $menu_visibility
+     *
+     */
+    public function setMenuVisibility($menu_visibility)
+    {
+        $this->visibility = $menu_visibility;
+    }
+
+    /**
+     * setMenuOrder
+     *
+     * @param int|num $sort
+     *
+     */
+    public function setMenuOrder($sort)
+    {
+        $this->sort = $sort;
+    }
+
+    /**
+     * setMenuStatus
+     *
+     * @param string $menu_status
+     *
+     */
+    public function setMenuStatus($menu_status)
+    {
+        $this->status = $menu_status;
+    }
+
+    /**
+     * setMenuLocale
+     *
+     * @param string $menu_locale
+     *
+     */
+    public function setMenuLocale($menu_locale)
+    {
+        $this->menu_locale = sanitize_locale($menu_locale);
+    }
+
+    /**
+     * grabMenus
+     *
+     * @param string $orderBy
+     * @return mixed
+     *
+     */
+    public function grabMenus($orderBy = "ID")
+    {
+        return $this->menuDao->findMenus($orderBy);
+    }
+
+    /**
+     * grabMenu
+     *
+     * @param int|string $id
+     * @return mixed
+     *
+     */
+    public function grabMenu($id)
+    {
+        return $this->menuDao->findMenu($id, $this->sanitize);
+    }
+
+    /**
+     * grabMenuParent
+     *
+     * @param int|string $parent_id
+     * @return mixed
+     *
+     */
+    public function grabMenuParent($parent_id)
+    {
+        return $this->menuDao->findMenuParent($parent_id, $this->sanitize);
+    }
+
+    /**
+     * addMenu
+     *
+     * @return mixed
+     *
+     */
+    public function addMenu()
+    {
+
+        $this->validator->sanitize($this->parent_id, 'int');
+        $this->validator->sanitize($this->sort, 'int');
+        $this->validator->sanitize($this->label, 'string');
+
+        if (!empty($this->link)) {
+            $this->validator->sanitize($this->link, 'url');
+        }
+
+        return $this->menuDao->insertMenu([
           'menu_label' => $this->label,
           'menu_link' => $this->link,
-          'menu_status' => $this->status,
           'menu_visibility' => $this->visibility,
           'parent_id' => $this->parent_id,
-          'menu_sort' => $this->sort
-    
-        ], $this->menu_id);
-
-  }
-
-  /**
-   * enableMenu()
-   * 
-   */
-  public function enableMenu()
-  {
-    $this->validator->sanitize($this->menu_id, 'int');
-
-    $menu_enabled = $this->menuDao->findMenu($this->menu_id, $this->sanitize);
-    
-    if (! $menu_enabled ) {
-       direct_page('index.php?load=menu&error=menuNotFound', 404);
+          'menu_sort' => $this->sort,
+          'menu_locale' => $this->menu_locale
+        ]);
     }
 
-    return $this->menuDao->activateMenu($this->menu_id, $this->sanitize);
+    /**
+     * modifyMenu
+     *
+     */
+    public function modifyMenu()
+    {
+        $this->validator->sanitize($this->parent_id, 'int');
+        $this->validator->sanitize($this->menu_id, 'int');
+        $this->validator->sanitize($this->link, 'url');
+        $this->validator->sanitize($this->label, 'string');
 
-  }
+        return $this->menuDao->updateMenu($this->sanitize, [
 
-  /**
-   * disableMenu()
-   *
-   */
-  public function disableMenu()
-  {
-    $this->validator->sanitize($this->menu_id, $this->sanitize);
+              'menu_label' => $this->label,
+              'menu_link' => $this->link,
+              'menu_status' => $this->status,
+              'menu_visibility' => $this->visibility,
+              'parent_id' => $this->parent_id,
+              'menu_sort' => $this->sort,
+              'menu_locale' => $this->menu_locale
 
-    $menu_disabled = $this->menuDao->findMenu($this->menu_id, $this->sanitize);
-    if (! $menu_disabled) {
-      direct_page('index.php?load=menu&error=menuNotFound', 404);
+            ], $this->menu_id);
     }
 
-    return $this->menuDao->deactivateMenu($this->menu_id, $this->sanitize);
-    
-  }
+    /**
+     * enableMenu()
+     *
+     */
+    public function enableMenu()
+    {
+        $this->validator->sanitize($this->menu_id, 'int');
 
-  /**
-   * removeMenu()
-   * 
-   */
-  public function removeMenu()
-  {
-    $this->validator->sanitize($this->menu_id, 'int');
+        $menu_enabled = $this->menuDao->findMenu($this->menu_id, $this->sanitize);
 
-    if (!$this->menuDao->findMenu($this->menu_id, $this->sanitize)) {
-       direct_page('index.php?load=menu&error=menuNotFound', 404);
+        if (! $menu_enabled) {
+            direct_page('index.php?load=menu&error=menuNotFound', 404);
+        }
+
+        return $this->menuDao->activateMenu($this->menu_id, $this->sanitize);
     }
 
-    return $this->menuDao->deleteMenu($this->menu_id, $this->sanitize);
+    /**
+     * disableMenu()
+     *
+     */
+    public function disableMenu()
+    {
+        $this->validator->sanitize($this->menu_id, $this->sanitize);
 
-  }
+        $menu_disabled = $this->menuDao->findMenu($this->menu_id, $this->sanitize);
+        if (! $menu_disabled) {
+            direct_page('index.php?load=menu&error=menuNotFound', 404);
+        }
 
-  /**
-   * parentDropDown
-   *
-   * @param string $selected
-   * 
-   */
-  public function parentDropDown($selected = "")
-  {
-    return $this->menuDao->dropDownMenuParent($selected);
-  }
+        return $this->menuDao->deactivateMenu($this->menu_id, $this->sanitize);
+    }
 
-  /**
-   * visibilityDropDown()
-   * 
-   * @param string $selected
-   * 
-   */
-  public function visibilityDropDown($selected = "")
-  {
-    return $this->menuDao->dropDownMenuVisibility($selected);
-  }
+    /**
+     * removeMenu()
+     *
+     */
+    public function removeMenu()
+    {
+        $this->validator->sanitize($this->menu_id, 'int');
 
-  /**
-   * isMenuExists
-   *
-   * @param string $menu_label
-   * 
-   */
-  public function isMenuExists($menu_label)
-  {
-    return $this->menuDao->menuExists($menu_label);
-  }
+        if (!$this->menuDao->findMenu($this->menu_id, $this->sanitize)) {
+            direct_page('index.php?load=menu&error=menuNotFound', 404);
+        }
 
-  /**
-   * totalMenus
-   *
-   * @param mixed|array $data
-   *  
-   */
-  public function totalMenus(array $data = []): ?int
-  {
-    return $this->menuDao->totalMenuRecords($data);
-  }
+        return $this->menuDao->deleteMenu($this->menu_id, $this->sanitize);
+    }
 
+    /**
+     * parentDropDown
+     *
+     * @param string $selected
+     *
+     */
+    public function parentDropDown($selected = "")
+    {
+        return $this->menuDao->dropDownMenuParent($selected);
+    }
+
+    /**
+     * visibilityDropDown()
+     *
+     * @param string $selected
+     *
+     */
+    public function visibilityDropDown($selected = "")
+    {
+        return $this->menuDao->dropDownMenuVisibility($selected);
+    }
+
+    /**
+     * localeDropDown
+     *
+     * @param string $selected
+     * @return string
+     *
+     */
+    public function localeDropDown($selected = "")
+    {
+        return $this->menuDao->dropDownLocale($selected);
+    }
+
+    /**
+     * isMenuExists
+     *
+     * @param string $menu_label
+     *
+     */
+    public function isMenuExists($menu_label)
+    {
+        return $this->menuDao->menuExists($menu_label);
+    }
+
+    /**
+     * totalMenus
+     *
+     * @param mixed|array $data
+     *
+     */
+    public function totalMenus(array $data = []): ?int
+    {
+        return $this->menuDao->totalMenuRecords($data);
+    }
 }

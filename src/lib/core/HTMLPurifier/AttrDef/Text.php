@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_AttrDef_Text extends HTMLPurifier_AttrDef
 {
-
     /**
      * @param string $string
      * @param HTMLPurifier_Config $config

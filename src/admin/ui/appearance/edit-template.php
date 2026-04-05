@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) exit(); ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -25,17 +27,17 @@
 <!-- /.box-header -->
 <?php
 if (isset($errors)) :
-?>
+    ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 <h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
-<?php 
-foreach ($errors as $e) :
-echo '<p>' . $e . '</p>';
-endforeach;
-?>
+    <?php
+    foreach ($errors as $e) :
+        echo '<p>' . $e . '</p>';
+    endforeach;
+    ?>
 </div>
-<?php 
+    <?php
 endif;
 
 $action = (isset($formAction)) ? $formAction : null;
@@ -81,14 +83,14 @@ $theme_id = (isset($themeData['ID'])) ? safe_html((int)$themeData['ID']) : 0;
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
 <input type="submit" name="themeFormSubmit" class="btn btn-primary" value="<?=(($theme_id) && ($theme_id != '')) ? "Update" : "Add New Theme"; ?>">
-<?php 
- if(!empty($themeData['ID'])) :
-?>
-<a href="javascript:deleteTheme('<?=(isset($themeData['ID']) ?  safe_html((int)$themeData['ID']) : 0); ?>', '<?=(isset($themeData['theme_title']) ? safe_html($themeData['theme_title']) : ""); ?>')"
+<?php
+if (!empty($themeData['ID'])) :
+    ?>
+<a href="javascript:deleteTheme('<?=(isset($themeData['ID']) ? safe_html((int)$themeData['ID']) : 0); ?>', '<?=(isset($themeData['theme_title']) ? safe_html($themeData['theme_title']) : ""); ?>')"
 title="Delete Theme" class="btn btn-danger pull-right"> <i class="fa fa-exclamation-circle fa-fw"></i> Delete
 </a>
-<?php 
- endif;
+    <?php
+endif;
 ?>
 
 </div>
@@ -107,9 +109,9 @@ title="Delete Theme" class="btn btn-danger pull-right"> <i class="fa fa-exclamat
 <script type="text/javascript">
   function deleteTheme(id, theme)
   {
-	  if (confirm("Are you sure want to uninstall Theme '" + theme + "'"))
-	  {
-	  	window.location.href = 'index.php?load=templates&action=deleteTheme&Id=' + id;
-	  }
+      if (confirm("Are you sure want to uninstall Theme '" + theme + "'"))
+      {
+        window.location.href = 'index.php?load=templates&action=deleteTheme&Id=' + id;
+      }
   }
 </script>

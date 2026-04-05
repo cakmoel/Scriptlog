@@ -1,74 +1,55 @@
-<?php 
+<?php
+
 /**
  * file recover-password.php
- * 
+ *
  * @category  recovering user password
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
- * 
+ *
  */
 
 if (file_exists(__DIR__ . '/../config.php')) {
-    
-  include dirname(dirname(__FILE__)).'/lib/main.php';
-  
+    include dirname(dirname(__FILE__)) . '/lib/main.php';
 } else {
-
-  header("Location: ../install");
-  exit();
-  
+    header("Location: ../install");
+    exit();
 }
 
 $stop = null;
 
 $tempKey = isset($_GET['tempKey']) ? escape_html($_GET['tempKey']) : "";
-$user = $userDao->getUserByResetKey($tempKey);
+$user = $app->userDao->getUserByResetKey($tempKey);
 
 if (empty($user['user_reset_key'])) {
-    
-  $stop = "Temporary key is not valid.";
-
+    $stop = "Temporary key is not valid.";
 } elseif ($user['user_reset_complete'] == 'Yes') {
     $stop = "Your password has been changed";
 }
 
 if (isset($_POST['Change']) && $_POST['Change'] == 'Change Password') {
+    $password = isset($_POST['pass1']) ? prevent_injection($_POST['pass1']) : "";
+    $confirmPass = isset($_POST['pass2']) ? prevent_injection($_POST['pass2']) : "";
+    $csrf = isset($_POST['csrf']) ? $_POST['csrf'] : '';
+    $valid = !empty($csrf) && verify_form_token('recover_pwd', $csrf);
 
-  $password = isset($_POST['pass1']) ? prevent_injection($_POST['pass1']) : "";
-  $confirmPass = isset($_POST['pass2']) ? prevent_injection($_POST['pass2']) : "";
-  $csrf = isset($_POST['csrf']) ? $_POST['csrf'] : '';
-  $valid = !empty($csrf) && verify_form_token('recover_pwd', $csrf);
+    if (!$valid) {
+        $errors['errorMessage'] = "Sorry, there was a security issue";
+    }
 
-  if (!$valid) {
-
-    $errors['errorMessage'] = "Sorry, there was a security issue";
-
-  }
-    
-  if (empty($password) || empty($confirmPass)) {
-
-    $errors['errorMessage'] = "All column must be filled";
-
-  } elseif ($password !== $confirmPass) {
-
-    $errors['errorMessage'] = "Password does not match";
-
-  } elseif (check_common_password($password) === true ) {
-
-    $errors['errorMessage'] = "Your password seems to be the most hacked password, please try another";
-
-  } elseif (false === check_pwd_strength($password) ) { 
-
-    $errors['errorMessage'] = "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters";
-
-  } else {
-
-    $authenticator->updateNewPassword($password, abs((int)$user['ID']), $user['user_email']);
-    direct_page('login.php?status=changed', 302);
-
-  }
-
+    if (empty($password) || empty($confirmPass)) {
+        $errors['errorMessage'] = "All column must be filled";
+    } elseif ($password !== $confirmPass) {
+        $errors['errorMessage'] = "Password does not match";
+    } elseif (check_common_password($password) === true) {
+        $errors['errorMessage'] = "Your password seems to be the most hacked password, please try another";
+    } elseif (false === check_pwd_strength($password)) {
+        $errors['errorMessage'] = "Password requires at least 8 characters with lowercase, uppercase letters, numbers and special characters";
+    } else {
+        $app->authenticator->updateNewPassword($password, abs((int)$user['ID']), $user['user_email']);
+        direct_page('login.php?status=changed', 302);
+    }
 }
 
 ?>
@@ -117,30 +98,29 @@ if (isset($_POST['Change']) && $_POST['Change'] == 'Change Password') {
   <!-- /.login-logo -->
   <div class="login-box-body">
   
-  <?php 
-       if (isset($errors['errorMessage'])) : 
-    ?>
+  <?php
+    if (isset($errors['errorMessage'])) :
+        ?>
     
        <div class="alert alert-danger alert-dismissable">
     <button type="button" class="close" data-dismiss="alert"
       aria-hidden="true">&times;</button>
-           <?= $errors['errorMessage']; ?>
+        <?= $errors['errorMessage']; ?>
     </div>
   
-    <?php 
-      endif; 
+        <?php
+    endif;
     ?>
 
-  <?php 
+  <?php
     if (isset($stop)) :
-  ?>
+        ?>
 <div class="alert alert-danger">
-<?= $stop; ?>
+        <?= $stop; ?>
 <script type="text/javascript">function leave() {  window.location = "<?= $config['app']['url']; ?>";} setTimeout("leave()", 3640);</script>
 </div>
-<?php 
-else :
-?>
+    <?php else :
+        ?>
   <p class="login-box-msg">Enter your new password</p>
   
     <form name="formlogin" action="recover-password.php" method="post" onSubmit="return validasi(this)" role="form" autocomplete="off">
@@ -158,9 +138,9 @@ else :
         
       <div class="row">
         <div class="col-xs-8">
-  <?php 
-    $block_csrf = generate_form_token('recover_pwd', 64); 
-  ?>
+        <?php
+        $block_csrf = generate_form_token('recover_pwd', 64);
+        ?>
         <input type="hidden" name="csrf" value="<?= $block_csrf; ?>">
         <input type="submit" class="btn btn-primary btn-block btn-flat" name="Change" value="Change Password">
         </div>
@@ -169,9 +149,9 @@ else :
     </form>
 
     <div class="social-auth-links text-center"></div>
-<?php 
-endif; 
-?>
+        <?php
+    endif;
+    ?>
   </div>
   <!-- /.login-box-body -->
 </div>
