@@ -1,7 +1,9 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * NotificationService Class
- * 
+ *
  * Service for sending email notifications using Symfony Mailer
  * Supports SMTP configuration for various email providers
  *
@@ -14,7 +16,6 @@
  */
 class NotificationService
 {
-
     /**
      * Symfony Mailer Dsn
      * @var string
@@ -34,40 +35,81 @@ class NotificationService
     private $fromName;
 
     /**
-     * Constructor
-     * 
-     * Load SMTP configuration from config.php
+     * Configuration Service
+     * @var ConfigurationService
      */
-    public function __construct()
+    private $configService;
+
+    /**
+     * Constructor
+     *
+     * Load SMTP configuration from database or config.php
+     */
+    public function __construct(ConfigurationService $configService = null)
     {
+        $this->configService = $configService;
         $this->loadConfiguration();
     }
 
     /**
      * Load mail configuration
-     * 
+     *
      * @return void
      */
     private function loadConfiguration()
     {
         $config = [];
-        
+
         if (file_exists(APP_ROOT . '/config.php')) {
             $config = require APP_ROOT . '/config.php';
         }
 
+        // Default from config.php
         $mailConfig = $config['mail'] ?? [];
         $smtp = $mailConfig['smtp'] ?? [];
-        
+
         $host = $smtp['host'] ?? 'smtp.example.com';
         $port = $smtp['port'] ?? 587;
         $encryption = $smtp['encryption'] ?? 'tls';
         $username = $smtp['username'] ?? '';
         $password = $smtp['password'] ?? '';
-        
+
         $from = $mailConfig['from'] ?? [];
         $this->fromEmail = $from['email'] ?? 'noreply@example.com';
         $this->fromName = $from['name'] ?? 'Application';
+
+        // Override with database settings if available
+        if ($this->configService) {
+            $dbHost = $this->configService->grabSettingByName('smtp_host');
+            $dbPort = $this->configService->grabSettingByName('smtp_port');
+            $dbEnc = $this->configService->grabSettingByName('smtp_encryption');
+            $dbUser = $this->configService->grabSettingByName('smtp_username');
+            $dbPass = $this->configService->grabSettingByName('smtp_password');
+            $dbFromEmail = $this->configService->grabSettingByName('smtp_from_email');
+            $dbFromName = $this->configService->grabSettingByName('smtp_from_name');
+
+            if (!empty($dbHost['setting_value'])) {
+                $host = $dbHost['setting_value'];
+            }
+            if (!empty($dbPort['setting_value'])) {
+                $port = (int)$dbPort['setting_value'];
+            }
+            if (!empty($dbEnc['setting_value'])) {
+                $encryption = $dbEnc['setting_value'];
+            }
+            if (!empty($dbUser['setting_value'])) {
+                $username = $dbUser['setting_value'];
+            }
+            if (!empty($dbPass['setting_value'])) {
+                $password = $dbPass['setting_value'];
+            }
+            if (!empty($dbFromEmail['setting_value'])) {
+                $this->fromEmail = $dbFromEmail['setting_value'];
+            }
+            if (!empty($dbFromName['setting_value'])) {
+                $this->fromName = $dbFromName['setting_value'];
+            }
+        }
 
         $this->dsn = sprintf(
             'smtp://%s:%s@%s:%d?encryption=%s',
@@ -81,7 +123,7 @@ class NotificationService
 
     /**
      * Send email notification
-     * 
+     *
      * @param string $to Email address to send to
      * @param string $subject Email subject
      * @param string $body Email body (HTML or plain text)
@@ -96,51 +138,14 @@ class NotificationService
         $replyTo = $options['reply_to'] ?? null;
 
         try {
-            
-            $transport = new \Symfony\Component\Mailer\Transport\DsnTransport(
-                new \Symfony\Component\Mailer\Dsn\Dsn(
-                    $this->dsn
-                ),
-                new \Symfony\Component\Mailer\Transport\SmtpTransport(
-                    new \Symfony\Component\Mailer\Transport\StreamBufferFactory(
-                        new \Symfony\Component\Mailer\Transport\StreamOptions()
-                    )
-                )
-            );
+            $mailer = $this->getMailer();
+            $email = $this->createEmail($to, $subject, $body, $isHtml);
 
-            $mailer = new \Symfony\Component\Mailer\Mailer($transport);
-
-            $email = (new \Symfony\Component\Mime\Email())
-                ->from($this->fromEmail, $this->fromName)
-                ->to($to)
-                ->subject($subject);
-
-            if ($isHtml) {
-                $email->html($body);
-            } else {
-                $email->text($body);
-            }
-
-            if (!empty($Cc)) {
-                foreach ($Cc as $cc) {
-                    $email->addCc($cc);
-                }
-            }
-
-            if (!empty($Bcc)) {
-                foreach ($Bcc as $bcc) {
-                    $email->addBcc($bcc);
-                }
-            }
-
-            if ($replyTo) {
-                $email->replyTo($replyTo);
-            }
+            $this->applyEmailOptions($email, $Cc, $Bcc, $replyTo);
 
             $mailer->send($email);
 
             return true;
-
         } catch (\Exception $e) {
             error_log('Email send failed: ' . $e->getMessage());
             return false;
@@ -148,8 +153,68 @@ class NotificationService
     }
 
     /**
+     * Get Mailer instance
+     *
+     * Protected to allow mocking in tests
+     *
+     * @return \Symfony\Component\Mailer\MailerInterface
+     */
+    protected function getMailer()
+    {
+        $transport = \Symfony\Component\Mailer\Transport::fromDsn($this->dsn);
+        return new \Symfony\Component\Mailer\Mailer($transport);
+    }
+
+    /**
+     * Create Email instance
+     *
+     * @param string $to
+     * @param string $subject
+     * @param string $body
+     * @param bool $isHtml
+     * @return \Symfony\Component\Mime\Email
+     */
+    protected function createEmail($to, $subject, $body, $isHtml = true)
+    {
+        $email = (new \Symfony\Component\Mime\Email())
+            ->from(new \Symfony\Component\Mime\Address($this->fromEmail, $this->fromName))
+            ->to($to)
+            ->subject($subject);
+
+        if ($isHtml) {
+            $email->html($body);
+        } else {
+            $email->text($body);
+        }
+
+        return $email;
+    }
+
+    /**
+     * Apply additional options to email
+     */
+    private function applyEmailOptions($email, $Cc, $Bcc, $replyTo)
+    {
+        if (!empty($Cc)) {
+            foreach ($Cc as $cc) {
+                $email->addCc($cc);
+            }
+        }
+
+        if (!empty($Bcc)) {
+            foreach ($Bcc as $bcc) {
+                $email->addBcc($bcc);
+            }
+        }
+
+        if ($replyTo) {
+            $email->replyTo($replyTo);
+        }
+    }
+
+    /**
      * Send GDPR data request confirmation email to user
-     * 
+     *
      * @param string $email User's email address
      * @param string $requestType Type of request (export/deletion)
      * @param string $requestId Request ID
@@ -158,7 +223,7 @@ class NotificationService
     public function sendDataRequestConfirmation($email, $requestType, $requestId)
     {
         $subject = 'Data ' . ucfirst($requestType) . ' Request Received';
-        
+
         $body = <<<HTML
 <!DOCTYPE html>
 <html>
@@ -198,7 +263,7 @@ HTML;
 
     /**
      * Send notification to admin about new data request
-     * 
+     *
      * @param string $adminEmail Admin email address
      * @param string $userEmail User's email address
      * @param string $requestType Type of request
@@ -208,7 +273,8 @@ HTML;
     public function sendAdminNotification($adminEmail, $userEmail, $requestType, $requestId)
     {
         $subject = 'New GDPR Data Request - ' . ucfirst($requestType);
-        
+        $date = date('Y-m-d H:i:s');
+
         $body = <<<HTML
 <!DOCTYPE html>
 <html>
@@ -232,7 +298,7 @@ HTML;
                 <li><strong>Request Type:</strong> {$requestType}</li>
                 <li><strong>User Email:</strong> {$userEmail}</li>
                 <li><strong>Request ID:</strong> #{$requestId}</li>
-                <li><strong>Date:</strong> {date('Y-m-d H:i:s')}</li>
+                <li><strong>Date:</strong> {$date}</li>
             </ul>
             <p>Please review and process this request in the admin panel.</p>
         </div>
@@ -246,7 +312,7 @@ HTML;
 
     /**
      * Send data request completion email
-     * 
+     *
      * @param string $email User's email address
      * @param string $requestType Type of request
      * @return bool
@@ -254,11 +320,11 @@ HTML;
     public function sendRequestCompleted($email, $requestType)
     {
         $subject = 'Your Data ' . ucfirst($requestType) . ' Request Has Been Processed';
-        
-        $actionText = ($requestType === 'deletion') 
-            ? 'Your personal data has been anonymized as requested.' 
+
+        $actionText = ($requestType === 'deletion')
+            ? 'Your personal data has been anonymized as requested.'
             : 'Your data export is ready for download.';
-        
+
         $body = <<<HTML
 <!DOCTYPE html>
 <html>
@@ -291,14 +357,14 @@ HTML;
 
     /**
      * Send profile deletion confirmation
-     * 
+     *
      * @param string $email User's email address
      * @return bool
      */
     public function sendProfileDeletionConfirmation($email)
     {
         $subject = 'Profile Deletion Confirmation';
-        
+
         $body = <<<HTML
 <!DOCTYPE html>
 <html>
@@ -332,13 +398,13 @@ HTML;
 
     /**
      * Get SMTP configuration (for admin settings page)
-     * 
+     *
      * @return array
      */
     public function getSmtpConfig()
     {
         $config = [];
-        
+
         if (file_exists(APP_ROOT . '/config.php')) {
             $config = require APP_ROOT . '/config.php';
         }

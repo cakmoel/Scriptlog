@@ -1,4 +1,6 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * UserService Class
  *
@@ -11,666 +13,642 @@
  */
 class UserService
 {
-    
- /**   
-  * User's ID
-  * @var integer
-  */
- private $user_id;
- 
- /**
-  * User Login
-  * @var string
-  */
- private $user_login;
- 
- /**
-  * User E-mail
-  * @var string
-  */
- private $user_email;
- 
- /**
-  * User password
-  * @var string
-  */
- private $user_pass;
+    /**
+     * User's ID
+     * @var integer
+     */
+    private $user_id;
 
- /**
-  * User level
-  * @var string
-  */
- private $user_level;
+    /**
+     * User Login
+     * @var string
+     */
+    private $user_login;
 
- /**
-  * User fullname
-  * @var string
-  */
- private $user_fullname;
- 
- /**
-  * User url
-  * @var string
-  */
- private $user_url;
- 
- /**
-  * user activation key
-  * @var string
-  */
- private $user_activation_key;
+    /**
+     * User E-mail
+     * @var string
+     */
+    private $user_email;
 
-/**
- * Password validator for cookies
- *
- * @var string
- * 
- */
- private $pwd_hash;
+    /**
+     * User password
+     * @var string
+     */
+    private $user_pass;
 
-/**
- * Selector validator for cookies
- *
- * @var string
- * 
- */
- private $selector_hash;
+    /**
+     * User level
+     * @var string
+     */
+    private $user_level;
 
-/**
- * Cookie expired date
- *
- * @var string
- * 
- */
- private $cookie_expired_date;
- 
- /**
-  * user session
-  * @var string
-  */
- private $user_session;
+    /**
+     * User fullname
+     * @var string
+     */
+    private $user_fullname;
 
-/**
- * user_banned
- *
- * @var int|numeric
- */
- private $user_banned;
+    /**
+     * User url
+     * @var string
+     */
+    private $user_url;
 
-/**
- * userDao
- *
- * @var object
- * 
- */
- private $userDao; 
+    /**
+     * user activation key
+     * @var string
+     */
+    private $user_activation_key;
 
-/**
- * userToken
- *
- * @var object
- * 
- */
- private $userToken; 
- 
-/**
- * validator
- *
- * @var object
- * 
- */
- private $validator; 
- 
-/**
- * sanitize
- *
- * @var object
- * 
- */
- private $sanitize;
+    /**
+     * Password validator for cookies
+     *
+     * @var string
+     *
+     */
+    private $pwd_hash;
 
- /**
-  * key
-  *
-  * @var string
-  */
- private $key;
+    /**
+     * Selector validator for cookies
+     *
+     * @var string
+     *
+     */
+    private $selector_hash;
 
- /**
-  * validator_verified
-  *
-  * @var boolean
-  */
- private $validator_verified = false;
+    /**
+     * Cookie expired date
+     *
+     * @var string
+     *
+     */
+    private $cookie_expired_date;
 
- /**
-  * selector_verified
-  *
-  * @var boolean
-  */
- private $selector_verified = false;
+    /**
+     * user session
+     * @var string
+     */
+    private $user_session;
 
- /**
-  * expired_verified
-  *
-  * @var boolean
-  */
- private $expired_verified = false;
+    /**
+     * user_banned
+     *
+     * @var int|numeric
+     */
+    private $user_banned;
 
- /**
-  * @method __constructor()
-  * 
-  */
- public function __construct(UserDao $userDao, FormValidator $validator, UserTokenDao $userToken, Sanitize $sanitize)
- {
-    $this->userDao = $userDao;
+    /**
+     * userDao
+     *
+     * @var object
+     *
+     */
+    private $userDao;
 
-    $this->userToken = $userToken;
+    /**
+     * userToken
+     *
+     * @var object
+     *
+     */
+    private $userToken;
 
-    $this->validator = $validator;
-    
-    $this->sanitize = $sanitize;
+    /**
+     * validator
+     *
+     * @var object
+     *
+     */
+    private $validator;
 
-    if (Registry::isKeySet('key')) {
+    /**
+     * sanitize
+     *
+     * @var object
+     *
+     */
+    private $sanitize;
 
-      $this->key = Registry::get('key');
+    /**
+     * key
+     *
+     * @var string
+     */
+    private $key;
 
+    /**
+     * validator_verified
+     *
+     * @var boolean
+     */
+    private $validator_verified = false;
+
+    /**
+     * selector_verified
+     *
+     * @var boolean
+     */
+    private $selector_verified = false;
+
+    /**
+     * expired_verified
+     *
+     * @var boolean
+     */
+    private $expired_verified = false;
+
+    /**
+     * @method __constructor()
+     *
+     */
+    public function __construct(UserDao $userDao, FormValidator $validator, UserTokenDao $userToken, Sanitize $sanitize)
+    {
+        $this->userDao = $userDao;
+
+        $this->userToken = $userToken;
+
+        $this->validator = $validator;
+
+        $this->sanitize = $sanitize;
+
+        if (Registry::isKeySet('key')) {
+            $this->key = Registry::get('key');
+        }
     }
 
- }
-
-/**
- * set user Id
- *
- * @method public setUserId()
- * @param int $userId
- * 
- */
- public function setUserId($userId)
- {
-   $this->user_id = $userId;   
- }
- 
- /**
-  * Set user login
-  *
-  * @param string $user_login
-  *
-  */
- public function setUserLogin($user_login)
- {
-   $this->user_login = remove_accents($user_login);
- }
- 
- /**
-  * Set user email
-  * @param string $user_email
-  *
-  */
- public function setUserEmail($user_email)
- {
-   $this->user_email = $user_email;
- }
- 
-/**
- * Set user password
- * @param string $user_pass
- */
- public function setUserPass($user_pass)
- {
-   $this->user_pass = $user_pass;
- }
-
-/**
- * setPwdHash
- * set password hash validator for cookies
- * 
- * @param string $pwd_hash
- * 
- */
- public function setPwdHash($pwd_hash)
- {
-   $this->pwd_hash = $pwd_hash;
- }
-
-/**
- * setSelectorHash
- * set selector hash validator for cookies
- *
- * @param string $selector_hash
- * 
- */
- public function setSelectorHash($selector_hash)
- {
-   $this->selector_hash = $selector_hash;
- }
-
- public function setCookieExpireDate($cookie_expired_date)
- {
-   $this->cookie_expired_date = $cookie_expired_date;
- }
-
-/**
- * Set user level
- * @param string $user_level
- */
- public function setUserLevel($user_level)
- {
-   $this->user_level = $user_level;
- }
-
-/**
- * Set user fullname
- * @param string $user_fullname
- */
- public function setUserFullname($user_fullname)
- {
-   $this->user_fullname = $user_fullname;
- }
-
-/**
- * SetUserUrl
- * 
- * @method public setUserUrl()
- * @param string $user_url
- * 
- */
- public function setUserUrl($user_url)
- {
-   $this->user_url = $user_url;
- }
-
-/**
- * SetUserActivationKey
- * 
- * @method public setUserActivationKey($activation_key)
- * @param string $activation_key
- * 
- */
- public function setUserActivationKey($activation_key)
- {
-   $this->user_activation_key = $activation_key;
- }
- 
-/**
- * SetUserSession()
- * @param string $user_session
- * 
- */
- public function setUserSession($user_session)
- {
-   $this->user_session = $user_session;
- }
- 
-/**
- * setUserBanned
- *
- * @param strin $user_banned
- */
- public function setUserBanned($user_banned)
- {
-   $this->user_banned = $user_banned;
- }
-
-/**
- * Retrieving All records from table users
- *
- * @method public grabUsers()
- * @param string $orderBy
- * @param static PDO::FETCH_MODE $fetchMode
- * @return array
- * 
- */
- public function grabUsers($orderBy = 'ID', $fetchMode = null)
- {
-   $orderBySanitized = function_exists('sanitize_sql_orderby') ? sanitize_sql_orderby($orderBy) : ""; 
-   return $this->userDao->getUsers($orderBySanitized, $fetchMode);    
- }
- 
- /**
-  * grabUser
-  *
-  * @param string $userId
-  * @param static PDO::FETCH_MODE $fetchMode
-  * @return array
-  */
- public function grabUser($userId, $fetchMode = null)
- {
-   return $this->userDao->getUserById($userId, $this->sanitize, $fetchMode);
- }
-
- /**
-  * grabUserByLogin
-  *
-  * @param string $user_login
-  * @param static PDO::FETCH_MODE $fetchMode 
-  * @return array
-  */
- public function grabUserByLogin($user_login, $fetchMode = null)
- {
-   return $this->userDao->getUserByLogin($user_login, $fetchMode);
- }
-
- /**
-  * grabTokenByLogin
-  *
-  * @param string $login
-  * @param string $expired
-  * @param static PDO::FETCH_MODE $fetchMode
-  * @return array
-  */
- public function grabTokenByLogin($login, $expired, $fetchMode = null)
- {
-   return $this->userToken->getTokenByLogin($login, $expired, $fetchMode);
- }
-
-/**
- * addUser
- *
- */
- public function addUser()
- {
-   
-  $this->validator->sanitize($this->user_login, 'string');
-  $this->validator->sanitize($this->user_fullname, 'string');
-  $this->validator->sanitize($this->user_email, 'email');
-
-    if (empty($this->user_activation_key)) {
-           
-        return $this->userDao->createUser([
-
-            'user_login' => $this->user_login,
-            'user_email' => $this->user_email,
-            'user_pass'  => $this->user_pass,
-            'user_level' => $this->user_level,
-            'user_fullname' => $this->user_fullname,
-            'user_url' => $this->user_url,
-            'user_registered' => date("Y-m-d H:i:s"),
-            'user_session' => $this->user_session
-
-        ]);
-        
-    } else {
-        
-        return $this->userDao->createUser([
-
-            'user_login' => $this->user_login,
-            'user_email' => $this->user_email,
-            'user_pass'  => $this->user_pass,
-            'user_level' => $this->user_level,
-            'user_fullname' => $this->user_fullname,
-            'user_url' => $this->user_url,
-            'user_activation_key' => $this->user_activation_key,
-            'user_session' => $this->user_session
-
-        ]);
-        
+    /**
+     * set user Id
+     *
+     * @method public setUserId()
+     * @param int $userId
+     *
+     */
+    public function setUserId($userId)
+    {
+        $this->user_id = $userId;
     }
-    
- }
 
-/**
- * modifyUser
- * 
- */
- public function modifyUser()
- {
-  
-  $this->validator->sanitize($this->user_url, 'url');
-  $this->validator->sanitize($this->user_fullname, 'string');
-  $this->validator->sanitize($this->user_email, 'email');
-  
-  $secret = ScriptlogCryptonize::generateSecretKey();
+    /**
+     * Set user login
+     *
+     * @param string $user_login
+     *
+     */
+    public function setUserLogin($user_login)
+    {
+        $this->user_login = remove_accents($user_login);
+    }
 
-  if ($this->isUserLevel() != 'administrator') {
-   
-       if (!empty($this->user_pass)) {
-           
-           $bind = [
-               'user_email'    => $this->user_email,
-               'user_pass'     => $this->user_pass,
-               'user_fullname' => $this->user_fullname,
-               'user_url'      => $this->user_url
-              ];
+    /**
+     * Set user email
+     * @param string $user_email
+     *
+     */
+    public function setUserEmail($user_email)
+    {
+        $this->user_email = $user_email;
+    }
 
-       } else {
-           
-           $bind = [
-               'user_email'    => $this->user_email,
-               'user_fullname' => $this->user_fullname,
-               'user_url'      => $this->user_url
-           ];
-           
-       }
-   
-   } else {
-       
-       if (!empty($this->user_pass)) {
-           
-           $bind = [
-               'user_email' => $this->user_email,
-               'user_pass' => $this->user_pass,
-               'user_level' => $this->user_level,
-               'user_fullname' => $this->user_fullname,
-               'user_url' => $this->user_url,
-               'user_banned' => $this->user_banned
-           ];
-           
-       } else {
-           
-           $bind = [
-               'user_email' => $this->user_email,
-               'user_level' => $this->user_level,
-               'user_fullname' => $this->user_fullname,
-               'user_url' => $this->user_url,
-               'user_banned' => $this->user_banned
-           ];
-           
-       }
-       
-   }
+    /**
+     * Set user password
+     * @param string $user_pass
+     */
+    public function setUserPass($user_pass)
+    {
+        $this->user_pass = $user_pass;
+    }
 
-   if ($this->identifyCookieToken($secret)) {
- 
-      $bind_meta = ['pwd_hash' => $this->pwd_hash, 'selector_hash' => $this->selector_hash, 'expired_date' => $this->cookie_expired_date];
+    /**
+     * setPwdHash
+     * set password hash validator for cookies
+     *
+     * @param string $pwd_hash
+     *
+     */
+    public function setPwdHash($pwd_hash)
+    {
+        $this->pwd_hash = $pwd_hash;
+    }
 
-      $this->userToken->updateUserToken($bind_meta, $this->user_login);
+    /**
+     * setSelectorHash
+     * set selector hash validator for cookies
+     *
+     * @param string $selector_hash
+     *
+     */
+    public function setSelectorHash($selector_hash)
+    {
+        $this->selector_hash = $selector_hash;
+    }
 
-   }
+    public function setCookieExpireDate($cookie_expired_date)
+    {
+        $this->cookie_expired_date = $cookie_expired_date;
+    }
 
-   return $this->userDao->updateUser($this->isUserLevel(), $this->sanitize, $bind, $this->user_id);
+    /**
+     * Set user level
+     * @param string $user_level
+     */
+    public function setUserLevel($user_level)
+    {
+        $this->user_level = $user_level;
+    }
 
- }
- 
-/**
- * modifyTokenExpired
- *
- * @param integer $userTokenId
- * 
- */
- public function modifyTokenExpired($userTokenId)
- {
-   return $this->userToken->updateTokenExpired($userTokenId);
- }
+    /**
+     * Set user fullname
+     * @param string $user_fullname
+     */
+    public function setUserFullname($user_fullname)
+    {
+        $this->user_fullname = $user_fullname;
+    }
 
-/**
- * removeUser
- * 
- * remove user from record
- * 
- */
- public function removeUser()
- {
-   $this->validator->sanitize($this->user_id, 'int');
-   return $this->userDao->deleteUser($this->user_id, $this->sanitize); 
- }
+    /**
+     * SetUserUrl
+     *
+     * @method public setUserUrl()
+     * @param string $user_url
+     *
+     */
+    public function setUserUrl($user_url)
+    {
+        $this->user_url = $user_url;
+    }
 
- /**
-  * removeUserWithAnonymization
-  * 
-  * Remove user and anonymize their data (GDPR compliance)
-  * This preserves data integrity while respecting Right to be Forgotten
-  * 
-  * @param int $userId
-  * @param string $userEmail
-  * @return bool
-  */
- public function removeUserWithAnonymization($userId, $userEmail = null)
- {
-     $this->validator->sanitize($userId, 'int');
-     
-     if ($userEmail) {
-         $commentDao = new CommentDao();
-         $commentDao->anonymizeCommentsByEmail($userEmail);
-         
-         $postDao = new PostDao();
-         $postDao->anonymizePostAuthor($userId);
-         
-         $this->anonymizeUserData($userId);
-     }
-     
-     return $this->userDao->deleteUser($userId, $this->sanitize);
- }
+    /**
+     * SetUserActivationKey
+     *
+     * @method public setUserActivationKey($activation_key)
+     * @param string $activation_key
+     *
+     */
+    public function setUserActivationKey($activation_key)
+    {
+        $this->user_activation_key = $activation_key;
+    }
 
- /**
-  * Anonymize user record
-  * 
-  * @param int $userId
-  * @return bool
-  */
- private function anonymizeUserData($userId)
- {
-     $sql = "UPDATE tbl_users SET 
+    /**
+     * SetUserSession()
+     * @param string $user_session
+     *
+     */
+    public function setUserSession($user_session)
+    {
+        $this->user_session = $user_session;
+    }
+
+    /**
+     * setUserBanned
+     *
+     * @param strin $user_banned
+     */
+    public function setUserBanned($user_banned)
+    {
+        $this->user_banned = $user_banned;
+    }
+
+    /**
+     * Retrieving All records from table users
+     *
+     * @method public grabUsers()
+     * @param string $orderBy
+     * @param static PDO::FETCH_MODE $fetchMode
+     * @return array
+     *
+     */
+    public function grabUsers($orderBy = 'ID', $fetchMode = null)
+    {
+        $orderBySanitized = function_exists('sanitize_sql_orderby') ? sanitize_sql_orderby($orderBy) : "";
+        return $this->userDao->getUsers($orderBySanitized, $fetchMode);
+    }
+
+    /**
+     * grabUser
+     *
+     * @param string $userId
+     * @param static PDO::FETCH_MODE $fetchMode
+     * @return array
+     */
+    public function grabUser($userId, $fetchMode = null)
+    {
+        return $this->userDao->getUserById($userId, $this->sanitize, $fetchMode);
+    }
+
+    /**
+     * grabUserByLogin
+     *
+     * @param string $user_login
+     * @param static PDO::FETCH_MODE $fetchMode
+     * @return array
+     */
+    public function grabUserByLogin($user_login, $fetchMode = null)
+    {
+        return $this->userDao->getUserByLogin($user_login, $fetchMode);
+    }
+
+    /**
+     * grabTokenByLogin
+     *
+     * @param string $login
+     * @param string $expired
+     * @param static PDO::FETCH_MODE $fetchMode
+     * @return array
+     */
+    public function grabTokenByLogin($login, $expired, $fetchMode = null)
+    {
+        return $this->userToken->getTokenByLogin($login, $expired, $fetchMode);
+    }
+
+    /**
+     * addUser
+     *
+     */
+    public function addUser()
+    {
+
+        $this->validator->sanitize($this->user_login, 'string');
+        $this->validator->sanitize($this->user_fullname, 'string');
+        $this->validator->sanitize($this->user_email, 'email');
+
+        if (empty($this->user_activation_key)) {
+            return $this->userDao->createUser([
+
+                'user_login' => $this->user_login,
+                'user_email' => $this->user_email,
+                'user_pass'  => $this->user_pass,
+                'user_level' => $this->user_level,
+                'user_fullname' => $this->user_fullname,
+                'user_url' => $this->user_url,
+                'user_registered' => date("Y-m-d H:i:s"),
+                'user_session' => $this->user_session
+
+            ]);
+        } else {
+            return $this->userDao->createUser([
+
+                'user_login' => $this->user_login,
+                'user_email' => $this->user_email,
+                'user_pass'  => $this->user_pass,
+                'user_level' => $this->user_level,
+                'user_fullname' => $this->user_fullname,
+                'user_url' => $this->user_url,
+                'user_activation_key' => $this->user_activation_key,
+                'user_session' => $this->user_session
+
+            ]);
+        }
+    }
+
+    /**
+     * modifyUser
+     *
+     */
+    public function modifyUser()
+    {
+
+        $this->validator->sanitize($this->user_url, 'url');
+        $this->validator->sanitize($this->user_fullname, 'string');
+        $this->validator->sanitize($this->user_email, 'email');
+
+        $secret = ScriptlogCryptonize::generateSecretKey();
+
+        if ($this->isUserLevel() != 'administrator') {
+            if (!empty($this->user_pass)) {
+                $bind = [
+                    'user_email'    => $this->user_email,
+                    'user_pass'     => $this->user_pass,
+                    'user_fullname' => $this->user_fullname,
+                    'user_url'      => $this->user_url
+                   ];
+            } else {
+                $bind = [
+                    'user_email'    => $this->user_email,
+                    'user_fullname' => $this->user_fullname,
+                    'user_url'      => $this->user_url
+                ];
+            }
+        } else {
+            if (!empty($this->user_pass)) {
+                $bind = [
+                    'user_email' => $this->user_email,
+                    'user_pass' => $this->user_pass,
+                    'user_level' => $this->user_level,
+                    'user_fullname' => $this->user_fullname,
+                    'user_url' => $this->user_url,
+                    'user_banned' => $this->user_banned
+                ];
+            } else {
+                $bind = [
+                    'user_email' => $this->user_email,
+                    'user_level' => $this->user_level,
+                    'user_fullname' => $this->user_fullname,
+                    'user_url' => $this->user_url,
+                    'user_banned' => $this->user_banned
+                ];
+            }
+        }
+
+        if ($this->identifyCookieToken($secret)) {
+            $bind_meta = ['pwd_hash' => $this->pwd_hash, 'selector_hash' => $this->selector_hash, 'expired_date' => $this->cookie_expired_date];
+
+            $this->userToken->updateUserToken($bind_meta, $this->user_login);
+        }
+
+        return $this->userDao->updateUser($this->isUserLevel(), $this->sanitize, $bind, $this->user_id);
+    }
+
+    /**
+     * modifyTokenExpired
+     *
+     * @param integer $userTokenId
+     *
+     */
+    public function modifyTokenExpired($userTokenId)
+    {
+        return $this->userToken->updateTokenExpired($userTokenId);
+    }
+
+    /**
+     * removeUser
+     *
+     * remove user from record
+     *
+     */
+    public function removeUser()
+    {
+        $this->validator->sanitize($this->user_id, 'int');
+        return $this->userDao->deleteUser($this->user_id, $this->sanitize);
+    }
+
+    /**
+     * removeUserWithAnonymization
+     *
+     * Remove user and anonymize their data (GDPR compliance)
+     * This preserves data integrity while respecting Right to be Forgotten
+     *
+     * @param int $userId
+     * @param string $userEmail
+     * @return bool
+     */
+    public function removeUserWithAnonymization($userId, $userEmail = null)
+    {
+        $this->validator->sanitize($userId, 'int');
+
+        if ($userEmail) {
+            $commentDao = new CommentDao();
+            $commentDao->anonymizeCommentsByEmail($userEmail);
+
+            $postDao = new PostDao();
+            $postDao->anonymizePostAuthor($userId);
+
+            $this->anonymizeUserData($userId);
+        }
+
+        return $this->userDao->deleteUser($userId, $this->sanitize);
+    }
+
+    /**
+     * Anonymize user record
+     *
+     * @param int $userId
+     * @return bool
+     */
+    private function anonymizeUserData($userId)
+    {
+        $sql = "UPDATE tbl_users SET 
              user_email = CONCAT('deleted_', ID, '@user.local'),
              user_fullname = 'Deleted User',
              user_url = '#'
              WHERE ID = ?";
-     
-     $this->userDao->setSQL($sql);
-     $this->userDao->getDbc()->dbQuery($sql, [(int)$userId]);
-     
-     return true;
- }
- 
- /**
-  * User Level DropDown
-  * 
-  * @param string $selected
-  * @return string
-  */
- public function userLevelDropDown($selected = "") 
- {
-    return $this->userDao->dropDownUserLevel($selected);
- }
 
- /**
-  * Checking User login
-  * @param string $user_login
-  * @return boolean
-  *
-  */
- public function checkUserLogin($user_login)
- {
-    return $this->userDao->isUserLoginExists($user_login);
- }
+        $this->userDao->setSQL($sql);
+        $this->userDao->getDbc()->dbQuery($sql, [(int)$userId]);
 
- /**
-  * Whether email address exists or not
-  *
-  * @param string $user_email
-  * @return boolean
-  */
- public function isEmailExists($user_email)
- {
-   return $this->userDao->checkUserEmail($user_email);    
- }
- 
-/**
- * isUserLevel
- * Check whether user level session defined or not
- * if defined then return it
- * 
- * @method public isUserLevel()
- * @return boolean
- * 
- */ 
- public function isUserLevel()
- {
-  return user_privilege();
- }
+        return true;
+    }
 
-/**
- * reAuthenticateUserPrivilege
- *
- * @param string $login
- * @param string $password
- * @return bool
- * 
- */
-public function reAuthenticateUserPrivilege($login, $password)
-{
-  return $this->userDao->checkUserPassword($login, $password);
-}
+    /**
+     * User Level DropDown
+     *
+     * @param string $selected
+     * @return string
+     */
+    public function userLevelDropDown($selected = "")
+    {
+        return $this->userDao->dropDownUserLevel($selected);
+    }
 
-/**
- * identifyCookieToken
- * 
- * Checking whether a session cookies defined or not
- * if defined then return it
- *
- * @method public identifyUserLogin()
- * @return bool
- * 
- */
- public function identifyCookieToken($secret)
- {
+    /**
+     * Checking User login
+     * @param string $user_login
+     * @return boolean
+     *
+     */
+    public function checkUserLogin($user_login)
+    {
+        return $this->userDao->isUserLoginExists($user_login);
+    }
 
-   $this->user_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $this->key) : Session::getInstance()->scriptlog_session_login;
+    /**
+     * Whether email address exists or not
+     *
+     * @param string $user_email
+     * @return boolean
+     */
+    public function isEmailExists($user_email)
+    {
+        return $this->userDao->checkUserEmail($user_email);
+    }
 
-   if ((isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector']))) {
+    /**
+     * isUserLevel
+     * Check whether user level session defined or not
+     * if defined then return it
+     *
+     * @method public isUserLevel()
+     * @return boolean
+     *
+     */
+    public function isUserLevel()
+    {
+        return user_privilege();
+    }
 
-      //retrieve user token info
-      $token_info = $this->grabTokenByLogin($this->user_login, 0);
+    /**
+     * reAuthenticateUserPrivilege
+     *
+     * @param string $login
+     * @param string $password
+     * @return bool
+     *
+     */
+    public function reAuthenticateUserPrivilege($login, $password)
+    {
+        return $this->userDao->checkUserPassword($login, $password);
+    }
 
-      $expected_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
-      $correct_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
+    /**
+     * identifyCookieToken
+     *
+     * Checking whether a session cookies defined or not
+     * if defined then return it
+     *
+     * @method public identifyUserLogin()
+     * @return bool
+     *
+     */
+    public function identifyCookieToken($secret)
+    {
 
-      $expected_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
-      $correct_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
+        $this->user_login = '';
+        if (isset($_COOKIE['scriptlog_auth'])) {
+            try {
+                $this->user_login = ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], ScriptlogCryptonize::scriptlogCipherKey());
+            } catch (Throwable $e) {
+                $this->user_login = Session::getInstance()->scriptlog_session_login;
+            }
+        } else {
+            $this->user_login = Session::getInstance()->scriptlog_session_login;
+        }
 
-      if (hash_equals($expected_validator, $correct_validator) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']))) {
+        if ((isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector']))) {
+            //retrieve user token info
+            $token_info = $this->grabTokenByLogin($this->user_login, 0);
 
-        $this->validator_verified = true;
-      } 
+            $expected_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
+            $correct_validator = crypt($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']);
 
-      if (hash_equals($expected_selector, $correct_selector) && (Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret))) {
+            $expected_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
+            $correct_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
 
-        $this->selector_verified = true;
+            if (hash_equals($expected_validator, $correct_validator) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']))) {
+                $this->validator_verified = true;
+            }
 
-      }
+            if (hash_equals($expected_selector, $correct_selector) && (Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret))) {
+                $this->selector_verified = true;
+            }
 
-      if ($token_info['expired_date'] >= date("Y-m-d H:i:s", time())) {
+            if ($token_info['expired_date'] >= date("Y-m-d H:i:s", time())) {
+                $this->expired_verified = true;
+            }
 
-        $this->expired_verified = true;
+            return (!empty($token_info['ID'])) && $this->validator_verified && $this->selector_verified && $this->expired_verified ? true : false;
+        }
+    }
 
-      }
-
-      return (!empty($token_info['ID'])) && $this->validator_verified && $this->selector_verified && $this->expired_verified ? true : false;
-      
-   }
-
- }
-
-/**
- * Total User recorded
- * 
- * @param array $data
- * @return integer
- * 
- */
- public function totalUsers(array $data = []): ?int
- {
-  return $this->userDao->totalUserRecords($data);
- }
- 
+    /**
+     * Total User recorded
+     *
+     * @param array $data
+     * @return integer
+     *
+     */
+    public function totalUsers(array $data = []): ?int
+    {
+        return $this->userDao->totalUserRecords($data);
+    }
 }
