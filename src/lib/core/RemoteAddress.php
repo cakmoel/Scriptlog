@@ -1,13 +1,15 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class RemoteAddress
- * 
+ *
  * @category  Core Class
  * @see https://github.com/zendframework/zend-http for the canonical source repository
  * @see https://framework.zend.com/apidoc/2.1/classes/Zend.Http.PhpEnvironment.RemoteAddress.html
  * @copyright Copyright (c) 2005-2017 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   https://github.com/zendframework/zend-http/blob/master/LICENSE.md New BSD License
- * 
+ *
  */
 class RemoteAddress
 {
@@ -114,7 +116,8 @@ class RemoteAddress
      */
     protected function getIpAddressFromProxy()
     {
-        if (! $this->useProxy
+        if (
+            ! $this->useProxy
             || (isset($_SERVER['REMOTE_ADDR']) && ! in_array($_SERVER['REMOTE_ADDR'], $this->trustedProxies))
         ) {
             return false;

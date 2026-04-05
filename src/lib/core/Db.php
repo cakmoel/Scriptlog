@@ -1,10 +1,12 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted.");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted.");
 /**
  * Class Db implements DbInterface
- * 
+ *
  * This class provides a database abstraction layer using PDO with MySQL functionality.
  * It implements all methods defined in DbInterface for consistent database operations.
- * 
+ *
  * @category  Core Class
  * @author    M.Noermoehammad
  * @license   MIT
@@ -18,33 +20,34 @@ class Db implements DbInterface
 {
     /**
      * PDO database connection instance
-     * 
+     *
      * @var PDO|null
      */
     private ?PDO $dbc = null;
 
     /**
      * Path to SSL CA certificate file for secure connections
-     * 
+     *
      * @var string|null
      */
     private ?string $caPath = null;
 
     /**
      * Table name prefix
-     * 
+     *
      * @var string
      */
     private string $tablePrefix = '';
 
     /**
      * Known table names for prefix replacement
-     * 
+     *
      * @var array
      */
     private array $knownTables = [
         'tbl_users',
         'tbl_user_token',
+        'tbl_login_attempt',
         'tbl_posts',
         'tbl_topics',
         'tbl_post_topic',
@@ -55,12 +58,19 @@ class Db implements DbInterface
         'tbl_menu',
         'tbl_plugin',
         'tbl_settings',
-        'tbl_themes'
+        'tbl_themes',
+        'tbl_consents',
+        'tbl_data_requests',
+        'tbl_privacy_logs',
+        'tbl_privacy_policies',
+        'tbl_languages',
+        'tbl_translations',
+        'tbl_download_log'
     ];
 
     /**
      * Constructor - Initializes the database connection if config is provided
-     * 
+     *
      * @param array $config Database configuration [DSN, username, password]
      * @param array $options Additional PDO connection options
      */
@@ -73,7 +83,7 @@ class Db implements DbInterface
 
     /**
      * Set table prefix
-     * 
+     *
      * @param string $prefix
      */
     public function setTablePrefix(string $prefix): void
@@ -83,7 +93,7 @@ class Db implements DbInterface
 
     /**
      * Get table prefix
-     * 
+     *
      * @return string
      */
     public function getTablePrefix(): string
@@ -93,7 +103,7 @@ class Db implements DbInterface
 
     /**
      * Establishes a database connection using PDO
-     * 
+     *
      * @param array $config Database configuration [DSN, username, password]
      * @param array $options Additional PDO connection options
      * @return void
@@ -112,7 +122,6 @@ class Db implements DbInterface
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES   => false,
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_general_ci',
         ];
 
         if ($this->caPath) {
@@ -128,7 +137,7 @@ class Db implements DbInterface
 
     /**
      * Checks if database connection is active
-     * 
+     *
      * @return bool True if connected, false otherwise
      */
     public function isConnected(): bool
@@ -138,7 +147,7 @@ class Db implements DbInterface
 
     /**
      * Closes the database connection
-     * 
+     *
      * @return void
      */
     public function closeDbConnection(): void
@@ -148,7 +157,7 @@ class Db implements DbInterface
 
     /**
      * Ensures database connection is established before operations
-     * 
+     *
      * @return void
      * @throws RuntimeException If connection is not established
      */
@@ -161,7 +170,7 @@ class Db implements DbInterface
 
     /**
      * Executes a database query and returns the statement
-     * 
+     *
      * @param string $sql SQL query to execute
      * @param array $args Parameters for prepared statement
      * @return PDOStatement Executed statement
@@ -178,7 +187,7 @@ class Db implements DbInterface
 
     /**
      * Executes a SELECT query and returns results
-     * 
+     *
      * @param string $sql SQL SELECT query
      * @param array $parameters Query parameters
      * @param int $fetchMode PDO fetch mode (default: PDO::FETCH_OBJ)
@@ -201,7 +210,7 @@ class Db implements DbInterface
 
     /**
      * Inserts a new record into the specified table
-     * 
+     *
      * @param string $tablename Name of the table
      * @param array $params Associative array of column => value pairs
      * @return bool True on success, false on failure
@@ -235,7 +244,7 @@ class Db implements DbInterface
 
     /**
      * Returns the last inserted ID
-     * 
+     *
      * @return string Last inserted row ID
      * @throws RuntimeException If connection is not established
      */
@@ -247,7 +256,7 @@ class Db implements DbInterface
 
     /**
      * Updates records in the specified table
-     * 
+     *
      * @param string $tablename Name of the table
      * @param array $params Associative array of column => value pairs to update
      * @param array $where Associative array of conditions for WHERE clause
@@ -266,8 +275,8 @@ class Db implements DbInterface
         // Apply prefix to table name
         $tablename = $this->applyTablePrefix($tablename);
 
-        $setClause = implode(", ", array_map(fn($key) => "$key = ?", array_keys($params)));
-        $whereClause = implode(" AND ", array_map(fn($key) => "$key = ?", array_keys($where)));
+        $setClause = implode(", ", array_map(fn ($key) => "$key = ?", array_keys($params)));
+        $whereClause = implode(" AND ", array_map(fn ($key) => "$key = ?", array_keys($where)));
 
         $sql = "UPDATE `$tablename` SET $setClause WHERE $whereClause";
 
@@ -279,9 +288,9 @@ class Db implements DbInterface
 
     /**
      * Performs an INSERT or UPDATE (upsert) operation
-     * 
+     *
      * Inserts a new record or updates existing one if duplicate key exists
-     * 
+     *
      * @param string $tablename Name of the table
      * @param array $params Associative array of column => value pairs for insert
      * @param array $updateParams Associative array of column => value pairs for update
@@ -304,7 +313,7 @@ class Db implements DbInterface
         $placeholders = array_fill(0, count($fields), '?');
 
         $updateFields = array_keys($updateParams);
-        $updateAssignments = implode(", ", array_map(fn($field) => "$field = ?", $updateFields));
+        $updateAssignments = implode(", ", array_map(fn ($field) => "$field = ?", $updateFields));
 
         $sql = sprintf(
             "INSERT INTO `%s` (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s",
@@ -320,7 +329,7 @@ class Db implements DbInterface
 
     /**
      * Deletes records from the specified table
-     * 
+     *
      * @param string $tablename Name of the table
      * @param array $where Associative array of conditions for WHERE clause
      * @param int|null $limit Optional maximum number of rows to delete
@@ -339,7 +348,7 @@ class Db implements DbInterface
         // Apply prefix to table name
         $tablename = $this->applyTablePrefix($tablename);
 
-        $whereClause = implode(" AND ", array_map(fn($key) => "$key = ?", array_keys($where)));
+        $whereClause = implode(" AND ", array_map(fn ($key) => "$key = ?", array_keys($where)));
 
         $sql = "DELETE FROM `$tablename` WHERE $whereClause";
 
@@ -355,7 +364,7 @@ class Db implements DbInterface
 
     /**
      * Begins a transaction
-     * 
+     *
      * @return bool True on success, false on failure
      * @throws RuntimeException If connection is not established
      */
@@ -367,7 +376,7 @@ class Db implements DbInterface
 
     /**
      * Commits a transaction
-     * 
+     *
      * @return bool True on success, false on failure
      * @throws RuntimeException If connection is not established
      */
@@ -379,7 +388,7 @@ class Db implements DbInterface
 
     /**
      * Rolls back a transaction
-     * 
+     *
      * @return bool True on success, false on failure
      * @throws RuntimeException If connection is not established
      */
@@ -391,7 +400,7 @@ class Db implements DbInterface
 
     /**
      * Apply table prefix to SQL query
-     * 
+     *
      * @param string $sql
      * @return string
      */

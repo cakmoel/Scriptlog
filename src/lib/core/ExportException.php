@@ -2,9 +2,9 @@
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * Class ImportException
+ * Class ExportException
  *
- * Custom exception for import operations
+ * Custom exception for export operations
  *
  * @category  Core Class
  * @author    M.Noermoehammad
@@ -13,7 +13,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
-class ImportException extends CoreException
+class ExportException extends CoreException
 {
     public function __construct($message = "", $code = 0, Throwable $previous = null)
     {
