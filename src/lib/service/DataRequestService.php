@@ -1,7 +1,9 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * DataRequestService Class
- * 
+ *
  * Service layer for GDPR data requests (access, deletion)
  *
  * @category  Service Class
@@ -13,7 +15,6 @@
  */
 class DataRequestService
 {
-
     /**
      * DataRequestDao
      * @var DataRequestDao
@@ -40,22 +41,23 @@ class DataRequestService
 
     /**
      * Constructor
-     * 
+     *
      * @param DataRequestDao $dataRequestDao
      * @param PrivacyLogDao $privacyLogDao
      * @param Sanitize $sanitizer
+     * @param ConfigurationService|null $configService
      */
-    public function __construct(DataRequestDao $dataRequestDao, PrivacyLogDao $privacyLogDao, Sanitize $sanitizer)
+    public function __construct(DataRequestDao $dataRequestDao, PrivacyLogDao $privacyLogDao, Sanitize $sanitizer, ConfigurationService $configService = null)
     {
         $this->dataRequestDao = $dataRequestDao;
         $this->privacyLogDao = $privacyLogDao;
         $this->sanitizer = $sanitizer;
-        $this->notificationService = class_exists('NotificationService') ? new NotificationService() : null;
+        $this->notificationService = class_exists('NotificationService') ? new NotificationService($configService) : null;
     }
 
     /**
      * Create a new data request
-     * 
+     *
      * @param string $requestType
      * @param string $email
      * @param array $options
@@ -99,7 +101,7 @@ class DataRequestService
 
     /**
      * Get all requests
-     * 
+     *
      * @return array
      */
     public function getAllRequests()
@@ -109,7 +111,7 @@ class DataRequestService
 
     /**
      * Get pending requests count
-     * 
+     *
      * @return int
      */
     public function getPendingCount()
@@ -119,7 +121,7 @@ class DataRequestService
 
     /**
      * Get total requests count
-     * 
+     *
      * @return int
      */
     public function getTotalRequests()
@@ -129,7 +131,7 @@ class DataRequestService
 
     /**
      * Update request status
-     * 
+     *
      * @param int $requestId
      * @param string $status
      * @param string|null $note
@@ -138,7 +140,7 @@ class DataRequestService
     public function updateRequestStatus($requestId, $status, $note = null)
     {
         $request = $this->dataRequestDao->getRequestById($requestId);
-        
+
         if (!$request) {
             throw new AppException("Request not found");
         }
@@ -165,7 +167,7 @@ class DataRequestService
 
     /**
      * Export user data
-     * 
+     *
      * @param string $email
      * @param array $options
      * @return array
@@ -202,14 +204,14 @@ class DataRequestService
             if (isset($options['export_comments']) && $options['export_comments']) {
                 $commentDao = new CommentDao();
                 $comments = $commentDao->findComments();
-                $exportData['comments'] = array_filter($comments, function($c) use ($email) {
+                $exportData['comments'] = array_filter($comments, function ($c) use ($email) {
                     return isset($c['comment_author_email']) && $c['comment_author_email'] === $email;
                 });
             }
 
             if (isset($options['export_posts']) && $options['export_posts']) {
                 $postDao = new PostDao();
-                $posts = $postDao->findPosts('ID', $user['ID']);
+                $posts = $postDao->findPosts('ID', $user['ID'], false);
                 $exportData['posts'] = $posts ?: [];
             }
 
@@ -234,7 +236,7 @@ class DataRequestService
 
     /**
      * Delete user data (anonymize)
-     * 
+     *
      * @param string $email
      * @return bool
      */
@@ -268,7 +270,7 @@ class DataRequestService
 
     /**
      * Validate email address
-     * 
+     *
      * @param string $email
      * @return bool
      */

@@ -1,4 +1,6 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class ConsentService
  *
@@ -13,7 +15,6 @@
  */
 class ConsentService
 {
-
     /**
      * Consent type
      * @var string
@@ -46,7 +47,7 @@ class ConsentService
 
     /**
      * Constructor
-     * 
+     *
      * @param ConsentDao $consentDao
      */
     public function __construct(ConsentDao $consentDao)
@@ -56,7 +57,7 @@ class ConsentService
 
     /**
      * Record user consent
-     * 
+     *
      * @param string $consentType
      * @param string $consentStatus
      * @param string $ipAddress
@@ -80,7 +81,7 @@ class ConsentService
 
     /**
      * Update user consent
-     * 
+     *
      * @param int $consentId
      * @param string $consentStatus
      * @return bool
@@ -92,7 +93,7 @@ class ConsentService
 
     /**
      * Get latest consent by type
-     * 
+     *
      * @param string $consentType
      * @return array|bool
      */
@@ -103,7 +104,7 @@ class ConsentService
 
     /**
      * Get all consent records
-     * 
+     *
      * @return array|bool
      */
     public function getAllConsents()
@@ -113,7 +114,7 @@ class ConsentService
 
     /**
      * Check if user has given consent
-     * 
+     *
      * @param string $consentType
      * @return bool
      */
@@ -124,7 +125,7 @@ class ConsentService
 
     /**
      * Process cookie consent from user
-     * 
+     *
      * @param string $status 'accepted' or 'rejected'
      * @return bool
      */
@@ -140,23 +141,23 @@ class ConsentService
 
     /**
      * Get cookie consent status
-     * 
+     *
      * @return bool
      */
     public function getCookieConsentStatus()
     {
         $consent = $this->getLatestConsent('cookie');
-        
+
         if ($consent && $consent['consent_status'] === 'accepted') {
             return true;
         }
-        
+
         return false;
     }
 
     /**
      * Clean old consent records
-     * 
+     *
      * @param int $days
      * @return bool
      */
