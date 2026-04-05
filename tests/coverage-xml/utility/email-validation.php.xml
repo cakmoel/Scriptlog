@@ -1,0 +1,310 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="email-validation.php" path="/utility">
+    <totals>
+      <lines total="72" comments="48" code="24" executable="4" executed="0" percent="0.00"/>
+      <methods count="0" tested="0" percent="0"/>
+      <functions count="3" tested="0" percent="0.00"/>
+      <classes count="0" tested="0" percent="0"/>
+      <traits count="0" tested="0" percent="0"/>
+    </totals>
+    <function name="validator_email_instance" signature="validator_email_instance()" start="30" crap="2" executable="1" executed="0" coverage="0"/>
+    <function name="email_validation" signature="email_validation($email, $validation_type)" start="47" crap="2" executable="1" executed="0" coverage="0"/>
+    <function name="email_multiple_validation" signature="email_multiple_validation($email)" start="67" crap="2" executable="2" executed="0" coverage="0"/>
+    <source>
+      <line no="1">
+        <token name="T_OPEN_TAG">&lt;?php</token>
+      </line>
+      <line no="2"/>
+      <line no="3">
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="4">
+        <token name="T_DOC_COMMENT"> * validator_email_instance</token>
+      </line>
+      <line no="5">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="6">
+        <token name="T_DOC_COMMENT"> * @category function</token>
+      </line>
+      <line no="7">
+        <token name="T_DOC_COMMENT"> * @author M.Noermoehammad</token>
+      </line>
+      <line no="8">
+        <token name="T_DOC_COMMENT"> * @author Eduardo Gulias Davis author of EmailValidator Package</token>
+      </line>
+      <line no="9">
+        <token name="T_DOC_COMMENT"> * @license MIT</token>
+      </line>
+      <line no="10">
+        <token name="T_DOC_COMMENT"> * @version 1.0</token>
+      </line>
+      <line no="11">
+        <token name="T_DOC_COMMENT"> * @param string $email</token>
+      </line>
+      <line no="12">
+        <token name="T_DOC_COMMENT"> * @see https://github.com/egulias/EmailValidator</token>
+      </line>
+      <line no="13">
+        <token name="T_DOC_COMMENT"> * @see https://www.cloudways.com/blog/php-libraries/#email-validator</token>
+      </line>
+      <line no="14">
+        <token name="T_DOC_COMMENT"> * @uses \Egulias\EmailValidator\EmailValidator</token>
+      </line>
+      <line no="15">
+        <token name="T_DOC_COMMENT"> * @return object</token>
+      </line>
+      <line no="16">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="17">
+        <token name="T_DOC_COMMENT"> */</token>
+      </line>
+      <line no="18"/>
+      <line no="19">
+        <token name="T_USE">use</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_NAME_QUALIFIED">Egulias\EmailValidator\EmailValidator</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="20">
+        <token name="T_USE">use</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_NAME_QUALIFIED">Egulias\EmailValidator\Validation\DNSCheckValidation</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="21">
+        <token name="T_USE">use</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_NAME_QUALIFIED">Egulias\EmailValidator\Validation\MultipleValidationWithAnd</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="22">
+        <token name="T_USE">use</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_NAME_QUALIFIED">Egulias\EmailValidator\Validation\RFCValidation</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="23"/>
+      <line no="24">
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="25">
+        <token name="T_DOC_COMMENT"> * validator_email_instance()</token>
+      </line>
+      <line no="26">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="27">
+        <token name="T_DOC_COMMENT"> * @return object</token>
+      </line>
+      <line no="28">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="29">
+        <token name="T_DOC_COMMENT"> */</token>
+      </line>
+      <line no="30">
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">validator_email_instance</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="31">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="32">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_NEW">new</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">EmailValidator</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="33">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="34"/>
+      <line no="35">
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="36">
+        <token name="T_DOC_COMMENT"> * email_validation</token>
+      </line>
+      <line no="37">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="38">
+        <token name="T_DOC_COMMENT"> * @category function</token>
+      </line>
+      <line no="39">
+        <token name="T_DOC_COMMENT"> * @author M.Noermoehammad</token>
+      </line>
+      <line no="40">
+        <token name="T_DOC_COMMENT"> * @license MIT</token>
+      </line>
+      <line no="41">
+        <token name="T_DOC_COMMENT"> * @version 1.0</token>
+      </line>
+      <line no="42">
+        <token name="T_DOC_COMMENT"> * @param string $email</token>
+      </line>
+      <line no="43">
+        <token name="T_DOC_COMMENT"> * @param string $validation_type</token>
+      </line>
+      <line no="44">
+        <token name="T_DOC_COMMENT"> * @return object</token>
+      </line>
+      <line no="45">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="46">
+        <token name="T_DOC_COMMENT"> */</token>
+      </line>
+      <line no="47">
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">email_validation</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$email</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$validation_type</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="48">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="49">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">validator_email_instance</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">isValid</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$email</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$validation_type</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="50">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="51"/>
+      <line no="52">
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="53">
+        <token name="T_DOC_COMMENT"> * email_multiple_validation</token>
+      </line>
+      <line no="54">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="55">
+        <token name="T_DOC_COMMENT"> * @category function</token>
+      </line>
+      <line no="56">
+        <token name="T_DOC_COMMENT"> * @author M.Noermoehammad</token>
+      </line>
+      <line no="57">
+        <token name="T_DOC_COMMENT"> * @license MIT</token>
+      </line>
+      <line no="58">
+        <token name="T_DOC_COMMENT"> * @version 1.0</token>
+      </line>
+      <line no="59">
+        <token name="T_DOC_COMMENT"> * @param string $email</token>
+      </line>
+      <line no="60">
+        <token name="T_DOC_COMMENT"> * @param array $validation_type</token>
+      </line>
+      <line no="61">
+        <token name="T_DOC_COMMENT"> * @uses \Egulias\EmailValidator\Validation\MultipleValidationWithAnd</token>
+      </line>
+      <line no="62">
+        <token name="T_DOC_COMMENT"> * @uses \Egulias\EmailValidator\Validation\DNSCheckValidation</token>
+      </line>
+      <line no="63">
+        <token name="T_DOC_COMMENT"> * @uses \Egulias\EmailValidator\Validation\RFCValidation</token>
+      </line>
+      <line no="64">
+        <token name="T_DOC_COMMENT"> * @return bool</token>
+      </line>
+      <line no="65">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="66">
+        <token name="T_DOC_COMMENT"> */</token>
+      </line>
+      <line no="67">
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">email_multiple_validation</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$email</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="68">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="69">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_VARIABLE">$multiple_validations</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_NEW">new</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">MultipleValidationWithAnd</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_NEW">new</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">RFCValidation</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_NEW">new</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">DNSCheckValidation</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="70">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">validator_email_instance</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">isValid</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$email</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$multiple_validations</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="71">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="72"/>
+    </source>
+  </file>
+</phpunit>
