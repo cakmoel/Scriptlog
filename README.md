@@ -5,7 +5,7 @@
 [![MySQL Version](https://img.shields.io/badge/MySQL-5.6%2B-4479A1.svg)](https://www.mysql.com/)
 [![MariaDB Version](https://img.shields.io/badge/MariaDB-10.3%2B-003545.svg)](https://mariadb.org/)
 [![PSR-12](https://img.shields.io/badge/PSR--12-Compliant-2C2C2C.svg)](https://www.php-fig.org/psr/psr-12/)
-[![Tests](https://github.com/cakmoel/Scriptlog/actions/workflows/tests.yml/badge.svg)](https://github.com/cakmoel/Scriptlog/actions/workflows/tests.yml)
+[![Tests](https://github.com/cakmoel/Scriptlog/actions/workflows/tests/badge.svg)](https://github.com/cakmoel/Scriptlog/actions/workflows/tests.yml)
 
 Scriptlog is a simple, secure, modular, and robust personal blogging platform. It is a refactored fork of Piluscart 1.4.1, engineered to emphasize simplicity, privacy, and security without the overhead of a complex Content Management System.
 
