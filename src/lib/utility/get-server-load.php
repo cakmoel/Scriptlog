@@ -100,4 +100,6 @@ function win_architecture()
 
         return "Unknown";
     }
+
+    return "Unknown";
 }

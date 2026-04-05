@@ -845,13 +845,14 @@ function hl_regex($t)
             $valMsgErr = isset($php_errormsg) ? $php_errormsg : null;
         } else {
             ini_set('track_errors', '1');
+            $php_errormsg = null;
         }
         unset($php_errormsg);
     }
     if (($valShowErr = ini_get('display_errors'))) {
         ini_set('display_errors', '0');
     }
-    preg_match($t, '');
+    @preg_match($t, '');
     if ($funcsExist) {
         $out = error_get_last() == null ? 1 : 0;
     } else {

@@ -131,4 +131,6 @@ function set_cookies_scl($name, $value, $expire, $path, $domain, $secure, $httpo
            'samesite' => $samesite,
         ]);
     }
+
+    return true;
 }

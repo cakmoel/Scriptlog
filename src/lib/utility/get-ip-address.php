@@ -207,5 +207,5 @@ function request_ip_address()
         return $_SERVER['HTTP_CF_CONNECTING_IP'];
     }
 
-    return zend_ip_address();
+    return zend_ip_address() ?? '';
 }
