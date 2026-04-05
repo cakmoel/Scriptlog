@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="url-validation.php" path="/utility">
+    <totals>
+      <lines total="29" comments="20" code="9" executable="8" executed="0" percent="0.00"/>
+      <methods count="0" tested="0" percent="0"/>
+      <functions count="1" tested="0" percent="0.00"/>
+      <classes count="0" tested="0" percent="0"/>
+      <traits count="0" tested="0" percent="0"/>
+    </totals>
+    <function name="url_validation" signature="url_validation($url)" start="16" crap="6" executable="8" executed="0" coverage="0"/>
+    <source>
+      <line no="1">
+        <token name="T_OPEN_TAG">&lt;?php</token>
+      </line>
+      <line no="2"/>
+      <line no="3">
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="4">
+        <token name="T_DOC_COMMENT"> * url_validation()</token>
+      </line>
+      <line no="5">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="6">
+        <token name="T_DOC_COMMENT"> * URL Validation with regular expression</token>
+      </line>
+      <line no="7">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="8">
+        <token name="T_DOC_COMMENT"> * @category function</token>
+      </line>
+      <line no="9">
+        <token name="T_DOC_COMMENT"> * @author Contributors</token>
+      </line>
+      <line no="10">
+        <token name="T_DOC_COMMENT"> * @license MIT</token>
+      </line>
+      <line no="11">
+        <token name="T_DOC_COMMENT"> * @version 1.0</token>
+      </line>
+      <line no="12">
+        <token name="T_DOC_COMMENT"> * @param string $url</token>
+      </line>
+      <line no="13">
+        <token name="T_DOC_COMMENT"> * @return boolean</token>
+      </line>
+      <line no="14">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="15">
+        <token name="T_DOC_COMMENT"> */</token>
+      </line>
+      <line no="16">
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">url_validation</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$url</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="17">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="18"/>
+      <line no="19">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_VARIABLE">$regex</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"((https?|ftp|http)\:\/\/)?"</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_COMMENT">// SCHEME</token>
+      </line>
+      <line no="20">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_VARIABLE">$regex</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONCAT_EQUAL">.=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"([a-z0-9+!*(),;?&amp;=\$_.-]+(\:[a-z0-9+!*(),;?&amp;=\$_.-]+)?@)?"</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_COMMENT">// User and Pass</token>
+      </line>
+      <line no="21">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_VARIABLE">$regex</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONCAT_EQUAL">.=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"([a-z0-9-.]*)\.([a-z]{2,3})"</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_COMMENT">// Host or IP</token>
+      </line>
+      <line no="22">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_VARIABLE">$regex</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONCAT_EQUAL">.=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"(\:[0-9]{2,5})?"</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_COMMENT">// Port</token>
+      </line>
+      <line no="23">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_VARIABLE">$regex</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONCAT_EQUAL">.=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"(\/([a-z0-9+\$_-]\.?)+)*\/?"</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_COMMENT">// Path</token>
+      </line>
+      <line no="24">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_VARIABLE">$regex</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONCAT_EQUAL">.=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"(\?[a-z+&amp;\$_.-][a-z0-9;:@&amp;%=+\/\$_.-]*)?"</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_COMMENT">// GET Query</token>
+      </line>
+      <line no="25">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_VARIABLE">$regex</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONCAT_EQUAL">.=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"(#[a-z_.-][a-z0-9+\$_.-]*)?"</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_COMMENT">// Anchor</token>
+      </line>
+      <line no="26"/>
+      <line no="27">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">preg_match</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_DOUBLE_QUOTES">"</token>
+        <token name="T_ENCAPSED_AND_WHITESPACE">/^</token>
+        <token name="T_VARIABLE">$regex</token>
+        <token name="T_ENCAPSED_AND_WHITESPACE">$/</token>
+        <token name="T_DOUBLE_QUOTES">"</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$url</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">true</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">false</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="28">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="29"/>
+    </source>
+  </file>
+</phpunit>

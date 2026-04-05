@@ -1,0 +1,720 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="cookies-baked.php" path="/utility">
+    <totals>
+      <lines total="135" comments="80" code="55" executable="21" executed="0" percent="0.00"/>
+      <methods count="0" tested="0" percent="0"/>
+      <functions count="5" tested="0" percent="0.00"/>
+      <classes count="0" tested="0" percent="0"/>
+      <traits count="0" tested="0" percent="0"/>
+    </totals>
+    <function name="is_cookies_secured" signature="is_cookies_secured()" start="15" crap="6" executable="1" executed="0" coverage="0"/>
+    <function name="set_session_cookies_key" signature="set_session_cookies_key($app_email, $app_key)" start="32" crap="2" executable="1" executed="0" coverage="0"/>
+    <function name="is_cookies" signature="is_cookies(array $cookies)" start="50" crap="20" executable="6" executed="0" coverage="0"/>
+    <function name="set_cookies_path" signature="set_cookies_path()" start="76" crap="6" executable="3" executed="0" coverage="0"/>
+    <function name="set_cookies_scl" signature="set_cookies_scl($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite)" start="119" crap="6" executable="10" executed="0" coverage="0"/>
+    <source>
+      <line no="1">
+        <token name="T_OPEN_TAG">&lt;?php</token>
+      </line>
+      <line no="2"/>
+      <line no="3">
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="4">
+        <token name="T_DOC_COMMENT"> * is_cookies_secured()</token>
+      </line>
+      <line no="5">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="6">
+        <token name="T_DOC_COMMENT"> * checking whether a secure HTTPS connection enabled</token>
+      </line>
+      <line no="7">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="8">
+        <token name="T_DOC_COMMENT"> * @category function</token>
+      </line>
+      <line no="9">
+        <token name="T_DOC_COMMENT"> * @author M.Noermoehammad</token>
+      </line>
+      <line no="10">
+        <token name="T_DOC_COMMENT"> * @license MIT</token>
+      </line>
+      <line no="11">
+        <token name="T_DOC_COMMENT"> * @version 1.0</token>
+      </line>
+      <line no="12">
+        <token name="T_DOC_COMMENT"> * @return boolean</token>
+      </line>
+      <line no="13">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="14">
+        <token name="T_DOC_COMMENT"> */</token>
+      </line>
+      <line no="15">
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">is_cookies_secured</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="16">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="17">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_STRING">is_ssl</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_IS_IDENTICAL">===</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">true</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">true</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">false</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="18">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="19"/>
+      <line no="20">
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="21">
+        <token name="T_DOC_COMMENT"> * set_session_cookies_key()</token>
+      </line>
+      <line no="22">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="23">
+        <token name="T_DOC_COMMENT"> * generating session cookies key</token>
+      </line>
+      <line no="24">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="25">
+        <token name="T_DOC_COMMENT"> * @category function</token>
+      </line>
+      <line no="26">
+        <token name="T_DOC_COMMENT"> * @author M.Noermoehammad</token>
+      </line>
+      <line no="27">
+        <token name="T_DOC_COMMENT"> * @license MIT</token>
+      </line>
+      <line no="28">
+        <token name="T_DOC_COMMENT"> * @version 1.0</token>
+      </line>
+      <line no="29">
+        <token name="T_DOC_COMMENT"> * @return string</token>
+      </line>
+      <line no="30">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="31">
+        <token name="T_DOC_COMMENT"> */</token>
+      </line>
+      <line no="32">
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">set_session_cookies_key</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$app_email</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$app_key</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="33">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="34">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">hash_hmac</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'sha384'</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$app_email</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$app_key</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">get_ip_address</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">hash</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'sha384'</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$app_email</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$app_key</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">get_ip_address</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">true</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="35">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="36"/>
+      <line no="37">
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="38">
+        <token name="T_DOC_COMMENT"> * is_cookies()</token>
+      </line>
+      <line no="39">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="40">
+        <token name="T_DOC_COMMENT"> * checking set array cookies that have array elements</token>
+      </line>
+      <line no="41">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="42">
+        <token name="T_DOC_COMMENT"> * @category function</token>
+      </line>
+      <line no="43">
+        <token name="T_DOC_COMMENT"> * @author M.Noermoehammad</token>
+      </line>
+      <line no="44">
+        <token name="T_DOC_COMMENT"> * @license MIT</token>
+      </line>
+      <line no="45">
+        <token name="T_DOC_COMMENT"> * @version 1.0</token>
+      </line>
+      <line no="46">
+        <token name="T_DOC_COMMENT"> * @param array $cookies</token>
+      </line>
+      <line no="47">
+        <token name="T_DOC_COMMENT"> * @return string</token>
+      </line>
+      <line no="48">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="49">
+        <token name="T_DOC_COMMENT"> */</token>
+      </line>
+      <line no="50">
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">is_cookies</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_ARRAY">array</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$cookies</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="51">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="52"/>
+      <line no="53">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_IF">if</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_ISSET">isset</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$_COOKIE</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_VARIABLE">$cookies</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="54">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_FOREACH">foreach</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$_COOKIE</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_VARIABLE">$cookies</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_AS">as</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$name</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$value</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="55">
+        <token name="T_WHITESPACE">            </token>
+        <token name="T_IF">if</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EXCLAMATION_MARK">!</token>
+        <token name="T_EMPTY">empty</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$name</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="56">
+        <token name="T_WHITESPACE">                </token>
+        <token name="T_VARIABLE">$name</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">safe_html</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$name</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="57"/>
+      <line no="58">
+        <token name="T_WHITESPACE">                </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$name</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="59">
+        <token name="T_WHITESPACE">            </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="60">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="61">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="62"/>
+      <line no="63">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">false</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="64">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="65"/>
+      <line no="66">
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="67">
+        <token name="T_DOC_COMMENT"> * set_cookie_path()</token>
+      </line>
+      <line no="68">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="69">
+        <token name="T_DOC_COMMENT"> * @category function</token>
+      </line>
+      <line no="70">
+        <token name="T_DOC_COMMENT"> * @author M.Noermoehammad</token>
+      </line>
+      <line no="71">
+        <token name="T_DOC_COMMENT"> * @license MIT</token>
+      </line>
+      <line no="72">
+        <token name="T_DOC_COMMENT"> * @version 1.0</token>
+      </line>
+      <line no="73">
+        <token name="T_DOC_COMMENT"> * @return string</token>
+      </line>
+      <line no="74">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="75">
+        <token name="T_DOC_COMMENT"> */</token>
+      </line>
+      <line no="76">
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">set_cookies_path</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="77">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="78"/>
+      <line no="79">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_VARIABLE">$root_path</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_ISSET">isset</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$_SERVER</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'DOCUMENT_ROOT'</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$_SERVER</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'DOCUMENT_ROOT'</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">""</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="80"/>
+      <line no="81">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_VARIABLE">$admin_path</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">dirname</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_FILE">__FILE__</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'/../../'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">APP_ADMIN</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="82"/>
+      <line no="83">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">str_replace</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$root_path</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">''</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$admin_path</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="84">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="85"/>
+      <line no="86">
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="87">
+        <token name="T_DOC_COMMENT"> * set_cookies_scl()</token>
+      </line>
+      <line no="88">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="89">
+        <token name="T_DOC_COMMENT"> * Supporting samesite cookie flag</token>
+      </line>
+      <line no="90">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="91">
+        <token name="T_DOC_COMMENT"> * @category function</token>
+      </line>
+      <line no="92">
+        <token name="T_DOC_COMMENT"> * @author M.Noermoehammad</token>
+      </line>
+      <line no="93">
+        <token name="T_DOC_COMMENT"> * @license MIT</token>
+      </line>
+      <line no="94">
+        <token name="T_DOC_COMMENT"> * @version 1.0</token>
+      </line>
+      <line no="95">
+        <token name="T_DOC_COMMENT"> * @see https://github.com/GoogleChromeLabs/samesite-examples/blob/master/php.md</token>
+      </line>
+      <line no="96">
+        <token name="T_DOC_COMMENT"> * @see https://stackoverflow.com/a/46971326/2308553</token>
+      </line>
+      <line no="97">
+        <token name="T_DOC_COMMENT"> * @see https://stackoverflow.com/questions/39750906/php-setcookie-samesite-strict</token>
+      </line>
+      <line no="98">
+        <token name="T_DOC_COMMENT"> * @see https://stackoverflow.com/questions/58317981/php-setting-a-session-cookie-with-samesite</token>
+      </line>
+      <line no="99">
+        <token name="T_DOC_COMMENT"> * @see https://www.php.net/manual/en/function.session-set-cookie-params.php</token>
+      </line>
+      <line no="100">
+        <token name="T_DOC_COMMENT"> * @see https://stackoverflow.com/questions/36877/how-do-you-set-up-use-httponly-cookies-in-php</token>
+      </line>
+      <line no="101">
+        <token name="T_DOC_COMMENT"> * @see https://www.php.net/manual/en/session.configuration.php#ini.session.cookie-samesite</token>
+      </line>
+      <line no="102">
+        <token name="T_DOC_COMMENT"> * @see https://stackoverflow.com/a/46971326/2308553</token>
+      </line>
+      <line no="103">
+        <token name="T_DOC_COMMENT"> * @see https://www.php.net/manual/en/function.setcookie.php</token>
+      </line>
+      <line no="104">
+        <token name="T_DOC_COMMENT"> * @see https://www.php.net/setcookie</token>
+      </line>
+      <line no="105">
+        <token name="T_DOC_COMMENT"> * @see https://www.php.net/manual/en/features.cookies.php</token>
+      </line>
+      <line no="106">
+        <token name="T_DOC_COMMENT"> * @see https://scotthelme.co.uk/csrf-is-really-dead/</token>
+      </line>
+      <line no="107">
+        <token name="T_DOC_COMMENT"> * @see https://stackoverflow.com/questions/1354999/keep-me-logged-in-the-best-approach/17266448#17266448</token>
+      </line>
+      <line no="108">
+        <token name="T_DOC_COMMENT"> * @param string $name</token>
+      </line>
+      <line no="109">
+        <token name="T_DOC_COMMENT"> * @param string $value</token>
+      </line>
+      <line no="110">
+        <token name="T_DOC_COMMENT"> * @param string $expire</token>
+      </line>
+      <line no="111">
+        <token name="T_DOC_COMMENT"> * @param string $path</token>
+      </line>
+      <line no="112">
+        <token name="T_DOC_COMMENT"> * @param string $domain</token>
+      </line>
+      <line no="113">
+        <token name="T_DOC_COMMENT"> * @param bool $secure</token>
+      </line>
+      <line no="114">
+        <token name="T_DOC_COMMENT"> * @param bool $httponly</token>
+      </line>
+      <line no="115">
+        <token name="T_DOC_COMMENT"> * @param string $samesite</token>
+      </line>
+      <line no="116">
+        <token name="T_DOC_COMMENT"> * @return bool</token>
+      </line>
+      <line no="117">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="118">
+        <token name="T_DOC_COMMENT"> */</token>
+      </line>
+      <line no="119">
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">set_cookies_scl</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$name</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$value</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$expire</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$path</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$domain</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$secure</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$httponly</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$samesite</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"Strict"</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="120">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="121"/>
+      <line no="122">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_IF">if</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_STRING">PHP_VERSION_ID</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_IS_SMALLER_OR_EQUAL">&lt;=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_LNUMBER">70300</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="123">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_STRING">setcookie</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$name</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$value</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$expire</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_QUOTES">"</token>
+        <token name="T_VARIABLE">$path</token>
+        <token name="T_ENCAPSED_AND_WHITESPACE">; samesite=</token>
+        <token name="T_VARIABLE">$samesite</token>
+        <token name="T_DOUBLE_QUOTES">"</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$domain</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$secure</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$httponly</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="124">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_ELSE">else</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="125">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_STRING">setcookie</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$name</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$value</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_SQUARE">[</token>
+      </line>
+      <line no="126">
+        <token name="T_WHITESPACE">           </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'expires'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$expire</token>
+        <token name="T_COMMA">,</token>
+      </line>
+      <line no="127">
+        <token name="T_WHITESPACE">           </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'path'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$path</token>
+        <token name="T_COMMA">,</token>
+      </line>
+      <line no="128">
+        <token name="T_WHITESPACE">           </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'domain'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$domain</token>
+        <token name="T_COMMA">,</token>
+      </line>
+      <line no="129">
+        <token name="T_WHITESPACE">           </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'secure'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$secure</token>
+        <token name="T_COMMA">,</token>
+      </line>
+      <line no="130">
+        <token name="T_WHITESPACE">           </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'httponly'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$httponly</token>
+        <token name="T_COMMA">,</token>
+      </line>
+      <line no="131">
+        <token name="T_WHITESPACE">           </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'samesite'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$samesite</token>
+        <token name="T_COMMA">,</token>
+      </line>
+      <line no="132">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="133">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="134">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="135"/>
+    </source>
+  </file>
+</phpunit>
