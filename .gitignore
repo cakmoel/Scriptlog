@@ -33,3 +33,6 @@ node_modules/
 
 # lts
 *.txt
+
+# Rate limit cache files
+src/public/cache/rate_limit/
