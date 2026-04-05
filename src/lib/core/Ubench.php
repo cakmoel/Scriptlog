@@ -1,11 +1,13 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /*
  * Class Ubench
- * 
+ *
  * @category Core Class
  * @author Jeremy Perret
  * @license MIT
- * 
+ *
  * The MIT License (MIT)
  * Copyright (c) 2012 Jeremy Perret
  *
@@ -26,7 +28,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- * 
+ *
  */
 
 class Ubench
@@ -55,8 +57,7 @@ class Ubench
      */
     public function end()
     {
-        if (!$this->hasStarted())
-        {
+        if (!$this->hasStarted()) {
             throw new LogicException("You must call start()");
         }
 
@@ -75,13 +76,11 @@ class Ubench
      */
     public function getTime($raw = false, $format = null)
     {
-        if (!$this->hasStarted())
-        {
+        if (!$this->hasStarted()) {
             throw new LogicException("You must call start()");
         }
 
-        if (!$this->hasEnded())
-        {
+        if (!$this->hasEnded()) {
             throw new LogicException("You must call end()");
         }
 
@@ -153,7 +152,7 @@ class Ubench
             $format = '%.2f%s';
         }
 
-        $units = explode(' ','B Kb Mb Gb Tb');
+        $units = explode(' ', 'B Kb Mb Gb Tb');
 
         for ($i = 0; $size > $mod; $i++) {
             $size /= $mod;
@@ -184,7 +183,7 @@ class Ubench
             $time = round($microtime, $round);
         } else {
             $unit = 'ms';
-            $time = round($microtime*1000);
+            $time = round($microtime * 1000);
 
             $format = preg_replace('/(%.[\d]+f)/', '%d', $format);
         }

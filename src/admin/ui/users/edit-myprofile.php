@@ -1,5 +1,5 @@
 <?php if (!defined('SCRIPTLOG')) {
-  exit();
+    exit();
 } ?>
 
 <div class="content-wrapper">
@@ -36,13 +36,11 @@
 
                 <?php
                 if (isset($userData['user_url']) && !empty($userData['user_url']) && $userData['user_url'] != '#') :
-
-
-                ?>
+                    ?>
                   <b> <?= safe_html($userData['user_url']); ?></b>
                   <a class="pull-right" href="<?= safe_html($userData['user_url']); ?>" target="_blank" rel="noopener noreferrer" title="site_address"><i class="fa fa-external-link"></i> </a>
 
-                <?php
+                    <?php
                 endif;
                 ?>
 
@@ -95,45 +93,43 @@
           <!-- /.box-header -->
 
           <?php
-          if (isset($errors)) :
-          ?>
+            if (isset($errors)) :
+                ?>
             <div class="alert alert-danger alert-dismissible">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
               <h4><i class="icon fa fa-warning"></i> Invalid form data!</h4>
-              <?php
-              foreach ($errors as $e) :
-                echo '<p>' . $e . '</p>';
-              endforeach;
-              ?>
+                <?php
+                foreach ($errors as $e) :
+                    echo '<p>' . $e . '</p>';
+                endforeach;
+                ?>
             </div>
-          <?php
-          endif;
-          ?>
+                <?php
+            endif;
+            ?>
 
           <?php
-          if (isset($status)) :
-          ?>
+            if (isset($status)) :
+                ?>
             <div class="alert alert-success alert-dismissible">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
               <h4><i class="icon fa fa-check"></i>
                 <?php
                 foreach ($status as $s) :
-
-                  echo $s;
-
+                    echo $s;
                 endforeach;
 
                 ?>
               </h4>
             </div>
 
-          <?php
-          endif;
+                <?php
+            endif;
 
-          $action = isset($formAction) ? $formAction : null;
-          $user_id = isset($userData['ID']) ? safe_html((int)$userData['ID']) : 0;
-          $session_id = isset($userData['user_session']) ? safe_html($userData['user_session']) : null;
-          ?>
+            $action = isset($formAction) ? $formAction : null;
+            $user_id = isset($userData['ID']) ? safe_html((int)$userData['ID']) : 0;
+            $session_id = isset($userData['user_session']) ? safe_html($userData['user_session']) : null;
+            ?>
 
           <form name="scriptlogForm" method="post" action="<?= generate_request('index.php', 'post', ['users', $action, $user_id, $session_id])['link']; ?>" autocomplete="off">
             <input type="hidden" name="user_id" value="<?= $user_id; ?>">
@@ -141,15 +137,15 @@
 
             <div class="box-body">
               <?php
-              if ((isset($userData['user_login'])) && ($userData['user_login'] != '')) :
-              ?>
+                if ((isset($userData['user_login'])) && ($userData['user_login'] != '')) :
+                    ?>
                 <div class="form-group">
                   <label for="username">Username</label>
                   <input type="text" class="form-control" id="username" name="user_login" value="
-<?= ($userData['user_login']) ? safe_html($userData['user_login']) : ""; ?>" <?= (!empty($userData['user_login'])) ? "disabled" : ""; ?>>
+                    <?= ($userData['user_login']) ? safe_html($userData['user_login']) : ""; ?>" <?= (!empty($userData['user_login'])) ? "disabled" : ""; ?>>
                   <p class="help-block">This username can not be changed.</p>
                 </div>
-              <?php endif;  ?>
+                <?php endif;  ?>
 
               <div class="form-group">
                 <label for="fullname">Fullname</label>
@@ -171,7 +167,6 @@
               </div>
 
               <?php if (!empty($userData['user_email'])) : ?>
-
                 <div class="form-group">
                   <label for="confirm_pwd"><?= (!empty($userData['user_email'])) ? "Confirm new passowrd (required)" : ""; ?></label>
                   <input type="password" class="form-control" id="confirm_pwd" name="user_pass2" placeholder="Confirm password" maxlength="50" autocomplete="off">

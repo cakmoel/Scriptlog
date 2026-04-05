@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_AttrDef_HTML_Pixels extends HTMLPurifier_AttrDef
 {
-
     /**
      * @type int
      */

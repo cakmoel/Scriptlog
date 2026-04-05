@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -17,25 +19,30 @@
  <!-- Main content -->
 <section class="content">
 <div class="row">
-<div class="col-md-6">
-<div class="box box-primary">
-<div class="box-header with-border"></div>
-<!-- /.box-header -->
 <?php
- if (isset($errors)) :
-?>
+if (isset($errors)) :
+    ?>
+<div class="col-md-12">
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-<h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
-<?php 
- foreach ($errors as $e) :
-  echo '<p>' . $e . '</p>';
- endforeach;
-?>
+<h4><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h4>
+    <?php
+    foreach ($errors as $e) :
+        echo '<p>' . $e . '</p>';
+    endforeach;
+    ?>
 </div>
-<?php 
- endif;
-
+</div>
+    <?php
+endif;
+?>
+<div class="col-md-8">
+<div class="box box-primary">
+<div class="box-header with-border">
+  <h3 class="box-title">Edit Comment</h3>
+</div>
+<!-- /.box-header -->
+<?php
 $action = isset($formAction) ? $formAction : null;
 $comment_id = isset($commentData['ID']) ? (int)$commentData['ID'] : 0;
 ?>
@@ -46,16 +53,13 @@ $comment_id = isset($commentData['ID']) ? (int)$commentData['ID'] : 0;
 
 <div class="box-body">
 <div class="form-group">
-<label for="comment_author">Author</label>
-<input type="text" class="form-control" id="comment_author" name="author_name" placeholder="" value="
-<?=(isset($commentData['comment_author_name'])) ? htmlspecialchars($commentData['comment_author_name']) : ""; ?>" required>
+<label for="comment_author">Author <span class="text-red">*</span></label>
+<input type="text" class="form-control" id="comment_author" name="author_name" placeholder="Enter author name" value="<?=(isset($commentData['comment_author_name'])) ? htmlspecialchars($commentData['comment_author_name']) : ""; ?>" required>
 </div>
 
 <div class="form-group">
-<label for="comment">Content (required)</label>
-<textarea class="form-control" id="comment" rows="3" placeholder="Enter ..." name="comment_content" maxlength="500" >
-<?=(isset($commentData['comment_content'])) ? $commentData['comment_content'] : ""; ?>
-</textarea>
+<label for="comment">Content <span class="text-red">*</span></label>
+<textarea class="form-control" id="comment" rows="5" placeholder="Enter comment content..." name="comment_content" maxlength="500" required><?=(isset($commentData['comment_content'])) ? $commentData['comment_content'] : ""; ?></textarea>
 </div>
 
 <div class="form-group">
@@ -69,16 +73,21 @@ $comment_id = isset($commentData['ID']) ? (int)$commentData['ID'] : 0;
 
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
-<input type="submit" name="commentFormSubmit" class="btn btn-primary" value="<?=(isset($commentData['ID']) && $commentData['ID'] != '') ? "Update" : ""; ?>">
+<button type="submit" name="commentFormSubmit" class="btn btn-primary pull-right">
+  <i class="fa fa-save" aria-hidden="true"></i> Update
+</button>
+<a href="index.php?load=comments" class="btn btn-default pull-right" style="margin-right: 10px;">
+  <i class="fa fa-arrow-left" aria-hidden="true"></i> Cancel
+</a>
 </div>
 </form>
             
 </div>
 <!-- /.box -->
 </div>
-<!-- /.col-md-6 -->
+<!-- /.col-md-8 -->
 
-<div class="col-md-6">
+<div class="col-md-4">
 <!-- Form Element sizes -->
     <div class="box box-info">
         <div class="box-header with-border">
@@ -95,7 +104,7 @@ $comment_id = isset($commentData['ID']) ? (int)$commentData['ID'] : 0;
                 </p>
             </div>
             <div class="form-group">
-                <a href="<?= generate_request("index.php", 'get', ['reply', ActionConst::RESPONSETO, $commentData['ID']])['link']; ?>" class="btn btn-primary" title="Reply"><i class="fa fa-reply fa-fw" aria-hidden="true"></i> Reply</a>
+                <a href="<?= generate_request("index.php", 'get', ['reply', ActionConst::REPLY, $commentData['ID']])['link']; ?>" class="btn btn-primary" title="Reply"><i class="fa fa-reply fa-fw" aria-hidden="true"></i> Reply</a>
             </div>
         </div>
             <!-- /.box-body -->

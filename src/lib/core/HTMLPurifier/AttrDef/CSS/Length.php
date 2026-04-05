@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_AttrDef_CSS_Length extends HTMLPurifier_AttrDef
 {
-
     /**
      * @type HTMLPurifier_Length|string
      */

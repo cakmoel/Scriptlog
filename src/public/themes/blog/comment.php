@@ -8,26 +8,24 @@ $img_alt = isset($retrieve_post['media_caption']) ? htmlout($retrieve_post['medi
 $post_title = isset($retrieve_post['post_title']) ? htmlout($retrieve_post['post_title']) : "";
 $post_content = isset($retrieve_post['post_content']) ? html_entity_decode(htmLawed(html($retrieve_post['post_content']))) : "";
 $comment_permit = isset($retrieve_post['comment_permit']) ? htmlout($retrieve_post['comment_permit']) : "";
-$total_comment = (total_comment($post_id)['total'] > 0) ? total_comment($post_id)['total'] : 0;
+$total_comment = (!empty($post_id) && total_comment($post_id)['total'] > 0) ? total_comment($post_id)['total'] : 0;
+if (isset($retrieve_post['user_fullname'])) {
+    $post_author = htmlout($retrieve_post['user_fullname']);
+}
 
-if (!empty($post_id) || $post_id !== '') { 
-    if (isset($retrieve_post['user_fullname'])) {
-        $post_author = htmlout($retrieve_post['user_fullname']);
-    }
-    
-    if (isset($retrieve_post['user_login'])) {
-        $post_author = htmlout($retrieve_post['user_login']);
-    }
-    
-    if (isset($retrieve_post['post_date'])) {
-        $post_created = htmlout(make_date($retrieve_post['post_date']));
-    }
-    
-    if (isset($retrieve_post['post_modified'])) {
-        $post_created = htmlout(make_date($retrieve_post['post_modified']));
-    }
-    
-    $cpage = (function_exists('request_path')) ? request_path()->param4 : 1;
+if (isset($retrieve_post['user_login'])) {
+    $post_author = htmlout($retrieve_post['user_login']);
+}
+
+if (isset($retrieve_post['post_date'])) {
+    $post_created = htmlout(make_date($retrieve_post['post_date']));
+}
+
+if (isset($retrieve_post['post_modified'])) {
+    $post_created = htmlout(make_date($retrieve_post['post_modified']));
+}
+
+$cpage = (function_exists('request_path')) ? request_path()->param4 : 1;
 
 ?>
  <div class="container">
@@ -57,10 +55,10 @@ if (!empty($post_id) || $post_id !== '') {
                         </div>
                     </div>
                     <div class="post-body">
-                        <?php 
-                          if (class_exists('DebugRoute')) {
+                        <?php
+                        if (class_exists('DebugRoute')) {
                             DebugRoute::debugging();
-                          }
+                        }
                         ?>
                     </div>
 
@@ -74,9 +72,9 @@ if (!empty($post_id) || $post_id !== '') {
                     </div>
 
                     <?php
-                      if ($comment_permit == 'open') :
+                    if ($comment_permit == 'open') :
                         echo retrieve_comments($post_id, $cpage);
-                    ?>
+                        ?>
 
                         <div class="comment-form-wrap pt-5">
                             <h3 class="h6 mb-5">Leave a comment</h3>
@@ -109,8 +107,8 @@ if (!empty($post_id) || $post_id !== '') {
                                 <div id="success_message" class="ajax_response"></div>
                             </form>
                         </div>
-                    <?php
-                      endif;
+                        <?php
+                    endif;
                     ?>
                 </div>
             </div>
@@ -122,12 +120,3 @@ if (!empty($post_id) || $post_id !== '') {
     ?>
 </div>
 </div>
-
-<?php
-
-} else {
-    http_response_code(404);
-    include dirname(__FILE__) . '/404.php';
-}
-
-?>

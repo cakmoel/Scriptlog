@@ -1,4 +1,6 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Util.php
  *
@@ -10,7 +12,7 @@
  *
  * @author Brandon Wamboldt <brandon.wamboldt@gmail.com>
  * @link   http://github.com/brandonwamboldt/utilphp/ Official Documentation
- * 
+ *
  */
 class Util
 {
@@ -20,7 +22,7 @@ class Util
      *
      * @var integer
      */
-    const SECONDS_IN_A_MINUTE = 60;
+    public const SECONDS_IN_A_MINUTE = 60;
 
     /**
      * A constant representing the number of seconds in an hour, for making
@@ -28,8 +30,8 @@ class Util
      *
      * @var integer
      */
-    const SECONDS_IN_A_HOUR = 3600;
-    const SECONDS_IN_AN_HOUR = 3600;
+    public const SECONDS_IN_A_HOUR = 3600;
+    public const SECONDS_IN_AN_HOUR = 3600;
 
     /**
      * A constant representing the number of seconds in a day, for making
@@ -37,7 +39,7 @@ class Util
      *
      * @var integer
      */
-    const SECONDS_IN_A_DAY = 86400;
+    public const SECONDS_IN_A_DAY = 86400;
 
     /**
      * A constant representing the number of seconds in a week, for making
@@ -45,7 +47,7 @@ class Util
      *
      * @var integer
      */
-    const SECONDS_IN_A_WEEK = 604800;
+    public const SECONDS_IN_A_WEEK = 604800;
 
     /**
      * A constant representing the number of seconds in a month (30 days),
@@ -53,7 +55,7 @@ class Util
      *
      * @var integer
      */
-    const SECONDS_IN_A_MONTH = 2592000;
+    public const SECONDS_IN_A_MONTH = 2592000;
 
     /**
      * A constant representing the number of seconds in a year (365 days),
@@ -61,7 +63,7 @@ class Util
      *
      * @var integer
      */
-    const SECONDS_IN_A_YEAR = 31536000;
+    public const SECONDS_IN_A_YEAR = 31536000;
 
     /**
      * URL constants as defined in the PHP Manual under "Constants usable with
@@ -69,17 +71,17 @@ class Util
      *
      * @see http://us2.php.net/manual/en/http.constants.php#http.constants.url
      */
-    const HTTP_URL_REPLACE = 1;
-    const HTTP_URL_JOIN_PATH = 2;
-    const HTTP_URL_JOIN_QUERY = 4;
-    const HTTP_URL_STRIP_USER = 8;
-    const HTTP_URL_STRIP_PASS = 16;
-    const HTTP_URL_STRIP_AUTH = 32;
-    const HTTP_URL_STRIP_PORT = 64;
-    const HTTP_URL_STRIP_PATH = 128;
-    const HTTP_URL_STRIP_QUERY = 256;
-    const HTTP_URL_STRIP_FRAGMENT = 512;
-    const HTTP_URL_STRIP_ALL = 1024;
+    public const HTTP_URL_REPLACE = 1;
+    public const HTTP_URL_JOIN_PATH = 2;
+    public const HTTP_URL_JOIN_QUERY = 4;
+    public const HTTP_URL_STRIP_USER = 8;
+    public const HTTP_URL_STRIP_PASS = 16;
+    public const HTTP_URL_STRIP_AUTH = 32;
+    public const HTTP_URL_STRIP_PORT = 64;
+    public const HTTP_URL_STRIP_PATH = 128;
+    public const HTTP_URL_STRIP_QUERY = 256;
+    public const HTTP_URL_STRIP_FRAGMENT = 512;
+    public const HTTP_URL_STRIP_ALL = 1024;
 
     /**
      * A collapse icon, using in the dump_var function to allow collapsing
@@ -356,7 +358,7 @@ class Util
             $setStyle = 'display:inline;';
         } elseif ($expLevel == 0) {
             $setImg = 1;
-            $setStyle='display:none;';
+            $setStyle = 'display:none;';
         } elseif ($expLevel < 0) {
             $setImg = 0;
             $setStyle = 'display:inline;';
@@ -391,9 +393,9 @@ class Util
             self::$hasArray = true;
             $uuid = 'include-php-' . uniqid() . mt_rand(1, 1000000);
 
-            $html .= (!empty($var) ? ' <img id="' . $uuid . '" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D" onclick="javascript:colToggle(this.id);" /><script>setImg("' . $uuid . '",'.$setImg.',1);</script>' : '') . '<span style="color:#588bff;">array</span>(' . count($var) . ')';
+            $html .= (!empty($var) ? ' <img id="' . $uuid . '" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D" onclick="javascript:colToggle(this.id);" /><script>setImg("' . $uuid . '",' . $setImg . ',1);</script>' : '') . '<span style="color:#588bff;">array</span>(' . count($var) . ')';
             if (!empty($var)) {
-                $html .= ' <span id="' . $uuid . '-collapsable" style="'.$setStyle.'"><br />[<br />';
+                $html .= ' <span id="' . $uuid . '-collapsable" style="' . $setStyle . '"><br />[<br />';
 
                 $indent = 4;
                 $longest_key = 0;
@@ -440,10 +442,10 @@ class Util
             // Keep track of variables we have already processed to detect recursion
             $done[] = &$var;
 
-            self::$hasArray=true;
+            self::$hasArray = true;
             $uuid = 'include-php-' . uniqid() . mt_rand(1, 1000000);
 
-            $html .= ' <img id="' . $uuid . '" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D" onclick="javascript:colToggle(this.id);" /><script>setImg("' . $uuid . '",'.$setImg.',1);</script><span style="color:#588bff;">object</span>(' . get_class($var) . ') <span id="' . $uuid . '-collapsable" style="'.$setStyle.'"><br />[<br />';
+            $html .= ' <img id="' . $uuid . '" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D" onclick="javascript:colToggle(this.id);" /><script>setImg("' . $uuid . '",' . $setImg . ',1);</script><span style="color:#588bff;">object</span>(' . get_class($var) . ') <span id="' . $uuid . '-collapsable" style="' . $setStyle . '"><br />[<br />';
 
             $varArray = (array) $var;
 
@@ -729,7 +731,7 @@ class Util
      */
     public static function fix_broken_serialization($brokenSerializedData)
     {
-        $fixdSerializedData = preg_replace_callback('!s:(\d+):"(.*?)";!', function($matches) {
+        $fixdSerializedData = preg_replace_callback('!s:(\d+):"(.*?)";!', function ($matches) {
             $snip = $matches[2];
             return 's:' . strlen($snip) . ':"' . $snip . '";';
         }, $brokenSerializedData);
@@ -886,9 +888,9 @@ class Util
             if (isset($parts['path']) && ($flags & self::HTTP_URL_JOIN_PATH)) {
                 if (isset($url['path']) && substr($parts['path'], 0, 1) !== '/') {
                     $url['path'] = rtrim(
-                            str_replace(basename($url['path']), '', $url['path']),
-                            '/'
-                        ) . '/' . ltrim($parts['path'], '/');
+                        str_replace(basename($url['path']), '', $url['path']),
+                        '/'
+                    ) . '/' . ltrim($parts['path'], '/');
                 } else {
                     $url['path'] = $parts['path'];
                 }
@@ -1380,7 +1382,7 @@ class Util
 
     protected static function numberToWordConvertGroup($index)
     {
-        switch($index) {
+        switch ($index) {
             case 11:
                 return ' decillion';
             case 10:
@@ -2032,7 +2034,7 @@ class Util
             return $string;
         }
 
-        return rtrim($matches[0]).$append;
+        return rtrim($matches[0]) . $append;
     }
 
     /**
@@ -2043,13 +2045,12 @@ class Util
      */
     public static function ordinal($number, $locale)
     {
-        
+
         $numberFormat = new NumberFormatter($locale, NumberFormatter::ORDINAL);
 
         $display_ordinal = $numberFormat->format($number);
 
         return $display_ordinal;
-
     }
 
     /**
@@ -2182,7 +2183,7 @@ class Util
     {
         $flattened = array();
 
-        array_walk_recursive($array, function($value, $key) use (&$flattened, $preserve_keys) {
+        array_walk_recursive($array, function ($value, $key) use (&$flattened, $preserve_keys) {
             if ($preserve_keys && !is_int($key)) {
                 $flattened[$key] = $value;
             } else {
@@ -2499,7 +2500,7 @@ class Util
     public static function directory_size($dir)
     {
         $size = 0;
-        foreach(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::CURRENT_AS_FILEINFO | \FilesystemIterator::SKIP_DOTS)) as $file => $key) {
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::CURRENT_AS_FILEINFO | \FilesystemIterator::SKIP_DOTS)) as $file => $key) {
             if ($key->isFile()) {
                 $size += $key->getSize();
             }
@@ -2514,8 +2515,11 @@ class Util
      */
     public static function get_user_directory()
     {
-        if (isset($_SERVER['HOMEDRIVE'])) return $_SERVER['HOMEDRIVE'] . $_SERVER['HOMEPATH'];
-        else return $_SERVER['HOME'];
+        if (isset($_SERVER['HOMEDRIVE'])) {
+            return $_SERVER['HOMEDRIVE'] . $_SERVER['HOMEPATH'];
+        } else {
+            return $_SERVER['HOME'];
+        }
     }
 
     /**
@@ -2527,7 +2531,7 @@ class Util
     public static function directory_contents($dir)
     {
         $contents = array();
-        foreach(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_FILEINFO | \FilesystemIterator::SKIP_DOTS)) as $pathname => $fi) {
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_FILEINFO | \FilesystemIterator::SKIP_DOTS)) as $pathname => $fi) {
             $contents[] = $pathname;
         }
         natsort($contents);

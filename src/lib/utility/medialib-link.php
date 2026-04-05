@@ -1,86 +1,73 @@
 <?php
+
 /**
  * Function medialib link
  * generate link media location
- * 
+ *
  * @param string $media_type
  * @param string $media_filename
  * @return string
- * 
+ *
  */
 function medialib_link($media_type, $media_filename)
 {
- 
-  if (!preg_match('/^(?:[a-z0-9_-]|\.(?!\.))+$/iD', $media_filename)) {
 
-     scriptlog_error("Bad filename", E_USER_WARNING);
+    if (!preg_match('/^(?:[a-z0-9_-]|\.(?!\.))+$/iD', $media_filename)) {
+        scriptlog_error("Bad filename", E_USER_WARNING);
+    }
 
-  }
+    switch ($media_type) {
+        case "image/jpeg":
+        case "image/jpg":
+        case "image/pjpeg":
+        case "image/gif":
+        case "image/png":
+        case "image/bmp":
+        case "image/webp":
+            $image_dir =  __DIR__ . '/../../' . APP_IMAGE_MEDIUM . 'medium_' . $media_filename;
 
-  switch ($media_type) {
+            $file_basename = substr($media_filename, 0, strripos($media_filename, '.'));
 
-      case "image/jpeg":
-      case "image/jpg":
-      case "image/pjpeg":  
-      case "image/gif":
-      case "image/png":
-      case "image/bmp":
-      case "image/webp":
+            if (is_readable($image_dir)) {
+                $image_link = app_url() . DS . APP_IMAGE_MEDIUM . 'medium_' . rawurlencode(basename($media_filename));
+            } else {
+                $image_link = app_url() . DS . APP_IMAGE_MEDIUM . 'medium_' . rawurlencode(basename($file_basename . '.webp'));
+            }
 
-        $image_dir =  __DIR__ . '/../../'.APP_IMAGE_MEDIUM.'medium_'.$media_filename;
+            return $image_link;
 
-        $file_basename = substr($media_filename, 0, strripos($media_filename, '.'));
+            break;
 
-        if(is_readable($image_dir)) {
+        case 'audio/wav':
+        case 'audio/ogg':
+        case 'audio/mpeg':
+            $audio_link = app_url() . DS . APP_AUDIO . rawurlencode(basename($media_filename));
 
-          $image_link = app_url().DS.APP_IMAGE_MEDIUM.'medium_'.rawurlencode(basename($media_filename));
-          
-        } else {
+            return $audio_link;
 
-          $image_link = app_url().DS.APP_IMAGE_MEDIUM.'medium_'.rawurlencode(basename($file_basename.'.webp'));
-          
-        }
+            break;
 
-        return $image_link;
-          
-        break;
-        
-      case 'audio/wav':
-      case 'audio/ogg':
-      case 'audio/mpeg':
-        
-        $audio_link = app_url().DS.APP_AUDIO.rawurlencode(basename($media_filename));
+        case 'video/mp4':
+        case 'video/webm':
+        case 'video/ogg':
+            $video_link = app_url() . DS . APP_VIDEO . rawurlencode(basename($media_filename));
 
-        return $audio_link;
+            return $video_link;
 
-        break;
-      
-      case 'video/mp4':
-      case 'video/webm':
-      case 'video/ogg':
-        
-        $video_link = app_url().DS.APP_VIDEO.rawurlencode(basename($media_filename));
+            break;
 
-        return $video_link;
+        case "application/pdf":
+            $pdf_link = app_url() . DS . APP_DOCUMENT . rawurlencode(basename($media_filename));
 
-        break;
-        
-      case "application/pdf":
+            return $pdf_link;
 
-           $pdf_link = app_url().DS.APP_DOCUMENT.rawurlencode(basename($media_filename));
+            break;
 
-           return $pdf_link;
+        default:
+            $media_link = "#";
 
-        break;
+            return $media_link;
 
-      default:
-          
-        $media_link = "#";
-
-        return $media_link;
-
-        break;
-
-  }
-  
+            break;
+    }
 }

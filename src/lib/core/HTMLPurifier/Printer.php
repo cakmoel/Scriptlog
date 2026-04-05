@@ -5,7 +5,6 @@
 
 class HTMLPurifier_Printer
 {
-
     /**
      * For HTML generation convenience funcs.
      * @type HTMLPurifier_Generator

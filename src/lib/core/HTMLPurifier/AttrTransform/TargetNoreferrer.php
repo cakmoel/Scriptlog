@@ -34,4 +34,3 @@ class HTMLPurifier_AttrTransform_TargetNoreferrer extends HTMLPurifier_AttrTrans
         return $attr;
     }
 }
-

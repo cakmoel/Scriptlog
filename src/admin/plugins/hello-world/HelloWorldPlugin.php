@@ -1,14 +1,16 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * HelloWorld Plugin
- * 
+ *
  * Sample plugin demonstrating the plugin system structure
- * 
+ *
  * @category Plugin
  * @author Your Name
  * @license MIT
  * @version 1.0.0
- * 
+ *
  */
 class HelloWorldPlugin
 {
@@ -16,7 +18,7 @@ class HelloWorldPlugin
      * Plugin directory
      */
     private $pluginDir;
-    
+
     /**
      * Constructor
      */
@@ -25,21 +27,21 @@ class HelloWorldPlugin
         $this->pluginDir = dirname(__FILE__);
         $this->registerHooks();
     }
-    
+
     /**
      * Register plugin hooks using clip() system
      */
     private function registerHooks()
     {
-        clip('clip_Hello World', null, function($content = '') {
+        clip('clip_Hello World', null, function ($content = '') {
             return $this->frontendDisplay($content);
         });
-        
-        clip('clip_Hello World_admin', null, function() {
+
+        clip('clip_Hello World_admin', null, function () {
             return $this->adminPage();
         });
     }
-    
+
     /**
      * Initialize plugin
      * Called when plugin is activated
@@ -48,7 +50,7 @@ class HelloWorldPlugin
     {
         return true;
     }
-    
+
     /**
      * Deactivate plugin
      * Called when plugin is deactivated
@@ -57,7 +59,7 @@ class HelloWorldPlugin
     {
         return true;
     }
-    
+
     /**
      * Uninstall plugin
      * Called when plugin is deleted
@@ -66,7 +68,7 @@ class HelloWorldPlugin
     {
         return true;
     }
-    
+
     /**
      * Plugin admin page
      * Render plugin settings page in admin panel
@@ -84,7 +86,7 @@ class HelloWorldPlugin
             </div>
         </div>';
     }
-    
+
     /**
      * Frontend display
      * Display content on frontend
@@ -96,20 +98,20 @@ class HelloWorldPlugin
             <p>This content is rendered by the Hello World plugin!</p>
         </div>';
     }
-    
+
     /**
      * Get plugin info
-     * 
+     *
      * @return array
      */
     public function getInfo()
     {
         $iniFile = $this->pluginDir . DIRECTORY_SEPARATOR . 'plugin.ini';
-        
+
         if (file_exists($iniFile)) {
             return parse_ini_file($iniFile);
         }
-        
+
         return [];
     }
 }

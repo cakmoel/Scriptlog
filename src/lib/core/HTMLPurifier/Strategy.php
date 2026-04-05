@@ -11,7 +11,6 @@
 
 abstract class HTMLPurifier_Strategy
 {
-
     /**
      * Executes the strategy on the tokens.
      *

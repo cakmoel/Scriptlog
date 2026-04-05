@@ -1,37 +1,37 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 // *****************************************************************************
 // Copyright 2003-2011 by A J Marston <http://www.tonymarston.net>
 // Amended 2011 by A J Marston to replace ereg* functions with preg* functions
 // @category Core Class
 // @license  the GNU General Public Licence
 // *****************************************************************************
-class DateGenerator 
+class DateGenerator
 {
-
     // private variables
-    var $monthalpha;            // array of 3-character month names
-    var $internaldate;          // date as held in the database (yyyymmdd)
-    var $externaldate;          // date as shown to the user (dd Mmm yyyy)
-    var $errors;                // error messages
-    var $date_format = 'dmy';   // date format - 'dmy', 'mdy' or 'ymd'
+    public $monthalpha;            // array of 3-character month names
+    public $internaldate;          // date as held in the database (yyyymmdd)
+    public $externaldate;          // date as shown to the user (dd Mmm yyyy)
+    public $errors;                // error messages
+    public $date_format = 'dmy';   // date format - 'dmy', 'mdy' or 'ymd'
 
     // ****************************************************************************
     // class constructor
     // ****************************************************************************
-    function __construct()
+    public function __construct()
     {
         $this->monthalpha = array(1 => 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 
         if (isset($GLOBALS['date_format'])) {
             $this->date_format = $GLOBALS['date_format'];
         } // if
-
     } // __construct
 
     // ****************************************************************************
     // accessor functions
     // ****************************************************************************
-    function formatDate ($dd, $mm, $ccyy)
+    public function formatDate($dd, $mm, $ccyy)
     // convert a date into the format required by the user
     {
         $format     = strtolower($this->date_format);
@@ -69,11 +69,10 @@ class DateGenerator
         } // switch
 
         return $output;
-
     } // formatDate
 
     // ****************************************************************************
-    function getInternalDate ($input)
+    public function getInternalDate($input)
     // convert date from external format (as input by user)
     // to internal format (as used in the database)
     {
@@ -203,7 +202,7 @@ class DateGenerator
             list($date, $time) = explode(' ', $input);
             if (strlen($date) == strlen($input)) {
                 // same length, so drop last character
-                $date = substr($date, 0, strlen($date)-1);
+                $date = substr($date, 0, strlen($date) - 1);
             } // if
             $this->internaldate = $this->getInternalDate($date);
             return $this->internaldate;
@@ -212,11 +211,10 @@ class DateGenerator
         $this->errors = 'This is not a valid date';
 
         return false;
-
     } // getInternalDate
 
     // ****************************************************************************
-    function getInternalTime ($input)
+    public function getInternalTime($input)
     // convert time from external format (as input by user)
     // to internal format (as used in the database)
     {
@@ -269,11 +267,10 @@ class DateGenerator
         $this->errors = 'This is not a valid time';
 
         return false;
-
     } // getInternalTime
 
     // ****************************************************************************
-    function getInternalDateTime ($input)
+    public function getInternalDateTime($input)
     // convert datetime from external format (as input by user)
     // to internal format (as used in the database)
     {
@@ -282,7 +279,7 @@ class DateGenerator
 
         // now split the input into its two portions
         $date = substr($input, 0, $pos);
-        $time = substr($input, $pos+1);
+        $time = substr($input, $pos + 1);
 
         // validate the separate portions
         if (!$internaldate = $this->getInternalDate(trim($date))) {
@@ -298,11 +295,10 @@ class DateGenerator
         $this->errors = 'This is not a valid datetime';
 
         return false;
-
     } // getInternalDateTime
 
     // ****************************************************************************
-    function verifyDate ($day, $month, $year)
+    public function verifyDate($day, $month, $year)
     {
         if (preg_match('/([a-z]{3})/i', $month)) {
             // convert array from 'N=month' to 'month=N'
@@ -354,11 +350,10 @@ class DateGenerator
         } // if
 
         return;
-
     } // verifyDate
 
     // ****************************************************************************
-    function verifyTime ($hours, $minutes, $seconds)
+    public function verifyTime($hours, $minutes, $seconds)
     {
         if ($hours > 23) {
             $this->errors = 'Invalid HOURS';
@@ -376,11 +371,10 @@ class DateGenerator
         } // if
 
         return "$hours:$minutes:$seconds";
-
     } // verifyTime
 
     // ****************************************************************************
-    function getExternalDate ($input)
+    public function getExternalDate($input)
     // convert date from internal format (as used in the database)
     // to external format (as shown to the user))
     {
@@ -465,7 +459,7 @@ class DateGenerator
         if (strlen($input) > 11) {
             // input is too long, so split into two pieces (after last ' ') and process first piece
             $time = strrchr($input, ' ');
-            $date = substr($input, 0, strlen($input)-strlen($time));
+            $date = substr($input, 0, strlen($input) - strlen($time));
             $this->externaldate = $this->getExternalDate($date);
             return $this->externaldate;
         } // if
@@ -473,11 +467,10 @@ class DateGenerator
         $this->errors = 'This is not a valid date';
 
         return $input;
-
     } // getExternalDate
 
     // ****************************************************************************
-    function addDays ($internaldate, $days)
+    public function addDays($internaldate, $days)
     // add a number of days (may be negative) to $internaldate (YYYY-MM-DD)
     // and return the result in the same format
     {
@@ -485,7 +478,7 @@ class DateGenerator
         $internaldate = $this->getInternalDate($internaldate);
 
         // convert to the number of days since basedate (4714 BC)
-        $julian = GregoriantoJD(substr($internaldate, 5, 2) , substr($internaldate, 8, 2) , substr($internaldate, 0, 4));
+        $julian = GregoriantoJD(substr($internaldate, 5, 2), substr($internaldate, 8, 2), substr($internaldate, 0, 4));
 
         $days = (int)$days;
         $julian = $julian + $days;
@@ -494,29 +487,27 @@ class DateGenerator
         $gregorian = JDtoGregorian($julian);
 
         // split date into its component parts
-        list ($month, $day, $year) = preg_split ('[/]', $gregorian);
+        list($month, $day, $year) = preg_split('[/]', $gregorian);
 
         // convert back into standard format
         $result = $this->getInternaldate("$day/$month/$year");
 
         return $result;
-
     } // addDays
 
     // ****************************************************************************
-    function addWeeks ($internaldate, $weeks)
+    public function addWeeks($internaldate, $weeks)
     // add a number of days (may be negative) to $internaldate (YYYY-MM-DD)
     // and return the result in the same format
     {
         // multiply weeks by 7 to get days
-        $result = $this->addDays($internaldate, $weeks*7);
+        $result = $this->addDays($internaldate, $weeks * 7);
 
         return $result;
-
     } // addWeeks
 
     // ****************************************************************************
-    function addMonths ($internaldate, $months)
+    public function addMonths($internaldate, $months)
     // add a number of days (may be negative) to $internaldate (YYYY-MM-DD)
     // and return the result in the same format
     {
@@ -524,22 +515,20 @@ class DateGenerator
         $internaldate = $this->getInternalDate($internaldate);
 
         // adjust it by speciied number of months
-        $timestamp = strtotime($internaldate .' + ' .$months .' months');
+        $timestamp = strtotime($internaldate . ' + ' . $months . ' months');
 
         // convert from unix timestamp into a human-readable date
         $result = date('Y-m-d', $timestamp);
 
         return $result;
-
     } // addMonths
 
     // ****************************************************************************
-    function getErrors ()
+    public function getErrors()
     {
         return $this->errors;
-
     } // getErrors
 
-// ****************************************************************************
+    // ****************************************************************************
 } // end date_class
 // ****************************************************************************

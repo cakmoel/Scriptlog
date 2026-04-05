@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
  <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -21,39 +23,36 @@
       <!-- /.box-header -->
 <?php
 if (isset($errors)) :
-?>
+    ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 <h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
-<?php 
-foreach ($errors as $e) :
-echo '<p>' . $e . '</p>';
-endforeach;
-?>
+    <?php
+    foreach ($errors as $e) :
+        echo '<p>' . $e . '</p>';
+    endforeach;
+    ?>
 </div>
 
-<?php 
-
+    <?php
 endif;
 
 if (isset($status)) :
-
-?>  
+    ?>  
 
 <div class="alert alert-success alert-dismissible">
   <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
   <h2><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h2>
     
-    <?php 
-        foreach ($status as $s) :
-          echo $s;
-        endforeach;
+    <?php
+    foreach ($status as $s) :
+        echo $s;
+    endforeach;
     ?>
     
 </div>
 
-<?php
- 
+    <?php
 endif;
 
 $action = (isset($formAction)) ? $formAction : null;
@@ -64,79 +63,70 @@ $action = (isset($formAction)) ? $formAction : null;
   <form method="post" action="<?= generate_request('index.php', 'get', ['option-general', $action, 0])['link']; ?>" >
     <table class="table table-bordered table-striped" aria-describedby="general-setting">
           <tbody>
-          <?php 
+          <?php
             if (is_array($settings)) :
-              $i = 0;
-              foreach ($settings as $s) :
+                $i = 0;
+                foreach ($settings as $s) :
+                    switch ($s['setting_name']) {
+                        default:
+                        case 'app_key':
+                            $setting_name = "Application Key";
 
-                switch ($s['setting_name']) {
+                            break;
 
-                   default:
-                   case 'app_key':
-                     
-                     $setting_name = "Application Key";
+                        case 'app_url':
+                            $setting_name = "Site Address(URL)";
 
-                     break;
-                   
-                   case 'app_url':
+                            break;
 
-                     $setting_name = "Site Address(URL)";
-                     
-                     break;
+                        case 'site_name':
+                            $setting_name = "Site Title";
 
-                   case 'site_name':
+                            break;
 
-                     $setting_name = "Site Title";
-                      
-                     break;
-                     
-                   case 'site_tagline':
+                        case 'site_tagline':
+                            $setting_name = "Tagline";
 
-                     $setting_name = "Tagline";
+                            break;
 
-                    break;
+                        case 'site_description':
+                            $setting_name = "Description";
 
-                   case 'site_description':
+                            break;
 
-                     $setting_name = "Description";
+                        case 'site_keywords':
+                            $setting_name = "Keywords";
 
-                    break;
+                            break;
 
-                  case 'site_keywords':
+                        case 'site_email':
+                            $setting_name = "Administration Email Address";
 
-                     $setting_name = "Keywords";
+                            break;
+                    }
 
-                   break;
-
-                  case 'site_email':
-
-                     $setting_name = "Administration Email Address";
-                     
-                   break;
-                   
-                }
-
-          ?>
+                    ?>
             <tr>
               <th>
               <label for="<?=(isset($s['setting_name'])) ? safe_html($s['setting_name']) : ""; ?>"> <?=(isset($setting_name) ? safe_html($setting_name) : ""); ?></label>
               </th>
               <td>
-                <input type="hidden" name="<?= 'setting_id['.$s['ID'].']'; ?>" value="<?= safe_html((int)$s['ID']);?>">
-                <input type="text" name="<?= 'setting_value['.$s['ID'].']' ?>" class="form-control" id="<?=(isset($s['setting_name'])) ? safe_html($s['setting_name']) : ""; ?>" value="<?= safe_html($s['setting_value']); ?>" maxlength="255" >
+                <input type="hidden" name="<?= 'setting_id[' . $s['ID'] . ']'; ?>" value="<?= safe_html((int)$s['ID']);?>">
+                <input type="text" name="<?= 'setting_value[' . $s['ID'] . ']' ?>" class="form-control" id="<?=(isset($s['setting_name'])) ? safe_html($s['setting_name']) : ""; ?>" value="<?= safe_html($s['setting_value']); ?>" maxlength="255" >
               </td>
             </tr>
              
-          <?php
-                $i++;
-              endforeach;
+                    <?php
+                          $i++;
+                endforeach;
             endif;
-          ?>
+            ?>
           </tbody>
         </table>
         <div class="box-footer">
         <input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
         <input type="submit" name="configFormSubmit" class="btn btn-primary" value="<?=(empty($s)) ?: "Update" ?>">
+        <input type="submit" name="clearCacheSubmit" class="btn btn-warning" value="Clear Page Cache">
         </div>
      </form>
    </div>

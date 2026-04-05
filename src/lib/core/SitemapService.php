@@ -1,14 +1,16 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class SiteMapService
- * 
+ *
  * @category Core Class
  * @author nirmalakhanza  <nirmala.adiba.khanza@email.com>
  * @uses Sitemap::addItem()
  * @uses Sitemap::createSitemapIndex()
  * @license MIT
  * @version 1.0
- * 
+ *
  */
 class SiteMapService
 {
@@ -39,7 +41,7 @@ class SiteMapService
 
     /**
      * add URL to sitemap
-     * 
+     *
      * @method private addURL()
      */
     private function addURL()
@@ -52,13 +54,12 @@ class SiteMapService
      *
      * @method private addPages()
      * @param object $pages
-     * 
+     *
      */
     private function addPages($pages)
     {
         if (!empty($pages)) {
-
-            foreach($pages as $key => $value) {
+            foreach ($pages as $key => $value) {
                 $this->sitemap->addItem($pages[$key]);
             }
         }
@@ -69,7 +70,7 @@ class SiteMapService
      *
      * @param object $pages
      * @return "1" |  "0"
-     * 
+     *
      */
     public function generateSitemap($pages)
     {
@@ -77,6 +78,5 @@ class SiteMapService
         $this->addPages($pages);
 
         return empty($this->sitemap->createSitemapIndex($this->domain, 'Now')) ? "1" : "0";
-
     }
 }

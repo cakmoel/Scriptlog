@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_AttrDef_HTML_FrameTarget extends HTMLPurifier_AttrDef_Enum
 {
-
     /**
      * @type array
      */

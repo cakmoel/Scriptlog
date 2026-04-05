@@ -34,4 +34,3 @@ class HTMLPurifier_AttrTransform_TargetNoopener extends HTMLPurifier_AttrTransfo
         return $attr;
     }
 }
-

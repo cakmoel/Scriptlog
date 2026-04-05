@@ -25,7 +25,6 @@
  */
 class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
 {
-
     // FULLY-PUBLIC VARIABLES ---------------------------------------------
 
     /**
@@ -382,6 +381,7 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
                             break;
                         }
                         // otherwise fall through
+                        // no break
                     case 1:
                         $attribute = htmlspecialchars($bits[0]);
                         trigger_error(

@@ -16,7 +16,6 @@
 
 abstract class HTMLPurifier_AttrTransform
 {
-
     /**
      * Abstract: makes changes to the attributes dependent on multiple values.
      *

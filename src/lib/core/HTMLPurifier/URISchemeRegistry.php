@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_URISchemeRegistry
 {
-
     /**
      * Retrieve sole instance of the registry.
      * @param HTMLPurifier_URISchemeRegistry $prototype Optional prototype to overload sole instance with,

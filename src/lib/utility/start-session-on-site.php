@@ -1,4 +1,5 @@
 <?php
+
 /**
  * start_session_on_site
  *
@@ -63,7 +64,6 @@ function start_session_on_site($session_handler)
             $current_cookie_params["secure"],
             true
         );
-        
     } catch (Exception $e) {
         error_log("Error in start_session_on_site: " . $e->getMessage());
         return false;
@@ -90,7 +90,7 @@ function session_valid_id($session_id)
     try {
         if (PHP_VERSION_ID >= 70100) {
             $sidLength = ini_get('session.sid_length');
-            
+
             switch (ini_get('session.sid_bits_per_character')) {
                 case 6:
                     $characterClass = '0-9a-zA-z,-';
@@ -105,14 +105,12 @@ function session_valid_id($session_id)
                     error_log('Unknown value in session.sid_bits_per_character: ' . ini_get('session.sid_bits_per_character'));
                     return false;
             }
-            
+
             $pattern = '/^[' . $characterClass . ']{' . $sidLength . '}$/';
             return preg_match($pattern, $session_id) === 1;
-            
         } else {
             return preg_match('/^[-,a-zA-Z0-9]{1,128}$/', $session_id) === 1;
         }
-        
     } catch (Exception $e) {
         error_log("Error validating session ID: " . $e->getMessage());
         return false;

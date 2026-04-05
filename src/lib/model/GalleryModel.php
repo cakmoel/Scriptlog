@@ -1,35 +1,34 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class GalleryModel extends Dao
- * 
+ *
  * @category  Model Class
  * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
- * 
+ *
  */
 class GalleryModel extends BaseModel
 {
+    /**
+     * getGalleries
+     *
+     * @param int|num $start
+     * @param int|num $limit
+     *
+     */
+    public function getGalleries($start, $limit)
+    {
 
-/**
- * getGalleries
- *
- * @param int|num $start
- * @param int|num $limit
- * 
- */
-public function getGalleries($start, $limit)
-{
-
- $sql = "SELECT ID, media_filename, media_caption FROM tbl_media WHERE media_target = 'gallery'
+        $sql = "SELECT ID, media_filename, media_caption FROM tbl_media WHERE media_target = 'gallery'
  ORDER BY ID LIMIT :start, :limit ";
 
- $this->setSQL($sql);
+        $this->setSQL($sql);
 
- $galleries = $this->findAll([':start' => $start, ':limit' => $limit]);
+        $galleries = $this->findAll([':start' => $start, ':limit' => $limit]);
 
- return (empty($galleries)) ?: $galleries;
-
-}
-
+        return (empty($galleries)) ?: $galleries;
+    }
 }

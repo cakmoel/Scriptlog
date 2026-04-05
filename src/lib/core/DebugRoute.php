@@ -1,4 +1,5 @@
 <?php
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -40,13 +41,11 @@ class DebugRoute
         $requestURI = self::requestURI();
 
         foreach (self::$routes as $key => $value) {
-  
             // Add delimiters to the regex pattern
             $pattern = '~^' . $value . '$~i';
 
             // Try to match the URL against the pattern
             if (@preg_match($pattern, $requestURI, $matches)) {
-                
                 echo "<div style='padding: 10px; border: 1px solid #ccc; margin-bottom: 20px;'>";
                 echo "<h3 style='margin: 0;'>Debugging Results</h3>";
                 echo "<hr style='margin-top: 5px; margin-bottom: 10px;'>";
@@ -54,7 +53,7 @@ class DebugRoute
                 echo "<strong>Route Pattern:</strong> $pattern<br>";
                 echo "<strong>Matched Route:</strong> $key<br>";
                 echo "<strong>Request URI:</strong> $requestURI<br>";
-                
+
                 // Print captured parameters
                 if (!empty($matches)) {
                     echo "<strong style='color: #008000;'>Captured parameters:</strong><br>";
@@ -64,13 +63,13 @@ class DebugRoute
                 } else {
                     echo "<strong style='color: #008000;'>No captured parameters</strong>";
                 }
-                
+
                 // Print execution time
                 $executionTime = microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
                 echo "<strong style='color: #008000;'>Page executed in:</strong> <span style='color: #FF0000;'>" . number_format($executionTime, 4) . " seconds</span>";
-                
+
                 echo "</div>";
-                
+
                 return; // Stop after first match
             }
         }
@@ -81,6 +80,5 @@ class DebugRoute
         echo "<hr style='margin-top: 5px; margin-bottom: 10px;'>";
         echo "<strong>No Match Found</strong>";
         echo "</div>";
-        
     }
 }

@@ -5,7 +5,6 @@
  */
 abstract class HTMLPurifier_TagTransform
 {
-
     /**
      * Tag name to transform the tag to.
      * @type string

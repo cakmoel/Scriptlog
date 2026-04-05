@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * extractKeywords
@@ -9,7 +9,7 @@
  * @version 1.0
  * @param string $content
  * @param integer $limit
- * 
+ *
  */
 function extract_keywords($content, $limit = 5)
 {

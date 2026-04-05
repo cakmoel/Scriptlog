@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Render the HTML for the comments section with Bootstrap 4.6 styling.
@@ -14,7 +14,7 @@ function render_comments_section(int $postId, int $offset = 0): string
     ob_start(); ?>
 
     <div id="comments-section" class="post-comments container-fluid px-0">
-        <?php if ($offset === 0): ?>
+        <?php if ($offset === 0) : ?>
         <div class="row">
             <div class="col">
                 <header class="mb-3">

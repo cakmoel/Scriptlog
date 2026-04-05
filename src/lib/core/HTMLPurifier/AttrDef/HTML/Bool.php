@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_AttrDef_HTML_Bool extends HTMLPurifier_AttrDef
 {
-
     /**
      * @type string
      */

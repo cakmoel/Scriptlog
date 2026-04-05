@@ -43,7 +43,6 @@
  */
 class HTMLPurifier_AttrDef_CSS_BackgroundPosition extends HTMLPurifier_AttrDef
 {
-
     /**
      * @type HTMLPurifier_AttrDef_CSS_Length
      */

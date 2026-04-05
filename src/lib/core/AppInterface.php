@@ -1,4 +1,6 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * AppInterface Interface
  *
@@ -11,32 +13,30 @@
  */
 interface AppInterface
 {
+    /**
+     * set page title
+     *
+     * @param string $pageTitle
+     *
+     */
+    public function setPageTitle($pageTitle);
 
-  /**
-   * set page title
-   * 
-   * @param string $pageTitle
-   * 
-   */
-  public function setPageTitle($pageTitle);
+    /**
+     * get page title
+     */
+    public function getPageTitle();
 
-  /**
-   * get page title
-   */
-  public function getPageTitle();
+    /**
+     * set form action
+     *
+     * @param string $formAction
+     *
+     */
+    public function setFormAction($formAction);
 
-  /**
-   * set form action
-   * 
-   * @param string $formAction
-   * 
-   */
-  public function setFormAction($formAction);
-
-  /**
-   * get form action
-   * 
-   */
-  public function getFormAction();
-    
+    /**
+     * get form action
+     *
+     */
+    public function getFormAction();
 }

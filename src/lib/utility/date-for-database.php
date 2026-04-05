@@ -1,4 +1,5 @@
 <?php
+
 /**
  * date_for_database()
  *
@@ -6,25 +7,20 @@
  * @see https://stackoverflow.com/questions/2215354/php-date-format-when-inserting-into-datetime-in-mysql
  * @param string $date
  * @return string
- * 
+ *
  */
 function date_for_database($date = null): string
 {
 
-$timezone = function_exists('timezone_identifier') ? timezone_identifier() : "";
-date_default_timezone_set($timezone);
+    $timezone = function_exists('timezone_identifier') ? timezone_identifier() : "";
+    date_default_timezone_set($timezone);
 
-if (! is_null($date) ) {
+    if (! is_null($date)) {
+        $timestamp = strtotime($date);
+        $date_formated = date("Y-m-d H:i:s", $timestamp);
+    } else {
+        $date_formated = date_create()->format('Y-m-d H:i:s');
+    }
 
- $timestamp = strtotime($date);
- $date_formated = date("Y-m-d H:i:s", $timestamp);
-
-} else {
-
- $date_formated = date_create()->format('Y-m-d H:i:s');
-
-}
-
-return $date_formated;
-
+    return $date_formated;
 }

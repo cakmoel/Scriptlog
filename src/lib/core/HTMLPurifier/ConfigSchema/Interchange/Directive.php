@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_ConfigSchema_Interchange_Directive
 {
-
     /**
      * ID of directive.
      * @type HTMLPurifier_ConfigSchema_Interchange_Id

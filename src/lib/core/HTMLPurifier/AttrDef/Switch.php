@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_AttrDef_Switch
 {
-
     /**
      * @type string
      */

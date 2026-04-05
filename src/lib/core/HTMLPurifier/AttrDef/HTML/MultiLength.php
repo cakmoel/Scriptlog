@@ -8,7 +8,6 @@
  */
 class HTMLPurifier_AttrDef_HTML_MultiLength extends HTMLPurifier_AttrDef_HTML_Length
 {
-
     /**
      * @param string $string
      * @param HTMLPurifier_Config $config

@@ -1,5 +1,8 @@
 <?php
 
+use lib\core\FrontHelper;
+use lib\utility\permalinks;
+
 $retrieve_post = (rewrite_status() == 'yes') ? retrieve_detail_post(request_path()->param1) : retrieve_detail_post(HandleRequest::isQueryStringRequested()['value']);
 
 $post_id = isset($retrieve_post['ID']) ? intval((int)$retrieve_post['ID']) : "";
@@ -7,11 +10,28 @@ $post_img = isset($retrieve_post['media_filename']) ? htmlout($retrieve_post['me
 $img_alt = isset($retrieve_post['media_caption']) ? htmlout($retrieve_post['media_caption']) : "";
 $post_title = isset($retrieve_post['post_title']) ? htmlout($retrieve_post['post_title']) : "";
 $post_slug = isset($retrieve_post['post_slug']) ? htmlout($retrieve_post['post_slug']) : "";
-$post_content = isset($retrieve_post['post_content']) ? html_entity_decode(htmLawed(html($retrieve_post['post_content']))) : "";
+$post_content = '';
+$post_visibility = isset($retrieve_post['post_visibility']) ? $retrieve_post['post_visibility'] : 'public';
 $comment_permit = isset($retrieve_post['comment_permit']) ? htmlout($retrieve_post['comment_permit']) : "";
-$total_comment = (total_comment($post_id)['total'] > 0) ? total_comment($post_id)['total'] : 0;
+$total_comment = (!empty($post_id) && total_comment($post_id)['total'] > 0) ? total_comment($post_id)['total'] : 0;
 
-if (!empty($post_id) || $post_id !== '') {
+$unlock_error = false;
+$is_unlocked = false;
+
+if ($post_visibility === 'protected') {
+    if (isset($_POST['unlock_post']) && isset($_POST['post_password'])) {
+        $is_unlocked = checking_post_password($post_id, $_POST['post_password']);
+        $unlock_error = !$is_unlocked;
+    }
+    
+    if ($is_unlocked) {
+        $post_content = isset($retrieve_post['post_content']) ? html_entity_decode(htmLawed(html(decrypt_post($post_id, $_POST['post_password'])['post_content']))) : "";
+    }
+}
+
+if ($post_visibility !== 'protected') {
+    $post_content = isset($retrieve_post['post_content']) ? html_entity_decode(htmLawed(html($retrieve_post['post_content']))) : "";
+}
 
 if (isset($retrieve_post['user_fullname'])) {
     $post_author = htmlout($retrieve_post['user_fullname']);
@@ -38,7 +58,7 @@ if (isset($retrieve_post['post_modified'])) {
                 <div class="container">
                     <div class="post-single">
                         <div class="post-thumbnal">
-                            <img src="<?= isset($post_img) ? invoke_frontimg($post_img) : "https://picsum.photos/730/486"; ?>" alt="<?= (isset($img_alt)) ? $img_alt : ""; ?>" class="img-fluid">
+                            <?= isset($post_img) ? invoke_responsive_image($post_img, 'medium', true, isset($img_alt) ? $img_alt : "", 'img-fluid', true) : '<img src="https://picsum.photos/730/486" alt="" width="730" height="486" class="img-fluid" loading="lazy" decoding="async">' ?>
                         </div>
 
                         <div class="post-details">
@@ -58,7 +78,27 @@ if (isset($retrieve_post['post_modified'])) {
                                 </div>
                             </div>
                             <div class="post-body">
+                                <?php if ($post_visibility === 'protected' && !$is_unlocked) : ?>
+                                <div class="password-protected-post text-center py-5">
+                                    <div class="lock-icon mb-3">
+                                        <i class="fa fa-lock fa-3x text-muted" aria-hidden="true"></i>
+                                    </div>
+                                    <h3 class="h4 mb-3"><?= t('visibility.password'); ?></h3>
+                                    <p class="text-muted mb-4"><?= t('protected.post.description'); ?></p>
+                                    <form method="post" class="password-form-inline d-inline-block">
+                                        <div class="form-group<?= $unlock_error ? ' has-error' : ''; ?>">
+                                            <input type="password" class="form-control" name="post_password" placeholder="<?= t('form.password'); ?>" required>
+                                            <input type="hidden" name="unlock_post" value="1">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary"><?= t('button.unlock'); ?></button>
+                                    </form>
+                                    <?php if ($unlock_error) : ?>
+                                    <p class="text-danger mt-2"><?= t('error.wrong_password'); ?></p>
+                                    <?php endif; ?>
+                                </div>
+                                <?php else : ?>
                                 <?= $post_content; ?>
+                                <?php endif; ?>
                             </div>
 
                             <div class="post-tags">
@@ -70,30 +110,30 @@ if (isset($retrieve_post['post_modified'])) {
                                 <?= next_post($post_id); ?>
                             </div>
 
-                            <?php
-                              if ($comment_permit == 'open') :
-                                echo render_comments_section($post_id);
-                              
-                            ?>
+<?php
+if ($comment_permit == 'open') :
+    echo render_comments_section($post_id);
+
+    ?>
 
                                 <div class="comment-form-wrap pt-5">
-                                    <h3 class="h6 mb-5">Leave a comment</h3>
+                                    <h3 class="h6 mb-5"><?= t('single.comment.leave_reply'); ?></h3>
                                     <form method="post" action="<?= retrieve_site_url() . DS . basename('comments-post.php'); ?>" id="commentForm" class="p-5 bg-light">
 
                                         <div class="form-group">
-                                            <label for="comment">Type your comment*</label>
-                                            <textarea cols="30" rows="10" id="comment" name="comment" class="form-control" placeholder="Enter your comment" maxlength="320" required></textarea>
+                                            <label for="comment"><?= t('single.comment.label'); ?>*</label>
+                                            <textarea cols="30" rows="10" id="comment" name="comment" class="form-control" placeholder="<?= t('single.comment.placeholder'); ?>" maxlength="320" required></textarea>
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="name">Name*</label>
-                                            <input type="text" class="form-control" id="name" name="name" maxlength="90" placeholder="Enter name" required>
+                                            <label for="name"><?= t('form.name.label'); ?>*</label>
+                                            <input type="text" class="form-control" id="name" name="name" maxlength="90" placeholder="<?= t('form.name.placeholder'); ?>" required>
                                             <div class="help-block with-errors"></div>
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="email">Email (will not be published)*</label>
-                                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" maxlength="180" required>
+                                            <label for="email"><?= t('form.email.label'); ?>*</label>
+                                            <input type="email" class="form-control" id="email" name="email" placeholder="<?= t('form.email.placeholder'); ?>" maxlength="180" required>
                                             <div class="help-block with-errors"></div>
                                         </div>
 
@@ -101,15 +141,15 @@ if (isset($retrieve_post['post_modified'])) {
                                             <input type="hidden" id="csrf" class="form-control" name="csrf" value="<?= block_csrf(); ?>">
                                             <input type="hidden" id="post_id" class="form-control" name="post_id" value="<?= abs((int)$post_id); ?>">
                                             <input type="hidden" id="parent_id" class="form-control" name="parent_id" value="0">
-                                            <button type="submit" class="btn btn-secondary">Submit Comment</button>
+                                            <button type="submit" class="btn btn-secondary"><?= t('single.comment.submit'); ?></button>
                                         </div>
                                         <div id="error_message" class="ajax_response"></div>
                                         <div id="success_message" class="ajax_response"></div>
                                     </form>
                                 </div>
                             <?php
-                              endif;
-                            ?>
+endif;
+?>
                         </div>
                     </div>
                 </div>
@@ -119,19 +159,4 @@ if (isset($retrieve_post['post_modified'])) {
               include dirname(__FILE__) . '/sidebar.php';
             ?>
         </div>
-    </div>
-  
-<?php
-
-} elseif (!filter_var($post_id, FILTER_VALIDATE_INT)) { 
-
-    http_response_code(404);
-    include dirname(__FILE__) . '/404.php';
-
-} else {
-
-    http_response_code(404);
-    include dirname(__FILE__) . '/404.php';
-}
-
-?>
+</div>

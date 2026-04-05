@@ -6,7 +6,6 @@
  */
 class HTMLPurifier_AttrDef_CSS_ListStyle extends HTMLPurifier_AttrDef
 {
-
     /**
      * Local copy of validators.
      * @type HTMLPurifier_AttrDef[]

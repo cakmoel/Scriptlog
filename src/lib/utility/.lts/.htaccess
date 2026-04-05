@@ -1,0 +1,3 @@
+# Deny all public access to encryption keys
+Order deny,allow
+Deny from all

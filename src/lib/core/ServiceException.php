@@ -1,6 +1,4 @@
-<?php 
-
-namespace Scriptlog\Core;
+<?php
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
@@ -14,42 +12,31 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  */
 
-use Exception;
-use Scriptlog\Core\IEventThrowable;
-
-class ServiceException extends Exception implements IEventThrowable
+class ServiceException extends \Exception implements IEventThrowable
 {
-  
-  
-protected $message = 'Unknown Exception';
+    protected $message = 'Unknown Exception';
 
-protected $previous;
+    protected $previous;
 
-public function __construct($message = null, $code = 0, Exception $previous = null)
-{
+    public function __construct($message = null, $code = 0, ?Exception $previous = null)
+    {
 
-  $code = $this->getCode();
+        $code = $this->getCode();
 
-  if (!$message) {
+        if (!$message) {
+            throw new $this('Unknown' . get_class($this));
+        }
 
-    throw new $this('Unknown'.get_class($this));
-    
-  }
+        parent::__construct($message, $code, $previous);
 
-  parent::__construct($message, $code, $previous);
+        if (!is_null($previous)) {
+            $this->previous = $previous;
+        }
+    }
 
-  if (!is_null($previous)) {
-
-    $this->previous = $previous;
-    
-  }
-  
-}
-
-public function __toString()
-{
-  return get_class($this) . "'{$this->message}' in {$this->getFile()}({$this->getLine()})\n"
-                            . "{$this->getTraceAsString()}";
-}
-  
+    public function __toString()
+    {
+        return get_class($this) . "'{$this->message}' in {$this->getFile()}({$this->getLine()})\n"
+                                  . "{$this->getTraceAsString()}";
+    }
 }
