@@ -93,16 +93,51 @@ function make_secure_connection($host, $username, $passwd, $dbname, $dbport, $ca
 }
 
 /**
- * close_connection()
+ * generate_license()
+ * to create serial generation of license key with php
  *
- * closing database connection
- *
- * @param object $link
+ * @link https://stackoverflow.com/questions/3687878/serial-generation-with-php
+ * @param string $suffix
+ * @return string
  *
  */
-function close_connection($link)
+function generate_license($suffix = null)
 {
-    $link->close();
+    $tokens = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No ambiguous characters
+    $token_length = strlen($tokens); // Store token length for efficiency
+
+    // Determine the number of segments and characters per segment
+    $num_segments = isset($suffix) ? 3 : 4;
+    $segment_chars = isset($suffix) ? 6 : 5;
+
+    // Build the license string using CSPRNG
+    $segments = [];
+    for ($i = 0; $i < $num_segments; $i++) {
+        $segment = '';
+        for ($j = 0; $j < $segment_chars; $j++) {
+            $segment .= $tokens[random_int(0, $token_length - 1)];
+        }
+        $segments[] = $segment;
+    }
+
+    $license_string = implode('-', $segments);
+
+    // Append the suffix if provided
+    if (isset($suffix)) {
+        if (is_numeric($suffix)) {
+            // User ID provided
+            $license_string .= '-' . strtoupper(base_convert($suffix, 10, 36));
+        } elseif (filter_var($suffix, FILTER_VALIDATE_IP)) {
+            // Valid IP address
+            $long = ip2long($suffix);
+            $license_string .= '-' . strtoupper(base_convert($long, 10, 36));
+        } else {
+            // General string suffix
+            $license_string .= '-' . strtoupper(str_replace(' ', '-', $suffix));
+        }
+    }
+
+    return $license_string;
 }
 
 /**
@@ -394,6 +429,26 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
             $recordSmtpFromName = $link->prepare($saveSettings);
             $recordSmtpFromName->bind_param('ss', $smtp_from_name, $smtp_name_val);
             $recordSmtpFromName->execute();
+
+            // insert API rate limiting settings
+            $api_rate_limit_enabled = "api_rate_limit_enabled";
+            $api_rate_limit_enabled_value = "1"; // enabled by default
+            $api_rate_limit_read = "api_rate_limit_read";
+            $api_rate_limit_read_value = "60"; // 60 requests per minute
+            $api_rate_limit_write = "api_rate_limit_write";
+            $api_rate_limit_write_value = "20"; // 20 requests per minute
+
+            $recordApiRateEnabled = $link->prepare($saveSettings);
+            $recordApiRateEnabled->bind_param('ss', $api_rate_limit_enabled, $api_rate_limit_enabled_value);
+            $recordApiRateEnabled->execute();
+
+            $recordApiRateRead = $link->prepare($saveSettings);
+            $recordApiRateRead->bind_param('ss', $api_rate_limit_read, $api_rate_limit_read_value);
+            $recordApiRateRead->execute();
+
+            $recordApiRateWrite = $link->prepare($saveSettings);
+            $recordApiRateWrite->bind_param('ss', $api_rate_limit_write, $api_rate_limit_write_value);
+            $recordApiRateWrite->execute();
 
             // insert language settings
             $link->query($insertLangSettings);
@@ -1155,54 +1210,6 @@ function escapeHTML($html)
 }
 
 /**
- * Generate License Function
- * to create serial generation of license key with php
- *
- * @link https://stackoverflow.com/questions/3687878/serial-generation-with-php
- * @param string $suffix
- * @return string
- *
- */
-function generate_license($suffix = null)
-{
-    $tokens = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No ambiguous characters
-    $token_length = strlen($tokens); // Store token length for efficiency
-
-    // Determine the number of segments and characters per segment
-    $num_segments = isset($suffix) ? 3 : 4;
-    $segment_chars = isset($suffix) ? 6 : 5;
-
-    // Build the license string
-    $segments = [];
-    for ($i = 0; $i < $num_segments; $i++) {
-        $segment = '';
-        for ($j = 0; $j < $segment_chars; $j++) {
-            $segment .= $tokens[rand(0, $token_length - 1)];
-        }
-        $segments[] = $segment;
-    }
-
-    $license_string = implode('-', $segments);
-
-    // Append the suffix if provided
-    if (isset($suffix)) {
-        if (is_numeric($suffix)) {
-            // User ID provided
-            $license_string .= '-' . strtoupper(base_convert($suffix, 10, 36));
-        } elseif (filter_var($suffix, FILTER_VALIDATE_IP)) {
-            // Valid IP address
-            $long = ip2long($suffix);
-            $license_string .= '-' . strtoupper(base_convert($long, 10, 36));
-        } else {
-            // General string suffix
-            $license_string .= '-' . strtoupper(str_replace(' ', '-', $suffix));
-        }
-    }
-
-    return $license_string;
-}
-
-/**
  * installation_key
  *
  * @param int|num $length
@@ -1367,6 +1374,12 @@ function generate_defuse_key()
     return $keyFile;
 }
 
+/**
+ * genereate_table_prefix()
+ *
+ * @param integer $length
+ * 
+ */
 function generate_table_prefix($length = 6)
 {
     $chars = 'abcdefghijklmnopqrstuvwxyz';

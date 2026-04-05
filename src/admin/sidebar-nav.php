@@ -195,7 +195,7 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
             <?php endif; ?>
 
             <?php if (access_control_list(ActionConst::CONFIGURATION)) : ?>
-            <li <?= ($module === 'option-general' || $module === 'option-permalink' || $module === 'option-reading' || $module === 'option-timezone' || $module === 'option-memberships') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+            <li <?= ($module === 'option-general' || $module === 'option-permalink' || $module === 'option-reading' || $module === 'option-timezone' || $module === 'option-memberships' || $module === 'option-api') ? 'class="treeview active"' : 'class="treeview"'; ?>>
                 <a href="#">
                     <i class="fa fa-sliders fa-fw"></i>
                     <span><?= admin_translate('nav.settings'); ?></span>
@@ -211,6 +211,7 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
                     <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-memberships', ActionConst::MEMBERSHIP_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.membership'); ?></a></li>
                     <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-mail', ActionConst::MAIL_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.mail_settings'); ?></a></li>
                     <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-downloads', ActionConst::DOWNLOAD_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.download_settings'); ?></a></li>
+                    <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-api', ActionConst::API_CONFIG, 0])['link']; ?>">RESTful API</a></li>
                 </ul>
             </li>
             <?php endif; ?>

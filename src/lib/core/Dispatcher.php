@@ -246,7 +246,7 @@ class Dispatcher
         $basePath = dirname($_SERVER['SCRIPT_NAME']);
 
         // Remove the base path from the request path if it exists
-        if ($basePath !== '/' && str_starts_with($path, $basePath)) {
+        if ($basePath !== '/' && function_exists('str_starts_with') ? str_starts_with($path, $basePath) : (strncmp($path, $basePath, strlen($basePath)) === 0)) {
             $path = substr($path, strlen($basePath));
         }
 

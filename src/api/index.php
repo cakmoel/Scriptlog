@@ -3,7 +3,7 @@
 /**
  * API Entry Point
  *
- * Blogware RESTful API
+ * RESTful API
  *
  * This is the entry point for all API requests.
  * It handles request routing, authentication, and response formatting.
@@ -11,6 +11,7 @@
  * API Version: 1.0
  * Base URL: /api/v1/
  *
+ * @category  api/index.php
  * @author    Blogware Team
  * @license   MIT
  * @version   1.0
@@ -75,6 +76,9 @@ require_once __DIR__ . '/../lib/controller/api/GdprApiController.php';
 require_once __DIR__ . '/../lib/controller/api/LanguagesApiController.php';
 require_once __DIR__ . '/../lib/controller/api/TranslationsApiController.php';
 require_once __DIR__ . '/../lib/controller/api/SearchApiController.php';
+require_once __DIR__ . '/../lib/controller/api/ProtectedPostApiController.php';
+require_once __DIR__ . '/../lib/utility/rate-limiter.php';
+require_once __DIR__ . '/../lib/core/ApiHateoas.php';
 
 // Initialize API
 try {
@@ -92,34 +96,95 @@ try {
     // Initialize API Router
     $router = new ApiRouter();
 
+    // Apply rate limiting before dispatching
+    // Read settings from database or use defaults
+    $rateLimitEnabled = true;
+    $readLimit = ApiResponse::RATE_LIMIT;
+    $writeLimit = 20;
+
+    try {
+        $dbc = Registry::get('dbc');
+
+        // Check if rate limiting is enabled
+        $stmt = $dbc->prepare("SELECT setting_value FROM tbl_settings WHERE setting_name = 'api_rate_limit_enabled' LIMIT 1");
+        $stmt->execute();
+        $enabledRow = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($enabledRow) {
+            $rateLimitEnabled = ((int)$enabledRow['setting_value'] === 1);
+        }
+
+        // Read rate limit
+        $stmt = $dbc->prepare("SELECT setting_value FROM tbl_settings WHERE setting_name = 'api_rate_limit_read' LIMIT 1");
+        $stmt->execute();
+        $readRow = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($readRow) {
+            $readLimit = max(1, (int)$readRow['setting_value']);
+        }
+
+        // Write rate limit
+        $stmt = $dbc->prepare("SELECT setting_value FROM tbl_settings WHERE setting_name = 'api_rate_limit_write' LIMIT 1");
+        $stmt->execute();
+        $writeRow = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($writeRow) {
+            $writeLimit = max(1, (int)$writeRow['setting_value']);
+        }
+    } catch (\Throwable $e) {
+        // Fall back to defaults if database is unavailable
+    }
+
+    if ($rateLimitEnabled) {
+        $rateLimiter = new RateLimiter();
+
+        // Use stricter limits for write operations
+        if (in_array($method, ['POST', 'PUT', 'DELETE', 'PATCH'])) {
+            $rateResult = $rateLimiter->check(null, $writeLimit, ApiResponse::RATE_WINDOW);
+        } else {
+            $rateResult = $rateLimiter->check(null, $readLimit, ApiResponse::RATE_WINDOW);
+        }
+
+        if (!$rateResult['allowed']) {
+            ApiResponse::tooManyRequests('Rate limit exceeded. Please slow down.', $rateResult['retry_after']);
+        }
+
+        // Store rate result for response headers
+        $GLOBALS['_api_rate_result'] = $rateResult;
+    }
+
     // Register API routes
     // Posts API
     $router->get('posts', 'PostsApiController@index');
-    $router->get('posts/([0-9]+)', 'PostsApiController@show');
-    $router->get('posts/([0-9]+)/comments', 'PostsApiController@comments');
+    $router->get('posts/(?P<id>[0-9]+)', 'PostsApiController@show');
+    $router->get('posts/(?P<id>[0-9]+)/comments', 'PostsApiController@comments');
     $router->post('posts', 'PostsApiController@store');
-    $router->put('posts/([0-9]+)', 'PostsApiController@update');
-    $router->delete('posts/([0-9]+)', 'PostsApiController@destroy');
+    $router->put('posts/(?P<id>[0-9]+)', 'PostsApiController@update');
+    $router->patch('posts/(?P<id>[0-9]+)', 'PostsApiController@update');
+    $router->delete('posts/(?P<id>[0-9]+)', 'PostsApiController@destroy');
+
+    // Protected Post API
+    $router->post('posts/(?P<id>[0-9]+)/unlock', 'ProtectedPostApiController@unlock');
+    $router->post('posts/(?P<id>[0-9]+)/verify', 'ProtectedPostApiController@verify');
 
     // Categories/Topics API
     $router->get('categories', 'CategoriesApiController@index');
-    $router->get('categories/([0-9]+)', 'CategoriesApiController@show');
-    $router->get('categories/([0-9]+)/posts', 'CategoriesApiController@posts');
+    $router->get('categories/(?P<id>[0-9]+)', 'CategoriesApiController@show');
+    $router->get('categories/(?P<id>[0-9]+)/posts', 'CategoriesApiController@posts');
     $router->post('categories', 'CategoriesApiController@store');
-    $router->put('categories/([0-9]+)', 'CategoriesApiController@update');
-    $router->delete('categories/([0-9]+)', 'CategoriesApiController@destroy');
+    $router->put('categories/(?P<id>[0-9]+)', 'CategoriesApiController@update');
+    $router->patch('categories/(?P<id>[0-9]+)', 'CategoriesApiController@update');
+    $router->delete('categories/(?P<id>[0-9]+)', 'CategoriesApiController@destroy');
 
     // Comments API
     $router->get('comments', 'CommentsApiController@index');
-    $router->get('comments/([0-9]+)', 'CommentsApiController@show');
+    $router->get('comments/(?P<id>[0-9]+)', 'CommentsApiController@show');
     $router->post('comments', 'CommentsApiController@store');
-    $router->put('comments/([0-9]+)', 'CommentsApiController@update');
-    $router->delete('comments/([0-9]+)', 'CommentsApiController@destroy');
+    $router->put('comments/(?P<id>[0-9]+)', 'CommentsApiController@update');
+    $router->patch('comments/(?P<id>[0-9]+)', 'CommentsApiController@update');
+    $router->delete('comments/(?P<id>[0-9]+)', 'CommentsApiController@destroy');
 
     // Archives API
     $router->get('archives', 'ArchivesApiController@index');
-    $router->get('archives/([0-9]{4})', 'ArchivesApiController@year');
-    $router->get('archives/([0-9]{4})/([0-9]{2})', 'ArchivesApiController@month');
+    $router->get('archives/(?P<year>[0-9]{4})', 'ArchivesApiController@year');
+    $router->get('archives/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})', 'ArchivesApiController@month');
 
     // Search API
     $router->get('search', 'SearchApiController@index');
@@ -134,20 +199,20 @@ try {
     $router->get('languages', 'LanguagesApiController@index');
     $router->get('languages/active', 'LanguagesApiController@index');
     $router->get('languages/default', 'LanguagesApiController@default');
-    $router->get('languages/([a-z]{2})', 'LanguagesApiController@show');
+    $router->get('languages/(?P<code>[a-z]{2})', 'LanguagesApiController@show');
     $router->post('languages', 'LanguagesApiController@store');
-    $router->put('languages/([a-z]{2})', 'LanguagesApiController@update');
-    $router->delete('languages/([a-z]{2})', 'LanguagesApiController@destroy');
-    $router->post('languages/([a-z]{2})/default', 'LanguagesApiController@setDefault');
+    $router->put('languages/(?P<code>[a-z]{2})', 'LanguagesApiController@update');
+    $router->delete('languages/(?P<code>[a-z]{2})', 'LanguagesApiController@destroy');
+    $router->put('languages/(?P<code>[a-z]{2})/default', 'LanguagesApiController@setDefault');
 
     // Translations API
-    $router->get('translations/([a-z]{2})', 'TranslationsApiController@index');
-    $router->get('translations/([a-z]{2})/([a-zA-Z0-9._-]+)', 'TranslationsApiController@show');
-    $router->post('translations/([a-z]{2})', 'TranslationsApiController@store');
-    $router->put('translations/([0-9]+)', 'TranslationsApiController@update');
-    $router->delete('translations/([0-9]+)', 'TranslationsApiController@destroy');
-    $router->get('translations/([a-z]{2})/export', 'TranslationsApiController@export');
-    $router->post('translations/([a-z]{2})/import', 'TranslationsApiController@import');
+    $router->get('translations/(?P<code>[a-z]{2})', 'TranslationsApiController@index');
+    $router->get('translations/(?P<code>[a-z]{2})/(?P<key>[a-zA-Z0-9._-]+)', 'TranslationsApiController@show');
+    $router->post('translations/(?P<code>[a-z]{2})', 'TranslationsApiController@store');
+    $router->put('translations/(?P<id>[0-9]+)', 'TranslationsApiController@update');
+    $router->delete('translations/(?P<id>[0-9]+)', 'TranslationsApiController@destroy');
+    $router->get('translations/(?P<code>[a-z]{2})/export', 'TranslationsApiController@export');
+    $router->post('translations/(?P<code>[a-z]{2})/import', 'TranslationsApiController@import');
     $router->post('translations/([a-z]{2})/cache', 'TranslationsApiController@cache');
 
     // API OpenAPI spec endpoint
@@ -165,6 +230,11 @@ try {
     // API Info endpoint
     $router->get('', 'ApiController@info');
     $router->get('/', 'ApiController@info');
+
+    // Validate Accept header for all API requests
+    if (!ApiResponse::validateAccept(['application/json', '*/*'])) {
+        ApiResponse::notAcceptable('This API only supports application/json responses', ['application/json']);
+    }
 
     // Dispatch the request
     $router->dispatch($method, $uri, $queryParams);

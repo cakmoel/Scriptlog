@@ -42,7 +42,7 @@ class FrontHelper
 
         $query = db_simple_query($sql);
 
-        $result = $query->fetch_assoc();
+        $result = $query->fetch();
 
         return empty($result) ? null : $result;
     }
@@ -63,7 +63,7 @@ class FrontHelper
 
         $query = db_simple_query($sql);
 
-        $result = $query->fetch_assoc();
+        $result = $query->fetch();
 
         return empty($result) ? null : $result;
     }
@@ -83,7 +83,7 @@ class FrontHelper
         $query = db_simple_query($sql);
 
         $results = [];
-        while ($row = $query->fetch_assoc()) {
+        while ($row = $query->fetch()) {
             $results[] = $row;
         }
 
@@ -115,68 +115,46 @@ AND p.post_visibility = 'public'
 AND p.post_type = 'page' 
 AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
-        $results = db_simple_query($sql)->fetch_assoc();
+        $results = db_simple_query($sql)->fetch();
 
         return empty($results) ? null : $results;
     }
 
     /**
-      * grabFrontTag
-      *
-      * implementing a simple MySQL full-text searching
-      *
-      * @param string $tag
-      * @return mixed
-      *
-      */
+     * grabFrontTag
+     *
+     * implementing a simple MySQL full-text searching
+     *
+     * @param string $tag
+     * @return mixed
+     *
+     */
     public static function simpleSearchingTag($tag)
     {
-        // First check if $tag is valid - if empty, return empty array
         if (empty($tag)) {
             return [];
         }
 
-        // If database functions aren't available, return a placeholder result
-        // The template will handle the "no posts" display
         try {
             if (!function_exists('db_instance')) {
-                error_log("simpleSearchingTag: db_instance function not available");
                 return [];
             }
 
             $dbc = db_instance();
             if (!is_object($dbc)) {
-                error_log("simpleSearchingTag: db_instance didn't return an object");
                 return [];
-            }
-
-            // Check if query method exists
-            if (!method_exists($dbc, 'query')) {
-                error_log("simpleSearchingTag: DbMySQLi doesn't have query method");
-                // Return a minimal placeholder so page can render
-                return ['ID' => 0, 'post_title' => '', 'post_content' => '', 'post_summary' => ''];
             }
 
             $escapedTag = $dbc->escape_string($tag);
             $tagSearch = '%' . $escapedTag . '%';
             $sql = "SELECT ID, post_title, post_content, post_summary, post_tags FROM tbl_posts WHERE post_tags LIKE '$tagSearch' AND post_status = 'publish' AND post_type = 'blog' LIMIT 1";
 
-            error_log("simpleSearchingTag: sql = " . $sql);
-
             $result = $dbc->query($sql);
-            $results = $result ? $result->fetch_assoc() : null;
-
-            if (empty($results)) {
-                error_log("simpleSearchingTag: NO RESULTS for tag=$tag");
-            } else {
-                error_log("simpleSearchingTag: FOUND post ID=" . $results['ID']);
-            }
+            $results = $result ? $result->fetch() : null;
 
             return empty($results) ? null : $results;
         } catch (Throwable $e) {
-            error_log("simpleSearchingTag: Throwable - " . $e->getMessage());
-            // Return a minimal placeholder so page can render
-            return ['ID' => 0, 'post_title' => '', 'post_content' => '', 'post_summary' => ''];
+            return [];
         }
     }
 
@@ -196,22 +174,20 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
         $results = db_simple_query($sql);
 
-        if ($results->num_rows > 0) {
-            while ($row = $results->fetch_array(MYSQLI_ASSOC)) {
-                $parts = explode(',', $row['postTags']);
+        while ($row = $results->fetch()) {
+            $parts = explode(',', $row['postTags']);
 
-                foreach ($parts as $part) {
-                    $tagArrays[] = $part;
-                }
+            foreach ($parts as $part) {
+                $tagArrays[] = $part;
             }
-
-            $finalTags = array_unique($tagArrays);
-            foreach ($finalTags as $tag) {
-                $taglink[] = trim($tag);
-            }
-
-            return $taglink;
         }
+
+        $finalTags = array_unique($tagArrays);
+        foreach ($finalTags as $tag) {
+            $taglink[] = trim($tag);
+        }
+
+        return $taglink;
     }
 
     /**
@@ -235,11 +211,11 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
         LEFT JOIN tbl_media AS m ON p.media_id = m.ID
         LEFT JOIN tbl_users AS u ON p.post_author = u.ID
         WHERE p.ID = ? AND p.post_status = 'publish'
-        AND p.post_visibility = 'public'
+        AND p.post_visibility IN ('public', 'protected')
         AND p.post_type = 'blog' AND m.media_target = 'blog' 
         AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
-        return db_prepared_query($sql, [$id], 'i')->get_result()->fetch_assoc();
+        return db_prepared_query($sql, [$id], 'i')->fetch();
     }
 
     /**
@@ -267,7 +243,7 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
   AND p.post_type = 'page' 
   AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
-        return db_prepared_query($sql, [$slug], 's')->get_result()->fetch_assoc();
+        return db_prepared_query($sql, [$slug], 's')->fetch();
     }
 
     /**
@@ -282,7 +258,7 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
         $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE topic_slug = ? AND topic_status = 'Y'";
 
-        return db_prepared_query($sql, [$slug], 's')->get_result()->fetch_assoc();
+        return db_prepared_query($sql, [$slug], 's')->fetch();
     }
 
     /**
@@ -297,7 +273,7 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
         $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE ID = ? AND topic_status = 'Y'";
 
-        return db_prepared_query($sql, [$id], 'i')->get_result()->fetch_assoc();
+        return db_prepared_query($sql, [$id], 'i')->fetch();
     }
 
     /**
@@ -313,7 +289,6 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
         $month = isset($values['month']) ? Sanitize::mildSanitizer($values['month']) : null;
         $year = isset($values['year']) ? Sanitize::mildSanitizer($values['year']) : null;
 
-        // set from and to dates
         $from = date('Y-m-01 00:00:00', strtotime("$year-$month"));
         $to = date('Y-m-31 23:59:59', strtotime("$year-$month"));
 
@@ -321,7 +296,7 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
     p.post_modified, p.post_title, p.post_slug, 
     p.post_content, p.post_summary, p.post_tags, p.post_type, p.post_status, 
     p.post_sticky, u.user_login, u.user_fullname,
-    m.media_filename, m.media_captionh
+    m.media_filename, m.media_caption
   FROM tbl_posts AS p
   LEFT JOIN tbl_users AS u ON p.post_author = u.ID
   LEFT JOIN tbl_media AS m ON p.media_id = m.ID
@@ -329,7 +304,7 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
   AND p.post_type = 'blog' AND p.post_status = 'publish'
   ORDER BY DATE(p.post_date) DESC ";
 
-        return db_prepared_query($sql, [$from, $to], 'ss')->get_result()->fetch_assoc();
+        return db_prepared_query($sql, [$from, $to], 'ss')->fetch();
     }
 
     /**

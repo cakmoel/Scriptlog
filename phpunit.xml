@@ -38,12 +38,11 @@
     
     <coverage processUncoveredFiles="false">
         <include>
-            <directory suffix=".php">lib</directory>
+            <directory suffix=".php">src</directory>
         </include>
         <exclude>
-            <directory suffix=".php">lib/vendor</directory>
-            <directory suffix=".php">lib/core/HTMLPurifier</directory>
-            <file>lib/utility/db-mysqli.php</file>
+            <directory suffix=".php">vendor</directory>
+            <file>src/core/HTMLPurifier</file>
         </exclude>
     </coverage>
 </phpunit>

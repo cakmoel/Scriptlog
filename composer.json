@@ -17,7 +17,6 @@
         "platform": {
             "php": "7.4.33"
         },
-        "vendor-dir": "lib/vendor",
         "sort-packages": true
     },
     "require": {
@@ -48,14 +47,14 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "autoload": {
-        "classmap": ["lib/"]
+        "classmap": ["src/lib/"]
     },
     "scripts": {
         "metrics": "php bin/phpmetrics",
-        "phpstan": "phpstan analyse lib --level 0 --memory-limit=1G",
-        "phpstan:strict": "phpstan analyse lib --level 1 --memory-limit=1G",
-        "phpcs": "phpcs --standard=phpcs.xml lib/",
-        "phpcbf": "phpcbf --standard=phpcs.xml lib/",
+        "phpstan": "phpstan analyse src --level 0 --memory-limit=1G",
+        "phpstan:strict": "phpstan analyse src --level 1 --memory-limit=1G",
+        "phpcs": "phpcs --standard=phpcs.xml src/",
+        "phpcbf": "phpcbf --standard=phpcs.xml src/",
         "csfix": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff",
         "csfix:apply": "php-cs-fixer fix --config=.php-cs-fixer.dist.php",
         "test": "phpunit --configuration phpunit.xml",

@@ -164,7 +164,7 @@ class SessionMaker extends SessionHandler
     /**
      * refresh
      *
-     * @return void
+     * @return bool
      *
      */
     public function refresh()

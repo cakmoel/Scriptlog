@@ -62,10 +62,13 @@ final class HandleRequest
         if (is_array($rules)) {
             foreach ($rules as $key => $value) {
                 if (preg_match('~^' . $value . '$~i', $uri, $matches)) {
-                    return $parameters[] = $matches;
+                    $parameters[] = $matches;
+                    return $parameters;
                 }
             }
         }
+
+        return $parameters;
     }
 
     /**

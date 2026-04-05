@@ -1,5 +1,14 @@
 <?php
-// generate-utility-list.php
+/**
+ * Utility Manifest Generator
+ * Scans the utility directory and regenerates the utility-loader.php file.
+ * This tool should be run whenever a new utility file is added to /lib/utility/.
+ * Usage: php generate-utility-list.php
+ * 
+ * @category Scan utility directory then regenerates the utility-loader.php file
+ * @author  M.Noermoehammad
+ * @license MIT
+ */
 
 // Define the path to the utility folder and the target output file
 $utility_dir = __DIR__ . '/lib/utility/';

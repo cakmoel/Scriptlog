@@ -25,9 +25,13 @@ class BlogSchema
         // Retrieve blog post content using FrontHelper
         $post = FrontHelper::grabPreparedFrontPostById($post);
 
+        // Return empty schema if post not found
+        if (empty($post)) {
+            return '';
+        }
 
         // Determine the most specific CreativeWork type
-        $type = self::determineCreativeWorkType($post['post_type']);
+        $type = self::determineCreativeWorkType($post['post_type'] ?? 'blog');
 
         // Prepare schema.org structured data
 
