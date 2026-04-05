@@ -9,7 +9,6 @@
  */
 class HTMLPurifier_HTMLModule_Iframe extends HTMLPurifier_HTMLModule
 {
-
     /**
      * @type string
      */

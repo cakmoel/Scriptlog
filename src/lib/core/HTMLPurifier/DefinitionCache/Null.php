@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_DefinitionCache_Null extends HTMLPurifier_DefinitionCache
 {
-
     /**
      * @param HTMLPurifier_Definition $def
      * @param HTMLPurifier_Config $config

@@ -2,7 +2,6 @@
 
 class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
 {
-
     /**
      * @type HTMLPurifier_HTMLDefinition, for easy access
      */
@@ -15,7 +14,7 @@ class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
     public function render($config)
     {
         $ret = '';
-        $this->config =& $config;
+        $this->config = & $config;
 
         $this->def = $config->getHTMLDefinition();
 

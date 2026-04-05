@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_AttrDef_CSS_Percentage extends HTMLPurifier_AttrDef
 {
-
     /**
      * Instance to defer number validation to.
      * @type HTMLPurifier_AttrDef_CSS_Number

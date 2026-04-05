@@ -17,7 +17,6 @@
 
 class HTMLPurifier_HTMLModule
 {
-
     // -- Overloadable ----------------------------------------------------
 
     /**

@@ -6,7 +6,6 @@
  */
 class HTMLPurifier_AttrDef_URI_Email_SimpleCheck extends HTMLPurifier_AttrDef_URI_Email
 {
-
     /**
      * @param string $string
      * @param HTMLPurifier_Config $config

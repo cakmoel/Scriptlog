@@ -8,7 +8,6 @@
  */
 class HTMLPurifier_AttrDef_URI_IPv6 extends HTMLPurifier_AttrDef_URI_IPv4
 {
-
     /**
      * @param string $aIP
      * @param HTMLPurifier_Config $config

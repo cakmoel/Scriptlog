@@ -8,7 +8,6 @@
  */
 class HTMLPurifier_IDAccumulator
 {
-
     /**
      * Lookup table of IDs we've accumulated.
      * @public

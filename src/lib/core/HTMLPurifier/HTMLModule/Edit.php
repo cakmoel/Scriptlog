@@ -6,7 +6,6 @@
  */
 class HTMLPurifier_HTMLModule_Edit extends HTMLPurifier_HTMLModule
 {
-
     /**
      * @type string
      */

@@ -9,7 +9,6 @@
  */
 class HTMLPurifier_Context
 {
-
     /**
      * Private array that stores the references.
      * @type array
@@ -30,7 +29,7 @@ class HTMLPurifier_Context
             );
             return;
         }
-        $this->_storage[$name] =& $ref;
+        $this->_storage[$name] = & $ref;
     }
 
     /**

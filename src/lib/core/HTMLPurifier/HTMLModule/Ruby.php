@@ -6,7 +6,6 @@
  */
 class HTMLPurifier_HTMLModule_Ruby extends HTMLPurifier_HTMLModule
 {
-
     /**
      * @type string
      */
