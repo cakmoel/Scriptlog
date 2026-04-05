@@ -6,7 +6,6 @@
  */
 class HTMLPurifier_CSSDefinition extends HTMLPurifier_Definition
 {
-
     public $type = 'CSS';
 
     /**
@@ -436,7 +435,8 @@ class HTMLPurifier_CSSDefinition extends HTMLPurifier_Definition
             array(
                 new HTMLPurifier_AttrDef_CSS_Percentage(true), // disallow negative
                 new HTMLPurifier_AttrDef_CSS_Length('0') // disallow negative
-            ));
+            )
+        );
 
         $this->info['border-top-left-radius'] =
         $this->info['border-top-right-radius'] =

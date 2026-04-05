@@ -1,30 +1,30 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * interface IException
- * 
+ *
  * @category Core Class
  * @see      https://stackoverflow.com/questions/628408/custom-exception-messages-best-practices
  * @see      https://secure.php.net/manual/en/language.exceptions.php#91159
  * @license  MIT
  * @version  1.0
  * @since    1.0
- * 
+ *
  */
 interface IException
 {
-  
-  public function getMessage();
-  
-  public function getCode();
+    public function getMessage();
 
-  public function getFile();
+    public function getCode();
 
-  public function getLine();
+    public function getFile();
 
-  public function getTraceAsString();
+    public function getLine();
 
-  public function __toString();
+    public function getTraceAsString();
 
-  public function __construct($message = null, $code = 0);
-  
+    public function __toString();
+
+    public function __construct($message = null, $code = 0);
 }

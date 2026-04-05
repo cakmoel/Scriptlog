@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
 
 <div class="content-wrapper">
 <!-- Content Header (Page header) -->
@@ -23,17 +25,17 @@
 <!-- /.box-header -->
 <?php
 if (isset($errors)) :
-?>
+    ?>
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 <h4><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h4>
-<?php 
-foreach ($errors as $e) :
-echo '<p>' . $e . '</p>';
-endforeach;
-?>
+    <?php
+    foreach ($errors as $e) :
+        echo '<p>' . $e . '</p>';
+    endforeach;
+    ?>
 </div>
-<?php 
+    <?php
 endif;
 
 $action = (isset($formAction)) ? $formAction : null;
@@ -64,15 +66,14 @@ $menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
 <?=(isset($menuData['menu_link'])) ? htmlspecialchars($menuData['menu_link']) : ""; ?>
 <?=(isset($formData['menu_link'])) ? htmlspecialchars($formData['menu_link'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" >
 <p class="help-block">
-<?php 
-  if (function_exists('is_permalink_enabled') && is_permalink_enabled() === 'yes'):
-?>
-<i>ex: /post/id/your-friendly-neighborhood</i>.Please check out <a href="https://scriptlog.my.id/doc/" target="_blank" rel="noopener noreferrer">documentation</a> for more information.
 <?php
- else:
-?>
+if (function_exists('is_permalink_enabled') && is_permalink_enabled() === 'yes') :
+    ?>
+<i>ex: /post/id/your-friendly-neighborhood</i>.Please check out <a href="https://scriptlog.my.id/doc/" target="_blank" rel="noopener noreferrer">documentation</a> for more information.
+<?php else :
+    ?>
 <i>ex: ?p=1</i>. Please check out <a href="https://scriptlog.my.id/doc/" target="_blank" rel="noopener noreferrer">documentation</a> for more information.
-<?php 
+      <?php
 endif;
 ?>
 </p>
@@ -84,8 +85,8 @@ endif;
 <div class="radio">
 <label for="optionRadios1">
 <input type="radio" name="menu_status" id="optionsRadios1" value="Y" 
-<?=(isset($menuData['menu_status']) && $menuData['menu_status'] === 'Y') ? 'checked="checked"' : ""; ?>
-<?=(isset($formData['menu_status']) && $formData['menu_status'] === 'Y') ? 'checked="checked"' : "" ?> >
+    <?=(isset($menuData['menu_status']) && $menuData['menu_status'] === 'Y') ? 'checked="checked"' : ""; ?>
+    <?=(isset($formData['menu_status']) && $formData['menu_status'] === 'Y') ? 'checked="checked"' : "" ?> >
    Yes
  </label>
 </div>
@@ -93,20 +94,25 @@ endif;
 <div class="radio">
 <label for="optionRadios2">
 <input type="radio" name="menu_status" id="optionsRadios2" value="N" 
-<?=(isset($menuData['menu_status']) && $menuData['menu_status'] === 'N') ? 'checked="checked"' : ""; ?>
-<?=(isset($formData['menu_status']) && $formData['menu_status'] === 'N') ? 'checked="checked"' : ""; ?> >
+    <?=(isset($menuData['menu_status']) && $menuData['menu_status'] === 'N') ? 'checked="checked"' : ""; ?>
+    <?=(isset($formData['menu_status']) && $formData['menu_status'] === 'N') ? 'checked="checked"' : ""; ?> >
    No
  </label>
 </div>
 
 </div>
-<?php 
+    <?php
 endif;
 ?>
 
 <div class="form-group">
 <label for="menu_visibility">Visibility</label>
 <?=(isset($visibility)) ? $visibility : ""; ?>
+</div>
+
+<div class="form-group">
+<label for="menu_locale">Language</label>
+<?=(isset($menuLocale)) ? $menuLocale : ""; ?>
 </div>
 
 <div class="form-group">

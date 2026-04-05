@@ -6,7 +6,6 @@
  */
 class HTMLPurifier_AttrDef_URI extends HTMLPurifier_AttrDef
 {
-
     /**
      * @type HTMLPurifier_URIParser
      */

@@ -1,24 +1,23 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class AppException extends Exception implements IAppThrowable
- * 
+ *
  * @category Core Class
  * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0
  * @since    Since Release 1.0
- * 
+ *
  */
-
-use Exception;
 
 class AppException extends Exception implements IAppThrowable
 {
-    
-/**
-     * Previous exception
-     * @var Exception|null
-     */
+    /**
+         * Previous exception
+         * @var Exception|null
+         */
     protected ?Exception $previous = null;
 
     /**
@@ -35,7 +34,7 @@ class AppException extends Exception implements IAppThrowable
         }
 
         parent::__construct($message, $code, $previous);
-        
+
         $this->previous = $previous;
     }
 
@@ -55,5 +54,4 @@ class AppException extends Exception implements IAppThrowable
             $this->getTraceAsString()
         );
     }
-
 }

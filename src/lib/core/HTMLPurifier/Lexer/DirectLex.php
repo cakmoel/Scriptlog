@@ -85,7 +85,7 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
 
         $e = false;
         if ($config->get('Core.CollectErrors')) {
-            $e =& $context->get('ErrorCollector');
+            $e = & $context->get('ErrorCollector');
         }
 
         // for testing synchronization
@@ -127,14 +127,14 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
 
             if (!$inside_tag && $position_next_lt !== false) {
                 // We are not inside tag and there still is another tag to parse
-                $token = new
-                HTMLPurifier_Token_Text(
+                $token = new HTMLPurifier_Token_Text(
                     $this->parseText(
                         substr(
                             $html,
                             $cursor,
                             $position_next_lt - $cursor
-                        ), $config
+                        ),
+                        $config
                     )
                 );
                 if ($maintain_line_numbers) {
@@ -152,13 +152,13 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
                     break;
                 }
                 // Create Text of rest of string
-                $token = new
-                HTMLPurifier_Token_Text(
+                $token = new HTMLPurifier_Token_Text(
                     $this->parseText(
                         substr(
                             $html,
                             $cursor
-                        ), $config
+                        ),
+                        $config
                     )
                 );
                 if ($maintain_line_numbers) {
@@ -204,8 +204,7 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
                     }
                     $strlen_segment = $position_comment_end - $cursor;
                     $segment = substr($html, $cursor, $strlen_segment);
-                    $token = new
-                    HTMLPurifier_Token_Comment(
+                    $token = new HTMLPurifier_Token_Comment(
                         substr(
                             $segment,
                             3,
@@ -321,11 +320,11 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
                 if ($e) {
                     $e->send(E_WARNING, 'Lexer: Missing gt');
                 }
-                $token = new
-                HTMLPurifier_Token_Text(
+                $token = new HTMLPurifier_Token_Text(
                     '<' .
                     $this->parseText(
-                        substr($html, $cursor), $config
+                        substr($html, $cursor),
+                        $config
                     )
                 );
                 if ($maintain_line_numbers) {
@@ -383,7 +382,7 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
 
         $e = false;
         if ($config->get('Core.CollectErrors')) {
-            $e =& $context->get('ErrorCollector');
+            $e = & $context->get('ErrorCollector');
         }
 
         // let's see if we can abort as quickly as possible

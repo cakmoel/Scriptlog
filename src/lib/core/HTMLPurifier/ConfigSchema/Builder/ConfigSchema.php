@@ -6,7 +6,6 @@
  */
 class HTMLPurifier_ConfigSchema_Builder_ConfigSchema
 {
-
     /**
      * @param HTMLPurifier_ConfigSchema_Interchange $interchange
      * @return HTMLPurifier_ConfigSchema

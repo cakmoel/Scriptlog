@@ -6,7 +6,6 @@
  */
 class HTMLPurifier_Language
 {
-
     /**
      * ISO 639 language code of language. Prefers shortest possible version.
      * @type string

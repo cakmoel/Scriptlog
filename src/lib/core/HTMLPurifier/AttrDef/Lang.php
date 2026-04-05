@@ -6,7 +6,6 @@
  */
 class HTMLPurifier_AttrDef_Lang extends HTMLPurifier_AttrDef
 {
-
     /**
      * @param string $string
      * @param HTMLPurifier_Config $config

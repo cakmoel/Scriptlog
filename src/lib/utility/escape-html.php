@@ -1,10 +1,11 @@
 <?php
+
 /**
  * escape_html()
- * 
+ *
  * Escape HTML, HTML Atrributes, JavaScript, CSS and Url.
  * This function for escaping data for output not be misused for filtering input data
- * 
+ *
  * @category function
  * @author M.Noermoehammad
  * @license MIT
@@ -22,30 +23,25 @@
  * @see https://docs.laminas.dev/laminas-escaper/escaping-css/
  * @see https://docs.laminas.dev/laminas-escaper/escaping-url/
  * @return string
- * 
+ *
  */
 function escape_html($input, $type = 'html', $encoding = 'utf-8', $mode = 'base')
 {
 
-  $escaper = new Laminas\Escaper\Escaper($encoding);
+    $escaper = new Laminas\Escaper\Escaper($encoding);
 
-  switch ($mode) {
+    switch ($mode) {
+        default:
+        case 'base':
+            return base_escape($input, $type, $escaper);
 
-    default:
-    case 'base':
+            break;
 
-      return base_escape($input, $type, $escaper); 
+        case 'various':
+            return various_escape($input, $type, $escaper);
 
-    break;
-
-    case 'various':
-
-      return various_escape($input, $type, $escaper);
-
-    break;
-
-  }
-
+            break;
+    }
 }
 
 /**
@@ -59,16 +55,11 @@ function escape_html($input, $type = 'html', $encoding = 'utf-8', $mode = 'base'
 function base_escape($input, $type, $escaper)
 {
 
- if ($type === 'html_attributes') {
-
-  return is_object($escaper) ? $escaper->escapeHtmlAttr($input) : "";
-
- } elseif ($type === 'html') {
-
-  return is_object($escaper) ? $escaper->escapeHtml($input) : "";
-
- }
-
+    if ($type === 'html_attributes') {
+        return is_object($escaper) ? $escaper->escapeHtmlAttr($input) : "";
+    } elseif ($type === 'html') {
+        return is_object($escaper) ? $escaper->escapeHtml($input) : "";
+    }
 }
 
 /**
@@ -81,18 +72,11 @@ function base_escape($input, $type, $escaper)
 function various_escape($input, $type, $escaper)
 {
 
-  if ($type === 'js') {
-    
-    return is_object($escaper) ? $escaper->escapeJs($input) : "";
-
-  } elseif ($type === 'css') {
-
-    return is_object($escaper) ? $escaper->escapeCss($input) : "";
-  
-  } elseif ($type === 'url') {
-
-    return is_object($escaper) ? $escaper->escapeUrl($input) : "";
-
-  } 
-
+    if ($type === 'js') {
+        return is_object($escaper) ? $escaper->escapeJs($input) : "";
+    } elseif ($type === 'css') {
+        return is_object($escaper) ? $escaper->escapeCss($input) : "";
+    } elseif ($type === 'url') {
+        return is_object($escaper) ? $escaper->escapeUrl($input) : "";
+    }
 }

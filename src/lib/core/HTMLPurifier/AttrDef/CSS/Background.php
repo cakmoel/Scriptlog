@@ -6,7 +6,6 @@
  */
 class HTMLPurifier_AttrDef_CSS_Background extends HTMLPurifier_AttrDef
 {
-
     /**
      * Local copy of component validators.
      * @type HTMLPurifier_AttrDef[]

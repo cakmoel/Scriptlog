@@ -1,4 +1,6 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Abstract Class BaseApp implements AppInterface
  *
@@ -11,97 +13,96 @@
  */
 abstract class BaseApp implements AppInterface
 {
-  /**
-   * Page title
-   * 
-   * @var string
-   */
-  protected $pageTitle;
+    /**
+     * Page title
+     *
+     * @var string
+     */
+    protected $pageTitle;
 
-  /**
-   * Form action
-   * 
-   * @var string
-   * 
-   */
-  protected $formAction;
-  
-  /**
-   * set page title
-   * 
-   * @param string $pageTitle
-   * 
-   */
-  public function setPageTitle($pageTitle)
-  {
-    $this->pageTitle = $pageTitle; 
-  }
+    /**
+     * Form action
+     *
+     * @var string
+     *
+     */
+    protected $formAction;
 
-  /**
-   * get page title
-   * 
-   * @return string
-   * 
-   */
-  public function getPageTitle()
-  {
-    return $this->pageTitle;
-  }
-  
-  /**
-   * set form action
-   * 
-   * @param string $formAction
-   * 
-   */
-  public function setFormAction($formAction)
-  {
-    $this->formAction = $formAction;
-  }
-  
-  /**
-   * get form action
-   * 
-   * @return string
-   * 
-   */
-  public function getFormAction()
-  {
-    return $this->formAction;
-  }
-  
-  /**
-   * abstract method list items
-   * 
-   * @abstract @method protected  listItems()
-   * 
-   */
-  abstract protected function listItems();
-  
-  /**
-   * abstract method insert
-   * 
-   * @abstract @method protected insert() 
-   * 
-   */
-  abstract protected function insert();
- 
-/**
- * Abstract method update
- * 
- * @abstract @method protected update()
- * @param integer $id
- * 
- */
-  abstract protected function update($id);
+    /**
+     * set page title
+     *
+     * @param string $pageTitle
+     *
+     */
+    public function setPageTitle($pageTitle)
+    {
+        $this->pageTitle = $pageTitle;
+    }
 
-/**
- * Abstract method remove
- * 
- * @abstract @method protected remove()
- * @param integer $id
- * 
- */
-  abstract protected function remove($id);
-  
-} 
+    /**
+     * get page title
+     *
+     * @return string
+     *
+     */
+    public function getPageTitle()
+    {
+        return $this->pageTitle;
+    }
+
+    /**
+     * set form action
+     *
+     * @param string $formAction
+     *
+     */
+    public function setFormAction($formAction)
+    {
+        $this->formAction = $formAction;
+    }
+
+    /**
+     * get form action
+     *
+     * @return string
+     *
+     */
+    public function getFormAction()
+    {
+        return $this->formAction;
+    }
+
+    /**
+     * abstract method list items
+     *
+     * @abstract @method protected  listItems()
+     *
+     */
+    abstract protected function listItems();
+
+    /**
+     * abstract method insert
+     *
+     * @abstract @method protected insert()
+     *
+     */
+    abstract protected function insert();
+
+    /**
+     * Abstract method update
+     *
+     * @abstract @method protected update()
+     * @param integer $id
+     *
+     */
+    abstract protected function update($id);
+
+    /**
+     * Abstract method remove
+     *
+     * @abstract @method protected remove()
+     * @param integer $id
+     *
+     */
+    abstract protected function remove($id);
+}

@@ -1,4 +1,4 @@
- <?php 
+<?php
 /**
  * index.php file
  * 
@@ -11,4 +11,19 @@
  */
 require dirname(__FILE__) . '/lib/main.php';
 
-route_request($dispatcher);
+// Check if a valid cache file exists and serve it
+if (function_exists('page_cache_exists') && page_cache_exists()) {
+    page_cache_serve();
+}
+
+// Start capturing output if caching is enabled
+if (function_exists('page_cache_start')) {
+    page_cache_start();
+}
+
+$app->dispatcher->dispatch();
+
+// Capture the output and save it to the cache if it was a miss
+if (function_exists('page_cache_finish')) {
+    page_cache_finish();
+}

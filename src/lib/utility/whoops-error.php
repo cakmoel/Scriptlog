@@ -1,7 +1,8 @@
 <?php
+
 /**
  * whoops_error()
- * 
+ *
  * @category function
  * @author M.Noermoehammad
  * @version 1.0
@@ -10,43 +11,38 @@
  * @uses \Whoops\Handler\PrettyPageHandler
  * @since Since Release 1.0
  * @return void
- * 
+ *
  */
 function whoops_error()
 {
 
-if (APP_DEVELOPMENT === true) {
+    if (APP_DEVELOPMENT === true) {
+        $whoops = new \Whoops\Run();
 
-$whoops = new \Whoops\Run();
+        $errorPage = new \Whoops\Handler\PrettyPageHandler();
+        $errorPage->setPageTitle(APP_TITLE . " broken!");
+        $errorPage->addDataTable(APP_TITLE, array(
+            "version" => APP_VERSION,
+            "codename" => APP_CODENAME,
+            "hostname" => app_url()
+        ));
 
-$errorPage = new \Whoops\Handler\PrettyPageHandler();
-$errorPage->setPageTitle(APP_TITLE . " broken!");
-$errorPage->addDataTable(APP_TITLE, array(
-    "version" => APP_VERSION,
-    "codename" => APP_CODENAME,
-    "hostname" => app_url()
-));
+        $whoops->pushHandler($errorPage);
+        $whoops->register();
+    } else {
+        set_exception_handler('LogError::exceptionHandler');
 
-$whoops->pushHandler($errorPage);
-$whoops->register();
-   
-} else {
+        set_error_handler('LogError::errorHandler');
 
-set_exception_handler('LogError::exceptionHandler');
+        register_shutdown_function(function () {
+            $error = error_get_last();
+            if ($error !== null) {
+                $e = new ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']);
 
-set_error_handler('LogError::errorHandler');
-
-register_shutdown_function(function () {
-    $error = error_get_last();
-    if ($error !== null) {
-        $e = new ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']);
-      
-        if (class_exists('LogError')) {
-            LogError::exceptionHandler($e);
-        }
+                if (class_exists('LogError')) {
+                    LogError::exceptionHandler($e);
+                }
+            }
+        });
     }
-});
-
-}
-
 }

@@ -33,7 +33,7 @@ class HTMLPurifier_ConfigSchema_ValidatorAtom
         $this->context = $context;
         $this->obj = $obj;
         $this->member = $member;
-        $this->contents =& $obj->$member;
+        $this->contents = & $obj->$member;
     }
 
     /**

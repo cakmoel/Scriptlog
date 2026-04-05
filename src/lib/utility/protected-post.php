@@ -1,4 +1,5 @@
 <?php
+
 /**
  * protect_post
  *
@@ -8,19 +9,18 @@
  * @param string $visibility
  * @param string $password
  * @return mixed|array
- * 
+ *
  */
 function protect_post($post_content, $visibility, $password)
 {
-  
- $sanitize_content = prevent_injection($post_content);
 
- $password_shield = password_hash($password, PASSWORD_DEFAULT);
- 
- $protected = encrypt_post($sanitize_content, $visibility, $password_shield);
+    $sanitize_content = prevent_injection($post_content);
 
- return array("post_content" => $protected, "post_password" => $password_shield);
+    $password_shield = password_hash($password, PASSWORD_DEFAULT);
 
+    $protected = encrypt_post($sanitize_content, $visibility, $password_shield);
+
+    return array("post_content" => $protected, "post_password" => $password_shield);
 }
 
 /**
@@ -32,24 +32,21 @@ function protect_post($post_content, $visibility, $password)
 function grab_post_protected($post_id)
 {
 
- $grab_post = null;
+    $grab_post = null;
 
- $idsanitized = sanitizer($post_id, 'sql');
+    $idsanitized = sanitizer($post_id, 'sql');
 
- $grab_post = medoo_column_where("tbl_posts", ["ID", "post_content", "post_visibility"], ["ID" => $idsanitized]);
- 
- $postId = isset($grab_post['ID']) ? abs((int)$grab_post['ID']) : 0;
- $content = isset($grab_post['post_content']) ? safe_html($grab_post['post_content']) : "";
- $visibility = isset($grab_post['post_visibility']) ? safe_html($grab_post['post_visibility']) : "";
+    $grab_post = medoo_column_where("tbl_posts", ["ID", "post_content", "post_visibility"], ["ID" => $idsanitized]);
 
- if (! $grab_post) {
+    $postId = isset($grab_post['ID']) ? abs((int)$grab_post['ID']) : 0;
+    $content = isset($grab_post['post_content']) ? safe_html($grab_post['post_content']) : "";
+    $visibility = isset($grab_post['post_visibility']) ? safe_html($grab_post['post_visibility']) : "";
 
-    scriptlog_error("Post protected not found");
+    if (! $grab_post) {
+        scriptlog_error("Post protected not found");
+    }
 
- }
-
- return array('post_id' => $postId, "post_content" => $content, "visibility" => $visibility);
-
+    return array('post_id' => $postId, "post_content" => $content, "visibility" => $visibility);
 }
 
 /**
@@ -57,19 +54,18 @@ function grab_post_protected($post_id)
  *
  * @param int|num $post_id
  * @param string $post_password
- * 
+ *
  */
 function checking_post_password($post_id, $post_password)
 {
- 
-$idsanitized = sanitizer($post_id, 'sql');
 
-$grab_post = medoo_column_where("tbl_posts", ["ID", "post_password"], ["ID" => $idsanitized]);
+    $idsanitized = sanitizer($post_id, 'sql');
 
-$valid_post_protected = password_verify($post_password, $grab_post['post_password']);
+    $grab_post = medoo_column_where("tbl_posts", ["ID", "post_password"], ["ID" => $idsanitized]);
 
-return ($valid_post_protected) ? true : false;
- 
+    $valid_post_protected = password_verify($post_password, $grab_post['post_password']);
+
+    return ($valid_post_protected) ? true : false;
 }
 
 /**
@@ -78,11 +74,11 @@ return ($valid_post_protected) ? true : false;
  * @param string $post_content
  * @param string $visibility
  * @param string $post_password
- * 
+ *
  */
 function encrypt_post($post_content, $visibility, $post_password)
 {
-  return ($visibility == 'protected') ? encrypt($post_content, $post_password) : ""; 
+    return ($visibility == 'protected') ? encrypt($post_content, $post_password) : "";
 }
 
 /**
@@ -92,56 +88,46 @@ function encrypt_post($post_content, $visibility, $post_password)
  * @param int|num $post_id
  * @param string $visibility
  * @param string $post_password
- * 
+ *
  */
 function decrypt_post($post_id, $post_password)
 {
-  
-  $grab_post = grab_post_protected($post_id); // grab post protected based on post ID
-  $id_post = isset($grab_post['post_id']) ? (int)$grab_post['post_id'] : 0;
-  $content = isset($grab_post['post_content']) ? escape_html($grab_post['post_content']) : "";
-  $visibility = isset($grab_post['visibility']) ? escape_html($grab_post['visibility']) : "";
 
-  if (($visibility == 'protected') && (true === checking_post_password($id_post, $post_password))) {
+    $grab_post = grab_post_protected($post_id); // grab post protected based on post ID
+    $id_post = isset($grab_post['post_id']) ? (int)$grab_post['post_id'] : 0;
+    $content = isset($grab_post['post_content']) ? escape_html($grab_post['post_content']) : "";
+    $visibility = isset($grab_post['visibility']) ? escape_html($grab_post['visibility']) : "";
 
-    $grab_password = medoo_column_where("tbl_posts", "post_password", ["ID" => $id_post]);
+    if (($visibility == 'protected') && (true === checking_post_password($id_post, $post_password))) {
+        $grab_password = medoo_column_where("tbl_posts", "post_password", ["ID" => $id_post]);
 
-    return ['post_content' => decrypt($content, $grab_password['post_password'])];
-
-  }
-
+        return ['post_content' => decrypt($content, $grab_password['post_password'])];
+    }
 }
 
 /**
  * save_post_protected
  *
  * @param array $credentials
- * 
+ *
  */
 function save_post_protected(array $credentials)
 {
 
-$path = __DIR__ . '/../../admin/ui/posts/.credential' . DIRECTORY_SEPARATOR;
+    $path = __DIR__ . '/../../admin/ui/posts/.credential' . DIRECTORY_SEPARATOR;
 
-$action_allowed = ['administrator', 'manager', 'editor', 'author', 'contributor'];
+    $action_allowed = ['administrator', 'manager', 'editor', 'author', 'contributor'];
 
-if (! in_array(user_privilege(), $action_allowed)) {
-  
-  scriptlog_error("Your are not allowed undertaking this action");
+    if (! in_array(user_privilege(), $action_allowed)) {
+        scriptlog_error("Your are not allowed undertaking this action");
+    } else {
+        if (is_dir($path) === false) {
+            create_directory($path);
+        }
 
-} else {
-
-  if (is_dir($path) === false) {
-
-    create_directory($path);
-
-  }
-
-   // create file for post protected to keep its credentials detail
-   return generate_post_credentials($path, $credentials);
-
-}
-
+        // create file for post protected to keep its credentials detail
+        return generate_post_credentials($path, $credentials);
+    }
 }
 
 /**
@@ -150,17 +136,17 @@ if (! in_array(user_privilege(), $action_allowed)) {
  * @param string $path
  * @param array $data
  * @return bool
- * 
+ *
  */
 function generate_post_credentials($path, $data)
 {
 
-  $created_at = isset($data['post_date']) ? $data['post_date'] : null;
-  $modified_at = isset($data['post_modified']) ?? $data['post_modified'];
-  $passphrase = isset($data['passphrase']) ? md5(app_key().$data['passphrase']) : null;
-  $credential_path = $path . DIRECTORY_SEPARATOR . $passphrase . '.php';
+    $created_at = isset($data['post_date']) ? $data['post_date'] : null;
+    $modified_at = isset($data['post_modified']) ?? $data['post_modified'];
+    $passphrase = isset($data['passphrase']) ? md5(app_key() . $data['passphrase']) : null;
+    $credential_path = $path . DIRECTORY_SEPARATOR . $passphrase . '.php';
 
-  $file = '<?php  
+    $file = '<?php  
     
     return [' . "
                     
@@ -182,12 +168,9 @@ function generate_post_credentials($path, $data)
 
         ];";
 
-  if (isset($_SESSION['post_protected'])) {
+    if (isset($_SESSION['post_protected'])) {
+        file_put_contents($credential_path, $file, FILE_APPEND | LOCK_EX);
+    }
 
-    file_put_contents($credential_path, $file, FILE_APPEND | LOCK_EX);
-
-  }
-  
-  return false;
-  
+    return false;
 }

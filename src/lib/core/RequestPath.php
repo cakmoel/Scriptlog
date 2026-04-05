@@ -1,13 +1,15 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class RequestPath
- * 
+ *
  * Improved version with:
  * - Replaced deprecated strtok() with parse_url()
  * - Enhanced path sanitization
  * - Better parameter handling
  * - Type safety improvements
- * 
+ *
  * @category Core Class
  * @license MIT
  * @version 1.1
@@ -31,11 +33,14 @@ class RequestPath
     private function getSanitizedPath(): string
     {
         $path = $_SERVER['PATH_INFO'] ?? $_SERVER['REQUEST_URI'] ?? '';
-        
+
         // Remove query string more reliably than strtok()
         $parsed = parse_url($path);
         $cleanPath = $parsed['path'] ?? '';
-        
+
+        // Decode URL-encoded characters (e.g., %20 -> space)
+        $cleanPath = urldecode($cleanPath);
+
         return $this->sanitizePath($cleanPath);
     }
 
@@ -55,10 +60,10 @@ class RequestPath
     {
         // Normalize path separators
         $path = str_replace(['../', './'], '', $path);
-        
-        // Remove unwanted characters (more strict version)
-        $cleanPath = preg_replace('/[^a-zA-Z0-9\/\-_\.]/', '', $path);
-        
+
+        // Remove unwanted characters (allow spaces for tag URLs)
+        $cleanPath = preg_replace('/[^a-zA-Z0-9\/\-_\. ]/', '', $path);
+
         return rtrim($cleanPath, '/');
     }
 
@@ -69,7 +74,7 @@ class RequestPath
     {
         $parsed = [];
         $bits = array_values(array_filter($bits)); // Remove empty segments
-        
+
         if (empty($bits)) {
             $parsed['matched'] = '';
             return $parsed;
@@ -84,7 +89,7 @@ class RequestPath
             $key = "param$i";
             $value = $this->sanitizeValue($bits[$i - 1] ?? '');
             $parsed[$key] = $value;
-            
+
             // Only add to sequential array if not empty
             if ($value !== '') {
                 $parsed[] = $value;
@@ -103,13 +108,15 @@ class RequestPath
     private function parseKeyValuePairs(array $bits, array &$parsed): void
     {
         $count = count($bits);
-        
+
         for ($i = 0; $i < $count; $i += 2) {
-            if (!isset($bits[$i + 1])) break;
-            
+            if (!isset($bits[$i + 1])) {
+                break;
+            }
+
             $key = $this->sanitizeValue($bits[$i]);
             $value = $this->sanitizeValue($bits[$i + 1]);
-            
+
             $parsed[$key] = $value;
             $parsed[] = $value;
         }

@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_AttrDef_CSS_Font extends HTMLPurifier_AttrDef
 {
-
     /**
      * Local copy of validators
      * @type HTMLPurifier_AttrDef[]
@@ -93,6 +92,7 @@ class HTMLPurifier_AttrDef_CSS_Font extends HTMLPurifier_AttrDef
                     if ($r !== false) {
                         break;
                     }
+                    // no break
                 case 1: // attempting to catch font-size and perhaps line-height
                     $found_slash = false;
                     if (strpos($bits[$i], '/') !== false) {

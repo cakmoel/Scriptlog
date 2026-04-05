@@ -22,6 +22,18 @@
 14. [API Reference](#14-api-reference)
 15. [Testing](#15-testing)
 16. [Troubleshooting](#16-troubleshooting)
+17. [Asset Management](#17-asset-management)
+18. [GDPR Compliance](#18-gdpr-compliance)
+19. [Internationalization (i18n)](#19-internationalization-i18n)
+20. [Comment-Reply System](#20-comment-reply-system)
+21. [Content Import System](#21-content-import-system)
+22. [Content Export System](#22-content-export-system)
+23. [UI Asset Management](#23-ui-asset-management)
+24. [Dynamic SMTP System](#24-dynamic-smtp-system)
+25. [Search Functionality](#25-search-functionality)
+26. [Premium UI Standards](#26-premium-ui-standards)
+
+> **NOTE:** For comprehensive testing documentation including PHPStan setup and CI/CD integration, see [TESTING_GUIDE.md](TESTING_GUIDE.md).
 
 ---
 
@@ -50,7 +62,7 @@
 |  4. Run install/index.php (system requirements)               |
 |  5. Run install/setup-db.php (create tables)                  |
 |  6. Run install/finish.php (complete setup)                   |
-|  7. Configuration saved to config.php                         |
+|  7. Configuration saved to config.php and .env               |
 +---------------------------------------------------------------+
 ```
 
@@ -58,7 +70,7 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/blogware/scriptlog.git
+git clone https://github.com/ScriptLog/scriptlog.git
 cd scriptlog
 
 # Install dependencies
@@ -81,9 +93,232 @@ chmod -R 777 public/cache/ public/log/
 
 ---
 
+## 2.1 Configuration System
+
+### Overview
+
+ScriptLog supports both `.env` and `config.php` files for configuration. During first-time installation, both files are automatically generated and kept in sync.
+
+### Configuration Files
+
+#### config.php
+
+The main configuration file uses `$_ENV` pattern with fallback values:
+
+```php
+<?php
+
+return [
+    'db' => [
+        'host' => $_ENV['DB_HOST'] ?? 'localhost',
+        'user' => $_ENV['DB_USER'] ?? '',
+        'pass' => $_ENV['DB_PASS'] ?? '',
+        'name' => $_ENV['DB_NAME'] ?? '',
+        'port' => $_ENV['DB_PORT'] ?? '3306',
+        'prefix' => $_ENV['DB_PREFIX'] ?? ''
+    ],
+
+    'app' => [
+        'url'   => $_ENV['APP_URL'] ?? 'http://example.com',
+        'email' => $_ENV['APP_EMAIL'] ?? '',
+        'key'   => $_ENV['APP_KEY'] ?? '',
+        'defuse_key' => 'lib/utility/.lts/lts.txt'
+    ],
+
+    'mail' => [
+        'smtp' => [
+            'host' => $_ENV['SMTP_HOST'] ?? '',
+            'port' => $_ENV['SMTP_PORT'] ?? 587,
+            'encryption' => $_ENV['SMTP_ENCRYPTION'] ?? 'tls',
+            'username' => $_ENV['SMTP_USER'] ?? '',
+            'password' => $_ENV['SMTP_PASS'] ?? '',
+        ],
+        'from' => [
+            'email' => $_ENV['MAIL_FROM_ADDRESS'] ?? '',
+            'name' => $_ENV['MAIL_FROM_NAME'] ?? 'Blogware'
+        ]
+    ],
+
+    'os' => [
+        'system_software' => $_ENV['SYSTEM_OS'] ?? 'Linux',
+        'distrib_name'    => $_ENV['DISTRIB_NAME'] ?? ''
+    ],
+];
+```
+
+#### .env File
+
+Auto-generated environment file:
+
+```bash
+# --- DATABASE CONFIGURATION ---
+DB_HOST=localhost
+DB_USER=blogwareuser
+DB_PASS=yourpassword
+DB_NAME=blogwaredb
+DB_PORT=3306
+DB_PREFIX=
+
+# --- APPLICATION CONFIGURATION ---
+APP_URL=https://example.com
+APP_EMAIL=admin@example.com
+APP_KEY=XXXXXX-XXXXXX-XXXXXX-XXXXXX
+
+# --- MAIL / SMTP CONFIGURATION ---
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
+SMTP_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=admin@example.com
+MAIL_FROM_NAME=Blogware
+
+# --- SYSTEM ---
+SYSTEM_OS=Linux
+DISTRIB_NAME="Linux Mint"
+```
+
+### Automatic Defuse Key Generation
+
+During first-time installation, the system automatically:
+- Generates a Defuse encryption key using `Defuse\Crypto\Key::createNewRandomKey()`
+- Saves the key to `lib/utility/.lts/lts.txt`
+- Stores the key path in `config.php` under `app.defuse_key`
+- This key is used for authentication cookie encryption
+
+### Installation Fixes
+
+During development, the following bugs were discovered and fixed:
+
+#### 1. write_config_file() Argument Order Bug
+
+**Problem**: The `write_config_file()` function in `install/include/setup.php` has the signature:
+```php
+function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuser, $dbname, $dbport, ...)
+```
+
+But `install/index.php` was calling it with `$dbuser` and `$dbpass` in the wrong order, causing "Access denied" errors when creating config.php.
+
+**Fix**: In `install/index.php` line 168, corrected the argument order:
+```php
+// BEFORE (WRONG):
+write_config_file($protocol, $server_host, $dbhost, $dbuser, $dbpass, $dbname, ...)
+
+// AFTER (CORRECT):
+write_config_file($protocol, $server_host, $dbhost, $dbpass, $dbuser, $dbname, ...)
+```
+
+#### 2. popper.min.js Path Bug
+
+**Problem**: The install layout was loading popper.js from a non-existent path `assets/vendor/bootstrap/js/vendor/popper.min.js`.
+
+**Fix**: In `install/install-layout.php`, corrected the path to `assets/vendor/bootstrap/js/popper.min.js`.
+
+#### 3. Database Tables Created
+
+The installation now creates 21 tables:
+- Core: tbl_users, tbl_user_token, tbl_login_attempt, tbl_posts, tbl_topics, tbl_post_topic, tbl_comments
+- Media: tbl_media, tbl_mediameta, tbl_media_download
+- System: tbl_menu, tbl_plugin, tbl_settings, tbl_themes
+- GDPR: tbl_consents, tbl_data_requests, tbl_privacy_logs, tbl_privacy_policies
+- i18n: tbl_languages, tbl_translations
+- Downloads: tbl_download_log
+
+#### 4. Database Column Fixes
+
+**Problem**: The `PostModel` class references a `post_keyword` column that didn't exist in the database, causing errors when accessing post data.
+
+**Fix**: Added `post_keyword` column to `tbl_posts` in `install/include/dbtable.php`:
+```sql
+ALTER TABLE tbl_posts ADD COLUMN post_keyword VARCHAR(255) DEFAULT NULL AFTER post_tags;
+```
+
+#### 5. Db Class KnownTables Array
+
+**Problem**: The `Db` class (`lib/core/Db.php`) had an incomplete `knownTables` array, missing several tables that the application uses. This caused issues with prefix handling.
+
+**Fix**: Added all 21 tables to the `knownTables` array in `lib/core/Db.php`:
+```php
+private $knownTables = [
+    'users', 'user_token', 'login_attempt', 'posts', 'topics', 
+    'post_topic', 'comments', 'media', 'mediameta', 'media_download',
+    'menu', 'plugin', 'settings', 'themes', 'consents', 
+    'data_requests', 'privacy_logs', 'privacy_policies', 
+    'languages', 'translations', 'download_log'
+];
+```
+
+### Post-Installation Fixes
+
+After initial installation, several issues were discovered and fixed:
+
+#### 6. Table Prefix Compatibility
+
+**Problem**: The application uses table prefixes (e.g., `urmpnj_posts`) but utility functions using Medoo were creating new database connections without applying the prefix.
+
+**Fixes**:
+
+1. **medooin.php**: Modified to use the Registry connection (`Registry::get('dbc')`) instead of creating a new Medoo connection, ensuring table prefix is applied.
+
+2. **db-mysqli.php**: Updated to work with both PDO and mysqli connections - checks connection type and handles accordingly.
+
+#### 7. Null Safety and Compatibility Fixes
+
+The following utility functions were fixed for null safety and PDO/mysqli compatibility:
+
+1. **membership.php** (`lib/utility/membership.php`):
+   - Added null checks for `$user['user_fullname']` and `$user['user_login']`
+   - Fixed array access patterns
+
+2. **app-info.php** (`lib/utility/app-info.php`):
+   - Fixed array/object compatibility issues
+   - Added type checking for different return formats
+
+3. **theme-navigation.php** (`lib/utility/theme-navigation.php`):
+   - Added PDO/mysqli compatibility handling
+   - Fixed result fetching for both connection types
+
+4. **login-attempt.php** (`lib/utility/login-attempt.php`):
+   - Added PDO/mysqli compatibility handling
+   - Fixed result fetching patterns
+
+#### 8. Hello World Plugin Installation
+
+**Problem**: The sample Hello World plugin existed in `admin/plugins/hello-world/` but was not being added to the database during installation.
+
+**Fix**: Added the plugin to the installation process:
+
+1. **dbtable.php**: Added `savePlugin` SQL query:
+```php
+$savePlugin = "INSERT INTO {$prefix}tbl_plugin (plugin_name, plugin_link, plugin_directory, plugin_desc, plugin_status, plugin_level, plugin_sort) VALUES (?, ?, ?, ?, ?, ?, ?)";
+```
+
+2. **setup.php**: Added code to insert Hello World plugin during installation:
+```php
+$plugin_name = "Hello World";
+$plugin_link = "#";
+$plugin_directory = "hello-world";
+$plugin_desc = "A simple Hello World plugin to demonstrate the plugin system";
+$plugin_status = "N"; // disabled by default
+$plugin_level = "administrator";
+$plugin_sort = 1;
+```
+
+The plugin is inserted as disabled (`plugin_status = 'N'`) by default, allowing users to enable it from the admin panel after installation.
+
+### Key Files
+
+| File | Location | Purpose |
+|------|----------|---------|
+| `config.php` | Root | Main configuration with `$_ENV` fallbacks |
+| `.env` | Root | Environment variables (auto-generated) |
+| `defuse_key` | `lib/utility/.lts/lts.txt` | Encryption key for authentication |
+
+---
+
 ## 2. Architecture Overview
 
-Blogware uses a **multi-layer architecture** designed for maintainability and scalability:
+ScriptLog uses a **multi-layer architecture** designed for maintainability and scalability:
 
 ```
 +---------------------------------------------------------------+
@@ -104,7 +339,7 @@ Blogware uses a **multi-layer architecture** designed for maintainability and sc
 |              |                                                |
 |              v                                                |
 |   +---------------------+                                     |
-|   | Dispatcher         |  (lib/core/Dispatcher.php)           |
+|   | Dispatcher          |  (lib/core/Dispatcher.php)          |
 |   +----------+----------+                                     |
 |              |                                                |
 |              v                                                |
@@ -144,34 +379,176 @@ Blogware uses a **multi-layer architecture** designed for maintainability and sc
 
 > **WARNING:** Never bypass the DAO layer when accessing the database. Always use prepared statements to prevent SQL injection.
 
+### 404 Handling
+
+All 404 handling is done in the Dispatcher, NOT in theme templates. This prevents "headers already sent" errors:
+
+- **Dispatcher** (`lib/core/Dispatcher.php`): Contains `validateContentExists()` method that checks if content exists in database before rendering
+- **Validation happens BEFORE header output**: Ensures proper 404 status code is set
+- **Route parameter names**: Use correct named parameters from route patterns (`id` for posts, `page` for pages, `category` for categories)
+- **Custom 404 template**: Uses theme's `404.php` template
+- **HandleRequest** (`lib/core/HandleRequest.php`): Handles query string URLs when permalinks are disabled, renders custom 404 template for invalid paths
+
+```php
+// Example: validateContentExists in Dispatcher
+private function validateContentExists($routeKey, $requestPath)
+{
+    switch ($routeKey) {
+        case 'single':
+            $postId = isset($requestPath->id) ? $requestPath->id : null;
+            $postSlug = isset($requestPath->post) ? $requestPath->post : null;
+            
+            if (empty($postId) || empty($postSlug)) {
+                return false;
+            }
+            
+            $post = class_exists('FrontHelper') ? FrontHelper::grabPreparedFrontPostById($postId) : null;
+            
+            if (empty($post) || !is_array($post)) {
+                return false;
+            }
+            
+            // Validate slug matches - redirect to 404 if slug is incorrect
+            $dbSlug = isset($post['post_slug']) ? $post['post_slug'] : '';
+            return ($dbSlug === $postSlug);
+        // ... other cases
+    }
+}
+```
+
+**Important**: A `.htaccess` file is required for Apache to route all requests to `index.php`. This ensures the PHP-based routing works regardless of permalink settings.
+
+```apache
+# .htaccess - Required for Apache
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [L,QSA]
+</IfModule>
+```
+
+Do NOT add http_response_code() in theme templates - let the Dispatcher handle 404s.
+
+### Canonical URL Validation
+
+The Dispatcher validates that the URL slug matches the database slug for posts and pages. This ensures canonical URL enforcement and prevents duplicate content:
+
+- `/post/2/cicero` → post exists with slug "cicero" → renders post
+- `/post/2/ciceros` → post ID 2 exists but slug is "cicero" (not "ciceros") → returns 404
+- `/page/about-us` → page exists with slug "about-us" → renders page
+- `/page/about-us-extra` → page slug doesn't match → returns 404
+
+This prevents SEO issues from duplicate content when users access pages with incorrect slugs.
+
+### Tag URLs
+
+Tags are stored as comma-separated values in `tbl_posts.post_tags` column (e.g., "cicero,lorem ipsum,MariaDB"). The tag system works as follows:
+
+| Aspect | Details |
+|--------|---------|
+| **Route Pattern** | `/tag/(?'tag'[\w\- ]+)` - supports spaces and hyphens |
+| **URL Encoding** | Spaces encoded as `%20` (e.g., `/tag/lorem%20ipsum`) |
+| **URL Decoding** | `RequestPath` class decodes automatically for SEO-friendly; `HandleRequest::isQueryStringRequested()` decodes for query string |
+| **Validation** | Dispatcher uses `FrontHelper::simpleSearchingTag()` to verify posts exist |
+| **Search** | Uses LIKE query (`%tag%`) to match tags in comma-separated list |
+
+**SEO-Friendly URL (Enabled)**:
+- Pattern: `/tag/your-tag` (supports spaces via URL encoding)
+- Parameters extracted via `request_path()` object (tag property)
+- Use `is_permalink_enabled()` to check if SEO-friendly URLs are enabled
+
+**Query String URL (Disabled)**:
+- Pattern: `?tag=your-tag` (spaces encoded as %20)
+- Parameters extracted via `HandleRequest::isQueryStringRequested()`['value']
+- Use `urldecode()` in HandleRequest to handle URL-encoded values
+
+**Examples:**
+- `/tag/cicero` - shows posts with tag "cicero" (SEO-friendly)
+- `/tag/lorem%20ipsum` - shows posts with tag "lorem ipsum" (SEO-friendly)
+- `?tag=lorem` - shows posts with tag "lorem" (query string)
+- `?tag=lorem%20ipsum` - shows posts with tag "lorem ipsum" (query string)
+
+**Key Files:**
+- `lib/core/Bootstrap.php` - Route pattern definition
+- `lib/core/Dispatcher.php` - Tag validation in `validateContentExists()`
+- `lib/core/RequestPath.php` - URL decoding for `%20` spaces
+- `lib/core/HandleRequest.php` - `isQueryStringRequested()` for query string URLs
+- `lib/core/FrontHelper.php` - `simpleSearchingTag()` method
+- `lib/utility/permalinks.php` - `is_permalink_enabled()` function
+- `lib/model/TagModel.php` - `getPostsPublishedByTag()` method
+- `public/themes/blog/tag.php` - Tag archive template
+
+### Archive URLs
+
+Archive functionality allows users to browse posts by month/year:
+
+| Aspect | Details |
+|--------|---------|
+| **Route Patterns** | `/archive/[0-9]{2}/[0-9]{4}` for monthly archives, `/archives` for index |
+| **Archive Index** | Groups archives by year, shows month name and post count |
+| **Pagination** | Uses `post_per_archive` setting |
+| **Validation** | Dispatcher checks if posts exist in archive before rendering |
+
+**SEO-Friendly URL (Enabled)**:
+- Pattern: `/archive/03/2025` (month/year format)
+- Parameters extracted via `request_path()` object (param1 = month, param2 = year)
+- Use `is_permalink_enabled()` to check if SEO-friendly URLs are enabled
+
+**Query String URL (Disabled)**:
+- Pattern: `?a=032025` (6-digit format: year + month)
+- Parameters extracted via `HandleRequest::isQueryStringRequested()`['value']
+- Use `preg_split("//", ...)` to split the string and extract year (indices 0-3) and month (indices 4-5)
+
+**Examples:**
+- `/archives` - Shows all archive dates grouped by year
+- `/archive/03/2025` - Shows posts from March 2025 (SEO-friendly)
+- `?a=032025` - Shows posts from March 2025 (query string)
+
+**Key Files:**
+- `lib/core/Bootstrap.php` - Route patterns for `archive` and `archives`
+- `lib/core/Dispatcher.php` - Archive validation in `validateContentExists()`
+- `lib/model/ArchivesModel.php` - `getPostsByArchive()`, `getArchiveIndex()`
+- `lib/model/FrontContentModel.php` - `frontPostsByArchive()`, `frontArchiveIndex()`
+- `lib/utility/permalinks.php` - `listen_query_string()` for archive URL generation
+- `public/themes/blog/archive.php` - Archive month template
+- `public/themes/blog/archives.php` - Archive index template
+
 ---
 
 ## 3. Directory Structure
 
 ```
-blogware/public_html/
+ScriptLog/public_html/
 |
 |-- index.php                    # Public front controller
 |-- config.php                   # Application configuration
 |
-|-- admin/                       # Admin panel
+|-- admin/                      # Admin panel
 |   |-- index.php               # Admin entry point
 |   |-- login.php               # Login page
 |   |-- posts.php               # Post management
 |   |-- pages.php               # Page management
 |   |-- topics.php              # Category management
 |   |-- comments.php            # Comment management
+|   |-- reply.php               # Reply management
 |   |-- users.php               # User management
 |   |-- menu.php                # Menu management
 |   |-- templates.php           # Theme management
 |   |-- plugins.php             # Plugin management
 |   |-- medialib.php            # Media library
 |   +-- ui/                     # Admin UI components
+|       +-- comments/           # Comment UI templates
+|           |-- all-comments.php
+|           |-- edit-comment.php
+|           |-- reply.php
+|           +-- reply-list.php
 |
 |-- api/                        # RESTful API
 |   +-- index.php               # API entry point
 |
-|-- lib/                        # Core library
+|-- lib/                       # Core library
 |   |-- main.php               # Application bootstrap
 |   |-- common.php             # Constants and functions
 |   |-- options.php            # PHP configuration
@@ -181,16 +558,16 @@ blogware/public_html/
 |   +-- core/                  # Core classes (80+ files)
 |       |-- Bootstrap.php      # Application initialization
 |       |-- Dispatcher.php     # URL routing
-|       |-- DbFactory.php     # PDO database connection
+|       |-- DbFactory.php      # PDO database connection
 |       |-- Authentication.php # User authentication
 |       |-- SessionMaker.php   # Custom session handler
-|       |-- View.php          # View rendering
-|       |-- ApiResponse.php   # API response handler
-|       |-- ApiAuth.php       # API authentication
-|       |-- ApiRouter.php     # API routing
+|       |-- View.php           # View rendering
+|       |-- ApiResponse.php    # API response handler
+|       |-- ApiAuth.php        # API authentication
+|       |-- ApiRouter.php      # API routing
 |       +-- ...
 |
-|   +-- dao/                   # Data Access Objects
+|   +-- dao/                  # Data Access Objects
 |       |-- PostDao.php       # Posts CRUD
 |       |-- UserDao.php       # Users CRUD
 |       |-- CommentDao.php    # Comments CRUD
@@ -253,9 +630,9 @@ blogware/public_html/
 |       |-- email-validation.php
 |       +-- ...
 |
-|   +-- vendor/               # Composer dependencies
+|   +-- vendor/              # Composer dependencies
 |
-|-- public/                   # Public web root
+|-- public/                  # Public web root
 |   +-- themes/              # Theme templates
 |       +-- blog/            # Default theme
 |   +-- files/               # Uploaded files
@@ -266,8 +643,9 @@ blogware/public_html/
 |   +-- cache/               # Cache directory
 |   +-- log/                 # Log directory
 |
-|-- docs/                     # Documentation
+|-- docs/                    # Documentation
 |   |-- DEVELOPER_GUIDE.md
+|   |-- TESTING_GUIDE.md
 |   |-- PLUGIN_DEVELOPER_GUIDE.md
 |   |-- API_DOCUMENTATION.md
 |   |-- API_OPENAPI.yaml
@@ -304,7 +682,7 @@ $vars = Bootstrap::initialize(APP_ROOT);
 
 ### Dispatcher (`lib/core/Dispatcher.php`)
 
-Handles URL routing and dispatches requests to appropriate controllers.
+Handles URL routing and dispatches requests to appropriate controllers. Also validates content exists before rendering to handle 404s properly.
 
 ```php
 // Route patterns defined in Bootstrap
@@ -312,13 +690,22 @@ $rules = [
     'home'     => "/",
     'category' => "/category/(?'category'[\w\-]+)",
     'archive'  => "/archive/[0-9]{2}/[0-9]{4}",
+    'archives' => "/archives",
     'blog'     => "/blog([^/]*)",
     'page'     => "/page/(?'page'[^/]+)",
     'single'   => "/post/(?'id'\d+)/(?'post'[\w\-]+)",
     'search'   => "(?'search'[\w\-]+)",
-    'tag'      => "/tag/(?'tag'[\w\-]+)"
+    'tag'      => "/tag/(?'tag'[\w\- ]+)"
 ];
 ```
+
+#### Content Validation
+
+The Dispatcher validates content exists in the database before rendering templates to ensure proper 404 handling:
+
+- Uses named parameters from route patterns (`id`, `page`, `category`)
+- Checks database via FrontHelper methods
+- Calls `errorNotFound()` before any output if content not found
 
 ### DbFactory (`lib/core/DbFactory.php`)
 
@@ -326,7 +713,7 @@ Creates PDO database connections.
 
 ```php
 $dbc = DbFactory::connect([
-    'mysql:host=localhost;port=3306;dbname=blogwaredb',
+    'mysql:host=localhost;port=3306;dbname=ScriptLogdb',
     'username',
     'password'
 ]);
@@ -335,6 +722,47 @@ $dbc = DbFactory::connect([
 ### Authentication (`lib/core/Authentication.php`)
 
 Handles user authentication, login, logout, and session management.
+
+#### Key Features
+
+- **Login**: Accepts email or username, validates credentials, creates session
+- **Remember Me**: Uses three cookies (scriptlog_auth, scriptlog_validator, scriptlog_selector) with token-based authentication
+- **Session Fingerprinting**: Stores IP address and HMAC-hashed user agent for session validation
+- **Cookie Encryption**: Uses Defuse/php-encryption for secure cookie storage
+- **Access Control**: `userAccessControl()` method implements role-based permissions
+
+#### Session Data
+
+When a user logs in, these session variables are set:
+- `scriptlog_session_id` - User ID
+- `scriptlog_session_email` - User email
+- `scriptlog_session_level` - User level (administrator, manager, editor, author, contributor, subscriber)
+- `scriptlog_session_login` - Username
+- `scriptlog_session_fullname` - Full name
+- `scriptlog_session_agent` - User agent fingerprint
+- `scriptlog_session_ip` - Client IP address
+- `scriptlog_fingerprint` - HMAC-based session fingerprint
+- `scriptlog_last_active` - Last activity timestamp
+
+#### User Levels and Access Control
+
+| Level | Permissions |
+|-------|-------------|
+| **administrator** | Full access - PRIVACY, USERS, IMPORT, PLUGINS, THEMES, CONFIGURATION, PAGES, NAVIGATION, TOPICS, COMMENTS, MEDIALIB, REPLY, POSTS, DASHBOARD |
+| **manager** | PLUGINS, THEMES, CONFIGURATION, PAGES, NAVIGATION, TOPICS, COMMENTS, MEDIALIB, REPLY, POSTS, DASHBOARD |
+| **editor** | TOPICS, COMMENTS, MEDIALIB, REPLY, POSTS, DASHBOARD |
+| **author** | COMMENTS, MEDIALIB, REPLY, POSTS, DASHBOARD |
+| **contributor** | POSTS, DASHBOARD |
+| **subscriber** | DASHBOARD only |
+
+#### Access Control Implementation
+
+```php
+// In admin pages, check authorization before processing
+if (false === $authenticator->userAccessControl(ActionConst::PRIVACY)) {
+    direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
+}
+```
 
 ### SessionMaker (`lib/core/SessionMaker.php`)
 
@@ -929,6 +1357,126 @@ Utility functions are loaded via `lib/utility-loader.php` and include:
 | **Media** | `invoke-frontimg.php`, `upload-video.php` |
 | **Session** | `turn-on-session.php`, `regenerate-session.php` |
 
+### Image Handling Functions
+
+The blog includes comprehensive image display functions with WebP support and responsive images.
+
+#### Image Storage Structure
+
+```
+public/files/pictures/
+├── small/           # Thumbnail images (640x450)
+│   └── small_*.jpg
+├── medium/         # Medium images (730x486)
+│   └── medium_*.jpg
+├── large/          # Large images (1200x630)
+│   └── large_*.jpg
+├── *.webp          # WebP versions (shared with main folder)
+└── *.jpg           # Original JPEG versions
+```
+
+#### Key Constants (lib/common.php)
+
+```php
+// Defined in lib/common.php:
+define('APP_IMAGE', APP_PUBLIC . DS . 'files' . DS . 'pictures' . DS);
+define('APP_IMAGE_LARGE', APP_IMAGE . 'large' . DS);
+define('APP_IMAGE_MEDIUM', APP_IMAGE . 'medium' . DS);
+define('APP_IMAGE_SMALL', APP_IMAGE . 'small' . DS);
+```
+
+#### Image Functions
+
+| Function | Purpose | Location |
+|----------|---------|----------|
+| `invoke_webp_image()` | Returns WebP URL if available, else returns original | `lib/utility/invoke-webp-image.php` |
+| `invoke_frontimg()` | Primary function for displaying featured images | `lib/utility/invoke-frontimg.php` |
+| `invoke_responsive_image()` | Generates `<picture>` element with WebP support | `lib/utility/invoke-responsive-image.php` |
+| `invoke_hero_image()` | Hero/LCP images with fetchpriority="high" | `lib/utility/invoke-responsive-image.php` |
+| `invoke_gallery_image()` | Gallery images with lazy loading | `lib/utility/invoke-responsive-image.php` |
+
+#### Function Signatures
+
+```php
+// Basic featured image
+invoke_frontimg(string $media_filename, bool $image_thumb = true): string
+
+// Responsive image with full options
+invoke_responsive_image(
+    string $media_filename,
+    string $size = 'thumbnail', // 'thumbnail', 'medium', 'large'
+    bool $image_thumb = true,
+    string $alt = '',
+    string $class = 'img-fluid',
+    bool $fetchpriority = false,
+    string $decoding = 'auto'
+): string
+```
+
+#### Image Dimensions
+
+| Size | Width | Height | Folder | Prefix |
+|------|-------|--------|--------|--------|
+| thumbnail | 640 | 450 | small/ | small_ |
+| medium | 730 | 486 | medium/ | medium_ |
+| large | 1200 | 630 | large/ | large_ |
+
+#### Usage Examples
+
+```php
+// Basic featured image
+echo invoke_frontimg('image123.jpg');
+
+// Responsive image with specific size
+echo invoke_responsive_image('image123.jpg', 'medium', true, 'My Image', 'img-fluid');
+
+// Hero image for LCP optimization
+echo invoke_hero_image('hero-image.jpg', '', 'Hero Title');
+
+// Gallery image with lazy loading
+echo invoke_gallery_image('gallery-1.jpg', 'Gallery Image');
+```
+
+#### Output Examples
+
+**With WebP support:**
+```html
+<picture>
+    <source srcset="https://example.com/public/files/pictures/image123.webp" type="image/webp">
+    <img src="https://example.com/public/files/pictures/medium/medium_image123.jpg" alt="My Image" width="730" height="486" class="img-fluid" decoding="auto">
+</picture>
+```
+
+**Without WebP (fallback):**
+```html
+<img src="https://example.com/public/files/pictures/medium/medium_image123.jpg" alt="My Image" width="730" height="486" class="img-fluid" decoding="auto">
+```
+
+#### Common Issues and Solutions
+
+**1. esc_attr() Not Defined**
+- Symptom: PHP error "Call to undefined function esc_attr()"
+- Cause: Using WordPress function in theme files
+- Solution: Replace with `htmlout()`
+
+```php
+// WRONG
+esc_attr($value);
+
+// CORRECT
+htmlout($value);
+```
+
+**2. Empty src Attributes**
+- Symptom: `<img src="">` in HTML output
+- Cause: Incorrect path construction
+- Solution: Always use APP_IMAGE constants or test path construction
+
+**IMPORTANT:** When modifying image functions:
+- Always use APP_IMAGE constants defined in lib/common.php
+- Test changes on live site before committing
+- Ask permission before changing existing working code
+
 ### Example: Using Utility Functions
 
 ```php
@@ -943,7 +1491,7 @@ if (!email_validation($email)) {
 $safeHtml = escape_html($userInput);
 
 // Check CSRF token
-if (!csrf_defender_verify($token)) {
+if (!csrf_check_token($token)) {
     throw new \Exception("Invalid CSRF token");
 }
 
@@ -957,99 +1505,280 @@ $ip = get_ip_address();
 
 ## 12. Theming
 
-### Theme Structure
+### Theme Directory Structure
+
+The default theme is located at `public/themes/blog/` and contains:
 
 ```
-public/themes/[theme-name]/
-|-- functions.php         # Theme functions and hooks
-|-- header.php            # Site header
-|-- footer.php            # Site footer
-|-- home.php              # Homepage template
-|-- single.php            # Single post template
-|-- page.php              # Page template
-|-- category.php          # Category archive template
-|-- archive.php           # Archive template
-|-- tag.php               # Tag archive template
-|-- comment.php           # Comment form/template
-|-- sidebar.php           # Sidebar
-|-- 404.php               # 404 error page
-|+-- assets/              # CSS, JS, images
-|   |-- css/
-|   |-- js/
-|   +-- img/
-+-- theme.ini             # Theme metadata
+public/themes/blog/
+├── theme.ini              # Theme metadata configuration
+├── functions.php          # Theme functions and template tags
+├── header.php            # Site header with navigation
+├── footer.php            # Site footer with scripts and cookie consent
+├── home.php              # Homepage template
+├── single.php            # Single post view with comments
+├── page.php              # Static page template
+├── category.php          # Category archive template
+├── tag.php               # Tag archive template
+├── archive.php           # Monthly archive template
+├── archives.php          # Archive index (all archives by year)
+├── blog.php              # Blog listing page
+├── sidebar.php           # Sidebar with widgets
+├── comment.php           # Comment form (legacy)
+├── privacy.php           # Privacy policy page template
+├── 404.php               # 404 error page
+├── cookie-consent.php    # GDPR cookie consent banner
+├── download.php          # Download page template
+├── download_file.php     # Download file handler
+├── render-comments.php   # Comments rendering function
+├── index.php             # Entry point (usually empty)
+├── lang/                 # Language files
+│   └── en.json          # English translations (i18n)
+└── assets/               # Theme assets
+    ├── css/             # Stylesheets
+    ├── js/              # JavaScript files
+    ├── vendor/          # Third-party libraries
+    ├── fonts/           # Custom fonts
+    └── img/             # Images
+```
+
+### theme.ini Configuration
+
+```ini
+[info]
+theme_name = Bootstrap Blog
+theme_designer = Ondrej Svetska
+theme_description = Scriptlog default theme 
+theme_directory = blog
 ```
 
 ### Theme Functions (functions.php)
 
-```php
-<?php
-// Define theme support
-function theme_setup()
-{
-    add_theme_support('title-tag');
-    add_theme_support('post-thumbnails');
-    add_theme_support('automatic-feed-links');
-    
-    // Register navigation menu
-    register_nav_menus([
-        'primary' => 'Primary Menu',
-        'footer'  => 'Footer Menu'
-    ]);
-}
-add_action('after_setup_theme', 'theme_setup');
+The theme provides functions in the following categories:
 
-// Enqueue scripts and styles
-function theme_scripts()
-{
-    wp_enqueue_style('theme-style', get_theme_file_uri('/assets/css/style.css'));
-    wp_enqueue_script('theme-script', get_theme_file_uri('/assets/js/script.js'), [], '1.0', true);
-}
-add_action('wp_enqueue_scripts', 'theme_scripts');
+#### i18n Functions
 
-// Template functions
-function get_post_thumbnail($postId, $size = 'medium')
-{
-    $mediaDao = new MediaDao();
-    $post = $postDao->findPostById($postId);
-    
-    if ($post && $post['media_id']) {
-        return invoke_frontimg($post['media_filename'], $size);
-    }
-    
-    return get_theme_file_uri('/assets/img/default.jpg');
-}
-```
+| Function | Description |
+|----------|-------------|
+| `t($key, $params)` | Translate a string |
+| `locale_url($path, $locale)` | Get URL with locale prefix |
+| `get_locale()` | Get current locale |
+| `available_locales()` | Get available locales |
+| `is_rtl()` | Check if current locale is RTL |
+| `get_html_dir()` | Get HTML dir attribute |
+| `language_switcher($args)` | Generate language switcher HTML |
 
-### Theme Template Tags
+#### Model Initialization Functions
 
-```php
-// In template files
+| Function | Description |
+|----------|-------------|
+| `request_path()` | Get request path object |
+| `initialize_post()` | Initialize PostModel |
+| `initialize_page()` | Initialize PageModel |
+| `initialize_comment()` | Initialize CommentModel |
+| `initialize_archive()` | Initialize ArchivesModel |
+| `initialize_topic()` | Initialize TopicModel |
+| `initialize_tag()` | Initialize TagModel |
+| `initialize_gallery()` | Initialize GalleryModel |
 
-// Header and footer
-call_theme_header();
-call_theme_footer();
+#### Post Retrieval Functions
 
-// Post loop
-if (have_posts()) {
-    while (have_posts()) {
-        the_post();
-        
-        // Display post data
-        echo get_the_title();
-        echo get_the_content();
-        echo get_the_date();
-        echo get_the_author();
-        echo get_the_tags();
-    }
-}
+| Function | Description |
+|----------|-------------|
+| `featured_post()` | Get random headline posts |
+| `get_slideshow($limit)` | Get posts with media for slideshow |
+| `sticky_page()` | Get random sticky page |
+| `random_posts($start, $end)` | Get random posts |
+| `latest_posts($limit, $position)` | Get latest posts |
+| `retrieve_blog_posts()` | Get all published blog posts |
+| `retrieve_detail_post($id)` | Get single post by ID |
+| `posts_by_archive($values)` | Get posts by archive month/year |
+| `archive_index()` | Get all archives for index |
+| `posts_by_tag($tag)` | Get posts by tag |
+| `searching_by_tag($tag)` | Full-text tag search |
+| `posts_by_category($topicId)` | Get posts by category |
+| `retrieve_page($arg, $rewrite)` | Get page by ID or slug |
+| `retrieve_archives()` | Get archives for sidebar |
 
-// Pagination
-front_paginator($wp_query);
+#### Navigation and Utility Functions
 
-// Comments
-comments_template();
-```
+| Function | Description |
+|----------|-------------|
+| `front_navigation($parent, $menu)` | Render navigation menu recursively |
+| `total_comment($id)` | Get total approved comments for post |
+| `block_csrf()` | Generate CSRF token for comment form |
+| `retrieves_topic_simple($id)` | Get topics for a post (simple) |
+| `retrieves_topic_prepared($id)` | Get topics for a post (prepared) |
+| `sidebar_topics()` | Get topics for sidebar |
+| `retrieve_tags()` | Get tags for sidebar |
+| `link_tag($id)` | Generate tag links for post |
+| `link_topic($id)` | Generate topic links for post |
+| `previous_post($id)` | Get previous post link |
+| `next_post($id)` | Get next post link |
+| `display_galleries($start, $limit)` | Get gallery images |
+| `render_comments_section($postId, $offset)` | Render comments section HTML |
+| `nothing_found()` | Display "no posts" message |
+| `retrieve_site_url()` | Get site URL from config |
+
+### Theme Header (header.php)
+
+The header includes:
+- HTML doctype with language and direction attributes from i18n
+- Meta tags (viewport, charset, SEO via theme_meta())
+- RSS and Atom feed links
+- Asset stylesheets (Bootstrap, Font Awesome, custom styles)
+- Favicon
+- Schema.org markup
+- Navigation menu with collapsible mobile support (Sina Nav)
+
+### Theme Footer (footer.php)
+
+The footer includes:
+- Copyright notice with dynamic year
+- Template credits
+- JavaScript assets (jQuery, Bootstrap, plugins)
+- Cookie consent banner (GDPR)
+- RTL script support
+
+### Supported Features
+
+| Feature | Implementation |
+|---------|---------------|
+| **RTL Support** | `is_rtl()` function, rtl.css, rtl.js |
+| **Internationalization** | I18nManager class, lang/en.json |
+| **Cookie Consent** | GDPR banner with API endpoint |
+| **Comments** | AJAX loading, CSRF protection |
+| **Download System** | UUID-based secure download links |
+| **Archives** | Monthly archives with index |
+| **Privacy Policy** | Static page template |
+| **Responsive** | Bootstrap 4, mobile navigation |
+
+### Asset Locations
+
+| Asset Type | Location |
+|------------|----------|
+| Main CSS | `assets/css/style.sea.css` |
+| Custom CSS | `assets/css/custom.css` |
+| Cookie Consent | `assets/css/cookie-consent.css` |
+| Comment CSS | `assets/css/comment.css` |
+| RTL CSS | `assets/css/rtl.css` |
+| 404 CSS | `assets/css/not-found.css` |
+| Navigation CSS | `assets/css/sina-nav.css` |
+| Front JS | `assets/js/front.js` |
+| Comment JS | `assets/js/comment-submission.js`, `assets/js/load-comment.js` |
+| Cookie JS | `assets/js/cookie-consent.js` |
+| RTL JS | `assets/js/rtl.js` |
+| Bootstrap | `assets/vendor/bootstrap/` |
+| Font Awesome | `assets/vendor/font-awesome/` |
+| jQuery | `assets/vendor/jquery/` |
+| Fancybox | `assets/vendor/@fancyapps/fancybox/` |
+| Popper.js | `assets/vendor/popper.js/` |
+
+### Theme Template Files
+
+#### home.php
+
+The homepage template includes:
+- Hero section with featured post background
+- Intro section with sticky page content
+- Plugin invocation for "Hello World" plugin
+- Random posts section (alternating left/right layout)
+- Divider section with featured content background
+- Latest posts grid (3 columns)
+- Gallery section with Fancybox lightbox
+
+#### single.php
+
+Single post template displays:
+- Featured image
+- Post title with permalink
+- Author, date, and comment count metadata
+- Post content with htmLawed HTML filtering
+- Post tags
+- Previous/next post navigation
+- Comments section (AJAX-loaded)
+- Comment form with CSRF protection
+
+#### page.php
+
+Static page template includes:
+- Featured image
+- Page title with permalink
+- Author and date metadata
+- Page content with HTML filtering
+- Tags display
+
+#### category.php, tag.php, archive.php, archives.php, blog.php
+
+Archive templates share common structure:
+- Topic/tag/archive header
+- Post grid layout (2 columns)
+- Post metadata (thumbnail, title, excerpt, author, date, comments)
+- Sidebar inclusion
+- Pagination
+
+#### sidebar.php
+
+Sidebar widgets:
+- Search form
+- Latest posts (5 posts with thumbnails)
+- Categories list with post counts
+- Archives list with post counts
+- Tags cloud
+
+#### 404.php
+
+Simple 404 error page with:
+- 404 display
+- "Page not found" message
+- Back to home link
+
+#### privacy.php
+
+Static privacy policy page with:
+- Privacy policy content
+- Last updated date
+- Contact information
+- Back to home button
+
+#### cookie-consent.php
+
+GDPR cookie consent banner with:
+- Privacy notice text
+- Accept/Reject/Learn More buttons
+- Privacy policy link
+- API endpoint for consent management
+
+#### download.php, download_file.php
+
+Download page templates:
+- File information display
+- Download button with UUID-based URL
+- Copy link functionality
+- Expiration countdown
+- Optional support URL
+
+### Creating Custom Themes
+
+1. Create directory: `public/themes/[theme-name]/`
+2. Copy required templates from blog theme:
+   - `theme.ini` - Theme metadata
+   - `functions.php` - Theme functions
+   - `header.php` - Site header
+   - `footer.php` - Site footer
+   - `home.php` - Homepage
+   - `single.php` - Post view
+   - `page.php` - Page view
+   - `category.php` - Category archive
+   - `tag.php` - Tag archive
+   - `archive.php` - Monthly archive
+   - `archives.php` - Archive index
+   - `blog.php` - Blog listing
+   - `sidebar.php` - Sidebar
+   - `404.php` - Error page
+3. Create `theme.ini` with metadata
+4. Add assets to `assets/` subdirectory
+5. Register theme in admin panel (admin/templates.php)
 
 > **TIP:** Use `public/themes/blog/` as a reference theme for creating new themes.
 
@@ -1219,12 +1948,12 @@ Available in `lib/utility/plugin-validator.php`:
 
 ### RESTful API Overview
 
-Blogware provides a RESTful API that allows external applications to interact with blog content. The API follows OpenAPI 3.0 specification and returns JSON responses.
+ScriptLog provides a RESTful API that allows external applications to interact with blog content. The API follows OpenAPI 3.0 specification and returns JSON responses.
 
 | Environment | URL |
 |-------------|-----|
-| **Production** | `http://blogware.site/api/v1` |
-| **Development** | `http://localhost/blogware/public_html/api/v1` |
+| **Production** | `http://ScriptLog.site/api/v1` |
+| **Development** | `http://localhost/ScriptLog/public_html/api/v1` |
 
 > **NOTE:** The complete OpenAPI 3.0 specification is available at `/docs/API_OPENAPI.json` and `/docs/API_OPENAPI.yaml`.
 
@@ -1236,7 +1965,7 @@ The API supports two authentication methods:
 
 ```
 GET /api/v1/posts HTTP/1.1
-Host: blogware.site
+Host: ScriptLog.site
 X-API-Key: your-api-key-here
 ```
 
@@ -1244,7 +1973,7 @@ X-API-Key: your-api-key-here
 
 ```
 GET /api/v1/posts HTTP/1.1
-Host: blogware.site
+Host: ScriptLog.site
 Authorization: Bearer your-token-here
 ```
 
@@ -1457,29 +2186,40 @@ $router->delete('resources/([0-9]+)', 'MyResourceApiController@destroy');
 
 ## 15. Testing
 
-### Test Suite Overview
+> **NOTE:** For comprehensive testing documentation including PHPStan setup and CI/CD integration, see [TESTING_GUIDE.md](TESTING_GUIDE.md).
+
+### Testing Overview
+
+This project uses two complementary testing approaches:
+
+| Tool | Purpose | Coverage |
+|------|---------|----------|
+| **PHPUnit** | Unit and integration testing | Functional correctness |
+| **PHPStan** | Static code analysis | Type safety, code quality |
+
+### Test Suite Metrics
 
 | Metric | Value |
 |--------|-------|
-| **Total Tests** | 246 |
-| **Assertions** | 290 |
+| **Total Tests** | 868 |
+| **Assertions** | ~1000+ |
 | **PHPUnit Version** | 9.6.34 |
+| **Target Coverage** | 40% |
+| **Completed Tests** | 407+ |
 
-### Running Tests
+### Test Coverage Plan
 
-```bash
-# Run all tests
-vendor/bin/phpunit
+The test coverage plan is organized into phases:
 
-# Run with coverage (requires Xdebug)
-vendor/bin/phpunit --coverage-html coverage
+#### Phase Status
 
-# Run specific test file
-vendor/bin/phpunit tests/EmailValidationTest.php
-
-# Run tests matching pattern
-vendor/bin/phpunit --filter "EmailValidation"
-```
+| Phase | Priority | Status | Tests |
+|-------|----------|--------|-------|
+| Phase 1: DAO Integration | HIGH | ✅ Complete | 92 |
+| Phase 2: Service Layer | HIGH | ✅ Complete | 148 |
+| Phase 3: Core Classes | MEDIUM | 🔄 Pending | 65 |
+| Phase 4: Controllers | MEDIUM | 🔄 Pending | 34 |
+| Phase 5: Utilities | LOW | ✅ Complete | 68 |
 
 ### Test Categories
 
@@ -1488,7 +2228,107 @@ vendor/bin/phpunit --filter "EmailValidation"
 | **Unit Tests** | Utility function tests, class existence tests |
 | **Integration Tests** | Database CRUD operations using `blogware_test` database |
 
-#### Writing Tests
+### Security Testing
+
+PostDao security tests verify critical security features:
+
+| Test | Purpose |
+|------|---------|
+| `testFindPostsHasOnlyPublishedParameter` | Verifies default filters for published posts only |
+| `testFindPostHasOnlyPublishedParameter` | Verifies single post retrieval filters for published posts |
+| `testFindPostsHasAuthorParameter` | Verifies author filtering support |
+| `testFindPostsHasSanitizedOrderBy` | Verifies ORDER BY uses whitelist to prevent SQL injection |
+| `testFindPostsFiltersByStatusAndVisibility` | Verifies post_status and post_visibility filters |
+| `testFindPostFiltersByStatusAndVisibility` | Verifies single post respects status/visibility |
+
+**Location**: `tests/unit/PostDaoSecurityTest.php`
+
+### Running Tests
+
+#### PHPUnit Commands
+
+```bash
+# Run all tests
+lib/vendor/bin/phpunit
+
+# Run with coverage (requires Xdebug)
+lib/vendor/bin/phpunit --coverage-html coverage
+
+# Run specific test file
+lib/vendor/bin/phpunit tests/EmailValidationTest.php
+
+# Run tests matching pattern
+lib/vendor/bin/phpunit --filter "EmailValidation"
+```
+
+#### PHPStan Commands
+
+```bash
+# Run static analysis
+lib/vendor/bin/phpstan analyse
+
+# Run with specific config
+lib/vendor/bin/phpstan analyse --configuration=phpstan.neon
+
+# Run with memory limit (recommended)
+lib/vendor/bin/phpstan analyse --memory-limit=1G
+
+# Generate/update baseline
+lib/vendor/bin/phpstan analyse --generate-baseline=phpstan.baseline.neon
+
+# Increase analysis level for stricter checks
+lib/vendor/bin/phpstan analyse -l 5
+```
+
+### Static Analysis with PHPStan
+
+PHPStan is a static analysis tool that finds bugs in your code without running it.
+
+#### Configuration Files
+
+| File | Purpose |
+|------|---------|
+| `phpstan.neon` | Main configuration |
+| `phpstan.baseline.neon` | Baseline of known issues to ignore |
+
+#### PHPStan Configuration
+
+```neon
+includes:
+    - phpstan.baseline.neon
+
+parameters:
+    phpVersion: 70400
+    paths:
+        - lib/
+        - index.php
+    excludePaths:
+        - lib/vendor/
+        - lib/core/HTMLPurifier/
+    level: 0
+```
+
+#### Key Settings
+
+- **phpVersion**: Set to `70400` for PHP 7.4 compatibility
+- **level**: Currently at level 0 (most lenient). Increase gradually for stricter checks
+- **excludePaths**: Excludes vendor and third-party code
+
+### Test Database Setup
+
+Tests use a separate database (`blogware_test`) to avoid affecting production data.
+
+```bash
+# Create test database
+php tests/setup_test_db.php
+
+# Or manually
+mysql -u root -p -e "CREATE DATABASE blogware_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+```
+
+### Writing Tests
+
+#### PHPUnit Test Structure
 
 ```php
 <?php
@@ -1513,12 +2353,77 @@ class MyTest extends TestCase
 }
 ```
 
-### Test Database Setup
+#### Best Practices
+
+1. **Test one thing per method** - Each test should verify a single behavior
+2. **Use descriptive names** - Method names should describe what is being tested
+3. **Arrange-Act-Assert** - Structure tests with clear setup, action, and verification phases
+4. **Mock external dependencies** - Use mocks for database, filesystem, etc.
+
+### CI/CD Integration
+
+#### GitHub Actions Example
+
+```yaml
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install dependencies
+        run: composer install --no-interaction --no-dev
+      
+      - name: Run PHPUnit
+        run: lib/vendor/bin/phpunit
+      
+      - name: Run PHPStan
+        run: lib/vendor/bin/phpstan analyse --memory-limit=1G
+```
+
+#### Pre-commit Hook
+
+Add to `.git/hooks/pre-commit`:
 
 ```bash
-# Create test database
-php tests/setup_test_db.php
+#!/bin/bash
+lib/vendor/bin/phpstan analyse --memory-limit=1G
+lib/vendor/bin/phpunit
 ```
+
+### Troubleshooting
+
+#### PHPUnit Issues
+
+| Issue | Solution |
+|-------|----------|
+| Tests fail with "Database not found" | Run `php tests/setup_test_db.php` |
+| Xdebug required for coverage | Install Xdebug or skip coverage |
+
+#### PHPStan Issues
+
+| Issue | Solution |
+|-------|----------|
+| Memory limit exceeded | Run with `--memory-limit=1G` |
+| Too many errors | Use baseline or increase level gradually |
+| False positives | Add to ignoreErrors in phpstan.neon |
+| Missing bleedingEdge.neon | Remove from includes in phpstan.neon |
+
+### Recently Added Tests
+
+#### Medoo and Membership Utilities Tests (April 2026)
+- `tests/unit/MedooinFunctionsTest.php` (26 tests) - Tests for `is_medoo_database()`, `is_db_database()`, `db_build_where()`, `medoo_select()`, `medoo_insert()`, `medoo_update()`, `medoo_delete()`
+- `tests/integration/MedooinIntegrationTest.php` (8+ tests) - Integration tests for database selection and operations
+- `tests/unit/MembershipFunctionsTest.php` (26 tests) - Tests for `is_registration_unable()`, `membership_default_role()`, `membership_get_role()`, `membership_get_role_name()`
+- `tests/integration/MembershipIntegrationTest.php` (8 tests) - Integration tests for membership settings
+
+#### PostDao Security Tests (April 2026)
+- `tests/unit/PostDaoSecurityTest.php` (6 tests) - Verifies SQL injection prevention and security filters
 
 ---
 
@@ -1550,6 +2455,63 @@ if (APP_DEVELOPMENT) {
 
 ---
 
+## 17. Asset Management
+
+### UI Asset Locations
+
+| Location | Purpose |
+|----------|---------|
+| `admin/assets/` | Admin panel CSS, JS, images |
+| `public/themes/blog/assets/` | Blog theme CSS, JS, images |
+
+### Known Active Assets
+
+**Admin Panel (admin/assets/):**
+- `dist/css/AdminLTE.min.css` - Main theme
+- `dist/css/skins/scriptlog-skin.css` - Active skin
+- `dist/css/rtl.css` - RTL language support
+- `components/bootstrap/dist/css/bootstrap.min.css`
+- `components/font-awesome/css/font-awesome.min.css`
+
+**Blog Theme (public/themes/blog/assets/):**
+- `css/style.sea.css` - Main theme style
+- `css/sina-nav.css` - Navigation styles
+- `vendor/@fancyapps/fancybox/jquery.fancybox.min.css` - Lightbox
+- `vendor/bootstrap/css/bootstrap.min.css`
+- `vendor/font-awesome/css/font-awesome.min.css`
+
+### Asset Cleanup Best Practices
+
+**Before deleting any asset files:**
+
+1. **Read template files** that include assets:
+   - `admin/admin-layout.php` - Admin header template
+   - `public/themes/blog/header.php` - Theme header template
+   - `public/themes/blog/footer.php` - Theme footer template
+
+2. **Search for references** using grep:
+   ```bash
+   grep -r "stylesheet\|script.*src" admin/ public/themes/
+   ```
+
+3. **Verify all files exist** before cleanup:
+   ```bash
+   ls -la path/to/asset.css
+   ```
+
+**Files that are safe to remove:**
+- Non-minified `.css`/`.js` files when minified versions exist
+- Duplicate libraries in different formats
+- Reference documentation files (e.g., `icons-reference/`)
+- License files in vendor directories
+
+**Files to NEVER remove without verification:**
+- Files referenced in layout templates
+- Minified versions (they're typically what's used)
+- Skin files actively used by the theme
+
+---
+
 ## Key Constants
 
 ```php
@@ -1578,8 +2540,10 @@ APP_DEVELOPMENT    // true/false
 | Category | Classes |
 |----------|---------|
 | **Core** | Bootstrap, Dispatcher, DbFactory, Authentication, SessionMaker, Registry, FormValidator, Sanitize, View |
-| **DAO** | PostDao, UserDao, CommentDao, TopicDao, MediaDao, PageDao, MenuDao, PluginDao, ThemeDao, ConfigurationDao |
-| **Service** | PostService, UserService, CommentService, TopicService, MediaService, PageService, MenuService, PluginService, ThemeService |
+| **DAO** | PostDao, UserDao, CommentDao, ReplyDao, TopicDao, MediaDao, PageDao, MenuDao, PluginDao, ThemeDao, ConfigurationDao, ConsentDao |
+| **Service** | PostService, UserService, CommentService, ReplyService, TopicService, MediaService, PageService, MenuService, PluginService, ThemeService, ConsentService, DownloadService |
+| **Controller** | PostController, UserController, CommentController, ReplyController, TopicController, MediaController, PageController, MenuController, PluginController, ThemeController, DownloadController, DownloadAdminController |
+| **Utility** | DownloadHandler, DownloadSettings |
 
 ## Global Functions
 
@@ -1589,7 +2553,7 @@ start_session_on_site($sessionMaker);
 regenerate_session();
 
 // Security
-csrf_defender_verify($token);
+csrf_check_token($token);
 remove_xss($data);
 escape_html($html);
 sanitize_urls($url);
@@ -1672,7 +2636,537 @@ $escaper = new Escaper('utf-8');
 
 ---
 
-## Contributing
+## 18. GDPR Compliance
+
+### Overview
+
+ScriptLog includes built-in GDPR compliance features designed to handle user consent, data subject requests, and automated privacy auditing. This section documents the architecture and implementation of these features.
+
+### Admin Page Authorization
+
+All admin pages containing sensitive operations (especially GDPR features) must implement proper authentication checks to prevent unauthorized access to personal data:
+
+```php
+// admin/privacy.php - Example of proper authorization
+if (false === $authenticator->userAccessControl(ActionConst::PRIVACY)) {
+    direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
+}
+```
+
+Available permissions:
+- `ActionConst::PRIVACY` - Privacy settings, GDPR data requests, audit logs.
+- `ActionConst::USERS` - User management and profile deletion.
+
+### Database Tables
+
+The GDPR system relies on three core tables for consent, requests, and auditing:
+
+**1. tbl_consents** - Stores user choices for cookies and tracking.
+```sql
+CREATE TABLE tbl_consents (
+    ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    consent_type VARCHAR(50) NOT NULL,
+    consent_status ENUM('accepted','rejected') NOT NULL,
+    consent_ip VARCHAR(45) NOT NULL,
+    consent_user_agent VARCHAR(255) DEFAULT NULL,
+    consent_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (ID)
+);
+```
+
+**2. tbl_data_requests** - Tracks data export and deletion requests.
+```sql
+CREATE TABLE tbl_data_requests (
+    ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    request_type VARCHAR(50) NOT NULL,
+    request_email VARCHAR(100) NOT NULL,
+    request_status ENUM('pending','processing','completed','rejected') DEFAULT 'pending',
+    request_ip VARCHAR(45) NOT NULL,
+    request_note TEXT DEFAULT NULL,
+    request_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    request_completed_date DATETIME DEFAULT NULL,
+    PRIMARY KEY (ID)
+);
+```
+
+**3. tbl_privacy_logs** - Automated audit trail for all privacy-related actions.
+```sql
+CREATE TABLE tbl_privacy_logs (
+    ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    log_action VARCHAR(50) NOT NULL,
+    log_type VARCHAR(50) NOT NULL,
+    log_user_id BIGINT(20) UNSIGNED DEFAULT NULL,
+    log_email VARCHAR(100) DEFAULT NULL,
+    log_details TEXT DEFAULT NULL,
+    log_ip VARCHAR(45) NOT NULL,
+    log_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (ID)
+);
+```
+
+### Core Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `ConsentService` | `lib/service/ConsentService.php` | Manages user consent records. |
+| `DataRequestService` | `lib/service/DataRequestService.php` | Handles data exports and anonymization logic. |
+| `NotificationService` | `lib/service/NotificationService.php` | Orchestrates automated compliance emails. |
+| `PrivacyLogDao` | `lib/dao/PrivacyLogDao.php` | Records audit trails for privacy actions. |
+
+### Data Subject Requests
+
+#### 1. Data Export
+Administrators can process export requests via `DataRequestService::exportUserData()`. This method:
+- Aggregates user profile data, comments, posts, and activity logs.
+- Generates a structured JSON file for the user.
+- Logs the export event to the privacy audit trail.
+
+#### 2. Data Deletion & Anonymization
+To respect the "Right to be Forgotten," ScriptLog uses an anonymization approach rather than hard deletion to preserve database integrity:
+- **Comments**: Name, email, and IP are anonymized.
+- **Posts**: Reassigned to the primary administrator (ID: 1).
+- **Profile**: Email is changed to a unique placeholder (`deleted_ID@user.local`).
+- **Automation**: Managed via `UserService::removeUserWithAnonymization()`.
+
+### Automated Email Notifications
+
+The system sends automated notifications during the compliance lifecycle:
+- **Confirmation**: Sent to the user when a request is received.
+- **Admin Alert**: Notifies administrators of new pending requests.
+- **Completion**: Sent when data has been exported or anonymized.
+- **Transport**: Powered by the **Dynamic SMTP System** using Symfony Mailer.
+
+### Cookie Consent Banner
+
+The frontend provides a standard consent interface:
+- **Banner**: `public/themes/blog/cookie-consent.php`.
+- **Logic**: `public/themes/blog/assets/js/cookie-consent.js`.
+- **Persistence**: Choices are stored in both cookies (frontend) and `tbl_consents` (backend).
+
+### GDPR API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/gdpr/consent` | Record user consent choice. |
+| `GET` | `/api/v1/gdpr/consent` | Retrieve current consent status. |
+
+### Implementation Workflow
+
+To add new compliance features:
+1.  **Define Table**: Add to `install/include/dbtable.php`.
+2.  **Service Logic**: Implement in `lib/service/`.
+3.  **Audit Trail**: Call `PrivacyLogDao::createLog()` for every sensitive action.
+4.  **Notification**: Use `NotificationService` to inform users of the action.
+5.  **UI**: Add management forms to `admin/ui/privacy/`.
+
+### Testing Compliance
+
+```bash
+# Verify privacy page accessibility
+curl -I https://example.com/privacy
+
+# Test automated logging
+# Perform a data export in Admin UI and check tbl_privacy_logs
+```
+
+---
+
+## 19. Internationalization (i18n)
+
+### Overview
+
+ScriptLog includes a comprehensive i18n system for multi-language support, including:
+- Language detection from browser, URL, or user preference
+- Database-driven translation management
+- RTL (Right-to-Left) language support
+- Translation caching for performance
+- RESTful API for managing languages and translations
+
+### Architecture
+
+```
++---------------------------------------------------------------+
+|                     i18n REQUEST FLOW                         |
++---------------------------------------------------------------+
+|                                                               |
+|   Request                                                     |
+|     |                                                         |
+|     v                                                         |
+|   +---------------------+                                     |
+|   | LocaleDetector      |  Detect locale from:                |
+|   |                     |  - URL prefix (/ar/, /es/)          |
+|   +----------+----------+  - Cookie (lang)                    |
+|              |             - Accept-Language header           |
+|              |             - Default (en_US)                  |
+|              v                                                |
+|   +---------------------+                                     |
+|   | I18nManager         |  Load translations & manage locale  |
+|   +----------+----------+                                     |
+|              |                                                |
+|              v                                                |
+|   +---------------------+                                     |
+|   | TranslationLoader   |  Load from:                         |
+|   +----------+----------+  - Database (tbl_translations)      |
+|              |             - Cache file                       |
+|              v                                                |
+|   +---------------------+                                     |
+|   | View/Theme          |  Output with lang/dir attributes    |
+|   +---------------------+                                     |
+|                                                               |
++---------------------------------------------------------------+
+```
+
+### Core Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `I18nManager` | `lib/core/I18nManager.php` | Main i18n orchestrator |
+| `LocaleDetector` | `lib/core/LocaleDetector.php` | Language detection |
+| `LocaleRouter` | `lib/core/LocaleRouter.php` | URL-based routing |
+| `TranslationLoader` | `lib/core/TranslationLoader.php` | Translation loading/caching |
+| `LanguageDao` | `lib/dao/LanguageDao.php` | Language CRUD |
+| `TranslationDao` | `lib/dao/TranslationDao.php` | Translation CRUD |
+| `LanguageService` | `lib/service/LanguageService.php` | Language business logic |
+| `TranslationService` | `lib/service/TranslationService.php` | Translation business logic |
+
+### Database Tables
+
+**tbl_languages** - Supported languages
+
+```sql
+CREATE TABLE IF NOT EXISTS tbl_languages (
+    ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    locale VARCHAR(10) NOT NULL UNIQUE,
+    language_name VARCHAR(100) NOT NULL,
+    native_name VARCHAR(100) NOT NULL,
+    is_rtl TINYINT(1) NOT NULL DEFAULT 0,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    is_default TINYINT(1) NOT NULL DEFAULT 0,
+    sort_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (ID),
+    KEY locale(locale),
+    KEY is_active(is_active)
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+**tbl_translations** - Translation strings
+
+```sql
+CREATE TABLE IF NOT EXISTS tbl_translations (
+    ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    locale VARCHAR(10) NOT NULL,
+    translation_key VARCHAR(255) NOT NULL,
+    translation_value TEXT NOT NULL,
+    context VARCHAR(100) DEFAULT NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (ID),
+    UNIQUE KEY unique_key_locale(locale, translation_key),
+    KEY locale(locale),
+    KEY translation_key(translation_key)
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+### Language Detection Priority
+
+1. **URL Prefix** - `/ar/`, `/es/`, `/fr/` (e.g., `example.com/ar/posts`)
+2. **Cookie** - `lang` cookie set by language switcher
+3. **Accept-Language Header** - Browser's language preference
+4. **Default** - `en_US` (configurable)
+
+### URL Routing for Languages
+
+Languages are handled via URL prefixes in the existing routing system:
+
+```php
+// lib/core/Bootstrap.php
+$rules = [
+    // ... existing rules
+    'language_blog' => "/{lang}/blog",
+    'language_single' => "/{lang}/post/(?'id'\d+)/(?'post'[\w\-]+)",
+    'language_page' => "/{lang}/page/(?'page'[^/]+)",
+    'language_category' => "/{lang}/category/(?'category'[\w\-]+)",
+    'language_tag' => "/{lang}/tag/(?'tag'[\w\-]+)",
+];
+```
+
+### Translation Functions
+
+```php
+// Basic translation
+__('Hello World');           // Returns translated string
+__('Welcome, %s', [$name]); // With placeholders
+
+// Echo translation
+_e('Submit');                // Echoes translated string
+
+// With context
+_x('Read', 'verb');          // Context disambiguates same key
+_ex('Read', 'book title');   // Echo with context
+
+// Plural forms
+_n('%d comment', '%d comments', $count);  // Returns correct form
+```
+
+### RTL Support
+
+RTL languages (Arabic, Hebrew, Farsi, etc.) are automatically detected and styled:
+
+```php
+// Automatic detection based on language
+$isRtl = $i18nManager->isRtl();  // true for ar, he, fa, etc.
+
+// Theme files include RTL CSS
+// public/themes/blog/assets/css/rtl.css
+// public/themes/blog/assets/js/rtl.js
+```
+
+### i18n API Endpoints
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/v1/languages` | No | List all languages |
+| `GET` | `/api/v1/languages/active` | No | List active languages |
+| `GET` | `/api/v1/languages/{locale}` | No | Get language details |
+| `GET` | `/api/v1/translations` | No | Get translations for locale |
+| `POST` | `/api/v1/languages` | Yes | Create language |
+| `PUT` | `/api/v1/languages/{locale}` | Yes | Update language |
+| `POST` | `/api/v1/translations` | Yes | Create translation |
+| `PUT` | `/api/v1/translations/{key}` | Yes | Update translation |
+
+### Creating i18n Features
+
+1. **Add Language**: Use API or admin panel
+2. **Add Translations**: Insert into `tbl_translations` with locale and key
+3. **Use in Code**: Call translation functions
+4. **Theme Support**: Ensure templates use translation functions
+
+### Translation Caching
+
+Translations are cached for performance:
+
+- **Cache Location**: `public/files/cache/translations/`
+- **Cache Format**: `translations_{locale}.json`
+- **Cache Invalidation**: On translation update via API
+
+### Adding New Translatable Content
+
+When adding new features that need translation:
+
+1. Use translation functions in templates:
+```php
+<h1><?= __('Welcome Message'); ?></h1>
+```
+
+2. Add translations via API:
+```bash
+curl -X POST https://example.com/api/v1/translations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {token}" \
+  -d '{"locale": "es", "key": "welcome_message", "value": "Bienvenido"}'
+```
+
+### Testing i18n
+
+```bash
+# Test language detection
+curl -H "Accept-Language: es" http://example.com/
+
+# Test translation API
+curl http://example.com/api/v1/translations?locale=es
+
+# Test RTL rendering
+curl http://example.com/ar/ | grep 'dir="rtl"'
+```
+
+### Admin Panel Translations
+
+Admin panel uses a **hybrid translation system** via `lib/utility/admin-translations.php`:
+
+```
+Translation Request Flow:
+  admin_translate('key') 
+    → Check database (tbl_translations) first
+    → If found, return database value
+    → If not found, check hardcoded arrays
+    → Return fallback or key
+```
+
+```php
+// Usage in admin views
+admin_translate('nav.dashboard');      // "Dashboard"
+admin_translate('form.save');          // "Save"
+admin_translate('status.publish');     // "Published"
+
+// With parameter interpolation
+admin_t('welcome_message', ['name' => 'John']); // "Welcome, John"
+
+// Locale management
+admin_get_locale();    // Get current locale
+admin_set_locale('ar'); // Set locale
+admin_is_rtl();        // Check RTL (true for Arabic)
+```
+
+**Key format**: Dot-notation with underscore separators (e.g., `nav.dashboard`, `form.save`, `status.publish`)
+
+The hybrid approach allows translations to be:
+1. Managed via admin UI (Settings → Translations)
+2. Stored in database for easy editing
+3. Fallback to hardcoded arrays if not in database
+
+### Translation Editor
+
+The admin panel includes a translation editor at **Settings → Translations**:
+
+- **View**: Table listing all translations with filtering
+- **Add New**: Add new translation keys via modal form
+- **Edit**: Modify existing translations via modal form  
+- **Delete**: Remove translations (POST with CSRF protection)
+- **Export**: Download translations as JSON
+- **Import**: Upload translations from JSON
+- **Cache**: Regenerate translation cache
+- **Language Selector**: Switch between languages or view all
+
+### Common Issues and Fixes
+
+#### 1. Database Connection Charset (CRITICAL)
+
+The PDO database connection MUST use `charset=utf8mb4` in the DSN to properly load translations in non-English languages (Chinese, Arabic, etc.).
+
+**Files to check:**
+- `lib/core/Bootstrap.php` - Database DSN configuration
+- `lib/core/Db.php` - PDO connection options
+
+**Correct DSN format:**
+```php
+$dbc = DbFactory::connect([
+    'mysql:host=' . $host . ';port=' . $port . ';dbname=' . $dbname . ';charset=utf8mb4',
+    $user,
+    $pwd
+]);
+```
+
+**WRONG (will show "???" for Chinese/Arabic):**
+```php
+'mysql:host=...;dbname=...'
+```
+
+#### 2. Translation Value Standards
+
+**Human-readable first**: Translation values should be natural, complete phrases in the target language, not abbreviations or technical terms.
+
+```
+✅ Good:   "Choose your language", "Add New", "All Posts", "Error Server Error"
+❌ Bad:    "Language Settings", "addNew", "allPosts", "Error serverError"
+```
+
+**Example** - `nav.language_settings`:
+| Language | Value |
+|----------|-------|
+| en | Choose your language |
+| ar | اختر لغتك |
+| zh | 选择您的语言 |
+| fr | Choisissez votre langue |
+| ru | Выберите язык |
+| es | Elige tu idioma |
+| id | Pilih bahasa Anda |
+
+When updating translations in the database, always clear the cache:
+
+```php
+// Clear translation cache after database updates
+$cacheFile = 'public/files/cache/translations/' . $locale . '.json';
+@unlink($cacheFile);
+// System will regenerate on next request
+```
+
+#### 3. Translation Database Fixes
+
+When translations in the database show incorrect values (like "Nav addNew" instead of actual translations), fix directly via SQL:
+
+**Check broken translations:**
+```sql
+SELECT * FROM tbl_translations 
+WHERE translation_value LIKE 'Nav %'
+```
+
+#### 4. Language Selector Not Working
+
+The Translation Editor language dropdown must work with the session-based locale system:
+
+**Flow:**
+1. User selects language in dropdown → JavaScript redirects with `?switch-lang=id`
+2. `admin/index.php` processes `switch-lang` parameter → calls `admin_set_locale('id')`
+3. `admin_set_locale()` saves to `$_SESSION['admin_locale']` and cookie
+4. Translation Editor uses `admin_get_locale()` to determine which translations to show
+
+**Key files:**
+- `admin/index.php` - Handles `switch-lang` parameter
+- `lib/utility/admin-translations.php` - `admin_get_locale()` and `admin_set_locale()` functions
+- `lib/controller/TranslationController.php` - Uses `admin_get_locale()` when `$_GET['lang']` not set
+
+**TranslationController locale logic (CORRECT):**
+```php
+if (isset($_GET['lang']) && $_GET['lang'] === 'all') {
+    $langCode = 'all';
+} elseif (isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'ar', 'zh', 'fr', 'ru', 'es', 'id'])) {
+    $langCode = $_GET['lang'];
+} else {
+    // Fall back to session/cookie locale
+    $langCode = admin_get_locale();
+}
+```
+
+#### 5. Translation Editor URL Parameters
+
+The Translation Editor uses these URL parameters:
+- `?load=translations` - Main page
+- `?load=translations&lang=en` - Show English translations
+- `?load=translations&lang=id` - Show Indonesian translations  
+- `?load=translations&lang=all` - Show all languages (with pagination)
+- `?load=translations&action=update` - Update translation (POST)
+- `?load=translations&action=new-translation` - Create translation (POST)
+
+### Adding Content i18n Support
+
+To add locale support to a new content type:
+
+1. **Database**: Add `content_locale` column to table
+2. **Dao**: Add `dropDownLocale()` method
+3. **Service**: Add `setContentLocale()` method
+4. **Controller**: Add locale filters and setters
+5. **Admin UI**: Add locale dropdown to edit form
+
+### Populating Languages and Translations
+
+The system includes:
+- 7 languages (en, ar, zh, fr, ru, es, id)
+- 111 translation keys with 819 total translations
+- Translation editor in admin panel (Settings → Translations)
+- Translation cache in `public/files/cache/translations/`
+
+Use the admin panel (Settings → Languages and Settings → Translations) to manage languages and translations.
+
+### Configuration
+
+Default language settings are in `lib/core/I18nManager.php`:
+
+```php
+private $defaultLocale = 'en_US';
+private $supportedLocales = ['en_US', 'ar', 'es', 'fr', 'de', 'zh_CN'];
+```
+
+### Documentation
+
+For comprehensive API documentation and testing, see:
+- `docs/I18N_ARCHITECTURE.md` - Full architecture documentation
+- `docs/I18N_API.md` - API reference
+- `docs/I18N_TESTING_GUIDE.md` - Testing guide
+
+---
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -1682,10 +3176,879 @@ $escaper = new Escaper('utf-8');
 
 ---
 
+## 20. Comment-Reply System
+
+### Overview
+
+ScriptLog includes a complete comment-reply system that allows threaded discussions on blog posts. Replies are stored in the same `tbl_comments` table using a self-referential `comment_parent_id` field.
+
+### Architecture
+
+```
+Comments (comment_parent_id = 0)
+    └── Reply 1 (comment_parent_id = parent_comment_id)
+    └── Reply 2 (comment_parent_id = parent_comment_id)
+```
+
+### Database Schema
+
+The reply system uses the existing `tbl_comments` table structure:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ID` | BIGINT | Primary key |
+| `comment_post_id` | BIGINT | FK to tbl_posts |
+| `comment_parent_id` | BIGINT | Parent comment ID (0 for top-level comments) |
+| `comment_author_name` | VARCHAR(60) | Author's name |
+| `comment_author_ip` | VARCHAR(100) | Author's IP address |
+| `comment_author_email` | VARCHAR(100) | Author's email |
+| `comment_content` | text | Comment/reply content |
+| `comment_status` | VARCHAR(20) | Status: approved, pending, spam, draft |
+| `comment_date` | datetime | Creation timestamp |
+
+### Core Components
+
+| Component | Location | Purpose |
+|----------|----------|---------|
+| `ReplyDao` | `lib/dao/ReplyDao.php` | Reply CRUD operations |
+| `ReplyService` | `lib/service/ReplyService.php` | Business logic for replies |
+| `ReplyController` | `lib/controller/ReplyController.php` | HTTP request handling |
+| `CommentDao` | `lib/dao/CommentDao.php` | Comment operations (includes `countReplies()`) |
+| `CommentService` | `lib/service/CommentService.php` | Comment business logic |
+
+### Admin Panel Routing
+
+| Action | URL | Description |
+|--------|-----|-------------|
+| **List Comments** | `?load=comments` | View all comments |
+| **Edit Comment** | `?load=comments&action=editComment&Id={id}` | Edit a comment |
+| **Reply to Comment** | `?load=reply&action=reply&Id={parent_id}` | Create new reply |
+| **Edit Reply** | `?load=reply&action=editReply&Id={reply_id}` | Edit existing reply |
+| **Delete Reply** | `?load=reply&action=deleteReply&Id={reply_id}` | Delete reply |
+| **Delete Comment** | `?load=comments&action=deleteComment&Id={id}` | Delete comment (also deletes replies) |
+
+### Whitelisting Routes
+
+To add a new admin route, update `lib/utility/admin-query.php`:
+
+```php
+function admin_query()
+{
+    return array(
+        // ... existing routes ...
+        'comments' => 'comments.php',
+        'reply' => 'reply.php',  // Add this line
+        // ... other routes ...
+    );
+}
+```
+
+### Action Constants
+
+Defined in `lib/core/ActionConst.php`:
+
+```php
+// Comment constants
+const COMMENTS      = "comments";
+const EDITCOMMENT   = "editComment";
+const DELETECOMMENT = "deleteComment";
+
+// Reply constants
+const REPLY         = "reply";
+const EDITREPLY     = "editReply";
+const DELETEREPLY   = "deleteReply";
+```
+
+### Access Control
+
+Reply functionality requires `ActionConst::REPLY` permission, available to:
+- **administrator** - Full access
+- **manager** - Full access
+- **editor** - Full access
+- **author** - Full access
+
+### ReplyDao Methods
+
+```php
+class ReplyDao extends Dao
+{
+    // Create a new reply
+    public function createReply($bind);
+    
+    // Find all replies for a parent comment
+    public function findReplies($commentId, $orderBy = 'ID');
+    
+    // Find a single reply by ID
+    public function findReply($id, $sanitize);
+    
+    // Update reply
+    public function updateReply($sanitize, $bind, $ID);
+    
+    // Delete reply
+    public function deleteReply($id, $sanitize);
+    
+    // Check if reply exists
+    public function checkReplyId($id, $sanitize);
+    
+    // Get parent comment info
+    public function getParentComment($parentId, $sanitize);
+    
+    // Count total replies
+    public function totalReplyRecords($data = null, $parentId = null);
+    
+    // Generate status dropdown
+    public function dropDownReplyStatement($selected = '');
+}
+```
+
+### ReplyService Methods
+
+```php
+class ReplyService
+{
+    // Setters
+    public function setReplyId($reply_id);
+    public function setPostId($post_id);
+    public function setParentId($parent_id);
+    public function setAuthorName($author_name);
+    public function setAuthorIP($author_ip);
+    public function setAuthorEmail($author_email);
+    public function setReplyContent($content);
+    public function setReplyStatus($status);
+    
+    // Getters/Operations
+    public function grabReplies($parentId, $orderBy = 'ID');
+    public function grabReply($id);
+    public function grabParentComment($parentId);
+    public function addReply();
+    public function modifyReply();
+    public function removeReply();
+    public function checkReplyExists($id);
+    public function totalReplies($data = null, $parentId = null);
+}
+```
+
+### ReplyController Methods
+
+```php
+class ReplyController extends BaseApp
+{
+    // List all replies for a comment
+    public function listItems($parentId = null);
+    
+    // Create new reply (handles both GET for form and POST for submission)
+    public function insert();
+    
+    // Update existing reply
+    public function update($id);
+    
+    // Delete reply
+    public function remove($id);
+}
+```
+
+### Admin Page Implementation
+
+#### admin/reply.php Routing
+
+```php
+<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+
+$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
+$replyId = isset($_GET['Id']) ? abs((int)$_GET['Id']) : 0;
+
+$replyDao = new ReplyDao();
+$replyService = new ReplyService($replyDao, $validator, $sanitizer);
+$replyController = new ReplyController($replyService);
+
+try {
+    switch ($action) {
+        case ActionConst::REPLY:
+            // GET: show reply form, POST: process submission
+            if ($authenticator->userAccessControl(ActionConst::REPLY)) {
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $replyController->insert();
+                } else {
+                    $replyController->insert();
+                }
+            }
+            break;
+            
+        case ActionConst::EDITREPLY:
+            // Edit existing reply
+            if ($authenticator->userAccessControl(ActionConst::REPLY)) {
+                $replyController->update($replyId);
+            }
+            break;
+            
+        case ActionConst::DELETEREPLY:
+            // Delete reply
+            if ($authenticator->userAccessControl(ActionConst::REPLY)) {
+                $replyController->remove($replyId);
+            }
+            break;
+    }
+} catch (Throwable $th) {
+    LogError::exceptionHandler($th);
+}
+```
+
+### Frontend Comment Submission
+
+Visitors can submit comments and replies via `comments-post.php`:
+
+```php
+// From public/themes/blog/single.php
+<form method="post" action="<?= retrieve_site_url() ?>/comments-post.php">
+    <input type="hidden" name="post_id" value="<?= $post_id ?>">
+    <input type="hidden" name="parent_id" value="0"> <!-- 0 for comment, parent_id for reply -->
+    <input type="text" name="name" placeholder="Name">
+    <input type="email" name="email" placeholder="Email">
+    <textarea name="comment" placeholder="Comment"></textarea>
+    <button type="submit">Submit</button>
+</form>
+```
+
+### Viewing Replies in Admin
+
+#### Comments List (all-comments.php)
+
+Shows reply counts per comment:
+
+```php
+$replyCount = $commentService->countReplies($comment['ID']);
+if ($replyCount > 0) {
+    echo '<span class="badge bg-blue">' . $replyCount . ' replies</span>';
+}
+```
+
+#### Reply Form (reply.php)
+
+Form for creating/editing replies:
+
+```php
+<form method="post" action="<?= generate_request('index.php', 'post', ['reply', $action, $reply_id])['link'] ?>">
+    <input type="text" name="author_name" value="<?= htmlspecialchars($replyData['comment_author_name'] ?? '') ?>">
+    <textarea name="reply_content"><?= htmlspecialchars($replyData['comment_content'] ?? '') ?></textarea>
+    <?= $replyStatus // Dropdown for status ?>
+    <input type="hidden" name="csrfToken" value="<?= csrf_generate_token('csrfToken') ?>">
+    <button type="submit" name="replyFormSubmit">Submit Reply</button>
+</form>
+```
+
+### Deleting Comments with Replies
+
+When deleting a parent comment, consider whether to:
+1. Delete all child replies (cascade delete)
+2. Keep replies and reassign to a system account
+
+Current implementation: Manual deletion required for each reply.
+
+### Testing the Reply System
+
+```bash
+# Test comment listing with reply counts
+curl http://example.com/admin/index.php?load=comments
+
+# Test reply form display
+curl http://example.com/admin/index.php?load=reply&action=reply&Id=5
+
+# Test reply submission (requires authentication)
+curl -X POST http://example.com/admin/index.php \
+  -d "load=reply&action=reply&Id=5" \
+  -d "author_name=Test&reply_content=Test+reply&reply_status=pending&replyFormSubmit=1"
+```
+
+---
+
+## 21. Content Import System
+
+### Overview
+
+ScriptLog includes a robust content import system that supports migrating data from WordPress (WXR), Ghost (JSON), Blogspot/Blogger (XML), and ScriptLog's native JSON format. The native format allows migration between ScriptLog installations, preserving menus, settings, and content relationships.
+
+### Architecture
+
+The import system follows the project's standard layered pattern:
+
+1.  **UI Layer**: `admin/ui/import/index.php` (upload form) and `preview.php` (data verification).
+2.  **Controller Layer**: `ImportController` handles requests, CSRF validation, and user assignment.
+3.  **Service Layer**: `MigrationService` coordinates the import process and handles database interactions via `dbc`.
+4.  **Utility Layer**: Specific importer classes (`WordPressImporter`, `GhostImporter`, `BlogspotImporter`, `ScriptlogImporter`) handle file parsing.
+
+### Core Components
+
+| Component | Location | Purpose |
+| :--- | :--- | :--- |
+| `ImportController` | `lib/controller/ImportController.php` | Request handling and CSRF protection |
+| `MigrationService` | `lib/service/MigrationService.php` | Main import logic and DB operations |
+| `WordPressImporter` | `lib/utility/import-wordpress.php` | WXR (XML) parser |
+| `GhostImporter` | `lib/utility/import-ghost.php` | Ghost JSON parser |
+| `BlogspotImporter` | `lib/utility/import-blogspot.php` | Blogger XML parser |
+| `ScriptlogImporter` | `lib/utility/import-scriptlog.php` | Native JSON parser |
+| `ImportException` | `lib/core/ImportException.php` | Specialized import error handling |
+
+### Import Workflow
+
+1.  **Upload**: User selects source platform and uploads export file.
+2.  **Preview**: `MigrationService::previewImport()` parses the file and returns a summary and sample data.
+3.  **Import**:
+    *   Categories are created or mapped if they already exist.
+    *   Posts/Pages are created with unique slugs.
+    *   Comments are imported and linked to their respective posts.
+    *   Content is assigned to the selected author.
+
+### Security and Validation
+
+*   **CSRF Protection**: All import actions require a valid security token.
+*   **Access Control**: Only users with `administrator` level can access the import feature.
+*   **Sanitization**: Imported HTML is purified using `purify_dirty_html()` and input is sanitized via `prevent_injection()`.
+*   **Duplicate Prevention**: Existing posts with the same slug are skipped or renamed to ensure uniqueness.
+
+### Adding New Importers
+
+To add support for a new platform:
+
+1.  Create a new importer class in `lib/utility/` (e.g., `MediumImporter.php`).
+2.  Run `php generate-utility-list.php` to register the new utility.
+3.  Update `MigrationService.php` to include the new source constant and handle the new importer.
+4. Update the UI in `admin/ui/import/index.php` to add the new option.
+
+---
+
+## 22. Content Export System
+
+### Overview
+
+ScriptLog includes a content export system that supports exporting data to WordPress (WXR), Ghost (JSON), Blogspot/Blogger (XML), and ScriptLog's native JSON format. The native format preserves menus, settings, and content relationships for seamless migration between installations.
+
+### Architecture
+
+The export system follows the project's standard layered pattern:
+
+1.  **UI Layer**: `admin/ui/export/index.php` (format selection form).
+2.  **Controller Layer**: `ExportController` handles requests and format selection.
+3.  **Service Layer**: `ExportService` coordinates the export process and data retrieval.
+4.  **Utility Layer**: Specific exporter classes (`WordPressExporter`, `GhostExporter`, `BlogspotExporter`, `ScriptlogExporter`) handle format generation.
+
+### Core Components
+
+| Component | Location | Purpose |
+| :--- | :--- | :--- |
+| `ExportController` | `lib/controller/ExportController.php` | Request handling |
+| `ExportService` | `lib/service/ExportService.php` | Main export logic and data retrieval |
+| `WordPressExporter` | `lib/utility/export-wordpress.php` | WXR (XML) generator |
+| `GhostExporter` | `lib/utility/export-ghost.php` | Ghost JSON generator |
+| `BlogspotExporter` | `lib/utility/export-blogspot.php` | Blogger XML generator |
+| `ScriptlogExporter` | `lib/utility/export-scriptlog.php` | Native JSON generator |
+| `ExportException` | `lib/core/ExportException.php` | Specialized export error handling |
+
+### Export Workflow
+
+1.  **Select Format**: User selects target platform (WordPress, Ghost, Blogspot, or Scriptlog).
+2.  **Generate**: `ExportService` retrieves posts, pages, categories, tags, and comments from the database.
+3.  **Transform**: Selected exporter formats the data according to target platform specifications.
+4.  **Download**: File is generated and sent to browser for download.
+
+### Native Scriptlog Format
+
+The Scriptlog native export format (`export-scriptlog.php`) preserves:
+
+- Posts, pages, categories, tags, and comments
+- Navigation menus and menu items
+- System settings and configuration
+- Post-topic relationships
+- Content metadata
+
+This format is ideal for migrating between Scriptlog installations or creating backups.
+
+### Security and Access Control
+
+*   **Access Control**: Only users with `administrator` level can access the export feature.
+*   **Admin Route Only**: Export is not exposed as a public route - it's accessed via `admin/index.php?load=export`.
+*   **Whitelist**: Export is registered in `lib/utility/admin-query.php` for admin routing.
+
+### Adding New Exporters
+
+To add support for a new platform:
+
+1.  Create a new exporter class in `lib/utility/` (e.g., `MediumExporter.php`).
+2.  Implement format generation logic in the exporter class.
+3.  Update `ExportController.php` to include the new format option.
+4.  Update the UI in `admin/ui/export/index.php` to add the new option.
+
+### Common Issues and Solutions
+
+#### XML Parse Error: Unexpected Identifier
+
+When generating XML files (WordPress WXR, Blogspot Atom), the XML declaration `<?xml version="1.0" encoding="UTF-8"?>` may cause a PHP parse error if placed inline with PHP code. This happens because PHP interprets `<?` as a short opening tag.
+
+**The Problem:**
+```php
+// This causes parse error - PHP tries to interpret "xml" as PHP code
+ob_start();
+?>
+<?xml version="1.0" encoding="UTF-8"?>
+<rss ...
+```
+
+**The Solution:**
+Use PHP string concatenation to output XML content:
+
+```php
+public function export(&$exportStats, $authorId = null)
+{
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    $xml .= '<rss version="2.0">' . "\n";
+    // ... build XML as string
+    return $xml;
+}
+```
+
+**Files Fixed:**
+- `lib/utility/export-wordpress.php`
+- `lib/utility/export-blogspot.php`
+
+---
+
+## 23. UI Asset Management
+
+### Overview
+
+ScriptLog manages UI assets (CSS, JavaScript, images) separately for the admin panel and the public theme. Understanding the asset structure is essential for theming and plugin development.
+
+### Asset Locations
+
+| Location | Purpose |
+|----------|---------|
+| `admin/assets/` | Admin panel CSS, JS, images |
+| `public/themes/blog/assets/` | Blog theme CSS, JS, images |
+
+### Active Admin Assets
+
+**Admin Panel (admin/assets/):**
+- `dist/css/AdminLTE.min.css` - Main admin theme
+- `dist/css/skins/scriptlog-skin.css` - Active admin skin
+- `dist/css/rtl.css` - RTL language support
+- `components/bootstrap/dist/css/bootstrap.min.css`
+- `components/font-awesome/css/font-awesome.min.css`
+
+### Active Theme Assets
+
+**Blog Theme (public/themes/blog/assets/):**
+- `css/style.sea.min.css` - Main theme style (minified)
+- `css/sina-nav.min.css` - Navigation styles (minified)
+- `js/front.min.js` - Main theme logic (minified)
+- `js/sina-nav.min.js` - Navigation logic (minified)
+- `vendor/bootstrap/css/bootstrap.min.css`
+- `vendor/font-awesome/css/font-awesome.min.css`
+
+### Asset Optimization (Performance)
+
+To maintain high performance (Target: 100/100 Lighthouse), follow these patterns:
+
+#### 1. Minification
+Always use minified versions of CSS and JS in production. A helper script `tmp/minify.php` can be used to generate `.min` versions of theme assets.
+
+**Theme Asset Minification Script:**
+
+| File | Purpose |
+|------|---------|
+| `tmp/minify.php` | Development utility to generate minified `.min.css` and `.min.js` files |
+
+**Usage:**
+```bash
+php tmp/minify.php
+```
+
+**What it does:**
+- Scans `public/themes/blog/assets/css/` for `.css` files (skips `.min.css`)
+- Scans `public/themes/blog/assets/js/` for `.js` files (skips `.min.js`)
+- Generates corresponding `.min.css` and `.min.js` versions
+- Removes comments, whitespace, and redundant characters
+
+**When to use:**
+- After modifying source CSS/JS files before deployment
+- During development when adding new non-minified assets
+- Before committing to ensure production uses optimized files
+
+**Workflow:**
+```bash
+# 1. Edit source files in public/themes/blog/assets/css/ or js/
+# 2. Run minification
+php tmp/minify.php
+
+# 3. Verify minified versions were created
+ls -la public/themes/blog/assets/css/*.min.css
+ls -la public/themes/blog/assets/js/*.min.js
+```
+
+> **Note:** Minified versions are already committed to the repository. This script is for development workflow when adding or modifying theme assets.
+
+#### 2. Critical CSS
+Inline above-the-fold CSS in `header.php` to prevent render-blocking. Essential layout, navigation, and hero styles should be inlined within `<style>` tags.
+
+#### 3. Asset Deferral
+Use the `defer` attribute for all non-critical scripts in `footer.php`. This allows the browser to continue parsing HTML while scripts are being downloaded.
+
+#### 4. Compression & Caching
+Server-side compression (Gzip) and browser caching are configured in `.htaccess`. Ensure these rules are moved to the web server configuration (Nginx/Apache) for maximum efficiency.
+
+### Performance Testing
+
+To ensure optimizations are maintained, the project includes specific performance-related tests in the test suite.
+
+#### 1. Page Cache Testing
+Unit tests in `tests/unit/PageCacheTest.php` verify the full-page caching logic, ensuring that cache keys are generated correctly and that sensitive pages (search, logged-in sessions) are never cached.
+
+#### 2. DAO Eager Loading
+Integration tests in `tests/integration/PostDaoIntegrationTest.php` verify that the DAO layer uses efficient `INNER JOIN` queries and database indexes. This ensures minimal Time to First Byte (TTFB) by reducing the number of database round-trips.
+
+#### 3. Running Performance Tests
+Run the specific performance test suite using:
+```bash
+lib/vendor/bin/phpunit --bootstrap tests/bootstrap_integration.php --filter "PostDaoIntegration|PageCache"
+```
+
+### Asset Cleanup Guidelines
+
+**Before deleting any asset files:**
+
+1. **Read template files** that include assets:
+   - `admin/admin-layout.php` - Admin header template
+   - `public/themes/blog/header.php` - Theme header template
+   - `public/themes/blog/footer.php` - Theme footer template
+
+2. **Search for references** using grep:
+   ```bash
+   grep -r "asset-path" .
+   grep -r "stylesheet\|script.*src" admin/ public/themes/
+   ```
+
+3. **Verify existence** before cleanup:
+   ```bash
+   ls -la path/to/asset.css
+   ```
+
+**Files that are safe to remove:**
+- Non-minified `.css`/`.js` files when minified versions exist
+- Duplicate libraries in different formats
+- Reference documentation files (e.g., `icons-reference/`)
+- License files in vendor directories
+- SCSS/Less source files in vendor directories (not compiled)
+- Non-minified theme CSS when `.min.css` versions are loaded
+
+**Files to NEVER remove without verification:**
+- Files referenced in layout templates
+- Minified versions (they're typically what's used)
+- Skin files actively used by the theme
+- Development utilities (`tmp/minify.php`)
+
+---
+
+## 24. Dynamic SMTP System
+
+### Overview
+
+ScriptLog features a dynamic SMTP configuration system that allows administrators to manage email settings directly from the dashboard. This system replaces static configuration in `config.php` with database-driven settings, enabling real-time updates without manual file modification.
+
+### Architecture
+
+The SMTP system integrates with the project's multi-layered architecture:
+
+1.  **UI Layer**: `admin/ui/setting/mail-setting.php` (configuration form).
+2.  **Controller Layer**: `ConfigurationController::updateMailSetting()` handles request processing, CSRF validation, and data persistence.
+3.  **Service Layer**: 
+    *   `ConfigurationService` manages the underlying `tbl_settings` operations.
+    *   `NotificationService` orchestrates email delivery using **Symfony Mailer**.
+4.  **Data Layer**: `ConfigurationDao` interacts with `tbl_settings` using prepared statements.
+
+### Core Components
+
+| Component | Location | Purpose |
+| :--- | :--- | :--- |
+| `NotificationService` | `lib/service/NotificationService.php` | Main email delivery service with database fallback. |
+| `ConfigurationController` | `lib/controller/ConfigurationController.php` | Handles SMTP setting updates in the admin panel. |
+| `MAIL_CONFIG` | `lib/core/ActionConst.php` | Action constant for mail configuration. |
+| `option-mail.php` | `admin/option-mail.php` | Admin entry point for mail settings. |
+
+### Configuration Keys (tbl_settings)
+
+The following keys are used in `tbl_settings` to store SMTP configuration:
+
+*   `smtp_host`: SMTP server hostname (e.g., `smtp.gmail.com`).
+*   `smtp_port`: SMTP server port (e.g., `587`, `465`).
+*   `smtp_encryption`: Encryption method (`tls`, `ssl`, or `none`).
+*   `smtp_username`: SMTP authentication username.
+*   `smtp_password`: SMTP authentication password.
+*   `smtp_from_email`: Default "From" email address.
+*   `smtp_from_name`: Default "From" name (e.g., `Blogware`).
+
+### Implementation Details
+
+#### 1. Configuration Priority
+`NotificationService` prioritizes settings found in the database. If a setting is missing or empty in `tbl_settings`, it gracefully falls back to the values defined in `config.php`.
+
+#### 2. Security
+*   **CSRF Protection**: All SMTP setting updates are protected by the project's built-in CSRF defender.
+*   **Password Handling**: SMTP passwords are submitted via secure POST requests and stored in the database.
+*   **Input Validation**: Ports are validated as numeric, and "From" addresses are validated as legitimate email formats.
+
+### Usage Example
+
+To send an email using the dynamic SMTP system:
+
+```php
+// The NotificationService automatically loads settings from the DB
+$notification = new NotificationService($configService);
+$notification->send('user@example.com', 'Subject', 'Email body');
+```
+
+---
+
+## 25. Search Functionality
+
+The blog includes a secure AJAX-based search functionality in the sidebar widget.
+
+### Overview
+
+The search system provides real-time search results as users type, with support for both posts and pages. Results are returned via a REST API endpoint and displayed in a dropdown below the search input.
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `lib/core/SearchFinder.php` | Core search class using Db (PDO wrapper) |
+| `lib/controller/api/SearchApiController.php` | REST API controller for search |
+| `public/themes/blog/sidebar.php` | Search form in sidebar |
+| `public/themes/blog/assets/js/search.js` | AJAX search JavaScript |
+| `public/themes/blog/assets/css/custom.css` | Search result dropdown styles |
+| `api/index.php` | API route registration |
+
+### Architecture
+
+```
+User types in search box
+       |
+       v
+search.js (AJAX) --[keyword]--> SearchApiController
+       |
+       v
+SearchFinder (searches DB using Db class)
+       |
+       v
+JSON response with results
+       |
+       v
+search.js (displays dropdown)
+```
+
+### Search API Endpoints
+
+| Endpoint | Method | Description |
+|---------|--------|-------------|
+| `/api/v1/search` | GET | Search all content (posts + pages) |
+| `/api/v1/search/posts` | GET | Search posts only |
+| `/api/v1/search/pages` | GET | Search pages only |
+
+### Search API Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `q` | string | Yes | Search keyword (min 2, max 100 chars) |
+| `type` | string | No | `all`, `posts`, or `pages` (default: `all`) |
+
+### Example Request
+
+```
+GET /api/v1/search?q=cicero&type=all
+```
+
+### Example Response
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "1",
+      "title": "Lorem ipsum dolor sit amet",
+      "slug": "lorem-ipsum",
+      "excerpt": "Lorem ipsum dolor sit amet, consectetur...",
+      "type": "post",
+      "date": "2026-03-01",
+      "url": "/post/1/lorem-ipsum"
+    }
+  ]
+}
+```
+
+### Security Features
+
+| Feature | Implementation |
+|---------|---------------|
+| **XSS Prevention** | Server-side sanitization via `sanitizeKeyword()` function |
+| **SQL Injection** | Uses prepared statements via Db class (PDO wrapper) |
+| **CSRF Protection** | Hidden CSRF token in search form, validated on submit |
+| **Input Validation** | Keyword length limits (min 2, max 100 characters) |
+
+### URL Format Support
+
+The search results support both SEO-friendly and query string URLs based on permalink settings:
+
+**SEO-Friendly URLs (when permalinks enabled):**
+- Posts: `/post/ID/slug`
+- Pages: `/page/slug`
+
+**Query String URLs (when permalinks disabled):**
+- Posts: `?p=ID`
+- Pages: `?pg=ID`
+
+### Implementation Notes
+
+- The SearchFinder class uses the custom `Db` class (PDO wrapper), NOT Medoo
+- Database connection accessed via `Registry::get('dbc')`
+- API routes registered in `api/index.php`
+- Public endpoint (no authentication required)
+- Results include: id, title, slug, excerpt, type, date, url
+- The search uses FULLTEXT index on `tbl_posts` (post_tags, post_title, post_content)
+
+### Adding Search to Custom Themes
+
+To add search to a custom theme:
+
+1. Include the search form in your template:
+```php
+<form id="search-form" method="get" action="">
+    <input type="hidden" name="csrf_token" value="<?php echo block_csrf(); ?>">
+    <input type="text" id="search-keyword" name="q" placeholder="Search..." autocomplete="off">
+    <div id="search-results" class="search-results-dropdown"></div>
+</form>
+```
+
+2. Include the search JavaScript in your footer:
+```php
+<script src="<?php echo app_url(); ?>/themes/your-theme/assets/js/search.js"></script>
+```
+
+3. Add CSS styles for the search dropdown (see `custom.css` for reference).
+
+---
+
+## 26. Premium UI Standards
+
+### Overview
+
+Scriptlog follows a specific design language for system interfaces (Installer, Admin Tools) and high-end frontend pages (e.g., Privacy Policy). This is known as the **Minimalist & Elegant Dashboard Pattern**.
+
+### Core Principles
+
+| Principle | Implementation |
+|-----------|----------------|
+| **Color Palette** | High-contrast **Navy Dark Blue (#000080)** and **Chartreuse (#7FFF00)**. |
+| **Typography** | Primary font: **'Outfit'** (Google Fonts). Use variable weights (300 to 800). |
+| **Glassmorphism** | Translucent cards with `backdrop-filter: blur(25px)` for depth. |
+| **Motion** | Subtle `fadeInUp` animations for entrance and hover state transitions. |
+| **Focus** | Single-column centered layouts for long-form content to maximize readability. |
+
+### Implementation Example (Frontend)
+
+When applying this pattern to a frontend page (like `privacy.php`), follow these structural rules:
+
+1.  **Dedicated Stylesheet**: Create a page-specific CSS file (e.g., `assets/css/privacy.css`) to avoid bloat in `style.sea.css`.
+2.  **Hero Section**: Use a gradient background (Navy) with Chartreuse accents for the page header.
+3.  **Glass Card**: Wrap the main content in a container with glassmorphism effects.
+4.  **Semantic Icons**: Enhance headings with FontAwesome icons.
+
+#### CSS Pattern
+
+```css
+.glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(0, 0, 128, 0.1);
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 128, 0.15);
+}
+
+.animate-up {
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+```
+
+### Best Practices
+
+*   **Preload Fonts**: Ensure 'Outfit' is preloaded in `header.php` to prevent FOUT (Flash of Unstyled Text).
+*   **Keep Logic Separate**: Do not mix premium UI markup with complex PHP logic; keep templates clean.
+*   **Mobile-First**: Test all glassmorphism effects on mobile; ensure borders and shadows don't create visual clutter on small screens.
+
+---
+
+## Important: Respect Existing Code
+
+This codebase belongs to the project owner/developer. As a developer working on this project, you must follow these rules:
+
+### Rules for Modifying Existing Code
+
+1. **NEVER rewrite existing working code** without explicit permission from the owner
+2. **ALWAYS propose changes first** before modifying any existing file:
+   - Explain what you want to change
+   - Show the proposed solution
+   - Wait for approval before implementing
+3. **NEVER remove or change constants, functions, or logic flow** that the owner created
+4. **If something works, DON'T fix it** - even if you think your approach is "better"
+5. **Ask before changing** - When in doubt, always ask for permission
+
+### Why This Matters
+
+The owner has specific reasons for their code structure:
+- Using `APP_IMAGE` constants instead of hardcoded paths
+- Specific function signatures and return values
+- Particular logic flow for business rules
+
+### Example of what NOT to do:
+```
+❌ WRONG: "I'm going to rewrite invoke-webp-image.php to use hardcoded paths"
+❌ WRONG: "I'll replace APP_IMAGE constants with direct strings"
+❌ WRONG: "Let me change the function logic to my approach"
+```
+
+### Example of what to do:
+```
+✅ CORRECT: "I noticed an issue with image display. Can I propose a fix using the existing APP_IMAGE constants?"
+✅ CORRECT: "Would you like me to enhance invoke-responsive-image.php while keeping APP_IMAGE constants?"
+✅ CORRECT: "Can I add a new function next to the existing ones?"
+```
+
+### Lesson: What Happens When You Don't Ask
+
+A developer once noticed images on the homepage had empty `src` attributes. Instead of asking the owner, they:
+1. Replaced APP_IMAGE constants with hardcoded paths
+2. Changed the function logic to their approach
+3. Didn't test properly before claiming it worked
+4. Broke the owner's existing working code
+
+**The actual fix was simple:** The issue was `esc_attr()` being used in theme files (WordPress function). The developer should have checked the theme files first instead of modifying working utility code.
+
+**What should have happened:**
+1. Identify the issue (empty src attributes)
+2. Propose a fix to the owner
+3. Wait for approval
+4. If approved, implement using existing constants/logic
+5. Test on live site
+6. Commit only after verification
+
+---
+
 ## License
 
 This project is licensed under the MIT License.
 
 ---
 
-*Last Updated: March 2026 | Version 1.0.0*
+*Last Updated: March 2026 | Version 1.0.2*

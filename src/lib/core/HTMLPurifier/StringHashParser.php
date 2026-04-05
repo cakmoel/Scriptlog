@@ -27,7 +27,6 @@
  */
 class HTMLPurifier_StringHashParser
 {
-
     /**
      * @type string
      */

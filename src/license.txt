@@ -1,10 +1,6 @@
-Scriptlog is Open Source and Free PHP Blog Software
+MIT License
 
-Please notice that scriptlog uses third party libraries which might be distributed under other licenses
-
-MIT License (MIT)
-
-Copyright (c) 2018 M.Noermoehammad
+Copyright (c) 2018 Scriptlog
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

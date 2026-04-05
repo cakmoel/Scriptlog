@@ -1,4 +1,6 @@
-<?php if (!defined('SCRIPTLOG')) { exit(); } ?>
+<?php if (!defined('SCRIPTLOG')) {
+    exit();
+} ?>
  <!-- Content Wrapper. Contains page content -->
  <div class="content-wrapper">
  <!-- Content Header (Page header) -->
@@ -23,38 +25,35 @@
 
 <?php
 if (isset($errors)) :
-?>
+    ?>
 
 <div class="alert alert-danger alert-dismissible">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 <h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
-<?php 
-foreach ($errors as $e) :
-echo '<p>' . $e . '</p>';
-endforeach;
-?>
+    <?php
+    foreach ($errors as $e) :
+        echo '<p>' . $e . '</p>';
+    endforeach;
+    ?>
 </div>
 
-<?php 
-
+    <?php
 endif;
 
 if (isset($status)) :
-
-?>
+    ?>
 
 <div class="alert alert-success alert-dismissible">
   <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
   <h2><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h2>
-    <?php 
-        foreach ($status as $s) :
-          echo $s;
-        endforeach;
+    <?php
+    foreach ($status as $s) :
+        echo $s;
+    endforeach;
     ?>
 </div>
 
-<?php
- 
+    <?php
 endif;
 
 $action = (isset($formAction)) ? $formAction : null;
@@ -65,44 +64,36 @@ $action = (isset($formAction)) ? $formAction : null;
 <form method="post" action="<?= generate_request('index.php', 'get', ['option-reading', $action, 0])['link']; ?>" >
 <table class="table table-bordered table-striped" aria-describedby = "reading setting">
 <tbody>
-<?php 
+<?php
 
 if (is_array($settings)) :
+    $i = 0;
 
-   $i = 0; 
+    foreach ($settings as $s) :
+        switch ($s['setting_name']) {
+            default:
+            case 'post_per_page':
+                $setting_name = "Posts to display on frontpage";
 
-   foreach ($settings as $s) :
-     
-    switch ($s['setting_name']) {
+                break;
 
-      default:
-      case 'post_per_page':
-         
-        $setting_name = "Posts to display on frontpage";
-         
-        break;
+            case 'post_per_rss':
+                $setting_name = "Posts to display in Feeds";
 
-      case 'post_per_rss';
+                break;
 
-        $setting_name = "Posts to display in Feeds";
+            case 'post_per_archive':
+                $setting_name = "Posts to display in Archives";
 
-        break;
+                break;
 
-      case 'post_per_archive':
+            case 'comment_per_post':
+                $setting_name = "Comments to display in post";
 
-        $setting_name = "Posts to display in Archives";
+                break;
+        }
 
-        break;
-       
-      case 'comment_per_post':
-
-        $setting_name = "Comments to display in post";
-
-        break;
-
-     }
-
-?>
+        ?>
 
   <tr>
     <th><label for="<?=(isset($s['setting_name'])) ? safe_html($s['setting_name']) : ""; ?>"> <?=(isset($setting_name) ? safe_html($setting_name) : "") ; ?></label></th>
@@ -112,10 +103,10 @@ if (is_array($settings)) :
     </td>
   </tr>
              
-<?php
-    $i++;
+        <?php
+            $i++;
     endforeach;
-  endif;
+endif;
 ?>
 
 </tbody>

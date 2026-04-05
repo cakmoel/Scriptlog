@@ -1,4 +1,6 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted.");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted.");
 /**
  * interface DbInterface
  * Describe the functionality
@@ -6,7 +8,7 @@
  *
  * @category  Core Class
  * @author    M.Noermoehammad
- * @license   MIT 
+ * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0
  *
@@ -15,9 +17,9 @@ interface DbInterface
 {
     /**
      * Set database connection.
-     * 
+     *
      * @param array $config
-     * @param array $options 
+     * @param array $options
      * @return void
      */
     public function setDbConnection(array $config, array $options = []): void;
@@ -29,8 +31,8 @@ interface DbInterface
 
     /**
      * Execute an SQL query.
-     * 
-     * @param string $sql 
+     *
+     * @param string $sql
      * @param array $parameters
      * @return PDOStatement|false
      */
@@ -38,19 +40,19 @@ interface DbInterface
 
     /**
      * Insert a new record.
-     * 
+     *
      * @param string $tablename
-     * @param array $params 
+     * @param array $params
      * @return boolean
-     * 
+     *
      */
     public function dbInsert(string $tablename, array $params): bool;
 
     /**
      * Insert ... On Duplicate Key Update.
-     * 
-     * Replace statement to Insert or Update row. The correct way to do REPLACE INTO 
-     * 
+     *
+     * Replace statement to Insert or Update row. The correct way to do REPLACE INTO
+     *
      * @param string $tablename
      * @param array $params
      * @param array $updateParams
@@ -60,20 +62,20 @@ interface DbInterface
 
     /**
      * Update an existing record.
-     * 
-     * @param string $tablename 
-     * @param array $params 
+     *
+     * @param string $tablename
+     * @param array $params
      * @param array $where
-     * @return int 
+     * @return int
      */
     public function dbUpdate(string $tablename, array $params, array $where): int;
 
     /**
      * Delete a record.
-     * 
+     *
      * @param string $tablename
-     * @param array $where 
-     * @param int $limit default null 
+     * @param array $where
+     * @param int $limit default null
      * @return int
      */
     public function dbDelete(string $tablename, array $where, ?int $limit = null): int;

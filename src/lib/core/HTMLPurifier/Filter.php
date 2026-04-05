@@ -21,7 +21,6 @@
 
 class HTMLPurifier_Filter
 {
-
     /**
      * Name of the filter for identification purposes.
      * @type string

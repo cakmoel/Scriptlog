@@ -7,7 +7,6 @@
  */
 class HTMLPurifier_AttrTransform_BdoDir extends HTMLPurifier_AttrTransform
 {
-
     /**
      * @param array $attr
      * @param HTMLPurifier_Config $config
