@@ -1,0 +1,30 @@
+#!/bin/bash
+# Mock venv activate script
+# This script simulates the activation of a Python virtual environment for testing.
+# It sets dummy variables and prints a success message.
+
+# Ensure the virtual environment directory exists
+VENV_DIR="\$1" # Expected argument for virtualenv path
+if [ -z "\$VENV_DIR" ]; then
+    echo "Mock activate script error: Virtual environment path not provided." >&2
+    exit 1
+fi
+mkdir -p "\$VENV_DIR"
+mkdir -p "\$VENV_DIR/bin"
+
+# Set dummy environment variables
+export VIRTUAL_ENV="\$VENV_DIR"
+# Prepend the mock bin directory to PATH
+export PATH="\$VENV_DIR/bin:\$PATH"
+
+# Create a dummy activate script in the mock bin directory
+echo '#!/bin/bash
+# Dummy activate script content
+export VIRTUAL_ENV='"$TEST_DIR/mock_venv"'
+export PATH="$VIRTUAL_ENV/bin:$PATH"
+echo "Mock venv activated."
+' > "\$VENV_DIR/bin/activate"
+chmod +x "\$VENV_DIR/bin/activate"
+
+echo "Mock virtual environment setup at \$VENV_DIR"
+exit 0
