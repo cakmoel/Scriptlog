@@ -1,25 +1,47 @@
 <?php
 
-if (function_exists('rewrite_status') && rewrite_status() == 'yes') {
+$grab_month = "";
+$grab_year = "";
 
-    $grab_month = function_exists('request_path') ? request_path()->param1 : "";
-    $grab_year = function_exists('request_path') ? request_path()->param2 : "";
-
-    $values = ['month_archive' => $grab_month, 'year_archive' => $grab_year];
-
-    $archives = function_exists('posts_by_archive') ? posts_by_archive($values) : "";
-    $entries = (!empty($archives)) ? $archives['archivesPublished'] : "";
-    
+if (function_exists('is_permalink_enabled') && is_permalink_enabled() === 'yes') {
+    if (function_exists('request_path')) {
+        $requestPath = request_path();
+        if (isset($requestPath->param1) && isset($requestPath->param2)) {
+            $grab_month = $requestPath->param1;
+            $grab_year = $requestPath->param2;
+        }
+    }
 } else {
+    $query_param = class_exists('HandleRequest') ? HandleRequest::isQueryStringRequested()['value'] : "";
 
-    $archive_requested = class_exists('HandleRequest') ? preg_split("//", HandleRequest::isQueryStringRequested()['value'], -1, PREG_SPLIT_NO_EMPTY) : "";
-    $grab_year = (isset($archive_requested[0]) && isset($archive_requested[1]) && isset($archive_requested[2]) && isset($archive_requested[3])) ? $archive_requested[0] . $archive_requested[1] . $archive_requested[2] . $archive_requested[3] : $_SESSION['year_archive'];
-    $grab_month = (isset($archive_requested[4]) && isset($archive_requested[5]))  ? $archive_requested[4].$archive_requested[5] : $archive_requested[4] . "";
-    $values = ['month_archive' => $grab_month, 'year_archive' => $grab_year];
+    if (!empty($query_param)) {
+        $archive_requested = preg_split("//", $query_param, -1, PREG_SPLIT_NO_EMPTY);
 
-    $archives = function_exists('posts_by_archive') ? posts_by_archive($values) : "";
-    $entries = (isset($archives)) ? $archives['archivesPublished'] : "";
+        // Extract year (first 4 digits) - indices 0-3
+        $yearPart = "";
+        for ($i = 0; $i < 4; $i++) {
+            if (isset($archive_requested[$i])) {
+                $yearPart .= $archive_requested[$i];
+            }
+        }
+        $grab_year = $yearPart;
+
+        // Extract month (next 2 digits) - indices 4-5, pad with leading zero if needed
+        $monthPart = "";
+        for ($i = 4; $i < 6; $i++) {
+            if (isset($archive_requested[$i])) {
+                $monthPart .= $archive_requested[$i];
+            }
+        }
+        $grab_month = str_pad($monthPart, 2, '0', STR_PAD_LEFT);
+    }
 }
+
+$values = ['month_archive' => $grab_month, 'year_archive' => $grab_year];
+
+$archives = function_exists('posts_by_archive') ? posts_by_archive($values) : [];
+$entries = !empty($archives) && isset($archives['archivesPublished']) ? $archives['archivesPublished'] : [];
+$pagination = !empty($archives) && isset($archives['paginationLink']) ? $archives['paginationLink'] : "";
 
 ?>
 
@@ -33,25 +55,25 @@ if (function_exists('rewrite_status') && rewrite_status() == 'yes') {
 
                     <?php
 
-                    foreach ($entries as $entry) :
+                    if (!empty($entries)) :
+                        foreach ($entries as $entry) :
+                            $entry_id = isset($entry['ID']) ? (int)$entry['ID'] : "";
+                            $entry_title = isset($entry['post_title']) ? htmlout($entry['post_title']) : "";
+                            $entry_content = isset($entry['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($entry['post_content']))) : "";
+                            $entry_img = ((isset($entry['media_filename'])) && ($entry['media_filename'] !== '') ? htmlout($entry['media_filename']) : "");
+                            $entry_img_caption = isset($entry['media_caption']) ? htmlout($entry['media_caption']) : "";
+                            $entry_created = isset($entry['modified_at']) ? htmlout(make_date($entry['modified_at'])) : htmlout(make_date($entry['created_at']));
+                            $entry_author = (isset($entry['user_login']) || isset($entry['user_fullname']) ? htmlout($entry['user_login']) : htmlout($entry['user_fullname']));
+                            $total_comment = isset($entry['total_comments']) ? (int)$entry['total_comments'] : 0;
 
-                        $entry_id = isset($entry['ID']) ? (int)$entry['ID'] : "";
-                        $entry_title = isset($entry['post_title']) ? htmlout($entry['post_title']) : "";
-                        $entry_content = isset($entry['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($entry['post_content']))) : "";
-                        $entry_img = ((isset($entry['media_filename'])) && ($entry['media_filename'] !== '') ? htmlout($entry['media_filename']) : "");
-                        $entry_img_caption = isset($entry['media_caption']) ? htmlout($entry['media_caption']) : "";
-                        $entry_created = isset($entry['modified_at']) ? htmlout(make_date($entry['modified_at'])) : htmlout(make_date($entry['created_at']));
-                        $entry_author = (isset($entry['user_login']) || isset($entry['user_fullname']) ? htmlout($entry['user_login']) : htmlout($entry['user_fullname']));
-                        $total_comment = (total_comment($entry_id)['total'] > 0) ? total_comment($entry_id)['total'] : 0;
-
-                    ?>
+                            ?>
 
                         <div class="post col-xl-6">
-                            <div class="post-thumbnail"><a href="<?= isset($entry_id) ? permalinks($entry_id)['post'] : "#"; ?>"><img src="<?= isset($entry_img) ? invoke_frontimg($entry_img) : "https://via.placeholder.com/640x450"; ?>" alt="<?= isset($entry_img_caption) ? $entry_img_caption : $entry_title; ?>" class="img-fluid"></a></div>
+                            <div class="post-thumbnail"><a href="<?= isset($entry_id) ? permalinks($entry_id)['post'] : "#"; ?>"><?= isset($entry_img) ? invoke_responsive_image($entry_img, 'thumbnail', true, isset($entry_img_caption) ? $entry_img_caption : $entry_title, 'img-fluid') : '<img src="https://via.placeholder.com/640x450" alt="" width="640" height="450" class="img-fluid" loading="lazy" decoding="async">' ?></a></div>
                             <div class="post-details">
                                 <div class="post-meta d-flex justify-content-between">
                                     <div class="date meta-last"> <?= isset($entry_created) ? $entry_created : ""; ?> </div>
-                                    <div class="category"><?= retrieves_topic_simple($entry_id); ?></div>
+                                    <div class="category"><?= isset($entry['topics_data']) ? format_topics($entry['topics_data']) : ""; ?></div>
                                 </div><a href="<?= isset($entry_id) ? permalinks($entry_id)['post'] : "javascript:void(0)"; ?>" title="<?= isset($entry_title) ? $entry_title : ""; ?>">
                                     <h3 class="h4"> <?= isset($entry_title) ? $entry_title : ""; ?> </h3>
                                 </a>
@@ -66,18 +88,21 @@ if (function_exists('rewrite_status') && rewrite_status() == 'yes') {
                             </div>
                         </div>
 
-                    <?php
-                    endforeach;
+                            <?php
+                        endforeach;
+                    endif;
                     ?>
 
                 </div>
 
                 <!-- Pagination -->
+                <?php if (!empty($pagination)) : ?>
                 <nav aria-label="Page navigation example">
                     <ul class="pagination pagination-template d-flex justify-content-center">
-                        
+                        <?= $pagination; ?>
                     </ul>
                 </nav>
+                <?php endif; ?>
             </div>
         </main>
 

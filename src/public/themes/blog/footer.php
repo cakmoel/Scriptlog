@@ -58,7 +58,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6">
-          <p><?= copyright() . "\r"; ?><?= year_on_footer(date("Y")); ?>. All rights reserved. <?= function_exists('app_sitename') ? app_sitename() : ""; ?> </p>
+          <p><?= copyright() . "\r"; ?><?= year_on_footer(date("Y")); ?>. <?= t('footer.copyright'); ?>. <?= function_exists('app_sitename') ? app_sitename() : ""; ?> </p>
         </div>
         <div class="col-md-6 text-right">
           <p>Template By <a href="https://bootstrapious.com" class="text-white">Ondrej Svetska</a>
@@ -71,27 +71,42 @@
 </footer>
 <!-- JavaScript files-->
 <script src="<?= theme_dir(); ?>assets/vendor/jquery/jquery.min.js"></script>
-<script src="<?= theme_dir(); ?>assets/vendor/popper.js/umd/popper.min.js"></script>
-<script src="<?= theme_dir(); ?>assets/vendor/bootstrap/js/bootstrap.min.js"></script>
-<script src="<?= theme_dir(); ?>assets/vendor/jquery.cookie/jquery.cookie.js"></script>
-<script src="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.js"></script>
-<script src="<?= theme_dir(); ?>assets/js/front.js"></script>
-<script src="<?= theme_dir(); ?>assets/js/jquery.marquee.js"></script>
-<script src="<?= theme_dir(); ?>assets/js/jquery.pause.min.js"></script>
-<script src="<?= theme_dir(); ?>assets/js/jquery.easing.min.js"></script>
-<script src="<?= theme_dir(); ?>assets/js/comment-submission.js"></script>
-<script src="<?= theme_dir(); ?>assets/js/load-comment.js"></script>
-<script src="<?= theme_dir(); ?>assets/js/validator.min.js"></script>
-<script src="<?= theme_dir(); ?>assets/js/wow.min.js"></script>
-<script src="<?= theme_dir(); ?>assets/js/sina-nav.js"></script>
+<script src="<?= theme_dir(); ?>assets/vendor/popper.js/umd/popper.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/vendor/bootstrap/js/bootstrap.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/vendor/jquery.cookie/jquery.cookie.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/front.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/jquery.marquee.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/jquery.pause.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/jquery.easing.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/comment-submission.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/load-comment.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/validator.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/wow.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/sina-nav.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/cookie-consent.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/search.min.js" defer></script>
+<?php if (is_rtl()) : ?>
+<script src="<?= theme_dir(); ?>assets/js/rtl.min.js" defer></script>
+<?php endif; ?>
 
 <!-- For All Plug-in Activation & Others -->
  <script type="text/javascript">
-        $(document).ready(function() {
-            // WOW animation initialize
-            new WOW().init();
+        window.addEventListener('load', function() {
+            if (typeof WOW !== 'undefined') {
+                new WOW().init();
+            }
         });
 </script>
+
+<!-- Cookie Consent Banner -->
+<?php
+if (function_exists('should_show_consent_banner') && should_show_consent_banner()) {
+    if (file_exists(__DIR__ . '/cookie-consent.php')) {
+        include __DIR__ . '/cookie-consent.php';
+    }
+}
+?>
 
 </body>
 </html>
