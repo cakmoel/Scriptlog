@@ -1,4 +1,5 @@
 <?php
+
 /**
  * remove_dir_recursive
  *
@@ -11,22 +12,17 @@
 function remove_dir_recursive($dir)
 {
 
-foreach(scandir($dir) as $file) {
-        
- if ('.' === $file || '..' === $file) continue;
-    
- if (is_dir("$dir/$file")) {
-  
-    remove_dir_recursive("$dir/$file");
- 
- } else {
+    foreach (scandir($dir) as $file) {
+        if ('.' === $file || '..' === $file) {
+            continue;
+        }
 
-    unlink("$dir/$file");
+        if (is_dir("$dir/$file")) {
+            remove_dir_recursive("$dir/$file");
+        } else {
+            unlink("$dir/$file");
+        }
+    }
 
- }
-
-}
- 
-rmdir($dir);
-
+    rmdir($dir);
 }

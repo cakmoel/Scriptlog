@@ -2,13 +2,13 @@
 
 /**
  * random_generator()
- * 
+ *
  * A funtion for generating random strings and numbers
- * 
+ *
  * @category function
  * @param int $digits
  * @return string
- * 
+ *
  */
 function random_generator($digits)
 {
@@ -27,7 +27,6 @@ function random_generator($digits)
             $rand_index = array_rand($input);
             $randomGenerator .= $input[$rand_index]; // One char is added
         } else {
-
             // Add one numeric digit between 1 and 10
             $randomGenerator .= rand(1, 10); // one number is added
         } // end of if else
@@ -38,10 +37,10 @@ function random_generator($digits)
 
 /**
  * make_seed
- * 
+ *
  * @category function
  * @see http://url.comhttps://www.php.net/manual/en/function.srand
- * 
+ *
  */
 function make_seed()
 {
@@ -51,25 +50,23 @@ function make_seed()
 
 /**
  * ircmaxel_generator_string()
- * 
+ *
  * A function for generating random string of various strength
- * 
+ *
  * @category function
  * @see https://github.com/ircmaxell/RandomLib
  * @param string $strength
  * @param integer $length
  * @param string $character_list
- * 
+ *
  */
 function ircmaxell_generator_string($strength, $length = 32, $character_list = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/')
 {
 
-    $factory = new RandomLib\Factory;
+    $factory = new RandomLib\Factory();
 
     switch ($strength) {
-
         case 'low':
-
             $generator = $factory->getGenerator(new SecurityLib\Strength(SecurityLib\Strength::LOW));
 
             return $generator->generateString($length, $character_list) . "\n";
@@ -77,7 +74,6 @@ function ircmaxell_generator_string($strength, $length = 32, $character_list = '
             break;
 
         case 'high':
-
             $generator = $factory->getGenerator(new SecurityLib\Strength(SecurityLib\Strength::HIGH));
 
             return $generator->generateString($length, $character_list) . "\n";
@@ -85,15 +81,13 @@ function ircmaxell_generator_string($strength, $length = 32, $character_list = '
             break;
 
         case 'medium':
-
             $generator = $factory->getGenerator(new SecurityLib\Strength(SecurityLib\Strength::MEDIUM));
 
             return $generator->generateString($length, $character_list) . "\n";
 
             break;
-        
-        default:
 
+        default:
             scriptlog_error("Unknown strength, generator string failed");
             break;
     }
@@ -101,9 +95,9 @@ function ircmaxell_generator_string($strength, $length = 32, $character_list = '
 
 /**
  * ircmaxell_generator_numbers()
- * 
- * A function for generating random numbers 
- * 
+ *
+ * A function for generating random numbers
+ *
  * @category function
  * @param number|integer $min
  * @param number|integer $max
@@ -112,7 +106,7 @@ function ircmaxell_generator_string($strength, $length = 32, $character_list = '
 function ircmaxell_generator_numbers($min, $max)
 {
 
-    $factory = new RandomLib\Factory;
+    $factory = new RandomLib\Factory();
 
     $generator = $factory->getGenerator(new SecurityLib\Strength(SecurityLib\Strength::MEDIUM));
 
@@ -121,19 +115,19 @@ function ircmaxell_generator_numbers($min, $max)
 
 /**
  * ircmaxell_random_generator()
- * 
+ *
  * generating simple random bytes string
- * 
+ *
  * @category function
  * @param int $length
  * @see https://github.com/ircmaxell/RandomLib
  * @return string
- * 
+ *
  */
 function ircmaxell_random_generator($length)
 {
 
-    $factory = new RandomLib\Factory;
+    $factory = new RandomLib\Factory();
 
     $generator = $factory->getGenerator(new SecurityLib\Strength(SecurityLib\Strength::MEDIUM));
 
@@ -146,7 +140,7 @@ function ircmaxell_random_generator($length)
  * @category function
  * https://github.com/ircmaxell/random_compat
  * @return string
- * 
+ *
  */
 function ircmaxell_random_compat($length = 64)
 {
@@ -160,12 +154,12 @@ function ircmaxell_random_compat($length = 64)
  * random_password function
  * generates random characters that can be used as insecure password
  * never use this function for storing your password
- * 
+ *
  * @see https://thisinterestsme.com/php-random-password/
  * @see https://stackoverflow.com/questions/4356289/php-random-string-generator
  * @param integer $length
  * @return string
- * 
+ *
  */
 function random_password($length)
 {
@@ -189,10 +183,10 @@ function random_password($length)
  * @param integer $length
  * @see https://www.php.net/manual/en/function.random-bytes.php
  * @return string
- * 
+ *
  */
 function str_rand($length = 64)
 {
     $length = ($length < 4) ? 4 : $length;
-    return bin2hex(random_bytes(($length-($length%2))/2));
+    return bin2hex(random_bytes(($length - ($length % 2)) / 2));
 }

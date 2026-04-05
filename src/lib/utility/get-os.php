@@ -7,7 +7,7 @@ use Sinergi\BrowserDetector\Os;
  *
  * @see https://stackoverflow.com/questions/18070154/get-operating-system-info
  * @return string
- * 
+ *
  */
 
 function get_os()
@@ -63,11 +63,8 @@ function get_os()
     );
 
     if ($user_agent) {
-
         foreach ($os_array as $regex => $value) {
-
             if (preg_match($regex, $user_agent)) {
-
                 $unknown_os = $value;
             }
         }
@@ -85,7 +82,7 @@ function get_os()
  * @author Soumitra roytuts2014@gmail.com
  * @see https://roytuts.com/detect-operating-system-using-php/
  * @return string
- * 
+ *
  */
 function get_operating_system()
 {
@@ -128,22 +125,29 @@ function get_operating_system()
  * @category function
  * @see https://stackoverflow.com/questions/26862978/get-the-linux-distribution-name-in-php
  * @return mixed
- * 
+ *
  */
 function get_linux_distro()
 {
 
     if (strtolower(substr(PHP_OS, 0, 5)) == 'linux') {
-
         $vars = array();
-        $files = function_exists('glob') ? glob('/etc/*-release') : "";
+        $files = function_exists('glob') ? glob('/etc/*-release') : array();
 
         foreach ($files as $file) {
-
+            
+            if (!is_file($file)) {
+                continue;
+            }
+            
             $lines = array_filter(array_map(function ($line) {
-
+                // skip empty lines
+                if (empty(trim($line))) {
+                    return false;
+                }
+                
                 // split value from key
-                $parts = explode('=', $line);
+                $parts = explode('=', $line, 2);
 
                 // makes sure that "useless" lines are ignored (together with array_filter)
                 if (count($parts) !== 2) {
