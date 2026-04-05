@@ -118,4 +118,7 @@ class ActionConst
     public const DOWNLOADS = "downloads";
     public const DOWNLOAD_CONFIG = "downloadConfig";
     public const DELETEDOWNLOAD = "deleteDownload";
+
+    // action constant for API settings
+    public const API_CONFIG = "apiConfig";
 }

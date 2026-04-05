@@ -136,3 +136,44 @@
 .widget.search button.submit:hover {
     color: #007bff;
 }
+
+/* Password Protected Post Styles */
+.password-protected-post .password-form-inline {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.password-protected-post .password-form-inline .form-group {
+    margin-bottom: 0;
+}
+
+.password-protected-post .unlock-post-error {
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.password-protected-post .unlock-post-loading {
+    font-size: 14px;
+    color: #666;
+    margin-top: 10px;
+}
+
+.password-protected-post .unlock-post-loading i {
+    margin-right: 5px;
+}
+
+.password-protected-content {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

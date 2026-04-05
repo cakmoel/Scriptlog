@@ -89,6 +89,8 @@ function check_form_request($data, array $whitelist)
     foreach ($data as $key => $value) {
         return (! in_array($key, $whitelist)) ? false : true;
     }
+
+    return true;
 }
 
 /**

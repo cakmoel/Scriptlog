@@ -11,6 +11,7 @@
  * @version   1.0
  * @since     Since Release 1.0
  *
+ * @property Db $dbc
  */
 class SearchApiController extends ApiController
 {

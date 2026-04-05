@@ -290,9 +290,11 @@ class ApiController
      */
     public function info()
     {
+        $hateoas = new ApiHateoas();
+
         $apiInfo = [
             'name' => 'Blogware RESTful API',
-            'version' => '1.0.0',
+            'version' => '1.1.0',
             'description' => 'RESTful API for Blogware content management system',
             'base_url' => '/api/v1',
             'authentication' => [
@@ -341,9 +343,23 @@ class ApiController
                     'sort_by' => 'Field to sort by',
                     'sort_order' => 'ASC or DESC'
                 ]
+            ],
+            'rate_limiting' => [
+                'read_limit' => '60 requests per minute',
+                'write_limit' => '20 requests per minute',
+                'headers' => [
+                    'X-RateLimit-Limit' => 'Maximum requests per window',
+                    'X-RateLimit-Remaining' => 'Remaining requests in current window',
+                    'X-RateLimit-Reset' => 'Unix timestamp when the rate limit resets'
+                ]
+            ],
+            'hypermedia' => [
+                'type' => 'HATEOAS (Hypermedia as the Engine of Application State)',
+                'description' => 'All responses include _links for discoverable navigation',
+                'standard' => 'RFC 5988 (Web Linking)'
             ]
         ];
 
-        ApiResponse::success($apiInfo, 200, 'Welcome to Blogware RESTful API');
+        ApiResponse::success($apiInfo, 200, 'Welcome to Blogware RESTful API', $hateoas->rootLinks());
     }
 }

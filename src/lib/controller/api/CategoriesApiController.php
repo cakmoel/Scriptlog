@@ -25,6 +25,11 @@ class CategoriesApiController extends ApiController
     private $sanitizer;
 
     /**
+     * @var ApiHateoas
+     */
+    private $hateoas;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -34,6 +39,7 @@ class CategoriesApiController extends ApiController
         // Initialize DAO
         $this->topicDao = new TopicDao();
         $this->sanitizer = new Sanitize();
+        $this->hateoas = new ApiHateoas();
     }
 
     /**
@@ -81,7 +87,10 @@ class CategoriesApiController extends ApiController
             // Transform topics
             $transformedTopics = array_map([$this, 'transformTopic'], $topics);
 
-            ApiResponse::paginated($transformedTopics, $pagination['page'], $pagination['per_page'], $total);
+            // Generate HATEOAS pagination links
+            $hateoasLinks = $this->hateoas->paginationLinks('categories', $pagination['page'], $pagination['per_page'], $total);
+
+            ApiResponse::paginated($transformedTopics, $pagination['page'], $pagination['per_page'], $total, $hateoasLinks);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to fetch categories: ' . $e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -129,7 +138,7 @@ class CategoriesApiController extends ApiController
                 return;
             }
 
-            ApiResponse::success($this->transformTopic($topic));
+            ApiResponse::success($this->transformTopic($topic), 200, null, $this->hateoas->categoryLinks($topicId, $topic['topic_slug']));
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to fetch category: ' . $e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -214,12 +223,16 @@ class CategoriesApiController extends ApiController
                 'category' => [
                     'id' => (int)$topicId,
                     'title' => $topic['topic_title'],
-                    'slug' => $topic['topic_slug']
+                    'slug' => $topic['topic_slug'],
+                    '_links' => $this->hateoas->categoryLinks($topicId, $topic['topic_slug'])
                 ],
                 'posts' => $transformedPosts
             ];
 
-            ApiResponse::paginated($response, $pagination['page'], $pagination['per_page'], $total);
+            // Generate HATEOAS pagination links
+            $hateoasLinks = $this->hateoas->paginationLinks('categories/' . $topicId . '/posts', $pagination['page'], $pagination['per_page'], $total);
+
+            ApiResponse::paginated($response, $pagination['page'], $pagination['per_page'], $total, $hateoasLinks);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to fetch category posts: ' . $e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -286,7 +299,7 @@ class CategoriesApiController extends ApiController
             $fetchStmt->execute([$topicId]);
             $createdTopic = $fetchStmt->fetch(PDO::FETCH_ASSOC);
 
-            ApiResponse::created($this->transformTopic($createdTopic), 'Category created successfully');
+            ApiResponse::created($this->transformTopic($createdTopic), 'Category created successfully', $this->hateoas->categoryLinks($topicId, $slug), $this->getAppUrl() . '/api/v1/categories/' . $topicId);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to create category: ' . $e->getMessage(), 500, 'CREATE_ERROR');
         }
@@ -423,7 +436,7 @@ class CategoriesApiController extends ApiController
             $deleteStmt = $dbc->prepare($deleteSql);
             $deleteStmt->execute([$topicId]);
 
-            ApiResponse::success(null, 200, 'Category deleted successfully');
+            ApiResponse::noContent();
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to delete category: ' . $e->getMessage(), 500, 'DELETE_ERROR');
         }

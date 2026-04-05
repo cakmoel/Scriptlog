@@ -34,7 +34,7 @@ function get_mime($filename, $mode = 0)
         'wav' => 'audio/wav',
         'ogg' => 'audio/ogg',
         'mp4' => 'video/mp4',
-        'ogg' => 'video/ogg',
+        'oga' => 'video/ogg',
         'webm' => 'video/webm',
 
         // adobe

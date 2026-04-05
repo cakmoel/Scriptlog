@@ -29,6 +29,8 @@ function defender()
             readfile(basename(__DIR__ . DS . '.guard' . DS . 'fortres.gzip'));
         }
     }
+
+    return false;
 }
 
 /**
@@ -73,7 +75,7 @@ function midfielder()
 function starts_with($haystack, $needle)
 {
 
-    if (version_compare(PHP_VERSION, '7.4', '>=')) {
+    if (function_exists('str_starts_with')) {
         return str_starts_with($haystack, $needle);
     } else {
         return substr_compare($haystack, $needle, 0, strlen($needle)) === 0;
@@ -93,7 +95,7 @@ function starts_with($haystack, $needle)
 function ends_with($haystack, $needle)
 {
 
-    if (version_compare(PHP_VERSION, '7.4', '>=')) {
+    if (function_exists('str_ends_with')) {
         return str_ends_with($haystack, $needle);
     } else {
         return substr_compare($haystack, $needle, -strlen($needle)) === 0;

@@ -972,4 +972,85 @@ class ConfigurationController
     {
         $this->view = new View('admin', 'ui', 'setting', $viewName);
     }
+
+    /**
+     * updateApiSetting
+     *
+     * @return mixed
+     *
+     */
+    public function updateApiSetting()
+    {
+        $errors = array();
+        $status = array();
+        $checkError = true;
+        $checkStatus = false;
+
+        $apiSettingKeys = [
+            'api_rate_limit_enabled',
+            'api_rate_limit_read',
+            'api_rate_limit_write'
+        ];
+
+        if (isset($_POST['apiConfigSubmit'])) {
+            try {
+                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    throw new AppException("Sorry, unpleasant attempt detected!");
+                }
+
+                $enabled = isset($_POST['api_rate_limit_enabled']) ? '1' : '0';
+                $readLimit = isset($_POST['api_rate_limit_read']) ? (int)$_POST['api_rate_limit_read'] : 60;
+                $writeLimit = isset($_POST['api_rate_limit_write']) ? (int)$_POST['api_rate_limit_write'] : 20;
+
+                $readLimit = max(1, min(1000, $readLimit));
+                $writeLimit = max(1, min(500, $writeLimit));
+
+                $apiValues = [
+                    'api_rate_limit_enabled' => $enabled,
+                    'api_rate_limit_read' => (string)$readLimit,
+                    'api_rate_limit_write' => (string)$writeLimit
+                ];
+
+                foreach ($apiSettingKeys as $key) {
+                    $existing = $this->configService->grabSettingByName($key);
+                    if ($existing) {
+                        $this->configService->setConfigId($existing['ID']);
+                        $this->configService->setConfigName($key);
+                        $this->configService->setConfigValue($apiValues[$key]);
+                        $this->configService->modifySetting();
+                    } else {
+                        $this->configService->setConfigName($key);
+                        $this->configService->setConfigValue($apiValues[$key]);
+                        $this->configService->addSetting();
+                    }
+                }
+
+                $_SESSION['status'] = "apiConfigUpdated";
+                direct_page('index.php?load=option-api&status=apiConfigUpdated', 302);
+            } catch (AppException $e) {
+                $checkError = false;
+                $errors[] = $e->getMessage();
+            }
+        }
+
+        $currentApi = [];
+        foreach ($apiSettingKeys as $key) {
+            $setting = $this->configService->grabSettingByName($key);
+            $currentApi[$key] = $setting['setting_value'] ?? '';
+        }
+
+        $this->view->set('pageTitle', $this->getPageTitle());
+        $this->view->set('formAction', $this->getFormAction());
+        $this->view->set('api', $currentApi);
+        if (!$checkError) {
+            $this->view->set('errors', $errors);
+        }
+        if ($checkStatus) {
+            $this->view->set('status', $status);
+        }
+        $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+
+        return $this->view->render();
+    }
 }

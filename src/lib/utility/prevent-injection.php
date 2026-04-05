@@ -19,5 +19,9 @@ function prevent_injection($str)
 {
     $filter = @trim(stripslashes(strip_tags(htmlspecialchars($str, ENT_COMPAT | ENT_HTML5, 'UTF-8'))));
 
-    return (function_exists('htmLawed')) ? htmLawed($filter) : "";
+    if (function_exists('htmLawed')) {
+        return htmLawed($filter, array('deny_attribute' => 'style'));
+    }
+    
+    return $filter;
 }

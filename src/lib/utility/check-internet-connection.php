@@ -24,6 +24,8 @@ function checking_connection_with_fsockopen($hostname)
 
         return $is_conn;
     }
+
+    return false;
 }
 
 /**

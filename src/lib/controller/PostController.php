@@ -13,32 +13,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  */
 class PostController extends BaseApp
 {
-    /**
-     * an instance of View
-     * @var object
-     */
     private $view;
-
-    /**
-     * an instance of PostService
-     * @var object
-     */
     private $postService;
 
-    /**
-     * Credential
-     *
-     * @var array
-     */
-    private $crendential = [];
-
-    /**
-     * Initialize instance of object properties and method
-     * @param object $postService
-     */
     public function __construct(PostService $postService)
     {
-
         $this->postService = $postService;
     }
 
@@ -67,10 +46,6 @@ class PostController extends BaseApp
             ($_SESSION['status'] == 'postDeleted') ? array_push($status, "Post deleted") : "";
 
             unset($_SESSION['status']);
-
-            if (isset($_SESSION['post_protected'])) {
-                unset($_SESSION['post_protected']);
-            }
         }
 
         $this->setView('all-posts');
@@ -353,12 +328,13 @@ class PostController extends BaseApp
                     $this->postService->setPostSlug(distill_post_request($filters)['post_title']);
 
                     if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
-                        (!empty($_POST['post_password'])) ? $this->postService->setProtected(protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password'])) : "";
-
-                        $this->postService->setPostContent(protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password'])['post_content']);
-                        $this->postService->setPassPhrase(distill_post_request($filters)['post_password']);
-
-                        $_SESSION['post_protected'] = (!isset($_SESSION['post_protected'])) ? distill_post_request($filters)['post_password'] : "";
+                        if (!empty($_POST['post_password'])) {
+                            $protected = protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password']);
+                            $this->postService->setPostContent($protected['post_content']);
+                            $this->postService->setProtected($protected['post_password']);
+                            $this->postService->setPassPhrase(distill_post_request($filters)['post_password']);
+                            $_SESSION['post_protected'] = distill_post_request($filters)['post_password'];
+                        }
                     } else {
                         $this->postService->setPostContent(distill_post_request($filters)['post_content']);
                     }
@@ -380,19 +356,7 @@ class PostController extends BaseApp
                         $this->postService->setPostTags(distill_post_request($filters)['post_tags']);
                     }
 
-                    $postId = $this->postService->addPost();
-
-                    if (isset($_SESSION['post_protected']) && $postId > 0) {
-                        $values = [
-                          'post_id' => $postId,
-                          'post_author' => $this->postService->postAuthorId(),
-                          'post_date' => date_for_database(distill_post_request($filters)['post_date']),
-                          'post_password' => distill_post_request($filters)['post_password'],
-                          'passpharse' => distill_post_request($filters)['post_password']
-                        ];
-
-                        save_post_protected($this->setCredential($values));
-                    }
+                    $this->postService->addPost();
 
                     $_SESSION['status'] = "postAdded";
                     direct_page('index.php?load=posts&status=postAdded', 200);
@@ -718,14 +682,13 @@ class PostController extends BaseApp
 
                     if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
                         if (!empty($_POST['post_password'])) {
-                            $this->postService->setProtected(protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password']));
+                            $protected = protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password']);
+                            $this->postService->setProtected($protected['post_password']);
+                            $this->postService->setPostContent($protected['post_content']);
+                            $this->postService->setPassPhrase(distill_post_request($filters)['post_password']);
+                            $_SESSION['post_protected'] = distill_post_request($filters)['post_password'];
                         }
-
                         $this->postService->setVisibility(distill_post_request($filters)['visibility']);
-                        $this->postService->setPostContent(protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password'])['post_content']);
-                        $this->postService->setPassPhrase(distill_post_request($filters)['post_password']);
-
-                        $_SESSION['post_protected'] = (!isset($_SESSION['post_protected'])) ? distill_post_request($filters)['post_password'] : "";
                     } else {
                         $this->postService->setVisibility(distill_post_request($filters)['visibility']);
                         $this->postService->setPostContent(distill_post_request($filters)['post_content']);
@@ -738,18 +701,6 @@ class PostController extends BaseApp
                     }
 
                     $this->postService->modifyPost();
-
-                    if (isset($_SESSION['post_protected']) && $postId > 0) {
-                        $values = [
-                          'post_id' => $postId,
-                          'post_author' => $this->postService->postAuthorId(),
-                          'post_date' => date_for_database(distill_post_request($filters)['post_date']),
-                          'post_password' => distill_post_request($filters)['post_password'],
-                          'passpharse' => distill_post_request($filters)['post_password']
-                        ];
-
-                        save_post_protected($this->setCredential($values));
-                    }
 
                     $_SESSION['status'] = "postUpdated";
                     direct_page('index.php?load=posts&status=postUpdated', 200);
@@ -777,7 +728,8 @@ class PostController extends BaseApp
             }
 
             if ($data_post['post_visibility'] == 'protected') {
-                $this->view->set('postContent', decrypt_post($getPost['ID'], $getPost['post_password']));
+                $decrypted = decrypt_post_admin($getPost['ID']);
+                $this->view->set('postContent', $decrypted['post_content']);
             } else {
                 $this->view->set('postContent', $data_post['post_content']);
             }
@@ -801,59 +753,33 @@ class PostController extends BaseApp
      */
     public function remove($id)
     {
+        $id = abs((int)$id);
+        
+        if ($id <= 0) {
+            $_SESSION['error'] = "postNotFound";
+            direct_page('index.php?load=posts&error=postNotFound', 404);
+            return;
+        }
 
-        $checkError = true;
-        $errors = array();
+        $getPost = $this->postService->grabPost($id);
 
-        if (isset($_GET['Id'])) {
-            $getPost = $this->postService->grabPost($id);
+        if (!$getPost) {
+            $_SESSION['error'] = "postNotFound";
+            direct_page('index.php?load=posts&error=postNotFound', 404);
+            return;
+        }
 
-            try {
-                if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
-                    header("Status: 400 Bad Request");
-                    throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
-                }
-
-                if (!filter_var($id, FILTER_VALIDATE_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
-                    header("Status: 400 Bad Request");
-                    throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
-                }
-
-                if (!$getPost) {
-                    $checkError = false;
-                    array_push($errors, "Error: Post not found!");
-                }
-
-                if (!$checkError) {
-                    $this->setView('all-posts');
-                    $this->setPageTitle('Post not found');
-                    $this->view->set('pageTitle', $this->getPageTitle());
-                    $this->view->set('errors', $errors);
-
-                    if ($this->postService->postAuthorLevel() === 'administrator') {
-                        $this->view->set('postsTotal', $this->postService->totalPosts());
-                        $this->view->set('posts', $this->postService->grabPosts());
-                    } else {
-                        $this->view->set('postsTotal', $this->postService->totalPosts([$this->postService->postAuthorId()]));
-                        $this->view->set('posts', $this->postService->grabPosts('ID', $this->postService->postAuthorId()));
-                    }
-
-                    return $this->view->render();
-                } else {
-                    $this->postService->setPostId($id);
-                    $this->postService->removePost();
-                    $_SESSION['status'] = "postDeleted";
-                    direct_page('index.php?load=posts&status=postDeleted', 200);
-                }
-            } catch (\Throwable $th) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($th);
-            } catch (AppException $e) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($e);
-            }
+        try {
+            $this->postService->setPostId($id);
+            $this->postService->removePost();
+            $_SESSION['status'] = "postDeleted";
+            direct_page('index.php?load=posts&status=postDeleted', 200);
+        } catch (\Throwable $th) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($th);
+        } catch (AppException $e) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($e);
         }
     }
 
@@ -868,22 +794,4 @@ class PostController extends BaseApp
         $this->view = new View('admin', 'ui', 'posts', $viewName);
     }
 
-    /**
-     * setCredential
-     *
-     * @param array $values
-     *
-     */
-    private function setCredential(array $values)
-    {
-        $this->crendential = [
-          'post_id' => $values['post_id'],
-          'post_author' => $values['post_author'],
-          'post_date' => $values['post_date'],
-          'post_password' => $values['post_password'],
-          'passphrase' => $values['post_password']
-        ];
-
-        return $this->crendential;
-    }
 }

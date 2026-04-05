@@ -98,6 +98,7 @@ class DbMySQLi
     public function dbMySQLTransaction()
     {
         $this->dbc->begin_transaction();
+        return true;
     }
 
     /**
@@ -335,11 +336,13 @@ class DbMySQLi
         $check_table = $this->dbc->query("SHOW TABLES LIKE '$table_name'");
         $check_table_schema = $this->dbc->query("SELECT table_name FROM information_schema.tables WHERE table_schema = '$database' AND table_name = '$table_name'");
 
-        (($check_table->num_rows > 0) || ($check_table_schema->num_rows == 1) ? true : false);
+        $exists = (($check_table->num_rows > 0) || ($check_table_schema->num_rows == 1) ? true : false);
 
         if (is_resource($check_table) || is_resource($check_table_schema)) {
             $check_table->free();
         }
+
+        return $exists;
     }
 
     /**
@@ -360,6 +363,8 @@ class DbMySQLi
                 }
             }
         }
+
+        return 0;
     }
 
     /**
@@ -471,5 +476,6 @@ class DbMySQLi
         if (($ca !== false) && (certificate_authority(distrib_name()) !== null)) {
             return certificate_authority(distrib_name());
         }
+        return '';
     }
 }

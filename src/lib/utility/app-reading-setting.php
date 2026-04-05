@@ -43,4 +43,6 @@ function app_reading_setting()
 
         return $reading_settings;
     }
+
+    return [];
 }

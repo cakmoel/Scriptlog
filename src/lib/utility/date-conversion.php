@@ -77,6 +77,8 @@ function grab_month($month = null)
 
             break;
     }
+
+    return '';
 }
 
 /**

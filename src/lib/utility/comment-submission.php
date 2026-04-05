@@ -168,9 +168,6 @@ function processing_comment(array $values)
     }
 
     list($errors) = checking_form_input($author_name, $author_email, $comment_content);
-    if (!empty($input_errors)) {
-        $errors = array_merge($errors, $input_errors);
-    }
 
     // Stop processing if there are errors
     if (!empty($errors)) {
