@@ -1,82 +1,82 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class TagModel extends Dao
- * 
+ *
  * @category Model class
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * 
+ *
  */
 class TagModel extends BaseModel
 {
+    /**
+     * linkPosts
+     * alias for link property from BaseModel
+     *
+     * @var object
+     */
+    private $linkPosts;
 
-  /**
-   * linkPosts
-   * alias for link property from BaseModel
-   * 
-   * @var object
-   */
-  private $linkPosts;
+    /**
+     * getLinkTag()
+     *
+     * @see https://www.longren.io/how-to-build-a-tag-cloud-with-php-mysql-and-css/
+     * @see http://howto.philippkeller.com/2005/04/24/Tags-Database-schemas/
+     * @see http://howto.philippkeller.com/2005/06/19/Tagsystems-performance-tests/
+     * @see https://snook.ca/archives/php/how_i_added_tag
+     *
+     */
+    public function getLinkTag($postId, $sanitize)
+    {
 
-/**
- * getLinkTag()
- * 
- * @see https://www.longren.io/how-to-build-a-tag-cloud-with-php-mysql-and-css/
- * @see http://howto.philippkeller.com/2005/04/24/Tags-Database-schemas/
- * @see http://howto.philippkeller.com/2005/06/19/Tagsystems-performance-tests/
- * @see https://snook.ca/archives/php/how_i_added_tag
- * 
- */
-public function getLinkTag($postId, $sanitize) 
-{
+        $html = [];
 
-$html = [];
+        $idsanitized = $this->filteringId($sanitize, $postId, 'sql');
 
-$idsanitized = $this->filteringId($sanitize, $postId, 'sql');
+        $sql = "SELECT DISTINCT tbl_posts.post_tags FROM tbl_posts WHERE tbl_posts.ID = :post_id LIMIT 1";
 
-$sql = "SELECT DISTINCT tbl_posts.post_tags FROM tbl_posts WHERE tbl_posts.ID = :post_id LIMIT 1";
+        $this->setSQL($sql);
 
-$this->setSQL($sql);
+        $data = array(':post_id' => $idsanitized);
 
-$data = array(':post_id' => $idsanitized);
+        $tags = $this->findColumn($data);
 
-$tags = $this->findColumn($data);
+        $tag_exploaded = explode(',', strtolower($tags));
 
-$tag_exploaded = explode(',', strtolower($tags));
+        foreach ((array) $tag_exploaded as $tag) {
+            $html[] = '<a href="' . permalinks($postId)['post'] . '" class="tag" title="' . escape_html($tag) . '">#' . escape_html($tag) . '</a>';
+        }
 
-foreach ((array) $tag_exploaded as $tag) {
+        return implode(" ", $html);
+    }
 
-  $html[] = '<a href="'.permalinks($postId)['post'].'" class="tag" title="'.escape_html($tag).'">#'.escape_html($tag).'</a>';
+    /**
+     * getPostsPublishedByTag
+     *
+     * @param string $tag
+     * @param object $sanitize
+     * @param Paginator $paginator
+     * @return mixed
+     */
+    public function getPostsPublishedByTag($tag, $sanitize, Paginator $perPage)
+    {
+        $entries = [];
 
-}
+        $this->linkPosts = $perPage;
 
-return implode(" ", $html);
+        $tagSearch = '%' . trim($tag) . '%';
 
-}
-
-/**
- * getPostsPublishedByTag
- *
- * @param string $tag
- * @param object $sanitize
- * @param Paginator $paginator
- * @return mixed
- */
-public function getPostsPublishedByTag($tag, $sanitize, Paginator $perPage)
-{
-  $entries = [];
-
-  $this->linkPosts = $perPage;
-
-  $count_tags = "SELECT tbl_posts.ID, tbl_posts.post_title, tbl_posts.post_content, tbl_posts.post_tags 
+        $count_tags = "SELECT tbl_posts.ID, tbl_posts.post_title, tbl_posts.post_content, tbl_posts.post_tags 
                  FROM tbl_posts WHERE tbl_posts.post_tags LIKE :post_tags ORDER BY tbl_posts.ID DESC";
 
-  $this->setSQL($count_tags);
+        $this->setSQL($count_tags);
 
-  $this->linkPosts->set_total($this->checkCountValue([':post_tags' => $tag]));
+        $this->linkPosts->set_total($this->checkCountValue([':post_tags' => $tagSearch]));
 
-  $sql = "SELECT tbl_posts.ID, tbl_posts.media_id, tbl_posts.post_author, 
+        $sql = "SELECT tbl_posts.ID, tbl_posts.media_id, tbl_posts.post_author, 
                  tbl_posts.post_date AS created_at, 
                  tbl_posts.post_modified AS modified_at,  
                  tbl_posts.post_title, tbl_posts.post_slug, 
@@ -85,22 +85,21 @@ public function getPostsPublishedByTag($tag, $sanitize, Paginator $perPage)
                  tbl_posts.post_type, tbl_posts.comment_status, tbl_users.user_fullname,
                  tbl_users.user_login, tbl_users.user_level,
                  tbl_media.media_filename, tbl_media.media_caption
-          FROM tbl_posts, tbl_users, tbl_media
-          WHERE tbl_posts.post_tags LIKE :post_tags 
-          AND tbl_posts.post_author = tbl_users.ID
-          AND tbl_posts.post_status = 'publish' 
-          AND tbl_posts.post_type = 'blog'
-          AND tbl_users.user_banned = '0'
-          AND tbl_posts.media_id = tbl_media.ID
-          ORDER BY tbl_posts.post_date DESC " . $this->linkPosts->get_limit($sanitize);
+           FROM tbl_posts
+           LEFT JOIN tbl_users ON tbl_posts.post_author = tbl_users.ID
+           LEFT JOIN tbl_media ON tbl_posts.media_id = tbl_media.ID
+           WHERE tbl_posts.post_tags LIKE :post_tags 
+           AND tbl_posts.post_status = 'publish' 
+           AND tbl_posts.post_type = 'blog'
+           AND (tbl_users.user_banned = '0' OR tbl_users.user_banned IS NULL)
+           ORDER BY tbl_posts.post_date DESC " . $this->linkPosts->get_limit($sanitize);
 
-  $this->setSQL($sql);
+        $this->setSQL($sql);
 
-  $entries = $this->findAll([':post_tags' => $tag]);
+        $entries = $this->findAll([':post_tags' => $tagSearch]);
 
-  $this->pagination = $this->linkPosts->page_links($sanitize);
+        $this->pagination = $this->linkPosts->page_links($sanitize);
 
-  return (empty($entries)) ?: ['postsByTag' => $entries, 'paginationLink' => $this->pagination];
-}
-
+        return (empty($entries)) ?: ['postsByTag' => $entries, 'paginationLink' => $this->pagination];
+    }
 }
