@@ -1,4 +1,7 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class SearchFinder
  * Searching keyword from search functionality form
@@ -12,210 +15,211 @@
  */
 class SearchFinder
 {
+    /**
+     * Database connection
+     *
+     * @var Db
+     */
+    private $dbc;
 
-/**
- * Database connection
- * 
- * @var object
- * 
- */
- private $dbc;
- 
-/**
- * errorss
- * 
- * @var object
- * 
- */
- protected $errors;
+    /**
+     * Error message
+     *
+     * @var string
+     */
+    protected $error;
 
-/**
- * SQL
- * 
- * @var string
- * 
- */
- public $sql;
- 
-/**
- * Results from SQL Query
- * 
- * @var string
- * 
- */
- public $results;
- 
-/**
- * Bind data
- * 
- * @var string
- * 
- */
- public $bind;
+    /**
+     * Initialize object properties and method
+     * and an instance of database connection
+     */
+    public function __construct()
+    {
+        if (Registry::isKeySet('dbc')) {
+            $this->dbc = Registry::get('dbc');
+        }
+    }
 
-/**
- * Initialize object properties and method
- * and an instance of database connection
- * 
- * @param object $dbc
- * 
- */
- public function __construct()
- {
-	
-  if (Registry::isKeySet('dbc')) {
+    public function __destruct()
+    {
+        session_write_close();
+    }
 
-	$this->dbc = Registry::get('dbc');
-  
-  }
+    /**
+     * Get error message
+     *
+     * @return string|null
+     */
+    public function getError()
+    {
+        return $this->error;
+    }
 
- }
- 
- public function __destruct()
- {
-	Registry::set('dbc', null);
-	session_write_close();
- }
+    /**
+     * Sanitize search keyword
+     * Prevents XSS and SQL injection
+     *
+     * @param string $keyword
+     * @return string
+     */
+    public function sanitizeKeyword($keyword)
+    {
+        if (!is_string($keyword)) {
+            return '';
+        }
 
-/**
- * Clean Up
- * 
- * @param array $bind
- * @return array
- * 
- */
- public function cleanUp($bind)
- {
-  return $bind;
- }
+        $keyword = trim($keyword);
 
-/**
- * Binding statement
- * 
- * @param string $sql
- * @param string $bind
- * @return bool
- * 
- */
- public function bindStatement($sql, $bind = "")
- {
-  $this->sql = $sql;
-  $this->bind = $this->cleanUp($bind);
-  $this->errors = '';
-  
-  try {
-  	
-  	$sth = $this->dbc->prepare($this->sql);
-  	
-  	if ($sth -> execute($this->bind) !== false ) {
-  		
-  		if (preg_match("/^(" . implode("|", array ("select", "describe", "pragma")) . ") /i", $this->sql)) {
+        if (mb_strlen($keyword, 'UTF-8') < 2) {
+            return '';
+        }
 
-			  return $sth->fetchAll(PDO::FETCH_ASSOC);
-			  
-  		} elseif (preg_match("/^(" . implode("|", array ("delete", "insert", "update")) . ") /i", $this->sql)) {
+        if (mb_strlen($keyword, 'UTF-8') > 100) {
+            $keyword = mb_substr($keyword, 0, 100, 'UTF-8');
+        }
 
-			  return $sth->rowCount();
-			  
-  		}
-  		
-  	}
-  	
-  } catch (Throwable $th) {
+        return $keyword;
+    }
 
-	$this->errors = LogError::setStatusCode(http_response_code(500));
-	$this->errors = LogError::exceptionHandler($th);
+    /**
+     * Search posts
+     *
+     * @param string $keyword
+     * @return array
+     */
+    public function searchPost($keyword)
+    {
+        $keyword = $this->sanitizeKeyword($keyword);
 
-  } catch (DbException $e) {
-  	
-  	$this->errors = LogError::setStatusCode(http_response_code(500));
-  	$this->errors = LogError::exceptionHandler($e);
-  	
-  }
-  
-  return false;
-  
- }
- 
-/**
- * Set Query
- * 
- * @param string $sql
- * @param bool $bind
- * @return bool
- * 
- */
- public function setQuery($sql, $bind = false)
- {
-  $this->errors = '';
-  
-  try {
-  	
-  	if ($bind !== false) {
-  	
-  	 return $this->bindStatement($sql, $bind);
-  	 
-  	} else {
-  		
-  		$this->results = $this->dbc->query($sql);
-  		return $this->results;
-  	}
-  	
-  } catch (Throwable $th) {
+        if (empty($keyword)) {
+            return ['results' => [], 'totalRows' => 0];
+        }
 
-	$this->errors = LogError::setStatusCode(http_response_code());
-	$this->errors = LogError::exceptionHandler($th);
+        try {
+            $searchTerm = "%{$keyword}%";
 
-  } catch (PDOException $e) {
-  	
-  	$this->errors = LogError::setStatusCode(http_response_code());
-  	$this->errors = Logerror::exceptionHandler($e);
-  	
-  }
-  
-  return false;
-  
- }
- 
-/**
- * Searching Post especially blog post
- * 
- * @param string $data
- * @return mixed
- * 
- */
- public function searchPost($data)
- {
-    
-    $bind = array(":keyword1" => "%$data%", ":keyword2" => "%$data%", ":keyword3" => "%$data%");
-     
- 	$this->sql = "SELECT 
-                     ID,
-                     post_author, post_created, post_modified, 
-                     post_title, post_slug, 
-                     post_content, post_status, 
-                     post_type
-                 FROM 
-                    tbl_posts
-                 WHERE 
-                    post_title LIKE :keyword1 
-					OR post_content LIKE :keyword2
-					OR post_tags LIKE :keyword3
-                    AND post_status = 'publish' AND post_type = 'blog' ";
- 	             
- 	
- 	$results = $this->setQuery($this->sql, $bind); // hasil pencarian
- 	
- 	$sth = $this->dbc->prepare($this->sql);
- 	$keyword = '%'.$data.'%';
- 	$sth->bindValue(':keyword1', $keyword, PDO::PARAM_STR);
- 	$sth->bindValue(':keyword2', $keyword, PDO::PARAM_STR);
-	$sth->bindValue(':keyword3', $keyword, PDO::PARAM_STR);
- 	$sth->execute();
- 	$totalRows = $sth->rowCount();
- 	
- 	return array("results" => $results, "totalRows" => $totalRows);
- 	
- }
- 
+            $sql = "SELECT ID, post_author, post_date, post_modified, 
+                           post_title, post_slug, post_content, 
+                           post_status, post_type
+                    FROM tbl_posts 
+                    WHERE (post_title LIKE ? OR post_content LIKE ? OR post_tags LIKE ?) 
+                    AND post_status = 'publish' 
+                    AND post_type = 'blog'
+                    ORDER BY post_date DESC 
+                    LIMIT 20";
+
+            $results = $this->dbc->dbSelect($sql, [$searchTerm, $searchTerm, $searchTerm]);
+
+            $countSql = "SELECT COUNT(*) as total 
+                         FROM tbl_posts 
+                         WHERE (post_title LIKE ? OR post_content LIKE ? OR post_tags LIKE ?) 
+                         AND post_status = 'publish' 
+                         AND post_type = 'blog'";
+
+            $countResult = $this->dbc->dbSelect($countSql, [$searchTerm, $searchTerm, $searchTerm]);
+            $totalRows = isset($countResult[0]->total) ? (int)$countResult[0]->total : 0;
+
+            return [
+                'results' => $results ?: [],
+                'totalRows' => $totalRows
+            ];
+        } catch (\Throwable $th) {
+            $this->error = $th->getMessage();
+            return ['results' => [], 'totalRows' => 0, 'error' => $this->error];
+        }
+    }
+
+    /**
+     * Search pages
+     *
+     * @param string $keyword
+     * @return array
+     */
+    public function searchPage($keyword)
+    {
+        $keyword = $this->sanitizeKeyword($keyword);
+
+        if (empty($keyword)) {
+            return ['results' => [], 'totalRows' => 0];
+        }
+
+        try {
+            $searchTerm = "%{$keyword}%";
+
+            $sql = "SELECT ID, post_author, post_date, post_modified, 
+                           post_title, post_slug, post_content, 
+                           post_status, post_type
+                    FROM tbl_posts 
+                    WHERE (post_title LIKE ? OR post_content LIKE ?) 
+                    AND post_status = 'publish' 
+                    AND post_type = 'page'
+                    ORDER BY post_date DESC 
+                    LIMIT 20";
+
+            $results = $this->dbc->dbSelect($sql, [$searchTerm, $searchTerm]);
+
+            $countSql = "SELECT COUNT(*) as total 
+                         FROM tbl_posts 
+                         WHERE (post_title LIKE ? OR post_content LIKE ?) 
+                         AND post_status = 'publish' 
+                         AND post_type = 'page'";
+
+            $countResult = $this->dbc->dbSelect($countSql, [$searchTerm, $searchTerm]);
+            $totalRows = isset($countResult[0]->total) ? (int)$countResult[0]->total : 0;
+
+            return [
+                'results' => $results ?: [],
+                'totalRows' => $totalRows
+            ];
+        } catch (\Throwable $th) {
+            $this->error = $th->getMessage();
+            return ['results' => [], 'totalRows' => 0, 'error' => $this->error];
+        }
+    }
+
+    /**
+     * Search both posts and pages
+     *
+     * @param string $keyword
+     * @return array
+     */
+    public function searchAll($keyword)
+    {
+        $keyword = $this->sanitizeKeyword($keyword);
+
+        if (empty($keyword)) {
+            return ['results' => [], 'totalRows' => 0];
+        }
+
+        try {
+            $searchTerm = "%{$keyword}%";
+
+            $sql = "SELECT ID, post_author, post_date, post_modified, 
+                           post_title, post_slug, post_content, 
+                           post_status, post_type
+                    FROM tbl_posts 
+                    WHERE (post_title LIKE ? OR post_content LIKE ? OR post_tags LIKE ?) 
+                    AND post_status = 'publish'
+                    ORDER BY post_date DESC 
+                    LIMIT 50";
+
+            $results = $this->dbc->dbSelect($sql, [$searchTerm, $searchTerm, $searchTerm]);
+
+            $countSql = "SELECT COUNT(*) as total 
+                         FROM tbl_posts 
+                         WHERE (post_title LIKE ? OR post_content LIKE ? OR post_tags LIKE ?) 
+                         AND post_status = 'publish'";
+
+            $countResult = $this->dbc->dbSelect($countSql, [$searchTerm, $searchTerm, $searchTerm]);
+            $totalRows = isset($countResult[0]->total) ? (int)$countResult[0]->total : 0;
+
+            return [
+                'results' => $results ?: [],
+                'totalRows' => $totalRows
+            ];
+        } catch (\Throwable $th) {
+            $this->error = $th->getMessage();
+            return ['results' => [], 'totalRows' => 0, 'error' => $this->error];
+        }
+    }
 }

@@ -1,21 +1,23 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Random Class
- * 
+ *
  * @category Core Class
  * @author Anthony Ferrara me@ircmaxell.com
  * @see https://github.com/ircmaxell/random_compat
  * @see https://timoh6.github.io/2013/11/05/Secure-random-numbers-for-PHP-developers.html
- * 
+ *
  */
-class Random {
+class Random
+{
+    public const BLOCK_SIZE = 32;
 
-    const BLOCK_SIZE = 32;
-
-    const TOKEN_LOWER_ALPHA = "abcdefghijklmnopqrstuvwxyz";
-    const TOKEN_UPPER_ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const TOKEN_ALPHA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const TOKEN_ALNUM = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    public const TOKEN_LOWER_ALPHA = "abcdefghijklmnopqrstuvwxyz";
+    public const TOKEN_UPPER_ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    public const TOKEN_ALPHA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    public const TOKEN_ALNUM = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     private static $state = '';
 
@@ -26,7 +28,8 @@ class Random {
      *
      * @param bool $secure Should generated random numbers be cryptographically secure
      */
-    public function __construct($secure = false) {
+    public function __construct($secure = false)
+    {
         $this->secure = (bool) $secure;
     }
 
@@ -37,7 +40,8 @@ class Random {
      *
      * @return string The generated string
      */
-    public function bytes($length) {
+    public function bytes($length)
+    {
         $blocks = max(ceil($length / $this::BLOCK_SIZE), 1);
         $result = '';
         for ($i = 0; $i < $blocks; $i++) {
@@ -55,7 +59,8 @@ class Random {
      *
      * @return int The generated integer
      */
-    public function int($min, $max = null) {
+    public function int($min, $max = null)
+    {
         if (is_null($max)) {
             $max = $min;
             $min = 0;
@@ -72,7 +77,7 @@ class Random {
         do {
             $test = $this->bytes($bytes);
             $result = hexdec(bin2hex($test)) & $mask;
-        } while($result > $range);
+        } while ($result > $range);
 
         return $result + $min;
     }
@@ -82,18 +87,20 @@ class Random {
      *
      * @return float The generated float
      */
-    public function float() {
+    public function float()
+    {
         return ($this->int(0, \PHP_INT_MAX) / (\PHP_INT_MAX));
     }
 
     /**
      * Given a sequence (string, array or object), pick one of them at random
-     * 
+     *
      * @param string|array|object $value The sequence to choose from
      *
      * @return mixed The randomly chosen value
      */
-    public function choose($value) {
+    public function choose($value)
+    {
         $count = 0;
         if (is_string($value)) {
             $count = strlen($value);
@@ -117,7 +124,8 @@ class Random {
      *
      * @return string|array The generated shuffled sequence
      */
-    public function shuffle($value) {
+    public function shuffle($value)
+    {
         $buffer = array();
         if (is_string($value)) {
             $buffer = str_split($value, 1);
@@ -158,7 +166,8 @@ class Random {
      *
      * @return string The generated random token
      */
-    public function token($length, $alphabet = self::TOKEN_ALNUM) {
+    public function token($length, $alphabet = self::TOKEN_ALNUM)
+    {
         if (is_string($alphabet)) {
             $alphabet = str_split($alphabet, 1);
         } elseif (is_array($alphabet)) {
@@ -174,11 +183,12 @@ class Random {
         }
         return $result;
     }
-    
+
     /**
      * Protected function to overload the generator for unit testing purposes
      */
-    protected function genRandom() {
+    protected function genRandom()
+    {
         $buffer = $this->mergeBuffers(self::$state, $this->genNormal());
         if ($this->secure) {
             $buffer = $this->mergeBuffers($buffer, $this->genSecure());
@@ -190,7 +200,8 @@ class Random {
     /**
      * Generate a non-CS random seed
      */
-    private function genNormal() {
+    private function genNormal()
+    {
         $buffer = '';
         if (function_exists('random_bytes')) {
             $buffer = $this->mergeBuffers($buffer, random_bytes($this::BLOCK_SIZE));
@@ -217,14 +228,15 @@ class Random {
     /**
      * Generate a cryptographically-secure random seed
      */
-    private function genSecure() {
+    private function genSecure()
+    {
         $buffer = '';
         if (function_exists('random_bytes')) {
             $buffer = $this->mergeBuffers($buffer, random_bytes($this::BLOCK_SIZE));
         }
         if (function_exists('openssl_random_pseudo_bytes')) {
             $strength = true;
-            /* Since mcrypt could have possibly generated content, 
+            /* Since mcrypt could have possibly generated content,
              * We want to merge the result of the function with the existing buffer
              */
             $tmp = $this->mergeBuffers($buffer, openssl_random_pseudo_bytes($this::BLOCK_SIZE, $strength));
@@ -247,7 +259,8 @@ class Random {
     /**
      * Merge two buffers into a single buffer in a non-deterministic way
      */
-    private function mergeBuffers($buffer1, $buffer2) {
+    private function mergeBuffers($buffer1, $buffer2)
+    {
         if (ord(self::$state) % 2 === 0) {
             return hash_hmac('sha256', $buffer1, $buffer2, true);
         } else {
@@ -258,7 +271,8 @@ class Random {
     /**
      * Count the number of bits needed to represent an integer
      */
-    private function countBits($number) {
+    private function countBits($number)
+    {
         $log2 = 0;
         while ($number >>= 1) {
             $log2++;
