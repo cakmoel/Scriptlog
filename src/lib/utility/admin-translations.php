@@ -20,6 +20,10 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * - ru: Russian
  * - es: Spanish
  * - id: Indonesian
+ * 
+ * @category utility functions 
+ * @license MIT
+ * @version 1.0.0
  */
 
 function admin_translate(string $key, ?string $locale = null): string
@@ -108,11 +112,7 @@ function admin_translate_fallback(string $key, string $locale): string
                 'nav.delete_language' => 'Delete Language',
                 'nav.set_default' => 'Set Default',
                 'nav.no_languages' => 'No languages found',
-                'nav.plugins' => 'Plugins',
-                'nav.themes' => 'Themes',
-                'nav.menus' => 'Menus',
                 'nav.widgets' => 'Widgets',
-                'nav.all_posts' => 'All Posts',
                 'nav.new_post' => 'New Post',
                 'nav.edit_post' => 'Edit Post',
                 'nav.all_pages' => 'All Pages',

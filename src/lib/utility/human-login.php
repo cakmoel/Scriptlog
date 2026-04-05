@@ -9,7 +9,7 @@
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * @return void
+ * @return string
  *
  */
 function human_login_id()
@@ -27,7 +27,7 @@ function human_login_id()
  * @license MIT
  * @version 1.0
  * @param string $loginId
- * @return void
+ * @return bool
  *
  */
 function verify_human_login_id($loginId)
@@ -87,7 +87,8 @@ function checking_login_request($ip, $loginId, $uniqueKey, array $values)
         exit("400 Bad Request");
     }
 
-    if (! isset($uniqueKey) && ($uniqueKey !== md5(app_key() . $ip))) {
+    $computedKey = md5(app_key() . $ip);
+    if ($uniqueKey !== $computedKey) {
         http_response_code(400);
         exit("400 Bad Request ");
     }

@@ -68,7 +68,8 @@ function invoke_plugin($plugin_name, $args)
             return $val;
         });
 
-        return clip('clip_' . $plugin_name, $args);
+        $result = clip('clip_' . $plugin_name, $args);
+        return $result !== null ? $result : $args;
     } else {
         return false;
     }

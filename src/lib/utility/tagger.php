@@ -130,23 +130,21 @@ function tag_query()
 
     $tags = [];
 
-    if ($get_tags->num_rows > 0) {
-        while ($rows = $get_tags->fetch_array(MYSQLI_ASSOC)) {
-            if (isset($rows['postTags'])) {
-                $tags = array_merge($tags, explode(",", strtolower(trim($rows['postTags']))));
-            }
+    while ($rows = $get_tags->fetch()) {
+        if (isset($rows['postTags'])) {
+            $tags = array_merge($tags, explode(",", strtolower(trim($rows['postTags']))));
         }
-
-        if (checking_duplicate_tags() === false) {
-            $tags = array_unique_compact($tags);
-        }
-
-        for ($t = 0; $t < count($tags); $t++) {
-            $taglink[] = '<li class="list-inline-item"><a href="' . app_url() . DS . '?tag=' . $tags[$t] . '" class="tag" title="' . $tags[$t] . '">#' . $tags[$t] . '</a></li>';
-        }
-
-        return is_iterable($taglink) ? implode(" ", $taglink) : array();
     }
+
+    if (checking_duplicate_tags() === false) {
+        $tags = array_unique_compact($tags);
+    }
+
+    for ($t = 0; $t < count($tags); $t++) {
+        $taglink[] = '<li class="list-inline-item"><a href="' . app_url() . DS . '?tag=' . $tags[$t] . '" class="tag" title="' . $tags[$t] . '">#' . $tags[$t] . '</a></li>';
+    }
+
+    return is_iterable($taglink) ? implode(" ", $taglink) : array();
 }
 
 /**
@@ -162,22 +160,20 @@ function tag_path()
 
     $get_tags = function_exists('db_simple_query') ? db_simple_query('SELECT DISTINCT LOWER(post_tags) AS postTags FROM tbl_posts WHERE post_tags != "" GROUP BY postTags') : "";
 
-    if ($get_tags->num_rows > 0) {
-        while ($row = $get_tags->fetch_array(MYSQLI_ASSOC)) {
-            if (isset($row['postTags'])) {
-                $parts = explode(',', $row['postTags']);
-            }
-
-            foreach ($parts as $part) {
-                $tagArrays[] = $part;
-            }
+    while ($row = $get_tags->fetch()) {
+        if (isset($row['postTags'])) {
+            $parts = explode(',', $row['postTags']);
         }
 
-        $finalTags = array_unique($tagArrays);
-        foreach ($finalTags as $tag) {
-            $taglink[] = '<li class="list-inline-item"><a href="' . app_url() . DS . 'tag' . DS . $tag . '" class="tag" title="' . trim($tag) . '">#' . trim($tag) . '</a></li>';
+        foreach ($parts as $part) {
+            $tagArrays[] = $part;
         }
-
-        return is_iterable($taglink) ? implode(" ", $taglink) : array();
     }
+
+    $finalTags = array_unique($tagArrays);
+    foreach ($finalTags as $tag) {
+        $taglink[] = '<li class="list-inline-item"><a href="' . app_url() . DS . 'tag' . DS . $tag . '" class="tag" title="' . trim($tag) . '">#' . trim($tag) . '</a></li>';
+    }
+
+    return is_iterable($taglink) ? implode(" ", $taglink) : array();
 }

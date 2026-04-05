@@ -35,13 +35,11 @@ function escape_html($input, $type = 'html', $encoding = 'utf-8', $mode = 'base'
         case 'base':
             return base_escape($input, $type, $escaper);
 
-            break;
-
         case 'various':
             return various_escape($input, $type, $escaper);
-
-            break;
     }
+
+    return '';
 }
 
 /**

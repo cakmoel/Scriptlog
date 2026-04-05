@@ -66,6 +66,8 @@ function resize_image($current_width, $current_height, $max_size, $destination, 
 
         return true;
     }
+
+    return false;
 }
 
 /**
@@ -139,4 +141,6 @@ function crop_image($current_width, $current_height, $new_size, $destination, $i
 
         return true;
     }
+
+    return false;
 }

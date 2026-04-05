@@ -26,4 +26,5 @@ function image_encoder($filename, $filetype)
         $imgbinary = fread(fopen($filename, "r"), filesize($filename));
         return 'data:image/' . $filetype . ';base64,' . base64_encode($imgbinary);
     }
+    return '';
 }
