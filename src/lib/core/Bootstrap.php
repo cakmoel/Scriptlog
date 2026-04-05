@@ -1,12 +1,15 @@
-<?php defined('SCRIPTLOG') || die("Direct access not permitted");
+<?php
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
  * Class Bootstrap
- * * Central orchestrator for the MyBlogi framework. This class handles the 
- * sequential loading of configurations, utility functions, core services, 
+ *
+ * Central orchestrator for the MyBlogi framework. This class handles the
+ * sequential loading of configurations, utility functions, core services,
  * and global security policies.
- * * @category Core
- * @package  Scriptlog\Core
+ *
+ * @category Core
  * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0.0
@@ -24,15 +27,41 @@ class Bootstrap
      */
     private static $services = [];
 
+    private static $allowed_exported_vars = [
+        'db_host',
+        'db_user',
+        'db_pwd',
+        'db_name',
+        'db_port',
+        'db_prefix',
+        'app_email',
+        'app_url',
+        'app_key',
+        'cipher_key',
+        'sessionMaker',
+        'searchPost',
+        'authenticator',
+        'ubench',
+        'sanitizer',
+        'searchPost',
+        'validator',
+        'configDao',
+        'configService',
+        'dispatcher',
+        'i18n',
+        'userDao',
+        'userToken'
+    ];
+
     /**
      * Initializes the application environment.
-     * * Performs the full bootstrap sequence: configuration, utilities, 
+     * * Performs the full bootstrap sequence: configuration, utilities,
      * service containerization, and security header enforcement.
      *
      * @param string $appRoot The absolute path to the application root directory.
-     * @return array<string, mixed> Merged collection of configuration variables and service instances.
+     * @return AppContext Merged collection of configuration variables and service instances.
      */
-    public static function initialize(string $appRoot): array
+    public static function initialize(string $appRoot): AppContext
     {
         // 1. Load Configuration and get core variables
         $core_vars = self::loadConfiguration($appRoot);
@@ -46,8 +75,10 @@ class Bootstrap
         // 4. Apply Security Headers (using functions loaded in step 2)
         self::applySecurity();
 
-        // Merge core variables (db_host, etc.) and instantiated services ($authenticator, etc.)
-        return array_merge($core_vars, $services);
+        $all_vars = array_merge($core_vars, $services);
+
+        // Only return what is explicitly allowed
+        return new AppContext(array_intersect_key($all_vars, array_flip(self::$allowed_exported_vars)));
     }
 
     /**
@@ -75,6 +106,9 @@ class Bootstrap
         $app_url   = self::$config['app']['url'] ?? "";
         $app_key   = self::$config['app']['key'] ?? "";
 
+        if (empty($app_key)) {
+            throw new Exception("Security Risk: APP_KEY is missing from environment.");
+        }
         $cipher_key = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::scriptlogCipherKey() : "";
 
         return compact('db_host', 'db_user', 'db_pwd', 'db_name', 'db_port', 'db_prefix', 'app_email', 'app_url', 'app_key', 'cipher_key');
@@ -94,7 +128,7 @@ class Bootstrap
     {
         // STEP 1: CREATE DATABASE CONNECTION
         $dbc = class_exists('DbFactory') ? DbFactory::connect([
-            'mysql:host=' . $core_vars['db_host'] . ';port=' . $core_vars['db_port'] . ';dbname=' . $core_vars['db_name'],
+            'mysql:host=' . $core_vars['db_host'] . ';port=' . $core_vars['db_port'] . ';dbname=' . $core_vars['db_name'] . ';charset=utf8mb4',
             $core_vars['db_user'],
             $core_vars['db_pwd']
         ]) : "";
@@ -108,12 +142,15 @@ class Bootstrap
             'home'     => "/",
             'category' => "/category/(?'category'[\w\-]+)",
             'archive'  => "/archive/[0-9]{2}/[0-9]{4}",
+            'archives' => "/archives",
             'blog'     => "/blog([^/]*)",
             'page'     => "/page/(?'page'[^/]+)",
             'single'   => "/post/(?'id'\d+)/(?'post'[\w\-]+)",
             'search'   => "(?'search'[\w\-]+)",
-            'tag'      => "/tag/(?'tag'[\w\-]+)",
-            'privacy'  => "/privacy"
+            'tag'      => "/tag/(?'tag'[\w\- ]+)",
+            'privacy'  => "/privacy",
+            'download' => "/download/(?'identifier'[a-f0-9\-]+)",
+            'download_file' => "/download/(?'identifier'[a-f0-9\-]+)/file"
         ];
 
         // STEP 3: SET REGISTRY
@@ -128,20 +165,33 @@ class Bootstrap
         $userDao = class_exists('UserDao') ? new UserDao() : null;
         $userToken = class_exists('UserTokenDao') ? new UserTokenDao() : null;
         $validator = class_exists('FormValidator') ? new FormValidator() : null;
+        $sanitizer = class_exists('Sanitize') ? new Sanitize() : null;
+
+        $configDao = class_exists('ConfigurationDao') ? new ConfigurationDao() : null;
+        $configService = ($configDao && $validator && $sanitizer) ? new ConfigurationService($configDao, $validator, $sanitizer) : null;
 
         $sessionMaker = class_exists('SessionMaker') ? new SessionMaker(set_session_cookies_key($core_vars['app_email'], $core_vars['app_key'])) : null;
 
         self::$services = [
             'sessionMaker' => $sessionMaker,
             'searchPost' => class_exists('SearchFinder') ? new SearchFinder() : null,
-            'sanitizer' => class_exists('Sanitize') ? new Sanitize() : null,
+            'sanitizer' => $sanitizer,
             'userDao' => $userDao,
             'userToken' => $userToken,
             'validator' => $validator,
+            'configDao' => $configDao,
+            'configService' => $configService,
             'authenticator' => class_exists('Authentication') ? new Authentication($userDao, $userToken, $validator) : null,
             'ubench' => class_exists('Ubench') ? new Ubench() : null,
             'dispatcher' => class_exists('Dispatcher') ? new Dispatcher() : null,
         ];
+
+        // STEP 5: Initialize i18n if available
+        if (class_exists('I18nManager')) {
+            $i18n = I18nManager::getInstance();
+            $i18n->initialize();
+            self::$services['i18n'] = $i18n;
+        }
 
         return self::$services;
     }
