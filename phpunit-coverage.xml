@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="lib/vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="tests/bootstrap.php"
+         bootstrap="tests/bootstrap_integration.php"
          colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
@@ -12,20 +12,12 @@
          stopOnSkipped="false"
          failOnWarning="false"
          testdox="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
 >
     <testsuites>
         <testsuite name="Scriptlog Test Suite">
             <directory>tests</directory>
             <exclude>tests/TablePrefixTest.php</exclude>
-        </testsuite>
-        <testsuite name="Unit Tests">
-            <directory>tests/unit</directory>
-        </testsuite>
-        <testsuite name="Integration Tests">
-            <directory>tests/integration</directory>
-        </testsuite>
-        <testsuite name="Service Tests">
-            <directory>tests/service</directory>
         </testsuite>
     </testsuites>
     
@@ -33,17 +25,5 @@
         <ini name="display_errors" value="1"/>
         <ini name="display_startup_errors" value="1"/>
         <ini name="error_reporting" value="-1"/>
-        <env name="XDEBUG_MODE" value="coverage"/>
     </php>
-    
-    <coverage processUncoveredFiles="false">
-        <include>
-            <directory suffix=".php">lib</directory>
-        </include>
-        <exclude>
-            <directory suffix=".php">lib/vendor</directory>
-            <directory suffix=".php">lib/core/HTMLPurifier</directory>
-            <file>lib/utility/db-mysqli.php</file>
-        </exclude>
-    </coverage>
 </phpunit>
