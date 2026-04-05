@@ -10,7 +10,7 @@
  * @category  Core Class
  * @author    Blogware Team
  * @license   MIT
- * @version   1.0
+ * @version   1.1
  * @since     Since Release 1.0
  *
  */
@@ -27,6 +27,7 @@ class ApiResponse
     public const HTTP_FORBIDDEN = 403;
     public const HTTP_NOT_FOUND = 404;
     public const HTTP_METHOD_NOT_ALLOWED = 405;
+    public const HTTP_NOT_ACCEPTABLE = 406;
     public const HTTP_CONFLICT = 409;
     public const HTTP_UNPROCESSABLE_ENTITY = 422;
     public const HTTP_TOO_MANY_REQUESTS = 429;
@@ -34,34 +35,211 @@ class ApiResponse
     public const HTTP_SERVICE_UNAVAILABLE = 503;
 
     /**
-     * Rate limiting settings
+     * Rate limiting settings (fallback defaults)
      */
     public const RATE_LIMIT = 60;
     public const RATE_WINDOW = 60;
 
     /**
-     * Track rate limit for current request
+     * Default cache TTL for GET responses (seconds)
+     */
+    public const CACHE_TTL = 300;
+
+    /**
+     * Track rate limit for current request (used when RateLimiter not available)
      */
     private static $rateLimitRemaining;
     private static $rateLimitReset;
+    private static $rateLimitLimit;
 
     /**
-     * Initialize rate limiting
+     * Cached headers to be applied during send()
      */
-    public static function initRateLimit()
+    private static $pendingHeaders = [];
+
+    /**
+     * Initialize rate limiting (fallback when RateLimiter class not loaded)
+     *
+     * @param int $limit
+     * @param int $window
+     */
+    public static function initRateLimit($limit = self::RATE_LIMIT, $window = self::RATE_WINDOW)
     {
-        self::$rateLimitRemaining = self::RATE_LIMIT;
-        self::$rateLimitReset = time() + self::RATE_WINDOW;
+        self::$rateLimitLimit = $limit;
+        self::$rateLimitRemaining = $limit;
+        self::$rateLimitReset = time() + $window;
     }
 
     /**
-     * Set rate limit headers
+     * Set rate limit headers from RateLimiter result or fallback
+     *
+     * @param array|null $rateResult RateLimiter check result
      */
-    private static function setRateLimitHeaders()
+    public static function setRateLimitHeaders($rateResult = null)
     {
-        header('X-RateLimit-Limit: ' . self::RATE_LIMIT);
-        header('X-RateLimit-Remaining: ' . self::$rateLimitRemaining);
-        header('X-RateLimit-Reset: ' . self::$rateLimitReset);
+        if ($rateResult !== null) {
+            header('X-RateLimit-Limit: ' . $rateResult['limit']);
+            header('X-RateLimit-Remaining: ' . $rateResult['remaining']);
+            header('X-RateLimit-Reset: ' . $rateResult['reset']);
+            if ($rateResult['retry_after'] > 0) {
+                header('Retry-After: ' . $rateResult['retry_after']);
+            }
+        } else {
+            header('X-RateLimit-Limit: ' . (self::$rateLimitLimit ?? self::RATE_LIMIT));
+            header('X-RateLimit-Remaining: ' . self::$rateLimitRemaining);
+            header('X-RateLimit-Reset: ' . self::$rateLimitReset);
+        }
+    }
+
+    /**
+     * Queue a header to be sent with the response
+     *
+     * @param string $header
+     * @return void
+     */
+    public static function withHeader($header)
+    {
+        self::$pendingHeaders[] = $header;
+    }
+
+    /**
+     * Set ETag header for cache validation
+     *
+     * @param string $etag ETag value (will be quoted automatically)
+     * @param bool $weak Whether this is a weak validator
+     * @return void
+     */
+    public static function withEtag($etag, $weak = false)
+    {
+        $quoted = '"' . trim($etag, '"') . '"';
+        if ($weak) {
+            $quoted = 'W/' . $quoted;
+        }
+        header('ETag: ' . $quoted);
+    }
+
+    /**
+     * Set Last-Modified header for cache validation
+     *
+     * @param string|int $timestamp Unix timestamp or HTTP date string
+     * @return void
+     */
+    public static function withLastModified($timestamp)
+    {
+        if (is_numeric($timestamp)) {
+            $timestamp = gmdate('D, d M Y H:i:s', (int)$timestamp) . ' GMT';
+        }
+        header('Last-Modified: ' . $timestamp);
+    }
+
+    /**
+     * Set Location header for redirect or created resource
+     *
+     * @param string $url
+     * @return void
+     */
+    public static function withLocation($url)
+    {
+        header('Location: ' . $url);
+    }
+
+    /**
+     * Check If-None-Match header against provided ETag
+     * Returns true if client should use cached version (send 304)
+     *
+     * @param string $etag Current ETag for the resource
+     * @return bool True if 304 should be sent
+     */
+    public static function checkEtagMatch($etag)
+    {
+        $ifNoneMatch = $_SERVER['HTTP_IF_NONE_MATCH'] ?? '';
+        if (empty($ifNoneMatch)) {
+            return false;
+        }
+
+        $etags = array_map('trim', explode(',', $ifNoneMatch));
+        $currentEtag = trim($etag, '"');
+        $currentEtag = preg_replace('/^W\//', '', $currentEtag);
+
+        foreach ($etags as $clientEtag) {
+            $clientEtag = trim($clientEtag);
+            $clientEtag = preg_replace('/^W\//', '', $clientEtag);
+            $clientEtag = trim($clientEtag, '"');
+
+            if ($clientEtag === $currentEtag || $clientEtag === '*') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check If-Modified-Since header against provided timestamp
+     * Returns true if client should use cached version (send 304)
+     *
+     * @param string|int $timestamp Unix timestamp or HTTP date string
+     * @return bool True if 304 should be sent
+     */
+    public static function checkModifiedSince($timestamp)
+    {
+        $ifModifiedSince = $_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? '';
+        if (empty($ifModifiedSince)) {
+            return false;
+        }
+
+        $sinceTime = strtotime($ifModifiedSince);
+        if ($sinceTime === false) {
+            return false;
+        }
+
+        $resourceTime = is_numeric($timestamp) ? (int)$timestamp : strtotime($timestamp);
+
+        return $sinceTime >= $resourceTime;
+    }
+
+    /**
+     * Send a 304 Not Modified response
+     *
+     * @return void
+     */
+    public static function notModified()
+    {
+        http_response_code(304);
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: public, max-age=' . self::CACHE_TTL);
+        self::setRateLimitHeaders($GLOBALS['_api_rate_result'] ?? null);
+        exit;
+    }
+
+    /**
+     * Set cache headers based on HTTP method
+     *
+     * @param int $statusCode
+     * @param int $ttl Cache TTL in seconds (default 300)
+     * @return void
+     */
+    private static function setCacheHeaders($statusCode, $ttl = self::CACHE_TTL)
+    {
+        if ($statusCode === self::HTTP_NO_CONTENT) {
+            header('Cache-Control: no-store');
+            return;
+        }
+
+        if (in_array($statusCode, [self::HTTP_CREATED, self::HTTP_UNPROCESSABLE_ENTITY, self::HTTP_CONFLICT])) {
+            header('Cache-Control: no-store');
+            return;
+        }
+
+        if ($statusCode >= 400) {
+            header('Cache-Control: no-cache, no-store, must-revalidate');
+            header('Pragma: no-cache');
+            header('Expires: 0');
+            return;
+        }
+
+        header('Cache-Control: public, max-age=' . $ttl);
+        header('Vary: Accept, Accept-Encoding, X-API-Key');
     }
 
     /**
@@ -70,16 +248,24 @@ class ApiResponse
      * @param mixed $data The data to be encoded as JSON
      * @param int $statusCode HTTP status code (default: 200)
      * @param string $message Optional success message
+     * @param array $links Optional HATEOAS links
+     * @param int $ttl Cache TTL in seconds
      * @return void
      */
-    public static function success($data = null, $statusCode = self::HTTP_OK, $message = null)
+    public static function success($data = null, $statusCode = self::HTTP_OK, $message = null, $links = [], $ttl = self::CACHE_TTL)
     {
-        self::send([
+        $response = [
             'success' => true,
             'status' => $statusCode,
             'message' => $message,
             'data' => $data
-        ], $statusCode);
+        ];
+
+        if (!empty($links)) {
+            $response['_links'] = $links;
+        }
+
+        self::send($response, $statusCode, $ttl);
     }
 
     /**
@@ -87,16 +273,28 @@ class ApiResponse
      *
      * @param mixed $data The created resource data
      * @param string $message Optional success message
+     * @param array $links Optional HATEOAS links
+     * @param string|null $locationUrl Optional Location header URL
      * @return void
      */
-    public static function created($data, $message = 'Resource created successfully')
+    public static function created($data, $message = 'Resource created successfully', $links = [], $locationUrl = null)
     {
-        self::send([
+        $response = [
             'success' => true,
             'status' => self::HTTP_CREATED,
             'message' => $message,
             'data' => $data
-        ], self::HTTP_CREATED);
+        ];
+
+        if (!empty($links)) {
+            $response['_links'] = $links;
+        }
+
+        if ($locationUrl !== null) {
+            self::withLocation($locationUrl);
+        }
+
+        self::send($response, self::HTTP_CREATED);
     }
 
     /**
@@ -171,6 +369,19 @@ class ApiResponse
     }
 
     /**
+     * Send a 406 Not Acceptable error
+     *
+     * @param string $message Error message
+     * @param array $supportedTypes List of supported content types
+     * @return void
+     */
+    public static function notAcceptable($message = 'Not Acceptable - Requested media type not supported', $supportedTypes = ['application/json'])
+    {
+        header('Accept: ' . implode(', ', $supportedTypes));
+        self::error($message, self::HTTP_NOT_ACCEPTABLE, 'NOT_ACCEPTABLE');
+    }
+
+    /**
      * Send a 409 Conflict error
      *
      * @param string $message Error message
@@ -221,23 +432,27 @@ class ApiResponse
      * Send a method not allowed error
      *
      * @param string $message Error message
+     * @param string $allowedMethods Comma-separated list of allowed methods
      * @return void
      */
-    public static function methodNotAllowed($message = 'Method not allowed')
+    public static function methodNotAllowed($message = 'Method not allowed', $allowedMethods = 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
     {
+        header('Allow: ' . $allowedMethods);
         self::error($message, self::HTTP_METHOD_NOT_ALLOWED, 'METHOD_NOT_ALLOWED');
     }
 
     /**
-     * Send a paginated response
+     * Send a paginated response with HATEOAS links
      *
      * @param array $data The paginated data
      * @param int $currentPage Current page number
      * @param int $perPage Items per page
      * @param int $totalItems Total number of items
+     * @param array $links Optional HATEOAS links
+     * @param int $ttl Cache TTL in seconds
      * @return void
      */
-    public static function paginated($data, $currentPage, $perPage, $totalItems)
+    public static function paginated($data, $currentPage, $perPage, $totalItems, $links = [], $ttl = self::CACHE_TTL)
     {
         $totalPages = ceil($totalItems / $perPage);
 
@@ -255,7 +470,47 @@ class ApiResponse
             ]
         ];
 
-        self::send($response, self::HTTP_OK);
+        if (!empty($links)) {
+            $response['_links'] = $links;
+        }
+
+        self::send($response, self::HTTP_OK, $ttl);
+    }
+
+    /**
+     * Validate Accept header against supported types
+     * Returns true if request is acceptable
+     *
+     * @param array $supportedTypes List of supported MIME types
+     * @return bool
+     */
+    public static function validateAccept($supportedTypes = ['application/json', '*/*'])
+    {
+        $acceptHeader = $_SERVER['HTTP_ACCEPT'] ?? '*/*';
+
+        if (empty($acceptHeader) || $acceptHeader === '*/*') {
+            return true;
+        }
+
+        $acceptedTypes = array_map('trim', explode(',', $acceptHeader));
+
+        foreach ($acceptedTypes as $acceptedType) {
+            $type = preg_replace('/;\s*q=[0-9.]+/', '', $acceptedType);
+
+            foreach ($supportedTypes as $supported) {
+                if ($type === $supported || $type === '*/*') {
+                    return true;
+                }
+
+                $acceptedMain = explode('/', $type)[0] ?? '';
+                $supportedMain = explode('/', $supported)[0] ?? '';
+                if ($acceptedMain === $supportedMain && substr($type, -2) === '/*') {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -263,42 +518,36 @@ class ApiResponse
      *
      * @param mixed $data Data to be encoded
      * @param int $statusCode HTTP status code
+     * @param int $ttl Cache TTL in seconds
      * @return void
      */
-    private static function send($data, $statusCode)
+    private static function send($data, $statusCode, $ttl = self::CACHE_TTL)
     {
-        // Set HTTP status code
         http_response_code($statusCode);
 
-        // Set content type - OpenAPI compliant
         header('Content-Type: application/json; charset=utf-8');
 
-        // Prevent caching for API responses
-        header('Cache-Control: no-cache, no-store, must-revalidate');
-        header('Pragma: no-cache');
-        header('Expires: 0');
+        self::setCacheHeaders($statusCode, $ttl);
 
-        // Add API version header - OpenAPI compliant
         header('X-API-Version: ' . API_VERSION);
 
-        // Add rate limiting headers - OpenAPI compliant
-        self::setRateLimitHeaders();
+        $rateResult = $GLOBALS['_api_rate_result'] ?? null;
+        self::setRateLimitHeaders($rateResult);
 
-        // Add allow header for method not allowed
         if ($statusCode === self::HTTP_METHOD_NOT_ALLOWED) {
             header('Allow: GET, POST, PUT, DELETE, PATCH, OPTIONS');
         }
 
-        // Encode and output JSON
         if ($data === null) {
+            if ($statusCode === self::HTTP_NO_CONTENT) {
+                exit;
+            }
             echo json_encode(null);
         } else {
-            // Ensure proper JSON encoding with UTF-8 support
             $jsonOptions = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT;
             echo json_encode($data, $jsonOptions);
         }
 
-        // End script execution
         exit;
     }
 
@@ -316,6 +565,7 @@ class ApiResponse
             self::HTTP_FORBIDDEN => 'FORBIDDEN',
             self::HTTP_NOT_FOUND => 'NOT_FOUND',
             self::HTTP_METHOD_NOT_ALLOWED => 'METHOD_NOT_ALLOWED',
+            self::HTTP_NOT_ACCEPTABLE => 'NOT_ACCEPTABLE',
             self::HTTP_CONFLICT => 'CONFLICT',
             self::HTTP_UNPROCESSABLE_ENTITY => 'VALIDATION_ERROR',
             self::HTTP_TOO_MANY_REQUESTS => 'RATE_LIMIT_EXCEEDED',
@@ -336,7 +586,8 @@ class ApiResponse
     {
         header('Access-Control-Allow-Origin: ' . $origin);
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS');
-        header('Access-Control-Allow-Headers: Content-Type, Authorization, X-API-Key, X-Requested-With');
+        header('Access-Control-Allow-Headers: Content-Type, Authorization, X-API-Key, X-Requested-With, If-None-Match, If-Modified-Since');
         header('Access-Control-Max-Age: 3600');
+        header('Access-Control-Expose-Headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, ETag, Last-Modified, Location');
     }
 }

@@ -49,7 +49,10 @@ class Sanitize
      */
     public static function mildSanitizer($str)
     {
-        return (function_exists('simple_remove_xss')) ? simple_remove_xss($str) : "";
+        if (function_exists('simple_remove_xss')) {
+            simple_remove_xss($str);
+        }
+        return $str;
     }
 
     /**

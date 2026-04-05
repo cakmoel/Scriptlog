@@ -11,7 +11,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../lib/common.php';
+require_once __DIR__ . '/../src/lib/common.php';
 
 require_once __DIR__ . '/../install/include/dbtable.php';
 

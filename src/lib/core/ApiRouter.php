@@ -1,5 +1,6 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * API Router
  *
@@ -132,8 +133,14 @@ class ApiRouter
      */
     private function convertToRegex($pattern)
     {
-        // Replace route parameters with regex
-        $regex = preg_replace('/\((.*?)\)/', '(?P<$1>[^/]+)', $pattern);
+        // Check if pattern already uses named capture groups like (?P<name>...)
+        if (strpos($pattern, '?P<') !== false) {
+            // Pattern already has named groups, just add anchors
+            return '#^' . $pattern . '$#';
+        }
+        
+        // Replace route parameters with regex - handle (name) style
+        $regex = preg_replace('/\((\w+)\)/', '(?P<$1>[^/]+)', $pattern);
 
         // Add start and end anchors
         $regex = '#^' . $regex . '$#';

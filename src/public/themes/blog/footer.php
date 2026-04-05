@@ -86,6 +86,7 @@
 <script src="<?= theme_dir(); ?>assets/js/sina-nav.min.js" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/cookie-consent.min.js" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/search.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/unlock-post.min.js" defer></script>
 <?php if (is_rtl()) : ?>
 <script src="<?= theme_dir(); ?>assets/js/rtl.min.js" defer></script>
 <?php endif; ?>

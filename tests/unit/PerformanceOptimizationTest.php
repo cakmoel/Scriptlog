@@ -20,8 +20,8 @@ class PerformanceOptimizationTest extends TestCase
         $_SERVER['REQUEST_METHOD'] = 'GET';
         
         // Load required files
-        require_once __DIR__ . '/../../lib/common.php';
-        require_once __DIR__ . '/../../lib/utility-loader.php';
+        require_once __DIR__ . '/../../src/lib/common.php';
+        require_once __DIR__ . '/../../src/lib/utility-loader.php';
         
         // Read header.php content
         $headerPath = dirname(__FILE__) . '/../../public/themes/blog/header.php';
