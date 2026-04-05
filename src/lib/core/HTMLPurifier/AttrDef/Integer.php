@@ -9,7 +9,6 @@
  */
 class HTMLPurifier_AttrDef_Integer extends HTMLPurifier_AttrDef
 {
-
     /**
      * Whether or not negative values are allowed.
      * @type bool

@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_AttrDef_CSS_FontFamily extends HTMLPurifier_AttrDef
 {
-
     protected $mask = null;
 
     public function __construct()

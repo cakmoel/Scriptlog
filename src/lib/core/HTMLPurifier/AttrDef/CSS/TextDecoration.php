@@ -7,7 +7,6 @@
  */
 class HTMLPurifier_AttrDef_CSS_TextDecoration extends HTMLPurifier_AttrDef
 {
-
     /**
      * @param string $string
      * @param HTMLPurifier_Config $config

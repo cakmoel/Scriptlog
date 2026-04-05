@@ -9,7 +9,6 @@
  */
 class HTMLPurifier_LanguageFactory
 {
-
     /**
      * Cache of language code information used to load HTMLPurifier_Language objects.
      * Structure is: $factory->cache[$language_code][$key] = $value

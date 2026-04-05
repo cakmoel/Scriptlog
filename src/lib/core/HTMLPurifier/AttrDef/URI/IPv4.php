@@ -6,7 +6,6 @@
  */
 class HTMLPurifier_AttrDef_URI_IPv4 extends HTMLPurifier_AttrDef
 {
-
     /**
      * IPv4 regex, protected so that IPv6 can reuse it.
      * @type string

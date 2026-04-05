@@ -6,7 +6,6 @@
  */
 class HTMLPurifier_ConfigSchema_Builder_Xml extends XMLWriter
 {
-
     /**
      * @type HTMLPurifier_ConfigSchema_Interchange
      */

@@ -7,7 +7,6 @@
  */
 class HTMLPurifier_VarParser_Native extends HTMLPurifier_VarParser
 {
-
     /**
      * @param mixed $var
      * @param int $type

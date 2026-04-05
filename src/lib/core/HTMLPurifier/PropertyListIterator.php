@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_PropertyListIterator extends FilterIterator
 {
-
     /**
      * @type int
      */

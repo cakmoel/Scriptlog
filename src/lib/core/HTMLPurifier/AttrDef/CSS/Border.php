@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_AttrDef_CSS_Border extends HTMLPurifier_AttrDef
 {
-
     /**
      * Local copy of properties this property is shorthand for.
      * @type HTMLPurifier_AttrDef[]

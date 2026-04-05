@@ -10,7 +10,6 @@
  */
 class HTMLPurifier_ConfigSchema_Validator
 {
-
     /**
      * @type HTMLPurifier_ConfigSchema_Interchange
      */

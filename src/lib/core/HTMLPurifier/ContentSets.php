@@ -5,7 +5,6 @@
  */
 class HTMLPurifier_ContentSets
 {
-
     /**
      * List of content set strings (pipe separators) indexed by name.
      * @type array

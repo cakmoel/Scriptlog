@@ -6,7 +6,6 @@
  */
 class HTMLPurifier_Length
 {
-
     /**
      * String numeric magnitude.
      * @type string
