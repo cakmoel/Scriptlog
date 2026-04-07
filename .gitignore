@@ -28,11 +28,12 @@ sess_*
 # Build
 node_modules/
 
+# lts directory
+.lts/
+
 # lts
 *.txt
 
 # Rate limit cache files
 src/public/cache/rate_limit/
-
-# Plan
-.plan
+.plan/

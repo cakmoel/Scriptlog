@@ -1,0 +1,3529 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <build time="Fri Apr 3 22:40:27 UTC 2026" phpunit="9.6.34" coverage="9.2.32">
+    <runtime name="PHP" version="8.3.30" url="https://secure.php.net/"/>
+    <driver name="xdebug" version="3.5.0"/>
+  </build>
+  <project source="/var/www/blogware/public_html/lib">
+    <tests>
+      <test name="MedooinFunctionsTest::testDbBuildWhere" size="unknown" result="0" status="PASSED"/>
+      <test name="MedooinFunctionsTest::testDbBuildWhereWithOperators" size="unknown" result="0" status="PASSED"/>
+      <test name="MedooinFunctionsTest::testDbBuildWhereWithInClause" size="unknown" result="0" status="PASSED"/>
+      <test name="MedooinFunctionsTest::testDbBuildWhereEmpty" size="unknown" result="0" status="PASSED"/>
+      <test name="MedooinFunctionsTest::testIsDbDatabase" size="unknown" result="0" status="PASSED"/>
+      <test name="MedooinFunctionsTest::testIsMedooDatabase" size="unknown" result="0" status="PASSED"/>
+      <test name="MedooinFunctionsTest::testAppSettingsFunctionsWithMock" size="unknown" result="0" status="PASSED"/>
+      <test name="MedooinFunctionsTest::testAppTaglineQueryBuild" size="unknown" result="0" status="PASSED"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="60807" comments="17386" code="43421" executable="22029" executed="26" percent="0.12"/>
+        <methods count="1617" tested="0" percent="0.00"/>
+        <functions count="417" tested="1" percent="0.24"/>
+        <classes count="154" tested="0" percent="0.00"/>
+        <traits count="0" tested="0" percent="0"/>
+      </totals>
+      <directory name="controller">
+        <totals>
+          <lines total="10468" comments="1636" code="8832" executable="5299" executed="0" percent="0.00"/>
+          <methods count="243" tested="0" percent="0.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="26" tested="0" percent="0.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+        <directory name="api">
+          <totals>
+            <lines total="2825" comments="644" code="2181" executable="1195" executed="0" percent="0.00"/>
+            <methods count="77" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="8" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+          <file name="ArchivesApiController.php" href="controller/api/ArchivesApiController.php.xml">
+            <totals>
+              <lines total="340" comments="83" code="257" executable="138" executed="0" percent="0.00"/>
+              <methods count="8" tested="0" percent="0.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+          <file name="CategoriesApiController.php" href="controller/api/CategoriesApiController.php.xml">
+            <totals>
+              <lines total="527" comments="141" code="386" executable="211" executed="0" percent="0.00"/>
+              <methods count="13" tested="0" percent="0.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+          <file name="CommentsApiController.php" href="controller/api/CommentsApiController.php.xml">
+            <totals>
+              <lines total="473" comments="115" code="358" executable="206" executed="0" percent="0.00"/>
+              <methods count="10" tested="0" percent="0.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+          <file name="GdprApiController.php" href="controller/api/GdprApiController.php.xml">
+            <totals>
+              <lines total="149" comments="46" code="103" executable="53" executed="0" percent="0.00"/>
+              <methods count="4" tested="0" percent="0.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+          <file name="LanguagesApiController.php" href="controller/api/LanguagesApiController.php.xml">
+            <totals>
+              <lines total="196" comments="0" code="196" executable="103" executed="0" percent="0.00"/>
+              <methods count="8" tested="0" percent="0.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+          <file name="PostsApiController.php" href="controller/api/PostsApiController.php.xml">
+            <totals>
+              <lines total="688" comments="182" code="506" executable="287" executed="0" percent="0.00"/>
+              <methods count="16" tested="0" percent="0.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+          <file name="SearchApiController.php" href="controller/api/SearchApiController.php.xml">
+            <totals>
+              <lines total="236" comments="77" code="159" executable="83" executed="0" percent="0.00"/>
+              <methods count="9" tested="0" percent="0.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+          <file name="TranslationsApiController.php" href="controller/api/TranslationsApiController.php.xml">
+            <totals>
+              <lines total="216" comments="0" code="216" executable="114" executed="0" percent="0.00"/>
+              <methods count="9" tested="0" percent="0.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+        </directory>
+        <file name="ApiController.php" href="controller/ApiController.php.xml">
+          <totals>
+            <lines total="350" comments="114" code="236" executable="130" executed="0" percent="0.00"/>
+            <methods count="14" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="CommentController.php" href="controller/CommentController.php.xml">
+          <totals>
+            <lines total="225" comments="29" code="196" executable="118" executed="0" percent="0.00"/>
+            <methods count="6" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ConfigurationController.php" href="controller/ConfigurationController.php.xml">
+          <totals>
+            <lines total="976" comments="97" code="879" executable="564" executed="0" percent="0.00"/>
+            <methods count="15" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="DownloadAdminController.php" href="controller/DownloadAdminController.php.xml">
+          <totals>
+            <lines total="286" comments="99" code="187" executable="77" executed="0" percent="0.00"/>
+            <methods count="18" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="DownloadController.php" href="controller/DownloadController.php.xml">
+          <totals>
+            <lines total="233" comments="50" code="183" executable="99" executed="0" percent="0.00"/>
+            <methods count="9" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ExportController.php" href="controller/ExportController.php.xml">
+          <totals>
+            <lines total="200" comments="56" code="144" executable="70" executed="0" percent="0.00"/>
+            <methods count="9" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ImportController.php" href="controller/ImportController.php.xml">
+          <totals>
+            <lines total="276" comments="60" code="216" executable="107" executed="0" percent="0.00"/>
+            <methods count="10" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="LanguageController.php" href="controller/LanguageController.php.xml">
+          <totals>
+            <lines total="189" comments="0" code="189" executable="100" executed="0" percent="0.00"/>
+            <methods count="10" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="MediaController.php" href="controller/MediaController.php.xml">
+          <totals>
+            <lines total="586" comments="68" code="518" executable="335" executed="0" percent="0.00"/>
+            <methods count="6" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="MenuController.php" href="controller/MenuController.php.xml">
+          <totals>
+            <lines total="355" comments="52" code="303" executable="202" executed="0" percent="0.00"/>
+            <methods count="6" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PageController.php" href="controller/PageController.php.xml">
+          <totals>
+            <lines total="506" comments="56" code="450" executable="303" executed="0" percent="0.00"/>
+            <methods count="6" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PluginController.php" href="controller/PluginController.php.xml">
+          <totals>
+            <lines total="405" comments="49" code="356" executable="215" executed="0" percent="0.00"/>
+            <methods count="9" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PostController.php" href="controller/PostController.php.xml">
+          <totals>
+            <lines total="890" comments="62" code="828" executable="542" executed="0" percent="0.00"/>
+            <methods count="7" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ReplyController.php" href="controller/ReplyController.php.xml">
+          <totals>
+            <lines total="312" comments="32" code="280" executable="179" executed="0" percent="0.00"/>
+            <methods count="6" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ThemeController.php" href="controller/ThemeController.php.xml">
+          <totals>
+            <lines total="454" comments="28" code="426" executable="278" executed="0" percent="0.00"/>
+            <methods count="8" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="TopicController.php" href="controller/TopicController.php.xml">
+          <totals>
+            <lines total="296" comments="44" code="252" executable="161" executed="0" percent="0.00"/>
+            <methods count="6" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="TranslationController.php" href="controller/TranslationController.php.xml">
+          <totals>
+            <lines total="275" comments="5" code="270" executable="144" executed="0" percent="0.00"/>
+            <methods count="12" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="UserController.php" href="controller/UserController.php.xml">
+          <totals>
+            <lines total="829" comments="91" code="738" executable="480" executed="0" percent="0.00"/>
+            <methods count="9" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+      <directory name="core">
+        <totals>
+          <lines total="17174" comments="5540" code="11634" executable="5197" executed="0" percent="0.00"/>
+          <methods count="592" tested="0" percent="0.00"/>
+          <functions count="2" tested="0" percent="0.00"/>
+          <classes count="70" tested="0" percent="0.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+        <file name="ActionConst.php" href="core/ActionConst.php.xml">
+          <totals>
+            <lines total="122" comments="28" code="94" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ApiAuth.php" href="core/ApiAuth.php.xml">
+          <totals>
+            <lines total="429" comments="146" code="283" executable="121" executed="0" percent="0.00"/>
+            <methods count="16" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ApiResponse.php" href="core/ApiResponse.php.xml">
+          <totals>
+            <lines total="343" comments="146" code="197" executable="86" executed="0" percent="0.00"/>
+            <methods count="18" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ApiRouter.php" href="core/ApiRouter.php.xml">
+          <totals>
+            <lines total="286" comments="123" code="163" executable="66" executed="0" percent="0.00"/>
+            <methods count="12" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="AppConfig.php" href="core/AppConfig.php.xml">
+          <totals>
+            <lines total="56" comments="32" code="24" executable="5" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="AppContext.php" href="core/AppContext.php.xml">
+          <totals>
+            <lines total="29" comments="7" code="22" executable="3" executed="0" percent="0.00"/>
+            <methods count="3" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="AppException.php" href="core/AppException.php.xml">
+          <totals>
+            <lines total="58" comments="26" code="32" executable="13" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="AppInterface.php" href="core/AppInterface.php.xml">
+          <totals>
+            <lines total="43" comments="29" code="14" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="AtomWriter.php" href="core/AtomWriter.php.xml">
+          <totals>
+            <lines total="143" comments="44" code="99" executable="49" executed="0" percent="0.00"/>
+            <methods count="4" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Authentication.php" href="core/Authentication.php.xml">
+          <totals>
+            <lines total="629" comments="234" code="395" executable="185" executed="0" percent="0.00"/>
+            <methods count="19" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Authorization.php" href="core/Authorization.php.xml">
+          <totals>
+            <lines total="85" comments="41" code="44" executable="10" executed="0" percent="0.00"/>
+            <methods count="5" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="BaseApp.php" href="core/BaseApp.php.xml">
+          <totals>
+            <lines total="109" comments="71" code="38" executable="5" executed="0" percent="0.00"/>
+            <methods count="4" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="BaseModel.php" href="core/BaseModel.php.xml">
+          <totals>
+            <lines total="104" comments="58" code="46" executable="8" executed="0" percent="0.00"/>
+            <methods count="7" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="BlogSchema.php" href="core/BlogSchema.php.xml">
+          <totals>
+            <lines total="103" comments="20" code="83" executable="49" executed="0" percent="0.00"/>
+            <methods count="3" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="BoardInterface.php" href="core/BoardInterface.php.xml">
+          <totals>
+            <lines total="39" comments="27" code="12" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Bootstrap.php" href="core/Bootstrap.php.xml">
+          <totals>
+            <lines total="221" comments="59" code="162" executable="85" executed="0" percent="0.00"/>
+            <methods count="4" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="CSRFGuard.php" href="core/CSRFGuard.php.xml">
+          <totals>
+            <lines total="145" comments="36" code="109" executable="48" executed="0" percent="0.00"/>
+            <methods count="4" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Clean.php" href="core/Clean.php.xml">
+          <totals>
+            <lines total="105" comments="60" code="45" executable="24" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="CoreException.php" href="core/CoreException.php.xml">
+          <totals>
+            <lines total="58" comments="25" code="33" executable="13" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Dao.php" href="core/Dao.php.xml">
+          <totals>
+            <lines total="318" comments="147" code="171" executable="48" executed="0" percent="0.00"/>
+            <methods count="17" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Dashboard.php" href="core/Dashboard.php.xml">
+          <totals>
+            <lines total="65" comments="36" code="29" executable="4" executed="0" percent="0.00"/>
+            <methods count="3" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="DateGenerator.php" href="core/DateGenerator.php.xml">
+          <totals>
+            <lines total="535" comments="131" code="404" executable="283" executed="0" percent="0.00"/>
+            <methods count="12" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Db.php" href="core/Db.php.xml">
+          <totals>
+            <lines total="422" comments="169" code="253" executable="104" executed="0" percent="0.00"/>
+            <methods count="18" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="DbException.php" href="core/DbException.php.xml">
+          <totals>
+            <lines total="47" comments="13" code="34" executable="8" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="DbFactory.php" href="core/DbFactory.php.xml">
+          <totals>
+            <lines total="45" comments="18" code="27" executable="12" executed="0" percent="0.00"/>
+            <methods count="1" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="DbInterface.php" href="core/DbInterface.php.xml">
+          <totals>
+            <lines total="108" comments="78" code="30" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="DbMySQLi.php" href="core/DbMySQLi.php.xml">
+          <totals>
+            <lines total="476" comments="174" code="302" executable="114" executed="0" percent="0.00"/>
+            <methods count="22" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="DebugRoute.php" href="core/DebugRoute.php.xml">
+          <totals>
+            <lines total="85" comments="18" code="67" executable="30" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Dispatcher.php" href="core/Dispatcher.php.xml">
+          <totals>
+            <lines total="330" comments="105" code="225" executable="115" executed="0" percent="0.00"/>
+            <methods count="10" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ExportException.php" href="core/ExportException.php.xml">
+          <totals>
+            <lines total="23" comments="12" code="11" executable="2" executed="0" percent="0.00"/>
+            <methods count="1" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="FormValidator.php" href="core/FormValidator.php.xml">
+          <totals>
+            <lines total="250" comments="48" code="202" executable="92" executed="0" percent="0.00"/>
+            <methods count="7" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="FrontHelper.php" href="core/FrontHelper.php.xml">
+          <totals>
+            <lines total="376" comments="112" code="264" executable="91" executed="0" percent="0.00"/>
+            <methods count="13" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="HTMLPurifier.auto.php" href="core/HTMLPurifier.auto.php.xml">
+          <totals>
+            <lines total="12" comments="4" code="8" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="HTMLPurifier.autoload-legacy.php" href="core/HTMLPurifier.autoload-legacy.php.xml">
+          <totals>
+            <lines total="14" comments="6" code="8" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="HTMLPurifier.autoload.php" href="core/HTMLPurifier.autoload.php.xml">
+          <totals>
+            <lines total="26" comments="9" code="17" executable="8" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="HTMLPurifier.composer.php" href="core/HTMLPurifier.composer.php.xml">
+          <totals>
+            <lines total="6" comments="0" code="6" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="HTMLPurifier.func.php" href="core/HTMLPurifier.func.php.xml">
+          <totals>
+            <lines total="26" comments="13" code="13" executable="4" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="HTMLPurifier.includes.php" href="core/HTMLPurifier.includes.php.xml">
+          <totals>
+            <lines total="236" comments="17" code="219" executable="215" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="HTMLPurifier.kses.php" href="core/HTMLPurifier.kses.php.xml">
+          <totals>
+            <lines total="31" comments="5" code="26" executable="14" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="HTMLPurifier.path.php" href="core/HTMLPurifier.path.php.xml">
+          <totals>
+            <lines total="12" comments="6" code="6" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="HTMLPurifier.php" href="core/HTMLPurifier.php.xml">
+          <totals>
+            <lines total="297" comments="152" code="145" executable="72" executed="0" percent="0.00"/>
+            <methods count="6" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="HTMLPurifier.safe-includes.php" href="core/HTMLPurifier.safe-includes.php.xml">
+          <totals>
+            <lines total="230" comments="9" code="221" executable="216" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="HZip.php" href="core/HZip.php.xml">
+          <totals>
+            <lines total="61" comments="24" code="37" executable="20" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="HandleRequest.php" href="core/HandleRequest.php.xml">
+          <totals>
+            <lines total="340" comments="99" code="241" executable="133" executed="0" percent="0.00"/>
+            <methods count="9" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Html.php" href="core/Html.php.xml">
+          <totals>
+            <lines total="587" comments="197" code="390" executable="137" executed="0" percent="0.00"/>
+            <methods count="10" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="I18nManager.php" href="core/I18nManager.php.xml">
+          <totals>
+            <lines total="233" comments="0" code="233" executable="92" executed="0" percent="0.00"/>
+            <methods count="21" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="IAppThrowable.php" href="core/IAppThrowable.php.xml">
+          <totals>
+            <lines total="14" comments="7" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ICoreThrowable.php" href="core/ICoreThrowable.php.xml">
+          <totals>
+            <lines total="14" comments="7" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="IDbThrowable.php" href="core/IDbThrowable.php.xml">
+          <totals>
+            <lines total="14" comments="7" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="IEventThrowable.php" href="core/IEventThrowable.php.xml">
+          <totals>
+            <lines total="14" comments="7" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="IException.php" href="core/IException.php.xml">
+          <totals>
+            <lines total="31" comments="11" code="20" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="IModelThrowable.php" href="core/IModelThrowable.php.xml">
+          <totals>
+            <lines total="17" comments="9" code="8" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="IProviderThrowable.php" href="core/IProviderThrowable.php.xml">
+          <totals>
+            <lines total="16" comments="9" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ISessionThrowable.php" href="core/ISessionThrowable.php.xml">
+          <totals>
+            <lines total="16" comments="9" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="IThrowable.php" href="core/IThrowable.php.xml">
+          <totals>
+            <lines total="39" comments="17" code="22" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="IViewThrowable.php" href="core/IViewThrowable.php.xml">
+          <totals>
+            <lines total="16" comments="9" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ImgCompressor.php" href="core/ImgCompressor.php.xml">
+          <totals>
+            <lines total="144" comments="35" code="109" executable="76" executed="0" percent="0.00"/>
+            <methods count="4" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ImportException.php" href="core/ImportException.php.xml">
+          <totals>
+            <lines total="23" comments="12" code="11" executable="2" executed="0" percent="0.00"/>
+            <methods count="1" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="LocaleDetector.php" href="core/LocaleDetector.php.xml">
+          <totals>
+            <lines total="176" comments="0" code="176" executable="73" executed="0" percent="0.00"/>
+            <methods count="14" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="LocaleRouter.php" href="core/LocaleRouter.php.xml">
+          <totals>
+            <lines total="111" comments="0" code="111" executable="46" executed="0" percent="0.00"/>
+            <methods count="11" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="LogError.php" href="core/LogError.php.xml">
+          <totals>
+            <lines total="131" comments="44" code="87" executable="31" executed="0" percent="0.00"/>
+            <methods count="7" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Mailer.php" href="core/Mailer.php.xml">
+          <totals>
+            <lines total="252" comments="112" code="140" executable="52" executed="0" percent="0.00"/>
+            <methods count="12" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="MedooInit.php" href="core/MedooInit.php.xml">
+          <totals>
+            <lines total="25" comments="8" code="17" executable="3" executed="0" percent="0.00"/>
+            <methods count="1" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="MessageLog.php" href="core/MessageLog.php.xml">
+          <totals>
+            <lines total="220" comments="37" code="183" executable="87" executed="0" percent="0.00"/>
+            <methods count="5" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ModelException.php" href="core/ModelException.php.xml">
+          <totals>
+            <lines total="43" comments="10" code="33" executable="9" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PageCache.php" href="core/PageCache.php.xml">
+          <totals>
+            <lines total="73" comments="25" code="48" executable="11" executed="0" percent="0.00"/>
+            <methods count="5" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Pagination.php" href="core/Pagination.php.xml">
+          <totals>
+            <lines total="120" comments="31" code="89" executable="44" executed="0" percent="0.00"/>
+            <methods count="4" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Paginator.php" href="core/Paginator.php.xml">
+          <totals>
+            <lines total="240" comments="98" code="142" executable="63" executed="0" percent="0.00"/>
+            <methods count="7" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PassPhraseKey.php" href="core/PassPhraseKey.php.xml">
+          <totals>
+            <lines total="148" comments="64" code="84" executable="29" executed="0" percent="0.00"/>
+            <methods count="6" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ProviderException.php" href="core/ProviderException.php.xml">
+          <totals>
+            <lines total="42" comments="10" code="32" executable="9" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="RSSWriter.php" href="core/RSSWriter.php.xml">
+          <totals>
+            <lines total="46" comments="10" code="36" executable="15" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Random.php" href="core/Random.php.xml">
+          <totals>
+            <lines total="283" comments="78" code="205" executable="110" executed="0" percent="0.00"/>
+            <methods count="12" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Registry.php" href="core/Registry.php.xml">
+          <totals>
+            <lines total="130" comments="80" code="50" executable="12" executed="0" percent="0.00"/>
+            <methods count="7" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="RemoteAddress.php" href="core/RemoteAddress.php.xml">
+          <totals>
+            <lines total="170" comments="86" code="84" executable="31" executed="0" percent="0.00"/>
+            <methods count="7" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="RequestPath.php" href="core/RequestPath.php.xml">
+          <totals>
+            <lines total="184" comments="62" code="122" executable="45" executed="0" percent="0.00"/>
+            <methods count="12" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Resize.php" href="core/Resize.php.xml">
+          <totals>
+            <lines total="279" comments="65" code="214" executable="117" executed="0" percent="0.00"/>
+            <methods count="10" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ResponsiveCaptcha.php" href="core/ResponsiveCaptcha.php.xml">
+          <totals>
+            <lines total="643" comments="134" code="509" executable="190" executed="0" percent="0.00"/>
+            <methods count="12" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Sanitize.php" href="core/Sanitize.php.xml">
+          <totals>
+            <lines total="79" comments="32" code="47" executable="21" executed="0" percent="0.00"/>
+            <methods count="4" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ScriptlogCryptonize.php" href="core/ScriptlogCryptonize.php.xml">
+          <totals>
+            <lines total="554" comments="153" code="401" executable="218" executed="0" percent="0.00"/>
+            <methods count="16" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ScriptlogCryptonizeException.php" href="core/ScriptlogCryptonizeException.php.xml">
+          <totals>
+            <lines total="16" comments="9" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ScriptlogScanner.php" href="core/ScriptlogScanner.php.xml">
+          <totals>
+            <lines total="52" comments="9" code="43" executable="9" executed="0" percent="0.00"/>
+            <methods count="6" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="SearchFinder.php" href="core/SearchFinder.php.xml">
+          <totals>
+            <lines total="226" comments="55" code="171" executable="67" executed="0" percent="0.00"/>
+            <methods count="7" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ServiceException.php" href="core/ServiceException.php.xml">
+          <totals>
+            <lines total="43" comments="10" code="33" executable="9" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Session.php" href="core/Session.php.xml">
+          <totals>
+            <lines total="87" comments="13" code="74" executable="18" executed="0" percent="0.00"/>
+            <methods count="7" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="SessionMaker.php" href="core/SessionMaker.php.xml">
+          <totals>
+            <lines total="344" comments="125" code="219" executable="91" executed="0" percent="0.00"/>
+            <methods count="13" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="SessionMakerException.php" href="core/SessionMakerException.php.xml">
+          <totals>
+            <lines total="16" comments="9" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Sitemap.php" href="core/Sitemap.php.xml">
+          <totals>
+            <lines total="274" comments="109" code="165" executable="64" executed="0" percent="0.00"/>
+            <methods count="18" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="SitemapService.php" href="core/SitemapService.php.xml">
+          <totals>
+            <lines total="83" comments="45" code="38" executable="10" executed="0" percent="0.00"/>
+            <methods count="4" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="SyntaxHighlight.php" href="core/SyntaxHighlight.php.xml">
+          <totals>
+            <lines total="94" comments="24" code="70" executable="30" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Tokenizer.php" href="core/Tokenizer.php.xml">
+          <totals>
+            <lines total="145" comments="69" code="76" executable="28" executed="0" percent="0.00"/>
+            <methods count="5" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="TranslationLoader.php" href="core/TranslationLoader.php.xml">
+          <totals>
+            <lines total="216" comments="0" code="216" executable="87" executed="0" percent="0.00"/>
+            <methods count="17" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Ubench.php" href="core/Ubench.php.xml">
+          <totals>
+            <lines total="204" comments="86" code="118" executable="42" executed="0" percent="0.00"/>
+            <methods count="10" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Util.php" href="core/Util.php.xml">
+          <totals>
+            <lines total="2541" comments="783" code="1758" executable="794" executed="0" percent="0.00"/>
+            <methods count="67" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="View.php" href="core/View.php.xml">
+          <totals>
+            <lines total="137" comments="58" code="79" executable="29" executed="0" percent="0.00"/>
+            <methods count="4" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ViewException.php" href="core/ViewException.php.xml">
+          <totals>
+            <lines total="17" comments="10" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="Wall.php" href="core/Wall.php.xml">
+          <totals>
+            <lines total="74" comments="34" code="40" executable="15" executed="0" percent="0.00"/>
+            <methods count="4" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+      <directory name="dao">
+        <totals>
+          <lines total="5177" comments="1579" code="3598" executable="1618" executed="0" percent="0.00"/>
+          <methods count="242" tested="0" percent="0.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="19" tested="0" percent="0.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+        <file name="CommentDao.php" href="dao/CommentDao.php.xml">
+          <totals>
+            <lines total="239" comments="92" code="147" executable="56" executed="0" percent="0.00"/>
+            <methods count="11" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ConfigurationDao.php" href="dao/ConfigurationDao.php.xml">
+          <totals>
+            <lines total="284" comments="111" code="173" executable="71" executed="0" percent="0.00"/>
+            <methods count="14" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ConsentDao.php" href="dao/ConsentDao.php.xml">
+          <totals>
+            <lines total="172" comments="66" code="106" executable="41" executed="0" percent="0.00"/>
+            <methods count="9" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="DataRequestDao.php" href="dao/DataRequestDao.php.xml">
+          <totals>
+            <lines total="167" comments="72" code="95" executable="39" executed="0" percent="0.00"/>
+            <methods count="10" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="LanguageDao.php" href="dao/LanguageDao.php.xml">
+          <totals>
+            <lines total="90" comments="0" code="90" executable="38" executed="0" percent="0.00"/>
+            <methods count="11" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="MediaDao.php" href="dao/MediaDao.php.xml">
+          <totals>
+            <lines total="655" comments="173" code="482" executable="212" executed="0" percent="0.00"/>
+            <methods count="22" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="MenuDao.php" href="dao/MenuDao.php.xml">
+          <totals>
+            <lines total="397" comments="127" code="270" executable="130" executed="0" percent="0.00"/>
+            <methods count="16" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PageDao.php" href="dao/PageDao.php.xml">
+          <totals>
+            <lines total="332" comments="86" code="246" executable="120" executed="0" percent="0.00"/>
+            <methods count="11" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PluginDao.php" href="dao/PluginDao.php.xml">
+          <totals>
+            <lines total="341" comments="124" code="217" executable="93" executed="0" percent="0.00"/>
+            <methods count="16" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PostDao.php" href="dao/PostDao.php.xml">
+          <totals>
+            <lines total="520" comments="110" code="410" executable="226" executed="0" percent="0.00"/>
+            <methods count="13" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PostTopicDao.php" href="dao/PostTopicDao.php.xml">
+          <totals>
+            <lines total="108" comments="33" code="75" executable="22" executed="0" percent="0.00"/>
+            <methods count="4" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PrivacyLogDao.php" href="dao/PrivacyLogDao.php.xml">
+          <totals>
+            <lines total="171" comments="73" code="98" executable="41" executed="0" percent="0.00"/>
+            <methods count="10" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PrivacyPolicyDao.php" href="dao/PrivacyPolicyDao.php.xml">
+          <totals>
+            <lines total="70" comments="0" code="70" executable="27" executed="0" percent="0.00"/>
+            <methods count="9" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ReplyDao.php" href="dao/ReplyDao.php.xml">
+          <totals>
+            <lines total="247" comments="75" code="172" executable="76" executed="0" percent="0.00"/>
+            <methods count="11" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ThemeDao.php" href="dao/ThemeDao.php.xml">
+          <totals>
+            <lines total="239" comments="108" code="131" executable="59" executed="0" percent="0.00"/>
+            <methods count="12" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="TopicDao.php" href="dao/TopicDao.php.xml">
+          <totals>
+            <lines total="277" comments="88" code="189" executable="100" executed="0" percent="0.00"/>
+            <methods count="11" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="TranslationDao.php" href="dao/TranslationDao.php.xml">
+          <totals>
+            <lines total="202" comments="0" code="202" executable="87" executed="0" percent="0.00"/>
+            <methods count="22" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="UserDao.php" href="dao/UserDao.php.xml">
+          <totals>
+            <lines total="555" comments="193" code="362" executable="164" executed="0" percent="0.00"/>
+            <methods count="24" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="UserTokenDao.php" href="dao/UserTokenDao.php.xml">
+          <totals>
+            <lines total="111" comments="48" code="63" executable="16" executed="0" percent="0.00"/>
+            <methods count="6" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+      <directory name="model">
+        <totals>
+          <lines total="1640" comments="631" code="1009" executable="339" executed="0" percent="0.00"/>
+          <methods count="61" tested="0" percent="0.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="9" tested="0" percent="0.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+        <file name="ArchivesModel.php" href="model/ArchivesModel.php.xml">
+          <totals>
+            <lines total="141" comments="50" code="91" executable="31" executed="0" percent="0.00"/>
+            <methods count="4" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="CommentModel.php" href="model/CommentModel.php.xml">
+          <totals>
+            <lines total="35" comments="15" code="20" executable="10" executed="0" percent="0.00"/>
+            <methods count="1" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="DownloadModel.php" href="model/DownloadModel.php.xml">
+          <totals>
+            <lines total="262" comments="88" code="174" executable="80" executed="0" percent="0.00"/>
+            <methods count="12" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="FrontContentModel.php" href="model/FrontContentModel.php.xml">
+          <totals>
+            <lines total="393" comments="227" code="166" executable="49" executed="0" percent="0.00"/>
+            <methods count="23" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="GalleryModel.php" href="model/GalleryModel.php.xml">
+          <totals>
+            <lines total="35" comments="16" code="19" executable="6" executed="0" percent="0.00"/>
+            <methods count="1" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PageModel.php" href="model/PageModel.php.xml">
+          <totals>
+            <lines total="99" comments="31" code="68" executable="18" executed="0" percent="0.00"/>
+            <methods count="3" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PostModel.php" href="model/PostModel.php.xml">
+          <totals>
+            <lines total="378" comments="109" code="269" executable="79" executed="0" percent="0.00"/>
+            <methods count="10" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="TagModel.php" href="model/TagModel.php.xml">
+          <totals>
+            <lines total="106" comments="32" code="74" executable="24" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="TopicModel.php" href="model/TopicModel.php.xml">
+          <totals>
+            <lines total="191" comments="63" code="128" executable="42" executed="0" percent="0.00"/>
+            <methods count="5" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+      <directory name="service">
+        <totals>
+          <lines total="7304" comments="2669" code="4635" executable="1964" executed="0" percent="0.00"/>
+          <methods count="364" tested="0" percent="0.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="19" tested="0" percent="0.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+        <file name="CommentService.php" href="service/CommentService.php.xml">
+          <totals>
+            <lines total="210" comments="85" code="125" executable="29" executed="0" percent="0.00"/>
+            <methods count="16" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ConfigurationService.php" href="service/ConfigurationService.php.xml">
+          <totals>
+            <lines total="194" comments="74" code="120" executable="32" executed="0" percent="0.00"/>
+            <methods count="15" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ConsentService.php" href="service/ConsentService.php.xml">
+          <totals>
+            <lines total="169" comments="87" code="82" executable="24" executed="0" percent="0.00"/>
+            <methods count="9" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="DataRequestService.php" href="service/DataRequestService.php.xml">
+          <totals>
+            <lines total="282" comments="86" code="196" executable="111" executed="0" percent="0.00"/>
+            <methods count="9" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="DownloadService.php" href="service/DownloadService.php.xml">
+          <totals>
+            <lines total="393" comments="152" code="241" executable="105" executed="0" percent="0.00"/>
+            <methods count="24" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ExportService.php" href="service/ExportService.php.xml">
+          <totals>
+            <lines total="366" comments="96" code="270" executable="140" executed="0" percent="0.00"/>
+            <methods count="15" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="LanguageService.php" href="service/LanguageService.php.xml">
+          <totals>
+            <lines total="148" comments="9" code="139" executable="55" executed="0" percent="0.00"/>
+            <methods count="12" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="MediaService.php" href="service/MediaService.php.xml">
+          <totals>
+            <lines total="612" comments="292" code="320" executable="128" executed="0" percent="0.00"/>
+            <methods count="29" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="MenuService.php" href="service/MenuService.php.xml">
+          <totals>
+            <lines total="390" comments="198" code="192" executable="61" executed="0" percent="0.00"/>
+            <methods count="22" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="MigrationService.php" href="service/MigrationService.php.xml">
+          <totals>
+            <lines total="974" comments="183" code="791" executable="471" executed="0" percent="0.00"/>
+            <methods count="30" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="NotificationService.php" href="service/NotificationService.php.xml">
+          <totals>
+            <lines total="415" comments="104" code="311" executable="111" executed="0" percent="0.00"/>
+            <methods count="11" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PageService.php" href="service/PageService.php.xml">
+          <totals>
+            <lines total="579" comments="281" code="298" executable="121" executed="0" percent="0.00"/>
+            <methods count="26" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PluginService.php" href="service/PluginService.php.xml">
+          <totals>
+            <lines total="290" comments="89" code="201" executable="67" executed="0" percent="0.00"/>
+            <methods count="19" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="PostService.php" href="service/PostService.php.xml">
+          <totals>
+            <lines total="677" comments="319" code="358" executable="148" executed="0" percent="0.00"/>
+            <methods count="31" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ReplyService.php" href="service/ReplyService.php.xml">
+          <totals>
+            <lines total="223" comments="62" code="161" executable="52" executed="0" percent="0.00"/>
+            <methods count="19" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ThemeService.php" href="service/ThemeService.php.xml">
+          <totals>
+            <lines total="273" comments="129" code="144" executable="50" executed="0" percent="0.00"/>
+            <methods count="15" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="TopicService.php" href="service/TopicService.php.xml">
+          <totals>
+            <lines total="229" comments="118" code="111" executable="32" executed="0" percent="0.00"/>
+            <methods count="13" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="TranslationService.php" href="service/TranslationService.php.xml">
+          <totals>
+            <lines total="225" comments="0" code="225" executable="99" executed="0" percent="0.00"/>
+            <methods count="18" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="UserService.php" href="service/UserService.php.xml">
+          <totals>
+            <lines total="655" comments="305" code="350" executable="128" executed="0" percent="0.00"/>
+            <methods count="31" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+      <directory name="utility">
+        <totals>
+          <lines total="18404" comments="5177" code="13227" executable="7259" executed="26" percent="0.36"/>
+          <methods count="105" tested="0" percent="0.00"/>
+          <functions count="414" tested="1" percent="0.24"/>
+          <classes count="10" tested="0" percent="0.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+        <file name="absolute-path.php" href="utility/absolute-path.php.xml">
+          <totals>
+            <lines total="37" comments="12" code="25" executable="10" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="absolute-url.php" href="utility/absolute-url.php.xml">
+          <totals>
+            <lines total="53" comments="20" code="33" executable="14" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="access-control-list.php" href="utility/access-control-list.php.xml">
+          <totals>
+            <lines total="30" comments="14" code="16" executable="5" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="add-http.php" href="utility/add-http.php.xml">
+          <totals>
+            <lines total="39" comments="22" code="17" executable="4" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="admin-query.php" href="utility/admin-query.php.xml">
+          <totals>
+            <lines total="49" comments="12" code="37" executable="30" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="admin-tag-title.php" href="utility/admin-tag-title.php.xml">
+          <totals>
+            <lines total="129" comments="12" code="117" executable="62" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="admin-translations.php" href="utility/admin-translations.php.xml">
+          <totals>
+            <lines total="781" comments="23" code="758" executable="692" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="7" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="app-config.php" href="utility/app-config.php.xml">
+          <totals>
+            <lines total="33" comments="21" code="12" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="app-info.php" href="utility/app-info.php.xml">
+          <totals>
+            <lines total="67" comments="13" code="54" executable="38" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="app-key.php" href="utility/app-key.php.xml">
+          <totals>
+            <lines total="64" comments="28" code="36" executable="15" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="app-reading-setting.php" href="utility/app-reading-setting.php.xml">
+          <totals>
+            <lines total="47" comments="8" code="39" executable="19" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="app-sitename.php" href="utility/app-sitename.php.xml">
+          <totals>
+            <lines total="17" comments="9" code="8" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="app-tagline.php" href="utility/app-tagline.php.xml">
+          <totals>
+            <lines total="19" comments="11" code="8" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="app-url.php" href="utility/app-url.php.xml">
+          <totals>
+            <lines total="20" comments="12" code="8" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="archive-scanner.php" href="utility/archive-scanner.php.xml">
+          <totals>
+            <lines total="53" comments="15" code="38" executable="12" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="autolink.php" href="utility/autolink.php.xml">
+          <totals>
+            <lines total="18" comments="9" code="9" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="autoloader.php" href="utility/autoloader.php.xml">
+          <totals>
+            <lines total="168" comments="65" code="103" executable="60" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="block-request-type.php" href="utility/block-request-type.php.xml">
+          <totals>
+            <lines total="27" comments="11" code="16" executable="5" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="build-query.php" href="utility/build-query.php.xml">
+          <totals>
+            <lines total="20" comments="12" code="8" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="call-htmlpurifier.php" href="utility/call-htmlpurifier.php.xml">
+          <totals>
+            <lines total="19" comments="10" code="9" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="catch-weblink.php" href="utility/catch-weblink.php.xml">
+          <totals>
+            <lines total="42" comments="14" code="28" executable="11" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="certificate-authority.php" href="utility/certificate-authority.php.xml">
+          <totals>
+            <lines total="36" comments="12" code="24" executable="13" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="check-disabled-functions.php" href="utility/check-disabled-functions.php.xml">
+          <totals>
+            <lines total="24" comments="9" code="15" executable="7" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="check-file-extension.php" href="utility/check-file-extension.php.xml">
+          <totals>
+            <lines total="76" comments="17" code="59" executable="34" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="check-file-length.php" href="utility/check-file-length.php.xml">
+          <totals>
+            <lines total="16" comments="9" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="check-file-name.php" href="utility/check-file-name.php.xml">
+          <totals>
+            <lines total="16" comments="9" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="check-integer.php" href="utility/check-integer.php.xml">
+          <totals>
+            <lines total="16" comments="9" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="check-internet-connection.php" href="utility/check-internet-connection.php.xml">
+          <totals>
+            <lines total="91" comments="29" code="62" executable="27" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="4" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="check-mime-type.php" href="utility/check-mime-type.php.xml">
+          <totals>
+            <lines total="53" comments="14" code="39" executable="21" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="check-online.php" href="utility/check-online.php.xml">
+          <totals>
+            <lines total="35" comments="12" code="23" executable="8" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="check-pwd-strength.php" href="utility/check-pwd-strength.php.xml">
+          <totals>
+            <lines total="54" comments="28" code="26" executable="9" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="check-request-generated.php" href="utility/check-request-generated.php.xml">
+          <totals>
+            <lines total="26" comments="9" code="17" executable="6" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="check-upload-filesize.php" href="utility/check-upload-filesize.php.xml">
+          <totals>
+            <lines total="21" comments="13" code="8" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="check-weblink.php" href="utility/check-weblink.php.xml">
+          <totals>
+            <lines total="53" comments="21" code="32" executable="15" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="clip.php" href="utility/clip.php.xml">
+          <totals>
+            <lines total="47" comments="25" code="22" executable="9" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="comment-submission.php" href="utility/comment-submission.php.xml">
+          <totals>
+            <lines total="282" comments="68" code="214" executable="114" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="9" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="convert-to-paragraph.php" href="utility/convert-to-paragraph.php.xml">
+          <totals>
+            <lines total="21" comments="11" code="10" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="cookie-consent.php" href="utility/cookie-consent.php.xml">
+          <totals>
+            <lines total="142" comments="53" code="89" executable="35" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="7" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="cookies-baked.php" href="utility/cookies-baked.php.xml">
+          <totals>
+            <lines total="135" comments="80" code="55" executable="21" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="5" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="create-directory.php" href="utility/create-directory.php.xml">
+          <totals>
+            <lines total="21" comments="11" code="10" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="create-thumbnail.php" href="utility/create-thumbnail.php.xml">
+          <totals>
+            <lines total="143" comments="34" code="109" executable="58" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="csrf-defender.php" href="utility/csrf-defender.php.xml">
+          <totals>
+            <lines total="38" comments="24" code="14" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="current-http-version.php" href="utility/current-http-version.php.xml">
+          <totals>
+            <lines total="25" comments="11" code="14" executable="4" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="current-load-page.php" href="utility/current-load-page.php.xml">
+          <totals>
+            <lines total="15" comments="8" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="current-load-url.php" href="utility/current-load-url.php.xml">
+          <totals>
+            <lines total="30" comments="8" code="22" executable="8" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="current-request-method.php" href="utility/current-request-method.php.xml">
+          <totals>
+            <lines total="19" comments="11" code="8" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="date-conversion.php" href="utility/date-conversion.php.xml">
+          <totals>
+            <lines total="116" comments="37" code="79" executable="36" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="4" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="date-for-database.php" href="utility/date-for-database.php.xml">
+          <totals>
+            <lines total="27" comments="9" code="18" executable="7" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="delete-directory.php" href="utility/delete-directory.php.xml">
+          <totals>
+            <lines total="70" comments="27" code="43" executable="17" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="detect-origin.php" href="utility/detect-origin.php.xml">
+          <totals>
+            <lines total="26" comments="10" code="16" executable="6" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="detect-proxies.php" href="utility/detect-proxies.php.xml">
+          <totals>
+            <lines total="58" comments="19" code="39" executable="31" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="detect-web-server.php" href="utility/detect-web-server.php.xml">
+          <totals>
+            <lines total="48" comments="17" code="31" executable="13" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="direct-page.php" href="utility/direct-page.php.xml">
+          <totals>
+            <lines total="81" comments="16" code="65" executable="52" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="displaying-greeting.php" href="utility/displaying-greeting.php.xml">
+          <totals>
+            <lines total="27" comments="8" code="19" executable="8" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="distill-post-request.php" href="utility/distill-post-request.php.xml">
+          <totals>
+            <lines total="25" comments="13" code="12" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="distrib-name.php" href="utility/distrib-name.php.xml">
+          <totals>
+            <lines total="24" comments="13" code="11" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="do-logout.php" href="utility/do-logout.php.xml">
+          <totals>
+            <lines total="71" comments="33" code="38" executable="12" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="download-handler.php" href="utility/download-handler.php.xml">
+          <totals>
+            <lines total="207" comments="70" code="137" executable="75" executed="0" percent="0.00"/>
+            <methods count="9" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="download-settings.php" href="utility/download-settings.php.xml">
+          <totals>
+            <lines total="306" comments="102" code="204" executable="62" executed="0" percent="0.00"/>
+            <methods count="16" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="dropdown.php" href="utility/dropdown.php.xml">
+          <totals>
+            <lines total="37" comments="16" code="21" executable="7" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="email-validation.php" href="utility/email-validation.php.xml">
+          <totals>
+            <lines total="72" comments="48" code="24" executable="4" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="encode-email-address.php" href="utility/encode-email-address.php.xml">
+          <totals>
+            <lines total="23" comments="9" code="14" executable="4" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="encrypt-decrypt.php" href="utility/encrypt-decrypt.php.xml">
+          <totals>
+            <lines total="102" comments="33" code="69" executable="32" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="escape-html.php" href="utility/escape-html.php.xml">
+          <totals>
+            <lines total="83" comments="40" code="43" executable="15" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="escape-null-byte.php" href="utility/escape-null-byte.php.xml">
+          <totals>
+            <lines total="21" comments="11" code="10" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="export-blogspot.php" href="utility/export-blogspot.php.xml">
+          <totals>
+            <lines total="224" comments="47" code="177" executable="111" executed="0" percent="0.00"/>
+            <methods count="6" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="export-ghost.php" href="utility/export-ghost.php.xml">
+          <totals>
+            <lines total="380" comments="85" code="295" executable="197" executed="0" percent="0.00"/>
+            <methods count="11" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="export-scriptlog.php" href="utility/export-scriptlog.php.xml">
+          <totals>
+            <lines total="284" comments="65" code="219" executable="119" executed="0" percent="0.00"/>
+            <methods count="10" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="export-wordpress.php" href="utility/export-wordpress.php.xml">
+          <totals>
+            <lines total="295" comments="61" code="234" executable="142" executed="0" percent="0.00"/>
+            <methods count="8" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="extract-keywords.php" href="utility/extract-keywords.php.xml">
+          <totals>
+            <lines total="26" comments="11" code="15" executable="7" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="find-webserver-name.php" href="utility/find-webserver-name.php.xml">
+          <totals>
+            <lines total="23" comments="11" code="12" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="finding-pwd-cost.php" href="utility/finding-pwd-cost.php.xml">
+          <totals>
+            <lines total="31" comments="16" code="15" executable="6" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="forbidden-direct-access.php" href="utility/forbidden-direct-access.php.xml">
+          <totals>
+            <lines total="15" comments="7" code="8" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="forbidden-id.php" href="utility/forbidden-id.php.xml">
+          <totals>
+            <lines total="15" comments="8" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="form-action.php" href="utility/form-action.php.xml">
+          <totals>
+            <lines total="39" comments="10" code="29" executable="15" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="form-filled-validation.php" href="utility/form-filled-validation.php.xml">
+          <totals>
+            <lines total="29" comments="15" code="14" executable="4" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="form-id.php" href="utility/form-id.php.xml">
+          <totals>
+            <lines total="38" comments="10" code="28" executable="13" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="form-security.php" href="utility/form-security.php.xml">
+          <totals>
+            <lines total="120" comments="58" code="62" executable="25" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="4" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="form-size-validation.php" href="utility/form-size-validation.php.xml">
+          <totals>
+            <lines total="22" comments="7" code="15" executable="5" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="format-size-unit.php" href="utility/format-size-unit.php.xml">
+          <totals>
+            <lines total="30" comments="8" code="22" executable="12" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="front-paginator.php" href="utility/front-paginator.php.xml">
+          <totals>
+            <lines total="17" comments="10" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="front-sanitizer.php" href="utility/front-sanitizer.php.xml">
+          <totals>
+            <lines total="15" comments="8" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="generate-filename.php" href="utility/generate-filename.php.xml">
+          <totals>
+            <lines total="23" comments="9" code="14" executable="4" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="generate-hash.php" href="utility/generate-hash.php.xml">
+          <totals>
+            <lines total="25" comments="7" code="18" executable="8" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="generate-media-identifier.php" href="utility/generate-media-identifier.php.xml">
+          <totals>
+            <lines total="41" comments="20" code="21" executable="9" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="generate-request.php" href="utility/generate-request.php.xml">
+          <totals>
+            <lines total="103" comments="13" code="90" executable="49" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="generate-session-key.php" href="utility/generate-session-key.php.xml">
+          <totals>
+            <lines total="26" comments="12" code="14" executable="4" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="generate-token.php" href="utility/generate-token.php.xml">
+          <totals>
+            <lines total="24" comments="10" code="14" executable="5" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="get-browser-name.php" href="utility/get-browser-name.php.xml">
+          <totals>
+            <lines total="84" comments="16" code="68" executable="47" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="get-directory-size.php" href="utility/get-directory-size.php.xml">
+          <totals>
+            <lines total="78" comments="24" code="54" executable="21" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="get-file-extension.php" href="utility/get-file-extension.php.xml">
+          <totals>
+            <lines total="99" comments="47" code="52" executable="15" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="5" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="get-image-type.php" href="utility/get-image-type.php.xml">
+          <totals>
+            <lines total="89" comments="9" code="80" executable="37" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="get-ip-address.php" href="utility/get-ip-address.php.xml">
+          <totals>
+            <lines total="212" comments="74" code="138" executable="69" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="9" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="get-mime.php" href="utility/get-mime.php.xml">
+          <totals>
+            <lines total="76" comments="16" code="60" executable="41" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="get-os.php" href="utility/get-os.php.xml">
+          <totals>
+            <lines total="170" comments="28" code="142" executable="92" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="get-request-header.php" href="utility/get-request-header.php.xml">
+          <totals>
+            <lines total="25" comments="9" code="16" executable="5" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="get-server-load.php" href="utility/get-server-load.php.xml">
+          <totals>
+            <lines total="104" comments="23" code="81" executable="43" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="get-table-prefix.php" href="utility/get-table-prefix.php.xml">
+          <totals>
+            <lines total="28" comments="9" code="19" executable="8" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="hide-email.php" href="utility/hide-email.php.xml">
+          <totals>
+            <lines total="37" comments="10" code="27" executable="12" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="htmlawed.php" href="utility/htmlawed.php.xml">
+          <totals>
+            <lines total="1627" comments="214" code="1413" executable="1016" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="14" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="human-login.php" href="utility/human-login.php.xml">
+          <totals>
+            <lines total="273" comments="107" code="166" executable="85" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="6" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="human-readable-datetime.php" href="utility/human-readable-datetime.php.xml">
+          <totals>
+            <lines total="18" comments="11" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="image-encoder.php" href="utility/image-encoder.php.xml">
+          <totals>
+            <lines total="30" comments="20" code="10" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="import-blogspot.php" href="utility/import-blogspot.php.xml">
+          <totals>
+            <lines total="448" comments="63" code="385" executable="224" executed="0" percent="0.00"/>
+            <methods count="10" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="import-ghost.php" href="utility/import-ghost.php.xml">
+          <totals>
+            <lines total="384" comments="73" code="311" executable="178" executed="0" percent="0.00"/>
+            <methods count="12" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="import-scriptlog.php" href="utility/import-scriptlog.php.xml">
+          <totals>
+            <lines total="188" comments="69" code="119" executable="44" executed="0" percent="0.00"/>
+            <methods count="12" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="import-wordpress.php" href="utility/import-wordpress.php.xml">
+          <totals>
+            <lines total="384" comments="70" code="314" executable="183" executed="0" percent="0.00"/>
+            <methods count="11" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="invoke-audio-uploaded.php" href="utility/invoke-audio-uploaded.php.xml">
+          <totals>
+            <lines total="22" comments="8" code="14" executable="4" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="invoke-config.php" href="utility/invoke-config.php.xml">
+          <totals>
+            <lines total="39" comments="18" code="21" executable="6" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="invoke-fileicon.php" href="utility/invoke-fileicon.php.xml">
+          <totals>
+            <lines total="75" comments="11" code="64" executable="28" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="invoke-frontimg.php" href="utility/invoke-frontimg.php.xml">
+          <totals>
+            <lines total="24" comments="7" code="17" executable="6" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="invoke-image-uploaded.php" href="utility/invoke-image-uploaded.php.xml">
+          <totals>
+            <lines total="32" comments="10" code="22" executable="8" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="invoke-plugin.php" href="utility/invoke-plugin.php.xml">
+          <totals>
+            <lines total="123" comments="51" code="72" executable="27" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="6" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="invoke-responsive-image.php" href="utility/invoke-responsive-image.php.xml">
+          <totals>
+            <lines total="174" comments="44" code="130" executable="72" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="invoke-video-uploaded.php" href="utility/invoke-video-uploaded.php.xml">
+          <totals>
+            <lines total="26" comments="8" code="18" executable="6" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="invoke-webp-image.php" href="utility/invoke-webp-image.php.xml">
+          <totals>
+            <lines total="45" comments="11" code="34" executable="16" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ips.php" href="utility/ips.php.xml">
+          <totals>
+            <lines total="102" comments="43" code="59" executable="20" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="4" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="is-json-valid.php" href="utility/is-json-valid.php.xml">
+          <totals>
+            <lines total="19" comments="10" code="9" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="is-non-administrator.php" href="utility/is-non-administrator.php.xml">
+          <totals>
+            <lines total="32" comments="10" code="22" executable="10" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="is-ssl.php" href="utility/is-ssl.php.xml">
+          <totals>
+            <lines total="33" comments="13" code="20" executable="7" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="is-valid-domain.php" href="utility/is-valid-domain.php.xml">
+          <totals>
+            <lines total="56" comments="20" code="36" executable="14" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="is-valid-utf8.php" href="utility/is-valid-utf8.php.xml">
+          <totals>
+            <lines total="37" comments="12" code="25" executable="6" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="limit-word.php" href="utility/limit-word.php.xml">
+          <totals>
+            <lines total="38" comments="17" code="21" executable="7" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="login-attempt.php" href="utility/login-attempt.php.xml">
+          <totals>
+            <lines total="184" comments="75" code="109" executable="43" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="10" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="make-date.php" href="utility/make-date.php.xml">
+          <totals>
+            <lines total="96" comments="15" code="81" executable="30" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="make-slug.php" href="utility/make-slug.php.xml">
+          <totals>
+            <lines total="40" comments="14" code="26" executable="10" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="media-properties.php" href="utility/media-properties.php.xml">
+          <totals>
+            <lines total="14" comments="7" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="medialib-link.php" href="utility/medialib-link.php.xml">
+          <totals>
+            <lines total="74" comments="9" code="65" executable="30" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="medooin.php" href="utility/medooin.php.xml">
+          <totals>
+            <lines total="427" comments="151" code="276" executable="170" executed="26" percent="15.29"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="14" tested="1" percent="7.14"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="membership.php" href="utility/membership.php.xml">
+          <totals>
+            <lines total="83" comments="25" code="58" executable="23" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="mime-type-dictionary.php" href="utility/mime-type-dictionary.php.xml">
+          <totals>
+            <lines total="55" comments="13" code="42" executable="27" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="navigation-helper.php" href="utility/navigation-helper.php.xml">
+          <totals>
+            <lines total="34" comments="14" code="20" executable="6" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="notfound-id.php" href="utility/notfound-id.php.xml">
+          <totals>
+            <lines total="19" comments="12" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="notify-new-user.php" href="utility/notify-new-user.php.xml">
+          <totals>
+            <lines total="55" comments="11" code="44" executable="26" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="number-cpus.php" href="utility/number-cpus.php.xml">
+          <totals>
+            <lines total="55" comments="11" code="44" executable="20" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="on-page-optimization.php" href="utility/on-page-optimization.php.xml">
+          <totals>
+            <lines total="108" comments="42" code="66" executable="40" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="page-cache.php" href="utility/page-cache.php.xml">
+          <totals>
+            <lines total="137" comments="47" code="90" executable="37" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="7" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="paragraph-trim.php" href="utility/paragraph-trim.php.xml">
+          <totals>
+            <lines total="92" comments="26" code="66" executable="32" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="parse-post-id.php" href="utility/parse-post-id.php.xml">
+          <totals>
+            <lines total="32" comments="11" code="21" executable="8" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="parse-query.php" href="utility/parse-query.php.xml">
+          <totals>
+            <lines total="26" comments="8" code="18" executable="9" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="permalinks.php" href="utility/permalinks.php.xml">
+          <totals>
+            <lines total="177" comments="42" code="135" executable="75" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="4" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="plugin-helper.php" href="utility/plugin-helper.php.xml">
+          <totals>
+            <lines total="123" comments="45" code="78" executable="30" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="4" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="plugin-validator.php" href="utility/plugin-validator.php.xml">
+          <totals>
+            <lines total="228" comments="44" code="184" executable="100" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="5" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="prevent-injection.php" href="utility/prevent-injection.php.xml">
+          <totals>
+            <lines total="24" comments="15" code="9" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="protected-post.php" href="utility/protected-post.php.xml">
+          <totals>
+            <lines total="177" comments="57" code="120" executable="48" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="7" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="purify-dirty-html.php" href="utility/purify-dirty-html.php.xml">
+          <totals>
+            <lines total="25" comments="12" code="13" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="random-generator.php" href="utility/random-generator.php.xml">
+          <totals>
+            <lines total="193" comments="91" code="102" executable="43" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="8" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="read-datetime.php" href="utility/read-datetime.php.xml">
+          <totals>
+            <lines total="17" comments="9" code="8" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="regenerate-session.php" href="utility/regenerate-session.php.xml">
+          <totals>
+            <lines total="69" comments="23" code="46" executable="18" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="relative-url.php" href="utility/relative-url.php.xml">
+          <totals>
+            <lines total="18" comments="8" code="10" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="remove-accents.php" href="utility/remove-accents.php.xml">
+          <totals>
+            <lines total="25" comments="11" code="14" executable="4" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="remove-dir-recursive.php" href="utility/remove-dir-recursive.php.xml">
+          <totals>
+            <lines total="29" comments="9" code="20" executable="7" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="remove-xss.php" href="utility/remove-xss.php.xml">
+          <totals>
+            <lines total="45" comments="22" code="23" executable="6" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="rename-file.php" href="utility/rename-file.php.xml">
+          <totals>
+            <lines total="86" comments="41" code="45" executable="21" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="reset-account.php" href="utility/reset-account.php.xml">
+          <totals>
+            <lines total="89" comments="19" code="70" executable="43" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="rewrite-status.php" href="utility/rewrite-status.php.xml">
+          <totals>
+            <lines total="20" comments="11" code="9" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="route-request.php" href="utility/route-request.php.xml">
+          <totals>
+            <lines total="18" comments="11" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="safe-html.php" href="utility/safe-html.php.xml">
+          <totals>
+            <lines total="30" comments="17" code="13" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="sanitize-email.php" href="utility/sanitize-email.php.xml">
+          <totals>
+            <lines total="16" comments="9" code="7" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="sanitize-locale.php" href="utility/sanitize-locale.php.xml">
+          <totals>
+            <lines total="74" comments="0" code="74" executable="54" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="sanitize-selection-box.php" href="utility/sanitize-selection-box.php.xml">
+          <totals>
+            <lines total="94" comments="11" code="83" executable="41" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="sanitize-sql-orderby.php" href="utility/sanitize-sql-orderby.php.xml">
+          <totals>
+            <lines total="21" comments="9" code="12" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="sanitize-urls.php" href="utility/sanitize-urls.php.xml">
+          <totals>
+            <lines total="38" comments="8" code="30" executable="14" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="sanitizer.php" href="utility/sanitizer.php.xml">
+          <totals>
+            <lines total="33" comments="16" code="17" executable="5" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="scriptlog-error.php" href="utility/scriptlog-error.php.xml">
+          <totals>
+            <lines total="154" comments="31" code="123" executable="62" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="4" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="scriptlog-password.php" href="utility/scriptlog-password.php.xml">
+          <totals>
+            <lines total="22" comments="10" code="12" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="scriptlog-upload-filesize.php" href="utility/scriptlog-upload-filesize.php.xml">
+          <totals>
+            <lines total="29" comments="11" code="18" executable="6" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="scriptlog-verify-password.php" href="utility/scriptlog-verify-password.php.xml">
+          <totals>
+            <lines total="16" comments="8" code="8" executable="1" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="secure-http-headers.php" href="utility/secure-http-headers.php.xml">
+          <totals>
+            <lines total="132" comments="66" code="66" executable="35" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="6" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="simple-salt.php" href="utility/simple-salt.php.xml">
+          <totals>
+            <lines total="37" comments="13" code="24" executable="8" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="sitemap-generator.php" href="utility/sitemap-generator.php.xml">
+          <totals>
+            <lines total="22" comments="8" code="14" executable="5" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="start-session-on-site.php" href="utility/start-session-on-site.php.xml">
+          <totals>
+            <lines total="119" comments="26" code="93" executable="61" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="strip-tags-content.php" href="utility/strip-tags-content.php.xml">
+          <totals>
+            <lines total="30" comments="11" code="19" executable="9" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="system-software.php" href="utility/system-software.php.xml">
+          <totals>
+            <lines total="19" comments="10" code="9" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="tagger.php" href="utility/tagger.php.xml">
+          <totals>
+            <lines total="184" comments="69" code="115" executable="48" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="7" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="terminator.php" href="utility/terminator.php.xml">
+          <totals>
+            <lines total="41" comments="14" code="27" executable="12" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="theme-caller.php" href="utility/theme-caller.php.xml">
+          <totals>
+            <lines total="97" comments="49" code="48" executable="13" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="5" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="theme-helpers.php" href="utility/theme-helpers.php.xml">
+          <totals>
+            <lines total="97" comments="43" code="54" executable="18" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="6" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="theme-meta.php" href="utility/theme-meta.php.xml">
+          <totals>
+            <lines total="355" comments="34" code="321" executable="222" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="theme-navigation.php" href="utility/theme-navigation.php.xml">
+          <totals>
+            <lines total="49" comments="9" code="40" executable="20" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="time-elapsed-string.php" href="utility/time-elapsed-string.php.xml">
+          <totals>
+            <lines total="35" comments="10" code="25" executable="15" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="time-keeper.php" href="utility/time-keeper.php.xml">
+          <totals>
+            <lines total="39" comments="16" code="23" executable="8" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="timezone.php" href="utility/timezone.php.xml">
+          <totals>
+            <lines total="115" comments="48" code="67" executable="35" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="4" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="timing-safe-equals.php" href="utility/timing-safe-equals.php.xml">
+          <totals>
+            <lines total="39" comments="14" code="25" executable="11" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="transform-html.php" href="utility/transform-html.php.xml">
+          <totals>
+            <lines total="33" comments="10" code="23" executable="9" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="turn-on-session.php" href="utility/turn-on-session.php.xml">
+          <totals>
+            <lines total="68" comments="26" code="42" executable="25" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="uniqid-real.php" href="utility/uniqid-real.php.xml">
+          <totals>
+            <lines total="25" comments="10" code="15" executable="6" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="unparse-url.php" href="utility/unparse-url.php.xml">
+          <totals>
+            <lines total="25" comments="9" code="16" executable="10" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="unreg-globals.php" href="utility/unreg-globals.php.xml">
+          <totals>
+            <lines total="34" comments="10" code="24" executable="9" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="upload-audio.php" href="utility/upload-audio.php.xml">
+          <totals>
+            <lines total="23" comments="10" code="13" executable="4" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="upload-doc.php" href="utility/upload-doc.php.xml">
+          <totals>
+            <lines total="54" comments="14" code="40" executable="16" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="upload-media.php" href="utility/upload-media.php.xml">
+          <totals>
+            <lines total="68" comments="12" code="56" executable="37" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="upload-photo.php" href="utility/upload-photo.php.xml">
+          <totals>
+            <lines total="526" comments="95" code="431" executable="229" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="10" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="upload-plugin.php" href="utility/upload-plugin.php.xml">
+          <totals>
+            <lines total="153" comments="32" code="121" executable="61" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="upload-theme.php" href="utility/upload-theme.php.xml">
+          <totals>
+            <lines total="47" comments="12" code="35" executable="18" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="upload-video.php" href="utility/upload-video.php.xml">
+          <totals>
+            <lines total="26" comments="15" code="11" executable="3" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="url-validation.php" href="utility/url-validation.php.xml">
+          <totals>
+            <lines total="29" comments="20" code="9" executable="8" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="user-activation-key.php" href="utility/user-activation-key.php.xml">
+          <totals>
+            <lines total="21" comments="13" code="8" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="user-info.php" href="utility/user-info.php.xml">
+          <totals>
+            <lines total="28" comments="14" code="14" executable="4" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="user-privilege.php" href="utility/user-privilege.php.xml">
+          <totals>
+            <lines total="32" comments="9" code="23" executable="10" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="user-registration.php" href="utility/user-registration.php.xml">
+          <totals>
+            <lines total="198" comments="57" code="141" executable="78" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="7" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="validate-date.php" href="utility/validate-date.php.xml">
+          <totals>
+            <lines total="23" comments="13" code="10" executable="2" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="whoops-error.php" href="utility/whoops-error.php.xml">
+          <totals>
+            <lines total="49" comments="13" code="36" executable="20" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="worst-passwords.php" href="utility/worst-passwords.php.xml">
+          <totals>
+            <lines total="73" comments="28" code="45" executable="34" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="write-htaccess.php" href="utility/write-htaccess.php.xml">
+          <totals>
+            <lines total="91" comments="24" code="67" executable="43" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="2" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="write-ini.php" href="utility/write-ini.php.xml">
+          <totals>
+            <lines total="98" comments="31" code="67" executable="34" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="write-log.php" href="utility/write-log.php.xml">
+          <totals>
+            <lines total="53" comments="11" code="42" executable="24" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="write-nginx-config.php" href="utility/write-nginx-config.php.xml">
+          <totals>
+            <lines total="129" comments="46" code="83" executable="46" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+      <file name="Autoloader.php" href="Autoloader.php.xml">
+        <totals>
+          <lines total="246" comments="131" code="115" executable="41" executed="0" percent="0.00"/>
+          <methods count="10" tested="0" percent="0.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="1" tested="0" percent="0.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="common.php" href="common.php.xml">
+        <totals>
+          <lines total="78" comments="2" code="76" executable="57" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="main.php" href="main.php.xml">
+        <totals>
+          <lines total="62" comments="6" code="56" executable="32" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="options.php" href="options.php.xml">
+        <totals>
+          <lines total="24" comments="10" code="14" executable="9" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="utility-loader.php" href="utility-loader.php.xml">
+        <totals>
+          <lines total="230" comments="5" code="225" executable="214" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="1" tested="0" percent="0.00"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+    </directory>
+  </project>
+</phpunit>

@@ -140,7 +140,7 @@ class PostDaoMethodIntegrationTest extends TestCase
         
         $postDao = new PostDao();
         
-        $post = $postDao->findPost(self::$postId, self::$sanitize);
+        $post = $postDao->findPost(self::$postId, self::$sanitize, null, false);
         
         $this->assertIsArray($post);
         $this->assertEquals(self::$postId, $post['ID']);
@@ -162,7 +162,7 @@ class PostDaoMethodIntegrationTest extends TestCase
     {
         $postDao = new PostDao();
         
-        $posts = $postDao->findPosts('ID');
+        $posts = $postDao->findPosts('ID', null, false);
         
         $this->assertIsArray($posts);
     }

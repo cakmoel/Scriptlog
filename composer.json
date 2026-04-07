@@ -17,36 +17,61 @@
         "platform": {
             "php": "7.4.33"
         },
-        "vendor-dir": "src/lib/vendor"
+        "sort-packages": true
     },
-    
     "require": {
-        "sinergi/browser-detector": "^6.1",
+        "php": ">=7.4",
+        "catfan/medoo": "^2.1",
+        "defuse/php-encryption": "^2.2",
+        "egulias/email-validator": "^2.1",
+        "filp/whoops": "^2.9",
         "intervention/image": "^2.5",
         "ircmaxell/random-lib": "^1.2",
-        "egulias/email-validator": "^2.1",
-        "voku/anti-xss": "^4.1",
-        "defuse/php-encryption": "^2.2",
-        "filp/whoops": "^2.9",
-        "psr/log": "^1.1",
-        "melbahja/seo": "^2.0",
-        "laminas/laminas-escaper": "^2.12",
         "laminas/laminas-crypt": "^3.3",
+        "laminas/laminas-escaper": "^2.12",
         "laminas/laminas-feed": "^2.17",
-        "catfan/medoo": "^2.1",
+        "melbahja/seo": "^2.0",
+        "psr/log": "^1.1",
+        "sinergi/browser-detector": "^6.1",
         "symfony/mailer": "^5.4",
-        "symfony/mime": "^5.4",
-        "vlucas/phpdotenv": "^5.6"
+        "vlucas/phpdotenv": "^5.6",
+        "voku/anti-xss": "^4.1"
     },
-    "require-dev": {
+"require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
+        "phpmetrics/phpmetrics": "^2.9",
+        "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.5",
-        "phpstan/phpstan": "^2.0",
         "squizlabs/php_codesniffer": "^3.7"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
     "autoload": {
         "classmap": ["src/lib/"]
+    },
+    "scripts": {
+        "metrics": "php bin/phpmetrics",
+        "phpstan": "phpstan analyse src --level 0 --memory-limit=1G",
+        "phpstan:strict": "phpstan analyse src --level 1 --memory-limit=1G",
+        "phpcs": "phpcs --standard=phpcs.xml src/",
+        "phpcbf": "phpcbf --standard=phpcs.xml src/",
+        "csfix": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff",
+        "csfix:apply": "php-cs-fixer fix --config=.php-cs-fixer.dist.php",
+        "test": "phpunit --configuration phpunit.xml",
+        "test:coverage": "phpunit --configuration phpunit.xml --coverage-html build/coverage",
+        "analyse": [
+            "@phpstan",
+            "@phpcs"
+        ],
+        "quality": [
+            "@phpstan",
+            "@phpcs",
+            "@metrics"
+        ],
+        "build": [
+            "@phpstan:strict",
+            "@phpcs",
+            "@test"
+        ]
     }
 }

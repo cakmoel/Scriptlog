@@ -47,7 +47,10 @@ class PostDaoIntegrationTest extends TestCase
             self::$testAuthorId = (int)$user['ID'];
         }
         
-        // Clean up any existing test posts
+        // Initialize test slug
+        self::$testSlug = 'test-post-title-' . time();
+        
+        // Clean up any existing test posts with this slug pattern
         self::$pdo->exec("DELETE FROM tbl_posts WHERE post_slug LIKE 'test-post-title-%'");
     }
     
@@ -64,8 +67,7 @@ class PostDaoIntegrationTest extends TestCase
     
     protected function setUp(): void
     {
-        self::$postId = null;
-        self::$testSlug = 'test-post-title-' . time();
+        // Do not reset self::$postId or self::$testSlug to maintain state between interdependent tests
     }
 
     public function testDatabaseConnection(): void
@@ -247,7 +249,42 @@ class PostDaoIntegrationTest extends TestCase
         $post = $stmt->fetch();
         
         if ($post) {
-            $this->assertArrayHasKey('user_login', $post);
+            $this->assertArrayHasKey('user_login', $post, 'Eager loading should include user_login from tbl_users');
         }
+    }
+
+    public function testPerformanceFindPostsWithAuthors(): void
+    {
+        // This test specifically targets the optimized findPosts query
+        $sql = "SELECT p.*, u.user_login
+                FROM tbl_posts AS p
+                INNER JOIN tbl_users AS u ON p.post_author = u.ID
+                WHERE p.post_type = 'blog'
+                ORDER BY p.ID DESC";
+        
+        $stmt = self::$pdo->query($sql);
+        $posts = $stmt->fetchAll();
+        
+        $this->assertIsArray($posts);
+        if (!empty($posts)) {
+            $this->assertArrayHasKey('user_login', $posts[0], 'Result should contain user_login field via INNER JOIN');
+        }
+    }
+
+    public function testPerformanceSearchBySlugEfficiently(): void
+    {
+        if (!self::$postId) {
+            $this->testInsertPost();
+        }
+
+        $startTime = microtime(true);
+        $stmt = self::$pdo->prepare("SELECT ID FROM tbl_posts WHERE post_slug = ? LIMIT 1");
+        $stmt->execute([self::$testSlug]);
+        $post = $stmt->fetch();
+        $endTime = microtime(true);
+
+        $this->assertNotFalse($post, 'Slug search should find the post');
+        $this->assertEquals(self::$postId, $post['ID']);
+        $this->assertLessThan(0.1, $endTime - $startTime, 'Slug search should be near-instant with index');
     }
 }
