@@ -24,11 +24,60 @@ info:
     
     ## Rate Limiting
     
-    API requests are rate limited to ensure fair usage. The following headers are included in responses:
-    - `X-RateLimit-Limit`: Maximum requests per minute
+    API requests are rate limited to ensure fair usage and prevent abuse:
+    
+    | Endpoint Type | Limit | Window |
+    |--------------|-------|--------|
+    | **Read (GET)** | 60 requests | 60 seconds |
+    | **Write (POST/PUT/DELETE/PATCH)** | 20 requests | 60 seconds |
+    
+    Rate limits are tracked per client using API key, Bearer token, or IP address.
+    
+    The following headers are included in all responses:
+    - `X-RateLimit-Limit`: Maximum requests allowed per window
     - `X-RateLimit-Remaining`: Remaining requests in current window
     - `X-RateLimit-Reset`: Unix timestamp when the rate limit resets
+    - `Retry-After`: Seconds to wait before retrying (only on 429 responses)
     
+    Exceeding the rate limit returns `429 Too Many Requests`.
+    
+    ## HATEOAS (Hypermedia as the Engine of Application State)
+    
+    All API responses include HATEOAS links following [RFC 5988 (Web Linking)](https://tools.ietf.org/html/rfc5988).
+    Each response contains a `_links` object with discoverable navigation:
+    
+    ```json
+    {
+      "success": true,
+      "status": 200,
+      "data": { ... },
+      "_links": {
+        "self": { "href": "...", "rel": "self", "type": "GET" },
+        "collection": { "href": "...", "rel": "collection", "type": "GET" }
+      }
+    }
+    ```
+    
+    Common link relations: `self`, `collection`, `first`, `prev`, `next`, `last`, `canonical`, `comments`, `post`, `posts`, `year`, `search`, `service-desc`.
+    
+    ## Caching and Conditional Requests
+
+    GET responses are cacheable with ETag and Last-Modified headers:
+    - **ETag**: Entity tag for cache validation
+    - **Last-Modified**: Timestamp of last resource modification
+    - **If-None-Match**: Client sends cached ETag to check for changes
+    - **If-Modified-Since**: Client sends cached timestamp
+    - **304 Not Modified**: Response when resource hasn't changed
+
+    Cache-Control headers vary by HTTP method:
+    - **GET**: `public, max-age=300` (cacheable for 5 minutes)
+    - **POST/PUT/DELETE/PATCH**: `no-store` (never cache)
+    - **4xx errors**: `no-cache, no-store, must-revalidate`
+
+    ## Content Negotiation
+
+    The API supports `Accept` header validation. Requests with unsupported media types receive `406 Not Acceptable`. Currently only `application/json` is supported.
+
     ## Response Format
     
     All responses are returned in JSON format with the following structure:
@@ -79,7 +128,7 @@ info:
     - `per_page`: Items per page (default: 10, max: 100)
     - `sort_by`: Field to sort by
     - `sort_order`: Sort direction (ASC or DESC)
-  version: 1.0.0
+  version: 1.1.1
   contact:
     name: Blogware Support
     email: alanmoehammad@gmail.com
@@ -122,6 +171,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiInfo'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
 
   /posts:
     get:
@@ -146,6 +197,8 @@ paths:
                 $ref: '#/components/schemas/PostListResponse'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
     post:
       tags:
         - Posts
@@ -255,12 +308,44 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PostId'
       responses:
+        '204':
+          description: Post deleted successfully (no content)
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Posts
+      summary: Partially update a post
+      description: |
+        Partially updates an existing blog post. Only send the fields you want to change.
+        Requires authentication with administrator or editor permissions.
+      operationId: patchPost
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostUpdate'
+      responses:
         '200':
-          description: Post deleted successfully
+          description: Post updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeleteResponse'
+                $ref: '#/components/schemas/PostResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -431,12 +516,44 @@ paths:
       parameters:
         - $ref: '#/components/parameters/CategoryId'
       responses:
+        '204':
+          description: Category deleted successfully (no content)
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Categories
+      summary: Partially update a category
+      description: |
+        Partially updates an existing category/topic. Only send the fields you want to change.
+        Requires authentication with administrator or editor permissions.
+      operationId: patchCategory
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdate'
+      responses:
         '200':
-          description: Category deleted successfully
+          description: Category updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeleteResponse'
+                $ref: '#/components/schemas/CategoryResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -612,12 +729,44 @@ paths:
       parameters:
         - $ref: '#/components/parameters/CommentId'
       responses:
+        '204':
+          description: Comment deleted successfully (no content)
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Comments
+      summary: Partially update a comment
+      description: |
+        Partially updates an existing comment. Only send the fields you want to change.
+        Requires authentication with administrator or editor permissions.
+      operationId: patchComment
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CommentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentUpdate'
+      responses:
         '200':
-          description: Comment deleted successfully
+          description: Comment updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeleteResponse'
+                $ref: '#/components/schemas/CommentResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -863,6 +1012,8 @@ components:
           example: Operation successful
         data:
           type: object
+        _links:
+          $ref: '#/components/schemas/Links'
 
     # Post Schemas
     Post:
@@ -1365,6 +1516,49 @@ components:
               $ref: '#/components/schemas/Pagination'
 
     # Utility Schemas
+    Link:
+      type: object
+      description: HATEOAS link following RFC 5988 (Web Linking)
+      properties:
+        href:
+          type: string
+          description: The URL of the linked resource
+          example: http://blogware.site/api/v1/posts
+        rel:
+          type: string
+          description: The relationship type
+          example: self
+        type:
+          type: string
+          description: The HTTP method or MIME type
+          example: GET
+        templated:
+          type: boolean
+          description: Whether the URL is a URI template
+          example: false
+      required:
+        - href
+        - rel
+
+    Links:
+      type: object
+      description: HATEOAS links for discoverable API navigation
+      additionalProperties:
+        $ref: '#/components/schemas/Link'
+      example:
+        self:
+          href: http://blogware.site/api/v1/posts?page=1
+          rel: self
+          type: GET
+        next:
+          href: http://blogware.site/api/v1/posts?page=2
+          rel: next
+          type: GET
+        collection:
+          href: http://blogware.site/api/v1/posts
+          rel: collection
+          type: GET
+
     Pagination:
       type: object
       properties:
@@ -1409,7 +1603,7 @@ components:
                   example: Blogware RESTful API
                 version:
                   type: string
-                  example: 1.0.0
+                  example: 1.1.1
                 description:
                   type: string
                 base_url:
@@ -1468,6 +1662,48 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      headers:
+        Retry-After:
+          description: Seconds to wait before retrying
+          schema:
+            type: integer
+            example: 60
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotAcceptable:
+      description: Not Acceptable - Requested media type not supported
+      headers:
+        Accept:
+          description: Supported media types
+          schema:
+            type: string
+            example: 'application/json'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotModified:
+      description: Not Modified - Resource has not changed (use cached version)
+      headers:
+        ETag:
+          description: Entity tag for the resource
+          schema:
+            type: string
+            example: '"abc123"'
+        Last-Modified:
+          description: Last modification timestamp
+          schema:
+            type: string
+            format: date-time
+        Cache-Control:
+          description: Cache directives
+          schema:
+            type: string
+            example: 'public, max-age=300'
 
 externalDocs:
   description: Blogware Documentation
