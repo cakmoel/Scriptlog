@@ -1,0 +1,106 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Result of function regenerate_session \\(void\\) is used\\.$#"
+			count: 1
+			path: lib/core/Authentication.php
+
+		-
+			message: "#^Result of method DbMySQLi\\:\\:getConfiguration\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: lib/core/DbMySQLi.php
+
+		-
+			message: "#^Array has 2 duplicate keys with value 'nav\\.all_pages' \\('nav\\.all_pages', 'nav\\.all_pages'\\)\\.$#"
+			count: 1
+			path: lib/utility/admin-translations.php
+
+		-
+			message: "#^Array has 2 duplicate keys with value 'nav\\.all_users' \\('nav\\.all_users', 'nav\\.all_users'\\)\\.$#"
+			count: 1
+			path: lib/utility/admin-translations.php
+
+		-
+			message: "#^Array has 2 duplicate keys with value 'nav\\.comments' \\('nav\\.comments', 'nav\\.comments'\\)\\.$#"
+			count: 1
+			path: lib/utility/admin-translations.php
+
+		-
+			message: "#^Array has 2 duplicate keys with value 'nav\\.export' \\('nav\\.export', 'nav\\.export'\\)\\.$#"
+			count: 1
+			path: lib/utility/admin-translations.php
+
+		-
+			message: "#^Array has 2 duplicate keys with value 'nav\\.import' \\('nav\\.import', 'nav\\.import'\\)\\.$#"
+			count: 1
+			path: lib/utility/admin-translations.php
+
+		-
+			message: "#^Array has 2 duplicate keys with value 'nav\\.tools' \\('nav\\.tools', 'nav\\.tools'\\)\\.$#"
+			count: 1
+			path: lib/utility/admin-translations.php
+
+		-
+			message: "#^Instantiated class Selective\\\\ArchiveBomb\\\\Engine\\\\RarBombEngine not found\\.$#"
+			count: 1
+			path: lib/utility/archive-scanner.php
+
+		-
+			message: "#^Instantiated class Selective\\\\ArchiveBomb\\\\Engine\\\\ZipBombEngine not found\\.$#"
+			count: 1
+			path: lib/utility/archive-scanner.php
+
+		-
+			message: "#^Instantiated class Selective\\\\ArchiveBomb\\\\Scanner\\\\BombScanner not found\\.$#"
+			count: 2
+			path: lib/utility/archive-scanner.php
+
+		-
+			message: "#^Result of function getimage_type \\(void\\) is used\\.$#"
+			count: 1
+			path: lib/utility/check-mime-type.php
+
+		-
+			message: "#^Result of function current_request_method \\(void\\) is used\\.$#"
+			count: 1
+			path: lib/utility/check-request-generated.php
+
+		-
+			message: "#^Class GdImage not found\\.$#"
+			count: 2
+			path: lib/utility/create-thumbnail.php
+
+		-
+			message: "#^Result of function base_escape \\(void\\) is used\\.$#"
+			count: 1
+			path: lib/utility/escape-html.php
+
+		-
+			message: "#^Result of function zend_ip_address \\(void\\) is used\\.$#"
+			count: 1
+			path: lib/utility/get-ip-address.php
+
+		-
+			message: "#^Cannot unset offset 'del' on array\\{abbr\\: 1, acronym\\: 1, address\\: 1, b\\: 1, bdi\\: 1, bdo\\: 1, big\\: 1, caption\\: 1, \\.\\.\\.\\}\\.$#"
+			count: 2
+			path: lib/utility/htmlawed.php
+
+		-
+			message: "#^Cannot unset offset 'ins' on array\\{abbr\\: 1, acronym\\: 1, address\\: 1, b\\: 1, bdi\\: 1, bdo\\: 1, big\\: 1, caption\\: 1, \\.\\.\\.\\}\\.$#"
+			count: 2
+			path: lib/utility/htmlawed.php
+
+		-
+			message: "#^Inner named functions are not supported by PHPStan\\. Consider refactoring to an anonymous function, class method, or a top\\-level\\-defined function\\. See issue \\#165 \\(https\\://github\\.com/phpstan/phpstan/issues/165\\) for more details\\.$#"
+			count: 2
+			path: lib/utility/htmlawed.php
+
+		-
+			message: "#^Undefined variable\\: \\$php_errormsg$#"
+			count: 1
+			path: lib/utility/htmlawed.php
+
+		-
+			message: "#^Result of function clip \\(void\\) is used\\.$#"
+			count: 1
+			path: lib/utility/invoke-plugin.php

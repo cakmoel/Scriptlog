@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpmetrics xmlns="https://github.com/phpmetrics/phpmetrics"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="https://github.com/phpmetrics/phpmetrics https://raw.githubusercontent.com/phpmetrics/phpmetrics/master/resources/schema/phpmetrics.xsd">
+
+    <file extensions="php"
+          exclude="vendor|tests|node_modules|tmp|install|public|admin|api|docs|docsite" />
+
+    <analysis>
+        <paths>
+            <directory name="lib/core" />
+            <directory name="lib/dao" />
+            <directory name="lib/service" />
+            <directory name="lib/controller" />
+            <directory name="lib/model" />
+            <directory name="lib/utility" />
+        </paths>
+
+        <haltbauer>
+            <warning threshold="0.75" />
+        </haltbauer>
+    </analysis>
+
+    <report>
+        <template dir="lib/vendor/phpmetrics/phpmetrics/src/Hal/Report/Html/Template" name="default" />
+        <html path="build/phpmetrics/index.html" />
+        <json path="build/phpmetrics/report.json" />
+        <csv path="build/phpmetrics/report.csv" />
+        <violations path="build/phpmetrics/violations.xml" format="checkstyle" />
+    </report>
+
+    <plugins>
+        <plugin class="Hal\Report\SummaryStats\Subscriber\Subscriber" />
+    </plugins>
+</phpmetrics>
