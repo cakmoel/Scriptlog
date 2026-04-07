@@ -1,0 +1,13 @@
+{
+    "report": {
+        "html": "build/phpmetrics/index.html",
+        "json": "build/phpmetrics/report.json",
+        "csv": "build/phpmetrics/report.csv",
+        "violations": "build/phpmetrics/violations.xml"
+    },
+    "plugins": {
+        "git": {
+            "binary": "git"
+        }
+    }
+}
