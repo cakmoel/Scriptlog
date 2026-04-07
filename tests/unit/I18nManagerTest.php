@@ -18,19 +18,26 @@ class I18nManagerTest extends TestCase
     {
         parent::setUp();
         
-        if (!class_exists('I18nManager')) {
-            $this->markTestSkipped('I18nManager class not found');
-        }
+        I18nManager::resetInstance();
+        
+        $this->i18n = I18nManager::getInstance();
+        
+        $this->i18n->initializeWithSettings([
+            'default' => 'en',
+            'available' => ['en', 'es', 'fr'],
+            'auto_detect' => '1'
+        ]);
     }
 
     protected function tearDown(): void
     {
-        // Reset singleton for next test
-        if (class_exists('I18nManager')) {
-            $reflection = new ReflectionClass(I18nManager::class);
-            $property = $reflection->getProperty('instance');
-            $property->setAccessible(true);
-            $property->setValue(null, null);
+        I18nManager::resetInstance();
+        
+        if (isset($_SESSION['scriptlog_locale'])) {
+            unset($_SESSION['scriptlog_locale']);
+        }
+        if (isset($_COOKIE['scriptlog_locale'])) {
+            setcookie('scriptlog_locale', '', time() - 3600, '/');
         }
         
         parent::tearDown();
@@ -54,232 +61,158 @@ class I18nManagerTest extends TestCase
     public function testInitializeSetsInitializedFlag()
     {
         $instance = I18nManager::getInstance();
+        $instance->initializeWithSettings([
+            'default' => 'en',
+            'available' => ['en'],
+            'auto_detect' => '0'
+        ]);
         
-        // Check if initialize method exists and can be called
-        if (method_exists($instance, 'initialize')) {
-            $instance->initialize();
-            $this->assertTrue(true); // Method executed without error
-        } else {
-            $this->markTestSkipped('initialize method not found');
-        }
+        $this->assertTrue($instance->isInitialized());
     }
 
     public function testGetLocaleReturnsString()
     {
-        $instance = I18nManager::getInstance();
+        $locale = $this->i18n->getLocale();
         
-        if (method_exists($instance, 'getLocale')) {
-            $locale = $instance->getLocale();
-            $this->assertIsString($locale);
-            $this->assertEquals('en', $locale); // Default should be 'en'
-        } else {
-            $this->markTestSkipped('getLocale method not found');
-        }
+        $this->assertIsString($locale);
+        $this->assertEquals('en', $locale);
     }
 
     public function testGetAvailableLocalesReturnsArray()
     {
-        $instance = I18nManager::getInstance();
+        $locales = $this->i18n->getAvailableLocales();
         
-        if (method_exists($instance, 'getAvailableLocales')) {
-            $locales = $instance->getAvailableLocales();
-            $this->assertIsArray($locales);
-        } else {
-            $this->markTestSkipped('getAvailableLocales method not found');
-        }
+        $this->assertIsArray($locales);
+        $this->assertContains('en', $locales);
+        $this->assertContains('es', $locales);
     }
 
     public function testIsRtlReturnsBoolean()
     {
-        $instance = I18nManager::getInstance();
+        $isRtl = $this->i18n->isRtl();
         
-        if (method_exists($instance, 'isRtl')) {
-            $isRtl = $instance->isRtl();
-            $this->assertIsBool($isRtl);
-            $this->assertFalse($isRtl); // Default English should not be RTL
-        } else {
-            $this->markTestSkipped('isRtl method not found');
-        }
+        $this->assertIsBool($isRtl);
+        $this->assertFalse($isRtl);
+    }
+
+    public function testIsRtlReturnsTrueForRtlLanguage()
+    {
+        $this->i18n->setLanguageDirection('rtl');
+        
+        $this->assertTrue($this->i18n->isRtl());
     }
 
     public function testGetLanguageDirectionReturnsString()
     {
-        $instance = I18nManager::getInstance();
+        $direction = $this->i18n->getLanguageDirection();
         
-        if (method_exists($instance, 'getLanguageDirection')) {
-            $direction = $instance->getLanguageDirection();
-            $this->assertIsString($direction);
-            $this->assertContains($direction, ['ltr', 'rtl']);
-        } else {
-            $this->markTestSkipped('getLanguageDirection method not found');
-        }
+        $this->assertIsString($direction);
+        $this->assertContains($direction, ['ltr', 'rtl']);
     }
 
     public function testTranslateMethodExists()
     {
-        $instance = I18nManager::getInstance();
-        
-        $this->assertTrue(method_exists($instance, 't'));
+        $this->assertTrue(method_exists($this->i18n, 't'));
     }
 
     public function testTranslateWithValidKey()
     {
-        $instance = I18nManager::getInstance();
-        
-        if (method_exists($instance, 't')) {
-            // Test with a key that might exist
-            $result = $instance->t('header.nav.home');
-            $this->assertIsString($result);
-        } else {
-            $this->markTestSkipped('t method not found');
-        }
+        $result = $this->i18n->t('header.nav.home');
+        $this->assertIsString($result);
     }
 
     public function testTranslateWithUnknownKey()
     {
-        $instance = I18nManager::getInstance();
+        $unknownKey = 'unknown.key.' . time();
+        $result = $this->i18n->t($unknownKey);
         
-        if (method_exists($instance, 't')) {
-            // Unknown key should return the key itself
-            $unknownKey = 'unknown.key.' . time();
-            $result = $instance->t($unknownKey);
-            $this->assertEquals($unknownKey, $result);
-        } else {
-            $this->markTestSkipped('t method not found');
-        }
+        $this->assertEquals($unknownKey, $result);
     }
 
     public function testTranslateWithParameters()
     {
-        $instance = I18nManager::getInstance();
-        
-        if (method_exists($instance, 't')) {
-            // Test interpolation parameters
-            $result = $instance->t('test.key', ['name' => 'John', 'count' => 5]);
-            $this->assertIsString($result);
-        } else {
-            $this->markTestSkipped('t method not found');
-        }
+        $result = $this->i18n->t('test.key', ['name' => 'John', 'count' => 5]);
+        $this->assertIsString($result);
     }
 
     public function testSetLocaleWithValidLocale()
     {
-        $instance = I18nManager::getInstance();
-        
-        if (method_exists($instance, 'setLocale')) {
-            // Note: This might fail if 'es' locale is not available
-            $result = $instance->setLocale('en');
-            $this->assertTrue($result);
-        } else {
-            $this->markTestSkipped('setLocale method not found');
+        if (headers_sent()) {
+            $this->markTestSkipped('Cannot test setLocale with cookies in PHPUnit context (headers already sent)');
         }
+        
+        $result = $this->i18n->setLocale('es');
+        
+        $this->assertTrue($result);
+        $this->assertEquals('es', $this->i18n->getLocale());
     }
 
     public function testSetLocaleWithInvalidLocale()
     {
-        $instance = I18nManager::getInstance();
+        $result = $this->i18n->setLocale('xx');
         
-        if (method_exists($instance, 'setLocale')) {
-            $result = $instance->setLocale('xx');
-            $this->assertFalse($result);
-        } else {
-            $this->markTestSkipped('setLocale method not found');
-        }
+        $this->assertFalse($result);
     }
 
     public function testUrlMethodExists()
     {
-        $instance = I18nManager::getInstance();
-        
-        $this->assertTrue(method_exists($instance, 'url'));
+        $this->assertTrue(method_exists($this->i18n, 'url'));
     }
 
     public function testUrlWithPath()
     {
-        $instance = I18nManager::getInstance();
+        $url = $this->i18n->url('/blog');
         
-        if (method_exists($instance, 'url')) {
-            $url = $instance->url('/blog');
-            $this->assertIsString($url);
-            $this->assertStringStartsWith('/', $url);
-        } else {
-            $this->markTestSkipped('url method not found');
-        }
+        $this->assertIsString($url);
+        $this->assertStringStartsWith('/', $url);
     }
 
     public function testUrlWithLocale()
     {
-        $instance = I18nManager::getInstance();
+        $url = $this->i18n->url('/blog', 'es');
         
-        if (method_exists($instance, 'url')) {
-            $url = $instance->url('/blog', 'es');
-            $this->assertIsString($url);
-            $this->assertStringContainsString('es', $url);
-        } else {
-            $this->markTestSkipped('url method not found');
-        }
+        $this->assertIsString($url);
+        $this->assertStringContainsString('es', $url);
     }
 
     public function testGetLoaderMethodExists()
     {
-        $instance = I18nManager::getInstance();
-        
-        $this->assertTrue(method_exists($instance, 'getLoader'));
+        $this->assertTrue(method_exists($this->i18n, 'getLoader'));
     }
 
     public function testGetLoaderReturnsTranslationLoader()
     {
-        $instance = I18nManager::getInstance();
+        $loader = $this->i18n->getLoader();
         
-        if (method_exists($instance, 'getLoader')) {
-            $loader = $instance->getLoader();
-            $this->assertInstanceOf(TranslationLoader::class, $loader);
-        } else {
-            $this->markTestSkipped('getLoader method not found');
-        }
+        $this->assertInstanceOf(TranslationLoader::class, $loader);
     }
 
     public function testGetRouterMethodExists()
     {
-        $instance = I18nManager::getInstance();
-        
-        $this->assertTrue(method_exists($instance, 'getRouter'));
+        $this->assertTrue(method_exists($this->i18n, 'getRouter'));
     }
 
     public function testGetRouterReturnsLocaleRouter()
     {
-        $instance = I18nManager::getInstance();
+        $router = $this->i18n->getRouter();
         
-        if (method_exists($instance, 'getRouter')) {
-            $router = $instance->getRouter();
-            $this->assertInstanceOf(LocaleRouter::class, $router);
-        } else {
-            $this->markTestSkipped('getRouter method not found');
-        }
+        $this->assertInstanceOf(LocaleRouter::class, $router);
     }
 
     public function testGetDetectorMethodExists()
     {
-        $instance = I18nManager::getInstance();
-        
-        $this->assertTrue(method_exists($instance, 'getDetector'));
+        $this->assertTrue(method_exists($this->i18n, 'getDetector'));
     }
 
     public function testGetDetectorReturnsLocaleDetector()
     {
-        $instance = I18nManager::getInstance();
+        $detector = $this->i18n->getDetector();
         
-        if (method_exists($instance, 'getDetector')) {
-            $detector = $instance->getDetector();
-            $this->assertInstanceOf(LocaleDetector::class, $detector);
-        } else {
-            $this->markTestSkipped('getDetector method not found');
-        }
+        $this->assertInstanceOf(LocaleDetector::class, $detector);
     }
 
     public function testInterpolationLogic()
     {
-        // Test the interpolation logic directly
         $text = 'Hello :name, you have :count items';
         $params = ['name' => 'Alice', 'count' => 10];
         
@@ -294,27 +227,52 @@ class I18nManagerTest extends TestCase
 
     public function testSingletonPreventsCloning()
     {
-        $instance = I18nManager::getInstance();
-        
-        if (method_exists($instance, '__clone')) {
-            $reflection = new ReflectionClass($instance);
+        if (method_exists($this->i18n, '__clone')) {
+            $reflection = new ReflectionClass($this->i18n);
             $cloneMethod = $reflection->getMethod('__clone');
             
-            // __clone should be private
             $this->assertTrue($cloneMethod->isPrivate());
         }
     }
 
     public function testSingletonPreventsUnserialization()
     {
-        $instance = I18nManager::getInstance();
-        
-        if (method_exists($instance, '__wakeup')) {
-            $reflection = new ReflectionClass($instance);
+        if (method_exists($this->i18n, '__wakeup')) {
+            $reflection = new ReflectionClass($this->i18n);
             $wakeupMethod = $reflection->getMethod('__wakeup');
             
-            // __wakeup should throw exception
             $this->assertTrue($wakeupMethod->isPublic() || $wakeupMethod->isPrivate());
         }
+    }
+
+    public function testResetInstance()
+    {
+        $instance1 = I18nManager::getInstance();
+        I18nManager::resetInstance();
+        $instance2 = I18nManager::getInstance();
+        
+        $this->assertNotSame($instance1, $instance2);
+    }
+
+    public function testGetLocaleWhenNotInitialized()
+    {
+        I18nManager::resetInstance();
+        $freshInstance = I18nManager::getInstance();
+        
+        $freshInstance->initializeWithSettings([
+            'default' => 'es',
+            'available' => ['en', 'es'],
+            'auto_detect' => '0'
+        ]);
+        
+        $this->assertEquals('es', $freshInstance->getLocale());
+    }
+
+    public function testSetLanguageDirection()
+    {
+        $this->i18n->setLanguageDirection('rtl');
+        
+        $this->assertEquals('rtl', $this->i18n->getLanguageDirection());
+        $this->assertTrue($this->i18n->isRtl());
     }
 }
