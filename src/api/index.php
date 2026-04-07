@@ -64,6 +64,17 @@ ob_start();
 
 // Load required core files
 require_once __DIR__ . '/../lib/main.php';
+
+// Ensure sessions are properly started for API requests that need authentication
+// This is needed for endpoints like media upload which require admin session
+if (isset($app->sessionMaker)) {
+    session_save_path(sys_get_temp_dir());
+    session_set_save_handler($app->sessionMaker, true);
+    register_shutdown_function('session_write_close');
+    if (function_exists('start_session_on_site')) {
+        start_session_on_site($app->sessionMaker);
+    }
+}
 require_once __DIR__ . '/../lib/core/ApiAuth.php';
 require_once __DIR__ . '/../lib/core/ApiResponse.php';
 require_once __DIR__ . '/../lib/core/ApiRouter.php';
@@ -77,6 +88,7 @@ require_once __DIR__ . '/../lib/controller/api/LanguagesApiController.php';
 require_once __DIR__ . '/../lib/controller/api/TranslationsApiController.php';
 require_once __DIR__ . '/../lib/controller/api/SearchApiController.php';
 require_once __DIR__ . '/../lib/controller/api/ProtectedPostApiController.php';
+require_once __DIR__ . '/../lib/controller/api/MediaApiController.php';
 require_once __DIR__ . '/../lib/utility/rate-limiter.php';
 require_once __DIR__ . '/../lib/core/ApiHateoas.php';
 
@@ -163,6 +175,9 @@ try {
     // Protected Post API
     $router->post('posts/(?P<id>[0-9]+)/unlock', 'ProtectedPostApiController@unlock');
     $router->post('posts/(?P<id>[0-9]+)/verify', 'ProtectedPostApiController@verify');
+
+    // Media API (for SummerNote image upload)
+    $router->post('media/upload', 'MediaApiController@upload');
 
     // Categories/Topics API
     $router->get('categories', 'CategoriesApiController@index');

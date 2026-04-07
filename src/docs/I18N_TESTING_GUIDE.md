@@ -30,14 +30,16 @@ This guide covers testing procedures for the i18n (internationalization) system 
 ```
 tests/
 ├── unit/
-│   ├── LocaleDetectorTest.php       ✅ Pass
-│   ├── TranslationLoaderTest.php   ✅ Pass
-│   ├── I18nManagerTest.php         ✅ Pass
+│   ├── LocaleDetectorTest.php       ✅ Pass (17 tests)
+│   ├── TranslationLoaderTest.php   ✅ Pass (9 tests)
+│   ├── I18nManagerTest.php         ✅ Pass (29 tests)
 │   ├── LocaleRouterTest.php         ✅ Pass
-│   └── ThemeI18nTest.php            ✅ Pass (NEW - Frontend JSON i18n)
+│   ├── ThemeI18nTest.php            ✅ Pass (26 tests - Frontend JSON i18n)
+│   └── LanguageSwitcherTest.php     ✅ Pass (9 tests - NEW)
 ├── integration/
 │   ├── LanguageDaoIntegrationTest.php
-│   └── TranslationServiceIntegrationTest.php
+│   ├── TranslationServiceIntegrationTest.php
+│   └── PrivacyPolicyDaoIntegrationTest.php (NEW)
 └── setup_test_db.php
 ```
 
@@ -147,7 +149,8 @@ lib/vendor/bin/phpunit --filter "Locale|I18n|Translation|Theme"
 | I18nManagerTest.php | 29 | ✅ Pass |
 | LocaleRouterTest.php | (included) | ✅ Pass |
 | ThemeI18nTest.php | 26 | ✅ Pass |
-| **Total** | **81+** | **✅ All Pass** |
+| LanguageSwitcherTest.php | 9 | ✅ Pass (NEW) |
+| **Total** | **90+** | **✅ All Pass** |
 
 ### Run with Coverage Report
 
@@ -272,6 +275,26 @@ Tests for JSON-based frontend translation system (no database).
 | `testCookieConsentTranslationsInArabic` | ✅ | Cookie consent Arabic |
 | `testAllSupportedLocalesAreRecognized` | ✅ | All 7 locales recognized |
 
+### LanguageSwitcherTest ✅ PASS (NEW)
+
+Tests for the frontend language switcher UI functionality.
+
+**Status:** All tests passing (9 tests)
+
+**Test Methods:**
+
+| Method | Status | Description |
+|--------|--------|-------------|
+| `testGetLanguageNameNative` | ✅ | Verify native language names (English, العربية, 中文, etc.) |
+| `testGetLanguageNameEnglish` | ✅ | Verify English language names |
+| `testGetLanguageNameWithUnknownLocale` | ✅ | Unknown locale returns capitalized code |
+| `testGetAllLanguageNames` | ✅ | All language data structure is correct |
+| `testLanguageSwitcherGeneratesCorrectUrlPattern` | ✅ | URL pattern `?switch-lang=XX` is correct |
+| `testRedirectUrlEncoding` | ✅ | Redirect URL encoding handles special chars |
+| `testAllLanguageCodesGenerateUrls` | ✅ | All 7 language codes generate valid URLs |
+| `testArabicLocaleGeneration` | ✅ | Arabic native name contains RTL characters |
+| `testChineseLocaleGeneration` | ✅ | Chinese native name contains CJK characters |
+
 ---
 
 ## Integration Tests
@@ -322,6 +345,82 @@ Tests for translation management with database.
 | `testExportToArray` | Export translations |
 | `testImportFromArray` | Import translations |
 | `testImportFromArrayUpdatesExisting` | Test merge behavior |
+
+### PrivacyPolicyDaoIntegrationTest
+
+Tests for privacy policy CRUD operations with database.
+
+**Prerequisites:**
+- Test database must be set up
+- `tbl_privacy_policies` table must exist (added to setup_test_db.php)
+
+**Test Methods:**
+
+| Method | Description |
+|--------|-------------|
+| `testCreatePolicy` | Create new privacy policy |
+| `testFindById` | Find policy by ID |
+| `testFindByIdReturnsNullForNonexistent` | Handle missing ID |
+| `testFindByLocale` | Find policy by locale |
+| `testFindByLocaleReturnsNullForNonexistent` | Handle missing locale |
+| `testFindDefault` | Get default policy |
+| `testFindAllPolicies` | Get all policies |
+| `testUpdatePolicy` | Update policy |
+| `testDeletePolicy` | Delete policy |
+| `testSetDefaultPolicy` | Set policy as default |
+| `testClearDefaultPolicy` | Clear default flag |
+| `testFetchAll` | Fetch all policies |
+| `testSetAsDefaultPolicy` | Set as default (alias) |
+| `testPolicyExists` | Check policy existence |
+| `testPolicyExistsReturnsFalse` | Check non-existent policy |
+| `testCreatePolicyWithMinimalData` | Test minimal data creation |
+| `testCreateDuplicateLocaleThrowsException` | Test UNIQUE constraint |
+
+### LanguageSwitcherIntegrationTest (PLANNED)
+
+Tests for the full frontend language switching flow.
+
+**Prerequisites:**
+- Live site with database
+- Browser with cookie support
+
+**Test Flow:**
+
+```
+1. User clicks language in dropdown
+   ↓
+2. Browser navigates to ?switch-lang=XX&redirect=URL
+   ↓
+3. lib/main.php processes switch-lang parameter
+   ↓
+4. Locale saved to $_SESSION['scriptlog_locale']
+   ↓
+5. Locale saved to cookie 'scriptlog_locale'
+   ↓
+6. Redirect to original URL (without switch-lang param)
+   ↓
+7. Page loads with new locale
+   ↓
+8. LocaleDetector reads from session/cookie
+   ↓
+9. Content filtered by locale
+   ↓
+10. UI strings displayed in selected language
+```
+
+**Planned Test Methods:**
+
+| Method | Description | Status |
+|--------|-------------|--------|
+| `testSwitchLangParameterSetsSession` | Verify session is set | ⏳ TODO |
+| `testSwitchLangParameterSetsCookie` | Verify cookie is set | ⏳ TODO |
+| `testRedirectPreservesOriginalUrl` | Verify redirect URL | ⏳ TODO |
+| `testLocalePersistsAcrossPages` | Session persists | ⏳ TODO |
+| `testContentFilteredByLocale` | Posts filtered correctly | ⏳ TODO |
+| `testMenuFilteredByLocale` | Menus filtered correctly | ⏳ TODO |
+| `testTopicFilteredByLocale` | Topics filtered correctly | ⏳ TODO |
+| `testRTLAppliedForArabic` | RTL layout applied | ⏳ TODO |
+| `testRTLAppliedForOtherRTL` | Other RTL languages | ⏳ TODO |
 
 ---
 

@@ -148,7 +148,7 @@ class MediaDao extends Dao
 
         $mediameta = $this->findRow([$idsanitized, $media_filename]);
 
-        return (empty($mediameta)) ?: $mediameta;
+        return $mediameta ?: null;
     }
 
     /**
