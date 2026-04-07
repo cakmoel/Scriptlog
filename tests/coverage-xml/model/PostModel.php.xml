@@ -1,0 +1,2033 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="PostModel.php" path="/model">
+    <totals>
+      <lines total="378" comments="109" code="269" executable="79" executed="0" percent="0.00"/>
+      <methods count="10" tested="0" percent="0.00"/>
+      <functions count="0" tested="0" percent="0"/>
+      <classes count="1" tested="0" percent="0.00"/>
+      <traits count="0" tested="0" percent="0"/>
+    </totals>
+    <class name="PostModel" start="13" executable="78" executed="0" crap="506">
+      <namespace name=""/>
+      <method name="getPostFeeds" signature="getPostFeeds($limit)" start="32" end="53" crap="6" executable="6" executed="0" coverage="0"/>
+      <method name="getLatestPosts" signature="getLatestPosts($limit)" start="66" end="97" crap="12" executable="11" executed="0" coverage="0"/>
+      <method name="getAllBlogPosts" signature="getAllBlogPosts($sanitize, Paginator $perPage)" start="106" end="144" crap="6" executable="16" executed="0" coverage="0"/>
+      <method name="getPostById" signature="getPostById($id)" start="156" end="179" crap="6" executable="6" executed="0" coverage="0"/>
+      <method name="getPostBySlug" signature="getPostBySlug($slug, $fetchMode)" start="190" end="215" crap="12" executable="6" executed="0" coverage="0"/>
+      <method name="getPostByAuthor" signature="getPostByAuthor($author)" start="226" end="249" crap="6" executable="5" executed="0" coverage="0"/>
+      <method name="getRandomHeadlines" signature="getRandomHeadlines()" start="262" end="285" crap="6" executable="5" executed="0" coverage="0"/>
+      <method name="getRelatedPosts" signature="getRelatedPosts($post_title)" start="296" end="310" crap="6" executable="5" executed="0" coverage="0"/>
+      <method name="getRandomPosts" signature="getRandomPosts($start, $end)" start="321" end="348" crap="6" executable="13" executed="0" coverage="0"/>
+      <method name="getPostsOnSidebar" signature="getPostsOnSidebar($limit)" start="358" end="376" crap="6" executable="5" executed="0" coverage="0"/>
+    </class>
+    <source>
+      <line no="1">
+        <token name="T_OPEN_TAG">&lt;?php</token>
+      </line>
+      <line no="2"/>
+      <line no="3">
+        <token name="T_STRING">defined</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'SCRIPTLOG'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_BOOLEAN_OR">||</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EXIT">die</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"Direct access not permitted"</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="4">
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="5">
+        <token name="T_DOC_COMMENT"> * class PostModel extends Dao</token>
+      </line>
+      <line no="6">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="7">
+        <token name="T_DOC_COMMENT"> * @category Model class</token>
+      </line>
+      <line no="8">
+        <token name="T_DOC_COMMENT"> * @author M.Noermoehammad</token>
+      </line>
+      <line no="9">
+        <token name="T_DOC_COMMENT"> * @license MIT</token>
+      </line>
+      <line no="10">
+        <token name="T_DOC_COMMENT"> * @version 1.0</token>
+      </line>
+      <line no="11">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="12">
+        <token name="T_DOC_COMMENT"> */</token>
+      </line>
+      <line no="13">
+        <token name="T_CLASS">class</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">PostModel</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EXTENDS">extends</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">BaseModel</token>
+      </line>
+      <line no="14">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="15">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="16">
+        <token name="T_DOC_COMMENT">     * linkPosts</token>
+      </line>
+      <line no="17">
+        <token name="T_DOC_COMMENT">     * alias for link property from BaseModel</token>
+      </line>
+      <line no="18">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="19">
+        <token name="T_DOC_COMMENT">     * @var object</token>
+      </line>
+      <line no="20">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="21">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PRIVATE">private</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$linkPosts</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="22"/>
+      <line no="23">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="24">
+        <token name="T_DOC_COMMENT">     * getPostFeeds</token>
+      </line>
+      <line no="25">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="26">
+        <token name="T_DOC_COMMENT">     * Retrieve posts records for sharing post on post feeds</token>
+      </line>
+      <line no="27">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="28">
+        <token name="T_DOC_COMMENT">     * @param integer $limit</token>
+      </line>
+      <line no="29">
+        <token name="T_DOC_COMMENT">     * @return void</token>
+      </line>
+      <line no="30">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="31">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="32">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getPostFeeds</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$limit</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="33">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="34"/>
+      <line no="35">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE">  </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"SELECT p.ID, p.media_id, p.post_author,</token>
+      </line>
+      <line no="36">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                  p.post_date, p.post_modified, p.post_title,</token>
+      </line>
+      <line no="37">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                  p.post_slug, p.post_content, p.post_type,</token>
+      </line>
+      <line no="38">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                  p.post_status, p.post_tags, </token>
+      </line>
+      <line no="39">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                  p.post_sticky, u.user_fullname, u.user_login</token>
+      </line>
+      <line no="40">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            FROM tbl_posts AS p</token>
+      </line>
+      <line no="41">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            INNER JOIN tbl_users AS u ON p.post_author = u.ID</token>
+      </line>
+      <line no="42">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            WHERE p.post_type = 'blog' AND p.post_status = 'publish'</token>
+      </line>
+      <line no="43">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            AND p.post_visibility = 'public'</token>
+      </line>
+      <line no="44">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            ORDER BY p.ID DESC LIMIT :limit"</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="45"/>
+      <line no="46">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$data</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_ARRAY">array</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">':limit'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$limit</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="47"/>
+      <line no="48">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">setSQL</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="49"/>
+      <line no="50">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$feeds</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">findAll</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$data</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="51"/>
+      <line no="52">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EMPTY">empty</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$feeds</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$feeds</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="53">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="54"/>
+      <line no="55">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="56">
+        <token name="T_DOC_COMMENT">     * getLatesetPosts</token>
+      </line>
+      <line no="57">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="58">
+        <token name="T_DOC_COMMENT">     * retrieves latest posts and display it on homepage</token>
+      </line>
+      <line no="59">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="60">
+        <token name="T_DOC_COMMENT">     * @param int|numeric $position</token>
+      </line>
+      <line no="61">
+        <token name="T_DOC_COMMENT">     * @param int|num $limit</token>
+      </line>
+      <line no="62">
+        <token name="T_DOC_COMMENT">     * @param PDO::FETCH_MODE static $fetchMode = null</token>
+      </line>
+      <line no="63">
+        <token name="T_DOC_COMMENT">     * @return mixed</token>
+      </line>
+      <line no="64">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="65">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="66">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getLatestPosts</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$limit</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="67">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="68"/>
+      <line no="69">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"SELECT p.ID, p.media_id, p.post_author,</token>
+      </line>
+      <line no="70">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            p.post_date AS created_at, p.post_modified AS modified_at,</token>
+      </line>
+      <line no="71">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            p.post_title, p.post_slug, p.post_content, p.post_summary,</token>
+      </line>
+      <line no="72">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            p.post_keyword, p.post_status, p.post_tags,</token>
+      </line>
+      <line no="73">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            p.post_type, p.comment_status,</token>
+      </line>
+      <line no="74">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            m.media_filename, m.media_caption, m.media_access,</token>
+      </line>
+      <line no="75">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            u.user_fullname, u.user_login,</token>
+      </line>
+      <line no="76">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            (SELECT COUNT(c.ID) FROM "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_comments'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" c WHERE c.comment_post_id = p.ID AND c.comment_status = 'approved') AS total_comments,</token>
+      </line>
+      <line no="77">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            (SELECT GROUP_CONCAT(CONCAT(t.ID, ':', t.topic_title, ':', t.topic_slug) SEPARATOR '|') </token>
+      </line>
+      <line no="78">
+        <token name="T_CONSTANT_ENCAPSED_STRING">             FROM "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_post_topic'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" pt </token>
+      </line>
+      <line no="79">
+        <token name="T_CONSTANT_ENCAPSED_STRING">             JOIN "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_topics'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" t ON pt.topic_id = t.ID </token>
+      </line>
+      <line no="80">
+        <token name="T_CONSTANT_ENCAPSED_STRING">             WHERE pt.post_id = p.ID AND t.topic_status = 'Y') AS topics_data</token>
+      </line>
+      <line no="81">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            FROM "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_posts'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" AS p</token>
+      </line>
+      <line no="82">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            INNER JOIN "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_media'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" AS m ON p.media_id = m.ID</token>
+      </line>
+      <line no="83">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            INNER JOIN "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_users'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" AS u ON p.post_author = u.ID</token>
+      </line>
+      <line no="84">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            WHERE p.post_status = 'publish'</token>
+      </line>
+      <line no="85">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            AND p.post_type = 'blog'</token>
+      </line>
+      <line no="86">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            AND m.media_target = 'blog'</token>
+      </line>
+      <line no="87">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            AND m.media_access = 'public'</token>
+      </line>
+      <line no="88">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            AND m.media_status = '1'</token>
+      </line>
+      <line no="89">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            AND u.user_banned = '0'</token>
+      </line>
+      <line no="90">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            ORDER BY p.post_date DESC LIMIT :limit"</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="91"/>
+      <line no="92">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">setSQL</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="93"/>
+      <line no="94">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$latestPosts</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_ISSET">isset</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$limit</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">findAll</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">':limit'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$limit</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_LNUMBER">0</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="95"/>
+      <line no="96">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EMPTY">empty</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$latestPosts</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$latestPosts</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="97">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="98">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="99">
+        <token name="T_DOC_COMMENT">     * getAllBlogPosts</token>
+      </line>
+      <line no="100">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="101">
+        <token name="T_DOC_COMMENT">     * @param object $sanitize</token>
+      </line>
+      <line no="102">
+        <token name="T_DOC_COMMENT">     * @param Paginator $perPage</token>
+      </line>
+      <line no="103">
+        <token name="T_DOC_COMMENT">     * @return void</token>
+      </line>
+      <line no="104">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="105">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="106">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getAllBlogPosts</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$sanitize</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">Paginator</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$perPage</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="107">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="108">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$entries</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="109"/>
+      <line no="110">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">linkPosts</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$perPage</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="111"/>
+      <line no="112">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$stmt</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">dbc</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">dbQuery</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"SELECT ID FROM tbl_posts WHERE post_type = 'blog'"</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="113"/>
+      <line no="114">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">linkPosts</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">set_total</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$stmt</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">rowCount</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="115"/>
+      <line no="116">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"SELECT p.ID, p.media_id, p.post_author,</token>
+      </line>
+      <line no="117">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            p.post_date AS created_at,</token>
+      </line>
+      <line no="118">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            p.post_modified AS modified_at,</token>
+      </line>
+      <line no="119">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            p.post_title, p.post_slug, p.post_content, p.post_summary,</token>
+      </line>
+      <line no="120">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            p.post_keyword, p.post_type, p.post_status, p.post_sticky,</token>
+      </line>
+      <line no="121">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            u.user_login, u.user_fullname,</token>
+      </line>
+      <line no="122">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            m.media_filename, m.media_caption,</token>
+      </line>
+      <line no="123">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            (SELECT COUNT(c.ID) FROM "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_comments'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" c WHERE c.comment_post_id = p.ID AND c.comment_status = 'approved') AS total_comments,</token>
+      </line>
+      <line no="124">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            (SELECT GROUP_CONCAT(CONCAT(t.ID, ':', t.topic_title, ':', t.topic_slug) SEPARATOR '|') </token>
+      </line>
+      <line no="125">
+        <token name="T_CONSTANT_ENCAPSED_STRING">             FROM "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_post_topic'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" pt </token>
+      </line>
+      <line no="126">
+        <token name="T_CONSTANT_ENCAPSED_STRING">             JOIN "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_topics'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" t ON pt.topic_id = t.ID </token>
+      </line>
+      <line no="127">
+        <token name="T_CONSTANT_ENCAPSED_STRING">             WHERE pt.post_id = p.ID AND t.topic_status = 'Y') AS topics_data</token>
+      </line>
+      <line no="128">
+        <token name="T_CONSTANT_ENCAPSED_STRING">    FROM "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_posts'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" AS p</token>
+      </line>
+      <line no="129">
+        <token name="T_CONSTANT_ENCAPSED_STRING">    INNER JOIN "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_users'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" AS u ON p.post_author = u.ID</token>
+      </line>
+      <line no="130">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        INNER JOIN "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_media'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" AS m ON p.media_id = m.ID</token>
+      </line>
+      <line no="131">
+        <token name="T_CONSTANT_ENCAPSED_STRING">    WHERE p.post_type = 'blog'</token>
+      </line>
+      <line no="132">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        AND p.post_status = 'publish'</token>
+      </line>
+      <line no="133">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        AND m.media_target = 'blog'</token>
+      </line>
+      <line no="134">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        AND m.media_status = '1'</token>
+      </line>
+      <line no="135">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        AND u.user_banned = '0'</token>
+      </line>
+      <line no="136">
+        <token name="T_CONSTANT_ENCAPSED_STRING">    ORDER BY p.ID DESC "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">linkPosts</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">get_limit</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$sanitize</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="137">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">setSQL</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="138"/>
+      <line no="139">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$entries</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">findAll</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="140"/>
+      <line no="141">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">pagination</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">linkPosts</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">page_links</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$sanitize</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="142"/>
+      <line no="143">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EMPTY">empty</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$entries</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'blogPosts'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$entries</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'paginationLink'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">pagination</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="144">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="145"/>
+      <line no="146">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="147">
+        <token name="T_DOC_COMMENT">     * getPostById</token>
+      </line>
+      <line no="148">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="149">
+        <token name="T_DOC_COMMENT">     * retrieving detail post record by Id</token>
+      </line>
+      <line no="150">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="151">
+        <token name="T_DOC_COMMENT">     * @param int|num $id</token>
+      </line>
+      <line no="152">
+        <token name="T_DOC_COMMENT">     * @param object $sanitize</token>
+      </line>
+      <line no="153">
+        <token name="T_DOC_COMMENT">     * @return boolean|array|object|mixed</token>
+      </line>
+      <line no="154">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="155">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="156">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getPostById</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$id</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="157">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="158"/>
+      <line no="159">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, </token>
+      </line>
+      <line no="160">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          p.post_slug, p.post_content, p.post_summary, p.post_keyword, p.post_status, p.post_sticky, </token>
+      </line>
+      <line no="161">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          p.post_type, p.post_visibility, p.post_password, p.comment_status AS comment_permit, m.media_filename, </token>
+      </line>
+      <line no="162">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          m.media_caption, m.media_target, </token>
+      </line>
+      <line no="163">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          m.media_access, m.media_status, u.user_login, u.user_fullname</token>
+      </line>
+      <line no="164">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          FROM tbl_posts p</token>
+      </line>
+      <line no="165">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          INNER JOIN tbl_media m ON p.media_id = m.ID</token>
+      </line>
+      <line no="166">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          INNER JOIN tbl_users u ON p.post_author = u.ID</token>
+      </line>
+      <line no="167">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          WHERE p.ID = :ID </token>
+      </line>
+      <line no="168">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          AND p.post_status = 'publish'</token>
+      </line>
+      <line no="169">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          AND p.post_type = 'blog' AND m.media_target = 'blog'</token>
+      </line>
+      <line no="170">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          AND m.media_access = 'public' AND m.media_status = '1' "</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="171"/>
+      <line no="172">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$sanitizeid</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">Sanitize</token>
+        <token name="T_DOUBLE_COLON">::</token>
+        <token name="T_STRING">severeSanitizer</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$id</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="173"/>
+      <line no="174">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">setSQL</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="175"/>
+      <line no="176">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$item</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">findRow</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">':ID'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$sanitizeid</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="177"/>
+      <line no="178">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EMPTY">empty</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$item</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$item</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="179">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="180"/>
+      <line no="181">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="182">
+        <token name="T_DOC_COMMENT">     * getPostBySlug</token>
+      </line>
+      <line no="183">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="184">
+        <token name="T_DOC_COMMENT">     * retrieving post record by slug</token>
+      </line>
+      <line no="185">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="186">
+        <token name="T_DOC_COMMENT">     * @param string $slug</token>
+      </line>
+      <line no="187">
+        <token name="T_DOC_COMMENT">     * @return mixed</token>
+      </line>
+      <line no="188">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="189">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="190">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getPostBySlug</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$slug</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$fetchMode</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">null</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="191">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="192"/>
+      <line no="193">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"SELECT p.ID, p.media_id, p.post_author,</token>
+      </line>
+      <line no="194">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 p.post_date, p.post_modified, p.post_title,</token>
+      </line>
+      <line no="195">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 p.post_slug, p.post_content, p.post_summary,</token>
+      </line>
+      <line no="196">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 p.post_keyword, p.post_status, p.post_sticky, </token>
+      </line>
+      <line no="197">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 p.post_type, p.comment_status, </token>
+      </line>
+      <line no="198">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 m.media_filename, m.media_caption, m.media_target, m.media_access,</token>
+      </line>
+      <line no="199">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 u.user_login, u.user_fullname</token>
+      </line>
+      <line no="200">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          FROM tbl_posts AS p</token>
+      </line>
+      <line no="201">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          INNER JOIN tbl_users AS u ON p.post_author = u.ID</token>
+      </line>
+      <line no="202">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          INNER JOIN tbl_media AS m ON p.media_id = m.ID</token>
+      </line>
+      <line no="203">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          WHERE p.post_slug = :slug </token>
+      </line>
+      <line no="204">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          AND p.post_status = 'publish'</token>
+      </line>
+      <line no="205">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          AND p.post_type = 'blog' AND m.media_target = 'blog'</token>
+      </line>
+      <line no="206">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          AND m.media_access = 'public' AND m.media_status = '1'"</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="207"/>
+      <line no="208">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$slug_sanitized</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">Sanitize</token>
+        <token name="T_DOUBLE_COLON">::</token>
+        <token name="T_STRING">severeSanitizer</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$slug</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="209"/>
+      <line no="210">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">setSQL</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="211"/>
+      <line no="212">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$postBySlug</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">is_null</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$fetchMode</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">findRow</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">':ID'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$slug_sanitized</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">findRow</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">':ID'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$slug_sanitized</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$fetchMode</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="213"/>
+      <line no="214">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EMPTY">empty</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$postBySlug</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$postBySlug</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="215">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="216"/>
+      <line no="217">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="218">
+        <token name="T_DOC_COMMENT">     * getPostByAuthor</token>
+      </line>
+      <line no="219">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="220">
+        <token name="T_DOC_COMMENT">     * retrieving post records based on author</token>
+      </line>
+      <line no="221">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="222">
+        <token name="T_DOC_COMMENT">     * @param string $author</token>
+      </line>
+      <line no="223">
+        <token name="T_DOC_COMMENT">     * @return mixed</token>
+      </line>
+      <line no="224">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="225">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="226">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getPostByAuthor</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$author</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="227">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="228"/>
+      <line no="229">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"SELECT p.ID, p.media_id, p.post_author,</token>
+      </line>
+      <line no="230">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 p.post_date, p.post_modified, p.post_title,</token>
+      </line>
+      <line no="231">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 p.post_slug, p.post_content, p.post_summary,</token>
+      </line>
+      <line no="232">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 p.post_keyword, </token>
+      </line>
+      <line no="233">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 p.post_status, p.post_sticky, </token>
+      </line>
+      <line no="234">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 p.post_type, p.comment_status, </token>
+      </line>
+      <line no="235">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 m.media_filename, m.media_caption, m.media_target, m.media_access,</token>
+      </line>
+      <line no="236">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 u.user_fullname, u.user_login</token>
+      </line>
+      <line no="237">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          FROM tbl_posts AS p</token>
+      </line>
+      <line no="238">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          INNER JOIN tbl_user AS u ON p.post_author = u.ID</token>
+      </line>
+      <line no="239">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          INNER JOIN tbl_media AS m ON p.media_id = m.ID</token>
+      </line>
+      <line no="240">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          WHERE u.user_fullname = :author AND p.post_status = 'publish'</token>
+      </line>
+      <line no="241">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          AND p.post_type = 'blog' AND m.media_target = 'blog'</token>
+      </line>
+      <line no="242">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          AND m.media_access = 'public' AND m.media_status = '1'"</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="243"/>
+      <line no="244">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">setSQL</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="245"/>
+      <line no="246">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$postByAuthor</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">findRow</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">':author'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$author</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="247"/>
+      <line no="248">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EMPTY">empty</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$postByAuthor</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$postByAuthor</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="249">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="250"/>
+      <line no="251">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="252">
+        <token name="T_DOC_COMMENT">     * getRandomHeadlinesPosts</token>
+      </line>
+      <line no="253">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="254">
+        <token name="T_DOC_COMMENT">     * retrieving random headlines</token>
+      </line>
+      <line no="255">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="256">
+        <token name="T_DOC_COMMENT">     * @method public getRandomHeadlinesPosts()</token>
+      </line>
+      <line no="257">
+        <token name="T_DOC_COMMENT">     * @param int $start</token>
+      </line>
+      <line no="258">
+        <token name="T_DOC_COMMENT">     * @param int $limit</token>
+      </line>
+      <line no="259">
+        <token name="T_DOC_COMMENT">     * @return mixed</token>
+      </line>
+      <line no="260">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="261">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="262">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getRandomHeadlines</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="263">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="264"/>
+      <line no="265">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"SELECT p.ID, p.media_id, p.post_author,</token>
+      </line>
+      <line no="266">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        p.post_date, p.post_modified, p.post_title,</token>
+      </line>
+      <line no="267">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        p.post_slug, p.post_content, p.post_summary,</token>
+      </line>
+      <line no="268">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        p.post_keyword, p.post_sticky, p.post_type, p.post_status, </token>
+      </line>
+      <line no="269">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        p.post_tags, u.user_login, u.user_fullname,</token>
+      </line>
+      <line no="270">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        m.media_filename, m.media_caption, m.media_type, m.media_target, m.media_access</token>
+      </line>
+      <line no="271">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        FROM tbl_posts AS p</token>
+      </line>
+      <line no="272">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        INNER JOIN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 5) AS p2 ON p.ID = p2.ID </token>
+      </line>
+      <line no="273">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        INNER JOIN tbl_users AS u ON p.post_author = u.ID</token>
+      </line>
+      <line no="274">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        INNER JOIN tbl_media AS m ON p.media_id = m.ID</token>
+      </line>
+      <line no="275">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        WHERE p.post_type = 'blog'</token>
+      </line>
+      <line no="276">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        AND m.media_target = 'blog' </token>
+      </line>
+      <line no="277">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        AND p.post_status = 'publish' </token>
+      </line>
+      <line no="278">
+        <token name="T_CONSTANT_ENCAPSED_STRING">        AND p.post_headlines = '1' "</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="279"/>
+      <line no="280">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">setSQL</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="281"/>
+      <line no="282">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$headlines</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">findAll</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="283"/>
+      <line no="284">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EMPTY">empty</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$headlines</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$headlines</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="285">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="286"/>
+      <line no="287">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="288">
+        <token name="T_DOC_COMMENT">     * getRelatedPosts</token>
+      </line>
+      <line no="289">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="290">
+        <token name="T_DOC_COMMENT">     * retrieving related post records</token>
+      </line>
+      <line no="291">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="292">
+        <token name="T_DOC_COMMENT">     * @param string $post_title</token>
+      </line>
+      <line no="293">
+        <token name="T_DOC_COMMENT">     * @return mixed</token>
+      </line>
+      <line no="294">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="295">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="296">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getRelatedPosts</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$post_title</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="297">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="298"/>
+      <line no="299">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"SELECT ID, media_id, post_author, post_date, post_modified,</token>
+      </line>
+      <line no="300">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 post_title, post_slug, post_content, MATCH(post_title, post_content, post_tags)</token>
+      </line>
+      <line no="301">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                 AGAINST(?) AS score</token>
+      </line>
+      <line no="302">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          FROM tbl_posts WHERE MATCH(post_title, post_content) AGAINTS(?)</token>
+      </line>
+      <line no="303">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          ORDER BY score ASC LIMIT 3"</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="304"/>
+      <line no="305">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">setSQL</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="306"/>
+      <line no="307">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$relatedPosts</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">findRow</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_VARIABLE">$post_title</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="308"/>
+      <line no="309">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EMPTY">empty</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$relatedPosts</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$relatedPosts</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="310">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="311"/>
+      <line no="312">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="313">
+        <token name="T_DOC_COMMENT">     * getRandomPosts</token>
+      </line>
+      <line no="314">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="315">
+        <token name="T_DOC_COMMENT">     * retrieving random posts and display it on homepage</token>
+      </line>
+      <line no="316">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="317">
+        <token name="T_DOC_COMMENT">     * @param int $limit</token>
+      </line>
+      <line no="318">
+        <token name="T_DOC_COMMENT">     * @return mixed</token>
+      </line>
+      <line no="319">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="320">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="321">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getRandomPosts</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$start</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$end</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="322">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="323"/>
+      <line no="324">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,</token>
+      </line>
+      <line no="325">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                   p.post_title, p.post_slug, p.post_content,</token>
+      </line>
+      <line no="326">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                   m.media_filename, m.media_caption, u.user_login, u.user_fullname,</token>
+      </line>
+      <line no="327">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                   (SELECT COUNT(c.ID) FROM "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_comments'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" c WHERE c.comment_post_id = p.ID AND c.comment_status = 'approved') AS total_comments,</token>
+      </line>
+      <line no="328">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                   (SELECT GROUP_CONCAT(CONCAT(t.ID, ':', t.topic_title, ':', t.topic_slug) SEPARATOR '|') </token>
+      </line>
+      <line no="329">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                    FROM "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_post_topic'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" pt </token>
+      </line>
+      <line no="330">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                    JOIN "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_topics'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" t ON pt.topic_id = t.ID </token>
+      </line>
+      <line no="331">
+        <token name="T_CONSTANT_ENCAPSED_STRING">                    WHERE pt.post_id = p.ID AND t.topic_status = 'Y') AS topics_data</token>
+      </line>
+      <line no="332">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          FROM "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_posts'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" AS p</token>
+      </line>
+      <line no="333">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          INNER JOIN (SELECT ID FROM "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_posts'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" ORDER BY RAND() LIMIT 3) AS p2 ON p.ID = p2.ID</token>
+      </line>
+      <line no="334">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          INNER JOIN "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_users'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" AS u ON p.post_author = u.ID</token>
+      </line>
+      <line no="335">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          INNER JOIN "</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">table</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'tbl_media'</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">" AS m ON p.media_id = m.ID</token>
+      </line>
+      <line no="336">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          WHERE p.post_type = 'blog'</token>
+      </line>
+      <line no="337">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          AND p.post_status = 'publish'</token>
+      </line>
+      <line no="338">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          AND m.media_target = 'blog'</token>
+      </line>
+      <line no="339">
+        <token name="T_CONSTANT_ENCAPSED_STRING">          LIMIT :position, :end"</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="340"/>
+      <line no="341">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">setSQL</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="342"/>
+      <line no="343">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$data</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_ARRAY">array</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">':position'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$start</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">':end'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$end</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="344"/>
+      <line no="345">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$randomPosts</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">findAll</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$data</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="346"/>
+      <line no="347">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EMPTY">empty</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$randomPosts</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$randomPosts</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="348">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="349">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="350">
+        <token name="T_DOC_COMMENT">     * getPostsOnSidebar</token>
+      </line>
+      <line no="351">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="352">
+        <token name="T_DOC_COMMENT">     * @param string $status</token>
+      </line>
+      <line no="353">
+        <token name="T_DOC_COMMENT">     * @param int|num $start</token>
+      </line>
+      <line no="354">
+        <token name="T_DOC_COMMENT">     * @param int|num $limit</token>
+      </line>
+      <line no="355">
+        <token name="T_DOC_COMMENT">     * @return array</token>
+      </line>
+      <line no="356">
+        <token name="T_DOC_COMMENT">     *</token>
+      </line>
+      <line no="357">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="358">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getPostsOnSidebar</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$limit</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="359">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="360"/>
+      <line no="361">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title,</token>
+      </line>
+      <line no="362">
+        <token name="T_CONSTANT_ENCAPSED_STRING">               p.post_slug, p.post_content, p.post_summary,</token>
+      </line>
+      <line no="363">
+        <token name="T_CONSTANT_ENCAPSED_STRING">               p.post_keyword, p.post_sticky,</token>
+      </line>
+      <line no="364">
+        <token name="T_CONSTANT_ENCAPSED_STRING">               p.post_type, p.post_status, u.user_login, u.user_fullname</token>
+      </line>
+      <line no="365">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            FROM tbl_posts AS p</token>
+      </line>
+      <line no="366">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            INNER JOIN tbl_users AS u ON p.post_author = u.ID</token>
+      </line>
+      <line no="367">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            WHERE p.post_type = 'blog' </token>
+      </line>
+      <line no="368">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            AND p.post_status = 'publish'</token>
+      </line>
+      <line no="369">
+        <token name="T_CONSTANT_ENCAPSED_STRING">            ORDER BY p.post_date DESC LIMIT :limit "</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="370"/>
+      <line no="371">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">setSQL</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$sql</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="372"/>
+      <line no="373">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$sidebar_posts</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">findAll</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">':limit'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$limit</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="374"/>
+      <line no="375">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EMPTY">empty</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$sidebar_posts</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'sidebarPosts'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOUBLE_ARROW">=&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$sidebar_posts</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="376">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="377">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="378"/>
+    </source>
+  </file>
+</phpunit>

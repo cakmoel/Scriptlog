@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="image-encoder.php" path="/utility">
+    <totals>
+      <lines total="30" comments="20" code="10" executable="3" executed="0" percent="0.00"/>
+      <methods count="0" tested="0" percent="0"/>
+      <functions count="1" tested="0" percent="0.00"/>
+      <classes count="0" tested="0" percent="0"/>
+      <traits count="0" tested="0" percent="0"/>
+    </totals>
+    <function name="image_encoder" signature="image_encoder($filename, $filetype)" start="23" crap="6" executable="3" executed="0" coverage="0"/>
+    <source>
+      <line no="1">
+        <token name="T_OPEN_TAG">&lt;?php</token>
+      </line>
+      <line no="2"/>
+      <line no="3">
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="4">
+        <token name="T_DOC_COMMENT"> * Image Encoder Function</token>
+      </line>
+      <line no="5">
+        <token name="T_DOC_COMMENT"> * return local images as base64 encrypted code, i.e embedding the image</token>
+      </line>
+      <line no="6">
+        <token name="T_DOC_COMMENT"> * source into the html request.</token>
+      </line>
+      <line no="7">
+        <token name="T_DOC_COMMENT"> * Example:</token>
+      </line>
+      <line no="8">
+        <token name="T_DOC_COMMENT"> * &lt;img src="&lt;?php echo base64_encode_image ('img/logo.png','png'); ?&gt;"/&gt;</token>
+      </line>
+      <line no="9">
+        <token name="T_DOC_COMMENT"> * OR</token>
+      </line>
+      <line no="10">
+        <token name="T_DOC_COMMENT"> *  &lt;style type="text/css"&gt;</token>
+      </line>
+      <line no="11">
+        <token name="T_DOC_COMMENT"> *    .logo {</token>
+      </line>
+      <line no="12">
+        <token name="T_DOC_COMMENT"> *    background: url("&lt;?php echo base64_encode_image ('img/logo.png','png'); ?&gt;") no-repeat right 5px;</token>
+      </line>
+      <line no="13">
+        <token name="T_DOC_COMMENT"> *    }</token>
+      </line>
+      <line no="14">
+        <token name="T_DOC_COMMENT"> *  &lt;/style&gt;</token>
+      </line>
+      <line no="15">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="16">
+        <token name="T_DOC_COMMENT"> * @category Function</token>
+      </line>
+      <line no="17">
+        <token name="T_DOC_COMMENT"> * @see  https://www.php.net/manual/en/function.base64-encode.php#105200</token>
+      </line>
+      <line no="18">
+        <token name="T_DOC_COMMENT"> * @param string $filename</token>
+      </line>
+      <line no="19">
+        <token name="T_DOC_COMMENT"> * @param string $filetype</token>
+      </line>
+      <line no="20">
+        <token name="T_DOC_COMMENT"> * @return string</token>
+      </line>
+      <line no="21">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="22">
+        <token name="T_DOC_COMMENT"> */</token>
+      </line>
+      <line no="23">
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">image_encoder</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$filename</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$filetype</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="24">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="25">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_IF">if</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$filename</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="26">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$imgbinary</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">fread</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_STRING">fopen</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$filename</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"r"</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">filesize</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$filename</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="27">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'data:image/'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$filetype</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">';base64,'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">base64_encode</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$imgbinary</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="28">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="29">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="30"/>
+    </source>
+  </file>
+</phpunit>

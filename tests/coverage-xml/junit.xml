@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="MedooinFunctionsTest" file="/var/www/blogware/public_html/tests/unit/MedooinFunctionsTest.php" tests="8" assertions="28" errors="0" warnings="0" failures="0" skipped="0" time="0.011356">
+    <testcase name="testDbBuildWhere" class="MedooinFunctionsTest" classname="MedooinFunctionsTest" file="/var/www/blogware/public_html/tests/unit/MedooinFunctionsTest.php" line="20" assertions="7" time="0.005774"/>
+    <testcase name="testDbBuildWhereWithOperators" class="MedooinFunctionsTest" classname="MedooinFunctionsTest" file="/var/www/blogware/public_html/tests/unit/MedooinFunctionsTest.php" line="34" assertions="3" time="0.000758"/>
+    <testcase name="testDbBuildWhereWithInClause" class="MedooinFunctionsTest" classname="MedooinFunctionsTest" file="/var/www/blogware/public_html/tests/unit/MedooinFunctionsTest.php" line="47" assertions="3" time="0.000823"/>
+    <testcase name="testDbBuildWhereEmpty" class="MedooinFunctionsTest" classname="MedooinFunctionsTest" file="/var/www/blogware/public_html/tests/unit/MedooinFunctionsTest.php" line="59" assertions="2" time="0.000732"/>
+    <testcase name="testIsDbDatabase" class="MedooinFunctionsTest" classname="MedooinFunctionsTest" file="/var/www/blogware/public_html/tests/unit/MedooinFunctionsTest.php" line="67" assertions="4" time="0.001103"/>
+    <testcase name="testIsMedooDatabase" class="MedooinFunctionsTest" classname="MedooinFunctionsTest" file="/var/www/blogware/public_html/tests/unit/MedooinFunctionsTest.php" line="76" assertions="3" time="0.000889"/>
+    <testcase name="testAppSettingsFunctionsWithMock" class="MedooinFunctionsTest" classname="MedooinFunctionsTest" file="/var/www/blogware/public_html/tests/unit/MedooinFunctionsTest.php" line="84" assertions="4" time="0.000744"/>
+    <testcase name="testAppTaglineQueryBuild" class="MedooinFunctionsTest" classname="MedooinFunctionsTest" file="/var/www/blogware/public_html/tests/unit/MedooinFunctionsTest.php" line="100" assertions="2" time="0.000533"/>
+  </testsuite>
+</testsuites>
