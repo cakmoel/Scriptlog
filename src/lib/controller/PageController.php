@@ -105,7 +105,7 @@ class PageController extends BaseApp
               'post_locale' => isset($_POST['post_locale']) ? Sanitize::mildSanitizer($_POST['post_locale']) : "en"
             ];
 
-            $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_content' => 50000];
+            $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_content' => 500000];
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
@@ -292,7 +292,7 @@ class PageController extends BaseApp
               'post_locale' => isset($_POST['post_locale']) ? Sanitize::mildSanitizer($_POST['post_locale']) : "en"
             ];
 
-            $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_content' => 50000];
+            $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_content' => 500000];
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {

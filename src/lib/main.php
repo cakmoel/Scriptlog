@@ -59,3 +59,32 @@ if (isset($app->sessionMaker)) {
         start_session_on_site($app->sessionMaker);
     }
 }
+
+// Handle frontend language switch
+if (isset($_GET['switch-lang']) && !empty($_GET['switch-lang'])) {
+    $langCode = preg_replace('/[^a-z]{2}/', '', strtolower($_GET['switch-lang']));
+    $validLocales = ['en', 'ar', 'zh', 'fr', 'ru', 'es', 'id'];
+    
+    if (in_array($langCode, $validLocales)) {
+        $_SESSION['scriptlog_locale'] = $langCode;
+        setcookie('scriptlog_locale', $langCode, time() + (86400 * 365), '/');
+        
+        // Redirect to remove switch-lang from URL
+        $redirectUrl = $_GET['redirect'] ?? '/';
+        if (!empty($_GET['redirect'])) {
+            header("Location: " . urldecode($_GET['redirect']));
+        } else {
+            // Remove switch-lang param and redirect to same page
+            $urlParts = parse_url($_SERVER['REQUEST_URI']);
+            $path = $urlParts['path'] ?? '/';
+            $query = [];
+            if (isset($urlParts['query'])) {
+                parse_str($urlParts['query'], $query);
+                unset($query['switch-lang']);
+            }
+            $newQuery = !empty($query) ? '?' . http_build_query($query) : '';
+            header("Location: " . $path . $newQuery);
+        }
+        exit();
+    }
+}
