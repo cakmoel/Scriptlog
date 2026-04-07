@@ -1,0 +1,19 @@
+includes:
+    - phpstan.baseline.neon
+
+parameters:
+    phpVersion: 70400
+
+    paths:
+        - lib/
+        - index.php
+
+    excludePaths:
+        - lib/vendor/*
+        - lib/core/HTMLPurifier/*
+        - lib/core/ServiceException.php
+        - tests/*
+
+    reportUnmatchedIgnoredErrors: false
+
+    level: 0
