@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<ruleset name="BlogwarePSR12">
+    <description>Blogware PSR12 Coding Standard</description>
+    
+    <!-- Base on PSR12 -->
+    <rule ref="PSR12">
+        <exclude name="PSR12.Namespaces" />
+    </rule>
+    
+    <!-- Exclude PSR1 namespace requirement -->
+    <rule ref="PSR1.Classes.ClassDeclaration">
+        <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace" />
+    </rule>
+    
+    <!-- Exclude PSR1 side effects (security check at top of files) -->
+    <rule ref="PSR1.Files.SideEffects">
+        <exclude name="PSR1.Files.SideEffects.FoundWithSymbols" />
+    </rule>
+    
+    <!-- Exclude line length warnings -->
+    <rule ref="Generic.Files.LineLength">
+        <exclude name="Generic.Files.LineLength.TooLong" />
+    </rule>
+    
+    <!-- Exclude PSR2 underscore naming conventions (project uses $_var convention) -->
+    <rule ref="PSR2.Classes.PropertyDeclaration">
+        <exclude name="PSR2.Classes.PropertyDeclaration.Underscore" />
+    </rule>
+    <rule ref="PSR2.Methods.MethodDeclaration">
+        <exclude name="PSR2.Methods.MethodDeclaration.Underscore" />
+    </rule>
+    
+    <!-- Exclude PSR1 method naming (project uses snake_case) -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName">
+        <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps" />
+        <exclude name="PSR1.Methods.CamelCapsMethodName.IntendedMismatch" />
+    </rule>
+    
+    <!-- Exclude Squiz brace/function spacing issues -->
+    <rule ref="Squiz.ControlStructures.ControlSignature">
+        <exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterCloseBrace" />
+    </rule>
+    <rule ref="Squiz.Functions.MultiLineFunctionDeclaration">
+        <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceSpacing" />
+    </rule>
+    
+    <!-- Exclude PSR12 closing brace issues -->
+    <rule ref="PSR12.Classes.ClosingBrace">
+        <exclude name="PSR12.Classes.ClosingBrace.StatementAfter" />
+    </rule>
+    
+    <!-- Exclude vendor directory -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    
+    <!-- Exclude admin assets -->
+    <exclude-pattern>*/admin/assets/*</exclude-pattern>
+    
+    <!-- Exclude theme assets -->
+    <exclude-pattern>*/themes/blog/assets/*</exclude-pattern>
+    
+    <!-- Exclude HTMLPurifier (third-party) -->
+    <exclude-pattern>*/lib/core/HTMLPurifier/*</exclude-pattern>
+    
+    <!-- Exclude third-party utility files -->
+    <exclude-pattern>*/lib/utility/htmlawed.php</exclude-pattern>
+</ruleset>
