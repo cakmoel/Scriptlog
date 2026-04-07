@@ -211,7 +211,7 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
                     <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-memberships', ActionConst::MEMBERSHIP_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.membership'); ?></a></li>
                     <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-mail', ActionConst::MAIL_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.mail_settings'); ?></a></li>
                     <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-downloads', ActionConst::DOWNLOAD_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.download_settings'); ?></a></li>
-                    <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-api', ActionConst::API_CONFIG, 0])['link']; ?>">RESTful API</a></li>
+                    <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-api', ActionConst::API_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.api'); ?></a></li>
                 </ul>
             </li>
             <?php endif; ?>
@@ -238,6 +238,7 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
                     <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['privacy'], false)['link']; ?>"><?= admin_translate('nav.privacy_settings'); ?></a></li>
                     <li><a href="<?= $url; ?>/index.php?load=privacy&p=data-requests"><?= admin_translate('nav.data_requests'); ?></a></li>
                     <li><a href="<?= $url; ?>/index.php?load=privacy&p=audit-logs"><?= admin_translate('nav.audit_logs'); ?></a></li>
+                    <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['privacy-policy'], false)['link']; ?>"><?= admin_translate('nav.privacy_policy'); ?></a></li>
                 </ul>
             </li>
             <?php endif; ?>

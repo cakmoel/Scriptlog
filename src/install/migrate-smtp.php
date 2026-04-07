@@ -7,7 +7,13 @@
  */
 
 define('SCRIPTLOG', true);
-require_once __DIR__ . '/../lib/vendor/autoload.php';
+
+// Universal vendor autoload - works for both standard and Composer installations
+if (file_exists(__DIR__ . '/../lib/vendor/autoload.php')) {
+    require_once __DIR__ . '/../lib/vendor/autoload.php';
+} elseif (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+}
 
 $config = require __DIR__ . '/../config.php';
 
