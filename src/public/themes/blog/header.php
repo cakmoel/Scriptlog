@@ -91,6 +91,66 @@ endif;
                     $menus = theme_navigation('public');
                     echo  front_navigation(0, $menus);
                     ?>
+                    
+                    <!-- Language Switcher -->
+                    <li class="dropdown language-switcher">
+                        <button type="button" 
+                                class="btn-language dropdown-toggle" 
+                                id="languageMenu" 
+                                data-toggle="dropdown" 
+                                aria-haspopup="true" 
+                                aria-expanded="false"
+                                aria-label="Select language - Current: <?php echo get_language_name(get_locale(), false); ?>">
+                            <i class="fa fa-globe" aria-hidden="true"></i>
+                            <span class="lang-text"><?php echo get_language_name(get_locale(), true); ?></span>
+                            <span class="lang-code"><?php echo strtoupper(get_locale()); ?></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="languageMenu">
+                            <?php
+                            $locales = available_locales();
+                            $current = get_locale();
+                            $default = get_default_locale();
+                            $permalinksEnabled = function_exists('is_permalink_enabled') && is_permalink_enabled() === 'yes';
+                            
+                            foreach ($locales as $locale) :
+                                $is_active = ($locale === $current) ? 'active' : '';
+                                
+                                // Determine the correct URL based on permalink and locale prefix settings
+                                if (!$permalinksEnabled) {
+                                    // When permalinks disabled: use query string format
+                                    $lang_url = '?switch-lang=' . urlencode($locale) . '&redirect=' . urlencode($_SERVER['REQUEST_URI']);
+                                } else {
+                                    // When permalinks enabled: use locale_url() which handles prefix logic
+                                    $lang_url = locale_url($_SERVER['REQUEST_URI'], $locale);
+                                }
+                                
+                                $native_name = get_language_name($locale, true);
+                                $english_name = get_language_name($locale, false);
+                                $lang_code = strtoupper($locale);
+                                ?>
+                                <li>
+                                    <a href="<?php echo htmlspecialchars($lang_url, ENT_QUOTES, 'UTF-8'); ?>" 
+                                       class="dropdown-item <?php echo $is_active; ?>" 
+                                       role="menuitem"
+                                       aria-current="<?php echo ($is_active === 'active') ? 'page' : 'false'; ?>"
+                                       aria-label="<?php echo htmlout($english_name); ?>">
+                                        <span class="lang-flag" aria-hidden="true">
+                                            <?php if ($is_active === 'active') : ?>
+                                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                            <?php else : ?>
+                                                <i class="fa fa-circle-o text-muted" aria-hidden="true"></i>
+                                            <?php endif; ?>
+                                        </span>
+                                        <span class="lang-info">
+                                            <span class="lang-native"><?php echo htmlout($native_name); ?></span>
+                                            <span class="lang-english"><?php echo htmlout($english_name); ?></span>
+                                        </span>
+                                        <span class="lang-code-badge"><?php echo htmlout($lang_code); ?></span>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- .container -->

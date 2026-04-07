@@ -315,6 +315,11 @@ class MediaController extends BaseApp
 
         $getMediaMeta = $this->mediaService->grabMediaMeta($getMedia['ID'], $getMedia['media_filename']);
 
+        if (empty($getMediaMeta)) {
+            $_SESSION['error'] = "mediaNotFound";
+            direct_page('index.php?load=medialib&error=mediaNotFound', 404);
+        }
+
         $media_properties = array(
 
           'ID' => $getMediaMeta['ID'],
