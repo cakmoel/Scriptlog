@@ -23,7 +23,7 @@
 
 The ScriptLog RESTful API provides programmatic access to your blog's content, allowing other platforms, operating systems, and devices to interact with your blog data. The API follows REST architectural principles and returns JSON responses.
 
-**API Version:** 1.0.0  
+**API Version:** 1.1.1  
 **Format:** JSON
 
 ---
@@ -81,6 +81,33 @@ Authorization: Bearer your-bearer-token
 
 ## API Endpoints
 
+### API Settings (Admin Panel)
+
+The API includes configurable rate limiting settings that can be managed through the admin panel.
+
+#### Access API Settings
+
+Navigate to **Settings → API** in the admin panel:
+
+```
+https://blogware.site/admin/index.php?load=option-api&action=apiConfig&Id=0
+```
+
+#### Rate Limiting Configuration
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| Enable Rate Limiting | Toggle rate limiting on/off | Enabled |
+| Read Rate Limit | Maximum GET requests per minute per client | 60 |
+| Write Rate Limit | Maximum POST/PUT/DELETE/PATCH requests per minute per client | 20 |
+
+**Note:** Rate limiting settings are stored in the `tbl_settings` table with keys:
+- `api_rate_limit_enabled` (0 or 1)
+- `api_rate_limit_read` (1-1000)
+- `api_rate_limit_write` (1-500)
+
+---
+
 ### API Information
 
 #### Get API Information
@@ -104,7 +131,7 @@ curl -X GET http://blogware.site/api/v1/
   "message": "Welcome to Blogware RESTful API",
   "data": {
     "name": "Blogware RESTful API",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "description": "RESTful API for Blogware content management system",
     "base_url": "/api/v1",
     "authentication": {
@@ -274,6 +301,16 @@ Updates an existing blog post. **Requires authentication.**
 
 ---
 
+#### Partially Update Post
+
+```
+PATCH /api/v1/posts/{id}
+```
+
+Partially updates an existing blog post. **Requires authentication.** Only send the fields you want to change.
+
+---
+
 #### Delete Post
 
 ```
@@ -372,6 +409,16 @@ Updates a category. **Requires authentication.**
 
 ---
 
+#### Partially Update Category
+
+```
+PATCH /api/v1/categories/{id}
+```
+
+Partially updates a category. **Requires authentication.** Only send the fields you want to change.
+
+---
+
 #### Delete Category
 
 ```
@@ -444,6 +491,16 @@ PUT /api/v1/comments/{id}
 ```
 
 Updates a comment. **Requires authentication.**
+
+---
+
+#### Partially Update Comment
+
+```
+PATCH /api/v1/comments/{id}
+```
+
+Partially updates a comment. **Requires authentication.** Only send the fields you want to change.
 
 ---
 
@@ -630,15 +687,229 @@ curl -X GET "http://blogware.site/api/v1/posts?sort_by=post_date&sort_order=DESC
 
 ## Rate Limiting
 
-API requests are rate limited to ensure fair usage. Rate limit headers are included in responses:
+API requests are rate limited to ensure fair usage and prevent abuse. Rate limiting is applied per-client using IP address, API key, or Bearer token as the identifier.
+
+### Rate Limits
+
+| Endpoint Type | Limit | Window |
+|--------------|-------|--------|
+| **Read (GET)** | 60 requests | 60 seconds |
+| **Write (POST/PUT/DELETE/PATCH)** | 20 requests | 60 seconds |
+
+### Rate Limit Headers
+
+All API responses include rate limit headers:
 
 | Header | Description |
 |--------|-------------|
-| X-RateLimit-Limit | Maximum requests per minute |
+| X-RateLimit-Limit | Maximum requests allowed per window |
 | X-RateLimit-Remaining | Remaining requests in current window |
 | X-RateLimit-Reset | Unix timestamp when the rate limit resets |
+| Retry-After | Seconds to wait before retrying (only on 429 responses) |
 
-If you exceed the rate limit, you'll receive a `429 Too Many Requests` response.
+### Rate Limit Exceeded
+
+If you exceed the rate limit, you'll receive a `429 Too Many Requests` response:
+
+```json
+{
+  "success": false,
+  "status": 429,
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Rate limit exceeded. Please slow down."
+  }
+}
+```
+
+### Client Identification
+
+Rate limits are tracked per client using the following priority:
+1. **API Key** (`X-API-Key` header) - if provided
+2. **Bearer Token** (`Authorization` header) - if provided
+3. **IP Address** (`REMOTE_ADDR`) - fallback
+
+---
+
+## HATEOAS (Hypermedia as the Engine of Application State)
+
+All API responses include HATEOAS links following [RFC 5988 (Web Linking)](https://tools.ietf.org/html/rfc5988). This allows clients to discover available actions dynamically without hardcoding URLs.
+
+### Response Structure
+
+Every response includes a `_links` object with discoverable navigation:
+
+```json
+{
+  "success": true,
+  "status": 200,
+  "data": { ... },
+  "_links": {
+    "self": {
+      "href": "http://blogware.site/api/v1/posts/1",
+      "rel": "self",
+      "type": "GET"
+    },
+    "collection": {
+      "href": "http://blogware.site/api/v1/posts",
+      "rel": "collection",
+      "type": "GET"
+    }
+  }
+}
+```
+
+### Common Link Relations
+
+| Relation | Description |
+|----------|-------------|
+| `self` | The current resource URL |
+| `collection` | The parent collection URL |
+| `first` | First page of paginated results |
+| `prev` | Previous page of paginated results |
+| `next` | Next page of paginated results |
+| `last` | Last page of paginated results |
+| `canonical` | The canonical HTML URL for the resource |
+| `comments` | Comments for a post |
+| `post` | The parent post for a comment |
+| `posts` | Posts in a category |
+| `year` | Year archive for a month |
+| `search` | Search endpoint (templated URL) |
+| `service-desc` | OpenAPI specification URL |
+
+### Root API Links
+
+The API root (`GET /api/v1/`) returns links to all available endpoints:
+
+```json
+{
+  "success": true,
+  "status": 200,
+  "data": {
+    "name": "Blogware RESTful API",
+    "version": "1.0.0"
+  },
+  "_links": {
+    "self": {
+      "href": "http://blogware.site/api/v1",
+      "rel": "self",
+      "type": "GET"
+    },
+    "posts": {
+      "href": "http://blogware.site/api/v1/posts",
+      "rel": "posts",
+      "type": "GET"
+    },
+    "categories": {
+      "href": "http://blogware.site/api/v1/categories",
+      "rel": "categories",
+      "type": "GET"
+    },
+    "comments": {
+      "href": "http://blogware.site/api/v1/comments",
+      "rel": "comments",
+      "type": "GET"
+    },
+    "archives": {
+      "href": "http://blogware.site/api/v1/archives",
+      "rel": "archives",
+      "type": "GET"
+    },
+    "search": {
+      "href": "http://blogware.site/api/v1/search?q={query}",
+      "rel": "search",
+      "type": "GET",
+      "templated": true
+    },
+    "openapi": {
+      "href": "http://blogware.site/api/v1/openapi.json",
+      "rel": "service-desc",
+      "type": "application/json"
+    }
+  }
+}
+```
+
+### Paginated Response with HATEOAS
+
+```json
+{
+  "success": true,
+  "status": 200,
+  "data": [ ... ],
+  "pagination": {
+    "current_page": 2,
+    "per_page": 10,
+    "total_items": 50,
+    "total_pages": 5,
+    "has_next_page": true,
+    "has_previous_page": true
+  },
+  "_links": {
+    "self": {
+      "href": "http://blogware.site/api/v1/posts?page=2&per_page=10",
+      "rel": "self",
+      "type": "GET"
+    },
+    "first": {
+      "href": "http://blogware.site/api/v1/posts?page=1&per_page=10",
+      "rel": "first",
+      "type": "GET"
+    },
+    "prev": {
+      "href": "http://blogware.site/api/v1/posts?page=1&per_page=10",
+      "rel": "prev",
+      "type": "GET"
+    },
+    "next": {
+      "href": "http://blogware.site/api/v1/posts?page=3&per_page=10",
+      "rel": "next",
+      "type": "GET"
+    },
+    "last": {
+      "href": "http://blogware.site/api/v1/posts?page=5&per_page=10",
+      "rel": "last",
+      "type": "GET"
+    }
+  }
+}
+```
+
+### Single Resource with HATEOAS
+
+```json
+{
+  "success": true,
+  "status": 200,
+  "data": {
+    "id": 1,
+    "title": "My First Blog Post",
+    "slug": "my-first-blog-post"
+  },
+  "_links": {
+    "self": {
+      "href": "http://blogware.site/api/v1/posts/1",
+      "rel": "self",
+      "type": "GET"
+    },
+    "comments": {
+      "href": "http://blogware.site/api/v1/posts/1/comments",
+      "rel": "comments",
+      "type": "GET"
+    },
+    "canonical": {
+      "href": "http://blogware.site/post/1/my-first-blog-post",
+      "rel": "canonical",
+      "type": "text/html"
+    },
+    "collection": {
+      "href": "http://blogware.site/api/v1/posts",
+      "rel": "collection",
+      "type": "GET"
+    }
+  }
+}
+```
 
 ---
 
@@ -779,6 +1050,34 @@ For issues and questions:
 ---
 
 ## Changelog
+
+### Version 1.1.1 (2026-04-04)
+- **Caching**: GET responses are now cacheable with `Cache-Control: public, max-age=300`
+  - `ETag` header for entity tag cache validation
+  - `Last-Modified` header for timestamp-based validation
+  - `304 Not Modified` response for conditional requests (`If-None-Match`, `If-Modified-Since`)
+  - `Vary: Accept, Accept-Encoding, X-API-Key` header for proper cache keying
+- **HTTP Compliance**:
+  - `Location` header on all `201 Created` responses
+  - `204 No Content` for `DELETE` operations (was `200 OK`)
+  - `406 Not Acceptable` for unsupported `Accept` header values
+  - `PATCH` method support for partial updates (Posts, Categories, Comments)
+  - `Allow` header on `405 Method Not Allowed` responses
+- **REST Semantic Fixes**:
+  - Changed `POST /languages/{code}/default` to `PUT` (proper state change semantics)
+
+### Version 1.1.0 (2026-04-04)
+- **Rate Limiting**: Implemented file-based rate limiting with sliding window
+  - 60 requests/minute for read operations (GET)
+  - 20 requests/minute for write operations (POST/PUT/DELETE/PATCH)
+  - Per-client tracking by API key, Bearer token, or IP address
+  - Standard rate limit headers (X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset)
+- **HATEOAS**: Added Hypermedia as the Engine of Application State to all responses
+  - `_links` object in every response following RFC 5988 (Web Linking)
+  - Pagination links (self, first, prev, next, last)
+  - Resource links (self, collection, canonical, comments, post)
+  - Root API links for endpoint discovery
+  - Templated search URL support
 
 ### Version 1.0.0 (2024-01-15)
 - Initial release
