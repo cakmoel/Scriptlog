@@ -5,8 +5,8 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Bootstrap
  *
- * Central orchestrator for the MyBlogi framework. This class handles the
- * sequential loading of configurations, utility functions, core services,
+ * Central orchestrator for this blog. This class handles 
+ * the sequential loading of configurations, utility functions, core services,
  * and global security policies.
  *
  * @category Core
@@ -67,7 +67,7 @@ class Bootstrap
         $core_vars = self::loadConfiguration($appRoot);
 
         // 2. Load Utility Functions (Requires lib/utility-loader.php to exist)
-        require __DIR__ . '/../../lib/utility-loader.php';
+        require_once __DIR__ . '/../../lib/utility-loader.php';
 
         // 3. Set Up Services and Registry
         $services = self::initializeServices($core_vars);
@@ -126,14 +126,26 @@ class Bootstrap
      */
     private static function initializeServices(array $core_vars): array
     {
-        // STEP 1: CREATE DATABASE CONNECTION
-        $dbc = class_exists('DbFactory') ? DbFactory::connect([
-            'mysql:host=' . $core_vars['db_host'] . ';port=' . $core_vars['db_port'] . ';dbname=' . $core_vars['db_name'] . ';charset=utf8mb4',
-            $core_vars['db_user'],
-            $core_vars['db_pwd']
-        ]) : "";
+        // STEP 1: CREATE DATABASE CONNECTION (only if all required keys exist)
+        $dbc = "";
+        
+        if (class_exists('DbFactory') && 
+            !empty($core_vars['db_host']) && 
+            !empty($core_vars['db_user']) && 
+            !empty($core_vars['db_name'])) {
+            try {
+                $dbc = DbFactory::connect([
+                    'mysql:host=' . $core_vars['db_host'] . ';port=' . $core_vars['db_port'] . ';dbname=' . $core_vars['db_name'] . ';charset=utf8mb4',
+                    $core_vars['db_user'],
+                    $core_vars['db_pwd']
+                ]);
+            } catch (Exception $e) {
+                // Database connection failed - continue without db connection
+                $dbc = "";
+            }
+        }
 
-        if (isset($core_vars['db_prefix']) && !empty($core_vars['db_prefix']) && method_exists($dbc, 'setTablePrefix')) {
+        if (!empty($dbc) && isset($core_vars['db_prefix']) && !empty($core_vars['db_prefix']) && method_exists($dbc, 'setTablePrefix')) {
             $dbc->setTablePrefix($core_vars['db_prefix']);
         }
 
@@ -156,21 +168,59 @@ class Bootstrap
         // STEP 3: SET REGISTRY
         class_exists('Registry') ? Registry::setAll([
             'dbc' => $dbc,
-            'key' => $core_vars['cipher_key'],
+            'key' => $core_vars['cipher_key'] ?? '',
             'route' => $rules,
             'uri' => class_exists('RequestPath') ? new RequestPath() : null
         ]) : "";
 
         // STEP 4: INSTANTIATE SERVICES
-        $userDao = class_exists('UserDao') ? new UserDao() : null;
-        $userToken = class_exists('UserTokenDao') ? new UserTokenDao() : null;
-        $validator = class_exists('FormValidator') ? new FormValidator() : null;
-        $sanitizer = class_exists('Sanitize') ? new Sanitize() : null;
+        $userDao = null;
+        $userToken = null;
+        $validator = null;
+        $sanitizer = null;
+        
+        // Only instantiate DAOs if we have a valid database connection
+        if (!empty($dbc) && $dbc !== "") {
+            $userDao = class_exists('UserDao') ? new UserDao() : null;
+            $userToken = class_exists('UserTokenDao') ? new UserTokenDao() : null;
+            $validator = class_exists('FormValidator') ? new FormValidator() : null;
+            $sanitizer = class_exists('Sanitize') ? new Sanitize() : null;
 
-        $configDao = class_exists('ConfigurationDao') ? new ConfigurationDao() : null;
-        $configService = ($configDao && $validator && $sanitizer) ? new ConfigurationService($configDao, $validator, $sanitizer) : null;
+            $configDao = class_exists('ConfigurationDao') ? new ConfigurationDao() : null;
+            $configService = ($configDao && $validator && $sanitizer) ? new ConfigurationService($configDao, $validator, $sanitizer) : null;
+        } else {
+            $configDao = null;
+            $configService = null;
+        }
 
-        $sessionMaker = class_exists('SessionMaker') ? new SessionMaker(set_session_cookies_key($core_vars['app_email'], $core_vars['app_key'])) : null;
+        $sessionMaker = null;
+        if (class_exists('SessionMaker')) {
+            try {
+                if (!headers_sent() || PHP_SAPI === 'cli') {
+                    $sessionMaker = new SessionMaker(set_session_cookies_key($core_vars['app_email'] ?? '', $core_vars['app_key'] ?? ''));
+                }
+            } catch (Exception $e) {
+                // Session creation failed - continue without session
+            }
+        }
+
+        $authenticator = null;
+        if (class_exists('Authentication') && !empty($dbc) && $dbc !== "") {
+            try {
+                $authenticator = new Authentication($userDao, $userToken, $validator);
+            } catch (Exception $e) {
+                // Authentication creation failed
+            }
+        }
+
+        $dispatcher = null;
+        if (class_exists('Dispatcher') && !empty($dbc) && $dbc !== "") {
+            try {
+                $dispatcher = new Dispatcher();
+            } catch (Exception $e) {
+                // Dispatcher creation failed
+            }
+        }
 
         self::$services = [
             'sessionMaker' => $sessionMaker,
@@ -181,9 +231,9 @@ class Bootstrap
             'validator' => $validator,
             'configDao' => $configDao,
             'configService' => $configService,
-            'authenticator' => class_exists('Authentication') ? new Authentication($userDao, $userToken, $validator) : null,
+            'authenticator' => $authenticator,
             'ubench' => class_exists('Ubench') ? new Ubench() : null,
-            'dispatcher' => class_exists('Dispatcher') ? new Dispatcher() : null,
+            'dispatcher' => $dispatcher,
         ];
 
         // STEP 5: Initialize i18n if available
@@ -204,7 +254,7 @@ class Bootstrap
      */
     private static function applySecurity(): void
     {
-        if (!headers_sent()) {
+        if (!headers_sent() && PHP_SAPI !== 'cli') {
             x_frame_option();
             x_content_type_options();
             x_xss_protection();
@@ -213,8 +263,22 @@ class Bootstrap
             remove_x_powered_by();
         }
 
-        call_htmlpurifier();
-        get_server_load();
-        whoops_error();
+        if (function_exists('call_htmlpurifier')) {
+            call_htmlpurifier();
+        }
+        if (function_exists('get_server_load')) {
+            try {
+                get_server_load();
+            } catch (Exception $e) {
+                // Ignore server load check errors
+            }
+        }
+        if (function_exists('whoops_error')) {
+            try {
+                whoops_error();
+            } catch (Exception $e) {
+                // Ignore whoops errors
+            }
+        }
     }
 }

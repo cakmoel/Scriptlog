@@ -10,7 +10,16 @@ ini_set('display_errors', 1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../src/lib/common.php';
-require_once __DIR__ . '/../src/lib/utility-loader.php';
+
+if (!function_exists('load_core_utilities')) {
+    require_once __DIR__ . '/../src/lib/utility-loader.php';
+}
+
+// Force load all utilities by calling load_core_utilities
+if (function_exists('load_core_utilities')) {
+    load_core_utilities();
+}
+
 require_once __DIR__ . '/../src/lib/utility/rate-limiter.php';
 
 // Setup autoloader for DAO and Service classes
