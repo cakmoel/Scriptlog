@@ -44,4 +44,4 @@ jobs:
           mysql -h 127.0.0.1 -u root -proot blogware_test < src/install/include/dbtable.php
 
       - name: Run PHPUnit
-        run: src/lib/vendor/bin/phpunit tests/unit tests/service tests/integration --testdox --colors=never
+        run: vendor/bin/phpunit tests/unit tests/service tests/integration --testdox --colors=never
