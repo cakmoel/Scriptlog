@@ -246,6 +246,50 @@ function get_html_dir(): string
 }
 
 /**
+ * get_language_name() - Get human-readable language name
+ *
+ * @param string $locale Language code (en, ar, zh, fr, ru, es, id)
+ * @param bool $native Return native name if true, English name if false
+ * @return string
+ */
+function get_language_name(string $locale, bool $native = true): string
+{
+    $names = [
+        'en' => ['native' => 'English', 'english' => 'English'],
+        'ar' => ['native' => 'العربية', 'english' => 'Arabic'],
+        'zh' => ['native' => '中文', 'english' => 'Chinese'],
+        'fr' => ['native' => 'Français', 'english' => 'French'],
+        'ru' => ['native' => 'Русский', 'english' => 'Russian'],
+        'es' => ['native' => 'Español', 'english' => 'Spanish'],
+        'id' => ['native' => 'Bahasa Indonesia', 'english' => 'Indonesian'],
+    ];
+
+    $key = $native ? 'native' : 'english';
+    return $names[$locale][$key] ?? ucfirst($locale);
+}
+
+/**
+ * get_all_language_names() - Get all available language names
+ *
+ * @return array
+ */
+function get_all_language_names(): array
+{
+    $locales = available_locales();
+    $names = [];
+
+    foreach ($locales as $locale) {
+        $names[$locale] = [
+            'native' => get_language_name($locale, true),
+            'english' => get_language_name($locale, false),
+            'code' => strtoupper($locale),
+        ];
+    }
+
+    return $names;
+}
+
+/**
  * language_switcher() - Generate language switcher HTML
  *
  * @param array $args Optional arguments
@@ -261,30 +305,41 @@ function language_switcher(array $args = []): string
     }
 
     $style = $args['style'] ?? 'dropdown';
-    $show_flag = $args['show_flag'] ?? false;
+    $show_names = $args['show_names'] ?? true;
     $class = $args['class'] ?? 'language-switcher';
+    $current_native = get_language_name($current, true);
+    $current_code = strtoupper($current);
 
     $html = '<div class="' . escape_html($class) . '">';
 
     if ($style === 'dropdown') {
         $html .= '<div class="dropdown">';
-        $html .= '<button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">';
-        $html .= strtoupper($current);
+        $html .= '<button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+        $html .= '<i class="fa fa-globe" aria-hidden="true"></i> ';
+        $html .= $show_names ? escape_html($current_native) : $current_code;
         $html .= '</button>';
         $html .= '<div class="dropdown-menu">';
 
         foreach ($locales as $locale) {
             $active = ($locale === $current) ? 'active' : '';
-            $url = locale_url('/', $locale);
-            $html .= '<a class="dropdown-item ' . $active . '" href="' . escape_html($url) . '">' . strtoupper($locale) . '</a>';
+            $url = '?switch-lang=' . escape_html($locale) . '&redirect=' . urlencode($_SERVER['REQUEST_URI'] ?? '/');
+            $native_name = get_language_name($locale, true);
+            $lang_code = strtoupper($locale);
+            $html .= '<a class="dropdown-item ' . $active . '" href="' . $url . '">';
+            $html .= '<span class="lang-code-badge">' . $lang_code . '</span>';
+            $html .= '<span class="lang-name">' . escape_html($native_name) . '</span>';
+            if ($active) {
+                $html .= ' <i class="fa fa-check" aria-hidden="true"></i>';
+            }
+            $html .= '</a>';
         }
 
         $html .= '</div></div>';
     } else {
         foreach ($locales as $locale) {
             $active = ($locale === $current) ? 'active' : '';
-            $url = locale_url('/', $locale);
-            $html .= '<a class="' . $active . '" href="' . escape_html($url) . '">' . strtoupper($locale) . '</a>';
+            $url = '?switch-lang=' . escape_html($locale) . '&redirect=' . urlencode($_SERVER['REQUEST_URI'] ?? '/');
+            $html .= '<a class="' . $active . '" href="' . $url . '">' . get_language_name($locale, true) . '</a>';
         }
     }
 
@@ -867,21 +922,32 @@ function block_csrf()
 /**
  * front_navigation
  *
+ * Renders navigation menu HTML with proper URL format based on permalink settings.
+ * Automatically converts between SEO-friendly URLs and query string URLs.
+ *
  * @param int|num| $parent
  * @param array $menu
- *
+ * @return string
  */
 function front_navigation($parent, $menu)
 {
     $html = "";
+    $permalinkEnabled = function_exists('is_permalink_enabled') && is_permalink_enabled() === 'yes';
 
     if (isset($menu['parents'][$parent])) {
         foreach ($menu['parents'][$parent] as $itemId) {
+            $item = $menu['items'][$itemId];
+            $link = $item['menu_link'];
+            $label = $item['menu_label'];
+            
+            // Convert URL based on permalink status
+            $convertedLink = convert_menu_link($link, $permalinkEnabled);
+            
             if (!isset($menu['parents'][$itemId])) {
-                $html .= "<li><a  href='" . $menu['items'][$itemId]['menu_link'] . "'>" . $menu['items'][$itemId]['menu_label'] . "</a></li>";
+                $html .= "<li><a href='" . htmlspecialchars($convertedLink, ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . "</a></li>";
             }
             if (isset($menu['parents'][$itemId])) {
-                $html .= "<li class='dropdown'><a class='dropdown-toggle' data-toggle='dropdown' href='" . $menu['items'][$itemId]['menu_link'] . "'>" . $menu['items'][$itemId]['menu_label'] . "</a>";
+                $html .= "<li class='dropdown'><a class='dropdown-toggle' data-toggle='dropdown' href='" . htmlspecialchars($convertedLink, ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . "</a>";
                 $html .= '<ul class="dropdown-menu">';
                 $html .= front_navigation($itemId, $menu);
                 $html .= '</ul>';
@@ -891,6 +957,111 @@ function front_navigation($parent, $menu)
     }
 
     return $html;
+}
+
+/**
+ * convert_menu_link
+ *
+ * Converts menu link between SEO-friendly and query string formats based on permalink status.
+ * 
+ * @param string $link Original menu link
+ * @param bool $permalinkEnabled Whether permalinks are enabled
+ * @return string Converted link
+ */
+function convert_menu_link(string $link, bool $permalinkEnabled): string
+{
+    // Skip external links, anchors, and special links
+    if (empty($link) || $link === '#' || strpos($link, '://') !== false || strpos($link, 'mailto:') !== false || strpos($link, '#') === 0) {
+        return $link;
+    }
+    
+    // Skip full URLs - only convert relative links
+    if (strpos($link, 'http://') === 0 || strpos($link, 'https://') === 0) {
+        return $link;
+    }
+    
+    if ($permalinkEnabled) {
+        // Convert query string format to SEO-friendly format
+        // ?p=1 -> /post/1/slug
+        // ?pg=1 -> /page/slug
+        // ?cat=1 -> /category/slug
+        // ?a=032025 -> /archive/03/2025
+        
+        if (preg_match('/^\?p=(\d+)$/', $link, $matches)) {
+            $id = $matches[1];
+            $converted = permalinks($id);
+            return $converted['post'] ?? $link;
+        }
+        
+        if (preg_match('/^\?pg=(\d+)$/', $link, $matches)) {
+            $id = $matches[1];
+            $converted = permalinks($id);
+            return $converted['page'] ?? $link;
+        }
+        
+        if (preg_match('/^\?cat=(\d+)$/', $link, $matches)) {
+            $id = $matches[1];
+            $converted = permalinks($id);
+            return $converted['cat'] ?? $link;
+        }
+        
+        if (preg_match('/^\?a=(\d+)$/', $link, $matches)) {
+            $id = $matches[1];
+            $converted = permalinks($id);
+            return $converted['archive'] ?? $link;
+        }
+        
+        // Already in SEO format, return as-is
+        if (strpos($link, '/') === 0) {
+            return $link;
+        }
+        
+        // Remove .php extension and add leading slash if needed
+        $cleanLink = str_replace('.php', '', $link);
+        if (strpos($cleanLink, '/') !== 0) {
+            $cleanLink = '/' . $cleanLink;
+        }
+        
+        return $cleanLink;
+    } else {
+        // Convert SEO-friendly format to query string format
+        // /post/1/slug -> ?p=1
+        // /page/slug -> ?pg=ID
+        // /category/slug -> ?cat=ID
+        // /archive/03/2025 -> ?a=032025
+        
+        if (preg_match('/^\/post\/(\d+)\/[\w-]+$/', $link, $matches)) {
+            return '?p=' . $matches[1];
+        }
+        
+        if (preg_match('/^\/page\/([\w-]+)$/', $link, $matches)) {
+            // Need to resolve page slug to ID - use FrontHelper
+            if (class_exists('FrontHelper')) {
+                $page = FrontHelper::grabPreparedFrontPageBySlug($matches[1]);
+                return '?pg=' . ($page['ID'] ?? 1);
+            }
+            return '?pg=1';
+        }
+        
+        if (preg_match('/^\/category\/([\w-]+)$/', $link, $matches)) {
+            if (class_exists('FrontHelper')) {
+                $cat = FrontHelper::grabPreparedFrontTopicBySlug($matches[1]);
+                return '?cat=' . ($cat['ID'] ?? 1);
+            }
+            return '?cat=1';
+        }
+        
+        if (preg_match('/^\/archive\/(\d{2})\/(\d{4})$/', $link, $matches)) {
+            return '?a=' . $matches[2] . $matches[1];
+        }
+        
+        // For other links, just remove leading slash and prepend ? if needed
+        if (strpos($link, '/') === 0) {
+            return '?' . ltrim($link, '/');
+        }
+        
+        return $link;
+    }
 }
 
 /**

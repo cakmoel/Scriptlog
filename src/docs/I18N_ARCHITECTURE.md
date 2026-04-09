@@ -2,8 +2,8 @@
 
 **Project:** Blogware/Scriptlog CMS  
 **Version:** 2.0  
-**Last Updated:** March 2026  
-**Status:** 🚧 Implementation In Progress
+**Last Updated:** April 2026  
+**Status:** ✅ Completed
 
 ---
 
@@ -371,8 +371,8 @@ class PrivacyPolicyDao extends Dao
 
 | File | Purpose |
 |------|---------|
-| `functions.php` | i18n helper functions (t(), locale_url(), get_locale(), is_rtl(), language_switcher()) |
-| `header.php` | Dynamic lang/dir attributes, RTL CSS loading |
+| `functions.php` | i18n helper functions (t(), locale_url(), get_locale(), is_rtl(), available_locales(), language_switcher()) |
+| `header.php` | Dynamic lang/dir attributes, RTL CSS loading, language switcher |
 | `footer.php` | Copyright translation, RTL JS loading |
 | `sidebar.php` | Widget titles |
 | `single.php` | Comment form |

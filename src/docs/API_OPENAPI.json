@@ -1,10 +1,9 @@
-Xdebug: [Step Debug] Could not connect to debugging client. Tried: localhost:9003 (through xdebug.client_host/xdebug.client_port).
 {
     "openapi": "3.0.3",
     "info": {
         "title": "Blogware RESTful API",
-        "description": "RESTful API for Blogware content management system.\n\nThis API provides programmatic access to blog posts, categories, comments, and archives.\nIt follows OpenAPI 3.0 specification and supports both public and authenticated operations.\n\n## Authentication\n\nThe API supports two authentication methods:\n- **API Key**: Pass your API key in the `X-API-Key` header\n- **Bearer Token**: Pass a bearer token in the `Authorization` header\n\nExample:\n```\nX-API-Key: your-api-key-here\n```\nor\n```\nAuthorization: Bearer your-token-here\n```\n\n## Rate Limiting\n\nAPI requests are rate limited to ensure fair usage. The following headers are included in responses:\n- `X-RateLimit-Limit`: Maximum requests per minute\n- `X-RateLimit-Remaining`: Remaining requests in current window\n- `X-RateLimit-Reset`: Unix timestamp when the rate limit resets\n\n## Response Format\n\nAll responses are returned in JSON format with the following structure:\n\n### Success Response\n```json\n{\n  \"success\": true,\n  \"status\": 200,\n  \"message\": \"Operation description\",\n  \"data\": { ... }\n}\n```\n\n### Paginated Response\n```json\n{\n  \"success\": true,\n  \"status\": 200,\n  \"data\": [...],\n  \"pagination\": {\n    \"current_page\": 1,\n    \"per_page\": 10,\n    \"total_items\": 50,\n    \"total_pages\": 5,\n    \"has_next_page\": true,\n    \"has_previous_page\": false\n  }\n}\n```\n\n### Error Response\n```json\n{\n  \"success\": false,\n  \"status\": 400,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Error description\"\n  }\n}\n```\n\n## Filtering and Sorting\n\nQuery parameters for filtering and sorting:\n- `page`: Page number (default: 1)\n- `per_page`: Items per page (default: 10, max: 100)\n- `sort_by`: Field to sort by\n- `sort_order`: Sort direction (ASC or DESC)\n",
-        "version": "1.0.0",
+        "description": "RESTful API for Blogware content management system.\n\nThis API provides programmatic access to blog posts, categories, comments, and archives.\nIt follows OpenAPI 3.0 specification and supports both public and authenticated operations.\n\n## Authentication\n\nThe API supports two authentication methods:\n- **API Key**: Pass your API key in the `X-API-Key` header\n- **Bearer Token**: Pass a bearer token in the `Authorization` header\n\nExample:\n```\nX-API-Key: your-api-key-here\n```\nor\n```\nAuthorization: Bearer your-token-here\n```\n\n## Rate Limiting\n\nAPI requests are rate limited to ensure fair usage and prevent abuse:\n\n| Endpoint Type | Limit | Window |\n|--------------|-------|--------|\n| **Read (GET)** | 60 requests | 60 seconds |\n| **Write (POST/PUT/DELETE/PATCH)** | 20 requests | 60 seconds |\n\nRate limits are tracked per client using API key, Bearer token, or IP address.\n\nThe following headers are included in all responses:\n- `X-RateLimit-Limit`: Maximum requests allowed per window\n- `X-RateLimit-Remaining`: Remaining requests in current window\n- `X-RateLimit-Reset`: Unix timestamp when the rate limit resets\n- `Retry-After`: Seconds to wait before retrying (only on 429 responses)\n\nExceeding the rate limit returns `429 Too Many Requests`.\n\n## HATEOAS (Hypermedia as the Engine of Application State)\n\nAll API responses include HATEOAS links following [RFC 5988 (Web Linking)](https://tools.ietf.org/html/rfc5988).\nEach response contains a `_links` object with discoverable navigation:\n\n```json\n{\n  \"success\": true,\n  \"status\": 200,\n  \"data\": { ... },\n  \"_links\": {\n    \"self\": { \"href\": \"...\", \"rel\": \"self\", \"type\": \"GET\" },\n    \"collection\": { \"href\": \"...\", \"rel\": \"collection\", \"type\": \"GET\" }\n  }\n}\n```\n\nCommon link relations: `self`, `collection`, `first`, `prev`, `next`, `last`, `canonical`, `comments`, `post`, `posts`, `year`, `search`, `service-desc`.\n\n## Caching and Conditional Requests\n\nGET responses are cacheable with ETag and Last-Modified headers:\n- **ETag**: Entity tag for cache validation\n- **Last-Modified**: Timestamp of last resource modification\n- **If-None-Match**: Client sends cached ETag to check for changes\n- **If-Modified-Since**: Client sends cached timestamp\n- **304 Not Modified**: Response when resource hasn't changed\n\nCache-Control headers vary by HTTP method:\n- **GET**: `public, max-age=300` (cacheable for 5 minutes)\n- **POST/PUT/DELETE/PATCH**: `no-store` (never cache)\n- **4xx errors**: `no-cache, no-store, must-revalidate`\n\n## Content Negotiation\n\nThe API supports `Accept` header validation. Requests with unsupported media types receive `406 Not Acceptable`. Currently only `application/json` is supported.\n\n## Response Format\n\nAll responses are returned in JSON format with the following structure:\n\n### Success Response\n```json\n{\n  \"success\": true,\n  \"status\": 200,\n  \"message\": \"Operation description\",\n  \"data\": { ... }\n}\n```\n\n### Paginated Response\n```json\n{\n  \"success\": true,\n  \"status\": 200,\n  \"data\": [...],\n  \"pagination\": {\n    \"current_page\": 1,\n    \"per_page\": 10,\n    \"total_items\": 50,\n    \"total_pages\": 5,\n    \"has_next_page\": true,\n    \"has_previous_page\": false\n  }\n}\n```\n\n### Error Response\n```json\n{\n  \"success\": false,\n  \"status\": 400,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Error description\"\n  }\n}\n```\n\n## Filtering and Sorting\n\nQuery parameters for filtering and sorting:\n- `page`: Page number (default: 1)\n- `per_page`: Items per page (default: 10, max: 100)\n- `sort_by`: Field to sort by\n- `sort_order`: Sort direction (ASC or DESC)\n",
+        "version": "1.1.1",
         "contact": {
             "name": "Blogware Support",
             "email": "alanmoehammad@gmail.com"
@@ -68,6 +67,9 @@ Xdebug: [Step Debug] Could not connect to debugging client. Tried: localhost:900
                                 }
                             }
                         }
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
                     }
                 }
             }
@@ -107,6 +109,9 @@ Xdebug: [Step Debug] Could not connect to debugging client. Tried: localhost:900
                     },
                     "500": {
                         "$ref": "#/components/responses/InternalServerError"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
                     }
                 }
             },
@@ -278,12 +283,63 @@ Xdebug: [Step Debug] Could not connect to debugging client. Tried: localhost:900
                     }
                 ],
                 "responses": {
+                    "204": {
+                        "description": "Post deleted successfully (no content)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Partially update a post",
+                "description": "Partially updates an existing blog post. Only send the fields you want to change.\nRequires authentication with administrator or editor permissions.\n",
+                "operationId": "patchPost",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/PostId"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PostUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
                     "200": {
-                        "description": "Post deleted successfully",
+                        "description": "Post updated successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/DeleteResponse"
+                                    "$ref": "#/components/schemas/PostResponse"
                                 }
                             }
                         }
@@ -554,12 +610,63 @@ Xdebug: [Step Debug] Could not connect to debugging client. Tried: localhost:900
                     }
                 ],
                 "responses": {
+                    "204": {
+                        "description": "Category deleted successfully (no content)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Partially update a category",
+                "description": "Partially updates an existing category/topic. Only send the fields you want to change.\nRequires authentication with administrator or editor permissions.\n",
+                "operationId": "patchCategory",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/CategoryId"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategoryUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
                     "200": {
-                        "description": "Category deleted successfully",
+                        "description": "Category updated successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/DeleteResponse"
+                                    "$ref": "#/components/schemas/CategoryResponse"
                                 }
                             }
                         }
@@ -835,12 +942,63 @@ Xdebug: [Step Debug] Could not connect to debugging client. Tried: localhost:900
                     }
                 ],
                 "responses": {
+                    "204": {
+                        "description": "Comment deleted successfully (no content)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Partially update a comment",
+                "description": "Partially updates an existing comment. Only send the fields you want to change.\nRequires authentication with administrator or editor permissions.\n",
+                "operationId": "patchComment",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/CommentId"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CommentUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
                     "200": {
-                        "description": "Comment deleted successfully",
+                        "description": "Comment updated successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/DeleteResponse"
+                                    "$ref": "#/components/schemas/CommentResponse"
                                 }
                             }
                         }
@@ -1177,6 +1335,9 @@ Xdebug: [Step Debug] Could not connect to debugging client. Tried: localhost:900
                     },
                     "data": {
                         "type": "object"
+                    },
+                    "_links": {
+                        "$ref": "#/components/schemas/Links"
                     }
                 }
             },
@@ -1909,6 +2070,60 @@ Xdebug: [Step Debug] Could not connect to debugging client. Tried: localhost:900
                     }
                 ]
             },
+            "Link": {
+                "type": "object",
+                "description": "HATEOAS link following RFC 5988 (Web Linking)",
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "description": "The URL of the linked resource",
+                        "example": "http://blogware.site/api/v1/posts"
+                    },
+                    "rel": {
+                        "type": "string",
+                        "description": "The relationship type",
+                        "example": "self"
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "The HTTP method or MIME type",
+                        "example": "GET"
+                    },
+                    "templated": {
+                        "type": "boolean",
+                        "description": "Whether the URL is a URI template",
+                        "example": false
+                    }
+                },
+                "required": [
+                    "href",
+                    "rel"
+                ]
+            },
+            "Links": {
+                "type": "object",
+                "description": "HATEOAS links for discoverable API navigation",
+                "additionalProperties": {
+                    "$ref": "#/components/schemas/Link"
+                },
+                "example": {
+                    "self": {
+                        "href": "http://blogware.site/api/v1/posts?page=1",
+                        "rel": "self",
+                        "type": "GET"
+                    },
+                    "next": {
+                        "href": "http://blogware.site/api/v1/posts?page=2",
+                        "rel": "next",
+                        "type": "GET"
+                    },
+                    "collection": {
+                        "href": "http://blogware.site/api/v1/posts",
+                        "rel": "collection",
+                        "type": "GET"
+                    }
+                }
+            },
             "Pagination": {
                 "type": "object",
                 "properties": {
@@ -1971,7 +2186,7 @@ Xdebug: [Step Debug] Could not connect to debugging client. Tried: localhost:900
                                     },
                                     "version": {
                                         "type": "string",
-                                        "example": "1.0.0"
+                                        "example": "1.1.1"
                                     },
                                     "description": {
                                         "type": "string"
@@ -2068,6 +2283,70 @@ Xdebug: [Step Debug] Could not connect to debugging client. Tried: localhost:900
                     "application/json": {
                         "schema": {
                             "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "TooManyRequests": {
+                "description": "Too Many Requests - Rate limit exceeded",
+                "headers": {
+                    "Retry-After": {
+                        "description": "Seconds to wait before retrying",
+                        "schema": {
+                            "type": "integer",
+                            "example": 60
+                        }
+                    }
+                },
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "NotAcceptable": {
+                "description": "Not Acceptable - Requested media type not supported",
+                "headers": {
+                    "Accept": {
+                        "description": "Supported media types",
+                        "schema": {
+                            "type": "string",
+                            "example": "application/json"
+                        }
+                    }
+                },
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "NotModified": {
+                "description": "Not Modified - Resource has not changed (use cached version)",
+                "headers": {
+                    "ETag": {
+                        "description": "Entity tag for the resource",
+                        "schema": {
+                            "type": "string",
+                            "example": "\"abc123\""
+                        }
+                    },
+                    "Last-Modified": {
+                        "description": "Last modification timestamp",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    "Cache-Control": {
+                        "description": "Cache directives",
+                        "schema": {
+                            "type": "string",
+                            "example": "public, max-age=300"
                         }
                     }
                 }

@@ -187,7 +187,54 @@ $(document).ready(function() {
   $('#summernote').summernote({
     height: 300,                 
     minHeight: null,             
-    maxHeight: null,             
+    maxHeight: null,
+    toolbar: [
+      ['style', ['style']],
+      ['font', ['bold', 'italic', 'underline', 'clear']],
+      ['fontname', ['fontname']],
+      ['color', ['color']],
+      ['para', ['ul', 'ol', 'paragraph']],
+      ['height', ['height']],
+      ['insert', ['link', 'picture', 'video']],
+      ['view', ['fullscreen', 'codeview']],
+      ['help', ['help']]
+    ],
+    callbacks: {
+      onImageUpload: function(files) {
+        // Upload image to server
+        var file = files[0];
+        var formData = new FormData();
+        formData.append('image', file);
+        formData.append('csrfToken', $('#csrf-token').val());
+        
+        // Get post_id from hidden input if available
+        var postId = $('#post_id').val() || null;
+        if (postId) {
+          formData.append('post_id', postId);
+        }
+        
+        $.ajax({
+          url: '/admin/media-upload.php',
+          method: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          xhrFields: {
+            withCredentials: true
+          },
+          success: function(response) {
+            if (response.success && response.data && response.data.url) {
+              $('#summernote').summernote('insertImage', response.data.url);
+            } else {
+              alert('Failed to upload image: ' + (response.error?.message || 'Unknown error'));
+            }
+          },
+          error: function(xhr, status, error) {
+            alert('Failed to upload image: ' + error);
+          }
+        });
+      }
+    }
   });
 });
 </script>
@@ -224,6 +271,10 @@ $(function() {
         autocomplete:{selectFirst:true,width:'100px',autoFill:true}
     });
 </script>
+
+<!-- Hidden inputs for Summernote AJAX upload -->
+<input type="hidden" id="csrf-token" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
+<input type="hidden" id="post_id" value="<?= (isset($post_id)) ? $post_id : ""; ?>">
 
 </body>
 </html>

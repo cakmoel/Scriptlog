@@ -1128,6 +1128,67 @@ footer.main-footer .title::after {
   display: none !important;
 }
 
+/* Footer Navigation */
+footer.main-footer .footer-navigation {
+  padding: 20px 0;
+}
+
+footer.main-footer .footer-nav {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+footer.main-footer .footer-nav li {
+  margin: 0 15px;
+}
+
+footer.main-footer .footer-nav-link {
+  color: #ccc;
+  font-size: 0.95em;
+  font-weight: 400;
+  text-decoration: none;
+  padding: 8px 0;
+  display: inline-block;
+  transition: color 0.3s ease, border-bottom 0.3s ease;
+  border-bottom: 2px solid transparent;
+}
+
+footer.main-footer .footer-nav-link:hover,
+footer.main-footer .footer-nav-link:focus {
+  color: #fff;
+  border-bottom-color: #379392;
+}
+
+footer.main-footer .footer-divider {
+  border: none;
+  border-top: 1px solid #333;
+  margin: 30px 0;
+}
+
+footer.main-footer .social-menu {
+  margin-top: 20px;
+}
+
+footer.main-footer .social-menu a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  color: #ccc;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+footer.main-footer .social-menu a:hover {
+  background: #379392;
+  color: #fff;
+  transform: translateY(-3px);
+}
+
 /* Footer Media Query ------------------------------------- */
 @media (max-width: 767px) {
   footer.main-footer div[class*="col-"] {
@@ -1352,6 +1413,13 @@ main.posts-listing .post-footer {
   font-size: 1em;
   line-height: 1.7em;
   color: #555;
+}
+
+.blog-post .post-body img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 20px 0;
 }
 
 .blog-post .posts-nav {

@@ -108,7 +108,7 @@ class PostController extends BaseApp
               'post_locale' => isset($_POST['post_locale']) ? Sanitize::mildSanitizer($_POST['post_locale']) : "en"
             ];
 
-            $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_tags' => 200, 'post_content' => 50000];
+            $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_tags' => 200, 'post_content' => 500000];
 
             $new_filename = generate_filename($file_name)['new_filename'];
             $file_extension = generate_filename($file_name)['file_extension'];
@@ -460,7 +460,7 @@ class PostController extends BaseApp
               'post_locale' => isset($_POST['post_locale']) ? Sanitize::mildSanitizer($_POST['post_locale']) : "en"
             ];
 
-            $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_tags' => 200, 'post_content' => 50000];
+            $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_tags' => 200, 'post_content' => 500000];
 
             $new_filename = generate_filename($file_name)['new_filename'];
             $file_extension = generate_filename($file_name)['file_extension'];

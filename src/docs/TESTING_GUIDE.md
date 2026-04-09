@@ -34,8 +34,9 @@ This project uses two complementary testing approaches:
 
 | Metric | Value |
 |--------|-------|
-| **Total Tests** | 868 |
-| **Assertions** | ~1000+ |
+| **Total Tests** | 1,172 |
+| **Test Files** | 73 |
+| **Assertions** | ~1300+ |
 | **PHPUnit Version** | 9.6.34 |
 | **Target Coverage** | 40% |
 
@@ -146,9 +147,10 @@ Fill gaps in utility function testing.
 | Phase 3: Core Classes | MEDIUM | 🔄 Pending | 65 | 305 |
 | Phase 4: Controllers | MEDIUM | 🔄 Pending | 34 | 339 |
 | Phase 5: Utilities | LOW | 🔄 Complete | 68 | 407 |
+| Password Protected Posts | HIGH | ✅ Complete | 59 | 466 |
 
 **Total Completed**: 407 tests
-**Current Total**: 868 tests
+**Current Total**: 1,172 tests
 
 ### Recently Added Tests
 
@@ -198,6 +200,32 @@ Fill gaps in utility function testing.
 - ✓ `tests/integration/MenuDaoIntegrationTest.php`
 - ✓ `tests/integration/PluginDaoIntegrationTest.php`
 - ✓ `tests/integration/ThemeDaoIntegrationTest.php`
+
+#### Password-Protected Posts Tests (April 2026)
+
+**Total: 59 tests across 3 files**
+
+- ✓ `tests/unit/ProtectedPostTest.php` (12 tests)
+  - Tests for `protect_post()`, `encrypt_post()`, `decrypt_post()`
+  - Tests for `checking_post_password()`, `grab_post_protected()`
+  - Visibility validation tests (public, private, protected)
+
+- ✓ `tests/unit/ProtectedPostRateLimitTest.php` (20 tests)
+  - Rate limiting logic tests (5 attempts limit per 15 minutes)
+  - Old attempts expiration tests
+  - Separate limits per post ID and IP
+  - Password strength validation tests (length, uppercase, lowercase, number, special char)
+  - Session-based unlock storage tests
+  - Tests for: `is_unlock_rate_limited()`, `track_failed_unlock_attempt()`, `clear_failed_unlock_attempts()`, `get_failed_unlock_attempts()`, `check_post_password_strength()`
+
+- ✓ `tests/unit/PostControllerProtectedPostTest.php` (27 tests)
+  - Visibility validation tests (public, private, protected)
+  - Password validation for protected posts
+  - Content encryption/decryption flow
+  - Session handling for protected posts
+  - Form validation error handling
+  - CSRF protection tests
+  - Required field validation tests
 
 #### Phase 2 - Service Layer Tests (Complete)
 - ✓ `tests/service/UserServiceTest.php` (18 tests)

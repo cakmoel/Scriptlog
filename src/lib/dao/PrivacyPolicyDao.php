@@ -60,6 +60,21 @@ class PrivacyPolicyDao extends Dao
         $this->modify($this->table('tbl_privacy_policies'), ['is_default' => 1], ['ID' => $id]);
     }
 
+    public function fetchAll(): array
+    {
+        return $this->findAllPolicies();
+    }
+
+    public function clearDefaultPolicy(): void
+    {
+        $this->dbc->dbQuery("UPDATE {$this->table('tbl_privacy_policies')} SET is_default = 0");
+    }
+
+    public function setAsDefaultPolicy(int $id): void
+    {
+        $this->setDefaultPolicy($id);
+    }
+
     public function policyExists(string $locale): bool
     {
         $sql = "SELECT ID FROM {$this->table('tbl_privacy_policies')} WHERE locale = ?";

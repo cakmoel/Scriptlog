@@ -986,6 +986,8 @@ class ConfigurationController
         $checkError = true;
         $checkStatus = false;
 
+        $this->setView('api-setting');
+
         $apiSettingKeys = [
             'api_rate_limit_enabled',
             'api_rate_limit_read',
