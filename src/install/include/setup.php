@@ -554,6 +554,7 @@ function install_i18n_data($link, $prefix = '', $default_lang = 'en')
         'nav.privacy_settings' => ['Privacy Settings', 'إعدادات الخصوصية', '隐私设置', 'Paramètres de confidentialité', 'Настройки конфиденциальности', 'Configuración de privacidad', 'Pengaturan Privasi'],
         'nav.data_requests' => ['Data Requests', 'طلبات البيانات', '数据请求', 'Demandes de données', 'Запросы данных', 'Solicitudes de datos', 'Permintaan Data'],
         'nav.audit_logs' => ['Audit Logs', 'سجلات التدقيق', '审计日志', 'Journaux d\'audit', 'Журналы аудита', 'Registros de auditoría', 'Log Audit'],
+        'nav.privacy_policy' => ['Privacy Policy', 'سياسة الخصوصية', '隐私政策', 'Politique de confidentialité', 'Политика конфиденциальности', 'Política de Privacidad', 'Kebijakan Privasi'],
         'nav.languages' => ['Languages', 'اللغات', '语言', 'Langues', 'Языки', 'Idiomas', 'Bahasa'],
         'nav.all_languages' => ['All Languages', 'جميع اللغات', '所有语言', 'Toutes les langues', 'Все языки', 'Todos los idiomas', 'Semua Bahasa'],
         'nav.translations' => ['Translations', 'الترجمات', '翻译', 'Traductions', 'Переводы', 'Traducciones', 'Terjemahan'],
