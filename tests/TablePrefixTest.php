@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../src/lib/common.php';
 
-require_once __DIR__ . '/../install/include/dbtable.php';
+require_once __DIR__ . '/../src/install/include/dbtable.php';
 
 function generate_table_prefix($length = 6)
 {

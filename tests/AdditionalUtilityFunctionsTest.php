@@ -324,7 +324,7 @@ class AdditionalUtilityFunctionsTest extends TestCase
     public function testValidatePluginStructureValid(): void
     {
         if (function_exists('validate_plugin_structure')) {
-            $pluginDir = __DIR__ . '/../admin/plugins/hello-world';
+            $pluginDir = __DIR__ . '/../src/admin/plugins/hello-world';
             $result = validate_plugin_structure($pluginDir);
             
             $this->assertIsArray($result);
@@ -367,7 +367,7 @@ class AdditionalUtilityFunctionsTest extends TestCase
     public function testGetPluginInfo(): void
     {
         if (function_exists('get_plugin_info')) {
-            $pluginDir = __DIR__ . '/../admin/plugins/hello-world';
+            $pluginDir = __DIR__ . '/../src/admin/plugins/hello-world';
             $result = get_plugin_info($pluginDir);
             
             $this->assertIsArray($result);
@@ -388,7 +388,7 @@ class AdditionalUtilityFunctionsTest extends TestCase
     public function testGetPluginSqlFile(): void
     {
         if (function_exists('get_plugin_sql_file')) {
-            $pluginDir = __DIR__ . '/../admin/plugins/hello-world';
+            $pluginDir = __DIR__ . '/../src/admin/plugins/hello-world';
             $result = get_plugin_sql_file($pluginDir);
             
             $this->assertIsString($result);
@@ -413,7 +413,7 @@ class AdditionalUtilityFunctionsTest extends TestCase
     public function testGetPluginFunctionsFile(): void
     {
         if (function_exists('get_plugin_functions_file')) {
-            $pluginDir = __DIR__ . '/../admin/plugins/hello-world';
+            $pluginDir = __DIR__ . '/../src/admin/plugins/hello-world';
             $result = get_plugin_functions_file($pluginDir);
             
             $this->assertIsString($result);
