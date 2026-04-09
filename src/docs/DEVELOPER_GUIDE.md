@@ -1,6 +1,6 @@
 # Developer Guide - Scriptlog
 
-**Version:** 1.0.0 | **Last Updated:** March 2026
+**Version:** 1.1.0 | **Last Updated:** April 2026
 
 ---
 
@@ -30,8 +30,10 @@
 22. [Content Export System](#22-content-export-system)
 23. [UI Asset Management](#23-ui-asset-management)
 24. [Dynamic SMTP System](#24-dynamic-smtp-system)
-25. [Search Functionality](#25-search-functionality)
-26. [Premium UI Standards](#26-premium-ui-standards)
+ 25. [Search Functionality](#25-search-functionality)
+ 26. [Premium UI Standards](#26-premium-ui-standards)
+  27. [Password-Protected Posts](#27-password-protected-posts)
+  28. [Summernote AJAX Image Upload](#28-summernote-ajax-image-upload)
 
 > **NOTE:** For comprehensive testing documentation including PHPStan setup and CI/CD integration, see [TESTING_GUIDE.md](TESTING_GUIDE.md).
 
@@ -68,6 +70,8 @@
 
 **Step-by-Step Installation**
 
+### Option 1: Clone from GitHub
+
 ```bash
 # Clone repository
 git clone https://github.com/ScriptLog/scriptlog.git
@@ -81,15 +85,56 @@ chmod -R 755 public/
 chmod -R 777 public/cache/ public/log/
 ```
 
-> **TIP:** On Linux/Mac, ensure the web server user has write permissions to `public/cache/` and `public/log/`
+### Option 2: Install via Composer from Packagist
+
+```bash
+# Create project directory
+mkdir my-scriptlog
+cd my-scriptlog
+
+# Initialize composer (create composer.json first)
+composer init --name="my/scriptlog" --type=project --no-interaction
+
+# Require the package with dev-develop branch
+composer require cakmoel/scriptlog:dev-develop --prefer-stable
+
+# Or use minimum-stability dev in composer.json
+# "minimum-stability": "dev",
+# "prefer-stable": true
+# Then: composer require cakmoel/scriptlog
+
+# The package will be installed in vendor/ directory
+# Entry point is in src/ directory
+```
 
 ### Running the Application
 
+```bash
+# From project root (recommended)
+cd /path/to/your-project
+php -S localhost:8080 -t src
+
+# Or from within src directory
+cd /path/to/your-project/src
+php -S localhost:8080
+```
+
+Then access the application at: **http://localhost:8080**
+
+> **NOTE:** The `-t src` flag tells PHP's built-in server that the `src` directory is the document root. Without this flag, the server cannot locate `index.php` and will return a "Failed to open stream" error.
+
+> **TIP:** On Linux/Mac, ensure the web server user has write permissions to `public/cache/` and `public/log/`
+
+### Post-Installation
+
 | Environment | URL |
 |-------------|-----|
-| **Public Site** | `http://your-domain/` |
-| **Admin Panel** | `http://your-domain/admin/` |
-| **API Endpoint** | `http://your-domain/api/v1/` |
+| **Public Site** | `http://localhost:8080/` |
+| **Admin Panel** | `http://localhost:8080/admin/` |
+| **API Endpoint** | `http://localhost:8080/api/v1/` |
+| **Installation Wizard** | `http://localhost:8080/install/` |
+
+> **NOTE:** After installation, access `/install/` in your browser to set up the database and complete the setup.
 
 ---
 
@@ -122,7 +167,7 @@ return [
         'url'   => $_ENV['APP_URL'] ?? 'http://example.com',
         'email' => $_ENV['APP_EMAIL'] ?? '',
         'key'   => $_ENV['APP_KEY'] ?? '',
-        'defuse_key' => 'lib/utility/.lts/lts.txt'
+        'defuse_key' => '/var/www/your-project/storage/keys/[random_filename].php'
     ],
 
     'mail' => [
@@ -182,9 +227,101 @@ DISTRIB_NAME="Linux Mint"
 
 During first-time installation, the system automatically:
 - Generates a Defuse encryption key using `Defuse\Crypto\Key::createNewRandomKey()`
-- Saves the key to `lib/utility/.lts/lts.txt`
-- Stores the key path in `config.php` under `app.defuse_key`
+- **Saves the key outside the document root** for maximum security
+- Generates a random filename (16 alphanumeric characters) for the key file
+- Falls back to `lib/utility/.lts/` if storage directory is not writable
+- Stores the key path in:
+  - `config.php` under `app.defuse_key` (absolute path)
+  - `.env` under `DEFUSE_KEY_PATH`
+  - Database `tbl_settings` with key `defuse_key_path`
 - This key is used for authentication cookie encryption
+
+#### Key Location Logic
+
+The `generate_defuse_key()` function in `install/include/setup.php` determines the key location as follows:
+
+```
+Primary Location (outside web root - RECOMMENDED):
+/var/www/your-project/storage/keys/[random_filename].php
+
+Fallback Location (inside web root - less secure):
+/var/www/your-project/public_html/lib/utility/.lts/[random_filename].php
+```
+
+The function works as follows:
+
+```php
+// install/include/setup.php - generate_defuse_key() function
+function generate_defuse_key()
+{
+    $appRoot = dirname(__DIR__, 2);       // e.g., /var/www/myblog/public_html
+    $parentDir = dirname($appRoot);       // e.g., /var/www/myblog
+    
+    // Try to create storage directory outside web root
+    $secureStorage = $parentDir . '/storage';
+    $keyDir = $secureStorage . '/keys';
+    
+    if (!is_dir($keyDir)) {
+        @mkdir($keyDir, 0755, true);
+    }
+    
+    // Fallback to inside web root if not writable
+    if (!is_dir($keyDir) || !is_writable($keyDir)) {
+        $keyDir = $appRoot . '/lib/utility/.lts';
+        if (!is_dir($keyDir)) {
+            @mkdir($keyDir, 0755, true);
+        }
+    }
+    
+    // Add .htaccess protection in fallback location
+    if (strpos($keyDir, $appRoot) !== false && !file_exists($keyDir . '/.htaccess')) {
+        $htaccessContent = "# Deny all public access to encryption keys\nOrder deny,allow\nDeny from all\n";
+        @file_put_contents($keyDir . '/.htaccess', $htaccessContent);
+    }
+    
+    // Generate random filename and save key
+    $keyFilename = generate_random_key_filename();
+    $keyFile = $keyDir . '/' . $keyFilename;
+    
+    $key = Defuse\Crypto\Key::createNewRandomKey();
+    $keyAscii = $key->saveToAsciiSafeString();
+    
+    $phpContent = "<?php\n// Encryption key generated on " . date('Y-m-d H:i:s') . "\nreturn '$keyAscii';";
+    file_put_contents($keyFile, $phpContent, LOCK_EX);
+    
+    return $keyFile;
+}
+```
+
+#### Ensuring Keys Are Stored Outside Web Root
+
+For the key to be stored in the secure location (outside web root), you must create the `storage` directory **before running the installation**:
+
+```bash
+# Navigate to your project parent directory
+cd /var/www/myblog
+
+# Create storage directory (sibling to public_html)
+sudo mkdir -p storage/keys
+
+# Set ownership to web server user
+sudo chown -R www-data:www-data storage
+
+# Set appropriate permissions
+sudo chmod -R 755 storage
+```
+
+| Scenario | Storage Directory Created? | Key Location |
+|----------|---------------------------|--------------|
+| **Yes** (you created storage/) | `/var/www/myblog/storage/keys/` | Outside web root - RECOMMENDED |
+| **No** (skipped step above) | Not available | Falls back to `lib/utility/.lts/` (less secure) |
+
+#### Security Note
+
+- **Outside web root** (`storage/keys/`): Recommended - the key file cannot be accessed via HTTP
+- **Inside web root** (`lib/utility/.lts/`): Less secure but protected by `.htaccess` (auto-generated)
+
+If the key ends up in the fallback location, you can manually move it to `storage/keys/` after installation and update the path in `config.php`, `tbl_settings`, and `.env`.
 
 ### Installation Fixes
 
@@ -312,7 +449,7 @@ The plugin is inserted as disabled (`plugin_status = 'N'`) by default, allowing 
 |------|----------|---------|
 | `config.php` | Root | Main configuration with `$_ENV` fallbacks |
 | `.env` | Root | Environment variables (auto-generated) |
-| `defuse_key` | `lib/utility/.lts/lts.txt` | Encryption key for authentication |
+| `defuse_key` | `/var/www/your-project/storage/keys/[random_filename].php` | Encryption key for authentication |
 
 ---
 
@@ -1619,6 +1756,104 @@ The theme provides functions in the following categories:
 | `render_comments_section($postId, $offset)` | Render comments section HTML |
 | `nothing_found()` | Display "no posts" message |
 | `retrieve_site_url()` | Get site URL from config |
+| `convert_menu_link($link, $permalinkEnabled)` | Convert menu link between SEO-friendly and query string formats |
+
+### Navigation & i18n URL Compatibility
+
+The theme navigation system properly adapts to both SEO-friendly URLs (permalinks enabled) and query string URLs (permalinks disabled), following the architecture defined in `I18N_ARCHITECTURE.md`.
+
+#### URL Conversion Logic
+
+| Permalink Status | Menu Links | Language Switcher |
+|-----------------|------------|-------------------|
+| **Disabled** | Query string (`?p=1`, `?pg=1`, etc.) | `?switch-lang=locale&redirect=...` |
+| **Enabled** | SEO-friendly (`/post/1/slug`, `/page/slug`) | `locale_url()` with proper prefix |
+
+#### locale_url() Behavior
+
+The `locale_url()` function handles locale prefix based on settings:
+
+```php
+function locale_url(string $path = '', ?string $locale = null): string
+{
+    // When permalinks disabled: never add prefix
+    if (!is_permalink_enabled()) {
+        return $path;
+    }
+    
+    // When permalinks enabled but prefix toggle off: no prefix for any language
+    if (is_permalink_enabled() && !is_locale_prefix_enabled()) {
+        return $path;
+    }
+    
+    // When both permalinks and prefix enabled:
+    // - Default language (en): no prefix
+    // - Non-default language: add prefix (e.g., /es/post/1/slug)
+    if ($targetLocale === $defaultLocale) {
+        return $path;
+    }
+    
+    return '/' . $targetLocale . ($path ? '/' . ltrim($path, '/') : '');
+}
+```
+
+#### convert_menu_link() Function
+
+This function converts menu links between formats based on permalink status:
+
+```php
+function convert_menu_link(string $link, bool $permalinkEnabled): string
+{
+    // Skip external links, anchors, and special links
+    if (empty($link) || $link === '#' || strpos($link, '://') !== false) {
+        return $link;
+    }
+    
+    if ($permalinkEnabled) {
+        // Convert query string to SEO-friendly format
+        // ?p=1 -> /post/1/slug, ?pg=1 -> /page/slug, etc.
+    } else {
+        // Convert SEO-friendly to query string format
+        // /post/1/slug -> ?p=1, /page/slug -> ?pg=ID, etc.
+    }
+}
+```
+
+#### theme_navigation() Locale Filtering
+
+The `theme_navigation()` function filters menus by current locale:
+
+```php
+function theme_navigation($visibility)
+{
+    $currentLocale = get_locale();
+    
+    $sql = "SELECT ... FROM tbl_menu 
+            WHERE menu_status = 'Y' 
+              AND menu_visibility = ? 
+              AND (menu_locale = ? OR menu_locale IS NULL OR menu_locale = '')
+            ORDER BY menu_sort ASC, menu_label";
+    // ...
+}
+```
+
+This ensures only menus matching the current language (or menus with no specific locale) are displayed.
+
+#### Language Switcher URL Format
+
+The language switcher in `header.php` determines URL format based on permalink status:
+
+```php
+$permalinksEnabled = is_permalink_enabled() === 'yes';
+
+if (!$permalinksEnabled) {
+    // Query string format when permalinks disabled
+    $lang_url = '?switch-lang=' . urlencode($locale) . '&redirect=' . urlencode($_SERVER['REQUEST_URI']);
+} else {
+    // locale_url() when permalinks enabled
+    $lang_url = locale_url($_SERVER['REQUEST_URI'], $locale);
+}
+```
 
 ### Theme Header (header.php)
 
@@ -1957,6 +2192,116 @@ ScriptLog provides a RESTful API that allows external applications to interact w
 
 > **NOTE:** The complete OpenAPI 3.0 specification is available at `/docs/API_OPENAPI.json` and `/docs/API_OPENAPI.yaml`.
 
+### API Version: 1.1.0
+
+**Latest Enhancements (v1.1.0):**
+- **Rate Limiting**: File-based sliding window rate limiter with per-client tracking
+- **HATEOAS**: RFC 5988 Web Linking support — all responses include `_links` for discoverable navigation
+
+### Rate Limiting
+
+API requests are rate limited to ensure fair usage and prevent abuse. Rate limiting is applied per-client using IP address, API key, or Bearer token as the identifier.
+
+| Endpoint Type | Limit | Window |
+|--------------|-------|--------|
+| **Read (GET)** | 60 requests | 60 seconds |
+| **Write (POST/PUT/DELETE/PATCH)** | 20 requests | 60 seconds |
+
+#### Rate Limit Headers
+
+All API responses include rate limit headers:
+
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | Maximum requests allowed per window |
+| `X-RateLimit-Remaining` | Remaining requests in current window |
+| `X-RateLimit-Reset` | Unix timestamp when the rate limit resets |
+| `Retry-After` | Seconds to wait before retrying (only on 429 responses) |
+
+#### Rate Limit Exceeded Response
+
+```json
+{
+  "success": false,
+  "status": 429,
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Rate limit exceeded. Please slow down."
+  }
+}
+```
+
+#### Client Identification
+
+Rate limits are tracked per client using the following priority:
+1. **API Key** (`X-API-Key` header) — if provided
+2. **Bearer Token** (`Authorization` header) — if provided
+3. **IP Address** (`REMOTE_ADDR`) — fallback
+
+### HATEOAS (Hypermedia as the Engine of Application State)
+
+All API responses include HATEOAS links following [RFC 5988 (Web Linking)](https://tools.ietf.org/html/rfc5988). This allows clients to discover available actions dynamically without hardcoding URLs.
+
+#### Response Structure
+
+Every response includes a `_links` object:
+
+```json
+{
+  "success": true,
+  "status": 200,
+  "data": { ... },
+  "_links": {
+    "self": {
+      "href": "http://blogware.site/api/v1/posts/1",
+      "rel": "self",
+      "type": "GET"
+    },
+    "collection": {
+      "href": "http://blogware.site/api/v1/posts",
+      "rel": "collection",
+      "type": "GET"
+    }
+  }
+}
+```
+
+#### Common Link Relations
+
+| Relation | Description |
+|----------|-------------|
+| `self` | The current resource URL |
+| `collection` | The parent collection URL |
+| `first` | First page of paginated results |
+| `prev` | Previous page of paginated results |
+| `next` | Next page of paginated results |
+| `last` | Last page of paginated results |
+| `canonical` | The canonical HTML URL for the resource |
+| `comments` | Comments for a post |
+| `post` | The parent post for a comment |
+| `posts` | Posts in a category |
+| `year` | Year archive for a month |
+| `search` | Search endpoint (templated URL) |
+| `service-desc` | OpenAPI specification URL |
+
+#### Root API Links
+
+The API root (`GET /api/v1/`) returns links to all available endpoints:
+
+```json
+{
+  "_links": {
+    "self": { "href": "/api/v1", "rel": "self", "type": "GET" },
+    "posts": { "href": "/api/v1/posts", "rel": "posts", "type": "GET" },
+    "categories": { "href": "/api/v1/categories", "rel": "categories", "type": "GET" },
+    "comments": { "href": "/api/v1/comments", "rel": "comments", "type": "GET" },
+    "archives": { "href": "/api/v1/archives", "rel": "archives", "type": "GET" },
+    "search": { "href": "/api/v1/search?q={query}", "rel": "search", "type": "GET", "templated": true },
+    "openapi": { "href": "/api/v1/openapi.json", "rel": "service-desc", "type": "application/json" }
+  }
+}
+```
+
 ### Authentication
 
 The API supports two authentication methods:
@@ -2201,11 +2546,12 @@ This project uses two complementary testing approaches:
 
 | Metric | Value |
 |--------|-------|
-| **Total Tests** | 868 |
-| **Assertions** | ~1000+ |
+| **Total Tests** | 1,172 |
+| **Test Files** | 73 |
+| **Assertions** | ~1300+ |
 | **PHPUnit Version** | 9.6.34 |
 | **Target Coverage** | 40% |
-| **Completed Tests** | 407+ |
+| **Current Coverage** | ~35% |
 
 ### Test Coverage Plan
 
@@ -2220,6 +2566,7 @@ The test coverage plan is organized into phases:
 | Phase 3: Core Classes | MEDIUM | 🔄 Pending | 65 |
 | Phase 4: Controllers | MEDIUM | 🔄 Pending | 34 |
 | Phase 5: Utilities | LOW | ✅ Complete | 68 |
+| Password Protected Posts | HIGH | ✅ Complete | 59 |
 
 ### Test Categories
 
@@ -2242,6 +2589,35 @@ PostDao security tests verify critical security features:
 | `testFindPostFiltersByStatusAndVisibility` | Verifies single post respects status/visibility |
 
 **Location**: `tests/unit/PostDaoSecurityTest.php`
+
+### Password-Protected Posts Testing
+
+Comprehensive tests for the password-protected posts system:
+
+| Test File | Tests | Coverage |
+|-----------|-------|----------|
+| `tests/unit/ProtectedPostTest.php` | 12 | Core encryption/decryption functions |
+| `tests/unit/ProtectedPostRateLimitTest.php` | 20 | Rate limiting & password strength |
+| `tests/unit/PostControllerProtectedPostTest.php` | 27 | Controller flow & validation |
+
+**Total: 59 tests**
+
+| Test Category | Tests |
+|--------------|-------|
+| Rate Limiting Logic | 9 (5 attempts limit, old expiration, per-IP/per-post) |
+| Password Strength | 8 (length, uppercase, lowercase, number, special char) |
+| Functions Existence | 1 |
+| Session Storage | 3 |
+| Encryption/Decryption | 4 |
+| Visibility Validation | 4 |
+| Form Validation | 6 |
+| CSRF Protection | 1 |
+| Required Fields | 2 |
+
+Run password-protected posts tests:
+```bash
+php lib/vendor/bin/phpunit tests/unit/ProtectedPost*.php --bootstrap tests/bootstrap.php
+```
 
 ### Running Tests
 
@@ -3989,10 +4365,317 @@ When applying this pattern to a frontend page (like `privacy.php`), follow these
 
 ---
 
+## 27. Password-Protected Posts
+
+### Overview
+
+ScriptLog includes a secure password-protected posts system that allows users to lock post content with a password. The system uses AJAX for unlock functionality without page reload.
+
+### Security Features
+
+| Feature | Implementation |
+|---------|---------------|
+| **Database-only storage** | All password hashes stored in database, no credential files |
+| **Bcrypt hashing** | Passwords verified against bcrypt hash |
+| **AES-256-CBC encryption** | Post content encrypted with unique passphrase |
+| **Rate limiting** | Max 5 failed attempts per 15 minutes per post/IP |
+| **XSS protection** | Content sanitized with htmLawed after decryption |
+| **Inline style stripping** | Removes Word paste formatting artifacts |
+
+### Architecture
+
+```
+Frontend User Flow:
+1. User visits protected post → sees password form (no content)
+2. User enters password → AJAX request to API
+3. API verifies password (bcrypt hash match)
+4. If valid: API decrypts content (using passphrase) and returns it
+5. Frontend replaces form with decrypted content
+
+Admin Flow:
+1. Admin edits protected post → content auto-decrypted for editing
+2. Admin saves → content re-encrypted with new passphrase
+```
+
+### Database Schema
+
+**tbl_posts columns used for protection:**
+
+| Column | Purpose |
+|--------|---------|
+| `post_visibility` | Set to `protected` for protected posts |
+| `post_password` | Bcrypt hash of the password |
+| `passphrase` | MD5 hash used for encryption: `md5(app_key + password)` |
+| `post_content` | AES-encrypted content |
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `lib/controller/api/ProtectedPostApiController.php` | API controller with unlock/verify endpoints |
+| `lib/utility/protected-post.php` | `decrypt_post()`, `decrypt_post_admin()`, rate limiting functions |
+| `lib/utility/encrypt-decrypt.php` | `encrypt()`, `decrypt()` using AES-256-CBC |
+| `lib/core/FrontHelper.php` | `grabPreparedFrontPostById()` - includes protected posts |
+| `public/themes/blog/assets/js/unlock-post.js` | AJAX form handler |
+| `public/themes/blog/single.php` | Uses AJAX unlock for protected posts |
+| `admin/ui/posts/edit-post.php` | Decrypts content for admin editing |
+| `api/index.php` | Routes: POST `/api/v1/posts/{id}/verify`, POST `/api/v1/posts/{id}/unlock` |
+
+### API Endpoints
+
+| Endpoint | Method | Auth | Description |
+|----------|--------|------|-------------|
+| `/api/v1/posts/{id}/verify` | POST | None | Verify password (returns success/fail only) |
+| `/api/v1/posts/{id}/unlock` | POST | None | Verify password AND return decrypted content |
+
+### Request/Response Examples
+
+**Unlock Request:**
+```json
+POST /api/v1/posts/3/unlock
+{
+  "password": "Bac4D0nG(*)#"
+}
+```
+
+**Unlock Response (success):**
+```json
+{
+  "success": true,
+  "status": 200,
+  "data": {
+    "content": "<p>Decrypted post content here...</p>"
+  }
+}
+```
+
+**Unlock Response (rate limited):**
+```json
+{
+  "success": false,
+  "status": 429,
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Too many failed attempts. Please try again later."
+  }
+}
+```
+
+### Rate Limiting Functions
+
+| Function | Purpose |
+|----------|---------|
+| `is_unlock_rate_limited($postId)` | Check if IP has exceeded max attempts |
+| `track_failed_unlock_attempt($postId)` | Record failed attempt (clears after 15 min) |
+| `clear_failed_unlock_attempts($postId)` | Clear attempts after successful unlock |
+| `get_failed_unlock_attempts($postId)` | Get current attempt count |
+
+### Unit Tests
+
+**Total: 59 tests across 3 files**
+
+| Test File | Tests | Coverage |
+|-----------|-------|----------|
+| `tests/unit/ProtectedPostTest.php` | 12 | Core encryption/decryption functions |
+| `tests/unit/ProtectedPostRateLimitTest.php` | 20 | Rate limiting & password strength |
+| `tests/unit/PostControllerProtectedPostTest.php` | 27 | Controller flow & validation |
+
+Run tests:
+```bash
+php lib/vendor/phpunit/phpunit/phpunit tests/unit/ProtectedPost*.php --bootstrap tests/bootstrap.php
+```
+
+---
+
+## 28. Summernote AJAX Image Upload
+
+### Overview
+
+Summernote WYSIWYG editor includes AJAX image upload functionality for inserting images into post/page content. The upload system uses a direct admin endpoint with proper authentication.
+
+### Implementation Details
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| Upload Endpoint | `admin/media-upload.php` | Direct upload handler with session auth |
+| AJAX Handler | `admin/admin-layout.php` | jQuery AJAX configuration |
+| Media DAO | `lib/dao/MediaDao.php` | Database storage for media metadata |
+| Upload Utility | `lib/utility/upload-photo.php` | Image processing (resize + WebP) |
+
+### Authentication Flow
+
+The upload uses admin session authentication instead of API authentication:
+
+```
+1. Admin opens post editor (Summernote initialized)
+2. Admin clicks image button in toolbar
+3. Admin selects image file
+4. AJAX sends POST to /admin/media-upload.php
+5. Endpoint validates session via Session::getInstance()
+6. If valid: process upload, save to database, return JSON URL
+7. If invalid: return 401 Unauthorized
+```
+
+### Root Causes of Original Issues
+
+The initial implementation had three issues that prevented uploads:
+
+| Issue | Root Cause | Solution |
+|-------|-----------|---------|
+| "Unauthorized" error | Cookie path was `/admin/` instead of `/` | Changed `COOKIE_PATH` in `Authentication.php` |
+| Session not initialized | API entry point didn't initialize sessions | Used direct admin endpoint |
+| JSON parse error | Output buffering issues | Clean output buffers before response |
+
+### Key Files Modified
+
+| File | Change |
+|------|--------|
+| `lib/core/Authentication.php` | Changed `COOKIE_PATH` from `APP_ADMIN` to `/` |
+| `admin/media-upload.php` | New - direct upload endpoint with session auth |
+| `admin/admin-layout.php` | Updated AJAX URL and `withCredentials` setting |
+
+### admin/media-upload.php
+
+Created a dedicated upload endpoint with:
+
+- **Session Authentication**: Uses `Session::getInstance()` (shares admin session context)
+- **Output Buffering**: Cleans all output buffers before JSON response
+- **Error Suppression**: `error_reporting(0)` prevents PHP errors in JSON output
+- **Database Storage**: Saves to `tbl_media` and `tbl_mediameta`
+- **Image Processing**: Creates 3 sizes + WebP via `upload_photo()`
+
+```php
+<?php
+// Key features of the endpoint:
+
+// 1. Disable output and errors
+error_reporting(0);
+ini_set('display_errors', 0);
+
+// 2. Clean all output buffers
+while (ob_get_level()) {
+    ob_end_clean();
+}
+
+// 3. Start fresh buffer
+ob_start();
+
+// 4. Session authentication
+$session = Session::getInstance();
+if (!$session->get('scriptlog_session_login')) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+    exit;
+}
+
+// 5. Process upload
+ob_start();
+upload_photo(...);
+$result = ob_get_clean();
+
+// 6. Save to database
+$mediaId = $mediaDao->insertMedia($data);
+$mediaDao->insertMediaMeta($mediaId, 'post_id', $postId);
+
+// 7. Return clean JSON
+echo json_encode([
+    'success' => true,
+    'url' => $imageUrl,
+    'filename' => $filename,
+    'media_id' => $mediaId
+]);
+```
+
+### AJAX Configuration (admin-layout.php)
+
+```javascript
+$.ajax({
+    url: '/admin/media-upload.php',  // Direct admin endpoint
+    method: 'POST',
+    data: formData,
+    processData: false,
+    contentType: false,
+    xhrFields: {
+        withCredentials: true  // Send cookies with request
+    },
+    success: function(response) {
+        // Insert image into editor
+        summernote.summernote('insertImage', response.url);
+    },
+    error: function(xhr) {
+        // Show error message
+        alert('Failed to upload image: ' + xhr.statusText);
+    }
+});
+```
+
+### Database Schema
+
+**tbl_media** - Image metadata:
+```sql
+- media_filename: Unique filename
+- media_type: 'image'
+- media_target: 'blog'
+- media_user: Username who uploaded
+```
+
+**tbl_mediameta** - Post linkage:
+```sql
+- media_id: Links to tbl_media
+- meta_key: 'post_id'
+- meta_value: Post ID
+```
+
+### Response Format
+
+**Success (201 Created):**
+```json
+{
+  "success": true,
+  "status": 201,
+  "data": {
+    "url": "/public/files/pictures/abc123_image.jpg",
+    "filename": "abc123_image.jpg",
+    "media_id": 42,
+    "post_id": 5
+  }
+}
+```
+
+**Error (401 Unauthorized):**
+```json
+{
+  "success": false,
+  "error": "Unauthorized"
+}
+```
+
+### Testing
+
+1. Log out and log back in (to get new cookie with path `/`)
+2. Go to Posts → Add New
+3. Click image button in Summernote toolbar
+4. Select image file
+5. Verify:
+   - Files created: `public/files/pictures/` has 4 versions + WebP
+   - Database: `tbl_media` and `tbl_mediameta` have new records
+   - Editor: Image inserted into content
+
+### Commits
+
+| Commit | Description |
+|--------|-------------|
+| `f2e1d91` | Fix Summernote AJAX image upload authentication |
+| `5db174e` | Fix cookie path for AJAX API requests |
+| `a593f39` | Use direct admin endpoint for Summernote image upload |
+| `44db5e7` | Fix JSON response in media upload handler |
+
+---
+
 ## License
 
 This project is licensed under the MIT License.
 
 ---
 
-*Last Updated: March 2026 | Version 1.0.2*
+*Last Updated: April 2026 | Version 1.1.1*
