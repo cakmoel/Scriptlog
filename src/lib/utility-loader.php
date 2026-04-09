@@ -6,9 +6,10 @@
  * Run 'php generate-utility-list.php' to regenerate this list.
  */
 
-function load_core_utilities()
-{
-    $utility_files = [
+if (!function_exists('load_core_utilities')) {
+    function load_core_utilities()
+    {
+        $utility_files = [
         'absolute-path.php',
         'absolute-url.php',
         'access-control-list.php',
@@ -224,6 +225,9 @@ function load_core_utilities()
     foreach ($utility_files as $file) {
         require_once $utility_dir . $file;
     }
+    }
 }
 
-load_core_utilities();
+if (!function_exists('load_core_utilities')) {
+    load_core_utilities();
+}
