@@ -45,10 +45,20 @@ jobs:
             require "src/install/include/dbtable.php";
             $tables = get_table_definitions("");
             $pdo = new PDO("mysql:host=127.0.0.1;dbname=blogware_test", "root", "root");
-            foreach ($tables as $sql) {
-                $pdo->exec($sql);
+            // Only create tables (first 14 items are table definitions)
+            $tableKeys = [
+                "tblUser", "tblUserToken", "tblLoginAttempt", "tblPost", "tblMedia",
+                "tblMediaMeta", "tblMediaDownload", "tblTopic", "tblPostTopic", "tblComment",
+                "tblMenu", "tblPlugin", "tblSetting", "tblTheme", "tblConsents",
+                "tblDataRequests", "tblPrivacyLogs", "tblLanguage", "tblTranslation",
+                "tblDownloadLog", "tblPrivacyPolicy"
+            ];
+            foreach ($tableKeys as $key) {
+                if (isset($tables[$key])) {
+                    $pdo->exec($tables[$key]);
+                }
             }
-            echo "Tables created successfully\n";
+            echo "Tables created\n";
           '
 
       - name: Run PHPUnit
