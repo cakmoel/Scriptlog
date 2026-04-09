@@ -8,6 +8,7 @@
 [![MariaDB Version](https://img.shields.io/badge/MariaDB-10.3%2B-003545.svg)](https://mariadb.org/)
 [![PSR-12](https://img.shields.io/badge/PSR--12-Compliant-2C2C2C.svg)](https://www.php-fig.org/psr/psr-12/)
 [![Tests](https://github.com/cakmoel/Scriptlog/workflows/Tests/badge.svg)](https://github.com/cakmoel/Scriptlog/actions/workflows/tests.yml)
+[![Test Status](https://img.shields.io/badge/tests-381%20passed%2C%2012%20skipped-green)](tests/)
 ![Scriptlog Mascot](assets/scriptlog-mascot-min.png)
 
 ---

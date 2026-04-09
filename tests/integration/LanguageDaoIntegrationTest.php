@@ -28,8 +28,8 @@ class LanguageDaoIntegrationTest extends TestCase
             );
             
             // Load required classes
-            require_once __DIR__ . '/../../lib/core/Dao.php';
-            require_once __DIR__ . '/../../lib/dao/LanguageDao.php';
+            require_once __DIR__ . '/../../src/lib/core/Dao.php';
+            require_once __DIR__ . '/../../src/lib/dao/LanguageDao.php';
             
             // Initialize DAO
             self::$dao = new LanguageDao();
