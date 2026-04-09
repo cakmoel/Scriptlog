@@ -32,7 +32,8 @@ class ApiHateoasTest extends \PHPUnit\Framework\TestCase
             $config = require $configPath;
             $this->appUrl = rtrim($config['app']['url'] ?? 'http://blogware.site', '/');
         } else {
-            $this->appUrl = 'http://blogware.site';
+            // When config.php doesn't exist (e.g., during testing), use localhost
+            $this->appUrl = 'http://localhost';
         }
 
         $this->hateoas = new ApiHateoas($this->appUrl . '/api/v1');

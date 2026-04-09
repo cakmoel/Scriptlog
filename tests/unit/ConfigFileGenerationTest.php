@@ -192,10 +192,10 @@ class ConfigFileGenerationTest extends TestCase
         
         $rootDir = dirname(__DIR__, 2);
         
-        // The root should have an install directory
-        $this->assertDirectoryExists($rootDir . '/install');
+        // The root should have an src/install directory (install is inside src)
+        $this->assertDirectoryExists($rootDir . '/src/install');
         
-        // The path should end with public_html (project root)
-        $this->assertStringEndsWith('public_html', $rootDir);
+        // The path should end with Scriptlog (project root)
+        $this->assertStringEndsWith('Scriptlog', $rootDir);
     }
 }
