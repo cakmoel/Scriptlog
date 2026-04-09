@@ -167,7 +167,7 @@ return [
         'url'   => $_ENV['APP_URL'] ?? 'http://example.com',
         'email' => $_ENV['APP_EMAIL'] ?? '',
         'key'   => $_ENV['APP_KEY'] ?? '',
-        'defuse_key' => 'lib/utility/.lts/lts.txt'
+        'defuse_key' => '/var/www/your-project/storage/keys/[random_filename].php'
     ],
 
     'mail' => [
@@ -227,9 +227,101 @@ DISTRIB_NAME="Linux Mint"
 
 During first-time installation, the system automatically:
 - Generates a Defuse encryption key using `Defuse\Crypto\Key::createNewRandomKey()`
-- Saves the key to outside of web root
-- Stores the key path in `config.php` under `app.defuse_key`
+- **Saves the key outside the document root** for maximum security
+- Generates a random filename (16 alphanumeric characters) for the key file
+- Falls back to `lib/utility/.lts/` if storage directory is not writable
+- Stores the key path in:
+  - `config.php` under `app.defuse_key` (absolute path)
+  - `.env` under `DEFUSE_KEY_PATH`
+  - Database `tbl_settings` with key `defuse_key_path`
 - This key is used for authentication cookie encryption
+
+#### Key Location Logic
+
+The `generate_defuse_key()` function in `install/include/setup.php` determines the key location as follows:
+
+```
+Primary Location (outside web root - RECOMMENDED):
+/var/www/your-project/storage/keys/[random_filename].php
+
+Fallback Location (inside web root - less secure):
+/var/www/your-project/public_html/lib/utility/.lts/[random_filename].php
+```
+
+The function works as follows:
+
+```php
+// install/include/setup.php - generate_defuse_key() function
+function generate_defuse_key()
+{
+    $appRoot = dirname(__DIR__, 2);       // e.g., /var/www/myblog/public_html
+    $parentDir = dirname($appRoot);       // e.g., /var/www/myblog
+    
+    // Try to create storage directory outside web root
+    $secureStorage = $parentDir . '/storage';
+    $keyDir = $secureStorage . '/keys';
+    
+    if (!is_dir($keyDir)) {
+        @mkdir($keyDir, 0755, true);
+    }
+    
+    // Fallback to inside web root if not writable
+    if (!is_dir($keyDir) || !is_writable($keyDir)) {
+        $keyDir = $appRoot . '/lib/utility/.lts';
+        if (!is_dir($keyDir)) {
+            @mkdir($keyDir, 0755, true);
+        }
+    }
+    
+    // Add .htaccess protection in fallback location
+    if (strpos($keyDir, $appRoot) !== false && !file_exists($keyDir . '/.htaccess')) {
+        $htaccessContent = "# Deny all public access to encryption keys\nOrder deny,allow\nDeny from all\n";
+        @file_put_contents($keyDir . '/.htaccess', $htaccessContent);
+    }
+    
+    // Generate random filename and save key
+    $keyFilename = generate_random_key_filename();
+    $keyFile = $keyDir . '/' . $keyFilename;
+    
+    $key = Defuse\Crypto\Key::createNewRandomKey();
+    $keyAscii = $key->saveToAsciiSafeString();
+    
+    $phpContent = "<?php\n// Encryption key generated on " . date('Y-m-d H:i:s') . "\nreturn '$keyAscii';";
+    file_put_contents($keyFile, $phpContent, LOCK_EX);
+    
+    return $keyFile;
+}
+```
+
+#### Ensuring Keys Are Stored Outside Web Root
+
+For the key to be stored in the secure location (outside web root), you must create the `storage` directory **before running the installation**:
+
+```bash
+# Navigate to your project parent directory
+cd /var/www/myblog
+
+# Create storage directory (sibling to public_html)
+sudo mkdir -p storage/keys
+
+# Set ownership to web server user
+sudo chown -R www-data:www-data storage
+
+# Set appropriate permissions
+sudo chmod -R 755 storage
+```
+
+| Scenario | Storage Directory Created? | Key Location |
+|----------|---------------------------|--------------|
+| **Yes** (you created storage/) | `/var/www/myblog/storage/keys/` | Outside web root - RECOMMENDED |
+| **No** (skipped step above) | Not available | Falls back to `lib/utility/.lts/` (less secure) |
+
+#### Security Note
+
+- **Outside web root** (`storage/keys/`): Recommended - the key file cannot be accessed via HTTP
+- **Inside web root** (`lib/utility/.lts/`): Less secure but protected by `.htaccess` (auto-generated)
+
+If the key ends up in the fallback location, you can manually move it to `storage/keys/` after installation and update the path in `config.php`, `tbl_settings`, and `.env`.
 
 ### Installation Fixes
 
@@ -357,7 +449,7 @@ The plugin is inserted as disabled (`plugin_status = 'N'`) by default, allowing 
 |------|----------|---------|
 | `config.php` | Root | Main configuration with `$_ENV` fallbacks |
 | `.env` | Root | Environment variables (auto-generated) |
-| `defuse_key` | `lib/utility/.lts/lts.txt` | Encryption key for authentication |
+| `defuse_key` | `/var/www/your-project/storage/keys/[random_filename].php` | Encryption key for authentication |
 
 ---
 
