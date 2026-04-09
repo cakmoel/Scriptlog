@@ -122,10 +122,10 @@ class Authentication
 
     /**
      * Constant COOKIE_PATH
-     * Available in whole domain
+     * Available in whole domain (including /api/* for AJAX requests)
      *
      */
-    public const COOKIE_PATH = APP_ADMIN;
+    public const COOKIE_PATH = '/';
 
     public function __construct(UserDao $userDao, UserTokenDao $userToken, FormValidator $validator)
     {

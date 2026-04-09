@@ -547,6 +547,8 @@ function install_i18n_data($link, $prefix = '', $default_lang = 'en')
         'nav.membership' => ['Membership', 'العضوية', '会员资格', 'Adhésion', 'Членство', 'Membresía', 'Kanggotaan'],
         'nav.download_settings' => ['Download Settings', 'إعدادات التنزيل', '下载设置', 'Paramètres de téléchargement', 'Настройки загрузки', 'Configuración de descarga', 'Pengaturan Unduhan'],
         'nav.mail_settings' => ['Mail Settings', 'إعدادات البريد', '邮件设置', 'Paramètres de messagerie', 'Настройки почты', 'Configuración de correo', 'Pengaturan Surel'],
+        'nav.api' => ['API', 'API', 'API', 'API', 'API', 'API', 'API'],
+        'nav.api_settings' => ['API Settings', 'إعدادات API', 'API设置', 'Paramètres API', 'Настройки API', 'Configuración API', 'Pengaturan API'],
         'nav.plugins' => ['Plugins', 'الإضافات', '插件', 'Extensions', 'Плагины', 'Complementos', 'Plugin'],
         'nav.privacy' => ['Privacy', 'الخصوصية', '隐私', 'Confidentialité', 'Конфиденциальность', 'Privacidad', 'Privasi'],
         'nav.privacy_settings' => ['Privacy Settings', 'إعدادات الخصوصية', '隐私设置', 'Paramètres de confidentialité', 'Настройки конфиденциальности', 'Configuración de privacidad', 'Pengaturan Privasi'],

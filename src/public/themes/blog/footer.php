@@ -1,58 +1,76 @@
 <footer class="main-footer">
   <div class="container">
-    <!--
-        <div class="row">
-          <div class="col-md-4">
-            <div class="logo">
-              <h6 class="text-white">Bootstrap Blog</h6>
-            </div>
-            <div class="contact-details">
-              <p>53 Broadway, Broklyn, NY 11249</p>
-              <p>Phone: (020) 123 456 789</p>
-              <p>Email: <a href="mailto:info@company.com">Info@Company.com</a></p>
-              <ul class="social-menu">
-                <li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
-                <li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
-                <li class="list-inline-item"><a href="#"><i class="fa fa-instagram"></i></a></li>
-                <li class="list-inline-item"><a href="#"><i class="fa fa-behance"></i></a></li>
-                <li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
-              </ul>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="menus d-flex">
-              <ul class="list-unstyled">
-                <li> <a href="#">My Account</a></li>
-                <li> <a href="#">Add Listing</a></li>
-                <li> <a href="#">Pricing</a></li>
-                <li> <a href="#">Privacy &amp; Policy</a></li>
-              </ul>
-              <ul class="list-unstyled">
-                <li> <a href="#">Our Partners</a></li>
-                <li> <a href="#">FAQ</a></li>
-                <li> <a href="#">How It Works</a></li>
-                <li> <a href="#">Contact</a></li>
-              </ul>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="latest-posts"><a href="#">
-                <div class="post d-flex align-items-center">
-                  <div class="image"><img src="/img/small-thumbnail-1.jpg" alt="..." class="img-fluid"></div>
-                  <div class="title"><strong>Hotels for all budgets</strong><span class="date last-meta">October 26, 2016</span></div>
-                </div></a><a href="#">
-                <div class="post d-flex align-items-center">
-                  <div class="image"><img src="/img/small-thumbnail-2.jpg" alt="..." class="img-fluid"></div>
-                  <div class="title"><strong>Great street atrs in London</strong><span class="date last-meta">October 26, 2016</span></div>
-                </div></a><a href="#">
-                <div class="post d-flex align-items-center">
-                  <div class="image"><img src="/img/small-thumbnail-3.jpg" alt="..." class="img-fluid"></div>
-                  <div class="title"><strong>Best coffee shops in Sydney</strong><span class="date last-meta">October 26, 2016</span></div>
-                </div></a></div>
-          </div>
-        </div>
--->
-
+    <?php
+    // Retrieve footer navigation from tbl_menu using existing utility function
+    $footerMenus = theme_navigation('public');
+    $footerMenuItems = [];
+    
+    if (isset($footerMenus['items']) && !empty($footerMenus['items'])) {
+        $footerMenuItems = array_values($footerMenus['items']);
+    }
+    ?>
+    
+    <?php if (!empty($footerMenuItems)) : ?>
+    <div class="row footer-navigation" role="navigation" aria-label="<?= t('footer.navigation.aria_label'); ?>">
+      <div class="col-12">
+        <ul class="footer-nav list-inline text-center mb-4">
+          <?php foreach ($footerMenuItems as $item) : ?>
+            <?php 
+            // Skip parent items with children in footer (keep flat)
+            $isParent = false;
+            foreach ($footerMenuItems as $checkItem) {
+                if (isset($checkItem['parent_id']) && $checkItem['parent_id'] == $item['ID']) {
+                    $isParent = true;
+                    break;
+                }
+            }
+            if ($isParent) continue;
+            ?>
+            <li class="list-inline-item">
+              <a href="<?= htmlout($item['menu_link'] ?? '#'); ?>" class="footer-nav-link">
+                <?= htmlout($item['menu_label'] ?? ''); ?>
+              </a>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      </div>
+    </div>
+    <?php endif; ?>
+    
+    <hr class="footer-divider">
+    
+    <!-- Social Links Section (optional - can be managed via admin in future) -->
+    <div class="row footer-social">
+      <div class="col-12 text-center">
+        <ul class="social-menu list-inline mb-4">
+          <li class="list-inline-item">
+            <a href="#" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-facebook" aria-hidden="true"></i>
+            </a>
+          </li>
+          <li class="list-inline-item">
+            <a href="#" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-twitter" aria-hidden="true"></i>
+            </a>
+          </li>
+          <li class="list-inline-item">
+            <a href="#" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-instagram" aria-hidden="true"></i>
+            </a>
+          </li>
+          <li class="list-inline-item">
+            <a href="#" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-linkedin" aria-hidden="true"></i>
+            </a>
+          </li>
+          <li class="list-inline-item">
+            <a href="<?= app_url(); ?>/rss.php" aria-label="RSS Feed">
+              <i class="fa fa-rss" aria-hidden="true"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
   <div class="copyrights">
     <div class="container">
