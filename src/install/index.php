@@ -568,4 +568,3 @@ async function validateDatabaseStep() {
 install_footer($current_path);
 ob_end_flush();
 
- 
