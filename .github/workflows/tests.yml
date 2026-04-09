@@ -41,7 +41,15 @@ jobs:
       - name: Setup test database
         run: |
           mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS blogware_test;"
-          mysql -h 127.0.0.1 -u root -proot blogware_test < src/install/include/dbtable.php
+          php -r '
+            require "src/install/include/dbtable.php";
+            $tables = get_table_definitions("");
+            $pdo = new PDO("mysql:host=127.0.0.1;dbname=blogware_test", "root", "root");
+            foreach ($tables as $sql) {
+                $pdo->exec($sql);
+            }
+            echo "Tables created successfully\n";
+          '
 
       - name: Run PHPUnit
         run: vendor/bin/phpunit tests/unit tests/service tests/integration --testdox --colors=never
