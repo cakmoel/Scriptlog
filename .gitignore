@@ -34,6 +34,9 @@ node_modules/
 # lts
 *.txt
 
+# PHPUnit
+.phpunit.result.cache
+
 # Rate limit cache files
 src/public/cache/rate_limit/
 .plan/
