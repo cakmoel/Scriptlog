@@ -242,11 +242,14 @@ The `generate_defuse_key()` function in `install/include/setup.php` determines t
 ```
 Primary Location (outside web root - REQUIRED):
 /var/www/your-project/storage/keys/[random_filename].php
+
+Fallback Location (inside web root):
+/var/www/your-project/public_html/lib/utility/.lts/[random_filename].php
 ```
 
-> **IMPORTANT:** The `.lts/` fallback directory has been removed from the repository. Keys **must** be stored outside the web root. Users must create the `storage/keys/` directory before running installation.
+> **IMPORTANT:** The `.lts/` directory has been removed from the repository. While the setup.php code still contains the fallback logic, the `.lts/` directory no longer exists in the repository. Users **must** create the `storage/keys/` directory before running installation.
 
-The function works as follows:
+The function works as follows (from `install/include/setup.php`):
 
 ```php
 // install/include/setup.php - generate_defuse_key() function
@@ -263,9 +266,12 @@ function generate_defuse_key()
         @mkdir($keyDir, 0755, true);
     }
     
-    // Check if directory is writable - throw error if not
+    // Fallback to inside web root if not writable
     if (!is_dir($keyDir) || !is_writable($keyDir)) {
-        throw new \Exception("Cannot create secure key storage directory. Please create /var/www/your-project/storage/keys/ with proper permissions before running installation.");
+        $keyDir = $appRoot . '/lib/utility/.lts';
+        if (!is_dir($keyDir)) {
+            @mkdir($keyDir, 0755, true);
+        }
     }
     
     // Generate random filename and save key
@@ -303,12 +309,12 @@ sudo chmod -R 755 storage
 | Scenario | Storage Directory Created? | Installation Result |
 |----------|---------------------------|---------------------|
 | **Yes** (you created storage/keys/) | `/var/www/myblog/storage/keys/` | SUCCESS - Key stored securely |
-| **No** (not created) | Not available | FAILS - Installation requires this directory |
+| **No** (not created) | Not available | FAILS - The `.lts/` fallback directory was removed from repository |
 
 #### Security Note
 
 - **Outside web root** (`storage/keys/`): **REQUIRED** - The key file cannot be accessed via HTTP
-- Keys stored inside the web root are **NO LONGER SUPPORTED**
+- The `.lts/` fallback inside web root is no longer available (directory was removed from repository)
 
 If you already have a key in the old location, you should move it to `storage/keys/` after installation and update the path in `config.php`, `tbl_settings`, and `.env`.
 
