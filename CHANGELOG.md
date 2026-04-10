@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.2] - 2026-04-10
+
+### Changed
+- Updated utility loader generator to prevent function redeclaration errors
+- Bootstrap reliability improvements
+
+### Fixed
+- **Bootstrap**: Database connection now fails gracefully when credentials are missing or invalid
+- **Bootstrap**: DAOs and services now only instantiate when a valid database connection exists
+- **Bootstrap**: Added null coalescing operators for array keys that may not exist
+- **Bootstrap**: Added guards to prevent session operations in CLI/header-sent scenarios
+- **Bootstrap**: Made applySecurity() resilient to utility function errors
+- **Utility Loader**: Fixed duplicate function declaration error for load_core_utilities()
+
+### Added
+- Comprehensive unit tests for Bootstrap class (43 tests, 89 assertions)
+- Updated test bootstrap to properly load critical utility functions
+
+### Details
+This patch release addresses several reliability and robustness issues in the Bootstrap process and utility loader.
+
+### Comparison
+- **Previous release**: v1.0.1
+- **Changes since v1.0.1**: 13 commits
+
+---
+
 ## [1.0.1] - 2026-04-09
 
 ### Added
