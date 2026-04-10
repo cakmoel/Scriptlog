@@ -229,6 +229,7 @@ During first-time installation, the system automatically:
 - Generates a Defuse encryption key using `Defuse\Crypto\Key::createNewRandomKey()`
 - **Saves the key outside the document root** for maximum security
 - Generates a random filename (16 alphanumeric characters) for the key file
+- Falls back to `lib/utility/.lts/` if storage directory is not writable
 - Stores the key path in:
   - `config.php` under `app.defuse_key` (absolute path)
   - `.env` under `DEFUSE_KEY_PATH`
@@ -240,16 +241,14 @@ During first-time installation, the system automatically:
 The `generate_defuse_key()` function in `install/include/setup.php` determines the key location as follows:
 
 ```
-Primary Location (outside web root - REQUIRED):
+Primary Location (outside web root - RECOMMENDED):
 /var/www/your-project/storage/keys/[random_filename].php
 
-Fallback Location (inside web root):
+Fallback Location (inside web root - less secure):
 /var/www/your-project/public_html/lib/utility/.lts/[random_filename].php
 ```
 
-> **IMPORTANT:** The `.lts/` directory has been removed from the repository. While the setup.php code still contains the fallback logic, the `.lts/` directory no longer exists in the repository. Users **must** create the `storage/keys/` directory before running installation.
-
-The function works as follows (from `install/include/setup.php`):
+The function works as follows:
 
 ```php
 // install/include/setup.php - generate_defuse_key() function
@@ -258,7 +257,7 @@ function generate_defuse_key()
     $appRoot = dirname(__DIR__, 2);       // e.g., /var/www/myblog/public_html
     $parentDir = dirname($appRoot);       // e.g., /var/www/myblog
     
-    // Create storage directory outside web root
+    // Try to create storage directory outside web root
     $secureStorage = $parentDir . '/storage';
     $keyDir = $secureStorage . '/keys';
     
@@ -272,6 +271,12 @@ function generate_defuse_key()
         if (!is_dir($keyDir)) {
             @mkdir($keyDir, 0755, true);
         }
+    }
+    
+    // Add .htaccess protection in fallback location
+    if (strpos($keyDir, $appRoot) !== false && !file_exists($keyDir . '/.htaccess')) {
+        $htaccessContent = "# Deny all public access to encryption keys\nOrder deny,allow\nDeny from all\n";
+        @file_put_contents($keyDir . '/.htaccess', $htaccessContent);
     }
     
     // Generate random filename and save key
@@ -288,7 +293,7 @@ function generate_defuse_key()
 }
 ```
 
-#### Required: Create Storage Directory Outside Web Root
+#### Ensuring Keys Are Stored Outside Web Root
 
 **Before running the installation**, you must create the storage directory:
 
@@ -306,17 +311,17 @@ sudo chown -R www-data:www-data storage
 sudo chmod -R 755 storage
 ```
 
-| Scenario | Storage Directory Created? | Installation Result |
-|----------|---------------------------|---------------------|
-| **Yes** (you created storage/keys/) | `/var/www/myblog/storage/keys/` | SUCCESS - Key stored securely |
-| **No** (not created) | Not available | FAILS - The `.lts/` fallback directory was removed from repository |
+| Scenario | Storage Directory Created? | Key Location |
+|----------|---------------------------|--------------|
+| **Yes** (you created storage/keys/) | `/var/www/myblog/storage/keys/` | Outside web root - RECOMMENDED |
+| **No** (skipped step above) | Not available | Falls back to `lib/utility/.lts/` (less secure) |
 
 #### Security Note
 
-- **Outside web root** (`storage/keys/`): **REQUIRED** - The key file cannot be accessed via HTTP
-- The `.lts/` fallback inside web root is no longer available (directory was removed from repository)
+- **Outside web root** (`storage/keys/`): Recommended - the key file cannot be accessed via HTTP
+- **Inside web root** (`lib/utility/.lts/`): Less secure but protected by `.htaccess` (auto-generated)
 
-If you already have a key in the old location, you should move it to `storage/keys/` after installation and update the path in `config.php`, `tbl_settings`, and `.env`.
+If the key ends up in the fallback location, you can manually move it to `storage/keys/` after installation and update the path in `config.php`, `tbl_settings`, and `.env`.
 
 ### Installation Fixes
 
