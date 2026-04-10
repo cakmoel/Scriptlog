@@ -228,6 +228,6 @@ if (!function_exists('load_core_utilities')) {
     }
 }
 
-if (!function_exists('load_core_utilities')) {
-    load_core_utilities();
+if (function_exists('load_core_utilities')) {
+    return load_core_utilities();
 }
