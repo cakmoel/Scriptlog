@@ -1,0 +1,1721 @@
+openapi: 3.0.3
+info:
+  title: Blogware RESTful API
+  description: |
+    RESTful API for Blogware content management system.
+    
+    This API provides programmatic access to blog posts, categories, comments, and archives.
+    It follows OpenAPI 3.0 specification and supports both public and authenticated operations.
+    
+    ## Authentication
+    
+    The API supports two authentication methods:
+    - **API Key**: Pass your API key in the `X-API-Key` header
+    - **Bearer Token**: Pass a bearer token in the `Authorization` header
+    
+    Example:
+    ```
+    X-API-Key: your-api-key-here
+    ```
+    or
+    ```
+    Authorization: Bearer your-token-here
+    ```
+    
+    ## Rate Limiting
+    
+    API requests are rate limited to ensure fair usage and prevent abuse:
+    
+    | Endpoint Type | Limit | Window |
+    |--------------|-------|--------|
+    | **Read (GET)** | 60 requests | 60 seconds |
+    | **Write (POST/PUT/DELETE/PATCH)** | 20 requests | 60 seconds |
+    
+    Rate limits are tracked per client using API key, Bearer token, or IP address.
+    
+    The following headers are included in all responses:
+    - `X-RateLimit-Limit`: Maximum requests allowed per window
+    - `X-RateLimit-Remaining`: Remaining requests in current window
+    - `X-RateLimit-Reset`: Unix timestamp when the rate limit resets
+    - `Retry-After`: Seconds to wait before retrying (only on 429 responses)
+    
+    Exceeding the rate limit returns `429 Too Many Requests`.
+    
+    ## HATEOAS (Hypermedia as the Engine of Application State)
+    
+    All API responses include HATEOAS links following [RFC 5988 (Web Linking)](https://tools.ietf.org/html/rfc5988).
+    Each response contains a `_links` object with discoverable navigation:
+    
+    ```json
+    {
+      "success": true,
+      "status": 200,
+      "data": { ... },
+      "_links": {
+        "self": { "href": "...", "rel": "self", "type": "GET" },
+        "collection": { "href": "...", "rel": "collection", "type": "GET" }
+      }
+    }
+    ```
+    
+    Common link relations: `self`, `collection`, `first`, `prev`, `next`, `last`, `canonical`, `comments`, `post`, `posts`, `year`, `search`, `service-desc`.
+    
+    ## Caching and Conditional Requests
+
+    GET responses are cacheable with ETag and Last-Modified headers:
+    - **ETag**: Entity tag for cache validation
+    - **Last-Modified**: Timestamp of last resource modification
+    - **If-None-Match**: Client sends cached ETag to check for changes
+    - **If-Modified-Since**: Client sends cached timestamp
+    - **304 Not Modified**: Response when resource hasn't changed
+
+    Cache-Control headers vary by HTTP method:
+    - **GET**: `public, max-age=300` (cacheable for 5 minutes)
+    - **POST/PUT/DELETE/PATCH**: `no-store` (never cache)
+    - **4xx errors**: `no-cache, no-store, must-revalidate`
+
+    ## Content Negotiation
+
+    The API supports `Accept` header validation. Requests with unsupported media types receive `406 Not Acceptable`. Currently only `application/json` is supported.
+
+    ## Response Format
+    
+    All responses are returned in JSON format with the following structure:
+    
+    ### Success Response
+    ```json
+    {
+      "success": true,
+      "status": 200,
+      "message": "Operation description",
+      "data": { ... }
+    }
+    ```
+    
+    ### Paginated Response
+    ```json
+    {
+      "success": true,
+      "status": 200,
+      "data": [...],
+      "pagination": {
+        "current_page": 1,
+        "per_page": 10,
+        "total_items": 50,
+        "total_pages": 5,
+        "has_next_page": true,
+        "has_previous_page": false
+      }
+    }
+    ```
+    
+    ### Error Response
+    ```json
+    {
+      "success": false,
+      "status": 400,
+      "error": {
+        "code": "BAD_REQUEST",
+        "message": "Error description"
+      }
+    }
+    ```
+    
+    ## Filtering and Sorting
+    
+    Query parameters for filtering and sorting:
+    - `page`: Page number (default: 1)
+    - `per_page`: Items per page (default: 10, max: 100)
+    - `sort_by`: Field to sort by
+    - `sort_order`: Sort direction (ASC or DESC)
+  version: 1.1.1
+  contact:
+    name: Blogware Support
+    email: alanmoehammad@gmail.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  x-logo:
+    url: https://blogware.site/public/files/pictures/logo.png
+
+servers:
+  - url: http://blogware.site/api/v1
+    description: Production server
+  - url: http://localhost/blogware/public_html/api/v1
+    description: Development server
+
+tags:
+  - name: Posts
+    description: Blog posts operations
+  - name: Categories
+    description: Category/topic operations
+  - name: Comments
+    description: Comment operations
+  - name: Archives
+    description: Archive by date operations
+  - name: API Info
+    description: API information and metadata
+
+paths:
+  /:
+    get:
+      tags:
+        - API Info
+      summary: Get API information
+      description: Returns API metadata, available endpoints, and usage information
+      operationId: getApiInfo
+      responses:
+        '200':
+          description: API information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiInfo'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /posts:
+    get:
+      tags:
+        - Posts
+      summary: List published posts
+      description: |
+        Retrieves a paginated list of published blog posts.
+        This endpoint is public and does not require authentication.
+      operationId: listPosts
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/SortBy'
+        - $ref: '#/components/parameters/SortOrder'
+      responses:
+        '200':
+          description: Posts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostListResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+    post:
+      tags:
+        - Posts
+      summary: Create a new post
+      description: |
+        Creates a new blog post.
+        Requires authentication with administrator, editor, or author permissions.
+      operationId: createPost
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+      responses:
+        '201':
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /posts/{id}:
+    get:
+      tags:
+        - Posts
+      summary: Get a single post
+      description: |
+        Retrieves a single blog post by its ID.
+        This endpoint is public and does not require authentication.
+      operationId: getPost
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      responses:
+        '200':
+          description: Post retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostDetailResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Posts
+      summary: Update a post
+      description: |
+        Updates an existing blog post.
+        Requires authentication with administrator or editor permissions.
+      operationId: updatePost
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostUpdate'
+      responses:
+        '200':
+          description: Post updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Posts
+      summary: Delete a post
+      description: |
+        Deletes a blog post.
+        Requires authentication with administrator permissions.
+      operationId: deletePost
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      responses:
+        '204':
+          description: Post deleted successfully (no content)
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Posts
+      summary: Partially update a post
+      description: |
+        Partially updates an existing blog post. Only send the fields you want to change.
+        Requires authentication with administrator or editor permissions.
+      operationId: patchPost
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostUpdate'
+      responses:
+        '200':
+          description: Post updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /posts/{id}/comments:
+    get:
+      tags:
+        - Posts
+      summary: Get comments for a post
+      description: |
+        Retrieves approved comments for a specific blog post.
+        This endpoint is public and does not require authentication.
+      operationId: getPostComments
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Comments retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /categories:
+    get:
+      tags:
+        - Categories
+      summary: List all categories
+      description: |
+        Retrieves a paginated list of all categories/topics.
+        This endpoint is public and does not require authentication.
+      operationId: listCategories
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/SortBy'
+        - $ref: '#/components/parameters/SortOrder'
+      responses:
+        '200':
+          description: Categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryListResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Categories
+      summary: Create a new category
+      description: |
+        Creates a new category/topic.
+        Requires authentication with administrator or editor permissions.
+      operationId: createCategory
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryCreate'
+      responses:
+        '201':
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /categories/{id}:
+    get:
+      tags:
+        - Categories
+      summary: Get a single category
+      description: |
+        Retrieves a single category/topic by its ID.
+        This endpoint is public and does not require authentication.
+      operationId: getCategory
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+      responses:
+        '200':
+          description: Category retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Categories
+      summary: Update a category
+      description: |
+        Updates an existing category/topic.
+        Requires authentication with administrator or editor permissions.
+      operationId: updateCategory
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdate'
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Categories
+      summary: Delete a category
+      description: |
+        Deletes a category/topic.
+        Requires authentication with administrator permissions.
+      operationId: deleteCategory
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+      responses:
+        '204':
+          description: Category deleted successfully (no content)
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Categories
+      summary: Partially update a category
+      description: |
+        Partially updates an existing category/topic. Only send the fields you want to change.
+        Requires authentication with administrator or editor permissions.
+      operationId: patchCategory
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdate'
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /categories/{id}/posts:
+    get:
+      tags:
+        - Categories
+      summary: Get posts in a category
+      description: |
+        Retrieves posts belonging to a specific category.
+        This endpoint is public and does not require authentication.
+      operationId: getCategoryPosts
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/SortBy'
+        - $ref: '#/components/parameters/SortOrder'
+      responses:
+        '200':
+          description: Posts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryPostsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /comments:
+    get:
+      tags:
+        - Comments
+      summary: List all approved comments
+      description: |
+        Retrieves a paginated list of approved comments.
+        This endpoint is public and does not require authentication.
+      operationId: listComments
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/SortBy'
+        - $ref: '#/components/parameters/SortOrder'
+        - name: post_id
+          in: query
+          description: Filter comments by post ID
+          required: false
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Comments retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentListResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Comments
+      summary: Create a new comment
+      description: |
+        Creates a new comment on a blog post.
+        This endpoint is public and does not require authentication.
+        Comments are submitted with 'pending' status for moderation.
+      operationId: createComment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+      responses:
+        '201':
+          description: Comment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /comments/{id}:
+    get:
+      tags:
+        - Comments
+      summary: Get a single comment
+      description: |
+        Retrieves a single comment by its ID.
+        This endpoint is public for approved comments.
+      operationId: getComment
+      parameters:
+        - $ref: '#/components/parameters/CommentId'
+      responses:
+        '200':
+          description: Comment retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Comments
+      summary: Update a comment
+      description: |
+        Updates an existing comment.
+        Requires authentication with administrator or editor permissions.
+      operationId: updateComment
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CommentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentUpdate'
+      responses:
+        '200':
+          description: Comment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Comments
+      summary: Delete a comment
+      description: |
+        Deletes a comment.
+        Requires authentication with administrator or editor permissions.
+      operationId: deleteComment
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CommentId'
+      responses:
+        '204':
+          description: Comment deleted successfully (no content)
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Comments
+      summary: Partially update a comment
+      description: |
+        Partially updates an existing comment. Only send the fields you want to change.
+        Requires authentication with administrator or editor permissions.
+      operationId: patchComment
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CommentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentUpdate'
+      responses:
+        '200':
+          description: Comment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /archives:
+    get:
+      tags:
+        - Archives
+      summary: List available archive dates
+      description: |
+        Returns a list of years and months that have published posts.
+        This endpoint is public and does not require authentication.
+      operationId: listArchives
+      responses:
+        '200':
+          description: Archives retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchiveListResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /archives/{year}:
+    get:
+      tags:
+        - Archives
+      summary: Get posts from a specific year
+      description: |
+        Retrieves posts published in a specific year.
+        This endpoint is public and does not require authentication.
+      operationId: getArchiveYear
+      parameters:
+        - name: year
+          in: path
+          description: Year (e.g., 2024)
+          required: true
+          schema:
+            type: integer
+            minimum: 1900
+            maximum: 2030
+            example: 2024
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/SortBy'
+        - $ref: '#/components/parameters/SortOrder'
+      responses:
+        '200':
+          description: Posts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchiveYearResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /archives/{year}/{month}:
+    get:
+      tags:
+        - Archives
+      summary: Get posts from a specific month
+      description: |
+        Retrieves posts published in a specific month and year.
+        This endpoint is public and does not require authentication.
+      operationId: getArchiveMonth
+      parameters:
+        - name: year
+          in: path
+          description: Year (e.g., 2024)
+          required: true
+          schema:
+            type: integer
+            minimum: 1900
+            maximum: 2030
+            example: 2024
+        - name: month
+          in: path
+          description: Month (1-12)
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+            example: 6
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/SortBy'
+        - $ref: '#/components/parameters/SortOrder'
+      responses:
+        '200':
+          description: Posts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchiveMonthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: |
+        API key authentication. Pass your API key in the X-API-Key header.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Bearer token authentication. Pass your bearer token in the Authorization header.
+
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: Page number for pagination
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+        example: 1
+    PerPage:
+      name: per_page
+      in: query
+      description: Number of items per page
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+        example: 10
+    SortBy:
+      name: sort_by
+      in: query
+      description: Field to sort by
+      required: false
+      schema:
+        type: string
+        default: ID
+        enum:
+          - ID
+          - post_date
+          - post_modified
+          - post_title
+          - topic_title
+          - comment_date
+    SortOrder:
+      name: sort_order
+      in: query
+      description: Sort direction
+      required: false
+      schema:
+        type: string
+        enum:
+          - ASC
+          - DESC
+        default: DESC
+    PostId:
+      name: id
+      in: path
+      description: Post ID
+      required: true
+      schema:
+        type: integer
+        example: 1
+    CategoryId:
+      name: id
+      in: path
+      description: Category ID
+      required: true
+      schema:
+        type: integer
+        example: 1
+    CommentId:
+      name: id
+      in: path
+      description: Comment ID
+      required: true
+      schema:
+        type: integer
+        example: 1
+
+  schemas:
+    # Base Schemas
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        status:
+          type: integer
+          example: 400
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: BAD_REQUEST
+            message:
+              type: string
+              example: Error description
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                  message:
+                    type: string
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Operation successful
+        data:
+          type: object
+        _links:
+          $ref: '#/components/schemas/Links'
+
+    # Post Schemas
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: My First Blog Post
+        slug:
+          type: string
+          example: my-first-blog-post
+        content:
+          type: string
+          example: Full post content here...
+        summary:
+          type: string
+          nullable: true
+          example: Post summary for preview
+        excerpt:
+          type: string
+          example: Generated excerpt...
+        status:
+          type: string
+          enum:
+            - publish
+            - draft
+            - pending
+            - private
+          example: publish
+        visibility:
+          type: string
+          enum:
+            - public
+            - private
+            - protected
+          example: public
+        tags:
+          type: array
+          items:
+            type: string
+          example:
+            - php
+            - rest-api
+        comment_status:
+          type: string
+          enum:
+            - open
+            - closed
+          example: open
+        type:
+          type: string
+          example: blog
+        author:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            login:
+              type: string
+              example: admin
+            name:
+              type: string
+              example: Administrator
+        date:
+          type: string
+          format: date-time
+          example: 2024-01-15 10:30:00
+        modified:
+          type: string
+          format: date-time
+          nullable: true
+          example: 2024-01-15 14:20:00
+        url:
+          type: string
+          example: http://blogware.site/post/1/my-first-blog-post
+
+    PostCreate:
+      type: object
+      required:
+        - post_title
+        - post_content
+      properties:
+        post_title:
+          type: string
+          maxLength: 200
+          example: My First Blog Post
+        post_content:
+          type: string
+          example: Full post content here...
+        post_summary:
+          type: string
+          maxLength: 320
+          nullable: true
+          example: Post summary
+        post_status:
+          type: string
+          enum:
+            - publish
+            - draft
+          default: draft
+        post_visibility:
+          type: string
+          enum:
+            - public
+            - private
+            - protected
+          default: public
+        post_tags:
+          type: string
+          nullable: true
+          example: php, api, rest
+        comment_status:
+          type: string
+          enum:
+            - open
+            - closed
+          default: open
+        topics:
+          type: array
+          items:
+            type: integer
+          example:
+            - 1
+            - 2
+
+    PostUpdate:
+      type: object
+      properties:
+        post_title:
+          type: string
+          maxLength: 200
+        post_content:
+          type: string
+        post_summary:
+          type: string
+          maxLength: 320
+          nullable: true
+        post_status:
+          type: string
+          enum:
+            - publish
+            - draft
+            - pending
+            - private
+        post_visibility:
+          type: string
+          enum:
+            - public
+            - private
+            - protected
+        post_tags:
+          type: string
+          nullable: true
+        comment_status:
+          type: string
+          enum:
+            - open
+            - closed
+        topics:
+          type: array
+          items:
+            type: integer
+
+    PostListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Post'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    PostDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/Post'
+                - type: object
+                  properties:
+                    topics:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CategorySummary'
+                    featured_image:
+                      type: string
+                      nullable: true
+                      example: http://blogware.site/public/files/pictures/featured.jpg
+
+    PostResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Post'
+
+    # Category Schemas
+    CategorySummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Technology
+        slug:
+          type: string
+          example: technology
+
+    Category:
+      allOf:
+        - $ref: '#/components/schemas/CategorySummary'
+        - type: object
+          properties:
+            status:
+              type: string
+              enum:
+                - Y
+                - N
+              example: Y
+            post_count:
+              type: integer
+              example: 15
+            url:
+              type: string
+              example: http://blogware.site/category/technology
+
+    CategoryCreate:
+      type: object
+      required:
+        - topic_title
+      properties:
+        topic_title:
+          type: string
+          maxLength: 255
+          example: Technology
+        topic_status:
+          type: string
+          enum:
+            - Y
+            - N
+          default: Y
+
+    CategoryUpdate:
+      type: object
+      properties:
+        topic_title:
+          type: string
+          maxLength: 255
+        topic_status:
+          type: string
+          enum:
+            - Y
+            - N
+
+    CategoryListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Category'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    CategoryResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Category'
+
+    CategoryPostsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                category:
+                  $ref: '#/components/schemas/CategorySummary'
+                posts:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Post'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    # Comment Schemas
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        post_id:
+          type: integer
+          example: 1
+        parent_id:
+          type: integer
+          example: 0
+        author:
+          type: object
+          properties:
+            name:
+              type: string
+              example: John Doe
+            email:
+              type: string
+              example: john@example.com
+        content:
+          type: string
+          example: Great article!
+        status:
+          type: string
+          enum:
+            - approved
+            - pending
+            - spam
+          example: approved
+        date:
+          type: string
+          format: date-time
+          example: 2024-01-15 10:30:00
+
+    CommentCreate:
+      type: object
+      required:
+        - comment_author_name
+        - comment_content
+        - comment_post_id
+      properties:
+        comment_author_name:
+          type: string
+          maxLength: 60
+          example: John Doe
+        comment_author_email:
+          type: string
+          format: email
+          nullable: true
+          example: john@example.com
+        comment_content:
+          type: string
+          example: Great article!
+        comment_post_id:
+          type: integer
+          example: 1
+        comment_parent_id:
+          type: integer
+          default: 0
+          example: 0
+
+    CommentUpdate:
+      type: object
+      properties:
+        comment_author_name:
+          type: string
+          maxLength: 60
+        comment_content:
+          type: string
+        comment_status:
+          type: string
+          enum:
+            - approved
+            - pending
+            - spam
+
+    CommentListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Comment'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    CommentResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/Comment'
+                - type: object
+                  properties:
+                    post:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                        slug:
+                          type: string
+                        url:
+                          type: string
+                      nullable: true
+
+    # Archive Schemas
+    ArchiveMonth:
+      type: object
+      properties:
+        month:
+          type: integer
+          example: 6
+        month_name:
+          type: string
+          example: June
+        post_count:
+          type: integer
+          example: 5
+
+    ArchiveYear:
+      type: object
+      properties:
+        year:
+          type: integer
+          example: 2024
+        months:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArchiveMonth'
+        total_posts:
+          type: integer
+          example: 25
+
+    ArchiveListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                archives:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ArchiveYear'
+                total_years:
+                  type: integer
+                  example: 3
+
+    ArchiveYearResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                year:
+                  type: integer
+                  example: 2024
+                posts:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Post'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    ArchiveMonthResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                year:
+                  type: integer
+                  example: 2024
+                month:
+                  type: integer
+                  example: 6
+                month_name:
+                  type: string
+                  example: June
+                posts:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Post'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    # Utility Schemas
+    Link:
+      type: object
+      description: HATEOAS link following RFC 5988 (Web Linking)
+      properties:
+        href:
+          type: string
+          description: The URL of the linked resource
+          example: http://blogware.site/api/v1/posts
+        rel:
+          type: string
+          description: The relationship type
+          example: self
+        type:
+          type: string
+          description: The HTTP method or MIME type
+          example: GET
+        templated:
+          type: boolean
+          description: Whether the URL is a URI template
+          example: false
+      required:
+        - href
+        - rel
+
+    Links:
+      type: object
+      description: HATEOAS links for discoverable API navigation
+      additionalProperties:
+        $ref: '#/components/schemas/Link'
+      example:
+        self:
+          href: http://blogware.site/api/v1/posts?page=1
+          rel: self
+          type: GET
+        next:
+          href: http://blogware.site/api/v1/posts?page=2
+          rel: next
+          type: GET
+        collection:
+          href: http://blogware.site/api/v1/posts
+          rel: collection
+          type: GET
+
+    Pagination:
+      type: object
+      properties:
+        current_page:
+          type: integer
+          example: 1
+        per_page:
+          type: integer
+          example: 10
+        total_items:
+          type: integer
+          example: 50
+        total_pages:
+          type: integer
+          example: 5
+        has_next_page:
+          type: boolean
+          example: true
+        has_previous_page:
+          type: boolean
+          example: false
+
+    DeleteResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: null
+              example: null
+
+    ApiInfo:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Blogware RESTful API
+                version:
+                  type: string
+                  example: 1.1.1
+                description:
+                  type: string
+                base_url:
+                  type: string
+                  example: /api/v1
+                authentication:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    header:
+                      type: string
+                    required:
+                      type: boolean
+
+  responses:
+    BadRequest:
+      description: Bad Request - Invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized - Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found - Resource does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Conflict - Resource already exists
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnprocessableEntity:
+      description: Unprocessable Entity - Validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      headers:
+        Retry-After:
+          description: Seconds to wait before retrying
+          schema:
+            type: integer
+            example: 60
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotAcceptable:
+      description: Not Acceptable - Requested media type not supported
+      headers:
+        Accept:
+          description: Supported media types
+          schema:
+            type: string
+            example: 'application/json'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotModified:
+      description: Not Modified - Resource has not changed (use cached version)
+      headers:
+        ETag:
+          description: Entity tag for the resource
+          schema:
+            type: string
+            example: '"abc123"'
+        Last-Modified:
+          description: Last modification timestamp
+          schema:
+            type: string
+            format: date-time
+        Cache-Control:
+          description: Cache directives
+          schema:
+            type: string
+            example: 'public, max-age=300'
+
+externalDocs:
+  description: Blogware Documentation
+  url: https://blogware.site/docs
+
+x-tagGroups:
+  - name: Core
+    tags:
+      - API Info
+  - name: Content
+    tags:
+      - Posts
+      - Categories
+      - Comments
+      - Archives
