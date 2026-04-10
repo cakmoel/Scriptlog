@@ -47,8 +47,8 @@ $php_content .= "    }\n";
 $php_content .= "}\n\n";
 
 // Add guard to prevent calling before function is defined
-$php_content .= "if (!function_exists('load_core_utilities')) {\n";
-$php_content .= "    load_core_utilities();\n";
+$php_content .= "if (function_exists('load_core_utilities')) {\n";
+$php_content .= "    return load_core_utilities();\n";
 $php_content .= "}\n";
 
 // Write the content to the target file
