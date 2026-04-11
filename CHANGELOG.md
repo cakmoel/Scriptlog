@@ -28,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Details
 This patch release addresses several reliability and robustness issues in the Bootstrap process and utility loader.
 
+### Codename
+**Maleo Senkawor** - Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia. This large bird, known for its distinctive bony casque and remarkable incubation strategy using geothermal and solar heat, faces severe threats from habitat loss and egg poaching. With only an estimated 4,000–7,000 breeding pairs remaining in the wild, the maleo is listed as Critically Endangered on the IUCN Red List and protected under CITES Appendix I. Conservation efforts by organizations like the Wildlife Conservation Society and the Alliance for Tompotika Conservation are vital to safeguarding this unique species and its habitat.
+
 ### Comparison
 - **Previous release**: v1.0.1
 - **Changes since v1.0.1**: 13 commits
