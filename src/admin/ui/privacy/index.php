@@ -100,7 +100,7 @@
                             <?php endif; ?>
                           </p>
                           <p><strong>Banner URL:</strong> <code>/privacy</code></p>
-                          <a href="/privacy" target="_blank" class="btn btn-info btn-block">
+                          <a href="<?= function_exists('get_privacy_policy_url') ? get_privacy_policy_url() : app_url() . '/privacy'; ?>" target="_blank" class="btn btn-info btn-block">
                             <i class="fa fa-eye"></i> View Privacy Policy
                           </a>
                         </div>
