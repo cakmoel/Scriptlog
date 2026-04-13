@@ -51,6 +51,30 @@ Focuses on i18N improvements, security fixes, and bug corrections.
 
 ---
 
+## [1.0.3] - 2026-04-13
+
+### Fixed
+- **Security**: Fixed CSP blocking legitimate resources
+- **Encryption**: Fixed "Invalid ciphertext: HMAC verification failed" error
+- **i18n**: Fixed language switcher not working
+- **i18n**: Fixed sidebar menu not reflecting language changes
+- **Admin**: Fixed link to privacy-policy page
+
+### Added
+- Enhanced i18n implementation for admin panel
+
+### Details
+This patch release addresses bug fixes and reliability improvements across the framework.
+
+### Codename
+**Maleo Senkawor** - Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi and Buton Island, Indonesia. This remarkable bird, known for its distinctive bony casque and unique reproductive strategy, is one of the world's most fascinating creatures. Maleos are monogamous pairs that dig deep pits in which a single egg is laid—incubated by geothermal heat at inland forested sites or by the sun at beach nesting grounds. The chicks hatch fully feathered and immediately fly into the forest, independent from birth. With population declined by over 90% since the 1950s and fewer than 10,000 individuals remaining, the maleo is listed as Critically Endangered on the IUCN Red List and protected under CITES Appendix I. Major threats include over-harvesting of eggs, habitat destruction, and predation by introduced species. Conservation efforts by the Wildlife Conservation Society (WCS) Indonesia and the Alliance for Tompotika Conservation have released over 10,000 chicks into the wild since 2001, working to protect nesting grounds and establish semi-natural hatcheries.
+
+### Comparison
+- **Previous release**: v1.0.2
+- **Changes since v1.0.2**: 21 commits
+
+---
+
 ## [1.0.2] - 2026-04-10
 
 ### Changed
