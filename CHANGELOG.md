@@ -1,9 +1,53 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project are documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## Quick Links
+
+- [Latest Release](#103---2026-04-13)
+- [All Releases](#releases)
+
+---
+
+## Releases
+
+## [1.0.3] - 2026-04-13
+
+### Added
+- 40 unit tests for UtilityLoader class
+- OpenAPI specification files for Blogware RESTful API
+
+### Changed
+- Enhanced i18N implementation for admin panel
+- Updated documentation
+
+### Fixed
+- CSP blocking resources
+- Privacy policy page link
+- Admin sidebar menu language changes
+- Language switcher functionality
+- i18N feature bug
+- Invalid ciphertext HMAC verification
+- Undefined `load_core_utilitier` error
+- Undefined `get_table_prefix` error
+
+### Removed
+- `.lts` directory containing sensitive keys
+- PHPUnit result cache from git tracking
+
+### Notes
+Focuses on i18N improvements, security fixes, and bug corrections.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.0.2
+- **Changes since v1.0.2**: 22 commits
 
 ---
 
@@ -11,25 +55,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Updated utility loader generator to prevent function redeclaration errors
-- Bootstrap reliability improvements
+- Improved Bootstrap reliability
 
 ### Fixed
-- **Bootstrap**: Database connection now fails gracefully when credentials are missing or invalid
-- **Bootstrap**: DAOs and services now only instantiate when a valid database connection exists
+- **Bootstrap**: Database connection fails gracefully when credentials are missing or invalid
+- **Bootstrap**: DAOs and services only instantiate when a valid database connection exists
 - **Bootstrap**: Added null coalescing operators for array keys that may not exist
 - **Bootstrap**: Added guards to prevent session operations in CLI/header-sent scenarios
-- **Bootstrap**: Made applySecurity() resilient to utility function errors
-- **Utility Loader**: Fixed duplicate function declaration error for load_core_utilities()
+- **Bootstrap**: Made `applySecurity()` resilient to utility function errors
+- **Utility Loader**: Fixed duplicate function declaration error for `load_core_utilities()`
 
 ### Added
-- Comprehensive unit tests for Bootstrap class (43 tests, 89 assertions)
+- 43 unit tests for Bootstrap class (89 assertions)
 - Updated test bootstrap to properly load critical utility functions
 
-### Details
+### Notes
 This patch release addresses several reliability and robustness issues in the Bootstrap process and utility loader.
 
 ### Codename
-**Maleo Senkawor** - Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia. This large bird, known for its distinctive bony casque and remarkable incubation strategy using geothermal and solar heat, faces severe threats from habitat loss and egg poaching. With only an estimated 4,000–7,000 breeding pairs remaining in the wild, the maleo is listed as Critically Endangered on the IUCN Red List and protected under CITES Appendix I. Conservation efforts by organizations like the Wildlife Conservation Society and the Alliance for Tompotika Conservation are vital to safeguarding this unique species and its habitat.
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
 
 ### Comparison
 - **Previous release**: v1.0.1
@@ -50,7 +94,7 @@ This patch release addresses several reliability and robustness issues in the Bo
 - **Security**: Resolved all Dependabot-detected vulnerabilities
 - **Quality**: Removed unnecessary files from the codebase
 
-### Details
+### Notes
 This patch addresses security vulnerabilities detected by Dependabot and removes unnecessary files to improve codebase quality. It also includes documentation updates and adds standard visual identity assets.
 
 ### Comparison
@@ -59,9 +103,20 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 ---
 
-## [1.0.0] - Initial Release
+## [1.0.0] - 2026-04-09
 
 ### Added
 - Initial stable release of Scriptlog
 - Complete PHP library with modern architecture
 - Support for MVC, database, validation, encryption, and more
+
+---
+
+## Version History
+
+| Version | Date | Status |
+|---------|------|--------|
+| 1.0.3 | 2026-04-13 | Stable |
+| 1.0.2 | 2026-04-10 | Stable |
+| 1.0.1 | 2026-04-09 | Stable |
+| 1.0.0 | 2026-04-09 | Initial Release |
