@@ -720,25 +720,20 @@ function admin_translate_fallback(string $key, string $locale): string
 
 function admin_get_locale(): string
 {
-    // First check URL parameter (from translation editor language selector)
-    if (isset($_GET['lang']) && !empty($_GET['lang'])) {
-        $lang = strtolower($_GET['lang']);
-        $validLocales = ['en', 'ar', 'zh', 'fr', 'ru', 'es', 'id', 'all'];
-        if (in_array($lang, $validLocales)) {
-            return $lang;
-        }
-    }
-
-    // Then check session
+    // IMPORTANT: Admin locale is COMPLETELY SEPARATE from frontend locale
+    // This prevents frontend language changes from affecting admin panel
+    
+    // Check admin-specific session (separate from frontend 'scriptlog_locale')
     if (isset($_SESSION['admin_locale'])) {
         return $_SESSION['admin_locale'];
     }
 
-    // Then check cookie
+    // Check admin-specific cookie (separate from frontend 'scriptlog_locale')
     if (isset($_COOKIE['admin_locale'])) {
         return $_COOKIE['admin_locale'];
     }
 
+    // Default to English
     return 'en';
 }
 
