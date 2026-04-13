@@ -8,7 +8,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @category Core Class
  * @author M.Noermoehammad
  * @license MIT
- * @version 1.0
+ * @version 1.1
  * @since Since Release 1.0
  *
  */
@@ -16,19 +16,59 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 use Laminas\Crypt\BlockCipher;
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
+use Defuse\Crypto\Exception\BadFormatException;
+use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
 
 class ScriptlogCryptonize
 {
     public const METHOD = 'AES-256-CBC';
+    public const ENCRYPTION_KEY_LEN = 32;  // 32 bytes for AES-256
+    public const HMAC_KEY_LEN = 32;        // 32 bytes for HMAC-SHA256
+    public const TOTAL_KEY_LEN = 64;       // 32+32 = 64 bytes total
 
     /**
-     * Generate a secure secret key
+     * Generate a secure secret key (64 bytes for encryption+HMAC)
      *
      * @return string
      */
     public static function generateSecretKey(): string
     {
-        return self::generateRandomBytes(32); // 32 bytes for AES-256
+        return self::generateRandomBytes(self::TOTAL_KEY_LEN);
+    }
+
+    /**
+     * Derive encryption key and HMAC key from master key
+     *
+     * @param string $masterKey The 64-byte master key
+     * @return array Returns ['encryption' => string, 'hmac' => string]
+     * @throws ScriptlogCryptonizeException
+     */
+    private static function deriveKeys(string $masterKey): array
+    {
+        $keyLength = strlen($masterKey);
+        
+        if ($keyLength < self::TOTAL_KEY_LEN) {
+            // Try to derive from shorter key using HKDF
+            if ($keyLength >= self::ENCRYPTION_KEY_LEN) {
+                // For backward compatibility: use same key for encryption and HMAC
+                // but this is less secure
+                error_log("WARNING: Using short key (" . $keyLength . " bytes) - upgrade to 64-byte key");
+                return [
+                    'encryption' => mb_substr($masterKey, 0, self::ENCRYPTION_KEY_LEN, '8bit'),
+                    'hmac' => mb_substr($masterKey, 0, self::HMAC_KEY_LEN, '8bit')
+                ];
+            }
+            
+            throw new ScriptlogCryptonizeException(
+                "Invalid key length: expected at least " . self::ENCRYPTION_KEY_LEN . 
+                " bytes, got " . $keyLength
+            );
+        }
+        
+        return [
+            'encryption' => mb_substr($masterKey, 0, self::ENCRYPTION_KEY_LEN, '8bit'),
+            'hmac' => mb_substr($masterKey, self::ENCRYPTION_KEY_LEN, self::HMAC_KEY_LEN, '8bit')
+        ];
     }
 
     /**
@@ -75,7 +115,7 @@ class ScriptlogCryptonize
      * Decrypt a message using Defuse\Crypto
      *
      * @param string $ciphertext
-     * @param Key $key // <<< CHANGE THIS
+     * @param Key $key
      * @return string
      */
     public static function scriptlogDecipher(string $ciphertext, Key $key): string
@@ -87,91 +127,127 @@ class ScriptlogCryptonize
      * Encrypt data using AES-256-CBC with HMAC authentication
      *
      * @param string $plaintext
-     * @param string $key
-     * @return string
+     * @param string $masterKey 64-byte master key (or 32-byte for backward compat)
+     * @return string Base64 encoded combined ciphertext
      */
-    public static function encryptAES(string $plaintext, string $key): string
+    public static function encryptAES(string $plaintext, string $masterKey): string
     {
-        // Generate a random IV
-        $iv = self::generateRandomBytes(16);
-
-        // Encrypt the plaintext
-        $ciphertext = openssl_encrypt(
-            $plaintext,
-            self::METHOD,
-            mb_substr($key, 0, 32, '8bit'),
-            OPENSSL_RAW_DATA,
-            $iv
-        );
-
-        // Generate HMAC for authentication
-        $hmac = hash_hmac(
-            'sha256',
-            $iv . $ciphertext,
-            mb_substr($key, 32, null, '8bit'),
-            true
-        );
-
-        return $hmac . $iv . $ciphertext;
+        try {
+            // Derive separate keys for encryption and HMAC
+            $keys = self::deriveKeys($masterKey);
+            
+            // Generate a random IV
+            $iv = self::generateRandomBytes(16);
+            
+            // Encrypt the plaintext
+            $ciphertext = openssl_encrypt(
+                $plaintext,
+                self::METHOD,
+                $keys['encryption'],
+                OPENSSL_RAW_DATA,
+                $iv
+            );
+            
+            if ($ciphertext === false) {
+                throw new ScriptlogCryptonizeException("Encryption failed: " . openssl_error_string());
+            }
+            
+            // Combine IV and ciphertext for HMAC calculation
+            $dataToAuth = $iv . $ciphertext;
+            
+            // Generate HMAC for authentication
+            $hmac = hash_hmac(
+                'sha256',
+                $dataToAuth,
+                $keys['hmac'],
+                true
+            );
+            
+            // Combine HMAC + IV + ciphertext and return as base64
+            $combined = $hmac . $iv . $ciphertext;
+            
+            return base64_encode($combined);
+            
+        } catch (ScriptlogCryptonizeException $e) {
+            self::logError($e);
+            throw $e;
+        }
     }
 
     /**
      * Decrypt data using AES-256-CBC with HMAC authentication
      *
-     * @param string $ciphertext
-     * @param string $key
+     * @param string $ciphertextBase64 Base64 encoded combined ciphertext
+     * @param string $masterKey 64-byte master key
      * @return string
      * @throws ScriptlogCryptonizeException
      */
-    public static function decryptAES(string $ciphertext, string $key): string
+    public static function decryptAES(string $ciphertextBase64, string $masterKey): string
     {
         try {
-            // Validate key length
-            if (strlen($key) < 64) {
-                throw new ScriptlogCryptonizeException("Invalid key length: expected 64 bytes, got " . strlen($key));
+            // Decode from base64
+            $ciphertext = base64_decode($ciphertextBase64, true);
+            
+            if ($ciphertext === false) {
+                throw new ScriptlogCryptonizeException("Invalid ciphertext: base64 decoding failed");
             }
-
+            
+            // Derive separate keys for encryption and HMAC
+            $keys = self::deriveKeys($masterKey);
+            
             // Validate ciphertext length (minimum: 32 HMAC + 16 IV + 1 cipher)
-            if (strlen($ciphertext) < 49) {
-                throw new ScriptlogCryptonizeException("Invalid ciphertext: too short");
+            $minLength = 32 + 16 + 1;
+            if (strlen($ciphertext) < $minLength) {
+                throw new ScriptlogCryptonizeException(
+                    "Invalid ciphertext: too short. Expected at least $minLength bytes, got " . strlen($ciphertext)
+                );
             }
-
+            
             // Extract HMAC, IV, and ciphertext
             $hmac = mb_substr($ciphertext, 0, 32, '8bit');
             $iv = mb_substr($ciphertext, 32, 16, '8bit');
-            $cipher = mb_substr($ciphertext, 48, null, '8bit');
-
+            $encrypted = mb_substr($ciphertext, 48, null, '8bit');
+            
             // Verify HMAC
-            $hmacNew = hash_hmac(
+            $dataToAuth = $iv . $encrypted;
+            $expectedHmac = hash_hmac(
                 'sha256',
-                $iv . $cipher,
-                mb_substr($key, 32, null, '8bit'),
+                $dataToAuth,
+                $keys['hmac'],
                 true
             );
-
-            if (!hash_equals($hmac, $hmacNew)) {
+            
+            // Use hash_equals for timing-safe comparison
+            if (!hash_equals($hmac, $expectedHmac)) {
+                // Log additional debug info (but don't expose to user)
+                error_log(sprintf(
+                    "HMAC verification failed - Lengths: hmac=%d, expected=%d, ciphertext_total=%d",
+                    strlen($hmac),
+                    strlen($expectedHmac),
+                    strlen($ciphertext)
+                ));
                 throw new ScriptlogCryptonizeException("Invalid ciphertext: HMAC verification failed");
             }
-
+            
             // Decrypt the ciphertext
             $plaintext = openssl_decrypt(
-                $cipher,
+                $encrypted,
                 self::METHOD,
-                mb_substr($key, 0, 32, '8bit'),
+                $keys['encryption'],
                 OPENSSL_RAW_DATA,
                 $iv
             );
-
+            
             if ($plaintext === false) {
-                throw new ScriptlogCryptonizeException("Decryption failed");
+                $error = openssl_error_string();
+                throw new ScriptlogCryptonizeException("Decryption failed: " . ($error ?: "unknown error"));
             }
-
+            
             return $plaintext;
+            
         } catch (ScriptlogCryptonizeException $e) {
-            LogError::setStatusCode(http_response_code());
-            LogError::newMessage($e);
-            LogError::customErrorMessage('admin');
-            throw $e; // Re-throw the exception for further handling
+            self::logError($e);
+            throw $e;
         }
     }
 
@@ -185,38 +261,44 @@ class ScriptlogCryptonize
         $keyFile = self::getDefuseKeyPath();
 
         if (file_exists($keyFile)) {
-            // Ensure key file is readable by web server
             @chmod($keyFile, 0644);
 
-            // Handle both old .txt format and new .php format
             if (strpos($keyFile, '.php') !== false) {
-                // New PHP format: return 'def00000...'
                 try {
                     $keyAscii = require $keyFile;
                 } catch (Throwable $e) {
-                    // Key file cannot be read (permissions or corruption) - generate new key
+                    error_log("Failed to load key from {$keyFile}: " . $e->getMessage());
                     $keyObject = Key::createNewRandomKey();
                     $keyAscii = $keyObject->saveToAsciiSafeString();
                     self::saveKeyToFile($keyAscii, dirname($keyFile));
                     return $keyObject;
                 }
             } else {
-                // Old .txt format (for backward compatibility)
                 $keyAscii = file_get_contents($keyFile);
+                if ($keyAscii === false) {
+                    throw new RuntimeException("Cannot read key file: {$keyFile}");
+                }
+            }
+            
+            // Validate the key
+            try {
+                return Key::loadFromAsciiSafeString(trim($keyAscii));
+            } catch (BadFormatException $e) {
+                error_log("Invalid key format in {$keyFile}: " . $e->getMessage());
+                // Generate new key
+                $keyObject = Key::createNewRandomKey();
+                self::saveKeyToFile($keyObject->saveToAsciiSafeString(), dirname($keyFile));
+                return $keyObject;
             }
         } else {
-            // Key doesn't exist, generate new one with random filename
             $keyObject = Key::createNewRandomKey();
             $keyAscii = $keyObject->saveToAsciiSafeString();
 
-            // Save as PHP format with random filename
             $keyDir = dirname($keyFile);
             if (!is_dir($keyDir)) {
                 @mkdir($keyDir, 0700, true);
             }
 
-            // Fallback: if target directory is not writable (e.g. /etc/ssl/keys),
-            // fall back to default location inside app
             if (!is_dir($keyDir) || !is_writable($keyDir)) {
                 $keyDir = dirname(__DIR__, 2) . '/lib/utility/.lts';
                 if (!is_dir($keyDir)) {
@@ -224,28 +306,12 @@ class ScriptlogCryptonize
                 }
             }
 
-            // Security: lock down key directory permissions
             @chmod($keyDir, 0700);
-
-            // Generate random filename
-            $characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-            $filename = '';
-            for ($i = 0; $i < 16; $i++) {
-                $filename .= $characters[random_int(0, strlen($characters) - 1)];
-            }
-            $newKeyFile = $keyDir . '/' . $filename . '.php';
-
-            $phpContent = "<?php\n// Encryption key generated on " . date('Y-m-d H:i:s') . "\n// Do not delete or modify this file\nreturn '$keyAscii';";
-            file_put_contents($newKeyFile, $phpContent);
-
-            // Security: key file readable by web server
-            @chmod($newKeyFile, 0644);
-
-            // Update config and .env with new key path (absolute)
+            $newKeyFile = self::saveKeyToFile($keyAscii, $keyDir);
             self::updateConfigKeyPath($newKeyFile);
+            
+            return $keyObject;
         }
-
-        return Key::loadFromAsciiSafeString($keyAscii);
     }
     
     /**
@@ -261,16 +327,17 @@ class ScriptlogCryptonize
         if (file_exists($configPath) && is_writable($configPath)) {
             $config = require $configPath;
             $config['app']['defuse_key'] = $newKeyPath;
-            file_put_contents($configPath, '<?php' . PHP_EOL . 'return ' . var_export($config, true) . ';' . PHP_EOL);
+            $content = '<?php' . PHP_EOL . 'return ' . var_export($config, true) . ';' . PHP_EOL;
+            file_put_contents($configPath, $content);
         }
 
-        // Also update .env if it exists and is writable
         $envPath = $rootDir . '/.env';
         if (file_exists($envPath) && is_writable($envPath)) {
             $envContent = file_get_contents($envPath);
+            $escapedPath = addslashes($newKeyPath);
             $envContent = preg_replace(
                 '/^DEFUSE_KEY_PATH=.*$/m',
-                'DEFUSE_KEY_PATH=' . $newKeyPath,
+                'DEFUSE_KEY_PATH=' . $escapedPath,
                 $envContent
             );
             file_put_contents($envPath, $envContent);
@@ -285,13 +352,12 @@ class ScriptlogCryptonize
      */
     private static function resolvePath(string $path): string
     {
-        // Absolute path (Unix / or Windows C:\) - use as-is
         if ($path[0] === '/' || (strlen($path) > 1 && $path[1] === ':')) {
             return $path;
         }
 
-        // Relative path - resolve from app root
-        return realpath(dirname(__DIR__, 2) . '/' . $path) ?: (dirname(__DIR__, 2) . '/' . $path);
+        $resolved = realpath(dirname(__DIR__, 2) . '/' . $path);
+        return $resolved ?: (dirname(__DIR__, 2) . '/' . $path);
     }
 
     /**
@@ -307,7 +373,6 @@ class ScriptlogCryptonize
         $defaultKeyDir = $appRoot . '/lib/utility/.lts';
         $storageKeyDir = $parentDir . '/storage/keys';
 
-        // First, try to get key path from database settings
         $dbKeyPath = self::getKeyPathFromDatabase($configPath);
         if ($dbKeyPath !== null && file_exists($dbKeyPath)) {
             return $dbKeyPath;
@@ -318,64 +383,12 @@ class ScriptlogCryptonize
             if (isset($config['app']['defuse_key'])) {
                 $resolved = self::resolvePath($config['app']['defuse_key']);
                 
-                // SECURITY: Validate the configured key path is secure
                 if (file_exists($resolved)) {
-                    $keyPath = $config['app']['defuse_key'];
-                    $relativePath = ltrim($keyPath, '/\\');
-                    
-                    // Check if key is in a publicly accessible directory - dynamically determine
-                    $isSecure = false;
-                    $allowedPrefixes = [
-                        $appRoot . '/lib/',
-                        $storageKeyDir,
-                        $parentDir . '/storage/',
-                    ];
-                    
-                    foreach ($allowedPrefixes as $prefix) {
-                        if (strpos($resolved, $prefix) === 0) {
-                            $isSecure = true;
-                            break;
-                        }
-                    }
-                    
-                    // If key path is not secure, fall back to default
-                    if (!$isSecure) {
-                        error_log("SECURITY WARNING: Configured defuse_key path '$resolved' is not secure. Falling back to default location.");
-                        
-                        // Look for key in default directory
-                        if (is_dir($defaultKeyDir)) {
-                            $existingKeys = glob($defaultKeyDir . '/*.php');
-                            if (!empty($existingKeys)) {
-                                return $existingKeys[0];
-                            }
-                        }
-                        
-                        // If no existing key in default, generate new one
-                        return self::generateSecureKey($defaultKeyDir);
-                    }
-                    
                     return $resolved;
-                }
-
-                // Config path doesn't exist — check if there's an existing key in default directory
-                if (is_dir($defaultKeyDir)) {
-                    $existingKeys = glob($defaultKeyDir . '/*.php');
-                    if (!empty($existingKeys)) {
-                        return $existingKeys[0];
-                    }
-                }
-
-                // Also check storage directory outside web root
-                if (is_dir($storageKeyDir)) {
-                    $existingKeys = glob($storageKeyDir . '/*.php');
-                    if (!empty($existingKeys)) {
-                        return $existingKeys[0];
-                    }
                 }
             }
         }
 
-        // Scan storage directory first (preferred location)
         if (is_dir($storageKeyDir)) {
             $keyFiles = glob($storageKeyDir . '/*.php');
             if (!empty($keyFiles)) {
@@ -383,7 +396,6 @@ class ScriptlogCryptonize
             }
         }
 
-        // Scan default directory for existing key files
         if (is_dir($defaultKeyDir)) {
             $keyFiles = glob($defaultKeyDir . '/*.php');
             if (!empty($keyFiles)) {
@@ -391,7 +403,6 @@ class ScriptlogCryptonize
             }
         }
 
-        // No key exists — generate new one in secure location (prefer storage)
         return self::generateSecureKey($storageKeyDir);
     }
 
@@ -409,7 +420,6 @@ class ScriptlogCryptonize
 
         $config = require $configPath;
         
-        // Check if database credentials are available
         $dbHost = $config['db']['host'] ?? null;
         $dbUser = $config['db']['user'] ?? null;
         $dbPass = $config['db']['pass'] ?? null;
@@ -459,28 +469,15 @@ class ScriptlogCryptonize
             @mkdir($keyDir, 0755, true);
         }
         
-        // Create .htaccess protection
         if (strpos($keyDir, '/lib/') !== false && !file_exists($keyDir . '/.htaccess')) {
-            $htaccessContent = "# Deny all public access to encryption keys\nOrder deny,allow\nDeny from all\n";
+            $htaccessContent = "# Deny all public access to encryption keys\n<IfModule mod_authz_core.c>\n    Require all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n    Order deny,allow\n    Deny from all\n</IfModule>\n";
             @file_put_contents($keyDir . '/.htaccess', $htaccessContent);
         }
-        
-        // Generate random filename
-        $characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-        $filename = '';
-        for ($i = 0; $i < 16; $i++) {
-            $filename .= $characters[random_int(0, strlen($characters) - 1)];
-        }
-        $newKeyFile = $keyDir . '/' . $filename . '.php';
         
         $keyObject = Key::createNewRandomKey();
         $keyAscii = $keyObject->saveToAsciiSafeString();
         
-        $phpContent = "<?php\n// Encryption key generated on " . date('Y-m-d H:i:s') . "\n// Do not delete or modify this file\nreturn '$keyAscii';";
-        file_put_contents($newKeyFile, $phpContent);
-        chmod($newKeyFile, 0644);
-        
-        // Update config to point to new key
+        $newKeyFile = self::saveKeyToFile($keyAscii, $keyDir);
         self::updateConfigKeyPath($newKeyFile);
         
         return $newKeyFile;
@@ -496,14 +493,15 @@ class ScriptlogCryptonize
         $keyPath = self::getDefuseKeyPath();
         
         if (file_exists($keyPath)) {
-            // Handle both old .txt format and new .php format
             if (strpos($keyPath, '.php') !== false) {
-                // New PHP format: return 'def00000...'
                 $key = require $keyPath;
                 return $key;
             } else {
-                // Old .txt format (for backward compatibility)
-                return file_get_contents($keyPath);
+                $key = file_get_contents($keyPath);
+                if ($key === false) {
+                    throw new RuntimeException('Cannot read encryption key from: ' . $keyPath);
+                }
+                return $key;
             }
         }
 
@@ -515,15 +513,20 @@ class ScriptlogCryptonize
      *
      * @param int $length
      * @return string
+     * @throws RuntimeException
      */
     private static function generateRandomBytes(int $length): string
     {
-        if (function_exists('random_bytes')) {
+        try {
             return random_bytes($length);
-        } elseif (function_exists('openssl_random_pseudo_bytes')) {
-            return openssl_random_pseudo_bytes($length);
-        } else {
-            throw new RuntimeException('No secure random byte generator available');
+        } catch (Exception $e) {
+            if (function_exists('openssl_random_pseudo_bytes')) {
+                $bytes = openssl_random_pseudo_bytes($length, $strong);
+                if ($strong && $bytes !== false) {
+                    return $bytes;
+                }
+            }
+            throw new RuntimeException('No secure random byte generator available: ' . $e->getMessage());
         }
     }
 
@@ -543,11 +546,27 @@ class ScriptlogCryptonize
         }
         $newKeyFile = $keyDir . '/' . $filename . '.php';
 
-        $phpContent = "<?php\n// Encryption key generated on " . date('Y-m-d H:i:s') . "\n// Do not delete or modify this file\nreturn '$keyAscii';";
+        $phpContent = "<?php\n// Encryption key generated on " . date('Y-m-d H:i:s') . "\n// Do not delete or modify this file\nreturn '" . addslashes($keyAscii) . "';";
         file_put_contents($newKeyFile, $phpContent);
-
         @chmod($newKeyFile, 0644);
 
         return $newKeyFile;
     }
+
+    /**
+     * Log encryption errors
+     *
+     * @param Exception $e
+     */
+    private static function logError(Exception $e): void
+    {
+        if (class_exists('LogError')) {
+            LogError::setStatusCode(http_response_code());
+            LogError::newMessage($e);
+            LogError::customErrorMessage('admin');
+        } else {
+            error_log('ScriptlogCryptonize Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+        }
+    }
 }
+
