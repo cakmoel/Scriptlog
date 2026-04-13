@@ -226,7 +226,7 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
             <?php endif; ?>
 
             <?php if (access_control_list(ActionConst::PRIVACY)) : ?>
-            <li <?= ($module === 'privacy') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+            <li <?= ($module === 'privacy' || $module === 'privacy-policy') ? 'class="treeview active"' : 'class="treeview"'; ?>>
                 <a href="#">
                     <i class="fa fa-shield fa-fw"></i>
                     <span><?= admin_translate('nav.privacy'); ?></span>
