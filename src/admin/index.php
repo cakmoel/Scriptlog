@@ -22,15 +22,32 @@ if (file_exists(__DIR__ . '/../config.php') && is_file(__DIR__ . '/../config.php
         $app->authenticator->logout();
     }
 
-    // Handle admin language switch
-    if (isset($_GET['switch-lang']) && !empty($_GET['switch-lang'])) {
-        $langCode = preg_replace('/[^a-z]{2}/', '', strtolower($_GET['switch-lang']));
-        $availableLocales = ['en', 'ar', 'zh', 'fr', 'ru', 'es', 'id'];
-        if (in_array($langCode, $availableLocales)) {
-            admin_set_locale($langCode);
+    // Handle admin language switch using ?lang=
+    if (isset($_GET['lang']) && !empty($_GET['lang'])) {
+        // Ensure session is started before setting locale
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
-        $redirect = $_GET['redirect'] ?? '/admin/index.php?load=dashboard';
-        header('Location: ' . $redirect);
+        
+        // Validate language code
+        $langCode = preg_replace('/[^a-z]/', '', strtolower($_GET['lang']));
+        $availableLocales = ['en', 'ar', 'zh', 'fr', 'ru', 'es', 'id'];
+        
+        if (in_array($langCode, $availableLocales)) {
+            $_SESSION['admin_locale'] = $langCode;
+        }
+        
+        // Redirect back to current page without lang param
+        $currentUrl = $_SERVER['REQUEST_URI'] ?? '/admin/index.php?load=dashboard';
+        $currentUrl = preg_replace('/[?&]lang=[^&]*/', '', $currentUrl);
+        $currentUrl = empty($currentUrl) ? '/admin/index.php?load=dashboard' : $currentUrl;
+        
+        // Ensure proper path
+        if (!preg_match('#^/admin/#', $currentUrl)) {
+            $currentUrl = '/admin/' . ltrim($currentUrl, '/');
+        }
+        
+        header('Location: ' . $currentUrl);
         exit();
     }
 
