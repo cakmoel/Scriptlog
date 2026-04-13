@@ -17,8 +17,10 @@
 6. [Fallback Mechanism](#fallback-mechanism)
 7. [Privacy Policy Implementation](#privacy-policy-implementation)
 8. [Theme Integration](#theme-integration)
+   - [Frontend Language Switcher](#frontend-language-switcher)
 9. [Translation Keys Dictionary](#translation-keys-dictionary)
 10. [Files Reference](#files-reference)
+11. [Admin Language Switcher](#admin-language-switcher)
 
 ---
 
@@ -56,7 +58,7 @@ This document outlines the complete architecture for implementing internationali
 │                     REQUEST FLOW (i18n)                         │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   Permalinks ENABLED:  /en/post/1/slug                           │
+│   Permalinks ENABLED:  /en/post/1/slug                          │
 │   Permalinks DISABLED: ?p=1  (default language, no prefix)      │
 │       │                                                         │
 │       ▼                                                         │
@@ -77,7 +79,7 @@ This document outlines the complete architecture for implementing internationali
 │              ▼                                                  │
 │   ┌──────────────────────┐                                      │
 │   │   Theme Render       │  → Render with translated strings    │
-│   └──────────┘                                                       │
+│   └────────────────────┘                                        │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -367,6 +369,88 @@ class PrivacyPolicyDao extends Dao
 
 ## 8. Theme Integration
 
+### Frontend Language Switcher
+
+Location: `public/themes/blog/header.php`
+
+The frontend theme includes a language switcher in the navigation bar that allows visitors to switch languages.
+
+```php
+<!-- public/themes/blog/header.php - Language Switcher -->
+<li class="dropdown language-switcher">
+    <button type="button" class="btn-language dropdown-toggle" 
+            id="languageMenu" data-toggle="dropdown">
+        <i class="fa fa-globe"></i>
+        <span class="lang-text"><?php echo get_language_name(get_locale(), true); ?></span>
+        <span class="lang-code"><?php echo strtoupper(get_locale()); ?></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+        <?php foreach (available_locales() as $locale) : ?>
+        <li>
+            <a href="?switch-lang=<?php echo $locale; ?>">
+                <?php echo get_language_name($locale, true); ?>
+                <!-- Show check for current locale -->
+            </a>
+        </li>
+        <?php endforeach; ?>
+    </ul>
+</li>
+```
+
+### IMPORTANT: Separate from Admin
+
+The frontend uses **COMPLETELY SEPARATE** locale system from admin panel:
+
+- **Session**: `$_SESSION['scriptlog_locale']` (NOT admin_locale)
+- **Cookie**: `scriptlog_locale` (NOT admin_locale)
+- **URL Parameter**: `?switch-lang=` (NOT ?lang=)
+- **Function**: `get_locale()` (NOT admin_get_locale())
+
+This ensures:
+- Frontend visitors can change language without affecting admin panel
+- Admin can change language without affecting frontend
+- No conflict between the two systems
+
+### Frontend Locale Handling
+
+The frontend uses different functions compared to the admin panel:
+
+| Function | Location | Purpose |
+|-----------|----------|---------|
+| `get_locale()` | `public/themes/blog/functions.php` | Get current frontend locale |
+| `set_locale()` | `public/themes/blog/functions.php` | Set locale |
+| `available_locales()` | `public/themes/blog/functions.php` | Get available languages |
+| `locale_url()` | `public/themes/blog/functions.php` | Generate locale-prefixed URL |
+| `get_language_name()` | `public/themes/blog/functions.php` | Get language name |
+| `t()` | `I18nManager` | Translate frontend strings |
+
+### Frontend Language Switch Flow
+
+```
+User clicks language in frontend dropdown
+         │
+         ▼
+?switch-lang=id (URL parameter)
+         │
+         ▼
+lib/main.php handles switch
+         │
+         ▼
+$_SESSION['scriptlog_locale'] = 'id' (NOT admin_locale!)
+         │
+         ▼
+Redirects to clean URL (without switch-lang)
+         │
+         ▼
+Page loads with new locale via get_locale()
+         │
+         ▼
+Theme renders with t() translations
+         │
+         ▼
+Admin panel language UNCHANGED
+```
+
 ### Theme Files Modified
 
 | File | Purpose |
@@ -524,6 +608,139 @@ class PrivacyPolicyDao extends Dao
 | lib/core/Dispatcher.php | Extract locale before routing |
 | lib/core/RequestPath.php | Handle locale in path |
 | .htaccess | Rewrite rules for locale prefixes |
+
+---
+
+## 11. Admin Language Switcher
+
+### Overview
+
+The admin panel includes a language switcher in the header navigation that allows administrators to switch between available languages without page reload. The implementation uses a simple URL-based query parameter approach.
+
+### IMPORTANT: Separate Architecture
+
+The admin panel and frontend use **COMPLETELY SEPARATE** locale systems to prevent language changes in one area from affecting the other:
+
+| Aspect | Admin Panel | Frontend |
+|--------|------------|---------|
+| **Session Variable** | `$_SESSION['admin_locale']` | `$_SESSION['scriptlog_locale']` |
+| **Cookie** | `admin_locale` | `scriptlog_locale` |
+| **URL Parameter** | `?lang=` | `?switch-lang=` |
+| **Functions** | `admin_get_locale()` | `get_locale()` |
+
+This separation ensures:
+- Frontend visitors can change language without affecting admin panel
+- Admin can change language without affecting frontend visitors
+- No conflict between the two systems
+
+### Language Switcher in Admin Navigation
+
+Location: `admin/navigation.php`
+
+The language switcher is a Bootstrap dropdown menu that lists all available languages. When a user clicks a language option, it redirects to the same page with `?lang=` query parameter.
+
+```php
+<!-- admin/navigation.php - Language Switcher -->
+<li class="dropdown notifications-menu">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="Language">
+        <i class="fa fa-globe"></i>
+        <span class="hidden-xs"><?= strtoupper(admin_get_locale()); ?></span>
+    </a>
+    <ul class="dropdown-menu">
+        <li class="header"><?= admin_translate('nav.language_settings'); ?></li>
+        <li>
+            <ul class="menu">
+                <?php foreach (admin_get_available_locales() as $code => $name) : ?>
+                <li>
+                    <a href="?lang=<?= $code; ?>">
+                        <!-- Show check icon for current locale -->
+                        <?php if (admin_get_locale() === $code) : ?>
+                        <i class="fa fa-check text-success"></i>
+                        <?php else : ?>
+                        <i class="fa fa-globe text-muted"></i>
+                        <?php endif; ?>
+                        &nbsp;<?= safe_html($name); ?>
+                    </a>
+                </li>
+                <?php endforeach; ?>
+            </ul>
+        </li>
+    </ul>
+</li>
+```
+
+### How It Works
+
+1. **URL Parameter**: The switcher uses `?lang=` query parameter (e.g., `?lang=id` for Indonesian)
+
+2. **Locale Detection**: The `admin_get_locale()` function in `lib/utility/admin-translations.php` checks in this order:
+   - Session `$_SESSION['admin_locale']` first (NOT URL - prevents frontend pollution)
+   - Cookie `$_COOKIE['admin_locale']`
+   - Default: `'en'`
+
+3. **admin/index.php** handles the `?lang=` parameter and saves to session, then redirects to clean URL
+
+### Key Functions
+
+| Function | Location | Purpose |
+|----------|----------|---------|
+| `admin_get_locale()` | `lib/utility/admin-translations.php` | Get admin locale (session/cookie only) |
+| `admin_set_locale()` | `lib/utility/admin-translations.php` | Set admin locale |
+| `admin_get_available_locales()` | `lib/utility/admin-translations.php` | Get available languages |
+| `admin_translate()` | `lib/utility/admin-translations.php` | Translate admin UI strings |
+
+### Supported Languages
+
+| Code | Name | Direction |
+|------|------|-----------|
+| en | English | ltr |
+| ar | العربية | rtl |
+| zh | 中文 | ltr |
+| fr | Français | ltr |
+| ru | Русский | ltr |
+| es | Español | ltr |
+| id | Bahasa Indonesia | ltr |
+
+### Sidebar Translation
+
+The admin sidebar (`admin/sidebar-nav.php`) uses `admin_translate()` for all navigation items. When the locale changes via the language switcher, all sidebar items automatically update to the selected language.
+
+```php
+// Example: sidebar navigation items use admin_translate()
+<span><?= admin_translate('nav.dashboard'); ?></span>
+<span><?= admin_translate('nav.posts'); ?></span>
+<span><?= admin_translate('nav.users'); ?></span>
+```
+
+### Flow Diagram
+
+```
+User clicks language in admin dropdown
+         │
+         ▼
+?lang=id (URL parameter)
+         │
+         ▼
+admin/index.php processes ?lang= 
+         │
+         ▼
+Saves to $_SESSION['admin_locale'] (NOT scriptlog_locale!)
+         │
+         ▼
+Redirects to clean URL (no ?lang=)
+         │
+         ▼
+admin_get_locale() returns session value
+         │
+         ▼
+Sidebar renders with admin_translate('key', 'id')
+         │
+         ▼
+Admin panel displays in Indonesian
+         │
+         ▼
+Frontend language UNCHANGED
+```
 
 ---
 

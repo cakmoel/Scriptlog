@@ -1,22 +1,9 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * x_frame_option
- *
- * http header x-frame-options
- * This http header helps avoiding clickjacking attacks.
- * Browser support is as follow: IE 8+, Chrome 4.1+, Firefox 3.6.9+, Opera 10.5+, Safari 4+. P
- * The Content-Security-Policy HTTP header has a frame-ancestors directive
- * which obsoletes this header for supporting browsers.Posible values are:
- *
- * deny -- browser refuses to display requested document in a frame
- * sameorigin -- browser refuses to display requested document in a frame, in case that origin does not match
- * allow-from: DOMAIN -- browser displays requested document in a frame only if it loaded from DOMAIN
- *
- * @param string $options
- * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
- * @return void
- *
  */
 function x_frame_option($options = "sameorigin")
 {
@@ -25,20 +12,6 @@ function x_frame_option($options = "sameorigin")
 
 /**
  * x_xss_protection
- *
- * http_header x-xss-protection
- * Use this header to enable browser built-in XSS Filter.
- * It prevent cross-site scripting attacks. X-XSS-Protection header is supported by IE 8+, Opera, Chrome, and Safari.
- * Available directives:
- *
- * 0 -- disable XSS Filter
- * 1 -- enables the XSS Filter. If a cross-site scripting attack is detected, in order to stop the attack, the browser will sanitize the page.
- * 1; mode=block -- enables the XSS Filter. Rather than sanitize the page, when a XSS attack is detected, the browser will prevent rendering of the page.
- * 1; report=<reporting-URI> -- enables the XSS Filter. If a cross-site scripting attack is detected, the browser will sanitize the page and report the violation.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
- * @return void
- *
  */
 function x_xss_protection()
 {
@@ -46,10 +19,7 @@ function x_xss_protection()
 }
 
 /**
- * x_content_type_protection
- *
- * @return void
- *
+ * x_content_type_options
  */
 function x_content_type_options($options = "nosniff")
 {
@@ -58,9 +28,6 @@ function x_content_type_options($options = "nosniff")
 
 /**
  * strict_transport_security
- *
- * @return void
- *
  */
 function strict_transport_security()
 {
@@ -69,8 +36,6 @@ function strict_transport_security()
 
 /**
  * remove_x_powered_by
- *
- * @return void
  */
 function remove_x_powered_by()
 {
@@ -78,54 +43,85 @@ function remove_x_powered_by()
 }
 
 /**
- * content_security_policy()
- *
- * set content_securiy_policy header
- *
- * @category function
- * @author M.Noermoehammad
- * @see https://scotthelme.co.uk/content-security-policy-an-introduction/
- * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
- * @license MIT
- * @version 1.0
- * @return void
- *
+ * content_security_policy
+ * 
+ * Configured to allow:
+ * - Inline JavaScript and styles
+ * - AJAX requests to same origin
+ * - Form submissions
+ * - Images and media
+ * - Safe external resources
+ * 
+ * @param string $app_url
  */
 function content_security_policy($app_url)
 {
+    $is_ssl = is_ssl();
+    $scheme = $is_ssl ? 'https:' : 'http:';
+    
+    // Base CSP - allows inline scripts/styles, AJAX, forms, images
+    $csp = "Content-Security-Policy: " .
+        "default-src 'self'; " .
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' {$scheme}; " .
+        "style-src 'self' 'unsafe-inline' {$scheme}; " .
+        "img-src 'self' data: {$scheme}; " .
+        "font-src 'self' data: {$scheme}; " .
+        "connect-src 'self' {$scheme}; " .
+        "media-src 'self' {$scheme}; " .
+        "frame-src 'self' {$scheme}; " .
+        "child-src 'self' {$scheme}; " .
+        "object-src 'self'; " .
+        "frame-ancestors 'self'; " .
+        "base-uri 'self'; " .
+        "form-action 'self' {$app_url}; " .
+        "manifest-src 'self';";
+    
+    if (!$is_ssl) {
+        $csp .= "; upgrade-insecure-requests";
+    }
+    
+    header($csp);
+}
 
-    if (is_ssl() === false) {
-        $csp_non_ssl = "Content-Security-Policy: " .
-            "connect-src 'self' http:; " .
-            "default-src 'self' http:; " .
-            "font-src 'unsafe-inline' data: http:; " .
-            "form-action 'self' " . $app_url . "; " .
-            "img-src data: http:; " .
-            "frame-ancestors 'none' ; " .
-            "frame-src 'none'; " .
-            "child-src http:; " .
-            "media-src 'self' http:; " .
-            "object-src 'self' www.google-analytics.com ajax.googleapis.com platform-api.sharethis.com yourusername.disqus.com;" .
-            "script-src 'self' 'unsafe-inline' http:; " .
-            "style-src 'self' 'unsafe-inline' http:;";
+/**
+ * Allow AJAX from admin area
+ * Use this in admin AJAX endpoints before any output
+ */
+function allow_admin_ajax()
+{
+    header('Access-Control-Allow-Origin: ' . (app_url() . '/admin/'));
+    header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, X-Requested-With');
+    header('Access-Control-Allow-Credentials: true');
+    header('Cache-Control: no-cache, no-store, must-revalidate');
+}
 
-        header($csp_non_ssl);
-    } else {
-        $csp_ssl = "Content-Security-Policy:" .
-            "frame-ancestors 'none'; " .
-            "connect-src 'self' https:; " .
-            "default-src 'self' https:; " .
-            "font-src 'unsafe-inline' data: https:; " .
-            "form-action 'self' " . $app_url . "; " .
-            "img-src data: https:; " .
-            "frame-ancestors 'none'; " .
-            "frame-src 'none; " .
-            "child-src https:; " .
-            "media-src 'self' https:; " .
-            "object-src 'self' www.google-analytics.com ajax.googleapis.com platform-api.sharethis.com yourusername.disqus.com;" .
-            "script-src 'self' 'unsafe-inline' https:; " .
-            "style-src 'self' 'unsafe-inline' https:;";
+/**
+ * Set CORS headers for API endpoints
+ */
+function set_cors_headers($origin = null)
+{
+    if ($origin === null) {
+        $origin = app_url();
+    }
+    
+    header("Access-Control-Allow-Origin: {$origin}");
+    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-API-Key");
+    header("Access-Control-Allow-Credentials: true");
+    header("Access-Control-Max-Age: 86400");
+}
 
-        header($csp_ssl);
+/**
+ * Handle preflight OPTIONS request
+ */
+function handle_preflight_request()
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        header('Access-Control-Allow-Origin: ' . (app_url() ?? '*'));
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type, X-Requested-With');
+        http_response_code(204);
+        exit();
     }
 }
