@@ -181,7 +181,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $server_config = generate_server_config();
                     $_SESSION['server_config'] = $server_config;
                     
-                    header("Location:" . $protocol . "://" . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR . "finish.php?status=success&token={$key}", true, 302);
+                    $installPath = rtrim(dirname($_SERVER['PHP_SELF']), '/');
+                    if ($installPath === '/') {
+                        $installPath = '';
+                    }
+                    header("Location:" . $protocol . "://" . $server_host . $installPath . "/finish.php?status=success&token={$key}", true, 302);
                     exit;
                 }
             }

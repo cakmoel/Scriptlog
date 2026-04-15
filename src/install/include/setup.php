@@ -17,12 +17,18 @@ require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'dbtable.php';
 
 function current_url() // returning current url
 {
-
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== "off") ? "https" : "http";
-
     $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
-
-    return $scheme . "://" . $host . dirname($_SERVER['PHP_SELF']) . DIRECTORY_SEPARATOR;
+    
+    $phpSelf = $_SERVER['PHP_SELF'];
+    
+    $path = dirname(rtrim($phpSelf, '/'));
+    
+    if ($path === '/') {
+        $path = '';
+    }
+    
+    return $scheme . "://" . $host . $path . '/';
 }
 
 /**
