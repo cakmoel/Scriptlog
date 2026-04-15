@@ -20,7 +20,11 @@ require dirname(__FILE__) . '/include/setup.php';
 require dirname(__FILE__) . '/install-layout.php';
 
 if (!file_exists(__DIR__ . '/../config.php')) {
-    header("Location: " . $protocol . '://' . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR, true, 302);
+    $installPath = rtrim(dirname($_SERVER['PHP_SELF']), '/');
+    if ($installPath === '/') {
+        $installPath = '';
+    }
+    header("Location: " . $protocol . '://' . $server_host . $installPath . '/', true, 302);
     exit();
 } else {
     $set_config = require __DIR__ . '/../config.php';
@@ -167,7 +171,11 @@ if (!file_exists(__DIR__ . '/../config.php')) {
                     $server_config = generate_server_config();
                     $_SESSION['server_config'] = $server_config;
 
-                    header("Location:" . $protocol . "://" . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR . "finish.php?status=success&token={$key}");
+                    $installPath = rtrim(dirname($_SERVER['PHP_SELF']), '/');
+                    if ($installPath === '/') {
+                        $installPath = '';
+                    }
+                    header("Location:" . $protocol . "://" . $server_host . $installPath . "/finish.php?status=success&token={$key}");
                 }
             } catch (mysqli_sql_exception $e) {
                 $errors['errorInstall'] = "Database error: " . $e->getMessage();
