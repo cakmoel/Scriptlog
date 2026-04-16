@@ -832,9 +832,27 @@ $rules = [
     'page'     => "/page/(?'page'[^/]+)",
     'single'   => "/post/(?'id'\d+)/(?'post'[\w\-]+)",
     'search'   => "(?'search'[\w\-]+)",
-    'tag'      => "/tag/(?'tag'[\w\- ]+)"
+    'tag'      => "/tag/(?'tag'[\w\- ]+)",
+    'privacy'  => "/privacy",
+    'download' => "/download/(?'identifier'[a-f0-9\-]+)",
+    'download_file' => "/download/(?'identifier'[a-f0-9\-]+)/file"
 ];
 ```
+
+| Route Key | Pattern | Description |
+|-----------|---------|-------------|
+| `home` | `/` | Homepage |
+| `category` | `/category/{slug}` | Category archive pages |
+| `archive` | `/archive/{mm}/{yyyy}` | Monthly archive pages |
+| `archives` | `/archives` | Archive index |
+| `blog` | `/blog*` | Blog listing |
+| `page` | `/page/{slug}` | Static pages |
+| `single` | `/post/{id}/{slug}` | Single post view |
+| `search` | `/{keyword}` | Search results |
+| `tag` | `/tag/{tag}` | Tag archive pages (supports spaces) |
+| `privacy` | `/privacy` | Privacy policy page |
+| `download` | `/download/{identifier}` | Secure download (UUID) |
+| `download_file` | `/download/{identifier}/file` | File download endpoint |
 
 #### Content Validation
 
@@ -1156,89 +1174,480 @@ class NewsletterController
 
 | Guideline | Description |
 |-----------|-------------|
+| **Extends Dao** | DAOs extend the base `Dao` class for database connectivity |
 | **Single Responsibility** | Each DAO handles one database table |
-| **Prepared Statements** | Use for all queries to prevent SQL injection |
-| **Return Format** | Return associative arrays or objects |
-| **Error Handling** | Handle exceptions gracefully |
+| **CRUD Operations** | DAOs handle Create, Read, Update, Delete operations |
+| **No Business Logic** | Keep validation in Services, not DAOs |
 
-### Example: PostDao
+### Dao Base Class
+
+All DAOs extend the base `Dao` class which provides database methods:
 
 ```php
-class PostDao
+// lib/core/Dao.php
+class Dao
 {
-    private $db;
+    protected $dbc;       // Database connection
+    protected $error;      // Error tracking
+    protected $tableName; // Current table
+
+    // Core methods
+    protected function setSQL($sql);                    // Set SQL query
+    protected function create($table, $bind);        // INSERT
+    protected function modify($table, $bind, $where); // UPDATE
+    protected function deleteRecord($table, $where);  // DELETE
+    protected function findAll($data = []);         // SELECT all
+    protected function findRow($data = [], $fetchMode = null); // SELECT one
+    protected function checkCountValue($data);           // COUNT records
+    protected function filteringId($sanitize, $id, $type); // Sanitize ID
+    protected function lastId();                       // Get last insert ID
+    
+    // Transaction methods
+    protected function callTransaction();  // START TRANSACTION
+    protected function callCommit();     // COMMIT
+    protected function callRollBack(); // ROLLBACK
+}
+```
+
+### PostDao Implementation
+
+The actual `PostDao` class at `lib/dao/PostDao.php` extends `Dao`:
+
+```php
+// lib/dao/PostDao.php
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
+class PostDao extends Dao
+{
+    private $selected; // For dropdown selections
 
     public function __construct()
     {
-        $this->db = Registry::get('dbc');
+        parent::__construct();
     }
 
-    public function insertPost($data)
+    /**
+     * Find all posts with optional filters
+     * @param string $orderBy Sort column
+     * @param int|null $author Filter by author ID
+     * @param bool $onlyPublished Only published posts
+     * @return array Posts array
+     */
+    public function findPosts($orderBy = 'ID', $author = null, $onlyPublished = true)
     {
-        $sql = "INSERT INTO tbl_posts 
-                (post_author, post_title, post_slug, post_content, 
-                 post_status, post_type, post_date) 
-                VALUES (?, ?, ?, ?, ?, ?, NOW())";
-        
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            $data['post_author'],
-            $data['post_title'],
-            $data['post_slug'],
-            $data['post_content'],
-            $data['post_status'],
-            $data['post_type']
-        ]);
+        $allowedColumns = ['ID', 'post_date', 'post_title', 'post_modified'];
+        $sortColumn = in_array($orderBy, $allowedColumns) ? $orderBy : 'ID';
+
+        $sql = "SELECT p.ID, p.media_id, p.post_author,
+            p.post_date, p.post_modified, p.post_title,
+            p.post_slug, p.post_content, p.post_status,
+            p.post_visibility, p.post_password, p.post_tags,
+            p.post_headlines, p.post_type, p.post_locale,
+            p.passphrase, u.user_login
+            FROM tbl_posts AS p
+            INNER JOIN tbl_users AS u ON p.post_author = u.ID
+            WHERE p.post_type = 'blog'";
+
+        $data = [];
+
+        if (!is_null($author)) {
+            $sql .= " AND p.post_author = ?";
+            $data[] = (int)$author;
+        }
+
+        if ($onlyPublished) {
+            $sql .= " AND p.post_status = 'publish' AND p.post_visibility = 'public'";
+        }
+
+        $sql .= " ORDER BY p.$sortColumn DESC";
+
+        $this->setSQL($sql);
+        $posts = $this->findAll($data);
+
+        return (empty($posts)) ? [] : $posts;
     }
 
-    public function updatePost($id, $data)
+    /**
+     * Find single post by ID
+     * @param int $id Post ID
+     * @param object $sanitize Sanitizer object
+     * @param int|null $author Filter by author
+     * @param bool $onlyPublished Only published
+     * @return array|bool Post data or false
+     */
+    public function findPost($id, $sanitize, $author = null, $onlyPublished = true)
     {
-        $sql = "UPDATE tbl_posts SET 
-                post_title = ?, post_slug = ?, post_content = ?,
-                post_modified = NOW() WHERE ID = ?";
-        
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            $data['post_title'],
-            $data['post_slug'],
-            $data['post_content'],
-            $id
-        ]);
+        $idsanitized = $this->filteringId($sanitize, $id, 'sql');
+
+        $sql = "SELECT ID, media_id, post_author, post_date,
+            post_modified, post_title, post_slug, post_content,
+            post_summary, post_status, post_visibility, post_password,
+            post_tags, post_headlines, post_locale, comment_status, 
+            passphrase
+            FROM tbl_posts
+            WHERE ID = ? AND post_type = 'blog'";
+
+        $data = [$idsanitized];
+
+        if (!is_null($author)) {
+            $sql .= " AND post_author = ?";
+            $data[] = (int)$author;
+        }
+
+        if ($onlyPublished) {
+            $sql .= " AND post_status = 'publish' AND post_visibility = 'public'";
+        }
+
+        $this->setSQL($sql);
+        $postDetail = $this->findRow($data);
+
+        return (empty($postDetail)) ? false : $postDetail;
     }
 
-    public function deletePost($id)
+    /**
+     * Create new post
+     * @param array $bind Post data
+     * @param int $topicId Topic/category ID
+     * @return int New post ID
+     */
+    public function createPost($bind, $topicId)
     {
-        $stmt = $this->db->prepare("DELETE FROM tbl_posts WHERE ID = ?");
-        return $stmt->execute([$id]);
+        $this->setSQL("SET SQL_MODE='ALLOW_INVALID_DATE'");
+
+        if (!empty($bind['media_id'])) {
+            $this->create("tbl_posts", [
+                'media_id' => $bind['media_id'],
+                'post_author' => $bind['post_author'],
+                'post_date' => $bind['post_date'],
+                'post_title' => $bind['post_title'],
+                'post_slug' => $bind['post_slug'],
+                'post_content' => $bind['post_content'],
+                'post_summary' => $bind['post_summary'],
+                'post_status' => $bind['post_status'],
+                'post_visibility' => $bind['post_visibility'],
+                'post_password' => $bind['post_password'],
+                'post_tags' => $bind['post_tags'],
+                'post_headlines' => $bind['post_headlines'],
+                'post_locale' => $bind['post_locale'] ?? 'en',
+                'comment_status' => $bind['comment_status'],
+                'passphrase' => $bind['passphrase']
+            ]);
+        } else {
+            $this->create("tbl_posts", [
+                'post_author' => $bind['post_author'],
+                'post_date' => $bind['post_date'],
+                'post_title' => $bind['post_title'],
+                'post_slug' => $bind['post_slug'],
+                'post_content' => $bind['post_content'],
+                'post_summary' => $bind['post_summary'],
+                'post_status' => $bind['post_status'],
+                'post_visibility' => $bind['post_visibility'],
+                'post_password' => $bind['post_password'],
+                'post_tags' => $bind['post_tags'],
+                'post_headlines' => $bind['post_headlines'],
+                'post_locale' => $bind['post_locale'] ?? 'en',
+                'comment_status' => $bind['comment_status'],
+                'passphrase' => $bind['passphrase']
+            ]);
+        }
+
+        $postId = $this->lastId();
+
+        // Handle post-topic relationships
+        if ((is_array($topicId)) && (!empty($postId))) {
+            foreach ($_POST['catID'] as $topicId) {
+                $this->create("tbl_post_topic", [
+                    'post_id' => $postId,
+                    'topic_id' => $topicId
+                ]);
+            }
+        } else {
+            $this->create("tbl_post_topic", [
+                'post_id' => $postId,
+                'topic_id' => $topicId
+            ]);
+        }
+
+        return $postId;
     }
 
-    public function findPostById($id)
+    /**
+     * Update existing post with transaction
+     * @param object $sanitize Sanitizer
+     * @param array $bind Post data
+     * @param int $id Post ID
+     * @param int $topicId Topic ID
+     */
+    public function updatePost($sanitize, $bind, $id, $topicId)
     {
-        $stmt = $this->db->prepare(
-            "SELECT p.*, u.user_login, u.user_fullname 
-             FROM tbl_posts p 
-             LEFT JOIN tbl_users u ON p.post_author = u.ID 
-             WHERE p.ID = ?"
-        );
-        $stmt->execute([$id]);
-        return $stmt->fetch();
+        $cleanId = $this->filteringId($sanitize, $id, 'sql');
+
+        try {
+            $this->callTransaction();
+
+            if (!empty($bind['media_id'])) {
+                $this->modify("tbl_posts", [
+                    'media_id' => $bind['media_id'],
+                    'post_author' => $bind['post_author'],
+                    'post_modified' => $bind['post_modified'],
+                    'post_title' => $bind['post_title'],
+                    'post_slug' => $bind['post_slug'],
+                    'post_content' => $bind['post_content'],
+                    'post_summary' => $bind['post_summary'],
+                    'post_status' => $bind['post_status'],
+                    'post_visibility' => $bind['post_visibility'],
+                    'post_password' => $bind['post_password'],
+                    'post_tags' => $bind['post_tags'],
+                    'post_headlines' => $bind['post_headlines'],
+                    'post_locale' => $bind['post_locale'] ?? 'en',
+                    'comment_status' => $bind['comment_status'],
+                    'passphrase' => $bind['passphrase']
+                ], ['ID' => (int)$cleanId]);
+            } else {
+                $this->modify("tbl_posts", [
+                    'post_author' => $bind['post_author'],
+                    'post_modified' => $bind['post_modified'],
+                    'post_title' => $bind['post_title'],
+                    'post_slug' => $bind['post_slug'],
+                    'post_content' => $bind['post_content'],
+                    'post_summary' => $bind['post_summary'],
+                    'post_status' => $bind['post_status'],
+                    'post_visibility' => $bind['post_visibility'],
+                    'post_password' => $bind['post_password'],
+                    'post_tags' => $bind['post_tags'],
+                    'post_headlines' => $bind['post_headlines'],
+                    'post_locale' => $bind['post_locale'] ?? 'en',
+                    'comment_status' => $bind['comment_status'],
+                    'passphrase' => $bind['passphrase']
+                ], ['ID' => (int)$cleanId]);
+            }
+
+            // Delete existing post topics
+            $this->deleteRecord("tbl_post_topic", ['post_id' => $cleanId]);
+
+            // Insert new post topics
+            if ((is_array($topicId)) && (isset($_POST['catID']))) {
+                foreach ($_POST['catID'] as $topicId) {
+                    $this->create("tbl_post_topic", [
+                        'post_id' => $cleanId,
+                        'topic_id' => $topicId
+                    ]);
+                }
+            }
+
+            $this->callCommit();
+        } catch (\Throwable $th) {
+            $this->callRollBack();
+            $this->error = LogError::setStatusCode(http_response_code(500));
+            $this->error = LogError::exceptionHandler($th);
+        }
     }
 
-    public function findPublishedPosts($limit = 10, $offset = 0)
+    /**
+     * Delete post
+     * @param int $id Post ID
+     * @param object $sanitize Sanitizer
+     */
+    public function deletePost($id, $sanitize)
     {
-        $stmt = $this->db->prepare(
-            "SELECT p.*, u.user_login, u.user_fullname 
-             FROM tbl_posts p 
-             LEFT JOIN tbl_users u ON p.post_author = u.ID 
-             WHERE p.post_status = 'publish' 
-             ORDER BY p.post_date DESC 
-             LIMIT ? OFFSET ?"
-        );
-        $stmt->execute([$limit, $offset]);
-        return $stmt->fetchAll();
+        $cleanId = $this->filteringId($sanitize, $id, 'sql');
+        $this->deleteRecord("tbl_posts", ['ID' => $cleanId]);
+    }
+
+    /**
+     * Anonymize post author (GDPR: Right to be Forgotten)
+     * @param int $authorId Author ID to anonymize
+     * @return bool
+     */
+    public function anonymizePostAuthor($authorId)
+    {
+        $anonymousAuthor = 1;
+
+        $sql = "UPDATE tbl_posts SET post_author = ? WHERE post_author = ?";
+
+        $this->setSQL($sql);
+        $this->dbc->dbQuery($sql, [$anonymousAuthor, (int)$authorId]);
+
+        return true;
+    }
+
+    /**
+     * Check if post exists
+     * @param int $id Post ID
+     * @param object $sanitizing Sanitizer
+     * @return bool
+     */
+    public function checkPostId($id, $sanitizing)
+    {
+        $sql = "SELECT ID FROM tbl_posts WHERE ID = ? AND post_type = 'blog'";
+        $idsanitized = $this->filteringId($sanitizing, $id, 'sql');
+        $this->setSQL($sql);
+        $stmt = $this->checkCountValue([$idsanitized]);
+        return $stmt > 0;
+    }
+
+    /**
+     * Get post status dropdown HTML
+     * @param string $selected Current selection
+     * @return string HTML dropdown
+     */
+    public function dropDownPostStatus($selected = "")
+    {
+        $name = 'post_status';
+        $posts_status = ['publish' => 'Publish', 'draft' => 'Draft'];
+
+        if ($selected !== '') {
+            $this->selected = $selected;
+        }
+
+        return dropdown($name, $posts_status, $this->selected);
+    }
+
+    /**
+     * Get comment status dropdown HTML
+     * @param string $selected Current selection
+     * @return string HTML dropdown
+     */
+    public function dropDownCommentStatus($selected = "")
+    {
+        $name = 'comment_status';
+        $comment_status = ['open' => 'Open', 'closed' => 'Closed'];
+
+        if ($selected !== '') {
+            $this->selected = $selected;
+        }
+
+        return dropdown($name, $comment_status, $this->selected);
+    }
+
+    /**
+     * Get visibility dropdown with password field
+     * @param string $selected Current selection
+     * @param int|null $postId Post ID for existing password
+     * @return string HTML dropdown
+     */
+    public function dropDownVisibility($selected = null, $postId = null)
+    {
+        $name = "visibility";
+        $dropdown = '<div class="form-group">';
+        $dropdown .= '<label for="visibility">Post visibility</label>';
+        $dropdown .= '<select name="' . $name . '" class="form-control" onchange="checkVisibilitySelection();" id="visibility.system">';
+
+        $this->selected = $selected;
+        $visibility_list = ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'];
+
+        foreach ($visibility_list as $key => $visibility) {
+            $select = $this->selected === $key ? ' selected' : null;
+            $dropdown .= '<option value="' . $key . '"' . $select . '>' . $visibility . '</option>';
+        }
+
+        $dropdown .= '</select>';
+
+        // Password field for protected posts
+        if (!is_null($postId)) {
+            // ... password field logic
+        }
+
+        return $dropdown;
+    }
+
+    /**
+     * Count total post records
+     * @param array $data Optional filter data
+     * @return int Count
+     */
+    public function totalPostRecords(array $data = []): ?int
+    {
+        if (!empty($data)) {
+            $sql = "SELECT ID FROM tbl_posts WHERE post_author = ? AND post_type = 'blog'";
+        } else {
+            $sql = "SELECT ID FROM tbl_posts WHERE post_type = 'blog'";
+        }
+
+        $this->setSQL($sql);
+        return $this->checkCountValue($data) ?? 0;
+    }
+
+    /**
+     * Get locale dropdown
+     * @param string $selected Current selection
+     * @return string HTML dropdown
+     */
+    public function dropDownLocale($selected = "")
+    {
+        $name = 'post_locale';
+
+        $locales = [
+            'en' => 'English', 'es' => 'Spanish', 'fr' => 'French',
+            'de' => 'German', 'it' => 'Italian', 'pt' => 'Portuguese',
+            'ru' => 'Russian', 'zh' => 'Chinese', 'ja' => 'Japanese',
+            'ko' => 'Korean', 'ar' => 'Arabic', 'hi' => 'Hindi',
+            'id' => 'Indonesian', 'ms' => 'Malay', 'tr' => 'Turkish',
+            'nl' => 'Dutch', 'pl' => 'Polish', 'vi' => 'Vietnamese',
+            'th' => 'Thai', 'he' => 'Hebrew'
+        ];
+
+        if ($selected !== '') {
+            $this->selected = $selected;
+        }
+
+        return dropdown($name, $locales, $this->selected);
     }
 }
 ```
+
+### Key Methods in PostDao
+
+| Method | Purpose | Parameters |
+|--------|---------|-----------|
+| `findPosts()` | Get all posts with filters | `$orderBy`, `$author`, `$onlyPublished` |
+| `findPost()` | Get single post by ID | `$id`, `$sanitize`, `$author`, `$onlyPublished` |
+| `createPost()` | Insert new post | `$bind`, `$topicId` |
+| `updatePost()` | Update post with transaction | `$sanitize`, `$bind`, `$id`, `$topicId` |
+| `deletePost()` | Delete post | `$id`, `$sanitize` |
+| `anonymizePostAuthor()` | GDPR: anonymize author | `$authorId` |
+| `checkPostId()` | Verify post exists | `$id`, `$sanitizing` |
+| `dropDownPostStatus()` | Post status dropdown | `$selected` |
+| `dropDownCommentStatus()` | Comment status dropdown | `$selected` |
+| `dropDownVisibility()` | Visibility dropdown | `$selected`, `$postId` |
+| `totalPostRecords()` | Count posts | `$data` |
+| `dropDownLocale()` | Locale dropdown | `$selected` |
+
+### Database Columns in tbl_posts
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `ID` | BIGINT | Primary key |
+| `media_id` | BIGINT | Featured image |
+| `post_author` | BIGINT | Author (FK to tbl_users) |
+| `post_date` | DATETIME | Creation date |
+| `post_modified` | DATETIME | Last modified |
+| `post_title` | TINYTEXT | Post title |
+| `post_slug` | TEXT | URL slug |
+| `post_content` | LONGTEXT | Full content |
+| `post_summary` | MEDIUMTEXT | Short summary |
+| `post_status` | VARCHAR | publish/draft |
+| `post_visibility` | VARCHAR | public/private/protected |
+| `post_password` | VARCHAR | Password hash |
+| `post_tags` | TEXT | Comma-separated tags |
+| `post_type` | VARCHAR | blog/article/news |
+| `post_locale` | VARCHAR | Language code |
+| `comment_status` | VARCHAR | open/closed |
+| `passphrase` | VARCHAR | Encryption key (MD5) |
+| `post_headlines` | VARCHAR | Headline flag |
+
+### Other DAOs
+
+| DAO | File | Purpose |
+|-----|------|---------|
+| `UserDao` | `lib/dao/UserDao.php` | User CRUD |
+| `CommentDao` | `lib/dao/CommentDao.php` | Comment CRUD |
+| `TopicDao` | `lib/dao/TopicDao.php` | Category CRUD |
+| `MediaDao` | `lib/dao/MediaDao.php` | Media CRUD |
+| `PageDao` | `lib/dao/PageDao.php` | Page CRUD |
+| `MenuDao` | `lib/dao/MenuDao.php` | Menu CRUD |
+| `PluginDao` | `lib/dao/PluginDao.php` | Plugin CRUD |
+| `ThemeDao` | `lib/dao/ThemeDao.php` | Theme CRUD |
 
 ---
 
@@ -1248,71 +1657,391 @@ class PostDao
 
 | Principle | Description |
 |-----------|-------------|
-| **Business Logic** | Services contain business logic |
-| **Validation** | Services validate input |
-| **Data Access** | Services call DAOs |
-| **Composition** | Services can call other services |
+| **Business Logic** | Services contain business logic and input handling |
+| **Setter Methods** | Services use setters to prepare data before passing to DAO |
+| **Data Access** | Services call DAOs for database operations |
+| **Sanitization** | Services sanitize and purify input |
+| **Validation** | Services validate using FormValidator |
 
-### Example: PostService
+### PostService Implementation
+
+The actual `PostService` class at `lib/service/PostService.php` manages post business logic:
 
 ```php
+// lib/service/PostService.php
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 class PostService
 {
-    private $postDao;
-    private $mediaDao;
-    private $topicDao;
+    private $postId;
+    private $post_image;
+    private $author;
+    private $post_date;
+    private $post_modified;
+    private $title;
+    private $slug;
+    private $content;
+    private $meta_desc;
+    private $post_status;
+    private $post_visibility;
+    private $post_password;
+    private $post_headlines;
+    private $comment_status;
+    private $passphrase;
+    private $topics;
+    private $tags;
+    private $post_locale;
 
-    public function __construct(PostDao $postDao, MediaDao $mediaDao, TopicDao $topicDao)
+    private $postDao;
+    private $validator;
+    private $sanitizer;
+
+    /**
+     * Constructor
+     * @param PostDao $postDao
+     * @param FormValidator $validator
+     * @param Sanitize $sanitizer
+     */
+    public function __construct(PostDao $postDao, FormValidator $validator, Sanitize $sanitizer)
     {
         $this->postDao = $postDao;
-        $this->mediaDao = $mediaDao;
-        $this->topicDao = $topicDao;
+        $this->validator = $validator;
+        $this->sanitizer = $sanitizer;
     }
 
-    public function createPost($data)
+    // Setter methods for post properties
+    
+    public function setPostId($postId) { $this->postId = $postId; }
+    
+    public function setPostImage($post_image) { $this->post_image = $post_image; }
+    
+    public function setPostAuthor($author) { $this->author = $author; }
+    
+    public function setPostDate($date_created) { $this->post_date = $date_created; }
+    
+    public function setPostModified($date_modified) { $this->post_modified = $date_modified; }
+    
+    public function setPostTitle($title) { 
+        $this->title = prevent_injection($title); 
+    }
+    
+    public function setPostSlug($slug) { 
+        $this->slug = make_slug($slug); 
+    }
+    
+    public function setPostContent($content) { 
+        $this->content = purify_dirty_html($content); 
+    }
+    
+    public function setMetaDesc($meta_desc) { 
+        $this->meta_desc = prevent_injection($meta_desc); 
+    }
+    
+    public function setPublish($post_status) { $this->post_status = $post_status; }
+    
+    public function setVisibility($post_visibility) { $this->post_visibility = $post_visibility; }
+    
+    public function setProtected($post_password) { $this->post_password = $post_password; }
+    
+    public function setHeadlines($post_headlines) { $this->post_headlines = $post_headlines; }
+    
+    public function setComment($comment_status) { $this->comment_status = $comment_status; }
+    
+    public function setPassPhrase($passphrase) { 
+        $this->passphrase = md5(app_key() . $passphrase); 
+    }
+    
+    public function setTopics($topics) { $this->topics = $topics; }
+    
+    public function setPostTags($tags) { $this->tags = $tags; }
+    
+    public function setPostLocale($post_locale) { 
+        $this->post_locale = sanitize_locale($post_locale); 
+    }
+
+    /**
+     * Retrieve all posts
+     * @param string $orderBy
+     * @param int|null $author
+     * @return array
+     */
+    public function grabPosts($orderBy = 'ID', $author = null)
     {
-        // Validation
-        if (empty($data['post_title'])) {
-            throw new \Exception("Post title is required");
+        return $this->postDao->findPosts($orderBy, $author, false);
+    }
+
+    /**
+     * Retrieve single post by ID
+     * @param int $postId
+     * @return array|bool
+     */
+    public function grabPost($postId)
+    {
+        return $this->postDao->findPost($postId, $this->sanitizer, null, false);
+    }
+
+    /**
+     * Insert new post
+     * @return int New post ID
+     */
+    public function addPost()
+    {
+        $category = new TopicDao();
+
+        $this->validator->sanitize($this->author, 'int');
+        $this->validator->sanitize($this->post_image, 'int');
+        $this->validator->sanitize($this->title, 'string');
+
+        if ((!empty($this->meta_desc)) || (!empty($this->tags))) {
+            $this->validator->sanitize($this->meta_desc, 'string');
         }
 
-        // Generate slug
-        $data['post_slug'] = $this->generateSlug($data['post_title']);
+        // Auto-create "Uncategorized" if no topic selected
+        if ($this->topics == 0) {
+            $categoryId = $category->createTopic(['topic_title' => 'Uncategorized', 'topic_slug' => 'uncategorized']);
+            $getCategory = $category->findTopicById($categoryId, $this->sanitizer, PDO::FETCH_ASSOC);
+            
+            $new_post = [
+                'media_id' => $this->post_image,
+                'post_author' => $this->author,
+                'post_date' => $this->post_date,
+                'post_title' => $this->title,
+                'post_slug' => $this->slug,
+                'post_content' => $this->content,
+                'post_summary' => $this->meta_desc,
+                'post_status' => $this->post_status,
+                'post_visibility' => $this->post_visibility,
+                'post_password' => $this->post_password,
+                'post_tags' => $this->tags,
+                'post_headlines' => $this->post_headlines,
+                'post_locale' => $this->post_locale ?? 'en',
+                'comment_status' => $this->comment_status,
+                'passphrase' => $this->passphrase
+            ];
 
-        // Insert post
-        $postId = $this->postDao->insertPost($data);
+            $topic_id = isset($getCategory['ID']) ? abs((int)$getCategory['ID']) : 0;
+        } else {
+            $new_post = [
+                'media_id' => $this->post_image,
+                'post_author' => $this->author,
+                'post_date' => $this->post_date,
+                'post_title' => $this->title,
+                'post_slug' => $this->slug,
+                'post_content' => $this->content,
+                'post_summary' => $this->meta_desc,
+                'post_status' => $this->post_status,
+                'post_visibility' => $this->post_visibility,
+                'post_password' => $this->post_password,
+                'post_tags' => $this->tags,
+                'post_headlines' => $this->post_headlines,
+                'post_locale' => $this->post_locale ?? 'en',
+                'comment_status' => $this->comment_status,
+                'passphrase' => $this->passphrase
+            ];
 
-        // Handle topics
-        if (!empty($data['post_topics'])) {
-            $this->topicDao->setPostTopics($postId, $data['post_topics']);
+            $topic_id = $this->topics;
         }
 
-        return $postId;
+        return $this->postDao->createPost($new_post, $topic_id);
     }
 
-    public function publishPost($id)
+    /**
+     * Update existing post
+     * @return int
+     */
+    public function modifyPost()
     {
-        return $this->postDao->updatePost($id, ['post_status' => 'publish']);
-    }
+        $this->validator->sanitize($this->postId, 'int');
+        $this->validator->sanitize($this->author, 'int');
+        $this->validator->sanitize($this->post_image, 'int');
+        $this->validator->sanitize($this->title, 'string');
 
-    public function getPostWithMedia($id)
-    {
-        $post = $this->postDao->findPostById($id);
-        
-        if ($post && $post['media_id']) {
-            $post['media'] = $this->mediaDao->findMediaById($post['media_id']);
+        if ((!empty($this->meta_desc)) || (!empty($this->tags))) {
+            $this->validator->sanitize($this->meta_desc, 'string');
+            $this->validator->sanitize($this->tags, 'string');
         }
 
-        return $post;
+        if (empty($this->post_image)) {
+            return $this->postDao->updatePost($this->sanitizer, [
+                'post_author' => $this->author,
+                'post_modified' => $this->post_modified,
+                'post_title' => $this->title,
+                'post_slug' => $this->slug,
+                'post_content' => $this->content,
+                'post_summary' => $this->meta_desc,
+                'post_status' => $this->post_status,
+                'post_visibility' => $this->post_visibility,
+                'post_password' => $this->post_password,
+                'post_tags' => $this->tags,
+                'post_headlines' => $this->post_headlines,
+                'post_locale' => $this->post_locale ?? 'en',
+                'comment_status' => $this->comment_status,
+                'passphrase' => $this->passphrase
+            ], $this->postId, $this->topics);
+        } else {
+            return $this->postDao->updatePost($this->sanitizer, [
+                'media_id' => $this->post_image,
+                'post_author' => $this->author,
+                'post_modified' => $this->post_modified,
+                'post_title' => $this->title,
+                'post_slug' => $this->slug,
+                'post_content' => $this->content,
+                'post_summary' => $this->meta_desc,
+                'post_status' => $this->post_status,
+                'post_visibility' => $this->post_visibility,
+                'post_password' => $this->post_password,
+                'post_tags' => $this->tags,
+                'post_headlines' => $this->post_headlines,
+                'post_locale' => $this->post_locale ?? 'en',
+                'comment_status' => $this->comment_status,
+                'passphrase' => $this->passphrase
+            ], $this->postId, $this->topics);
+        }
     }
 
-    private function generateSlug($title)
+    /**
+     * Delete post and associated media
+     */
+    public function removePost()
     {
-        $slug = strtolower(trim(preg_replace('/[^a-zA-Z0-9-]+/', '-', $title)));
-        return $slug;
+        $this->validator->sanitize($this->postId, 'int');
+
+        if (!$data_post = $this->postDao->findPost($this->postId, $this->sanitizer)) {
+            $_SESSION['error'] = "postNotFound";
+            direct_page('index.php?load=posts&error=postNotFound', 404);
+            return false;
+        }
+
+        $media_id = $data_post['media_id'] ?? 0;
+
+        // Delete associated media files
+        if (class_exists('MediaDao') && $media_id) {
+            $medialib = new MediaDao();
+            if (method_exists($medialib, 'findMediaBlog') && $media_id) {
+                $media_data = $medialib->findMediaBlog((int)$media_id);
+                $media_filename = isset($media_data['media_filename']) && 
+                    preg_match('/^[a-zA-Z0-9_\-\.]+$/', $media_data['media_filename']) ? 
+                    basename($media_data['media_filename']) : '';
+
+                if (!empty($media_filename)) {
+                    $base_path = __DIR__ . '/../../' . APP_IMAGE;
+                    $files_to_delete = [
+                        $base_path . $media_filename,
+                        $base_path . APP_IMAGE_LARGE . 'large_' . $media_filename,
+                        $base_path . APP_IMAGE_MEDIUM . 'medium_' . $media_filename,
+                        $base_path . APP_IMAGE_SMALL . 'small_' . $media_filename,
+                    ];
+
+                    foreach ($files_to_delete as $file) {
+                        if (file_exists($file) && is_writable($file)) {
+                            unlink($file);
+                        }
+                    }
+
+                    if (method_exists($medialib, 'deleteMedia')) {
+                        $medialib->deleteMedia((int) $media_id, $this->sanitizer);
+                    }
+                }
+            }
+        }
+
+        return $this->postDao->deletePost($this->postId, $this->sanitizer);
+    }
+
+    // Dropdown methods (delegate to DAO)
+
+    public function postStatusDropDown($selected = "")
+    {
+        return $this->postDao->dropDownPostStatus($selected);
+    }
+
+    public function commentStatusDropDown($selected = "")
+    {
+        return $this->postDao->dropDownCommentStatus($selected);
+    }
+
+    public function visibilityDropDown($selected = "")
+    {
+        return $this->postDao->dropDownVisibility($selected);
+    }
+
+    public function localeDropDown($selected = "")
+    {
+        return $this->postDao->dropDownLocale($selected);
+    }
+
+    public function postAuthorId()
+    {
+        if (isset(Session::getInstance()->scriptlog_session_id)) {
+            return Session::getInstance()->scriptlog_session_id;
+        }
+        return false;
+    }
+
+    public function postAuthorLevel()
+    {
+        return user_privilege();
+    }
+
+    public function totalPosts(array $data = []): ?int
+    {
+        return $this->postDao->totalPostRecords($data);
     }
 }
 ```
+
+### Key Methods in PostService
+
+| Category | Method | Purpose |
+|----------|--------|---------|
+| **Setters** | `setPostTitle()`, `setPostSlug()`, `setPostContent()`, etc. | Prepare post properties |
+| **Retrieval** | `grabPosts()` | Get all posts |
+| **Retrieval** | `grabPost()` | Get single post by ID |
+| **CRUD** | `addPost()` | Create new post |
+| **CRUD** | `modifyPost()` | Update existing post |
+| **CRUD** | `removePost()` | Delete post and media |
+| **Dropdowns** | `postStatusDropDown()` | Post status dropdown HTML |
+| **Dropdowns** | `commentStatusDropDown()` | Comment status dropdown |
+| **Dropdowns** | `visibilityDropDown()` | Visibility dropdown |
+| **Dropdowns** | `localeDropDown()` | Locale/language dropdown |
+| **User** | `postAuthorId()` | Get current author ID |
+| **User** | `postAuthorLevel()` | Get current author level |
+| **Count** | `totalPosts()` | Count total posts |
+
+### Input Sanitization in PostService
+
+The service uses various utility functions for sanitization:
+
+| Function | Purpose |
+|----------|---------|
+| `prevent_injection()` | Prevent SQL injection |
+| `make_slug()` | Generate URL-friendly slug |
+| `purify_dirty_html()` | Clean HTML content (htmLawed) |
+| `sanitize_locale()` | Validate locale code |
+
+### Service Dependencies
+
+PostService depends on:
+- `PostDao` - Database operations
+- `FormValidator` - Input validation  
+- `Sanitize` - ID sanitization
+- `TopicDao` - Auto-create categories
+- `MediaDao` - Media cleanup on delete
+
+### Other Services
+
+| Service | File | Purpose |
+|---------|------|---------|
+| `UserService` | `lib/service/UserService.php` | User business logic |
+| `CommentService` | `lib/service/CommentService.php` | Comment handling |
+| `TopicService` | `lib/service/TopicService.php` | Category logic |
+| `MediaService` | `lib/service/MediaService.php` | Media handling |
+| `PageService` | `lib/service/PageService.php` | Page logic |
+| `MenuService` | `lib/service/MenuService.php` | Menu logic |
+| `PluginService` | `lib/service/PluginService.php` | Plugin logic |
+| `ThemeService` | `lib/service/ThemeService.php` | Theme logic |
+| `ConfigurationService` | `lib/service/ConfigurationService.php` | Settings |
+| `ReplyService` | `lib/service/ReplyService.php` | Reply logic |
 
 ---
 
@@ -1322,87 +2051,431 @@ class PostService
 
 | Guideline | Description |
 |-----------|-------------|
-| **HTTP Handling** | Controllers handle HTTP requests |
-| **Service Calls** | Controllers call services |
-| **Response Format** | Controllers return views or JSON |
-| **Thin Design** | Keep controllers thin, move logic to services |
+| **Extends BaseApp** | Controllers extend `BaseApp` for view/viewtitle handling |
+| **HTTP Handling** | Controllers handle HTTP requests (POST, GET) |
+| **Service Calls** | Controllers call Services for business logic |
+| **View Rendering** | Controllers render views using View class |
+| **Session Messages** | Controllers set session status/error messages |
 
-### Example: PostController
+### PostController Implementation
+
+The actual `PostController` class at `lib/controller/PostController.php` extends `BaseApp`:
 
 ```php
-class PostController
+// lib/controller/PostController.php
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
+class PostController extends BaseApp
 {
+    private $view;
     private $postService;
-    private $topicService;
-    private $validator;
 
-    public function __construct(
-        PostService $postService,
-        TopicService $topicService,
-        FormValidator $validator
-    ) {
-        $this->postService = $postService;
-        $this->topicService = $topicService;
-        $this->validator = $validator;
-    }
-
-    public function create()
+    public function __construct(PostService $postService)
     {
-        // Check authorization
-        if (!current_user_can('create_posts')) {
-            http_response_code(403);
-            return ['error' => 'Unauthorized'];
-        }
-
-        // Validate input
-        $this->validator->validate($_POST, [
-            'post_title' => 'required|min:3',
-            'post_content' => 'required|min:10'
-        ]);
-
-        if ($this->validator->hasErrors()) {
-            return ['errors' => $this->validator->getErrors()];
-        }
-
-        try {
-            $postId = $this->postService->createPost($_POST);
-            return ['success' => true, 'post_id' => $postId];
-        } catch (\Exception $e) {
-            return ['error' => $e->getMessage()];
-        }
+        $this->postService = $postService;
     }
 
+    /**
+     * List all posts
+     * @return string Rendered view
+     */
+    public function listItems()
+    {
+        $errors = array();
+        $status = array();
+        $checkError = true;
+        $checkStatus = false;
+
+        // Check for session errors/status
+        if (isset($_SESSION['error'])) {
+            $checkError = false;
+            ($_SESSION['error'] == 'postNotFound') ? array_push($errors, "Error: Post Not Found!") : "";
+            unset($_SESSION['error']);
+        }
+
+        if (isset($_SESSION['status'])) {
+            $checkStatus = true;
+            ($_SESSION['status'] == 'postAdded') ? array_push($status, "New post added") : "";
+            ($_SESSION['status'] == 'postUpdated') ? array_push($status, "Post updated") : "";
+            ($_SESSION['status'] == 'postDeleted') ? array_push($status, "Post deleted") : "";
+            unset($_SESSION['status']);
+        }
+
+        $this->setView('all-posts');
+        $this->setPageTitle('Posts');
+        $this->view->set('pageTitle', $this->getPageTitle());
+
+        if (!$checkError) {
+            $this->view->set('errors', $errors);
+        }
+
+        if ($checkStatus) {
+            $this->view->set('status', $status);
+        }
+
+        // Get posts based on user level
+        if ($this->postService->postAuthorLevel() == 'administrator') {
+            $this->view->set('postsTotal', $this->postService->totalPosts());
+            $this->view->set('posts', $this->postService->grabPosts());
+        } else {
+            $this->view->set('postsTotal', $this->postService->totalPosts([$this->postService->postAuthorId()]));
+            $this->view->set('posts', $this->postService->grabPosts('ID', $this->postService->postAuthorId()));
+        }
+
+        return $this->view->render();
+    }
+
+    /**
+     * Insert new post
+     * Handles form submission, file uploads, validation
+     * @return string Rendered view
+     */
+    public function insert()
+    {
+        $topics = new TopicDao();
+        $medialib = new MediaDao();
+        $errors = array();
+        $checkError = true;
+        $user_level = $this->postService->postAuthorLevel();
+
+        if (isset($_POST['postFormSubmit'])) {
+            // Get file info
+            $file_location = isset($_FILES['media']['tmp_name']) ? $_FILES['media']['tmp_name'] : '';
+            $file_type = isset($_FILES['media']['type']) ? $_FILES['media']['type'] : '';
+            $file_name = isset($_FILES['media']['name']) ? $_FILES['media']['name'] : '';
+            $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : '';
+            $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
+
+            // Define filters for form inputs
+            $filters = [
+                'post_title' => isset($_POST['post_title']) ? Sanitize::strictSanitizer($_POST['post_title']) : "",
+                'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+                'post_date' => isset($_POST['post_date']) ? Sanitize::mildSanitizer($_POST['post_date']) : "",
+                'image_id' => isset($_POST['image_id']) ? FILTER_SANITIZE_NUMBER_INT : "",
+                'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
+                'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+                'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+                'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
+                'visibility' => isset($_POST['visibility']) ? Sanitize::mildSanitizer($_POST['visibility']) : "",
+                'post_password' => isset($_POST['post_password']) ? FILTER_SANITIZE_FULL_SPECIAL_CHARS : "",
+                'post_headlines' => FILTER_SANITIZE_NUMBER_INT,
+                'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : "",
+                'post_locale' => isset($_POST['post_locale']) ? Sanitize::mildSanitizer($_POST['post_locale']) : "en"
+            ];
+
+            $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_tags' => 200, 'post_content' => 500000];
+
+            // CSRF Token validation
+            try {
+                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+                    header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
+                    throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
+                }
+
+                // Check required fields
+                if ((empty($_POST['post_title'])) || (empty($_POST['post_content']))) {
+                    $checkError = false;
+                    array_push($errors, "Please enter a required field");
+                }
+
+                // Form size validation
+                if (true === form_size_validation($form_fields)) {
+                    $checkError = false;
+                    array_push($errors, "Form data is longer than allowed");
+                }
+
+                // Validate dropdown selections
+                if (false === sanitize_selection_box(distill_post_request($filters)['post_status'], ['publish' => 'Publish', 'draft' => 'Draft'])) {
+                    $checkError = false;
+                    array_push($errors, MESSAGE_INVALID_SELECTBOX);
+                }
+
+                // Validate visibility
+                if (false === sanitize_selection_box(distill_post_request($filters)['visibility'], ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'])) {
+                    $checkError = false;
+                    array_push($errors, MESSAGE_INVALID_SELECTBOX);
+                }
+
+                // Validate password for protected posts
+                if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
+                    if (check_common_password($_POST['post_password']) === true) {
+                        $checkError = false;
+                        array_push($errors, "Your password seems to be the most hacked password, please try another");
+                    }
+                    if (false === check_pwd_strength($_POST['post_password'])) {
+                        $checkError = false;
+                        array_push($errors, MESSAGE_WEAK_PASSWORD);
+                    }
+                }
+
+                // Handle errors or process form
+                if (!$checkError) {
+                    // Render form with errors
+                    $this->setView('edit-post');
+                    $this->setPageTitle('Add New Post');
+                    $this->setFormAction(ActionConst::NEWPOST);
+                    $this->view->set('pageTitle', $this->getPageTitle());
+                    $this->view->set('formAction', $this->getFormAction());
+                    $this->view->set('errors', $errors);
+                    $this->view->set('formData', $_POST);
+                    $this->view->set('topics', $topics->setCheckBoxTopic());
+                    $this->view->set('medialibs', $medialib->imageUploadHandler());
+                    $this->view->set('postStatus', $this->postService->postStatusDropDown());
+                    $this->view->set('commentStatus', $this->postService->commentStatusDropDown());
+                    $this->view->set('postVisibility', $this->postService->visibilityDropDown());
+                    $this->view->set('postLocale', $this->postService->localeDropDown());
+                    $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+                } else {
+                    // Process media upload
+                    if (!empty($file_location)) {
+                        // Upload file logic...
+                        $append_media = $medialib->createMedia($bind_media);
+                        $this->postService->setPostImage($append_media);
+                    }
+
+                    // Set post properties
+                    $this->postService->setPostAuthor((int)$this->postService->postAuthorId());
+                    $this->postService->setPostDate(date_for_database());
+                    $this->postService->setPostTitle(distill_post_request($filters)['post_title']);
+                    $this->postService->setPostSlug(distill_post_request($filters)['post_title']);
+                    $this->postService->setPostContent(distill_post_request($filters)['post_content']);
+                    $this->postService->setPublish(distill_post_request($filters)['post_status']);
+                    $this->postService->setVisibility(distill_post_request($filters)['visibility']);
+                    $this->postService->setComment(distill_post_request($filters)['comment_status']);
+                    $this->postService->setMetaDesc(distill_post_request($filters)['post_summary']);
+                    $this->postService->setPostLocale(distill_post_request($filters)['post_locale']);
+                    $this->postService->setPostTags(distill_post_request($filters)['post_tags']);
+
+                    // Handle protected posts
+                    if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
+                        $protected = protect_post(...);
+                        $this->postService->setPostContent($protected['post_content']);
+                        $this->postService->setProtected($protected['post_password']);
+                        $this->postService->setPassPhrase(distill_post_request($filters)['post_password']);
+                    }
+
+                    // Save post
+                    $this->postService->addPost();
+                    $_SESSION['status'] = "postAdded";
+                    direct_page('index.php?load=posts&status=postAdded', 200);
+                }
+            } catch (\Throwable $th) {
+                LogError::setStatusCode(http_response_code());
+                LogError::exceptionHandler($th);
+            }
+        } else {
+            // Render empty form for new post
+            $this->setView('edit-post');
+            $this->setPageTitle('Add new post');
+            $this->setFormAction(ActionConst::NEWPOST);
+            $this->view->set('pageTitle', $this->getPageTitle());
+            $this->view->set('formAction', $this->getFormAction());
+            $this->view->set('topics', $topics->setCheckBoxTopic());
+            $this->view->set('medialibs', $medialib->imageUploadHandler());
+            $this->view->set('postStatus', $this->postService->postStatusDropDown());
+            $this->view->set('commentStatus', $this->postService->commentStatusDropDown());
+            $this->view->set('postVisibility', $this->postService->visibilityDropDown());
+            $this->view->set('postLocale', $this->postService->localeDropDown());
+            $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+        }
+
+        return $this->view->render();
+    }
+
+    /**
+     * Update existing post
+     * @param int $id Post ID
+     * @return string Rendered view
+     */
     public function update($id)
     {
-        if (!current_user_can('edit_post', $id)) {
-            http_response_code(403);
-            return ['error' => 'Unauthorized'];
+        $topics = new TopicDao();
+        $medialib = new MediaDao();
+        $errors = array();
+        $checkError = true;
+        $user_level = $this->postService->postAuthorLevel();
+
+        // Get existing post
+        if (!$getPost = $this->postService->grabPost($id)) {
+            $_SESSION['error'] = "postNotFound";
+            direct_page('index.php?load=posts&error=postNotFound', 404);
+        }
+
+        // Build post data array
+        $data_post = array(
+            'ID' => $getPost['ID'],
+            'media_id' => $getPost['media_id'],
+            'post_author' => $getPost['post_author'],
+            'post_date' => $getPost['post_date'],
+            'post_modified' => $getPost['post_modified'],
+            'post_title' => $getPost['post_title'],
+            'post_content' => $getPost['post_content'],
+            'post_summary' => $getPost['post_summary'],
+            'post_status' => $getPost['post_status'],
+            'post_visibility' => $getPost['post_visibility'],
+            'post_password' => $getPost['post_password'],
+            'post_tags' => $getPost['post_tags'],
+            'post_headlines' => $getPost['post_headlines'],
+            'comment_status' => $getPost['comment_status'],
+            'passphrase' => $getPost['passphrase']
+        );
+
+        // Handle form submission (similar to insert)
+        if (isset($_POST['postFormSubmit'])) {
+            // Validation and update logic...
+            $this->postService->setPostId((int)distill_post_request($filters)['post_id']);
+            $this->postService->setPostAuthor($this->postService->postAuthorId());
+            $this->postService->setPostTitle(distill_post_request($filters)['post_title']);
+            $this->postService->setPostSlug(distill_post_request($filters)['post_title']);
+            $this->postService->setPublish(distill_post_request($filters)['post_status']);
+            // ... more setters
+            
+            $this->postService->modifyPost();
+            $_SESSION['status'] = "postUpdated";
+            direct_page('index.php?load=posts&status=postUpdated', 200);
+        } else {
+            // Render edit form with existing data
+            $this->setView('edit-post');
+            $this->setPageTitle('Edit Post');
+            $this->setFormAction(ActionConst::EDITPOST);
+            $this->view->set('pageTitle', $this->getPageTitle());
+            $this->view->set('formAction', $this->getFormAction());
+            $this->view->set('postData', $data_post);
+            $this->view->set('topics', $topics->setCheckBoxTopic($getPost['ID']));
+            $this->view->set('medialibs', $medialib->imageUploadHandler($getPost['media_id']));
+            
+            // Handle protected content decryption
+            if ($data_post['post_visibility'] == 'protected') {
+                $decrypted = decrypt_post_admin($getPost['ID']);
+                $this->view->set('postContent', $decrypted['post_content']);
+            } else {
+                $this->view->set('postContent', $data_post['post_content']);
+            }
+
+            $this->view->set('postStatus', $this->postService->postStatusDropDown($getPost['post_status']));
+            $this->view->set('commentStatus', $this->postService->commentStatusDropDown($getPost['comment_status']));
+            $this->view->set('postVisibility', $this->postService->visibilityDropDown($getPost['post_visibility']));
+            $this->view->set('postLocale', $this->postService->localeDropDown($getPost['post_locale'] ?? 'en'));
+            $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+        }
+
+        return $this->view->render();
+    }
+
+    /**
+     * Delete post
+     * @param int $id Post ID
+     */
+    public function remove($id)
+    {
+        $id = abs((int)$id);
+        
+        if ($id <= 0) {
+            $_SESSION['error'] = "postNotFound";
+            direct_page('index.php?load=posts&error=postNotFound', 404);
+            return;
+        }
+
+        $getPost = $this->postService->grabPost($id);
+
+        if (!$getPost) {
+            $_SESSION['error'] = "postNotFound";
+            direct_page('index.php?load=posts&error=postNotFound', 404);
+            return;
         }
 
         try {
-            $this->postService->updatePost($id, $_POST);
-            return ['success' => true];
-        } catch (\Exception $e) {
-            return ['error' => $e->getMessage()];
+            $this->postService->setPostId($id);
+            $this->postService->removePost();
+            $_SESSION['status'] = "postDeleted";
+            direct_page('index.php?load=posts&status=postDeleted', 200);
+        } catch (\Throwable $th) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($th);
         }
     }
 
-    public function delete($id)
+    /**
+     * Set view
+     * @param string $viewName
+     */
+    protected function setView($viewName)
     {
-        if (!current_user_can('delete_post', $id)) {
-            http_response_code(403);
-            return ['error' => 'Unauthorized'];
-        }
-
-        try {
-            $this->postService->deletePost($id);
-            return ['success' => true];
-        } catch (\Exception $e) {
-            return ['error' => $e->getMessage()];
-        }
+        $this->view = new View('admin', 'ui', 'posts', $viewName);
     }
 }
 ```
+
+### Key Methods in PostController
+
+| Method | Purpose |
+|-------|---------|
+| `listItems()` | Display all posts list |
+| `insert()` | Display form / create new post |
+| `update($id)` | Display form / update existing post |
+| `remove($id)` | Delete post |
+| `setView($name)` | Set view to render |
+
+### Controller Flow
+
+```
+User Request
+    |
+    v
+PostController::{method}()
+    |
+    +-> Validate CSRF token
+    +-> Validate form inputs
+    +-> Handle file uploads (media)
+    +-> Call service setters
+    +-> Call service methods (addPost, modifyPost, removePost)
+    +-> Set session status
+    +-> Redirect or render view
+```
+
+### BaseApp Class
+
+Controllers extend `BaseApp` which provides:
+
+```php
+// lib/core/BaseApp.php
+class BaseApp
+{
+    protected $pageTitle;
+    protected $formAction;
+    
+    protected function setView($viewName);  // Set view
+    protected function setPageTitle($title); // Set page title
+    protected function setFormAction($action); // Set form action
+    protected function getPageTitle();      // Get page title
+    protected function getFormAction();      // Get form action
+}
+```
+
+### Security in Controllers
+
+| Feature | Implementation |
+|---------|----------------|
+| **CSRF Protection** | `csrf_check_token()` validates token |
+| **Form Validation** | `check_form_request()` validates required fields |
+| **File Upload** | `check_file_name()`, `check_mime_type()`, `check_file_extension()` |
+| **Password Strength** | `check_common_password()`, `check_pwd_strength()` |
+| **Input Sanitization** | `Sanitize::strictSanitizer()`, `Sanitize::mildSanitizer()` |
+| **Dropdown Validation** | `sanitize_selection_box()` |
+
+### Other Controllers
+
+| Controller | File | Purpose |
+|------------|------|---------|
+| `UserController` | `lib/controller/UserController.php` | User management |
+| `CommentController` | `lib/controller/CommentController.php` | Comment handling |
+| `TopicController` | `lib/controller/TopicController.php` | Category management |
+| `MediaController` | `lib/controller/MediaController.php` | Media library |
+| `PageController` | `lib/controller/PageController.php` | Static pages |
+| `MenuController` | `lib/controller/MenuController.php` | Navigation |
+| `PluginController` | `lib/controller/PluginController.php` | Plugin management |
+| `ThemeController` | `lib/controller/ThemeController.php` | Theme management |
+| `ConfigurationController` | `lib/controller/ConfigurationController.php` | Settings |
 
 ---
 
@@ -1412,70 +2485,326 @@ class PostController
 
 | Principle | Description |
 |-----------|-------------|
-| **Data Entities** | Models represent data entities |
-| **Transformation** | Models can contain data transformation logic |
-| **View Preparation** | Models are used for view data preparation |
+| **Extends BaseModel** | Models extend `BaseModel` for database connectivity |
+| **Data Retrieval** | Models contain SQL queries for fetching data |
+| **View Preparation** | Models prepare data for views (transformations, joins, aggregations) |
+| **No Business Logic** | Keep business logic in Services, not Models |
 
-### Example: PostModel
+### BaseModel Class
+
+All Models extend `BaseModel`, which provides database access and utility methods:
 
 ```php
-class PostModel
+// lib/model/BaseModel.php
+class BaseModel
 {
-    public $ID;
-    public $post_title;
-    public $post_slug;
-    public $post_content;
-    public $post_summary;
-    public $post_date;
-    public $post_modified;
-    public $post_status;
-    public $post_type;
-    public $post_tags;
-    public $author_name;
-    public $media_filename;
+    protected $dbc;        // Database connection (PDO)
+    protected $pagination; // Pagination HTML links
+    protected $tableName;  // Current table name
 
-    public static function fromDbRow($row)
+    // Database methods
+    protected function setSQL($sql);           // Set SQL query
+    protected function findAll($data = []);       // Execute query, return all rows
+    protected function findRow($data = [], $fetchMode = null); // Execute query, return single row
+    
+    // Table prefix handling
+    protected function table($table);           // Apply table prefix
+    
+    // Additional utilities
+    public function getSql();                  // Get current SQL
+    public function getPaginator();             // Get pagination HTML
+}
+```
+
+### PostModel Implementation
+
+The actual `PostModel` class at `lib/model/PostModel.php` extends `BaseModel` and provides data retrieval methods:
+
+```php
+// lib/model/PostModel.php
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
+class PostModel extends BaseModel
+{
+    private $linkPosts; // Paginator instance
+
+    /**
+     * Get post feeds for social sharing
+     * @param int $limit Number of posts to retrieve
+     * @return array|null Posts data
+     */
+    public function getPostFeeds($limit)
     {
-        $model = new self();
-        $model->ID = $row['ID'];
-        $model->post_title = $row['post_title'];
-        $model->post_slug = $row['post_slug'];
-        $model->post_content = $row['post_content'];
-        $model->post_summary = $row['post_summary'];
-        $model->post_date = $row['post_date'];
-        $model->post_modified = $row['post_modified'];
-        $model->post_status = $row['post_status'];
-        $model->post_type = $row['post_type'];
-        $model->post_tags = $row['post_tags'];
-        $model->author_name = $row['user_fullname'] ?? $row['user_login'];
-        $model->media_filename = $row['media_filename'] ?? null;
+        $sql = "SELECT p.ID, p.media_id, p.post_author,
+                  p.post_date, p.post_modified, p.post_title,
+                  p.post_slug, p.post_content, p.post_type,
+                  p.post_status, p.post_tags, 
+                  p.post_sticky, u.user_fullname, u.user_login
+            FROM tbl_posts AS p
+            INNER JOIN tbl_users AS u ON p.post_author = u.ID
+            WHERE p.post_type = 'blog' AND p.post_status = 'publish'
+            AND p.post_visibility = 'public'
+            ORDER BY p.ID DESC LIMIT :limit";
+
+        $this->setSQL($sql);
+        $feeds = $this->findAll([':limit' => $limit]);
+        return (empty($feeds)) ?: $feeds;
+    }
+
+    /**
+     * Get latest published posts for homepage
+     * @param int $limit Number of posts
+     * @return array|null Posts with media, author, comments count, topics
+     */
+    public function getLatestPosts($limit)
+    {
+        $sql = "SELECT p.ID, p.media_id, p.post_author,
+            p.post_date AS created_at, p.post_modified AS modified_at,
+            p.post_title, p.post_slug, p.post_content, p.post_summary,
+            p.post_keyword, p.post_status, p.post_tags,
+            p.post_type, p.comment_status,
+            m.media_filename, m.media_caption, m.media_access,
+            u.user_fullname, u.user_login,
+            (SELECT COUNT(c.ID) FROM " . $this->table('tbl_comments') . " c 
+             WHERE c.comment_post_id = p.ID AND c.comment_status = 'approved') AS total_comments,
+            (SELECT GROUP_CONCAT(CONCAT(t.ID, ':', t.topic_title, ':', t.topic_slug) SEPARATOR '|') 
+             FROM " . $this->table('tbl_post_topic') . " pt 
+             JOIN " . $this->table('tbl_topics') . " t ON pt.topic_id = t.ID 
+             WHERE pt.post_id = p.ID AND t.topic_status = 'Y') AS topics_data
+            FROM " . $this->table('tbl_posts') . " AS p
+            INNER JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
+            INNER JOIN " . $this->table('tbl_users') . " AS u ON p.post_author = u.ID
+            WHERE p.post_status = 'publish'
+            AND p.post_type = 'blog'
+            AND m.media_target = 'blog'
+            AND m.media_access = 'public'
+            AND m.media_status = '1'
+            AND u.user_banned = '0'
+            ORDER BY p.post_date DESC LIMIT :limit";
+
+        $this->setSQL($sql);
+        $latestPosts = $this->findAll([':limit' => $limit]);
+        return (empty($latestPosts)) ?: $latestPosts;
+    }
+
+    /**
+     * Get all published blog posts with pagination
+     * @param object $sanitize Sanitize object for pagination
+     * @param Paginator $perPage Paginator instance
+     * @return array posts and pagination links
+     */
+    public function getAllBlogPosts($sanitize, Paginator $perPage)
+    {
+        $this->linkPosts = $perPage;
         
-        return $model;
-    }
+        // Set total records for pagination
+        $stmt = $this->dbc->dbQuery("SELECT ID FROM tbl_posts WHERE post_type = 'blog'");
+        $this->linkPosts->set_total($stmt->rowCount());
 
-    public function getExcerpt($length = 150)
-    {
-        if ($this->post_summary) {
-            return $this->post_summary;
-        }
+        $sql = "SELECT p.ID, p.media_id, p.post_author,
+            p.post_date AS created_at, p.post_modified AS modified_at,
+            p.post_title, p.post_slug, p.post_content, p.post_summary,
+            p.post_keyword, p.post_type, p.post_status, p.post_sticky,
+            u.user_login, u.user_fullname,
+            m.media_filename, m.media_caption,
+            (SELECT COUNT(c.ID) FROM " . $this->table('tbl_comments') . " c 
+             WHERE c.comment_post_id = p.ID AND c.comment_status = 'approved') AS total_comments,
+            (SELECT GROUP_CONCAT(CONCAT(t.ID, ':', t.topic_title, ':', t.topic_slug) SEPARATOR '|') 
+             FROM " . $this->table('tbl_post_topic') . " pt 
+             JOIN " . $this->table('tbl_topics') . " t ON pt.topic_id = t.ID 
+             WHERE pt.post_id = p.ID AND t.topic_status = 'Y') AS topics_data
+            FROM " . $this->table('tbl_posts') . " AS p
+            INNER JOIN " . $this->table('tbl_users') . " AS u ON p.post_author = u.ID
+            INNER JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
+            WHERE p.post_type = 'blog'
+            AND p.post_status = 'publish'
+            AND m.media_target = 'blog'
+            AND m.media_status = '1'
+            AND u.user_banned = '0'
+            ORDER BY p.ID DESC " . $this->linkPosts->get_limit($sanitize);
         
-        return substr(strip_tags($this->post_content), 0, $length) . '...';
+        $this->setSQL($sql);
+        $entries = $this->findAll([]);
+        $this->pagination = $this->linkPosts->page_links($sanitize);
+
+        return (empty($entries)) ?: ['blogPosts' => $entries, 'paginationLink' => $this->pagination];
     }
 
-    public function getFormattedDate($format = 'F j, Y')
+    /**
+     * Get single post by ID
+     * @param int $id Post ID
+     * @return array|null Post with media and author
+     */
+    public function getPostById($id)
     {
-        return date($format, strtotime($this->post_date));
+        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
+          p.post_title, p.post_slug, p.post_content, p.post_summary, p.post_keyword, 
+          p.post_status, p.post_sticky, p.post_type, p.post_visibility, p.post_password, 
+          p.comment_status AS comment_permit, m.media_filename, m.media_caption, m.media_target, 
+          m.media_access, m.media_status, u.user_login, u.user_fullname
+          FROM tbl_posts p
+          INNER JOIN tbl_media m ON p.media_id = m.ID
+          INNER JOIN tbl_users u ON p.post_author = u.ID
+          WHERE p.ID = :ID 
+          AND p.post_status = 'publish'
+          AND p.post_type = 'blog' AND m.media_target = 'blog'
+          AND m.media_access = 'public' AND m.media_status = '1'";
+
+        $sanitizeid = Sanitize::severeSanitizer($id);
+        $this->setSQL($sql);
+        $item = $this->findRow([':ID' => $sanitizeid]);
+        return (empty($item)) ?: $item;
     }
 
-    public function getTagsArray()
+    /**
+     * Get single post by slug
+     * @param string $slug Post slug
+     * @return array|null Post with media and author
+     */
+    public function getPostBySlug($slug, $fetchMode = null)
     {
-        if (empty($this->post_tags)) {
-            return [];
-        }
-        return array_map('trim', explode(',', $this->post_tags));
+        $sql = "SELECT p.ID, p.media_id, p.post_author,
+                 p.post_date, p.post_modified, p.post_title,
+                 p.post_slug, p.post_content, p.post_summary,
+                 p.post_keyword, p.post_status, p.post_sticky, 
+                 p.post_type, p.comment_status, 
+                 m.media_filename, m.media_caption, m.media_target, m.media_access,
+                 u.user_login, u.user_fullname
+          FROM tbl_posts AS p
+          INNER JOIN tbl_users AS u ON p.post_author = u.ID
+          INNER JOIN tbl_media AS m ON p.media_id = m.ID
+          WHERE p.post_slug = :slug 
+          AND p.post_status = 'publish'
+          AND p.post_type = 'blog' AND m.media_target = 'blog'
+          AND m.media_access = 'public' AND m.media_status = '1'";
+
+        $slug_sanitized = Sanitize::severeSanitizer($slug);
+        $this->setSQL($sql);
+        $postBySlug = $this->findRow([':ID' => $slug_sanitized], $fetchMode);
+        return (empty($postBySlug)) ?: $postBySlug;
+    }
+
+    /**
+     * Get random headline posts
+     * @return array Posts marked as headlines
+     */
+    public function getRandomHeadlines()
+    {
+        $sql = "SELECT p.ID, p.media_id, p.post_author,
+             p.post_date, p.post_modified, p.post_title,
+             p.post_slug, p.post_content, p.post_summary,
+             p.post_keyword, p.post_sticky, p.post_type, p.post_status, 
+             p.post_tags, u.user_login, u.user_fullname,
+             m.media_filename, m.media_caption, m.media_type, m.media_target, m.media_access
+             FROM tbl_posts AS p
+             INNER JOIN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 5) AS p2 ON p.ID = p2.ID 
+             INNER JOIN tbl_users AS u ON p.post_author = u.ID
+             INNER JOIN tbl_media AS m ON p.media_id = m.ID
+             WHERE p.post_type = 'blog'
+             AND m.media_target = 'blog' 
+             AND p.post_status = 'publish' 
+             AND p.post_headlines = '1'";
+
+        $this->setSQL($sql);
+        $headlines = $this->findAll([]);
+        return (empty($headlines)) ?: $headlines;
+    }
+
+    /**
+     * Get related posts using full-text search
+     * @param string $post_title Search term
+     * @return array Related posts
+     */
+    public function getRelatedPosts($post_title)
+    {
+        $sql = "SELECT ID, media_id, post_author, post_date, post_modified,
+                 post_title, post_slug, post_content, 
+                 MATCH(post_title, post_content, post_tags)
+                 AGAINST(?) AS score
+          FROM tbl_posts 
+          WHERE MATCH(post_title, post_content) AGAINST(?)
+          ORDER BY score ASC LIMIT 3";
+
+        $this->setSQL($sql);
+        $relatedPosts = $this->findRow([$post_title]);
+        return (empty($relatedPosts)) ?: $relatedPosts;
+    }
+
+    /**
+     * Get random posts for sidebar
+     * @param int $limit Number of posts
+     * @return array Posts for sidebar display
+     */
+    public function getPostsOnSidebar($limit)
+    {
+        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title,
+               p.post_slug, p.post_content, p.post_summary,
+               p.post_keyword, p.post_sticky, p.post_type, p.post_status, 
+               u.user_login, u.user_fullname
+            FROM tbl_posts AS p
+            INNER JOIN tbl_users AS u ON p.post_author = u.ID
+            WHERE p.post_type = 'blog' 
+            AND p.post_status = 'publish'
+            ORDER BY p.post_date DESC LIMIT :limit";
+
+        $this->setSQL($sql);
+        $sidebar_posts = $this->findAll([':limit' => $limit]);
+        return (empty($sidebar_posts)) ?: ['sidebarPosts' => $sidebar_posts];
     }
 }
 ```
+
+### Key Methods in PostModel
+
+| Method | Purpose | Returns |
+|--------|---------|---------|
+| `getPostFeeds($limit)` | Retrieve posts for social sharing | Array of published posts |
+| `getLatestPosts($limit)` | Get latest posts for homepage | Array with media, author, comments, topics |
+| `getAllBlogPosts($sanitize, $perPage)` | Paginated blog posts | Array with posts and pagination |
+| `getPostById($id)` | Get single post by ID | Post array or null |
+| `getPostBySlug($slug)` | Get single post by slug | Post array or null |
+| `getPostByAuthor($author)` | Get posts by author | Post array or null |
+| `getRandomHeadlines()` | Get random headline posts | Array of headlines |
+| `getRelatedPosts($title)` | Get related posts (full-text) | Array of related posts |
+| `getRandomPosts($start, $end)` | Get random posts | Array of random posts |
+| `getPostsOnSidebar($limit)` | Get posts for sidebar | Array with sidebarPosts key |
+
+### Database Columns Used
+
+The `PostModel` references these `tbl_posts` columns:
+
+| Column | Usage |
+|--------|-------|
+| `ID` | Post primary key |
+| `media_id` | Featured image |
+| `post_author` | User foreign key |
+| `post_date` | Creation timestamp |
+| `post_modified` | Last modification |
+| `post_title` | Post title |
+| `post_slug` | URL slug |
+| `post_content` | Full content |
+| `post_summary` | Short summary |
+| `post_keyword` | SEO keywords |
+| `post_status` | publish/draft/pending |
+| `post_visibility` | public/private/password-protected |
+| `post_password` | Password hash (when protected) |
+| `post_tags` | Comma-separated tags |
+| `post_type` | blog/article/news |
+| `post_sticky` | Sticky post flag |
+| `comment_status` | open/closed |
+
+### Other Models
+
+| Model | File | Purpose |
+|-------|------|---------|
+| `FrontContentModel` | `lib/model/FrontContentModel.php` | Frontend-specific queries |
+| `TopicModel` | `lib/model/TopicModel.php` | Category/topic queries |
+| `TagModel` | `lib/model/TagModel.php` | Tag-based queries |
+| `PageModel` | `lib/model/PageModel.php` | Static pages |
+| `CommentModel` | `lib/model/CommentModel.php` | Comments |
+| `GalleryModel` | `lib/model/GalleryModel.php` | Media galleries |
+| `ArchivesModel` | `lib/model/ArchivesModel.php` | Archive queries |
+| `DownloadModel` | `lib/model/DownloadModel.php` | Download tracking |
 
 ---
 
@@ -1502,7 +2831,7 @@ The blog includes comprehensive image display functions with WebP support and re
 
 ```
 public/files/pictures/
-├── small/           # Thumbnail images (640x450)
+├── small/          # Thumbnail images (640x450)
 │   └── small_*.jpg
 ├── medium/         # Medium images (730x486)
 │   └── medium_*.jpg
