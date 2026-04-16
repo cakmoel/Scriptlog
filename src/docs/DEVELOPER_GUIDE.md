@@ -6007,4 +6007,4 @@ This project is licensed under the MIT License.
 
 ---
 
-*Last Updated: April 2026 | Version 1.1.1*
+*Last Updated: April 2026 | Version 1.1.0*
