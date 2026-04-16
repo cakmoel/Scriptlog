@@ -1,6 +1,6 @@
 # Developer Guide - Scriptlog
 
-**Version:** 1.1.0 | **Last Updated:** April 2026
+**Version:** 1.1.1 | **Last Updated:** April 2026
 
 ---
 
