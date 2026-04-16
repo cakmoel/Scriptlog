@@ -422,7 +422,7 @@ install_header($current_path);
                                 </div>
                             </div>
                             
-                            <div class="alert alert-warning py-3 mb-4 rounded-lg d-flex align-items-center border-0" style="background: rgba(127, 255, 0, 0.05); color: #7FFF00;">
+                            <div class="alert alert-warning py-3 mb-4 rounded-lg d-flex align-items-center border-0" style="background: rgba(127, 255, 0, 0.05); color: #122430;">
                                 <i class="fa fa-shield mr-3 fa-lg"></i>
                                 <small>Strong passwords improve your site security. Aim for 8+ characters with a mix of letters and numbers.</small>
                             </div>
