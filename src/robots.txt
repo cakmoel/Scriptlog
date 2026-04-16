@@ -65,4 +65,4 @@ Disallow: /public/
 Disallow: /login.php
 Disallow: /cdn-cgi/email-protection/
 
-Sitemap: https://blogware.site/sitemap-index.xml
+Sitemap: https://yoursite.tld/sitemap-index.xml

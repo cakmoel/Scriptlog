@@ -69,10 +69,10 @@ $menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
 <?php
 if (function_exists('is_permalink_enabled') && is_permalink_enabled() === 'yes') :
     ?>
-<i>ex: /post/id/your-friendly-neighborhood</i>.Please check out <a href="https://scriptlog.my.id/doc/" target="_blank" rel="noopener noreferrer">documentation</a> for more information.
+<i>ex: /post/id/your-friendly-neighborhood</i>.Please check out <a href="https://developer.scriptlog.my.id/" target="_blank" rel="noopener noreferrer">documentation</a> for more information.
 <?php else :
     ?>
-<i>ex: ?p=1</i>. Please check out <a href="https://scriptlog.my.id/doc/" target="_blank" rel="noopener noreferrer">documentation</a> for more information.
+<i>ex: ?p=1</i>. Please check out <a href="https://developer.scriptlog.my.id/" target="_blank" rel="noopener noreferrer">documentation</a> for more information.
       <?php
 endif;
 ?>
