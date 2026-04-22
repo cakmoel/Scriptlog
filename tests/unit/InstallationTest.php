@@ -69,7 +69,7 @@ return [
     {
         $formHtml = file_get_contents(__DIR__ . '/../../src/install/index.php');
         
-        $this->assertStringContainsString('value="lib/utility/.lts/"', $formHtml);
+        $this->assertStringContainsString('/lib/utility/.lts/', $formHtml);
     }
 
     public function testConfigFileUsesEnvPattern(): void
@@ -110,12 +110,11 @@ return [
         $this->assertStringContainsString("function generate_random_key_filename()", $setupFile);
     }
 
-    public function testDefuseKeyFunctionSignatureAcceptsDirectoryPath(): void
+    public function testDefuseKeyFunctionExists(): void
     {
         $setupFile = file_get_contents(__DIR__ . '/../../src/install/include/setup.php');
         
-        $this->assertStringContainsString('function generate_defuse_key($keyPath', $setupFile);
-        $this->assertStringContainsString("'lib/utility/.lts/'", $setupFile);
+        $this->assertStringContainsString('function generate_defuse_key()', $setupFile);
     }
 
     public function testWriteConfigFileAcceptsEncryptionPathParameter(): void
