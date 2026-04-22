@@ -13,6 +13,8 @@
 
 use PHPUnit\Framework\TestCase;
 
+require_once __DIR__ . '/../../src/lib/dao/PostDao.php';
+
 class PostDaoSecurityTest extends TestCase
 {
     public function testFindPostsHasOnlyPublishedParameter(): void
@@ -75,7 +77,7 @@ class PostDaoSecurityTest extends TestCase
             return;
         }
         
-        $source = file_get_contents(__DIR__ . '/../../lib/dao/PostDao.php');
+        $source = file_get_contents(__DIR__ . '/../../src/lib/dao/PostDao.php');
         
         // Verify that ORDER BY uses a whitelist
         $this->assertStringContainsString('$allowedColumns', $source);
@@ -90,7 +92,7 @@ class PostDaoSecurityTest extends TestCase
             return;
         }
         
-        $source = file_get_contents(__DIR__ . '/../../lib/dao/PostDao.php');
+        $source = file_get_contents(__DIR__ . '/../../src/lib/dao/PostDao.php');
         
         // Verify that status filter is present
         $this->assertStringContainsString("p.post_status = 'publish'", $source);
@@ -105,7 +107,7 @@ class PostDaoSecurityTest extends TestCase
             return;
         }
         
-        $source = file_get_contents(__DIR__ . '/../../lib/dao/PostDao.php');
+        $source = file_get_contents(__DIR__ . '/../../src/lib/dao/PostDao.php');
         
         // Check for status filter anywhere in the findPost method
         $this->assertStringContainsString("post_status = 'publish'", $source);
