@@ -23,7 +23,7 @@ class PerformanceOptimizationTest extends TestCase
         require_once __DIR__ . '/../../src/lib/common.php';
         require_once __DIR__ . '/../../src/lib/utility-loader.php';
         
-        // Read header.php content (it's in src/public/themes/blog/)
+        // Read header.php content
         $headerPath = dirname(__FILE__) . '/../../src/public/themes/blog/header.php';
         if (file_exists($headerPath)) {
             $this->headerContent = file_get_contents($headerPath);
@@ -184,7 +184,7 @@ class PerformanceOptimizationTest extends TestCase
             'rtl.min.css'
         ];
         
-        $basePath = dirname(__FILE__) . '/../../src/public/themes/blog/assets/css/';
+        $basePath = dirname(__FILE__) . '/../../public/themes/blog/assets/css/';
         
         foreach ($cssFiles as $file) {
             $this->assertFileExists($basePath . $file, "Minified CSS file $file should exist");
@@ -202,7 +202,7 @@ class PerformanceOptimizationTest extends TestCase
             'wow.min.js'
         ];
         
-        $basePath = dirname(__FILE__) . '/../../src/public/themes/blog/assets/js/';
+        $basePath = dirname(__FILE__) . '/../../public/themes/blog/assets/js/';
         
         foreach ($jsFiles as $file) {
             $this->assertFileExists($basePath . $file, "Minified JS file $file should exist");
@@ -219,7 +219,7 @@ class PerformanceOptimizationTest extends TestCase
             'vendor/bootstrap/js/bootstrap.min.js'
         ];
         
-        $basePath = dirname(__FILE__) . '/../../src/public/themes/blog/assets/';
+        $basePath = dirname(__FILE__) . '/../../public/themes/blog/assets/';
         
         foreach ($vendorFiles as $file) {
             $this->assertFileExists($basePath . $file, "Vendor minified file $file should exist");
@@ -231,7 +231,7 @@ class PerformanceOptimizationTest extends TestCase
     public function testDatabaseIndexesDefined()
     {
         // Check if dbtable.php contains the index definitions
-        $dbtablePath = dirname(__FILE__) . '/../../src/install/include/dbtable.php';
+        $dbtablePath = dirname(__FILE__) . '/../../install/include/dbtable.php';
         
         if (file_exists($dbtablePath)) {
             $content = file_get_contents($dbtablePath);

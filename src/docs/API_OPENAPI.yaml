@@ -153,6 +153,16 @@ tags:
     description: Comment operations
   - name: Archives
     description: Archive by date operations
+  - name: Search
+    description: Search operations
+  - name: GDPR
+    description: GDPR consent operations
+  - name: Languages
+    description: Internationalization languages
+  - name: Translations
+    description: Internationalization translations
+  - name: Media
+    description: Media upload operations
   - name: API Info
     description: API information and metadata
 
@@ -381,6 +391,73 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
+  /posts/{id}/verify:
+    post:
+      tags:
+        - Posts
+      summary: Verify protected post password
+      description: |
+        Verifies the password for a password-protected post without returning content.
+        This endpoint is public and does not require authentication.
+      operationId: verifyProtectedPost
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtectedPostVerify'
+      responses:
+        '200':
+          description: Password verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtectedPostVerifyResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /posts/{id}/unlock:
+    post:
+      tags:
+        - Posts
+      summary: Unlock protected post content
+      description: |
+        Verifies password and returns decrypted content for a password-protected post.
+        This endpoint is public and does not require authentication.
+        Rate limited to prevent brute force attacks.
+      operationId: unlockProtectedPost
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtectedPostVerify'
+      responses:
+        '200':
+          description: Post unlocked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtectedPostUnlockResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
 
   /categories:
     get:
@@ -879,6 +956,664 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
+  /search:
+    get:
+      tags:
+        - Search
+      summary: Search all content
+      description: |
+        Searches posts and pages for the given keyword.
+        This endpoint is public and does not require authentication.
+      operationId: searchAll
+      parameters:
+        - name: q
+          in: query
+          description: Search keyword
+          required: true
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 100
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Search results retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /search/posts:
+    get:
+      tags:
+        - Search
+      summary: Search posts only
+      description: |
+        Searches only posts for the given keyword.
+        This endpoint is public and does not require authentication.
+      operationId: searchPosts
+      parameters:
+        - name: q
+          in: query
+          description: Search keyword
+          required: true
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 100
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Search results retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /search/pages:
+    get:
+      tags:
+        - Search
+      summary: Search pages only
+      description: |
+        Searches only pages for the given keyword.
+        This endpoint is public and does not require authentication.
+      operationId: searchPages
+      parameters:
+        - name: q
+          in: query
+          description: Search keyword
+          required: true
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 100
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Search results retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /gdpr/consent:
+    get:
+      tags:
+        - GDPR
+      summary: Get GDPR consent status
+      description: |
+        Retrieves the current user's GDPR consent status.
+        This endpoint is public and does not require authentication.
+      operationId: getConsentStatus
+      responses:
+        '200':
+          description: Consent status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GdprConsentResponse'
+    post:
+      tags:
+        - GDPR
+      summary: Submit GDPR consent
+      description: |
+        Submits GDPR consent preferences.
+        This endpoint is public and does not require authentication.
+      operationId: submitConsent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GdprConsent'
+      responses:
+        '200':
+          description: Consent submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /languages:
+    get:
+      tags:
+        - Languages
+      summary: List all languages
+      description: |
+        Retrieves a list of all available languages.
+        This endpoint is public and does not require authentication.
+      operationId: listLanguages
+      responses:
+        '200':
+          description: Languages retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguageListResponse'
+    post:
+      tags:
+        - Languages
+      summary: Create a new language
+      description: |
+        Creates a new language for internationalization.
+        Requires authentication with administrator permissions.
+      operationId: createLanguage
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LanguageCreate'
+      responses:
+        '201':
+          description: Language created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguageResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /languages/active:
+    get:
+      tags:
+        - Languages
+      summary: List active languages
+      description: |
+        Retrieves only active languages.
+        This endpoint is public and does not require authentication.
+      operationId: listActiveLanguages
+      responses:
+        '200':
+          description: Active languages retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguageListResponse'
+
+  /languages/{code}:
+    get:
+      tags:
+        - Languages
+      summary: Get a single language
+      description: |
+        Retrieves a single language by its code.
+        This endpoint is public and does not require authentication.
+      operationId: getLanguage
+      parameters:
+        - name: code
+          in: path
+          description: Language code (e.g., en, ar, zh)
+          required: true
+          schema:
+            type: string
+            example: en
+      responses:
+        '200':
+          description: Language retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguageResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Languages
+      summary: Update a language
+      description: |
+        Updates an existing language.
+        Requires authentication with administrator permissions.
+      operationId: updateLanguage
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: code
+          in: path
+          description: Language code (e.g., en, ar, zh)
+          required: true
+          schema:
+            type: string
+            example: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LanguageUpdate'
+      responses:
+        '200':
+          description: Language updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguageResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Languages
+      summary: Delete a language
+      description: |
+        Deletes a language.
+        Requires authentication with administrator permissions.
+      operationId: deleteLanguage
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: code
+          in: path
+          description: Language code (e.g., en, ar, zh)
+          required: true
+          schema:
+            type: string
+            example: en
+      responses:
+        '204':
+          description: Language deleted successfully (no content)
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /languages/default:
+    get:
+      tags:
+        - Languages
+      summary: Get default language
+      description: |
+        Retrieves the default language.
+        This endpoint is public and does not require authentication.
+      operationId: getDefaultLanguage
+      responses:
+        '200':
+          description: Default language retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguageResponse'
+    put:
+      tags:
+        - Languages
+      summary: Set default language
+      description: |
+        Sets a language as the default.
+        Requires authentication with administrator permissions.
+      operationId: setDefaultLanguage
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: code
+          in: path
+          description: Language code (e.g., en, ar, zh)
+          required: true
+          schema:
+            type: string
+            example: en
+      responses:
+        '200':
+          description: Default language set successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguageResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /translations/{code}:
+    get:
+      tags:
+        - Translations
+      summary: List translations for a language
+      description: |
+        Retrieves translations for a specific language.
+        This endpoint is public and does not require authentication.
+      operationId: listTranslations
+      parameters:
+        - name: code
+          in: path
+          description: Language code (e.g., en, ar, zh)
+          required: true
+          schema:
+            type: string
+            example: en
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Translations retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationListResponse'
+    post:
+      tags:
+        - Translations
+      summary: Create a translation
+      description: |
+        Creates a new translation entry.
+        Requires authentication with administrator permissions.
+      operationId: createTranslation
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: code
+          in: path
+          description: Language code (e.g., en, ar, zh)
+          required: true
+          schema:
+            type: string
+            example: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranslationCreate'
+      responses:
+        '201':
+          description: Translation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /translations/{code}/{key}:
+    get:
+      tags:
+        - Translations
+      summary: Get a single translation
+      description: |
+        Retrieves a single translation by key.
+        This endpoint is public and does not require authentication.
+      operationId: getTranslation
+      parameters:
+        - name: code
+          in: path
+          description: Language code
+          required: true
+          schema:
+            type: string
+            example: en
+        - name: key
+          in: path
+          description: Translation key
+          required: true
+          schema:
+            type: string
+            example: nav.dashboard
+      responses:
+        '200':
+          description: Translation retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /translations/{id}:
+    put:
+      tags:
+        - Translations
+      summary: Update a translation
+      description: |
+        Updates an existing translation by ID.
+        Requires authentication with administrator permissions.
+      operationId: updateTranslation
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Translation ID
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranslationUpdate'
+      responses:
+        '200':
+          description: Translation updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Translations
+      summary: Delete a translation
+      description: |
+        Deletes a translation by ID.
+        Requires authentication with administrator permissions.
+      operationId: deleteTranslation
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Translation ID
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '204':
+          description: Translation deleted successfully (no content)
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /translations/{code}/export:
+    get:
+      tags:
+        - Translations
+      summary: Export translations
+      description: |
+        Exports translations for a language as JSON.
+        This endpoint is public and does not require authentication.
+      operationId: exportTranslations
+      parameters:
+        - name: code
+          in: path
+          description: Language code (e.g., en, ar, zh)
+          required: true
+          schema:
+            type: string
+            example: en
+      responses:
+        '200':
+          description: Translations exported successfully
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /translations/{code}/import:
+    post:
+      tags:
+        - Translations
+      summary: Import translations
+      description: |
+        Imports translations from JSON.
+        Requires authentication with administrator permissions.
+      operationId: importTranslations
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: code
+          in: path
+          description: Language code (e.g., en, ar, zh)
+          required: true
+          schema:
+            type: string
+            example: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Translations imported successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /translations/{code}/cache:
+    post:
+      tags:
+        - Translations
+      summary: Regenerate translation cache
+      description: |
+        Regenerates the translation cache for a language.
+        Requires authentication with administrator permissions.
+      operationId: regenerateCache
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: code
+          in: path
+          description: Language code (e.g., en, ar, zh)
+          required: true
+          schema:
+            type: string
+            example: en
+      responses:
+        '200':
+          description: Cache regenerated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /media/upload:
+    post:
+      tags:
+        - Media
+      summary: Upload media file
+      description: |
+        Uploads an image file for use in posts.
+        Requires admin authentication.
+      operationId: uploadMedia
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MediaUpload'
+      responses:
+        '201':
+          description: Media uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaUploadResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
 
 components:
   securitySchemes:

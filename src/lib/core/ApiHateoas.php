@@ -294,6 +294,26 @@ class ApiHateoas
                 'type' => 'GET',
                 'templated' => true
             ],
+            'gdpr' => [
+                'href' => $this->baseUrl . '/gdpr/consent',
+                'rel' => 'gdpr',
+                'type' => 'GET'
+            ],
+            'languages' => [
+                'href' => $this->baseUrl . '/languages',
+                'rel' => 'languages',
+                'type' => 'GET'
+            ],
+            'translations' => [
+                'href' => $this->baseUrl . '/translations/en',
+                'rel' => 'translations',
+                'type' => 'GET'
+            ],
+            'media' => [
+                'href' => $this->baseUrl . '/media/upload',
+                'rel' => 'media',
+                'type' => 'POST'
+            ],
             'openapi' => [
                 'href' => $this->baseUrl . '/openapi.json',
                 'rel' => 'service-desc',

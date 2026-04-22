@@ -16,7 +16,7 @@ if (!defined('DS')) {
 }
 
 // Include the theme functions
-require_once __DIR__ . '/../../src/public/themes/blog/functions.php';
+require_once __DIR__ . '/../../public/themes/blog/functions.php';
 
 class ThemeI18nTest extends TestCase
 {
