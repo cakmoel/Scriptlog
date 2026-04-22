@@ -27,7 +27,10 @@ class ApiHateoasTest extends \PHPUnit\Framework\TestCase
         $_SERVER['REQUEST_URI'] = '/api/v1/posts';
 
         // Read the actual app URL from config
-        $configPath = __DIR__ . '/../../config.php';
+        $configPath = __DIR__ . '/../../src/config.php';
+        if (!file_exists($configPath)) {
+            $configPath = __DIR__ . '/../../src/config.sample.php';
+        }
         if (file_exists($configPath)) {
             $config = require $configPath;
             $this->appUrl = rtrim($config['app']['url'] ?? 'http://blogware.site', '/');
