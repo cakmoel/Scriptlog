@@ -12,7 +12,7 @@ require_once __DIR__ . '/../bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
 
-class DownloadHandlerTest extends TestCase
+class DownloadTest extends TestCase
 {
     protected function setUp(): void
     {

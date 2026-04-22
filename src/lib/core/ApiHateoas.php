@@ -32,11 +32,13 @@ class ApiHateoas
     public function __construct($baseUrl = null)
     {
         $config = [];
-        if (file_exists(__DIR__ . '/../../config.php')) {
-            $config = require __DIR__ . '/../../config.php';
+        if (file_exists(__DIR__ . '/../../src/config.php')) {
+            $config = require __DIR__ . '/../../src/config.php';
+        } elseif (file_exists(__DIR__ . '/../../src/config.sample.php')) {
+            $config = require __DIR__ . '/../../src/config.sample.php';
         }
 
-        $this->appUrl = rtrim($config['app']['url'] ?? 'http://localhost', '/');
+        $this->appUrl = rtrim($config['app']['url'] ?? 'http://blogware.site', '/');
         $this->baseUrl = rtrim($baseUrl ?? ($this->appUrl . '/api/v1'), '/');
     }
 
