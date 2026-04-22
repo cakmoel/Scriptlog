@@ -32,8 +32,7 @@ class ApiHateoasTest extends \PHPUnit\Framework\TestCase
             $config = require $configPath;
             $this->appUrl = rtrim($config['app']['url'] ?? 'http://blogware.site', '/');
         } else {
-            // When config.php doesn't exist (e.g., during testing), use localhost
-            $this->appUrl = 'http://localhost';
+            $this->appUrl = 'http://blogware.site';
         }
 
         $this->hateoas = new ApiHateoas($this->appUrl . '/api/v1');
@@ -267,6 +266,19 @@ class ApiHateoasTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('search', $links);
         $this->assertEquals($this->appUrl . '/api/v1/search?q={query}', $links['search']['href']);
         $this->assertTrue($links['search']['templated']);
+
+        $this->assertArrayHasKey('gdpr', $links);
+        $this->assertEquals($this->appUrl . '/api/v1/gdpr/consent', $links['gdpr']['href']);
+
+        $this->assertArrayHasKey('languages', $links);
+        $this->assertEquals($this->appUrl . '/api/v1/languages', $links['languages']['href']);
+
+        $this->assertArrayHasKey('translations', $links);
+        $this->assertEquals($this->appUrl . '/api/v1/translations/en', $links['translations']['href']);
+
+        $this->assertArrayHasKey('media', $links);
+        $this->assertEquals($this->appUrl . '/api/v1/media/upload', $links['media']['href']);
+        $this->assertEquals('POST', $links['media']['type']);
 
         $this->assertArrayHasKey('openapi', $links);
         $this->assertEquals($this->appUrl . '/api/v1/openapi.json', $links['openapi']['href']);
