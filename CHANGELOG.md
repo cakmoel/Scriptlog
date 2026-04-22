@@ -8,12 +8,46 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#103---2026-04-13)
+- [Latest Release](#104---2026-04-22)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.0.4] - 2026-04-22
+
+### Added
+- OpenAPI specification verification tests (34 new tests)
+- LanguageSwitcherTest for i18n functionality
+- NavigationI18nTest for permalink URL generation
+
+### Changed
+- Extended API HATEOAS with new endpoints (GDPR, languages, translations, media)
+- Updated OpenAPI specs (src/docs/)
+
+### Fixed
+- 530 unit tests now passing
+- Test path corrections (lib -> src/lib structure)
+- ApiHateoas config path to src/config.php
+- ImageDisplayTest utility-loader path
+- TranslationLoaderTest cache expiry flaky test
+
+### Removed
+- storage/keys from repo tracking
+- tests/COVERAGE.md artifact
+
+### Notes
+Hotfix release focusing on test infrastructure improvements and path corrections.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.0.3
+- **Changes since v1.0.3**: 23 commits
+
+---
 
 ## [1.0.3] - 2026-04-13
 
@@ -48,6 +82,40 @@ Focuses on i18N improvements, security fixes, and bug corrections.
 ### Comparison
 - **Previous release**: v1.0.2
 - **Changes since v1.0.2**: 22 commits
+
+---
+
+## [1.0.4] - 2026-04-22
+
+### Added
+- OpenAPI specification verification tests (34 new tests)
+- LanguageSwitcherTest for i18n functionality
+- NavigationI18nTest for permalink URL generation
+
+### Changed
+- Extended API HATEOAS with new endpoints (GDPR, languages, translations, media)
+- Updated OpenAPI specs (src/docs/)
+
+### Fixed
+- 530 unit tests now passing
+- Test path corrections (lib -> src/lib structure)
+- ApiHateoas config path to src/config.php
+- ImageDisplayTest utility-loader path
+- TranslationLoaderTest cache expiry flaky test
+
+### Removed
+- storage/keys from repo tracking
+- tests/COVERAGE.md artifact
+
+### Notes
+Hotfix release focusing on test infrastructure improvements and path corrections.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.0.3
+- **Changes since v1.0.3**: 23 commits
 
 ---
 
@@ -140,6 +208,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.0.4 | 2026-04-22 | Stable |
 | 1.0.3 | 2026-04-13 | Stable |
 | 1.0.2 | 2026-04-10 | Stable |
 | 1.0.1 | 2026-04-09 | Stable |
