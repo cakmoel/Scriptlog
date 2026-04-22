@@ -40,7 +40,7 @@ Ensure your hosting environment meets the following requirements:
 1. **Clone the Repository**
    ```bash
    git clone https://github.com/ScriptLog/scriptlog.git
-   cd scriptlog
+   cd Scriptlog
    ```
 
 2. **Install Dependencies**
