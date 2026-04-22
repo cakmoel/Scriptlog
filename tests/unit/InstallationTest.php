@@ -59,7 +59,7 @@ return [
 
     public function testInstallationFormHasEncryptionKeyPathField(): void
     {
-        $formHtml = file_get_contents(__DIR__ . '/../../src/install/index.php');
+        $formHtml = file_get_contents(__DIR__ . '/../../install/index.php');
         
         $this->assertStringContainsString('defuse_key_path', $formHtml);
         $this->assertStringContainsString('lib/utility/.lts/', $formHtml);
@@ -67,7 +67,9 @@ return [
 
     public function testEncryptionKeyPathDefaultValueInForm(): void
     {
-        $this->markTestSkipped('Encryption key path field removed from installation form');
+        $formHtml = file_get_contents(__DIR__ . '/../../install/index.php');
+        
+        $this->assertStringContainsString('value="lib/utility/.lts/"', $formHtml);
     }
 
     public function testConfigFileUsesEnvPattern(): void
@@ -93,7 +95,7 @@ return [
 
     public function testGenerateDefuseKeyCreatesPhpFile(): void
     {
-        $setupFile = file_get_contents(__DIR__ . '/../../src/install/include/setup.php');
+        $setupFile = file_get_contents(__DIR__ . '/../../install/include/setup.php');
         
         // Check that the function creates a .php file
         $this->assertStringContainsString('.php', $setupFile);
@@ -102,7 +104,7 @@ return [
 
     public function testGenerateRandomKeyFilename(): void
     {
-        $setupFile = file_get_contents(__DIR__ . '/../../src/install/include/setup.php');
+        $setupFile = file_get_contents(__DIR__ . '/../../install/include/setup.php');
         
         // Check function exists for generating random filenames
         $this->assertStringContainsString("function generate_random_key_filename()", $setupFile);
@@ -110,15 +112,15 @@ return [
 
     public function testDefuseKeyFunctionSignatureAcceptsDirectoryPath(): void
     {
-        $setupFile = file_get_contents(__DIR__ . '/../../src/install/include/setup.php');
+        $setupFile = file_get_contents(__DIR__ . '/../../install/include/setup.php');
         
-        $this->assertStringContainsString('function generate_defuse_key()', $setupFile);
-        $this->assertStringContainsString('.lts', $setupFile);
+        $this->assertStringContainsString('function generate_defuse_key($keyPath', $setupFile);
+        $this->assertStringContainsString("'lib/utility/.lts/'", $setupFile);
     }
 
     public function testWriteConfigFileAcceptsEncryptionPathParameter(): void
     {
-        $setupFile = file_get_contents(__DIR__ . '/../../src/install/include/setup.php');
+        $setupFile = file_get_contents(__DIR__ . '/../../install/include/setup.php');
         
         $this->assertStringContainsString('function write_config_file(', $setupFile);
         $this->assertStringContainsString('$defuse_key_path', $setupFile);
@@ -126,7 +128,7 @@ return [
 
     public function testEncryptionKeyGeneratedAsPhpFormat(): void
     {
-        $setupFile = file_get_contents(__DIR__ . '/../../src/install/include/setup.php');
+        $setupFile = file_get_contents(__DIR__ . '/../../install/include/setup.php');
         
         // Check that key is stored as PHP file with return statement
         $this->assertStringContainsString('<?php', $setupFile);
@@ -134,7 +136,7 @@ return [
     
     public function testEnvFileIncludesDefuseKeyPath(): void
     {
-        $setupFile = file_get_contents(__DIR__ . '/../../src/install/include/setup.php');
+        $setupFile = file_get_contents(__DIR__ . '/../../install/include/setup.php');
         
         // Check that write_env_file now accepts defuse_key_path parameter
         $this->assertStringContainsString('DEFUSE_KEY_PATH=', $setupFile);

@@ -167,19 +167,12 @@ class TranslationLoaderTest extends TestCase
         
         $this->assertFalse($isExpired);
         
-        // Simulate old file - use a much older timestamp to ensure it expires
-        $oldTime = time() - 7200; // 2 hours ago
-        touch($cacheFile, $oldTime);
-        clearstatcache();
+        // Simulate old file
+        touch($cacheFile, time() - ($cacheTtl + 100));
         $mtime = filemtime($cacheFile);
         $isExpired = (time() - $mtime) > $cacheTtl;
         
-        // In CI environment, this may be flaky - skip if file system doesn't support precise timestamps
-        if ($mtime >= $oldTime - 60) {
-            $this->assertTrue($isExpired);
-        } else {
-            $this->markTestSkipped('File system does not support precise mtime');
-        }
+        $this->assertTrue($isExpired);
     }
 
     public function testMemoryCacheLayer()
