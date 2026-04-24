@@ -42,8 +42,10 @@ class BlogspotImporter
 
         libxml_use_internal_errors(true);
 
+        @ini_set('display_errors', '0');
+        
         if (PHP_VERSION < 80000) {
-            libxml_disable_entity_loader(true);
+            @libxml_disable_entity_loader(true);
         }
         
         $this->xml = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_DTDLOAD);
