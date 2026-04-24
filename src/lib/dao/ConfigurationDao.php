@@ -159,7 +159,7 @@ class ConfigurationDao extends Dao
 
         $detailConfig = $this->findRow([$name_sanitized]);
 
-        return (empty($detailConfig)) ?: $detailConfig;
+        return (empty($detailConfig) || $detailConfig === false) ? [] : $detailConfig;
     }
 
     /**
@@ -249,12 +249,14 @@ class ConfigurationDao extends Dao
     public function createConfig($settingName, $settingValue, $sanitize)
     {
         $sanitizedName = $sanitize->sanitize($settingName, 'xss');
-        $sanitizedValue = $sanitize->sanitize($settingValue, 'xss');
+        $sanitizedValue = $sanitize->sanitize($settingValue, 'uri');
 
-        return $this->create("tbl_settings", [
+        $this->create("tbl_settings", [
           'setting_name' => $sanitizedName,
           'setting_value' => $sanitizedValue
         ]);
+
+        return true;
     }
 
     /**
@@ -268,14 +270,15 @@ class ConfigurationDao extends Dao
     public function updateConfigByName($settingName, $settingValue, $sanitize)
     {
         $sanitizedName = $sanitize->sanitize($settingName, 'xss');
-        $sanitizedValue = $sanitize->sanitize($settingValue, 'xss');
+        $sanitizedValue = $sanitize->sanitize($settingValue, 'uri');
 
         $config = $this->findConfigByName($sanitizedName, $sanitize);
 
         if (!empty($config)) {
-            return $this->modify("tbl_settings", [
+            $this->modify("tbl_settings", [
               'setting_value' => $sanitizedValue
             ], ['ID' => $config['ID']]);
+            return true;
         }
 
         return false;

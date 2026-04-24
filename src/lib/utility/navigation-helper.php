@@ -27,7 +27,15 @@ function nav_parent($parent_id)
 function nav_nested($parent)
 {
 
-    $row = (is_object($parent)) ? $parent->fetch_array(MYSQLI_ASSOC) : "";
-
-    return (is_iterable($row)) ? $row : [];
+    // Handle both MySQLi (fetch_array) and PDO (fetch)
+    if (is_object($parent)) {
+        if (method_exists($parent, 'fetch')) {
+            // PDO
+            return $parent->fetch(PDO::FETCH_ASSOC);
+        } elseif (method_exists($parent, 'fetch_array')) {
+            // MySQLi
+            return $parent->fetch_array(MYSQLI_ASSOC);
+        }
+    }
+    return [];
 }

@@ -1,17 +1,5 @@
 <?php
-
-/**
- * download.php
- *
- * Download page template
- *
- * @category Theme Template
- * @author   M.Noermoehammad
- * @license  MIT
- * @version  1.0
- * @since    Since Release 1.0
- *
- */
+defined('SCRIPTLOG') || die('Direct access not permitted');
 
 if (!isset($downloadPageData)) {
     $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
@@ -19,8 +7,6 @@ if (!isset($downloadPageData)) {
     $identifier = $requestPath->identifier ?? '';
     $downloadPageData = $downloadController->getDownloadPage($identifier);
 }
-
-call_theme_header();
 ?>
 
 <div class="container">
@@ -111,5 +97,3 @@ function copyToClipboard() {
     });
 }
 </script>
-
-<?php call_theme_footer(); ?>

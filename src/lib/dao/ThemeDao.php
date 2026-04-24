@@ -174,15 +174,78 @@ class ThemeDao extends Dao
     {
         $idsanitized = $this->filteringId($sanitize, $id, 'sql');
 
-        // activate theme
-        $stmt = $this->modify("tbl_themes", [
-          'theme_status' => 'Y'
-        ], ['ID' => $idsanitized]);
+        $this->modify("tbl_themes", ['theme_status' => 'Y'], ['ID' => (int)$idsanitized]);
 
-        // non-activate the other table
-        $stmt2 = $this->modify("tbl_themes", [
+        if (Registry::isKeySet('dbc')) {
+            $dbc = Registry::get('dbc');
+            $dbc->dbQuery("UPDATE tbl_themes SET theme_status = 'N' WHERE ID != ?", [(int)$idsanitized]);
+        }
+    }
+
+    /**
+     * Deactivate theme function
+     *
+     * @method mixed deactivateTheme()
+     * @param integer $id
+     * @param object $sanitize
+     *
+     */
+    public function deactivateTheme($id, $sanitize)
+    {
+        $idsanitized = $this->filteringId($sanitize, $id, 'sql');
+
+        $this->modify("tbl_themes", [
           'theme_status' => 'N'
-        ], ['ID' => $idsanitized]);
+        ], ['ID' => (int)$idsanitized]);
+
+        $activeThemes = $this->findActiveThemes();
+        if (empty($activeThemes)) {
+            $blogTheme = $this->findThemeByDirectory('blog');
+            if (!empty($blogTheme)) {
+                $this->modify("tbl_themes", [
+                    'theme_status' => 'Y'
+                ], ['ID' => (int)$blogTheme['ID']]);
+            }
+        }
+    }
+
+    /**
+     * Find theme by directory name
+     *
+     * @method mixed findThemeByDirectory()
+     * @param string $directory
+     * @return array|null
+     *
+     */
+    public function findThemeByDirectory($directory)
+    {
+
+        $sql = "SELECT ID, theme_title, theme_desc, theme_designer, 
+                theme_directory, theme_status 
+            FROM tbl_themes WHERE theme_directory = ?";
+
+        $this->setSQL($sql);
+
+        $result = $this->findRow([$directory]);
+
+        return (!empty($result)) ? $result : [];
+    }
+
+    /**
+     * Find active themes
+     *
+     * @method array findActiveThemes()
+     * @return array
+     *
+     */
+    public function findActiveThemes(): array
+    {
+        $sql = "SELECT ID, theme_title, theme_directory, theme_status 
+            FROM tbl_themes WHERE theme_status = 'Y'";
+
+        $this->setSQL($sql);
+
+        return $this->findAll([]);
     }
 
     /**
@@ -227,12 +290,20 @@ class ThemeDao extends Dao
     public function loadTheme($theme_status)
     {
         $sql = "SELECT ID, theme_directory, theme_status 
-          FROM tbl_themes WHERE theme_status = :theme_status";
+          FROM tbl_themes WHERE theme_status = ?";
 
         $this->setSQL($sql);
 
-        $activeTheme = $this->findRow([':theme_status' => $theme_status]);
+        $activeTheme = $this->findRow([$theme_status]);
 
-        return (empty($activeTheme)) ?: $activeTheme;
+        if (empty($activeTheme)) {
+            $sqlFallback = "SELECT ID, theme_directory, theme_status 
+              FROM tbl_themes WHERE theme_directory = 'blog'";
+
+            $this->setSQL($sqlFallback);
+            $activeTheme = $this->findRow([]);
+        }
+
+        return $activeTheme;
     }
 }

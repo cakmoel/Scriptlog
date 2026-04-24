@@ -226,6 +226,16 @@ class ThemeService
     }
 
     /**
+     * Deactivate an installed theme
+     *
+     */
+    public function deactivateInstalledTheme()
+    {
+        $this->validator->sanitize($this->theme_id, 'int');
+        return $this->themeDao->deactivateTheme($this->theme_id, $this->sanitize);
+    }
+
+    /**
      * Remove a theme
      *
      * @return bool

@@ -102,19 +102,15 @@ class MenuDao extends Dao
      *
      */
     public function insertMenu($bind)
-    {
+{
 
         // checking sort is empty or not
         $sorted = isset($bind['menu_sort']) ? abs((int)$bind['menu_sort']) : "0";
 
         // first update all menu_sort greater than or equal to $sorted
         // UPDATE tbl_menu SET menu_sort = menu_sort + 1 WHERE menu_sort >= $sorted
-
-        medoo_update("tbl_menu", [
-          "menu_sort[+]" => 1
-        ], [
-          "menu_sort[>=]" => $sorted
-        ]);
+        // Use dbQuery like other DAOs
+        $this->dbc->dbQuery("UPDATE " . $this->prefix . "tbl_menu SET menu_sort = menu_sort + 1 WHERE menu_sort >= ?", [$sorted]);
 
         $this->create("tbl_menu", [
           'menu_label' => $bind['menu_label'],

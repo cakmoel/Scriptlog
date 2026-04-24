@@ -95,6 +95,7 @@ if (!function_exists('load_core_utilities')) {
         'generate-filename.php',
         'generate-hash.php',
         'generate-media-identifier.php',
+        'generate-openapi-spec.php',
         'generate-request.php',
         'generate-session-key.php',
         'generate-token.php',

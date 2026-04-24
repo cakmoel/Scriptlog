@@ -37,7 +37,31 @@ class Sanitize
                 $str = prevent_injection($str);
                 return $str;
                 break;
+
+            case 'uri':
+                $d = array('\\', '#', ';', '\'', '"', '[', ']', '{', '}', ')', '(', '|', '`', '~', '!', '%', '$', '^', '&', '*', '=', '?', '+');
+                $str = str_replace($d, '', $str);
+                $str = stripcslashes($str);
+                $str = htmlspecialchars($str);
+                $str = prevent_injection($str);
+                return $str;
+                break;
         }
+    }
+
+    /**
+     * Sanitize string (alias for sanitasi).
+     *
+     * This method exists for API compatibility. ConfigurationDao and other DAO classes
+     * call $sanitizer->sanitize() but this class uses sanitasi() as its primary method.
+     *
+     * @param string $str
+     * @param string $tipe
+     * @return string|int
+     */
+    public function sanitize($str, $tipe)
+    {
+        return $this->sanitasi($str, $tipe);
     }
 
     /**

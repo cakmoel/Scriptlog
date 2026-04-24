@@ -12,6 +12,11 @@
   --shadow: 0 4px 20px rgba(0, 0, 128, 0.08);
   --success: #16a34a;
   --danger: #dc2626;
+  /* Info Alert Colors - Light Mode */
+  --info-bg: rgba(0, 0, 128, 0.08);
+  --info-color: #000080;
+  --info-icon: #000080;
+  --info-border: rgba(0, 0, 128, 0.15);
 }
 
 [data-theme='dark'] {
@@ -27,6 +32,11 @@
   --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
   --success: #7FFF00;
   --danger: #ef4444;
+  /* Info Alert Colors - Dark Mode */
+  --info-bg: rgba(127, 255, 0, 0.08);
+  --info-color: #7FFF00;
+  --info-icon: #7FFF00;
+  --info-border: rgba(127, 255, 0, 0.2);
 }
 
 body {
