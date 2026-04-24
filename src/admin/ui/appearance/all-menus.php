@@ -86,12 +86,23 @@
 
                     <tr>
 
-                      <td><?= htmlspecialchars($menu['menu_label']); ?></td>
-                      <td>
-                        
+<td><?= htmlspecialchars($menu['menu_label']); ?></td>
+                       <td>
+                         
                         <?php
                         $parent = nav_parent($menu['parent_id']);
-                        $total = $parent->num_rows;
+                        // Handle both PDO (rowCount) and MySQLi (num_rows)
+                        if (is_object($parent)) {
+                            if (method_exists($parent, 'rowCount')) {
+                                $total = $parent->rowCount();
+                            } elseif (isset($parent->num_rows)) {
+                                $total = $parent->num_rows;
+                            } else {
+                                $total = 0;
+                            }
+                        } else {
+                            $total = 0;
+                        }
 
                         if ($total > 0) {
                             while ($data_parent = nav_nested($parent)) {
@@ -102,7 +113,7 @@
                         }
 
                         ?>
-                      </td>
+                       </td>
 
                       <td><?= htmlspecialchars($menu['menu_link']); ?></td>
                       <td>

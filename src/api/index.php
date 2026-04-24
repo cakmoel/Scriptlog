@@ -230,16 +230,12 @@ try {
     $router->post('translations/(?P<code>[a-z]{2})/import', 'TranslationsApiController@import');
     $router->post('translations/([a-z]{2})/cache', 'TranslationsApiController@cache');
 
-    // API OpenAPI spec endpoint
+    // API OpenAPI spec endpoint (dynamic - uses runtime URL)
     $router->get('openapi.json', function ($params) {
-        $specFile = __DIR__ . '/../docs/API_OPENAPI.json';
-        if (file_exists($specFile)) {
-            header('Content-Type: application/json');
-            header('X-API-Version: ' . API_VERSION);
-            readfile($specFile);
-            exit;
-        }
-        ApiResponse::notFound('OpenAPI specification not found');
+        // Load utility and generate dynamic spec
+        require_once __DIR__ . '/../lib/utility/generate-openapi-spec.php';
+        generate_openapi_spec();
+        exit;
     });
 
     // API Info endpoint

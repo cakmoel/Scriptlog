@@ -44,6 +44,8 @@ function array_unique_compact($items)
 
     $temp_array = array_unique($items);
 
+    $newarr = [];
+
     $i = 0;
 
     foreach ($temp_array as $v) {

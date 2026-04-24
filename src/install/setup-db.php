@@ -162,7 +162,7 @@ if (!file_exists(__DIR__ . '/../config.php')) {
                         $defuse_key_path = generate_defuse_key();
                     } catch (Exception $e) {
                         error_log("Failed to generate defuse key: " . $e->getMessage());
-                        $defuse_key_path = dirname(__DIR__, 2) . '/src/lib/utility/.lts/lts.php';
+                        $defuse_key_path = dirname(__DIR__, 2) . '/lib/utility/.lts/lts.php';
                     }
 
                     install_database_table($dbconnect, $protocol, $server_host, $username, $password, $email, $key, $prefix, $site_language, $defuse_key_path);

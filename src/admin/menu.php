@@ -40,7 +40,7 @@ try {
             if (false === $app->authenticator->userAccessControl(ActionConst::NAVIGATION)) {
                 direct_page('index.php?load=403&error=forbidden=' . forbidden_id(), 403);
             } else {
-                if ($menuDao->checkMenuId($menuId, $sanitizer)) {
+                if ($menuDao->checkMenuId($menuId, $app->sanitizer)) {
                     $menuController->update((int)$menuId);
                 } else {
                     direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
@@ -59,7 +59,7 @@ try {
             if (false === $app->authenticator->userAccessControl(ActionConst::NAVIGATION)) {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
-                if ($menuDao->checkMenuId($menuId, $sanitizer)) {
+                if ($menuDao->checkMenuId($menuId, $app->sanitizer)) {
                     $menuController->remove((int)$menuId);
                 } else {
                     direct_page('index.php?load=404&notfound=' . notfound_id(), 404);

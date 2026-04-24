@@ -30,12 +30,14 @@ class ThemeController extends BaseApp
         $checkStatus = false;
 
         if (isset($_SESSION['status'])) {
-            ($_SESSION['status'] == "themeAdded") ? array_push($errors, "New theme added") : "";
-            ($_SESSION['status'] == "themeInstalled") ? array_push($errors, "Theme installation process is successful, please activate it first to see it works!") : "";
-            ($_SESSION['status'] == "themeUpdated") ? array_push($errors, "Theme updated") : "";
+            ($_SESSION['status'] == "themeAdded") ? array_push($status, "New theme added") : "";
+            ($_SESSION['status'] == "themeInstalled") ? array_push($status, "Theme installation process is successful, please activate it first to see it works!") : "";
+            ($_SESSION['status'] == "themeUpdated") ? array_push($status, "Theme updated") : "";
             ($_SESSION['status'] == "themeActivated") ? array_push($status, "Theme activated") : "";
+            ($_SESSION['status'] == "themeDeactivated") ? array_push($status, "Theme deactivated") : "";
             ($_SESSION['status'] == "themeDeleted") ? array_push($status, "Theme deleted") : "";
             unset($_SESSION['status']);
+            $checkStatus = !empty($status);
         }
 
         if (isset($_SESSION['error'])) {
@@ -427,8 +429,57 @@ class ThemeController extends BaseApp
                 } else {
                     $this->themeService->setThemeId($id);
                     $this->themeService->activateInstalledTheme();
-                    $_SESSION['status'] = "themeActived";
-                    direct_page('index.php?load=templates&status=themeActived', 302);
+                    $_SESSION['status'] = "themeActivated";
+                    direct_page('index.php?load=templates&status=themeActivated', 302);
+                }
+            } catch (Throwable $th) {
+                LogError::setStatusCode(http_response_code());
+                LogError::exceptionHandler($th);
+            } catch (AppException $e) {
+                LogError::setStatusCode(http_response_code());
+                LogError::exceptionHandler($e);
+            }
+        }
+    }
+
+    public function disableTheme($id)
+    {
+
+        $checkError = true;
+        $errors = array();
+
+        if (isset($_GET['Id'])) {
+            $getTheme = $this->themeService->grabTheme($id);
+
+            try {
+                if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    throw new AppException("Sorry, unpleasant attempt detected!");
+                }
+
+                if (!filter_var($id, FILTER_VALIDATE_INT)) {
+                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    throw new AppException("Sorry, unpleasant attempt detected!");
+                }
+
+                if (!$getTheme) {
+                    $checkError = false;
+                    array_push($errors, 'Error: Theme not found');
+                }
+
+                if (!$checkError) {
+                    $this->setView('all-templates');
+                    $this->setPageTitle('Theme not found');
+                    $this->view->set('pageTitle', $this->getPageTitle());
+                    $this->view->set('errors', $errors);
+                    $this->view->set('themesTotal', $this->themeService->totalThemes());
+                    $this->view->set('themes', $this->themeService->grabThemes());
+                    return $this->view->render();
+                } else {
+                    $this->themeService->setThemeId($id);
+                    $this->themeService->deactivateInstalledTheme();
+                    $_SESSION['status'] = "themeDeactivated";
+                    direct_page('index.php?load=templates&status=themeDeactivated', 302);
                 }
             } catch (Throwable $th) {
                 LogError::setStatusCode(http_response_code());

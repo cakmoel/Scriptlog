@@ -116,10 +116,21 @@ endif;
 </div>
 
 <div class="form-group">
-<label for="menu_sort">Order</label>
-<input type="number" class="form-control" name="menu_sort" id="menu_sort" min="0" oninput="this.value = Math.abs(this.value)" value="
-<?=(isset($menuData['menu_sort'])) ? $menuData['menu_sort'] : ''; ?>
-<?=(isset($formData['menu_sort'])) ? safe_html($formData['menu_sort']) : ''; ?>" >
+<label for="menu_sort">Order (ID: <?=(isset($menuData['ID'])) ? $menuData['ID'] : 'none'?>)</label>
+<input type="number" class="form-control" name="menu_sort" id="menu_sort" min="0" oninput="this.value = Math.abs(this.value)" value="<?php 
+$menuSort = '';
+if (isset($menuData)) {
+    if (is_array($menuData) && isset($menuData['menu_sort'])) {
+        $menuSort = $menuData['menu_sort'];
+    } elseif (is_object($menuData) && isset($menuData->menu_sort)) {
+        $menuSort = $menuData->menu_sort;
+    }
+}
+if ((string)$menuSort === '' && isset($formData['menu_sort'])) {
+    $menuSort = $formData['menu_sort'];
+}
+echo $menuSort;
+?>" >
 </div>
 
 </div>
