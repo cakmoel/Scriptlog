@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      APP_URL: https://blogware.site
     
     services:
       mysql:
