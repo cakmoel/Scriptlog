@@ -64,4 +64,20 @@ jobs:
           '
 
       - name: Run PHPUnit
-        run: vendor/bin/phpunit tests/unit tests/service tests/integration --testdox --colors=never
+        run: |
+          # Create config.php for tests
+          cat > src/config.php << 'EOF'
+          <?php
+          return [
+              'app' => [
+                  'url' => $_ENV['APP_URL'] ?? 'https://blogware.site',
+              ],
+              'db' => [
+                  'host' => '127.0.0.1',
+                  'user' => 'root',
+                  'pass' => 'root',
+                  'name' => 'blogware_test',
+              ]
+          ];
+          EOF
+          vendor/bin/phpunit tests/unit tests/service tests/integration --testdox --colors=never
