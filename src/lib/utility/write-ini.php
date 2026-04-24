@@ -27,16 +27,28 @@
 function write_ini(string $file, array $array = [])
 {
 
-    if (!is_readable($file)) {
-        scriptlog_error("$file is not exists or not writeable");
-    }
-
     if (!is_string($file)) {
         scriptlog_error("Function argument 1 must be a string");
     }
 
     if (!is_array($array)) {
         scriptlog_error("Function argument 2 must be an array");
+    }
+
+    // Check if file exists and fix permissions if not writable
+    if (file_exists($file) && !is_writable($file)) {
+        chmod($file, 0644);
+        clearstatcache();
+    }
+    
+    // Also try to fix directory permissions
+    $dir = dirname($file);
+    if (is_dir($dir) && !is_writable($dir)) {
+        chmod($dir, 0755);
+    }
+
+    if (!is_readable($file)) {
+        scriptlog_error("$file is not exists or not writeable");
     }
 
     // process array

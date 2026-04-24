@@ -200,7 +200,7 @@ class MenuController extends BaseApp
           'menu_link' => $getMenu['menu_link'],
           'menu_status' => $getMenu['menu_status'],
           'menu_visibility' => $getMenu['menu_visibility'],
-          'paret_id' => $getMenu['parent_id'],
+          'parent_id' => $getMenu['parent_id'],
           'menu_sort' => $getMenu['menu_sort'],
           'menu_locale' => $getMenu['menu_locale'] ?? 'en'
         );

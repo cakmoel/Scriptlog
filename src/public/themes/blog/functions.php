@@ -1,32 +1,36 @@
 <?php
 
 /**
- * Fast JSON-based translation for frontend
- * No database calls - uses JSON files directly
+ * Blog Theme Functions
+ * 
+ * Theme-specific functions for the Bootstrap Blog theme.
+ * All functions use function_exists() guards to avoid redeclaration errors.
  *
- * @param string $key Translation key
- * @param array $params Interpolation parameters
- * @return string
+ * @category Theme Function
+ * @package Scriptlog
  */
+
+defined('SCRIPTLOG') || die('Direct access not permitted');
+
+/**
+ * t() - Translation function for frontend
+ */
+if (!function_exists('t')) {
 function t(string $key, array $params = []): string
 {
     static $translations = [];
     static $locale = null;
 
-    // Detect locale once
     if ($locale === null) {
         $locale = detect_browser_locale();
     }
 
-    // Load translations if not loaded
     if (!isset($translations[$locale])) {
         $translations[$locale] = load_theme_translations($locale);
     }
 
-    // Get translation or fallback to English
     $value = $translations[$locale][$key] ?? ($translations['en'][$key] ?? $key);
 
-    // Interpolate parameters
     if (!empty($params)) {
         foreach ($params as $param => $val) {
             $value = str_replace('%' . $param . '%', $val, $value);
@@ -35,16 +39,17 @@ function t(string $key, array $params = []): string
 
     return $value;
 }
+}
 
 /**
- * Detect browser locale - fastest method
+ * detect_browser_locale() - Detect browser locale
  */
+if (!function_exists('detect_browser_locale')) {
 function detect_browser_locale(): string
 {
     $available = ['en', 'es', 'ar', 'zh', 'fr', 'ru', 'id'];
     $default = 'en';
 
-    // Check session/cookie first (if user explicitly selected)
     if (isset($_SESSION['scriptlog_locale']) && in_array($_SESSION['scriptlog_locale'], $available)) {
         return $_SESSION['scriptlog_locale'];
     }
@@ -53,7 +58,6 @@ function detect_browser_locale(): string
         return $_COOKIE['scriptlog_locale'];
     }
 
-    // Detect from browser - fastest approach
     if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
         $languages = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
         foreach ($languages as $lang) {
@@ -67,10 +71,12 @@ function detect_browser_locale(): string
 
     return $default;
 }
+}
 
 /**
- * Load translations from JSON file - fast, no database
+ * load_theme_translations() - Load translations from JSON file
  */
+if (!function_exists('load_theme_translations')) {
 function load_theme_translations(string $locale): array
 {
     static $cache = [];
@@ -91,23 +97,22 @@ function load_theme_translations(string $locale): array
 
     return $cache[$locale];
 }
+}
 
 /**
- * Reset translation cache - useful for testing
+ * reset_i18n_cache() - Reset translation cache
  */
+if (!function_exists('reset_i18n_cache')) {
 function reset_i18n_cache(): void
 {
-    // This function can be called to reset static caches
-    // Not implemented for production use but useful for testing
+    // Utility function for testing
+}
 }
 
 /**
  * locale_url() - Get URL with locale prefix
- *
- * @param string $path
- * @param string|null $locale
- * @return string
  */
+if (!function_exists('locale_url')) {
 function locale_url(string $path = '', ?string $locale = null): string
 {
     if (!class_exists('I18nManager')) {
@@ -120,44 +125,31 @@ function locale_url(string $path = '', ?string $locale = null): string
     $targetLocale = $locale ?? $i18n->getLocale();
 
     $permalinksEnabled = function_exists('rewrite_status') && rewrite_status() === 'yes';
-    $prefixEnabled = is_locale_prefix_enabled();
+    $prefixEnabled = function_exists('is_locale_prefix_enabled') ? is_locale_prefix_enabled() : false;
 
-    // When permalinks disabled: never add prefix (query string format)
     if (!$permalinksEnabled) {
         return $path;
     }
 
-    // When permalinks enabled but prefix toggle off:
-    // - Default language: no prefix (e.g., /post/1/slug)
-    // - Non-default language: no prefix (maintains existing behavior)
     if ($permalinksEnabled && !$prefixEnabled) {
-        // Only add prefix for non-default languages if you want
-        // But per current logic, no prefix for any when toggle is off
         if ($targetLocale === $defaultLocale) {
             return $path;
         }
-        // Optional: add prefix for non-default when toggle is off
-        // return '/' . $targetLocale . ($path ? '/' . ltrim($path, '/') : '');
         return $path;
     }
 
-    // When both permalinks enabled and prefix toggle on:
-    // - Default language: no prefix (e.g., /post/1/slug)
-    // - Non-default language: add prefix (e.g., /es/post/1/slug)
     if ($targetLocale === $defaultLocale) {
         return $path;
     }
 
     return '/' . $targetLocale . ($path ? '/' . ltrim($path, '/') : '');
 }
+}
 
 /**
- * is_locale_prefix_enabled()
- *
- * Check if locale prefix should be added to URLs
- *
- * @return bool
+ * is_locale_prefix_enabled() - Check if locale prefix should be added
  */
+if (!function_exists('is_locale_prefix_enabled')) {
 function is_locale_prefix_enabled(): bool
 {
     if (!class_exists('ConfigurationDao')) {
@@ -172,14 +164,12 @@ function is_locale_prefix_enabled(): bool
         return false;
     }
 }
+}
 
 /**
- * get_default_locale()
- *
- * Get the default locale from settings
- *
- * @return string
+ * get_default_locale() - Get the default locale
  */
+if (!function_exists('get_default_locale')) {
 function get_default_locale(): string
 {
     if (!class_exists('I18nManager')) {
@@ -189,12 +179,12 @@ function get_default_locale(): string
     $i18n = I18nManager::getInstance();
     return $i18n->getDetector()->getDefaultLocale();
 }
+}
 
 /**
  * get_locale() - Get current locale
- *
- * @return string
  */
+if (!function_exists('get_locale')) {
 function get_locale(): string
 {
     if (!class_exists('I18nManager')) {
@@ -204,12 +194,12 @@ function get_locale(): string
     $i18n = I18nManager::getInstance();
     return $i18n->getLocale();
 }
+}
 
 /**
  * available_locales() - Get available locales
- *
- * @return array
  */
+if (!function_exists('available_locales')) {
 function available_locales(): array
 {
     if (!class_exists('I18nManager')) {
@@ -219,12 +209,12 @@ function available_locales(): array
     $i18n = I18nManager::getInstance();
     return $i18n->getAvailableLocales();
 }
+}
 
 /**
  * is_rtl() - Check if current locale is RTL
- *
- * @return bool
  */
+if (!function_exists('is_rtl')) {
 function is_rtl(): bool
 {
     if (!class_exists('I18nManager')) {
@@ -234,24 +224,22 @@ function is_rtl(): bool
     $i18n = I18nManager::getInstance();
     return $i18n->isRtl();
 }
+}
 
 /**
  * get_html_dir() - Get HTML dir attribute
- *
- * @return string
  */
+if (!function_exists('get_html_dir')) {
 function get_html_dir(): string
 {
     return is_rtl() ? 'rtl' : 'ltr';
 }
+}
 
 /**
  * get_language_name() - Get human-readable language name
- *
- * @param string $locale Language code (en, ar, zh, fr, ru, es, id)
- * @param bool $native Return native name if true, English name if false
- * @return string
  */
+if (!function_exists('get_language_name')) {
 function get_language_name(string $locale, bool $native = true): string
 {
     $names = [
@@ -267,12 +255,12 @@ function get_language_name(string $locale, bool $native = true): string
     $key = $native ? 'native' : 'english';
     return $names[$locale][$key] ?? ucfirst($locale);
 }
+}
 
 /**
  * get_all_language_names() - Get all available language names
- *
- * @return array
  */
+if (!function_exists('get_all_language_names')) {
 function get_all_language_names(): array
 {
     $locales = available_locales();
@@ -288,13 +276,12 @@ function get_all_language_names(): array
 
     return $names;
 }
+}
 
 /**
  * language_switcher() - Generate language switcher HTML
- *
- * @param array $args Optional arguments
- * @return string
  */
+if (!function_exists('language_switcher')) {
 function language_switcher(array $args = []): string
 {
     $current = get_locale();
@@ -347,26 +334,22 @@ function language_switcher(array $args = []): string
 
     return $html;
 }
+}
 
 /**
- * request_path()
- *
- * @category theme function
- * @return object
- *
+ * request_path() - Get request path object
  */
+if (!function_exists('request_path')) {
 function request_path()
 {
     return class_exists('RequestPath') ? new RequestPath() : "";
 }
+}
 
 /**
- * previous_post()
- *
- * @category theme function
- * @param int|num $id
- *
+ * previous_post() - Get previous post link
  */
+if (!function_exists('previous_post')) {
 function previous_post($id)
 {
     $idsanitized = sanitizer($id, 'sql');
@@ -388,15 +371,12 @@ function previous_post($id)
 
     return $html;
 }
+}
 
 /**
- * next_post()
- *
- * @category theme function
- *
- * @param int|num $id
- *
+ * next_post() - Get next post link
  */
+if (!function_exists('next_post')) {
 function next_post($id)
 {
     $idsanitized = sanitizer($id, 'sql');
@@ -418,190 +398,164 @@ function next_post($id)
 
     return $html;
 }
+}
 
 /**
  * initialize_page()
- *
- * @category theme function
- * @return object
- *
  */
+if (!function_exists('initialize_page')) {
 function initialize_page()
 {
     return class_exists('PageModel') ? new PageModel() : "";
 }
+}
 
 /**
  * initialize_post()
- *
- * @category theme function
- * @return object
  */
+if (!function_exists('initialize_post')) {
 function initialize_post()
 {
     return class_exists('PostModel') ? new PostModel() : "";
 }
+}
 
 /**
- * initialize_comment
- *
- * @category theme function
- * @return object
- *
+ * initialize_comment()
  */
+if (!function_exists('initialize_comment')) {
 function initialize_comment()
 {
     return class_exists('CommentModel') ? new CommentModel() : "";
 }
+}
 
 /**
  * initialize_archive()
- *
- * @category theme function
- * @return object
- *
  */
+if (!function_exists('initialize_archive')) {
 function initialize_archive()
 {
     return class_exists('ArchivesModel') ? new ArchivesModel() : "";
 }
+}
 
 /**
  * initialize_topic()
- *
- * @category theme function
- * @return object
  */
+if (!function_exists('initialize_topic')) {
 function initialize_topic()
 {
     return class_exists('TopicModel') ? new TopicModel() : "";
 }
+}
 
 /**
  * initialize_tag()
- *
- * @category theme function
- * @return object
- *
  */
+if (!function_exists('initialize_tag')) {
 function initialize_tag()
 {
     return class_exists('TagModel') ? new TagModel() : "";
 }
-
-/**
- * initialize_gallery()
- *
- * @return object
- *
- */
-function initialize_gallery()
-{
-    return (class_exists('GalleryModel')) ? new GalleryModel() : "";
 }
 
 /**
- * featured_post()
- *
- * retrieving random headlines
- *
- * @category themes function
- * @return array
- *
+ * initialize_gallery()
  */
+if (!function_exists('initialize_gallery')) {
+function initialize_gallery()
+{
+    return class_exists('GalleryModel') ? new GalleryModel() : "";
+}
+}
+
+/**
+ * featured_post() - Get random headline posts
+ */
+if (!function_exists('featured_post')) {
 function featured_post()
 {
     $headlines = class_exists('FrontContentModel') ? FrontContentModel::frontRandomHeadlines(initialize_post()) : "";
     return is_iterable($headlines) ? $headlines : array();
 }
+}
 
 /**
- * get_slideshow
- *
- * @category theme function
- * @return mixed|array
+ * get_slideshow() - Get posts with media for slideshow
  */
+if (!function_exists('get_slideshow')) {
 function get_slideshow($limit = 5)
 {
     if (function_exists('medoo_init')) {
         $database = medoo_init();
+        return $database->select('tbl_posts', [
+            '[>]tbl_media' => ['media_id' => 'ID'],
+            '[>]tbl_users' => ['post_author' => 'ID']
+        ], [
+            'tbl_posts.ID(post_id)',
+            'tbl_posts.post_title',
+            'tbl_posts.post_content',
+            'tbl_posts.post_slug',
+            'tbl_posts.post_summary',
+            'tbl_posts.post_date(created_at)',
+            'tbl_posts.post_modified(modified_at)',
+            'tbl_media.media_filename',
+            'tbl_media.media_caption',
+            'tbl_users.user_fullname',
+            'tbl_users.user_login'
+        ], [
+            'tbl_posts.post_status' => 'publish',
+            'tbl_posts.post_type' => 'blog',
+            'tbl_media.media_target' => 'blog',
+            'tbl_media.media_access' => 'public',
+            'tbl_media.media_status' => 1,
+            'tbl_users.user_banned' => 0,
+            'ORDER' => ['tbl_posts.post_date' => 'DESC'],
+            'LIMIT' => $limit
+        ]);
     }
-
-    return $database->select('tbl_posts', [
-      '[>]tbl_media' => ['media_id' => 'ID'],
-      '[>]tbl_users' => ['post_author' => 'ID']
-    ], [
-      'tbl_posts.ID(post_id)',
-      'tbl_posts.post_title',
-      'tbl_posts.post_content',
-      'tbl_posts.post_slug',
-      'tbl_posts.post_summary',
-      'tbl_posts.post_date(created_at)',
-      'tbl_posts.post_modified(modified_at)',
-      'tbl_media.media_filename',
-      'tbl_media.media_caption',
-      'tbl_users.user_fullname',
-      'tbl_users.user_login'
-    ], [
-      'tbl_posts.post_status' => 'publish',
-      'tbl_posts.post_type' => 'blog',
-      'tbl_media.media_target' => 'blog',
-      'tbl_media.media_access' => 'public',
-      'tbl_media.media_status' => 1,
-      'tbl_users.user_banned' => 0,
-      'ORDER' => ['tbl_posts.post_date' => 'DESC'],
-      'LIMIT' => $limit
-    ]);
+    return [];
+}
 }
 
 /**
- * sticky_page()
- *
- * @category theme function
- * @return mixed
- *
+ * sticky_page() - Get random sticky page
  */
+if (!function_exists('sticky_page')) {
 function sticky_page()
 {
     $sticky_page = class_exists('FrontContentModel') ? FrontContentModel::frontRandomStickyPage(initialize_page()) : "";
     return is_iterable($sticky_page) ? $sticky_page : array();
 }
+}
 
 /**
- * random_posts()
- *
- * @category theme function
- * @param int|num $limit
- * @return mixed
- *
+ * random_posts() - Get random posts
  */
+if (!function_exists('random_posts')) {
 function random_posts($start, $end)
 {
     $random_posts = class_exists('FrontContentModel') ? FrontContentModel::frontRandomPosts($start, $end, initialize_post()) : "";
     return is_iterable($random_posts) ? $random_posts : array();
 }
+}
 
 /**
- * latest_posts()
- *
- * @category theme function
- * @param int|numeric $position
- * @param int|numeric $limit
- * @return array
- *
+ * latest_posts() - Get latest posts
  */
+if (!function_exists('latest_posts')) {
 function latest_posts($limit, $position = null)
 {
     $latest_posts = class_exists('FrontContentModel') ? FrontContentModel::frontLatestPosts($limit, initialize_post(), $position) : "";
     return is_iterable($latest_posts) ? $latest_posts : array();
 }
+}
 
 /**
- * format_topics
- *
- * @param string $topics_data
- * @return string
+ * format_topics() - Format topics string to HTML links
  */
+if (!function_exists('format_topics')) {
 function format_topics($topics_data)
 {
     if (empty($topics_data)) {
@@ -618,7 +572,7 @@ function format_topics($topics_data)
             $title = $parts[1];
             $slug = $parts[2];
 
-            $permalink = (rewrite_status() === 'yes') ? permalinks($slug)['cat'] : permalinks($id)['cat'];
+            $permalink = (function_exists('rewrite_status') && rewrite_status() === 'yes') ? permalinks($slug)['cat'] : permalinks($id)['cat'];
             $title_esc = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
             $links[] = "<a href='{$permalink}'>{$title_esc}</a>";
         }
@@ -626,17 +580,14 @@ function format_topics($topics_data)
 
     return implode(', ', $links);
 }
+}
 
 /**
- * retrieves_topic_simple()
- *
- * @category theme function
- * @param int|num $id
- *
+ * retrieves_topic_simple() - Get topic links for post
  */
+if (!function_exists('retrieves_topic_simple')) {
 function retrieves_topic_simple($id)
 {
-
     $categories = array();
 
     $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug
@@ -647,7 +598,7 @@ function retrieves_topic_simple($id)
 
     if ($stmt) {
         while ($result = $stmt->fetch()) {
-            $permalinks = (rewrite_status() === 'yes')
+            $permalinks = (function_exists('rewrite_status') && rewrite_status() === 'yes')
                 ? (permalinks($result['topic_slug'])['cat'] ?? '#')
                 : (permalinks($result['ID'])['cat'] ?? '#');
 
@@ -657,20 +608,16 @@ function retrieves_topic_simple($id)
         }
     }
 
-    // Return the concatenated HTML links
     return implode("", $categories);
+}
 }
 
 /**
- * retrieves_topic_prepared()
- *
- * @category theme function
- * @param int|num $id
- *
+ * retrieves_topic_prepared() - Get topic links with status check
  */
+if (!function_exists('retrieves_topic_prepared')) {
 function retrieves_topic_prepared($id)
 {
-
     $topics = null;
     $sql = "SELECT tbl_topics.ID, tbl_topics.topic_title, tbl_topics.topic_slug, tbl_topics.topic_status
           FROM tbl_topics, tbl_post_topic
@@ -687,200 +634,154 @@ function retrieves_topic_prepared($id)
 
     return implode("", $topics ?? []);
 }
+}
 
 /**
- * sidebar_topics()
- *
- * retrieving categories and display it on sidebar
- *
- * @return mixed
- *
+ * sidebar_topics() - Get topics for sidebar
  */
+if (!function_exists('sidebar_topics')) {
 function sidebar_topics()
 {
     $sidebar_topics = class_exists('FrontContentModel') ? FrontContentModel::frontSidebarTopics(initialize_topic()) : "";
     return is_iterable($sidebar_topics) ? $sidebar_topics : array();
 }
+}
 
 /**
- * retrieve_tags()
- *
- * retrieving tags records and display it on sidebar
- *
+ * retrieve_tags() - Get tags for sidebar
  */
+if (!function_exists('retrieve_tags')) {
 function retrieve_tags()
 {
     return (function_exists('outputting_tags')) ? outputting_tags() : "";
 }
+}
 
 /**
- * link_tag()
- *
- * @param num|int $id
- * @return mixed
- *
+ * link_tag() - Generate tag links
  */
+if (!function_exists('link_tag')) {
 function link_tag($id)
 {
     return (class_exists('FrontContentModel')) ? FrontContentModel::frontLinkTag($id, initialize_tag()) : "";
 }
+}
 
 /**
- * link_topic()
- *
- * @param num|int $id
- * @return mixed
- *
+ * link_topic() - Generate topic link
  */
+if (!function_exists('link_topic')) {
 function link_topic($id)
 {
     return (class_exists('FrontContentModel')) ? FrontContentModel::frontLinkTopic($id, initialize_topic()) : "";
 }
+}
 
 /**
- * display_galleries()
- *
- * @category theme function
- * @param int|num $start
- * @param int|num $limit
- *
+ * display_galleries() - Get gallery images
  */
+if (!function_exists('display_galleries')) {
 function display_galleries($start, $limit)
 {
     $showcase = class_exists('FrontContentModel') ? FrontContentModel::frontGalleries(initialize_gallery(), $start, $limit) : "";
     return is_iterable($showcase) ? $showcase : array();
 }
+}
 
 /**
- * retrieve_blog_posts()
- *
- * retrieving all posts published and display it on blog
- *
- * @category theme function
- * @return mixed
- *
+ * retrieve_blog_posts() - Get all blog posts
  */
+if (!function_exists('retrieve_blog_posts')) {
 function retrieve_blog_posts()
 {
     $posts = class_exists('FrontContentModel') ? FrontContentModel::frontBlogPosts(initialize_post()) : "";
     return is_iterable($posts) ? $posts : array();
 }
+}
 
 /**
- * retrieve_detail_post()
- *
- * @category theme function
- * @param int $id
- * @return mixed
- *
+ * retrieve_detail_post() - Get single post by ID
  */
+if (!function_exists('retrieve_detail_post')) {
 function retrieve_detail_post($id)
 {
     $detail_post = class_exists('FrontContentModel') ? FrontContentModel::frontPostById($id, initialize_post()) : "";
     return is_iterable($detail_post) ? $detail_post : array();
 }
+}
 
 /**
- * posts_by_archive
- *
- * retrieving posts by archive requested
- *
- * @category theme function
- * @param array $values
- * @return mixed
- *
+ * posts_by_archive() - Get posts by archive
  */
+if (!function_exists('posts_by_archive')) {
 function posts_by_archive(array $values)
 {
     $archives = class_exists('FrontContentModel') ? FrontContentModel::frontPostsByArchive($values, initialize_archive()) : "";
     return is_iterable($archives) ? $archives : array();
 }
+}
 
 /**
- * archive_index()
- *
- * Get all archives for index page
- *
- * @category theme function
- * @return mixed
+ * archive_index() - Get all archives for index
  */
+if (!function_exists('archive_index')) {
 function archive_index()
 {
     $archives = class_exists('FrontContentModel') ? FrontContentModel::frontArchiveIndex(initialize_archive()) : "";
     return is_iterable($archives) ? $archives : array();
 }
+}
 
 /**
- * posts_by_tag
- *
- * @category theme function
- * @param string $tag
- * @return mixed
- *
+ * posts_by_tag() - Get posts by tag
  */
+if (!function_exists('posts_by_tag')) {
 function posts_by_tag($tag)
 {
     $tags = class_exists('FrontContentModel') ? FrontContentModel::frontPostsByTag($tag, initialize_tag()) : "";
     return is_iterable($tags) ? $tags : array();
 }
+}
 
 /**
- * posts_by_tag()
- *
- * Full-Text searching for posts based on tag requested
- *
- * @category theme function
- * @param string $tag
- * @return mixed
- *
+ * searching_by_tag() - Full-text tag search
  */
+if (!function_exists('searching_by_tag')) {
 function searching_by_tag($tag)
 {
     $tags = class_exists('FrontHelper') ? FrontHelper::simpleSearchingTag($tag) : "";
     return is_iterable($tags) ? $tags : array();
 }
+}
 
 /**
- * posts_by_category
- *
- * @category theme function
- * @param numeric|int $category
- * @param string $rewrite
- * @return mixed
+ * posts_by_category() - Get posts by category
  */
+if (!function_exists('posts_by_category')) {
 function posts_by_category($topicId)
 {
-
     $entries = FrontContentModel::frontPostsByTopic($topicId, initialize_topic())['entries'];
     $pagination = FrontContentModel::frontPostsByTopic($topicId, initialize_topic())['pagination'];
 
     return is_iterable($entries) ? array('entries' => $entries, 'pagination' => $pagination) : array();
 }
+}
 
 /**
- * retrieve_archives()
- *
- * retrieving list of archives and display it on sidebar theme
- *
- * @category theme function
- * @return mixed
- *
+ * retrieve_archives() - Get archives for sidebar
  */
+if (!function_exists('retrieve_archives')) {
 function retrieve_archives()
 {
     $archives = class_exists('FrontContentModel') ? FrontContentModel::frontSidebarArchives(initialize_archive()) : "";
     return is_iterable($archives) ? $archives : array();
 }
+}
 
 /**
- * retrieve_page
- *
- * @category theme function
- * @param int|string|numeric $arg
- * @param string $rewrite
- * @return mixed
- *
+ * retrieve_page() - Get page by ID or slug
  */
+if (!function_exists('retrieve_page')) {
 function retrieve_page($arg, $rewrite)
 {
     if ($rewrite == 'no') {
@@ -891,13 +792,12 @@ function retrieve_page($arg, $rewrite)
         return is_iterable($page) ? $page : [];
     }
 }
+}
 
 /**
- * total_comment
- *
- * @param int| $id
- *
+ * total_comment() - Get total approved comments for post
  */
+if (!function_exists('total_comment')) {
 function total_comment($id)
 {
     $sql = "SELECT COUNT(1) AS total_comments FROM tbl_comments WHERE comment_post_id = ? AND comment_status = 'approved'";
@@ -906,29 +806,22 @@ function total_comment($id)
 
     return isset($row['total_comments']) ? ['total' => $row['total_comments']] : ['total' => 0];
 }
+}
 
 /**
- * block_csrf
- *
- * generating string token
- * @return string
- *
+ * block_csrf() - Generate CSRF token for comment form
  */
+if (!function_exists('block_csrf')) {
 function block_csrf()
 {
     return (function_exists('generate_form_token')) ? generate_form_token('comment_form', 32) : "";
 }
+}
 
 /**
- * front_navigation
- *
- * Renders navigation menu HTML with proper URL format based on permalink settings.
- * Automatically converts between SEO-friendly URLs and query string URLs.
- *
- * @param int|num| $parent
- * @param array $menu
- * @return string
+ * front_navigation() - Render navigation menu
  */
+if (!function_exists('front_navigation')) {
 function front_navigation($parent, $menu)
 {
     $html = "";
@@ -940,7 +833,6 @@ function front_navigation($parent, $menu)
             $link = $item['menu_link'];
             $label = $item['menu_label'];
             
-            // Convert URL based on permalink status
             $convertedLink = convert_menu_link($link, $permalinkEnabled);
             
             if (!isset($menu['parents'][$itemId])) {
@@ -958,35 +850,23 @@ function front_navigation($parent, $menu)
 
     return $html;
 }
+}
 
 /**
- * convert_menu_link
- *
- * Converts menu link between SEO-friendly and query string formats based on permalink status.
- * 
- * @param string $link Original menu link
- * @param bool $permalinkEnabled Whether permalinks are enabled
- * @return string Converted link
+ * convert_menu_link() - Convert menu link between URL formats
  */
+if (!function_exists('convert_menu_link')) {
 function convert_menu_link(string $link, bool $permalinkEnabled): string
 {
-    // Skip external links, anchors, and special links
     if (empty($link) || $link === '#' || strpos($link, '://') !== false || strpos($link, 'mailto:') !== false || strpos($link, '#') === 0) {
         return $link;
     }
     
-    // Skip full URLs - only convert relative links
     if (strpos($link, 'http://') === 0 || strpos($link, 'https://') === 0) {
         return $link;
     }
     
     if ($permalinkEnabled) {
-        // Convert query string format to SEO-friendly format
-        // ?p=1 -> /post/1/slug
-        // ?pg=1 -> /page/slug
-        // ?cat=1 -> /category/slug
-        // ?a=032025 -> /archive/03/2025
-        
         if (preg_match('/^\?p=(\d+)$/', $link, $matches)) {
             $id = $matches[1];
             $converted = permalinks($id);
@@ -1011,12 +891,10 @@ function convert_menu_link(string $link, bool $permalinkEnabled): string
             return $converted['archive'] ?? $link;
         }
         
-        // Already in SEO format, return as-is
         if (strpos($link, '/') === 0) {
             return $link;
         }
         
-        // Remove .php extension and add leading slash if needed
         $cleanLink = str_replace('.php', '', $link);
         if (strpos($cleanLink, '/') !== 0) {
             $cleanLink = '/' . $cleanLink;
@@ -1024,18 +902,11 @@ function convert_menu_link(string $link, bool $permalinkEnabled): string
         
         return $cleanLink;
     } else {
-        // Convert SEO-friendly format to query string format
-        // /post/1/slug -> ?p=1
-        // /page/slug -> ?pg=ID
-        // /category/slug -> ?cat=ID
-        // /archive/03/2025 -> ?a=032025
-        
         if (preg_match('/^\/post\/(\d+)\/[\w-]+$/', $link, $matches)) {
             return '?p=' . $matches[1];
         }
         
         if (preg_match('/^\/page\/([\w-]+)$/', $link, $matches)) {
-            // Need to resolve page slug to ID - use FrontHelper
             if (class_exists('FrontHelper')) {
                 $page = FrontHelper::grabPreparedFrontPageBySlug($matches[1]);
                 return '?pg=' . ($page['ID'] ?? 1);
@@ -1055,7 +926,6 @@ function convert_menu_link(string $link, bool $permalinkEnabled): string
             return '?a=' . $matches[2] . $matches[1];
         }
         
-        // For other links, just remove leading slash and prepend ? if needed
         if (strpos($link, '/') === 0) {
             return '?' . ltrim($link, '/');
         }
@@ -1063,45 +933,51 @@ function convert_menu_link(string $link, bool $permalinkEnabled): string
         return $link;
     }
 }
+}
 
 /**
- * retrieve_site_url
- *
- * @return mixed
- *
+ * retrieve_site_url() - Get site URL from config
  */
+if (!function_exists('retrieve_site_url')) {
 function retrieve_site_url()
 {
     $config_file = read_config(invoke_config());
     return isset($config_file['app']['url']) ? $config_file['app']['url'] : "";
 }
+}
 
+/**
+ * load_more_comments()
+ */
+if (!function_exists('load_more_comments')) {
 function load_more_comments()
 {
 }
+}
+
 /**
- * nothing_found
- *
- * @return string
- *
+ * nothing_found() - Display "no posts" message
  */
+if (!function_exists('nothing_found')) {
 function nothing_found()
 {
-
     $site_url = function_exists('app_url') ? app_url() . "/admin/login.php" : "";
 
     return <<<_NOTHING_FOUND
-
 <div class="alert alert-warning" role="alert">
-  <h4 class="alert-heading">Whoops !</h4>
+  <h4 class="alert-heading">Whoops!</h4>
   <p>I haven't posted to my blog yet!</p>
   <hr>
   <p class="mb-0">Please go to <a href="$site_url" target="_blank" rel="noopener noreferrer" title="administrator panel">administrator panel</a> to populate your blog.</p>
 </div>
-
 _NOTHING_FOUND;
 }
+}
 
+/**
+ * render_comments_section() - Render comments section HTML
+ */
+if (!function_exists('render_comments_section')) {
 function render_comments_section(int $postId, int $offset = 0): string
 {
     $totalRecords = isset(total_comment($postId)['total']) ? (int) total_comment($postId)['total'] : 0;
@@ -1142,4 +1018,5 @@ function render_comments_section(int $postId, int $offset = 0): string
 
     <?php
     return ob_get_clean();
+}
 }

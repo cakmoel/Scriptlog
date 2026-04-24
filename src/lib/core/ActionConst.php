@@ -81,6 +81,7 @@ class ActionConst
     public const NEWTHEME      = "newTheme";
     public const INSTALLTHEME  = "installTheme";
     public const ACTIVATETHEME = "activateTheme";
+    public const DEACTIVATETHEME = "deactivateTheme";
     public const EDITTHEME     = "editTheme";
     public const DELETETHEME   = "deleteTheme";
 

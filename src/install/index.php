@@ -165,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $defuse_key_path = generate_defuse_key();
                 } catch (Exception $e) {
                     error_log("Failed to generate defuse key: " . $e->getMessage());
-                    $defuse_key_path = dirname(__DIR__, 2) . '/src/lib/utility/.lts/lts.php';
+                    $defuse_key_path = dirname(__DIR__, 2) . '/lib/utility/.lts/lts.php';
                 }
 
                 install_database_table($link, $protocol, $server_host, $username, $password, $email, $key, $table_prefix, $site_language, $defuse_key_path);
@@ -422,9 +422,9 @@ install_header($current_path);
                                 </div>
                             </div>
                             
-                            <div class="alert alert-warning py-3 mb-4 rounded-lg d-flex align-items-center border-0" style="background: rgba(127, 255, 0, 0.05); color: #122430;">
-                                <i class="fa fa-shield mr-3 fa-lg"></i>
-                                <small>Strong passwords improve your site security. Aim for 8+ characters with a mix of letters and numbers.</small>
+                            <div class="alert alert-info py-3 mb-4 rounded-lg d-flex align-items-center" style="background: var(--info-bg); color: var(--info-color); border: 1px solid var(--info-border);">
+                                <i class="fa fa-shield mr-3 fa-lg" style="color: var(--info-icon);"></i>
+                                <small><strong>Password Tip:</strong> Strong passwords improve your site security. Aim for 8+ characters with a mix of letters, numbers, and special characters.</small>
                             </div>
 
                             <input type="hidden" name="setup" value="install">

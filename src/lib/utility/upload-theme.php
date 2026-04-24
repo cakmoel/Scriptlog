@@ -36,6 +36,13 @@ function upload_theme($file_name, $file_location, $blacklist)
             $zip->extractTo(APP_ROOT . 'public/themes/');
             $zip->close();
 
+            // Fix theme.ini permissions after extraction if exists
+            $theme_dir = APP_ROOT . 'public/themes/' . $file_basename;
+            $ini_file = $theme_dir . '/theme.ini';
+            if (file_exists($ini_file)) {
+                chmod($ini_file, 0644);
+            }
+
             unlink($pathFile);
         }
 

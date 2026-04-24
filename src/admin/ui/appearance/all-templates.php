@@ -43,7 +43,7 @@
                 ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h2><i class="icon fa fa-check"></i> Success!</h2>
+                <h4><i class="icon fa fa-check"></i> Success!</h4>
                        <?php
                         foreach ($status as $s) :
                             echo $s;
@@ -150,7 +150,7 @@
   {
       if (confirm("Are you sure want to deactivate theme '" + theme + "'"))
       {
-        window.location.href = 'index.php?load=templates&action=deactivatTheme&Id=' + id;
+        window.location.href = 'index.php?load=templates&action=deactivateTheme&Id=' + id;
       }
   }
 </script>
