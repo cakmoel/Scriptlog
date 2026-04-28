@@ -41,13 +41,11 @@ class BlogspotImporter
         $content = $this->cleanXmlContent($content);
 
         libxml_use_internal_errors(true);
+        
+        libxml_set_external_entity_loader(function ($public, $system, $context) {
+            return null;
+        });
 
-        @ini_set('display_errors', '0');
-        
-        if (PHP_VERSION < 80000) {
-            @libxml_disable_entity_loader(true);
-        }
-        
         $this->xml = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_DTDLOAD);
 
         if ($this->xml === false) {
