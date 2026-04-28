@@ -21,21 +21,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Menu and template management features with HATEOAS API support
 
 ### Changed
-- Revamped permalinks utility (src/lib/utility/permalinks.php)
-- Revamped theme upload utility (src/lib/utility/upload-theme.php)
+- Revamped `src/lib/utility/upload-theme.php`
+- Revamped `src/lib/utility/permalinks.php`
 - Updated libxml entity loading for PHP 8.1+ compatibility
 - Added tmp/minify.php configuration
+- Updated `tests/unit/ThemeUploadTest.php`
 
 ### Fixed
 - Corrected test paths from lib/utility to src/lib/utility
 - Set APP_URL environment variable for CI tests
 - Create config.php for CI before running tests
 - Suppress deprecated libxml warnings in PHP 8.1+
-- ThemeUploadTest.php failures
-- ApiHateoasTest URL mismatch
 - Resolved deprecated libxml_disable_entity_loader issue
 
 ### Removed
+- Unused `comment.php` from blog theme
 - Unused pictures from codebase
 
 ### Notes
