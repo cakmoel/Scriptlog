@@ -8,12 +8,47 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#104---2026-04-22)
+- [Latest Release](#105---2026-04-28)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.0.5] - 2026-04-28
+
+### Added
+- Menu and template management features with HATEOAS API support
+
+### Changed
+- Revamped `src/lib/utility/upload-theme.php`
+- Revamped `src/lib/utility/permalinks.php`
+- Updated libxml entity loading for PHP 8.1+ compatibility
+- Added tmp/minify.php configuration
+- Updated `tests/unit/ThemeUploadTest.php`
+
+### Fixed
+- Corrected test paths from lib/utility to src/lib/utility
+- Set APP_URL environment variable for CI tests
+- Create config.php for CI before running tests
+- Suppress deprecated libxml warnings in PHP 8.1+
+- Resolved deprecated libxml_disable_entity_loader issue
+
+### Removed
+- Unused `comment.php` from blog theme
+- Unused pictures from codebase
+
+### Notes
+Patch release addressing PHP 8.1+ compatibility, CI workflow improvements, and new menu/template management features.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.0.4
+- **Changes since v1.0.4**: 13 commits
+
+---
 
 ## [1.0.4] - 2026-04-22
 
@@ -54,72 +89,11 @@ Hotfix release focusing on test infrastructure improvements and path corrections
 ### Added
 - 40 unit tests for UtilityLoader class
 - OpenAPI specification files for Blogware RESTful API
+- Enhanced i18n implementation for admin panel
 
 ### Changed
 - Enhanced i18N implementation for admin panel
 - Updated documentation
-
-### Fixed
-- CSP blocking resources
-- Privacy policy page link
-- Admin sidebar menu language changes
-- Language switcher functionality
-- i18N feature bug
-- Invalid ciphertext HMAC verification
-- Undefined `load_core_utilitier` error
-- Undefined `get_table_prefix` error
-
-### Removed
-- `.lts` directory containing sensitive keys
-- PHPUnit result cache from git tracking
-
-### Notes
-Focuses on i18N improvements, security fixes, and bug corrections.
-
-### Codename
-**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
-
-### Comparison
-- **Previous release**: v1.0.2
-- **Changes since v1.0.2**: 22 commits
-
----
-
-## [1.0.4] - 2026-04-22
-
-### Added
-- OpenAPI specification verification tests (34 new tests)
-- LanguageSwitcherTest for i18n functionality
-- NavigationI18nTest for permalink URL generation
-
-### Changed
-- Extended API HATEOAS with new endpoints (GDPR, languages, translations, media)
-- Updated OpenAPI specs (src/docs/)
-
-### Fixed
-- 530 unit tests now passing
-- Test path corrections (lib -> src/lib structure)
-- ApiHateoas config path to src/config.php
-- ImageDisplayTest utility-loader path
-- TranslationLoaderTest cache expiry flaky test
-
-### Removed
-- storage/keys from repo tracking
-- tests/COVERAGE.md artifact
-
-### Notes
-Hotfix release focusing on test infrastructure improvements and path corrections.
-
-### Codename
-**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
-
-### Comparison
-- **Previous release**: v1.0.3
-- **Changes since v1.0.3**: 23 commits
-
----
-
-## [1.0.3] - 2026-04-13
 
 ### Fixed
 - **Security**: Fixed CSP blocking legitimate resources
@@ -127,9 +101,13 @@ Hotfix release focusing on test infrastructure improvements and path corrections
 - **i18n**: Fixed language switcher not working
 - **i18n**: Fixed sidebar menu not reflecting language changes
 - **Admin**: Fixed link to privacy-policy page
+- **Bug**: Fixed i18N feature bug
+- **Bug**: Fixed undefined `load_core_utilities` error
+- **Bug**: Fixed undefined `get_table_prefix` error
 
-### Added
-- Enhanced i18n implementation for admin panel
+### Removed
+- `.lts` directory containing sensitive keys
+- PHPUnit result cache from git tracking
 
 ### Details
 This patch release addresses bug fixes and reliability improvements across the framework.
@@ -208,6 +186,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.0.5 | 2026-04-28 | Stable |
 | 1.0.4 | 2026-04-22 | Stable |
 | 1.0.3 | 2026-04-13 | Stable |
 | 1.0.2 | 2026-04-10 | Stable |
