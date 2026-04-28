@@ -8,12 +8,47 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#104---2026-04-22)
+- [Latest Release](#105---2026-04-28)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.0.5] - 2026-04-28
+
+### Added
+- Menu and template management features with HATEOAS API support
+
+### Changed
+- Revamped permalinks utility (src/lib/utility/permalinks.php)
+- Revamped theme upload utility (src/lib/utility/upload-theme.php)
+- Updated libxml entity loading for PHP 8.1+ compatibility
+- Added tmp/minify.php configuration
+
+### Fixed
+- Corrected test paths from lib/utility to src/lib/utility
+- Set APP_URL environment variable for CI tests
+- Create config.php for CI before running tests
+- Suppress deprecated libxml warnings in PHP 8.1+
+- ThemeUploadTest.php failures
+- ApiHateoasTest URL mismatch
+- Resolved deprecated libxml_disable_entity_loader issue
+
+### Removed
+- Unused pictures from codebase
+
+### Notes
+Patch release addressing PHP 8.1+ compatibility, CI workflow improvements, and new menu/template management features.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.0.4
+- **Changes since v1.0.4**: 13 commits
+
+---
 
 ## [1.0.4] - 2026-04-22
 
@@ -151,6 +186,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.0.5 | 2026-04-28 | Stable |
 | 1.0.4 | 2026-04-22 | Stable |
 | 1.0.3 | 2026-04-13 | Stable |
 | 1.0.2 | 2026-04-10 | Stable |
