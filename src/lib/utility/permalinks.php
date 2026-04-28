@@ -152,13 +152,11 @@ function listen_request_path($id, $app_url)
     } elseif (($request_path->matched == 'archive') && ($id === $request_path->param1 . $request_path->param2)) {
         $month = isset($request_path->param1) ? escape_html($request_path->param1) : null;
         $year = isset($request_path->param2) ? escape_html($request_path->param2) : null;
-
         $rewrite['archive'] = $app_url . DS . 'archive' . DS . $month . DS . $year;
     } else {
         $getPost = FrontHelper::grabPreparedFrontPostById($id);
         $post_id = isset($getPost['ID']) ? abs((int)$getPost['ID']) : 0;
         $post_slug = isset($getPost['post_slug']) ? escape_html($getPost['post_slug']) : "";
-
         $rewrite['post'] = $app_url . DS . 'post' . DS . $post_id . DS . $post_slug;
 
         $getPage = FrontHelper::grabPreparedFrontPageBySlug($id);
@@ -168,7 +166,6 @@ function listen_request_path($id, $app_url)
         $getCategory = FrontHelper::grabPreparedFrontTopicByID($id);
         $category_slug = isset($getCategory['topic_slug']) ? escape_html($getCategory['topic_slug']) : $id;
         $rewrite['cat'] = $app_url . DS . 'category' . DS . $category_slug;
-
         $rewrite['archive'] = $app_url . DS . 'archive' . DS . $id;
     }
 
