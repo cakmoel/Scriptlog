@@ -54,72 +54,11 @@ Hotfix release focusing on test infrastructure improvements and path corrections
 ### Added
 - 40 unit tests for UtilityLoader class
 - OpenAPI specification files for Blogware RESTful API
+- Enhanced i18n implementation for admin panel
 
 ### Changed
 - Enhanced i18N implementation for admin panel
 - Updated documentation
-
-### Fixed
-- CSP blocking resources
-- Privacy policy page link
-- Admin sidebar menu language changes
-- Language switcher functionality
-- i18N feature bug
-- Invalid ciphertext HMAC verification
-- Undefined `load_core_utilitier` error
-- Undefined `get_table_prefix` error
-
-### Removed
-- `.lts` directory containing sensitive keys
-- PHPUnit result cache from git tracking
-
-### Notes
-Focuses on i18N improvements, security fixes, and bug corrections.
-
-### Codename
-**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
-
-### Comparison
-- **Previous release**: v1.0.2
-- **Changes since v1.0.2**: 22 commits
-
----
-
-## [1.0.4] - 2026-04-22
-
-### Added
-- OpenAPI specification verification tests (34 new tests)
-- LanguageSwitcherTest for i18n functionality
-- NavigationI18nTest for permalink URL generation
-
-### Changed
-- Extended API HATEOAS with new endpoints (GDPR, languages, translations, media)
-- Updated OpenAPI specs (src/docs/)
-
-### Fixed
-- 530 unit tests now passing
-- Test path corrections (lib -> src/lib structure)
-- ApiHateoas config path to src/config.php
-- ImageDisplayTest utility-loader path
-- TranslationLoaderTest cache expiry flaky test
-
-### Removed
-- storage/keys from repo tracking
-- tests/COVERAGE.md artifact
-
-### Notes
-Hotfix release focusing on test infrastructure improvements and path corrections.
-
-### Codename
-**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
-
-### Comparison
-- **Previous release**: v1.0.3
-- **Changes since v1.0.3**: 23 commits
-
----
-
-## [1.0.3] - 2026-04-13
 
 ### Fixed
 - **Security**: Fixed CSP blocking legitimate resources
@@ -127,9 +66,13 @@ Hotfix release focusing on test infrastructure improvements and path corrections
 - **i18n**: Fixed language switcher not working
 - **i18n**: Fixed sidebar menu not reflecting language changes
 - **Admin**: Fixed link to privacy-policy page
+- **Bug**: Fixed i18N feature bug
+- **Bug**: Fixed undefined `load_core_utilities` error
+- **Bug**: Fixed undefined `get_table_prefix` error
 
-### Added
-- Enhanced i18n implementation for admin panel
+### Removed
+- `.lts` directory containing sensitive keys
+- PHPUnit result cache from git tracking
 
 ### Details
 This patch release addresses bug fixes and reliability improvements across the framework.
