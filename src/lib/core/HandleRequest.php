@@ -298,6 +298,31 @@ final class HandleRequest
 
                 break;
 
+            case 'download':
+                // Deliver download request (query string URL)
+                $identifier = static::isQueryStringRequested()['value'] ?? '';
+                
+                if (!empty($identifier)) {
+                    // Check if it's a file download request (?download={id}/file)
+                    if (strpos($_SERVER['REQUEST_URI'], '/file') !== false) {
+                        // Strip /file suffix from identifier for file download
+                        $identifier = preg_replace('#/file$#', '', $identifier);
+                        // Handle file download
+                        $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
+                        $downloadController->download($identifier);
+                    } else {
+                        // Render download page
+                        http_response_code(200);
+                        call_theme_header();
+                        call_theme_content('download');
+                        call_theme_footer();
+                    }
+                } else {
+                    direct_page('', 302);
+                }
+
+                break;
+
             default:  # default request will be delivered
                 # When permalinks are disabled, check if the path is valid
                 # Get the first path segment (without query string)
@@ -308,6 +333,30 @@ final class HandleRequest
 
                 # Also check query string keys that are handled
                 $queryStringKey = static::isQueryStringRequested()['key'];
+
+                # Handle path-based download URLs when permalinks are disabled
+                if ($firstSegment === 'download') {
+                    $requestPath = self::findRequestToPath();
+                    $pathParts = explode('/', trim($requestPath, '/'));
+                    $identifier = $pathParts[1] ?? '';
+                    $isFileDownload = isset($pathParts[2]) && $pathParts[2] === 'file';
+
+                    if (!empty($identifier) && preg_match('/^[a-f0-9\-]{36}$/', $identifier)) {
+                        if ($isFileDownload) {
+                            # Handle file download
+                            $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
+                            $downloadController->download($identifier);
+                        } else {
+                            # Render download page
+                            $GLOBALS['download_identifier'] = $identifier;
+                            http_response_code(200);
+                            call_theme_header();
+                            call_theme_content('download');
+                            call_theme_footer();
+                        }
+                        break;
+                    }
+                }
 
                 if (!empty($queryStringKey)) {
                     # Has query string - let the switch handle it above

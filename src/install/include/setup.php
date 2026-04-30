@@ -455,7 +455,70 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
             $recordApiRateWrite = $link->prepare($saveSettings);
             $recordApiRateWrite->bind_param('ss', $api_rate_limit_write, $api_rate_limit_write_value);
             $recordApiRateWrite->execute();
-
+            
+            // insert download settings
+            $download_mime_types = "download_allowed_mime_types";
+            $download_mime_types_value = json_encode([
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-powerpoint',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                'application/rtf',
+                'text/plain',
+                'text/csv',
+                'application/zip',
+                'application/x-rar-compressed',
+                'application/x-7z-compressed',
+                'application/x-tar',
+                'application/gzip',
+                'image/png',
+                'image/jpeg',
+                'image/gif',
+                'image/webp',
+                'audio/mpeg',
+                'audio/wav',
+                'audio/ogg',
+                'video/mp4',
+                'video/webm',
+                'application/json',
+            ]);
+            $recordDownloadMimeTypes = $link->prepare($saveSettings);
+            $recordDownloadMimeTypes->bind_param('ss', $download_mime_types, $download_mime_types_value);
+            $recordDownloadMimeTypes->execute();
+            
+            $download_expiry = "download_expiry_hours";
+            $download_expiry_value = "8";
+            $recordDownloadExpiry = $link->prepare($saveSettings);
+            $recordDownloadExpiry->bind_param('ss', $download_expiry, $download_expiry_value);
+            $recordDownloadExpiry->execute();
+            
+            $download_hotlink = "download_hotlink_protection";
+            $download_hotlink_value = "no";
+            $recordDownloadHotlink = $link->prepare($saveSettings);
+            $recordDownloadHotlink->bind_param('ss', $download_hotlink, $download_hotlink_value);
+            $recordDownloadHotlink->execute();
+            
+            $download_domains = "download_allowed_domains";
+            $download_domains_value = json_encode([]);
+            $recordDownloadDomains = $link->prepare($saveSettings);
+            $recordDownloadDomains->bind_param('ss', $download_domains, $download_domains_value);
+            $recordDownloadDomains->execute();
+            
+            $download_support_url = "download_support_url";
+            $download_support_url_value = "";
+            $recordDownloadSupportUrl = $link->prepare($saveSettings);
+            $recordDownloadSupportUrl->bind_param('ss', $download_support_url, $download_support_url_value);
+            $recordDownloadSupportUrl->execute();
+            
+            $download_support_label = "download_support_label";
+            $download_support_label_value = "Support";
+            $recordDownloadSupportLabel = $link->prepare($saveSettings);
+            $recordDownloadSupportLabel->bind_param('ss', $download_support_label, $download_support_label_value);
+            $recordDownloadSupportLabel->execute();
+            
             // insert language settings
             $link->query($insertLangSettings);
 

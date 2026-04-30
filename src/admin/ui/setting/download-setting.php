@@ -82,8 +82,8 @@ $errors = $errors ?? [];
               <div class="box-body">
                 <div class="form-group">
                   <label for="expiry-hours">Expiration Time (hours)</label>
-                  <input type="number" name="expiry_hours" id="expiry-hours" 
-                         class="form-control" value="<?= (int)($currentSettings['expiry_hours'] ?? 8); ?>" 
+                  <input type="number" name="expiry_hours" id="expiry-hours"
+                         class="form-control" value="<?= (int)($currentSettings['expiry_hours'] ?? 8); ?>"
                          min="1" max="720">
                   <p class="help-block">Download links will expire after this many hours.</p>
                 </div>
@@ -134,7 +134,7 @@ $errors = $errors ?? [];
             </div>
             
             <div class="box-footer">
-              <button type="submit" name="downloadSettingSubmit" class="btn btn-primary">Save Changes</button>
+              <button type="submit" name="downloadSettingSubmit" value="1" class="btn btn-primary">Save Changes</button>
             </div>
           </form>
         </div>

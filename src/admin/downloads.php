@@ -73,15 +73,33 @@ try {
             if (false === $app->authenticator->userAccessControl(ActionConst::MEDIALIB)) {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
-                $mediaId = isset($_GET['mediaId']) ? (int)$_GET['mediaId'] : 0;
-
+                $mediaId = 0;
+                if (isset($_GET['mediaId'])) {
+                    $mediaId = (int)$_GET['mediaId'];
+                } elseif (isset($_GET['media_id'])) {
+                    $mediaId = (int)$_GET['media_id'];
+                }
+                
                 if ($mediaId > 0) {
-                    $downloadController->viewDownloadHistory($mediaId);
+                    $history = $downloadController->getDownloadHistoryForMedia($mediaId);
+                    
+                    $mediaFilename = '';
+                    if (!empty($history) && isset($history[0]['media_filename'])) {
+                        $mediaFilename = $history[0]['media_filename'];
+                    }
+                    
+                    $view = new View('admin', 'ui', 'downloads', 'download-history-page');
+                    $view->set('pageTitle', 'Download History');
+                    $view->set('mediaId', $mediaId);
+                    $view->set('mediaFilename', $mediaFilename);
+                    $view->set('history', $history);
+                    $view->set('csrfToken', csrf_generate_token('csrfToken'));
+                    $view->render();
                 } else {
                     direct_page('index.php?load=downloads&error=invalidId', 400);
                 }
             }
-
+            
             break;
 
         case 'bulkExpire':
@@ -114,6 +132,27 @@ try {
             } else {
                 if ($downloadController->bulkDeleteDownloads()) {
                     $_SESSION['status'] = 'downloadsDeleted';
+                }
+                direct_page('index.php?load=downloads', 302);
+            }
+
+            break;
+
+        case 'createLink':
+            if (false === $app->authenticator->userAccessControl(ActionConst::MEDIALIB)) {
+                direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
+            } else {
+                $mediaId = isset($_GET['mediaId']) ? (int)$_GET['mediaId'] : 0;
+
+                if ($mediaId > 0) {
+                    $newIdentifier = $downloadController->createDownloadLink($mediaId);
+                    if ($newIdentifier !== false) {
+                        $_SESSION['status'] = 'downloadLinkCreated';
+                    } else {
+                        $_SESSION['error'] = 'downloadLinkCreateFailed';
+                    }
+                } else {
+                    $_SESSION['error'] = 'invalidMediaId';
                 }
                 direct_page('index.php?load=downloads', 302);
             }

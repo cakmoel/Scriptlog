@@ -46,3 +46,4 @@ src/public/log/unlock_attempts/
 
 # Storage - sensitive key files
 storage/keys/
+src/config.php

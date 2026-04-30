@@ -74,6 +74,27 @@ class Dispatcher
     {
         $requestUri = $this->requestURI();
 
+        // Handle download query string even when SEO URLs are enabled
+        // This ensures ?download=xxx works regardless of permalink setting
+        if (isset($_GET['download']) && !empty($_GET['download'])) {
+            $downloadIdentifier = trim($_GET['download']);
+
+            // Check if it's a file download request
+            if (strpos($_SERVER['REQUEST_URI'], '/file') !== false) {
+                $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
+                $downloadController->download($downloadIdentifier);
+                return;
+            } else {
+                // Pass identifier to template via global variable
+                $GLOBALS['download_identifier'] = $downloadIdentifier;
+                http_response_code(200);
+                call_theme_header();
+                call_theme_content('download');
+                call_theme_footer();
+                return;
+            }
+        }
+
         // Handle locale prefix if LocaleRouter is available
         $localeRouter = null;
         if (class_exists('LocaleRouter')) {
@@ -117,7 +138,13 @@ class Dispatcher
                     return;
                 }
 
-                // 5. Render the found template
+                // 5. Special handling for download_file - bypass theme headers/footers
+                if ($key === 'download_file') {
+                    $this->renderDownloadFile($requestPath);
+                    return;
+                }
+
+                // 6. Render the found template
                 $this->renderTheme($key);
                 return;
             }
@@ -280,6 +307,21 @@ class Dispatcher
         call_theme_header();
         call_theme_content($template);
         call_theme_footer();
+    }
+
+    /**
+     * renderDownloadFile
+     *
+     * Handles actual file download - bypasses theme headers/footers
+     *
+     * @param RequestPath $requestPath
+     *
+     */
+    private function renderDownloadFile($requestPath)
+    {
+        // Make $requestPath available to the download handler
+        // Directly include download handler without theme wrappers
+        include_once APP_ROOT . APP_THEME . theme_identifier()['theme_directory'] . DIRECTORY_SEPARATOR . 'download_file.php';
     }
 
     /* errorNotFound
