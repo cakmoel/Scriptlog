@@ -47,7 +47,6 @@ jobs:
             require "src/install/include/dbtable.php";
             $tables = get_table_definitions("");
             $pdo = new PDO("mysql:host=127.0.0.1;dbname=blogware_test", "root", "root");
-            // Only create tables (first 14 items are table definitions)
             $tableKeys = [
                 "tblUser", "tblUserToken", "tblLoginAttempt", "tblPost", "tblMedia",
                 "tblMediaMeta", "tblMediaDownload", "tblTopic", "tblPostTopic", "tblComment",
@@ -65,19 +64,43 @@ jobs:
 
       - name: Run PHPUnit
         run: |
-          # Create config.php for tests
           cat > src/config.php << 'EOF'
           <?php
           return [
               'app' => [
                   'url' => $_ENV['APP_URL'] ?? 'https://blogware.site',
+                  'email' => 'test@blogware.site',
+                  'key' => 'test-key-12345',
+                  'defuse_key' => 'lib/utility/.lts/lts.php'
               ],
               'db' => [
                   'host' => '127.0.0.1',
-                  'user' => 'root',
-                  'pass' => 'root',
+                  'user' => 'blogwareuser',
+                  'pass' => 'userblogware',
                   'name' => 'blogware_test',
+                  'port' => '3306',
+                  'prefix' => ''
+              ],
+              'mail' => [
+                  'smtp' => [
+                      'host' => 'localhost',
+                      'port' => 587,
+                      'encryption' => 'tls',
+                      'username' => '',
+                      'password' => '',
+                  ],
+                  'from' => [
+                      'email' => 'noreply@blogware.site',
+                      'name' => 'Blogware'
+                  ]
+              ],
+              'os' => [
+                  'system_software' => 'Linux',
+                  'distrib_name' => 'Ubuntu'
+              ],
+              'api' => [
+                  'allowed_origins' => 'https://blogware.site'
               ]
           ];
           EOF
-          vendor/bin/phpunit tests/unit tests/service tests/integration --testdox --colors=never
+          vendor/bin/phpunit --configuration phpunit.xml --no-coverage --colors=never
