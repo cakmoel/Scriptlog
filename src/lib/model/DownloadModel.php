@@ -84,7 +84,9 @@ class DownloadModel extends BaseModel
     {
         $ip_address = get_ip_address();
 
-        $identifierSanitized = $sanitize->sanitize($identifier, 'sql');
+        // Don't use sql sanitizer for UUID - it strips hyphens and converts to int
+        // Prepared statements already protect against SQL injection
+        $identifierSanitized = preg_replace('/[^a-f0-9\-]/i', '', $identifier);
 
         $sql = "SELECT ID, media_id, media_identifier, before_expired, ip_address, created_at
           FROM tbl_media_download 
@@ -140,7 +142,7 @@ class DownloadModel extends BaseModel
                 'before_expired' => $bind['before_expired'],
                 'ip_address' => $bind['ip_address']
                 ],
-                "media_id = {$idsanitized}"
+                ['media_id' => $idsanitized]
             );
         } else {
             $this->modify(
@@ -150,7 +152,7 @@ class DownloadModel extends BaseModel
                 'before_expired' => $bind['before_expired'] ?? time(),
                 'ip_address' => $bind['ip_address'] ?? ''
                 ],
-                "media_identifier = '{$mediaId}'"
+                ['media_identifier' => $mediaId]
             );
         }
     }
