@@ -101,6 +101,7 @@ if (!function_exists('load_core_utilities')) {
         'generate-token.php',
         'get-browser-name.php',
         'get-directory-size.php',
+        'get-download-link.php',
         'get-file-extension.php',
         'get-image-type.php',
         'get-ip-address.php',
