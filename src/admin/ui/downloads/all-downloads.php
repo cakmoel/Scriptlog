@@ -1,7 +1,9 @@
 <?php if (!defined('SCRIPTLOG')) {
     exit();
-} ?>
+} 
 
+?>
+ 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -20,7 +22,7 @@
     <section class="content">
       <div class="row">
         <div class="col-xs-12">
-          
+           
           <?php if (isset($status)) : ?>
           <div class="alert alert-success alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -32,7 +34,7 @@
                 ?>
           </div>
           <?php endif; ?>
-          
+           
           <?php if (isset($errors)) : ?>
           <div class="alert alert-danger alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -44,7 +46,7 @@
                 ?>
           </div>
           <?php endif; ?>
-          
+           
           <div class="box box-primary">
             <div class="box-header with-border">
               <h2 class="box-title">
@@ -54,7 +56,7 @@
             
             <form id="downloads-form" method="post">
               <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ''; ?>">
-              
+               
               <div class="box-body table-responsive">
                 <div class="bulk-actions" style="margin-bottom: 15px;">
                   <select name="bulk-action" id="bulk-action" class="form-control" style="display: inline-block; width: auto;">
@@ -74,7 +76,7 @@
                       <th>ID</th>
                       <th>File</th>
                       <th>Type</th>
-                      <th>Identifier</th>
+                      <th>Download Links</th>
                       <th>Expires</th>
                       <th>Created</th>
                       <th>Actions</th>
@@ -84,7 +86,7 @@
                     <?php
                       $allDownloads = $allDownloads ?? [];
                     $downloadService = $downloadService ?? null;
-
+                    
                     if (is_array($allDownloads) && !empty($allDownloads)) :
                         $no = 0;
                         foreach ($allDownloads as $download) :
@@ -100,7 +102,37 @@
                         <br><small><?= safe_html($download['media_filename']); ?></small>
                       </td>
                       <td><?= safe_html($download['media_type']); ?></td>
-                      <td><code><?= safe_html(substr($download['media_identifier'], 0, 8)); ?>...</code></td>
+                      <td>
+                        <!-- Download Page Link -->
+                        <div style="margin-bottom: 8px;">
+                            <label style="font-size: 11px; color: #666;">Download Page:</label><br>
+                            <code id="page-link-<?= $download['media_identifier']; ?>" 
+                                  style="font-size: 11px; background: #f5f5f5; padding: 2px 4px; border-radius: 3px; display: inline-block; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <?= isset($download['media_identifier']) ? safe_html(get_download_link($download['media_identifier'], 'page')) : ''; ?>
+                            </code>
+                            <button type="button" 
+                                    class="btn btn-xs btn-default" 
+                                    title="Copy Download Page Link"
+                                    onclick="copyToClipboard('page-link-<?= $download['media_identifier']; ?>', 'Download page link copied!')">
+                                <i class="fa fa-copy"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Direct File Link -->
+                        <div>
+                            <label style="font-size: 11px; color: #666;">Direct File:</label><br>
+                            <code id="file-link-<?= $download['media_identifier']; ?>" 
+                                  style="font-size: 11px; background: #f5f5f5; padding: 2px 4px; border-radius: 3px; display: inline-block; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <?= isset($download['media_identifier']) ? safe_html(get_download_link($download['media_identifier'], 'file')) : ''; ?>
+                            </code>
+                            <button type="button" 
+                                    class="btn btn-xs btn-primary" 
+                                    title="Copy Direct File Link"
+                                    onclick="copyToClipboard('file-link-<?= $download['media_identifier']; ?>', 'Direct file link copied!')">
+                                <i class="fa fa-download"></i>
+                            </button>
+                        </div>
+                      </td>
                       <td>
                             <?php if ($isExpired) : ?>
                           <span class="label label-danger">Expired</span>
@@ -117,7 +149,7 @@
                         <a href="index.php?load=downloads&action=expire&identifier=<?= safe_html($download['media_identifier']); ?>" class="btn btn-warning btn-xs" title="Expire">
                           <i class="fa fa-clock-o"></i>
                         </a>
-                        <a href="index.php?load=downloads&action=deleteDownload&identifier=<?= safe_html($download['media_identifier']); ?>" class="btn btn-danger btn-xs" title="Delete">
+                        <a href="javascript:deleteDownload('<?= safe_html($download['media_identifier']); ?>', '<?= safe_html($download['media_caption'] ?? $download['media_filename']); ?>')" class="btn btn-danger btn-xs" title="Delete">
                           <i class="fa fa-trash"></i>
                         </a>
                       </td>
@@ -179,4 +211,71 @@
     return confirm('Are you sure you want to ' + action + ' ' + selected + ' download(s)?');
   });
 })();
+
+function copyToClipboard(elementId, message) {
+    var element = document.getElementById(elementId);
+    if (!element) return;
+    
+    var text = element.textContent || element.innerText;
+    
+    // Use modern Clipboard API if available
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() {
+            showCopyNotification(message || 'Link copied to clipboard!');
+        }, function(err) {
+            fallbackCopy(text, message);
+        });
+    } else {
+        fallbackCopy(text, message);
+    }
+}
+
+function fallbackCopy(text, message) {
+    var textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    
+    try {
+        document.execCommand('copy');
+        showCopyNotification(message || 'Link copied to clipboard!');
+    } catch (err) {
+        alert('Failed to copy link. Please manually copy: ' + text);
+    }
+    
+    document.body.removeChild(textarea);
+}
+
+function showCopyNotification(message) {
+    // Remove existing notification
+    var existing = document.getElementById('copy-notification');
+    if (existing) {
+        existing.parentNode.removeChild(existing);
+    }
+    
+    // Create notification
+    var notification = document.createElement('div');
+    notification.id = 'copy-notification';
+    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #00a65a; color: white; padding: 10px 20px; border-radius: 4px; z-index: 9999; box-shadow: 0 2px 5px rgba(0,0,0,0.2);';
+    notification.innerHTML = '<i class="fa fa-check"></i> ' + message;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(function() {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 3000);
+}
+</script>
+
+<script type="text/javascript">
+  function deleteDownload(identifier, filename) {
+    if (confirm("Are you sure you want to delete download '" + filename + "'?")) {
+      window.location.href = 'index.php?load=downloads&action=deleteDownload&identifier=' + identifier;
+    }
+  }
 </script>
