@@ -9,21 +9,19 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      APP_URL: https://blogware.site
     
     services:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: testroot
           MYSQL_DATABASE: blogware_test
-          MYSQL_USER: ${{ secrets.DB_USER }}
-          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_USER: testuser
+          MYSQL_PASSWORD: testpass
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="mysqladmin ping -h localhost"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
@@ -42,11 +40,11 @@ jobs:
 
       - name: Setup test database
         run: |
-          mysql -h 127.0.0.1 -u root -p${{ secrets.DB_ROOT_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS blogware_test;"
+          mysql -h 127.0.0.1 -u root -ptestroot -e "CREATE DATABASE IF NOT EXISTS blogware_test;"
           php -r '
             require "src/install/include/dbtable.php";
             $tables = get_table_definitions("");
-            $pdo = new PDO("mysql:host=127.0.0.1;dbname=blogware_test", "${{ secrets.DB_USER }}", "${{ secrets.DB_PASSWORD }}");
+            $pdo = new PDO("mysql:host=127.0.0.1;dbname=blogware_test", "root", "testroot");
             $tableKeys = [
                 "tblUser", "tblUserToken", "tblLoginAttempt", "tblPost", "tblMedia",
                 "tblMediaMeta", "tblMediaDownload", "tblTopic", "tblPostTopic", "tblComment",
@@ -68,15 +66,15 @@ jobs:
           <?php
           return [
               'app' => [
-                  'url' => $_ENV['APP_URL'] ?? 'https://blogware.site',
+                  'url' => 'https://blogware.site',
                   'email' => 'test@blogware.site',
                   'key' => 'test-key-12345',
                   'defuse_key' => 'lib/utility/.lts/lts.php'
               ],
               'db' => [
                   'host' => '127.0.0.1',
-                  'user' => '${{ secrets.DB_USER }}',
-                  'pass' => '${{ secrets.DB_PASSWORD }}',
+                  'user' => 'testuser',
+                  'pass' => 'testpass',
                   'name' => 'blogware_test',
                   'port' => '3306',
                   'prefix' => ''
