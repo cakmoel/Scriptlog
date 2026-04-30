@@ -46,6 +46,7 @@ class DownloadAdminController extends BaseApp
             ($_SESSION['status'] == 'downloadExpired') ? array_push($status, "Download has been expired") : "";
             ($_SESSION['status'] == 'downloadRegenerated') ? array_push($status, "Download has been regenerated") : "";
             ($_SESSION['status'] == 'downloadDeleted') ? array_push($status, "Download has been deleted") : "";
+            ($_SESSION['status'] == 'downloadLinkCreated') ? array_push($status, "Download link has been created") : "";
             unset($_SESSION['status']);
         }
 
@@ -112,6 +113,17 @@ class DownloadAdminController extends BaseApp
      * @param int $downloadId
      */
     public function viewDownloadHistory($mediaId)
+    {
+        return $this->downloadService->getDownloadsByMedia($mediaId);
+    }
+
+    /**
+     * Get download history for AJAX
+     *
+     * @param int $mediaId
+     * @return array
+     */
+    public function getDownloadHistoryForMedia($mediaId)
     {
         return $this->downloadService->getDownloadsByMedia($mediaId);
     }
@@ -198,6 +210,36 @@ class DownloadAdminController extends BaseApp
     }
 
     /**
+     * Create a new download link for a media file
+     *
+     * @param int $mediaId
+     * @param string $ipAddress
+     * @return string|false New identifier or false
+     */
+    public function createDownloadLink($mediaId, $ipAddress = '')
+    {
+        return $this->downloadService->createDownloadRecord($mediaId, $ipAddress);
+    }
+
+    /**
+     * Bulk create download links for media IDs
+     *
+     * @param array $mediaIds
+     * @return bool
+     */
+    public function bulkCreateDownloadLinks($mediaIds)
+    {
+        $result = true;
+
+        foreach ($mediaIds as $mediaId) {
+            $newIdentifier = $this->downloadService->createDownloadRecord((int)$mediaId, '');
+            $result = $result && ($newIdentifier !== false);
+        }
+
+        return $result;
+    }
+
+    /**
      * Get identifiers from POST data
      *
      * @return array
@@ -243,6 +285,26 @@ class DownloadAdminController extends BaseApp
     public function getDownloadHistory($limit = 50)
     {
         return $this->downloadService->getDownloadHistory($limit);
+    }
+
+    /**
+     * Render download history page
+     *
+     * @param int $mediaId
+     * @param string $mediaFilename
+     * @param array $history
+     * @return void
+     */
+    public function viewDownloadHistoryPage($mediaId, $mediaFilename, $history)
+    {
+        $this->setView('download-history-page');
+        $this->setPageTitle('Download History');
+        $this->view->set('pageTitle', $this->getPageTitle());
+        $this->view->set('mediaId', $mediaId);
+        $this->view->set('mediaFilename', $mediaFilename);
+        $this->view->set('history', $history);
+        $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+        $this->view->render();
     }
 
     /**
