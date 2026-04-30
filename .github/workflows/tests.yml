@@ -44,7 +44,7 @@ jobs:
           php -r '
             require "src/install/include/dbtable.php";
             $tables = get_table_definitions("");
-            $pdo = new PDO("mysql:host=127.0.0.1;dbname=blogware_test", "root", "testroot");
+            $pdo = new PDO("mysql:host=127.0.0.1;dbname=blogware_test", "testuser", "testpass");
             $tableKeys = [
                 "tblUser", "tblUserToken", "tblLoginAttempt", "tblPost", "tblMedia",
                 "tblMediaMeta", "tblMediaDownload", "tblTopic", "tblPostTopic", "tblComment",
