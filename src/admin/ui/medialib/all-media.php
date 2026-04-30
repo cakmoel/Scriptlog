@@ -22,114 +22,127 @@
     <!-- Main content -->
     <section class="content">
       <div class="row">
-         <div class="col-xs-12">
-         <?php
-            if (isset($errors)) :
-                ?>
-         <div class="alert alert-danger alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h4><i class="icon fa fa-ban"></i> Error!</h4>
-                <?php
-                foreach ($errors as $e) :
-                    echo $e;
-                endforeach;
-                ?>
-          </div>
-                <?php
-            endif;
-            ?>
-         
-         <?php
-            if (isset($status)) :
-                ?>
-         <div class="alert alert-success alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h4><i class="icon fa fa-check"></i> Success!</h4>
-                       <?php
-                        foreach ($status as $s) :
-                            echo $s;
-                        endforeach;
-                        ?>
-          </div>
-                <?php
-            endif;
-            ?>
-         
-            <div class="box box-primary">
-               <div class="box-header with-border">
-                <h2 class="box-title">
-              <?=(isset($mediaTotal)) ? $mediaTotal : 0; ?> 
+          <div class="col-xs-12">
+          <?php
+             if (isset($errors)) :
+                 ?>
+          <div class="alert alert-danger alert-dismissible">
+                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                 <h4><i class="icon fa fa-ban"></i> Error!</h4>
+                 <?php
+                 foreach ($errors as $e) :
+                     echo $e;
+                 endforeach;
+                 ?>
+           </div>
+                 <?php
+             endif;
+             ?>
+          
+          <?php
+             if (isset($status)) :
+                 ?>
+          <div class="alert alert-success alert-dismissible">
+                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                 <h4><i class="icon fa fa-check"></i> Success!</h4>
+                        <?php
+                         foreach ($status as $s) :
+                             echo $s;
+                         endforeach;
+                         ?>
+           </div>
+                 <?php
+             endif;
+             ?>
+          
+             <div class="box box-primary">
+                <div class="box-header with-border">
+                 <h2 class="box-title">
+               <?=(isset($mediaTotal)) ? $mediaTotal : 0; ?> 
                item<?=($mediaTotal != 1) ? 's' : ''; ?>
                in Total  
-              </h2>
+               </h2>
+                </div>
+               <!-- /.box-header -->
+               
+               <div class="box-body table-responsive">
+                <table id="scriptlog-table" class="table table-bordered table-striped" aria-describedby="all media">
+                 <thead>
+                  <tr>
+                   <th>#</th>
+                   <th>File</th>
+                   <th>Type</th>
+                   <th>Display on</th>
+                   <th>Download Link</th>
+                   <th>Edit</th>
+                   <th>Delete</th>
+                 </tr>
+                 </thead>
+                 <tbody>
+                  <?php
+                     if (is_array($mediaLib)) :
+                         $no = 0;
+                         foreach ($mediaLib as $media) :
+                             $no++;
+                             ?>
+               
+                     <tr>
+                        <td><?= $no; ?></td>
+                        <td>
+                        <a href="<?=medialib_link($media['media_type'], $media['media_filename']);?>" title="<?= (!empty(safe_html($media['media_caption']))) ? safe_html($media['media_caption']) : "Filename"; ?>" ><?=invoke_fileicon($media['media_type']); ?></a>
+                        </td>
+                        <td><?= safe_html($media['media_type']); ?></td>
+                        <td><?= safe_html($media['media_target']); ?></td>
+                        
+                        <td>
+                        <?php if ($media['media_target'] === 'download') : ?>
+                        <a href="index.php?load=downloads&action=createLink&mediaId=<?= (int)$media['ID']; ?>" 
+                           class="btn btn-success btn-xs" title="Create Download Link">
+                            <i class="fa fa-link"></i> Create Link
+                        </a>
+                        <?php else : ?>
+                        <span class="text-muted">N/A</span>
+                        <?php endif; ?>
+                        </td>
+
+                        <td>
+                        <a href="<?=generate_request("index.php", 'get', ['medialib', 'editMedia', $media['ID']])['link']; ?>" class="btn btn-warning" title="Edit media">
+                        <i class="fa fa-pencil fa-fw"></i> </a>
+                        </td>
+
+                        <td>
+                        <a href="javascript:deleteMedia('<?= abs((int)$media['ID']); ?>', '<?= $media['media_user']; ?>')" class="btn btn-danger" title="Delete media">
+                        <i class="fa fa-trash-o fa-fw"></i> </a>
+                        </td>
+
+                     </tr>
+                 
+                             <?php
+                         endforeach;
+                     endif;
+                     ?>
+                 
+                 </tbody>
+                 <tfoot>
+                 <tr>
+                   <th>#</th>
+                   <th>File</th>
+                   <th>Type</th>
+                   <th>Display on</th>
+                   <th>Download Link</th>
+                   <th>Edit</th>
+                   <th>Delete</th>
+                 </tr>
+                 </tfoot>
+               </table>
                </div>
-              <!-- /.box-header -->
-              
-              <div class="box-body table-responsive">
-               <table id="scriptlog-table" class="table table-bordered table-striped" aria-describedby="all media">
-                <thead>
-                <tr>
-                  <th>#</th>
-                  <th>File</th>
-                  <th>Type</th>
-                  <th>Display on</th>
-                  <th>Edit</th>
-                  <th>Delete</th>
-                </tr>
-                </thead>
-                <tbody>
-                 <?php
-                    if (is_array($mediaLib)) :
-                        $no = 0;
-                        foreach ($mediaLib as $media) :
-                            $no++;
-                            ?>
-              
-                    <tr>
-                       <td><?= $no; ?></td>
-                       <td>
-                       <a href="<?=medialib_link($media['media_type'], $media['media_filename']);?>" title="<?= (!empty(safe_html($media['media_caption']))) ? safe_html($media['media_caption']) : "Filename"; ?>" ><?=invoke_fileicon($media['media_type']); ?></a>
-                       </td>
-                       <td><?= safe_html($media['media_type']); ?></td>
-                       <td><?= safe_html($media['media_target']); ?></td>
-
-                       <td>
-                       <a href="<?=generate_request("index.php", 'get', ['medialib', 'editMedia', $media['ID']])['link']; ?>" class="btn btn-warning" title="Edit media">
-                       <i class="fa fa-pencil fa-fw"></i> </a>
-                       </td>
-
-                       <td>
-                       <a href="javascript:deleteMedia('<?= abs((int)$media['ID']); ?>', '<?= $media['media_user']; ?>')" class="btn btn-danger" title="Delete media">
-                       <i class="fa fa-trash-o fa-fw"></i> </a>
-                       </td>
-
-                    </tr>
-                
-                            <?php
-                        endforeach;
-                    endif;
-                    ?>
-                
-                </tbody>
-                <tfoot>
-                <tr>
-                  <th>#</th>
-                  <th>File</th>
-                  <th>Type</th>
-                  <th>Display on</th>
-                  <th>Edit</th>
-                  <th>Delete</th>
-                </tr>
-                </tfoot>
-              </table>
-              </div>
-                  <!-- /.box-body -->
-            </div>
-               <!-- /.box -->
-         </div>
-            <!-- /.col-xs-12 -->
-      </div>
-           <!-- /.row -->
+                   <!-- /.box-body -->
+             </div>
+                <!-- /.box -->
+          </div>
+             <!-- /.col-xs-12 -->
+       </div>
+            <!-- /.row -->
     </section>
     <!-- /.content -->
   </div>

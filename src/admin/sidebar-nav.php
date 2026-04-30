@@ -32,7 +32,8 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
                         </a>
                     </li>
                     <li>
-                        <a href="<?= $url . '/' . generate_request('index.php', 'get', ['posts', ActionConst::NEWPOST, 0])['link']; ?>">
+                        <a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['posts', ActionConst::NEWPOST, 0])['link']; ?>">
                             <?= admin_translate('nav.add_new'); ?>
                         </a>
                     </li>
@@ -48,7 +49,8 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
             <?php endif; ?>
 
             <?php if (access_control_list(ActionConst::MEDIALIB)) : ?>
-            <li <?= ($module === 'medialib' || $module === 'downloads') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+            <li
+                <?= ($module === 'medialib' || $module === 'downloads') ? 'class="treeview active"' : 'class="treeview"'; ?>>
                 <a href="#">
                     <i class="fa fa-image fa-fw"></i>
                     <span><?= admin_translate('nav.media'); ?></span>
@@ -58,17 +60,20 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
                 </a>
                 <ul class="treeview-menu">
                     <li>
-                        <a href="<?= $url . '/' . generate_request('index.php', 'get', ['medialib', ActionConst::MEDIALIB], false)['link']; ?>">
+                        <a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['medialib', ActionConst::MEDIALIB], false)['link']; ?>">
                             <?= admin_translate('nav.library'); ?>
                         </a>
                     </li>
                     <li>
-                        <a href="<?= $url . '/' . generate_request('index.php', 'get', ['medialib', ActionConst::NEWMEDIA, 0])['link']; ?>">
+                        <a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['medialib', ActionConst::NEWMEDIA, 0])['link']; ?>">
                             <?= admin_translate('nav.add_new'); ?>
                         </a>
                     </li>
                     <li>
-                        <a href="<?= $url . '/' . generate_request('index.php', 'get', ['downloads', ActionConst::DOWNLOADS], false)['link']; ?>">
+                        <a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['downloads', ActionConst::DOWNLOADS], false)['link']; ?>">
                             <?= admin_translate('nav.downloads'); ?>
                         </a>
                     </li>
@@ -87,12 +92,14 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
                 </a>
                 <ul class="treeview-menu">
                     <li>
-                        <a href="<?= $url . '/' . generate_request('index.php', 'get', ['pages', ActionConst::PAGES], false)['link']; ?>">
+                        <a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['pages', ActionConst::PAGES], false)['link']; ?>">
                             <?= admin_translate('nav.all_pages'); ?>
                         </a>
                     </li>
                     <li>
-                        <a href="<?= $url . '/' . generate_request('index.php', 'get', ['pages', ActionConst::NEWPAGE, 0])['link']; ?>">
+                        <a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['pages', ActionConst::NEWPAGE, 0])['link']; ?>">
                             <?= admin_translate('nav.add_new'); ?>
                         </a>
                     </li>
@@ -102,7 +109,8 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
 
             <?php if (access_control_list(ActionConst::COMMENTS)) : ?>
             <li <?= ($module === 'comments') ? 'class="active"' : ''; ?>>
-                <a href="<?= $url . '/' . generate_request('index.php', 'get', ['comments', ActionConst::COMMENTS], false)['link']; ?>">
+                <a
+                    href="<?= $url . '/' . generate_request('index.php', 'get', ['comments', ActionConst::COMMENTS], false)['link']; ?>">
                     <i class="fa fa-comments"></i>
                     <span><?= admin_translate('nav.comments'); ?></span>
                 </a>
@@ -153,7 +161,8 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
                         </a>
                     </li>
                     <li>
-                        <a href="<?= $url . '/' . generate_request('index.php', 'get', ['users', ActionConst::NEWUSER, 0, sha1(app_key())])['link']; ?>">
+                        <a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['users', ActionConst::NEWUSER, 0, sha1(app_key())])['link']; ?>">
                             <?= admin_translate('nav.add_new'); ?>
                         </a>
                     </li>
@@ -161,7 +170,8 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
             </li>
             <?php else : ?>
             <li <?= ($module === 'users') ? 'class="active"' : ''; ?>>
-                <a href="<?= generate_request('index.php', 'get', ['users', 'editUser', $user_id, $user_session])['link']; ?>">
+                <a
+                    href="<?= generate_request('index.php', 'get', ['users', 'editUser', $user_id, $user_session])['link']; ?>">
                     <i class="fa fa-user"></i>
                     <span><?= admin_translate('nav.your_profile'); ?></span>
                 </a>
@@ -169,7 +179,8 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
             <?php endif; ?>
 
             <?php if (access_control_list(ActionConst::THEMES)) : ?>
-            <li <?= ($module === 'templates' || $module === 'menu') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+            <li
+                <?= ($module === 'templates' || $module === 'menu') ? 'class="treeview active"' : 'class="treeview"'; ?>>
                 <a href="#">
                     <i class="fa fa-paint-brush fa-fw"></i>
                     <span><?= admin_translate('nav.appearance'); ?></span>
@@ -179,7 +190,8 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
                 </a>
                 <ul class="treeview-menu">
                     <li>
-                        <a href="<?= $url . '/' . generate_request('index.php', 'get', ['templates'], false)['link']; ?>">
+                        <a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['templates'], false)['link']; ?>">
                             <?= admin_translate('nav.themes'); ?>
                         </a>
                     </li>
@@ -195,7 +207,13 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
             <?php endif; ?>
 
             <?php if (access_control_list(ActionConst::CONFIGURATION)) : ?>
-            <li <?= ($module === 'option-general' || $module === 'option-permalink' || $module === 'option-reading' || $module === 'option-timezone' || $module === 'option-memberships' || $module === 'option-api') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+            <li <?= ($module === 'option-general' || $module === 'option-permalink' 
+                || $module === 'option-reading' 
+                || $module === 'option-timezone' 
+                || $module === 'option-memberships' 
+                || $module === 'option-api'
+                || $module === 'option-mail'
+                || $module === 'option-downloads') ? 'class="treeview active"' : 'class="treeview"'; ?>>
                 <a href="#">
                     <i class="fa fa-sliders fa-fw"></i>
                     <span><?= admin_translate('nav.settings'); ?></span>
@@ -204,21 +222,38 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-general', ActionConst::GENERAL_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.general'); ?></a></li>
-                    <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-reading', ActionConst::READING_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.reading'); ?></a></li>
-                    <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-permalink', ActionConst::PERMALINK_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.permalink'); ?></a></li>
-                    <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-timezone', ActionConst::TIMEZONE_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.timezone'); ?></a></li>
-                    <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-memberships', ActionConst::MEMBERSHIP_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.membership'); ?></a></li>
-                    <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-mail', ActionConst::MAIL_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.mail_settings'); ?></a></li>
-                    <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-downloads', ActionConst::DOWNLOAD_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.download_settings'); ?></a></li>
-                    <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-api', ActionConst::API_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.api'); ?></a></li>
+                    <li><a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['option-general', ActionConst::GENERAL_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.general'); ?></a>
+                    </li>
+                    <li><a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['option-reading', ActionConst::READING_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.reading'); ?></a>
+                    </li>
+                    <li><a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['option-permalink', ActionConst::PERMALINK_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.permalink'); ?></a>
+                    </li>
+                    <li><a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['option-timezone', ActionConst::TIMEZONE_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.timezone'); ?></a>
+                    </li>
+                    <li><a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['option-memberships', ActionConst::MEMBERSHIP_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.membership'); ?></a>
+                    </li>
+                    <li><a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['option-mail', ActionConst::MAIL_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.mail_settings'); ?></a>
+                    </li>
+                    <li><a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['option-downloads', ActionConst::DOWNLOAD_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.download_settings'); ?></a>
+                    </li>
+                    <li><a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['option-api', ActionConst::API_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.api'); ?></a>
+                    </li>
                 </ul>
             </li>
             <?php endif; ?>
 
             <?php if (access_control_list(ActionConst::PLUGINS)) : ?>
             <li <?= ($module === 'plugins') ? 'class="active"' : ''; ?>>
-                <a href="<?= $url . '/' . generate_request('index.php', 'get', ['plugins', ActionConst::PLUGINS], false)['link']; ?>">
+                <a
+                    href="<?= $url . '/' . generate_request('index.php', 'get', ['plugins', ActionConst::PLUGINS], false)['link']; ?>">
                     <i class="fa fa-plug fa-fw"></i>
                     <span><?= admin_translate('nav.plugins'); ?></span>
                 </a>
@@ -226,7 +261,8 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
             <?php endif; ?>
 
             <?php if (access_control_list(ActionConst::PRIVACY)) : ?>
-            <li <?= ($module === 'privacy' || $module === 'privacy-policy') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+            <li
+                <?= ($module === 'privacy' || $module === 'privacy-policy') ? 'class="treeview active"' : 'class="treeview"'; ?>>
                 <a href="#">
                     <i class="fa fa-shield fa-fw"></i>
                     <span><?= admin_translate('nav.privacy'); ?></span>
@@ -235,16 +271,25 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['privacy'], false)['link']; ?>"><?= admin_translate('nav.privacy_settings'); ?></a></li>
-                    <li><a href="<?= $url; ?>/index.php?load=privacy&p=data-requests"><?= admin_translate('nav.data_requests'); ?></a></li>
-                    <li><a href="<?= $url; ?>/index.php?load=privacy&p=audit-logs"><?= admin_translate('nav.audit_logs'); ?></a></li>
-                    <li><a href="<?= $url . '/' . generate_request('index.php', 'get', ['privacy-policy'], false)['link']; ?>"><?= admin_translate('nav.privacy_policy'); ?></a></li>
+                    <li><a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['privacy'], false)['link']; ?>"><?= admin_translate('nav.privacy_settings'); ?></a>
+                    </li>
+                    <li><a
+                            href="<?= $url; ?>/index.php?load=privacy&p=data-requests"><?= admin_translate('nav.data_requests'); ?></a>
+                    </li>
+                    <li><a
+                            href="<?= $url; ?>/index.php?load=privacy&p=audit-logs"><?= admin_translate('nav.audit_logs'); ?></a>
+                    </li>
+                    <li><a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['privacy-policy'], false)['link']; ?>"><?= admin_translate('nav.privacy_policy'); ?></a>
+                    </li>
                 </ul>
             </li>
             <?php endif; ?>
 
             <?php if (access_control_list(ActionConst::CONFIGURATION)) : ?>
-            <li <?= ($module === 'languages' || $module === 'translations' || $module === 'option-language') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+            <li
+                <?= ($module === 'languages' || $module === 'translations' || $module === 'option-language') ? 'class="treeview active"' : 'class="treeview"'; ?>>
                 <a href="#">
                     <i class="fa fa-globe fa-fw"></i>
                     <span><?= admin_translate('nav.languages'); ?></span>
@@ -254,17 +299,20 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
                 </a>
                 <ul class="treeview-menu">
                     <li>
-                        <a href="<?= $url . '/' . generate_request('index.php', 'get', ['languages'], false)['link']; ?>">
+                        <a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['languages'], false)['link']; ?>">
                             <?= admin_translate('nav.all_languages'); ?>
                         </a>
                     </li>
                     <li>
-                        <a href="<?= $url . '/' . generate_request('index.php', 'get', ['translations'], false)['link']; ?>">
+                        <a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['translations'], false)['link']; ?>">
                             <?= admin_translate('nav.translations'); ?>
                         </a>
                     </li>
                     <li>
-                        <a href="<?= $url . '/' . generate_request('index.php', 'get', ['option-language'], false)['link']; ?>">
+                        <a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['option-language'], false)['link']; ?>">
                             <?= admin_translate('nav.language_config'); ?>
                         </a>
                     </li>
@@ -274,5 +322,5 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
         </ul>
     </section>
 </aside>
-    <?php
+<?php
 }
