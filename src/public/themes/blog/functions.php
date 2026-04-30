@@ -1020,3 +1020,30 @@ function render_comments_section(int $postId, int $offset = 0): string
     return ob_get_clean();
 }
 }
+
+if (!function_exists('get_download_page_data')) {
+/**
+ * Get download page data
+ *
+ * @param string $identifier
+ * @return array
+ */
+function get_download_page_data($identifier)
+{
+    if (empty($identifier)) {
+        return ['error' => 'Invalid download identifier'];
+    }
+    
+    if (!class_exists('DownloadController') || !class_exists('DownloadService') || !class_exists('DownloadModel') || !class_exists('MediaDao')) {
+        return ['error' => 'Download system not available'];
+    }
+    
+    try {
+        $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
+        return $downloadController->getDownloadPage($identifier);
+    } catch (Exception $e) {
+        error_log('Download page error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+        return ['error' => 'Unable to retrieve download information'];
+    }
+}
+}
