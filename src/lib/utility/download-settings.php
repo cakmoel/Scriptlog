@@ -35,15 +35,12 @@ class DownloadSettings
         'image/jpeg',
         'image/gif',
         'image/webp',
-        'image/svg+xml',
         'audio/mpeg',
         'audio/wav',
         'audio/ogg',
         'video/mp4',
         'video/webm',
         'application/json',
-        'application/xml',
-        'application/sql',
     ];
 
     public const DEFAULT_EXPIRY_HOURS = 8;
@@ -162,7 +159,7 @@ class DownloadSettings
      */
     public static function getSupportUrl()
     {
-        return self::getSetting(self::KEY_SUPPORT_URL) ?: '';
+        return self::getSetting(self::KEY_SUPPORT_URL) ?? '';
     }
 
     /**
@@ -183,7 +180,7 @@ class DownloadSettings
      */
     public static function getSupportLabel()
     {
-        return self::getSetting(self::KEY_SUPPORT_LABEL) ?: 'Support';
+        return self::getSetting(self::KEY_SUPPORT_LABEL) ?? 'Support';
     }
 
     /**
