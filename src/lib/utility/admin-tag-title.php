@@ -32,6 +32,11 @@ function admin_tag_title($value)
 
             break;
 
+        case 'downloads':
+            $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+
+            break;
+
         case 'menu':
             $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
@@ -44,6 +49,16 @@ function admin_tag_title($value)
 
         case 'plugins':
             $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+
+            break;
+        
+        case 'privacy':
+            $title .= safe_html("Privacy settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+
+            break;
+
+        case 'privacy-policy':
+            $title .= safe_html(ucfirst("privacy policy")) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
             break;
 
@@ -86,7 +101,47 @@ function admin_tag_title($value)
 
             break;
 
+        case 'option-language':
+            $title .= safe_html("Language configuration") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+
+            break;
+        
+        case 'option-mail':
+            $title .= safe_html("Mail settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+
+            break;
+
+        case 'option-downloads':
+            $title .= safe_html("Download settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+
+            break;
+
+        case 'option-api':
+            $title .= safe_html("API settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+
+            break;
+        
+        case 'import':
+            $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+
+            break;
+
+        case 'export':
+            $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+
+            break;
+
         case 'templates':
+            $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+
+            break;
+
+        case 'languages':
+            $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
+
+            break;
+
+        case 'translations':
             $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
             break;
