@@ -41,9 +41,6 @@ node_modules/
 src/public/cache/rate_limit/
 src/public/log/unlock_attempts/
 
-# Plan
-.plan
-
 # Storage - sensitive key files
 storage/keys/
 src/config.php
