@@ -14,6 +14,7 @@
  */
 function app_info()
 {
+
     $app_info = [];
     
     $conn = function_exists('medoo_init') ? medoo_init() : "";
