@@ -8,12 +8,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#105---2026-04-28)
+- [Latest Release](#106---2026-05-01)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.0.6] - 2026-05-01
+
+### Changed
+- Revamped blog theme files (`functions.php`, `download.php`, `download_file.php`)
+- Revamped `src/lib/utility/import-wordpress.php`
+- Revamped `src/lib/utility/download-settings.php`
+- Revamped `src/lib/utility/admin-tag-title.php`
+- Updated blog theme CSS assets (`custom.css`, `custom.min.css`)
+- Updated `src/lib/utility-loader.php`
+
+### Fixed
+- Updated Laminas Crypt API usage in ScriptlogCryptonize (BlockCipher factory pattern)
+- Added missing `$strong` variable in random_bytes fallback
+- Resolved PHP 8.x compatibility issues in import-wordpress and app-info
+- Cleaned up deprecated `libxml_disable_entity_loader` references
+- Cleaned up `.gitignore` by removing `.plan` entry
+
+### Notes
+Maintenance release focusing on PHP 8.x compatibility fixes, code cleanup, and blog theme improvements.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.0.5
+- **Changes since v1.0.5**: 20+ commits
+
+---
 
 ## [1.0.5] - 2026-04-28
 
