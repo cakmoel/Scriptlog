@@ -14,10 +14,10 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  */
 
 use Laminas\Crypt\BlockCipher;
+use Laminas\Crypt\Symmetric\Openssl;
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
 use Defuse\Crypto\Exception\BadFormatException;
-use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
 
 class ScriptlogCryptonize
 {
@@ -80,7 +80,8 @@ class ScriptlogCryptonize
      */
     public static function cipherMessage(string $message, string $key): string
     {
-        $cipher = BlockCipher::factory('openssl', ['algo' => 'aes']);
+        $openssl = new Openssl(['algo' => 'aes']);
+        $cipher = new BlockCipher($openssl);
         $cipher->setKey($key);
         return $cipher->encrypt($message);
     }
@@ -94,7 +95,8 @@ class ScriptlogCryptonize
      */
     public static function decipherMessage(string $ciphertext, string $key): string
     {
-        $cipher = BlockCipher::factory('openssl', ['algo' => 'aes']);
+        $openssl = new Openssl(['algo' => 'aes']);
+        $cipher = new BlockCipher($openssl);
         $cipher->setKey($key);
         return $cipher->decrypt($ciphertext);
     }
@@ -521,6 +523,7 @@ class ScriptlogCryptonize
             return random_bytes($length);
         } catch (Exception $e) {
             if (function_exists('openssl_random_pseudo_bytes')) {
+                $strong = false;
                 $bytes = openssl_random_pseudo_bytes($length, $strong);
                 if ($strong && $bytes !== false) {
                     return $bytes;
