@@ -15,8 +15,10 @@
  */
 function csrf_check_token($key, $origin, $timespan = null)
 {
-    $check_csrf = class_exists('CSRFGuard') ? CSRFGuard::check($key, $origin, true, $timespan, false) : "";
-
+    if (!class_exists('CSRFGuard')) {
+        return false;
+    }
+    $check_csrf = CSRFGuard::check($key, $origin, true, $timespan, false);
     return ($check_csrf) ? true : false;
 }
 
