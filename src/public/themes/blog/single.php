@@ -100,7 +100,7 @@ if (isset($retrieve_post['post_modified'])) {
                                     <p class="text-muted mb-4"><?= t('protected.post.description'); ?></p>
                                     <form method="post" class="password-form-inline d-inline-flex align-items-start gap-2 unlock-post-form" data-post-id="<?= $post_id; ?>">
                                         <div class="form-group">
-                                            <input type="password" class="form-control post-password-input" name="post_password" placeholder="<?= t('form.password'); ?>" required>
+                                            <input type="password" class="form-control post-password-input" name="post_password" placeholder="<?= t('form.password'); ?>" autocomplete="current-password" required>
                                         </div>
                                         <button type="submit" class="btn btn-primary unlock-post-btn"><?= t('button.unlock'); ?></button>
                                     </form>
@@ -141,13 +141,13 @@ if ($comment_permit == 'open') :
 
                                         <div class="form-group">
                                             <label for="name"><?= t('form.name.label'); ?>*</label>
-                                            <input type="text" class="form-control" id="name" name="name" maxlength="90" placeholder="<?= t('form.name.placeholder'); ?>" required>
+                                            <input type="text" class="form-control" id="name" name="name" maxlength="90" placeholder="<?= t('form.name.placeholder'); ?>" autocomplete="name" required>
                                             <div class="help-block with-errors"></div>
                                         </div>
 
                                         <div class="form-group">
                                             <label for="email"><?= t('form.email.label'); ?>*</label>
-                                            <input type="email" class="form-control" id="email" name="email" placeholder="<?= t('form.email.placeholder'); ?>" maxlength="180" required>
+                                            <input type="email" class="form-control" id="email" name="email" placeholder="<?= t('form.email.placeholder'); ?>" maxlength="180" autocomplete="email" required>
                                             <div class="help-block with-errors"></div>
                                         </div>
 
