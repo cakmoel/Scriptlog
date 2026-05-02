@@ -4,11 +4,17 @@ $(document).ready(function () {
     const $commentsContainer = $("#comments");
     const $loadMoreBtn = $("#load-more");
 
-    const post_id = window.CommentSettings?.postId;
+    // Exit silently if comments section doesn't exist on this page
+    if (!$commentsContainer.length) {
+        return;
+    }
+
+    // Read post ID from data attribute (use .attr() for reliability)
+    const post_id = parseInt($commentsContainer.attr("data-post-id")) || 0;
     const limit = window.CommentSettings?.limit ?? 3; // fallback just in case
 
-    if (!post_id) {
-        console.error("Post ID missing in #comments data attribute.");
+    if (!post_id || post_id <= 0) {
+        console.error("Post ID missing or invalid in #comments data attribute.");
         $commentsContainer.html("<p class='text-danger'>Cannot load comments. Missing post ID.</p>");
         $loadMoreBtn.hide();
         return;
