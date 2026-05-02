@@ -682,11 +682,21 @@ class PostController extends BaseApp
 
                     if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
                         if (!empty($_POST['post_password'])) {
+                            // Password changed - re-encrypt with new password
                             $protected = protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password']);
                             $this->postService->setProtected($protected['post_password']);
                             $this->postService->setPostContent($protected['post_content']);
                             $this->postService->setPassPhrase(distill_post_request($filters)['post_password']);
                             $_SESSION['post_protected'] = distill_post_request($filters)['post_password'];
+                        } else {
+                            // Password NOT changed - re-encrypt content with existing passphrase from DB
+                            $existing_post = $this->postService->grabPost($id);
+                            if ($existing_post && !empty($existing_post['passphrase'])) {
+                                $reencrypted = encrypt(distill_post_request($filters)['post_content'], $existing_post['passphrase']);
+                                $this->postService->setPostContent($reencrypted);
+                            } else {
+                                $this->postService->setPostContent(distill_post_request($filters)['post_content']);
+                            }
                         }
                         $this->postService->setVisibility(distill_post_request($filters)['visibility']);
                     } else {
