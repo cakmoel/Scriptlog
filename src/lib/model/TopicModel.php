@@ -173,7 +173,7 @@ class TopicModel extends BaseModel
     WHERE p.ID = pt.post_id 
     AND pt.topic_id = :topicId
     AND p.post_author = u.ID
-    AND p.post_status = 'publish' 
+    AND p.post_status = 'publish'
     AND p.post_type = 'blog'
     AND u.user_banned = '0'
     AND p.media_id = m.ID
