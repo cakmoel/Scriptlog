@@ -3240,6 +3240,40 @@ The footer includes:
 
 ### Theme Template Files
 
+#### Important: Template Loading Pattern
+
+**DO NOT include `call_theme_header()` or `call_theme_footer()` in template files.** The core system automatically handles header and footer loading via `HandleRequest.php`:
+
+```
+HandleRequest.php loads templates in sequence:
+  1. call_theme_header()  →  Loads header.php automatically
+  2. call_theme_content()  →  Loads the page template (e.g., home.php, single.php)
+  3. call_theme_footer()   →  Loads footer.php automatically
+```
+
+**Correct template format:**
+```php
+<?php
+defined('SCRIPTLOG') || die('Direct access not permitted');
+
+// Note: header.php and footer.php are loaded automatically
+// Do NOT include call_theme_header() or call_theme_footer()
+
+// Template content starts here...
+<div class="container">
+...
+</div>
+```
+
+**Incorrect (DO NOT use):**
+```php
+<?php
+call_theme_header();  // WRONG - causes duplicate headers!
+// ...
+
+call_theme_footer();  // WRONG - causes duplicate footers!
+```
+
 #### home.php
 
 The homepage template includes:
@@ -5723,7 +5757,10 @@ Frontend User Flow:
 
 Admin Flow:
 1. Admin edits protected post → content auto-decrypted for editing
-2. Admin saves → content re-encrypted with new passphrase
+2. Admin saves → 
+   - IF password changed: content encrypted with NEW passphrase
+   - IF password NOT changed: content re-encrypted with EXISTING passphrase (fix: prevents transaction rollback)
+3. Tags/categories/content now save correctly in both cases
 ```
 
 ### Database Schema
@@ -5801,17 +5838,16 @@ POST /api/v1/posts/3/unlock
 
 ### Unit Tests
 
-**Total: 59 tests across 3 files**
+**Total: 32 tests across 2 files**
 
 | Test File | Tests | Coverage |
 |-----------|-------|----------|
 | `tests/unit/ProtectedPostTest.php` | 12 | Core encryption/decryption functions |
 | `tests/unit/ProtectedPostRateLimitTest.php` | 20 | Rate limiting & password strength |
-| `tests/unit/PostControllerProtectedPostTest.php` | 27 | Controller flow & validation |
 
 Run tests:
 ```bash
-php lib/vendor/phpunit/phpunit/phpunit tests/unit/ProtectedPost*.php --bootstrap tests/bootstrap.php
+php lib/vendor/phpunit/phpunit tests/unit/ProtectedPost*.php --bootstrap tests/bootstrap.php
 ```
 
 ---
