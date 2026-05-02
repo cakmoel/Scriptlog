@@ -8,13 +8,43 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#106---2026-05-01)
+- [Latest Release](#107---2026-05-02)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
 
+## [1.0.7] - 2026-05-02
+
+### Changed
+- Revamped `src/public/themes/blog/single.php`
+- Revamped `src/public/themes/blog/footer.php`
+- Revamped `src/public/themes/blog/assets/js/load-comment.js` and minified version
+- Updated `src/docs/DEVELOPER_GUIDE.md`
+
+### Fixed
+- Fixed `src/lib/model/TopicModel.php` to handle updated categories in both protected and public posts
+- Fixed `src/lib/dao/PostDao.php` to accommodate unchanged password in a protected post when edited
+- Fixed bug in update method when a protected post was edited without changing the password
+
+### Added
+- Updated PHP docs in `src/lib/utility/generate-filename.php`
+
+### Removed
+- Removed unused `src/api/media-upload.php`
+
+### Notes
+Patch release addressing blog theme improvements, post editing bug fixes, and documentation updates.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.0.6
+- **Changes since v1.0.6**: 10 commits
+
+---
 ## [1.0.6] - 2026-05-01
 
 ### Changed
@@ -40,7 +70,7 @@ Maintenance release focusing on PHP 8.x compatibility fixes, code cleanup, and b
 
 ### Comparison
 - **Previous release**: v1.0.5
-- **Changes since v1.0.5**: 20+ commits
+- **Changes since v1.0.5**: 21 commits
 
 ---
 
@@ -215,6 +245,8 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.0.7 | 2026-05-02 | Stable |
+| 1.0.6 | 2026-05-01 | Stable |
 | 1.0.5 | 2026-04-28 | Stable |
 | 1.0.4 | 2026-04-22 | Stable |
 | 1.0.3 | 2026-04-13 | Stable |
