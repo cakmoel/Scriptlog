@@ -4,7 +4,7 @@
  * Generate new filename function
  *
  * @param string $file_name
- * @return string
+ * @return array
  *
  */
 function generate_filename($file_name)
