@@ -98,7 +98,7 @@
 <script src="<?= theme_dir(); ?>assets/js/jquery.pause.min.js" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/jquery.easing.min.js" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/comment-submission.min.js" defer></script>
-<script src="<?= theme_dir(); ?>assets/js/load-comment.min.js" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/load-comment.min.js?v=1.2" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/validator.min.js" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/wow.min.js" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/sina-nav.min.js" defer></script>
