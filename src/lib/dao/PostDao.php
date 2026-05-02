@@ -223,45 +223,35 @@ WHERE ID = ? AND post_type = 'blog'";
             // transaction
             $this->callTransaction();
 
-            if (!empty($bind['media_id'])) {
-                $this->modify("tbl_posts", [
-
-                    'media_id' => $bind['media_id'],
-                    'post_author' => $bind['post_author'],
-                    'post_modified' => $bind['post_modified'],
-                    'post_title' => $bind['post_title'],
-                    'post_slug' => $bind['post_slug'],
-                    'post_content' => $bind['post_content'],
-                    'post_summary' => $bind['post_summary'],
-                    'post_status' => $bind['post_status'],
-                    'post_visibility' => $bind['post_visibility'],
-                    'post_password' => $bind['post_password'],
-                    'post_tags' => $bind['post_tags'],
-                    'post_headlines' => $bind['post_headlines'],
-                    'post_locale' => $bind['post_locale'] ?? 'en',
-                    'comment_status' => $bind['comment_status'],
-                    'passphrase' => $bind['passphrase']
-
-                ], ['ID' => (int)$cleanId]);
-            } else {
-                $this->modify("tbl_posts", [
-                    'post_author' => $bind['post_author'],
-                    'post_modified' => $bind['post_modified'],
-                    'post_title' => $bind['post_title'],
-                    'post_slug' => $bind['post_slug'],
-                    'post_content' => $bind['post_content'],
-                    'post_summary' => $bind['post_summary'],
-                    'post_status' => $bind['post_status'],
-                    'post_visibility' => $bind['post_visibility'],
-                    'post_password' => $bind['post_password'],
-                    'post_tags' => $bind['post_tags'],
-                    'post_headlines' => $bind['post_headlines'],
-                    'post_locale' => $bind['post_locale'] ?? 'en',
-                    'comment_status' => $bind['comment_status'],
-                    'passphrase' => $bind['passphrase']
-
-                ], ['ID' => (int)$cleanId]);
+            // Build update data - only include password/passphrase if not empty
+            $updateData = [
+                'post_author' => $bind['post_author'],
+                'post_modified' => $bind['post_modified'],
+                'post_title' => $bind['post_title'],
+                'post_slug' => $bind['post_slug'],
+                'post_content' => $bind['post_content'],
+                'post_summary' => $bind['post_summary'],
+                'post_status' => $bind['post_status'],
+                'post_visibility' => $bind['post_visibility'],
+                'post_tags' => $bind['post_tags'],
+                'post_headlines' => $bind['post_headlines'],
+                'post_locale' => $bind['post_locale'] ?? 'en',
+                'comment_status' => $bind['comment_status']
+            ];
+            
+            // Only update password and passphrase if they're not empty
+            if (!empty($bind['post_password'])) {
+                $updateData['post_password'] = $bind['post_password'];
             }
+            if (!empty($bind['passphrase'])) {
+                $updateData['passphrase'] = $bind['passphrase'];
+            }
+            
+            if (!empty($bind['media_id'])) {
+                $updateData['media_id'] = $bind['media_id'];
+            }
+            
+            $this->modify("tbl_posts", $updateData, ['ID' => (int)$cleanId]);
 
             // delete all post_topic by post_id
             $post_id = isset($ID) ? purify_dirty_html((int)$ID) : "";
