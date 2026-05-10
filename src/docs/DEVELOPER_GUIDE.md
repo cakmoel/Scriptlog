@@ -82,7 +82,7 @@ composer install
 
 # Set permissions
 chmod -R 755 public/
-chmod -R 777 public/cache/ public/log/
+chmod -R 755 public/cache/ public/log/
 ```
 
 ### Option 2: Install via Composer from Packagist
