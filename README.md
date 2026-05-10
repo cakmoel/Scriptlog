@@ -51,7 +51,7 @@ Ensure your hosting environment meets the following requirements:
 3. **Set Permissions**
    ```bash
    chmod -R 755 public/
-   chmod -R 777 public/cache/ public/log/
+   chmod -R 755 public/cache/ public/log/
    ```
 
 4. **Database Setup**
