@@ -141,7 +141,7 @@ register_header($stylePath);
         <div class="col-xs-8">
           <div class="checkbox icheck">
             <label for="iagree-to-terms">
-              <input type="checkbox" aria-checked="false" name="iagree" id="iagree-to-terms" value="1" required> I agree to the <a href="<?= app_url() . '/admin/terms-of-use.html'?>" target="_blank" rel="noopener noreferrer" title="Terms of use" aria-label="Terms of Use">terms of use</a>
+              <input type="checkbox" aria-checked="false" name="iagree" id="iagree-to-terms" value="1" required> I agree to the <a href="<?= app_url() . '/terms-of-use.html'?>" target="_blank" rel="noopener noreferrer" title="Terms of use" aria-label="Terms of Use">terms of use</a>
             </label>
           </div>
         </div>
