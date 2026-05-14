@@ -8,12 +8,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#107---2026-05-02)
+- [Latest Release](#108---2026-05-14)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.0.8] - 2026-05-14
+
+### Fixed
+- Fixed terms-of-use link path in signup form (`src/admin/signup.php`)
+- Changed recommended permissions from `777` to `755` for `public/cache/` and `public/log/` directories (`README.md`, `src/docs/DEVELOPER_GUIDE.md`)
+
+### Notes
+Patch release fixing the terms-of-use link URL and hardening directory permissions.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.0.7
+- **Changes since v1.0.7**: 4 commits
+
+---
 
 ## [1.0.7] - 2026-05-02
 
@@ -245,6 +263,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.0.8 | 2026-05-14 | Stable |
 | 1.0.7 | 2026-05-02 | Stable |
 | 1.0.6 | 2026-05-01 | Stable |
 | 1.0.5 | 2026-04-28 | Stable |
