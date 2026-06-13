@@ -1,3 +1,5 @@
+</main>
+
 <footer class="main-footer" role="contentinfo">
   <div class="container">
     <?php
@@ -126,8 +128,6 @@ if (function_exists('should_show_consent_banner') && should_show_consent_banner(
     }
 }
 ?>
-
-</main>
 
 </body>
 </html>
