@@ -370,7 +370,7 @@ final class FrontContentModel extends BaseModel
     /**
      * frontSanitizer
      * a
-     * @return object
+     * @return object|string
      */
     public static function frontSanitizer()
     {
@@ -382,7 +382,7 @@ final class FrontContentModel extends BaseModel
      *
      * @param int|num $perPage
      * @param string $instance
-     * @return object
+     * @return object|string
      *
      */
     private static function frontPaginator($perPage, $instance)

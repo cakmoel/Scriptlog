@@ -13,7 +13,7 @@
 function limit_word($args, $limit)
 {
 
-    $text = function_exists('is_valid_utf8') ? is_valid_utf8($args) : "";
+    $text = function_exists('is_valid_utf8') ? (is_valid_utf8($args) ?: "") : "";
 
     if (str_word_count($text, 0) > $limit) {
         $words = str_word_count($text, 2);

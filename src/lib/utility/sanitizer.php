@@ -5,14 +5,14 @@
  *
  * @category Function
  * @author M.Noermoehammad
- * @param string $str
+ * @param string|int $str
  * @param string $type
  *
  */
 function sanitizer($str, $type)
 {
     $sanitizer = class_exists('Sanitize') ? new Sanitize() : "";
-    return $sanitizer->sanitasi(sanitize_string($str), $type);
+    return $sanitizer->sanitasi(sanitize_string((string) $str), $type);
 }
 
 /**

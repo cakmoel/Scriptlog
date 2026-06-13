@@ -166,7 +166,7 @@ class ScriptlogExporter
         $where[] = 'post_status = ?';
         $params[] = 'publish';
 
-        $whereClause = empty($where) ? '' : 'WHERE ' . implode(' AND ', $where);
+        $whereClause = 'WHERE ' . implode(' AND ', $where);
 
         $sql = "SELECT p.*, u.user_login, u.user_fullname, u.user_email
                 FROM tbl_posts p 
@@ -201,7 +201,7 @@ class ScriptlogExporter
         $where[] = 'post_status = ?';
         $params[] = 'publish';
 
-        $whereClause = empty($where) ? '' : 'WHERE ' . implode(' AND ', $where);
+        $whereClause = 'WHERE ' . implode(' AND ', $where);
 
         $sql = "SELECT p.*, u.user_login, u.user_fullname, u.user_email
                 FROM tbl_posts p 

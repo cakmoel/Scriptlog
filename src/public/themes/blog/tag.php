@@ -75,7 +75,7 @@ $pagination = !empty($entries) && isset($entries['paginationLink']) ? $entries['
 
                 <!-- navigation -->
                 <?php if (!empty($pagination)) : ?>
-                <nav aria-label="Page navigation example">
+                <nav aria-label="<?= t('pagination.navigation'); ?>">
                     <ul class="pagination pagination-template d-flex justify-content-center">
                         <?= $pagination; ?>
                     </ul>

@@ -117,7 +117,7 @@ function set_cors_headers($origin = null)
  */
 function handle_preflight_request()
 {
-    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
         header('Access-Control-Allow-Origin: ' . (app_url() ?? '*'));
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
         header('Access-Control-Allow-Headers: Content-Type, X-Requested-With');

@@ -54,9 +54,9 @@ function encrypt(string $data, string $key): string
 
     if (! in_array('sha3-512', hash_algos())) {
         scriptlog_error("Hashing algorithm is not supported");
-    } else {
-        $hmac = hash_hmac('sha3-512', $ciphertext, $second_passphrase, true);
     }
+
+    $hmac = hash_hmac('sha3-512', $ciphertext, $second_passphrase, true);
 
     return base64_encode($iv . $hmac . $ciphertext);
 }

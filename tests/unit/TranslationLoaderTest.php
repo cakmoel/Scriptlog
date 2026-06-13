@@ -155,7 +155,24 @@ class TranslationLoaderTest extends TestCase
 
     public function testCacheExpiryLogic()
     {
-        $this->markTestSkipped('Cache expiry test has filesystem timing issues');
+        $cacheTtl = 3600; // 1 hour
+        $cacheFile = $this->cacheDir . '/test_cache.json';
+        
+        // Create a cache file
+        file_put_contents($cacheFile, json_encode(['test' => 'data']));
+        
+        // File should not be expired immediately
+        $mtime = filemtime($cacheFile);
+        $isExpired = (time() - $mtime) > $cacheTtl;
+        
+        $this->assertFalse($isExpired);
+        
+        // Simulate old file
+        touch($cacheFile, time() - ($cacheTtl + 100));
+        $mtime = filemtime($cacheFile);
+        $isExpired = (time() - $mtime) > $cacheTtl;
+        
+        $this->assertTrue($isExpired);
     }
 
     public function testMemoryCacheLayer()

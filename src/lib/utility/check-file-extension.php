@@ -20,7 +20,7 @@ function check_file_extension($file_name)
 
     $extension = get_file_extension($file_name);
 
-    switch (strtolower($extension)) {
+    switch (strtolower((string)$extension)) {
         // image
         case 'jpg':
         case 'jpe':

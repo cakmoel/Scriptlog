@@ -91,7 +91,7 @@ class PostModel extends BaseModel
 
         $this->setSQL($sql);
 
-        $latestPosts = isset($limit) ? $this->findAll([':limit' => $limit]) : 0;
+        $latestPosts = $this->findAll([':limit' => $limit]);
 
         return (empty($latestPosts)) ?: $latestPosts;
     }

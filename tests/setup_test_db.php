@@ -97,6 +97,16 @@ try {
           PRIMARY KEY (ID)
         )Engine=InnoDB DEFAULT CHARSET=utf8mb4',
 
+        'CREATE TABLE IF NOT EXISTS tbl_mediameta (
+          ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+          media_id BIGINT(20) UNSIGNED NOT NULL,
+          meta_key VARCHAR(255) NOT NULL,
+          meta_value LONGTEXT,
+          PRIMARY KEY (ID),
+          KEY idx_media_id (media_id),
+          KEY idx_meta_key (meta_key(191))
+        )Engine=InnoDB DEFAULT CHARSET=utf8mb4',
+
         'CREATE TABLE IF NOT EXISTS tbl_settings (
           ID INT(11) unsigned NOT NULL AUTO_INCREMENT,
           setting_name VARCHAR(255) NOT NULL,
@@ -167,6 +177,18 @@ try {
           UNIQUE KEY lang_key (lang_id, translation_key),
           KEY lang_id (lang_id),
           KEY translation_key (translation_key(191))
+        )Engine=InnoDB DEFAULT CHARSET=utf8mb4',
+
+        'CREATE TABLE IF NOT EXISTS tbl_privacy_policies (
+          ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+          locale VARCHAR(10) NOT NULL DEFAULT "en",
+          policy_title VARCHAR(255) NOT NULL,
+          policy_content LONGTEXT NOT NULL,
+          is_default TINYINT(1) NOT NULL DEFAULT 0,
+          created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+          PRIMARY KEY (ID),
+          UNIQUE KEY locale (locale)
         )Engine=InnoDB DEFAULT CHARSET=utf8mb4'
     ];
     

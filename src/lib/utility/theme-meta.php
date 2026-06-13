@@ -152,7 +152,7 @@ function metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri)
         case 'tag':
             $tag_item = isset($uri->param1) ? $uri->param1 : null;
 
-            $canonical = ((isset($tag)) || (isset($tag_item)) ? app_url() . DS . 'tag' . DS . $tag_item : app_url());
+            $canonical = (isset($tag_item) ? app_url() . DS . 'tag' . DS . $tag_item : app_url());
             $description = 'Tag:' . ' - ' . $tag_item;
             $keyword = escape_html(app_info()['site_keywords']);
             $date_published = date(DATE_ATOM);
@@ -280,7 +280,7 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
                 $date_modified = date(DATE_ATOM);
             }
 
-            $theme_meta['site_schema'] = (is_null($category_id)) ? generate_schema_org(ucfirst(trim('page not found')) . '|' . escape_html(app_info()['site_name'])) : generate_schema_org(ucfirst(trim($category_title)) . '|' . app_info()['site_name'], $canonical, $image, $category_title, $description, $scriptlog_imgthumb, $date_published, $date_modified);
+            $theme_meta['site_schema'] = (is_null($category_id)) ? generate_schema_org(ucfirst(trim('page not found')) . '|' . escape_html(app_info()['site_name'])) : generate_schema_org(ucfirst(trim($category_title)) . '|' . app_info()['site_name'], $canonical, $scriptlog_image, $category_title, $description, $scriptlog_imgthumb, $date_published, $date_modified);
             $theme_meta['site_meta_tags'] = (is_null($category_id)) ? generate_meta_tags(ucfirst(trim('page not found')) . '|' . app_info()['site_name'], app_info()['site_description'], app_info()['site_keywords'], APP_TITLE, $scriptlog_image, app_url()) : generate_meta_tags($category_title, $description, app_info()['site_name'], $scriptlog_image, $canonical);
 
             break;
@@ -293,10 +293,10 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
                 $month = (isset($archive_requested[4]) && isset($archive_requested[5])) ? $archive_requested[4] . $archive_requested[5] : $archive_requested[4] . "";
 
                 $canonical = (!empty($month)) ? app_url() . DS . '?a=' . $year . $month : app_url();
-                $month_num = isset($month) ? safe_html($month) : "";
+                $month_num = safe_html($month);
                 $monthObj = class_exists('DateTime') ? DateTime::createFromFormat('!m', $month_num) : "";
                 $month_name = method_exists($monthObj, 'format') ? $monthObj->format('F') : "";
-                $month_name = isset($month_name) ? $month_name : date("F", mktime(0, 0, 0, $month, 10));
+                $month_name = !empty($month_name) ? $month_name : date("F", mktime(0, 0, 0, $month, 10));
             } else {
                 http_response_code(404);
                 throw new InvalidArgumentException("Argument passed must be of the type string, numeric or integer, null given");
@@ -308,7 +308,7 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
             break;
 
         case 'tag':
-            if ((empty($value)) || (empty($value) === '')) {
+            if (empty($value)) {
                 http_response_code(404);
                 throw new InvalidArgumentException("Argument passed must be of the type string, numeric or integer, null given");
             } else {

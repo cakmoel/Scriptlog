@@ -8,7 +8,7 @@
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * @return void
+ * @return string
  *
  */
 function current_request_method()

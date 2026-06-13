@@ -50,7 +50,15 @@ class Bootstrap
         'dispatcher',
         'i18n',
         'userDao',
-        'userToken'
+        'userToken',
+        'themeRenderer',
+        'mediaDao',
+        'downloadService',
+        'downloadController',
+        'frontService',
+        'postDao',
+        'pageDao',
+        'topicDao'
     ];
 
     /**
@@ -204,6 +212,19 @@ class Bootstrap
             }
         }
 
+        // Initialize session (config before start to prevent "session_save_path(): Session save path cannot be changed when a session is active")
+        if ($sessionMaker) {
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                session_write_close();
+            }
+            session_save_path(sys_get_temp_dir());
+            session_set_save_handler($sessionMaker, true);
+            register_shutdown_function('session_write_close');
+            if (function_exists('start_session_on_site')) {
+                start_session_on_site($sessionMaker);
+            }
+        }
+
         $authenticator = null;
         if (class_exists('Authentication') && !empty($dbc) && $dbc !== "") {
             try {
@@ -213,10 +234,76 @@ class Bootstrap
             }
         }
 
+        // ThemeRenderer for centralized theme rendering
+        $themeRenderer = null;
+        if (class_exists('ThemeRenderer')) {
+            try {
+                $themeRenderer = new ThemeRenderer();
+            } catch (Exception $e) {
+                $themeRenderer = null;
+            }
+        }
+
+        // Set ThemeRenderer on HandleRequest for query-string routing
+        if ($themeRenderer && class_exists('HandleRequest')) {
+            HandleRequest::setThemeRenderer($themeRenderer);
+        }
+
+        // FrontService for frontend data access (with FrontHelper delegation)
+        $frontService = null;
+        if (class_exists('FrontService')) {
+            try {
+                $frontService = new FrontService();
+            } catch (Exception $e) {
+                $frontService = null;
+            }
+        }
+        if ($frontService && class_exists('FrontHelper')) {
+            FrontHelper::setFrontService($frontService);
+        }
+
+        // Download service chain
+        $mediaDao = null;
+        $downloadModel = null;
+        $downloadService = null;
+        $downloadController = null;
+
+        if (!empty($dbc) && $dbc !== "") {
+            $mediaDao = class_exists('MediaDao') ? new MediaDao() : null;
+            $downloadModel = class_exists('DownloadModel') ? new DownloadModel() : null;
+            if ($downloadModel && $mediaDao) {
+                $downloadService = new DownloadService($downloadModel, $mediaDao);
+            }
+            if ($downloadService) {
+                $downloadController = new DownloadController($downloadService);
+            }
+        }
+
+        // Create additional DAOs for FrontService
+        $postDao = null;
+        $pageDao = null;
+        $topicDao = null;
+
+        if (!empty($dbc) && $dbc !== "") {
+            $postDao = class_exists('PostDao') ? new PostDao() : null;
+            $pageDao = class_exists('PageDao') ? new PageDao() : null;
+            $topicDao = class_exists('TopicDao') ? new TopicDao() : null;
+        }
+
+        // Store services in Registry for global access
+        if (class_exists('Registry')) {
+            Registry::set('mediaDao', $mediaDao);
+            Registry::set('downloadService', $downloadService);
+            Registry::set('downloadController', $downloadController);
+            Registry::set('postDao', $postDao);
+            Registry::set('pageDao', $pageDao);
+            Registry::set('topicDao', $topicDao);
+        }
+
         $dispatcher = null;
         if (class_exists('Dispatcher') && !empty($dbc) && $dbc !== "") {
             try {
-                $dispatcher = new Dispatcher();
+                $dispatcher = new Dispatcher($themeRenderer);
             } catch (Exception $e) {
                 // Dispatcher creation failed
             }
@@ -234,7 +321,41 @@ class Bootstrap
             'authenticator' => $authenticator,
             'ubench' => class_exists('Ubench') ? new Ubench() : null,
             'dispatcher' => $dispatcher,
+            'themeRenderer' => $themeRenderer,
+            'mediaDao' => $mediaDao,
+            'downloadService' => $downloadService,
+            'downloadController' => $downloadController,
+            'frontService' => $frontService,
+            'postDao' => $postDao,
+            'pageDao' => $pageDao,
+            'topicDao' => $topicDao,
         ];
+
+        // Build HandlerRegistry for query-string routing
+        $handlerRegistry = null;
+        if ($themeRenderer) {
+            $handlerRegistry = new HandlerRegistry();
+
+            $downloadController = self::$services['downloadController'] ?? null;
+
+            $handlerRegistry->register('p', new PostHandler($themeRenderer));
+            $handlerRegistry->register('pg', new PageHandler($themeRenderer));
+            $handlerRegistry->register('cat', new CategoryHandler($themeRenderer));
+            $handlerRegistry->register('tag', new TagHandler($themeRenderer));
+            $handlerRegistry->register('a', new ArchiveHandler($themeRenderer));
+            $handlerRegistry->register('blog', new BlogHandler($themeRenderer));
+            $handlerRegistry->register('privacy', new PrivacyHandler($themeRenderer));
+
+            if ($downloadController) {
+                $handlerRegistry->register('download', new DownloadHandler(
+                    $themeRenderer,
+                    $downloadController
+                ));
+            }
+
+            // Store in Registry so HandleRequest can access it
+            class_exists('Registry') ? Registry::set('handlerRegistry', $handlerRegistry) : null;
+        }
 
         // STEP 5: Initialize i18n if available
         if (class_exists('I18nManager')) {
