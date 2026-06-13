@@ -254,7 +254,7 @@ WHERE ID = ? AND post_type = 'blog'";
             $this->modify("tbl_posts", $updateData, ['ID' => (int)$cleanId]);
 
             // delete all post_topic by post_id
-            $post_id = isset($ID) ? purify_dirty_html((int)$ID) : "";
+            $post_id = isset($ID) ? purify_dirty_html((string)$ID) : "";
 
             $this->deleteRecord("tbl_post_topic", ['post_id' => $post_id]);
 
@@ -389,7 +389,7 @@ WHERE ID = ? AND post_type = 'blog'";
     public function dropDownVisibility($selected = null, $postId = null)
     {
 
-        $dropdown = null;
+        $dropdown = '';
 
         $name = "visibility";
 
@@ -402,7 +402,7 @@ WHERE ID = ? AND post_type = 'blog'";
         $visibility_list = ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'];
 
         foreach ($visibility_list as $key => $visibility) {
-            $select = $this->selected === $key ? ' selected' : null;
+            $select = $this->selected === $key ? ' selected' : '';
 
             $dropdown .= '<option value="' . $key . '"' . $select . '>' . $visibility . '</option>' . PHP_EOL;
         }
