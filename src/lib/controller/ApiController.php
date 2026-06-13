@@ -36,7 +36,7 @@ class ApiController
     protected $headers = [];
 
     /**
-     * @var array Required authentication for endpoints
+     * @var bool|array Required authentication for endpoints
      */
     protected $requiresAuth = true;
 
@@ -46,7 +46,7 @@ class ApiController
     public function __construct()
     {
         // Get request method
-        $this->method = $_SERVER['REQUEST_METHOD'];
+        $this->method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
         // Get request headers
         $this->headers = $this->getHeaders();
