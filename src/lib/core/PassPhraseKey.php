@@ -53,17 +53,14 @@ class PassPhraseKey
      */
     public static function savePassPhraseKey($passphrase, $filename)
     {
+        static::$passphrase = $passphrase;
 
-        if (isset($passphrase)) {
-            static::$passphrase = $passphrase;
-
-            if (false === self::checkingUserLevel()) {
-                scriptlog_error("You are not allowed to do this procedure");
-            } else {
-                $fp = fopen(self::grabFilename($filename), 'w');
-                fwrite($fp, $passphrase);
-                fclose($fp);
-            }
+        if (false === self::checkingUserLevel()) {
+            scriptlog_error("You are not allowed to do this procedure");
+        } else {
+            $fp = fopen(self::grabFilename($filename), 'w');
+            fwrite($fp, $passphrase);
+            fclose($fp);
         }
     }
 
