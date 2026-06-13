@@ -335,7 +335,7 @@ class MediaDao extends Dao
      */
     public function updateMediaMeta($sanitize, $bind, $mediaId)
     {
-        $idsanitized = $this->filteringId($sanitize, $mediaId, 'sql');
+        $idsanitized = $this->filteringId($sanitize, (string)$mediaId, 'sql');
 
         if (!empty($bind['meta_key'])) {
             $this->modify("tbl_mediameta", [
@@ -432,7 +432,7 @@ class MediaDao extends Dao
      * dropDownMediaStatus
      *
      * @param int $selected
-     * @return int
+     * @return string
      *
      */
     public function dropDownMediaStatus($selected = "")
@@ -480,12 +480,13 @@ class MediaDao extends Dao
             foreach ($media_ids as $m => $media) {
                 $media_meta = $this->findMediaMetaValue($media['ID'], $media['media_filename'], $sanitizer);
 
-                $media_properties = isset($media_meta['meta_value']) ? media_properties($media_meta['meta_value']) : null;
+                $media_properties = isset($media_meta['meta_value']) ? media_properties($media_meta['meta_value']) : [];
 
-                $select = $selected === $media['ID'] ? ' selected' : null;
+                $select = $selected === $media['ID'] ? ' selected' : '';
 
                 if (in_array($media['media_type'], $picture_bucket_list)) {
-                    $dropdown .= '<option data-content="<img src=' . app_url() . DS . APP_IMAGE_SMALL . 'small_' . rawurlencode(basename(safe_html($media['media_filename']))) . '></img>" value="' . (int)$media['ID'] . '"' . $select . '>' . safe_html($media_properties['Origin']) . '</option>' . "\n";
+                    $origin = isset($media_properties['Origin']) ? safe_html($media_properties['Origin']) : '';
+                    $dropdown .= '<option data-content="<img src=' . app_url() . DS . APP_IMAGE_SMALL . 'small_' . rawurlencode(basename(safe_html($media['media_filename']))) . '></img>" value="' . (int)$media['ID'] . '"' . $select . '>' . $origin . '</option>' . "\n";
                 }
             }
         }
@@ -526,19 +527,21 @@ class MediaDao extends Dao
             foreach ($media_ids as $media) {
                 $media_meta = isset($media['ID']) ? $this->findMediaMetaValue($media['ID'], $media['media_filename'], $sanitizer) : null;
 
-                $media_properties = isset($media_meta['meta_value']) ? media_properties($media_meta['meta_value']) : null;
+                $media_properties = isset($media_meta['meta_value']) ? media_properties($media_meta['meta_value']) : [];
 
                 $imgradio .= '<div class="col-xs-4 col-sm-3 col-md-2 nopad text-center">' . "\n";
 
                 $imgradio .= '<label for="image_id" class="image-radio" >' . "\n";
 
                 // get filename
-                $file_basename = substr($media['media_filename'], 0, strripos($media['media_filename'], '.'));
+                $dotPos = strripos($media['media_filename'], '.');
+                $file_basename = $dotPos !== false ? substr($media['media_filename'], 0, $dotPos) : $media['media_filename'];
 
                 if ($file_basename == 'nophoto') {
                     $imgradio .= '<img class="img-responsive" src="https://s6.imgcdn.dev/vsWDK.th.jpg" alt="nophoto" border="0">';
                 } else {
-                    $imgradio .= '<img class="img-responsive" alt="' . safe_html($media_properties['Origin']) . '" src="' . app_url() . DS . APP_IMAGE_SMALL . 'small_' . rawurlencode(basename(safe_html($media['media_filename']))) . '" >' . "\n";
+                    $imgAlt = isset($media_properties['Origin']) ? safe_html($media_properties['Origin']) : '';
+                    $imgradio .= '<img class="img-responsive" alt="' . $imgAlt . '" src="' . app_url() . DS . APP_IMAGE_SMALL . 'small_' . rawurlencode(basename(safe_html($media['media_filename']))) . '" >' . "\n";
                 }
 
                 if ($checked === $media['ID']) {
