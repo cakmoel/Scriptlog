@@ -1,5 +1,4 @@
 {
-    "$schema": "https://raw.githubusercontent.com/composer/composer/master/res/composer-schema.json",
     "name": "cakmoel/scriptlog",
     "type": "project",
     "description": "Just another blog engine",
@@ -17,6 +16,7 @@
         "platform": {
             "php": "7.4.33"
         },
+        "vendor-dir": "lib/vendor",
         "sort-packages": true
     },
     "require": {
@@ -37,35 +37,46 @@
         "vlucas/phpdotenv": "^5.6",
         "voku/anti-xss": "^4.1"
     },
-"require-dev": {
+    "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
+        "phpmd/phpmd": "^2.15",
         "phpmetrics/phpmetrics": "^2.9",
         "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.5",
-        "squizlabs/php_codesniffer": "^3.7"
+        "squizlabs/php_codesniffer": "^3.7",
+        "vimeo/psalm": "^4.0"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
     "autoload": {
-        "classmap": ["src/lib/"]
+        "classmap": ["src/lib"]
     },
     "scripts": {
         "metrics": "php bin/phpmetrics",
-        "phpstan": "phpstan analyse src --level 0 --memory-limit=1G",
-        "phpstan:strict": "phpstan analyse src --level 1 --memory-limit=1G",
-        "phpcs": "phpcs --standard=phpcs.xml src/",
-        "phpcbf": "phpcbf --standard=phpcs.xml src/",
+        "phpstan": "phpstan analyse lib --level 1 --memory-limit=1G",
+        "phpstan:strict": "phpstan analyse lib --level 5 --memory-limit=1G",
+        "phpcs": "phpcs --standard=phpcs.xml lib/",
+        "phpcbf": "phpcbf --standard=phpcs.xml lib/",
         "csfix": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff",
         "csfix:apply": "php-cs-fixer fix --config=.php-cs-fixer.dist.php",
+        "phpmd": "phpmd lib/ text phpmd.xml --ignore-violations-on-exit",
+        "phpmd:html": "phpmd lib/ html phpmd.xml --report-file build/phpmd.html",
+        "phpmd:strict": "phpmd lib/ text phpmd.xml",
+        "psalm": "psalm --no-cache --php-version=7.4",
+        "psalm:baseline": "psalm --set-baseline=psalm-baseline.xml",
+        "psalm:update-baseline": "psalm --update-baseline",
+        "psalm:strict": "psalm --no-cache --php-version=7.4 --ignore-baseline",
         "test": "phpunit --configuration phpunit.xml",
         "test:coverage": "phpunit --configuration phpunit.xml --coverage-html build/coverage",
         "analyse": [
             "@phpstan",
-            "@phpcs"
+            "@phpcs",
+            "@phpmd"
         ],
         "quality": [
             "@phpstan",
             "@phpcs",
+            "@phpmd",
             "@metrics"
         ],
         "build": [
