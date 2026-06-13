@@ -8,17 +8,15 @@
  * @license MIT
  * @version 1.0
  * @param string $key
- * @param string $origin
- * @param string $timespan
+ * @param array|string $origin
+ * @param int|null $timespan
  * @return boolean
  *
  */
 function csrf_check_token($key, $origin, $timespan = null)
 {
-    if (!class_exists('CSRFGuard')) {
-        return false;
-    }
-    $check_csrf = CSRFGuard::check($key, $origin, true, $timespan, false);
+    $check_csrf = class_exists('CSRFGuard') ? CSRFGuard::check($key, $origin, true, $timespan, false) : "";
+
     return ($check_csrf) ? true : false;
 }
 
