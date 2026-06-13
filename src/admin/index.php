@@ -76,6 +76,23 @@ if (!$loggedIn) {
 
     $user_session = isset($user_data['user_session']) ? $user_data['user_session'] : do_logout($app->authenticator);
 
+    // Initialize admin locale from database default language if not already set
+    if (!isset($_SESSION['admin_locale']) && !isset($_COOKIE['admin_locale'])) {
+        try {
+            $configDao = new ConfigurationDao();
+            $defaultLang = $configDao->findConfigByName('lang_default', new Sanitize());
+            if (!empty($defaultLang['setting_value'])) {
+                $langCode = $defaultLang['setting_value'];
+                $availableLocales = ['en', 'ar', 'zh', 'fr', 'ru', 'es', 'id'];
+                if (in_array($langCode, $availableLocales)) {
+                    admin_set_locale($langCode);
+                }
+            }
+        } catch (Throwable $e) {
+            // Silently fall back to English
+        }
+    }
+
     // breadcrumb logic
     $breadcrumb = isset($_GET['load']) ? htmlspecialchars(sanitize_urls($_GET['load']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : http_response_code();
 
