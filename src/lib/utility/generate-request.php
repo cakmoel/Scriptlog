@@ -91,6 +91,12 @@ function generate_request($base, $type, $data = array(), $string_encoded = true)
 
                     );
                 }
+            } else {
+                $query_data = array(
+
+                  'load' => sanitize_urls($load)
+
+                );
             }
 
             $html['link'] = build_query($base, $query_data);
