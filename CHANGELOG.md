@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **HandleRequest upgrades**: Comprehensive query string handling and 404 management
 - **Test suite expansion**: 25+ new test files covering handlers, services, download features, integration tests, and smoke tests
 - **Test infrastructure**: New `tests/core/`, `tests/smoke/`, and `tests/unit/handlers/` test directories
+- **Psalm static analysis**: Configuration files (`psalm.xml`, `psalm-baseline.xml`, `psalm-autoload.php`) for improved code quality enforcement
 
 ### Changed
 - Updated `composer.json` and `composer.lock` dependencies
@@ -62,7 +63,7 @@ Minor release introducing a new handler-based front-end architecture, comprehens
 
 ### Comparison
 - **Previous release**: v1.0.8
-- **Changes since v1.0.8**: 280 commits
+- **Changes since v1.0.8**: 283 commits
 
 ---
 
