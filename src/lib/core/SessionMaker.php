@@ -51,18 +51,16 @@ class SessionMaker extends SessionHandler
         $this->name = $name;
         $this->cookie = $cookie;
 
-        if (ini_get('session.use_cookies')) {
-            $current_cookie_params = session_get_cookie_params();
-        }
+        $current_cookie_params = ini_get('session.use_cookies') ? session_get_cookie_params() : [];
 
         $httponly = true;
 
         if (PHP_VERSION_ID < 70300) {
             $this->cookie += [
 
-               'lifetime' => $current_cookie_params['lifetime'],
+               'lifetime' => $current_cookie_params['lifetime'] ?? 0,
                'path'     => '/; samesite=lax',
-               'domain'   => $current_cookie_params['domain'],
+               'domain'   => $current_cookie_params['domain'] ?? '',
                'secure'   => is_cookies_secured(),
                'httponly' => $httponly
 
@@ -70,9 +68,9 @@ class SessionMaker extends SessionHandler
         } else {
             $this->cookie += [
 
-               'lifetime' => $current_cookie_params['lifetime'],
+               'lifetime' => $current_cookie_params['lifetime'] ?? 0,
                'path'     => ini_get('session.cookies_path'),
-               'domain'   => $current_cookie_params['domain'],
+               'domain'   => $current_cookie_params['domain'] ?? '',
                'secure'   => is_cookies_secured(),
                'httponly' => $httponly,
                'samesite' => 'lax'
@@ -124,11 +122,21 @@ class SessionMaker extends SessionHandler
         if ((!isset($_COOKIE[session_name()])) || ($this->isSessionStarted() === false)) {
             if (version_compare(PHP_VERSION, '5.6.0', '<')) {
                 if (session_id() == '') {
-                    session_start();
+                    try {
+                        session_start();
+                    } catch (Throwable $e) {
+                        error_log("Session start failed (PHP < 5.6): " . $e->getMessage());
+                        return false;
+                    }
                 }
             } else {
                 if (session_status() == PHP_SESSION_NONE) {
-                    session_start();
+                    try {
+                        session_start();
+                    } catch (Throwable $e) {
+                        error_log("Session start failed: " . $e->getMessage());
+                        return false;
+                    }
                 }
             }
 
@@ -189,7 +197,7 @@ class SessionMaker extends SessionHandler
             }
 
             return $this->decrypt($data, $this->key);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             error_log("Session read error for ID " . substr($id, 0, 10) . "...: " . $e->getMessage());
             return "";
         }
@@ -244,9 +252,9 @@ class SessionMaker extends SessionHandler
     public function isGenuine()
     {
 
-        $agent = getenv('HTTP_USER_AGENT', true) ?: getenv('HTTP_USER_AGENT');
+        $agent = (getenv('HTTP_USER_AGENT', true) ?: getenv('HTTP_USER_AGENT')) ?: '';
 
-        $ip_client = getenv('REMOTE_ADDR', true) ? get_ip_address() : getenv('REMOTE_ADDR');
+        $ip_client = getenv('REMOTE_ADDR', true) ? get_ip_address() : (getenv('REMOTE_ADDR') ?: '0.0.0.0');
 
         $hash = md5($agent . (ip2long($ip_client) & ip2long('255.255.0.0')));
 
@@ -281,8 +289,12 @@ class SessionMaker extends SessionHandler
      */
     protected function encrypt($data, $key)
     {
-
-        return ScriptlogCryptonize::encryptAES($data, $key);
+        try {
+            return ScriptlogCryptonize::encryptAES($data, $key);
+        } catch (Throwable $e) {
+            error_log("Session encryption error: " . $e->getMessage());
+            return $data;
+        }
     }
 
     /**
@@ -310,7 +322,7 @@ class SessionMaker extends SessionHandler
                 }
 
                 return $decrypted;
-            } catch (Exception $defuseError) {
+            } catch (Throwable $defuseError) {
                 // Both methods failed - session is corrupted or invalid
                 error_log("Session decryption failed for both methods. OpenSSL error: " . $e->getMessage() . ", Defuse error: " . $defuseError->getMessage());
 
