@@ -51,7 +51,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Removed empty `load_more_comments()` function stub from blog theme `functions.php`
 
 ### Removed
-- `restoblog` and `tastybites` themes (added then removed from repository)
 - Unused CSS from blog theme (`custom.css` trimmed by 269 lines)
 - Deprecated code and unused utility files
 
