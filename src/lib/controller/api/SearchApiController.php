@@ -132,7 +132,7 @@ class SearchApiController extends ApiController
             return [];
         }
 
-        return array_map(function ($item) use ($type) {
+        return array_map(function ($item) {
             $item = (array) $item;
             return [
                 'id' => (int)$item['ID'],
