@@ -32,7 +32,7 @@
                             <h4><i class="icon fa fa-warning"></i> Invalid Form Data!</h4>
                             <?php
                             foreach ($errors as $e) :
-                                echo '<p>' . $e . '</p>';
+                                echo '<p>' . safe_html($e) . '</p>';
                             endforeach;
                             ?>
                         </div>
@@ -47,7 +47,7 @@
                             <h4><i class="icon fa fa-check"></i> Success!</h4>
                             <?php
                             foreach ($status as $s) :
-                                echo $s;
+                                echo safe_html($s);
                             endforeach;
                             ?>
                         </div>
