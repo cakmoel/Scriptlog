@@ -6,11 +6,10 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  * @category Function
  * @author M.Noermoehammad
- * @param int|num|string
- * @return string
+ * @param int $id
  *
  */
-function permalinks($id)
+function permalinks(int $id)
 {
 
     $config_file = read_config(invoke_config());
@@ -31,7 +30,6 @@ function permalinks($id)
  *
  * @category Function
  * @author M.Noermoehammad
- * @return mixed
  *
  */
 function is_permalink_enabled()
@@ -49,7 +47,7 @@ function is_permalink_enabled()
  * @param mixed $id
  * @param string $app_url
  * @uses FrontHelper::methodName()
- * @return mixed|array
+ * @return array
  *
  */
 function listen_query_string($id, $app_url)
@@ -66,7 +64,7 @@ function listen_query_string($id, $app_url)
             # Deliver request to single entry post
             if ((!empty(HandleRequest::isQueryStringRequested()['value'])) && ($id === HandleRequest::isQueryStringRequested()['value'])) {
                 $entry_post = FrontHelper::grabSimpleFrontPost($id);
-                $post_id = $app_url . DS . '?p=' . (isset($entry_post['ID'])) ? escape_html((int)$entry_post['ID']) : "";
+                $post_id = $app_url . DS . '?p=' . (isset($entry_post['ID']) ? escape_html((string)$entry_post['ID']) : "");
             }
 
             break;
@@ -75,7 +73,7 @@ function listen_query_string($id, $app_url)
             // Deliver request to single entry page
             if ((!empty(HandleRequest::isQueryStringRequested()['value'])) && ($id === HandleRequest::isQueryStringRequested()['value'])) {
                 $entry_page = FrontHelper::grabSimpleFrontPage($id);
-                $page_id = $app_url . DS . '?pg=' . (isset($entry_page['ID'])) ? escape_html((int)$entry_page['ID']) : 0;
+                $page_id = $app_url . DS . '?pg=' . (isset($entry_page['ID']) ? escape_html((string)$entry_page['ID']) : "0");
             }
 
             break;
@@ -83,7 +81,7 @@ function listen_query_string($id, $app_url)
         case 'cat':
             if ((!empty(HandleRequest::isQueryStringRequested()['value'])) && ($id === HandleRequest::isQueryStringRequested()['value'])) {
                 $entry_cat = FrontHelper::grabSimpleFrontTopic($id);
-                $cat_id = $app_url . DS . '?cat=' . (isset($entry_cat['ID'])) ? escape_html($entry_cat['ID']) : "";
+                $cat_id = $app_url . DS . '?cat=' . (isset($entry_cat['ID']) ? escape_html($entry_cat['ID']) : "");
             }
 
             break;
@@ -139,7 +137,6 @@ function listen_request_path($id, $app_url)
         $getPost = FrontHelper::grabPreparedFrontPostById($request_path->param1);
         $post_id = isset($getPost['ID']) ? (int)$getPost['ID'] : 0;
         $post_slug = isset($getPost['post_slug']) ? escape_html($getPost['post_slug']) : "";
-
         $rewrite['post'] = $app_url . DS . 'post' . DS .  $post_id . DS . $post_slug;
     } elseif (($request_path->matched == 'page') && ($id === $request_path->param1)) {
         $getPage = FrontHelper::grabPreparedFrontPageBySlug($request_path->param1);
