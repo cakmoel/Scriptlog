@@ -27,7 +27,7 @@
             <h2><i class="icon fa fa-ban" aria-hidden="true"></i> Error!</h2>
             <?php
             foreach ($errors as $e) :
-                echo '<p>' . $e . '</p>';
+                echo '<p>' . safe_html($e) . '</p>';
             endforeach;
             ?>
           </div>
@@ -43,7 +43,7 @@
             <h2><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h2>
             <?php
             foreach ($success as $s) :
-                echo '<p>' . nl2br($s) . '</p>';
+                echo '<p>' . safe_html(nl2br($s)) . '</p>';
             endforeach;
             ?>
           </div>
