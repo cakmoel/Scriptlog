@@ -27,5 +27,5 @@ function parse_post_id(): int
         $postId = intval($_GET['p']);
     }
 
-    return purify_dirty_html($postId);
+    return (int)purify_dirty_html((string)$postId);
 }
