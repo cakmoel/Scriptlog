@@ -8,12 +8,62 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#108---2026-05-14)
+- [Latest Release](#110---2026-06-13)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.1.0] - 2026-06-13
+
+### Added
+- **Handler system**: New front-end request handling pipeline with dedicated handlers for each content type (`ArchiveHandler`, `BlogHandler`, `CategoryHandler`, `DownloadHandler`, `FrontRequestHandler`, `HomeHandler`, `PageHandler`, `PostHandler`, `PrivacyHandler`, `TagHandler`) and a central `HandlerRegistry`
+- **FrontService**: New service layer for front-end content retrieval and rendering
+- **ThemeRenderer**: New core class for theme rendering
+- **CSRF/XSS protection**: Comprehensive protection added across all admin UI templates (comments, downloads, export, import, media library, pages, plugins, posts, privacy, settings, users)
+- **Blog theme improvements**: Enhanced header navigation, footer layout, single post view, download handling, sidebar, and 404 page
+- **Bootstrap hardening**: Improved error handling, null safety, and graceful failure when database credentials are missing
+- **Session management**: Enhanced `SessionMaker` with improved session handling and security
+- **Dispatcher refactoring**: URL routing and content validation improvements with canonical URL enforcement
+- **FrontHelper enhancements**: Improved front-end content retrieval methods
+- **HandleRequest upgrades**: Comprehensive query string handling and 404 management
+- **Test suite expansion**: 25+ new test files covering handlers, services, download features, integration tests, and smoke tests
+- **Test infrastructure**: New `tests/core/`, `tests/smoke/`, and `tests/unit/handlers/` test directories
+
+### Changed
+- Updated `composer.json` and `composer.lock` dependencies
+- Revamped blog theme files (`404.php`, `footer.php`, `functions.php`, `header.php`, `home.php`, `sidebar.php`, `download_file.php`, `load-comment.min.js`)
+- Updated all admin UI templates with modernized markup and security hardening
+- Updated all controllers, DAOs, services, and utility functions for PHP 8.x compatibility
+- Updated `Bootstrap.php`, `Dispatcher.php`, `HandleRequest.php`, `FrontHelper.php`, `SessionMaker.php` with significant improvements
+- Enhanced `DbMySQLi.php` for PDO/mysqli compatibility
+- Updated documentation files
+
+### Fixed
+- Resolved PHP 8.x compatibility issues across the codebase
+- Fixed null safety in utility functions and controllers
+- Fixed PDO/mysqli compatibility in database access layer
+- Corrected argument order in configuration write function
+- Fixed table prefix handling in Medoo integration
+- Resolved various edge cases in post editing and protected post handling
+
+### Removed
+- `restoblog` and `tastybites` themes (added then removed from repository)
+- Unused CSS from blog theme (`custom.css` trimmed by 269 lines)
+- Deprecated code and unused utility files
+
+### Notes
+Minor release introducing a new handler-based front-end architecture, comprehensive CSRF/XSS protection, significant test suite expansion, and numerous stability improvements across the entire codebase.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.0.8
+- **Changes since v1.0.8**: 277 commits
+
+---
 
 ## [1.0.8] - 2026-05-14
 
@@ -263,6 +313,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.1.0 | 2026-06-13 | Stable |
 | 1.0.8 | 2026-05-14 | Stable |
 | 1.0.7 | 2026-05-02 | Stable |
 | 1.0.6 | 2026-05-01 | Stable |
