@@ -56,7 +56,7 @@ class LanguageController
 
     public function create(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
             $this->setView('language-form');
             $this->setPageTitle('Add Language');
 
@@ -100,7 +100,7 @@ class LanguageController
             return;
         }
 
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
             $this->setView('language-form');
             $this->setPageTitle('Edit Language');
 
@@ -139,7 +139,7 @@ class LanguageController
 
     public function delete(int $id): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
             direct_page('index.php?load=languages', 302);
             return;
         }
