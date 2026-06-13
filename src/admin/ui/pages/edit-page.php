@@ -39,7 +39,7 @@ if (isset($errors)) :
 
     <?php
     foreach ($errors as $e) :
-        echo '<p>' . $e . '</p>';
+        echo '<p>' . safe_html($e) . '</p>';
     endforeach;
     ?>
 
