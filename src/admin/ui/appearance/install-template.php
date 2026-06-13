@@ -31,7 +31,7 @@ if (isset($errors)) :
 <h2><i class="icon fa fa-warning"></i> Invalid Form Data!</h2>
     <?php
     foreach ($errors as $e) :
-        echo '<p>' . $e . '</p>';
+        echo '<p>' . safe_html($e) . '</p>';
     endforeach;
     ?>
 </div>
@@ -46,7 +46,7 @@ if (isset($saveError)) :
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 <h2><i class="icon fa fa-ban"></i> Alert!</h2>
     <?php
-    echo "Error saving data. Please try again." . $saveError;
+    echo "Error saving data. Please try again." . safe_html($saveError);
     ?>
 </div>
     <?php
