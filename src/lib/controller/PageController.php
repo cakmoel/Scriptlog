@@ -109,13 +109,13 @@ class PageController extends BaseApp
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     header("Status: 400 Bad Request");
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
                 if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_status', 'post_sticky']) == false) {
-                    header($_SERVER["SERVER_PROTOCOL"] . ' 413 Payload Too Large', true, 413);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . ' 413 Payload Too Large', true, 413);
                     header('Status: 413 Payload Too Large');
                     header('Retry-After: 3600');
                     throw new AppException("Sorry, Unpleasant attempt detected");
@@ -296,7 +296,7 @@ class PageController extends BaseApp
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     header("Status: 400 Bad Request");
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
@@ -452,13 +452,13 @@ class PageController extends BaseApp
 
             try {
                 if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
                     header("Status: 400 Bad Request");
                     throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
                 }
 
                 if (!filter_var($id, FILTER_VALIDATE_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
                     header("Status: 400 Bad Request");
                     throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
                 }
