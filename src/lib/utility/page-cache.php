@@ -41,7 +41,7 @@ function page_cache_path($key)
  */
 function page_cache_exists()
 {
-    if (APP_CACHE !== true || $_SERVER['REQUEST_METHOD'] !== 'GET') {
+    if (APP_CACHE !== true || ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
         return false;
     }
 
@@ -89,7 +89,7 @@ function page_cache_serve()
  */
 function page_cache_start()
 {
-    if (APP_CACHE === true && $_SERVER['REQUEST_METHOD'] === 'GET' && !isset($_COOKIE['scriptlog_auth']) && !isset($_GET['search'])) {
+    if (APP_CACHE === true && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET' && !isset($_COOKIE['scriptlog_auth']) && !isset($_GET['search'])) {
         ob_start();
     }
 }
@@ -101,7 +101,7 @@ function page_cache_start()
  */
 function page_cache_finish()
 {
-    if (APP_CACHE === true && $_SERVER['REQUEST_METHOD'] === 'GET' && !isset($_COOKIE['scriptlog_auth']) && !isset($_GET['search'])) {
+    if (APP_CACHE === true && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET' && !isset($_COOKIE['scriptlog_auth']) && !isset($_GET['search'])) {
         $content = ob_get_flush();
 
         if (!is_dir(APP_CACHE_DIR)) {
