@@ -22,6 +22,7 @@ class ImgCompressor
         $im_name = time() . $name;
         $im_output = $this->setting['directory'] . '/' . $im_name;
         $im_ex = explode('.', $im_output); // get file extension
+        $im_type = '';
 
         // create image
         if ($type == 'image/jpeg') {
