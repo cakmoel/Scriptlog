@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 require_once __DIR__ . '/../../src/lib/utility/download-handler.php';
 
 /**
- * @coversDefaultClass \DownloadHandler
+ * @coversDefaultClass \DownloadUtility
  */
 class DownloadHandlerTest extends TestCase
 {
@@ -25,7 +25,7 @@ class DownloadHandlerTest extends TestCase
      */
     public function testIsExpired($timestamp, $expected): void
     {
-        $result = DownloadHandler::isExpired($timestamp);
+        $result = DownloadUtility::isExpired($timestamp);
         $this->assertEquals($expected, $result);
     }
 
@@ -35,7 +35,7 @@ class DownloadHandlerTest extends TestCase
      */
     public function testIsHotlinkingAllowed($referer, $allowedDomains, $expected): void
     {
-        $result = DownloadHandler::isHotlinkingAllowed($referer, $allowedDomains);
+        $result = DownloadUtility::isHotlinkingAllowed($referer, $allowedDomains);
         $this->assertEquals($expected, $result);
     }
 
@@ -45,7 +45,7 @@ class DownloadHandlerTest extends TestCase
      */
     public function testSanitizeFilePath($filename, $expected): void
     {
-        $result = DownloadHandler::sanitizeFilePath($filename);
+        $result = DownloadUtility::sanitizeFilePath($filename);
         $this->assertEquals($expected, $result);
     }
 
@@ -55,7 +55,7 @@ class DownloadHandlerTest extends TestCase
      */
     public function testValidateDownloadRequest($identifier, $expected): void
     {
-        $result = DownloadHandler::validateDownloadRequest($identifier);
+        $result = DownloadUtility::validateDownloadRequest($identifier);
         $this->assertEquals($expected, $result);
     }
 
@@ -71,7 +71,7 @@ class DownloadHandlerTest extends TestCase
     public function testSetDownloadHeadersDoesNotThrowException(): void
     {
         $this->expectNotToPerformAssertions();
-        DownloadHandler::setDownloadHeaders('test.pdf', 'application/pdf', 1024);
+        DownloadUtility::setDownloadHeaders('test.pdf', 'application/pdf', 1024);
     }
 
     /**
@@ -79,7 +79,7 @@ class DownloadHandlerTest extends TestCase
      */
     public function testGetMimeTypeReturnsApplicationOctetStreamForNonexistentFile(): void
     {
-        $result = DownloadHandler::getMimeType('/nonexistent/file.txt');
+        $result = DownloadUtility::getMimeType('/nonexistent/file.txt');
         $this->assertEquals('application/octet-stream', $result);
     }
 
@@ -92,7 +92,7 @@ class DownloadHandlerTest extends TestCase
         file_put_contents($tmpFile, 'test content');
 
         try {
-            $result = DownloadHandler::getMimeType($tmpFile);
+            $result = DownloadUtility::getMimeType($tmpFile);
             $this->assertIsString($result);
             $this->assertNotEmpty($result);
         } finally {
@@ -105,7 +105,7 @@ class DownloadHandlerTest extends TestCase
      */
     public function testChunkSizeConstant(): void
     {
-        $this->assertEquals(8192, DownloadHandler::CHUNK_SIZE);
+        $this->assertEquals(8192, DownloadUtility::CHUNK_SIZE);
     }
 
     /**
@@ -113,7 +113,7 @@ class DownloadHandlerTest extends TestCase
      */
     public function testDefaultExpiryConstant(): void
     {
-        $this->assertEquals(28800, DownloadHandler::DEFAULT_EXPIRY);
+        $this->assertEquals(28800, DownloadUtility::DEFAULT_EXPIRY);
     }
 
     /**
@@ -121,7 +121,7 @@ class DownloadHandlerTest extends TestCase
      */
     public function testIsMimeTypeAllowedReturnsTrue(): void
     {
-        $result = DownloadHandler::isMimeTypeAllowed('application/pdf');
+        $result = DownloadUtility::isMimeTypeAllowed('application/pdf');
         $this->assertTrue($result);
     }
 
@@ -130,7 +130,7 @@ class DownloadHandlerTest extends TestCase
      */
     public function testIsMimeTypeAllowedReturnsFalseForUnknownType(): void
     {
-        $result = DownloadHandler::isMimeTypeAllowed('application/x-unknown');
+        $result = DownloadUtility::isMimeTypeAllowed('application/x-unknown');
         $this->assertFalse($result);
     }
 

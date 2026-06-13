@@ -11,8 +11,8 @@
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../../lib/common.php';
-require_once __DIR__ . '/../../lib/utility/medooin.php';
+require_once __DIR__ . '/../../src/lib/common.php';
+require_once __DIR__ . '/../../src/lib/utility/medooin.php';
 
 class MedooinIntegrationTest extends TestCase
 {
