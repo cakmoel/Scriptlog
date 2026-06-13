@@ -18,7 +18,7 @@ function get_server_load()
 
     $factor = 15780543;
 
-    $threshold = function_exists('number_cpus') ? number_cpus() * $factor . PHP_EOL : "";
+    $threshold = function_exists('number_cpus') ? (int)number_cpus() * $factor : "";
 
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
         if (win_architecture() == 'x86') {

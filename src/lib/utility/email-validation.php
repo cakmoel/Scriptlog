@@ -40,8 +40,8 @@ function validator_email_instance()
  * @license MIT
  * @version 1.0
  * @param string $email
- * @param string $validation_type
- * @return object
+ * @param RFCValidation $validation_type
+ * @return bool
  *
  */
 function email_validation($email, $validation_type)

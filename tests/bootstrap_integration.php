@@ -8,10 +8,10 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../src/lib/common.php';
+require_once __DIR__ . '/../lib/vendor/autoload.php';
+require_once __DIR__ . '/../lib/common.php';
 
-// Load only essential utilities for testing
+// Load utility functions (includes get-table-prefix.php)
 $essential_utilities = [
     'access-control-list.php',
     'admin-query.php',
@@ -22,6 +22,7 @@ $essential_utilities = [
     'check-pwd-strength.php',
     'form-id.php',
     'generate-token.php',
+    'get-table-prefix.php',
     'media-properties.php',
     'mime-type-dictionary.php',
     'random-generator.php',
@@ -30,25 +31,31 @@ $essential_utilities = [
     'worst-passwords.php',
 ];
 
-$utility_dir = __DIR__ . '/../src/lib/utility/';
+$utility_dir = __DIR__ . '/../lib/utility/';
 foreach ($essential_utilities as $file) {
     if (file_exists($utility_dir . $file)) {
         require_once $utility_dir . $file;
     }
 }
 
+// Load all utility functions required by core classes
+if (function_exists('load_core_utilities')) {
+    load_core_utilities();
+}
+
 // Setup autoloader for DAO and Service classes
-if (file_exists(__DIR__ . '/../src/lib/Autoloader.php')) {
-    require_once __DIR__ . '/../src/lib/Autoloader.php';
+if (file_exists(__DIR__ . '/../lib/Autoloader.php')) {
+    require_once __DIR__ . '/../lib/Autoloader.php';
     
     if (class_exists('Autoloader')) {
         Autoloader::setBaseDir(__DIR__ . '/..');
         Autoloader::addClassDir(array(
-            'src/lib/core'       . DIRECTORY_SEPARATOR,
-            'src/lib/dao'        . DIRECTORY_SEPARATOR,
-            'src/lib/service'    . DIRECTORY_SEPARATOR,
-            'src/lib/controller' . DIRECTORY_SEPARATOR,
-            'src/lib/model'      . DIRECTORY_SEPARATOR
+            'lib/core'       . DIRECTORY_SEPARATOR,
+            'lib/dao'        . DIRECTORY_SEPARATOR,
+            'lib/service'    . DIRECTORY_SEPARATOR,
+            'lib/controller' . DIRECTORY_SEPARATOR,
+            'lib/model'      . DIRECTORY_SEPARATOR,
+            'lib/handler'    . DIRECTORY_SEPARATOR
         ));
     }
 }
@@ -68,7 +75,7 @@ function get_test_config(): array
             'port' => '3306'
         ],
         'app' => [
-            'url'   => 'http://blogware.site',
+            'url'   => 'https://blogware.site',
             'email' => 'admin@test.com',
             'key'   => 'GVXUD7-72HUXD-2TFCDT-8DDC2A'
         ],

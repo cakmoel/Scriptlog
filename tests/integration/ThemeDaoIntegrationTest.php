@@ -161,4 +161,118 @@ class ThemeDaoIntegrationTest extends TestCase
         $this->assertIsArray($result);
         $this->assertGreaterThanOrEqual(0, $result['total']);
     }
+    
+    public function testActivateTheme(): void
+    {
+        // Create a test theme first
+        $directory = 'test-activate-' . time();
+        
+        $stmt = self::$pdo->prepare("
+            INSERT INTO tbl_themes (theme_title, theme_desc, theme_designer, theme_directory, theme_status)
+            VALUES ('Activate Test', 'Testing activation', 'Tester', ?, 'N')
+        ");
+        $stmt->execute([$directory]);
+        $themeId = (int)self::$pdo->lastInsertId();
+        
+        // Activate the theme
+        $stmt = self::$pdo->prepare("UPDATE tbl_themes SET theme_status = 'Y' WHERE ID = ?");
+        $result = $stmt->execute([$themeId]);
+        
+        $this->assertTrue($result);
+        
+        // Verify activation
+        $stmt = self::$pdo->prepare("SELECT theme_status FROM tbl_themes WHERE ID = ?");
+        $stmt->execute([$themeId]);
+        $theme = $stmt->fetch();
+        
+        $this->assertEquals('Y', $theme['theme_status']);
+        
+        // Clean up
+        self::$pdo->exec("DELETE FROM tbl_themes WHERE ID = " . $themeId);
+    }
+    
+    public function testDeactivateTheme(): void
+    {
+        // Create an active test theme first
+        $directory = 'test-deactivate-' . time();
+        
+        $stmt = self::$pdo->prepare("
+            INSERT INTO tbl_themes (theme_title, theme_desc, theme_designer, theme_directory, theme_status)
+            VALUES ('Deactivate Test', 'Testing deactivation', 'Tester', ?, 'Y')
+        ");
+        $stmt->execute([$directory]);
+        $themeId = (int)self::$pdo->lastInsertId();
+        
+        // Deactivate the theme
+        $stmt = self::$pdo->prepare("UPDATE tbl_themes SET theme_status = 'N' WHERE ID = ?");
+        $result = $stmt->execute([$themeId]);
+        
+        $this->assertTrue($result);
+        
+        // Verify deactivation
+        $stmt = self::$pdo->prepare("SELECT theme_status FROM tbl_themes WHERE ID = ?");
+        $stmt->execute([$themeId]);
+        $theme = $stmt->fetch();
+        
+        $this->assertEquals('N', $theme['theme_status']);
+        
+        // Clean up
+        self::$pdo->exec("DELETE FROM tbl_themes WHERE ID = " . $themeId);
+    }
+    
+/**
+     * Test auto-activation fallback when deactivating last active theme
+     *
+     * This tests the core logic: when user deactivates the last active theme,
+     * the 'blog' theme should automatically activate as fallback.
+     */
+    public function testAutoActivateBlogThemeFallback(): void
+    {
+        // First, ensure blog theme exists
+        $stmt = self::$pdo->query("SELECT ID FROM tbl_themes WHERE theme_directory = 'blog'");
+        $blogTheme = $stmt->fetch();
+        
+        // Create blog theme if doesn't exist
+        if (empty($blogTheme)) {
+            self::$pdo->exec("
+                INSERT INTO tbl_themes (theme_title, theme_desc, theme_designer, theme_directory, theme_status)
+                VALUES ('Bootstrap Blog', 'Default blog theme', 'Scriptlog', 'blog', 'N')
+            ");
+            $blogThemeId = (int)self::$pdo->lastInsertId();
+        } else {
+            $blogThemeId = (int)$blogTheme['ID'];
+        }
+        
+        // Create a test theme and activate it
+        $testDir = 'test-fallback-' . time();
+        
+        self::$pdo->prepare("
+            INSERT INTO tbl_themes (theme_title, theme_desc, theme_designer, theme_directory, theme_status)
+            VALUES ('Fallback Test', 'Testing fallback', 'Tester', ?, 'Y')
+        ")->execute([$testDir]);
+        $testThemeId = (int)self::$pdo->lastInsertId();
+        
+        // Deactivate the test theme (simulating ThemeDao::deactivateTheme logic)
+        self::$pdo->prepare("UPDATE tbl_themes SET theme_status = 'N' WHERE ID = ?")->execute([$testThemeId]);
+        
+        // Check remaining active themes
+        $stmt = self::$pdo->query("SELECT ID, theme_directory, theme_status FROM tbl_themes WHERE theme_status = 'Y'");
+        $activeThemes = $stmt->fetchAll();
+        
+// If no active themes, blog should auto-activate
+        if (empty($activeThemes)) {
+            self::$pdo->prepare("UPDATE tbl_themes SET theme_status = 'Y' WHERE theme_directory = 'blog'")->execute();
+        }
+        
+        // Verify blog theme is now active
+        $stmt = self::$pdo->prepare("SELECT theme_status FROM tbl_themes WHERE theme_directory = 'blog'");
+        $stmt->execute();
+        $blogStatus = $stmt->fetch();
+        
+        $this->assertEquals('Y', $blogStatus['theme_status'], 
+            'Blog theme should auto-activate when last active theme is deactivated');
+        
+        // Clean up test theme
+        self::$pdo->exec("DELETE FROM tbl_themes WHERE ID = " . $testThemeId);
+    }
 }

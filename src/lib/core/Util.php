@@ -282,18 +282,14 @@ class Util
      * concisely access an index which may or may not exist without
      * raising a warning.
      *
-     * @param  array  $var     Array value to access
+     * @param  mixed  $var     Array value to access
      * @param  mixed  $default Default value to return if the key is not
      *                         present in the array
      * @return mixed
      */
     public static function array_get(&$var, $default = null)
     {
-        if (isset($var)) {
-            return $var;
-        }
-
-        return $default;
+        return $var ?? $default;
     }
 
     /**
@@ -352,16 +348,14 @@ class Util
     {
         $html = '';
 
+        $setImg = 0;
+        $setStyle = 'display:inline;';
+
         if ($expLevel > 0) {
             $expLevel--;
-            $setImg = 0;
-            $setStyle = 'display:inline;';
         } elseif ($expLevel == 0) {
             $setImg = 1;
             $setStyle = 'display:none;';
-        } elseif ($expLevel < 0) {
-            $setImg = 0;
-            $setStyle = 'display:inline;';
         }
 
         if (is_bool($var)) {
@@ -459,7 +453,12 @@ class Util
                     $varArray[$key] = $value;
                 } elseif (substr($key, 0, 1) == "\0") {
                     unset($varArray[$key]);
-                    $key = 'private:' . substr($key, 1, strpos(substr($key, 1), "\0")) . ':' . substr($key, strpos(substr($key, 1), "\0") + 2);
+                    $nullPos = strpos(substr($key, 1), "\0");
+                    if ($nullPos !== false) {
+                        $key = 'private:' . substr($key, 1, $nullPos) . ':' . substr($key, $nullPos + 2);
+                    } else {
+                        $key = 'private:' . substr($key, 1);
+                    }
                     $varArray[$key] = $value;
                 }
 

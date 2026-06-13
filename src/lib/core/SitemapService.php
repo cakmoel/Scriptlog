@@ -58,7 +58,7 @@ class SiteMapService
      */
     private function addPages($pages)
     {
-        if (!empty($pages)) {
+        if ($pages !== null) {
             foreach ($pages as $key => $value) {
                 $this->sitemap->addItem($pages[$key]);
             }

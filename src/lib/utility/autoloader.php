@@ -99,6 +99,7 @@ function autoloader($class_paths = null, $use_base_dir = true)
 
         foreach ($paths as $path) {
             if (!\is_array($path)) { // do not allow cached 'loaded' paths
+                $ext = '';
                 foreach ($conf['extensions'] as &$ext) {
                     $ext = \trim($ext);
 

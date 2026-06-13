@@ -132,6 +132,11 @@ class Resize
                 $optimalWidth = $optionArray['optimalWidth'];
                 $optimalHeight = $optionArray['optimalHeight'];
                 break;
+            default:
+                $optionArray = $this->getSizeByAuto($newWidth, $newHeight);
+                $optimalWidth = $optionArray['optimalWidth'];
+                $optimalHeight = $optionArray['optimalHeight'];
+                break;
         }
 
         return array(

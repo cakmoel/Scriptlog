@@ -40,10 +40,8 @@ function check_mime_type($accepted_type, $tmp_name)
                 return false;
             }
 
-            $type = getimage_type($tmp_name);
-            if (empty($type)) {
-                $type = 'image/jpeg';
-            }
+            $image_type_num = getimage_type($tmp_name);
+            $type = (is_int($image_type_num) && $image_type_num > 0) ? image_type_to_mime_type($image_type_num) : 'image/jpeg';
         } else {
             $type = get_mime($tmp_name);
         }

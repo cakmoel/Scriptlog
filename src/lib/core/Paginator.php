@@ -154,7 +154,8 @@ class Paginator
         $lastpage = ceil($this->_totalRows / $this->_perPage);
         $lpm1 = $lastpage - 1;
 
-        $pagination = null;
+        $pagination = '';
+        $counter = 0;
 
         if ($this->_page > $this->_totalRows) {
             $pagination .= '<div class="alert alert-danger alert-dismissible"><h2><i class="icon fa fa-ban" aria-hidden="true"></i> Content not found</h2></div>';
