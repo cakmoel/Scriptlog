@@ -6,7 +6,7 @@
  * @category Function
  * @param string $file
  * @see https://www.askapache.com/php/getting-mimetype-of-image/
- * @return void
+ * @return false|int
  *
  */
 function getimage_type($file)
