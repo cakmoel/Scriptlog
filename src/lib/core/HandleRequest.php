@@ -32,6 +32,23 @@ final class HandleRequest
     private static $frontHelper;
 
     /**
+     * ThemeRenderer instance for centralized theme rendering
+     *
+     * @var ThemeRenderer|null
+     */
+    private static ?ThemeRenderer $themeRenderer = null;
+
+    /**
+     * Set the ThemeRenderer instance
+     *
+     * @param ThemeRenderer|null $renderer
+     */
+    public static function setThemeRenderer(?ThemeRenderer $renderer): void
+    {
+        self::$themeRenderer = $renderer;
+    }
+
+    /**
      * handleFrontHelper
      *
      * @return object
@@ -183,23 +200,43 @@ final class HandleRequest
      */
     public static function deliverQueryString()
     {
+        $queryKey = static::isQueryStringRequested()['key'];
 
-        switch (static::isQueryStringRequested()['key']) {
+        // Use HandlerRegistry if available
+        $registry = class_exists('Registry') ? Registry::get('handlerRegistry') : null;
+
+        if ($registry instanceof HandlerRegistry && $registry->has($queryKey)) {
+            $registry->get($queryKey)->handle([
+                'key'   => $queryKey,
+                'value' => static::isQueryStringRequested()['value'],
+            ]);
+            return;
+        }
+
+        switch ($queryKey) {
             case 'p':
                 // Deliver request to a single post entry
                 if (! empty(static::isQueryStringRequested()['value'])) {
                     $query_post = self::handleFrontHelper()->grabSimpleFrontPost(static::isQueryStringRequested()['value']);
 
                     if (empty($query_post['ID'])) {
-                        http_response_code(404);
-                        call_theme_header();
-                        call_theme_content('404');
-                        call_theme_footer();
+                        if (self::$themeRenderer) {
+                            self::$themeRenderer->render404();
+                        } else {
+                            http_response_code(404);
+                            call_theme_header();
+                            call_theme_content('404');
+                            call_theme_footer();
+                        }
                     } else {
-                        http_response_code(200);
-                        call_theme_header();
-                        call_theme_content('single');
-                        call_theme_footer();
+                        if (self::$themeRenderer) {
+                            self::$themeRenderer->render('single');
+                        } else {
+                            http_response_code(200);
+                            call_theme_header();
+                            call_theme_content('single');
+                            call_theme_footer();
+                        }
                     }
                 } else {
                     direct_page('', 302);
@@ -213,15 +250,23 @@ final class HandleRequest
                     $query_cat = self::handleFrontHelper()->grabSimpleFrontTopic(static::isQueryStringRequested()['value']);
 
                     if (empty($query_cat['ID'])) {
-                        http_response_code(404);
-                        call_theme_header();
-                        call_theme_content('404');
-                        call_theme_footer();
+                        if (self::$themeRenderer) {
+                            self::$themeRenderer->render404();
+                        } else {
+                            http_response_code(404);
+                            call_theme_header();
+                            call_theme_content('404');
+                            call_theme_footer();
+                        }
                     } else {
-                        http_response_code(200);
-                        call_theme_header();
-                        call_theme_content('category');
-                        call_theme_footer();
+                        if (self::$themeRenderer) {
+                            self::$themeRenderer->render('category');
+                        } else {
+                            http_response_code(200);
+                            call_theme_header();
+                            call_theme_content('category');
+                            call_theme_footer();
+                        }
                     }
                 } else {
                     direct_page('', 302);
@@ -235,15 +280,23 @@ final class HandleRequest
                     $query_page = self::handleFrontHelper()->grabSimpleFrontPage(static::isQueryStringRequested()['value']);
 
                     if (empty($query_page['ID'])) {
-                        http_response_code(404);
-                        call_theme_header();
-                        call_theme_content('404');
-                        call_theme_footer();
+                        if (self::$themeRenderer) {
+                            self::$themeRenderer->render404();
+                        } else {
+                            http_response_code(404);
+                            call_theme_header();
+                            call_theme_content('404');
+                            call_theme_footer();
+                        }
                     } else {
-                        http_response_code(200);
-                        call_theme_header();
-                        call_theme_content('page');
-                        call_theme_footer();
+                        if (self::$themeRenderer) {
+                            self::$themeRenderer->render('page');
+                        } else {
+                            http_response_code(200);
+                            call_theme_header();
+                            call_theme_content('page');
+                            call_theme_footer();
+                        }
                     }
                 } else {
                     direct_page('', 302);
@@ -254,10 +307,14 @@ final class HandleRequest
             case 'a':
                 // Deliver request to an archives
                 if (! empty(static::isQueryStringRequested()['value'])) {
-                    http_response_code(200);
-                    call_theme_header();
-                    call_theme_content('archive');
-                    call_theme_footer();
+                    if (self::$themeRenderer) {
+                        self::$themeRenderer->render('archive');
+                    } else {
+                        http_response_code(200);
+                        call_theme_header();
+                        call_theme_content('archive');
+                        call_theme_footer();
+                    }
                 } else {
                     direct_page('', 302);
                 }
@@ -267,13 +324,14 @@ final class HandleRequest
             case 'tag':
                 // Deliver request to a tag - always render tag page, let template handle "no results"
                 if (! empty(static::isQueryStringRequested()['value'])) {
-                    $tagValue = static::isQueryStringRequested()['value'];
-
-                    // Just render the tag page - let the template handle if no posts found
-                    http_response_code(200);
-                    call_theme_header();
-                    call_theme_content('tag');
-                    call_theme_footer();
+                    if (self::$themeRenderer) {
+                        self::$themeRenderer->render('tag');
+                    } else {
+                        http_response_code(200);
+                        call_theme_header();
+                        call_theme_content('tag');
+                        call_theme_footer();
+                    }
                 } else {
                     direct_page('', 302);
                 }
@@ -282,19 +340,27 @@ final class HandleRequest
 
             case 'blog':
                 // Deliver request to blog
-                http_response_code(200);
-                call_theme_header();
-                call_theme_content('blog');
-                call_theme_footer();
+                if (self::$themeRenderer) {
+                    self::$themeRenderer->render('blog');
+                } else {
+                    http_response_code(200);
+                    call_theme_header();
+                    call_theme_content('blog');
+                    call_theme_footer();
+                }
 
                 break;
 
             case 'privacy':
                 // Deliver request to privacy policy page
-                http_response_code(200);
-                call_theme_header();
-                call_theme_content('privacy');
-                call_theme_footer();
+                if (self::$themeRenderer) {
+                    self::$themeRenderer->render('privacy');
+                } else {
+                    http_response_code(200);
+                    call_theme_header();
+                    call_theme_content('privacy');
+                    call_theme_footer();
+                }
 
                 break;
 
@@ -308,14 +374,23 @@ final class HandleRequest
                         // Strip /file suffix from identifier for file download
                         $identifier = preg_replace('#/file$#', '', $identifier);
                         // Handle file download
-                        $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
-                        $downloadController->download($identifier);
+                        $downloadController = class_exists('Registry') ? Registry::get('downloadController') : null;
+                        if ($downloadController instanceof DownloadController) {
+                            $downloadController->download($identifier);
+                        } else {
+                            $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
+                            $downloadController->download($identifier);
+                        }
                     } else {
                         // Render download page
-                        http_response_code(200);
-                        call_theme_header();
-                        call_theme_content('download');
-                        call_theme_footer();
+                        if (self::$themeRenderer) {
+                            self::$themeRenderer->render('download');
+                        } else {
+                            http_response_code(200);
+                            call_theme_header();
+                            call_theme_content('download');
+                            call_theme_footer();
+                        }
                     }
                 } else {
                     direct_page('', 302);
@@ -344,15 +419,24 @@ final class HandleRequest
                     if (!empty($identifier) && preg_match('/^[a-f0-9\-]{36}$/', $identifier)) {
                         if ($isFileDownload) {
                             # Handle file download
-                            $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
-                            $downloadController->download($identifier);
+                            $downloadController = class_exists('Registry') ? Registry::get('downloadController') : null;
+                            if ($downloadController instanceof DownloadController) {
+                                $downloadController->download($identifier);
+                            } else {
+                                $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
+                                $downloadController->download($identifier);
+                            }
                         } else {
                             # Render download page
                             $GLOBALS['download_identifier'] = $identifier;
-                            http_response_code(200);
-                            call_theme_header();
-                            call_theme_content('download');
-                            call_theme_footer();
+                            if (self::$themeRenderer) {
+                                self::$themeRenderer->render('download');
+                            } else {
+                                http_response_code(200);
+                                call_theme_header();
+                                call_theme_content('download');
+                                call_theme_footer();
+                            }
                         }
                         break;
                     }
@@ -361,28 +445,44 @@ final class HandleRequest
                 if (!empty($queryStringKey)) {
                     # Has query string - let the switch handle it above
                     if (false === static::checkMatchUriRequested()) {
-                        http_response_code(404);
-                        call_theme_header();
-                        call_theme_content('404');
-                        call_theme_footer();
+                        if (self::$themeRenderer) {
+                            self::$themeRenderer->render404();
+                        } else {
+                            http_response_code(404);
+                            call_theme_header();
+                            call_theme_content('404');
+                            call_theme_footer();
+                        }
+                    } else {
+                        if (self::$themeRenderer) {
+                            self::$themeRenderer->render('home');
+                        } else {
+                            http_response_code(200);
+                            call_theme_header();
+                            call_theme_content('home');
+                            call_theme_footer();
+                        }
+                    }
+                } elseif (empty($firstSegment) || in_array($firstSegment, $validSegments, true)) {
+                    # No query string but valid path segment - show home
+                    if (self::$themeRenderer) {
+                        self::$themeRenderer->render('home');
                     } else {
                         http_response_code(200);
                         call_theme_header();
                         call_theme_content('home');
                         call_theme_footer();
                     }
-                } elseif (empty($firstSegment) || in_array($firstSegment, $validSegments, true)) {
-                    # No query string but valid path segment - show home
-                    http_response_code(200);
-                    call_theme_header();
-                    call_theme_content('home');
-                    call_theme_footer();
                 } else {
                     # Invalid path - show 404
-                    http_response_code(404);
-                    call_theme_header();
-                    call_theme_content('404');
-                    call_theme_footer();
+                    if (self::$themeRenderer) {
+                        self::$themeRenderer->render404();
+                    } else {
+                        http_response_code(404);
+                        call_theme_header();
+                        call_theme_content('404');
+                        call_theme_footer();
+                    }
                 }
 
                 break;
