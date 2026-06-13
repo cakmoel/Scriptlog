@@ -47,6 +47,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Corrected argument order in configuration write function
 - Fixed table prefix handling in Medoo integration
 - Resolved various edge cases in post editing and protected post handling
+- Fixed `total_comment()` null safety in `single.php` to prevent array access on falsy return
+- Removed empty `load_more_comments()` function stub from blog theme `functions.php`
 
 ### Removed
 - `restoblog` and `tastybites` themes (added then removed from repository)
@@ -57,11 +59,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 Minor release introducing a new handler-based front-end architecture, comprehensive CSRF/XSS protection, significant test suite expansion, and numerous stability improvements across the entire codebase.
 
 ### Codename
-**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia. This remarkable bird, known for its distinctive bony casque and unique reproductive strategy, is one of the world's most fascinating creatures. Maleos are monogamous pairs that dig deep pits in which a single egg is laid—incubated by geothermal heat at inland forested sites or by the sun at beach nesting grounds. The chicks hatch fully feathered and immediately fly into the forest, independent from birth. With population declined by over 90% since the 1950s and fewer than 10,000 individuals remaining, the maleo is listed as Critically Endangered on the IUCN Red List and protected under CITES Appendix I. Major threats include over-harvesting of eggs, habitat destruction, and predation by introduced species. Conservation efforts by the Wildlife Conservation Society (WCS) Indonesia and the Alliance for Tompotika Conservation have released over 10,000 chicks into the wild since 2001, working to protect nesting grounds and establish semi-natural hatcheries.
 
 ### Comparison
 - **Previous release**: v1.0.8
-- **Changes since v1.0.8**: 277 commits
+- **Changes since v1.0.8**: 280 commits
 
 ---
 
