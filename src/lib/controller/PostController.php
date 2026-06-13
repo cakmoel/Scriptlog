@@ -115,13 +115,13 @@ class PostController extends BaseApp
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
                     header('Status: 400 Bad Request');
                     throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
                 }
 
                 if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_date', 'image_id', 'catID', 'post_summary', 'post_tags', 'post_status', 'post_headlines', 'visibility', 'comment_status']) === false) {
-                    header($_SERVER["SERVER_PROTOCOL"] . ' 413 Payload Too Large', true, 413);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . ' 413 Payload Too Large', true, 413);
                     header('Status: 413 Payload Too Large');
                     header('Retry-After: 3600');
                     throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
@@ -158,7 +158,7 @@ class PostController extends BaseApp
                 }
 
                 if (!empty($file_location)) {
-                    if (!isset($file_error) || is_array($file_error)) {
+                    if (is_array($file_error)) {
                         $checkError = false;
                         array_push($errors, "Invalid paramenter");
                     }
@@ -273,6 +273,8 @@ class PostController extends BaseApp
                             $this->postService->setPostImage($append_media);
                         }
                     } else {
+                        $media_metavalue = array();
+
                         if ($file_extension === "jpeg" || $file_extension === "jpg" || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp" || $file_extension === "bmp") {
                             $media_metavalue = array(
                               'Origin' => rename_file($file_name),
@@ -467,12 +469,12 @@ class PostController extends BaseApp
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
                     throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
                 }
 
                 if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_modified', 'image_id', 'catID', 'post_summary', 'post_status', 'post_headlines', 'visibility', 'comment_status']) === false) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 413 Payload Too Large", true, 413);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 413 Payload Too Large", true, 413);
                     header('Status: 413 Payload Too Large');
                     header('Retry-After: 3600');
                     throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
@@ -509,7 +511,7 @@ class PostController extends BaseApp
                 }
 
                 if (!empty($file_location)) {
-                    if ((!isset($file_error)) || (is_array($file_error))) {
+                    if ((is_array($file_error))) {
                         $checkError = false;
                         array_push($errors, "Invalid paramenter");
                     }
@@ -628,6 +630,8 @@ class PostController extends BaseApp
                             $this->postService->setPostImage($append_media);
                         }
                     } else {
+                        $media_metavalue = array();
+
                         if (
                             $file_extension === "jpeg" || $file_extension === "jpg"
                             || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp"
