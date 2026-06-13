@@ -12,7 +12,7 @@
  * @see https://www.php.net/manual/en/function.session-regenerate-id.php
  * @license MIT
  * @version 1.0
- * @return void
+ * @return string
  *
  */
 function regenerate_session()
@@ -32,7 +32,7 @@ function regenerate_session()
 
     unset($_SESSION['deleted_time']);
 
-    $newid = isset($oldid) ?: session_id();
+    $newid = $oldid ?: session_id();
 
     return $newid;
 }
