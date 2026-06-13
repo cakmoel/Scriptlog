@@ -100,7 +100,7 @@
               <h4><i class="icon fa fa-warning"></i> Invalid form data!</h4>
                 <?php
                 foreach ($errors as $e) :
-                    echo '<p>' . $e . '</p>';
+                    echo '<p>' . safe_html($e) . '</p>';
                 endforeach;
                 ?>
             </div>
@@ -116,7 +116,7 @@
               <h4><i class="icon fa fa-check"></i>
                 <?php
                 foreach ($status as $s) :
-                    echo $s;
+                    echo safe_html($s);
                 endforeach;
 
                 ?>
