@@ -53,7 +53,7 @@ if (!empty($queryString)) {
     $isValidRoute = true;
 }
 
-if (isset($isValidRoute) && !$isValidRoute) {
+if (!$isValidRoute) {
     http_response_code(404);
     die('404 Not Found');
 }
@@ -80,7 +80,8 @@ if (class_exists('Autoloader')) {
         APP_LIBRARY . DIRECTORY_SEPARATOR . 'dao'        . DIRECTORY_SEPARATOR,
         APP_LIBRARY . DIRECTORY_SEPARATOR . 'service'    . DIRECTORY_SEPARATOR,
         APP_LIBRARY . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR,
-        APP_LIBRARY . DIRECTORY_SEPARATOR . 'model'      . DIRECTORY_SEPARATOR
+        APP_LIBRARY . DIRECTORY_SEPARATOR . 'model'      . DIRECTORY_SEPARATOR,
+        APP_LIBRARY . DIRECTORY_SEPARATOR . 'handler'    . DIRECTORY_SEPARATOR
     ));
     require __DIR__ . '/core/Bootstrap.php'; // Now load the main class
 } else {
@@ -97,18 +98,6 @@ if (!file_exists(APP_ROOT . 'config.php')) {
     $app = Bootstrap::initialize(APP_ROOT);
 
     // Note: The Security functions (x_frame_option, etc.) are now called inside Bootstrap::applySecurity()
-}
-
-// Session setup now uses the $app object instead of $sessionMaker
-if (isset($app->sessionMaker)) {
-    session_save_path(sys_get_temp_dir());
-
-    session_set_save_handler($app->sessionMaker, true);
-    register_shutdown_function('session_write_close');
-
-    if (function_exists('start_session_on_site')) {
-        start_session_on_site($app->sessionMaker);
-    }
 }
 
 // Handle frontend language switch
