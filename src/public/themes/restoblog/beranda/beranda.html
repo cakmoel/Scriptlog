@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Resto Blog - Cita Rasa Indonesia</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-secondary-fixed-variant": "#474746",
+                "secondary": "#c8c6c5",
+                "outline": "#9a8f80",
+                "on-surface-variant": "#d1c5b4",
+                "surface-container-low": "#1a1c1c",
+                "secondary-container": "#474746",
+                "secondary-fixed": "#e5e2e1",
+                "surface": "#121414",
+                "tertiary-fixed": "#e5e2e1",
+                "inverse-surface": "#e2e2e2",
+                "on-tertiary-fixed-variant": "#474646",
+                "on-primary-fixed": "#261900",
+                "primary": "#e9c176",
+                "secondary-fixed-dim": "#c8c6c5",
+                "surface-container-highest": "#333535",
+                "on-primary": "#412d00",
+                "surface-variant": "#333535",
+                "primary-fixed": "#ffdea5",
+                "on-tertiary-container": "#3c3b3b",
+                "error": "#ffb4ab",
+                "on-background": "#e2e2e2",
+                "on-secondary-container": "#b7b5b4",
+                "on-primary-container": "#4e3700",
+                "on-secondary": "#313030",
+                "tertiary-fixed-dim": "#c9c6c5",
+                "on-tertiary": "#313030",
+                "tertiary": "#c9c6c5",
+                "on-error-container": "#ffdad6",
+                "on-surface": "#e2e2e2",
+                "surface-container-lowest": "#0c0f0f",
+                "primary-fixed-dim": "#e9c176",
+                "surface-tint": "#e9c176",
+                "error-container": "#93000a",
+                "on-primary-fixed-variant": "#5d4201",
+                "surface-dim": "#121414",
+                "on-tertiary-fixed": "#1c1b1b",
+                "background": "#121414",
+                "surface-container": "#1e2020",
+                "tertiary-container": "#a7a5a4",
+                "on-secondary-fixed": "#1c1b1b",
+                "surface-bright": "#38393a",
+                "on-error": "#690005",
+                "primary-container": "#c5a059",
+                "surface-container-high": "#282a2b",
+                "inverse-primary": "#775a19",
+                "inverse-on-surface": "#2f3131",
+                "outline-variant": "#4e4639"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "container-max": "1280px",
+                "base": "8px",
+                "margin-mobile": "20px",
+                "gutter": "24px",
+                "margin-desktop": "60px",
+                "section-gap": "80px"
+            },
+            "fontFamily": {
+                "body-md": ["Manrope"],
+                "body-lg": ["Manrope"],
+                "headline-lg-mobile": ["EB Garamond"],
+                "headline-md": ["EB Garamond"],
+                "headline-lg": ["EB Garamond"],
+                "display-lg": ["EB Garamond"],
+                "label-caps": ["Manrope"]
+            },
+            "fontSize": {
+                "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                "headline-lg": ["48px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                "display-lg": ["72px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                "label-caps": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .hero-gradient {
+            background: radial-gradient(circle at center, rgba(18, 20, 20, 0.4) 0%, rgba(12, 15, 15, 0.9) 100%);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="bg-surface/80 dark:bg-surface/80 backdrop-blur-md sticky top-0 z-50 border-b border-outline-variant/30">
+<nav class="flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded-full">
+<span class="material-symbols-outlined text-on-primary">restaurant</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md font-bold tracking-tight text-on-surface">Resto Blog</span>
+<span class="font-label-caps text-[10px] text-primary tracking-widest leading-none">CITA RASA INDONESIA</span>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md" href="#">Beranda</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Menu</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Tentang Kami</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Struktur</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Kegiatan</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Kontak</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="hidden md:flex items-center gap-2 px-5 py-2 border border-outline-variant text-on-surface rounded-lg hover:bg-surface-variant transition-all font-label-caps text-label-caps">
+<span class="material-symbols-outlined text-[20px]">lock</span> Login Admin
+                </button>
+<button class="px-5 py-2 bg-primary text-on-primary font-bold rounded-lg hover:brightness-110 active:scale-95 transition-all font-label-caps text-label-caps">
+                    Daftar Anggota
+                </button>
+</div>
+</nav>
+</header>
+<!-- Hero Section -->
+<section class="relative min-h-[921px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover" data-alt="A team of five professional Indonesian chefs in sleek, all-black uniforms standing confidently in a sophisticated, dimly lit restaurant kitchen. The lighting is dramatic and warm, emphasizing the premium and artisanal atmosphere of the establishment. The central chef, an Asian male with a tall black chef's hat, crosses his arms with a friendly yet authoritative expression. The background features polished wooden textures and golden accents consistent with a high-end gastronomic brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgpeTRV7WZx-vpEkl-VqZEpB6tfjepUTsTlhmBBnAxUGV-eEfrEqtElNBlij-WfTmP1Y-pUGr-JeFWCLMweHWHd3fglcGhpOGTNp4zxRbejNbAqFDiTTzPyixDTzBjab3JIoweUyaJffoq6aw4uLs6Tuuc5VHKmYsctIFUiJ8h634M-VYvmuTQUSOrnzYy7_iUEYoGXG8xVQrXM38KmoMSm9pl5ZfpxHwCG5JhF89wqAeNfgoGZHl5lGDXBLeT0N9UBKPx3D201Kyn"/>
+<div class="absolute inset-0 hero-gradient"></div>
+</div>
+<div class="relative z-10 w-full px-margin-desktop max-w-container-max mx-auto py-20">
+<div class="max-w-2xl">
+<span class="font-label-caps text-label-caps text-primary mb-4 block tracking-[0.2em]">SELAMAT DATANG DI</span>
+<h1 class="font-display-lg text-display-lg text-white mb-2">Resto Blog</h1>
+<p class="font-headline-md text-headline-md text-primary mb-6 italic">Cita Rasa Indonesia, Kualitas Mendunia</p>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-lg">
+                    Nikmati kelezatan masakan Nusantara yang disajikan dengan sentuhan modern oleh tim profesional kami yang berdedikasi tinggi untuk kualitas.
+                </p>
+<div class="flex flex-wrap gap-4">
+<button class="flex items-center gap-3 px-8 py-4 bg-primary text-on-primary font-bold rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">restaurant_menu</span>
+<span class="font-label-caps text-label-caps">Lihat Menu</span>
+</button>
+<button class="flex items-center gap-3 px-8 py-4 border border-outline-variant text-white font-bold rounded-lg hover:bg-white/10 transition-all">
+<span class="font-label-caps text-label-caps">Tentang Kami</span>
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Stats Bar -->
+<div class="mt-20 glass-card rounded-2xl p-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+<div class="flex items-center gap-5 md:border-r border-outline-variant/30 pr-4">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[32px]">group</span>
+</div>
+<div>
+<div class="text-white font-bold text-2xl">125+</div>
+<div class="font-label-caps text-[12px] text-on-surface-variant">Crew Profesional</div>
+</div>
+</div>
+<div class="flex items-center gap-5 md:border-r border-outline-variant/30 pr-4">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[32px]">location_on</span>
+</div>
+<div>
+<div class="text-white font-bold text-2xl">8</div>
+<div class="font-label-caps text-[12px] text-on-surface-variant">Cabang Kota</div>
+</div>
+</div>
+<div class="flex items-center gap-5 md:border-r border-outline-variant/30 pr-4">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[32px]">event_available</span>
+</div>
+<div>
+<div class="text-white font-bold text-2xl">250+</div>
+<div class="font-label-caps text-[12px] text-on-surface-variant">Kegiatan Resto</div>
+</div>
+</div>
+<div class="flex items-center gap-5">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[32px]">military_tech</span>
+</div>
+<div>
+<div class="text-white font-bold text-2xl">2015</div>
+<div class="font-label-caps text-[12px] text-on-surface-variant">Tahun Berdiri</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Pilihan Hidangan Terbaik Section -->
+<section class="py-section-gap px-margin-desktop max-w-container-max mx-auto bg-surface">
+<div class="text-center mb-16">
+<span class="font-label-caps text-label-caps text-primary tracking-[0.3em] uppercase block mb-4">Menu Spesial Kami</span>
+<h2 class="font-headline-lg text-headline-lg text-white mb-6">Pilihan Hidangan Terbaik</h2>
+<div class="flex items-center justify-center gap-4 mb-6">
+<div class="h-[1px] w-20 bg-outline-variant/50"></div>
+<div class="w-2 h-2 rotate-45 bg-primary"></div>
+<div class="h-[1px] w-20 bg-outline-variant/50"></div>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+                Berbagai hidangan lezat pilihan chef terbaik kami, dibuat dari bahan berkualitas tinggi dengan cita rasa autentik Indonesia yang tidak terlupakan.
+            </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Card 1 -->
+<div class="group relative overflow-hidden rounded-2xl aspect-[4/5]">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A gourmet presentation of traditional Indonesian Nasi Goreng served on a dark ceramic plate. The dish is garnished with a perfectly fried sunny-side-up egg, crispy shallots, and fresh cucumber slices. The lighting is soft and directional, creating a moody, high-end culinary aesthetic. The color palette is rich with deep browns, vibrant yellows, and fresh greens, set against a dark, textured background that exudes luxury." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgwNBGxgIFmyJiRcSw4_mi0K2GeKsYL7NCdqz_8gmPKqrb2qSxq6d6pRTEfZ5_5_AgptenyHw1SIDJtyW3yyJax_XQwOg3acnd5ynybnTp2k2-VtTfrNVEp8y6JoETFnP0xJHR4ufwlYweTeRLNyJTfSmPmbNa16-E7EXZWNomFhQa0ggtviWtoM_6elqFsbG948YGZkPnM-mcONVY7Yvq23HwV8LHT_38AU6kbY19TFVmt9wmFFMhntXr6BoYjnBMeDDkbdJ_W0cx"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 w-full">
+<span class="font-label-caps text-[12px] text-primary mb-2 block">MAKANAN UTAMA</span>
+<h3 class="font-headline-md text-headline-md text-white mb-2">Nasi Goreng Wagyu</h3>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity duration-300">Daging wagyu premium berpadu dengan rempah khas Nusantara.</p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group relative overflow-hidden rounded-2xl aspect-[4/5]">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Elegant presentation of Indonesian Satay (Sate) on a rustic wooden platter. The succulent meat skewers are drizzled with a thick, glossy peanut sauce and topped with sliced red chilies and green onions. The background is a sophisticated dark dining setting with warm amber lighting reflecting off glassware. The image captures a blend of traditional street food elevated to fine dining standards." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhy8I1oqiSrXLZT9rjFkej4GBkBiADRoGGwoIOXADQNj6F09QpyramQUTyaRUu5gPZSULDkQ7v36hjVUKgzINmjw-sBR2-cuplY_DsOIEnMpcXZAA3xJ6KzTVFOrbCIb9jhqMCxWNFgW3XRkb_Kjijk9aV3fHz37N1vAeHi9BC2vhVMCim-mTLAHfo7a22zii5_ETzD9-B9Rdjn9mttOIZPciZXgVH4ZFao8s4rvjANw2hgQ47bUU_Yymmj355oV-QI2iAboCwU9uE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 w-full">
+<span class="font-label-caps text-[12px] text-primary mb-2 block">HIDANGAN POPULER</span>
+<h3 class="font-headline-md text-headline-md text-white mb-2">Sate Maranggi Premium</h3>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity duration-300">Daging sapi pilihan dengan bumbu rahasia turun temurun.</p>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group relative overflow-hidden rounded-2xl aspect-[4/5]">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A modern take on a classic Indonesian dessert, Klepon, served in a minimalist glass bowl. The green rice cakes are coated in fine white coconut flakes and arranged artistically. Liquid palm sugar glazes the surface, glistening under soft, diffused lighting. The overall aesthetic is clean, sophisticated, and contemporary, emphasizing the artisanal textures of the dessert." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC383ECnK7fezQkHiTWdZaBXMweSirGXgNIfU45Iu2gRRmfowWfayoMOTe1So_4EibsKOcg71memY0Je5n4bgWjwxKoLFu0qMUdi6reA5OR_y8RQockXj5q8cRZg5Fe6PaEhdsJHEE3-c7Skcd0vm0hhdavr_Xy_5kza3-TWs3QHEjGC1721QgV8ObTqHDwiE39Ya6HGwnDZRu7wrYwM2E6QRXMuPbLc0sOnmlJ-vGHf5HtQ9V4KRiJc5V5VbxLVZrOQ1bgCykeQ38R"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 w-full">
+<span class="font-label-caps text-[12px] text-primary mb-2 block">DESSERT</span>
+<h3 class="font-headline-md text-headline-md text-white mb-2">Klepon Modernist</h3>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity duration-300">Tekstur lembut dengan ledakan gula aren cair yang manis.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Kegiatan Terbaru Section (Bento Layout) -->
+<section class="py-section-gap px-margin-desktop max-w-container-max mx-auto border-t border-outline-variant/20">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+<div class="max-w-xl">
+<span class="font-label-caps text-label-caps text-primary tracking-[0.3em] uppercase block mb-4">Blog &amp; Event</span>
+<h2 class="font-headline-lg text-headline-lg text-white">Kegiatan Terbaru</h2>
+</div>
+<a class="group flex items-center gap-2 text-primary font-bold" href="#">
+<span class="font-label-caps text-label-caps">LIHAT SEMUA KEGIATAN</span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-6 h-auto md:h-[600px]">
+<!-- Main Featured Post -->
+<div class="md:col-span-2 md:row-span-2 glass-card rounded-2xl overflow-hidden flex flex-col group">
+<div class="h-1/2 md:h-2/3 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A professional culinary workshop taking place in a large, modern kitchen. A head chef is demonstrating knife skills to a group of attentive students. The environment is clean and professional with stainless steel surfaces and professional cooking equipment. The lighting is bright and industrial, creating an educational and inspiring atmosphere consistent with high-end culinary training." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuUhr5kv1p2GK8GoD54wqTuW9dLo2ju66syJPJBVllhyVJ2v_Hx3uRr8fC0n75CcmvyNjCCO7Cn6BBS6VY2UZ28piGtR5bsCrS8XLBh1l7biNDan3lIl4zojuvG0M_xGa7lGyDq518FBV9GEoDyDgpAgs9B-RTRRB3O-eehpPWsoiwAY9E6K6oZMn6fOm01s0uoxVJHTiwviwkOBJTtaOKAoryRQN8oQPNmq4YH6yzXfBcEAyw9Kn-TfZmoitSrhyH0UokkL5mLwJB"/>
+</div>
+<div class="p-8 flex-1 flex flex-col justify-between">
+<div>
+<span class="text-[12px] font-label-caps text-primary mb-3 block">EVENT • 15 OKT 2024</span>
+<h3 class="font-headline-md text-headline-md text-white mb-4">Workshop Kuliner: Rahasia Bumbu Dasar Nusantara</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Bergabunglah dalam kelas eksklusif bersama Executive Chef kami untuk mempelajari seni meracik bumbu tradisional.</p>
+</div>
+<button class="mt-6 flex items-center gap-2 text-white font-bold hover:text-primary transition-colors">
+<span class="font-label-caps text-label-caps">BACA SELENGKAPNYA</span>
+<span class="material-symbols-outlined text-[18px]">open_in_new</span>
+</button>
+</div>
+</div>
+<!-- Side Post 1 -->
+<div class="md:col-span-2 glass-card rounded-2xl flex flex-col md:flex-row group overflow-hidden">
+<div class="w-full md:w-2/5 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A cinematic close-up of a chef plating a sophisticated dish. Precision and detail are highlighted as microgreens are placed with tweezers onto a bed of vibrant sauce. The lighting is moody and dramatic, focusing on the artistry and technique of fine dining preparation. The color palette is dark with pops of vibrant organic colors from the food elements." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5yfLSBb4gDm7S3i4nzMUPDS9E40UJSh9Qzg4h0v5J83wKvNFUiG2mEDZLDHBGRbCoGKlbDp9iV6NB_m0KKHpMIq8e8Qnhj_lIM6oAtixUS96lhhZp-KY1xmKL3Z-wiEjDv1QETUMCaGWyROTFPpSuA45Zck5j-I6Gd3-EL2a5iHMu1nRYIt225Ij2vbm3IGoxdVhemLOcOH3Ykw6b5JAhcAEYIZOj2yeSrVAC93rOWjWbNy84uLmOLlbt1ZFVw-PMKOh60eKS9KhH"/>
+</div>
+<div class="p-6 flex-1 flex flex-col justify-center">
+<span class="text-[10px] font-label-caps text-primary mb-2 block">ARTIKEL • 10 OKT 2024</span>
+<h3 class="font-body-lg text-body-lg font-bold text-white mb-2 leading-tight">Seni Plating: Mengubah Masakan Jadi Karya Seni</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-[14px] line-clamp-2">Bagaimana cara tim Resto Blog menyajikan hidangan dengan estetika modern.</p>
+</div>
+</div>
+<!-- Side Post 2 -->
+<div class="md:col-span-2 glass-card rounded-2xl flex flex-col md:flex-row group overflow-hidden">
+<div class="w-full md:w-2/5 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Interior of a luxury Indonesian restaurant at night. The space is filled with warm, ambient lighting from ornate pendant lamps. Dark wood furniture and traditional batik-inspired textures create an atmosphere of sophisticated comfort. Diners are blurred in the background, emphasizing the elegant architectural and interior design of the dining hall." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKVL7GHXo0BzLrW_aZ3lN2NK3gIN9i5FjQTw-6z0NtXeq0mnxCrjPAmiIDsiIroZ1kaKouY1m3ApWjWF_hhlu477GWniVfDRlnZZDvoKBd3O2VdIlG1d7e-nFkX8MjlQ-cWWYhbOp6rXNWD4-Q8iRzemRzLE-Le0GlFO0jix9ELN78ckGo0SUGgtA9GIiWSm1mdX0WNE-XnbyHGqlFEYOrb8VvwLHlSpYisDYPQyum3I-g8d6PcpU24KsS_6MsIQcw-JAhh8Do_h9X"/>
+</div>
+<div class="p-6 flex-1 flex flex-col justify-center">
+<span class="text-[10px] font-label-caps text-primary mb-2 block">HIGHLIGHT • 05 OKT 2024</span>
+<h3 class="font-body-lg text-body-lg font-bold text-white mb-2 leading-tight">Pembukaan Cabang Ke-8 di Surabaya</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-[14px] line-clamp-2">Kini kami hadir lebih dekat dengan para pecinta kuliner di Jawa Timur.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Floating Action Button -->
+<button class="fixed bottom-8 right-8 z-50 flex items-center gap-3 px-6 py-4 bg-[#25D366] text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat</span>
+<span class="font-label-caps text-label-caps font-bold">Pesan Sekarang</span>
+</button>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant/20 pt-section-gap pb-10 px-margin-desktop">
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-gutter mb-20">
+<div class="md:col-span-1">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded-full">
+<span class="material-symbols-outlined text-on-primary">restaurant</span>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-primary">Resto Blog</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">
+                    Wadah apresiasi kuliner Indonesia dengan sentuhan modern dan profesionalisme tanpa batas.
+                </p>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-all" href="#">
+<span class="material-symbols-outlined">share</span>
+</a>
+<a class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-all" href="#">
+<span class="material-symbols-outlined">public</span>
+</a>
+</div>
+</div>
+<div>
+<h4 class="font-label-caps text-label-caps text-white mb-8 border-l-2 border-primary pl-4 uppercase">Navigasi</h4>
+<ul class="space-y-4">
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Beranda</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Menu</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Tentang Kami</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Struktur</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-caps text-label-caps text-white mb-8 border-l-2 border-primary pl-4 uppercase">Informasi</h4>
+<ul class="space-y-4">
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Kegiatan</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Kontak</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Kebijakan Privasi</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Syarat &amp; Ketentuan</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-caps text-label-caps text-white mb-8 border-l-2 border-primary pl-4 uppercase">Hubungi Kami</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">
+                    Jl. Cita Rasa No. 123, Jakarta Selatan, Indonesia
+                </p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">
+                    Email: info@restoblog.id
+                </p>
+<p class="font-body-md text-body-md text-primary font-bold">
+                    Tlp: +62 21 555 0123
+                </p>
+</div>
+</div>
+<div class="max-w-container-max mx-auto pt-10 border-t border-outline-variant/10 text-center">
+<p class="font-body-md text-body-md text-on-surface-variant opacity-80">
+                © 2024 Resto Blog Cita Rasa Indonesia. All Rights Reserved.
+            </p>
+</div>
+</footer>
+</body></html>
