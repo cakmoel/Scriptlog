@@ -19,8 +19,9 @@ if (file_exists(__DIR__ . '/../config.php')) {
 
 $stop = null;
 
-$tempKey = isset($_GET['tempKey']) ? escape_html($_GET['tempKey']) : "";
-$user = $app->userDao->getUserByResetKey($tempKey);
+$tempKey = isset($_GET['tempKey']) ? $_GET['tempKey'] : "";
+$hashedKey = hash('sha256', $tempKey);
+$user = $app->userDao->getUserByResetKey($hashedKey);
 
 if (empty($user['user_reset_key'])) {
     $stop = "Temporary key is not valid.";
