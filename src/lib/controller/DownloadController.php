@@ -98,7 +98,7 @@ class DownloadController extends BaseApp
             $allowedDomains = DownloadSettings::getAllowedDomains();
             $referer = $_SERVER['HTTP_REFERER'] ?? '';
 
-            if (!DownloadHandler::isHotlinkingAllowed($referer, $allowedDomains)) {
+            if (!DownloadUtility::isHotlinkingAllowed($referer, $allowedDomains)) {
                 http_response_code(403);
                 echo 'Hotlinking not allowed';
                 exit;
@@ -125,7 +125,7 @@ class DownloadController extends BaseApp
         }
 
         $filename = basename($media['media_filename']);
-        DownloadHandler::deliverFile($filepath, $filename, $mimeType);
+        DownloadUtility::deliverFile($filepath, $filename, $mimeType);
     }
 
     /**
