@@ -20,9 +20,9 @@
  * @author Xeoncross
  * @license MIT
  * @param string $clip
- * @param string $value
- * @param string $callback
- * @return void
+ * @param mixed $value
+ * @param callable|string|false|null $callback
+ * @return mixed|void
  *
  */
 function clip($clip, $value = null, $callback = null)
