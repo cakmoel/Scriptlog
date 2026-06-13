@@ -84,7 +84,7 @@ class ThemeController extends BaseApp
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request");
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request");
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -161,7 +161,7 @@ class ThemeController extends BaseApp
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -296,7 +296,7 @@ class ThemeController extends BaseApp
                         'theme_id' => FILTER_SANITIZE_NUMBER_INT];
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request");
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request");
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -355,12 +355,12 @@ class ThemeController extends BaseApp
 
             try {
                 if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
                 if (!filter_var($id, FILTER_VALIDATE_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -404,12 +404,12 @@ class ThemeController extends BaseApp
 
             try {
                 if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
                 if (!filter_var($id, FILTER_VALIDATE_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -453,12 +453,12 @@ class ThemeController extends BaseApp
 
             try {
                 if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
                 if (!filter_var($id, FILTER_VALIDATE_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
