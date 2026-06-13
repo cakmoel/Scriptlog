@@ -10,12 +10,11 @@
  */
 function nav_parent($parent_id)
 {
-
-    $idsanitized = sanitizer($parent_id, 'sql');
+    $dbc = Registry::get('dbc');
     $sql = "SELECT ID, parent_id, menu_label, menu_link, menu_status, menu_visibility
-        FROM tbl_menu WHERE ID = '$idsanitized' ";
+        FROM tbl_menu WHERE ID = ?";
 
-    return db_simple_query($sql);
+    return $dbc->dbQuery($sql, [$parent_id]);
 }
 
 /**
