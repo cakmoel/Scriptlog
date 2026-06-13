@@ -13,7 +13,8 @@ $post_slug = isset($retrieve_post['post_slug']) ? htmlout($retrieve_post['post_s
 $post_content = '';
 $post_visibility = isset($retrieve_post['post_visibility']) ? $retrieve_post['post_visibility'] : 'public';
 $comment_permit = isset($retrieve_post['comment_permit']) ? htmlout($retrieve_post['comment_permit']) : "";
-$total_comment = (!empty($post_id) && total_comment($post_id)['total'] > 0) ? total_comment($post_id)['total'] : 0;
+$comment_data = total_comment($post_id);
+$total_comment = (!empty($post_id) && !empty($comment_data['total'])) ? (int)$comment_data['total'] : 0;
 
 $is_unlocked = false;
 
