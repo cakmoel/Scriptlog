@@ -190,7 +190,7 @@ class UserController extends BaseApp
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
                     throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
                 }
 
@@ -345,7 +345,7 @@ class UserController extends BaseApp
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
                     throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
                 }
 
@@ -526,7 +526,7 @@ class UserController extends BaseApp
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
                     throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
                 }
 
@@ -659,12 +659,12 @@ class UserController extends BaseApp
         if (isset($_GET['Id'])) {
             try {
                 if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
                     throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
                 }
 
                 if (!filter_var($userId, FILTER_VALIDATE_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
                     throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
                 }
 
@@ -738,7 +738,7 @@ class UserController extends BaseApp
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
                     throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
                 }
 
