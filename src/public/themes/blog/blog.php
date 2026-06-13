@@ -6,7 +6,7 @@ $entries_pagination = function_exists('retrieve_blog_posts') ? retrieve_blog_pos
 <div class="container">
   <div class="row">
     <!-- Latest Blog -->
-    <main class="posts-listing col-lg-8"> 
+    <div class="posts-listing col-lg-8"> 
       <div class="container">
         <div class="row">
         <!-- post -->
@@ -64,7 +64,7 @@ $entries_pagination = function_exists('retrieve_blog_posts') ? retrieve_blog_pos
         </nav>
         
       </div>
-    </main>
+    </div>
 
     <?php
       include dirname(__FILE__) . '/sidebar.php';
