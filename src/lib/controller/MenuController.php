@@ -101,7 +101,7 @@ class MenuController extends BaseApp
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!.");
                 }
 
@@ -120,8 +120,9 @@ class MenuController extends BaseApp
                     array_push($errors, MESSAGE_INVALID_SELECTBOX);
                 }
 
-                if ((!empty($_POST['menu_sort'])) || ($_POST['menu_sort'] !== '')) {
-                    if (is_numeric($_POST['menu_sort']) === false) {
+                $menu_sort = $_POST['menu_sort'] ?? '';
+                if ((!empty($menu_sort)) || ($menu_sort !== '')) {
+                    if (is_numeric($menu_sort) === false) {
                         $checkError = false;
                         array_push($errors, "Order must be a number");
                     }
@@ -219,7 +220,7 @@ class MenuController extends BaseApp
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!.");
                 }
 
@@ -303,12 +304,12 @@ class MenuController extends BaseApp
 
             try {
                 if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
                 if (!filter_var($id, FILTER_VALIDATE_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
