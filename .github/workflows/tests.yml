@@ -23,4 +23,4 @@ jobs:
         run: composer install --no-interaction --prefer-dist
 
       - name: Run Unit Tests (no database required)
-        run: vendor/bin/phpunit --configuration phpunit.xml --testsuite "Unit Tests" --no-coverage --colors=never
+        run: lib/vendor/bin/phpunit --configuration phpunit.xml --testsuite "Unit Tests" --no-coverage --colors=never
