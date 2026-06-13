@@ -206,6 +206,8 @@ class Mailer
                 $headers[] = 'BCC: ' . $this->bcc;
             }
 
+            $message = '';
+
             if ($this->sendText && !$this->sendHTML) {
                 $message = $this->textBody;
             } elseif (!$this->sendText && $this->sendHTML) {

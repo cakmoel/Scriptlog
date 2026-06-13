@@ -212,7 +212,7 @@ class ConfigurationDao extends Dao
         $timezone_list = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
 
         foreach ($timezone_list as $option) {
-            $select = $this->selected === $option ? '  selected' : null;
+            $select = $this->selected === $option ? '  selected' : '';
 
             /*** add each option to the dropdown ***/
             $dropdown .= '<option value="' . $option . '"' . $select . '>' . $option . '</option>' . PHP_EOL;

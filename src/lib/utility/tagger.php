@@ -143,7 +143,7 @@ function tag_query()
     }
 
     for ($t = 0; $t < count($tags); $t++) {
-        $taglink[] = '<li class="list-inline-item"><a href="' . app_url() . DS . '?tag=' . $tags[$t] . '" class="tag" title="' . $tags[$t] . '">#' . $tags[$t] . '</a></li>';
+        $taglink[] = '<li class="list-inline-item"><a href="' . app_url() . DS . '?tag=' . escape_html($tags[$t]) . '" class="tag" title="' . escape_html($tags[$t]) . '">#' . escape_html($tags[$t]) . '</a></li>';
     }
 
     return is_iterable($taglink) ? implode(" ", $taglink) : array();
@@ -163,9 +163,7 @@ function tag_path()
     $get_tags = function_exists('db_simple_query') ? db_simple_query('SELECT DISTINCT LOWER(post_tags) AS postTags FROM tbl_posts WHERE post_tags != "" GROUP BY postTags') : "";
 
     while ($row = $get_tags->fetch()) {
-        if (isset($row['postTags'])) {
-            $parts = explode(',', $row['postTags']);
-        }
+        $parts = isset($row['postTags']) ? explode(',', $row['postTags']) : [];
 
         foreach ($parts as $part) {
             $tagArrays[] = $part;
@@ -174,7 +172,7 @@ function tag_path()
 
     $finalTags = array_unique($tagArrays);
     foreach ($finalTags as $tag) {
-        $taglink[] = '<li class="list-inline-item"><a href="' . app_url() . DS . 'tag' . DS . $tag . '" class="tag" title="' . trim($tag) . '">#' . trim($tag) . '</a></li>';
+        $taglink[] = '<li class="list-inline-item"><a href="' . app_url() . DS . 'tag' . DS . escape_html($tag) . '" class="tag" title="' . escape_html(trim($tag)) . '">#' . escape_html(trim($tag)) . '</a></li>';
     }
 
     return is_iterable($taglink) ? implode(" ", $taglink) : array();

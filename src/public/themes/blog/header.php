@@ -14,12 +14,15 @@ require dirname(__FILE__) . '/functions.php';
 <?php endif; ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" as="style">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+<link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;display=swap"></noscript>
 
 <style>
 /* Critical CSS */
 body{overflow-x:hidden;font-family:"Open Sans",sans-serif}
+.skip-link{position:absolute;top:-40px;left:0;background:#122430;color:#fff;padding:8px 16px;z-index:100000;text-decoration:none;transition:top .2s ease}
+.skip-link:focus{top:0;outline:3px solid #7fff00;outline-offset:2px}
+*:focus-visible{outline:3px solid #7fff00;outline-offset:2px}
 .sina-nav{min-height:60px;background:#fff;border:1px solid #eee;position:relative;z-index:9999}
 .sina-nav .container{position:relative}
 .sina-nav .sina-brand{height:60px;float:left;text-decoration:none}
@@ -35,18 +38,30 @@ body{overflow-x:hidden;font-family:"Open Sans",sans-serif}
 <?php
 if (function_exists('theme_dir')) :
     ?>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/fontastic.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.css">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/fontastic.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/fontastic.min.css"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.css"></noscript>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/style.sea.min.css" id="theme-stylesheet" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/privacy.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/style.sea.min.css"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.min.css"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/privacy.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/privacy.min.css"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.min.css"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css"></noscript>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/sina-nav.min.css" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/cookie-consent.min.css">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/sina-nav.min.css"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/cookie-consent.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/cookie-consent.min.css"></noscript>
     <?php if (is_rtl()) : ?>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/rtl.min.css">
     <?php endif; ?>
@@ -68,7 +83,10 @@ endif;
 <script src="<?= theme_dir(); ?>assets/js/respond.min.js"></script><![endif]-->
 </head>
 <body>
-<nav class="sina-nav mobile-sidebar navbar-fixed" data-top="0">
+<!-- Skip to main content link for keyboard users -->
+<a class="skip-link" href="#main-content"><?= t('skip_to_content'); ?></a>
+<header role="banner">
+<nav class="sina-nav mobile-sidebar navbar-fixed" data-top="0" role="navigation" aria-label="<?= t('nav.main_navigation'); ?>">
         <div class="container">
 
             <div class="sina-nav-header">
@@ -155,3 +173,5 @@ endif;
             </div><!-- /.navbar-collapse -->
         </div><!-- .container -->
     </nav>
+</header>
+<main id="main-content" role="main">

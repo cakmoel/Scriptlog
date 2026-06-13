@@ -28,7 +28,7 @@
                 <h4><i class="icon fa fa-ban" aria-hidden="true"></i> Error!</h4>
                 <?php
                 foreach ($errors as $e) :
-                    echo $e;
+                    echo safe_html($e);
                 endforeach;
                 ?>
           </div>
@@ -44,7 +44,7 @@
                 <h4><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h4>
                       <?php
                         foreach ($status as $s) :
-                            echo $s;
+                            echo safe_html($s);
                         endforeach;
                         ?>
            </div>

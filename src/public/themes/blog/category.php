@@ -73,7 +73,7 @@ $pagination = function_exists('posts_by_category') ? posts_by_category($topicId)
                 </div>
 
                 <!-- navigation -->
-                <nav aria-label="Page navigation example">
+                <nav aria-label="<?= t('pagination.navigation'); ?>">
                     <ul class="pagination pagination-template d-flex justify-content-center">
                         <?php
                         (isset($total_comment) && $total_comment > 0) ? $pagination : "";

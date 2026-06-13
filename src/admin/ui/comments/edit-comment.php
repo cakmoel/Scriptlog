@@ -59,7 +59,7 @@ $comment_id = isset($commentData['ID']) ? (int)$commentData['ID'] : 0;
 
 <div class="form-group">
 <label for="comment">Content <span class="text-red">*</span></label>
-<textarea class="form-control" id="comment" rows="5" placeholder="Enter comment content..." name="comment_content" maxlength="500" required><?=(isset($commentData['comment_content'])) ? $commentData['comment_content'] : ""; ?></textarea>
+<textarea class="form-control" id="comment" rows="5" placeholder="Enter comment content..." name="comment_content" maxlength="500" required><?=(isset($commentData['comment_content'])) ? safe_html($commentData['comment_content']) : ""; ?></textarea>
 </div>
 
 <div class="form-group">
@@ -95,7 +95,7 @@ $comment_id = isset($commentData['ID']) ? (int)$commentData['ID'] : 0;
         </div>
         <div class="box-body">
             <div class="form-group">
-              <p><?=(isset($commentData['post_title'])) ? $commentData['post_title'] : ""; ?></p>
+              <p><?=(isset($commentData['post_title'])) ? safe_html($commentData['post_title']) : ""; ?></p>
             </div>
             <div class="form-group">
                 <label><i class="fa fa-calendar" aria-hidden="true"></i> Submited On</label>
