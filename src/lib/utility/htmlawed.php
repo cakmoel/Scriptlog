@@ -366,6 +366,7 @@ function hl_balance($t, $act = 1, $parentEle = 'div')
     if (isset($noKidEleAr[$mom])) {
         return (!$act ? '' : str_replace(array('<', '>'), array('&lt;', '&gt;'), $t));
     }
+    $validInMomEleAr = array();
     if (isset($validMomKidAr[$mom])) {
         $validInMomEleAr = $validMomKidAr[$mom];
     } elseif (isset($inlineKidEleAr[$mom])) {
@@ -393,6 +394,9 @@ function hl_balance($t, $act = 1, $parentEle = 'div')
 
     $t = explode('<', $t);
     $validKidsOfMom = $openEleQueue = array(); // Queue of opened elements
+    $attrs = null;
+    $slash = null;
+    $eleNow = null;
     ob_start();
     for ($i = -1, $eleCount = count($t); ++$i < $eleCount;) {
 
@@ -838,16 +842,16 @@ function hl_regex($t)
     if (empty($t) || !is_string($t)) {
         return 0;
     }
+    $php_errormsg = null;
     if ($funcsExist = function_exists('error_clear_last') && function_exists('error_get_last')) {
         error_clear_last();
     } else {
         if ($valTrackErr = ini_get('track_errors')) {
-            $valMsgErr = isset($php_errormsg) ? $php_errormsg : null;
+            $valMsgErr = $php_errormsg;
         } else {
             ini_set('track_errors', '1');
-            $php_errormsg = null;
         }
-        unset($php_errormsg);
+        $php_errormsg = null;
     }
     if (($valShowErr = ini_get('display_errors'))) {
         ini_set('display_errors', '0');
@@ -856,7 +860,8 @@ function hl_regex($t)
     if ($funcsExist) {
         $out = error_get_last() == null ? 1 : 0;
     } else {
-        $out = isset($php_errormsg) ? 0 : 1;
+        /** @psalm-suppress TypeDoesNotContainType, RedundantCondition - $php_errormsg is a PHP superglobal set when track_errors is enabled */
+        $out = $php_errormsg !== null ? 0 : 1;
         if ($valTrackErr) {
             $php_errormsg = isset($valMsgErr) ? $valMsgErr : null;
         } else {
@@ -1104,6 +1109,7 @@ function hl_tag($t)
     $attrStr = trim($attrStr, ' /');
     $attrAr = array();
     $state = 0;
+    $attr = '';
     while (strlen($attrStr)) {
         $ok = 0; // For parsing errors, to deal with space, ", and ' characters
         switch ($state) {
