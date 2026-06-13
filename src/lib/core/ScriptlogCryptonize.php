@@ -91,9 +91,9 @@ class ScriptlogCryptonize
      *
      * @param string $ciphertext
      * @param string $key
-     * @return string
+     * @return string|bool
      */
-    public static function decipherMessage(string $ciphertext, string $key): string
+    public static function decipherMessage(string $ciphertext, string $key)
     {
         $openssl = new Openssl(['algo' => 'aes']);
         $cipher = new BlockCipher($openssl);
@@ -170,7 +170,7 @@ class ScriptlogCryptonize
             
             return base64_encode($combined);
             
-        } catch (ScriptlogCryptonizeException $e) {
+        } catch (Throwable $e) {
             self::logError($e);
             throw $e;
         }
@@ -247,7 +247,7 @@ class ScriptlogCryptonize
             
             return $plaintext;
             
-        } catch (ScriptlogCryptonizeException $e) {
+        } catch (Throwable $e) {
             self::logError($e);
             throw $e;
         }
@@ -448,7 +448,7 @@ class ScriptlogCryptonize
             
             if ($row = $result->fetch_assoc()) {
                 $mysqli->close();
-                return $row['setting_value'];
+                return is_string($row['setting_value']) ? $row['setting_value'] : (string)$row['setting_value'];
             }
             
             $mysqli->close();
@@ -521,7 +521,7 @@ class ScriptlogCryptonize
     {
         try {
             return random_bytes($length);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             if (function_exists('openssl_random_pseudo_bytes')) {
                 $strong = false;
                 $bytes = openssl_random_pseudo_bytes($length, $strong);
@@ -561,7 +561,7 @@ class ScriptlogCryptonize
      *
      * @param Exception $e
      */
-    private static function logError(Exception $e): void
+    private static function logError(Throwable $e): void
     {
         if (class_exists('LogError')) {
             LogError::setStatusCode(http_response_code());
