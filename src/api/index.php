@@ -21,7 +21,7 @@
 
 // Prevent direct access to API
 define('SCRIPTLOG', hash('sha256', 'BLOGWARE_API_ACCESS'));
-define('API_VERSION', 'v1');
+defined('API_VERSION') || define('API_VERSION', 'v1');
 define('API_BASE_PATH', '/api/v1');
 
 // Load configuration
