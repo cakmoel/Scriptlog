@@ -29,7 +29,7 @@ function upload_media($file_location, $file_type, $file_size, $file_name)
         case 'application/vnd.microsoft.portable-executable':
         case 'application/vnd.oasis.opendocument.text':
         case 'application/vnd.oasis.opendocument.spreadsheet':
-            upload_doc($file_location, $file_size, $file_type, $file_name);
+            upload_doc($file_location, $file_name);
 
             break;
 
