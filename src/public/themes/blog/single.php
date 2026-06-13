@@ -68,7 +68,7 @@ if (isset($retrieve_post['post_modified'])) {
     <div class="container">
 
         <div class="row">
-            <main class="post blog-post col-lg-8">
+            <div class="post blog-post col-lg-8">
                 <div class="container">
                     <div class="post-single">
                         <div class="post-thumbnal">
@@ -168,7 +168,7 @@ endif;
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
 
             <?php
               include dirname(__FILE__) . '/sidebar.php';
