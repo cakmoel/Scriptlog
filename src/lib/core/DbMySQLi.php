@@ -40,12 +40,16 @@ class DbMySQLi
     {
 
         try {
-            $this->setDbRealConnection($this->ca);
+            $this->setDbRealConnection();
         } catch (Throwable $th) {
-            $this->errors = LogError::setStatusCode(http_response_code(500));
+            if (!headers_sent()) {
+                $this->errors = LogError::setStatusCode(http_response_code(500));
+            }
             $this->errors = LogError::exceptionHandler($th);
         } catch (mysqli_sql_exception $e) {
-            $this->errors = LogError::setStatusCode(http_response_code(500));
+            if (!headers_sent()) {
+                $this->errors = LogError::setStatusCode(http_response_code(500));
+            }
             $this->errors = LogError::exceptionHandler($e);
         }
     }
@@ -179,7 +183,7 @@ class DbMySQLi
 
         $types = $types ?: str_repeat("s", count($params));
 
-        $this->setDbRealConnection($this->ca);
+        $this->setDbRealConnection();
 
         $stmt = $this->dbc->prepare($sql);
 
@@ -274,7 +278,7 @@ class DbMySQLi
      */
     public function escape_string($field)
     {
-        $this->setDbRealConnection($this->ca);
+        $this->setDbRealConnection();
         return $this->dbc->real_escape_string("`" . str_replace("`", "``", $field) . "`");
     }
 
@@ -414,8 +418,8 @@ class DbMySQLi
         $this->dbhost = self::$config['db']['host'];
         $this->dbuser = self::$config['db']['user'];
         $this->dbpass = self::$config['db']['pass'];
-        $this->dbname = isset(self::$config['db']['name']) ? self::$config['db']['name'] : "";
-        $this->dbport = isset(self::$config['db']['port']) ? self::$config['db']['port'] : "";
+        $this->dbname = self::$config['db']['name'] ?? "";
+        $this->dbport = self::$config['db']['port'] ?? "";
 
         if ($this->ca !== false) {
             $this->dbc = mysqli_init();
@@ -456,12 +460,12 @@ class DbMySQLi
     /**
      * getConfiguration
      *
-     * @return void
+     * @return array
      *
      */
     private function getConfiguration()
     {
-        return (class_exists('AppConfig')) ? AppConfig::readConfiguration(invoke_config()) : "";
+        return (class_exists('AppConfig')) ? AppConfig::readConfiguration(invoke_config()) : [];
     }
 
     /**
