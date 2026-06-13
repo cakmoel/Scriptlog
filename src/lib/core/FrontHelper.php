@@ -18,6 +18,23 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 class FrontHelper
 {
     /**
+     * FrontService instance for delegated data access
+     *
+     * @var FrontService|null
+     */
+    private static ?FrontService $frontService = null;
+
+    /**
+     * Set the FrontService instance
+     *
+     * @param FrontService|null $service
+     */
+    public static function setFrontService(?FrontService $service): void
+    {
+        self::$frontService = $service;
+    }
+
+    /**
      * grabSimpleFrontPost
      *
      * @param int $id
@@ -136,20 +153,19 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
         }
 
         try {
-            if (!function_exists('db_instance')) {
+            if (!Registry::isKeySet('dbc')) {
                 return [];
             }
 
-            $dbc = db_instance();
+            $dbc = Registry::get('dbc');
             if (!is_object($dbc)) {
                 return [];
             }
 
-            $escapedTag = $dbc->escape_string($tag);
-            $tagSearch = '%' . $escapedTag . '%';
-            $sql = "SELECT ID, post_title, post_content, post_summary, post_tags FROM tbl_posts WHERE post_tags LIKE '$tagSearch' AND post_status = 'publish' AND post_type = 'blog' LIMIT 1";
+            $tagSearch = '%' . $tag . '%';
+            $sql = "SELECT ID, post_title, post_content, post_summary, post_tags FROM tbl_posts WHERE post_tags LIKE ? AND post_status = 'publish' AND post_type = 'blog' LIMIT 1";
 
-            $result = $dbc->query($sql);
+            $result = $dbc->dbQuery($sql, [$tagSearch]);
             $results = $result ? $result->fetch() : null;
 
             return empty($results) ? null : $results;
@@ -199,6 +215,9 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
      */
     public static function grabPreparedFrontPostById($id)
     {
+        if (self::$frontService) {
+            return self::$frontService->getPublishedPost((int)$id);
+        }
 
         $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, 
                YEAR(p.post_date) AS year_archive, MONTH(p.post_date) AS month_archive, 
@@ -227,6 +246,9 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
      */
     public static function grabPreparedFrontPageBySlug($slug)
     {
+        if (self::$frontService) {
+            return self::$frontService->getPublishedPage($slug);
+        }
 
         $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
                p.post_title, p.post_slug,
@@ -255,6 +277,9 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
      */
     public static function grabPreparedFrontTopicBySlug($slug)
     {
+        if (self::$frontService) {
+            return self::$frontService->getPublishedTopic($slug);
+        }
 
         $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE topic_slug = ? AND topic_status = 'Y'";
 
@@ -324,7 +349,7 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
         $results = get_result($statement);
 
-        if (isset($results)) {
+        if (!empty($results)) {
             foreach ($results as $result) {
                 $media_filename = $result['media_filename'];
                 $media_caption = $result['media_caption'];
@@ -333,6 +358,8 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
             return ['media_filename' => $media_filename, 'media_caption' => $media_caption, 'media_id' => $media_id];
         }
+
+        return null;
     }
 
     /**
