@@ -33,7 +33,7 @@
               <h3><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid form data!</h3>
                 <?php
                 foreach ($errors as $e) :
-                    echo '<p>' . $e . '</p>';
+                    echo '<p>' . safe_html($e) . '</p>';
                 endforeach;
                 ?>
             </div>
