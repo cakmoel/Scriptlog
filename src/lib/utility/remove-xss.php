@@ -28,7 +28,7 @@ function remove_xss($dirty_string)
  * @license MIT
  * @version 1.0
  * @param string $dirty_string
- * @return void
+ * @return string
  *
  */
 function simple_remove_xss($dirty_string)
