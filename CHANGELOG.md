@@ -8,14 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#120---2026-06-16)
+- [Latest Release](#121---2026-06-16)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
 
-## [1.2.0] - 2026-06-16
+## [1.2.1] - 2026-06-16
 
 ### Added
 - **CSS design tokens**: Custom properties for colors, spacing, and typography in the blog theme
@@ -40,7 +40,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Stale test files for deleted `tastybites` theme (4 files)
 
 ### Notes
-Minor release focused on theme modernization with CSS design tokens, dark mode support, responsive improvements, and CI/test infrastructure cleanup.
+Minor release focused on theme modernization with CSS design tokens, dark mode support, responsive improvements, and CI/test infrastructure cleanup. This version re-releases the same content as v1.2.0 under a new tag to avoid the upstream tag mutation lock on Packagist.
 
 ### Codename
 **Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
@@ -357,7 +357,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
-| 1.2.0 | 2026-06-16 | Stable |
+| 1.2.1 | 2026-06-16 | Stable |
 | 1.1.0 | 2026-06-13 | Stable |
 | 1.0.8 | 2026-05-14 | Stable |
 | 1.0.7 | 2026-05-02 | Stable |
