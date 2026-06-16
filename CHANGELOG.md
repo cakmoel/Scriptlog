@@ -8,12 +8,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#111---2026-06-13)
+- [Latest Release](#120---2026-06-16)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.2.0] - 2026-06-16
+
+### Added
+- **CSS design tokens**: Custom properties for colors, spacing, and typography in the blog theme
+- **Dark mode support**: Full theme support via `prefers-color-scheme: dark` media query
+- **Responsive improvements**: Enhanced layout adaptability for mobile, tablet, and desktop viewports
+
+### Changed
+- Blog theme templates: replaced `<main>` with `<div>` for semantic consistency across 8 templates (archive, archives, blog, category, page, single, tag, homepage)
+- Improved header navigation with better layout and accessibility
+- Enhanced footer template layout
+- Updated homepage template
+- Minified `style.sea.css` asset
+- Updated test bootstrap and file paths to match project structure
+
+### Fixed
+- PHPUnit binary path corrected from `vendor/bin/phpunit` to `lib/vendor/bin/phpunit` in CI workflow
+- Added `workflow_dispatch` trigger to CI workflow for manual test runs
+- Fixed stale tastybites theme test files (theme was previously removed)
+- Corrected test file paths from `../../lib/` to `../../src/lib/` project-wide
+
+### Removed
+- Stale test files for deleted `tastybites` theme (4 files)
+
+### Notes
+Minor release focused on theme modernization with CSS design tokens, dark mode support, responsive improvements, and CI/test infrastructure cleanup.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.1.0
+- **Changes since v1.1.0**: 18 commits
+
+---
 
 ## [1.1.0] - 2026-06-13
 
@@ -31,8 +67,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Test suite expansion**: 25+ new test files covering handlers, services, download features, integration tests, and smoke tests
 - **Test infrastructure**: New `tests/core/`, `tests/smoke/`, and `tests/unit/handlers/` test directories
 - **Psalm static analysis**: Configuration files (`psalm.xml`, `psalm-baseline.xml`, `psalm-autoload.php`) for improved code quality enforcement
-- **CSS design tokens**: Custom properties for colors, spacing, typography in blog theme
-- **Dark mode support**: `prefers-color-scheme: dark` media query with full theme support
 
 ### Changed
 - Updated `composer.json` and `composer.lock` dependencies
@@ -42,7 +76,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated `Bootstrap.php`, `Dispatcher.php`, `HandleRequest.php`, `FrontHelper.php`, `SessionMaker.php` with significant improvements
 - Enhanced `DbMySQLi.php` for PDO/mysqli compatibility
 - Updated documentation files
-- Blog theme templates: replaced `<main>` with `<div>` for semantic consistency across 8 templates
 
 ### Fixed
 - Resolved PHP 8.x compatibility issues across the codebase
@@ -324,6 +357,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.2.0 | 2026-06-16 | Stable |
 | 1.1.0 | 2026-06-13 | Stable |
 | 1.0.8 | 2026-05-14 | Stable |
 | 1.0.7 | 2026-05-02 | Stable |
