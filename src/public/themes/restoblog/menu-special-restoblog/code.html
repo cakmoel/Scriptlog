@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121414;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4e4639;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#474746",
+                        "secondary": "#c8c6c5",
+                        "outline": "#9a8f80",
+                        "on-surface-variant": "#d1c5b4",
+                        "surface-container-low": "#1a1c1c",
+                        "secondary-container": "#474746",
+                        "secondary-fixed": "#e5e2e1",
+                        "surface": "#121414",
+                        "tertiary-fixed": "#e5e2e1",
+                        "inverse-surface": "#e2e2e2",
+                        "on-tertiary-fixed-variant": "#474646",
+                        "on-primary-fixed": "#261900",
+                        "primary": "#e9c176",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "surface-container-highest": "#333535",
+                        "on-primary": "#412d00",
+                        "surface-variant": "#333535",
+                        "primary-fixed": "#ffdea5",
+                        "on-tertiary-container": "#3c3b3b",
+                        "error": "#ffb4ab",
+                        "on-background": "#e2e2e2",
+                        "on-secondary-container": "#b7b5b4",
+                        "on-primary-container": "#4e3700",
+                        "on-secondary": "#313030",
+                        "tertiary-fixed-dim": "#c9c6c5",
+                        "on-tertiary": "#313030",
+                        "tertiary": "#c9c6c5",
+                        "on-error-container": "#ffdad6",
+                        "on-surface": "#e2e2e2",
+                        "surface-container-lowest": "#0c0f0f",
+                        "primary-fixed-dim": "#e9c176",
+                        "surface-tint": "#e9c176",
+                        "error-container": "#93000a",
+                        "on-primary-fixed-variant": "#5d4201",
+                        "surface-dim": "#121414",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "background": "#121414",
+                        "surface-container": "#1e2020",
+                        "tertiary-container": "#a7a5a4",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "surface-bright": "#38393a",
+                        "on-error": "#690005",
+                        "primary-container": "#c5a059",
+                        "surface-container-high": "#282a2b",
+                        "inverse-primary": "#775a19",
+                        "inverse-on-surface": "#2f3131",
+                        "outline-variant": "#4e4639"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "base": "8px",
+                        "margin-mobile": "20px",
+                        "gutter": "24px",
+                        "margin-desktop": "60px",
+                        "section-gap": "80px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Manrope"],
+                        "body-lg": ["Manrope"],
+                        "headline-lg-mobile": ["EB Garamond"],
+                        "headline-md": ["EB Garamond"],
+                        "headline-lg": ["EB Garamond"],
+                        "display-lg": ["EB Garamond"],
+                        "label-caps": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                        "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                        "headline-lg": ["48px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                        "display-lg": ["72px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                        "label-caps": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary/30">
+<!-- TopNavBar -->
+<header class="bg-surface/80 dark:bg-surface/80 backdrop-blur-md docked full-width top-0 sticky z-50 border-b border-outline-variant/30 flat no shadows">
+<div class="flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 border-2 border-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">restaurant</span>
+</div>
+<span class="font-headline-md text-headline-md font-bold tracking-tight text-on-surface">Resto Blog</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Beranda</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md" href="#">Menu</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Tentang Kami</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Struktur</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Kegiatan</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Kontak</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="hidden lg:flex px-4 py-2 border border-outline-variant rounded hover:bg-primary-container/10 transition-all duration-300 scale-95 active:scale-90 font-label-caps text-label-caps text-on-surface-variant">Login Admin</button>
+<button class="bg-primary text-on-primary-fixed px-6 py-2 rounded font-bold font-label-caps text-label-caps scale-95 active:scale-90 transition-transform">Daftar Anggota</button>
+</div>
+</div>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative min-h-[614px] flex flex-col items-center justify-center overflow-hidden pt-20">
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-gradient-to-b from-surface/20 via-surface/80 to-surface z-10"></div>
+<img class="w-full h-full object-cover" data-alt="A moody, high-end restaurant interior with dim warm lighting reflecting off polished dark wood surfaces and crystal glassware. The atmosphere is sophisticated and intimate, with a soft cinematic blur in the background focusing on elegant table settings. Deep blacks and golden highlights dominate the color palette, creating a premium culinary experience feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB12P0XYp5FFvVqSelu1LjD7TBLtm7tO9OQY5CjT05Z9qxzy6HRJD8YZ9dLe3zUmzXxmf7TG1iLGul-e7gkSYkbE7TGQ1sYbN8A89Xmul0dD4to19awTHQlE1-hfLUJk3c_YHnl9NA31J1_bbx_kG-P-pl6lgalGryQ9aP-6R3dWeSLLTzpdP-G1wzY7uKzy4UJOBsuI6RHJJUZAKO1Z7XTwUnTS6MmSou7eDYQBd4X2l5FakORJbpYOilRbpbvE02uVZMkywI7oiIO"/>
+</div>
+<div class="relative z-20 text-center px-margin-mobile md:px-0">
+<p class="font-label-caps text-label-caps text-primary tracking-widest mb-4">MENU SPESIAL KAMI</p>
+<h1 class="font-display-lg text-display-lg md:text-display-lg text-white mb-6">Mahakarya Kuliner</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">Menyajikan simfoni rasa dari seluruh Nusantara, diolah dengan teknik modern untuk menciptakan pengalaman bersantap yang tak terlupakan.</p>
+</div>
+</section>
+<!-- Category Filter -->
+<section class="py-12 sticky top-20 z-40 bg-surface/80 backdrop-blur-md border-b border-outline-variant/10">
+<div class="max-w-container-max mx-auto px-margin-desktop flex flex-wrap justify-center gap-4 md:gap-12">
+<a class="font-label-caps text-label-caps text-primary border-b border-primary py-2 hover:opacity-80 transition-opacity" href="#appetizers">APPETIZERS</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant py-2 hover:text-primary transition-colors" href="#main-course">MAIN COURSE</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant py-2 hover:text-primary transition-colors" href="#desserts">DESSERTS</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant py-2 hover:text-primary transition-colors" href="#beverages">BEVERAGES</a>
+</div>
+</section>
+<!-- Appetizers Section -->
+<section class="py-section-gap px-margin-desktop max-w-container-max mx-auto" id="appetizers">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+<div>
+<span class="font-label-caps text-label-caps text-primary block mb-4">— PEMBUKA</span>
+<h2 class="font-headline-lg text-headline-lg">Appetizers</h2>
+</div>
+<p class="text-on-surface-variant max-w-md font-body-md text-body-md italic border-l-2 border-outline-variant pl-6">Mulailah perjalanan rasa Anda dengan pilihan hidangan ringan yang menggugah selera.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Menu Item 1 -->
+<div class="glass-card p-6 group hover:border-primary/50 transition-all duration-500">
+<div class="relative h-64 mb-6 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Gourmet Indonesian spring rolls elegantly plated on a dark ceramic dish, garnished with fresh microgreens and edible flowers. Soft directional lighting highlights the crispy golden texture of the pastry. The background is a dark, minimalist table setting consistent with the luxury brand aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlAFYw9OCI-ScDpqcUACPgHywtjAkAgVAfq2r9wFS15f4-9eEPyg-Kr2KLPN7vJivYApMYqw3WhDJUajlwSvZ0ZpieixaLVRbipVYm-WvBa5tw7yjifkgyLeIweOJS6qTDKK3SETirrOxtO2uAhARTUFiwPM5tl4wwUJtRUVsM9094eveEIJIfIW6ZV1fMJZ7b8DLtJvbL3zH1Lc7oKL4I4CBRJdOfVv7t_urZWyghj3AmVh4WSWIe-mYm0IcDVAnmfwpaABb4ZfxQ"/>
+<div class="absolute top-4 right-4 bg-primary text-on-primary px-3 py-1 font-label-caps text-[12px]">FAVORIT</div>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-[24px] text-white">Lumpia Semarang Premium</h3>
+<span class="text-primary font-bold font-body-lg text-body-lg">Rp 65k</span>
+</div>
+<p class="text-on-surface-variant font-body-md text-body-md mb-6">Rebung manis pilihan dengan udang segar, disajikan dengan saus tauco tradisional yang kental.</p>
+<div class="flex items-center gap-2 text-outline">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span class="text-[12px] font-label-caps">RESPSEP CHEF</span>
+</div>
+</div>
+<!-- Menu Item 2 -->
+<div class="glass-card p-6 group hover:border-primary/50 transition-all duration-500">
+<div class="relative h-64 mb-6 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="A vibrant salad featuring tropical Indonesian fruits and vegetables, dressed with a spicy peanut infusion. The dish is presented in a handcrafted stone bowl with theatrical lighting emphasizing the fresh colors. Elegant dark atmosphere with subtle golden light glints in the background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIfL_VWuSNBDBtmsqFytRBUCKulAtirQkh-KCuJC_D_gBQapqg-Q1G11mClDoN2CHFO1H1eDdzmnqXtuJIfBAl3SqmTa_rnaxREyhXIfyVbVWjbVIigWQBx0tkz8ofDwHjC_eHXTjEYYtW9nBIv0i3izjxPkXkesftP5fnUNEhgtL4H_2H4VB7iBl_QQ3x9qzRFGzeW3H-tMZMZoubcJlTvjA0hj5Myex4NiBSOG5y3Od8y8wTPZV-2EjzpM1so0P3uTau_vAX-YYc"/>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-[24px] text-white">Gado-Gado Deconstructed</h3>
+<span class="text-primary font-bold font-body-lg text-body-lg">Rp 55k</span>
+</div>
+<p class="text-on-surface-variant font-body-md text-body-md mb-6">Sayuran organik blanching, telur puyuh, dan foam bumbu kacang Mede yang halus.</p>
+<div class="flex items-center gap-2 text-outline">
+<span class="material-symbols-outlined text-[18px]">eco</span>
+<span class="text-[12px] font-label-caps">VEGETARIAN</span>
+</div>
+</div>
+<!-- Menu Item 3 -->
+<div class="glass-card p-6 group hover:border-primary/50 transition-all duration-500">
+<div class="relative h-64 mb-6 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Traditional Indonesian chicken satay sticks grilled to perfection, served on a black slate platter with rich peanut sauce and golden fried shallots. Subtle smoke wisps suggest freshness from the grill. Dark, moody lighting focuses on the glazed texture of the meat and the warm tones of the sauce." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsVufFlZUOXupcZZWQSm8DviFJL3aWVNhmR0t6WLpOczJVKLM1H3mGuytihDBT9TVIraBCCZZeFIo1G9Xd41DAsH6DMQqlXYTjn-hlpCuzVQcqGahIiUXJ1kLf9ineHn3Qua3LvFTmrT7vzAKBLG2Zv5mi0KJYN1gTG9ixvRAWD9Kj_IkYup1nqhLG02eoLNQGXd5SvY5KjhO9Es5iXqUoLcyo19-gf_kkyU2bfEW87zJr36DPz6NvrgLc-szF2Sp8QhHVRl3IWl0m"/>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-[24px] text-white">Sate Lilit Ikan Tenggiri</h3>
+<span class="text-primary font-bold font-body-lg text-body-lg">Rp 75k</span>
+</div>
+<p class="text-on-surface-variant font-body-md text-body-md mb-6">Ikan tenggiri halus dengan base gede Bali, dililitkan pada batang serai segar yang aromatik.</p>
+<div class="flex items-center gap-2 text-outline">
+<span class="material-symbols-outlined text-[18px]">local_fire_department</span>
+<span class="text-[12px] font-label-caps">SPICY</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Course Section - Bento Layout -->
+<section class="bg-surface-container-lowest py-section-gap" id="main-course">
+<div class="max-w-container-max mx-auto px-margin-desktop">
+<div class="text-center mb-16">
+<span class="font-label-caps text-label-caps text-primary tracking-widest block mb-4">HIDANGAN UTAMA</span>
+<h2 class="font-headline-lg text-headline-lg text-white">Signature Main Course</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-gutter">
+<!-- Featured Item -->
+<div class="md:col-span-2 md:row-span-2 glass-card overflow-hidden group border-primary/20 relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" data-alt="Luxury Indonesian Beef Rendang, slow-cooked for 12 hours, served with turmeric-infused rice and artisanal crackers. The plating is contemporary and refined, set against a dark, textured background. Soft warm spotlighting emphasizes the rich, dark coconut reduction and the tender fibers of the beef." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOfkbb4TU3VkNVQ3-86UAnHU5YJSeUtx2dAwfDz8ARxwzdlqotWj8nd4EQx72opmliPn9DFgTlrOxvRlupASEyumP9KsShMeIIOsTQjDRwgPadPgpKAojlo4f9X3jWDo0CAuDAJAkiubaB8dzbKUepJ7a04JmzCKW61QOdTBAm-BEcub0WxH-XW1_vvQS3loIlH2yNNu-H27IWEAUvpRuvDZ-4AvCdqexbsWTAPlRLAivDZMHVzs66cSbLD1f-9A-vsxOH3zY6ekN7"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex flex-col justify-end p-8">
+<span class="font-label-caps text-[12px] text-primary mb-2">CHEF'S SIGNATURE</span>
+<h3 class="font-headline-lg text-headline-md mb-4">Rendang Wagyu 12 Jam</h3>
+<p class="text-secondary max-w-sm mb-6">Daging Wagyu MB7+ yang dimasak perlahan dengan 15 rempah rahasia hingga meresap sempurna ke dalam serat daging.</p>
+<div class="flex justify-between items-center">
+<span class="font-headline-md text-primary">Rp 245k</span>
+<button class="px-6 py-2 border border-primary text-primary font-label-caps hover:bg-primary hover:text-on-primary transition-colors">PESAN SEKARANG</button>
+</div>
+</div>
+</div>
+<!-- Small Item 1 -->
+<div class="md:col-span-2 glass-card p-6 flex flex-col md:flex-row gap-6 group">
+<div class="w-full md:w-1/3 h-40 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Elegant presentation of Nasi Goreng Kambing, topped with a perfectly fried egg and pickled vegetables. The scene is shot in a high-end restaurant setting with dark wooden elements and warm golden lighting. The focus is sharp on the rice textures and the glistening spices." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAExFjdSW-R3T_OPehYogS4QugJWpFRVa994Uu_craVvOscVAaUSntfspxIAlSfAW2MPCZpk4FtjIj5nk3HBQDpiQKtxrt142dqGNGPUKjgzUK4nnLqIVK8DlfJsWtfzAzMRysGM4nCmmaApW6Q3cVEBLRdYA90aiPAJ9KtKUthIyOKcBTeHNbgQLcJVcUEtFKfdgZcbb-nZo-c_QLlFCg90zJJQaibeC86XzgTBsnT5kmIVG3gtiR3TJDzN6ui6Lvl9X_f7q4jUR5P"/>
+</div>
+<div class="w-full md:w-2/3 flex flex-col justify-center">
+<div class="flex justify-between items-center mb-2">
+<h4 class="font-headline-md text-[20px]">Nasi Goreng Kebuli</h4>
+<span class="text-primary font-bold">Rp 115k</span>
+</div>
+<p class="text-on-surface-variant text-body-md mb-4">Nasi aromatik dengan rempah Timur Tengah, daging kambing muda empuk, dan kismis.</p>
+<span class="text-outline text-[12px] font-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">stars</span> POPULER
+                            </span>
+</div>
+</div>
+<!-- Small Item 2 -->
+<div class="md:col-span-2 glass-card p-6 flex flex-col md:flex-row gap-6 group">
+<div class="w-full md:w-1/3 h-40 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Artisanal Bebek Goreng Crispy served with three types of sambal on a traditional woven platter lined with banana leaf. Professional food photography with high contrast and dark shadows, emphasizing the golden-brown crispness of the duck skin." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMG2rATZrJviS8HqQDD1g10P5qv0TDYbXV5UDcrvbPSZAcDIny4e1cjF7W5apG-dQwWQfAbYMcv5PBUCWggZv2yyId2hGu_t9ji3Kge8xA6AcaT4Q_ey2-oqHK1Py9LLMGnwyTGUSsnnzVKT2DJd4TTaNry7VxKliDHDEcd4z5iZZVhLe296lHTecGzchCtAe9VLvblBTarvYJsCFTzjT3uDF8tkr_8mmG7XFyFte4qjli3lbx9HvTecz2l1lvoEE6ukXX7ktri5LX"/>
+</div>
+<div class="w-full md:w-2/3 flex flex-col justify-center">
+<div class="flex justify-between items-center mb-2">
+<h4 class="font-headline-md text-[20px]">Bebek Betutu Gianyar</h4>
+<span class="text-primary font-bold">Rp 185k</span>
+</div>
+<p class="text-on-surface-variant text-body-md mb-4">Bebek utuh dimasak dalam pelepah pisang dengan bumbu genep Bali yang otentik dan pedas.</p>
+<span class="text-outline text-[12px] font-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">local_fire_department</span> PEDAS
+                            </span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Desserts & Beverages Section -->
+<section class="py-section-gap px-margin-desktop max-w-container-max mx-auto" id="desserts">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+<!-- Desserts Column -->
+<div>
+<div class="mb-12">
+<span class="font-label-caps text-label-caps text-primary block mb-2">MANISAN</span>
+<h2 class="font-headline-lg text-headline-lg">Signature Desserts</h2>
+</div>
+<div class="space-y-12">
+<div class="flex gap-6 group">
+<div class="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform" data-alt="A modern interpretation of Indonesian Bubur Sumsum presented as a silky pannacotta with palm sugar glaze and coconut tuille. Minimalist plating on a matte black plate, illuminated by soft rim lighting. The aesthetic is clean, sophisticated, and dark-themed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwlVFE_mIKjrWq_WcZphTAoLK9uxNNtoCUShfK8aN4hDK4R4edZuAfpSj_a-D-903EuU4_dGxt3n81AHjpY5Fyg3x7UhBEZNcWesgbxodUr20D6oP_po_z_S1jPBGKVmo18HNh6HuBOVV_hxrVdJV3cZ4l0TKXvaI59FXl2D-hmMCoaZCkYvQTBwmt0RZcdXFyGrFb3pO_IAY5IywuJJnEhZ64WxGoYMcLkNDhYYo8S9tzfr9wfkA9R_PYhzcUKAq_S4aF2eT8Eogs"/>
+</div>
+<div class="flex-grow border-b border-outline-variant/30 pb-6">
+<div class="flex justify-between items-baseline mb-2">
+<h4 class="font-headline-md text-[22px] group-hover:text-primary transition-colors">Sumsum Pannacotta</h4>
+<span class="font-body-lg text-primary">Rp 45k</span>
+</div>
+<p class="text-on-surface-variant">Puding beras lembut dengan saus kinca nangka dan kelapa panggang yang renyah.</p>
+</div>
+</div>
+<div class="flex gap-6 group">
+<div class="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform" data-alt="Exotic Indonesian Black Sticky Rice pudding with fresh mango slices and salted coconut cream. The colors of the purple rice and yellow mango pop against a dark slate background. Elegant, high-end food styling for a luxury restaurant menu." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBx_xQdoEZIuhAstIF4nYlO6HG7_m5LflzUSosulqoaAvYzRTlAPEkz9_SKn979iM992S0tdjjfKrrziRIreVGB5C8ZeiGZ-GHpaFUMXmHY1sH4jhFWAMiMavuvMTDg8pcA4kNZTaiIH3JC-FF_ZirUJJ-IKbq90LZEzgf4Gm8bbp_9O_syNSLmXpjlPoEirTVhSgO5kmyD12VeK8rcKFNK0yUhYqqo6_n4tyFY06uCMvpeh639Iwfl6U2er7jIQna68KMFWNcQf2_X"/>
+</div>
+<div class="flex-grow border-b border-outline-variant/30 pb-6">
+<div class="flex justify-between items-baseline mb-2">
+<h4 class="font-headline-md text-[22px] group-hover:text-primary transition-colors">Tape Cheesecake</h4>
+<span class="font-body-lg text-primary">Rp 55k</span>
+</div>
+<p class="text-on-surface-variant">Perpaduan keju krim dengan fermentasi singkong manis di atas crust biskuit rempah.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Beverages Column -->
+<div id="beverages">
+<div class="mb-12">
+<span class="font-label-caps text-label-caps text-primary block mb-2">MINUMAN</span>
+<h2 class="font-headline-lg text-headline-lg">Crafted Beverages</h2>
+</div>
+<div class="space-y-12">
+<div class="flex gap-6 group">
+<div class="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform" data-alt="A sophisticated Indonesian herb-infused mocktail in a crystal glass, garnished with cinnamon sticks and star anise. The lighting is low-key and dramatic, reflecting off the liquid and ice. Dark, elegant backdrop emphasizing the golden and amber liquid tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7eYuFbB90uckg8rtkG6BDSgnzlYnDyzRL__pN6Pavkf4fKLfxJJQVYqDPxtwfC6f04m7WU4s4d6vZ9fJT7og_X2jwnWiw3qbV8JPp3pJvssd_SRIibhwZZkY2KFr47Kw3wtr2vTh3EIxcE9swL80WLbMFau3QKimt17O4iQe7-Qfr3ZN3Bz34faHRlXPuZeZTmnbsKnoxyXliLmyn-jmmO_I8HfQq6XMH5Nf14ULAuhaK_sZeOlZ5Q14FsR0jfcxkg9VL2yU7-4Yg"/>
+</div>
+<div class="flex-grow border-b border-outline-variant/30 pb-6">
+<div class="flex justify-between items-baseline mb-2">
+<h4 class="font-headline-md text-[22px] group-hover:text-primary transition-colors">Wedang Rempah Royale</h4>
+<span class="font-body-lg text-primary">Rp 38k</span>
+</div>
+<p class="text-on-surface-variant">Infusi jahe merah, kayu manis, dan kapulaga dengan pemanis madu hutan alami.</p>
+</div>
+</div>
+<div class="flex gap-6 group">
+<div class="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform" data-alt="Single-origin Indonesian Luwak Coffee served in a minimalist ceramic cup. Steam rises gently in a dark, atmospheric setting. Gold spoons and dark chocolate accents complete the luxury coffee experience visual." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNWkknlY5v0w0_jQGWBjNAsLghRjUuF-u4w-uZiyBE7KKndFEsmB7oFMrb6U8zFoMi_1EwIT_ftnmvsidERQBvVrmx__H3Cj6qP7eVEdbfrLLeCJAzgCFgIxnL8IyMKe6vXhpTQMCLM-9k9sXvZiWqaq4IL7gLByMqBdcSmkc1Iu2yAWkXC8VAxOgeEKc-dXUDNfROvtgNehwM6NUbP3STXN45c4Gx2h6duM63pD10xUzMK2DIvBVmkceyVwMZwYPxrKY0Ialt0LSi"/>
+</div>
+<div class="flex-grow border-b border-outline-variant/30 pb-6">
+<div class="flex justify-between items-baseline mb-2">
+<h4 class="font-headline-md text-[22px] group-hover:text-primary transition-colors">Kopi Luwak Authentic</h4>
+<span class="font-body-lg text-primary">Rp 95k</span>
+</div>
+<p class="text-on-surface-variant">Kopi pilihan dengan proses fermentasi alami, disajikan dengan aroma yang kaya dan lembut.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="bg-primary/5 py-24 text-center">
+<div class="max-w-2xl mx-auto px-margin-mobile">
+<h3 class="font-headline-lg text-headline-lg mb-8">Ingin Merasakan Kelezatan Ini Langsung?</h3>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<button class="bg-primary text-on-primary-fixed px-10 py-4 font-bold font-label-caps text-label-caps flex items-center justify-center gap-2 hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">calendar_today</span> RESERVASI MEJA
+                    </button>
+<button class="border border-primary text-primary px-10 py-4 font-bold font-label-caps text-label-caps flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors">
+                        UNDUH MENU (PDF)
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB -->
+<a class="fixed bottom-8 right-8 bg-[#25D366] text-white px-6 py-3 rounded-full flex items-center gap-2 shadow-xl z-50 hover:scale-110 transition-transform" href="#">
+<svg class="w-6 h-6 fill-current" viewbox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.588-5.946 0-6.556 5.332-11.891 11.891-11.891 3.181 0 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.481 8.413 0 6.556-5.332 11.891-11.891 11.891-2.01 0-3.987-.512-5.741-1.487l-6.252 1.638zm6.545-3.818c1.554.919 3.193 1.398 4.887 1.398 5.181 0 9.4-4.219 9.4-9.391 0-2.513-1.01-4.877-2.845-6.713-1.834-1.835-4.197-2.844-6.703-2.844-5.181 0-9.401 4.221-9.401 9.391 0 1.933.585 3.81 1.688 5.4l-.403 1.473 1.474-.386zm10.27-5.592c-.274-.136-1.62-.8-1.868-.891-.248-.091-.43-.136-.61.136-.18.272-.696.891-.853 1.072-.157.182-.315.204-.59.068-.274-.136-1.157-.426-2.203-1.359-.815-.727-1.365-1.626-1.525-1.898-.16-.272-.017-.418.12-.553.122-.123.273-.318.41-.477.136-.16.181-.272.273-.454.091-.182.046-.341-.023-.477-.068-.136-.61-1.477-.837-2.022-.222-.53-.446-.458-.61-.466-.157-.008-.339-.01-.52-.01-.18 0-.476.068-.724.341-.248.272-.949.932-.949 2.272 0 1.341.974 2.636 1.111 2.818.136.182 1.916 2.926 4.643 4.103.648.28 1.155.448 1.549.574.653.207 1.246.177 1.715.107.523-.078 1.62-.663 1.848-1.303.228-.64.228-1.189.159-1.303-.068-.113-.249-.182-.524-.318z"></path></svg>
+<span class="font-bold font-label-caps text-[14px]">Pesan Sekarang</span>
+</a>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant/20 flat">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-section-gap max-w-container-max mx-auto">
+<div class="md:col-span-1">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-8 h-8 border border-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[18px]">restaurant</span>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-primary">Resto Blog</span>
+</div>
+<p class="text-on-surface-variant font-body-md text-body-md mb-6">Membawa cita rasa otentik Indonesia ke level yang lebih tinggi dengan sentuhan kemewahan modern.</p>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:border-primary text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">share</span>
+</a>
+<a class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:border-primary text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">public</span>
+</a>
+</div>
+</div>
+<div class="md:col-span-1">
+<h5 class="font-label-caps text-label-caps text-white mb-6 uppercase tracking-wider">Navigasi</h5>
+<ul class="space-y-4">
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Beranda</a></li>
+<li><a class="text-primary underline font-body-md text-body-md" href="#">Menu</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Tentang Kami</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Kegiatan</a></li>
+</ul>
+</div>
+<div class="md:col-span-1">
+<h5 class="font-label-caps text-label-caps text-white mb-6 uppercase tracking-wider">Jam Operasional</h5>
+<ul class="space-y-4 text-on-surface-variant font-body-md text-body-md">
+<li class="flex justify-between"><span>Senin - Kamis</span> <span>11:00 - 22:00</span></li>
+<li class="flex justify-between"><span>Jumat - Sabtu</span> <span>11:00 - 23:00</span></li>
+<li class="flex justify-between"><span>Minggu</span> <span>10:00 - 21:00</span></li>
+</ul>
+</div>
+<div class="md:col-span-1">
+<h5 class="font-label-caps text-label-caps text-white mb-6 uppercase tracking-wider">Hubungi Kami</h5>
+<p class="text-on-surface-variant font-body-md text-body-md mb-4">Jl. Cita Rasa No. 123, Jakarta Selatan, Indonesia</p>
+<p class="text-on-surface-variant font-body-md text-body-md mb-2">P: +62 21 555 1234</p>
+<p class="text-on-surface-variant font-body-md text-body-md">E: hello@restoblog.com</p>
+</div>
+</div>
+<div class="max-w-container-max mx-auto px-margin-desktop py-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-outline text-[12px] font-label-caps opacity-80">© 2024 Resto Blog Cita Rasa Indonesia. All Rights Reserved.</p>
+<div class="flex gap-6">
+<a class="text-outline text-[12px] font-label-caps hover:text-on-surface transition-colors" href="#">Kebijakan Privasi</a>
+<a class="text-outline text-[12px] font-label-caps hover:text-on-surface transition-colors" href="#">Syarat &amp; Ketentuan</a>
+</div>
+</div>
+</footer>
+</body></html>

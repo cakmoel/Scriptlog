@@ -44,7 +44,12 @@ class Session
     {
         if (session_status() === PHP_SESSION_NONE) {
             if ($this->session_state === self::SESSION_NOT_STARTED) {
-                $this->session_state = session_start();
+                if (!headers_sent()) {
+                    $this->session_state = session_start();
+                } else {
+                    error_log("Session cannot be started - headers already sent in " . $_SERVER['REQUEST_URI']);
+                    $this->session_state = false;
+                }
             }
         } else {
             $this->session_state = self::SESSION_STARTED;
