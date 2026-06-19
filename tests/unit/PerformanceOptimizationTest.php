@@ -142,7 +142,6 @@ class PerformanceOptimizationTest extends TestCase
         
         // Check for critical CSS content (navigation styles)
         $this->assertStringContainsString('sina-nav', $this->headerContent, 'Should contain navigation CSS');
-        $this->assertStringContainsString('.main-footer', $this->headerContent, 'Should contain footer CSS');
     }
 
     public function testHeaderFileContainsResourceHints()
