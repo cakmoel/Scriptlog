@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#474746",
+                        "secondary": "#c8c6c5",
+                        "outline": "#9a8f80",
+                        "on-surface-variant": "#d1c5b4",
+                        "surface-container-low": "#1a1c1c",
+                        "secondary-container": "#474746",
+                        "secondary-fixed": "#e5e2e1",
+                        "surface": "#121414",
+                        "tertiary-fixed": "#e5e2e1",
+                        "inverse-surface": "#e2e2e2",
+                        "on-tertiary-fixed-variant": "#474646",
+                        "on-primary-fixed": "#261900",
+                        "primary": "#e9c176",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "surface-container-highest": "#333535",
+                        "on-primary": "#412d00",
+                        "surface-variant": "#333535",
+                        "primary-fixed": "#ffdea5",
+                        "on-tertiary-container": "#3c3b3b",
+                        "error": "#ffb4ab",
+                        "on-background": "#e2e2e2",
+                        "on-secondary-container": "#b7b5b4",
+                        "on-primary-container": "#4e3700",
+                        "on-secondary": "#313030",
+                        "tertiary-fixed-dim": "#c9c6c5",
+                        "on-tertiary": "#313030",
+                        "tertiary": "#c9c6c5",
+                        "on-error-container": "#ffdad6",
+                        "on-surface": "#e2e2e2",
+                        "surface-container-lowest": "#0c0f0f",
+                        "primary-fixed-dim": "#e9c176",
+                        "surface-tint": "#e9c176",
+                        "error-container": "#93000a",
+                        "on-primary-fixed-variant": "#5d4201",
+                        "surface-dim": "#121414",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "background": "#121414",
+                        "surface-container": "#1e2020",
+                        "tertiary-container": "#a7a5a4",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "surface-bright": "#38393a",
+                        "on-error": "#690005",
+                        "primary-container": "#c5a059",
+                        "surface-container-high": "#282a2b",
+                        "inverse-primary": "#775a19",
+                        "inverse-on-surface": "#2f3131",
+                        "outline-variant": "#4e4639"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "base": "8px",
+                        "margin-mobile": "20px",
+                        "gutter": "24px",
+                        "margin-desktop": "60px",
+                        "section-gap": "80px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Manrope"],
+                        "body-lg": ["Manrope"],
+                        "headline-lg-mobile": ["EB Garamond"],
+                        "headline-md": ["EB Garamond"],
+                        "headline-lg": ["EB Garamond"],
+                        "display-lg": ["EB Garamond"],
+                        "label-caps": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                        "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                        "headline-lg": ["48px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                        "display-lg": ["72px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                        "label-caps": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(233, 193, 118, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<header class="bg-surface/80 dark:bg-surface/80 backdrop-blur-md docked full-width top-0 sticky z-50 border-b border-outline-variant/30">
+<nav class="flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 border-2 border-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="restaurant">restaurant</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md font-bold tracking-tight text-on-surface leading-none">Resto Blog</span>
+<span class="text-[10px] font-label-caps text-primary tracking-widest">CITA RASA INDONESIA</span>
+</div>
+</div>
+<div class="hidden lg:flex items-center gap-8">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Beranda</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Menu</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Tentang Kami</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Struktur</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-md text-body-md" href="#">Kegiatan</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md" href="#">Kontak</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-6 py-2 border border-outline-variant rounded-lg text-on-surface hover:bg-white/5 transition-all active:scale-95 text-body-md flex items-center gap-2">
+<span class="material-symbols-outlined text-lg" data-icon="lock">lock</span>
+                    Login Admin
+                </button>
+<button class="px-6 py-2 bg-primary text-on-primary font-bold rounded-lg hover:brightness-110 transition-all active:scale-95 text-body-md flex items-center gap-2">
+<span class="material-symbols-outlined text-lg" data-icon="person_add">person_add</span>
+                    Daftar Anggota
+                </button>
+</div>
+</nav>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative py-section-gap overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-b from-surface via-surface-container-low/50 to-surface z-0"></div>
+<div class="max-w-container-max mx-auto px-margin-desktop relative z-10">
+<div class="text-center max-w-3xl mx-auto mb-16">
+<span class="font-label-caps text-label-caps text-primary mb-4 block tracking-[0.2em]">HUBUNGI KAMI</span>
+<h1 class="font-display-lg text-display-lg mb-6 leading-tight">Kehadiran Kami di <span class="text-primary italic font-serif">Seluruh Nusantara</span></h1>
+<p class="text-on-surface-variant text-body-lg">Silakan hubungi tim kami untuk reservasi khusus, kemitraan, atau pertanyaan lainnya. Kami siap melayani Anda dengan cita rasa autentik Indonesia.</p>
+</div>
+<!-- Bento Grid Layout for Contact & Branches -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Contact Form Card -->
+<div class="lg:col-span-7 glass-card rounded-2xl p-10">
+<h2 class="font-headline-md text-headline-md mb-8 text-white">Kirim Pesan</h2>
+<form class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-outline">Nama Lengkap</label>
+<input class="w-full bg-surface-container-lowest border-b border-outline-variant focus:border-primary outline-none py-3 transition-colors text-on-surface" placeholder="Masukkan nama Anda" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-outline">Alamat Email</label>
+<input class="w-full bg-surface-container-lowest border-b border-outline-variant focus:border-primary outline-none py-3 transition-colors text-on-surface" placeholder="nama@email.com" type="email"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-outline">Subjek</label>
+<select class="w-full bg-surface-container-lowest border-b border-outline-variant focus:border-primary outline-none py-3 transition-colors text-on-surface appearance-none">
+<option>Reservasi Meja</option>
+<option>Kemitraan Bisnis</option>
+<option>Saran &amp; Kritik</option>
+<option>Lainnya</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-outline">Pesan Anda</label>
+<textarea class="w-full bg-surface-container-lowest border-b border-outline-variant focus:border-primary outline-none py-3 transition-colors text-on-surface resize-none" placeholder="Bagaimana kami bisa membantu Anda?" rows="4"></textarea>
+</div>
+<button class="w-full bg-primary text-on-primary font-bold py-4 rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-2 group">
+<span>Kirim Pesan Sekarang</span>
+<span class="material-symbols-outlined transition-transform group-hover:translate-x-1" data-icon="send">send</span>
+</button>
+</form>
+</div>
+<!-- Direct Contact & Socials -->
+<div class="lg:col-span-5 space-y-8">
+<!-- Fast Contact Card -->
+<div class="glass-card rounded-2xl p-8">
+<h3 class="font-label-caps text-label-caps text-primary mb-6">KONTAK CEPAT</h3>
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined" data-icon="phone_in_talk">phone_in_talk</span>
+</div>
+<div>
+<p class="text-outline text-label-caps mb-1">Telepon &amp; WhatsApp</p>
+<p class="text-body-lg font-bold text-on-surface">+62 811 2345 6789</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</div>
+<div>
+<p class="text-outline text-label-caps mb-1">Email Resmi</p>
+<p class="text-body-lg font-bold text-on-surface">hello@restoblog.id</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Social Media Grid -->
+<div class="glass-card rounded-2xl p-8">
+<h3 class="font-label-caps text-label-caps text-primary mb-6">IKUTI KAMI</h3>
+<div class="grid grid-cols-2 gap-4">
+<a class="flex items-center gap-3 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors border border-white/5" href="#">
+<div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm" data-icon="photo_camera">photo_camera</span>
+</div>
+<span class="font-medium">Instagram</span>
+</a>
+<a class="flex items-center gap-3 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors border border-white/5" href="#">
+<div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm" data-icon="videocam">videocam</span>
+</div>
+<span class="font-medium">TikTok</span>
+</a>
+<a class="flex items-center gap-3 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors border border-white/5" href="#">
+<div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm" data-icon="public">public</span>
+</div>
+<span class="font-medium">Facebook</span>
+</a>
+<a class="flex items-center gap-3 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors border border-white/5" href="#">
+<div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm" data-icon="play_circle">play_circle</span>
+</div>
+<span class="font-medium">YouTube</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Branch Locations Section -->
+<section class="py-section-gap bg-surface-container-lowest">
+<div class="max-w-container-max mx-auto px-margin-desktop">
+<div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+<div class="max-w-xl">
+<span class="font-label-caps text-label-caps text-primary mb-4 block">LOKASI CABANG</span>
+<h2 class="font-headline-lg text-headline-lg">Temukan Resto Blog di <span class="italic font-serif">Kota Terdekat</span> Anda</h2>
+</div>
+<div class="flex gap-4">
+<div class="text-right">
+<span class="text-display-lg font-display-lg text-primary leading-none block">8</span>
+<span class="text-label-caps text-outline">CABANG AKTIF</span>
+</div>
+<div class="w-px h-16 bg-outline-variant/30"></div>
+<div class="text-right">
+<span class="text-display-lg font-display-lg text-primary leading-none block">3</span>
+<span class="text-label-caps text-outline">KOTA BESAR</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Branch 1 -->
+<div class="group relative overflow-hidden rounded-2xl glass-card transition-all duration-500 hover:-translate-y-2">
+<div class="h-64 overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A luxurious interior of a fine-dining restaurant in Jakarta featuring warm golden lighting, dark wood paneling, and elegant table settings. Large floor-to-ceiling windows reveal a blurred cityscape of towering skyscrapers at twilight. The atmosphere is sophisticated and intimate, with a modern minimalist aesthetic using a color palette of charcoal, gold, and cream." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYPnn_o1Io9ldeMXp7sED6eYytlsY-yNX-iR8tphlaupSSqg5LDnr5ZcnbjPDV4FT06clYtkTzlUM3jnxZHGeqo9JDSecaMFPS-nof8So8uZlgAqPbD0aM_jKYFFLETbwCZVmoHbQmLvRoXYCSMarc0oeLdWvuAUQrOIX6fip7wJGaLuiDfkQBZO6KrGTkL1TLbxRAOfUM9M9uxg1fgk-dO_CikrIK2PvF4Bo9g3IUo2eMph5DmXFsOHTDaBlMiPavV39k5l6Wi7iN"/>
+<div class="absolute top-4 right-4 px-4 py-2 bg-primary/90 backdrop-blur-sm text-on-primary font-bold text-xs rounded-full">CABANG UTAMA</div>
+</div>
+<div class="p-8">
+<h3 class="font-headline-md text-headline-md mb-4 text-white">Jakarta Central</h3>
+<p class="text-on-surface-variant mb-6 text-body-md">Jl. Sudirman No. 45, Kebayoran Baru, Jakarta Selatan. Menawarkan pemandangan kota yang spektakuler.</p>
+<div class="space-y-3 pt-4 border-t border-outline-variant/20">
+<div class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="schedule">schedule</span>
+<span>10:00 - 22:00 WIB</span>
+</div>
+<div class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="map">map</span>
+<a class="text-primary hover:underline" href="#">Lihat di Google Maps</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Branch 2 -->
+<div class="group relative overflow-hidden rounded-2xl glass-card transition-all duration-500 hover:-translate-y-2">
+<div class="h-64 overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A cozy and premium restaurant interior in Bandung with a mix of industrial and traditional Indonesian elements. Brick walls are combined with carved teak wood accents and hanging plants. Soft ambient lighting creates a warm and welcoming mood. The style is contemporary yet rooted in local culture, dominated by earthy tones and subtle golden highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSpCmPokhrxxcSb05vuGwYoEqaLkLtZOUmM3EojBxFW8fknVf4KFgdRj9ROT1jw93H2zS2_JrgHXS2L-PpNS7_mt0GitmqlDKgLfIK04u6l5VA-kYhS8qcee2POEbZAgCkOVvcywf7Ipj20iG9oGbOsLGiIiBguSuJkaSV4i9THRRPJbs6ej2XROvfAH6QHFBWgmyU6oHA3V4i4zg-aYo42be5wAdl7ueVqf-esRZEniluB9bG7vml1vOdK-_4lHqq2I8IszVN9QgZ"/>
+<div class="absolute top-4 right-4 px-4 py-2 bg-white/10 backdrop-blur-md text-white font-bold text-xs rounded-full border border-white/20">DAGO HILLS</div>
+</div>
+<div class="p-8">
+<h3 class="font-headline-md text-headline-md mb-4 text-white">Bandung Dago</h3>
+<p class="text-on-surface-variant mb-6 text-body-md">Jl. Ir. H. Juanda No. 128, Dago, Bandung. Nikmati udara sejuk pegunungan dengan hidangan autentik.</p>
+<div class="space-y-3 pt-4 border-t border-outline-variant/20">
+<div class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="schedule">schedule</span>
+<span>09:00 - 23:00 WIB</span>
+</div>
+<div class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="map">map</span>
+<a class="text-primary hover:underline" href="#">Lihat di Google Maps</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Branch 3 -->
+<div class="group relative overflow-hidden rounded-2xl glass-card transition-all duration-500 hover:-translate-y-2">
+<div class="h-64 overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A tropical-themed luxury restaurant in Bali with an open-air architecture featuring bamboo structures and thatched roofs. The lighting is low-key with numerous candles and lanterns, reflecting off a calm water feature. The overall aesthetic is serene and exotic, emphasizing natural materials and a high-end island vibe with deep shadows and warm ember glows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPClg0fZCxYM6IZdMXkvTLsn2eg1M-hk0AFS8nt1cDYRr6tDtqCpu5MPzsmzkliorZCPealJdpCihEEOK5xXAjVBtPSCg3KbS8vjrLN_NoBhH0zyL9swyOue_-iKFPUdK9G1lEUJcfRuHOAO-LxPXkPT77UNyxS94DMTbKyUxmQY1make-4gZWD8gY-4GW-rLJeUCiskLCvlLm7PL2BDztqewm0m8W6zehnJb9_esFbqEm3dTgOCwpBKFTwhVISlv5g5iwgfPu_MEh"/>
+<div class="absolute top-4 right-4 px-4 py-2 bg-white/10 backdrop-blur-md text-white font-bold text-xs rounded-full border border-white/20">BEACH FRONT</div>
+</div>
+<div class="p-8">
+<h3 class="font-headline-md text-headline-md mb-4 text-white">Bali Seminyak</h3>
+<p class="text-on-surface-variant mb-6 text-body-md">Jl. Petitenget No. 88, Seminyak, Bali. Suasana santai pinggir pantai dengan sentuhan mewah.</p>
+<div class="space-y-3 pt-4 border-t border-outline-variant/20">
+<div class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="schedule">schedule</span>
+<span>11:00 - 00:00 WITA</span>
+</div>
+<div class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="map">map</span>
+<a class="text-primary hover:underline" href="#">Lihat di Google Maps</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Map Section -->
+<section class="h-[600px] w-full relative">
+<div class="absolute inset-0 grayscale opacity-40">
+<!-- Location data for map simulation -->
+<div class="w-full h-full bg-surface-container-high flex items-center justify-center" data-location="Jakarta, Indonesia" style="">
+<div class="text-center">
+<span class="material-symbols-outlined text-primary text-6xl mb-4" data-icon="map_search">map_search</span>
+<p class="text-body-lg text-outline">Peta Interaktif Dimuat...</p>
+</div>
+</div>
+</div>
+<!-- Glass Overlay for Map Info -->
+<div class="absolute top-1/2 left-margin-desktop -translate-y-1/2 w-80 glass-card p-8 rounded-2xl z-20 hidden md:block">
+<h4 class="font-headline-md text-white mb-4">Kantor Pusat</h4>
+<p class="text-on-surface-variant mb-6 text-sm">Gedung Resto Blog Lantai 12, Sudirman Central Business District, Jakarta.</p>
+<div class="flex items-center gap-2 text-primary font-bold">
+<span>Dapatkan Petunjuk</span>
+<span class="material-symbols-outlined" data-icon="directions">directions</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant/20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-section-gap max-w-container-max mx-auto">
+<!-- Brand Info -->
+<div class="space-y-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 border-2 border-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="restaurant">restaurant</span>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-primary">Resto Blog</span>
+</div>
+<p class="text-on-surface-variant text-body-md">Menghadirkan kelezatan masakan Nusantara yang disajikan dengan sentuhan modern oleh tim profesional kami untuk kualitas mendunia.</p>
+</div>
+<!-- Quick Links -->
+<div>
+<h4 class="text-white font-bold mb-8 font-label-caps tracking-widest text-sm">NAVIGASI</h4>
+<ul class="space-y-4">
+<li><a class="text-on-surface-variant hover:text-primary transition-colors text-body-md" href="#">Beranda</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors text-body-md" href="#">Menu</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors text-body-md" href="#">Tentang Kami</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors text-body-md" href="#">Kegiatan</a></li>
+</ul>
+</div>
+<!-- More Links -->
+<div>
+<h4 class="text-white font-bold mb-8 font-label-caps tracking-widest text-sm">INFORMASI</h4>
+<ul class="space-y-4">
+<li><a class="text-on-surface-variant hover:text-primary transition-colors text-body-md" href="#">Kontak</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors text-body-md" href="#">Kebijakan Privasi</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors text-body-md" href="#">Syarat &amp; Ketentuan</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors text-body-md" href="#">Karir</a></li>
+</ul>
+</div>
+<!-- Newsletter -->
+<div>
+<h4 class="text-white font-bold mb-8 font-label-caps tracking-widest text-sm">NEWSLETTER</h4>
+<p class="text-on-surface-variant text-body-md mb-6">Dapatkan info menu terbaru dan promo eksklusif.</p>
+<div class="flex">
+<input class="bg-surface border-b border-outline-variant focus:border-primary outline-none py-2 w-full text-on-surface" placeholder="Email Anda" type="email"/>
+<button class="text-primary p-2">
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="max-w-container-max mx-auto px-margin-desktop py-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-on-surface-variant text-sm font-label-caps">© 2024 Resto Blog Cita Rasa Indonesia. All Rights Reserved.</p>
+<div class="flex gap-6">
+<span class="material-symbols-outlined text-outline-variant text-xl hover:text-primary cursor-pointer transition-colors" data-icon="language">language</span>
+<span class="material-symbols-outlined text-outline-variant text-xl hover:text-primary cursor-pointer transition-colors" data-icon="settings">settings</span>
+</div>
+</div>
+</footer>
+<!-- FAB -->
+<a class="fixed bottom-8 right-8 bg-[#128C7E] text-white p-4 rounded-full shadow-2xl flex items-center gap-3 group hover:scale-110 active:scale-95 transition-all z-50" href="https://wa.me/6281123456789" target="_blank">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="font-bold pr-2 max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap">Pesan Sekarang</span>
+</a>
+</body></html>
