@@ -8,7 +8,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once __DIR__ . '/../lib/vendor/autoload.php';
+require_once __DIR__ . '/../src/lib/vendor/autoload.php';
 require_once __DIR__ . '/../src/lib/common.php';
 
 if (!function_exists('load_core_utilities')) {
