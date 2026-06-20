@@ -947,15 +947,6 @@ function retrieve_site_url()
 }
 
 /**
- * load_more_comments()
- */
-if (!function_exists('load_more_comments')) {
-function load_more_comments()
-{
-}
-}
-
-/**
  * nothing_found() - Display "no posts" message
  */
 if (!function_exists('nothing_found')) {

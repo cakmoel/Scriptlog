@@ -1,5 +1,7 @@
 <?php
 
+ob_start();
+
 /**
  * login.php - Revamped
  */
@@ -14,12 +16,12 @@ require __DIR__ . '/../lib/main.php';
 
 $ip = get_ip_address();
 
-require __DIR__ . '/authenticator.php';
-
-// Start Session if not already started in main.php
-if (session_status() === PHP_SESSION_NONE) {
+// Start session before authenticator to prevent "headers already sent" error
+if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
     session_start();
 }
+
+require __DIR__ . '/authenticator.php';
 
 // 2. Auth Check (Redirect if already logged in)
 if (isset($loggedIn) && $loggedIn === true) {

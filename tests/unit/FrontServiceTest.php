@@ -6,7 +6,7 @@ class FrontServiceTest extends TestCase
 {
     protected function setUp(): void
     {
-        require_once __DIR__ . '/../../lib/service/FrontService.php';
+        require_once __DIR__ . '/../../src/lib/service/FrontService.php';
     }
 
     public function testClassExists(): void

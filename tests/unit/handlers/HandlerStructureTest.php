@@ -12,7 +12,7 @@ class HandlerStructureTest extends TestCase
     public function testAllHandlerFilesExist(): void
     {
         foreach ($this->handlerClasses as $class) {
-            $file = __DIR__ . '/../../../lib/handler/' . $class . '.php';
+            $file = __DIR__ . '/../../../src/lib/handler/' . $class . '.php';
             $this->assertFileExists($file, "Handler file $class.php does not exist");
         }
     }
@@ -20,7 +20,7 @@ class HandlerStructureTest extends TestCase
     public function testAllHandlerFilesContainClass(): void
     {
         foreach ($this->handlerClasses as $class) {
-            $file = __DIR__ . '/../../../lib/handler/' . $class . '.php';
+            $file = __DIR__ . '/../../../src/lib/handler/' . $class . '.php';
             $content = file_get_contents($file);
             $this->assertStringContainsString(
                 "class $class",
@@ -43,7 +43,7 @@ class HandlerStructureTest extends TestCase
     public function testAllHandlerFilesHaveHandleMethod(): void
     {
         foreach ($this->handlerClasses as $class) {
-            $file = __DIR__ . '/../../../lib/handler/' . $class . '.php';
+            $file = __DIR__ . '/../../../src/lib/handler/' . $class . '.php';
             $content = file_get_contents($file);
             $this->assertStringContainsString(
                 'function handle(array $params)',
