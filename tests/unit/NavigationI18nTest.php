@@ -15,8 +15,8 @@ if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
 }
 
-require_once __DIR__ . '/../../public/themes/blog/functions.php';
-require_once __DIR__ . '/../../lib/utility/permalinks.php';
+require_once __DIR__ . '/../../src/public/themes/blog/functions.php';
+require_once __DIR__ . '/../../src/lib/utility/permalinks.php';
 
 class NavigationI18nTest extends TestCase
 {

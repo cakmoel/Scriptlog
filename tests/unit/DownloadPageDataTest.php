@@ -19,7 +19,7 @@ if (!defined('SCRIPTLOG')) {
     define('SCRIPTLOG', hash_hmac('sha256', 'test', 'test'));
 }
 
-require_once __DIR__ . '/../../public/themes/blog/functions.php';
+require_once __DIR__ . '/../../src/public/themes/blog/functions.php';
 
 class DownloadPageDataTest extends TestCase
 {

@@ -8,11 +8,11 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once __DIR__ . '/../lib/vendor/autoload.php';
-require_once __DIR__ . '/../lib/common.php';
+require_once __DIR__ . '/../src/lib/vendor/autoload.php';
+require_once __DIR__ . '/../src/lib/common.php';
 
 if (!function_exists('load_core_utilities')) {
-    require_once __DIR__ . '/../lib/utility-loader.php';
+    require_once __DIR__ . '/../src/lib/utility-loader.php';
 }
 
 // Force load all utilities by calling load_core_utilities
@@ -20,12 +20,12 @@ if (function_exists('load_core_utilities')) {
     load_core_utilities();
 }
 
-require_once __DIR__ . '/../lib/utility/rate-limiter.php';
-require_once __DIR__ . '/../lib/core/ApiHateoas.php';
+require_once __DIR__ . '/../src/lib/utility/rate-limiter.php';
+require_once __DIR__ . '/../src/lib/core/ApiHateoas.php';
 
 // Setup autoloader for DAO and Service classes
-if (file_exists(__DIR__ . '/../lib/Autoloader.php')) {
-    require_once __DIR__ . '/../lib/Autoloader.php';
+if (file_exists(__DIR__ . '/../src/lib/Autoloader.php')) {
+    require_once __DIR__ . '/../src/lib/Autoloader.php';
     
     if (class_exists('Autoloader')) {
         Autoloader::setBaseDir(__DIR__ . '/..');
