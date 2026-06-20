@@ -5,7 +5,7 @@ use Defuse\Crypto\Key;
 
 // Ensure ScriptlogCryptonize class is loaded
 if (!class_exists('ScriptlogCryptonize')) {
-    require_once dirname(__DIR__, 2) . '/lib/core/ScriptlogCryptonize.php';
+    require_once dirname(__DIR__, 2) . '/src/lib/core/ScriptlogCryptonize.php';
 }
 
 // Ensure exception class exists

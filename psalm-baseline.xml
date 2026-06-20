@@ -1,0 +1,2529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="4.30.0@d0bc6e25d89f649e4f36a534f330f8bb4643dd69">
+  <file src="lib/common.php">
+    <InvalidScalarArgument occurrences="3">
+      <code>substr(PHP_OS, 0, 3) == 'DAR'</code>
+      <code>substr(PHP_OS, 0, 3) == 'MAC'</code>
+      <code>substr(PHP_OS, 0, 3) == 'WIN'</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/controller/ApiController.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>array_map([$this, 'sanitize'], $value)</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/controller/ConfigurationController.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$this-&gt;view-&gt;render()</code>
+    </InvalidReturnStatement>
+    <TypeDoesNotContainType occurrences="7">
+      <code>!$checkError</code>
+      <code>!$checkError</code>
+      <code>!$checkError</code>
+      <code>$checkError</code>
+      <code>$checkError</code>
+      <code>$checkError</code>
+      <code>$checkStatus</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/controller/DownloadAdminController.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$this-&gt;downloadService-&gt;createDownloadRecord($mediaId, $ipAddress)</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string|false</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/controller/MediaController.php">
+    <MismatchingDocblockParamType occurrences="1">
+      <code>object</code>
+    </MismatchingDocblockParamType>
+    <UndefinedDocblockClass occurrences="1">
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/controller/MenuController.php">
+    <UndefinedDocblockClass occurrences="2">
+      <code>int|num</code>
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/controller/PageController.php">
+    <UndefinedDocblockClass occurrences="1">
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/controller/PluginController.php">
+    <UndefinedDocblockClass occurrences="3">
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/controller/PostController.php">
+    <InvalidArgument occurrences="1">
+      <code>$this-&gt;postService-&gt;postAuthorId()</code>
+    </InvalidArgument>
+    <InvalidScalarArgument occurrences="2">
+      <code>(int)$this-&gt;postService-&gt;postAuthorId()</code>
+      <code>(int)distill_post_request($filters)['image_id']</code>
+    </InvalidScalarArgument>
+    <UndefinedDocblockClass occurrences="1">
+      <code>num|int</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/controller/TopicController.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$this-&gt;view-&gt;render()</code>
+    </InvalidReturnStatement>
+    <UndefinedDocblockClass occurrences="2">
+      <code>int|num</code>
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/controller/UserController.php">
+    <InvalidClass occurrences="1">
+      <code>userService</code>
+    </InvalidClass>
+    <ParamNameMismatch occurrences="1">
+      <code>$userId</code>
+    </ParamNameMismatch>
+  </file>
+  <file src="lib/controller/api/ArchivesApiController.php">
+    <MissingFile occurrences="1">
+      <code>require __DIR__ . '/../../../config.php'</code>
+    </MissingFile>
+  </file>
+  <file src="lib/controller/api/CategoriesApiController.php">
+    <MissingFile occurrences="1">
+      <code>require __DIR__ . '/../../../config.php'</code>
+    </MissingFile>
+    <RedundantCast occurrences="1">
+      <code>(int)$topicId</code>
+    </RedundantCast>
+  </file>
+  <file src="lib/controller/api/CommentsApiController.php">
+    <InvalidArgument occurrences="2">
+      <code>$ip</code>
+      <code>$ip</code>
+    </InvalidArgument>
+    <InvalidReturnStatement occurrences="1">
+      <code>$ip</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string</code>
+    </InvalidReturnType>
+    <MissingFile occurrences="1">
+      <code>require __DIR__ . '/../../../config.php'</code>
+    </MissingFile>
+  </file>
+  <file src="lib/controller/api/GdprApiController.php">
+    <InvalidArgument occurrences="2">
+      <code>$ip</code>
+      <code>$ip</code>
+    </InvalidArgument>
+    <InvalidReturnStatement occurrences="1">
+      <code>$ip</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="1">
+      <code>'Consent recorded'</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/controller/api/LanguagesApiController.php">
+    <InvalidScalarArgument occurrences="3">
+      <code>'Default language set successfully'</code>
+      <code>'Language deleted successfully'</code>
+      <code>'Language updated successfully'</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/controller/api/PostsApiController.php">
+    <MissingFile occurrences="1">
+      <code>require __DIR__ . '/../../../config.php'</code>
+    </MissingFile>
+  </file>
+  <file src="lib/controller/api/SearchApiController.php">
+    <MissingFile occurrences="1">
+      <code>require __DIR__ . '/../../../config.php'</code>
+    </MissingFile>
+    <UndefinedThisPropertyFetch occurrences="1">
+      <code>$this-&gt;dbc</code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="lib/controller/api/TranslationsApiController.php">
+    <InvalidScalarArgument occurrences="3">
+      <code>'Cache regenerated successfully'</code>
+      <code>'Translation deleted successfully'</code>
+      <code>'Translation updated successfully'</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/core/ApiAuth.php">
+    <InvalidArgument occurrences="2">
+      <code>$ip</code>
+      <code>$ip</code>
+    </InvalidArgument>
+    <InvalidReturnStatement occurrences="2">
+      <code>$apiKey</code>
+      <code>$ip</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="2">
+      <code>string</code>
+      <code>string|null</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/core/ApiHateoas.php">
+    <InvalidScalarArgument occurrences="1">
+      <code>$totalPages</code>
+    </InvalidScalarArgument>
+    <MissingFile occurrences="1">
+      <code>require __DIR__ . '/../../config.php'</code>
+    </MissingFile>
+  </file>
+  <file src="lib/core/AppConfig.php">
+    <InvalidCast occurrences="1">
+      <code>$config</code>
+    </InvalidCast>
+    <InvalidReturnType occurrences="1">
+      <code>mixed</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/core/AtomWriter.php">
+    <RedundantPropertyInitializationCheck occurrences="1">
+      <code>isset($this-&gt;atomFeed)</code>
+    </RedundantPropertyInitializationCheck>
+    <UndefinedDocblockClass occurrences="2">
+      <code>int|num</code>
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/core/Authentication.php">
+    <InvalidReturnStatement occurrences="2">
+      <code>$this-&gt;userToken-&gt;updateTokenExpired($tokenId)</code>
+      <code>$this-&gt;userToken-&gt;updateUserToken($bind, $login)</code>
+    </InvalidReturnStatement>
+    <InvalidScalarArgument occurrences="1">
+      <code>0</code>
+    </InvalidScalarArgument>
+    <UndefinedDocblockClass occurrences="1">
+      <code>integer|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/core/Authorization.php">
+    <MismatchingDocblockReturnType occurrences="1">
+      <code>object</code>
+    </MismatchingDocblockReturnType>
+  </file>
+  <file src="lib/core/BlogSchema.php">
+    <ImplicitToStringCast occurrences="1">
+      <code>string</code>
+    </ImplicitToStringCast>
+  </file>
+  <file src="lib/core/Bootstrap.php">
+    <InvalidArgument occurrences="8">
+      <code>$downloadController</code>
+      <code>$downloadService</code>
+      <code>$handlerRegistry</code>
+      <code>$mediaDao</code>
+      <code>$pageDao</code>
+      <code>$postDao</code>
+      <code>$topicDao</code>
+    </InvalidArgument>
+  </file>
+  <file src="lib/core/Dao.php">
+    <MismatchingDocblockParamType occurrences="1">
+      <code>object</code>
+    </MismatchingDocblockParamType>
+    <MismatchingDocblockReturnType occurrences="1">
+      <code>integer|numeric|null</code>
+    </MismatchingDocblockReturnType>
+  </file>
+  <file src="lib/core/Dashboard.php">
+    <ParamNameMismatch occurrences="1">
+      <code>$viewName</code>
+    </ParamNameMismatch>
+  </file>
+  <file src="lib/core/DateGenerator.php">
+    <InvalidScalarArgument occurrences="9">
+      <code>$regs[1]</code>
+      <code>$regs[1]</code>
+      <code>$regs[2]</code>
+      <code>$regs[3]</code>
+      <code>$regs[3]</code>
+      <code>$regs[5]</code>
+      <code>substr($internaldate, 0, 4)</code>
+      <code>substr($internaldate, 5, 2)</code>
+      <code>substr($internaldate, 8, 2)</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/core/Db.php">
+    <ParamNameMismatch occurrences="1">
+      <code>$args</code>
+    </ParamNameMismatch>
+  </file>
+  <file src="lib/core/DbException.php">
+    <InvalidThrow occurrences="1">
+      <code>throw new $this('Unknown ' . get_class($this));</code>
+    </InvalidThrow>
+    <UndefinedClass occurrences="1">
+      <code>new $this('Unknown ' . get_class($this))</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/core/DbFactory.php">
+    <TypeDoesNotContainType occurrences="1">
+      <code>class_exists($database)</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/core/DbMySQLi.php">
+    <EmptyArrayAccess occurrences="1">
+      <code>$result[$i]</code>
+    </EmptyArrayAccess>
+    <FalsableReturnStatement occurrences="1">
+      <code>false</code>
+    </FalsableReturnStatement>
+    <InvalidReturnStatement occurrences="2">
+      <code>$this-&gt;dbc</code>
+      <code>true</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="2">
+      <code>bol</code>
+      <code>bool</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="2">
+      <code>$this-&gt;dbport</code>
+      <code>$this-&gt;dbport</code>
+    </InvalidScalarArgument>
+    <UndefinedDocblockClass occurrences="1">
+      <code>bol</code>
+    </UndefinedDocblockClass>
+    <UndefinedFunction occurrences="1">
+      <code>'escape_string'</code>
+    </UndefinedFunction>
+  </file>
+  <file src="lib/core/Dispatcher.php">
+    <RedundantCondition occurrences="2">
+      <code>is_array($matches)</code>
+      <code>is_object($requestPath) &amp;&amp; method_exists($requestPath, 'setParameters') &amp;&amp; is_array($matches)</code>
+    </RedundantCondition>
+  </file>
+  <file src="lib/core/FormValidator.php">
+    <RedundantCondition occurrences="1">
+      <code>filter_var($var, $filter) !== false</code>
+    </RedundantCondition>
+    <TypeDoesNotContainType occurrences="2">
+      <code>$filter === false</code>
+      <code>$filter === false</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/core/FrontHelper.php">
+    <InvalidScalarArgument occurrences="2">
+      <code>$id</code>
+      <code>$id</code>
+    </InvalidScalarArgument>
+    <NullableReturnStatement occurrences="1">
+      <code>self::$frontService-&gt;getPublishedPost((int)$id)</code>
+    </NullableReturnStatement>
+    <UndefinedDocblockClass occurrences="2">
+      <code>int|num</code>
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/core/HTMLPurifier.autoload.php">
+    <UndefinedFunction occurrences="1">
+      <code>'__autoload'</code>
+    </UndefinedFunction>
+  </file>
+  <file src="lib/core/HTMLPurifier.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$array</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string[]</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/CSS.php">
+    <ParamNameMismatch occurrences="1">
+      <code>$css</code>
+    </ParamNameMismatch>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/CSS/AlphaValue.php">
+    <FalsableReturnStatement occurrences="1">
+      <code>$result</code>
+    </FalsableReturnStatement>
+    <InvalidReturnStatement occurrences="1">
+      <code>$result</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string</code>
+    </InvalidReturnType>
+    <ParamNameMismatch occurrences="1">
+      <code>$number</code>
+    </ParamNameMismatch>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/CSS/Background.php">
+    <TypeDoesNotContainType occurrences="1">
+      <code>$caught['position'] !== false</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/CSS/Color.php">
+    <ParamNameMismatch occurrences="1">
+      <code>$color</code>
+    </ParamNameMismatch>
+    <RedundantCondition occurrences="1">
+      <code>$current_type == 'percentage'</code>
+    </RedundantCondition>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/CSS/Filter.php">
+    <ParamNameMismatch occurrences="1">
+      <code>$value</code>
+    </ParamNameMismatch>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/CSS/Font.php">
+    <LoopInvalidation occurrences="1">
+      <code>$i</code>
+    </LoopInvalidation>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/CSS/FontFamily.php">
+    <StringIncrement occurrences="2">
+      <code>$c</code>
+      <code>$c</code>
+    </StringIncrement>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/CSS/ListStyle.php">
+    <InvalidNullableReturnType occurrences="1">
+      <code>bool|string</code>
+    </InvalidNullableReturnType>
+    <TypeDoesNotContainType occurrences="3">
+      <code>$caught['image']</code>
+      <code>$caught['position']</code>
+      <code>$caught['type']</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/CSS/Number.php">
+    <ParamNameMismatch occurrences="1">
+      <code>$number</code>
+    </ParamNameMismatch>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/CSS/URI.php">
+    <InvalidScalarArgument occurrences="1">
+      <code>$result</code>
+    </InvalidScalarArgument>
+    <ParamNameMismatch occurrences="1">
+      <code>$uri_string</code>
+    </ParamNameMismatch>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/Clone.php">
+    <ParamNameMismatch occurrences="1">
+      <code>$v</code>
+    </ParamNameMismatch>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/HTML/Class.php">
+    <ImplementedReturnTypeMismatch occurrences="1">
+      <code>bool|string</code>
+    </ImplementedReturnTypeMismatch>
+    <InvalidReturnStatement occurrences="2">
+      <code>parent::split($string, $config, $context)</code>
+      <code>preg_split('/\s+/', $string)</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>bool|string</code>
+    </InvalidReturnType>
+    <UndefinedPropertyFetch occurrences="1">
+      <code>$config-&gt;getDefinition('HTML')-&gt;doctype</code>
+    </UndefinedPropertyFetch>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/HTML/ID.php">
+    <ParamNameMismatch occurrences="1">
+      <code>$id</code>
+    </ParamNameMismatch>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/Integer.php">
+    <ParamNameMismatch occurrences="1">
+      <code>$integer</code>
+    </ParamNameMismatch>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/URI.php">
+    <ParamNameMismatch occurrences="1">
+      <code>$uri</code>
+    </ParamNameMismatch>
+    <UndefinedMethod occurrences="2">
+      <code>filter</code>
+      <code>postFilter</code>
+    </UndefinedMethod>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/URI/Email.php">
+    <InvalidReturnType occurrences="1">
+      <code>mixed</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/URI/Host.php">
+    <UndefinedClass occurrences="1">
+      <code>Net_IDNA2</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/URI/IPv4.php">
+    <ParamNameMismatch occurrences="1">
+      <code>$aIP</code>
+    </ParamNameMismatch>
+  </file>
+  <file src="lib/core/HTMLPurifier/AttrDef/URI/IPv6.php">
+    <InvalidScalarArgument occurrences="1">
+      <code>$ip</code>
+    </InvalidScalarArgument>
+    <ParamNameMismatch occurrences="1">
+      <code>$aIP</code>
+    </ParamNameMismatch>
+  </file>
+  <file src="lib/core/HTMLPurifier/Bootstrap.php">
+    <FalsableReturnStatement occurrences="2">
+      <code>false</code>
+      <code>false</code>
+    </FalsableReturnStatement>
+  </file>
+  <file src="lib/core/HTMLPurifier/ChildDef/Custom.php">
+    <UndefinedPropertyFetch occurrences="1">
+      <code>$node-&gt;name</code>
+    </UndefinedPropertyFetch>
+  </file>
+  <file src="lib/core/HTMLPurifier/ChildDef/List.php">
+    <FalsableReturnStatement occurrences="4">
+      <code>false</code>
+      <code>false</code>
+      <code>false</code>
+      <code>false</code>
+    </FalsableReturnStatement>
+  </file>
+  <file src="lib/core/HTMLPurifier/ChildDef/Optional.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>true</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>array</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/core/HTMLPurifier/ChildDef/Required.php">
+    <FalsableReturnStatement occurrences="3">
+      <code>false</code>
+      <code>false</code>
+      <code>false</code>
+    </FalsableReturnStatement>
+  </file>
+  <file src="lib/core/HTMLPurifier/ChildDef/Table.php">
+    <FalsableReturnStatement occurrences="2">
+      <code>false</code>
+      <code>false</code>
+    </FalsableReturnStatement>
+    <RedundantCondition occurrences="1">
+      <code>$cols !== false</code>
+    </RedundantCondition>
+  </file>
+  <file src="lib/core/HTMLPurifier/Config.php">
+    <InvalidPropertyFetch occurrences="1">
+      <code>$def-&gt;allow_null</code>
+    </InvalidPropertyFetch>
+    <InvalidScalarArgument occurrences="1">
+      <code>$error</code>
+    </InvalidScalarArgument>
+    <TypeDoesNotContainType occurrences="1">
+      <code>$trace[$i + 1]['class'] === 'HTMLPurifier_Config'</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/core/HTMLPurifier/ConfigSchema.php">
+    <TypeDoesNotContainType occurrences="1">
+      <code>$prototype === true</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/core/HTMLPurifier/DefinitionCache/Serializer.php">
+    <InvalidNullableReturnType occurrences="3">
+      <code>int|bool</code>
+      <code>int|bool</code>
+      <code>int|bool</code>
+    </InvalidNullableReturnType>
+  </file>
+  <file src="lib/core/HTMLPurifier/DefinitionCacheFactory.php">
+    <TypeDoesNotContainType occurrences="1">
+      <code>$prototype === true</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/core/HTMLPurifier/Encoder.php">
+    <FalsableReturnStatement occurrences="5">
+      <code>false</code>
+      <code>false</code>
+      <code>false</code>
+      <code>false</code>
+      <code>false</code>
+    </FalsableReturnStatement>
+  </file>
+  <file src="lib/core/HTMLPurifier/EntityLookup.php">
+    <InvalidScalarArgument occurrences="1">
+      <code>$file</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/core/HTMLPurifier/ErrorCollector.php">
+    <InvalidScalarArgument occurrences="2">
+      <code>HTMLPurifier_ErrorStruct::ATTR</code>
+      <code>HTMLPurifier_ErrorStruct::CSSPROP</code>
+    </InvalidScalarArgument>
+    <UndefinedVariable occurrences="1">
+      <code>$cssprop</code>
+    </UndefinedVariable>
+  </file>
+  <file src="lib/core/HTMLPurifier/Filter/ExtractStyleBlocks.php">
+    <UndefinedClass occurrences="1">
+      <code>csstidy</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/core/HTMLPurifier/Generator.php">
+    <InvalidCast occurrences="1">
+      <code>$tidy</code>
+    </InvalidCast>
+  </file>
+  <file src="lib/core/HTMLPurifier/HTMLDefinition.php">
+    <InvalidArgument occurrences="2">
+      <code>$allowed</code>
+      <code>$list</code>
+    </InvalidArgument>
+  </file>
+  <file src="lib/core/HTMLPurifier/HTMLModule.php">
+    <FalsableReturnStatement occurrences="1">
+      <code>false</code>
+    </FalsableReturnStatement>
+    <InvalidScalarArgument occurrences="1">
+      <code>$type</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/core/HTMLPurifier/HTMLModule/Edit.php">
+    <FalsableReturnStatement occurrences="1">
+      <code>false</code>
+    </FalsableReturnStatement>
+    <InvalidArgument occurrences="2">
+      <code>$value[0]</code>
+      <code>$value[1]</code>
+    </InvalidArgument>
+  </file>
+  <file src="lib/core/HTMLPurifier/HTMLModule/Legacy.php">
+    <NullArgument occurrences="1">
+      <code>null</code>
+    </NullArgument>
+  </file>
+  <file src="lib/core/HTMLPurifier/HTMLModule/Object.php">
+    <NullArgument occurrences="1">
+      <code>null</code>
+    </NullArgument>
+  </file>
+  <file src="lib/core/HTMLPurifier/HTMLModule/SafeObject.php">
+    <InvalidArgument occurrences="1">
+      <code>false</code>
+    </InvalidArgument>
+  </file>
+  <file src="lib/core/HTMLPurifier/HTMLModule/SafeScripting.php">
+    <NullArgument occurrences="1">
+      <code>null</code>
+    </NullArgument>
+  </file>
+  <file src="lib/core/HTMLPurifier/HTMLModule/Tidy.php">
+    <InvalidDocblock occurrences="1">
+      <code>public function getFixType($name)</code>
+    </InvalidDocblock>
+    <InvalidReturnType occurrences="1">
+      <code>array</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/core/HTMLPurifier/HTMLModuleManager.php">
+    <FalsableReturnStatement occurrences="2">
+      <code>false</code>
+      <code>false</code>
+    </FalsableReturnStatement>
+  </file>
+  <file src="lib/core/HTMLPurifier/Injector/AutoParagraph.php">
+    <InvalidNullableReturnType occurrences="1">
+      <code>bool</code>
+    </InvalidNullableReturnType>
+    <NullArgument occurrences="4">
+      <code>$i</code>
+      <code>$i</code>
+      <code>$i</code>
+      <code>$nesting</code>
+    </NullArgument>
+    <NullReference occurrences="2">
+      <code>$current</code>
+      <code>$prev</code>
+    </NullReference>
+    <NullableReturnStatement occurrences="1">
+      <code>null</code>
+    </NullableReturnStatement>
+  </file>
+  <file src="lib/core/HTMLPurifier/Injector/DisplayLinkURI.php">
+    <InvalidPropertyFetch occurrences="1">
+      <code>$token-&gt;start-&gt;attr</code>
+    </InvalidPropertyFetch>
+  </file>
+  <file src="lib/core/HTMLPurifier/Injector/PurifierLinkify.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>parent::prepare($config, $context)</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/core/HTMLPurifier/Injector/RemoveEmpty.php">
+    <ImplementedReturnTypeMismatch occurrences="1">
+      <code>void</code>
+    </ImplementedReturnTypeMismatch>
+  </file>
+  <file src="lib/core/HTMLPurifier/Injector/SafeObject.php">
+    <ImplementedReturnTypeMismatch occurrences="1">
+      <code>void</code>
+    </ImplementedReturnTypeMismatch>
+    <InvalidArrayOffset occurrences="1">
+      <code>$token-&gt;attr['name']</code>
+    </InvalidArrayOffset>
+  </file>
+  <file src="lib/core/HTMLPurifier/Language.php">
+    <UndefinedPropertyAssignment occurrences="1">
+      <code>$stripped_token-&gt;attr</code>
+    </UndefinedPropertyAssignment>
+  </file>
+  <file src="lib/core/HTMLPurifier/LanguageFactory.php">
+    <TypeDoesNotContainType occurrences="1">
+      <code>$prototype == true</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/core/HTMLPurifier/Length.php">
+    <FalsableReturnStatement occurrences="3">
+      <code>false</code>
+      <code>false</code>
+      <code>false</code>
+    </FalsableReturnStatement>
+    <InvalidArgument occurrences="2">
+      <code>false</code>
+      <code>false</code>
+    </InvalidArgument>
+  </file>
+  <file src="lib/core/HTMLPurifier/Lexer.php">
+    <RedundantCast occurrences="1">
+      <code>(string)$html</code>
+    </RedundantCast>
+    <TypeDoesNotContainType occurrences="2">
+      <code>!$inst</code>
+      <code>$inst</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/core/HTMLPurifier/Lexer/DOMLex.php">
+    <InvalidReturnType occurrences="1">
+      <code>HTMLPurifier_Token</code>
+    </InvalidReturnType>
+    <NullArgument occurrences="1">
+      <code>$node-&gt;attributes</code>
+    </NullArgument>
+    <NullPropertyFetch occurrences="3">
+      <code>$def-&gt;doctype-&gt;dtdPublic</code>
+      <code>$def-&gt;doctype-&gt;dtdPublic</code>
+      <code>$def-&gt;doctype-&gt;dtdSystem</code>
+    </NullPropertyFetch>
+    <ParamNameMismatch occurrences="1">
+      <code>$html</code>
+    </ParamNameMismatch>
+    <RedundantCondition occurrences="3">
+      <code>isset($node-&gt;localName)</code>
+      <code>isset($node-&gt;nodeName)</code>
+      <code>isset($node-&gt;textContent)</code>
+    </RedundantCondition>
+    <TypeDoesNotContainType occurrences="1">
+      <code>!empty($def-&gt;doctype-&gt;dtdPublic)</code>
+    </TypeDoesNotContainType>
+    <UndefinedPropertyFetch occurrences="4">
+      <code>$attr-&gt;name</code>
+      <code>$attr-&gt;value</code>
+      <code>$node-&gt;data</code>
+      <code>$node-&gt;data</code>
+    </UndefinedPropertyFetch>
+  </file>
+  <file src="lib/core/HTMLPurifier/Lexer/DirectLex.php">
+    <LessSpecificImplementedReturnType occurrences="1">
+      <code>array|HTMLPurifier_Token[]</code>
+    </LessSpecificImplementedReturnType>
+    <ParamNameMismatch occurrences="1">
+      <code>$html</code>
+    </ParamNameMismatch>
+    <RedundantCondition occurrences="1">
+      <code>$inside_tag</code>
+    </RedundantCondition>
+    <TypeDoesNotContainType occurrences="1">
+      <code>$cursor === false</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/core/HTMLPurifier/Lexer/PH5P.php">
+    <InvalidPassByReference occurrences="1">
+      <code>array_keys($this-&gt;a_formatting, self::MARKER, true)</code>
+    </InvalidPassByReference>
+    <LoopInvalidation occurrences="3">
+      <code>$n</code>
+      <code>$n</code>
+      <code>$n</code>
+    </LoopInvalidation>
+    <ParadoxicalCondition occurrences="1">
+      <code>self::END_PHASE</code>
+    </ParadoxicalCondition>
+    <ParamNameMismatch occurrences="1">
+      <code>$html</code>
+    </ParamNameMismatch>
+    <RedundantCondition occurrences="2">
+      <code>$the_same</code>
+      <code>$this-&gt;foster_parent !== null</code>
+    </RedundantCondition>
+    <TooManyArguments occurrences="3">
+      <code>entityInAttributeValueState</code>
+      <code>entityInAttributeValueState</code>
+      <code>new DOMDocumentType(null, null, 'HTML')</code>
+    </TooManyArguments>
+  </file>
+  <file src="lib/core/HTMLPurifier/PercentEncoder.php">
+    <InvalidArrayAccess occurrences="1">
+      <code>$preserve[$i]</code>
+    </InvalidArrayAccess>
+    <InvalidScalarArgument occurrences="1">
+      <code>$preserve</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/core/HTMLPurifier/Printer/ConfigForm.php">
+    <UndefinedThisPropertyAssignment occurrences="1">
+      <code>$this-&gt;genConfig</code>
+    </UndefinedThisPropertyAssignment>
+    <UndefinedThisPropertyFetch occurrences="1">
+      <code>$this-&gt;genConfig</code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="lib/core/HTMLPurifier/Printer/HTMLDefinition.php">
+    <InvalidScalarArgument occurrences="5">
+      <code>0</code>
+      <code>0</code>
+      <code>0</code>
+      <code>0</code>
+      <code>0</code>
+    </InvalidScalarArgument>
+    <NullArgument occurrences="4">
+      <code>null</code>
+      <code>null</code>
+      <code>null</code>
+      <code>null</code>
+    </NullArgument>
+    <UndefinedPropertyFetch occurrences="3">
+      <code>$def-&gt;block</code>
+      <code>$def-&gt;dtd_regex</code>
+      <code>$def-&gt;inline</code>
+    </UndefinedPropertyFetch>
+  </file>
+  <file src="lib/core/HTMLPurifier/Strategy/FixNesting.php">
+    <LessSpecificImplementedReturnType occurrences="1">
+      <code>array|HTMLPurifier_Token[]</code>
+    </LessSpecificImplementedReturnType>
+  </file>
+  <file src="lib/core/HTMLPurifier/Strategy/MakeWellFormed.php">
+    <InvalidArrayAccess occurrences="2">
+      <code>$token</code>
+      <code>$zipper</code>
+    </InvalidArrayAccess>
+    <InvalidArrayOffset occurrences="1">
+      <code>list($zipper, $token)</code>
+    </InvalidArrayOffset>
+    <InvalidPropertyFetch occurrences="1">
+      <code>$object-&gt;skip</code>
+    </InvalidPropertyFetch>
+    <RedundantCondition occurrences="1">
+      <code>$reprocess</code>
+    </RedundantCondition>
+    <TypeDoesNotContainType occurrences="1">
+      <code>$token = $zipper-&gt;next($token)</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/core/HTMLPurifier/Strategy/RemoveForeignElements.php">
+    <LessSpecificImplementedReturnType occurrences="1">
+      <code>array|HTMLPurifier_Token[]</code>
+    </LessSpecificImplementedReturnType>
+  </file>
+  <file src="lib/core/HTMLPurifier/StringHashParser.php">
+    <EmptyArrayAccess occurrences="1">
+      <code>$ret[$state]</code>
+    </EmptyArrayAccess>
+    <FalsableReturnStatement occurrences="4">
+      <code>false</code>
+      <code>false</code>
+      <code>false</code>
+      <code>false</code>
+    </FalsableReturnStatement>
+  </file>
+  <file src="lib/core/HTMLPurifier/TagTransform/Simple.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$new_tag</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/core/HTMLPurifier/Token.php">
+    <TypeDoesNotContainType occurrences="5">
+      <code>'HTMLPurifier_Token_Comment'</code>
+      <code>'HTMLPurifier_Token_Empty'</code>
+      <code>'HTMLPurifier_Token_End'</code>
+      <code>'HTMLPurifier_Token_Start'</code>
+      <code>'HTMLPurifier_Token_Text'</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/core/HTMLPurifier/URI.php">
+    <FalsableReturnStatement occurrences="2">
+      <code>false</code>
+      <code>false</code>
+    </FalsableReturnStatement>
+    <InvalidScalarArgument occurrences="4">
+      <code>$chars_pchar . '/'</code>
+      <code>$chars_pchar . '/?'</code>
+      <code>$chars_sub_delims . ':'</code>
+      <code>$chars_sub_delims . '@'</code>
+    </InvalidScalarArgument>
+    <UndefinedMethod occurrences="2">
+      <code>getDefaultScheme</code>
+      <code>getDefaultScheme</code>
+    </UndefinedMethod>
+    <UndefinedPropertyFetch occurrences="3">
+      <code>$def-&gt;defaultScheme</code>
+      <code>$def-&gt;defaultScheme</code>
+      <code>$uri_def-&gt;host</code>
+    </UndefinedPropertyFetch>
+  </file>
+  <file src="lib/core/HTMLPurifier/URIFilter/DisableExternal.php">
+    <ImplementedReturnTypeMismatch occurrences="1">
+      <code>void</code>
+    </ImplementedReturnTypeMismatch>
+    <UndefinedPropertyFetch occurrences="1">
+      <code>$config-&gt;getDefinition('URI')-&gt;host</code>
+    </UndefinedPropertyFetch>
+  </file>
+  <file src="lib/core/HTMLPurifier/URIFilter/MakeAbsolute.php">
+    <RedundantCondition occurrences="1">
+      <code>is_null($uri-&gt;host)</code>
+    </RedundantCondition>
+    <UndefinedPropertyFetch occurrences="1">
+      <code>$def-&gt;base</code>
+    </UndefinedPropertyFetch>
+  </file>
+  <file src="lib/core/HTMLPurifier/URIFilter/SafeIframe.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>preg_match($this-&gt;regexp, $uri-&gt;toString())</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>bool</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/core/HTMLPurifier/URIParser.php">
+    <FalsableReturnStatement occurrences="1">
+      <code>false</code>
+    </FalsableReturnStatement>
+  </file>
+  <file src="lib/core/HTMLPurifier/URISchemeRegistry.php">
+    <TypeDoesNotContainType occurrences="1">
+      <code>$prototype == true</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/core/HTMLPurifier/UnitConverter.php">
+    <InvalidNullableReturnType occurrences="1">
+      <code>string</code>
+    </InvalidNullableReturnType>
+    <InvalidScalarArgument occurrences="5">
+      <code>$n</code>
+      <code>$n</code>
+      <code>$n</code>
+      <code>$n</code>
+      <code>substr($r, 0, strlen($r) + $scale)</code>
+    </InvalidScalarArgument>
+    <NullableReturnStatement occurrences="1">
+      <code>bcdiv($s1, $s2, $scale)</code>
+    </NullableReturnStatement>
+  </file>
+  <file src="lib/core/HTMLPurifier/VarParser.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$var</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string</code>
+    </InvalidReturnType>
+    <NullableReturnStatement occurrences="1">
+      <code>null</code>
+    </NullableReturnStatement>
+  </file>
+  <file src="lib/core/HTMLPurifier/VarParser/Flexible.php">
+    <ImplementedReturnTypeMismatch occurrences="1">
+      <code>array|bool|float|int|mixed|null|string</code>
+    </ImplementedReturnTypeMismatch>
+  </file>
+  <file src="lib/core/HTMLPurifier/VarParser/Native.php">
+    <ImplementedReturnTypeMismatch occurrences="1">
+      <code>null|string</code>
+    </ImplementedReturnTypeMismatch>
+  </file>
+  <file src="lib/core/HTMLPurifier/Zipper.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>array($z, $t)</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>Tuple</code>
+    </InvalidReturnType>
+    <NullableReturnStatement occurrences="3">
+      <code>empty($this-&gt;back) ? null : array_pop($this-&gt;back)</code>
+      <code>empty($this-&gt;back) ? null : array_pop($this-&gt;back)</code>
+      <code>empty($this-&gt;front) ? null : array_pop($this-&gt;front)</code>
+    </NullableReturnStatement>
+    <UndefinedDocblockClass occurrences="5">
+      <code>Original</code>
+      <code>Original</code>
+      <code>Original</code>
+      <code>Original</code>
+      <code>Tuple</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/core/HZip.php">
+    <InvalidClass occurrences="1">
+      <code>ZIPARCHIVE</code>
+    </InvalidClass>
+  </file>
+  <file src="lib/core/HandleRequest.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>self::$frontHelper</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>object</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/core/Html.php">
+    <InvalidArgument occurrences="1">
+      <code>$body</code>
+    </InvalidArgument>
+    <NullReference occurrences="1">
+      <code>$badTags</code>
+    </NullReference>
+    <UndefinedDocblockClass occurrences="1">
+      <code>htmlNode</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/core/LogError.php">
+    <UndefinedDocblockClass occurrences="1">
+      <code>number</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/core/Mailer.php">
+    <InvalidPropertyAssignmentValue occurrences="3">
+      <code>true</code>
+      <code>true</code>
+      <code>true</code>
+    </InvalidPropertyAssignmentValue>
+  </file>
+  <file src="lib/core/MessageLog.php">
+    <ImplicitToStringCast occurrences="1">
+      <code>$exception</code>
+    </ImplicitToStringCast>
+    <InvalidScalarArgument occurrences="1">
+      <code>1</code>
+    </InvalidScalarArgument>
+    <UndefinedDocblockClass occurrences="1">
+      <code>num|int</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/core/ModelException.php">
+    <InvalidThrow occurrences="1">
+      <code>throw new $this('Unknown' . get_class($this));</code>
+    </InvalidThrow>
+    <UndefinedClass occurrences="1">
+      <code>new $this('Unknown' . get_class($this))</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/core/PageCache.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>file_put_contents($this-&gt;cache_file, $contents)</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>boolean</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/core/Pagination.php">
+    <InvalidOperand occurrences="1">
+      <code>$limit</code>
+    </InvalidOperand>
+    <InvalidReturnStatement occurrences="2">
+      <code>$position</code>
+      <code>ceil($totalData / $limit)</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="2">
+      <code>number</code>
+      <code>number</code>
+    </InvalidReturnType>
+    <RedundantCast occurrences="1">
+      <code>(int)1</code>
+    </RedundantCast>
+    <UndefinedDocblockClass occurrences="2">
+      <code>number</code>
+      <code>number</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/core/Paginator.php">
+    <InvalidPropertyAssignmentValue occurrences="1">
+      <code>$perPage</code>
+    </InvalidPropertyAssignmentValue>
+    <InvalidReturnStatement occurrences="1">
+      <code>['offset' =&gt; $this-&gt;get_start(), 'limit' =&gt; $this-&gt;_perPage]</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string</code>
+    </InvalidReturnType>
+    <PossiblyInvalidDocblockTag occurrences="4">
+      <code>@var integer</code>
+      <code>@var integer</code>
+      <code>@var string $ext optionally pass in extra parameters to the GET</code>
+      <code>@var string $path optionally set the path for the link</code>
+    </PossiblyInvalidDocblockTag>
+  </file>
+  <file src="lib/core/ProviderException.php">
+    <InvalidThrow occurrences="1">
+      <code>throw new $this('Unknown' . get_class($this));</code>
+    </InvalidThrow>
+    <UndefinedClass occurrences="1">
+      <code>new $this('Unknown' . get_class($this))</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/core/Random.php">
+    <InvalidArrayOffset occurrences="1">
+      <code>$seed[$bytesNeeded]</code>
+    </InvalidArrayOffset>
+    <InvalidScalarArgument occurrences="2">
+      <code>$bytesNeeded</code>
+      <code>$bytesNeeded</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/core/Registry.php">
+    <InvalidDocblock occurrences="1">
+      <code>private static $data = [];</code>
+    </InvalidDocblock>
+    <InvalidReturnStatement occurrences="1">
+      <code>isset(self::$data[$key])</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>array</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/core/RemoteAddress.php">
+    <InvalidArgument occurrences="1">
+      <code>$_SERVER[$header]</code>
+    </InvalidArgument>
+  </file>
+  <file src="lib/core/RequestPath.php">
+    <ReservedWord occurrences="2">
+      <code>mixed</code>
+      <code>mixed</code>
+    </ReservedWord>
+  </file>
+  <file src="lib/core/Resize.php">
+    <InvalidArgument occurrences="6">
+      <code>$crop</code>
+      <code>$this-&gt;image</code>
+      <code>$this-&gt;imageResized</code>
+      <code>$this-&gt;imageResized</code>
+      <code>$this-&gt;imageResized</code>
+      <code>$this-&gt;imageResized</code>
+    </InvalidArgument>
+    <InvalidPropertyAssignmentValue occurrences="2">
+      <code>imagecreatetruecolor($newWidth, $newHeight)</code>
+      <code>imagecreatetruecolor($optimalWidth, $optimalHeight)</code>
+    </InvalidPropertyAssignmentValue>
+    <InvalidScalarArgument occurrences="1">
+      <code>$invertScaleQuality</code>
+    </InvalidScalarArgument>
+    <UndefinedDocblockClass occurrences="3">
+      <code>GdImage|resources</code>
+      <code>num|int</code>
+      <code>num|int</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/core/ResponsiveCaptcha.php">
+    <FalsableReturnStatement occurrences="1">
+      <code>false</code>
+    </FalsableReturnStatement>
+    <InvalidArrayOffset occurrences="3">
+      <code>$numberNames[$numGroup]</code>
+      <code>$numberNames[$number]</code>
+      <code>$numberNames[$onesPlace]</code>
+    </InvalidArrayOffset>
+    <InvalidScalarArgument occurrences="1">
+      <code>$number</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/core/ServiceException.php">
+    <InvalidThrow occurrences="1">
+      <code>throw new $this('Unknown' . get_class($this));</code>
+    </InvalidThrow>
+    <UndefinedClass occurrences="1">
+      <code>new $this('Unknown' . get_class($this))</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/core/Session.php">
+    <TypeDoesNotContainType occurrences="1">
+      <code>!$this-&gt;session_state = self::SESSION_STARTED</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/core/SessionMaker.php">
+    <InvalidReturnStatement occurrences="2">
+      <code>false</code>
+      <code>session_destroy()</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>void</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/core/Sitemap.php">
+    <InvalidParamDefault occurrences="1">
+      <code>string|null</code>
+    </InvalidParamDefault>
+    <InvalidScalarArgument occurrences="3">
+      <code>$date</code>
+      <code>$lastmod</code>
+      <code>$lastmod</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/core/SitemapService.php">
+    <InvalidArrayAccess occurrences="1">
+      <code>$pages[$key]</code>
+    </InvalidArrayAccess>
+    <InvalidReturnStatement occurrences="1">
+      <code>empty($this-&gt;sitemap-&gt;createSitemapIndex($this-&gt;domain, 'Now')) ? "1" : "0"</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1"/>
+  </file>
+  <file src="lib/core/SyntaxHighlight.php">
+    <InvalidArgument occurrences="1">
+      <code>array_values($regexp)</code>
+    </InvalidArgument>
+    <RedundantFunctionCall occurrences="1">
+      <code>array_values</code>
+    </RedundantFunctionCall>
+  </file>
+  <file src="lib/core/Tokenizer.php">
+    <UndefinedDocblockClass occurrences="1">
+      <code>integer|number</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/core/Util.php">
+    <FalsableReturnStatement occurrences="1">
+      <code>false</code>
+    </FalsableReturnStatement>
+    <InvalidArrayOffset occurrences="1">
+      <code>$digits[substr($slug, 0, 1)]</code>
+    </InvalidArrayOffset>
+    <InvalidOperand occurrences="1">
+      <code>$var</code>
+    </InvalidOperand>
+    <InvalidParamDefault occurrences="3">
+      <code>int</code>
+      <code>string</code>
+      <code>string</code>
+    </InvalidParamDefault>
+    <InvalidReturnStatement occurrences="3">
+      <code>$encoding ? mb_internal_encoding($encoding) : mb_internal_encoding()</code>
+      <code>static::random_string($length)</code>
+      <code>substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length)</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="2">
+      <code>bool</code>
+      <code>string</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="6">
+      <code>$key</code>
+      <code>$key</code>
+      <code>$key</code>
+      <code>$key</code>
+      <code>$number</code>
+      <code>$text[0]</code>
+    </InvalidScalarArgument>
+    <TypeDoesNotContainType occurrences="1">
+      <code>self::$hasArray</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/dao/CommentDao.php">
+    <InvalidNullableReturnType occurrences="1">
+      <code>numeric|int</code>
+    </InvalidNullableReturnType>
+    <InvalidReturnStatement occurrences="2">
+      <code>$stmt &gt; 0</code>
+      <code>(empty($comments)) ?: $comments</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="2">
+      <code>array</code>
+      <code>integer|numeric</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="2">
+      <code>$ID</code>
+      <code>$id</code>
+    </InvalidScalarArgument>
+    <NullableReturnStatement occurrences="1">
+      <code>(empty($data)) ? $this-&gt;checkCountValue([]) : $this-&gt;checkCountValue($data)</code>
+    </NullableReturnStatement>
+    <UndefinedDocblockClass occurrences="1">
+      <code>integer|number</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/dao/ConfigurationDao.php">
+    <InvalidNullableReturnType occurrences="1">
+      <code>integer|numeric</code>
+    </InvalidNullableReturnType>
+    <InvalidParamDefault occurrences="1">
+      <code>integer</code>
+    </InvalidParamDefault>
+    <InvalidReturnStatement occurrences="4">
+      <code>(empty($configs)) ?: $configs</code>
+      <code>(empty($detailConfig)) ?: $detailConfig</code>
+      <code>(empty($general_configs)) ?: $general_configs</code>
+      <code>(empty($reading_configs)) ?: $reading_configs</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="3">
+      <code>array</code>
+      <code>array</code>
+      <code>array</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="2">
+      <code>$id</code>
+      <code>$id</code>
+    </InvalidScalarArgument>
+    <NullableReturnStatement occurrences="1">
+      <code>$this-&gt;checkCountValue($data)</code>
+    </NullableReturnStatement>
+  </file>
+  <file src="lib/dao/ConsentDao.php">
+    <InvalidReturnStatement occurrences="3">
+      <code>$this-&gt;checkCountValue([])</code>
+      <code>(empty($consents)) ? false : $consents</code>
+      <code>(empty($consents)) ? false : $consents</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="3">
+      <code>array|bool</code>
+      <code>array|bool</code>
+      <code>int</code>
+    </InvalidReturnType>
+    <NullableReturnStatement occurrences="1">
+      <code>$this-&gt;checkCountValue([])</code>
+    </NullableReturnStatement>
+  </file>
+  <file src="lib/dao/DataRequestDao.php">
+    <InvalidReturnStatement occurrences="4">
+      <code>$this-&gt;checkCountValue([])</code>
+      <code>$this-&gt;findAll([$email])</code>
+      <code>$this-&gt;findAll([$status])</code>
+      <code>$this-&gt;findAll([])</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="4">
+      <code>array|bool</code>
+      <code>array|bool</code>
+      <code>array|bool</code>
+      <code>int</code>
+    </InvalidReturnType>
+    <NullableReturnStatement occurrences="1">
+      <code>$this-&gt;checkCountValue([])</code>
+    </NullableReturnStatement>
+  </file>
+  <file src="lib/dao/LanguageDao.php">
+    <InvalidReturnStatement occurrences="2">
+      <code>$this-&gt;findAll([])</code>
+      <code>$this-&gt;findAll([])</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="2">
+      <code>array</code>
+      <code>array</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/dao/MediaDao.php">
+    <InvalidArgument occurrences="1">
+      <code>"media_id = {$idsanitized}"</code>
+    </InvalidArgument>
+    <InvalidParamDefault occurrences="1">
+      <code>int</code>
+    </InvalidParamDefault>
+    <InvalidReturnStatement occurrences="3">
+      <code>$stmt &gt; 0</code>
+      <code>(empty($allMedia)) ?: $allMedia</code>
+      <code>(empty($mediaByType)) ?: $mediaByType</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="2">
+      <code>array</code>
+      <code>numeric</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="5">
+      <code>$id</code>
+      <code>$mediaId</code>
+      <code>$mediaId</code>
+      <code>$mediaId</code>
+      <code>$mediaId</code>
+    </InvalidScalarArgument>
+    <MismatchingDocblockReturnType occurrences="1">
+      <code>integer|numeric</code>
+    </MismatchingDocblockReturnType>
+    <UndefinedDocblockClass occurrences="1">
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/dao/MenuDao.php">
+    <InvalidParamDefault occurrences="1">
+      <code>integer</code>
+    </InvalidParamDefault>
+    <InvalidReturnStatement occurrences="2">
+      <code>$dropDown</code>
+      <code>$stmt &gt; 0</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="2">
+      <code>numeric</code>
+      <code>void</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="6">
+      <code>$id</code>
+      <code>$id</code>
+      <code>$id</code>
+      <code>$id</code>
+      <code>$id</code>
+      <code>$menuId</code>
+    </InvalidScalarArgument>
+    <MismatchingDocblockReturnType occurrences="1">
+      <code>integer|numeric</code>
+    </MismatchingDocblockReturnType>
+    <UndefinedDocblockClass occurrences="3">
+      <code>num|int</code>
+      <code>num|int</code>
+      <code>num|int</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/dao/PageDao.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$stmt &gt; 0</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>numeric</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="2">
+      <code>$id</code>
+      <code>$pageId</code>
+    </InvalidScalarArgument>
+    <MismatchingDocblockReturnType occurrences="1">
+      <code>numeric</code>
+    </MismatchingDocblockReturnType>
+  </file>
+  <file src="lib/dao/PluginDao.php">
+    <InvalidArrayAccess occurrences="1">
+      <code>$rows['plugin_sort']</code>
+    </InvalidArrayAccess>
+    <InvalidReturnStatement occurrences="1">
+      <code>$stmt &gt; 0</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>numeric</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="6">
+      <code>$id</code>
+      <code>$id</code>
+      <code>$id</code>
+      <code>$id</code>
+      <code>$id</code>
+      <code>$id</code>
+    </InvalidScalarArgument>
+    <MismatchingDocblockReturnType occurrences="1">
+      <code>numeric</code>
+    </MismatchingDocblockReturnType>
+  </file>
+  <file src="lib/dao/PostDao.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$stmt &gt; 0</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>numeric</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="2">
+      <code>$id</code>
+      <code>$id</code>
+    </InvalidScalarArgument>
+    <MismatchingDocblockReturnType occurrences="1">
+      <code>numeric</code>
+    </MismatchingDocblockReturnType>
+  </file>
+  <file src="lib/dao/PostTopicDao.php">
+    <InvalidScalarArgument occurrences="2">
+      <code>$postId</code>
+      <code>$topicId</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/dao/PrivacyLogDao.php">
+    <InvalidReturnStatement occurrences="6">
+      <code>$this-&gt;checkCountValue([])</code>
+      <code>$this-&gt;findAll([$action])</code>
+      <code>$this-&gt;findAll([$email])</code>
+      <code>$this-&gt;findAll([(int)$limit])</code>
+      <code>$this-&gt;findAll([(int)$userId])</code>
+      <code>$this-&gt;findAll([])</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="6">
+      <code>array|bool</code>
+      <code>array|bool</code>
+      <code>array|bool</code>
+      <code>array|bool</code>
+      <code>array|bool</code>
+      <code>int</code>
+    </InvalidReturnType>
+    <NullableReturnStatement occurrences="1">
+      <code>$this-&gt;checkCountValue([])</code>
+    </NullableReturnStatement>
+  </file>
+  <file src="lib/dao/PrivacyPolicyDao.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$this-&gt;findAll([])</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>array</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/dao/ReplyDao.php">
+    <InvalidReturnStatement occurrences="4">
+      <code>$this-&gt;checkCountValue([(int)$parentId])</code>
+      <code>(empty($data)) ? $this-&gt;checkCountValue([]) : $this-&gt;checkCountValue($data)</code>
+      <code>(empty($replies)) ? null : $replies</code>
+      <code>(empty($replies)) ? null : $replies</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="3">
+      <code>array|null</code>
+      <code>array|null</code>
+      <code>int</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="5">
+      <code>$ID</code>
+      <code>$id</code>
+      <code>$id</code>
+      <code>$id</code>
+      <code>$parentId</code>
+    </InvalidScalarArgument>
+    <NullableReturnStatement occurrences="2">
+      <code>$this-&gt;checkCountValue([(int)$parentId])</code>
+      <code>(empty($data)) ? $this-&gt;checkCountValue([]) : $this-&gt;checkCountValue($data)</code>
+    </NullableReturnStatement>
+  </file>
+  <file src="lib/dao/ThemeDao.php">
+    <FalsableReturnStatement occurrences="1">
+      <code>false</code>
+    </FalsableReturnStatement>
+    <InvalidParamDefault occurrences="1">
+      <code>integer</code>
+    </InvalidParamDefault>
+    <InvalidReturnStatement occurrences="3">
+      <code>$stmt &gt; 0</code>
+      <code>$this-&gt;findAll([])</code>
+      <code>(empty($is_actived)) ?: $is_actived</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="3">
+      <code>array</code>
+      <code>boolen|string</code>
+      <code>numeric</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="5">
+      <code>$id</code>
+      <code>$id</code>
+      <code>$id</code>
+      <code>$id</code>
+      <code>$id</code>
+    </InvalidScalarArgument>
+    <MismatchingDocblockReturnType occurrences="1">
+      <code>numeric|integer|null</code>
+    </MismatchingDocblockReturnType>
+    <UndefinedDocblockClass occurrences="1">
+      <code>boolen|string</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/dao/TopicDao.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$stmt &gt; 0</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>numeric</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="5">
+      <code>$id</code>
+      <code>$postId</code>
+      <code>$topicId</code>
+      <code>$topicId</code>
+      <code>$topicId</code>
+    </InvalidScalarArgument>
+    <MismatchingDocblockReturnType occurrences="1">
+      <code>numeric|int|null</code>
+    </MismatchingDocblockReturnType>
+  </file>
+  <file src="lib/dao/TranslationDao.php">
+    <InvalidReturnStatement occurrences="10">
+      <code>$this-&gt;findAll([$langId, "%{$query}%", "%{$query}%", $limit, $offset])</code>
+      <code>$this-&gt;findAll([$langId, "%{$query}%", "%{$query}%"])</code>
+      <code>$this-&gt;findAll([$langId, $context, $limit, $offset])</code>
+      <code>$this-&gt;findAll([$langId, $context])</code>
+      <code>$this-&gt;findAll([$langId, $limit, $offset])</code>
+      <code>$this-&gt;findAll([$langId, $prefix . '%'])</code>
+      <code>$this-&gt;findAll([$langId])</code>
+      <code>$this-&gt;findAll([$limit, $offset])</code>
+      <code>$this-&gt;findAll([$localeCode])</code>
+      <code>$this-&gt;findAll([])</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="10">
+      <code>array</code>
+      <code>array</code>
+      <code>array</code>
+      <code>array</code>
+      <code>array</code>
+      <code>array</code>
+      <code>array</code>
+      <code>array</code>
+      <code>array</code>
+      <code>array</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/dao/UserDao.php">
+    <InvalidDocblock occurrences="1">
+      <code>[type]</code>
+    </InvalidDocblock>
+    <InvalidReturnStatement occurrences="4">
+      <code>$stmt &gt; 0</code>
+      <code>$this-&gt;checkCountValue($data) ?? 0</code>
+      <code>$userAccount</code>
+      <code>true</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="4">
+      <code>false</code>
+      <code>int</code>
+      <code>integer</code>
+      <code>numeric</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="2">
+      <code>$userID</code>
+      <code>$userID</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/model/ArchivesModel.php">
+    <MismatchingDocblockParamType occurrences="2">
+      <code>object</code>
+      <code>object</code>
+    </MismatchingDocblockParamType>
+  </file>
+  <file src="lib/model/DownloadModel.php">
+    <InvalidReturnStatement occurrences="4">
+      <code>$this-&gt;findAll() ?? []</code>
+      <code>$this-&gt;findAll([$limit]) ?? []</code>
+      <code>$this-&gt;findAll([$limit]) ?? []</code>
+      <code>$this-&gt;findAll([$mediaId]) ?? []</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="4">
+      <code>array</code>
+      <code>array</code>
+      <code>array</code>
+      <code>array</code>
+    </InvalidReturnType>
+    <UndefinedDocblockClass occurrences="1">
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/model/FrontContentModel.php">
+    <InvalidArgument occurrences="1">
+      <code>self::frontSanitizer()</code>
+    </InvalidArgument>
+    <InvalidClass occurrences="1">
+      <code>postModel</code>
+    </InvalidClass>
+    <InvalidDocblock occurrences="1">
+      <code>public static function frontLatestPosts($limit, PostModel $postModel, $position = null)</code>
+    </InvalidDocblock>
+    <InvalidScalarArgument occurrences="1">
+      <code>$postId</code>
+    </InvalidScalarArgument>
+    <UndefinedDocblockClass occurrences="6">
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|number</code>
+      <code>num|int</code>
+      <code>num|int</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/model/GalleryModel.php">
+    <UndefinedDocblockClass occurrences="2">
+      <code>int|num</code>
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/model/PageModel.php">
+    <InvalidScalarArgument occurrences="1">
+      <code>$id</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/model/PostModel.php">
+    <InvalidReturnStatement occurrences="2">
+      <code>(empty($entries)) ?: ['blogPosts' =&gt; $entries, 'paginationLink' =&gt; $this-&gt;pagination]</code>
+      <code>(empty($feeds)) ?: $feeds</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="2">
+      <code>void</code>
+      <code>void</code>
+    </InvalidReturnType>
+    <UndefinedDocblockClass occurrences="3">
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/model/TagModel.php">
+    <InvalidScalarArgument occurrences="1">
+      <code>$tags</code>
+    </InvalidScalarArgument>
+    <RedundantCast occurrences="1">
+      <code>(array) $tag_exploaded</code>
+    </RedundantCast>
+  </file>
+  <file src="lib/model/TopicModel.php">
+    <InvalidReturnStatement occurrences="2">
+      <code>(empty($active_topics)) ?: $active_topics</code>
+      <code>implode("", $link)</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="2">
+      <code>array</code>
+      <code>array</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="1">
+      <code>$postId</code>
+    </InvalidScalarArgument>
+    <UndefinedConstant occurrences="2">
+      <code>PDO::FETCH_ASSOC|PDO::FETCH_OBJECT</code>
+      <code>PDO::FETCH_ASSOC|PDO::FETCH_OBJECT</code>
+    </UndefinedConstant>
+    <UndefinedDocblockClass occurrences="1">
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/options.php">
+    <InvalidScalarArgument occurrences="7">
+      <code>0</code>
+      <code>1</code>
+      <code>1</code>
+      <code>1</code>
+      <code>1</code>
+      <code>100</code>
+      <code>1440</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/service/CommentService.php">
+    <InvalidDocblock occurrences="1">
+      <code>private $sanitizer;</code>
+    </InvalidDocblock>
+  </file>
+  <file src="lib/service/DataRequestService.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$this-&gt;dataRequestDao-&gt;getAllRequests()</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>array</code>
+    </InvalidReturnType>
+    <InvalidScalarArgument occurrences="2">
+      <code>$requestId</code>
+      <code>$requestId</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/service/DownloadService.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$identifier</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>int</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/service/FrontService.php">
+    <FalsableReturnStatement occurrences="3">
+      <code>FrontHelper::grabSimpleFrontPage($id)</code>
+      <code>FrontHelper::grabSimpleFrontPost($id)</code>
+      <code>FrontHelper::grabSimpleFrontTopic($id)</code>
+    </FalsableReturnStatement>
+    <InvalidReturnStatement occurrences="1">
+      <code>$topic</code>
+    </InvalidReturnStatement>
+  </file>
+  <file src="lib/service/MediaService.php">
+    <InvalidParamDefault occurrences="1">
+      <code>integer</code>
+    </InvalidParamDefault>
+    <InvalidReturnStatement occurrences="1"/>
+    <MismatchingDocblockParamType occurrences="3">
+      <code>object</code>
+      <code>object</code>
+      <code>object</code>
+    </MismatchingDocblockParamType>
+    <UndefinedDocblockClass occurrences="1">
+      <code>integer|number</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/service/MenuService.php">
+    <UndefinedDocblockClass occurrences="1">
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/service/NotificationService.php">
+    <MissingFile occurrences="2">
+      <code>require APP_ROOT . '/config.php'</code>
+      <code>require APP_ROOT . '/config.php'</code>
+    </MissingFile>
+  </file>
+  <file src="lib/service/PageService.php">
+    <InvalidPropertyAssignmentValue occurrences="1">
+      <code>$page_sticky</code>
+    </InvalidPropertyAssignmentValue>
+    <RedundantCondition occurrences="2">
+      <code>method_exists($medialib, 'deleteMedia')</code>
+      <code>method_exists($medialib, 'findMediaById')</code>
+    </RedundantCondition>
+    <RedundantPropertyInitializationCheck occurrences="8">
+      <code>$this-&gt;page_locale</code>
+      <code>$this-&gt;page_locale</code>
+      <code>$this-&gt;page_locale</code>
+      <code>$this-&gt;page_locale</code>
+      <code>'en'</code>
+      <code>'en'</code>
+      <code>'en'</code>
+      <code>'en'</code>
+    </RedundantPropertyInitializationCheck>
+    <UndefinedDocblockClass occurrences="3">
+      <code>interger</code>
+      <code>int|number</code>
+      <code>slug</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/service/PluginService.php">
+    <MismatchingDocblockParamType occurrences="3">
+      <code>object</code>
+      <code>object</code>
+      <code>object</code>
+    </MismatchingDocblockParamType>
+  </file>
+  <file src="lib/service/PostService.php">
+    <FalsableReturnStatement occurrences="1">
+      <code>false</code>
+    </FalsableReturnStatement>
+    <InvalidArgument occurrences="1">
+      <code>PDO::FETCH_ASSOC</code>
+    </InvalidArgument>
+    <InvalidPropertyAssignmentValue occurrences="2">
+      <code>$post_image</code>
+      <code>$tags</code>
+    </InvalidPropertyAssignmentValue>
+    <MismatchingDocblockParamType occurrences="3">
+      <code>object</code>
+      <code>object</code>
+      <code>object</code>
+    </MismatchingDocblockParamType>
+    <RedundantCondition occurrences="2">
+      <code>method_exists($medialib, 'deleteMedia')</code>
+      <code>method_exists($medialib, 'findMediaBlog')</code>
+    </RedundantCondition>
+    <RedundantPropertyInitializationCheck occurrences="8">
+      <code>$this-&gt;post_locale</code>
+      <code>$this-&gt;post_locale</code>
+      <code>$this-&gt;post_locale</code>
+      <code>$this-&gt;post_locale</code>
+      <code>'en'</code>
+      <code>'en'</code>
+      <code>'en'</code>
+      <code>'en'</code>
+    </RedundantPropertyInitializationCheck>
+  </file>
+  <file src="lib/service/ReplyService.php">
+    <TooManyArguments occurrences="5">
+      <code>sanitize</code>
+      <code>sanitize</code>
+      <code>sanitize</code>
+      <code>sanitize</code>
+      <code>sanitize</code>
+    </TooManyArguments>
+  </file>
+  <file src="lib/service/ThemeService.php">
+    <MismatchingDocblockReturnType occurrences="1">
+      <code>integer|numeric|null</code>
+    </MismatchingDocblockReturnType>
+  </file>
+  <file src="lib/service/TopicService.php">
+    <MismatchingDocblockReturnType occurrences="1">
+      <code>integer|numeric|null</code>
+    </MismatchingDocblockReturnType>
+    <RedundantPropertyInitializationCheck occurrences="4">
+      <code>$this-&gt;topic_locale</code>
+      <code>$this-&gt;topic_locale</code>
+      <code>'en'</code>
+      <code>'en'</code>
+    </RedundantPropertyInitializationCheck>
+  </file>
+  <file src="lib/service/UserService.php">
+    <InvalidScalarArgument occurrences="1">
+      <code>0</code>
+    </InvalidScalarArgument>
+    <UndefinedDocblockClass occurrences="1">
+      <code>strin</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/absolute-url.php">
+    <InvalidArgument occurrences="1">
+      <code>$parse</code>
+    </InvalidArgument>
+  </file>
+  <file src="lib/utility/admin-translations.php">
+    <DuplicateArrayKey occurrences="6">
+      <code>'nav.all_pages' =&gt; 'All Pages'</code>
+      <code>'nav.all_users' =&gt; 'All Users'</code>
+      <code>'nav.comments' =&gt; 'Comments'</code>
+      <code>'nav.export' =&gt; 'Export'</code>
+      <code>'nav.import' =&gt; 'Import'</code>
+      <code>'nav.tools' =&gt; 'Tools'</code>
+    </DuplicateArrayKey>
+  </file>
+  <file src="lib/utility/app-info.php">
+    <InvalidReturnStatement occurrences="3">
+      <code>(class_exists('AppConfig')) ? AppConfig::readConfiguration(invoke_config()) : ""</code>
+      <code>(class_exists('AppConfig')) ? AppConfig::readConfiguration(invoke_config()) : ""</code>
+      <code>(is_array($app_info)) ? $app_info : ""</code>
+    </InvalidReturnStatement>
+    <RedundantCondition occurrences="1">
+      <code>is_array($app_info)</code>
+    </RedundantCondition>
+    <TypeDoesNotContainType occurrences="1">
+      <code>""</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/utility/archive-scanner.php">
+    <UndefinedClass occurrences="4">
+      <code>BombScanner</code>
+      <code>BombScanner</code>
+      <code>RarBombEngine</code>
+      <code>ZipBombEngine</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/utility/autoloader.php">
+    <InvalidArgument occurrences="1"/>
+    <NullArgument occurrences="1">
+      <code>null</code>
+    </NullArgument>
+  </file>
+  <file src="lib/utility/catch-weblink.php">
+    <InvalidNullableReturnType occurrences="1">
+      <code>array</code>
+    </InvalidNullableReturnType>
+    <NullableReturnStatement occurrences="1">
+      <code>null</code>
+    </NullableReturnStatement>
+  </file>
+  <file src="lib/utility/check-internet-connection.php">
+    <ParadoxicalCondition occurrences="1">
+      <code>CONNECTION_ABORTED &amp; CONNECTION_TIMEOUT</code>
+    </ParadoxicalCondition>
+  </file>
+  <file src="lib/utility/check-weblink.php">
+    <UndefinedDocblockClass occurrences="2">
+      <code>int|number</code>
+      <code>int|number</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/clip.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$value</code>
+    </InvalidReturnStatement>
+  </file>
+  <file src="lib/utility/comment-submission.php">
+    <MismatchingDocblockParamType occurrences="1">
+      <code>int|numeric</code>
+    </MismatchingDocblockParamType>
+    <RedundantCondition occurrences="1">
+      <code>$commentProvider instanceof CommentModel</code>
+    </RedundantCondition>
+  </file>
+  <file src="lib/utility/convert-to-paragraph.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>'&lt;p&gt;' . preg_replace('/[\r\n]+/', "&lt;/p&gt;\n&lt;p&gt;", $text) . "&lt;/p&gt;\n"</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>void</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/cookies-baked.php">
+    <FalsableReturnStatement occurrences="1">
+      <code>false</code>
+    </FalsableReturnStatement>
+    <InvalidArrayOffset occurrences="1">
+      <code>$_COOKIE[$cookies]</code>
+    </InvalidArrayOffset>
+    <InvalidIterator occurrences="1">
+      <code>$_COOKIE[$cookies]</code>
+    </InvalidIterator>
+    <InvalidScalarArgument occurrences="1">
+      <code>$expire</code>
+    </InvalidScalarArgument>
+  </file>
+  <file src="lib/utility/create-thumbnail.php">
+    <UndefinedDocblockClass occurrences="9">
+      <code>GdImage|Obj</code>
+      <code>GdImage|Obj</code>
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/current-request-method.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>(isset($_SERVER['REQUEST_METHOD'])) ? $_SERVER['REQUEST_METHOD'] : ""</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>void</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/db-mysqli.php">
+    <EmptyArrayAccess occurrences="1">
+      <code>$result[ $i ]</code>
+    </EmptyArrayAccess>
+    <InvalidReturnStatement occurrences="1">
+      <code>$dbscheme</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>void</code>
+    </InvalidReturnType>
+    <NullableReturnStatement occurrences="2">
+      <code>null</code>
+      <code>null</code>
+    </NullableReturnStatement>
+  </file>
+  <file src="lib/utility/do-logout.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$authenticator-&gt;logout()</code>
+    </InvalidReturnStatement>
+  </file>
+  <file src="lib/utility/download-settings.php">
+    <InvalidScalarArgument occurrences="1">
+      <code>(int)$hours</code>
+    </InvalidScalarArgument>
+    <RedundantCondition occurrences="1">
+      <code>$result</code>
+    </RedundantCondition>
+  </file>
+  <file src="lib/utility/encrypt-decrypt.php">
+    <FalsableReturnStatement occurrences="1">
+      <code>false</code>
+    </FalsableReturnStatement>
+    <RedundantCondition occurrences="1">
+      <code>'openssl_random_pseudo_bytes'</code>
+    </RedundantCondition>
+  </file>
+  <file src="lib/utility/escape-html.php">
+    <InvalidDocblock occurrences="1">
+      <code>[type]</code>
+    </InvalidDocblock>
+    <InvalidReturnStatement occurrences="2">
+      <code>is_object($escaper) ? $escaper-&gt;escapeHtml($input) : ""</code>
+      <code>is_object($escaper) ? $escaper-&gt;escapeHtmlAttr($input) : ""</code>
+    </InvalidReturnStatement>
+    <NullableReturnStatement occurrences="1">
+      <code>base_escape($input, $type, $escaper)</code>
+    </NullableReturnStatement>
+  </file>
+  <file src="lib/utility/form-action.php">
+    <RedundantCondition occurrences="3">
+      <code>is_array($data)</code>
+      <code>is_array($data)</code>
+      <code>is_array($data)</code>
+    </RedundantCondition>
+  </file>
+  <file src="lib/utility/form-id.php">
+    <UndefinedDocblockClass occurrences="1">
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/form-security.php">
+    <UndefinedDocblockClass occurrences="1">
+      <code>number|integer</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/format-size-unit.php">
+    <InvalidOperand occurrences="3">
+      <code>$bytes</code>
+      <code>$bytes</code>
+      <code>$bytes</code>
+    </InvalidOperand>
+  </file>
+  <file src="lib/utility/front-paginator.php">
+    <UndefinedDocblockClass occurrences="1">
+      <code>num|int</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/front-sanitizer.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>(class_exists('Sanitize')) ? new Sanitize() : ""</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>object|bool</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/generate-openapi-spec.php">
+    <MissingFile occurrences="1">
+      <code>require __DIR__ . '/../config.php'</code>
+    </MissingFile>
+  </file>
+  <file src="lib/utility/generate-token.php">
+    <InvalidParamDefault occurrences="1">
+      <code>number</code>
+    </InvalidParamDefault>
+    <UndefinedDocblockClass occurrences="1">
+      <code>number</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/get-browser-name.php">
+    <InvalidReturnStatement occurrences="1"/>
+    <InvalidReturnType occurrences="1">
+      <code>string</code>
+    </InvalidReturnType>
+    <TypeDoesNotContainType occurrences="1">
+      <code>$version == ""</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/utility/get-file-extension.php">
+    <InvalidPassByReference occurrences="1">
+      <code>explode(".", $file_name)</code>
+    </InvalidPassByReference>
+    <InvalidReturnStatement occurrences="1">
+      <code>$extension[1]</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>array</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/get-ip-address.php">
+    <InvalidOperand occurrences="1">
+      <code>$netmask</code>
+    </InvalidOperand>
+    <InvalidReturnStatement occurrences="1">
+      <code>(method_exists($ip, 'getIpAddress')) ? $ip-&gt;getIpAddress() : ""</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>void</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/get-mime.php">
+    <UndefinedDocblockClass occurrences="1">
+      <code>number|int</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/hide-email.php">
+    <InvalidArrayOffset occurrences="1">
+      <code>$key[strpos($character_set, $email[$i])]</code>
+    </InvalidArrayOffset>
+  </file>
+  <file src="lib/utility/htmlawed.php">
+    <InvalidArrayOffset occurrences="4">
+      <code>$inlineKidEleAr['del']</code>
+      <code>$inlineKidEleAr['del']</code>
+      <code>$inlineKidEleAr['ins']</code>
+      <code>$inlineKidEleAr['ins']</code>
+    </InvalidArrayOffset>
+    <InvalidLiteralArgument occurrences="1">
+      <code>' pre,script,textarea'</code>
+    </InvalidLiteralArgument>
+    <TypeDoesNotContainType occurrences="1">
+      <code>'*'</code>
+    </TypeDoesNotContainType>
+    <UndefinedVariable occurrences="2">
+      <code>$ele</code>
+      <code>$ele</code>
+    </UndefinedVariable>
+  </file>
+  <file src="lib/utility/human-login.php">
+    <UndefinedDocblockClass occurrences="2">
+      <code>integer|number</code>
+      <code>integer|number</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/import-blogspot.php">
+    <RedundantCondition occurrences="21">
+      <code>(string) $authorElement-&gt;name</code>
+      <code>(string) $cat['label']</code>
+      <code>(string) $cat['label']</code>
+      <code>(string) $cat['scheme']</code>
+      <code>(string) $cat['scheme']</code>
+      <code>(string) $cat['scheme']</code>
+      <code>(string) $cat['term']</code>
+      <code>(string) $cat['term']</code>
+      <code>(string) $cat['term']</code>
+      <code>(string) $cat['term']</code>
+      <code>(string) $contentElement['type']</code>
+      <code>(string) $l['href']</code>
+      <code>(string) $l['href']</code>
+      <code>(string) $l['rel']</code>
+      <code>(string) $l['rel']</code>
+      <code>(string) $link['href']</code>
+      <code>(string) $link['href']</code>
+      <code>(string) $link['rel']</code>
+      <code>(string) $link['rel']</code>
+      <code>(string) $this-&gt;xml-&gt;id</code>
+      <code>(string) $titleElement['type']</code>
+    </RedundantCondition>
+    <TypeDoesNotContainNull occurrences="21">
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>'text'</code>
+      <code>'text'</code>
+    </TypeDoesNotContainNull>
+  </file>
+  <file src="lib/utility/import-wordpress.php">
+    <RedundantCondition occurrences="19">
+      <code>(string) $cat</code>
+      <code>(string) $cat</code>
+      <code>(string) $cat['domain']</code>
+      <code>(string) $cat['domain']</code>
+      <code>(string) $cat['domain']</code>
+      <code>(string) $cat['nicename']</code>
+      <code>(string) $cat['nicename']</code>
+      <code>(string) $cat['nicename']</code>
+      <code>(string) $comment-&gt;comment_approved</code>
+      <code>(string) $comment-&gt;comment_author</code>
+      <code>(string) $comment-&gt;comment_author_email</code>
+      <code>(string) $comment-&gt;comment_author_ip</code>
+      <code>(string) $comment-&gt;comment_author_url</code>
+      <code>(string) $comment-&gt;comment_content</code>
+      <code>(string) $comment-&gt;comment_date</code>
+      <code>(string) $comment-&gt;comment_parent</code>
+      <code>(string) $item-&gt;link</code>
+      <code>(string) $item-&gt;pubDate</code>
+      <code>(string) $item-&gt;title</code>
+    </RedundantCondition>
+    <TypeDoesNotContainNull occurrences="19">
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>''</code>
+      <code>'0'</code>
+      <code>'1'</code>
+      <code>date('Y-m-d H:i:s')</code>
+    </TypeDoesNotContainNull>
+  </file>
+  <file src="lib/utility/invoke-audio-uploaded.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>app_url() . DS . APP_AUDIO . rawurlencode(basename($media_filename))</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>bool</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/invoke-image-uploaded.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$image_src</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>false</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/ips.php">
+    <InvalidLiteralArgument occurrences="2">
+      <code>(string)$agent</code>
+      <code>(string)$agent</code>
+    </InvalidLiteralArgument>
+    <InvalidReturnStatement occurrences="4">
+      <code>str_ends_with($haystack, $needle)</code>
+      <code>str_starts_with($haystack, $needle)</code>
+      <code>substr_compare($haystack, $needle, -strlen($needle)) === 0</code>
+      <code>substr_compare($haystack, $needle, 0, strlen($needle)) === 0</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="2">
+      <code>string</code>
+      <code>void</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/is-non-administrator.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$user_level</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/is-valid-domain.php">
+    <InvalidDocblock occurrences="1">
+      <code>function is_valid_domain($url)</code>
+    </InvalidDocblock>
+  </file>
+  <file src="lib/utility/limit-word.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>count(preg_split('~[^\p{L}\p{N}\']+~u', $str))</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>void</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/login-attempt.php">
+    <InvalidReturnStatement occurrences="6">
+      <code>db_prepared_query($sql, [$ip], "s")</code>
+      <code>db_prepared_query($sql, [$ip], "s")</code>
+      <code>db_prepared_query($sql, [$login], 's')</code>
+      <code>db_prepared_query($sql, [$login], 's')</code>
+      <code>db_prepared_query($sql, [$sign_in_count, $locked_until, $login], "iss")</code>
+      <code>db_prepared_query($sql, [$sign_in_count, $login], "is")</code>
+    </InvalidReturnStatement>
+  </file>
+  <file src="lib/utility/media-properties.php">
+    <InvalidParamDefault occurrences="1">
+      <code>string</code>
+    </InvalidParamDefault>
+  </file>
+  <file src="lib/utility/medooin.php">
+    <InvalidReturnStatement occurrences="3">
+      <code>!empty($result) ? $result[0] : null</code>
+      <code>$database-&gt;get($table, $join, $columns, $where)</code>
+      <code>null</code>
+    </InvalidReturnStatement>
+  </file>
+  <file src="lib/utility/navigation-helper.php">
+    <UndefinedDocblockClass occurrences="1">
+      <code>int|number</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/page-cache.php">
+    <RedundantCondition occurrences="1">
+      <code>APP_CACHE !== true</code>
+    </RedundantCondition>
+    <TypeDoesNotContainType occurrences="2">
+      <code>APP_CACHE === true</code>
+      <code>APP_CACHE === true</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/utility/permalinks.php">
+    <UndefinedDocblockClass occurrences="1">
+      <code>num|int</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/random-generator.php">
+    <InvalidOperand occurrences="2">
+      <code>$sec</code>
+      <code>$usec</code>
+    </InvalidOperand>
+    <UndefinedDocblockClass occurrences="3">
+      <code>number</code>
+      <code>number|integer</code>
+      <code>number|integer</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/regenerate-session.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$newid</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>void</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/remove-accents.php">
+    <InvalidReturnStatement occurrences="2">
+      <code>$transliterator-&gt;transliterate($string)</code>
+      <code>class_exists('Util') ? Util::remove_accents($string) : ""</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>void</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/remove-xss.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$filter</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/sanitize-selection-box.php">
+    <InvalidArrayAccess occurrences="10">
+      <code>$values['comment_status']</code>
+      <code>$values['media_access']</code>
+      <code>$values['media_status']</code>
+      <code>$values['media_target']</code>
+      <code>$values['menu_status']</code>
+      <code>$values['permalinks']</code>
+      <code>$values['plugin_level']</code>
+      <code>$values['post_status']</code>
+      <code>$values['topic_status']</code>
+      <code>$values['user_level']</code>
+    </InvalidArrayAccess>
+  </file>
+  <file src="lib/utility/sanitize-sql-orderby.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$orderby</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>bool | false</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/scriptlog-error.php">
+    <InvalidArgument occurrences="1">
+      <code>false</code>
+    </InvalidArgument>
+  </file>
+  <file src="lib/utility/scriptlog-verify-password.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>password_verify(base64_encode(hash('sha384', $user_input, true)), $stored)</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/simple-salt.php">
+    <UndefinedDocblockClass occurrences="1">
+      <code>int|number</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/sitemap-generator.php">
+    <InvalidArgument occurrences="1">
+      <code>$items</code>
+    </InvalidArgument>
+  </file>
+  <file src="lib/utility/strip-tags-content.php">
+    <RedundantCondition occurrences="1">
+      <code>is_array($tags)</code>
+    </RedundantCondition>
+  </file>
+  <file src="lib/utility/tagger.php">
+    <RedundantCondition occurrences="3">
+      <code>is_iterable($newarr)</code>
+      <code>is_iterable($taglink)</code>
+      <code>is_iterable($taglink)</code>
+    </RedundantCondition>
+    <TypeDoesNotContainType occurrences="3">
+      <code>array()</code>
+      <code>array()</code>
+      <code>array()</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/utility/theme-meta.php">
+    <InvalidScalarArgument occurrences="4">
+      <code>$month</code>
+      <code>$value</code>
+      <code>$value</code>
+      <code>$value</code>
+    </InvalidScalarArgument>
+    <RedundantCondition occurrences="2">
+      <code>generate_meta_tags($month_name, app_info()['site_description'], app_info()['site_name'], $scriptlog_image, $canonical)</code>
+      <code>generate_schema_org(ucfirst(trim(app_info()['site_name'] . '|' . $month . $year)), $canonical, $scriptlog_image, app_info()['site_description'], app_info()['site_keywords'], $scriptlog_imgthumb, date(DATE_ATOM))</code>
+    </RedundantCondition>
+    <TypeDoesNotContainNull occurrences="2">
+      <code>is_null($month)</code>
+      <code>is_null($month)</code>
+    </TypeDoesNotContainNull>
+  </file>
+  <file src="lib/utility/time-elapsed-string.php">
+    <InvalidPropertyAssignmentValue occurrences="1">
+      <code>$diff-&gt;d -= $w * 7</code>
+    </InvalidPropertyAssignmentValue>
+  </file>
+  <file src="lib/utility/timezone.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>$timezoneList</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>string</code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/uniqid-real.php">
+    <InvalidParamDefault occurrences="1">
+      <code>number</code>
+    </InvalidParamDefault>
+    <UndefinedDocblockClass occurrences="1">
+      <code>number</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/unparse-url.php">
+    <InvalidArrayOffset occurrences="8">
+      <code>$parsed_url['fragment']</code>
+      <code>$parsed_url['host']</code>
+      <code>$parsed_url['pass']</code>
+      <code>$parsed_url['path']</code>
+      <code>$parsed_url['port']</code>
+      <code>$parsed_url['query']</code>
+      <code>$parsed_url['scheme']</code>
+      <code>$parsed_url['user']</code>
+    </InvalidArrayOffset>
+  </file>
+  <file src="lib/utility/unreg-globals.php">
+    <RedundantCondition occurrences="2">
+      <code>is_array($_SESSION)</code>
+      <code>isset($_SESSION) &amp;&amp; is_array($_SESSION)</code>
+    </RedundantCondition>
+  </file>
+  <file src="lib/utility/upload-photo.php">
+    <InvalidNullableReturnType occurrences="1">
+      <code>false|true</code>
+    </InvalidNullableReturnType>
+    <InvalidScalarArgument occurrences="1">
+      <code>$file_size</code>
+    </InvalidScalarArgument>
+    <UndefinedDocblockClass occurrences="7">
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/user-registration.php">
+    <InvalidReturnStatement occurrences="1">
+      <code>(class_exists('UserDao')) ? new UserDao() : ""</code>
+    </InvalidReturnStatement>
+    <InvalidReturnType occurrences="1">
+      <code>object|bool</code>
+    </InvalidReturnType>
+    <UndefinedDocblockClass occurrences="3">
+      <code>int|num</code>
+      <code>int|num</code>
+      <code>int|num</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/write-ini.php">
+    <TypeDoesNotContainType occurrences="2">
+      <code>is_array($array)</code>
+      <code>is_string($file)</code>
+    </TypeDoesNotContainType>
+  </file>
+</files>

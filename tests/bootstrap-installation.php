@@ -14,11 +14,11 @@ require_once __DIR__ . '/../lib/vendor/autoload.php';
 
 // Load common.php but avoid loading utility-loader.php
 // which would load db-mysqli.php (conflicting function definitions)
-require_once __DIR__ . '/../lib/common.php';
+require_once __DIR__ . '/../src/lib/common.php';
 
 // Manually load only the installation files
-require_once __DIR__ . '/../install/include/check-engine.php';
-require_once __DIR__ . '/../install/include/setup.php';
+require_once __DIR__ . '/../src/install/include/check-engine.php';
+require_once __DIR__ . '/../src/install/include/setup.php';
 
 // Set up mock $_SERVER values
 $_SERVER['REMOTE_ADDR'] = '127.0.0.1';

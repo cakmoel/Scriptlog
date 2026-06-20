@@ -32,7 +32,7 @@ body{overflow-x:hidden;font-family:"Open Sans",sans-serif}
 .sina-nav .sina-menu>li{float:right}
 .sina-nav .sina-menu>li>a{display:block;padding:20px 15px;color:#222;font-size:14px;font-weight:700;text-transform:uppercase;text-decoration:none}
 @media (max-width:1024px){.sina-nav .sina-brand{margin-left:-35px}.sina-nav .navbar-toggle{float:left;padding:4px 10px;margin-top:12px;background:transparent;border:0;font-size:18px}}
-.main-footer{padding:50px 0;background:#222;color:#ccc}
+
 </style>
 
 <?php
