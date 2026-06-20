@@ -330,19 +330,19 @@ class ScriptlogCryptonize
             $config = require $configPath;
             $config['app']['defuse_key'] = $newKeyPath;
             $content = '<?php' . PHP_EOL . 'return ' . var_export($config, true) . ';' . PHP_EOL;
-            file_put_contents($configPath, $content);
+            @file_put_contents($configPath, $content);
         }
 
         $envPath = $rootDir . '/.env';
         if (file_exists($envPath) && is_writable($envPath)) {
-            $envContent = file_get_contents($envPath);
+            $envContent = @file_get_contents($envPath);
             $escapedPath = addslashes($newKeyPath);
             $envContent = preg_replace(
                 '/^DEFUSE_KEY_PATH=.*$/m',
                 'DEFUSE_KEY_PATH=' . $escapedPath,
                 $envContent
             );
-            file_put_contents($envPath, $envContent);
+            @file_put_contents($envPath, $envContent);
         }
     }
 
@@ -550,7 +550,7 @@ class ScriptlogCryptonize
         $newKeyFile = $keyDir . '/' . $filename . '.php';
 
         $phpContent = "<?php\n// Encryption key generated on " . date('Y-m-d H:i:s') . "\n// Do not delete or modify this file\nreturn '" . addslashes($keyAscii) . "';";
-        file_put_contents($newKeyFile, $phpContent);
+        @file_put_contents($newKeyFile, $phpContent);
         @chmod($newKeyFile, 0644);
 
         return $newKeyFile;

@@ -2,8 +2,8 @@
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../../lib/utility/download-handler.php';
-require_once __DIR__ . '/../../lib/utility/download-settings.php';
+require_once __DIR__ . '/../../src/lib/utility/download-handler.php';
+require_once __DIR__ . '/../../src/lib/utility/download-settings.php';
 
 class DownloadServiceTest extends TestCase
 {

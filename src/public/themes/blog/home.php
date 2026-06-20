@@ -281,6 +281,7 @@ endif;
 
 <!-- Gallery Section -->
 <section class="gallery no-padding">
+    <div class="container-fluid px-0">
     <div class="row">
 
         <?php
@@ -338,4 +339,5 @@ endif;
         endif;
         ?>
     </div>
+</div>
 </section>
