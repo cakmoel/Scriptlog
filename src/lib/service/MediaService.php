@@ -310,7 +310,7 @@ class MediaService
      * Grab all media
      * retrieve all media records
      *
-     * @param integer $orderBy
+     * @param string $orderBy
      *
      */
     public function grabAllMedia($orderBy = 'ID', $user_level = null)

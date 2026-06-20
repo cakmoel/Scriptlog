@@ -39,11 +39,19 @@ class Dispatcher
     private $theme_dir;
 
     /**
+     * ThemeRenderer instance for centralized theme rendering
+     *
+     * @var ThemeRenderer|null
+     */
+    private ?ThemeRenderer $themeRenderer = null;
+
+    /**
      * Constructor
      * Registry route and Initialize an instantiate of theme
      */
-    public function __construct()
+    public function __construct(?ThemeRenderer $themeRenderer = null)
     {
+        $this->themeRenderer = $themeRenderer;
 
         if (Registry::isKeySet('route')) {
             $this->route = Registry::get('route');
@@ -81,16 +89,25 @@ class Dispatcher
 
             // Check if it's a file download request
             if (strpos($_SERVER['REQUEST_URI'], '/file') !== false) {
-                $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
-                $downloadController->download($downloadIdentifier);
+                $downloadController = class_exists('Registry') ? Registry::get('downloadController') : null;
+                if ($downloadController instanceof DownloadController) {
+                    $downloadController->download($downloadIdentifier);
+                } else {
+                    $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
+                    $downloadController->download($downloadIdentifier);
+                }
                 return;
             } else {
                 // Pass identifier to template via global variable
                 $GLOBALS['download_identifier'] = $downloadIdentifier;
-                http_response_code(200);
-                call_theme_header();
-                call_theme_content('download');
-                call_theme_footer();
+                if ($this->themeRenderer) {
+                    $this->themeRenderer->render('download');
+                } else {
+                    http_response_code(200);
+                    call_theme_header();
+                    call_theme_content('download');
+                    call_theme_footer();
+                }
                 return;
             }
         }
@@ -303,6 +320,10 @@ class Dispatcher
      */
     private function renderTheme($template)
     {
+        if ($this->themeRenderer) {
+            $this->themeRenderer->render($template);
+            return;
+        }
         http_response_code(200);
         call_theme_header();
         call_theme_content($template);
@@ -333,6 +354,10 @@ class Dispatcher
     */
     private function errorNotFound()
     {
+        if ($this->themeRenderer) {
+            $this->themeRenderer->render404();
+            return;
+        }
         http_response_code(404);
         include $this->theme_dir . 'header.php';
         include $this->theme_dir . '404.php';

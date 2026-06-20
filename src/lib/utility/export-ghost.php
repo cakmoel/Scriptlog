@@ -231,7 +231,7 @@ class GhostExporter
         $where[] = 'post_status = ?';
         $params[] = 'publish';
 
-        $whereClause = empty($where) ? '' : 'WHERE ' . implode(' AND ', $where);
+        $whereClause = 'WHERE ' . implode(' AND ', $where);
 
         $sql = "SELECT p.*, u.user_login, u.user_fullname 
                 FROM tbl_posts p 
@@ -274,7 +274,7 @@ class GhostExporter
         $where[] = 'post_status = ?';
         $params[] = 'publish';
 
-        $whereClause = empty($where) ? '' : 'WHERE ' . implode(' AND ', $where);
+        $whereClause = 'WHERE ' . implode(' AND ', $where);
 
         $sql = "SELECT p.*, u.user_login, u.user_fullname 
                 FROM tbl_posts p 

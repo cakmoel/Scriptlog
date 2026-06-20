@@ -30,7 +30,7 @@ if (function_exists('featured_post')) :
                 </a>
             </div>
             <a <?= (!empty($featured_hero_id)) ? 'href=".intro"' : 'href="#intro"'; ?> class="continue link-scroll"
-                title="<?= t('home.hero.scroll_down'); ?>"><i class="fa fa-long-arrow-down" aria-hidden="true"></i>
+                title="<?= t('home.hero.scroll_down'); ?>" aria-label="<?= t('home.hero.scroll_down'); ?>"><i class="fa fa-long-arrow-down" aria-hidden="true"></i>
                 <?= t('home.hero.scroll_down'); ?>
             </a>
         </div>
@@ -279,19 +279,9 @@ endif;
 
 </section>
 
-<!-- Newsletter Section -->
-<section class="newsletter no-padding-top">
-    <div class="container">
-
-        <div class="row">
-
-        </div>
-
-    </div>
-</section>
-
 <!-- Gallery Section -->
 <section class="gallery no-padding">
+    <div class="container-fluid px-0">
     <div class="row">
 
         <?php
@@ -319,28 +309,28 @@ endif;
             ?>
         <div class="mix col-lg-3 col-md-3 col-sm-6">
             <div class="item"><a href="https://picsum.photos/640/450" data-fancybox="gallery" class="image">
-                    <img src="https://picsum.photos/640/450" alt="This is a gallery" class="img-fluid">
+                    <img src="https://picsum.photos/640/450" alt="Sample gallery image" class="img-fluid" loading="lazy" decoding="async">
                     <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"
                             aria-hidden="true"></i></div>
                 </a></div>
         </div>
         <div class="mix col-lg-3 col-md-3 col-sm-6">
             <div class="item"><a href="https://picsum.photos/640/450" data-fancybox="gallery" class="image">
-                    <img src="https://picsum.photos/640/450" alt="This is a gallery" class="img-fluid">
+                    <img src="https://picsum.photos/640/450" alt="Sample gallery image" class="img-fluid" loading="lazy" decoding="async">
                     <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"
                             aria-hidden="true"></i></div>
                 </a></div>
         </div>
         <div class="mix col-lg-3 col-md-3 col-sm-6">
             <div class="item"><a href="https://picsum.photos/640/450" data-fancybox="gallery" class="image">
-                    <img src="https://picsum.photos/640/450" alt="" class="img-fluid">
+                    <img src="https://picsum.photos/640/450" alt="Sample gallery image" class="img-fluid" loading="lazy" decoding="async">
                     <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"
                             aria-hidden="true"></i></div>
                 </a></div>
         </div>
         <div class="mix col-lg-3 col-md-3 col-sm-6">
             <div class="item"><a href="https://picsum.photos/640/450" data-fancybox="gallery" class="image">
-                    <img src="https://picsum.photos/640/450" alt="" class="img-fluid">
+                    <img src="https://picsum.photos/640/450" alt="Sample gallery image" class="img-fluid" loading="lazy" decoding="async">
                     <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"
                             aria-hidden="true"></i></div>
                 </a></div>
@@ -349,4 +339,5 @@ endif;
         endif;
         ?>
     </div>
+</div>
 </section>

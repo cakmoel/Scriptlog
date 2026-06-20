@@ -27,7 +27,7 @@ function reset_password($recipient, $reset_key)
             </body></html>";
 
     // Define Headers
-    $email_headers = 'From ' . $sanitize_sender . "\r\n" .
+    $email_headers = 'From: ' . $sanitize_sender . "\r\n" .
                      'Reply-To: ' . $sanitize_sender . "\r\n" .
                      'Return-Path: ' . $sanitize_sender . "\r\n" .
                      'MIME-Version: 1.0' . "\r\n" .
@@ -62,16 +62,14 @@ function recover_password($user_pass, $user_email)
     $subject = "Password Changed";
     $content = "<html><body>
                Your password has been changed.<br />
-               Here is your new password: <br /><br />
-               <b>Password:</b>{$user_pass}<br />
-               You can now login with your new password, by clicking the link below: <br />
+               You can now login with your new password by clicking the link below: <br />
                <a href={$app_url}" . APP_ADMIN . "/login.php><b>Login</b></a><br /><br />
                Thank You, <br />
                <b>{$site_name}</b>
                </body></html>";
 
     // Define Headers
-    $email_headers = 'From ' . $sanitize_sender . "\r\n" .
+    $email_headers = 'From: ' . $sanitize_sender . "\r\n" .
                      'Reply-To: ' . $sanitize_sender . "\r\n" .
                      'Return-Path: ' . $sanitize_sender . "\r\n" .
                      'MIME-Version: 1.0' . "\r\n" .

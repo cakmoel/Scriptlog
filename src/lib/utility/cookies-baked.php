@@ -107,7 +107,7 @@ function set_cookies_path()
  * @see https://stackoverflow.com/questions/1354999/keep-me-logged-in-the-best-approach/17266448#17266448
  * @param string $name
  * @param string $value
- * @param string $expire
+ * @param int $expire
  * @param string $path
  * @param string $domain
  * @param bool $secure
@@ -116,7 +116,7 @@ function set_cookies_path()
  * @return bool
  *
  */
-function set_cookies_scl($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite = "Strict")
+function set_cookies_scl(string $name, string $value, int $expire, string $path, string $domain, bool $secure, bool $httponly, string $samesite = "Strict"): bool
 {
 
     if (PHP_VERSION_ID <= 70300) {

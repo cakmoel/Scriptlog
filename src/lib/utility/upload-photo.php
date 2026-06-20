@@ -36,7 +36,7 @@ function photo_instance()
  * @param string $file_size
  * @param string $file_type
  * @param string $file_name
- * @return void
+ * @return false|void
  *
  */
 function upload_photo($file_location, $file_size, $file_type, $file_name)
@@ -87,7 +87,7 @@ function upload_photo($file_location, $file_size, $file_type, $file_name)
             break;
     }
 
-    list($current_width, $current_height) = isset($temp_src) ? getimagesize($temp_src) : "";
+    list($current_width, $current_height) = getimagesize($temp_src);
 
     // construct new name
     $large_thumb_name = 'large_' . $img_name;
@@ -111,6 +111,10 @@ function upload_photo($file_location, $file_size, $file_type, $file_name)
     $large_path_uploaded = $large_path . $large_thumb_name;
 
     if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exists('finfo'))) {
+        if (!$img_source) {
+            return false;
+        }
+
         if (resize_image($current_width, $current_height, $medium_size, $medium_path_uploaded, $img_source, 80, $file_type)) {
             if (!crop_image($current_width, $current_height, $small_size, $small_path_uploaded, $img_source, 80, $file_type)) {
                 scriptlog_error("Error Creating small size of thumbnail!");

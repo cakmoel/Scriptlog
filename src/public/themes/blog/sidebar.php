@@ -5,13 +5,14 @@
     <header>
       <h3 class="h6"><?= t('sidebar.search.title'); ?></h3>
     </header>
-    <form action="#" class="search-form" id="ajax-search-form">
+    <form action="#" class="search-form" id="ajax-search-form" role="search" aria-label="<?= t('sidebar.search.title'); ?>">
       <div class="form-group">
-        <input type="search" id="search-keyword" name="search" placeholder="<?= t('sidebar.search.placeholder'); ?>" autocomplete="off">
-        <button type="submit" class="submit"><i class="icon-search"></i></button>
+        <label for="search-keyword" class="sr-only"><?= t('sidebar.search.placeholder'); ?></label>
+        <input type="search" id="search-keyword" name="search" placeholder="<?= t('sidebar.search.placeholder'); ?>" autocomplete="off" aria-describedby="search-results">
+        <button type="submit" class="submit" aria-label="<?= t('sidebar.search.submit'); ?>"><i class="icon-search" aria-hidden="true"></i></button>
       </div>
-      <div id="search-results" class="search-results"></div>
-      <div id="search-error" class="search-error"></div>
+      <div id="search-results" class="search-results" aria-live="polite" aria-atomic="true"></div>
+      <div id="search-error" class="search-error" aria-live="assertive"></div>
       <input type="hidden" id="search-csrf" name="csrf" value="<?= block_csrf(); ?>">
     </form>
   </div>

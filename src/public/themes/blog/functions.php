@@ -629,7 +629,7 @@ function retrieves_topic_prepared($id)
 
     while ($item = $items->fetch()) {
         $permalinks = ((function_exists('rewrite_status')) && (rewrite_status() === 'yes') ? permalinks($item['topic_slug'])['cat'] : permalinks($item['ID'])['cat']);
-        $topics[] = "<a href='" . $permalinks . "'>" . $item['topic_title'] . "</a>";
+        $topics[] = "<a href='" . $permalinks . "'>" . escape_html($item['topic_title']) . "</a>";
     }
 
     return implode("", $topics ?? []);
@@ -947,15 +947,6 @@ function retrieve_site_url()
 }
 
 /**
- * load_more_comments()
- */
-if (!function_exists('load_more_comments')) {
-function load_more_comments()
-{
-}
-}
-
-/**
  * nothing_found() - Display "no posts" message
  */
 if (!function_exists('nothing_found')) {
@@ -1034,12 +1025,14 @@ function get_download_page_data($identifier)
         return ['error' => 'Invalid download identifier'];
     }
     
-    if (!class_exists('DownloadController') || !class_exists('DownloadService') || !class_exists('DownloadModel') || !class_exists('MediaDao')) {
-        return ['error' => 'Download system not available'];
-    }
-    
     try {
-        $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
+        $downloadController = class_exists('Registry') ? Registry::get('downloadController') : null;
+        if (!$downloadController instanceof DownloadController) {
+            if (!class_exists('DownloadService') || !class_exists('DownloadModel') || !class_exists('MediaDao')) {
+                return ['error' => 'Download system not available'];
+            }
+            $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
+        }
         return $downloadController->getDownloadPage($identifier);
     } catch (Exception $e) {
         error_log('Download page error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());

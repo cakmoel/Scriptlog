@@ -20,7 +20,7 @@ function write_nginx_config($permalink_status, $user_level, $data)
 
     clearstatcache();
 
-    $privilege = (isset($user_level)) ? user_privilege() : "";
+    $privilege = user_privilege();
 
     if ($privilege === 'administrator' || $privilege === 'manager') {
         $file_path = dirname(__FILE__, 3) . '/nginx-rewrites.conf';

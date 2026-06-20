@@ -85,10 +85,11 @@ function db_build_where($where)
             $placeholders = implode(', ', array_fill(0, count($value), '?'));
             $conditions[] = "`{$key}` IN ({$placeholders})";
             $params = array_merge($params, array_values($value));
-        } elseif (strpos($key, '>') !== false || strpos($key, '<') !== false || strpos($key, '!') !== false) {
-            // Handle operators: 'column>' => value, 'column<' => value, 'column!' => value
-            $op = '';
-            if (strpos($key, '>=') !== false) {
+            } elseif (strpos($key, '>') !== false || strpos($key, '<') !== false || strpos($key, '!') !== false) {
+                // Handle operators: 'column>' => value, 'column<' => value, 'column!' => value
+                $op = '';
+                $col = '';
+                if (strpos($key, '>=') !== false) {
                 $col = str_replace('>=', '', $key);
                 $op = '>=';
             } elseif (strpos($key, '<=') !== false) {
@@ -120,7 +121,7 @@ function db_build_where($where)
         }
     }
 
-    $sql = !empty($conditions) ? ' WHERE ' . implode(' AND ', $conditions) : '';
+    $sql = ' WHERE ' . implode(' AND ', $conditions);
     return ['sql' => $sql, 'params' => $params];
 }
 

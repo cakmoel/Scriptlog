@@ -49,15 +49,18 @@ class View
     public function __construct($eventPath, $uiPath, $modulePath = null, $file = null)
     {
 
+        $moduleDir = ($modulePath ?? '') . DS;
+
         // make sure event path for administrator in admin folder
         if ($eventPath == 'admin') {
-            $this->dir = APP_ROOT . APP_ADMIN . DS . $uiPath . DS . $modulePath . DS;
+            $this->dir = APP_ROOT . APP_ADMIN . DS . $uiPath . DS . $moduleDir;
         }
 
         // make sure event path for common weblog visitor in active theme folder
         if ($eventPath == 'public') {
-            if (is_dir(APP_ROOT . APP_THEME . $uiPath . DS . $modulePath . DS) && file_exists(APP_ROOT . APP_THEME . $uiPath . DS . $modulePath . DS)) {
-                $this->dir = APP_ROOT . APP_THEME . $uiPath . DS . $modulePath . DS;
+            $checkDir = APP_ROOT . APP_THEME . $uiPath . DS . $moduleDir;
+            if ($modulePath && is_dir($checkDir) && file_exists($checkDir)) {
+                $this->dir = $checkDir;
             } else {
                 $this->dir = APP_ROOT . APP_THEME . $uiPath . DS;
             }

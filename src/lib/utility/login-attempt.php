@@ -26,7 +26,7 @@ function get_login_attempt($ip)
  * create_login_attempt()
  *
  * @param string $ip
- * @return void
+ * @return object
  *
  */
 function create_login_attempt($ip)
@@ -39,7 +39,7 @@ function create_login_attempt($ip)
  * Delete login attempt()
  *
  * @param string $ip
- * @return void
+ * @return object
  *
  */
 function delete_login_attempt($ip)
@@ -76,7 +76,7 @@ function get_user_signin($user_login)
  *
  * @param int|numeric $sign_in_count
  * @param string $login
- * @return void
+ * @return object
  *
  */
 function sign_in_count($sign_in_count, $login)
@@ -96,7 +96,7 @@ function sign_in_count($sign_in_count, $login)
  * @param int|numeric $sign_in_count
  * @param string $locked_until
  * @param string $login
- * @return void
+ * @return object
  *
  */
 function locked_down_until($sign_in_count, $locked_until, $login)
@@ -114,7 +114,7 @@ function locked_down_until($sign_in_count, $locked_until, $login)
  * signin_count_to_zero()
  *
  * @param string $login
- * @return void
+ * @return object
  *
  */
 function signin_count_to_zero($login)
@@ -132,7 +132,7 @@ function signin_count_to_zero($login)
  * locked_down_to_null()
  *
  * @param string $login
- * @return void
+ * @return object
  *
  */
 function locked_down_to_null($login)

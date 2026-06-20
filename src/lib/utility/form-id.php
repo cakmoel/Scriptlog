@@ -8,7 +8,7 @@
  * @category function
  * @author M.Noermoehammad
  * @param string|null $type
- * @return int|num
+ * @return int
  */
 function form_id($type = null)
 {

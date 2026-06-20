@@ -2,7 +2,7 @@
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
- * Class DownloadHandler
+ * Class DownloadUtility
  *
  * Core utility class for handling file downloads
  *
@@ -13,7 +13,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since    Since Release 1.0
  *
  */
-class DownloadHandler
+class DownloadUtility
 {
     public const CHUNK_SIZE = 8192;
     public const DEFAULT_EXPIRY = 28800;

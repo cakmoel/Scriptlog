@@ -4,7 +4,7 @@
  * Generate Hash Function
  *
  * @category Function
- * @param string $quantityChar
+ * @param int $quantityChar
  * @return NULL|string
  */
 function generate_hash($quantityChar)
