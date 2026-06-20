@@ -25,7 +25,7 @@ if (!empty($archives)) {
 
 <div class="container">
     <div class="row">
-        <main class="posts-listing col-lg-8">
+        <div class="posts-listing col-lg-8">
             <div class="container">
                 <div class="row">
                     <div class="col-12">
@@ -60,7 +60,7 @@ if (!empty($archives)) {
 
                 </div>
             </div>
-        </main>
+        </div>
 
         <?php
           include dirname(__FILE__) . '/sidebar.php';

@@ -27,8 +27,8 @@ class MediaDaoIntegrationTest extends TestCase
                 [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
             );
             
-            require_once __DIR__ . '/../../lib/core/Dao.php';
-            require_once __DIR__ . '/../../lib/dao/MediaDao.php';
+            require_once __DIR__ . '/../../src/lib/core/Dao.php';
+            require_once __DIR__ . '/../../src/lib/dao/MediaDao.php';
             
             self::$dao = new MediaDao();
             self::cleanupTestData();
