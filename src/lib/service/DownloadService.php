@@ -34,7 +34,7 @@ class DownloadService
      */
     public function validateDownloadRequest($identifier)
     {
-        if (!DownloadHandler::validateDownloadRequest($identifier)) {
+        if (!DownloadUtility::validateDownloadRequest($identifier)) {
             return null;
         }
 
@@ -83,7 +83,7 @@ class DownloadService
             return true;
         }
 
-        return DownloadHandler::isExpired($downloadInfo['before_expired']);
+        return DownloadUtility::isExpired($downloadInfo['before_expired']);
     }
 
     /**
@@ -94,7 +94,7 @@ class DownloadService
      */
     public function isMimeTypeAllowed($mimeType)
     {
-        return DownloadHandler::isMimeTypeAllowed($mimeType);
+        return DownloadUtility::isMimeTypeAllowed($mimeType);
     }
 
     /**

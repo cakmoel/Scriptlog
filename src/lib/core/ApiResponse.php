@@ -14,6 +14,9 @@
  * @since     Since Release 1.0
  *
  */
+
+defined('API_VERSION') || define('API_VERSION', 'v1');
+
 class ApiResponse
 {
     /**

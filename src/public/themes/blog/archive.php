@@ -48,7 +48,7 @@ $pagination = !empty($archives) && isset($archives['paginationLink']) ? $archive
 <div class="container">
     <div class="row">
         <!-- Latest Posts -->
-        <main class="posts-listing col-lg-8">
+        <div class="posts-listing col-lg-8">
             <div class="container">
                 <div class="row">
                     <!-- post -->
@@ -97,14 +97,14 @@ $pagination = !empty($archives) && isset($archives['paginationLink']) ? $archive
 
                 <!-- Pagination -->
                 <?php if (!empty($pagination)) : ?>
-                <nav aria-label="Page navigation example">
+                <nav aria-label="<?= t('pagination.navigation'); ?>">
                     <ul class="pagination pagination-template d-flex justify-content-center">
                         <?= $pagination; ?>
                     </ul>
                 </nav>
                 <?php endif; ?>
             </div>
-        </main>
+        </div>
 
         <?php
           include dirname(__FILE__) . '/sidebar.php';

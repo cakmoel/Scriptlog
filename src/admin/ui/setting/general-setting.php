@@ -29,7 +29,7 @@ if (isset($errors)) :
 <h2><i class="icon fa fa-warning" aria-hidden="true"></i> Invalid Form Data!</h2>
     <?php
     foreach ($errors as $e) :
-        echo '<p>' . $e . '</p>';
+        echo '<p>' . safe_html($e) . '</p>';
     endforeach;
     ?>
 </div>
@@ -46,7 +46,7 @@ if (isset($status)) :
     
     <?php
     foreach ($status as $s) :
-        echo $s;
+        echo safe_html($s);
     endforeach;
     ?>
     

@@ -30,7 +30,7 @@
                 <h4><i class="icon fa fa-ban"></i> Alert!</h4>
                 <?php
                 foreach ($errors as $e) :
-                    echo $e;
+                    echo safe_html($e);
                 endforeach;
                 ?>
           </div>
@@ -46,7 +46,7 @@
                 <h2><i class="icon fa fa-check"></i> Success!</h2>
                        <?php
                         foreach ($status as $s) :
-                            echo $s;
+                            echo safe_html($s);
                         endforeach;
                         ?>
           </div>

@@ -14,9 +14,11 @@
 function delete_directory($dirname)
 {
 
-    if (is_dir($dirname)) {
-        $dir_handle = opendir($dirname);
+    if (!is_dir($dirname)) {
+        return false;
     }
+
+    $dir_handle = opendir($dirname);
 
     if (!$dir_handle) {
         return false;
