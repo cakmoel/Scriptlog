@@ -16,7 +16,7 @@ class ImageDisplayTest extends TestCase
     protected function setUp(): void
     {
         // Load all utilities via utility-loader
-        require_once '/var/www/blogware/public_html/lib/utility-loader.php';
+        require_once __DIR__ . '/../../src/lib/utility-loader.php';
         
         // Initialize database connection for tests that need it
         if (class_exists('Registry') && !Registry::get('dbc') && function_exists('set_test_database_connection')) {

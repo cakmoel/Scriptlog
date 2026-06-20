@@ -22,8 +22,8 @@ class GenerateOpenApiSpecTest extends PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->baseDir = dirname(__DIR__) . '/..';
-        $this->utilityFile = $this->baseDir . '/lib/utility/generate-openapi-spec.php';
-        $this->openapiFile = $this->baseDir . '/openapi.json';
+        $this->utilityFile = $this->baseDir . '/src/lib/utility/generate-openapi-spec.php';
+        $this->openapiFile = $this->baseDir . '/src/openapi.json';
     }
 
     public function testUtilityFileExists(): void
@@ -138,7 +138,7 @@ class GenerateOpenApiSpecTest extends PHPUnit\Framework\TestCase
 
     public function testLogoPathUsesExistingFile(): void
     {
-        $picturesDir = $this->baseDir . '/public/files/pictures';
+        $picturesDir = $this->baseDir . '/src/public/files/pictures';
         $this->assertDirectoryExists($picturesDir);
 
         $files = scandir($picturesDir);
@@ -163,7 +163,7 @@ class GenerateOpenApiSpecTest extends PHPUnit\Framework\TestCase
     {
         $expectedPath = 'scriptlog-1200x630.jpg';
 
-        $picturesDir = $this->baseDir . '/public/files/pictures';
+        $picturesDir = $this->baseDir . '/src/public/files/pictures';
         $fileExists = file_exists($picturesDir . '/' . $expectedPath);
 
         $this->assertTrue($fileExists, 'Generated logo path should match existing file');
