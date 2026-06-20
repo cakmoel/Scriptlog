@@ -416,13 +416,13 @@ class BootstrapTest extends TestCase
         }
     }
 
-    public function testAppContextReturnsNullForMissingService(): void
+    public function testAppContextReturnsSessionMaker(): void
     {
         $this->createValidConfig();
         
         $result = Bootstrap::initialize($this->testDir . '/');
         
-        $this->assertNull($result->sessionMaker);
+        $this->assertInstanceOf(SessionMaker::class, $result->sessionMaker);
     }
 
     public function testBootstrapHandlesEmptyDbPrefix(): void

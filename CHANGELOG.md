@@ -8,12 +8,106 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#108---2026-05-14)
+- [Latest Release](#121---2026-06-16)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.2.1] - 2026-06-16
+
+### Added
+- **CSS design tokens**: Custom properties for colors, spacing, and typography in the blog theme
+- **Dark mode support**: Full theme support via `prefers-color-scheme: dark` media query
+- **Responsive improvements**: Enhanced layout adaptability for mobile, tablet, and desktop viewports
+
+### Changed
+- Blog theme templates: replaced `<main>` with `<div>` for semantic consistency across 8 templates (archive, archives, blog, category, page, single, tag, homepage)
+- Improved header navigation with better layout and accessibility
+- Enhanced footer template layout
+- Updated homepage template
+- Minified `style.sea.css` asset
+- Updated test bootstrap and file paths to match project structure
+
+### Fixed
+- PHPUnit binary path corrected from `vendor/bin/phpunit` to `lib/vendor/bin/phpunit` in CI workflow
+- Added `workflow_dispatch` trigger to CI workflow for manual test runs
+- Fixed stale tastybites theme test files (theme was previously removed)
+- Corrected test file paths from `../../lib/` to `../../src/lib/` project-wide
+
+### Removed
+- Stale test files for deleted `tastybites` theme (4 files)
+
+### Notes
+Minor release focused on theme modernization with CSS design tokens, dark mode support, responsive improvements, and CI/test infrastructure cleanup. This version re-releases the same content as v1.2.0 under a new tag to avoid the upstream tag mutation lock on Packagist.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.1.0
+- **Changes since v1.1.0**: 18 commits
+
+---
+
+## [1.1.0] - 2026-06-13
+
+### Added
+- **Handler system**: New front-end request handling pipeline with dedicated handlers for each content type (`ArchiveHandler`, `BlogHandler`, `CategoryHandler`, `DownloadHandler`, `FrontRequestHandler`, `HomeHandler`, `PageHandler`, `PostHandler`, `PrivacyHandler`, `TagHandler`) and a central `HandlerRegistry`
+- **FrontService**: New service layer for front-end content retrieval and rendering
+- **ThemeRenderer**: New core class for theme rendering
+- **CSRF/XSS protection**: Comprehensive protection added across all admin UI templates (comments, downloads, export, import, media library, pages, plugins, posts, privacy, settings, users)
+- **Blog theme improvements**: Enhanced header navigation, footer layout, single post view, download handling, sidebar, and 404 page
+- **Bootstrap hardening**: Improved error handling, null safety, and graceful failure when database credentials are missing
+- **Session management**: Enhanced `SessionMaker` with improved session handling and security
+- **Dispatcher refactoring**: URL routing and content validation improvements with canonical URL enforcement
+- **FrontHelper enhancements**: Improved front-end content retrieval methods
+- **HandleRequest upgrades**: Comprehensive query string handling and 404 management
+- **Test suite expansion**: 25+ new test files covering handlers, services, download features, integration tests, and smoke tests
+- **Test infrastructure**: New `tests/core/`, `tests/smoke/`, and `tests/unit/handlers/` test directories
+- **Psalm static analysis**: Configuration files (`psalm.xml`, `psalm-baseline.xml`, `psalm-autoload.php`) for improved code quality enforcement
+
+### Changed
+- Updated `composer.json` and `composer.lock` dependencies
+- Revamped blog theme files (`404.php`, `footer.php`, `functions.php`, `header.php`, `home.php`, `sidebar.php`, `download_file.php`, `load-comment.min.js`)
+- Updated all admin UI templates with modernized markup and security hardening
+- Updated all controllers, DAOs, services, and utility functions for PHP 8.x compatibility
+- Updated `Bootstrap.php`, `Dispatcher.php`, `HandleRequest.php`, `FrontHelper.php`, `SessionMaker.php` with significant improvements
+- Enhanced `DbMySQLi.php` for PDO/mysqli compatibility
+- Updated documentation files
+
+### Fixed
+- Resolved PHP 8.x compatibility issues across the codebase
+- Fixed null safety in utility functions and controllers
+- Fixed PDO/mysqli compatibility in database access layer
+- Corrected argument order in configuration write function
+- Fixed table prefix handling in Medoo integration
+- Resolved various edge cases in post editing and protected post handling
+- Fixed `total_comment()` null safety in `single.php` to prevent array access on falsy return
+- Removed empty `load_more_comments()` function stub from blog theme `functions.php`
+- **Test infrastructure**: Corrected 30+ test file paths from `../../lib/` to `../../src/lib/` to match project structure
+- **CI workflow**: Fixed `phpunit` binary path from `vendor/bin/phpunit` to `lib/vendor/bin/phpunit` and added `workflow_dispatch` trigger
+- Removed stale tastybites theme test files (theme was previously removed)
+- Fixed `InstallationTest.php`, `DownloadHandlerTest.php`, `ConfigFileGenerationTest.php`, `OpenApiSpecVerificationTest.php` test logic
+- Updated `.gitignore` to exclude `lib/vendor/` directory
+
+### Removed
+- Unused CSS from blog theme (`custom.css` trimmed by 269 lines)
+- Deprecated code and unused utility files
+- Stale test files for deleted `tastybites` theme (4 files)
+
+### Notes
+Minor release introducing a new handler-based front-end architecture, comprehensive CSRF/XSS protection, significant test suite expansion, theme improvements, test infrastructure fixes, and numerous stability improvements across the entire codebase.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia. This remarkable bird, known for its distinctive bony casque and unique reproductive strategy, is one of the world's most fascinating creatures. Maleos are monogamous pairs that dig deep pits in which a single egg is laid—incubated by geothermal heat at inland forested sites or by the sun at beach nesting grounds. The chicks hatch fully feathered and immediately fly into the forest, independent from birth. With population declined by over 90% since the 1950s and fewer than 10,000 individuals remaining, the maleo is listed as Critically Endangered on the IUCN Red List and protected under CITES Appendix I. Major threats include over-harvesting of eggs, habitat destruction, and predation by introduced species. Conservation efforts by the Wildlife Conservation Society (WCS) Indonesia and the Alliance for Tompotika Conservation have released over 10,000 chicks into the wild since 2001, working to protect nesting grounds and establish semi-natural hatcheries.
+
+### Comparison
+- **Previous release**: v1.0.8
+- **Changes since v1.0.8**: 300 commits
+
+---
 
 ## [1.0.8] - 2026-05-14
 
@@ -263,6 +357,8 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.2.1 | 2026-06-16 | Stable |
+| 1.1.0 | 2026-06-13 | Stable |
 | 1.0.8 | 2026-05-14 | Stable |
 | 1.0.7 | 2026-05-02 | Stable |
 | 1.0.6 | 2026-05-01 | Stable |

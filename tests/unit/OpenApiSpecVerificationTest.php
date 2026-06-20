@@ -27,9 +27,9 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->baseDir = dirname(__DIR__) . '/..';
-        $this->yamlFile = $this->baseDir . '/dev-docs/API_OPENAPI.yaml';
-        $this->jsonFile = $this->baseDir . '/dev-docs/API_OPENAPI.json';
-        $this->apiIndexFile = $this->baseDir . '/api/index.php';
+        $this->yamlFile = $this->baseDir . '/src/docs/API_OPENAPI.yaml';
+        $this->jsonFile = $this->baseDir . '/src/docs/API_OPENAPI.json';
+        $this->apiIndexFile = $this->baseDir . '/src/api/index.php';
 
         $this->loadSpecs();
     }

@@ -8,7 +8,7 @@
  * @version 1.0
  */
 
-require_once __DIR__ . '/../../lib/utility/scriptlog-password.php';
+require_once __DIR__ . '/../../src/lib/utility/scriptlog-password.php';
 
 use PHPUnit\Framework\TestCase;
 

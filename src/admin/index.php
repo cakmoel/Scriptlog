@@ -106,7 +106,7 @@ if (!$loggedIn) {
 
     include dirname(__FILE__) . DS . 'sidebar-nav.php';
 
-    echo sidebar_navigation($breadcrumb, $current_url, $user_id, $user_session);
+    sidebar_navigation($breadcrumb, $current_url, $user_id, $user_session);
 
     require dirname(__FILE__) . DS . 'request.php';
 

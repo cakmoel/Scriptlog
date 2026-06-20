@@ -28,8 +28,8 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
             );
             
             // Load required classes
-            require_once __DIR__ . '/../../lib/core/Dao.php';
-            require_once __DIR__ . '/../../lib/dao/PrivacyPolicyDao.php';
+            require_once __DIR__ . '/../../src/lib/core/Dao.php';
+            require_once __DIR__ . '/../../src/lib/dao/PrivacyPolicyDao.php';
             
             // Initialize DAO
             self::$dao = new PrivacyPolicyDao();

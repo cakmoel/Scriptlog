@@ -8,11 +8,23 @@ use PHPUnit\Framework\TestCase;
  * Tests installation utility functions from install/include/setup.php
  * Following PHPUnit best practices: Arrange-Act-Assert pattern
  * 
- * Note: Uses dedicated bootstrap-installation.php to avoid
- * function redeclaration conflicts with lib/utility/db-mysqli.php
+ * IMPORTANT: This test requires loading setup.php which has functions
+ * that conflict with the main bootstrap. It must be run with a dedicated
+ * bootstrap, not as part of the standard Unit Tests suite.
+ * See: phpunit-installation.xml
  */
 class InstallationTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        if (!function_exists('generate_random_key_filename')) {
+            $this->markTestSkipped(
+                'InstallationTest requires dedicated bootstrap. ' .
+                'Run: phpunit --bootstrap tests/bootstrap-installation.php tests/unit/InstallationTest.php'
+            );
+        }
+    }
+
     /**
      * Test that generate_random_key_filename returns a string
      * and follows the expected pattern (16 chars + .php)
@@ -396,7 +408,7 @@ class InstallationTest extends TestCase
     public function testSetupFileHasNoSyntaxErrors(): void
     {
         // Arrange
-        $setupFile = __DIR__ . '/../../install/include/setup.php';
+        $setupFile = __DIR__ . '/../../src/install/include/setup.php';
 
         // Act
         $output = [];
