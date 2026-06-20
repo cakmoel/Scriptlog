@@ -31,13 +31,13 @@ class TranslationServiceIntegrationTest extends TestCase
             );
             
             // Load required classes
-            require_once __DIR__ . '/../../lib/core/Dao.php';
-            require_once __DIR__ . '/../../lib/dao/LanguageDao.php';
-            require_once __DIR__ . '/../../lib/dao/TranslationDao.php';
-            require_once __DIR__ . '/../../lib/core/TranslationLoader.php';
-            require_once __DIR__ . '/../../lib/service/TranslationService.php';
-             require_once __DIR__ . '/../../lib/core/FormValidator.php';
-             require_once __DIR__ . '/../../lib/core/Sanitize.php';
+            require_once __DIR__ . '/../../src/lib/core/Dao.php';
+            require_once __DIR__ . '/../../src/lib/dao/LanguageDao.php';
+            require_once __DIR__ . '/../../src/lib/dao/TranslationDao.php';
+            require_once __DIR__ . '/../../src/lib/core/TranslationLoader.php';
+            require_once __DIR__ . '/../../src/lib/service/TranslationService.php';
+             require_once __DIR__ . '/../../src/lib/core/FormValidator.php';
+             require_once __DIR__ . '/../../src/lib/core/Sanitize.php';
             
             // Initialize DAOs
             self::$languageDao = new LanguageDao();

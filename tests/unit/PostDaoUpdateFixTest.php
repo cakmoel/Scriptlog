@@ -46,7 +46,7 @@ class PostDaoUpdateFixTest extends TestCase
 
     public function testUpdatePostHasConditionalPasswordLogic(): void
     {
-        $source = file_get_contents(__DIR__ . '/../../lib/dao/PostDao.php');
+        $source = file_get_contents(__DIR__ . '/../../src/lib/dao/PostDao.php');
 
         // Verify the conditional logic exists
         $this->assertStringContainsString('if (!empty($bind[\'post_password\']))', $source);
@@ -55,7 +55,7 @@ class PostDaoUpdateFixTest extends TestCase
 
     public function testUpdatePostBuildsUpdateDataDynamically(): void
     {
-        $source = file_get_contents(__DIR__ . '/../../lib/dao/PostDao.php');
+        $source = file_get_contents(__DIR__ . '/../../src/lib/dao/PostDao.php');
 
         // Verify that updateData is built as an array (not fixed keys)
         $this->assertStringContainsString('$updateData = [', $source);
@@ -64,7 +64,7 @@ class PostDaoUpdateFixTest extends TestCase
 
     public function testUpdatePostDoesNotAlwaysIncludePassword(): void
     {
-        $source = file_get_contents(__DIR__ . '/../../lib/dao/PostDao.php');
+        $source = file_get_contents(__DIR__ . '/../../src/lib/dao/PostDao.php');
 
         // Find the updatePost method
         $pattern = '/function updatePost.*?\$this->modify\("tbl_posts".*?\);/s';
