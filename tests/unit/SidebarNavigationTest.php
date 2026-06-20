@@ -39,7 +39,7 @@ class SidebarNavigationTest extends TestCase
         ?int $userId = null,
         ?string $userSession = null
     ): string {
-        $sidebarFile = var_export(realpath(__DIR__ . '/../../admin/sidebar-nav.php'), true);
+        $sidebarFile = var_export(realpath(__DIR__ . '/../../src/admin/sidebar-nav.php'), true);
 
         $defaultPerms = [
             'posts' => true,
