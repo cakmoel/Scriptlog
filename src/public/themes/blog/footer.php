@@ -1,4 +1,6 @@
-<footer class="main-footer">
+</main>
+
+<footer class="main-footer" role="contentinfo">
   <div class="container">
     <?php
     // Retrieve footer navigation from tbl_menu using existing utility function
@@ -44,22 +46,22 @@
       <div class="col-12 text-center">
         <ul class="social-menu list-inline mb-4">
           <li class="list-inline-item">
-            <a href="#" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+            <a href="#" aria-label="Facebook" title="Facebook" target="_blank" rel="noopener noreferrer">
               <i class="fa fa-facebook" aria-hidden="true"></i>
             </a>
           </li>
           <li class="list-inline-item">
-            <a href="#" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
+            <a href="#" aria-label="Twitter" title="Twitter" target="_blank" rel="noopener noreferrer">
               <i class="fa fa-twitter" aria-hidden="true"></i>
             </a>
           </li>
           <li class="list-inline-item">
-            <a href="#" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+            <a href="#" aria-label="Instagram" title="Instagram" target="_blank" rel="noopener noreferrer">
               <i class="fa fa-instagram" aria-hidden="true"></i>
             </a>
           </li>
           <li class="list-inline-item">
-            <a href="#" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+            <a href="#" aria-label="LinkedIn" title="LinkedIn" target="_blank" rel="noopener noreferrer">
               <i class="fa fa-linkedin" aria-hidden="true"></i>
             </a>
           </li>

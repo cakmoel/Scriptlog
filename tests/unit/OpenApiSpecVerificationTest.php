@@ -2,26 +2,27 @@
 /**
  * OpenAPI Specification Verification Test
  *
- * Verifies that API_OPENAPI.yaml and API_OPENAPI.json are coherent
+ * Verifies that dev-docs/API_OPENAPI.yaml and dev-docs/API_OPENAPI.json are coherent
  * and correspond to the actual RESTful API implementation.
  *
  * @category   tests
- * @author     Blogware Team
- * @license    MIT
- * @version    1.0.0
- * @since      April 2026
+ * @author    Blogware Team
+ * @license   MIT
+ * @version   1.0.0
+ * @since     April 2026
  */
 
-use PHPUnit\Framework\TestCase;
+require_once __DIR__ . '/../bootstrap.php';
 
-class OpenApiSpecVerificationTest extends TestCase
+class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 {
     private string $baseDir;
     private string $yamlFile;
     private string $jsonFile;
     private string $apiIndexFile;
-    private array $yamlSpec = [];
-    private array $jsonSpec = [];
+
+    private ?array $yamlSpec = null;
+    private ?array $jsonSpec = null;
 
     protected function setUp(): void
     {
@@ -35,11 +36,10 @@ class OpenApiSpecVerificationTest extends TestCase
 
     private function loadSpecs(): void
     {
-        $yamlContent = file_get_contents($this->yamlFile);
-        $this->yamlSpec = yaml_parse($yamlContent) ?: [];
-
-        $jsonContent = file_get_contents($this->jsonFile);
-        $this->jsonSpec = json_decode($jsonContent, true) ?: [];
+        if (function_exists('yaml_parse_file')) {
+            $this->yamlSpec = yaml_parse_file($this->yamlFile);
+        }
+        $this->jsonSpec = json_decode(file_get_contents($this->jsonFile), true);
     }
 
     public function testYamlFileExists(): void
@@ -59,183 +59,175 @@ class OpenApiSpecVerificationTest extends TestCase
 
     public function testYamlIsValid(): void
     {
-        $yamlContent = file_get_contents($this->yamlFile);
-        $parsed = yaml_parse($yamlContent);
-        $this->assertNotFalse($parsed, 'YAML content should be parseable');
-        $this->assertIsArray($parsed, 'Parsed YAML should be an array');
+        if (!function_exists('yaml_parse')) {
+            $this->markTestSkipped('yaml_parse function not available');
+            return;
+        }
+
+        $content = file_get_contents($this->yamlFile);
+        $parsed = yaml_parse($content);
+
+        $this->assertNotFalse($parsed);
+        $this->assertIsArray($parsed);
     }
 
     public function testJsonIsValid(): void
     {
         $content = file_get_contents($this->jsonFile);
         $parsed = json_decode($content, true);
-        $this->assertNotNull($parsed, 'JSON should be parseable');
-        $this->assertEquals(JSON_ERROR_NONE, json_last_error(), 'JSON should have no errors');
+
+        $this->assertNotNull($parsed);
+        $this->assertSame(JSON_ERROR_NONE, json_last_error());
     }
 
-    public function testYamlHasOpenapiVersion(): void
+    public function testYamlAndJsonHaveOpenapiVersion(): void
     {
-        $this->assertArrayHasKey('openapi', $this->yamlSpec);
-        $this->assertStringStartsWith('3.', $this->yamlSpec['openapi']);
+        $yamlVersion = $this->yamlSpec['openapi'] ?? null;
+        $jsonVersion = $this->jsonSpec['openapi'] ?? null;
+
+        $this->assertNotNull($yamlVersion);
+        $this->assertNotNull($jsonVersion);
+        $this->assertSame($yamlVersion, $jsonVersion);
     }
 
-    public function testJsonHasOpenapiVersion(): void
+    public function testYamlAndJsonHaveSameInfo(): void
     {
-        $this->assertArrayHasKey('openapi', $this->jsonSpec);
-        $this->assertStringStartsWith('3.', $this->jsonSpec['openapi']);
+        $yamlInfo = $this->yamlSpec['info'] ?? [];
+        $jsonInfo = $this->jsonSpec['info'] ?? [];
+
+        $this->assertEquals($yamlInfo['title'], $jsonInfo['title']);
+        $this->assertEquals($yamlInfo['version'], $jsonInfo['version']);
     }
 
-    public function testYamlAndJsonHaveSamePaths(): void
+    public function testYamlAndJsonPathsMatch(): void
     {
-        $yamlPaths = array_keys($this->yamlSpec['paths'] ?? []);
-        $jsonPaths = array_keys($this->jsonSpec['paths'] ?? []);
-        $this->assertEquals($yamlPaths, $jsonPaths, 'YAML and JSON should have same paths');
+        $yamlPaths = array_keys($this->yamlSpec['paths']);
+        $jsonPaths = array_keys($this->jsonSpec['paths']);
+
+        $this->assertEquals($yamlPaths, $jsonPaths);
     }
 
-    public function testYamlAndJsonHaveSameTags(): void
+    public function testYamlAndJsonTagsMatch(): void
     {
-        $yamlTags = array_column($this->yamlSpec['tags'] ?? [], 'name');
-        $jsonTags = array_column($this->jsonSpec['tags'] ?? [], 'name');
-        $this->assertEquals($yamlTags, $jsonTags, 'YAML and JSON should have same tags');
+        $yamlTags = array_column($this->yamlSpec['tags'], 'name');
+        $jsonTags = array_column($this->jsonSpec['tags'], 'name');
+
+        $this->assertEquals($yamlTags, $jsonTags);
     }
 
-    public function testYamlAndJsonHaveSameSchemaCount(): void
+    public function testSchemaCountsMatch(): void
     {
-        $yamlSchemaCount = count($this->yamlSpec['components']['schemas'] ?? []);
-        $jsonSchemaCount = count($this->jsonSpec['components']['schemas'] ?? []);
-        $this->assertEquals($yamlSchemaCount, $jsonSchemaCount, 'Schema counts should match');
+        $yamlSchemaCount = count($this->yamlSpec['components']['schemas']);
+        $jsonSchemaCount = count($this->jsonSpec['components']['schemas']);
+
+        $this->assertEquals($yamlSchemaCount, $jsonSchemaCount);
     }
 
-    public function testYamlHasRequiredSchemas(): void
+    public function testRequiredSchemasExist(): void
     {
         $schemas = $this->yamlSpec['components']['schemas'] ?? [];
-        $requiredSchemas = ['Error', 'SuccessResponse', 'Post', 'PostCreate', 'PostUpdate'];
+
+        $requiredSchemas = [
+            'Error',
+            'SuccessResponse',
+            'Post',
+            'PostCreate',
+            'PostUpdate',
+            'Category',
+            'CategoryCreate',
+            'CategoryUpdate',
+            'Comment',
+            'CommentCreate',
+            'CommentUpdate',
+            'ArchiveMonth',
+            'ArchiveYear',
+            'Link',
+            'Links',
+            'Pagination',
+            'ApiInfo'
+        ];
 
         foreach ($requiredSchemas as $schema) {
             $this->assertArrayHasKey($schema, $schemas, "Schema '$schema' should exist");
         }
     }
 
-    public function testJsonHasRequiredSchemas(): void
+    public function testExpectedTagsExist(): void
     {
-        $schemas = $this->jsonSpec['components']['schemas'] ?? [];
-        $requiredSchemas = ['Error', 'SuccessResponse', 'Post', 'PostCreate', 'PostUpdate'];
+        $tags = array_column($this->yamlSpec['tags'], 'name');
 
-        foreach ($requiredSchemas as $schema) {
-            $this->assertArrayHasKey($schema, $schemas, "Schema '$schema' should exist");
+        $expectedTags = [
+            'Posts',
+            'Categories',
+            'Comments',
+            'Archives',
+            'Search',
+            'GDPR',
+            'Languages',
+            'Translations',
+            'Media',
+            'API Info'
+        ];
+
+        foreach ($expectedTags as $tag) {
+            $this->assertContains($tag, $tags, "Tag '$tag' should exist");
         }
     }
 
-    public function testYamlHasPostsTag(): void
-    {
-        $tags = array_column($this->yamlSpec['tags'] ?? [], 'name');
-        $this->assertContains('Posts', $tags);
-    }
-
-    public function testYamlHasCategoriesTag(): void
-    {
-        $tags = array_column($this->yamlSpec['tags'] ?? [], 'name');
-        $this->assertContains('Categories', $tags);
-    }
-
-    public function testYamlHasCommentsTag(): void
-    {
-        $tags = array_column($this->yamlSpec['tags'] ?? [], 'name');
-        $this->assertContains('Comments', $tags);
-    }
-
-    public function testYamlHasArchivesTag(): void
-    {
-        $tags = array_column($this->yamlSpec['tags'] ?? [], 'name');
-        $this->assertContains('Archives', $tags);
-    }
-
-    public function testYamlHasSearchTag(): void
-    {
-        $tags = array_column($this->yamlSpec['tags'] ?? [], 'name');
-        $this->assertContains('Search', $tags);
-    }
-
-    public function testYamlHasGdprTag(): void
-    {
-        $tags = array_column($this->yamlSpec['tags'] ?? [], 'name');
-        $this->assertContains('GDPR', $tags);
-    }
-
-    public function testYamlHasLanguagesTag(): void
-    {
-        $tags = array_column($this->yamlSpec['tags'] ?? [], 'name');
-        $this->assertContains('Languages', $tags);
-    }
-
-    public function testYamlHasTranslationsTag(): void
-    {
-        $tags = array_column($this->yamlSpec['tags'] ?? [], 'name');
-        $this->assertContains('Translations', $tags);
-    }
-
-    public function testYamlHasMediaTag(): void
-    {
-        $tags = array_column($this->yamlSpec['tags'] ?? [], 'name');
-        $this->assertContains('Media', $tags);
-    }
-
-    public function testYamlHasApiInfoTag(): void
-    {
-        $tags = array_column($this->yamlSpec['tags'] ?? [], 'name');
-        $this->assertContains('API Info', $tags);
-    }
-
-    public function testYamlHasServers(): void
-    {
-        $this->assertArrayHasKey('servers', $this->yamlSpec);
-        $this->assertNotEmpty($this->yamlSpec['servers']);
-    }
-
-    public function testJsonHasServers(): void
-    {
-        $this->assertArrayHasKey('servers', $this->jsonSpec);
-        $this->assertNotEmpty($this->jsonSpec['servers']);
-    }
-
-    public function testProductionServerUrl(): void
+    public function testServersAreDefined(): void
     {
         $servers = $this->yamlSpec['servers'] ?? [];
-        $this->assertNotEmpty($servers, 'Should have servers defined');
-        $firstServer = $servers[0] ?? [];
-        $this->assertArrayHasKey('url', $firstServer, 'First server should have URL');
+
+        $this->assertIsArray($servers);
+        $this->assertNotEmpty($servers);
+        $this->assertGreaterThanOrEqual(2, count($servers));
     }
 
-    public function testYamlHasInfoSection(): void
+    public function testProductionServerUrlExists(): void
     {
-        $this->assertArrayHasKey('info', $this->yamlSpec);
+        $servers = $this->yamlSpec['servers'] ?? [];
+
+        $this->assertArrayHasKey(0, $servers);
+        $this->assertArrayHasKey('url', $servers[0]);
+        $this->assertNotEmpty($servers[0]['url']);
     }
 
-    public function testJsonHasInfoSection(): void
+    public function testServerUrlsContainPlaceholderDomain(): void
     {
-        $this->assertArrayHasKey('info', $this->jsonSpec);
+        $servers = $this->yamlSpec['servers'] ?? [];
+
+        $hasPlaceholder = false;
+        foreach ($servers as $server) {
+            if (isset($server['url']) && 
+                (strpos($server['url'], 'blogware.site') !== false || 
+                 strpos($server['url'], 'localhost') !== false)) {
+                $hasPlaceholder = true;
+                break;
+            }
+        }
+
+        $this->assertTrue($hasPlaceholder, 'Servers should contain placeholder domain for replacement');
     }
 
-    public function testYamlInfoHasTitle(): void
+    public function testSecuritySchemesExist(): void
     {
-        $info = $this->yamlSpec['info'] ?? [];
-        $this->assertArrayHasKey('title', $info);
+        $securitySchemes = $this->yamlSpec['components']['securitySchemes'] ?? [];
+
+        $this->assertNotEmpty($securitySchemes);
     }
 
-    public function testYamlInfoHasVersion(): void
+    public function testApiKeySecuritySchemeExists(): void
     {
-        $info = $this->yamlSpec['info'] ?? [];
-        $this->assertArrayHasKey('version', $info);
+        $securitySchemes = $this->yamlSpec['components']['securitySchemes'] ?? [];
+
+        $this->assertArrayHasKey('ApiKeyAuth', $securitySchemes);
     }
 
-    public function testYamlPathsNotEmpty(): void
+    public function testBearerSecuritySchemeExists(): void
     {
-        $this->assertNotEmpty($this->yamlSpec['paths'] ?? [], 'Paths should not be empty');
-    }
+        $securitySchemes = $this->yamlSpec['components']['securitySchemes'] ?? [];
 
-    public function testJsonPathsNotEmpty(): void
-    {
-        $this->assertNotEmpty($this->jsonSpec['paths'] ?? [], 'Paths should not be empty');
+        $this->assertArrayHasKey('BearerAuth', $securitySchemes);
     }
 
     public function testYamlHasComponents(): void
@@ -248,9 +240,71 @@ class OpenApiSpecVerificationTest extends TestCase
         $this->assertArrayHasKey('components', $this->jsonSpec);
     }
 
-    public function testYamlComponentsHasSchemas(): void
+    public function testPathsHaveGetOperations(): void
     {
-        $components = $this->yamlSpec['components'] ?? [];
-        $this->assertArrayHasKey('schemas', $components);
+        $paths = $this->yamlSpec['paths'] ?? [];
+        $getOperations = 0;
+
+        foreach ($paths as $path => $methods) {
+            if (isset($methods['get'])) {
+                $getOperations++;
+            }
+        }
+
+        $this->assertGreaterThan(0, $getOperations, 'Should have GET operations');
+    }
+
+    public function testPathsHavePostOperations(): void
+    {
+        $paths = $this->yamlSpec['paths'] ?? [];
+        $postOperations = 0;
+
+        foreach ($paths as $path => $methods) {
+            if (isset($methods['post'])) {
+                $postOperations++;
+            }
+        }
+
+        $this->assertGreaterThan(0, $postOperations, 'Should have POST operations');
+    }
+
+    public function testInfoHasTitle(): void
+    {
+        $this->assertArrayHasKey('title', $this->yamlSpec['info']);
+        $this->assertNotEmpty($this->yamlSpec['info']['title']);
+    }
+
+    public function testInfoHasVersion(): void
+    {
+        $this->assertArrayHasKey('version', $this->yamlSpec['info']);
+        $this->assertNotEmpty($this->yamlSpec['info']['version']);
+    }
+
+    public function testInfoHasDescription(): void
+    {
+        $this->assertArrayHasKey('description', $this->yamlSpec['info']);
+    }
+
+    public function testInfoHasContact(): void
+    {
+        $this->assertArrayHasKey('contact', $this->yamlSpec['info']);
+    }
+
+    public function testInfoHasLicense(): void
+    {
+        $this->assertArrayHasKey('license', $this->yamlSpec['info']);
+    }
+
+    public function testXLogoExists(): void
+    {
+        $this->assertArrayHasKey('x-logo', $this->yamlSpec['info']);
+        $this->assertArrayHasKey('url', $this->yamlSpec['info']['x-logo']);
+    }
+
+    public function testXLogoContainsPlaceholderDomain(): void
+    {
+        $logoUrl = $this->yamlSpec['info']['x-logo']['url'] ?? '';
+
+        $this->assertStringContainsString('blogware.site', $logoUrl);
     }
 }

@@ -378,14 +378,12 @@ class MenuDao extends Dao
         $temp_sort = isset($temp_data['menu_sort']) ? (int)$temp_data['menu_sort'] : "";
 
         if ($temp_sort < $new_sort) {
-            $sclause = " menu_sort = menu_sort - 1";
-            $wclause = " menu_sort > $temp_sort AND menu_sort <= $new_sort";
+            $sql = "UPDATE tbl_menu SET menu_sort = menu_sort - 1 WHERE menu_sort > ? AND menu_sort <= ?";
         } else {
-            $sclause = " menu_sort = menu_sort + 1";
-            $wclause = " menu_sort < $temp_sort AND menu_sort >= $new_sort";
+            $sql = "UPDATE tbl_menu SET menu_sort = menu_sort + 1 WHERE menu_sort < ? AND menu_sort >= ?";
         }
 
-        db_simple_query("UPDATE tbl_menu SET $sclause WHERE $wclause");
+        $this->dbc->dbQuery($sql, [$temp_sort, $new_sort]);
 
         return $temp_id;
     }

@@ -19,7 +19,7 @@ function form_filled_validation($vars)
 {
 
     foreach ($vars as $key => $value) {
-        if ((!isset($key)) || ($value == '')) {
+        if ($value == '') {
             return false;
         }
     }

@@ -25,7 +25,7 @@ $pagination = function_exists('posts_by_category') ? posts_by_category($topicId)
 
 <div class="container">
     <div class="row">
-        <main class="posts-listing col-lg-8">
+        <div class="posts-listing col-lg-8">
             <div class="container">
                 <div class="row">
                     <!-- post -->
@@ -73,7 +73,7 @@ $pagination = function_exists('posts_by_category') ? posts_by_category($topicId)
                 </div>
 
                 <!-- navigation -->
-                <nav aria-label="Page navigation example">
+                <nav aria-label="<?= t('pagination.navigation'); ?>">
                     <ul class="pagination pagination-template d-flex justify-content-center">
                         <?php
                         (isset($total_comment) && $total_comment > 0) ? $pagination : "";
@@ -81,7 +81,7 @@ $pagination = function_exists('posts_by_category') ? posts_by_category($topicId)
                     </ul>
                 </nav>
             </div>
-        </main>
+        </div>
 
         <?php
           include dirname(__FILE__) . '/sidebar.php';

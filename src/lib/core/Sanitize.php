@@ -49,6 +49,10 @@ class Sanitize
         }
     }
 
+    public function __construct()
+    {
+    }
+
     /**
      * Sanitize string (alias for sanitasi).
      *
@@ -74,7 +78,7 @@ class Sanitize
     public static function mildSanitizer($str)
     {
         if (function_exists('simple_remove_xss')) {
-            simple_remove_xss($str);
+            return simple_remove_xss($str);
         }
         return $str;
     }

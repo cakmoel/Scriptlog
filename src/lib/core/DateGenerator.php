@@ -277,6 +277,10 @@ class DateGenerator
         // look for last space as a delimiter between date and time portions
         $pos = strrpos($input, ' ');
 
+        if ($pos === false) {
+            return false;
+        }
+
         // now split the input into its two portions
         $date = substr($input, 0, $pos);
         $time = substr($input, $pos + 1);

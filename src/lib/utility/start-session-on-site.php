@@ -64,7 +64,7 @@ function start_session_on_site($session_handler)
             $current_cookie_params["secure"],
             true
         );
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         error_log("Error in start_session_on_site: " . $e->getMessage());
         return false;
     }

@@ -127,7 +127,7 @@ class MediaController extends BaseApp
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     $checkError = false;
                     array_push($errors, "Sorry, unpleasant attempt detected!");
                 }
@@ -352,7 +352,7 @@ class MediaController extends BaseApp
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -391,7 +391,7 @@ class MediaController extends BaseApp
                     $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
                 } else {
                     if (!empty($file_location)) {
-                        if (!isset($file_error) || is_array($file_error)) {
+                        if (is_array($file_error)) {
                             $checkError = false;
                             array_push($errors, "Invalid paramenter");
                         }
@@ -430,7 +430,7 @@ class MediaController extends BaseApp
                         }
 
                         if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp" || $file_extension === "bmp") {
-                            list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : null;
+                            list($width, $height) = getimagesize($file_location);
 
                             $media_metavalue = array(
 
@@ -532,12 +532,12 @@ class MediaController extends BaseApp
 
             try {
                 if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
                 if (!filter_var($id, FILTER_VALIDATE_INT)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 

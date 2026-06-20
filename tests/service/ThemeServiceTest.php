@@ -93,4 +93,28 @@ class ThemeServiceTest extends TestCase
         $exists = $this->themeService->isThemeExists('Test Theme');
         $this->assertTrue($exists);
     }
+
+    public function testActivateInstalledTheme(): void
+    {
+        $this->themeDaoMock->expects($this->once())
+            ->method('activateTheme')
+            ->with(1, $this->sanitizeMock)
+            ->willReturn(true);
+        
+        $this->themeService->setThemeId(1);
+        $result = $this->themeService->activateInstalledTheme();
+        $this->assertTrue($result);
+    }
+
+    public function testDeactivateInstalledTheme(): void
+    {
+        $this->themeDaoMock->expects($this->once())
+            ->method('deactivateTheme')
+            ->with(1, $this->sanitizeMock)
+            ->willReturn(true);
+        
+        $this->themeService->setThemeId(1);
+        $result = $this->themeService->deactivateInstalledTheme();
+        $this->assertTrue($result);
+    }
 }

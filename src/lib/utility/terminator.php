@@ -27,6 +27,9 @@ function terminator($userID)
         $grab_post_id = function_exists('medoo_get_where') ? medoo_get_where('tbl_posts', 'ID', ['post_author' => $userID]) : "";
         $post_id = isset($grab_post_id['ID']) ? abs((int)$grab_post_id['ID']) : 0;
 
+        $remove_comments = false;
+        $remove_post = false;
+
         if (function_exists('medoo_delete')) {
             // removing comment
             $remove_comments = medoo_delete('tbl_comments', ['comment_post_id' => $post_id]);

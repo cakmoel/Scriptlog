@@ -30,9 +30,9 @@
                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                  <h4><i class="icon fa fa-ban"></i> Error!</h4>
                  <?php
-                 foreach ($errors as $e) :
-                     echo $e;
-                 endforeach;
+                foreach ($errors as $e) :
+                    echo safe_html($e);
+                endforeach;
                  ?>
            </div>
                  <?php
@@ -46,9 +46,9 @@
                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                  <h4><i class="icon fa fa-check"></i> Success!</h4>
                         <?php
-                         foreach ($status as $s) :
-                             echo $s;
-                         endforeach;
+                        foreach ($status as $s) :
+                            echo safe_html($s);
+                        endforeach;
                          ?>
            </div>
                  <?php

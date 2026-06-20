@@ -42,7 +42,7 @@ function turn_on_session($session_handler, $life_time, $cookies_name, $path, $do
         if (!empty($_SESSION['deleted_time']) && $_SESSION['deleted_time'] < time() - $life_time) {
             $session_handler->forget();
             $session_handler->start();
-            set_cookies_scl($cookies_name, session_id(), $life_time, $path, $domain, $secure, $httponly);
+            set_cookies_scl($cookies_name, session_id(), (int)$life_time, $path, $domain, $secure, $httponly);
             $session_handler->refresh();
         }
 
@@ -56,11 +56,11 @@ function turn_on_session($session_handler, $life_time, $cookies_name, $path, $do
             $session_handler->forget();
             $session_handler->start();
             return true;
-        } catch (Exception $retryError) {
+        } catch (Throwable $retryError) {
             error_log("Failed to recover session: " . $retryError->getMessage());
             return false;
         }
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         error_log("Unexpected error in turn_on_session: " . $e->getMessage());
         return false;
     }
