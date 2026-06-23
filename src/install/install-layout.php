@@ -69,7 +69,7 @@ function install_footer($stylePath)
         <div class="container border-top pt-4">
             <p class="mb-1">&copy; 
                 <?php
-                    $starYear = 2021;
+                    $starYear = 2018;
                 $thisYear = date("Y");
                 echo ($starYear == $thisYear) ? $starYear : "{$starYear} &#8211; {$thisYear}";
                 echo " Scriptlog";
