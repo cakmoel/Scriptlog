@@ -236,7 +236,7 @@ class Bootstrap
 
         // ThemeRenderer for centralized theme rendering
         $themeRenderer = null;
-        if (class_exists('ThemeRenderer') && !empty($dbc) && $dbc !== "") {
+        if (class_exists('ThemeRenderer')) {
             try {
                 $themeRenderer = new ThemeRenderer();
             } catch (Exception $e) {
