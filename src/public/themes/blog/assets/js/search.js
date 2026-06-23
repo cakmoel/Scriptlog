@@ -83,18 +83,7 @@
                     }
                 },
                 error: function(xhr, status, error) {
-                    var message = 'An error occurred during search: ' + error;
-                    try {
-                        var response = JSON.parse(xhr.responseText);
-                        if (response.message) {
-                            message = response.message;
-                        }
-                        if (response.error) {
-                            message += ' - ' + response.error;
-                        }
-                    } catch (e) {
-                        message += ' (Response: ' + xhr.responseText + ')';
-                    }
+                    var message = 'An error occurred during search. Please try again later.';
                     self.showError(message);
                 }
             });
