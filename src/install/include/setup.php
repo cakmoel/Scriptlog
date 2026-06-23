@@ -558,7 +558,6 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
  * @param string $prefix
  * @param string $default_lang (language code to set as default)
  *
- * @return void
  */
 function install_i18n_data($link, $prefix = '', $default_lang = 'en')
 {
@@ -1307,7 +1306,6 @@ function installation_key($length)
  * Format size memory usage onto b, kb, mb, gb, tb and pb
  *
  * @param int|float $size
- * @return mixed
  *
  */
 function convert_memory_used($size)
