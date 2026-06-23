@@ -1,12 +1,13 @@
 version: 2
 updates:
 - package-ecosystem: composer
-  directory: "/src/lib"
+  directory: "/"
   schedule:
-    interval: daily
-    time: "22:00"
+    interval: weekly
+    day: monday
+    time: "08:00"
   open-pull-requests-limit: 10
-  target-branch: master
+  target-branch: main
   ignore:
   - dependency-name: egulias/email-validator
     versions:
@@ -16,7 +17,6 @@ updates:
     versions:
     - 2.10.0
     - 2.11.0
-    - 2.12.0
   - dependency-name: voku/anti-xss
     versions:
     - 4.1.32
