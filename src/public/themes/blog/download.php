@@ -2,7 +2,7 @@
 defined('SCRIPTLOG') || die('Direct access not permitted');
 
 // Always get identifier from $_GET first - works for both SEO and query string modes
-$identifier = isset($_GET['download']) ? trim($_GET['download']) : '';
+$identifier = isset($_GET['download']) ? preg_replace('/[^a-zA-Z0-9\-]/', '', trim($_GET['download'])) : '';
 
 // Fallback to global variable set by Dispatcher/HandleRequest for path-based URLs
 if (empty($identifier)) {
