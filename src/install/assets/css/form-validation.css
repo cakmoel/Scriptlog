@@ -352,3 +352,323 @@ footer { border-top: 1px solid var(--glass-border); }
     0% { transform: rotate(0deg); }
     100% { transform: rotate(359deg); }
 }
+
+/* ============================================
+   RESPONSIVE DESIGN - Mobile Breakpoints
+   ============================================ */
+
+/* Tablet & Small Laptop (768px and below) */
+@media (max-width: 768px) {
+    .card-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .card-body {
+        padding: 1.25rem;
+    }
+    .py-5 {
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+    }
+    .install-step .card-body {
+        padding: 1.25rem;
+    }
+    .step-container {
+        max-width: 100%;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    .step-number {
+        width: 2.2rem;
+        height: 2.2rem;
+        font-size: 0.85rem;
+    }
+    .step-label {
+        font-size: 0.65rem;
+        letter-spacing: 0.02em;
+    }
+    .requirements-table td {
+        padding: 0.75rem 1rem;
+    }
+    .requirements-table td:first-child {
+        padding-left: 1rem;
+    }
+    .dashboard-section {
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* Mobile Landscape (576px and below) */
+@media (max-width: 576px) {
+    .py-5 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+    .mb-5 {
+        margin-bottom: 1.5rem !important;
+    }
+    .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    .step-container {
+        gap: 0.35rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 0.25rem;
+    }
+    .step-container::-webkit-scrollbar {
+        display: none;
+    }
+    .step-item {
+        flex: 0 0 auto;
+        min-width: 70px;
+    }
+    .step-number {
+        width: 1.8rem;
+        height: 1.8rem;
+        font-size: 0.75rem;
+        border-width: 2px;
+        margin-bottom: 0.3rem;
+    }
+    .step-label {
+        font-size: 0.55rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 70px;
+        margin: 0 auto;
+    }
+    .card {
+        border-radius: 1rem;
+        margin-bottom: 1rem;
+    }
+    .card-header {
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+    }
+    .card-body {
+        padding: 1rem;
+    }
+    .install-step .card-body {
+        padding: 1rem;
+    }
+    .form-control {
+        padding: 0.6rem 0.85rem;
+        font-size: 0.9rem;
+        border-radius: 0.6rem;
+    }
+    select.form-control-lg,
+    input.form-control-lg {
+        height: 3.2rem !important;
+        font-size: 1rem !important;
+        padding: 0.5rem 0.85rem !important;
+    }
+    .dashboard-title {
+        font-size: 0.75rem;
+        letter-spacing: 0.08rem;
+        margin-bottom: 1rem;
+    }
+    .requirements-table td {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.82rem;
+    }
+    .requirements-table td:first-child {
+        padding-left: 0.75rem;
+    }
+    .requirements-table td .font-weight-bold {
+        font-size: 0.82rem;
+    }
+    .requirements-table td code {
+        font-size: 0.7rem;
+    }
+    .sys-card {
+        padding: 1rem;
+    }
+    .sys-value {
+        font-size: 1rem;
+    }
+    .sys-label {
+        font-size: 0.6rem;
+    }
+    .btn {
+        padding: 0.6rem 1.25rem;
+        font-size: 0.85rem;
+        border-radius: 0.6rem;
+        white-space: nowrap;
+    }
+    .btn-lg {
+        padding: 0.6rem 1.25rem;
+        font-size: 0.9rem;
+    }
+    .help-text {
+        font-size: 0.7rem;
+    }
+    .install-icon-wrap {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 1rem;
+    }
+    .install-icon {
+        width: 34px;
+        height: 34px;
+    }
+    .theme-toggle-wrap {
+        top: 0.75rem;
+        right: 0.75rem;
+    }
+    .theme-btn {
+        width: 2rem;
+        height: 2rem;
+        font-size: 0.85rem;
+    }
+    .alert {
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+    }
+    .alert .fa-exclamation-triangle {
+        font-size: 1rem;
+    }
+    footer ul.list-inline {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.25rem;
+    }
+    footer .list-inline-item {
+        margin: 0 !important;
+    }
+    .d-flex.justify-content-between.mt-5 {
+        margin-top: 1.5rem !important;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .d-flex.justify-content-between.mt-5 .btn-link {
+        text-align: center;
+    }
+    .d-flex.justify-content-between.mt-5 .btn:not(.btn-link) {
+        width: 100%;
+    }
+    .text-right.mt-5 {
+        margin-top: 1.5rem !important;
+        text-align: center !important;
+    }
+    .text-right.mt-5 .btn {
+        width: 100%;
+    }
+    .dashboard-section {
+        margin-bottom: 1.25rem;
+    }
+    .step-item.active .step-number {
+        box-shadow: 0 0 10px rgba(0, 0, 128, 0.15);
+    }
+    .text-center.mb-5 {
+        margin-bottom: 1.5rem !important;
+    }
+    .install-step .alert-info {
+        padding: 0.65rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Small Mobile (400px and below) */
+@media (max-width: 400px) {
+    .card-body {
+        padding: 0.75rem;
+    }
+    .install-step .card-body {
+        padding: 0.75rem;
+    }
+    .card-header {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.8rem;
+    }
+    .step-item {
+        min-width: 60px;
+    }
+    .step-number {
+        width: 1.5rem;
+        height: 1.5rem;
+        font-size: 0.65rem;
+    }
+    .step-label {
+        font-size: 0.48rem;
+        max-width: 60px;
+    }
+    .step-container {
+        gap: 0.2rem;
+    }
+    .form-control {
+        padding: 0.5rem 0.7rem;
+        font-size: 0.85rem;
+    }
+    select.form-control-lg,
+    input.form-control-lg {
+        height: 2.8rem !important;
+        font-size: 0.9rem !important;
+        padding: 0.4rem 0.7rem !important;
+    }
+    .requirements-table td {
+        padding: 0.5rem 0.6rem;
+        font-size: 0.75rem;
+    }
+    .requirements-table td .font-weight-bold {
+        font-size: 0.75rem;
+    }
+    .requirements-table td code {
+        font-size: 0.6rem;
+    }
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+    .sys-card {
+        padding: 0.75rem;
+    }
+    .sys-value {
+        font-size: 0.9rem;
+    }
+    .install-icon-wrap {
+        width: 50px;
+        height: 50px;
+    }
+    .install-icon {
+        width: 28px;
+        height: 28px;
+    }
+    .theme-toggle-wrap {
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+    .theme-btn {
+        width: 1.75rem;
+        height: 1.75rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Handle step wrapping on very narrow screens */
+@media (max-width: 350px) {
+    .step-container {
+        gap: 0.15rem;
+    }
+    .step-item {
+        min-width: 50px;
+    }
+    .step-number {
+        width: 1.3rem;
+        height: 1.3rem;
+        font-size: 0.55rem;
+    }
+    .step-label {
+        font-size: 0.42rem;
+        max-width: 50px;
+    }
+}
