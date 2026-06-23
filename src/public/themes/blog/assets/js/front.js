@@ -12,18 +12,20 @@ $(document).ready(function () {
     var alternateColour = $('link#new-stylesheet');
 
     if ($.cookie("theme_csspath")) {
-        alternateColour.attr("href", $.cookie("theme_csspath"));
+        var href = $.cookie("theme_csspath").replace(/[^a-zA-Z0-9_.\/-]/g, '');
+        alternateColour.attr("href", href);
     }
 
     $("#colour").change(function () {
 
         if ($(this).val() !== '') {
 
-            var theme_csspath = 'css/style.' + $(this).val() + '.css';
+            var colour = $(this).val().replace(/[^a-zA-Z0-9_-]/g, '');
+            var theme_csspath = 'css/style.' + colour + '.css';
 
             alternateColour.attr("href", theme_csspath);
 
-            $.cookie("theme_csspath", theme_csspath, { expires: 30, path: document.URL.substr(0, document.URL.lastIndexOf('/')) });
+            $.cookie("theme_csspath", theme_csspath, { expires: 30, path: window.location.pathname });
 
         }
 
