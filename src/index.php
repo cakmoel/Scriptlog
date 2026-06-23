@@ -1,4 +1,7 @@
 <?php
+
+ob_start();
+
 /**
  * index.php file
  * 
