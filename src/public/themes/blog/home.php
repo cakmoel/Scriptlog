@@ -202,7 +202,7 @@ if (function_exists('featured_post')) :
     ?>
 
 <section
-    style="background-image: url(<?= isset($featured_divider_img) ? invoke_frontimg($featured_divider_img) : '' . theme_dir() . 'assets/img/placeholder.svg'; ?>)"
+    style="background-image: url(<?= isset($featured_divider_img) ? invoke_frontimg($featured_divider_img) : theme_dir() . 'assets/img/placeholder.svg'; ?>)"
     class="divider" role="img" aria-label="<?= isset($featured_divider_title) ? htmlout($featured_divider_title) : 'Divider image'; ?>">
     <div class="container">
         <div class="row">
