@@ -352,13 +352,11 @@ function request_path()
 if (!function_exists('previous_post')) {
 function previous_post($id)
 {
-    $idsanitized = sanitizer($id, 'sql');
-
     $html = null;
 
-    $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID < '$idsanitized' AND post_status = 'publish' AND post_type = 'blog' ORDER BY ID DESC LIMIT 1";
+    $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID < ? AND post_status = 'publish' AND post_type = 'blog' ORDER BY ID DESC LIMIT 1";
 
-    $stmt = db_simple_query($sql);
+    $stmt = db_prepared_query($sql, [(int)$id], 'i');
 
     while ($rows = $stmt->fetch()) {
         $html .= '<a href="' . permalinks($rows['ID'])['post'] . '" class="prev-post text-left d-flex align-items-center">';
@@ -379,13 +377,11 @@ function previous_post($id)
 if (!function_exists('next_post')) {
 function next_post($id)
 {
-    $idsanitized = sanitizer($id, 'sql');
-
     $html = null;
 
-    $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID > '$idsanitized' AND post_status = 'publish' AND post_type = 'blog' ORDER BY ID ASC LIMIT 1";
+    $sql = "SELECT ID, post_title, post_slug FROM tbl_posts WHERE ID > ? AND post_status = 'publish' AND post_type = 'blog' ORDER BY ID ASC LIMIT 1";
 
-    $stmt = db_simple_query($sql);
+    $stmt = db_prepared_query($sql, [(int)$id], 'i');
 
     while ($rows = $stmt->fetch()) {
         $html .= '<a href="' . permalinks($rows['ID'])['post'] . '"  class="next-post text-right d-flex align-items-center justify-content-end">';
@@ -574,7 +570,8 @@ function format_topics($topics_data)
 
             $permalink = (function_exists('rewrite_status') && rewrite_status() === 'yes') ? permalinks($slug)['cat'] : permalinks($id)['cat'];
             $title_esc = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-            $links[] = "<a href='{$permalink}'>{$title_esc}</a>";
+            $permalink_esc = htmlspecialchars($permalink, ENT_QUOTES, 'UTF-8');
+            $links[] = "<a href='{$permalink_esc}'>{$title_esc}</a>";
         }
     }
 
