@@ -25,8 +25,12 @@ $(document).ready(function () {
     }
 
     function loadComments() {
+        var fetchUrl = "/fetch-comments.php";
+        if (typeof window.scriptlog_vars !== 'undefined' && window.scriptlog_vars.site_url) {
+            fetchUrl = window.scriptlog_vars.site_url + "/fetch-comments.php";
+        }
         $.ajax({
-            url: "/fetch-comments.php",
+            url: fetchUrl,
             type: "GET",
             data: { post_id: post_id, offset: offset },
             dataType: "json",
