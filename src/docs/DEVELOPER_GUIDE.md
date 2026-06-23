@@ -1,6 +1,6 @@
 # Developer Guide - Scriptlog
 
-**Version:** 1.1.0 | **Last Updated:** June 2026
+**Version:** 1.2.0 | **Last Updated:** June 2026
 
 ---
 
@@ -30,10 +30,16 @@
 22. [Content Export System](#22-content-export-system)
 23. [UI Asset Management](#23-ui-asset-management)
 24. [Dynamic SMTP System](#24-dynamic-smtp-system)
- 25. [Search Functionality](#25-search-functionality)
- 26. [Premium UI Standards](#26-premium-ui-standards)
-  27. [Password-Protected Posts](#27-password-protected-posts)
-  28. [Summernote AJAX Image Upload](#28-summernote-ajax-image-upload)
+25. [Search Functionality](#25-search-functionality)
+26. [Premium UI Standards](#26-premium-ui-standards)
+27. [Password-Protected Posts](#27-password-protected-posts)
+28. [Summernote AJAX Image Upload](#28-summernote-ajax-image-upload)
+29. [Key Constants](#key-constants)
+30. [Key Classes](#key-classes)
+31. [Global Functions](#global-functions)
+32. [Dependencies](#dependencies)
+33. [Contributing](#contributing)
+34. [License](#license)
 
 > **NOTE:** For comprehensive testing documentation including PHPStan setup and CI/CD integration, see [TESTING_GUIDE.md](TESTING_GUIDE.md).
 
@@ -138,7 +144,7 @@ Then access the application at: **http://localhost:8080**
 
 ---
 
-## 2.1 Configuration System
+### 1.1 Configuration System
 
 ### Overview
 
@@ -2971,414 +2977,100 @@ $ip = get_ip_address();
 
 ## 12. Theming
 
-### Theme Directory Structure
+> **ℹ️ Comprehensive Theme Developer Guide:** For a complete, standalone guide covering architecture, directory structure, template hierarchy, functions reference, navigation/i18n URL compatibility, assets, images, i18n, security, step-by-step creation, testing, and troubleshooting, see [THEME_DEVELOPER_GUIDE.md](THEME_DEVELOPER_GUIDE.md). This section is a concise reference summary.
 
-The default theme is located at `public/themes/blog/` and contains:
+### Required Theme Files
 
 ```
-public/themes/blog/
-├── theme.ini              # Theme metadata configuration
-├── functions.php          # Theme functions and template tags
-├── header.php            # Site header with navigation
-├── footer.php            # Site footer with scripts and cookie consent
+public/themes/[theme-name]/
+├── theme.ini              # Theme metadata (REQUIRED)
+├── functions.php          # Theme functions & template tags (REQUIRED)
+├── header.php            # HTML head, navigation, CSS assets
+├── footer.php            # Scripts, footer content, cookie consent
 ├── home.php              # Homepage template
-├── single.php            # Single post view with comments
-├── page.php              # Static page template
-├── category.php          # Category archive template
-├── tag.php               # Tag archive template
-├── archive.php           # Monthly archive template
-├── archives.php          # Archive index (all archives by year)
+├── single.php            # Single post view (handles protected posts)
+├── page.php              # Static page view
+├── category.php          # Category archive
+├── tag.php               # Tag archive
+├── archive.php           # Monthly archive
+├── archives.php          # Archive index (all months)
 ├── blog.php              # Blog listing page
-├── sidebar.php           # Sidebar with widgets
-├── comment.php           # Comment form (legacy)
-├── privacy.php           # Privacy policy page template
+├── sidebar.php           # Sidebar widgets
 ├── 404.php               # 404 error page
+├── privacy.php           # Privacy policy page
 ├── cookie-consent.php    # GDPR cookie consent banner
-├── download.php          # Download page template
-├── download_file.php     # Download file handler
 ├── render-comments.php   # Comments rendering function
+├── download.php          # Download page template
+├── download_file.php     # File download handler
 ├── index.php             # Entry point (usually empty)
-├── lang/                 # Language files
-│   └── en.json          # English translations (i18n)
-└── assets/               # Theme assets
-    ├── css/             # Stylesheets
-    ├── js/              # JavaScript files
-    ├── vendor/          # Third-party libraries
-    ├── fonts/           # Custom fonts
-    └── img/             # Images
+└── lang/                 # Translation files (7 languages)
+    ├── en.json           # English (always required)
+    ├── ar.json, zh.json, fr.json, ru.json, es.json, id.json
 ```
 
-### theme.ini Configuration
+### theme.ini Format
 
 ```ini
 [info]
-theme_name = Bootstrap Blog
-theme_designer = Ondrej Svetska
-theme_description = Scriptlog default theme 
-theme_directory = blog
+theme_name = "My Custom Theme"
+theme_designer = "Your Name"
+theme_description = "Description of the theme's features"
+theme_directory = "my-custom-theme"
 ```
 
-### Theme Functions (functions.php)
+### Critical: Template Loading Pattern
 
-The theme provides functions in the following categories:
+**NEVER include `call_theme_header()` or `call_theme_footer()` in template files.** The core system (`HandleRequest.php`) loads them automatically in sequence: header → content → footer.
 
-#### i18n Functions
-
-| Function | Description |
-|----------|-------------|
-| `t($key, $params)` | Translate a string |
-| `locale_url($path, $locale)` | Get URL with locale prefix |
-| `get_locale()` | Get current locale |
-| `available_locales()` | Get available locales |
-| `is_rtl()` | Check if current locale is RTL |
-| `get_html_dir()` | Get HTML dir attribute |
-| `language_switcher($args)` | Generate language switcher HTML |
-
-#### Model Initialization Functions
-
-| Function | Description |
-|----------|-------------|
-| `request_path()` | Get request path object |
-| `initialize_post()` | Initialize PostModel |
-| `initialize_page()` | Initialize PageModel |
-| `initialize_comment()` | Initialize CommentModel |
-| `initialize_archive()` | Initialize ArchivesModel |
-| `initialize_topic()` | Initialize TopicModel |
-| `initialize_tag()` | Initialize TagModel |
-| `initialize_gallery()` | Initialize GalleryModel |
-
-#### Post Retrieval Functions
-
-| Function | Description |
-|----------|-------------|
-| `featured_post()` | Get random headline posts |
-| `get_slideshow($limit)` | Get posts with media for slideshow |
-| `sticky_page()` | Get random sticky page |
-| `random_posts($start, $end)` | Get random posts |
-| `latest_posts($limit, $position)` | Get latest posts |
-| `retrieve_blog_posts()` | Get all published blog posts |
-| `retrieve_detail_post($id)` | Get single post by ID |
-| `posts_by_archive($values)` | Get posts by archive month/year |
-| `archive_index()` | Get all archives for index |
-| `posts_by_tag($tag)` | Get posts by tag |
-| `searching_by_tag($tag)` | Full-text tag search |
-| `posts_by_category($topicId)` | Get posts by category |
-| `retrieve_page($arg, $rewrite)` | Get page by ID or slug |
-| `retrieve_archives()` | Get archives for sidebar |
-
-#### Navigation and Utility Functions
-
-| Function | Description |
-|----------|-------------|
-| `front_navigation($parent, $menu)` | Render navigation menu recursively |
-| `total_comment($id)` | Get total approved comments for post |
-| `block_csrf()` | Generate CSRF token for comment form |
-| `retrieves_topic_simple($id)` | Get topics for a post (simple) |
-| `retrieves_topic_prepared($id)` | Get topics for a post (prepared) |
-| `sidebar_topics()` | Get topics for sidebar |
-| `retrieve_tags()` | Get tags for sidebar |
-| `link_tag($id)` | Generate tag links for post |
-| `link_topic($id)` | Generate topic links for post |
-| `previous_post($id)` | Get previous post link |
-| `next_post($id)` | Get next post link |
-| `display_galleries($start, $limit)` | Get gallery images |
-| `render_comments_section($postId, $offset)` | Render comments section HTML |
-| `nothing_found()` | Display "no posts" message |
-| `retrieve_site_url()` | Get site URL from config |
-| `convert_menu_link($link, $permalinkEnabled)` | Convert menu link between SEO-friendly and query string formats |
-
-### Navigation & i18n URL Compatibility
-
-The theme navigation system properly adapts to both SEO-friendly URLs (permalinks enabled) and query string URLs (permalinks disabled), following the architecture defined in `I18N_ARCHITECTURE.md`.
-
-#### URL Conversion Logic
-
-| Permalink Status | Menu Links | Language Switcher |
-|-----------------|------------|-------------------|
-| **Disabled** | Query string (`?p=1`, `?pg=1`, etc.) | `?switch-lang=locale&redirect=...` |
-| **Enabled** | SEO-friendly (`/post/1/slug`, `/page/slug`) | `locale_url()` with proper prefix |
-
-#### locale_url() Behavior
-
-The `locale_url()` function handles locale prefix based on settings:
-
-```php
-function locale_url(string $path = '', ?string $locale = null): string
-{
-    // When permalinks disabled: never add prefix
-    if (!is_permalink_enabled()) {
-        return $path;
-    }
-    
-    // When permalinks enabled but prefix toggle off: no prefix for any language
-    if (is_permalink_enabled() && !is_locale_prefix_enabled()) {
-        return $path;
-    }
-    
-    // When both permalinks and prefix enabled:
-    // - Default language (en): no prefix
-    // - Non-default language: add prefix (e.g., /es/post/1/slug)
-    if ($targetLocale === $defaultLocale) {
-        return $path;
-    }
-    
-    return '/' . $targetLocale . ($path ? '/' . ltrim($path, '/') : '');
-}
-```
-
-#### convert_menu_link() Function
-
-This function converts menu links between formats based on permalink status:
-
-```php
-function convert_menu_link(string $link, bool $permalinkEnabled): string
-{
-    // Skip external links, anchors, and special links
-    if (empty($link) || $link === '#' || strpos($link, '://') !== false) {
-        return $link;
-    }
-    
-    if ($permalinkEnabled) {
-        // Convert query string to SEO-friendly format
-        // ?p=1 -> /post/1/slug, ?pg=1 -> /page/slug, etc.
-    } else {
-        // Convert SEO-friendly to query string format
-        // /post/1/slug -> ?p=1, /page/slug -> ?pg=ID, etc.
-    }
-}
-```
-
-#### theme_navigation() Locale Filtering
-
-The `theme_navigation()` function filters menus by current locale:
-
-```php
-function theme_navigation($visibility)
-{
-    $currentLocale = get_locale();
-    
-    $sql = "SELECT ... FROM tbl_menu 
-            WHERE menu_status = 'Y' 
-              AND menu_visibility = ? 
-              AND (menu_locale = ? OR menu_locale IS NULL OR menu_locale = '')
-            ORDER BY menu_sort ASC, menu_label";
-    // ...
-}
-```
-
-This ensures only menus matching the current language (or menus with no specific locale) are displayed.
-
-#### Language Switcher URL Format
-
-The language switcher in `header.php` determines URL format based on permalink status:
-
-```php
-$permalinksEnabled = is_permalink_enabled() === 'yes';
-
-if (!$permalinksEnabled) {
-    // Query string format when permalinks disabled
-    $lang_url = '?switch-lang=' . urlencode($locale) . '&redirect=' . urlencode($_SERVER['REQUEST_URI']);
-} else {
-    // locale_url() when permalinks enabled
-    $lang_url = locale_url($_SERVER['REQUEST_URI'], $locale);
-}
-```
-
-### Theme Header (header.php)
-
-The header includes:
-- HTML doctype with language and direction attributes from i18n
-- Meta tags (viewport, charset, SEO via theme_meta())
-- RSS and Atom feed links
-- Asset stylesheets (Bootstrap, Font Awesome, custom styles)
-- Favicon
-- Schema.org markup
-- Navigation menu with collapsible mobile support (Sina Nav)
-
-### Theme Footer (footer.php)
-
-The footer includes:
-- Copyright notice with dynamic year
-- Template credits
-- JavaScript assets (jQuery, Bootstrap, plugins)
-- Cookie consent banner (GDPR)
-- RTL script support
-
-### Supported Features
-
-| Feature | Implementation |
-|---------|---------------|
-| **RTL Support** | `is_rtl()` function, rtl.css, rtl.js |
-| **Internationalization** | I18nManager class, lang/en.json |
-| **Cookie Consent** | GDPR banner with API endpoint |
-| **Comments** | AJAX loading, CSRF protection |
-| **Download System** | UUID-based secure download links |
-| **Archives** | Monthly archives with index |
-| **Privacy Policy** | Static page template |
-| **Responsive** | Bootstrap 4, mobile navigation |
-
-### Asset Locations
-
-| Asset Type | Location |
-|------------|----------|
-| Main CSS | `assets/css/style.sea.css` |
-| Custom CSS | `assets/css/custom.css` |
-| Cookie Consent | `assets/css/cookie-consent.css` |
-| Comment CSS | `assets/css/comment.css` |
-| RTL CSS | `assets/css/rtl.css` |
-| 404 CSS | `assets/css/not-found.css` |
-| Navigation CSS | `assets/css/sina-nav.css` |
-| Front JS | `assets/js/front.js` |
-| Comment JS | `assets/js/comment-submission.js`, `assets/js/load-comment.js` |
-| Cookie JS | `assets/js/cookie-consent.js` |
-| RTL JS | `assets/js/rtl.js` |
-| Bootstrap | `assets/vendor/bootstrap/` |
-| Font Awesome | `assets/vendor/font-awesome/` |
-| jQuery | `assets/vendor/jquery/` |
-| Fancybox | `assets/vendor/@fancyapps/fancybox/` |
-| Popper.js | `assets/vendor/popper.js/` |
-
-### Theme Template Files
-
-#### Important: Template Loading Pattern
-
-**DO NOT include `call_theme_header()` or `call_theme_footer()` in template files.** The core system automatically handles header and footer loading via `HandleRequest.php`:
-
-```
-HandleRequest.php loads templates in sequence:
-  1. call_theme_header()  →  Loads header.php automatically
-  2. call_theme_content()  →  Loads the page template (e.g., home.php, single.php)
-  3. call_theme_footer()   →  Loads footer.php automatically
-```
-
-**Correct template format:**
 ```php
 <?php
 defined('SCRIPTLOG') || die('Direct access not permitted');
-
-// Note: header.php and footer.php are loaded automatically
-// Do NOT include call_theme_header() or call_theme_footer()
-
-// Template content starts here...
+// NO call_theme_header() — system handles it
+// Template content starts directly:
+?>
 <div class="container">
-...
+    <!-- Page content -->
 </div>
-```
-
-**Incorrect (DO NOT use):**
-```php
 <?php
-call_theme_header();  // WRONG - causes duplicate headers!
-// ...
-
-call_theme_footer();  // WRONG - causes duplicate footers!
+// NO call_theme_footer() — system handles it
 ```
 
-#### home.php
+This prevents duplicate HTML, "headers already sent" errors, and ensures proper 404 handling.
 
-The homepage template includes:
-- Hero section with featured post background
-- Intro section with sticky page content
-- Plugin invocation for "Hello World" plugin
-- Random posts section (alternating left/right layout)
-- Divider section with featured content background
-- Latest posts grid (3 columns)
-- Gallery section with Fancybox lightbox
+### Template Resolution
 
-#### single.php
+| Route | Template | Fallback |
+|-------|----------|----------|
+| `/` | `home.php` | `index.php` |
+| `/post/{id}/{slug}` | `single.php` | `index.php` |
+| `/page/{slug}` | `page.php` | `index.php` |
+| `/category/{slug}` | `category.php` | `archive.php` → `index.php` |
+| `/tag/{tag}` | `tag.php` | `index.php` |
+| `/archive/{mm}/{yyyy}` | `archive.php` | `index.php` |
+| `/archives` | `archives.php` | `index.php` |
+| `/blog*` | `blog.php` | `index.php` |
+| 404 | `404.php` | `index.php` |
 
-Single post template displays:
-- Featured image
-- Post title with permalink
-- Author, date, and comment count metadata
-- Post content with htmLawed HTML filtering
-- Post tags
-- Previous/next post navigation
-- Comments section (AJAX-loaded)
-- Comment form with CSRF protection
+### Asset Locations
 
-#### page.php
+| Type | Location |
+|------|----------|
+| Main CSS | `assets/css/style.sea.min.css` |
+| Custom/Cookie/Comment/Privacy/404/RTL CSS | `assets/css/*.min.css` |
+| Navigation CSS | `assets/css/sina-nav.min.css` |
+| Animation CSS | `assets/css/animate.min.css` |
+| Frontend JS | `assets/js/front.min.js` |
+| Feature JS (search, unlock, comments, cookie) | `assets/js/*.min.js` |
+| Vendor | `assets/vendor/{bootstrap,jquery,font-awesome,@fancyapps/fancybox,popper.js,jquery.cookie}/` |
 
-Static page template includes:
-- Featured image
-- Page title with permalink
-- Author and date metadata
-- Page content with HTML filtering
-- Tags display
+### Template Compliance
 
-#### category.php, tag.php, archive.php, archives.php, blog.php
-
-Archive templates share common structure:
-- Topic/tag/archive header
-- Post grid layout (2 columns)
-- Post metadata (thumbnail, title, excerpt, author, date, comments)
-- Sidebar inclusion
-- Pagination
-
-#### sidebar.php
-
-Sidebar widgets:
-- Search form
-- Latest posts (5 posts with thumbnails)
-- Categories list with post counts
-- Archives list with post counts
-- Tags cloud
-
-#### 404.php
-
-Simple 404 error page with:
-- 404 display
-- "Page not found" message
-- Back to home link
-
-#### privacy.php
-
-Static privacy policy page with:
-- Privacy policy content
-- Last updated date
-- Contact information
-- Back to home button
-
-#### cookie-consent.php
-
-GDPR cookie consent banner with:
-- Privacy notice text
-- Accept/Reject/Learn More buttons
-- Privacy policy link
-- API endpoint for consent management
-
-#### download.php, download_file.php
-
-Download page templates:
-- File information display
-- Download button with UUID-based URL
-- Copy link functionality
-- Expiration countdown
-- Optional support URL
-
-### Creating Custom Themes
-
-1. Create directory: `public/themes/[theme-name]/`
-2. Copy required templates from blog theme:
-   - `theme.ini` - Theme metadata
-   - `functions.php` - Theme functions
-   - `header.php` - Site header
-   - `footer.php` - Site footer
-   - `home.php` - Homepage
-   - `single.php` - Post view
-   - `page.php` - Page view
-   - `category.php` - Category archive
-   - `tag.php` - Tag archive
-   - `archive.php` - Monthly archive
-   - `archives.php` - Archive index
-   - `blog.php` - Blog listing
-   - `sidebar.php` - Sidebar
-   - `404.php` - Error page
-3. Create `theme.ini` with metadata
-4. Add assets to `assets/` subdirectory
-5. Register theme in admin panel (admin/templates.php)
-
-> **TIP:** Use `public/themes/blog/` as a reference theme for creating new themes.
+- All templates start with `defined('SCRIPTLOG') \|\| die('Direct access not permitted')`
+- All dynamic output uses `htmlout()` for escaping, `htmLawed()` for content sanitization
+- All forms include CSRF token via `block_csrf()`
+- Protected posts use `$post_visibility === 'protected'` check (not `'password-protected'`)
+- Images use `invoke_frontimg()`, `invoke_responsive_image()`, or `invoke_hero_image()`
+- Theme registration: activate via **Appearance → Templates** in admin panel
 
 ---
 
@@ -4901,11 +4593,13 @@ private $supportedLocales = ['en_US', 'ar', 'es', 'fr', 'de', 'zh_CN'];
 ### Documentation
 
 For comprehensive API documentation and testing, see:
-- `docs/I18N_ARCHITECTURE.md` - Full architecture documentation
-- `docs/I18N_API.md` - API reference
-- `docs/I18N_TESTING_GUIDE.md` - Testing guide
+- `I18N_ARCHITECTURE.md` - Full architecture documentation
+- `I18N_API.md` - API reference
+- `I18N_TESTING_GUIDE.md` - Testing guide
 
 ---
+
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -5977,7 +5671,7 @@ $.ajax({
 ### Database Schema
 
 **tbl_media** - Image metadata:
-```sql
+```
 - media_filename: Unique filename
 - media_type: 'image'
 - media_target: 'blog'
@@ -5985,7 +5679,7 @@ $.ajax({
 ```
 
 **tbl_mediameta** - Post linkage:
-```sql
+```
 - media_id: Links to tbl_media
 - meta_key: 'post_id'
 - meta_value: Post ID
@@ -6026,14 +5720,6 @@ $.ajax({
    - Database: `tbl_media` and `tbl_mediameta` have new records
    - Editor: Image inserted into content
 
-### Commits
-
-| Commit | Description |
-|--------|-------------|
-| `f2e1d91` | Fix Summernote AJAX image upload authentication |
-| `5db174e` | Fix cookie path for AJAX API requests |
-| `a593f39` | Use direct admin endpoint for Summernote image upload |
-| `44db5e7` | Fix JSON response in media upload handler |
 
 ---
 
@@ -6043,4 +5729,4 @@ This project is licensed under the MIT License.
 
 ---
 
-*Last Updated: April 2026 | Version 1.1.1*
+*Last Updated: June 2026 | Version 1.2.0*
