@@ -9,9 +9,15 @@ class ThemeRenderer
     public function __construct()
     {
         $theme = theme_identifier();
-        $this->themeDir = APP_ROOT . APP_THEME
+        $themeDir = APP_ROOT . APP_THEME
             . escape_html($theme['theme_directory'])
             . DIRECTORY_SEPARATOR;
+
+        if (!file_exists($themeDir . 'header.php')) {
+            $themeDir = APP_ROOT . APP_THEME . 'blog' . DIRECTORY_SEPARATOR;
+        }
+
+        $this->themeDir = $themeDir;
     }
 
     public function render(string $template, int $statusCode = 200): void
