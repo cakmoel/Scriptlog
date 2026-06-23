@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "catfan/medoo",
-            "version": "v2.2.1",
+            "version": "v2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/catfan/Medoo.git",
-                "reference": "0a9653a8b99b0853c3dbef3d661d4b359b9686b7"
+                "reference": "467d100225ec3cb3082476f98193bb572015aff5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/catfan/Medoo/zipball/0a9653a8b99b0853c3dbef3d661d4b359b9686b7",
-                "reference": "0a9653a8b99b0853c3dbef3d661d4b359b9686b7",
+                "url": "https://api.github.com/repos/catfan/Medoo/zipball/467d100225ec3cb3082476f98193bb572015aff5",
+                "reference": "467d100225ec3cb3082476f98193bb572015aff5",
                 "shasum": ""
             },
             "require": {
@@ -25,7 +25,7 @@
                 "php": ">=7.3"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9.0"
+                "phpunit/phpunit": "^13"
             },
             "suggest": {
                 "ext-pdo_dblib": "For MSSQL or Sybase database on Linux/UNIX platform",
@@ -80,7 +80,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2026-02-03T08:34:27+00:00"
+            "time": "2026-05-14T08:20:54+00:00"
         },
         {
             "name": "defuse/php-encryption",
@@ -8230,15 +8230,15 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.4"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "7.4.33"
     },
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.9.0"
 }
