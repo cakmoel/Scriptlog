@@ -36,39 +36,15 @@ function formSuccess(response) {
 }
 
 function formError(jqXHR, textStatus, errorThrown) {
-	try {
-		let msg = $.parseJSON(jqXHR.responseText);
+	var message = 'An error occurred. Please try again later.';
 
-		if (msg?.errors) { // Optional chaining to check for errors property
-			// Display specific error messages from the server
-			$.each(msg.errors, function (field, error) {
-				$("#" + field).addClass("is-invalid");
-				$("#error_message").show().html(error);
-			});
-		} else {
-			// Handle other error scenarios based on textStatus and errorThrown
-			switch (textStatus) {
-				case "timeout":
-					$("#error_message").show().html("The request timed out. Please try again.");
-					break;
-				case "abort":
-					// Handle aborted requests (e.g., due to form submission cancellation)
-					break;
-				case "parsererror":
-					$("#error_message").show().html("An error occurred while parsing the server response.");
-					break;
-				default:
-					// Generic error message for other cases
-					$("#error_message").show().html("An error occurred. Please try again later.");
-					break;
-			}
-			console.error("AJAX error:", textStatus, errorThrown); // Log for debugging
-		}
-	} catch (e) {
-		// Handle parsing errors
-		console.error("Error parsing AJAX error response:", e);
-		$("#error_message").show().html("An unexpected error occurred. Please contact support.");
+	if (textStatus === 'timeout') {
+		message = 'The request timed out. Please try again.';
+	} else if (textStatus === 'abort') {
+		return;
 	}
+
+	$("#error_message").show().html(message);
 }
 
 // checking author name - validation for author name
