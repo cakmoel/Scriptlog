@@ -27,7 +27,7 @@ $entries_pagination = function_exists('retrieve_blog_posts') ? retrieve_blog_pos
                 ?>
 
             <div class="post col-xl-6">
-              <div class="post-thumbnail"><a href="<?= isset($entry_id) ? permalinks($entry_id)['post'] : "#"; ?>"><?= isset($entry_img) ? invoke_responsive_image($entry_img, 'thumbnail', true, isset($entry_img_caption) ? $entry_img_caption : $entry_title, 'img-fluid') : '<img src="https://via.placeholder.com/640x450" alt="" width="640" height="450" class="img-fluid" loading="lazy" decoding="async">' ?></a></div>
+              <div class="post-thumbnail"><a href="<?= isset($entry_id) ? permalinks($entry_id)['post'] : "#"; ?>"><?= isset($entry_img) ? invoke_responsive_image($entry_img, 'thumbnail', true, isset($entry_img_caption) ? $entry_img_caption : $entry_title, 'img-fluid') : '<img src="' . theme_dir() . 'assets/img/placeholder.svg" alt="" width="640" height="450" class="img-fluid" loading="lazy" decoding="async">' ?></a></div>
               <div class="post-details">
                 <div class="post-meta d-flex justify-content-between">
                   <div class="date meta-last"> <?= isset($entry_created) ? $entry_created : ""; ?> </div>
