@@ -72,7 +72,7 @@ if (isset($retrieve_post['post_modified'])) {
                 <div class="container">
                     <div class="post-single">
                         <div class="post-thumbnal">
-                            <?= isset($post_img) ? invoke_responsive_image($post_img, 'medium', true, isset($img_alt) ? $img_alt : "", 'img-fluid', true) : '<img src="https://picsum.photos/730/486" alt="" width="730" height="486" class="img-fluid" loading="lazy" decoding="async">' ?>
+                            <?= isset($post_img) ? invoke_responsive_image($post_img, 'medium', true, isset($img_alt) ? $img_alt : "", 'img-fluid', true) : '<img src="' . theme_dir() . 'assets/img/placeholder.svg" alt="" width="730" height="486" class="img-fluid" loading="lazy" decoding="async">' ?>
                         </div>
 
                         <div class="post-details">
