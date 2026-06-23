@@ -294,7 +294,7 @@ function get_table_definitions($prefix = '')
 
     $insertDefaultLanguage = "INSERT INTO {$prefix}tbl_languages (lang_code, lang_name, lang_native, lang_locale, lang_direction, lang_sort, lang_is_default) VALUES ('en', 'English', 'English', 'en_US', 'ltr', 1, 1)";
 
-    $insertLangSettings = "INSERT INTO {$prefix}tbl_settings (setting_name, setting_value) VALUES ('lang_default', 'en'), ('lang_available', 'en'), ('lang_auto_detect', '1'), ('lang_prefix_required', '1')";
+    $insertLangSettings = "INSERT INTO {$prefix}tbl_settings (setting_name, setting_value) VALUES ('lang_default', 'en'), ('lang_available', 'en,ar,zh,fr,ru,es,id'), ('lang_auto_detect', '1'), ('lang_prefix_required', '1')";
 
     $alterPostLocale = "ALTER TABLE {$prefix}tbl_posts ADD COLUMN post_locale VARCHAR(10) NOT NULL DEFAULT 'en' AFTER post_type, ADD INDEX idx_post_locale (post_locale)";
 
