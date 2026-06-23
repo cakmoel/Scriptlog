@@ -248,7 +248,9 @@ class ScriptlogCryptonize
             return $plaintext;
             
         } catch (Throwable $e) {
-            self::logError($e);
+            if (!$e instanceof ScriptlogCryptonizeException) {
+                self::logError($e);
+            }
             throw $e;
         }
     }
