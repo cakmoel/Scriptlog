@@ -25,6 +25,7 @@
         "defuse/php-encryption": "^2.2",
         "egulias/email-validator": "^2.1",
         "filp/whoops": "^2.9",
+        "guzzlehttp/psr7": "^2.12.1",
         "intervention/image": "^2.5",
         "ircmaxell/random-lib": "^1.2",
         "laminas/laminas-crypt": "^3.3",
