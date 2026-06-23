@@ -32,7 +32,7 @@ if (isset($retrieve_page['post_date'])) {
         <div class="post blog-post col-lg-8">
             <div class="container">
                 <div class="post-single">
-                    <div class="post-thumbnail"><?= isset($page_img) ? invoke_responsive_image($page_img, 'medium', true, isset($img_alt) ? $img_alt : "", 'img-fluid') : '<img src="https://picsum.photos/730/486" alt="" width="730" height="486" class="img-fluid" loading="lazy" decoding="async">' ?></div>
+                    <div class="post-thumbnail"><?= isset($page_img) ? invoke_responsive_image($page_img, 'medium', true, isset($img_alt) ? $img_alt : "", 'img-fluid') : '<img src="' . theme_dir() . 'assets/img/placeholder.svg" alt="" width="730" height="486" class="img-fluid" loading="lazy" decoding="async">' ?></div>
                     <div class="post-details">
                         <div class="post-meta d-flex justify-content-between">
                             <div class="category">
