@@ -35,7 +35,7 @@ if (function_exists('is_permalink_enabled') && is_permalink_enabled() === 'yes')
 
 // Also check GET parameter as fallback
 if (empty($identifier) && isset($_GET['identifier'])) {
-    $identifier = $_GET['identifier'];
+    $identifier = preg_replace('/[^a-zA-Z0-9\-]/', '', trim($_GET['identifier']));
 }
 
 if (empty($identifier)) {
