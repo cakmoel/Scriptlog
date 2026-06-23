@@ -23,7 +23,7 @@ $(document).ready(function () {
 
             alternateColour.attr("href", theme_csspath);
 
-            $.cookie("theme_csspath", theme_csspath, { expires: 365, path: document.URL.substr(0, document.URL.lastIndexOf('/')) });
+            $.cookie("theme_csspath", theme_csspath, { expires: 30, path: document.URL.substr(0, document.URL.lastIndexOf('/')) });
 
         }
 
