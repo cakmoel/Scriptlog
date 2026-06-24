@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/sanitize-urls.php';
-
 /**
  * generate_request function
  *
@@ -17,6 +15,8 @@ require_once __DIR__ . '/sanitize-urls.php';
  * @return array
  *
  */
+require_once __DIR__ . '/sanitize-urls.php';
+
 function generate_request($base, $type, $data = array(), $string_encoded = true)
 {
 
