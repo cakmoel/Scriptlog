@@ -135,20 +135,22 @@ function db_prepared_query($sql, array $params, $types = "")
  * @return boolean
  *
  */
-function is_table_exists($table)
-{
-    $db = db_instance();
-    if (method_exists($db, 'isTableExists')) {
-        return $db->isTableExists($table);
-    } elseif (method_exists($db, 'dbSelect')) {
-        try {
-            $result = $db->dbSelect("SELECT 1 FROM {$table} LIMIT 1", [], PDO::FETCH_NUM);
-            return !empty($result);
-        } catch (Exception $e) {
-            return false;
+if (!function_exists('is_table_exists')) {
+    function is_table_exists($table)
+    {
+        $db = db_instance();
+        if (method_exists($db, 'isTableExists')) {
+            return $db->isTableExists($table);
+        } elseif (method_exists($db, 'dbSelect')) {
+            try {
+                $result = $db->dbSelect("SELECT 1 FROM {$table} LIMIT 1", [], PDO::FETCH_NUM);
+                return !empty($result);
+            } catch (Exception $e) {
+                return false;
+            }
         }
+        return false;
     }
-    return false;
 }
 
 /**

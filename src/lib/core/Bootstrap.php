@@ -236,10 +236,10 @@ class Bootstrap
 
         // ThemeRenderer for centralized theme rendering
         $themeRenderer = null;
-        if (class_exists('ThemeRenderer') && !empty($dbc)) {
+        if (class_exists('ThemeRenderer') && isset($dbc) && $dbc instanceof \PDO) {
             try {
                 $themeRenderer = new ThemeRenderer();
-            } catch (Exception $e) {
+            } catch (\Throwable $e) {
                 $themeRenderer = null;
             }
         }
