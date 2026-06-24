@@ -8,12 +8,79 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#121---2026-06-16)
+- [Latest Release](#122---2026-06-25)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.2.2] - 2026-06-25
+
+### Added
+- **Local placeholder SVG image**: Replaced external placeholder URLs with a local `placeholder.svg` asset across all blog templates (archive, category, tag, blog, single, page, home)
+- **THEME_DEVELOPER_GUIDE.md**: Comprehensive standalone theme reference documentation
+- **Language indicator widget**: i18n sidebar locale bootstrap with ARIA attributes for accessibility
+- **Extended locale support**: `lang_available` now includes Arabic, Chinese, French, Russian, Spanish, and Indonesian during installation
+- **SidebarNavigationTest**: Unit tests for admin sidebar navigation
+- **MIT license file**: Added `LICENSE` file to the blog theme
+
+### Changed
+- **Utility loader ordering**: `sanitize-urls.php` now loads before `generate-request.php` project-wide to resolve dependency ordering across multiple load paths
+- **Translation caches**: English, Spanish, and Indonesian translation caches restructured, expanded, and streamlined with full key-value pairs
+- **RELEASE_GUIDE.md**: Overhauled with Packagist version immutability guidance
+- **Theme cookie expiry**: Reduced from 365 to 30 days
+
+### Fixed
+- **ThemeRenderer DB guard**: Multiple hardening passes — replaced empty/null checks with `instanceof \PDO` type check, caught `\Throwable` instead of `Exception`, removed redundant guard conditions
+- **`is_table_exists` redeclaration**: Wrapped in `function_exists()` guard to prevent fatal errors when the function is loaded multiple times
+- **`generate-request.php` require ordering**: Moved `require_once` before function declaration to comply with PHP best practices
+- **Session initialization**: Reordered session start before authenticator include to prevent `headers_sent` errors
+- **Front controller**: Added `ob_start()` for proper output buffering
+- **Theme fallback**: Added directory fallback when `header.php` not found in active theme
+- **Comment endpoint**: Fixed `fetch-comments.php` to use dynamic `site_url`
+- **Copyright year**: Corrected start year from 2021 to 2018
+- **Void return types**: Removed incorrect `void` return type from `install_i18n_data` and `convert_memory_used`
+- **Error suppression**: Suppressed `file_put_contents`/`file_get_contents` warnings with `@` operator
+- **ScriptlogCryptonizeException**: Skip error logging for expected encryption exceptions in decrypt method
+- **Dependabot config**: Corrected target-branch and directory; updated CodeQL action versions
+- **Autoloader path**: Fixed composer autoload and PHPUnit paths for `lib/vendor` structure
+- **Bootstrap error handling**: Improved exception handling and SQL query logging in core Bootstrap
+- **Install system**: Improved error handling, DB connection validation, and security hardening in installation wizard
+
+### Security
+- **SRI integrity hashes**: Added Subresource Integrity hashes to all CSS and JavaScript assets; removed legacy IE tweaks
+- **Frontend JS hardening**: Validated cookie values and anchor targets in `front.js`
+- **XSS prevention**: Sanitized Summernote databasic and specialchars plugins
+- **Download identifier sanitization**: Sanitized download identifiers with `preg_replace` to prevent injection attacks
+- **Prepared statements**: Migrated previous/next post queries to prepared statements; escaped permalink in `format_topics`
+- **CVE-2026-55766**: Updated `guzzlehttp/psr7` to 2.12.1 to fix CRLF injection vulnerability
+- **Colour select sanitization**: Sanitized colour select input in admin `front.js`
+- **CodeQL scanning**: Added PHP to CodeQL analysis targets
+
+### Removed
+- **`restoblog` and `tastybites` themes**: Removed from repository (not yet production-ready)
+- **Redundant `echo`**: Removed extraneous `echo` before `sidebar_navigation()` call
+- **Stale translation caches**: Cleared stale `en.json` and `es.json` caches for clean regeneration
+
+### Refactored
+- **External dependency removal**: Replaced all external placeholder image URLs with local `placeholder.svg` across archive, category, tag, blog, single, page, and home templates
+- **AJAX error handling**: Simplified error handling in comment submission and search functionality
+
+### Style
+- **Install wizard responsiveness**: Added mobile breakpoint styles to install wizard CSS
+
+### Notes
+Security-focused release with 10+ vulnerability fixes, comprehensive utility loader stabilization, i18n expansion, and removal of external image dependencies. All unit tests passing (764 tests, 1753 assertions).
+
+### Codename
+**Kakatua Jambul Kuning** – Honoring *Cacatua sulphurea*, the critically endangered yellow-crested cockatoo endemic to Indonesia.
+
+### Comparison
+- **Previous release**: v1.2.1
+- **Changes since v1.2.1**: 79 commits
+
+---
 
 ## [1.2.1] - 2026-06-16
 
