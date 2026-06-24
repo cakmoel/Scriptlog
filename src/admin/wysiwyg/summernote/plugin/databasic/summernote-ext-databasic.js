@@ -169,8 +169,9 @@
     };
 
     self.setContent = function($node) {
-      $node.html('<p contenteditable="false">' + self.icon + ' ' + lang.databasic.name + ': ' +
-        $node.attr('data-test') + '</p>');
+      var testValue = $node.attr('data-test') || '';
+      var safeTest = testValue.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      $node.html('<p contenteditable="false">' + self.icon + ' ' + lang.databasic.name + ': ' + safeTest + '</p>');
     };
 
     self.updateNode = function(info) {
