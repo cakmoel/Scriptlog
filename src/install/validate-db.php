@@ -14,6 +14,12 @@ require dirname(__FILE__) . '/include/setup.php';
 
 header('Content-Type: application/json');
 
+// 0. Hard Lock: Prevent access if installation is already complete
+if (file_exists(__DIR__ . '/../config.php')) {
+    echo json_encode(['success' => false, 'message' => 'Installation is already complete.']);
+    exit;
+}
+
 // 1. CSRF Check
 if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
     echo json_encode(['success' => false, 'message' => 'CSRF validation failed.']);
