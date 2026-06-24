@@ -74,7 +74,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 Security-focused release with 10+ vulnerability fixes, comprehensive utility loader stabilization, i18n expansion, and removal of external image dependencies. All unit tests passing (764 tests, 1753 assertions).
 
 ### Codename
-**Kakatua Jambul Kuning** – Honoring *Cacatua sulphurea*, the critically endangered yellow-crested cockatoo endemic to Indonesia.
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
 
 ### Comparison
 - **Previous release**: v1.2.1
@@ -424,6 +424,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.2.2 | 2026-06-25 | Stable |
 | 1.2.1 | 2026-06-16 | Stable |
 | 1.1.0 | 2026-06-13 | Stable |
 | 1.0.8 | 2026-05-14 | Stable |
