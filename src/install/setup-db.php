@@ -37,7 +37,10 @@ if (!file_exists(__DIR__ . '/../config.php')) {
     $required_tables = [
       $prefix . 'tbl_users', $prefix . 'tbl_user_token', $prefix . 'tbl_topics', $prefix . 'tbl_themes',
       $prefix . 'tbl_settings', $prefix . 'tbl_posts', $prefix . 'tbl_post_topic', $prefix . 'tbl_plugin',
-      $prefix . 'tbl_menu', $prefix . 'tbl_mediameta', $prefix . 'tbl_media', $prefix . 'tbl_media_download', $prefix . 'tbl_comments'
+      $prefix . 'tbl_menu', $prefix . 'tbl_mediameta', $prefix . 'tbl_media', $prefix . 'tbl_media_download',
+      $prefix . 'tbl_comments', $prefix . 'tbl_login_attempt', $prefix . 'tbl_consents',
+      $prefix . 'tbl_data_requests', $prefix . 'tbl_privacy_logs', $prefix . 'tbl_languages',
+      $prefix . 'tbl_translations', $prefix . 'tbl_download_log', $prefix . 'tbl_privacy_policies'
     ];
 
     foreach ($required_tables as $table) {
@@ -165,7 +168,7 @@ if (!file_exists(__DIR__ . '/../config.php')) {
                         $defuse_key_path = dirname(__DIR__, 2) . '/lib/utility/.lts/lts.php';
                     }
 
-                    install_database_table($dbconnect, $protocol, $server_host, $username, $password, $email, $key, $prefix, $site_language, $defuse_key_path);
+                    install_database_table($dbconnect, $protocol, $server_host, $username, $password, $email, $key, $prefix, $site_language, $defuse_key_path, $set_config['db']['host']);
 
                     # Generate server config file based on web server
                     $server_config = generate_server_config();
@@ -177,8 +180,8 @@ if (!file_exists(__DIR__ . '/../config.php')) {
                     }
                     header("Location:" . $protocol . "://" . $server_host . $installPath . "/finish.php?status=success&token={$key}");
                 }
-            } catch (mysqli_sql_exception $e) {
-                $errors['errorInstall'] = "Database error: " . $e->getMessage();
+            } catch (RuntimeException $e) {
+                $errors['errorInstall'] = $e->getMessage();
             }
         }
     }

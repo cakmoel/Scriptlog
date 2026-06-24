@@ -11,6 +11,12 @@ define('SCRIPTLOG', true);
 
 header('Content-Type: application/json');
 
+// 0. Hard Lock: Prevent access if installation is already complete
+if (file_exists(__DIR__ . '/../config.php')) {
+    echo json_encode(['success' => false, 'message' => 'Installation is already complete.']);
+    exit;
+}
+
 if (!isset($_GET['step']) || !ctype_digit($_GET['step'])) {
     echo json_encode(['success' => false, 'message' => 'Invalid step.']);
     exit;

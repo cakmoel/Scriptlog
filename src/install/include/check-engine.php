@@ -188,16 +188,7 @@ function check_loader()
  */
 function check_log_dir()
 {
-
-    $perms = fileperms(APP_PATH . '../public/log');
-
-    if (is_dir(APP_PATH . '../public/log')) {
-        return true;
-    } elseif (is_writable(APP_PATH . '../public/log') || ($perms & 0x0080) || ($perms & 0x0010) || ($perms & 0x0002)) {
-        return true;
-    } else {
-        return false;
-    }
+    return (is_dir(APP_PATH . '../public/log') && is_writable(APP_PATH . '../public/log'));
 }
 
 /**
@@ -205,16 +196,7 @@ function check_log_dir()
  */
 function check_theme_dir()
 {
-
-    $perms = fileperms(APP_PATH . '../public/themes');
-
-    if (is_dir(APP_PATH . '../public/themes')) {
-        return true;
-    } elseif (is_writable(APP_PATH . '../public/themes') || ($perms & 0x0080) || ($perms & 0x0010) || ($perms & 0x0002)) {
-        return true;
-    } else {
-        return false;
-    }
+    return (is_dir(APP_PATH . '../public/themes') && is_writable(APP_PATH . '../public/themes'));
 }
 
 /**
@@ -223,16 +205,7 @@ function check_theme_dir()
  */
 function check_cache_dir()
 {
-
-    $perms = fileperms(APP_PATH . '../public/cache/');
-
-    if (is_dir(APP_PATH . '../public/cache')) {
-        return true;
-    } elseif (is_writable(APP_PATH . '../public/cache') || ($perms & 0x0080) || ($perms & 0x0010) || ($perms & 0x0002)) {
-        return true;
-    } else {
-        return false;
-    }
+    return (is_dir(APP_PATH . '../public/cache') && is_writable(APP_PATH . '../public/cache'));
 }
 
 /**
@@ -243,16 +216,7 @@ function check_cache_dir()
  */
 function check_plugin_dir()
 {
-
-    $perms = fileperms(APP_PATH . '../admin/plugins');
-
-    if (is_dir(APP_PATH . '../admin/plugins')) {
-        return true;
-    } elseif (is_writable(APP_PATH . '../admin/plugins') || ($perms & 0x0080) || ($perms & 0x0010) || ($perms & 0x0002)) {
-        return true;
-    } else {
-        return false;
-    }
+    return (is_dir(APP_PATH . '../admin/plugins') && is_writable(APP_PATH . '../admin/plugins'));
 }
 
 /**

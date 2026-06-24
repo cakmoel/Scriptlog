@@ -168,10 +168,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $defuse_key_path = dirname(__DIR__, 2) . '/lib/utility/.lts/lts.php';
                 }
 
-                install_database_table($link, $protocol, $server_host, $username, $password, $email, $key, $table_prefix, $site_language, $defuse_key_path);
+                install_database_table($link, $protocol, $server_host, $username, $password, $email, $key, $table_prefix, $site_language, $defuse_key_path, $dbhost);
 
                 // Write configuration file - system generates encryption key automatically outside web root
-                $configResult = write_config_file($protocol, $server_host, $dbhost, $dbpass, $dbuser, $dbname, $dbport, $email, $key, $ca, $table_prefix);
+                $configResult = write_config_file($protocol, $server_host, $dbhost, $dbpass, $dbuser, $dbname, $dbport, $email, $key, $ca, $table_prefix, $defuse_key_path);
                 
                 if (!$configResult) {
                     $errors['errorSetup'] = "Failed to create configuration files. Please check file permissions.";
@@ -189,8 +189,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     exit;
                 }
             }
-        } catch (mysqli_sql_exception $e) {
-            $errors['errorSetup'] = "Database error: " . $e->getMessage();
+        } catch (RuntimeException $e) {
+            $errors['errorSetup'] = $e->getMessage();
         }
     }
 }

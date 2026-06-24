@@ -319,7 +319,7 @@ class ScriptlogCryptonize
     }
     
     /**
-     * Update config.php and .env with new key path
+     * Update config.php, .env, and database with new key path
      *
      * @param string $newKeyPath Absolute path to the key file
      */
@@ -345,6 +345,54 @@ class ScriptlogCryptonize
                 $envContent
             );
             @file_put_contents($envPath, $envContent);
+        }
+
+        // Also update database tbl_settings
+        self::updateDatabaseKeyPath($newKeyPath, $configPath);
+    }
+
+    /**
+     * Update defuse_key_path in database settings table
+     *
+     * @param string $newKeyPath
+     * @param string $configPath
+     */
+    private static function updateDatabaseKeyPath(string $newKeyPath, string $configPath): void
+    {
+        if (!file_exists($configPath)) {
+            return;
+        }
+
+        $config = require $configPath;
+
+        $dbHost = $config['db']['host'] ?? null;
+        $dbUser = $config['db']['user'] ?? null;
+        $dbPass = $config['db']['pass'] ?? null;
+        $dbName = $config['db']['name'] ?? null;
+        $dbPort = $config['db']['port'] ?? '3306';
+        $prefix = $config['db']['prefix'] ?? '';
+
+        if (!$dbHost || !$dbUser || !$dbName) {
+            return;
+        }
+
+        try {
+            $mysqli = new mysqli($dbHost, $dbUser, $dbPass, $dbName, (int)$dbPort);
+
+            if ($mysqli->connect_error) {
+                return;
+            }
+
+            $stmt = $mysqli->prepare("UPDATE {$prefix}tbl_settings SET setting_value = ? WHERE setting_name = 'defuse_key_path'");
+            if ($stmt) {
+                $stmt->bind_param('s', $newKeyPath);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            $mysqli->close();
+        } catch (Exception $e) {
+            error_log("ScriptlogCryptonize: Failed to update defuse_key_path in database: " . $e->getMessage());
         }
     }
 

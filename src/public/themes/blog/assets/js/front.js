@@ -11,21 +11,21 @@ $(document).ready(function () {
     $( "<link id='new-stylesheet' rel='stylesheet'>" ).insertAfter(stylesheet);
     var alternateColour = $('link#new-stylesheet');
 
-    if ($.cookie("theme_csspath")) {
-        var href = $.cookie("theme_csspath").replace(/[^a-zA-Z0-9_.\/-]/g, '');
-        alternateColour.attr("href", href);
+    var themeCookie = $.cookie("theme_csspath");
+    if (themeCookie && themeCookie.indexOf('css/style.') === 0 && themeCookie.indexOf('..') === -1) {
+        alternateColour.attr("href", themeCookie);
     }
 
     $("#colour").change(function () {
 
         if ($(this).val() !== '') {
 
-            var colour = $(this).val().replace(/[^a-zA-Z0-9_-]/g, '');
-            var theme_csspath = 'css/style.' + colour + '.css';
+            var theme_csspath = 'css/style.' + $(this).val() + '.css';
 
             alternateColour.attr("href", theme_csspath);
 
-            $.cookie("theme_csspath", theme_csspath, { expires: 30, path: window.location.pathname });
+            var cookiePath = window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/')) || '/';
+            $.cookie("theme_csspath", theme_csspath, { expires: 30, path: cookiePath });
 
         }
 
@@ -51,10 +51,15 @@ $(document).ready(function () {
     // Preventing URL update on navigation link click
     // ---------------------------------------------- //
     $('.link-scroll').bind('click', function (e) {
-        var anchor = $(this);
-        $('html, body').stop().animate({
-            scrollTop: $(anchor.attr('href')).offset().top + 2
-        }, 700);
+        var href = this.getAttribute('href');
+        if (href && href.charAt(0) === '#') {
+            var $target = $(href);
+            if ($target.length) {
+                $('html, body').stop().animate({
+                    scrollTop: $target.offset().top + 2
+                }, 700);
+            }
+        }
         e.preventDefault();
     });
 
