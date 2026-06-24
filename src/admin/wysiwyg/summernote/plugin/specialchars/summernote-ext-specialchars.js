@@ -131,7 +131,8 @@
           context.invoke('editor.restoreRange');
 
           // build node
-          var $node = $('<span></span>').html(selectChar)[0];
+          var safeChar = specialCharDataSet.indexOf(selectChar) >= 0 ? selectChar : '';
+          var $node = $('<span></span>').html(safeChar)[0];
 
           if ($node) {
             // insert video node
