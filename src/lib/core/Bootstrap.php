@@ -390,7 +390,7 @@ class Bootstrap
         if (function_exists('get_server_load')) {
             try {
                 get_server_load();
-            } catch (Exception $e) {
+            } catch (\Throwable $e) {
                 // Ignore server load check errors
             }
         }
