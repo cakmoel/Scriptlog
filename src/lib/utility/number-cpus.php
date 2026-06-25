@@ -25,7 +25,7 @@ function number_cpus()
     } elseif ('WIN' === strtoupper(substr(PHP_OS, 0, 3))) {
         $process = function_exists('popen') ? @popen('wmic cpu get NumberOfCores', 'rb') : "";
 
-        if (false !== $process) {
+        if (is_resource($process)) {
             fgets($process);
 
             $cpu_core = intval(fgets($process));
@@ -35,7 +35,7 @@ function number_cpus()
     } else {
         $process = function_exists('popen') ? @popen('sysctl -a', 'rb') : "";
 
-        if (false !== $process) {
+        if (is_resource($process)) {
             $output = stream_get_contents($process);
 
             preg_match('/hw.ncpu: (\d+)/', $output, $matches);
