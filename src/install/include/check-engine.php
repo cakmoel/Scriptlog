@@ -220,6 +220,19 @@ function check_plugin_dir()
 }
 
 /**
+ * check_session_dir()
+ *
+ * Checking Sessions Directory. It is writable or not
+ *
+ * @return bool
+ *
+ */
+function check_session_dir()
+{
+    return (is_dir(APP_PATH . '../public/files/cache/sessions') && is_writable(APP_PATH . '../public/files/cache/sessions'));
+}
+
+/**
  * Checks if PCRE is compiled with UTF-8 and Unicode property support.
  * @return bool True if support is available, false otherwise.
  */
