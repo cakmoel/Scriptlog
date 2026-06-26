@@ -20,14 +20,14 @@ function resolve_session_save_path()
     $envPath = getenv('SESSION_SAVE_PATH');
     if ($envPath) {
         $envPath = rtrim($envPath, DIRECTORY_SEPARATOR);
-        if (is_dir($envPath) && is_writable($envPath)) {
-            return $envPath;
-        }
         if (!is_dir($envPath)) {
             @mkdir($envPath, 0755, true);
-            if (is_dir($envPath) && is_writable($envPath)) {
-                return $envPath;
-            }
+        }
+        if (is_dir($envPath) && !is_writable($envPath)) {
+            @chmod($envPath, 0777);
+        }
+        if (is_dir($envPath) && is_writable($envPath)) {
+            return $envPath;
         }
     }
 
@@ -37,6 +37,16 @@ function resolve_session_save_path()
 
     if (!is_dir($path)) {
         @mkdir($path, 0755, true);
+    }
+
+    if (is_dir($path) && !is_writable($path)) {
+        @chmod($path, 0777);
+        if (!is_writable($path)) {
+            $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'blogware_sessions';
+            if (!is_dir($path)) {
+                @mkdir($path, 0755, true);
+            }
+        }
     }
 
     return $path;
