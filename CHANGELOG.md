@@ -8,12 +8,51 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#122---2026-06-25)
+- [Latest Release](#123---2026-06-26)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.2.3] - 2026-06-26
+
+### Added
+- **`check_session_dir()` function**: New installer requirements check for sessions directory writability
+- **Sessions directory check**: Added to installer requirements UI for user visibility during setup
+- **`.gitkeep` and `index.html`**: Protect `public/files/cache/sessions/` directory from directory listing
+
+### Changed
+- **`resolve_session_save_path()`**: Added chmod fallback logic to attempt permission recovery when sessions directory exists but is not writable, with fallback to `sys_get_temp_dir()`
+
+### Fixed
+- **Session initialization**: Used `resolve_session_save_path()` in both Bootstrap and API session init to ensure consistent session storage location
+- **PHP 7.4 backwards compatibility**: Removed mixed return type declarations that caused fatal errors on PHP 7.4
+- **`number_cpus()` mac branch**: Removed redundant `is_resource` guard and replaced `false` comparison with `is_resource` for `popen()` in all branches
+
+### Security
+- **Sessions directory protection**: Added `index.html` to prevent directory listing of session files
+
+### Tests
+- **Bootstrap tests**: Added tests for `\Throwable` catch and `instanceof PDO` guard in theme renderer
+- **`number_cpus()` tests**: Comprehensive unit tests covering Linux, Windows, and Mac branches
+- **`generate_request` and `sanitize_urls` tests**: Full coverage for request generation and URL sanitization
+- **`db-mysqli` function tests**: Unit tests with `is_table_exists` guard coverage
+
+### Removed
+- **Stale translation caches**: Cleared stale `en.json` and `es.json` for clean regeneration
+
+### Notes
+Maintenance release focused on session path reliability, PHP 7.4 compatibility, expanded test coverage, and installer hardening. All unit tests passing (829 tests, 1854 assertions).
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.2.2
+- **Changes since v1.2.2**: 24 commits
+
+---
 
 ## [1.2.2] - 2026-06-25
 
@@ -424,6 +463,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.2.3 | 2026-06-26 | Stable |
 | 1.2.2 | 2026-06-25 | Stable |
 | 1.2.1 | 2026-06-16 | Stable |
 | 1.1.0 | 2026-06-13 | Stable |
