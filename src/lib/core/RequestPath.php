@@ -152,7 +152,7 @@ class RequestPath
     /**
      * Magic getter with null coalescing
      */
-    public function __get(string $key): mixed
+    public function __get(string $key)
     {
         return $this->parts[$key] ?? null;
     }
@@ -160,7 +160,7 @@ class RequestPath
     /**
      * Magic setter with sanitization
      */
-    public function __set(string $key, mixed $value): void
+    public function __set(string $key, $value): void
     {
         $this->parts[$key] = is_string($value) ? $this->sanitizeValue($value) : $value;
     }
