@@ -217,7 +217,7 @@ class Bootstrap
             if (session_status() === PHP_SESSION_ACTIVE) {
                 session_write_close();
             }
-            session_save_path(sys_get_temp_dir());
+            session_save_path(resolve_session_save_path());
             session_set_save_handler($sessionMaker, true);
             register_shutdown_function('session_write_close');
             if (function_exists('start_session_on_site')) {
