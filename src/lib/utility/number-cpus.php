@@ -44,9 +44,7 @@ function number_cpus()
                 $cpu_core = intval($matches[1][0]);
             }
 
-            if (is_resource($process)) {
-                pclose($process);
-            }
+            pclose($process);
         }
     }
 

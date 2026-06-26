@@ -182,6 +182,7 @@ if (!function_exists('load_core_utilities')) {
         'scriptlog-upload-filesize.php',
         'scriptlog-verify-password.php',
         'secure-http-headers.php',
+        'session-save-path.php',
         'simple-salt.php',
         'sitemap-generator.php',
         'start-session-on-site.php',
