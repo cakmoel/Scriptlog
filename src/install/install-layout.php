@@ -69,7 +69,7 @@ function install_footer($stylePath)
         <div class="container border-top pt-4">
             <p class="mb-1">&copy; 
                 <?php
-                    $starYear = 2021;
+                    $starYear = 2018;
                 $thisYear = date("Y");
                 echo ($starYear == $thisYear) ? $starYear : "{$starYear} &#8211; {$thisYear}";
                 echo " Scriptlog";
@@ -248,6 +248,7 @@ function check_dir_file()
                     'Load Engine' => ['condition' => check_loader(), 'path' => 'Autoloader.php'],
                     'Logs'        => ['condition' => check_log_dir(), 'path' => 'public/log'],
                     'Cache'       => ['condition' => check_cache_dir(), 'path' => 'public/cache'],
+                    'Sessions'    => ['condition' => check_session_dir(), 'path' => 'public/files/cache/sessions'],
                     'Themes'      => ['condition' => check_theme_dir(), 'path' => 'public/themes'],
                     'Plugins'     => ['condition' => check_plugin_dir(), 'path' => 'admin/plugins']
                 ];
@@ -302,6 +303,7 @@ function are_all_requirements_met()
         check_loader() &&
         check_log_dir() &&
         check_cache_dir() &&
+        check_session_dir() &&
         check_theme_dir() &&
         check_plugin_dir()
     );

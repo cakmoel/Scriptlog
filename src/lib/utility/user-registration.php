@@ -61,7 +61,7 @@ function signup_id()
  */
 function verify_signup_id($signupId)
 {
-    if ((!isset($_SESSION['human_signup_id'], $signupId)) || ($_SESSION['human_signup_id'] !== $signupId)) {
+    if (!isset($_SESSION['human_signup_id']) || ($_SESSION['human_signup_id'] !== $signupId)) {
         return false;
     }
 
@@ -92,7 +92,7 @@ function checking_signup_request($ip, $signupId, $uniqueKey, array $values)
         exit("400 Bad Request");
     }
 
-    if (!isset($uniqueKey) || ($uniqueKey !== md5(app_key() . $ip))) {
+    if ($uniqueKey !== md5(app_key() . $ip)) {
         http_response_code(400);
         exit("400 Bad Request ");
     }
@@ -159,7 +159,7 @@ function processing_signup($ip, $signupId, $uniqueKey, $errors, array $values)
         $errors['errorMessage'] = "Email already in use";
     }
 
-    if (isset($user_pass)) {
+    if ($user_pass) {
         if ((function_exists('check_common_password')) && (check_common_password($user_pass) === true)) {
             $checkError = false;
             $errors['errorMessage'] = "Your password seems to be the most hacked password, please try another";

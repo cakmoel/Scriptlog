@@ -14,12 +14,15 @@ require dirname(__FILE__) . '/functions.php';
 <?php endif; ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" as="style">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+<link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;display=swap"></noscript>
 
 <style>
 /* Critical CSS */
 body{overflow-x:hidden;font-family:"Open Sans",sans-serif}
+.skip-link{position:absolute;top:-40px;left:0;background:#122430;color:#fff;padding:8px 16px;z-index:100000;text-decoration:none;transition:top .2s ease}
+.skip-link:focus{top:0;outline:3px solid #7fff00;outline-offset:2px}
+*:focus-visible{outline:3px solid #7fff00;outline-offset:2px}
 .sina-nav{min-height:60px;background:#fff;border:1px solid #eee;position:relative;z-index:9999}
 .sina-nav .container{position:relative}
 .sina-nav .sina-brand{height:60px;float:left;text-decoration:none}
@@ -29,26 +32,39 @@ body{overflow-x:hidden;font-family:"Open Sans",sans-serif}
 .sina-nav .sina-menu>li{float:right}
 .sina-nav .sina-menu>li>a{display:block;padding:20px 15px;color:#222;font-size:14px;font-weight:700;text-transform:uppercase;text-decoration:none}
 @media (max-width:1024px){.sina-nav .sina-brand{margin-left:-35px}.sina-nav .navbar-toggle{float:left;padding:4px 10px;margin-top:12px;background:transparent;border:0;font-size:18px}}
-.main-footer{padding:50px 0;background:#222;color:#ccc}
+.language-switcher .btn-language.dropdown-toggle::after{display:none!important}
+
 </style>
 
 <?php
 if (function_exists('theme_dir')) :
     ?>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/fontastic.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/style.sea.min.css" id="theme-stylesheet" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/privacy.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/sina-nav.min.css" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/cookie-consent.min.css">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css" integrity="sha384-Oq7xDXb7j0ZfSRSnACBVv7zaO45LpKBoQr0kTJbxk6qMg0zQIo5obIA0lHyFfYLt" crossorigin="anonymous" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css" integrity="sha384-Oq7xDXb7j0ZfSRSnACBVv7zaO45LpKBoQr0kTJbxk6qMg0zQIo5obIA0lHyFfYLt" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/fontastic.min.css" integrity="sha384-2bFVvo+6+gr1UNtQSThcM6JnEWC+gdW/9qX1GjGydVPnNyU4lcILvA4FwWSMqL3N" crossorigin="anonymous" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/fontastic.min.css" integrity="sha384-2bFVvo+6+gr1UNtQSThcM6JnEWC+gdW/9qX1GjGydVPnNyU4lcILvA4FwWSMqL3N" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.css" integrity="sha384-/dUIqcuZmn0/Nt1CGyvylCjqPYa/w0/SdIVpbqBxsxYmfwd7PXM9Gt7PsRKRj9Xy" crossorigin="anonymous" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.css" integrity="sha384-/dUIqcuZmn0/Nt1CGyvylCjqPYa/w0/SdIVpbqBxsxYmfwd7PXM9Gt7PsRKRj9Xy" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/style.sea.min.css" id="theme-stylesheet" integrity="sha384-JbRgk69UODRbZObMRNsjMeO1wAK6VXCrdy16v0NB36QOH4GtS2oBEg0eoZFTNy37" crossorigin="anonymous" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/style.sea.min.css" integrity="sha384-JbRgk69UODRbZObMRNsjMeO1wAK6VXCrdy16v0NB36QOH4GtS2oBEg0eoZFTNy37" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css" integrity="sha384-05ZFPKwuZkVmbYwKdVxeSSTXUSRgKaDyKdhKj7vK/62LdtgJc+FUQ+fyxcqSEbQe" crossorigin="anonymous" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css" integrity="sha384-05ZFPKwuZkVmbYwKdVxeSSTXUSRgKaDyKdhKj7vK/62LdtgJc+FUQ+fyxcqSEbQe" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.min.css" integrity="sha384-JPaoEK2fBp+uA/Wgxb/Yuj5YuYkAK49IPnJNh8uBhWTN+zc7pS9PVvfoRs3deKRh" crossorigin="anonymous" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.min.css" integrity="sha384-JPaoEK2fBp+uA/Wgxb/Yuj5YuYkAK49IPnJNh8uBhWTN+zc7pS9PVvfoRs3deKRh" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/privacy.min.css" integrity="sha384-dgoJODadPMRID9MyK0IFyykN9Gz2NNqGDAzfhsUCe3ECqqe8uZ7cLRXp9BZSEBOp" crossorigin="anonymous" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/privacy.min.css" integrity="sha384-dgoJODadPMRID9MyK0IFyykN9Gz2NNqGDAzfhsUCe3ECqqe8uZ7cLRXp9BZSEBOp" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.min.css" integrity="sha384-qq9bnXoyBB4IsBWw08+n5BVNEBZtu+eQLQFd6h2HngnN18JcJddHan5oM1Iy9fJK" crossorigin="anonymous" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.min.css" integrity="sha384-qq9bnXoyBB4IsBWw08+n5BVNEBZtu+eQLQFd6h2HngnN18JcJddHan5oM1Iy9fJK" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css" integrity="sha384-7+U3CUdwcffqC0x8Co1Teg5mj0+fTKhBrzFMB1qIlC5KeiUVWrYFL/SdLqD7C6Py" crossorigin="anonymous" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css" integrity="sha384-7+U3CUdwcffqC0x8Co1Teg5mj0+fTKhBrzFMB1qIlC5KeiUVWrYFL/SdLqD7C6Py" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/sina-nav.min.css" integrity="sha384-/8qST2bRvHReXrpHR/ZSuKWz7bBV5fpC+az/N67a0JiqwAwNmhSNcUfaorK2FUM7" crossorigin="anonymous" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/sina-nav.min.css" integrity="sha384-/8qST2bRvHReXrpHR/ZSuKWz7bBV5fpC+az/N67a0JiqwAwNmhSNcUfaorK2FUM7" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/cookie-consent.min.css" integrity="sha384-SZGf4Fdh2KV3qITa3ZjL8Bn/o579CfNvA+5gt1XJv5sr9fsFxJ5iCvyNcY9TtGqg" crossorigin="anonymous" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/cookie-consent.min.css" integrity="sha384-SZGf4Fdh2KV3qITa3ZjL8Bn/o579CfNvA+5gt1XJv5sr9fsFxJ5iCvyNcY9TtGqg" crossorigin="anonymous"></noscript>
     <?php if (is_rtl()) : ?>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/rtl.min.css">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/rtl.min.css" integrity="sha384-K0RODyvrBSyO0LWBpmt4OSQVXVpa2uGgM5qtK9sSwPQFD2tnSOJbO+pkAaEnFSGg" crossorigin="anonymous">
     <?php endif; ?>
 <link rel="shortcut icon" href="<?= theme_dir(); ?>assets/img/favicon.ico">
     <?php
@@ -63,12 +79,12 @@ endif;
         theme_dir: '<?= theme_dir(); ?>'
     };
 </script>
-<!-- Tweaks for older IEs--><!--[if lt IE 9]>
-<script src="<?= theme_dir(); ?>assets/js/html5shiv.min.js"></script>
-<script src="<?= theme_dir(); ?>assets/js/respond.min.js"></script><![endif]-->
 </head>
 <body>
-<nav class="sina-nav mobile-sidebar navbar-fixed" data-top="0">
+<!-- Skip to main content link for keyboard users -->
+<a class="skip-link" href="#main-content"><?= t('skip_to_content'); ?></a>
+<header role="banner">
+<nav class="sina-nav mobile-sidebar navbar-fixed" data-top="0" role="navigation" aria-label="<?= t('nav.main_navigation'); ?>">
         <div class="container">
 
             <div class="sina-nav-header">
@@ -155,3 +171,5 @@ endif;
             </div><!-- /.navbar-collapse -->
         </div><!-- .container -->
     </nav>
+</header>
+<main id="main-content" role="main">

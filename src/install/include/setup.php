@@ -32,6 +32,32 @@ function current_url() // returning current url
 }
 
 /**
+ * friendly_mysql_error()
+ *
+ * Returns a user-friendly error message for common MySQL error codes.
+ *
+ * @param int $errno
+ * @param string $error
+ * @param string $host
+ * @param string $username
+ * @param string $dbname
+ * @return string
+ *
+ */
+function friendly_mysql_error($errno, $error, $host, $username, $dbname)
+{
+    if ($errno == 2002) {
+        return "Could not reach database server '{$host}'. Please verify the hostname is correct and the database server is running.";
+    } elseif ($errno == 1045) {
+        return "Access denied for user '{$username}'. Please check your database username and password.";
+    } elseif ($errno == 1049) {
+        return "Database '{$dbname}' does not exist. Please create it in your hosting control panel first, then try again.";
+    } else {
+        return "Database connection failed: " . $error;
+    }
+}
+
+/**
  * make_connection()
  *
  * @param string $host
@@ -44,19 +70,17 @@ function current_url() // returning current url
  */
 function make_connection($host, $username, $passwd, $dbname, $dbport)
 {
+    // Turn off MySQLi internal error reporting; we handle errors with friendly messages
+    $driver = class_exists('mysqli_driver') ? new mysqli_driver() : null;
+    if ($driver instanceof mysqli_driver) {
+        $driver->report_mode = MYSQLI_REPORT_OFF;
+    }
 
-    $driver = class_exists('mysqli_driver') ? new mysqli_driver() : "";
-
-    $driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
-
-    $connect = new mysqli($host, $username, $passwd, $dbname, $dbport);
+    $connect = @new mysqli($host, $username, $passwd, $dbname, $dbport);
 
     if ($connect->connect_errno) {
-        printf("Failed to connect to MySQL: (" . $connect->connect_errno . ") " . $connect->connect_error, E_USER_ERROR);
-
-        close_connection($connect);
-
-        exit();
+        $error_msg = friendly_mysql_error($connect->connect_errno, $connect->connect_error, $host, $username, $dbname);
+        throw new RuntimeException($error_msg);
     }
 
     $connect->set_charset('utf8mb4');
@@ -78,19 +102,16 @@ function make_connection($host, $username, $passwd, $dbname, $dbport)
  */
 function make_secure_connection($host, $username, $passwd, $dbname, $dbport, $ca)
 {
+    // Turn off MySQLi internal error reporting; we handle errors with friendly messages
+    mysqli_report(MYSQLI_REPORT_OFF);
 
-    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-    $connect = mysqli_init();
+    $connect = @mysqli_init();
     $connect->ssl_set(null, null, $ca, null, null);
-    $connect->real_connect($host, $username, $passwd, $dbname, $dbport);
+    @$connect->real_connect($host, $username, $passwd, $dbname, $dbport);
 
     if ($connect->connect_errno) {
-        printf("Failed to connect to MySQL: (" . $connect->connect_errno . ") " . $connect->connect_error, E_USER_ERROR);
-
-        close_connection($connect);
-
-        exit();
+        $error_msg = friendly_mysql_error($connect->connect_errno, $connect->connect_error, $host, $username, $dbname);
+        throw new RuntimeException($error_msg);
     }
 
     $connect->set_charset('utf8mb4');
@@ -196,7 +217,7 @@ function check_dbtable($link, $table)
  * @param string $defuse_key_path
  *
  */
-function install_database_table($link, $protocol, $server_host, $user_login, $user_pass, $user_email, $key, $prefix = '', $site_language = 'en', $defuse_key_path = '')
+function install_database_table($link, $protocol, $server_host, $user_login, $user_pass, $user_email, $key, $prefix = '', $site_language = 'en', $defuse_key_path = '', $dbhost = '')
 {
 
     $tables = get_table_definitions($prefix);
@@ -558,7 +579,6 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
  * @param string $prefix
  * @param string $default_lang (language code to set as default)
  *
- * @return void
  */
 function install_i18n_data($link, $prefix = '', $default_lang = 'en')
 {
@@ -1061,7 +1081,7 @@ function update_app_key($mysqli, $app_key, $id, $prefix = '')
  * @throws Exception
  *
  */
-function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuser, $dbname, $dbport, $email, $key, $ca, $prefix = '')
+function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuser, $dbname, $dbport, $email, $key, $ca, $prefix = '', $defuse_key_path_from_install = '')
 {
     // Start session if not already started
     if (session_status() === PHP_SESSION_NONE) {
@@ -1077,13 +1097,17 @@ function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuse
     if (isset($_SESSION['install']) && $_SESSION['install'] === true) {
         $distro = isset(get_linux_distro()['NAME']) ? get_linux_distro()['NAME'] : "";
 
-        // Generate Defuse encryption key for authentication - system generates random path outside web root
-        try {
-            $defuse_key_full_path = generate_defuse_key();
-        } catch (Exception $e) {
-            error_log("Failed to generate defuse key: " . $e->getMessage());
-            $appRoot = dirname(__DIR__, 2);
-            $defuse_key_full_path = $appRoot . '/lib/utility/.lts/lts.php';
+        // Use defuse key from installation if already generated, otherwise create new one
+        if (!empty($defuse_key_path_from_install)) {
+            $defuse_key_full_path = $defuse_key_path_from_install;
+        } else {
+            try {
+                $defuse_key_full_path = generate_defuse_key();
+            } catch (Exception $e) {
+                error_log("Failed to generate defuse key: " . $e->getMessage());
+                $appRoot = dirname(__DIR__, 2);
+                $defuse_key_full_path = $appRoot . '/lib/utility/.lts/lts.php';
+            }
         }
         
         // Use absolute path for config.php and .env
@@ -1179,6 +1203,19 @@ function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuse
 }
 
 /**
+ * Escape value for .env file format
+ * Wraps values in double quotes and properly escapes special characters
+ *
+ * @param string $value
+ * @return string
+ */
+function env_escape($value)
+{
+    $value = str_replace(['\\', '"', "\n", "\r", "\t"], ['\\\\', '\\"', '\\n', '\\r', '\\t'], $value);
+    return '"' . $value . '"';
+}
+
+/**
  * Write .env file with environment variables
  *
  * @param string $protocol
@@ -1197,18 +1234,18 @@ function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuse
 function write_env_file($protocol, $server_name, $dbhost, $dbuser, $dbpass, $dbname, $dbport, $prefix, $email, $app_key, $distro, $defuse_key_path = '')
 {
     $envContent = "# --- DATABASE CONFIGURATION ---" . PHP_EOL;
-    $envContent .= "DB_HOST=" . addslashes($dbhost) . PHP_EOL;
-    $envContent .= "DB_USER=" . addslashes($dbuser) . PHP_EOL;
-    $envContent .= "DB_PASS=" . addslashes($dbpass) . PHP_EOL;
-    $envContent .= "DB_NAME=" . addslashes($dbname) . PHP_EOL;
-    $envContent .= "DB_PORT=" . addslashes($dbport) . PHP_EOL;
-    $envContent .= "DB_PREFIX=" . addslashes($prefix) . PHP_EOL;
+    $envContent .= "DB_HOST=" . env_escape($dbhost) . PHP_EOL;
+    $envContent .= "DB_USER=" . env_escape($dbuser) . PHP_EOL;
+    $envContent .= "DB_PASS=" . env_escape($dbpass) . PHP_EOL;
+    $envContent .= "DB_NAME=" . env_escape($dbname) . PHP_EOL;
+    $envContent .= "DB_PORT=" . env_escape($dbport) . PHP_EOL;
+    $envContent .= "DB_PREFIX=" . env_escape($prefix) . PHP_EOL;
     $envContent .= PHP_EOL;
     $envContent .= "# --- APPLICATION CONFIGURATION ---" . PHP_EOL;
-    $envContent .= "APP_URL=" . addslashes(setup_base_url($protocol, $server_name)) . PHP_EOL;
-    $envContent .= "APP_EMAIL=" . addslashes($email) . PHP_EOL;
-    $envContent .= "APP_KEY=" . addslashes($app_key) . PHP_EOL;
-    $envContent .= "DEFUSE_KEY_PATH=" . addslashes($defuse_key_path) . PHP_EOL;
+    $envContent .= "APP_URL=" . env_escape(setup_base_url($protocol, $server_name)) . PHP_EOL;
+    $envContent .= "APP_EMAIL=" . env_escape($email) . PHP_EOL;
+    $envContent .= "APP_KEY=" . env_escape($app_key) . PHP_EOL;
+    $envContent .= "DEFUSE_KEY_PATH=" . env_escape($defuse_key_path) . PHP_EOL;
     $envContent .= PHP_EOL;
     $envContent .= "# --- MAIL / SMTP CONFIGURATION ---" . PHP_EOL;
     $envContent .= "SMTP_HOST=" . PHP_EOL;
@@ -1216,15 +1253,15 @@ function write_env_file($protocol, $server_name, $dbhost, $dbuser, $dbpass, $dbn
     $envContent .= "SMTP_USER=" . PHP_EOL;
     $envContent .= "SMTP_PASS=" . PHP_EOL;
     $envContent .= "SMTP_ENCRYPTION=tls" . PHP_EOL;
-    $envContent .= "MAIL_FROM_ADDRESS=" . addslashes($email) . PHP_EOL;
+    $envContent .= "MAIL_FROM_ADDRESS=" . env_escape($email) . PHP_EOL;
     $envContent .= "MAIL_FROM_NAME=Blogware" . PHP_EOL;
     $envContent .= PHP_EOL;
     $envContent .= "# --- SYSTEM ---" . PHP_EOL;
-    $envContent .= "SYSTEM_OS=" . addslashes(check_os()['Operating_system']) . PHP_EOL;
+    $envContent .= "SYSTEM_OS=" . env_escape(check_os()['Operating_system']) . PHP_EOL;
     $envContent .= "DISTRIB_NAME=\"" . trim($distro) . "\"" . PHP_EOL;
     $envContent .= PHP_EOL;
     $envContent .= "# --- API SECURITY ---" . PHP_EOL;
-    $envContent .= "CORS_ALLOWED_ORIGINS=" . addslashes(setup_base_url($protocol, $server_name)) . PHP_EOL;
+    $envContent .= "CORS_ALLOWED_ORIGINS=" . env_escape(setup_base_url($protocol, $server_name)) . PHP_EOL;
 
     file_put_contents(__DIR__ . '/../../.env', $envContent, LOCK_EX);
 }
@@ -1307,7 +1344,6 @@ function installation_key($length)
  * Format size memory usage onto b, kb, mb, gb, tb and pb
  *
  * @param int|float $size
- * @return mixed
  *
  */
 function convert_memory_used($size)
@@ -1355,6 +1391,7 @@ function purge_installation()
             $bytes = openssl_random_pseudo_bytes(ceil($length / 2));
         } else {
             trigger_error("no cryptographically secure random function available", E_USER_NOTICE);
+            return;
         }
 
         $disabled = APP_PATH . substr(bin2hex($bytes), 0, $length) . '.log';

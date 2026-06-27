@@ -123,13 +123,6 @@ class ProtectedPostTest extends TestCase
         }
     }
 
-    public function testVisibilityValuesAreCorrect(): void
-    {
-        $this->assertEquals('public', 'public');
-        $this->assertEquals('private', 'private');
-        $this->assertEquals('protected', 'protected');
-    }
-
     public function testProtectedPostFunctionExists(): void
     {
         $this->assertTrue(function_exists('protect_post'));

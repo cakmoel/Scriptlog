@@ -21,7 +21,7 @@
 
 // Prevent direct access to API
 define('SCRIPTLOG', hash('sha256', 'BLOGWARE_API_ACCESS'));
-define('API_VERSION', 'v1');
+defined('API_VERSION') || define('API_VERSION', 'v1');
 define('API_BASE_PATH', '/api/v1');
 
 // Load configuration
@@ -68,7 +68,7 @@ require_once __DIR__ . '/../lib/main.php';
 // Ensure sessions are properly started for API requests that need authentication
 // This is needed for endpoints like media upload which require admin session
 if (isset($app->sessionMaker)) {
-    session_save_path(sys_get_temp_dir());
+    session_save_path(resolve_session_save_path());
     session_set_save_handler($app->sessionMaker, true);
     register_shutdown_function('session_write_close');
     if (function_exists('start_session_on_site')) {

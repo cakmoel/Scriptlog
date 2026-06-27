@@ -114,13 +114,13 @@ class ArchivesModel extends BaseModel
             FROM " . $this->table('tbl_posts') . " AS p
             LEFT JOIN " . $this->table('tbl_users') . " AS u ON p.post_author = u.ID
             LEFT JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
-            WHERE MONTH(p.post_date) = '$month' AND YEAR(p.post_date) = '$year'
+            WHERE MONTH(p.post_date) = ? AND YEAR(p.post_date) = ?
             AND p.post_type = 'blog' AND p.post_status = 'publish'
             AND (u.user_banned = '0' OR u.user_banned IS NULL)
             ORDER BY DATE(p.post_date) DESC " . $this->linkArchives->get_limit($sanitize);
         $this->setSQL($sql);
 
-        $archivesPublished = $this->findAll([]);
+        $archivesPublished = $this->findAll([$month, $year]);
 
         $this->pagination = $this->linkArchives->page_links($sanitize);
 

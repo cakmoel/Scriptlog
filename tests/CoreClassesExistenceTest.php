@@ -217,6 +217,18 @@ class CoreClassesExistenceTest extends TestCase
         $this->assertTrue(class_exists('ActionConst'));
     }
     
+    public function testActionConstHasDeactivateTheme(): void
+    {
+        $this->assertTrue(defined('ActionConst::DEACTIVATETHEME'));
+        $this->assertEquals('deactivateTheme', ActionConst::DEACTIVATETHEME);
+    }
+    
+    public function testActionConstHasActivateTheme(): void
+    {
+        $this->assertTrue(defined('ActionConst::ACTIVATETHEME'));
+        $this->assertEquals('activateTheme', ActionConst::ACTIVATETHEME);
+    }
+    
     public function testDateGeneratorClassExists(): void
     {
         $this->assertTrue(class_exists('DateGenerator'));

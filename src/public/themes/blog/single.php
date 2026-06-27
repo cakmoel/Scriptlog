@@ -13,7 +13,8 @@ $post_slug = isset($retrieve_post['post_slug']) ? htmlout($retrieve_post['post_s
 $post_content = '';
 $post_visibility = isset($retrieve_post['post_visibility']) ? $retrieve_post['post_visibility'] : 'public';
 $comment_permit = isset($retrieve_post['comment_permit']) ? htmlout($retrieve_post['comment_permit']) : "";
-$total_comment = (!empty($post_id) && total_comment($post_id)['total'] > 0) ? total_comment($post_id)['total'] : 0;
+$comment_data = total_comment($post_id);
+$total_comment = (!empty($post_id) && !empty($comment_data['total'])) ? (int)$comment_data['total'] : 0;
 
 $is_unlocked = false;
 
@@ -67,11 +68,11 @@ if (isset($retrieve_post['post_modified'])) {
     <div class="container">
 
         <div class="row">
-            <main class="post blog-post col-lg-8">
+            <div class="post blog-post col-lg-8">
                 <div class="container">
                     <div class="post-single">
                         <div class="post-thumbnal">
-                            <?= isset($post_img) ? invoke_responsive_image($post_img, 'medium', true, isset($img_alt) ? $img_alt : "", 'img-fluid', true) : '<img src="https://picsum.photos/730/486" alt="" width="730" height="486" class="img-fluid" loading="lazy" decoding="async">' ?>
+                            <?= isset($post_img) ? invoke_responsive_image($post_img, 'medium', true, isset($img_alt) ? $img_alt : "", 'img-fluid', true) : '<img src="' . theme_dir() . 'assets/img/placeholder.svg" alt="" width="730" height="486" class="img-fluid" loading="lazy" decoding="async">' ?>
                         </div>
 
                         <div class="post-details">
@@ -167,7 +168,7 @@ endif;
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
 
             <?php
               include dirname(__FILE__) . '/sidebar.php';

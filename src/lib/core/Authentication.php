@@ -396,7 +396,7 @@ class Authentication
 
         $result = $this->userDao->checkUserPassword($login, $password);
 
-        (isset($verified) && true === $result) ? $verified = true : $verified = false;
+        $verified = (true === $result);
 
         return $verified;
     }
@@ -414,9 +414,10 @@ class Authentication
     {
 
         $reset_key = ircmaxell_random_generator(32);
+        $hashed_key = hash('sha256', $reset_key);
 
         if (filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
-            $bind = ['user_reset_key' => $reset_key, 'user_reset_complete' => 'No'];
+            $bind = ['user_reset_key' => $hashed_key, 'user_reset_complete' => 'No'];
 
             if ($this->userDao->updateResetKey($bind, $user_email)) {
                 // send notification to user email account
@@ -542,6 +543,8 @@ class Authentication
      */
     public function userAccessControl($control = null)
     {
+        $this->getUserAuthSession();
+
         switch ($control) {
             case ActionConst::USERS:
             case ActionConst::IMPORT:
@@ -614,7 +617,7 @@ class Authentication
      * @return void
      *
      */
-    private function getUserAuthSession()
+    protected function getUserAuthSession()
     {
         if (Session::getInstance()->scriptlog_session_ip !== $this->ip_address || Session::getInstance()->scriptlog_session_agent !== sha1($this->accept_charset . $this->accept_encoding . $this->accept_language . $this->agent)) {
             session_unset();

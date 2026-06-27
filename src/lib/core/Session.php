@@ -16,9 +16,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  */
 class Session
 {
-    public const SESSION_STARTED = false;
+    public const SESSION_STARTED = true;
 
-    public const SESSION_NOT_STARTED = true;
+    public const SESSION_NOT_STARTED = false;
 
     private $session_state = self::SESSION_NOT_STARTED;
 
@@ -42,9 +42,17 @@ class Session
 
     public function startSession()
     {
-
-        if (!$this->session_state == self::SESSION_NOT_STARTED) {
-            $this->session_state = session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            if ($this->session_state === self::SESSION_NOT_STARTED) {
+                if (!headers_sent()) {
+                    $this->session_state = session_start();
+                } else {
+                    error_log("Session cannot be started - headers already sent in " . $_SERVER['REQUEST_URI']);
+                    $this->session_state = false;
+                }
+            }
+        } else {
+            $this->session_state = self::SESSION_STARTED;
         }
 
         return $this->session_state;

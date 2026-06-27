@@ -102,7 +102,7 @@ class ConfigurationController
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -121,12 +121,12 @@ class ConfigurationController
                     $this->view->set('errors', $errors);
                     $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
                 } else {
+                    $dbc = Registry::get('dbc');
                     for ($i = 1; $i <= $size; $i++) {
                         $setting_value = purify_dirty_html(distill_post_request($filters)['setting_value'][$i]);
                         $setting_id = distill_post_request($filters)['setting_id'][$i];
 
-                        $sql = sprintf("UPDATE tbl_settings SET setting_value = '$setting_value' WHERE ID = %d", (int)$setting_id);
-                        db_simple_query($sql);
+                        $dbc->dbUpdate('tbl_settings', ['setting_value' => $setting_value], ['ID' => $setting_id]);
                     }
 
                     $_SESSION['status'] = "generalConfigUpdated";
@@ -142,7 +142,7 @@ class ConfigurationController
         } elseif (isset($_POST['clearCacheSubmit'])) {
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -219,7 +219,7 @@ class ConfigurationController
 
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -243,12 +243,12 @@ class ConfigurationController
                     $this->view->set('settings', $this->configService->grabReadingSettings());
                     $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
                 } else {
+                    $dbc = Registry::get('dbc');
                     for ($i = 0; $i < $size; $i++) {
                         $setting_value = purify_dirty_html(distill_post_request($filters)['setting_value'][$i]);
                         $setting_id = distill_post_request($filters)['setting_id'][$i];
 
-                        $sql = sprintf("UPDATE tbl_settings SET setting_value = '$setting_value' WHERE ID = %d", (int)$setting_id);
-                        db_simple_query($sql);
+                        $dbc->dbUpdate('tbl_settings', ['setting_value' => $setting_value], ['ID' => $setting_id]);
                     }
 
                     $_SESSION['status'] = "readingConfigUpdated";
@@ -324,7 +324,7 @@ class ConfigurationController
         if (isset($_POST['configFormSubmit'])) {
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -444,7 +444,7 @@ class ConfigurationController
         if (isset($_POST['configFormSubmit'])) {
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -560,7 +560,7 @@ class ConfigurationController
         if (isset($_POST['configFormSubmit'])) {
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -655,7 +655,7 @@ class ConfigurationController
         if (isset($_POST['downloadSettingSubmit'])) {
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -738,7 +738,7 @@ class ConfigurationController
         if (isset($_POST['mailConfigSubmit'])) {
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -842,7 +842,7 @@ class ConfigurationController
         if (isset($_POST['languageConfigSubmit'])) {
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
@@ -997,7 +997,7 @@ class ConfigurationController
         if (isset($_POST['apiConfigSubmit'])) {
             try {
                 if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 

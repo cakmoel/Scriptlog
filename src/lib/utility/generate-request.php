@@ -15,6 +15,8 @@ declare(strict_types=1);
  * @return array
  *
  */
+require_once __DIR__ . '/sanitize-urls.php';
+
 function generate_request($base, $type, $data = array(), $string_encoded = true)
 {
 
@@ -91,6 +93,12 @@ function generate_request($base, $type, $data = array(), $string_encoded = true)
 
                     );
                 }
+            } else {
+                $query_data = array(
+
+                  'load' => sanitize_urls($load)
+
+                );
             }
 
             $html['link'] = build_query($base, $query_data);

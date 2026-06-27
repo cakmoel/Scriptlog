@@ -30,7 +30,7 @@ if (function_exists('featured_post')) :
                 </a>
             </div>
             <a <?= (!empty($featured_hero_id)) ? 'href=".intro"' : 'href="#intro"'; ?> class="continue link-scroll"
-                title="<?= t('home.hero.scroll_down'); ?>"><i class="fa fa-long-arrow-down" aria-hidden="true"></i>
+                title="<?= t('home.hero.scroll_down'); ?>" aria-label="<?= t('home.hero.scroll_down'); ?>"><i class="fa fa-long-arrow-down" aria-hidden="true"></i>
                 <?= t('home.hero.scroll_down'); ?>
             </a>
         </div>
@@ -135,7 +135,7 @@ if (function_exists('invoke_plugin')) {
                 </div>
             </div>
             <div class="image col-lg-5">
-                    <?= isset($random_post_img) ? invoke_responsive_image($random_post_img, 'thumbnail', true, isset($random_post['media_caption']) ? htmlout($random_post['media_caption']) : htmlout($random_post['post_title']), 'img-fluid') : '<img src="https://via.placeholder.com/516x344" alt="" width="516" height="344" class="img-fluid" loading="lazy" decoding="async">'; ?>
+                    <?= isset($random_post_img) ? invoke_responsive_image($random_post_img, 'thumbnail', true, isset($random_post['media_caption']) ? htmlout($random_post['media_caption']) : htmlout($random_post['post_title']), 'img-fluid') : '<img src="' . theme_dir() . 'assets/img/placeholder.svg" alt="" width="516" height="344" class="img-fluid" loading="lazy" decoding="async">'; ?>
             </div>
 
         </div>
@@ -145,7 +145,7 @@ if (function_exists('invoke_plugin')) {
 
         <div class="row d-flex align-items-stretch">
             <div class="image col-lg-5">
-                    <?= isset($random_post_img) ? invoke_responsive_image($random_post_img, 'thumbnail', true, isset($random_post['media_caption']) ? htmlout($random_post['media_caption']) : htmlout($random_post['post_title']), 'img-fluid') : '<img src="https://via.placeholder.com/516x344" alt="" width="516" height="344" class="img-fluid" loading="lazy" decoding="async">'; ?>
+                    <?= isset($random_post_img) ? invoke_responsive_image($random_post_img, 'thumbnail', true, isset($random_post['media_caption']) ? htmlout($random_post['media_caption']) : htmlout($random_post['post_title']), 'img-fluid') : '<img src="' . theme_dir() . 'assets/img/placeholder.svg" alt="" width="516" height="344" class="img-fluid" loading="lazy" decoding="async">'; ?>
             </div>
             <div class="text col-lg-7">
                 <div class="text-inner d-flex align-items-center">
@@ -202,7 +202,7 @@ if (function_exists('featured_post')) :
     ?>
 
 <section
-    style="background-image: url(<?= isset($featured_divider_img) ? invoke_frontimg($featured_divider_img) : 'https://picsum.photos/1920/1280'; ?>)"
+    style="background-image: url(<?= isset($featured_divider_img) ? invoke_frontimg($featured_divider_img) : theme_dir() . 'assets/img/placeholder.svg'; ?>)"
     class="divider" role="img" aria-label="<?= isset($featured_divider_title) ? htmlout($featured_divider_title) : 'Divider image'; ?>">
     <div class="container">
         <div class="row">
@@ -250,7 +250,7 @@ endif;
                 <div class="post-thumbnail"><a
                         href="<?= isset($latest_post_id) ? permalinks($latest_post_id)['post'] : "javascript:void(0)"; ?>"
                         title="<?= $latest_post_title; ?>">
-                    <?= isset($latest_post_img) ? invoke_responsive_image($latest_post_img, 'thumbnail', true, isset($latest_img_caption) ? $latest_img_caption : $latest_post_title, 'img-fluid') : '<img src="https://via.placeholder.com/640x450" alt="" width="640" height="450" class="img-fluid" loading="lazy" decoding="async">' ?></a></div>
+                    <?= isset($latest_post_img) ? invoke_responsive_image($latest_post_img, 'thumbnail', true, isset($latest_img_caption) ? $latest_img_caption : $latest_post_title, 'img-fluid') : '<img src="' . theme_dir() . 'assets/img/placeholder.svg" alt="" width="640" height="450" class="img-fluid" loading="lazy" decoding="async">' ?></a></div>
                 <div class="post-details">
                     <div class="post-meta d-flex justify-content-between">
                         <div class="date"><?= $latest_post_created; ?></div>
@@ -279,19 +279,9 @@ endif;
 
 </section>
 
-<!-- Newsletter Section -->
-<section class="newsletter no-padding-top">
-    <div class="container">
-
-        <div class="row">
-
-        </div>
-
-    </div>
-</section>
-
 <!-- Gallery Section -->
 <section class="gallery no-padding">
+    <div class="container-fluid px-0">
     <div class="row">
 
         <?php
@@ -318,29 +308,29 @@ endif;
         else :
             ?>
         <div class="mix col-lg-3 col-md-3 col-sm-6">
-            <div class="item"><a href="https://picsum.photos/640/450" data-fancybox="gallery" class="image">
-                    <img src="https://picsum.photos/640/450" alt="This is a gallery" class="img-fluid">
+            <div class="item"><a href="<?= theme_dir(); ?>assets/img/placeholder.svg" data-fancybox="gallery" class="image">
+                    <img src="<?= theme_dir(); ?>assets/img/placeholder.svg" alt="Sample gallery image" class="img-fluid" loading="lazy" decoding="async">
                     <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"
                             aria-hidden="true"></i></div>
                 </a></div>
         </div>
         <div class="mix col-lg-3 col-md-3 col-sm-6">
-            <div class="item"><a href="https://picsum.photos/640/450" data-fancybox="gallery" class="image">
-                    <img src="https://picsum.photos/640/450" alt="This is a gallery" class="img-fluid">
+            <div class="item"><a href="<?= theme_dir(); ?>assets/img/placeholder.svg" data-fancybox="gallery" class="image">
+                    <img src="<?= theme_dir(); ?>assets/img/placeholder.svg" alt="Sample gallery image" class="img-fluid" loading="lazy" decoding="async">
                     <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"
                             aria-hidden="true"></i></div>
                 </a></div>
         </div>
         <div class="mix col-lg-3 col-md-3 col-sm-6">
-            <div class="item"><a href="https://picsum.photos/640/450" data-fancybox="gallery" class="image">
-                    <img src="https://picsum.photos/640/450" alt="" class="img-fluid">
+            <div class="item"><a href="<?= theme_dir(); ?>assets/img/placeholder.svg" data-fancybox="gallery" class="image">
+                    <img src="<?= theme_dir(); ?>assets/img/placeholder.svg" alt="Sample gallery image" class="img-fluid" loading="lazy" decoding="async">
                     <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"
                             aria-hidden="true"></i></div>
                 </a></div>
         </div>
         <div class="mix col-lg-3 col-md-3 col-sm-6">
-            <div class="item"><a href="https://picsum.photos/640/450" data-fancybox="gallery" class="image">
-                    <img src="https://picsum.photos/640/450" alt="" class="img-fluid">
+            <div class="item"><a href="<?= theme_dir(); ?>assets/img/placeholder.svg" data-fancybox="gallery" class="image">
+                    <img src="<?= theme_dir(); ?>assets/img/placeholder.svg" alt="Sample gallery image" class="img-fluid" loading="lazy" decoding="async">
                     <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"
                             aria-hidden="true"></i></div>
                 </a></div>
@@ -349,4 +339,5 @@ endif;
         endif;
         ?>
     </div>
+</div>
 </section>

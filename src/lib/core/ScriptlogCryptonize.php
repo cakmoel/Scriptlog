@@ -91,9 +91,9 @@ class ScriptlogCryptonize
      *
      * @param string $ciphertext
      * @param string $key
-     * @return string
+     * @return string|bool
      */
-    public static function decipherMessage(string $ciphertext, string $key): string
+    public static function decipherMessage(string $ciphertext, string $key)
     {
         $openssl = new Openssl(['algo' => 'aes']);
         $cipher = new BlockCipher($openssl);
@@ -170,7 +170,7 @@ class ScriptlogCryptonize
             
             return base64_encode($combined);
             
-        } catch (ScriptlogCryptonizeException $e) {
+        } catch (Throwable $e) {
             self::logError($e);
             throw $e;
         }
@@ -247,8 +247,10 @@ class ScriptlogCryptonize
             
             return $plaintext;
             
-        } catch (ScriptlogCryptonizeException $e) {
-            self::logError($e);
+        } catch (Throwable $e) {
+            if (!$e instanceof ScriptlogCryptonizeException) {
+                self::logError($e);
+            }
             throw $e;
         }
     }
@@ -317,7 +319,7 @@ class ScriptlogCryptonize
     }
     
     /**
-     * Update config.php and .env with new key path
+     * Update config.php, .env, and database with new key path
      *
      * @param string $newKeyPath Absolute path to the key file
      */
@@ -330,19 +332,67 @@ class ScriptlogCryptonize
             $config = require $configPath;
             $config['app']['defuse_key'] = $newKeyPath;
             $content = '<?php' . PHP_EOL . 'return ' . var_export($config, true) . ';' . PHP_EOL;
-            file_put_contents($configPath, $content);
+            @file_put_contents($configPath, $content);
         }
 
         $envPath = $rootDir . '/.env';
         if (file_exists($envPath) && is_writable($envPath)) {
-            $envContent = file_get_contents($envPath);
+            $envContent = @file_get_contents($envPath);
             $escapedPath = addslashes($newKeyPath);
             $envContent = preg_replace(
                 '/^DEFUSE_KEY_PATH=.*$/m',
                 'DEFUSE_KEY_PATH=' . $escapedPath,
                 $envContent
             );
-            file_put_contents($envPath, $envContent);
+            @file_put_contents($envPath, $envContent);
+        }
+
+        // Also update database tbl_settings
+        self::updateDatabaseKeyPath($newKeyPath, $configPath);
+    }
+
+    /**
+     * Update defuse_key_path in database settings table
+     *
+     * @param string $newKeyPath
+     * @param string $configPath
+     */
+    private static function updateDatabaseKeyPath(string $newKeyPath, string $configPath): void
+    {
+        if (!file_exists($configPath)) {
+            return;
+        }
+
+        $config = require $configPath;
+
+        $dbHost = $config['db']['host'] ?? null;
+        $dbUser = $config['db']['user'] ?? null;
+        $dbPass = $config['db']['pass'] ?? null;
+        $dbName = $config['db']['name'] ?? null;
+        $dbPort = $config['db']['port'] ?? '3306';
+        $prefix = $config['db']['prefix'] ?? '';
+
+        if (!$dbHost || !$dbUser || !$dbName) {
+            return;
+        }
+
+        try {
+            $mysqli = new mysqli($dbHost, $dbUser, $dbPass, $dbName, (int)$dbPort);
+
+            if ($mysqli->connect_error) {
+                return;
+            }
+
+            $stmt = $mysqli->prepare("UPDATE {$prefix}tbl_settings SET setting_value = ? WHERE setting_name = 'defuse_key_path'");
+            if ($stmt) {
+                $stmt->bind_param('s', $newKeyPath);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            $mysqli->close();
+        } catch (Exception $e) {
+            error_log("ScriptlogCryptonize: Failed to update defuse_key_path in database: " . $e->getMessage());
         }
     }
 
@@ -448,7 +498,7 @@ class ScriptlogCryptonize
             
             if ($row = $result->fetch_assoc()) {
                 $mysqli->close();
-                return $row['setting_value'];
+                return is_string($row['setting_value']) ? $row['setting_value'] : (string)$row['setting_value'];
             }
             
             $mysqli->close();
@@ -521,7 +571,7 @@ class ScriptlogCryptonize
     {
         try {
             return random_bytes($length);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             if (function_exists('openssl_random_pseudo_bytes')) {
                 $strong = false;
                 $bytes = openssl_random_pseudo_bytes($length, $strong);
@@ -550,7 +600,7 @@ class ScriptlogCryptonize
         $newKeyFile = $keyDir . '/' . $filename . '.php';
 
         $phpContent = "<?php\n// Encryption key generated on " . date('Y-m-d H:i:s') . "\n// Do not delete or modify this file\nreturn '" . addslashes($keyAscii) . "';";
-        file_put_contents($newKeyFile, $phpContent);
+        @file_put_contents($newKeyFile, $phpContent);
         @chmod($newKeyFile, 0644);
 
         return $newKeyFile;
@@ -561,7 +611,7 @@ class ScriptlogCryptonize
      *
      * @param Exception $e
      */
-    private static function logError(Exception $e): void
+    private static function logError(Throwable $e): void
     {
         if (class_exists('LogError')) {
             LogError::setStatusCode(http_response_code());

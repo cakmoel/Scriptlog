@@ -11,8 +11,9 @@ $(document).ready(function () {
     $( "<link id='new-stylesheet' rel='stylesheet'>" ).insertAfter(stylesheet);
     var alternateColour = $('link#new-stylesheet');
 
-    if ($.cookie("theme_csspath")) {
-        alternateColour.attr("href", $.cookie("theme_csspath"));
+    var themeCookie = $.cookie("theme_csspath");
+    if (themeCookie && themeCookie.indexOf('css/style.') === 0 && themeCookie.indexOf('..') === -1) {
+        alternateColour.attr("href", themeCookie);
     }
 
     $("#colour").change(function () {
@@ -23,7 +24,8 @@ $(document).ready(function () {
 
             alternateColour.attr("href", theme_csspath);
 
-            $.cookie("theme_csspath", theme_csspath, { expires: 365, path: document.URL.substr(0, document.URL.lastIndexOf('/')) });
+            var cookiePath = window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/')) || '/';
+            $.cookie("theme_csspath", theme_csspath, { expires: 30, path: cookiePath });
 
         }
 
@@ -49,10 +51,15 @@ $(document).ready(function () {
     // Preventing URL update on navigation link click
     // ---------------------------------------------- //
     $('.link-scroll').bind('click', function (e) {
-        var anchor = $(this);
-        $('html, body').stop().animate({
-            scrollTop: $(anchor.attr('href')).offset().top + 2
-        }, 700);
+        var href = this.getAttribute('href');
+        if (href && href.charAt(0) === '#') {
+            var $target = $(href);
+            if ($target.length) {
+                $('html, body').stop().animate({
+                    scrollTop: $target.offset().top + 2
+                }, 700);
+            }
+        }
         e.preventDefault();
     });
 

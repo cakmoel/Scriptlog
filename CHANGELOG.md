@@ -8,12 +8,212 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#108---2026-05-14)
+- [Latest Release](#123---2026-06-26)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.2.3] - 2026-06-26
+
+### Added
+- **`check_session_dir()` function**: New installer requirements check for sessions directory writability
+- **Sessions directory check**: Added to installer requirements UI for user visibility during setup
+- **`.gitkeep` and `index.html`**: Protect `public/files/cache/sessions/` directory from directory listing
+
+### Changed
+- **`resolve_session_save_path()`**: Added chmod fallback logic to attempt permission recovery when sessions directory exists but is not writable, with fallback to `sys_get_temp_dir()`
+
+### Fixed
+- **Session initialization**: Used `resolve_session_save_path()` in both Bootstrap and API session init to ensure consistent session storage location
+- **PHP 7.4 backwards compatibility**: Removed mixed return type declarations that caused fatal errors on PHP 7.4
+- **`number_cpus()` mac branch**: Removed redundant `is_resource` guard and replaced `false` comparison with `is_resource` for `popen()` in all branches
+
+### Security
+- **Sessions directory protection**: Added `index.html` to prevent directory listing of session files
+
+### Tests
+- **Bootstrap tests**: Added tests for `\Throwable` catch and `instanceof PDO` guard in theme renderer
+- **`number_cpus()` tests**: Comprehensive unit tests covering Linux, Windows, and Mac branches
+- **`generate_request` and `sanitize_urls` tests**: Full coverage for request generation and URL sanitization
+- **`db-mysqli` function tests**: Unit tests with `is_table_exists` guard coverage
+
+### Removed
+- **Stale translation caches**: Cleared stale `en.json` and `es.json` for clean regeneration
+
+### Notes
+Maintenance release focused on session path reliability, PHP 7.4 compatibility, expanded test coverage, and installer hardening. All unit tests passing (829 tests, 1854 assertions).
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.2.2
+- **Changes since v1.2.2**: 24 commits
+
+---
+
+## [1.2.2] - 2026-06-25
+
+### Added
+- **Local placeholder SVG image**: Replaced external placeholder URLs with a local `placeholder.svg` asset across all blog templates (archive, category, tag, blog, single, page, home)
+- **THEME_DEVELOPER_GUIDE.md**: Comprehensive standalone theme reference documentation
+- **Language indicator widget**: i18n sidebar locale bootstrap with ARIA attributes for accessibility
+- **Extended locale support**: `lang_available` now includes Arabic, Chinese, French, Russian, Spanish, and Indonesian during installation
+- **SidebarNavigationTest**: Unit tests for admin sidebar navigation
+- **MIT license file**: Added `LICENSE` file to the blog theme
+
+### Changed
+- **Utility loader ordering**: `sanitize-urls.php` now loads before `generate-request.php` project-wide to resolve dependency ordering across multiple load paths
+- **Translation caches**: English, Spanish, and Indonesian translation caches restructured, expanded, and streamlined with full key-value pairs
+- **RELEASE_GUIDE.md**: Overhauled with Packagist version immutability guidance
+- **Theme cookie expiry**: Reduced from 365 to 30 days
+
+### Fixed
+- **ThemeRenderer DB guard**: Multiple hardening passes — replaced empty/null checks with `instanceof \PDO` type check, caught `\Throwable` instead of `Exception`, removed redundant guard conditions
+- **`is_table_exists` redeclaration**: Wrapped in `function_exists()` guard to prevent fatal errors when the function is loaded multiple times
+- **`generate-request.php` require ordering**: Moved `require_once` before function declaration to comply with PHP best practices
+- **Session initialization**: Reordered session start before authenticator include to prevent `headers_sent` errors
+- **Front controller**: Added `ob_start()` for proper output buffering
+- **Theme fallback**: Added directory fallback when `header.php` not found in active theme
+- **Comment endpoint**: Fixed `fetch-comments.php` to use dynamic `site_url`
+- **Copyright year**: Corrected start year from 2021 to 2018
+- **Void return types**: Removed incorrect `void` return type from `install_i18n_data` and `convert_memory_used`
+- **Error suppression**: Suppressed `file_put_contents`/`file_get_contents` warnings with `@` operator
+- **ScriptlogCryptonizeException**: Skip error logging for expected encryption exceptions in decrypt method
+- **Dependabot config**: Corrected target-branch and directory; updated CodeQL action versions
+- **Autoloader path**: Fixed composer autoload and PHPUnit paths for `lib/vendor` structure
+- **Bootstrap error handling**: Improved exception handling and SQL query logging in core Bootstrap
+- **Install system**: Improved error handling, DB connection validation, and security hardening in installation wizard
+
+### Security
+- **SRI integrity hashes**: Added Subresource Integrity hashes to all CSS and JavaScript assets; removed legacy IE tweaks
+- **Frontend JS hardening**: Validated cookie values and anchor targets in `front.js`
+- **XSS prevention**: Sanitized Summernote databasic and specialchars plugins
+- **Download identifier sanitization**: Sanitized download identifiers with `preg_replace` to prevent injection attacks
+- **Prepared statements**: Migrated previous/next post queries to prepared statements; escaped permalink in `format_topics`
+- **CVE-2026-55766**: Updated `guzzlehttp/psr7` to 2.12.1 to fix CRLF injection vulnerability
+- **Colour select sanitization**: Sanitized colour select input in admin `front.js`
+- **CodeQL scanning**: Added PHP to CodeQL analysis targets
+
+### Removed
+- **`restoblog` and `tastybites` themes**: Removed from repository (not yet production-ready)
+- **Redundant `echo`**: Removed extraneous `echo` before `sidebar_navigation()` call
+- **Stale translation caches**: Cleared stale `en.json` and `es.json` caches for clean regeneration
+
+### Refactored
+- **External dependency removal**: Replaced all external placeholder image URLs with local `placeholder.svg` across archive, category, tag, blog, single, page, and home templates
+- **AJAX error handling**: Simplified error handling in comment submission and search functionality
+
+### Style
+- **Install wizard responsiveness**: Added mobile breakpoint styles to install wizard CSS
+
+### Notes
+Security-focused release with 10+ vulnerability fixes, comprehensive utility loader stabilization, i18n expansion, and removal of external image dependencies. All unit tests passing (764 tests, 1753 assertions).
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.2.1
+- **Changes since v1.2.1**: 79 commits
+
+---
+
+## [1.2.1] - 2026-06-16
+
+### Added
+- **CSS design tokens**: Custom properties for colors, spacing, and typography in the blog theme
+- **Dark mode support**: Full theme support via `prefers-color-scheme: dark` media query
+- **Responsive improvements**: Enhanced layout adaptability for mobile, tablet, and desktop viewports
+
+### Changed
+- Blog theme templates: replaced `<main>` with `<div>` for semantic consistency across 8 templates (archive, archives, blog, category, page, single, tag, homepage)
+- Improved header navigation with better layout and accessibility
+- Enhanced footer template layout
+- Updated homepage template
+- Minified `style.sea.css` asset
+- Updated test bootstrap and file paths to match project structure
+
+### Fixed
+- PHPUnit binary path corrected from `vendor/bin/phpunit` to `lib/vendor/bin/phpunit` in CI workflow
+- Added `workflow_dispatch` trigger to CI workflow for manual test runs
+- Fixed stale tastybites theme test files (theme was previously removed)
+- Corrected test file paths from `../../lib/` to `../../src/lib/` project-wide
+
+### Removed
+- Stale test files for deleted `tastybites` theme (4 files)
+
+### Notes
+Minor release focused on theme modernization with CSS design tokens, dark mode support, responsive improvements, and CI/test infrastructure cleanup. This version re-releases the same content as v1.2.0 under a new tag to avoid the upstream tag mutation lock on Packagist.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.1.0
+- **Changes since v1.1.0**: 18 commits
+
+---
+
+## [1.1.0] - 2026-06-13
+
+### Added
+- **Handler system**: New front-end request handling pipeline with dedicated handlers for each content type (`ArchiveHandler`, `BlogHandler`, `CategoryHandler`, `DownloadHandler`, `FrontRequestHandler`, `HomeHandler`, `PageHandler`, `PostHandler`, `PrivacyHandler`, `TagHandler`) and a central `HandlerRegistry`
+- **FrontService**: New service layer for front-end content retrieval and rendering
+- **ThemeRenderer**: New core class for theme rendering
+- **CSRF/XSS protection**: Comprehensive protection added across all admin UI templates (comments, downloads, export, import, media library, pages, plugins, posts, privacy, settings, users)
+- **Blog theme improvements**: Enhanced header navigation, footer layout, single post view, download handling, sidebar, and 404 page
+- **Bootstrap hardening**: Improved error handling, null safety, and graceful failure when database credentials are missing
+- **Session management**: Enhanced `SessionMaker` with improved session handling and security
+- **Dispatcher refactoring**: URL routing and content validation improvements with canonical URL enforcement
+- **FrontHelper enhancements**: Improved front-end content retrieval methods
+- **HandleRequest upgrades**: Comprehensive query string handling and 404 management
+- **Test suite expansion**: 25+ new test files covering handlers, services, download features, integration tests, and smoke tests
+- **Test infrastructure**: New `tests/core/`, `tests/smoke/`, and `tests/unit/handlers/` test directories
+- **Psalm static analysis**: Configuration files (`psalm.xml`, `psalm-baseline.xml`, `psalm-autoload.php`) for improved code quality enforcement
+
+### Changed
+- Updated `composer.json` and `composer.lock` dependencies
+- Revamped blog theme files (`404.php`, `footer.php`, `functions.php`, `header.php`, `home.php`, `sidebar.php`, `download_file.php`, `load-comment.min.js`)
+- Updated all admin UI templates with modernized markup and security hardening
+- Updated all controllers, DAOs, services, and utility functions for PHP 8.x compatibility
+- Updated `Bootstrap.php`, `Dispatcher.php`, `HandleRequest.php`, `FrontHelper.php`, `SessionMaker.php` with significant improvements
+- Enhanced `DbMySQLi.php` for PDO/mysqli compatibility
+- Updated documentation files
+
+### Fixed
+- Resolved PHP 8.x compatibility issues across the codebase
+- Fixed null safety in utility functions and controllers
+- Fixed PDO/mysqli compatibility in database access layer
+- Corrected argument order in configuration write function
+- Fixed table prefix handling in Medoo integration
+- Resolved various edge cases in post editing and protected post handling
+- Fixed `total_comment()` null safety in `single.php` to prevent array access on falsy return
+- Removed empty `load_more_comments()` function stub from blog theme `functions.php`
+- **Test infrastructure**: Corrected 30+ test file paths from `../../lib/` to `../../src/lib/` to match project structure
+- **CI workflow**: Fixed `phpunit` binary path from `vendor/bin/phpunit` to `lib/vendor/bin/phpunit` and added `workflow_dispatch` trigger
+- Removed stale tastybites theme test files (theme was previously removed)
+- Fixed `InstallationTest.php`, `DownloadHandlerTest.php`, `ConfigFileGenerationTest.php`, `OpenApiSpecVerificationTest.php` test logic
+- Updated `.gitignore` to exclude `lib/vendor/` directory
+
+### Removed
+- Unused CSS from blog theme (`custom.css` trimmed by 269 lines)
+- Deprecated code and unused utility files
+- Stale test files for deleted `tastybites` theme (4 files)
+
+### Notes
+Minor release introducing a new handler-based front-end architecture, comprehensive CSRF/XSS protection, significant test suite expansion, theme improvements, test infrastructure fixes, and numerous stability improvements across the entire codebase.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia. This remarkable bird, known for its distinctive bony casque and unique reproductive strategy, is one of the world's most fascinating creatures. Maleos are monogamous pairs that dig deep pits in which a single egg is laid—incubated by geothermal heat at inland forested sites or by the sun at beach nesting grounds. The chicks hatch fully feathered and immediately fly into the forest, independent from birth. With population declined by over 90% since the 1950s and fewer than 10,000 individuals remaining, the maleo is listed as Critically Endangered on the IUCN Red List and protected under CITES Appendix I. Major threats include over-harvesting of eggs, habitat destruction, and predation by introduced species. Conservation efforts by the Wildlife Conservation Society (WCS) Indonesia and the Alliance for Tompotika Conservation have released over 10,000 chicks into the wild since 2001, working to protect nesting grounds and establish semi-natural hatcheries.
+
+### Comparison
+- **Previous release**: v1.0.8
+- **Changes since v1.0.8**: 300 commits
+
+---
 
 ## [1.0.8] - 2026-05-14
 
@@ -263,6 +463,10 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.2.3 | 2026-06-26 | Stable |
+| 1.2.2 | 2026-06-25 | Stable |
+| 1.2.1 | 2026-06-16 | Stable |
+| 1.1.0 | 2026-06-13 | Stable |
 | 1.0.8 | 2026-05-14 | Stable |
 | 1.0.7 | 2026-05-02 | Stable |
 | 1.0.6 | 2026-05-01 | Stable |

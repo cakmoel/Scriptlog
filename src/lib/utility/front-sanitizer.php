@@ -5,7 +5,7 @@
  *
  * @category function
  * @author Nirmalakhanza
- * @return object|bool
+ * @return object|string
  *
  */
 function front_sanitizer()

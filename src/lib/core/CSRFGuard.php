@@ -135,7 +135,7 @@ class CSRFGuard
     /**
      * randomString
      *
-     * @param int|numeric $length
+     * @param int $length
      * @return string
      *
      */
