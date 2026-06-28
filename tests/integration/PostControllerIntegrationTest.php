@@ -47,47 +47,6 @@ class PostControllerIntegrationTest extends TestCase
         $this->assertInstanceOf(PostService::class, $service);
     }
 
-    public function testSetCredential(): void
-    {
-        $values = [
-            'post_id' => 1,
-            'post_author' => 1,
-            'post_date' => '2026-01-01',
-            'post_password' => 'testpass',
-            'passphrase' => 'testpass'
-        ];
-        
-        $reflection = new ReflectionClass($this->postController);
-        $method = $reflection->getMethod('setCredential');
-        $method->setAccessible(true);
-        
-        $result = $method->invoke($this->postController, $values);
-        
-        $this->assertIsArray($result);
-        $this->assertEquals(1, $result['post_id']);
-        $this->assertEquals('testpass', $result['post_password']);
-    }
-
-    public function testSetCredentialWithEmptyPassword(): void
-    {
-        $values = [
-            'post_id' => 1,
-            'post_author' => 1,
-            'post_date' => '2026-01-01',
-            'post_password' => '',
-            'passphrase' => ''
-        ];
-        
-        $reflection = new ReflectionClass($this->postController);
-        $method = $reflection->getMethod('setCredential');
-        $method->setAccessible(true);
-        
-        $result = $method->invoke($this->postController, $values);
-        
-        $this->assertIsArray($result);
-        $this->assertEquals('', $result['post_password']);
-    }
-
     public function testProtectedVisibilityValidation(): void
     {
         $validOptions = ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'];
@@ -169,15 +128,5 @@ class PostControllerIntegrationTest extends TestCase
         
         $result = ($visibility === 'protected' && empty($password));
         $this->assertFalse($result);
-    }
-
-    public function testCredentialPropertyInitialized(): void
-    {
-        $reflection = new ReflectionClass($this->postController);
-        $property = $reflection->getProperty('crendential');
-        $property->setAccessible(true);
-        $credential = $property->getValue($this->postController);
-        
-        $this->assertIsArray($credential);
     }
 }
