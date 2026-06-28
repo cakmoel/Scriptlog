@@ -25,6 +25,11 @@ class AuthenticationTest extends TestCase
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $_SERVER['HTTP_USER_AGENT'] = 'PHPUnit Test Agent';
 
+        // Set up Defuse Key in Registry for Authentication
+        // Must always set: Bootstrap::initializeServices() stores '' string otherwise
+        $key = \Defuse\Crypto\Key::createNewRandomKey();
+        Registry::set('key', $key);
+
         // Create mocks
         $this->userDao = $this->createMock(UserDao::class);
         $this->userToken = $this->createMock(UserTokenDao::class);
