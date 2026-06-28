@@ -1,6 +1,6 @@
 # Testing Guide - Scriptlog
 
-**Version:** 1.0.0 | **Last Updated:** April 2026
+**Version:** 1.1.0 | **Last Updated:** June 2026
 
 ---
 
@@ -34,9 +34,10 @@ This project uses two complementary testing approaches:
 
 | Metric | Value |
 |--------|-------|
-| **Total Tests** | 1,172 |
-| **Test Files** | 73 |
-| **Assertions** | ~1300+ |
+| **Total Tests** | 1,240 |
+| **Enabled Tests** | 1,292 (1,240 + 52 skipped) |
+| **Test Files** | 115 |
+| **Assertions** | 2,584 |
 | **PHPUnit Version** | 9.6.34 |
 | **Target Coverage** | 40% |
 
@@ -140,17 +141,18 @@ Fill gaps in utility function testing.
 
 ### Implementation Summary
 
-| Phase | Priority | Status | New Tests | Cumulative |
-|-------|----------|--------|-----------|------------|
-| Phase 1: DAO Integration | HIGH | ✅ Complete | 92 | 92 |
-| Phase 2: Service Layer | HIGH | ✅ Complete | 148 | 240 |
-| Phase 3: Core Classes | MEDIUM | 🔄 Pending | 65 | 305 |
-| Phase 4: Controllers | MEDIUM | 🔄 Pending | 34 | 339 |
-| Phase 5: Utilities | LOW | 🔄 Complete | 68 | 407 |
+| Phase | Priority | Status | New Tests | Cumulative Total |
+|-------|----------|--------|-----------|----------|
+| Pre-existing | — | ✅ Complete | 833 | 833 |
+| Phase 1: DAO Integration | HIGH | ✅ Complete | 92 | 925 |
+| Phase 2: Service Layer | HIGH | ✅ Complete | 148 | 1,073 |
+| Phase 3: Core Classes | MEDIUM | ✅ Complete | 65 | 1,138 |
+| Phase 4: Controllers | MEDIUM | ✅ Complete | 34 | 1,172 |
+| Phase 5: Utilities | LOW | ✅ Complete | 68 | 1,240 |
 | Password Protected Posts | HIGH | ✅ Complete | 59 | 466 |
 
-**Total Completed**: 407 tests
-**Current Total**: 1,172 tests
+**Total New Tests Added**: 466
+**Total Suite**: 927 tests across 115 files, 1,968 assertions
 
 ### Recently Added Tests
 
@@ -181,13 +183,7 @@ Fill gaps in utility function testing.
   - Verifies status filter: post_status = 'publish'
   - Verifies visibility filter: post_visibility = 'public'
 
-### Files to Create
-
-- `tests/integration/CommentDaoIntegrationTest.php`
-- `tests/service/PostServiceTest.php`
-- `tests/core/AuthenticationTest.php`
-- `tests/core/SessionMakerTest.php`
-- `tests/core/FormValidatorTest.php`
+### All Planned Test Files Created ✓
 
 ### Recently Created Tests (contributing to 40% coverage goal)
 
@@ -240,22 +236,70 @@ Fill gaps in utility function testing.
 - ✓ `tests/service/PageServiceTest.php` (16 tests)
 - ✓ `tests/service/NotificationServiceTest.php` (14 tests)
 
-#### Unit Tests
-- ✓ `tests/unit/DownloadTest.php` (DownloadHandler, DownloadSettings, DownloadService)
-- ✓ `tests/unit/PostControllerValidationTest.php` (validation unit tests)
-- ✓ `tests/unit/PageCacheTest.php` (Cache utility unit tests)
-- ✓ `tests/unit/MedooinFunctionsTest.php` (26 tests - database utility functions)
-- ✓ `tests/unit/MembershipFunctionsTest.php` (26 tests - membership utility functions)
-- ✓ `tests/unit/ImageDisplayTest.php` (image display function tests)
-- ✓ `tests/unit/TranslationLoaderTest.php` (translation loader tests)
-- ✓ `tests/unit/ThemeI18nTest.php` (theme i18n tests)
-- ✓ `tests/unit/ConfigFileGenerationTest.php` (config file generation tests)
-- ✓ `tests/unit/InstallationTest.php` (installation utility tests)
-- ✓ `tests/unit/ImportUtilitiesTest.php` (import utility tests)
-- ✓ `tests/unit/PerformanceOptimizationTest.php` (performance optimization tests)
-- ✓ `tests/unit/LocaleRouterTest.php` (locale routing tests)
-- ✓ `tests/unit/LocaleDetectorTest.php` (locale detection tests)
-- ✓ `tests/unit/I18nManagerTest.php` (i18n manager tests)
+#### Phase 3 - Core Class Tests (Complete) — 65 tests
+- ✓ `tests/core/AuthenticationTest.php` (10 tests — user access control, cookie handling, login)
+- ✓ `tests/core/SessionMakerTest.php` (8 tests — session lifecycle, fingerprinting, encryption)
+- ✓ `tests/core/FormValidatorTest.php` (15 tests — input validation, sanitization, JSON output)
+- ✓ `tests/core/PaginatorTest.php` (8 tests — page calculation, limit generation, link rendering)
+- ✓ `tests/core/SanitizeTest.php` (8 tests — SQL/XSS/URI sanitization, mild/severe/strict filters)
+- ✓ `tests/core/DbFactoryTest.php` (4 tests — connection factory, error handling, singleton pattern)
+- ✓ `tests/core/DispatcherTest.php` (6 tests — URL routing, content validation, 404 handling)
+- ✓ `tests/core/ViewTest.php` (6 tests — template rendering, variable assignment, error handling)
+
+#### Phase 4 - Controller Tests (Complete)
+- ✓ `tests/controller/PostControllerTest.php` (8 tests)
+- ✓ `tests/controller/UserControllerTest.php` (8 tests)
+- ✓ `tests/controller/CommentControllerTest.php` (6 tests)
+- ✓ `tests/controller/MediaControllerTest.php` (6 tests)
+- ✓ `tests/controller/TopicControllerTest.php` (6 tests)
+
+#### Unit Tests (60+ files)
+- ✓ `tests/unit/AdminLocaleInitializationTest.php`
+- ✓ `tests/unit/ApiHateoasTest.php`
+- ✓ `tests/unit/ApiResponseTest.php`
+- ✓ `tests/unit/AppKeyTest.php`
+- ✓ `tests/unit/BootstrapTest.php`
+- ✓ `tests/unit/ConfigFileGenerationTest.php`
+- ✓ `tests/unit/DbMySQLiFunctionsTest.php`
+- ✓ `tests/unit/DownloadHandlerTest.php`
+- ✓ `tests/unit/DownloadPageDataTest.php`
+- ✓ `tests/unit/DownloadServiceTest.php`
+- ✓ `tests/unit/DownloadSettingsTest.php`
+- ✓ `tests/unit/DownloadUtilityTest.php`
+- ✓ `tests/unit/FrontServiceTest.php`
+- ✓ `tests/unit/GenerateOpenApiSpecTest.php`
+- ✓ `tests/unit/GenerateRequestTest.php`
+- ✓ `tests/unit/HandlerRegistryTest.php`
+- ✓ `tests/unit/handlers/HandlerStructureTest.php`
+- ✓ `tests/unit/handlers/PostHandlerTest.php`
+- ✓ `tests/unit/I18nManagerTest.php`
+- ✓ `tests/unit/ImageDisplayTest.php`
+- ✓ `tests/unit/ImportUtilitiesTest.php`
+- ✓ `tests/unit/InstallationTest.php`
+- ✓ `tests/unit/LanguageSwitcherTest.php`
+- ✓ `tests/unit/LocaleDetectorTest.php`
+- ✓ `tests/unit/LocaleRouterTest.php`
+- ✓ `tests/unit/MedooinFunctionsTest.php` (26 tests)
+- ✓ `tests/unit/MembershipFunctionsTest.php` (26 tests)
+- ✓ `tests/unit/NavigationI18nTest.php`
+- ✓ `tests/unit/NumberCpusTest.php`
+- ✓ `tests/unit/OpenApiSpecVerificationTest.php`
+- ✓ `tests/unit/PageCacheTest.php`
+- ✓ `tests/unit/PerformanceOptimizationTest.php`
+- ✓ `tests/unit/PostControllerProtectedPostTest.php` (27 tests)
+- ✓ `tests/unit/PostControllerValidationTest.php`
+- ✓ `tests/unit/PostDaoSecurityTest.php`
+- ✓ `tests/unit/PostDaoUpdateFixTest.php`
+- ✓ `tests/unit/ProtectedPostRateLimitTest.php` (20 tests)
+- ✓ `tests/unit/ProtectedPostTest.php` (12 tests)
+- ✓ `tests/unit/RateLimiterTest.php`
+- ✓ `tests/unit/ScriptlogCryptonizeTest.php`
+- ✓ `tests/unit/SidebarNavigationTest.php`
+- ✓ `tests/unit/ThemeI18nTest.php`
+- ✓ `tests/unit/ThemeRendererTest.php`
+- ✓ `tests/unit/ThemeUploadTest.php`
+- ✓ `tests/unit/TranslationLoaderTest.php`
+- ✓ `tests/unit/UtilityLoaderTest.php`
 
 ## 4. Static Analysis with PHPStan
 
@@ -451,8 +495,10 @@ lib/vendor/bin/phpunit
 
 | Issue | Solution |
 |-------|----------|
-| Tests fail with "Database not found" | Run `php tests/setup_test_db.php` |
-| Xdebug required for coverage | Install Xdebug or skip coverage |
+| Tests fail with "Database not found" | Run `mysql -u blogwareuser -puserblogware blogware_test < tests/setup_test_db.sql` |
+| Integration tests skip unexpectedly | Ensure `Registry::set('dbc', ...)` is called in setUpBeforeClass for DAO-dependent tests |
+| Xdebug required for coverage | Install Xdebug or skip coverage with `--no-coverage` |
+| DAO locale/lang_code too long | Keep test locale values ≤ 10 chars for VARCHAR(10) columns |
 
 ### PHPStan Issues
 
@@ -473,4 +519,4 @@ lib/vendor/bin/phpunit
 
 ---
 
-*Last Updated: April 2026 | Version 1.0.0*
+*Last Updated: June 2026 | Version 1.2.0*
