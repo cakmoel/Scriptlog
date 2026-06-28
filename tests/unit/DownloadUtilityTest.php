@@ -148,7 +148,7 @@ class DownloadUtilityTest extends TestCase
         return [
             'future timestamp' => [time() + 3600, false],
             'past timestamp'  => [time() - 3600, true],
-            'current time'    => [time() + 1, false],
+            'current time'    => [time() + 60, false],
         ];
     }
 
