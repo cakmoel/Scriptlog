@@ -220,7 +220,7 @@ class ThemeDaoIntegrationTest extends TestCase
         self::$pdo->exec("DELETE FROM tbl_themes WHERE ID = " . $themeId);
     }
     
-/**
+    /**
      * Test auto-activation fallback when deactivating last active theme
      *
      * This tests the core logic: when user deactivates the last active theme,
@@ -228,19 +228,18 @@ class ThemeDaoIntegrationTest extends TestCase
      */
     public function testAutoActivateBlogThemeFallback(): void
     {
-        // First, ensure blog theme exists
+        // First, deactivate all themes to start from clean state
+        self::$pdo->exec("UPDATE tbl_themes SET theme_status = 'N'");
+        
+        // Create blog theme if doesn't exist
         $stmt = self::$pdo->query("SELECT ID FROM tbl_themes WHERE theme_directory = 'blog'");
         $blogTheme = $stmt->fetch();
         
-        // Create blog theme if doesn't exist
         if (empty($blogTheme)) {
             self::$pdo->exec("
                 INSERT INTO tbl_themes (theme_title, theme_desc, theme_designer, theme_directory, theme_status)
                 VALUES ('Bootstrap Blog', 'Default blog theme', 'Scriptlog', 'blog', 'N')
             ");
-            $blogThemeId = (int)self::$pdo->lastInsertId();
-        } else {
-            $blogThemeId = (int)$blogTheme['ID'];
         }
         
         // Create a test theme and activate it
@@ -259,7 +258,7 @@ class ThemeDaoIntegrationTest extends TestCase
         $stmt = self::$pdo->query("SELECT ID, theme_directory, theme_status FROM tbl_themes WHERE theme_status = 'Y'");
         $activeThemes = $stmt->fetchAll();
         
-// If no active themes, blog should auto-activate
+        // If no active themes, blog should auto-activate
         if (empty($activeThemes)) {
             self::$pdo->prepare("UPDATE tbl_themes SET theme_status = 'Y' WHERE theme_directory = 'blog'")->execute();
         }
