@@ -34,7 +34,7 @@ class TranslationService
             'translation_key' => $data['translation_key'],
             'translation_value' => $data['translation_value'],
             'translation_context' => $data['translation_context'] ?? null,
-            'is_html' => $data['is_html'] ?? false,
+            'is_html' => $data['is_html'] ?? 0,
         ]);
 
         $this->loader->invalidate($data['lang_code']);
@@ -217,7 +217,7 @@ class TranslationService
             throw new ServiceException("Invalid translation key format");
         }
 
-        if (!isset($data['translation_value'])) {
+        if (!isset($data['translation_value']) || $data['translation_value'] === '') {
             throw new ServiceException("Translation value is required");
         }
     }
