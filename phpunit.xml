@@ -20,6 +20,10 @@
         </testsuite>
         <testsuite name="Unit Tests">
             <directory>tests/unit</directory>
+            <directory>tests/core</directory>
+        </testsuite>
+        <testsuite name="Controller Tests">
+            <directory>tests/controller</directory>
         </testsuite>
         <testsuite name="Integration Tests">
             <directory>tests/integration</directory>
