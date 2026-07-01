@@ -85,11 +85,11 @@ function db_build_where($where)
             $placeholders = implode(', ', array_fill(0, count($value), '?'));
             $conditions[] = "`{$key}` IN ({$placeholders})";
             $params = array_merge($params, array_values($value));
-            } elseif (strpos($key, '>') !== false || strpos($key, '<') !== false || strpos($key, '!') !== false) {
-                // Handle operators: 'column>' => value, 'column<' => value, 'column!' => value
-                $op = '';
-                $col = '';
-                if (strpos($key, '>=') !== false) {
+        } elseif (strpos($key, '>') !== false || strpos($key, '<') !== false || strpos($key, '!') !== false) {
+            // Handle operators: 'column>' => value, 'column<' => value, 'column!' => value
+            $op = '';
+            $col = '';
+            if (strpos($key, '>=') !== false) {
                 $col = str_replace('>=', '', $key);
                 $op = '>=';
             } elseif (strpos($key, '<=') !== false) {
@@ -208,7 +208,7 @@ function medoo_join($table, $join, $columns, $where)
                 } elseif (strtoupper($joinType) === '<>' || strtoupper($joinType) === '[<>]') {
                     $joinType = 'INNER JOIN';
                 }
-                
+
                 if (is_string($condition) && strpos($condition, ':') !== false) {
                     // Medoo shorthand: 'table.column:other_table.other_column'
                     list($left, $right) = explode(':', $condition);
@@ -217,7 +217,7 @@ function medoo_join($table, $join, $columns, $where)
                     $joinClauses[] = "{$joinType} {$condition}";
                 }
             }
-            
+
             $cols = is_array($columns) ? implode(', ', $columns) : $columns;
             $whereClause = db_build_where($where);
             $sql = "SELECT {$cols} FROM {$table} " . implode(' ', $joinClauses) . $whereClause['sql'];
@@ -312,7 +312,7 @@ function medoo_get_join($table, $join, $columns, $where)
                 } elseif (strtoupper($joinType) === '<') {
                     $joinType = 'RIGHT JOIN';
                 }
-                
+
                 if (is_string($condition) && strpos($condition, ':') !== false) {
                     list($left, $right) = explode(':', $condition);
                     $joinClauses[] = "{$joinType} {$left} ON {$left} = {$right}";
@@ -320,7 +320,7 @@ function medoo_get_join($table, $join, $columns, $where)
                     $joinClauses[] = "{$joinType} {$condition}";
                 }
             }
-            
+
             $cols = is_array($columns) ? implode(', ', $columns) : $columns;
             $whereClause = db_build_where($where);
             $sql = "SELECT {$cols} FROM {$table} " . implode(' ', $joinClauses) . $whereClause['sql'];
