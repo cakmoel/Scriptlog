@@ -8,12 +8,79 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#123---2026-06-26)
+- [Latest Release](#130---2026-07-01)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.3.0] - 2026-07-01
+
+### Added
+- **`referrer_policy()` function**: New security header function for Referrer-Policy configuration
+- **`permissions_policy()` function**: New security header function for Permissions-Policy configuration
+- **Security headers to API entry point**: X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy, and Permissions-Policy headers integrated into `api/index.php`
+- **Bootstrap security header integration**: `referrer_policy` and `permissions_policy` wired into `Bootstrap::applySecurity()`
+- **CSRF protection for API write endpoints**: `validateCsrfForWrite()` and `generateCsrfToken()` methods in `ApiAuth`
+- **CSRF validation in API controllers**: Integrated CSRF validation into MediaApiController and other API controllers
+- **`create_encoded_key()` hardening**: Defuse cipher key derivation with `_try_decrypt()` helper for multi-path backward-compatible decryption
+- **Controller test suite**: 5 new test files (PostController, UserController, CommentController, MediaController, TopicController) — 34 tests
+- **Core class test suite**: 6 new test files (SessionMaker, Paginator, Sanitize, DbFactory, Dispatcher, View) — 65 tests
+- **phpunit.xml suite directories**: Added Controller Tests and Core Tests directories to the PHPUnit configuration
+
+### Changed
+- **Password hashing**: Upgraded from md5 to sha256 in `protect_post()` and `setPassPhrase()` for stronger hashing
+- **CSP hardening**: Removed `unsafe-eval` from Content-Security-Policy; added Report-Only header for migration monitoring
+- **Dynamic tests badge**: Replaced static badge with dynamic GitHub Actions badge in README
+
+### Fixed
+- **Test infrastructure**: `Registry::set('dbc')` added for Dao, MediaDao, Authentication constructors in integration tests
+- **Locale column length**: Shortened `lang_code` from VARCHAR(20) to VARCHAR(10) to match schema
+- **Unique locale collision**: Fixed via counter in test data setup
+- **`is_html` cast**: Cast to integer 0 instead of boolean false in translation tests
+- **DownloadUtilityTest race condition**: Resolved `time() + 1` race condition in data provider
+- **DownloadCreateLinkTest paths**: Corrected file paths for `src/` directory structure
+- **Theme auto-activate test**: Deactivate all themes first to ensure clean state
+- **Removed stale tests**: Removed tests for non-existent `setCredential()` method and `crendential` property
+- **Translation insert transaction**: Wrapped translation insert in transaction in setup-db; added hard lock detection for fully installed databases
+- **`generate_request()` null safety**: Removed redundant `isset($data) &&` before `array_key_exists()` calls
+
+### Style
+- **Code formatting**: Cleanup across service layer, utility loader, core classes, admin utilities, import files, and PostController
+- **Utility loader**: Fixed blank line after opening PHP tag and array bracket alignment
+
+### Docs
+- **README**: Updated Tests badge to reflect 1240 passed; documentation updates
+- **DEVELOPER_GUIDE.md**: Updated version to v1.2.3; documentation updates
+- **TESTING_GUIDE.md**: Updated to v1.2.0 with 1240 tests, 2584 assertions, database setup fixes
+
+### Tests
+- **Security headers**: Tests for `referrer_policy()`, `permissions_policy()`, secure HTTP headers (CSP, Report-Only)
+- **API auth CSRF**: Unit tests for `validateCsrfForWrite()`, `hasApiOrBearerAuth()`, `generateCsrfToken()` — additional test cases
+- **Encrypt-decrypt**: Tests for `create_encoded_key()`, `_try_decrypt()`, multi-path backward-compatible decryption
+- **Password hashing**: Verification that `PostService::setPassPhrase()` uses sha256 instead of md5
+- **Controller tests**: 8 PostController, 8 UserController, 6 CommentController, 6 MediaController, 6 TopicController tests
+- **Core class tests**: 8 SessionMaker, 8 Paginator, 15 Sanitize, 4 DbFactory, 6 Dispatcher, 6 View tests
+- **HTTP headers test**: Rewritten using subprocess instead of `runInSeparateProcess`
+
+### Security
+- **Password hashing**: Upgraded from md5 to sha256 for protected post passwords
+- **CSP hardening**: Removed `unsafe-eval` from Content-Security-Policy
+- **Security headers**: X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy added to API
+- **API CSRF protection**: CSRF validation for API write endpoints
+
+### Notes
+Feature release with security hardening (CSRF API protection, CSP hardening, password hashing upgrade, security headers), expanded test suite (+99 tests across controllers and core classes), and code quality improvements. All unit tests passing (950 tests, 2031 assertions).
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.2.3
+- **Changes since v1.2.3**: 50 commits
+
+---
 
 ## [1.2.3] - 2026-06-26
 
@@ -463,6 +530,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.3.0 | 2026-07-01 | Stable |
 | 1.2.3 | 2026-06-26 | Stable |
 | 1.2.2 | 2026-06-25 | Stable |
 | 1.2.1 | 2026-06-16 | Stable |
