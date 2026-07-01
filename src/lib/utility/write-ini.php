@@ -40,7 +40,7 @@ function write_ini(string $file, array $array = [])
         chmod($file, 0644);
         clearstatcache();
     }
-    
+
     // Also try to fix directory permissions
     $dir = dirname($file);
     if (is_dir($dir) && !is_writable($dir)) {
