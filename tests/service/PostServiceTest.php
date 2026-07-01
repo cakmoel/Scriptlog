@@ -134,6 +134,33 @@ class PostServiceTest extends TestCase
         $this->assertTrue(true);
     }
 
+    public function testSetPassPhraseUsesSha256(): void
+    {
+        $passphrase = 'test-passphrase-123';
+        $this->postService->setPassPhrase($passphrase);
+        $ref = new ReflectionClass($this->postService);
+        $prop = $ref->getProperty('passphrase');
+        $prop->setAccessible(true);
+        $value = $prop->getValue($this->postService);
+        $expected = hash('sha256', app_key() . $passphrase);
+        $this->assertEquals($expected, $value);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $value);
+    }
+
+    public function testSetPassPhraseDifferentInputs(): void
+    {
+        $this->postService->setPassPhrase('pass1');
+        $ref = new ReflectionClass($this->postService);
+        $prop = $ref->getProperty('passphrase');
+        $prop->setAccessible(true);
+        $val1 = $prop->getValue($this->postService);
+
+        $this->postService->setPassPhrase('pass2');
+        $val2 = $prop->getValue($this->postService);
+
+        $this->assertNotEquals($val1, $val2);
+    }
+
     public function testPostStatusDropDown(): void
     {
         $this->postDaoMock->method('dropDownPostStatus')->willReturn('<select><option>publish</option></select>');
