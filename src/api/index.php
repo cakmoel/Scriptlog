@@ -44,7 +44,7 @@ if (in_array($request_origin, $allowed_list, true)) {
 }
 
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization, X-API-Key, X-Requested-With');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-API-Key, X-Requested-With, X-CSRF-Token');
 header('Access-Control-Max-Age: 3600');
 header('Content-Type: application/json');
 header('X-API-Version: ' . API_VERSION);
@@ -241,6 +241,15 @@ try {
     // API Info endpoint
     $router->get('', 'ApiController@info');
     $router->get('/', 'ApiController@info');
+
+    // CSRF token helper endpoint (no auth required)
+    $router->get('csrf-token', function ($params) {
+        $token = ApiAuth::generateCsrfToken();
+        ApiResponse::success([
+            'csrf_token' => $token,
+            'expires_in' => 3600
+        ], 200, 'CSRF token generated. Include as X-CSRF-Token header on session-authenticated write requests.');
+    });
 
     // Validate Accept header for all API requests
     if (!ApiResponse::validateAccept(['application/json', '*/*'])) {

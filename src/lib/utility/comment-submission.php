@@ -214,7 +214,7 @@ function processing_comment(array $values)
 function fetch_comments(int $postId, int $offset = 0, ?int $limit = null): array
 {
     $database = medoo_init();
-    
+
     if (!$database) {
         error_log("Database connection failed in fetch_comments_medoo");
         return [];
@@ -265,7 +265,7 @@ function fetch_comments(int $postId, int $offset = 0, ?int $limit = null): array
                 FROM tbl_comments 
                 WHERE comment_post_id = ? AND comment_status = 'approved' 
                 ORDER BY comment_date DESC LIMIT ? OFFSET ?";
-        
+
         try {
             return $database->dbSelect($sql, [$postId, $limit, $offset], PDO::FETCH_ASSOC);
         } catch (Exception $e) {
@@ -273,6 +273,6 @@ function fetch_comments(int $postId, int $offset = 0, ?int $limit = null): array
             return [];
         }
     }
-    
+
     return [];
 }
