@@ -51,7 +51,7 @@
 
 | Requirement | Version | Purpose |
 |-------------|---------|---------|
-| **PHP** | 7.4+ | Server-side runtime |
+| **PHP** | 7.4 – 8.5 | Server-side runtime |
 | **MySQL/MariaDB** | 5.7+ | Database server |
 | **Apache/Nginx** | Latest | Web server |
 | **Composer** | Latest | Dependency management |
@@ -663,7 +663,7 @@ Archive functionality allows users to browse posts by month/year:
 ## 3. Directory Structure
 
 ```
-ScriptLog/public_html/
+ScriptLog/
 |
 |-- index.php                    # Public front controller
 |-- config.php                   # Application configuration
@@ -3243,7 +3243,7 @@ ScriptLog provides a RESTful API that allows external applications to interact w
 | Environment | URL |
 |-------------|-----|
 | **Production** | `http://ScriptLog.site/api/v1` |
-| **Development** | `http://localhost/ScriptLog/public_html/api/v1` |
+| **Development** | `http://localhost/ScriptLog/api/v1` |
 
 > **NOTE:** The complete OpenAPI 3.0 specification is available at `/docs/API_OPENAPI.json` and `/docs/API_OPENAPI.yaml`.
 
@@ -3601,12 +3601,12 @@ This project uses two complementary testing approaches:
 
 | Metric | Value |
 |--------|-------|
-| **Total Tests** | 1,172 |
-| **Test Files** | 73 |
-| **Assertions** | ~1300+ |
+| **Total Tests** | 1,240 |
+| **Test Files** | 115 |
+| **Assertions** | 2,584 |
 | **PHPUnit Version** | 9.6.34 |
 | **Target Coverage** | 40% |
-| **Current Coverage** | ~35% |
+| **Current Coverage** | ~38% |
 
 ### Test Coverage Plan
 
@@ -3618,8 +3618,8 @@ The test coverage plan is organized into phases:
 |-------|----------|--------|-------|
 | Phase 1: DAO Integration | HIGH | ✅ Complete | 92 |
 | Phase 2: Service Layer | HIGH | ✅ Complete | 148 |
-| Phase 3: Core Classes | MEDIUM | 🔄 Pending | 65 |
-| Phase 4: Controllers | MEDIUM | 🔄 Pending | 34 |
+| Phase 3: Core Classes | MEDIUM | ✅ Complete | 65 |
+| Phase 4: Controllers | MEDIUM | ✅ Complete | 34 |
 | Phase 5: Utilities | LOW | ✅ Complete | 68 |
 | Password Protected Posts | HIGH | ✅ Complete | 59 |
 
@@ -5532,7 +5532,7 @@ POST /api/v1/posts/3/unlock
 
 ### Unit Tests
 
-**Total: 32 tests across 2 files**
+**Total: 59 tests across 3 files**
 
 | Test File | Tests | Coverage |
 |-----------|-------|----------|
@@ -5729,4 +5729,4 @@ This project is licensed under the MIT License.
 
 ---
 
-*Last Updated: June 2026 | Version 1.2.0*
+*Last Updated: June 2026 | Version 1.2.3*

@@ -3,7 +3,7 @@
 **Empowering Your Personal Weblog**
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
-[![PHP Version](https://img.shields.io/badge/PHP-7.4%2B-777BB4.svg)](https://www.php.net/)
+[![PHP Version](https://img.shields.io/badge/PHP-7.4%20--%208.5-777BB4.svg)](https://www.php.net/)
 [![MySQL Version](https://img.shields.io/badge/MySQL-5.7%2B-4479A1.svg)](https://www.mysql.com/)
 [![MariaDB Version](https://img.shields.io/badge/MariaDB-10.3%2B-003545.svg)](https://mariadb.org/)
 [![PSR-12](https://img.shields.io/badge/PSR--12-Compliant-2C2C2C.svg)](https://www.php-fig.org/psr/psr-12/)
@@ -22,7 +22,7 @@ Scriptlog is not designed to replace full-scale CMS frameworks. Instead, it is m
 - Run fast with minimal overhead.
 
 ### Core Technologies
-- **Backend:** PHP 7.4+ (PSR-12 compliant)
+- **Backend:** PHP 7.4 – 8.5 (PSR-12 compliant)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
 - **Architecture:** Multi-layered MVC-like (`Request` → `Bootstrap` → `Dispatcher` → `Controller` → `Service` → `DAO` → `Database`)
 - **Security:** Laminas (Escaper, Crypt), Defuse PHP Encryption, voku Anti-XSS, HTMLPurifier.
@@ -30,7 +30,7 @@ Scriptlog is not designed to replace full-scale CMS frameworks. Instead, it is m
 ## Requirements
 
 Ensure your hosting environment meets the following requirements:
-- **PHP:** 7.4+ (with extensions: `pdo`, `pdo_mysql`, `json`, `mbstring`, `curl`)
+- **PHP:** 7.4 – 8.5 (with extensions: `pdo`, `pdo_mysql`, `json`, `mbstring`, `curl`)
 - **Web Server:** Apache (with `mod_rewrite` enabled) or Nginx
 - **Database:** MySQL 5.7+ or MariaDB 10.3+
 - **Composer:** Latest (for dependency management)
@@ -39,7 +39,7 @@ Ensure your hosting environment meets the following requirements:
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/ScriptLog/scriptlog.git
+   git clone https://github.com/cakmoel/Scriptlog.git
    cd Scriptlog
    ```
 
@@ -47,12 +47,25 @@ Ensure your hosting environment meets the following requirements:
    ```bash
    composer install
    ```
+   > **Note:** Composer's `platform.php` config locks dependency resolution to PHP 7.4, ensuring all packages stay compatible across PHP 7.4 through 8.5. No runtime warnings occur on newer PHP versions.
 
 3. **Set Permissions**
    ```bash
-   chmod -R 755 public/
-   chmod -R 755 public/cache/ public/log/
+   # Directories: readable and executable, Files: readable only
+   find public -type d -exec chmod 755 {} \;
+   find public -type f -exec chmod 644 {} \;
+
+   # Writable directories (web server needs write access)
+   chmod -R 775 public/cache public/log
+
+   # Writable uploads — directories only, files stay non-executable
+   find public/files -type d -exec chmod 775 {} \;
+   find public/files -type f -exec chmod 644 {} \;
+
+   # Restrict access to configuration files
+   chmod 640 config.php .env
    ```
+   > **Note:** Adjust ownership if needed — the web server user (e.g., `www-data`) must own or be in the group of `public/cache`, `public/log`, and `public/files`.
 
 4. **Database Setup**
    Create a new empty database (use `utf8mb4_general_ci` collation).
@@ -74,7 +87,7 @@ After installation, two configuration files are generated:
 |------|---------|
 | `config.php` | Main configuration with `$_ENV` fallbacks |
 | `.env` | Environment variables (auto-generated) |
-| `lib/utility/.lts/lts.txt` | Defuse encryption key for authentication cookies |
+| `storage/keys/[random_filename].php` | Defuse encryption key for authentication cookies |
 
 ## Configuration
 
@@ -97,7 +110,7 @@ return [
         'url'   => $_ENV['APP_URL'] ?? 'http://example.com',
         'email' => $_ENV['APP_EMAIL'] ?? '',
         'key'   => $_ENV['APP_KEY'] ?? '',
-        'defuse_key' => 'lib/utility/.lts/lts.txt'
+        'defuse_key' => 'storage/keys/[random_filename].php'
     ],
     'mail' => [
         'smtp' => [
