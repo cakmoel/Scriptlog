@@ -768,7 +768,7 @@ class PostController extends BaseApp
     public function remove($id)
     {
         $id = abs((int)$id);
-        
+
         if ($id <= 0) {
             $_SESSION['error'] = "postNotFound";
             direct_page('index.php?load=posts&error=postNotFound', 404);
@@ -807,5 +807,4 @@ class PostController extends BaseApp
     {
         $this->view = new View('admin', 'ui', 'posts', $viewName);
     }
-
 }
