@@ -382,6 +382,8 @@ class Bootstrap
             x_content_type_options();
             x_xss_protection();
             strict_transport_security();
+            referrer_policy();
+            permissions_policy();
             content_security_policy(self::$config['app']['url'] ?? '');
             remove_x_powered_by();
         }
