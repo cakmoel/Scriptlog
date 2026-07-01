@@ -22,6 +22,6 @@ function prevent_injection($str)
     if (function_exists('htmLawed')) {
         return htmLawed($filter, array('deny_attribute' => 'style'));
     }
-    
+
     return $filter;
 }

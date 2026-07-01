@@ -166,7 +166,7 @@ function alert_login_attempt($ip)
         $result = db_prepared_query($sql, [$ip], "s");
         return fetch_assoc($result);
     }
-    
+
     return [];
 }
 

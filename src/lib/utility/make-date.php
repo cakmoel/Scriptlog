@@ -92,6 +92,6 @@ function generate_month($value, $locale = null)
 
             break;
     }
-    
+
     return '';
 }

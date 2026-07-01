@@ -17,7 +17,7 @@ function invoke_webp_image($media_filename, $image_thumb = true)
     $file_basename = substr($media_filename, 0, strripos($media_filename, '.'));
 
     $base_path = __DIR__ . '/../../public/files/pictures/';
-    
+
     // Check for WebP in main folder
     $webp_file = $base_path . $file_basename . '.webp';
     $has_webp = is_readable($webp_file);

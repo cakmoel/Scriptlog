@@ -41,7 +41,7 @@ class BlogspotImporter
         $content = $this->cleanXmlContent($content);
 
         libxml_use_internal_errors(true);
-        
+
         libxml_set_external_entity_loader(function ($public, $system, $context) {
             return null;
         });
