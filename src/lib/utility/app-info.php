@@ -16,7 +16,7 @@ function app_info()
 {
 
     $app_info = [];
-    
+
     $conn = function_exists('medoo_init') ? medoo_init() : "";
 
     if (is_object($conn) && method_exists($conn, 'select')) {

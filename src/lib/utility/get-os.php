@@ -135,17 +135,16 @@ function get_linux_distro()
         $files = function_exists('glob') ? glob('/etc/*-release') : array();
 
         foreach ($files as $file) {
-            
             if (!is_file($file)) {
                 continue;
             }
-            
+
             $lines = array_filter(array_map(function ($line) {
                 // skip empty lines
                 if (empty(trim($line))) {
                     return false;
                 }
-                
+
                 // split value from key
                 $parts = explode('=', $line, 2);
 

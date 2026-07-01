@@ -4,12 +4,12 @@
  * app_key()
  *
  * Retrieves the application key from the configuration file.
- * 
+ *
  * The application key is generated during installation using cryptographically
  * secure random number generation and stored in both config.php and .env file.
  *
  * Note: This function reads ONLY from the configuration file (config.php).
- * It does NOT verify the key against the database. Use check_app_key() 
+ * It does NOT verify the key against the database. Use check_app_key()
  * if you need to compare with the database value.
  *
  * @category function
@@ -35,7 +35,7 @@ function app_key()
  * check_app_key()
  *
  * Verifies if a provided key matches the database value.
- * This function compares the given key against the app_key stored in 
+ * This function compares the given key against the app_key stored in
  * the tbl_settings database table.
  *
  * @category function
@@ -82,7 +82,7 @@ function grab_data_key()
  * is_valid_app_key()
  *
  * Validates if the given key meets minimum security requirements.
- * 
+ *
  * Requirements:
  * - Minimum length of 20 characters
  * - Must contain at least one uppercase letter

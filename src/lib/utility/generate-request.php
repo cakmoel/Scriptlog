@@ -1,22 +1,30 @@
 <?php
 
-declare(strict_types=1);
-
 /**
- * generate_request function
+ * generate_request
  *
  * build http query for requesting in order
  * to act CRUD functionality especially in administrator page.
  *
  * @category Function
  * @author M.Noermoehammad
- * @param string $base
- * @param string $type
- * @return array
- *
+ * @license https://mit-license.org/ MIT License
+ * @link https://github.com/cakmoel/scriptlog
  */
+
+declare(strict_types=1);
+
 require_once __DIR__ . '/sanitize-urls.php';
 
+/**
+ * generate_request function
+ *
+ * @param string $base
+ * @param string $type
+ * @param array $data
+ * @param bool $string_encoded
+ * @return array
+ */
 function generate_request($base, $type, $data = array(), $string_encoded = true)
 {
 

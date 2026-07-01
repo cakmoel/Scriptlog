@@ -15,7 +15,7 @@ function get_table_prefix()
     if (defined('SCRIPTLOG_TEST_MODE') || isset($GLOBALS['__test_prefix'])) {
         return ''; // No prefix in test database
     }
-    
+
     static $prefix = null;
 
     if ($prefix === null) {
