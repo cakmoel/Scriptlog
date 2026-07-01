@@ -102,7 +102,7 @@ class MenuDao extends Dao
      *
      */
     public function insertMenu($bind)
-{
+    {
 
         // checking sort is empty or not
         $sorted = isset($bind['menu_sort']) ? abs((int)$bind['menu_sort']) : "0";

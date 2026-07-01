@@ -367,7 +367,7 @@ final class HandleRequest
             case 'download':
                 // Deliver download request (query string URL)
                 $identifier = static::isQueryStringRequested()['value'] ?? '';
-                
+
                 if (!empty($identifier)) {
                     // Check if it's a file download request (?download={id}/file)
                     if (strpos($_SERVER['REQUEST_URI'], '/file') !== false) {
