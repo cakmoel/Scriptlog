@@ -90,6 +90,88 @@ class SecureHttpHeadersTest extends TestCase
         $this->assertStringContainsString('Strict-Transport-Security: max-age=31536000; includeSubDomains', $joined);
     }
 
+    public function testReferrerPolicyViaSubprocess(): void
+    {
+        $result = $this->runSubprocess(
+            'referrer_policy("strict-origin-when-cross-origin");',
+            false
+        );
+        $headers = json_decode($result, true);
+        $this->assertIsArray($headers);
+        $this->assertStringContainsString(
+            'Referrer-Policy: strict-origin-when-cross-origin',
+            implode("\n", $headers)
+        );
+    }
+
+    public function testReferrerPolicyCustomValueViaSubprocess(): void
+    {
+        $result = $this->runSubprocess(
+            'referrer_policy("no-referrer");',
+            false
+        );
+        $headers = json_decode($result, true);
+        $this->assertIsArray($headers);
+        $this->assertStringContainsString(
+            'Referrer-Policy: no-referrer',
+            implode("\n", $headers)
+        );
+    }
+
+    public function testReferrerPolicyNoReferrerWhenDowngradeViaSubprocess(): void
+    {
+        $result = $this->runSubprocess(
+            'referrer_policy("no-referrer-when-downgrade");',
+            false
+        );
+        $headers = json_decode($result, true);
+        $this->assertIsArray($headers);
+        $this->assertStringContainsString(
+            'Referrer-Policy: no-referrer-when-downgrade',
+            implode("\n", $headers)
+        );
+    }
+
+    public function testPermissionsPolicyViaSubprocess(): void
+    {
+        $result = $this->runSubprocess('permissions_policy();', false);
+        $headers = json_decode($result, true);
+        $this->assertIsArray($headers);
+        $joined = implode("\n", $headers);
+
+        $this->assertStringContainsString('Permissions-Policy:', $joined);
+        $this->assertStringContainsString('accelerometer=()', $joined);
+        $this->assertStringContainsString('camera=()', $joined);
+        $this->assertStringContainsString('geolocation=()', $joined);
+        $this->assertStringContainsString('microphone=()', $joined);
+        $this->assertStringContainsString('usb=()', $joined);
+        $this->assertStringContainsString('autoplay=(self)', $joined);
+        $this->assertStringContainsString('fullscreen=(self)', $joined);
+        $this->assertStringContainsString('encrypted-media=(self)', $joined);
+        $this->assertStringContainsString('sync-xhr=(self)', $joined);
+        $this->assertStringContainsString('web-share=(self)', $joined);
+    }
+
+    public function testPermissionsPolicyBlocksInterestCohortViaSubprocess(): void
+    {
+        $result = $this->runSubprocess('permissions_policy();', false);
+        $headers = json_decode($result, true);
+        $this->assertIsArray($headers);
+        $joined = implode("\n", $headers);
+
+        $this->assertStringContainsString('interest-cohort=()', $joined);
+    }
+
+    public function testPermissionsPolicyDoesNotContainUnsafeDirectivesViaSubprocess(): void
+    {
+        $result = $this->runSubprocess('permissions_policy();', false);
+        $headers = json_decode($result, true);
+        $this->assertIsArray($headers);
+        $joined = implode("\n", $headers);
+
+        $this->assertStringNotContainsString('*', $joined);
+    }
+
     public function testFunctionExistence(): void
     {
         require_once __DIR__ . '/../../src/lib/utility/secure-http-headers.php';
@@ -99,6 +181,8 @@ class SecureHttpHeadersTest extends TestCase
         $this->assertTrue(function_exists('x_content_type_options'));
         $this->assertTrue(function_exists('strict_transport_security'));
         $this->assertTrue(function_exists('remove_x_powered_by'));
+        $this->assertTrue(function_exists('referrer_policy'));
+        $this->assertTrue(function_exists('permissions_policy'));
     }
 
     private function runSubprocess(string $body, bool $ssl): string
