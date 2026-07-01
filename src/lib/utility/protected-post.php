@@ -14,11 +14,11 @@ function protect_post($post_content, $visibility, $password)
 {
     $sanitize_content = prevent_injection($post_content);
     $password_shield = password_hash($password, PASSWORD_DEFAULT);
-    $passphrase_key = md5(app_key() . $password);
+    $passphrase_key = hash('sha256', app_key() . $password);
     $protected = encrypt_post($sanitize_content, $visibility, $passphrase_key);
 
     return array(
-        "post_content" => $protected, 
+        "post_content" => $protected,
         "post_password" => $password_shield,
         "passphrase" => $passphrase_key
     );
@@ -49,8 +49,8 @@ function grab_post_protected($post_id)
     }
 
     return array(
-        'post_id' => $postId, 
-        "post_content" => $content, 
+        'post_id' => $postId,
+        "post_content" => $content,
         "visibility" => $visibility,
         "passphrase" => $passphrase
     );
@@ -71,7 +71,7 @@ function checking_post_password($post_id, $post_password)
     $grab_post = medoo_column_where("tbl_posts", ["ID", "post_password"], ["ID" => $idsanitized]);
 
     $post_password_hash = is_array($grab_post) ? ($grab_post[0]['post_password'] ?? '') : ($grab_post['post_password'] ?? '');
-    
+
     if (empty($post_password_hash)) {
         return false;
     }
@@ -116,7 +116,7 @@ function decrypt_post($post_id, $password)
             return ['post_content' => decrypt($content, $passphrase)];
         }
     }
-    
+
     return ['post_content' => ''];
 }
 
@@ -142,7 +142,7 @@ function decrypt_post_admin($post_id)
             return ['post_content' => $decrypted];
         }
     }
-    
+
     return ['post_content' => $content];
 }
 
@@ -160,14 +160,14 @@ function track_failed_unlock_attempt($post_id)
     $ip = get_ip_address();
     $identifier = md5($ip . '_' . $post_id);
     $log_dir = APP_ROOT . '/public/log/unlock_attempts/';
-    
+
     if (!is_dir($log_dir)) {
         mkdir($log_dir, 0755, true);
     }
-    
+
     $log_file = $log_dir . $identifier . '.json';
     $now = time();
-    
+
     $attempts = [];
     if (file_exists($log_file)) {
         $data = @file_get_contents($log_file);
@@ -175,15 +175,15 @@ function track_failed_unlock_attempt($post_id)
             $attempts = json_decode($data, true) ?: [];
         }
     }
-    
+
     $attempts[] = $now;
-    
-    $attempts = array_filter($attempts, function($timestamp) use ($now) {
+
+    $attempts = array_filter($attempts, function ($timestamp) use ($now) {
         return ($now - $timestamp) < 900;
     });
-    
+
     file_put_contents($log_file, json_encode($attempts), LOCK_EX);
-    
+
     return true;
 }
 
@@ -200,23 +200,23 @@ function get_failed_unlock_attempts($post_id)
     $ip = get_ip_address();
     $identifier = md5($ip . '_' . $post_id);
     $log_file = APP_ROOT . '/public/log/unlock_attempts/' . $identifier . '.json';
-    
+
     if (!file_exists($log_file)) {
         return 0;
     }
-    
+
     $data = @file_get_contents($log_file);
     if (!$data) {
         return 0;
     }
-    
+
     $attempts = json_decode($data, true) ?: [];
     $now = time();
-    
-    $recent_attempts = array_filter($attempts, function($timestamp) use ($now) {
+
+    $recent_attempts = array_filter($attempts, function ($timestamp) use ($now) {
         return ($now - $timestamp) < 900;
     });
-    
+
     return count($recent_attempts);
 }
 
@@ -233,11 +233,11 @@ function clear_failed_unlock_attempts($post_id)
     $ip = get_ip_address();
     $identifier = md5($ip . '_' . $post_id);
     $log_file = APP_ROOT . '/public/log/unlock_attempts/' . $identifier . '.json';
-    
+
     if (file_exists($log_file)) {
         @unlink($log_file);
     }
-    
+
     return true;
 }
 
@@ -269,22 +269,22 @@ function check_post_password_strength($password)
     if (strlen($password) < 8) {
         return false;
     }
-    
+
     if (!preg_match('/[A-Z]/', $password)) {
         return false;
     }
-    
+
     if (!preg_match('/[a-z]/', $password)) {
         return false;
     }
-    
+
     if (!preg_match('/[0-9]/', $password)) {
         return false;
     }
-    
+
     if (!preg_match('/[^A-Za-z0-9]/', $password)) {
         return false;
     }
-    
+
     return true;
 }

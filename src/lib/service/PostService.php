@@ -338,7 +338,7 @@ class PostService
      */
     public function setPassPhrase($passphrase)
     {
-        $this->passphrase = md5(app_key() . $passphrase);
+        $this->passphrase = hash('sha256', app_key() . $passphrase);
     }
 
     /**
