@@ -5,7 +5,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Class Bootstrap
  *
- * Central orchestrator for this blog. This class handles 
+ * Central orchestrator for this blog. This class handles
  * the sequential loading of configurations, utility functions, core services,
  * and global security policies.
  *
@@ -136,11 +136,13 @@ class Bootstrap
     {
         // STEP 1: CREATE DATABASE CONNECTION (only if all required keys exist)
         $dbc = "";
-        
-        if (class_exists('DbFactory') && 
-            !empty($core_vars['db_host']) && 
-            !empty($core_vars['db_user']) && 
-            !empty($core_vars['db_name'])) {
+
+        if (
+            class_exists('DbFactory') &&
+            !empty($core_vars['db_host']) &&
+            !empty($core_vars['db_user']) &&
+            !empty($core_vars['db_name'])
+        ) {
             try {
                 $dbc = DbFactory::connect([
                     'mysql:host=' . $core_vars['db_host'] . ';port=' . $core_vars['db_port'] . ';dbname=' . $core_vars['db_name'] . ';charset=utf8mb4',
@@ -186,7 +188,7 @@ class Bootstrap
         $userToken = null;
         $validator = null;
         $sanitizer = null;
-        
+
         // Only instantiate DAOs if we have a valid database connection
         if (!empty($dbc) && $dbc !== "") {
             $userDao = class_exists('UserDao') ? new UserDao() : null;

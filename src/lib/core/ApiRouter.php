@@ -138,7 +138,7 @@ class ApiRouter
             // Pattern already has named groups, just add anchors
             return '#^' . $pattern . '$#';
         }
-        
+
         // Replace route parameters with regex - handle (name) style
         $regex = preg_replace('/\((\w+)\)/', '(?P<$1>[^/]+)', $pattern);
 
