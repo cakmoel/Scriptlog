@@ -113,6 +113,59 @@ function content_security_policy($app_url)
 }
 
 /**
+ * referrer_policy
+ *
+ * Controls how much referrer information is sent with requests.
+ * strict-origin-when-cross-origin is the recommended default:
+ * - Full URL for same-origin requests
+ * - Origin only for cross-origin requests (over HTTPS)
+ * - No referrer for downgrades (HTTPS → HTTP)
+ */
+function referrer_policy($policy = "strict-origin-when-cross-origin")
+{
+    header("Referrer-Policy: $policy");
+}
+
+/**
+ * permissions_policy
+ *
+ * Restricts which browser features and APIs can be used.
+ * Blocks features not needed by this application.
+ */
+function permissions_policy()
+{
+    $policy = "Permissions-Policy: " .
+        "accelerometer=(), " .
+        "ambient-light-sensor=(), " .
+        "autoplay=(self), " .
+        "battery=(), " .
+        "camera=(), " .
+        "cross-origin-isolated=(), " .
+        "display-capture=(), " .
+        "document-domain=(), " .
+        "encrypted-media=(self), " .
+        "fullscreen=(self), " .
+        "gamepad=(), " .
+        "geolocation=(), " .
+        "gyroscope=(), " .
+        "interest-cohort=(), " .
+        "magnetometer=(), " .
+        "microphone=(), " .
+        "midi=(), " .
+        "navigation-override=(), " .
+        "payment=(), " .
+        "picture-in-picture=(), " .
+        "publickey-credentials-get=(), " .
+        "screen-wake-lock=(), " .
+        "sync-xhr=(self), " .
+        "usb=(), " .
+        "web-share=(self), " .
+        "xr-spatial-tracking=()";
+
+    header($policy);
+}
+
+/**
  * Allow AJAX from admin area
  * Use this in admin AJAX endpoints before any output
  */
