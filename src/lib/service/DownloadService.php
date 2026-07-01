@@ -270,7 +270,7 @@ class DownloadService
     public function getDownloadUrl($mediaId, $identifier)
     {
         $appUrl = function_exists('app_url') ? app_url() : '';
-        
+
         if (function_exists('is_permalink_enabled') && is_permalink_enabled() === 'yes') {
             return $appUrl . '/download/' . $identifier . '/file';
         } else {

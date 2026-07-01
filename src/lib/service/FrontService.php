@@ -38,7 +38,9 @@ class FrontService
         }
 
         $dbc = class_exists('Registry') ? Registry::get('dbc') : null;
-        if (!$dbc) return null;
+        if (!$dbc) {
+            return null;
+        }
 
         $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date,
                YEAR(p.post_date) AS year_archive, MONTH(p.post_date) AS month_archive,
@@ -67,7 +69,9 @@ class FrontService
     public function getPublishedPage(string $slug): ?array
     {
         $dbc = class_exists('Registry') ? Registry::get('dbc') : null;
-        if (!$dbc) return null;
+        if (!$dbc) {
+            return null;
+        }
 
         $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
                p.post_title, p.post_slug,
@@ -110,7 +114,9 @@ class FrontService
         }
 
         $dbc = class_exists('Registry') ? Registry::get('dbc') : null;
-        if (!$dbc) return null;
+        if (!$dbc) {
+            return null;
+        }
 
         $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE topic_slug = ? AND topic_status = 'Y'";
         $result = $dbc->dbQuery($sql, [$slug]);
@@ -129,7 +135,9 @@ class FrontService
         }
 
         $dbc = class_exists('Registry') ? Registry::get('dbc') : null;
-        if (!$dbc) return null;
+        if (!$dbc) {
+            return null;
+        }
 
         $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE ID = ? AND topic_status = 'Y'";
         $result = $dbc->dbQuery($sql, [$id]);
