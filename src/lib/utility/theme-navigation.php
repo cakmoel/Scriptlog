@@ -2,7 +2,7 @@
 
 /**
  * theme_navigation
- * 
+ *
  * Retrieves navigation menu items filtered by visibility and current locale
  *
  * @param string $visibility
@@ -12,7 +12,7 @@ function theme_navigation($visibility)
 {
 
     $currentLocale = 'en';
-    
+
     if (function_exists('get_locale')) {
         $currentLocale = get_locale();
     }
@@ -30,12 +30,12 @@ function theme_navigation($visibility)
     );
 
     $db = db_instance();
-    
+
     // Handle both Db (PDO) and mysqli
     if (method_exists($db, 'dbQuery')) {
         // PDO style - use dbQuery
         $stmt = $db->dbQuery($sql, [$visibility, $currentLocale]);
-        
+
         if ($stmt && $stmt->rowCount() > 0) {
             while ($items = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $menus['items'][$items['ID']] = $items;
@@ -53,7 +53,7 @@ function theme_navigation($visibility)
                AND (menu_locale = '$escapedLocale' OR menu_locale IS NULL OR menu_locale = '')
              ORDER BY menu_sort ASC, menu_label";
         $stmt = $db->simpleQuery($sql);
-        
+
         if ($stmt->num_rows > 0) {
             while ($items = $stmt->fetch_array(MYSQLI_ASSOC)) {
                 $menus['items'][$items['ID']] = $items;

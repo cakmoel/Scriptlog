@@ -20,8 +20,8 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * - ru: Russian
  * - es: Spanish
  * - id: Indonesian
- * 
- * @category utility functions 
+ *
+ * @category utility functions
  * @license MIT
  * @version 1.0.0
  */
@@ -722,7 +722,7 @@ function admin_get_locale(): string
 {
     // IMPORTANT: Admin locale is COMPLETELY SEPARATE from frontend locale
     // This prevents frontend language changes from affecting admin panel
-    
+
     // Check admin-specific session (separate from frontend 'scriptlog_locale')
     if (isset($_SESSION['admin_locale'])) {
         return $_SESSION['admin_locale'];

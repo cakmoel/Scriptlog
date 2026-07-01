@@ -46,7 +46,7 @@ class ScriptlogCryptonize
     private static function deriveKeys(string $masterKey): array
     {
         $keyLength = strlen($masterKey);
-        
+
         if ($keyLength < self::TOTAL_KEY_LEN) {
             // Try to derive from shorter key using HKDF
             if ($keyLength >= self::ENCRYPTION_KEY_LEN) {
@@ -58,13 +58,13 @@ class ScriptlogCryptonize
                     'hmac' => mb_substr($masterKey, 0, self::HMAC_KEY_LEN, '8bit')
                 ];
             }
-            
+
             throw new ScriptlogCryptonizeException(
-                "Invalid key length: expected at least " . self::ENCRYPTION_KEY_LEN . 
+                "Invalid key length: expected at least " . self::ENCRYPTION_KEY_LEN .
                 " bytes, got " . $keyLength
             );
         }
-        
+
         return [
             'encryption' => mb_substr($masterKey, 0, self::ENCRYPTION_KEY_LEN, '8bit'),
             'hmac' => mb_substr($masterKey, self::ENCRYPTION_KEY_LEN, self::HMAC_KEY_LEN, '8bit')
@@ -137,10 +137,10 @@ class ScriptlogCryptonize
         try {
             // Derive separate keys for encryption and HMAC
             $keys = self::deriveKeys($masterKey);
-            
+
             // Generate a random IV
             $iv = self::generateRandomBytes(16);
-            
+
             // Encrypt the plaintext
             $ciphertext = openssl_encrypt(
                 $plaintext,
@@ -149,14 +149,14 @@ class ScriptlogCryptonize
                 OPENSSL_RAW_DATA,
                 $iv
             );
-            
+
             if ($ciphertext === false) {
                 throw new ScriptlogCryptonizeException("Encryption failed: " . openssl_error_string());
             }
-            
+
             // Combine IV and ciphertext for HMAC calculation
             $dataToAuth = $iv . $ciphertext;
-            
+
             // Generate HMAC for authentication
             $hmac = hash_hmac(
                 'sha256',
@@ -164,12 +164,11 @@ class ScriptlogCryptonize
                 $keys['hmac'],
                 true
             );
-            
+
             // Combine HMAC + IV + ciphertext and return as base64
             $combined = $hmac . $iv . $ciphertext;
-            
+
             return base64_encode($combined);
-            
         } catch (Throwable $e) {
             self::logError($e);
             throw $e;
@@ -189,14 +188,14 @@ class ScriptlogCryptonize
         try {
             // Decode from base64
             $ciphertext = base64_decode($ciphertextBase64, true);
-            
+
             if ($ciphertext === false) {
                 throw new ScriptlogCryptonizeException("Invalid ciphertext: base64 decoding failed");
             }
-            
+
             // Derive separate keys for encryption and HMAC
             $keys = self::deriveKeys($masterKey);
-            
+
             // Validate ciphertext length (minimum: 32 HMAC + 16 IV + 1 cipher)
             $minLength = 32 + 16 + 1;
             if (strlen($ciphertext) < $minLength) {
@@ -204,12 +203,12 @@ class ScriptlogCryptonize
                     "Invalid ciphertext: too short. Expected at least $minLength bytes, got " . strlen($ciphertext)
                 );
             }
-            
+
             // Extract HMAC, IV, and ciphertext
             $hmac = mb_substr($ciphertext, 0, 32, '8bit');
             $iv = mb_substr($ciphertext, 32, 16, '8bit');
             $encrypted = mb_substr($ciphertext, 48, null, '8bit');
-            
+
             // Verify HMAC
             $dataToAuth = $iv . $encrypted;
             $expectedHmac = hash_hmac(
@@ -218,7 +217,7 @@ class ScriptlogCryptonize
                 $keys['hmac'],
                 true
             );
-            
+
             // Use hash_equals for timing-safe comparison
             if (!hash_equals($hmac, $expectedHmac)) {
                 // Log additional debug info (but don't expose to user)
@@ -230,7 +229,7 @@ class ScriptlogCryptonize
                 ));
                 throw new ScriptlogCryptonizeException("Invalid ciphertext: HMAC verification failed");
             }
-            
+
             // Decrypt the ciphertext
             $plaintext = openssl_decrypt(
                 $encrypted,
@@ -239,14 +238,13 @@ class ScriptlogCryptonize
                 OPENSSL_RAW_DATA,
                 $iv
             );
-            
+
             if ($plaintext === false) {
                 $error = openssl_error_string();
                 throw new ScriptlogCryptonizeException("Decryption failed: " . ($error ?: "unknown error"));
             }
-            
+
             return $plaintext;
-            
         } catch (Throwable $e) {
             if (!$e instanceof ScriptlogCryptonizeException) {
                 self::logError($e);
@@ -283,7 +281,7 @@ class ScriptlogCryptonize
                     throw new RuntimeException("Cannot read key file: {$keyFile}");
                 }
             }
-            
+
             // Validate the key
             try {
                 return Key::loadFromAsciiSafeString(trim($keyAscii));
@@ -313,11 +311,11 @@ class ScriptlogCryptonize
             @chmod($keyDir, 0700);
             $newKeyFile = self::saveKeyToFile($keyAscii, $keyDir);
             self::updateConfigKeyPath($newKeyFile);
-            
+
             return $keyObject;
         }
     }
-    
+
     /**
      * Update config.php, .env, and database with new key path
      *
@@ -434,7 +432,7 @@ class ScriptlogCryptonize
             $config = require $configPath;
             if (isset($config['app']['defuse_key'])) {
                 $resolved = self::resolvePath($config['app']['defuse_key']);
-                
+
                 if (file_exists($resolved)) {
                     return $resolved;
                 }
@@ -471,7 +469,7 @@ class ScriptlogCryptonize
         }
 
         $config = require $configPath;
-        
+
         $dbHost = $config['db']['host'] ?? null;
         $dbUser = $config['db']['user'] ?? null;
         $dbPass = $config['db']['pass'] ?? null;
@@ -485,7 +483,7 @@ class ScriptlogCryptonize
 
         try {
             $mysqli = new mysqli($dbHost, $dbUser, $dbPass, $dbName, (int)$dbPort);
-            
+
             if ($mysqli->connect_error) {
                 return null;
             }
@@ -495,12 +493,12 @@ class ScriptlogCryptonize
             $stmt->bind_param('s', $settingName);
             $stmt->execute();
             $result = $stmt->get_result();
-            
+
             if ($row = $result->fetch_assoc()) {
                 $mysqli->close();
                 return is_string($row['setting_value']) ? $row['setting_value'] : (string)$row['setting_value'];
             }
-            
+
             $mysqli->close();
         } catch (Exception $e) {
             error_log("Error reading defuse_key_path from database: " . $e->getMessage());
@@ -508,7 +506,7 @@ class ScriptlogCryptonize
 
         return null;
     }
-    
+
     /**
      * Generate a new secure key in the default directory
      *
@@ -520,18 +518,18 @@ class ScriptlogCryptonize
         if (!is_dir($keyDir)) {
             @mkdir($keyDir, 0755, true);
         }
-        
+
         if (strpos($keyDir, '/lib/') !== false && !file_exists($keyDir . '/.htaccess')) {
             $htaccessContent = "# Deny all public access to encryption keys\n<IfModule mod_authz_core.c>\n    Require all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n    Order deny,allow\n    Deny from all\n</IfModule>\n";
             @file_put_contents($keyDir . '/.htaccess', $htaccessContent);
         }
-        
+
         $keyObject = Key::createNewRandomKey();
         $keyAscii = $keyObject->saveToAsciiSafeString();
-        
+
         $newKeyFile = self::saveKeyToFile($keyAscii, $keyDir);
         self::updateConfigKeyPath($newKeyFile);
-        
+
         return $newKeyFile;
     }
 
@@ -543,7 +541,7 @@ class ScriptlogCryptonize
     private static function loadEncryptionKey(): string
     {
         $keyPath = self::getDefuseKeyPath();
-        
+
         if (file_exists($keyPath)) {
             if (strpos($keyPath, '.php') !== false) {
                 $key = require $keyPath;
@@ -622,4 +620,3 @@ class ScriptlogCryptonize
         }
     }
 }
-
