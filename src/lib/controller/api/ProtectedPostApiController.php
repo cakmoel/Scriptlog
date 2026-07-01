@@ -12,6 +12,7 @@
  * @since     Since Release 1.0
  *
  */
+
 defined('SCRIPTLOG') || die('Direct access not permitted');
 
 class ProtectedPostApiController extends ApiController
@@ -89,7 +90,7 @@ class ProtectedPostApiController extends ApiController
         if (!isset($_SESSION)) {
             session_start();
         }
-        
+
         if (!isset($_SESSION['unlocked_posts'])) {
             $_SESSION['unlocked_posts'] = [];
         }
