@@ -30,6 +30,14 @@ if (file_exists(__DIR__ . '/../config.php')) {
     $config = require __DIR__ . '/../config.php';
 }
 
+// Set security headers
+header('X-Frame-Options: SAMEORIGIN');
+header('X-Content-Type-Options: nosniff');
+header('X-XSS-Protection: 1; mode=block');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+$permPolicy = "Permissions-Policy: accelerometer=(), ambient-light-sensor=(), autoplay=(self), battery=(), camera=(), cross-origin-isolated=(), display-capture=(), document-domain=(), encrypted-media=(self), fullscreen=(self), gamepad=(), geolocation=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), navigation-override=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(self), usb=(), web-share=(self), xr-spatial-tracking=()";
+header($permPolicy);
+
 // Set CORS headers for cross-origin requests
 $allowed_origins = !empty($config['api']['allowed_origins']) ? $config['api']['allowed_origins'] : '';
 $request_origin = $_SERVER['HTTP_ORIGIN'] ?? '';
