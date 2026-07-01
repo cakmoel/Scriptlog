@@ -44,25 +44,29 @@ function remove_x_powered_by()
 
 /**
  * content_security_policy
- * 
+ *
  * Configured to allow:
- * - Inline JavaScript and styles
+ * - Inline JavaScript (via nonce/hash to be enforced later)
  * - AJAX requests to same origin
  * - Form submissions
  * - Images and media
  * - Safe external resources
- * 
+ *
+ * Hardenend: removed 'unsafe-eval' to block eval-based XSS vectors.
+ * A Report-Only header is also sent to monitor violations before
+ * fully removing 'unsafe-inline'.
+ *
  * @param string $app_url
  */
 function content_security_policy($app_url)
 {
     $is_ssl = is_ssl();
     $scheme = $is_ssl ? 'https:' : 'http:';
-    
-    // Base CSP - allows inline scripts/styles, AJAX, forms, images
+
+    // 1. Enforced CSP - blocks eval-based attacks
     $csp = "Content-Security-Policy: " .
         "default-src 'self'; " .
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' {$scheme}; " .
+        "script-src 'self' 'unsafe-inline' {$scheme}; " .
         "style-src 'self' 'unsafe-inline' {$scheme}; " .
         "img-src 'self' data: {$scheme}; " .
         "font-src 'self' data: {$scheme}; " .
@@ -75,12 +79,37 @@ function content_security_policy($app_url)
         "base-uri 'self'; " .
         "form-action 'self' {$app_url}; " .
         "manifest-src 'self';";
-    
+
     if (!$is_ssl) {
         $csp .= "; upgrade-insecure-requests";
     }
-    
+
     header($csp);
+
+    // 2. Report-Only header for monitoring violations
+    // This identifies what would break when we switch to nonce-based CSP.
+    // Remove 'unsafe-inline' from report-only to see what inline scripts exist.
+    $csp_report = "Content-Security-Policy-Report-Only: " .
+        "default-src 'self'; " .
+        "script-src 'self' {$scheme}; " .
+        "style-src 'self' {$scheme}; " .
+        "img-src 'self' data: {$scheme}; " .
+        "font-src 'self' data: {$scheme}; " .
+        "connect-src 'self' {$scheme}; " .
+        "media-src 'self' {$scheme}; " .
+        "frame-src 'self' {$scheme}; " .
+        "child-src 'self' {$scheme}; " .
+        "object-src 'self'; " .
+        "frame-ancestors 'self'; " .
+        "base-uri 'self'; " .
+        "form-action 'self' {$app_url}; " .
+        "manifest-src 'self';";
+
+    if (!$is_ssl) {
+        $csp_report .= "; upgrade-insecure-requests";
+    }
+
+    header($csp_report);
 }
 
 /**
@@ -104,7 +133,7 @@ function set_cors_headers($origin = null)
     if ($origin === null) {
         $origin = app_url();
     }
-    
+
     header("Access-Control-Allow-Origin: {$origin}");
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
     header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-API-Key");
