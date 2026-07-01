@@ -344,6 +344,99 @@ class ApiAuth
     }
 
     /**
+     * Validate CSRF token for session-authenticated write requests.
+     *
+     * CSRF protection is required for POST/PUT/DELETE/PATCH when the request
+     * is authenticated via session cookie (no API key or Bearer token).
+     * API-key and Bearer-token auth are inherently immune to CSRF.
+     *
+     * Expects the token in the X-CSRF-Token header.
+     *
+     * @return void Sends 403 response and exits on failure
+     */
+    /**
+     * Check whether the current request carries API-key or Bearer auth headers.
+     *
+     * @return bool
+     */
+    private static function hasApiOrBearerAuth()
+    {
+        if (!empty($_SERVER['HTTP_X_API_KEY'] ?? '')) {
+            return true;
+        }
+        $auth = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+        if (!empty($auth) && stripos($auth, 'Bearer ') === 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static function validateCsrfForWrite()
+    {
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        if (!in_array($method, ['POST', 'PUT', 'DELETE', 'PATCH'])) {
+            return;
+        }
+
+        // No active session — nothing to protect, skip CSRF
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return;
+        }
+
+        // Skip CSRF check when API-key or Bearer-token auth is present
+        // (these are inherently immune to CSRF because the secret is in a header, not a cookie)
+        if (self::hasApiOrBearerAuth()) {
+            return;
+        }
+
+        // Require X-CSRF-Token header
+        $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if (empty($token)) {
+            http_response_code(403);
+            echo json_encode([
+                'success' => false,
+                'status'  => 403,
+                'error'   => [
+                    'code'    => 'CSRF_MISSING',
+                    'message' => 'Missing X-CSRF-Token header. Include the CSRF token for session-authenticated write requests.'
+                ]
+            ]);
+            exit;
+        }
+
+        // Verify against session token
+        $sessionKey = 'csrf_api_write';
+        $storedToken = $_SESSION[$sessionKey] ?? null;
+        if ($storedToken === null || !hash_equals($storedToken, $token)) {
+            http_response_code(403);
+            echo json_encode([
+                'success' => false,
+                'status'  => 403,
+                'error'   => [
+                    'code'    => 'CSRF_INVALID',
+                    'message' => 'Invalid or expired CSRF token. Reload the page and try again.'
+                ]
+            ]);
+            exit;
+        }
+    }
+
+    /**
+     * Generate a CSRF token for API write operations and store it in session.
+     *
+     * @return string The generated token
+     */
+    public static function generateCsrfToken()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            return '';
+        }
+        $token = bin2hex(random_bytes(32));
+        $_SESSION['csrf_api_write'] = $token;
+        return $token;
+    }
+
+    /**
      * Get client IP address
      *
      * @return string
