@@ -51,7 +51,7 @@ function admin_tag_title($value)
             $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
             break;
-        
+
         case 'privacy':
             $title .= safe_html("Privacy settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
@@ -105,7 +105,7 @@ function admin_tag_title($value)
             $title .= safe_html("Language configuration") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
             break;
-        
+
         case 'option-mail':
             $title .= safe_html("Mail settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
@@ -120,7 +120,7 @@ function admin_tag_title($value)
             $title .= safe_html("API settings") . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
             break;
-        
+
         case 'import':
             $title .= safe_html(ucfirst($value)) . " &raquo; " . APP_TITLE . " &raquo; " . APP_CODENAME;
 
