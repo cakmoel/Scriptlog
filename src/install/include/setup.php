@@ -582,6 +582,7 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
  */
 function install_i18n_data($link, $prefix = '', $default_lang = 'en')
 {
+    set_time_limit(120);
     $languages = [
       'en' => ['name' => 'English', 'native' => 'English', 'locale' => 'en_US', 'direction' => 'ltr', 'sort' => 1, 'is_default' => 1],
       'ar' => ['name' => 'Arabic', 'native' => 'العربية', 'locale' => 'ar_SA', 'direction' => 'rtl', 'sort' => 2, 'is_default' => 0],
@@ -805,14 +806,21 @@ function install_i18n_data($link, $prefix = '', $default_lang = 'en')
 
     $insertTrans = $link->prepare("INSERT INTO {$prefix}tbl_translations (lang_id, translation_key, translation_value, translation_context) VALUES (?, ?, ?, ?)");
 
-    foreach ($translations as $context => $keys) {
-        foreach ($keys as $key => $values) {
-            foreach ($values as $index => $value) {
-                $code = $langOrder[$index];
-                $insertTrans->bind_param("isss", $langIds[$code], $key, $value, $context);
-                $insertTrans->execute();
+    $link->begin_transaction();
+    try {
+        foreach ($translations as $context => $keys) {
+            foreach ($keys as $key => $values) {
+                foreach ($values as $index => $value) {
+                    $code = $langOrder[$index];
+                    $insertTrans->bind_param("isss", $langIds[$code], $key, $value, $context);
+                    $insertTrans->execute();
+                }
             }
         }
+        $link->commit();
+    } catch (Exception $e) {
+        $link->rollback();
+        throw $e;
     }
 
     $langCodes = implode(',', $langOrder);

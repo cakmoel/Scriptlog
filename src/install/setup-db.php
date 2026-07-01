@@ -26,29 +26,64 @@ if (!file_exists(__DIR__ . '/../config.php')) {
     }
     header("Location: " . $protocol . '://' . $server_host . $installPath . '/', true, 302);
     exit();
-} else {
-    $set_config = require __DIR__ . '/../config.php';
+}
 
-    $dbconnect = make_connection($set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name'], $set_config['db']['port']);
+// Hard Lock: If config.php exists but all tables are already installed,
+// the installation is complete. Redirect away.
+$set_config = require __DIR__ . '/../config.php';
+$dbconnect = make_connection($set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name'], $set_config['db']['port']);
 
-    $prefix = isset($set_config['db']['prefix']) ? $set_config['db']['prefix'] : '';
+$prefix = isset($set_config['db']['prefix']) ? $set_config['db']['prefix'] : '';
 
-    // required table
-    $required_tables = [
-      $prefix . 'tbl_users', $prefix . 'tbl_user_token', $prefix . 'tbl_topics', $prefix . 'tbl_themes',
-      $prefix . 'tbl_settings', $prefix . 'tbl_posts', $prefix . 'tbl_post_topic', $prefix . 'tbl_plugin',
-      $prefix . 'tbl_menu', $prefix . 'tbl_mediameta', $prefix . 'tbl_media', $prefix . 'tbl_media_download',
-      $prefix . 'tbl_comments', $prefix . 'tbl_login_attempt', $prefix . 'tbl_consents',
-      $prefix . 'tbl_data_requests', $prefix . 'tbl_privacy_logs', $prefix . 'tbl_languages',
-      $prefix . 'tbl_translations', $prefix . 'tbl_download_log', $prefix . 'tbl_privacy_policies'
-    ];
+$required_tables = [
+    $prefix . 'tbl_users', $prefix . 'tbl_user_token', $prefix . 'tbl_topics', $prefix . 'tbl_themes',
+    $prefix . 'tbl_settings', $prefix . 'tbl_posts', $prefix . 'tbl_post_topic', $prefix . 'tbl_plugin',
+    $prefix . 'tbl_menu', $prefix . 'tbl_mediameta', $prefix . 'tbl_media', $prefix . 'tbl_media_download',
+    $prefix . 'tbl_comments', $prefix . 'tbl_login_attempt', $prefix . 'tbl_consents',
+    $prefix . 'tbl_data_requests', $prefix . 'tbl_privacy_logs', $prefix . 'tbl_languages',
+    $prefix . 'tbl_translations', $prefix . 'tbl_download_log', $prefix . 'tbl_privacy_policies'
+];
 
-    foreach ($required_tables as $table) {
-        if (!check_dbtable($dbconnect, $table)) {
-            header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-            exit("Database has been installed!");
-        }
+$all_tables_exist = true;
+foreach ($required_tables as $table) {
+    if (!check_dbtable($dbconnect, $table)) {
+        $all_tables_exist = false;
+        break;
     }
+}
+
+if ($all_tables_exist) {
+    $current_path = preg_replace("/\/setup-db\.php.*$/i", "", current_url());
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $server_host = $_SERVER['HTTP_HOST'];
+    $base_url = $protocol . '://' . $server_host . str_replace('setup-db.php', '', $_SERVER['PHP_SELF']);
+
+    install_header($current_path);
+    ?>
+    <div class="container py-5 fade-in text-center">
+        <div class="card border-0 shadow-lg mx-auto" style="max-width: 600px; border-radius: 20px; overflow: hidden;">
+            <div class="card-header bg-navy text-white py-4" style="background: #000080;">
+                <i class="fa fa-shield fa-3x mb-3 text-chartreuse"></i>
+                <h2 class="h4 mb-0">System Already Installed</h2>
+            </div>
+            <div class="card-body py-5">
+                <p class="lead mb-4 text-muted">All database tables were found. Scriptlog is already set up and secured.</p>
+                <div class="alert alert-info border-0 mb-4" style="background: rgba(0, 0, 128, 0.05); color: #000080;">
+                    <small><i class="fa fa-info-circle mr-2"></i> To re-install, you must manually delete or rename <code>config.php</code> in the root directory.</small>
+                </div>
+                <a href="<?= $base_url; ?>" class="btn btn-primary btn-lg px-5 shadow-sm rounded-pill" style="font-weight: 800; letter-spacing: 1px;">
+                    <i class="fa fa-home mr-2"></i> GO TO HOMEPAGE <i class="fa fa-chevron-right ml-2 tiny"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <?php
+    install_footer($current_path);
+    exit;
+}
+
+// Tables are incomplete — show the admin account creation form
+$install_path = preg_replace("/\/install\.php.*$/i", "", current_url());
 
     $install_path = preg_replace("/\/install\.php.*$/i", "", current_url());
 
