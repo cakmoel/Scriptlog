@@ -156,6 +156,13 @@ class ApiController
         if ($this->requiresAuth && !ApiAuth::isAuthenticated()) {
             ApiResponse::unauthorized('Authentication required. Please provide a valid API key or Bearer token.');
         }
+
+        // CSRF protection: only enforce for write methods on auth-required endpoints
+        // when the request is NOT using API-key/Bearer-token auth
+        $writeMethods = ['POST', 'PUT', 'DELETE', 'PATCH'];
+        if ($this->requiresAuth && in_array($this->method, $writeMethods)) {
+            ApiAuth::validateCsrfForWrite();
+        }
     }
 
     /**

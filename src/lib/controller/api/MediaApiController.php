@@ -16,10 +16,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  */
 class MediaApiController
 {
-    
     /**
      * Upload image for Summernote
-     * 
+     *
      * POST /api/v1/media/upload
      */
     public function upload()
@@ -28,7 +27,7 @@ class MediaApiController
         $isAuthenticated = false;
         $userLogin = null;
         $userLevel = null;
-        
+
         // Method 1: Check session variables
         if (isset($_SESSION['scriptlog_session_login']) && !empty($_SESSION['scriptlog_session_login'])) {
             $isAuthenticated = true;
@@ -55,7 +54,7 @@ class MediaApiController
                 // Cookie decryption failed
             }
         }
-        
+
         if (!$isAuthenticated || empty($userLogin)) {
             header('Content-Type: application/json');
             http_response_code(401);
@@ -121,11 +120,11 @@ class MediaApiController
         }
 
         $file = $_FILES['image'];
-        
+
         // Validate file type
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp'];
         $fileType = mime_content_type($file['tmp_name']);
-        
+
         if (!in_array($fileType, $allowedTypes)) {
             header('Content-Type: application/json');
             http_response_code(400);
