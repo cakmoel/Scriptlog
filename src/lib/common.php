@@ -3,7 +3,7 @@
 define('DS', DIRECTORY_SEPARATOR);
 define('APP_TITLE', 'Scriptlog');
 define('APP_CODENAME', 'Maleo Senkawor');
-define('APP_VERSION', '1.0');
+define('APP_VERSION', '1.3.0');
 define('API_VERSION', 'v1');
 define('APP_ROOT', dirname(dirname(__FILE__)) . DS);
 define('APP_ADMIN', 'admin');
