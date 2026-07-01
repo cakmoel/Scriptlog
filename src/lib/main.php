@@ -9,10 +9,10 @@ require __DIR__ . '/common.php';
 
 /**
  * Early 404 Short-Circuit
- * 
+ *
  * Quick URL pattern check BEFORE loading autoloader and full bootstrap.
  * This significantly reduces 404 response time from ~500ms to <50ms.
- * 
+ *
  * Supports both SEO-friendly URLs and query string URLs (permalinks disabled).
  */
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
@@ -104,11 +104,11 @@ if (!file_exists(APP_ROOT . 'config.php')) {
 if (isset($_GET['switch-lang']) && !empty($_GET['switch-lang'])) {
     $langCode = preg_replace('/[^a-z]{2}/', '', strtolower($_GET['switch-lang']));
     $validLocales = ['en', 'ar', 'zh', 'fr', 'ru', 'es', 'id'];
-    
+
     if (in_array($langCode, $validLocales)) {
         $_SESSION['scriptlog_locale'] = $langCode;
         setcookie('scriptlog_locale', $langCode, time() + (86400 * 365), '/');
-        
+
         // Redirect to remove switch-lang from URL
         $redirectUrl = $_GET['redirect'] ?? '/';
         if (!empty($_GET['redirect'])) {

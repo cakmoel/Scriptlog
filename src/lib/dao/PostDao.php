@@ -238,7 +238,7 @@ WHERE ID = ? AND post_type = 'blog'";
                 'post_locale' => $bind['post_locale'] ?? 'en',
                 'comment_status' => $bind['comment_status']
             ];
-            
+
             // Only update password and passphrase if they're not empty
             if (!empty($bind['post_password'])) {
                 $updateData['post_password'] = $bind['post_password'];
@@ -246,11 +246,11 @@ WHERE ID = ? AND post_type = 'blog'";
             if (!empty($bind['passphrase'])) {
                 $updateData['passphrase'] = $bind['passphrase'];
             }
-            
+
             if (!empty($bind['media_id'])) {
                 $updateData['media_id'] = $bind['media_id'];
             }
-            
+
             $this->modify("tbl_posts", $updateData, ['ID' => (int)$cleanId]);
 
             // delete all post_topic by post_id
