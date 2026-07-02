@@ -28,7 +28,7 @@ Patch release addressing PHP 8.5 magic method deprecation and hardening singleto
 
 ### Comparison
 - **Previous release**: v1.3.0
-- **Changes since v1.3.0**: 2 commits
+- **Changes since v1.3.0**: 8 commits
 
 ---
 
