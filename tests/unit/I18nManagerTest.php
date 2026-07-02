@@ -245,6 +245,27 @@ class I18nManagerTest extends TestCase
         }
     }
 
+    public function testHasUnserializeMethod()
+    {
+        $this->assertTrue(method_exists($this->i18n, '__unserialize'));
+    }
+
+    public function testUnserializeThrowsExceptionOnCall()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Cannot unserialize singleton');
+
+        $this->i18n->__unserialize(['locale' => 'en']);
+    }
+
+    public function testWakeupThrowsExceptionOnCall()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Cannot unserialize singleton');
+
+        $this->i18n->__wakeup();
+    }
+
     public function testResetInstance()
     {
         $instance1 = I18nManager::getInstance();
