@@ -8,12 +8,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#130---2026-07-01)
+- [Latest Release](#131---2026-07-02)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.3.1] - 2026-07-02
+
+### Fixed
+- **`I18nManager` magic methods**: Added `__unserialize()` method to `I18nManager` singleton to align with PHP 8.5 deprecation of `__wakeup` and prevent serialization bypasses.
+
+### Notes
+Patch release addressing PHP 8.5 magic method deprecation and hardening singleton serialization.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.3.0
+- **Changes since v1.3.0**: 2 commits
+
+---
 
 ## [1.3.0] - 2026-07-01
 
@@ -530,6 +547,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.3.1 | 2026-07-02 | Stable |
 | 1.3.0 | 2026-07-01 | Stable |
 | 1.2.3 | 2026-06-26 | Stable |
 | 1.2.2 | 2026-06-25 | Stable |
