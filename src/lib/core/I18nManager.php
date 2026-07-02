@@ -229,4 +229,9 @@ class I18nManager
     {
         throw new Exception("Cannot unserialize singleton");
     }
+
+    public function __unserialize(array $data): void
+    {
+        throw new Exception("Cannot unserialize singleton");
+    }
 }
