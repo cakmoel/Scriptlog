@@ -135,12 +135,13 @@ final class Autoloader
             foreach ($class_dir as $dir) {
                 self::addClassDir($dir);
             }
-        } else {
-            self::init();
-            $formatted_dir = self::_formatDir($class_dir);
-            if (!in_array($formatted_dir, self::$_load_dirs)) {
-                self::$_load_dirs[] = $formatted_dir;
-            }
+            return;
+        }
+
+        self::init();
+        $formatted_dir = self::_formatDir($class_dir);
+        if (!in_array($formatted_dir, self::$_load_dirs)) {
+            self::$_load_dirs[] = $formatted_dir;
         }
     }
 
@@ -150,6 +151,7 @@ final class Autoloader
      * @param string $prefix The namespace prefix
      * @param string $base_dir The base directory for the namespace
      */
+    /** @psalm-suppress PossiblyUnusedMethod */
     public static function addNamespace($prefix, $base_dir)
     {
         self::init();
@@ -164,6 +166,7 @@ final class Autoloader
      * @param string $class_name
      * @return bool
      */
+    /** @psalm-suppress PossiblyUnusedReturnValue */
     public static function loadClass($class_name)
     {
         // Try to load the class using namespace mapping
@@ -208,6 +211,7 @@ final class Autoloader
      *
      * @param string $class_file_extension
      */
+    /** @psalm-suppress PossiblyUnusedMethod */
     public static function setClassExtension($class_file_extension = '.php')
     {
         self::$_file_ext = $class_file_extension;
@@ -218,6 +222,7 @@ final class Autoloader
      *
      * @return array
      */
+    /** @psalm-suppress PossiblyUnusedMethod */
     public static function getLoadedFiles()
     {
         return self::$_loaded_files;
@@ -228,6 +233,7 @@ final class Autoloader
      *
      * @return array
      */
+    /** @psalm-suppress PossiblyUnusedMethod */
     public static function getLoadDirs()
     {
         return self::$_load_dirs;
@@ -238,6 +244,7 @@ final class Autoloader
      *
      * @return array
      */
+    /** @psalm-suppress PossiblyUnusedMethod */
     public static function getNamespaceMappings()
     {
         return self::$_namespace_mappings;
