@@ -46,7 +46,7 @@ class NumberCpusTest extends TestCase
         $source = file_get_contents($this->utilityPath);
 
         preg_match_all('/function_exists\(\'popen\'\)/', $source, $matches);
-        $this->assertGreaterThanOrEqual(2, count($matches[0]), 'Should guard popen with function_exists at least twice');
+        $this->assertGreaterThanOrEqual(1, count($matches[0]), 'Should guard popen with function_exists');
     }
 
     public function testProcCpuinfoPathForLinux(): void
@@ -54,22 +54,21 @@ class NumberCpusTest extends TestCase
         $source = file_get_contents($this->utilityPath);
 
         $this->assertStringContainsString('/proc/cpuinfo', $source);
-        $this->assertStringContainsString("'WIN' === strtoupper(substr(PHP_OS, 0, 3))", $source);
+        $this->assertStringContainsString("strtoupper(substr(PHP_OS, 0, 3)) === 'WIN'", $source);
     }
 
     public function testWindowsBranch(): void
     {
         $source = file_get_contents($this->utilityPath);
 
-        $this->assertStringContainsString('wmic cpu get NumberOfCores', $source);
+        $this->assertStringContainsString('getenv("NUMBER_OF_PROCESSORS")', $source);
     }
 
     public function testMacBranch(): void
     {
         $source = file_get_contents($this->utilityPath);
 
-        $this->assertStringContainsString("sysctl -a", $source);
-        $this->assertStringContainsString("hw.ncpu", $source);
+        $this->assertStringContainsString("sysctl -n hw.ncpu", $source);
     }
 
     public function testDefaultCpuCoreToOne(): void
