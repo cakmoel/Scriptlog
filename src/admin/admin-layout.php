@@ -99,7 +99,7 @@ function admin_header($stylePath, $breadcrumb = null)
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     <!-- Icon -->
     <link href="<?= $stylePath; ?>/favicon.ico" rel="alternate icon" type="image/vnd.microsoft.icon">
-    <style>
+    <style nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
     .avatar {
         vertical-align: middle;
         width: 50px;
@@ -170,7 +170,7 @@ function admin_footer($stylePath, $ubench = null)
         integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <script>
+    <script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
     $(document).ready(function() {
         $('#scriptlog-table').DataTable({
             "responsive": true,
@@ -184,7 +184,7 @@ function admin_footer($stylePath, $ubench = null)
     });
     </script>
 
-    <script type="text/javascript">
+    <script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
     $(document).ready(function() {
         $.uploadPreview({
             input_field: "#image-upload",
@@ -194,7 +194,7 @@ function admin_footer($stylePath, $ubench = null)
     });
     </script>
 
-    <script>
+    <script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
     $(document).ready(function() {
         $('#summernote').summernote({
             height: 300,
@@ -266,7 +266,7 @@ function admin_footer($stylePath, $ubench = null)
     });
     </script>
 
-    <script>
+    <script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
     $(function() {
 
         //Initialize Select2 Elements
@@ -292,7 +292,7 @@ function admin_footer($stylePath, $ubench = null)
     })
     </script>
 
-    <script>
+    <script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
     $('#tags').tagsInput({
         width: 'auto',
         autocomplete_url: 'fetch-tags.php',

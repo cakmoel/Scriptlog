@@ -244,7 +244,8 @@ class ThemeService
     {
         $this->validator->sanitize($this->theme_id, 'int');
 
-        if (!($data_theme = $this->themeDao->findTheme($this->theme_id, $this->sanitize))) {
+        $data_theme = $this->themeDao->findTheme($this->theme_id, $this->sanitize);
+        if (!$data_theme) {
             $_SESSION['error'] = "themeNotFound";
             direct_page('index.php?load=templates&error=themeNotFound', 404);
         }

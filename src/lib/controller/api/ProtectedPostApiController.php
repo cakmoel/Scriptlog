@@ -1,5 +1,5 @@
 <?php
-
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Protected Post API Controller
  *

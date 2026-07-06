@@ -4,9 +4,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 
 class PrivacyHandler implements FrontRequestHandler
 {
-    private ThemeRenderer $renderer;
+    private ThemeRendererInterface $renderer;
 
-    public function __construct(ThemeRenderer $renderer)
+    public function __construct(ThemeRendererInterface $renderer)
     {
         $this->renderer = $renderer;
     }

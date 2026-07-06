@@ -49,14 +49,14 @@ class Dao
 
     public function __construct()
     {
-        if (Registry::isKeySet('dbc')) {
-            $this->dbc = Registry::get('dbc');
-
-            if ($this->dbc === null) {
-                throw new DbException("Database connection (dbc) is null in the Registry");
-            }
-        } else {
+        if (!Registry::isKeySet('dbc')) {
             throw new DbException("Database connection (dbc) is not set in the Registry ");
+        }
+
+        $this->dbc = Registry::get('dbc');
+
+        if ($this->dbc === null) {
+            throw new DbException("Database connection (dbc) is null in the Registry");
         }
 
         $this->prefix = get_table_prefix();
@@ -102,9 +102,9 @@ class Dao
 
         if (!is_null($fetchMode)) {
             return $this->dbc->dbQuery($this->sql, $data)->fetchAll($fetchMode);
-        } else {
-            return $this->dbc->dbQuery($this->sql, $data)->fetchAll();
         }
+
+        return $this->dbc->dbQuery($this->sql, $data)->fetchAll();
     }
 
     /**
@@ -126,9 +126,9 @@ class Dao
 
         if (!is_null($fetchMode)) {
             return $this->dbc->dbQuery($this->sql, $data)->fetch($fetchMode);
-        } else {
-            return $this->dbc->dbQuery($this->sql, $data)->fetch();
         }
+
+        return $this->dbc->dbQuery($this->sql, $data)->fetch();
     }
 
     /**
@@ -150,9 +150,9 @@ class Dao
 
         if (!is_null($fetchMode)) {
             return $this->dbc->dbQuery($this->sql, $data)->fetchColumn($fetchMode);
-        } else {
-            return $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
         }
+
+        return $this->dbc->dbQuery($this->sql, $data)->fetchColumn();
     }
 
     /**
@@ -296,20 +296,20 @@ class Dao
             case 'sql':
                 if (filter_var($str, FILTER_SANITIZE_NUMBER_INT)) {
                     return $this->sanitizing->sanitasi($str, 'sql');
-                } else {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                    throw new DbException("ERROR: this - $str - Id is considered invalid.");
                 }
+
+                header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                throw new DbException("ERROR: this - $str - Id is considered invalid.");
 
                 break;
 
             case 'xss':
                 if (filter_var($str, FILTER_SANITIZE_FULL_SPECIAL_CHARS)) {
                     return $this->sanitizing->sanitasi(prevent_injection($str), 'xss');
-                } else {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                    throw new DbException("ERROR: this - $str - is considered invalid.");
                 }
+
+                header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
+                throw new DbException("ERROR: this - $str - is considered invalid.");
 
                 break;
         }

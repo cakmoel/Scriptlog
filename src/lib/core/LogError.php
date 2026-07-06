@@ -65,9 +65,10 @@ class LogError
 
                     break;
             }
-        } else {
-            echo MessageLog::contentMessage(static::$httpResponseCode);
+            return;
         }
+
+        echo MessageLog::contentMessage(static::$httpResponseCode);
     }
 
     /**
@@ -79,12 +80,13 @@ class LogError
     public static function exceptionHandler($e)
     {
 
+        self::newMessage($e);
+
         if (APP_DEVELOPMENT == true) {
-            self::newMessage($e);
-        } else {
-            self::newMessage($e);
-            self::customErrorMessage('admin');
+            return;
         }
+
+        self::customErrorMessage('admin');
     }
 
     /**

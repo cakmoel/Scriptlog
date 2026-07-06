@@ -206,10 +206,12 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
         if ($user_data) {
             $lockout_time = !empty($user_data['user_locked_until']) ? strtotime($user_data['user_locked_until']) : 0;
             if (time() < $lockout_time) {
-                throw new Exception("Account is temporarily locked. Try again later.");
+                $failed_attempt_count++;
+                throw new Exception("Invalid username, email, or password.");
             }
             if (!empty($user_data['user_banned'])) {
-                throw new Exception("Account is suspended.");
+                $failed_attempt_count++;
+                throw new Exception("Invalid username, email, or password.");
             }
         }
 

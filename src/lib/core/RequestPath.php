@@ -14,6 +14,12 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @license MIT
  * @version 1.1
  * @since Since Release 1.0
+ *
+ * @property-read string $matched
+ * @property-read string $param1
+ * @property-read string $param2
+ * @property-read string $param3
+ * @property-read string $param4
  */
 class RequestPath
 {

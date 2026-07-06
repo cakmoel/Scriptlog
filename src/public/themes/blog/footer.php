@@ -112,7 +112,7 @@
 <?php endif; ?>
 
 <!-- For All Plug-in Activation & Others -->
- <script type="text/javascript">
+ <script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
         window.addEventListener('load', function() {
             if (typeof WOW !== 'undefined') {
                 new WOW().init();

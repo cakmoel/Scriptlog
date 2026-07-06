@@ -179,12 +179,10 @@ class PluginService
     public function activateInstalledPlugin()
     {
 
-        $activation = false;
-
         $this->validator->sanitize($this->plugin_id, 'int');
 
-        if (!($data_plugin = $this->pluginDao->getPlugin($this->plugin_id, $this->sanitize))) {
-            $activation = false;
+        $data_plugin = $this->pluginDao->getPlugin($this->plugin_id, $this->sanitize);
+        if (!$data_plugin) {
             direct_page('index.php?load=plugins&error=pluginNotFound', 404);
         }
 
@@ -206,7 +204,6 @@ class PluginService
                 $result = $this->pluginDao->setSQL($sql);
 
                 if (!$result) {
-                    $activation = false;
                     direct_page('index.php?load=plugins&error=tableNotFound', 404);
                 }
             }
@@ -216,14 +213,14 @@ class PluginService
 
         $this->pluginDao->activatePlugin($this->plugin_id, $this->sanitize);
 
-        return $activation = true;
+        return true;
     }
 
     public function deactivateInstalledPlugin()
     {
         $this->validator->sanitize($this->plugin_id, 'int');
 
-        if (!$data_plugin = $this->pluginDao->getPlugin($this->plugin_id, $this->sanitize)) {
+        if (!$this->pluginDao->getPlugin($this->plugin_id, $this->sanitize)) {
             direct_page('index.php?load=plugins&error=pluginNotFound', 404);
         }
 
@@ -235,7 +232,8 @@ class PluginService
 
         $this->validator->sanitize($this->plugin_id, 'int');
 
-        if (!$data_plugin = $this->pluginDao->getPlugin($this->plugin_id, $this->sanitize)) {
+        $data_plugin = $this->pluginDao->getPlugin($this->plugin_id, $this->sanitize);
+        if (!$data_plugin) {
             direct_page('index.php?load=plugins&error=pluginNotFound', 404);
         }
 

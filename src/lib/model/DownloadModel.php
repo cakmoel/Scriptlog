@@ -19,7 +19,7 @@ class DownloadModel extends BaseModel
      * @return mixed
      *
      */
-    public function getAllMediaDownload($orderBy = 'ID')
+    public function getAllMediaDownload($_orderBy = 'ID')
     {
 
         $sql = "SELECT md.ID, md.media_id, md.media_identifier, md.before_expired, md.created_at,
@@ -80,10 +80,8 @@ class DownloadModel extends BaseModel
      * @return mixed
      *
      */
-    public function getMediaDownloadURL($identifier, $sanitize)
+    public function getMediaDownloadURL($identifier, $_sanitize)
     {
-        $ip_address = get_ip_address();
-
         // Don't use sql sanitizer for UUID - it strips hyphens and converts to int
         // Prepared statements already protect against SQL injection
         $identifierSanitized = preg_replace('/[^a-f0-9\-]/i', '', $identifier);
@@ -144,17 +142,19 @@ class DownloadModel extends BaseModel
                 ],
                 ['media_id' => $idsanitized]
             );
-        } else {
-            $this->modify(
-                "tbl_media_download",
-                [
-                'media_identifier' => $bind['media_identifier'] ?? '',
-                'before_expired' => $bind['before_expired'] ?? time(),
-                'ip_address' => $bind['ip_address'] ?? ''
-                ],
-                ['media_identifier' => $mediaId]
-            );
+
+            return;
         }
+
+        $this->modify(
+            "tbl_media_download",
+            [
+            'media_identifier' => $bind['media_identifier'] ?? '',
+            'before_expired' => $bind['before_expired'] ?? time(),
+            'ip_address' => $bind['ip_address'] ?? ''
+            ],
+            ['media_identifier' => $mediaId]
+        );
     }
 
     /**
@@ -166,7 +166,7 @@ class DownloadModel extends BaseModel
      */
     public function deleteMediaDownload($identifier, $sanitize)
     {
-        $idsanitized = $this->filteringId($sanitize, $identifier, 'sql');
+        $this->filteringId($sanitize, $identifier, 'sql');
         return $this->deleteRecord("tbl_media_download", ['media_identifier' => $identifier]);
     }
 

@@ -53,8 +53,11 @@ class PageDao extends Dao
   			ORDER BY '$orderBy' DESC";
 
             $data = array($author, $type);
-        } else {
-            $sql = "SELECT p.ID,
+            $this->setSQL($sql);
+            return $this->findAll($data);
+        }
+
+        $sql = "SELECT p.ID,
                 p.media_id,
                 p.post_author,
                 p.post_date,
@@ -73,8 +76,10 @@ class PageDao extends Dao
   		  WHERE p.post_type = ?
   		  ORDER BY '$orderBy' DESC";
 
-            $data = array($type);
-        }
+        $data = array($type);
+        $this->setSQL($sql);
+
+        return $this->findAll($data);
 
         $this->setSQL($sql);
 
@@ -130,36 +135,25 @@ class PageDao extends Dao
     public function createPage($bind)
     {
 
+        $data = [
+            'post_author' => $bind['post_author'],
+            'post_date' => $bind['post_date'],
+            'post_title' => $bind['post_title'],
+            'post_slug' => $bind['post_slug'],
+            'post_content' => $bind['post_content'],
+            'post_summary' => $bind['post_summary'],
+            'post_status' => $bind['post_status'],
+            'post_sticky' => $bind['post_sticky'],
+            'post_type' => $bind['post_type'],
+            'post_locale' => $bind['post_locale'] ?? 'en',
+            'comment_status' => $bind['comment_status']
+        ];
+
         if (!empty($bind['media_id'])) {
-            $this->create("tbl_posts", [
-                'media_id' => $bind['media_id'],
-                'post_author' => $bind['post_author'],
-                'post_date' => $bind['post_date'],
-                'post_title' => $bind['post_title'],
-                'post_slug' => $bind['post_slug'],
-                'post_content' => $bind['post_content'],
-                'post_summary' => $bind['post_summary'],
-                'post_status' => $bind['post_status'],
-                'post_sticky' => $bind['post_sticky'],
-                'post_type' => $bind['post_type'],
-                'post_locale' => $bind['post_locale'] ?? 'en',
-                'comment_status' => $bind['comment_status']
-            ]);
-        } else {
-            $this->create("tbl_posts", [
-                'post_author' => $bind['post_author'],
-                'post_date' => $bind['post_date'],
-                'post_title' => $bind['post_title'],
-                'post_slug' => $bind['post_slug'],
-                'post_content' => $bind['post_content'],
-                'post_summary' => $bind['post_summary'],
-                'post_status' => $bind['post_status'],
-                'post_sticky' => $bind['post_sticky'],
-                'post_type' => $bind['post_type'],
-                'post_locale' => $bind['post_locale'] ?? 'en',
-                'comment_status' => $bind['comment_status']
-            ]);
+            $data['media_id'] = $bind['media_id'];
         }
+
+        $this->create("tbl_posts", $data);
 
         if (function_exists('page_cache_clear')) {
             page_cache_clear();
@@ -180,34 +174,24 @@ class PageDao extends Dao
 
         $cleanId = $this->filteringId($sanitize, $ID, 'sql');
 
+        $data = [
+            'post_author' => $bind['post_author'],
+            'post_modified' => $bind['post_modified'],
+            'post_title' => $bind['post_title'],
+            'post_slug' => $bind['post_slug'],
+            'post_content' => $bind['post_content'],
+            'post_summary' => $bind['post_summary'],
+            'post_status' => $bind['post_status'],
+            'post_sticky' => $bind['post_sticky'],
+            'post_type' => $bind['post_type'],
+            'post_locale' => $bind['post_locale'] ?? 'en'
+        ];
+
         if (!empty($bind['media_id'])) {
-            $this->modify("tbl_posts", [
-                'media_id' => $bind['media_id'],
-                'post_author' => $bind['post_author'],
-                'post_modified' => $bind['post_modified'],
-                'post_title' => $bind['post_title'],
-                'post_slug' => $bind['post_slug'],
-                'post_content' => $bind['post_content'],
-                'post_summary' => $bind['post_summary'],
-                'post_status' => $bind['post_status'],
-                'post_sticky' => $bind['post_sticky'],
-                'post_type' => $bind['post_type'],
-                'post_locale' => $bind['post_locale'] ?? 'en'
-                ], ["ID" => (int)$cleanId]);
-        } else {
-            $this->modify("tbl_posts", [
-                'post_author' => $bind['post_author'],
-                'post_modified' => $bind['post_modified'],
-                'post_title' => $bind['post_title'],
-                'post_slug' => $bind['post_slug'],
-                'post_content' => $bind['post_content'],
-                'post_summary' => $bind['post_summary'],
-                'post_status' => $bind['post_status'],
-                'post_sticky' => $bind['post_sticky'],
-                'post_type' => $bind['post_type'],
-                'post_locale' => $bind['post_locale'] ?? 'en'
-                ], ["ID" => (int)$cleanId]);
+            $data['media_id'] = $bind['media_id'];
         }
+
+        $this->modify("tbl_posts", $data, ["ID" => (int)$cleanId]);
 
         if (function_exists('page_cache_clear')) {
             page_cache_clear();

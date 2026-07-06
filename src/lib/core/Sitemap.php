@@ -174,9 +174,10 @@ class Sitemap
         $this->setWriter(new \XMLWriter());
         if ($this->getCurrentSitemap()) {
             $this->getWriter()->openURI($this->getPath() . $this->getFilename() . self::SEPERATOR . $this->getCurrentSitemap() . self::EXT);
-        } else {
-            $this->getWriter()->openURI($this->getPath() . $this->getFilename() . self::EXT);
+            return;
         }
+
+        $this->getWriter()->openURI($this->getPath() . $this->getFilename() . self::EXT);
         $this->getWriter()->startDocument('1.0', 'UTF-8');
         $this->getWriter()->setIndent(true);
         $this->getWriter()->startElement('urlset');
@@ -227,10 +228,10 @@ class Sitemap
     {
         if (ctype_digit($date)) {
             return date('Y-m-d', $date);
-        } else {
-            $date = strtotime($date);
-            return date('Y-m-d', $date);
         }
+
+        $date = strtotime($date);
+        return date('Y-m-d', $date);
     }
 
     /**

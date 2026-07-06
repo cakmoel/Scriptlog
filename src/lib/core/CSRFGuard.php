@@ -33,9 +33,9 @@ class CSRFGuard
 
                         throw new CoreException('Missing CSRF Session Token');
                     }
-                } else {
-                    return false;
                 }
+
+                return false;
             }
 
             if (! isset($origin[$key])) {
@@ -45,9 +45,9 @@ class CSRFGuard
 
                         throw new CoreException('Missing CSRF form token');
                     }
-                } else {
-                    return false;
                 }
+
+                return false;
             }
 
             $hash = isset($_SESSION['csrf_' . $key]) ? $_SESSION['csrf_' . $key] : "";
@@ -63,29 +63,33 @@ class CSRFGuard
 
                         throw new CoreException('Form origin does not match token origin.');
                     }
-                } else {
-                    return false;
                 }
-            } elseif ($origin[$key] !== $hash) {
+
+                return false;
+            }
+
+            if ($origin[$key] !== $hash) {
                 if ($throwException) {
                     if (version_compare(phpversion(), '7.4.33', '<=')) {
                         http_response_code(400);
 
                         throw new CoreException('Invalid CSRF token');
                     }
-                } else {
-                    return false;
                 }
-            } elseif ($timespan != null && is_int($timespan) && intval(substr(base64_decode($hash), 0, 10)) + $timespan < time()) {
+
+                return false;
+            }
+
+            if ($timespan != null && is_int($timespan) && intval(substr(base64_decode($hash), 0, 10)) + $timespan < time()) {
                 if ($throwException) {
                     if (version_compare(phpversion(), '7.4.33', '<=')) {
                         http_response_code(400);
 
                         throw new CoreException('CSRF token has expired.');
                     }
-                } else {
-                    return false;
                 }
+
+                return false;
             }
 
             return true;

@@ -65,8 +65,6 @@ class TranslationsApiController extends ApiController
             return;
         }
 
-        $langCode = isset($params[0]) ? $params[0] : '';
-
         $validationErrors = $this->validateRequired($this->requestData, ['lang_code', 'translation_key', 'translation_value']);
 
         if ($validationErrors) {

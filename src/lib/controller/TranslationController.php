@@ -1,7 +1,11 @@
 <?php
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
-
+/**
+ * Class TranslationController
+ *
+ * @SuppressWarnings(PHPMD.ElseExpression)
+ */
 class TranslationController
 {
     private $translationService;

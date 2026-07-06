@@ -76,130 +76,29 @@ class DateGenerator
     // convert date from external format (as input by user)
     // to internal format (as used in the database)
     {
-        // look for d(d)?m(m)?(yyyy) format (may also be m(m)?d(d)?y(yyy) format)
-        $pattern = '/'
-                 . '(^[0-9]{1,2})'      // 1 or 2 digits
-                 . '([^0-9a-zA-Z])'     // not alpha or numeric
-                 . '([0-9]{1,2})'       // 1 or 2 digits
-                 . '([^0-9a-zA-Z])'     // not alpha or numeric
-                 . '([0-9]{0,4}$)'      // 0 to 4 digits
-                 . '/';
-        if (preg_match($pattern, $input, $regs)) {
-            if (preg_match('#^(dmy|dd/mm/yyyy|dd\.mm\.yyyy|dd/mm/yy)$#i', $this->date_format)) {
-                $result = $this->verifyDate($regs[1], $regs[3], $regs[5]);
-            } else { // assume 'mdy'
-                $result = $this->verifyDate($regs[3], $regs[1], $regs[5]);
-            } // if
+        $result = $this->matchDateWithSeparators($input);
+        if ($result !== false) {
             return $result;
-        } // if
+        }
 
-        // look for d(d)?MMM?(yyyy) format
-        $pattern = '/'
-                 . '(^[0-9]{1,2})'      // 1 or 2 digits
-                 . '([^0-9a-zA-Z])'     // not alpha or numeric
-                 . '([a-zA-Z]{1,})'     // 1 or more alpha
-                 . '([^0-9a-zA-Z])'     // not alpha or numeric
-                 . '([0-9]{0,4}$)'      // 0 to 4 digits
-                 . '/';
-        if (preg_match($pattern, $input, $regs)) {
-            $result = $this->verifyDate($regs[1], $regs[3], $regs[5]);
+        $result = $this->matchYearFirstDate($input);
+        if ($result !== false) {
             return $result;
-        } // if
+        }
 
-        // look for d(d)MMM(yyyy) format
-        $pattern = '/'
-                 . '(^[0-9]{1,2})'      // 1 or 2 digits
-                 . '([a-zA-Z]{1,})'     // 1 or more alpha
-                 . '([0-9]{0,4}$)'      // 0 to 4 digits
-                 . '/';
-        if (preg_match($pattern, $input, $regs)) {
-            $result = $this->verifyDate($regs[1], $regs[2], $regs[3]);
+        $result = $this->matchCompactDate($input);
+        if ($result !== false) {
             return $result;
-        } // if
+        }
 
-        // look for MMM?d(d)?(yyyy) format
-        $pattern = '/'
-                 . '(^[a-zA-Z]{1,})'    // 1 or more alpha
-                 . '([^0-9a-zA-Z])'     // not alpha or numeric
-                 . '([0-9]{1,2})'       // 1 or 2 digits
-                 . '([^0-9a-zA-Z])'     // not alpha or numeric
-                 . '([0-9]{1,4}$)'      // 0 to 4 digits
-                 . '/';
-        if (preg_match($pattern, $input, $regs)) {
-            $result = $this->verifyDate($regs[3], $regs[1], $regs[5]);
+        $result = $this->matchYearAlphaDate($input);
+        if ($result !== false) {
             return $result;
-        } // if
-
-        // look for MMMddyyyy format
-        $pattern = '/'
-                 . '(^[a-zA-Z]{1,})'    // 1 or more alpha
-                 . '([0-9]{2})'         // 2 digits
-                 . '([0-9]{4}$)'        // 4 digits
-                 . '/';
-        if (preg_match($pattern, $input, $regs)) {
-            $result = $this->verifyDate($regs[2], $regs[1], $regs[3]);
-            return $result;
-        } // if
-
-        // look for yyyy?m(m)?d(d) format
-        $pattern = '/'
-                 . '(^[0-9]{4})'        // 4 digits
-                 . '([^0-9a-zA-Z])'     // not alpha or numeric
-                 . '([0-9]{1,2})'       // 1 or 2 digits
-                 . '([^0-9a-zA-Z])'     // not alpha or numeric
-                 . '([0-9]{1,2}$)'      // 1 to 2 digits
-                 . '/';
-        if (preg_match($pattern, $input, $regs)) {
-            $result = $this->verifyDate($regs[5], $regs[3], $regs[1]);
-            return $result;
-        } // if
-
-        if (preg_match('/^(dmy|mdy)$/i', $this->date_format)) {
-            // look for ddmmyyyy format (may also be mmddyyyy format)
-            $pattern = '/'
-                     . '(^[0-9]{2})'        // 2 digits
-                     . '([0-9]{2})'         // 2 digits
-                     . '([0-9]{4}$)'        // 4 digits
-                     . '/';
-            if (preg_match($pattern, $input, $regs)) {
-                if (preg_match('/^(dmy)$/i', $this->date_format)) {
-                    $result = $this->verifyDate($regs[1], $regs[2], $regs[3]);
-                } else { // assume 'mdy'
-                    $result = $this->verifyDate($regs[2], $regs[1], $regs[3]);
-                } // if
-                return $result;
-            } // if
-        } // if
-
-        if (preg_match('/^(ymd)$/i', $this->date_format)) {
-            // look for yyyymmdd format
-            $pattern = '/'
-                     . '(^[0-9]{4})'        // 4 digits
-                     . '([0-9]{2})'         // 2 digits
-                     . '([0-9]{2}$)'        // 2 digits
-                     . '/';
-            if (preg_match($pattern, $input, $regs)) {
-                $result = $this->verifyDate($regs[3], $regs[2], $regs[1]);
-                return $result;
-            } // if
-        } // if
-
-        // look for yyyy?MMM?d(d) format
-        $pattern = '/'
-                 . '(^[0-9]{4})'        // 4 digits
-                 . '([^0-9a-zA-Z])'     // not alpha or numeric
-                 . '([a-zA-Z]{1,})'     // 1 or more alpha
-                 . '([^0-9a-zA-Z])'     // not alpha or numeric
-                 . '([0-9]{1,2}$)'      // 1 to 2 digits
-                 . '/';
-        if (preg_match($pattern, $input, $regs)) {
-            $result = $this->verifyDate($regs[5], $regs[3], $regs[1]);
-            return $result;
-        } // if
+        }
 
         if (strlen($input) > 10) {
             // input is too long, so split into two pieces and process first piece
-            list($date, $time) = explode(' ', $input);
+            list($date) = explode(' ', $input);
             if (strlen($date) == strlen($input)) {
                 // same length, so drop last character
                 $date = substr($date, 0, strlen($date) - 1);
@@ -286,15 +185,15 @@ class DateGenerator
         $time = substr($input, $pos + 1);
 
         // validate the separate portions
-        if (!$internaldate = $this->getInternalDate(trim($date))) {
-            // fall through
-        } elseif (!$internaltime = $this->getInternalTime(trim($time))) {
-            // fall through
-        } else {
-            // set datetime to internal format
-            $result = trim($internaldate) . ' ' . trim($internaltime);
-            return $result;
-        } // if
+        $internaldate = $this->getInternalDate(trim($date));
+        if ($internaldate) {
+            $internaltime = $this->getInternalTime(trim($time));
+            if ($internaltime) {
+                // set datetime to internal format
+                $result = trim($internaldate) . ' ' . trim($internaltime);
+                return $result;
+            }
+        }
 
         $this->errors = 'This is not a valid datetime';
 
@@ -302,25 +201,163 @@ class DateGenerator
     } // getInternalDateTime
 
     // ****************************************************************************
+    private function matchDateWithSeparators($input)
+    {
+        // look for d(d)?m(m)?(yyyy) format (may also be m(m)?d(d)?y(yyy) format)
+        $pattern = '/'
+                 . '(^[0-9]{1,2})'      // 1 or 2 digits
+                 . '([^0-9a-zA-Z])'     // not alpha or numeric
+                 . '([0-9]{1,2})'       // 1 or 2 digits
+                 . '([^0-9a-zA-Z])'     // not alpha or numeric
+                 . '([0-9]{0,4}$)'      // 0 to 4 digits
+                 . '/';
+        if (preg_match($pattern, $input, $regs)) {
+            if (preg_match('#^(dmy|dd/mm/yyyy|dd\.mm\.yyyy|dd/mm/yy)$#i', $this->date_format)) {
+                return $this->verifyDate($regs[1], $regs[3], $regs[5]);
+            }
+            return $this->verifyDate($regs[3], $regs[1], $regs[5]);
+        }
+
+        // look for d(d)?MMM?(yyyy) format
+        $pattern = '/'
+                 . '(^[0-9]{1,2})'      // 1 or 2 digits
+                 . '([^0-9a-zA-Z])'     // not alpha or numeric
+                 . '([a-zA-Z]{1,})'     // 1 or more alpha
+                 . '([^0-9a-zA-Z])'     // not alpha or numeric
+                 . '([0-9]{0,4}$)'      // 0 to 4 digits
+                 . '/';
+        if (preg_match($pattern, $input, $regs)) {
+            return $this->verifyDate($regs[1], $regs[3], $regs[5]);
+        }
+
+        // look for d(d)MMM(yyyy) format
+        $pattern = '/'
+                 . '(^[0-9]{1,2})'      // 1 or 2 digits
+                 . '([a-zA-Z]{1,})'     // 1 or more alpha
+                 . '([0-9]{0,4}$)'      // 0 to 4 digits
+                 . '/';
+        if (preg_match($pattern, $input, $regs)) {
+            return $this->verifyDate($regs[1], $regs[2], $regs[3]);
+        }
+
+        return false;
+    }
+
+    private function matchYearFirstDate($input)
+    {
+        // look for yyyy?m(m)?d(d) format
+        $pattern = '/'
+                 . '(^[0-9]{4})'        // 4 digits
+                 . '([^0-9a-zA-Z])'     // not alpha or numeric
+                 . '([0-9]{1,2})'       // 1 or 2 digits
+                 . '([^0-9a-zA-Z])'     // not alpha or numeric
+                 . '([0-9]{1,2}$)'      // 1 to 2 digits
+                 . '/';
+        if (preg_match($pattern, $input, $regs)) {
+            return $this->verifyDate($regs[5], $regs[3], $regs[1]);
+        }
+
+        // look for MMM?d(d)?(yyyy) format
+        $pattern = '/'
+                 . '(^[a-zA-Z]{1,})'    // 1 or more alpha
+                 . '([^0-9a-zA-Z])'     // not alpha or numeric
+                 . '([0-9]{1,2})'       // 1 or 2 digits
+                 . '([^0-9a-zA-Z])'     // not alpha or numeric
+                 . '([0-9]{1,4}$)'      // 0 to 4 digits
+                 . '/';
+        if (preg_match($pattern, $input, $regs)) {
+            return $this->verifyDate($regs[3], $regs[1], $regs[5]);
+        }
+
+        // look for MMMddyyyy format
+        $pattern = '/'
+                 . '(^[a-zA-Z]{1,})'    // 1 or more alpha
+                 . '([0-9]{2})'         // 2 digits
+                 . '([0-9]{4}$)'        // 4 digits
+                 . '/';
+        if (preg_match($pattern, $input, $regs)) {
+            return $this->verifyDate($regs[2], $regs[1], $regs[3]);
+        }
+
+        return false;
+    }
+
+    private function matchCompactDate($input)
+    {
+        if (preg_match('/^(dmy|mdy)$/i', $this->date_format)) {
+            // look for ddmmyyyy format (may also be mmddyyyy format)
+            $pattern = '/'
+                     . '(^[0-9]{2})'        // 2 digits
+                     . '([0-9]{2})'         // 2 digits
+                     . '([0-9]{4}$)'        // 4 digits
+                     . '/';
+            if (preg_match($pattern, $input, $regs)) {
+                if (preg_match('/^(dmy)$/i', $this->date_format)) {
+                    return $this->verifyDate($regs[1], $regs[2], $regs[3]);
+                }
+                return $this->verifyDate($regs[2], $regs[1], $regs[3]);
+            }
+        }
+
+        if (preg_match('/^(ymd)$/i', $this->date_format)) {
+            // look for yyyymmdd format
+            $pattern = '/'
+                     . '(^[0-9]{4})'        // 4 digits
+                     . '([0-9]{2})'         // 2 digits
+                     . '([0-9]{2}$)'        // 2 digits
+                     . '/';
+            if (preg_match($pattern, $input, $regs)) {
+                return $this->verifyDate($regs[3], $regs[2], $regs[1]);
+            }
+        }
+
+        return false;
+    }
+
+    private function matchYearAlphaDate($input)
+    {
+        // look for yyyy?MMM?d(d) format
+        $pattern = '/'
+                 . '(^[0-9]{4})'        // 4 digits
+                 . '([^0-9a-zA-Z])'     // not alpha or numeric
+                 . '([a-zA-Z]{1,})'     // 1 or more alpha
+                 . '([^0-9a-zA-Z])'     // not alpha or numeric
+                 . '([0-9]{1,2}$)'      // 1 to 2 digits
+                 . '/';
+        if (preg_match($pattern, $input, $regs)) {
+            return $this->verifyDate($regs[5], $regs[3], $regs[1]);
+        }
+
+        return false;
+    }
+
+    private function resolveMonthName($month)
+    {
+        // convert array from 'N=month' to 'month=N'
+        $month_array = array_flip($this->monthalpha);
+        // convert all month names to upper case
+        $month_array = array_change_key_case($month_array, CASE_UPPER);
+        $month = strtoupper($month);
+
+        if (!array_key_exists($month, $month_array)) {
+            $this->errors = 'Month name is invalid';
+            return false;
+        }
+
+        return $month_array[$month];
+    }
+
+    // ****************************************************************************
     public function verifyDate($day, $month, $year)
     {
+        $month_n = $month;
+
         if (preg_match('/([a-z]{3})/i', $month)) {
-            // convert array from 'N=month' to 'month=N'
-            $month_array = array_flip($this->monthalpha);
-            // convert all month names to upper case
-            $month_array = array_change_key_case($month_array, CASE_UPPER);
-
-            $month = strtoupper($month);
-
-            if (array_key_exists($month, $month_array)) {
-                $month_n = $month_array[$month];
-            } else {
-                $this->errors = 'Month name is invalid';
+            $month_n = $this->resolveMonthName($month);
+            if ($month_n === false) {
                 return false;
-            } // if
-        } else {
-            $month_n = $month;
-        } // if
+            }
+        }
 
         // ensure that year has 4 digits
         if (strlen($year) == 4) {
@@ -330,11 +367,7 @@ class DateGenerator
         } elseif (strlen($year) == 1) {
             $year = '200' . $year;
         } elseif (strlen($year) == 2) {
-            if ($year > 50) {
-                $year = '19' . $year;
-            } else {
-                $year = '20' . $year;
-            } // if
+            $year = ($year > 50) ? '19' . $year : '20' . $year;
         } elseif (strlen($year) == 3) {
             $year = '2' . $year;
         } // if
@@ -342,16 +375,16 @@ class DateGenerator
         if (!checkdate($month_n, $day, $year)) {
             $this->errors = 'This is not a valid date';
             return false;
-        } else {
-            if (strlen($day) < 2) {
-                $day = '0' . $day; // add leading zero
-            } // if
-            if (strlen($month_n) < 2) {
-                $month_n = '0' . $month_n; // add leading zero
-            } // if
-            $this->internaldate = $year . '-' . $month_n . '-' . $day;
-            return $this->internaldate;
+        }
+
+        if (strlen($day) < 2) {
+            $day = '0' . $day; // add leading zero
         } // if
+        if (strlen($month_n) < 2) {
+            $month_n = '0' . $month_n; // add leading zero
+        } // if
+        $this->internaldate = $year . '-' . $month_n . '-' . $day;
+        return $this->internaldate;
 
         return;
     } // verifyDate
@@ -382,96 +415,124 @@ class DateGenerator
     // convert date from internal format (as used in the database)
     // to external format (as shown to the user))
     {
-        $monthalpha = $this->monthalpha;
+        $result = $this->matchExternalFormat8($input);
+        if ($result !== false) {
+            return $result;
+        }
 
-        // input may be 'yyyy-mm-dd' or 'yyyymmdd'  or 'dd-Mmm-yy', so
-        // check the length and process accordingly
+        $result = $this->matchExternalFormat9($input);
+        if ($result !== false) {
+            return $result;
+        }
 
-        if (strlen($input) == 8) {
-            // test for 'yyyymmdd'
-            $pattern = '/'
-                     . '(^[0-9]{4})'    // 4 digits (yyyy)
-                     . '([0-9]{2})'     // 2 digits (mm)
-                     . '([0-9]{2}$)'    // 2 digits (dd)
-                     . '/';
-            if (preg_match($pattern, $input, $regs)) {
-                if ($input == '00000000') {
-                    return '';
-                } elseif (!checkdate($regs[2], $regs[3], $regs[1])) {
-                    $this->errors = 'This is not a valid date';
-                    return false;
-                } else {
-                    $this->externaldate = $this->formatDate($regs[3], $regs[2], $regs[1]);
-                    return $this->externaldate;
-                } // if
-            } // if
-
-            $this->errors = "Invalid date format: expected 'yyyymmdd'";
-            return false;
-        } // if
-
-        if (strlen($input) == 9) {
-            // test for 'dd-Mmm-yy'
-            $pattern = '/'
-                     . '(^[0-9]{2})'    // 2 digits (dd)
-                     . '([^0-9])'       // not a digit
-                     . '([a-zA-Z]{3})'  // 3 alpha (Mmm)
-                     . '([^0-9])'       // not a digit
-                     . '([0-9]{2}$)'    // 2 digits (yy)
-                     . '/';
-            if (preg_match($pattern, $input, $regs)) {
-                if ($result = $this->verifyDate($regs[1], $regs[3], $regs[5])) {
-                    $this->externaldate = $this->getExternalDate($result);
-                    return $this->externaldate;
-                } // if
-            } // if
-
-            $this->errors = "Invalid date format: expected 'dd-Mmm-yy'";
-            return false;
-        } // if
-
-        if (strlen($input) == 10) {
-            // test for 'yyyy-mm-dd'
-            $pattern = '/'
-                     . '(^[0-9]{4})'    // 4 digits (yyyy)
-                     . '([^0-9])'       // not a digit
-                     . '([0-9]{2})'     // 2 digits (mm)
-                     . '([^0-9])'       // not a digit
-                     . '([0-9]{2}$)'    // 2 digits (dd)
-                     . '/';
-            if (preg_match($pattern, $input, $regs)) {
-                if ($input == '0000-00-00') {
-                    return '';
-                } elseif (!checkdate($regs[3], $regs[5], $regs[1])) {
-                    $this->errors = 'This is not a valid date';
-                    return false;
-                } else {
-                    $this->externaldate = $this->formatDate($regs[5], $regs[3], $regs[1]);
-                    return $this->externaldate;
-                } // if
-            } // if
-
-            $this->errors = "Invalid date format: expected 'dd-mm-yyyy'";
-            return false;
-        } // if
+        $result = $this->matchExternalFormat10($input);
+        if ($result !== false) {
+            return $result;
+        }
 
         if (strlen($input) == 11) {
-            // this could already be in external format, so leave it alone
             return $input;
-        } // if
+        }
 
         if (strlen($input) > 11) {
-            // input is too long, so split into two pieces (after last ' ') and process first piece
             $time = strrchr($input, ' ');
             $date = substr($input, 0, strlen($input) - strlen($time));
             $this->externaldate = $this->getExternalDate($date);
             return $this->externaldate;
-        } // if
+        }
 
         $this->errors = 'This is not a valid date';
 
         return $input;
     } // getExternalDate
+
+    private function matchExternalFormat8($input)
+    {
+        if (strlen($input) != 8) {
+            return false;
+        }
+
+        $pattern = '/'
+                 . '(^[0-9]{4})'    // 4 digits (yyyy)
+                 . '([0-9]{2})'     // 2 digits (mm)
+                 . '([0-9]{2}$)'    // 2 digits (dd)
+                 . '/';
+        if (!preg_match($pattern, $input, $regs)) {
+            $this->errors = "Invalid date format: expected 'yyyymmdd'";
+            return false;
+        }
+
+        if ($input == '00000000') {
+            return '';
+        }
+
+        if (!checkdate($regs[2], $regs[3], $regs[1])) {
+            $this->errors = 'This is not a valid date';
+            return false;
+        }
+
+        $this->externaldate = $this->formatDate($regs[3], $regs[2], $regs[1]);
+        return $this->externaldate;
+    }
+
+    private function matchExternalFormat9($input)
+    {
+        if (strlen($input) != 9) {
+            return false;
+        }
+
+        $pattern = '/'
+                 . '(^[0-9]{2})'    // 2 digits (dd)
+                 . '([^0-9])'       // not a digit
+                 . '([a-zA-Z]{3})'  // 3 alpha (Mmm)
+                 . '([^0-9])'       // not a digit
+                 . '([0-9]{2}$)'    // 2 digits (yy)
+                 . '/';
+        if (!preg_match($pattern, $input, $regs)) {
+            $this->errors = "Invalid date format: expected 'dd-Mmm-yy'";
+            return false;
+        }
+
+        $result = $this->verifyDate($regs[1], $regs[3], $regs[5]);
+        if ($result) {
+            $this->externaldate = $this->getExternalDate($result);
+            return $this->externaldate;
+        }
+
+        $this->errors = "Invalid date format: expected 'dd-Mmm-yy'";
+        return false;
+    }
+
+    private function matchExternalFormat10($input)
+    {
+        if (strlen($input) != 10) {
+            return false;
+        }
+
+        $pattern = '/'
+                 . '(^[0-9]{4})'    // 4 digits (yyyy)
+                 . '([^0-9])'       // not a digit
+                 . '([0-9]{2})'     // 2 digits (mm)
+                 . '([^0-9])'       // not a digit
+                 . '([0-9]{2}$)'    // 2 digits (dd)
+                 . '/';
+        if (!preg_match($pattern, $input, $regs)) {
+            $this->errors = "Invalid date format: expected 'dd-mm-yyyy'";
+            return false;
+        }
+
+        if ($input == '0000-00-00') {
+            return '';
+        }
+
+        if (!checkdate($regs[3], $regs[5], $regs[1])) {
+            $this->errors = 'This is not a valid date';
+            return false;
+        }
+
+        $this->externaldate = $this->formatDate($regs[5], $regs[3], $regs[1]);
+        return $this->externaldate;
+    }
 
     // ****************************************************************************
     public function addDays($internaldate, $days)
