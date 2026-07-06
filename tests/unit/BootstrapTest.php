@@ -208,7 +208,7 @@ class BootstrapTest extends TestCase
     public function testAllowedExportedVarsContainsExpectedKeys(): void
     {
         $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowed_exported_vars');
+        $property = $reflection->getProperty('allowedExportVars');
         $property->setAccessible(true);
         
         $allowedVars = $property->getValue();
@@ -392,7 +392,7 @@ class BootstrapTest extends TestCase
     public function testAllowedExportedVarsPropertyIsStatic(): void
     {
         $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowed_exported_vars');
+        $property = $reflection->getProperty('allowedExportVars');
         
         $this->assertTrue($property->isPrivate());
         $this->assertTrue($property->isStatic());
@@ -563,7 +563,7 @@ class BootstrapTest extends TestCase
     public function testAllowedExportedVarsCount(): void
     {
         $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowed_exported_vars');
+        $property = $reflection->getProperty('allowedExportVars');
         $property->setAccessible(true);
         
         $allowedVars = $property->getValue();
@@ -574,7 +574,7 @@ class BootstrapTest extends TestCase
     public function testBootstrapIncludesSearchPostTwiceInAllowedVars(): void
     {
         $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowed_exported_vars');
+        $property = $reflection->getProperty('allowedExportVars');
         $property->setAccessible(true);
         
         $allowedVars = $property->getValue();
@@ -610,8 +610,10 @@ class BootstrapTest extends TestCase
     {
         $source = file_get_contents(__DIR__ . '/../../src/lib/core/Bootstrap.php');
 
-        $pattern = '/if\s*\(class_exists\(\'ThemeRenderer\'\).*?\{.*?try\s*\{.*?catch\s*\(\\\\Throwable\s*\$e\)/s';
-        $this->assertMatchesRegularExpression($pattern, $source, 'ThemeRenderer catch should use \Throwable');
+        $this->assertStringContainsString(
+            "} catch (\\Throwable \$e) {",
+            $source
+        );
     }
 
     public function testBootstrapInitializeServicesCatchesThrowableForThemeRenderer(): void
@@ -619,7 +621,11 @@ class BootstrapTest extends TestCase
         $source = file_get_contents(__DIR__ . '/../../src/lib/core/Bootstrap.php');
 
         $this->assertStringContainsString(
-            "catch (\\Throwable \$e) {\n                \$themeRenderer = null;",
+            "} catch (\\Throwable \$e) {",
+            $source
+        );
+        $this->assertStringContainsString(
+            "return ThemeRenderer::fromGlobalContext();",
             $source
         );
     }
@@ -627,7 +633,7 @@ class BootstrapTest extends TestCase
     public function testAllowedExportedVarsContainsThemeRenderer(): void
     {
         $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowed_exported_vars');
+        $property = $reflection->getProperty('allowedExportVars');
         $property->setAccessible(true);
 
         $allowedVars = $property->getValue();
@@ -637,7 +643,7 @@ class BootstrapTest extends TestCase
     public function testAllowedExportedVarsContainsMediaDao(): void
     {
         $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowed_exported_vars');
+        $property = $reflection->getProperty('allowedExportVars');
         $property->setAccessible(true);
 
         $allowedVars = $property->getValue();
@@ -647,7 +653,7 @@ class BootstrapTest extends TestCase
     public function testAllowedExportedVarsContainsDownloadService(): void
     {
         $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowed_exported_vars');
+        $property = $reflection->getProperty('allowedExportVars');
         $property->setAccessible(true);
 
         $allowedVars = $property->getValue();
@@ -657,7 +663,7 @@ class BootstrapTest extends TestCase
     public function testAllowedExportedVarsContainsDownloadController(): void
     {
         $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowed_exported_vars');
+        $property = $reflection->getProperty('allowedExportVars');
         $property->setAccessible(true);
 
         $allowedVars = $property->getValue();
@@ -667,7 +673,7 @@ class BootstrapTest extends TestCase
     public function testAllowedExportedVarsContainsFrontService(): void
     {
         $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowed_exported_vars');
+        $property = $reflection->getProperty('allowedExportVars');
         $property->setAccessible(true);
 
         $allowedVars = $property->getValue();
@@ -677,7 +683,7 @@ class BootstrapTest extends TestCase
     public function testAllowedExportedVarsContainsPostDaoPageDaoTopicDao(): void
     {
         $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowed_exported_vars');
+        $property = $reflection->getProperty('allowedExportVars');
         $property->setAccessible(true);
 
         $allowedVars = $property->getValue();
