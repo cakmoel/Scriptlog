@@ -45,3 +45,6 @@ src/public/log/unlock_attempts/
 # Storage - sensitive key files
 storage/keys/
 
+# Themes
+src/public/themes/restoblog
+src/public/themes/tastybites
