@@ -8,12 +8,67 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#131---2026-07-02)
+- [Latest Release](#140---2026-07-06)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.4.0] - 2026-07-06
+
+### Added
+- **`ThemeRendererInterface`**: New interface for theme rendering with constructor dependency injection
+- **`ThemeResolutionException`**: New exception class with factory methods for common failure modes
+- **`IServiceThrowable` interface**: Replaces deprecated `IEventThrowable`; extends `IThrowable` for consistent service-layer exception handling
+- **Unit tests**: 3 new test files (`IServiceThrowableTest`, `ThemeRendererInterfaceTest`, `ThemeResolutionExceptionTest`) — 4 tests
+
+### Changed
+- **ThemeRenderer**: Refactored to implement `ThemeRendererInterface` with constructor injection, documented public API, and improved theme directory resolution
+- **Core library classes**: Refactored Bootstrap, Dispatcher, HandleRequest, ApiRouter, Authentication, CSRFGuard, and other core classes with improved type safety, modular private methods, and code quality
+- **All controllers**: Refactored PostController, UserController, MediaController, MenuController, PageController, PluginController, ThemeController, ReplyController, DownloadAdminController, and all API controllers with improved type safety
+- **DAO layer**: Updated PostDao, PageDao, PluginDao, UserTokenDao, TopicDao, ThemeDao, MenuDao, PostTopicDao with improved type safety
+- **Service layer**: Updated PostService, PageService, UserService, MigrationService, MediaService, PluginService, TranslationService, and other services
+- **Theme templates**: Updated header, footer, download, and functions templates with deferred CSS loading for performance
+- **Admin UI templates**: Updated all admin templates with security improvements
+- **Installation wizard**: Updated `setup-db.php` and `finish.php` with improved setup logic
+- **Autoloader**: Updated with new class mappings for new interfaces and classes
+- **Utility files**: Updated with improved security and type safety
+- **Dependencies**: Updated `composer.json` (added explicit PHP extension requirements: `ext-json`, `ext-mbstring`, `ext-pdo`, `ext-fileinfo`, `ext-openssl`, `ext-gd`; removed `guzzlehttp/psr7`); updated `composer.lock`
+
+### Fixed
+- **Test fixes**: Fixed failing tests for Bootstrap property rename, NumberCpus code changes, PerformanceOptimization CSS deferral, and ThemeRenderer refactor
+
+### Removed
+- **`IEventThrowable`**: Deprecated interface removed, replaced by `IServiceThrowable`
+- **Avatar images**: Removed unused avatar images from admin assets (`avatar.png`, `avatar04.png`, `avatar2.png`, `avatar3.png`, `avatar5.png`, `boxed-bg.png`, `default-150x150.png`, `default-50x50.gif`, `icons.png`)
+- **`$config` global**: Removed unused `$config = array()` from `common.php`
+- **`start-session-on-site.php`**: Removed unused utility
+
+### Style
+- **Code formatting**: Array bracket alignment fix in `utility-loader.php`
+
+### Docs
+- **`src/readme.html`**: Synced with README.md (reduced from 285 lines)
+
+### Security
+- **Utility files**: Updated with improved security and type safety across utility functions
+
+### Tests
+- **New test suites**: 3 new test files for `IServiceThrowable`, `ThemeRendererInterface`, `ThemeResolutionException`
+- **Test fixes**: Updated BootstrapTest, NumberCpusTest, PerformanceOptimizationTest, ThemeRendererTest for compatibility with refactored code
+
+### Notes
+Maintenance release focused on code quality improvements across the entire codebase — refactoring core library classes with new interfaces, improved type safety, deferred CSS loading for performance, updated dependencies, and expanded test coverage. All unit tests passing.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.3.1
+- **Changes since v1.3.1**: 12 commits
+
+---
 
 ## [1.3.1] - 2026-07-02
 
@@ -547,6 +602,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.4.0 | 2026-07-06 | Stable |
 | 1.3.1 | 2026-07-02 | Stable |
 | 1.3.0 | 2026-07-01 | Stable |
 | 1.2.3 | 2026-06-26 | Stable |
