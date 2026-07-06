@@ -120,9 +120,10 @@ class LogError
         return MessageLog::messageException($exception, self::logPath() . 'exceptions.log');
     }
 
-    public static function setStatusCode($statusCode)
+    public static function setStatusCode($statusCode): int
     {
         self::$httpResponseCode = $statusCode;
+        return $statusCode;
     }
 
     private static function getStatusCode()
