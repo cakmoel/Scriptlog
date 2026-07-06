@@ -9,7 +9,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0
+ * @SuppressWarnings(PHPMD.ElseExpression)
  *
+ * @psalm-suppress UnusedClass
  */
 class CommentController extends BaseApp
 {
@@ -40,6 +42,7 @@ class CommentController extends BaseApp
         $this->commentService = $commentService;
     }
 
+    #[\Override]
     public function listItems()
     {
 
@@ -81,17 +84,20 @@ class CommentController extends BaseApp
         return $this->view->render();
     }
 
+    #[\Override]
     public function insert()
     {
         // left empty
     }
 
+    #[\Override]
     public function update($id)
     {
         $errors = array();
         $checkError = true;
 
-        if (!$getComment = $this->commentService->grabComment($id)) {
+        $getComment = $this->commentService->grabComment($id);
+        if (!$getComment) {
             $_SESSION['error'] = "commentNotFound";
             direct_page('index.php?load=comments&error=commentNotFound', 404);
         }
@@ -171,6 +177,7 @@ class CommentController extends BaseApp
         return $this->view->render();
     }
 
+    #[\Override]
     public function remove($id)
     {
 

@@ -1,5 +1,5 @@
 <?php
-
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Categories API Controller
  *
@@ -246,7 +246,7 @@ class CategoriesApiController extends ApiController
      * @param array $params Request data
      * @return void
      */
-    public function store($params = [])
+    public function store($_params = [])
     {
         // Require authentication
         $this->requiresAuth = true;
@@ -460,9 +460,12 @@ class CategoriesApiController extends ApiController
         ];
     }
 
+    // kept for potential future use
     /**
      * Transform post data for API response
      *
+     * @deprecated No longer used internally
+     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
      * @param array $post
      * @return array
      */

@@ -10,6 +10,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version   1.0
  * @since     Since Release 1.0
  *
+ * @SuppressWarnings(PHPMD.ElseExpression)
  */
 
 use Egulias\EmailValidator\Validation\RFCValidation;
@@ -40,7 +41,7 @@ class UserController extends BaseApp
      */
     private $configService;
 
-    public function __construct(userService $userService, ConfigurationService $configService = null)
+    public function __construct(userService $userService, ?ConfigurationService $configService = null)
     {
         $this->userService = $userService;
         $this->configService = $configService;
@@ -126,7 +127,8 @@ class UserController extends BaseApp
             unset($_SESSION['status']);
         }
 
-        if (!$getUser = $this->userService->grabUserByLogin($user_login)) {
+        $getUser = $this->userService->grabUserByLogin($user_login);
+        if (!$getUser) {
             direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
         }
 
@@ -172,117 +174,10 @@ class UserController extends BaseApp
      */
     public function insert()
     {
-
         $errors = array();
         $checkError = true;
 
-        if (isset($_POST['userFormSubmit'])) {
-            $filters = [
-                'user_login' => isset($_POST['user_login']) ? Sanitize::severeSanitizer($_POST['user_login']) : "",
-                'user_fullname' => isset($_POST['user_fullname']) ? Sanitize::severeSanitizer($_POST['user_fullname']) : "",
-                'user_email' => FILTER_SANITIZE_EMAIL,
-                'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'user_url' => FILTER_SANITIZE_URL,
-                'user_level' => isset($_POST['user_level']) ? Sanitize::mildSanitizer($_POST['user_level']) : "",
-                'session_id' => FILTER_SANITIZE_ENCODED,
-                'send_user_notification' => FILTER_SANITIZE_NUMBER_INT
-            ];
-
-            try {
-                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
-                    throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
-                }
-
-                if (empty($_POST['user_login']) || empty($_POST['user_email']) || empty($_POST['user_pass'])) {
-                    $checkError = false;
-                    array_push($errors, "All columns required must be filled");
-                }
-
-                if ((isset($_POST['user_login'])) && (!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $_POST['user_login']))) {
-                    $checkError = false;
-                    array_push($errors, "Username requires only alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20");
-                } elseif ($this->userService->checkUserLogin($_POST['user_login'])) {
-                    $checkError = false;
-                    array_push($errors, "Username already in use");
-                }
-
-                if ((isset($_POST['user_email'])) && (!email_validation($_POST['user_email'], new RFCValidation()))) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_INVALID_EMAILADDRESS);
-                } elseif ((checking_internet_connection()) && (!email_multiple_validation($_POST['user_email']))) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_UNKNOWN_DNS);
-                } elseif ($this->userService->isEmailExists($_POST['user_email'])) {
-                    $checkError = false;
-                    array_push($errors, "Email already in use");
-                }
-
-                if (isset($_POST['user_pass'])) {
-                    if (check_common_password($_POST['user_pass']) === true) {
-                        $checkError = false;
-                        array_push($errors, "Your password seems to be the most hacked password, please try another");
-                    }
-
-                    if (false === check_pwd_strength($_POST['user_pass'])) {
-                        $checkError = false;
-                        array_push($errors, MESSAGE_WEAK_PASSWORD);
-                    }
-                }
-
-                if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
-                    $checkError = false;
-                    array_push($errors, "Please enter a valid URL.");
-                }
-
-                if ((!empty($_POST['user_fullname'])) && (!preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']))) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_INVALID_FULLNAME);
-                }
-
-                if (sanitize_selection_box(distill_post_request($filters)['user_level'], ['manager' => 'Manager', 'editor' => 'Editor', 'author' => 'Author', 'contributor' => 'Contributor', 'subscriber' => 'Subscriber']) === false) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_INVALID_SELECTBOX);
-                }
-
-                if (!$checkError) {
-                    $this->setView('edit-user');
-                    $this->setPageTitle('Add New User');
-                    $this->setFormAction(ActionConst::NEWUSER);
-                    $this->view->set('pageTitle', $this->getPageTitle());
-                    $this->view->set('formAction', $this->getFormAction());
-                    $this->view->set('errors', $errors);
-                    $this->view->set('formData', $_POST);
-                    $this->view->set('userRole', $this->userService->userLevelDropDown());
-                    $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-                } else {
-                    $this->userService->setUserLogin(prevent_injection(distill_post_request($filters)['user_login']));
-                    $this->userService->setUserEmail(distill_post_request($filters)['user_email']);
-                    $this->userService->setUserPass(prevent_injection(distill_post_request($filters)['user_pass']));
-                    $this->userService->setUserLevel(distill_post_request($filters)['user_level']);
-                    $this->userService->setUserFullname((isset($_POST['user_fullname']) ? purify_dirty_html(distill_post_request($filters)['user_fullname']) : ""));
-                    $this->userService->setUserUrl((isset($_POST['user_url']) ? escape_html(distill_post_request($filters)['user_url']) : ""));
-                    $this->userService->setUserSession(distill_post_request($filters)['session_id']);
-
-                    if ((isset($_POST['send_user_notification'])) && ($_POST['send_user_notification'] == 1)) {
-                        $this->userService->setUserActivationKey(user_activation_key(distill_post_request($filters)['user_email'] . get_ip_address()));
-                        $this->userService->addUser();
-                        notify_new_user(distill_post_request($filters)['user_email'], prevent_injection(distill_post_request($filters)['user_pass']));
-                    } else {
-                        $this->userService->addUser();
-                    }
-
-                    $_SESSION['status'] = "userAdded";
-                    direct_page('index.php?load=users&status=userAdded', 302);
-                }
-            } catch (Throwable $th) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($th);
-            } catch (AppException $e) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($e);
-            }
-        } else {
+        if (!isset($_POST['userFormSubmit'])) {
             $this->setView('edit-user');
             $this->setPageTitle('Add New User');
             $this->setFormAction(ActionConst::NEWUSER);
@@ -290,9 +185,134 @@ class UserController extends BaseApp
             $this->view->set('formAction', $this->getFormAction());
             $this->view->set('userRole', $this->userService->userLevelDropDown());
             $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+            return $this->view->render();
         }
 
+        $filters = [
+            'user_login' => isset($_POST['user_login']) ? Sanitize::severeSanitizer($_POST['user_login']) : "",
+            'user_fullname' => isset($_POST['user_fullname']) ? Sanitize::severeSanitizer($_POST['user_fullname']) : "",
+            'user_email' => FILTER_SANITIZE_EMAIL,
+            'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'user_url' => FILTER_SANITIZE_URL,
+            'user_level' => isset($_POST['user_level']) ? Sanitize::mildSanitizer($_POST['user_level']) : "",
+            'session_id' => FILTER_SANITIZE_ENCODED,
+            'send_user_notification' => FILTER_SANITIZE_NUMBER_INT
+        ];
+
+        try {
+            if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+                header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
+                throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
+            }
+
+            $checkError = $this->validateNewUserInput($filters, $errors, $checkError);
+
+            if (!$checkError) {
+                $this->setView('edit-user');
+                $this->setPageTitle('Add New User');
+                $this->setFormAction(ActionConst::NEWUSER);
+                $this->view->set('pageTitle', $this->getPageTitle());
+                $this->view->set('formAction', $this->getFormAction());
+                $this->view->set('errors', $errors);
+                $this->view->set('formData', $_POST);
+                $this->view->set('userRole', $this->userService->userLevelDropDown());
+                $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+                return $this->view->render();
+            }
+
+            $this->createNewUser($filters);
+        } catch (Throwable $th) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($th);
+        } catch (AppException $e) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($e);
+        }
+
+        $this->setView('edit-user');
+        $this->setPageTitle('Add New User');
+        $this->setFormAction(ActionConst::NEWUSER);
+        $this->view->set('pageTitle', $this->getPageTitle());
+        $this->view->set('formAction', $this->getFormAction());
+        $this->view->set('userRole', $this->userService->userLevelDropDown());
+        $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+
         return $this->view->render();
+    }
+
+    private function validateNewUserInput($filters, &$errors, $checkError)
+    {
+        if (empty($_POST['user_login']) || empty($_POST['user_email']) || empty($_POST['user_pass'])) {
+            $checkError = false;
+            array_push($errors, "All columns required must be filled");
+        }
+
+        if ((isset($_POST['user_login'])) && (!preg_match('/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/', $_POST['user_login']))) {
+            $checkError = false;
+            array_push($errors, "Username requires only alphanumerics characters, underscore and dot. Number of characters must be between 8 to 20");
+        } elseif ($this->userService->checkUserLogin($_POST['user_login'])) {
+            $checkError = false;
+            array_push($errors, "Username already in use");
+        }
+
+        if ((isset($_POST['user_email'])) && (!email_validation($_POST['user_email'], new RFCValidation()))) {
+            $checkError = false;
+            array_push($errors, MESSAGE_INVALID_EMAILADDRESS);
+        } elseif ((checking_internet_connection()) && (!email_multiple_validation($_POST['user_email']))) {
+            $checkError = false;
+            array_push($errors, MESSAGE_UNKNOWN_DNS);
+        } elseif ($this->userService->isEmailExists($_POST['user_email'])) {
+            $checkError = false;
+            array_push($errors, "Email already in use");
+        }
+
+        if (isset($_POST['user_pass'])) {
+            if (check_common_password($_POST['user_pass']) === true) {
+                $checkError = false;
+                array_push($errors, "Your password seems to be the most hacked password, please try another");
+            }
+
+            if (false === check_pwd_strength($_POST['user_pass'])) {
+                $checkError = false;
+                array_push($errors, MESSAGE_WEAK_PASSWORD);
+            }
+        }
+
+        if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
+            $checkError = false;
+            array_push($errors, "Please enter a valid URL.");
+        }
+
+        if ((!empty($_POST['user_fullname'])) && (!preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']))) {
+            $checkError = false;
+            array_push($errors, MESSAGE_INVALID_FULLNAME);
+        }
+
+        if (sanitize_selection_box(distill_post_request($filters)['user_level'], ['manager' => 'Manager', 'editor' => 'Editor', 'author' => 'Author', 'contributor' => 'Contributor', 'subscriber' => 'Subscriber']) === false) {
+            $checkError = false;
+            array_push($errors, MESSAGE_INVALID_SELECTBOX);
+        }
+
+        return $checkError;
+    }
+
+    private function createNewUser($filters)
+    {
+        $this->userService->setUserLogin(prevent_injection(distill_post_request($filters)['user_login']));
+        $this->userService->setUserEmail(distill_post_request($filters)['user_email']);
+        $this->userService->setUserPass(prevent_injection(distill_post_request($filters)['user_pass']));
+        $this->userService->setUserLevel(distill_post_request($filters)['user_level']);
+        $this->userService->setUserFullname((isset($_POST['user_fullname']) ? purify_dirty_html(distill_post_request($filters)['user_fullname']) : ""));
+        $this->userService->setUserUrl((isset($_POST['user_url']) ? escape_html(distill_post_request($filters)['user_url']) : ""));
+        $this->userService->setUserSession(distill_post_request($filters)['session_id']);
+
+        if ((isset($_POST['send_user_notification'])) && ($_POST['send_user_notification'] == 1)) {
+            $this->userService->setUserActivationKey(user_activation_key(distill_post_request($filters)['user_email'] . get_ip_address()));
+            $this->userService->addUser();
+            notify_new_user(distill_post_request($filters)['user_email'], prevent_injection(distill_post_request($filters)['user_pass']));
+        }
+
+        $this->userService->addUser();
     }
 
     /**
@@ -306,18 +326,17 @@ class UserController extends BaseApp
      */
     public function update($id)
     {
-
         $errors = array();
         $checkError = true;
         $secret = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::generateSecretKey() : '';
 
-        if (!$getUser = $this->userService->grabUser($id)) {
+        $getUser = $this->userService->grabUser($id);
+        if (!$getUser) {
             $_SESSION['error'] = "userNotFound";
             direct_page('index.php?load=users&error=userNotFound', 404);
         }
 
         $data_user = array(
-
             'ID'            => (int)$getUser['ID'],
             'user_login'    => $getUser['user_login'],
             'user_email'    => $getUser['user_email'],
@@ -327,141 +346,9 @@ class UserController extends BaseApp
             'user_registered' => $getUser['user_registered'],
             'user_session'  => $getUser['user_session'],
             'user_banned'   => $getUser['user_banned']
-
         );
 
-        if (isset($_POST['userFormSubmit'])) {
-            $filters = [
-                'user_fullname' => isset($_POST['user_fullname']) ? Sanitize::severeSanitizer($_POST['user_fullname']) : "",
-                'user_email' => FILTER_SANITIZE_EMAIL,
-                'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'current_pwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'user_url' => FILTER_SANITIZE_URL,
-                'user_level' => isset($_POST['user_level']) ? Sanitize::mildSanitizer($_POST['user_level']) : "",
-                'user_id' => FILTER_SANITIZE_NUMBER_INT,
-                'user_banned' => FILTER_SANITIZE_NUMBER_INT
-            ];
-
-            try {
-                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
-                    throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
-                }
-
-                if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass'])) || (!empty($_POST['current_pwd']))) {
-                    if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
-                        $checkError = false;
-                        array_push($errors, "Password should both be equal");
-                    }
-
-                    if (check_common_password($_POST['user_pass']) === true) {
-                        $checkError = false;
-                        array_push($errors, "Your password seems to be the most hacked password, please try another");
-                    }
-
-                    if (false === check_pwd_strength($_POST['user_pass'])) {
-                        $checkError = false;
-                        array_push($errors, MESSAGE_WEAK_PASSWORD);
-                    }
-
-                    if (false === $this->userService->reAuthenticateUserPrivilege($getUser['user_login'], $_POST['current_pwd'])) {
-                        $checkError = false;
-                        array_push($errors, "re-authentication failed, please check your current password");
-                    }
-                }
-
-                if ((!empty($_POST['user_fullname'])) && (!preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']))) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_INVALID_FULLNAME);
-                }
-
-                if (false === sanitize_selection_box(distill_post_request($filters)['user_level'], ['manager' => 'Manager', 'editor' => 'Editor', 'author' => 'Author', 'contributor' => 'Contributor'])) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_INVALID_SELECTBOX);
-                }
-
-                if (false === checking_internet_connection()) {
-                    $checkError = false;
-                    array_push($errors, "Please, check your internet connection");
-                } else {
-                    if (!email_validation($_POST['user_email'], new RFCValidation())) {
-                        $checkError = false;
-                        array_push($errors, MESSAGE_INVALID_EMAILADDRESS);
-                    } elseif (!email_multiple_validation($_POST['user_email'])) {
-                        $checkError = false;
-                        array_push($errors, MESSAGE_UNKNOWN_DNS);
-                    }
-                }
-
-                if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
-                    $checkError = false;
-                    array_push($errors, "Please enter a valid URL Website");
-                }
-
-                if (!$checkError) {
-                    $this->setView('edit-user');
-                    $this->setPageTitle('Edit User');
-                    $this->setFormAction(ActionConst::EDITUSER);
-                    $this->view->set('pageTitle', $this->getPageTitle());
-                    $this->view->set('formAction', $this->getFormAction());
-                    $this->view->set('errors', $errors);
-                    $this->view->set('userData', $data_user);
-
-                    if (($getUser['ID'] == 1) && ($this->userService->isUserLevel() == 'administrator')) {
-                        $this->view->set('userRole', $this->userService->isUserLevel());
-                    } else {
-                        $this->view->set('userRole', $this->userService->userLevelDropDown($getUser['user_level']));
-                    }
-
-                    $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-                } else {
-                    $this->userService->setUserEmail(distill_post_request($filters)['user_email']);
-                    $this->userService->setUserFullname((isset($_POST['user_fullname']) ? purify_dirty_html(distill_post_request($filters)['user_fullname']) : ""));
-                    $this->userService->setUserUrl((isset($_POST['user_url']) ? escape_html(distill_post_request($filters)['user_url']) : ""));
-                    $this->userService->setUserId((isset($_POST['user_id']) ? abs((int)distill_post_request($filters)['user_id']) : 0));
-                    $this->userService->setUserBanned((isset($_POST['user_banned']) ? abs((int)distill_post_request($filters)['user_banned']) : 0));
-
-                    if ((isset($_POST['user_id'])) && ($_POST['user_id'] == 1) && ($this->userService->isUserLevel() == 'administrator')) {
-                        $this->userService->setUserLevel($getUser['user_level']);
-                    } else {
-                        $this->userService->setUserLevel(distill_post_request($filters)['user_level']);
-                    }
-
-                    if (!empty($_POST['user_pass'])) {
-                        $this->userService->setUserPass(prevent_injection(distill_post_request($filters)['user_pass']));
-                    }
-
-                    if (($this->userService->identifyCookieToken($secret)) && (!empty($_POST['user_pass']))) {
-                        $random_password = Tokenizer::createToken(128);
-                        set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-
-                        $random_selector = Tokenizer::createToken(128);
-                        set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-
-                        $hashed_password = Tokenizer::setRandomPasswordProtected($random_password);
-                        $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
-
-                        $this->userService->setPwdHash($hashed_password);
-                        $this->userService->setSelectorHash($hashed_selector);
-                        $this->userService->setUserLogin($getUser['user_login']);
-
-                        $expiry_date = date("Y-m-d H:i:s", time() + Authentication::COOKIE_EXPIRE);
-                        $this->userService->setCookieExpireDate($expiry_date);
-                    }
-
-                    $this->userService->modifyUser();
-                    $_SESSION['status'] = "userUpdated";
-                    direct_page('index.php?load=users&status=userUpdated', 302);
-                }
-            } catch (\Throwable $th) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($th);
-            } catch (AppException $e) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($e);
-            }
-        } else {
+        if (!isset($_POST['userFormSubmit'])) {
             $this->setView('edit-user');
             $this->setPageTitle('Edit User');
             $this->setFormAction(ActionConst::EDITUSER);
@@ -469,16 +356,169 @@ class UserController extends BaseApp
             $this->view->set('formAction', $this->getFormAction());
             $this->view->set('userData', $data_user);
 
-            if (($getUser['ID'] == 1)  && ($this->userService->isUserLevel() == 'administrator')) {
-                $this->view->set('userRole', $this->userService->isUserLevel());
-            } else {
-                $this->view->set('userRole', $this->userService->userLevelDropDown($getUser['user_level']));
+            $userRole = $this->userService->userLevelDropDown($getUser['user_level']);
+            if (($getUser['ID'] == 1) && ($this->userService->isUserLevel() == 'administrator')) {
+                $userRole = $this->userService->isUserLevel();
             }
+            $this->view->set('userRole', $userRole);
 
             $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+            return $this->view->render();
+        }
+
+        $filters = [
+            'user_fullname' => isset($_POST['user_fullname']) ? Sanitize::severeSanitizer($_POST['user_fullname']) : "",
+            'user_email' => FILTER_SANITIZE_EMAIL,
+            'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'current_pwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'user_url' => FILTER_SANITIZE_URL,
+            'user_level' => isset($_POST['user_level']) ? Sanitize::mildSanitizer($_POST['user_level']) : "",
+            'user_id' => FILTER_SANITIZE_NUMBER_INT,
+            'user_banned' => FILTER_SANITIZE_NUMBER_INT
+        ];
+
+        try {
+            if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+                header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
+                throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
+            }
+
+            $checkError = $this->validateUserUpdate($filters, $getUser, $errors, $checkError);
+
+            if (!$checkError) {
+                $this->setView('edit-user');
+                $this->setPageTitle('Edit User');
+                $this->setFormAction(ActionConst::EDITUSER);
+                $this->view->set('pageTitle', $this->getPageTitle());
+                $this->view->set('formAction', $this->getFormAction());
+                $this->view->set('errors', $errors);
+                $this->view->set('userData', $data_user);
+
+                $userRole = $this->userService->userLevelDropDown($getUser['user_level']);
+                if (($getUser['ID'] == 1) && ($this->userService->isUserLevel() == 'administrator')) {
+                    $userRole = $this->userService->isUserLevel();
+                }
+                $this->view->set('userRole', $userRole);
+
+                $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+                return $this->view->render();
+            }
+
+            $this->applyUserUpdate($filters, $getUser, $secret);
+        } catch (\Throwable $th) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($th);
+        } catch (AppException $e) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($e);
         }
 
         return $this->view->render();
+    }
+
+    private function validateUserUpdate($filters, $getUser, &$errors, $checkError)
+    {
+        if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass'])) || (!empty($_POST['current_pwd']))) {
+            if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
+                $checkError = false;
+                array_push($errors, "Password should both be equal");
+            }
+
+            if (check_common_password($_POST['user_pass']) === true) {
+                $checkError = false;
+                array_push($errors, "Your password seems to be the most hacked password, please try another");
+            }
+
+            if (false === check_pwd_strength($_POST['user_pass'])) {
+                $checkError = false;
+                array_push($errors, MESSAGE_WEAK_PASSWORD);
+            }
+
+            if (false === $this->userService->reAuthenticateUserPrivilege($getUser['user_login'], $_POST['current_pwd'])) {
+                $checkError = false;
+                array_push($errors, "re-authentication failed, please check your current password");
+            }
+        }
+
+        if ((!empty($_POST['user_fullname'])) && (!preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']))) {
+            $checkError = false;
+            array_push($errors, MESSAGE_INVALID_FULLNAME);
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['user_level'], ['manager' => 'Manager', 'editor' => 'Editor', 'author' => 'Author', 'contributor' => 'Contributor'])) {
+            $checkError = false;
+            array_push($errors, MESSAGE_INVALID_SELECTBOX);
+        }
+
+        $hasInternet = checking_internet_connection();
+        if (!$hasInternet) {
+            $checkError = false;
+            array_push($errors, "Please, check your internet connection");
+        }
+
+        if ($hasInternet) {
+            if (!email_validation($_POST['user_email'], new RFCValidation())) {
+                $checkError = false;
+                array_push($errors, MESSAGE_INVALID_EMAILADDRESS);
+            } elseif (!email_multiple_validation($_POST['user_email'])) {
+                $checkError = false;
+                array_push($errors, MESSAGE_UNKNOWN_DNS);
+            }
+        }
+
+        if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
+            $checkError = false;
+            array_push($errors, "Please enter a valid URL Website");
+        }
+
+        return $checkError;
+    }
+
+    private function applyUserUpdate($filters, $getUser, $secret)
+    {
+        $this->userService->setUserEmail(distill_post_request($filters)['user_email']);
+        $this->userService->setUserFullname((isset($_POST['user_fullname']) ? purify_dirty_html(distill_post_request($filters)['user_fullname']) : ""));
+        $this->userService->setUserUrl((isset($_POST['user_url']) ? escape_html(distill_post_request($filters)['user_url']) : ""));
+        $this->userService->setUserId((isset($_POST['user_id']) ? abs((int)distill_post_request($filters)['user_id']) : 0));
+        $this->userService->setUserBanned((isset($_POST['user_banned']) ? abs((int)distill_post_request($filters)['user_banned']) : 0));
+
+        $this->userService->setUserLevel(
+            (isset($_POST['user_id']) && $_POST['user_id'] == 1 && $this->userService->isUserLevel() == 'administrator')
+                ? $getUser['user_level']
+                : distill_post_request($filters)['user_level']
+        );
+
+        if (!empty($_POST['user_pass'])) {
+            $this->userService->setUserPass(prevent_injection(distill_post_request($filters)['user_pass']));
+        }
+
+        $this->applyUserCookieUpdate($getUser, $secret);
+
+        $this->userService->modifyUser();
+        $_SESSION['status'] = "userUpdated";
+        direct_page('index.php?load=users&status=userUpdated', 302);
+    }
+
+    private function applyUserCookieUpdate($getUser, $secret)
+    {
+        if (($this->userService->identifyCookieToken($secret)) && (!empty($_POST['user_pass']))) {
+            $random_password = Tokenizer::createToken(128);
+            set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+
+            $random_selector = Tokenizer::createToken(128);
+            set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+
+            $hashed_password = Tokenizer::setRandomPasswordProtected($random_password);
+            $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
+
+            $this->userService->setPwdHash($hashed_password);
+            $this->userService->setSelectorHash($hashed_selector);
+            $this->userService->setUserLogin($getUser['user_login']);
+
+            $expiry_date = date("Y-m-d H:i:s", time() + Authentication::COOKIE_EXPIRE);
+            $this->userService->setCookieExpireDate($expiry_date);
+        }
     }
 
     /**
@@ -490,18 +530,17 @@ class UserController extends BaseApp
      */
     public function updateProfile($user_login)
     {
-
         $errors = array();
         $checkError = true;
         $secret = ScriptlogCryptonize::generateSecretKey();
 
-        if (!$getProfile = $this->userService->grabUserByLogin($user_login)) {
+        $getProfile = $this->userService->grabUserByLogin($user_login);
+        if (!$getProfile) {
             $_SESSION['error'] = "profileNotFound";
             direct_page('index.php?load=users&error=profileNotFound', 404);
         }
 
         $data_profile = array(
-
             'ID' => (int)$getProfile['ID'],
             'user_login' => $getProfile['user_login'],
             'user_email' => $getProfile['user_email'],
@@ -510,120 +549,9 @@ class UserController extends BaseApp
             'user_url' => $getProfile['user_url'],
             'user_registered' => $getProfile['user_registered'],
             'user_session' => $getProfile['user_session']
-
         );
 
-        if (isset($_POST['userFormSubmit'])) {
-            $filters = [
-                'user_fullname' => isset($_POST['user_fullname']) ? Sanitize::severeSanitizer($_POST['user_fullname']) : "",
-                'user_email' => FILTER_SANITIZE_EMAIL,
-                'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'current_pwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'user_url' => FILTER_SANITIZE_URL,
-                'user_id' => FILTER_SANITIZE_NUMBER_INT
-            ];
-
-            try {
-                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
-                    throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
-                }
-
-                if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass'])) || (!empty($_POST['current_pwd']))) {
-                    if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
-                        $checkError = false;
-                        array_push($errors, "Password should both be equal");
-                    }
-
-                    if (check_common_password($_POST['user_pass']) === true) {
-                        $checkError = false;
-                        array_push($errors, "Your password seems to be the most hacked password, please try another.");
-                    }
-
-                    if (false === check_pwd_strength($_POST['user_pass'])) {
-                        $checkError = false;
-                        array_push($errors, MESSAGE_WEAK_PASSWORD);
-                    }
-
-                    if (false === $this->userService->reAuthenticateUserPrivilege($getProfile['user_login'], $_POST['current_pwd'])) {
-                        $checkError = false;
-                        array_push($errors, "re-authentication failed, please check your current password");
-                    }
-                }
-
-                if (false === checking_internet_connection()) {
-                    $checkError = false;
-                    array_push($errors, "Please, check your internet connection");
-                } else {
-                    if (!email_validation($_POST['user_email'], new RFCValidation())) {
-                        $checkError = false;
-                        array_push($errors, MESSAGE_INVALID_EMAILADDRESS);
-                    } elseif (!email_multiple_validation($_POST['user_email'])) {
-                        $checkError = false;
-                        array_push($errors, MESSAGE_UNKNOWN_DNS);
-                    }
-                }
-
-                if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
-                    $checkError = false;
-                    array_push($errors, "Please enter a valid URL");
-                }
-
-                if ((!empty($_POST['user_fullname'])) && (!preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']))) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_INVALID_FULLNAME);
-                }
-
-                if (!$checkError) {
-                    $this->setView('edit-myprofile');
-                    $this->setPageTitle('Profile');
-                    $this->setFormAction(ActionConst::EDITUSER);
-                    $this->view->set('pageTitle', $this->getPageTitle());
-                    $this->view->set('formAction', $this->getFormAction());
-                    $this->view->set('errors', $errors);
-                    $this->view->set('userData', $data_profile);
-                    $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-                } else {
-                    $this->userService->setUserEmail(distill_post_request($filters)['user_email']);
-                    $this->userService->setUserFullname((isset($_POST['user_fullname']) ? purify_dirty_html(distill_post_request($filters)['user_fullname']) : ""));
-                    $this->userService->setUserUrl((isset($_POST['user_url']) ? escape_html(distill_post_request($filters)['user_url'], 'url') : ""));
-                    $this->userService->setUserId((isset($_POST['user_id']) ? abs((int)distill_post_request($filters)['user_id']) : 0));
-
-                    if (!empty($_POST['user_pass'])) {
-                        $this->userService->setUserPass(purify_dirty_html(distill_post_request($filters)['user_pass']));
-                    }
-
-                    if (($this->userService->identifyCookieToken($secret)) && (!empty($_POST['user_pass']))) {
-                        $random_password = Tokenizer::createToken(128);
-                        set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-
-                        $random_selector = Tokenizer::createToken(128);
-                        set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
-
-                        $hashed_password = Tokenizer::setRandomPasswordProtected($random_password);
-                        $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
-
-                        $this->userService->setPwdHash($hashed_password);
-                        $this->userService->setSelectorHash($hashed_selector);
-                        $this->userService->setUserLogin($getProfile['user_login']);
-
-                        $expiry_date = date("Y-m-d H:i:s", time() + Authentication::COOKIE_EXPIRE);
-                        $this->userService->setCookieExpireDate($expiry_date);
-                    }
-
-                    $this->userService->modifyUser();
-                    $_SESSION['status'] = "profileUpdated";
-                    direct_page('index.php?load=users&status=profileUpdated', 200);
-                }
-            } catch (Throwable $th) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($th);
-            } catch (AppException $e) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($e);
-            }
-        } else {
+        if (!isset($_POST['userFormSubmit'])) {
             $this->setView('edit-myprofile');
             $this->setPageTitle('Profile');
             $this->setFormAction(ActionConst::EDITUSER);
@@ -631,9 +559,141 @@ class UserController extends BaseApp
             $this->view->set('formAction', $this->getFormAction());
             $this->view->set('userData', $data_profile);
             $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+            return $this->view->render();
+        }
+
+        $filters = [
+            'user_fullname' => isset($_POST['user_fullname']) ? Sanitize::severeSanitizer($_POST['user_fullname']) : "",
+            'user_email' => FILTER_SANITIZE_EMAIL,
+            'user_pass' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'user_pass2' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'current_pwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'user_url' => FILTER_SANITIZE_URL,
+            'user_id' => FILTER_SANITIZE_NUMBER_INT
+        ];
+
+        try {
+            if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+                header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
+                throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
+            }
+
+            $checkError = $this->validateProfileUpdate($getProfile, $errors, $checkError);
+
+            if (!$checkError) {
+                $this->setView('edit-myprofile');
+                $this->setPageTitle('Profile');
+                $this->setFormAction(ActionConst::EDITUSER);
+                $this->view->set('pageTitle', $this->getPageTitle());
+                $this->view->set('formAction', $this->getFormAction());
+                $this->view->set('errors', $errors);
+                $this->view->set('userData', $data_profile);
+                $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+                return $this->view->render();
+            }
+
+            $this->applyProfileUpdate($filters, $getProfile, $secret);
+        } catch (Throwable $th) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($th);
+        } catch (AppException $e) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($e);
         }
 
         return $this->view->render();
+    }
+
+    private function validateProfileUpdate($getProfile, &$errors, $checkError)
+    {
+        if ((!empty($_POST['user_pass2'])) || (!empty($_POST['user_pass'])) || (!empty($_POST['current_pwd']))) {
+            if (($_POST['user_pass']) !== ($_POST['user_pass2'])) {
+                $checkError = false;
+                array_push($errors, "Password should both be equal");
+            }
+
+            if (check_common_password($_POST['user_pass']) === true) {
+                $checkError = false;
+                array_push($errors, "Your password seems to be the most hacked password, please try another.");
+            }
+
+            if (false === check_pwd_strength($_POST['user_pass'])) {
+                $checkError = false;
+                array_push($errors, MESSAGE_WEAK_PASSWORD);
+            }
+
+            if (false === $this->userService->reAuthenticateUserPrivilege($getProfile['user_login'], $_POST['current_pwd'])) {
+                $checkError = false;
+                array_push($errors, "re-authentication failed, please check your current password");
+            }
+        }
+
+        $hasInternet = checking_internet_connection();
+        if (!$hasInternet) {
+            $checkError = false;
+            array_push($errors, "Please, check your internet connection");
+        }
+
+        if ($hasInternet) {
+            if (!email_validation($_POST['user_email'], new RFCValidation())) {
+                $checkError = false;
+                array_push($errors, MESSAGE_INVALID_EMAILADDRESS);
+            } elseif (!email_multiple_validation($_POST['user_email'])) {
+                $checkError = false;
+                array_push($errors, MESSAGE_UNKNOWN_DNS);
+            }
+        }
+
+        if ((!empty($_POST['user_url'])) && (!url_validation($_POST['user_url']))) {
+            $checkError = false;
+            array_push($errors, "Please enter a valid URL");
+        }
+
+        if ((!empty($_POST['user_fullname'])) && (!preg_match('/^[A-Z \'.-]{2,90}$/i', $_POST['user_fullname']))) {
+            $checkError = false;
+            array_push($errors, MESSAGE_INVALID_FULLNAME);
+        }
+
+        return $checkError;
+    }
+
+    private function applyProfileUpdate($filters, $getProfile, $secret)
+    {
+        $this->userService->setUserEmail(distill_post_request($filters)['user_email']);
+        $this->userService->setUserFullname((isset($_POST['user_fullname']) ? purify_dirty_html(distill_post_request($filters)['user_fullname']) : ""));
+        $this->userService->setUserUrl((isset($_POST['user_url']) ? escape_html(distill_post_request($filters)['user_url'], 'url') : ""));
+        $this->userService->setUserId((isset($_POST['user_id']) ? abs((int)distill_post_request($filters)['user_id']) : 0));
+
+        if (!empty($_POST['user_pass'])) {
+            $this->userService->setUserPass(purify_dirty_html(distill_post_request($filters)['user_pass']));
+        }
+
+        $this->applyProfileCookieUpdate($getProfile, $secret);
+
+        $this->userService->modifyUser();
+        $_SESSION['status'] = "profileUpdated";
+        direct_page('index.php?load=users&status=profileUpdated', 200);
+    }
+
+    private function applyProfileCookieUpdate($getProfile, $secret)
+    {
+        if (($this->userService->identifyCookieToken($secret)) && (!empty($_POST['user_pass']))) {
+            $random_password = Tokenizer::createToken(128);
+            set_cookies_scl('scriptlog_validator', $random_password, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+
+            $random_selector = Tokenizer::createToken(128);
+            set_cookies_scl('scriptlog_selector', $random_selector, time() + Authentication::COOKIE_EXPIRE, Authentication::COOKIE_PATH, domain_name(), is_cookies_secured(), true);
+
+            $hashed_password = Tokenizer::setRandomPasswordProtected($random_password);
+            $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
+
+            $this->userService->setPwdHash($hashed_password);
+            $this->userService->setSelectorHash($hashed_selector);
+            $this->userService->setUserLogin($getProfile['user_login']);
+
+            $expiry_date = date("Y-m-d H:i:s", time() + Authentication::COOKIE_EXPIRE);
+            $this->userService->setCookieExpireDate($expiry_date);
+        }
     }
 
     /**
@@ -649,7 +709,8 @@ class UserController extends BaseApp
         $checkError = true;
         $errors = array();
 
-        if (! $getUser = $this->userService->grabUser($userId)) {
+        $getUser = $this->userService->grabUser($userId);
+        if (!$getUser) {
             $_SESSION['error'] = "userNotFound";
             direct_page('index.php?load=users&error=userNotFound', 404);
         }
@@ -682,12 +743,12 @@ class UserController extends BaseApp
                     $this->view->set('usersTotal', $this->userService->totalUsers());
                     $this->view->set('users', $this->userService->grabUsers());
                     return $this->view->render();
-                } else {
-                    $userEmail = $getUser['user_email'] ?? null;
-                    $this->userService->removeUserWithAnonymization($sanitizeID, $userEmail);
-                    $_SESSION['status'] = "userDeleted";
-                    direct_page('index.php?load=users&status=userDeleted', 302);
                 }
+
+                $userEmail = $getUser['user_email'] ?? null;
+                $this->userService->removeUserWithAnonymization($sanitizeID, $userEmail);
+                $_SESSION['status'] = "userDeleted";
+                direct_page('index.php?load=users&status=userDeleted', 302);
             } catch (Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
@@ -707,17 +768,16 @@ class UserController extends BaseApp
      */
     public function removeProfile($user_login, $authenticator)
     {
-
         $errors = array();
         $checkError = true;
 
-        if (!$getProfile = $this->userService->grabUserByLogin($user_login)) {
+        $getProfile = $this->userService->grabUserByLogin($user_login);
+        if (!$getProfile) {
             $_SESSION['error'] = "profileNotFound";
             direct_page('index.php?load=users&error=profileNotFound', 404);
         }
 
         $data_profile = array(
-
             'ID' => (int)$getProfile['ID'],
             'user_login' => $getProfile['user_login'],
             'user_email' => $getProfile['user_email'],
@@ -726,83 +786,9 @@ class UserController extends BaseApp
             'user_url' => $getProfile['user_url'],
             'user_registered' => $getProfile['user_registered'],
             'user_session' => $getProfile['user_session']
-
         );
 
-        if (isset($_POST['userFormSubmit'])) {
-            $filters = [
-                'user_id' =>  FILTER_SANITIZE_NUMBER_INT,
-                'current_pwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'confirm_pwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
-            ];
-
-            try {
-                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
-                    throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
-                }
-
-                if (
-                    isset($_POST['user_id']) && ($_POST['user_id'] == 1) && ($getProfile['ID'] == 1)
-                    && ($getProfile['user_level'] === 'administrator') && ($this->userService->isUserLevel() === 'administrator')
-                ) {
-                    $checkError = false;
-                    array_push($errors, "Sorry, ID not recognized");
-                }
-
-                if ((!empty($_POST['current_pwd'])) || (!empty($_POST['confirm_pwd']))) {
-                    if (($_POST['current_pwd']) !== ($_POST['confirm_pwd'])) {
-                        $checkError = false;
-                        array_push($errors, "Password should both be equal");
-                    }
-
-                    if (false === $this->userService->reAuthenticateUserPrivilege($getProfile['user_login'], $_POST['current_pwd'])) {
-                        $checkError = false;
-                        array_push($errors, "re-authentication failed, please check your current password");
-                    }
-                }
-
-
-                if (!$checkError) {
-                    $this->setView('remove-profile');
-                    $this->setPageTitle('Remove profile');
-                    $this->setFormAction(ActionConst::DELETEUSER);
-                    $this->view->set('pageTitle', $this->getPageTitle());
-                    $this->view->set('formAction', $this->getFormAction());
-                    $this->view->set('errors', $errors);
-                    $this->view->set('userData', $data_profile);
-                    $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-                } else {
-                    if (true === terminator($getProfile['ID'])) {
-                        (function_exists('sleep')) ? sleep(10) : "";
-
-                        session_unset();
-                        session_destroy();
-                        session_start();
-                        session_regenerate_id(true);
-                        Session::getInstance()->startSession();
-                        ((!empty($_POST['current_pwd'])) && (is_a($authenticator, 'Authentication'))) ?? $authenticator->removeCookies();
-                        Session::getInstance()->destroy();
-
-                        $userId = sanitizer(distill_post_request($filters)['user_id'], 'sql');
-                        $userEmail = $getProfile['user_email'] ?? null;
-                        $this->userService->removeUserWithAnonymization($userId, $userEmail);
-
-                        if (class_exists('NotificationService')) {
-                            $notificationService = new NotificationService($this->configService);
-                            $notificationService->sendProfileDeletionConfirmation($userEmail);
-                        }
-                        direct_page('login.php', 302);
-                    }
-                }
-            } catch (Throwable $th) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($th);
-            } catch (AppException $e) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($e);
-            }
-        } else {
+        if (!isset($_POST['userFormSubmit'])) {
             $this->setView('remove-profile');
             $this->setPageTitle('Remove profile');
             $this->setFormAction(ActionConst::DELETEUSER);
@@ -810,9 +796,88 @@ class UserController extends BaseApp
             $this->view->set('formAction', $this->getFormAction());
             $this->view->set('userData', $data_profile);
             $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+            return $this->view->render();
+        }
+
+        $filters = [
+            'user_id' =>  FILTER_SANITIZE_NUMBER_INT,
+            'current_pwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'confirm_pwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        ];
+
+        try {
+            if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+                header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
+                throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
+            }
+
+            if (
+                isset($_POST['user_id']) && ($_POST['user_id'] == 1) && ($getProfile['ID'] == 1)
+                && ($getProfile['user_level'] === 'administrator') && ($this->userService->isUserLevel() === 'administrator')
+            ) {
+                $checkError = false;
+                array_push($errors, "Sorry, ID not recognized");
+            }
+
+            if ((!empty($_POST['current_pwd'])) || (!empty($_POST['confirm_pwd']))) {
+                if (($_POST['current_pwd']) !== ($_POST['confirm_pwd'])) {
+                    $checkError = false;
+                    array_push($errors, "Password should both be equal");
+                }
+
+                if (false === $this->userService->reAuthenticateUserPrivilege($getProfile['user_login'], $_POST['current_pwd'])) {
+                    $checkError = false;
+                    array_push($errors, "re-authentication failed, please check your current password");
+                }
+            }
+
+            if (!$checkError) {
+                $this->setView('remove-profile');
+                $this->setPageTitle('Remove profile');
+                $this->setFormAction(ActionConst::DELETEUSER);
+                $this->view->set('pageTitle', $this->getPageTitle());
+                $this->view->set('formAction', $this->getFormAction());
+                $this->view->set('errors', $errors);
+                $this->view->set('userData', $data_profile);
+                $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+                return $this->view->render();
+            }
+
+            $this->processProfileDeletion($filters, $getProfile, $authenticator);
+        } catch (Throwable $th) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($th);
+        } catch (AppException $e) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($e);
         }
 
         return $this->view->render();
+    }
+
+    private function processProfileDeletion($filters, $getProfile, $authenticator)
+    {
+        if (true === terminator($getProfile['ID'])) {
+            (function_exists('sleep')) ? sleep(10) : "";
+
+            session_unset();
+            session_destroy();
+            session_start();
+            session_regenerate_id(true);
+            Session::getInstance()->startSession();
+            ((!empty($_POST['current_pwd'])) && (is_a($authenticator, 'Authentication'))) ?? $authenticator->removeCookies();
+            Session::getInstance()->destroy();
+
+            $userId = sanitizer(distill_post_request($filters)['user_id'], 'sql');
+            $userEmail = $getProfile['user_email'] ?? null;
+            $this->userService->removeUserWithAnonymization($userId, $userEmail);
+
+            if (class_exists('NotificationService')) {
+                $notificationService = new NotificationService($this->configService);
+                $notificationService->sendProfileDeletionConfirmation($userEmail);
+            }
+            direct_page('login.php', 302);
+        }
     }
 
     /**

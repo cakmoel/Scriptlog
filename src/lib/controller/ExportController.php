@@ -11,6 +11,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0
+ * @SuppressWarnings(PHPMD.ElseExpression)
  *
  */
 class ExportController extends BaseApp
@@ -178,7 +179,7 @@ class ExportController extends BaseApp
      *
      * @param string $viewName
      */
-    protected function setView($viewName)
+    protected function setView($_viewName)
     {
         // Views are handled inline
     }
