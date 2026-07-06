@@ -3,6 +3,7 @@
 use Melbahja\Seo\Schema;
 use Melbahja\Seo\Schema\Thing;
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * class BlogSchema
  *

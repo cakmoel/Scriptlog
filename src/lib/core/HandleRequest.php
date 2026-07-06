@@ -32,18 +32,18 @@ final class HandleRequest
     private static $frontHelper;
 
     /**
-     * ThemeRenderer instance for centralized theme rendering
+     * ThemeRendererInterface instance for centralized theme rendering
      *
-     * @var ThemeRenderer|null
+     * @var ThemeRendererInterface|null
      */
-    private static ?ThemeRenderer $themeRenderer = null;
+    private static ?ThemeRendererInterface $themeRenderer = null;
 
     /**
-     * Set the ThemeRenderer instance
+     * Set the ThemeRendererInterface instance
      *
-     * @param ThemeRenderer|null $renderer
+     * @param ThemeRendererInterface|null $renderer
      */
-    public static function setThemeRenderer(?ThemeRenderer $renderer): void
+    public static function setThemeRenderer(?ThemeRendererInterface $renderer): void
     {
         self::$themeRenderer = $renderer;
     }
@@ -77,7 +77,7 @@ final class HandleRequest
         $parameters = [];
 
         if (is_array($rules)) {
-            foreach ($rules as $key => $value) {
+            foreach ($rules as $value) {
                 if (preg_match('~^' . $value . '$~i', $uri, $matches)) {
                     $parameters[] = $matches;
                     return $parameters;
@@ -106,7 +106,8 @@ final class HandleRequest
 
         $path = implode(DIRECTORY_SEPARATOR, $parts);
 
-        if (($position = strpos($path, '?')) !== false) {
+        $position = strpos($path, '?');
+        if ($position !== false) {
             $path = substr($path, 0, $position);
         }
 
@@ -128,9 +129,9 @@ final class HandleRequest
 
         if (isset($path[$args])) {
             return basename($path[$args]);
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -177,7 +178,7 @@ final class HandleRequest
      * allowedPathRequested
      * * Checking whether the first segment of the URI is in the whitelist.
      */
-    public static function allowedPathRequested($path, $rules)
+    public static function allowedPathRequested($path, $_rules)
     {
         // Fix: We only check if the first path segment (e.g., 'post', 'category')
         // is present in the simple $path whitelist. This allows the Dispatcher
@@ -194,6 +195,70 @@ final class HandleRequest
         return false;
     }
 
+    private static function renderTemplate($template, $statusCode = 200)
+    {
+        if (self::$themeRenderer) {
+            if ($template === '404') {
+                self::$themeRenderer->render404();
+                return;
+            }
+            self::$themeRenderer->render($template);
+            return;
+        }
+
+        http_response_code($statusCode);
+        call_theme_header();
+        call_theme_content($template);
+        call_theme_footer();
+    }
+
+    private static function handleDownloadRequest($identifier)
+    {
+        if (strpos($_SERVER['REQUEST_URI'], '/file') !== false) {
+            $identifier = preg_replace('#/file$#', '', $identifier);
+            $downloadController = self::getDownloadController();
+            $downloadController->download($identifier);
+            return;
+        }
+
+        self::renderTemplate('download');
+    }
+
+    private static function handlePathBasedDownload($firstSegment)
+    {
+        if ($firstSegment !== 'download') {
+            return false;
+        }
+
+        $requestPath = self::findRequestToPath();
+        $pathParts = explode('/', trim($requestPath, '/'));
+        $identifier = $pathParts[1] ?? '';
+        $isFileDownload = isset($pathParts[2]) && $pathParts[2] === 'file';
+
+        if (empty($identifier) || !preg_match('/^[a-f0-9\-]{36}$/', $identifier)) {
+            return false;
+        }
+
+        if ($isFileDownload) {
+            $downloadController = self::getDownloadController();
+            $downloadController->download($identifier);
+            return true;
+        }
+
+        $GLOBALS['download_identifier'] = $identifier;
+        self::renderTemplate('download');
+        return true;
+    }
+
+    private static function getDownloadController()
+    {
+        $controller = class_exists('Registry') ? Registry::get('downloadController') : null;
+        if ($controller instanceof DownloadController) {
+            return $controller;
+        }
+        return new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
+    }
+
     /**
      * deliverQueryString
      *
@@ -202,9 +267,7 @@ final class HandleRequest
     {
         $queryKey = static::isQueryStringRequested()['key'];
 
-        // Use HandlerRegistry if available
         $registry = class_exists('Registry') ? Registry::get('handlerRegistry') : null;
-
         if ($registry instanceof HandlerRegistry && $registry->has($queryKey)) {
             $registry->get($queryKey)->handle([
                 'key'   => $queryKey,
@@ -215,277 +278,143 @@ final class HandleRequest
 
         switch ($queryKey) {
             case 'p':
-                // Deliver request to a single post entry
-                if (! empty(static::isQueryStringRequested()['value'])) {
-                    $query_post = self::handleFrontHelper()->grabSimpleFrontPost(static::isQueryStringRequested()['value']);
-
-                    if (empty($query_post['ID'])) {
-                        if (self::$themeRenderer) {
-                            self::$themeRenderer->render404();
-                        } else {
-                            http_response_code(404);
-                            call_theme_header();
-                            call_theme_content('404');
-                            call_theme_footer();
-                        }
-                    } else {
-                        if (self::$themeRenderer) {
-                            self::$themeRenderer->render('single');
-                        } else {
-                            http_response_code(200);
-                            call_theme_header();
-                            call_theme_content('single');
-                            call_theme_footer();
-                        }
-                    }
-                } else {
-                    direct_page('', 302);
-                }
-
+                self::deliverQueryPost();
                 break;
-
             case 'cat':
-                // Deliver request to a single category or topic
-                if (! empty(static::isQueryStringRequested()['value'])) {
-                    $query_cat = self::handleFrontHelper()->grabSimpleFrontTopic(static::isQueryStringRequested()['value']);
-
-                    if (empty($query_cat['ID'])) {
-                        if (self::$themeRenderer) {
-                            self::$themeRenderer->render404();
-                        } else {
-                            http_response_code(404);
-                            call_theme_header();
-                            call_theme_content('404');
-                            call_theme_footer();
-                        }
-                    } else {
-                        if (self::$themeRenderer) {
-                            self::$themeRenderer->render('category');
-                        } else {
-                            http_response_code(200);
-                            call_theme_header();
-                            call_theme_content('category');
-                            call_theme_footer();
-                        }
-                    }
-                } else {
-                    direct_page('', 302);
-                }
-
+                self::deliverQueryCategory();
                 break;
-
             case 'pg':
-                // Deliver request to a single page
-                if (! empty(static::isQueryStringRequested()['value'])) {
-                    $query_page = self::handleFrontHelper()->grabSimpleFrontPage(static::isQueryStringRequested()['value']);
-
-                    if (empty($query_page['ID'])) {
-                        if (self::$themeRenderer) {
-                            self::$themeRenderer->render404();
-                        } else {
-                            http_response_code(404);
-                            call_theme_header();
-                            call_theme_content('404');
-                            call_theme_footer();
-                        }
-                    } else {
-                        if (self::$themeRenderer) {
-                            self::$themeRenderer->render('page');
-                        } else {
-                            http_response_code(200);
-                            call_theme_header();
-                            call_theme_content('page');
-                            call_theme_footer();
-                        }
-                    }
-                } else {
-                    direct_page('', 302);
-                }
-
+                self::deliverQueryPage();
                 break;
-
             case 'a':
-                // Deliver request to an archives
-                if (! empty(static::isQueryStringRequested()['value'])) {
-                    if (self::$themeRenderer) {
-                        self::$themeRenderer->render('archive');
-                    } else {
-                        http_response_code(200);
-                        call_theme_header();
-                        call_theme_content('archive');
-                        call_theme_footer();
-                    }
-                } else {
-                    direct_page('', 302);
-                }
-
+                self::deliverQueryArchive();
                 break;
-
             case 'tag':
-                // Deliver request to a tag - always render tag page, let template handle "no results"
-                if (! empty(static::isQueryStringRequested()['value'])) {
-                    if (self::$themeRenderer) {
-                        self::$themeRenderer->render('tag');
-                    } else {
-                        http_response_code(200);
-                        call_theme_header();
-                        call_theme_content('tag');
-                        call_theme_footer();
-                    }
-                } else {
-                    direct_page('', 302);
-                }
-
+                self::deliverQueryTag();
                 break;
-
             case 'blog':
-                // Deliver request to blog
-                if (self::$themeRenderer) {
-                    self::$themeRenderer->render('blog');
-                } else {
-                    http_response_code(200);
-                    call_theme_header();
-                    call_theme_content('blog');
-                    call_theme_footer();
-                }
-
+                self::renderTemplate('blog');
                 break;
-
             case 'privacy':
-                // Deliver request to privacy policy page
-                if (self::$themeRenderer) {
-                    self::$themeRenderer->render('privacy');
-                } else {
-                    http_response_code(200);
-                    call_theme_header();
-                    call_theme_content('privacy');
-                    call_theme_footer();
-                }
-
+                self::renderTemplate('privacy');
                 break;
-
             case 'download':
-                // Deliver download request (query string URL)
-                $identifier = static::isQueryStringRequested()['value'] ?? '';
-
-                if (!empty($identifier)) {
-                    // Check if it's a file download request (?download={id}/file)
-                    if (strpos($_SERVER['REQUEST_URI'], '/file') !== false) {
-                        // Strip /file suffix from identifier for file download
-                        $identifier = preg_replace('#/file$#', '', $identifier);
-                        // Handle file download
-                        $downloadController = class_exists('Registry') ? Registry::get('downloadController') : null;
-                        if ($downloadController instanceof DownloadController) {
-                            $downloadController->download($identifier);
-                        } else {
-                            $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
-                            $downloadController->download($identifier);
-                        }
-                    } else {
-                        // Render download page
-                        if (self::$themeRenderer) {
-                            self::$themeRenderer->render('download');
-                        } else {
-                            http_response_code(200);
-                            call_theme_header();
-                            call_theme_content('download');
-                            call_theme_footer();
-                        }
-                    }
-                } else {
-                    direct_page('', 302);
-                }
-
+                self::deliverQueryDownload();
                 break;
-
-            default:  # default request will be delivered
-                # When permalinks are disabled, check if the path is valid
-                # Get the first path segment (without query string)
-                $firstSegment = self::isRequestToPathValid(0);
-
-                # Define valid segments when permalinks are disabled
-                $validSegments = ['', 'index.php', 'blog', 'privacy', 'download', 'download_file', 'rss.php', 'atom.php'];
-
-                # Also check query string keys that are handled
-                $queryStringKey = static::isQueryStringRequested()['key'];
-
-                # Handle path-based download URLs when permalinks are disabled
-                if ($firstSegment === 'download') {
-                    $requestPath = self::findRequestToPath();
-                    $pathParts = explode('/', trim($requestPath, '/'));
-                    $identifier = $pathParts[1] ?? '';
-                    $isFileDownload = isset($pathParts[2]) && $pathParts[2] === 'file';
-
-                    if (!empty($identifier) && preg_match('/^[a-f0-9\-]{36}$/', $identifier)) {
-                        if ($isFileDownload) {
-                            # Handle file download
-                            $downloadController = class_exists('Registry') ? Registry::get('downloadController') : null;
-                            if ($downloadController instanceof DownloadController) {
-                                $downloadController->download($identifier);
-                            } else {
-                                $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
-                                $downloadController->download($identifier);
-                            }
-                        } else {
-                            # Render download page
-                            $GLOBALS['download_identifier'] = $identifier;
-                            if (self::$themeRenderer) {
-                                self::$themeRenderer->render('download');
-                            } else {
-                                http_response_code(200);
-                                call_theme_header();
-                                call_theme_content('download');
-                                call_theme_footer();
-                            }
-                        }
-                        break;
-                    }
-                }
-
-                if (!empty($queryStringKey)) {
-                    # Has query string - let the switch handle it above
-                    if (false === static::checkMatchUriRequested()) {
-                        if (self::$themeRenderer) {
-                            self::$themeRenderer->render404();
-                        } else {
-                            http_response_code(404);
-                            call_theme_header();
-                            call_theme_content('404');
-                            call_theme_footer();
-                        }
-                    } else {
-                        if (self::$themeRenderer) {
-                            self::$themeRenderer->render('home');
-                        } else {
-                            http_response_code(200);
-                            call_theme_header();
-                            call_theme_content('home');
-                            call_theme_footer();
-                        }
-                    }
-                } elseif (empty($firstSegment) || in_array($firstSegment, $validSegments, true)) {
-                    # No query string but valid path segment - show home
-                    if (self::$themeRenderer) {
-                        self::$themeRenderer->render('home');
-                    } else {
-                        http_response_code(200);
-                        call_theme_header();
-                        call_theme_content('home');
-                        call_theme_footer();
-                    }
-                } else {
-                    # Invalid path - show 404
-                    if (self::$themeRenderer) {
-                        self::$themeRenderer->render404();
-                    } else {
-                        http_response_code(404);
-                        call_theme_header();
-                        call_theme_content('404');
-                        call_theme_footer();
-                    }
-                }
-
+            default:
+                self::deliverDefaultQuery();
                 break;
         }
+    }
+
+    private static function deliverQueryPost()
+    {
+        $value = static::isQueryStringRequested()['value'];
+        if (empty($value)) {
+            direct_page('', 302);
+            return;
+        }
+
+        $query_post = self::handleFrontHelper()->grabSimpleFrontPost($value);
+        if (empty($query_post['ID'])) {
+            self::renderTemplate('404', 404);
+            return;
+        }
+
+        self::renderTemplate('single');
+    }
+
+    private static function deliverQueryCategory()
+    {
+        $value = static::isQueryStringRequested()['value'];
+        if (empty($value)) {
+            direct_page('', 302);
+            return;
+        }
+
+        $query_cat = self::handleFrontHelper()->grabSimpleFrontTopic($value);
+        if (empty($query_cat['ID'])) {
+            self::renderTemplate('404', 404);
+            return;
+        }
+
+        self::renderTemplate('category');
+    }
+
+    private static function deliverQueryPage()
+    {
+        $value = static::isQueryStringRequested()['value'];
+        if (empty($value)) {
+            direct_page('', 302);
+            return;
+        }
+
+        $query_page = self::handleFrontHelper()->grabSimpleFrontPage($value);
+        if (empty($query_page['ID'])) {
+            self::renderTemplate('404', 404);
+            return;
+        }
+
+        self::renderTemplate('page');
+    }
+
+    private static function deliverQueryArchive()
+    {
+        $value = static::isQueryStringRequested()['value'];
+        if (empty($value)) {
+            direct_page('', 302);
+            return;
+        }
+
+        self::renderTemplate('archive');
+    }
+
+    private static function deliverQueryTag()
+    {
+        $value = static::isQueryStringRequested()['value'];
+        if (empty($value)) {
+            direct_page('', 302);
+            return;
+        }
+
+        self::renderTemplate('tag');
+    }
+
+    private static function deliverQueryDownload()
+    {
+        $identifier = static::isQueryStringRequested()['value'] ?? '';
+        if (empty($identifier)) {
+            direct_page('', 302);
+            return;
+        }
+
+        self::handleDownloadRequest($identifier);
+    }
+
+    private static function deliverDefaultQuery()
+    {
+        $firstSegment = self::isRequestToPathValid(0);
+        $validSegments = ['', 'index.php', 'blog', 'privacy', 'download', 'download_file', 'rss.php', 'atom.php'];
+        $queryStringKey = static::isQueryStringRequested()['key'];
+
+        if (self::handlePathBasedDownload($firstSegment)) {
+            return;
+        }
+
+        if (!empty($queryStringKey)) {
+            if (static::checkMatchUriRequested()) {
+                self::renderTemplate('home');
+                return;
+            }
+            self::renderTemplate('404', 404);
+            return;
+        }
+
+        if (empty($firstSegment) || in_array($firstSegment, $validSegments, true)) {
+            self::renderTemplate('home');
+            return;
+        }
+
+        self::renderTemplate('404', 404);
     }
 }

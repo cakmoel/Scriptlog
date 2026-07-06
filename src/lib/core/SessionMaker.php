@@ -39,6 +39,7 @@ class SessionMaker extends SessionHandler
     /**
      * Instantiate session cookies
      *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      * @param string $key
      * @param string $name
      * @param array $cookie
@@ -51,26 +52,26 @@ class SessionMaker extends SessionHandler
         $this->name = $name;
         $this->cookie = $cookie;
 
-        $current_cookie_params = ini_get('session.use_cookies') ? session_get_cookie_params() : [];
+        $cookieParams = ini_get('session.use_cookies') ? session_get_cookie_params() : [];
 
         $httponly = true;
 
         if (PHP_VERSION_ID < 70300) {
             $this->cookie += [
 
-               'lifetime' => $current_cookie_params['lifetime'] ?? 0,
+               'lifetime' => $cookieParams['lifetime'] ?? 0,
                'path'     => '/; samesite=lax',
-               'domain'   => $current_cookie_params['domain'] ?? '',
+               'domain'   => $cookieParams['domain'] ?? '',
                'secure'   => is_cookies_secured(),
                'httponly' => $httponly
 
             ];
-        } else {
+        } else { // @SuppressWarnings(PHPMD.ElseExpression)
             $this->cookie += [
 
-               'lifetime' => $current_cookie_params['lifetime'] ?? 0,
+               'lifetime' => $cookieParams['lifetime'] ?? 0,
                'path'     => ini_get('session.cookies_path'),
-               'domain'   => $current_cookie_params['domain'] ?? '',
+               'domain'   => $cookieParams['domain'] ?? '',
                'secure'   => is_cookies_secured(),
                'httponly' => $httponly,
                'samesite' => 'lax'
@@ -85,6 +86,7 @@ class SessionMaker extends SessionHandler
      * setup
      * set the session cookie parameters
      *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      * @method private setup()
      * @return void
      *
@@ -96,7 +98,7 @@ class SessionMaker extends SessionHandler
 
         if (PHP_VERSION_ID < 70300) {
             session_set_cookie_params($this->cookie['lifetime'], $this->cookie['path'], $this->cookie['domain'], $this->cookie['secure'], $this->cookie['httponly']);
-        } else {
+        } else { // @SuppressWarnings(PHPMD.ElseExpression)
             session_set_cookie_params([
 
                'lifetime' => $this->cookie['lifetime'],
@@ -113,6 +115,7 @@ class SessionMaker extends SessionHandler
     /**
      * start
      *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      * @return bool
      *
      */
@@ -129,7 +132,7 @@ class SessionMaker extends SessionHandler
                         return false;
                     }
                 }
-            } else {
+            } else { // @SuppressWarnings(PHPMD.ElseExpression)
                 if (session_status() == PHP_SESSION_NONE) {
                     try {
                         session_start();
@@ -345,9 +348,9 @@ class SessionMaker extends SessionHandler
         if (!headers_sent() && php_sapi_name() !== 'cli') {
             if (version_compare(phpversion(), '5.6.0', '>=')) {
                 return (session_status() === PHP_SESSION_ACTIVE) ? true : false;
-            } else {
-                return (session_id() === '') ? false : true;
             }
+
+            return (session_id() === '') ? false : true;
         }
 
         return false;
