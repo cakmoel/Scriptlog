@@ -129,7 +129,7 @@
                           <i class="fa fa-pencil fa-fw" aria-hidden="true"></i> </a>
                       </td>
                       <td>
-                        <a href="javascript:deleteMenu('<?= abs((int)$menu['ID']); ?>', '<?= $menu['menu_label']; ?>')" class="btn btn-danger" title="Deactivate menu">
+                        <a href="javascript:deleteMenu('<?= abs((int)$menu['ID']); ?>', '<?= htmlspecialchars($menu['menu_label'], ENT_QUOTES, 'UTF-8'); ?>')" class="btn btn-danger" title="Deactivate menu">
                           <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> </a>
                       </td>
 

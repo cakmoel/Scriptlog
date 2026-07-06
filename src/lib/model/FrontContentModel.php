@@ -98,9 +98,9 @@ final class FrontContentModel extends BaseModel
 
         if ($position === 'sidebar') {
             return self::$postModel->getPostsOnSidebar($limit);
-        } else {
-            return self::$postModel->getLatestPosts($limit);
         }
+
+        return self::$postModel->getLatestPosts($limit);
     }
 
     /**

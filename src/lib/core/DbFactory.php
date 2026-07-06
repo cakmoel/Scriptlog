@@ -28,11 +28,11 @@ class DbFactory
         try {
             $database = "Db";
 
-            if (class_exists($database)) {
-                return new $database($connection, $options);
-            } else {
+            if (!class_exists($database)) {
                 throw new DbException("Database object does not exists");
             }
+
+            return new $database($connection, $options);
         } catch (\Throwable $th) {
             LogError::setStatusCode(http_response_code(500));
             LogError::exceptionHandler($th);

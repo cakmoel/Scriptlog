@@ -276,13 +276,14 @@ class MigrationService
 
             if ($existingTopic) {
                 $this->categoryMap[$topic['ID']] = $existingTopic['ID'];
-            } else {
-                $topicId = $this->createTopic($name, $slug);
+                continue;
+            }
 
-                if ($topicId) {
-                    $this->categoryMap[$topic['ID']] = $topicId;
-                    $this->importStats['categories_created']++;
-                }
+            $topicId = $this->createTopic($name, $slug);
+
+            if ($topicId) {
+                $this->categoryMap[$topic['ID']] = $topicId;
+                $this->importStats['categories_created']++;
             }
         }
     }
@@ -311,30 +312,31 @@ class MigrationService
                 if ($existingPost) {
                     $this->importStats['posts_skipped']++;
                     $this->postIdMap[$originalPostId] = $existingPost['ID'];
-                } else {
-                    $postData = [
-                      'post_author' => $this->authorId,
-                      'post_date' => $this->formatDate($post['post_date'] ?? date('Y-m-d H:i:s')),
-                      'post_modified' => $this->formatDate($post['post_modified'] ?? date('Y-m-d H:i:s')),
-                      'post_title' => $title,
-                      'post_slug' => $this->ensureUniqueSlug($slug),
-                      'post_content' => $content,
-                      'post_summary' => $excerpt,
-                      'post_status' => $this->mapStatus($post['post_status'] ?? 'publish'),
-                      'post_visibility' => $post['post_visibility'] ?? 'public',
-                      'post_password' => $post['post_password'] ?? '',
-                      'post_tags' => $this->sanitizeInput($post['post_tags'] ?? ''),
-                      'post_type' => $post['post_type'] ?? 'blog',
-                      'comment_status' => $post['comment_status'] ?? 'open',
-                      'media_id' => 0
-                    ];
+                    continue;
+                }
 
-                    $postId = $this->createPost($postData);
+                $postData = [
+                  'post_author' => $this->authorId,
+                  'post_date' => $this->formatDate($post['post_date'] ?? date('Y-m-d H:i:s')),
+                  'post_modified' => $this->formatDate($post['post_modified'] ?? date('Y-m-d H:i:s')),
+                  'post_title' => $title,
+                  'post_slug' => $this->ensureUniqueSlug($slug),
+                  'post_content' => $content,
+                  'post_summary' => $excerpt,
+                  'post_status' => $this->mapStatus($post['post_status'] ?? 'publish'),
+                  'post_visibility' => $post['post_visibility'] ?? 'public',
+                  'post_password' => $post['post_password'] ?? '',
+                  'post_tags' => $this->sanitizeInput($post['post_tags'] ?? ''),
+                  'post_type' => $post['post_type'] ?? 'blog',
+                  'comment_status' => $post['comment_status'] ?? 'open',
+                  'media_id' => 0
+                ];
 
-                    if ($postId) {
-                        $this->postIdMap[$originalPostId] = $postId;
-                        $this->importStats['posts_created']++;
-                    }
+                $postId = $this->createPost($postData);
+
+                if ($postId) {
+                    $this->postIdMap[$originalPostId] = $postId;
+                    $this->importStats['posts_created']++;
                 }
             } catch (\Throwable $e) {
                 $this->importStats['errors'][] = 'Error importing post: ' . ($post['post_title'] ?? 'Unknown') . ' - ' . $e->getMessage();
@@ -364,30 +366,31 @@ class MigrationService
 
                 if ($existingPost) {
                     $this->postIdMap[$originalPageId] = $existingPost['ID'];
-                } else {
-                    $postData = [
-                      'post_author' => $this->authorId,
-                      'post_date' => $this->formatDate($page['post_date'] ?? date('Y-m-d H:i:s')),
-                      'post_modified' => $this->formatDate($page['post_modified'] ?? date('Y-m-d H:i:s')),
-                      'post_title' => $title,
-                      'post_slug' => $this->ensureUniqueSlug($slug),
-                      'post_content' => $content,
-                      'post_summary' => '',
-                      'post_status' => $this->mapStatus($page['post_status'] ?? 'publish'),
-                      'post_visibility' => $page['post_visibility'] ?? 'public',
-                      'post_password' => '',
-                      'post_tags' => '',
-                      'post_type' => 'page',
-                      'comment_status' => 'closed',
-                      'media_id' => 0
-                    ];
+                    continue;
+                }
 
-                    $pageId = $this->createPost($postData);
+                $postData = [
+                  'post_author' => $this->authorId,
+                  'post_date' => $this->formatDate($page['post_date'] ?? date('Y-m-d H:i:s')),
+                  'post_modified' => $this->formatDate($page['post_modified'] ?? date('Y-m-d H:i:s')),
+                  'post_title' => $title,
+                  'post_slug' => $this->ensureUniqueSlug($slug),
+                  'post_content' => $content,
+                  'post_summary' => '',
+                  'post_status' => $this->mapStatus($page['post_status'] ?? 'publish'),
+                  'post_visibility' => $page['post_visibility'] ?? 'public',
+                  'post_password' => '',
+                  'post_tags' => '',
+                  'post_type' => 'page',
+                  'comment_status' => 'closed',
+                  'media_id' => 0
+                ];
 
-                    if ($pageId) {
-                        $this->postIdMap[$originalPageId] = $pageId;
-                        $this->importStats['pages_created']++;
-                    }
+                $pageId = $this->createPost($postData);
+
+                if ($pageId) {
+                    $this->postIdMap[$originalPageId] = $pageId;
+                    $this->importStats['pages_created']++;
                 }
             } catch (\Throwable $e) {
                 $this->importStats['errors'][] = 'Error importing page: ' . ($page['post_title'] ?? 'Unknown') . ' - ' . $e->getMessage();
@@ -492,12 +495,13 @@ class MigrationService
                         ['setting_value' => $value],
                         ['setting_name' => $name]
                     );
-                } else {
-                    $this->dbc->dbInsert('tbl_settings', [
-                      'setting_name' => $name,
-                      'setting_value' => $value
-                    ]);
+                    continue;
                 }
+
+                $this->dbc->dbInsert('tbl_settings', [
+                  'setting_name' => $name,
+                  'setting_value' => $value
+                ]);
             } catch (\Throwable $e) {
                 $this->importStats['errors'][] = 'Error importing setting: ' . $name;
             }
@@ -601,13 +605,14 @@ class MigrationService
 
             if ($existingTopic) {
                 $this->categoryMap[$slug] = $existingTopic['ID'];
-            } else {
-                $topicId = $this->createTopic($name, $slug);
+                continue;
+            }
 
-                if ($topicId) {
-                    $this->categoryMap[$slug] = $topicId;
-                    $this->importStats['categories_created']++;
-                }
+            $topicId = $this->createTopic($name, $slug);
+
+            if ($topicId) {
+                $this->categoryMap[$slug] = $topicId;
+                $this->importStats['categories_created']++;
             }
         }
     }
@@ -634,44 +639,41 @@ class MigrationService
 
                 if ($existingPost) {
                     $this->importStats['posts_skipped']++;
-                    $originalPostId = $existingPost['ID'];
-                } else {
-                    $postData = [
-                      'post_author' => $this->authorId,
-                      'post_date' => $this->formatDate($post['date'] ?? date('Y-m-d H:i:s')),
-                      'post_title' => $title,
-                      'post_slug' => $this->ensureUniqueSlug($slug),
-                      'post_content' => $content,
-                      'post_summary' => $excerpt,
-                      'post_status' => $this->mapStatus($post['status'] ?? 'publish'),
-                      'post_visibility' => 'public',
-                      'post_password' => '',
-                      'post_tags' => implode(',', $post['tags'] ?? []),
-                      'post_type' => $post['type'] ?? 'blog',
-                      'comment_status' => $post['comment_status'] ?? 'open'
-                    ];
-
-                    $postId = $this->createPost($postData);
-
-                    if ($postId) {
-                        $this->postIdMap[$post['id'] ?? $postId] = $postId;
-
-                        if (!empty($post['categories'])) {
-                            $this->assignCategories($postId, $post['categories']);
-                        }
-
-                        if ($post['type'] === 'page') {
-                            $this->importStats['pages_created']++;
-                        } else {
-                            $this->importStats['posts_created']++;
-                        }
-
-                        $originalPostId = $postId;
-                    } else {
-                        $this->importStats['errors'][] = 'Failed to create post: ' . $title;
-                        continue;
-                    }
+                    $this->postIdMap[$post['id'] ?? $existingPost['ID']] = $existingPost['ID'];
+                    continue;
                 }
+
+                $postData = [
+                  'post_author' => $this->authorId,
+                  'post_date' => $this->formatDate($post['date'] ?? date('Y-m-d H:i:s')),
+                  'post_title' => $title,
+                  'post_slug' => $this->ensureUniqueSlug($slug),
+                  'post_content' => $content,
+                  'post_summary' => $excerpt,
+                  'post_status' => $this->mapStatus($post['status'] ?? 'publish'),
+                  'post_visibility' => 'public',
+                  'post_password' => '',
+                  'post_tags' => implode(',', $post['tags'] ?? []),
+                  'post_type' => $post['type'] ?? 'blog',
+                  'comment_status' => $post['comment_status'] ?? 'open'
+                ];
+
+                $postId = $this->createPost($postData);
+
+                if (!$postId) {
+                    $this->importStats['errors'][] = 'Failed to create post: ' . $title;
+                    continue;
+                }
+
+                $this->postIdMap[$post['id'] ?? $postId] = $postId;
+
+                if (!empty($post['categories'])) {
+                    $this->assignCategories($postId, $post['categories']);
+                }
+
+                $this->importStats[($post['type'] === 'page') ? 'pages_created' : 'posts_created']++;
+
+                $originalPostId = $postId;
 
                 if (!empty($post['comments'])) {
                     $this->importComments($post['comments'], $originalPostId);

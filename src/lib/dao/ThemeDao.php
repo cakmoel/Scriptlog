@@ -157,9 +157,9 @@ class ThemeDao extends Dao
             $is_actived = $this->findColumn([$theme_title]);
 
             return (empty($is_actived)) ?: $is_actived;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

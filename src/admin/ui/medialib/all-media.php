@@ -111,7 +111,7 @@
                         </td>
 
                         <td>
-                        <a href="javascript:deleteMedia('<?= abs((int)$media['ID']); ?>', '<?= $media['media_user']; ?>')" class="btn btn-danger" title="Delete media">
+                        <a href="javascript:deleteMedia('<?= abs((int)$media['ID']); ?>', '<?= htmlspecialchars($media['media_user'], ENT_QUOTES, 'UTF-8'); ?>')" class="btn btn-danger" title="Delete media">
                         <i class="fa fa-trash-o fa-fw"></i> </a>
                         </td>
 

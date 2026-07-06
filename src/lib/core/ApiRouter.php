@@ -32,6 +32,16 @@ class ApiRouter
     private $allowedMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
     /**
+     * @var array|null Compiled combined regex cache per method
+     */
+    private $compiled = null;
+
+    /**
+     * @var int Max routes per combined regex chunk
+     */
+    const CHUNK_SIZE = 10;
+
+    /**
      * Register a GET route
      *
      * @param string $pattern Route pattern
@@ -238,7 +248,13 @@ class ApiRouter
     }
 
     /**
-     * Match the request URI to a route
+     * Match the request URI to a route using combined-regex dispatch.
+     *
+     * Phase 1: Single preg_match per chunk quickly eliminates non-matching
+     * URIs. Phase 2: Iterate the chunk's dispatch table to identify the
+     * specific route using each entry's original regex. This keeps the
+     * fast-fail path (non-matching URI) at O(1) preg_match per chunk,
+     * while the identification path uses targeted per-route checks.
      *
      * @param string $method HTTP method
      * @param string $uri Request URI
@@ -250,24 +266,98 @@ class ApiRouter
             return false;
         }
 
-        foreach ($this->routes[$method] as $regex => $route) {
-            if (preg_match($regex, $uri, $matches)) {
-                // Extract named parameters
-                $params = [];
-                foreach ($matches as $key => $value) {
-                    if (!is_numeric($key)) {
-                        $params[$key] = $value;
-                    }
-                }
+        if ($this->compiled === null) {
+            $this->compiled = [];
+        }
 
-                return [
-                    'handler' => $route['handler'],
-                    'params' => $params
-                ];
+        if (!isset($this->compiled[$method])) {
+            $this->compiled[$method] = $this->compileRoutes($method);
+        }
+
+        $chunks = $this->compiled[$method];
+
+        if (empty($chunks)) {
+            return false;
+        }
+
+        foreach ($chunks as $chunk) {
+            if (!preg_match($chunk['regex'], $uri)) {
+                continue;
+            }
+
+            foreach ($chunk['map'] as $route) {
+                if (preg_match($route['regex'], $uri, $routeMatches)) {
+                    $params = [];
+                    foreach ($routeMatches as $key => $value) {
+                        if (is_string($key) && !empty($key)) {
+                            $params[$key] = $value;
+                        }
+                    }
+
+                    return ['handler' => $route['handler'], 'params' => $params];
+                }
             }
         }
 
         return false;
+    }
+
+    /**
+     * Compile all routes for a given HTTP method into combined regex chunks.
+     *
+     * Each chunk contains up to CHUNK_SIZE routes combined into a single
+     * (?|...) branch-reset regex. A dispatch table maps each branch to its
+     * handler, parameter positions, verification prefix, and suffix.
+     *
+     * @param string $method
+     * @return array|null
+     */
+    private function compileRoutes($method)
+    {
+        if (!isset($this->routes[$method]) || empty($this->routes[$method])) {
+            return null;
+        }
+
+        $routeList = $this->routes[$method];
+        $chunks = array_chunk($routeList, self::CHUNK_SIZE, true);
+        $compiled = [];
+
+        foreach ($chunks as $chunkRoutes) {
+            $branches = [];
+            $chunkMap = [];
+
+            foreach ($chunkRoutes as $regex => $route) {
+                $inner = substr($regex, 2, -2);
+
+                $paramMap = [];
+                $numbered = preg_replace_callback(
+                    '/\(\?P<(\w+)>([^)]+)\)/',
+                    function ($m) use (&$paramMap) {
+                        $pos = count($paramMap) + 1;
+                        $paramMap[$pos] = $m[1];
+                        return '(' . $m[2] . ')';
+                    },
+                    $inner
+                );
+
+                $branches[] = $numbered;
+
+                $chunkMap[] = [
+                    'handler' => $route['handler'],
+                    'regex' => $regex,
+                    'paramMap' => $paramMap,
+                ];
+            }
+
+            $combined = '~^(?|' . implode('|', $branches) . ')$~ix';
+
+            $compiled[] = [
+                'regex' => $combined,
+                'map' => $chunkMap,
+            ];
+        }
+
+        return $compiled;
     }
 
     /**

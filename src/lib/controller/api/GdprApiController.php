@@ -51,7 +51,7 @@ class GdprApiController extends ApiController
      *
      * @param array $params
      */
-    public function consent($params = [])
+    public function consent($_params = [])
     {
         if ($this->method !== 'POST') {
             ApiResponse::error('Method not allowed', 405, 'METHOD_NOT_ALLOWED');
@@ -96,7 +96,7 @@ class GdprApiController extends ApiController
      *
      * @param array $params
      */
-    public function getConsentStatus($params = [])
+    public function getConsentStatus($_params = [])
     {
         if ($this->method !== 'GET') {
             ApiResponse::error('Method not allowed', 405, 'METHOD_NOT_ALLOWED');

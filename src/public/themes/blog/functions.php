@@ -974,7 +974,7 @@ function render_comments_section(int $postId, int $offset = 0): string
     ob_start(); ?>
 
     <div id="comments-section" class="post-comments container-fluid px-0">
-       <script>
+       <script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
             window.CommentSettings = {
                 postId: <?= (int)$postId ?>,
                 limit: <?= (int)$commentLimit ?>

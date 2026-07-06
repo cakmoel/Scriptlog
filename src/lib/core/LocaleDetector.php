@@ -13,9 +13,10 @@ class LocaleDetector
     {
         if (!empty($settings)) {
             $this->applySettings($settings);
-        } else {
-            $this->loadSettings();
+            return;
         }
+
+        $this->loadSettings();
     }
 
     private function applySettings(array $settings): void

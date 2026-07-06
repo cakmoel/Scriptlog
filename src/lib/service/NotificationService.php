@@ -183,9 +183,10 @@ class NotificationService
 
         if ($isHtml) {
             $email->html($body);
-        } else {
-            $email->text($body);
+            return $email;
         }
+
+        $email->text($body);
 
         return $email;
     }

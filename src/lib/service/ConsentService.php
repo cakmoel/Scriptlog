@@ -144,7 +144,7 @@ class ConsentService
      *
      * @return bool
      */
-    public function getCookieConsentStatus()
+    public function isCookieConsentAccepted()
     {
         $consent = $this->getLatestConsent('cookie');
 

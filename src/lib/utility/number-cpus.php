@@ -16,34 +16,16 @@ function number_cpus()
 
     $cpu_core = 1;
 
-    if (is_file('/proc/cpuinfo')) {
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        $cpu_core = getenv("NUMBER_OF_PROCESSORS");
+    } elseif (is_file('/proc/cpuinfo')) {
         $cpuinfo = file_get_contents('/proc/cpuinfo');
-
         preg_match_all('/^processor/m', $cpuinfo, $matches);
-
         $cpu_core = count($matches[0]);
-    } elseif ('WIN' === strtoupper(substr(PHP_OS, 0, 3))) {
-        $process = function_exists('popen') ? @popen('wmic cpu get NumberOfCores', 'rb') : "";
-
-        if (is_resource($process)) {
-            fgets($process);
-
-            $cpu_core = intval(fgets($process));
-
-            pclose($process);
-        }
     } else {
-        $process = function_exists('popen') ? @popen('sysctl -a', 'rb') : "";
-
+        $process = function_exists('popen') ? @popen('sysctl -n hw.ncpu', 'rb') : "";
         if (is_resource($process)) {
-            $output = stream_get_contents($process);
-
-            preg_match('/hw.ncpu: (\d+)/', $output, $matches);
-
-            if ($matches) {
-                $cpu_core = intval($matches[1][0]);
-            }
-
+            $cpu_core = intval(fgets($process));
             pclose($process);
         }
     }

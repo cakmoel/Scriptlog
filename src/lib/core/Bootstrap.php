@@ -27,7 +27,7 @@ class Bootstrap
      */
     private static $services = [];
 
-    private static $allowed_exported_vars = [
+    private static $allowedExportVars = [
         'db_host',
         'db_user',
         'db_pwd',
@@ -81,12 +81,16 @@ class Bootstrap
         $services = self::initializeServices($core_vars);
 
         // 4. Apply Security Headers (using functions loaded in step 2)
-        self::applySecurity();
+        try {
+            self::applySecurity();
+        } catch (\Throwable $e) {
+            error_log('Security header application failed: ' . $e->getMessage());
+        }
 
         $all_vars = array_merge($core_vars, $services);
 
         // Only return what is explicitly allowed
-        return new AppContext(array_intersect_key($all_vars, array_flip(self::$allowed_exported_vars)));
+        return new AppContext(array_intersect_key($all_vars, array_flip(self::$allowedExportVars)));
     }
 
     /**
@@ -97,11 +101,11 @@ class Bootstrap
      */
     private static function loadConfiguration(string $appRoot): array
     {
-        if (file_exists($appRoot . 'config.php')) {
-            self::$config = require $appRoot . 'config.php';
-        } else {
+        if (!file_exists($appRoot . 'config.php')) {
             return [];
         }
+
+        self::$config = require $appRoot . 'config.php';
 
         $db_host = self::$config['db']['host'] ?? "";
         $db_user = self::$config['db']['user'] ?? "";
@@ -134,7 +138,45 @@ class Bootstrap
      */
     private static function initializeServices(array $core_vars): array
     {
-        // STEP 1: CREATE DATABASE CONNECTION (only if all required keys exist)
+        $dbc = self::createDatabaseConnection($core_vars);
+
+        $rules = self::defineRoutingRules();
+
+        self::initializeRegistry($dbc, $core_vars, $rules);
+
+        list($userDao, $userToken, $validator, $sanitizer, $configDao, $configService) = self::createBaseDaos($dbc);
+
+        $sessionMaker = self::createSession($core_vars);
+
+        $authenticator = self::createAuthenticator($dbc, $userDao, $userToken, $validator);
+
+        $themeRenderer = self::createThemeRenderer($dbc);
+
+        if ($themeRenderer && class_exists('HandleRequest')) {
+            HandleRequest::setThemeRenderer($themeRenderer);
+        }
+
+        $frontService = self::createFrontService();
+
+        list($mediaDao, $downloadService, $downloadController) = self::createDownloadChain($dbc);
+
+        list($postDao, $pageDao, $topicDao) = self::createContentDaos($dbc);
+
+        self::storeInRegistry($mediaDao, $downloadService, $downloadController, $postDao, $pageDao, $topicDao);
+
+        $dispatcher = self::createDispatcher($dbc, $themeRenderer);
+
+        self::$services = self::buildServiceMap($sessionMaker, $sanitizer, $userDao, $userToken, $validator, $configDao, $configService, $authenticator, $dispatcher, $themeRenderer, $mediaDao, $downloadService, $downloadController, $frontService, $postDao, $pageDao, $topicDao);
+
+        self::buildHandlerRegistry($themeRenderer);
+
+        self::initializeI18n();
+
+        return self::$services;
+    }
+
+    private static function createDatabaseConnection(array $core_vars)
+    {
         $dbc = "";
 
         if (
@@ -150,7 +192,6 @@ class Bootstrap
                     $core_vars['db_pwd']
                 ]);
             } catch (Exception $e) {
-                // Database connection failed - continue without db connection
                 $dbc = "";
             }
         }
@@ -159,8 +200,12 @@ class Bootstrap
             $dbc->setTablePrefix($core_vars['db_prefix']);
         }
 
-        // STEP 2: Define Routing Rules
-        $rules = [
+        return $dbc;
+    }
+
+    private static function defineRoutingRules(): array
+    {
+        return [
             'home'     => "/",
             'category' => "/category/(?'category'[\w\-]+)",
             'archive'  => "/archive/[0-9]{2}/[0-9]{4}",
@@ -174,35 +219,41 @@ class Bootstrap
             'download' => "/download/(?'identifier'[a-f0-9\-]+)",
             'download_file' => "/download/(?'identifier'[a-f0-9\-]+)/file"
         ];
+    }
 
-        // STEP 3: SET REGISTRY
+    private static function initializeRegistry($dbc, array $core_vars, array $rules): void
+    {
         class_exists('Registry') ? Registry::setAll([
             'dbc' => $dbc,
             'key' => $core_vars['cipher_key'] ?? '',
             'route' => $rules,
             'uri' => class_exists('RequestPath') ? new RequestPath() : null
         ]) : "";
+    }
 
-        // STEP 4: INSTANTIATE SERVICES
+    private static function createBaseDaos($dbc): array
+    {
         $userDao = null;
         $userToken = null;
         $validator = null;
         $sanitizer = null;
+        $configDao = null;
+        $configService = null;
 
-        // Only instantiate DAOs if we have a valid database connection
         if (!empty($dbc) && $dbc !== "") {
             $userDao = class_exists('UserDao') ? new UserDao() : null;
             $userToken = class_exists('UserTokenDao') ? new UserTokenDao() : null;
             $validator = class_exists('FormValidator') ? new FormValidator() : null;
             $sanitizer = class_exists('Sanitize') ? new Sanitize() : null;
-
             $configDao = class_exists('ConfigurationDao') ? new ConfigurationDao() : null;
             $configService = ($configDao && $validator && $sanitizer) ? new ConfigurationService($configDao, $validator, $sanitizer) : null;
-        } else {
-            $configDao = null;
-            $configService = null;
         }
 
+        return [$userDao, $userToken, $validator, $sanitizer, $configDao, $configService];
+    }
+
+    private static function createSession(array $core_vars)
+    {
         $sessionMaker = null;
         if (class_exists('SessionMaker')) {
             try {
@@ -210,11 +261,10 @@ class Bootstrap
                     $sessionMaker = new SessionMaker(set_session_cookies_key($core_vars['app_email'] ?? '', $core_vars['app_key'] ?? ''));
                 }
             } catch (Exception $e) {
-                // Session creation failed - continue without session
+                // Session creation failed silently - acceptable during early bootstrap
             }
         }
 
-        // Initialize session (config before start to prevent "session_save_path(): Session save path cannot be changed when a session is active")
         if ($sessionMaker) {
             if (session_status() === PHP_SESSION_ACTIVE) {
                 session_write_close();
@@ -227,46 +277,55 @@ class Bootstrap
             }
         }
 
-        $authenticator = null;
-        if (class_exists('Authentication') && !empty($dbc) && $dbc !== "") {
-            try {
-                $authenticator = new Authentication($userDao, $userToken, $validator);
-            } catch (Exception $e) {
-                // Authentication creation failed
+        return $sessionMaker;
+    }
+
+    private static function createAuthenticator($dbc, $userDao, $userToken, $validator)
+    {
+        if (!class_exists('Authentication') || empty($dbc) || $dbc === "") {
+            return null;
+        }
+
+        try {
+            return new Authentication($userDao, $userToken, $validator);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    private static function createThemeRenderer($dbc)
+    {
+        if (!class_exists('ThemeRenderer') || !(isset($dbc) && $dbc instanceof \PDO)) {
+            return null;
+        }
+
+        try {
+            return ThemeRenderer::fromGlobalContext();
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    private static function createFrontService()
+    {
+        if (!class_exists('FrontService')) {
+            return null;
+        }
+
+        try {
+            $frontService = new FrontService();
+            if (class_exists('FrontHelper')) {
+                FrontHelper::setFrontService($frontService);
             }
+            return $frontService;
+        } catch (Exception $e) {
+            return null;
         }
+    }
 
-        // ThemeRenderer for centralized theme rendering
-        $themeRenderer = null;
-        if (class_exists('ThemeRenderer') && isset($dbc) && $dbc instanceof \PDO) {
-            try {
-                $themeRenderer = new ThemeRenderer();
-            } catch (\Throwable $e) {
-                $themeRenderer = null;
-            }
-        }
-
-        // Set ThemeRenderer on HandleRequest for query-string routing
-        if ($themeRenderer && class_exists('HandleRequest')) {
-            HandleRequest::setThemeRenderer($themeRenderer);
-        }
-
-        // FrontService for frontend data access (with FrontHelper delegation)
-        $frontService = null;
-        if (class_exists('FrontService')) {
-            try {
-                $frontService = new FrontService();
-            } catch (Exception $e) {
-                $frontService = null;
-            }
-        }
-        if ($frontService && class_exists('FrontHelper')) {
-            FrontHelper::setFrontService($frontService);
-        }
-
-        // Download service chain
+    private static function createDownloadChain($dbc): array
+    {
         $mediaDao = null;
-        $downloadModel = null;
         $downloadService = null;
         $downloadController = null;
 
@@ -281,7 +340,11 @@ class Bootstrap
             }
         }
 
-        // Create additional DAOs for FrontService
+        return [$mediaDao, $downloadService, $downloadController];
+    }
+
+    private static function createContentDaos($dbc): array
+    {
         $postDao = null;
         $pageDao = null;
         $topicDao = null;
@@ -292,26 +355,40 @@ class Bootstrap
             $topicDao = class_exists('TopicDao') ? new TopicDao() : null;
         }
 
-        // Store services in Registry for global access
-        if (class_exists('Registry')) {
-            Registry::set('mediaDao', $mediaDao);
-            Registry::set('downloadService', $downloadService);
-            Registry::set('downloadController', $downloadController);
-            Registry::set('postDao', $postDao);
-            Registry::set('pageDao', $pageDao);
-            Registry::set('topicDao', $topicDao);
+        return [$postDao, $pageDao, $topicDao];
+    }
+
+    private static function storeInRegistry($mediaDao, $downloadService, $downloadController, $postDao, $pageDao, $topicDao): void
+    {
+        if (!class_exists('Registry')) {
+            return;
         }
 
-        $dispatcher = null;
-        if (class_exists('Dispatcher') && !empty($dbc) && $dbc !== "") {
-            try {
-                $dispatcher = new Dispatcher($themeRenderer);
-            } catch (Exception $e) {
-                // Dispatcher creation failed
-            }
+        Registry::set('mediaDao', $mediaDao);
+        Registry::set('downloadService', $downloadService);
+        Registry::set('downloadController', $downloadController);
+        Registry::set('postDao', $postDao);
+        Registry::set('pageDao', $pageDao);
+        Registry::set('topicDao', $topicDao);
+    }
+
+    private static function createDispatcher($dbc, $themeRenderer)
+    {
+        if (!class_exists('Dispatcher') || empty($dbc) || $dbc === "") {
+            return null;
         }
 
-        self::$services = [
+        try {
+            return new Dispatcher($themeRenderer);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /** @SuppressWarnings(PHPMD.ExcessiveParameterList) */
+    private static function buildServiceMap($sessionMaker, $sanitizer, $userDao, $userToken, $validator, $configDao, $configService, $authenticator, $dispatcher, $themeRenderer, $mediaDao, $downloadService, $downloadController, $frontService, $postDao, $pageDao, $topicDao): array
+    {
+        return [
             'sessionMaker' => $sessionMaker,
             'searchPost' => class_exists('SearchFinder') ? new SearchFinder() : null,
             'sanitizer' => $sanitizer,
@@ -332,41 +409,42 @@ class Bootstrap
             'pageDao' => $pageDao,
             'topicDao' => $topicDao,
         ];
+    }
 
-        // Build HandlerRegistry for query-string routing
-        $handlerRegistry = null;
-        if ($themeRenderer) {
-            $handlerRegistry = new HandlerRegistry();
-
-            $downloadController = self::$services['downloadController'] ?? null;
-
-            $handlerRegistry->register('p', new PostHandler($themeRenderer));
-            $handlerRegistry->register('pg', new PageHandler($themeRenderer));
-            $handlerRegistry->register('cat', new CategoryHandler($themeRenderer));
-            $handlerRegistry->register('tag', new TagHandler($themeRenderer));
-            $handlerRegistry->register('a', new ArchiveHandler($themeRenderer));
-            $handlerRegistry->register('blog', new BlogHandler($themeRenderer));
-            $handlerRegistry->register('privacy', new PrivacyHandler($themeRenderer));
-
-            if ($downloadController) {
-                $handlerRegistry->register('download', new DownloadHandler(
-                    $themeRenderer,
-                    $downloadController
-                ));
-            }
-
-            // Store in Registry so HandleRequest can access it
-            class_exists('Registry') ? Registry::set('handlerRegistry', $handlerRegistry) : null;
+    private static function buildHandlerRegistry($themeRenderer): void
+    {
+        if (!$themeRenderer) {
+            return;
         }
 
-        // STEP 5: Initialize i18n if available
-        if (class_exists('I18nManager')) {
-            $i18n = I18nManager::getInstance();
-            $i18n->initialize();
-            self::$services['i18n'] = $i18n;
+        $handlerRegistry = new HandlerRegistry();
+
+        $downloadController = self::$services['downloadController'] ?? null;
+
+        $handlerRegistry->register('p', new PostHandler($themeRenderer));
+        $handlerRegistry->register('pg', new PageHandler($themeRenderer));
+        $handlerRegistry->register('cat', new CategoryHandler($themeRenderer));
+        $handlerRegistry->register('tag', new TagHandler($themeRenderer));
+        $handlerRegistry->register('a', new ArchiveHandler($themeRenderer));
+        $handlerRegistry->register('blog', new BlogHandler($themeRenderer));
+        $handlerRegistry->register('privacy', new PrivacyHandler($themeRenderer));
+
+        if ($downloadController) {
+            $handlerRegistry->register('download', new DownloadHandler($themeRenderer, $downloadController));
         }
 
-        return self::$services;
+        class_exists('Registry') ? Registry::set('handlerRegistry', $handlerRegistry) : null;
+    }
+
+    private static function initializeI18n(): void
+    {
+        if (!class_exists('I18nManager')) {
+            return;
+        }
+
+        $i18n = I18nManager::getInstance();
+        $i18n->initialize();
+        self::$services['i18n'] = $i18n;
     }
 
     /**
@@ -377,17 +455,58 @@ class Bootstrap
      */
     private static function applySecurity(): void
     {
+        self::defineCspNonce();
+
         if (!headers_sent() && PHP_SAPI !== 'cli') {
-            x_frame_option();
-            x_content_type_options();
-            x_xss_protection();
-            strict_transport_security();
-            referrer_policy();
-            permissions_policy();
-            content_security_policy(self::$config['app']['url'] ?? '');
-            remove_x_powered_by();
+            self::sendSecurityHeaders();
+            self::sendContentSecurityPolicy();
         }
 
+        self::initializePostSecurity();
+    }
+
+    private static function defineCspNonce(): void
+    {
+        if (!defined('CSP_NONCE')) {
+            define('CSP_NONCE', base64_encode(random_bytes(20)));
+        }
+    }
+
+    private static function sendSecurityHeaders(): void
+    {
+        $headerFunctions = [
+            'x_frame_option',
+            'x_content_type_options',
+            'x_xss_protection',
+            'strict_transport_security',
+            'referrer_policy',
+            'permissions_policy',
+            'remove_x_powered_by'
+        ];
+        foreach ($headerFunctions as $func) {
+            if (function_exists($func)) {
+                try {
+                    $func();
+                } catch (\Throwable $e) {
+                    error_log("Security header [$func] failed: " . $e->getMessage());
+                }
+            }
+        }
+    }
+
+    private static function sendContentSecurityPolicy(): void
+    {
+        if (function_exists('content_security_policy')) {
+            try {
+                content_security_policy(self::$config['app']['url'] ?? '');
+            } catch (\Throwable $e) {
+                error_log("Security header [content_security_policy] failed: " . $e->getMessage());
+            }
+        }
+    }
+
+    private static function initializePostSecurity(): void
+    {
         if (function_exists('call_htmlpurifier')) {
             call_htmlpurifier();
         }
@@ -395,14 +514,14 @@ class Bootstrap
             try {
                 get_server_load();
             } catch (\Throwable $e) {
-                // Ignore server load check errors
+                // Server load check failed silently
             }
         }
         if (function_exists('whoops_error')) {
             try {
                 whoops_error();
             } catch (Exception $e) {
-                // Ignore whoops errors
+                // Whoops error handler initialization failed silently
             }
         }
     }
