@@ -171,7 +171,7 @@
     </section>
 </div>
 
-<script>
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
 (function() {
   'use strict';
   
@@ -272,7 +272,7 @@ function showCopyNotification(message) {
 }
 </script>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
   function deleteDownload(identifier, filename) {
     if (confirm("Are you sure you want to delete download '" + filename + "'?")) {
       window.location.href = 'index.php?load=downloads&action=deleteDownload&identifier=' + identifier;

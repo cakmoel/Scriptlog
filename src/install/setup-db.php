@@ -85,9 +85,7 @@ if ($all_tables_exist) {
 // Tables are incomplete — show the admin account creation form
 $install_path = preg_replace("/\/install\.php.*$/i", "", current_url());
 
-    $install_path = preg_replace("/\/install\.php.*$/i", "", current_url());
-
-    install_header($install_path, $protocol, $server_host);
+install_header($install_path);
 
     $setup = isset($_POST['setup']) ? stripcslashes($_POST['setup']) : '';
 
@@ -127,7 +125,7 @@ $install_path = preg_replace("/\/install\.php.*$/i", "", current_url());
             $errors['errorInstall'] = 'Requires PHP 7.4 or newer';
         }
 
-        if (true === check_pcre_utf8()) {
+        if (false === check_pcre_utf8()) {
             $errors['errorInstall'] = 'PCRE has not been compiled with UTF-8 or Unicode property support';
         }
 
@@ -303,5 +301,5 @@ $install_path = preg_replace("/\/install\.php.*$/i", "", current_url());
   </div>
 
     <?php
-      install_footer($install_path, $protocol, $server_host);
-}
+      install_footer($install_path);
+

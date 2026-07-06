@@ -68,15 +68,7 @@
             font-size: 1.2rem;
             color: var(--sl-light-text);
             text-align: center;
-            margin-bottom: 0.25rem;
-        }
-
-        .subtitle {
-            font-size: 1rem;
-            color: var(--sl-light-text);
-            text-align: center;
             margin-bottom: 3rem;
-            font-style: italic;
         }
 
         h2 {
@@ -136,7 +128,6 @@
             border-radius: 0.5rem;
             overflow-x: auto;
             margin: 1.5rem 0;
-            white-space: pre;
         }
 
         pre code {
@@ -174,33 +165,6 @@
         .footer p {
             margin-bottom: 0.25rem;
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1.5rem 0;
-        }
-
-        table th, table td {
-            border: 1px solid var(--sl-border-color);
-            padding: 0.75rem;
-            text-align: left;
-        }
-
-        table th {
-            background-color: var(--sl-light-bg);
-            font-weight: 700;
-        }
-
-        .badge-row {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .badge-row img {
-            display: inline-block;
-            margin: 0 2px;
-        }
     </style>
 </head>
 <body>
@@ -208,232 +172,87 @@
 <div class="container main-container">
     <div id="main">
         <h1>Welcome to Scriptlog</h1>
-        <p class="tagline">Empowering Your Personal Weblog</p>
-        <p class="subtitle">A simple, secure, modular, and robust personal blogging platform.</p>
+        <p class="tagline">A simple, secure home for your stories and thoughts.</p>
 
-        <p>Scriptlog is a free and open-source PHP blog software. It is a refactored fork of Piluscart 1.4.1, engineered to emphasize simplicity, privacy, and security without the overhead of a complex Content Management System.</p>
+        <p>Scriptlog is a free and open-source PHP blog software. It is designed to be simple, private, and secure without the complexity of big Content Management Systems.</p>
 
-        <p>Scriptlog is not designed to replace full-scale CMS frameworks. Instead, it is meticulously engineered to:</p>
+        <p>Scriptlog is built to:</p>
         <ul>
-            <li>Power personal weblogs that do not require a heavy CMS.</li>
-            <li>Provide a secure foundation for blogging with modern security practices.</li>
-            <li>Run fast with minimal overhead.</li>
-        </ul>
-
-        <h2>Core Technologies</h2>
-        <ul>
-            <li><strong>Backend:</strong> PHP 7.4 – 8.5 (PSR-12 compliant)</li>
-            <li><strong>Database:</strong> MySQL 5.7+ / MariaDB 10.3+</li>
-            <li><strong>Architecture:</strong> Multi-layered MVC-like (<code>Request</code> → <code>Bootstrap</code> → <code>Dispatcher</code> → <code>Controller</code> → <code>Service</code> → <code>DAO</code> → <code>Database</code>)</li>
-            <li><strong>Security:</strong> Laminas (Escaper, Crypt), Defuse PHP Encryption, voku Anti-XSS, HTMLPurifier.</li>
+            <li>Run your personal blog without needing a heavy CMS.</li>
+            <li>Keep your site secure with modern security practices.</li>
+            <li>Load fast with minimal resources.</li>
         </ul>
 
         <h2>Requirements</h2>
-        <p>Ensure your hosting environment meets the following requirements:</p>
+        <p>Before installing, make sure your web hosting supports the following:</p>
         <ul>
-            <li><strong>PHP:</strong> 7.4 – 8.5 (with extensions: <code>pdo</code>, <code>pdo_mysql</code>, <code>json</code>, <code>mbstring</code>, <code>curl</code>)</li>
-            <li><strong>Web Server:</strong> Apache (with <code>mod_rewrite</code> enabled) or Nginx</li>
+            <li><strong>PHP:</strong> Version 7.4 or higher</li>
+            <li><strong>Web Server:</strong> Apache or Nginx</li>
             <li><strong>Database:</strong> MySQL 5.7+ or MariaDB 10.3+</li>
-            <li><strong>Composer:</strong> Latest (for dependency management)</li>
-            <li>HTTPS Support is recommended.</li>
+            <li>HTTPS is recommended.</li>
         </ul>
 
         <h2>Installation</h2>
 
-        <h3>1. Clone the Repository</h3>
-        <pre><code>git clone https://github.com/cakmoel/Scriptlog.git
-cd Scriptlog</code></pre>
+        <h3>Step 1: Download Scriptlog</h3>
+        <p>Download the latest version of Scriptlog as a ZIP file from the official website or GitHub repository. Extract the ZIP file on your computer, then upload all the files and folders to your web server using FTP or your hosting control panel's file manager.</p>
 
-        <h3>2. Install Dependencies</h3>
-        <p>Scriptlog uses Composer to manage its dependencies. Run the following command in the root of your project:</p>
-        <pre><code>composer install</code></pre>
-        <p><em>Note:</em> Composer's <code>platform.php</code> config locks dependency resolution to PHP 7.4, ensuring all packages stay compatible across PHP 7.4 through 8.5. No runtime warnings occur on newer PHP versions.</p>
+        <h3>Step 2: Create a Database</h3>
+        <p>Log in to your hosting control panel (like cPanel) and create a new MySQL database. Make sure to write down the database name, username, and password. You will need them in the next step.</p>
 
-        <h3>3. Set Permissions</h3>
-        <pre><code># Directories: readable and executable, Files: readable only
-find public -type d -exec chmod 755 {} \;
-find public -type f -exec chmod 644 {} \;
-
-# Writable directories (web server needs write access)
-chmod -R 775 public/cache public/log
-
-# Writable uploads — directories only, files stay non-executable
-find public/files -type d -exec chmod 775 {} \;
-find public/files -type f -exec chmod 644 {} \;
-
-# Restrict access to configuration files
-chmod 640 config.php .env</code></pre>
-        <p><em>Note:</em> Adjust ownership if needed — the web server user (e.g., <code>www-data</code>) must own or be in the group of <code>public/cache</code>, <code>public/log</code>, and <code>public/files</code>.</p>
-
-        <h3>4. Database Setup</h3>
-        <p>Create a new empty database for Scriptlog. It is recommended to use the <code>utf8mb4_general_ci</code> collation.</p>
-
-        <h3>5. Run the Installer</h3>
-        <p>Navigate to <code>/install/</code> in your web browser and follow the wizard:</p>
+        <h3>Step 3: Run the Installer</h3>
+        <p>Open your web browser and go to the address where you uploaded Scriptlog, followed by <code>/install/</code>. For example, if your site is at <code>http://example.com</code>, go to <code>http://example.com/install/</code>.</p>
+        <p>Follow the installation wizard:</p>
         <ul>
-            <li>Step 1: System Requirements Check (<code>install/index.php</code>)</li>
-            <li>Step 2: Database Setup (<code>install/setup-db.php</code>) — creates 21 tables</li>
-            <li>Step 3: Complete Setup (<code>install/finish.php</code>)</li>
+            <li><strong>Step 1:</strong> The installer checks if your server meets the requirements.</li>
+            <li><strong>Step 2:</strong> Enter your database details (name, username, password) and create an admin account.</li>
+            <li><strong>Step 3:</strong> Complete the setup. The installer saves your settings automatically.</li>
         </ul>
 
-        <h3>6. Cleanup (Critical)</h3>
-        <p>For security purposes, <strong>delete the <code>install/</code> directory</strong> immediately after installation is complete.</p>
+        <h3>Step 4: Delete the Install Folder</h3>
+        <p>For security, <strong>delete the <code>install/</code> folder</strong> from your server after installation is complete.</p>
 
-        <h2>Configuration</h2>
-        <p>Scriptlog supports both <code>.env</code> and <code>config.php</code> files for configuration. During installation, both files are automatically generated and kept in sync.</p>
-
-        <p>After installation, these configuration files exist:</p>
+        <h2>After Installation</h2>
+        <p>Once installed, you can access your site at the following addresses:</p>
         <ul>
-            <li><code>config.php</code> — Main configuration with <code>$_ENV</code> fallbacks</li>
-            <li><code>.env</code> — Environment variables (auto-generated)</li>
-            <li><code>storage/keys/[random_filename].php</code> — Defuse encryption key for authentication cookies</li>
+            <li><strong>Your Blog:</strong> <code>http://your-domain.com/</code></li>
+            <li><strong>Admin Panel:</strong> <code>http://your-domain.com/admin/</code></li>
         </ul>
-
-        <p>The <code>config.php</code> structure uses <code>$_ENV</code> with fallback values:</p>
-<pre><code class="language-php">return [
-    'db' => [
-        'host' => $_ENV['DB_HOST'] ?? 'localhost',
-        'user' => $_ENV['DB_USER'] ?? '',
-        'pass' => $_ENV['DB_PASS'] ?? '',
-        'name' => $_ENV['DB_NAME'] ?? '',
-        'port' => $_ENV['DB_PORT'] ?? '3306',
-        'prefix' => $_ENV['DB_PREFIX'] ?? ''
-    ],
-    'app' => [
-        'url'   => $_ENV['APP_URL'] ?? 'http://example.com',
-        'email' => $_ENV['APP_EMAIL'] ?? '',
-        'key'   => $_ENV['APP_KEY'] ?? '',
-        'defuse_key' => 'storage/keys/[random_filename].php'
-    ],
-    'mail' => [
-        'smtp' => [
-            'host' => $_ENV['SMTP_HOST'] ?? '',
-            'port' => $_ENV['SMTP_PORT'] ?? 587,
-            'encryption' => $_ENV['SMTP_ENCRYPTION'] ?? 'tls',
-            'username' => $_ENV['SMTP_USER'] ?? '',
-            'password' => $_ENV['SMTP_PASS'] ?? '',
-        ],
-        'from' => [
-            'email' => $_ENV['MAIL_FROM_ADDRESS'] ?? '',
-            'name' => $_ENV['MAIL_FROM_NAME'] ?? 'Blogware'
-        ]
-    ],
-];</code></pre>
-
-        <h2>Running the Application</h2>
-        <table>
-            <tr><th>Environment</th><th>URL</th></tr>
-            <tr><td><strong>Public Site</strong></td><td><code>http://your-domain/</code></td></tr>
-            <tr><td><strong>Admin Panel</strong></td><td><code>http://your-domain/admin/</code></td></tr>
-            <tr><td><strong>API Endpoint</strong></td><td><code>http://your-domain/api/v1/</code></td></tr>
-        </table>
+        <p>Log in to the admin panel with the account you created during installation to start writing posts, adding pages, and managing your blog.</p>
 
         <h2>Directory Structure</h2>
-<pre>ScriptLog/
-|-- index.php                    # Public front controller
-|-- config.php                   # Application configuration
-|-- .env                         # Environment variables
-
-|-- admin/                       # Admin panel
-|   |-- index.php                # Admin entry point
-|   |-- login.php                # Login page
-|   +-- ...                      # Other admin pages
-
-|-- api/                         # RESTful API
-|   +-- index.php                # API entry point
-
-|-- lib/                         # Core library
-|   |-- main.php                 # Application bootstrap
-|   |-- common.php               # Constants and functions
-|   +-- core/                    # Core classes
-|       +-- dao/                 # Data Access Objects
-|       +-- service/             # Business logic layer
-|       +-- controller/          # Request controllers
-|       +-- model/               # Data models
-|       +-- utility/             # Utility functions (100+ files)
-|       +-- vendor/              # Composer dependencies
-
-|-- public/                      # Web root
-|   +-- themes/                  # Theme templates
-|       +-- blog/                # Default theme
-|   +-- files/                   # User uploads
-|   +-- cache/                   # Cache directory
-|   +-- log/                     # Log directory
-
-|-- install/                     # Installation wizard
-|   +-- include/                 # Installation includes
-
-|-- docs/                        # Developer guides
-|   +-- DEVELOPER_GUIDE.md
-|   +-- TESTING_GUIDE.md
-|   +-- PLUGIN_DEVELOPER_GUIDE.md
-|   +-- API_DOCUMENTATION.md
-|   +-- API_OPENAPI.yaml
-|   +-- API_OPENAPI.json
-
-+-- tests/                       # PHPUnit test suite</pre>
-
-        <h2>How the System Works</h2>
-        <p>Scriptlog uses a multi-layer architecture designed for maintainability and scalability:</p>
-<pre>Request → Front Controller → Bootstrap → Dispatcher → Controller → Service → DAO → Database</pre>
-        <ol>
-            <li><strong>Front Controller</strong> (<code>index.php</code>) — Entry point for all requests.</li>
-            <li><strong>Bootstrap</strong> (<code>lib/core/Bootstrap.php</code>) — Initializes the application and sets up the service container.</li>
-            <li><strong>Dispatcher</strong> (<code>lib/core/Dispatcher.php</code>) — Routes the request to the appropriate controller based on URL patterns, and validates content existence for proper 404 handling.</li>
-            <li><strong>Controller</strong> (<code>lib/controller/*</code>) — Handles HTTP request logic.</li>
-            <li><strong>Service</strong> (<code>lib/service/*</code>) — Business logic layer.</li>
-            <li><strong>DAO</strong> (<code>lib/dao/*</code>) — Data access layer using prepared statements.</li>
-            <li><strong>View</strong> (<code>lib/core/View.php</code>) — Renders the output using the active theme.</li>
-        </ol>
-
-        <h3>Adding New Features</h3>
-        <p>When adding features, follow the layered implementation pattern:</p>
-        <ol>
-            <li><strong>Database Table:</strong> Add to <code>install/include/dbtable.php</code></li>
-            <li><strong>DAO:</strong> Create in <code>lib/dao/</code> (Database interactions)</li>
-            <li><strong>Service:</strong> Create in <code>lib/service/</code> (Business logic)</li>
-            <li><strong>Controller:</strong> Create in <code>lib/controller/</code> (Request handling)</li>
-            <li><strong>Routes:</strong> Add to <code>lib/core/Bootstrap.php</code></li>
-        </ol>
-        <p><strong>WARNING:</strong> Never bypass the DAO layer when accessing the database. Always use prepared statements to prevent SQL injection.</p>
-
-        <h3>Key Commands</h3>
+        <p>After uploading Scriptlog to your server, you will see these main folders:</p>
         <ul>
-            <li><strong>Run Tests:</strong> <code>vendor/bin/phpunit</code></li>
-            <li><strong>Static Analysis:</strong> <code>vendor/bin/phpstan</code></li>
+            <li><code>admin/</code> &mdash; The administration panel where you manage your blog.</li>
+            <li><code>lib/</code> &mdash; Core application files (you do not need to edit these).</li>
+            <li><code>api/</code> &mdash; RESTful API endpoints for external integrations.</li>
+            <li><code>public/</code> &mdash; Contains your theme, uploaded files, cache, and logs.</li>
+            <li><code>install/</code> &mdash; The installer wizard (delete this after installation).</li>
         </ul>
 
-        <h2>Security Features</h2>
+        <h2>How It Works</h2>
+        <p>When someone visits your blog, Scriptlog checks the web address and loads the right page. If the page does not exist, it shows a friendly 404 message. Your blog's appearance is controlled by a theme, and you can change it anytime from the admin panel.</p>
+
+        <h2>Security</h2>
+        <p>Scriptlog includes several security features to keep your blog safe:</p>
         <ul>
-            <li><strong>Authentication:</strong> Custom secure session handler (<code>SessionMaker</code>) with remember-me tokens and session fingerprinting.</li>
-            <li><strong>CSRF:</strong> Protected via <code>csrf_defender</code> and form security utilities.</li>
-            <li><strong>XSS:</strong> Multi-layered prevention using <code>Anti-XSS</code> (voku) and <code>HTMLPurifier</code>.</li>
-            <li><strong>Encryption:</strong> Sensitive data encrypted using <code>defuse/php-encryption</code> with auto-generated keys.</li>
-            <li><strong>Password Hashing:</strong> Uses PHP's built-in <code>password_hash()</code> with bcrypt.</li>
-            <li><strong>Access Control:</strong> Role-based user levels with granular permissions.</li>
+            <li>Login protection with password hashing.</li>
+            <li>Form security to block spam and fake submissions.</li>
+            <li>Content filtering to prevent malicious code.</li>
+            <li>Data encryption for sensitive information.</li>
+            <li>User roles that control what each person can do.</li>
         </ul>
 
         <h3>User Levels</h3>
-        <table>
-            <tr><th>Level</th><th>Permissions</th></tr>
-            <tr><td><strong>administrator</strong></td><td>Full access — PRIVACY, USERS, IMPORT, PLUGINS, THEMES, CONFIGURATION, PAGES, NAVIGATION, TOPICS, COMMENTS, MEDIALIB, REPLY, POSTS, DASHBOARD</td></tr>
-            <tr><td><strong>manager</strong></td><td>PLUGINS, THEMES, CONFIGURATION, PAGES, NAVIGATION, TOPICS, COMMENTS, MEDIALIB, REPLY, POSTS, DASHBOARD</td></tr>
-            <tr><td><strong>editor</strong></td><td>TOPICS, COMMENTS, MEDIALIB, REPLY, POSTS, DASHBOARD</td></tr>
-            <tr><td><strong>author</strong></td><td>COMMENTS, MEDIALIB, REPLY, POSTS, DASHBOARD</td></tr>
-            <tr><td><strong>contributor</strong></td><td>POSTS, DASHBOARD</td></tr>
-            <tr><td><strong>subscriber</strong></td><td>DASHBOARD only</td></tr>
-        </table>
-
-        <h2>Contributing</h2>
-        <p>Contributions are welcome! We encourage you to read our contribution guidelines before submitting pull requests. Please refer to the following resources in our repository:</p>
+        <p>Scriptlog has six user levels with different permissions:</p>
         <ul>
-            <li><strong><a href="CONTRIBUTING.md">Contributing Guidelines</a></strong></li>
-            <li><strong><a href="CODE_OF_CONDUCT.md">Code of Conduct</a></strong></li>
-            <li>For security vulnerabilities, please review our <strong><a href="SECURITY.md">Security Policy</a></strong> for responsible disclosure.</li>
+            <li><strong>Administrator:</strong> Full access to everything.</li>
+            <li><strong>Manager:</strong> Can manage content, comments, and settings.</li>
+            <li><strong>Editor:</strong> Can manage content and comments.</li>
+            <li><strong>Author:</strong> Can write and manage their own posts.</li>
+            <li><strong>Contributor:</strong> Can write posts but cannot publish them.</li>
+            <li><strong>Subscriber:</strong> Can only view the dashboard.</li>
         </ul>
-
-        <h2>Pass it on!</h2>
-        <p>Scriptlog has no marketing budget or corporate sponsors, but we believe in our community. If you enjoy Scriptlog, please consider telling your friends, family, and colleagues about it, setting it up for someone, or writing an article about your experience.</p>
 
         <h2>License</h2>
         <p>Scriptlog is <b>Open Source</b> and <b>Free</b> PHP Blog Software licensed under the <a href="http://www.opensource.org/licenses/mit-license.html">MIT License</a>.</p>
@@ -441,8 +260,8 @@ chmod 640 config.php .env</code></pre>
         <hr>
 
         <div class="footer">
-            <p><strong>Thank you for creating with Scriptlog</strong></p>
-            <p><a href="https://github.com/cakmoel/Scriptlog">github.com/cakmoel/Scriptlog</a></p>
+            <p><strong>Thank you for using Scriptlog</strong></p>
+            <p><a href="https://github.com/cakmoel/Scriptlog">M.Noermoehammad</a></p>
         </div>
     </div>
 </div>

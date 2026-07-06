@@ -163,7 +163,7 @@
     </div>
   </section>
   
-  <script>
+  <script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
   (function() {
     document.getElementById('importBtn').addEventListener('click', function(e) {
       var selectedSource = document.getElementById('source').value;

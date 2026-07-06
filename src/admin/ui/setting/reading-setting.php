@@ -6,12 +6,12 @@
  <!-- Content Header (Page header) -->
  <section class="content-header">
    <h1>
-     <?=(isset($pageTitle) ? $pageTitle : ""); ?> 
-     <small>Control Panel</small>
-   </h1>
-   <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home </a></li>
-        <li class="active"><a href="index.php?load=option-reading"><?=(isset($pageTitle)) ? $pageTitle : ""; ?></a></li>
+      <?=(isset($pageTitle) ? safe_html($pageTitle) : ""); ?> 
+      <small>Control Panel</small>
+    </h1>
+    <ol class="breadcrumb">
+         <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home </a></li>
+         <li class="active"><a href="index.php?load=option-reading"><?=(isset($pageTitle)) ? safe_html($pageTitle) : ""; ?></a></li>
    </ol>
  </section>
 

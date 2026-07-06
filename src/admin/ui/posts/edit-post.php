@@ -184,13 +184,13 @@
    <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
-<script type="text/javascript">
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
    var loadFile = function(event) {
       var output = document.getElementById('output');
       output.src = URL.createObjectURL(event.target.files[0]);
    };
 </script>
-<script>
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
    function checkVisibilitySelection() {
       a = document.getElementById("visibility.system");
       if (a.value == "protected") {
