@@ -12,7 +12,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 1.0
  *
  */
-function theme_meta()
+function theme_meta(): array
 {
 
     $scriptlog_image = app_url() . DS . APP_IMAGE . 'scriptlog-1200x630.jpg';
@@ -29,28 +29,36 @@ function theme_meta()
 
         return metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri);
     } else {
-        return metatag_by_query(HandleRequest::isQueryStringRequested()['key'], HandleRequest::isQueryStringRequested()['value'], $scriptlog_image, $scriptlog_imgthumb);
+        $qs = (array) HandleRequest::isQueryStringRequested();
+        return metatag_by_query(
+            isset($qs['key']) ? (string) $qs['key'] : '',
+            isset($qs['value']) ? (string) $qs['value'] : '',
+            $scriptlog_image,
+            $scriptlog_imgthumb
+        );
     }
 }
 
 /**
  * metatag_by_path
  *
- * @param object $param1
- * @param object $param2
  * @param string $scriptlog_image
  * @param string $scriptlog_imgthumb
+ * @param RequestPath|string|null $uri
+ * @return array
  *
  */
-function metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri)
+function metatag_by_path(string $scriptlog_image, string $scriptlog_imgthumb, $uri): array
 {
 
-    $uri = is_a($uri, 'RequestPath') ? $uri : null;
+    $uri = ($uri instanceof RequestPath) ? $uri : null;
+
+    if ($uri === null) {
+        return array('site_schema' => '', 'site_meta_tags' => '');
+    }
 
     $theme_meta = array();
     $post_id = null;
-    $created_at = null;
-    $modified_at = null;
     $page_id = null;
     $post_title = null;
     $page_title = null;
@@ -60,24 +68,18 @@ function metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri)
     $topic_title = null;
     $canonical = null;
     $image = null;
-    $date_published = null;
-    $date_modified = null;
 
     switch ($uri->matched) {
         case 'post':
             if (!empty($uri->param1)) {
-                $read_post = class_exists('FrontHelper') ? FrontHelper::grabPreparedFrontPostById($uri->param1) : null;
-                if (!empty($read_post) && is_array($read_post)) {
+                $read_post = class_exists('FrontHelper') ? (array) FrontHelper::grabPreparedFrontPostById((int)$uri->param1) : array();
+                if (!empty($read_post)) {
                     $post_id = (!empty($read_post['ID'])) ? abs((int)$read_post['ID']) : null;
                     $post_title = (!empty($read_post['post_title'])) ? escape_html($read_post['post_title']) : "";
                     $description = (!empty($read_post['post_summary'])) ? escape_html($read_post['post_summary']) : (isset($read_post['post_title']) ? escape_html($read_post['post_title']) : "");
                     $author = (!empty($read_post['user_login'])) ? escape_html($read_post['user_login']) : escape_html(app_info()['site_name']);
                     $image = (!empty($read_post['media_filename'])) ? invoke_webp_image(escape_html($read_post['media_filename'])) : $scriptlog_imgthumb;
-                    $canonical = (!empty($read_post['post_slug'])) ? app_url() . DS . 'post' . DS . $post_id . DS . escape_html($read_post['post_slug']) : app_url();
-                    $created_at = (!empty($read_post['post_date'])) ? convert_to_timestamp(escape_html($read_post['post_date'])) : "";
-                    $modified_at = (!empty($read_post['post_modified'])) ? convert_to_timestamp(escape_html($read_post['post_modified'])) : "";
-                    $date_published = (!empty($created_at)) ? convert_to_atom($created_at) : date(DATE_ATOM);
-                    $date_modified = (!empty($modified_at)) ? convert_to_atom($modified_at) : date(DATE_ATOM);
+                    $canonical = (!empty($read_post['post_slug'])) ? app_url() . DS . 'post' . DS . ($post_id ?? '') . DS . escape_html($read_post['post_slug']) : app_url();
                 }
             }
 
@@ -87,9 +89,12 @@ function metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri)
             break;
 
         case 'page':
+            $date_published = date(DATE_ATOM);
+            $date_modified = date(DATE_ATOM);
+
             if (!empty($uri->param1)) {
-                $read_page = FrontHelper::grabPreparedFrontPageBySlug($uri->param1);
-                if (!empty($read_page) && is_array($read_page)) {
+                $read_page = (array) FrontHelper::grabPreparedFrontPageBySlug($uri->param1);
+                if (!empty($read_page)) {
                     $page_id = (!empty($read_page['ID'])) ? abs((int)$read_page['ID']) : null;
                     $page_title = (!empty($read_page['post_title'])) ? escape_html($read_page['post_title']) : "";
                     $description = (!empty($read_page['post_summary'])) ? escape_html($read_page['post_summary']) : (isset($read_page['post_title']) ? escape_html($read_page['post_title']) : "");
@@ -117,9 +122,12 @@ function metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri)
             break;
 
         case 'category':
+            $date_published = date(DATE_ATOM);
+            $date_modified = date(DATE_ATOM);
+
             if (!empty($uri->param1)) {
-                $read_topic = FrontHelper::grabPreparedFrontTopicBySlug($uri->param1);
-                if (!empty($read_topic) && is_array($read_topic)) {
+                $read_topic = (array) FrontHelper::grabPreparedFrontTopicBySlug($uri->param1);
+                if (!empty($read_topic)) {
                     $topic_id = (!empty($read_topic['ID'])) ? abs((int)$read_topic['ID']) : null;
                     $topic_title = (!empty($read_topic['topic_title'])) ? escape_html($read_topic['topic_title']) : app_info()['site_name'];
                     $description = 'Category: ' . $topic_title . ' | ' . escape_html(app_info()['site_description']);
@@ -181,58 +189,34 @@ function metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri)
  * @param string $scriptlog_imgthumb
  *
  */
-function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
+function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb): array
 {
 
     $theme_meta = array();
-    $post_id = null;
-    $page_id = null;
-    $category_id = null;
-    $post_title = null;
-    $page_title = null;
-    $category_title = null;
-    $tag_id = null;
-    $tag_title = null;
-    $author = null;
-    $keyword = null;
-    $description = null;
-    $category_title = null;
-    $canonical = null;
-    $image = null;
-    $created_at = null;
-    $modified_at = null;
-    $date_published = null;
-    $date_modified = null;
 
     switch ($key) {
         case 'p':
-            if ((empty($value)) || ($value === '')) {
+            if (empty($value)) {
                 http_response_code(404);
                 throw new InvalidArgumentException("Argument passed must be of the type string, numeric or integer, null given");
             } else {
-                $read_post = class_exists('FrontHelper') ? FrontHelper::grabSimpleFrontPost($value) : null;
+                $read_post = class_exists('FrontHelper') ? (array) FrontHelper::grabSimpleFrontPost((int)$value) : array();
 
                 // Handle case when post is not found (null returned)
-                if (empty($read_post) || !is_array($read_post)) {
+                if (empty($read_post)) {
                     $post_id = null;
                     $post_title = "";
                     $description = "";
                     $author = escape_html(app_info()['site_name']);
                     $image = app_url() . DS . APP_IMAGE . 'scriptlog-612x221.jpg';
                     $canonical = app_url();
-                    $created_at = "";
-                    $modified_at = "";
                 } else {
                     $post_id = (!empty($read_post['ID'])) ? abs((int)$read_post['ID']) : null;
                     $post_title = (!empty($read_post['post_title'])) ? escape_html($read_post['post_title']) : "";
                     $description = (!empty($read_post['post_summary'])) ? escape_html($read_post['post_summary']) : escape_html($read_post['post_title']);
                     $author = (!empty($read_post['user_login'])) ? escape_html($read_post['user_login']) : escape_html(app_info()['site_name']);
                     $image = (!empty($read_post['media_filename'])) ? invoke_webp_image(escape_html($read_post['media_filename'])) : app_url() . DS . APP_IMAGE . 'scriptlog-612x221.jpg';
-                    $canonical = (!empty($read_post['post_slug'])) ? app_url() . DS . '?p=' . $post_id : app_url();
-                    $created_at = (!empty($read_post['post_date'])) ? convert_to_timestamp(escape_html($read_post['post_date'])) : "";
-                    $modified_at = (!empty($read_post['post_modified'])) ? convert_to_timestamp(escape_html($read_post['post_modified'])) : "";
-                    $date_published = (!empty($created_at)) ? convert_to_atom($created_at) : date(DATE_ATOM);
-                    $date_modified = (!empty($modified_at)) ? convert_to_atom($modified_at) : date(DATE_ATOM);
+                    $canonical = (!empty($read_post['post_slug'])) ? app_url() . DS . '?p=' . ($post_id ?? '') : app_url();
                 }
             }
 
@@ -242,11 +226,11 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
             break;
 
         case 'pg':
-            if ((empty($value)) || ($value === '')) {
+            if (empty($value)) {
                 http_response_code(404);
                 throw new InvalidArgumentException("Argument passed must be of the type string, numeric or integer, null given");
             } else {
-                $read_page = class_exists('FrontHelper') ? FrontHelper::grabSimpleFrontPage($value) : "";
+                $read_page = class_exists('FrontHelper') ? (array) FrontHelper::grabSimpleFrontPage((int)$value) : array();
 
                 $page_id = (!empty($read_page['ID'])) ? $read_page['ID'] : null;
                 $page_title = (!empty($read_page['post_title'])) ? escape_html($read_page['post_title']) : "";
@@ -266,11 +250,11 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
             break;
 
         case 'cat':
-            if ((empty($value)) || ($value === '')) {
+            if (empty($value)) {
                 http_response_code(404);
                 throw new InvalidArgumentException("Argument passed must be of the type string, numeric or integer, null given");
             } else {
-                $read_category = class_exists('FrontHelper') ? FrontHelper::grabSimpleFrontTopic($value) : "";
+                $read_category = class_exists('FrontHelper') ? (array) FrontHelper::grabSimpleFrontTopic((int)$value) : array();
 
                 $category_id = (!empty($read_category['ID'])) ? $read_category['ID'] : null;
                 $category_title = (!empty($read_category['topic_title'])) ? escape_html($read_category['topic_title']) : app_info()['site_name'];
@@ -287,7 +271,8 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
 
         case 'a':
             if (!empty($value)) {
-                $archive_requested = class_exists('HandleRequest') ? preg_split("//", HandleRequest::isQueryStringRequested()['value'], -1, PREG_SPLIT_NO_EMPTY) : preg_split("//", $value, -1, PREG_SPLIT_NO_EMPTY);
+                $qs_archive = (array) HandleRequest::isQueryStringRequested();
+                $archive_requested = class_exists('HandleRequest') ? preg_split("//", isset($qs_archive['value']) ? (string) $qs_archive['value'] : '', -1, PREG_SPLIT_NO_EMPTY) : preg_split("//", $value, -1, PREG_SPLIT_NO_EMPTY);
 
                 $year = (isset($archive_requested[0]) && isset($archive_requested[1]) && isset($archive_requested[2]) && isset($archive_requested[3])) ? $archive_requested[0] . $archive_requested[1] . $archive_requested[2] . $archive_requested[3] : null;
                 $month = (isset($archive_requested[4]) && isset($archive_requested[5])) ? $archive_requested[4] . $archive_requested[5] : $archive_requested[4] . "";
@@ -312,7 +297,8 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb)
                 http_response_code(404);
                 throw new InvalidArgumentException("Argument passed must be of the type string, numeric or integer, null given");
             } else {
-                $tag_requested = class_exists('HandleRequest') ? HandleRequest::isQueryStringRequested()['value'] : escape_html($value);
+                $qs_tag = (array) HandleRequest::isQueryStringRequested();
+                $tag_requested = class_exists('HandleRequest') ? (isset($qs_tag['value']) ? (string) $qs_tag['value'] : '') : escape_html($value);
 
                 // Get tag data - can be empty array if no results or error
                 $tag = class_exists('FrontHelper') ? FrontHelper::simpleSearchingTag($tag_requested) : "";

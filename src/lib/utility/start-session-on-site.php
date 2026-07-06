@@ -36,8 +36,6 @@ function start_session_on_site($session_handler)
 
         if (isset($_COOKIE[$session_name])) {
             $session_id = $_COOKIE[$session_name];
-        } elseif (isset($_GET[$session_name])) {
-            $session_id = $_GET[$session_name];
         } else {
             return turn_on_session(
                 $session_handler,
