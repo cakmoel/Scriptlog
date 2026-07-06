@@ -81,17 +81,17 @@ WHERE p.post_type = 'blog'";
      *
      * Retrieving a single post records by it's Id
      *
-     * @param integer $postId
+     * @param integer $ID
      * @param object $sanitize
      * @param integer|null $author
      * @param bool $onlyPublished
      * @return boolean|array|object
      *
      */
-    public function findPost($id, $sanitize, $author = null, $onlyPublished = true)
+    public function findPost($ID, $sanitize, $author = null, $onlyPublished = true)
     {
 
-        $idsanitized = $this->filteringId($sanitize, $id, 'sql');
+        $idsanitized = $this->filteringId($sanitize, $ID, 'sql');
 
         $sql = "SELECT ID,
             media_id,
@@ -138,10 +138,9 @@ WHERE ID = ? AND post_type = 'blog'";
      *
      * @param array $bind
      * @param integer $topicId
-     * @param string $tagId
      *
      */
-    public function createPost($bind, $topicId)
+    public function createPost($bind, $topicId): int
     {
 
         $this->setSQL("SET SQL_MODE='ALLOW_INVALID_DATE'");
@@ -176,10 +175,10 @@ WHERE ID = ? AND post_type = 'blog'";
         }
 
         if ((is_array($topicId)) && (!empty($postId))) {
-            foreach ($_POST['catID'] as $topicId) {
+            foreach ($_POST['catID'] as $topic_id) {
                 $this->create("tbl_post_topic", [
                   'post_id' => $postId,
-                  'topic_id' => $topicId]);
+                  'topic_id' => $topic_id]);
             }
 
             return $postId;
@@ -197,21 +196,20 @@ WHERE ID = ? AND post_type = 'blog'";
      *
      * updating an existing post record
      *
+     * @param object $sanitize
      * @param array $bind
-     * @param integer $id
+     * @param integer $ID
      * @param integer $topicId
      *
      */
-    public function updatePost($sanitize, $bind, $ID, $topicId)
+    public function updatePost($sanitize, $bind, $ID, $topicId): void
     {
 
         $cleanId = $this->filteringId($sanitize, $ID, 'sql');
 
         try {
-            // transaction
             $this->callTransaction();
 
-            // Build update data - only include password/passphrase if not empty
             $updateData = [
                 'post_author' => $bind['post_author'],
                 'post_modified' => $bind['post_modified'],
@@ -227,7 +225,6 @@ WHERE ID = ? AND post_type = 'blog'";
                 'comment_status' => $bind['comment_status']
             ];
 
-            // Only update password and passphrase if they're not empty
             if (!empty($bind['post_password'])) {
                 $updateData['post_password'] = $bind['post_password'];
             }
@@ -241,16 +238,13 @@ WHERE ID = ? AND post_type = 'blog'";
 
             $this->modify("tbl_posts", $updateData, ['ID' => (int)$cleanId]);
 
-            // delete all post_topic by post_id
-            $post_id = isset($ID) ? purify_dirty_html((string)$ID) : "";
-
-            $this->deleteRecord("tbl_post_topic", ['post_id' => $post_id]);
+            $this->deleteRecord("tbl_post_topic", ['post_id' => (int)$cleanId]);
 
             if ((is_array($topicId)) && (isset($_POST['catID']))) {
-                foreach ($_POST['catID'] as $topicId) {
+                foreach ($_POST['catID'] as $topic_id) {
                     $this->create("tbl_post_topic", [
                         'post_id' => $cleanId,
-                        'topic_id' => $topicId
+                        'topic_id' => $topic_id
                     ]);
                 }
             }
@@ -260,27 +254,27 @@ WHERE ID = ? AND post_type = 'blog'";
             if (function_exists('page_cache_clear')) {
                 page_cache_clear();
             }
-        } catch (\Throwable $th) {
-            $this->callRollBack();
-            $this->error = LogError::setStatusCode(http_response_code(500));
-            $this->error = LogError::exceptionHandler($th);
         } catch (DbException $e) {
             $this->callRollBack();
             $this->error = LogError::setStatusCode(http_response_code(500));
-            $this->error = LogError::exceptionHandler($e);
+            LogError::exceptionHandler($e);
+        } catch (\Throwable $th) {
+            $this->callRollBack();
+            $this->error = LogError::setStatusCode(http_response_code(500));
+            LogError::exceptionHandler($th);
         }
     }
 
     /**
      * DeletePost
      *
-     * @param integer $id
-     * @param object $sanitizing
+     * @param integer $ID
+     * @param object $sanitize
      *
      */
-    public function deletePost($id, $sanitize)
+    public function deletePost($ID, $sanitize): void
     {
-        $cleanId = $this->filteringId($sanitize, $id, 'sql');
+        $cleanId = $this->filteringId($sanitize, $ID, 'sql');
         $this->deleteRecord("tbl_posts", ['ID' => $cleanId]);
 
         if (function_exists('page_cache_clear')) {
@@ -312,15 +306,15 @@ WHERE ID = ? AND post_type = 'blog'";
     /**
      * checkPostId
      *
-     * @param integer $id
-     * @param object $sanitizing
+     * @param integer $ID
+     * @param object $sanitize
      * @return numeric
      *
      */
-    public function checkPostId($id, $sanitizing)
+    public function checkPostId($ID, $sanitize)
     {
         $sql = "SELECT ID FROM tbl_posts WHERE ID = ? AND post_type = 'blog'";
-        $idsanitized = $this->filteringId($sanitizing, $id, 'sql');
+        $idsanitized = $this->filteringId($sanitize, $ID, 'sql');
         $this->setSQL($sql);
         $stmt = $this->checkCountValue([$idsanitized]);
         return $stmt > 0;

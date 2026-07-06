@@ -331,7 +331,7 @@ class PostService
     }
 
     /**
-     * setPassPhraseKey
+     * setPassPhrase
      *
      * @param string $passphrase
      *
@@ -375,13 +375,11 @@ class PostService
     }
 
     /**
-     * Retrieve all posts
+     * Retrieve all posts.
      *
-     * @param number $position
-     * @param number $limit
      * @param string $orderBy
-     * @param null $author
-     * @return boolean|array|object
+     * @param mixed $author
+     * @return array|bool|object
      *
      */
     public function grabPosts($orderBy = 'ID', $author = null)
@@ -390,10 +388,10 @@ class PostService
     }
 
     /**
-     * Retrieve single post by ID
+     * Retrieve a single post by ID.
      *
-     * @param integer $id
-     * @return boolean|array|object
+     * @param int $postId
+     * @return array|bool|object
      */
     public function grabPost($postId)
     {
@@ -453,7 +451,7 @@ class PostService
     /**
      * modifyPost
      *
-     * @return integer
+     * @return void
      *
      */
     public function modifyPost()
@@ -490,7 +488,7 @@ class PostService
             $postData['media_id'] = $this->post_image;
         }
 
-        return $this->postDao->updatePost($this->sanitizer, $postData, $this->postId, $this->topics);
+        $this->postDao->updatePost($this->sanitizer, $postData, $this->postId, $this->topics);
     }
 
     /**
@@ -502,8 +500,6 @@ class PostService
     {
 
         (version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
-
-        $media_data = [];
 
         $this->validator->sanitize($this->postId, 'int');
 
@@ -550,7 +546,7 @@ class PostService
         }
 
         // Delete the post
-        return $this->postDao->deletePost($this->postId, $this->sanitizer);
+        $this->postDao->deletePost($this->postId, $this->sanitizer);
     }
 
     /**
@@ -621,9 +617,9 @@ class PostService
     /**
      * postAuthorLevel
      *
-     * Checking whether author cookie_level or session_level exists
+     * Checking whether author cookie_level or session_level exists.
      *
-     * @return void|bool return bool if return false elsewhere return void
+     * @return string|bool
      *
      */
     public function postAuthorLevel()
@@ -632,10 +628,10 @@ class PostService
     }
 
     /**
-     * Total posts records
+     * Total posts records.
      *
      * @param array $data
-     * @return integer
+     * @return int|null
      *
      */
     public function totalPosts(array $data = []): ?int
