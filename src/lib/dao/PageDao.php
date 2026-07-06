@@ -22,14 +22,15 @@ class PageDao extends Dao
     /**
      * Find pages
      *
-     * @param integer $position
-     * @param integer $limit
      * @param string $type
      * @param string $orderBy
      * @return boolean|array|object
      */
     public function findPages($type, $orderBy = 'ID', $author = null)
     {
+
+        $allowedColumns = ['ID', 'post_date', 'post_title', 'post_modified'];
+        $sortColumn = in_array($orderBy, $allowedColumns) ? $orderBy : 'ID';
 
         if (!is_null($author)) {
             $sql = "SELECT p.ID,
@@ -50,7 +51,7 @@ class PageDao extends Dao
   			INNER JOIN tbl_users AS u ON p.post_author = u.ID
   			WHERE p.post_author = ?
   			AND p.post_type = ?
-  			ORDER BY '$orderBy' DESC";
+  			ORDER BY $sortColumn DESC";
 
             $data = array($author, $type);
             $this->setSQL($sql);
@@ -74,32 +75,25 @@ class PageDao extends Dao
   		  FROM tbl_posts AS p
   		  INNER JOIN tbl_users AS u ON p.post_author = u.ID
   		  WHERE p.post_type = ?
-  		  ORDER BY '$orderBy' DESC";
+  		  ORDER BY $sortColumn DESC";
 
         $data = array($type);
         $this->setSQL($sql);
 
         return $this->findAll($data);
-
-        $this->setSQL($sql);
-
-        $pages = $this->findAll($data);
-
-        return (empty($pages)) ?: $pages;
     }
 
     /**
      * Find page by id
      *
-     * @param integer $pageId
-     * @param string $post_type
-     * @param object $sanitizing
+     * @param integer $ID
+     * @param object $sanitize
      * @return boolean|array|object
      */
-    public function findPageById($pageId, $sanitize)
+    public function findPageById($ID, $sanitize)
     {
 
-        $idsanitized = $this->filteringId($sanitize, $pageId, 'sql');
+        $idsanitized = $this->filteringId($sanitize, $ID, 'sql');
 
         $sql = "SELECT ID, 
     	           media_id, 
@@ -121,7 +115,7 @@ class PageDao extends Dao
 
         $pageById = $this->findRow([$idsanitized]);
 
-        return (empty($pageById)) ?: $pageById;
+        return (empty($pageById)) ? false : $pageById;
     }
 
     /**
@@ -132,7 +126,7 @@ class PageDao extends Dao
      * @param array $bind
      *
      */
-    public function createPage($bind)
+    public function createPage($bind): void
     {
 
         $data = [
@@ -165,11 +159,12 @@ class PageDao extends Dao
      *
      * Updating an existing page record
      *
+     * @param object $sanitize
      * @param array $bind
-     * @param integer $id
+     * @param integer $ID
      *
      */
-    public function updatePage($sanitize, $bind, $ID)
+    public function updatePage($sanitize, $bind, $ID): void
     {
 
         $cleanId = $this->filteringId($sanitize, $ID, 'sql');
@@ -203,11 +198,11 @@ class PageDao extends Dao
      *
      * Deleting an existing record based on it's ID
      *
-     * @param integer $id
-     * @param object $sanitizing
+     * @param integer $ID
+     * @param object $sanitize
      * @param string $type
      */
-    public function deletePage($ID, $sanitize, $type)
+    public function deletePage($ID, $sanitize, $type): void
     {
         $cleanId = $this->filteringId($sanitize, $ID, 'sql');
         $this->deleteRecord("tbl_posts", ["ID" => (int)$cleanId, "post_type" => $type]);

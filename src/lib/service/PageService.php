@@ -384,7 +384,7 @@ class PageService
             $pageData['media_id'] = $this->post_image;
         }
 
-        return $this->pageDao->createPage($pageData);
+        $this->pageDao->createPage($pageData);
     }
 
     /**
@@ -424,7 +424,7 @@ class PageService
             $pageData['media_id'] = $this->post_image;
         }
 
-        return $this->pageDao->updatePage($this->sanitizer, $pageData, $this->pageId);
+        $this->pageDao->updatePage($this->sanitizer, $pageData, $this->pageId);
     }
 
     /**
@@ -476,7 +476,7 @@ class PageService
         }
 
         // Delete page
-        return $this->pageDao->deletePage($this->pageId, $this->sanitizer, $this->post_type);
+        $this->pageDao->deletePage($this->pageId, $this->sanitizer, $this->post_type);
     }
 
     /**
