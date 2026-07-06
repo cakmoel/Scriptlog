@@ -4,11 +4,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 
 class DownloadHandler implements FrontRequestHandler
 {
-    private ThemeRenderer $renderer;
+    private ThemeRendererInterface $renderer;
     private ?DownloadController $downloadController;
 
     public function __construct(
-        ThemeRenderer $renderer,
+        ThemeRendererInterface $renderer,
         ?DownloadController $downloadController = null
     ) {
         $this->renderer = $renderer;

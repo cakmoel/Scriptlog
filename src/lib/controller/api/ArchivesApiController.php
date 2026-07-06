@@ -1,5 +1,5 @@
 <?php
-
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Archives API Controller
  *
@@ -38,7 +38,7 @@ class ArchivesApiController extends ApiController
      * @param array $params Query parameters
      * @return void
      */
-    public function index($params = [])
+    public function index($_params = [])
     {
         // This is a public endpoint - no auth required
         $this->requiresAuth = false;
@@ -274,9 +274,12 @@ class ArchivesApiController extends ApiController
         }
     }
 
+    // kept for potential future use
     /**
      * Transform post data for API response
      *
+     * @deprecated No longer used internally
+     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
      * @param array $post
      * @return array
      */

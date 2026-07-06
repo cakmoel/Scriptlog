@@ -389,20 +389,20 @@ class UserService
                 'user_session' => $this->user_session
 
             ]);
-        } else {
-            return $this->userDao->createUser([
-
-                'user_login' => $this->user_login,
-                'user_email' => $this->user_email,
-                'user_pass'  => $this->user_pass,
-                'user_level' => $this->user_level,
-                'user_fullname' => $this->user_fullname,
-                'user_url' => $this->user_url,
-                'user_activation_key' => $this->user_activation_key,
-                'user_session' => $this->user_session
-
-            ]);
         }
+
+        return $this->userDao->createUser([
+
+            'user_login' => $this->user_login,
+            'user_email' => $this->user_email,
+            'user_pass'  => $this->user_pass,
+            'user_level' => $this->user_level,
+            'user_fullname' => $this->user_fullname,
+            'user_url' => $this->user_url,
+            'user_activation_key' => $this->user_activation_key,
+            'user_session' => $this->user_session
+
+        ]);
     }
 
     /**
@@ -418,40 +418,19 @@ class UserService
 
         $secret = ScriptlogCryptonize::generateSecretKey();
 
-        if ($this->isUserLevel() != 'administrator') {
-            if (!empty($this->user_pass)) {
-                $bind = [
-                    'user_email'    => $this->user_email,
-                    'user_pass'     => $this->user_pass,
-                    'user_fullname' => $this->user_fullname,
-                    'user_url'      => $this->user_url
-                   ];
-            } else {
-                $bind = [
-                    'user_email'    => $this->user_email,
-                    'user_fullname' => $this->user_fullname,
-                    'user_url'      => $this->user_url
-                ];
-            }
-        } else {
-            if (!empty($this->user_pass)) {
-                $bind = [
-                    'user_email' => $this->user_email,
-                    'user_pass' => $this->user_pass,
-                    'user_level' => $this->user_level,
-                    'user_fullname' => $this->user_fullname,
-                    'user_url' => $this->user_url,
-                    'user_banned' => $this->user_banned
-                ];
-            } else {
-                $bind = [
-                    'user_email' => $this->user_email,
-                    'user_level' => $this->user_level,
-                    'user_fullname' => $this->user_fullname,
-                    'user_url' => $this->user_url,
-                    'user_banned' => $this->user_banned
-                ];
-            }
+        $bind = [
+            'user_email'    => $this->user_email,
+            'user_fullname' => $this->user_fullname,
+            'user_url'      => $this->user_url
+        ];
+
+        if (!empty($this->user_pass)) {
+            $bind['user_pass'] = $this->user_pass;
+        }
+
+        if ($this->isUserLevel() === 'administrator') {
+            $bind['user_level'] = $this->user_level;
+            $bind['user_banned'] = $this->user_banned;
         }
 
         if ($this->identifyCookieToken($secret)) {
@@ -606,15 +585,13 @@ class UserService
     public function identifyCookieToken($secret)
     {
 
-        $this->user_login = '';
+        $this->user_login = Session::getInstance()->scriptlog_session_login;
         if (isset($_COOKIE['scriptlog_auth'])) {
             try {
                 $this->user_login = ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], ScriptlogCryptonize::scriptlogCipherKey());
             } catch (Throwable $e) {
                 $this->user_login = Session::getInstance()->scriptlog_session_login;
             }
-        } else {
-            $this->user_login = Session::getInstance()->scriptlog_session_login;
         }
 
         if ((isset($_COOKIE['scriptlog_validator'])) && (isset($_COOKIE['scriptlog_selector']))) {
@@ -627,11 +604,11 @@ class UserService
             $expected_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
             $correct_selector = crypt($_COOKIE['scriptlog_selector'], $token_info['selector_hash']);
 
-            if (hash_equals($expected_validator, $correct_validator) && (Tokenizer::getRandomPasswordProtected($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']))) {
+            if (hash_equals($expected_validator, $correct_validator) && (Tokenizer::isPasswordValid($_COOKIE['scriptlog_validator'], $token_info['pwd_hash']))) {
                 $this->validator_verified = true;
             }
 
-            if (hash_equals($expected_selector, $correct_selector) && (Tokenizer::getRandomSelectorProtected($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret))) {
+            if (hash_equals($expected_selector, $correct_selector) && (Tokenizer::isSelectorValid($_COOKIE['scriptlog_selector'], $token_info['selector_hash'], $secret))) {
                 $this->selector_verified = true;
             }
 

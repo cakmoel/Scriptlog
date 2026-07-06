@@ -4,9 +4,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 
 class PageHandler implements FrontRequestHandler
 {
-    private ThemeRenderer $renderer;
+    private ThemeRendererInterface $renderer;
 
-    public function __construct(ThemeRenderer $renderer)
+    public function __construct(ThemeRendererInterface $renderer)
     {
         $this->renderer = $renderer;
     }
@@ -24,15 +24,15 @@ class PageHandler implements FrontRequestHandler
             ? HandleRequest::handleFrontHelper()
             : null;
 
-        if ($frontHelper && method_exists($frontHelper, 'grabSimpleFrontPage')) {
-            $page = $frontHelper->grabSimpleFrontPage($id);
-            if (empty($page['ID'])) {
-                $this->renderer->render404();
-            } else {
-                $this->renderer->render('page');
-            }
-        } else {
+        if (!$frontHelper || !method_exists($frontHelper, 'grabSimpleFrontPage')) {
             $this->renderer->render404();
+            return;
         }
+        $page = $frontHelper->grabSimpleFrontPage($id);
+        if (empty($page['ID'])) {
+            $this->renderer->render404();
+            return;
+        }
+        $this->renderer->render('page');
     }
 }

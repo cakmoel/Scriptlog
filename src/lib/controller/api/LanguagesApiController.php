@@ -12,7 +12,7 @@ class LanguagesApiController extends ApiController
         $this->languageService = new LanguageService();
     }
 
-    public function index($params = []): void
+    public function index($_params = []): void
     {
         $this->requiresAuth = false;
 
@@ -49,7 +49,7 @@ class LanguagesApiController extends ApiController
         }
     }
 
-    public function default($params = []): void
+    public function default($_params = []): void
     {
         $this->requiresAuth = false;
 
@@ -67,7 +67,7 @@ class LanguagesApiController extends ApiController
         }
     }
 
-    public function store($params = []): void
+    public function store($_params = []): void
     {
         $this->requiresAuth = true;
 
