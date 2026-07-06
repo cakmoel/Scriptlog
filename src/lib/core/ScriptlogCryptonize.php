@@ -263,7 +263,7 @@ class ScriptlogCryptonize
         $keyFile = self::getDefuseKeyPath();
 
         if (file_exists($keyFile)) {
-            @chmod($keyFile, 0644);
+            chmod($keyFile, 0644);
 
             if (strpos($keyFile, '.php') !== false) {
                 try {
@@ -275,7 +275,9 @@ class ScriptlogCryptonize
                     self::saveKeyToFile($keyAscii, dirname($keyFile));
                     return $keyObject;
                 }
-            } else {
+            }
+
+            if (strpos($keyFile, '.php') === false) {
                 $keyAscii = file_get_contents($keyFile);
                 if ($keyAscii === false) {
                     throw new RuntimeException("Cannot read key file: {$keyFile}");
@@ -292,28 +294,28 @@ class ScriptlogCryptonize
                 self::saveKeyToFile($keyObject->saveToAsciiSafeString(), dirname($keyFile));
                 return $keyObject;
             }
-        } else {
-            $keyObject = Key::createNewRandomKey();
-            $keyAscii = $keyObject->saveToAsciiSafeString();
-
-            $keyDir = dirname($keyFile);
-            if (!is_dir($keyDir)) {
-                @mkdir($keyDir, 0700, true);
-            }
-
-            if (!is_dir($keyDir) || !is_writable($keyDir)) {
-                $keyDir = dirname(__DIR__, 2) . '/lib/utility/.lts';
-                if (!is_dir($keyDir)) {
-                    @mkdir($keyDir, 0700, true);
-                }
-            }
-
-            @chmod($keyDir, 0700);
-            $newKeyFile = self::saveKeyToFile($keyAscii, $keyDir);
-            self::updateConfigKeyPath($newKeyFile);
-
-            return $keyObject;
         }
+
+        $keyObject = Key::createNewRandomKey();
+        $keyAscii = $keyObject->saveToAsciiSafeString();
+
+        $keyDir = dirname($keyFile);
+        if (!is_dir($keyDir)) {
+            mkdir($keyDir, 0700, true);
+        }
+
+        if (!is_dir($keyDir) || !is_writable($keyDir)) {
+            $keyDir = dirname(__DIR__, 2) . '/lib/utility/.lts';
+            if (!is_dir($keyDir)) {
+                mkdir($keyDir, 0700, true);
+            }
+        }
+
+        chmod($keyDir, 0700);
+        $newKeyFile = self::saveKeyToFile($keyAscii, $keyDir);
+        self::updateConfigKeyPath($newKeyFile);
+
+        return $keyObject;
     }
 
     /**
@@ -330,19 +332,19 @@ class ScriptlogCryptonize
             $config = require $configPath;
             $config['app']['defuse_key'] = $newKeyPath;
             $content = '<?php' . PHP_EOL . 'return ' . var_export($config, true) . ';' . PHP_EOL;
-            @file_put_contents($configPath, $content);
+            file_put_contents($configPath, $content);
         }
 
         $envPath = $rootDir . '/.env';
         if (file_exists($envPath) && is_writable($envPath)) {
-            $envContent = @file_get_contents($envPath);
+            $envContent = file_get_contents($envPath);
             $escapedPath = addslashes($newKeyPath);
             $envContent = preg_replace(
                 '/^DEFUSE_KEY_PATH=.*$/m',
                 'DEFUSE_KEY_PATH=' . $escapedPath,
                 $envContent
             );
-            @file_put_contents($envPath, $envContent);
+            file_put_contents($envPath, $envContent);
         }
 
         // Also update database tbl_settings
@@ -494,7 +496,8 @@ class ScriptlogCryptonize
             $stmt->execute();
             $result = $stmt->get_result();
 
-            if ($row = $result->fetch_assoc()) {
+            $row = $result->fetch_assoc();
+            if ($row) {
                 $mysqli->close();
                 return is_string($row['setting_value']) ? $row['setting_value'] : (string)$row['setting_value'];
             }
@@ -516,12 +519,12 @@ class ScriptlogCryptonize
     private static function generateSecureKey(string $keyDir): string
     {
         if (!is_dir($keyDir)) {
-            @mkdir($keyDir, 0755, true);
+            mkdir($keyDir, 0755, true);
         }
 
         if (strpos($keyDir, '/lib/') !== false && !file_exists($keyDir . '/.htaccess')) {
             $htaccessContent = "# Deny all public access to encryption keys\n<IfModule mod_authz_core.c>\n    Require all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n    Order deny,allow\n    Deny from all\n</IfModule>\n";
-            @file_put_contents($keyDir . '/.htaccess', $htaccessContent);
+            file_put_contents($keyDir . '/.htaccess', $htaccessContent);
         }
 
         $keyObject = Key::createNewRandomKey();
@@ -531,31 +534,6 @@ class ScriptlogCryptonize
         self::updateConfigKeyPath($newKeyFile);
 
         return $newKeyFile;
-    }
-
-    /**
-     * Load encryption key from PHP file
-     *
-     * @return string
-     */
-    private static function loadEncryptionKey(): string
-    {
-        $keyPath = self::getDefuseKeyPath();
-
-        if (file_exists($keyPath)) {
-            if (strpos($keyPath, '.php') !== false) {
-                $key = require $keyPath;
-                return $key;
-            } else {
-                $key = file_get_contents($keyPath);
-                if ($key === false) {
-                    throw new RuntimeException('Cannot read encryption key from: ' . $keyPath);
-                }
-                return $key;
-            }
-        }
-
-        throw new RuntimeException('Encryption key not found at: ' . $keyPath);
     }
 
     /**
@@ -598,8 +576,8 @@ class ScriptlogCryptonize
         $newKeyFile = $keyDir . '/' . $filename . '.php';
 
         $phpContent = "<?php\n// Encryption key generated on " . date('Y-m-d H:i:s') . "\n// Do not delete or modify this file\nreturn '" . addslashes($keyAscii) . "';";
-        @file_put_contents($newKeyFile, $phpContent);
-        @chmod($newKeyFile, 0644);
+        file_put_contents($newKeyFile, $phpContent);
+        chmod($newKeyFile, 0644);
 
         return $newKeyFile;
     }
@@ -615,8 +593,9 @@ class ScriptlogCryptonize
             LogError::setStatusCode(http_response_code());
             LogError::newMessage($e);
             LogError::customErrorMessage('admin');
-        } else {
-            error_log('ScriptlogCryptonize Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            return;
         }
+
+        error_log('ScriptlogCryptonize Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
     }
 }

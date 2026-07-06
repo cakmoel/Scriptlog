@@ -189,24 +189,25 @@ class Mailer
 
         if (!is_null($to) && !is_null($subject) && !is_null($message)) {
             return mail($to, $subject, $message, $headers);
-        } else {
-            $headers = array();
+        }
 
-            $eol = PHP_EOL;
+        $headers = array();
 
-            if (!empty($this->from)) {
-                $headers[] = 'From: ' . $this->from;
-            }
+        $eol = PHP_EOL;
 
-            if (!empty($this->cc)) {
-                $headers[] = 'CC: ' . $this->cc;
-            }
+        if (!empty($this->from)) {
+            $headers[] = 'From: ' . $this->from;
+        }
 
-            if (!empty($this->bcc)) {
-                $headers[] = 'BCC: ' . $this->bcc;
-            }
+        if (!empty($this->cc)) {
+            $headers[] = 'CC: ' . $this->cc;
+        }
 
-            $message = '';
+        if (!empty($this->bcc)) {
+            $headers[] = 'BCC: ' . $this->bcc;
+        }
+
+        $message = '';
 
             if ($this->sendText && !$this->sendHTML) {
                 $message = $this->textBody;
@@ -232,7 +233,6 @@ class Mailer
             }
 
             return mail($this->to, $this->subject, $message, implode($eol, $headers));
-        }
     }
 
     /**

@@ -59,7 +59,7 @@ class RemoteAddress
      *
      * @return bool Current setting value.
      */
-    public function getUseProxy()
+    public function isUseProxy()
     {
         return $this->useProxy;
     }

@@ -1,5 +1,5 @@
 <?php
-
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * API Response Handler
  *
@@ -87,11 +87,12 @@ class ApiResponse
             if ($rateResult['retry_after'] > 0) {
                 header('Retry-After: ' . $rateResult['retry_after']);
             }
-        } else {
-            header('X-RateLimit-Limit: ' . (self::$rateLimitLimit ?? self::RATE_LIMIT));
-            header('X-RateLimit-Remaining: ' . self::$rateLimitRemaining);
-            header('X-RateLimit-Reset: ' . self::$rateLimitReset);
+            return;
         }
+
+        header('X-RateLimit-Limit: ' . (self::$rateLimitLimit ?? self::RATE_LIMIT));
+        header('X-RateLimit-Remaining: ' . self::$rateLimitRemaining);
+        header('X-RateLimit-Reset: ' . self::$rateLimitReset);
     }
 
     /**
@@ -546,10 +547,11 @@ class ApiResponse
                 exit;
             }
             echo json_encode(null);
-        } else {
-            $jsonOptions = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT;
-            echo json_encode($data, $jsonOptions);
+            exit;
         }
+
+        $jsonOptions = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT;
+        echo json_encode($data, $jsonOptions);
 
         exit;
     }

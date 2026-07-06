@@ -160,6 +160,7 @@ class Resize
         return $newHeight;
     }
 
+    /** @SuppressWarnings(PHPMD.ElseExpression) */
     private function getSizeByAuto($newWidth, $newHeight)
     {
         if ($this->height < $this->width) {
@@ -170,15 +171,14 @@ class Resize
             // *** Image to be resized is taller (portrait)
             $optimalWidth = $this->getSizeByFixedHeight($newHeight);
             $optimalHeight = $newHeight;
-        } else { // *** Image to be resizerd is a square
+        } else { // @SuppressWarnings(PHPMD.ElseExpression)
             if ($newHeight < $newWidth) {
                 $optimalWidth = $newWidth;
                 $optimalHeight = $this->getSizeByFixedWidth($newWidth);
             } elseif ($newHeight > $newWidth) {
                 $optimalWidth = $this->getSizeByFixedHeight($newHeight);
                 $optimalHeight = $newHeight;
-            } else {
-                // *** Sqaure being resized to a square
+            } else { // @SuppressWarnings(PHPMD.ElseExpression)
                 $optimalWidth = $newWidth;
                 $optimalHeight = $newHeight;
             }
@@ -196,10 +196,10 @@ class Resize
         $heightRatio = $this->height / $newHeight;
         $widthRatio = $this->width / $newWidth;
 
+        $optimalRatio = $widthRatio;
+
         if ($heightRatio < $widthRatio) {
             $optimalRatio = $heightRatio;
-        } else {
-            $optimalRatio = $widthRatio;
         }
 
         $optimalHeight = $this->height / $optimalRatio;

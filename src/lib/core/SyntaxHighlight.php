@@ -85,11 +85,9 @@ class SyntaxHighlight
         $id = "##r" . uniqid() . "##";
 
         // String or Comment?
-        if ($match[0] == '/' || $match[0] == '#') {
-            $a[$id] = '<span class="C">' . $match . '</span>';
-        } else {
-            $a[$id] = '<span class="S">' . $match . '</span>';
-        }
+        $a[$id] = ($match[0] == '/' || $match[0] == '#')
+            ? '<span class="C">' . $match . '</span>'
+            : '<span class="S">' . $match . '</span>';
         return $id;
     }
 }

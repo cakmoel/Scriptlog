@@ -1,5 +1,5 @@
 <?php
-
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * API HATEOAS Links Generator
  *
@@ -226,6 +226,12 @@ class ApiHateoas
     {
         $links = [];
 
+        $links['self'] = [
+            'href' => $this->baseUrl . '/archives/' . $year,
+            'rel' => 'self',
+            'type' => 'GET'
+        ];
+
         if ($month !== null) {
             $links['self'] = [
                 'href' => $this->baseUrl . '/archives/' . $year . '/' . $month,
@@ -236,12 +242,6 @@ class ApiHateoas
             $links['year'] = [
                 'href' => $this->baseUrl . '/archives/' . $year,
                 'rel' => 'year',
-                'type' => 'GET'
-            ];
-        } else {
-            $links['self'] = [
-                'href' => $this->baseUrl . '/archives/' . $year,
-                'rel' => 'self',
                 'type' => 'GET'
             ];
         }

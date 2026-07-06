@@ -243,9 +243,10 @@ class HTMLPurifier
         foreach ($array_of_html as $key => $value) {
             if (is_array($value)) {
                 $array[$key] = $this->purifyArray($value, $config);
-            } else {
-                $array[$key] = $this->purify($value, $config);
+                $context_array[$key] = $this->context;
+                continue;
             }
+            $array[$key] = $this->purify($value, $config);
             $context_array[$key] = $this->context;
         }
         $this->context = $context_array;
@@ -255,6 +256,7 @@ class HTMLPurifier
     /**
      * Singleton for enforcing just one HTML Purifier in your system
      *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      * @param HTMLPurifier|HTMLPurifier_Config $prototype Optional prototype
      *                   HTMLPurifier instance to overload singleton with,
      *                   or HTMLPurifier_Config instance to configure the
@@ -269,7 +271,7 @@ class HTMLPurifier
                 self::$instance = $prototype;
             } elseif ($prototype) {
                 self::$instance = new HTMLPurifier($prototype);
-            } else {
+            } else { // @SuppressWarnings(PHPMD.ElseExpression)
                 self::$instance = new HTMLPurifier();
             }
         }

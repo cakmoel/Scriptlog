@@ -107,9 +107,10 @@ class FormValidator
             if ($result === false) {
                 $havefailures = true;
                 $this->addError($key, $val);
-            } else {
-                $this->corrects[] = $key;
+                continue;
             }
+
+            $this->corrects[] = $key;
         }
 
         return !$havefailures;

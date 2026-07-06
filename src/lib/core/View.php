@@ -61,9 +61,11 @@ class View
             $checkDir = APP_ROOT . APP_THEME . $uiPath . DS . $moduleDir;
             if ($modulePath && is_dir($checkDir) && file_exists($checkDir)) {
                 $this->dir = $checkDir;
-            } else {
-                $this->dir = APP_ROOT . APP_THEME . $uiPath . DS;
+                return;
             }
+
+            $this->dir = APP_ROOT . APP_THEME . $uiPath . DS;
+            return;
         }
 
         if (!is_null($file)) {

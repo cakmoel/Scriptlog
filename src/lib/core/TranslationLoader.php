@@ -40,7 +40,7 @@ class TranslationLoader
     private function ensureCacheDirectory(): void
     {
         if (!is_dir($this->cacheDir)) {
-            @mkdir($this->cacheDir, 0755, true);
+            mkdir($this->cacheDir, 0755, true);
         }
     }
 
@@ -105,7 +105,7 @@ class TranslationLoader
     {
         $cacheFile = $this->getCacheFilePath($locale);
 
-        @file_put_contents($cacheFile, json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        file_put_contents($cacheFile, json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     }
 
     private function loadFromDatabase(string $locale): array

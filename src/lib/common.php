@@ -75,4 +75,3 @@ if (ini_get("date.timezone") === "" && function_exists("date_default_timezone_se
     date_default_timezone_set("UTC");
 }
 
-$config = array();
