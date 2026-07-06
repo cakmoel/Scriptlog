@@ -163,9 +163,13 @@ class PerformanceOptimizationTest extends TestCase
     {
         $this->assertNotEmpty($this->headerContent, 'Header file should exist');
         
-        // Check for print media trick to defer CSS
-        $this->assertStringContainsString('media="print" onload="this.media=', $this->headerContent, 
+        // Check for print media trick to defer CSS (using JS-based loading)
+        $this->assertStringContainsString('media="print"', $this->headerContent, 
             'Should use print media trick for deferred CSS loading');
+        
+        // Check for the JS that switches media to all
+        $this->assertStringContainsString("links[i].media = 'all'", $this->headerContent,
+            'Should include JS to set media to all on load');
         
         // Check main style is deferred
         $this->assertStringContainsString('style.sea.min.css', $this->headerContent, 
