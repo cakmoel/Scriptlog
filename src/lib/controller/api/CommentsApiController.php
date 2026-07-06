@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Comments API Controller
  *
@@ -177,7 +179,7 @@ class CommentsApiController extends ApiController
      * @param array $params Request data
      * @return void
      */
-    public function store($params = [])
+    public function store($_params = [])
     {
         // This is a public endpoint - visitors can post comments
         $this->requiresAuth = false;

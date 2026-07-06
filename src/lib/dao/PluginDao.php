@@ -207,9 +207,9 @@ class PluginDao extends Dao
             $plugin_status = $this->findColumn([$plugin_name]);
 
             return (empty($plugin_status)) ?: $plugin_status;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -254,13 +254,15 @@ class PluginDao extends Dao
 
                         $html .= '<li "' . $plugin_selected . '">';
 
+                        $pluginLink = '#';
+                        clip('clip_' . safe_html($plugin['plugin_name']), null, false);
+
                         if (isset($plugin['plugin_status']) && $plugin['plugin_status'] == 'Y') {
                             clip('clip_' . safe_html($plugin['plugin_name']), null, safe_html($plugin['plugin_name']));
-                            $html .= '<a href="' . safe_html($plugin['plugin_link']) . '">' . safe_html($plugin['plugin_name']) . '</a>';
-                        } else {
-                            clip('clip_' . safe_html($plugin['plugin_name']), null, false);
-                            $html .= '<a href="#">' . safe_html($plugin['plugin_name']) . '</a>';
+                            $pluginLink = safe_html($plugin['plugin_link']);
                         }
+
+                        $html .= '<a href="' . $pluginLink . '">' . safe_html($plugin['plugin_name']) . '</a>';
 
                         $html .= '</li>';
                     }

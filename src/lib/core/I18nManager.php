@@ -11,7 +11,7 @@ class I18nManager
     private $loader;
     private $router;
     private $initialized = false;
-    private $languageDirectionCache = [];
+    private $dirCache = [];
 
     public static function getInstance(): self
     {
@@ -62,6 +62,7 @@ class I18nManager
         $this->initialized = true;
     }
 
+    /** @SuppressWarnings(PHPMD.ElseExpression) */
     public function t(string $key, array $params = [], ?string $locale = null): string
     {
         if (!$this->initialized) {
@@ -73,7 +74,7 @@ class I18nManager
         if ($locale !== $this->locale) {
             $translations = $this->loader->load($locale);
             $value = $translations[$key] ?? null;
-        } else {
+        } else { // @SuppressWarnings(PHPMD.ElseExpression)
             $value = $this->translations[$key] ?? null;
         }
 
@@ -150,8 +151,8 @@ class I18nManager
 
     public function getLanguageDirection(): string
     {
-        if (isset($this->languageDirectionCache[$this->locale])) {
-            return $this->languageDirectionCache[$this->locale];
+        if (isset($this->dirCache[$this->locale])) {
+            return $this->dirCache[$this->locale];
         }
 
         $direction = 'ltr';
@@ -166,13 +167,13 @@ class I18nManager
             }
         }
 
-        $this->languageDirectionCache[$this->locale] = $direction;
+        $this->dirCache[$this->locale] = $direction;
         return $direction;
     }
 
     public function setLanguageDirection(string $direction): void
     {
-        $this->languageDirectionCache[$this->locale] = $direction;
+        $this->dirCache[$this->locale] = $direction;
     }
 
     public function url(string $path, ?string $locale = null): string
@@ -230,7 +231,7 @@ class I18nManager
         throw new Exception("Cannot unserialize singleton");
     }
 
-    public function __unserialize(array $data): void
+    public function __unserialize(array $_data): void
     {
         throw new Exception("Cannot unserialize singleton");
     }

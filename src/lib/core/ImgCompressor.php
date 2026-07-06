@@ -17,6 +17,7 @@ class ImgCompressor
         $this->setting = $setting;
     }
 
+    /** @SuppressWarnings(PHPMD.ElseExpression) */
     private function create($image, $name, $type, $size, $c_type, $level)
     {
         $im_name = time() . $name;
@@ -26,44 +27,43 @@ class ImgCompressor
 
         // create image
         if ($type == 'image/jpeg') {
-            $im = imagecreatefromjpeg($image); // create image from jpeg
+            $im = imagecreatefromjpeg($image);
         } elseif ($type == 'image/gif') {
-            $im = imagecreatefromgif($image); // create image from gif
-        } else {
-            $im = imagecreatefrompng($image);  // create image from png (default)
+            $im = imagecreatefromgif($image);
+        } else { // @SuppressWarnings(PHPMD.ElseExpression)
+            $im = imagecreatefrompng($image);
         }
 
-        // compree image
         if (in_array($c_type, array('jpeg', 'jpg', 'JPG', 'JPEG'))) {
-            $im_name = str_replace(end($im_ex), 'jpg', $im_name); // replace file extension
-            $im_output = str_replace(end($im_ex), 'jpg', $im_output); // replace file extension
+            $im_name = str_replace(end($im_ex), 'jpg', $im_name);
+            $im_output = str_replace(end($im_ex), 'jpg', $im_output);
             if (!empty($level)) {
-                imagejpeg($im, $im_output, 100 - ($level * 10)); // if level = 2 then quality = 80%
-            } else {
-                imagejpeg($im, $im_output, 100); // default quality = 100% (no compression)
+                imagejpeg($im, $im_output, 100 - ($level * 10));
+            } else { // @SuppressWarnings(PHPMD.ElseExpression)
+                imagejpeg($im, $im_output, 100);
             }
             $im_type = 'image/jpeg';
         } elseif (in_array($c_type, array('gif', 'GIF'))) {
-            $im_name = str_replace(end($im_ex), 'gif', $im_name); // replace file extension
-            $im_output = str_replace(end($im_ex), 'gif', $im_output); // replace file extension
-            if ($this->check_transparent($im)) { // Check if image is transparent
+            $im_name = str_replace(end($im_ex), 'gif', $im_name);
+            $im_output = str_replace(end($im_ex), 'gif', $im_output);
+            if ($this->check_transparent($im)) {
                 imageAlphaBlending($im, true);
                 imageSaveAlpha($im, true);
                 imagegif($im, $im_output);
-            } else {
+            } else { // @SuppressWarnings(PHPMD.ElseExpression)
                 imagegif($im, $im_output);
             }
             $im_type = 'image/gif';
         } elseif (in_array($c_type, array('png', 'PNG'))) {
-            $im_name = str_replace(end($im_ex), 'png', $im_name); // replace file extension
-            $im_output = str_replace(end($im_ex), 'png', $im_output); // replace file extension
-            if ($this->check_transparent($im)) { // Check if image is transparent
-                imageAlphaBlending($im, true);
-                imageSaveAlpha($im, true);
-                imagepng($im, $im_output, $level); // if level = 2 like quality = 80%
-            } else {
-                imagepng($im, $im_output, $level); // default level = 0 (no compression)
-            }
+            $im_name = str_replace(end($im_ex), 'png', $im_name);
+            $im_output = str_replace(end($im_ex), 'png', $im_output);
+                if ($this->check_transparent($im)) {
+                    imageAlphaBlending($im, true);
+                    imageSaveAlpha($im, true);
+                    imagepng($im, $im_output, $level);
+                } else { // @SuppressWarnings(PHPMD.ElseExpression)
+                    imagepng($im, $im_output, $level);
+                }
             $im_type = 'image/png';
         }
 
@@ -126,18 +126,17 @@ class ImgCompressor
                 if ($level >= 0 && $level <= 9) {
                     $result['status'] = 'success';
                     $result['data'] = $this->create($image, $im_name, $im_type, $im_size, $c_type, $level);
-                } else {
-                    $result['status'] = 'error';
-                    $result['message'] = 'Compression level: from 0 (no compression) to 9';
+                    return $result;
                 }
-            } else {
+
                 $result['status'] = 'error';
-                $result['message'] = 'Failed file type';
+                $result['message'] = 'Compression level: from 0 (no compression) to 9';
+                return $result;
             }
-        } else {
-            $result['status'] = 'error';
-            $result['message'] = 'Failed file type';
         }
+
+        $result['status'] = 'error';
+        $result['message'] = 'Failed file type';
 
         return $result;
     }

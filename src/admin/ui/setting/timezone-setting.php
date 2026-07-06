@@ -81,7 +81,7 @@
         </div>
     </section>
 </div>
-<script>
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
 let data = Intl.DateTimeFormat().resolvedOptions()
 $("#timezone").val(data.timeZone);
 </script>

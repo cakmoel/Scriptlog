@@ -1,5 +1,5 @@
 <?php
-
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Search API Controller
  *
@@ -42,7 +42,7 @@ class SearchApiController extends ApiController
      * @param array $params Query parameters (q, type)
      * @return void
      */
-    public function index($params = [])
+    public function index($_params = [])
     {
         $this->requiresAuth = false;
 
@@ -126,7 +126,7 @@ class SearchApiController extends ApiController
      * @param string $type
      * @return array
      */
-    private function transformResults($results, $type)
+    private function transformResults($results, $_type)
     {
         if (empty($results)) {
             return [];

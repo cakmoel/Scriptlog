@@ -295,6 +295,7 @@ final class Html
     }
 
 
+    /** @SuppressWarnings(PHPMD.ElseExpression) */
     protected function cleanAttributeNode(&$node, &$attr, &$goodAttributes, &$href)
     {
         /**
@@ -326,7 +327,7 @@ final class Html
                 case 'longdesc':
                     if (self::urlFilter($val)) {
                         $href = $val;
-                    } else {
+                    } else { // @SuppressWarnings(PHPMD.ElseExpression)
                         $val = '';
                     }
                     break;
@@ -337,7 +338,7 @@ final class Html
                 default:
                     if (self::decodeScrub($val)) {
                         $val = self::entities($val);
-                    } else {
+                    } else { // @SuppressWarnings(PHPMD.ElseExpression)
                         $val = '';
                     }
             }
@@ -378,6 +379,7 @@ final class Html
                 );
             }
         } catch (Exception $e) {
+            // Silently ignore invalid attributes
         }
     }
 
@@ -440,14 +442,10 @@ final class Html
                     $this->cleanNodes($child, $badTags);
                 }
             }
-        } else {
+            return;
+        }
 
-            /**
-             * Not in whitelist so no need to check its child nodes.
-             * Simply add to array of nodes pending deletion.
-             */
-            $badTags[] = $node;
-        } // End if array_key_exists( $node->nodeName, self::$whitelist )
+        $badTags[] = $node;
     }
 
     /**#@-*/
@@ -480,18 +478,15 @@ final class Html
             /**
              * PHP's native filter isn't restrictive enough.
              */
-            if (preg_match(self::$options['rx_url'], $v)) {
-                $out = true;
-            } else {
-                $out = false;
-            }
+            $out = (bool) preg_match(self::$options['rx_url'], $v);
 
             if ($out) {
                 $out = self::decodeScrub($v);
             }
-        } else {
-            $out = false;
+            return $out;
         }
+
+        return false;
 
         return $out;
     }
@@ -526,18 +521,18 @@ final class Html
             ) {
                 $success = false;
                 break;
-            } else {
-                $old    = $v;
-                $v  = self::utfdecode($v);
+            }
 
-                /**
-                 * We found the the lowest decode level.
-                 * No need to continue decoding.
-                 */
-                if ($old === $v) {
-                    $success = true;
-                    break;
-                }
+            $old    = $v;
+            $v  = self::utfdecode($v);
+
+            /**
+             * We found the the lowest decode level.
+             * No need to continue decoding.
+             */
+            if ($old === $v) {
+                $success = true;
+                break;
             }
 
             $i++;

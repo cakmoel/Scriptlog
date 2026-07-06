@@ -43,18 +43,20 @@ class UserTokenDao extends Dao
             $this->setSQL($sql);
 
             $userToken = (is_null($fetchMode)) ? $this->findRow([':user_email' => $login, ':expired' => $expired]) : $this->findRow([':user_email' => $login, ':expired' => $expired], $fetchMode);
-        } else {
-            $sql = "SELECT t.ID, t.user_login, t.pwd_hash, t.selector_hash, 
-                     t.is_expired, t.expired_date,
-                     u.user_login, u.user_email
-             FROM tbl_user_token AS t
-             INNER JOIN tbl_users AS u ON t.user_login = u.user_login 
-             WHERE u.user_login = :user_login AND t.is_expired = :expired";
 
-            $this->setSQL($sql);
-
-            $userToken = (is_null($fetchMode)) ? $this->findRow([':user_login' => $login, ':expired' => $expired]) : $this->findRow([':user_login' => $login, ':expired' => $expired], $fetchMode);
+            return (empty($userToken)) ?: $userToken;
         }
+
+        $sql = "SELECT t.ID, t.user_login, t.pwd_hash, t.selector_hash, 
+                 t.is_expired, t.expired_date,
+                 u.user_login, u.user_email
+         FROM tbl_user_token AS t
+         INNER JOIN tbl_users AS u ON t.user_login = u.user_login 
+         WHERE u.user_login = :user_login AND t.is_expired = :expired";
+
+        $this->setSQL($sql);
+
+        $userToken = (is_null($fetchMode)) ? $this->findRow([':user_login' => $login, ':expired' => $expired]) : $this->findRow([':user_login' => $login, ':expired' => $expired], $fetchMode);
 
         return (empty($userToken)) ?: $userToken;
     }

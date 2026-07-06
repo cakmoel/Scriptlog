@@ -57,11 +57,12 @@ class PassPhraseKey
 
         if (false === self::checkingUserLevel()) {
             scriptlog_error("You are not allowed to do this procedure");
-        } else {
-            $fp = fopen(self::grabFilename($filename), 'w');
-            fwrite($fp, $passphrase);
-            fclose($fp);
+            return;
         }
+
+        $fp = fopen(self::grabFilename($filename), 'w');
+        fwrite($fp, $passphrase);
+        fclose($fp);
     }
 
     /**
@@ -74,17 +75,18 @@ class PassPhraseKey
     {
         if (false === self::checkingUserLevel()) {
             scriptlog_error("You are not allowed to do this procedure");
-        } else {
-            $readPassPhraseKey = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? fopen($filename, "rb") : fopen($filename, "r");
-
-            if (false === fgets($readPassPhraseKey, 4096)) {
-                scriptlog_error("Error: Unexpected fget() fail\n");
-            } else {
-                echo fgets($readPassPhraseKey, 4096);
-            }
-
-            fclose($readPassPhraseKey);
+            return;
         }
+
+        $readPassPhraseKey = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? fopen($filename, "rb") : fopen($filename, "r");
+
+        if (false === fgets($readPassPhraseKey, 4096)) {
+            scriptlog_error("Error: Unexpected fget() fail\n");
+            return;
+        }
+        echo fgets($readPassPhraseKey, 4096);
+
+        fclose($readPassPhraseKey);
     }
 
     /**
@@ -137,8 +139,9 @@ class PassPhraseKey
 
         if ((!file_exists(static::$filepath . static::$filename)) || (!is_writable(static::$filepath . static::$filename))) {
             scriptlog_error("Permission denied");
-        } else {
-            return static::$filepath . static::$filename;
+            return null;
         }
+
+        return static::$filepath . static::$filename;
     }
 }

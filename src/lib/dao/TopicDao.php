@@ -157,46 +157,47 @@ class TopicDao extends Dao
         $checked = "";
 
         if (empty($postId)) {
-            if (is_array($items)) {
-                foreach ($items as $item) {
-                    if (isset($_POST['catID'])) {
-                        if (in_array($item['ID'], $_POST['catID'])) {
-                            $checked = "checked='checked'";
-                        } else {
-                            $checked = null;
-                        }
-                    }
-
-                    $html .= '<div class="checkbox">';
-                    $html .= '<label>';
-                    $html .= '<input type="checkbox" name="catID[]" value="' . $item['ID'] . '" ' . $checked . '>' . $item['topic_title'];
-                    $html .= '</label>';
-                    $html .= '</div>';
-                }
-            } else {
+            if (!is_array($items)) {
                 $html .= '<div class="checkbox">';
                 $html .= '<label>';
                 $html .= '<input type="checkbox" name="catID" value="0" checked>Uncategorized';
                 $html .= '</label>';
                 $html .= '</div>';
+                $html .= '</div>';
+
+                return $html;
             }
-        } else {
-            if (is_array($items)) {
-                foreach ($items as $i => $item) {
-                    $post_topic = $this->findPostTopic($item['ID'], $postId);
 
-                    if (isset($post_topic['topic_id']) && $post_topic['topic_id'] == $item['ID']) {
-                        $checked = "checked='checked'";
-                    } else {
-                        $checked = null;
-                    }
+            foreach ($items as $item) {
+                $checked = (isset($_POST['catID']) && in_array($item['ID'], $_POST['catID']))
+                    ? "checked='checked'"
+                    : null;
 
-                    $html .= '<div class="checkbox">';
-                    $html .= '<label>';
-                    $html .= '<input type="checkbox" name="catID[]" value="' . $item['ID'] . '" ' . $checked . '>' . $item['topic_title'];
-                    $html .= '</label>';
-                    $html .= '</div>';
-                }
+                $html .= '<div class="checkbox">';
+                $html .= '<label>';
+                $html .= '<input type="checkbox" name="catID[]" value="' . $item['ID'] . '" ' . $checked . '>' . $item['topic_title'];
+                $html .= '</label>';
+                $html .= '</div>';
+            }
+
+            $html .= '</div>';
+
+            return $html;
+        }
+
+        if (is_array($items)) {
+            foreach ($items as $item) {
+                $post_topic = $this->findPostTopic($item['ID'], $postId);
+
+                $checked = (isset($post_topic['topic_id']) && $post_topic['topic_id'] == $item['ID'])
+                    ? "checked='checked'"
+                    : null;
+
+                $html .= '<div class="checkbox">';
+                $html .= '<label>';
+                $html .= '<input type="checkbox" name="catID[]" value="' . $item['ID'] . '" ' . $checked . '>' . $item['topic_title'];
+                $html .= '</label>';
+                $html .= '</div>';
             }
         }
 

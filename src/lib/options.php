@@ -21,3 +21,6 @@ ini_set('session.gc_maxlifetime', 1440);
 ini_set('session.gc_probability', 1);
 
 #header("Permissions-Policy: interest-cohort=()"); // Opt out of FLoC
+
+// Enable debug logging for security headers (set to true for troubleshooting)
+defined('APP_HEADER_DEBUG') || define('APP_HEADER_DEBUG', false);

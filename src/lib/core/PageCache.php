@@ -16,7 +16,7 @@ class PageCache
 
     private $cache_folder = APP_ROOT . 'public/cache/';
 
-    private $include_query_strings = true;
+    private $includeQueryStr = true;
 
     private $cache_file = "";
 
@@ -27,7 +27,7 @@ class PageCache
     {
 
         $file = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : "";
-        if (!$this->include_query_strings && strpos($file, "?") !== false) {
+        if (!$this->includeQueryStr && strpos($file, "?") !== false) {
             $qs = explode("?", $file);
             $file = $qs[0];
         }

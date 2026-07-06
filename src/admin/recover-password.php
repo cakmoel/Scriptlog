@@ -117,8 +117,8 @@ if (isset($_POST['Change']) && $_POST['Change'] == 'Change Password') {
     if (isset($stop)) :
         ?>
 <div class="alert alert-danger">
-        <?= $stop; ?>
-<script type="text/javascript">function leave() {  window.location = "<?= $config['app']['url']; ?>";} setTimeout("leave()", 3640);</script>
+        <?= safe_html($stop); ?>
+<script type="text/javascript">function leave() {  window.location = "<?= safe_html($config['app']['url']); ?>";} setTimeout("leave()", 3640);</script>
 </div>
     <?php else :
         ?>

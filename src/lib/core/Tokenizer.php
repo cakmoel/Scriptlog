@@ -71,7 +71,7 @@ final class Tokenizer
      * @return bool
      *
      */
-    public static function getRandomPasswordProtected($password, $hash)
+    public static function isPasswordValid($password, $hash)
     {
 
         return password_verify($password, $hash);
@@ -95,7 +95,7 @@ final class Tokenizer
     }
 
     /**
-     * getRandomSelectorProtected
+     * isSelectorValid
      *
      * @param string $cipher_data
      * @param string $selector
@@ -103,27 +103,15 @@ final class Tokenizer
      * @return bool
      *
      */
-    public static function getRandomSelectorProtected($cipher_data, $selector, $key)
+    public static function isSelectorValid($cipher_data, $selector, $key)
     {
 
-        switch (get_browser_name()) {
-            case 'Chrome':
-            case 'Edge':
-            case 'Opera':
-                $decipher = ScriptlogCryptonize::decipherMessage($cipher_data, $key);
+        $decipher = ScriptlogCryptonize::decipherMessage($cipher_data, $key);
 
-                $hash_data = hash('SHA256', $selector, true);
+        $hash_data = hash('sha256', $selector, true);
 
-                $hash_encoded = base64_encode($hash_data);
+        $hash_encoded = base64_encode($hash_data);
 
-                return password_verify($hash_encoded, (string) $decipher);
-
-                break;
-
-            default:
-                return password_verify($cipher_data, $selector);
-
-                break;
-        }
+        return password_verify($hash_encoded, (string) $decipher);
     }
 }

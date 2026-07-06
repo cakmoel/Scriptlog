@@ -11,11 +11,15 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @license  MIT
  * @version  1.0
  * @since    Since Release 1.0
+ * @SuppressWarnings(PHPMD.UnusedPrivateField)
+ * @SuppressWarnings(PHPMD.ElseExpression)
  *
  */
 class DownloadController extends BaseApp
 {
     private $downloadService;
+
+    /** @deprecated */
     private $view;
 
     public function __construct(DownloadService $downloadService)
@@ -222,7 +226,8 @@ class DownloadController extends BaseApp
         $units = ['B', 'KB', 'MB', 'GB'];
         $i = 0;
 
-        while ($size >= 1024 && $i < count($units) - 1) {
+        $unitsCount = count($units);
+        while ($size >= 1024 && $i < $unitsCount - 1) {
             $size /= 1024;
             $i++;
         }

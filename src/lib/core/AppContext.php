@@ -1,5 +1,6 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * A simple Read-Only Data Object to hold application state.
  *

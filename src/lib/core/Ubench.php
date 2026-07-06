@@ -181,12 +181,13 @@ class Ubench
         if ($microtime >= 1) {
             $unit = 's';
             $time = round($microtime, $round);
-        } else {
-            $unit = 'ms';
-            $time = round($microtime * 1000);
-
-            $format = preg_replace('/(%.[\d]+f)/', '%d', $format);
+            return sprintf($format, $time, $unit);
         }
+
+        $unit = 'ms';
+        $time = round($microtime * 1000);
+
+        $format = preg_replace('/(%.[\d]+f)/', '%d', $format);
 
         return sprintf($format, $time, $unit);
     }

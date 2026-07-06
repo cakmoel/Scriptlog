@@ -267,15 +267,15 @@ class DownloadService
      * @param string $identifier
      * @return string
      */
-    public function getDownloadUrl($mediaId, $identifier)
+    public function getDownloadUrl($_mediaId, $identifier)
     {
         $appUrl = function_exists('app_url') ? app_url() : '';
 
         if (function_exists('is_permalink_enabled') && is_permalink_enabled() === 'yes') {
             return $appUrl . '/download/' . $identifier . '/file';
-        } else {
-            return $appUrl . '/?download=' . $identifier . '/file';
         }
+
+        return $appUrl . '/?download=' . $identifier . '/file';
     }
 
     /**
@@ -318,9 +318,9 @@ class DownloadService
             $totalDownloads += $this->getDownloadCountByMedia($download['media_id']);
             if ($this->isDownloadExpired($download['media_identifier'])) {
                 $expiredLinks++;
-            } else {
-                $activeLinks++;
+                continue;
             }
+            $activeLinks++;
         }
 
         return [

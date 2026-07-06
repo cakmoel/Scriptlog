@@ -156,13 +156,15 @@ class TranslationService
                 $this->translationDao->updateTranslation($existing['ID'], [
                     'translation_value' => $value,
                 ]);
-            } else {
-                $this->translationDao->createTranslation([
-                    'lang_id' => $language['ID'],
-                    'translation_key' => $key,
-                    'translation_value' => $value,
-                ]);
+
+                continue;
             }
+
+            $this->translationDao->createTranslation([
+                'lang_id' => $language['ID'],
+                'translation_key' => $key,
+                'translation_value' => $value,
+            ]);
 
             $imported++;
         }

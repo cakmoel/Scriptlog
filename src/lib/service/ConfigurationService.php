@@ -176,8 +176,8 @@ class ConfigurationService
      */
     public function membershipDefaultRoleDropDown($selected = "")
     {
-        $membershipDefaultRole = class_exists('UserDao') ? new UserDao() : "";
-        return $membershipDefaultRole->dropDownUserLevel($selected);
+        $defaultRole = class_exists('UserDao') ? new UserDao() : "";
+        return $defaultRole->dropDownUserLevel($selected);
     }
 
     /**

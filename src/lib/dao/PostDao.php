@@ -146,42 +146,28 @@ WHERE ID = ? AND post_type = 'blog'";
 
         $this->setSQL("SET SQL_MODE='ALLOW_INVALID_DATE'");
 
+        $data = [
+           'post_author' => $bind['post_author'],
+           'post_date' => $bind['post_date'],
+           'post_title' => $bind['post_title'],
+           'post_slug' => $bind['post_slug'],
+           'post_content' => $bind['post_content'],
+           'post_summary' => $bind['post_summary'],
+           'post_status' => $bind['post_status'],
+           'post_visibility' => $bind['post_visibility'],
+           'post_password' => $bind['post_password'],
+           'post_tags' => $bind['post_tags'],
+           'post_headlines' => $bind['post_headlines'],
+           'post_locale' => $bind['post_locale'] ?? 'en',
+           'comment_status' => $bind['comment_status'],
+           'passphrase' => $bind['passphrase']
+        ];
+
         if (!empty($bind['media_id'])) {
-            $this->create("tbl_posts", [
-                'media_id' => $bind['media_id'],
-                'post_author' => $bind['post_author'],
-                'post_date' => $bind['post_date'],
-                'post_title' => $bind['post_title'],
-                'post_slug' => $bind['post_slug'],
-                'post_content' => $bind['post_content'],
-                'post_summary' => $bind['post_summary'],
-                'post_status' => $bind['post_status'],
-                'post_visibility' => $bind['post_visibility'],
-                'post_password' => $bind['post_password'],
-                'post_tags' => $bind['post_tags'],
-                'post_headlines' => $bind['post_headlines'],
-                'post_locale' => $bind['post_locale'] ?? 'en',
-                'comment_status' => $bind['comment_status'],
-                'passphrase' => $bind['passphrase']
-                ]);
-        } else {
-            $this->create("tbl_posts", [
-               'post_author' => $bind['post_author'],
-               'post_date' => $bind['post_date'],
-               'post_title' => $bind['post_title'],
-               'post_slug' => $bind['post_slug'],
-               'post_content' => $bind['post_content'],
-               'post_summary' => $bind['post_summary'],
-               'post_status' => $bind['post_status'],
-               'post_visibility' => $bind['post_visibility'],
-               'post_password' => $bind['post_password'],
-               'post_tags' => $bind['post_tags'],
-               'post_headlines' => $bind['post_headlines'],
-               'post_locale' => $bind['post_locale'] ?? 'en',
-               'comment_status' => $bind['comment_status'],
-               'passphrase' => $bind['passphrase']
-            ]);
+            $data['media_id'] = $bind['media_id'];
         }
+
+        $this->create("tbl_posts", $data);
 
         $postId = $this->lastId();
 
@@ -195,11 +181,13 @@ WHERE ID = ? AND post_type = 'blog'";
                   'post_id' => $postId,
                   'topic_id' => $topicId]);
             }
-        } else {
-            $this->create("tbl_post_topic", [
-              'post_id' => $postId,
-              'topic_id' => $topicId]);
+
+            return $postId;
         }
+
+        $this->create("tbl_post_topic", [
+          'post_id' => $postId,
+          'topic_id' => $topicId]);
 
         return $postId;
     }
@@ -421,14 +409,27 @@ WHERE ID = ? AND post_type = 'blog'";
             $dropdown .= '<label for="protected">Password:</label>';
             $dropdown .= '<input type="password" class="form-control" name="post_password" value="' . $post_pwd . '" placeholder="Use a secure password">';
             $dropdown .= '<p class="help-block">Protected with a password you choose. Only those with the password can view this post.</p>';
-        } else {
-            $dropdown .= '<div id="protected" style="display:none">';
-            $dropdown .= '<br />';
-            $dropdown .= '<label for="protected">Password:</label>';
-            $dropdown .= '<input type="password" class="form-control" name="post_password" value="" placeholder="Use a secure password">';
-            $dropdown .= '<p class="help-block">Protected with a password you choose. Only those with the password can view this post.</p>';
+            $dropdown .= '</div>';
+            $dropdown .= '</div>';
+            $dropdown .= '<script>';
+            $dropdown .= 'function checkVisibilitySelection() {' . PHP_EOL;
+            $dropdown .= 'a = document.getElementById("visibility.system");' . PHP_EOL;
+            $dropdown .= 'if (a.value == "protected")' . PHP_EOL;
+            $dropdown .= 'document.getElementById("protected").setAttribute("style", "display:inline");' . PHP_EOL;
+            $dropdown .= 'else' . PHP_EOL;
+            $dropdown .= 'document.getElementById("protected").setAttribute("style", "display:none");' . PHP_EOL;
+            $dropdown .= 'return a.value;' . PHP_EOL;
+            $dropdown .= '}' . PHP_EOL;
+            $dropdown .= '</script>';
+
+            return $dropdown;
         }
 
+        $dropdown .= '<div id="protected" style="display:none">';
+        $dropdown .= '<br />';
+        $dropdown .= '<label for="protected">Password:</label>';
+        $dropdown .= '<input type="password" class="form-control" name="post_password" value="" placeholder="Use a secure password">';
+        $dropdown .= '<p class="help-block">Protected with a password you choose. Only those with the password can view this post.</p>';
         $dropdown .= '</div>';
         $dropdown .= '</div>';
         $dropdown .= '<script>';
@@ -455,10 +456,10 @@ WHERE ID = ? AND post_type = 'blog'";
     public function totalPostRecords(array $data = []): ?int
     {
 
+        $sql = "SELECT ID FROM tbl_posts WHERE post_type = 'blog'";
+
         if (!empty($data)) {
             $sql = "SELECT ID FROM tbl_posts WHERE post_author = ? AND post_type = 'blog'";
-        } else {
-            $sql = "SELECT ID FROM tbl_posts WHERE post_type = 'blog'";
         }
 
         $this->setSQL($sql);

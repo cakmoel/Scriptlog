@@ -16,7 +16,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @see https://stackoverflow.com/questions/26419426/htaccess-url-re-styling-image-url-to-seo-friendly
  * @see https://mediatemple.net/community/products/dv/204643270/using-htaccess-rewrite-rules
  * @see https://stackoverflow.com/questions/16388959/url-rewriting-with-php
- * @version  1.1
+ * @version  1.1.2
  * @since    Since Release 0.1
  *
  */
@@ -31,6 +31,11 @@ class Dispatcher
     private $route = [];
 
     /**
+     * @var array|null Compiled combined regex cache for frontend routes
+     */
+    private $frontendCompiled = null;
+
+    /**
      * Theme's Directory
      *
      * @var string
@@ -39,17 +44,17 @@ class Dispatcher
     private $theme_dir;
 
     /**
-     * ThemeRenderer instance for centralized theme rendering
+     * ThemeRendererInterface instance for centralized theme rendering
      *
-     * @var ThemeRenderer|null
+     * @var ThemeRendererInterface|null
      */
-    private ?ThemeRenderer $themeRenderer = null;
+    private ?ThemeRendererInterface $themeRenderer = null;
 
     /**
      * Constructor
      * Registry route and Initialize an instantiate of theme
      */
-    public function __construct(?ThemeRenderer $themeRenderer = null)
+    public function __construct(?ThemeRendererInterface $themeRenderer = null)
     {
         $this->themeRenderer = $themeRenderer;
 
@@ -69,9 +74,10 @@ class Dispatcher
     {
         if (rewrite_status() === 'yes') {
             $this->handleSeoFriendlyUrl();
-        } else {
-            $this->handleQueryStringUrl();
+            return;
         }
+
+        $this->handleQueryStringUrl();
     }
 
     /**
@@ -85,31 +91,8 @@ class Dispatcher
         // Handle download query string even when SEO URLs are enabled
         // This ensures ?download=xxx works regardless of permalink setting
         if (isset($_GET['download']) && !empty($_GET['download'])) {
-            $downloadIdentifier = trim($_GET['download']);
-
-            // Check if it's a file download request
-            if (strpos($_SERVER['REQUEST_URI'], '/file') !== false) {
-                $downloadController = class_exists('Registry') ? Registry::get('downloadController') : null;
-                if ($downloadController instanceof DownloadController) {
-                    $downloadController->download($downloadIdentifier);
-                } else {
-                    $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
-                    $downloadController->download($downloadIdentifier);
-                }
-                return;
-            } else {
-                // Pass identifier to template via global variable
-                $GLOBALS['download_identifier'] = $downloadIdentifier;
-                if ($this->themeRenderer) {
-                    $this->themeRenderer->render('download');
-                } else {
-                    http_response_code(200);
-                    call_theme_header();
-                    call_theme_content('download');
-                    call_theme_footer();
-                }
-                return;
-            }
+            $this->handleQueryDownload();
+            return;
         }
 
         // Handle locale prefix if LocaleRouter is available
@@ -139,30 +122,45 @@ class Dispatcher
         // 1. Get RequestPath object from the Registry
         $requestPath = class_exists('Registry') ? Registry::get('uri') : null;
 
-        foreach ($this->route as $key => $pattern) {
-            $matches = []; // Initialize $matches as an empty array for safety
+        // 2. Compile frontend routes on first call (cached for request lifecycle)
+        if ($this->frontendCompiled === null) {
+            $this->frontendCompiled = $this->compileFrontendRoutes();
+        }
 
-            // 2. Perform the regex match, capturing results into $matches
-            if (preg_match('~^' . $pattern . '$~i', $requestUri, $matches)) {
-                // 3. Ensure $matches is an array and the object is valid before calling the setter
-                if (is_object($requestPath) && method_exists($requestPath, 'setParameters') && is_array($matches)) {
-                    $requestPath->setParameters($matches);
+        $compiled = $this->frontendCompiled;
+
+        // 3. Phase 1: Single combined preg_match per chunk (fast-fail)
+        if (!preg_match($compiled['regex'], $requestUri)) {
+            $this->errorNotFound();
+            return;
+        }
+
+        // 4. Phase 2: Per-route regex for precise identification
+        foreach ($compiled['map'] as $entry) {
+            $routeMatches = [];
+
+            if (preg_match($entry['regex'], $requestUri, $routeMatches)) {
+                // 5. Set matched parameters on RequestPath
+                // Note: $routeMatches is always an array here (initialized above,
+                // populated by-ref via preg_match), so no is_array() guard is needed.
+                if (is_object($requestPath) && method_exists($requestPath, 'setParameters')) {
+                    $requestPath->setParameters($routeMatches);
                 }
 
-                // 4. Check if content exists before rendering
-                if (!$this->validateContentExists($key, $requestPath)) {
+                // 6. Check if content exists before rendering
+                if (!$this->validateContentExists($entry['key'], $requestPath)) {
                     $this->errorNotFound();
                     return;
                 }
 
-                // 5. Special handling for download_file - bypass theme headers/footers
-                if ($key === 'download_file') {
+                // 7. Special handling for download_file - bypass theme headers/footers
+                if ($entry['key'] === 'download_file') {
                     $this->renderDownloadFile($requestPath);
                     return;
                 }
 
-                // 6. Render the found template
-                $this->renderTheme($key);
+                // 8. Render the found template
+                $this->renderTheme($entry['key']);
                 return;
             }
         }
@@ -186,82 +184,119 @@ class Dispatcher
 
         switch ($routeKey) {
             case 'single':
-                $postId = isset($requestPath->id) ? $requestPath->id : null;
-                $postSlug = isset($requestPath->post) ? $requestPath->post : null;
-
-                if (empty($postId) || empty($postSlug)) {
-                    return false;
-                }
-
-                $post = class_exists('FrontHelper') ? FrontHelper::grabPreparedFrontPostById($postId) : null;
-
-                if (empty($post) || !is_array($post)) {
-                    return false;
-                }
-
-                // Validate slug matches - redirect to 404 if slug is incorrect
-                $dbSlug = isset($post['post_slug']) ? $post['post_slug'] : '';
-                return ($dbSlug === $postSlug);
-
+                return $this->validateSinglePost($requestPath);
             case 'page':
-                $pageSlug = isset($requestPath->page) ? $requestPath->page : null;
-
-                if (empty($pageSlug)) {
-                    return false;
-                }
-
-                $page = class_exists('FrontHelper') ? FrontHelper::grabPreparedFrontPageBySlug($pageSlug) : null;
-
-                if (empty($page) || !is_array($page)) {
-                    return false;
-                }
-
-                // Validate slug matches - redirect to 404 if slug is incorrect
-                $dbSlug = isset($page['post_slug']) ? $page['post_slug'] : '';
-                return ($dbSlug === $pageSlug);
-
+                return $this->validatePage($requestPath);
             case 'category':
-                $categorySlug = isset($requestPath->category) ? $requestPath->category : null;
-                if (empty($categorySlug)) {
-                    return false;
-                }
-                $topic = class_exists('FrontHelper') ? FrontHelper::grabPreparedFrontTopicBySlug($categorySlug) : null;
-                return !empty($topic) && is_array($topic);
-
+                return $this->validateCategory($requestPath);
             case 'archive':
-                $month = isset($requestPath->param1) ? $requestPath->param1 : null;
-                $year = isset($requestPath->param2) ? $requestPath->param2 : null;
-                if (empty($month) || empty($year)) {
-                    return false;
-                }
-                // Check if there are posts in this archive
-                $archives = class_exists('FrontHelper') ? FrontHelper::grabSimpleFrontArchive() : [];
-                $monthInt = (int)$month;
-                $yearInt = (int)$year;
-                foreach ($archives as $archive) {
-                    if ((int)$archive['month_archive'] === $monthInt && (int)$archive['year_archive'] === $yearInt) {
-                        return true;
-                    }
-                }
-                return false;
-
+                return $this->validateArchive($requestPath);
             case 'tag':
-                $tagSlug = isset($requestPath->tag) ? $requestPath->tag : null;
-                if (empty($tagSlug)) {
-                    return false;
-                }
-                // Tags are stored as comma-separated values in post_tags column
-                // Use FrontHelper::simpleSearchingTag which does full-text search
-                $tag = class_exists('FrontHelper') ? FrontHelper::simpleSearchingTag($tagSlug) : null;
-                return !empty($tag);
-
+                return $this->validateTag($requestPath);
             case 'archives':
-                // Archive index - always valid if archives exist
                 return true;
-
             default:
                 return true;
         }
+    }
+
+    private function validateSinglePost($requestPath)
+    {
+        $postId = isset($requestPath->id) ? $requestPath->id : null;
+        $postSlug = isset($requestPath->post) ? $requestPath->post : null;
+
+        if (empty($postId) || empty($postSlug)) {
+            return false;
+        }
+
+        $post = class_exists('FrontHelper') ? FrontHelper::grabPreparedFrontPostById($postId) : null;
+
+        if (empty($post) || !is_array($post)) {
+            return false;
+        }
+
+        $dbSlug = isset($post['post_slug']) ? $post['post_slug'] : '';
+        return ($dbSlug === $postSlug);
+    }
+
+    private function validatePage($requestPath)
+    {
+        $pageSlug = isset($requestPath->page) ? $requestPath->page : null;
+
+        if (empty($pageSlug)) {
+            return false;
+        }
+
+        $page = class_exists('FrontHelper') ? FrontHelper::grabPreparedFrontPageBySlug($pageSlug) : null;
+
+        if (empty($page) || !is_array($page)) {
+            return false;
+        }
+
+        $dbSlug = isset($page['post_slug']) ? $page['post_slug'] : '';
+        return ($dbSlug === $pageSlug);
+    }
+
+    private function validateCategory($requestPath)
+    {
+        $categorySlug = isset($requestPath->category) ? $requestPath->category : null;
+        if (empty($categorySlug)) {
+            return false;
+        }
+        $topic = class_exists('FrontHelper') ? FrontHelper::grabPreparedFrontTopicBySlug($categorySlug) : null;
+        return !empty($topic) && is_array($topic);
+    }
+
+    private function validateArchive($requestPath)
+    {
+        $month = isset($requestPath->param1) ? $requestPath->param1 : null;
+        $year = isset($requestPath->param2) ? $requestPath->param2 : null;
+        if (empty($month) || empty($year)) {
+            return false;
+        }
+        $archives = class_exists('FrontHelper') ? FrontHelper::grabSimpleFrontArchive() : [];
+        $monthInt = (int)$month;
+        $yearInt = (int)$year;
+        foreach ($archives as $archive) {
+            if ((int)$archive['month_archive'] === $monthInt && (int)$archive['year_archive'] === $yearInt) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function validateTag($requestPath)
+    {
+        $tagSlug = isset($requestPath->tag) ? $requestPath->tag : null;
+        if (empty($tagSlug)) {
+            return false;
+        }
+        $tag = class_exists('FrontHelper') ? FrontHelper::simpleSearchingTag($tagSlug) : null;
+        return !empty($tag);
+    }
+
+    private function handleQueryDownload()
+    {
+        $downloadIdentifier = trim($_GET['download']);
+
+        if (strpos($_SERVER['REQUEST_URI'], '/file') !== false) {
+            $downloadController = Registry::get('downloadController');
+            if (!($downloadController instanceof DownloadController)) {
+                $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
+            }
+            $downloadController->download($downloadIdentifier);
+            return;
+        }
+
+        $GLOBALS['download_identifier'] = $downloadIdentifier;
+        if ($this->themeRenderer) {
+            $this->themeRenderer->render('download');
+            return;
+        }
+        http_response_code(200);
+        call_theme_header();
+        call_theme_content('download');
+        call_theme_footer();
     }
 
     /**
@@ -331,6 +366,51 @@ class Dispatcher
     }
 
     /**
+     * Compile all frontend routes into a combined (?|...) branch-reset regex.
+     *
+     * Converts Perl-style (?'name'...) named groups to numbered groups for
+     * the combined regex, while preserving the original pattern for the
+     * per-route verification phase. With ~13 routes, no chunking is needed.
+     *
+     * @return array
+     */
+    private function compileFrontendRoutes()
+    {
+        $branches = [];
+        $map = [];
+
+        foreach ($this->route as $key => $pattern) {
+            $numbered = $pattern;
+            $paramMap = [];
+
+            if (strpos($pattern, "?'") !== false) {
+                $numbered = preg_replace_callback(
+                    "/\(\?'(\w+)'([^)]+)\)/",
+                    function ($m) use (&$paramMap) {
+                        $pos = count($paramMap) + 1;
+                        $paramMap[$pos] = $m[1];
+                        return '(' . $m[2] . ')';
+                    },
+                    $pattern
+                );
+            }
+
+            $branches[] = $numbered;
+
+            $map[] = [
+                'key' => $key,
+                'regex' => '~^' . $pattern . '$~i',
+                'paramMap' => $paramMap,
+            ];
+        }
+
+        return [
+            'regex' => '~^(?|' . implode('|', $branches) . ')$~ix',
+            'map' => $map,
+        ];
+    }
+
+    /**
      * renderDownloadFile
      *
      * Handles actual file download - bypasses theme headers/footers
@@ -338,11 +418,14 @@ class Dispatcher
      * @param RequestPath $requestPath
      *
      */
-    private function renderDownloadFile($requestPath)
+    private function renderDownloadFile($_requestPath)
     {
         // Make $requestPath available to the download handler
         // Directly include download handler without theme wrappers
-        include_once APP_ROOT . APP_THEME . theme_identifier()['theme_directory'] . DIRECTORY_SEPARATOR . 'download_file.php';
+        $downloadPath = ($this->themeRenderer !== null)
+            ? $this->themeRenderer->getThemeDir()
+            : APP_ROOT . APP_THEME . theme_identifier()['theme_directory'] . DIRECTORY_SEPARATOR;
+        include_once $downloadPath . 'download_file.php';
     }
 
     /* errorNotFound

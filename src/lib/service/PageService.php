@@ -366,36 +366,25 @@ class PageService
             $this->validator->sanitize($this->post_tags, 'string');
         }
 
+        $pageData = [
+          'post_author' => $this->author,
+          'post_date' => date_for_database($this->post_date),
+          'post_title' => $this->title,
+          'post_slug' => $this->slug,
+          'post_content' => $this->content,
+          'post_summary' => $this->meta_desc,
+          'post_status' => $this->page_status,
+          'post_sticky' => $this->page_sticky,
+          'post_type' => $this->post_type,
+          'post_locale' => $this->page_locale ?? 'en',
+          'comment_status' => $this->comment_status
+        ];
+
         if (!empty($this->post_image)) {
-            return $this->pageDao->createPage([
-              'media_id' => $this->post_image,
-              'post_author' => $this->author,
-              'post_date' => date_for_database($this->post_date),
-              'post_title' => $this->title,
-              'post_slug' => $this->slug,
-              'post_content' => $this->content,
-              'post_summary' => $this->meta_desc,
-              'post_status' => $this->page_status,
-              'post_sticky' => $this->page_sticky,
-              'post_type' => $this->post_type,
-              'post_locale' => $this->page_locale ?? 'en',
-              'comment_status' => $this->comment_status
-            ]);
-        } else {
-            return $this->pageDao->createPage([
-              'post_author' => $this->author,
-              'post_date' => date_for_database($this->post_date),
-              'post_title' => $this->title,
-              'post_slug' => $this->slug,
-              'post_content' => $this->content,
-              'post_summary' => $this->meta_desc,
-              'post_status' => $this->page_status,
-              'post_sticky' => $this->page_sticky,
-              'post_type' => $this->post_type,
-              'post_locale' => $this->page_locale ?? 'en',
-              'comment_status' => $this->comment_status
-            ]);
+            $pageData['media_id'] = $this->post_image;
         }
+
+        return $this->pageDao->createPage($pageData);
     }
 
     /**
@@ -417,36 +406,25 @@ class PageService
             $this->validator->sanitize($this->post_tags, 'string');
         }
 
-        if (empty($this->post_image)) {
-            return $this->pageDao->updatePage($this->sanitizer, [
-              'post_author' => $this->author,
-              'post_modified' => date_for_database($this->post_modified),
-              'post_title' => $this->title,
-              'post_slug' => $this->slug,
-              'post_content' => $this->content,
-              'post_summary' => $this->meta_desc,
-              'post_tags' => $this->post_tags,
-              'post_status' => $this->page_status,
-              'post_sticky' => $this->page_sticky,
-              'post_type' => $this->post_type,
-              'post_locale' => $this->page_locale ?? 'en'
-            ], $this->pageId);
-        } else {
-            return $this->pageDao->updatePage($this->sanitizer, [
-              'media_id' => $this->post_image,
-              'post_author' => $this->author,
-              'post_modified' => date_for_database($this->post_modified),
-              'post_title' => $this->title,
-              'post_slug' => $this->slug,
-              'post_content' => $this->content,
-              'post_summary' => $this->meta_desc,
-              'post_tags' => $this->post_tags,
-              'post_status' => $this->page_status,
-              'post_sticky' => $this->page_sticky,
-              'post_type' => $this->post_type,
-              'post_locale' => $this->page_locale ?? 'en'
-            ], $this->pageId);
+        $pageData = [
+          'post_author' => $this->author,
+          'post_modified' => date_for_database($this->post_modified),
+          'post_title' => $this->title,
+          'post_slug' => $this->slug,
+          'post_content' => $this->content,
+          'post_summary' => $this->meta_desc,
+          'post_tags' => $this->post_tags,
+          'post_status' => $this->page_status,
+          'post_sticky' => $this->page_sticky,
+          'post_type' => $this->post_type,
+          'post_locale' => $this->page_locale ?? 'en'
+        ];
+
+        if (!empty($this->post_image)) {
+            $pageData['media_id'] = $this->post_image;
         }
+
+        return $this->pageDao->updatePage($this->sanitizer, $pageData, $this->pageId);
     }
 
     /**
@@ -458,7 +436,8 @@ class PageService
 
         $this->validator->sanitize($this->pageId, 'int');
 
-        if (!$data_page = $this->pageDao->findPageById($this->pageId, $this->post_type, $this->sanitizer)) {
+        $data_page = $this->pageDao->findPageById($this->pageId, $this->post_type, $this->sanitizer);
+        if (!$data_page) {
             direct_page('index.php?load=pages&error=pageNotFound', 404);
         }
 

@@ -12,7 +12,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  */
 
-class ServiceException extends \Exception implements IEventThrowable
+class ServiceException extends \Exception implements IServiceThrowable
 {
     protected $message = 'Unknown Exception';
 
