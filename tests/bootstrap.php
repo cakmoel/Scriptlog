@@ -43,3 +43,5 @@ if (file_exists(__DIR__ . '/../src/lib/Autoloader.php')) {
 
 $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36';
+$_SERVER['SERVER_NAME'] = 'localhost';
+$_SERVER['PHP_SELF'] = '/index.php';
