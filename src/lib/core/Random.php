@@ -71,9 +71,9 @@ class Random
         $mask = pow(2, $bits) - 1;
         if ($mask >= \PHP_INT_MAX) {
             $mask = \PHP_INT_MAX;
-        } else {
-            $mask = (int) $mask;
         }
+
+        $mask = (int) $mask;
         do {
             $test = $this->bytes($bytes);
             $result = hexdec(bin2hex($test)) & $mask;
@@ -101,6 +101,10 @@ class Random
      */
     public function choose($value)
     {
+        if (!is_string($value) && !is_array($value) && !is_object($value)) {
+            throw new \InvalidArgumentException('Unsure what to choose from, please provide a string, array or object');
+        }
+
         $count = 0;
         if (is_string($value)) {
             $count = strlen($value);
@@ -110,9 +114,8 @@ class Random
         } elseif (is_object($value)) {
             $value = array_values(get_object_vars($value));
             $count = count($value);
-        } else {
-            throw new \InvalidArgumentException('Unsure what to choose from, please provide a string, array or object');
         }
+
         return $value[$this->int(0, $count - 1)];
     }
 
@@ -126,6 +129,10 @@ class Random
      */
     public function shuffle($value)
     {
+        if (!is_string($value) && !is_array($value) && !is_object($value)) {
+            throw new \InvalidArgumentException('Unsure what to shuffle, please provide a string, array or object');
+        }
+
         $buffer = array();
         if (is_string($value)) {
             $buffer = str_split($value, 1);
@@ -133,8 +140,6 @@ class Random
             $buffer = array_values($value);
         } elseif (is_object($value)) {
             $buffer = array_values(get_object_vars($value));
-        } else {
-            throw new \InvalidArgumentException('Unsure what to shuffle, please provide a string, array or object');
         }
         $result = array();
         while (!empty($buffer)) {
@@ -168,12 +173,14 @@ class Random
      */
     public function token($length, $alphabet = self::TOKEN_ALNUM)
     {
+        if (!is_string($alphabet) && !is_array($alphabet)) {
+            throw new \InvalidArgumentException("Expecting either a String or Array alphabet");
+        }
+
         if (is_string($alphabet)) {
             $alphabet = str_split($alphabet, 1);
         } elseif (is_array($alphabet)) {
             $alphabet = array_values($alphabet);
-        } else {
-            throw new \InvalidArgumentException("Expecting either a String or Array alphabet");
         }
         $alphabet = array_unique($alphabet);
         $count = count($alphabet);
@@ -263,9 +270,9 @@ class Random
     {
         if (ord(self::$state) % 2 === 0) {
             return hash_hmac('sha256', $buffer1, $buffer2, true);
-        } else {
-            return hash_hmac('sha256', $buffer2, $buffer1, true);
         }
+
+        return hash_hmac('sha256', $buffer2, $buffer1, true);
     }
 
     /**

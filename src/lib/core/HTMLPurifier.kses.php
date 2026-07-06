@@ -14,9 +14,9 @@ function kses($string, $allowed_html, $allowed_protocols = null)
     $allowed_attributes = array();
     foreach ($allowed_html as $element => $attributes) {
         $allowed_elements[$element] = true;
-        foreach ($attributes as $attribute => $x) {
-            $allowed_attributes["$element.$attribute"] = true;
-        }
+    foreach (array_keys($attributes) as $attribute) {
+        $allowed_attributes["$element.$attribute"] = true;
+    }
     }
     $config->set('HTML.AllowedElements', $allowed_elements);
     $config->set('HTML.AllowedAttributes', $allowed_attributes);

@@ -26,11 +26,12 @@ class Wall extends Dashboard
             $non_admin = isset($_COOKIE['scriptlog_auth']) ? user_info($authenticator, $user_login)['user_fullname'] : Session::getInstance()->scriptlog_session_fullname;
 
             $this->welcomeUser(safe_html($non_admin));
-        } else {
-            $administrator = isset($_COOKIE['scriptlog_auth']) ? user_info($authenticator, $user_login)['user_login'] : Session::getInstance()->scriptlog_session_login;
-
-            $this->welcomeAdmin(safe_html($administrator));
+            return;
         }
+
+        $administrator = isset($_COOKIE['scriptlog_auth']) ? user_info($authenticator, $user_login)['user_login'] : Session::getInstance()->scriptlog_session_login;
+
+        $this->welcomeAdmin(safe_html($administrator));
     }
 
     /**

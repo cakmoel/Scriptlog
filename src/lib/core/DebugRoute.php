@@ -34,6 +34,7 @@ class DebugRoute
         return urldecode($request_uri);
     }
 
+    /** @SuppressWarnings(PHPMD.DevelopmentCodeFragment) @SuppressWarnings(PHPMD.ElseExpression) */
     public static function debugging()
     {
         error_reporting(E_ALL); // Set error reporting to show all errors and warnings
@@ -45,7 +46,7 @@ class DebugRoute
             $pattern = '~^' . $value . '$~i';
 
             // Try to match the URL against the pattern
-            if (@preg_match($pattern, $requestURI, $matches)) {
+            if (preg_match($pattern, $requestURI, $matches)) {
                 echo "<div style='padding: 10px; border: 1px solid #ccc; margin-bottom: 20px;'>";
                 echo "<h3 style='margin: 0;'>Debugging Results</h3>";
                 echo "<hr style='margin-top: 5px; margin-bottom: 10px;'>";
@@ -57,10 +58,8 @@ class DebugRoute
                 // Print captured parameters
                 if (!empty($matches)) {
                     echo "<strong style='color: #008000;'>Captured parameters:</strong><br>";
-                    echo "<pre>";
-                    print_r($matches);
-                    echo "</pre>";
-                } else {
+                    error_log(print_r($matches, true)); // @SuppressWarnings(PHPMD.DevelopmentCodeFragment)
+                } else { // @SuppressWarnings(PHPMD.ElseExpression)
                     echo "<strong style='color: #008000;'>No captured parameters</strong>";
                 }
 

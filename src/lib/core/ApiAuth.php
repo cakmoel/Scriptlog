@@ -1,5 +1,5 @@
 <?php
-
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * API Authentication
  *
@@ -487,12 +487,13 @@ class ApiAuth
                 $sql = "UPDATE tbl_settings SET setting_value = ? WHERE setting_name = 'api_key_user_" . (int)$userId . "'";
                 $stmt = $dbc->prepare($sql);
                 $stmt->execute([$key]);
-            } else {
-                // Insert new
-                $sql = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES ('api_key_user_" . (int)$userId . "', ?)";
-                $stmt = $dbc->prepare($sql);
-                $stmt->execute([$key]);
+                return $key;
             }
+
+            // Insert new
+            $sql = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES ('api_key_user_" . (int)$userId . "', ?)";
+            $stmt = $dbc->prepare($sql);
+            $stmt->execute([$key]);
 
             return $key;
         } catch (\Throwable $e) {
