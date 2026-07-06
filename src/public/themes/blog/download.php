@@ -118,8 +118,7 @@ $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
                     <button type="button"
                             class="download-share-btn"
                             id="copy-link-btn"
-                            aria-label="Copy download link to clipboard"
-                            onclick="copyDownloadLink()">
+                            aria-label="Copy download link to clipboard">
                         <i class="fa fa-copy" aria-hidden="true"></i>
                         <span>Copy</span>
                     </button>
@@ -154,7 +153,7 @@ $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
     </div>
 </section>
 
-<script>
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
 (function() {
     'use strict';
 
@@ -240,10 +239,13 @@ $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
         }, 2000);
     }
 
-    // Keyboard support: Enter/Space on button
+    // Click and keyboard support for copy button
     document.addEventListener('DOMContentLoaded', function() {
         var btn = document.getElementById('copy-link-btn');
         if (btn) {
+            btn.addEventListener('click', function(e) {
+                window.copyDownloadLink();
+            });
             btn.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
