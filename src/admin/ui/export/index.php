@@ -141,7 +141,7 @@
     </div>
   </section>
   
-  <script>
+  <script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
   (function() {
     document.getElementById('exportBtn').addEventListener('click', function(e) {
       var selectedDest = document.getElementById('destination').value;
