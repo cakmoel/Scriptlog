@@ -565,7 +565,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('langSelector').addEventListener('change', function() {
         var lang = this.value;

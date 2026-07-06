@@ -70,7 +70,7 @@ function login_footer($stylePath)
 <script src="<?= $stylePath; ?>/assets/components/bootstrap/dist/js/bootstrap.min.js?v=<?=$version; ?>"></script>
 <script src="<?= $stylePath; ?>/assets/components/iCheck/icheck.min.js?v=<?=$version; ?>"></script>
 <script src="<?= $stylePath; ?>/assets/dist/js/checklogin.js?v=<?=$version; ?>"></script>
-<script>
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
     $(function () {
       $('input').iCheck({
         checkboxClass: 'icheckbox_square-blue',

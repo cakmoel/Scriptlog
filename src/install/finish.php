@@ -17,7 +17,7 @@ require dirname(__FILE__) . '/install-layout.php';
 
 $current_path = preg_replace("/\/index\.php.*$/i", "", current_url());
 
-install_header($current_path, $protocol, $server_host);
+install_header($current_path);
 
 ?>
 

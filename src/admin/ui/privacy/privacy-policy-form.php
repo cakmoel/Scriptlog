@@ -135,7 +135,7 @@
     </section>
 </div>
 
-<script>
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
 $(document).ready(function() {
     // Initialize Select2 for dropdowns
     $('.select2').select2();
