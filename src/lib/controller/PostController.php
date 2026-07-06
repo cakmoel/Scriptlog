@@ -10,6 +10,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version   1.0
  * @since     Since Release 1.0
  *
+ * @SuppressWarnings(PHPMD.ElseExpression)
  */
 class PostController extends BaseApp
 {
@@ -71,14 +72,8 @@ class PostController extends BaseApp
         return $this->view->render();
     }
 
-    /**
-     * Insert new post
-     * {@inheritDoc}
-     * @see BaseApp::insert()
-     */
     public function insert()
     {
-
         $topics = new TopicDao();
         $medialib = new MediaDao();
         $errors = array();
@@ -92,277 +87,32 @@ class PostController extends BaseApp
             $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : '';
             $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
 
-            $filters = [
-              'post_title' => isset($_POST['post_title']) ? Sanitize::strictSanitizer($_POST['post_title']) : "",
-              'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-              'post_date' => isset($_POST['post_date']) ? Sanitize::mildSanitizer($_POST['post_date']) : "",
-              'image_id' => isset($_POST['image_id']) ? FILTER_SANITIZE_NUMBER_INT : "",
-              'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
-              'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-              'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-              'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
-              'visibility' => isset($_POST['visibility']) ? Sanitize::mildSanitizer($_POST['visibility']) : "",
-              'post_password' => isset($_POST['post_password']) ? FILTER_SANITIZE_FULL_SPECIAL_CHARS : "",
-              'post_headlines' => FILTER_SANITIZE_NUMBER_INT,
-              'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : "",
-              'post_locale' => isset($_POST['post_locale']) ? Sanitize::mildSanitizer($_POST['post_locale']) : "en"
-            ];
-
+            $filters = $this->getPostFilters();
             $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_tags' => 200, 'post_content' => 500000];
 
             $new_filename = generate_filename($file_name)['new_filename'];
             $file_extension = generate_filename($file_name)['file_extension'];
 
             try {
-                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
-                    header('Status: 400 Bad Request');
-                    throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
-                }
+                $this->checkPostCsrf();
+                $this->checkPostPayload();
 
-                if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_date', 'image_id', 'catID', 'post_summary', 'post_tags', 'post_status', 'post_headlines', 'visibility', 'comment_status']) === false) {
-                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . ' 413 Payload Too Large', true, 413);
-                    header('Status: 413 Payload Too Large');
-                    header('Retry-After: 3600');
-                    throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
-                }
-
-                if ((empty($_POST['post_title'])) || (empty($_POST['post_content']))) {
-                    $checkError = false;
-                    array_push($errors, "Please enter a required field");
-                }
-
-                if (true === form_size_validation($form_fields)) {
-                    $checkError = false;
-                    array_push($errors, "Form data is longer than allowed");
-                }
-
-                if (false === sanitize_selection_box(distill_post_request($filters)['post_status'], ['publish' => 'Publish', 'draft' => 'Draft'])) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_INVALID_SELECTBOX);
-                }
-
-                if (false === sanitize_selection_box(distill_post_request($filters)['comment_status'], ['open' => 'Open', 'closed' => 'Closed'])) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_INVALID_SELECTBOX);
-                }
-
-                if (false === sanitize_selection_box(distill_post_request($filters)['visibility'], ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'])) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_INVALID_SELECTBOX);
-                }
-
-                if (!empty($_POST['post_date']) && validate_date($_POST['post_date']) === false) {
-                    $checkError = false;
-                    array_push($errors, "Please fix your date format");
-                }
-
-                if (!empty($file_location)) {
-                    if (is_array($file_error)) {
-                        $checkError = false;
-                        array_push($errors, "Invalid paramenter");
-                    }
-
-                    switch ($file_error) {
-                        case UPLOAD_ERR_OK:
-                            break;
-                        case UPLOAD_ERR_INI_SIZE:
-                        case UPLOAD_ERR_FORM_SIZE:
-                            $checkError = false;
-                            array_push($errors, "Exceeded filesize limit");
-                            break;
-                        default:
-                            $checkError = false;
-                            array_push($errors, "Unknown errors");
-                            break;
-                    }
-
-                    if ($file_size > APP_FILE_SIZE) {
-                        $checkError = false;
-                        array_push($errors, "Exceeded file size limit. Maximum file size is. " . format_size_unit(APP_FILE_SIZE));
-                    }
-
-                    if (false === check_file_name($file_location)) {
-                        $checkError = false;
-                        array_push($errors, "File name is not valid");
-                    }
-
-                    if (true === check_file_length($file_location)) {
-                        $checkError = false;
-                        array_push($errors, "File name is too long");
-                    }
-
-                    if ((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
-                        $checkError = false;
-                        array_push($errors, "Invalid file format");
-                    }
-                }
-
-                if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
-                    if (check_common_password($_POST['post_password']) === true) {
-                        $checkError = false;
-                        array_push($errors, "Your password seems to be the most hacked password, please try another");
-                    }
-
-                    if (false === check_pwd_strength($_POST['post_password'])) {
-                        $checkError = false;
-                        array_push($errors, MESSAGE_WEAK_PASSWORD);
-                    }
-                }
+                $checkError = $this->validatePostSubmission($filters, $form_fields, $file_location, $file_error, $file_size, $file_name, $errors, $checkError);
 
                 if (!$checkError) {
-                    $this->setView('edit-post');
-                    $this->setPageTitle('Add New Post');
-                    $this->setFormAction(ActionConst::NEWPOST);
-                    $this->view->set('pageTitle', $this->getPageTitle());
-                    $this->view->set('formAction', $this->getFormAction());
-                    $this->view->set('errors', $errors);
-                    $this->view->set('formData', $_POST);
-                    $this->view->set('topics', $topics->setCheckBoxTopic());
-
-                    if ($user_level === 'contributor') {
-                        $this->view->set('medialibs', $medialib->dropDownMediaSelect());
-                    } else {
-                        $this->view->set('medialibs', $medialib->imageUploadHandler());
-                    }
-
-                    $this->view->set('postStatus', $this->postService->postStatusDropDown());
-                    $this->view->set('commentStatus', $this->postService->commentStatusDropDown());
-                    $this->view->set('postVisibility', $this->postService->visibilityDropDown());
-                    $this->view->set('postLocale', $this->postService->localeDropDown());
-                    $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-                } else {
-                    list($width, $height) = ($file_location) ? getimagesize($file_location) : getimagesize(app_url() . '/public/files/pictures/nophoto.jpg');
-
-                    $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] === 'publish')) ? 'public' : 'private';
-
-                    if (empty($file_location)) {
-                        if (isset($_POST['image_id'])) {
-                            $this->postService->setPostImage((int)distill_post_request($filters)['image_id']);
-                        } else {
-                            clearstatcache();
-
-                            $media_metavalue = array(
-                              'Origin' => "nophoto.jpg",
-                              'File type' => "image/jpg",
-                              'File size' => format_size_unit(filesize(__DIR__ . '/../../' . APP_IMAGE . "nophoto.jpg")),
-                              'Uploaded at' => date("Y-m-d H:i:s"),
-                              'Dimension' => $width . 'x' . $height
-                            );
-
-                            $bind_media = [
-                              'media_filename' => "nophoto.jpg",
-                              'media_caption' => prevent_injection(distill_post_request($filters)['post_title']),
-                              'media_type' => "image/jpg",
-                              'media_target' => 'blog',
-                              'media_user' => $user_level,
-                              'media_access' => $media_access,
-                              'media_status' => '1'
-                            ];
-
-                            $append_media = $medialib->createMedia($bind_media);
-
-                            $mediameta = [
-                              'media_id' => $append_media,
-                              'meta_key' => "nophoto.jpg",
-                              'meta_value' => json_encode($media_metavalue)
-                            ];
-
-                            $medialib->createMediaMeta($mediameta);
-
-                            $this->postService->setPostImage($append_media);
-                        }
-                    } else {
-                        $media_metavalue = array();
-
-                        if ($file_extension === "jpeg" || $file_extension === "jpg" || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp" || $file_extension === "bmp") {
-                            $media_metavalue = array(
-                              'Origin' => rename_file($file_name),
-                              'File type' => $file_type,
-                              'File size' => format_size_unit($file_size),
-                              'Uploaded at' => date("Y-m-d H:i:s"),
-                              'Dimension' => $width . 'x' . $height
-                            );
-                        }
-
-                        if (is_uploaded_file($file_location)) {
-                            upload_media($file_location, $file_type, $file_size, basename($new_filename));
-                        }
-
-                        $bind_media = [
-                          'media_filename' => $new_filename,
-                          'media_caption' => prevent_injection(distill_post_request($filters)['post_title']),
-                          'media_type' => $file_type,
-                          'media_target' => 'blog',
-                          'media_user' => $user_level,
-                          'media_access' => $media_access,
-                          'media_status' => '1'
-                        ];
-
-                        $append_media = $medialib->createMedia($bind_media);
-
-                        $mediameta = [
-                          'media_id' => $append_media,
-                          'meta_key' => $new_filename,
-                          'meta_value' => json_encode($media_metavalue)
-                        ];
-
-                        $medialib->createMediaMeta($mediameta);
-
-                        $this->postService->setPostImage($append_media);
-                    }
-
-                    if (isset($_POST['catID']) && $_POST['catID'] == 0) {
-                        $this->postService->setTopics(0);
-                    } else {
-                        $this->postService->setTopics(distill_post_request($filters)['catID']);
-                    }
-
-                    $this->postService->setPostAuthor((int)$this->postService->postAuthorId());
-
-                    if (empty($_POST['post_date'])) {
-                        $this->postService->setPostDate(date_for_database());
-                    } else {
-                        $this->postService->setPostDate(date_for_database(distill_post_request($filters)['post_date']));
-                    }
-
-                    $this->postService->setPostTitle(distill_post_request($filters)['post_title']);
-                    $this->postService->setPostSlug(distill_post_request($filters)['post_title']);
-
-                    if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
-                        if (!empty($_POST['post_password'])) {
-                            $protected = protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password']);
-                            $this->postService->setPostContent($protected['post_content']);
-                            $this->postService->setProtected($protected['post_password']);
-                            $this->postService->setPassPhrase(distill_post_request($filters)['post_password']);
-                            $_SESSION['post_protected'] = distill_post_request($filters)['post_password'];
-                        }
-                    } else {
-                        $this->postService->setPostContent(distill_post_request($filters)['post_content']);
-                    }
-
-                    $this->postService->setPublish(distill_post_request($filters)['post_status']);
-                    $this->postService->setVisibility(distill_post_request($filters)['visibility']);
-
-                    if (empty($_POST['post_headlines'])) {
-                        $this->postService->setHeadlines(0);
-                    } else {
-                        $this->postService->setHeadlines(distill_post_request($filters)['post_headlines']);
-                    }
-
-                    $this->postService->setComment(distill_post_request($filters)['comment_status']);
-                    $this->postService->setMetaDesc(distill_post_request($filters)['post_summary']);
-                    $this->postService->setPostLocale(distill_post_request($filters)['post_locale']);
-
-                    if (isset($_POST['post_tags'])) {
-                        $this->postService->setPostTags(distill_post_request($filters)['post_tags']);
-                    }
-
-                    $this->postService->addPost();
-
-                    $_SESSION['status'] = "postAdded";
-                    direct_page('index.php?load=posts&status=postAdded', 200);
+                    $this->renderNewPostForm($errors, $_POST, $topics, $medialib, $user_level);
+                    return $this->view->render();
                 }
+
+                list($width, $height) = ($file_location) ? getimagesize($file_location) : getimagesize(app_url() . '/public/files/pictures/nophoto.jpg');
+                $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] === 'publish')) ? 'public' : 'private';
+
+                $this->handlePostImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, $filters, $medialib);
+                $this->setPostServiceData($filters);
+
+                $this->postService->addPost();
+                $_SESSION['status'] = "postAdded";
+                direct_page('index.php?load=posts&status=postAdded', 200);
             } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
@@ -370,28 +120,316 @@ class PostController extends BaseApp
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($e);
             }
-        } else {
-            $this->setView('edit-post');
-            $this->setPageTitle('Add new post');
-            $this->setFormAction(ActionConst::NEWPOST);
-            $this->view->set('pageTitle', $this->getPageTitle());
-            $this->view->set('formAction', $this->getFormAction());
-            $this->view->set('topics', $topics->setCheckBoxTopic());
-
-            if ($user_level === 'contributor') {
-                $this->view->set('medialibs', $medialib->dropDownMediaSelect());
-            } else {
-                $this->view->set('medialibs', $medialib->imageUploadHandler());
-            }
-
-            $this->view->set('postStatus', $this->postService->postStatusDropDown());
-            $this->view->set('commentStatus', $this->postService->commentStatusDropDown());
-            $this->view->set('postVisibility', $this->postService->visibilityDropDown());
-            $this->view->set('postLocale', $this->postService->localeDropDown());
-            $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
         }
 
+        $this->renderNewPostForm(null, null, $topics, $medialib, $user_level);
         return $this->view->render();
+    }
+
+    private function getPostFilters()
+    {
+        return [
+          'post_title' => isset($_POST['post_title']) ? Sanitize::strictSanitizer($_POST['post_title']) : "",
+          'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+          'post_date' => isset($_POST['post_date']) ? Sanitize::mildSanitizer($_POST['post_date']) : "",
+          'image_id' => isset($_POST['image_id']) ? FILTER_SANITIZE_NUMBER_INT : "",
+          'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
+          'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+          'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+          'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
+          'visibility' => isset($_POST['visibility']) ? Sanitize::mildSanitizer($_POST['visibility']) : "",
+          'post_password' => isset($_POST['post_password']) ? FILTER_SANITIZE_FULL_SPECIAL_CHARS : "",
+          'post_headlines' => FILTER_SANITIZE_NUMBER_INT,
+          'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : "",
+          'post_locale' => isset($_POST['post_locale']) ? Sanitize::mildSanitizer($_POST['post_locale']) : "en"
+        ];
+    }
+
+    private function checkPostCsrf()
+    {
+        if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+            header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
+            header('Status: 400 Bad Request');
+            throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
+        }
+    }
+
+    private function checkPostPayload()
+    {
+        if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_date', 'image_id', 'catID', 'post_summary', 'post_tags', 'post_status', 'post_headlines', 'visibility', 'comment_status']) === false) {
+            header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . ' 413 Payload Too Large', true, 413);
+            header('Status: 413 Payload Too Large');
+            header('Retry-After: 3600');
+            throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
+        }
+    }
+
+    private function validatePostSubmission($filters, $form_fields, $file_location, $file_error, $file_size, $file_name, &$errors, $checkError)
+    {
+        if ((empty($_POST['post_title'])) || (empty($_POST['post_content']))) {
+            $checkError = false;
+            array_push($errors, "Please enter a required field");
+        }
+
+        if (true === form_size_validation($form_fields)) {
+            $checkError = false;
+            array_push($errors, "Form data is longer than allowed");
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['post_status'], ['publish' => 'Publish', 'draft' => 'Draft'])) {
+            $checkError = false;
+            array_push($errors, MESSAGE_INVALID_SELECTBOX);
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['comment_status'], ['open' => 'Open', 'closed' => 'Closed'])) {
+            $checkError = false;
+            array_push($errors, MESSAGE_INVALID_SELECTBOX);
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['visibility'], ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'])) {
+            $checkError = false;
+            array_push($errors, MESSAGE_INVALID_SELECTBOX);
+        }
+
+        if (!empty($_POST['post_date']) && validate_date($_POST['post_date']) === false) {
+            $checkError = false;
+            array_push($errors, "Please fix your date format");
+        }
+
+        if (!empty($file_location)) {
+            $checkError = $this->validateFileUpload($file_location, $file_error, $file_size, $file_name, $errors, $checkError);
+        }
+
+        if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
+            $checkError = $this->validateProtectedPassword($errors, $checkError);
+        }
+
+        return $checkError;
+    }
+
+    private function validateFileUpload($file_location, $file_error, $file_size, $file_name, &$errors, $checkError)
+    {
+        if (is_array($file_error)) {
+            $checkError = false;
+            array_push($errors, "Invalid paramenter");
+        }
+
+        switch ($file_error) {
+            case UPLOAD_ERR_OK:
+                break;
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                $checkError = false;
+                array_push($errors, "Exceeded filesize limit");
+                break;
+            default:
+                $checkError = false;
+                array_push($errors, "Unknown errors");
+                break;
+        }
+
+        if ($file_size > APP_FILE_SIZE) {
+            $checkError = false;
+            array_push($errors, "Exceeded file size limit. Maximum file size is. " . format_size_unit(APP_FILE_SIZE));
+        }
+
+        if (false === check_file_name($file_location)) {
+            $checkError = false;
+            array_push($errors, "File name is not valid");
+        }
+
+        if (true === check_file_length($file_location)) {
+            $checkError = false;
+            array_push($errors, "File name is too long");
+        }
+
+        if ((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
+            $checkError = false;
+            array_push($errors, "Invalid file format");
+        }
+
+        return $checkError;
+    }
+
+    private function validateProtectedPassword(&$errors, $checkError)
+    {
+        if (check_common_password($_POST['post_password']) === true) {
+            $checkError = false;
+            array_push($errors, "Your password seems to be the most hacked password, please try another");
+        }
+
+        if (false === check_pwd_strength($_POST['post_password'])) {
+            $checkError = false;
+            array_push($errors, MESSAGE_WEAK_PASSWORD);
+        }
+
+        return $checkError;
+    }
+
+    /** @SuppressWarnings(PHPMD.ExcessiveParameterList) */
+    private function handlePostImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, $filters, $medialib)
+    {
+        if (empty($file_location)) {
+            $this->handleDefaultImage($filters, $width, $height, $media_access, $user_level, $medialib);
+            return;
+        }
+
+        $this->handleUploadedImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, $filters, $medialib);
+    }
+
+    private function handleDefaultImage($filters, $width, $height, $media_access, $user_level, $medialib)
+    {
+        if (isset($_POST['image_id'])) {
+            $this->postService->setPostImage((int)distill_post_request($filters)['image_id']);
+            return;
+        }
+
+        clearstatcache();
+        $media_metavalue = array(
+          'Origin' => "nophoto.jpg",
+          'File type' => "image/jpg",
+          'File size' => format_size_unit(filesize(__DIR__ . '/../../' . APP_IMAGE . "nophoto.jpg")),
+          'Uploaded at' => date("Y-m-d H:i:s"),
+          'Dimension' => $width . 'x' . $height
+        );
+
+        $bind_media = [
+          'media_filename' => "nophoto.jpg",
+          'media_caption' => prevent_injection(distill_post_request($filters)['post_title']),
+          'media_type' => "image/jpg",
+          'media_target' => 'blog',
+          'media_user' => $user_level,
+          'media_access' => $media_access,
+          'media_status' => '1'
+        ];
+
+        $append_media = $medialib->createMedia($bind_media);
+        $medialib->createMediaMeta([
+          'media_id' => $append_media,
+          'meta_key' => "nophoto.jpg",
+          'meta_value' => json_encode($media_metavalue)
+        ]);
+
+        $this->postService->setPostImage($append_media);
+    }
+
+    /** @SuppressWarnings(PHPMD.ExcessiveParameterList) */
+    private function handleUploadedImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, $filters, $medialib)
+    {
+        $media_metavalue = array();
+
+        if ($file_extension === "jpeg" || $file_extension === "jpg" || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp" || $file_extension === "bmp") {
+            $media_metavalue = array(
+              'Origin' => rename_file($file_name),
+              'File type' => $file_type,
+              'File size' => format_size_unit($file_size),
+              'Uploaded at' => date("Y-m-d H:i:s"),
+              'Dimension' => $width . 'x' . $height
+            );
+        }
+
+        if (is_uploaded_file($file_location)) {
+            upload_media($file_location, $file_type, $file_size, basename($new_filename));
+        }
+
+        $bind_media = [
+          'media_filename' => $new_filename,
+          'media_caption' => prevent_injection(distill_post_request($filters)['post_title']),
+          'media_type' => $file_type,
+          'media_target' => 'blog',
+          'media_user' => $user_level,
+          'media_access' => $media_access,
+          'media_status' => '1'
+        ];
+
+        $append_media = $medialib->createMedia($bind_media);
+        $medialib->createMediaMeta([
+          'media_id' => $append_media,
+          'meta_key' => $new_filename,
+          'meta_value' => json_encode($media_metavalue)
+        ]);
+
+        $this->postService->setPostImage($append_media);
+    }
+
+    private function setPostServiceData($filters)
+    {
+        if (isset($_POST['catID']) && $_POST['catID'] == 0) {
+            $this->postService->setTopics(0);
+        } else {
+            $this->postService->setTopics(distill_post_request($filters)['catID']);
+        }
+
+        $this->postService->setPostAuthor((int)$this->postService->postAuthorId());
+
+        if (empty($_POST['post_date'])) {
+            $this->postService->setPostDate(date_for_database());
+        } else {
+            $this->postService->setPostDate(date_for_database(distill_post_request($filters)['post_date']));
+        }
+
+        $this->postService->setPostTitle(distill_post_request($filters)['post_title']);
+        $this->postService->setPostSlug(distill_post_request($filters)['post_title']);
+
+        if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
+            if (!empty($_POST['post_password'])) {
+                $protected = protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password']);
+                $this->postService->setPostContent($protected['post_content']);
+                $this->postService->setProtected($protected['post_password']);
+                $this->postService->setPassPhrase(distill_post_request($filters)['post_password']);
+                $_SESSION['post_protected'] = distill_post_request($filters)['post_password'];
+            }
+        } else {
+            $this->postService->setPostContent(distill_post_request($filters)['post_content']);
+        }
+
+        $this->postService->setPublish(distill_post_request($filters)['post_status']);
+        $this->postService->setVisibility(distill_post_request($filters)['visibility']);
+
+        if (empty($_POST['post_headlines'])) {
+            $this->postService->setHeadlines(0);
+        } else {
+            $this->postService->setHeadlines(distill_post_request($filters)['post_headlines']);
+        }
+
+        $this->postService->setComment(distill_post_request($filters)['comment_status']);
+        $this->postService->setMetaDesc(distill_post_request($filters)['post_summary']);
+        $this->postService->setPostLocale(distill_post_request($filters)['post_locale']);
+
+        if (isset($_POST['post_tags'])) {
+            $this->postService->setPostTags(distill_post_request($filters)['post_tags']);
+        }
+    }
+
+    private function renderNewPostForm($errors, $formData, $topics, $medialib, $user_level)
+    {
+        $this->setView('edit-post');
+        $this->setPageTitle(($formData !== null) ? 'Add New Post' : 'Add new post');
+        $this->setFormAction(ActionConst::NEWPOST);
+        $this->view->set('pageTitle', $this->getPageTitle());
+        $this->view->set('formAction', $this->getFormAction());
+
+        if ($formData !== null) {
+            $this->view->set('formData', $formData);
+        }
+
+        $this->view->set('topics', $topics->setCheckBoxTopic());
+
+        if ($user_level === 'contributor') {
+            $this->view->set('medialibs', $medialib->dropDownMediaSelect());
+        } else {
+            $this->view->set('medialibs', $medialib->imageUploadHandler());
+        }
+
+        if (!empty($errors)) {
+            $this->view->set('errors', $errors);
+        }
+
+        $this->view->set('postStatus', $this->postService->postStatusDropDown());
+        $this->view->set('commentStatus', $this->postService->commentStatusDropDown());
+        $this->view->set('postVisibility', $this->postService->visibilityDropDown());
+        $this->view->set('postLocale', $this->postService->localeDropDown());
+        $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
     }
 
     /**
@@ -402,14 +440,14 @@ class PostController extends BaseApp
      */
     public function update($id)
     {
-
         $topics = new TopicDao();
         $medialib = new MediaDao();
         $errors = array();
         $checkError = true;
         $user_level = $this->postService->postAuthorLevel();
 
-        if (!$getPost = $this->postService->grabPost($id)) {
+        $getPost = $this->postService->grabPost($id);
+        if (!$getPost) {
             $_SESSION['error'] = "postNotFound";
             direct_page('index.php?load=posts&error=postNotFound', 404);
         }
@@ -432,10 +470,7 @@ class PostController extends BaseApp
           'passphrase' => $getPost['passphrase']
         );
 
-        $postId = isset($getPost['ID']) ? $getPost['ID'] : 0;
-
         $timezone = function_exists('timezone_identifier') ? timezone_identifier() : "";
-
         (function_exists('date_default_timezone_set')) ? date_default_timezone_set($timezone) : "";
 
         if (isset($_POST['postFormSubmit'])) {
@@ -445,280 +480,28 @@ class PostController extends BaseApp
             $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : '';
             $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
 
-            $filters = [
-              'post_id' => FILTER_SANITIZE_NUMBER_INT,
-              'post_title' => isset($_POST['post_title']) ? Sanitize::strictSanitizer($_POST['post_title']) : "",
-              'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-              'post_modified' => isset($_POST['post_modified']) ? Sanitize::mildSanitizer($_POST['post_modified']) : "",
-              'image_id' => isset($_POST['image_id']) ? FILTER_SANITIZE_NUMBER_INT : "",
-              'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
-              'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-              'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
-              'visibility' => isset($_POST['visibility']) ? Sanitize::mildSanitizer($_POST['visibility']) : "",
-              'post_password' => isset($_POST['post_password']) ? FILTER_SANITIZE_FULL_SPECIAL_CHARS : "",
-              'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-              'post_headlines' => FILTER_SANITIZE_NUMBER_INT,
-              'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : "",
-              'post_locale' => isset($_POST['post_locale']) ? Sanitize::mildSanitizer($_POST['post_locale']) : "en"
-            ];
-
+            $filters = $this->getPostUpdateFilters();
             $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_tags' => 200, 'post_content' => 500000];
 
             $new_filename = generate_filename($file_name)['new_filename'];
             $file_extension = generate_filename($file_name)['file_extension'];
 
             try {
-                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
-                    throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
-                }
+                $this->checkPostCsrf();
+                $this->checkPostUpdatePayload();
 
-                if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_modified', 'image_id', 'catID', 'post_summary', 'post_status', 'post_headlines', 'visibility', 'comment_status']) === false) {
-                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 413 Payload Too Large", true, 413);
-                    header('Status: 413 Payload Too Large');
-                    header('Retry-After: 3600');
-                    throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
-                }
-
-                if ((empty($_POST['post_title'])) || (empty($_POST['post_content']))) {
-                    $checkError = false;
-                    array_push($errors, "Please enter a required field");
-                }
-
-                if (true === form_size_validation($form_fields)) {
-                    $checkError = false;
-                    array_push($errors, "Form data is longer than allowed");
-                }
-
-                if (false === sanitize_selection_box(distill_post_request($filters)['post_status'], ['publish' => 'Publish', 'draft' => 'Draft'])) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_INVALID_SELECTBOX);
-                }
-
-                if (false === sanitize_selection_box(distill_post_request($filters)['comment_status'], ['open' => 'Open', 'closed' => 'Closed'])) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_INVALID_SELECTBOX);
-                }
-
-                if (false === sanitize_selection_box(distill_post_request($filters)['visibility'], ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'])) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_INVALID_SELECTBOX);
-                }
-
-                if (!empty($_POST['post_modfied']) && validate_date($_POST['post_modified']) === false) {
-                    $checkError = false;
-                    array_push($errors, "Please fix your date format");
-                }
-
-                if (!empty($file_location)) {
-                    if ((is_array($file_error))) {
-                        $checkError = false;
-                        array_push($errors, "Invalid paramenter");
-                    }
-
-                    switch ($file_error) {
-                        case UPLOAD_ERR_OK:
-                            break;
-
-                        case UPLOAD_ERR_INI_SIZE:
-                        case UPLOAD_ERR_FORM_SIZE:
-                            $checkError = false;
-                            array_push($errors, "Exceeded filesize limit");
-
-                            break;
-
-                        default:
-                            $checkError = false;
-                            array_push($errors, "Unknown errors");
-
-                            break;
-                    }
-
-                    if ($file_size > APP_FILE_SIZE) {
-                        $checkError = false;
-                        array_push($errors, "Exceeded file size limit. Maximum file size is. " . format_size_unit(APP_FILE_SIZE));
-                    }
-
-                    if (true === check_file_length($file_location)) {
-                        $checkError = false;
-                        array_push($errors, "File name is too long");
-                    }
-
-                    if (false === check_file_name($file_location)) {
-                        $checkError = false;
-                        array_push($errors, "File name is not valid");
-                    }
-
-                    if ((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
-                        $checkError = false;
-                        array_push($errors, "Invalid file format");
-                    }
-                }
+                $checkError = $this->validatePostUpdate($filters, $form_fields, $file_location, $file_error, $file_size, $file_name, $errors, $checkError);
 
                 if (!$checkError) {
-                    $this->setView('edit-post');
-                    $this->setPageTitle('Edit Post');
-                    $this->setFormAction(ActionConst::EDITPOST);
-                    $this->view->set('pageTitle', $this->getPageTitle());
-                    $this->view->set('formAction', $this->getFormAction());
-                    $this->view->set('errors', $errors);
-                    $this->view->set('postData', $data_post);
-                    $this->view->set('topics', $topics->setCheckBoxTopic($getPost['ID']));
-
-                    if ($user_level === 'contributor') {
-                        $this->view->set('medialibs', $medialib->dropDownMediaSelect($getPost['media_id']));
-                    } else {
-                        $this->view->set('medialibs', $medialib->imageUploadHandler($getPost['media_id']));
-                    }
-
-                    $this->view->set('postStatus', $this->postService->postStatusDropDown($getPost['post_status']));
-                    $this->view->set('commentStatus', $this->postService->commentStatusDropDown($getPost['comment_status']));
-                    $this->view->set('postVisibility', $this->postService->visibilityDropDown($getPost['post_visibility']));
-                    $this->view->set('postLocale', $this->postService->localeDropDown($getPost['post_locale'] ?? 'en'));
-                    $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-                } else {
-                    $this->postService->setPostId((int)distill_post_request($filters)['post_id']);
-                    $this->postService->setPostAuthor($this->postService->postAuthorId());
-                    $this->postService->setPostTitle(distill_post_request($filters)['post_title']);
-                    $this->postService->setPostSlug(distill_post_request($filters)['post_title']);
-                    $this->postService->setPublish(distill_post_request($filters)['post_status']);
-
-                    if (isset($_POST['catID']) && $_POST['catID'] == 0) {
-                        $this->postService->setTopics(0);
-                    } else {
-                        $this->postService->setTopics(distill_post_request($filters)['catID']);
-                    }
-
-                    list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : getimagesize(app_url() . '/public/files/pictures/nophoto.jpg');
-
-                    $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
-
-                    if (empty($file_location)) {
-                        if (isset($_POST['image_id'])) {
-                            $this->postService->setPostImage((int)distill_post_request($filters)['image_id']);
-                        } else {
-                            clearstatcache();
-
-                            $media_metavalue = array(
-                              'Origin' => "nophoto.jpg",
-                              'File type' => "image/jpg",
-                              'File size' => format_size_unit(filesize(__DIR__ . '/../../' . APP_IMAGE . "nophoto.jpg")),
-                              'Uploaded at' => date("Y-m-d H:i:s"),
-                              'Dimension' => $width . 'x' . $height
-                            );
-
-                            $bind_media = [
-                              'media_filename' => "nophoto.jpg",
-                              'media_caption' => prevent_injection(distill_post_request($filters)['post_title']),
-                              'media_type' => "image/jpg",
-                              'media_target' => 'blog',
-                              'media_user' => $user_level,
-                              'media_access' => $media_access,
-                              'media_status' => '1'
-                            ];
-
-                            $append_media = $medialib->createMedia($bind_media);
-
-                            $mediameta = [
-                              'media_id' => $append_media,
-                              'meta_key' => "nophoto.jpg",
-                              'meta_value' => json_encode($media_metavalue)
-                            ];
-
-                            $medialib->createMediaMeta($mediameta);
-
-                            $this->postService->setPostImage($append_media);
-                        }
-                    } else {
-                        $media_metavalue = array();
-
-                        if (
-                            $file_extension === "jpeg" || $file_extension === "jpg"
-                            || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp"
-                            || $file_extension === "bmp"
-                        ) {
-                            $media_metavalue = array(
-                              'Origin' => rename_file($file_name),
-                              'File type' => $file_type,
-                              'File size' => format_size_unit($file_size),
-                              'Uploaded at' => date("Y-m-d H:i:s"),
-                              'Dimension' => $width . 'x' . $height
-                            );
-                        }
-
-                        if (is_uploaded_file($file_location)) {
-                            upload_media($file_location, $file_type, $file_size, basename($new_filename));
-                        }
-
-                        $bind_media = [
-                          'media_filename' => $new_filename,
-                          'media_caption' => prevent_injection(distill_post_request($filters)['post_title']),
-                          'media_type' => $file_type,
-                          'media_target' => 'blog',
-                          'media_user' => $user_level,
-                          'media_access' => $media_access,
-                          'media_status' => '1'
-                        ];
-
-                        $append_media = $medialib->createMedia($bind_media);
-
-                        $mediameta = [
-                          'media_id' => $append_media,
-                          'meta_key' => $new_filename,
-                          'meta_value' => json_encode($media_metavalue)
-                        ];
-
-                        $medialib->createMediaMeta($mediameta);
-
-                        $this->postService->setPostImage($append_media);
-                    }
-
-                    $this->postService->setComment(distill_post_request($filters)['comment_status']);
-                    $this->postService->setMetaDesc(distill_post_request($filters)['post_summary']);
-                    $this->postService->setPostTags(distill_post_request($filters)['post_tags']);
-                    $this->postService->setPostLocale(distill_post_request($filters)['post_locale']);
-
-                    if (empty($_POST['post_modified'])) {
-                        $this->postService->setPostModified(date_for_database());
-                    } else {
-                        $this->postService->setPostModified(date_for_database(distill_post_request($filters)['post_modified']));
-                    }
-
-                    if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
-                        if (!empty($_POST['post_password'])) {
-                            // Password changed - re-encrypt with new password
-                            $protected = protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password']);
-                            $this->postService->setProtected($protected['post_password']);
-                            $this->postService->setPostContent($protected['post_content']);
-                            $this->postService->setPassPhrase(distill_post_request($filters)['post_password']);
-                            $_SESSION['post_protected'] = distill_post_request($filters)['post_password'];
-                        } else {
-                            // Password NOT changed - re-encrypt content with existing passphrase from DB
-                            $existing_post = $this->postService->grabPost($id);
-                            if ($existing_post && !empty($existing_post['passphrase'])) {
-                                $reencrypted = encrypt(distill_post_request($filters)['post_content'], $existing_post['passphrase']);
-                                $this->postService->setPostContent($reencrypted);
-                            } else {
-                                $this->postService->setPostContent(distill_post_request($filters)['post_content']);
-                            }
-                        }
-                        $this->postService->setVisibility(distill_post_request($filters)['visibility']);
-                    } else {
-                        $this->postService->setVisibility(distill_post_request($filters)['visibility']);
-                        $this->postService->setPostContent(distill_post_request($filters)['post_content']);
-                    }
-
-                    if (empty($_POST['post_headlines'])) {
-                        $this->postService->setHeadlines(0);
-                    } else {
-                        $this->postService->setHeadlines(distill_post_request($filters)['post_headlines']);
-                    }
-
-                    $this->postService->modifyPost();
-
-                    $_SESSION['status'] = "postUpdated";
-                    direct_page('index.php?load=posts&status=postUpdated', 200);
+                    $this->renderEditPostForm($errors, $data_post, $getPost, $topics, $medialib, $user_level);
+                    return $this->view->render();
                 }
+
+                $this->processPostUpdate($id, $filters, $file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $user_level, $medialib);
+
+                $this->postService->modifyPost();
+                $_SESSION['status'] = "postUpdated";
+                direct_page('index.php?load=posts&status=postUpdated', 200);
             } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
@@ -726,36 +509,184 @@ class PostController extends BaseApp
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($e);
             }
-        } else {
-            $this->setView('edit-post');
-            $this->setPageTitle('Edit Post');
-            $this->setFormAction(ActionConst::EDITPOST);
-            $this->view->set('pageTitle', $this->getPageTitle());
-            $this->view->set('formAction', $this->getFormAction());
-            $this->view->set('postData', $data_post);
-            $this->view->set('topics', $topics->setCheckBoxTopic($getPost['ID']));
-
-            if ($user_level === 'contributor') {
-                $this->view->set('medialibs', $medialib->dropDownMediaSelect($getPost['media_id']));
-            } else {
-                $this->view->set('medialibs', $medialib->imageUploadHandler($getPost['media_id']));
-            }
-
-            if ($data_post['post_visibility'] == 'protected') {
-                $decrypted = decrypt_post_admin($getPost['ID']);
-                $this->view->set('postContent', $decrypted['post_content']);
-            } else {
-                $this->view->set('postContent', $data_post['post_content']);
-            }
-
-            $this->view->set('postStatus', $this->postService->postStatusDropDown($getPost['post_status']));
-            $this->view->set('commentStatus', $this->postService->commentStatusDropDown($getPost['comment_status']));
-            $this->view->set('postVisibility', $this->postService->visibilityDropDown($getPost['post_visibility']));
-            $this->view->set('postLocale', $this->postService->localeDropDown($getPost['post_locale'] ?? 'en'));
-            $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
         }
 
+        $this->renderEditPostForm(null, $data_post, $getPost, $topics, $medialib, $user_level);
         return $this->view->render();
+    }
+
+    private function getPostUpdateFilters()
+    {
+        return [
+          'post_id' => FILTER_SANITIZE_NUMBER_INT,
+          'post_title' => isset($_POST['post_title']) ? Sanitize::strictSanitizer($_POST['post_title']) : "",
+          'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+          'post_modified' => isset($_POST['post_modified']) ? Sanitize::mildSanitizer($_POST['post_modified']) : "",
+          'image_id' => isset($_POST['image_id']) ? FILTER_SANITIZE_NUMBER_INT : "",
+          'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
+          'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+          'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
+          'visibility' => isset($_POST['visibility']) ? Sanitize::mildSanitizer($_POST['visibility']) : "",
+          'post_password' => isset($_POST['post_password']) ? FILTER_SANITIZE_FULL_SPECIAL_CHARS : "",
+          'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+          'post_headlines' => FILTER_SANITIZE_NUMBER_INT,
+          'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : "",
+          'post_locale' => isset($_POST['post_locale']) ? Sanitize::mildSanitizer($_POST['post_locale']) : "en"
+        ];
+    }
+
+    private function checkPostUpdatePayload()
+    {
+        if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_modified', 'image_id', 'catID', 'post_summary', 'post_status', 'post_headlines', 'visibility', 'comment_status']) === false) {
+            header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 413 Payload Too Large", true, 413);
+            header('Status: 413 Payload Too Large');
+            header('Retry-After: 3600');
+            throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
+        }
+    }
+
+    private function validatePostUpdate($filters, $form_fields, $file_location, $file_error, $file_size, $file_name, &$errors, $checkError)
+    {
+        if ((empty($_POST['post_title'])) || (empty($_POST['post_content']))) {
+            $checkError = false;
+            array_push($errors, "Please enter a required field");
+        }
+
+        if (true === form_size_validation($form_fields)) {
+            $checkError = false;
+            array_push($errors, "Form data is longer than allowed");
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['post_status'], ['publish' => 'Publish', 'draft' => 'Draft'])) {
+            $checkError = false;
+            array_push($errors, MESSAGE_INVALID_SELECTBOX);
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['comment_status'], ['open' => 'Open', 'closed' => 'Closed'])) {
+            $checkError = false;
+            array_push($errors, MESSAGE_INVALID_SELECTBOX);
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['visibility'], ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'])) {
+            $checkError = false;
+            array_push($errors, MESSAGE_INVALID_SELECTBOX);
+        }
+
+        if (!empty($_POST['post_modfied']) && validate_date($_POST['post_modified']) === false) {
+            $checkError = false;
+            array_push($errors, "Please fix your date format");
+        }
+
+        if (!empty($file_location)) {
+            $checkError = $this->validateFileUpload($file_location, $file_error, $file_size, $file_name, $errors, $checkError);
+        }
+
+        return $checkError;
+    }
+
+    /** @SuppressWarnings(PHPMD.ExcessiveParameterList) */
+    private function processPostUpdate($id, $filters, $file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $user_level, $medialib)
+    {
+        $this->postService->setPostId((int)distill_post_request($filters)['post_id']);
+        $this->postService->setPostAuthor($this->postService->postAuthorId());
+        $this->postService->setPostTitle(distill_post_request($filters)['post_title']);
+        $this->postService->setPostSlug(distill_post_request($filters)['post_title']);
+        $this->postService->setPublish(distill_post_request($filters)['post_status']);
+
+        if (isset($_POST['catID']) && $_POST['catID'] == 0) {
+            $this->postService->setTopics(0);
+        } else {
+            $this->postService->setTopics(distill_post_request($filters)['catID']);
+        }
+
+        list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : getimagesize(app_url() . '/public/files/pictures/nophoto.jpg');
+
+        $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
+
+        $this->handlePostImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, $filters, $medialib);
+
+        $this->postService->setComment(distill_post_request($filters)['comment_status']);
+        $this->postService->setMetaDesc(distill_post_request($filters)['post_summary']);
+        $this->postService->setPostTags(distill_post_request($filters)['post_tags']);
+        $this->postService->setPostLocale(distill_post_request($filters)['post_locale']);
+
+        if (empty($_POST['post_modified'])) {
+            $this->postService->setPostModified(date_for_database());
+        } else {
+            $this->postService->setPostModified(date_for_database(distill_post_request($filters)['post_modified']));
+        }
+
+        $this->setProtectedPostContent($id, $filters);
+        $this->setPostHeadlines($filters);
+    }
+
+    private function setProtectedPostContent($id, $filters)
+    {
+        if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
+            if (!empty($_POST['post_password'])) {
+                $protected = protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password']);
+                $this->postService->setProtected($protected['post_password']);
+                $this->postService->setPostContent($protected['post_content']);
+                $this->postService->setPassPhrase(distill_post_request($filters)['post_password']);
+                $_SESSION['post_protected'] = distill_post_request($filters)['post_password'];
+            } else {
+                $existing_post = $this->postService->grabPost($id);
+                if ($existing_post && !empty($existing_post['passphrase'])) {
+                    $reencrypted = encrypt(distill_post_request($filters)['post_content'], $existing_post['passphrase']);
+                    $this->postService->setPostContent($reencrypted);
+                } else {
+                    $this->postService->setPostContent(distill_post_request($filters)['post_content']);
+                }
+            }
+            $this->postService->setVisibility(distill_post_request($filters)['visibility']);
+        } else {
+            $this->postService->setVisibility(distill_post_request($filters)['visibility']);
+            $this->postService->setPostContent(distill_post_request($filters)['post_content']);
+        }
+    }
+
+    private function setPostHeadlines($filters)
+    {
+        if (empty($_POST['post_headlines'])) {
+            $this->postService->setHeadlines(0);
+        } else {
+            $this->postService->setHeadlines(distill_post_request($filters)['post_headlines']);
+        }
+    }
+
+    private function renderEditPostForm($errors, $data_post, $getPost, $topics, $medialib, $user_level)
+    {
+        $this->setView('edit-post');
+        $this->setPageTitle('Edit Post');
+        $this->setFormAction(ActionConst::EDITPOST);
+        $this->view->set('pageTitle', $this->getPageTitle());
+        $this->view->set('formAction', $this->getFormAction());
+
+        if ($errors !== null) {
+            $this->view->set('errors', $errors);
+        }
+
+        $this->view->set('postData', $data_post);
+        $this->view->set('topics', $topics->setCheckBoxTopic($getPost['ID']));
+
+        if ($user_level === 'contributor') {
+            $this->view->set('medialibs', $medialib->dropDownMediaSelect($getPost['media_id']));
+        } else {
+            $this->view->set('medialibs', $medialib->imageUploadHandler($getPost['media_id']));
+        }
+
+        if ($data_post['post_visibility'] == 'protected') {
+            $decrypted = decrypt_post_admin($getPost['ID']);
+            $this->view->set('postContent', $decrypted['post_content']);
+        } else {
+            $this->view->set('postContent', $data_post['post_content']);
+        }
+
+        $this->view->set('postStatus', $this->postService->postStatusDropDown($getPost['post_status']));
+        $this->view->set('commentStatus', $this->postService->commentStatusDropDown($getPost['comment_status']));
+        $this->view->set('postVisibility', $this->postService->visibilityDropDown($getPost['post_visibility']));
+        $this->view->set('postLocale', $this->postService->localeDropDown($getPost['post_locale'] ?? 'en'));
+        $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
     }
 
     /**

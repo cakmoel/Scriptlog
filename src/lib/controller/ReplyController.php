@@ -93,59 +93,7 @@ class ReplyController extends BaseApp
             return;
         }
 
-        if (isset($_POST['replyFormSubmit'])) {
-            $author_name = isset($_POST['author_name']) ? trim(htmlspecialchars($_POST['author_name'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8")) : "";
-            $reply_content = isset($_POST['reply_content']) ? Sanitize::severeSanitizer($_POST['reply_content']) : "";
-            $reply_status = isset($_POST['reply_status']) ? Sanitize::mildSanitizer($_POST['reply_status']) : "pending";
-
-            try {
-                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request");
-                    throw new AppException("Sorry, unpleasant attempt detected!");
-                }
-
-                if (empty($author_name)) {
-                    $checkError = false;
-                    array_push($errors, "Please enter author name");
-                }
-
-                if (empty($reply_content)) {
-                    $checkError = false;
-                    array_push($errors, "Please enter reply content");
-                }
-
-                if (!$checkError) {
-                    $this->setView('reply');
-                    $this->setPageTitle("Reply to Comment");
-                    $this->setFormAction(ActionConst::REPLY);
-                    $this->view->set('pageTitle', $this->getPageTitle());
-                    $this->view->set('formAction', $this->getFormAction());
-                    $this->view->set('errors', $errors);
-                    $this->view->set('parentComment', $parentComment);
-                    $this->view->set('replyStatus', $this->replyService->replyStatementDropDown($reply_status));
-                    $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-                } else {
-                    $this->replyService->setParentId($parentId);
-                    $this->replyService->setPostId($parentComment['comment_post_id']);
-                    $this->replyService->setAuthorName($author_name);
-                    $this->replyService->setAuthorIP(get_ip_address());
-                    $this->replyService->setAuthorEmail(isset($_SESSION['scriptlog_session_email']) ? $_SESSION['scriptlog_session_email'] : "");
-                    $this->replyService->setReplyContent($reply_content);
-                    $this->replyService->setReplyStatus($reply_status);
-
-                    $this->replyService->addReply();
-
-                    $_SESSION['status'] = "replyAdded";
-                    direct_page('index.php?load=comments&action=editComment&Id=' . $parentId . '&status=replyAdded', 200);
-                }
-            } catch (Throwable $th) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($th);
-            } catch (AppException $e) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($e);
-            }
-        } else {
+        if (!isset($_POST['replyFormSubmit'])) {
             $this->setView('reply');
             $this->setPageTitle("Reply to Comment");
             $this->setFormAction(ActionConst::REPLY);
@@ -154,6 +102,60 @@ class ReplyController extends BaseApp
             $this->view->set('parentComment', $parentComment);
             $this->view->set('replyStatus', $this->replyService->replyStatementDropDown('pending'));
             $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+            return $this->view->render();
+        }
+
+        $author_name = isset($_POST['author_name']) ? trim(htmlspecialchars($_POST['author_name'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8")) : "";
+        $reply_content = isset($_POST['reply_content']) ? Sanitize::severeSanitizer($_POST['reply_content']) : "";
+        $reply_status = isset($_POST['reply_status']) ? Sanitize::mildSanitizer($_POST['reply_status']) : "pending";
+
+        try {
+            if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+                header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request");
+                throw new AppException("Sorry, unpleasant attempt detected!");
+            }
+
+            if (empty($author_name)) {
+                $checkError = false;
+                array_push($errors, "Please enter author name");
+            }
+
+            if (empty($reply_content)) {
+                $checkError = false;
+                array_push($errors, "Please enter reply content");
+            }
+
+            if (!$checkError) {
+                $this->setView('reply');
+                $this->setPageTitle("Reply to Comment");
+                $this->setFormAction(ActionConst::REPLY);
+                $this->view->set('pageTitle', $this->getPageTitle());
+                $this->view->set('formAction', $this->getFormAction());
+                $this->view->set('errors', $errors);
+                $this->view->set('parentComment', $parentComment);
+                $this->view->set('replyStatus', $this->replyService->replyStatementDropDown($reply_status));
+                $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+                return $this->view->render();
+            }
+
+            $this->replyService->setParentId($parentId);
+            $this->replyService->setPostId($parentComment['comment_post_id']);
+            $this->replyService->setAuthorName($author_name);
+            $this->replyService->setAuthorIP(get_ip_address());
+            $this->replyService->setAuthorEmail(isset($_SESSION['scriptlog_session_email']) ? $_SESSION['scriptlog_session_email'] : "");
+            $this->replyService->setReplyContent($reply_content);
+            $this->replyService->setReplyStatus($reply_status);
+
+            $this->replyService->addReply();
+
+            $_SESSION['status'] = "replyAdded";
+            direct_page('index.php?load=comments&action=editComment&Id=' . $parentId . '&status=replyAdded', 200);
+        } catch (Throwable $th) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($th);
+        } catch (AppException $e) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($e);
         }
 
         return $this->view->render();
@@ -170,7 +172,8 @@ class ReplyController extends BaseApp
         $errors = array();
         $checkError = true;
 
-        if (!$getReply = $this->replyService->grabReply($id)) {
+        $getReply = $this->replyService->grabReply($id);
+        if (!$getReply) {
             $_SESSION['error'] = "replyNotFound";
             direct_page('index.php?load=comments&error=replyNotFound', 404);
             return;
@@ -190,56 +193,7 @@ class ReplyController extends BaseApp
           'parent_comment_author' => $getReply['parent_comment_author'] ?? ''
         );
 
-        if (isset($_POST['replyFormSubmit'])) {
-            $author_name = isset($_POST['author_name']) ? trim(htmlspecialchars($_POST['author_name'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8")) : "";
-            $reply_content = isset($_POST['reply_content']) ? Sanitize::severeSanitizer($_POST['reply_content']) : "";
-            $reply_status = isset($_POST['reply_status']) ? Sanitize::mildSanitizer($_POST['reply_status']) : "";
-
-            try {
-                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request");
-                    throw new AppException("Sorry, unpleasant attempt detected!");
-                }
-
-                if (empty($author_name)) {
-                    $checkError = false;
-                    array_push($errors, "Please enter author name");
-                }
-
-                if (empty($reply_content)) {
-                    $checkError = false;
-                    array_push($errors, "Please enter reply content");
-                }
-
-                if (!$checkError) {
-                    $this->setView('reply');
-                    $this->setPageTitle("Edit Reply");
-                    $this->setFormAction(ActionConst::EDITREPLY);
-                    $this->view->set('pageTitle', $this->getPageTitle());
-                    $this->view->set('formAction', $this->getFormAction());
-                    $this->view->set('errors', $errors);
-                    $this->view->set('replyData', $data_reply);
-                    $this->view->set('replyStatus', $this->replyService->replyStatementDropDown($getReply['comment_status']));
-                    $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-                } else {
-                    $this->replyService->setReplyId($id);
-                    $this->replyService->setAuthorName($author_name);
-                    $this->replyService->setReplyContent($reply_content);
-                    $this->replyService->setReplyStatus($reply_status);
-
-                    $this->replyService->modifyReply();
-
-                    $_SESSION['status'] = "replyUpdated";
-                    direct_page('index.php?load=reply&action=editReply&Id=' . $id . '&status=replyUpdated', 200);
-                }
-            } catch (Throwable $th) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($th);
-            } catch (AppException $e) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($e);
-            }
-        } else {
+        if (!isset($_POST['replyFormSubmit'])) {
             $this->setView('reply');
             $this->setPageTitle("Edit Reply");
             $this->setFormAction(ActionConst::EDITREPLY);
@@ -248,6 +202,57 @@ class ReplyController extends BaseApp
             $this->view->set('replyData', $data_reply);
             $this->view->set('replyStatus', $this->replyService->replyStatementDropDown($getReply['comment_status']));
             $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+            return $this->view->render();
+        }
+
+        $author_name = isset($_POST['author_name']) ? trim(htmlspecialchars($_POST['author_name'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8")) : "";
+        $reply_content = isset($_POST['reply_content']) ? Sanitize::severeSanitizer($_POST['reply_content']) : "";
+        $reply_status = isset($_POST['reply_status']) ? Sanitize::mildSanitizer($_POST['reply_status']) : "";
+
+        try {
+            if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+                header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request");
+                throw new AppException("Sorry, unpleasant attempt detected!");
+            }
+
+            if (empty($author_name)) {
+                $checkError = false;
+                array_push($errors, "Please enter author name");
+            }
+
+            if (empty($reply_content)) {
+                $checkError = false;
+                array_push($errors, "Please enter reply content");
+            }
+
+            if (!$checkError) {
+                $this->setView('reply');
+                $this->setPageTitle("Edit Reply");
+                $this->setFormAction(ActionConst::EDITREPLY);
+                $this->view->set('pageTitle', $this->getPageTitle());
+                $this->view->set('formAction', $this->getFormAction());
+                $this->view->set('errors', $errors);
+                $this->view->set('replyData', $data_reply);
+                $this->view->set('replyStatus', $this->replyService->replyStatementDropDown($getReply['comment_status']));
+                $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+                return $this->view->render();
+            }
+
+            $this->replyService->setReplyId($id);
+            $this->replyService->setAuthorName($author_name);
+            $this->replyService->setReplyContent($reply_content);
+            $this->replyService->setReplyStatus($reply_status);
+
+            $this->replyService->modifyReply();
+
+            $_SESSION['status'] = "replyUpdated";
+            direct_page('index.php?load=reply&action=editReply&Id=' . $id . '&status=replyUpdated', 200);
+        } catch (Throwable $th) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($th);
+        } catch (AppException $e) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($e);
         }
 
         return $this->view->render();
@@ -287,13 +292,14 @@ class ReplyController extends BaseApp
                     $this->setPageTitle('Reply not found');
                     $this->view->set('pageTitle', $this->getPageTitle());
                     $this->view->set('errors', $errors);
-                } else {
-                    $this->replyService->setReplyId($id);
-                    $this->replyService->removeReply();
-
-                    $_SESSION['status'] = "replyDeleted";
-                    direct_page('index.php?load=comments', 200);
+                    return $this->view->render();
                 }
+
+                $this->replyService->setReplyId($id);
+                $this->replyService->removeReply();
+
+                $_SESSION['status'] = "replyDeleted";
+                direct_page('index.php?load=comments', 200);
             } catch (Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);

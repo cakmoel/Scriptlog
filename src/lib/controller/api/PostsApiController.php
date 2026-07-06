@@ -1,5 +1,5 @@
 <?php
-
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * Posts API Controller
  *
@@ -278,7 +278,7 @@ class PostsApiController extends ApiController
      * @param array $params Request data
      * @return void
      */
-    public function store($params = [])
+    public function store($_params = [])
     {
         // Require authentication
         $this->requiresAuth = true;
@@ -568,9 +568,12 @@ class PostsApiController extends ApiController
         ];
     }
 
+    // kept for potential future use
     /**
      * Transform comment data for API response
      *
+     * @deprecated No longer used internally
+     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
      * @param array $comment
      * @return array
      */

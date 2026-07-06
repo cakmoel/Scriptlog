@@ -62,11 +62,9 @@ class PostTopicDao extends Dao
         $linkCategories = $this->findPostTopic($postId, $sanitize);
 
         foreach ($linkCategories as $linkCategory) {
-            if (!$position) {
-                $html[] = prevent_injection($linkCategory['topic_title']);
-            } else {
-                $html[] = '<a href="' . $url . 'category/' . prevent_injection($linkCategory['topic_slug']) . '" class="' . $href_attr . '">' . prevent_injection($linkCategory['topic_title']) . '</a>';
-            }
+            $html[] = (!$position)
+                ? prevent_injection($linkCategory['topic_title'])
+                : '<a href="' . $url . 'category/' . prevent_injection($linkCategory['topic_slug']) . '" class="' . $href_attr . '">' . prevent_injection($linkCategory['topic_title']) . '</a>';
         }
 
         return implode(", ", $html);

@@ -423,16 +423,16 @@ class MediaService
                 'media_access' => $this->media_access,
                 'media_status' => $this->media_status
             ], $this->mediaId);
-        } else {
-            return $this->mediaDao->updateMedia($this->sanitizer, [
-                'media_filename' => $this->media_filename,
-                'media_caption' => $this->media_caption,
-                'media_type'   => $this->media_type,
-                'media_target' => $this->media_target,
-                'media_access' => $this->media_access,
-                'media_status' => $this->media_status
-            ], $this->mediaId);
         }
+
+        return $this->mediaDao->updateMedia($this->sanitizer, [
+            'media_filename' => $this->media_filename,
+            'media_caption' => $this->media_caption,
+            'media_type'   => $this->media_type,
+            'media_target' => $this->media_target,
+            'media_access' => $this->media_access,
+            'media_status' => $this->media_status
+        ], $this->mediaId);
     }
 
     /**
@@ -478,7 +478,8 @@ class MediaService
 
         $this->validator->sanitize($this->mediaId, 'int');
 
-        if (!$data_media = $this->mediaDao->findMediaById($this->mediaId, $this->sanitizer)) {
+        $data_media = $this->mediaDao->findMediaById($this->mediaId, $this->sanitizer);
+        if (!$data_media) {
             direct_page('index.php?load=media&error=mediaNotFound', 404);
         }
 

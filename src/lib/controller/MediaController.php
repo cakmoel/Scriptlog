@@ -9,6 +9,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @license  MIT
  * @version  1.0
  * @since    Since Release 1.0
+ * @SuppressWarnings(PHPMD.ElseExpression)
  *
  */
 class MediaController extends BaseApp
@@ -86,7 +87,9 @@ class MediaController extends BaseApp
         if ($this->mediaService->isMediaUser() == 'administrator') {
             $this->view->set('mediaTotal', $this->mediaService->totalMedia());
             $this->view->set('mediaLib', $this->mediaService->grabAllMedia());
-        } else {
+        }
+
+        if ($this->mediaService->isMediaUser() !== 'administrator') {
             $this->view->set('mediaTotal', $this->mediaService->totalMedia([$this->mediaService->isMediaUser()]));
             $this->view->set('mediaLib', $this->mediaService->grabAllMedia('ID', $this->mediaService->isMediaUser()));
         }
@@ -103,7 +106,6 @@ class MediaController extends BaseApp
      */
     public function insert()
     {
-
         $errors = array();
         $checkError = true;
 
@@ -121,96 +123,19 @@ class MediaController extends BaseApp
 
             $form_fields = ['media_caption' => 200];
 
-            // get new filename and extension
             $new_filename = generate_filename($file_name)['new_filename'];
             $file_extension = generate_filename($file_name)['file_extension'];
 
             try {
-                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
-                    $checkError = false;
-                    array_push($errors, "Sorry, unpleasant attempt detected!");
+                $checkError = $this->validateMediaUpload($file_location, $file_error, $file_size, $filters, $form_fields, $errors, $checkError);
+
+                if (!$checkError) {
+                    $this->renderUploadForm($errors, $_POST);
+                    return $this->view->render();
                 }
 
-                if ((! empty($_POST['media_caption'])) && (true === form_size_validation($form_fields))) {
-                    $checkError = false;
-                    array_push($errors, "Form data is longer than allowed");
-                }
+                $media_metavalue = $this->buildMediaMetadata($file_extension, $file_name, $file_type, $file_size, $file_location);
 
-                if (false === sanitize_selection_box(distill_post_request($filters)['media_target'], ['blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery', 'page' => 'Page'])) {
-                    $checkError = false;
-                    array_push($errors, "Please choose the available value provided!");
-                }
-
-                if (false === sanitize_selection_box(distill_post_request($filters)['media_access'], ['public' => 'Public', 'private' => 'Private'])) {
-                    $checkError = false;
-                    array_push($errors, "Please choose the available value provided!");
-                }
-
-                if (!isset($file_error) || is_array($file_error)) {
-                    $checkError = false;
-                    array_push($errors, "Invalid paramenter");
-                }
-
-                switch ($file_error) {
-                    case UPLOAD_ERR_OK:
-                        break;
-                    case UPLOAD_ERR_NO_FILE:
-                        $checkError = false;
-                        array_push($errors, "No file uploaded");
-
-                        break;
-
-                    case UPLOAD_ERR_INI_SIZE:
-                    case UPLOAD_ERR_FORM_SIZE:
-                        $checkError = false;
-                        array_push($errors, "Exceeded filesize limit");
-
-                        break;
-
-                    default:
-                        $checkError = false;
-                        array_push($errors, "Unknown errors");
-
-                        break;
-                }
-
-                if ($file_size > APP_FILE_SIZE) {
-                    $checkError = false;
-                    array_push($errors, "Exceeded file size limit. Maximum file size is. " . format_size_unit(APP_FILE_SIZE));
-                }
-
-                if (false === check_file_name($file_location)) {
-                    $checkError = false;
-                    array_push($errors, "file name is not valid");
-                }
-
-                if (true === check_file_length($file_location)) {
-                    $checkError = false;
-                    array_push($errors, "file name is too long");
-                }
-
-                if ($file_extension === "jpeg" || $file_extension === "jpg" || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp" || $file_extension === "bmp") {
-                    list($width, $height) = ($file_location) ? getimagesize($file_location) : null;
-
-                    $media_metavalue = array(
-                         'Origin' => rename_file($file_name),
-                         'File type' => $file_type,
-                         'File size' => format_size_unit($file_size),
-                         'Uploaded at' => date("Y-m-d H:i:s"),
-                         'Dimension' => $width . 'x' . $height
-                       );
-                } else {
-                    $media_metavalue = array(
-                       'Origin' => rename_file($file_name),
-                       'File type' => $file_type,
-                       'File size' => format_size_unit($file_size),
-                       'Uploaded at' => date(
-                           "Y-m-d H:i:s"
-                       ));
-                }
-
-                // upload file
                 if (is_uploaded_file($file_location)) {
                     if ((false === check_file_extension($file_name)) || (false === check_mime_type(mime_type_dictionary(), $file_location))) {
                         $checkError = false;
@@ -221,45 +146,14 @@ class MediaController extends BaseApp
                 }
 
                 if (!$checkError) {
-                    $this->setView('edit-media');
-                    $this->setPageTitle('Upload New Media');
-                    $this->setFormAction(ActionConst::NEWMEDIA);
-                    $this->view->set('pageTitle', $this->getPageTitle());
-                    $this->view->set('formAction', $this->getFormAction());
-                    $this->view->set('errors', $errors);
-                    $this->view->set('formData', $_POST);
-                    $this->view->set('mediaTarget', $this->mediaService->mediaTargetDropDown());
-                    $this->view->set('mediaAccess', $this->mediaService->mediaAccessDropDown());
-                    $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-                } else {
-                    $this->mediaService->setMediaFilename($new_filename);
-                    $this->mediaService->setMediaCaption(prevent_injection(distill_post_request($filters)['media_caption']));
-                    $this->mediaService->setMediaType($file_type);
-                    $this->mediaService->setMediaTarget(distill_post_request($filters)['media_target']);
-                    $this->mediaService->setMediaUser($this->mediaService->isMediaUser());
-                    $this->mediaService->setMediaAccess(distill_post_request($filters)['media_access']);
-                    $this->mediaService->setMediaStatus('1');
-
-                    $media_id = $this->mediaService->addMedia();
-
-                    if ($media_id) {
-                        $this->mediaService->setMediaId($media_id);
-                        $this->mediaService->setMediaKey($new_filename);
-                        $this->mediaService->setMediaValue(json_encode($media_metavalue));
-                        $this->mediaService->addMediaMeta();
-
-                        if (isset($_POST['media_target']) && $_POST['media_target'] == 'download') {
-                            $this->mediaService->setMediaId($media_id);
-                            $this->mediaService->setMediaIdentifier(generate_media_identifier());
-                            $this->mediaService->setBeforeExpired(time() + self::TIME_BEFORE_EXPIRED * 60 * 60);
-                            $this->mediaService->setIpAddress(get_ip_address());
-                            $this->mediaService->addMediaDownload();
-                        }
-                    }
-
-                    $_SESSION['status'] = "mediaAdded";
-                    direct_page('index.php?load=medialib&status=mediaAdded', 302);
+                    $this->renderUploadForm($errors, $_POST);
+                    return $this->view->render();
                 }
+
+                $this->saveMediaRecord($new_filename, $file_type, $filters, $media_metavalue);
+
+                $_SESSION['status'] = "mediaAdded";
+                direct_page('index.php?load=medialib&status=mediaAdded', 302);
             } catch (Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
@@ -267,18 +161,145 @@ class MediaController extends BaseApp
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($e);
             }
-        } else {
-            $this->setView('edit-media');
-            $this->setPageTitle('Upload New Media');
-            $this->setFormAction(ActionConst::NEWMEDIA);
-            $this->view->set('pageTitle', $this->getPageTitle());
-            $this->view->set('formAction', $this->getFormAction());
-            $this->view->set('mediaTarget', $this->mediaService->mediaTargetDropDown());
-            $this->view->set('mediaAccess', $this->mediaService->mediaAccessDropDown());
-            $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
         }
 
+        $this->renderUploadForm();
         return $this->view->render();
+    }
+
+    private function validateMediaUpload($file_location, $file_error, $file_size, $filters, $form_fields, &$errors, $checkError)
+    {
+        if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+            header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
+            $checkError = false;
+            array_push($errors, "Sorry, unpleasant attempt detected!");
+        }
+
+        if ((! empty($_POST['media_caption'])) && (true === form_size_validation($form_fields))) {
+            $checkError = false;
+            array_push($errors, "Form data is longer than allowed");
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['media_target'], ['blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery', 'page' => 'Page'])) {
+            $checkError = false;
+            array_push($errors, "Please choose the available value provided!");
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['media_access'], ['public' => 'Public', 'private' => 'Private'])) {
+            $checkError = false;
+            array_push($errors, "Please choose the available value provided!");
+        }
+
+        if (!isset($file_error) || is_array($file_error)) {
+            $checkError = false;
+            array_push($errors, "Invalid paramenter");
+        }
+
+        switch ($file_error) {
+            case UPLOAD_ERR_OK:
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                $checkError = false;
+                array_push($errors, "No file uploaded");
+                break;
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                $checkError = false;
+                array_push($errors, "Exceeded filesize limit");
+                break;
+            default:
+                $checkError = false;
+                array_push($errors, "Unknown errors");
+                break;
+        }
+
+        if ($file_size > APP_FILE_SIZE) {
+            $checkError = false;
+            array_push($errors, "Exceeded file size limit. Maximum file size is. " . format_size_unit(APP_FILE_SIZE));
+        }
+
+        if (false === check_file_name($file_location)) {
+            $checkError = false;
+            array_push($errors, "file name is not valid");
+        }
+
+        if (true === check_file_length($file_location)) {
+            $checkError = false;
+            array_push($errors, "file name is too long");
+        }
+
+        return $checkError;
+    }
+
+    private function buildMediaMetadata($file_extension, $file_name, $file_type, $file_size, $file_location)
+    {
+        if ($file_extension === "jpeg" || $file_extension === "jpg" || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp" || $file_extension === "bmp") {
+            list($width, $height) = ($file_location) ? getimagesize($file_location) : null;
+
+            $media_metavalue = array(
+                 'Origin' => rename_file($file_name),
+                 'File type' => $file_type,
+                 'File size' => format_size_unit($file_size),
+                 'Uploaded at' => date("Y-m-d H:i:s"),
+                 'Dimension' => $width . 'x' . $height
+               );
+        } else {
+            $media_metavalue = array(
+               'Origin' => rename_file($file_name),
+               'File type' => $file_type,
+               'File size' => format_size_unit($file_size),
+               'Uploaded at' => date("Y-m-d H:i:s"));
+        }
+
+        return $media_metavalue;
+    }
+
+    private function saveMediaRecord($new_filename, $file_type, $filters, $media_metavalue)
+    {
+        $this->mediaService->setMediaFilename($new_filename);
+        $this->mediaService->setMediaCaption(prevent_injection(distill_post_request($filters)['media_caption']));
+        $this->mediaService->setMediaType($file_type);
+        $this->mediaService->setMediaTarget(distill_post_request($filters)['media_target']);
+        $this->mediaService->setMediaUser($this->mediaService->isMediaUser());
+        $this->mediaService->setMediaAccess(distill_post_request($filters)['media_access']);
+        $this->mediaService->setMediaStatus('1');
+
+        $media_id = $this->mediaService->addMedia();
+
+        if ($media_id) {
+            $this->mediaService->setMediaId($media_id);
+            $this->mediaService->setMediaKey($new_filename);
+            $this->mediaService->setMediaValue(json_encode($media_metavalue));
+            $this->mediaService->addMediaMeta();
+
+            if (isset($_POST['media_target']) && $_POST['media_target'] == 'download') {
+                $this->mediaService->setMediaId($media_id);
+                $this->mediaService->setMediaIdentifier(generate_media_identifier());
+                $this->mediaService->setBeforeExpired(time() + self::TIME_BEFORE_EXPIRED * 60 * 60);
+                $this->mediaService->setIpAddress(get_ip_address());
+                $this->mediaService->addMediaDownload();
+            }
+        }
+    }
+
+    private function renderUploadForm($errors = array(), $formData = null)
+    {
+        $this->setView('edit-media');
+        $this->setPageTitle('Upload New Media');
+        $this->setFormAction(ActionConst::NEWMEDIA);
+        $this->view->set('pageTitle', $this->getPageTitle());
+        $this->view->set('formAction', $this->getFormAction());
+        $this->view->set('mediaTarget', $this->mediaService->mediaTargetDropDown());
+        $this->view->set('mediaAccess', $this->mediaService->mediaAccessDropDown());
+        $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+
+        if (!empty($errors)) {
+            $this->view->set('errors', $errors);
+        }
+
+        if ($formData !== null) {
+            $this->view->set('formData', $formData);
+        }
     }
 
     /**
@@ -291,17 +312,16 @@ class MediaController extends BaseApp
      */
     public function update($id)
     {
-
         $errors = array();
         $checkError = true;
 
-        if (!$getMedia = $this->mediaService->grabMedia($id)) {
+        $getMedia = $this->mediaService->grabMedia($id);
+        if (!$getMedia) {
             $_SESSION['error'] = "mediaNotFound";
             direct_page('index.php?load=medialib&error=mediaNotFound', 404);
         }
 
         $data_media = array(
-
           'ID' => $getMedia['ID'],
           'media_filename' => $getMedia['media_filename'],
           'media_caption' => $getMedia['media_caption'],
@@ -310,23 +330,19 @@ class MediaController extends BaseApp
           'media_user' => $getMedia['media_user'],
           'media_access' => $getMedia['media_access'],
           'media_status' => $getMedia['media_status']
-
         );
 
         $getMediaMeta = $this->mediaService->grabMediaMeta($getMedia['ID'], $getMedia['media_filename']);
-
         if (empty($getMediaMeta)) {
             $_SESSION['error'] = "mediaNotFound";
             direct_page('index.php?load=medialib&error=mediaNotFound', 404);
         }
 
         $media_properties = array(
-
           'ID' => $getMediaMeta['ID'],
           'media_id' => $getMediaMeta['media_id'],
           'meta_key' => $getMediaMeta['meta_key'],
           'meta_value' => $getMediaMeta['meta_value']
-
         );
 
         if (isset($_POST['mediaFormSubmit'])) {
@@ -345,8 +361,6 @@ class MediaController extends BaseApp
             ];
 
             $form_fields = ['media_caption' => 200];
-
-            // get new filename
             $new_filename = generate_filename($file_name)['new_filename'];
             $file_extension = generate_filename($file_name)['file_extension'];
 
@@ -356,139 +370,23 @@ class MediaController extends BaseApp
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
-                if ((! empty($_POST['media_caption'])) && (true === form_size_validation($form_fields))) {
-                    $checkError = false;
-                    array_push($errors, "Form data is longer than allowed");
-                }
-
-                if (false === sanitize_selection_box(distill_post_request($filters)['media_target'], ['blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery', 'page' => 'Page'])) {
-                    $checkError = false;
-                    array_push($errors, "Please choose the available value provided!");
-                }
-
-                if (false === sanitize_selection_box(distill_post_request($filters)['media_access'], ['public' => 'Public', 'private' => 'Private'])) {
-                    $checkError = false;
-                    array_push($errors, "Please choose the available value provided!");
-                }
-
-                if (false === sanitize_selection_box(distill_post_request($filters)['media_status'], ['Enabled', 'Disabled'])) {
-                    $checkError = false;
-                    array_push($errors, "Please choose the available value provided!");
-                }
+                $checkError = $this->validateMediaEdit($filters, $form_fields, $errors, $checkError);
 
                 if (!$checkError) {
-                    $this->setView('edit-media');
-                    $this->setPageTitle('Edit Media');
-                    $this->setFormAction(ActionConst::EDITMEDIA);
-                    $this->view->set('pageTitle', $this->getPageTitle());
-                    $this->view->set('formAction', $this->getFormAction());
-                    $this->view->set('errors', $errors);
-                    $this->view->set('mediaData', $data_media);
-                    $this->view->set('mediaTarget', $this->mediaService->mediaTargetDropDown($getMedia['media_target']));
-                    $this->view->set('mediaAccess', $this->mediaService->mediaAccessDropDown($getMedia['media_access']));
-                    $this->view->set('mediaStatus', $this->mediaService->mediaStatusDropDown($getMedia['media_status']));
-                    $this->view->set('mediaProperties', $media_properties);
-                    $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-                } else {
-                    if (!empty($file_location)) {
-                        if (is_array($file_error)) {
-                            $checkError = false;
-                            array_push($errors, "Invalid paramenter");
-                        }
-
-                        switch ($file_error) {
-                            case UPLOAD_ERR_OK:
-                                break;
-
-                            case UPLOAD_ERR_INI_SIZE:
-                            case UPLOAD_ERR_FORM_SIZE:
-                                $checkError = false;
-                                array_push($errors, "Exceeded filesize limit");
-
-                                break;
-
-                            default:
-                                $checkError = false;
-                                array_push($errors, "Unknown errors");
-
-                                break;
-                        }
-
-                        if ($file_size > APP_FILE_SIZE) {
-                            $checkError = false;
-                            array_push($errors, "Exceeded file size limit. Maximum file size is. " . format_size_unit(APP_FILE_SIZE));
-                        }
-
-                        if (false === check_file_name($file_location)) {
-                            $checkError = false;
-                            array_push($errors, "file name is not valid");
-                        }
-
-                        if (true === check_file_length($file_location)) {
-                            $checkError = false;
-                            array_push($errors, "file name is too long");
-                        }
-
-                        if ($file_extension == "jpeg" || $file_extension == "jpg" || $file_extension == "png" || $file_extension == "gif" || $file_extension == "webp" || $file_extension === "bmp") {
-                            list($width, $height) = getimagesize($file_location);
-
-                            $media_metavalue = array(
-
-                              'Origin' => rename_file($file_name),
-                              'File type' => $file_type,
-                              'File size' => format_size_unit($file_size),
-                              'Uploaded at' => date("Y-m-d H:i:s"),
-                              'Dimension' => $width . 'x' . $height);
-                        } else {
-                            $media_metavalue = array(
-
-                              'Origin' => rename_file($file_name),
-                              'File type' => $file_type,
-                              'File size' => format_size_unit($file_size),
-                              'Uploaded at' => date("Y-m-d H:i:s"));
-                        }
-
-                        // upload file
-                        if (is_uploaded_file($file_location)) {
-                            if ((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
-                                $checkError = false;
-                                array_push($errors, "Invalid file format");
-                            } else {
-                                upload_media($file_location, $file_type, $file_size, basename($new_filename));
-                            }
-                        }
-
-                        $this->mediaService->setMediaFilename($new_filename);
-                        $this->mediaService->setMediaCaption(prevent_injection(distill_post_request($filters)['media_caption']));
-                        $this->mediaService->setMediaType($file_type);
-                        $this->mediaService->setMediaTarget(distill_post_request($filters)['media_target']);
-                        $this->mediaService->setMediaAccess(distill_post_request($filters)['media_access']);
-                        $this->mediaService->setMediaStatus(distill_post_request($filters)['media_status']);
-                        $this->mediaService->setMediaId(distill_post_request($filters)['media_id']);
-
-                        $this->mediaService->setMediaKey($new_filename);
-                        $this->mediaService->setMediaValue(json_encode($media_metavalue));
-                        $this->mediaService->modifyMediaMeta();
-
-                        if (isset($_POST['media_target']) && $_POST['media_target'] == 'download') {
-                            $this->mediaService->setMediaId(distill_post_request($filters)['media_id']);
-                            $this->mediaService->setMediaIdentifier(generate_media_identifier());
-                            $this->mediaService->setBeforeExpired(time() + self::TIME_BEFORE_EXPIRED * 60 * 60);
-                            $this->mediaService->setIpAddress(get_ip_address());
-                            $this->mediaService->modifyMediaDownload();
-                        }
-                    } else {
-                        $this->mediaService->setMediaCaption(prevent_injection(distill_post_request($filters)['media_caption']));
-                        $this->mediaService->setMediaTarget(distill_post_request($filters)['media_target']);
-                        $this->mediaService->setMediaAccess(distill_post_request($filters)['media_access']);
-                        $this->mediaService->setMediaStatus(distill_post_request($filters)['media_status']);
-                        $this->mediaService->setMediaId(distill_post_request($filters)['media_id']);
-                    }
-
-                    $this->mediaService->modifyMedia();
-                    $_SESSION['status'] = "mediaUpdated";
-                    direct_page('index.php?load=medialib&status=mediaUpdated', 302);
+                    $this->renderEditForm($errors, $data_media, $media_properties, $getMedia);
+                    return $this->view->render();
                 }
+
+                $checkError = $this->handleMediaFileUpdate($file_location, $file_error, $file_size, $file_name, $file_type, $file_extension, $new_filename, $filters, $errors, $checkError);
+
+                if (!$checkError) {
+                    $this->renderEditForm($errors, $data_media, $media_properties, $getMedia);
+                    return $this->view->render();
+                }
+
+                $this->mediaService->modifyMedia();
+                $_SESSION['status'] = "mediaUpdated";
+                direct_page('index.php?load=medialib&status=mediaUpdated', 302);
             } catch (Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
@@ -496,21 +394,153 @@ class MediaController extends BaseApp
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($e);
             }
-        } else {
-            $this->setView('edit-media');
-            $this->setPageTitle('Edit Media ');
-            $this->setFormAction(ActionConst::EDITMEDIA);
-            $this->view->set('pageTitle', $this->getPageTitle());
-            $this->view->set('formAction', $this->getFormAction());
+        }
+
+        $this->renderEditForm(null, $data_media, $media_properties, $getMedia);
+        return $this->view->render();
+    }
+
+    private function validateMediaEdit($filters, $form_fields, &$errors, $checkError)
+    {
+        if ((! empty($_POST['media_caption'])) && (true === form_size_validation($form_fields))) {
+            $checkError = false;
+            array_push($errors, "Form data is longer than allowed");
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['media_target'], ['blog' => 'Blog', 'download' => 'Download', 'gallery' => 'Gallery', 'page' => 'Page'])) {
+            $checkError = false;
+            array_push($errors, "Please choose the available value provided!");
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['media_access'], ['public' => 'Public', 'private' => 'Private'])) {
+            $checkError = false;
+            array_push($errors, "Please choose the available value provided!");
+        }
+
+        if (false === sanitize_selection_box(distill_post_request($filters)['media_status'], ['Enabled', 'Disabled'])) {
+            $checkError = false;
+            array_push($errors, "Please choose the available value provided!");
+        }
+
+        return $checkError;
+    }
+
+    /** @SuppressWarnings(PHPMD.ExcessiveParameterList) */
+    private function handleMediaFileUpdate($file_location, $file_error, $file_size, $file_name, $file_type, $file_extension, $new_filename, $filters, &$errors, $checkError)
+    {
+        if (empty($file_location)) {
+            $this->updateMediaMetaOnly($filters);
+            return $checkError;
+        }
+
+        if (is_array($file_error)) {
+            $checkError = false;
+            array_push($errors, "Invalid paramenter");
+        }
+
+        switch ($file_error) {
+            case UPLOAD_ERR_OK:
+                break;
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                $checkError = false;
+                array_push($errors, "Exceeded filesize limit");
+                break;
+            default:
+                $checkError = false;
+                array_push($errors, "Unknown errors");
+                break;
+        }
+
+        if ($file_size > APP_FILE_SIZE) {
+            $checkError = false;
+            array_push($errors, "Exceeded file size limit. Maximum file size is. " . format_size_unit(APP_FILE_SIZE));
+        }
+
+        if (false === check_file_name($file_location)) {
+            $checkError = false;
+            array_push($errors, "file name is not valid");
+        }
+
+        if (true === check_file_length($file_location)) {
+            $checkError = false;
+            array_push($errors, "file name is too long");
+        }
+
+        if (!$checkError) {
+            return $checkError;
+        }
+
+        $media_metavalue = $this->buildMediaMetadata($file_extension, $file_name, $file_type, $file_size, $file_location);
+
+        if (is_uploaded_file($file_location)) {
+            if ((false === check_mime_type(mime_type_dictionary(), $file_location)) || (false === check_file_extension($file_name))) {
+                $checkError = false;
+                array_push($errors, "Invalid file format");
+                return $checkError;
+            }
+
+            upload_media($file_location, $file_type, $file_size, basename($new_filename));
+        }
+
+        $this->updateMediaWithFile($new_filename, $file_type, $filters, $media_metavalue);
+
+        return $checkError;
+    }
+
+    private function updateMediaWithFile($new_filename, $file_type, $filters, $media_metavalue)
+    {
+        $this->mediaService->setMediaFilename($new_filename);
+        $this->mediaService->setMediaCaption(prevent_injection(distill_post_request($filters)['media_caption']));
+        $this->mediaService->setMediaType($file_type);
+        $this->mediaService->setMediaTarget(distill_post_request($filters)['media_target']);
+        $this->mediaService->setMediaAccess(distill_post_request($filters)['media_access']);
+        $this->mediaService->setMediaStatus(distill_post_request($filters)['media_status']);
+        $this->mediaService->setMediaId(distill_post_request($filters)['media_id']);
+
+        $this->mediaService->setMediaKey($new_filename);
+        $this->mediaService->setMediaValue(json_encode($media_metavalue));
+        $this->mediaService->modifyMediaMeta();
+
+        if (isset($_POST['media_target']) && $_POST['media_target'] == 'download') {
+            $this->mediaService->setMediaId(distill_post_request($filters)['media_id']);
+            $this->mediaService->setMediaIdentifier(generate_media_identifier());
+            $this->mediaService->setBeforeExpired(time() + self::TIME_BEFORE_EXPIRED * 60 * 60);
+            $this->mediaService->setIpAddress(get_ip_address());
+            $this->mediaService->modifyMediaDownload();
+        }
+    }
+
+    private function updateMediaMetaOnly($filters)
+    {
+        $this->mediaService->setMediaCaption(prevent_injection(distill_post_request($filters)['media_caption']));
+        $this->mediaService->setMediaTarget(distill_post_request($filters)['media_target']);
+        $this->mediaService->setMediaAccess(distill_post_request($filters)['media_access']);
+        $this->mediaService->setMediaStatus(distill_post_request($filters)['media_status']);
+        $this->mediaService->setMediaId(distill_post_request($filters)['media_id']);
+    }
+
+    private function renderEditForm($errors = null, $data_media = null, $media_properties = null, $getMedia = null)
+    {
+        $this->setView('edit-media');
+        $this->setPageTitle('Edit Media');
+        $this->setFormAction(ActionConst::EDITMEDIA);
+        $this->view->set('pageTitle', $this->getPageTitle());
+        $this->view->set('formAction', $this->getFormAction());
+
+        if ($errors !== null) {
+            $this->view->set('errors', $errors);
+        }
+
+        if ($data_media !== null) {
             $this->view->set('mediaData', $data_media);
             $this->view->set('mediaTarget', $this->mediaService->mediaTargetDropDown($getMedia['media_target']));
             $this->view->set('mediaAccess', $this->mediaService->mediaAccessDropDown($getMedia['media_access']));
             $this->view->set('mediaStatus', $this->mediaService->mediaStatusDropDown($getMedia['media_status']));
             $this->view->set('mediaProperties', $media_properties);
-            $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
         }
 
-        return $this->view->render();
+        $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
     }
 
     /**
@@ -523,57 +553,60 @@ class MediaController extends BaseApp
      */
     public function remove($id)
     {
-
         $checkError = true;
         $errors = array();
 
-        if (isset($_GET['Id'])) {
-            $getMedia = $this->mediaService->grabMedia($id);
+        if (!isset($_GET['Id'])) {
+            return;
+        }
 
-            try {
-                if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
-                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
-                    throw new AppException("Sorry, unpleasant attempt detected!");
-                }
+        $getMedia = $this->mediaService->grabMedia($id);
 
-                if (!filter_var($id, FILTER_VALIDATE_INT)) {
-                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
-                    throw new AppException("Sorry, unpleasant attempt detected!");
-                }
-
-                if (!$getMedia) {
-                    $checkError = false;
-                    array_push($errors, 'Error: Media not found');
-                }
-
-                if (!$checkError) {
-                    $this->setView('all-media');
-                    $this->setPageTitle('Media not found');
-                    $this->view->set('pageTitle', $this->getPageTitle());
-                    $this->view->set('errors', $errors);
-
-                    if ($this->mediaService->isMediaUser() == 'administrator') {
-                        $this->view->set('mediaTotal', $this->mediaService->totalMedia());
-                        $this->view->set('mediaLib', $this->mediaService->grabAllMedia());
-                    } else {
-                        $this->view->set('mediaTotal', $this->mediaService->totalMedia([$this->mediaService->isMediaUser()]));
-                        $this->view->set('mediaLib', $this->mediaService->grabAllMedia('ID', $this->mediaService->isMediaUser()));
-                    }
-
-                    return $this->view->render();
-                } else {
-                    $this->mediaService->setMediaId($id);
-                    $this->mediaService->removeMedia();
-                    $_SESSION['status'] = "mediaDeleted";
-                    direct_page('index.php?load=medialib&status=mediaDeleted', 302);
-                }
-            } catch (Throwable $th) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($th);
-            } catch (AppException $e) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($e);
+        try {
+            if (!filter_input(INPUT_GET, 'Id', FILTER_SANITIZE_NUMBER_INT)) {
+                header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
+                throw new AppException("Sorry, unpleasant attempt detected!");
             }
+
+            if (!filter_var($id, FILTER_VALIDATE_INT)) {
+                header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
+                throw new AppException("Sorry, unpleasant attempt detected!");
+            }
+
+            if (!$getMedia) {
+                $checkError = false;
+                array_push($errors, 'Error: Media not found');
+            }
+
+            if (!$checkError) {
+                $this->setView('all-media');
+                $this->setPageTitle('Media not found');
+                $this->view->set('pageTitle', $this->getPageTitle());
+                $this->view->set('errors', $errors);
+
+                if ($this->mediaService->isMediaUser() == 'administrator') {
+                    $this->view->set('mediaTotal', $this->mediaService->totalMedia());
+                    $this->view->set('mediaLib', $this->mediaService->grabAllMedia());
+                }
+
+                if ($this->mediaService->isMediaUser() !== 'administrator') {
+                    $this->view->set('mediaTotal', $this->mediaService->totalMedia([$this->mediaService->isMediaUser()]));
+                    $this->view->set('mediaLib', $this->mediaService->grabAllMedia('ID', $this->mediaService->isMediaUser()));
+                }
+
+                return $this->view->render();
+            }
+
+            $this->mediaService->setMediaId($id);
+            $this->mediaService->removeMedia();
+            $_SESSION['status'] = "mediaDeleted";
+            direct_page('index.php?load=medialib&status=mediaDeleted', 302);
+        } catch (Throwable $th) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($th);
+        } catch (AppException $e) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($e);
         }
     }
 

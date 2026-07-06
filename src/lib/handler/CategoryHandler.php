@@ -4,9 +4,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 
 class CategoryHandler implements FrontRequestHandler
 {
-    private ThemeRenderer $renderer;
+    private ThemeRendererInterface $renderer;
 
-    public function __construct(ThemeRenderer $renderer)
+    public function __construct(ThemeRendererInterface $renderer)
     {
         $this->renderer = $renderer;
     }
@@ -24,15 +24,15 @@ class CategoryHandler implements FrontRequestHandler
             ? HandleRequest::handleFrontHelper()
             : null;
 
-        if ($frontHelper && method_exists($frontHelper, 'grabSimpleFrontTopic')) {
-            $topic = $frontHelper->grabSimpleFrontTopic($id);
-            if (empty($topic['ID'])) {
-                $this->renderer->render404();
-            } else {
-                $this->renderer->render('category');
-            }
-        } else {
+        if (!$frontHelper || !method_exists($frontHelper, 'grabSimpleFrontTopic')) {
             $this->renderer->render404();
+            return;
         }
+        $topic = $frontHelper->grabSimpleFrontTopic($id);
+        if (empty($topic['ID'])) {
+            $this->renderer->render404();
+            return;
+        }
+        $this->renderer->render('category');
     }
 }

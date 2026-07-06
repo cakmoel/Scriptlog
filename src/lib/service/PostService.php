@@ -419,51 +419,33 @@ class PostService
             $this->validator->sanitize($this->meta_desc, 'string');
         }
 
+        $topic_id = $this->topics;
+
         if ($this->topics == 0) {
             $categoryId = $category->createTopic(['topic_title' => 'Uncategorized', 'topic_slug' => 'uncategorized']);
 
             $getCategory = $category->findTopicById($categoryId, $this->sanitizer, PDO::FETCH_ASSOC);
 
-            $new_post = [
-              'media_id' => $this->post_image,
-              'post_author' => $this->author,
-              'post_date' => $this->post_date,
-              'post_title' => $this->title,
-              'post_slug'  => $this->slug,
-              'post_content' => $this->content,
-              'post_summary' => $this->meta_desc,
-              'post_status' => $this->post_status,
-              'post_visibility' => $this->post_visibility,
-              'post_password' => $this->post_password,
-              'post_tags' => $this->tags,
-              'post_headlines' => $this->post_headlines,
-              'post_locale' => $this->post_locale ?? 'en',
-              'comment_status' => $this->comment_status,
-              'passphrase' => $this->passphrase
-            ];
-
             $topic_id = isset($getCategory['ID']) ? abs((int)$getCategory['ID']) : 0;
-        } else {
-            $new_post = [
-              'media_id' => $this->post_image,
-              'post_author' => $this->author,
-              'post_date' => $this->post_date,
-              'post_title' => $this->title,
-              'post_slug'  => $this->slug,
-              'post_content' => $this->content,
-              'post_summary' => $this->meta_desc,
-              'post_status' => $this->post_status,
-              'post_visibility' => $this->post_visibility,
-              'post_password' => $this->post_password,
-              'post_tags' => $this->tags,
-              'post_headlines' => $this->post_headlines,
-              'post_locale' => $this->post_locale ?? 'en',
-              'comment_status' => $this->comment_status,
-              'passphrase' => $this->passphrase
-            ];
-
-            $topic_id = $this->topics;
         }
+
+        $new_post = [
+          'media_id' => $this->post_image,
+          'post_author' => $this->author,
+          'post_date' => $this->post_date,
+          'post_title' => $this->title,
+          'post_slug'  => $this->slug,
+          'post_content' => $this->content,
+          'post_summary' => $this->meta_desc,
+          'post_status' => $this->post_status,
+          'post_visibility' => $this->post_visibility,
+          'post_password' => $this->post_password,
+          'post_tags' => $this->tags,
+          'post_headlines' => $this->post_headlines,
+          'post_locale' => $this->post_locale ?? 'en',
+          'comment_status' => $this->comment_status,
+          'passphrase' => $this->passphrase
+        ];
 
         return $this->postDao->createPost($new_post, $topic_id);
     }
@@ -487,42 +469,28 @@ class PostService
             $this->validator->sanitize($this->tags, 'string');
         }
 
-        if (empty($this->post_image)) {
-            return $this->postDao->updatePost($this->sanitizer, [
-              'post_author' => $this->author,
-              'post_modified' => $this->post_modified,
-              'post_title' => $this->title,
-              'post_slug' => $this->slug,
-              'post_content' => $this->content,
-              'post_summary' => $this->meta_desc,
-              'post_status' => $this->post_status,
-              'post_visibility' => $this->post_visibility,
-              'post_password' => $this->post_password,
-              'post_tags' => $this->tags,
-              'post_headlines' => $this->post_headlines,
-              'post_locale' => $this->post_locale ?? 'en',
-              'comment_status' => $this->comment_status,
-              'passphrase' => $this->passphrase
-            ], $this->postId, $this->topics);
-        } else {
-            return $this->postDao->updatePost($this->sanitizer, [
-              'media_id' => $this->post_image,
-              'post_author' => $this->author,
-              'post_modified' => $this->post_modified,
-              'post_title' => $this->title,
-              'post_slug' => $this->slug,
-              'post_content' => $this->content,
-              'post_summary' => $this->meta_desc,
-              'post_status' => $this->post_status,
-              'post_visibility' => $this->post_visibility,
-              'post_password' => $this->post_password,
-              'post_tags' => $this->tags,
-              'post_headlines' => $this->post_headlines,
-              'post_locale' => $this->post_locale ?? 'en',
-              'comment_status' => $this->comment_status,
-              'passphrase' => $this->passphrase
-            ], $this->postId, $this->topics);
+        $postData = [
+          'post_author' => $this->author,
+          'post_modified' => $this->post_modified,
+          'post_title' => $this->title,
+          'post_slug' => $this->slug,
+          'post_content' => $this->content,
+          'post_summary' => $this->meta_desc,
+          'post_status' => $this->post_status,
+          'post_visibility' => $this->post_visibility,
+          'post_password' => $this->post_password,
+          'post_tags' => $this->tags,
+          'post_headlines' => $this->post_headlines,
+          'post_locale' => $this->post_locale ?? 'en',
+          'comment_status' => $this->comment_status,
+          'passphrase' => $this->passphrase
+        ];
+
+        if (!empty($this->post_image)) {
+            $postData['media_id'] = $this->post_image;
         }
+
+        return $this->postDao->updatePost($this->sanitizer, $postData, $this->postId, $this->topics);
     }
 
     /**
@@ -539,7 +507,8 @@ class PostService
 
         $this->validator->sanitize($this->postId, 'int');
 
-        if (!$data_post = $this->postDao->findPost($this->postId, $this->sanitizer)) {
+        $data_post = $this->postDao->findPost($this->postId, $this->sanitizer);
+        if (!$data_post) {
             $_SESSION['error'] = "postNotFound";
             direct_page('index.php?load=posts&error=postNotFound', 404);
             return false;

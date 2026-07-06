@@ -1,5 +1,6 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * API Base Controller
  *
@@ -32,6 +33,8 @@ class ApiController
 
     /**
      * @var array Request headers
+     *
+     * @psalm-suppress PossiblyUnusedProperty
      */
     protected $headers = [];
 
@@ -111,10 +114,10 @@ class ApiController
                 $jsonData = $this->getJsonBody();
                 if ($jsonData) {
                     $data = $jsonData;
-                } else {
-                    parse_str(file_get_contents('php://input'), $data);
-                    $data = array_merge($_POST, $data);
+                    break;
                 }
+                parse_str(file_get_contents('php://input'), $data);
+                $data = array_merge($_POST, $data);
                 break;
         }
 
@@ -179,6 +182,8 @@ class ApiController
      * Get authenticated user
      *
      * @return array|null
+     *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     protected function getUser()
     {
@@ -233,8 +238,8 @@ class ApiController
     /**
      * Sanitize string input
      *
-     * @param string $value
-     * @return string
+     * @param array|string $value
+     * @return array|string
      */
     protected function sanitize($value)
     {
@@ -294,6 +299,8 @@ class ApiController
      * API info endpoint
      *
      * @return void
+     *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function info()
     {
