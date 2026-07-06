@@ -1,7 +1,7 @@
 {
     "name": "cakmoel/scriptlog",
     "type": "project",
-    "description": "Just another blog engine",
+    "description": "Blog engine",
     "license": "MIT",
     "authors": [
         {
@@ -17,20 +17,29 @@
             "php": "7.4.33"
         },
         "vendor-dir": "src/lib/vendor",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "bamarni/composer-bin-plugin": true
+        }
     },
     "require": {
         "php": ">=7.4",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-pdo": "*",
+        "ext-fileinfo": "*",
+        "ext-openssl": "*",
+        "ext-gd": "*",
         "catfan/medoo": "^2.1",
         "defuse/php-encryption": "^2.2",
         "egulias/email-validator": "^2.1",
         "filp/whoops": "^2.9",
-        "guzzlehttp/psr7": "^2.12.1",
         "intervention/image": "^2.5",
         "ircmaxell/random-lib": "^1.2",
-        "laminas/laminas-crypt": "^3.3",
-        "laminas/laminas-escaper": "^2.12",
-        "laminas/laminas-feed": "^2.17",
+        "laminas/laminas-crypt": "^3.3 <3.12",
+        "laminas/laminas-escaper": "^2.12 <2.18",
+        "laminas/laminas-feed": "^2.17 <2.22",
         "melbahja/seo": "^2.0",
         "psr/log": "^1.1",
         "sinergi/browser-detector": "^6.1",
@@ -39,18 +48,28 @@
         "voku/anti-xss": "^4.1"
     },
     "require-dev": {
+        "bamarni/composer-bin-plugin": "^1.9",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "friendsofphp/php-cs-fixer": "^3.0",
+        "phpcompatibility/php-compatibility": "^10.0.0@dev",
         "phpmd/phpmd": "^2.15",
         "phpmetrics/phpmetrics": "^2.9",
         "phpstan/phpstan": "^2.0",
+        "phpunit/php-code-coverage": "^9.2",
         "phpunit/phpunit": "^9.5",
-        "squizlabs/php_codesniffer": "^4.0",
-        "vimeo/psalm": "^4.0"
+        "squizlabs/php_codesniffer": "^3.11"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
     "autoload": {
-        "classmap": ["src/lib"]
+        "classmap": ["src/lib/"]
+    },
+    "extra": {
+        "bamarni-bin": {
+            "bin-links": true,
+            "target-directory": "vendor-bin",
+            "forward-command": true
+        }
     },
     "scripts": {
         "metrics": "php bin/phpmetrics",
@@ -63,16 +82,21 @@
         "phpmd": "phpmd lib/ text phpmd.xml --ignore-violations-on-exit",
         "phpmd:html": "phpmd lib/ html phpmd.xml --report-file build/phpmd.html",
         "phpmd:strict": "phpmd lib/ text phpmd.xml",
-        "psalm": "psalm --no-cache --php-version=7.4",
-        "psalm:baseline": "psalm --set-baseline=psalm-baseline.xml",
-        "psalm:update-baseline": "psalm --update-baseline",
-        "psalm:strict": "psalm --no-cache --php-version=7.4 --ignore-baseline",
+        "psalm": "php vendor-bin/psalm/vendor/vimeo/psalm/psalm --no-cache --php-version=7.4",
+        "psalm:baseline": "php vendor-bin/psalm/vendor/vimeo/psalm/psalm --set-baseline=psalm-baseline.xml",
+        "psalm:update-baseline": "php vendor-bin/psalm/vendor/vimeo/psalm/psalm --update-baseline",
+        "psalm:strict": "php vendor-bin/psalm/vendor/vimeo/psalm/psalm --no-cache --php-version=7.4 --ignore-baseline",
         "test": "phpunit --configuration phpunit.xml",
         "test:coverage": "phpunit --configuration phpunit.xml --coverage-html build/coverage",
+        "test:coverage-clover": "phpunit --configuration phpunit.xml --coverage-clover build/coverage.xml",
+        "compat": "phpcs -p lib/ --standard=phpcs-compatibility.xml",
+        "compat:report": "phpcs -p lib/ --standard=phpcs-compatibility.xml --report-full=build/php-compatibility.txt",
+        "audit": "composer audit",
         "analyse": [
             "@phpstan",
             "@phpcs",
-            "@phpmd"
+            "@phpmd",
+            "@compat"
         ],
         "quality": [
             "@phpstan",
@@ -83,7 +107,8 @@
         "build": [
             "@phpstan:strict",
             "@phpcs",
-            "@test"
+            "@test",
+            "@audit"
         ]
     }
 }
