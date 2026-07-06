@@ -2,15 +2,35 @@
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
+/**
+ * Renders the category (topic) archive page.
+ *
+ * Validates that the requested category exists in the database via
+ * FrontHelper before rendering. Returns a 404 response when the
+ * category is not found or the helper is unavailable.
+ */
 class CategoryHandler implements FrontRequestHandler
 {
+    /**
+     * The theme renderer used to output the response.
+     *
+     * @var ThemeRendererInterface
+     */
     private ThemeRendererInterface $renderer;
 
+    /**
+     * Construct a new CategoryHandler.
+     *
+     * @param ThemeRendererInterface $renderer The theme renderer instance.
+     */
     public function __construct(ThemeRendererInterface $renderer)
     {
         $this->renderer = $renderer;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function handle(array $params): void
     {
         $id = $params['value'] ?? '';
