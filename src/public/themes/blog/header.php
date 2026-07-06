@@ -14,7 +14,7 @@ require dirname(__FILE__) . '/functions.php';
 <?php endif; ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;display=swap" as="style">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;display=swap"></noscript>
 
 <style>
@@ -39,29 +39,29 @@ body{overflow-x:hidden;font-family:"Open Sans",sans-serif}
 <?php
 if (function_exists('theme_dir')) :
     ?>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css" integrity="sha384-Oq7xDXb7j0ZfSRSnACBVv7zaO45LpKBoQr0kTJbxk6qMg0zQIo5obIA0lHyFfYLt" crossorigin="anonymous" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css" integrity="sha384-Oq7xDXb7j0ZfSRSnACBVv7zaO45LpKBoQr0kTJbxk6qMg0zQIo5obIA0lHyFfYLt" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/bootstrap/css/bootstrap.min.css" integrity="sha384-Oq7xDXb7j0ZfSRSnACBVv7zaO45LpKBoQr0kTJbxk6qMg0zQIo5obIA0lHyFfYLt" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/font-awesome/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/fontastic.min.css" integrity="sha384-2bFVvo+6+gr1UNtQSThcM6JnEWC+gdW/9qX1GjGydVPnNyU4lcILvA4FwWSMqL3N" crossorigin="anonymous" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/fontastic.min.css" integrity="sha384-2bFVvo+6+gr1UNtQSThcM6JnEWC+gdW/9qX1GjGydVPnNyU4lcILvA4FwWSMqL3N" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/fontastic.min.css" integrity="sha384-2bFVvo+6+gr1UNtQSThcM6JnEWC+gdW/9qX1GjGydVPnNyU4lcILvA4FwWSMqL3N" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.css" integrity="sha384-/dUIqcuZmn0/Nt1CGyvylCjqPYa/w0/SdIVpbqBxsxYmfwd7PXM9Gt7PsRKRj9Xy" crossorigin="anonymous" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.css" integrity="sha384-/dUIqcuZmn0/Nt1CGyvylCjqPYa/w0/SdIVpbqBxsxYmfwd7PXM9Gt7PsRKRj9Xy" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.css" integrity="sha384-/dUIqcuZmn0/Nt1CGyvylCjqPYa/w0/SdIVpbqBxsxYmfwd7PXM9Gt7PsRKRj9Xy" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/style.sea.min.css" id="theme-stylesheet" integrity="sha384-JbRgk69UODRbZObMRNsjMeO1wAK6VXCrdy16v0NB36QOH4GtS2oBEg0eoZFTNy37" crossorigin="anonymous" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/style.sea.min.css" id="theme-stylesheet" integrity="sha384-JbRgk69UODRbZObMRNsjMeO1wAK6VXCrdy16v0NB36QOH4GtS2oBEg0eoZFTNy37" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/style.sea.min.css" integrity="sha384-JbRgk69UODRbZObMRNsjMeO1wAK6VXCrdy16v0NB36QOH4GtS2oBEg0eoZFTNy37" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css" integrity="sha384-05ZFPKwuZkVmbYwKdVxeSSTXUSRgKaDyKdhKj7vK/62LdtgJc+FUQ+fyxcqSEbQe" crossorigin="anonymous" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css" integrity="sha384-05ZFPKwuZkVmbYwKdVxeSSTXUSRgKaDyKdhKj7vK/62LdtgJc+FUQ+fyxcqSEbQe" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css" integrity="sha384-05ZFPKwuZkVmbYwKdVxeSSTXUSRgKaDyKdhKj7vK/62LdtgJc+FUQ+fyxcqSEbQe" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.min.css" integrity="sha384-JPaoEK2fBp+uA/Wgxb/Yuj5YuYkAK49IPnJNh8uBhWTN+zc7pS9PVvfoRs3deKRh" crossorigin="anonymous" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.min.css" integrity="sha384-JPaoEK2fBp+uA/Wgxb/Yuj5YuYkAK49IPnJNh8uBhWTN+zc7pS9PVvfoRs3deKRh" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.min.css" integrity="sha384-JPaoEK2fBp+uA/Wgxb/Yuj5YuYkAK49IPnJNh8uBhWTN+zc7pS9PVvfoRs3deKRh" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/privacy.min.css" integrity="sha384-dgoJODadPMRID9MyK0IFyykN9Gz2NNqGDAzfhsUCe3ECqqe8uZ7cLRXp9BZSEBOp" crossorigin="anonymous" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/privacy.min.css" integrity="sha384-dgoJODadPMRID9MyK0IFyykN9Gz2NNqGDAzfhsUCe3ECqqe8uZ7cLRXp9BZSEBOp" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/privacy.min.css" integrity="sha384-dgoJODadPMRID9MyK0IFyykN9Gz2NNqGDAzfhsUCe3ECqqe8uZ7cLRXp9BZSEBOp" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.min.css" integrity="sha384-qq9bnXoyBB4IsBWw08+n5BVNEBZtu+eQLQFd6h2HngnN18JcJddHan5oM1Iy9fJK" crossorigin="anonymous" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.min.css" integrity="sha384-qq9bnXoyBB4IsBWw08+n5BVNEBZtu+eQLQFd6h2HngnN18JcJddHan5oM1Iy9fJK" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.min.css" integrity="sha384-qq9bnXoyBB4IsBWw08+n5BVNEBZtu+eQLQFd6h2HngnN18JcJddHan5oM1Iy9fJK" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css" integrity="sha384-7+U3CUdwcffqC0x8Co1Teg5mj0+fTKhBrzFMB1qIlC5KeiUVWrYFL/SdLqD7C6Py" crossorigin="anonymous" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css" integrity="sha384-7+U3CUdwcffqC0x8Co1Teg5mj0+fTKhBrzFMB1qIlC5KeiUVWrYFL/SdLqD7C6Py" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css" integrity="sha384-7+U3CUdwcffqC0x8Co1Teg5mj0+fTKhBrzFMB1qIlC5KeiUVWrYFL/SdLqD7C6Py" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/sina-nav.min.css" integrity="sha384-/8qST2bRvHReXrpHR/ZSuKWz7bBV5fpC+az/N67a0JiqwAwNmhSNcUfaorK2FUM7" crossorigin="anonymous" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/sina-nav.min.css" integrity="sha384-/8qST2bRvHReXrpHR/ZSuKWz7bBV5fpC+az/N67a0JiqwAwNmhSNcUfaorK2FUM7" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/sina-nav.min.css" integrity="sha384-/8qST2bRvHReXrpHR/ZSuKWz7bBV5fpC+az/N67a0JiqwAwNmhSNcUfaorK2FUM7" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/cookie-consent.min.css" integrity="sha384-SZGf4Fdh2KV3qITa3ZjL8Bn/o579CfNvA+5gt1XJv5sr9fsFxJ5iCvyNcY9TtGqg" crossorigin="anonymous" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/cookie-consent.min.css" integrity="sha384-SZGf4Fdh2KV3qITa3ZjL8Bn/o579CfNvA+5gt1XJv5sr9fsFxJ5iCvyNcY9TtGqg" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/cookie-consent.min.css" integrity="sha384-SZGf4Fdh2KV3qITa3ZjL8Bn/o579CfNvA+5gt1XJv5sr9fsFxJ5iCvyNcY9TtGqg" crossorigin="anonymous"></noscript>
     <?php if (is_rtl()) : ?>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/rtl.min.css" integrity="sha384-K0RODyvrBSyO0LWBpmt4OSQVXVpa2uGgM5qtK9sSwPQFD2tnSOJbO+pkAaEnFSGg" crossorigin="anonymous">
@@ -72,12 +72,26 @@ endif;
 ?>
 
 <?= function_exists('theme_meta') ? theme_meta()['site_schema'] . PHP_EOL : ""; ?>
-<script>
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
     var scriptlog_vars = {
         api_url: '<?= app_url(); ?>/api/v1',
         site_url: '<?= app_url(); ?>',
         theme_dir: '<?= theme_dir(); ?>'
     };
+</script>
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
+(function() {
+    var links = document.querySelectorAll('link[media="print"]');
+    for (var i = 0; i < links.length; i++) {
+        if (links[i].rel === 'stylesheet') {
+            links[i].media = 'all';
+        }
+    }
+    var fontLink = document.querySelector('link[rel="preload"][as="style"]');
+    if (fontLink) {
+        fontLink.rel = 'stylesheet';
+    }
+})();
 </script>
 </head>
 <body>
