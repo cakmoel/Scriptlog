@@ -43,6 +43,9 @@ class FrontHelper
      */
     public static function grabSimpleFrontPost($id)
     {
+        if (self::$frontService) {
+            return self::$frontService->getSimplePost($id);
+        }
 
         $idsanitized = static::frontSanitizer($id, 'sql');
 
@@ -73,6 +76,9 @@ class FrontHelper
      */
     public static function grabSimpleFrontTopic($id)
     {
+        if (self::$frontService) {
+            return self::$frontService->getSimpleTopic($id);
+        }
 
         $idsanitized = static::frontSanitizer($id, 'sql');
 
@@ -91,6 +97,9 @@ class FrontHelper
      */
     public static function grabSimpleFrontArchive()
     {
+        if (self::$frontService) {
+            return self::$frontService->getSimpleArchive();
+        }
 
         $sql = "SELECT YEAR(tbl_posts.post_date) AS year_archive, MONTH(tbl_posts.post_date) AS month_archive
             FROM tbl_posts WHERE tbl_posts.post_type = 'blog' AND tbl_posts.post_status = 'publish'
@@ -116,6 +125,10 @@ class FrontHelper
      */
     public static function grabSimpleFrontPage($id)
     {
+        if (self::$frontService) {
+            return self::$frontService->getSimplePage($id);
+        }
+
         $idsanitized = static::frontSanitizer($id, 'sql');
 
         $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
@@ -152,6 +165,10 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
             return [];
         }
 
+        if (self::$frontService) {
+            return self::$frontService->searchTag($tag);
+        }
+
         try {
             if (!Registry::isKeySet('dbc')) {
                 return [];
@@ -182,6 +199,9 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
      */
     public static function grabTagLists()
     {
+        if (self::$frontService) {
+            return self::$frontService->getTagLists();
+        }
 
         $taglink = [];
         $tagArrays = [];
@@ -295,6 +315,9 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
      */
     public static function grabPreparedFrontTopicByID($id)
     {
+        if (self::$frontService) {
+            return self::$frontService->getPublishedTopicById((int)$id);
+        }
 
         $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE ID = ? AND topic_status = 'Y'";
 
@@ -310,6 +333,9 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
      */
     public static function grabPreparedFrontArchive($values)
     {
+        if (self::$frontService) {
+            return self::$frontService->getArchivePosts($values);
+        }
 
         $month = isset($values['month']) ? Sanitize::mildSanitizer($values['month']) : null;
         $year = isset($values['year']) ? Sanitize::mildSanitizer($values['year']) : null;
@@ -342,6 +368,9 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
      */
     public static function grabPreparedFrontGalleries($start, $limit)
     {
+        if (self::$frontService) {
+            return self::$frontService->getGalleries($start, $limit);
+        }
 
         $sql = "SELECT ID, media_filename, media_caption FROM tbl_media WHERE media_target = 'gallery' ORDER BY ID LIMIT ?, ?";
 
