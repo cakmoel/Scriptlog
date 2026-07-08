@@ -363,6 +363,8 @@ class ConfigurationController
                         write_htaccess(distill_post_request($filters)['permalinks'], Session::getInstance()->scriptlog_session_level, read_htaccess_config(distill_post_request($filters)['permalinks']));
                     } elseif ($detected_server == 'Nginx') {
                         write_nginx_config(distill_post_request($filters)['permalinks'], Session::getInstance()->scriptlog_session_level, read_nginx_config_template(distill_post_request($filters)['permalinks']));
+                    } elseif (($detected_server == 'Microsoft-IIS') || ($detected_server == 'IIS')) {
+                        write_web_config(distill_post_request($filters)['permalinks'], Session::getInstance()->scriptlog_session_level, read_web_config_template(distill_post_request($filters)['permalinks']));
                     }
 
                     $this->configService->modifySetting();
