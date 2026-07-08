@@ -66,6 +66,12 @@ install_header($current_path);
                                     <pre class="bg-light p-3 rounded"><code>include <?= dirname(__DIR__, 2); ?>/nginx-rewrites.conf;</code></pre>
                                     <p class="mb-0 text-muted"><small>Then restart Nginx for changes to take effect.</small></p>
                                 </div>
+                            <?php elseif (isset($_SESSION['server_config']) && $_SESSION['server_config']['web_server'] === 'Microsoft-IIS') : ?>
+                                <div class="alert alert-info text-left mt-3 mb-4">
+                                    <h5><i class="fa fa-info-circle"></i> IIS Configuration Note</h5>
+                                    <p class="mb-2">A <code>web.config</code> file has been generated automatically for IIS.</p>
+                                    <p class="mb-0 text-muted"><small>Ensure the URL Rewrite Module 2.0 and FastCGI Module are installed for proper URL routing.</small></p>
+                                </div>
                             <?php endif; ?>
                             
                             <a href="<?= setup_base_url($protocol, $server_host) . '/admin/login.php'; ?>" class="btn btn-success btn-lg shadow-sm px-5">

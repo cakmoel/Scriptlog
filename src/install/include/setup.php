@@ -804,19 +804,34 @@ function install_i18n_data($link, $prefix = '', $default_lang = 'en')
         $langIds[$code] = $link->insert_id;
     }
 
-    $insertTrans = $link->prepare("INSERT INTO {$prefix}tbl_translations (lang_id, translation_key, translation_value, translation_context) VALUES (?, ?, ?, ?)");
-
     $link->begin_transaction();
     try {
+        $batchValues = [];
+        $batchCount = 0;
+        $batchSize = 100;
+
         foreach ($translations as $context => $keys) {
             foreach ($keys as $key => $values) {
                 foreach ($values as $index => $value) {
                     $code = $langOrder[$index];
-                    $insertTrans->bind_param("isss", $langIds[$code], $key, $value, $context);
-                    $insertTrans->execute();
+                    $batchValues[] = "({$langIds[$code]}, '" . $link->real_escape_string($key) . "', '" . $link->real_escape_string($value) . "', '" . $link->real_escape_string($context) . "')";
+                    $batchCount++;
+
+                    if ($batchCount >= $batchSize) {
+                        $sql = "INSERT INTO {$prefix}tbl_translations (lang_id, translation_key, translation_value, translation_context) VALUES " . implode(',', $batchValues);
+                        $link->query($sql);
+                        $batchValues = [];
+                        $batchCount = 0;
+                    }
                 }
             }
         }
+
+        if (!empty($batchValues)) {
+            $sql = "INSERT INTO {$prefix}tbl_translations (lang_id, translation_key, translation_value, translation_context) VALUES " . implode(',', $batchValues);
+            $link->query($sql);
+        }
+
         $link->commit();
     } catch (Exception $e) {
         $link->rollback();
@@ -1180,16 +1195,12 @@ function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuse
             $rootDir = dirname(dirname(__DIR__)); // From install/include to root
             $configPath = $rootDir . '/config.php';
             
-            // Debug: Log the path
-            error_log("DEBUG: Attempting to write config.php to: " . $configPath);
-            
             $result = file_put_contents($configPath, $configFile, LOCK_EX);
             
             // If failed, try alternate path
             if ($result === false) {
                 $configPath = dirname(__DIR__, 2) . '/config.php';
                 $result = file_put_contents($configPath, $configFile, LOCK_EX);
-                error_log("DEBUG: Tried alternate path: " . $configPath . " result: " . ($result !== false ? "SUCCESS" : "FAILED"));
             }
 
             if ($result !== false) {
@@ -1198,12 +1209,7 @@ function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuse
                 write_env_file($protocol, $server_name, $dbhost, $dbuser, $dbpassword, $dbname, $dbport, $prefix, $email, $app_key, $distro, $defuseKeyPath);
                 
                 $configuration = true;
-                error_log("DEBUG: Configuration completed successfully");
-            } else {
-                error_log("ERROR: Failed to write config.php");
             }
-        } else {
-            error_log("DEBUG: Session token not set - config will not be written");
         }
     }  // <-- This was missing
 
@@ -1595,6 +1601,179 @@ location ~ /\.git/ {
     include ' . $nginx_path . ';
     
     Then restart Nginx.';
+    } elseif (stripos($web_server, 'microsoft-iis') !== false) {
+        # Generate web.config for IIS with URL Rewrite and security rules
+        $iis_config = dirname(__DIR__, 2) . '/web.config';
+        
+        $webconfig_content = '<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <system.webServer>
+        <!--
+            =============================================
+            SECURITY HEADERS
+            =============================================
+        -->
+        <httpProtocol>
+            <customHeaders>
+                <clear />
+                <add name="X-Frame-Options" value="SAMEORIGIN" />
+                <add name="X-Content-Type-Options" value="nosniff" />
+                <add name="X-XSS-Protection" value="1; mode=block" />
+                <add name="Referrer-Policy" value="strict-origin-when-cross-origin" />
+                <add name="Strict-Transport-Security" value="max-age=31536000; includeSubDomains" />
+                <add name="Permissions-Policy" value="accelerometer=(), ambient-light-sensor=(), autoplay=(self), battery=(), camera=(), cross-origin-isolated=(), display-capture=(), document-domain=(), encrypted-media=(self), fullscreen=(self), gamepad=(), geolocation=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), navigation-override=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(self), usb=(), web-share=(self), xr-spatial-tracking=()" />
+            </customHeaders>
+        </httpProtocol>
+
+        <!--
+            =============================================
+            URL REWRITE RULES
+            Requires IIS URL Rewrite Module 2.0
+            https://www.iis.net/downloads/microsoft/url-rewrite
+            =============================================
+        -->
+        <rewrite>
+            <rules>
+                <!-- API routes -->
+                <rule name="API Routes" stopProcessing="true">
+                    <match url="^api/(.*)$" />
+                    <action type="Rewrite" url="api/index.php" />
+                </rule>
+
+                <!-- Public asset files - allow direct access -->
+                <rule name="Public Assets" stopProcessing="true">
+                    <match url="^public/.*\.(ico|css|png|jpg|jpeg|webp|gif|js|txt|htm|html|eot|svg|ttf|woff|woff2|webm|ogg|mp4|wav|mp3|pdf)$" />
+                    <action type="None" />
+                </rule>
+
+                <!-- Admin panel -->
+                <rule name="Admin Panel" stopProcessing="true">
+                    <match url="^admin/(.*)$" />
+                    <action type="Rewrite" url="admin/{R:1}" />
+                </rule>
+
+                <!-- Application routes with language prefix (e.g., /en/post/...) -->
+                <rule name="Language Routes" stopProcessing="true">
+                    <match url="^[a-z]{2}/(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$" />
+                    <action type="Rewrite" url="index.php" />
+                </rule>
+
+                <rule name="Language Root" stopProcessing="true">
+                    <match url="^[a-z]{2}/?$" />
+                    <action type="Rewrite" url="index.php" />
+                </rule>
+
+                <!-- Application URL rewriting -->
+                <rule name="ScriptLog Rewrite" stopProcessing="true">
+                    <match url="^(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$" />
+                    <action type="Rewrite" url="index.php" />
+                </rule>
+
+                <!-- Root request -->
+                <rule name="Root Request" stopProcessing="true">
+                    <match url="^$" />
+                    <action type="Rewrite" url="index.php" />
+                </rule>
+            </rules>
+        </rewrite>
+
+        <!--
+            =============================================
+            SECURITY - Block sensitive file types
+            =============================================
+        -->
+        <security>
+            <requestFiltering>
+                <hiddenSegments>
+                    <add segment=".git" />
+                    <add segment="lib" />
+                    <add segment="install" />
+                </hiddenSegments>
+                <denyUrlSequences>
+                    <add sequence="config.php" />
+                    <add sequence="composer.json" />
+                    <add sequence="composer.lock" />
+                    <add sequence="package.json" />
+                    <add sequence="package-lock.json" />
+                    <add sequence=".env" />
+                    <add sequence=".git" />
+                    <add sequence=".htaccess" />
+                    <add sequence=".htpasswd" />
+                </denyUrlSequences>
+                <fileExtensions allowUnlisted="true">
+                    <add fileExtension=".sql" allowed="false" />
+                    <add fileExtension=".log" allowed="false" />
+                    <add fileExtension=".sh" allowed="false" />
+                    <add fileExtension=".bak" allowed="false" />
+                    <add fileExtension=".old" allowed="false" />
+                    <add fileExtension=".swp" allowed="false" />
+                    <add fileExtension=".yml" allowed="false" />
+                    <add fileExtension=".yaml" allowed="false" />
+                    <add fileExtension=".ini" allowed="false" />
+                    <add fileExtension=".dist" allowed="false" />
+                    <add fileExtension=".example" allowed="false" />
+                    <add fileExtension=".md" allowed="false" />
+                </fileExtensions>
+            </requestFiltering>
+        </security>
+
+        <!--
+            =============================================
+            STATIC CONTENT CACHING
+            =============================================
+        -->
+        <staticContent>
+            <clientCache cacheControlMode="UseMaxAge" cacheControlMaxAge="30.00:00:00" />
+            <remove fileExtension=".webp" />
+            <mimeMap fileExtension=".webp" mimeType="image/webp" />
+            <remove fileExtension=".woff2" />
+            <mimeMap fileExtension=".woff2" mimeType="font/woff2" />
+            <remove fileExtension=".eot" />
+            <mimeMap fileExtension=".eot" mimeType="application/vnd.ms-fontobject" />
+            <remove fileExtension=".svg" />
+            <mimeMap fileExtension=".svg" mimeType="image/svg+xml" />
+        </staticContent>
+
+        <!--
+            =============================================
+            COMPRESSION
+            =============================================
+        -->
+        <urlCompression doStaticCompression="true" doDynamicCompression="true" />
+
+        <!--
+            =============================================
+            PHP HANDLER VIA FastCGI
+            =============================================
+        -->
+        <handlers>
+            <add name="PHP-FastCGI" path="*.php" verb="*" modules="FastCgiModule" scriptProcessor="php-cgi.exe" resourceType="Either" requireAccess="Script" />
+        </handlers>
+    </system.webServer>
+
+    <!--
+        =============================================
+        .NET FRAMEWORK SETTINGS
+        =============================================
+    -->
+    <system.web>
+        <compilation debug="false" targetFramework="4.0" />
+        <customErrors mode="RemoteOnly" />
+    </system.web>
+</configuration>
+';
+
+        if (!empty($webconfig_content)) {
+            file_put_contents($iis_config, $webconfig_content, LOCK_EX);
+            $result['config_file'] = 'web.config';
+            $result['instructions'] = 'IIS detected! A web.config file has been generated automatically.
+    
+    The following IIS modules are required:
+    - URL Rewrite Module 2.0
+    - FastCGI Module (for PHP)
+    
+    If permalinks are not working, ensure the URL Rewrite module is installed via the IIS Web Platform Installer.';
+        }
     } else {
         # Generate .htaccess for Apache/LiteSpeed with security rules
         $htaccess_content = '# =============================================

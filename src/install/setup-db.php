@@ -212,6 +212,7 @@ install_header($install_path);
                         $installPath = '';
                     }
                     header("Location:" . $protocol . "://" . $server_host . $installPath . "/finish.php?status=success&token={$key}");
+                    exit;
                 }
             } catch (RuntimeException $e) {
                 $errors['errorInstall'] = $e->getMessage();
