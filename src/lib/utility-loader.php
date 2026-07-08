@@ -222,6 +222,7 @@ if (!function_exists('load_core_utilities')) {
         'write-ini.php',
         'write-log.php',
         'write-nginx-config.php',
+        'write-web-config.php',
     ];
 
         $utility_dir = __DIR__ . DIRECTORY_SEPARATOR . 'utility' . DIRECTORY_SEPARATOR;

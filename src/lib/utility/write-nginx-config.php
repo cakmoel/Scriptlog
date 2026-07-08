@@ -122,6 +122,9 @@ function get_webserver_config_filename($server_type)
         case 'Apache':
         case 'LiteSpeed':
             return '.htaccess';
+        case 'Microsoft-IIS':
+        case 'IIS':
+            return 'web.config';
         default:
             return '.htaccess';
     }

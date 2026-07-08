@@ -32,6 +32,10 @@ function detect_web_server()
             return 'LiteSpeed';
         }
 
+        if (strpos($server, 'microsoft-iis') !== false) {
+            return 'Microsoft-IIS';
+        }
+
         # Return the detected server name
         $parts = explode('/', $server);
         return ucfirst($parts[0]);
