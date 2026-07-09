@@ -138,7 +138,7 @@ class TopicDao extends Dao
      * Set topic
      * post category
      *
-     * @param string $postId
+     * @param int|string|null $postId
      * @param array $checked
      * @return string
      */
@@ -187,7 +187,7 @@ class TopicDao extends Dao
 
         if (is_array($items)) {
             foreach ($items as $item) {
-                $post_topic = $this->findPostTopic($item['ID'], $postId);
+                $post_topic = $this->findPostTopic($item['ID'], (int)$postId);
 
                 $checked = (isset($post_topic['topic_id']) && $post_topic['topic_id'] == $item['ID'])
                     ? "checked='checked'"
