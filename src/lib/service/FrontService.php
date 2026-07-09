@@ -590,7 +590,7 @@ class FrontService
                 ORDER BY ID
                 LIMIT ?, ?";
 
-        $result = $dbc->dbQuery($sql, [(int)$start, (int)$limit]);
+        $result = $dbc->dbQuery($sql, [$start, $limit]);
 
         if (!$result) {
             return null;
