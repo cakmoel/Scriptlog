@@ -8,12 +8,51 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#140---2026-07-06)
+- [Latest Release](#150---2026-07-09)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.5.0] - 2026-07-09
+
+### Added
+- **IIS web.config generation**: New `write-web-config.php` utility for Microsoft IIS `web.config` rewrite rules (NGINX-style)
+- **`FrontHelper` class**: Static delegation layer providing convenient access to FrontService methods (e.g., `FrontHelper::getPosts()`, `FrontHelper::getPages()`)
+- **IIS detection**: Microsoft IIS server detection added to `detect-web-server.php`
+- **Installer IIS note**: IIS configuration guidance displayed in the installation wizard (`setup.php`, `finish.php`)
+- **Permalink IIS support**: IIS `web.config` option added to the permalink configuration dropdown
+- **Unit tests**: 6 new test files — `WebServerDetectionTest` (12 tests), `NginxConfigWriterTest` (20 tests), `WebConfigWriterTest` (13 tests), `ThemeMetaTest`, `LogErrorTest`, and 7 handler test files (Archive/Blog/Category/Home/Page/Privacy/Post/Tag handlers)
+
+### Changed
+- **FrontService**: Refactored to use standalone database queries instead of delegating to FrontHelper; public interface now accessible via FrontHelper static methods
+- **DAO layer**: SQL injection prevention and return type hints added to `PostDao`, `PageDao`, `PageService`, `PostService`
+- **Handler classes**: PHPDoc blocks added and return type consistency improved across all front-end request handlers
+- **LogError**: Added return type hint and return value to `setStatusCode()`
+- **Installer**: Batch insert optimization and debug logging removal in setup wizard
+- **Translation cache**: Updated `en.json` and `es.json`
+
+### Removed
+- **Development themes**: Removed unused theme files
+- **Duplicate test files**: Removed 4 redundant test files — `AdditionalUtilityFunctionsTest.php`, `UserDaoTest.php`, `PostDaoMethodIntegrationTest.php`, `TopicDaoTest.php` (1686 lines)
+
+### Tests
+- **New test suites**: 6 new test files — WebServerDetectionTest (12 tests), NginxConfigWriterTest (20 tests), WebConfigWriterTest (13 tests), ThemeMetaTest, LogErrorTest, handler tests (7 files covering all front-end request handlers)
+- **FrontServiceTest**: Expanded to cover all autonomous method implementations
+- **Test cleanup**: 4 duplicate test files removed; bootstrap updated with `SERVER_NAME` and `PHP_SELF` constants for direct_page support
+
+### Notes
+Feature release focused on IIS web server support, FrontService delegation layer, expanded test coverage (45+ new tests), and code quality improvements across DAO and handler layers. Redundant test files consolidated.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.4.0
+- **Changes since v1.4.0**: 21 commits
+
+---
 
 ## [1.4.0] - 2026-07-06
 
@@ -602,6 +641,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.5.0 | 2026-07-09 | Stable |
 | 1.4.0 | 2026-07-06 | Stable |
 | 1.3.1 | 2026-07-02 | Stable |
 | 1.3.0 | 2026-07-01 | Stable |
