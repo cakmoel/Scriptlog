@@ -109,6 +109,7 @@ class TopicController extends BaseApp
                     $this->view->set('formData', $_POST);
                     $this->view->set('topicLocale', $this->topicService->localeDropDown());
                     $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+                    $this->view->render();
                 } else {
                     $this->topicService->setTopicTitle(prevent_injection(trim(distill_post_request($filters)['topic_title'])));
                     $this->topicService->setTopicSlug(make_slug(distill_post_request($filters)['topic_title']));
@@ -120,9 +121,11 @@ class TopicController extends BaseApp
             } catch (Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
+                direct_page('index.php?load=topics&error=internalError', 500);
             } catch (AppException $e) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($e);
+                direct_page('index.php?load=topics&error=internalError', 400);
             }
         } else {
             $this->setView('edit-topic');
@@ -132,9 +135,8 @@ class TopicController extends BaseApp
             $this->view->set('formAction', $this->getFormAction());
             $this->view->set('topicLocale', $this->topicService->localeDropDown());
             $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+            $this->view->render();
         }
-
-        return $this->view->render();
     }
 
     /**
@@ -195,6 +197,7 @@ class TopicController extends BaseApp
                     $this->view->set('topicData', $data_topic);
                     $this->view->set('topicLocale', $this->topicService->localeDropDown($data_topic['topic_locale'] ?? 'en'));
                     $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+                    return $this->view->render();
                 } else {
                     $this->topicService->setTopicId((int)distill_post_request($filters)['topic_id']);
                     $this->topicService->setTopicTitle(prevent_injection(distill_post_request($filters)['topic_title']));
@@ -208,9 +211,11 @@ class TopicController extends BaseApp
             } catch (Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
+                direct_page('index.php?load=topics&error=internalError', 500);
             } catch (AppException $e) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($e);
+                direct_page('index.php?load=topics&error=internalError', 400);
             }
         } else {
             $this->setView('edit-topic');
@@ -221,9 +226,8 @@ class TopicController extends BaseApp
             $this->view->set('topicData', $data_topic);
             $this->view->set('topicLocale', $this->topicService->localeDropDown($data_topic['topic_locale'] ?? 'en'));
             $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+            return $this->view->render();
         }
-
-        return $this->view->render();
     }
 
     /**
