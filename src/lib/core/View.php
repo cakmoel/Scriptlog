@@ -34,7 +34,7 @@ class View
     /**
      * Error
      *
-     * @var string
+     * @var int|string
      */
     private $errors;
 

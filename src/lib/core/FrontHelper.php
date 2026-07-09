@@ -194,6 +194,8 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
     /**
      * grabTagLists()
      *
+     * @psalm-suppress PossiblyUnusedMethod
+     *
      * @return mixed
      *
      */
@@ -327,6 +329,8 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
     /**
      * grabPreparedFrontArchive
      *
+     * @psalm-suppress PossiblyUnusedMethod
+     *
      * @param array $values
      * @return mixed
      *
@@ -360,6 +364,8 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
 
     /**
      * frontGalleries
+     *
+     * @psalm-suppress PossiblyUnusedMethod
      *
      * @param int $start
      * @param int $limit

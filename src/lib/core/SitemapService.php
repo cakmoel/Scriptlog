@@ -69,7 +69,7 @@ class SiteMapService
      * generating sitemap
      *
      * @param object $pages
-     * @return "1" |  "0"
+     * @return "0" | "1"
      *
      */
     public function generateSitemap($pages)
