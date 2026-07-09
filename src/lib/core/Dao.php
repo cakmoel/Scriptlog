@@ -281,7 +281,7 @@ class Dao
      * Filtering Id passed by HTTP request
      *
      * @param object $sanitize
-     * @param string $str
+     * @param int|string $str
      * @param string $type
      * @return string|integer
      *
