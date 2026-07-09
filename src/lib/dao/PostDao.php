@@ -91,7 +91,7 @@ WHERE p.post_type = 'blog'";
     public function findPost($ID, $sanitize, $author = null, $onlyPublished = true)
     {
 
-        $idsanitized = $this->filteringId($sanitize, $ID, 'sql');
+        $idsanitized = $this->filteringId($sanitize, (string)$ID, 'sql');
 
         $sql = "SELECT ID,
             media_id,
@@ -205,7 +205,7 @@ WHERE ID = ? AND post_type = 'blog'";
     public function updatePost($sanitize, $bind, $ID, $topicId): void
     {
 
-        $cleanId = $this->filteringId($sanitize, $ID, 'sql');
+        $cleanId = $this->filteringId($sanitize, (string)$ID, 'sql');
 
         try {
             $this->callTransaction();
@@ -256,11 +256,11 @@ WHERE ID = ? AND post_type = 'blog'";
             }
         } catch (DbException $e) {
             $this->callRollBack();
-            $this->error = LogError::setStatusCode(http_response_code(500));
+            $this->error = (string)LogError::setStatusCode(http_response_code(500));
             LogError::exceptionHandler($e);
         } catch (\Throwable $th) {
             $this->callRollBack();
-            $this->error = LogError::setStatusCode(http_response_code(500));
+            $this->error = (string)LogError::setStatusCode(http_response_code(500));
             LogError::exceptionHandler($th);
         }
     }
@@ -274,7 +274,7 @@ WHERE ID = ? AND post_type = 'blog'";
      */
     public function deletePost($ID, $sanitize): void
     {
-        $cleanId = $this->filteringId($sanitize, $ID, 'sql');
+        $cleanId = $this->filteringId($sanitize, (string)$ID, 'sql');
         $this->deleteRecord("tbl_posts", ['ID' => $cleanId]);
 
         if (function_exists('page_cache_clear')) {
@@ -314,7 +314,7 @@ WHERE ID = ? AND post_type = 'blog'";
     public function checkPostId($ID, $sanitize)
     {
         $sql = "SELECT ID FROM tbl_posts WHERE ID = ? AND post_type = 'blog'";
-        $idsanitized = $this->filteringId($sanitize, $ID, 'sql');
+        $idsanitized = $this->filteringId($sanitize, (string)$ID, 'sql');
         $this->setSQL($sql);
         $stmt = $this->checkCountValue([$idsanitized]);
         return $stmt > 0;
