@@ -93,7 +93,7 @@ class ConfigurationController
                      'flags' => FILTER_REQUIRE_ARRAY],
 
                'setting_value' => [
-                     'filter' => FILTER_FLAG_NO_ENCODE_QUOTES,
+                     'filter' => FILTER_UNSAFE_RAW,
                      'flags' => FILTER_REQUIRE_ARRAY]
 
             ];
