@@ -79,13 +79,13 @@ class PostModel extends BaseModel
              JOIN " . $this->table('tbl_topics') . " t ON pt.topic_id = t.ID 
              WHERE pt.post_id = p.ID AND t.topic_status = 'Y') AS topics_data
             FROM " . $this->table('tbl_posts') . " AS p
-            INNER JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
+            LEFT JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
+                AND m.media_target = 'blog'
+                AND m.media_access = 'public'
+                AND m.media_status = '1'
             INNER JOIN " . $this->table('tbl_users') . " AS u ON p.post_author = u.ID
             WHERE p.post_status = 'publish'
             AND p.post_type = 'blog'
-            AND m.media_target = 'blog'
-            AND m.media_access = 'public'
-            AND m.media_status = '1'
             AND u.user_banned = '0'
             ORDER BY p.post_date DESC LIMIT :limit";
 
@@ -127,11 +127,11 @@ class PostModel extends BaseModel
              WHERE pt.post_id = p.ID AND t.topic_status = 'Y') AS topics_data
     FROM " . $this->table('tbl_posts') . " AS p
     INNER JOIN " . $this->table('tbl_users') . " AS u ON p.post_author = u.ID
-        INNER JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
+        LEFT JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
+            AND m.media_target = 'blog'
+            AND m.media_status = '1'
     WHERE p.post_type = 'blog'
         AND p.post_status = 'publish'
-        AND m.media_target = 'blog'
-        AND m.media_status = '1'
         AND u.user_banned = '0'
     ORDER BY p.ID DESC " . $this->linkPosts->get_limit($sanitize);
         $this->setSQL($sql);
@@ -155,24 +155,20 @@ class PostModel extends BaseModel
      */
     public function getPostById($id)
     {
-
         $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, 
           p.post_slug, p.post_content, p.post_summary, p.post_keyword, p.post_status, p.post_sticky, 
-          p.post_type, p.post_visibility, p.post_password, p.comment_status AS comment_permit, m.media_filename, 
-          m.media_caption, m.media_target, 
+          p.post_type, p.post_visibility, p.post_password, p.comment_status AS comment_permit, 
+          m.media_filename, m.media_caption, m.media_target, 
           m.media_access, m.media_status, u.user_login, u.user_fullname
           FROM tbl_posts p
-          INNER JOIN tbl_media m ON p.media_id = m.ID
-          INNER JOIN tbl_users u ON p.post_author = u.ID
+          LEFT JOIN tbl_media m ON p.media_id = m.ID AND m.media_target = 'blog' AND m.media_access = 'public' AND m.media_status = '1'
+          LEFT JOIN tbl_users u ON p.post_author = u.ID
           WHERE p.ID = :ID 
           AND p.post_status = 'publish'
-          AND p.post_type = 'blog' AND m.media_target = 'blog'
-          AND m.media_access = 'public' AND m.media_status = '1' ";
+          AND p.post_type = 'blog'";
 
         $sanitizeid = Sanitize::severeSanitizer($id);
-
         $this->setSQL($sql);
-
         $item = $this->findRow([':ID' => $sanitizeid]);
 
         return (empty($item)) ?: $item;
@@ -199,11 +195,13 @@ class PostModel extends BaseModel
                  u.user_login, u.user_fullname
           FROM tbl_posts AS p
           INNER JOIN tbl_users AS u ON p.post_author = u.ID
-          INNER JOIN tbl_media AS m ON p.media_id = m.ID
+          LEFT JOIN tbl_media AS m ON p.media_id = m.ID
+              AND m.media_target = 'blog'
+              AND m.media_access = 'public'
+              AND m.media_status = '1'
           WHERE p.post_slug = :slug 
           AND p.post_status = 'publish'
-          AND p.post_type = 'blog' AND m.media_target = 'blog'
-          AND m.media_access = 'public' AND m.media_status = '1'";
+          AND p.post_type = 'blog'";
 
         $slug_sanitized = Sanitize::severeSanitizer($slug);
 
@@ -236,10 +234,12 @@ class PostModel extends BaseModel
                  u.user_fullname, u.user_login
           FROM tbl_posts AS p
           INNER JOIN tbl_user AS u ON p.post_author = u.ID
-          INNER JOIN tbl_media AS m ON p.media_id = m.ID
+          LEFT JOIN tbl_media AS m ON p.media_id = m.ID
+              AND m.media_target = 'blog'
+              AND m.media_access = 'public'
+              AND m.media_status = '1'
           WHERE u.user_fullname = :author AND p.post_status = 'publish'
-          AND p.post_type = 'blog' AND m.media_target = 'blog'
-          AND m.media_access = 'public' AND m.media_status = '1'";
+          AND p.post_type = 'blog'";
 
         $this->setSQL($sql);
 
@@ -271,9 +271,9 @@ class PostModel extends BaseModel
         FROM tbl_posts AS p
         INNER JOIN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 5) AS p2 ON p.ID = p2.ID 
         INNER JOIN tbl_users AS u ON p.post_author = u.ID
-        INNER JOIN tbl_media AS m ON p.media_id = m.ID
+        LEFT JOIN tbl_media AS m ON p.media_id = m.ID
+            AND m.media_target = 'blog' 
         WHERE p.post_type = 'blog'
-        AND m.media_target = 'blog' 
         AND p.post_status = 'publish' 
         AND p.post_headlines = '1' ";
 
@@ -332,10 +332,10 @@ class PostModel extends BaseModel
           FROM " . $this->table('tbl_posts') . " AS p
           INNER JOIN (SELECT ID FROM " . $this->table('tbl_posts') . " ORDER BY RAND() LIMIT 3) AS p2 ON p.ID = p2.ID
           INNER JOIN " . $this->table('tbl_users') . " AS u ON p.post_author = u.ID
-          INNER JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
+          LEFT JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
+              AND m.media_target = 'blog'
           WHERE p.post_type = 'blog'
           AND p.post_status = 'publish'
-          AND m.media_target = 'blog'
           LIMIT :position, :end";
 
         $this->setSQL($sql);

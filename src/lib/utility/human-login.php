@@ -114,7 +114,7 @@ function validate_login_context($ip, $loginId, $uniqueKey, array $values)
 {
 
     // 1. Check Payload Size & Required Fields (Fail Fast)
-    if (function_exists('check_form_request') && check_form_request($values, ['login', 'user_pass', 'csrf', 'LogIn']) === false) {
+    if (function_exists('check_form_request') && check_form_request($values, ['login', 'user_pass', 'csrf', 'LogIn', 'captcha_login', 'scriptpot_name', 'scriptpot_email', 'remember']) === false) {
         http_response_code(413);
         exit("413 Payload Too Large");
     }
