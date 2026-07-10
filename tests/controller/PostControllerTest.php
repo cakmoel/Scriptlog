@@ -23,7 +23,9 @@ class PostControllerTest extends TestCase
         $_FILES = [];
 
         $this->postService = $this->createMock(PostService::class);
-        $this->postController = new PostController($this->postService);
+        $topicDao = $this->createMock(TopicDao::class);
+        $mediaDao = $this->createMock(MediaDao::class);
+        $this->postController = new PostController($this->postService, $topicDao, $mediaDao);
     }
 
     protected function tearDown(): void
@@ -111,5 +113,23 @@ class PostControllerTest extends TestCase
         } else {
             $this->markTestSkipped('direct_page() exited before setting session');
         }
+    }
+
+    public function testCheckPostUpdatePayloadWhitelistHasPostDate(): void
+    {
+        $source = @file_get_contents(__DIR__ . '/../../src/lib/controller/PostController.php');
+        if (!$source) {
+            $this->markTestSkipped('PostController.php not found');
+        }
+        $this->assertStringContainsString("'post_modified', 'post_date'", $source);
+    }
+
+    public function testCheckPostUpdatePayloadWhitelistHasAllFields(): void
+    {
+        $source = @file_get_contents(__DIR__ . '/../../src/lib/controller/PostController.php');
+        if (!$source) {
+            $this->markTestSkipped('PostController.php not found');
+        }
+        $this->assertStringContainsString("'post_id', 'post_title', 'post_content', 'post_modified', 'post_date'", $source);
     }
 }

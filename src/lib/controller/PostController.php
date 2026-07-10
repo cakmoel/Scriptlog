@@ -455,7 +455,7 @@ class PostController extends BaseApp
 
     private function checkPostUpdatePayload()
     {
-        if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_modified', 'image_id', 'catID', 'post_summary', 'post_status', 'post_headlines', 'visibility', 'comment_status', 'post_password', 'post_tags', 'post_locale']) === false) {
+        if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_modified', 'post_date', 'image_id', 'catID', 'post_summary', 'post_status', 'post_headlines', 'visibility', 'comment_status', 'post_password', 'post_tags', 'post_locale']) === false) {
             header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 413 Payload Too Large", true, 413);
             header('Status: 413 Payload Too Large');
             header('Retry-After: 3600');
