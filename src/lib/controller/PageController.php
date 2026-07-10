@@ -126,7 +126,7 @@ class PageController extends BaseApp
                 throw new AppException("Sorry, unpleasant attempt detected!");
             }
 
-            if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_status', 'post_sticky']) == false) {
+            if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'post_modified', 'image_id', 'post_summary', 'post_status', 'post_sticky']) == false) {
                 header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . ' 413 Payload Too Large', true, 413);
                 header('Status: 413 Payload Too Large');
                 header('Retry-After: 3600');
@@ -320,7 +320,7 @@ class PageController extends BaseApp
                 throw new AppException("Sorry, unpleasant attempt detected!");
             }
 
-            if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'image_id', 'post_summary', 'post_status', 'post_sticky']) === false) {
+            if (check_form_request($_POST, ['page_id', 'post_title', 'post_content', 'post_date', 'post_modified', 'image_id', 'post_summary', 'post_status', 'post_sticky']) === false) {
                 header(APP_PROTOCOL . ' 413 Payload Too Large', true, 413);
                 header('Status: 413 Payload Too Large');
                 header('Retry-After: 3600');
