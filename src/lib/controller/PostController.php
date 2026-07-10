@@ -16,10 +16,14 @@ class PostController extends BaseApp
 {
     private $view;
     private $postService;
+    private $topicDao;
+    private $mediaDao;
 
-    public function __construct(PostService $postService)
+    public function __construct(PostService $postService, TopicDao $topicDao, MediaDao $mediaDao)
     {
         $this->postService = $postService;
+        $this->topicDao = $topicDao;
+        $this->mediaDao = $mediaDao;
     }
 
     /**
@@ -74,11 +78,11 @@ class PostController extends BaseApp
 
     public function insert()
     {
-        $topics = new TopicDao();
-        $medialib = new MediaDao();
         $errors = array();
         $checkError = true;
         $user_level = $this->postService->postAuthorLevel();
+        $topics = $this->topicDao;
+        $medialib = $this->mediaDao;
 
         if (isset($_POST['postFormSubmit'])) {
             $file_location = isset($_FILES['media']['tmp_name']) ? $_FILES['media']['tmp_name'] : '';
@@ -104,11 +108,12 @@ class PostController extends BaseApp
                     return $this->view->render();
                 }
 
-                list($width, $height) = ($file_location) ? getimagesize($file_location) : getimagesize(app_url() . '/public/files/pictures/nophoto.jpg');
+                list($width, $height) = ($file_location) ? getimagesize($file_location) : getimagesize(__DIR__ . '/../../' . APP_IMAGE . 'nophoto.jpg');
                 $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] === 'publish')) ? 'public' : 'private';
+                $filtered = distill_post_request($filters);
 
-                $this->handlePostImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, $filters, $medialib);
-                $this->setPostServiceData($filters);
+                $this->postService->processPostImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, $filtered, false, null);
+                $this->setPostServiceData($filters, $filtered);
 
                 $this->postService->addPost();
                 $_SESSION['status'] = "postAdded";
@@ -116,9 +121,6 @@ class PostController extends BaseApp
             } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
-            } catch (AppException $e) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($e);
             }
         }
 
@@ -156,7 +158,7 @@ class PostController extends BaseApp
 
     private function checkPostPayload()
     {
-        if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_date', 'image_id', 'catID', 'post_summary', 'post_tags', 'post_status', 'post_headlines', 'visibility', 'comment_status']) === false) {
+        if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_date', 'image_id', 'catID', 'post_summary', 'post_tags', 'post_status', 'post_headlines', 'visibility', 'comment_status', 'post_password', 'post_locale']) === false) {
             header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . ' 413 Payload Too Large', true, 413);
             header('Status: 413 Payload Too Large');
             header('Retry-After: 3600');
@@ -266,98 +268,16 @@ class PostController extends BaseApp
         return $checkError;
     }
 
-    /** @SuppressWarnings(PHPMD.ExcessiveParameterList) */
-    private function handlePostImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, $filters, $medialib)
+    private function setPostServiceData($filters, array $filtered = null)
     {
-        if (empty($file_location)) {
-            $this->handleDefaultImage($filters, $width, $height, $media_access, $user_level, $medialib);
-            return;
+        if ($filtered === null) {
+            $filtered = distill_post_request($filters);
         }
 
-        $this->handleUploadedImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, $filters, $medialib);
-    }
-
-    private function handleDefaultImage($filters, $width, $height, $media_access, $user_level, $medialib)
-    {
-        if (isset($_POST['image_id'])) {
-            $this->postService->setPostImage((int)distill_post_request($filters)['image_id']);
-            return;
-        }
-
-        clearstatcache();
-        $media_metavalue = array(
-          'Origin' => "nophoto.jpg",
-          'File type' => "image/jpg",
-          'File size' => format_size_unit(filesize(__DIR__ . '/../../' . APP_IMAGE . "nophoto.jpg")),
-          'Uploaded at' => date("Y-m-d H:i:s"),
-          'Dimension' => $width . 'x' . $height
-        );
-
-        $bind_media = [
-          'media_filename' => "nophoto.jpg",
-          'media_caption' => prevent_injection(distill_post_request($filters)['post_title']),
-          'media_type' => "image/jpg",
-          'media_target' => 'blog',
-          'media_user' => $user_level,
-          'media_access' => $media_access,
-          'media_status' => '1'
-        ];
-
-        $append_media = $medialib->createMedia($bind_media);
-        $medialib->createMediaMeta([
-          'media_id' => $append_media,
-          'meta_key' => "nophoto.jpg",
-          'meta_value' => json_encode($media_metavalue)
-        ]);
-
-        $this->postService->setPostImage($append_media);
-    }
-
-    /** @SuppressWarnings(PHPMD.ExcessiveParameterList) */
-    private function handleUploadedImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, $filters, $medialib)
-    {
-        $media_metavalue = array();
-
-        if ($file_extension === "jpeg" || $file_extension === "jpg" || $file_extension === "png" || $file_extension === "gif" || $file_extension === "webp" || $file_extension === "bmp") {
-            $media_metavalue = array(
-              'Origin' => rename_file($file_name),
-              'File type' => $file_type,
-              'File size' => format_size_unit($file_size),
-              'Uploaded at' => date("Y-m-d H:i:s"),
-              'Dimension' => $width . 'x' . $height
-            );
-        }
-
-        if (is_uploaded_file($file_location)) {
-            upload_media($file_location, $file_type, $file_size, basename($new_filename));
-        }
-
-        $bind_media = [
-          'media_filename' => $new_filename,
-          'media_caption' => prevent_injection(distill_post_request($filters)['post_title']),
-          'media_type' => $file_type,
-          'media_target' => 'blog',
-          'media_user' => $user_level,
-          'media_access' => $media_access,
-          'media_status' => '1'
-        ];
-
-        $append_media = $medialib->createMedia($bind_media);
-        $medialib->createMediaMeta([
-          'media_id' => $append_media,
-          'meta_key' => $new_filename,
-          'meta_value' => json_encode($media_metavalue)
-        ]);
-
-        $this->postService->setPostImage($append_media);
-    }
-
-    private function setPostServiceData($filters)
-    {
         if (isset($_POST['catID']) && $_POST['catID'] == 0) {
             $this->postService->setTopics(0);
         } else {
-            $this->postService->setTopics(distill_post_request($filters)['catID']);
+            $this->postService->setTopics($filtered['catID']);
         }
 
         $this->postService->setPostAuthor((int)$this->postService->postAuthorId());
@@ -365,39 +285,39 @@ class PostController extends BaseApp
         if (empty($_POST['post_date'])) {
             $this->postService->setPostDate(date_for_database());
         } else {
-            $this->postService->setPostDate(date_for_database(distill_post_request($filters)['post_date']));
+            $this->postService->setPostDate(date_for_database($filtered['post_date']));
         }
 
-        $this->postService->setPostTitle(distill_post_request($filters)['post_title']);
-        $this->postService->setPostSlug(distill_post_request($filters)['post_title']);
+        $this->postService->setPostTitle($filtered['post_title']);
+        $this->postService->setPostSlug($filtered['post_title']);
 
         if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
             if (!empty($_POST['post_password'])) {
-                $protected = protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password']);
+                $protected = protect_post($filtered['post_content'], $filtered['visibility'], $filtered['post_password']);
                 $this->postService->setPostContent($protected['post_content']);
                 $this->postService->setProtected($protected['post_password']);
-                $this->postService->setPassPhrase(distill_post_request($filters)['post_password']);
-                $_SESSION['post_protected'] = distill_post_request($filters)['post_password'];
+                $this->postService->setPassPhrase($filtered['post_password']);
+                $_SESSION['post_protected'] = $filtered['post_password'];
             }
         } else {
-            $this->postService->setPostContent(distill_post_request($filters)['post_content']);
+            $this->postService->setPostContent($filtered['post_content']);
         }
 
-        $this->postService->setPublish(distill_post_request($filters)['post_status']);
-        $this->postService->setVisibility(distill_post_request($filters)['visibility']);
+        $this->postService->setPublish($filtered['post_status']);
+        $this->postService->setVisibility($filtered['visibility']);
 
         if (empty($_POST['post_headlines'])) {
             $this->postService->setHeadlines(0);
         } else {
-            $this->postService->setHeadlines(distill_post_request($filters)['post_headlines']);
+            $this->postService->setHeadlines($filtered['post_headlines']);
         }
 
-        $this->postService->setComment(distill_post_request($filters)['comment_status']);
-        $this->postService->setMetaDesc(distill_post_request($filters)['post_summary']);
-        $this->postService->setPostLocale(distill_post_request($filters)['post_locale']);
+        $this->postService->setComment($filtered['comment_status']);
+        $this->postService->setMetaDesc($filtered['post_summary']);
+        $this->postService->setPostLocale($filtered['post_locale']);
 
         if (isset($_POST['post_tags'])) {
-            $this->postService->setPostTags(distill_post_request($filters)['post_tags']);
+            $this->postService->setPostTags($filtered['post_tags']);
         }
     }
 
@@ -440,11 +360,11 @@ class PostController extends BaseApp
      */
     public function update($id)
     {
-        $topics = new TopicDao();
-        $medialib = new MediaDao();
         $errors = array();
         $checkError = true;
         $user_level = $this->postService->postAuthorLevel();
+        $topics = $this->topicDao;
+        $medialib = $this->mediaDao;
 
         $getPost = $this->postService->grabPost($id);
         if (!$getPost) {
@@ -497,7 +417,8 @@ class PostController extends BaseApp
                     return $this->view->render();
                 }
 
-                $this->processPostUpdate($id, $filters, $file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $user_level, $medialib);
+                $filtered = distill_post_request($filters);
+                $this->processPostUpdate($id, $filters, $file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $user_level, $medialib, $data_post['media_id'], $filtered);
 
                 $this->postService->modifyPost();
                 $_SESSION['status'] = "postUpdated";
@@ -505,9 +426,6 @@ class PostController extends BaseApp
             } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
-            } catch (AppException $e) {
-                LogError::setStatusCode(http_response_code());
-                LogError::exceptionHandler($e);
             }
         }
 
@@ -537,7 +455,7 @@ class PostController extends BaseApp
 
     private function checkPostUpdatePayload()
     {
-        if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_modified', 'image_id', 'catID', 'post_summary', 'post_status', 'post_headlines', 'visibility', 'comment_status']) === false) {
+        if (check_form_request($_POST, ['post_id', 'post_title', 'post_content', 'post_modified', 'image_id', 'catID', 'post_summary', 'post_status', 'post_headlines', 'visibility', 'comment_status', 'post_password', 'post_tags', 'post_locale']) === false) {
             header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 413 Payload Too Large", true, 413);
             header('Status: 413 Payload Too Large');
             header('Retry-After: 3600');
@@ -572,7 +490,7 @@ class PostController extends BaseApp
             array_push($errors, MESSAGE_INVALID_SELECTBOX);
         }
 
-        if (!empty($_POST['post_modfied']) && validate_date($_POST['post_modified']) === false) {
+        if (!empty($_POST['post_modified']) && validate_date($_POST['post_modified']) === false) {
             $checkError = false;
             array_push($errors, "Please fix your date format");
         }
@@ -585,72 +503,84 @@ class PostController extends BaseApp
     }
 
     /** @SuppressWarnings(PHPMD.ExcessiveParameterList) */
-    private function processPostUpdate($id, $filters, $file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $user_level, $medialib)
+    private function processPostUpdate($id, $filters, $file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $user_level, $medialib, $oldMediaId = null, array $filtered = null)
     {
-        $this->postService->setPostId((int)distill_post_request($filters)['post_id']);
+        if ($filtered === null) {
+            $filtered = distill_post_request($filters);
+        }
+
+        $this->postService->setPostId((int)$filtered['post_id']);
         $this->postService->setPostAuthor($this->postService->postAuthorId());
-        $this->postService->setPostTitle(distill_post_request($filters)['post_title']);
-        $this->postService->setPostSlug(distill_post_request($filters)['post_title']);
-        $this->postService->setPublish(distill_post_request($filters)['post_status']);
+        $this->postService->setPostTitle($filtered['post_title']);
+        $this->postService->setPostSlug($filtered['post_title']);
+        $this->postService->setPublish($filtered['post_status']);
 
         if (isset($_POST['catID']) && $_POST['catID'] == 0) {
             $this->postService->setTopics(0);
         } else {
-            $this->postService->setTopics(distill_post_request($filters)['catID']);
+            $this->postService->setTopics($filtered['catID']);
         }
 
-        list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : getimagesize(app_url() . '/public/files/pictures/nophoto.jpg');
+        list($width, $height) = (!empty($file_location)) ? getimagesize($file_location) : getimagesize(__DIR__ . '/../../' . APP_IMAGE . 'nophoto.jpg');
 
         $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish')) ? 'public' : 'private';
 
-        $this->handlePostImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, $filters, $medialib);
+        $this->postService->processPostImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, $filtered, true, $oldMediaId);
 
-        $this->postService->setComment(distill_post_request($filters)['comment_status']);
-        $this->postService->setMetaDesc(distill_post_request($filters)['post_summary']);
-        $this->postService->setPostTags(distill_post_request($filters)['post_tags']);
-        $this->postService->setPostLocale(distill_post_request($filters)['post_locale']);
+        $this->postService->setComment($filtered['comment_status']);
+        $this->postService->setMetaDesc($filtered['post_summary']);
+        $this->postService->setPostTags($filtered['post_tags']);
+        $this->postService->setPostLocale($filtered['post_locale']);
 
         if (empty($_POST['post_modified'])) {
             $this->postService->setPostModified(date_for_database());
         } else {
-            $this->postService->setPostModified(date_for_database(distill_post_request($filters)['post_modified']));
+            $this->postService->setPostModified(date_for_database($filtered['post_modified']));
         }
 
-        $this->setProtectedPostContent($id, $filters);
-        $this->setPostHeadlines($filters);
+        $this->setProtectedPostContent($id, $filters, $filtered);
+        $this->setPostHeadlines($filters, $filtered);
     }
 
-    private function setProtectedPostContent($id, $filters)
+    private function setProtectedPostContent($id, $filters, array $filtered = null)
     {
+        if ($filtered === null) {
+            $filtered = distill_post_request($filters);
+        }
+
         if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
             if (!empty($_POST['post_password'])) {
-                $protected = protect_post(distill_post_request($filters)['post_content'], distill_post_request($filters)['visibility'], distill_post_request($filters)['post_password']);
+                $protected = protect_post($filtered['post_content'], $filtered['visibility'], $filtered['post_password']);
                 $this->postService->setProtected($protected['post_password']);
-                $this->postService->setPostContent($protected['post_content']);
-                $this->postService->setPassPhrase(distill_post_request($filters)['post_password']);
-                $_SESSION['post_protected'] = distill_post_request($filters)['post_password'];
+                $this->postService->setPostContent($protected['post_content'], true);
+                $this->postService->setPassPhrase($filtered['post_password']);
+                $_SESSION['post_protected'] = $filtered['post_password'];
             } else {
                 $existing_post = $this->postService->grabPost($id);
                 if ($existing_post && !empty($existing_post['passphrase'])) {
-                    $reencrypted = encrypt(distill_post_request($filters)['post_content'], $existing_post['passphrase']);
-                    $this->postService->setPostContent($reencrypted);
+                    $reencrypted = encrypt($filtered['post_content'], $existing_post['passphrase']);
+                    $this->postService->setPostContent($reencrypted, true);
                 } else {
-                    $this->postService->setPostContent(distill_post_request($filters)['post_content']);
+                    $this->postService->setPostContent($filtered['post_content']);
                 }
             }
-            $this->postService->setVisibility(distill_post_request($filters)['visibility']);
+            $this->postService->setVisibility($filtered['visibility']);
         } else {
-            $this->postService->setVisibility(distill_post_request($filters)['visibility']);
-            $this->postService->setPostContent(distill_post_request($filters)['post_content']);
+            $this->postService->setVisibility($filtered['visibility']);
+            $this->postService->setPostContent($filtered['post_content']);
         }
     }
 
-    private function setPostHeadlines($filters)
+    private function setPostHeadlines($filters, array $filtered = null)
     {
+        if ($filtered === null) {
+            $filtered = distill_post_request($filters);
+        }
+
         if (empty($_POST['post_headlines'])) {
             $this->postService->setHeadlines(0);
         } else {
-            $this->postService->setHeadlines(distill_post_request($filters)['post_headlines']);
+            $this->postService->setHeadlines($filtered['post_headlines']);
         }
     }
 
@@ -722,9 +652,6 @@ class PostController extends BaseApp
         } catch (\Throwable $th) {
             LogError::setStatusCode(http_response_code());
             LogError::exceptionHandler($th);
-        } catch (AppException $e) {
-            LogError::setStatusCode(http_response_code());
-            LogError::exceptionHandler($e);
         }
     }
 

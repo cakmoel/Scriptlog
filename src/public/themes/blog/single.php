@@ -3,7 +3,42 @@
 // Retrieve post based on permalink settings
 // SEO-friendly URLs: /post/{id}/slug -> request_path()->param1
 // Query string URLs: ?p={id} -> HandleRequest::isQueryStringRequested()['value']
-$retrieve_post = (rewrite_status() == 'yes') ? retrieve_detail_post(request_path()->param1) : retrieve_detail_post(HandleRequest::isQueryStringRequested()['value']);
+$retrieve_post = (rewrite_status() == 'yes') ? retrieve_detail_post(request_path()->param1) : 
+retrieve_detail_post(HandleRequest::isQueryStringRequested()['value']);
+
+// ====== ADD THIS VALIDATION ======
+// Check if post exists and has a valid ID
+if (empty($retrieve_post) || !is_array($retrieve_post) || !isset($retrieve_post['ID']) || (int)$retrieve_post['ID'] <= 0) {
+    // Log for debugging
+    error_log("Single.php: Post not found. ID passed: " . print_r([
+        'param1' => request_path()->param1 ?? 'not set',
+        'query_value' => HandleRequest::isQueryStringRequested()['value'] ?? 'not set'
+    ], true));
+    
+    // Show 404
+    http_response_code(404);
+    // Option 1: Include a 404 template
+    if (file_exists(dirname(__FILE__) . '/404.php')) {
+        include_once(dirname(__FILE__) . '/404.php');
+    } else {
+        echo "<h1>404 - Post Not Found</h1>";
+        echo "<p>The requested post does not exist.</p>";
+    }
+    exit;
+}
+// ====== END VALIDATION ======
+
+// Set default values for all post variables
+$post_author = '';
+$post_created = '';
+$post_content = '';
+$post_title = '';
+$post_img = '';
+$img_alt = '';
+$total_comment = 0;
+$post_visibility = 'public';
+$comment_permit = 'closed';
+
 
 $post_id = isset($retrieve_post['ID']) ? intval((int)$retrieve_post['ID']) : 0;
 $post_img = isset($retrieve_post['media_filename']) ? htmlout($retrieve_post['media_filename']) : "";
@@ -18,33 +53,45 @@ $total_comment = (!empty($post_id) && !empty($comment_data['total'])) ? (int)$co
 
 $is_unlocked = false;
 
+// --- Protected Post Logic ---
 if ($post_visibility === 'protected' && !empty($post_id)) {
     if (isset($_SESSION['unlocked_posts']) && isset($_SESSION['unlocked_posts'][$post_id])) {
         $is_unlocked = true;
     }
-    
+
+    // Only attempt processing if we have decrypted content and the key exists
     if ($is_unlocked && isset($_SESSION['unlocked_posts'][$post_id])) {
         $decrypted_content = decrypt_post($post_id, $_SESSION['unlocked_posts'][$post_id]);
-        $decoded_content = html_entity_decode($decrypted_content['post_content'], ENT_QUOTES, 'UTF-8');
-        $decoded_content = html_entity_decode($decoded_content, ENT_QUOTES, 'UTF-8');
-        $clean_content = preg_replace('/\s*style="[^"]*"/', '', $decoded_content);
-        $clean_content = preg_replace('/\s*style=[^>\s]*/', '', $clean_content);
-        $post_content = isset($decrypted_content['post_content']) ? htmLawed($clean_content, array(
-            'deny_attribute' => 'style,onclick,onerror,onload,onmouseover,onfocus,onblur,onchange,onsubmit,onkeydown,onkeyup,onkeypress',
-            'keep_bad' => 0
-        )) : "";
+
+        if (isset($decrypted_content['post_content'])) {
+            $decoded_content = html_entity_decode($decrypted_content['post_content'], ENT_QUOTES, 'UTF-8');
+            $decoded_content = html_entity_decode($decoded_content, ENT_QUOTES, 'UTF-8');
+            $clean_content = preg_replace('/\s*style="[^"]*"/', '', $decoded_content);
+            $clean_content = preg_replace('/\s*style=[^>\s]*/', '', $clean_content);
+            $post_content = htmLawed($clean_content, array(
+                'deny_attribute' => 'style,onclick,onerror,onload,onmouseover,onfocus,onblur,onchange,onsubmit,onkeydown,onkeyup,onkeypress',
+                'keep_bad' => 0
+            ));
+        }
     }
 }
 
+// --- Public Post Logic ---
 if ($post_visibility !== 'protected') {
-    $decoded_content = html_entity_decode($retrieve_post['post_content'], ENT_QUOTES, 'UTF-8');
-    $decoded_content = html_entity_decode($decoded_content, ENT_QUOTES, 'UTF-8');
-    $clean_content = preg_replace('/\s*style="[^"]*"/', '', $decoded_content);
-    $clean_content = preg_replace('/\s*style=[^>\s]*/', '', $clean_content);
-    $post_content = isset($retrieve_post['post_content']) ? htmLawed($clean_content, array(
-        'deny_attribute' => 'style,onclick,onerror,onload,onmouseover,onfocus,onblur,onchange,onsubmit,onkeydown,onkeyup,onkeypress',
-        'keep_bad' => 0
-    )) : "";
+
+    // FIX: Check if the key exists BEFORE trying to decode it
+    if (isset($retrieve_post['post_content'])) {
+        $decoded_content = html_entity_decode($retrieve_post['post_content'], ENT_QUOTES, 'UTF-8');
+        $decoded_content = html_entity_decode($decoded_content, ENT_QUOTES, 'UTF-8');
+        $clean_content = preg_replace('/\s*style="[^"]*"/', '', $decoded_content);
+        $clean_content = preg_replace('/\s*style=[^>\s]*/', '', $clean_content);
+        $post_content = htmLawed($clean_content, array(
+            'deny_attribute' => 'style,onclick,onerror,onload,onmouseover,onfocus,onblur,onchange,onsubmit,onkeydown,onkeyup,onkeypress',
+            'keep_bad' => 0
+        ));
+    } else {
+        $post_content = "Content not found";
+    }
 }
 
 if (isset($retrieve_post['user_fullname'])) {
@@ -65,34 +112,34 @@ if (isset($retrieve_post['post_modified'])) {
 
 ?>
 
-    <div class="container">
+<div class="container">
 
-        <div class="row">
-            <div class="post blog-post col-lg-8">
-                <div class="container">
-                    <div class="post-single">
-                        <div class="post-thumbnal">
-                            <?= isset($post_img) ? invoke_responsive_image($post_img, 'medium', true, isset($img_alt) ? $img_alt : "", 'img-fluid', true) : '<img src="' . theme_dir() . 'assets/img/placeholder.svg" alt="" width="730" height="486" class="img-fluid" loading="lazy" decoding="async">' ?>
+    <div class="row">
+        <div class="post blog-post col-lg-8">
+            <div class="container">
+                <div class="post-single">
+                    <div class="post-thumbnal">
+                        <?= get_post_thumbnail($post_img, $post_title, $img_alt); ?>
+                    </div>
+
+                    <div class="post-details">
+                        <div class="post-meta d-flex justify-content-between">
+                            <div class="category">
+                                 <?= !empty($post_id) ? link_topic((int)$post_id) : ""; ?> 
+                            </div>
                         </div>
-
-                        <div class="post-details">
-                            <div class="post-meta d-flex justify-content-between">
-                                <div class="category">
-                                    <?= isset($post_id) ? link_topic((int)$post_id) : ""; ?>
-                                </div>
+                        <h1><?= isset($post_title) ? $post_title : ""; ?><a href="<?= isset($post_id) ? permalinks($post_id)['post'] : "#"; ?>" title="<?= isset($post_title) ? $post_title : ""; ?>"><i class="fa fa-external-link" aria-hidden="true"></i></a></h1>
+                        <div class="post-footer d-flex align-items-center flex-column flex-sm-row">
+                            <div class="author d-flex align-items-center flex-wrap">
+                                <div class="title"><span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= $post_author; ?> </span></div>
                             </div>
-                            <h1><?= isset($post_title) ? $post_title : ""; ?><a href="<?= isset($post_id) ? permalinks($post_id)['post'] : "#"; ?>" title="<?= isset($post_title) ? $post_title : ""; ?>"><i class="fa fa-external-link" aria-hidden="true"></i></a></h1>
-                            <div class="post-footer d-flex align-items-center flex-column flex-sm-row">
-                                <div class="author d-flex align-items-center flex-wrap">
-                                    <div class="title"><span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= $post_author; ?> </span></div>
-                                </div>
-                                <div class="d-flex align-items-center flex-wrap">
-                                    <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i> <?= $post_created; ?> </div>
-                                    <div class="comments meta-last"><i class="icon-comment" aria-hidden="true"></i><?= $total_comment; ?></div>
-                                </div>
+                            <div class="d-flex align-items-center flex-wrap">
+                                <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i> <?= $post_created; ?> </div>
+                                <div class="comments meta-last"><i class="icon-comment" aria-hidden="true"></i><?= $total_comment; ?></div>
                             </div>
-                            <div class="post-body">
-                                <?php if ($post_visibility === 'protected' && !$is_unlocked) : ?>
+                        </div>
+                        <div class="post-body">
+                            <?php if ($post_visibility === 'protected' && !$is_unlocked) : ?>
                                 <div class="password-protected-post text-center py-5" id="password-protected-<?= $post_id; ?>">
                                     <div class="lock-icon mb-3">
                                         <i class="fa fa-lock fa-3x text-muted" aria-hidden="true"></i>
@@ -111,67 +158,67 @@ if (isset($retrieve_post['post_modified'])) {
                                     </div>
                                 </div>
                                 <div class="password-protected-content" id="unlocked-content-<?= $post_id; ?>" style="display: none;"></div>
-                                <?php else : ?>
+                            <?php else : ?>
                                 <?= $post_content; ?>
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="post-tags">
-                                <?= link_tag($post_id) ?? ""; ?>
-                            </div>
-
-                            <div class="posts-nav d-flex justify-content-between align-items-stretch flex-column flex-md-row">
-                                <?= previous_post($post_id); ?>
-                                <?= next_post($post_id); ?>
-                            </div>
-
-<?php
-if ($comment_permit == 'open') :
-    echo render_comments_section($post_id);
-
-    ?>
-
-                                <div class="comment-form-wrap pt-5">
-                                    <h3 class="h6 mb-5"><?= t('single.comment.leave_reply'); ?></h3>
-                                    <form method="post" action="<?= retrieve_site_url() . DS . basename('comments-post.php'); ?>" id="commentForm" class="p-5 bg-light">
-
-                                        <div class="form-group">
-                                            <label for="comment"><?= t('single.comment.label'); ?>*</label>
-                                            <textarea cols="30" rows="10" id="comment" name="comment" class="form-control" placeholder="<?= t('single.comment.placeholder'); ?>" maxlength="320" required></textarea>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="name"><?= t('form.name.label'); ?>*</label>
-                                            <input type="text" class="form-control" id="name" name="name" maxlength="90" placeholder="<?= t('form.name.placeholder'); ?>" autocomplete="name" required>
-                                            <div class="help-block with-errors"></div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="email"><?= t('form.email.label'); ?>*</label>
-                                            <input type="email" class="form-control" id="email" name="email" placeholder="<?= t('form.email.placeholder'); ?>" maxlength="180" autocomplete="email" required>
-                                            <div class="help-block with-errors"></div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <input type="hidden" id="csrf" class="form-control" name="csrf" value="<?= block_csrf(); ?>">
-                                            <input type="hidden" id="post_id" class="form-control" name="post_id" value="<?= abs((int)$post_id); ?>">
-                                            <input type="hidden" id="parent_id" class="form-control" name="parent_id" value="0">
-                                            <button type="submit" class="btn btn-secondary"><?= t('single.comment.submit'); ?></button>
-                                        </div>
-                                        <div id="error_message" class="ajax_response"></div>
-                                        <div id="success_message" class="ajax_response"></div>
-                                    </form>
-                                </div>
-                            <?php
-endif;
-?>
+                            <?php endif; ?>
                         </div>
+
+                        <div class="post-tags">
+                            <?= link_tag($post_id) ?? ""; ?>
+                        </div>
+
+                        <div class="posts-nav d-flex justify-content-between align-items-stretch flex-column flex-md-row">
+                            <?= previous_post($post_id); ?>
+                            <?= next_post($post_id); ?>
+                        </div>
+
+                        <?php
+                        if ($comment_permit == 'open') :
+                            echo render_comments_section($post_id);
+
+                        ?>
+
+                            <div class="comment-form-wrap pt-5">
+                                <h3 class="h6 mb-5"><?= t('single.comment.leave_reply'); ?></h3>
+                                <form method="post" action="<?= retrieve_site_url() . DS . basename('comments-post.php'); ?>" id="commentForm" class="p-5 bg-light">
+
+                                    <div class="form-group">
+                                        <label for="comment"><?= t('single.comment.label'); ?>*</label>
+                                        <textarea cols="30" rows="10" id="comment" name="comment" class="form-control" placeholder="<?= t('single.comment.placeholder'); ?>" maxlength="320" required></textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="name"><?= t('form.name.label'); ?>*</label>
+                                        <input type="text" class="form-control" id="name" name="name" maxlength="90" placeholder="<?= t('form.name.placeholder'); ?>" autocomplete="name" required>
+                                        <div class="help-block with-errors"></div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="email"><?= t('form.email.label'); ?>*</label>
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="<?= t('form.email.placeholder'); ?>" maxlength="180" autocomplete="email" required>
+                                        <div class="help-block with-errors"></div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input type="hidden" id="csrf" class="form-control" name="csrf" value="<?= block_csrf(); ?>">
+                                        <input type="hidden" id="post_id" class="form-control" name="post_id" value="<?= abs((int)$post_id); ?>">
+                                        <input type="hidden" id="parent_id" class="form-control" name="parent_id" value="0">
+                                        <button type="submit" class="btn btn-secondary"><?= t('single.comment.submit'); ?></button>
+                                    </div>
+                                    <div id="error_message" class="ajax_response"></div>
+                                    <div id="success_message" class="ajax_response"></div>
+                                </form>
+                            </div>
+                        <?php
+                        endif;
+                        ?>
                     </div>
                 </div>
             </div>
-
-            <?php
-              include dirname(__FILE__) . '/sidebar.php';
-            ?>
         </div>
+
+        <?php
+        include dirname(__FILE__) . '/sidebar.php';
+        ?>
+    </div>
 </div>

@@ -238,7 +238,7 @@ WHERE ID = ? AND post_type = 'blog'";
 
             $this->modify("tbl_posts", $updateData, ['ID' => (int)$cleanId]);
 
-            $this->deleteRecord("tbl_post_topic", ['post_id' => (int)$cleanId]);
+            $this->deleteRecord("tbl_post_topic", ['post_id' => (int)$cleanId], null);
 
             if ((is_array($topicId)) && (isset($_POST['catID']))) {
                 foreach ($_POST['catID'] as $topic_id) {

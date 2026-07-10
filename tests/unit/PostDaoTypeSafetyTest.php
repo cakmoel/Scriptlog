@@ -83,7 +83,7 @@ class PostDaoTypeSafetyTest extends TestCase
     {
         $source = file_get_contents(__DIR__ . '/../../src/lib/core/Dao.php');
 
-        $this->assertStringContainsString('@param int|string $str', $source);
+        $this->assertStringContainsString('@param mixed $str', $source);
     }
 
     public function testViewErrorPhpDocUpdated(): void
