@@ -8,12 +8,52 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#150---2026-07-09)
+- [Latest Release](#151---2026-07-10)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.5.1] - 2026-07-10
+
+### Added
+- **Unit tests**: 11 new test files covering recent type safety, filter validation, and error handling fixes — `DaoFilteringIdTest` (11 tests), `PostServiceNewMethodsTest` (9 tests), `PostModelQueryTest` (8 tests), `MediaDaoBugFixesTest` (6 tests), `FormSecurityFunctionsTest` (13 tests), `FunctionsThemeTest` (11 tests), `PageControllerTest` (7 tests), `HumanLoginValidateTest` (8 tests), `UploadPhotoFunctionTest` (7 tests), `PostDaoDeleteRecordTest` (6 tests), `PostControllerConstructorTest` (10 tests)
+
+### Fixed
+- **Dao::filteringId()**: Now throws `InvalidArgumentException` instead of `DbException`; returns `int` for `'sql'` type with positive integer validation
+- **PostDao::updatePost()**: Added explicit `null` third parameter to `deleteRecord()` call
+- **MediaDao::findMediaBlog()**: Fixed return type from boolean `true` to `null` for empty results
+- **MediaDao::imageUploadHandler()**: Added null check on `$data_media` before array access
+- **PostModel**: Migrated all JOINs from `INNER JOIN` to `LEFT JOIN` for `tbl_media`; moved media filter conditions from WHERE to ON clause; fixed `tbl_user` → `tbl_users` in `getPostByAuthor()`
+- **PostService::setPostContent()**: Added `$skipPurify` parameter to bypass HTMLPurifier for encrypted content
+- **form-security.php::check_form_request()**: Added `$alwaysAllowed` fields (`csrfToken`, `postFormSubmit`, `MAX_FILE_SIZE`) that skip whitelist validation
+- **human-login.php::validate_login_context()**: Expanded whitelist with `csrf`, `remember` fields
+- **upload-photo.php::upload_photo()**: Skip `set_origin_photo()` when `fileinfo` extension is loaded (file already moved by `set_webp_origin`)
+- **PostController**: Refactored constructor to accept `TopicDao` and `MediaDao`; delegated image handling to `PostService`; expanded payload whitelist with `post_password`, `post_locale`, `post_tags`
+- **PageController**: Added `post_modified` to `check_form_request()` whitelist in `insert()` and `update()`
+- **admin/posts.php**: Updated `PostController` instantiation with 3 constructor arguments
+- **Theme functions**: Added `filter_var()` validation to `link_tag()` and `link_topic()`; added ID validation to `retrieve_detail_post()`; added `get_post_thumbnail()` function with fallback image
+- **single.php**: Added 404 validation when post not found; added default value initialization for all template variables; restructured protected post content processing with proper `isset()` guards
+
+### Changed
+- **PostController**: Refactored `insert()` and `update()` to use injected DAOs instead of creating new instances; removed `handlePostImage()`, `handleDefaultImage()`, `handleUploadedImage()` (moved to PostService)
+- **PostService**: Added `processPostImage()`, `processDefaultImage()`, `processUploadedImage()` methods orchestrating image handling logic
+
+### Chore
+- Updated translation cache files and exception log
+
+### Notes
+Patch release focused on type safety hardening, input validation, and error handling improvements across DAO, Service, Controller, and Model layers. 11 new test files (94+ tests) added to cover all recent changes. 33 commits since v1.5.0.
+
+### Codename
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.5.0
+- **Changes since v1.5.0**: 33 commits
+
+---
 
 ## [1.5.0] - 2026-07-09
 
@@ -641,6 +681,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.5.1 | 2026-07-10 | Stable |
 | 1.5.0 | 2026-07-09 | Stable |
 | 1.4.0 | 2026-07-06 | Stable |
 | 1.3.1 | 2026-07-02 | Stable |
