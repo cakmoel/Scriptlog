@@ -177,7 +177,6 @@ class MediaDao extends Dao
      *
      * @param int $mediaId
      * @param obj $sanitize
-     * @return mixed
      */
     public function findMediaBlog($mediaId)
     {
@@ -194,7 +193,7 @@ class MediaDao extends Dao
 
         $item = $this->findRow([$idsanitized]);
 
-        return (empty($item)) ?: $item;
+        return empty($item) ? null : $item;
     }
 
     /**
@@ -255,13 +254,13 @@ class MediaDao extends Dao
 
         $this->create("tbl_media", [
 
-          'media_filename' => $bind['media_filename'],
-          'media_caption'  => $bind['media_caption'],
-          'media_type'     => $bind['media_type'],
-          'media_target'   => $bind['media_target'],
-          'media_user'     => $bind['media_user'],
-          'media_access'   => $bind['media_access'],
-          'media_status'   => $bind['media_status']
+            'media_filename' => $bind['media_filename'],
+            'media_caption'  => $bind['media_caption'],
+            'media_type'     => $bind['media_type'],
+            'media_target'   => $bind['media_target'],
+            'media_user'     => $bind['media_user'],
+            'media_access'   => $bind['media_access'],
+            'media_status'   => $bind['media_status']
 
         ]);
 
@@ -280,9 +279,9 @@ class MediaDao extends Dao
 
         $this->create("tbl_mediameta", [
 
-          'media_id' => $bind['media_id'],
-          'meta_key' => $bind['meta_key'],
-          'meta_value' => $bind['meta_value']
+            'media_id' => $bind['media_id'],
+            'meta_key' => $bind['meta_key'],
+            'meta_value' => $bind['meta_value']
 
         ]);
     }
@@ -304,21 +303,21 @@ class MediaDao extends Dao
         if (!empty($bind['media_filename'])) {
             $this->modify("tbl_media", [
 
-              'media_filename' => $bind['media_filename'],
-              'media_caption'  => $bind['media_caption'],
-              'media_type'     => $bind['media_type'],
-              'media_target'   => $bind['media_target'],
-              'media_access'   => $bind['media_access'],
-              'media_status'   => $bind['media_status']
+                'media_filename' => $bind['media_filename'],
+                'media_caption'  => $bind['media_caption'],
+                'media_type'     => $bind['media_type'],
+                'media_target'   => $bind['media_target'],
+                'media_access'   => $bind['media_access'],
+                'media_status'   => $bind['media_status']
 
             ], ['ID' => $idsanitized]);
         } else {
             $this->modify("tbl_media", [
 
-              'media_caption' => $bind['media_caption'],
-              'media_target'  => $bind['media_target'],
-              'media_access'  => $bind['media_access'],
-              'media_status'  => $bind['media_status']
+                'media_caption' => $bind['media_caption'],
+                'media_target'  => $bind['media_target'],
+                'media_access'  => $bind['media_access'],
+                'media_status'  => $bind['media_status']
 
             ], ['ID' => $idsanitized]);
         }
@@ -340,8 +339,8 @@ class MediaDao extends Dao
         if (!empty($bind['meta_key'])) {
             $this->modify("tbl_mediameta", [
 
-              'meta_key' => $bind['meta_key'],
-              'meta_value' => $bind['meta_value']
+                'meta_key' => $bind['meta_key'],
+                'meta_value' => $bind['meta_value']
 
             ], "media_id = {$idsanitized}");
         }
@@ -570,16 +569,28 @@ class MediaDao extends Dao
     /**
      * imageUploadHandler
      *
-     * @param int|num $mediaId
-     * @return mixed
+     * @param int|num|null $mediaId
      *
      */
     public function imageUploadHandler($mediaId = null)
     {
-
         if ((!is_null($mediaId)) && ($mediaId !== 0)) {
             $data_media = $this->findMediaBlog((int)$mediaId);
 
+            // Check if media record exists
+            if ($data_media === null || !is_array($data_media)) {
+                // Return default image upload form if no media found
+                $mediablog  = '<div class="form-group">';
+                $mediablog .= '<div class="img-responsive pad" id="image-preview">';
+                $mediablog .= '<label for="image-upload" id="image-label">Featured image</label>';
+                $mediablog .= '<input type="file" name="media" id="image-upload" accept="image/*" class="form-control" maxlength="512">';
+                $mediablog .= '</div>';
+                $mediablog .= '<p class="help-block"> Maximum file size: ' . format_size_unit(APP_FILE_SIZE) . '</p>';
+                $mediablog .= '</div>';
+                return $mediablog;
+            }
+
+            // Safely access array keys
             $image_src = invoke_image_uploaded($data_media['media_filename'], false);
             $webp_src = invoke_webp_image($data_media['media_filename'], false);
             $image_src_thumb = invoke_image_uploaded($data_media['media_filename'], true);
@@ -591,36 +602,24 @@ class MediaDao extends Dao
                 $webp_src_thumb = app_url() . '/public/files/pictures/nophoto.jpg';
             }
 
-            if ($image_src || $webp_src) {
-                $mediablog  = '<div class="form-group">';
-                $mediablog .= '<a href="' . $webp_src . '" title="' . $media_caption . '" >
-                      <picture class="img-responsive pad">';
-                $mediablog .= '<source srcset="' . $webp_src_thumb . '" type="image/webp">';
-                $mediablog .= '<img src="' . $image_src_thumb . '" class="img-responsive pad" alt="' . $media_caption . '">';
-                $mediablog .= '</picture></a>';
-                $mediablog .= '<div class="img-responsive pad" id="image-preview">';
-                $mediablog .= '<label for="image-upload" id="image-label">Replace image</label>';
-                $mediablog .= '<input type="file" name="media" id="image-upload" accept="image/*" class="form-control" maxlength="512">';
-                $mediablog .= '</div>';
-                $mediablog .= '<p class="help-block"> Maximum file size: ' . format_size_unit(APP_FILE_SIZE) . '</p>';
-                $mediablog .= '<input type="hidden" name="image_id" value="' . $mediaId . '">';
-                $mediablog .= '</div>';
-            } else {
-                $mediablog  = '<div class="form-group">';
-                $mediablog .= '<a href="' . $webp_src . '" title="' . $media_caption . '">';
-                $mediablog .= '<picture class="img-responsive pad">';
-                $mediablog .= '<source srcset="' . $webp_src_thumb . '" type="image/webp">';
-                $mediablog .= '<img src="' . $image_src_thumb . '" class="img-responsive pad" alt="' . $media_caption . '">';
-                $mediablog .= '</picture></a>';
-                $mediablog .= '<div class="img-responsive pad" id="image-preview">';
-                $mediablog .= '<label for="image-upload" id="image-label">Replace image</label>';
-                $mediablog .= '<input type="file" name="media" id="image-upload" accept="image/*" class="form-control" maxlength="512">';
-                $mediablog .= '</div>';
-                $mediablog .= '<p class="help-block">Maximum file size:' . format_size_unit(APP_FILE_SIZE) . '</p>';
-                $mediablog .= '<input type="hidden" name="image_id" value="' . $mediaId . '">';
-                $mediablog .= '</div>';
-            }
+            // Build the HTML output (removed duplicate code)
+            $mediablog  = '<div class="form-group">';
+            $mediablog .= '<a href="' . $webp_src . '" title="' . $media_caption . '" >
+              <picture class="img-responsive pad">';
+            $mediablog .= '<source srcset="' . $webp_src_thumb . '" type="image/webp">';
+            $mediablog .= '<img src="' . $image_src_thumb . '" class="img-responsive pad" alt="' . $media_caption . '">';
+            $mediablog .= '</picture></a>';
+            $mediablog .= '<div class="img-responsive pad" id="image-preview">';
+            $mediablog .= '<label for="image-upload" id="image-label">Replace image</label>';
+            $mediablog .= '<input type="file" name="media" id="image-upload" accept="image/*" class="form-control" maxlength="512">';
+            $mediablog .= '</div>';
+            $mediablog .= '<p class="help-block"> Maximum file size: ' . format_size_unit(APP_FILE_SIZE) . '</p>';
+            $mediablog .= '<input type="hidden" name="image_id" value="' . $mediaId . '">';
+            $mediablog .= '</div>';
+
+            return $mediablog;
         } else {
+            // No mediaId provided - return default upload form
             $mediablog  = '<div class="form-group">';
             $mediablog .= '<div class="img-responsive pad" id="image-preview">';
             $mediablog .= '<label for="image-upload" id="image-label">Featured image</label>';
@@ -628,9 +627,8 @@ class MediaDao extends Dao
             $mediablog .= '</div>';
             $mediablog .= '<p class="help-block"> Maximum file size: ' . format_size_unit(APP_FILE_SIZE) . '</p>';
             $mediablog .= '</div>';
+            return $mediablog;
         }
-
-        return $mediablog;
     }
 
     /**
