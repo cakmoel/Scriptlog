@@ -149,9 +149,11 @@ function upload_photo($file_location, $file_size, $file_type, $file_name)
         }
     }
 
-    // save origin picture
-    if (false === set_origin_photo($current_width, $current_height, $file_location, $file_size, $origin_path_uploaded)) {
-        scriptlog_error("Error uploading picture", E_USER_WARNING);
+    // save origin picture (skip when fileinfo path already moved file via set_webp_origin)
+    if (!(extension_loaded('fileinfo') || function_exists('finfo_open') || class_exists('finfo'))) {
+        if (false === set_origin_photo($current_width, $current_height, $file_location, $file_size, $origin_path_uploaded)) {
+            scriptlog_error("Error uploading picture", E_USER_WARNING);
+        }
     }
 
     // crop to regular size
