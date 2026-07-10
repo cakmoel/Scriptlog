@@ -255,10 +255,11 @@ class PostService
      * set post's content
      *
      * @param string $content
+     * @param bool $skipPurify
      */
-    public function setPostContent($content)
+    public function setPostContent($content, $skipPurify = false)
     {
-        $this->content = purify_dirty_html($content);
+        $this->content = $skipPurify ? $content : purify_dirty_html($content);
     }
 
     /**
@@ -547,6 +548,154 @@ class PostService
 
         // Delete the post
         $this->postDao->deletePost($this->postId, $this->sanitizer);
+    }
+
+    /**
+     * Process post image - orchestrates default or uploaded image handling.
+     *
+     * @param string $file_location
+     * @param string $file_type
+     * @param string $file_name
+     * @param int $file_size
+     * @param string $file_extension
+     * @param string $new_filename
+     * @param int $width
+     * @param int $height
+     * @param string $media_access
+     * @param string $user_level
+     * @param array $filtered
+     * @param bool $isUpdate
+     * @param mixed $oldMediaId
+     * @return void
+     */
+    public function processPostImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, array $filtered, $isUpdate = false, $oldMediaId = null)
+    {
+        if (empty($file_location)) {
+            $mediaId = $this->processDefaultImage($filtered, $width, $height, $media_access, $user_level, $isUpdate);
+            if ($mediaId !== null) {
+                $this->setPostImage($mediaId);
+            }
+            return;
+        }
+
+        $this->processUploadedImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, $filtered, $oldMediaId);
+    }
+
+    /**
+     * Process default image (nophoto or existing image_id).
+     *
+     * @param array $filtered
+     * @param int $width
+     * @param int $height
+     * @param string $media_access
+     * @param string $user_level
+     * @param bool $isUpdate
+     * @return int|null
+     */
+    private function processDefaultImage(array $filtered, $width, $height, $media_access, $user_level, $isUpdate = false)
+    {
+        if (isset($_POST['image_id'])) {
+            return (int)$filtered['image_id'];
+        }
+
+        if ($isUpdate) {
+            return null;
+        }
+
+        clearstatcache();
+        $mediaLib = new MediaDao();
+
+        $media_metavalue = array(
+          'Origin' => "nophoto.jpg",
+          'File type' => "image/jpg",
+          'File size' => format_size_unit(filesize(__DIR__ . '/../../' . APP_IMAGE . "nophoto.jpg")),
+          'Uploaded at' => date("Y-m-d H:i:s"),
+          'Dimension' => $width . 'x' . $height
+        );
+
+        $bind_media = [
+          'media_filename' => "nophoto.jpg",
+          'media_caption' => prevent_injection($filtered['post_title']),
+          'media_type' => "image/jpg",
+          'media_target' => 'blog',
+          'media_user' => $user_level,
+          'media_access' => $media_access,
+          'media_status' => '1'
+        ];
+
+        $append_media = $mediaLib->createMedia($bind_media);
+        $mediaLib->createMediaMeta([
+          'media_id' => $append_media,
+          'meta_key' => "nophoto.jpg",
+          'meta_value' => json_encode($media_metavalue)
+        ]);
+
+        return $append_media;
+    }
+
+    /**
+     * Process uploaded image - handles file upload and media record.
+     *
+     * @param string $file_location
+     * @param string $file_type
+     * @param string $file_name
+     * @param int $file_size
+     * @param string $file_extension
+     * @param string $new_filename
+     * @param int $width
+     * @param int $height
+     * @param string $media_access
+     * @param string $user_level
+     * @param array $filtered
+     * @param mixed $oldMediaId
+     * @return void
+     */
+    private function processUploadedImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, array $filtered, $oldMediaId = null)
+    {
+        $mediaLib = new MediaDao();
+
+        if ($oldMediaId) {
+            $sanitizer = new Sanitize();
+            $oldMedia = $mediaLib->findMediaById($oldMediaId, $sanitizer);
+            if ($oldMedia && !empty($oldMedia['media_filename']) && $oldMedia['media_filename'] !== 'nophoto.jpg') {
+                $mediaLib->deleteMedia($oldMediaId, $sanitizer);
+            }
+        }
+
+        $media_metavalue = array();
+
+        if (in_array($file_extension, ['jpeg', 'jpg', 'png', 'gif', 'webp', 'bmp'])) {
+            $media_metavalue = array(
+              'Origin' => rename_file($file_name),
+              'File type' => $file_type,
+              'File size' => format_size_unit($file_size),
+              'Uploaded at' => date("Y-m-d H:i:s"),
+              'Dimension' => $width . 'x' . $height
+            );
+        }
+
+        if (is_uploaded_file($file_location)) {
+            upload_media($file_location, $file_type, $file_size, basename($new_filename));
+        }
+
+        $bind_media = [
+          'media_filename' => $new_filename,
+          'media_caption' => prevent_injection($filtered['post_title']),
+          'media_type' => $file_type,
+          'media_target' => 'blog',
+          'media_user' => $user_level,
+          'media_access' => $media_access,
+          'media_status' => '1'
+        ];
+
+        $append_media = $mediaLib->createMedia($bind_media);
+        $mediaLib->createMediaMeta([
+          'media_id' => $append_media,
+          'meta_key' => $new_filename,
+          'meta_value' => json_encode($media_metavalue)
+        ]);
+
+        $this->setPostImage($append_media);
     }
 
     /**
