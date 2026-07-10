@@ -569,7 +569,7 @@ class MediaDao extends Dao
     /**
      * imageUploadHandler
      *
-     * @param int|num|null $mediaId
+     * @param int|null $mediaId
      *
      */
     public function imageUploadHandler($mediaId = null)
