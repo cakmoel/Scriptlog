@@ -278,40 +278,60 @@ class Dao
     }
 
     /**
-     * Filtering Id passed by HTTP request
+     * Filter and sanitize input values
      *
-     * @param object $sanitize
-     * @param int|string $str
-     * @param string $type
-     * @return string|integer
-     *
+     * @param Sanitize $sanitize Sanitizer instance
+     * @param mixed $str Input value to filter
+     * @param string $type Sanitization type ('sql' or 'xss')
+     * @return int|string Sanitized value as integer (sql) or string (xss)
+     * @throws InvalidArgumentException When input is invalid
      */
     protected function filteringId(Sanitize $sanitize, $str, $type)
     {
-
         $this->sanitizing = $sanitize;
 
+        // If $str is null or empty, throw exception immediately
+        if ($str === null || $str === '') {
+            throw new InvalidArgumentException("Input value cannot be empty");
+        }
+
+        // Convert to appropriate type based on $type
         switch ($type) {
-            default:
             case 'sql':
-                if (filter_var($str, FILTER_SANITIZE_NUMBER_INT)) {
-                    return $this->sanitizing->sanitasi($str, 'sql');
+                // First validate it's an integer
+                $intVal = filter_var($str, FILTER_VALIDATE_INT);
+
+                if ($intVal === false || $intVal <= 0) {
+                    throw new InvalidArgumentException(
+                        sprintf(
+                            "Invalid ID: '%s' - must be a positive integer",
+                            is_scalar($str) ? (string)$str : gettype($str)
+                        )
+                    );
                 }
 
-                header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                throw new DbException("ERROR: this - $str - Id is considered invalid.");
+                // Now sanitize the validated integer
+                $sanitized = $this->sanitizing->sanitasi((string)$intVal, 'sql');
 
-                break;
+                // Return as integer for database safety
+                return (int)$sanitized;
 
             case 'xss':
-                if (filter_var($str, FILTER_SANITIZE_FULL_SPECIAL_CHARS)) {
-                    return $this->sanitizing->sanitasi(prevent_injection($str), 'xss');
+                // Validate is a string
+                if (!is_string($str) || empty(trim($str))) {
+                    throw new InvalidArgumentException("Input value for XSS sanitization must be a non-empty string");
                 }
 
-                header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                throw new DbException("ERROR: this - $str - is considered invalid.");
+                // Sanitize the string
+                $sanitized = $this->sanitizing->sanitasi(prevent_injection($str), 'xss');
 
-                break;
+                // Return sanitized string
+                return $sanitized;
+
+            default:
+                throw new InvalidArgumentException(
+                    sprintf("Invalid sanitization type: '%s'. Allowed types: 'sql', 'xss'", $type)
+                );
         }
     }
 }
