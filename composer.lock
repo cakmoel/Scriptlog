@@ -2927,16 +2927,16 @@
         },
         {
             "name": "voku/anti-xss",
-            "version": "4.1.43",
+            "version": "4.1.44",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/anti-xss.git",
-                "reference": "72b4248bfc29422b954182104438d9a4ffb8f8d9"
+                "reference": "fe2bbb7a8a6d958d55c2b5df391945a99f036312"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/anti-xss/zipball/72b4248bfc29422b954182104438d9a4ffb8f8d9",
-                "reference": "72b4248bfc29422b954182104438d9a4ffb8f8d9",
+                "url": "https://api.github.com/repos/voku/anti-xss/zipball/fe2bbb7a8a6d958d55c2b5df391945a99f036312",
+                "reference": "fe2bbb7a8a6d958d55c2b5df391945a99f036312",
                 "shasum": ""
             },
             "require": {
@@ -2982,7 +2982,7 @@
             ],
             "support": {
                 "issues": "https://github.com/voku/anti-xss/issues",
-                "source": "https://github.com/voku/anti-xss/tree/4.1.43"
+                "source": "https://github.com/voku/anti-xss/tree/4.1.44"
             },
             "funding": [
                 {
@@ -3006,7 +3006,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-04-22T01:22:21+00:00"
+            "time": "2026-07-10T11:50:11+00:00"
         },
         {
             "name": "voku/portable-ascii",
@@ -7702,9 +7702,9 @@
         "ext-openssl": "*",
         "ext-gd": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "7.4.33"
     },
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.9.0"
 }
