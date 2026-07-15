@@ -107,7 +107,11 @@ class PageCacheTest extends TestCase
         }
 
         $testFile = APP_CACHE_DIR . 'test_cache_file.html';
-        file_put_contents($testFile, 'test content');
+        $result = @file_put_contents($testFile, 'test content');
+        
+        if ($result === false) {
+            $this->markTestSkipped('Cache directory is not writable: ' . APP_CACHE_DIR);
+        }
         
         $this->assertFileExists($testFile);
         
