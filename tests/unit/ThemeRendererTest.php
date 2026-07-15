@@ -15,11 +15,25 @@ class ThemeRendererTest extends TestCase
         $this->testThemeDir = '/tmp/test-theme/';
         require_once __DIR__ . '/../../src/lib/core/ThemeRenderer.php';
         require_once __DIR__ . '/../../src/lib/core/ThemeResolutionException.php';
+
+        if (!is_dir($this->testThemeDir)) {
+            mkdir($this->testThemeDir, 0755, true);
+        }
+        file_put_contents($this->testThemeDir . 'header.php', '<?php echo "TestHeader";');
+        file_put_contents($this->testThemeDir . 'footer.php', '<?php echo "TestFooter";');
+        file_put_contents($this->testThemeDir . '404.php', '<?php echo "Test404Content";');
+        file_put_contents($this->testThemeDir . 'home.php', '<?php echo "TestHomeContent";');
     }
 
     protected function tearDown(): void
     {
         http_response_code(200);
+        if (is_dir($this->testThemeDir)) {
+            foreach (glob($this->testThemeDir . '*.php') as $file) {
+                @unlink($file);
+            }
+            @rmdir($this->testThemeDir);
+        }
     }
 
     public function testClassExists(): void
