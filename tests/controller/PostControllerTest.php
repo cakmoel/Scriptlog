@@ -114,4 +114,22 @@ class PostControllerTest extends TestCase
             $this->markTestSkipped('direct_page() exited before setting session');
         }
     }
+
+    public function testCheckPostUpdatePayloadWhitelistHasPostDate(): void
+    {
+        $source = @file_get_contents(__DIR__ . '/../../src/lib/controller/PostController.php');
+        if (!$source) {
+            $this->markTestSkipped('PostController.php not found');
+        }
+        $this->assertStringContainsString("'post_modified', 'post_date'", $source);
+    }
+
+    public function testCheckPostUpdatePayloadWhitelistHasAllFields(): void
+    {
+        $source = @file_get_contents(__DIR__ . '/../../src/lib/controller/PostController.php');
+        if (!$source) {
+            $this->markTestSkipped('PostController.php not found');
+        }
+        $this->assertStringContainsString("'post_id', 'post_title', 'post_content', 'post_modified', 'post_date'", $source);
+    }
 }
