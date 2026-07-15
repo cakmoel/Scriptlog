@@ -23,7 +23,9 @@ class PostControllerTest extends TestCase
         $_FILES = [];
 
         $this->postService = $this->createMock(PostService::class);
-        $this->postController = new PostController($this->postService);
+        $topicDao = $this->createMock(TopicDao::class);
+        $mediaDao = $this->createMock(MediaDao::class);
+        $this->postController = new PostController($this->postService, $topicDao, $mediaDao);
     }
 
     protected function tearDown(): void
