@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 class ProtectedPostRateLimitTest extends TestCase
 {
     private $testDir;
-    private $originalAppRoot;
 
     protected function setUp(): void
     {
@@ -23,12 +22,7 @@ class ProtectedPostRateLimitTest extends TestCase
             define('SCRIPTLOG', bin2hex(random_bytes(16)));
         }
 
-        if (!defined('APP_ROOT')) {
-            $this->originalAppRoot = dirname(__DIR__, 2);
-            define('APP_ROOT', $this->originalAppRoot);
-        }
-
-        $this->testDir = APP_ROOT . '/public/log/unlock_attempts_test/';
+        $this->testDir = sys_get_temp_dir() . '/phpunit_rate_limit_test/';
         if (!is_dir($this->testDir)) {
             mkdir($this->testDir, 0755, true);
         }
