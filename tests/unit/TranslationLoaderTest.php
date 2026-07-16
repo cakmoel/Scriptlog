@@ -169,6 +169,7 @@ class TranslationLoaderTest extends TestCase
         
         // Simulate old file
         touch($cacheFile, time() - ($cacheTtl + 100));
+        clearstatcache(true, $cacheFile);
         $mtime = filemtime($cacheFile);
         $isExpired = (time() - $mtime) > $cacheTtl;
         
