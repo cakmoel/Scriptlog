@@ -195,7 +195,7 @@ class SecureHttpHeadersTest extends TestCase
             . 'if(!function_exists("app_url")){function app_url(){return "%s";}}'
             . 'if(!function_exists("is_ssl")){function is_ssl(){return %s;}}'
             . '%s;'
-            . 'file_put_contents("%s",json_encode(function_exists("xdebug_get_headers")?xdebug_get_headers():headers_list()));',
+            . 'file_put_contents("%s",json_encode(xdebug_get_headers()));',
             escapeshellarg($headersFile),
             $ssl ? 'https://example.com' : 'http://example.com',
             $ssl ? 'true' : 'false',
