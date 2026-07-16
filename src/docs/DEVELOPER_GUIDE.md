@@ -1,6 +1,6 @@
 # Developer Guide - Scriptlog
 
-**Version:** 1.2.3 | **Last Updated:** June 2026
+**Version:** 1.5.1 | **Last Updated:** July 2026
 
 ---
 
@@ -56,7 +56,7 @@
 | **Apache/Nginx** | Latest | Web server |
 | **Composer** | Latest | Dependency management |
 
-> **NOTE:** PHP extensions required: `pdo`, `pdo_mysql`, `json`, `mbstring`, `curl`
+> **NOTE:** PHP extensions required: `pdo`, `pdo_mysql`, `json`, `mbstring`, `curl`, `gd`, `fileinfo`, `openssl`
 
 ### Installation
 
@@ -80,7 +80,7 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/ScriptLog/scriptlog.git
+git clone https://github.com/cakmoel/Scriptlog.git
 cd scriptlog
 
 # Install dependencies
@@ -663,7 +663,7 @@ Archive functionality allows users to browse posts by month/year:
 ## 3. Directory Structure
 
 ```
-ScriptLog/
+Scriptlog/
 |
 |-- index.php                    # Public front controller
 |-- config.php                   # Application configuration
@@ -752,7 +752,13 @@ ScriptLog/
 |           |-- PostsApiController.php
 |           |-- CategoriesApiController.php
 |           |-- CommentsApiController.php
-|           +-- ArchivesApiController.php
+|           |-- ArchivesApiController.php
+|           |-- SearchApiController.php
+|           |-- GdprApiController.php
+|           |-- MediaApiController.php
+|           |-- ProtectedPostApiController.php
+|           |-- LanguagesApiController.php
+|           +-- TranslationsApiController.php
 |
 |   +-- model/                # Data models
 |       |-- PostModel.php
@@ -1636,11 +1642,13 @@ class PostDao extends Dao
 | `post_visibility` | VARCHAR | public/private/protected |
 | `post_password` | VARCHAR | Password hash |
 | `post_tags` | TEXT | Comma-separated tags |
+| `post_keyword` | VARCHAR(255) | SEO meta keywords |
+| `post_headlines` | INT(5) | Headline/slideshow flag |
+| `post_sticky` | INT(5) | Sticky post flag |
 | `post_type` | VARCHAR | blog/article/news |
 | `post_locale` | VARCHAR | Language code |
 | `comment_status` | VARCHAR | open/closed |
 | `passphrase` | VARCHAR | Encryption key (MD5) |
-| `post_headlines` | VARCHAR | Headline flag |
 
 ### Other DAOs
 
@@ -1654,6 +1662,20 @@ class PostDao extends Dao
 | `MenuDao` | `lib/dao/MenuDao.php` | Menu CRUD |
 | `PluginDao` | `lib/dao/PluginDao.php` | Plugin CRUD |
 | `ThemeDao` | `lib/dao/ThemeDao.php` | Theme CRUD |
+| `ReplyDao` | `lib/dao/ReplyDao.php` | Nested comment replies |
+| `ConfigurationDao` | `lib/dao/ConfigurationDao.php` | System settings CRUD |
+| `ConsentDao` | `lib/dao/ConsentDao.php` | GDPR consent records |
+| `DataRequestDao` | `lib/dao/DataRequestDao.php` | GDPR data requests |
+| `PrivacyLogDao` | `lib/dao/PrivacyLogDao.php` | Privacy audit logs |
+| `PrivacyPolicyDao` | `lib/dao/PrivacyPolicyDao.php` | Privacy policy versions |
+| `LanguageDao` | `lib/dao/LanguageDao.php` | Language definitions |
+| `TranslationDao` | `lib/dao/TranslationDao.php` | Translation key/value pairs |
+| `UserTokenDao` | `lib/dao/UserTokenDao.php` | Password reset tokens |
+| `PostTopicDao` | `lib/dao/PostTopicDao.php` | Post-topic relationships |
+| `MediaMetaDao` | `lib/dao/MediaMetaDao.php` | Media metadata |
+| `MediaDownloadDao` | `lib/dao/MediaDownloadDao.php` | Media download records |
+| `LoginAttemptDao` | `lib/dao/LoginAttemptDao.php` | Login attempt tracking |
+| `DownloadLogDao` | `lib/dao/DownloadLogDao.php` | File download logs |
 
 ---
 
@@ -2048,6 +2070,16 @@ PostService depends on:
 | `ThemeService` | `lib/service/ThemeService.php` | Theme logic |
 | `ConfigurationService` | `lib/service/ConfigurationService.php` | Settings |
 | `ReplyService` | `lib/service/ReplyService.php` | Reply logic |
+| `FrontService` | `lib/service/FrontService.php` | Frontend post/page/archive queries |
+| `ConsentService` | `lib/service/ConsentService.php` | GDPR consent management |
+| `DataRequestService` | `lib/service/DataRequestService.php` | GDPR data request handling |
+| `PrivacyLogService` | `lib/service/PrivacyLogService.php` | Privacy audit logging |
+| `DownloadService` | `lib/service/DownloadService.php` | Secure file downloads |
+| `ExportService` | `lib/service/ExportService.php` | Content export (WordPress, Ghost, etc.) |
+| `MigrationService` | `lib/service/MigrationService.php` | Content import logic |
+| `LanguageService` | `lib/service/LanguageService.php` | Language management |
+| `TranslationService` | `lib/service/TranslationService.php` | Translation management |
+| `NotificationService` | `lib/service/NotificationService.php` | Email notifications |
 
 ---
 
@@ -2473,6 +2505,13 @@ class BaseApp
 
 | Controller | File | Purpose |
 |------------|------|---------|
+| `ReplyController` | `lib/controller/ReplyController.php` | Nested comment replies |
+| `DownloadController` | `lib/controller/DownloadController.php` | Frontend download display |
+| `DownloadAdminController` | `lib/controller/DownloadAdminController.php` | Admin download management |
+| `ExportController` | `lib/controller/ExportController.php` | Content export (WordPress, Ghost, etc.) |
+| `ImportController` | `lib/controller/ImportController.php` | Content import |
+| `LanguageController` | `lib/controller/LanguageController.php` | Language management |
+| `TranslationController` | `lib/controller/TranslationController.php` | Translation management |
 | `UserController` | `lib/controller/UserController.php` | User management |
 | `CommentController` | `lib/controller/CommentController.php` | Comment handling |
 | `TopicController` | `lib/controller/TopicController.php` | Category management |
@@ -3242,12 +3281,12 @@ ScriptLog provides a RESTful API that allows external applications to interact w
 
 | Environment | URL |
 |-------------|-----|
-| **Production** | `http://ScriptLog.site/api/v1` |
-| **Development** | `http://localhost/ScriptLog/api/v1` |
+| **Production** | `https://blogware.site/api/v1` |
+| **Development** | `http://localhost:8080/api/v1` |
 
 > **NOTE:** The complete OpenAPI 3.0 specification is available at `/docs/API_OPENAPI.json` and `/docs/API_OPENAPI.yaml`.
 
-### API Version: 1.1.0
+### API Version: v1
 
 **Latest Enhancements (v1.1.0):**
 - **Rate Limiting**: File-based sliding window rate limiter with per-client tracking
@@ -3365,7 +3404,7 @@ The API supports two authentication methods:
 
 ```
 GET /api/v1/posts HTTP/1.1
-Host: ScriptLog.site
+Host: blogware.site
 X-API-Key: your-api-key-here
 ```
 
@@ -3373,7 +3412,7 @@ X-API-Key: your-api-key-here
 
 ```
 GET /api/v1/posts HTTP/1.1
-Host: ScriptLog.site
+Host: blogware.site
 Authorization: Bearer your-token-here
 ```
 
@@ -3602,7 +3641,7 @@ This project uses two complementary testing approaches:
 | Metric | Value |
 |--------|-------|
 | **Total Tests** | 1,240 |
-| **Test Files** | 115 |
+| **Test Files** | 110 |
 | **Assertions** | 2,584 |
 | **PHPUnit Version** | 9.6.34 |
 | **Target Coverage** | 40% |
@@ -3962,8 +4001,8 @@ SCRIPTLOG          // Security constant (HMAC hash)
 
 // Settings
 APP_TITLE          // 'Scriptlog'
-APP_VERSION        // '1.0'
-APP_DEVELOPMENT    // true/false
+APP_VERSION        // '1.5.1'
+APP_DEVELOPMENT    // true or false
 ```
 
 ## Key Classes
@@ -3971,9 +4010,9 @@ APP_DEVELOPMENT    // true/false
 | Category | Classes |
 |----------|---------|
 | **Core** | Bootstrap, Dispatcher, DbFactory, Authentication, SessionMaker, Registry, FormValidator, Sanitize, View |
-| **DAO** | PostDao, UserDao, CommentDao, ReplyDao, TopicDao, MediaDao, PageDao, MenuDao, PluginDao, ThemeDao, ConfigurationDao, ConsentDao |
-| **Service** | PostService, UserService, CommentService, ReplyService, TopicService, MediaService, PageService, MenuService, PluginService, ThemeService, ConsentService, DownloadService |
-| **Controller** | PostController, UserController, CommentController, ReplyController, TopicController, MediaController, PageController, MenuController, PluginController, ThemeController, DownloadController, DownloadAdminController |
+| **DAO** | PostDao, UserDao, CommentDao, ReplyDao, TopicDao, PostTopicDao, MediaDao, MediaMetaDao, MediaDownloadDao, PageDao, MenuDao, PluginDao, ThemeDao, ConfigurationDao, ConsentDao, DataRequestDao, PrivacyLogDao, PrivacyPolicyDao, LanguageDao, TranslationDao, UserTokenDao, LoginAttemptDao, DownloadLogDao |
+| **Service** | PostService, UserService, CommentService, ReplyService, TopicService, MediaService, PageService, MenuService, PluginService, ThemeService, ConfigurationService, ConsentService, DataRequestService, PrivacyLogService, LanguageService, TranslationService, DownloadService, ExportService, MigrationService, FrontService, NotificationService |
+| **Controller** | PostController, UserController, CommentController, ReplyController, TopicController, MediaController, PageController, MenuController, PluginController, ThemeController, ConfigurationController, DownloadController, DownloadAdminController, ExportController, ImportController, LanguageController, TranslationController |
 | **Utility** | DownloadHandler, DownloadSettings |
 
 ## Global Functions
@@ -4023,6 +4062,8 @@ invoke_frontimg($filename, $size = 'medium');
 | `laminas/laminas-escaper` | ^2.12 | HTML escaping | `lib/utility/escape-html.php` |
 | `laminas/laminas-crypt` | ^3.3 | Cryptography | `lib/core/ScriptlogCryptonize.php` |
 | `laminas/laminas-feed` | ^2.17 | RSS/Atom feeds | `lib/core/AtomWriter.php`, `lib/core/RSSWriter.php` |
+| `symfony/mailer` | ^6.4 | Email delivery | `lib/service/NotificationService.php` |
+| `vlucas/phpdotenv` | ^5.6 | .env file loading | `install/include/setup.php` |
 | `catfan/medoo` | ^2.1 | Database ORM | `lib/core/MedooInit.php` |
 
 ### Package Usage Examples
@@ -4228,7 +4269,7 @@ ScriptLog includes a comprehensive i18n system for multi-language support, inclu
 |   |                     |  - URL prefix (/ar/, /es/)          |
 |   +----------+----------+  - Cookie (lang)                    |
 |              |             - Accept-Language header           |
-|              |             - Default (en_US)                  |
+|              |             - Default (en)                   |
 |              v                                                |
 |   +---------------------+                                     |
 |   | I18nManager         |  Load translations & manage locale  |
@@ -4265,39 +4306,39 @@ ScriptLog includes a comprehensive i18n system for multi-language support, inclu
 **tbl_languages** - Supported languages
 
 ```sql
-CREATE TABLE IF NOT EXISTS tbl_languages (
-    ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    locale VARCHAR(10) NOT NULL UNIQUE,
-    language_name VARCHAR(100) NOT NULL,
-    native_name VARCHAR(100) NOT NULL,
-    is_rtl TINYINT(1) NOT NULL DEFAULT 0,
-    is_active TINYINT(1) NOT NULL DEFAULT 1,
-    is_default TINYINT(1) NOT NULL DEFAULT 0,
-    sort_order INT NOT NULL DEFAULT 0,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+CREATE TABLE IF NOT EXISTS {$prefix}tbl_languages (
+    ID INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+    lang_code VARCHAR(10) NOT NULL,
+    lang_name VARCHAR(50) NOT NULL,
+    lang_native VARCHAR(50) NOT NULL,
+    lang_locale VARCHAR(10) DEFAULT NULL,
+    lang_direction ENUM('ltr','rtl') NOT NULL DEFAULT 'ltr',
+    lang_sort INT(11) NOT NULL DEFAULT 0,
+    lang_is_default TINYINT(1) NOT NULL DEFAULT 0,
+    lang_is_active TINYINT(1) NOT NULL DEFAULT 1,
+    lang_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (ID),
-    KEY locale(locale),
-    KEY is_active(is_active)
+    UNIQUE KEY lang_code (lang_code)
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
 **tbl_translations** - Translation strings
 
 ```sql
-CREATE TABLE IF NOT EXISTS tbl_translations (
+CREATE TABLE IF NOT EXISTS {$prefix}tbl_translations (
     ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    locale VARCHAR(10) NOT NULL,
+    lang_id INT(11) UNSIGNED NOT NULL,
     translation_key VARCHAR(255) NOT NULL,
     translation_value TEXT NOT NULL,
-    context VARCHAR(100) DEFAULT NULL,
-    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    translation_context VARCHAR(100) DEFAULT NULL,
+    translation_plurals VARCHAR(255) DEFAULT NULL,
+    is_html TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (ID),
-    UNIQUE KEY unique_key_locale(locale, translation_key),
-    KEY locale(locale),
-    KEY translation_key(translation_key)
+    UNIQUE KEY lang_key (lang_id, translation_key),
+    KEY lang_id (lang_id),
+    KEY translation_key (translation_key(191))
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
@@ -4306,7 +4347,7 @@ CREATE TABLE IF NOT EXISTS tbl_translations (
 1. **URL Prefix** - `/ar/`, `/es/`, `/fr/` (e.g., `example.com/ar/posts`)
 2. **Cookie** - `lang` cookie set by language switcher
 3. **Accept-Language Header** - Browser's language preference
-4. **Default** - `en_US` (configurable)
+4. **Default** - `en` (configurable)
 
 ### URL Routing for Languages
 
@@ -4371,7 +4412,7 @@ $isRtl = $i18nManager->isRtl();  // true for ar, he, fa, etc.
 ### Creating i18n Features
 
 1. **Add Language**: Use API or admin panel
-2. **Add Translations**: Insert into `tbl_translations` with locale and key
+2. **Add Translations**: Insert into `tbl_translations` with `lang_id` (FK to `tbl_languages.ID`) and key
 3. **Use in Code**: Call translation functions
 4. **Theme Support**: Ensure templates use translation functions
 
@@ -4583,12 +4624,13 @@ Use the admin panel (Settings → Languages and Settings → Translations) to ma
 
 ### Configuration
 
-Default language settings are in `lib/core/I18nManager.php`:
+Default language settings are detected at runtime. The `LocaleDetector` (`lib/core/LocaleDetector.php`) defaults to `'en'`:
 
 ```php
-private $defaultLocale = 'en_US';
-private $supportedLocales = ['en_US', 'ar', 'es', 'fr', 'de', 'zh_CN'];
+private $defaultLocale = 'en';
 ```
+
+The 7 supported language codes are: `en`, `ar`, `zh`, `fr`, `ru`, `es`, `id`.
 
 ### Documentation
 
@@ -5729,4 +5771,4 @@ This project is licensed under the MIT License.
 
 ---
 
-*Last Updated: June 2026 | Version 1.2.3*
+*Last Updated: July 2026 | Version 1.5.1*
