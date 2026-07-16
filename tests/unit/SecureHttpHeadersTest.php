@@ -188,13 +188,15 @@ class SecureHttpHeadersTest extends TestCase
     private function runSubprocess(string $body, bool $ssl): string
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'hdr_');
+        $headersFile = __DIR__ . '/../../src/lib/utility/secure-http-headers.php';
         $snippet = sprintf(
             'define("SCRIPTLOG",true);'
-            . 'require "/var/www/html/Scriptlog/src/lib/utility/secure-http-headers.php";'
+            . 'require %s;'
             . 'if(!function_exists("app_url")){function app_url(){return "%s";}}'
             . 'if(!function_exists("is_ssl")){function is_ssl(){return %s;}}'
             . '%s;'
             . 'file_put_contents("%s",json_encode(xdebug_get_headers()));',
+            escapeshellarg($headersFile),
             $ssl ? 'https://example.com' : 'http://example.com',
             $ssl ? 'true' : 'false',
             $body,
