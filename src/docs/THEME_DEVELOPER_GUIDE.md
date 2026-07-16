@@ -5,6 +5,8 @@
 
 > **Audience:** Theme developers building custom themes from scratch. This guide is a superset of the theming section in [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md) and covers the complete theme development lifecycle — from directory structure through testing and troubleshooting.
 
+> **HTMX Alternative:** Blogware also ships with the **Valdur** theme (`public/themes/valdur/`), an HTMX-powered theme with zero jQuery dependency. If you're building a new theme and want to use HTMX, vanilla JS, and custom CSS instead of Bootstrap + jQuery, see the [HTMX Theme Developer Guide](HTMX_THEME_DEVELOPER_GUIDE.md). The Valdur theme uses the `is_htmx_request()` backend pattern, `partials/` fragment templates, CSRF via `window.scriptlog_vars`, and a pure CSS design system.
+
 ---
 
 ## Table of Contents
