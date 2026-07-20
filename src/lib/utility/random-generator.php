@@ -145,7 +145,7 @@ function ircmaxell_random_generator($length)
 function ircmaxell_random_compat($length = 64)
 {
 
-    $random_compat = new Random();
+    $random_compat = new \Scriptlog\Core\Random();
 
     return bin2hex($random_compat->bytes($length));
 }

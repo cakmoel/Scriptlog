@@ -15,7 +15,21 @@
 function app_info()
 {
 
-    $app_info = [];
+    $app_info = [
+        'site_name' => '',
+        'site_tagline' => '',
+        'site_description' => '',
+        'site_keywords' => '',
+        'site_email' => '',
+        'app_key' => '',
+        'app_url' => '',
+        'post_per_page' => '',
+        'post_per_rss' => '',
+        'post_per_archive' => '',
+        'comment_per_post' => '',
+        'permalink_setting' => '',
+        'timezone_setting' => '',
+    ];
 
     $conn = function_exists('medoo_init') ? medoo_init() : "";
 

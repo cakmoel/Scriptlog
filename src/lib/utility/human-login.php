@@ -218,7 +218,7 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
         // 6. Authentication
         // We do this LAST to save DB resources if previous checks failed
         $is_authenticated = false;
-        if (is_a($authenticator, 'Authentication')) {
+        if ($authenticator instanceof \Scriptlog\Core\Authentication) {
             $is_authenticated = $authenticator->validateUserAccount($login_input, $pass_input);
         }
 

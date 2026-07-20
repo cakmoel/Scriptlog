@@ -125,7 +125,7 @@ function upload_photo($file_location, $file_size, $file_type, $file_name)
             }
 
             // creating large size thumbnail
-            $large_size_thumb = new Resize($origin_path_uploaded);
+            $large_size_thumb = new \Scriptlog\Core\Resize($origin_path_uploaded);
             $large_size_thumb->resizeImage($large_size, 400, "crop");
             $large_size_thumb->saveImage($large_path_uploaded, 80);
         }

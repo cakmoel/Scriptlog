@@ -13,6 +13,7 @@
  */
 
 use voku\helper\AntiXSS;
+use Scriptlog\Core\Clean;
 
 function remove_xss($dirty_string)
 {

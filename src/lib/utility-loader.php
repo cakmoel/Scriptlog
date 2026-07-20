@@ -167,6 +167,7 @@ if (!function_exists('load_core_utilities')) {
         'remove-dir-recursive.php',
         'remove-xss.php',
         'rename-file.php',
+        'request-helper.php',
         'reset-account.php',
         'rewrite-status.php',
         'route-request.php',

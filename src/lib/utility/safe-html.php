@@ -24,6 +24,6 @@ function safe_html($data)
  */
 function safe_filter_html($data)
 {
-    $html_filter = new Html();
+    $html_filter = new \Scriptlog\Core\Html();
     return $html_filter->filter($data);
 }

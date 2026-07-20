@@ -72,6 +72,18 @@ if (is_readable(APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'vendor/autoload.
     }
 }
 
+// Lazy PSR-4 backward-compatibility aliases (loads only when old class names are used)
+// MUST be registered BEFORE the custom Autoloader to prevent duplicate includes
+// when old global class names are referenced but the namespaced version was already loaded.
+if (file_exists(__DIR__ . '/autoload-aliases-map.php')) {
+    $scriptlogAliasMap = require __DIR__ . '/autoload-aliases-map.php';
+    spl_autoload_register(function ($className) use ($scriptlogAliasMap) {
+        if (isset($scriptlogAliasMap[$className])) {
+            class_alias($scriptlogAliasMap[$className], $className);
+        }
+    });
+}
+
 if (class_exists('Autoloader')) {
     Autoloader::setBaseDir(APP_ROOT);
     // Configure Autoloader paths
@@ -87,7 +99,6 @@ if (class_exists('Autoloader')) {
 } else {
     require __DIR__ . '/core/Bootstrap.php';
 }
-
 
 if (!file_exists(APP_ROOT . 'config.php')) {
     if (is_dir(APP_ROOT . 'install')) {

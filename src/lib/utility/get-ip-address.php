@@ -1,5 +1,7 @@
 <?php
 
+use Scriptlog\Core\RemoteAddress;
+
 /**
  * get_ip_address()
  *
