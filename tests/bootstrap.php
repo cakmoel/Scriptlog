@@ -8,23 +8,16 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+if (!defined('HTMLPURIFIER_PREFIX')) {
+    define('HTMLPURIFIER_PREFIX', __DIR__ . '/../src/lib/core');
+}
+
+date_default_timezone_set('UTC');
+
 require_once __DIR__ . '/../src/lib/vendor/autoload.php';
-require_once __DIR__ . '/../src/lib/common.php';
 
-if (!function_exists('load_core_utilities')) {
-    require_once __DIR__ . '/../src/lib/utility-loader.php';
-}
-
-// Force load all utilities by calling load_core_utilities
-if (function_exists('load_core_utilities')) {
-    load_core_utilities();
-}
-
-require_once __DIR__ . '/../src/lib/utility/rate-limiter.php';
-require_once __DIR__ . '/../src/lib/core/ApiHateoas.php';
-
-// Register lazy PSR-4 backward-compatibility aliases FIRST
-// so old class names resolve before the legacy Autoloader tries to include files.
+// Register lazy PSR-4 backward-compatibility aliases BEFORE loading utilities
+// so class_exists('Dao'), class_exists('Sanitize'), etc. resolve via alias autoloader.
 if (file_exists(__DIR__ . '/../src/lib/autoload-aliases-map.php')) {
     $scriptlogAliasMap = require __DIR__ . '/../src/lib/autoload-aliases-map.php';
     spl_autoload_register(function ($className) use ($scriptlogAliasMap) {
@@ -34,15 +27,42 @@ if (file_exists(__DIR__ . '/../src/lib/autoload-aliases-map.php')) {
     });
 }
 
-// Setup autoloader for legacy class directories (files without namespaces)
-// Namespaced classes under src/lib/ are handled by Composer's PSR-4 autoloader.
+require_once __DIR__ . '/../src/lib/common.php';
+
+// Load all core utilities from the generated loader
+if (!function_exists('load_core_utilities')) {
+    require_once __DIR__ . '/../src/lib/utility-loader.php';
+}
+
+// Register a mock DB object in Registry so app_info() / date_for_database() work without MySQL.
+if (class_exists('\\Scriptlog\\Core\\Registry')) {
+    $testDb = new class() {
+        public function select() { return []; }
+        public function get() { return null; }
+        public function dbSelect() { return []; }
+        public function dbInsert($table, $params) { return true; }
+        public function dbUpdate($table, $params, $where) { return 1; }
+        public function dbDelete($table, $where, $limit = null) { return 1; }
+        public function dbQuery($sql, $args = []) { return new \PDOStatement(); }
+        public function dbLastInsertId() { return '1'; }
+        public function dbTransaction() { return true; }
+        public function dbCommit() { return true; }
+        public function dbRollBack() { return true; }
+        public function dbReplace($table, $params, $updateParams) { return true; }
+    };
+    \Scriptlog\Core\Registry::set('dbc', $testDb);
+}
+
+require_once __DIR__ . '/../src/lib/utility/rate-limiter.php';
+require_once __DIR__ . '/../src/lib/core/ApiHateoas.php';
+
+// Setup autoloader for legacy non-namespaced utility files
 if (file_exists(__DIR__ . '/../src/lib/Autoloader.php')) {
     require_once __DIR__ . '/../src/lib/Autoloader.php';
     
     if (class_exists('Autoloader')) {
         Autoloader::setBaseDir(__DIR__ . '/..');
         Autoloader::addClassDir(array(
-            // Only directories with non-namespaced files or procedural utilities
             'src/lib/utility'    . DIRECTORY_SEPARATOR
         ));
     }
