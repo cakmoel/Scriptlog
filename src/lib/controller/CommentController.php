@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class CommentController
  *
@@ -13,6 +15,15 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  * @psalm-suppress UnusedClass
  */
+
+use Scriptlog\Core\ActionConst;
+use Scriptlog\Core\AppException;
+use Scriptlog\Core\BaseApp;
+use Scriptlog\Core\LogError;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Core\View;
+use Scriptlog\Service\CommentService;
+
 class CommentController extends BaseApp
 {
     /**
@@ -156,7 +167,7 @@ class CommentController extends BaseApp
                     $_SESSION['status'] = "commentUpdated";
                     direct_page('index.php?load=comments&status=commentUpdated', 200);
                 }
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {
@@ -214,7 +225,7 @@ class CommentController extends BaseApp
                     $_SESSION['status'] = "commentDeleted";
                     direct_page('index.php?load=comments&status=commentDeleted', 200);
                 }
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {

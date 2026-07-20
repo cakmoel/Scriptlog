@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class MediaController
  *
@@ -12,6 +14,15 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @SuppressWarnings(PHPMD.ElseExpression)
  *
  */
+
+use Scriptlog\Core\ActionConst;
+use Scriptlog\Core\AppException;
+use Scriptlog\Core\BaseApp;
+use Scriptlog\Core\LogError;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Core\View;
+use Scriptlog\Service\MediaService;
+
 class MediaController extends BaseApp
 {
     /**
@@ -154,7 +165,7 @@ class MediaController extends BaseApp
 
                 $_SESSION['status'] = "mediaAdded";
                 direct_page('index.php?load=medialib&status=mediaAdded', 302);
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {
@@ -387,7 +398,7 @@ class MediaController extends BaseApp
                 $this->mediaService->modifyMedia();
                 $_SESSION['status'] = "mediaUpdated";
                 direct_page('index.php?load=medialib&status=mediaUpdated', 302);
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {
@@ -601,7 +612,7 @@ class MediaController extends BaseApp
             $this->mediaService->removeMedia();
             $_SESSION['status'] = "mediaDeleted";
             direct_page('index.php?load=medialib&status=mediaDeleted', 302);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             LogError::setStatusCode(http_response_code());
             LogError::exceptionHandler($th);
         } catch (AppException $e) {

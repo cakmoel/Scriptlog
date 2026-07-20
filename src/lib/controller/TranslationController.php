@@ -1,11 +1,19 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class TranslationController
  *
  * @SuppressWarnings(PHPMD.ElseExpression)
  */
+
+use Scriptlog\Core\ServiceException;
+use Scriptlog\Core\View;
+use Scriptlog\Service\LanguageService;
+use Scriptlog\Service\TranslationService;
+
 class TranslationController
 {
     private $translationService;
@@ -140,7 +148,7 @@ class TranslationController
 
             $_SESSION['status'] = 'translationUpdated';
             direct_page('index.php?load=translations', 302);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             $_SESSION['error'] = $th->getMessage();
             direct_page('index.php?load=translations&error=updateFailed', 302);
         }
@@ -167,7 +175,7 @@ class TranslationController
 
             $_SESSION['status'] = 'translationCreated';
             direct_page('index.php?load=translations&lang=' . ($_POST['lang_code'] ?? 'en'), 302);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             $_SESSION['error'] = $th->getMessage();
             direct_page('index.php?load=translations&error=createFailed', 302);
         }
@@ -188,7 +196,7 @@ class TranslationController
             $this->translationService->deleteTranslation($id);
 
             $_SESSION['status'] = 'translationDeleted';
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             $_SESSION['error'] = $th->getMessage();
         }
 
@@ -206,7 +214,7 @@ class TranslationController
             header('Content-Disposition: attachment; filename="' . $langCode . '-translations.json"');
 
             echo json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             http_response_code(500);
             echo json_encode(['error' => $th->getMessage()]);
         }
@@ -241,7 +249,7 @@ class TranslationController
 
             $_SESSION['status'] = "imported{$count}";
             direct_page("index.php?load=translations&lang={$langCode}", 302);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             $_SESSION['error'] = $th->getMessage();
             direct_page('index.php?load=translations&error=importFailed', 302);
         }
@@ -254,7 +262,7 @@ class TranslationController
         try {
             $this->translationService->regenerateCache($langCode);
             $_SESSION['status'] = 'cacheRegenerated';
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             $_SESSION['error'] = $th->getMessage();
         }
 

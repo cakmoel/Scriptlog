@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class PluginController
  *
@@ -12,6 +14,14 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @SuppressWarnings(PHPMD.ElseExpression)
  *
  */
+
+use Scriptlog\Core\ActionConst;
+use Scriptlog\Core\AppException;
+use Scriptlog\Core\BaseApp;
+use Scriptlog\Core\LogError;
+use Scriptlog\Core\View;
+use Scriptlog\Service\PluginService;
+
 class PluginController extends BaseApp
 {
     /**
@@ -131,7 +141,7 @@ class PluginController extends BaseApp
             }
 
             $this->saveInstalledPlugin($file_name);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             LogError::setStatusCode(http_response_code());
             LogError::exceptionHandler($th);
         } catch (AppException $e) {
@@ -293,7 +303,7 @@ class PluginController extends BaseApp
                     $_SESSION['status'] = "pluginActivated";
                     direct_page('index.php?load=plugins&status=pluginActivated', 302);
                 }
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {
@@ -348,7 +358,7 @@ class PluginController extends BaseApp
                 $this->pluginService->deactivateInstalledPlugin();
                 $_SESSION['status'] = "pluginDeactivated";
                 direct_page('index.php?load=plugins&status=pluginDeactivated', 302);
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {
@@ -403,7 +413,7 @@ class PluginController extends BaseApp
                 $this->pluginService->removePlugin();
                 $_SESSION['status'] = "pluginDeleted";
                 direct_page('index.php?load=plugins&status=pluginDeleted', 302);
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {

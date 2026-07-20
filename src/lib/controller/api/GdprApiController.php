@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller\Api;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * GDPR API Controller
  *
@@ -13,6 +15,12 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Controller\ApiController;
+use Scriptlog\Core\ApiResponse;
+use Scriptlog\Dao\ConsentDao;
+use Scriptlog\Service\ConsentService;
+
 class GdprApiController extends ApiController
 {
     /**

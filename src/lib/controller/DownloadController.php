@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class DownloadController
  *
@@ -15,6 +17,10 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @SuppressWarnings(PHPMD.ElseExpression)
  *
  */
+
+use Scriptlog\Core\BaseApp;
+use Scriptlog\Service\DownloadService;
+
 class DownloadController extends BaseApp
 {
     private $downloadService;
@@ -96,13 +102,13 @@ class DownloadController extends BaseApp
             exit;
         }
 
-        $hotlinkProtection = DownloadSettings::isHotlinkProtectionEnabled();
+        $hotlinkProtection = \DownloadSettings::isHotlinkProtectionEnabled();
 
         if ($hotlinkProtection) {
-            $allowedDomains = DownloadSettings::getAllowedDomains();
+            $allowedDomains = \DownloadSettings::getAllowedDomains();
             $referer = $_SERVER['HTTP_REFERER'] ?? '';
 
-            if (!DownloadUtility::isHotlinkingAllowed($referer, $allowedDomains)) {
+            if (!\DownloadUtility::isHotlinkingAllowed($referer, $allowedDomains)) {
                 http_response_code(403);
                 echo 'Hotlinking not allowed';
                 exit;
@@ -129,7 +135,7 @@ class DownloadController extends BaseApp
         }
 
         $filename = basename($media['media_filename']);
-        DownloadUtility::deliverFile($filepath, $filename, $mimeType);
+        \DownloadUtility::deliverFile($filepath, $filename, $mimeType);
     }
 
     /**
@@ -164,8 +170,8 @@ class DownloadController extends BaseApp
         }
 
         $downloadUrl = $this->downloadService->getDownloadUrl($media['ID'], $identifier);
-        $supportUrl = DownloadSettings::getSupportUrl();
-        $supportLabel = DownloadSettings::getSupportLabel();
+        $supportUrl = \DownloadSettings::getSupportUrl();
+        $supportLabel = \DownloadSettings::getSupportLabel();
 
         $fileSize = $this->getFileSize($media);
 

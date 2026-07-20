@@ -1,5 +1,8 @@
 <?php
+
+namespace Scriptlog\Controller\Api;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Archives API Controller
  *
@@ -12,6 +15,12 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Controller\ApiController;
+use Scriptlog\Core\ApiHateoas;
+use Scriptlog\Core\ApiResponse;
+use Scriptlog\Core\Registry;
+
 class ArchivesApiController extends ApiController
 {
     /**
@@ -59,7 +68,7 @@ class ArchivesApiController extends ApiController
                     ORDER BY year DESC, month DESC";
 
             $stmt = $dbc->query($sql);
-            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             // Group by year
             $archives = [];
@@ -145,7 +154,7 @@ class ArchivesApiController extends ApiController
 
             $stmt = $dbc->prepare($sql);
             $stmt->execute([$year]);
-            $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $posts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             // Get total count
             $countSql = "SELECT COUNT(*) as total
@@ -156,7 +165,7 @@ class ArchivesApiController extends ApiController
                          AND post_visibility = 'public'";
             $countStmt = $dbc->prepare($countSql);
             $countStmt->execute([$year]);
-            $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+            $total = $countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
 
             if ($total == 0) {
                 ApiResponse::notFound('No posts found for year ' . $year);
@@ -234,7 +243,7 @@ class ArchivesApiController extends ApiController
 
             $stmt = $dbc->prepare($sql);
             $stmt->execute([$year, $month]);
-            $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $posts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             // Get total count
             $countSql = "SELECT COUNT(*) as total
@@ -246,7 +255,7 @@ class ArchivesApiController extends ApiController
                          AND post_visibility = 'public'";
             $countStmt = $dbc->prepare($countSql);
             $countStmt->execute([$year, $month]);
-            $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+            $total = $countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
 
             if ($total == 0) {
                 ApiResponse::notFound('No posts found for ' . $this->getMonthName($month) . ' ' . $year);

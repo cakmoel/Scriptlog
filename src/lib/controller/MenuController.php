@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class MenuController
  *
@@ -12,6 +14,15 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @SuppressWarnings(PHPMD.ElseExpression)
  *
  */
+
+use Scriptlog\Core\ActionConst;
+use Scriptlog\Core\AppException;
+use Scriptlog\Core\BaseApp;
+use Scriptlog\Core\LogError;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Core\View;
+use Scriptlog\Service\MenuService;
+
 class MenuController extends BaseApp
 {
     /**
@@ -287,7 +298,7 @@ class MenuController extends BaseApp
             $this->menuService->modifyMenu();
             $_SESSION['status'] = "menuUpdated";
             direct_page('index.php?load=menu&status=menuUpdated', 200);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             LogError::setStatusCode(http_response_code());
             LogError::exceptionHandler($th);
         } catch (AppException $e) {
@@ -343,7 +354,7 @@ class MenuController extends BaseApp
                 $this->menuService->removeMenu();
                 $_SESSION['status'] = "menuDeleted";
                 direct_page('index.php?load=menu&status=menuDeleted', 200);
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {

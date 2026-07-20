@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class ThemeController
  *
@@ -12,6 +14,15 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @SuppressWarnings(PHPMD.ElseExpression)
  *
  */
+
+use Scriptlog\Core\ActionConst;
+use Scriptlog\Core\AppException;
+use Scriptlog\Core\BaseApp;
+use Scriptlog\Core\LogError;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Core\View;
+use Scriptlog\Service\ThemeService;
+
 class ThemeController extends BaseApp
 {
     private $view;
@@ -133,7 +144,7 @@ class ThemeController extends BaseApp
             $this->themeService->addTheme();
             $_SESSION['status'] = "themeAdded";
             direct_page('index.php?load=templates&status=themeAdded', 302);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             LogError::setStatusCode(http_response_code());
             LogError::exceptionHandler($th);
         } catch (AppException $e) {
@@ -191,7 +202,7 @@ class ThemeController extends BaseApp
             }
 
             $this->installUploadedTheme($file_name, $file_location, $theme_title, $theme_dir);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             LogError::setStatusCode(http_response_code());
             LogError::exceptionHandler($th);
         } catch (AppException $e) {
@@ -355,7 +366,7 @@ class ThemeController extends BaseApp
             $this->themeService->modifyTheme();
             $_SESSION['status'] = "themeUpdated";
             direct_page('index.php?load=templates&status=themeUpdated', 302);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             LogError::setStatusCode(http_response_code());
             LogError::exceptionHandler($th);
         } catch (AppException $e) {
@@ -405,7 +416,7 @@ class ThemeController extends BaseApp
                 $this->themeService->removeTheme();
                 $_SESSION['status'] = "themeDeleted";
                 direct_page('index.php?load=templates&status=themeDeleted', 302);
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {
@@ -453,7 +464,7 @@ class ThemeController extends BaseApp
                 $this->themeService->activateInstalledTheme();
                 $_SESSION['status'] = "themeActivated";
                 direct_page('index.php?load=templates&status=themeActivated', 302);
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {
@@ -501,7 +512,7 @@ class ThemeController extends BaseApp
                 $this->themeService->deactivateInstalledTheme();
                 $_SESSION['status'] = "themeDeactivated";
                 direct_page('index.php?load=templates&status=themeDeactivated', 302);
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {

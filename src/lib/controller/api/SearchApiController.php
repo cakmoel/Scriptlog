@@ -1,5 +1,8 @@
 <?php
+
+namespace Scriptlog\Controller\Api;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Search API Controller
  *
@@ -13,12 +16,22 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  * @property Db $dbc
  */
+
+use Scriptlog\Controller\ApiController;
+use Scriptlog\Core\ApiResponse;
+use Scriptlog\Core\SearchFinder;
+
 class SearchApiController extends ApiController
 {
     /**
      * @var SearchFinder
      */
     private $searchFinder;
+
+    /**
+     * @var \Scriptlog\Core\Db|null
+     */
+    private $dbc;
 
     /**
      * Constructor
@@ -30,6 +43,7 @@ class SearchApiController extends ApiController
         parent::__construct();
 
         $this->searchFinder = new SearchFinder();
+        $this->dbc = \Scriptlog\Core\Registry::get('dbc');
     }
 
     /**

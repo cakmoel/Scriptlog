@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Controller\Api;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -14,6 +15,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version   1.0
  *
  */
+
+use Scriptlog\Core\ScriptlogCryptonize;
+use Scriptlog\Dao\MediaDao;
+use Scriptlog\Dao\UserDao;
+
 class MediaApiController
 {
     /**
@@ -50,7 +56,7 @@ class MediaApiController
                         }
                     }
                 }
-            } catch (Throwable $e) {
+            } catch (\Throwable $e) {
                 // Cookie decryption failed
             }
         }

@@ -1,5 +1,8 @@
 <?php
+
+namespace Scriptlog\Controller\Api;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Categories API Controller
  *
@@ -12,6 +15,14 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Controller\ApiController;
+use Scriptlog\Core\ApiHateoas;
+use Scriptlog\Core\ApiResponse;
+use Scriptlog\Core\Registry;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Dao\TopicDao;
+
 class CategoriesApiController extends ApiController
 {
     /**
@@ -77,12 +88,12 @@ class CategoriesApiController extends ApiController
                     LIMIT " . $pagination['per_page'] . " OFFSET " . $pagination['offset'];
 
             $stmt = $dbc->query($sql);
-            $topics = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $topics = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             // Get total count
             $countSql = "SELECT COUNT(*) as total FROM tbl_topics WHERE topic_status = 'Y'";
             $countStmt = $dbc->query($countSql);
-            $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+            $total = $countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
 
             // Transform topics
             $transformedTopics = array_map([$this, 'transformTopic'], $topics);
@@ -131,7 +142,7 @@ class CategoriesApiController extends ApiController
 
             $stmt = $dbc->prepare($sql);
             $stmt->execute([$topicId]);
-            $topic = $stmt->fetch(PDO::FETCH_ASSOC);
+            $topic = $stmt->fetch(\PDO::FETCH_ASSOC);
 
             if (!$topic) {
                 ApiResponse::notFound('Category not found');
@@ -177,7 +188,7 @@ class CategoriesApiController extends ApiController
             $checkSql = "SELECT topic_title, topic_slug FROM tbl_topics WHERE ID = ? AND topic_status = 'Y'";
             $checkStmt = $dbc->prepare($checkSql);
             $checkStmt->execute([$topicId]);
-            $topic = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            $topic = $checkStmt->fetch(\PDO::FETCH_ASSOC);
 
             if (!$topic) {
                 ApiResponse::notFound('Category not found');
@@ -201,7 +212,7 @@ class CategoriesApiController extends ApiController
 
             $stmt = $dbc->prepare($sql);
             $stmt->execute([$topicId]);
-            $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $posts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             // Get total count
             $countSql = "SELECT COUNT(*) as total
@@ -213,7 +224,7 @@ class CategoriesApiController extends ApiController
                          AND p.post_visibility = 'public'";
             $countStmt = $dbc->prepare($countSql);
             $countStmt->execute([$topicId]);
-            $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+            $total = $countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
 
             // Transform posts
             $transformedPosts = array_map([$this, 'transformPost'], $posts);
@@ -297,7 +308,7 @@ class CategoriesApiController extends ApiController
             $fetchSql = "SELECT * FROM tbl_topics WHERE ID = ?";
             $fetchStmt = $dbc->prepare($fetchSql);
             $fetchStmt->execute([$topicId]);
-            $createdTopic = $fetchStmt->fetch(PDO::FETCH_ASSOC);
+            $createdTopic = $fetchStmt->fetch(\PDO::FETCH_ASSOC);
 
             ApiResponse::created($this->transformTopic($createdTopic), 'Category created successfully', $this->hateoas->categoryLinks($topicId, $slug), $this->getAppUrl() . '/api/v1/categories/' . $topicId);
         } catch (\Throwable $e) {
@@ -338,7 +349,7 @@ class CategoriesApiController extends ApiController
             $checkSql = "SELECT ID FROM tbl_topics WHERE ID = ?";
             $checkStmt = $dbc->prepare($checkSql);
             $checkStmt->execute([$topicId]);
-            $topic = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            $topic = $checkStmt->fetch(\PDO::FETCH_ASSOC);
 
             if (!$topic) {
                 ApiResponse::notFound('Category not found');
@@ -378,7 +389,7 @@ class CategoriesApiController extends ApiController
             $fetchSql = "SELECT * FROM tbl_topics WHERE ID = ?";
             $fetchStmt = $dbc->prepare($fetchSql);
             $fetchStmt->execute([$topicId]);
-            $updatedTopic = $fetchStmt->fetch(PDO::FETCH_ASSOC);
+            $updatedTopic = $fetchStmt->fetch(\PDO::FETCH_ASSOC);
 
             ApiResponse::success($this->transformTopic($updatedTopic), 200, 'Category updated successfully');
         } catch (\Throwable $e) {
@@ -419,7 +430,7 @@ class CategoriesApiController extends ApiController
             $checkSql = "SELECT ID FROM tbl_topics WHERE ID = ?";
             $checkStmt = $dbc->prepare($checkSql);
             $checkStmt->execute([$topicId]);
-            $topic = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            $topic = $checkStmt->fetch(\PDO::FETCH_ASSOC);
 
             if (!$topic) {
                 ApiResponse::notFound('Category not found');

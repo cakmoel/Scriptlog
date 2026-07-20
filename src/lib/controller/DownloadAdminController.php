@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class DownloadAdminController
  *
@@ -14,6 +16,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @SuppressWarnings(PHPMD.ElseExpression)
  *
  */
+
+use Scriptlog\Core\BaseApp;
+use Scriptlog\Core\View;
+use Scriptlog\Service\DownloadService;
+
 class DownloadAdminController extends BaseApp
 {
     private $downloadService;
