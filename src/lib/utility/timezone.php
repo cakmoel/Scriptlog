@@ -109,6 +109,15 @@ function print_timezone_list()
  */
 function timezone_identifier()
 {
-    $timezone_identifier = json_decode(app_info()['timezone_setting'], true);
-    return $timezone_identifier['timezone_identifier'];
+    $info = app_info();
+    $timezone = 'UTC';
+
+    if (isset($info['timezone_setting'])) {
+        $decoded = json_decode($info['timezone_setting'], true);
+        if (isset($decoded['timezone_identifier'])) {
+            $timezone = $decoded['timezone_identifier'];
+        }
+    }
+
+    return $timezone;
 }

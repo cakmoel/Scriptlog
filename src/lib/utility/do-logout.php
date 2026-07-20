@@ -15,7 +15,7 @@
 function do_logout($authenticator)
 {
 
-    if (is_a($authenticator, 'Authentication')) {
+    if ($authenticator instanceof \Scriptlog\Core\Authentication) {
         return $authenticator->logout();
     }
 }

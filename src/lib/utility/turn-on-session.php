@@ -21,7 +21,7 @@
  */
 function turn_on_session($session_handler, $life_time, $cookies_name, $path, $domain, $secure, $httponly)
 {
-    if (!is_a($session_handler, 'SessionMaker')) {
+    if (!($session_handler instanceof \Scriptlog\Core\SessionMaker)) {
         error_log("Invalid session handler provided to turn_on_session");
         return false;
     }

@@ -11,6 +11,6 @@
  */
 function read_datetime($datetime)
 {
-    $dateGenerator = class_exists('DateGenerator') ? new DateGenerator() : "";
+    $dateGenerator = class_exists('DateGenerator') ? new \Scriptlog\Core\DateGenerator() : "";
     return (method_exists($dateGenerator, 'getExternalDate')) ? $dateGenerator->getExternalDate($datetime) : "";
 }
