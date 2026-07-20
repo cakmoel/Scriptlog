@@ -1,0 +1,1 @@
+<?php return ["db" => ["type" => "sqlite", "name" => ":memory:", "host" => "", "user" => "", "pass" => "", "port" => ""]];
