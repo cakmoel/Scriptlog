@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Model;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -11,6 +12,10 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 1.0
  *
  */
+
+use Scriptlog\Core\BaseModel;
+use Scriptlog\Core\Paginator;
+use Scriptlog\Core\Sanitize;
 
 class ArchivesModel extends BaseModel
 {

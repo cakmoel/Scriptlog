@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Model;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class FrontContentModel
  *
@@ -10,7 +12,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 1.0
  *
  */
-final class FrontContentModel extends BaseModel
+use Scriptlog\Core\BaseModel;
+
+final
+
+class FrontContentModel extends BaseModel
 {
     /**
      * postModel;

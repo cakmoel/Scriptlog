@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Handler;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -8,6 +9,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Displays posts matching the requested tag. Redirects to the homepage
  * if no tag value is provided.
  */
+
+use Scriptlog\Core\ThemeRendererInterface;
+
 class TagHandler implements FrontRequestHandler
 {
     /**

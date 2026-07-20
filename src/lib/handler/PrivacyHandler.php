@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Handler;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -8,6 +9,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Displays the site's privacy policy content. Rendering is delegated
  * entirely to the theme renderer; no parameter validation is required.
  */
+
+use Scriptlog\Core\ThemeRendererInterface;
+
 class PrivacyHandler implements FrontRequestHandler
 {
     /**

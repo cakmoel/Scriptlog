@@ -1,6 +1,12 @@
 <?php
 
+namespace Scriptlog\Service;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
+use Scriptlog\Core\ServiceException;
+use Scriptlog\Core\TranslationLoader;
+use Scriptlog\Dao\LanguageDao;
+use Scriptlog\Dao\TranslationDao;
 
 class TranslationService
 {

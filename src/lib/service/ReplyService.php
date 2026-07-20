@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Service;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class ReplyService
  *
@@ -10,6 +12,12 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 1.0
  *
  */
+
+use Scriptlog\Core\AppException;
+use Scriptlog\Core\FormValidator;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Dao\ReplyDao;
+
 class ReplyService
 {
     private $reply_id;

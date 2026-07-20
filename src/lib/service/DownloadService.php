@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Service;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class DownloadService
  *
@@ -13,6 +15,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since    Since Release 1.0
  *
  */
+
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Dao\MediaDao;
+use Scriptlog\Model\DownloadModel;
+
 class DownloadService
 {
     private $downloadModel;
@@ -34,7 +41,7 @@ class DownloadService
      */
     public function validateDownloadRequest($identifier)
     {
-        if (!DownloadUtility::validateDownloadRequest($identifier)) {
+        if (!\DownloadUtility::validateDownloadRequest($identifier)) {
             return null;
         }
 
@@ -83,7 +90,7 @@ class DownloadService
             return true;
         }
 
-        return DownloadUtility::isExpired($downloadInfo['before_expired']);
+        return \DownloadUtility::isExpired($downloadInfo['before_expired']);
     }
 
     /**
@@ -94,7 +101,7 @@ class DownloadService
      */
     public function isMimeTypeAllowed($mimeType)
     {
-        return DownloadUtility::isMimeTypeAllowed($mimeType);
+        return \DownloadUtility::isMimeTypeAllowed($mimeType);
     }
 
     /**
@@ -107,7 +114,7 @@ class DownloadService
     public function createDownloadRecord($mediaId, $ipAddress)
     {
         $identifier = $this->generateDownloadIdentifier();
-        $expiryHours = DownloadSettings::getDownloadExpiry();
+        $expiryHours = \DownloadSettings::getDownloadExpiry();
         $beforeExpired = time() + ($expiryHours * 3600);
 
         $this->downloadModel->createMediaDownload([
@@ -191,7 +198,7 @@ class DownloadService
     public function regenerateDownloadRecord($identifier)
     {
         $newIdentifier = $this->generateDownloadIdentifier();
-        $expiryHours = DownloadSettings::getDownloadExpiry();
+        $expiryHours = \DownloadSettings::getDownloadExpiry();
         $beforeExpired = time() + ($expiryHours * 3600);
 
         $this->downloadModel->updateMediaDownload($this->sanitizer, [
@@ -250,7 +257,7 @@ class DownloadService
      */
     public function refreshDownloadExpiry($identifier)
     {
-        $expiryHours = DownloadSettings::getDownloadExpiry();
+        $expiryHours = \DownloadSettings::getDownloadExpiry();
         $beforeExpired = time() + ($expiryHours * 3600);
 
         $this->downloadModel->updateMediaDownload($this->sanitizer, [

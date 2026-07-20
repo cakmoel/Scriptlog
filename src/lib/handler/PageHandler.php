@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Handler;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -9,6 +10,10 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * FrontHelper before rendering. Returns a 404 response when the
  * page is not found or the helper is unavailable.
  */
+
+use Scriptlog\Core\HandleRequest;
+use Scriptlog\Core\ThemeRendererInterface;
+
 class PageHandler implements FrontRequestHandler
 {
     /**

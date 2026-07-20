@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Service;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -30,6 +31,14 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version  1.0
  * @since    Since Release 1.0
  */
+
+use Scriptlog\Core\Registry;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Dao\MediaDao;
+use Scriptlog\Dao\PageDao;
+use Scriptlog\Dao\PostDao;
+use Scriptlog\Dao\TopicDao;
+
 class FrontService
 {
     /**
