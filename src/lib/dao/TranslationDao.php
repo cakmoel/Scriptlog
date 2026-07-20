@@ -1,6 +1,9 @@
 <?php
 
+namespace Scriptlog\Dao;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
+use Scriptlog\Core\Dao;
 
 class TranslationDao extends Dao
 {

@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Dao;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Page class extends Dao
  *
@@ -12,6 +14,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Core\Dao;
+
 class PageDao extends Dao
 {
     public function __construct()

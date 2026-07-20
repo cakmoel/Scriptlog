@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Dao;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class ReplyDao extends Dao
  *
@@ -9,6 +11,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @license MIT
  *
  */
+
+use Scriptlog\Core\Dao;
+
 class ReplyDao extends Dao
 {
     private $selected;

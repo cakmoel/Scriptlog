@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Dao;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class TopicDao extends Dao
  *
@@ -11,6 +13,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Core\Dao;
+
 class TopicDao extends Dao
 {
     /**
@@ -45,7 +50,7 @@ class TopicDao extends Dao
      *
      * @param integer $topicId
      * @param object $sanitize
-     * @param static $fetchMode
+     * @param int|null $fetchMode
      * @return mixed
      */
     public function findTopicById($topicId, $sanitize, $fetchMode = null)
