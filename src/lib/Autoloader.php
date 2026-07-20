@@ -169,11 +169,6 @@ final class Autoloader
     /** @psalm-suppress PossiblyUnusedReturnValue */
     public static function loadClass($class_name)
     {
-        // Skip if class already exists
-        if (class_exists($class_name, false)) {
-            return false;
-        }
-
         // Try to load the class using namespace mapping
         foreach (self::$_namespace_mappings as $prefix => $base_dir) {
             if (strpos($class_name, $prefix) === 0) {
@@ -192,15 +187,9 @@ final class Autoloader
         foreach (self::$_load_dirs as $dir) {
             $file = $dir . $class_name . self::$_file_ext;
             if (file_exists($file)) {
-                $beforeClasses = get_declared_classes();
                 include $file;
-                $afterClasses = get_declared_classes();
-                $newClasses = array_diff($afterClasses, $beforeClasses);
-                if (!empty($newClasses)) {
-                    self::$_loaded_files[] = $file;
-                    return true;
-                }
-                return false;
+                self::$_loaded_files[] = $file;
+                return true;
             }
         }
 
