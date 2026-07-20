@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class ProviderException extends Exception implements IAppThrowable
  *
@@ -11,13 +13,14 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since    Since Release 1.0
  *
  */
-class ProviderException extends Exception implements IProviderThrowable
+
+class ProviderException extends \Exception implements IProviderThrowable
 {
     protected $message = 'Unknown Exception';
 
     protected $previous;
 
-    public function __construct($message = null, $code = 0, Exception $previous = null)
+    public function __construct($message = null, $code = 0, ?\Exception $previous = null)
     {
 
         $code = $this->getCode();

@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Util.php
  *
@@ -14,6 +16,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @link   http://github.com/brandonwamboldt/utilphp/ Official Documentation
  *
  */
+
 class Util
 {
     /**
@@ -2045,7 +2048,7 @@ class Util
     public static function ordinal($number, $locale)
     {
 
-        $numberFormat = new NumberFormatter($locale, NumberFormatter::ORDINAL);
+        $numberFormat = new \NumberFormatter($locale, \NumberFormatter::ORDINAL);
 
         $display_ordinal = $numberFormat->format($number);
 

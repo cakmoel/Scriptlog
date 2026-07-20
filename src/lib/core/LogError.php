@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class LogError
  *
@@ -13,6 +15,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
 class LogError
 {
     private static $logFilePath = APP_ROOT . APP_PUBLIC . '/log/';
@@ -98,7 +101,7 @@ class LogError
      * @param string $errorString
      * @param string $file
      * @param string $line
-     * @return number
+     * @return void|bool
      *
      */
     public static function errorHandler($code, $description, $file = null, $line = null)
@@ -109,7 +112,7 @@ class LogError
     /**
      *
      * @static method newMessage
-     * @param Exception|Throwable $exception
+     * @param \Exception|\Throwable $exception
      * @param string $_printError
      * @param string $clear
      * @param string $error_file

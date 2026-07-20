@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted.");
+
 /**
  * Class Db implements DbInterface
  *
@@ -21,9 +23,9 @@ class Db implements DbInterface
     /**
      * PDO database connection instance
      *
-     * @var PDO|null
+     * @var \PDO|null
      */
-    private ?PDO $dbc = null;
+    private ?\PDO $dbc = null;
 
     /**
      * Path to SSL CA certificate file for secure connections
@@ -107,31 +109,31 @@ class Db implements DbInterface
      * @param array $config Database configuration [DSN, username, password]
      * @param array $options Additional PDO connection options
      * @return void
-     * @throws InvalidArgumentException If configuration is incomplete
-     * @throws RuntimeException If connection fails
+     * @throws \InvalidArgumentException If configuration is incomplete
+     * @throws \RuntimeException If connection fails
      */
     public function setDbConnection(array $config = [], array $options = []): void
     {
         if (count($config) < 3) {
-            throw new InvalidArgumentException("Database configuration array must contain DSN, username, and password.");
+            throw new \InvalidArgumentException("Database configuration array must contain DSN, username, and password.");
         }
 
         [$dsn, $dbUser, $dbPass] = $config;
 
         $defaultOptions = [
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false,
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+            \PDO::ATTR_EMULATE_PREPARES   => false,
+            \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
         ];
 
         if ($this->caPath) {
-            $defaultOptions[PDO::MYSQL_ATTR_SSL_CA] = $this->caPath;
+            $defaultOptions[\PDO::MYSQL_ATTR_SSL_CA] = $this->caPath;
         }
 
         try {
-            $this->dbc = new PDO($dsn, $dbUser, $dbPass, array_replace($defaultOptions, $options));
-        } catch (PDOException $e) {
-            throw new RuntimeException("Database connection failed: " . $e->getMessage());
+            $this->dbc = new \PDO($dsn, $dbUser, $dbPass, array_replace($defaultOptions, $options));
+        } catch (\PDOException $e) {
+            throw new \RuntimeException("Database connection failed: " . $e->getMessage());
         }
     }
 
@@ -159,12 +161,12 @@ class Db implements DbInterface
      * Ensures database connection is established before operations
      *
      * @return void
-     * @throws RuntimeException If connection is not established
+     * @throws \RuntimeException If connection is not established
      */
     private function ensureConnection(): void
     {
         if (!$this->dbc) {
-            throw new RuntimeException("Database connection is not established.");
+            throw new \RuntimeException("Database connection is not established.");
         }
     }
 
@@ -173,10 +175,10 @@ class Db implements DbInterface
      *
      * @param string $sql SQL query to execute
      * @param array $args Parameters for prepared statement
-     * @return PDOStatement Executed statement
-     * @throws RuntimeException If connection is not established
+     * @return \PDOStatement Executed statement
+     * @throws \RuntimeException If connection is not established
      */
-    public function dbQuery(string $sql, array $args = []): PDOStatement
+    public function dbQuery(string $sql, array $args = []): \PDOStatement
     {
         $this->ensureConnection();
         $sql = $this->applyTablePrefix($sql);
@@ -193,9 +195,9 @@ class Db implements DbInterface
      * @param int $fetchMode PDO fetch mode (default: PDO::FETCH_OBJ)
      * @param string $class Class name for PDO::FETCH_CLASS mode
      * @return array Fetched results
-     * @throws RuntimeException If connection is not established
+     * @throws \RuntimeException If connection is not established
      */
-    public function dbSelect(string $sql, array $parameters = [], int $fetchMode = PDO::FETCH_OBJ, string $class = ''): array
+    public function dbSelect(string $sql, array $parameters = [], int $fetchMode = \PDO::FETCH_OBJ, string $class = ''): array
     {
         $this->ensureConnection();
         $sql = $this->applyTablePrefix($sql);
@@ -203,7 +205,7 @@ class Db implements DbInterface
         $stmt = $this->dbc->prepare($sql);
         $stmt->execute($parameters);
 
-        return $fetchMode === PDO::FETCH_CLASS ?
+        return $fetchMode === \PDO::FETCH_CLASS ?
             $stmt->fetchAll($fetchMode, $class) :
             $stmt->fetchAll($fetchMode);
     }
@@ -214,15 +216,15 @@ class Db implements DbInterface
      * @param string $tablename Name of the table
      * @param array $params Associative array of column => value pairs
      * @return bool True on success, false on failure
-     * @throws InvalidArgumentException If parameters are empty
-     * @throws RuntimeException If connection is not established
+     * @throws \InvalidArgumentException If parameters are empty
+     * @throws \RuntimeException If connection is not established
      */
     public function dbInsert(string $tablename, array $params): bool
     {
         $this->ensureConnection();
 
         if (empty($params)) {
-            throw new InvalidArgumentException("Insert parameters cannot be empty.");
+            throw new \InvalidArgumentException("Insert parameters cannot be empty.");
         }
 
         // Apply prefix to table name
@@ -246,7 +248,7 @@ class Db implements DbInterface
      * Returns the last inserted ID
      *
      * @return string Last inserted row ID
-     * @throws RuntimeException If connection is not established
+     * @throws \RuntimeException If connection is not established
      */
     public function dbLastInsertId(): string
     {
@@ -261,15 +263,15 @@ class Db implements DbInterface
      * @param array $params Associative array of column => value pairs to update
      * @param array $where Associative array of conditions for WHERE clause
      * @return int Number of affected rows
-     * @throws InvalidArgumentException If parameters or conditions are empty
-     * @throws RuntimeException If connection is not established
+     * @throws \InvalidArgumentException If parameters or conditions are empty
+     * @throws \RuntimeException If connection is not established
      */
     public function dbUpdate(string $tablename, array $params, array $where): int
     {
         $this->ensureConnection();
 
         if (empty($params) || empty($where)) {
-            throw new InvalidArgumentException("Update parameters and conditions cannot be empty.");
+            throw new \InvalidArgumentException("Update parameters and conditions cannot be empty.");
         }
 
         // Apply prefix to table name
@@ -295,15 +297,15 @@ class Db implements DbInterface
      * @param array $params Associative array of column => value pairs for insert
      * @param array $updateParams Associative array of column => value pairs for update
      * @return bool True on success, false on failure
-     * @throws InvalidArgumentException If parameters are empty
-     * @throws RuntimeException If connection is not established
+     * @throws \InvalidArgumentException If parameters are empty
+     * @throws \RuntimeException If connection is not established
      */
     public function dbReplace(string $tablename, array $params, array $updateParams): bool
     {
         $this->ensureConnection();
 
         if (empty($params) || empty($updateParams)) {
-            throw new InvalidArgumentException("Upsert parameters cannot be empty.");
+            throw new \InvalidArgumentException("Upsert parameters cannot be empty.");
         }
 
         // Apply prefix to table name
@@ -334,15 +336,15 @@ class Db implements DbInterface
      * @param array $where Associative array of conditions for WHERE clause
      * @param int|null $limit Optional maximum number of rows to delete
      * @return int Number of affected rows
-     * @throws InvalidArgumentException If conditions are empty
-     * @throws RuntimeException If connection is not established
+     * @throws \InvalidArgumentException If conditions are empty
+     * @throws \RuntimeException If connection is not established
      */
     public function dbDelete(string $tablename, array $where, ?int $limit = null): int
     {
         $this->ensureConnection();
 
         if (empty($where)) {
-            throw new InvalidArgumentException("Delete conditions cannot be empty.");
+            throw new \InvalidArgumentException("Delete conditions cannot be empty.");
         }
 
         // Apply prefix to table name
@@ -366,7 +368,7 @@ class Db implements DbInterface
      * Begins a transaction
      *
      * @return bool True on success, false on failure
-     * @throws RuntimeException If connection is not established
+     * @throws \RuntimeException If connection is not established
      */
     public function dbTransaction(): bool
     {
@@ -378,7 +380,7 @@ class Db implements DbInterface
      * Commits a transaction
      *
      * @return bool True on success, false on failure
-     * @throws RuntimeException If connection is not established
+     * @throws \RuntimeException If connection is not established
      */
     public function dbCommit(): bool
     {
@@ -390,7 +392,7 @@ class Db implements DbInterface
      * Rolls back a transaction
      *
      * @return bool True on success, false on failure
-     * @throws RuntimeException If connection is not established
+     * @throws \RuntimeException If connection is not established
      */
     public function dbRollBack(): bool
     {

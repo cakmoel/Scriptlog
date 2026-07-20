@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -15,6 +16,29 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version  1.0.0
  * @since    1.0.0
  */
+
+use Scriptlog\Controller\DownloadController;
+use Scriptlog\Dao\ConfigurationDao;
+use Scriptlog\Dao\MediaDao;
+use Scriptlog\Dao\PageDao;
+use Scriptlog\Dao\PostDao;
+use Scriptlog\Dao\TopicDao;
+use Scriptlog\Dao\UserDao;
+use Scriptlog\Dao\UserTokenDao;
+use Scriptlog\Handler\ArchiveHandler;
+use Scriptlog\Handler\BlogHandler;
+use Scriptlog\Handler\CategoryHandler;
+use Scriptlog\Handler\DownloadHandler;
+use Scriptlog\Handler\HandlerRegistry;
+use Scriptlog\Handler\PageHandler;
+use Scriptlog\Handler\PostHandler;
+use Scriptlog\Handler\PrivacyHandler;
+use Scriptlog\Handler\TagHandler;
+use Scriptlog\Model\DownloadModel;
+use Scriptlog\Service\ConfigurationService;
+use Scriptlog\Service\DownloadService;
+use Scriptlog\Service\FrontService;
+
 class Bootstrap
 {
     /**
@@ -119,7 +143,7 @@ class Bootstrap
         $app_key   = self::$config['app']['key'] ?? "";
 
         if (empty($app_key)) {
-            throw new Exception("Security Risk: APP_KEY is missing from environment.");
+            throw new \Exception("Security Risk: APP_KEY is missing from environment.");
         }
         $cipher_key = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::scriptlogCipherKey() : "";
 
@@ -191,7 +215,7 @@ class Bootstrap
                     $core_vars['db_user'],
                     $core_vars['db_pwd']
                 ]);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $dbc = "";
             }
         }
@@ -213,9 +237,10 @@ class Bootstrap
             'blog'     => "/blog([^/]*)",
             'page'     => "/page/(?'page'[^/]+)",
             'single'   => "/post/(?'id'\d+)/(?'post'[\w\-]+)",
-            'search'   => "(?'search'[\w\-]+)",
             'tag'      => "/tag/(?'tag'[\w\- ]+)",
+            'search'   => "/search",
             'privacy'  => "/privacy",
+            'locale'   => "/locale",
             'download' => "/download/(?'identifier'[a-f0-9\-]+)",
             'download_file' => "/download/(?'identifier'[a-f0-9\-]+)/file"
         ];
@@ -260,7 +285,7 @@ class Bootstrap
                 if (!headers_sent() || PHP_SAPI === 'cli') {
                     $sessionMaker = new SessionMaker(set_session_cookies_key($core_vars['app_email'] ?? '', $core_vars['app_key'] ?? ''));
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 // Session creation failed silently - acceptable during early bootstrap
             }
         }
@@ -288,7 +313,7 @@ class Bootstrap
 
         try {
             return new Authentication($userDao, $userToken, $validator);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }
@@ -318,7 +343,7 @@ class Bootstrap
                 FrontHelper::setFrontService($frontService);
             }
             return $frontService;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }
@@ -380,7 +405,7 @@ class Bootstrap
 
         try {
             return new Dispatcher($themeRenderer);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }
@@ -520,7 +545,7 @@ class Bootstrap
         if (function_exists('whoops_error')) {
             try {
                 whoops_error();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 // Whoops error handler initialization failed silently
             }
         }

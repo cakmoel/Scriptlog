@@ -1,6 +1,9 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
+use Scriptlog\Dao\LanguageDao;
 
 class I18nManager
 {
@@ -162,7 +165,7 @@ class I18nManager
                 $languageDao = new LanguageDao();
                 $language = $languageDao->findLanguageByCode($this->locale);
                 $direction = $language['lang_direction'] ?? 'ltr';
-            } catch (Throwable $e) {
+            } catch (\Throwable $e) {
                 $direction = 'ltr';
             }
         }
@@ -228,11 +231,11 @@ class I18nManager
 
     public function __wakeup()
     {
-        throw new Exception("Cannot unserialize singleton");
+        throw new \Exception("Cannot unserialize singleton");
     }
 
     public function __unserialize(array $_data): void
     {
-        throw new Exception("Cannot unserialize singleton");
+        throw new \Exception("Cannot unserialize singleton");
     }
 }

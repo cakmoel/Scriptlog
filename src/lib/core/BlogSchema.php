@@ -1,9 +1,8 @@
 <?php
 
-use Melbahja\Seo\Schema;
-use Melbahja\Seo\Schema\Thing;
-
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class BlogSchema
  *
@@ -12,6 +11,10 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @license MIT
  *
  */
+
+use Melbahja\Seo\Schema;
+use Melbahja\Seo\Schema\Thing;
+
 class BlogSchema
 {
     /**

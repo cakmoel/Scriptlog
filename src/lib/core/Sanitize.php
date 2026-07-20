@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * sanitize.class.php
  * Sanitizing input and output
@@ -12,6 +14,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @license    MIT
  *
  */
+
 class Sanitize
 {
     public function sanitasi($str, $tipe)

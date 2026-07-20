@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class AtomWriter
  *
@@ -10,6 +12,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 1.0
  *
  */
+
+use Scriptlog\Model\FrontContentModel;
+use Scriptlog\Model\PostModel;
 
 class AtomWriter
 {
@@ -105,13 +110,13 @@ class AtomWriter
             $feed_title = isset($feed_post['post_title']) ? htmlout($feed_post['post_title']) : "";
 
             $timestamp_created = isset($feed_post['post_date']) ? strtotime($feed_post['post_date']) : time();
-            $feed_created = new DateTime();
+            $feed_created = new \DateTime();
             $feed_created->setTimestamp($timestamp_created);
 
             $timestamp_modified = isset($feed_post['post_modified']) && !empty($feed_post['post_modified'])
               ? strtotime($feed_post['post_modified'])
               : (isset($feed_post['post_date']) ? strtotime($feed_post['post_date']) : time());
-            $feed_modified = new DateTime();
+            $feed_modified = new \DateTime();
             $feed_modified->setTimestamp($timestamp_modified);
 
             $feed_permalinks = isset($feed_post['ID']) ? permalinks($feed_id)['post'] : "";

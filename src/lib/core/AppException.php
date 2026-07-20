@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class AppException extends Exception implements IAppThrowable
  *
@@ -12,22 +14,22 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  */
 
-class AppException extends Exception implements IAppThrowable
+class AppException extends \Exception implements IAppThrowable
 {
     /**
          * Previous exception
-         * @var Exception|null
+         * @var \Exception|null
          */
-    protected ?Exception $previous = null;
+    protected ?\Exception $previous = null;
 
     /**
      * CoreException constructor
      *
      * @param string|null $message
      * @param int $code
-     * @param Exception|null $previous
+     * @param \Exception|null $previous
      */
-    public function __construct(?string $message = null, int $code = 0, ?Exception $previous = null)
+    public function __construct(?string $message = null, int $code = 0, ?\Exception $previous = null)
     {
         if (is_null($message)) {
             $message = 'Unknown ' . get_class($this);

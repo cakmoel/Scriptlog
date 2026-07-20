@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Abstract Class Dashboard implement BoardInterface
  *
@@ -11,7 +13,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since    Since Release 1.0
  *
  */
-abstract class Dashboard implements BoardInterface
+abstract
+
+class Dashboard implements BoardInterface
 {
     /**
      * View

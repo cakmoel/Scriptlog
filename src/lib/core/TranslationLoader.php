@@ -1,6 +1,10 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
+use Scriptlog\Dao\LanguageDao;
+use Scriptlog\Dao\TranslationDao;
 
 class TranslationLoader
 {
@@ -30,7 +34,7 @@ class TranslationLoader
                 $this->translationDao = new TranslationDao();
                 $this->languageDao = new LanguageDao();
                 $this->initialized = true;
-            } catch (Throwable $e) {
+            } catch (\Throwable $e) {
                 $this->translationDao = null;
                 $this->languageDao = null;
             }
@@ -129,7 +133,7 @@ class TranslationLoader
             }
 
             return $result;
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->loadDefaultStrings($locale);
         }
     }
@@ -152,7 +156,7 @@ class TranslationLoader
         if (function_exists('theme_identifier')) {
             try {
                 return theme_identifier();
-            } catch (Throwable $e) {
+            } catch (\Throwable $e) {
                 return 'blog';
             }
         }

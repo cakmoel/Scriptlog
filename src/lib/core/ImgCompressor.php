@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /***********************************************************
  * #### PHP Image Compressor Class ####
  * Coded by Ican Bachors 2016.
@@ -8,6 +10,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Updates will be posted to this site.
  * @category Core Class
  ***********************************************************/
+
 class ImgCompressor
 {
     private $setting;

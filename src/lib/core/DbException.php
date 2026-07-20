@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * DbException class extends Abstract Class CoreException
  *
@@ -12,15 +14,14 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  */
 
-
-class DbException extends PDOException implements IDbThrowable
+class DbException extends \PDOException implements IDbThrowable
 {
     protected $message = 'Unknown Exception';
 
 
     protected $previous = null;
 
-    public function __construct(string $message = "", int $code = 0, ?Exception $previous = null)
+    public function __construct(string $message = "", int $code = 0, ?\Exception $previous = null)
     {
 
         $code = $this->getCode();

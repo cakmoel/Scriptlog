@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -12,22 +13,22 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  */
 
-class CoreException extends Exception implements ICoreThrowable
+class CoreException extends \Exception implements ICoreThrowable
 {
     /**
      * Previous exception
-     * @var Exception|null
+     * @var \Exception|null
      */
-    protected ?Exception $previous = null;
+    protected ?\Exception $previous = null;
 
     /**
      * CoreException constructor
      *
      * @param string|null $message
      * @param int $code
-     * @param Exception|null $previous
+     * @param \Exception|null $previous
      */
-    public function __construct(?string $message = null, int $code = 0, ?Exception $previous = null)
+    public function __construct(?string $message = null, int $code = 0, ?\Exception $previous = null)
     {
         if (is_null($message)) {
             $message = 'Unknown ' . get_class($this);

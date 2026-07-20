@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Random Class
  *
@@ -10,6 +12,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @see https://timoh6.github.io/2013/11/05/Secure-random-numbers-for-PHP-developers.html
  *
  */
+
 class Random
 {
     public const BLOCK_SIZE = 32;

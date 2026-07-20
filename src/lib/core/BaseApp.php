@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Abstract Class BaseApp implements AppInterface
  *
@@ -11,7 +13,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
-abstract class BaseApp implements AppInterface
+abstract
+
+class BaseApp implements AppInterface
 {
     /**
      * Page title

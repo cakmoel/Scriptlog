@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class Dispatcher
  *
@@ -20,6 +22,14 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since    Since Release 0.1
  *
  */
+
+use Scriptlog\Controller\DownloadController;
+use Scriptlog\Controller\LocaleController;
+use Scriptlog\Controller\SearchController;
+use Scriptlog\Dao\MediaDao;
+use Scriptlog\Model\DownloadModel;
+use Scriptlog\Service\DownloadService;
+
 class Dispatcher
 {
     /**
@@ -153,13 +163,27 @@ class Dispatcher
                     return;
                 }
 
-                // 7. Special handling for download_file - bypass theme headers/footers
+                // 7. Special handling for search - route to SearchController
+                if ($entry['key'] === 'search') {
+                    $controller = new SearchController($this->themeRenderer);
+                    $controller->search();
+                    return;
+                }
+
+                // 8. Special handling for locale - route to LocaleController
+                if ($entry['key'] === 'locale') {
+                    $controller = new LocaleController();
+                    $controller->switch();
+                    return;
+                }
+
+                // 9. Special handling for download_file - bypass theme headers/footers
                 if ($entry['key'] === 'download_file') {
                     $this->renderDownloadFile($requestPath);
                     return;
                 }
 
-                // 8. Render the found template
+                // 10. Render the found template (HTMX-aware)
                 $this->renderTheme($entry['key']);
                 return;
             }
@@ -355,6 +379,11 @@ class Dispatcher
      */
     private function renderTheme($template)
     {
+        if (function_exists('is_htmx_request') && is_htmx_request()) {
+            $this->renderHtmxFragment($template);
+            return;
+        }
+
         if ($this->themeRenderer) {
             $this->themeRenderer->render($template);
             return;
@@ -363,6 +392,27 @@ class Dispatcher
         call_theme_header();
         call_theme_content($template);
         call_theme_footer();
+    }
+
+    /**
+     * Render HTMX fragment — just the content template, no header/footer.
+     *
+     * @param string $template
+     */
+    private function renderHtmxFragment($template)
+    {
+        http_response_code(200);
+        header('Content-Type: text/html; charset=utf-8');
+
+        $themeDir = $this->theme_dir;
+
+        $templateFile = $themeDir . $template . '.php';
+
+        if (file_exists($templateFile)) {
+            require $templateFile;
+        } else {
+            echo '<!-- HTMX fragment: ' . htmlspecialchars($template, ENT_QUOTES, 'UTF-8') . ' -->';
+        }
     }
 
     /**
@@ -452,7 +502,7 @@ class Dispatcher
      */
     private function whiteListPathRequested()
     {
-        $base = ['/', '//', 'post', 'page', 'blog', 'category', 'archive', 'archives', 'tag', 'privacy', 'download', 'download_file'];
+        $base = ['/', '//', 'post', 'page', 'blog', 'category', 'archive', 'archives', 'tag', 'privacy', 'search', 'locale', 'download', 'download_file'];
 
         // Add locale prefixes if LocaleRouter is available
         if (class_exists('LocaleRouter')) {

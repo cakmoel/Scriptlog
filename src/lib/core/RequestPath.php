@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class RequestPath
  *
@@ -21,6 +23,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @property-read string $param3
  * @property-read string $param4
  */
+
 class RequestPath
 {
     private array $parts = [];

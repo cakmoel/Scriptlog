@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Generate random text-based CAPTCHAs with simple arithmetic and logic questions
  * Website: https://github.com/theodorejb/responsive-Captcha
@@ -22,7 +24,7 @@ class ResponsiveCaptcha
             // no session has been started; try starting it
 
             if (!session_start()) {
-                throw new Exception("Unable to start session");
+                throw new \Exception("Unable to start session");
             } else {
                 session_regenerate_id();
             }
@@ -46,7 +48,7 @@ class ResponsiveCaptcha
         // ensure that the session answer variable is set
 
         if (!isset($_SESSION[$this->sessionVariableName])) {
-            throw new Exception("The captcha answer session variable is not set");
+            throw new \Exception("The captcha answer session variable is not set");
         } else {
             $storedAnswer = $_SESSION[$this->sessionVariableName];
 
@@ -57,7 +59,7 @@ class ResponsiveCaptcha
             if ($answer == $storedAnswer || $answer === $this->getWordFromNumber($storedAnswer)) {
                 return true;
             } else {
-                throw new Exception("Incorrect captcha response");
+                throw new \Exception("Incorrect captcha response");
             }
 
             return false;
@@ -577,7 +579,7 @@ class ResponsiveCaptcha
 
                 return $numberName;
             } else {
-                throw new Exception("Number is out of range!");
+                throw new \Exception("Number is out of range!");
             }
         }
 
@@ -636,7 +638,7 @@ class ResponsiveCaptcha
 
             return $numbers;
         } else {
-            throw new Exception("Requested numbers are out of range!");
+            throw new \Exception("Requested numbers are out of range!");
         }
     }
 }

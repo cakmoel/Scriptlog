@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class DbMySQLi
  *
@@ -10,6 +12,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 1.0
  *
  */
+
 class DbMySQLi
 {
     private $dbc;
@@ -41,12 +44,12 @@ class DbMySQLi
 
         try {
             $this->setDbRealConnection();
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (!headers_sent()) {
                 $this->errors = LogError::setStatusCode(http_response_code(500));
             }
             $this->errors = LogError::exceptionHandler($th);
-        } catch (mysqli_sql_exception $e) {
+        } catch (\mysqli_sql_exception $e) {
             if (!headers_sent()) {
                 $this->errors = LogError::setStatusCode(http_response_code(500));
             }
@@ -144,7 +147,7 @@ class DbMySQLi
         try {
             $this->setDbRealConnection();
             return is_a($this->dbc, 'mysqli') ? $this->dbc->query($sql) : "";
-        } catch (mysqli_sql_exception $e) {
+        } catch (\mysqli_sql_exception $e) {
             $this->errors = LogError::setStatusCode(http_response_code(500));
             $this->errors = LogError::exceptionHandler($e);
             $this->disconnect();
@@ -360,7 +363,7 @@ class DbMySQLi
 
         if ($results) {
             if ($this->dbc->error) {
-                throw new mysqli_sql_exception($this->dbc->error);
+                throw new \mysqli_sql_exception($this->dbc->error);
             } else {
                 if ($row_count = $results->num_rows) {
                     return $row_count;
@@ -425,29 +428,29 @@ class DbMySQLi
             $this->dbc = mysqli_init();
 
             if (!$this->dbc) {
-                throw new mysqli_sql_exception("mysqli_init failed");
+                throw new \mysqli_sql_exception("mysqli_init failed");
             }
 
             if (!$this->dbc->options(MYSQLI_INIT_COMMAND, 'SET AUTOCOMMIT = 0')) {
-                throw new mysqli_sql_exception("Setting MYSQLI_INIT_COMMAND failed");
+                throw new \mysqli_sql_exception("Setting MYSQLI_INIT_COMMAND failed");
             }
 
             if (!$this->dbc->options(MYSQLI_OPT_CONNECT_TIMEOUT, 5)) {
-                throw new mysqli_sql_exception("Setting MYSQLI_OPT_CONNECT_TIMEOUT failed");
+                throw new \mysqli_sql_exception("Setting MYSQLI_OPT_CONNECT_TIMEOUT failed");
             }
 
             $this->dbc->ssl_set(null, null, $this->caRootPath($this->ca), null, null);
 
             if (!$this->dbc->real_connect($this->dbhost, $this->dbuser, $this->dbpass, $this->dbname, $this->dbport)) {
                 $this->disconnect();
-                throw new mysqli_sql_exception("Error Processiong Connection", 1);
+                throw new \mysqli_sql_exception("Error Processiong Connection", 1);
             }
         } else {
-            $this->dbc = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->dbname, $this->dbport);
+            $this->dbc = new \mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->dbname, $this->dbport);
 
             if ($this->dbc->connect_errno) {
                 $this->disconnect();
-                throw new mysqli_sql_exception("Error Processing Connection", 1);
+                throw new \mysqli_sql_exception("Error Processing Connection", 1);
             }
         }
 

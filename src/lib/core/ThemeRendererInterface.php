@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -12,6 +13,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Each rendering method outputs HTML directly via include statements.
  * Callers must not assume output buffering is active.
  */
+
 interface ThemeRendererInterface
 {
     /**

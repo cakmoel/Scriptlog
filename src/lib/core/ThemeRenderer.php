@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -25,6 +26,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *   $renderer->render404();
  * </code>
  */
+
 class ThemeRenderer implements ThemeRendererInterface
 {
     /**

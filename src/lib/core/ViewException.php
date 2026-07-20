@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * ViewException Class extends Exception implements IViewThrowable
  *
@@ -11,6 +13,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
-class ViewException extends Exception implements IViewThrowable
+
+class ViewException extends \Exception implements IViewThrowable
 {
 }

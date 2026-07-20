@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class RemoteAddress
  *
@@ -11,6 +13,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @license   https://github.com/zendframework/zend-http/blob/master/LICENSE.md New BSD License
  *
  */
+
 class RemoteAddress
 {
     /**

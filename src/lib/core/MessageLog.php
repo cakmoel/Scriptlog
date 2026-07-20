@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * MessageLog
  *
@@ -11,7 +13,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since Since Release 1.0
  *
  */
-final class MessageLog
+final
+
+class MessageLog
 {
     private static $display_errors;
 
@@ -71,7 +75,7 @@ MSG;
     /**
      * messageException
      *
-     * @param Exception|Throwable $exception
+     * @param \Exception|\Throwable $exception
      * @param string $logPath
      * @return string|void -- return string or void
      *
@@ -79,7 +83,7 @@ MSG;
     public static function messageException($exception, $logPath)
     {
 
-        if (! $exception instanceof Exception) {
+        if (! $exception instanceof \Exception) {
             $exception = new CoreException($exception);
         }
 
