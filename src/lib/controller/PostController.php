@@ -105,7 +105,7 @@ class PostController extends BaseApp
      *
      * @return string
      */
-    public function insert(): string
+    public function insert()
     {
         $errors = array();
         $checkError = true;
@@ -155,7 +155,7 @@ class PostController extends BaseApp
      * @param int $id
      * @return string
      */
-    public function update($id): string
+    public function update($id)
     {
         $errors = array();
         $checkError = true;
