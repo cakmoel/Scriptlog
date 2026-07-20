@@ -520,6 +520,404 @@ ScriptLog uses a **multi-layer architecture** designed for maintainability and s
 | 6 | **DAO** | `lib/dao/*` | Data access layer |
 | 7 | **View** | `lib/core/View.php` | Renders output |
 
+### PSR-4 Autoloading & Namespace Convention
+
+All project classes now use `Scriptlog\*` namespaces with backward-compatible `class_alias()` aliases:
+
+| Directory | Namespace | Example |
+|-----------|-----------|---------|
+| `lib/core/` | `Scriptlog\Core` | `Scriptlog\Core\Bootstrap` |
+| `lib/dao/` | `Scriptlog\Dao` | `Scriptlog\Dao\PostDao` |
+| `lib/service/` | `Scriptlog\Service` | `Scriptlog\Service\PostService` |
+| `lib/controller/` | `Scriptlog\Controller` | `Scriptlog\Controller\PostController` |
+| `lib/controller/api/` | `Scriptlog\Controller\Api` | `Scriptlog\Controller\Api\PostsApiController` |
+| `lib/model/` | `Scriptlog\Model` | `Scriptlog\Model\PostModel` |
+| `lib/handler/` | `Scriptlog\Handler` | `Scriptlog\Handler\PostHandler` |
+
+**Backward Compatibility:**
+- `lib/autoload-aliases.php` — 179 `class_alias()` entries mapping old global names to new namespaced classes (kept as reference)
+- `lib/autoload-aliases-map.php` — Static array map used by the lazy autoloader (fast, no class loading)
+- `lib/main.php` and `tests/bootstrap.php` register a lazy `spl_autoload_register()` that creates aliases on demand — **only when old class names are actually used at runtime**
+
+**Performance impact:** Lazy loading reduced autoload overhead from ~100ms to ~30ms and memory from 12MB to 6MB per request. See `benchmark/autoload_perf_bench.md`.
+
+### Migration Script (`lib/migrate-namespaces.php`)
+
+#### What Problem Did This Script Solve?
+
+Before the migration, all 179 project classes were in the **global namespace** — no `namespace` declarations at all. This meant any class could be referenced simply by its short name (e.g., `Bootstrap`, `PostDao`). While simple, this approach caused problems:
+
+- **Collisions**: Two Composer packages could define the same class name
+- **No autoloading control**: Composer's PSR-4 autoloader couldn't map paths to classes without namespaces
+- **Hard to modernize**: Modern PHP frameworks and tools expect namespaced code
+
+This script performed the **one-time migration** to add `namespace Scriptlog\*` declarations to all 179 class files, add cross-namespace `use` imports where needed, and generate backward-compatible `class_alias()` entries so existing code continued working.
+
+#### How It Works (3-Step Algorithm)
+
+| Step | What It Does | Files Affected |
+|------|-------------|----------------|
+| **1: Build class map** | Scans all `lib/` subdirectories, finds every class/interface/trait, maps each short name to its target namespace | None (read-only) |
+| **2: Process each file** | For every PHP file: tokenizes it, preserves existing `use` statements, detects cross-namespace references (extends, implements, new, instanceof, catch, ::), injects `namespace` declaration + new `use` statements | All 179 class files in `lib/core/`, `lib/dao/`, `lib/service/`, `lib/controller/`, `lib/model/`, `lib/handler/` |
+| **3: Generate aliases** | Writes `lib/autoload-aliases.php` with 179 `class_alias()` entries mapping old global names (e.g., `Bootstrap`) to new namespaced names (e.g., `Scriptlog\Core\Bootstrap`) | `lib/autoload-aliases.php` (created) |
+
+#### What It Did NOT Do
+
+- It did **not** create `lib/autoload-aliases-map.php` — that file was hand-crafted later in commit `20c376a2` as part of a performance optimization
+- It did **not** update `lib/main.php` or `tests/bootstrap.php` — those were updated in a later commit to use the lazy autoloader
+- It did **not** update `composer.json` — the PSR-4 autoloading config was added in Phase 1
+- It did **not** delete any files — backup `.bak` files were cleaned up in a separate commit
+
+#### The Tokenizer Logic (For Advanced Readers)
+
+The script uses PHP's built-in tokenizer (`token_get_all()`) rather than regex to safely parse PHP files. Here is what each token analysis does:
+
+```php
+// 1. Find existing "use" statements by locating T_USE tokens
+//    (must distinguish top-level use from trait use statements)
+if ($tokens[$i][0] === T_USE) { ... }
+
+// 2. Find the class/interface/trait declaration position
+//    (everything before it is the "header" to be rewritten)
+if ($tokens[$i][0] === T_CLASS && $classTokenPos === null) { ... }
+
+// 3. Detect cross-namespace references by examining context
+//    around each T_STRING token:
+//    extends, implements, new, instanceof, catch → needs use import
+//    :: (static call) → needs use import
+//    T_STRING followed by variable → type hint, needs use import
+if ($prevKind === T_EXTENDS || $prevKind === T_IMPLEMENTS || ...) {
+    $shouldUse = true;
+}
+```
+
+#### Practical Guidance for Developers Today
+
+Since the migration script was **deleted** after use, adding new classes today is a **manual process**:
+
+| When you create a new class... | You must update |
+|------------------------------|----------------|
+| New file in `lib/core/`, `lib/dao/`, etc. | Add the class to its appropriate namespace — no alias needed (new code uses namespaces) |
+| New **public API** class referencing old global names | Add `class_alias()` entry to `lib/autoload-aliases.php` |
+| New **public API** class referencing old global names | Add array entry to `lib/autoload-aliases-map.php` |
+
+**Example — adding a new class manually:**
+
+```php
+<?php
+// File: lib/service/NewsletterService.php
+namespace Scriptlog\Service;
+
+use Scriptlog\Dao\UserDao;  // Cross-namespace import (required!)
+
+class NewsletterService
+{
+    // ...
+}
+```
+
+Then add to both alias files:
+
+```php
+// lib/autoload-aliases.php
+class_alias('Scriptlog\Service\NewsletterService', 'NewsletterService');
+
+// lib/autoload-aliases-map.php (inside $aliasMap array)
+'NewsletterService' => 'Scriptlog\Service\NewsletterService',
+```
+
+#### Full Source Code (Archive Reference)
+
+The script below is the exact code committed in `99e7964c`. It is kept here for historical reference — **do not run it again** (it would add duplicate namespace declarations):
+
+```php
+<?php
+/**
+ * PSR-4 Phase 2 Migration Script
+ *
+ * 1. Adds namespace declarations to all project class files
+ * 2. Adds use statements for cross-namespace references
+ * 3. Preserves existing third-party use statements
+ * 4. Generates lib/autoload-aliases.php for backward compatibility
+ *
+ * Usage: php lib/migrate-namespaces.php
+ */
+
+$dirs = [
+    'Scriptlog\\Core'           => __DIR__ . '/core',
+    'Scriptlog\\Dao'            => __DIR__ . '/dao',
+    'Scriptlog\\Service'        => __DIR__ . '/service',
+    'Scriptlog\\Controller'     => __DIR__ . '/controller',
+    'Scriptlog\\Controller\\Api' => __DIR__ . '/controller/api',
+    'Scriptlog\\Model'          => __DIR__ . '/model',
+    'Scriptlog\\Handler'        => __DIR__ . '/handler',
+];
+
+$skipFiles = ['HTMLPurifier', 'Psr4AutoloadTest'];
+
+$classMap = [];
+$reverseMap = [];
+
+foreach ($dirs as $ns => $dir) {
+    $files = new DirectoryIterator($dir);
+    foreach ($files as $file) {
+        if (!$file->isFile() || $file->getExtension() !== 'php') continue;
+        $baseName = $file->getBasename('.php');
+        $skip = false;
+        foreach ($skipFiles as $pattern) {
+            if (strpos($baseName, $pattern) !== false) { $skip = true; break; }
+        }
+        if ($skip) continue;
+        $content = file_get_contents($file->getPathname());
+        if (preg_match('/^(?:abstract\s+)?(?:final\s+)?(?:class|interface|trait)\s+(\w+)/m', $content, $m)) {
+            $className = $m[1];
+            $classMap[$className] = $ns;
+            $reverseMap[$ns][] = $className;
+        }
+    }
+}
+echo "Found " . count($classMap) . " project classes\n";
+
+$processedFiles = 0;
+$filesWithUses = 0;
+$aliases = [];
+
+foreach ($dirs as $targetNs => $dir) {
+    $files = new DirectoryIterator($dir);
+    foreach ($files as $file) {
+        if (!$file->isFile() || $file->getExtension() !== 'php') continue;
+        $baseName = $file->getBasename('.php');
+        $skip = false;
+        foreach ($skipFiles as $pattern) {
+            if (strpos($baseName, $pattern) !== false) { $skip = true; break; }
+        }
+        if ($skip) continue;
+
+        $path = $file->getPathname();
+        $content = file_get_contents($path);
+
+        $definedClasses = [];
+        preg_match_all('/^(?:abstract\s+)?(?:final\s+)?(?:class|interface|trait)\s+(\w+)/m', $content, $matches);
+        foreach ($matches[1] as $cName) {
+            $definedClasses[] = $cName;
+            $aliases[$cName] = $targetNs . '\\' . $cName;
+        }
+        if (empty($definedClasses)) { echo "  SKIP (no class): $path\n"; continue; }
+
+        $tokens = @token_get_all($content);
+        if (!$tokens) { echo "  ERROR tokenizing: $path\n"; continue; }
+
+        $existingUses = [];
+        $classTokenPos = null;
+
+        for ($i = 0; $i < count($tokens); $i++) {
+            if (!is_array($tokens[$i])) continue;
+
+            if ($tokens[$i][0] === T_USE) {
+                $useStmt = '';
+                $j = $i;
+                while ($j < count($tokens)) {
+                    if (!is_array($tokens[$j])) {
+                        $useStmt .= $tokens[$j];
+                        if ($tokens[$j] === ';') break;
+                    } else {
+                        $useStmt .= $tokens[$j][1];
+                        if ($tokens[$j][1] === ';') break;
+                    }
+                    $j++;
+                }
+                if (preg_match('/^use\s+([^;]+?)(?:\s+as\s+\w+)?\s*;\s*$/', trim($useStmt), $m)) {
+                    $fqcn = trim($m[1]);
+                    $existingUses[] = ['stmt' => $useStmt, 'fqcn' => $fqcn, 'token_idx' => $i];
+                }
+            }
+
+            if (($tokens[$i][0] === T_CLASS || $tokens[$i][0] === T_INTERFACE || $tokens[$i][0] === T_TRAIT)
+                && $tokens[$i][1] !== '__halt_compiler' && $classTokenPos === null) {
+                $classTokenPos = $i;
+            }
+        }
+
+        if ($classTokenPos === null) { echo "  ERROR no class declaration in: $path\n"; continue; }
+
+        $classOffset = 0;
+        for ($j = 0; $j < $classTokenPos; $j++) {
+            if (is_array($tokens[$j])) {
+                $classOffset += strlen($tokens[$j][1]);
+            } else {
+                $classOffset += strlen($tokens[$j]);
+            }
+        }
+
+        $topLevelUses = [];
+        $topLevelFqcns = [];
+        foreach ($existingUses as $u) {
+            $useOffset = 0;
+            for ($j = 0; $j < $u['token_idx']; $j++) {
+                if (is_array($tokens[$j])) {
+                    $useOffset += strlen($tokens[$j][1]);
+                } else {
+                    $useOffset += strlen($tokens[$j]);
+                }
+            }
+            if ($useOffset < $classOffset) {
+                $topLevelUses[] = $u['stmt'];
+                $topLevelFqcns[] = $u['fqcn'];
+            }
+        }
+
+        $needsUse = [];
+
+        for ($i = 0; $i < count($tokens); $i++) {
+            if (!is_array($tokens[$i])) continue;
+            if ($tokens[$i][0] !== T_STRING) continue;
+            $name = $tokens[$i][1];
+            if (in_array($name, $definedClasses)) continue;
+
+            $classNs = $classMap[$name] ?? null;
+            if ($classNs === null) continue;
+            if ($classNs === $targetNs) continue;
+
+            $fqcn = $classNs . '\\' . $name;
+            if (in_array($fqcn, $topLevelFqcns)) continue;
+
+            $prevIdx = $i - 1;
+            while ($prevIdx >= 0 && is_array($tokens[$prevIdx]) && $tokens[$prevIdx][0] === T_WHITESPACE)
+                $prevIdx--;
+            $prevToken = $prevIdx >= 0 ? $tokens[$prevIdx] : null;
+            $prevKind = is_array($prevToken) ? $prevToken[0] : null;
+
+            $nextIdx = $i + 1;
+            while ($nextIdx < count($tokens) && is_array($tokens[$nextIdx]) && $tokens[$nextIdx][0] === T_WHITESPACE)
+                $nextIdx++;
+            $nextToken = $nextIdx < count($tokens) ? $tokens[$nextIdx] : null;
+            $nextKind = is_array($nextToken) ? $nextToken[0] : null;
+
+            $shouldUse = false;
+            if ($prevKind === T_EXTENDS || $prevKind === T_IMPLEMENTS
+                || $prevKind === T_NEW || $prevKind === T_INSTANCEOF
+                || $prevKind === T_CATCH) {
+                $shouldUse = true;
+            } elseif ($nextKind === T_DOUBLE_COLON) {
+                $shouldUse = true;
+            } elseif ($nextKind === T_VARIABLE) {
+                $shouldUse = true;
+            }
+
+            if ($shouldUse) {
+                $needsUse[$fqcn] = $name;
+            }
+        }
+
+        $headerContent = substr($content, 0, $classOffset);
+        $classContent = substr($content, $classOffset);
+
+        $headerWithoutUses = $headerContent;
+        foreach ($topLevelUses as $useStmt) {
+            $headerWithoutUses = str_replace($useStmt, '', $headerWithoutUses);
+        }
+        $headerWithoutUses = preg_replace('/\n\s*\n\s*\n+/', "\n\n", $headerWithoutUses);
+
+        $guardPos = strpos($headerWithoutUses, "defined('SCRIPTLOG')");
+        $guardLine = '';
+        if ($guardPos !== false) {
+            $guardEndPos = strpos($headerWithoutUses, "\n", $guardPos);
+            if ($guardEndPos === false) $guardEndPos = strlen($headerWithoutUses);
+            $guardLine = substr($headerWithoutUses, $guardPos, $guardEndPos - $guardPos);
+        }
+
+        $afterGuard = '';
+        if ($guardPos !== false) {
+            $guardEndPos = strpos($headerWithoutUses, "\n", $guardPos);
+            if ($guardEndPos === false) $guardEndPos = strlen($headerWithoutUses);
+            $afterGuard = trim(substr($headerWithoutUses, $guardEndPos + 1));
+        } else {
+            $phpPos = strpos($headerWithoutUses, '<?php');
+            if ($phpPos !== false) {
+                $afterGuard = trim(substr($headerWithoutUses, $phpPos + 5));
+            }
+        }
+
+        $newHeader = '<?php' . "\n\n";
+        $newHeader .= 'namespace ' . $targetNs . ';' . "\n";
+        if (!empty($guardLine)) {
+            $newHeader .= $guardLine . "\n";
+        }
+        if (!empty($afterGuard)) {
+            $newHeader .= "\n" . $afterGuard . "\n";
+        }
+
+        $allUses = [];
+
+        foreach ($topLevelFqcns as $i => $fqcn) {
+            $allUses[$fqcn] = $topLevelUses[$i];
+        }
+
+        foreach ($needsUse as $fqcn => $shortName) {
+            if (!isset($allUses[$fqcn])) {
+                $allUses[$fqcn] = 'use ' . $fqcn . ';';
+            }
+        }
+
+        ksort($allUses);
+
+        if (!empty($allUses)) {
+            $newHeader .= "\n";
+            foreach ($allUses as $fqcn => $stmt) {
+                $newHeader .= $stmt . "\n";
+            }
+        }
+
+        $newHeader .= "\n";
+        $newContent = $newHeader . $classContent;
+
+        file_put_contents($path, $newContent);
+        $processedFiles++;
+        $newUseCount = count($needsUse);
+
+        if ($newUseCount > 0) $filesWithUses++;
+
+        echo "  OK: " . basename($path) . " (" . $targetNs . ")"
+            . ($newUseCount > 0 ? ' +' . $newUseCount . ' uses' : '') . "\n";
+    }
+}
+
+$aliasContent = "<?php\n\n/**\n * PSR-4 Backward Compatibility Aliases\n *\n * Auto-generated by lib/migrate-namespaces.php\n */\n\n";
+
+ksort($aliases);
+foreach ($aliases as $shortName => $fqcn) {
+    $aliasContent .= "class_alias('{$fqcn}', '{$shortName}');\n";
+}
+$aliasContent .= "\n";
+
+$aliasPath = __DIR__ . '/autoload-aliases.php';
+if (file_exists($aliasPath)) copy($aliasPath, $aliasPath . '.bak');
+file_put_contents($aliasPath, $aliasContent);
+
+echo "\nGenerated aliases: $aliasPath (" . count($aliases) . " entries)\n";
+echo "\n=== Migration Summary ===\n";
+echo "Processed files: $processedFiles\n";
+echo "Files with new use statements: $filesWithUses\n";
+echo "Aliases generated: " . count($aliases) . "\n";
+echo "Done.\n";
+```
+
+**Writing new code:**
+```php
+<?php
+namespace Scriptlog\Controller\Api;
+
+use Scriptlog\Core\ApiResponse;
+use Scriptlog\Dao\PostDao;
+
+class MyApiController extends ApiController
+{
+    // ...
+}
+```
+
+**Key rule:** `class_alias()` does NOT help with unqualified type hints in namespaced files. Always add explicit `use` imports for cross-namespace classes.
+
 > **WARNING:** Never bypass the DAO layer when accessing the database. Always use prepared statements to prevent SQL injection.
 
 ### 404 Handling
@@ -695,10 +1093,12 @@ Scriptlog/
 |   |-- main.php               # Application bootstrap
 |   |-- common.php             # Constants and functions
 |   |-- options.php            # PHP configuration
-|   |-- Autoloader.php         # Class autoloader
+|   |-- Autoloader.php         # Legacy class autoloader
 |   |-- utility-loader.php     # Utility functions loader
+|   |-- autoload-aliases.php   # 179 class_alias() entries (reference only)
+|   |-- autoload-aliases-map.php # Static alias map for lazy autoloader
 |   |
-|   +-- core/                  # Core classes (80+ files)
+|   +-- core/                  # Core classes — Scriptlog\Core (80+ files)
 |       |-- Bootstrap.php      # Application initialization
 |       |-- Dispatcher.php     # URL routing
 |       |-- DbFactory.php      # PDO database connection
@@ -710,7 +1110,7 @@ Scriptlog/
 |       |-- ApiRouter.php      # API routing
 |       +-- ...
 |
-|   +-- dao/                  # Data Access Objects
+|   +-- dao/                  # Data Access Objects — Scriptlog\Dao
 |       |-- PostDao.php       # Posts CRUD
 |       |-- UserDao.php       # Users CRUD
 |       |-- CommentDao.php    # Comments CRUD
@@ -722,8 +1122,13 @@ Scriptlog/
 |       |-- ThemeDao.php      # Themes CRUD
 |       +-- ConfigurationDao.php
 |
-|   +-- service/               # Business logic layer
+|   +-- dto/                   # Data Transfer Objects
+|       |-- PostRequestDto.php
+|       +-- UploadedFileDto.php
+|
+|   +-- service/               # Business logic layer — Scriptlog\Service (21 files)
 |       |-- PostService.php
+|       |-- PostApplicationService.php
 |       |-- UserService.php
 |       |-- CommentService.php
 |       |-- TopicService.php
@@ -733,9 +1138,38 @@ Scriptlog/
 |       |-- PluginService.php
 |       |-- ThemeService.php
 |       |-- ConfigurationService.php
-|       +-- ReplyService.php
+|       |-- ReplyService.php
+|       |-- FrontService.php
+|       |-- ConsentService.php
+|       |-- DataRequestService.php
+|       |-- DownloadService.php
+|       |-- ExportService.php
+|       |-- MigrationService.php
+|       |-- LanguageService.php
+|       |-- TranslationService.php
+|       +-- NotificationService.php
 |
-|   +-- controller/            # Request controllers
+|   +-- handler/               # Request handlers — Scriptlog\Handler
+|       |-- PostHandler.php
+|       |-- PageHandler.php
+|       |-- CategoryHandler.php
+|       |-- TagHandler.php
+|       |-- ArchiveHandler.php
+|       |-- SearchHandler.php
+|       |-- PrivacyHandler.php
+|       |-- DownloadHandler.php
+|       |-- GalleryHandler.php
+|       |-- BlogHandler.php
+|       +-- HomeHandler.php
+|
+|   +-- validator/              # Validators
+|       |-- PostValidator.php
+|       |-- FileUploadValidator.php
+|       |-- ProtectedPostValidator.php
+|       |-- CompositeValidator.php
+|       +-- ValidationResult.php
+|
+|   +-- controller/            # Request controllers — Scriptlog\Controller (20 files)
 |       |-- PostController.php
 |       |-- UserController.php
 |       |-- CommentController.php
@@ -747,8 +1181,17 @@ Scriptlog/
 |       |-- ThemeController.php
 |       |-- ConfigurationController.php
 |       |-- ReplyController.php
+|       |-- DownloadController.php
+|       |-- DownloadAdminController.php
+|       |-- ExportController.php
+|       |-- ImportController.php
+|       |-- LanguageController.php
+|       |-- LocaleController.php
+|       |-- SearchController.php
+|       |-- TranslationController.php
+|       |-- ApiController.php
 |       |
-|       +-- api/              # API Controllers
+|       +-- api/              # API Controllers — Scriptlog\Controller\Api
 |           |-- PostsApiController.php
 |           |-- CategoriesApiController.php
 |           |-- CommentsApiController.php
@@ -760,7 +1203,7 @@ Scriptlog/
 |           |-- LanguagesApiController.php
 |           +-- TranslationsApiController.php
 |
-|   +-- model/                # Data models
+|   +-- model/                # Data models — Scriptlog\Model
 |       |-- PostModel.php
 |       |-- FrontContentModel.php
 |       |-- TopicModel.php
@@ -780,6 +1223,8 @@ Scriptlog/
 |       +-- ...
 |
 |   +-- vendor/              # Composer dependencies
+|
+|-- benchmark/               # Performance benchmarks
 |
 |-- public/                  # Public web root
 |   +-- themes/              # Theme templates
@@ -1079,14 +1524,19 @@ $tblNewsletter = "CREATE TABLE IF NOT EXISTS tbl_newsletter (
 
 ```php
 // lib/dao/NewsletterDao.php
-<?php
+namespace Scriptlog\Dao;
+
+use Scriptlog\Core\DbFactory;
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 class NewsletterDao
 {
     private $db;
 
     public function __construct()
     {
-        $this->db = DbFactory::connect([...]);
+        $this->db = Registry::get('dbc');
     }
 
     public function subscribe($email)
@@ -1121,7 +1571,12 @@ class NewsletterDao
 
 ```php
 // lib/service/NewsletterService.php
-<?php
+namespace Scriptlog\Service;
+
+use Scriptlog\Dao\NewsletterDao;
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 class NewsletterService
 {
     private $newsletterDao;
@@ -1135,7 +1590,7 @@ class NewsletterService
     {
         // Validate email
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new \Exception("Invalid email address");
+            throw new \InvalidArgumentException("Invalid email address");
         }
 
         return $this->newsletterDao->subscribe($email);
@@ -1152,7 +1607,12 @@ class NewsletterService
 
 ```php
 // lib/controller/NewsletterController.php
-<?php
+namespace Scriptlog\Controller;
+
+use Scriptlog\Service\NewsletterService;
+
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 class NewsletterController
 {
     private $newsletterService;
@@ -1177,6 +1637,8 @@ class NewsletterController
 ```
 
 > **TIP:** Always validate input in the service layer, not in DAOs. Keep DAOs focused on data operations only.
+>
+> **Backward compatibility:** When creating a new namespaced class, add a `class_alias()` entry to `lib/autoload-aliases.php` and to the `$aliasMap` in `lib/autoload-aliases-map.php` so existing global-name references continue working.
 
 ---
 
@@ -1227,6 +1689,10 @@ The actual `PostDao` class at `lib/dao/PostDao.php` extends `Dao`:
 
 ```php
 // lib/dao/PostDao.php
+namespace Scriptlog\Dao;
+
+use Scriptlog\Core\Dao;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 class PostDao extends Dao
@@ -1697,6 +2163,11 @@ The actual `PostService` class at `lib/service/PostService.php` manages post bus
 
 ```php
 // lib/service/PostService.php
+namespace Scriptlog\Service;
+
+use Scriptlog\Core\Validator;
+use Scriptlog\Dao\PostDao;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 class PostService
@@ -2070,6 +2541,7 @@ PostService depends on:
 | `ThemeService` | `lib/service/ThemeService.php` | Theme logic |
 | `ConfigurationService` | `lib/service/ConfigurationService.php` | Settings |
 | `ReplyService` | `lib/service/ReplyService.php` | Reply logic |
+| `PostApplicationService` | `lib/service/PostApplicationService.php` | Post orchestration (create/update with media, encryption, headlines) |
 | `FrontService` | `lib/service/FrontService.php` | Frontend post/page/archive queries |
 | `ConsentService` | `lib/service/ConsentService.php` | GDPR consent management |
 | `DataRequestService` | `lib/service/DataRequestService.php` | GDPR data request handling |
@@ -2095,348 +2567,173 @@ PostService depends on:
 | **View Rendering** | Controllers render views using View class |
 | **Session Messages** | Controllers set session status/error messages |
 
-### PostController Implementation
+### PostController Implementation (Thinned — Phase 3)
 
-The actual `PostController` class at `lib/controller/PostController.php` extends `BaseApp`:
+The `PostController` was refactored in Phase 3 to delegate business logic to `PostApplicationService`. The controller now handles **only** HTTP/security, validation, view rendering, and simple delegation:
 
 ```php
-// lib/controller/PostController.php
-defined('SCRIPTLOG') || die("Direct access not permitted");
+// lib/controller/PostController.php (thinned — ~290 lines)
+namespace Scriptlog\Controller;
+
+use Scriptlog\Core\ActionConst;
+use Scriptlog\Core\AppException;
+use Scriptlog\Core\BaseApp;
+use Scriptlog\Core\LogError;
+use Scriptlog\Core\View;
+use Scriptlog\Dao\MediaDao;
+use Scriptlog\Dao\TopicDao;
+use Scriptlog\Dto\PostRequestDto;
+use Scriptlog\Dto\UploadedFileDto;
+use Scriptlog\Service\PostApplicationService;
+use Scriptlog\Service\PostService;
+use Scriptlog\Validator\FileUploadValidator;
+use Scriptlog\Validator\PostValidator;
+use Scriptlog\Validator\ProtectedPostValidator;
 
 class PostController extends BaseApp
 {
     private $view;
     private $postService;
+    private $topicDao;
+    private $mediaDao;
+    private $appService;
 
-    public function __construct(PostService $postService)
+    public function __construct(PostService $postService, TopicDao $topicDao, MediaDao $mediaDao, PostApplicationService $appService)
     {
         $this->postService = $postService;
+        $this->topicDao = $topicDao;
+        $this->mediaDao = $mediaDao;
+        $this->appService = $appService;
     }
 
-    /**
-     * List all posts
-     * @return string Rendered view
-     */
     public function listItems()
     {
-        $errors = array();
-        $status = array();
-        $checkError = true;
-        $checkStatus = false;
-
-        // Check for session errors/status
-        if (isset($_SESSION['error'])) {
-            $checkError = false;
-            ($_SESSION['error'] == 'postNotFound') ? array_push($errors, "Error: Post Not Found!") : "";
-            unset($_SESSION['error']);
-        }
-
-        if (isset($_SESSION['status'])) {
-            $checkStatus = true;
-            ($_SESSION['status'] == 'postAdded') ? array_push($status, "New post added") : "";
-            ($_SESSION['status'] == 'postUpdated') ? array_push($status, "Post updated") : "";
-            ($_SESSION['status'] == 'postDeleted') ? array_push($status, "Post deleted") : "";
-            unset($_SESSION['status']);
-        }
-
-        $this->setView('all-posts');
-        $this->setPageTitle('Posts');
-        $this->view->set('pageTitle', $this->getPageTitle());
-
-        if (!$checkError) {
-            $this->view->set('errors', $errors);
-        }
-
-        if ($checkStatus) {
-            $this->view->set('status', $status);
-        }
-
-        // Get posts based on user level
-        if ($this->postService->postAuthorLevel() == 'administrator') {
-            $this->view->set('postsTotal', $this->postService->totalPosts());
-            $this->view->set('posts', $this->postService->grabPosts());
-        } else {
-            $this->view->set('postsTotal', $this->postService->totalPosts([$this->postService->postAuthorId()]));
-            $this->view->set('posts', $this->postService->grabPosts('ID', $this->postService->postAuthorId()));
-        }
-
-        return $this->view->render();
+        // Session status/error handling
+        // Delegates to $this->postService for data
+        // Renders 'all-posts' view
     }
 
-    /**
-     * Insert new post
-     * Handles form submission, file uploads, validation
-     * @return string Rendered view
-     */
     public function insert()
     {
-        $topics = new TopicDao();
-        $medialib = new MediaDao();
-        $errors = array();
-        $checkError = true;
-        $user_level = $this->postService->postAuthorLevel();
-
         if (isset($_POST['postFormSubmit'])) {
-            // Get file info
-            $file_location = isset($_FILES['media']['tmp_name']) ? $_FILES['media']['tmp_name'] : '';
-            $file_type = isset($_FILES['media']['type']) ? $_FILES['media']['type'] : '';
-            $file_name = isset($_FILES['media']['name']) ? $_FILES['media']['name'] : '';
-            $file_size = isset($_FILES['media']['size']) ? $_FILES['media']['size'] : '';
-            $file_error = isset($_FILES['media']['error']) ? $_FILES['media']['error'] : '';
-
-            // Define filters for form inputs
-            $filters = [
-                'post_title' => isset($_POST['post_title']) ? Sanitize::strictSanitizer($_POST['post_title']) : "",
-                'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'post_date' => isset($_POST['post_date']) ? Sanitize::mildSanitizer($_POST['post_date']) : "",
-                'image_id' => isset($_POST['image_id']) ? FILTER_SANITIZE_NUMBER_INT : "",
-                'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
-                'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'post_tags' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'post_status' => isset($_POST['post_status']) ? Sanitize::mildSanitizer($_POST['post_status']) : "",
-                'visibility' => isset($_POST['visibility']) ? Sanitize::mildSanitizer($_POST['visibility']) : "",
-                'post_password' => isset($_POST['post_password']) ? FILTER_SANITIZE_FULL_SPECIAL_CHARS : "",
-                'post_headlines' => FILTER_SANITIZE_NUMBER_INT,
-                'comment_status' => isset($_POST['comment_status']) ? Sanitize::mildSanitizer($_POST['comment_status']) : "",
-                'post_locale' => isset($_POST['post_locale']) ? Sanitize::mildSanitizer($_POST['post_locale']) : "en"
-            ];
-
-            $form_fields = ['post_title' => 200, 'post_summary' => 320, 'post_tags' => 200, 'post_content' => 500000];
-
-            // CSRF Token validation
             try {
-                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
-                    header($_SERVER["SERVER_PROTOCOL"] . MESSAGE_BADREQUEST, true, 400);
-                    throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
-                }
+                $this->checkPostCsrf();                // CSRF validation
+                $this->checkPostPayload();              // Form key whitelist
+                $checkError = $this->validatePostSubmission(...); // DTO + Validators
 
-                // Check required fields
-                if ((empty($_POST['post_title'])) || (empty($_POST['post_content']))) {
-                    $checkError = false;
-                    array_push($errors, "Please enter a required field");
-                }
-
-                // Form size validation
-                if (true === form_size_validation($form_fields)) {
-                    $checkError = false;
-                    array_push($errors, "Form data is longer than allowed");
-                }
-
-                // Validate dropdown selections
-                if (false === sanitize_selection_box(distill_post_request($filters)['post_status'], ['publish' => 'Publish', 'draft' => 'Draft'])) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_INVALID_SELECTBOX);
-                }
-
-                // Validate visibility
-                if (false === sanitize_selection_box(distill_post_request($filters)['visibility'], ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'])) {
-                    $checkError = false;
-                    array_push($errors, MESSAGE_INVALID_SELECTBOX);
-                }
-
-                // Validate password for protected posts
-                if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
-                    if (check_common_password($_POST['post_password']) === true) {
-                        $checkError = false;
-                        array_push($errors, "Your password seems to be the most hacked password, please try another");
-                    }
-                    if (false === check_pwd_strength($_POST['post_password'])) {
-                        $checkError = false;
-                        array_push($errors, MESSAGE_WEAK_PASSWORD);
-                    }
-                }
-
-                // Handle errors or process form
                 if (!$checkError) {
-                    // Render form with errors
-                    $this->setView('edit-post');
-                    $this->setPageTitle('Add New Post');
-                    $this->setFormAction(ActionConst::NEWPOST);
-                    $this->view->set('pageTitle', $this->getPageTitle());
-                    $this->view->set('formAction', $this->getFormAction());
-                    $this->view->set('errors', $errors);
-                    $this->view->set('formData', $_POST);
-                    $this->view->set('topics', $topics->setCheckBoxTopic());
-                    $this->view->set('medialibs', $medialib->imageUploadHandler());
-                    $this->view->set('postStatus', $this->postService->postStatusDropDown());
-                    $this->view->set('commentStatus', $this->postService->commentStatusDropDown());
-                    $this->view->set('postVisibility', $this->postService->visibilityDropDown());
-                    $this->view->set('postLocale', $this->postService->localeDropDown());
-                    $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
-                } else {
-                    // Process media upload
-                    if (!empty($file_location)) {
-                        // Upload file logic...
-                        $append_media = $medialib->createMedia($bind_media);
-                        $this->postService->setPostImage($append_media);
-                    }
-
-                    // Set post properties
-                    $this->postService->setPostAuthor((int)$this->postService->postAuthorId());
-                    $this->postService->setPostDate(date_for_database());
-                    $this->postService->setPostTitle(distill_post_request($filters)['post_title']);
-                    $this->postService->setPostSlug(distill_post_request($filters)['post_title']);
-                    $this->postService->setPostContent(distill_post_request($filters)['post_content']);
-                    $this->postService->setPublish(distill_post_request($filters)['post_status']);
-                    $this->postService->setVisibility(distill_post_request($filters)['visibility']);
-                    $this->postService->setComment(distill_post_request($filters)['comment_status']);
-                    $this->postService->setMetaDesc(distill_post_request($filters)['post_summary']);
-                    $this->postService->setPostLocale(distill_post_request($filters)['post_locale']);
-                    $this->postService->setPostTags(distill_post_request($filters)['post_tags']);
-
-                    // Handle protected posts
-                    if (isset($_POST['visibility']) && $_POST['visibility'] == 'protected') {
-                        $protected = protect_post(...);
-                        $this->postService->setPostContent($protected['post_content']);
-                        $this->postService->setProtected($protected['post_password']);
-                        $this->postService->setPassPhrase(distill_post_request($filters)['post_password']);
-                    }
-
-                    // Save post
-                    $this->postService->addPost();
-                    $_SESSION['status'] = "postAdded";
-                    direct_page('index.php?load=posts&status=postAdded', 200);
+                    $this->renderNewPostForm($errors, $_POST, ...);
+                    return $this->view->render();
                 }
+
+                // Delegate ALL business logic to PostApplicationService
+                $this->appService->createPost($file_location, $file_type, $file_name,
+                    $file_size, $file_extension, $new_filename, $user_level);
+
+                $_SESSION['status'] = "postAdded";
+                direct_page('index.php?load=posts&status=postAdded', 200);
             } catch (\Throwable $th) {
-                LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             }
-        } else {
-            // Render empty form for new post
-            $this->setView('edit-post');
-            $this->setPageTitle('Add new post');
-            $this->setFormAction(ActionConst::NEWPOST);
-            $this->view->set('pageTitle', $this->getPageTitle());
-            $this->view->set('formAction', $this->getFormAction());
-            $this->view->set('topics', $topics->setCheckBoxTopic());
-            $this->view->set('medialibs', $medialib->imageUploadHandler());
-            $this->view->set('postStatus', $this->postService->postStatusDropDown());
-            $this->view->set('commentStatus', $this->postService->commentStatusDropDown());
-            $this->view->set('postVisibility', $this->postService->visibilityDropDown());
-            $this->view->set('postLocale', $this->postService->localeDropDown());
-            $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
         }
 
+        $this->renderNewPostForm(null, null, ...);
         return $this->view->render();
     }
 
-    /**
-     * Update existing post
-     * @param int $id Post ID
-     * @return string Rendered view
-     */
     public function update($id)
     {
-        $topics = new TopicDao();
-        $medialib = new MediaDao();
-        $errors = array();
-        $checkError = true;
-        $user_level = $this->postService->postAuthorLevel();
+        $getPost = $this->postService->grabPost($id);
+        // ... build $data_post array ...
 
-        // Get existing post
-        if (!$getPost = $this->postService->grabPost($id)) {
-            $_SESSION['error'] = "postNotFound";
-            direct_page('index.php?load=posts&error=postNotFound', 404);
-        }
-
-        // Build post data array
-        $data_post = array(
-            'ID' => $getPost['ID'],
-            'media_id' => $getPost['media_id'],
-            'post_author' => $getPost['post_author'],
-            'post_date' => $getPost['post_date'],
-            'post_modified' => $getPost['post_modified'],
-            'post_title' => $getPost['post_title'],
-            'post_content' => $getPost['post_content'],
-            'post_summary' => $getPost['post_summary'],
-            'post_status' => $getPost['post_status'],
-            'post_visibility' => $getPost['post_visibility'],
-            'post_password' => $getPost['post_password'],
-            'post_tags' => $getPost['post_tags'],
-            'post_headlines' => $getPost['post_headlines'],
-            'comment_status' => $getPost['comment_status'],
-            'passphrase' => $getPost['passphrase']
-        );
-
-        // Handle form submission (similar to insert)
         if (isset($_POST['postFormSubmit'])) {
-            // Validation and update logic...
-            $this->postService->setPostId((int)distill_post_request($filters)['post_id']);
-            $this->postService->setPostAuthor($this->postService->postAuthorId());
-            $this->postService->setPostTitle(distill_post_request($filters)['post_title']);
-            $this->postService->setPostSlug(distill_post_request($filters)['post_title']);
-            $this->postService->setPublish(distill_post_request($filters)['post_status']);
-            // ... more setters
-            
-            $this->postService->modifyPost();
-            $_SESSION['status'] = "postUpdated";
-            direct_page('index.php?load=posts&status=postUpdated', 200);
-        } else {
-            // Render edit form with existing data
-            $this->setView('edit-post');
-            $this->setPageTitle('Edit Post');
-            $this->setFormAction(ActionConst::EDITPOST);
-            $this->view->set('pageTitle', $this->getPageTitle());
-            $this->view->set('formAction', $this->getFormAction());
-            $this->view->set('postData', $data_post);
-            $this->view->set('topics', $topics->setCheckBoxTopic($getPost['ID']));
-            $this->view->set('medialibs', $medialib->imageUploadHandler($getPost['media_id']));
-            
-            // Handle protected content decryption
-            if ($data_post['post_visibility'] == 'protected') {
-                $decrypted = decrypt_post_admin($getPost['ID']);
-                $this->view->set('postContent', $decrypted['post_content']);
-            } else {
-                $this->view->set('postContent', $data_post['post_content']);
-            }
+            try {
+                $this->checkPostCsrf();
+                $this->checkPostUpdatePayload();
+                $checkError = $this->validatePostUpdate(...);
 
-            $this->view->set('postStatus', $this->postService->postStatusDropDown($getPost['post_status']));
-            $this->view->set('commentStatus', $this->postService->commentStatusDropDown($getPost['comment_status']));
-            $this->view->set('postVisibility', $this->postService->visibilityDropDown($getPost['post_visibility']));
-            $this->view->set('postLocale', $this->postService->localeDropDown($getPost['post_locale'] ?? 'en'));
-            $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+                if (!$checkError) {
+                    $this->renderEditPostForm($errors, $data_post, ...);
+                    return $this->view->render();
+                }
+
+                // Delegate ALL business logic to PostApplicationService
+                $this->appService->updatePost((int)$id, $file_location, $file_type,
+                    $file_name, $file_size, $file_extension, $new_filename,
+                    $user_level, $data_post['media_id']);
+
+                $_SESSION['status'] = "postUpdated";
+                direct_page('index.php?load=posts&status=postUpdated', 200);
+            } catch (\Throwable $th) {
+                LogError::exceptionHandler($th);
+            }
         }
 
+        $this->renderEditPostForm(null, $data_post, ...);
         return $this->view->render();
     }
 
-    /**
-     * Delete post
-     * @param int $id Post ID
-     */
     public function remove($id)
     {
-        $id = abs((int)$id);
-        
-        if ($id <= 0) {
-            $_SESSION['error'] = "postNotFound";
-            direct_page('index.php?load=posts&error=postNotFound', 404);
-            return;
-        }
+        // Same pattern as before (no AppService needed for delete)
+        $this->postService->setPostId($id);
+        $this->postService->removePost();
+        $_SESSION['status'] = "postDeleted";
+        direct_page('index.php?load=posts&status=postDeleted', 200);
+    }
 
-        $getPost = $this->postService->grabPost($id);
+    // ─── Security ──────────────────────────────────────────────
 
-        if (!$getPost) {
-            $_SESSION['error'] = "postNotFound";
-            direct_page('index.php?load=posts&error=postNotFound', 404);
-            return;
-        }
-
-        try {
-            $this->postService->setPostId($id);
-            $this->postService->removePost();
-            $_SESSION['status'] = "postDeleted";
-            direct_page('index.php?load=posts&status=postDeleted', 200);
-        } catch (\Throwable $th) {
-            LogError::setStatusCode(http_response_code());
-            LogError::exceptionHandler($th);
+    private function checkPostCsrf()
+    {
+        if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+            throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
         }
     }
 
-    /**
-     * Set view
-     * @param string $viewName
-     */
+    private function checkPostPayload()
+    {
+        if (check_form_request($_POST, ['post_id', 'post_title', 'post_content',
+            'post_date', 'image_id', 'catID', ...]) === false) {
+            throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
+        }
+    }
+
+    // ─── Validation (DTO + Validators) ────────────────────────
+
+    private function validatePostSubmission(...)
+    {
+        $dto = PostRequestDto::fromGlobals();
+        $result = (new PostValidator())->validate($dto);
+        // ... merge errors ...
+
+        $uploadedFile = UploadedFileDto::fromGlobals();
+        if ($uploadedFile->isValid()) {
+            $fileResult = (new FileUploadValidator())->validate($uploadedFile);
+            // ... merge errors ...
+        }
+
+        if ($dto->isProtected()) {
+            $pwdResult = (new ProtectedPostValidator())->validate($dto);
+            // ... merge errors ...
+        }
+        return $checkError;
+    }
+
+    // ─── Rendering ────────────────────────────────────────────
+
+    private function renderNewPostForm($errors, $formData, $topics, $medialib, $user_level)
+    {
+        // Sets view, pageTitle, formAction, topics, medialibs,
+        // postStatus/commentStatus/visibility/locale dropdowns, csrfToken
+    }
+
+    private function renderEditPostForm($errors, $data_post, $getPost, $topics, $medialib, $user_level)
+    {
+        // Same as renderNewPostForm but with existing post data
+        // Handles protected post decryption via decrypt_post_admin()
+    }
+
     protected function setView($viewName)
     {
         $this->view = new View('admin', 'ui', 'posts', $viewName);
@@ -2449,12 +2746,16 @@ class PostController extends BaseApp
 | Method | Purpose |
 |-------|---------|
 | `listItems()` | Display all posts list |
-| `insert()` | Display form / create new post |
-| `update($id)` | Display form / update existing post |
+| `insert()` | Display form / create new post (delegates to `$this->appService->createPost()`) |
+| `update($id)` | Display form / update existing post (delegates to `$this->appService->updatePost()`) |
 | `remove($id)` | Delete post |
+| `checkPostCsrf()` | Validate CSRF token |
+| `checkPostPayload()` / `checkPostUpdatePayload()` | Whitelist POST keys |
+| `validatePostSubmission()` / `validatePostUpdate()` | DTO + Validator-based validation |
+| `renderNewPostForm()` / `renderEditPostForm()` | View rendering helpers |
 | `setView($name)` | Set view to render |
 
-### Controller Flow
+### Controller Flow (Post Refactoring)
 
 ```
 User Request
@@ -2462,14 +2763,25 @@ User Request
     v
 PostController::{method}()
     |
-    +-> Validate CSRF token
-    +-> Validate form inputs
-    +-> Handle file uploads (media)
-    +-> Call service setters
-    +-> Call service methods (addPost, modifyPost, removePost)
+    +-> checkPostCsrf()              — CSRF token validation
+    +-> checkPostPayload()           — Form key whitelist
+    +-> validatePostSubmission()     — DTO + PostValidator
+    |     +-> PostRequestDto::fromGlobals()
+    |     +-> (new PostValidator())->validate($dto)
+    |     +-> (new FileUploadValidator())->validate($uploadedFile)
+    |     +-> (new ProtectedPostValidator())->validate($dto)
+    +-> PostApplicationService       — All business logic
+    |     +-> createPost() / updatePost()
+    |           +-> File upload (upload_photo)
+    |           +-> PostService setters
+    |           +-> Password encryption (setProtected / setPassPhrase)
+    |           +-> Content encryption (protected posts)
+    |           +-> PostDao createPost / updatePost
     +-> Set session status
     +-> Redirect or render view
 ```
+
+> **Key insight**: The controller's `insert()` and `update()` methods are now ~15-20 lines each (down from ~80+). All post preparation logic — media upload, encryption, slug generation, tag/headline processing — moved verbatim into `PostApplicationService`. The PostApplicationService itself contains ~210 lines and is the orchestration layer between the controller and the domain services (PostService, TopicDao, MediaDao).
 
 ### BaseApp Class
 
@@ -2567,6 +2879,10 @@ The actual `PostModel` class at `lib/model/PostModel.php` extends `BaseModel` an
 
 ```php
 // lib/model/PostModel.php
+namespace Scriptlog\Model;
+
+use Scriptlog\Core\BaseModel;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 class PostModel extends BaseModel
@@ -4007,13 +4323,17 @@ APP_DEVELOPMENT    // true or false
 
 ## Key Classes
 
-| Category | Classes |
-|----------|---------|
-| **Core** | Bootstrap, Dispatcher, DbFactory, Authentication, SessionMaker, Registry, FormValidator, Sanitize, View |
-| **DAO** | PostDao, UserDao, CommentDao, ReplyDao, TopicDao, PostTopicDao, MediaDao, MediaMetaDao, MediaDownloadDao, PageDao, MenuDao, PluginDao, ThemeDao, ConfigurationDao, ConsentDao, DataRequestDao, PrivacyLogDao, PrivacyPolicyDao, LanguageDao, TranslationDao, UserTokenDao, LoginAttemptDao, DownloadLogDao |
-| **Service** | PostService, UserService, CommentService, ReplyService, TopicService, MediaService, PageService, MenuService, PluginService, ThemeService, ConfigurationService, ConsentService, DataRequestService, PrivacyLogService, LanguageService, TranslationService, DownloadService, ExportService, MigrationService, FrontService, NotificationService |
-| **Controller** | PostController, UserController, CommentController, ReplyController, TopicController, MediaController, PageController, MenuController, PluginController, ThemeController, ConfigurationController, DownloadController, DownloadAdminController, ExportController, ImportController, LanguageController, TranslationController |
-| **Utility** | DownloadHandler, DownloadSettings |
+All classes live under `Scriptlog\*` namespaces (e.g., `Scriptlog\Core\Bootstrap`, `Scriptlog\Dao\PostDao`).
+
+| Category | Namespace | Classes |
+|----------|-----------|---------|
+| **Core** | `Scriptlog\Core` | Bootstrap, Dispatcher, DbFactory, Authentication, SessionMaker, Registry, FormValidator, Sanitize, View |
+| **DAO** | `Scriptlog\Dao` | PostDao, UserDao, CommentDao, ReplyDao, TopicDao, PostTopicDao, MediaDao, MediaMetaDao, MediaDownloadDao, PageDao, MenuDao, PluginDao, ThemeDao, ConfigurationDao, ConsentDao, DataRequestDao, PrivacyLogDao, PrivacyPolicyDao, LanguageDao, TranslationDao, UserTokenDao, LoginAttemptDao, DownloadLogDao |
+| **Service** | `Scriptlog\Service` | PostService, UserService, CommentService, ReplyService, TopicService, MediaService, PageService, MenuService, PluginService, ThemeService, ConfigurationService, ConsentService, DataRequestService, PrivacyLogService, LanguageService, TranslationService, DownloadService, ExportService, MigrationService, FrontService, NotificationService |
+| **Controller** | `Scriptlog\Controller` | PostController, UserController, CommentController, ReplyController, TopicController, MediaController, PageController, MenuController, PluginController, ThemeController, ConfigurationController, DownloadController, DownloadAdminController, ExportController, ImportController, LanguageController, TranslationController |
+| **API Controller** | `Scriptlog\Controller\Api` | PostsApiController, CategoriesApiController, CommentsApiController, ArchivesApiController, SearchApiController, GdprApiController, LanguagesApiController, TranslationsApiController, MediaApiController, ProtectedPostApiController |
+| **Model** | `Scriptlog\Model` | PostModel, FrontContentModel, TopicModel, TagModel, PageModel, CommentModel, GalleryModel, ArchivesModel, DownloadModel |
+| **Handler** | `Scriptlog\Handler` | PostHandler, PageHandler, CategoryHandler, TagHandler, ArchiveHandler, SearchHandler, PrivacyHandler, DownloadHandler, GalleryHandler, BlogHandler, HomeHandler |
 
 ## Global Functions
 
