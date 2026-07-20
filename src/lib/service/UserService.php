@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Service;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * UserService Class
  *
@@ -11,6 +13,18 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Core\FormValidator;
+use Scriptlog\Core\Registry;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Core\ScriptlogCryptonize;
+use Scriptlog\Core\Session;
+use Scriptlog\Core\Tokenizer;
+use Scriptlog\Dao\CommentDao;
+use Scriptlog\Dao\PostDao;
+use Scriptlog\Dao\UserDao;
+use Scriptlog\Dao\UserTokenDao;
+
 class UserService
 {
     /**
@@ -589,7 +603,7 @@ class UserService
         if (isset($_COOKIE['scriptlog_auth'])) {
             try {
                 $this->user_login = ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], ScriptlogCryptonize::scriptlogCipherKey());
-            } catch (Throwable $e) {
+            } catch (\Throwable $e) {
                 $this->user_login = Session::getInstance()->scriptlog_session_login;
             }
         }

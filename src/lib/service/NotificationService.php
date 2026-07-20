@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Service;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * NotificationService Class
  *
@@ -14,6 +16,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
 class NotificationService
 {
     /**
@@ -45,7 +48,7 @@ class NotificationService
      *
      * Load SMTP configuration from database or config.php
      */
-    public function __construct(ConfigurationService $configService = null)
+    public function __construct(?ConfigurationService $configService = null)
     {
         $this->configService = $configService;
         $this->loadConfiguration();

@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Handler;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -8,6 +9,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Receives a month/year value from the dispatcher and renders the
  * archive template. Redirects to the homepage if no value is provided.
  */
+
+use Scriptlog\Core\ThemeRendererInterface;
+
 class ArchiveHandler implements FrontRequestHandler
 {
     /**

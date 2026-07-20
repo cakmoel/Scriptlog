@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Service;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * ExportService
  *
@@ -13,6 +15,15 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Core\ExportException;
+use Scriptlog\Core\Registry;
+use Scriptlog\Core\Sanitize;
+use BlogspotExporter;
+use GhostExporter;
+use ScriptlogExporter;
+use WordPressExporter;
+
 class ExportService
 {
     private $dbc;

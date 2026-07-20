@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Handler;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -9,6 +10,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * FrontRequestHandler implementations. Used by the dispatcher to look up
  * the correct handler for each incoming request.
  */
+
 class HandlerRegistry
 {
     /**

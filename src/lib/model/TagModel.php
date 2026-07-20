@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Model;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class TagModel extends Dao
  *
@@ -10,6 +12,10 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 1.0
  *
  */
+
+use Scriptlog\Core\BaseModel;
+use Scriptlog\Core\Paginator;
+
 class TagModel extends BaseModel
 {
     /**

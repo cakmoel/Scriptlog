@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Handler;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -8,6 +9,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Displays paginated blog posts. Rendering is delegated entirely
  * to the theme renderer; no parameter validation is required.
  */
+
+use Scriptlog\Core\ThemeRendererInterface;
+
 class BlogHandler implements FrontRequestHandler
 {
     /**

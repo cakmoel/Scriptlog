@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Handler;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -9,6 +10,10 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * DownloadController to stream the file. Otherwise it renders the
  * download information page via the theme renderer.
  */
+
+use Scriptlog\Controller\DownloadController;
+use Scriptlog\Core\ThemeRendererInterface;
+
 class DownloadHandler implements FrontRequestHandler
 {
     /**

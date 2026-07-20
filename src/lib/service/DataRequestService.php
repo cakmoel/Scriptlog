@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Service;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * DataRequestService Class
  *
@@ -13,6 +15,15 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Core\AppException;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Dao\CommentDao;
+use Scriptlog\Dao\DataRequestDao;
+use Scriptlog\Dao\PostDao;
+use Scriptlog\Dao\PrivacyLogDao;
+use Scriptlog\Dao\UserDao;
+
 class DataRequestService
 {
     /**
@@ -47,7 +58,7 @@ class DataRequestService
      * @param Sanitize $sanitizer
      * @param ConfigurationService|null $configService
      */
-    public function __construct(DataRequestDao $dataRequestDao, PrivacyLogDao $privacyLogDao, Sanitize $sanitizer, ConfigurationService $configService = null)
+    public function __construct(DataRequestDao $dataRequestDao, PrivacyLogDao $privacyLogDao, Sanitize $sanitizer, ?ConfigurationService $configService = null)
     {
         $this->dataRequestDao = $dataRequestDao;
         $this->privacyLogDao = $privacyLogDao;

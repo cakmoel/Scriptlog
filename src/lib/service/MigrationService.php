@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Service;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * MigrationService
  *
@@ -13,6 +15,15 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Core\ImportException;
+use Scriptlog\Core\Registry;
+use Scriptlog\Core\Sanitize;
+use BlogspotImporter;
+use GhostImporter;
+use ScriptlogImporter;
+use WordPressImporter;
+
 class MigrationService
 {
     private $dbc;

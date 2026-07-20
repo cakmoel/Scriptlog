@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Service;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class MediaService
  *
@@ -11,6 +13,12 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since    Since Release 1.0
  *
  */
+
+use Scriptlog\Core\FormValidator;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Dao\MediaDao;
+use Scriptlog\Model\DownloadModel;
+
 class MediaService
 {
     /**

@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Model;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class TopicProviderModel extends Dao
  *
@@ -10,6 +12,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 1.0
  *
  */
+
+use Scriptlog\Core\BaseModel;
+use Scriptlog\Core\Paginator;
+use Scriptlog\Core\Sanitize;
+
 class TopicModel extends BaseModel
 {
     /**
@@ -53,7 +60,7 @@ class TopicModel extends BaseModel
      * retrieves topic record by it slug record
      *
      * @param string $slug
-     * @param PDO::FETCH_ASSOC|PDO::FETCH_OBJECT $fetchMode
+     * @param int|null $fetchMode
      * @return mixed
      *
      */
@@ -76,7 +83,7 @@ class TopicModel extends BaseModel
      *
      * @param int|num $id
      * @param object $sanitize
-     * @param PDO::FETCH_ASSOC|PDO::FETCH_OBJECT $fetchMode
+     * @param int|null $fetchMode
      * @return mixed
      */
     public function getTopicById($id, $fetchMode = null)

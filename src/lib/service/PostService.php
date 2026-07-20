@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Service;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class PostService
  *
@@ -11,6 +13,14 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Core\FormValidator;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Core\Session;
+use Scriptlog\Dao\MediaDao;
+use Scriptlog\Dao\PostDao;
+use Scriptlog\Dao\TopicDao;
+
 class PostService
 {
     /**
@@ -423,7 +433,7 @@ class PostService
         if ($this->topics == 0) {
             $categoryId = $category->createTopic(['topic_title' => 'Uncategorized', 'topic_slug' => 'uncategorized']);
 
-            $getCategory = $category->findTopicById($categoryId, $this->sanitizer, PDO::FETCH_ASSOC);
+            $getCategory = $category->findTopicById($categoryId, $this->sanitizer, \PDO::FETCH_ASSOC);
 
             $topic_id = isset($getCategory['ID']) ? abs((int)$getCategory['ID']) : 0;
         }

@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Handler;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -10,6 +11,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * receive a ThemeRendererInterface instance to render the appropriate
  * theme template.
  */
+
 interface FrontRequestHandler
 {
     /**
