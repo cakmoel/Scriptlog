@@ -1,5 +1,8 @@
 <?php
+
+namespace Scriptlog\Controller\Api;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Posts API Controller
  *
@@ -12,6 +15,17 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Controller\ApiController;
+use Scriptlog\Core\ApiAuth;
+use Scriptlog\Core\ApiHateoas;
+use Scriptlog\Core\ApiResponse;
+use Scriptlog\Core\Registry;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Dao\CommentDao;
+use Scriptlog\Dao\PostDao;
+use Scriptlog\Dao\TopicDao;
+
 class PostsApiController extends ApiController
 {
     /**
@@ -20,7 +34,7 @@ class PostsApiController extends ApiController
     private $postDao;
 
     /**
-     * @var PostService
+     * @var \Scriptlog\Service\PostService
      */
     private $postService;
 
@@ -98,13 +112,13 @@ class PostsApiController extends ApiController
                     LIMIT " . $pagination['per_page'] . " OFFSET " . $pagination['offset'];
 
             $stmt = $dbc->query($sql);
-            $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $posts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             // Get total count
             $countSql = "SELECT COUNT(*) as total FROM tbl_posts 
                          WHERE post_status = 'publish' AND post_type = 'blog' AND post_visibility = 'public'";
             $countStmt = $dbc->query($countSql);
-            $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+            $total = $countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
 
             // Transform posts for API response
             $transformedPosts = array_map([$this, 'transformPost'], $posts);
@@ -161,7 +175,7 @@ class PostsApiController extends ApiController
 
             $stmt = $dbc->prepare($sql);
             $stmt->execute([$postId]);
-            $post = $stmt->fetch(PDO::FETCH_ASSOC);
+            $post = $stmt->fetch(\PDO::FETCH_ASSOC);
 
             if (!$post) {
                 ApiResponse::notFound('Post not found');
@@ -244,14 +258,14 @@ class PostsApiController extends ApiController
 
             $stmt = $dbc->prepare($sql);
             $stmt->execute([$postId, $pagination['per_page'], $pagination['offset']]);
-            $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $comments = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             // Get total count
             $countSql = "SELECT COUNT(*) as total FROM tbl_comments 
                          WHERE comment_post_id = ? AND comment_status = 'approved'";
             $countStmt = $dbc->prepare($countSql);
             $countStmt->execute([$postId]);
-            $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+            $total = $countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
 
             // Transform comments
             $transformedComments = array_map([$this, 'transformComment'], $comments);
@@ -352,7 +366,7 @@ class PostsApiController extends ApiController
             $fetchSql = "SELECT * FROM tbl_posts WHERE ID = ?";
             $fetchStmt = $dbc->prepare($fetchSql);
             $fetchStmt->execute([$postId]);
-            $createdPost = $fetchStmt->fetch(PDO::FETCH_ASSOC);
+            $createdPost = $fetchStmt->fetch(\PDO::FETCH_ASSOC);
 
             ApiResponse::created($this->transformPost($createdPost), 'Post created successfully', $this->hateoas->postLinks($postId, $slug), $this->getAppUrl() . '/api/v1/posts/' . $postId);
         } catch (\Throwable $e) {
@@ -393,7 +407,7 @@ class PostsApiController extends ApiController
             $checkSql = "SELECT ID, post_author FROM tbl_posts WHERE ID = ?";
             $checkStmt = $dbc->prepare($checkSql);
             $checkStmt->execute([$postId]);
-            $post = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            $post = $checkStmt->fetch(\PDO::FETCH_ASSOC);
 
             if (!$post) {
                 ApiResponse::notFound('Post not found');
@@ -468,7 +482,7 @@ class PostsApiController extends ApiController
             $fetchSql = "SELECT * FROM tbl_posts WHERE ID = ?";
             $fetchStmt = $dbc->prepare($fetchSql);
             $fetchStmt->execute([$postId]);
-            $updatedPost = $fetchStmt->fetch(PDO::FETCH_ASSOC);
+            $updatedPost = $fetchStmt->fetch(\PDO::FETCH_ASSOC);
 
             ApiResponse::success($this->transformPost($updatedPost), 200, 'Post updated successfully');
         } catch (\Throwable $e) {
@@ -509,7 +523,7 @@ class PostsApiController extends ApiController
             $checkSql = "SELECT ID FROM tbl_posts WHERE ID = ?";
             $checkStmt = $dbc->prepare($checkSql);
             $checkStmt->execute([$postId]);
-            $post = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            $post = $checkStmt->fetch(\PDO::FETCH_ASSOC);
 
             if (!$post) {
                 ApiResponse::notFound('Post not found');
@@ -611,7 +625,7 @@ class PostsApiController extends ApiController
 
             $stmt = $dbc->prepare($sql);
             $stmt->execute([$postId]);
-            $topics = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $topics = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             return array_map(function ($topic) {
                 return [
@@ -686,7 +700,7 @@ class PostsApiController extends ApiController
             $sql = "SELECT media_filename FROM tbl_media WHERE ID = ?";
             $stmt = $dbc->prepare($sql);
             $stmt->execute([$mediaId]);
-            $media = $stmt->fetch(PDO::FETCH_ASSOC);
+            $media = $stmt->fetch(\PDO::FETCH_ASSOC);
 
             if ($media) {
                 $appUrl = $this->getAppUrl();

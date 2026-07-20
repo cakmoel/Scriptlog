@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Controller\Api;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -14,6 +15,14 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Controller\ApiController;
+use Scriptlog\Core\ApiHateoas;
+use Scriptlog\Core\ApiResponse;
+use Scriptlog\Core\Registry;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Dao\CommentDao;
+
 class CommentsApiController extends ApiController
 {
     /**
@@ -92,13 +101,13 @@ class CommentsApiController extends ApiController
 
             $stmt = $dbc->prepare($sql);
             $stmt->execute($paramsArr);
-            $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $comments = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             // Get total count
             $countSql = "SELECT COUNT(*) as total FROM tbl_comments " . $countWhereClause;
             $countStmt = $dbc->prepare($countSql);
             $countStmt->execute($postIdFilter ? [$postIdFilter] : []);
-            $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+            $total = $countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
 
             // Transform comments
             $transformedComments = array_map([$this, 'transformComment'], $comments);
@@ -152,7 +161,7 @@ class CommentsApiController extends ApiController
 
             $stmt = $dbc->prepare($sql);
             $stmt->execute([$commentId]);
-            $comment = $stmt->fetch(PDO::FETCH_ASSOC);
+            $comment = $stmt->fetch(\PDO::FETCH_ASSOC);
 
             if (!$comment) {
                 ApiResponse::notFound('Comment not found');
@@ -208,7 +217,7 @@ class CommentsApiController extends ApiController
             $checkPostSql = "SELECT ID, comment_status FROM tbl_posts WHERE ID = ?";
             $checkPostStmt = $dbc->prepare($checkPostSql);
             $checkPostStmt->execute([$postId]);
-            $post = $checkPostStmt->fetch(PDO::FETCH_ASSOC);
+            $post = $checkPostStmt->fetch(\PDO::FETCH_ASSOC);
 
             if (!$post) {
                 ApiResponse::notFound('Post not found');
@@ -254,7 +263,7 @@ class CommentsApiController extends ApiController
             $fetchSql = "SELECT * FROM tbl_comments WHERE ID = ?";
             $fetchStmt = $dbc->prepare($fetchSql);
             $fetchStmt->execute([$commentId]);
-            $createdComment = $fetchStmt->fetch(PDO::FETCH_ASSOC);
+            $createdComment = $fetchStmt->fetch(\PDO::FETCH_ASSOC);
 
             ApiResponse::created(
                 $this->transformComment($createdComment),
@@ -300,7 +309,7 @@ class CommentsApiController extends ApiController
             $checkSql = "SELECT ID FROM tbl_comments WHERE ID = ?";
             $checkStmt = $dbc->prepare($checkSql);
             $checkStmt->execute([$commentId]);
-            $comment = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            $comment = $checkStmt->fetch(\PDO::FETCH_ASSOC);
 
             if (!$comment) {
                 ApiResponse::notFound('Comment not found');
@@ -348,7 +357,7 @@ class CommentsApiController extends ApiController
                          WHERE c.ID = ?";
             $fetchStmt = $dbc->prepare($fetchSql);
             $fetchStmt->execute([$commentId]);
-            $updatedComment = $fetchStmt->fetch(PDO::FETCH_ASSOC);
+            $updatedComment = $fetchStmt->fetch(\PDO::FETCH_ASSOC);
 
             ApiResponse::success($this->transformComment($updatedComment), 200, 'Comment updated successfully');
         } catch (\Throwable $e) {
@@ -389,7 +398,7 @@ class CommentsApiController extends ApiController
             $checkSql = "SELECT ID FROM tbl_comments WHERE ID = ?";
             $checkStmt = $dbc->prepare($checkSql);
             $checkStmt->execute([$commentId]);
-            $comment = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            $comment = $checkStmt->fetch(\PDO::FETCH_ASSOC);
 
             if (!$comment) {
                 ApiResponse::notFound('Comment not found');

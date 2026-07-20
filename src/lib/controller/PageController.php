@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class PageController
  *
@@ -12,6 +14,16 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @SuppressWarnings(PHPMD.ElseExpression)
  *
  */
+
+use Scriptlog\Core\ActionConst;
+use Scriptlog\Core\AppException;
+use Scriptlog\Core\BaseApp;
+use Scriptlog\Core\LogError;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Core\View;
+use Scriptlog\Dao\MediaDao;
+use Scriptlog\Service\PageService;
+
 class PageController extends BaseApp
 {
     /**
@@ -494,7 +506,7 @@ class PageController extends BaseApp
                 $this->pageService->removePage();
                 $_SESSION['status'] = "pageDeleted";
                 direct_page('index.php?load=pages&status=pageDeleted', 302);
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {

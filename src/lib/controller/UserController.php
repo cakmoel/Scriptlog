@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class UserController
  *
@@ -14,6 +16,19 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  */
 
 use Egulias\EmailValidator\Validation\RFCValidation;
+use Scriptlog\Core\ActionConst;
+use Scriptlog\Core\AppException;
+use Scriptlog\Core\Authentication;
+use Scriptlog\Core\BaseApp;
+use Scriptlog\Core\LogError;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Core\ScriptlogCryptonize;
+use Scriptlog\Core\Session;
+use Scriptlog\Core\Tokenizer;
+use Scriptlog\Core\View;
+use Scriptlog\Service\ConfigurationService;
+use Scriptlog\Service\NotificationService;
+use Scriptlog\Service\UserService;
 
 class UserController extends BaseApp
 {
@@ -221,7 +236,7 @@ class UserController extends BaseApp
             }
 
             $this->createNewUser($filters);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             LogError::setStatusCode(http_response_code());
             LogError::exceptionHandler($th);
         } catch (AppException $e) {
@@ -313,6 +328,9 @@ class UserController extends BaseApp
         }
 
         $this->userService->addUser();
+        
+        $_SESSION['status'] = "userAdded";
+        direct_page('index.php?load=users&status=userAdded', 302);
     }
 
     /**
@@ -593,7 +611,7 @@ class UserController extends BaseApp
             }
 
             $this->applyProfileUpdate($filters, $getProfile, $secret);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             LogError::setStatusCode(http_response_code());
             LogError::exceptionHandler($th);
         } catch (AppException $e) {
@@ -749,7 +767,7 @@ class UserController extends BaseApp
                 $this->userService->removeUserWithAnonymization($sanitizeID, $userEmail);
                 $_SESSION['status'] = "userDeleted";
                 direct_page('index.php?load=users&status=userDeleted', 302);
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {
@@ -844,7 +862,7 @@ class UserController extends BaseApp
             }
 
             $this->processProfileDeletion($filters, $getProfile, $authenticator);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             LogError::setStatusCode(http_response_code());
             LogError::exceptionHandler($th);
         } catch (AppException $e) {
@@ -865,7 +883,9 @@ class UserController extends BaseApp
             session_start();
             session_regenerate_id(true);
             Session::getInstance()->startSession();
-            ((!empty($_POST['current_pwd'])) && (is_a($authenticator, 'Authentication'))) ?? $authenticator->removeCookies();
+            if (!empty($_POST['current_pwd']) && ($authenticator instanceof Authentication)) {
+                $authenticator->removeCookies();
+            }
             Session::getInstance()->destroy();
 
             $userId = sanitizer(distill_post_request($filters)['user_id'], 'sql');

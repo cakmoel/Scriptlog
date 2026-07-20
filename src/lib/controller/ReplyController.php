@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class ReplyController extends BaseApp
  *
@@ -11,6 +13,15 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since    Since Release 1.0
  *
  */
+
+use Scriptlog\Core\ActionConst;
+use Scriptlog\Core\AppException;
+use Scriptlog\Core\BaseApp;
+use Scriptlog\Core\LogError;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Core\View;
+use Scriptlog\Service\ReplyService;
+
 class ReplyController extends BaseApp
 {
     private $view;
@@ -150,7 +161,7 @@ class ReplyController extends BaseApp
 
             $_SESSION['status'] = "replyAdded";
             direct_page('index.php?load=comments&action=editComment&Id=' . $parentId . '&status=replyAdded', 200);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             LogError::setStatusCode(http_response_code());
             LogError::exceptionHandler($th);
         } catch (AppException $e) {
@@ -247,7 +258,7 @@ class ReplyController extends BaseApp
 
             $_SESSION['status'] = "replyUpdated";
             direct_page('index.php?load=reply&action=editReply&Id=' . $id . '&status=replyUpdated', 200);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             LogError::setStatusCode(http_response_code());
             LogError::exceptionHandler($th);
         } catch (AppException $e) {
@@ -300,7 +311,7 @@ class ReplyController extends BaseApp
 
                 $_SESSION['status'] = "replyDeleted";
                 direct_page('index.php?load=comments', 200);
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {

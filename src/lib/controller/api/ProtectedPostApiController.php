@@ -1,5 +1,8 @@
 <?php
+
+namespace Scriptlog\Controller\Api;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Protected Post API Controller
  *
@@ -14,6 +17,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  */
 
 defined('SCRIPTLOG') || die('Direct access not permitted');
+
+use Scriptlog\Controller\ApiController;
+use Scriptlog\Core\ApiResponse;
 
 class ProtectedPostApiController extends ApiController
 {
@@ -39,33 +45,63 @@ class ProtectedPostApiController extends ApiController
         $postId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (empty($postId)) {
+            if (function_exists('is_htmx_request') && is_htmx_request()) {
+                render_htmx_fragment('unlock-error', ['error' => 'Post ID is required'], 400);
+                return;
+            }
             ApiResponse::error('Post ID is required', 400);
+            return;
         }
 
         $input = $this->getJsonBody();
         $password = isset($input['password']) ? trim($input['password']) : '';
 
         if (empty($password)) {
+            if (function_exists('is_htmx_request') && is_htmx_request()) {
+                render_htmx_fragment('unlock-error', ['error' => 'Password is required'], 400);
+                return;
+            }
             ApiResponse::error('Password is required', 400);
+            return;
         }
 
         if (function_exists('is_unlock_rate_limited') && is_unlock_rate_limited($postId)) {
+            if (function_exists('is_htmx_request') && is_htmx_request()) {
+                render_htmx_fragment('unlock-error', ['error' => 'Too many failed attempts. Please try again later.'], 429);
+                return;
+            }
             ApiResponse::error('Too many failed attempts. Please try again later.', 429);
+            return;
         }
 
         if (!function_exists('checking_post_password')) {
+            if (function_exists('is_htmx_request') && is_htmx_request()) {
+                render_htmx_fragment('unlock-error', ['error' => 'Password verification function not available'], 500);
+                return;
+            }
             ApiResponse::error('Password verification function not available', 500);
+            return;
         }
 
         if (!function_exists('decrypt_post')) {
+            if (function_exists('is_htmx_request') && is_htmx_request()) {
+                render_htmx_fragment('unlock-error', ['error' => 'Decryption function not available'], 500);
+                return;
+            }
             ApiResponse::error('Decryption function not available', 500);
+            return;
         }
 
         if (!checking_post_password($postId, $password)) {
             if (function_exists('track_failed_unlock_attempt')) {
                 track_failed_unlock_attempt($postId);
             }
+            if (function_exists('is_htmx_request') && is_htmx_request()) {
+                render_htmx_fragment('unlock-error', ['error' => 'Incorrect password'], 401);
+                return;
+            }
             ApiResponse::error('Incorrect password', 401);
+            return;
         }
 
         if (function_exists('clear_failed_unlock_attempts')) {
@@ -95,6 +131,14 @@ class ProtectedPostApiController extends ApiController
             $_SESSION['unlocked_posts'] = [];
         }
         $_SESSION['unlocked_posts'][$postId] = $password;
+
+        if (function_exists('is_htmx_request') && is_htmx_request()) {
+            render_htmx_fragment('unlock-success', [
+                'content' => $content,
+                'post_id' => $postId
+            ]);
+            return;
+        }
 
         ApiResponse::success([
             'content' => $content
@@ -132,7 +176,12 @@ class ProtectedPostApiController extends ApiController
             if (function_exists('track_failed_unlock_attempt')) {
                 track_failed_unlock_attempt($postId);
             }
+            if (function_exists('is_htmx_request') && is_htmx_request()) {
+                render_htmx_fragment('unlock-error', ['error' => 'Incorrect password'], 401);
+                return;
+            }
             ApiResponse::error('Incorrect password', 401);
+            return;
         }
 
         if (function_exists('clear_failed_unlock_attempts')) {
@@ -140,6 +189,15 @@ class ProtectedPostApiController extends ApiController
         }
 
         $isValid = checking_post_password($postId, $password);
+
+        if (function_exists('is_htmx_request') && is_htmx_request()) {
+            render_htmx_fragment('unlock-success', [
+                'content' => '',
+                'post_id' => $postId,
+                'verified' => true
+            ]);
+            return;
+        }
 
         ApiResponse::success([
             'valid' => $isValid

@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class ConfigurationController
  *
@@ -11,6 +13,17 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Core\ActionConst;
+use Scriptlog\Core\AppException;
+use Scriptlog\Core\LogError;
+use Scriptlog\Core\Registry;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Core\Session;
+use Scriptlog\Core\View;
+use Scriptlog\Service\ConfigurationService;
+use Scriptlog\Service\LanguageService;
+
 class ConfigurationController
 {
     /**
@@ -132,7 +145,7 @@ class ConfigurationController
                     $_SESSION['status'] = "generalConfigUpdated";
                     direct_page('index.php?load=option-general&status=generalConfigUpdated', 302);
                 }
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {
@@ -151,7 +164,7 @@ class ConfigurationController
                     $_SESSION['status'] = "cacheCleared";
                     direct_page('index.php?load=option-general&status=cacheCleared', 302);
                 }
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             }
@@ -670,14 +683,14 @@ class ConfigurationController
                   'support_label' => $_POST['support_label'] ?? 'Support'
                 ];
 
-                if (DownloadSettings::saveSettings($settings)) {
+                if (\DownloadSettings::saveSettings($settings)) {
                     $_SESSION['status'] = 'downloadConfigUpdated';
                     direct_page('index.php?load=option-downloads&action=downloadConfig&status=downloadConfigUpdated', 302);
                 } else {
                     $checkError = false;
                     array_push($errors, "Failed to save settings");
                 }
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {
@@ -706,8 +719,8 @@ class ConfigurationController
 
         $this->view->set('pageTitle', $this->getPageTitle());
         $this->view->set('formAction', $this->getFormAction());
-        $this->view->set('currentSettings', DownloadSettings::getAllSettings());
-        $this->view->set('defaultMimeTypes', DownloadSettings::DEFAULT_MIME_TYPES);
+        $this->view->set('currentSettings', \DownloadSettings::getAllSettings());
+        $this->view->set('defaultMimeTypes', \DownloadSettings::DEFAULT_MIME_TYPES);
         $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
 
         return $this->view->render();
@@ -780,7 +793,7 @@ class ConfigurationController
                     $_SESSION['status'] = "mailConfigUpdated";
                     direct_page('index.php?load=option-mail&status=mailConfigUpdated', 302);
                 }
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {

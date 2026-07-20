@@ -1,6 +1,12 @@
 <?php
 
+namespace Scriptlog\Controller\Api;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
+use Scriptlog\Controller\ApiController;
+use Scriptlog\Core\ApiResponse;
+use Scriptlog\Service\LanguageService;
+use Scriptlog\Service\TranslationService;
 
 class TranslationsApiController extends ApiController
 {

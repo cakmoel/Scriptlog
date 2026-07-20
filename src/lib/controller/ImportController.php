@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * ImportController
  *
@@ -14,6 +16,13 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @SuppressWarnings(PHPMD.ElseExpression)
  *
  */
+
+use Scriptlog\Core\BaseApp;
+use Scriptlog\Core\Session;
+use Scriptlog\Core\View;
+use Scriptlog\Dao\UserDao;
+use Scriptlog\Service\MigrationService;
+
 class ImportController extends BaseApp
 {
     private $migrationService;
@@ -82,7 +91,7 @@ class ImportController extends BaseApp
         $this->setPageTitle('Import Content');
         $this->view = new View('admin', 'ui', 'import', 'index');
 
-        $users = $this->userDao->getUsers('ID', PDO::FETCH_ASSOC);
+        $users = $this->userDao->getUsers('ID', \PDO::FETCH_ASSOC);
 
         $this->view->set('pageTitle', $this->getPageTitle());
         $this->view->set('errors', $this->error);

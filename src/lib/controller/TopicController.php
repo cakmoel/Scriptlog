@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class TopicController
  *
@@ -11,6 +13,15 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Core\ActionConst;
+use Scriptlog\Core\AppException;
+use Scriptlog\Core\BaseApp;
+use Scriptlog\Core\LogError;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Core\View;
+use Scriptlog\Service\TopicService;
+
 class TopicController extends BaseApp
 {
     private $view;
@@ -118,7 +129,7 @@ class TopicController extends BaseApp
                     $_SESSION['status'] = "topicAdded";
                     direct_page('index.php?load=topics&status=topicAdded', 302);
                 }
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
                 direct_page('index.php?load=topics&error=internalError', 500);
@@ -208,7 +219,7 @@ class TopicController extends BaseApp
                     $_SESSION['status'] = "topicUpdated";
                     direct_page('index.php?load=topics&status=topicUpdated', 302);
                 }
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
                 direct_page('index.php?load=topics&error=internalError', 500);
@@ -276,7 +287,7 @@ class TopicController extends BaseApp
                     $_SESSION['status'] = "topicDeleted";
                     direct_page('index.php?load=topics&status=topicDeleted', 302);
                 }
-            } catch (Throwable $th) {
+            } catch (\Throwable $th) {
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             } catch (AppException $e) {

@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * API Base Controller
  *
@@ -14,6 +16,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Core\ApiAuth;
+use Scriptlog\Core\ApiHateoas;
+use Scriptlog\Core\ApiResponse;
+
 class ApiController
 {
     /**

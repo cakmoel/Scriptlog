@@ -1,6 +1,11 @@
 <?php
 
+namespace Scriptlog\Controller;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
+use Scriptlog\Core\ServiceException;
+use Scriptlog\Core\View;
+use Scriptlog\Service\LanguageService;
 
 class LanguageController
 {
@@ -86,7 +91,7 @@ class LanguageController
 
             $_SESSION['status'] = 'languageCreated';
             direct_page('index.php?load=languages&status=languageCreated', 302);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             $_SESSION['error'] = $th->getMessage();
             direct_page('index.php?load=languages&error=createFailed', 302);
         }
@@ -131,7 +136,7 @@ class LanguageController
 
             $_SESSION['status'] = 'languageUpdated';
             direct_page('index.php?load=languages&status=languageUpdated', 302);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             $_SESSION['error'] = $th->getMessage();
             direct_page('index.php?load=languages&error=updateFailed', 302);
         }
@@ -153,7 +158,7 @@ class LanguageController
 
             $_SESSION['status'] = 'languageDeleted';
             direct_page('index.php?load=languages&status=languageDeleted', 302);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             $_SESSION['error'] = $th->getMessage();
             direct_page('index.php?load=languages&error=deleteFailed', 302);
         }
@@ -164,7 +169,7 @@ class LanguageController
         try {
             $this->languageService->setDefaultLanguage($id);
             $_SESSION['status'] = 'defaultSet';
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             $_SESSION['error'] = $th->getMessage();
         }
 
