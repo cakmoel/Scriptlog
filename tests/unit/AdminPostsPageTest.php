@@ -51,12 +51,12 @@ class AdminPostsPageTest extends TestCase
         $this->assertStringContainsString('PostService', $this->source);
     }
 
-    public function testPostControllerInstantiationWithThreeParams(): void
+    public function testPostControllerInstantiationWithFourParams(): void
     {
         if (!$this->source) {
             $this->markTestSkipped('admin/posts.php not found');
         }
-        $this->assertStringContainsString('new PostController($postService, $topicDao, $mediaDao)', $this->source);
+        $this->assertStringContainsString('new PostController($postService, $topicDao, $mediaDao, $postAppService)', $this->source);
     }
 
     public function testHasActionSwitch(): void

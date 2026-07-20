@@ -8,7 +8,8 @@ $postDao = class_exists('PostDao') ? new PostDao() : "";
 $topicDao = class_exists('TopicDao') ? new TopicDao() : "";
 $mediaDao = class_exists('MediaDao') ? new MediaDao() : "";
 $postService = class_exists('PostService') ? new PostService($postDao, $app->validator, $app->sanitizer) : "";
-$postController = class_exists('PostController') ? new PostController($postService, $topicDao, $mediaDao) : "";
+$postAppService = class_exists('PostApplicationService') ? new PostApplicationService($postService) : "";
+$postController = class_exists('PostController') ? new PostController($postService, $topicDao, $mediaDao, $postAppService) : "";
 
 try {
     switch ($action) {
