@@ -17,10 +17,10 @@ $(document).ready(function () {
     }
 
     $("#colour").change(function () {
+        var val = $(this).val();
+        if (val !== '' && /^[\w-]+$/.test(val)) {
 
-        if ($(this).val() !== '') {
-
-            var theme_csspath = 'css/style.' + $(this).val() + '.css';
+            var theme_csspath = 'css/style.' + val + '.css';
 
             alternateColour.attr("href", theme_csspath);
 
@@ -53,7 +53,7 @@ $(document).ready(function () {
     $('.link-scroll').bind('click', function (e) {
         var href = this.getAttribute('href');
         if (href && href.charAt(0) === '#') {
-            var $target = $(href);
+            var $target = $(document).find(href);
             if ($target.length) {
                 $('html, body').stop().animate({
                     scrollTop: $target.offset().top + 2
