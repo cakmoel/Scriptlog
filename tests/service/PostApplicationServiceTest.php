@@ -32,12 +32,21 @@ class PostApplicationServiceTest extends TestCase
 
     public function testCreatePostCallsAddPost(): void
     {
-        $_POST['post_title'] = 'Test Post';
-        $_POST['post_content'] = 'Content';
-        $_POST['post_status'] = 'publish';
-        $_POST['visibility'] = 'public';
-        $_POST['comment_status'] = 'open';
-        $_POST['post_locale'] = 'en';
+        $filtered = [
+            'post_title' => 'Test Post',
+            'post_content' => 'Content',
+            'post_status' => 'publish',
+            'visibility' => 'public',
+            'comment_status' => 'open',
+            'post_locale' => 'en',
+            'post_summary' => '',
+            'post_tags' => '',
+            'post_headlines' => 0,
+            'catID' => [1],
+            'post_date' => '',
+            'image_id' => '',
+            'post_password' => '',
+        ];
 
         $this->postService->expects($this->once())
             ->method('addPost');
@@ -45,18 +54,29 @@ class PostApplicationServiceTest extends TestCase
         $this->postService->method('postAuthorId')->willReturn(1);
 
         $this->appService->createPost(
-            '', '', '', 0, '', '', 'administrator', null
+            '', '', '', 0, '', '', 'administrator', $filtered
         );
     }
 
     public function testUpdatePostCallsModifyPost(): void
     {
-        $_POST['post_title'] = 'Updated Post';
-        $_POST['post_content'] = 'Updated content';
-        $_POST['post_status'] = 'publish';
-        $_POST['visibility'] = 'public';
-        $_POST['comment_status'] = 'open';
-        $_POST['post_locale'] = 'en';
+        $filtered = [
+            'post_id' => 1,
+            'post_title' => 'Updated Post',
+            'post_content' => 'Updated content',
+            'post_status' => 'publish',
+            'visibility' => 'public',
+            'comment_status' => 'open',
+            'post_locale' => 'en',
+            'post_summary' => '',
+            'post_tags' => '',
+            'post_headlines' => 0,
+            'catID' => [1],
+            'post_date' => '',
+            'image_id' => '',
+            'post_password' => '',
+            'post_modified' => '',
+        ];
 
         $this->postService->expects($this->once())
             ->method('modifyPost');
@@ -65,7 +85,7 @@ class PostApplicationServiceTest extends TestCase
         $this->postService->method('grabPost')->willReturn(null);
 
         $this->appService->updatePost(
-            1, '', '', '', 0, '', '', 'administrator', null, null
+            1, '', '', '', 0, '', '', 'administrator', null, $filtered
         );
     }
 
@@ -81,6 +101,10 @@ class PostApplicationServiceTest extends TestCase
             'post_summary' => 'Summary',
             'post_tags' => '',
             'post_headlines' => 0,
+            'catID' => [1],
+            'post_date' => '',
+            'image_id' => '',
+            'post_password' => '',
         ];
 
         $this->postService->expects($this->once())
@@ -106,6 +130,11 @@ class PostApplicationServiceTest extends TestCase
             'post_summary' => 'New summary',
             'post_tags' => 'php, testing',
             'post_headlines' => 1,
+            'catID' => [1],
+            'post_date' => '',
+            'image_id' => '',
+            'post_password' => '',
+            'post_modified' => '',
         ];
 
         $this->postService->expects($this->once())
