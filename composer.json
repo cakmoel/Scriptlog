@@ -62,7 +62,10 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "autoload": {
-        "classmap": ["src/lib/"]
+        "classmap": ["src/lib/"],
+        "psr-4": {
+            "Scriptlog\\": "src/lib/"
+        }
     },
     "extra": {
         "bamarni-bin": {
@@ -91,7 +94,7 @@
         "test:coverage-clover": "phpunit --configuration phpunit.xml --coverage-clover build/coverage.xml",
         "compat": "phpcs -p lib/ --standard=phpcs-compatibility.xml",
         "compat:report": "phpcs -p lib/ --standard=phpcs-compatibility.xml --report-full=build/php-compatibility.txt",
-        "audit": "composer audit",
+        "composer-audit": "composer audit",
         "analyse": [
             "@phpstan",
             "@phpcs",
@@ -108,7 +111,7 @@
             "@phpstan:strict",
             "@phpcs",
             "@test",
-            "@audit"
+            "@composer-audit"
         ]
     }
 }

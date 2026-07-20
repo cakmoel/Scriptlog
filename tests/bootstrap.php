@@ -23,20 +23,27 @@ if (function_exists('load_core_utilities')) {
 require_once __DIR__ . '/../src/lib/utility/rate-limiter.php';
 require_once __DIR__ . '/../src/lib/core/ApiHateoas.php';
 
-// Setup autoloader for DAO and Service classes
+// Register lazy PSR-4 backward-compatibility aliases FIRST
+// so old class names resolve before the legacy Autoloader tries to include files.
+if (file_exists(__DIR__ . '/../src/lib/autoload-aliases-map.php')) {
+    $scriptlogAliasMap = require __DIR__ . '/../src/lib/autoload-aliases-map.php';
+    spl_autoload_register(function ($className) use ($scriptlogAliasMap) {
+        if (isset($scriptlogAliasMap[$className])) {
+            class_alias($scriptlogAliasMap[$className], $className);
+        }
+    });
+}
+
+// Setup autoloader for legacy class directories (files without namespaces)
+// Namespaced classes under src/lib/ are handled by Composer's PSR-4 autoloader.
 if (file_exists(__DIR__ . '/../src/lib/Autoloader.php')) {
     require_once __DIR__ . '/../src/lib/Autoloader.php';
     
     if (class_exists('Autoloader')) {
         Autoloader::setBaseDir(__DIR__ . '/..');
         Autoloader::addClassDir(array(
-            'src/lib/core'       . DIRECTORY_SEPARATOR,
-            'src/lib/dao'        . DIRECTORY_SEPARATOR,
-            'src/lib/service'    . DIRECTORY_SEPARATOR,
-            'src/lib/controller' . DIRECTORY_SEPARATOR,
-            'src/lib/model'      . DIRECTORY_SEPARATOR,
-            'src/lib/utility'    . DIRECTORY_SEPARATOR,
-            'src/lib/handler'    . DIRECTORY_SEPARATOR
+            // Only directories with non-namespaced files or procedural utilities
+            'src/lib/utility'    . DIRECTORY_SEPARATOR
         ));
     }
 }
