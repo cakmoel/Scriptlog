@@ -2,7 +2,7 @@
 /**
  * PostController Constructor Test
  *
- * Tests for the refactored PostController constructor with 3 params.
+ * Tests for the refactored PostController constructor with 4 params.
  *
  * @category Tests
  * @version 1.0
@@ -18,7 +18,7 @@ class PostControllerConstructorTest extends TestCase
             $this->markTestSkipped('PostController class not found');
         }
         $reflection = new ReflectionMethod(PostController::class, '__construct');
-        $this->assertEquals(3, $reflection->getNumberOfParameters());
+        $this->assertEquals(4, $reflection->getNumberOfParameters());
     }
 
     public function testPostControllerConstructorParameterTypes(): void
@@ -28,10 +28,11 @@ class PostControllerConstructorTest extends TestCase
         }
         $reflection = new ReflectionMethod(PostController::class, '__construct');
         $params = $reflection->getParameters();
-        $this->assertCount(3, $params);
+        $this->assertCount(4, $params);
         $this->assertEquals('postService', $params[0]->getName());
         $this->assertEquals('topicDao', $params[1]->getName());
         $this->assertEquals('mediaDao', $params[2]->getName());
+        $this->assertEquals('appService', $params[3]->getName());
     }
 
     public function testPostControllerInsertMethodExists(): void
@@ -79,18 +80,22 @@ class PostControllerConstructorTest extends TestCase
 
     public function testPostControllerSetProtectedPostContentPassesTrueToSetPostContent(): void
     {
-        $source = @file_get_contents(__DIR__ . '/../../src/lib/controller/PostController.php');
+        $source = @file_get_contents(__DIR__ . '/../../src/lib/service/PostApplicationService.php');
         if (!$source) {
-            $this->markTestSkipped('PostController.php not found');
+            $this->markTestSkipped('PostApplicationService.php not found');
         }
         $this->assertStringContainsString('setPostContent($protected[\'post_content\'], true)', $source);
     }
 
-    public function testPostControllerProcessPostUpdateMethodExists(): void
+    public function testPostControllerDelegatesToApplicationService(): void
     {
-        if (!class_exists('PostController')) {
-            $this->markTestSkipped('PostController class not found');
-        }
-        $this->assertTrue(method_exists(PostController::class, 'processPostUpdate'));
+        $this->assertTrue(method_exists(PostController::class, 'insert'));
+        $this->assertTrue(method_exists(PostController::class, 'update'));
+        $this->assertTrue(class_exists(\Scriptlog\Service\PostApplicationService::class));
+    }
+
+    public function testPostApplicationServiceHasUpdateMethod(): void
+    {
+        $this->assertTrue(method_exists(\Scriptlog\Service\PostApplicationService::class, 'updatePost'));
     }
 }
