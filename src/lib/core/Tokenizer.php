@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class Tokenizer
  *
@@ -27,7 +29,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version  1.0
  *
  */
-final class Tokenizer
+final
+
+class Tokenizer
 {
     /**
      * Create token

@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class SessionMakerException extends CoreException
  *
@@ -10,6 +12,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 1.0
  *
  */
-class SessionMakerException extends Exception implements ISessionThrowable
+
+class SessionMakerException extends \Exception implements ISessionThrowable
 {
 }

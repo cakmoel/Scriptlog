@@ -1,11 +1,14 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * A simple Read-Only Data Object to hold application state.
  *
  *
  */
+
 class AppContext
 {
     private array $container = [];

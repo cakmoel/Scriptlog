@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted.");
+
 /**
  * interface DbInterface
  * Describe the functionality
@@ -13,6 +15,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted.");
  * @since     Since Release 1.0
  *
  */
+
 interface DbInterface
 {
     /**
@@ -34,7 +37,7 @@ interface DbInterface
      *
      * @param string $sql
      * @param array $parameters
-     * @return PDOStatement|false
+     * @return \PDOStatement|false
      */
     public function dbQuery(string $sql, array $parameters = []);
 

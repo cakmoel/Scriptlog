@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /*
  * Class Ubench
  *
@@ -58,7 +60,7 @@ class Ubench
     public function end()
     {
         if (!$this->hasStarted()) {
-            throw new LogicException("You must call start()");
+            throw new \LogicException("You must call start()");
         }
 
         $this->end_time = microtime(true);
@@ -77,11 +79,11 @@ class Ubench
     public function getTime($raw = false, $format = null)
     {
         if (!$this->hasStarted()) {
-            throw new LogicException("You must call start()");
+            throw new \LogicException("You must call start()");
         }
 
         if (!$this->hasEnded()) {
-            throw new LogicException("You must call end()");
+            throw new \LogicException("You must call end()");
         }
 
         $elapsed = $this->end_time - $this->start_time;

@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * final class HandleRequest
  *
@@ -13,7 +15,15 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since Since Release 1.0
  *
  */
-final class HandleRequest
+use Scriptlog\Controller\DownloadController;
+use Scriptlog\Dao\MediaDao;
+use Scriptlog\Handler\HandlerRegistry;
+use Scriptlog\Model\DownloadModel;
+use Scriptlog\Service\DownloadService;
+
+final
+
+class HandleRequest
 {
     /**
      * requestPathURI

@@ -1,6 +1,9 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
+use Scriptlog\Dao\ConfigurationDao;
 
 class LocaleDetector
 {
@@ -55,7 +58,7 @@ class LocaleDetector
 
             $this->autoDetectEnabled = ($autoDetect['setting_value'] ?? '1') === '1';
             $this->settingsLoaded = true;
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             $this->availableLocales = ['en'];
             $this->settingsLoaded = true;
         }

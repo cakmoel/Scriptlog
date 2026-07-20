@@ -1,8 +1,7 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
-
-use Medoo\Medoo;
 
 /**
  * Class MedooInit
@@ -12,6 +11,9 @@ use Medoo\Medoo;
  * @license MIT
  *
  */
+
+use Medoo\Medoo;
+
 class MedooInit
 {
     protected static $database;

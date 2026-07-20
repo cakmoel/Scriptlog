@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class FrontHelper
  *
@@ -15,6 +17,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since Since Release 1.0
  *
  */
+
+use Scriptlog\Service\FrontService;
+
 class FrontHelper
 {
     /**
@@ -186,7 +191,7 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
             $results = $result ? $result->fetch() : null;
 
             return empty($results) ? null : $results;
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             return [];
         }
     }

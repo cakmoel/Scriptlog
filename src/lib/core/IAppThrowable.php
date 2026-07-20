@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * interface IAppThrowable extends IThrowable
  *
@@ -8,6 +10,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @author M.Noermoehammad
  *
  */
+
 interface IAppThrowable extends IThrowable
 {
 }

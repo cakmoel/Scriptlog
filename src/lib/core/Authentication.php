@@ -1,8 +1,8 @@
 <?php
 
-use Defuse\Crypto\Key;
-
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class Authentication
  *
@@ -13,6 +13,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Defuse\Crypto\Key;
+use Scriptlog\Dao\UserDao;
+use Scriptlog\Dao\UserTokenDao;
+
 class Authentication
 {
     /**
@@ -142,7 +147,7 @@ class Authentication
         if (isset($_COOKIE['scriptlog_auth'])) {
             try {
                 $this->session_cookies = ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $this->key);
-            } catch (Throwable $e) {
+            } catch (\Throwable $e) {
                 $this->session_cookies = '';
                 $this->clearAuthCookies('');
             }

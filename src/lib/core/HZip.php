@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * HZip Class
  * Zip a folder (include itself)
@@ -9,12 +11,13 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @link https://secure.php.net/manual/en/class.ziparchive.php
  *
  */
+
 class HZip
 {
     /**
       * Add files and sub-directories in a folder to zip file.
       * @param string $folder
-      * @param ZipArchive $zipFile
+      * @param \ZipArchive $zipFile
       * @param int $exclusiveLength Number of text to be exclusived from the file path.
       */
     private static function folderToZip($folder, &$zipFile, $exclusiveLength)
@@ -51,8 +54,8 @@ class HZip
         $parentPath = $pathInfo['dirname'];
         $dirName = $pathInfo['basename'];
 
-        $z = new ZipArchive();
-        $z->open($outZipPath, ZIPARCHIVE::CREATE);
+        $z = new \ZipArchive();
+        $z->open($outZipPath, \ZipArchive::CREATE);
         $z->addEmptyDir($dirName);
         self::folderToZip($sourcePath, $z, strlen("$parentPath/"));
         $z->close();

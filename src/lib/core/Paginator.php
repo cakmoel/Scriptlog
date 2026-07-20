@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class Paginator
  *
@@ -10,6 +12,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since    October 20, 2012
  *
  */
+
 class Paginator
 {
     /**

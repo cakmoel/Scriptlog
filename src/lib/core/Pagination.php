@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Pagination class
  * digunakan untuk paging
@@ -9,6 +11,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @author   Lukmanul Hakim @lokomedia
  *
  */
+
 class Pagination
 {
     /**

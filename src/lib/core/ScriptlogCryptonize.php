@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -13,11 +14,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  */
 
+use Defuse\Crypto\Crypto;
+use Defuse\Crypto\Exception\BadFormatException;
+use Defuse\Crypto\Key;
 use Laminas\Crypt\BlockCipher;
 use Laminas\Crypt\Symmetric\Openssl;
-use Defuse\Crypto\Crypto;
-use Defuse\Crypto\Key;
-use Defuse\Crypto\Exception\BadFormatException;
 
 class ScriptlogCryptonize
 {
@@ -169,7 +170,7 @@ class ScriptlogCryptonize
             $combined = $hmac . $iv . $ciphertext;
 
             return base64_encode($combined);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             self::logError($e);
             throw $e;
         }
@@ -245,7 +246,7 @@ class ScriptlogCryptonize
             }
 
             return $plaintext;
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             if (!$e instanceof ScriptlogCryptonizeException) {
                 self::logError($e);
             }
@@ -268,7 +269,7 @@ class ScriptlogCryptonize
             if (strpos($keyFile, '.php') !== false) {
                 try {
                     $keyAscii = require $keyFile;
-                } catch (Throwable $e) {
+                } catch (\Throwable $e) {
                     error_log("Failed to load key from {$keyFile}: " . $e->getMessage());
                     $keyObject = Key::createNewRandomKey();
                     $keyAscii = $keyObject->saveToAsciiSafeString();
@@ -280,7 +281,7 @@ class ScriptlogCryptonize
             if (strpos($keyFile, '.php') === false) {
                 $keyAscii = file_get_contents($keyFile);
                 if ($keyAscii === false) {
-                    throw new RuntimeException("Cannot read key file: {$keyFile}");
+                    throw new \RuntimeException("Cannot read key file: {$keyFile}");
                 }
             }
 
@@ -377,7 +378,7 @@ class ScriptlogCryptonize
         }
 
         try {
-            $mysqli = new mysqli($dbHost, $dbUser, $dbPass, $dbName, (int)$dbPort);
+            $mysqli = new \mysqli($dbHost, $dbUser, $dbPass, $dbName, (int)$dbPort);
 
             if ($mysqli->connect_error) {
                 return;
@@ -391,7 +392,7 @@ class ScriptlogCryptonize
             }
 
             $mysqli->close();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("ScriptlogCryptonize: Failed to update defuse_key_path in database: " . $e->getMessage());
         }
     }
@@ -484,7 +485,7 @@ class ScriptlogCryptonize
         }
 
         try {
-            $mysqli = new mysqli($dbHost, $dbUser, $dbPass, $dbName, (int)$dbPort);
+            $mysqli = new \mysqli($dbHost, $dbUser, $dbPass, $dbName, (int)$dbPort);
 
             if ($mysqli->connect_error) {
                 return null;
@@ -503,7 +504,7 @@ class ScriptlogCryptonize
             }
 
             $mysqli->close();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Error reading defuse_key_path from database: " . $e->getMessage());
         }
 
@@ -541,13 +542,13 @@ class ScriptlogCryptonize
      *
      * @param int $length
      * @return string
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     private static function generateRandomBytes(int $length): string
     {
         try {
             return random_bytes($length);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             if (function_exists('openssl_random_pseudo_bytes')) {
                 $strong = false;
                 $bytes = openssl_random_pseudo_bytes($length, $strong);
@@ -555,7 +556,7 @@ class ScriptlogCryptonize
                     return $bytes;
                 }
             }
-            throw new RuntimeException('No secure random byte generator available: ' . $e->getMessage());
+            throw new \RuntimeException('No secure random byte generator available: ' . $e->getMessage());
         }
     }
 
@@ -585,9 +586,9 @@ class ScriptlogCryptonize
     /**
      * Log encryption errors
      *
-     * @param Exception $e
+     * @param \Throwable $e
      */
-    private static function logError(Throwable $e): void
+    private static function logError(\Throwable $e): void
     {
         if (class_exists('LogError')) {
             LogError::setStatusCode(http_response_code());

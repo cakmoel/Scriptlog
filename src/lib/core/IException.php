@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * interface IException
  *
@@ -12,6 +14,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since    1.0
  *
  */
+
 interface IException
 {
     public function getMessage();

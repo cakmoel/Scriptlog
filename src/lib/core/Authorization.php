@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class Authorization
  *
@@ -10,6 +12,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 1.0
  *
  */
+
 class Authorization
 {
     /**
@@ -31,14 +34,14 @@ class Authorization
      *
      * @param object $authentication Instance to set
      * @return void
-     * @throws InvalidArgumentException If $authentication is not an instance of Authentication
+     * @throws \InvalidArgumentException If $authentication is not an instance of Authentication
      *
      */
     public static function setAuthInstance($authentication): void
     {
 
         if (! ($authentication instanceof Authentication)) {
-            throw new InvalidArgumentException('Argument must be an instance of Authentication');
+            throw new \InvalidArgumentException('Argument must be an instance of Authentication');
         }
 
         self::$authentication = $authentication;

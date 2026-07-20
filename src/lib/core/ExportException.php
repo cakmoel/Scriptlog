@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class ExportException
  *
@@ -13,9 +15,10 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
 class ExportException extends CoreException
 {
-    public function __construct($message = "", $code = 0, Throwable $previous = null)
+    public function __construct($message = "", $code = 0, ?\Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

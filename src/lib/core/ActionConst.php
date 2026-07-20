@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * The collection of actions constant
  *
@@ -11,6 +13,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since    Since Release 1.0
  *
  */
+
 class ActionConst
 {
     // action constand for dashboard

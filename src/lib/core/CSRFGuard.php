@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * CSRFGuard
  *
@@ -11,6 +13,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 1.0
  *
  */
+
 class CSRFGuard
 {
     private static $checkOrigin = false;
@@ -19,7 +22,7 @@ class CSRFGuard
      * check
      *
      * @method public static check()
-     * @return true|false|Exception
+     * @return true|false|\Exception
      *
      */
     public static function check($key, $origin, $throwException = false, $timespan = null, $multiple = false)

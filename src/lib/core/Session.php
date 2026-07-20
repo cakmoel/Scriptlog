@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class Session
  * Example:
@@ -14,6 +16,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 1.0
  *
  */
+
 class Session
 {
     public const SESSION_STARTED = true;

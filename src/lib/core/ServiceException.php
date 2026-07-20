@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class ServiceException extends Exception implements IEventThrowable
  *
@@ -18,7 +20,7 @@ class ServiceException extends \Exception implements IServiceThrowable
 
     protected $previous;
 
-    public function __construct($message = null, $code = 0, ?Exception $previous = null)
+    public function __construct($message = null, $code = 0, ?\Exception $previous = null)
     {
 
         $code = $this->getCode();

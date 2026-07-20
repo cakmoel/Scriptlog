@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * ScriptlogCryptoException extends CoreException
  *
@@ -10,6 +12,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 1.0
  *
  */
+
 class ScriptlogCryptonizeException extends CoreException
 {
 }

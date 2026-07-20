@@ -1,5 +1,8 @@
 <?php
+
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * API HATEOAS Links Generator
  *
@@ -12,6 +15,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version   1.0
  * @since     1.0.0
  */
+
 class ApiHateoas
 {
     /**

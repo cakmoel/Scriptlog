@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -13,6 +14,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version  1.0
  * @since Since Release 0.1
  */
+
 class DebugRoute
 {
     private static $routes = [

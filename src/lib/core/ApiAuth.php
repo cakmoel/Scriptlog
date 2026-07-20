@@ -1,5 +1,8 @@
 <?php
+
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * API Authentication
  *
@@ -13,6 +16,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
 class ApiAuth
 {
     /**
@@ -102,7 +106,7 @@ class ApiAuth
 
             $stmt = $dbc->prepare($sql);
             $stmt->execute([$apiKey]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $user = $stmt->fetch(\PDO::FETCH_ASSOC);
 
             if ($user && !$user['user_banned'] && self::isAccountLocked($user) === false) {
                 self::$user = $user;
@@ -152,7 +156,7 @@ class ApiAuth
 
             $stmt = $dbc->prepare($sql);
             $stmt->execute([substr($token, 0, 16)]); // Use selector part of token
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $result = $stmt->fetch(\PDO::FETCH_ASSOC);
 
             if ($result) {
                 // Verify the full token hash
@@ -322,7 +326,7 @@ class ApiAuth
 
                 $stmt = $dbc->prepare($sql);
                 $stmt->execute([$ipAddress]);
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                $result = $stmt->fetch(\PDO::FETCH_ASSOC);
 
                 if ($result && $result['attempts'] >= self::MAX_LOGIN_ATTEMPTS) {
                     // Too many failed attempts
@@ -480,7 +484,7 @@ class ApiAuth
             // Check if user already has an API key
             $sql = "SELECT ID FROM tbl_settings WHERE setting_name = 'api_key_user_" . (int)$userId . "'";
             $stmt = $dbc->query($sql);
-            $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+            $existing = $stmt->fetch(\PDO::FETCH_ASSOC);
 
             if ($existing) {
                 // Update existing

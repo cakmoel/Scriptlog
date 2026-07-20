@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -19,7 +20,8 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  * @psalm-suppress PossiblyUnusedMethod
  */
-class ThemeResolutionException extends RuntimeException
+
+class ThemeResolutionException extends \RuntimeException
 {
     /**
      * Create an exception for a theme that could not be resolved.

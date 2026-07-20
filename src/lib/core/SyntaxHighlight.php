@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Generic Syntax Highlighting with Regular Expressions
  *
@@ -9,6 +11,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @see https://phoboslab.org/log/2007/08/generic-syntax-highlighting-with-regular-expressions
  *
  */
+
 class SyntaxHighlight
 {
     public static function process($s)

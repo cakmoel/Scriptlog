@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Dao Class
  *
@@ -13,6 +15,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
 class Dao
 {
     /**
@@ -284,7 +287,7 @@ class Dao
      * @param mixed $str Input value to filter
      * @param string $type Sanitization type ('sql' or 'xss')
      * @return int|string Sanitized value as integer (sql) or string (xss)
-     * @throws InvalidArgumentException When input is invalid
+     * @throws \InvalidArgumentException When input is invalid
      */
     protected function filteringId(Sanitize $sanitize, $str, $type)
     {
@@ -292,7 +295,7 @@ class Dao
 
         // If $str is null or empty, throw exception immediately
         if ($str === null || $str === '') {
-            throw new InvalidArgumentException("Input value cannot be empty");
+            throw new \InvalidArgumentException("Input value cannot be empty");
         }
 
         // Convert to appropriate type based on $type
@@ -302,7 +305,7 @@ class Dao
                 $intVal = filter_var($str, FILTER_VALIDATE_INT);
 
                 if ($intVal === false || $intVal <= 0) {
-                    throw new InvalidArgumentException(
+                    throw new \InvalidArgumentException(
                         sprintf(
                             "Invalid ID: '%s' - must be a positive integer",
                             is_scalar($str) ? (string)$str : gettype($str)
@@ -319,7 +322,7 @@ class Dao
             case 'xss':
                 // Validate is a string
                 if (!is_string($str) || empty(trim($str))) {
-                    throw new InvalidArgumentException("Input value for XSS sanitization must be a non-empty string");
+                    throw new \InvalidArgumentException("Input value for XSS sanitization must be a non-empty string");
                 }
 
                 // Sanitize the string
@@ -329,7 +332,7 @@ class Dao
                 return $sanitized;
 
             default:
-                throw new InvalidArgumentException(
+                throw new \InvalidArgumentException(
                     sprintf("Invalid sanitization type: '%s'. Allowed types: 'sql', 'xss'", $type)
                 );
         }

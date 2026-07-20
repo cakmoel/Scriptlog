@@ -1,5 +1,6 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -15,6 +16,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
 class BaseModel extends Dao
 {
     /**

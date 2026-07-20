@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * BoardInterface Interface
  * giving dashboard application interface to set page title and handle dashboard's view.
@@ -13,6 +15,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
 interface BoardInterface
 {
     /**

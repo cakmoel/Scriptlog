@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class SessionMaker extends SessionHandler
  *
@@ -10,7 +12,8 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 1.0
  *
  */
-class SessionMaker extends SessionHandler
+
+class SessionMaker extends \SessionHandler
 {
     /**
      * key
@@ -127,7 +130,7 @@ class SessionMaker extends SessionHandler
                 if (session_id() == '') {
                     try {
                         session_start();
-                    } catch (Throwable $e) {
+                    } catch (\Throwable $e) {
                         error_log("Session start failed (PHP < 5.6): " . $e->getMessage());
                         return false;
                     }
@@ -136,7 +139,7 @@ class SessionMaker extends SessionHandler
                 if (session_status() == PHP_SESSION_NONE) {
                     try {
                         session_start();
-                    } catch (Throwable $e) {
+                    } catch (\Throwable $e) {
                         error_log("Session start failed: " . $e->getMessage());
                         return false;
                     }
@@ -200,7 +203,7 @@ class SessionMaker extends SessionHandler
             }
 
             return $this->decrypt($data, $this->key);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             error_log("Session read error for ID " . substr($id, 0, 10) . "...: " . $e->getMessage());
             return "";
         }
@@ -294,7 +297,7 @@ class SessionMaker extends SessionHandler
     {
         try {
             return ScriptlogCryptonize::encryptAES($data, $key);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             error_log("Session encryption error: " . $e->getMessage());
             return $data;
         }
@@ -325,7 +328,7 @@ class SessionMaker extends SessionHandler
                 }
 
                 return $decrypted;
-            } catch (Throwable $defuseError) {
+            } catch (\Throwable $defuseError) {
                 // Both methods failed - session is corrupted or invalid
                 error_log("Session decryption failed for both methods. OpenSSL error: " . $e->getMessage() . ", Defuse error: " . $defuseError->getMessage());
 

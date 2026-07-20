@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Sitemap
  *
@@ -13,6 +15,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @license    http://opensource.org/licenses/MIT MIT License
  * @link       http://github.com/evert/sitemap-php
  */
+
 class Sitemap
 {
     /**

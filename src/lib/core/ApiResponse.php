@@ -1,5 +1,8 @@
 <?php
+
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * API Response Handler
  *

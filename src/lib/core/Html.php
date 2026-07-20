@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * HTML parsing, filtering and sanitization
  * This class depends on Tidy which is included in the core since PHP 5.3
@@ -15,7 +17,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 0.2
  *
  */
-final class Html
+final
+
+class Html
 {
     /**
      * @var array HTML filtering options
@@ -246,7 +250,7 @@ final class Html
          * Convert to paragraphs and begin
          */
         $out    = $this->makeParagraphs($out);
-        $dom    = new DOMDocument();
+        $dom    = new \DOMDocument();
 
         /**
          * Hide parse warnings since we'll be cleaning the output anyway
@@ -378,7 +382,7 @@ final class Html
                     'nofollow'
                 );
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Silently ignore invalid attributes
         }
     }

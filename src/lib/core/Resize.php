@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Core;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class Resize
  * Purpose: Resizing and save image
@@ -15,6 +17,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @author   Jarrod Oberto
  *
  */
+
 class Resize
 {
     /**
