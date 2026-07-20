@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Dao;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * class PostDao extends Dao
  *
@@ -11,6 +13,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Core\Dao;
+use Scriptlog\Core\DbException;
+use Scriptlog\Core\LogError;
+
 class PostDao extends Dao
 {
     private $selected;

@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Dao;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Class Configuration extends Dao
  *
@@ -11,6 +13,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Core\Dao;
+
 class ConfigurationDao extends Dao
 {
     private $selected;
@@ -209,7 +214,7 @@ class ConfigurationDao extends Dao
 
         $this->selected = $selected;
 
-        $timezone_list = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
+        $timezone_list = \DateTimeZone::listIdentifiers(\DateTimeZone::ALL);
 
         foreach ($timezone_list as $option) {
             $select = $this->selected === $option ? '  selected' : '';

@@ -1,6 +1,8 @@
 <?php
 
+namespace Scriptlog\Dao;
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * User class extends Dao
  * insert, update, delete
@@ -13,6 +15,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since     Since Release 1.0
  *
  */
+
+use Scriptlog\Core\Dao;
+
 class UserDao extends Dao
 {
     private $selected;
