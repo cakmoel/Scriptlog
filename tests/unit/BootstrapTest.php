@@ -557,7 +557,7 @@ class BootstrapTest extends TestCase
         $returnType = $method->getReturnType();
         
         $this->assertNotNull($returnType);
-        $this->assertEquals('AppContext', $returnType->getName());
+        $this->assertEquals('Scriptlog\Core\AppContext', $returnType->getName());
     }
 
     public function testAllowedExportedVarsCount(): void

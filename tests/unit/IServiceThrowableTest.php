@@ -22,7 +22,7 @@ class IServiceThrowableTest extends TestCase
         require_once $this->interfacePath;
         $reflection = new ReflectionClass('IServiceThrowable');
         $interfaces = $reflection->getInterfaceNames();
-        $this->assertContains('IThrowable', $interfaces);
+        $this->assertContains('Scriptlog\Core\IThrowable', $interfaces);
     }
 
     public function testServiceExceptionImplementsIServiceThrowable(): void
