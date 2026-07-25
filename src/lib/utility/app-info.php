@@ -15,69 +15,36 @@
 function app_info()
 {
 
+    $settings = function_exists('app_settings') ? app_settings() : array();
+
     $app_info = [
-        'site_name' => '',
-        'site_tagline' => '',
-        'site_description' => '',
-        'site_keywords' => '',
-        'site_email' => '',
-        'app_key' => '',
-        'app_url' => '',
-        'post_per_page' => '',
-        'post_per_rss' => '',
-        'post_per_archive' => '',
-        'comment_per_post' => '',
-        'permalink_setting' => '',
-        'timezone_setting' => '',
+        'site_name' => isset($settings['site_name']) ? $settings['site_name'] : '',
+        'site_tagline' => isset($settings['site_tagline']) ? $settings['site_tagline'] : '',
+        'site_description' => isset($settings['site_description']) ? $settings['site_description'] : '',
+        'site_keywords' => isset($settings['site_keywords']) ? $settings['site_keywords'] : '',
+        'site_email' => isset($settings['site_email']) ? $settings['site_email'] : '',
+        'app_key' => isset($settings['app_key']) ? $settings['app_key'] : '',
+        'app_url' => isset($settings['app_url']) ? $settings['app_url'] : '',
+        'post_per_page' => isset($settings['post_per_page']) ? $settings['post_per_page'] : '',
+        'post_per_rss' => isset($settings['post_per_rss']) ? $settings['post_per_rss'] : '',
+        'post_per_archive' => isset($settings['post_per_archive']) ? $settings['post_per_archive'] : '',
+        'comment_per_post' => isset($settings['comment_per_post']) ? $settings['comment_per_post'] : '',
+        'permalink_setting' => isset($settings['permalink_setting']) ? $settings['permalink_setting'] : '',
+        'timezone_setting' => isset($settings['timezone_setting']) ? $settings['timezone_setting'] : '',
     ];
 
-    $conn = function_exists('medoo_init') ? medoo_init() : "";
+    if ($app_info['site_name'] === '' && $app_info['app_url'] === '') {
+        // No settings were read (e.g. no database connection) - fall back to the
+        // configuration file, preserving the historical behavior of app_info().
+        $config = (class_exists('AppConfig')) ? AppConfig::readConfiguration(invoke_config()) : [];
 
-    if (is_object($conn) && method_exists($conn, 'select')) {
-        $results = $conn->select("tbl_settings", ["setting_name", "setting_value"]);
-    } elseif (is_object($conn) && method_exists($conn, 'dbSelect')) {
-        $results = $conn->dbSelect("SELECT setting_name, setting_value FROM tbl_settings", [], PDO::FETCH_ASSOC);
-    } else {
-        return (class_exists('AppConfig')) ? AppConfig::readConfiguration(invoke_config()) : "";
-    }
-
-    if (is_array($results)) {
-        foreach ($results as $data) {
-            // Handle both array and object formats
-            $settingName = is_array($data) ? ($data['setting_name'] ?? '') : ($data->setting_name ?? '');
-            $settingValue = is_array($data) ? ($data['setting_value'] ?? '') : ($data->setting_value ?? '');
-
-            if ($settingName == 'app_key') {
-                $app_info['app_key'] = $settingValue;
-            } elseif ($settingName == 'app_url') {
-                $app_info['app_url'] = $settingValue;
-            } elseif ($settingName === 'site_name') {
-                $app_info['site_name'] = $settingValue;
-            } elseif ($settingName === 'site_tagline') {
-                $app_info['site_tagline'] = $settingValue;
-            } elseif ($settingName === 'site_description') {
-                $app_info['site_description'] = $settingValue;
-            } elseif ($settingName === 'site_keywords') {
-                $app_info['site_keywords'] = $settingValue;
-            } elseif ($settingName === 'site_email') {
-                $app_info['site_email'] = $settingValue;
-            } elseif ($settingName === 'post_per_page') {
-                $app_info['post_per_page'] = $settingValue;
-            } elseif ($settingName === 'post_per_rss') {
-                $app_info['post_per_rss'] = $settingValue;
-            } elseif ($settingName === 'post_per_archive') {
-                $app_info['post_per_archive'] = $settingValue;
-            } elseif ($settingName === 'comment_per_post') {
-                $app_info['comment_per_post'] = $settingValue;
-            } elseif ($settingName === 'permalink_setting') {
-                $app_info['permalink_setting'] = $settingValue;
-            } elseif ($settingName === 'timezone_setting') {
-                $app_info['timezone_setting'] = $settingValue;
-            }
+        if (is_array($config)) {
+            $app_info['site_name'] = (isset($config['app']['name'])) ? $config['app']['name'] : $app_info['site_name'];
+            $app_info['site_email'] = (isset($config['app']['email'])) ? $config['app']['email'] : $app_info['site_email'];
+            $app_info['app_url'] = (isset($config['app']['url'])) ? $config['app']['url'] : $app_info['app_url'];
+            $app_info['app_key'] = (isset($config['app']['key'])) ? $config['app']['key'] : $app_info['app_key'];
         }
-
-        return (is_array($app_info)) ? $app_info : "";
-    } else {
-        return (class_exists('AppConfig')) ? AppConfig::readConfiguration(invoke_config()) : "";
     }
+
+    return $app_info;
 }
