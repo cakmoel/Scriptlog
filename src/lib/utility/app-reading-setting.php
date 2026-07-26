@@ -11,38 +11,15 @@
 function app_reading_setting()
 {
 
-    $configurations = class_exists('ConfigurationDao') ? new ConfigurationDao() : "";
+    $settings = function_exists('app_settings') ? app_settings() : array();
+
     $reading_settings = array();
-    $results = method_exists($configurations, 'findReadingConfigs') ? $configurations->findReadingConfigs() : "";
 
-    if (is_array($results)) {
-        foreach ($results as $data) {
-            switch ($data['setting_name']) {
-                default:
-                case 'post_per_page':
-                    $reading_settings['post_per_page'] = $data['setting_value'];
-
-                    break;
-
-                case 'post_per_rss':
-                    $reading_settings['post_per_rss'] = $data['setting_value'];
-
-                    break;
-
-                case 'post_per_archive':
-                    $reading_settings['post_per_archive'] = $data['setting_value'];
-
-                    break;
-
-                case 'comment_per_post':
-                    $reading_settings['comment_per_post'] = $data['setting_value'];
-
-                    break;
-            }
+    foreach (['post_per_page', 'post_per_rss', 'post_per_archive', 'comment_per_post'] as $name) {
+        if (isset($settings[$name])) {
+            $reading_settings[$name] = $settings[$name];
         }
-
-        return $reading_settings;
     }
 
-    return [];
+    return $reading_settings;
 }
