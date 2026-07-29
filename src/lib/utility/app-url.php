@@ -14,6 +14,5 @@
  */
 function app_url()
 {
-    $appURL = function_exists('medoo_get_where') ? medoo_get_where("tbl_settings", ['ID', 'setting_name', 'setting_value'], ['setting_name' => 'app_url']) : "";
-    return (is_array($appURL) && isset($appURL['setting_value'])) ? $appURL['setting_value'] : "";
+    return function_exists('app_setting') ? app_setting('app_url') : "";
 }
