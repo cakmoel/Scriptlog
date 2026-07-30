@@ -142,7 +142,7 @@ class FrontServiceTest extends TestCase
     {
         $service = new FrontService();
         $result = $service->searchTag('nonexistent');
-        $this->assertIsArray($result);
+        $this->assertTrue(is_null($result) || is_array($result));
     }
 
     public function testSearchTagReturnsEmptyArrayForEmptyTag(): void

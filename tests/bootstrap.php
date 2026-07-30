@@ -43,7 +43,16 @@ if (class_exists('\\Scriptlog\\Core\\Registry')) {
         public function dbInsert($table, $params) { return true; }
         public function dbUpdate($table, $params, $where) { return 1; }
         public function dbDelete($table, $where, $limit = null) { return 1; }
-        public function dbQuery($sql, $args = []) { return new \PDOStatement(); }
+        public function dbQuery($sql, $args = []) {
+            $stmt = new class() {
+                public function fetch() { return null; }
+                public function fetchAll() { return []; }
+                public function fetchColumn() { return null; }
+                public function rowCount() { return 0; }
+                public function closeCursor() { return true; }
+            };
+            return $stmt;
+        }
         public function dbLastInsertId() { return '1'; }
         public function dbTransaction() { return true; }
         public function dbCommit() { return true; }
