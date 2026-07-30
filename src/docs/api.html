@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Scriptlog REST API Reference - Complete API documentation for programmatic access.">
+    <title>API Reference - Developer Guide</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+</head>
+<body>
+    <a href="#main-content" class="visually-hidden-focusable btn btn-primary position-absolute top-0 start-0 m-2" style="z-index: 9999;">Skip to main content</a>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" role="navigation" aria-label="Main navigation">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="index.html" aria-label="Scriptlog home">
+                <i class="bi bi-journal-code me-2" aria-hidden="true"></i>Developer Guide
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Documentation
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="installation.html"><i class="bi bi-download me-2"></i>Installation</a></li>
+                            <li><a class="dropdown-item" href="architecture.html"><i class="bi bi-diagram-3 me-2"></i>Architecture</a></li>
+                            <li><a class="dropdown-item" href="configuration.html"><i class="bi bi-gear me-2"></i>Configuration</a></li>
+                            <li><a class="dropdown-item" href="database.html"><i class="bi bi-database me-2"></i>Database Schema</a></li>
+                            <li><a class="dropdown-item" href="components.html"><i class="bi bi-box-seam me-2"></i>Components</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="theming.html"><i class="bi bi-palette me-2"></i>Theming</a></li>
+                            <li><a class="dropdown-item" href="plugins.html"><i class="bi bi-puzzle me-2"></i>Plugin Development</a></li>
+                            <li><a class="dropdown-item" href="api.html"><i class="bi bi-code-slash me-2"></i>API Reference</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="testing.html"><i class="bi bi-check-circle me-2"></i>Testing</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="api.html">API</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/cakmoel/Scriptlog" target="_blank" rel="noopener">GitHub</a>
+                    </li>
+                </ul>
+                
+                <div class="doc-search-wrapper">
+                    <form class="d-flex doc-search-form" role="search" id="docSearchForm">
+                        <div class="doc-search-input-wrap">
+                            <i class="bi bi-search doc-search-icon" aria-hidden="true"></i>
+                            <input class="form-control doc-search-input" type="search" placeholder="Search documentation..." aria-label="Search documentation" id="searchInput" autocomplete="off" aria-describedby="searchHelp">
+                            <kbd class="doc-search-kbd">/</kbd>
+                            <div class="doc-search-hint" role="tooltip">
+                                <i class="bi bi-lightbulb me-1" aria-hidden="true"></i> Type <code>installation</code>, <code>API</code>, <code>database</code>, or any topic
+                            </div>
+                        </div>
+                        <div class="doc-search-results" id="searchResults" aria-live="polite" role="listbox"></div>
+                    </form>
+                    <div id="searchHelp" class="visually-hidden">Type at least 2 characters to search. Use arrow keys to navigate results.</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main-content" class="main-content">
+        <section class="doc-hero">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto text-center">
+                        <div class="doc-hero-icon" role="img" aria-label="API">
+                            <i class="bi bi-code-slash" aria-hidden="true"></i>
+                        </div>
+                        <h1 class="display-4 fw-bold mb-3">API Reference</h1>
+                        <p class="lead mb-4">Scriptlog provides a RESTful API that allows external applications to interact with blog content. The API follows OpenAPI 3.0 specification and returns JSON responses.</p>
+                        <div class="doc-breadcrumb">
+                            <a href="index.html">Home</a> / <a href="#">Documentation</a> / API Reference
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <!-- Base URLs -->
+                        <div class="alert alert-info mt-4" role="alert">
+                            <h5><i class="bi bi-info-circle text-accent me-2" aria-hidden="true"></i>Base URLs</h5>
+                            <table class="table table-sm mb-0">
+                                <tbody>
+                                    <tr><td><strong>Production</strong></td><td><code>http://blogware.site/api/v1</code></td></tr>
+                                    <tr><td><strong>Development</strong></td><td><code>http://localhost/blogware/public_html/api/v1</code></td></tr>
+                                </tbody>
+                            </table>
+                            <div class="mt-2 mb-0">
+                                <strong>API Version:</strong> 1.1.1 | <strong>Format:</strong> JSON
+                            </div>
+                            <div class="mt-2 mb-0">
+                                <strong>Live Specification:</strong> <code><a href="/api/v1/openapi.json">/api/v1/openapi.json</a></code>
+                            </div>
+                        </div>
+
+                        <!-- Authentication -->
+                        <h2 class="mt-5 mb-4" id="authentication"><i class="bi bi-shield-lock text-accent me-2" aria-hidden="true"></i>Authentication</h2>
+                        <p>The API supports two authentication methods:</p>
+
+                        <h3 class="mb-3">API Key Authentication</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">HTTP</span>
+                            <span class="code-file">headers</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>GET /api/v1/posts HTTP/1.1
+Host: blogware.site
+X-API-Key: your-api-key-here</code></pre>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Bearer Token Authentication</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">HTTP</span>
+                            <span class="code-file">headers</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>GET /api/v1/posts HTTP/1.1
+Host: blogware.site
+Authorization: Bearer your-bearer-token</code></pre>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Authentication Requirements</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Endpoint Type</th>
+                                        <th scope="col">Authentication Required</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Read (GET) - Public content</td><td>No</td></tr>
+                                    <tr><td>Create/Update/Partial Update/Delete (POST/PUT/PATCH/DELETE)</td><td>Yes</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- API Info Endpoint -->
+                        <h3 class="mb-3 mt-4"><i class="bi bi-info-circle text-accent me-2" aria-hidden="true"></i>API Information</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Method</th>
+                                        <th scope="col">Endpoint</th>
+                                        <th scope="col">Auth</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/</code></td><td>No</td><td>Get API metadata and available endpoints</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Example Response</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">response</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "success": true,
+  "status": 200,
+  "message": "Welcome to Blogware RESTful API",
+  "data": {
+    "name": "Blogware RESTful API",
+    "version": "1.1.1",
+    "description": "RESTful API for Blogware content management system",
+    "base_url": "/api/v1",
+    "authentication": {
+      "type": "API Key or Bearer Token",
+      "header": "X-API-Key or Authorization: Bearer <token>",
+      "required": true
+    }
+  },
+  "_links": {
+    "self": { "href": "http://blogware.site/api/v1", "rel": "self", "type": "GET" },
+    "posts": { "href": "http://blogware.site/api/v1/posts", "rel": "posts", "type": "GET" },
+    "categories": { "href": "http://blogware.site/api/v1/categories", "rel": "categories", "type": "GET" },
+    "comments": { "href": "http://blogware.site/api/v1/comments", "rel": "comments", "type": "GET" },
+    "archives": { "href": "http://blogware.site/api/v1/archives", "rel": "archives", "type": "GET" },
+    "search": { "href": "http://blogware.site/api/v1/search?q={query}", "rel": "search", "type": "GET", "templated": true },
+    "gdpr": { "href": "http://blogware.site/api/v1/gdpr/consent", "rel": "gdpr", "type": "GET" },
+    "languages": { "href": "http://blogware.site/api/v1/languages", "rel": "languages", "type": "GET" },
+    "translations": { "href": "http://blogware.site/api/v1/translations/en", "rel": "translations", "type": "GET" },
+    "media": { "href": "http://blogware.site/api/v1/media/upload", "rel": "media", "type": "POST" },
+    "openapi": { "href": "http://blogware.site/api/v1/openapi.json", "rel": "service-desc", "type": "application/json" }
+  }
+}</code></pre>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Permission Levels</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Level</th>
+                                        <th scope="col">Create Posts</th>
+                                        <th scope="col">Edit Posts</th>
+                                        <th scope="col">Delete Posts</th>
+                                        <th scope="col">Manage Categories</th>
+                                        <th scope="col">Moderate Comments</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><strong>administrator</strong></td><td><i class="bi bi-check text-success"></i></td><td><i class="bi bi-check text-success"></i></td><td><i class="bi bi-check text-success"></i></td><td><i class="bi bi-check text-success"></i></td><td><i class="bi bi-check text-success"></i></td></tr>
+                                    <tr><td><strong>editor</strong></td><td><i class="bi bi-check text-success"></i></td><td><i class="bi bi-check text-success"></i></td><td><i class="bi bi-x text-danger"></i></td><td><i class="bi bi-check text-success"></i></td><td><i class="bi bi-check text-success"></i></td></tr>
+                                    <tr><td><strong>author</strong></td><td><i class="bi bi-check text-success"></i></td><td><i class="bi bi-check text-success"></i> <small>(own only)</small></td><td><i class="bi bi-x text-danger"></i></td><td><i class="bi bi-x text-danger"></i></td><td><i class="bi bi-x text-danger"></i></td></tr>
+                                    <tr><td><strong>subscriber</strong></td><td><i class="bi bi-x text-danger"></i></td><td><i class="bi bi-x text-danger"></i></td><td><i class="bi bi-x text-danger"></i></td><td><i class="bi bi-x text-danger"></i></td><td><i class="bi bi-x text-danger"></i></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Rate Limiting -->
+                        <h3 class="mb-3 mt-4"><i class="bi bi-speedometer2 text-accent me-2" aria-hidden="true"></i>Rate Limiting</h3>
+                        <p>API requests are rate limited to ensure fair usage and prevent abuse. Rate limiting is applied per-client using IP address, API key, or Bearer token as the identifier.</p>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Endpoint Type</th>
+                                        <th scope="col">Limit</th>
+                                        <th scope="col">Window</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><strong>Read (GET)</strong></td><td>60 requests</td><td>60 seconds</td></tr>
+                                    <tr><td><strong>Write (POST/PUT/DELETE/PATCH)</strong></td><td>20 requests</td><td>60 seconds</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-responsive mt-4">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Header</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><code>X-RateLimit-Limit</code></td><td>Maximum requests allowed per window</td></tr>
+                                    <tr><td><code>X-RateLimit-Remaining</code></td><td>Remaining requests in current window</td></tr>
+                                    <tr><td><code>X-RateLimit-Reset</code></td><td>Unix timestamp when the rate limit resets</td></tr>
+                                    <tr><td><code>Retry-After</code></td><td>Seconds to wait before retrying (only on 429 responses)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>
+                            If you exceed the rate limit, you'll receive a <code>429 Too Many Requests</code> response.
+                        </div>
+
+                        <!-- Posts API -->
+                        <h2 class="mt-5 mb-4" id="posts-api"><i class="bi bi-file-post text-accent me-2" aria-hidden="true"></i>Posts API</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Method</th>
+                                        <th scope="col">Endpoint</th>
+                                        <th scope="col">Auth</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/posts</code></td><td>No</td><td>List published posts</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/posts/{id}</code></td><td>No</td><td>Get single post</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/posts/{id}/comments</code></td><td>No</td><td>Get post comments</td></tr>
+                                    <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/v1/posts</code></td><td>Yes</td><td>Create post</td></tr>
+                                    <tr><td><span class="badge bg-warning">PUT</span></td><td><code>/api/v1/posts/{id}</code></td><td>Yes</td><td>Update post</td></tr>
+                                    <tr><td><span class="badge bg-info">PATCH</span></td><td><code>/api/v1/posts/{id}</code></td><td>Yes</td><td>Partially update post</td></tr>
+                                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/v1/posts/{id}</code></td><td>Yes</td><td>Delete post</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Query Parameters (List Posts)</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Parameter</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Default</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><code>page</code></td><td>integer</td><td>1</td><td>Page number</td></tr>
+                                    <tr><td><code>per_page</code></td><td>integer</td><td>10</td><td>Items per page (max: 100)</td></tr>
+                                    <tr><td><code>sort_by</code></td><td>string</td><td>ID</td><td>Sort field (ID, post_date, post_modified, post_title)</td></tr>
+                                    <tr><td><code>sort_order</code></td><td>string</td><td>DESC</td><td>Sort direction (ASC, DESC)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Path Parameters (Get Single Post)</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Parameter</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><code>id</code></td><td>integer</td><td>Post ID</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Example Paginated Response</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">response</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "success": true,
+  "status": 200,
+  "data": [...],
+  "pagination": {
+    "current_page": 1,
+    "per_page": 10,
+    "total_items": 50,
+    "total_pages": 5,
+    "has_next_page": true,
+    "has_previous_page": false
+  },
+  "_links": {
+    "self": { "href": "http://blogware.site/api/v1/posts?page=1", "rel": "self", "type": "GET" },
+    "next": { "href": "http://blogware.site/api/v1/posts?page=2", "rel": "next", "type": "GET" },
+    "last": { "href": "http://blogware.site/api/v1/posts?page=5", "rel": "last", "type": "GET" }
+  }
+}</code></pre>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Create Post - Request Body</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">request</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "post_title": "My New Post",
+  "post_content": "Full content of the post",
+  "post_summary": "Optional summary",
+  "post_status": "draft",
+  "post_visibility": "public",
+  "post_tags": "php, api",
+  "comment_status": "open",
+  "topics": [1, 2]
+}</code></pre>
+                        </div>
+
+                        <h5 class="mb-2 mt-3">Required Fields</h5>
+                        <ul class="feature-list">
+                            <li><code>post_title</code> (string)</li>
+                            <li><code>post_content</code> (string)</li>
+                        </ul>
+
+                        <h5 class="mb-2 mt-3">Optional Fields</h5>
+                        <ul class="feature-list">
+                            <li><code>post_summary</code> (string)</li>
+                            <li><code>post_status</code> (string: "publish", "draft")</li>
+                            <li><code>post_visibility</code> (string: "public", "private", "protected")</li>
+                            <li><code>post_tags</code> (string, comma-separated)</li>
+                            <li><code>comment_status</code> (string: "open", "closed")</li>
+                            <li><code>topics</code> (array of integers)</li>
+                        </ul>
+
+                        <h3 class="mb-3 mt-4">Query Parameters (Get Comments for Post)</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Parameter</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Default</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><code>page</code></td><td>integer</td><td>1</td><td>Page number</td></tr>
+                                    <tr><td><code>per_page</code></td><td>integer</td><td>10</td><td>Items per page</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Categories API -->
+                        <h2 class="mt-5 mb-4" id="categories-api"><i class="bi bi-folder text-accent me-2" aria-hidden="true"></i>Categories API</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Method</th>
+                                        <th scope="col">Endpoint</th>
+                                        <th scope="col">Auth</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/categories</code></td><td>No</td><td>List categories</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/categories/{id}</code></td><td>No</td><td>Get category</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/categories/{id}/posts</code></td><td>No</td><td>Get posts in category</td></tr>
+                                    <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/v1/categories</code></td><td>Yes</td><td>Create category</td></tr>
+                                    <tr><td><span class="badge bg-warning">PUT</span></td><td><code>/api/v1/categories/{id}</code></td><td>Yes</td><td>Update category</td></tr>
+                                    <tr><td><span class="badge bg-info">PATCH</span></td><td><code>/api/v1/categories/{id}</code></td><td>Yes</td><td>Partially update category</td></tr>
+                                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/v1/categories/{id}</code></td><td>Yes</td><td>Delete category</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Query Parameters (List Categories)</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Parameter</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Default</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><code>page</code></td><td>integer</td><td>1</td><td>Page number</td></tr>
+                                    <tr><td><code>per_page</code></td><td>integer</td><td>10</td><td>Items per page</td></tr>
+                                    <tr><td><code>sort_by</code></td><td>string</td><td>ID</td><td>Sort field</td></tr>
+                                    <tr><td><code>sort_order</code></td><td>string</td><td>DESC</td><td>Sort direction</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Example Response (List Categories)</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">response</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "success": true,
+  "status": 200,
+  "data": [
+    {
+      "id": 1,
+      "title": "Technology",
+      "slug": "technology",
+      "status": "Y",
+      "post_count": 15,
+      "url": "http://blogware.site/category/technology",
+      "_links": {
+        "self": { "href": "http://blogware.site/api/v1/categories/1", "rel": "self", "type": "GET" },
+        "posts": { "href": "http://blogware.site/api/v1/categories/1/posts", "rel": "posts", "type": "GET" },
+        "canonical": { "href": "http://blogware.site/category/technology", "rel": "canonical", "type": "text/html" },
+        "collection": { "href": "http://blogware.site/api/v1/categories", "rel": "collection", "type": "GET" }
+      }
+    }
+  ],
+  "pagination": {...},
+  "_links": { ... }
+}</code></pre>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Create Category - Request Body</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">request</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "topic_title": "Category Name",
+  "topic_status": "Y"
+}</code></pre>
+                        </div>
+
+                        <!-- Comments API -->
+                        <h2 class="mt-5 mb-4" id="comments-api"><i class="bi bi-chat-dots text-accent me-2" aria-hidden="true"></i>Comments API</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Method</th>
+                                        <th scope="col">Endpoint</th>
+                                        <th scope="col">Auth</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/comments</code></td><td>No</td><td>List approved comments</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/comments/{id}</code></td><td>No</td><td>Get comment</td></tr>
+                                    <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/v1/comments</code></td><td>No</td><td>Submit comment</td></tr>
+                                    <tr><td><span class="badge bg-warning">PUT</span></td><td><code>/api/v1/comments/{id}</code></td><td>Yes</td><td>Update comment</td></tr>
+                                    <tr><td><span class="badge bg-info">PATCH</span></td><td><code>/api/v1/comments/{id}</code></td><td>Yes</td><td>Partially update comment</td></tr>
+                                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/v1/comments/{id}</code></td><td>Yes</td><td>Delete comment</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Query Parameters (List Comments)</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Parameter</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><code>post_id</code></td><td>integer</td><td>Filter by post ID</td></tr>
+                                    <tr><td><code>page</code></td><td>integer</td><td>Page number</td></tr>
+                                    <tr><td><code>per_page</code></td><td>integer</td><td>Items per page</td></tr>
+                                    <tr><td><code>sort_by</code></td><td>string</td><td>Sort field</td></tr>
+                                    <tr><td><code>sort_order</code></td><td>string</td><td>Sort direction</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Create Comment - Request Body</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">request</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "comment_author_name": "John Doe",
+  "comment_author_email": "john@example.com",
+  "comment_content": "Great article!",
+  "comment_post_id": 1,
+  "comment_parent_id": 0
+}</code></pre>
+                        </div>
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-info-circle me-2" aria-hidden="true"></i>
+                            <strong>Note:</strong> Comments are submitted with 'pending' status for moderation.
+                        </div>
+
+                        <!-- Archives API -->
+                        <h2 class="mt-5 mb-4" id="archives-api"><i class="bi bi-archive text-accent me-2" aria-hidden="true"></i>Archives API</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Method</th>
+                                        <th scope="col">Endpoint</th>
+                                        <th scope="col">Auth</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/archives</code></td><td>No</td><td>List archive dates</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/archives/{year}</code></td><td>No</td><td>Posts from year</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/archives/{year}/{month}</code></td><td>No</td><td>Posts from month</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Example Response (List Archives)</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">response</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "success": true,
+  "status": 200,
+  "data": {
+    "archives": [
+      {
+        "year": 2024,
+        "months": [
+          {
+            "month": 6,
+            "month_name": "June",
+            "post_count": 5
+          }
+        ],
+        "total_posts": 25
+      }
+    ],
+    "total_years": 3
+  },
+  "_links": {
+    "self": { "href": "http://blogware.site/api/v1/archives", "rel": "self", "type": "GET" },
+    "collection": { "href": "http://blogware.site/api/v1/archives", "rel": "collection", "type": "GET" }
+  }
+}</code></pre>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Path Parameters</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Parameter</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><code>year</code></td><td>integer</td><td>Year (e.g., 2024)</td></tr>
+                                    <tr><td><code>month</code></td><td>integer</td><td>Month (1-12)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Search API -->
+                        <h2 class="mt-5 mb-4" id="search-api"><i class="bi bi-search text-accent me-2" aria-hidden="true"></i>Search API</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Method</th>
+                                        <th scope="col">Endpoint</th>
+                                        <th scope="col">Auth</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/search</code></td><td>No</td><td>Search all content (posts + pages)</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/search/posts</code></td><td>No</td><td>Search posts only</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/search/pages</code></td><td>No</td><td>Search pages only</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4>Search Parameters</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Parameter</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Required</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><code>q</code></td><td>string</td><td>Yes</td><td>Search keyword (min 2, max 100 chars)</td></tr>
+                                    <tr><td><code>type</code></td><td>string</td><td>No</td><td><code>all</code>, <code>posts</code>, or <code>pages</code> (default: <code>all</code>)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4 class="mt-4">Example Request</h4>
+                        <div class="code-block-header">
+                            <span class="code-lang">HTTP</span>
+                            <span class="code-file">request</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>GET /api/v1/search?q=cicero&type=all</code></pre>
+                        </div>
+
+                        <!-- Protected Posts API -->
+                        <h2 class="mt-5 mb-4" id="protected-posts-api"><i class="bi bi-lock text-accent me-2" aria-hidden="true"></i>Protected Posts API</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Method</th>
+                                        <th scope="col">Endpoint</th>
+                                        <th scope="col">Auth</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/v1/posts/{id}/unlock</code></td><td>No</td><td>Unlock password-protected post</td></tr>
+                                    <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/v1/posts/{id}/verify</code></td><td>No</td><td>Verify password for protected post</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Unlock Post - Request Body</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">request</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "password": "post-password"
+}</code></pre>
+                        </div>
+                        <p class="mt-2">Returns decrypted content on success, <code>401 Unauthorized</code> on wrong password. Rate-limited to prevent brute-force attacks.</p>
+
+                        <!-- Languages API -->
+                        <h2 class="mt-5 mb-4" id="languages-api"><i class="bi bi-globe text-accent me-2" aria-hidden="true"></i>Languages API</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Method</th>
+                                        <th scope="col">Endpoint</th>
+                                        <th scope="col">Auth</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/languages</code></td><td>No</td><td>List active languages</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/languages/active</code></td><td>No</td><td>List active languages</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/languages/default</code></td><td>No</td><td>Get default language</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/languages/{code}</code></td><td>No</td><td>Get single language</td></tr>
+                                    <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/v1/languages</code></td><td>Yes</td><td>Create language</td></tr>
+                                    <tr><td><span class="badge bg-warning">PUT</span></td><td><code>/api/v1/languages/{code}</code></td><td>Yes</td><td>Update language</td></tr>
+                                    <tr><td><span class="badge bg-info">PATCH</span></td><td><code>/api/v1/languages/{code}</code></td><td>Yes</td><td>Partially update language</td></tr>
+                                    <tr><td><span class="badge bg-warning">PUT</span></td><td><code>/api/v1/languages/{code}/default</code></td><td>Yes</td><td>Set as default language</td></tr>
+                                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/v1/languages/{code}</code></td><td>Yes</td><td>Delete language</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Create Language - Request Body</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">request</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "lang_code": "de",
+  "lang_name": "German",
+  "lang_locale": "de_DE",
+  "is_default": false,
+  "is_active": true
+}</code></pre>
+                        </div>
+
+                        <!-- Translations API -->
+                        <h2 class="mt-5 mb-4" id="translations-api"><i class="bi bi-language text-accent me-2" aria-hidden="true"></i>Translations API</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Method</th>
+                                        <th scope="col">Endpoint</th>
+                                        <th scope="col">Auth</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/translations/{code}</code></td><td>No</td><td>List translations for language</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/translations/{code}/{key}</code></td><td>No</td><td>Get single translation</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/translations/{code}/export</code></td><td>No</td><td>Export translations as key-value map</td></tr>
+                                    <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/v1/translations/{code}</code></td><td>Yes</td><td>Create translation</td></tr>
+                                    <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/v1/translations/{code}/import</code></td><td>Yes</td><td>Bulk import translations</td></tr>
+                                    <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/v1/translations/{code}/cache</code></td><td>Yes</td><td>Clear translation cache</td></tr>
+                                    <tr><td><span class="badge bg-warning">PUT</span></td><td><code>/api/v1/translations/{id}</code></td><td>Yes</td><td>Update translation</td></tr>
+                                    <tr><td><span class="badge bg-info">PATCH</span></td><td><code>/api/v1/translations/{id}</code></td><td>Yes</td><td>Partially update translation</td></tr>
+                                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/v1/translations/{id}</code></td><td>Yes</td><td>Delete translation</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Create Translation - Request Body</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">request</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "trans_key": "nav.dashboard",
+  "trans_value": "Dashboard",
+  "trans_locale": "en"
+}</code></pre>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Import Translations - Request Body</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">request</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "translations": {
+    "nav.dashboard": "Dashboard",
+    "nav.posts": "Posts",
+    "nav.settings": "Settings"
+  }
+}</code></pre>
+                        </div>
+
+                        <!-- GDPR API -->
+                        <h2 class="mt-5 mb-4" id="gdpr-api"><i class="bi bi-shield-check text-accent me-2" aria-hidden="true"></i>GDPR API</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Method</th>
+                                        <th scope="col">Endpoint</th>
+                                        <th scope="col">Auth</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/v1/gdpr/consent</code></td><td>No</td><td>Submit cookie consent</td></tr>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/gdpr/consent</code></td><td>No</td><td>Get consent status</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Submit Consent - Request Body</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">request</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "status": "accepted",
+  "type": "cookie"
+}</code></pre>
+                        </div>
+
+                        <!-- Health Check -->
+                        <h2 class="mt-5 mb-4" id="health-check"><i class="bi bi-heart-pulse text-accent me-2" aria-hidden="true"></i>Health Check</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Method</th>
+                                        <th scope="col">Endpoint</th>
+                                        <th scope="col">Auth</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/health</code></td><td>No</td><td>API health status for monitoring</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Example Response</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">response</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "success": true,
+  "status": 200,
+  "data": {
+    "status": "healthy",
+    "timestamp": "2026-07-30 12:00:00",
+    "php_version": "8.1.28"
+  }
+}</code></pre>
+                        </div>
+
+                        <!-- CSRF Token -->
+                        <h2 class="mt-5 mb-4" id="csrf-token"><i class="bi bi-key text-accent me-2" aria-hidden="true"></i>CSRF Token</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Method</th>
+                                        <th scope="col">Endpoint</th>
+                                        <th scope="col">Auth</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/v1/csrf-token</code></td><td>No</td><td>Get CSRF token for write operations</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Media Upload -->
+                        <h2 class="mt-5 mb-4" id="media-upload-api"><i class="bi bi-image text-accent me-2" aria-hidden="true"></i>Media Upload</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Method</th>
+                                        <th scope="col">Endpoint</th>
+                                        <th scope="col">Auth</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/v1/media/upload</code></td><td>Yes</td><td>Upload image (Summernote editor)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p><strong>Request:</strong> <code>multipart/form-data</code> with field <code>image</code>. Supported types: JPEG, PNG, GIF, WebP, BMP. Max size: 5MB.</p>
+
+                        <!-- Query API (RFC 10008) -->
+                        <h2 class="mt-5 mb-4" id="query-api"><i class="bi bi-search-heart text-accent me-2" aria-hidden="true"></i>Query API (RFC 10008)</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Method</th>
+                                        <th scope="col">Endpoint</th>
+                                        <th scope="col">Auth</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-info">QUERY</span></td><td><code>/api/v1/query</code></td><td>No</td><td>Query posts + pages (JSON body)</td></tr>
+                                    <tr><td><span class="badge bg-info">QUERY</span></td><td><code>/api/v1/query/posts</code></td><td>No</td><td>Query posts only</td></tr>
+                                    <tr><td><span class="badge bg-info">QUERY</span></td><td><code>/api/v1/query/pages</code></td><td>No</td><td>Query pages only</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p>The <code>QUERY</code> method (RFC 10008) is a safe, idempotent alternative to GET for complex queries. The query parameters are sent in the request body as JSON.</p>
+
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">request body</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "type": "all",
+  "q": "search keyword"
+}</code></pre>
+                        </div>
+
+                        <!-- Query Parameters -->
+                        <h2 class="mt-5 mb-4" id="query-params"><i class="bi bi-sliders text-accent me-2" aria-hidden="true"></i>Query Parameters</h2>
+                        <p>All list endpoints support the following parameters:</p>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Parameter</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Default</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><code>page</code></td><td>integer</td><td>1</td><td>Page number</td></tr>
+                                    <tr><td><code>per_page</code></td><td>integer</td><td>10</td><td>Items per page (max: 100)</td></tr>
+                                    <tr><td><code>sort_by</code></td><td>string</td><td>ID</td><td>Sort field</td></tr>
+                                    <tr><td><code>sort_order</code></td><td>string</td><td>DESC</td><td>Sort direction (ASC/DESC)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Response Format -->
+                        <h2 class="mt-5 mb-4" id="response-format"><i class="bi bi-box-seam text-accent me-2" aria-hidden="true"></i>Response Format</h2>
+                        
+                        <h4>Success Response</h4>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">response</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "success": true,
+  "status": 200,
+  "message": "Operation description",
+  "data": { ... }
+}</code></pre>
+                        </div>
+
+                        <h4 class="mt-4">Created Response</h4>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">response</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "success": true,
+  "status": 201,
+  "message": "Resource created",
+  "data": {
+    "id": 42
+  }
+}</code></pre>
+                        </div>
+                        <p class="mt-2">Includes <code>Location</code> header with the resource URL.</p>
+
+                        <h4 class="mt-4">No Content Response</h4>
+                        <p>Used for <code>DELETE</code> operations. Status <code>204</code> with empty body.</p>
+
+                        <h4 class="mt-4">Paginated Response</h4>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">response</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "success": true,
+  "status": 200,
+  "data": [...],
+  "pagination": {
+    "current_page": 1,
+    "per_page": 10,
+    "total_items": 50,
+    "total_pages": 5,
+    "has_next_page": true,
+    "has_previous_page": false
+  },
+  "_links": {
+    "self": { "href": "http://blogware.site/api/v1/posts?page=1", "rel": "self", "type": "GET" },
+    "first": { "href": "http://blogware.site/api/v1/posts?page=1", "rel": "first", "type": "GET" },
+    "next": { "href": "http://blogware.site/api/v1/posts?page=2", "rel": "next", "type": "GET" },
+    "last": { "href": "http://blogware.site/api/v1/posts?page=5", "rel": "last", "type": "GET" }
+  }
+}</code></pre>
+                        </div>
+
+                        <h4 class="mt-4">Error Response</h4>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">error</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "success": false,
+  "status": 400,
+  "error": {
+    "code": "BAD_REQUEST",
+    "message": "Error description"
+  }
+}</code></pre>
+                        </div>
+
+                        <!-- HATEOAS -->
+                        <h2 class="mt-5 mb-4" id="hateoas"><i class="bi bi-link-45deg text-accent me-2" aria-hidden="true"></i>HATEOAS (Hypermedia as the Engine of Application State)</h2>
+                        <p>All API responses include HATEOAS links following RFC 5988 (Web Linking). This allows clients to discover available actions dynamically without hardcoding URLs.</p>
+
+                        <h4 class="mb-3 mt-4">Common Link Relations</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Relation</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><code>self</code></td><td>The current resource URL</td></tr>
+                                    <tr><td><code>collection</code></td><td>The parent collection URL</td></tr>
+                                    <tr><td><code>first</code></td><td>First page of paginated results</td></tr>
+                                    <tr><td><code>prev</code></td><td>Previous page of paginated results</td></tr>
+                                    <tr><td><code>next</code></td><td>Next page of paginated results</td></tr>
+                                    <tr><td><code>last</code></td><td>Last page of paginated results</td></tr>
+                                    <tr><td><code>canonical</code></td><td>The canonical HTML URL for the resource</td></tr>
+                                    <tr><td><code>comments</code></td><td>Comments for a post</td></tr>
+                                    <tr><td><code>post</code></td><td>The parent post for a comment</td></tr>
+                                    <tr><td><code>posts</code></td><td>Posts in a category</td></tr>
+                                    <tr><td><code>year</code></td><td>Year archive for a month</td></tr>
+                                    <tr><td><code>search</code></td><td>Search endpoint (templated URL)</td></tr>
+                                    <tr><td><code>service-desc</code></td><td>OpenAPI specification URL</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4 class="mb-3 mt-4">Example Single Resource with HATEOAS</h4>
+                        <div class="code-block-header">
+                            <span class="code-lang">JSON</span>
+                            <span class="code-file">response</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>{
+  "success": true,
+  "status": 200,
+  "data": {
+    "id": 1,
+    "title": "My First Blog Post",
+    "slug": "my-first-blog-post"
+  },
+  "_links": {
+    "self": { "href": "http://blogware.site/api/v1/posts/1", "rel": "self", "type": "GET" },
+    "comments": { "href": "http://blogware.site/api/v1/posts/1/comments", "rel": "comments", "type": "GET" },
+    "canonical": { "href": "http://blogware.site/post/1/my-first-blog-post", "rel": "canonical", "type": "text/html" },
+    "collection": { "href": "http://blogware.site/api/v1/posts", "rel": "collection", "type": "GET" }
+  }
+}</code></pre>
+                        </div>
+
+                        <!-- HTTP Status Codes -->
+                        <h2 class="mt-5 mb-4" id="status-codes"><i class="bi bi-info-circle text-accent me-2" aria-hidden="true"></i>HTTP Status Codes</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Code</th>
+                                        <th scope="col">Meaning</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><span class="badge bg-success">200</span></td><td>OK</td></tr>
+                                    <tr><td><span class="badge bg-success">201</span></td><td>Created</td></tr>
+                                    <tr><td><span class="badge bg-secondary">204</span></td><td>No Content</td></tr>
+                                    <tr><td><span class="badge bg-info">304</span></td><td>Not Modified (conditional GET)</td></tr>
+                                    <tr><td><span class="badge bg-warning">400</span></td><td>Bad Request</td></tr>
+                                    <tr><td><span class="badge bg-danger">401</span></td><td>Unauthorized</td></tr>
+                                    <tr><td><span class="badge bg-danger">403</span></td><td>Forbidden</td></tr>
+                                    <tr><td><span class="badge bg-danger">404</span></td><td>Not Found</td></tr>
+                                    <tr><td><span class="badge bg-warning">405</span></td><td>Method Not Allowed</td></tr>
+                                    <tr><td><span class="badge bg-warning">406</span></td><td>Not Acceptable</td></tr>
+                                    <tr><td><span class="badge bg-warning">409</span></td><td>Conflict</td></tr>
+                                    <tr><td><span class="badge bg-warning">415</span></td><td>Unsupported Media Type</td></tr>
+                                    <tr><td><span class="badge bg-warning">422</span></td><td>Unprocessable Entity</td></tr>
+                                    <tr><td><span class="badge bg-danger">429</span></td><td>Too Many Requests</td></tr>
+                                    <tr><td><span class="badge bg-danger">500</span></td><td>Internal Server Error</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Error Codes -->
+                        <h3 class="mb-3 mt-4">Error Codes</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Code</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><code>BAD_REQUEST</code></td><td>Invalid request parameters</td></tr>
+                                    <tr><td><code>UNAUTHORIZED</code></td><td>Authentication required</td></tr>
+                                    <tr><td><code>FORBIDDEN</code></td><td>Insufficient permissions</td></tr>
+                                    <tr><td><code>NOT_FOUND</code></td><td>Resource not found</td></tr>
+                                    <tr><td><code>CONFLICT</code></td><td>Resource already exists</td></tr>
+                                    <tr><td><code>VALIDATION_ERROR</code></td><td>Validation failed</td></tr>
+                                    <tr><td><code>MISSING_QUERY</code></td><td>Search query parameter required</td></tr>
+                                    <tr><td><code>RATE_LIMIT_EXCEEDED</code></td><td>Too many requests</td></tr>
+                                    <tr><td><code>INTERNAL_SERVER_ERROR</code></td><td>Server error</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- SDK Examples -->
+                        <h2 class="mt-5 mb-4" id="sdk-examples"><i class="bi bi-code text-accent me-2" aria-hidden="true"></i>SDK Examples</h2>
+
+                        <h3 class="mb-3">JavaScript / Fetch</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">JavaScript</span>
+                            <span class="code-file">example.js</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>const baseUrl = 'http://blogware.site/api/v1';
+
+// Get posts
+const response = await fetch(`${baseUrl}/posts`);
+const data = await response.json();
+
+// Get single post
+const post = await fetch(`${baseUrl}/posts/1`);
+
+// Create comment (no auth required)
+const comment = await fetch(`${baseUrl}/comments`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    comment_author_name: 'John Doe',
+    comment_author_email: 'john@example.com',
+    comment_content: 'Great article!',
+    comment_post_id: 1
+  })
+});</code></pre>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">PHP</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">PHP</span>
+                            <span class="code-file">example.php</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>$baseUrl = 'http://blogware.site/api/v1';
+
+// Get posts
+$response = file_get_contents($baseUrl . '/posts');
+$posts = json_decode($response, true);
+
+// Get posts with authentication
+$context = stream_context_create([
+  'http' => [
+    'header' => "X-API-Key: your-api-key\r\n"
+  ]
+]);
+$response = file_get_contents($baseUrl . '/posts', false, $context);</code></pre>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Python</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">Python</span>
+                            <span class="code-file">example.py</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>import requests
+
+base_url = 'http://blogware.site/api/v1'
+
+# Get posts
+response = requests.get(f'{base_url}/posts')
+posts = response.json()
+
+# Get posts with authentication
+headers = {'X-API-Key': 'your-api-key'}
+response = requests.get(f'{base_url}/posts', headers=headers)
+
+# Create comment
+data = {
+    'comment_author_name': 'John Doe',
+    'comment_author_email': 'john@example.com',
+    'comment_content': 'Great article!',
+    'comment_post_id': 1
+}
+response = requests.post(f'{base_url}/comments', json=data)</code></pre>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">cURL</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">BASH</span>
+                            <span class="code-file">commands</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code># Get posts
+curl http://blogware.site/api/v1/posts
+
+# Get posts with authentication
+curl -H "X-API-Key: your-api-key" http://blogware.site/api/v1/posts
+
+# Create comment
+curl -X POST http://blogware.site/api/v1/comments \
+  -H "Content-Type: application/json" \
+  -d '{
+    "comment_author_name": "John Doe",
+    "comment_author_email": "john@example.com",
+    "comment_content": "Great article!",
+    "comment_post_id": 1
+  }'</code></pre>
+                        </div>
+
+                        <!-- OpenAPI Specification -->
+                        <h2 class="mt-5 mb-4" id="openapi"><i class="bi bi-file-earmark-code text-accent me-2" aria-hidden="true"></i>OpenAPI Specification</h2>
+                        <p>The complete OpenAPI 3.0 specification is available via the dynamic endpoint or as static files:</p>
+
+                        <h5 class="mb-2">Dynamic Endpoint (Recommended)</h5>
+                        <p>Access the live specification at <code><a href="/api/v1/openapi.json">GET /api/v1/openapi.json</a></code> — it substitutes runtime server URLs automatically.</p>
+
+                        <h5 class="mb-2 mt-3">Static Files</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <a href="../docs/API_OPENAPI.json" class="resource-card" download aria-label="Download OpenAPI specification in JSON format">
+                                    <div class="resource-icon">
+                                        <i class="bi bi-file-code" aria-hidden="true"></i>
+                                    </div>
+                                    <div class="resource-content">
+                                        <h5>OpenAPI JSON</h5>
+                                        <p>Download the JSON format specification</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="../docs/API_OPENAPI.yaml" class="resource-card" download aria-label="Download OpenAPI specification in YAML format">
+                                    <div class="resource-icon">
+                                        <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+                                    </div>
+                                    <div class="resource-content">
+                                        <h5>OpenAPI YAML</h5>
+                                        <p>Download the YAML format specification</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <p class="mt-3">Use these files to generate client SDKs, validate API responses, import into API testing tools (Postman, Swagger UI), or auto-generate documentation.</p>
+
+                        <h3 class="mb-3 mt-4">Using with Swagger UI</h3>
+                        <p>To view the API documentation in Swagger UI:</p>
+                        <ol class="feature-list">
+                            <li>Copy the <code>API_OPENAPI.json</code> file to a web server</li>
+                            <li>Navigate to <a href="https://editor.swagger.io/" target="_blank" rel="noopener">Swagger Editor</a></li>
+                            <li>Paste the JSON content</li>
+                            <li>Explore the interactive API documentation</li>
+                        </ol>
+
+                        <h3 class="mb-3 mt-4">Using with Postman</h3>
+                        <p>To import into Postman:</p>
+                        <ol class="feature-list">
+                            <li>Open Postman</li>
+                            <li>Click Import</li>
+                            <li>Select "Import from link"</li>
+                            <li>Enter: <code>http://blogware.site/docs/API_OPENAPI.json</code></li>
+                        </ol>
+
+                        <!-- Creating API Controllers -->
+                        <h2 class="mt-5 mb-4" id="creating-controllers"><i class="bi bi-code-branch text-accent me-2" aria-hidden="true"></i>Creating API Controllers</h2>
+                        <p>All API controllers follow a consistent pattern: <strong>Controller → Service → DAO → Database</strong>, with DTOs for response formatting.</p>
+
+                        <h3 class="mb-3">Step 1: Create DTO</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">PHP</span>
+                            <span class="code-file">lib/dto/api/MyResourceApiDto.php</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>&lt;?php
+namespace Scriptlog\Dto\Api;
+
+class MyResourceApiDto
+{
+    public static function transform(array $resource, string $appUrl): array
+    {
+        return [
+            'id' => (int)$resource['id'],
+            'title' => $resource['title'],
+            'slug' => $resource['slug'],
+            'url' => $appUrl . '/resource/' . $resource['id'] . '/' . $resource['slug'],
+            'date' => $resource['created_at'],
+            '_links' => [
+                'self' => ApiHateoas::resourceLink($resource['id']),
+                'collection' => ApiHateoas::collectionLink()
+            ]
+        ];
+    }
+
+    public static function transformCollection(array $resources, string $appUrl): array
+    {
+        return array_map(function ($r) use ($appUrl) {
+            return self::transform($r, $appUrl);
+        }, $resources);
+    }
+}</code></pre>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Step 2: Create DAO</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">PHP</span>
+                            <span class="code-file">lib/dao/MyResourceDao.php</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>&lt;?php
+namespace Scriptlog\Dao;
+
+class MyResourceDao
+{
+    private $db;
+
+    public function __construct($db)
+    {
+        $this-&gt;db = $db;
+    }
+
+    public function findAll(int $page, int $perPage, int $offset): array
+    {
+        $stmt = $this-&gt;db-&gt;prepare(
+            "SELECT * FROM tbl_resources ORDER BY id DESC LIMIT ? OFFSET ?"
+        );
+        $stmt-&gt;execute([$perPage, $offset]);
+        return $stmt-&gt;fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function count(): int
+    {
+        return (int)$this-&gt;db-&gt;query("SELECT COUNT(*) FROM tbl_resources")-&gt;fetchColumn();
+    }
+
+    public function findById(int $id): ?array
+    {
+        $stmt = $this-&gt;db-&gt;prepare("SELECT * FROM tbl_resources WHERE id = ?");
+        $stmt-&gt;execute([$id]);
+        $row = $stmt-&gt;fetch(\PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    public function create(array $data): int
+    {
+        $stmt = $this-&gt;db-&gt;prepare(
+            "INSERT INTO tbl_resources (title, content) VALUES (?, ?)"
+        );
+        $stmt-&gt;execute([$data['title'], $data['content']]);
+        return (int)$this-&gt;db-&gt;lastInsertId();
+    }
+}</code></pre>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Step 3: Create Service</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">PHP</span>
+                            <span class="code-file">lib/service/MyResourceService.php</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>&lt;?php
+namespace Scriptlog\Service;
+
+class MyResourceService
+{
+    private $resourceDao;
+
+    public function __construct($resourceDao)
+    {
+        $this-&gt;resourceDao = $resourceDao;
+    }
+
+    public function getPaginatedResources(int $page, int $perPage): array
+    {
+        $offset = ($page - 1) * $perPage;
+        return [
+            'items' => $this-&gt;resourceDao-&gt;findAll($page, $perPage, $offset),
+            'total' => $this-&gt;resourceDao-&gt;count()
+        ];
+    }
+
+    public function getResource(int $id): ?array
+    {
+        return $this-&gt;resourceDao-&gt;findById($id);
+    }
+
+    public function createResource(array $data): int
+    {
+        return $this-&gt;resourceDao-&gt;create($data);
+    }
+}</code></pre>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Step 4: Create Controller</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">PHP</span>
+                            <span class="code-file">lib/controller/api/MyResourceApiController.php</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>&lt;?php
+namespace Scriptlog\Controller\Api;
+
+use Scriptlog\Core\ApiResponse;
+use Scriptlog\Dto\Api\MyResourceApiDto;
+
+class MyResourceApiController extends \Scriptlog\Controller\ApiController
+{
+    private $resourceService;
+
+    public function __construct($resourceService)
+    {
+        parent::__construct();
+        $this-&gt;resourceService = $resourceService;
+    }
+
+    public function index($params = [])
+    {
+        $this-&gt;requiresAuth = false;
+        $pagination = $this-&gt;getPagination($params);
+
+        try {
+            $result = $this-&gt;resourceService-&gt;getPaginatedResources(
+                $pagination['page'],
+                $pagination['per_page']
+            );
+            $transformed = MyResourceApiDto::transformCollection(
+                $result['items'],
+                $this-&gt;getAppUrl()
+            );
+            ApiResponse::paginated(
+                $transformed,
+                $pagination['page'],
+                $pagination['per_page'],
+                $result['total']
+            );
+        } catch (\Throwable $e) {
+            ApiResponse::error($e-&gt;getMessage(), 500, 'FETCH_ERROR');
+        }
+    }
+
+    public function show($params = [])
+    {
+        $this-&gt;requiresAuth = false;
+        $id = isset($params['id']) ? (int)$params['id'] : 0;
+
+        if (!$id) {
+            ApiResponse::badRequest('Resource ID is required');
+            return;
+        }
+
+        $resource = $this-&gt;resourceService-&gt;getResource($id);
+
+        if (!$resource) {
+            ApiResponse::notFound('Resource not found');
+            return;
+        }
+
+        ApiResponse::success(
+            MyResourceApiDto::transform($resource, $this-&gt;getAppUrl())
+        );
+    }
+
+    public function store($params = [])
+    {
+        $this-&gt;requiresAuth = true;
+
+        if (!$this-&gt;hasPermission(['administrator', 'editor'])) {
+            ApiResponse::forbidden('Permission denied');
+            return;
+        }
+
+        $errors = $this-&gt;validateRequired($this-&gt;requestData, ['title', 'content']);
+
+        if ($errors) {
+            ApiResponse::unprocessableEntity('Validation failed', $errors);
+            return;
+        }
+
+        $id = $this-&gt;resourceService-&gt;createResource($this-&gt;requestData);
+        ApiResponse::created(['id' => $id], 'Resource created');
+    }
+}</code></pre>
+                        </div>
+
+                        <h3 class="mb-3 mt-4">Step 5: Register Routes</h3>
+                        <div class="code-block-header">
+                            <span class="code-lang">PHP</span>
+                            <span class="code-file">api/index.php</span>
+                        </div>
+                        <div class="code-block" tabindex="0">
+                            <pre><code>$router-&gt;get('resources', 'MyResourceApiController@index');
+$router-&gt;get('resources/(?P&lt;id&gt;[0-9]+)', 'MyResourceApiController@show');
+$router-&gt;post('resources', 'MyResourceApiController@store');
+$router-&gt;put('resources/(?P&lt;id&gt;[0-9]+)', 'MyResourceApiController@update');
+$router-&gt;patch('resources/(?P&lt;id&gt;[0-9]+)', 'MyResourceApiController@update');
+$router-&gt;delete('resources/(?P&lt;id&gt;[0-9]+)', 'MyResourceApiController@destroy');</code></pre>
+                        </div>
+                        <div class="alert alert-info mt-3" role="alert">
+                            <i class="bi bi-info-circle me-2" aria-hidden="true"></i>
+                            <strong>Note:</strong> Routes use named capture groups <code>(?P&lt;id&gt;[0-9]+)</code> for parameter resolution. Always reference parameters as <code>$params['id']</code>, never <code>$params[0]</code>. When adding new classes, use PSR-4 namespaces and register them in both <code>lib/autoload-aliases.php</code> and <code>lib/autoload-aliases-map.php</code>.
+                        </div>
+
+                        <!-- Support -->
+                        <h2 class="mt-5 mb-4" id="support"><i class="bi bi-life-preserver text-accent me-2" aria-hidden="true"></i>Support</h2>
+                        <p>For issues and questions:</p>
+                        <ul class="feature-list" aria-label="Support contact options">
+                            <li><strong>Email:</strong> <a href="mailto:scriptlog@yandex.com" aria-label="Send email to scriptlog at yandex dot com">scriptlog@yandex.com</a></li>
+                            <li><strong>Documentation:</strong> <a href="https://developers.scriptlog.my.id/" target="_blank" rel="noopener" aria-label="Visit developer documentation at developers dot scriptlog dot my dot id">https://developers.scriptlog.my.id</a></li>
+                        </ul>
+
+
+
+                        <!-- Related Docs -->
+                        <div class="related-docs mt-5">
+                            <h5><i class="bi bi-link-45deg text-accent me-2" aria-hidden="true"></i>Related Documentation</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <a href="architecture.html" class="related-card">
+                                        <i class="bi bi-diagram-3"></i>
+                                        <span>Architecture</span>
+                                        <small>Understand the MVC structure and request flow</small>
+                                    </a>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="components.html" class="related-card">
+                                        <i class="bi bi-box-seam"></i>
+                                        <span>Components</span>
+                                        <small>DAO, Service, and Controller patterns explained</small>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Page Navigation -->
+                        <div class="doc-navigation mt-5">
+                            <div class="row">
+                                <div class="col-6">
+                                    <a href="configuration.html" class="text-decoration-none"><i class="bi bi-arrow-left"></i> Configuration Guide</a>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <a href="database.html" class="text-decoration-none">Database Schema <i class="bi bi-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer bg-primary text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5><i class="bi bi-journal-code me-2"></i>Scriptlog</h5>
+                    <p>Just Another Blog Engine</p>
+                    <p class="mb-0"><small>Version 1.0.0</small></p>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6>Documentation</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="installation.html" class="text-white-50">Installation</a></li>
+                        <li><a href="architecture.html" class="text-white-50">Architecture</a></li>
+                        <li><a href="configuration.html" class="text-white-50">Configuration</a></li>
+                        <li><a href="database.html" class="text-white-50">Database</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6>Development</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="theming.html" class="text-white-50">Theming</a></li>
+                        <li><a href="plugins.html" class="text-white-50">Plugins</a></li>
+                        <li><a href="api.html" class="text-white-50">API Reference</a></li>
+                        <li><a href="testing.html" class="text-white-50">Testing</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6>Resources</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="components.html" class="text-white-50">Components</a></li>
+                        <li><a href="https://github.com/cakmoel/Scriptlog" target="_blank" rel="noopener" class="text-white-50">GitHub</a></li>
+                        <li><a href="https://github.com/cakmoel/Scriptlog/issues" target="_blank" rel="noopener" class="text-white-50">Issues</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6>Connect</h6>
+                    <div class="social-links">
+                        <a href="https://github.com/cakmoel/Scriptlog" target="_blank" rel="noopener" class="text-white-50 me-2" aria-label="GitHub"><i class="bi bi-github"></i></a>
+                        <a href="https://x.com/getscriptlog" class="text-white-50 me-2" aria-label="Twitter"><i class="bi bi-twitter"></i></a>
+                        
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; <span id="currentYear"></span> Scriptlog. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">Made with <i class="bi bi-heart-fill text-accent" aria-hidden="true"></i> for developers</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <button id="backToTop" class="btn btn-accent position-fixed" style="bottom: 20px; right: 20px; display: none; z-index: 1000;" aria-label="Back to top">
+        <i class="bi bi-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
