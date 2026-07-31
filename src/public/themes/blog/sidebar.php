@@ -5,10 +5,10 @@
     <header>
       <h3 class="h6"><?= t('sidebar.search.title'); ?></h3>
     </header>
-    <form action="#" class="search-form" id="ajax-search-form" role="search" aria-label="<?= t('sidebar.search.title'); ?>">
+    <form action="<?= app_url(); ?>/search" method="get" class="search-form" id="ajax-search-form" role="search" aria-label="<?= t('sidebar.search.title'); ?>">
       <div class="form-group">
         <label for="search-keyword" class="sr-only"><?= t('sidebar.search.placeholder'); ?></label>
-        <input type="search" id="search-keyword" name="search" placeholder="<?= t('sidebar.search.placeholder'); ?>" autocomplete="off" aria-describedby="search-results">
+        <input type="search" id="search-keyword" name="q" placeholder="<?= t('sidebar.search.placeholder'); ?>" autocomplete="off" aria-describedby="search-results">
         <button type="submit" class="submit" aria-label="<?= t('sidebar.search.submit'); ?>"><i class="icon-search" aria-hidden="true"></i></button>
       </div>
       <div id="search-results" class="search-results" aria-live="polite" aria-atomic="true"></div>

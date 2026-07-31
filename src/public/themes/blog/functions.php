@@ -549,7 +549,14 @@ if (!function_exists('latest_posts')) {
 }
 
 /**
- * format_topics() - Format topics string to HTML links
+ * Format topics data into HTML category links
+ *
+ * Parses pipe-delimited topic strings (id:title:slug) from the database
+ * and returns comma-separated HTML anchor links. Handles colons in
+ * topic titles by extracting ID from the start and slug from the end.
+ *
+ * @param string|null $topics_data Pipe-delimited topic data from GROUP_CONCAT
+ * @return string HTML links joined by ', ' or empty string
  */
 if (!function_exists('format_topics')) {
     function format_topics($topics_data)
@@ -562,20 +569,36 @@ if (!function_exists('format_topics')) {
         $links = [];
 
         foreach ($topics as $topic) {
-            $parts = explode(':', $topic);
-            if (count($parts) === 3) {
-                $id = $parts[0];
-                $title = $parts[1];
-                $slug = $parts[2];
+            $topic = trim($topic);
 
-                $permalink = (function_exists('rewrite_status') && rewrite_status() === 'yes') ? permalinks($slug)['cat'] : permalinks($id)['cat'];
-                $title_esc = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-                $permalink_esc = htmlspecialchars($permalink, ENT_QUOTES, 'UTF-8');
-                $links[] = "<a href='{$permalink_esc}'>{$title_esc}</a>";
+            if ($topic === '') {
+                continue;
             }
+
+            $parts = explode(':', $topic);
+
+            if (count($parts) < 3) {
+                continue;
+            }
+
+            $id = array_shift($parts);
+            $slug = array_pop($parts);
+            $title = implode(':', $parts);
+
+            if ($id === '' || $slug === '') {
+                continue;
+            }
+
+            $permalink = (function_exists('rewrite_status') && rewrite_status() === 'yes')
+                ? permalinks($slug)['cat']
+                : permalinks($id)['cat'];
+
+            $title_esc = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+            $permalink_esc = htmlspecialchars($permalink, ENT_QUOTES, 'UTF-8');
+            $links[] = "<a href='{$permalink_esc}'>{$title_esc}</a>";
         }
 
-        return implode(', ', $links);
+        return $links ? implode(' ', $links) : "";
     }
 }
 

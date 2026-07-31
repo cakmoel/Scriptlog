@@ -4,7 +4,7 @@ $retrieve_page = function_exists('rewrite_status') && rewrite_status() == 'yes' 
 
 $page_img = isset($retrieve_page['media_filename']) ? htmlout($retrieve_page['media_filename']) : "";
 $page_id = isset($retrieve_page['ID']) ? (int)$retrieve_page['ID'] : "";
-$page_title = isset($retrieve_page['post_title']) ? htmlout($retrieve_page['post_title']) : "";
+$page_title = isset($retrieve_page['post_title']) ? htmlspecialchars($retrieve_page['post_title'], ENT_QUOTES, 'UTF-8', false) : "";
 
 if (isset($retrieve_page['user_fullname'])) {
     $page_author = htmlout($retrieve_page['user_fullname']);

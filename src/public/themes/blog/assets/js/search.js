@@ -118,7 +118,7 @@
             
             if (data.results.length > 10) {
                 html += '<div class="search-result-item" style="text-align:center;">' +
-                        '<a href="' + scriptlog_vars.site_url + '/blog?q=' + encodeURIComponent(data.keyword) + '">View all ' + data.total + ' results</a>' +
+                        '<a href="' + scriptlog_vars.site_url + '/search?q=' + encodeURIComponent(data.keyword) + '">View all ' + data.total + ' results</a>' +
                         '</div>';
             }
             
