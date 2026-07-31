@@ -125,7 +125,8 @@ sendJsonResponse(201, true, null, null, [
 /**
  * Send JSON response and exit
  */
-function sendJsonResponse($statusCode, $success, $errorCode = null, $errorMessage = null, $data = null) {
+function sendJsonResponse($statusCode, $success, $errorCode = null, $errorMessage = null, $data = null) 
+{
     // Clean any output buffers
     while (ob_get_level()) {
         ob_end_clean();
