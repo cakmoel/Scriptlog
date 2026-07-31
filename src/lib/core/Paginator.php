@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -156,6 +157,9 @@ class Paginator
         $next =  (int)$this->_page + 1;
         $lastpage = ceil($this->_totalRows / $this->_perPage);
         $lpm1 = $lastpage - 1;
+
+        $path = htmlspecialchars($path, ENT_QUOTES, 'UTF-8');
+        $ext = $ext !== null ? htmlspecialchars($ext, ENT_QUOTES, 'UTF-8') : null;
 
         $this->_paginationHtml = '';
 
