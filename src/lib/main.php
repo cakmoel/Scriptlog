@@ -19,7 +19,7 @@ $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $requestPath = parse_url($requestUri, PHP_URL_PATH);
 $queryString = parse_url($requestUri, PHP_URL_QUERY);
 
-$knownQueryParams = ['p', 'pg', 'cat', 'tag', 'a', 'search'];
+$knownQueryParams = ['p', 'pg', 'cat', 'tag', 'a', 'search', 'q'];
 
 if (!empty($queryString)) {
     parse_str($queryString, $parsedQuery);
@@ -38,7 +38,7 @@ if (!empty($queryString)) {
         '/^\/category\/[\w\-]+$/D', '/^\/archive(\/[\d]{2}\/[\d]{4})?$/D',
         '/^\/archives$/D', '/^\/blog(\/page\/[\d]+)?$/D',
         '/^\/page\/[\w\-]+$/D', '/^\/post\/[\d]+\/[\w\-]+$/D',
-        '/^\/tag\/[\w\-\s]+$/D', '/^\/privacy$/D',
+        '/^\/tag\/[\w\-\s]+$/D', '/^\/privacy$/D', '/^\/search$/D',
         '/^\/download\/[a-f0-9\-]+(\/file)?$/D',
         '/^\/themes/i', '/^\/files/i', '/^\/rss\.php$/i', '/^\/atom\.php$/i',
     ];
