@@ -96,12 +96,12 @@
                               <i class="fa fa-calendar" aria-hidden="true"></i>
                            </div>
 
-               <input type="text" id="datetimepicker" name="<?= (isset($postData['post_modified']) ? "post_modified" : "post_date"); ?>" class="form-control" placeholder="YYYY-MM-DD HH:MM:SS" value="<?php
+                <input type="text" id="datetimepicker" name="<?= (isset($postData['post_modified']) ? "post_modified" : "post_date"); ?>" class="form-control" placeholder="YYYY-MM-DD HH:MM:SS" value="<?php
                 if (isset($postData['post_modified']) || isset($postData['post_date'])) {
                     if ($postData['post_modified'] === null) {
-                        echo make_date(safe_html($postData['post_date']));
+                        echo safe_html($postData['post_date']);
                     } else {
-                        echo make_date(safe_html($postData['post_modified']));
+                        echo safe_html($postData['post_modified']);
                     }
                 }
                 ?>">
