@@ -1,5 +1,7 @@
 <?php
+
 namespace Scriptlog\Validator;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 use Scriptlog\Dto\PostRequestDto;

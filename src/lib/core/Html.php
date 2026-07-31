@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -17,9 +18,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version 0.2
  *
  */
-final
-
-class Html
+final class Html
 {
     /**
      * @var array HTML filtering options
