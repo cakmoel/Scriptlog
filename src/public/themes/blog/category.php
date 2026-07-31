@@ -34,7 +34,7 @@ $pagination = function_exists('posts_by_category') ? posts_by_category($topicId)
                     if (!empty($entries)) :
                         foreach ($entries as $entry) :
                             $entry_id = isset($entry['ID']) ? (int)$entry['ID'] : "";
-                            $entry_title = isset($entry['post_title']) ? htmlout($entry['post_title']) : "";
+                            $entry_title = isset($entry['post_title']) ? htmlspecialchars($entry['post_title'], ENT_QUOTES, 'UTF-8', false) : "";
                             $entry_content = isset($entry['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($entry['post_content']))) : "";
                             $entry_img = ((isset($entry['media_filename'])) && ($entry['media_filename'] !== '') ? htmlout($entry['media_filename']) : "");
                             $entry_img_caption = isset($entry['media_caption']) ? htmlout($entry['media_caption']) : "";
