@@ -169,6 +169,35 @@ class ConfigurationController
                 LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             }
+        } elseif (isset($_POST['cacheConfigSubmit'])) {
+            try {
+                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
+                    throw new AppException("Sorry, unpleasant attempt detected!");
+                }
+
+                $cacheEnabled = (isset($_POST['cache_enabled']) && $_POST['cache_enabled'] === '1') ? '1' : '0';
+                $cacheLifetime = (isset($_POST['cache_lifetime']) && ctype_digit((string)$_POST['cache_lifetime']))
+                    ? (string)(int)$_POST['cache_lifetime']
+                    : '3600';
+
+                $this->persistCacheSetting('cache_enabled', $cacheEnabled);
+                $this->persistCacheSetting('cache_lifetime', $cacheLifetime);
+
+                if (function_exists('reset_app_settings_cache')) {
+                    reset_app_settings_cache();
+                }
+
+                if (function_exists('page_cache_clear')) {
+                    page_cache_clear();
+                }
+
+                $_SESSION['status'] = "cacheConfigUpdated";
+                direct_page('index.php?load=option-general&status=cacheConfigUpdated', 302);
+            } catch (\Throwable $th) {
+                LogError::setStatusCode(http_response_code());
+                LogError::exceptionHandler($th);
+            }
         } else {
             if ((isset($_SESSION['status'])) && ($_SESSION['status'] == 'generalConfigUpdated')) {
                 $checkStatus = true;
@@ -179,6 +208,12 @@ class ConfigurationController
             if ((isset($_SESSION['status'])) && ($_SESSION['status'] == 'cacheCleared')) {
                 $checkStatus = true;
                 array_push($status, "Page cache has been cleared");
+                unset($_SESSION['status']);
+            }
+
+            if ((isset($_SESSION['status'])) && ($_SESSION['status'] == 'cacheConfigUpdated')) {
+                $checkStatus = true;
+                array_push($status, "Page cache settings have been updated");
                 unset($_SESSION['status']);
             }
 
@@ -198,6 +233,8 @@ class ConfigurationController
             $this->view->set('settings', $this->configService->grabGeneralSettings('ID', 7));
             $this->view->set('formAction', $this->getFormAction());
             $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+            $this->view->set('cacheEnabled', (function_exists('page_cache_is_enabled')) ? page_cache_is_enabled() : false);
+            $this->view->set('cacheLifetime', (function_exists('page_cache_ttl')) ? page_cache_ttl() : 3600);
         }
 
         return $this->view->render();
@@ -976,6 +1013,32 @@ class ConfigurationController
         }
 
         return $settings;
+    }
+
+    /**
+     * persistCacheSetting
+     *
+     * Persist a single page-cache setting (cache_enabled / cache_lifetime),
+     * creating the row when missing and updating it when present.
+     *
+     * @param string $name
+     * @param string $value
+     * @return void
+     *
+     */
+    private function persistCacheSetting($name, $value)
+    {
+        $this->configService->setConfigName($name);
+        $this->configService->setConfigValue($value);
+
+        $existing = $this->configService->grabSettingByName($name);
+
+        if (is_array($existing) && isset($existing['ID'])) {
+            $this->configService->setConfigId($existing['ID']);
+            $this->configService->modifySetting();
+        } else {
+            $this->configService->addSetting();
+        }
     }
 
     /**
