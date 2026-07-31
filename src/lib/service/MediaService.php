@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Service;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -499,34 +500,24 @@ class MediaService
                 scriptlog_error("Bad filename", E_USER_WARNING);
             }
 
-            switch ($filetype) {
-                case 'audio/mpeg':
-                case 'audio/wav':
-                case 'audio/ogg':
+            $group = get_mime_group($filetype);
+
+            switch ($group) {
+                case 'audio':
                     if (is_readable(__DIR__ . '/../../public/files/audio/' . $filename)) {
                         unlink(__DIR__ . '/../../public/files/audio/' . $filename);
                     }
 
                     break;
 
-                case 'application/pdf':
-                case 'application/msword':
-                case 'application/rar':
-                case 'application/zip':
-                case 'application/vnd.ms-excel':
-                case 'application/vnd.microsoft.portable-executable':
-                case 'application/vnd.ms-powerpoint':
-                case 'application/octet-stream':
+                case 'doc':
                     if (is_readable(__DIR__ . '/../../public/files/docs/' . $filename)) {
                         unlink(__DIR__ . '/../../public/files/docs/' . $filename);
                     }
 
                     break;
 
-                case 'video/mp4':
-                case 'video/webm':
-                case 'video/ogg':
-                case 'video/mpeg':
+                case 'video':
                     if (is_readable(__DIR__ . '/../../public/files/video/' . $filename)) {
                         unlink(__DIR__ . '/../../public/files/video/' . $filename);
                     }

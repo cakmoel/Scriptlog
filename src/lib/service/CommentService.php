@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Service;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -150,6 +151,33 @@ class CommentService
         return $this->commentDao->findComment($id, $this->sanitizer);
     }
 
+    /**
+     * Get paginated approved comments for API
+     *
+     * @param integer $page
+     * @param integer $perPage
+     * @param string $sortBy
+     * @param string $sortOrder
+     * @param int|null $postId
+     * @return array
+     */
+    public function getApprovedCommentsApi($page = 1, $perPage = 10, $sortBy = 'ID', $sortOrder = 'DESC', $postId = null)
+    {
+        $offset = ($page - 1) * $perPage;
+        return $this->commentDao->findApprovedCommentsPaginated($perPage, $offset, $sortBy, $sortOrder, $postId);
+    }
+
+    /**
+     * Count approved comments for API
+     *
+     * @param int|null $postId
+     * @return integer
+     */
+    public function countApprovedCommentsApi($postId = null)
+    {
+        return $this->commentDao->countApprovedComments($postId);
+    }
+
     public function modifyComment()
     {
         $this->validator->sanitize($this->comment_id, 'int');
@@ -212,5 +240,61 @@ class CommentService
     public function countReplies($commentId)
     {
         return $this->commentDao->countReplies($commentId);
+    }
+
+    /**
+     * Get a single comment with post info for the API.
+     *
+     * @param int $commentId
+     * @return array|false
+     */
+    public function getCommentApi($commentId)
+    {
+        return $this->commentDao->findCommentWithPost($commentId);
+    }
+
+    /**
+     * Create a comment from raw data for the API.
+     *
+     * @param array $data
+     * @return int
+     */
+    public function createCommentApi(array $data)
+    {
+        return $this->commentDao->insertCommentApi($data);
+    }
+
+    /**
+     * Update a comment with raw data for the API.
+     *
+     * @param int $commentId
+     * @param array $data
+     * @return void
+     */
+    public function updateCommentApi($commentId, array $data)
+    {
+        $this->commentDao->updateCommentApi($commentId, $data);
+    }
+
+    /**
+     * Delete a comment and its replies for the API.
+     *
+     * @param int $commentId
+     * @return void
+     */
+    public function removeCommentApi($commentId)
+    {
+        $this->commentDao->deleteCommentWithReplies($commentId);
+    }
+
+    /**
+     * Check if a post exists and allows comments.
+     *
+     * @param int $postId
+     * @return string|null Returns comment_status value or null if post not found
+     */
+    public function checkPostAcceptsComments($postId)
+    {
+        return $this->commentDao->getPostCommentStatus($postId);
     }
 }
