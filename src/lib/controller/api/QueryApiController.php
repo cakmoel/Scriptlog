@@ -28,6 +28,9 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 use Scriptlog\Controller\ApiController;
 use Scriptlog\Core\ApiHateoas;
 use Scriptlog\Core\ApiResponse;
+use Scriptlog\Core\FormValidator;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Dao\PostDao;
 use Scriptlog\Service\PostService;
 
 /**
@@ -47,7 +50,7 @@ class QueryApiController extends ApiController
     {
         $this->requiresAuth = false;
         parent::__construct();
-        $this->postService = new PostService();
+        $this->postService = new PostService(new PostDao(), new FormValidator(), new Sanitize());
     }
 
     /**
