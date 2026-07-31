@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Service;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 use Scriptlog\Core\Sanitize;
@@ -21,7 +22,6 @@ use Scriptlog\Core\Sanitize;
  */
 class PostApplicationService
 {
-
     /**
      * PostService instance.
      * @var PostService
@@ -79,9 +79,19 @@ class PostApplicationService
             : 'private';
 
         $this->postService->processPostImage(
-            $file_location, $file_type, $file_name, $file_size,
-            $file_extension, $new_filename, $width, $height,
-            $media_access, $user_level, $filtered, false, null
+            $file_location,
+            $file_type,
+            $file_name,
+            $file_size,
+            $file_extension,
+            $new_filename,
+            $width,
+            $height,
+            $media_access,
+            $user_level,
+            $filtered,
+            false,
+            null
         );
 
         $this->setPostServiceData($filters, $filtered);
@@ -146,9 +156,19 @@ class PostApplicationService
             : 'private';
 
         $this->postService->processPostImage(
-            $file_location, $file_type, $file_name, $file_size,
-            $file_extension, $new_filename, $width, $height,
-            $media_access, $user_level, $filtered, true, $oldMediaId
+            $file_location,
+            $file_type,
+            $file_name,
+            $file_size,
+            $file_extension,
+            $new_filename,
+            $width,
+            $height,
+            $media_access,
+            $user_level,
+            $filtered,
+            true,
+            $oldMediaId
         );
 
         $this->postService->setComment($filtered['comment_status']);

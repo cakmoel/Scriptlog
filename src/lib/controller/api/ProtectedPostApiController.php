@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Controller\Api;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -33,6 +34,49 @@ class ProtectedPostApiController extends ApiController
     }
 
     /**
+     * Respond with HTMX fragment or API JSON, depending on request type.
+     *
+     * @param string $htmxFragment
+     * @param array $htmxData
+     * @param array|null $apiData
+     * @param int $statusCode
+     * @param string|null $apiErrorCode
+     * @return bool True if HTMX response was sent
+     */
+    private function respondWithHtmxFallback($htmxFragment, $htmxData, $apiData = null, $statusCode = 200, $apiErrorCode = null)
+    {
+        if (function_exists('is_htmx_request') && is_htmx_request()) {
+            render_htmx_fragment($htmxFragment, $htmxData, $statusCode);
+            return true;
+        }
+        if ($apiData !== null) {
+            if ($statusCode >= 400) {
+                ApiResponse::error($apiData['message'] ?? 'Error', $statusCode, $apiErrorCode ?? 'ERROR');
+            } else {
+                ApiResponse::success($apiData, $statusCode);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Send an error response via HTMX or API JSON.
+     *
+     * @param string $message
+     * @param int $statusCode
+     * @param string|null $errorCode
+     * @return void
+     */
+    private function sendError($message, $statusCode = 400, $errorCode = null)
+    {
+        if (function_exists('is_htmx_request') && is_htmx_request()) {
+            render_htmx_fragment('unlock-error', ['error' => $message], $statusCode);
+            return;
+        }
+        ApiResponse::error($message, $statusCode, $errorCode ?? 'ERROR');
+    }
+
+    /**
      * Unlock password-protected post
      *
      * POST /api/v1/posts/{id}/unlock
@@ -45,11 +89,7 @@ class ProtectedPostApiController extends ApiController
         $postId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (empty($postId)) {
-            if (function_exists('is_htmx_request') && is_htmx_request()) {
-                render_htmx_fragment('unlock-error', ['error' => 'Post ID is required'], 400);
-                return;
-            }
-            ApiResponse::error('Post ID is required', 400);
+            $this->sendError('Post ID is required', 400);
             return;
         }
 
@@ -57,38 +97,22 @@ class ProtectedPostApiController extends ApiController
         $password = isset($input['password']) ? trim($input['password']) : '';
 
         if (empty($password)) {
-            if (function_exists('is_htmx_request') && is_htmx_request()) {
-                render_htmx_fragment('unlock-error', ['error' => 'Password is required'], 400);
-                return;
-            }
-            ApiResponse::error('Password is required', 400);
+            $this->sendError('Password is required', 400);
             return;
         }
 
         if (function_exists('is_unlock_rate_limited') && is_unlock_rate_limited($postId)) {
-            if (function_exists('is_htmx_request') && is_htmx_request()) {
-                render_htmx_fragment('unlock-error', ['error' => 'Too many failed attempts. Please try again later.'], 429);
-                return;
-            }
-            ApiResponse::error('Too many failed attempts. Please try again later.', 429);
+            $this->sendError('Too many failed attempts. Please try again later.', 429);
             return;
         }
 
         if (!function_exists('checking_post_password')) {
-            if (function_exists('is_htmx_request') && is_htmx_request()) {
-                render_htmx_fragment('unlock-error', ['error' => 'Password verification function not available'], 500);
-                return;
-            }
-            ApiResponse::error('Password verification function not available', 500);
+            $this->sendError('Password verification function not available', 500);
             return;
         }
 
         if (!function_exists('decrypt_post')) {
-            if (function_exists('is_htmx_request') && is_htmx_request()) {
-                render_htmx_fragment('unlock-error', ['error' => 'Decryption function not available'], 500);
-                return;
-            }
-            ApiResponse::error('Decryption function not available', 500);
+            $this->sendError('Decryption function not available', 500);
             return;
         }
 
@@ -96,11 +120,7 @@ class ProtectedPostApiController extends ApiController
             if (function_exists('track_failed_unlock_attempt')) {
                 track_failed_unlock_attempt($postId);
             }
-            if (function_exists('is_htmx_request') && is_htmx_request()) {
-                render_htmx_fragment('unlock-error', ['error' => 'Incorrect password'], 401);
-                return;
-            }
-            ApiResponse::error('Incorrect password', 401);
+            $this->sendError('Incorrect password', 401);
             return;
         }
 
@@ -111,7 +131,8 @@ class ProtectedPostApiController extends ApiController
         $decrypted = decrypt_post($postId, $password);
 
         if (!isset($decrypted['post_content']) || empty($decrypted['post_content'])) {
-            ApiResponse::error('Unable to decrypt post content', 500);
+            $this->sendError('Unable to decrypt post content', 500);
+            return;
         }
 
         $decoded_content = html_entity_decode($decrypted['post_content'], ENT_QUOTES, 'UTF-8');
@@ -132,15 +153,10 @@ class ProtectedPostApiController extends ApiController
         }
         $_SESSION['unlocked_posts'][$postId] = $password;
 
-        if (function_exists('is_htmx_request') && is_htmx_request()) {
-            render_htmx_fragment('unlock-success', [
-                'content' => $content,
-                'post_id' => $postId
-            ]);
-            return;
-        }
-
-        ApiResponse::success([
+        $this->respondWithHtmxFallback('unlock-success', [
+            'content' => $content,
+            'post_id' => $postId
+        ], [
             'content' => $content
         ]);
     }
@@ -158,29 +174,28 @@ class ProtectedPostApiController extends ApiController
         $postId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (empty($postId)) {
-            ApiResponse::error('Post ID is required', 400);
+            $this->sendError('Post ID is required', 400);
+            return;
         }
 
         $input = $this->getJsonBody();
         $password = isset($input['password']) ? trim($input['password']) : '';
 
         if (empty($password)) {
-            ApiResponse::error('Password is required', 400);
+            $this->sendError('Password is required', 400);
+            return;
         }
 
         if (function_exists('is_unlock_rate_limited') && is_unlock_rate_limited($postId)) {
-            ApiResponse::error('Too many failed attempts. Please try again later.', 429);
+            $this->sendError('Too many failed attempts. Please try again later.', 429);
+            return;
         }
 
         if (!checking_post_password($postId, $password)) {
             if (function_exists('track_failed_unlock_attempt')) {
                 track_failed_unlock_attempt($postId);
             }
-            if (function_exists('is_htmx_request') && is_htmx_request()) {
-                render_htmx_fragment('unlock-error', ['error' => 'Incorrect password'], 401);
-                return;
-            }
-            ApiResponse::error('Incorrect password', 401);
+            $this->sendError('Incorrect password', 401);
             return;
         }
 
@@ -188,19 +203,12 @@ class ProtectedPostApiController extends ApiController
             clear_failed_unlock_attempts($postId);
         }
 
-        $isValid = checking_post_password($postId, $password);
-
-        if (function_exists('is_htmx_request') && is_htmx_request()) {
-            render_htmx_fragment('unlock-success', [
-                'content' => '',
-                'post_id' => $postId,
-                'verified' => true
-            ]);
-            return;
-        }
-
-        ApiResponse::success([
-            'valid' => $isValid
+        $this->respondWithHtmxFallback('unlock-success', [
+            'content' => '',
+            'post_id' => $postId,
+            'verified' => true
+        ], [
+            'valid' => true
         ]);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Dao;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**

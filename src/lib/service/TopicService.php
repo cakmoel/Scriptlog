@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Service;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -162,6 +163,69 @@ class TopicService
     }
 
     /**
+     * Get paginated active topics for API
+     *
+     * @param integer $page
+     * @param integer $perPage
+     * @param string $sortBy
+     * @param string $sortOrder
+     * @return array
+     */
+    public function getActiveTopicsApi($page = 1, $perPage = 10, $sortBy = 'ID', $sortOrder = 'DESC')
+    {
+        $offset = ($page - 1) * $perPage;
+        return $this->topicDao->findActiveTopicsPaginated($perPage, $offset, $sortBy, $sortOrder);
+    }
+
+    /**
+     * Count active topics for API
+     *
+     * @return integer
+     */
+    public function countActiveTopicsApi()
+    {
+        return $this->topicDao->countActiveTopics();
+    }
+
+    /**
+     * Get a single topic with post count for API
+     *
+     * @param integer $topicId
+     * @return array|false
+     */
+    public function getTopicApi($topicId)
+    {
+        return $this->topicDao->findTopicWithPostCount($topicId);
+    }
+
+    /**
+     * Get paginated posts by topic for API
+     *
+     * @param integer $topicId
+     * @param integer $page
+     * @param integer $perPage
+     * @param string $sortBy
+     * @param string $sortOrder
+     * @return array
+     */
+    public function getPostsByTopicApi($topicId, $page = 1, $perPage = 10, $sortBy = 'ID', $sortOrder = 'DESC')
+    {
+        $offset = ($page - 1) * $perPage;
+        return $this->topicDao->findPostsByTopicPaginated($topicId, $perPage, $offset, $sortBy, $sortOrder);
+    }
+
+    /**
+     * Count published posts by topic for API
+     *
+     * @param integer $topicId
+     * @return integer
+     */
+    public function countPostsByTopicApi($topicId)
+    {
+        return $this->topicDao->countPostsByTopic($topicId);
+    }
+
+    /**
      * addTopic
      *
      */
@@ -231,5 +295,50 @@ class TopicService
     public function localeDropDown($selected = "")
     {
         return $this->topicDao->dropDownLocale($selected);
+    }
+
+    /**
+     * Check if a topic slug already exists.
+     *
+     * @param string $slug
+     * @return bool
+     */
+    public function checkTopicSlugExists($slug)
+    {
+        return $this->topicDao->findTopicBySlug($slug) !== false;
+    }
+
+    /**
+     * Create a topic from raw data for the API.
+     *
+     * @param array $data
+     * @return int
+     */
+    public function createTopicApi(array $data)
+    {
+        return $this->topicDao->insertTopicApi($data);
+    }
+
+    /**
+     * Update a topic with raw data for the API.
+     *
+     * @param int $topicId
+     * @param array $data
+     * @return void
+     */
+    public function updateTopicApi($topicId, array $data)
+    {
+        $this->topicDao->updateTopicApi($topicId, $data);
+    }
+
+    /**
+     * Delete a topic and its relationships for the API.
+     *
+     * @param int $topicId
+     * @return void
+     */
+    public function removeTopicApi($topicId)
+    {
+        $this->topicDao->deleteTopicCascade($topicId);
     }
 }

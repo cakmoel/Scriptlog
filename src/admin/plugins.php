@@ -9,77 +9,18 @@ $pluginService = class_exists('PluginService') ? new PluginService($pluginDao, $
 $pluginController = class_exists('PluginController') ? new PluginController($pluginService) : "";
 
 try {
-    switch ($action) {
-        case ActionConst::INSTALLPLUGIN:
-            if (false === $app->authenticator->userAccessControl(ActionConst::PLUGINS)) {
-                direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
-            } else {
-                if ((!check_integer($pluginId)) && (gettype($pluginId))) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                    header("Status: 400 Bad Request");
-                    throw new AppException("Invalid ID data type!");
-                }
+    $actionKey = empty($action) ? 'default_plugin' : $action;
 
-                if ($pluginId == 0) {
-                    $pluginController->installPlugin();
-                } else {
-                    direct_page('index.php?load=dashboard', 302);
-                }
-            }
-
-            break;
-
-        case ActionConst::ACTIVATEPLUGIN:
-            if (false === $app->authenticator->userAccessControl(ActionConst::PLUGINS)) {
-                direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
-            } else {
-                if ($pluginDao->checkPluginId($pluginId, $app->sanitizer)) {
-                    $pluginController->enablePlugin((int)$pluginId);
-                } else {
-                    direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
-                }
-            }
-
-            break;
-
-        case ActionConst::DEACTIVATEPLUGIN:
-            if (false === $app->authenticator->userAccessControl(ActionConst::PLUGINS)) {
-                direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
-            } else {
-                if ($pluginDao->checkPluginId($pluginId, $app->sanitizer)) {
-                    $pluginController->disablePlugin((int)$pluginId);
-                } else {
-                    direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
-                }
-            }
-
-            break;
-
-        case ActionConst::DELETEPLUGIN:
-            if (false === $app->authenticator->userAccessControl(ActionConst::PLUGINS)) {
-                direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
-            } else {
-                if ((!check_integer($pluginId)) && (gettype($pluginId) !== "integer")) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                    header("Status: 400 Bad Request");
-                    throw new AppException("Invalid ID data type!");
-                }
-
-                if ($pluginDao->checkPluginId($pluginId, $app->sanitizer)) {
-                    $pluginController->remove((int)$pluginId);
-                } else {
-                    direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
-                }
-            }
-
-            break;
-
-        default:
-            if (false === $app->authenticator->userAccessControl(ActionConst::PLUGINS)) {
-                direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
-            } else {
-                $pluginController->listItems();
-            }
+    if ($app->adminActionRegistry && $app->adminActionRegistry->has($actionKey)) {
+        $app->adminActionRegistry->execute($actionKey, [
+            'app' => $app,
+            'id' => $pluginId,
+            'pluginDao' => $pluginDao,
+            'pluginService' => $pluginService,
+            'pluginController' => $pluginController,
+        ]);
+    } else {
+        direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
     }
 } catch (\Throwable $th) {
     if (class_exists('LogError')) {

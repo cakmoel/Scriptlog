@@ -81,7 +81,7 @@
           <p><?= copyright() . "\r"; ?><?= year_on_footer(date("Y")); ?>. <?= t('footer.copyright'); ?>. <?= function_exists('app_sitename') ? app_sitename() : ""; ?> </p>
         </div>
         <div class="col-md-6 text-right">
-          <p>Template By <a href="https://bootstrapious.com" class="text-white">Ondrej Svetska</a>
+          <p>Template By <a href="https://ondrejsvestka.cz/" class="text-white">Ondrej Svetska</a>
             <!-- Please do not remove the backlink to Bootstrap Temple unless you purchase an attribution-free license @ Bootstrap Temple or support us at http://bootstrapious.com/donate. It is part of the license conditions. Thanks for understanding :)                         -->
           </p>
         </div>
@@ -95,6 +95,8 @@
 <script src="<?= theme_dir(); ?>assets/vendor/bootstrap/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous" defer></script>
 <script src="<?= theme_dir(); ?>assets/vendor/jquery.cookie/jquery.cookie.js" integrity="sha384-ch1nZWLCNJ31V+4aC8U2svT7i40Ru+O8WHeLF4Mvq4aS7VD5ciODxwuOCdkIsX86" crossorigin="anonymous" defer></script>
 <script src="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.js" integrity="sha384-9P6MXH8lfxrzYEF6RdCaepmJsgsERWZGoUT0A7GtFJnA3drRC/UFhapoG1ETT/G/" crossorigin="anonymous" defer></script>
+<!-- Prism.js syntax highlighting -->
+<script src="<?= theme_dir(); ?>assets/vendor/prism/prism.js" integrity="sha384-Uo7StAor23ikLRSSe1KnYLOqudG1iH6SdjPpkuqmRZcmGDlbiKultKemHaJ9yzbd" crossorigin="anonymous" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/front.min.js" integrity="sha384-p8/ptwh75dWpkRgwFM0+kBa446gJ6bMsowJdjYc1U6pjNjxBUa8EDyN0BZuQ1qYp" crossorigin="anonymous" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/jquery.marquee.min.js" integrity="sha384-WQc1hOZkcOOSA84mSoGlpISELGiMCzndtE9DqqiDoYBcUD65cMZqNR9Ut8Pfl5Sj" crossorigin="anonymous" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/jquery.pause.min.js" integrity="sha384-ozxO7tw8nUwiSvQ7WYLD9xV5KlhtBKrlM3ej/cvXGEdJgc7NDJxAEzm9f/dzi5Ne" crossorigin="anonymous" defer></script>

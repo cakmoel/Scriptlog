@@ -11,7 +11,7 @@ if (function_exists('featured_post')) :
     foreach (featured_post() as $hero_headline) {
         $featured_hero_id = isset($hero_headline['ID']) ? (int)$hero_headline['ID'] : "";
         $featured_hero_img = ((isset($hero_headline['media_filename'])) && ($hero_headline['media_filename'] !== "") ? htmlout($hero_headline['media_filename']) : "");
-        $featured_hero_title = isset($hero_headline['post_title']) ? htmlout($hero_headline['post_title']) : "";
+        $featured_hero_title = isset($hero_headline['post_title']) ? htmlspecialchars($hero_headline['post_title'], ENT_QUOTES, 'UTF-8', false) : "";
     }
     ?>
 
@@ -44,8 +44,8 @@ endif;
 <?php
 if (function_exists('sticky_page')) :
     foreach (sticky_page() as $sticky) {
-        $sticky_title = isset($sticky['post_title']) ? htmlout($sticky['post_title']) : "";
-        $sticky_content = isset($sticky['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($sticky['post_content']))) : "";
+        $sticky_title = isset($sticky['post_title']) ? htmlspecialchars($sticky['post_title'], ENT_QUOTES, 'UTF-8', false) : "";
+        $sticky_content = isset($sticky['post_content']) ? paragraph_l2br(safe_html(paragraph_trim($sticky['post_content']))) : "";
     }
     ?>
 
@@ -57,9 +57,7 @@ if (function_exists('sticky_page')) :
 
                 <h2 class="h3"><?= isset($sticky_title) ? $sticky_title : "Welcome to ScriptLog"; ?></h2>
                 <p class="text-big">
-                   <?= isset($sticky_content) ? $sticky_content : "Your entryway to a personal blog that lets you easily express, create, and share your ideas. 
-          Whether you're a creative writer, hobbyist, tech enthusiast, personal blogger, or someone who values digital independence, 
-          ScriptLog empowers you to craft your online presence."; ?>
+                   <?= isset($sticky_content) ? $sticky_content : t('home.intro.welcome', ['%name%' => 'ScriptLog']); ?>
                 </p>
 
             </div>
@@ -91,9 +89,9 @@ if (function_exists('invoke_plugin')) {
 
                 $random_post_id = isset($random_post['ID']) ? (int)$random_post['ID'] : 0;
                 $random_post_img = ((isset($random_post['media_filename'])) && ($random_post['media_filename'] !== "") ? htmlout($random_post['media_filename']) : "");
-                $random_post_author = (isset($random_post['user_login']) || isset($random_post['user_fullname']) ? htmlout($random_post['user_login']) : htmlout($random_post['user_fullname']));
-                $random_post_title = isset($random_post['post_title']) ? htmlout($random_post['post_title']) : "";
-                $random_post_content = isset($random_post['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($random_post['post_content']))) : "";
+                $random_post_author = isset($random_post['user_login']) ? htmlout($random_post['user_login']) : htmlout($random_post['user_fullname'] ?? '');
+                $random_post_title = isset($random_post['post_title']) ? htmlspecialchars($random_post['post_title'], ENT_QUOTES, 'UTF-8', false) : "";
+                $random_post_content = isset($random_post['post_content']) ? paragraph_l2br(safe_html(paragraph_trim($random_post['post_content']))) : "";
                 $random_post_created = isset($random_post['post_modified']) ? htmlout(make_date($random_post['post_modified'])) : htmlout(make_date($random_post['post_date']));
                 $total_comment = isset($random_post['total_comments']) ? (int)$random_post['total_comments'] : 0;
 
@@ -197,7 +195,7 @@ if (function_exists('featured_post')) :
     foreach (featured_post() as $divider_content) {
         $featured_divider_id = isset($divider_content['ID']) ? (int)$divider_content['ID'] : "";
         $featured_divider_img = (isset($divider_content['media_filename']) && $divider_content['media_filename'] != "") ? htmlout($divider_content['media_filename']) : "";
-        $featured_divider_title = isset($divider_content['post_title']) ? htmlout($divider_content['post_title']) : "";
+        $featured_divider_title = isset($divider_content['post_title']) ? htmlspecialchars($divider_content['post_title'], ENT_QUOTES, 'UTF-8', false) : "";
     }
     ?>
 
@@ -210,7 +208,7 @@ if (function_exists('featured_post')) :
                 <h2 class="h2"><?= isset($featured_divider_title) ? $featured_divider_title : ""; ?> </h2>
                 <a <?= (!empty($featured_divider_id)) ? 'href="' . permalinks($featured_divider_id)['post'] . '" ' : 'href="' . app_url() . '/admin/login.php"';  ?>
                     class="hero-link">
-                    <?= (!empty($featured_divider_id)) ? 'View More' : 'Go to administrator panel'; ?>
+                    <?= (!empty($featured_divider_id)) ? t('home.divider.view_more') : t('home.hero.admin_panel'); ?>
                 </a>
             </div>
         </div>
@@ -238,8 +236,8 @@ endif;
                 <?php
                 foreach ($latest_posts as $latest_post) :
                     $latest_post_id = isset($latest_post['ID']) ? (int)$latest_post['ID'] : "";
-                    $latest_post_title = isset($latest_post['post_title']) ? htmlout($latest_post['post_title']) : "";
-                    $latest_post_content = isset($latest_post['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($latest_post['post_content']))) : "";
+                    $latest_post_title = isset($latest_post['post_title']) ? htmlspecialchars($latest_post['post_title'], ENT_QUOTES, 'UTF-8', false) : "";
+                    $latest_post_content = isset($latest_post['post_content']) ? paragraph_l2br(safe_html(paragraph_trim($latest_post['post_content']))) : "";
                     $latest_post_img = ((isset($latest_post['media_filename'])) && ($latest_post['media_filename'] !== "") ? htmlout($latest_post['media_filename']) : "");
                     $latest_img_caption = isset($latest_post['media_caption']) ? htmlout($latest_post['media_caption']) : "";
                     $latest_post_created = isset($latest_post['modified_at']) ? htmlout(make_date($latest_post['modified_at'])) : htmlout(make_date($latest_post['created_at']));

@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Dao;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -52,6 +53,71 @@ class CommentDao extends Dao
         $comments = $this->findAll([]);
 
         return (empty($comments)) ?: $comments;
+    }
+
+    /**
+     * Find approved comments with pagination for API
+     *
+     * @param integer $limit
+     * @param integer $offset
+     * @param string $sortBy
+     * @param string $sortOrder
+     * @param int|null $postId
+     * @return array
+     */
+    public function findApprovedCommentsPaginated($limit, $offset, $sortBy = 'ID', $sortOrder = 'DESC', $postId = null)
+    {
+        $allowedColumns = ['ID', 'comment_date'];
+        $sortColumn = in_array($sortBy, $allowedColumns) ? $sortBy : 'ID';
+        $sortDir = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
+
+        $sql = "SELECT c.ID, c.comment_post_id, c.comment_parent_id,
+                       c.comment_author_name, c.comment_author_email,
+                       c.comment_content, c.comment_status, c.comment_date,
+                       p.post_title, p.post_slug
+                FROM tbl_comments c
+                LEFT JOIN tbl_posts p ON c.comment_post_id = p.ID
+                WHERE c.comment_status = 'approved'";
+
+        $data = [];
+
+        if ($postId !== null) {
+            $sql .= " AND c.comment_post_id = ?";
+            $data[] = (int)$postId;
+        }
+
+        $sql .= " ORDER BY c.$sortColumn $sortDir";
+        $sql .= " LIMIT ? OFFSET ?";
+        $data[] = (int)$limit;
+        $data[] = (int)$offset;
+
+        $this->setSQL($sql);
+        $comments = $this->findAll($data);
+
+        return empty($comments) ? [] : $comments;
+    }
+
+    /**
+     * Count approved comments
+     *
+     * @param int|null $postId
+     * @return integer
+     */
+    public function countApprovedComments($postId = null)
+    {
+        $sql = "SELECT COUNT(*) as total FROM tbl_comments WHERE comment_status = 'approved'";
+
+        $data = [];
+
+        if ($postId !== null) {
+            $sql .= " AND comment_post_id = ?";
+            $data[] = (int)$postId;
+        }
+
+        $this->setSQL($sql);
+        $result = $this->findRow($data);
+
+        return $result ? (int)$result['total'] : 0;
     }
 
     /**
@@ -239,5 +305,71 @@ class CommentDao extends Dao
         $this->setSQL($sql);
         $result = $this->findRow([(int)$commentId]);
         return (isset($result['reply_count'])) ? (int)$result['reply_count'] : 0;
+    }
+
+    /**
+     * Find a single comment with post info (no sanitize required).
+     *
+     * @param int $commentId
+     * @return array|false
+     */
+    public function findCommentWithPost($commentId)
+    {
+        $sql = "SELECT c.*, p.post_title, p.post_slug
+                FROM tbl_comments c
+                LEFT JOIN tbl_posts p ON c.comment_post_id = p.ID
+                WHERE c.ID = ?";
+        $this->setSQL($sql);
+        return $this->findRow([(int)$commentId]);
+    }
+
+    /**
+     * Insert a comment with the given data and return the new ID.
+     *
+     * @param array $data
+     * @return int
+     */
+    public function insertCommentApi(array $data)
+    {
+        $this->create("tbl_comments", $data);
+        return $this->lastId();
+    }
+
+    /**
+     * Update specific comment fields.
+     *
+     * @param int $commentId
+     * @param array $data
+     * @return void
+     */
+    public function updateCommentApi($commentId, array $data)
+    {
+        $this->modify("tbl_comments", $data, ['ID' => (int)$commentId]);
+    }
+
+    /**
+     * Delete replies for a comment, then the comment itself.
+     *
+     * @param int $commentId
+     * @return void
+     */
+    public function deleteCommentWithReplies($commentId)
+    {
+        $this->deleteRecord("tbl_comments", ['comment_parent_id' => (int)$commentId]);
+        $this->deleteRecord("tbl_comments", ['ID' => (int)$commentId]);
+    }
+
+    /**
+     * Get comment_status for a post.
+     *
+     * @param int $postId
+     * @return string|null
+     */
+    public function getPostCommentStatus($postId)
+    {
+        $sql = "SELECT comment_status FROM tbl_posts WHERE ID = ?";
+        $this->setSQL($sql);
+        $result = $this->findRow([(int)$postId]);
+        return $result ? $result['comment_status'] : null;
     }
 }

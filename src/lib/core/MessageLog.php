@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -13,9 +14,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since Since Release 1.0
  *
  */
-final
-
-class MessageLog
+final class MessageLog
 {
     private static $display_errors;
 

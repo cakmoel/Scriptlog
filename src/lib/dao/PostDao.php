@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Dao;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -81,6 +82,105 @@ WHERE p.post_type = 'blog'";
         $posts = $this->findAll($data);
 
         return (empty($posts)) ? [] : $posts;
+    }
+
+    /**
+     * Find published posts with pagination for API endpoints
+     *
+     * @param integer $limit
+     * @param integer $offset
+     * @param string $sortBy
+     * @param string $sortOrder
+     * @param int|null $author
+     * @return array
+     */
+    public function findPublishedPostsPaginated($limit, $offset, $sortBy = 'ID', $sortOrder = 'DESC', $author = null)
+    {
+        $allowedColumns = ['ID', 'post_date', 'post_title', 'post_modified'];
+        $sortColumn = in_array($sortBy, $allowedColumns) ? $sortBy : 'ID';
+        $sortDir = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
+
+        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
+                       p.post_title, p.post_slug, p.post_summary, p.post_status,
+                       p.post_visibility, p.post_tags, p.post_type, p.comment_status,
+                       u.user_login as author_login, u.user_fullname as author_name
+                FROM tbl_posts p
+                LEFT JOIN tbl_users u ON p.post_author = u.ID
+                WHERE p.post_status = 'publish'
+                AND p.post_type = 'blog'
+                AND p.post_visibility = 'public'";
+
+        $data = [];
+
+        if ($author !== null) {
+            $sql .= " AND p.post_author = ?";
+            $data[] = (int)$author;
+        }
+
+        $sql .= " ORDER BY p.$sortColumn $sortDir";
+        $sql .= " LIMIT ? OFFSET ?";
+        $data[] = (int)$limit;
+        $data[] = (int)$offset;
+
+        $this->setSQL($sql);
+
+        $posts = $this->findAll($data);
+
+        return empty($posts) ? [] : $posts;
+    }
+
+    /**
+     * Count published posts
+     *
+     * @param int|null $author
+     * @return integer
+     */
+    public function countPublishedPosts($author = null)
+    {
+        $sql = "SELECT COUNT(*) as total FROM tbl_posts
+                WHERE post_status = 'publish'
+                AND post_type = 'blog'
+                AND post_visibility = 'public'";
+
+        $data = [];
+
+        if ($author !== null) {
+            $sql .= " AND post_author = ?";
+            $data[] = (int)$author;
+        }
+
+        $this->setSQL($sql);
+
+        $result = $this->findRow($data);
+
+        return $result ? (int)$result['total'] : 0;
+    }
+
+    /**
+     * Find a single published post by ID
+     *
+     * @param integer $postId
+     * @return array|false
+     */
+    public function findPublishedPostById($postId)
+    {
+        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
+                       p.post_title, p.post_slug, p.post_content, p.post_summary, p.post_status,
+                       p.post_visibility, p.post_password, p.post_tags, p.post_headlines,
+                       p.post_type, p.comment_status, p.passphrase, p.post_locale,
+                       u.user_login as author_login, u.user_fullname as author_name
+                FROM tbl_posts p
+                LEFT JOIN tbl_users u ON p.post_author = u.ID
+                WHERE p.ID = ?
+                AND p.post_type = 'blog'
+                AND p.post_status = 'publish'
+                AND p.post_visibility = 'public'";
+
+        $this->setSQL($sql);
+
+        $result = $this->findRow([(int)$postId]);
+
+        return empty($result) ? false : $result;
     }
 
     /**
@@ -507,5 +607,253 @@ WHERE ID = ? AND post_type = 'blog'";
         }
 
         return dropdown($name, $locales, $this->selected);
+    }
+
+    /**
+     * Get distinct year-month combinations with post counts for archive index.
+     *
+     * @return array
+     */
+    public function findArchiveIndex()
+    {
+        $sql = "SELECT
+                    YEAR(post_date) as year,
+                    MONTH(post_date) as month,
+                    COUNT(*) as post_count
+                FROM tbl_posts
+                WHERE post_status = 'publish'
+                AND post_type = 'blog'
+                AND post_visibility = 'public'
+                GROUP BY YEAR(post_date), MONTH(post_date)
+                ORDER BY year DESC, month DESC";
+
+        $this->setSQL($sql);
+        $results = $this->findAll();
+
+        return empty($results) ? [] : $results;
+    }
+
+    /**
+     * Find published posts by year with pagination.
+     *
+     * @param int $year
+     * @param int $limit
+     * @param int $offset
+     * @param string $sortBy
+     * @param string $sortOrder
+     * @return array
+     */
+    public function findPostsByYear($year, $limit, $offset, $sortBy = 'ID', $sortOrder = 'DESC')
+    {
+        $allowedColumns = ['ID', 'post_date', 'post_title', 'post_modified'];
+        $sortColumn = in_array($sortBy, $allowedColumns) ? $sortBy : 'ID';
+        $sortDir = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
+
+        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
+                       p.post_title, p.post_slug, p.post_summary, p.post_status,
+                       p.post_visibility, p.post_tags, p.post_type, p.comment_status,
+                       u.user_login as author_login, u.user_fullname as author_name
+                FROM tbl_posts p
+                LEFT JOIN tbl_users u ON p.post_author = u.ID
+                WHERE YEAR(p.post_date) = ?
+                AND p.post_status = 'publish'
+                AND p.post_type = 'blog'
+                AND p.post_visibility = 'public'
+                ORDER BY p.$sortColumn $sortDir
+                LIMIT ? OFFSET ?";
+
+        $this->setSQL($sql);
+        $posts = $this->findAll([(int)$year, (int)$limit, (int)$offset]);
+
+        return empty($posts) ? [] : $posts;
+    }
+
+    /**
+     * Count published posts for a given year.
+     *
+     * @param int $year
+     * @return int
+     */
+    public function countPostsByYear($year)
+    {
+        $sql = "SELECT COUNT(*) as total
+                FROM tbl_posts
+                WHERE YEAR(post_date) = ?
+                AND post_status = 'publish'
+                AND post_type = 'blog'
+                AND post_visibility = 'public'";
+
+        $this->setSQL($sql);
+        $result = $this->findRow([(int)$year]);
+
+        return $result ? (int)$result['total'] : 0;
+    }
+
+    /**
+     * Find published posts by year and month with pagination.
+     *
+     * @param int $year
+     * @param int $month
+     * @param int $limit
+     * @param int $offset
+     * @param string $sortBy
+     * @param string $sortOrder
+     * @return array
+     */
+    public function findPostsByYearMonth($year, $month, $limit, $offset, $sortBy = 'ID', $sortOrder = 'DESC')
+    {
+        $allowedColumns = ['ID', 'post_date', 'post_title', 'post_modified'];
+        $sortColumn = in_array($sortBy, $allowedColumns) ? $sortBy : 'ID';
+        $sortDir = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
+
+        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
+                       p.post_title, p.post_slug, p.post_summary, p.post_status,
+                       p.post_visibility, p.post_tags, p.post_type, p.comment_status,
+                       u.user_login as author_login, u.user_fullname as author_name
+                FROM tbl_posts p
+                LEFT JOIN tbl_users u ON p.post_author = u.ID
+                WHERE YEAR(p.post_date) = ?
+                AND MONTH(p.post_date) = ?
+                AND p.post_status = 'publish'
+                AND p.post_type = 'blog'
+                AND p.post_visibility = 'public'
+                ORDER BY p.$sortColumn $sortDir
+                LIMIT ? OFFSET ?";
+
+        $this->setSQL($sql);
+        $posts = $this->findAll([(int)$year, (int)$month, (int)$limit, (int)$offset]);
+
+        return empty($posts) ? [] : $posts;
+    }
+
+    /**
+     * Count published posts for a given year and month.
+     *
+     * @param int $year
+     * @param int $month
+     * @return int
+     */
+    public function countPostsByYearMonth($year, $month)
+    {
+        $sql = "SELECT COUNT(*) as total
+                FROM tbl_posts
+                WHERE YEAR(post_date) = ?
+                AND MONTH(post_date) = ?
+                AND post_status = 'publish'
+                AND post_type = 'blog'
+                AND post_visibility = 'public'";
+
+        $this->setSQL($sql);
+        $result = $this->findRow([(int)$year, (int)$month]);
+
+        return $result ? (int)$result['total'] : 0;
+    }
+
+    /**
+     * Search posts with LIKE for API query endpoint.
+     *
+     * @param string $keyword
+     * @param string $type 'blog', 'page', or 'all'
+     * @param int $limit
+     * @return array
+     */
+    public function searchPostsApi($keyword, $type = 'all', $limit = 50)
+    {
+        $likeKeyword = '%' . $keyword . '%';
+
+        if ($type === 'page') {
+            $sql = "SELECT ID, post_title, post_slug, post_date, post_content,
+                           post_summary, post_status, post_type
+                    FROM tbl_posts
+                    WHERE post_status = 'publish'
+                    AND post_type = 'page'
+                    AND (post_title LIKE ? OR post_content LIKE ?)
+                    ORDER BY post_date DESC
+                    LIMIT ?";
+            $this->setSQL($sql);
+            return $this->findAll([$likeKeyword, $likeKeyword, (int)$limit]);
+        }
+
+        $sql = "SELECT ID, post_title, post_slug, post_date, post_content,
+                       post_summary, post_status, post_type
+                FROM tbl_posts
+                WHERE post_status = 'publish'
+                AND (post_title LIKE ? OR post_content LIKE ?" .
+                ($type === 'all' ? " OR post_tags LIKE ?" : "") . ")
+                " . ($type === 'blog' ? "AND post_type = 'blog'" : "") . "
+                ORDER BY post_date DESC
+                LIMIT ?";
+
+        $this->setSQL($sql);
+        $params = [$likeKeyword, $likeKeyword];
+        if ($type === 'all') {
+            $params[] = $likeKeyword;
+        }
+        $params[] = (int)$limit;
+        return $this->findAll($params);
+    }
+
+    /**
+     * Find topics/categories attached to a post.
+     *
+     * @param int $postId
+     * @return array
+     */
+    public function findTopicsByPostId($postId)
+    {
+        $sql = "SELECT t.ID, t.topic_title, t.topic_slug
+                FROM tbl_topics t
+                INNER JOIN tbl_post_topic pt ON t.ID = pt.topic_id
+                WHERE pt.post_id = ?";
+
+        $this->setSQL($sql);
+        $topics = $this->findAll([(int)$postId]);
+        return empty($topics) ? [] : $topics;
+    }
+
+    /**
+     * Delete all topic relationships for a post.
+     *
+     * @param int $postId
+     * @return void
+     */
+    public function deletePostTopics($postId)
+    {
+        $this->deleteRecord("tbl_post_topic", ['post_id' => (int)$postId]);
+    }
+
+    /**
+     * Delete all comments for a post.
+     *
+     * @param int $postId
+     * @return void
+     */
+    public function deletePostComments($postId)
+    {
+        $this->deleteRecord("tbl_comments", ['comment_post_id' => (int)$postId]);
+    }
+
+    /**
+     * Insert a post with the given data and return the new ID.
+     *
+     * @param array $data Column => value pairs
+     * @return int
+     */
+    public function insertPostApi(array $data)
+    {
+        $this->create("tbl_posts", $data);
+        return $this->lastId();
+    }
+
+    /**
+     * Update specific post fields.
+     *
+     * @param int $postId
+     * @param array $data Column => value pairs
+     * @return void
+     */
+    public function updatePostApi($postId, array $data)
+    {
+        $this->modify("tbl_posts", $data, ['ID' => (int)$postId]);
     }
 }

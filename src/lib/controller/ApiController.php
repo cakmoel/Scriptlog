@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Controller;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -18,6 +19,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  */
 
 use Scriptlog\Core\ApiAuth;
+use Scriptlog\Core\ApiHelper;
 use Scriptlog\Core\ApiHateoas;
 use Scriptlog\Core\ApiResponse;
 
@@ -60,6 +62,9 @@ class ApiController
 
         // Get request headers
         $this->headers = $this->getHeaders();
+
+        // Validate Content-Type for write requests (sends 415 on mismatch)
+        $this->validateContentType();
 
         // Get request data based on method
         $this->requestData = $this->getRequestData();
@@ -129,6 +134,48 @@ class ApiController
         }
 
         return $data;
+    }
+
+    /**
+     * Validate Content-Type for write requests
+     *
+     * Enforces application/json Content-Type for POST, PUT, PATCH, DELETE
+     * when a Content-Type header is present and is not a supported form type.
+     * Sends 415 Unsupported Media Type response on mismatch.
+     *
+     * Override in child controllers (e.g., MediaApiController for uploads)
+     * to permit multipart/form-data.
+     *
+     * @return void
+     */
+    protected function validateContentType()
+    {
+        $writeMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
+        if (!in_array($this->method, $writeMethods)) {
+            return;
+        }
+
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+
+        // No Content-Type header — accept (BC with existing clients)
+        if (empty($contentType)) {
+            return;
+        }
+
+        $allowedTypes = [
+            'application/json',
+            'application/x-www-form-urlencoded',
+        ];
+
+        foreach ($allowedTypes as $allowed) {
+            if (strpos($contentType, $allowed) !== false) {
+                return;
+            }
+        }
+
+        ApiResponse::unsupportedMediaType(
+            'Content-Type must be application/json for API write requests. Received: ' . $contentType
+        );
     }
 
     /**
@@ -243,6 +290,16 @@ class ApiController
     }
 
     /**
+     * Get application URL from config
+     *
+     * @return string
+     */
+    protected function getAppUrl()
+    {
+        return ApiHelper::getAppUrl();
+    }
+
+    /**
      * Sanitize string input
      *
      * @param array|string $value
@@ -297,7 +354,7 @@ class ApiController
         }
 
         return [
-            'sort_by' => $sortBy,
+            'sort_by' => '`' . $sortBy . '`',
             'sort_order' => $sortOrder
         ];
     }
