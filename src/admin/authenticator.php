@@ -5,6 +5,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * File authenticator.php - Refactored for AppContext
  */
 
+use Scriptlog\Core\Authentication;
+use Scriptlog\Core\Session;
+use Scriptlog\Core\ScriptlogCryptonize;
+use Scriptlog\Core\Tokenizer;
+
 $timeout = class_exists('Authentication') ? Authentication::COOKIE_EXPIRE : 2592000;
 $current_date = date("Y-m-d H:i:s", time());
 $uagent = $_SERVER['HTTP_USER_AGENT'] ?? "";
@@ -36,19 +41,41 @@ if (class_exists('Session')) {
         $expired_verified   = false;
 
         // Use $app->cipher_key and $app->authenticator
-        $decrypt_auth = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $app->cipher_key) : "";
+        $decrypt_auth = "";
+        if (class_exists('ScriptlogCryptonize') && !empty($_COOKIE['scriptlog_auth'])) {
+            try {
+                $decrypt_auth = ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $app->cipher_key);
+                if (!is_string($decrypt_auth)) {
+                    $decrypt_auth = "";
+                }
+            } catch (\Throwable $e) {
+                // FIX: Corrupted cookie or key mismatch — clear it and continue as logged-out
+                $decrypt_auth = "";
+                if (isset($app->authenticator) && is_a($app->authenticator, 'Authentication')) {
+                    $app->authenticator->clearAuthCookies('');
+                }
+            }
+        }
 
         // Ensure $app->authenticator is available
         $token_info = (isset($app->authenticator)) ? $app->authenticator->findTokenByLogin($decrypt_auth, 0) : [];
 
         // Check 1: Token Found
         if (!empty($token_info['ID'])) {
-            if (hash_equals($token_info['pwd_hash'], Tokenizer::setRandomPasswordProtected($_COOKIE['scriptlog_validator']))) {
+
+            if (\Tokenizer::isPasswordValid($_COOKIE['scriptlog_validator'], $token_info['pwd_hash'])) {
                 $validator_verified = true;
             }
 
-            $secret = class_exists('ScriptlogCryptonize') ? ScriptlogCryptonize::generateSecretKey() : "";
-            if (hash_equals($token_info['selector_hash'], Tokenizer::setRandomSelectorProtected($_COOKIE['scriptlog_selector'], $secret))) {
+            $secret = function_exists('app_key') ? app_key() : "";
+
+            if (
+                !empty($secret) && Tokenizer::isSelectorValid(
+                    $token_info['selector_hash'],      // encrypted DB value
+                    $_COOKIE['scriptlog_selector'],    // cookie
+                    $secret
+                )
+            ) {
                 $selector_verified = true;
             }
 
@@ -93,6 +120,7 @@ if (class_exists('Session')) {
             if (!empty($decrypt_auth) && isset($app->authenticator)) {
                 $app->authenticator->clearAuthCookies($decrypt_auth);
             }
+
         }
     }
 }

@@ -49,6 +49,7 @@ if ($action === 'LogIn' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $login_data = [
         'login'           => filter_input(INPUT_POST, 'login', FILTER_SANITIZE_SPECIAL_CHARS),
         'user_pass'       => $_POST['user_pass'] ?? '', // Raw password
+        'remember'        => $_POST['remember'] ?? '',
         'csrf'            => $_POST['csrf'] ?? '',
         'captcha_login'   => $_POST['captcha_login'] ?? '',
         'scriptpot_name'  => $_POST['scriptpot_name'] ?? '',
@@ -114,7 +115,7 @@ login_header($stylePath);
         <div class="form-group has-feedback">
             <label for="inputLogin">Username or Email Address</label>
             <input type="text" class="form-control" id="inputLogin" name="login" maxlength="186"
-                value="<?= isset($_POST['login']) ? htmlspecialchars($_POST['login']) : (isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $app->cipher_key) : ""); ?>"
+                value="<?= isset($_POST['login']) ? htmlspecialchars($_POST['login']) : htmlspecialchars(get_remembered_username()); ?>"
                 required autofocus>
             <span class="glyphicon glyphicon-user form-control-feedback"></span>
         </div>

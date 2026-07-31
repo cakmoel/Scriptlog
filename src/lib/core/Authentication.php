@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -118,12 +119,12 @@ class Authentication
 
     /**
      * Constant COOKIE_EXPIRE
-     * default 1 hour
+     * default 30 days for persistent login (Remember Me)
      *
      * @var null|int|numeric
      *
      */
-    public const COOKIE_EXPIRE = 3600;
+    public const COOKIE_EXPIRE = 2592000;
 
     /**
      * Constant COOKIE_PATH
@@ -332,7 +333,8 @@ class Authentication
 
         $hashed_password = Tokenizer::setRandomPasswordProtected($random_password);
 
-        $secret = ScriptlogCryptonize::generateSecretKey();
+        //$secret = ScriptlogCryptonize::generateSecretKey();
+        $secret = app_key();
         $hashed_selector = Tokenizer::setRandomSelectorProtected($random_selector, $secret);
 
         $expiry_date = date("Y-m-d H:i:s", time() + self::COOKIE_EXPIRE);
@@ -343,7 +345,13 @@ class Authentication
             $this->userToken->updateTokenExpired($token_info['ID']);
         }
 
-        $bind_token = ['user_login' => $this->user_login, 'pwd_hash' => $hashed_password, 'selector_hash' => $hashed_selector, 'expired_date' => $expiry_date];
+        $bind_token = [
+            'user_login' => $this->user_login,
+            'pwd_hash' => $hashed_password,
+            'selector_hash' => $hashed_selector,
+            'is_expired' => 0,
+            'expired_date' => $expiry_date
+        ];
         $this->userToken->createUserToken($bind_token);
     }
 
@@ -357,13 +365,50 @@ class Authentication
      */
     public function logout()
     {
+        // Capture user login BEFORE destroying anything
+        $userLogin = null;
+
+        // Try to get login from session first
+        if (isset(Session::getInstance()->scriptlog_session_login) && !empty(Session::getInstance()->scriptlog_session_login)) {
+            $userLogin = Session::getInstance()->scriptlog_session_login;
+        }
+        // Then try the stored session_cookies from constructor
+        elseif (!empty($this->session_cookies)) {
+            $userLogin = $this->session_cookies;
+        }
+        // Last resort: decrypt cookie directly
+        elseif (isset($_COOKIE['scriptlog_auth']) && !empty($_COOKIE['scriptlog_auth'])) {
+            try {
+                $decrypted = ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $this->key);
+                if (!empty($decrypted)) {
+                    $userLogin = $decrypted;
+                }
+            } catch (\Throwable $e) {
+                // Corrupted cookie, ignore
+            }
+        }
+
+        // Remove cookies
         $this->removeCookies();
 
-        $this->clearAuthCookies($this->session_cookies);
+        // Clear auth cookies from database if we have a valid login
+        if (!empty($userLogin)) {
+            $this->clearAuthCookies($userLogin);
+        } else {
+            // If no login found, still try to clear cookies
+            $this->clearAllAuthCookies();
+            unset($_COOKIE['scriptlog_auth'], $_COOKIE['scriptlog_validator'], $_COOKIE['scriptlog_selector']);
+        }
 
-        Session::getInstance()->startSession();
+        // Start session if not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            Session::getInstance()->startSession();
+        }
+
+        // Clear all session variables
         $_SESSION = [];
 
+        // Delete the session cookie
         if (ini_get("session.use_cookies")) {
             $params = session_get_cookie_params();
             setcookie(
@@ -377,8 +422,10 @@ class Authentication
             );
         }
 
+        // Destroy the session
         session_destroy();
 
+        // Redirect to login page
         direct_page('login.php', 302);
     }
 

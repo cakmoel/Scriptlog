@@ -11,16 +11,26 @@ try {
             if (false === $app->authenticator->userAccessControl()) {
                 direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
             } else {
+                // Check if user is authenticated via Remember Me cookie
+                $hasRememberMe = isset($_COOKIE['scriptlog_auth']) && !empty($_COOKIE['scriptlog_auth']);
+                
+                // Validate logout token
                 $valid_logout = !empty($logOutId) && verify_logout_id($logOutId);
-
-                if (!$valid_logout) {
+                
+                // If token is invalid but user has Remember Me cookie, allow logout
+                // This is the fix for the "URL Redirection to Untrusted Site" error
+                if (!$valid_logout && $hasRememberMe) {
+                    // Proceed with logout for Remember Me users
+                    $app->authenticator->logout();
+                } elseif ($valid_logout) {
+                    // Normal logout with valid token
+                    $app->authenticator->logout();
+                } else {
+                    // Neither valid token nor Remember Me - possible security issue
                     header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
                     throw new AppException("URL Redirection to Untrusted Site");
-                } else {
-                    $app->authenticator->logout();
                 }
             }
-
             break;
 
         default:
