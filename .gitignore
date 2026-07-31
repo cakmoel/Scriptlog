@@ -41,6 +41,7 @@ node_modules/
 # Runtime cache files
 src/public/cache/rate_limit/
 src/public/log/unlock_attempts/
+src/public/files/cache/
 
 # Storage - sensitive key files
 storage/keys/
