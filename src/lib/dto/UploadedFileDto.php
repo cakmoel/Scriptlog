@@ -1,5 +1,7 @@
 <?php
+
 namespace Scriptlog\Dto;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
