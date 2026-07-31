@@ -286,6 +286,19 @@ function get_table_definitions($prefix = '')
     UNIQUE KEY locale (locale)
   ) Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
+   $tblApiKeys = "CREATE TABLE IF NOT EXISTS {$prefix}tbl_api_keys (
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT(20) UNSIGNED NOT NULL,
+    key_hash VARCHAR(255) NOT NULL COMMENT 'password_hash() of the raw API key',
+    description VARCHAR(255) DEFAULT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME DEFAULT NULL,
+    last_used_at DATETIME DEFAULT NULL,
+    is_revoked TINYINT(1) NOT NULL DEFAULT 0,
+    INDEX idx_user_id (user_id),
+    INDEX idx_key_hash (key_hash(191)),
+    CONSTRAINT fk_api_keys_user FOREIGN KEY (user_id) REFERENCES {$prefix}tbl_users (ID) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
     $saveAdmin    = "INSERT INTO {$prefix}tbl_users (user_login, user_email, user_pass, user_level, user_registered, `user_session`) VALUES (?, ?, ?, ?, ?, ?)";
     $saveSettings = "INSERT INTO {$prefix}tbl_settings (setting_name, setting_value) VALUES(?, ?)";
@@ -332,6 +345,7 @@ function get_table_definitions($prefix = '')
       'alterPostLocale' => $alterPostLocale,
       'alterTopicLocale' => $alterTopicLocale,
       'alterMenuLocale' => $alterMenuLocale,
+      'tblApiKeys' => $tblApiKeys,
       'tblPrivacyPolicy' => $tblPrivacyPolicy,
     ];
 }

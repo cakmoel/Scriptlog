@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Controller\Api;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -18,6 +19,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  */
 
 use Scriptlog\Controller\ApiController;
+use Scriptlog\Core\ApiHateoas;
 use Scriptlog\Core\ApiResponse;
 use Scriptlog\Core\SearchFinder;
 
@@ -29,9 +31,9 @@ class SearchApiController extends ApiController
     private $searchFinder;
 
     /**
-     * @var \Scriptlog\Core\Db|null
+     * @var ApiHateoas
      */
-    private $dbc;
+    private $hateoas;
 
     /**
      * Constructor
@@ -43,7 +45,7 @@ class SearchApiController extends ApiController
         parent::__construct();
 
         $this->searchFinder = new SearchFinder();
-        $this->dbc = \Scriptlog\Core\Registry::get('dbc');
+        $this->hateoas = new ApiHateoas();
     }
 
     /**
@@ -73,17 +75,19 @@ class SearchApiController extends ApiController
             return;
         }
 
+        $pagination = $this->getPagination($_GET);
+
         try {
             switch ($type) {
                 case 'posts':
-                    $results = $this->searchFinder->searchPost($keyword);
+                    $results = $this->searchFinder->searchPost($keyword, $pagination['page'], $pagination['per_page']);
                     break;
                 case 'pages':
-                    $results = $this->searchFinder->searchPage($keyword);
+                    $results = $this->searchFinder->searchPage($keyword, $pagination['page'], $pagination['per_page']);
                     break;
                 case 'all':
                 default:
-                    $results = $this->searchFinder->searchAll($keyword);
+                    $results = $this->searchFinder->searchAll($keyword, $pagination['page'], $pagination['per_page']);
                     break;
             }
 
@@ -94,12 +98,37 @@ class SearchApiController extends ApiController
 
             $transformedResults = $this->transformResults($results['results'], $type);
 
-            ApiResponse::success([
+            $totalPages = $results['totalRows'] > 0
+                ? (int)ceil($results['totalRows'] / $results['perPage'])
+                : 0;
+
+            $hateoasLinks = $this->hateoas->paginationLinks(
+                'search',
+                $results['page'],
+                $results['perPage'],
+                $results['totalRows'],
+                ['q' => $keyword]
+            );
+
+            $responseData = [
                 'keyword' => $keyword,
                 'type' => $type,
-                'total' => $results['totalRows'],
-                'results' => $transformedResults
-            ]);
+                'results' => $transformedResults,
+                'pagination' => [
+                    'current_page' => (int)$results['page'],
+                    'per_page' => (int)$results['perPage'],
+                    'total_items' => (int)$results['totalRows'],
+                    'total_pages' => $totalPages,
+                    'has_next_page' => $results['page'] < $totalPages,
+                    'has_previous_page' => $results['page'] > 1
+                ]
+            ];
+
+            if (!empty($hateoasLinks)) {
+                $responseData['_links'] = $hateoasLinks;
+            }
+
+            ApiResponse::success($responseData);
         } catch (\Throwable $e) {
             ApiResponse::error('Search failed: ' . $e->getMessage(), 500, 'SEARCH_ERROR');
         }
@@ -194,7 +223,7 @@ class SearchApiController extends ApiController
     private function getContentUrl($id, $slug, $type)
     {
         $appUrl = $this->getAppUrl();
-        $permalinkEnabled = $this->isPermalinkEnabled();
+        $permalinkEnabled = function_exists('rewrite_status') ? rewrite_status() : 'no';
 
         if ($type === 'page') {
             if ($permalinkEnabled === 'yes') {
@@ -208,43 +237,5 @@ class SearchApiController extends ApiController
         }
 
         return $appUrl . '/?p=' . (int)$id;
-    }
-
-    /**
-     * Check if permalinks are enabled
-     *
-     * @return string
-     */
-    private function isPermalinkEnabled()
-    {
-        try {
-            $result = $this->dbc->dbSelect(
-                "SELECT setting_value FROM tbl_settings WHERE setting_name = 'permalink_setting'",
-                []
-            );
-
-            if (!empty($result) && isset($result[0]->setting_value)) {
-                $rewriteStatus = json_decode($result[0]->setting_value, true);
-                return (is_array($rewriteStatus) && isset($rewriteStatus['rewrite'])) ? $rewriteStatus['rewrite'] : 'no';
-            }
-        } catch (\Throwable $e) {
-            // Fallback to 'no' if query fails
-        }
-
-        return 'no';
-    }
-
-    /**
-     * Get application URL
-     *
-     * @return string
-     */
-    private function getAppUrl()
-    {
-        $config = [];
-        if (file_exists(__DIR__ . '/../../../config.php')) {
-            $config = require __DIR__ . '/../../../config.php';
-        }
-        return $config['app']['url'] ?? 'http://localhost';
     }
 }

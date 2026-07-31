@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Controller;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 use Scriptlog\Core\ServiceException;

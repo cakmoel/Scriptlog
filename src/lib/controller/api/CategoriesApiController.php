@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Controller\Api;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -19,9 +20,12 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 use Scriptlog\Controller\ApiController;
 use Scriptlog\Core\ApiHateoas;
 use Scriptlog\Core\ApiResponse;
-use Scriptlog\Core\Registry;
+use Scriptlog\Core\FormValidator;
 use Scriptlog\Core\Sanitize;
 use Scriptlog\Dao\TopicDao;
+use Scriptlog\Dto\Api\PostApiDto;
+use Scriptlog\Dto\Api\TopicApiDto;
+use Scriptlog\Service\TopicService;
 
 class CategoriesApiController extends ApiController
 {
@@ -29,6 +33,11 @@ class CategoriesApiController extends ApiController
      * @var TopicDao
      */
     private $topicDao;
+
+    /**
+     * @var TopicService
+     */
+    private $topicService;
 
     /**
      * @var Sanitize
@@ -47,10 +56,11 @@ class CategoriesApiController extends ApiController
     {
         parent::__construct();
 
-        // Initialize DAO
+        // Initialize DAO and services
         $this->topicDao = new TopicDao();
         $this->sanitizer = new Sanitize();
         $this->hateoas = new ApiHateoas();
+        $this->topicService = new TopicService($this->topicDao, new FormValidator(), $this->sanitizer);
     }
 
     /**
@@ -73,30 +83,20 @@ class CategoriesApiController extends ApiController
         $sorting = $this->getSorting($params, ['ID', 'topic_title', 'topic_slug']);
 
         try {
-            $dbc = Registry::get('dbc');
+            $sortBy = str_replace('`', '', $sorting['sort_by']);
+            $sortOrder = $sorting['sort_order'];
 
-            // Get categories with post count
-            $sql = "SELECT t.ID, t.topic_title, t.topic_slug, t.topic_status,
-                           (SELECT COUNT(*) FROM tbl_post_topic pt 
-                            INNER JOIN tbl_posts p ON pt.post_id = p.ID 
-                            WHERE pt.topic_id = t.ID 
-                            AND p.post_status = 'publish' 
-                            AND p.post_type = 'blog') as post_count
-                    FROM tbl_topics t
-                    WHERE t.topic_status = 'Y'
-                    ORDER BY t." . $sorting['sort_by'] . " " . $sorting['sort_order'] . "
-                    LIMIT " . $pagination['per_page'] . " OFFSET " . $pagination['offset'];
+            $topics = $this->topicService->getActiveTopicsApi(
+                $pagination['page'],
+                $pagination['per_page'],
+                $sortBy,
+                $sortOrder
+            );
 
-            $stmt = $dbc->query($sql);
-            $topics = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-            // Get total count
-            $countSql = "SELECT COUNT(*) as total FROM tbl_topics WHERE topic_status = 'Y'";
-            $countStmt = $dbc->query($countSql);
-            $total = $countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
+            $total = $this->topicService->countActiveTopicsApi();
 
             // Transform topics
-            $transformedTopics = array_map([$this, 'transformTopic'], $topics);
+            $transformedTopics = TopicApiDto::transformCollection($topics, $this->getAppUrl());
 
             // Generate HATEOAS pagination links
             $hateoasLinks = $this->hateoas->paginationLinks('categories', $pagination['page'], $pagination['per_page'], $total);
@@ -120,7 +120,7 @@ class CategoriesApiController extends ApiController
         // This is a public endpoint - no auth required
         $this->requiresAuth = false;
 
-        $topicId = isset($params[0]) ? (int)$params[0] : 0;
+        $topicId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (!$topicId) {
             ApiResponse::badRequest('Category ID is required');
@@ -128,28 +128,14 @@ class CategoriesApiController extends ApiController
         }
 
         try {
-            $dbc = Registry::get('dbc');
-
-            // Get topic
-            $sql = "SELECT t.*,
-                           (SELECT COUNT(*) FROM tbl_post_topic pt 
-                            INNER JOIN tbl_posts p ON pt.post_id = p.ID 
-                            WHERE pt.topic_id = t.ID 
-                            AND p.post_status = 'publish' 
-                            AND p.post_type = 'blog') as post_count
-                    FROM tbl_topics t
-                    WHERE t.ID = ?";
-
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute([$topicId]);
-            $topic = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $topic = $this->topicService->getTopicApi($topicId);
 
             if (!$topic) {
                 ApiResponse::notFound('Category not found');
                 return;
             }
 
-            ApiResponse::success($this->transformTopic($topic), 200, null, $this->hateoas->categoryLinks($topicId, $topic['topic_slug']));
+            ApiResponse::success(TopicApiDto::transform($topic, $this->getAppUrl()), 200, null, $this->hateoas->categoryLinks($topicId, $topic['topic_slug']));
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to fetch category: ' . $e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -168,7 +154,7 @@ class CategoriesApiController extends ApiController
         // This is a public endpoint - no auth required
         $this->requiresAuth = false;
 
-        $topicId = isset($params[0]) ? (int)$params[0] : 0;
+        $topicId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (!$topicId) {
             ApiResponse::badRequest('Category ID is required');
@@ -182,60 +168,36 @@ class CategoriesApiController extends ApiController
         $sorting = $this->getSorting($params, ['ID', 'post_date', 'post_modified', 'post_title']);
 
         try {
-            $dbc = Registry::get('dbc');
+            $category = $this->topicService->getTopicApi($topicId);
 
-            // Check if category exists
-            $checkSql = "SELECT topic_title, topic_slug FROM tbl_topics WHERE ID = ? AND topic_status = 'Y'";
-            $checkStmt = $dbc->prepare($checkSql);
-            $checkStmt->execute([$topicId]);
-            $topic = $checkStmt->fetch(\PDO::FETCH_ASSOC);
-
-            if (!$topic) {
+            if (!$category) {
                 ApiResponse::notFound('Category not found');
                 return;
             }
 
-            // Get posts in this category
-            $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
-                           p.post_title, p.post_slug, p.post_summary, p.post_status,
-                           p.post_visibility, p.post_tags, p.post_type, p.comment_status,
-                           u.user_login as author_login, u.user_fullname as author_name
-                    FROM tbl_posts p
-                    INNER JOIN tbl_post_topic pt ON p.ID = pt.post_id
-                    LEFT JOIN tbl_users u ON p.post_author = u.ID
-                    WHERE pt.topic_id = ?
-                    AND p.post_status = 'publish'
-                    AND p.post_type = 'blog'
-                    AND p.post_visibility = 'public'
-                    ORDER BY p." . $sorting['sort_by'] . " " . $sorting['sort_order'] . "
-                    LIMIT " . $pagination['per_page'] . " OFFSET " . $pagination['offset'];
+            $sortBy = str_replace('`', '', $sorting['sort_by']);
+            $sortOrder = $sorting['sort_order'];
 
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute([$topicId]);
-            $posts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $posts = $this->topicService->getPostsByTopicApi(
+                $topicId,
+                $pagination['page'],
+                $pagination['per_page'],
+                $sortBy,
+                $sortOrder
+            );
 
-            // Get total count
-            $countSql = "SELECT COUNT(*) as total
-                         FROM tbl_posts p
-                         INNER JOIN tbl_post_topic pt ON p.ID = pt.post_id
-                         WHERE pt.topic_id = ?
-                         AND p.post_status = 'publish'
-                         AND p.post_type = 'blog'
-                         AND p.post_visibility = 'public'";
-            $countStmt = $dbc->prepare($countSql);
-            $countStmt->execute([$topicId]);
-            $total = $countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
+            $total = $this->topicService->countPostsByTopicApi($topicId);
 
             // Transform posts
-            $transformedPosts = array_map([$this, 'transformPost'], $posts);
+            $transformedPosts = PostApiDto::transformCollection($posts, $this->getAppUrl());
 
             // Include category info
             $response = [
                 'category' => [
                     'id' => (int)$topicId,
-                    'title' => $topic['topic_title'],
-                    'slug' => $topic['topic_slug'],
-                    '_links' => $this->hateoas->categoryLinks($topicId, $topic['topic_slug'])
+                    'title' => $category['topic_title'],
+                    'slug' => $category['topic_slug'],
+                    '_links' => $this->hateoas->categoryLinks($topicId, $category['topic_slug'])
                 ],
                 'posts' => $transformedPosts
             ];
@@ -278,39 +240,22 @@ class CategoriesApiController extends ApiController
         }
 
         try {
-            $dbc = Registry::get('dbc');
-
-            // Generate slug from title
             $slug = $this->generateSlug($this->requestData['topic_title']);
 
-            // Check if slug already exists
-            $checkSql = "SELECT ID FROM tbl_topics WHERE topic_slug = ?";
-            $checkStmt = $dbc->prepare($checkSql);
-            $checkStmt->execute([$slug]);
-
-            if ($checkStmt->fetch()) {
+            if ($this->topicService->checkTopicSlugExists($slug)) {
                 ApiResponse::conflict('A category with this title already exists');
                 return;
             }
 
-            // Insert topic
-            $sql = "INSERT INTO tbl_topics (topic_title, topic_slug, topic_status) VALUES (?, ?, ?)";
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute([
-                $this->sanitize($this->requestData['topic_title']),
-                $slug,
-                isset($this->requestData['topic_status']) ? $this->requestData['topic_status'] : 'Y'
+            $topicId = $this->topicService->createTopicApi([
+                'topic_title' => $this->sanitize($this->requestData['topic_title']),
+                'topic_slug' => $slug,
+                'topic_status' => isset($this->requestData['topic_status']) ? $this->requestData['topic_status'] : 'Y'
             ]);
 
-            $topicId = $dbc->lastInsertId();
+            $createdTopic = $this->topicService->getTopicApi($topicId);
 
-            // Fetch created topic
-            $fetchSql = "SELECT * FROM tbl_topics WHERE ID = ?";
-            $fetchStmt = $dbc->prepare($fetchSql);
-            $fetchStmt->execute([$topicId]);
-            $createdTopic = $fetchStmt->fetch(\PDO::FETCH_ASSOC);
-
-            ApiResponse::created($this->transformTopic($createdTopic), 'Category created successfully', $this->hateoas->categoryLinks($topicId, $slug), $this->getAppUrl() . '/api/v1/categories/' . $topicId);
+            ApiResponse::created(TopicApiDto::transform($createdTopic, $this->getAppUrl()), 'Category created successfully', $this->hateoas->categoryLinks($topicId, $slug), $this->getAppUrl() . '/api/v1/categories/' . $topicId);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to create category: ' . $e->getMessage(), 500, 'CREATE_ERROR');
         }
@@ -329,7 +274,7 @@ class CategoriesApiController extends ApiController
         // Require authentication
         $this->requiresAuth = true;
 
-        $topicId = isset($params[0]) ? (int)$params[0] : 0;
+        $topicId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (!$topicId) {
             ApiResponse::badRequest('Category ID is required');
@@ -343,55 +288,34 @@ class CategoriesApiController extends ApiController
         }
 
         try {
-            $dbc = Registry::get('dbc');
-
-            // Check if topic exists
-            $checkSql = "SELECT ID FROM tbl_topics WHERE ID = ?";
-            $checkStmt = $dbc->prepare($checkSql);
-            $checkStmt->execute([$topicId]);
-            $topic = $checkStmt->fetch(\PDO::FETCH_ASSOC);
+            $topic = $this->topicService->getTopicApi($topicId);
 
             if (!$topic) {
                 ApiResponse::notFound('Category not found');
                 return;
             }
 
-            // Build update query
-            $updates = [];
-            $values = [];
+            $updateData = [];
 
             if (isset($this->requestData['topic_title'])) {
-                $updates[] = 'topic_title = ?';
-                $values[] = $this->sanitize($this->requestData['topic_title']);
-                $updates[] = 'topic_slug = ?';
-                $values[] = $this->generateSlug($this->requestData['topic_title']);
+                $updateData['topic_title'] = $this->sanitize($this->requestData['topic_title']);
+                $updateData['topic_slug'] = $this->generateSlug($this->requestData['topic_title']);
             }
 
             if (isset($this->requestData['topic_status'])) {
-                $updates[] = 'topic_status = ?';
-                $values[] = in_array($this->requestData['topic_status'], ['Y', 'N']) ? $this->requestData['topic_status'] : 'Y';
+                $updateData['topic_status'] = in_array($this->requestData['topic_status'], ['Y', 'N']) ? $this->requestData['topic_status'] : 'Y';
             }
 
-            if (empty($updates)) {
+            if (empty($updateData)) {
                 ApiResponse::badRequest('No fields to update');
                 return;
             }
 
-            // Add topic ID to values
-            $values[] = $topicId;
+            $this->topicService->updateTopicApi($topicId, $updateData);
 
-            // Execute update
-            $sql = "UPDATE tbl_topics SET " . implode(', ', $updates) . " WHERE ID = ?";
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute($values);
+            $updatedTopic = $this->topicService->getTopicApi($topicId);
 
-            // Fetch updated topic
-            $fetchSql = "SELECT * FROM tbl_topics WHERE ID = ?";
-            $fetchStmt = $dbc->prepare($fetchSql);
-            $fetchStmt->execute([$topicId]);
-            $updatedTopic = $fetchStmt->fetch(\PDO::FETCH_ASSOC);
-
-            ApiResponse::success($this->transformTopic($updatedTopic), 200, 'Category updated successfully');
+            ApiResponse::success(TopicApiDto::transform($updatedTopic, $this->getAppUrl()), 200, 'Category updated successfully');
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to update category: ' . $e->getMessage(), 500, 'UPDATE_ERROR');
         }
@@ -410,7 +334,7 @@ class CategoriesApiController extends ApiController
         // Require authentication
         $this->requiresAuth = true;
 
-        $topicId = isset($params[0]) ? (int)$params[0] : 0;
+        $topicId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (!$topicId) {
             ApiResponse::badRequest('Category ID is required');
@@ -424,28 +348,14 @@ class CategoriesApiController extends ApiController
         }
 
         try {
-            $dbc = Registry::get('dbc');
-
-            // Check if topic exists
-            $checkSql = "SELECT ID FROM tbl_topics WHERE ID = ?";
-            $checkStmt = $dbc->prepare($checkSql);
-            $checkStmt->execute([$topicId]);
-            $topic = $checkStmt->fetch(\PDO::FETCH_ASSOC);
+            $topic = $this->topicService->getTopicApi($topicId);
 
             if (!$topic) {
                 ApiResponse::notFound('Category not found');
                 return;
             }
 
-            // Delete post-topic relationships first
-            $deleteRelSql = "DELETE FROM tbl_post_topic WHERE topic_id = ?";
-            $deleteRelStmt = $dbc->prepare($deleteRelSql);
-            $deleteRelStmt->execute([$topicId]);
-
-            // Delete the topic
-            $deleteSql = "DELETE FROM tbl_topics WHERE ID = ?";
-            $deleteStmt = $dbc->prepare($deleteSql);
-            $deleteStmt->execute([$topicId]);
+            $this->topicService->removeTopicApi($topicId);
 
             ApiResponse::noContent();
         } catch (\Throwable $e) {
@@ -453,52 +363,7 @@ class CategoriesApiController extends ApiController
         }
     }
 
-    /**
-     * Transform topic data for API response
-     *
-     * @param array $topic
-     * @return array
-     */
-    private function transformTopic($topic)
-    {
-        return [
-            'id' => (int)$topic['ID'],
-            'title' => $topic['topic_title'],
-            'slug' => $topic['topic_slug'],
-            'status' => $topic['topic_status'],
-            'post_count' => isset($topic['post_count']) ? (int)$topic['post_count'] : 0,
-            'url' => $this->getCategoryUrl($topic['topic_slug'])
-        ];
-    }
 
-    // kept for potential future use
-    /**
-     * Transform post data for API response
-     *
-     * @deprecated No longer used internally
-     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
-     * @param array $post
-     * @return array
-     */
-    private function transformPost($post)
-    {
-        return [
-            'id' => (int)$post['ID'],
-            'title' => $post['post_title'],
-            'slug' => $post['post_slug'],
-            'summary' => $post['post_summary'],
-            'status' => $post['post_status'],
-            'visibility' => $post['post_visibility'],
-            'author' => [
-                'id' => (int)$post['post_author'],
-                'login' => $post['author_login'] ?? '',
-                'name' => $post['author_name'] ?? ''
-            ],
-            'date' => $post['post_date'],
-            'modified' => $post['post_modified'],
-            'url' => $this->getPostUrl($post['ID'], $post['post_slug'])
-        ];
-    }
 
     /**
      * Generate URL-friendly slug
@@ -510,44 +375,5 @@ class CategoriesApiController extends ApiController
     {
         $slug = strtolower(trim(preg_replace('/[^a-zA-Z0-9-]+/', '-', $title)));
         return preg_replace('/-+/', '-', $slug);
-    }
-
-    /**
-     * Get category URL
-     *
-     * @param string $slug
-     * @return string
-     */
-    private function getCategoryUrl($slug)
-    {
-        $appUrl = $this->getAppUrl();
-        return $appUrl . '/category/' . $slug;
-    }
-
-    /**
-     * Get post URL
-     *
-     * @param int $id
-     * @param string $slug
-     * @return string
-     */
-    private function getPostUrl($id, $slug)
-    {
-        $appUrl = $this->getAppUrl();
-        return $appUrl . '/post/' . $id . '/' . $slug;
-    }
-
-    /**
-     * Get application URL
-     *
-     * @return string
-     */
-    private function getAppUrl()
-    {
-        $config = [];
-        if (file_exists(__DIR__ . '/../../../config.php')) {
-            $config = require __DIR__ . '/../../../config.php';
-        }
-        return $config['app']['url'] ?? 'http://localhost';
     }
 }

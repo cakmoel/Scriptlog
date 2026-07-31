@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -59,7 +60,7 @@ class SearchFinder
 
     /**
      * Sanitize search keyword
-     * Prevents XSS and SQL injection
+     * Strips FULLTEXT boolean mode operators to prevent operator injection.
      *
      * @param string $keyword
      * @return string
@@ -80,54 +81,91 @@ class SearchFinder
             $keyword = mb_substr($keyword, 0, 100, 'UTF-8');
         }
 
+        $keyword = preg_replace('/[+\-><()~*:"@]+/', ' ', $keyword);
+        $keyword = trim(preg_replace('/\s+/', ' ', $keyword));
+
+        if (mb_strlen($keyword, 'UTF-8') < 2) {
+            return '';
+        }
+
         return $keyword;
+    }
+
+    /**
+     * Build a FULLTEXT boolean mode query string from user keyword.
+     * Prepends + to each word for AND semantics.
+     *
+     * @param string $keyword Already-sanitized keyword
+     * @return string
+     */
+    private function buildBooleanQuery($keyword)
+    {
+        $terms = explode(' ', $keyword);
+        $terms = array_filter($terms, function ($t) {
+            return trim($t) !== '';
+        });
+        if (empty($terms)) {
+            return '';
+        }
+        return '+' . implode(' +', $terms);
     }
 
     /**
      * Search posts
      *
      * @param string $keyword
+     * @param int $page
+     * @param int $perPage
      * @return array
      */
-    public function searchPost($keyword)
+    public function searchPost($keyword, $page = 1, $perPage = 10)
     {
         $keyword = $this->sanitizeKeyword($keyword);
+        $page = max(1, (int)$page);
+        $perPage = max(1, min(100, (int)$perPage));
+        $offset = ($page - 1) * $perPage;
 
         if (empty($keyword)) {
-            return ['results' => [], 'totalRows' => 0];
+            return ['results' => [], 'totalRows' => 0, 'page' => $page, 'perPage' => $perPage, 'totalPages' => 0, 'keyword' => ''];
         }
 
         try {
-            $searchTerm = "%{$keyword}%";
+            $booleanQuery = $this->buildBooleanQuery($keyword);
 
-            $sql = "SELECT ID, post_author, post_date, post_modified, 
-                           post_title, post_slug, post_content, 
-                           post_status, post_type
-                    FROM tbl_posts 
-                    WHERE (post_title LIKE ? OR post_content LIKE ? OR post_tags LIKE ?) 
-                    AND post_status = 'publish' 
+            $sql = "SELECT ID, post_author, post_date, post_modified,
+                           post_title, post_slug, post_content,
+                           post_status, post_type,
+                           MATCH (post_title, post_content, post_tags) AGAINST (? IN BOOLEAN MODE) AS relevance
+                    FROM tbl_posts
+                    WHERE MATCH (post_title, post_content, post_tags) AGAINST (? IN BOOLEAN MODE)
+                    AND post_status = 'publish'
                     AND post_type = 'blog'
-                    ORDER BY post_date DESC 
-                    LIMIT 20";
+                    ORDER BY relevance DESC, post_date DESC
+                    LIMIT ? OFFSET ?";
 
-            $results = $this->dbc->dbSelect($sql, [$searchTerm, $searchTerm, $searchTerm]);
+            $results = $this->dbc->dbSelect($sql, [$booleanQuery, $booleanQuery, $perPage, $offset]);
 
-            $countSql = "SELECT COUNT(*) as total 
-                         FROM tbl_posts 
-                         WHERE (post_title LIKE ? OR post_content LIKE ? OR post_tags LIKE ?) 
-                         AND post_status = 'publish' 
+            $countSql = "SELECT COUNT(*) as total
+                         FROM tbl_posts
+                         WHERE MATCH (post_title, post_content, post_tags) AGAINST (? IN BOOLEAN MODE)
+                         AND post_status = 'publish'
                          AND post_type = 'blog'";
 
-            $countResult = $this->dbc->dbSelect($countSql, [$searchTerm, $searchTerm, $searchTerm]);
+            $countResult = $this->dbc->dbSelect($countSql, [$booleanQuery]);
             $totalRows = isset($countResult[0]->total) ? (int)$countResult[0]->total : 0;
+            $totalPages = $totalRows > 0 ? (int)ceil($totalRows / $perPage) : 0;
 
             return [
                 'results' => $results ?: [],
-                'totalRows' => $totalRows
+                'totalRows' => $totalRows,
+                'page' => $page,
+                'perPage' => $perPage,
+                'totalPages' => $totalPages,
+                'keyword' => $keyword
             ];
         } catch (\Throwable $th) {
             $this->error = $th->getMessage();
-            return ['results' => [], 'totalRows' => 0, 'error' => $this->error];
+            return ['results' => [], 'totalRows' => 0, 'page' => $page, 'perPage' => $perPage, 'totalPages' => 0, 'keyword' => $keyword, 'error' => $this->error];
         }
     }
 
@@ -135,47 +173,58 @@ class SearchFinder
      * Search pages
      *
      * @param string $keyword
+     * @param int $page
+     * @param int $perPage
      * @return array
      */
-    public function searchPage($keyword)
+    public function searchPage($keyword, $page = 1, $perPage = 10)
     {
         $keyword = $this->sanitizeKeyword($keyword);
+        $page = max(1, (int)$page);
+        $perPage = max(1, min(100, (int)$perPage));
+        $offset = ($page - 1) * $perPage;
 
         if (empty($keyword)) {
-            return ['results' => [], 'totalRows' => 0];
+            return ['results' => [], 'totalRows' => 0, 'page' => $page, 'perPage' => $perPage, 'totalPages' => 0, 'keyword' => ''];
         }
 
         try {
-            $searchTerm = "%{$keyword}%";
+            $booleanQuery = $this->buildBooleanQuery($keyword);
 
-            $sql = "SELECT ID, post_author, post_date, post_modified, 
-                           post_title, post_slug, post_content, 
-                           post_status, post_type
-                    FROM tbl_posts 
-                    WHERE (post_title LIKE ? OR post_content LIKE ?) 
-                    AND post_status = 'publish' 
+            $sql = "SELECT ID, post_author, post_date, post_modified,
+                           post_title, post_slug, post_content,
+                           post_status, post_type,
+                           MATCH (post_title, post_content, post_tags) AGAINST (? IN BOOLEAN MODE) AS relevance
+                    FROM tbl_posts
+                    WHERE MATCH (post_title, post_content, post_tags) AGAINST (? IN BOOLEAN MODE)
+                    AND post_status = 'publish'
                     AND post_type = 'page'
-                    ORDER BY post_date DESC 
-                    LIMIT 20";
+                    ORDER BY relevance DESC, post_date DESC
+                    LIMIT ? OFFSET ?";
 
-            $results = $this->dbc->dbSelect($sql, [$searchTerm, $searchTerm]);
+            $results = $this->dbc->dbSelect($sql, [$booleanQuery, $booleanQuery, $perPage, $offset]);
 
-            $countSql = "SELECT COUNT(*) as total 
-                         FROM tbl_posts 
-                         WHERE (post_title LIKE ? OR post_content LIKE ?) 
-                         AND post_status = 'publish' 
+            $countSql = "SELECT COUNT(*) as total
+                         FROM tbl_posts
+                         WHERE MATCH (post_title, post_content, post_tags) AGAINST (? IN BOOLEAN MODE)
+                         AND post_status = 'publish'
                          AND post_type = 'page'";
 
-            $countResult = $this->dbc->dbSelect($countSql, [$searchTerm, $searchTerm]);
+            $countResult = $this->dbc->dbSelect($countSql, [$booleanQuery]);
             $totalRows = isset($countResult[0]->total) ? (int)$countResult[0]->total : 0;
+            $totalPages = $totalRows > 0 ? (int)ceil($totalRows / $perPage) : 0;
 
             return [
                 'results' => $results ?: [],
-                'totalRows' => $totalRows
+                'totalRows' => $totalRows,
+                'page' => $page,
+                'perPage' => $perPage,
+                'totalPages' => $totalPages,
+                'keyword' => $keyword
             ];
         } catch (\Throwable $th) {
             $this->error = $th->getMessage();
-            return ['results' => [], 'totalRows' => 0, 'error' => $this->error];
+            return ['results' => [], 'totalRows' => 0, 'page' => $page, 'perPage' => $perPage, 'totalPages' => 0, 'keyword' => $keyword, 'error' => $this->error];
         }
     }
 
@@ -183,45 +232,56 @@ class SearchFinder
      * Search both posts and pages
      *
      * @param string $keyword
+     * @param int $page
+     * @param int $perPage
      * @return array
      */
-    public function searchAll($keyword)
+    public function searchAll($keyword, $page = 1, $perPage = 10)
     {
         $keyword = $this->sanitizeKeyword($keyword);
+        $page = max(1, (int)$page);
+        $perPage = max(1, min(100, (int)$perPage));
+        $offset = ($page - 1) * $perPage;
 
         if (empty($keyword)) {
-            return ['results' => [], 'totalRows' => 0];
+            return ['results' => [], 'totalRows' => 0, 'page' => $page, 'perPage' => $perPage, 'totalPages' => 0, 'keyword' => ''];
         }
 
         try {
-            $searchTerm = "%{$keyword}%";
+            $booleanQuery = $this->buildBooleanQuery($keyword);
 
-            $sql = "SELECT ID, post_author, post_date, post_modified, 
-                           post_title, post_slug, post_content, 
-                           post_status, post_type
-                    FROM tbl_posts 
-                    WHERE (post_title LIKE ? OR post_content LIKE ? OR post_tags LIKE ?) 
+            $sql = "SELECT ID, post_author, post_date, post_modified,
+                           post_title, post_slug, post_content,
+                           post_status, post_type,
+                           MATCH (post_title, post_content, post_tags) AGAINST (? IN BOOLEAN MODE) AS relevance
+                    FROM tbl_posts
+                    WHERE MATCH (post_title, post_content, post_tags) AGAINST (? IN BOOLEAN MODE)
                     AND post_status = 'publish'
-                    ORDER BY post_date DESC 
-                    LIMIT 50";
+                    ORDER BY relevance DESC, post_date DESC
+                    LIMIT ? OFFSET ?";
 
-            $results = $this->dbc->dbSelect($sql, [$searchTerm, $searchTerm, $searchTerm]);
+            $results = $this->dbc->dbSelect($sql, [$booleanQuery, $booleanQuery, $perPage, $offset]);
 
-            $countSql = "SELECT COUNT(*) as total 
-                         FROM tbl_posts 
-                         WHERE (post_title LIKE ? OR post_content LIKE ? OR post_tags LIKE ?) 
+            $countSql = "SELECT COUNT(*) as total
+                         FROM tbl_posts
+                         WHERE MATCH (post_title, post_content, post_tags) AGAINST (? IN BOOLEAN MODE)
                          AND post_status = 'publish'";
 
-            $countResult = $this->dbc->dbSelect($countSql, [$searchTerm, $searchTerm, $searchTerm]);
+            $countResult = $this->dbc->dbSelect($countSql, [$booleanQuery]);
             $totalRows = isset($countResult[0]->total) ? (int)$countResult[0]->total : 0;
+            $totalPages = $totalRows > 0 ? (int)ceil($totalRows / $perPage) : 0;
 
             return [
                 'results' => $results ?: [],
-                'totalRows' => $totalRows
+                'totalRows' => $totalRows,
+                'page' => $page,
+                'perPage' => $perPage,
+                'totalPages' => $totalPages,
+                'keyword' => $keyword
             ];
         } catch (\Throwable $th) {
             $this->error = $th->getMessage();
-            return ['results' => [], 'totalRows' => 0, 'error' => $this->error];
+            return ['results' => [], 'totalRows' => 0, 'page' => $page, 'perPage' => $perPage, 'totalPages' => 0, 'keyword' => $keyword, 'error' => $this->error];
         }
     }
 }

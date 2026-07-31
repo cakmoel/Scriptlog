@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Model;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -14,9 +15,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  */
 use Scriptlog\Core\BaseModel;
 
-final
-
-class FrontContentModel extends BaseModel
+final class FrontContentModel extends BaseModel
 {
     /**
      * postModel;
@@ -288,7 +287,8 @@ class FrontContentModel extends BaseModel
     public static function frontPostsByArchive(array $values, ArchivesModel $archivesModel)
     {
         self::$archivesModel = $archivesModel;
-        return self::$archivesModel->getPostsByArchive(self::frontPaginator(app_reading_setting()['post_per_archive'], 'p'), self::frontSanitizer(), $values);
+        $paginator = self::frontPaginator(app_reading_setting()['post_per_archive'], 'p');
+        return self::$archivesModel->getPostsByArchive($paginator, self::frontSanitizer(), $values);
     }
 
     /**
@@ -302,8 +302,10 @@ class FrontContentModel extends BaseModel
     {
         self::$topicModel = $topicModel;
 
-        $entries = self::$topicModel->getPostsPublishedByTopic($topicId, self::frontSanitizer(), self::frontPaginator(app_reading_setting()['post_per_page'], 'p'))['entries'];
-        $pagination = self::$topicModel->getPostsPublishedByTopic($topicId, self::frontSanitizer(), self::frontPaginator(app_reading_setting()['post_per_page'], 'p'))['paginationLink'];
+        $paginator = self::frontPaginator(app_reading_setting()['post_per_page'], 'p');
+        $result = self::$topicModel->getPostsPublishedByTopic($topicId, self::frontSanitizer(), $paginator);
+        $entries = $result['entries'];
+        $pagination = $result['paginationLink'];
         return array('entries' => $entries, 'pagination' => $pagination);
     }
 
@@ -317,7 +319,8 @@ class FrontContentModel extends BaseModel
     public static function frontBlogPosts(PostModel $postModel)
     {
         self::$postModel = $postModel;
-        return self::$postModel->getAllBlogPosts(self::frontSanitizer(), self::frontPaginator(app_reading_setting()['post_per_page'], 'p'));
+        $paginator = self::frontPaginator(app_reading_setting()['post_per_page'], 'p');
+        return self::$postModel->getAllBlogPosts(self::frontSanitizer(), $paginator);
     }
 
     /**
@@ -331,7 +334,8 @@ class FrontContentModel extends BaseModel
     public static function frontPostsByTag($tag, TagModel $tagModel)
     {
         self::$tagModel = $tagModel;
-        return self::$tagModel->getPostsPublishedByTag($tag, self::frontSanitizer(), self::frontPaginator(app_reading_setting()['post_per_page'], 'p'));
+        $paginator = self::frontPaginator(app_reading_setting()['post_per_page'], 'p');
+        return self::$tagModel->getPostsPublishedByTag($tag, self::frontSanitizer(), $paginator);
     }
 
     /**

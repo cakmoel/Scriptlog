@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted.");
 
 /**
@@ -67,7 +68,8 @@ class Db implements DbInterface
         'tbl_privacy_policies',
         'tbl_languages',
         'tbl_translations',
-        'tbl_download_log'
+        'tbl_download_log',
+        'tbl_api_keys'
     ];
 
     /**
@@ -398,6 +400,24 @@ class Db implements DbInterface
     {
         $this->ensureConnection();
         return $this->dbc->rollBack();
+    }
+
+    /**
+     * Prepare a SQL statement with table prefix applied.
+     *
+     * Delegates to PDO::prepare() after applying the configured table prefix.
+     * This enables legacy code (ApiAuth, API controllers) that calls
+     * $dbc->prepare() directly to work correctly with prefixed table names.
+     *
+     * @param string $sql SQL query (may contain unprefixed tbl_ names)
+     * @param array $driverOptions Optional PDO driver options
+     * @return \PDOStatement|false
+     */
+    public function prepare(string $sql, array $driverOptions = [])
+    {
+        $this->ensureConnection();
+        $sql = $this->applyTablePrefix($sql);
+        return $this->dbc->prepare($sql, $driverOptions);
     }
 
     /**

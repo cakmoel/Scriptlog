@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Controller;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -328,7 +329,7 @@ class UserController extends BaseApp
         }
 
         $this->userService->addUser();
-        
+
         $_SESSION['status'] = "userAdded";
         direct_page('index.php?load=users&status=userAdded', 302);
     }

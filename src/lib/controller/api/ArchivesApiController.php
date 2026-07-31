@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Controller\Api;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -19,7 +20,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 use Scriptlog\Controller\ApiController;
 use Scriptlog\Core\ApiHateoas;
 use Scriptlog\Core\ApiResponse;
-use Scriptlog\Core\Registry;
+use Scriptlog\Core\FormValidator;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Dao\PostDao;
+use Scriptlog\Dto\Api\PostApiDto;
+use Scriptlog\Service\PostService;
 
 class ArchivesApiController extends ApiController
 {
@@ -29,12 +34,18 @@ class ArchivesApiController extends ApiController
     private $hateoas;
 
     /**
+     * @var PostService
+     */
+    private $postService;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         parent::__construct();
         $this->hateoas = new ApiHateoas();
+        $this->postService = new PostService(new PostDao(), new FormValidator(), new Sanitize());
     }
 
     /**
@@ -53,22 +64,7 @@ class ArchivesApiController extends ApiController
         $this->requiresAuth = false;
 
         try {
-            $dbc = Registry::get('dbc');
-
-            // Get distinct year-month combinations
-            $sql = "SELECT 
-                        YEAR(post_date) as year,
-                        MONTH(post_date) as month,
-                        COUNT(*) as post_count
-                    FROM tbl_posts
-                    WHERE post_status = 'publish' 
-                    AND post_type = 'blog'
-                    AND post_visibility = 'public'
-                    GROUP BY YEAR(post_date), MONTH(post_date)
-                    ORDER BY year DESC, month DESC";
-
-            $stmt = $dbc->query($sql);
-            $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $results = $this->postService->getArchiveIndexApi();
 
             // Group by year
             $archives = [];
@@ -101,9 +97,8 @@ class ArchivesApiController extends ApiController
 
             ApiResponse::success([
                 'archives' => $archives,
-                'total_years' => count($archives),
-                '_links' => $hateoasLinks
-            ]);
+                'total_years' => count($archives)
+            ], 200, null, $hateoasLinks);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to fetch archives: ' . $e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -122,7 +117,7 @@ class ArchivesApiController extends ApiController
         // This is a public endpoint - no auth required
         $this->requiresAuth = false;
 
-        $year = isset($params[0]) ? (int)$params[0] : 0;
+        $year = isset($params['year']) ? (int)$params['year'] : 0;
 
         if (!$year || $year < 1900 || $year > date('Y')) {
             ApiResponse::badRequest('Invalid year');
@@ -136,36 +131,18 @@ class ArchivesApiController extends ApiController
         $sorting = $this->getSorting($params, ['ID', 'post_date', 'post_modified', 'post_title']);
 
         try {
-            $dbc = Registry::get('dbc');
+            $sortBy = str_replace('`', '', $sorting['sort_by']);
+            $sortOrder = $sorting['sort_order'];
 
-            // Get posts from this year
-            $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
-                           p.post_title, p.post_slug, p.post_summary, p.post_status,
-                           p.post_visibility, p.post_tags, p.post_type, p.comment_status,
-                           u.user_login as author_login, u.user_fullname as author_name
-                    FROM tbl_posts p
-                    LEFT JOIN tbl_users u ON p.post_author = u.ID
-                    WHERE YEAR(p.post_date) = ?
-                    AND p.post_status = 'publish'
-                    AND p.post_type = 'blog'
-                    AND p.post_visibility = 'public'
-                    ORDER BY p." . $sorting['sort_by'] . " " . $sorting['sort_order'] . "
-                    LIMIT " . $pagination['per_page'] . " OFFSET " . $pagination['offset'];
+            $posts = $this->postService->getPostsByYearApi(
+                $year,
+                $pagination['page'],
+                $pagination['per_page'],
+                $sortBy,
+                $sortOrder
+            );
 
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute([$year]);
-            $posts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-            // Get total count
-            $countSql = "SELECT COUNT(*) as total
-                         FROM tbl_posts
-                         WHERE YEAR(post_date) = ?
-                         AND post_status = 'publish'
-                         AND post_type = 'blog'
-                         AND post_visibility = 'public'";
-            $countStmt = $dbc->prepare($countSql);
-            $countStmt->execute([$year]);
-            $total = $countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
+            $total = $this->postService->countPostsByYearApi($year);
 
             if ($total == 0) {
                 ApiResponse::notFound('No posts found for year ' . $year);
@@ -173,7 +150,7 @@ class ArchivesApiController extends ApiController
             }
 
             // Transform posts
-            $transformedPosts = array_map([$this, 'transformPost'], $posts);
+            $transformedPosts = PostApiDto::transformCollection($posts, $this->getAppUrl());
 
             // Generate HATEOAS links
             $hateoasLinks = $this->hateoas->archiveLinks($year);
@@ -204,8 +181,8 @@ class ArchivesApiController extends ApiController
         // This is a public endpoint - no auth required
         $this->requiresAuth = false;
 
-        $year = isset($params[0]) ? (int)$params[0] : 0;
-        $month = isset($params[1]) ? (int)$params[1] : 0;
+        $year = isset($params['year']) ? (int)$params['year'] : 0;
+        $month = isset($params['month']) ? (int)$params['month'] : 0;
 
         if (!$year || $year < 1900 || $year > date('Y')) {
             ApiResponse::badRequest('Invalid year');
@@ -224,38 +201,19 @@ class ArchivesApiController extends ApiController
         $sorting = $this->getSorting($params, ['ID', 'post_date', 'post_modified', 'post_title']);
 
         try {
-            $dbc = Registry::get('dbc');
+            $sortBy = str_replace('`', '', $sorting['sort_by']);
+            $sortOrder = $sorting['sort_order'];
 
-            // Get posts from this month
-            $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
-                           p.post_title, p.post_slug, p.post_summary, p.post_status,
-                           p.post_visibility, p.post_tags, p.post_type, p.comment_status,
-                           u.user_login as author_login, u.user_fullname as author_name
-                    FROM tbl_posts p
-                    LEFT JOIN tbl_users u ON p.post_author = u.ID
-                    WHERE YEAR(p.post_date) = ?
-                    AND MONTH(p.post_date) = ?
-                    AND p.post_status = 'publish'
-                    AND p.post_type = 'blog'
-                    AND p.post_visibility = 'public'
-                    ORDER BY p." . $sorting['sort_by'] . " " . $sorting['sort_order'] . "
-                    LIMIT " . $pagination['per_page'] . " OFFSET " . $pagination['offset'];
+            $posts = $this->postService->getPostsByYearMonthApi(
+                $year,
+                $month,
+                $pagination['page'],
+                $pagination['per_page'],
+                $sortBy,
+                $sortOrder
+            );
 
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute([$year, $month]);
-            $posts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-            // Get total count
-            $countSql = "SELECT COUNT(*) as total
-                         FROM tbl_posts
-                         WHERE YEAR(post_date) = ?
-                         AND MONTH(post_date) = ?
-                         AND post_status = 'publish'
-                         AND post_type = 'blog'
-                         AND post_visibility = 'public'";
-            $countStmt = $dbc->prepare($countSql);
-            $countStmt->execute([$year, $month]);
-            $total = $countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
+            $total = $this->postService->countPostsByYearMonthApi($year, $month);
 
             if ($total == 0) {
                 ApiResponse::notFound('No posts found for ' . $this->getMonthName($month) . ' ' . $year);
@@ -263,7 +221,7 @@ class ArchivesApiController extends ApiController
             }
 
             // Transform posts
-            $transformedPosts = array_map([$this, 'transformPost'], $posts);
+            $transformedPosts = PostApiDto::transformCollection($posts, $this->getAppUrl());
 
             // Generate HATEOAS links
             $hateoasLinks = $this->hateoas->archiveLinks($year, $month);
@@ -281,37 +239,6 @@ class ArchivesApiController extends ApiController
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to fetch month archives: ' . $e->getMessage(), 500, 'FETCH_ERROR');
         }
-    }
-
-    // kept for potential future use
-    /**
-     * Transform post data for API response
-     *
-     * @deprecated No longer used internally
-     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
-     * @param array $post
-     * @return array
-     */
-    private function transformPost($post)
-    {
-        return [
-            'id' => (int)$post['ID'],
-            'title' => $post['post_title'],
-            'slug' => $post['post_slug'],
-            'summary' => $post['post_summary'],
-            'status' => $post['post_status'],
-            'visibility' => $post['post_visibility'],
-            'tags' => $post['post_tags'] ? explode(',', $post['post_tags']) : [],
-            'comment_status' => $post['comment_status'],
-            'author' => [
-                'id' => (int)$post['post_author'],
-                'login' => $post['author_login'] ?? '',
-                'name' => $post['author_name'] ?? ''
-            ],
-            'date' => $post['post_date'],
-            'modified' => $post['post_modified'],
-            'url' => $this->getPostUrl($post['ID'], $post['post_slug'])
-        ];
     }
 
     /**
@@ -338,32 +265,5 @@ class ArchivesApiController extends ApiController
         ];
 
         return $months[$month] ?? '';
-    }
-
-    /**
-     * Get post URL
-     *
-     * @param int $id
-     * @param string $slug
-     * @return string
-     */
-    private function getPostUrl($id, $slug)
-    {
-        $appUrl = $this->getAppUrl();
-        return $appUrl . '/post/' . $id . '/' . $slug;
-    }
-
-    /**
-     * Get application URL
-     *
-     * @return string
-     */
-    private function getAppUrl()
-    {
-        $config = [];
-        if (file_exists(__DIR__ . '/../../../config.php')) {
-            $config = require __DIR__ . '/../../../config.php';
-        }
-        return $config['app']['url'] ?? 'http://localhost';
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -32,7 +33,7 @@ class ApiRouter
     /**
      * @var array Allowed HTTP methods
      */
-    private $allowedMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
+    private $allowedMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'QUERY'];
 
     /**
      * @var array|null Compiled combined regex cache per method
@@ -42,7 +43,7 @@ class ApiRouter
     /**
      * @var int Max routes per combined regex chunk
      */
-    const CHUNK_SIZE = 10;
+    public const CHUNK_SIZE = 10;
 
     /**
      * Register a GET route
@@ -102,6 +103,21 @@ class ApiRouter
     public function delete($pattern, $handler)
     {
         return $this->addRoute('DELETE', $pattern, $handler);
+    }
+
+    /**
+     * Register a QUERY route (RFC 10008)
+     *
+     * QUERY is a safe, idempotent method for server-side queries
+     * where the query input is passed as request content rather than URI params.
+     *
+     * @param string $pattern Route pattern
+     * @param string $handler Controller@method
+     * @return self
+     */
+    public function query($pattern, $handler)
+    {
+        return $this->addRoute('QUERY', $pattern, $handler);
     }
 
     /**
@@ -176,7 +192,8 @@ class ApiRouter
 
         // Check if method is allowed
         if (!in_array($method, $this->allowedMethods)) {
-            ApiResponse::methodNotAllowed('HTTP method ' . $method . ' is not allowed');
+            $allowedList = implode(', ', $this->allowedMethods);
+            ApiResponse::methodNotAllowed('HTTP method ' . $method . ' is not allowed. Allowed: ' . $allowedList, $allowedList);
             return;
         }
 

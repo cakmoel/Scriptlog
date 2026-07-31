@@ -28,25 +28,25 @@ if (file_exists(__DIR__ . '/../config.php') && is_file(__DIR__ . '/../config.php
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        
+
         // Validate language code
         $langCode = preg_replace('/[^a-z]/', '', strtolower($_GET['lang']));
         $availableLocales = ['en', 'ar', 'zh', 'fr', 'ru', 'es', 'id'];
-        
+
         if (in_array($langCode, $availableLocales)) {
             $_SESSION['admin_locale'] = $langCode;
         }
-        
+
         // Redirect back to current page without lang param
         $currentUrl = $_SERVER['REQUEST_URI'] ?? '/admin/index.php?load=dashboard';
         $currentUrl = preg_replace('/[?&]lang=[^&]*/', '', $currentUrl);
         $currentUrl = empty($currentUrl) ? '/admin/index.php?load=dashboard' : $currentUrl;
-        
+
         // Ensure proper path
         if (!preg_match('#^/admin/#', $currentUrl)) {
             $currentUrl = '/admin/' . ltrim($currentUrl, '/');
         }
-        
+
         header('Location: ' . $currentUrl);
         exit();
     }
@@ -62,25 +62,39 @@ if (file_exists(__DIR__ . '/../config.php') && is_file(__DIR__ . '/../config.php
 if (!$loggedIn) {
     direct_page('login.php', 302);
 } else {
-    $decrypt_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $app->cipher_key) : "";
-
-    $user_login = isset($_COOKIE['scriptlog_auth']) ? $decrypt_login : Session::getInstance()->scriptlog_session_login;
+    //$decrypt_login = isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $app->cipher_key) : "";
+    $decrypt_login = "";
+    if (!empty($_COOKIE['scriptlog_auth']) && class_exists('ScriptlogCryptonize') && isset($app->cipher_key)) {
+        try {
+            $decrypt_login = \ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $app->cipher_key);
+            if (!is_string($decrypt_login)) {
+                $decrypt_login = "";
+            }
+        } catch (\Throwable $e) {
+            // FIX: Corrupted remember-me cookie — ignore and use session instead
+            $decrypt_login = "";
+        }
+    }
+    $user_login = isset($_COOKIE['scriptlog_auth']) ? $decrypt_login : \Session::getInstance()->scriptlog_session_login;
 
     // FIXED: Pass $app->authenticator to the helper function
     $user_data = user_info($app->authenticator, $user_login);
 
-    $user_login = isset($_COOKIE['scriptlog_auth']) ? $user_data['user_login'] : Session::getInstance()->scriptlog_session_login;
-    $user_email = isset($_SESSION['scriptlog_session_email']) ? Session::getInstance()->scriptlog_session_email : $user_data['user_email'];
-    $user_level = isset($_SESSION['scriptlog_session_level']) ? Session::getInstance()->scriptlog_session_level : $user_data['user_level'];
-    $user_id    = isset($_SESSION['scriptlog_session_id']) ? Session::getInstance()->scriptlog_session_id : $user_data['ID'];
+    //$user_login = isset($_COOKIE['scriptlog_auth']) ? $user_data['user_login'] : Session::getInstance()->scriptlog_session_login;
+    $user_login = (!empty($decrypt_login) && !empty($user_data['user_login']))
+        ? $user_data['user_login'] : \Session::getInstance()->scriptlog_session_login;
+
+    $user_email = isset($_SESSION['scriptlog_session_email']) ? \Session::getInstance()->scriptlog_session_email : $user_data['user_email'];
+    $user_level = isset($_SESSION['scriptlog_session_level']) ? \Session::getInstance()->scriptlog_session_level : $user_data['user_level'];
+    $user_id    = isset($_SESSION['scriptlog_session_id']) ? \Session::getInstance()->scriptlog_session_id : $user_data['ID'];
 
     $user_session = isset($user_data['user_session']) ? $user_data['user_session'] : do_logout($app->authenticator);
 
     // Initialize admin locale from database default language if not already set
     if (!isset($_SESSION['admin_locale']) && !isset($_COOKIE['admin_locale'])) {
         try {
-            $configDao = new ConfigurationDao();
-            $defaultLang = $configDao->findConfigByName('lang_default', new Sanitize());
+            $configDao = new \ConfigurationDao();
+            $defaultLang = $configDao->findConfigByName('lang_default', new \Sanitize());
             if (!empty($defaultLang['setting_value'])) {
                 $langCode = $defaultLang['setting_value'];
                 $availableLocales = ['en', 'ar', 'zh', 'fr', 'ru', 'es', 'id'];
