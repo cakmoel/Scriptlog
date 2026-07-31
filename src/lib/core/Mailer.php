@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -212,28 +213,28 @@ class Mailer
 
         $message = '';
 
-            if ($this->sendText && !$this->sendHTML) {
-                $message = $this->textBody;
-            } elseif (!$this->sendText && $this->sendHTML) {
-                $headers[] = 'MIME-Version: 1.0';
-                $headers[] = 'Content-Type: text/html; charset="utf-8"';
-                $headers[] = 'From: <' . self::getAppEmail() . '>';
-                $headers[] = 'Reply-To: ' . self::getAppEmail();
+        if ($this->sendText && !$this->sendHTML) {
+            $message = $this->textBody;
+        } elseif (!$this->sendText && $this->sendHTML) {
+            $headers[] = 'MIME-Version: 1.0';
+            $headers[] = 'Content-Type: text/html; charset="utf-8"';
+            $headers[] = 'From: <' . self::getAppEmail() . '>';
+            $headers[] = 'Reply-To: ' . self::getAppEmail();
 
-                $message = $this->HTMLBody;
-            } elseif ($this->sendText && $this->sendHTML) { //Multipart Message in MIME format
-                $headers[] = 'MIME-Version: 1.0';
-                $headers[] = "From: <" . self::getAppEmail() . ">";
-                $headers[] = "Reply-To:" . self::getAppEmail();
+            $message = $this->HTMLBody;
+        } elseif ($this->sendText && $this->sendHTML) { //Multipart Message in MIME format
+            $headers[] = 'MIME-Version: 1.0';
+            $headers[] = "From: <" . self::getAppEmail() . ">";
+            $headers[] = "Reply-To:" . self::getAppEmail();
 
-                $message .= 'Content-Type: text/plain; charset="utf-8"';
-                $message .= 'Content-Transfer-Encoding: 7bit';
-                $message .= $this->textBody . "\n";
+            $message .= 'Content-Type: text/plain; charset="utf-8"';
+            $message .= 'Content-Transfer-Encoding: 7bit';
+            $message .= $this->textBody . "\n";
 
-                $message .= 'Content-Type: text/html; charset="utf-8"' . "\n";
-                $message .= 'Content-Transfer-Encoding: 7bit' . "\n";
-                $message .= $this->HTMLBody . "\n";
-            }
+            $message .= 'Content-Type: text/html; charset="utf-8"' . "\n";
+            $message .= 'Content-Transfer-Encoding: 7bit' . "\n";
+            $message .= $this->HTMLBody . "\n";
+        }
 
             return mail($this->to, $this->subject, $message, implode($eol, $headers));
     }
