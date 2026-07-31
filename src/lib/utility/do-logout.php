@@ -33,12 +33,15 @@ function do_logout($authenticator)
 function do_logout_id()
 {
 
-    $prefix = isset(Session::getInstance()->scriptlog_fingerprint) ? Session::getInstance()->scriptlog_fingerprint : hash_hmac('sha256', $_SERVER['HTTP_USER_AGENT'], hash('sha256', app_key(), true));
+    $prefix = isset(Session::getInstance()->scriptlog_fingerprint)
+        ? Session::getInstance()->scriptlog_fingerprint
+        : hash_hmac('sha256', $_SERVER['HTTP_USER_AGENT'] ?? '', hash('sha256', app_key(), true));
 
     $id_logout = uniqid($prefix, true);
 
-    if (empty($_SESSION['loggingOut'])) {
-        $_SESSION['loggingOut'] = array();
+    // Initialize loggingOut array if it doesn't exist
+    if (!isset($_SESSION['loggingOut']) || !is_array($_SESSION['loggingOut'])) {
+        $_SESSION['loggingOut'] = [];
     }
 
     $_SESSION['loggingOut'][$id_logout] = true;
@@ -59,10 +62,9 @@ function do_logout_id()
  */
 function verify_logout_id($id_logout)
 {
-
-    if (isset($_SESSION['loggingOut'][$id_logout])) {
+    // Check if loggingOut array exists and the ID is valid
+    if (isset($_SESSION['loggingOut']) && is_array($_SESSION['loggingOut']) && isset($_SESSION['loggingOut'][$id_logout])) {
         unset($_SESSION['loggingOut'][$id_logout]);
-
         return true;
     }
 

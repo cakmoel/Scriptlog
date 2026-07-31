@@ -74,9 +74,9 @@ function read_htaccess_config($permalink_status)
         $content .= 'RewriteCond %{REQUEST_FILENAME} !-f ' . PHP_EOL;
         $content .= 'RewriteCond %{REQUEST_FILENAME} !-l ' . PHP_EOL;
         $content .= '# Only route known application prefixes to index.php' . PHP_EOL;
-        $content .= 'RewriteRule ^(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$ index.php [QSA,L]' . PHP_EOL;
+        $content .= 'RewriteRule ^(post|page|blog|category|archive|archives|tag|privacy|search|download|download_file)(/.*)?$ index.php [QSA,L]' . PHP_EOL;
         $content .= 'RewriteRule ^$ index.php [QSA,L]' . PHP_EOL;
-        $content .= 'RewriteRule ^[a-z]{2}/(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$ index.php [QSA,L]' . PHP_EOL;
+        $content .= 'RewriteRule ^[a-z]{2}/(post|page|blog|category|archive|archives|tag|privacy|search|download|download_file)(/.*)?$ index.php [QSA,L]' . PHP_EOL;
         $content .= 'RewriteRule ^[a-z]{2}/?$ index.php [QSA,L]' . PHP_EOL;
         $content .= '</IfModule>' . PHP_EOL;
     } else {
