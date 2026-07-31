@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -16,14 +17,14 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  */
 use Scriptlog\Controller\DownloadController;
+use Scriptlog\Controller\SearchController;
+use Scriptlog\Core\SearchFinder;
 use Scriptlog\Dao\MediaDao;
 use Scriptlog\Handler\HandlerRegistry;
 use Scriptlog\Model\DownloadModel;
 use Scriptlog\Service\DownloadService;
 
-final
-
-class HandleRequest
+final class HandleRequest
 {
     /**
      * requestPathURI
@@ -222,6 +223,37 @@ class HandleRequest
         call_theme_footer();
     }
 
+    private static function deliverQuerySearch()
+    {
+        $keyword = isset($_GET['q']) ? trim($_GET['q']) : '';
+        if (empty($keyword) || mb_strlen($keyword, 'UTF-8') < 2) {
+            $GLOBALS['search_results'] = [];
+            $GLOBALS['search_keyword'] = '';
+            $GLOBALS['search_pagination'] = [];
+            self::renderTemplate('search');
+            return;
+        }
+        $finder = new SearchFinder();
+        $results = $finder->searchAll($keyword);
+        $safeResults = is_array($results) ? $results : [];
+        $sanitizedKeyword = isset($safeResults['keyword']) ? $safeResults['keyword'] : '';
+        unset($safeResults['error']);
+
+        $page = isset($safeResults['page']) ? (int)$safeResults['page'] : 1;
+        $totalPages = isset($safeResults['totalPages']) ? (int)$safeResults['totalPages'] : 0;
+        $totalRows = isset($safeResults['totalRows']) ? (int)$safeResults['totalRows'] : 0;
+
+        $GLOBALS['search_results'] = $safeResults;
+        $GLOBALS['search_keyword'] = $sanitizedKeyword;
+        $GLOBALS['search_pagination'] = [
+            'page' => $page,
+            'totalPages' => $totalPages,
+            'totalRows' => $totalRows,
+            'html' => ''
+        ];
+        self::renderTemplate('search');
+    }
+
     private static function handleDownloadRequest($identifier)
     {
         if (strpos($_SERVER['REQUEST_URI'], '/file') !== false) {
@@ -310,6 +342,9 @@ class HandleRequest
                 break;
             case 'download':
                 self::deliverQueryDownload();
+                break;
+            case 'q':
+                self::deliverQuerySearch();
                 break;
             default:
                 self::deliverDefaultQuery();
