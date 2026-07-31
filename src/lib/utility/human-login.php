@@ -234,7 +234,7 @@ function processing_human_login($authenticator, $ip, $loginId, $uniqueKey, $erro
             unset($_SESSION['human_login_id'], $_SESSION['captcha_login']);
 
             // Log user in
-            $authenticator->login($_POST);
+            $authenticator->login($values);
             delete_login_attempt($ip); // Clear IP log
 
             direct_page('index.php?load=dashboard', 302);
