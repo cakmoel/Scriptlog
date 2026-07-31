@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Controller\Api;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -17,6 +18,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  */
 
 use Scriptlog\Controller\ApiController;
+use Scriptlog\Core\ApiHateoas;
 use Scriptlog\Core\ApiResponse;
 use Scriptlog\Dao\ConsentDao;
 use Scriptlog\Service\ConsentService;
@@ -36,6 +38,11 @@ class GdprApiController extends ApiController
     private $consentService;
 
     /**
+     * @var ApiHateoas
+     */
+    private $hateoas;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -44,6 +51,8 @@ class GdprApiController extends ApiController
         $this->requiresAuth = false;
 
         parent::__construct();
+
+        $this->hateoas = new ApiHateoas();
 
         // Initialize consent DAO and service
         if (class_exists('ConsentDao')) {
@@ -87,11 +96,13 @@ class GdprApiController extends ApiController
                 $this->consentService->recordConsent('cookie', $status, $ipAddress, $userAgent);
             }
 
+            $links = $this->hateoas->rootLinks();
+
             ApiResponse::success([
                 'status' => $status,
                 'message' => 'Consent recorded successfully',
                 'timestamp' => date('Y-m-d H:i:s')
-            ], 'Consent recorded');
+            ], 200, 'Consent recorded', $links);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to record consent: ' . $e->getMessage(), 500, 'CONSENT_FAILED');
         }
@@ -119,10 +130,12 @@ class GdprApiController extends ApiController
                 $hasConsented = $this->consentService->hasConsented($consentType);
             }
 
+            $links = $this->hateoas->rootLinks();
+
             ApiResponse::success([
                 'consent_given' => $hasConsented,
                 'consent_type' => $consentType
-            ]);
+            ], 200, null, $links);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to get consent status: ' . $e->getMessage(), 500, 'CONSENT_STATUS_FAILED');
         }
