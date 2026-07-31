@@ -64,39 +64,35 @@ class AdminPostsPageTest extends TestCase
         if (!$this->source) {
             $this->markTestSkipped('admin/posts.php not found');
         }
-        $this->assertStringContainsString('switch ($action)', $this->source);
+        $this->assertStringContainsString('adminActionRegistry', $this->source);
+        $this->assertStringContainsString('default_post', $this->source);
     }
 
     public function testHasNewPostAction(): void
     {
-        if (!$this->source) {
-            $this->markTestSkipped('admin/posts.php not found');
-        }
-        $this->assertStringContainsString('ActionConst::NEWPOST', $this->source);
+        $file = __DIR__ . '/../../src/lib/handler/admin/post/NewPostCmd.php';
+        $this->assertFileExists($file, 'NewPostCmd.php not found');
     }
 
     public function testHasEditPostAction(): void
     {
-        if (!$this->source) {
-            $this->markTestSkipped('admin/posts.php not found');
-        }
-        $this->assertStringContainsString('ActionConst::EDITPOST', $this->source);
+        $file = __DIR__ . '/../../src/lib/handler/admin/post/EditPostCmd.php';
+        $this->assertFileExists($file, 'EditPostCmd.php not found');
     }
 
     public function testHasDeletePostAction(): void
     {
-        if (!$this->source) {
-            $this->markTestSkipped('admin/posts.php not found');
-        }
-        $this->assertStringContainsString('ActionConst::DELETEPOST', $this->source);
+        $file = __DIR__ . '/../../src/lib/handler/admin/post/DeletePostCmd.php';
+        $this->assertFileExists($file, 'DeletePostCmd.php not found');
     }
 
     public function testHasAccessControlCheck(): void
     {
-        if (!$this->source) {
-            $this->markTestSkipped('admin/posts.php not found');
+        $file = __DIR__ . '/../../src/lib/handler/admin/post/NewPostCmd.php';
+        if (!file_exists($file)) {
+            $this->markTestSkipped('NewPostCmd.php not found');
         }
-        $this->assertStringContainsString('userAccessControl', $this->source);
+        $this->assertStringContainsString('userAccessControl', file_get_contents($file));
     }
 
     public function testPostIdIntvalSanitization(): void
