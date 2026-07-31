@@ -41,7 +41,8 @@ $required_tables = [
     $prefix . 'tbl_menu', $prefix . 'tbl_mediameta', $prefix . 'tbl_media', $prefix . 'tbl_media_download',
     $prefix . 'tbl_comments', $prefix . 'tbl_login_attempt', $prefix . 'tbl_consents',
     $prefix . 'tbl_data_requests', $prefix . 'tbl_privacy_logs', $prefix . 'tbl_languages',
-    $prefix . 'tbl_translations', $prefix . 'tbl_download_log', $prefix . 'tbl_privacy_policies'
+    $prefix . 'tbl_translations', $prefix . 'tbl_download_log', $prefix . 'tbl_privacy_policies',
+    $prefix . 'tbl_api_keys'
 ];
 
 $all_tables_exist = true;
