@@ -341,6 +341,7 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
             $link->query($tblTranslation);
             $link->query($tblPrivacyPolicy);
             $link->query($tblDownloadLog);
+            $link->query($tblApiKeys);
 
             // insert configuration - app_key
             $recordAppKey = $link->prepare($saveSettings);
@@ -1654,7 +1655,7 @@ location ~ /\.git/ {
 
                 <!-- Application routes with language prefix (e.g., /en/post/...) -->
                 <rule name="Language Routes" stopProcessing="true">
-                    <match url="^[a-z]{2}/(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$" />
+                    <match url="^[a-z]{2}/(post|page|blog|category|archive|archives|tag|privacy|search|download|download_file)(/.*)?$" />
                     <action type="Rewrite" url="index.php" />
                 </rule>
 
@@ -1665,7 +1666,7 @@ location ~ /\.git/ {
 
                 <!-- Application URL rewriting -->
                 <rule name="ScriptLog Rewrite" stopProcessing="true">
-                    <match url="^(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$" />
+                    <match url="^(post|page|blog|category|archive|archives|tag|privacy|search|download|download_file)(/.*)?$" />
                     <action type="Rewrite" url="index.php" />
                 </rule>
 
@@ -1860,9 +1861,9 @@ location ~ /\.git/ {
     RewriteCond %{REQUEST_FILENAME} !-f 
     RewriteCond %{REQUEST_FILENAME} !-l 
     # Only route known application prefixes to index.php
-    RewriteRule ^(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$ index.php [QSA,L]
+    RewriteRule ^(post|page|blog|category|archive|archives|tag|privacy|search|download|download_file)(/.*)?$ index.php [QSA,L]
     RewriteRule ^$ index.php [QSA,L]
-    RewriteRule ^[a-z]{2}/(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$ index.php [QSA,L]
+    RewriteRule ^[a-z]{2}/(post|page|blog|category|archive|archives|tag|privacy|search|download|download_file)(/.*)?$ index.php [QSA,L]
     RewriteRule ^[a-z]{2}/?$ index.php [QSA,L]
 </IfModule>
 # FINISH ScriptLog
