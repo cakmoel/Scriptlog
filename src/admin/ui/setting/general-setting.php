@@ -129,12 +129,36 @@ $action = (isset($formAction)) ? $formAction : null;
         <input type="submit" name="clearCacheSubmit" class="btn btn-warning" value="Clear Page Cache">
         </div>
      </form>
-   </div>
- </div>
-   <!-- /.box-primary -->
 </div>
+  </div>
+   <!-- /.box-primary -->
+   <div class="box box-primary">
+    <div class="box-header with-border">
+      <h3 class="box-title">Page Cache</h3>
+    </div>
+    <div class="box-body">
+      <form method="post" action="index.php?load=option-general">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" name="cache_enabled" value="1" <?= (!empty($cacheEnabled)) ? 'checked' : ''; ?>>
+            Enable full-page caching for anonymous visitors
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="cache_lifetime">Cache lifetime (seconds)</label>
+          <input type="number" name="cache_lifetime" id="cache_lifetime" class="form-control" value="<?= (isset($cacheLifetime)) ? safe_html($cacheLifetime) : 3600; ?>" min="60" max="86400">
+          <p class="help-block">How long a cached page stays valid before regeneration (default 3600).</p>
+        </div>
+        <div class="box-footer">
+          <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
+          <input type="submit" name="cacheConfigSubmit" class="btn btn-primary" value="Save Cache Settings">
+        </div>
+      </form>
+    </div>
+  </div>
+ </div>
     <!--- /.col-md-6 -->
-</div>     
+</div>
 </section>
     <!-- /.content -->
 </div>
