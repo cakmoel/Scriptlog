@@ -73,6 +73,27 @@ class Db implements DbInterface
     ];
 
     /**
+     * Cache of prepared statements keyed by fully-prefixed SQL text
+     *
+     * @var array<string, \PDOStatement>
+     */
+    private array $statementCache = [];
+
+    /**
+     * Maximum number of prepared statements to keep in the per-request cache
+     *
+     * @var int
+     */
+    private const STATEMENT_CACHE_MAX = 64;
+
+    /**
+     * Lazily-built single-pass table-prefix alternation pattern
+     *
+     * @var string|null
+     */
+    private ?string $tablePrefixPattern = null;
+
+    /**
      * Constructor - Initializes the database connection if config is provided
      *
      * @param array $config Database configuration [DSN, username, password]
@@ -134,6 +155,7 @@ class Db implements DbInterface
 
         try {
             $this->dbc = new \PDO($dsn, $dbUser, $dbPass, array_replace($defaultOptions, $options));
+            $this->statementCache = [];
         } catch (\PDOException $e) {
             throw new \RuntimeException("Database connection failed: " . $e->getMessage());
         }
@@ -157,6 +179,7 @@ class Db implements DbInterface
     public function closeDbConnection(): void
     {
         $this->dbc = null;
+        $this->statementCache = [];
     }
 
     /**
@@ -184,7 +207,7 @@ class Db implements DbInterface
     {
         $this->ensureConnection();
         $sql = $this->applyTablePrefix($sql);
-        $stmt = $this->dbc->prepare($sql);
+        $stmt = $this->prepareCached($sql);
         $stmt->execute($args);
         return $stmt;
     }
@@ -204,12 +227,49 @@ class Db implements DbInterface
         $this->ensureConnection();
         $sql = $this->applyTablePrefix($sql);
 
-        $stmt = $this->dbc->prepare($sql);
+        $stmt = $this->prepareCached($sql);
         $stmt->execute($parameters);
 
         return $fetchMode === \PDO::FETCH_CLASS ?
             $stmt->fetchAll($fetchMode, $class) :
             $stmt->fetchAll($fetchMode);
+    }
+
+    /**
+     * Prepare a SQL statement with table prefix applied, reusing already
+     * prepared statements with identical SQL text for the lifetime of the
+     * connection (request-scoped). Bound parameters are passed via execute()
+     * on each call, which PDO supports repeatedly on the same statement.
+     *
+     * The cache is bounded to STATEMENT_CACHE_MAX entries; once full it is
+     * reset so the request continues with fresh prepares.
+     *
+     * @param string $sql Fully-prefixed SQL query
+     * @return \PDOStatement
+     */
+    private function prepareCached(string $sql): \PDOStatement
+    {
+        if (!isset($this->statementCache[$sql])) {
+            if (count($this->statementCache) >= self::STATEMENT_CACHE_MAX) {
+                $this->statementCache = [];
+            }
+            $this->statementCache[$sql] = $this->dbc->prepare($sql);
+        }
+
+        return $this->statementCache[$sql];
+    }
+
+    /**
+     * Forget all cached prepared statements.
+     *
+     * Exposed for tests and called automatically when the connection is
+     * re-established or closed.
+     *
+     * @return void
+     */
+    public function clearStatementCache(): void
+    {
+        $this->statementCache = [];
     }
 
     /**
@@ -432,12 +492,27 @@ class Db implements DbInterface
             return $sql;
         }
 
-        foreach ($this->knownTables as $table) {
-            // Match table name not already prefixed
-            $pattern = '/(?<![a-zA-Z_])' . preg_quote($table, '/') . '(?![a-zA-Z_])/';
-            $sql = preg_replace($pattern, $this->tablePrefix . $table, $sql);
+        if ($this->tablePrefixPattern === null) {
+            $tables = $this->knownTables;
+
+            if (empty($tables)) {
+                return $sql;
+            }
+
+            // Longest first so prefix relationships (e.g. tbl_media vs
+            // tbl_mediameta vs tbl_media_download) resolve to the longest
+            // matching table name.
+            usort($tables, function ($a, $b) {
+                return strlen($b) <=> strlen($a);
+            });
+
+            $alternation = implode('|', array_map(function ($table) {
+                return preg_quote($table, '/');
+            }, $tables));
+
+            $this->tablePrefixPattern = '/(?<![a-zA-Z_])(' . $alternation . ')(?![a-zA-Z_])/';
         }
 
-        return $sql;
+        return preg_replace($this->tablePrefixPattern, $this->tablePrefix . '$1', $sql);
     }
 }
