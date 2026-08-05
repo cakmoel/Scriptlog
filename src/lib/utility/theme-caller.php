@@ -15,9 +15,49 @@
 function theme_dir()
 {
 
+    $directory = &theme_dir_cache();
+
+    if ($directory !== null) {
+        return $directory;
+    }
+
     $active_theme = theme_identifier();
 
-    return (isset($active_theme['theme_directory'])) ? app_url() . DIRECTORY_SEPARATOR . APP_THEME . $active_theme['theme_directory'] . DIRECTORY_SEPARATOR : "";
+    $directory = (isset($active_theme['theme_directory'])) ? app_url() . DIRECTORY_SEPARATOR . APP_THEME . $active_theme['theme_directory'] . DIRECTORY_SEPARATOR : "";
+
+    return $directory;
+}
+
+/**
+ * theme_dir_cache()
+ *
+ * Request-scoped holder for the memoized theme directory value.
+ * Accessed by reference so tests can reset it between cases.
+ *
+ * @category functions
+ * @author M.Noermoehammad
+ * @return mixed
+ *
+ */
+function &theme_dir_cache()
+{
+    static $directory = null;
+    return $directory;
+}
+
+/**
+ * reset_theme_dir_cache()
+ *
+ * Forget the memoized theme directory (used by tests and after theme changes).
+ *
+ * @category functions
+ * @return void
+ *
+ */
+function reset_theme_dir_cache()
+{
+    $cache = &theme_dir_cache();
+    $cache = null;
 }
 
 /**
@@ -32,9 +72,52 @@ function theme_dir()
 function theme_identifier()
 {
 
+    $state = &theme_identifier_cache();
+
+    if ($state['resolved']) {
+        return $state['theme'];
+    }
+
     $theme_init = class_exists('ThemeDao') ? new ThemeDao() : "";
 
-    return empty($theme_init->loadTheme('Y')) ?: $theme_init->loadTheme('Y');
+    $loaded = ($theme_init instanceof ThemeDao) ? $theme_init->loadTheme('Y') : "";
+
+    $state['theme'] = empty($loaded) ? "" : $loaded;
+    $state['resolved'] = true;
+
+    return $state['theme'];
+}
+
+/**
+ * theme_identifier_cache()
+ *
+ * Request-scoped holder for the memoized active-theme row.
+ * Accessed by reference so tests can reset it between cases.
+ *
+ * @category functions
+ * @return array{theme: mixed, resolved: bool}
+ *
+ */
+function &theme_identifier_cache()
+{
+    static $state = ['theme' => null, 'resolved' => false];
+    return $state;
+}
+
+/**
+ * reset_theme_identifier_cache()
+ *
+ * Forget the memoized active theme (used by tests and after theme changes).
+ *
+ * @category functions
+ * @return void
+ *
+ */
+function reset_theme_identifier_cache()
+{
+    $state = &theme_identifier_cache();
+    $state['theme'] = null;
+    $state['resolved'] = false;
 }
 
 /**
