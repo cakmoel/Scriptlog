@@ -46,7 +46,9 @@ function resize_image($current_width, $current_height, $max_size, $destination, 
         }
 
         if (is_resource($new_canves) || $new_canves instanceof \GdImage) {
-            imagedestroy($new_canves);
+            if (PHP_VERSION_ID < 80500) {
+                imagedestroy($new_canves); // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.imagedestroyDeprecated
+            }
         }
 
         return true;
@@ -106,7 +108,9 @@ function crop_image($current_width, $current_height, $new_size, $destination, $i
         }
 
         if (is_resource($new_canves) || $new_canves instanceof \GdImage) {
-            imagedestroy($new_canves);
+            if (PHP_VERSION_ID < 80500) {
+                imagedestroy($new_canves); // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.imagedestroyDeprecated
+            }
         }
 
         return true;
