@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "catfan/medoo",
-            "version": "v2.4.0",
+            "version": "v2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/catfan/Medoo.git",
-                "reference": "467d100225ec3cb3082476f98193bb572015aff5"
+                "reference": "3c6690957337b822520ade34a74fb715763d5515"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/catfan/Medoo/zipball/467d100225ec3cb3082476f98193bb572015aff5",
-                "reference": "467d100225ec3cb3082476f98193bb572015aff5",
+                "url": "https://api.github.com/repos/catfan/Medoo/zipball/3c6690957337b822520ade34a74fb715763d5515",
+                "reference": "3c6690957337b822520ade34a74fb715763d5515",
                 "shasum": ""
             },
             "require": {
@@ -80,7 +80,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2026-05-14T08:20:54+00:00"
+            "time": "2026-07-13T01:24:34+00:00"
         },
         {
             "name": "defuse/php-encryption",
@@ -4537,16 +4537,16 @@
         },
         {
             "name": "phpmetrics/phpmetrics",
-            "version": "v2.9.1",
+            "version": "2.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpmetrics/PhpMetrics.git",
-                "reference": "e2e68ddd1543bc3f44402c383f7bccb62de1ece3"
+                "reference": "7e177cedfe0ee71ee701b9d00eafbc96d9410446"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpmetrics/PhpMetrics/zipball/e2e68ddd1543bc3f44402c383f7bccb62de1ece3",
-                "reference": "e2e68ddd1543bc3f44402c383f7bccb62de1ece3",
+                "url": "https://api.github.com/repos/phpmetrics/PhpMetrics/zipball/7e177cedfe0ee71ee701b9d00eafbc96d9410446",
+                "reference": "7e177cedfe0ee71ee701b9d00eafbc96d9410446",
                 "shasum": ""
             },
             "require": {
@@ -4595,7 +4595,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PhpMetrics/PhpMetrics/issues",
-                "source": "https://github.com/phpmetrics/PhpMetrics/tree/v2.9.1"
+                "source": "https://github.com/phpmetrics/PhpMetrics/tree/2.10.0"
             },
             "funding": [
                 {
@@ -4603,7 +4603,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-09-25T05:21:02+00:00"
+            "time": "2026-07-21T16:15:57+00:00"
         },
         {
             "name": "phpstan/phpstan",
