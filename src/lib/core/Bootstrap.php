@@ -218,13 +218,20 @@ class Bootstrap
             HandleRequest::setThemeRenderer($themeRenderer);
         }
 
-        $frontService = self::createFrontService();
-
         list($mediaDao, $downloadService, $downloadController) = self::createDownloadChain($dbc);
 
         list($postDao, $pageDao, $topicDao) = self::createContentDaos($dbc);
 
         self::storeInRegistry($mediaDao, $downloadService, $downloadController, $postDao, $pageDao, $topicDao);
+
+        // FrontService resolves its DAOs from the Registry at construction time,
+        // so it must be built after the content DAOs are registered above.
+        $frontService = self::createFrontService();
+
+        // Register the shared FrontService in the global Registry so that
+        // HandleRequest::handleFrontHelper() and front_service() can resolve it
+        // at request time (query-string delivery, handlers, theme helpers).
+        class_exists('Registry') ? Registry::set('frontService', $frontService) : null;
 
         $dispatcher = self::createDispatcher($dbc, $themeRenderer);
 
@@ -383,7 +390,7 @@ class Bootstrap
                 FrontHelper::setFrontService($frontService);
             }
             return $frontService;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }
