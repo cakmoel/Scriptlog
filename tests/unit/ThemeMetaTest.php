@@ -149,4 +149,12 @@ class ThemeMetaTest extends TestCase
         $source = file_get_contents($this->utilityPath);
         $this->assertStringContainsString('($uri instanceof RequestPath)', $source);
     }
+
+    public function testMetatagByQueryTagBranchUsesSimplifiedNullChecks(): void
+    {
+        $source = file_get_contents($this->utilityPath);
+        $this->assertStringContainsString('$tag_id = isset($tag[\'ID\']) ? intval($tag[\'ID\']) : null;', $source);
+        $this->assertStringContainsString('$description = isset($tag[\'post_content\'])', $source);
+        $this->assertStringNotContainsString('(!empty($tag) && is_array($tag) && isset($tag[\'ID\']))', $source);
+    }
 }
