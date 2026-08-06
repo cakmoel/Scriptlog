@@ -66,11 +66,13 @@ class RateLimiter
      * @param string $key Unique identifier (default: client IP)
      * @param int $limit Maximum requests allowed in the window
      * @param int $window Window size in seconds
+     * @param string $namespace Optional counter namespace (e.g. 'read' vs 'write')
      * @return array Result with limit, remaining, reset, retry_after, allowed
      */
-    public function check($key = null, $limit = self::DEFAULT_LIMIT, $window = self::DEFAULT_WINDOW)
+    public function check($key = null, $limit = self::DEFAULT_LIMIT, $window = self::DEFAULT_WINDOW, $namespace = '')
     {
-        $key = $key ?: $this->getClientKey();
+        $baseKey = $key ?: $this->getClientKey();
+        $key = $namespace !== '' ? $namespace . ':' . $baseKey : $baseKey;
         $file = $this->cacheDir . DS . md5($key) . '.ratelimit';
         $now = time();
         $windowStart = $now - $window;
