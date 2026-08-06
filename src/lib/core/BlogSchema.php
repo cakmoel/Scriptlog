@@ -29,7 +29,7 @@ class BlogSchema
 
         // Retrieve blog post content through the shared FrontService
         $frontService = function_exists('front_service') ? front_service() : null;
-        $post = $frontService ? $frontService->getPublishedPost((int)$post) : null;
+        $post = $frontService ? $frontService->getPublishedPost($post) : null;
 
         // Return empty schema if post not found
         if (empty($post)) {
