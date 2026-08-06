@@ -156,9 +156,9 @@ try {
 
         // Use stricter limits for write operations (QUERY is safe/idempotent per RFC 10008)
         if (in_array($method, ['POST', 'PUT', 'DELETE', 'PATCH'])) {
-            $rateResult = $rateLimiter->check(null, $writeLimit, ApiResponse::RATE_WINDOW);
+            $rateResult = $rateLimiter->check(null, $writeLimit, ApiResponse::RATE_WINDOW, 'write');
         } else {
-            $rateResult = $rateLimiter->check(null, $readLimit, ApiResponse::RATE_WINDOW);
+            $rateResult = $rateLimiter->check(null, $readLimit, ApiResponse::RATE_WINDOW, 'read');
         }
 
         if (!$rateResult['allowed']) {
