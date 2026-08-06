@@ -14,8 +14,8 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  */
 
-$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$identifier = isset($_GET['identifier']) ? htmlentities(strip_tags($_GET['identifier'])) : "";
+$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action']), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "";
+$identifier = isset($_GET['identifier']) ? htmlentities(strip_tags($_GET['identifier']), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "";
 
 $downloadModel = class_exists('DownloadModel') ? new DownloadModel() : "";
 $mediaDao = class_exists('MediaDao') ? new MediaDao() : "";
