@@ -2,7 +2,7 @@
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
-$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
+$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action']), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "";
 $topicId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $topicDao = class_exists('TopicDao') ? new TopicDao() : "";
 $topicService = class_exists('TopicService') ? new TopicService($topicDao, $app->validator, $app->sanitizer) : "";
