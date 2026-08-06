@@ -41,7 +41,7 @@ $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
                     <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
                 </div>
                 <h2 class="download-error-title" id="download-heading">Download Unavailable</h2>
-                <p class="download-error-message"><?= safe_html($downloadPageData['error']); ?></p>
+                <p class="download-error-message"><?= theme_escape_html($downloadPageData['error']); ?></p>
                 <?php if (isset($downloadPageData['expired']) && $downloadPageData['expired']) : ?>
                 <p class="download-error-hint">This download link has expired. Please contact the site administrator for a new link.</p>
                 <?php endif; ?>
@@ -55,13 +55,13 @@ $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
                 </div>
                 <div class="download-file-meta">
                     <h1 class="download-file-title" id="download-heading">
-                        <?= safe_html($downloadPageData['media']['media_caption'] ?? 'Download File'); ?>
+                        <?= theme_escape_html($downloadPageData['media']['media_caption'] ?? 'Download File'); ?>
                     </h1>
                     <div class="download-file-badges">
                         <?php if (!empty($fileExtension)) : ?>
-                        <span class="download-badge badge-ext"><?= strtoupper(safe_html($fileExtension)); ?></span>
+                        <span class="download-badge badge-ext"><?= strtoupper(theme_escape_html($fileExtension)); ?></span>
                         <?php endif; ?>
-                        <span class="download-badge badge-type"><?= safe_html($downloadPageData['media']['media_type'] ?? 'File'); ?></span>
+                        <span class="download-badge badge-type"><?= theme_escape_html($downloadPageData['media']['media_type'] ?? 'File'); ?></span>
                         <span class="download-badge badge-size"><?= $downloadPageData['file_size'] ?? 'Unknown'; ?></span>
                     </div>
                 </div>
@@ -73,7 +73,7 @@ $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
                         <i class="fa fa-file-text-o" aria-hidden="true"></i>
                         <span>Filename</span>
                     </div>
-                    <div class="download-detail-value download-detail-value--filename" title="<?= safe_html($filename); ?>"><?= safe_html($filename); ?></div>
+                    <div class="download-detail-value download-detail-value--filename" title="<?= theme_escape_html($filename); ?>"><?= theme_escape_html($filename); ?></div>
                 </div>
                 <div class="download-detail-divider"></div>
                 <div class="download-detail-row">
@@ -81,7 +81,7 @@ $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
                         <i class="fa fa-file-o" aria-hidden="true"></i>
                         <span>Type</span>
                     </div>
-                    <div class="download-detail-value"><?= safe_html($downloadPageData['media']['media_type'] ?? 'N/A'); ?></div>
+                    <div class="download-detail-value"><?= theme_escape_html($downloadPageData['media']['media_type'] ?? 'N/A'); ?></div>
                 </div>
                 <div class="download-detail-divider"></div>
                 <div class="download-detail-row">
@@ -94,10 +94,10 @@ $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
             </div>
 
             <div class="download-actions">
-                <a href="<?= safe_html($downloadPageData['download_url'] ?? '#'); ?>"
+                <a href="<?= theme_escape_html($downloadPageData['download_url'] ?? '#'); ?>"
                    class="download-btn download-btn-primary"
                    role="button"
-                   aria-label="Download <?= safe_html($downloadPageData['media']['media_caption'] ?? 'file'); ?>">
+                   aria-label="Download <?= theme_escape_html($downloadPageData['media']['media_caption'] ?? 'file'); ?>">
                     <i class="fa fa-download" aria-hidden="true"></i>
                     <span>Download Now</span>
                 </a>
@@ -111,7 +111,7 @@ $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
                     <input type="text"
                            id="download-share-url"
                            class="download-share-input"
-                           value="<?= safe_html($downloadPageData['download_url'] ?? ''); ?>"
+                           value="<?= theme_escape_html($downloadPageData['download_url'] ?? ''); ?>"
                            readonly
                            aria-label="Download link URL"
                            aria-describedby="copy-status">
@@ -129,13 +129,13 @@ $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
             <?php if (!empty($downloadPageData['support_url'])) : ?>
             <div class="download-support">
                 <p class="download-support-text">Support this project</p>
-                <a href="<?= safe_html($downloadPageData['support_url']); ?>"
+                <a href="<?= theme_escape_html($downloadPageData['support_url']); ?>"
                    class="download-btn download-btn-support"
                    target="_blank"
                    rel="noopener noreferrer"
                    aria-label="Support this project (opens in new tab)">
                     <i class="fa fa-heart" aria-hidden="true"></i>
-                    <span><?= safe_html($downloadPageData['support_label']); ?></span>
+                    <span><?= theme_escape_html($downloadPageData['support_label']); ?></span>
                 </a>
             </div>
             <?php endif; ?>
