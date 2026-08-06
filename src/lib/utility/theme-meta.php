@@ -311,14 +311,14 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb): 
                 $tag = $frontService ? $frontService->searchTag($tag_requested) : "";
 
                 // Handle both empty array and proper result
-                $tag_id = (!empty($tag) && is_array($tag) && isset($tag['ID'])) ? intval($tag['ID']) : null;
+                $tag_id = isset($tag['ID']) ? intval($tag['ID']) : null;
                 $tag_title = !empty($tag_requested) ? $tag_requested : null;
 
                 // Ensure description and keyword are never null - use fallback values
-                $description = (!empty($tag) && is_array($tag) && isset($tag['post_content']))
+                $description = isset($tag['post_content'])
                     ? html_entity_decode(paragraph_l2br(htmlout($tag['post_content'])), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401)
                     : app_info()['site_description'];
-                $keyword = (!empty($tag) && is_array($tag) && isset($tag['post_summary']))
+                $keyword = isset($tag['post_summary'])
                     ? htmlout($tag['post_summary'])
                     : app_info()['site_keywords'];
 
