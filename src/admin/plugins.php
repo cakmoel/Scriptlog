@@ -2,7 +2,7 @@
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
-$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
+$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action']), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "";
 $pluginId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $pluginDao = class_exists('PluginDao') ? new PluginDao() : "";
 $pluginService = class_exists('PluginService') ? new PluginService($pluginDao, $app->validator, $app->sanitizer) : "";
