@@ -130,12 +130,12 @@ class ThemeMetaTest extends TestCase
         $this->assertStringNotContainsString('$modified_at = null;', $source);
     }
 
-    public function testMetatagByPathCastsFrontHelperResultToArray(): void
+    public function testMetatagByPathCastsFrontServiceResultToArray(): void
     {
         $source = file_get_contents($this->utilityPath);
-        $this->assertStringContainsString('(array) FrontHelper::grabPreparedFrontPostById', $source);
-        $this->assertStringContainsString('(array) FrontHelper::grabPreparedFrontPageBySlug', $source);
-        $this->assertStringContainsString('(array) FrontHelper::grabPreparedFrontTopicBySlug', $source);
+        $this->assertStringContainsString('(array) $frontService->getPublishedPost', $source);
+        $this->assertStringContainsString('(array) $frontService->getPublishedPage', $source);
+        $this->assertStringContainsString('(array) $frontService->getPublishedTopic', $source);
     }
 
     public function testMetatagByPathPerformsNullCheckOnUri(): void
