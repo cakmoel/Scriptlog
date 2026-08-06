@@ -2,13 +2,25 @@
 
 use PHPUnit\Framework\TestCase;
 
+/**
+ * FrontHelper Deprecation Test
+ *
+ * The static FrontHelper facade methods were deprecated in favour of the
+ * Scriptlog\Service\FrontService instance. This verifies the deprecation
+ * markers are present so static callers are steered to the service layer.
+ */
 class FrontHelperPsalmSuppressTest extends TestCase
 {
-    public function testGrabTagListsHasPsalmSuppress(): void
-    {
-        $source = file_get_contents(__DIR__ . '/../../src/lib/core/FrontHelper.php');
+    private $source;
 
-        $this->assertStringContainsString('@psalm-suppress PossiblyUnusedMethod', $source);
+    protected function setUp(): void
+    {
+        $this->source = file_get_contents(__DIR__ . '/../../src/lib/core/FrontHelper.php');
+    }
+
+    public function testGrabTagListsIsDeprecated(): void
+    {
+        $this->assertStringContainsString('@deprecated Use Scriptlog\Service\FrontService::getTagLists()', $this->source);
     }
 
     public function testGrabTagListsMethodExists(): void
@@ -19,12 +31,9 @@ class FrontHelperPsalmSuppressTest extends TestCase
         $this->assertTrue(method_exists('FrontHelper', 'grabTagLists'));
     }
 
-    public function testGrabPreparedFrontArchiveHasPsalmSuppress(): void
+    public function testGrabPreparedFrontArchiveIsDeprecated(): void
     {
-        $source = file_get_contents(__DIR__ . '/../../src/lib/core/FrontHelper.php');
-        $occurrences = substr_count($source, '@psalm-suppress PossiblyUnusedMethod');
-
-        $this->assertGreaterThanOrEqual(3, $occurrences, 'Should have at least 3 @psalm-suppress annotations');
+        $this->assertStringContainsString('@deprecated Use Scriptlog\Service\FrontService::getArchivePosts()', $this->source);
     }
 
     public function testGrabPreparedFrontArchiveMethodExists(): void
@@ -35,10 +44,9 @@ class FrontHelperPsalmSuppressTest extends TestCase
         $this->assertTrue(method_exists('FrontHelper', 'grabPreparedFrontArchive'));
     }
 
-    public function testFrontGalleriesHasPsalmSuppress(): void
+    public function testFrontGalleriesIsDeprecated(): void
     {
-        $source = file_get_contents(__DIR__ . '/../../src/lib/core/FrontHelper.php');
-        $this->assertStringContainsString('@psalm-suppress PossiblyUnusedMethod', $source);
+        $this->assertStringContainsString('@deprecated Use Scriptlog\Service\FrontService::getGalleries()', $this->source);
     }
 
     public function testGrabPreparedFrontGalleriesMethodExists(): void
@@ -47,5 +55,11 @@ class FrontHelperPsalmSuppressTest extends TestCase
             $this->markTestSkipped('FrontHelper class not found');
         }
         $this->assertTrue(method_exists('FrontHelper', 'grabPreparedFrontGalleries'));
+    }
+
+    public function testDeprecationMarkersCoverServiceBoundary(): void
+    {
+        $occurrences = substr_count($this->source, '@deprecated Use Scriptlog\Service\FrontService');
+        $this->assertGreaterThanOrEqual(3, $occurrences, 'Should have at least 3 @deprecated annotations');
     }
 }
