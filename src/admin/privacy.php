@@ -2,8 +2,8 @@
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
-$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
-$page = isset($_GET['p']) ? htmlentities(strip_tags($_GET['p'])) : "index";
+$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action']), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "";
+$page = isset($_GET['p']) ? htmlentities(strip_tags($_GET['p']), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "index";
 
 if (!isset($sanitizer) || empty($sanitizer)) {
     $sanitizer = class_exists('Sanitize') ? new Sanitize() : null;
