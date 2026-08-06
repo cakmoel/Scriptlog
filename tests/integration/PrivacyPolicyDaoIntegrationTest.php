@@ -42,14 +42,12 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
             require_once __DIR__ . '/../../src/lib/dao/PrivacyPolicyDao.php';
             
             // Set up Db in Registry for Dao constructor
-            if (!Registry::isKeySet('dbc')) {
-                $db = new Db([
-                    'mysql:host=localhost;dbname=blogware_test;charset=utf8mb4',
-                    'blogwareuser',
-                    'userblogware'
-                ]);
-                Registry::set('dbc', $db);
-            }
+            $db = new Db([
+                'mysql:host=localhost;dbname=blogware_test;charset=utf8mb4',
+                'blogwareuser',
+                'userblogware'
+            ]);
+            Registry::set('dbc', $db);
             
             // Initialize DAO
             self::$dao = new PrivacyPolicyDao();
