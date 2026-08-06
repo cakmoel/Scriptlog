@@ -267,7 +267,7 @@ class ThemeDao extends Dao
     {
         $sql = "SELECT ID FROM tbl_themes";
         $this->setSQL($sql);
-        return $this->checkCountValue($data) ?? 0;
+        return $this->checkCountValue($data);
     }
 
     /**
