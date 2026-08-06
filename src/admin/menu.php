@@ -2,7 +2,7 @@
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
-$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
+$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action']), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "";
 $menuId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $menuDao = class_exists('MenuDao') ? new MenuDao() : "";
 $menuService = class_exists('MenuService') ? new MenuService($menuDao, $app->validator, $app->sanitizer) : "";
