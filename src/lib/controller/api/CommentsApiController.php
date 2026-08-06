@@ -53,6 +53,8 @@ class CommentsApiController extends ApiController
      */
     public function __construct()
     {
+        $this->requiresAuth = false;
+
         parent::__construct();
 
         // Initialize DAO and services
@@ -73,8 +75,6 @@ class CommentsApiController extends ApiController
     public function index($params = [])
     {
         // This is a public endpoint - no auth required
-        $this->requiresAuth = false;
-
         // Get pagination
         $pagination = $this->getPagination($params);
 
@@ -130,8 +130,6 @@ class CommentsApiController extends ApiController
     public function show($params = [])
     {
         // This is a public endpoint - no auth required
-        $this->requiresAuth = false;
-
         $commentId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (!$commentId) {
@@ -174,8 +172,6 @@ class CommentsApiController extends ApiController
     public function store($_params = [])
     {
         // This is a public endpoint - visitors can post comments
-        $this->requiresAuth = false;
-
         // Validate required fields
         $required = ['comment_author_name', 'comment_content', 'comment_post_id'];
         $validationErrors = $this->validateRequired($this->requestData, $required);
