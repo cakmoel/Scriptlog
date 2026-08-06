@@ -27,8 +27,9 @@ class BlogSchema
     public static function generateBlogPostSchema(int $post)
     {
 
-        // Retrieve blog post content using FrontHelper
-        $post = FrontHelper::grabPreparedFrontPostById($post);
+        // Retrieve blog post content through the shared FrontService
+        $frontService = function_exists('front_service') ? front_service() : null;
+        $post = $frontService ? $frontService->getPublishedPost((int)$post) : null;
 
         // Return empty schema if post not found
         if (empty($post)) {
