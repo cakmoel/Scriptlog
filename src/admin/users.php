@@ -2,7 +2,7 @@
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
-$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
+$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action']), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "";
 $userId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $sessionId = isset($_GET['sessionId']) ? safe_html($_GET['sessionId']) : null;
 $userService = class_exists('UserService') ? new UserService($app->userDao, $app->validator, $app->userToken, $app->sanitizer) : "";
