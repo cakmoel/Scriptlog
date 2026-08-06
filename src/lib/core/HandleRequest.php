@@ -23,6 +23,7 @@ use Scriptlog\Dao\MediaDao;
 use Scriptlog\Handler\HandlerRegistry;
 use Scriptlog\Model\DownloadModel;
 use Scriptlog\Service\DownloadService;
+use Scriptlog\Service\FrontService;
 
 final class HandleRequest
 {
@@ -37,7 +38,7 @@ final class HandleRequest
     /**
      * frontHelper
      *
-     * @var object
+     * @var FrontService|null
      *
      */
     private static $frontHelper;
@@ -62,12 +63,18 @@ final class HandleRequest
     /**
      * handleFrontHelper
      *
-     * @return object
+     * Resolve the shared FrontService instance from the global registry.
+     * Returns null when the service has not been registered so callers can
+     * fail safely. The FrontHelper static facade is deprecated; front-end
+     * content is now accessed through this service.
+     *
+     * @return FrontService|null
      *
      */
     public static function handleFrontHelper()
     {
-        self::$frontHelper = class_exists('FrontHelper') ? new FrontHelper() : '';
+        $service = class_exists('Registry') ? Registry::get('frontService') : null;
+        self::$frontHelper = ($service instanceof FrontService) ? $service : null;
         return self::$frontHelper;
     }
 
@@ -360,7 +367,8 @@ final class HandleRequest
             return;
         }
 
-        $query_post = self::handleFrontHelper()->grabSimpleFrontPost($value);
+        $frontService = self::handleFrontHelper();
+        $query_post = $frontService ? $frontService->getSimplePost($value) : null;
         if (empty($query_post['ID'])) {
             self::renderTemplate('404', 404);
             return;
@@ -377,7 +385,8 @@ final class HandleRequest
             return;
         }
 
-        $query_cat = self::handleFrontHelper()->grabSimpleFrontTopic($value);
+        $frontService = self::handleFrontHelper();
+        $query_cat = $frontService ? $frontService->getSimpleTopic($value) : null;
         if (empty($query_cat['ID'])) {
             self::renderTemplate('404', 404);
             return;
@@ -394,7 +403,8 @@ final class HandleRequest
             return;
         }
 
-        $query_page = self::handleFrontHelper()->grabSimpleFrontPage($value);
+        $frontService = self::handleFrontHelper();
+        $query_page = $frontService ? $frontService->getSimplePage($value) : null;
         if (empty($query_page['ID'])) {
             self::renderTemplate('404', 404);
             return;
