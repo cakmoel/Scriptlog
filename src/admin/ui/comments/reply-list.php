@@ -98,7 +98,7 @@
                         <th scope="row"><?= $no; ?></th>
                         <td class="hidden-xs"><?= safe_html($reply['comment_author_name']); ?></td>
                         <td>
-                          <?= htmlspecialchars(mb_substr($reply['comment_content'], 0, 70)); ?><?= (strlen($reply['comment_content']) > 70) ? '...' : ''; ?>
+                          <?= htmlspecialchars(mb_substr($reply['comment_content'], 0, 70), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?><?= (strlen($reply['comment_content']) > 70) ? '...' : ''; ?>
                         </td>
                         <td class="hidden-xs">
                           <?php
