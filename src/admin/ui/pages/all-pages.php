@@ -84,9 +84,9 @@
                     <tr>
                        
                        <td><?= $no; ?></td>
-                       <td><?= htmlspecialchars($page['post_title']); ?></td>
-                       <td><?= htmlspecialchars($page['user_login']); ?></td>
-                       <td><?= (isset($page['post_modified'])) ? htmlspecialchars(make_date($page['post_modified'])) : htmlspecialchars(make_date($page['post_date'])); ?></td>
+                       <td><?= htmlspecialchars($page['post_title'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?></td>
+                       <td><?= htmlspecialchars($page['user_login'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?></td>
+                       <td><?= (isset($page['post_modified'])) ? htmlspecialchars(make_date($page['post_modified']), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : htmlspecialchars(make_date($page['post_date']), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?></td>
                        <td>
                        <a href="<?=generate_request('index.php', 'get', ['pages', 'editPage', $page['ID']])['link']; ?>" class="btn btn-warning" title="Edit page">
                        <i class="fa fa-pencil fa-fw"></i> </a>
