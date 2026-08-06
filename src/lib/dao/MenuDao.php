@@ -364,7 +364,7 @@ class MenuDao extends Dao
     {
         $sql = "SELECT ID FROM tbl_menu";
         $this->setSQL($sql);
-        return $this->checkCountValue($data) ?? 0;
+        return $this->checkCountValue($data);
     }
 
     /**
