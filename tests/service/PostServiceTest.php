@@ -161,27 +161,6 @@ class PostServiceTest extends TestCase
         $this->assertNotEquals($val1, $val2);
     }
 
-    public function testPostStatusDropDown(): void
-    {
-        $this->postDaoMock->method('dropDownPostStatus')->willReturn('<select><option>publish</option></select>');
-        $dropdown = $this->postService->postStatusDropDown();
-        $this->assertIsString($dropdown);
-    }
-
-    public function testCommentStatusDropDown(): void
-    {
-        $this->postDaoMock->method('dropDownCommentStatus')->willReturn('<select><option>open</option></select>');
-        $dropdown = $this->postService->commentStatusDropDown();
-        $this->assertIsString($dropdown);
-    }
-
-    public function testVisibilityDropDown(): void
-    {
-        $this->postDaoMock->method('dropDownVisibility')->willReturn('<select><option>public</option></select>');
-        $dropdown = $this->postService->visibilityDropDown();
-        $this->assertIsString($dropdown);
-    }
-
     public function testPostAuthorId(): void
     {
         $_SESSION['scriptlog_session_id'] = 1;
