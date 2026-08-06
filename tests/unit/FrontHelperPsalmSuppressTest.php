@@ -62,4 +62,10 @@ class FrontHelperPsalmSuppressTest extends TestCase
         $occurrences = substr_count($this->source, '@deprecated Use Scriptlog\Service\FrontService');
         $this->assertGreaterThanOrEqual(3, $occurrences, 'Should have at least 3 @deprecated annotations');
     }
+
+    public function testDeprecatedMethodsCarryPsalmSuppressMarkers(): void
+    {
+        $occurrences = substr_count($this->source, '@psalm-suppress PossiblyUnusedMethod');
+        $this->assertGreaterThanOrEqual(12, $occurrences, 'Should suppress PossiblyUnusedMethod for deprecated facade methods');
+    }
 }
