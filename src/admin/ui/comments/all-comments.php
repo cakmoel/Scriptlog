@@ -85,7 +85,7 @@
                          <th scope="row"><?= $no; ?></th>
                          <td>
                            <a href="<?= generate_request("index.php", 'get', ['comments', ActionConst::EDITCOMMENT, $comment['ID']])['link']; ?>">
-                             <?= htmlspecialchars(mb_substr($comment['comment_content'], 0, 60)); ?><?= (strlen($comment['comment_content']) > 60) ? '...' : ''; ?>
+                             <?= htmlspecialchars(mb_substr($comment['comment_content'], 0, 60), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?><?= (strlen($comment['comment_content']) > 60) ? '...' : ''; ?>
                            </a>
                            <br>
                            <small class="text-muted">by <?= safe_html($comment['comment_author_name']); ?></small>
