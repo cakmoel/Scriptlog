@@ -119,7 +119,7 @@ class PassPhraseKey
      */
     private static function grabDirectoryKey()
     {
-        self::$directory = isset($_SERVER['DOCUMENT_ROOT']) ? htmlspecialchars($_SERVER['DOCUMENT_ROOT']) : "";
+        self::$directory = isset($_SERVER['DOCUMENT_ROOT']) ? htmlspecialchars($_SERVER['DOCUMENT_ROOT'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "";
 
         return self::$directory;
     }
