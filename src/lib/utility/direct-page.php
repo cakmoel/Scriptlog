@@ -56,7 +56,7 @@ function direct_page($page = '', $http_status_code = null)
     );
 
     // defining url
-    $url = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname(htmlspecialchars($_SERVER['PHP_SELF']));
+    $url = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname(htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401));
 
     // remove any trailing slashes
     $url = rtrim($url, '/\\');
