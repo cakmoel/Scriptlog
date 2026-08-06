@@ -42,10 +42,10 @@ $last_updated_label = t('privacy.last_updated');
             <div class="col-lg-10 col-xl-9">
                 <article class="privacy-card">
                     <header class="privacy-header">
-                        <h1><?= htmlout($privacy_title); ?></h1>
+                        <h1><?= theme_escape_html($privacy_title); ?></h1>
                         <div class="privacy-meta">
                             <i class="fa fa-calendar-check-o" aria-hidden="true"></i> 
-                            <?= $last_updated_label; ?>: <?= htmlout($last_updated); ?>
+                            <?= $last_updated_label; ?>: <?= theme_escape_html($last_updated); ?>
                         </div>
                     </header>
                     <section class="privacy-body">
@@ -53,7 +53,7 @@ $last_updated_label = t('privacy.last_updated');
                             <?= $privacy_content; ?>
                         <?php else : ?>
                             <p class="lead mt-0 mb-1">
-                                This Privacy Policy describes how <strong><?= htmlout($site_name); ?></strong> ("we," "us," or "our") collects, uses, and discloses your information. We are committed to protecting your privacy and handling your data in an open and transparent manner.
+                                This Privacy Policy describes how <strong><?= theme_escape_html($site_name); ?></strong> ("we," "us," or "our") collects, uses, and discloses your information. We are committed to protecting your privacy and handling your data in an open and transparent manner.
                             </p>
                             <h2><?= t('privacy.information_we_collect'); ?></h2>
                             <p>We may collect the following types of information:</p>
@@ -87,7 +87,7 @@ $last_updated_label = t('privacy.last_updated');
                             <h2><?= t('privacy.contact_us'); ?></h2>
                             <p>
                                 For inquiries regarding this policy, please reach us at: 
-                                <a href="mailto:<?= htmlout($contact_email); ?>" class="text-primary fw-bold"><?= htmlout($contact_email); ?></a>
+                                <a href="mailto:<?= theme_escape_html($contact_email); ?>" class="text-primary fw-bold"><?= theme_escape_html($contact_email); ?></a>
                             </p>
                         <?php endif; ?>
                     </section>
