@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "catfan/medoo",
-            "version": "v2.4.0",
+            "version": "v2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/catfan/Medoo.git",
-                "reference": "467d100225ec3cb3082476f98193bb572015aff5"
+                "reference": "3c6690957337b822520ade34a74fb715763d5515"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/catfan/Medoo/zipball/467d100225ec3cb3082476f98193bb572015aff5",
-                "reference": "467d100225ec3cb3082476f98193bb572015aff5",
+                "url": "https://api.github.com/repos/catfan/Medoo/zipball/3c6690957337b822520ade34a74fb715763d5515",
+                "reference": "3c6690957337b822520ade34a74fb715763d5515",
                 "shasum": ""
             },
             "require": {
@@ -80,7 +80,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2026-05-14T08:20:54+00:00"
+            "time": "2026-07-13T01:24:34+00:00"
         },
         {
             "name": "defuse/php-encryption",
