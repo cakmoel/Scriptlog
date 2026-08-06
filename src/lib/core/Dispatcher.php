@@ -256,7 +256,7 @@ class Dispatcher
         $frontService = function_exists('front_service') ? front_service() : null;
         $page = $frontService ? $frontService->getPublishedPage($pageSlug) : null;
 
-        if (empty($page) || !is_array($page)) {
+        if (empty($page)) {
             return false;
         }
 
@@ -272,7 +272,7 @@ class Dispatcher
         }
         $frontService = function_exists('front_service') ? front_service() : null;
         $topic = $frontService ? $frontService->getPublishedTopic($categorySlug) : null;
-        return !empty($topic) && is_array($topic);
+        return !empty($topic);
     }
 
     private function validateArchive($requestPath)
