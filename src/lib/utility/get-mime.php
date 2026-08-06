@@ -65,7 +65,9 @@ function get_mime($filename, $mode = 0)
     if (function_exists('finfo_open') && $mode == 0) {
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimetype = finfo_file($finfo, $filename);
-        finfo_close($finfo);
+        if (PHP_VERSION_ID < 80100) {
+            finfo_close($finfo); // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.finfo_closeDeprecated
+        }
         return $mimetype;
     } elseif (array_key_exists($ext, $mime_types)) {
         return $mime_types[$ext];
