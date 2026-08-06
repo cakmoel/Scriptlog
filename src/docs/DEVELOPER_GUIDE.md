@@ -70,7 +70,7 @@
 |  4. Run install/index.php (system requirements)               |
 |  5. Run install/setup-db.php (create tables)                  |
 |  6. Run install/finish.php (complete setup)                   |
-|  7. Configuration saved to config.php and .env               |
+|  7. Configuration saved to config.php and .env                |
 +---------------------------------------------------------------+
 ```
 
@@ -194,6 +194,10 @@ return [
         'system_software' => $_ENV['SYSTEM_OS'] ?? 'Linux',
         'distrib_name'    => $_ENV['DISTRIB_NAME'] ?? ''
     ],
+
+    'api' => [
+        'allowed_origins' => $_ENV['CORS_ALLOWED_ORIGINS'] ?? ''
+    ],
 ];
 ```
 
@@ -227,6 +231,9 @@ MAIL_FROM_NAME=Blogware
 # --- SYSTEM ---
 SYSTEM_OS=Linux
 DISTRIB_NAME="Linux Mint"
+
+# --- API / CORS ---
+CORS_ALLOWED_ORIGINS=
 ```
 
 ### Automatic Defuse Key Generation
@@ -329,126 +336,6 @@ sudo chmod -R 755 storage
 
 If the key ends up in the fallback location, you can manually move it to `storage/keys/` after installation and update the path in `config.php`, `tbl_settings`, and `.env`.
 
-### Installation Fixes
-
-During development, the following bugs were discovered and fixed:
-
-#### 1. write_config_file() Argument Order Bug
-
-**Problem**: The `write_config_file()` function in `install/include/setup.php` has the signature:
-```php
-function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuser, $dbname, $dbport, ...)
-```
-
-But `install/index.php` was calling it with `$dbuser` and `$dbpass` in the wrong order, causing "Access denied" errors when creating config.php.
-
-**Fix**: In `install/index.php` line 168, corrected the argument order:
-```php
-// BEFORE (WRONG):
-write_config_file($protocol, $server_host, $dbhost, $dbuser, $dbpass, $dbname, ...)
-
-// AFTER (CORRECT):
-write_config_file($protocol, $server_host, $dbhost, $dbpass, $dbuser, $dbname, ...)
-```
-
-#### 2. popper.min.js Path Bug
-
-**Problem**: The install layout was loading popper.js from a non-existent path `assets/vendor/bootstrap/js/vendor/popper.min.js`.
-
-**Fix**: In `install/install-layout.php`, corrected the path to `assets/vendor/bootstrap/js/popper.min.js`.
-
-#### 3. Database Tables Created
-
-The installation now creates 21 tables:
-- Core: tbl_users, tbl_user_token, tbl_login_attempt, tbl_posts, tbl_topics, tbl_post_topic, tbl_comments
-- Media: tbl_media, tbl_mediameta, tbl_media_download
-- System: tbl_menu, tbl_plugin, tbl_settings, tbl_themes
-- GDPR: tbl_consents, tbl_data_requests, tbl_privacy_logs, tbl_privacy_policies
-- i18n: tbl_languages, tbl_translations
-- Downloads: tbl_download_log
-
-#### 4. Database Column Fixes
-
-**Problem**: The `PostModel` class references a `post_keyword` column that didn't exist in the database, causing errors when accessing post data.
-
-**Fix**: Added `post_keyword` column to `tbl_posts` in `install/include/dbtable.php`:
-```sql
-ALTER TABLE tbl_posts ADD COLUMN post_keyword VARCHAR(255) DEFAULT NULL AFTER post_tags;
-```
-
-#### 5. Db Class KnownTables Array
-
-**Problem**: The `Db` class (`lib/core/Db.php`) had an incomplete `knownTables` array, missing several tables that the application uses. This caused issues with prefix handling.
-
-**Fix**: Added all 21 tables to the `knownTables` array in `lib/core/Db.php`:
-```php
-private $knownTables = [
-    'users', 'user_token', 'login_attempt', 'posts', 'topics', 
-    'post_topic', 'comments', 'media', 'mediameta', 'media_download',
-    'menu', 'plugin', 'settings', 'themes', 'consents', 
-    'data_requests', 'privacy_logs', 'privacy_policies', 
-    'languages', 'translations', 'download_log'
-];
-```
-
-### Post-Installation Fixes
-
-After initial installation, several issues were discovered and fixed:
-
-#### 6. Table Prefix Compatibility
-
-**Problem**: The application uses table prefixes (e.g., `urmpnj_posts`) but utility functions using Medoo were creating new database connections without applying the prefix.
-
-**Fixes**:
-
-1. **medooin.php**: Modified to use the Registry connection (`Registry::get('dbc')`) instead of creating a new Medoo connection, ensuring table prefix is applied.
-
-2. **db-mysqli.php**: Updated to work with both PDO and mysqli connections - checks connection type and handles accordingly.
-
-#### 7. Null Safety and Compatibility Fixes
-
-The following utility functions were fixed for null safety and PDO/mysqli compatibility:
-
-1. **membership.php** (`lib/utility/membership.php`):
-   - Added null checks for `$user['user_fullname']` and `$user['user_login']`
-   - Fixed array access patterns
-
-2. **app-info.php** (`lib/utility/app-info.php`):
-   - Fixed array/object compatibility issues
-   - Added type checking for different return formats
-
-3. **theme-navigation.php** (`lib/utility/theme-navigation.php`):
-   - Added PDO/mysqli compatibility handling
-   - Fixed result fetching for both connection types
-
-4. **login-attempt.php** (`lib/utility/login-attempt.php`):
-   - Added PDO/mysqli compatibility handling
-   - Fixed result fetching patterns
-
-#### 8. Hello World Plugin Installation
-
-**Problem**: The sample Hello World plugin existed in `admin/plugins/hello-world/` but was not being added to the database during installation.
-
-**Fix**: Added the plugin to the installation process:
-
-1. **dbtable.php**: Added `savePlugin` SQL query:
-```php
-$savePlugin = "INSERT INTO {$prefix}tbl_plugin (plugin_name, plugin_link, plugin_directory, plugin_desc, plugin_status, plugin_level, plugin_sort) VALUES (?, ?, ?, ?, ?, ?, ?)";
-```
-
-2. **setup.php**: Added code to insert Hello World plugin during installation:
-```php
-$plugin_name = "Hello World";
-$plugin_link = "#";
-$plugin_directory = "hello-world";
-$plugin_desc = "A simple Hello World plugin to demonstrate the plugin system";
-$plugin_status = "N"; // disabled by default
-$plugin_level = "administrator";
-$plugin_sort = 1;
-```
-
-The plugin is inserted as disabled (`plugin_status = 'N'`) by default, allowing users to enable it from the admin panel after installation.
-
 ### Key Files
 
 | File | Location | Purpose |
@@ -456,6 +343,8 @@ The plugin is inserted as disabled (`plugin_status = 'N'`) by default, allowing 
 | `config.php` | Root | Main configuration with `$_ENV` fallbacks |
 | `.env` | Root | Environment variables (auto-generated) |
 | `defuse_key` | `/var/www/your-project/storage/keys/[random_filename].php` | Encryption key for authentication |
+
+> **Installation troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` — [Installation Issues](TROUBLESHOOTING.md#installation-issues) and [Database Issues](TROUBLESHOOTING.md#database-issues).
 
 ---
 
@@ -535,8 +424,8 @@ All project classes now use `Scriptlog\*` namespaces with backward-compatible `c
 | `lib/handler/` | `Scriptlog\Handler` | `Scriptlog\Handler\PostHandler` |
 
 **Backward Compatibility:**
-- `lib/autoload-aliases.php` — 179 `class_alias()` entries mapping old global names to new namespaced classes (kept as reference)
-- `lib/autoload-aliases-map.php` — Static array map used by the lazy autoloader (fast, no class loading)
+- `lib/autoload-aliases.php` — 223 `class_alias()` entries mapping old global names to new namespaced classes (kept as reference)
+- `lib/autoload-aliases-map.php` — Static array map (223 entries) used by the lazy autoloader (fast, no class loading)
 - `lib/main.php` and `tests/bootstrap.php` register a lazy `spl_autoload_register()` that creates aliases on demand — **only when old class names are actually used at runtime**
 
 **Performance impact:** Lazy loading reduced autoload overhead from ~100ms to ~30ms and memory from 12MB to 6MB per request. See `benchmark/autoload_perf_bench.md`.
@@ -545,13 +434,13 @@ All project classes now use `Scriptlog\*` namespaces with backward-compatible `c
 
 #### What Problem Did This Script Solve?
 
-Before the migration, all 179 project classes were in the **global namespace** — no `namespace` declarations at all. This meant any class could be referenced simply by its short name (e.g., `Bootstrap`, `PostDao`). While simple, this approach caused problems:
+Before the migration, the 179 original project classes were in the **global namespace** — no `namespace` declarations at all. This meant any class could be referenced simply by its short name (e.g., `Bootstrap`, `PostDao`). While simple, this approach caused problems:
 
 - **Collisions**: Two Composer packages could define the same class name
 - **No autoloading control**: Composer's PSR-4 autoloader couldn't map paths to classes without namespaces
 - **Hard to modernize**: Modern PHP frameworks and tools expect namespaced code
 
-This script performed the **one-time migration** to add `namespace Scriptlog\*` declarations to all 179 class files, add cross-namespace `use` imports where needed, and generate backward-compatible `class_alias()` entries so existing code continued working.
+This script performed the **one-time migration** to add `namespace Scriptlog\*` declarations to all 179 original class files, add cross-namespace `use` imports where needed, and generate backward-compatible `class_alias()` entries so existing code continued working. Since then the project has grown to 223 classes, each new one being added manually to both alias files (see the TIP below).
 
 #### How It Works (3-Step Algorithm)
 
@@ -559,7 +448,7 @@ This script performed the **one-time migration** to add `namespace Scriptlog\*` 
 |------|-------------|----------------|
 | **1: Build class map** | Scans all `lib/` subdirectories, finds every class/interface/trait, maps each short name to its target namespace | None (read-only) |
 | **2: Process each file** | For every PHP file: tokenizes it, preserves existing `use` statements, detects cross-namespace references (extends, implements, new, instanceof, catch, ::), injects `namespace` declaration + new `use` statements | All 179 class files in `lib/core/`, `lib/dao/`, `lib/service/`, `lib/controller/`, `lib/model/`, `lib/handler/` |
-| **3: Generate aliases** | Writes `lib/autoload-aliases.php` with 179 `class_alias()` entries mapping old global names (e.g., `Bootstrap`) to new namespaced names (e.g., `Scriptlog\Core\Bootstrap`) | `lib/autoload-aliases.php` (created) |
+| **3: Generate aliases** | Writes `lib/autoload-aliases.php` with `class_alias()` entries mapping old global names (e.g., `Bootstrap`) to new namespaced names (e.g., `Scriptlog\Core\Bootstrap`) | `lib/autoload-aliases.php` (created; now 223 entries) |
 
 #### What It Did NOT Do
 
@@ -1076,45 +965,55 @@ Scriptlog/
 |   |-- reply.php               # Reply management
 |   |-- users.php               # User management
 |   |-- menu.php                # Menu management
+|   |-- navigation.php          # Navigation menu
 |   |-- templates.php           # Theme management
 |   |-- plugins.php             # Plugin management
 |   |-- medialib.php            # Media library
-|   +-- ui/                     # Admin UI components
-|       +-- comments/           # Comment UI templates
-|           |-- all-comments.php
-|           |-- edit-comment.php
-|           |-- reply.php
-|           +-- reply-list.php
+|   |-- media-upload.php        # Media upload
+|   |-- downloads.php           # Download management
+|   |-- dashboard.php           # Dashboard
+|   |-- export.php / import.php # Data import/export
+|   |-- languages.php           # Language management
+|   |-- translations.php        # Translation management
+|   |-- privacy.php             # Privacy management
+|   |-- signup.php              # User registration
+|   |-- option-*.php            # Settings pages (general, permalink, mail, ...)
+|   |-- ui/                     # Admin UI components
+|   |-- assets/                 # Admin assets
+|   +-- wysiwyg/                # Rich text editor
 |
 |-- api/                        # RESTful API
-|   +-- index.php               # API entry point
+|   +-- index.php               # API entry point (/api/v1/)
 |
 |-- lib/                       # Core library
 |   |-- main.php               # Application bootstrap
-|   |-- common.php             # Constants and functions
+|   |-- common.php             # Constants (APP_ROOT, APP_ADMIN, ...)
 |   |-- options.php            # PHP configuration
 |   |-- Autoloader.php         # Legacy class autoloader
 |   |-- utility-loader.php     # Utility functions loader
-|   |-- autoload-aliases.php   # 179 class_alias() entries (reference only)
-|   |-- autoload-aliases-map.php # Static alias map for lazy autoloader
+|   |-- autoload-aliases.php   # 223 class_alias() entries (reference only)
+|   |-- autoload-aliases-map.php # Static alias map for lazy autoloader (223 entries)
 |   |
-|   +-- core/                  # Core classes — Scriptlog\Core (80+ files)
-|       |-- Bootstrap.php      # Application initialization
+|   +-- core/                  # Core classes — Scriptlog\Core (103 files)
+|       |-- Bootstrap.php      # Application initialization, routes
 |       |-- Dispatcher.php     # URL routing
 |       |-- DbFactory.php      # PDO database connection
+|       |-- Db.php             # PDO wrapper (prefix handling, dbQuery/dbInsert/...)
 |       |-- Authentication.php # User authentication
 |       |-- SessionMaker.php   # Custom session handler
-|       |-- View.php           # View rendering
+|       |-- Dao.php            # DAO base class
+|       |-- CSRFGuard.php      # CSRF protection
 |       |-- ApiResponse.php    # API response handler
 |       |-- ApiAuth.php        # API authentication
 |       |-- ApiRouter.php      # API routing
+|       |-- SearchFinder.php   # FULLTEXT search engine
 |       +-- ...
 |
-|   +-- dao/                  # Data Access Objects — Scriptlog\Dao
+|   +-- dao/                  # Data Access Objects — Scriptlog\Dao (19 files)
 |       |-- PostDao.php       # Posts CRUD
 |       |-- UserDao.php       # Users CRUD
 |       |-- CommentDao.php    # Comments CRUD
-|       |-- TopicDao.php      # Topics CRUD
+|       |-- TopicDao.php      # Categories CRUD
 |       |-- MediaDao.php      # Media CRUD
 |       |-- PageDao.php       # Pages CRUD
 |       |-- MenuDao.php       # Menus CRUD
@@ -1122,9 +1021,13 @@ Scriptlog/
 |       |-- ThemeDao.php      # Themes CRUD
 |       +-- ConfigurationDao.php
 |
-|   +-- dto/                   # Data Transfer Objects
+|   +-- dto/                   # Data Transfer Objects — Scriptlog\Dto
 |       |-- PostRequestDto.php
-|       +-- UploadedFileDto.php
+|       |-- UploadedFileDto.php
+|       +-- api/               # API DTOs
+|           |-- PostApiDto.php
+|           |-- CommentApiDto.php
+|           +-- TopicApiDto.php
 |
 |   +-- service/               # Business logic layer — Scriptlog\Service (21 files)
 |       |-- PostService.php
@@ -1149,20 +1052,23 @@ Scriptlog/
 |       |-- TranslationService.php
 |       +-- NotificationService.php
 |
-|   +-- handler/               # Request handlers — Scriptlog\Handler
+|   +-- handler/               # Request handlers — Scriptlog\Handler (13 files)
+|       |-- HandlerRegistry.php       # Handler registration & lookup
+|       |-- FrontRequestHandler.php   # Frontend dispatch coordinator
 |       |-- PostHandler.php
 |       |-- PageHandler.php
 |       |-- CategoryHandler.php
 |       |-- TagHandler.php
 |       |-- ArchiveHandler.php
-|       |-- SearchHandler.php
 |       |-- PrivacyHandler.php
 |       |-- DownloadHandler.php
-|       |-- GalleryHandler.php
 |       |-- BlogHandler.php
-|       +-- HomeHandler.php
+|       |-- HomeHandler.php
+|       +-- admin/              # Admin action handlers
+|           |-- AdminActionRegistry.php
+|           +-- AdminActionCommand.php
 |
-|   +-- validator/              # Validators
+|   +-- validator/              # Validators — Scriptlog\Validator (5 files)
 |       |-- PostValidator.php
 |       |-- FileUploadValidator.php
 |       |-- ProtectedPostValidator.php
@@ -1191,7 +1097,7 @@ Scriptlog/
 |       |-- TranslationController.php
 |       |-- ApiController.php
 |       |
-|       +-- api/              # API Controllers — Scriptlog\Controller\Api
+|       +-- api/              # API Controllers — Scriptlog\Controller\Api (11 files)
 |           |-- PostsApiController.php
 |           |-- CategoriesApiController.php
 |           |-- CommentsApiController.php
@@ -1201,9 +1107,10 @@ Scriptlog/
 |           |-- MediaApiController.php
 |           |-- ProtectedPostApiController.php
 |           |-- LanguagesApiController.php
-|           +-- TranslationsApiController.php
+|           |-- TranslationsApiController.php
+|           +-- QueryApiController.php
 |
-|   +-- model/                # Data models — Scriptlog\Model
+|   +-- model/                # Data models — Scriptlog\Model (9 files)
 |       |-- PostModel.php
 |       |-- FrontContentModel.php
 |       |-- TopicModel.php
@@ -1214,9 +1121,9 @@ Scriptlog/
 |       |-- ArchivesModel.php
 |       +-- DownloadModel.php
 |
-|   +-- utility/              # Utility functions (100+ files)
-|       |-- invoke-config.php
-|       |-- form-security.php
+|   +-- utility/              # Utility functions (218 files, dash-lowercase)
+|       |-- app-config.php
+|       |-- app-url.php
 |       |-- csrf-defender.php
 |       |-- remove-xss.php
 |       |-- email-validation.php
@@ -1228,7 +1135,10 @@ Scriptlog/
 |
 |-- public/                  # Public web root
 |   +-- themes/              # Theme templates
-|       +-- blog/            # Default theme
+|       |-- blog/            # Default theme
+|       |-- restoblog/
+|       |-- tastybites/
+|       +-- valdur/
 |   +-- files/               # Uploaded files
 |       |-- pictures/
 |       |-- audio/
@@ -1237,17 +1147,24 @@ Scriptlog/
 |   +-- cache/               # Cache directory
 |   +-- log/                 # Log directory
 |
-|-- docs/                    # Documentation
+|-- dev-docs/                # Developer documentation
 |   |-- DEVELOPER_GUIDE.md
 |   |-- TESTING_GUIDE.md
+|   |-- THEME_DEVELOPER_GUIDE.md
 |   |-- PLUGIN_DEVELOPER_GUIDE.md
 |   |-- API_DOCUMENTATION.md
+|   |-- DATABASE_SCHEMA_GUIDE.md
 |   |-- API_OPENAPI.yaml
 |   +-- API_OPENAPI.json
+|
+|-- tests/                   # PHPUnit test suites
+|
+|-- e2e/                     # End-to-end tests
 |
 +-- install/                  # Installation wizard
     |-- index.php
     |-- setup-db.php
+    |-- validate-db.php
     |-- finish.php
     +-- include/
         |-- dbtable.php
@@ -1288,9 +1205,10 @@ $rules = [
     'blog'     => "/blog([^/]*)",
     'page'     => "/page/(?'page'[^/]+)",
     'single'   => "/post/(?'id'\d+)/(?'post'[\w\-]+)",
-    'search'   => "(?'search'[\w\-]+)",
+    'search'   => "/search",
     'tag'      => "/tag/(?'tag'[\w\- ]+)",
     'privacy'  => "/privacy",
+    'locale'   => "/locale",
     'download' => "/download/(?'identifier'[a-f0-9\-]+)",
     'download_file' => "/download/(?'identifier'[a-f0-9\-]+)/file"
 ];
@@ -1305,9 +1223,10 @@ $rules = [
 | `blog` | `/blog*` | Blog listing |
 | `page` | `/page/{slug}` | Static pages |
 | `single` | `/post/{id}/{slug}` | Single post view |
-| `search` | `/{keyword}` | Search results |
+| `search` | `/search` | Search results |
 | `tag` | `/tag/{tag}` | Tag archive pages (supports spaces) |
 | `privacy` | `/privacy` | Privacy policy page |
+| `locale` | `/locale` | Locale/language switching |
 | `download` | `/download/{identifier}` | Secure download (UUID) |
 | `download_file` | `/download/{identifier}/file` | File download endpoint |
 
@@ -1384,110 +1303,69 @@ Custom session handler with secure cookie management.
 
 ## 5. Database Schema
 
-### Table: tbl_users
+The database is MySQL/MariaDB with InnoDB tables. The schema is **22 tables**. Every definition, index, default value, and seed insert lives in one file:
 
-```sql
-CREATE TABLE tbl_users (
-    ID BIGINT(20) unsigned NOT NULL AUTO_INCREMENT,
-    user_login VARCHAR(60) NOT NULL UNIQUE,
-    user_email VARCHAR(100) NOT NULL UNIQUE,
-    user_pass VARCHAR(255) NOT NULL,
-    user_level VARCHAR(20) NOT NULL,
-    user_fullname VARCHAR(120) DEFAULT NULL,
-    user_url VARCHAR(100) DEFAULT NULL,
-    user_registered datetime NOT NULL,
-    user_activation_key VARCHAR(255),
-    user_session VARCHAR(255) NOT NULL,
-    user_banned TINYINT DEFAULT '0',
-    user_signin_count INT DEFAULT '0',
-    user_locked_until DATETIME NULL,
-    PRIMARY KEY (ID)
-) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+install/include/dbtable.php
 ```
 
-### Table: tbl_posts
+The function `get_table_definitions($prefix)` returns the complete set. Production databases use a table prefix generated randomly during installation (e.g. `abc123_`), stored under `db.prefix` in the created config; the `tpglkl_` value in the stock `config.php` is only a fallback placeholder. The test database `blogware_test` uses unprefixed names.
 
-```sql
-CREATE TABLE tbl_posts (
-    ID BIGINT(20) unsigned NOT NULL AUTO_INCREMENT,
-    media_id BIGINT(20) UNSIGNED DEFAULT '0',
-    post_author BIGINT(20) UNSIGNED NOT NULL,
-    post_date datetime NOT NULL,
-    post_modified datetime DEFAULT NULL,
-    post_title tinytext NOT NULL,
-    post_slug text NOT NULL,
-    post_content longtext NOT NULL,
-    post_summary mediumtext DEFAULT NULL,
-    post_status VARCHAR(20) DEFAULT 'publish',
-    post_visibility VARCHAR(20) DEFAULT 'public',
-    post_password VARCHAR(255) DEFAULT NULL,
-    post_tags text DEFAULT NULL,
-    post_type VARCHAR(120) DEFAULT 'blog',
-    comment_status VARCHAR(20) DEFAULT 'open',
-    PRIMARY KEY (ID),
-    KEY author_id(post_author),
-    FULLTEXT KEY (post_tags, post_title, post_content)
-) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
-```
+All tables use `Engine=InnoDB DEFAULT CHARSET=utf8mb4`. The collation is `utf8mb4_general_ci` on every table except `tbl_api_keys`, which uses `utf8mb4_unicode_ci`. The only real `FOREIGN KEY` constraint is `tbl_api_keys.user_id` referencing `tbl_users.ID` with `ON DELETE CASCADE`; every other relationship is application-managed.
 
-### Table: tbl_topics (Categories)
+For the full column-by-column reference (data types, defaults, indexes, descriptions, DAO coverage, and how to change the schema), see `dev-docs/DATABASE_SCHEMA_GUIDE.md`.
 
-```sql
-CREATE TABLE tbl_topics (
-    ID BIGINT(20) unsigned NOT NULL AUTO_INCREMENT,
-    topic_title VARCHAR(255) NOT NULL,
-    topic_slug VARCHAR(255) NOT NULL,
-    topic_status ENUM('Y','N') DEFAULT 'Y',
-    PRIMARY KEY (ID)
-) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
-```
+### Users and authentication
 
-### Table: tbl_comments
+| Table | Purpose | Key columns |
+|-------|---------|-------------|
+| `tbl_users` | User accounts and login data | `ID`, `user_login` (unique), `user_email` (unique), `user_pass` (bcrypt), `user_level`, `user_reset_key`, `user_banned`, `login_time` |
+| `tbl_user_token` | Persistent login tokens (remember me) | `ID`, `user_login`, `selector_hash`, `pwd_hash`, `is_expired`, `expired_date` |
+| `tbl_login_attempt` | Failed login tracking by IP for rate limiting and lockout | `ip_address`, `login_date` |
+| `tbl_api_keys` | REST API keys (only table with a real foreign key) | `id`, `user_id` (FK), `key_hash`, `expires_at`, `is_revoked` |
 
-```sql
-CREATE TABLE tbl_comments (
-    ID BIGINT(20) unsigned NOT NULL AUTO_INCREMENT,
-    comment_post_id BIGINT(20) unsigned NOT NULL,
-    comment_parent_id BIGINT(20) DEFAULT '0',
-    comment_author_name VARCHAR(60) NOT NULL,
-    comment_author_ip VARCHAR(100) NOT NULL,
-    comment_author_email VARCHAR(100) DEFAULT NULL,
-    comment_content text NOT NULL,
-    comment_status VARCHAR(20) DEFAULT 'pending',
-    comment_date datetime NOT NULL,
-    PRIMARY KEY (ID)
-) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
-```
+### Content
 
-### Table: tbl_media
+| Table | Purpose | Key columns |
+|-------|---------|-------------|
+| `tbl_posts` | Blog posts and static pages | `ID`, `post_author`, `post_title`, `post_slug`, `post_content`, `post_status`, `post_type` (`blog`/`page`), `post_locale`, `comment_status`, `passphrase` |
+| `tbl_topics` | Categories | `ID`, `topic_title`, `topic_slug`, `topic_status` (`Y`/`N`), `topic_locale` |
+| `tbl_post_topic` | Many-to-many link between posts and topics | `post_id`, `topic_id` (composite PK) |
+| `tbl_comments` | Comments with nested replies | `ID`, `comment_post_id`, `comment_parent_id`, `comment_status`, `comment_date` |
 
-```sql
-CREATE TABLE tbl_media (
-    ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    media_filename VARCHAR(200) DEFAULT NULL,
-    media_caption VARCHAR(200) DEFAULT NULL,
-    media_type VARCHAR(90) NOT NULL,
-    media_target VARCHAR(20) DEFAULT 'blog',
-    media_user VARCHAR(20) NOT NULL,
-    media_access VARCHAR(10) DEFAULT 'public',
-    media_status INT DEFAULT '0',
-    PRIMARY KEY (ID)
-) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
-```
+### Media and downloads
 
-### Table: tbl_settings
+| Table | Purpose | Key columns |
+|-------|---------|-------------|
+| `tbl_media` | Media library entries | `ID`, `media_filename`, `media_type`, `media_target`, `media_access`, `media_status` |
+| `tbl_mediameta` | Key-value metadata for media items | `ID`, `media_id`, `meta_key`, `meta_value` |
+| `tbl_media_download` | Secure download grants (UUID identifier, expiry, IP) | `ID`, `media_id`, `media_identifier` (unique UUID), `before_expired`, `ip_address` |
+| `tbl_download_log` | Audit log of media downloads | `ID`, `media_id`, `media_identifier`, `ip_address`, `user_agent`, `status` |
 
-```sql
-CREATE TABLE tbl_settings (
-    ID INT(11) unsigned NOT NULL AUTO_INCREMENT,
-    setting_name VARCHAR(255) NOT NULL,
-    setting_value TEXT DEFAULT NULL,
-    PRIMARY KEY (ID),
-    KEY setting_name(setting_name(191))
-) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
-```
+### Navigation and configuration
 
-> **NOTE:** For complete table definitions including `tbl_post_topic`, `tbl_user_token`, `tbl_login_attempt`, `tbl_mediameta`, `tbl_media_download`, `tbl_menu`, `tbl_plugin`, and `tbl_themes`, see `install/include/dbtable.php`.
+| Table | Purpose | Key columns |
+|-------|---------|-------------|
+| `tbl_menu` | Navigation menu items | `ID`, `menu_label`, `menu_link`, `menu_status`, `parent_id`, `menu_sort`, `menu_locale` |
+| `tbl_settings` | Key-value configuration store | `ID`, `setting_name`, `setting_value` |
+| `tbl_plugin` | Registered plugins | `ID`, `plugin_name`, `plugin_directory`, `plugin_status` |
+| `tbl_themes` | Registered themes | `ID`, `theme_title`, `theme_designer`, `theme_directory`, `theme_status` |
+
+### GDPR and privacy
+
+| Table | Purpose | Key columns |
+|-------|---------|-------------|
+| `tbl_consents` | Cookie and consent records | `ID`, `consent_type`, `consent_status`, `consent_ip`, `consent_date` |
+| `tbl_data_requests` | GDPR access and erasure requests | `ID`, `request_type`, `request_email`, `request_status`, `request_date` |
+| `tbl_privacy_logs` | Audit log of privacy actions | `ID`, `log_action`, `log_type`, `log_ip`, `log_date` |
+| `tbl_privacy_policies` | Localized privacy policy content | `ID`, `locale` (unique), `policy_title`, `policy_content` |
+
+### Internationalization
+
+| Table | Purpose | Key columns |
+|-------|---------|-------------|
+| `tbl_languages` | Supported languages (`en`, `ar`, `zh`, `fr`, `ru`, `es`, `id`) | `ID`, `lang_code` (unique), `lang_name`, `lang_direction`, `lang_is_default` |
+| `tbl_translations` | UI translation strings per language | `ID`, `lang_id`, `translation_key`, `translation_value` (unique `lang_id` + `translation_key`) |
 
 ---
 
@@ -1526,46 +1404,77 @@ $tblNewsletter = "CREATE TABLE IF NOT EXISTS tbl_newsletter (
 // lib/dao/NewsletterDao.php
 namespace Scriptlog\Dao;
 
-use Scriptlog\Core\DbFactory;
+use Scriptlog\Core\Dao;
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
-class NewsletterDao
+/**
+ * NewsletterDao extends Dao
+ *
+ * Demonstrates the standard DAO pattern: extend Scriptlog\Core\Dao,
+ * use prefixed table names via $this->table(), and delegate to the
+ * base class helpers (setSQL/findAll/findRow/create/modify/lastId).
+ */
+class NewsletterDao extends Dao
 {
-    private $db;
-
+    /**
+     * NewsletterDao constructor
+     */
     public function __construct()
     {
-        $this->db = Registry::get('dbc');
+        parent::__construct();
     }
 
+    /**
+     * Insert a subscriber.
+     *
+     * @param string $email
+     * @return int Last insert ID
+     */
     public function subscribe($email)
     {
-        $stmt = $this->db->prepare(
-            "INSERT INTO tbl_newsletter (subscriber_email) VALUES (?)"
-        );
-        $stmt->execute([$email]);
-        return $this->db->lastInsertId();
+        $this->create($this->table('newsletter'), [
+            'subscriber_email' => $email
+        ]);
+
+        return $this->lastId();
     }
 
+    /**
+     * Mark a subscriber as unsubscribed.
+     *
+     * @param string $email
+     * @return bool
+     */
     public function unsubscribe($email)
     {
-        $stmt = $this->db->prepare(
-            "UPDATE tbl_newsletter SET status = 'unsubscribed', 
-             unsubscribe_at = NOW() WHERE subscriber_email = ?"
-        );
-        return $stmt->execute([$email]);
+        $sql = "UPDATE " . $this->table('newsletter')
+            . " SET status = 'unsubscribed', unsubscribe_at = NOW()"
+            . " WHERE subscriber_email = ?";
+
+        $this->setSQL($sql);
+        $this->findAll([$email]);
+
+        return true;
     }
 
+    /**
+     * List all active subscribers.
+     *
+     * @return array
+     */
     public function getActiveSubscribers()
     {
-        $stmt = $this->db->query(
-            "SELECT * FROM tbl_newsletter WHERE status = 'active'"
-        );
-        return $stmt->fetchAll();
+        $sql = "SELECT * FROM " . $this->table('newsletter') . " WHERE status = 'active'";
+
+        $this->setSQL($sql);
+
+        return $this->findAll();
     }
 }
 ```
+
+> **Note:** The prefix-aware `table()` helper is a protected method on `Dao`, so table names are always written as `$this->table('newsletter')` — never hard-coded with the raw `tbl_` prefix. Queries are executed through the `Db` wrapper (`dbQuery`/`dbInsert`/`dbUpdate`), not raw `PDOStatement` calls.
 
 #### Step 3: Service
 
@@ -1648,56 +1557,86 @@ class NewsletterController
 
 | Guideline | Description |
 |-----------|-------------|
-| **Extends Dao** | DAOs extend the base `Dao` class for database connectivity |
-| **Single Responsibility** | Each DAO handles one database table |
+| **Extends Dao** | DAOs extend the base `Scriptlog\Core\Dao` class for database connectivity |
+| **Single Responsibility** | Each DAO handles one database table (an aggregate such as `PostDao` may also manage its relationship table, e.g. `tbl_post_topic`) |
 | **CRUD Operations** | DAOs handle Create, Read, Update, Delete operations |
 | **No Business Logic** | Keep validation in Services, not DAOs |
+| **No SQL strings from user input** | `ORDER BY` values are resolved against an allow-list; all values are bound parameters |
 
 ### Dao Base Class
 
-All DAOs extend the base `Dao` class which provides database methods:
+All DAOs extend the base `Dao` class at `lib/core/Dao.php` (namespace `Scriptlog\Core`). Its constructor resolves the `dbc` connection from `Registry` (throwing a `DbException` when it is absent) and stores the configured table prefix, which `table()` applies to raw table names:
 
 ```php
-// lib/core/Dao.php
+// lib/core/Dao.php (abridged signature list)
 class Dao
 {
-    protected $dbc;       // Database connection
+    protected $dbc;        // Database connection (Db wrapper)
+    protected $sql;        // Last set SQL query
     protected $error;      // Error tracking
-    protected $tableName; // Current table
+    protected $sanitizing; // Sanitize instance (set by filteringId())
+    protected $prefix;     // Configured table prefix
 
-    // Core methods
-    protected function setSQL($sql);                    // Set SQL query
-    protected function create($table, $bind);        // INSERT
-    protected function modify($table, $bind, $where); // UPDATE
-    protected function deleteRecord($table, $where);  // DELETE
-    protected function findAll($data = []);         // SELECT all
-    protected function findRow($data = [], $fetchMode = null); // SELECT one
-    protected function checkCountValue($data);           // COUNT records
-    protected function filteringId($sanitize, $id, $type); // Sanitize ID
-    protected function lastId();                       // Get last insert ID
-    
-    // Transaction methods
-    protected function callTransaction();  // START TRANSACTION
-    protected function callCommit();     // COMMIT
-    protected function callRollBack(); // ROLLBACK
+    public function __construct();  // Reads Registry::get('dbc'), sets $prefix
+
+    protected function table($table);               // Apply table prefix
+    protected function setSQL($sql);                // Set SQL query
+    protected function findAll(array $data = [], $fetchMode = null);  // SELECT all rows
+    protected function findRow(array $data = [], $fetchMode = null);  // SELECT one row
+    protected function findColumn(array $data = [], $fetchMode = null); // SELECT one column
+    public function checkCountValue(array $data = []): ?int;           // Row-count for SELECT
+    protected function create($table, $params);          // INSERT via Db::dbInsert()
+    protected function modify($table, $params, $where);  // UPDATE via Db::dbUpdate()
+    protected function deleteRecord($table, $where, $limit = 1); // DELETE via Db::dbDelete()
+    protected function replaceRecord($table, $params, $to);      // REPLACE via Db::dbReplace()
+    protected function callTransaction();   // BEGIN (Db::dbTransaction())
+    protected function callCommit();        // COMMIT (Db::dbCommit())
+    protected function callRollBack();      // ROLLBACK (Db::dbRollBack())
+    protected function closeConnection();   // Db::closeDbConnection()
+    protected function lastId();            // Db::dbLastInsertId()
+    protected function filteringId(Sanitize $sanitize, $str, $type); // Sanitize ID ('sql'|'xss')
 }
 ```
 
+> **Note:** The DAO layer is backed by the custom `Scriptlog\Core\Db` PDO wrapper (methods `dbQuery()`, `dbInsert()`, `dbUpdate()`, `dbDelete()`, `dbSelect()`, etc.) — not Medoo.
+
 ### PostDao Implementation
 
-The actual `PostDao` class at `lib/dao/PostDao.php` extends `Dao`:
+The actual `PostDao` class at `lib/dao/PostDao.php` extends `Scriptlog\Core\Dao`. It is the current reference implementation of the DAO pattern (791 lines). It declares three private constants used by the shared paginated queries, then a full set of CRUD, archive, search, and API helper methods:
 
 ```php
-// lib/dao/PostDao.php
+// lib/dao/PostDao.php (key methods, abridged)
 namespace Scriptlog\Dao;
 
 use Scriptlog\Core\Dao;
+use Scriptlog\Core\DbException;
+use Scriptlog\Core\LogError;
+use Scriptlog\Core\Sanitize;
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 class PostDao extends Dao
 {
-    private $selected; // For dropdown selections
+    /**
+     * Columns allowed in ORDER BY clauses to prevent SQL injection.
+     * @var array
+     */
+    private const ALLOWED_SORT_COLUMNS = ['ID', 'post_date', 'post_title', 'post_modified'];
+
+    /**
+     * Shared WHERE fragment filtering to published, public blog posts.
+     * @var string
+     */
+    private const PUBLISHED_FILTER = "p.post_status = 'publish' AND p.post_visibility = 'public'";
+
+    /**
+     * Shared SELECT column list for paginated published-post queries.
+     * @var string
+     */
+    private const SELECT_PUBLISHED_COLUMNS = "p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
+                   p.post_title, p.post_slug, p.post_summary, p.post_status,
+                   p.post_visibility, p.post_tags, p.post_type, p.comment_status,
+                   u.user_login as author_login, u.user_fullname as author_name";
 
     public function __construct()
     {
@@ -1705,26 +1644,38 @@ class PostDao extends Dao
     }
 
     /**
-     * Find all posts with optional filters
-     * @param string $orderBy Sort column
-     * @param int|null $author Filter by author ID
-     * @param bool $onlyPublished Only published posts
-     * @return array Posts array
+     * findPosts — retrieve all blog records from tbl_posts.
+     *
+     * @param string $orderBy       Sort column (whitelisted)
+     * @param int|null $author      Filter by author ID
+     * @param bool $onlyPublished   Only published + public posts
+     * @return array
+     * @throws DbException
      */
-    public function findPosts($orderBy = 'ID', $author = null, $onlyPublished = true)
+    public function findPosts(string $orderBy = 'ID', ?int $author = null, bool $onlyPublished = true): array
     {
-        $allowedColumns = ['ID', 'post_date', 'post_title', 'post_modified'];
-        $sortColumn = in_array($orderBy, $allowedColumns) ? $orderBy : 'ID';
+        $sortColumn = $this->resolveSortColumn($orderBy);
 
-        $sql = "SELECT p.ID, p.media_id, p.post_author,
-            p.post_date, p.post_modified, p.post_title,
-            p.post_slug, p.post_content, p.post_status,
-            p.post_visibility, p.post_password, p.post_tags,
-            p.post_headlines, p.post_type, p.post_locale,
-            p.passphrase, u.user_login
-            FROM tbl_posts AS p
-            INNER JOIN tbl_users AS u ON p.post_author = u.ID
-            WHERE p.post_type = 'blog'";
+        $sql = "SELECT p.ID,
+            p.media_id,
+            p.post_author,
+            p.post_date,
+            p.post_modified,
+            p.post_title,
+            p.post_slug,
+            p.post_content,
+            p.post_status,
+            p.post_visibility,
+            p.post_password,
+            p.post_tags,
+            p.post_headlines,
+            p.post_type,
+            p.post_locale,
+            p.passphrase,
+            u.user_login
+FROM tbl_posts AS p
+INNER JOIN tbl_users AS u ON p.post_author = u.ID
+WHERE p.post_type = 'blog'";
 
         $data = [];
 
@@ -1734,36 +1685,52 @@ class PostDao extends Dao
         }
 
         if ($onlyPublished) {
-            $sql .= " AND p.post_status = 'publish' AND p.post_visibility = 'public'";
+            $sql .= " AND " . self::PUBLISHED_FILTER;
         }
 
         $sql .= " ORDER BY p.$sortColumn DESC";
 
         $this->setSQL($sql);
+
         $posts = $this->findAll($data);
 
         return (empty($posts)) ? [] : $posts;
     }
 
     /**
-     * Find single post by ID
-     * @param int $id Post ID
-     * @param object $sanitize Sanitizer object
-     * @param int|null $author Filter by author
-     * @param bool $onlyPublished Only published
-     * @return array|bool Post data or false
+     * findPost — retrieve a single post record by ID.
+     *
+     * @param int $ID
+     * @param Sanitize $sanitize
+     * @param int|null $author
+     * @param bool $onlyPublished
+     * @return array|null
+     * @throws DbException
+     * @throws \InvalidArgumentException
      */
-    public function findPost($id, $sanitize, $author = null, $onlyPublished = true)
+    public function findPost(int $ID, Sanitize $sanitize, ?int $author = null, bool $onlyPublished = true): ?array
     {
-        $idsanitized = $this->filteringId($sanitize, $id, 'sql');
+        $idsanitized = $this->filteringId($sanitize, (string)$ID, 'sql');
 
-        $sql = "SELECT ID, media_id, post_author, post_date,
-            post_modified, post_title, post_slug, post_content,
-            post_summary, post_status, post_visibility, post_password,
-            post_tags, post_headlines, post_locale, comment_status, 
+        $sql = "SELECT ID,
+            media_id,
+            post_author,
+            post_date,
+            post_modified,
+            post_title,
+            post_slug,
+            post_content,
+            post_summary,
+            post_status,
+            post_visibility,
+            post_password,
+            post_tags,
+            post_headlines,
+            post_locale,
+            comment_status,
             passphrase
-            FROM tbl_posts
-            WHERE ID = ? AND post_type = 'blog'";
+FROM tbl_posts
+WHERE ID = ? AND post_type = 'blog'";
 
         $data = [$idsanitized];
 
@@ -1777,344 +1744,297 @@ class PostDao extends Dao
         }
 
         $this->setSQL($sql);
+
         $postDetail = $this->findRow($data);
 
-        return (empty($postDetail)) ? false : $postDetail;
+        return (empty($postDetail)) ? null : $postDetail;
     }
 
     /**
-     * Create new post
-     * @param array $bind Post data
-     * @param int $topicId Topic/category ID
-     * @return int New post ID
+     * createPost — insert a new post record together with its topic relationships.
+     *
+     * @param array $bind      Post column => value pairs
+     * @param int|array $topicId  Topic/category ID(s)
+     * @return int  New post ID
+     * @throws \InvalidArgumentException
      */
-    public function createPost($bind, $topicId)
+    public function createPost(array $bind, $topicId): int
     {
-        $this->setSQL("SET SQL_MODE='ALLOW_INVALID_DATE'");
+        $data = [
+           'post_author' => $bind['post_author'],
+           'post_date' => $bind['post_date'],
+           'post_title' => $bind['post_title'],
+           'post_slug' => $bind['post_slug'],
+           'post_content' => $bind['post_content'],
+           'post_summary' => $bind['post_summary'],
+           'post_status' => $bind['post_status'],
+           'post_visibility' => $bind['post_visibility'],
+           'post_password' => $bind['post_password'],
+           'post_tags' => $bind['post_tags'],
+           'post_headlines' => $bind['post_headlines'],
+           'post_locale' => $bind['post_locale'] ?? 'en',
+           'comment_status' => $bind['comment_status'],
+           'passphrase' => $bind['passphrase']
+        ];
 
         if (!empty($bind['media_id'])) {
-            $this->create("tbl_posts", [
-                'media_id' => $bind['media_id'],
-                'post_author' => $bind['post_author'],
-                'post_date' => $bind['post_date'],
-                'post_title' => $bind['post_title'],
-                'post_slug' => $bind['post_slug'],
-                'post_content' => $bind['post_content'],
-                'post_summary' => $bind['post_summary'],
-                'post_status' => $bind['post_status'],
-                'post_visibility' => $bind['post_visibility'],
-                'post_password' => $bind['post_password'],
-                'post_tags' => $bind['post_tags'],
-                'post_headlines' => $bind['post_headlines'],
-                'post_locale' => $bind['post_locale'] ?? 'en',
-                'comment_status' => $bind['comment_status'],
-                'passphrase' => $bind['passphrase']
-            ]);
-        } else {
-            $this->create("tbl_posts", [
-                'post_author' => $bind['post_author'],
-                'post_date' => $bind['post_date'],
-                'post_title' => $bind['post_title'],
-                'post_slug' => $bind['post_slug'],
-                'post_content' => $bind['post_content'],
-                'post_summary' => $bind['post_summary'],
-                'post_status' => $bind['post_status'],
-                'post_visibility' => $bind['post_visibility'],
-                'post_password' => $bind['post_password'],
-                'post_tags' => $bind['post_tags'],
-                'post_headlines' => $bind['post_headlines'],
-                'post_locale' => $bind['post_locale'] ?? 'en',
-                'comment_status' => $bind['comment_status'],
-                'passphrase' => $bind['passphrase']
-            ]);
+            $data['media_id'] = $bind['media_id'];
         }
 
-        $postId = $this->lastId();
+        $this->create("tbl_posts", $data);
 
-        // Handle post-topic relationships
-        if ((is_array($topicId)) && (!empty($postId))) {
-            foreach ($_POST['catID'] as $topicId) {
-                $this->create("tbl_post_topic", [
-                    'post_id' => $postId,
-                    'topic_id' => $topicId
-                ]);
-            }
-        } else {
+        $postId = (int)$this->lastId();
+
+        foreach ((array)$topicId as $topic_id) {
             $this->create("tbl_post_topic", [
-                'post_id' => $postId,
-                'topic_id' => $topicId
-            ]);
+              'post_id' => $postId,
+              'topic_id' => $topic_id]);
+        }
+
+        if (function_exists('page_cache_clear')) {
+            page_cache_clear();
         }
 
         return $postId;
     }
 
     /**
-     * Update existing post with transaction
-     * @param object $sanitize Sanitizer
-     * @param array $bind Post data
-     * @param int $id Post ID
-     * @param int $topicId Topic ID
+     * updatePost — update an existing post record (transactional) together with
+     * its topic relationships. Old relationships are deleted and re-created.
+     *
+     * @param Sanitize $sanitize
+     * @param array $bind
+     * @param int $ID
+     * @param int|array $topicId
+     * @return void
+     * @throws \InvalidArgumentException
      */
-    public function updatePost($sanitize, $bind, $id, $topicId)
+    public function updatePost(Sanitize $sanitize, array $bind, int $ID, $topicId): void
     {
-        $cleanId = $this->filteringId($sanitize, $id, 'sql');
+        $cleanId = $this->filteringId($sanitize, (string)$ID, 'sql');
 
         try {
             $this->callTransaction();
 
+            $updateData = [
+                'post_author' => $bind['post_author'],
+                'post_modified' => $bind['post_modified'],
+                'post_title' => $bind['post_title'],
+                'post_slug' => $bind['post_slug'],
+                'post_content' => $bind['post_content'],
+                'post_summary' => $bind['post_summary'],
+                'post_status' => $bind['post_status'],
+                'post_visibility' => $bind['post_visibility'],
+                'post_tags' => $bind['post_tags'],
+                'post_headlines' => $bind['post_headlines'],
+                'post_locale' => $bind['post_locale'] ?? 'en',
+                'comment_status' => $bind['comment_status']
+            ];
+
+            if (!empty($bind['post_password'])) {
+                $updateData['post_password'] = $bind['post_password'];
+            }
+            if (!empty($bind['passphrase'])) {
+                $updateData['passphrase'] = $bind['passphrase'];
+            }
             if (!empty($bind['media_id'])) {
-                $this->modify("tbl_posts", [
-                    'media_id' => $bind['media_id'],
-                    'post_author' => $bind['post_author'],
-                    'post_modified' => $bind['post_modified'],
-                    'post_title' => $bind['post_title'],
-                    'post_slug' => $bind['post_slug'],
-                    'post_content' => $bind['post_content'],
-                    'post_summary' => $bind['post_summary'],
-                    'post_status' => $bind['post_status'],
-                    'post_visibility' => $bind['post_visibility'],
-                    'post_password' => $bind['post_password'],
-                    'post_tags' => $bind['post_tags'],
-                    'post_headlines' => $bind['post_headlines'],
-                    'post_locale' => $bind['post_locale'] ?? 'en',
-                    'comment_status' => $bind['comment_status'],
-                    'passphrase' => $bind['passphrase']
-                ], ['ID' => (int)$cleanId]);
-            } else {
-                $this->modify("tbl_posts", [
-                    'post_author' => $bind['post_author'],
-                    'post_modified' => $bind['post_modified'],
-                    'post_title' => $bind['post_title'],
-                    'post_slug' => $bind['post_slug'],
-                    'post_content' => $bind['post_content'],
-                    'post_summary' => $bind['post_summary'],
-                    'post_status' => $bind['post_status'],
-                    'post_visibility' => $bind['post_visibility'],
-                    'post_password' => $bind['post_password'],
-                    'post_tags' => $bind['post_tags'],
-                    'post_headlines' => $bind['post_headlines'],
-                    'post_locale' => $bind['post_locale'] ?? 'en',
-                    'comment_status' => $bind['comment_status'],
-                    'passphrase' => $bind['passphrase']
-                ], ['ID' => (int)$cleanId]);
+                $updateData['media_id'] = $bind['media_id'];
             }
 
-            // Delete existing post topics
-            $this->deleteRecord("tbl_post_topic", ['post_id' => $cleanId]);
+            $this->modify("tbl_posts", $updateData, ['ID' => (int)$cleanId]);
 
-            // Insert new post topics
-            if ((is_array($topicId)) && (isset($_POST['catID']))) {
-                foreach ($_POST['catID'] as $topicId) {
-                    $this->create("tbl_post_topic", [
-                        'post_id' => $cleanId,
-                        'topic_id' => $topicId
-                    ]);
-                }
+            $this->deleteRecord("tbl_post_topic", ['post_id' => (int)$cleanId], null);
+
+            foreach ((array)$topicId as $topic_id) {
+                $this->create("tbl_post_topic", [
+                    'post_id' => $cleanId,
+                    'topic_id' => $topic_id
+                ]);
             }
 
             $this->callCommit();
+
+            if (function_exists('page_cache_clear')) {
+                page_cache_clear();
+            }
+        } catch (DbException $e) {
+            $this->callRollBack();
+            $this->error = (string)LogError::setStatusCode(500);
+            LogError::exceptionHandler($e);
         } catch (\Throwable $th) {
             $this->callRollBack();
-            $this->error = LogError::setStatusCode(http_response_code(500));
-            $this->error = LogError::exceptionHandler($th);
+            $this->error = (string)LogError::setStatusCode(500);
+            LogError::exceptionHandler($th);
         }
     }
 
     /**
-     * Delete post
-     * @param int $id Post ID
-     * @param object $sanitize Sanitizer
+     * deletePost — delete a post record by ID.
+     *
+     * @param int $ID
+     * @param Sanitize $sanitize
+     * @return void
+     * @throws \InvalidArgumentException
      */
-    public function deletePost($id, $sanitize)
+    public function deletePost(int $ID, Sanitize $sanitize): void
     {
-        $cleanId = $this->filteringId($sanitize, $id, 'sql');
+        $cleanId = $this->filteringId($sanitize, (string)$ID, 'sql');
         $this->deleteRecord("tbl_posts", ['ID' => $cleanId]);
+
+        if (function_exists('page_cache_clear')) {
+            page_cache_clear();
+        }
     }
 
     /**
-     * Anonymize post author (GDPR: Right to be Forgotten)
-     * @param int $authorId Author ID to anonymize
+     * anonymizePostAuthor — reassign all posts of a deleted user to the
+     * primary administrator (ID 1). Used for GDPR "Right to be Forgotten".
+     *
+     * @param int $authorId
      * @return bool
+     * @throws \InvalidArgumentException
      */
-    public function anonymizePostAuthor($authorId)
+    public function anonymizePostAuthor(int $authorId): bool
     {
-        $anonymousAuthor = 1;
-
-        $sql = "UPDATE tbl_posts SET post_author = ? WHERE post_author = ?";
-
-        $this->setSQL($sql);
-        $this->dbc->dbQuery($sql, [$anonymousAuthor, (int)$authorId]);
+        $this->modify("tbl_posts", ['post_author' => 1], ['post_author' => $authorId]);
 
         return true;
     }
 
     /**
-     * Check if post exists
-     * @param int $id Post ID
-     * @param object $sanitizing Sanitizer
+     * checkPostId — verify a blog post record exists.
+     *
+     * @param int $ID
+     * @param Sanitize $sanitize
      * @return bool
+     * @throws \InvalidArgumentException
+     * @throws DbException
      */
-    public function checkPostId($id, $sanitizing)
+    public function checkPostId(int $ID, Sanitize $sanitize): bool
     {
+        $idsanitized = $this->filteringId($sanitize, (string)$ID, 'sql');
+
         $sql = "SELECT ID FROM tbl_posts WHERE ID = ? AND post_type = 'blog'";
-        $idsanitized = $this->filteringId($sanitizing, $id, 'sql');
+
         $this->setSQL($sql);
+
         $stmt = $this->checkCountValue([$idsanitized]);
+
         return $stmt > 0;
     }
 
     /**
-     * Get post status dropdown HTML
-     * @param string $selected Current selection
-     * @return string HTML dropdown
+     * totalPostRecords — total blog post records (optionally per author).
+     *
+     * @param int|null $author
+     * @return int
+     * @throws DbException
      */
-    public function dropDownPostStatus($selected = "")
+    public function totalPostRecords(?int $author = null): int
     {
-        $name = 'post_status';
-        $posts_status = ['publish' => 'Publish', 'draft' => 'Draft'];
+        $sql = "SELECT ID FROM tbl_posts WHERE post_type = 'blog'";
 
-        if ($selected !== '') {
-            $this->selected = $selected;
-        }
+        $data = [];
 
-        return dropdown($name, $posts_status, $this->selected);
-    }
-
-    /**
-     * Get comment status dropdown HTML
-     * @param string $selected Current selection
-     * @return string HTML dropdown
-     */
-    public function dropDownCommentStatus($selected = "")
-    {
-        $name = 'comment_status';
-        $comment_status = ['open' => 'Open', 'closed' => 'Closed'];
-
-        if ($selected !== '') {
-            $this->selected = $selected;
-        }
-
-        return dropdown($name, $comment_status, $this->selected);
-    }
-
-    /**
-     * Get visibility dropdown with password field
-     * @param string $selected Current selection
-     * @param int|null $postId Post ID for existing password
-     * @return string HTML dropdown
-     */
-    public function dropDownVisibility($selected = null, $postId = null)
-    {
-        $name = "visibility";
-        $dropdown = '<div class="form-group">';
-        $dropdown .= '<label for="visibility">Post visibility</label>';
-        $dropdown .= '<select name="' . $name . '" class="form-control" onchange="checkVisibilitySelection();" id="visibility.system">';
-
-        $this->selected = $selected;
-        $visibility_list = ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'];
-
-        foreach ($visibility_list as $key => $visibility) {
-            $select = $this->selected === $key ? ' selected' : null;
-            $dropdown .= '<option value="' . $key . '"' . $select . '>' . $visibility . '</option>';
-        }
-
-        $dropdown .= '</select>';
-
-        // Password field for protected posts
-        if (!is_null($postId)) {
-            // ... password field logic
-        }
-
-        return $dropdown;
-    }
-
-    /**
-     * Count total post records
-     * @param array $data Optional filter data
-     * @return int Count
-     */
-    public function totalPostRecords(array $data = []): ?int
-    {
-        if (!empty($data)) {
+        if (!is_null($author)) {
             $sql = "SELECT ID FROM tbl_posts WHERE post_author = ? AND post_type = 'blog'";
-        } else {
-            $sql = "SELECT ID FROM tbl_posts WHERE post_type = 'blog'";
+            $data[] = $author;
         }
 
         $this->setSQL($sql);
+
         return $this->checkCountValue($data) ?? 0;
     }
 
     /**
-     * Get locale dropdown
-     * @param string $selected Current selection
-     * @return string HTML dropdown
+     * Resolve a safe ORDER BY column from a user-supplied sort key.
+     * Falls back to 'ID' when the requested column is not whitelisted.
+     *
+     * @param string $sortBy
+     * @return string
      */
-    public function dropDownLocale($selected = "")
+    private function resolveSortColumn(string $sortBy): string
     {
-        $name = 'post_locale';
+        $allowedColumns = self::ALLOWED_SORT_COLUMNS;
 
-        $locales = [
-            'en' => 'English', 'es' => 'Spanish', 'fr' => 'French',
-            'de' => 'German', 'it' => 'Italian', 'pt' => 'Portuguese',
-            'ru' => 'Russian', 'zh' => 'Chinese', 'ja' => 'Japanese',
-            'ko' => 'Korean', 'ar' => 'Arabic', 'hi' => 'Hindi',
-            'id' => 'Indonesian', 'ms' => 'Malay', 'tr' => 'Turkish',
-            'nl' => 'Dutch', 'pl' => 'Polish', 'vi' => 'Vietnamese',
-            'th' => 'Thai', 'he' => 'Hebrew'
-        ];
+        return in_array($sortBy, $allowedColumns) ? $sortBy : 'ID';
+    }
 
-        if ($selected !== '') {
-            $this->selected = $selected;
-        }
-
-        return dropdown($name, $locales, $this->selected);
+    /**
+     * Resolve a safe ORDER BY direction ('ASC' or 'DESC').
+     * Any value other than ASC falls back to DESC.
+     *
+     * @param string $sortOrder
+     * @return string
+     */
+    private function resolveSortDirection(string $sortOrder): string
+    {
+        return strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
     }
 }
 ```
 
+> **Note:** The legacy `dropDownPostStatus()`, `dropDownCommentStatus()`, `dropDownVisibility()`, and `dropDownLocale()` helpers were removed from `PostDao`; the admin post form now renders these selects through utility functions (`post_status_dropdown()`, `comment_status_dropdown()`, `post_visibility_dropdown()`, `post_locale_dropdown()`), called directly from `PostController`. The remaining `PostDao` methods (pagination, archive, search, and API helpers) are listed in the table below.
+
 ### Key Methods in PostDao
 
-| Method | Purpose | Parameters |
-|--------|---------|-----------|
-| `findPosts()` | Get all posts with filters | `$orderBy`, `$author`, `$onlyPublished` |
-| `findPost()` | Get single post by ID | `$id`, `$sanitize`, `$author`, `$onlyPublished` |
-| `createPost()` | Insert new post | `$bind`, `$topicId` |
-| `updatePost()` | Update post with transaction | `$sanitize`, `$bind`, `$id`, `$topicId` |
-| `deletePost()` | Delete post | `$id`, `$sanitize` |
-| `anonymizePostAuthor()` | GDPR: anonymize author | `$authorId` |
-| `checkPostId()` | Verify post exists | `$id`, `$sanitizing` |
-| `dropDownPostStatus()` | Post status dropdown | `$selected` |
-| `dropDownCommentStatus()` | Comment status dropdown | `$selected` |
-| `dropDownVisibility()` | Visibility dropdown | `$selected`, `$postId` |
-| `totalPostRecords()` | Count posts | `$data` |
-| `dropDownLocale()` | Locale dropdown | `$selected` |
+| Method | Purpose | Signature highlights |
+|--------|---------|---------------------|
+| `findPosts()` | Get all blog posts with filters | `(string $orderBy = 'ID', ?int $author = null, bool $onlyPublished = true): array` |
+| `findPublishedPostsPaginated()` | Paginated published posts (API) | `(int $limit, int $offset, string $sortBy = 'ID', string $sortOrder = 'DESC', ?int $author = null): array` |
+| `countPublishedPosts()` | Count published posts (API) | `(?int $author = null): int` |
+| `findPublishedPostById()` | Single published post by ID (API) | `(int $postId): ?array` |
+| `getPostById()` | Post by ID, any status (API) | `(int $postId): ?array` |
+| `findPost()` | Single post by ID with filters | `(int $ID, Sanitize $sanitize, ?int $author = null, bool $onlyPublished = true): ?array` |
+| `createPost()` | Insert post + topic relationships | `(array $bind, $topicId): int` |
+| `updatePost()` | Update post + topic relationships (transactional) | `(Sanitize $sanitize, array $bind, int $ID, $topicId): void` |
+| `deletePost()` | Delete post | `(int $ID, Sanitize $sanitize): void` |
+| `anonymizePostAuthor()` | GDPR: reassign posts to admin (ID 1) | `(int $authorId): bool` |
+| `checkPostId()` | Verify blog post exists | `(int $ID, Sanitize $sanitize): bool` |
+| `totalPostRecords()` | Count blog posts (optionally per author) | `(?int $author = null): int` |
+| `findArchiveIndex()` | Year/month archive index with counts | `(): array` |
+| `findPostsByYear()` | Paginated posts for a year (API) | `(int $year, int $limit, int $offset, string $sortBy = 'ID', string $sortOrder = 'DESC'): array` |
+| `countPostsByYear()` | Count posts in a year (API) | `(int $year): int` |
+| `findPostsByYearMonth()` | Paginated posts for year+month (API) | `(int $year, int $month, int $limit, int $offset, string $sortBy = 'ID', string $sortOrder = 'DESC'): array` |
+| `countPostsByYearMonth()` | Count posts in year+month (API) | `(int $year, int $month): int` |
+| `searchPostsApi()` | LIKE search of posts/pages (API) | `(string $keyword, string $type = 'all', int $limit = 50): array` |
+| `findTopicsByPostId()` | Topics attached to a post | `(int $postId): array` |
+| `deletePostTopics()` | Delete all topic relationships | `(int $postId): void` |
+| `setPostTopics()` | Replace all topic relationships (API) | `(int $postId, array $topicIds): void` |
+| `deletePostComments()` | Delete all comments for a post | `(int $postId): void` |
+| `insertPostApi()` | Insert post from raw data (API) | `(array $data): int` |
+| `updatePostApi()` | Update specific post fields (API) | `(int $postId, array $data): void` |
+
+Private helpers: `resolveSortColumn(string $sortBy): string` and `resolveSortDirection(string $sortOrder): string` whitelist `ORDER BY` input against `ALLOWED_SORT_COLUMNS` to prevent SQL injection.
 
 ### Database Columns in tbl_posts
 
+Source of truth: `install/include/dbtable.php` (engine `InnoDB`, charset `utf8mb4`).
+
 | Column | Type | Description |
 |--------|------|-------------|
-| `ID` | BIGINT | Primary key |
-| `media_id` | BIGINT | Featured image |
-| `post_author` | BIGINT | Author (FK to tbl_users) |
+| `ID` | BIGINT(20) unsigned | Primary key (auto-increment) |
+| `media_id` | BIGINT(20) unsigned | Featured image (`0` when none) |
+| `post_author` | BIGINT(20) unsigned | Author (FK to `tbl_users.ID`) |
 | `post_date` | DATETIME | Creation date |
-| `post_modified` | DATETIME | Last modified |
+| `post_modified` | DATETIME | Last modified (nullable) |
 | `post_title` | TINYTEXT | Post title |
-| `post_slug` | TEXT | URL slug |
+| `post_slug` | VARCHAR(255) | URL slug (indexed, `idx_post_slug`) |
 | `post_content` | LONGTEXT | Full content |
-| `post_summary` | MEDIUMTEXT | Short summary |
-| `post_status` | VARCHAR | publish/draft |
-| `post_visibility` | VARCHAR | public/private/protected |
-| `post_password` | VARCHAR | Password hash |
+| `post_summary` | MEDIUMTEXT | Short summary (meta description) |
+| `post_keyword` | TEXT | SEO meta keywords (nullable) |
+| `post_status` | VARCHAR(20) | `publish` / `draft` |
+| `post_visibility` | VARCHAR(20) | `public` / `private` / `protected` |
+| `post_password` | VARCHAR(255) | Bcrypt password hash (protected posts) |
 | `post_tags` | TEXT | Comma-separated tags |
-| `post_keyword` | VARCHAR(255) | SEO meta keywords |
-| `post_headlines` | INT(5) | Headline/slideshow flag |
-| `post_sticky` | INT(5) | Sticky post flag |
-| `post_type` | VARCHAR | blog/article/news |
-| `post_locale` | VARCHAR | Language code |
-| `comment_status` | VARCHAR | open/closed |
-| `passphrase` | VARCHAR | Encryption key (MD5) |
+| `post_headlines` | INT(5) | Headline/slideshow flag (`0`/`1`) |
+| `post_sticky` | INT(5) | Sticky post flag (`0`/`1`) |
+| `post_type` | VARCHAR(120) | `blog` (default) or `page` |
+| `post_locale` | VARCHAR(10) | Language code, default `en` (indexed, `idx_post_locale`) |
+| `comment_status` | VARCHAR(20) | `open` / `closed` |
+| `passphrase` | VARCHAR(255) | SHA-256 passphrase `hash('sha256', app_key() . password)` used for AES content encryption |
+
+Indexes: `PRIMARY KEY (ID)`, `KEY author_id (post_author)`, `KEY post_media (media_id)`, `KEY idx_post_slug (post_slug)`, `KEY idx_post_locale (post_locale)`, `FULLTEXT KEY (post_tags, post_title, post_content)`.
 
 ### Other DAOs
 
@@ -2122,13 +2042,14 @@ class PostDao extends Dao
 |-----|------|---------|
 | `UserDao` | `lib/dao/UserDao.php` | User CRUD |
 | `CommentDao` | `lib/dao/CommentDao.php` | Comment CRUD |
+| `ReplyDao` | `lib/dao/ReplyDao.php` | Nested comment replies |
 | `TopicDao` | `lib/dao/TopicDao.php` | Category CRUD |
+| `PostTopicDao` | `lib/dao/PostTopicDao.php` | Post-topic relationships |
 | `MediaDao` | `lib/dao/MediaDao.php` | Media CRUD |
 | `PageDao` | `lib/dao/PageDao.php` | Page CRUD |
 | `MenuDao` | `lib/dao/MenuDao.php` | Menu CRUD |
 | `PluginDao` | `lib/dao/PluginDao.php` | Plugin CRUD |
 | `ThemeDao` | `lib/dao/ThemeDao.php` | Theme CRUD |
-| `ReplyDao` | `lib/dao/ReplyDao.php` | Nested comment replies |
 | `ConfigurationDao` | `lib/dao/ConfigurationDao.php` | System settings CRUD |
 | `ConsentDao` | `lib/dao/ConsentDao.php` | GDPR consent records |
 | `DataRequestDao` | `lib/dao/DataRequestDao.php` | GDPR data requests |
@@ -2136,12 +2057,9 @@ class PostDao extends Dao
 | `PrivacyPolicyDao` | `lib/dao/PrivacyPolicyDao.php` | Privacy policy versions |
 | `LanguageDao` | `lib/dao/LanguageDao.php` | Language definitions |
 | `TranslationDao` | `lib/dao/TranslationDao.php` | Translation key/value pairs |
-| `UserTokenDao` | `lib/dao/UserTokenDao.php` | Password reset tokens |
-| `PostTopicDao` | `lib/dao/PostTopicDao.php` | Post-topic relationships |
-| `MediaMetaDao` | `lib/dao/MediaMetaDao.php` | Media metadata |
-| `MediaDownloadDao` | `lib/dao/MediaDownloadDao.php` | Media download records |
-| `LoginAttemptDao` | `lib/dao/LoginAttemptDao.php` | Login attempt tracking |
-| `DownloadLogDao` | `lib/dao/DownloadLogDao.php` | File download logs |
+| `UserTokenDao` | `lib/dao/UserTokenDao.php` | Persistent auth tokens / password reset |
+
+That is **19 DAO classes** in total. There is **no** dedicated DAO for `tbl_login_attempt`, `tbl_api_keys`, `tbl_mediameta`, `tbl_media_download`, or `tbl_download_log` — those tables are accessed via core classes, services, and utility functions (e.g. login throttling in `Authentication`, API keys in `lib/core/` middleware, media metadata/downloads via `MediaService`).
 
 ---
 
@@ -2165,8 +2083,12 @@ The actual `PostService` class at `lib/service/PostService.php` manages post bus
 // lib/service/PostService.php
 namespace Scriptlog\Service;
 
-use Scriptlog\Core\Validator;
+use Scriptlog\Core\FormValidator;
+use Scriptlog\Core\Sanitize;
+use Scriptlog\Core\Session;
+use Scriptlog\Dao\MediaDao;
 use Scriptlog\Dao\PostDao;
+use Scriptlog\Dao\TopicDao;
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
@@ -2228,8 +2150,8 @@ class PostService
         $this->slug = make_slug($slug); 
     }
     
-    public function setPostContent($content) { 
-        $this->content = purify_dirty_html($content); 
+    public function setPostContent($content, $skipPurify = false) { 
+        $this->content = $skipPurify ? $content : purify_dirty_html($content); 
     }
     
     public function setMetaDesc($meta_desc) { 
@@ -2247,7 +2169,7 @@ class PostService
     public function setComment($comment_status) { $this->comment_status = $comment_status; }
     
     public function setPassPhrase($passphrase) { 
-        $this->passphrase = md5(app_key() . $passphrase); 
+        $this->passphrase = hash('sha256', app_key() . $passphrase); 
     }
     
     public function setTopics($topics) { $this->topics = $topics; }
@@ -2295,58 +2217,40 @@ class PostService
             $this->validator->sanitize($this->meta_desc, 'string');
         }
 
+        $topic_id = $this->topics;
+
         // Auto-create "Uncategorized" if no topic selected
         if ($this->topics == 0) {
             $categoryId = $category->createTopic(['topic_title' => 'Uncategorized', 'topic_slug' => 'uncategorized']);
-            $getCategory = $category->findTopicById($categoryId, $this->sanitizer, PDO::FETCH_ASSOC);
-            
-            $new_post = [
-                'media_id' => $this->post_image,
-                'post_author' => $this->author,
-                'post_date' => $this->post_date,
-                'post_title' => $this->title,
-                'post_slug' => $this->slug,
-                'post_content' => $this->content,
-                'post_summary' => $this->meta_desc,
-                'post_status' => $this->post_status,
-                'post_visibility' => $this->post_visibility,
-                'post_password' => $this->post_password,
-                'post_tags' => $this->tags,
-                'post_headlines' => $this->post_headlines,
-                'post_locale' => $this->post_locale ?? 'en',
-                'comment_status' => $this->comment_status,
-                'passphrase' => $this->passphrase
-            ];
+            $getCategory = $category->findTopicById($categoryId, $this->sanitizer, \PDO::FETCH_ASSOC);
 
             $topic_id = isset($getCategory['ID']) ? abs((int)$getCategory['ID']) : 0;
-        } else {
-            $new_post = [
-                'media_id' => $this->post_image,
-                'post_author' => $this->author,
-                'post_date' => $this->post_date,
-                'post_title' => $this->title,
-                'post_slug' => $this->slug,
-                'post_content' => $this->content,
-                'post_summary' => $this->meta_desc,
-                'post_status' => $this->post_status,
-                'post_visibility' => $this->post_visibility,
-                'post_password' => $this->post_password,
-                'post_tags' => $this->tags,
-                'post_headlines' => $this->post_headlines,
-                'post_locale' => $this->post_locale ?? 'en',
-                'comment_status' => $this->comment_status,
-                'passphrase' => $this->passphrase
-            ];
-
-            $topic_id = $this->topics;
         }
+
+        $new_post = [
+            'media_id' => $this->post_image,
+            'post_author' => $this->author,
+            'post_date' => $this->post_date,
+            'post_title' => $this->title,
+            'post_slug' => $this->slug,
+            'post_content' => $this->content,
+            'post_summary' => $this->meta_desc,
+            'post_status' => $this->post_status,
+            'post_visibility' => $this->post_visibility,
+            'post_password' => $this->post_password,
+            'post_tags' => $this->tags,
+            'post_headlines' => $this->post_headlines,
+            'post_locale' => $this->post_locale ?? 'en',
+            'comment_status' => $this->comment_status,
+            'passphrase' => $this->passphrase
+        ];
 
         return $this->postDao->createPost($new_post, $topic_id);
     }
 
     /**
      * Update existing post
-     * @return int
+     * @return void
      */
     public function modifyPost()
     {
@@ -2360,42 +2264,28 @@ class PostService
             $this->validator->sanitize($this->tags, 'string');
         }
 
-        if (empty($this->post_image)) {
-            return $this->postDao->updatePost($this->sanitizer, [
-                'post_author' => $this->author,
-                'post_modified' => $this->post_modified,
-                'post_title' => $this->title,
-                'post_slug' => $this->slug,
-                'post_content' => $this->content,
-                'post_summary' => $this->meta_desc,
-                'post_status' => $this->post_status,
-                'post_visibility' => $this->post_visibility,
-                'post_password' => $this->post_password,
-                'post_tags' => $this->tags,
-                'post_headlines' => $this->post_headlines,
-                'post_locale' => $this->post_locale ?? 'en',
-                'comment_status' => $this->comment_status,
-                'passphrase' => $this->passphrase
-            ], $this->postId, $this->topics);
-        } else {
-            return $this->postDao->updatePost($this->sanitizer, [
-                'media_id' => $this->post_image,
-                'post_author' => $this->author,
-                'post_modified' => $this->post_modified,
-                'post_title' => $this->title,
-                'post_slug' => $this->slug,
-                'post_content' => $this->content,
-                'post_summary' => $this->meta_desc,
-                'post_status' => $this->post_status,
-                'post_visibility' => $this->post_visibility,
-                'post_password' => $this->post_password,
-                'post_tags' => $this->tags,
-                'post_headlines' => $this->post_headlines,
-                'post_locale' => $this->post_locale ?? 'en',
-                'comment_status' => $this->comment_status,
-                'passphrase' => $this->passphrase
-            ], $this->postId, $this->topics);
+        $postData = [
+            'post_author' => $this->author,
+            'post_modified' => $this->post_modified,
+            'post_title' => $this->title,
+            'post_slug' => $this->slug,
+            'post_content' => $this->content,
+            'post_summary' => $this->meta_desc,
+            'post_status' => $this->post_status,
+            'post_visibility' => $this->post_visibility,
+            'post_password' => $this->post_password,
+            'post_tags' => $this->tags,
+            'post_headlines' => $this->post_headlines,
+            'post_locale' => $this->post_locale ?? 'en',
+            'comment_status' => $this->comment_status,
+            'passphrase' => $this->passphrase
+        ];
+
+        if (!empty($this->post_image)) {
+            $postData['media_id'] = $this->post_image;
         }
+
+        $this->postDao->updatePost($this->sanitizer, $postData, $this->postId, $this->topics);
     }
 
     /**
@@ -2403,9 +2293,12 @@ class PostService
      */
     public function removePost()
     {
+        (version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
+
         $this->validator->sanitize($this->postId, 'int');
 
-        if (!$data_post = $this->postDao->findPost($this->postId, $this->sanitizer)) {
+        $data_post = $this->postDao->findPost($this->postId, $this->sanitizer);
+        if (!$data_post) {
             $_SESSION['error'] = "postNotFound";
             direct_page('index.php?load=posts&error=postNotFound', 404);
             return false;
@@ -2414,12 +2307,13 @@ class PostService
         $media_id = $data_post['media_id'] ?? 0;
 
         // Delete associated media files
-        if (class_exists('MediaDao') && $media_id) {
+        if (class_exists('MediaDao')) {
             $medialib = new MediaDao();
+
             if (method_exists($medialib, 'findMediaBlog') && $media_id) {
                 $media_data = $medialib->findMediaBlog((int)$media_id);
-                $media_filename = isset($media_data['media_filename']) && 
-                    preg_match('/^[a-zA-Z0-9_\-\.]+$/', $media_data['media_filename']) ? 
+                $media_filename = isset($media_data['media_filename']) &&
+                    preg_match('/^[a-zA-Z0-9_\-\.]+$/', $media_data['media_filename']) ?
                     basename($media_data['media_filename']) : '';
 
                 if (!empty($media_filename)) {
@@ -2444,29 +2338,7 @@ class PostService
             }
         }
 
-        return $this->postDao->deletePost($this->postId, $this->sanitizer);
-    }
-
-    // Dropdown methods (delegate to DAO)
-
-    public function postStatusDropDown($selected = "")
-    {
-        return $this->postDao->dropDownPostStatus($selected);
-    }
-
-    public function commentStatusDropDown($selected = "")
-    {
-        return $this->postDao->dropDownCommentStatus($selected);
-    }
-
-    public function visibilityDropDown($selected = "")
-    {
-        return $this->postDao->dropDownVisibility($selected);
-    }
-
-    public function localeDropDown($selected = "")
-    {
-        return $this->postDao->dropDownLocale($selected);
+        $this->postDao->deletePost($this->postId, $this->sanitizer);
     }
 
     public function postAuthorId()
@@ -2484,7 +2356,9 @@ class PostService
 
     public function totalPosts(array $data = []): ?int
     {
-        return $this->postDao->totalPostRecords($data);
+        $author = isset($data[0]) ? (int)$data[0] : null;
+
+        return $this->postDao->totalPostRecords($author);
     }
 }
 ```
@@ -2493,19 +2367,22 @@ class PostService
 
 | Category | Method | Purpose |
 |----------|--------|---------|
-| **Setters** | `setPostTitle()`, `setPostSlug()`, `setPostContent()`, etc. | Prepare post properties |
+| **Setters** | `setPostTitle()`, `setPostSlug()`, `setPostContent()` (2nd arg `$skipPurify`), etc. | Prepare post properties |
 | **Retrieval** | `grabPosts()` | Get all posts |
 | **Retrieval** | `grabPost()` | Get single post by ID |
 | **CRUD** | `addPost()` | Create new post |
 | **CRUD** | `modifyPost()` | Update existing post |
 | **CRUD** | `removePost()` | Delete post and media |
-| **Dropdowns** | `postStatusDropDown()` | Post status dropdown HTML |
-| **Dropdowns** | `commentStatusDropDown()` | Comment status dropdown |
-| **Dropdowns** | `visibilityDropDown()` | Visibility dropdown |
-| **Dropdowns** | `localeDropDown()` | Locale/language dropdown |
 | **User** | `postAuthorId()` | Get current author ID |
 | **User** | `postAuthorLevel()` | Get current author level |
 | **Count** | `totalPosts()` | Count total posts |
+| **API** | `getPublishedPostsApi()` / `countPublishedPostsApi()` / `getPublishedPostApi()` | Paginated published posts |
+| **API** | `getArchiveIndexApi()`, `getPostsByYearApi()`, `countPostsByYearApi()`, `getPostsByYearMonthApi()`, `countPostsByYearMonthApi()` | Archive data |
+| **API** | `searchPostsApi()`, `getPostTopicsApi()`, `setPostTopicsApi()` | Search + topic mapping |
+| **API** | `createPostApi()`, `updatePostApi()`, `removePostApi()`, `getPostByIdApi()` | Post CRUD via API |
+| **Media** | `processPostImage()` (private `processDefaultImage()` / `processUploadedImage()`) | Featured image processing |
+
+The legacy `postStatusDropDown()`, `commentStatusDropDown()`, `visibilityDropDown()`, and `localeDropDown()` methods were removed from `PostService` (along with the DAO dropdown methods) — the admin form now calls `post_status_dropdown()`, `comment_status_dropdown()`, `post_visibility_dropdown()`, and `post_locale_dropdown()` utilities directly from the controller.
 
 ### Input Sanitization in PostService
 
@@ -2545,13 +2422,14 @@ PostService depends on:
 | `FrontService` | `lib/service/FrontService.php` | Frontend post/page/archive queries |
 | `ConsentService` | `lib/service/ConsentService.php` | GDPR consent management |
 | `DataRequestService` | `lib/service/DataRequestService.php` | GDPR data request handling |
-| `PrivacyLogService` | `lib/service/PrivacyLogService.php` | Privacy audit logging |
 | `DownloadService` | `lib/service/DownloadService.php` | Secure file downloads |
 | `ExportService` | `lib/service/ExportService.php` | Content export (WordPress, Ghost, etc.) |
 | `MigrationService` | `lib/service/MigrationService.php` | Content import logic |
 | `LanguageService` | `lib/service/LanguageService.php` | Language management |
 | `TranslationService` | `lib/service/TranslationService.php` | Translation management |
 | `NotificationService` | `lib/service/NotificationService.php` | Email notifications |
+
+That is **21 services** in total. Privacy audit logging is handled by the `PrivacyLogDao` (used by `DataRequestService`), not by a dedicated `PrivacyLogService`.
 
 ---
 
@@ -2572,7 +2450,7 @@ PostService depends on:
 The `PostController` was refactored in Phase 3 to delegate business logic to `PostApplicationService`. The controller now handles **only** HTTP/security, validation, view rendering, and simple delegation:
 
 ```php
-// lib/controller/PostController.php (thinned — ~290 lines)
+// lib/controller/PostController.php (thinned — 426 lines, down from ~656)
 namespace Scriptlog\Controller;
 
 use Scriptlog\Core\ActionConst;
@@ -2615,14 +2493,30 @@ class PostController extends BaseApp
 
     public function insert()
     {
+        $errors = array();
+        $checkError = true;
+        $user_level = $this->postService->postAuthorLevel();
+        $topics = $this->topicDao;
+        $medialib = $this->mediaDao;
+
         if (isset($_POST['postFormSubmit'])) {
+            $mediaFile = UploadedFileDto::fromGlobals();
+            $file_location = $mediaFile->tmpName;
+            $file_type = $mediaFile->type;
+            $file_name = $mediaFile->name;
+            $file_size = $mediaFile->size;
+            $file_error = $mediaFile->error;
+
+            $new_filename = generate_filename($file_name)['new_filename'];
+            $file_extension = generate_filename($file_name)['file_extension'];
+
             try {
                 $this->checkPostCsrf();                // CSRF validation
                 $this->checkPostPayload();              // Form key whitelist
-                $checkError = $this->validatePostSubmission(...); // DTO + Validators
+                $checkError = $this->validatePostSubmission($file_location, $file_error, $file_size, $file_name, $errors, $checkError);
 
                 if (!$checkError) {
-                    $this->renderNewPostForm($errors, $_POST, ...);
+                    $this->renderNewPostForm($errors, $_POST, $topics, $medialib, $user_level);
                     return $this->view->render();
                 }
 
@@ -2633,27 +2527,65 @@ class PostController extends BaseApp
                 $_SESSION['status'] = "postAdded";
                 direct_page('index.php?load=posts&status=postAdded', 200);
             } catch (\Throwable $th) {
+                LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             }
         }
 
-        $this->renderNewPostForm(null, null, ...);
+        $this->renderNewPostForm(null, null, $topics, $medialib, $user_level);
         return $this->view->render();
     }
 
     public function update($id)
     {
+        $errors = array();
+        $checkError = true;
+        $user_level = $this->postService->postAuthorLevel();
+        $topics = $this->topicDao;
+        $medialib = $this->mediaDao;
+
         $getPost = $this->postService->grabPost($id);
-        // ... build $data_post array ...
+        if (!$getPost) {
+            $_SESSION['error'] = "postNotFound";
+            direct_page('index.php?load=posts&error=postNotFound', 404);
+        }
+
+        $data_post = array(
+          'ID' => $getPost['ID'],
+          'media_id' => $getPost['media_id'],
+          'post_author' => $getPost['post_author'],
+          'post_date' => $getPost['post_date'],
+          'post_modified' => $getPost['post_modified'],
+          'post_title' => $getPost['post_title'],
+          'post_content' => $getPost['post_content'],
+          'post_summary' => $getPost['post_summary'],
+          'post_status' => $getPost['post_status'],
+          'post_visibility' => $getPost['post_visibility'],
+          'post_password' => $getPost['post_password'],
+          'post_tags' => $getPost['post_tags'],
+          'post_headlines' => $getPost['post_headlines'],
+          'comment_status' => $getPost['comment_status'],
+          'passphrase' => $getPost['passphrase']
+        );
 
         if (isset($_POST['postFormSubmit'])) {
+            $mediaFile = UploadedFileDto::fromGlobals();
+            $file_location = $mediaFile->tmpName;
+            $file_type = $mediaFile->type;
+            $file_name = $mediaFile->name;
+            $file_size = $mediaFile->size;
+            $file_error = $mediaFile->error;
+
+            $new_filename = generate_filename($file_name)['new_filename'];
+            $file_extension = generate_filename($file_name)['file_extension'];
+
             try {
                 $this->checkPostCsrf();
                 $this->checkPostUpdatePayload();
-                $checkError = $this->validatePostUpdate(...);
+                $checkError = $this->validatePostUpdate($file_location, $file_error, $file_size, $file_name, $errors, $checkError);
 
                 if (!$checkError) {
-                    $this->renderEditPostForm($errors, $data_post, ...);
+                    $this->renderEditPostForm($errors, $data_post, $getPost, $topics, $medialib, $user_level);
                     return $this->view->render();
                 }
 
@@ -2665,21 +2597,41 @@ class PostController extends BaseApp
                 $_SESSION['status'] = "postUpdated";
                 direct_page('index.php?load=posts&status=postUpdated', 200);
             } catch (\Throwable $th) {
+                LogError::setStatusCode(http_response_code());
                 LogError::exceptionHandler($th);
             }
         }
 
-        $this->renderEditPostForm(null, $data_post, ...);
+        $this->renderEditPostForm(null, $data_post, $getPost, $topics, $medialib, $user_level);
         return $this->view->render();
     }
 
     public function remove($id)
     {
-        // Same pattern as before (no AppService needed for delete)
-        $this->postService->setPostId($id);
-        $this->postService->removePost();
-        $_SESSION['status'] = "postDeleted";
-        direct_page('index.php?load=posts&status=postDeleted', 200);
+        $id = abs((int)$id);
+
+        if ($id <= 0) {
+            $_SESSION['error'] = "postNotFound";
+            direct_page('index.php?load=posts&error=postNotFound', 404);
+            return;
+        }
+
+        $getPost = $this->postService->grabPost($id);
+        if (!$getPost) {
+            $_SESSION['error'] = "postNotFound";
+            direct_page('index.php?load=posts&error=postNotFound', 404);
+            return;
+        }
+
+        try {
+            $this->postService->setPostId($id);
+            $this->postService->removePost();
+            $_SESSION['status'] = "postDeleted";
+            direct_page('index.php?load=posts&status=postDeleted', 200);
+        } catch (\Throwable $th) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($th);
+        }
     }
 
     // ─── Security ──────────────────────────────────────────────
@@ -2687,6 +2639,8 @@ class PostController extends BaseApp
     private function checkPostCsrf()
     {
         if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+            header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
+            header('Status: 400 Bad Request');
             throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
         }
     }
@@ -2695,6 +2649,9 @@ class PostController extends BaseApp
     {
         if (check_form_request($_POST, ['post_id', 'post_title', 'post_content',
             'post_date', 'image_id', 'catID', ...]) === false) {
+            header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . ' 413 Payload Too Large', true, 413);
+            header('Status: 413 Payload Too Large');
+            header('Retry-After: 3600');
             throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
         }
     }
@@ -2781,7 +2738,7 @@ PostController::{method}()
     +-> Redirect or render view
 ```
 
-> **Key insight**: The controller's `insert()` and `update()` methods are now ~15-20 lines each (down from ~80+). All post preparation logic — media upload, encryption, slug generation, tag/headline processing — moved verbatim into `PostApplicationService`. The PostApplicationService itself contains ~210 lines and is the orchestration layer between the controller and the domain services (PostService, TopicDao, MediaDao).
+> **Key insight**: The controller's `insert()` and `update()` methods are now ~40 and ~70 lines respectively (down from ~80+ each in the original monolithic controller). All post preparation logic — media upload, encryption, slug generation, tag/headline processing — moved verbatim into `PostApplicationService`. The PostApplicationService itself is the orchestration layer between the controller and the domain services (PostService, TopicDao, MediaDao).
 
 ### BaseApp Class
 
@@ -2933,13 +2890,13 @@ class PostModel extends BaseModel
              JOIN " . $this->table('tbl_topics') . " t ON pt.topic_id = t.ID 
              WHERE pt.post_id = p.ID AND t.topic_status = 'Y') AS topics_data
             FROM " . $this->table('tbl_posts') . " AS p
-            INNER JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
+            LEFT JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
+                AND m.media_target = 'blog'
+                AND m.media_access = 'public'
+                AND m.media_status = '1'
             INNER JOIN " . $this->table('tbl_users') . " AS u ON p.post_author = u.ID
             WHERE p.post_status = 'publish'
             AND p.post_type = 'blog'
-            AND m.media_target = 'blog'
-            AND m.media_access = 'public'
-            AND m.media_status = '1'
             AND u.user_banned = '0'
             ORDER BY p.post_date DESC LIMIT :limit";
 
@@ -2956,6 +2913,8 @@ class PostModel extends BaseModel
      */
     public function getAllBlogPosts($sanitize, Paginator $perPage)
     {
+        $entries = [];
+
         $this->linkPosts = $perPage;
         
         // Set total records for pagination
@@ -2976,11 +2935,11 @@ class PostModel extends BaseModel
              WHERE pt.post_id = p.ID AND t.topic_status = 'Y') AS topics_data
             FROM " . $this->table('tbl_posts') . " AS p
             INNER JOIN " . $this->table('tbl_users') . " AS u ON p.post_author = u.ID
-            INNER JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
+            LEFT JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
+                AND m.media_target = 'blog'
+                AND m.media_status = '1'
             WHERE p.post_type = 'blog'
             AND p.post_status = 'publish'
-            AND m.media_target = 'blog'
-            AND m.media_status = '1'
             AND u.user_banned = '0'
             ORDER BY p.ID DESC " . $this->linkPosts->get_limit($sanitize);
         
@@ -3004,12 +2963,11 @@ class PostModel extends BaseModel
           p.comment_status AS comment_permit, m.media_filename, m.media_caption, m.media_target, 
           m.media_access, m.media_status, u.user_login, u.user_fullname
           FROM tbl_posts p
-          INNER JOIN tbl_media m ON p.media_id = m.ID
-          INNER JOIN tbl_users u ON p.post_author = u.ID
+          LEFT JOIN tbl_media m ON p.media_id = m.ID AND m.media_target = 'blog' AND m.media_access = 'public' AND m.media_status = '1'
+          LEFT JOIN tbl_users u ON p.post_author = u.ID
           WHERE p.ID = :ID 
           AND p.post_status = 'publish'
-          AND p.post_type = 'blog' AND m.media_target = 'blog'
-          AND m.media_access = 'public' AND m.media_status = '1'";
+          AND p.post_type = 'blog'";
 
         $sanitizeid = Sanitize::severeSanitizer($id);
         $this->setSQL($sql);
@@ -3033,15 +2991,17 @@ class PostModel extends BaseModel
                  u.user_login, u.user_fullname
           FROM tbl_posts AS p
           INNER JOIN tbl_users AS u ON p.post_author = u.ID
-          INNER JOIN tbl_media AS m ON p.media_id = m.ID
+          LEFT JOIN tbl_media AS m ON p.media_id = m.ID
+              AND m.media_target = 'blog'
+              AND m.media_access = 'public'
+              AND m.media_status = '1'
           WHERE p.post_slug = :slug 
           AND p.post_status = 'publish'
-          AND p.post_type = 'blog' AND m.media_target = 'blog'
-          AND m.media_access = 'public' AND m.media_status = '1'";
+          AND p.post_type = 'blog'";
 
         $slug_sanitized = Sanitize::severeSanitizer($slug);
         $this->setSQL($sql);
-        $postBySlug = $this->findRow([':ID' => $slug_sanitized], $fetchMode);
+        $postBySlug = is_null($fetchMode) ? $this->findRow([':ID' => $slug_sanitized]) : $this->findRow([':ID' => $slug_sanitized], $fetchMode);
         return (empty($postBySlug)) ?: $postBySlug;
     }
 
@@ -3060,9 +3020,9 @@ class PostModel extends BaseModel
              FROM tbl_posts AS p
              INNER JOIN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 5) AS p2 ON p.ID = p2.ID 
              INNER JOIN tbl_users AS u ON p.post_author = u.ID
-             INNER JOIN tbl_media AS m ON p.media_id = m.ID
+             LEFT JOIN tbl_media AS m ON p.media_id = m.ID
+                 AND m.media_target = 'blog' 
              WHERE p.post_type = 'blog'
-             AND m.media_target = 'blog' 
              AND p.post_status = 'publish' 
              AND p.post_headlines = '1'";
 
@@ -3089,6 +3049,40 @@ class PostModel extends BaseModel
         $this->setSQL($sql);
         $relatedPosts = $this->findRow([$post_title]);
         return (empty($relatedPosts)) ?: $relatedPosts;
+    }
+
+    /**
+     * Get random posts for homepage
+     * @param int $start Start position
+     * @param int $end End position
+     * @return array Posts for homepage display
+     */
+    public function getRandomPosts($start, $end)
+    {
+        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
+                   p.post_title, p.post_slug, p.post_content,
+                   m.media_filename, m.media_caption, u.user_login, u.user_fullname,
+                   (SELECT COUNT(c.ID) FROM " . $this->table('tbl_comments') . " c WHERE c.comment_post_id = p.ID AND c.comment_status = 'approved') AS total_comments,
+                   (SELECT GROUP_CONCAT(CONCAT(t.ID, ':', t.topic_title, ':', t.topic_slug) SEPARATOR '|') 
+                    FROM " . $this->table('tbl_post_topic') . " pt 
+                    JOIN " . $this->table('tbl_topics') . " t ON pt.topic_id = t.ID 
+                    WHERE pt.post_id = p.ID AND t.topic_status = 'Y') AS topics_data
+          FROM " . $this->table('tbl_posts') . " AS p
+          INNER JOIN (SELECT ID FROM " . $this->table('tbl_posts') . " ORDER BY RAND() LIMIT 3) AS p2 ON p.ID = p2.ID
+          INNER JOIN " . $this->table('tbl_users') . " AS u ON p.post_author = u.ID
+          LEFT JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
+              AND m.media_target = 'blog'
+          WHERE p.post_type = 'blog'
+          AND p.post_status = 'publish'
+          LIMIT :position, :end";
+
+        $this->setSQL($sql);
+
+        $data = array(':position' => $start, ':end' => $end);
+
+        $randomPosts = $this->findAll($data);
+
+        return (empty($randomPosts)) ?: $randomPosts;
     }
 
     /**
@@ -3146,13 +3140,15 @@ The `PostModel` references these `tbl_posts` columns:
 | `post_content` | Full content |
 | `post_summary` | Short summary |
 | `post_keyword` | SEO keywords |
-| `post_status` | publish/draft/pending |
-| `post_visibility` | public/private/password-protected |
+| `post_status` | publish/draft |
+| `post_visibility` | public/private/protected |
 | `post_password` | Password hash (when protected) |
 | `post_tags` | Comma-separated tags |
-| `post_type` | blog/article/news |
+| `post_type` | blog/page |
 | `post_sticky` | Sticky post flag |
 | `comment_status` | open/closed |
+| `post_headlines` | Headline/slideshow flag |
+| `post_locale` | Language code |
 
 ### Other Models
 
@@ -3279,30 +3275,7 @@ echo invoke_gallery_image('gallery-1.jpg', 'Gallery Image');
 <img src="https://example.com/public/files/pictures/medium/medium_image123.jpg" alt="My Image" width="730" height="486" class="img-fluid" decoding="auto">
 ```
 
-#### Common Issues and Solutions
-
-**1. esc_attr() Not Defined**
-- Symptom: PHP error "Call to undefined function esc_attr()"
-- Cause: Using WordPress function in theme files
-- Solution: Replace with `htmlout()`
-
-```php
-// WRONG
-esc_attr($value);
-
-// CORRECT
-htmlout($value);
-```
-
-**2. Empty src Attributes**
-- Symptom: `<img src="">` in HTML output
-- Cause: Incorrect path construction
-- Solution: Always use APP_IMAGE constants or test path construction
-
-**IMPORTANT:** When modifying image functions:
-- Always use APP_IMAGE constants defined in lib/common.php
-- Test changes on live site before committing
-- Ask permission before changing existing working code
+> **Image troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` — [Image/Media Issues](TROUBLESHOOTING.md#imagemedia-issues).
 
 ### Example: Using Utility Functions
 
@@ -3957,9 +3930,9 @@ This project uses two complementary testing approaches:
 | Metric | Value |
 |--------|-------|
 | **Total Tests** | 1,240 |
-| **Test Files** | 110 |
+| **Test Files** | 131 (`find tests -name "*Test.php"`) |
 | **Assertions** | 2,584 |
-| **PHPUnit Version** | 9.6.34 |
+| **PHPUnit Version** | 9.6.35 |
 | **Target Coverage** | 40% |
 | **Current Coverage** | ~38% |
 
@@ -4215,14 +4188,7 @@ lib/vendor/bin/phpunit
 
 ## 16. Troubleshooting
 
-### Common Issues
-
-| Issue | Solution |
-|-------|----------|
-| **Session not starting** | Check `SessionMaker` is properly initialized in Bootstrap |
-| **Database connection failed** | Verify `config.php` has correct credentials |
-| **404 on valid routes** | Check `.htaccess` rewrite rules |
-| **CSRF errors** | Ensure `csrf-defender.php` is loaded and tokens are passed |
+See `dev-docs/TROUBLESHOOTING.md` for documented issues and solutions covering installation, database, post/content, image/media, auth/session, i18n/translation, API, navigation/URL, theme, and server/config issues.
 
 ### Debug Mode
 
@@ -4327,13 +4293,13 @@ All classes live under `Scriptlog\*` namespaces (e.g., `Scriptlog\Core\Bootstrap
 
 | Category | Namespace | Classes |
 |----------|-----------|---------|
-| **Core** | `Scriptlog\Core` | Bootstrap, Dispatcher, DbFactory, Authentication, SessionMaker, Registry, FormValidator, Sanitize, View |
-| **DAO** | `Scriptlog\Dao` | PostDao, UserDao, CommentDao, ReplyDao, TopicDao, PostTopicDao, MediaDao, MediaMetaDao, MediaDownloadDao, PageDao, MenuDao, PluginDao, ThemeDao, ConfigurationDao, ConsentDao, DataRequestDao, PrivacyLogDao, PrivacyPolicyDao, LanguageDao, TranslationDao, UserTokenDao, LoginAttemptDao, DownloadLogDao |
-| **Service** | `Scriptlog\Service` | PostService, UserService, CommentService, ReplyService, TopicService, MediaService, PageService, MenuService, PluginService, ThemeService, ConfigurationService, ConsentService, DataRequestService, PrivacyLogService, LanguageService, TranslationService, DownloadService, ExportService, MigrationService, FrontService, NotificationService |
-| **Controller** | `Scriptlog\Controller` | PostController, UserController, CommentController, ReplyController, TopicController, MediaController, PageController, MenuController, PluginController, ThemeController, ConfigurationController, DownloadController, DownloadAdminController, ExportController, ImportController, LanguageController, TranslationController |
-| **API Controller** | `Scriptlog\Controller\Api` | PostsApiController, CategoriesApiController, CommentsApiController, ArchivesApiController, SearchApiController, GdprApiController, LanguagesApiController, TranslationsApiController, MediaApiController, ProtectedPostApiController |
+| **Core** | `Scriptlog\Core` | Bootstrap, Dispatcher, DbFactory, Authentication, SessionMaker, Registry, FormValidator, Sanitize, View, Dao, Db, SearchFinder, CSRFGuard, BaseApp, BaseModel |
+| **DAO** | `Scriptlog\Dao` | PostDao, UserDao, CommentDao, ReplyDao, TopicDao, PostTopicDao, MediaDao, PageDao, MenuDao, PluginDao, ThemeDao, ConfigurationDao, ConsentDao, DataRequestDao, PrivacyLogDao, PrivacyPolicyDao, LanguageDao, TranslationDao, UserTokenDao |
+| **Service** | `Scriptlog\Service` | PostService, PostApplicationService, UserService, CommentService, ReplyService, TopicService, MediaService, PageService, MenuService, PluginService, ThemeService, ConfigurationService, ConsentService, DataRequestService, LanguageService, TranslationService, DownloadService, ExportService, MigrationService, FrontService, NotificationService |
+| **Controller** | `Scriptlog\Controller` | PostController, UserController, CommentController, ReplyController, TopicController, MediaController, PageController, MenuController, PluginController, ThemeController, ConfigurationController, DownloadController, DownloadAdminController, ExportController, ImportController, LanguageController, LocaleController, SearchController, TranslationController, ApiController |
+| **API Controller** | `Scriptlog\Controller\Api` | PostsApiController, CategoriesApiController, CommentsApiController, ArchivesApiController, SearchApiController, GdprApiController, LanguagesApiController, TranslationsApiController, MediaApiController, ProtectedPostApiController, QueryApiController |
 | **Model** | `Scriptlog\Model` | PostModel, FrontContentModel, TopicModel, TagModel, PageModel, CommentModel, GalleryModel, ArchivesModel, DownloadModel |
-| **Handler** | `Scriptlog\Handler` | PostHandler, PageHandler, CategoryHandler, TagHandler, ArchiveHandler, SearchHandler, PrivacyHandler, DownloadHandler, GalleryHandler, BlogHandler, HomeHandler |
+| **Handler** | `Scriptlog\Handler` | HandlerRegistry, FrontRequestHandler, PostHandler, PageHandler, CategoryHandler, TagHandler, ArchiveHandler, PrivacyHandler, DownloadHandler, BlogHandler, HomeHandler |
 
 ## Global Functions
 
@@ -4352,7 +4318,6 @@ forbidden_direct_access();
 // Validation
 email_validation($email);
 url_validation($url);
-form_id_validation($id);
 
 // Utility
 get_ip_address();
@@ -4360,6 +4325,8 @@ app_url();
 app_info();
 theme_identifier();
 invoke_frontimg($filename, $size = 'medium');
+make_date($timestamp);             // Format date for display (frontend only, e.g. "July 26, 2026")
+                                    // ⚠ NOT for admin form <input> values — use raw Y-m-d H:i:s instead
 ```
 
 ---
@@ -4822,115 +4789,17 @@ The admin panel includes a translation editor at **Settings → Translations**:
 - **Cache**: Regenerate translation cache
 - **Language Selector**: Switch between languages or view all
 
-### Common Issues and Fixes
-
-#### 1. Database Connection Charset (CRITICAL)
-
-The PDO database connection MUST use `charset=utf8mb4` in the DSN to properly load translations in non-English languages (Chinese, Arabic, etc.).
-
-**Files to check:**
-- `lib/core/Bootstrap.php` - Database DSN configuration
-- `lib/core/Db.php` - PDO connection options
-
-**Correct DSN format:**
-```php
-$dbc = DbFactory::connect([
-    'mysql:host=' . $host . ';port=' . $port . ';dbname=' . $dbname . ';charset=utf8mb4',
-    $user,
-    $pwd
-]);
-```
-
-**WRONG (will show "???" for Chinese/Arabic):**
-```php
-'mysql:host=...;dbname=...'
-```
-
-#### 2. Translation Value Standards
-
-**Human-readable first**: Translation values should be natural, complete phrases in the target language, not abbreviations or technical terms.
-
-```
-✅ Good:   "Choose your language", "Add New", "All Posts", "Error Server Error"
-❌ Bad:    "Language Settings", "addNew", "allPosts", "Error serverError"
-```
-
-**Example** - `nav.language_settings`:
-| Language | Value |
-|----------|-------|
-| en | Choose your language |
-| ar | اختر لغتك |
-| zh | 选择您的语言 |
-| fr | Choisissez votre langue |
-| ru | Выберите язык |
-| es | Elige tu idioma |
-| id | Pilih bahasa Anda |
-
-When updating translations in the database, always clear the cache:
-
-```php
-// Clear translation cache after database updates
-$cacheFile = 'public/files/cache/translations/' . $locale . '.json';
-@unlink($cacheFile);
-// System will regenerate on next request
-```
-
-#### 3. Translation Database Fixes
-
-When translations in the database show incorrect values (like "Nav addNew" instead of actual translations), fix directly via SQL:
-
-**Check broken translations:**
-```sql
-SELECT * FROM tbl_translations 
-WHERE translation_value LIKE 'Nav %'
-```
-
-#### 4. Language Selector Not Working
-
-The Translation Editor language dropdown must work with the session-based locale system:
-
-**Flow:**
-1. User selects language in dropdown → JavaScript redirects with `?switch-lang=id`
-2. `admin/index.php` processes `switch-lang` parameter → calls `admin_set_locale('id')`
-3. `admin_set_locale()` saves to `$_SESSION['admin_locale']` and cookie
-4. Translation Editor uses `admin_get_locale()` to determine which translations to show
-
-**Key files:**
-- `admin/index.php` - Handles `switch-lang` parameter
-- `lib/utility/admin-translations.php` - `admin_get_locale()` and `admin_set_locale()` functions
-- `lib/controller/TranslationController.php` - Uses `admin_get_locale()` when `$_GET['lang']` not set
-
-**TranslationController locale logic (CORRECT):**
-```php
-if (isset($_GET['lang']) && $_GET['lang'] === 'all') {
-    $langCode = 'all';
-} elseif (isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'ar', 'zh', 'fr', 'ru', 'es', 'id'])) {
-    $langCode = $_GET['lang'];
-} else {
-    // Fall back to session/cookie locale
-    $langCode = admin_get_locale();
-}
-```
-
-#### 5. Translation Editor URL Parameters
-
-The Translation Editor uses these URL parameters:
-- `?load=translations` - Main page
-- `?load=translations&lang=en` - Show English translations
-- `?load=translations&lang=id` - Show Indonesian translations  
-- `?load=translations&lang=all` - Show all languages (with pagination)
-- `?load=translations&action=update` - Update translation (POST)
-- `?load=translations&action=new-translation` - Create translation (POST)
+> **i18n troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` — [i18n/Translation Issues](TROUBLESHOOTING.md#i18ntranslation-issues).
 
 ### Adding Content i18n Support
 
 To add locale support to a new content type:
 
 1. **Database**: Add `content_locale` column to table
-2. **Dao**: Add `dropDownLocale()` method
+2. **Dao**: Add `post_locale`-style locale column to the select/insert/update queries
 3. **Service**: Add `setContentLocale()` method
 4. **Controller**: Add locale filters and setters
-5. **Admin UI**: Add locale dropdown to edit form
+5. **Admin UI**: Add locale dropdown to edit form via the `*_locale_dropdown()` utility (e.g. `post_locale_dropdown()` from `lib/utility/`) — the DAO-level `dropDown*()` helpers were removed in favor of utility functions
 
 ### Populating Languages and Translations
 
@@ -5372,37 +5241,7 @@ To add support for a new platform:
 3.  Update `ExportController.php` to include the new format option.
 4.  Update the UI in `admin/ui/export/index.php` to add the new option.
 
-### Common Issues and Solutions
-
-#### XML Parse Error: Unexpected Identifier
-
-When generating XML files (WordPress WXR, Blogspot Atom), the XML declaration `<?xml version="1.0" encoding="UTF-8"?>` may cause a PHP parse error if placed inline with PHP code. This happens because PHP interprets `<?` as a short opening tag.
-
-**The Problem:**
-```php
-// This causes parse error - PHP tries to interpret "xml" as PHP code
-ob_start();
-?>
-<?xml version="1.0" encoding="UTF-8"?>
-<rss ...
-```
-
-**The Solution:**
-Use PHP string concatenation to output XML content:
-
-```php
-public function export(&$exportStats, $authorId = null)
-{
-    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-    $xml .= '<rss version="2.0">' . "\n";
-    // ... build XML as string
-    return $xml;
-}
-```
-
-**Files Fixed:**
-- `lib/utility/export-wordpress.php`
-- `lib/utility/export-blogspot.php`
+> **Export troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` — [Server/Config Issues](TROUBLESHOOTING.md#serverconfig-issues) (XML Parse Error).
 
 ---
 
@@ -5603,39 +5442,69 @@ $notification->send('user@example.com', 'Subject', 'Email body');
 
 ## 25. Search Functionality
 
-The blog includes a secure AJAX-based search functionality in the sidebar widget.
+The search system provides two complementary paths for finding published content:
 
-### Overview
+| Path | Route | Controller | Output |
+|------|-------|-----------|--------|
+| **Full page** | `/search?q=keyword` | `SearchController` | Renders `search.php` template |
+| **AJAX inline** | `GET /api/v1/search?q=keyword` | `SearchApiController` | JSON response consumed by `search.js` |
 
-The search system provides real-time search results as users type, with support for both posts and pages. Results are returned via a REST API endpoint and displayed in a dropdown below the search input.
+Both paths delegate to the same `SearchFinder` engine.
 
 ### Key Files
 
 | File | Purpose |
 |------|---------|
-| `lib/core/SearchFinder.php` | Core search class using Db (PDO wrapper) |
-| `lib/controller/api/SearchApiController.php` | REST API controller for search |
+| `lib/core/SearchFinder.php` | Core search engine — MySQL FULLTEXT `MATCH ... AGAINST` against `tbl_posts` |
+| `lib/controller/SearchController.php` | Frontend controller for full search page (`/search`) |
+| `lib/controller/api/SearchApiController.php` | REST API controller (`/api/v1/search`) |
+| `public/themes/blog/search.php` | Search results page template |
 | `public/themes/blog/sidebar.php` | Search form in sidebar |
-| `public/themes/blog/assets/js/search.js` | AJAX search JavaScript |
-| `public/themes/blog/assets/css/custom.css` | Search result dropdown styles |
-| `api/index.php` | API route registration |
+| `public/themes/blog/assets/js/search.js` | AJAX autocomplete JS (300 ms debounce) |
+| `public/themes/blog/lang/en.json` | Search i18n keys (`search.*`) |
+| `lib/core/Dispatcher.php` | Routes `/search` to `SearchController` |
+| `lib/core/Bootstrap.php` | Route definition: `'search' => "/search"` |
 
 ### Architecture
 
 ```
-User types in search box
-       |
-       v
-search.js (AJAX) --[keyword]--> SearchApiController
-       |
-       v
-SearchFinder (searches DB using Db class)
-       |
-       v
-JSON response with results
-       |
-       v
-search.js (displays dropdown)
+                    ┌──────────────────────┐
+                    │   User types/enters   │
+                    │   search keyword      │
+                    └──────────┬───────────┘
+                               │
+              ┌────────────────┼────────────────┐
+              │                │                │
+              v                v                v
+   ┌──────────────────┐  ┌──────────────────────────┐
+   │  search.js AJAX  │  │  Form submit (GET) or     │
+   │  (300 ms delay)  │  │  direct URL /search?q=    │
+   └────────┬─────────┘  └────────────┬─────────────┘
+            │                         │
+            v                         v
+   ┌──────────────────┐  ┌──────────────────────┐
+   │SearchApiController│  │  SearchController    │
+   └────────┬─────────┘  └──────────┬───────────┘
+            │                       │
+            └──────────┬────────────┘
+                       │
+                       v
+              ┌──────────────────┐
+               │  SearchFinder    │
+               │  (FULLTEXT       │
+               │  IN BOOLEAN MODE)│
+               └────────┬─────────┘
+                        │
+           ┌────────────┼────────────┐
+           v            v            v
+    ┌───────────┐ ┌──────────┐ ┌──────────┐
+    │ searchAll │ │searchPost│ │searchPage│
+    │  (all)    │ │  (blog)  │ │  (page)  │
+    └─────┬─────┘ └────┬─────┘ └────┬─────┘
+          │            │            │
+          v            v            v
+    JSON response  Full template  search.php
+    (AJAX path)    (page path)    rendered
 ```
 
 ### Search API Endpoints
@@ -5664,28 +5533,51 @@ GET /api/v1/search?q=cicero&type=all
 ```json
 {
   "success": true,
-  "data": [
-    {
-      "id": "1",
-      "title": "Lorem ipsum dolor sit amet",
-      "slug": "lorem-ipsum",
-      "excerpt": "Lorem ipsum dolor sit amet, consectetur...",
-      "type": "post",
-      "date": "2026-03-01",
-      "url": "/post/1/lorem-ipsum"
-    }
-  ]
+  "data": {
+    "keyword": "cicero",
+    "type": "all",
+    "total": 3,
+    "results": [
+      {
+        "id": 1,
+        "title": "Lorem ipsum dolor sit amet",
+        "slug": "lorem-ipsum",
+        "excerpt": "Lorem ipsum dolor sit amet, consectetur...",
+        "type": "blog",
+        "date": "2026-03-01 12:00:00",
+        "url": "/post/1/lorem-ipsum"
+      }
+    ]
+  }
 }
+```
+
+### Search Page (Full Page Rendering)
+
+When a user visits `/search?q=keyword` (directly or via form submit), the `Dispatcher` routes to `SearchController`:
+
+1. **`SearchController::search()`** reads `$_GET['q']` or `$_GET['keyword']` and `$_GET['type']`
+2. Delegates to `SearchFinder::searchAll()`, `searchPost()`, or `searchPage()`
+3. Sets `$GLOBALS['search_results']` and `$GLOBALS['search_keyword']`
+4. Renders `search.php` via `ThemeRenderer`
+
+The `search.php` template then reads from globals:
+
+```php
+$searchResults = $GLOBALS['search_results'] ?? [];
+$searchKeyword = $GLOBALS['search_keyword'] ?? '';
+$results = $searchResults['results'] ?? [];
+$totalRows = $searchResults['totalRows'] ?? 0;
 ```
 
 ### Security Features
 
 | Feature | Implementation |
 |---------|---------------|
-| **XSS Prevention** | Server-side sanitization via `sanitizeKeyword()` function |
-| **SQL Injection** | Uses prepared statements via Db class (PDO wrapper) |
-| **CSRF Protection** | Hidden CSRF token in search form, validated on submit |
-| **Input Validation** | Keyword length limits (min 2, max 100 characters) |
+| **XSS Prevention** | Server-side sanitization via `SearchFinder::sanitizeKeyword()` + `htmlout()` in template |
+| **SQL Injection** | Uses PDO prepared statements |
+| **CSRF Protection** | Hidden CSRF token in search form |
+| **Input Validation** | Keyword length limits (min 2, max 100 characters), non-string rejection |
 
 ### URL Format Support
 
@@ -5701,32 +5593,67 @@ The search results support both SEO-friendly and query string URLs based on perm
 
 ### Implementation Notes
 
-- The SearchFinder class uses the custom `Db` class (PDO wrapper), NOT Medoo
-- Database connection accessed via `Registry::get('dbc')`
-- API routes registered in `api/index.php`
-- Public endpoint (no authentication required)
-- Results include: id, title, slug, excerpt, type, date, url
-- The search uses FULLTEXT index on `tbl_posts` (post_tags, post_title, post_content)
+- **Search engine**: Uses MySQL FULLTEXT `MATCH (post_title, post_content, post_tags) AGAINST (? IN BOOLEAN MODE)` with `+` AND-semantics built by `SearchFinder::buildBooleanQuery()`. NOT `LIKE '%keyword%'` — the old LIKE implementation was replaced with FULLTEXT.
+- **DB wrapper**: The `SearchFinder` class uses the custom `Db` class (PDO wrapper), NOT Medoo
+- **DB access**: via `Registry::get('dbc')`
+- **API auth**: Public endpoint (no authentication required)
+- **API response fields**: id, title, slug, excerpt, type, date, url
+- **HTMX support**: `SearchController` renders partial fragments when `is_htmx_request()` returns true (used by Valdur theme)
 
 ### Adding Search to Custom Themes
 
-To add search to a custom theme:
+To add AJAX search + full results page to a custom theme:
 
-1. Include the search form in your template:
+1. **Create `search.php`** in your theme directory. Use `$GLOBALS['search_results']` and `$GLOBALS['search_keyword']`:
+
 ```php
-<form id="search-form" method="get" action="">
-    <input type="hidden" name="csrf_token" value="<?php echo block_csrf(); ?>">
-    <input type="text" id="search-keyword" name="q" placeholder="Search..." autocomplete="off">
-    <div id="search-results" class="search-results-dropdown"></div>
+<?php
+defined('SCRIPTLOG') || die('Direct access not permitted');
+$searchResults = $GLOBALS['search_results'] ?? [];
+$searchKeyword = $GLOBALS['search_keyword'] ?? '';
+$results = $searchResults['results'] ?? [];
+$totalRows = $searchResults['totalRows'] ?? 0;
+?>
+<div class="container">
+    <h1><?= t('search.title'); ?></h1>
+    <!-- Iterate $results, display title/excerpt/type/date -->
+</div>
+```
+
+2. **Include the sidebar search form** (typically in `sidebar.php`):
+
+```php
+<form action="<?= app_url(); ?>/search" method="get" class="search-form" id="ajax-search-form"
+      role="search">
+    <label for="search-keyword" class="sr-only"><?= t('sidebar.search.placeholder'); ?></label>
+    <input type="search" id="search-keyword" name="q" placeholder="Search..."
+           autocomplete="off" minlength="2">
+    <button type="submit" aria-label="<?= t('sidebar.search.submit'); ?>">Search</button>
+    <div id="search-results" class="search-results" aria-live="polite"></div>
+    <?= block_csrf(); ?>
 </form>
 ```
 
-2. Include the search JavaScript in your footer:
+3. **Include the search JavaScript** in your `footer.php`:
+
 ```php
-<script src="<?php echo app_url(); ?>/themes/your-theme/assets/js/search.js"></script>
+<script src="<?= theme_dir(); ?>assets/js/search.min.js" defer></script>
 ```
 
-3. Add CSS styles for the search dropdown (see `custom.css` for reference).
+4. **Add CSS styles** for the search dropdown (see `custom.css` for reference).
+
+5. **Add i18n keys** to your `lang/en.json`:
+
+```json
+{
+    "search.title": "Search",
+    "search.found_results": "Found %count% result(s) for \"%keyword%\"",
+    "search.no_results": "No results found for \"%keyword%\"",
+    "search.enter_keyword": "Please enter a search keyword to find content.",
+    "search.try_different_keywords": "No results found. Please try different keywords.",
+    "search.read_more": "Read More"
+}
+```
 
 ---
 
@@ -5903,7 +5830,7 @@ POST /api/v1/posts/3/unlock
 
 Run tests:
 ```bash
-php lib/vendor/phpunit/phpunit tests/unit/ProtectedPost*.php --bootstrap tests/bootstrap.php
+lib/vendor/bin/phpunit tests/unit/ProtectedPost*.php --bootstrap tests/bootstrap.php
 ```
 
 ---
@@ -5937,15 +5864,7 @@ The upload uses admin session authentication instead of API authentication:
 7. If invalid: return 401 Unauthorized
 ```
 
-### Root Causes of Original Issues
-
-The initial implementation had three issues that prevented uploads:
-
-| Issue | Root Cause | Solution |
-|-------|-----------|---------|
-| "Unauthorized" error | Cookie path was `/admin/` instead of `/` | Changed `COOKIE_PATH` in `Authentication.php` |
-| Session not initialized | API entry point didn't initialize sessions | Used direct admin endpoint |
-| JSON parse error | Output buffering issues | Clean output buffers before response |
+> **Upload troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` — [Summernote AJAX Upload](TROUBLESHOOTING.md#imagemedia-issues).
 
 ### Key Files Modified
 
