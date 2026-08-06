@@ -16,12 +16,18 @@ $privacyUrl = function_exists('get_privacy_policy_url') ? get_privacy_policy_url
 
 // Get site name
 $siteName = function_exists('app_sitename') ? app_sitename() : 'Our Website';
+
+// Consent behavior configuration (mirrors lib/common.php constants)
+$consentLifetime = defined('COOKIE_CONSENT_LIFETIME_DAYS') ? COOKIE_CONSENT_LIFETIME_DAYS : 180;
+$consentVersion = defined('COOKIE_CONSENT_VERSION') ? COOKIE_CONSENT_VERSION : '1';
 ?>
 
 <div id="cookie-consent-banner" 
      class="cookie-consent-banner hidden" 
-     data-privacy-url="<?= htmlout($privacyUrl); ?>"
+     data-privacy-url="<?= theme_escape_html($privacyUrl); ?>"
      data-api-endpoint="<?= app_url(); ?>/api/v1/gdpr/consent"
+     data-consent-lifetime="<?= (int) $consentLifetime; ?>"
+     data-consent-version="<?= theme_escape_html($consentVersion); ?>"
      role="dialog"
      aria-labelledby="cookie-consent-title"
      aria-describedby="cookie-consent-description">
@@ -32,8 +38,8 @@ $siteName = function_exists('app_sitename') ? app_sitename() : 'Our Website';
                 <i class="fa fa-info-circle" aria-hidden="true"></i> <?= t('cookie_consent.banner.title'); ?>
             </h3>
             <p id="cookie-consent-description" class="cookie-consent-text">
-                <?= htmlout($siteName); ?> <?= t('cookie_consent.banner.description'); ?>
-                <a href="<?= htmlout($privacyUrl); ?>" target="_blank"><?= t('cookie_consent.privacy.link'); ?></a>
+                <?= theme_escape_html($siteName); ?> <?= t('cookie_consent.banner.description'); ?>
+                <a href="<?= theme_escape_html($privacyUrl); ?>" target="_blank"><?= t('cookie_consent.privacy.link'); ?></a>
             </p>
         </div>
         
