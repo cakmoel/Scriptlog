@@ -178,7 +178,7 @@ class ApiAuth
 
             // Look up token in user_token table
             $sql = "SELECT u.ID, u.user_login, u.user_email, u.user_level, u.user_banned, u.user_locked_until,
-                           t.expired_date, t.is_expired
+                           t.pwd_hash, t.expired_date, t.is_expired
                     FROM tbl_user_token t
                     INNER JOIN tbl_users u ON t.user_login = u.user_login
                     WHERE t.selector_hash = ? 
