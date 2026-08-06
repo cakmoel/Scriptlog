@@ -598,7 +598,7 @@ class FrontService
                 FROM tbl_media
                 WHERE media_target = 'gallery'
                 ORDER BY ID
-                LIMIT " . (int)$start . ", " . (int)$limit;
+                LIMIT " . $start . ", " . $limit;
 
         $result = $dbc->dbQuery($sql);
 
