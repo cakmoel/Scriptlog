@@ -23,13 +23,28 @@ if (!class_exists('ConsentService')) {
 }
 
 /**
- * Check if user has given cookie consent
+ * Check if user has given cookie consent for the current consent version
+ *
+ * Consent is only considered valid when both the consent cookie is set to
+ * "accepted" and the consent version cookie matches COOKIE_CONSENT_VERSION.
  *
  * @return bool
  */
 function has_cookie_consent()
 {
-    return isset($_COOKIE['cookie_consent']) && $_COOKIE['cookie_consent'] === 'accepted';
+    return isset($_COOKIE['cookie_consent'])
+        && $_COOKIE['cookie_consent'] === 'accepted'
+        && get_cookie_consent_version() === COOKIE_CONSENT_VERSION;
+}
+
+/**
+ * Get the stored cookie consent version
+ *
+ * @return string Consent version stored in the cookie, or '' when absent
+ */
+function get_cookie_consent_version()
+{
+    return isset($_COOKIE['cookie_consent_version']) ? $_COOKIE['cookie_consent_version'] : '';
 }
 
 /**
@@ -70,21 +85,30 @@ function record_cookie_consent($status)
 /**
  * Set cookie consent cookie
  *
+ * Sets the consent status cookie and a companion version cookie so that a
+ * policy change (bumped COOKIE_CONSENT_VERSION) forces re-consent. The
+ * default lifetime is controlled by COOKIE_CONSENT_LIFETIME_DAYS.
+ *
  * @param string $status 'accepted' or 'rejected'
  * @param int $expiryDays Number of days to remember
- * @return bool
+ * @return bool True when both cookies were set successfully
  */
-function set_cookie_consent_cookie($status, $expiryDays = 365)
+function set_cookie_consent_cookie($status, $expiryDays = COOKIE_CONSENT_LIFETIME_DAYS)
 {
     $expiry = time() + (86400 * $expiryDays); // 86400 = 1 day
 
-    return setcookie('cookie_consent', $status, [
+    $options = [
         'expires' => $expiry,
         'path' => '/',
         'samesite' => 'Lax',
         'secure' => is_cookies_secured(),
         'httponly' => true
-    ]);
+    ];
+
+    $consentSet = setcookie('cookie_consent', $status, $options);
+    $versionSet = setcookie('cookie_consent_version', COOKIE_CONSENT_VERSION, $options);
+
+    return $consentSet && $versionSet;
 }
 
 /**
@@ -103,11 +127,18 @@ function get_privacy_policy_url()
 /**
  * Check if consent banner should be shown
  *
+ * The banner is shown when no consent cookie exists yet, or when the stored
+ * consent version does not match COOKIE_CONSENT_VERSION (policy change).
+ *
  * @return bool
  */
 function should_show_consent_banner()
 {
-    return !isset($_COOKIE['cookie_consent']);
+    if (!isset($_COOKIE['cookie_consent'])) {
+        return true;
+    }
+
+    return get_cookie_consent_version() !== COOKIE_CONSENT_VERSION;
 }
 
 /**
