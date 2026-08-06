@@ -81,7 +81,7 @@
               <div class="box-body">
                 <div class="form-group">
                   <label for="author_name">Author Name <span class="text-red">*</span></label>
-                  <input type="text" class="form-control" id="author_name" name="author_name" placeholder="Enter your name" value="<?=(isset($replyData['comment_author_name'])) ? htmlspecialchars($replyData['comment_author_name']) : ""; ?>" required maxlength="60">
+                  <input type="text" class="form-control" id="author_name" name="author_name" placeholder="Enter your name" value="<?=(isset($replyData['comment_author_name'])) ? htmlspecialchars($replyData['comment_author_name'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : ""; ?>" required maxlength="60">
                 </div>
 
                 <div class="form-group">
