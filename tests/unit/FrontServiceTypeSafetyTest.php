@@ -4,13 +4,16 @@ use PHPUnit\Framework\TestCase;
 
 class FrontServiceTypeSafetyTest extends TestCase
 {
-    public function testGetGalleriesQueryUsesCastedParams(): void
+    public function testGetGalleriesQueryUsesTypedIntParams(): void
     {
         $source = file_get_contents(__DIR__ . '/../../src/lib/service/FrontService.php');
 
-        // LIMIT/OFFSET values are int-cast before interpolation to prevent SQL injection.
-        $this->assertStringContainsString('(int)$start', $source);
-        $this->assertStringContainsString('(int)$limit', $source);
+        // LIMIT/OFFSET values are enforced as int by the method signature,
+        // so interpolating them into the query is safe from SQL injection.
+        $this->assertStringContainsString(
+            'public function getGalleries(int $start, int $limit): ?array',
+            $source
+        );
         $this->assertStringContainsString('$dbc->dbQuery($sql)', $source);
     }
 
