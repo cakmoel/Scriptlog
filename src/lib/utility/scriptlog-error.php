@@ -63,7 +63,7 @@ function scriptlog_shutdown_fatal()
       E_USER_ERROR         => 'User Error',
       E_USER_WARNING       => 'User Warning',
       E_USER_NOTICE        => 'User Notice',
-      E_STRICT             => 'Runtime Notice',
+      (defined('E_STRICT') ? E_STRICT : 2048) => 'Runtime Notice', // phpcs:ignore PHPCompatibility.Constants.RemovedConstants.e_strictDeprecated
       E_RECOVERABLE_ERROR  => 'Catchable Fatal Error'
     ];
 
