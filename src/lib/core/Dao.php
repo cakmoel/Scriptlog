@@ -95,7 +95,7 @@ class Dao
      * @param array $data
      * @param PDO::FETCH_MODE static $fetchMode
      * @throws DbException
-     * @return array|object
+     * @return array<array-key, mixed>
      */
     protected function findAll(array $data = array(), $fetchMode = null)
     {
@@ -164,10 +164,10 @@ class Dao
      *
      * @param array $data
      * @throws DbException
-     * @return integer|numeric|null
+     * @return int
      *
      */
-    public function checkCountValue(array $data = []): ?int
+    public function checkCountValue(array $data = []): int
     {
 
         if (!$this->sql) {
@@ -209,13 +209,16 @@ class Dao
     /**
      * deleteRecord()
      *
+     * Delete matching record(s). When $limit is null, all matching rows
+     * are removed; otherwise at most $limit rows are deleted.
+     *
      * @param string $table
      * @param array $where
-     * @param integer $limit
+     * @param int|null $limit Maximum rows to delete, or null to delete all
      */
-    protected function deleteRecord($table, $where, $limit = 1)
+    protected function deleteRecord($table, $where, ?int $limit = 1)
     {
-        (is_numeric($limit)) ? $this->dbc->dbDelete($table, $where, $limit) : $this->dbc->dbDelete($table, $where);
+        $this->dbc->dbDelete($table, $where, $limit);
     }
 
     /**

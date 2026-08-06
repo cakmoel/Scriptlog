@@ -35,6 +35,8 @@ define('MAX_FILES', 10000);
 define('MAX_SIZE', 1000000000); // 1 GB
 define('MAX_RATIO', 10);
 define('READ_LENGTH', 1024);
+define('COOKIE_CONSENT_LIFETIME_DAYS', 180); // Cookie consent lifetime in days (CNIL-aligned renewal)
+define('COOKIE_CONSENT_VERSION', '1'); // Bump to force re-consent when the policy changes
 define('SCRIPTLOG', hash_hmac('sha256', APP_TITLE . ':' . APP_CODENAME . mt_rand(1, 1000), hash('sha256', uniqid() . 'M4Le053Nk4WoR!@#{>}>01[:+]-07|=_$%^&*(id)')));
 
 if (!defined('PHP_EOL')) {

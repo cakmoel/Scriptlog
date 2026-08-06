@@ -461,9 +461,9 @@ class FrontService
      * Uses a LIKE query against the post_tags column.
      *
      * @param string $tag The tag keyword to search for.
-     * @return array|null Matching post data or null if not found.
+     * @return array Matching post data, or an empty array when not found.
      */
-    public function searchTag(string $tag): ?array
+    public function searchTag(string $tag): array
     {
         if (empty($tag)) {
             return [];
@@ -487,7 +487,7 @@ class FrontService
             $result = $dbc->dbQuery($sql, [$tagSearch]);
             $row = $result ? $result->fetch() : null;
 
-            return empty($row) ? null : $row;
+            return empty($row) ? [] : $row;
         } catch (\Throwable $e) {
             return [];
         }
@@ -598,9 +598,9 @@ class FrontService
                 FROM tbl_media
                 WHERE media_target = 'gallery'
                 ORDER BY ID
-                LIMIT ?, ?";
+                LIMIT " . $start . ", " . $limit;
 
-        $result = $dbc->dbQuery($sql, [$start, $limit]);
+        $result = $dbc->dbQuery($sql);
 
         if (!$result) {
             return null;

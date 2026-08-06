@@ -748,54 +748,6 @@ class PostService
     }
 
     /**
-     * Drop down post status
-     *
-     * @param string $selected
-     * @return string
-     *
-     */
-    public function postStatusDropDown($selected = "")
-    {
-        return $this->postDao->dropDownPostStatus($selected);
-    }
-
-    /**
-     * Drop down comment status
-     *
-     * @param string $selected
-     * @return string
-     *
-     */
-    public function commentStatusDropDown($selected = "")
-    {
-        return $this->postDao->dropDownCommentStatus($selected);
-    }
-
-    /**
-     * visibilityDropDown
-     *
-     * @param string $selected
-     * @return string
-     *
-     */
-    public function visibilityDropDown($selected = "")
-    {
-        return $this->postDao->dropDownVisibility($selected);
-    }
-
-    /**
-     * localeDropDown
-     *
-     * @param string $selected
-     * @return string
-     *
-     */
-    public function localeDropDown($selected = "")
-    {
-        return $this->postDao->dropDownLocale($selected);
-    }
-
-    /**
      * postAuthorId
      * Checking whether author cookie_id or session_id exists
      *
@@ -828,13 +780,15 @@ class PostService
     /**
      * Total posts records.
      *
-     * @param array $data
+     * @param array $data Optional list where the first element is the author ID.
      * @return int|null
      *
      */
     public function totalPosts(array $data = []): ?int
     {
-        return $this->postDao->totalPostRecords($data);
+        $author = isset($data[0]) ? (int)$data[0] : null;
+
+        return $this->postDao->totalPostRecords($author);
     }
 
     /**
@@ -936,13 +890,7 @@ class PostService
      */
     public function setPostTopicsApi($postId, $topicIds)
     {
-        $this->postDao->deletePostTopics($postId);
-        foreach ($topicIds as $topicId) {
-            $this->postDao->create("tbl_post_topic", [
-                'post_id' => (int)$postId,
-                'topic_id' => (int)$topicId
-            ]);
-        }
+        $this->postDao->setPostTopics((int)$postId, (array)$topicIds);
     }
 
     /**
@@ -989,8 +937,6 @@ class PostService
      */
     public function getPostByIdApi($postId)
     {
-        $sql = "SELECT * FROM tbl_posts WHERE ID = ?";
-        $this->postDao->setSQL($sql);
-        return $this->postDao->findRow([(int)$postId]);
+        return $this->postDao->getPostById((int)$postId);
     }
 }

@@ -1,31 +1,36 @@
 <aside class="col-lg-4">
   
+  <?php
+  $sidebar = function_exists('prepare_sidebar') ? prepare_sidebar() : null;
+  $search_action = ($sidebar !== null && $sidebar->searchAction() !== '') ? $sidebar->searchAction() : (string)app_url() . '/search';
+  ?>
+
   <!-- Widget [Search Bar Widget]-->
   <div class="widget search">
     <header>
       <h3 class="h6"><?= t('sidebar.search.title'); ?></h3>
     </header>
-    <form action="<?= app_url(); ?>/search" method="get" class="search-form" id="ajax-search-form" role="search" aria-label="<?= t('sidebar.search.title'); ?>">
-      <div class="form-group">
+    <form action="<?= theme_escape_html($search_action); ?>" method="get" class="search-form" id="ajax-search-form" role="search" aria-label="<?= t('sidebar.search.title'); ?>">
+      <div class="search-input-group">
+        <i class="icon-search search-icon" aria-hidden="true"></i>
         <label for="search-keyword" class="sr-only"><?= t('sidebar.search.placeholder'); ?></label>
-        <input type="search" id="search-keyword" name="q" placeholder="<?= t('sidebar.search.placeholder'); ?>" autocomplete="off" aria-describedby="search-results">
-        <button type="submit" class="submit" aria-label="<?= t('sidebar.search.submit'); ?>"><i class="icon-search" aria-hidden="true"></i></button>
+        <input type="search" id="search-keyword" name="q" class="search-input" placeholder="<?= t('sidebar.search.placeholder'); ?>" autocomplete="off" aria-describedby="search-hint search-results" aria-controls="search-results" aria-expanded="false">
+        <button type="submit" class="search-submit" aria-label="<?= t('sidebar.search.submit'); ?>"><i class="icon-search" aria-hidden="true"></i></button>
+        <button type="button" class="search-clear" id="search-clear" aria-label="<?= t('sidebar.search.clear'); ?>" hidden><i class="fa fa-times" aria-hidden="true"></i></button>
       </div>
+      <p class="sr-only" id="search-hint"><?= t('sidebar.search.hint'); ?></p>
       <div id="search-results" class="search-results" aria-live="polite" aria-atomic="true"></div>
       <div id="search-error" class="search-error" aria-live="assertive"></div>
       <input type="hidden" id="search-csrf" name="csrf" value="<?= block_csrf(); ?>">
     </form>
   </div>
-  
-  <?php
-  $latest_posts = function_exists('latest_posts') ? latest_posts(5, 'sidebar') : "";
-    ?>
 
   <!-- Widget [Latest Posts Widget] -->
   <div class="widget latest-posts">
 
     <?php
-    if ($latest_posts) :
+    $latestPosts = ($sidebar !== null) ? $sidebar->latestPosts() : [];
+    if (!empty($latestPosts)) :
         ?>
 
       <header>
@@ -35,19 +40,15 @@
       <div class="blog-posts">
 
         <?php
-        foreach ((array)$latest_posts['sidebarPosts'] as $latest_post) :
-            $author = (isset($latest_post['user_login'])) ? escape_html($latest_post['user_login']) : escape_html($latest_post['user_fullname']);
-            $latest_post_id = (isset($latest_post['ID'])) ? abs((int)$latest_post['ID']) : "";
-            $total_comment = (total_comment($latest_post_id)['total'] > 0) ? total_comment($latest_post_id)['total'] : 0;
-
+        foreach ($latestPosts as $latest_post) :
             ?>
 
-          <a href="<?= isset($latest_post['ID']) ? permalinks($latest_post['ID'])['post'] : "#" ?>">
+          <a href="<?= $latest_post->url(); ?>">
             <div class="item d-flex align-items-center">
-              <div class="title"><strong><?= isset($latest_post['post_title']) ? escape_html($latest_post['post_title']) : ""; ?></strong>
+              <div class="title"><strong><?= $latest_post->title(); ?></strong>
                 <div class="d-flex align-items-center">
-                  <div class="views"><i class="fa fa-user-circle" aria-hidden="true"></i> <?= $author; ?></div>
-                  <div class="comments"><i class="icon-comment" aria-hidden="true"></i> <?= $total_comment; ?> </div>
+                  <div class="views"><i class="fa fa-user-circle" aria-hidden="true"></i> <?= $latest_post->author(); ?></div>
+                  <div class="comments"><i class="icon-comment" aria-hidden="true"></i> <?= $latest_post->comments(); ?> </div>
                 </div>
               </div>
             </div>
@@ -61,6 +62,7 @@
     endif;
     ?>
   </div>
+
   <!-- Categories-->
   <div class="widget categories">
     <header>
@@ -68,11 +70,12 @@
     </header>
 
    <?php
-    if (function_exists('sidebar_topics')) :
-        foreach (sidebar_topics() as $category) :
+    $categories = ($sidebar !== null) ? $sidebar->categories() : [];
+    if (!empty($categories)) :
+        foreach ($categories as $category) :
             ?>
 
-      <div class="item d-flex justify-content-between"><a href="<?= isset($category['ID']) ? permalinks($category['ID'])['cat'] : "#"; ?>"><?= isset($category['topic_title']) ? escape_html($category['topic_title']) : ""; ?></a><span><?= isset($category['total_posts']) ? $category['total_posts'] : "" ?></span></div>
+      <div class="item d-flex justify-content-between"><a href="<?= $category['url']; ?>"><?= $category['title']; ?></a><span><?= $category['count']; ?></span></div>
 
             <?php
         endforeach;
@@ -88,32 +91,20 @@
     </header>
 
   <?php
+    $archives = ($sidebar !== null) ? $sidebar->archives() : [];
+    if (!empty($archives)) :
+        foreach ($archives as $archive) :
+            ?>
 
-    if (function_exists('retrieve_archives')) :
-        foreach (retrieve_archives() as $archives) :
-            $month_num = isset($archives['month_archive']) ? safe_html($archives['month_archive']) : "";
-            $monthObj = class_exists('DateTime') ? DateTime::createFromFormat('!m', $month_num) : "";
-            $month_name = method_exists($monthObj, 'format') ? $monthObj->format('F') : "";
-            $monthDate = method_exists($monthObj, 'format') ? $monthObj->format('m') : "";
-            $month_name = isset($month_name) ? $month_name : date('F', mktime(0, 0, 0, $archives['month_archive'], 10));
-            $year = isset($archives['year_archive']) ? safe_html($archives['year_archive']) : "";
-            $total = isset($archives['total_archive']) ? safe_html($archives['total_archive']) : "";
+      <div class="item d-flex justify-content-between"><a href="<?= $archive['url']; ?>" title="<?= $archive['label']; ?>"><?= $archive['label']; ?></a><span><?= $archive['count']; ?></span></div>
 
-            if (rewrite_status() === 'yes') :
-                ?>
-
-      <div class="item d-flex justify-content-between"><a href="<?= permalinks($monthDate . DS . $year)['archive']; ?>" title="<?= $month_name; ?>"><?= $month_name . ' ' . $year; ?></a><span><?= $total; ?></span></div>
-    
-            <?php else :
-                ?>
-    <div class="item d-flex justify-content-between"><a href="<?= permalinks($archives['year_archive'] . $archives['month_archive'])['archive'] ?>" title="<?= $month_name; ?>"><?= $month_name . ' ' . $year; ?></a><span><?= $total; ?></span></div>
-                   <?php
-            endif;
+        <?php
         endforeach;
     endif;
     ?>
-    
+
   </div>
+
   <!-- Widget [Tags Cloud Widget]-->
 
   <div class="widget tags">
@@ -122,9 +113,14 @@
     </header>
     <ul class="list-inline">
       <?php
-        if (function_exists('retrieve_tags')) {
-            echo retrieve_tags();
-        }
+        $tags = ($sidebar !== null) ? $sidebar->tags() : [];
+        if (!empty($tags)) :
+            foreach ($tags as $tag) :
+                ?>
+      <li class="list-inline-item"><a href="<?= $tag['url']; ?>" class="tag" title="<?= $tag['label']; ?>">#<?= $tag['label']; ?></a></li>
+                <?php
+            endforeach;
+        endif;
         ?>
     </ul>
   </div>

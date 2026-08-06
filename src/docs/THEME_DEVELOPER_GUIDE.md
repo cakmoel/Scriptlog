@@ -104,6 +104,7 @@ public/themes/[theme-name]/
 ├── archive.php           # Monthly archive
 ├── archives.php          # Archive index (all months)
 ├── blog.php              # Blog listing page
+├── search.php            # Search results page
 ├── sidebar.php           # Sidebar widgets
 ├── 404.php               # 404 error page
 ├── privacy.php           # Privacy policy page
@@ -197,6 +198,7 @@ assets/
 | `archive.php` | Monthly archive | `header.php`, `footer.php`, `sidebar.php` |
 | `archives.php` | Archive index | `header.php`, `footer.php` |
 | `blog.php` | Blog listing | `header.php`, `footer.php`, `sidebar.php` |
+| `search.php` | Search results page | `header.php`, `footer.php`, `sidebar.php` |
 | `sidebar.php` | Search, categories, tags, archives | None |
 | `404.php` | Error page | `header.php`, `footer.php` |
 | `privacy.php` | Privacy policy | `header.php`, `footer.php` |
@@ -463,6 +465,45 @@ Download page templates:
 
 Archive index page listing all archive months grouped by year:
 
+### 6.12 search.php
+
+The search results page displays matches from the `SearchFinder` engine:
+
+- **Route**: `/search?q=keyword` or AJAX via `/api/v1/search?q=keyword`
+- **Data source**: `$GLOBALS['search_results']` (set by `SearchController`)
+- **Variables**: `$results` (array of objects with ID, post_title, post_slug, post_content, post_type, post_date), `$totalRows`, `$searchKeyword`
+
+**Key functions used:**
+
+```php
+$searchResults = $GLOBALS['search_results'] ?? [];
+$searchKeyword = $GLOBALS['search_keyword'] ?? '';
+$results = $searchResults['results'] ?? [];
+$totalRows = $searchResults['totalRows'] ?? 0;
+permalinks($itemId)['post']      // Build post URL
+permalinks($itemId)['page']      // Build page URL
+paragraph_trim($content)          // Generate excerpt
+paragraph_l2br($content)          // Convert newlines to <br>
+make_date($timestamp)             // Format date
+```
+
+**Key i18n keys used:**
+- `search.title`
+- `search.found_results` (params: `%count%`, `%keyword%`)
+- `search.no_results` (params: `%keyword%`)
+- `search.enter_keyword`
+- `search.try_different_keywords`
+- `search.read_more`
+
+**AJAX search flow (sidebar widget):**
+1. User types in search input — `search.js` fires a `GET /api/v1/search?q=keyword&type=all` request with a 300ms debounce
+2. `SearchApiController` transforms results to JSON with id, title, slug, excerpt, type, date, url
+3. Up to 10 inline results shown in a dropdown; "View all N results" link routes to `/search?q=keyword`
+4. Non-JS fallback: form submits via GET to `/search?q=keyword`, `Dispatcher` routes to `SearchController`
+
+**Key JS dependencies:**
+- `assets/js/search.js` — jQuery AJAX autocomplete with debounce, XSS-safe rendering
+
 ```
 2026
 ├── June (3 posts)
@@ -550,7 +591,7 @@ Archive index page listing all archive months grouped by year:
 | `render_comments_section()` | `(int $postId, int $offset): string` | Render comments section HTML | HTML string |
 | `nothing_found()` | `(): string` | Display "no posts found" message | HTML string |
 | `retrieve_site_url()` | `(): string` | Get site base URL from config | URL string |
-| `make_date()` | `(string $timestamp): string` | Format date for display | Formatted date string |
+| `make_date()` | `(string $timestamp): string` | Format date for display (e.g. "July 26, 2026"). ⚠ Display only — do NOT use in admin form `<input>` values; pass raw `Y-m-d H:i:s` instead. | Formatted date string |
 | `htmlout()` | `(string $string): string` | Escape HTML for safe output | Escaped string |
 | `get_ip_address()` | `(): string` | Get client IP address | IP string |
 | `app_url()` | `(): string` | Get application base URL | URL string |
@@ -725,6 +766,7 @@ All scripts after jQuery use `defer` attribute for non-blocking execution. jQuer
 | **Fancybox** | 3 | `jquery.fancybox.min.css`, `jquery.fancybox.min.js` | Image gallery lightbox |
 | **Popper.js** | 1 | `popper.min.js` | Bootstrap dropdowns, tooltips, popovers |
 | **jQuery.cookie** | 1 | `jquery.cookie.js` | Cookie read/write for consent management |
+| **Prism.js** | 1 | `prism.css`, `prism-override.min.css`, `prism.js` | Client-side syntax highlighting for code blocks |
 
 ### 9.4 Load Order (footer.php)
 
@@ -939,6 +981,16 @@ namespace.sub.key    →  "cookie_consent.buttons.accept"
 | `header.nav.blog` | Blog |
 | `header.nav.about` | About |
 
+#### Search Page (search.*)
+| Key | English |
+|-----|---------|
+| `search.title` | Search |
+| `search.found_results` | Found %count% result(s) for "%keyword%" |
+| `search.no_results` | No results found for "%keyword%" |
+| `search.enter_keyword` | Please enter a search keyword to find content. |
+| `search.try_different_keywords` | No results found. Please try different keywords. |
+| `search.read_more` | Read More |
+
 #### Sidebar (sidebar.*)
 | Key | English |
 |-----|---------|
@@ -1032,12 +1084,19 @@ This prevents direct URL access to template files (e.g., `https://example.com/pu
 Always escape output to prevent XSS:
 
 ```php
-// CORRECT — escape all dynamic output
+// CORRECT — escape all dynamic output (plain text)
 <?= htmlout($post['post_title']); ?>
 <a href="<?= htmlout($postUrl); ?>"><?= htmlout($post['post_title']); ?></a>
 
 // CORRECT — content with HTML allowed (sanitized, not escaped)
 <?= htmLawed($post['post_content'], $htmLawedConfig); ?>
+
+// CORRECT — post excerpt (pre-sanitized by paragraph_trim)
+<?= paragraph_l2br(safe_html(paragraph_trim($post['post_content']))); ?>
+// ⚠ DO NOT use htmlout() here — it chains safe_html() + escape_html()
+//    escape_html() (Laminas) calls htmlspecialchars() without double_encode=false,
+//    re-encoding valid entities like &quot; → &amp;quot;.
+//    Use safe_html() for content already stripped of tags.
 ```
 
 ### 12.3 CSRF Protection
@@ -1075,7 +1134,7 @@ The cookie consent banner must:
 ### 12.6 Security Checklist for Theme Development
 
 - [ ] All PHP files have `defined('SCRIPTLOG') || die()` guard
-- [ ] All dynamic output uses `htmlout()` or `htmlspecialchars()`
+- [ ] All dynamic output uses `htmlout()` or `safe_html()` — use `htmlout()` for raw user input strings, `safe_html()` for content pre-sanitized by `paragraph_trim()` (never chain both)
 - [ ] All forms include CSRF token via `block_csrf()`
 - [ ] User-submitted content is sanitized with `htmLawed()`
 - [ ] No database queries in templates (use functions.php helpers)
@@ -1681,7 +1740,7 @@ htmlout($string)                      // Escape HTML
 htmLawed($content, $config)           // Sanitize HTML
 
 // Utility
-make_date($timestamp)                 // Format date
+make_date($timestamp)                 // Format date (display only, not for form inputs)
 retrieve_site_url()                   // Site base URL
 app_url()                             // App URL from config
 nothing_found()                       // "No posts" message

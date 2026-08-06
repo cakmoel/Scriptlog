@@ -122,7 +122,7 @@ class AtomWriter
 
             $feed_permalinks = isset($feed_post['ID']) ? permalinks($feed_id)['post'] : "";
             $feed_author = (isset($feed_post['user_login']) || isset($feed_post['user_fullname']) ? htmlout($feed_post['user_login']) : htmlout($feed_post['user_fullname']));
-            $feed_content = isset($feed_post['post_content']) ? htmlout(strip_tags(nl2br(html_entity_decode($feed_post['post_content'])))) : "";
+            $feed_content = isset($feed_post['post_content']) ? htmlout(strip_tags(nl2br(html_entity_decode($feed_post['post_content'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401)))) : "";
             $feed_description = substr($feed_content, 0, 220);
             $feed_description = substr($feed_content, 0, strrpos($feed_description, " "));
 

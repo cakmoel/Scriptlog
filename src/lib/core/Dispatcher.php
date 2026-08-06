@@ -234,7 +234,8 @@ class Dispatcher
             return false;
         }
 
-        $post = class_exists('FrontHelper') ? FrontHelper::grabPreparedFrontPostById($postId) : null;
+        $frontService = function_exists('front_service') ? front_service() : null;
+        $post = $frontService ? $frontService->getPublishedPost((int)$postId) : null;
 
         if (empty($post) || !is_array($post)) {
             return false;
@@ -252,9 +253,10 @@ class Dispatcher
             return false;
         }
 
-        $page = class_exists('FrontHelper') ? FrontHelper::grabPreparedFrontPageBySlug($pageSlug) : null;
+        $frontService = function_exists('front_service') ? front_service() : null;
+        $page = $frontService ? $frontService->getPublishedPage($pageSlug) : null;
 
-        if (empty($page) || !is_array($page)) {
+        if (empty($page)) {
             return false;
         }
 
@@ -268,8 +270,9 @@ class Dispatcher
         if (empty($categorySlug)) {
             return false;
         }
-        $topic = class_exists('FrontHelper') ? FrontHelper::grabPreparedFrontTopicBySlug($categorySlug) : null;
-        return !empty($topic) && is_array($topic);
+        $frontService = function_exists('front_service') ? front_service() : null;
+        $topic = $frontService ? $frontService->getPublishedTopic($categorySlug) : null;
+        return !empty($topic);
     }
 
     private function validateArchive($requestPath)
@@ -279,7 +282,8 @@ class Dispatcher
         if (empty($month) || empty($year)) {
             return false;
         }
-        $archives = class_exists('FrontHelper') ? FrontHelper::grabSimpleFrontArchive() : [];
+        $frontService = function_exists('front_service') ? front_service() : null;
+        $archives = $frontService ? $frontService->getSimpleArchive() : [];
         $monthInt = (int)$month;
         $yearInt = (int)$year;
         foreach ($archives as $archive) {
@@ -296,7 +300,8 @@ class Dispatcher
         if (empty($tagSlug)) {
             return false;
         }
-        $tag = class_exists('FrontHelper') ? FrontHelper::simpleSearchingTag($tagSlug) : null;
+        $frontService = function_exists('front_service') ? front_service() : null;
+        $tag = $frontService ? $frontService->searchTag($tagSlug) : null;
         return !empty($tag);
     }
 
@@ -350,7 +355,7 @@ class Dispatcher
         $basePath = dirname($_SERVER['SCRIPT_NAME']);
 
         // Remove the base path from the request path if it exists
-        if ($basePath !== '/' && function_exists('str_starts_with') ? str_starts_with($path, $basePath) : (strncmp($path, $basePath, strlen($basePath)) === 0)) {
+        if ($basePath !== '/' && strncmp($path, $basePath, strlen($basePath)) === 0) {
             $path = substr($path, strlen($basePath));
         }
 

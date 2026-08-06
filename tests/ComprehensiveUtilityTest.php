@@ -330,7 +330,7 @@ class ComprehensiveUtilityTest extends TestCase
     public function testFindingPwdCost(): void
     {
         if (function_exists('finding_pwd_cost')) {
-            $result = finding_pwd_cost('test', 10);
+            $result = finding_pwd_cost(0.001, 10);
             $this->assertIsInt($result);
         }
     }

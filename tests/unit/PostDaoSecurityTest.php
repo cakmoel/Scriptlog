@@ -78,8 +78,8 @@ class PostDaoSecurityTest extends TestCase
         $source = file_get_contents(__DIR__ . '/../../src/lib/dao/PostDao.php');
         
         // Verify that ORDER BY uses a whitelist
-        $this->assertStringContainsString('$allowedColumns', $source);
-        $this->assertStringContainsString('in_array($orderBy, $allowedColumns)', $source);
+        $this->assertStringContainsString('ALLOWED_SORT_COLUMNS', $source);
+        $this->assertStringContainsString('resolveSortColumn', $source);
         $this->assertStringContainsString('ORDER BY p.$sortColumn', $source);
     }
     

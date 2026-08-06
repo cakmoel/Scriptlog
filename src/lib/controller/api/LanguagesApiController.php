@@ -17,6 +17,8 @@ class LanguagesApiController extends ApiController
 
     public function __construct()
     {
+        $this->requiresAuth = false;
+
         parent::__construct();
         $this->languageService = new LanguageService();
         $this->hateoas = new ApiHateoas();
@@ -24,8 +26,6 @@ class LanguagesApiController extends ApiController
 
     public function index($_params = []): void
     {
-        $this->requiresAuth = false;
-
         try {
             $languages = $this->languageService->getActiveLanguages();
             $pagination = $this->getPagination($_GET);
@@ -47,8 +47,6 @@ class LanguagesApiController extends ApiController
 
     public function show($params = []): void
     {
-        $this->requiresAuth = false;
-
         $code = isset($params['code']) ? $params['code'] : '';
 
         if (empty($code)) {
@@ -72,8 +70,6 @@ class LanguagesApiController extends ApiController
 
     public function default($_params = []): void
     {
-        $this->requiresAuth = false;
-
         try {
             $language = $this->languageService->getDefaultLanguage();
 

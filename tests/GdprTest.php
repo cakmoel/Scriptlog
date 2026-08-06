@@ -368,14 +368,14 @@ class GdprConsentDaoTest extends TestCase
     public function testConsentDaoHasCreateConsentMethod(): void
     {
         if ($this->consentDao) {
-            $this->assertTrue(method_exists($this->consentDao, 'createConsent'));
+            $this->assertTrue(method_exists($this->consentDao, 'recordConsent'));
         }
     }
     
     public function testConsentDaoHasGetConsentByTypeMethod(): void
     {
         if ($this->consentDao) {
-            $this->assertTrue(method_exists($this->consentDao, 'getConsentByType'));
+            $this->assertTrue(method_exists($this->consentDao, 'getLatestConsent'));
         }
     }
     
@@ -389,14 +389,14 @@ class GdprConsentDaoTest extends TestCase
     public function testConsentDaoHasUpdateConsentStatusMethod(): void
     {
         if ($this->consentDao) {
-            $this->assertTrue(method_exists($this->consentDao, 'updateConsentStatus'));
+            $this->assertTrue(method_exists($this->consentDao, 'updateConsent'));
         }
     }
     
     public function testConsentDaoHasDeleteConsentMethod(): void
     {
         if ($this->consentDao) {
-            $this->assertTrue(method_exists($this->consentDao, 'deleteConsent'));
+            $this->assertTrue(method_exists($this->consentDao, 'deleteOldConsents'));
         }
     }
 }

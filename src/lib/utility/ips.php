@@ -75,11 +75,7 @@ function midfielder()
 function starts_with($haystack, $needle)
 {
 
-    if (function_exists('str_starts_with')) {
-        return str_starts_with($haystack, $needle);
-    } else {
-        return substr_compare($haystack, $needle, 0, strlen($needle)) === 0;
-    }
+    return substr_compare($haystack, $needle, 0, strlen($needle)) === 0;
 }
 
 /**
@@ -95,9 +91,5 @@ function starts_with($haystack, $needle)
 function ends_with($haystack, $needle)
 {
 
-    if (function_exists('str_ends_with')) {
-        return str_ends_with($haystack, $needle);
-    } else {
-        return substr_compare($haystack, $needle, -strlen($needle)) === 0;
-    }
+    return substr_compare($haystack, $needle, -strlen($needle)) === 0;
 }

@@ -50,7 +50,7 @@ function paragraph_trim($content, $limit = 200, $schr = PHP_EOL, $scnt = 2)
         }
     }
 
-    $entry = html_entity_decode($content);
+    $entry = html_entity_decode($content, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401);
     $entry = strip_tags($entry);
     $entry = purify_dirty_html($entry);
     $content = substr($entry, 0, $post);

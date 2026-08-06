@@ -9,7 +9,16 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  * FrontHelper class will be useful for theme functionality
  * to retrieves particular content needed on theme layout
- * and theme meta
+ * and theme meta.
+ *
+ * @deprecated 1.0 Use Scriptlog\Service\FrontService instead. This facade is
+ *             kept for backward compatibility only; every data-access method
+ *             delegates to the FrontService instance registered by Bootstrap
+ *             through FrontHelper::setFrontService(). When no service is
+ *             registered, the methods return null / an empty array rather than
+ *             falling back to raw SQL (the legacy inline queries were removed
+ *             because they drifted from FrontService, used string interpolation,
+ *             and one path was mysqli-only and broke on PDO).
  *
  * @category Core Class
  * @author M.Noermoehammad
@@ -43,117 +52,56 @@ class FrontHelper
     /**
      * grabSimpleFrontPost
      *
+     * @deprecated Use Scriptlog\Service\FrontService::getSimplePost()
      * @param int $id
-     * @return array|null|false
+     * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabSimpleFrontPost($id)
     {
-        if (self::$frontService) {
-            return self::$frontService->getSimplePost($id);
-        }
-
-        $idsanitized = static::frontSanitizer($id, 'sql');
-
-        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
-           p.post_content, p.post_summary, p.post_tags, p.post_status, p.post_sticky, 
-           p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, 
-           m.media_access, u.user_login, u.user_fullname
-           FROM tbl_posts p
-           LEFT JOIN tbl_media m ON p.media_id = m.ID
-           LEFT JOIN tbl_users u ON p.post_author = u.ID
-           WHERE p.ID = '$idsanitized' AND p.post_status = 'publish'
-           AND p.post_type = 'blog' AND m.media_target = 'blog'
-           AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
-
-        $query = db_simple_query($sql);
-
-        $result = $query->fetch();
-
-        return empty($result) ? null : $result;
+        return self::$frontService ? self::$frontService->getSimplePost($id) : null;
     }
 
     /**
      * grabSimpleFrontTopic
      *
-     * @param int|numeric $id
-     * @return array|null|false
+     * @deprecated Use Scriptlog\Service\FrontService::getSimpleTopic()
+     * @param int $id
+     * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabSimpleFrontTopic($id)
     {
-        if (self::$frontService) {
-            return self::$frontService->getSimpleTopic($id);
-        }
-
-        $idsanitized = static::frontSanitizer($id, 'sql');
-
-        $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE topic_status = 'Y' AND ID = '$idsanitized'";
-
-        $query = db_simple_query($sql);
-
-        $result = $query->fetch();
-
-        return empty($result) ? null : $result;
+        return self::$frontService ? self::$frontService->getSimpleTopic($id) : null;
     }
 
     /**
      * grabSimpleFrontArchive
      *
+     * @deprecated Use Scriptlog\Service\FrontService::getSimpleArchive()
+     * @return array
+     *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabSimpleFrontArchive()
     {
-        if (self::$frontService) {
-            return self::$frontService->getSimpleArchive();
-        }
-
-        $sql = "SELECT YEAR(tbl_posts.post_date) AS year_archive, MONTH(tbl_posts.post_date) AS month_archive
-            FROM tbl_posts WHERE tbl_posts.post_type = 'blog' AND tbl_posts.post_status = 'publish'
-            GROUP BY YEAR(tbl_posts.post_date), MONTH(tbl_posts.post_date) 
-            ORDER BY YEAR(tbl_posts.post_date) DESC, MONTH(tbl_posts.post_date) DESC";
-
-        $query = db_simple_query($sql);
-
-        $results = [];
-        while ($row = $query->fetch()) {
-            $results[] = $row;
-        }
-
-        return $results;
+        return self::$frontService ? self::$frontService->getSimpleArchive() : [];
     }
 
     /**
      * grabSimpleFrontPage
      *
-     * @param int|num $id
-     * @return array|null|false
+     * @deprecated Use Scriptlog\Service\FrontService::getSimplePage()
+     * @param int $id
+     * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabSimpleFrontPage($id)
     {
-        if (self::$frontService) {
-            return self::$frontService->getSimplePage($id);
-        }
-
-        $idsanitized = static::frontSanitizer($id, 'sql');
-
-        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title, p.post_slug,
-    p.post_content, p.post_summary, 
-    p.post_status, p.post_visibility, p.post_tags, p.post_sticky, 
-    p.post_type, p.comment_status, m.ID, m.media_filename, m.media_caption, m.media_access, 
-    u.ID, u.user_login, u.user_fullname
-FROM tbl_posts AS p
-LEFT JOIN tbl_media AS m ON p.media_id = m.ID
-LEFT JOIN tbl_users AS u ON p.post_author = u.ID
-WHERE p.ID = '$idsanitized'
-AND p.post_status = 'publish' 
-AND p.post_visibility = 'public'
-AND p.post_type = 'page' 
-AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
-
-        $results = db_simple_query($sql)->fetch();
-
-        return empty($results) ? null : $results;
+        return self::$frontService ? self::$frontService->getSimplePage($id) : null;
     }
 
     /**
@@ -161,9 +109,11 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
      *
      * implementing a simple MySQL full-text searching
      *
+     * @deprecated Use Scriptlog\Service\FrontService::searchTag()
      * @param string $tag
-     * @return mixed
+     * @return array
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function simpleSearchingTag($tag)
     {
@@ -171,248 +121,104 @@ AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
             return [];
         }
 
-        if (self::$frontService) {
-            return self::$frontService->searchTag($tag);
-        }
-
-        try {
-            if (!Registry::isKeySet('dbc')) {
-                return [];
-            }
-
-            $dbc = Registry::get('dbc');
-            if (!is_object($dbc)) {
-                return [];
-            }
-
-            $tagSearch = '%' . $tag . '%';
-            $sql = "SELECT ID, post_title, post_content, post_summary, post_tags FROM tbl_posts WHERE post_tags LIKE ? AND post_status = 'publish' AND post_type = 'blog' LIMIT 1";
-
-            $result = $dbc->dbQuery($sql, [$tagSearch]);
-            $results = $result ? $result->fetch() : null;
-
-            return empty($results) ? null : $results;
-        } catch (\Throwable $e) {
-            return [];
-        }
+        return self::$frontService ? self::$frontService->searchTag($tag) : [];
     }
 
     /**
      * grabTagLists()
      *
+     * @deprecated Use Scriptlog\Service\FrontService::getTagLists()
+     * @return array
+     *
      * @psalm-suppress PossiblyUnusedMethod
-     *
-     * @return mixed
-     *
      */
     public static function grabTagLists()
     {
-        if (self::$frontService) {
-            return self::$frontService->getTagLists();
-        }
-
-        $taglink = [];
-        $tagArrays = [];
-
-        $sql = 'SELECT DISTINCT LOWER(post_tags) AS postTags FROM tbl_posts WHERE post_tags != "" GROUP BY postTags';
-
-        $results = db_simple_query($sql);
-
-        while ($row = $results->fetch()) {
-            $parts = explode(',', $row['postTags']);
-
-            foreach ($parts as $part) {
-                $tagArrays[] = $part;
-            }
-        }
-
-        $finalTags = array_unique($tagArrays);
-        foreach ($finalTags as $tag) {
-            $taglink[] = trim($tag);
-        }
-
-        return $taglink;
+        return self::$frontService ? self::$frontService->getTagLists() : [];
     }
 
     /**
      * grabPreparedFrontPostById
      *
+     * @deprecated Use Scriptlog\Service\FrontService::getPublishedPost()
      * @param int $id
-     * @return array
+     * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabPreparedFrontPostById($id)
     {
-        if (self::$frontService) {
-            return self::$frontService->getPublishedPost((int)$id);
-        }
-
-        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, 
-               YEAR(p.post_date) AS year_archive, MONTH(p.post_date) AS month_archive, 
-               p.post_modified, p.post_title, p.post_slug,
-               p.post_content, p.post_summary, p.post_tags, 
-               p.post_status, p.post_visibility, p.post_sticky, 
-               p.post_type, p.comment_status, m.media_filename, m.media_caption, m.media_target, 
-               m.media_access, u.user_fullname
-        FROM tbl_posts AS p
-        LEFT JOIN tbl_media AS m ON p.media_id = m.ID
-        LEFT JOIN tbl_users AS u ON p.post_author = u.ID
-        WHERE p.ID = ? AND p.post_status = 'publish'
-        AND p.post_visibility IN ('public', 'protected')
-        AND p.post_type = 'blog' AND m.media_target = 'blog' 
-        AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
-
-        return db_prepared_query($sql, [$id], 'i')->fetch();
+        return self::$frontService ? self::$frontService->getPublishedPost((int)$id) : null;
     }
 
     /**
      * frontPageBySlug
      *
+     * @deprecated Use Scriptlog\Service\FrontService::getPublishedPage()
      * @param string $slug
-     * @return mixed
+     * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabPreparedFrontPageBySlug($slug)
     {
-        if (self::$frontService) {
-            return self::$frontService->getPublishedPage($slug);
-        }
-
-        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
-               p.post_title, p.post_slug,
-               p.post_content, p.post_summary,
-               p.post_tags, p.post_status, p.post_visibility, p.post_sticky, 
-               p.post_type, p.comment_status,
-               m.ID, m.media_filename, m.media_caption, m.media_access, u.ID, u.user_fullname
-  FROM tbl_posts AS p
-  LEFT JOIN tbl_media AS m ON p.media_id = m.ID
-  LEFT JOIN tbl_users AS u ON p.post_author = u.ID
-  WHERE p.post_slug = ?
-  AND p.post_status = 'publish' 
-  AND p.post_visibility = 'public'
-  AND p.post_type = 'page' 
-  AND m.media_access = 'public' AND m.media_status = '1' LIMIT 1";
-
-        return db_prepared_query($sql, [$slug], 's')->fetch();
+        return self::$frontService ? self::$frontService->getPublishedPage($slug) : null;
     }
 
     /**
      * grabPreparedFrontTopicBySlug
      *
+     * @deprecated Use Scriptlog\Service\FrontService::getPublishedTopic()
      * @param string $slug
-     * @return mixed
+     * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabPreparedFrontTopicBySlug($slug)
     {
-        if (self::$frontService) {
-            return self::$frontService->getPublishedTopic($slug);
-        }
-
-        $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE topic_slug = ? AND topic_status = 'Y'";
-
-        return db_prepared_query($sql, [$slug], 's')->fetch();
+        return self::$frontService ? self::$frontService->getPublishedTopic($slug) : null;
     }
 
     /**
      * grabPreparedFrontTopicByID
      *
-     * @param int|num $id
-     * @return mixed
+     * @deprecated Use Scriptlog\Service\FrontService::getPublishedTopicById()
+     * @param int $id
+     * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabPreparedFrontTopicByID($id)
     {
-        if (self::$frontService) {
-            return self::$frontService->getPublishedTopicById((int)$id);
-        }
-
-        $sql = "SELECT ID, topic_title, topic_slug FROM tbl_topics WHERE ID = ? AND topic_status = 'Y'";
-
-        return db_prepared_query($sql, [$id], 'i')->fetch();
+        return self::$frontService ? self::$frontService->getPublishedTopicById((int)$id) : null;
     }
 
     /**
      * grabPreparedFrontArchive
      *
-     * @psalm-suppress PossiblyUnusedMethod
-     *
+     * @deprecated Use Scriptlog\Service\FrontService::getArchivePosts()
      * @param array $values
-     * @return mixed
+     * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabPreparedFrontArchive($values)
     {
-        if (self::$frontService) {
-            return self::$frontService->getArchivePosts($values);
-        }
-
-        $month = isset($values['month']) ? Sanitize::mildSanitizer($values['month']) : null;
-        $year = isset($values['year']) ? Sanitize::mildSanitizer($values['year']) : null;
-
-        $from = date('Y-m-01 00:00:00', strtotime("$year-$month"));
-        $to = date('Y-m-31 23:59:59', strtotime("$year-$month"));
-
-        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, 
-    p.post_modified, p.post_title, p.post_slug, 
-    p.post_content, p.post_summary, p.post_tags, p.post_type, p.post_status, 
-    p.post_sticky, u.user_login, u.user_fullname,
-    m.media_filename, m.media_caption
-  FROM tbl_posts AS p
-  LEFT JOIN tbl_users AS u ON p.post_author = u.ID
-  LEFT JOIN tbl_media AS m ON p.media_id = m.ID
-  WHERE DATE(p.post_date) BETWEEN ? AND ? 
-  AND p.post_type = 'blog' AND p.post_status = 'publish'
-  ORDER BY DATE(p.post_date) DESC ";
-
-        return db_prepared_query($sql, [$from, $to], 'ss')->fetch();
+        return self::$frontService ? self::$frontService->getArchivePosts($values) : null;
     }
 
     /**
      * frontGalleries
      *
-     * @psalm-suppress PossiblyUnusedMethod
-     *
+     * @deprecated Use Scriptlog\Service\FrontService::getGalleries()
      * @param int $start
      * @param int $limit
-     * @return mixed
+     * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabPreparedFrontGalleries($start, $limit)
     {
-        if (self::$frontService) {
-            return self::$frontService->getGalleries($start, $limit);
-        }
-
-        $sql = "SELECT ID, media_filename, media_caption FROM tbl_media WHERE media_target = 'gallery' ORDER BY ID LIMIT ?, ?";
-
-        $statement = db_prepared_query($sql, [$start, $limit], 'ii');
-
-        $results = get_result($statement);
-
-        if (!empty($results)) {
-            foreach ($results as $result) {
-                $media_filename = $result['media_filename'];
-                $media_caption = $result['media_caption'];
-                $media_id = $result['ID'];
-            }
-
-            return ['media_filename' => $media_filename, 'media_caption' => $media_caption, 'media_id' => $media_id];
-        }
-
-        return null;
-    }
-
-    /**
-     * frontSanitizer
-     *
-     * @param string $str
-     * @param string $type
-     * @return string
-     *
-     */
-    private static function frontSanitizer($str, $type)
-    {
-        return sanitizer($str, $type);
+        return self::$frontService ? self::$frontService->getGalleries($start, $limit) : null;
     }
 }

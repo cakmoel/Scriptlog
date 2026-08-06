@@ -43,6 +43,8 @@ class ArchivesApiController extends ApiController
      */
     public function __construct()
     {
+        $this->requiresAuth = false;
+
         parent::__construct();
         $this->hateoas = new ApiHateoas();
         $this->postService = new PostService(new PostDao(), new FormValidator(), new Sanitize());
@@ -61,8 +63,6 @@ class ArchivesApiController extends ApiController
     public function index($_params = [])
     {
         // This is a public endpoint - no auth required
-        $this->requiresAuth = false;
-
         try {
             $results = $this->postService->getArchiveIndexApi();
 
@@ -115,8 +115,6 @@ class ArchivesApiController extends ApiController
     public function year($params = [])
     {
         // This is a public endpoint - no auth required
-        $this->requiresAuth = false;
-
         $year = isset($params['year']) ? (int)$params['year'] : 0;
 
         if (!$year || $year < 1900 || $year > date('Y')) {
@@ -179,8 +177,6 @@ class ArchivesApiController extends ApiController
     public function month($params = [])
     {
         // This is a public endpoint - no auth required
-        $this->requiresAuth = false;
-
         $year = isset($params['year']) ? (int)$params['year'] : 0;
         $month = isset($params['month']) ? (int)$params['month'] : 0;
 

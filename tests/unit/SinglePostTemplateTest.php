@@ -24,7 +24,7 @@ class SinglePostTemplateTest extends TestCase
         if (!$this->source) {
             $this->markTestSkipped('single.php not found');
         }
-        $this->assertStringContainsString('empty($retrieve_post)', $this->source);
+        $this->assertStringContainsString('!$has_post', $this->source);
     }
 
     public function testHas404ValidationIsArrayCheck(): void
@@ -32,7 +32,7 @@ class SinglePostTemplateTest extends TestCase
         if (!$this->source) {
             $this->markTestSkipped('single.php not found');
         }
-        $this->assertStringContainsString('!is_array($retrieve_post)', $this->source);
+        $this->assertStringContainsString('is_array($retrieve_post)', $this->source);
     }
 
     public function testHas404ValidationIdExistsCheck(): void
@@ -40,7 +40,7 @@ class SinglePostTemplateTest extends TestCase
         if (!$this->source) {
             $this->markTestSkipped('single.php not found');
         }
-        $this->assertStringContainsString("!isset(\$retrieve_post['ID'])", $this->source);
+        $this->assertStringContainsString("isset(\$retrieve_post['ID'])", $this->source);
     }
 
     public function testHas404ValidationIdPositiveCheck(): void
@@ -48,15 +48,19 @@ class SinglePostTemplateTest extends TestCase
         if (!$this->source) {
             $this->markTestSkipped('single.php not found');
         }
-        $this->assertStringContainsString('(int)$retrieve_post[\'ID\'] <= 0', $this->source);
+        $this->assertStringContainsString("(int)\$retrieve_post['ID'] > 0", $this->source);
     }
 
-    public function testHasHttpResponseCode404(): void
+    public function testDoesNotSetHttpResponseCodeInTemplate(): void
     {
         if (!$this->source) {
             $this->markTestSkipped('single.php not found');
         }
-        $this->assertStringContainsString('http_response_code(404)', $this->source);
+        // 404 handling is owned by the Dispatcher (validateContentExists) per the
+        // Developer Guide; the template documents that it never calls
+        // http_response_code() or exit().
+        $this->assertStringContainsString('This template never calls http_response_code() or exit()', $this->source);
+        $this->assertStringNotContainsString('http_response_code(404)', $this->source);
     }
 
     public function testHasDefaultPostAuthor(): void
@@ -144,7 +148,8 @@ class SinglePostTemplateTest extends TestCase
         if (!$this->source) {
             $this->markTestSkipped('single.php not found');
         }
-        $this->assertStringContainsString("isset(\$retrieve_post['post_content'])", $this->source);
+        // Public/protected content resolution is delegated to ProtectedPostService.
+        $this->assertStringContainsString('$protectedPostService->resolve(', $this->source);
     }
 
     public function testPublicPostHasContentNotFoundFallback(): void
@@ -152,7 +157,7 @@ class SinglePostTemplateTest extends TestCase
         if (!$this->source) {
             $this->markTestSkipped('single.php not found');
         }
-        $this->assertStringContainsString('"Content not found"', $this->source);
+        $this->assertStringContainsString('Post not found.', $this->source);
     }
 
     public function testProtectedPostHasDecryptContentKeyCheck(): void
@@ -160,7 +165,9 @@ class SinglePostTemplateTest extends TestCase
         if (!$this->source) {
             $this->markTestSkipped('single.php not found');
         }
-        $this->assertStringContainsString("isset(\$decrypted_content['post_content'])", $this->source);
+        // Decryption and unlocked-session handling is delegated to ProtectedPostService.
+        $this->assertStringContainsString('new ProtectedPostService()', $this->source);
+        $this->assertStringContainsString("\$_SESSION['unlocked_posts']", $this->source);
     }
 
     public function testLinkTopicUsesEmptyCheck(): void
@@ -176,7 +183,8 @@ class SinglePostTemplateTest extends TestCase
         if (!$this->source) {
             $this->markTestSkipped('single.php not found');
         }
-        $this->assertStringContainsString('error_log("Single.php: Post not found', $this->source);
+        // Missing posts render a placeholder and return early without terminating.
+        $this->assertStringContainsString('return;', $this->source);
     }
 
     public function testHasStyleTagRemovalInContent(): void
@@ -184,6 +192,7 @@ class SinglePostTemplateTest extends TestCase
         if (!$this->source) {
             $this->markTestSkipped('single.php not found');
         }
-        $this->assertStringContainsString("deny_attribute' => 'style", $this->source);
+        // Sanitization (style strip + htmLawed whitelist) moved to ProtectedPostService.
+        $this->assertStringContainsString('new ProtectedPostService()', $this->source);
     }
 }
