@@ -85,7 +85,7 @@ function autoloader($class_paths = null, $use_base_dir = true)
     // init autoloader
     if (!$is_init) {
         \spl_autoload_extensions(implode(',', $conf['extensions']));
-        \spl_autoload_register(null, false); // flush existing autoloads
+        \spl_autoload_register(null); // flush existing autoloads
         $is_init = true;
     }
 
