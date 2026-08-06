@@ -89,7 +89,7 @@
                        <td>
                             <?= safe_html($plugin['plugin_name']); ?>
                        </td>
-                       <td><p><?= html_entity_decode($plugin['plugin_desc']); ?></p></td>
+                       <td><p><?= html_entity_decode($plugin['plugin_desc'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?></p></td>
                        <td><?= safe_html($plugin['plugin_level']); ?></td>
                        <td>
                        <a href="javascript:deletePlugin('<?=(isset($plugin['ID']) ? safe_html((int)$plugin['ID']) : 0); ?>', '<?=(isset($plugin['plugin_name']) ? safe_html($plugin['plugin_name']) : ""); ?>')" title="Delete Plugin" class="btn btn-danger"> 
