@@ -250,7 +250,7 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
 
     // Setting Site_Tagline
     $site_tagline = "site_tagline";
-    $site_tagline_value = "Just another personal weblog";
+    $site_tagline_value = "Blog engine";
 
     // Setting Site_Description
     $site_description = "site_description";
@@ -1063,7 +1063,7 @@ function grab_app_key($mysqli, $key, $prefix = '')
 
     $row = mysqli_fetch_assoc($mysqli->query($sql));
 
-    $app_key = isset($row['setting_value']) ? htmlspecialchars($row['setting_value']) : "";
+    $app_key = isset($row['setting_value']) ? htmlspecialchars($row['setting_value'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "";
     $id = isset($row['ID']) ? abs((int)$row['ID']) : "";
 
     return array('app_key' => generate_license(substr($app_key, 0, 6)), 'ID' => $id);
@@ -1346,7 +1346,7 @@ function installation_key($length)
     } elseif (function_exists("openssl_random_pseudo_bytes")) {
         $token = openssl_random_pseudo_bytes(ceil($length / 2));
     } else {
-        trigger_error("No cryptographically secure random function available", E_USER_ERROR);
+        throw new \RuntimeException("No cryptographically secure random function available");
     }
 
     return bin2hex($token);
