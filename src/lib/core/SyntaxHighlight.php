@@ -17,7 +17,7 @@ class SyntaxHighlight
 {
     public static function process($s)
     {
-        $s = htmlspecialchars($s);
+        $s = htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401);
 
         // Workaround for escaped backslashes
         $s = str_replace('\\\\', '\\\\<e>', $s);
