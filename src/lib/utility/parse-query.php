@@ -11,7 +11,7 @@
 function parse_query($var)
 {
     $var  = parse_url($var, PHP_URL_QUERY);
-    $var  = html_entity_decode($var);
+    $var  = html_entity_decode($var, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401);
     $var  = explode('&', $var);
     $arr  = array();
 
