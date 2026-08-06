@@ -25,7 +25,9 @@ function check_mime_type($accepted_type, $tmp_name)
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $type = finfo_file($finfo, $tmp_name);
 
-        is_resource($finfo) ? finfo_close($finfo) : "";
+        if (PHP_VERSION_ID < 80100) {
+            is_resource($finfo) ? finfo_close($finfo) : ""; // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.finfo_closeDeprecated
+        }
     } elseif (function_exists('mime_content_type')) {
         $type = mime_content_type($tmp_name);
     } else {
