@@ -86,7 +86,7 @@
 
                     <tr>
 
-<td><?= htmlspecialchars($menu['menu_label']); ?></td>
+<td><?= htmlspecialchars($menu['menu_label'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?></td>
                        <td>
                          
                         <?php
@@ -115,7 +115,7 @@
                         ?>
                        </td>
 
-                      <td><?= htmlspecialchars($menu['menu_link']); ?></td>
+                      <td><?= htmlspecialchars($menu['menu_link'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?></td>
                       <td>
                         <?php if ($menu['menu_status'] === 'N') : ?>
                           disabled

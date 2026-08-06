@@ -71,7 +71,7 @@ login_header($stylePath);
 <div class="login-logo">
     <h1>
         <a href="#">
-            <img class="d-block mx-auto mb-4" src="<?= htmlspecialchars($stylePath); ?>/assets/dist/img/icon612x612.png" alt="scriptlog-logo" width="72" height="72">
+            <img class="d-block mx-auto mb-4" src="<?= htmlspecialchars($stylePath, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>/assets/dist/img/icon612x612.png" alt="scriptlog-logo" width="72" height="72">
         </a>
     </h1>
 </div>
@@ -81,7 +81,7 @@ login_header($stylePath);
     <?php if (!empty($errors['errorMessage'])) : ?>
         <div class="alert alert-danger alert-dismissable">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <?= htmlspecialchars($errors['errorMessage']); ?>
+            <?= htmlspecialchars($errors['errorMessage'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>
         </div>
     <?php endif; ?>
 
@@ -99,7 +99,7 @@ login_header($stylePath);
             ?>
             <div class="alert alert-info alert-dismissable">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <?= htmlspecialchars($status_msg); ?>
+                <?= htmlspecialchars($status_msg, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>
             </div>
         <?php endif; ?>
     <?php endif; ?>
@@ -115,7 +115,7 @@ login_header($stylePath);
         <div class="form-group has-feedback">
             <label for="inputLogin">Username or Email Address</label>
             <input type="text" class="form-control" id="inputLogin" name="login" maxlength="186"
-                value="<?= isset($_POST['login']) ? htmlspecialchars($_POST['login']) : htmlspecialchars(get_remembered_username()); ?>"
+                value="<?= isset($_POST['login']) ? htmlspecialchars($_POST['login'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : htmlspecialchars(get_remembered_username(), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>"
                 required autofocus>
             <span class="glyphicon glyphicon-user form-control-feedback"></span>
         </div>

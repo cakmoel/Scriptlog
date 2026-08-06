@@ -69,10 +69,11 @@ class ApiController
         // Get request data based on method
         $this->requestData = $this->getRequestData();
 
-        // Attempt authentication (can be overridden in child controllers)
-        if ($this->requiresAuth) {
-            $this->authenticate();
-        }
+        // Attempt authentication (also runs for public controllers so that
+        // API-key/Bearer identity is available to actions that guard with
+        // hasPermission(); authenticate() only enforces 401/CSRF when
+        // requiresAuth is true)
+        $this->authenticate();
     }
 
     /**
@@ -371,9 +372,9 @@ class ApiController
         $hateoas = new ApiHateoas();
 
         $apiInfo = [
-            'name' => 'Blogware RESTful API',
+            'name' => 'Scriptlog RESTful API',
             'version' => '1.1.0',
-            'description' => 'RESTful API for Blogware content management system',
+            'description' => 'RESTful API for Blog engine',
             'base_url' => '/api/v1',
             'authentication' => [
                 'type' => 'API Key or Bearer Token',
@@ -438,6 +439,6 @@ class ApiController
             ]
         ];
 
-        ApiResponse::success($apiInfo, 200, 'Welcome to Blogware RESTful API', $hateoas->rootLinks());
+        ApiResponse::success($apiInfo, 200, 'Welcome to Scriptlog RESTful API', $hateoas->rootLinks());
     }
 }

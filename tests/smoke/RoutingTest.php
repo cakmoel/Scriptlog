@@ -19,6 +19,12 @@ class RoutingTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         self::$baseUrl = getenv('TEST_BASE_URL') ?: 'http://blogware.site';
+
+        if (!getenv('TEST_BASE_URL')) {
+            self::markTestSkipped(
+                'Smoke routing tests require a deployed application; set TEST_BASE_URL to enable them.'
+            );
+        }
     }
 
     public function testHomePageReturns200(): void

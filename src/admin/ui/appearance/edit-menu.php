@@ -63,7 +63,7 @@ $menu_id = (isset($menuData['ID'])) ? safe_html((int)$menuData['ID']) : 0;
 <div class="form-group">
 <label for="menu_url">Link</label>
 <input type="text" class="form-control" id="menu_url" name="menu_link" placeholder="ex:about-us" value="
-<?=(isset($menuData['menu_link'])) ? htmlspecialchars($menuData['menu_link']) : ""; ?>
+<?=(isset($menuData['menu_link'])) ? htmlspecialchars($menuData['menu_link'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : ""; ?>
 <?=(isset($formData['menu_link'])) ? htmlspecialchars($formData['menu_link'], ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") : ""; ?>" >
 <p class="help-block">
 <?php

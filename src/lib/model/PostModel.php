@@ -369,7 +369,8 @@ class PostModel extends BaseModel
         $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, p.post_title,
                p.post_slug, p.post_content, p.post_summary,
                p.post_keyword, p.post_sticky,
-               p.post_type, p.post_status, u.user_login, u.user_fullname
+               p.post_type, p.post_status, u.user_login, u.user_fullname,
+               (SELECT COUNT(c.ID) FROM " . $this->table('tbl_comments') . " c WHERE c.comment_post_id = p.ID AND c.comment_status = 'approved') AS total_comments
             FROM tbl_posts AS p
             INNER JOIN tbl_users AS u ON p.post_author = u.ID
             WHERE p.post_type = 'blog' 

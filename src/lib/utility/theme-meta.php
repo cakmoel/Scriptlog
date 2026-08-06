@@ -72,7 +72,8 @@ function metatag_by_path(string $scriptlog_image, string $scriptlog_imgthumb, $u
     switch ($uri->matched) {
         case 'post':
             if (!empty($uri->param1)) {
-                $read_post = class_exists('FrontHelper') ? (array) FrontHelper::grabPreparedFrontPostById((int)$uri->param1) : array();
+                $frontService = function_exists('front_service') ? front_service() : null;
+                $read_post = $frontService ? (array) $frontService->getPublishedPost((int)$uri->param1) : array();
                 if (!empty($read_post)) {
                     $post_id = (!empty($read_post['ID'])) ? abs((int)$read_post['ID']) : null;
                     $post_title = (!empty($read_post['post_title'])) ? escape_html($read_post['post_title']) : "";
@@ -93,7 +94,8 @@ function metatag_by_path(string $scriptlog_image, string $scriptlog_imgthumb, $u
             $date_modified = date(DATE_ATOM);
 
             if (!empty($uri->param1)) {
-                $read_page = (array) FrontHelper::grabPreparedFrontPageBySlug($uri->param1);
+                $frontService = function_exists('front_service') ? front_service() : null;
+                $read_page = $frontService ? (array) $frontService->getPublishedPage($uri->param1) : array();
                 if (!empty($read_page)) {
                     $page_id = (!empty($read_page['ID'])) ? abs((int)$read_page['ID']) : null;
                     $page_title = (!empty($read_page['post_title'])) ? escape_html($read_page['post_title']) : "";
@@ -126,7 +128,8 @@ function metatag_by_path(string $scriptlog_image, string $scriptlog_imgthumb, $u
             $date_modified = date(DATE_ATOM);
 
             if (!empty($uri->param1)) {
-                $read_topic = (array) FrontHelper::grabPreparedFrontTopicBySlug($uri->param1);
+                $frontService = function_exists('front_service') ? front_service() : null;
+                $read_topic = $frontService ? (array) $frontService->getPublishedTopic($uri->param1) : array();
                 if (!empty($read_topic)) {
                     $topic_id = (!empty($read_topic['ID'])) ? abs((int)$read_topic['ID']) : null;
                     $topic_title = (!empty($read_topic['topic_title'])) ? escape_html($read_topic['topic_title']) : app_info()['site_name'];
@@ -200,7 +203,8 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb): 
                 http_response_code(404);
                 throw new InvalidArgumentException("Argument passed must be of the type string, numeric or integer, null given");
             } else {
-                $read_post = class_exists('FrontHelper') ? (array) FrontHelper::grabSimpleFrontPost((int)$value) : array();
+                $frontService = function_exists('front_service') ? front_service() : null;
+                $read_post = $frontService ? (array) $frontService->getSimplePost((int)$value) : array();
 
                 // Handle case when post is not found (null returned)
                 if (empty($read_post)) {
@@ -230,7 +234,8 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb): 
                 http_response_code(404);
                 throw new InvalidArgumentException("Argument passed must be of the type string, numeric or integer, null given");
             } else {
-                $read_page = class_exists('FrontHelper') ? (array) FrontHelper::grabSimpleFrontPage((int)$value) : array();
+                $frontService = function_exists('front_service') ? front_service() : null;
+                $read_page = $frontService ? (array) $frontService->getSimplePage((int)$value) : array();
 
                 $page_id = (!empty($read_page['ID'])) ? $read_page['ID'] : null;
                 $page_title = (!empty($read_page['post_title'])) ? escape_html($read_page['post_title']) : "";
@@ -254,7 +259,8 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb): 
                 http_response_code(404);
                 throw new InvalidArgumentException("Argument passed must be of the type string, numeric or integer, null given");
             } else {
-                $read_category = class_exists('FrontHelper') ? (array) FrontHelper::grabSimpleFrontTopic((int)$value) : array();
+                $frontService = function_exists('front_service') ? front_service() : null;
+                $read_category = $frontService ? (array) $frontService->getSimpleTopic((int)$value) : array();
 
                 $category_id = (!empty($read_category['ID'])) ? $read_category['ID'] : null;
                 $category_title = (!empty($read_category['topic_title'])) ? escape_html($read_category['topic_title']) : app_info()['site_name'];
@@ -301,17 +307,18 @@ function metatag_by_query($key, $value, $scriptlog_image, $scriptlog_imgthumb): 
                 $tag_requested = class_exists('HandleRequest') ? (isset($qs_tag['value']) ? (string) $qs_tag['value'] : '') : escape_html($value);
 
                 // Get tag data - can be empty array if no results or error
-                $tag = class_exists('FrontHelper') ? FrontHelper::simpleSearchingTag($tag_requested) : "";
+                $frontService = function_exists('front_service') ? front_service() : null;
+                $tag = $frontService ? $frontService->searchTag($tag_requested) : "";
 
                 // Handle both empty array and proper result
-                $tag_id = (!empty($tag) && is_array($tag) && isset($tag['ID'])) ? intval($tag['ID']) : null;
+                $tag_id = isset($tag['ID']) ? intval($tag['ID']) : null;
                 $tag_title = !empty($tag_requested) ? $tag_requested : null;
 
                 // Ensure description and keyword are never null - use fallback values
-                $description = (!empty($tag) && is_array($tag) && isset($tag['post_content']))
-                    ? html_entity_decode(paragraph_l2br(htmlout($tag['post_content'])))
+                $description = isset($tag['post_content'])
+                    ? html_entity_decode(paragraph_l2br(htmlout($tag['post_content'])), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401)
                     : app_info()['site_description'];
-                $keyword = (!empty($tag) && is_array($tag) && isset($tag['post_summary']))
+                $keyword = isset($tag['post_summary'])
                     ? htmlout($tag['post_summary'])
                     : app_info()['site_keywords'];
 

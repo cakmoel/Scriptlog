@@ -18,6 +18,8 @@ class TranslationsApiController extends ApiController
 
     public function __construct()
     {
+        $this->requiresAuth = false;
+
         parent::__construct();
         $this->translationService = new TranslationService();
         $this->languageService = new LanguageService();
@@ -26,8 +28,6 @@ class TranslationsApiController extends ApiController
 
     public function index($params = []): void
     {
-        $this->requiresAuth = false;
-
         $langCode = isset($params['code']) ? $params['code'] : 'en';
 
         $pagination = $this->getPagination($_GET);
@@ -52,8 +52,6 @@ class TranslationsApiController extends ApiController
 
     public function show($params = []): void
     {
-        $this->requiresAuth = false;
-
         $langCode = isset($params['code']) ? $params['code'] : 'en';
         $key = isset($params['key']) ? $params['key'] : '';
 
@@ -171,8 +169,6 @@ class TranslationsApiController extends ApiController
 
     public function export($params = []): void
     {
-        $this->requiresAuth = false;
-
         $langCode = isset($params['code']) ? $params['code'] : 'en';
 
         try {

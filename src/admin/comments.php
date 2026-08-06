@@ -2,7 +2,7 @@
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
-$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
+$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action']), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "";
 $commentId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $commentDao = class_exists('CommentDao') ? new CommentDao() : "";
 $commentService = class_exists('CommentService') ? new CommentService($commentDao, $app->validator, $app->sanitizer) : "";

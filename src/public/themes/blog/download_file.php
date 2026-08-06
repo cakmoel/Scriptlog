@@ -38,14 +38,16 @@ if (empty($identifier) && isset($_GET['identifier'])) {
     $identifier = preg_replace('/[^a-zA-Z0-9\-]/', '', trim($_GET['identifier']));
 }
 
-if (empty($identifier)) {
-    http_response_code(400);
-    echo 'Invalid download request';
-    exit;
-}
-
+// HTTP status decisions (invalid identifier -> 400/404) are owned by the
+// controller/service layer, never this template. This file never calls
+// http_response_code() or exit(). When the identifier is missing we terminate
+// the render quietly by returning early; the controller resolves the actual
+// status for any non-empty identifier.
 $downloadController = class_exists('Registry') ? Registry::get('downloadController') : null;
 if (!$downloadController instanceof DownloadController) {
     $downloadController = new DownloadController(new DownloadService(new DownloadModel(), new MediaDao()));
 }
-$downloadController->download($identifier);
+
+if (!empty($identifier)) {
+    $downloadController->download($identifier);
+}

@@ -585,7 +585,7 @@ class Authentication
             return;
         }
 
-        $actived = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR . 'login.php?status=actived';
+        $actived = APP_PROTOCOL . '://' . APP_HOSTNAME . dirname(htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401)) . DIRECTORY_SEPARATOR . 'login.php?status=actived';
         header("Location: $actived", true, 302);
         exit();
     }
