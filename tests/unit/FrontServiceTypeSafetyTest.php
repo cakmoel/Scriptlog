@@ -4,12 +4,14 @@ use PHPUnit\Framework\TestCase;
 
 class FrontServiceTypeSafetyTest extends TestCase
 {
-    public function testGetGalleriesQueryUsesNonCastedParams(): void
+    public function testGetGalleriesQueryUsesCastedParams(): void
     {
         $source = file_get_contents(__DIR__ . '/../../src/lib/service/FrontService.php');
 
-        $this->assertStringContainsString('$dbc->dbQuery($sql, [$start, $limit])', $source);
-        $this->assertStringNotContainsString('(int)$start, (int)$limit', $source);
+        // LIMIT/OFFSET values are int-cast before interpolation to prevent SQL injection.
+        $this->assertStringContainsString('(int)$start', $source);
+        $this->assertStringContainsString('(int)$limit', $source);
+        $this->assertStringContainsString('$dbc->dbQuery($sql)', $source);
     }
 
     public function testGetGalleriesMethodExists(): void
