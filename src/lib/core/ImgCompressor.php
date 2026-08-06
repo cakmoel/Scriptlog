@@ -72,7 +72,9 @@ class ImgCompressor
         }
 
         // image destroy
-        imagedestroy($im);
+        if (PHP_VERSION_ID < 80500) {
+            imagedestroy($im); // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.imagedestroyDeprecated
+        }
 
         // output original image & compressed image
         $im_size = filesize($im_output);
