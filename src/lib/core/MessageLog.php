@@ -204,7 +204,7 @@ MSG;
                 $error = 'Notice';
                 $log = LOG_NOTICE;
                 break;
-            case E_STRICT:
+            case (defined('E_STRICT') ? E_STRICT : 2048): // phpcs:ignore PHPCompatibility.Constants.RemovedConstants.e_strictDeprecated
                 $error = 'Strict';
                 $log = LOG_NOTICE;
                 break;
