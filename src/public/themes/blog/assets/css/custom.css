@@ -15,77 +15,255 @@
     position: relative;
 }
 
+.widget.search .search-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.widget.search .search-icon {
+    position: absolute;
+    inset-inline-start: 14px;
+    color: var(--color-text-soft, #6c757d);
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.widget.search .search-input {
+    width: 100%;
+    padding: 11px 76px 11px 38px; /* physical fallback (LTR) */
+    padding-inline-start: 38px;
+    padding-inline-end: 76px;
+    border: 1px solid var(--color-border, #ddd);
+    border-radius: 999px;
+    font-size: 14px;
+    font-family: var(--font-sans, "Open Sans", sans-serif);
+    color: var(--color-text, #222);
+    background: var(--color-bg, #fff);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.widget.search .search-input::-webkit-search-cancel-button {
+    display: none;
+}
+
+.widget.search .search-input:focus {
+    outline: none;
+    border-color: #379392;
+    box-shadow: 0 0 0 3px rgba(55, 147, 146, 0.18);
+}
+
+.widget.search .search-input::placeholder {
+    color: var(--color-text-soft, #6c757d);
+    opacity: 1;
+}
+
+.widget.search .search-submit {
+    position: absolute;
+    inset-inline-end: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: #379392;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.widget.search .search-submit:hover {
+    background: #2d7776;
+}
+
+.widget.search .search-submit:active {
+    transform: translateY(-50%) scale(0.94);
+}
+
+.widget.search .search-submit:focus-visible,
+.widget.search .search-clear:focus-visible {
+    outline: 2px solid var(--brand-accent, #7fff00);
+    outline-offset: 2px;
+}
+
+.widget.search .search-clear {
+    position: absolute;
+    inset-inline-end: 46px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    color: var(--color-text-soft, #6c757d);
+    cursor: pointer;
+    font-size: 12px;
+    border-radius: 50%;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.widget.search .search-clear:hover {
+    color: #dc3545;
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.widget.search .search-clear[hidden] {
+    display: none;
+}
+
+/* Results dropdown */
 .widget.search .search-results {
     position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-top: none;
+    top: calc(100% + 8px);
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    background: var(--color-bg, #fff);
+    border: 1px solid var(--color-border, #eee);
+    border-radius: 12px;
     max-height: 400px;
     overflow-y: auto;
-    z-index: 1000;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 1050;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
     display: none;
 }
 
 .widget.search .search-results.show {
     display: block;
+    animation: searchDropIn 0.18s ease-out;
+}
+
+@keyframes searchDropIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.widget.search .search-result-count {
+    position: sticky;
+    top: 0;
+    padding: 10px 16px;
+    background: var(--color-bg-soft, #f8f9fa);
+    font-size: 12px;
+    color: var(--color-text-soft, #6c757d);
+    border-bottom: 1px solid var(--color-border, #eee);
+    border-radius: 12px 12px 0 0;
+    z-index: 1;
 }
 
 .widget.search .search-result-item {
-    padding: 12px 15px;
-    border-bottom: 1px solid #eee;
-    transition: background-color 0.2s;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-border, #f0f0f0);
+    transition: background-color 0.15s ease;
 }
 
 .widget.search .search-result-item:last-child {
     border-bottom: none;
 }
 
-.widget.search .search-result-item:hover {
-    background-color: #f8f9fa;
+.widget.search .search-result-item:hover,
+.widget.search .search-result-item:focus-within {
+    background-color: var(--color-bg-soft, #f8f9fa);
 }
 
 .widget.search .search-result-item a {
     display: block;
     text-decoration: none;
+    color: inherit;
 }
 
 .widget.search .search-result-title {
     font-weight: 600;
-    color: #333;
+    color: var(--color-text, #222);
     margin-bottom: 4px;
     font-size: 14px;
+    line-height: 1.35;
+}
+
+.widget.search .search-result-item:hover .search-result-title {
+    color: #379392;
 }
 
 .widget.search .search-result-excerpt {
     font-size: 12px;
-    color: #666;
+    color: var(--color-text-soft, #666);
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+}
+
+.widget.search .search-result-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
 }
 
 .widget.search .search-result-type {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
     font-size: 10px;
-    color: #999;
+    font-weight: 600;
+    color: #379392;
+    background: rgba(55, 147, 146, 0.12);
+    border-radius: 999px;
     text-transform: uppercase;
-    margin-top: 4px;
+    letter-spacing: 0.4px;
+}
+
+.widget.search .search-result-date {
+    font-size: 11px;
+    color: var(--color-text-soft, #999);
+}
+
+.widget.search .search-result-more {
+    padding: 10px 16px;
+    text-align: center;
+    border-top: 1px solid var(--color-border, #eee);
+}
+
+.widget.search .search-result-more a {
+    font-size: 13px;
+    font-weight: 600;
+    color: #379392;
+}
+
+.widget.search .search-result-more a:hover {
+    color: #2d7776;
+    text-decoration: underline;
 }
 
 .widget.search .search-no-results {
-    padding: 15px;
+    padding: 20px 16px;
     text-align: center;
-    color: #666;
+    color: var(--color-text-soft, #666);
     font-size: 14px;
 }
 
 .widget.search .search-loading {
-    padding: 15px;
+    padding: 18px 16px;
     text-align: center;
-    color: #666;
+    color: var(--color-text-soft, #666);
+    font-size: 13px;
+}
+
+.widget.search .search-loading i {
+    margin-inline-end: 6px;
 }
 
 .widget.search .search-error {
@@ -99,42 +277,56 @@
     display: block;
 }
 
-.widget.search .search-result-count {
-    padding: 8px 15px;
-    background-color: #f8f9fa;
-    font-size: 12px;
-    color: #666;
-    border-bottom: 1px solid #eee;
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .widget.search .search-input {
+        background: #222831;
+        border-color: #333;
+        color: #e8e8e8;
+    }
+
+    .widget.search .search-results {
+        background: #1a1a2e;
+        border-color: #333;
+    }
+
+    .widget.search .search-result-count,
+    .widget.search .search-result-more {
+        background: #222831;
+        border-color: #333;
+    }
+
+    .widget.search .search-result-item {
+        border-bottom-color: #333;
+    }
+
+    .widget.search .search-result-item:hover,
+    .widget.search .search-result-item:focus-within {
+        background-color: #222831;
+    }
+
+    .widget.search .search-result-title {
+        color: #e8e8e8;
+    }
 }
 
-.widget.search input[type="search"] {
-    width: 100%;
-    padding: 10px 40px 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    transition: border-color 0.2s;
+/* RTL — logical properties handle flips; keep a physical fallback for the
+   icon/submit positions so old browsers degrade gracefully */
+[dir="rtl"] .widget.search .search-input {
+    padding-inline-start: 38px;
+    padding-inline-end: 76px;
 }
 
-.widget.search input[type="search"]:focus {
-    outline: none;
-    border-color: #007bff;
-}
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .widget.search .search-results.show {
+        animation: none;
+    }
 
-.widget.search button.submit {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-    color: #666;
-}
-
-.widget.search button.submit:hover {
-    color: #007bff;
+    .widget.search .search-submit,
+    .widget.search .search-input {
+        transition: none;
+    }
 }
 
 /* Password Protected Post Styles */
@@ -1074,4 +1266,79 @@
 
 [dir="rtl"] .download-share-label {
     flex-direction: row-reverse;
+}
+
+/* ==========================================================================
+   Design System — custom properties (design tokens)
+   Centralizes color, spacing, typography and focus tokens so templates and
+   the critical inline CSS reference var(--token) instead of hard-coded
+   values (Phase 8 remediation). Brand colors are immutable.
+   ========================================================================== */
+:root {
+    /* Brand (immutable) */
+    --brand-dark: #122430;
+    --brand-accent: #7fff00;
+
+    /* Neutrals */
+    --color-text: #222;
+    --color-text-soft: #6c757d;
+    --color-bg: #ffffff;
+    --color-bg-soft: #f8f9fa;
+    --color-border: #eee;
+
+    /* Typography */
+    --font-sans: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    /* Spacing scale */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 1rem;
+    --space-4: 1.5rem;
+    --space-5: 3rem;
+
+    /* Measure — readable line length for long-form content */
+    --measure: 70ch;
+
+    /* Focus */
+    --focus-outline: 3px solid var(--brand-accent);
+    --focus-offset: 2px;
+}
+
+/* Readable line length for long-form reading areas */
+.post-body,
+.page-body {
+    max-width: var(--measure);
+}
+
+/* Skip-link uses the logical start edge so RTL stays correct */
+.skip-link {
+    inset-inline-start: 0;
+}
+
+/* Card meta wraps instead of clipping on narrow viewports */
+.post .post-details .post-meta,
+.post .post-footer {
+    flex-wrap: wrap;
+    row-gap: var(--space-2);
+}
+
+/* ==========================================================================
+   Reduced motion — respect prefers-reduced-motion (accessibility)
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* Never hide content behind scroll-reveal placeholders for these users */
+    .wow,
+    .animated {
+        animation: none !important;
+        visibility: visible !important;
+    }
 }
