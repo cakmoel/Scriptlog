@@ -1,14 +1,15 @@
 <?php
 
 namespace Scriptlog\Handler;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
  * Renders the category (topic) archive page.
  *
- * Validates that the requested category exists in the database via
- * FrontHelper before rendering. Returns a 404 response when the
- * category is not found or the helper is unavailable.
+ * Validates that the requested category exists in the database via the
+ * shared FrontService before rendering. Returns a 404 response when the
+ * category is not found or the service is unavailable.
  */
 
 use Scriptlog\Core\HandleRequest;
@@ -45,15 +46,13 @@ class CategoryHandler implements FrontRequestHandler
             return;
         }
 
-        $frontHelper = class_exists('FrontHelper')
-            ? HandleRequest::handleFrontHelper()
-            : null;
+        $frontService = HandleRequest::handleFrontHelper();
 
-        if (!$frontHelper || !method_exists($frontHelper, 'grabSimpleFrontTopic')) {
+        if (!$frontService || !method_exists($frontService, 'getSimpleTopic')) {
             $this->renderer->render404();
             return;
         }
-        $topic = $frontHelper->grabSimpleFrontTopic($id);
+        $topic = $frontService->getSimpleTopic($id);
         if (empty($topic['ID'])) {
             $this->renderer->render404();
             return;

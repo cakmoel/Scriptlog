@@ -2,77 +2,25 @@
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
-$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
+$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action']), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "";
 $topicId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $topicDao = class_exists('TopicDao') ? new TopicDao() : "";
 $topicService = class_exists('TopicService') ? new TopicService($topicDao, $app->validator, $app->sanitizer) : "";
 $topicController = class_exists('TopicController') ? new TopicController($topicService) : "";
 
 try {
-    switch ($action) {
-        case ActionConst::NEWTOPIC:
-            if (false === $app->authenticator->userAccessControl(ActionConst::TOPICS)) {
-                direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
-            } else {
-                if ((!check_integer($topicId)) && (gettype($topicId) != "integer")) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                    header("Status: 400 Bad Request");
-                    throw new AppException("Invalid ID data type");
-                }
+    $actionKey = empty($action) ? 'default_topic' : $action;
 
-                if ($topicId == 0) {
-                    $topicController->insert();
-                } else {
-                    direct_page('index.php?load=dashboard', 302);
-                }
-            }
-
-            break;
-
-        case ActionConst::EDITTOPIC:
-            if (false === $app->authenticator->userAccessControl(ActionConst::TOPICS)) {
-                direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
-            } else {
-                if ((!check_integer($topicId)) && (gettype($topicId) !== "integer")) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                    header("Status: 400 Bad Request");
-                    throw new AppException("Invalid ID data type");
-                }
-
-                if ($topicDao->checkTopicId($topicId, $app->sanitizer)) {
-                    $topicController->update((int)$topicId);
-                } else {
-                    direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
-                }
-            }
-
-            break;
-
-        case ActionConst::DELETETOPIC:
-            if ((!check_integer($topicId)) && (gettype($topicId) !== "integer")) {
-                header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                header("Status: 400 Bad Request");
-                throw new AppException("Invalid ID data type");
-            }
-
-            if (false === $app->authenticator->userAccessControl(ActionConst::TOPICS)) {
-                direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
-            } else {
-                if ($topicDao->checkTopicId($topicId, $app->sanitizer)) {
-                    $topicController->remove((int)$topicId);
-                } else {
-                    direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
-                }
-            }
-
-            break;
-
-        default:
-            if (false === $app->authenticator->userAccessControl(ActionConst::TOPICS)) {
-                direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
-            } else {
-                $topicController->listItems();
-            }
+    if ($app->adminActionRegistry && $app->adminActionRegistry->has($actionKey)) {
+        $app->adminActionRegistry->execute($actionKey, [
+            'app' => $app,
+            'id' => $topicId,
+            'topicDao' => $topicDao,
+            'topicService' => $topicService,
+            'topicController' => $topicController,
+        ]);
+    } else {
+        direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
     }
 } catch (\Throwable $th) {
     if (class_exists('LogError')) {

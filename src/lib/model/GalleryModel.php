@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Model;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**

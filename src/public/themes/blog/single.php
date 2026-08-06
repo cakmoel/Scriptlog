@@ -1,4 +1,5 @@
 <?php
+defined('SCRIPTLOG') || die('Direct access not permitted');
 
 // Retrieve post based on permalink settings
 // SEO-friendly URLs: /post/{id}/slug -> request_path()->param1
@@ -6,27 +7,18 @@
 $retrieve_post = (rewrite_status() == 'yes') ? retrieve_detail_post(request_path()->param1) : 
 retrieve_detail_post(HandleRequest::isQueryStringRequested()['value']);
 
-// ====== ADD THIS VALIDATION ======
-// Check if post exists and has a valid ID
-if (empty($retrieve_post) || !is_array($retrieve_post) || !isset($retrieve_post['ID']) || (int)$retrieve_post['ID'] <= 0) {
-    // Log for debugging
-    error_log("Single.php: Post not found. ID passed: " . print_r([
-        'param1' => request_path()->param1 ?? 'not set',
-        'query_value' => HandleRequest::isQueryStringRequested()['value'] ?? 'not set'
-    ], true));
-    
-    // Show 404
-    http_response_code(404);
-    // Option 1: Include a 404 template
-    if (file_exists(dirname(__FILE__) . '/404.php')) {
-        include_once(dirname(__FILE__) . '/404.php');
-    } else {
-        echo "<h1>404 - Post Not Found</h1>";
-        echo "<p>The requested post does not exist.</p>";
-    }
-    exit;
+// Content-existence validation is owned by the Dispatcher (validateContentExists).
+// When the resolved post is empty we render an empty body WITHOUT setting HTTP
+// status codes or terminating the request, so the header/footer pipeline is never
+// corrupted. This template never calls http_response_code() or exit().
+$has_post = is_array($retrieve_post)
+    && isset($retrieve_post['ID'])
+    && (int)$retrieve_post['ID'] > 0;
+
+if (!$has_post) {
+    echo '<div class="container"><p>Post not found.</p></div>';
+    return;
 }
-// ====== END VALIDATION ======
 
 // Set default values for all post variables
 $post_author = '';
@@ -41,73 +33,42 @@ $comment_permit = 'closed';
 
 
 $post_id = isset($retrieve_post['ID']) ? intval((int)$retrieve_post['ID']) : 0;
-$post_img = isset($retrieve_post['media_filename']) ? htmlout($retrieve_post['media_filename']) : "";
-$img_alt = isset($retrieve_post['media_caption']) ? htmlout($retrieve_post['media_caption']) : "";
-$post_title = isset($retrieve_post['post_title']) ? htmlout($retrieve_post['post_title']) : "";
-$post_slug = isset($retrieve_post['post_slug']) ? htmlout($retrieve_post['post_slug']) : "";
+$post_img = isset($retrieve_post['media_filename']) ? theme_escape_html($retrieve_post['media_filename']) : "";
+$img_alt = isset($retrieve_post['media_caption']) ? theme_escape_html($retrieve_post['media_caption']) : "";
+$post_title = isset($retrieve_post['post_title']) ? theme_escape_html($retrieve_post['post_title']) : "";
+$post_slug = isset($retrieve_post['post_slug']) ? theme_escape_html($retrieve_post['post_slug']) : "";
 $post_content = '';
 $post_visibility = isset($retrieve_post['post_visibility']) ? $retrieve_post['post_visibility'] : 'public';
-$comment_permit = isset($retrieve_post['comment_permit']) ? htmlout($retrieve_post['comment_permit']) : "";
+$comment_permit = isset($retrieve_post['comment_permit']) ? theme_escape_html($retrieve_post['comment_permit']) : "";
 $comment_data = total_comment($post_id);
 $total_comment = (!empty($post_id) && !empty($comment_data['total'])) ? (int)$comment_data['total'] : 0;
 
-$is_unlocked = false;
+// Protected/public content resolution is owned by ProtectedPostService
+// (decryption, double html_entity_decode, style strip, htmLawed sanitize).
+$protectedPostService = class_exists('ProtectedPostService')
+    ? new ProtectedPostService()
+    : null;
+$post_render = ($protectedPostService instanceof ProtectedPostService)
+    ? $protectedPostService->resolve($retrieve_post, isset($_SESSION['unlocked_posts']) && is_array($_SESSION['unlocked_posts']) ? $_SESSION['unlocked_posts'] : [])
+    : ['id' => $post_id, 'is_protected' => ($post_visibility === 'protected'), 'is_unlocked' => false, 'show_password_form' => ($post_visibility === 'protected'), 'content' => ''];
 
-// --- Protected Post Logic ---
-if ($post_visibility === 'protected' && !empty($post_id)) {
-    if (isset($_SESSION['unlocked_posts']) && isset($_SESSION['unlocked_posts'][$post_id])) {
-        $is_unlocked = true;
-    }
-
-    // Only attempt processing if we have decrypted content and the key exists
-    if ($is_unlocked && isset($_SESSION['unlocked_posts'][$post_id])) {
-        $decrypted_content = decrypt_post($post_id, $_SESSION['unlocked_posts'][$post_id]);
-
-        if (isset($decrypted_content['post_content'])) {
-            $decoded_content = html_entity_decode($decrypted_content['post_content'], ENT_QUOTES, 'UTF-8');
-            $decoded_content = html_entity_decode($decoded_content, ENT_QUOTES, 'UTF-8');
-            $clean_content = preg_replace('/\s*style="[^"]*"/', '', $decoded_content);
-            $clean_content = preg_replace('/\s*style=[^>\s]*/', '', $clean_content);
-            $post_content = htmLawed($clean_content, array(
-                'deny_attribute' => 'style,onclick,onerror,onload,onmouseover,onfocus,onblur,onchange,onsubmit,onkeydown,onkeyup,onkeypress',
-                'keep_bad' => 0
-            ));
-        }
-    }
-}
-
-// --- Public Post Logic ---
-if ($post_visibility !== 'protected') {
-
-    // FIX: Check if the key exists BEFORE trying to decode it
-    if (isset($retrieve_post['post_content'])) {
-        $decoded_content = html_entity_decode($retrieve_post['post_content'], ENT_QUOTES, 'UTF-8');
-        $decoded_content = html_entity_decode($decoded_content, ENT_QUOTES, 'UTF-8');
-        $clean_content = preg_replace('/\s*style="[^"]*"/', '', $decoded_content);
-        $clean_content = preg_replace('/\s*style=[^>\s]*/', '', $clean_content);
-        $post_content = htmLawed($clean_content, array(
-            'deny_attribute' => 'style,onclick,onerror,onload,onmouseover,onfocus,onblur,onchange,onsubmit,onkeydown,onkeyup,onkeypress',
-            'keep_bad' => 0
-        ));
-    } else {
-        $post_content = "Content not found";
-    }
-}
+$post_content = $post_render['content'];
+$show_password_form = $post_render['show_password_form'];
 
 if (isset($retrieve_post['user_fullname'])) {
-    $post_author = htmlout($retrieve_post['user_fullname']);
+    $post_author = theme_escape_html($retrieve_post['user_fullname']);
 }
 
 if (isset($retrieve_post['user_login'])) {
-    $post_author = htmlout($retrieve_post['user_login']);
+    $post_author = theme_escape_html($retrieve_post['user_login']);
 }
 
 if (isset($retrieve_post['post_date'])) {
-    $post_created = htmlout(make_date($retrieve_post['post_date']));
+    $post_created = theme_escape_html(make_date($retrieve_post['post_date']));
 }
 
 if (isset($retrieve_post['post_modified'])) {
-    $post_created = htmlout(make_date($retrieve_post['post_modified']));
+    $post_created = theme_escape_html(make_date($retrieve_post['post_modified']));
 }
 
 ?>
@@ -139,7 +100,7 @@ if (isset($retrieve_post['post_modified'])) {
                             </div>
                         </div>
                         <div class="post-body">
-                            <?php if ($post_visibility === 'protected' && !$is_unlocked) : ?>
+                            <?php if ($show_password_form) : ?>
                                 <div class="password-protected-post text-center py-5" id="password-protected-<?= $post_id; ?>">
                                     <div class="lock-icon mb-3">
                                         <i class="fa fa-lock fa-3x text-muted" aria-hidden="true"></i>

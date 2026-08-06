@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -25,6 +26,42 @@ use Scriptlog\Dao\PostDao;
 use Scriptlog\Dao\TopicDao;
 use Scriptlog\Dao\UserDao;
 use Scriptlog\Dao\UserTokenDao;
+use Scriptlog\Handler\Admin\Comment\DeleteCommentCmd;
+use Scriptlog\Handler\Admin\Comment\EditCommentCmd;
+use Scriptlog\Handler\Admin\Comment\ListCommentsCmd;
+use Scriptlog\Handler\Admin\Topic\DeleteTopicCmd;
+use Scriptlog\Handler\Admin\Topic\EditTopicCmd;
+use Scriptlog\Handler\Admin\Topic\ListTopicsCmd;
+use Scriptlog\Handler\Admin\Topic\NewTopicCmd;
+use Scriptlog\Handler\Admin\Post\DeletePostCmd;
+use Scriptlog\Handler\Admin\Post\EditPostCmd;
+use Scriptlog\Handler\Admin\Post\ListPostsCmd;
+use Scriptlog\Handler\Admin\Post\NewPostCmd;
+use Scriptlog\Handler\Admin\Page\DeletePageCmd;
+use Scriptlog\Handler\Admin\Page\EditPageCmd;
+use Scriptlog\Handler\Admin\Page\ListPagesCmd;
+use Scriptlog\Handler\Admin\Page\NewPageCmd;
+use Scriptlog\Handler\Admin\User\DeleteUserCmd;
+use Scriptlog\Handler\Admin\User\EditUserCmd;
+use Scriptlog\Handler\Admin\User\ListUsersCmd;
+use Scriptlog\Handler\Admin\User\NewUserCmd;
+use Scriptlog\Handler\Admin\Media\DeleteMediaCmd;
+use Scriptlog\Handler\Admin\Media\EditMediaCmd;
+use Scriptlog\Handler\Admin\Media\ListMediaCmd;
+use Scriptlog\Handler\Admin\Media\NewMediaCmd;
+use Scriptlog\Handler\Admin\Plugin\ActivatePluginCmd;
+use Scriptlog\Handler\Admin\Plugin\DeactivatePluginCmd;
+use Scriptlog\Handler\Admin\Plugin\DeletePluginCmd;
+use Scriptlog\Handler\Admin\Plugin\InstallPluginCmd;
+use Scriptlog\Handler\Admin\Plugin\ListPluginsCmd;
+use Scriptlog\Handler\Admin\Theme\ActivateThemeCmd;
+use Scriptlog\Handler\Admin\Theme\DeactivateThemeCmd;
+use Scriptlog\Handler\Admin\Theme\DeleteThemeCmd;
+use Scriptlog\Handler\Admin\Theme\EditThemeCmd;
+use Scriptlog\Handler\Admin\Theme\InstallThemeCmd;
+use Scriptlog\Handler\Admin\Theme\ListThemesCmd;
+use Scriptlog\Handler\Admin\Theme\NewThemeCmd;
+use Scriptlog\Handler\AdminActionRegistry;
 use Scriptlog\Handler\ArchiveHandler;
 use Scriptlog\Handler\BlogHandler;
 use Scriptlog\Handler\CategoryHandler;
@@ -82,7 +119,8 @@ class Bootstrap
         'frontService',
         'postDao',
         'pageDao',
-        'topicDao'
+        'topicDao',
+        'adminActionRegistry'
     ];
 
     /**
@@ -180,19 +218,28 @@ class Bootstrap
             HandleRequest::setThemeRenderer($themeRenderer);
         }
 
-        $frontService = self::createFrontService();
-
         list($mediaDao, $downloadService, $downloadController) = self::createDownloadChain($dbc);
 
         list($postDao, $pageDao, $topicDao) = self::createContentDaos($dbc);
 
         self::storeInRegistry($mediaDao, $downloadService, $downloadController, $postDao, $pageDao, $topicDao);
 
+        // FrontService resolves its DAOs from the Registry at construction time,
+        // so it must be built after the content DAOs are registered above.
+        $frontService = self::createFrontService();
+
+        // Register the shared FrontService in the global Registry so that
+        // HandleRequest::handleFrontHelper() and front_service() can resolve it
+        // at request time (query-string delivery, handlers, theme helpers).
+        class_exists('Registry') ? Registry::set('frontService', $frontService) : null;
+
         $dispatcher = self::createDispatcher($dbc, $themeRenderer);
 
         self::$services = self::buildServiceMap($sessionMaker, $sanitizer, $userDao, $userToken, $validator, $configDao, $configService, $authenticator, $dispatcher, $themeRenderer, $mediaDao, $downloadService, $downloadController, $frontService, $postDao, $pageDao, $topicDao);
 
         self::buildHandlerRegistry($themeRenderer);
+
+        self::buildAdminActionRegistry();
 
         self::initializeI18n();
 
@@ -343,7 +390,7 @@ class Bootstrap
                 FrontHelper::setFrontService($frontService);
             }
             return $frontService;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }
@@ -459,6 +506,143 @@ class Bootstrap
         }
 
         class_exists('Registry') ? Registry::set('handlerRegistry', $handlerRegistry) : null;
+    }
+
+    /**
+     * Build the admin action command registry and register known commands.
+     *
+     * @return void
+     */
+    private static function buildAdminActionRegistry(): void
+    {
+        if (!class_exists('AdminActionRegistry')) {
+            return;
+        }
+
+        $registry = new AdminActionRegistry();
+
+        // Comment commands
+        if (class_exists('EditCommentCmd')) {
+            $registry->register(ActionConst::EDITCOMMENT, new EditCommentCmd());
+        }
+        if (class_exists('DeleteCommentCmd')) {
+            $registry->register(ActionConst::DELETECOMMENT, new DeleteCommentCmd());
+        }
+        if (class_exists('ListCommentsCmd')) {
+            $registry->register('default', new ListCommentsCmd());
+        }
+
+        // Topic commands
+        if (class_exists('NewTopicCmd')) {
+            $registry->register(ActionConst::NEWTOPIC, new NewTopicCmd());
+        }
+        if (class_exists('EditTopicCmd')) {
+            $registry->register(ActionConst::EDITTOPIC, new EditTopicCmd());
+        }
+        if (class_exists('DeleteTopicCmd')) {
+            $registry->register(ActionConst::DELETETOPIC, new DeleteTopicCmd());
+        }
+        if (class_exists('ListTopicsCmd')) {
+            $registry->register('default_topic', new ListTopicsCmd());
+        }
+
+        // Post commands
+        if (class_exists('NewPostCmd')) {
+            $registry->register(ActionConst::NEWPOST, new NewPostCmd());
+        }
+        if (class_exists('EditPostCmd')) {
+            $registry->register(ActionConst::EDITPOST, new EditPostCmd());
+        }
+        if (class_exists('DeletePostCmd')) {
+            $registry->register(ActionConst::DELETEPOST, new DeletePostCmd());
+        }
+        if (class_exists('ListPostsCmd')) {
+            $registry->register('default_post', new ListPostsCmd());
+        }
+
+        // Page commands
+        if (class_exists('NewPageCmd')) {
+            $registry->register(ActionConst::NEWPAGE, new NewPageCmd());
+        }
+        if (class_exists('EditPageCmd')) {
+            $registry->register(ActionConst::EDITPAGE, new EditPageCmd());
+        }
+        if (class_exists('DeletePageCmd')) {
+            $registry->register(ActionConst::DELETEPAGE, new DeletePageCmd());
+        }
+        if (class_exists('ListPagesCmd')) {
+            $registry->register('default_page', new ListPagesCmd());
+        }
+
+        // User commands
+        if (class_exists('NewUserCmd')) {
+            $registry->register(ActionConst::NEWUSER, new NewUserCmd());
+        }
+        if (class_exists('EditUserCmd')) {
+            $registry->register(ActionConst::EDITUSER, new EditUserCmd());
+        }
+        if (class_exists('DeleteUserCmd')) {
+            $registry->register(ActionConst::DELETEUSER, new DeleteUserCmd());
+        }
+        if (class_exists('ListUsersCmd')) {
+            $registry->register('default_user', new ListUsersCmd());
+        }
+
+        // Media commands
+        if (class_exists('NewMediaCmd')) {
+            $registry->register(ActionConst::NEWMEDIA, new NewMediaCmd());
+        }
+        if (class_exists('EditMediaCmd')) {
+            $registry->register(ActionConst::EDITMEDIA, new EditMediaCmd());
+        }
+        if (class_exists('DeleteMediaCmd')) {
+            $registry->register(ActionConst::DELETEMEDIA, new DeleteMediaCmd());
+        }
+        if (class_exists('ListMediaCmd')) {
+            $registry->register('default_media', new ListMediaCmd());
+        }
+
+        // Plugin commands
+        if (class_exists('InstallPluginCmd')) {
+            $registry->register(ActionConst::INSTALLPLUGIN, new InstallPluginCmd());
+        }
+        if (class_exists('ActivatePluginCmd')) {
+            $registry->register(ActionConst::ACTIVATEPLUGIN, new ActivatePluginCmd());
+        }
+        if (class_exists('DeactivatePluginCmd')) {
+            $registry->register(ActionConst::DEACTIVATEPLUGIN, new DeactivatePluginCmd());
+        }
+        if (class_exists('DeletePluginCmd')) {
+            $registry->register(ActionConst::DELETEPLUGIN, new DeletePluginCmd());
+        }
+        if (class_exists('ListPluginsCmd')) {
+            $registry->register('default_plugin', new ListPluginsCmd());
+        }
+
+        // Theme commands
+        if (class_exists('NewThemeCmd')) {
+            $registry->register(ActionConst::NEWTHEME, new NewThemeCmd());
+        }
+        if (class_exists('InstallThemeCmd')) {
+            $registry->register(ActionConst::INSTALLTHEME, new InstallThemeCmd());
+        }
+        if (class_exists('EditThemeCmd')) {
+            $registry->register(ActionConst::EDITTHEME, new EditThemeCmd());
+        }
+        if (class_exists('DeleteThemeCmd')) {
+            $registry->register(ActionConst::DELETETHEME, new DeleteThemeCmd());
+        }
+        if (class_exists('ActivateThemeCmd')) {
+            $registry->register(ActionConst::ACTIVATETHEME, new ActivateThemeCmd());
+        }
+        if (class_exists('DeactivateThemeCmd')) {
+            $registry->register(ActionConst::DEACTIVATETHEME, new DeactivateThemeCmd());
+        }
+        if (class_exists('ListThemesCmd')) {
+            $registry->register('default_theme', new ListThemesCmd());
+        }
+
+        self::$services['adminActionRegistry'] = $registry;
     }
 
     private static function initializeI18n(): void

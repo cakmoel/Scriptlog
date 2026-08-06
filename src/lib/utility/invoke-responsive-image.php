@@ -15,6 +15,7 @@
  * @param string $class
  * @param bool $fetchpriority
  * @param string $decoding
+ * @param string $loading - 'lazy'|'eager'|'auto' (no attribute when 'auto')
  * @return string
  */
 function invoke_responsive_image(
@@ -24,7 +25,8 @@ function invoke_responsive_image(
     $alt = '',
     $class = 'img-fluid',
     $fetchpriority = false,
-    $decoding = 'auto'
+    $decoding = 'auto',
+    $loading = 'auto'
 ) {
 
     if (empty($media_filename) || $media_filename === 'nophoto') {
@@ -45,6 +47,9 @@ function invoke_responsive_image(
     $height = $size_info['height'];
     $prefix = $size_info['prefix'];
     $folder = $size_info['folder'];
+
+    // Loading attribute - only emitted for explicit lazy/eager values
+    $loading_attr = ($loading === 'lazy' || $loading === 'eager') ? ' loading="' . $loading . '"' : '';
 
     // Paths to check - using APP_IMAGE constants
     $base_path = __DIR__ . '/../../' . APP_IMAGE;
@@ -73,10 +78,10 @@ function invoke_responsive_image(
     if ($has_webp) {
         return '<picture>
             <source srcset="' . $webp_src . '" type="image/webp">
-            <img src="' . $image_src . '" alt="' . htmlout($alt) . '" width="' . $width . '" height="' . $height . '" class="' . htmlout($class) . '" decoding="' . htmlout($decoding) . '"' . $fetchpriority_attr . '>
+            <img src="' . $image_src . '" alt="' . htmlout($alt) . '" width="' . $width . '" height="' . $height . '" class="' . htmlout($class) . '" decoding="' . htmlout($decoding) . '"' . $loading_attr . $fetchpriority_attr . '>
         </picture>';
     } else {
-        return '<img src="' . $image_src . '" alt="' . htmlout($alt) . '" width="' . $width . '" height="' . $height . '" class="' . htmlout($class) . '" decoding="' . htmlout($decoding) . '"' . $fetchpriority_attr . '>';
+        return '<img src="' . $image_src . '" alt="' . htmlout($alt) . '" width="' . $width . '" height="' . $height . '" class="' . htmlout($class) . '" decoding="' . htmlout($decoding) . '"' . $loading_attr . $fetchpriority_attr . '>';
     }
 }
 

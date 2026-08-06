@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -278,7 +279,9 @@ class Resize
         }
 
         if (is_resource($this->imageResized)) {
-            imagedestroy($this->imageResized);
+            if (PHP_VERSION_ID < 80500) {
+                imagedestroy($this->imageResized); // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.imagedestroyDeprecated
+            }
         }
     }
 

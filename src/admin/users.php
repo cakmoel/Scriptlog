@@ -2,85 +2,26 @@
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
-$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
+$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action']), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "";
 $userId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $sessionId = isset($_GET['sessionId']) ? safe_html($_GET['sessionId']) : null;
 $userService = class_exists('UserService') ? new UserService($app->userDao, $app->validator, $app->userToken, $app->sanitizer) : "";
 $userController = class_exists('UserController') ? new UserController($userService) : "";
 
 try {
-    switch ($action) {
-        case ActionConst::NEWUSER:
-            if (false === $app->authenticator->userAccessControl(ActionConst::USERS)) {
-                direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
-            } else {
-                if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                    header("Status: 400 Bad Request");
-                    throw new AppException("invalid ID data type!");
-                }
+    $actionKey = empty($action) ? 'default_user' : $action;
 
-                if ($userId === 0) {
-                    $userController->insert();
-                } else {
-                    direct_page('index.php?load=dashboard', 302);
-                }
-            }
-
-            break;
-
-        case ActionConst::EDITUSER:
-            if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
-                header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                header("Status: 400 Bad Request");
-                throw new AppException("Invalid ID data type!");
-            }
-
-            if (!$app->userDao->checkUserId($userId, $app->sanitizer)) {
-                if (false === $app->authenticator->userAccessControl(ActionConst::USERS)) {
-                    direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
-                } else {
-                    direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
-                }
-            } else {
-                if (false === $app->authenticator->userAccessControl(ActionConst::USERS)) {
-                    $userController->updateProfile($user_login);
-                } else {
-                    $userController->update((int)$userId);
-                }
-            }
-
-            break;
-
-        case ActionConst::DELETEUSER:
-            if ((!check_integer($userId)) && (gettype($userId) !== "integer")) {
-                header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request", true, 400);
-                header("Status: 400 Bad Request");
-                throw new AppException("Invalid ID data type!");
-            }
-
-            if (!$app->userDao->checkUserId($userId, $app->sanitizer)) {
-                if (false === $app->authenticator->userAccessControl(ActionConst::USERS)) {
-                    direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
-                } else {
-                    direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
-                }
-            } else {
-                if (false === $app->authenticator->userAccessControl(ActionConst::USERS)) {
-                    $userController->removeProfile($user_login, $app->authenticator);
-                } else {
-                    $userController->remove((int)$userId);
-                }
-            }
-
-            break;
-
-        default:
-            if (false === $app->authenticator->userAccessControl(ActionConst::USERS)) {
-                $userController->showProfile($user_login);
-            } else {
-                $userController->listItems();
-            }
+    if ($app->adminActionRegistry && $app->adminActionRegistry->has($actionKey)) {
+        $app->adminActionRegistry->execute($actionKey, [
+            'app' => $app,
+            'id' => $userId,
+            'sessionId' => $sessionId,
+            'userLogin' => $user_login ?? '',
+            'userService' => $userService,
+            'userController' => $userController,
+        ]);
+    } else {
+        direct_page('index.php?load=404&notfound=' . notfound_id(), 404);
     }
 } catch (\Throwable $th) {
     if (class_exists('LogError')) {

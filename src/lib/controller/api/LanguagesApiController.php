@@ -1,9 +1,11 @@
 <?php
 
 namespace Scriptlog\Controller\Api;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 use Scriptlog\Controller\ApiController;
+use Scriptlog\Core\ApiHateoas;
 use Scriptlog\Core\ApiResponse;
 use Scriptlog\Service\LanguageService;
 
@@ -11,19 +13,33 @@ class LanguagesApiController extends ApiController
 {
     private $languageService;
 
+    private $hateoas;
+
     public function __construct()
     {
+        $this->requiresAuth = false;
+
         parent::__construct();
         $this->languageService = new LanguageService();
+        $this->hateoas = new ApiHateoas();
     }
 
     public function index($_params = []): void
     {
-        $this->requiresAuth = false;
-
         try {
             $languages = $this->languageService->getActiveLanguages();
-            ApiResponse::success($languages);
+            $pagination = $this->getPagination($_GET);
+
+            $total = count($languages);
+            $offset = $pagination['offset'];
+            $perPage = $pagination['per_page'];
+            $page = $pagination['page'];
+
+            $paginated = array_slice($languages, $offset, $perPage);
+
+            $links = $this->hateoas->paginationLinks('languages', $page, $perPage, $total);
+
+            ApiResponse::paginated($paginated, $page, $perPage, $total, $links);
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -31,9 +47,7 @@ class LanguagesApiController extends ApiController
 
     public function show($params = []): void
     {
-        $this->requiresAuth = false;
-
-        $code = isset($params[0]) ? $params[0] : '';
+        $code = isset($params['code']) ? $params['code'] : '';
 
         if (empty($code)) {
             ApiResponse::badRequest('Language code is required');
@@ -48,7 +62,7 @@ class LanguagesApiController extends ApiController
                 return;
             }
 
-            ApiResponse::success($language);
+            ApiResponse::success($language, 200, null, $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -56,8 +70,6 @@ class LanguagesApiController extends ApiController
 
     public function default($_params = []): void
     {
-        $this->requiresAuth = false;
-
         try {
             $language = $this->languageService->getDefaultLanguage();
 
@@ -66,7 +78,7 @@ class LanguagesApiController extends ApiController
                 return;
             }
 
-            ApiResponse::success($language);
+            ApiResponse::success($language, 200, null, $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -99,7 +111,7 @@ class LanguagesApiController extends ApiController
                 'lang_is_default' => !empty($this->requestData['lang_is_default']) ? 1 : 0,
             ]);
 
-            ApiResponse::created(['id' => $id], 'Language created successfully');
+            ApiResponse::created(['id' => $id], 'Language created successfully', $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'CREATE_ERROR');
         }
@@ -114,7 +126,7 @@ class LanguagesApiController extends ApiController
             return;
         }
 
-        $code = isset($params[0]) ? $params[0] : '';
+        $code = isset($params['code']) ? $params['code'] : '';
 
         if (empty($code)) {
             ApiResponse::badRequest('Language code is required');
@@ -130,7 +142,7 @@ class LanguagesApiController extends ApiController
 
         try {
             $this->languageService->updateLanguage($language['ID'], $this->requestData);
-            ApiResponse::success(['id' => $language['ID']], 'Language updated successfully');
+            ApiResponse::success(['id' => $language['ID']], 'Language updated successfully', $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'UPDATE_ERROR');
         }
@@ -145,7 +157,7 @@ class LanguagesApiController extends ApiController
             return;
         }
 
-        $code = isset($params[0]) ? $params[0] : '';
+        $code = isset($params['code']) ? $params['code'] : '';
 
         if (empty($code)) {
             ApiResponse::badRequest('Language code is required');
@@ -161,7 +173,7 @@ class LanguagesApiController extends ApiController
 
         try {
             $this->languageService->deleteLanguage($language['ID']);
-            ApiResponse::success(null, 'Language deleted successfully');
+            ApiResponse::success(null, 'Language deleted successfully', $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'DELETE_ERROR');
         }
@@ -176,7 +188,7 @@ class LanguagesApiController extends ApiController
             return;
         }
 
-        $code = isset($params[0]) ? $params[0] : '';
+        $code = isset($params['code']) ? $params['code'] : '';
 
         if (empty($code)) {
             ApiResponse::badRequest('Language code is required');
@@ -192,7 +204,7 @@ class LanguagesApiController extends ApiController
 
         try {
             $this->languageService->setDefaultLanguage($language['ID']);
-            ApiResponse::success(['id' => $language['ID']], 'Default language set successfully');
+            ApiResponse::success(['id' => $language['ID']], 'Default language set successfully', $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'UPDATE_ERROR');
         }

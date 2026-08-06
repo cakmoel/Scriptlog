@@ -10,14 +10,16 @@
  * which is a good baseline for systems handling interactive logins.
  *
  * @category function
- * @param float $target -- stretching time
+ * @param float $target -- stretching time in seconds
  * @param int $cost 8-10 is a good baseline
  * @see https://www.php.net/manual/en/function.password-hash.php
- * @return numeric
+ * @return int
  *
  */
 function finding_pwd_cost($target, $cost)
 {
+    $target = (float) $target;
+    $cost = (int) $cost;
 
     do {
         $cost++;

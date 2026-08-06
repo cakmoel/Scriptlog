@@ -54,7 +54,7 @@ $comment_id = isset($commentData['ID']) ? (int)$commentData['ID'] : 0;
 <div class="box-body">
 <div class="form-group">
 <label for="comment_author">Author <span class="text-red">*</span></label>
-<input type="text" class="form-control" id="comment_author" name="author_name" placeholder="Enter author name" value="<?=(isset($commentData['comment_author_name'])) ? htmlspecialchars($commentData['comment_author_name']) : ""; ?>" required>
+<input type="text" class="form-control" id="comment_author" name="author_name" placeholder="Enter author name" value="<?=(isset($commentData['comment_author_name'])) ? htmlspecialchars($commentData['comment_author_name'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : ""; ?>" required>
 </div>
 
 <div class="form-group">

@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Dao;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -43,6 +44,129 @@ class TopicDao extends Dao
         $topics = $this->findAll([]);
 
         return (empty($topics)) ?: $topics;
+    }
+
+    /**
+     * Find active topics with pagination and post count for API
+     *
+     * @param integer $limit
+     * @param integer $offset
+     * @param string $sortBy
+     * @param string $sortOrder
+     * @return array
+     */
+    public function findActiveTopicsPaginated($limit, $offset, $sortBy = 'ID', $sortOrder = 'DESC')
+    {
+        $allowedColumns = ['ID', 'topic_title', 'topic_slug'];
+        $sortColumn = in_array($sortBy, $allowedColumns) ? $sortBy : 'ID';
+        $sortDir = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
+
+        $sql = "SELECT t.ID, t.topic_title, t.topic_slug, t.topic_status,
+                       (SELECT COUNT(*) FROM tbl_post_topic pt
+                        INNER JOIN tbl_posts p ON pt.post_id = p.ID
+                        WHERE pt.topic_id = t.ID
+                        AND p.post_status = 'publish'
+                        AND p.post_type = 'blog') as post_count
+                FROM tbl_topics t
+                WHERE t.topic_status = 'Y'
+                ORDER BY t.$sortColumn $sortDir
+                LIMIT ? OFFSET ?";
+
+        $this->setSQL($sql);
+        $topics = $this->findAll([(int)$limit, (int)$offset]);
+
+        return empty($topics) ? [] : $topics;
+    }
+
+    /**
+     * Count active topics
+     *
+     * @return integer
+     */
+    public function countActiveTopics()
+    {
+        $sql = "SELECT COUNT(*) as total FROM tbl_topics WHERE topic_status = 'Y'";
+        $this->setSQL($sql);
+        $result = $this->findRow([]);
+        return $result ? (int)$result['total'] : 0;
+    }
+
+    /**
+     * Find a single topic with post count
+     *
+     * @param integer $topicId
+     * @return array|false
+     */
+    public function findTopicWithPostCount($topicId)
+    {
+        $sql = "SELECT t.*,
+                       (SELECT COUNT(*) FROM tbl_post_topic pt
+                        INNER JOIN tbl_posts p ON pt.post_id = p.ID
+                        WHERE pt.topic_id = t.ID
+                        AND p.post_status = 'publish'
+                        AND p.post_type = 'blog') as post_count
+                FROM tbl_topics t
+                WHERE t.ID = ?";
+
+        $this->setSQL($sql);
+        $result = $this->findRow([(int)$topicId]);
+        return empty($result) ? false : $result;
+    }
+
+    /**
+     * Find published posts by topic with pagination
+     *
+     * @param integer $topicId
+     * @param integer $limit
+     * @param integer $offset
+     * @param string $sortBy
+     * @param string $sortOrder
+     * @return array
+     */
+    public function findPostsByTopicPaginated($topicId, $limit, $offset, $sortBy = 'ID', $sortOrder = 'DESC')
+    {
+        $allowedColumns = ['ID', 'post_date', 'post_title', 'post_modified'];
+        $sortColumn = in_array($sortBy, $allowedColumns) ? $sortBy : 'ID';
+        $sortDir = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
+
+        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
+                       p.post_title, p.post_slug, p.post_summary, p.post_status,
+                       p.post_visibility, p.post_tags, p.post_type, p.comment_status,
+                       u.user_login as author_login, u.user_fullname as author_name
+                FROM tbl_posts p
+                INNER JOIN tbl_post_topic pt ON p.ID = pt.post_id
+                LEFT JOIN tbl_users u ON p.post_author = u.ID
+                WHERE pt.topic_id = ?
+                AND p.post_status = 'publish'
+                AND p.post_type = 'blog'
+                AND p.post_visibility = 'public'
+                ORDER BY p.$sortColumn $sortDir
+                LIMIT ? OFFSET ?";
+
+        $this->setSQL($sql);
+        $posts = $this->findAll([(int)$topicId, (int)$limit, (int)$offset]);
+        return empty($posts) ? [] : $posts;
+    }
+
+    /**
+     * Count published posts by topic
+     *
+     * @param integer $topicId
+     * @return integer
+     */
+    public function countPostsByTopic($topicId)
+    {
+        $sql = "SELECT COUNT(*) as total
+                FROM tbl_posts p
+                INNER JOIN tbl_post_topic pt ON p.ID = pt.post_id
+                WHERE pt.topic_id = ?
+                AND p.post_status = 'publish'
+                AND p.post_type = 'blog'
+                AND p.post_visibility = 'public'";
+
+        $this->setSQL($sql);
+        $result = $this->findRow([(int)$topicId]);
+        return $result ? (int)$result['total'] : 0;
     }
 
     /**
@@ -236,11 +360,60 @@ class TopicDao extends Dao
      * @return numeric|int|null
      *
      */
+    /**
+     * Find a topic by slug (for duplicate checking).
+     *
+     * @param string $slug
+     * @return array|false
+     */
+    public function findTopicBySlug($slug)
+    {
+        $sql = "SELECT ID FROM tbl_topics WHERE topic_slug = ?";
+        $this->setSQL($sql);
+        return $this->findRow([$slug]);
+    }
+
+    /**
+     * Insert a topic with the given data and return the new ID.
+     *
+     * @param array $data
+     * @return int
+     */
+    public function insertTopicApi(array $data)
+    {
+        $this->create("tbl_topics", $data);
+        return $this->lastId();
+    }
+
+    /**
+     * Update specific topic fields.
+     *
+     * @param int $topicId
+     * @param array $data
+     * @return void
+     */
+    public function updateTopicApi($topicId, array $data)
+    {
+        $this->modify("tbl_topics", $data, ['ID' => (int)$topicId]);
+    }
+
+    /**
+     * Delete topic relationships then the topic itself.
+     *
+     * @param int $topicId
+     * @return void
+     */
+    public function deleteTopicCascade($topicId)
+    {
+        $this->deleteRecord("tbl_post_topic", ['topic_id' => (int)$topicId]);
+        $this->deleteRecord("tbl_topics", ['ID' => (int)$topicId]);
+    }
+
     public function totalTopicRecords(array $data = []): ?int
     {
         $sql = "SELECT ID FROM tbl_topics";
         $this->setSQL($sql);
-        return $this->checkCountValue($data) ?? 0;
+        return $this->checkCountValue($data);
     }
 
     /**

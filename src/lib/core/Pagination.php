@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -56,7 +57,7 @@ class Pagination
         if ($activePage > 1) {
             $Sebelumnya = $activePage - 1;
             $page_link .= "<span class=disabled><a href=" . escape_html($_SERVER['PHP_SELF']) . "?load=$_GET[load]&order=" . abs((int)1) . ">Awal</a></span>
-			<span class=disabled><a href=" . htmlspecialchars($_SERVER['PHP_SELF']) . "?load=$_GET[load]&order=" . abs((int)$Sebelumnya) . ">Sebelumnya</a></span> ";
+			<span class=disabled><a href=" . htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) . "?load=$_GET[load]&order=" . abs((int)$Sebelumnya) . ">Sebelumnya</a></span> ";
         } else {
             $page_link .= "<span class=disabled> Awal</span>";
         }

@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -13,9 +14,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @since Since Release 1.0
  *
  */
-final
-
-class MessageLog
+final class MessageLog
 {
     private static $display_errors;
 
@@ -205,7 +204,7 @@ MSG;
                 $error = 'Notice';
                 $log = LOG_NOTICE;
                 break;
-            case E_STRICT:
+            case (defined('E_STRICT') ? E_STRICT : 2048): // phpcs:ignore PHPCompatibility.Constants.RemovedConstants.e_strictDeprecated
                 $error = 'Strict';
                 $log = LOG_NOTICE;
                 break;

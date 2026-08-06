@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -84,6 +85,10 @@ class ApiAuth
     /**
      * Authenticate using API Key
      *
+     * Looks up the key in the dedicated tbl_api_keys table and verifies
+     * it against the stored password_hash(). Falls back to direct comparison
+     * for legacy plaintext keys that may exist in tbl_settings.
+     *
      * @param string $apiKey The API key
      * @return bool Authentication success
      */
@@ -95,28 +100,55 @@ class ApiAuth
             return false;
         }
 
-        // Look up API key in database
         try {
             $dbc = Registry::get('dbc');
 
-            $sql = "SELECT u.ID, u.user_login, u.user_email, u.user_level, u.user_banned, u.user_locked_until
-                    FROM tbl_users u
-                    INNER JOIN tbl_settings s ON s.setting_name = 'api_key' AND s.setting_value = ?
-                    WHERE u.ID = s.ID";
+            // Look up user by API key hash in the dedicated table
+            $sql = "SELECT k.user_id, k.key_hash, k.is_revoked,
+                           u.ID, u.user_login, u.user_email, u.user_level,
+                           u.user_banned, u.user_locked_until
+                    FROM tbl_api_keys k
+                    INNER JOIN tbl_users u ON k.user_id = u.ID
+                    WHERE k.is_revoked = 0
+                    AND (k.expires_at IS NULL OR k.expires_at > NOW())
+                    ORDER BY k.id DESC
+                    LIMIT 1";
 
             $stmt = $dbc->prepare($sql);
-            $stmt->execute([$apiKey]);
-            $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-            if ($user && !$user['user_banned'] && self::isAccountLocked($user) === false) {
-                self::$user = $user;
-                self::$authType = self::AUTH_API_KEY;
-                self::$isAuthenticated = true;
+            // Verify the key against each stored hash
+            foreach ($rows as $row) {
+                $isValid = false;
 
-                // Log successful authentication
-                self::logAccess($user['ID'], true);
+                // Try password_verify() first (for hashed keys)
+                if (password_verify($apiKey, $row['key_hash'])) {
+                    $isValid = true;
+                } elseif ($row['key_hash'] === $apiKey) {
+                    // Legacy fallback: direct comparison for plaintext keys
+                    $isValid = true;
+                }
 
-                return true;
+                if (
+                    $isValid
+                    && !$row['user_banned']
+                    && self::isAccountLocked($row) === false
+                ) {
+                    self::$user = $row;
+                    self::$authType = self::AUTH_API_KEY;
+                    self::$isAuthenticated = true;
+
+                    // Update last_used_at
+                    $updateSql = "UPDATE tbl_api_keys SET last_used_at = NOW() WHERE id = ?";
+                    $updateStmt = $dbc->prepare($updateSql);
+                    $updateStmt->execute([$row['id']]);
+
+                    // Log successful authentication
+                    self::logAccess($row['ID'], true);
+
+                    return true;
+                }
             }
 
             self::logAccess(0, false);
@@ -146,7 +178,7 @@ class ApiAuth
 
             // Look up token in user_token table
             $sql = "SELECT u.ID, u.user_login, u.user_email, u.user_level, u.user_banned, u.user_locked_until,
-                           t.expired_date, t.is_expired
+                           t.pwd_hash, t.expired_date, t.is_expired
                     FROM tbl_user_token t
                     INNER JOIN tbl_users u ON t.user_login = u.user_login
                     WHERE t.selector_hash = ? 
@@ -341,7 +373,8 @@ class ApiAuth
 
             // Clean up old login attempts (older than 24 hours)
             $sql = "DELETE FROM tbl_login_attempt WHERE login_date < DATE_SUB(NOW(), INTERVAL 24 HOUR)";
-            $dbc->query($sql);
+            $stmt = $dbc->prepare($sql);
+            $stmt->execute();
         } catch (\Throwable $e) {
             // Silently fail - don't break API for logging issues
         }
@@ -467,37 +500,58 @@ class ApiAuth
     }
 
     /**
+     * Set authenticated user from session-based authentication
+     *
+     * Used by MediaApiController and other admin panel entry points
+     * that authenticate via session/cookie rather than API key/token.
+     *
+     * @param array $userData Must contain 'user_login' and optionally 'user_level'
+     * @param string $authType The authentication type (default: 'session')
+     * @return void
+     */
+    public static function setSessionUser(array $userData, $authType = 'session')
+    {
+        self::$user = $userData;
+        self::$authType = $authType;
+        self::$isAuthenticated = true;
+    }
+
+    /**
+     * Get authenticated user login name
+     *
+     * @return string|null
+     */
+    public static function getUserLogin()
+    {
+        return self::$user['user_login'] ?? null;
+    }
+
+    /**
      * Generate API key for a user
      *
+     * Stores the key hash (bcrypt) in the dedicated tbl_api_keys table
+     * and returns the raw key to the caller for one-time display.
+     *
      * @param int $userId User ID
-     * @return string Generated API key
+     * @param string $description Optional description for the key
+     * @return string Generated API key (plaintext, show once)
      */
-    public static function generateApiKey($userId)
+    public static function generateApiKey($userId, $description = '')
     {
         // Generate a random 32-byte key
         $key = bin2hex(random_bytes(32));
 
-        // Store in settings table (in production, use a separate table)
+        // Hash the key for storage
+        $keyHash = password_hash($key, PASSWORD_BCRYPT);
+
         try {
             $dbc = Registry::get('dbc');
 
-            // Check if user already has an API key
-            $sql = "SELECT ID FROM tbl_settings WHERE setting_name = 'api_key_user_" . (int)$userId . "'";
-            $stmt = $dbc->query($sql);
-            $existing = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-            if ($existing) {
-                // Update existing
-                $sql = "UPDATE tbl_settings SET setting_value = ? WHERE setting_name = 'api_key_user_" . (int)$userId . "'";
-                $stmt = $dbc->prepare($sql);
-                $stmt->execute([$key]);
-                return $key;
-            }
-
-            // Insert new
-            $sql = "INSERT INTO tbl_settings (setting_name, setting_value) VALUES ('api_key_user_" . (int)$userId . "', ?)";
+            // Insert into dedicated api_keys table
+            $sql = "INSERT INTO tbl_api_keys (user_id, key_hash, description, created_at)
+                    VALUES (?, ?, ?, NOW())";
             $stmt = $dbc->prepare($sql);
-            $stmt->execute([$key]);
+            $stmt->execute([(int)$userId, $keyHash, $description]);
 
             return $key;
         } catch (\Throwable $e) {
@@ -506,7 +560,9 @@ class ApiAuth
     }
 
     /**
-     * Revoke API key for a user
+     * Revoke all API keys for a user
+     *
+     * Sets is_revoked = 1 on all active keys for the given user.
      *
      * @param int $userId User ID
      * @return bool Success
@@ -516,9 +572,28 @@ class ApiAuth
         try {
             $dbc = Registry::get('dbc');
 
-            $sql = "DELETE FROM tbl_settings WHERE setting_name = 'api_key_user_" . (int)$userId . "'";
+            $sql = "UPDATE tbl_api_keys SET is_revoked = 1, expires_at = NOW() WHERE user_id = ? AND is_revoked = 0";
             $stmt = $dbc->prepare($sql);
-            return $stmt->execute();
+            return $stmt->execute([(int)$userId]);
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Revoke a specific API key by ID
+     *
+     * @param int $keyId The API key ID
+     * @return bool Success
+     */
+    public static function revokeApiKeyById($keyId)
+    {
+        try {
+            $dbc = Registry::get('dbc');
+
+            $sql = "UPDATE tbl_api_keys SET is_revoked = 1, expires_at = NOW() WHERE id = ? AND is_revoked = 0";
+            $stmt = $dbc->prepare($sql);
+            return $stmt->execute([(int)$keyId]);
         } catch (\Throwable $e) {
             return false;
         }

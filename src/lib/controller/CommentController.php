@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Controller;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -53,7 +54,10 @@ class CommentController extends BaseApp
         $this->commentService = $commentService;
     }
 
-    #[\Override]
+    /**
+     * {@inheritDoc}
+     * @see BaseApp::listItems()
+     */
     public function listItems()
     {
 
@@ -95,13 +99,19 @@ class CommentController extends BaseApp
         return $this->view->render();
     }
 
-    #[\Override]
+    /**
+     * {@inheritDoc}
+     * @see BaseApp::insert()
+     */
     public function insert()
     {
         // left empty
     }
 
-    #[\Override]
+    /**
+     * {@inheritDoc}
+     * @see BaseApp::update()
+     */
     public function update($id)
     {
         $errors = array();
@@ -188,7 +198,10 @@ class CommentController extends BaseApp
         return $this->view->render();
     }
 
-    #[\Override]
+    /**
+     * {@inheritDoc}
+     * @see BaseApp::remove()
+     */
     public function remove($id)
     {
 

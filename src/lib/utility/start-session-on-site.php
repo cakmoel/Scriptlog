@@ -86,10 +86,10 @@ function session_valid_id($session_id)
     }
 
     try {
-        if (PHP_VERSION_ID >= 70100) {
-            $sidLength = ini_get('session.sid_length');
+        if (PHP_VERSION_ID >= 70100 && PHP_VERSION_ID < 80400) {
+            $sidLength = ini_get('session.sid_length'); // phpcs:ignore PHPCompatibility.IniDirectives.RemovedIniDirectives.session_sid_lengthDeprecated
 
-            switch (ini_get('session.sid_bits_per_character')) {
+            switch (ini_get('session.sid_bits_per_character')) { // phpcs:ignore PHPCompatibility.IniDirectives.RemovedIniDirectives.session_sid_bits_per_characterDeprecated
                 case 6:
                     $characterClass = '0-9a-zA-z,-';
                     break;
@@ -100,7 +100,7 @@ function session_valid_id($session_id)
                     $characterClass = '0-9a-f';
                     break;
                 default:
-                    error_log('Unknown value in session.sid_bits_per_character: ' . ini_get('session.sid_bits_per_character'));
+                    error_log('Unknown value in session.sid_bits_per_character: ' . ini_get('session.sid_bits_per_character')); // phpcs:ignore PHPCompatibility.IniDirectives.RemovedIniDirectives.session_sid_bits_per_characterDeprecated
                     return false;
             }
 

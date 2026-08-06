@@ -1,14 +1,15 @@
 <?php
 
 namespace Scriptlog\Handler;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
  * Renders a static page.
  *
- * Validates that the requested page exists in the database via
- * FrontHelper before rendering. Returns a 404 response when the
- * page is not found or the helper is unavailable.
+ * Validates that the requested page exists in the database via the
+ * shared FrontService before rendering. Returns a 404 response when the
+ * page is not found or the service is unavailable.
  */
 
 use Scriptlog\Core\HandleRequest;
@@ -45,15 +46,13 @@ class PageHandler implements FrontRequestHandler
             return;
         }
 
-        $frontHelper = class_exists('FrontHelper')
-            ? HandleRequest::handleFrontHelper()
-            : null;
+        $frontService = HandleRequest::handleFrontHelper();
 
-        if (!$frontHelper || !method_exists($frontHelper, 'grabSimpleFrontPage')) {
+        if (!$frontService || !method_exists($frontService, 'getSimplePage')) {
             $this->renderer->render404();
             return;
         }
-        $page = $frontHelper->grabSimpleFrontPage($id);
+        $page = $frontService->getSimplePage($id);
         if (empty($page['ID'])) {
             $this->renderer->render404();
             return;

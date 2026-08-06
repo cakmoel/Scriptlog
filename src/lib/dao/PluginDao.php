@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Dao;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -309,7 +310,7 @@ class PluginDao extends Dao
     {
         $sql = "SELECT ID FROM tbl_plugin";
         $this->setSQL($sql);
-        return $this->checkCountValue($data) ?? 0;
+        return $this->checkCountValue($data);
     }
 
     /**

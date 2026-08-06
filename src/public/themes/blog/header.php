@@ -18,19 +18,21 @@ require dirname(__FILE__) . '/functions.php';
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;display=swap"></noscript>
 
 <style>
-/* Critical CSS */
-body{overflow-x:hidden;font-family:"Open Sans",sans-serif}
-.skip-link{position:absolute;top:-40px;left:0;background:#122430;color:#fff;padding:8px 16px;z-index:100000;text-decoration:none;transition:top .2s ease}
-.skip-link:focus{top:0;outline:3px solid #7fff00;outline-offset:2px}
-*:focus-visible{outline:3px solid #7fff00;outline-offset:2px}
-.sina-nav{min-height:60px;background:#fff;border:1px solid #eee;position:relative;z-index:9999}
+/* Critical CSS — design tokens defined inline for critical-path availability;
+   the same tokens live in assets/css/custom.css for the rest of the theme. */
+:root{--brand-dark:#122430;--brand-accent:#7fff00;--color-text:#222;--color-bg:#fff;--color-border:#eee;--font-sans:"Open Sans",sans-serif;--focus-outline:3px solid #7fff00;--focus-offset:2px}
+body{overflow-x:hidden;font-family:var(--font-sans)}
+.skip-link{position:absolute;top:-40px;inset-inline-start:0;background:var(--brand-dark);color:#fff;padding:8px 16px;z-index:100000;text-decoration:none;transition:top .2s ease}
+.skip-link:focus{top:0;outline:var(--focus-outline);outline-offset:var(--focus-offset)}
+*:focus-visible{outline:var(--focus-outline);outline-offset:var(--focus-offset)}
+.sina-nav{min-height:60px;background:var(--color-bg);border:1px solid var(--color-border);position:relative;z-index:9999}
 .sina-nav .container{position:relative}
 .sina-nav .sina-brand{height:60px;float:left;text-decoration:none}
-.sina-nav .sina-brand h2{color:#222;font-size:30px;line-height:36px;margin:0}
-.sina-nav .sina-brand p{color:#222;font-size:14px;line-height:16px;margin:0}
+.sina-nav .sina-brand h2{color:var(--color-text);font-size:30px;line-height:36px;margin:0}
+.sina-nav .sina-brand p{color:var(--color-text);font-size:14px;line-height:16px;margin:0}
 .sina-nav .sina-menu{list-style:none;margin:0;padding:0}
 .sina-nav .sina-menu>li{float:right}
-.sina-nav .sina-menu>li>a{display:block;padding:20px 15px;color:#222;font-size:14px;font-weight:700;text-transform:uppercase;text-decoration:none}
+.sina-nav .sina-menu>li>a{display:block;padding:20px 15px;color:var(--color-text);font-size:14px;font-weight:700;text-transform:uppercase;text-decoration:none}
 @media (max-width:1024px){.sina-nav .sina-brand{margin-left:-35px}.sina-nav .navbar-toggle{float:left;padding:4px 10px;margin-top:12px;background:transparent;border:0;font-size:18px}}
 .language-switcher .btn-language.dropdown-toggle::after{display:none!important}
 
@@ -49,20 +51,25 @@ if (function_exists('theme_dir')) :
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.css" integrity="sha384-/dUIqcuZmn0/Nt1CGyvylCjqPYa/w0/SdIVpbqBxsxYmfwd7PXM9Gt7PsRKRj9Xy" crossorigin="anonymous"></noscript>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/style.sea.min.css" id="theme-stylesheet" integrity="sha384-JbRgk69UODRbZObMRNsjMeO1wAK6VXCrdy16v0NB36QOH4GtS2oBEg0eoZFTNy37" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/style.sea.min.css" integrity="sha384-JbRgk69UODRbZObMRNsjMeO1wAK6VXCrdy16v0NB36QOH4GtS2oBEg0eoZFTNy37" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css" integrity="sha384-05ZFPKwuZkVmbYwKdVxeSSTXUSRgKaDyKdhKj7vK/62LdtgJc+FUQ+fyxcqSEbQe" crossorigin="anonymous" media="print">
-<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css" integrity="sha384-05ZFPKwuZkVmbYwKdVxeSSTXUSRgKaDyKdhKj7vK/62LdtgJc+FUQ+fyxcqSEbQe" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css" integrity="sha384-7D9pMA341OgtcGgB1wxRB84bW4oAcWU8Ng3qnM2mclo/QuT2Vq16jqCcZNb0okIS" crossorigin="anonymous" media="print">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css" integrity="sha384-7D9pMA341OgtcGgB1wxRB84bW4oAcWU8Ng3qnM2mclo/QuT2Vq16jqCcZNb0okIS" crossorigin="anonymous"></noscript>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.min.css" integrity="sha384-JPaoEK2fBp+uA/Wgxb/Yuj5YuYkAK49IPnJNh8uBhWTN+zc7pS9PVvfoRs3deKRh" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.min.css" integrity="sha384-JPaoEK2fBp+uA/Wgxb/Yuj5YuYkAK49IPnJNh8uBhWTN+zc7pS9PVvfoRs3deKRh" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/privacy.min.css" integrity="sha384-dgoJODadPMRID9MyK0IFyykN9Gz2NNqGDAzfhsUCe3ECqqe8uZ7cLRXp9BZSEBOp" crossorigin="anonymous" media="print">
-<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/privacy.min.css" integrity="sha384-dgoJODadPMRID9MyK0IFyykN9Gz2NNqGDAzfhsUCe3ECqqe8uZ7cLRXp9BZSEBOp" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/privacy.min.css" integrity="sha384-ZacOPBIrxBk6ObKa88A32hDhk9KIweS4fNdYXRhpIHTPGlv1mejG30r3Z1Z4aH2r" crossorigin="anonymous" media="print">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/privacy.min.css" integrity="sha384-ZacOPBIrxBk6ObKa88A32hDhk9KIweS4fNdYXRhpIHTPGlv1mejG30r3Z1Z4aH2r" crossorigin="anonymous"></noscript>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.min.css" integrity="sha384-qq9bnXoyBB4IsBWw08+n5BVNEBZtu+eQLQFd6h2HngnN18JcJddHan5oM1Iy9fJK" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/comment.min.css" integrity="sha384-qq9bnXoyBB4IsBWw08+n5BVNEBZtu+eQLQFd6h2HngnN18JcJddHan5oM1Iy9fJK" crossorigin="anonymous"></noscript>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css" integrity="sha384-7+U3CUdwcffqC0x8Co1Teg5mj0+fTKhBrzFMB1qIlC5KeiUVWrYFL/SdLqD7C6Py" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/animate.min.css" integrity="sha384-7+U3CUdwcffqC0x8Co1Teg5mj0+fTKhBrzFMB1qIlC5KeiUVWrYFL/SdLqD7C6Py" crossorigin="anonymous"></noscript>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/sina-nav.min.css" integrity="sha384-/8qST2bRvHReXrpHR/ZSuKWz7bBV5fpC+az/N67a0JiqwAwNmhSNcUfaorK2FUM7" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/sina-nav.min.css" integrity="sha384-/8qST2bRvHReXrpHR/ZSuKWz7bBV5fpC+az/N67a0JiqwAwNmhSNcUfaorK2FUM7" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/cookie-consent.min.css" integrity="sha384-SZGf4Fdh2KV3qITa3ZjL8Bn/o579CfNvA+5gt1XJv5sr9fsFxJ5iCvyNcY9TtGqg" crossorigin="anonymous" media="print">
-<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/cookie-consent.min.css" integrity="sha384-SZGf4Fdh2KV3qITa3ZjL8Bn/o579CfNvA+5gt1XJv5sr9fsFxJ5iCvyNcY9TtGqg" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/cookie-consent.min.css" integrity="sha384-fSB06K3pAj9ZeMChaSCPDa8EdWxPO7r/ofK/R0toHkAJxoEA+gjZE2MJE9k83FOQ" crossorigin="anonymous" media="print">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/cookie-consent.min.css" integrity="sha384-fSB06K3pAj9ZeMChaSCPDa8EdWxPO7r/ofK/R0toHkAJxoEA+gjZE2MJE9k83FOQ" crossorigin="anonymous"></noscript>
+<!-- Prism.js syntax highlighting -->
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/prism/prism.css" integrity="sha384-+GkyFJeCCbBA3eRVrMwWcofk/aYW0UuRmirJN+mz8EfLFObEXVbVNYYmqROjxjDM" crossorigin="anonymous" media="print">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/prism/prism.css" integrity="sha384-+GkyFJeCCbBA3eRVrMwWcofk/aYW0UuRmirJN+mz8EfLFObEXVbVNYYmqROjxjDM" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/prism-override.min.css" integrity="sha384-eoZdp54lW+jvWpkqC0BiMFINdqqFckG0ZuqgPvrQjrZucHm3OWupwDBo1D8cSzrC" crossorigin="anonymous" media="print">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/prism-override.min.css" integrity="sha384-eoZdp54lW+jvWpkqC0BiMFINdqqFckG0ZuqgPvrQjrZucHm3OWupwDBo1D8cSzrC" crossorigin="anonymous"></noscript>
     <?php if (is_rtl()) : ?>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/rtl.min.css" integrity="sha384-K0RODyvrBSyO0LWBpmt4OSQVXVpa2uGgM5qtK9sSwPQFD2tnSOJbO+pkAaEnFSGg" crossorigin="anonymous">
     <?php endif; ?>
@@ -72,11 +79,23 @@ endif;
 ?>
 
 <?= function_exists('theme_meta') ? theme_meta()['site_schema'] . PHP_EOL : ""; ?>
+<?php
+    $theme_search_i18n = [
+        'count' => t('search.widget.count'),
+        'no_results' => t('search.widget.no_results'),
+        'view_all' => t('search.widget.view_all'),
+        'loading' => t('search.widget.loading'),
+        'error' => t('search.widget.error'),
+        'type_post' => t('search.type.post'),
+        'type_page' => t('search.type.page'),
+    ];
+?>
 <script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
     var scriptlog_vars = {
         api_url: '<?= app_url(); ?>/api/v1',
         site_url: '<?= app_url(); ?>',
-        theme_dir: '<?= theme_dir(); ?>'
+        theme_dir: '<?= theme_dir(); ?>',
+        search: <?= json_encode($theme_search_i18n, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>
     };
 </script>
 <script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
@@ -107,9 +126,9 @@ endif;
                 </button>
                 <a class="sina-brand" href="<?= app_url(); ?>">
                     <h2>
-                        <?= htmlout(app_sitename());?>
+                        <?= theme_escape_html(app_sitename());?>
                     </h2>
-                    <p><?= htmlout(app_tagline()) ?></p>
+                    <p><?= theme_escape_html(app_tagline()) ?></p>
                 </a>
             </div><!-- .sina-nav-header -->
 
@@ -159,11 +178,11 @@ endif;
                                 $lang_code = strtoupper($locale);
                                 ?>
                                 <li>
-                                    <a href="<?php echo htmlspecialchars($lang_url, ENT_QUOTES, 'UTF-8'); ?>" 
+                                    <a href="<?php echo theme_escape_html($lang_url); ?>" 
                                        class="dropdown-item <?php echo $is_active; ?>" 
                                        role="menuitem"
                                        aria-current="<?php echo ($is_active === 'active') ? 'page' : 'false'; ?>"
-                                       aria-label="<?php echo htmlout($english_name); ?>">
+                                       aria-label="<?php echo theme_escape_html($english_name); ?>">
                                         <span class="lang-flag" aria-hidden="true">
                                             <?php if ($is_active === 'active') : ?>
                                                 <i class="fa fa-check text-success" aria-hidden="true"></i>
@@ -172,10 +191,10 @@ endif;
                                             <?php endif; ?>
                                         </span>
                                         <span class="lang-info">
-                                            <span class="lang-native"><?php echo htmlout($native_name); ?></span>
-                                            <span class="lang-english"><?php echo htmlout($english_name); ?></span>
+                                            <span class="lang-native"><?php echo theme_escape_html($native_name); ?></span>
+                                            <span class="lang-english"><?php echo theme_escape_html($english_name); ?></span>
                                         </span>
-                                        <span class="lang-code-badge"><?php echo htmlout($lang_code); ?></span>
+                                        <span class="lang-code-badge"><?php echo theme_escape_html($lang_code); ?></span>
                                     </a>
                                 </li>
                             <?php endforeach; ?>

@@ -46,22 +46,20 @@ $allowed_list = array_filter(array_map('trim', explode(',', $allowed_origins)));
 if (in_array($request_origin, $allowed_list, true)) {
     header('Access-Control-Allow-Origin: ' . $request_origin);
     header('Access-Control-Allow-Credentials: true');
+    header('Vary: Origin');
 } elseif (!empty($allowed_list[0])) {
     header('Access-Control-Allow-Origin: ' . $allowed_list[0]);
     header('Access-Control-Allow-Credentials: true');
+    header('Vary: Origin');
 }
 
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, QUERY, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-API-Key, X-Requested-With, X-CSRF-Token');
 header('Access-Control-Max-Age: 3600');
+header('Timing-Allow-Origin: *');
+header('Link: <' . ($config['app']['url'] ?? '') . '>; rel="preconnect"');
 header('Content-Type: application/json');
 header('X-API-Version: ' . API_VERSION);
-
-// Handle preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(204);
-    exit;
-}
 
 // Set error reporting for API (production should disable this)
 error_reporting(0);
@@ -97,6 +95,7 @@ require_once __DIR__ . '/../lib/controller/api/TranslationsApiController.php';
 require_once __DIR__ . '/../lib/controller/api/SearchApiController.php';
 require_once __DIR__ . '/../lib/controller/api/ProtectedPostApiController.php';
 require_once __DIR__ . '/../lib/controller/api/MediaApiController.php';
+require_once __DIR__ . '/../lib/controller/api/QueryApiController.php';
 require_once __DIR__ . '/../lib/utility/rate-limiter.php';
 require_once __DIR__ . '/../lib/core/ApiHateoas.php';
 
@@ -153,13 +152,13 @@ try {
     }
 
     if ($rateLimitEnabled) {
-        $rateLimiter = new RateLimiter();
+        $rateLimiter = new \Scriptlog\Core\RateLimiter();
 
-        // Use stricter limits for write operations
+        // Use stricter limits for write operations (QUERY is safe/idempotent per RFC 10008)
         if (in_array($method, ['POST', 'PUT', 'DELETE', 'PATCH'])) {
-            $rateResult = $rateLimiter->check(null, $writeLimit, ApiResponse::RATE_WINDOW);
+            $rateResult = $rateLimiter->check(null, $writeLimit, ApiResponse::RATE_WINDOW, 'write');
         } else {
-            $rateResult = $rateLimiter->check(null, $readLimit, ApiResponse::RATE_WINDOW);
+            $rateResult = $rateLimiter->check(null, $readLimit, ApiResponse::RATE_WINDOW, 'read');
         }
 
         if (!$rateResult['allowed']) {
@@ -218,6 +217,11 @@ try {
     $router->post('gdpr/consent', 'GdprApiController@consent');
     $router->get('gdpr/consent', 'GdprApiController@getConsentStatus');
 
+    // Query API (RFC 10008 — safe, idempotent query method)
+    $router->query('query', 'QueryApiController@index');
+    $router->query('query/posts', 'QueryApiController@posts');
+    $router->query('query/pages', 'QueryApiController@pages');
+
     // Languages API
     $router->get('languages', 'LanguagesApiController@index');
     $router->get('languages/active', 'LanguagesApiController@index');
@@ -225,18 +229,30 @@ try {
     $router->get('languages/(?P<code>[a-z]{2})', 'LanguagesApiController@show');
     $router->post('languages', 'LanguagesApiController@store');
     $router->put('languages/(?P<code>[a-z]{2})', 'LanguagesApiController@update');
+    $router->patch('languages/(?P<code>[a-z]{2})', 'LanguagesApiController@update');
     $router->delete('languages/(?P<code>[a-z]{2})', 'LanguagesApiController@destroy');
     $router->put('languages/(?P<code>[a-z]{2})/default', 'LanguagesApiController@setDefault');
+    $router->patch('languages/(?P<code>[a-z]{2})/default', 'LanguagesApiController@setDefault');
 
     // Translations API
     $router->get('translations/(?P<code>[a-z]{2})', 'TranslationsApiController@index');
     $router->get('translations/(?P<code>[a-z]{2})/(?P<key>[a-zA-Z0-9._-]+)', 'TranslationsApiController@show');
     $router->post('translations/(?P<code>[a-z]{2})', 'TranslationsApiController@store');
     $router->put('translations/(?P<id>[0-9]+)', 'TranslationsApiController@update');
+    $router->patch('translations/(?P<id>[0-9]+)', 'TranslationsApiController@update');
     $router->delete('translations/(?P<id>[0-9]+)', 'TranslationsApiController@destroy');
     $router->get('translations/(?P<code>[a-z]{2})/export', 'TranslationsApiController@export');
     $router->post('translations/(?P<code>[a-z]{2})/import', 'TranslationsApiController@import');
-    $router->post('translations/([a-z]{2})/cache', 'TranslationsApiController@cache');
+    $router->post('translations/(?P<code>[a-z]{2})/cache', 'TranslationsApiController@cache');
+
+    // Health check endpoint
+    $router->get('health', function ($params) {
+        ApiResponse::success([
+            'status' => 'healthy',
+            'timestamp' => date('Y-m-d H:i:s'),
+            'php_version' => PHP_VERSION
+        ], 200, 'API is operational');
+    });
 
     // API OpenAPI spec endpoint (dynamic - uses runtime URL)
     $router->get('openapi.json', function ($params) {
@@ -258,6 +274,35 @@ try {
             'expires_in' => 3600
         ], 200, 'CSRF token generated. Include as X-CSRF-Token header on session-authenticated write requests.');
     });
+
+    // Per-endpoint OPTIONS handler
+    if ($method === 'OPTIONS') {
+        $allowed = [];
+        $allRoutes = $router->getRoutes();
+        $allMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'QUERY'];
+
+        foreach ($allMethods as $m) {
+            if (isset($allRoutes[$m])) {
+                foreach ($allRoutes[$m] as $regex => $route) {
+                    if ($route['pattern'] === $uri || preg_match($regex, $uri)) {
+                        $allowed[] = $m;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (empty($allowed)) {
+            $allowed = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'QUERY', 'OPTIONS'];
+        } else {
+            $allowed[] = 'OPTIONS';
+        }
+
+        $allowedStr = implode(', ', array_unique($allowed));
+        header('Allow: ' . $allowedStr);
+        http_response_code(204);
+        exit;
+    }
 
     // Validate Accept header for all API requests
     if (!ApiResponse::validateAccept(['application/json', '*/*'])) {

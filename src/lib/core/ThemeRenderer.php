@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -213,8 +214,8 @@ class ThemeRenderer implements ThemeRendererInterface
 
     /**
      * {@inheritDoc}
+     * @see ThemeRendererInterface::getThemeDir()
      */
-    #[\Override]
     public function getThemeDir(): string
     {
         return $this->themeDir;

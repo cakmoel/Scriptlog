@@ -14,54 +14,27 @@
  */
 function upload_media($file_location, $file_type, $file_size, $file_name)
 {
+    $group = get_mime_group($file_type);
 
-    switch ($file_type) {
-        case 'application/pdf':
-        case 'application/msword':
-        case 'application/vnd.ms-excel':
-        case 'application/rtf':
-        case 'application/vnd.ms-powerpoint':
-        case 'application/rar':
-        case 'application/zip':
-        case 'application/x-zip':
-        case 'multipart/x-zip':
-        case 'application/x-zip-compressed':
-        case 'application/vnd.microsoft.portable-executable':
-        case 'application/vnd.oasis.opendocument.text':
-        case 'application/vnd.oasis.opendocument.spreadsheet':
+    switch ($group) {
+        case 'doc':
             upload_doc($file_location, $file_name);
-
             break;
 
-        case 'audio/mpeg':
-        case 'audio/wav':
-        case 'audio/ogg':
+        case 'audio':
             upload_audio($file_location, $file_name);
-
             break;
 
-        case 'image/jpeg':
-        case 'image/pjpeg':
-        case 'image/jpg':
-        case 'image/png':
-        case 'image/gif':
-        case 'image/webp':
-        case 'image/bmp':
+        case 'image':
             upload_photo($file_location, $file_size, $file_type, $file_name);
-
             break;
 
-        case 'video/mp4':
-        case 'video/webm':
-        case 'video/ogg':
-        case 'video/mpeg':
+        case 'video':
             upload_video($file_location, $file_name);
-
             break;
 
         default:
             scriptlog_error("Error - file type not allowed!", E_USER_WARNING);
-
             break;
     }
 }

@@ -36,7 +36,9 @@ try {
         header("Pragma: no-cache");
 
         imagejpeg($layer);
-        imagedestroy($layer);
+        if (PHP_VERSION_ID < 80500) {
+            imagedestroy($layer); // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.imagedestroyDeprecated
+        }
     }
 } catch (\Throwable $th) {
     //throw $th;

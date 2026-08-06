@@ -50,41 +50,25 @@ function upload_photo($file_location, $file_size, $file_type, $file_name)
     $img_name = pathinfo($file_name, PATHINFO_BASENAME);
     $img_source = null;
 
-    switch (strtolower($file_type)) {
-        case 'image/png':
-            $img_source = imagecreatefrompng($file_location);
-            imagepalettetotruecolor($img_source);
-            imagealphablending($img_source, true);
-            imagesavealpha($img_source, true);
+    $format = get_image_format(strtolower($file_type));
+    if ($format === null) {
+        scriptlog_error("Unsupported File!");
+        return;
+    }
 
-            break;
-
-        case 'image/gif':
-            $img_source = imagecreatefromgif($file_location);
-
-            break;
-
-        case 'image/jpeg':
-        case 'image/pjpeg':
-        case 'image/jpg':
-            $img_source = imagecreatefromjpeg($file_location);
-
-            break;
-
-        case 'image/webp':
-            $img_source = imagecreatefromwebp($file_location);
-
-            break;
-
-        case 'image/bmp':
-            $img_source = imagecreatefrombmp($file_location);
-
-            break;
-
-        default:
-            scriptlog_error("Unsupported File!");
-
-            break;
+    if ($format === 'png') {
+        $img_source = imagecreatefrompng($file_location);
+        imagepalettetotruecolor($img_source);
+        imagealphablending($img_source, true);
+        imagesavealpha($img_source, true);
+    } elseif ($format === 'gif') {
+        $img_source = imagecreatefromgif($file_location);
+    } elseif ($format === 'jpeg') {
+        $img_source = imagecreatefromjpeg($file_location);
+    } elseif ($format === 'webp') {
+        $img_source = imagecreatefromwebp($file_location);
+    } elseif ($format === 'bmp') {
+        $img_source = imagecreatefrombmp($file_location);
     }
 
     list($current_width, $current_height) = getimagesize($temp_src);
@@ -264,52 +248,15 @@ function set_regular_photo($current_width, $current_height, $file_path_uploaded,
     $regular_photo = photo_instance()->make($file_path_uploaded);
     $regular_photo->fit($new_width, $new_height);
 
-    switch ($file_type) {
-        case "image/jpeg":
-        case "image/jpg":
-            if ($regular_photo->save($file_path_thumb . 'large_' . $file_name, 80, 'jpg')) {
-                $regular_photo->destroy();
-                return true;
-            }
+    $format = get_image_format($file_type);
+    if ($format === null) {
+        return false;
+    }
 
-            break;
-
-        case "image/png":
-            if ($regular_photo->save($file_path_thumb . 'large_' . $file_name, 80, 'png')) {
-                $regular_photo->destroy();
-                return true;
-            }
-
-            break;
-
-        case "image/gif":
-            if ($regular_photo->save($file_path_thumb . 'large_' . $file_name, 80, 'gif')) {
-                $regular_photo->destroy();
-                return true;
-            }
-
-            break;
-
-        case "image/bmp":
-            if ($regular_photo->save($file_path_thumb . 'large_' . $file_name, 80, 'bmp')) {
-                $regular_photo->destroy();
-                return true;
-            }
-
-            break;
-
-        case "image/webp":
-            if ($regular_photo->save($file_path_thumb . 'large_' . $file_name, 80, 'webp')) {
-                $regular_photo->destroy();
-                return true;
-            }
-
-            break;
-
-        default:
-            return false;
-
-            break;
+    $saveFormat = ($format === 'jpeg') ? 'jpg' : $format;
+    if ($regular_photo->save($file_path_thumb . 'large_' . $file_name, 80, $saveFormat)) {
+        $regular_photo->destroy();
+        return true;
     }
 }
 
@@ -347,7 +294,20 @@ function set_webp_regular($current_width, $current_height, $file_path_uploaded, 
     }
 }
 
-// setting medium size of picture
+/**
+ * set_medium_photo
+ *
+ * Create a medium-sized version of an uploaded image using Intervention.
+ *
+ * @category Function
+ * @param int|numeric $current_width
+ * @param int|numeric $current_height
+ * @param string $file_path_uploaded
+ * @param string $file_path_thumb
+ * @param string $file_name
+ * @param string $file_type
+ * @return bool
+ */
 function set_medium_photo($current_width, $current_height, $file_path_uploaded, $file_path_thumb, $file_name, $file_type)
 {
 
@@ -364,53 +324,18 @@ function set_medium_photo($current_width, $current_height, $file_path_uploaded, 
     $medium_photo = photo_instance()->make($file_path_uploaded);
     $medium_photo->fit($new_width, $new_height);
 
-    switch ($file_type) {
-        case "image/jpeg":
-        case "image/jpg":
-            if ($medium_photo->save($file_path_thumb . 'medium_' . $file_name, 80, 'jpg')) {
-                $medium_photo->destroy();
-                return true;
-            }
-
-            break;
-
-        case "image/png":
-            if ($medium_photo->save($file_path_thumb . 'medium_' . $file_name, 80, 'png')) {
-                $medium_photo->destroy();
-                return true;
-            }
-
-            break;
-
-        case "image/gif":
-            if ($medium_photo->save($file_path_thumb . 'medium_' . $file_name, 80, 'gif')) {
-                $medium_photo->destroy();
-                return true;
-            }
-
-            break;
-
-        case "image/bmp":
-            if ($medium_photo->save($file_path_thumb . 'medium_' . $file_name, 80, 'bmp')) {
-                $medium_photo->destroy();
-                return true;
-            }
-
-            break;
-
-        case "image/webp":
-            if ($medium_photo->save($file_path_thumb . 'medium_' . $file_name, 80, 'webp')) {
-                $medium_photo->destroy();
-                return true;
-            }
-
-            break;
-
-        default:
-            return false;
-
-            break;
+    $format = get_image_format($file_type);
+    if ($format === null) {
+        return false;
     }
+
+    $saveFormat = ($format === 'jpeg') ? 'jpg' : $format;
+    if ($medium_photo->save($file_path_thumb . 'medium_' . $file_name, 80, $saveFormat)) {
+        $medium_photo->destroy();
+        return true;
+    }
+
+    return false;
 }
 
 // setting medium size of webp image format
@@ -438,7 +363,20 @@ function set_webp_medium($current_width, $current_height, $file_path_uploaded, $
     }
 }
 
-// setting smaller size of picture
+/**
+ * set_small_photo
+ *
+ * Create a small-sized version of an uploaded image using Intervention.
+ *
+ * @category Function
+ * @param int|numeric $current_width
+ * @param int|numeric $current_height
+ * @param string $file_path_uploaded
+ * @param string $file_path_thumb
+ * @param string $file_name
+ * @param string $file_type
+ * @return bool
+ */
 function set_small_photo($current_width, $current_height, $file_path_uploaded, $file_path_thumb, $file_name, $file_type)
 {
 
@@ -455,54 +393,18 @@ function set_small_photo($current_width, $current_height, $file_path_uploaded, $
     $small_photo = photo_instance()->make($file_path_uploaded);
     $small_photo->fit($new_width, $new_height);
 
-    switch ($file_type) {
-        case "image/jpeg":
-        case "image/jpg":
-            if ($small_photo->save($file_path_thumb . 'small_' . $file_name, 80, 'jpg')) {
-                $small_photo->destroy();
-                return true;
-            }
-
-            break;
-
-        case "image/png":
-            if ($small_photo->save($file_path_thumb . 'small_' . $file_name, 80, 'png')) {
-                $small_photo->destroy();
-                return true;
-            }
-
-            break;
-
-        case "image/gif":
-            if ($small_photo->save($file_path_thumb . 'small_' . $file_name, 80, 'gif')) {
-                $small_photo->destroy();
-                return true;
-            }
-
-
-            break;
-
-        case "image/bmp":
-            if ($small_photo->save($file_path_thumb . 'small_' . $file_name, 80, 'bmp')) {
-                $small_photo->destroy();
-                return true;
-            }
-
-            break;
-
-        case "image/webp":
-            if ($small_photo->save($file_path_thumb . 'small_' . $file_name, 80, 'webp')) {
-                $small_photo->destroy();
-                return true;
-            }
-
-            break;
-
-        default:
-            return false;
-
-            break;
+    $format = get_image_format($file_type);
+    if ($format === null) {
+        return false;
     }
+
+    $saveFormat = ($format === 'jpeg') ? 'jpg' : $format;
+    if ($small_photo->save($file_path_thumb . 'small_' . $file_name, 80, $saveFormat)) {
+        $small_photo->destroy();
+        return true;
+    }
+
+    return false;
 }
 
 // setting smaller size of webp image format

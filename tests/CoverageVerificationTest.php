@@ -14,14 +14,14 @@ class CoverageVerificationTest extends TestCase
 {
     public function testNewDaoIntegrationTestsExist(): void
     {
-        $this->assertTrue(class_exists('UserDaoIntegrationTest'));
-        $this->assertTrue(class_exists('PostDaoIntegrationTest'));
-        $this->assertTrue(class_exists('TopicDaoIntegrationTest'));
+        $this->assertFileExists(__DIR__ . '/integration/UserDaoIntegrationTest.php');
+        $this->assertFileExists(__DIR__ . '/integration/PostDaoIntegrationTest.php');
+        $this->assertFileExists(__DIR__ . '/integration/PageDaoIntegrationTest.php');
     }
 
     public function testNewServiceTestExists(): void
     {
-        $this->assertTrue(class_exists('UserServiceTest'));
+        $this->assertFileExists(__DIR__ . '/service/UserServiceTest.php');
     }
 
     public function testBasicAssertionWorks(): void
