@@ -20,7 +20,7 @@ function render_comments_section(int $postId, int $offset = 0): string
                 <header class="mb-3">
                     <h3 class="h5 font-weight-bold">
                         Post Comments
-                        <span class="badge badge-secondary"><?= htmlspecialchars($totalRecords) ?></span>
+                        <span class="badge badge-secondary"><?= theme_escape_html($totalRecords) ?></span>
                     </h3>
                 </header>
             </div>
