@@ -371,10 +371,10 @@ class PostController extends BaseApp
             $this->view->set('errors', $errors);
         }
 
-        $this->view->set('postStatus', $this->postService->postStatusDropDown());
-        $this->view->set('commentStatus', $this->postService->commentStatusDropDown());
-        $this->view->set('postVisibility', $this->postService->visibilityDropDown());
-        $this->view->set('postLocale', $this->postService->localeDropDown());
+        $this->view->set('postStatus', post_status_dropdown());
+        $this->view->set('commentStatus', comment_status_dropdown());
+        $this->view->set('postVisibility', post_visibility_dropdown());
+        $this->view->set('postLocale', post_locale_dropdown());
         $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
     }
 
@@ -406,10 +406,10 @@ class PostController extends BaseApp
             $this->view->set('postContent', $data_post['post_content']);
         }
 
-        $this->view->set('postStatus', $this->postService->postStatusDropDown($getPost['post_status']));
-        $this->view->set('commentStatus', $this->postService->commentStatusDropDown($getPost['comment_status']));
-        $this->view->set('postVisibility', $this->postService->visibilityDropDown($getPost['post_visibility']));
-        $this->view->set('postLocale', $this->postService->localeDropDown($getPost['post_locale'] ?? 'en'));
+        $this->view->set('postStatus', post_status_dropdown($getPost['post_status']));
+        $this->view->set('commentStatus', comment_status_dropdown($getPost['comment_status']));
+        $this->view->set('postVisibility', post_visibility_dropdown($getPost['post_visibility']));
+        $this->view->set('postLocale', post_locale_dropdown($getPost['post_locale'] ?? 'en'));
         $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
     }
 
