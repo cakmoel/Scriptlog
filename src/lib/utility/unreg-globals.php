@@ -11,8 +11,12 @@
  */
 function unreg_globals()
 {
+    // register_globals was removed in PHP 5.4; nothing to emulate on newer versions
+    if (PHP_VERSION_ID >= 50400) {
+        return;
+    }
 
-    if (!ini_get('register_globals')) {
+    if (!ini_get('register_globals')) { // phpcs:ignore PHPCompatibility.IniDirectives.RemovedIniDirectives.register_globalsDeprecatedRemoved
         return;
     }
 
