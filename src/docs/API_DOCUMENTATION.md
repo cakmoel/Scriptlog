@@ -8,22 +8,33 @@
 4. [API Endpoints](#api-endpoints)
    - [API Information](#api-information)
    - [Posts](#posts)
+   - [Protected Posts](#protected-posts)
    - [Categories](#categories)
    - [Comments](#comments)
    - [Archives](#archives)
+   - [Search](#search)
+   - [Languages](#languages)
+   - [Translations](#translations)
+   - [GDPR](#gdpr)
+   - [Media Upload](#media-upload)
+   - [Health Check](#health-check)
+   - [OpenAPI Spec](#openapi-spec)
 5. [Response Format](#response-format)
 6. [Error Handling](#error-handling)
 7. [Filtering and Sorting](#filtering-and-sorting)
 8. [Rate Limiting](#rate-limiting)
-9. [OpenAPI Specification](#openapi-specification)
-
+9. [HATEOAS](#hateoas)
+10. [OpenAPI Specification](#openapi-specification)
+11. [SDK Examples](#sdk-examples)
 ---
+
+
 
 ## Introduction
 
 The ScriptLog RESTful API provides programmatic access to your blog's content, allowing other platforms, operating systems, and devices to interact with your blog data. The API follows REST architectural principles and returns JSON responses.
 
-**API Version:** 1.1.1  
+**API Version:** 1.1.0  
 **Format:** JSON
 
 ---
@@ -66,7 +77,7 @@ Authorization: Bearer your-bearer-token
 | Endpoint Type | Authentication Required |
 |--------------|------------------------|
 | Read (GET) - Public content | No |
-| Create/Update/Delete (POST/PUT/DELETE) | Yes |
+| Create/Update/Delete (POST/PUT/DELETE/PATCH) | Yes |
 
 ### Permission Levels
 
@@ -80,33 +91,6 @@ Authorization: Bearer your-bearer-token
 ---
 
 ## API Endpoints
-
-### API Settings (Admin Panel)
-
-The API includes configurable rate limiting settings that can be managed through the admin panel.
-
-#### Access API Settings
-
-Navigate to **Settings → API** in the admin panel:
-
-```
-https://blogware.site/admin/index.php?load=option-api&action=apiConfig&Id=0
-```
-
-#### Rate Limiting Configuration
-
-| Setting | Description | Default |
-|---------|-------------|---------|
-| Enable Rate Limiting | Toggle rate limiting on/off | Enabled |
-| Read Rate Limit | Maximum GET requests per minute per client | 60 |
-| Write Rate Limit | Maximum POST/PUT/DELETE/PATCH requests per minute per client | 20 |
-
-**Note:** Rate limiting settings are stored in the `tbl_settings` table with keys:
-- `api_rate_limit_enabled` (0 or 1)
-- `api_rate_limit_read` (1-1000)
-- `api_rate_limit_write` (1-500)
-
----
 
 ### API Information
 
@@ -128,10 +112,9 @@ curl -X GET http://blogware.site/api/v1/
 {
   "success": true,
   "status": 200,
-  "message": "Welcome to Blogware RESTful API",
   "data": {
     "name": "Blogware RESTful API",
-    "version": "1.1.1",
+    "version": "1.1.0",
     "description": "RESTful API for Blogware content management system",
     "base_url": "/api/v1",
     "authentication": {
@@ -139,6 +122,19 @@ curl -X GET http://blogware.site/api/v1/
       "header": "X-API-Key or Authorization: Bearer <token>",
       "required": true
     }
+  },
+  "_links": {
+    "self": { "href": "http://blogware.site/api/v1", "rel": "self", "type": "GET" },
+    "posts": { "href": "http://blogware.site/api/v1/posts", "rel": "posts", "type": "GET" },
+    "categories": { "href": "http://blogware.site/api/v1/categories", "rel": "categories", "type": "GET" },
+    "comments": { "href": "http://blogware.site/api/v1/comments", "rel": "comments", "type": "GET" },
+    "archives": { "href": "http://blogware.site/api/v1/archives", "rel": "archives", "type": "GET" },
+    "search": { "href": "http://blogware.site/api/v1/search?q={query}", "rel": "search", "type": "GET", "templated": true },
+    "gdpr": { "href": "http://blogware.site/api/v1/gdpr/consent", "rel": "gdpr", "type": "GET" },
+    "languages": { "href": "http://blogware.site/api/v1/languages", "rel": "languages", "type": "GET" },
+    "translations": { "href": "http://blogware.site/api/v1/translations/en", "rel": "translations", "type": "GET" },
+    "media": { "href": "http://blogware.site/api/v1/media/upload", "rel": "media", "type": "POST" },
+    "openapi": { "href": "http://blogware.site/api/v1/openapi.json", "rel": "service-desc", "type": "application/json" }
   }
 }
 ```
@@ -146,6 +142,8 @@ curl -X GET http://blogware.site/api/v1/
 ---
 
 ### Posts
+
+Endpoints for managing blog posts and pages.
 
 #### List Published Posts
 
@@ -187,6 +185,7 @@ curl -X GET "http://blogware.site/api/v1/posts?page=1&per_page=10"
       "tags": ["php", "rest-api"],
       "comment_status": "open",
       "type": "blog",
+      "locale": "en",
       "author": {
         "id": 1,
         "login": "admin",
@@ -194,7 +193,13 @@ curl -X GET "http://blogware.site/api/v1/posts?page=1&per_page=10"
       },
       "date": "2024-01-15 10:30:00",
       "modified": "2024-01-15 14:20:00",
-      "url": "http://blogware.site/post/1/my-first-blog-post"
+      "url": "http://blogware.site/post/1/my-first-blog-post",
+      "_links": {
+        "self": { "href": "http://blogware.site/api/v1/posts/1", "rel": "self", "type": "GET" },
+        "comments": { "href": "http://blogware.site/api/v1/posts/1/comments", "rel": "comments", "type": "GET" },
+        "canonical": { "href": "http://blogware.site/post/1/my-first-blog-post", "rel": "canonical", "type": "text/html" },
+        "collection": { "href": "http://blogware.site/api/v1/posts", "rel": "collection", "type": "GET" }
+      }
     }
   ],
   "pagination": {
@@ -204,6 +209,12 @@ curl -X GET "http://blogware.site/api/v1/posts?page=1&per_page=10"
     "total_pages": 5,
     "has_next_page": true,
     "has_previous_page": false
+  },
+  "_links": {
+    "self": { "href": "http://blogware.site/api/v1/posts?page=1&per_page=10", "rel": "self", "type": "GET" },
+    "first": { "href": "http://blogware.site/api/v1/posts?page=1&per_page=10", "rel": "first", "type": "GET" },
+    "next": { "href": "http://blogware.site/api/v1/posts?page=2&per_page=10", "rel": "next", "type": "GET" },
+    "last": { "href": "http://blogware.site/api/v1/posts?page=5&per_page=10", "rel": "last", "type": "GET" }
   }
 }
 ```
@@ -321,6 +332,49 @@ Deletes a blog post. **Requires administrator authentication.**
 
 ---
 
+### Protected Posts
+
+#### Unlock Password-Protected Post
+
+```
+POST /api/v1/posts/{id}/unlock
+```
+
+Unlocks a password-protected post by providing the correct password.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| id | integer | Post ID |
+
+**Request Body:**
+```json
+{
+  "password": "post-password"
+}
+```
+
+**Response:** `200 OK` on success, `401 Unauthorized` on wrong password.
+
+---
+
+#### Verify Password-Protected Post
+
+```
+POST /api/v1/posts/{id}/verify
+```
+
+Verifies whether the current session has already unlocked a protected post.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| id | integer | Post ID |
+
+---
+
 ### Categories
 
 #### List Categories
@@ -348,14 +402,23 @@ Retrieves a paginated list of all categories/topics.
   "data": [
     {
       "id": 1,
-      "title": "Technology",
+      "name": "Technology",
       "slug": "technology",
+      "description": "Technology related posts",
       "status": "Y",
+      "locale": "en",
       "post_count": 15,
-      "url": "http://blogware.site/category/technology"
+      "url": "http://blogware.site/category/technology",
+      "_links": {
+        "self": { "href": "http://blogware.site/api/v1/categories/1", "rel": "self", "type": "GET" },
+        "posts": { "href": "http://blogware.site/api/v1/categories/1/posts", "rel": "posts", "type": "GET" },
+        "canonical": { "href": "http://blogware.site/category/technology", "rel": "canonical", "type": "text/html" },
+        "collection": { "href": "http://blogware.site/api/v1/categories", "rel": "collection", "type": "GET" }
+      }
     }
   ],
-  "pagination": {...}
+  "pagination": { ... },
+  "_links": { ... }
 }
 ```
 
@@ -457,7 +520,7 @@ Retrieves approved comments. Public endpoint.
 GET /api/v1/comments/{id}
 ```
 
-Retrieves a single comment by ID.
+Retrieves a single comment by ID. Includes nested replies.
 
 ---
 
@@ -522,7 +585,7 @@ Deletes a comment. **Requires authentication.**
 GET /api/v1/archives
 ```
 
-Returns available archive dates (years and months with published posts).
+Returns available archive dates (years and months with published posts). Includes HATEOAS links at response root.
 
 **Example Response:**
 ```json
@@ -544,6 +607,10 @@ Returns available archive dates (years and months with published posts).
       }
     ],
     "total_years": 3
+  },
+  "_links": {
+    "self": { "href": "http://blogware.site/api/v1/archives", "rel": "self", "type": "GET" },
+    "collection": { "href": "http://blogware.site/api/v1/archives", "rel": "collection", "type": "GET" }
   }
 }
 ```
@@ -583,6 +650,408 @@ Retrieves posts from a specific month and year.
 
 ---
 
+### Search
+
+#### Search Content
+
+```
+GET /api/v1/search?q={query}
+```
+
+Searches across posts and pages. Returns paginated results with HATEOAS links.
+
+**Query Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| q | string | — | Search query (required) |
+| page | integer | 1 | Page number |
+| per_page | integer | 10 | Items per page |
+| type | string | all | Search scope: `posts`, `pages`, or `all` |
+
+**Example Request:**
+```bash
+curl -X GET "http://blogware.site/api/v1/search?q=php&page=1&per_page=10"
+```
+
+**Error Response (missing query):**
+```json
+{
+  "success": false,
+  "status": 400,
+  "error": {
+    "code": "MISSING_QUERY",
+    "message": "Search query is required"
+  }
+}
+```
+
+---
+
+#### Search Posts Only
+
+```
+GET /api/v1/search/posts?q={query}
+```
+
+Searches only within blog posts.
+
+---
+
+#### Search Pages Only
+
+```
+GET /api/v1/search/pages?q={query}
+```
+
+Searches only within static pages.
+
+---
+
+### Languages
+
+#### List Languages
+
+```
+GET /api/v1/languages
+```
+
+Returns a paginated list of all supported languages.
+
+**Query Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| page | integer | 1 | Page number |
+| per_page | integer | 10 | Items per page |
+
+---
+
+#### List Active Languages
+
+```
+GET /api/v1/languages/active
+```
+
+Returns only active (enabled) languages.
+
+---
+
+#### Get Default Language
+
+```
+GET /api/v1/languages/default
+```
+
+Returns the current default language.
+
+---
+
+#### Get Single Language
+
+```
+GET /api/v1/languages/{code}
+```
+
+Retrieves a language by its ISO 639-1 code (e.g., `en`, `fr`, `zh`).
+
+---
+
+#### Create Language
+
+```
+POST /api/v1/languages
+```
+
+Creates a new language. **Requires authentication.**
+
+**Request Body:**
+```json
+{
+  "lang_code": "de",
+  "lang_name": "German",
+  "lang_locale": "de_DE",
+  "is_default": false,
+  "is_active": true
+}
+```
+
+---
+
+#### Update Language
+
+```
+PUT /api/v1/languages/{code}
+```
+
+Updates a language. **Requires authentication.**
+
+---
+
+#### Partially Update Language
+
+```
+PATCH /api/v1/languages/{code}
+```
+
+Partially updates a language. **Requires authentication.**
+
+---
+
+#### Set Default Language
+
+```
+PUT /api/v1/languages/{code}/default
+```
+
+Sets the specified language as the default. **Requires authentication.**
+
+---
+
+#### Delete Language
+
+```
+DELETE /api/v1/languages/{code}
+```
+
+Deletes a language. **Requires authentication.** Returns 409 Conflict if this is the last language.
+
+---
+
+### Translations
+
+#### List Translations
+
+```
+GET /api/v1/translations/{code}
+```
+
+Returns a paginated list of translation strings for a given language.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| code | string | ISO 639-1 language code (e.g., `en`) |
+
+**Query Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| page | integer | 1 | Page number |
+| per_page | integer | 50 | Items per page |
+
+---
+
+#### Get Single Translation
+
+```
+GET /api/v1/translations/{code}/{key}
+```
+
+Retrieves a single translation by language code and key.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| code | string | Language code (e.g., `en`) |
+| key | string | Translation key (e.g., `nav.dashboard`) |
+
+---
+
+#### Create Translation
+
+```
+POST /api/v1/translations/{code}
+```
+
+Creates a new translation string. **Requires authentication.**
+
+**Request Body:**
+```json
+{
+  "trans_key": "nav.dashboard",
+  "trans_value": "Dashboard",
+  "trans_locale": "en"
+}
+```
+
+---
+
+#### Update Translation
+
+```
+PUT /api/v1/translations/{id}
+```
+
+Updates a translation by ID. **Requires authentication.**
+
+---
+
+#### Partially Update Translation
+
+```
+PATCH /api/v1/translations/{id}
+```
+
+Partially updates a translation by ID. **Requires authentication.**
+
+---
+
+#### Delete Translation
+
+```
+DELETE /api/v1/translations/{id}
+```
+
+Deletes a translation by ID. **Requires authentication.**
+
+---
+
+#### Export Translations
+
+```
+GET /api/v1/translations/{code}/export
+```
+
+Exports all translations for a language as a JSON key-value map. **Requires authentication.**
+
+---
+
+#### Import Translations
+
+```
+POST /api/v1/translations/{code}/import
+```
+
+Bulk imports translations for a language. **Requires authentication.**
+
+**Request Body:**
+```json
+{
+  "translations": {
+    "nav.dashboard": "Dashboard",
+    "nav.posts": "Posts"
+  }
+}
+```
+
+---
+
+#### Clear Translation Cache
+
+```
+POST /api/v1/translations/{code}/cache
+```
+
+Invalidates the translation cache for a language. **Requires authentication.**
+
+---
+
+### GDPR
+
+#### Submit Consent
+
+```
+POST /api/v1/gdpr/consent
+```
+
+Records a user's GDPR consent.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "consent": true
+}
+```
+
+---
+
+#### Get Consent Status
+
+```
+GET /api/v1/gdpr/consent?email={email}
+```
+
+Retrieves the current GDPR consent status for a given email address.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| email | string | Email address to check |
+
+---
+
+### Media Upload
+
+#### Upload Image
+
+```
+POST /api/v1/media/upload
+```
+
+Uploads an image file. **Requires authentication (admin session).** Used primarily by the Summernote editor integration.
+
+**Request:**
+- Content-Type: `multipart/form-data`
+- Field: `image` (file)
+- Optional: `post_id` (integer)
+
+**Supported file types:** JPEG, PNG, GIF, WebP, BMP
+
+---
+
+### Health Check
+
+#### Health Check
+
+```
+GET /api/v1/health
+```
+
+Returns the API health status for monitoring and load balancers.
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "status": 200,
+  "data": {
+    "status": "ok",
+    "timestamp": "2026-07-30T12:00:00+00:00",
+    "service": "ScriptLog API",
+    "version": "1.1.0"
+  }
+}
+```
+
+---
+
+### OpenAPI Spec
+
+#### Get OpenAPI Specification
+
+```
+GET /api/v1/openapi.json
+```
+
+Returns the dynamic OpenAPI 3.0 specification with runtime server URL substitution.
+
+---
+
+#### Get CSRF Token
+
+```
+GET /api/v1/csrf-token
+```
+
+Returns a CSRF token for use in write operations.
+
+---
+
 ## Response Format
 
 All responses follow a consistent JSON structure:
@@ -593,10 +1062,11 @@ All responses follow a consistent JSON structure:
 {
   "success": true,
   "status": 200,
-  "message": "Operation description",
   "data": { ... }
 }
 ```
+
+Single resources include `_links` at the response root.
 
 ### Paginated Response
 
@@ -612,9 +1082,40 @@ All responses follow a consistent JSON structure:
     "total_pages": 5,
     "has_next_page": true,
     "has_previous_page": false
+  },
+  "_links": {
+    "self": { "href": "...", "rel": "self", "type": "GET" },
+    "first": { "href": "...", "rel": "first", "type": "GET" },
+    "prev": { "href": "...", "rel": "prev", "type": "GET" },
+    "next": { "href": "...", "rel": "next", "type": "GET" },
+    "last": { "href": "...", "rel": "last", "type": "GET" }
   }
 }
 ```
+
+### Created Response
+
+```json
+{
+  "success": true,
+  "status": 201,
+  "message": "Resource created",
+  "data": { "id": 42 }
+}
+```
+
+Includes `Location` header with the resource URL.
+
+### No Content Response
+
+```json
+{
+  "success": true,
+  "status": 204
+}
+```
+
+Used for DELETE operations. No response body.
 
 ### Error Response
 
@@ -640,12 +1141,15 @@ The API uses standard HTTP status codes:
 | 200 | OK | Request succeeded |
 | 201 | Created | Resource created successfully |
 | 204 | No Content | Request succeeded, no content to return |
+| 304 | Not Modified | Resource not modified (conditional GET) |
 | 400 | Bad Request | Invalid parameters or missing required fields |
 | 401 | Unauthorized | Authentication required |
 | 403 | Forbidden | Authenticated but insufficient permissions |
 | 404 | Not Found | Resource does not exist |
 | 405 | Method Not Allowed | HTTP method not supported |
-| 409 | Conflict | Resource already exists |
+| 406 | Not Acceptable | Unsupported Accept header |
+| 409 | Conflict | Resource already exists or conflict |
+| 415 | Unsupported Media Type | Wrong Content-Type header |
 | 422 | Unprocessable Entity | Validation failed |
 | 429 | Too Many Requests | Rate limit exceeded |
 | 500 | Internal Server Error | Server error |
@@ -660,6 +1164,7 @@ The API uses standard HTTP status codes:
 | NOT_FOUND | Resource not found |
 | CONFLICT | Resource already exists |
 | VALIDATION_ERROR | Validation failed |
+| MISSING_QUERY | Search query parameter required |
 | RATE_LIMIT_EXCEEDED | Too many requests |
 | INTERNAL_SERVER_ERROR | Server error |
 
@@ -669,12 +1174,12 @@ The API uses standard HTTP status codes:
 
 ### Query Parameters
 
-| Parameter | Description |
-|-----------|-------------|
-| page | Page number for pagination |
-| per_page | Number of items per page (max: 100) |
-| sort_by | Field to sort by |
-| sort_order | Sort direction (ASC or DESC) |
+| Parameter | Description | Supported Endpoints |
+|-----------|-------------|-------------------|
+| page | Page number for pagination | Posts, Categories, Comments, Archives, Search, Languages, Translations |
+| per_page | Number of items per page (max: 100) | Posts, Categories, Comments, Archives, Search, Languages, Translations |
+| sort_by | Field to sort by | Posts, Categories, Comments |
+| sort_order | Sort direction (ASC or DESC) | Posts, Categories, Comments |
 
 ### Example
 
@@ -728,6 +1233,16 @@ Rate limits are tracked per client using the following priority:
 1. **API Key** (`X-API-Key` header) - if provided
 2. **Bearer Token** (`Authorization` header) - if provided
 3. **IP Address** (`REMOTE_ADDR`) - fallback
+
+### Rate Limiting Configuration
+
+Navigate to **Settings → API** in the admin panel to configure:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| Enable Rate Limiting | Toggle rate limiting on/off | Enabled |
+| Read Rate Limit | Maximum GET requests per minute | 60 |
+| Write Rate Limit | Maximum write requests per minute | 20 |
 
 ---
 
@@ -787,45 +1302,20 @@ The API root (`GET /api/v1/`) returns links to all available endpoints:
   "status": 200,
   "data": {
     "name": "Blogware RESTful API",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "_links": {
-    "self": {
-      "href": "http://blogware.site/api/v1",
-      "rel": "self",
-      "type": "GET"
-    },
-    "posts": {
-      "href": "http://blogware.site/api/v1/posts",
-      "rel": "posts",
-      "type": "GET"
-    },
-    "categories": {
-      "href": "http://blogware.site/api/v1/categories",
-      "rel": "categories",
-      "type": "GET"
-    },
-    "comments": {
-      "href": "http://blogware.site/api/v1/comments",
-      "rel": "comments",
-      "type": "GET"
-    },
-    "archives": {
-      "href": "http://blogware.site/api/v1/archives",
-      "rel": "archives",
-      "type": "GET"
-    },
-    "search": {
-      "href": "http://blogware.site/api/v1/search?q={query}",
-      "rel": "search",
-      "type": "GET",
-      "templated": true
-    },
-    "openapi": {
-      "href": "http://blogware.site/api/v1/openapi.json",
-      "rel": "service-desc",
-      "type": "application/json"
-    }
+    "self": { "href": "http://blogware.site/api/v1", "rel": "self", "type": "GET" },
+    "posts": { "href": "http://blogware.site/api/v1/posts", "rel": "posts", "type": "GET" },
+    "categories": { "href": "http://blogware.site/api/v1/categories", "rel": "categories", "type": "GET" },
+    "comments": { "href": "http://blogware.site/api/v1/comments", "rel": "comments", "type": "GET" },
+    "archives": { "href": "http://blogware.site/api/v1/archives", "rel": "archives", "type": "GET" },
+    "search": { "href": "http://blogware.site/api/v1/search?q={query}", "rel": "search", "type": "GET", "templated": true },
+    "gdpr": { "href": "http://blogware.site/api/v1/gdpr/consent", "rel": "gdpr", "type": "GET" },
+    "languages": { "href": "http://blogware.site/api/v1/languages", "rel": "languages", "type": "GET" },
+    "translations": { "href": "http://blogware.site/api/v1/translations/en", "rel": "translations", "type": "GET" },
+    "media": { "href": "http://blogware.site/api/v1/media/upload", "rel": "media", "type": "POST" },
+    "openapi": { "href": "http://blogware.site/api/v1/openapi.json", "rel": "service-desc", "type": "application/json" }
   }
 }
 ```
@@ -846,31 +1336,11 @@ The API root (`GET /api/v1/`) returns links to all available endpoints:
     "has_previous_page": true
   },
   "_links": {
-    "self": {
-      "href": "http://blogware.site/api/v1/posts?page=2&per_page=10",
-      "rel": "self",
-      "type": "GET"
-    },
-    "first": {
-      "href": "http://blogware.site/api/v1/posts?page=1&per_page=10",
-      "rel": "first",
-      "type": "GET"
-    },
-    "prev": {
-      "href": "http://blogware.site/api/v1/posts?page=1&per_page=10",
-      "rel": "prev",
-      "type": "GET"
-    },
-    "next": {
-      "href": "http://blogware.site/api/v1/posts?page=3&per_page=10",
-      "rel": "next",
-      "type": "GET"
-    },
-    "last": {
-      "href": "http://blogware.site/api/v1/posts?page=5&per_page=10",
-      "rel": "last",
-      "type": "GET"
-    }
+    "self": { "href": "http://blogware.site/api/v1/posts?page=2&per_page=10", "rel": "self", "type": "GET" },
+    "first": { "href": "http://blogware.site/api/v1/posts?page=1&per_page=10", "rel": "first", "type": "GET" },
+    "prev": { "href": "http://blogware.site/api/v1/posts?page=1&per_page=10", "rel": "prev", "type": "GET" },
+    "next": { "href": "http://blogware.site/api/v1/posts?page=3&per_page=10", "rel": "next", "type": "GET" },
+    "last": { "href": "http://blogware.site/api/v1/posts?page=5&per_page=10", "rel": "last", "type": "GET" }
   }
 }
 ```
@@ -887,26 +1357,10 @@ The API root (`GET /api/v1/`) returns links to all available endpoints:
     "slug": "my-first-blog-post"
   },
   "_links": {
-    "self": {
-      "href": "http://blogware.site/api/v1/posts/1",
-      "rel": "self",
-      "type": "GET"
-    },
-    "comments": {
-      "href": "http://blogware.site/api/v1/posts/1/comments",
-      "rel": "comments",
-      "type": "GET"
-    },
-    "canonical": {
-      "href": "http://blogware.site/post/1/my-first-blog-post",
-      "rel": "canonical",
-      "type": "text/html"
-    },
-    "collection": {
-      "href": "http://blogware.site/api/v1/posts",
-      "rel": "collection",
-      "type": "GET"
-    }
+    "self": { "href": "http://blogware.site/api/v1/posts/1", "rel": "self", "type": "GET" },
+    "comments": { "href": "http://blogware.site/api/v1/posts/1/comments", "rel": "comments", "type": "GET" },
+    "canonical": { "href": "http://blogware.site/post/1/my-first-blog-post", "rel": "canonical", "type": "text/html" },
+    "collection": { "href": "http://blogware.site/api/v1/posts", "rel": "collection", "type": "GET" }
   }
 }
 ```
@@ -929,16 +1383,12 @@ You can use these files to:
 
 ### Using with Swagger UI
 
-To view the API documentation in Swagger UI:
-
 1. Copy the `API_OPENAPI.json` file to a web server
 2. Navigate to [Swagger Editor](https://editor.swagger.io/)
 3. Paste the JSON content
 4. Explore the interactive API documentation
 
 ### Using with Postman
-
-To import into Postman:
 
 1. Open Postman
 2. Click Import
@@ -964,9 +1414,7 @@ const post = await fetch(`${baseUrl}/posts/1`);
 // Create comment (no auth required)
 const comment = await fetch(`${baseUrl}/comments`, {
   method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
+  headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     comment_author_name: 'John Doe',
     comment_author_email: 'john@example.com',
@@ -1049,41 +1497,4 @@ For issues and questions:
 
 ---
 
-## Changelog
 
-### Version 1.1.1 (2026-04-04)
-- **Caching**: GET responses are now cacheable with `Cache-Control: public, max-age=300`
-  - `ETag` header for entity tag cache validation
-  - `Last-Modified` header for timestamp-based validation
-  - `304 Not Modified` response for conditional requests (`If-None-Match`, `If-Modified-Since`)
-  - `Vary: Accept, Accept-Encoding, X-API-Key` header for proper cache keying
-- **HTTP Compliance**:
-  - `Location` header on all `201 Created` responses
-  - `204 No Content` for `DELETE` operations (was `200 OK`)
-  - `406 Not Acceptable` for unsupported `Accept` header values
-  - `PATCH` method support for partial updates (Posts, Categories, Comments)
-  - `Allow` header on `405 Method Not Allowed` responses
-- **REST Semantic Fixes**:
-  - Changed `POST /languages/{code}/default` to `PUT` (proper state change semantics)
-
-### Version 1.1.0 (2026-04-04)
-- **Rate Limiting**: Implemented file-based rate limiting with sliding window
-  - 60 requests/minute for read operations (GET)
-  - 20 requests/minute for write operations (POST/PUT/DELETE/PATCH)
-  - Per-client tracking by API key, Bearer token, or IP address
-  - Standard rate limit headers (X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset)
-- **HATEOAS**: Added Hypermedia as the Engine of Application State to all responses
-  - `_links` object in every response following RFC 5988 (Web Linking)
-  - Pagination links (self, first, prev, next, last)
-  - Resource links (self, collection, canonical, comments, post)
-  - Root API links for endpoint discovery
-  - Templated search URL support
-
-### Version 1.0.0 (2024-01-15)
-- Initial release
-- Posts CRUD operations
-- Categories CRUD operations
-- Comments CRUD operations
-- Archives by date
-- API Key and Bearer Token authentication
-- OpenAPI 3.0 specification
