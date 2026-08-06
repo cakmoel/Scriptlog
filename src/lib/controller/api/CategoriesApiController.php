@@ -54,6 +54,8 @@ class CategoriesApiController extends ApiController
      */
     public function __construct()
     {
+        $this->requiresAuth = false;
+
         parent::__construct();
 
         // Initialize DAO and services
@@ -74,8 +76,6 @@ class CategoriesApiController extends ApiController
     public function index($params = [])
     {
         // This is a public endpoint - no auth required
-        $this->requiresAuth = false;
-
         // Get pagination
         $pagination = $this->getPagination($params);
 
@@ -118,8 +118,6 @@ class CategoriesApiController extends ApiController
     public function show($params = [])
     {
         // This is a public endpoint - no auth required
-        $this->requiresAuth = false;
-
         $topicId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (!$topicId) {
@@ -152,8 +150,6 @@ class CategoriesApiController extends ApiController
     public function posts($params = [])
     {
         // This is a public endpoint - no auth required
-        $this->requiresAuth = false;
-
         $topicId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (!$topicId) {
