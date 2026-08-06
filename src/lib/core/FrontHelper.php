@@ -56,6 +56,7 @@ class FrontHelper
      * @param int $id
      * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabSimpleFrontPost($id)
     {
@@ -69,6 +70,7 @@ class FrontHelper
      * @param int $id
      * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabSimpleFrontTopic($id)
     {
@@ -81,6 +83,7 @@ class FrontHelper
      * @deprecated Use Scriptlog\Service\FrontService::getSimpleArchive()
      * @return array
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabSimpleFrontArchive()
     {
@@ -94,6 +97,7 @@ class FrontHelper
      * @param int $id
      * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabSimpleFrontPage($id)
     {
@@ -109,6 +113,7 @@ class FrontHelper
      * @param string $tag
      * @return array
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function simpleSearchingTag($tag)
     {
@@ -125,6 +130,7 @@ class FrontHelper
      * @deprecated Use Scriptlog\Service\FrontService::getTagLists()
      * @return array
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabTagLists()
     {
@@ -138,6 +144,7 @@ class FrontHelper
      * @param int $id
      * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabPreparedFrontPostById($id)
     {
@@ -151,6 +158,7 @@ class FrontHelper
      * @param string $slug
      * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabPreparedFrontPageBySlug($slug)
     {
@@ -164,6 +172,7 @@ class FrontHelper
      * @param string $slug
      * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabPreparedFrontTopicBySlug($slug)
     {
@@ -177,6 +186,7 @@ class FrontHelper
      * @param int $id
      * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabPreparedFrontTopicByID($id)
     {
@@ -190,6 +200,7 @@ class FrontHelper
      * @param array $values
      * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabPreparedFrontArchive($values)
     {
@@ -204,6 +215,7 @@ class FrontHelper
      * @param int $limit
      * @return array|null
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function grabPreparedFrontGalleries($start, $limit)
     {
