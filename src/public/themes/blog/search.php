@@ -3,7 +3,7 @@
 defined('SCRIPTLOG') || die('Direct access not permitted');
 
 $searchResults = isset($GLOBALS['search_results']) ? $GLOBALS['search_results'] : [];
-$searchKeyword = isset($GLOBALS['search_keyword']) ? htmlspecialchars($GLOBALS['search_keyword'], ENT_QUOTES, 'UTF-8') : '';
+$searchKeyword = isset($GLOBALS['search_keyword']) ? theme_escape_html($GLOBALS['search_keyword']) : '';
 $searchPagination = isset($GLOBALS['search_pagination']) ? $GLOBALS['search_pagination'] : [];
 $searchRateLimited = isset($GLOBALS['search_rate_limited']) ? (bool)$GLOBALS['search_rate_limited'] : false;
 
@@ -52,17 +52,17 @@ $paginationHtml = isset($searchPagination['html']) ? $searchPagination['html'] :
           <div class="search-results-list" role="list" aria-label="<?= t('search.title'); ?>">
             <?php foreach ($results as $item) :
               $itemId = isset($item->ID) ? (int)$item->ID : 0;
-              $itemTitle = isset($item->post_title) ? htmlspecialchars($item->post_title, ENT_QUOTES, 'UTF-8') : '';
-              $itemType = isset($item->post_type) ? htmlspecialchars($item->post_type, ENT_QUOTES, 'UTF-8') : 'blog';
-              $itemDate = isset($item->post_date) ? htmlspecialchars(make_date($item->post_date), ENT_QUOTES, 'UTF-8') : '';
-              $itemDateTime = isset($item->post_date) ? htmlspecialchars($item->post_date, ENT_QUOTES, 'UTF-8') : '';
-              $itemExcerpt = isset($item->post_content) ? paragraph_l2br(htmlspecialchars(paragraph_trim($item->post_content), ENT_QUOTES, 'UTF-8')) : '';
+              $itemTitle = isset($item->post_title) ? theme_escape_html($item->post_title) : '';
+              $itemType = isset($item->post_type) ? theme_escape_html($item->post_type) : 'blog';
+              $itemDate = isset($item->post_date) ? theme_escape_html(make_date($item->post_date)) : '';
+              $itemDateTime = isset($item->post_date) ? theme_escape_html($item->post_date) : '';
+              $itemExcerpt = isset($item->post_content) ? paragraph_l2br(safe_html(paragraph_trim($item->post_content))) : '';
 
               if ($itemType === 'page') {
-                $itemUrl = permalinks($itemId)['page'];
+                $itemUrl = theme_page_url(['ID' => $itemId, 'post_slug' => isset($item->post_slug) ? $item->post_slug : '']);
                 $typeLabel = t('search.type.page');
               } else {
-                $itemUrl = permalinks($itemId)['post'];
+                $itemUrl = theme_post_url(['ID' => $itemId, 'post_slug' => isset($item->post_slug) ? $item->post_slug : '']);
                 $typeLabel = t('search.type.post');
               }
             ?>
