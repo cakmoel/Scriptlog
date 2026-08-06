@@ -2,7 +2,7 @@
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
-$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action'])) : "";
+$action = isset($_GET['action']) ? htmlentities(strip_tags($_GET['action']), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "";
 $policyId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 
 if (false === $app->authenticator->userAccessControl(ActionConst::PRIVACY)) {
