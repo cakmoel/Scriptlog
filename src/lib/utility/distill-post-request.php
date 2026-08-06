@@ -17,7 +17,6 @@ function distill_post_request($refine)
 {
 
     if (is_array($refine)) {
-
         static $validFilterIds = null;
 
         if ($validFilterIds === null) {

@@ -41,7 +41,7 @@ class WordPressImporter
         libxml_use_internal_errors(true);
 
         if (PHP_VERSION_ID < 80100 && function_exists('libxml_disable_entity_loader')) {
-            libxml_disable_entity_loader(true);
+            libxml_disable_entity_loader(true); // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.libxml_disable_entity_loaderDeprecated
         }
 
         $this->xml = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_DTDLOAD);

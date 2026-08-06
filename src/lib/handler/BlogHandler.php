@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Handler;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**

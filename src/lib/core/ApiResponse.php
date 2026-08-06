@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -34,6 +35,7 @@ class ApiResponse
     public const HTTP_NOT_FOUND = 404;
     public const HTTP_METHOD_NOT_ALLOWED = 405;
     public const HTTP_NOT_ACCEPTABLE = 406;
+    public const HTTP_UNSUPPORTED_MEDIA_TYPE = 415;
     public const HTTP_CONFLICT = 409;
     public const HTTP_UNPROCESSABLE_ENTITY = 422;
     public const HTTP_TOO_MANY_REQUESTS = 429;
@@ -246,7 +248,7 @@ class ApiResponse
         }
 
         header('Cache-Control: public, max-age=' . $ttl);
-        header('Vary: Accept, Accept-Encoding, X-API-Key');
+        header('Vary: Accept, Accept-Encoding, Origin, X-API-Key');
     }
 
     /**
@@ -386,6 +388,17 @@ class ApiResponse
     {
         header('Accept: ' . implode(', ', $supportedTypes));
         self::error($message, self::HTTP_NOT_ACCEPTABLE, 'NOT_ACCEPTABLE');
+    }
+
+    /**
+     * Send a 415 Unsupported Media Type error
+     *
+     * @param string $message Error message
+     * @return void
+     */
+    public static function unsupportedMediaType($message = 'Unsupported Media Type')
+    {
+        self::error($message, self::HTTP_UNSUPPORTED_MEDIA_TYPE, 'UNSUPPORTED_MEDIA_TYPE');
     }
 
     /**
@@ -553,7 +566,12 @@ class ApiResponse
             exit;
         }
 
-        $jsonOptions = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT;
+        $jsonOptions = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
+
+        if (isset($_GET['pretty']) || (defined('APP_DEBUG') && APP_DEBUG === true)) {
+            $jsonOptions |= JSON_PRETTY_PRINT;
+        }
+
         echo json_encode($data, $jsonOptions);
 
         exit;
@@ -574,6 +592,7 @@ class ApiResponse
             self::HTTP_NOT_FOUND => 'NOT_FOUND',
             self::HTTP_METHOD_NOT_ALLOWED => 'METHOD_NOT_ALLOWED',
             self::HTTP_NOT_ACCEPTABLE => 'NOT_ACCEPTABLE',
+            self::HTTP_UNSUPPORTED_MEDIA_TYPE => 'UNSUPPORTED_MEDIA_TYPE',
             self::HTTP_CONFLICT => 'CONFLICT',
             self::HTTP_UNPROCESSABLE_ENTITY => 'VALIDATION_ERROR',
             self::HTTP_TOO_MANY_REQUESTS => 'RATE_LIMIT_EXCEEDED',

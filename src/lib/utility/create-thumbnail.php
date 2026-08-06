@@ -31,37 +31,24 @@ function resize_image($current_width, $current_height, $max_size, $destination, 
 
     // resize image
     if (imagecopyresampled($new_canves, $img_src, 0, 0, 0, 0, $new_width, $new_height, $current_width, $current_height)) {
-        switch (strtolower($img_type)) {
-            case 'image/png':
-                imagepng($new_canves, $destination);
+        $format = get_image_format(strtolower($img_type));
 
-                break;
-
-            case 'image/gif':
-                imagegif($new_canves, $destination);
-
-                break;
-
-            case 'image/jpeg':
-            case 'image/pjpeg':
-            case 'image/jpg':
-                imagejpeg($new_canves, $destination, $quality);
-
-                break;
-
-            case 'image/webp':
-                imagewebp($new_canves, $destination);
-
-                break;
-
-            default:
-                return false;
-
-                break;
+        if ($format === 'png') {
+            imagepng($new_canves, $destination);
+        } elseif ($format === 'gif') {
+            imagegif($new_canves, $destination);
+        } elseif ($format === 'jpeg') {
+            imagejpeg($new_canves, $destination, $quality);
+        } elseif ($format === 'webp') {
+            imagewebp($new_canves, $destination);
+        } else {
+            return false;
         }
 
         if (is_resource($new_canves) || $new_canves instanceof \GdImage) {
-            imagedestroy($new_canves);
+            if (PHP_VERSION_ID < 80500) {
+                imagedestroy($new_canves); // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.imagedestroyDeprecated
+            }
         }
 
         return true;
@@ -106,37 +93,24 @@ function crop_image($current_width, $current_height, $new_size, $destination, $i
     $new_canves = imagecreatetruecolor($new_size, $new_size);
 
     if (imagecopyresampled($new_canves, $img_src, 0, 0, $x_offset, $y_offset, $new_size, $new_size, $square_size, $square_size)) {
-        switch (strtolower($img_type)) {
-            case 'image/png':
-                imagepng($new_canves, $destination);
+        $format = get_image_format(strtolower($img_type));
 
-                break;
-
-            case 'image/gif':
-                imagegif($new_canves, $destination);
-
-                break;
-
-            case 'image/jpeg':
-            case 'image/pjpeg':
-            case 'image/jpg':
-                imagejpeg($new_canves, $destination, $quality);
-
-                break;
-
-            case 'image/webp':
-                imagewebp($new_canves, $destination);
-
-                break;
-
-            default:
-                return false;
-
-                break;
+        if ($format === 'png') {
+            imagepng($new_canves, $destination);
+        } elseif ($format === 'gif') {
+            imagegif($new_canves, $destination);
+        } elseif ($format === 'jpeg') {
+            imagejpeg($new_canves, $destination, $quality);
+        } elseif ($format === 'webp') {
+            imagewebp($new_canves, $destination);
+        } else {
+            return false;
         }
 
         if (is_resource($new_canves) || $new_canves instanceof \GdImage) {
-            imagedestroy($new_canves);
+            if (PHP_VERSION_ID < 80500) {
+                imagedestroy($new_canves); // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.imagedestroyDeprecated
+            }
         }
 
         return true;

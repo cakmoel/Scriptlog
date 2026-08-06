@@ -250,7 +250,7 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
 
     // Setting Site_Tagline
     $site_tagline = "site_tagline";
-    $site_tagline_value = "Just another personal weblog";
+    $site_tagline_value = "Blog engine";
 
     // Setting Site_Description
     $site_description = "site_description";
@@ -341,6 +341,7 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
             $link->query($tblTranslation);
             $link->query($tblPrivacyPolicy);
             $link->query($tblDownloadLog);
+            $link->query($tblApiKeys);
 
             // insert configuration - app_key
             $recordAppKey = $link->prepare($saveSettings);
@@ -1062,7 +1063,7 @@ function grab_app_key($mysqli, $key, $prefix = '')
 
     $row = mysqli_fetch_assoc($mysqli->query($sql));
 
-    $app_key = isset($row['setting_value']) ? htmlspecialchars($row['setting_value']) : "";
+    $app_key = isset($row['setting_value']) ? htmlspecialchars($row['setting_value'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : "";
     $id = isset($row['ID']) ? abs((int)$row['ID']) : "";
 
     return array('app_key' => generate_license(substr($app_key, 0, 6)), 'ID' => $id);
@@ -1345,7 +1346,7 @@ function installation_key($length)
     } elseif (function_exists("openssl_random_pseudo_bytes")) {
         $token = openssl_random_pseudo_bytes(ceil($length / 2));
     } else {
-        trigger_error("No cryptographically secure random function available", E_USER_ERROR);
+        throw new \RuntimeException("No cryptographically secure random function available");
     }
 
     return bin2hex($token);
@@ -1654,7 +1655,7 @@ location ~ /\.git/ {
 
                 <!-- Application routes with language prefix (e.g., /en/post/...) -->
                 <rule name="Language Routes" stopProcessing="true">
-                    <match url="^[a-z]{2}/(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$" />
+                    <match url="^[a-z]{2}/(post|page|blog|category|archive|archives|tag|privacy|search|download|download_file)(/.*)?$" />
                     <action type="Rewrite" url="index.php" />
                 </rule>
 
@@ -1665,7 +1666,7 @@ location ~ /\.git/ {
 
                 <!-- Application URL rewriting -->
                 <rule name="ScriptLog Rewrite" stopProcessing="true">
-                    <match url="^(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$" />
+                    <match url="^(post|page|blog|category|archive|archives|tag|privacy|search|download|download_file)(/.*)?$" />
                     <action type="Rewrite" url="index.php" />
                 </rule>
 
@@ -1860,9 +1861,9 @@ location ~ /\.git/ {
     RewriteCond %{REQUEST_FILENAME} !-f 
     RewriteCond %{REQUEST_FILENAME} !-l 
     # Only route known application prefixes to index.php
-    RewriteRule ^(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$ index.php [QSA,L]
+    RewriteRule ^(post|page|blog|category|archive|archives|tag|privacy|search|download|download_file)(/.*)?$ index.php [QSA,L]
     RewriteRule ^$ index.php [QSA,L]
-    RewriteRule ^[a-z]{2}/(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$ index.php [QSA,L]
+    RewriteRule ^[a-z]{2}/(post|page|blog|category|archive|archives|tag|privacy|search|download|download_file)(/.*)?$ index.php [QSA,L]
     RewriteRule ^[a-z]{2}/?$ index.php [QSA,L]
 </IfModule>
 # FINISH ScriptLog

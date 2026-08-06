@@ -2,18 +2,19 @@
 
 $archives = function_exists('archive_index') ? archive_index() : [];
 
-$monthNames = [
-    '01' => 'January', '02' => 'February', '03' => 'March',
-    '04' => 'April', '05' => 'May', '06' => 'June',
-    '07' => 'July', '08' => 'August', '09' => 'September',
-    '10' => 'October', '11' => 'November', '12' => 'December'
-];
-
-// Group archives by year
-$archivesByYear = [];
-if (!empty($archives)) {
+// Normalize each raw archive row into a typed, already-escaped ArchiveViewModel
+$archiveVMs = [];
+if (!empty($archives) && function_exists('prepare_archive')) {
     foreach ($archives as $archive) {
-        $year = $archive['year_archive'];
+        $archiveVMs[] = prepare_archive($archive);
+    }
+}
+
+// Group archives by year (year lives on the view model getter)
+$archivesByYear = [];
+if (!empty($archiveVMs)) {
+    foreach ($archiveVMs as $archive) {
+        $year = (string)$archive->year();
         if (!isset($archivesByYear[$year])) {
             $archivesByYear[$year] = [];
         }
@@ -35,16 +36,15 @@ if (!empty($archives)) {
                     <?php if (!empty($archivesByYear)) : ?>
                         <?php foreach ($archivesByYear as $year => $yearArchives) : ?>
                             <div class="col-12 mb-4">
-                                <h3 class="year-archive"><?= htmlout($year); ?></h3>
+                                <h3 class="year-archive"><?= $year; ?></h3>
                                 <div class="archive-list">
                                     <?php foreach ($yearArchives as $archive) :
-                                        $month = str_pad($archive['month_archive'], 2, '0', STR_PAD_LEFT);
-                                        $monthName = $monthNames[$month] ?? $month;
-                                        $total = $archive['total_archive'];
+                                        $monthName = $archive->label();
+                                        $total = (string)$archive->count();
                                         ?>
                                         <div class="archive-item mb-2">
-                                            <a href="<?= app_url(); ?>/archive/<?= $month; ?>/<?= $year; ?>" class="archive-link">
-                                                <span class="archive-month"><?= htmlout($monthName); ?></span>
+                                            <a href="<?= $archive->url(); ?>" class="archive-link">
+                                                <span class="archive-month"><?= $monthName; ?></span>
                                                 <span class="archive-count">(<?= $total; ?> <?= $total == 1 ? 'post' : 'posts'; ?>)</span>
                                             </a>
                                         </div>

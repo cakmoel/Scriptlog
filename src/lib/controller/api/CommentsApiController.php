@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Controller\Api;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -19,9 +20,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 use Scriptlog\Controller\ApiController;
 use Scriptlog\Core\ApiHateoas;
 use Scriptlog\Core\ApiResponse;
-use Scriptlog\Core\Registry;
+use Scriptlog\Core\FormValidator;
 use Scriptlog\Core\Sanitize;
 use Scriptlog\Dao\CommentDao;
+use Scriptlog\Dto\Api\CommentApiDto;
+use Scriptlog\Service\CommentService;
 
 class CommentsApiController extends ApiController
 {
@@ -29,6 +32,11 @@ class CommentsApiController extends ApiController
      * @var CommentDao
      */
     private $commentDao;
+
+    /**
+     * @var CommentService
+     */
+    private $commentService;
 
     /**
      * @var Sanitize
@@ -45,12 +53,15 @@ class CommentsApiController extends ApiController
      */
     public function __construct()
     {
+        $this->requiresAuth = false;
+
         parent::__construct();
 
-        // Initialize DAO
+        // Initialize DAO and services
         $this->commentDao = new CommentDao();
         $this->sanitizer = new Sanitize();
         $this->hateoas = new ApiHateoas();
+        $this->commentService = new CommentService($this->commentDao, new FormValidator(), $this->sanitizer);
     }
 
     /**
@@ -64,8 +75,6 @@ class CommentsApiController extends ApiController
     public function index($params = [])
     {
         // This is a public endpoint - no auth required
-        $this->requiresAuth = false;
-
         // Get pagination
         $pagination = $this->getPagination($params);
 
@@ -76,41 +85,21 @@ class CommentsApiController extends ApiController
         $postIdFilter = isset($params['post_id']) ? (int)$params['post_id'] : null;
 
         try {
-            $dbc = Registry::get('dbc');
+            $sortBy = str_replace('`', '', $sorting['sort_by']);
+            $sortOrder = $sorting['sort_order'];
 
-            // Build query
-            $whereClause = "WHERE c.comment_status = 'approved'";
-            $countWhereClause = "WHERE comment_status = 'approved'";
-            $paramsArr = [];
+            $comments = $this->commentService->getApprovedCommentsApi(
+                $pagination['page'],
+                $pagination['per_page'],
+                $sortBy,
+                $sortOrder,
+                $postIdFilter
+            );
 
-            if ($postIdFilter) {
-                $whereClause .= " AND c.comment_post_id = ?";
-                $countWhereClause .= " AND comment_post_id = ?";
-                $paramsArr[] = $postIdFilter;
-            }
-
-            $sql = "SELECT c.ID, c.comment_post_id, c.comment_parent_id, 
-                           c.comment_author_name, c.comment_author_email,
-                           c.comment_content, c.comment_status, c.comment_date,
-                           p.post_title, p.post_slug
-                    FROM tbl_comments c
-                    LEFT JOIN tbl_posts p ON c.comment_post_id = p.ID
-                    " . $whereClause . "
-                    ORDER BY c." . $sorting['sort_by'] . " " . $sorting['sort_order'] . "
-                    LIMIT " . $pagination['per_page'] . " OFFSET " . $pagination['offset'];
-
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute($paramsArr);
-            $comments = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-            // Get total count
-            $countSql = "SELECT COUNT(*) as total FROM tbl_comments " . $countWhereClause;
-            $countStmt = $dbc->prepare($countSql);
-            $countStmt->execute($postIdFilter ? [$postIdFilter] : []);
-            $total = $countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
+            $total = $this->commentService->countApprovedCommentsApi($postIdFilter);
 
             // Transform comments
-            $transformedComments = array_map([$this, 'transformComment'], $comments);
+            $transformedComments = CommentApiDto::transformCollection($comments, $this->getAppUrl());
 
             // Generate HATEOAS pagination links
             $hateoasLinks = $this->hateoas->paginationLinks('comments', $pagination['page'], $pagination['per_page'], $total);
@@ -141,9 +130,7 @@ class CommentsApiController extends ApiController
     public function show($params = [])
     {
         // This is a public endpoint - no auth required
-        $this->requiresAuth = false;
-
-        $commentId = isset($params[0]) ? (int)$params[0] : 0;
+        $commentId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (!$commentId) {
             ApiResponse::badRequest('Comment ID is required');
@@ -151,17 +138,7 @@ class CommentsApiController extends ApiController
         }
 
         try {
-            $dbc = Registry::get('dbc');
-
-            // Get comment
-            $sql = "SELECT c.*, p.post_title, p.post_slug
-                    FROM tbl_comments c
-                    LEFT JOIN tbl_posts p ON c.comment_post_id = p.ID
-                    WHERE c.ID = ?";
-
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute([$commentId]);
-            $comment = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $comment = $this->commentService->getCommentApi($commentId);
 
             if (!$comment) {
                 ApiResponse::notFound('Comment not found');
@@ -174,7 +151,11 @@ class CommentsApiController extends ApiController
                 return;
             }
 
-            ApiResponse::success($this->transformComment($comment));
+            $links = $this->hateoas->commentLinks($commentId, $comment['comment_post_id']);
+
+            $responseData = CommentApiDto::transform($comment, $this->getAppUrl());
+
+            ApiResponse::success($responseData, 200, null, $links);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to fetch comment: ' . $e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -191,8 +172,6 @@ class CommentsApiController extends ApiController
     public function store($_params = [])
     {
         // This is a public endpoint - visitors can post comments
-        $this->requiresAuth = false;
-
         // Validate required fields
         $required = ['comment_author_name', 'comment_content', 'comment_post_id'];
         $validationErrors = $this->validateRequired($this->requestData, $required);
@@ -211,20 +190,14 @@ class CommentsApiController extends ApiController
         }
 
         try {
-            $dbc = Registry::get('dbc');
+            $commentStatus = $this->commentService->checkPostAcceptsComments($postId);
 
-            // Check if post exists and allows comments
-            $checkPostSql = "SELECT ID, comment_status FROM tbl_posts WHERE ID = ?";
-            $checkPostStmt = $dbc->prepare($checkPostSql);
-            $checkPostStmt->execute([$postId]);
-            $post = $checkPostStmt->fetch(\PDO::FETCH_ASSOC);
-
-            if (!$post) {
+            if ($commentStatus === null) {
                 ApiResponse::notFound('Post not found');
                 return;
             }
 
-            if ($post['comment_status'] !== 'open') {
+            if ($commentStatus !== 'open') {
                 ApiResponse::forbidden('Comments are closed for this post');
                 return;
             }
@@ -237,36 +210,23 @@ class CommentsApiController extends ApiController
                 }
             }
 
-            // Get client IP
             $ipAddress = $this->getClientIp();
 
-            // Insert comment (default status is pending for moderation)
-            $sql = "INSERT INTO tbl_comments 
-                    (comment_post_id, comment_parent_id, comment_author_name, 
-                     comment_author_ip, comment_author_email, comment_content, 
-                     comment_status, comment_date)
-                    VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())";
-
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute([
-                $postId,
-                isset($this->requestData['comment_parent_id']) ? (int)$this->requestData['comment_parent_id'] : 0,
-                $this->sanitize($this->requestData['comment_author_name']),
-                $ipAddress,
-                isset($this->requestData['comment_author_email']) ? $this->sanitize($this->requestData['comment_author_email']) : null,
-                $this->sanitize($this->requestData['comment_content'])
+            $commentId = $this->commentService->createCommentApi([
+                'comment_post_id' => $postId,
+                'comment_parent_id' => isset($this->requestData['comment_parent_id']) ? (int)$this->requestData['comment_parent_id'] : 0,
+                'comment_author_name' => $this->sanitize($this->requestData['comment_author_name']),
+                'comment_author_ip' => $ipAddress,
+                'comment_author_email' => isset($this->requestData['comment_author_email']) ? $this->sanitize($this->requestData['comment_author_email']) : null,
+                'comment_content' => $this->sanitize($this->requestData['comment_content']),
+                'comment_status' => 'pending',
+                'comment_date' => date('Y-m-d H:i:s')
             ]);
 
-            $commentId = $dbc->lastInsertId();
-
-            // Fetch created comment
-            $fetchSql = "SELECT * FROM tbl_comments WHERE ID = ?";
-            $fetchStmt = $dbc->prepare($fetchSql);
-            $fetchStmt->execute([$commentId]);
-            $createdComment = $fetchStmt->fetch(\PDO::FETCH_ASSOC);
+            $createdComment = $this->commentService->getCommentApi($commentId);
 
             ApiResponse::created(
-                $this->transformComment($createdComment),
+                CommentApiDto::transform($createdComment, $this->getAppUrl()),
                 'Comment submitted successfully. It will be visible after moderation.',
                 $this->hateoas->commentLinks($commentId, $postId),
                 $this->getAppUrl() . '/api/v1/comments/' . $commentId
@@ -289,7 +249,7 @@ class CommentsApiController extends ApiController
         // Require authentication
         $this->requiresAuth = true;
 
-        $commentId = isset($params[0]) ? (int)$params[0] : 0;
+        $commentId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (!$commentId) {
             ApiResponse::badRequest('Comment ID is required');
@@ -303,63 +263,39 @@ class CommentsApiController extends ApiController
         }
 
         try {
-            $dbc = Registry::get('dbc');
+            $existing = $this->commentService->getCommentApi($commentId);
 
-            // Check if comment exists
-            $checkSql = "SELECT ID FROM tbl_comments WHERE ID = ?";
-            $checkStmt = $dbc->prepare($checkSql);
-            $checkStmt->execute([$commentId]);
-            $comment = $checkStmt->fetch(\PDO::FETCH_ASSOC);
-
-            if (!$comment) {
+            if (!$existing) {
                 ApiResponse::notFound('Comment not found');
                 return;
             }
 
-            // Build update query
-            $updates = [];
-            $values = [];
+            $updateData = [];
 
             if (isset($this->requestData['comment_author_name'])) {
-                $updates[] = 'comment_author_name = ?';
-                $values[] = $this->sanitize($this->requestData['comment_author_name']);
+                $updateData['comment_author_name'] = $this->sanitize($this->requestData['comment_author_name']);
             }
 
             if (isset($this->requestData['comment_content'])) {
-                $updates[] = 'comment_content = ?';
-                $values[] = $this->sanitize($this->requestData['comment_content']);
+                $updateData['comment_content'] = $this->sanitize($this->requestData['comment_content']);
             }
 
             if (isset($this->requestData['comment_status'])) {
-                $updates[] = 'comment_status = ?';
-                $values[] = in_array($this->requestData['comment_status'], ['approved', 'pending', 'spam'])
+                $updateData['comment_status'] = in_array($this->requestData['comment_status'], ['approved', 'pending', 'spam'])
                     ? $this->requestData['comment_status']
                     : 'pending';
             }
 
-            if (empty($updates)) {
+            if (empty($updateData)) {
                 ApiResponse::badRequest('No fields to update');
                 return;
             }
 
-            // Add comment ID to values
-            $values[] = $commentId;
+            $this->commentService->updateCommentApi($commentId, $updateData);
 
-            // Execute update
-            $sql = "UPDATE tbl_comments SET " . implode(', ', $updates) . " WHERE ID = ?";
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute($values);
+            $updatedComment = $this->commentService->getCommentApi($commentId);
 
-            // Fetch updated comment
-            $fetchSql = "SELECT c.*, p.post_title, p.post_slug
-                         FROM tbl_comments c
-                         LEFT JOIN tbl_posts p ON c.comment_post_id = p.ID
-                         WHERE c.ID = ?";
-            $fetchStmt = $dbc->prepare($fetchSql);
-            $fetchStmt->execute([$commentId]);
-            $updatedComment = $fetchStmt->fetch(\PDO::FETCH_ASSOC);
-
-            ApiResponse::success($this->transformComment($updatedComment), 200, 'Comment updated successfully');
+            ApiResponse::success(CommentApiDto::transform($updatedComment, $this->getAppUrl()), 200, 'Comment updated successfully');
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to update comment: ' . $e->getMessage(), 500, 'UPDATE_ERROR');
         }
@@ -378,7 +314,7 @@ class CommentsApiController extends ApiController
         // Require authentication
         $this->requiresAuth = true;
 
-        $commentId = isset($params[0]) ? (int)$params[0] : 0;
+        $commentId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (!$commentId) {
             ApiResponse::badRequest('Comment ID is required');
@@ -392,28 +328,14 @@ class CommentsApiController extends ApiController
         }
 
         try {
-            $dbc = Registry::get('dbc');
+            $existing = $this->commentService->getCommentApi($commentId);
 
-            // Check if comment exists
-            $checkSql = "SELECT ID FROM tbl_comments WHERE ID = ?";
-            $checkStmt = $dbc->prepare($checkSql);
-            $checkStmt->execute([$commentId]);
-            $comment = $checkStmt->fetch(\PDO::FETCH_ASSOC);
-
-            if (!$comment) {
+            if (!$existing) {
                 ApiResponse::notFound('Comment not found');
                 return;
             }
 
-            // Delete replies first
-            $deleteRepliesSql = "DELETE FROM tbl_comments WHERE comment_parent_id = ?";
-            $deleteRepliesStmt = $dbc->prepare($deleteRepliesSql);
-            $deleteRepliesStmt->execute([$commentId]);
-
-            // Delete the comment
-            $deleteSql = "DELETE FROM tbl_comments WHERE ID = ?";
-            $deleteStmt = $dbc->prepare($deleteSql);
-            $deleteStmt->execute([$commentId]);
+            $this->commentService->removeCommentApi($commentId);
 
             ApiResponse::noContent();
         } catch (\Throwable $e) {
@@ -421,45 +343,7 @@ class CommentsApiController extends ApiController
         }
     }
 
-    /**
-     * Transform comment data for API response
-     *
-     * @param array $comment
-     * @return array
-     */
-    private function transformComment($comment)
-    {
-        return [
-            'id' => (int)$comment['ID'],
-            'post_id' => (int)$comment['comment_post_id'],
-            'parent_id' => (int)$comment['comment_parent_id'],
-            'author' => [
-                'name' => $comment['comment_author_name'],
-                'email' => $comment['comment_author_email'] ?? ''
-            ],
-            'content' => $comment['comment_content'],
-            'status' => $comment['comment_status'],
-            'date' => $comment['comment_date'],
-            'post' => isset($comment['post_title']) ? [
-                'title' => $comment['post_title'],
-                'slug' => $comment['post_slug'] ?? '',
-                'url' => $this->getPostUrl($comment['comment_post_id'], $comment['post_slug'] ?? '')
-            ] : null
-        ];
-    }
 
-    /**
-     * Get post URL
-     *
-     * @param int $id
-     * @param string $slug
-     * @return string
-     */
-    private function getPostUrl($id, $slug)
-    {
-        $appUrl = $this->getAppUrl();
-        return $appUrl . '/post/' . $id . '/' . ($slug ?: 'post');
-    }
 
     /**
      * Get client IP address
@@ -485,19 +369,5 @@ class CommentsApiController extends ApiController
         }
 
         return '0.0.0.0';
-    }
-
-    /**
-     * Get application URL
-     *
-     * @return string
-     */
-    private function getAppUrl()
-    {
-        $config = [];
-        if (file_exists(__DIR__ . '/../../../config.php')) {
-            $config = require __DIR__ . '/../../../config.php';
-        }
-        return $config['app']['url'] ?? 'http://localhost';
     }
 }

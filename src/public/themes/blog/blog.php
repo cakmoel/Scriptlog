@@ -1,6 +1,11 @@
 <?php
-$entries = function_exists('retrieve_blog_posts') ? retrieve_blog_posts()['blogPosts'] : "";
-$entries_pagination = function_exists('retrieve_blog_posts') ? retrieve_blog_posts()['paginationLink'] : "";
+defined('SCRIPTLOG') || die('Direct access not permitted');
+
+$blog_posts = function_exists('retrieve_blog_posts') ? retrieve_blog_posts() : [];
+$entries = isset($blog_posts['blogPosts']) ? $blog_posts['blogPosts'] : "";
+$entries_pagination = isset($blog_posts['paginationLink']) ? $blog_posts['paginationLink'] : "";
+
+$partial_dir = dirname(__FILE__) . '/partials/';
 ?>
 
 <div class="container">
@@ -15,53 +20,20 @@ $entries_pagination = function_exists('retrieve_blog_posts') ? retrieve_blog_pos
 
         if (!empty($entries)) :
             foreach ($entries as $entry) :
-                $entry_id = isset($entry['ID']) ? (int)$entry['ID'] : "";
-                $entry_title = isset($entry['post_title']) ? htmlout($entry['post_title']) : "";
-                $entry_content = isset($entry['post_content']) ? paragraph_l2br(htmlout(paragraph_trim($entry['post_content']))) : "";
-                $entry_img = ((isset($entry['media_filename'])) && ($entry['media_filename'] !== '') ? htmlout($entry['media_filename']) : "");
-                $entry_img_caption = isset($entry['media_caption']) ? htmlout($entry['media_caption']) : "";
-                $entry_created = isset($entry['modified_at']) ? htmlout(make_date($entry['modified_at'])) : htmlout(make_date($entry['created_at']));
-                $entry_author = (isset($entry['user_login']) || isset($entry['user_fullname']) ? htmlout($entry['user_login']) : htmlout($entry['user_fullname']));
-                $total_comment = isset($entry['total_comments']) ? (int)$entry['total_comments'] : 0;
-
-                ?>
-
-            <div class="post col-xl-6">
-              <div class="post-thumbnail"><a href="<?= isset($entry_id) ? permalinks($entry_id)['post'] : "#"; ?>"><?= isset($entry_img) ? invoke_responsive_image($entry_img, 'thumbnail', true, isset($entry_img_caption) ? $entry_img_caption : $entry_title, 'img-fluid') : '<img src="' . theme_dir() . 'assets/img/placeholder.svg" alt="" width="640" height="450" class="img-fluid" loading="lazy" decoding="async">' ?></a></div>
-              <div class="post-details">
-                <div class="post-meta d-flex justify-content-between">
-                  <div class="date meta-last"> <?= isset($entry_created) ? $entry_created : ""; ?> </div>
-                  <div class="category"><?= isset($entry['topics_data']) ? format_topics($entry['topics_data']) : ""; ?></div>
-                </div>
-                <a href="<?= isset($entry_id) ? permalinks($entry_id)['post'] : "javascript:void(0)"; ?>" title="<?= isset($entry_title) ? $entry_title : ""; ?>">
-                  <h3 class="h4"> <?= isset($entry_title) ? $entry_title : ""; ?> </h3>
-                </a>
-                <p class="text-muted"><?= isset($entry_content) ? html_entity_decode($entry_content) : ""; ?></p>
-                 <footer class="post-footer d-flex align-items-center">
-                  <a href="javascript:void(0)" class="author d-flex align-items-center flex-wrap">
-                    <div class="title"><span><i class="fa fa-user-circle" aria-hidden="true"></i> <?= isset($entry_author) ? $entry_author : ""; ?></span></div>
-                  </a>
-                  <div class="date"><i class="fa fa-calendar" aria-hidden="true"></i> <?= isset($entry_created) ? $entry_created : ""; ?></div>
-                  <div class="comments meta-last"><i class="icon-comment" aria-hidden="true"></i><?= isset($total_comment) ? $total_comment : ""; ?></div>
-                </footer>
-              </div>
-            </div>
-
-                <?php
+                $post = function_exists('prepare_post_card') ? prepare_post_card($entry) : PostViewModel::fromPrepared([]);
+                $card_class = 'col-xl-6';
+                include $partial_dir . 'card.php';
             endforeach;
         endif;
         ?>
 
         </div>
 
-        <!-- Pagination -->
-        <nav aria-label="Page navigation example">
-          <ul class="pagination pagination-template d-flex justify-content-center">
-            <?php
-            ((isset($total_comment)) && $total_comment > 0) ? $entries_pagination : "";
-            ?>
-          </ul>
-        </nav>
+        <?php
+        $pagination_html = $entries_pagination;
+        $pagination_aria_label = t('pagination.navigation');
+        include $partial_dir . 'paginator.php';
+        ?>
         
       </div>
     </div>

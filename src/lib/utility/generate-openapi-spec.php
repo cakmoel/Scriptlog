@@ -15,7 +15,7 @@
 
 function generate_openapi_spec(): void
 {
-    $specFile = __DIR__ . '/../openapi.json';
+    $specFile = __DIR__ . '/../../openapi.json';
 
     if (!file_exists($specFile)) {
         http_response_code(404);

@@ -32,12 +32,21 @@ class TranslationServiceIntegrationTest extends TestCase
             
             // Load required classes
             require_once __DIR__ . '/../../src/lib/core/Dao.php';
+            require_once __DIR__ . '/../../src/lib/core/Db.php';
             require_once __DIR__ . '/../../src/lib/dao/LanguageDao.php';
             require_once __DIR__ . '/../../src/lib/dao/TranslationDao.php';
             require_once __DIR__ . '/../../src/lib/core/TranslationLoader.php';
             require_once __DIR__ . '/../../src/lib/service/TranslationService.php';
              require_once __DIR__ . '/../../src/lib/core/FormValidator.php';
              require_once __DIR__ . '/../../src/lib/core/Sanitize.php';
+            
+            // Set up Db in Registry for DAO constructors
+            $db = new Db([
+                'mysql:host=localhost;dbname=blogware_test;charset=utf8mb4',
+                'blogwareuser',
+                'userblogware'
+            ]);
+            Registry::set('dbc', $db);
             
             // Initialize DAOs
             self::$languageDao = new LanguageDao();

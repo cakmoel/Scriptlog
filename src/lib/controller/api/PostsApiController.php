@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Controller\Api;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -20,11 +21,15 @@ use Scriptlog\Controller\ApiController;
 use Scriptlog\Core\ApiAuth;
 use Scriptlog\Core\ApiHateoas;
 use Scriptlog\Core\ApiResponse;
-use Scriptlog\Core\Registry;
+use Scriptlog\Core\FormValidator;
 use Scriptlog\Core\Sanitize;
 use Scriptlog\Dao\CommentDao;
+use Scriptlog\Dao\MediaDao;
 use Scriptlog\Dao\PostDao;
 use Scriptlog\Dao\TopicDao;
+use Scriptlog\Dto\Api\CommentApiDto;
+use Scriptlog\Dto\Api\PostApiDto;
+use Scriptlog\Service\PostService;
 
 class PostsApiController extends ApiController
 {
@@ -49,6 +54,11 @@ class PostsApiController extends ApiController
     private $commentDao;
 
     /**
+     * @var MediaDao
+     */
+    private $mediaDao;
+
+    /**
      * @var Sanitize
      */
     private $sanitizer;
@@ -63,17 +73,18 @@ class PostsApiController extends ApiController
      */
     public function __construct()
     {
+        $this->requiresAuth = false;
+
         parent::__construct();
 
         // Initialize DAOs and services
         $this->postDao = new PostDao();
         $this->topicDao = new TopicDao();
         $this->commentDao = new CommentDao();
+        $this->mediaDao = new MediaDao();
         $this->sanitizer = new Sanitize();
         $this->hateoas = new ApiHateoas();
-
-        // Service requires validator - create minimal version
-        $this->postService = null; // Will be initialized when needed
+        $this->postService = new PostService($this->postDao, new FormValidator(), $this->sanitizer);
     }
 
     /**
@@ -87,8 +98,6 @@ class PostsApiController extends ApiController
     public function index($params = [])
     {
         // This is a public endpoint - no auth required
-        $this->requiresAuth = false;
-
         // Get pagination
         $pagination = $this->getPagination($params);
 
@@ -96,32 +105,20 @@ class PostsApiController extends ApiController
         $sorting = $this->getSorting($params, ['ID', 'post_date', 'post_modified', 'post_title']);
 
         try {
-            $dbc = Registry::get('dbc');
+            $sortBy = str_replace('`', '', $sorting['sort_by']);
+            $sortOrder = $sorting['sort_order'];
 
-            // Build query
-            $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
-                           p.post_title, p.post_slug, p.post_summary, p.post_status,
-                           p.post_visibility, p.post_tags, p.post_type, p.comment_status,
-                           u.user_login as author_login, u.user_fullname as author_name
-                    FROM tbl_posts p
-                    LEFT JOIN tbl_users u ON p.post_author = u.ID
-                    WHERE p.post_status = 'publish' 
-                    AND p.post_type = 'blog'
-                    AND p.post_visibility = 'public'
-                    ORDER BY p." . $sorting['sort_by'] . " " . $sorting['sort_order'] . "
-                    LIMIT " . $pagination['per_page'] . " OFFSET " . $pagination['offset'];
+            $posts = $this->postService->getPublishedPostsApi(
+                $pagination['page'],
+                $pagination['per_page'],
+                $sortBy,
+                $sortOrder
+            );
 
-            $stmt = $dbc->query($sql);
-            $posts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-            // Get total count
-            $countSql = "SELECT COUNT(*) as total FROM tbl_posts 
-                         WHERE post_status = 'publish' AND post_type = 'blog' AND post_visibility = 'public'";
-            $countStmt = $dbc->query($countSql);
-            $total = $countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
+            $total = $this->postService->countPublishedPostsApi();
 
             // Transform posts for API response
-            $transformedPosts = array_map([$this, 'transformPost'], $posts);
+            $transformedPosts = PostApiDto::transformCollection($posts, $this->getAppUrl());
 
             // Generate ETag from post count and page for cache validation
             $etag = md5($total . '_' . $pagination['page'] . '_' . $pagination['per_page']);
@@ -154,9 +151,7 @@ class PostsApiController extends ApiController
     public function show($params = [])
     {
         // This is a public endpoint - no auth required
-        $this->requiresAuth = false;
-
-        $postId = isset($params[0]) ? (int)$params[0] : 0;
+        $postId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (!$postId) {
             ApiResponse::badRequest('Post ID is required');
@@ -164,32 +159,15 @@ class PostsApiController extends ApiController
         }
 
         try {
-            $dbc = Registry::get('dbc');
-
-            // Get post
-            $sql = "SELECT p.*, u.user_login as author_login, u.user_fullname as author_name
-                    FROM tbl_posts p
-                    LEFT JOIN tbl_users u ON p.post_author = u.ID
-                    WHERE p.ID = ? 
-                    AND p.post_type = 'blog'";
-
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute([$postId]);
-            $post = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $post = $this->postService->getPublishedPostApi($postId);
 
             if (!$post) {
                 ApiResponse::notFound('Post not found');
                 return;
             }
 
-            // Check visibility - only show public posts without password
-            if ($post['post_visibility'] !== 'public') {
-                ApiResponse::forbidden('This post is not publicly accessible');
-                return;
-            }
-
             // Get categories/topics for this post
-            $topics = $this->getPostTopics($postId);
+            $topics = $this->postService->getPostTopicsApi($postId);
 
             // Generate ETag from post_modified for cache validation
             $etag = md5($post['post_modified'] . $postId);
@@ -203,12 +181,15 @@ class PostsApiController extends ApiController
             }
 
             // Transform post for API response
-            $transformedPost = $this->transformPost($post);
+            $transformedPost = PostApiDto::transform($post, $this->getAppUrl());
             $transformedPost['topics'] = $topics;
 
             // Get featured image if available
             if ($post['media_id']) {
-                $transformedPost['featured_image'] = $this->getMediaUrl($post['media_id']);
+                $media = $this->mediaDao->findMediaById($post['media_id'], $this->sanitizer);
+                if ($media && is_array($media)) {
+                    $transformedPost['featured_image'] = $this->getAppUrl() . '/public/files/pictures/' . $media['media_filename'];
+                }
             }
 
             // Generate HATEOAS links
@@ -231,9 +212,7 @@ class PostsApiController extends ApiController
     public function comments($params = [])
     {
         // This is a public endpoint - no auth required
-        $this->requiresAuth = false;
-
-        $postId = isset($params[0]) ? (int)$params[0] : 0;
+        $postId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (!$postId) {
             ApiResponse::badRequest('Post ID is required');
@@ -244,33 +223,23 @@ class PostsApiController extends ApiController
         $pagination = $this->getPagination($params);
 
         try {
-            $dbc = Registry::get('dbc');
+            $comments = $this->commentDao->findApprovedCommentsPaginated(
+                $pagination['per_page'],
+                $pagination['offset'],
+                'ID',
+                'DESC',
+                $postId
+            );
 
-            // Get comments for this post
-            $sql = "SELECT c.ID, c.comment_post_id, c.comment_parent_id, 
-                           c.comment_author_name, c.comment_author_email,
-                           c.comment_content, c.comment_status, c.comment_date
-                    FROM tbl_comments c
-                    WHERE c.comment_post_id = ?
-                    AND c.comment_status = 'approved'
-                    ORDER BY c.comment_date DESC
-                    LIMIT ? OFFSET ?";
+            $total = $this->commentDao->countApprovedComments($postId);
 
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute([$postId, $pagination['per_page'], $pagination['offset']]);
-            $comments = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $transformedComments = [];
 
-            // Get total count
-            $countSql = "SELECT COUNT(*) as total FROM tbl_comments 
-                         WHERE comment_post_id = ? AND comment_status = 'approved'";
-            $countStmt = $dbc->prepare($countSql);
-            $countStmt->execute([$postId]);
-            $total = $countStmt->fetch(\PDO::FETCH_ASSOC)['total'];
+            foreach ($comments as $comment) {
+                $c = (array) $comment;
+                $transformedComments[] = CommentApiDto::transform($c, $this->getAppUrl());
+            }
 
-            // Transform comments
-            $transformedComments = array_map([$this, 'transformComment'], $comments);
-
-            // Generate HATEOAS links
             $hateoasLinks = $this->hateoas->paginationLinks('posts/' . $postId . '/comments', $pagination['page'], $pagination['per_page'], $total);
             $hateoasLinks['post'] = [
                 'href' => $this->hateoas->postLinks($postId)['self']['href'],
@@ -313,15 +282,9 @@ class PostsApiController extends ApiController
         }
 
         try {
-            $dbc = Registry::get('dbc');
-
-            // Generate slug from title
             $slug = $this->generateSlug($this->requestData['post_title']);
-
-            // Get user ID from auth
             $userId = ApiAuth::getUserId();
 
-            // Prepare post data
             $postData = [
                 'post_author' => $userId,
                 'post_date' => date('Y-m-d H:i:s'),
@@ -332,43 +295,19 @@ class PostsApiController extends ApiController
                 'post_status' => isset($this->requestData['post_status']) ? $this->requestData['post_status'] : 'draft',
                 'post_visibility' => isset($this->requestData['post_visibility']) ? $this->requestData['post_visibility'] : 'public',
                 'post_tags' => isset($this->requestData['post_tags']) ? $this->sanitize($this->requestData['post_tags']) : null,
-                'comment_status' => isset($this->requestData['comment_status']) ? $this->requestData['comment_status'] : 'open'
+                'comment_status' => isset($this->requestData['comment_status']) ? $this->requestData['comment_status'] : 'open',
+                'post_type' => 'blog'
             ];
 
-            // Insert post
-            $sql = "INSERT INTO tbl_posts (post_author, post_date, post_title, post_slug, 
-                           post_content, post_summary, post_status, post_visibility, 
-                           post_tags, comment_status, post_type)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'blog')";
+            $postId = $this->postService->createPostApi($postData);
 
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute([
-                $postData['post_author'],
-                $postData['post_date'],
-                $postData['post_title'],
-                $postData['post_slug'],
-                $postData['post_content'],
-                $postData['post_summary'],
-                $postData['post_status'],
-                $postData['post_visibility'],
-                $postData['post_tags'],
-                $postData['comment_status']
-            ]);
-
-            $postId = $dbc->lastInsertId();
-
-            // Handle categories/topics if provided
             if (isset($this->requestData['topics']) && is_array($this->requestData['topics'])) {
-                $this->setPostTopics($postId, $this->requestData['topics']);
+                $this->postService->setPostTopicsApi($postId, $this->requestData['topics']);
             }
 
-            // Fetch created post
-            $fetchSql = "SELECT * FROM tbl_posts WHERE ID = ?";
-            $fetchStmt = $dbc->prepare($fetchSql);
-            $fetchStmt->execute([$postId]);
-            $createdPost = $fetchStmt->fetch(\PDO::FETCH_ASSOC);
+            $createdPost = $this->postService->getPostByIdApi($postId);
 
-            ApiResponse::created($this->transformPost($createdPost), 'Post created successfully', $this->hateoas->postLinks($postId, $slug), $this->getAppUrl() . '/api/v1/posts/' . $postId);
+            ApiResponse::created(PostApiDto::transform($createdPost, $this->getAppUrl()), 'Post created successfully', $this->hateoas->postLinks($postId, $slug), $this->getAppUrl() . '/api/v1/posts/' . $postId);
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to create post: ' . $e->getMessage(), 500, 'CREATE_ERROR');
         }
@@ -387,7 +326,7 @@ class PostsApiController extends ApiController
         // Require authentication
         $this->requiresAuth = true;
 
-        $postId = isset($params[0]) ? (int)$params[0] : 0;
+        $postId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (!$postId) {
             ApiResponse::badRequest('Post ID is required');
@@ -401,90 +340,55 @@ class PostsApiController extends ApiController
         }
 
         try {
-            $dbc = Registry::get('dbc');
-
-            // Check if post exists
-            $checkSql = "SELECT ID, post_author FROM tbl_posts WHERE ID = ?";
-            $checkStmt = $dbc->prepare($checkSql);
-            $checkStmt->execute([$postId]);
-            $post = $checkStmt->fetch(\PDO::FETCH_ASSOC);
+            $post = $this->postService->getPostByIdApi($postId);
 
             if (!$post) {
                 ApiResponse::notFound('Post not found');
                 return;
             }
 
-            // Build update query
-            $updates = [];
-            $values = [];
+            $updateData = [];
 
             if (isset($this->requestData['post_title'])) {
-                $updates[] = 'post_title = ?';
-                $values[] = $this->sanitize($this->requestData['post_title']);
-                $updates[] = 'post_slug = ?';
-                $values[] = $this->generateSlug($this->requestData['post_title']);
+                $updateData['post_title'] = $this->sanitize($this->requestData['post_title']);
+                $updateData['post_slug'] = $this->generateSlug($this->requestData['post_title']);
             }
 
             if (isset($this->requestData['post_content'])) {
-                $updates[] = 'post_content = ?';
-                $values[] = $this->requestData['post_content'];
+                $updateData['post_content'] = $this->requestData['post_content'];
             }
 
             if (isset($this->requestData['post_summary'])) {
-                $updates[] = 'post_summary = ?';
-                $values[] = $this->sanitize($this->requestData['post_summary']);
+                $updateData['post_summary'] = $this->sanitize($this->requestData['post_summary']);
             }
 
             if (isset($this->requestData['post_status'])) {
-                $updates[] = 'post_status = ?';
-                $values[] = $this->requestData['post_status'];
+                $updateData['post_status'] = $this->requestData['post_status'];
             }
 
             if (isset($this->requestData['post_visibility'])) {
-                $updates[] = 'post_visibility = ?';
-                $values[] = $this->requestData['post_visibility'];
+                $updateData['post_visibility'] = $this->requestData['post_visibility'];
             }
 
             if (isset($this->requestData['post_tags'])) {
-                $updates[] = 'post_tags = ?';
-                $values[] = $this->sanitize($this->requestData['post_tags']);
+                $updateData['post_tags'] = $this->sanitize($this->requestData['post_tags']);
             }
 
             if (isset($this->requestData['comment_status'])) {
-                $updates[] = 'comment_status = ?';
-                $values[] = $this->requestData['comment_status'];
+                $updateData['comment_status'] = $this->requestData['comment_status'];
             }
 
-            // Always update modified date
-            $updates[] = 'post_modified = ?';
-            $values[] = date('Y-m-d H:i:s');
+            $updateData['post_modified'] = date('Y-m-d H:i:s');
 
-            // Add post ID to values
-            $values[] = $postId;
+            $this->postService->updatePostApi($postId, $updateData);
 
-            // Execute update
-            $sql = "UPDATE tbl_posts SET " . implode(', ', $updates) . " WHERE ID = ?";
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute($values);
-
-            // Handle topics if provided
             if (isset($this->requestData['topics']) && is_array($this->requestData['topics'])) {
-                // Delete existing topics
-                $deleteSql = "DELETE FROM tbl_post_topic WHERE post_id = ?";
-                $deleteStmt = $dbc->prepare($deleteSql);
-                $deleteStmt->execute([$postId]);
-
-                // Add new topics
-                $this->setPostTopics($postId, $this->requestData['topics']);
+                $this->postService->setPostTopicsApi($postId, $this->requestData['topics']);
             }
 
-            // Fetch updated post
-            $fetchSql = "SELECT * FROM tbl_posts WHERE ID = ?";
-            $fetchStmt = $dbc->prepare($fetchSql);
-            $fetchStmt->execute([$postId]);
-            $updatedPost = $fetchStmt->fetch(\PDO::FETCH_ASSOC);
+            $updatedPost = $this->postService->getPostByIdApi($postId);
 
-            ApiResponse::success($this->transformPost($updatedPost), 200, 'Post updated successfully');
+            ApiResponse::success(PostApiDto::transform($updatedPost, $this->getAppUrl()), 200, 'Post updated successfully');
         } catch (\Throwable $e) {
             ApiResponse::error('Failed to update post: ' . $e->getMessage(), 500, 'UPDATE_ERROR');
         }
@@ -503,7 +407,7 @@ class PostsApiController extends ApiController
         // Require authentication
         $this->requiresAuth = true;
 
-        $postId = isset($params[0]) ? (int)$params[0] : 0;
+        $postId = isset($params['id']) ? (int)$params['id'] : 0;
 
         if (!$postId) {
             ApiResponse::badRequest('Post ID is required');
@@ -517,33 +421,14 @@ class PostsApiController extends ApiController
         }
 
         try {
-            $dbc = Registry::get('dbc');
-
-            // Check if post exists
-            $checkSql = "SELECT ID FROM tbl_posts WHERE ID = ?";
-            $checkStmt = $dbc->prepare($checkSql);
-            $checkStmt->execute([$postId]);
-            $post = $checkStmt->fetch(\PDO::FETCH_ASSOC);
+            $post = $this->postService->getPostByIdApi($postId);
 
             if (!$post) {
                 ApiResponse::notFound('Post not found');
                 return;
             }
 
-            // Delete post topics first
-            $deleteTopicSql = "DELETE FROM tbl_post_topic WHERE post_id = ?";
-            $deleteTopicStmt = $dbc->prepare($deleteTopicSql);
-            $deleteTopicStmt->execute([$postId]);
-
-            // Delete comments for this post
-            $deleteCommentSql = "DELETE FROM tbl_comments WHERE comment_post_id = ?";
-            $deleteCommentStmt = $dbc->prepare($deleteCommentSql);
-            $deleteCommentStmt->execute([$postId]);
-
-            // Delete the post
-            $deleteSql = "DELETE FROM tbl_posts WHERE ID = ?";
-            $deleteStmt = $dbc->prepare($deleteSql);
-            $deleteStmt->execute([$postId]);
+            $this->postService->removePostApi($postId);
 
             ApiResponse::noContent();
         } catch (\Throwable $e) {
@@ -551,115 +436,7 @@ class PostsApiController extends ApiController
         }
     }
 
-    /**
-     * Transform post data for API response
-     *
-     * @param array $post
-     * @return array
-     */
-    private function transformPost($post)
-    {
-        return [
-            'id' => (int)$post['ID'],
-            'title' => $post['post_title'],
-            'slug' => $post['post_slug'],
-            'content' => $post['post_content'],
-            'summary' => $post['post_summary'],
-            'excerpt' => $post['post_summary'] ?? $this->generateExcerpt($post['post_content']),
-            'status' => $post['post_status'],
-            'visibility' => $post['post_visibility'],
-            'tags' => $post['post_tags'] ? explode(',', $post['post_tags']) : [],
-            'comment_status' => $post['comment_status'],
-            'type' => $post['post_type'],
-            'author' => [
-                'id' => (int)$post['post_author'],
-                'login' => $post['author_login'] ?? '',
-                'name' => $post['author_name'] ?? ''
-            ],
-            'date' => $post['post_date'],
-            'modified' => $post['post_modified'],
-            'url' => $this->getPostUrl($post['ID'], $post['post_slug'])
-        ];
-    }
 
-    // kept for potential future use
-    /**
-     * Transform comment data for API response
-     *
-     * @deprecated No longer used internally
-     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
-     * @param array $comment
-     * @return array
-     */
-    private function transformComment($comment)
-    {
-        return [
-            'id' => (int)$comment['ID'],
-            'post_id' => (int)$comment['comment_post_id'],
-            'parent_id' => (int)$comment['comment_parent_id'],
-            'author' => [
-                'name' => $comment['comment_author_name'],
-                'email' => $comment['comment_author_email'] ?? ''
-            ],
-            'content' => $comment['comment_content'],
-            'status' => $comment['comment_status'],
-            'date' => $comment['comment_date']
-        ];
-    }
-
-    /**
-     * Get topics/categories for a post
-     *
-     * @param int $postId
-     * @return array
-     */
-    private function getPostTopics($postId)
-    {
-        try {
-            $dbc = Registry::get('dbc');
-
-            $sql = "SELECT t.ID, t.topic_title, t.topic_slug
-                    FROM tbl_topics t
-                    INNER JOIN tbl_post_topic pt ON t.ID = pt.topic_id
-                    WHERE pt.post_id = ?";
-
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute([$postId]);
-            $topics = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-            return array_map(function ($topic) {
-                return [
-                    'id' => (int)$topic['ID'],
-                    'title' => $topic['topic_title'],
-                    'slug' => $topic['topic_slug']
-                ];
-            }, $topics);
-        } catch (\Throwable $e) {
-            return [];
-        }
-    }
-
-    /**
-     * Set topics for a post
-     *
-     * @param int $postId
-     * @param array $topicIds
-     */
-    private function setPostTopics($postId, $topicIds)
-    {
-        try {
-            $dbc = Registry::get('dbc');
-
-            $sql = "INSERT INTO tbl_post_topic (post_id, topic_id) VALUES (?, ?)";
-            $stmt = $dbc->prepare($sql);
-
-            foreach ($topicIds as $topicId) {
-                $stmt->execute([$postId, (int)$topicId]);
-            }
-        } catch (\Throwable $e) {
-            // Silently fail - topics are optional
-        }
-    }
 
     /**
      * Generate URL-friendly slug
@@ -671,75 +448,5 @@ class PostsApiController extends ApiController
     {
         $slug = strtolower(trim(preg_replace('/[^a-zA-Z0-9-]+/', '-', $title)));
         return preg_replace('/-+/', '-', $slug);
-    }
-
-    /**
-     * Get post URL
-     *
-     * @param int $id
-     * @param string $slug
-     * @return string
-     */
-    private function getPostUrl($id, $slug)
-    {
-        $appUrl = $this->getAppUrl();
-        return $appUrl . '/post/' . $id . '/' . $slug;
-    }
-
-    /**
-     * Get media URL
-     *
-     * @param int $mediaId
-     * @return string|null
-     */
-    private function getMediaUrl($mediaId)
-    {
-        try {
-            $dbc = Registry::get('dbc');
-
-            $sql = "SELECT media_filename FROM tbl_media WHERE ID = ?";
-            $stmt = $dbc->prepare($sql);
-            $stmt->execute([$mediaId]);
-            $media = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-            if ($media) {
-                $appUrl = $this->getAppUrl();
-                return $appUrl . '/public/files/pictures/' . $media['media_filename'];
-            }
-        } catch (\Throwable $e) {
-            // Silently fail
-        }
-
-        return null;
-    }
-
-    /**
-     * Get application URL
-     *
-     * @return string
-     */
-    private function getAppUrl()
-    {
-        $config = [];
-        if (file_exists(__DIR__ . '/../../../config.php')) {
-            $config = require __DIR__ . '/../../../config.php';
-        }
-        return $config['app']['url'] ?? 'http://localhost';
-    }
-
-    /**
-     * Generate excerpt from content
-     *
-     * @param string $content
-     * @param int $length
-     * @return string
-     */
-    private function generateExcerpt($content, $length = 150)
-    {
-        $content = strip_tags($content);
-        if (strlen($content) <= $length) {
-            return $content;
-        }
-        return substr($content, 0, $length) . '...';
     }
 }

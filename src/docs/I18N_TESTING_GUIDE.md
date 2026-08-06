@@ -39,7 +39,8 @@ tests/
 ├── integration/
 │   ├── LanguageDaoIntegrationTest.php
 │   ├── TranslationServiceIntegrationTest.php
-│   └── PrivacyPolicyDaoIntegrationTest.php (NEW)
+│   ├── PrivacyPolicyDaoIntegrationTest.php (NEW)
+│   └── LanguageSwitcherIntegrationTest.php (NEW - 19 tests)
 └── setup_test_db.php
 ```
 
@@ -149,8 +150,9 @@ lib/vendor/bin/phpunit --filter "Locale|I18n|Translation|Theme"
 | I18nManagerTest.php | 29 | ✅ Pass |
 | LocaleRouterTest.php | (included) | ✅ Pass |
 | ThemeI18nTest.php | 26 | ✅ Pass |
-| LanguageSwitcherTest.php | 9 | ✅ Pass (NEW) |
-| **Total** | **90+** | **✅ All Pass** |
+| LanguageSwitcherTest.php | 9 | ✅ Pass |
+| LanguageSwitcherIntegrationTest.php | 19 | ✅ Pass (NEW) |
+| **Total** | **109+** | **✅ All Pass** |
 
 ### Run with Coverage Report
 
@@ -376,51 +378,52 @@ Tests for privacy policy CRUD operations with database.
 | `testCreatePolicyWithMinimalData` | Test minimal data creation |
 | `testCreateDuplicateLocaleThrowsException` | Test UNIQUE constraint |
 
-### LanguageSwitcherIntegrationTest (PLANNED)
+### LanguageSwitcherIntegrationTest ✅ COMPLETED
 
-Tests for the full frontend language switching flow.
+Tests for the full frontend language switching flow. Implements the I18N_INTEGRATION_TEST_PLAN covering 4 phases.
 
-**Prerequisites:**
-- Live site with database
-- Browser with cookie support
+**Location:** `tests/integration/LanguageSwitcherIntegrationTest.php`
+**Fixtures:** `tests/fixtures/language_switcher_fixture.php`
+**Status:** All tests passing (19 tests)
 
-**Test Flow:**
+**Test Flow Validated:**
 
 ```
-1. User clicks language in dropdown
-   ↓
-2. Browser navigates to ?switch-lang=XX&redirect=URL
-   ↓
-3. lib/main.php processes switch-lang parameter
-   ↓
-4. Locale saved to $_SESSION['scriptlog_locale']
-   ↓
-5. Locale saved to cookie 'scriptlog_locale'
-   ↓
-6. Redirect to original URL (without switch-lang param)
-   ↓
-7. Page loads with new locale
-   ↓
-8. LocaleDetector reads from session/cookie
-   ↓
-9. Content filtered by locale
-   ↓
-10. UI strings displayed in selected language
+1. ✓ User clicks language in dropdown → ?switch-lang=XX
+2. ✓ lib/main.php logic processes switch-lang parameter
+3. ✓ Locale saved to $_SESSION['scriptlog_locale']
+4. ✓ Redirect URL removes switch-lang param
+5. ✓ Session/cookie fallback works
+6. ✓ Content filtered by locale (posts, topics, menus)
+7. ✓ RTL layout detected for Arabic
+8. ✓ Invalid locales are rejected
+9. ✓ Default locale fallback works
 ```
 
-**Planned Test Methods:**
+**Test Methods:**
 
-| Method | Description | Status |
-|--------|-------------|--------|
-| `testSwitchLangParameterSetsSession` | Verify session is set | ⏳ TODO |
-| `testSwitchLangParameterSetsCookie` | Verify cookie is set | ⏳ TODO |
-| `testRedirectPreservesOriginalUrl` | Verify redirect URL | ⏳ TODO |
-| `testLocalePersistsAcrossPages` | Session persists | ⏳ TODO |
-| `testContentFilteredByLocale` | Posts filtered correctly | ⏳ TODO |
-| `testMenuFilteredByLocale` | Menus filtered correctly | ⏳ TODO |
-| `testTopicFilteredByLocale` | Topics filtered correctly | ⏳ TODO |
-| `testRTLAppliedForArabic` | RTL layout applied | ⏳ TODO |
-| `testRTLAppliedForOtherRTL` | Other RTL languages | ⏳ TODO |
+| Phase | Method | Status | Description |
+|-------|--------|--------|-------------|
+| 1 | `testSwitchLangParameterSetsSession` | ✅ | Session set from ?switch-lang=ar |
+| 1 | `testSwitchLangForAllSupportedLocales` | ✅ | All 7 locales set session correctly |
+| 1 | `testRedirectUrlIsProperlyConstructed` | ✅ | Redirect preserves original URL |
+| 1 | `testRedirectUrlRemovesSwitchLangParam` | ✅ | switch-lang stripped from redirect |
+| 1 | `testLocaleIsStoredInSession` | ✅ | Session locale returned by detectLocale |
+| 1 | `testLocaleIsStoredInCookie` | ✅ | Cookie fallback when session empty |
+| 2 | `testPostsAreFilteredByLocale` | ✅ | Posts filtered exclusively by post_locale |
+| 2 | `testTopicsAreFilteredByLocale` | ✅ | Topics filtered exclusively by topic_locale |
+| 2 | `testMenuItemsAreFilteredByLocale` | ✅ | Menu items filtered exclusively by menu_locale |
+| 2 | `testNonexistentLocaleReturnsEmptyResults` | ✅ | Unknown locale returns empty results |
+| 3 | `testRTLIsDetectedForArabic` | ✅ | Arabic detected as RTL, others as LTR |
+| 3 | `testHtmlDirAttributeIsSetCorrectly` | ✅ | Dir attribute matches locale direction |
+| 3 | `testOnlyArabicIsRtl` | ✅ | No other locale falsely detected as RTL |
+| 4 | `testCompleteLanguageSwitchFlow` | ✅ | Full en→ar switch flow validated |
+| 4 | `testLanguageSwitchPersistsAcrossRequests` | ✅ | Language persists across simulated requests |
+| 4 | `testInvalidLocaleIsRejected` | ✅ | Invalid code 'xx' rejected (returns null) |
+| 4 | `testMalformedLocaleIsRejected` | ✅ | 'en-us' rejected (only 2-char codes) |
+| 4 | `testDefaultLocaleFallbackWorks` | ✅ | Falls back to 'en' when nothing set |
+| 4 | `testLocaleIsLowercased` | ✅ | 'AR' normalized to 'ar' |
+| 4 | `testCookieFallbackWhenSessionExpires` | ✅ | Cookie used when session locale absent |
 
 ---
 

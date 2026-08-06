@@ -28,7 +28,9 @@ function check_online($domain)
 
     $response = curl_exec($curlInit);
 
-    curl_close($curlInit);
+    if (PHP_VERSION_ID < 80500) {
+        curl_close($curlInit); // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.curl_closeDeprecated
+    }
 
     return ($response) ? true : false;
 }

@@ -67,7 +67,7 @@ if (!isset($_SESSION['install_step_reached'])) {
 $generated_prefix = generate_table_prefix(6);
 $completed = false;
 $errors = [];
-$installation_path = $protocol . '://' . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'])) . DIRECTORY_SEPARATOR;
+$installation_path = $protocol . '://' . $server_host . dirname(htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401)) . DIRECTORY_SEPARATOR;
 
 // 4b. Step Gatekeeper: Prevent bypassing via direct URL or DOM manipulation
 $step_to_show = 1;
@@ -343,26 +343,26 @@ install_header($current_path);
                             <div class="row">
                                 <div class="col-md-9 mb-4">
                                     <label for="databaseHost" class="font-weight-bold">Database Host</label>
-                                    <input type="text" class="form-control form-control-lg" id="databaseHost" name="db_host" placeholder="localhost" value="<?= htmlspecialchars($dbhost ?? 'localhost'); ?>" required>
+                                    <input type="text" class="form-control form-control-lg" id="databaseHost" name="db_host" placeholder="localhost" value="<?= htmlspecialchars($dbhost ?? 'localhost', ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>" required>
                                     <span class="help-text">Standard host is usually "localhost".</span>
                                 </div>
                                 <div class="col-md-3 mb-4">
                                     <label for="databasePort" class="font-weight-bold">Port</label>
-                                    <input type="text" class="form-control form-control-lg" id="databasePort" name="db_port" placeholder="3306" value="<?= htmlspecialchars($dbport ?? '3306'); ?>" required>
+                                    <input type="text" class="form-control form-control-lg" id="databasePort" name="db_port" placeholder="3306" value="<?= htmlspecialchars($dbport ?? '3306', ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>" required>
                                     <span class="help-text">Default: 3306</span>
                                 </div>
                             </div>
 
                             <div class="mb-4">
                                 <label for="databaseName" class="font-weight-bold">Database Name</label>
-                                <input type="text" class="form-control form-control-lg" id="databaseName" name="db_name" placeholder="scriptlog_db" value="<?= htmlspecialchars($dbname ?? ''); ?>" required>
+                                <input type="text" class="form-control form-control-lg" id="databaseName" name="db_name" placeholder="scriptlog_db" value="<?= htmlspecialchars($dbname ?? '', ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>" required>
                                 <span class="help-text">Enter the name of your pre-created SQL database.</span>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-4">
                                     <label for="databaseUser" class="font-weight-bold">Database Username</label>
-                                    <input type="text" class="form-control form-control-lg" id="databaseUser" name="db_user" placeholder="db_user" value="<?= htmlspecialchars($dbuser ?? ''); ?>" required>
+                                    <input type="text" class="form-control form-control-lg" id="databaseUser" name="db_user" placeholder="db_user" value="<?= htmlspecialchars($dbuser ?? '', ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>" required>
                                 </div>
                                 <div class="col-md-6 mb-4">
                                     <label for="databasePass" class="font-weight-bold">Database Password</label>
@@ -372,7 +372,7 @@ install_header($current_path);
 
                             <div class="mb-4">
                                 <label for="tablePrefix" class="font-weight-bold">Table Prefix</label>
-                                <input type="text" class="form-control form-control-lg" id="tablePrefix" name="tbl_prefix" placeholder="<?= htmlspecialchars($generated_prefix); ?>" value="<?= htmlspecialchars($generated_prefix); ?>">
+                                <input type="text" class="form-control form-control-lg" id="tablePrefix" name="tbl_prefix" placeholder="<?= htmlspecialchars($generated_prefix, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>" value="<?= htmlspecialchars($generated_prefix, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>">
                                 <span class="help-text">For security, we recommend using the generated prefix.</span>
                             </div>
 
@@ -401,13 +401,13 @@ install_header($current_path);
                         <div class="card-body">
                             <div class="mb-4">
                                 <label for="username" class="font-weight-bold">Create Admin Username</label>
-                                <input type="text" class="form-control form-control-lg" name="user_login" id="username" placeholder="admin" value="<?= htmlspecialchars($username ?? ''); ?>" required>
+                                <input type="text" class="form-control form-control-lg" name="user_login" id="username" placeholder="admin" value="<?= htmlspecialchars($username ?? '', ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>" required>
                                 <span class="help-text">This is what you'll use to log in.</span>
                             </div>
 
                             <div class="mb-4">
                                 <label for="email" class="font-weight-bold">Email Address</label>
-                                <input type="email" class="form-control form-control-lg" id="email" name="user_email" placeholder="admin@example.com" value="<?= htmlspecialchars($email ?? ''); ?>" required>
+                                <input type="email" class="form-control form-control-lg" id="email" name="user_email" placeholder="admin@example.com" value="<?= htmlspecialchars($email ?? '', ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>" required>
                                 <span class="help-text">For recovery and system notifications.</span>
                             </div>
 

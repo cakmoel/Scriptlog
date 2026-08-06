@@ -66,7 +66,7 @@ class AuthenticationTest extends TestCase
         $cookieExpire = $reflection->getConstant('COOKIE_EXPIRE');
 
         $this->assertIsInt($cookieExpire);
-        $this->assertEquals(3600, $cookieExpire);
+        $this->assertEquals(2592000, $cookieExpire);
     }
 
     // =========================================================================

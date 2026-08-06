@@ -49,6 +49,7 @@ if ($action === 'LogIn' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $login_data = [
         'login'           => filter_input(INPUT_POST, 'login', FILTER_SANITIZE_SPECIAL_CHARS),
         'user_pass'       => $_POST['user_pass'] ?? '', // Raw password
+        'remember'        => $_POST['remember'] ?? '',
         'csrf'            => $_POST['csrf'] ?? '',
         'captcha_login'   => $_POST['captcha_login'] ?? '',
         'scriptpot_name'  => $_POST['scriptpot_name'] ?? '',
@@ -70,7 +71,7 @@ login_header($stylePath);
 <div class="login-logo">
     <h1>
         <a href="#">
-            <img class="d-block mx-auto mb-4" src="<?= htmlspecialchars($stylePath); ?>/assets/dist/img/icon612x612.png" alt="scriptlog-logo" width="72" height="72">
+            <img class="d-block mx-auto mb-4" src="<?= htmlspecialchars($stylePath, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>/assets/dist/img/icon612x612.png" alt="scriptlog-logo" width="72" height="72">
         </a>
     </h1>
 </div>
@@ -80,7 +81,7 @@ login_header($stylePath);
     <?php if (!empty($errors['errorMessage'])) : ?>
         <div class="alert alert-danger alert-dismissable">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <?= htmlspecialchars($errors['errorMessage']); ?>
+            <?= htmlspecialchars($errors['errorMessage'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>
         </div>
     <?php endif; ?>
 
@@ -98,7 +99,7 @@ login_header($stylePath);
             ?>
             <div class="alert alert-info alert-dismissable">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <?= htmlspecialchars($status_msg); ?>
+                <?= htmlspecialchars($status_msg, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>
             </div>
         <?php endif; ?>
     <?php endif; ?>
@@ -114,7 +115,7 @@ login_header($stylePath);
         <div class="form-group has-feedback">
             <label for="inputLogin">Username or Email Address</label>
             <input type="text" class="form-control" id="inputLogin" name="login" maxlength="186"
-                value="<?= isset($_POST['login']) ? htmlspecialchars($_POST['login']) : (isset($_COOKIE['scriptlog_auth']) ? ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $app->cipher_key) : ""); ?>"
+                value="<?= isset($_POST['login']) ? htmlspecialchars($_POST['login'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) : htmlspecialchars(get_remembered_username(), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?>"
                 required autofocus>
             <span class="glyphicon glyphicon-user form-control-feedback"></span>
         </div>

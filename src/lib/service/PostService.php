@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Service;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -410,6 +411,44 @@ class PostService
     }
 
     /**
+     * Get paginated published posts for API
+     *
+     * @param integer $page
+     * @param integer $perPage
+     * @param string $sortBy
+     * @param string $sortOrder
+     * @param int|null $author
+     * @return array
+     */
+    public function getPublishedPostsApi($page = 1, $perPage = 10, $sortBy = 'ID', $sortOrder = 'DESC', $author = null)
+    {
+        $offset = ($page - 1) * $perPage;
+        return $this->postDao->findPublishedPostsPaginated($perPage, $offset, $sortBy, $sortOrder, $author);
+    }
+
+    /**
+     * Count published posts for API
+     *
+     * @param int|null $author
+     * @return integer
+     */
+    public function countPublishedPostsApi($author = null)
+    {
+        return $this->postDao->countPublishedPosts($author);
+    }
+
+    /**
+     * Get a single published post by ID for API
+     *
+     * @param integer $postId
+     * @return array|false
+     */
+    public function getPublishedPostApi($postId)
+    {
+        return $this->postDao->findPublishedPostById($postId);
+    }
+
+    /**
      * Insert new post
      *
      * @return integer
@@ -709,54 +748,6 @@ class PostService
     }
 
     /**
-     * Drop down post status
-     *
-     * @param string $selected
-     * @return string
-     *
-     */
-    public function postStatusDropDown($selected = "")
-    {
-        return $this->postDao->dropDownPostStatus($selected);
-    }
-
-    /**
-     * Drop down comment status
-     *
-     * @param string $selected
-     * @return string
-     *
-     */
-    public function commentStatusDropDown($selected = "")
-    {
-        return $this->postDao->dropDownCommentStatus($selected);
-    }
-
-    /**
-     * visibilityDropDown
-     *
-     * @param string $selected
-     * @return string
-     *
-     */
-    public function visibilityDropDown($selected = "")
-    {
-        return $this->postDao->dropDownVisibility($selected);
-    }
-
-    /**
-     * localeDropDown
-     *
-     * @param string $selected
-     * @return string
-     *
-     */
-    public function localeDropDown($selected = "")
-    {
-        return $this->postDao->dropDownLocale($selected);
-    }
-
-    /**
      * postAuthorId
      * Checking whether author cookie_id or session_id exists
      *
@@ -789,12 +780,163 @@ class PostService
     /**
      * Total posts records.
      *
-     * @param array $data
+     * @param array $data Optional list where the first element is the author ID.
      * @return int|null
      *
      */
     public function totalPosts(array $data = []): ?int
     {
-        return $this->postDao->totalPostRecords($data);
+        $author = isset($data[0]) ? (int)$data[0] : null;
+
+        return $this->postDao->totalPostRecords($author);
+    }
+
+    /**
+     * Get archive index (distinct year/month with post counts).
+     *
+     * @return array
+     */
+    public function getArchiveIndexApi()
+    {
+        return $this->postDao->findArchiveIndex();
+    }
+
+    /**
+     * Get published posts by year for API.
+     *
+     * @param int $year
+     * @param int $page
+     * @param int $perPage
+     * @param string $sortBy
+     * @param string $sortOrder
+     * @return array
+     */
+    public function getPostsByYearApi($year, $page = 1, $perPage = 10, $sortBy = 'ID', $sortOrder = 'DESC')
+    {
+        $offset = ($page - 1) * $perPage;
+        return $this->postDao->findPostsByYear($year, $perPage, $offset, $sortBy, $sortOrder);
+    }
+
+    /**
+     * Count published posts by year for API.
+     *
+     * @param int $year
+     * @return int
+     */
+    public function countPostsByYearApi($year)
+    {
+        return $this->postDao->countPostsByYear($year);
+    }
+
+    /**
+     * Get published posts by year and month for API.
+     *
+     * @param int $year
+     * @param int $month
+     * @param int $page
+     * @param int $perPage
+     * @param string $sortBy
+     * @param string $sortOrder
+     * @return array
+     */
+    public function getPostsByYearMonthApi($year, $month, $page = 1, $perPage = 10, $sortBy = 'ID', $sortOrder = 'DESC')
+    {
+        $offset = ($page - 1) * $perPage;
+        return $this->postDao->findPostsByYearMonth($year, $month, $perPage, $offset, $sortBy, $sortOrder);
+    }
+
+    /**
+     * Count published posts by year and month for API.
+     *
+     * @param int $year
+     * @param int $month
+     * @return int
+     */
+    public function countPostsByYearMonthApi($year, $month)
+    {
+        return $this->postDao->countPostsByYearMonth($year, $month);
+    }
+
+    /**
+     * Search posts by keyword for API query endpoint.
+     *
+     * @param string $keyword
+     * @param string $type 'blog', 'page', or 'all'
+     * @param int $limit
+     * @return array
+     */
+    public function searchPostsApi($keyword, $type = 'all', $limit = 50)
+    {
+        return $this->postDao->searchPostsApi($keyword, $type, $limit);
+    }
+
+    /**
+     * Get topics for a post.
+     *
+     * @param int $postId
+     * @return array
+     */
+    public function getPostTopicsApi($postId)
+    {
+        return $this->postDao->findTopicsByPostId($postId);
+    }
+
+    /**
+     * Set topic relationships for a post.
+     *
+     * @param int $postId
+     * @param array $topicIds
+     * @return void
+     */
+    public function setPostTopicsApi($postId, $topicIds)
+    {
+        $this->postDao->setPostTopics((int)$postId, (array)$topicIds);
+    }
+
+    /**
+     * Create a post for the API and return the new ID.
+     *
+     * @param array $data
+     * @return int
+     */
+    public function createPostApi(array $data)
+    {
+        return $this->postDao->insertPostApi($data);
+    }
+
+    /**
+     * Update a post with dynamic fields for the API.
+     *
+     * @param int $postId
+     * @param array $data
+     * @return void
+     */
+    public function updatePostApi($postId, array $data)
+    {
+        $this->postDao->updatePostApi($postId, $data);
+    }
+
+    /**
+     * Delete a post and all related data.
+     *
+     * @param int $postId
+     * @return void
+     */
+    public function removePostApi($postId)
+    {
+        $this->postDao->deletePostTopics($postId);
+        $this->postDao->deletePostComments($postId);
+        $this->postDao->deletePost($postId, $this->sanitizer);
+    }
+
+    /**
+     * Get a post by ID (any status).
+     *
+     * @param int $postId
+     * @return array|false
+     */
+    public function getPostByIdApi($postId)
+    {
+        return $this->postDao->getPostById((int)$postId);
     }
 }

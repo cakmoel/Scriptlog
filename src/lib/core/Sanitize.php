@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -26,7 +27,7 @@ class Sanitize
                 $d = array('-', '/', '\\', ',', '#', ':', ';', '\'', '"', '[', ']', '{', '}', ')', '(', '|', '`', '~', '!', '%', '$', '^', '&', '*', '=', '?', '+');
                 $str = str_replace($d, '', $str);
                 $str = stripcslashes($str);
-                $str = htmlspecialchars($str);
+                $str = htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401);
                 $str = preg_replace('/[^A-Za-z0-9]/', '', $str);
                 return intval($str);
                 break;
@@ -35,7 +36,7 @@ class Sanitize
                 $d = array('\\', '#', ';', '\'', '"', '[', ']', '{', '}', ')', '(', '|', '`', '~', '!', '%', '$', '^', '&', '*', '=', '?', '+');
                 $str = str_replace($d, '', $str);
                 $str = stripcslashes($str);
-                $str = htmlspecialchars($str);
+                $str = htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401);
                 $str = preg_replace('/[\W]/', '', $str);
                 $str = prevent_injection($str);
                 return $str;
@@ -45,7 +46,7 @@ class Sanitize
                 $d = array('\\', '#', ';', '\'', '"', '[', ']', '{', '}', ')', '(', '|', '`', '~', '!', '%', '$', '^', '&', '*', '=', '?', '+');
                 $str = str_replace($d, '', $str);
                 $str = stripcslashes($str);
-                $str = htmlspecialchars($str);
+                $str = htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401);
                 $str = prevent_injection($str);
                 return $str;
                 break;

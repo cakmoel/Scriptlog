@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /***********************************************************
@@ -60,18 +61,20 @@ class ImgCompressor
         } elseif (in_array($c_type, array('png', 'PNG'))) {
             $im_name = str_replace(end($im_ex), 'png', $im_name);
             $im_output = str_replace(end($im_ex), 'png', $im_output);
-                if ($this->check_transparent($im)) {
-                    imageAlphaBlending($im, true);
-                    imageSaveAlpha($im, true);
-                    imagepng($im, $im_output, $level);
-                } else { // @SuppressWarnings(PHPMD.ElseExpression)
-                    imagepng($im, $im_output, $level);
-                }
+            if ($this->check_transparent($im)) {
+                imageAlphaBlending($im, true);
+                imageSaveAlpha($im, true);
+                imagepng($im, $im_output, $level);
+            } else { // @SuppressWarnings(PHPMD.ElseExpression)
+                imagepng($im, $im_output, $level);
+            }
             $im_type = 'image/png';
         }
 
         // image destroy
-        imagedestroy($im);
+        if (PHP_VERSION_ID < 80500) {
+            imagedestroy($im); // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.imagedestroyDeprecated
+        }
 
         // output original image & compressed image
         $im_size = filesize($im_output);

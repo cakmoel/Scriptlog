@@ -1,14 +1,15 @@
 <?php
 
 namespace Scriptlog\Handler;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
  * Renders a single post view.
  *
- * Validates that the requested post exists in the database via
- * FrontHelper before rendering. Returns a 404 response when the
- * post is not found or the helper is unavailable.
+ * Validates that the requested post exists in the database via the
+ * shared FrontService before rendering. Returns a 404 response when the
+ * post is not found or the service is unavailable.
  */
 
 use Scriptlog\Core\HandleRequest;
@@ -45,15 +46,13 @@ class PostHandler implements FrontRequestHandler
             return;
         }
 
-        $frontHelper = class_exists('FrontHelper')
-            ? HandleRequest::handleFrontHelper()
-            : null;
+        $frontService = HandleRequest::handleFrontHelper();
 
-        if (!$frontHelper || !method_exists($frontHelper, 'grabSimpleFrontPost')) {
+        if (!$frontService || !method_exists($frontService, 'getSimplePost')) {
             $this->renderer->render404();
             return;
         }
-        $post = $frontHelper->grabSimpleFrontPost($id);
+        $post = $frontService->getSimplePost($id);
         if (empty($post['ID'])) {
             $this->renderer->render404();
             return;

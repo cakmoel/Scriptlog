@@ -20,7 +20,10 @@ class PostControllerIntegrationTest extends TestCase
     protected function setUp(): void
     {
         $this->postServiceMock = $this->createMock(PostService::class);
-        $this->postController = new PostController($this->postServiceMock);
+        $topicDao = $this->createMock(TopicDao::class);
+        $mediaDao = $this->createMock(MediaDao::class);
+        $appService = $this->createMock(\Scriptlog\Service\PostApplicationService::class);
+        $this->postController = new PostController($this->postServiceMock, $topicDao, $mediaDao, $appService);
     }
 
     protected function tearDown(): void

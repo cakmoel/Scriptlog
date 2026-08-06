@@ -123,7 +123,9 @@ class DownloadUtility
         if (function_exists('finfo_open')) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mimeType = finfo_file($finfo, $filepath);
-            finfo_close($finfo);
+            if (PHP_VERSION_ID < 80100) {
+                finfo_close($finfo); // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.finfo_closeDeprecated
+            }
             return $mimeType;
         }
 

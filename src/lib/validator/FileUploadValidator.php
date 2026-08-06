@@ -1,5 +1,7 @@
 <?php
+
 namespace Scriptlog\Validator;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 use Scriptlog\Dto\UploadedFileDto;
@@ -60,7 +62,8 @@ class FileUploadValidator
             $result->addError("File name is too long");
         }
 
-        if ((false === check_mime_type(mime_type_dictionary(), $file->tmpName))
+        if (
+            (false === check_mime_type(mime_type_dictionary(), $file->tmpName))
             || (false === check_file_extension($file->name))
         ) {
             $result->addError("Invalid file format");

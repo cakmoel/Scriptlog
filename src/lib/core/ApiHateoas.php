@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Core;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -35,12 +36,7 @@ class ApiHateoas
      */
     public function __construct($baseUrl = null)
     {
-        $config = [];
-        if (file_exists(__DIR__ . '/../../config.php')) {
-            $config = require __DIR__ . '/../../config.php';
-        }
-
-        $this->appUrl = rtrim($config['app']['url'] ?? 'http://localhost', '/');
+        $this->appUrl = rtrim(ApiHelper::getAppUrl(), '/');
         $this->baseUrl = rtrim($baseUrl ?? ($this->appUrl . '/api/v1'), '/');
     }
 

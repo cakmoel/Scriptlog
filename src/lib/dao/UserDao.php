@@ -1,6 +1,7 @@
 <?php
 
 namespace Scriptlog\Dao;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -476,7 +477,7 @@ class UserDao extends Dao
 
         $this->setSQL($sql);
 
-        return $this->checkCountValue($data) ?? 0;
+        return $this->checkCountValue($data);
     }
 
     /**

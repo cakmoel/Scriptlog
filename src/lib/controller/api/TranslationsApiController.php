@@ -1,9 +1,11 @@
 <?php
 
 namespace Scriptlog\Controller\Api;
+
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 use Scriptlog\Controller\ApiController;
+use Scriptlog\Core\ApiHateoas;
 use Scriptlog\Core\ApiResponse;
 use Scriptlog\Service\LanguageService;
 use Scriptlog\Service\TranslationService;
@@ -12,23 +14,37 @@ class TranslationsApiController extends ApiController
 {
     private $translationService;
     private $languageService;
+    private $hateoas;
 
     public function __construct()
     {
+        $this->requiresAuth = false;
+
         parent::__construct();
         $this->translationService = new TranslationService();
         $this->languageService = new LanguageService();
+        $this->hateoas = new ApiHateoas();
     }
 
     public function index($params = []): void
     {
-        $this->requiresAuth = false;
+        $langCode = isset($params['code']) ? $params['code'] : 'en';
 
-        $langCode = isset($params[0]) ? $params[0] : 'en';
+        $pagination = $this->getPagination($_GET);
 
         try {
             $translations = $this->translationService->getTranslations($langCode);
-            ApiResponse::success($translations);
+
+            $total = count($translations);
+            $offset = $pagination['offset'];
+            $perPage = $pagination['per_page'];
+            $page = $pagination['page'];
+
+            $paginated = array_slice($translations, $offset, $perPage);
+
+            $links = $this->hateoas->paginationLinks('translations/' . $langCode, $page, $perPage, $total);
+
+            ApiResponse::paginated($paginated, $page, $perPage, $total, $links);
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'FETCH_ERROR');
         }
@@ -36,10 +52,8 @@ class TranslationsApiController extends ApiController
 
     public function show($params = []): void
     {
-        $this->requiresAuth = false;
-
-        $langCode = isset($params[0]) ? $params[0] : 'en';
-        $key = isset($params[1]) ? $params[1] : '';
+        $langCode = isset($params['code']) ? $params['code'] : 'en';
+        $key = isset($params['key']) ? $params['key'] : '';
 
         if (empty($key)) {
             ApiResponse::badRequest('Translation key is required');
@@ -51,7 +65,7 @@ class TranslationsApiController extends ApiController
 
             foreach ($translations as $t) {
                 if ($t['translation_key'] === $key) {
-                    ApiResponse::success($t);
+                    ApiResponse::success($t, 200, null, $this->hateoas->rootLinks());
                     return;
                 }
             }
@@ -87,7 +101,7 @@ class TranslationsApiController extends ApiController
                 'is_html' => !empty($this->requestData['is_html']) ? 1 : 0,
             ]);
 
-            ApiResponse::created(['id' => $id], 'Translation created successfully');
+            ApiResponse::created(['id' => $id], 'Translation created successfully', $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'CREATE_ERROR');
         }
@@ -102,7 +116,7 @@ class TranslationsApiController extends ApiController
             return;
         }
 
-        $id = isset($params[0]) ? (int)$params[0] : 0;
+        $id = isset($params['id']) ? (int)$params['id'] : 0;
 
         if ($id <= 0) {
             ApiResponse::badRequest('Translation ID is required');
@@ -123,7 +137,7 @@ class TranslationsApiController extends ApiController
                 'is_html' => !empty($this->requestData['is_html']) ? 1 : 0,
             ]);
 
-            ApiResponse::success(['id' => $id], 'Translation updated successfully');
+            ApiResponse::success(['id' => $id], 'Translation updated successfully', $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'UPDATE_ERROR');
         }
@@ -138,7 +152,7 @@ class TranslationsApiController extends ApiController
             return;
         }
 
-        $id = isset($params[0]) ? (int)$params[0] : 0;
+        $id = isset($params['id']) ? (int)$params['id'] : 0;
 
         if ($id <= 0) {
             ApiResponse::badRequest('Translation ID is required');
@@ -147,7 +161,7 @@ class TranslationsApiController extends ApiController
 
         try {
             $this->translationService->deleteTranslation($id);
-            ApiResponse::success(null, 'Translation deleted successfully');
+            ApiResponse::success(null, 'Translation deleted successfully', $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'DELETE_ERROR');
         }
@@ -155,13 +169,11 @@ class TranslationsApiController extends ApiController
 
     public function export($params = []): void
     {
-        $this->requiresAuth = false;
-
-        $langCode = isset($params[0]) ? $params[0] : 'en';
+        $langCode = isset($params['code']) ? $params['code'] : 'en';
 
         try {
             $translations = $this->translationService->exportToArray($langCode);
-            ApiResponse::success($translations);
+            ApiResponse::success($translations, 200, null, $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'EXPORT_ERROR');
         }
@@ -176,7 +188,7 @@ class TranslationsApiController extends ApiController
             return;
         }
 
-        $langCode = isset($params[0]) ? $params[0] : '';
+        $langCode = isset($params['code']) ? $params['code'] : '';
 
         if (empty($langCode)) {
             ApiResponse::badRequest('Language code is required');
@@ -192,7 +204,7 @@ class TranslationsApiController extends ApiController
 
         try {
             $count = $this->translationService->importFromArray($langCode, $data);
-            ApiResponse::created(['count' => $count], "Imported {$count} translations successfully");
+            ApiResponse::created(['count' => $count], "Imported {$count} translations successfully", $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'IMPORT_ERROR');
         }
@@ -207,11 +219,11 @@ class TranslationsApiController extends ApiController
             return;
         }
 
-        $langCode = isset($params[0]) ? $params[0] : 'en';
+        $langCode = isset($params['code']) ? $params['code'] : 'en';
 
         try {
             $this->translationService->regenerateCache($langCode);
-            ApiResponse::success(null, 'Cache regenerated successfully');
+            ApiResponse::success(null, 'Cache regenerated successfully', $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'CACHE_ERROR');
         }
