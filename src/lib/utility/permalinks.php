@@ -46,7 +46,7 @@ function is_permalink_enabled()
  * @author M.Noermoehammad
  * @param mixed $id
  * @param string $app_url
- * @uses FrontHelper::methodName()
+ * @uses Scriptlog\Service\FrontService
  * @return array
  *
  */
@@ -63,7 +63,8 @@ function listen_query_string($id, $app_url)
         case 'p':
             # Deliver request to single entry post
             if ((!empty(HandleRequest::isQueryStringRequested()['value'])) && ($id === HandleRequest::isQueryStringRequested()['value'])) {
-                $entry_post = FrontHelper::grabSimpleFrontPost($id);
+                $frontService = function_exists('front_service') ? front_service() : null;
+                $entry_post = $frontService ? $frontService->getSimplePost($id) : null;
                 $post_id = $app_url . DS . '?p=' . (isset($entry_post['ID']) ? escape_html((string)$entry_post['ID']) : "");
             }
 
@@ -72,7 +73,8 @@ function listen_query_string($id, $app_url)
         case 'pg':
             // Deliver request to single entry page
             if ((!empty(HandleRequest::isQueryStringRequested()['value'])) && ($id === HandleRequest::isQueryStringRequested()['value'])) {
-                $entry_page = FrontHelper::grabSimpleFrontPage($id);
+                $frontService = function_exists('front_service') ? front_service() : null;
+                $entry_page = $frontService ? $frontService->getSimplePage($id) : null;
                 $page_id = $app_url . DS . '?pg=' . (isset($entry_page['ID']) ? escape_html((string)$entry_page['ID']) : "0");
             }
 
@@ -80,7 +82,8 @@ function listen_query_string($id, $app_url)
 
         case 'cat':
             if ((!empty(HandleRequest::isQueryStringRequested()['value'])) && ($id === HandleRequest::isQueryStringRequested()['value'])) {
-                $entry_cat = FrontHelper::grabSimpleFrontTopic($id);
+                $frontService = function_exists('front_service') ? front_service() : null;
+                $entry_cat = $frontService ? $frontService->getSimpleTopic($id) : null;
                 $cat_id = $app_url . DS . '?cat=' . (isset($entry_cat['ID']) ? escape_html($entry_cat['ID']) : "");
             }
 
@@ -88,7 +91,8 @@ function listen_query_string($id, $app_url)
 
         case 'a':
             if ((!empty(HandleRequest::isQueryStringRequested()['value'])) && ($id === HandleRequest::isQueryStringRequested()['value'])) {
-                $entry_archives = FrontHelper::grabSimpleFrontArchive();
+                $frontService = function_exists('front_service') ? front_service() : null;
+                $entry_archives = $frontService ? $frontService->getSimpleArchive() : [];
 
                 $archive_requested = class_exists('HandleRequest') ? preg_split("//", HandleRequest::isQueryStringRequested()['value'], -1, PREG_SPLIT_NO_EMPTY) : preg_split("//", $id, -1, PREG_SPLIT_NO_EMPTY);
 
@@ -132,18 +136,19 @@ function listen_request_path($id, $app_url)
 
     $request_path = class_exists('RequestPath') ? new RequestPath() : "";
     $rewrite = array();
+    $frontService = function_exists('front_service') ? front_service() : null;
 
     if (($request_path->matched == 'post') && ($id === $request_path->param1)) {
-        $getPost = FrontHelper::grabPreparedFrontPostById($request_path->param1);
+        $getPost = $frontService ? $frontService->getPublishedPost((int)$request_path->param1) : null;
         $post_id = isset($getPost['ID']) ? (int)$getPost['ID'] : 0;
         $post_slug = isset($getPost['post_slug']) ? escape_html($getPost['post_slug']) : "";
         $rewrite['post'] = $app_url . DS . 'post' . DS .  $post_id . DS . $post_slug;
     } elseif (($request_path->matched == 'page') && ($id === $request_path->param1)) {
-        $getPage = FrontHelper::grabPreparedFrontPageBySlug($request_path->param1);
+        $getPage = $frontService ? $frontService->getPublishedPage($request_path->param1) : null;
         $page_slug = isset($getPage['post_slug']) ? escape_html($getPage['post_slug']) : "";
         $rewrite['page'] = $app_url . DS . 'page' . DS . $page_slug;
     } elseif (($request_path->matched == 'category') && ($id === $request_path->param1)) {
-        $getCategory = FrontHelper::grabPreparedFrontTopicBySlug($request_path->param1);
+        $getCategory = $frontService ? $frontService->getPublishedTopic($request_path->param1) : null;
         $category_slug = isset($getCategory['topic_slug']) ? escape_html($getCategory['topic_slug']) : "";
         $rewrite['cat'] = $app_url . DS . 'category' . DS . $category_slug;
     } elseif (($request_path->matched == 'archive') && ($id === $request_path->param1 . $request_path->param2)) {
@@ -151,16 +156,16 @@ function listen_request_path($id, $app_url)
         $year = isset($request_path->param2) ? escape_html($request_path->param2) : null;
         $rewrite['archive'] = $app_url . DS . 'archive' . DS . $month . DS . $year;
     } else {
-        $getPost = FrontHelper::grabPreparedFrontPostById($id);
+        $getPost = $frontService ? $frontService->getPublishedPost((int)$id) : null;
         $post_id = isset($getPost['ID']) ? abs((int)$getPost['ID']) : 0;
         $post_slug = isset($getPost['post_slug']) ? escape_html($getPost['post_slug']) : "";
         $rewrite['post'] = $app_url . DS . 'post' . DS . $post_id . DS . $post_slug;
 
-        $getPage = FrontHelper::grabPreparedFrontPageBySlug($id);
+        $getPage = $frontService ? $frontService->getPublishedPage($id) : null;
         $page_slug = isset($getPage['post_slug']) ? escape_html($getPage['post_slug']) : "";
         $rewrite['page'] = $app_url . DS . 'page' . DS . $page_slug;
 
-        $getCategory = FrontHelper::grabPreparedFrontTopicByID($id);
+        $getCategory = $frontService ? $frontService->getPublishedTopicById((int)$id) : null;
         $category_slug = isset($getCategory['topic_slug']) ? escape_html($getCategory['topic_slug']) : $id;
         $rewrite['cat'] = $app_url . DS . 'category' . DS . $category_slug;
         $rewrite['archive'] = $app_url . DS . 'archive' . DS . $id;
