@@ -88,8 +88,14 @@ function read_nginx_config_template($permalink_status)
         $content .= '    deny all;' . PHP_EOL;
         $content .= '}' . PHP_EOL . PHP_EOL;
     } else {
-        # When permalinks are disabled, all requests go to index.php
-        $content .= '# Permalink disabled - route all requests to index.php' . PHP_EOL;
+        # API routes (highest priority) - always needed regardless of permalink status
+        $content .= '# API routes' . PHP_EOL;
+        $content .= 'location ~ ^/api/ {' . PHP_EOL;
+        $content .= '    try_files $uri $uri/ /api/index.php?$query_string;' . PHP_EOL;
+        $content .= '}' . PHP_EOL . PHP_EOL;
+
+        # When permalinks are disabled, all other requests go to index.php
+        $content .= '# Permalink disabled - route all other requests to index.php' . PHP_EOL;
         $content .= 'location / {' . PHP_EOL;
         $content .= '    try_files $uri $uri/ /index.php?$query_string;' . PHP_EOL;
         $content .= '}' . PHP_EOL . PHP_EOL;
