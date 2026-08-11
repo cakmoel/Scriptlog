@@ -41,7 +41,7 @@ class TranslationService
             'translation_key' => $data['translation_key'],
             'translation_value' => $data['translation_value'],
             'translation_context' => $data['translation_context'] ?? null,
-            'is_html' => (int)($data['is_html'] ?? 0),
+            'is_html' => $data['is_html'] ?? false,
         ]);
 
         $this->loader->invalidate($data['lang_code']);
@@ -61,7 +61,7 @@ class TranslationService
         $this->translationDao->updateTranslation($id, [
             'translation_value' => $data['translation_value'] ?? $translation['translation_value'],
             'translation_context' => $data['translation_context'] ?? $translation['translation_context'],
-            'is_html' => (int)($data['is_html'] ?? $translation['is_html']),
+            'is_html' => $data['is_html'] ?? $translation['is_html'],
         ]);
 
         $this->loader->invalidate($language['lang_code']);
@@ -164,7 +164,6 @@ class TranslationService
                     'translation_value' => $value,
                 ]);
 
-                $imported++;
                 continue;
             }
 
@@ -227,7 +226,7 @@ class TranslationService
             throw new ServiceException("Invalid translation key format");
         }
 
-        if (!isset($data['translation_value']) || $data['translation_value'] === '') {
+        if (!isset($data['translation_value'])) {
             throw new ServiceException("Translation value is required");
         }
     }
