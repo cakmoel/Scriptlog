@@ -4,7 +4,7 @@ defined('SCRIPTLOG') || die('Direct access not permitted');
 // Retrieve post based on permalink settings
 // SEO-friendly URLs: /post/{id}/slug -> request_path()->param1
 // Query string URLs: ?p={id} -> HandleRequest::isQueryStringRequested()['value']
-$retrieve_post = (rewrite_status() == 'yes') ? retrieve_detail_post(request_path()->param1) : 
+$retrieve_post = (rewrite_status() == 'yes') ? retrieve_detail_post(request_path()->param1) :
 retrieve_detail_post(HandleRequest::isQueryStringRequested()['value']);
 
 // Content-existence validation is owned by the Dispatcher (validateContentExists).
@@ -137,7 +137,7 @@ if (isset($retrieve_post['post_modified'])) {
                         if ($comment_permit == 'open') :
                             echo render_comments_section($post_id);
 
-                        ?>
+                            ?>
 
                             <div class="comment-form-wrap pt-5">
                                 <h3 class="h6 mb-5"><?= t('single.comment.leave_reply'); ?></h3>
@@ -170,7 +170,7 @@ if (isset($retrieve_post['post_modified'])) {
                                     <div id="success_message" class="ajax_response"></div>
                                 </form>
                             </div>
-                        <?php
+                            <?php
                         endif;
                         ?>
                     </div>
