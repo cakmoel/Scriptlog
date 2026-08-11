@@ -28,7 +28,16 @@ if (class_exists('PrivacyPolicyDao')) {
 }
 
 $privacy_title = $policy['policy_title'] ?? t('privacy.page_title');
-$privacy_content = $policy['policy_content'] ?? "";
+$privacy_content_raw = $policy['policy_content'] ?? "";
+$privacy_content = $privacy_content_raw;
+
+if ($privacy_content_raw !== '' && function_exists('htmLawed')) {
+    $privacy_content = htmLawed($privacy_content_raw, array(
+        'elements' => 'h2,h3,h4,p,ul,ol,li,strong,em,a,br,blockquote,code,pre',
+        'deny_attribute' => 'style,onclick,onerror,onload,onmouseover,onfocus,onblur,onchange,onsubmit,onkeydown,onkeyup,onkeypress',
+        'keep_bad' => 0
+    ));
+}
 $site_name = function_exists('app_sitename') ? app_sitename() : 'Our Website';
 $contact_info = function_exists('app_info') ? app_info() : [];
 $contact_email = isset($contact_info['site_email']) ? $contact_info['site_email'] : 'admin@example.com';
