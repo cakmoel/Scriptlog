@@ -765,7 +765,13 @@ class UserController extends BaseApp
                 }
 
                 $userEmail = $getUser['user_email'] ?? null;
-                $this->userService->removeUserWithAnonymization($sanitizeID, $userEmail);
+                $deleted = $this->userService->removeUserWithAnonymization($sanitizeID, $userEmail);
+
+                if (!$deleted) {
+                    $_SESSION['error'] = 'userDeleteFailed';
+                    direct_page('index.php?load=users&error=userDeleteFailed', 302);
+                }
+
                 $_SESSION['status'] = "userDeleted";
                 direct_page('index.php?load=users&status=userDeleted', 302);
             } catch (\Throwable $th) {
@@ -876,29 +882,31 @@ class UserController extends BaseApp
 
     private function processProfileDeletion($filters, $getProfile, $authenticator)
     {
-        if (true === terminator($getProfile['ID'])) {
-            (function_exists('sleep')) ? sleep(10) : "";
+        (function_exists('sleep')) ? sleep(10) : "";
 
-            session_unset();
-            session_destroy();
-            session_start();
-            session_regenerate_id(true);
-            Session::getInstance()->startSession();
-            if (!empty($_POST['current_pwd']) && ($authenticator instanceof Authentication)) {
-                $authenticator->removeCookies();
-            }
-            Session::getInstance()->destroy();
-
-            $userId = sanitizer(distill_post_request($filters)['user_id'], 'sql');
-            $userEmail = $getProfile['user_email'] ?? null;
-            $this->userService->removeUserWithAnonymization($userId, $userEmail);
-
-            if (class_exists('NotificationService')) {
-                $notificationService = new NotificationService($this->configService);
-                $notificationService->sendProfileDeletionConfirmation($userEmail);
-            }
-            direct_page('login.php', 302);
+        session_unset();
+        session_destroy();
+        session_start();
+        session_regenerate_id(true);
+        Session::getInstance()->startSession();
+        if (!empty($_POST['current_pwd']) && ($authenticator instanceof Authentication)) {
+            $authenticator->removeCookies();
         }
+        Session::getInstance()->destroy();
+
+        $userId = sanitizer(distill_post_request($filters)['user_id'], 'sql');
+        $userEmail = $getProfile['user_email'] ?? null;
+        $deleted = $this->userService->removeUserWithAnonymization($userId, $userEmail);
+
+        if (!$deleted) {
+            throw new AppException('Unable to delete profile');
+        }
+
+        if (class_exists('NotificationService')) {
+            $notificationService = new NotificationService($this->configService);
+            $notificationService->sendProfileDeletionConfirmation($userEmail);
+        }
+        direct_page('login.php', 302);
     }
 
     /**
