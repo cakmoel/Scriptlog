@@ -1,4 +1,5 @@
 <?php
+
 namespace Scriptlog\Core\Theme;
 
 defined('SCRIPTLOG') || die('Direct access not permitted');
