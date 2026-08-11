@@ -62,7 +62,6 @@ if (class_exists('Session')) {
 
         // Check 1: Token Found
         if (!empty($token_info['ID'])) {
-
             if (\Tokenizer::isPasswordValid($_COOKIE['scriptlog_validator'], $token_info['pwd_hash'])) {
                 $validator_verified = true;
             }
@@ -120,7 +119,6 @@ if (class_exists('Session')) {
             if (!empty($decrypt_auth) && isset($app->authenticator)) {
                 $app->authenticator->clearAuthCookies($decrypt_auth);
             }
-
         }
     }
 }
