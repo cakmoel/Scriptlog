@@ -61,7 +61,7 @@ function get_cookie_consent_from_db()
         $consentService = new ConsentService($consentDao);
     }
 
-    return $consentService->getCookieConsentStatus();
+    return $consentService->isCookieConsentAccepted();
 }
 
 /**
@@ -169,4 +169,30 @@ function process_consent_ajax()
 
     echo json_encode(['success' => true, 'message' => 'Consent recorded']);
     exit;
+}
+
+/**
+ * Check whether the current visitor may submit another data request.
+ *
+ * Per-IP throttle for data subject access/erasure request creation, backed by
+ * the shared RateLimiter. Allows up to 5 requests per 15 minutes per IP and
+ * fails open when the rate limiter is unavailable.
+ *
+ * @return bool True when the request may proceed, false when throttled
+ */
+function dsar_request_allowed()
+{
+    if (!class_exists('Scriptlog\Core\RateLimiter')) {
+        return true;
+    }
+
+    try {
+        $rateLimiter = new \Scriptlog\Core\RateLimiter();
+        $result = $rateLimiter->check(null, 5, 900, 'dsar');
+
+        return isset($result['allowed']) && $result['allowed'];
+    } catch (\Throwable $e) {
+        error_log('RateLimiter error: ' . $e->getMessage());
+        return true;
+    }
 }
