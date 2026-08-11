@@ -1,6 +1,6 @@
 # Database Schema Guide
 
-**Version:** 1.5.1 | **Last Updated:** July 2026
+**Version:** 1.6.0 | **Last Updated:** August 2026
 
 This guide documents every table in the Scriptlog database. It is written for developers of all levels, from beginners setting up their first installation to senior developers extending the schema.
 
