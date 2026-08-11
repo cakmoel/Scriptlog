@@ -88,21 +88,21 @@
                      <td>
                              <?php
                                   $typeLabel = '';
-                            $typeClass = 'label-default';
-                            if ($request['request_type'] == 'access') {
-                                $typeLabel = 'Data Access';
-                                $typeClass = 'label-info';
-                            } elseif ($request['request_type'] == 'rectification') {
-                                $typeLabel = 'Rectification';
-                                $typeClass = 'label-warning';
-                            } elseif ($request['request_type'] == 'erasure') {
-                                $typeLabel = 'Erasure';
-                                $typeClass = 'label-danger';
-                            } elseif ($request['request_type'] == 'deletion') {
-                                $typeLabel = 'Deletion';
-                                $typeClass = 'label-danger';
-                            }
-                            ?>
+                                $typeClass = 'label-default';
+                                if ($request['request_type'] == 'access') {
+                                    $typeLabel = 'Data Access';
+                                    $typeClass = 'label-info';
+                                } elseif ($request['request_type'] == 'rectification') {
+                                    $typeLabel = 'Rectification';
+                                    $typeClass = 'label-warning';
+                                } elseif ($request['request_type'] == 'erasure') {
+                                    $typeLabel = 'Erasure';
+                                    $typeClass = 'label-danger';
+                                } elseif ($request['request_type'] == 'deletion') {
+                                    $typeLabel = 'Deletion';
+                                    $typeClass = 'label-danger';
+                                }
+                                ?>
                         <span class="label <?= $typeClass; ?>"><?= $typeLabel; ?></span>
                      </td>
                      <td><?= isset($request['request_email']) ? htmlout($request['request_email']) : ""; ?></td>
@@ -142,12 +142,12 @@
                             <input type="hidden" name="request_id" value="<?= (int)$request['ID']; ?>">
                             <input type="hidden" name="action" value="complete">
                             <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
-                            <?php if (in_array($request['request_type'], ['deletion', 'erasure'], true)) : ?>
+                                <?php if (in_array($request['request_type'], ['deletion', 'erasure'], true)) : ?>
                             <label class="confirm-erasure" style="display:block;margin-bottom:4px;">
                                 <input type="checkbox" name="confirm_erasure" value="1" required>
                                 Confirm irreversible erasure
                             </label>
-                            <?php endif; ?>
+                                <?php endif; ?>
                             <button type="submit" class="btn btn-xs btn-success">Complete</button>
                         </form>
                             <?php endif; ?>
