@@ -125,8 +125,8 @@ function admin_footer($stylePath, $ubench = null)
 
             <div class="pull-right hidden-xs">
                 <?php
-            echo APP_CODENAME;
-        ?>
+                echo APP_CODENAME;
+                ?>
             </div>
 
             <strong>Thank you for creating with
