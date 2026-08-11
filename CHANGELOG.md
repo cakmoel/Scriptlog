@@ -68,7 +68,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 Feature release centred on a public REST API, admin command architecture, theme view models, GDPR/privacy tooling, live search, and broad PHP 8.4/8.5 compatibility hardening. 346 commits since v1.5.1.
 
 ### Codename
-**Anoa** – Honoring *Bubalus depressicornis*, the dwarf buffalo endemic to Sulawesi, Indonesia. This secretive lowland forest dweller is the world's smallest wild bovine, standing barely 1 meter at the shoulder. With fewer than 2,500 mature individuals remaining, the lowland anoa is listed as Endangered on the IUCN Red List, threatened by habitat loss from agricultural expansion and unregulated hunting. Protected across Indonesian reserves, it is also the emblem of Southeast Sulawesi province.
+**Maleo Senkawor** – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
 
 ### Comparison
 - **Previous release**: v1.5.1
