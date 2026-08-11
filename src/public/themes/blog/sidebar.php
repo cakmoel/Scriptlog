@@ -3,7 +3,7 @@
   <?php
   $sidebar = function_exists('prepare_sidebar') ? prepare_sidebar() : null;
   $search_action = ($sidebar !== null && $sidebar->searchAction() !== '') ? $sidebar->searchAction() : (function_exists('theme_search_url') ? theme_search_url() : (string)app_url() . '/search');
-  ?>
+    ?>
 
   <!-- Widget [Search Bar Widget]-->
   <div class="widget search">
@@ -98,7 +98,7 @@
 
       <div class="item d-flex justify-content-between"><a href="<?= $archive['url']; ?>" title="<?= $archive['label']; ?>"><?= $archive['label']; ?></a><span><?= $archive['count']; ?></span></div>
 
-        <?php
+            <?php
         endforeach;
     endif;
     ?>
