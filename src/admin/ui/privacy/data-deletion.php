@@ -66,7 +66,8 @@
                   
                   <p>Under GDPR Article 17, you have the "right to be forgotten" - the right to request deletion of your personal data.</p>
                   
-                  <form method="post" action="index.php?load=privacy&action=delete" class="form-horizontal">
+                  <form method="post" action="index.php?load=privacy&p=data-deletion&action=delete" class="form-horizontal">
+                    <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
                     <div class="form-group">
                       <label for="email" class="col-sm-2 control-label">Email Address</label>
                       <div class="col-sm-10">
