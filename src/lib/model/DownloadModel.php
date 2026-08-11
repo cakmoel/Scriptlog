@@ -173,7 +173,7 @@ class DownloadModel extends BaseModel
     public function deleteMediaDownload($identifier, $sanitize)
     {
         $this->filteringId($sanitize, $identifier, 'sql');
-        return $this->deleteRecord("tbl_media_download", ['media_identifier' => $identifier]);
+        return $this->deleteRecord("tbl_media_download", ['media_identifier' => $identifier]) > 0;
     }
 
     /**
