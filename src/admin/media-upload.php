@@ -1,7 +1,8 @@
 <?php
+
 /**
  * Simple Media Upload Handler for SummerNote
- * 
+ *
  * This endpoint handles image uploads from SummerNote WYSIWYG editor
  * It's placed in the admin folder so it uses admin session authentication
  */
@@ -125,30 +126,30 @@ sendJsonResponse(201, true, null, null, [
 /**
  * Send JSON response and exit
  */
-function sendJsonResponse($statusCode, $success, $errorCode = null, $errorMessage = null, $data = null) 
+function sendJsonResponse($statusCode, $success, $errorCode = null, $errorMessage = null, $data = null)
 {
     // Clean any output buffers
     while (ob_get_level()) {
         ob_end_clean();
     }
-    
+
     http_response_code($statusCode);
     header('Content-Type: application/json');
     header('Cache-Control: no-store, no-cache, must-revalidate');
-    
+
     $response = ['success' => $success];
-    
+
     if ($errorCode !== null) {
         $response['error'] = [
             'code' => $errorCode,
             'message' => $errorMessage
         ];
     }
-    
+
     if ($data !== null) {
         $response['data'] = $data;
     }
-    
+
     echo json_encode($response);
     exit;
 }
