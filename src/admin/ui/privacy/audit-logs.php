@@ -56,21 +56,21 @@
                             <?php
                                  $actionLabel = '';
                             $actionClass = 'label-default';
-                            if ($log['log_action'] == 'consent_given') {
-                                $actionLabel = 'Consent';
-                                $actionClass = 'label-success';
-                            } elseif ($log['log_action'] == 'data_access') {
-                                $actionLabel = 'Data Access';
+                            if ($log['log_action'] == 'data_request_created') {
+                                $actionLabel = 'Data Request';
                                 $actionClass = 'label-info';
-                            } elseif ($log['log_action'] == 'data_export') {
+                            } elseif ($log['log_action'] == 'request_status_updated') {
+                                $actionLabel = 'Status Update';
+                                $actionClass = 'label-warning';
+                            } elseif ($log['log_action'] == 'data_exported') {
                                 $actionLabel = 'Export';
                                 $actionClass = 'label-primary';
-                            } elseif ($log['log_action'] == 'data_deletion') {
+                            } elseif ($log['log_action'] == 'data_deleted') {
                                 $actionLabel = 'Deletion';
                                 $actionClass = 'label-danger';
-                            } elseif ($log['log_action'] == 'data_rectification') {
-                                $actionLabel = 'Rectification';
-                                $actionClass = 'label-warning';
+                            } else {
+                                $actionLabel = ucwords(str_replace('_', ' ', (string)$log['log_action']));
+                                $actionClass = 'label-default';
                             }
                             ?>
                         <span class="label <?= $actionClass; ?>"><?= $actionLabel; ?></span>
