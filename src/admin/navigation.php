@@ -26,11 +26,11 @@
                   <?php foreach (admin_get_available_locales() as $code => $name) : ?>
                   <li>
                     <a href="?lang=<?= $code; ?>">
-                      <?php if (admin_get_locale() === $code) : ?>
+                        <?php if (admin_get_locale() === $code) : ?>
                       <i class="fa fa-check text-success"></i>
-                      <?php else : ?>
+                        <?php else : ?>
                       <i class="fa fa-globe text-muted"></i>
-                      <?php endif; ?>
+                        <?php endif; ?>
                       &nbsp;<?= safe_html($name); ?>
                     </a>
                   </li>
