@@ -2,7 +2,7 @@
   
   <?php
   $sidebar = function_exists('prepare_sidebar') ? prepare_sidebar() : null;
-  $search_action = ($sidebar !== null && $sidebar->searchAction() !== '') ? $sidebar->searchAction() : (string)app_url() . '/search';
+  $search_action = ($sidebar !== null && $sidebar->searchAction() !== '') ? $sidebar->searchAction() : (function_exists('theme_search_url') ? theme_search_url() : (string)app_url() . '/search');
   ?>
 
   <!-- Widget [Search Bar Widget]-->

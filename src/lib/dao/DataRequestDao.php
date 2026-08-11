@@ -108,12 +108,18 @@ class DataRequestDao extends Dao
     /**
      * Get all requests
      *
+     * Sort column is validated against an explicit allow-list so raw input is
+     * never interpolated into the query.
+     *
      * @param string $orderBy
      * @return array|bool
      */
     public function getAllRequests($orderBy = 'ID')
     {
-        $sql = "SELECT * FROM tbl_data_requests ORDER BY '$orderBy' DESC";
+        $allowedColumns = ['ID', 'request_type', 'request_email', 'request_status', 'request_date', 'request_completed_date'];
+        $sortColumn = in_array($orderBy, $allowedColumns, true) ? $orderBy : 'ID';
+
+        $sql = "SELECT * FROM tbl_data_requests ORDER BY $sortColumn DESC";
         $this->setSQL($sql);
         return $this->findAll([]);
     }

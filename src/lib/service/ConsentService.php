@@ -121,12 +121,16 @@ class ConsentService
     /**
      * Check if user has given consent
      *
+     * Consent is evaluated per visitor when an IP address is provided;
+     * without one the check falls back to the site-global record (legacy).
+     *
      * @param string $consentType
+     * @param string|null $ipAddress
      * @return bool
      */
-    public function hasConsented($consentType)
+    public function hasConsented($consentType, $ipAddress = null)
     {
-        return $this->consentDao->hasConsented($consentType);
+        return $this->consentDao->hasConsented($consentType, $ipAddress);
     }
 
     /**

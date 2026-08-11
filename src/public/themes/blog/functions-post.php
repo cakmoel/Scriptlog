@@ -360,6 +360,32 @@ if (!function_exists('theme_page_url')) {
 }
 
 /**
+ * theme_search_url() - Build the front-end search URL honoring the permalink setting.
+ *
+ * With SEO-friendly permalinks enabled the search page lives at /search; otherwise
+ * the query-string router dispatches ?q= on the app root. Mirrors theme_post_url()
+ * and theme_page_url() with per-request memoization. Returns the raw (unescaped)
+ * URL so callers escape at their own output boundary.
+ *
+ * @return string Absolute search URL
+ */
+if (!function_exists('theme_search_url')) {
+    function theme_search_url(): string
+    {
+        static $url = null;
+
+        if ($url === null) {
+            $base = (string)app_url();
+            $url = (function_exists('is_permalink_enabled') && is_permalink_enabled() === 'yes')
+                ? $base . DS . 'search'
+                : $base . DS;
+        }
+
+        return $url;
+    }
+}
+
+/**
  * theme_tag_url() - Build a tag archive URL without a per-row DB round-trip.
  *
  * Mirrors tag_path()/tag_query() but returns a single escaped URL for one tag
@@ -594,7 +620,7 @@ if (!function_exists('prepare_sidebar')) {
             'categories'    => $categories,
             'archives'      => $archives,
             'tags'          => $tags,
-            'search_action' => (string)app_url() . '/search',
+            'search_action' => function_exists('theme_search_url') ? theme_search_url() : (string)app_url() . '/search',
         ));
     }
 }

@@ -157,7 +157,7 @@
             
             if (total > 10) {
                 html += '<div class="search-result-more">' +
-                        '<a href="' + scriptlog_vars.site_url + '/search?q=' + encodeURIComponent(keyword) + '">' +
+                        '<a href="' + scriptlog_vars.search_url + '?q=' + encodeURIComponent(keyword) + '">' +
                         this.format(this.i18n.viewAll || 'View all %count% results', { count: total }) +
                         '</a>' +
                         '</div>';

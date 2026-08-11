@@ -62,7 +62,8 @@
                   <p>Under GDPR, you have the right to receive a copy of your personal data in a commonly used electronic format. 
                   Use the form below to request an export of your data.</p>
                   
-                  <form method="post" action="index.php?load=privacy&action=export" class="form-horizontal">
+                  <form method="post" action="index.php?load=privacy&p=data-export&action=export" class="form-horizontal">
+                    <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
                     <div class="form-group">
                       <label for="email" class="col-sm-2 control-label">Email Address</label>
                       <div class="col-sm-10">

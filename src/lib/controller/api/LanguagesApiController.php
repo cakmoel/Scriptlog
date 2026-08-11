@@ -142,7 +142,7 @@ class LanguagesApiController extends ApiController
 
         try {
             $this->languageService->updateLanguage($language['ID'], $this->requestData);
-            ApiResponse::success(['id' => $language['ID']], 'Language updated successfully', $this->hateoas->rootLinks());
+            ApiResponse::success(['id' => $language['ID']], 200, 'Language updated successfully', $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'UPDATE_ERROR');
         }
@@ -173,7 +173,7 @@ class LanguagesApiController extends ApiController
 
         try {
             $this->languageService->deleteLanguage($language['ID']);
-            ApiResponse::success(null, 'Language deleted successfully', $this->hateoas->rootLinks());
+            ApiResponse::success(null, 200, 'Language deleted successfully', $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'DELETE_ERROR');
         }
@@ -204,7 +204,7 @@ class LanguagesApiController extends ApiController
 
         try {
             $this->languageService->setDefaultLanguage($language['ID']);
-            ApiResponse::success(['id' => $language['ID']], 'Default language set successfully', $this->hateoas->rootLinks());
+            ApiResponse::success(['id' => $language['ID']], 200, 'Default language set successfully', $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'UPDATE_ERROR');
         }
