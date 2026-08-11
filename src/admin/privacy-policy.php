@@ -12,14 +12,20 @@ if (false === $app->authenticator->userAccessControl(ActionConst::PRIVACY)) {
 $privacyPolicyDao = class_exists('PrivacyPolicyDao') ? new PrivacyPolicyDao() : null;
 $errors = [];
 $status = [];
+$csrfToken = class_exists('CSRFGuard') ? csrf_generate_token('csrfToken') : "";
 
 try {
     switch ($action) {
         case 'new-policy':
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && $privacyPolicyDao !== null) {
+                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+                    $errors[] = MESSAGE_UNPLEASANT_ATTEMPT;
+                    break;
+                }
+
                 $locale = isset($_POST['locale']) ? strip_tags($_POST['locale']) : 'en';
                 $policyTitle = isset($_POST['policy_title']) ? trim($_POST['policy_title']) : '';
-                $policyContent = isset($_POST['policy_content']) ? $_POST['policy_content'] : '';
+                $policyContent = isset($_POST['policy_content']) ? purify_dirty_html($_POST['policy_content']) : '';
                 $isDefault = isset($_POST['is_default']) ? 1 : 0;
 
                 if (empty($policyTitle)) {
@@ -51,8 +57,13 @@ try {
         case 'edit-policy':
             if ($privacyPolicyDao !== null && $policyId > 0) {
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+                        $errors[] = MESSAGE_UNPLEASANT_ATTEMPT;
+                        break;
+                    }
+
                     $policyTitle = isset($_POST['policy_title']) ? trim($_POST['policy_title']) : '';
-                    $policyContent = isset($_POST['policy_content']) ? $_POST['policy_content'] : '';
+                    $policyContent = isset($_POST['policy_content']) ? purify_dirty_html($_POST['policy_content']) : '';
                     $isDefault = isset($_POST['is_default']) ? 1 : 0;
 
                     if (empty($policyTitle)) {
@@ -87,7 +98,12 @@ try {
             break;
 
         case 'delete-policy':
-            if ($privacyPolicyDao !== null && $policyId > 0) {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && $privacyPolicyDao !== null && $policyId > 0) {
+                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+                    $errors[] = MESSAGE_UNPLEASANT_ATTEMPT;
+                    break;
+                }
+
                 $privacyPolicyDao->deletePolicy((int)$policyId);
                 $_SESSION['status'] = 'policyDeleted';
                 direct_page('index.php?load=privacy-policy', 302);
@@ -95,7 +111,12 @@ try {
             break;
 
         case 'setDefault':
-            if ($privacyPolicyDao !== null && $policyId > 0) {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && $privacyPolicyDao !== null && $policyId > 0) {
+                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+                    $errors[] = MESSAGE_UNPLEASANT_ATTEMPT;
+                    break;
+                }
+
                 $privacyPolicyDao->clearDefaultPolicy();
                 $privacyPolicyDao->setAsDefaultPolicy((int)$policyId);
                 $_SESSION['status'] = 'policyDefaultSet';
