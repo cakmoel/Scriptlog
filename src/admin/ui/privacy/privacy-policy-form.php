@@ -79,6 +79,7 @@
 
                     <div class="box-body">
                         <form method="post" action="index.php?load=privacy-policy&action=<?= (isset($action) && $action === 'edit-policy') ? 'edit-policy' : 'new-policy'; ?><?= ($policyId > 0) ? '&Id=' . (int)$policyId : ''; ?>" id="policyForm">
+                            <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
                             
                             <?php if (!isset($action) || $action !== 'edit-policy') : ?>
                             <div class="form-group">
@@ -106,7 +107,7 @@
 
                             <div class="form-group">
                                 <label for="policy_content">Policy Content <span class="text-red">*</span></label>
-                                <textarea name="policy_content" id="policy_content" class="form-control" rows="20" required placeholder="Enter HTML content..."><?= (isset($policy) && isset($policy['policy_content'])) ? $policy['policy_content'] : ''; ?></textarea>
+                                <textarea name="policy_content" id="policy_content" class="form-control" rows="20" required placeholder="Enter HTML content..."><?= (isset($policy) && isset($policy['policy_content'])) ? escape_html($policy['policy_content'], 'html') : ''; ?></textarea>
                                 <small class="help-block">Enter HTML content for the privacy policy. You can use HTML tags like &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, etc.</small>
                             </div>
 
