@@ -142,14 +142,20 @@
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <h4><i class="icon fa fa-check"></i> Success!</h4>
             <p>
-            <?php 
+            <?php
                 $statusMsg = $_SESSION['status'];
                 unset($_SESSION['status']);
-                if ($statusMsg === 'policyCreated') echo "Privacy policy created successfully.";
-                elseif ($statusMsg === 'policyUpdated') echo "Privacy policy updated successfully.";
-                elseif ($statusMsg === 'policyDeleted') echo "Privacy policy deleted successfully.";
-                elseif ($statusMsg === 'policyDefaultSet') echo "Default policy set successfully.";
-                else echo "Operation completed successfully.";
+            if ($statusMsg === 'policyCreated') {
+                echo "Privacy policy created successfully.";
+            } elseif ($statusMsg === 'policyUpdated') {
+                echo "Privacy policy updated successfully.";
+            } elseif ($statusMsg === 'policyDeleted') {
+                echo "Privacy policy deleted successfully.";
+            } elseif ($statusMsg === 'policyDefaultSet') {
+                echo "Default policy set successfully.";
+            } else {
+                echo "Operation completed successfully.";
+            }
             ?>
             </p>
         </div>
