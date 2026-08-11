@@ -62,7 +62,6 @@ if (file_exists(__DIR__ . '/../config.php') && is_file(__DIR__ . '/../config.php
 if (!$loggedIn) {
     direct_page('login.php', 302);
 } else {
-    
     $decrypt_login = "";
     if (!empty($_COOKIE['scriptlog_auth']) && class_exists('ScriptlogCryptonize') && isset($app->cipher_key)) {
         try {
