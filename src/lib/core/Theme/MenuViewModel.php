@@ -1,4 +1,5 @@
 <?php
+
 namespace Scriptlog\Core\Theme;
 
 defined('SCRIPTLOG') || die('Direct access not permitted');
@@ -36,7 +37,7 @@ final class MenuViewModel extends AbstractThemeViewModel
             'label'     => $self->safe($row['menu_label'] ?? null, $escape),
             'url'       => isset($row['menu_link']) ? $escape((string)$row['menu_link']) : '#',
             'parent'    => $self->safe($row['parent_id'] ?? null, $escape),
-            'visibility'=> $self->safe($row['menu_visibility'] ?? 'public', $escape),
+            'visibility' => $self->safe($row['menu_visibility'] ?? 'public', $escape),
         ];
 
         return $self;
@@ -85,15 +86,30 @@ final class MenuViewModel extends AbstractThemeViewModel
     }
 
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function id(): ?string { return $this->values['id'] ?? null; }
+    public function id(): ?string
+    {
+        return $this->values['id'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function label(): ?string { return $this->values['label'] ?? null; }
+    public function label(): ?string
+    {
+        return $this->values['label'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function url(): string { return $this->values['url'] ?? '#'; }
+    public function url(): string
+    {
+        return $this->values['url'] ?? '#';
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function parent(): ?string { return $this->values['parent'] ?? null; }
+    public function parent(): ?string
+    {
+        return $this->values['parent'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function visibility(): ?string { return $this->values['visibility'] ?? null; }
+    public function visibility(): ?string
+    {
+        return $this->values['visibility'] ?? null;
+    }
 
     /**
      * @return MenuViewModel[]
