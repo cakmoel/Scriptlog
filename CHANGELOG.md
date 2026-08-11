@@ -8,12 +8,73 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#151---2026-07-10)
+- [Latest Release](#160---2026-08-11)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.6.0] - 2026-08-11
+
+### Added
+- **Public REST API**: New HTTP API with API key authentication (`tbl_api_keys`), JSON responses, rate limiting, and a search endpoint. Controllers cover posts, comments, topics, pages, media, GDPR requests, languages, and translations. Includes `QueryApiController` (RFC 10008 `QUERY` method), `RateLimiter`, and `ApiHelper` URL resolution, wired to services and API DTOs
+- **Admin command pattern**: `AdminActionRegistry` and `AdminActionCommand` interface with ~40 command classes (activate/deactivate/edit/delete/install/list/new for users, topics, themes, plugins, pages, media, posts, and comments); admin pages migrated to command-registry dispatch
+- **Theme view models**: `ThemeViewModel` interface, `AbstractThemeViewModel`, and `PostViewModel`, `PageViewModel`, `ArchiveViewModel`, `MenuViewModel`, `SidebarViewModel` with a factory; `theme_escape_html()` and `front_service()` helper functions
+- **Theme partial templates**: Post card, comments, post meta, and paginator partials; modular theme helper groups for i18n, navigation, posts, media, and comments
+- **ProtectedPostService**: Dedicated service for password-protected post handling
+- **Live search widget**: Blog search template with live-search behaviour and rebuilt minified script; total-count field in the search API response
+- **Cookie consent versioning**: Consent records versioned with configurable lifetime; banner honours the consent version; `COOKIE_CONSENT_VERSION` constant to force re-consent on policy changes
+- **GDPR enhancements**: New Data Retention admin page with configurable retention window and automatic cleanup; user account anonymization/erasure on data deletion requests; CSRF protection on data export/deletion forms; per-IP throttling for data subject access requests; data retention policy included in the installer privacy policy (Arabic, English, Chinese, French, Indonesian, Russian, Spanish)
+- **Syntax highlighting**: Prism.js vendor assets and theme overrides for code blocks in the blog theme
+- **PSR-4 autoloading**: DTOs, validators, and PSR-4 namespaces across core, DAO, controller, service, and model layers
+- **PHP 8.4/8.5 compatibility**: Guards for session `sid` ini directives, `E_STRICT`, `imagedestroy()`, `finfo_close()`, `curl_close()`, and `register_globals` emulation
+- **Explicit image loading attribute** support in post content
+- **Documentation**: API documentation HTML, database schema guide, troubleshooting guide, HTMX theme developer guide, refreshed README
+- **Unit tests**: 60+ new test files covering the API, admin commands, view models, theme helpers, consent versioning, DTOs, validators, and services
+
+### Changed
+- **FrontHelper** static facade deprecated in favour of `FrontService` and the `front_service()` helper
+- **Admin pages** refactored from direct dispatch to the command registry
+- **Authentication cookie handling** hardened
+- **DAO layer**: `Dao::deleteRecord()` return types hardened; `PostDao` sort-column whitelist and topic helpers; query builders simplified
+- **Theme templates** refactored to consume view models and partial templates
+- **Rate limiting** counters namespaced separately for read and write operations
+- **Translation caches** updated with search-widget and cookie-settings strings for ar, en, es, fr, id, ru, and zh
+- **Dependencies**: catfan/medoo 2.4.0 → 2.5.0, voku/anti-xss → 4.1.44, vlucas/phpdotenv → 5.6.4, plus dev updates (phpstan, php-cs-fixer, phpmetrics)
+
+### Fixed
+- **Output escaping**: HTML-escaping flags hardened across installer, admin forms, sanitizer, syntax highlighter, pagination links, redirects, feed content, and post paragraph trimming
+- **PHP 8.x compatibility** issues guarded (see Added)
+- **Translation values**: `is_html` cast to int and translation values validated
+- **Error handling**: `trigger_error()` replaced with `RuntimeException` where appropriate
+- **Search/feed**: total comment count included in post feed queries; `pwd_hash` included in token lookup
+- **Media**: void return types removed from `insert()`/`update()` for PHP compatibility
+
+### Removed
+- **CodeQL analysis workflow** and generated `api.html` documentation
+- **Duplicate test files**: `DownloadHandlerTest` (identical to `DownloadUtilityTest`)
+
+### Security
+- **CSRF protection** added to GDPR data export and deletion forms
+- **Per-IP rate limiting** on data subject access/erasure requests (5 requests / 15 minutes, fails open)
+- **Output escaping hardening** across request-facing rendering paths
+- **CI actions pinned** to full-length commit SHAs
+
+### Deprecated
+- **`FrontHelper`** static facade — use `front_service()` / `FrontService` instead
+
+### Notes
+Feature release centred on a public REST API, admin command architecture, theme view models, GDPR/privacy tooling, live search, and broad PHP 8.4/8.5 compatibility hardening. 346 commits since v1.5.1.
+
+### Codename
+**Anoa** – Honoring *Bubalus depressicornis*, the dwarf buffalo endemic to Sulawesi, Indonesia. This secretive lowland forest dweller is the world's smallest wild bovine, standing barely 1 meter at the shoulder. With fewer than 2,500 mature individuals remaining, the lowland anoa is listed as Endangered on the IUCN Red List, threatened by habitat loss from agricultural expansion and unregulated hunting. Protected across Indonesian reserves, it is also the emblem of Southeast Sulawesi province.
+
+### Comparison
+- **Previous release**: v1.5.1
+- **Changes since v1.5.1**: 346 commits
+
+---
 
 ## [1.5.1] - 2026-07-10
 
@@ -681,6 +742,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.6.0 | 2026-08-11 | Stable |
 | 1.5.1 | 2026-07-10 | Stable |
 | 1.5.0 | 2026-07-09 | Stable |
 | 1.4.0 | 2026-07-06 | Stable |

@@ -11,7 +11,7 @@ class AppConstantsTest extends TestCase
 
     public function testAppVersionConstant(): void
     {
-        $this->assertEquals('1.5.1', APP_VERSION);
+        $this->assertEquals('1.6.0', APP_VERSION);
     }
 
     public function testApiVersionConstant(): void
