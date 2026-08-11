@@ -19,7 +19,6 @@ use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Exception\BadFormatException;
 use Defuse\Crypto\Key;
 use Laminas\Crypt\BlockCipher;
-use Laminas\Crypt\Symmetric\Openssl;
 
 class ScriptlogCryptonize
 {
@@ -82,7 +81,7 @@ class ScriptlogCryptonize
      */
     public static function cipherMessage(string $message, string $key): string
     {
-        $openssl = new Openssl(['algo' => 'aes']);
+        $openssl = new ScriptlogOpenssl(['algo' => 'aes']);
         $cipher = new BlockCipher($openssl);
         $cipher->setKey($key);
         return $cipher->encrypt($message);
@@ -97,7 +96,7 @@ class ScriptlogCryptonize
      */
     public static function decipherMessage(string $ciphertext, string $key)
     {
-        $openssl = new Openssl(['algo' => 'aes']);
+        $openssl = new ScriptlogOpenssl(['algo' => 'aes']);
         $cipher = new BlockCipher($openssl);
         $cipher->setKey($key);
         return $cipher->decrypt($ciphertext);
