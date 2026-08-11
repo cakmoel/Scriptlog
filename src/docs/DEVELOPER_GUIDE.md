@@ -1223,7 +1223,7 @@ $rules = [
 | `blog` | `/blog*` | Blog listing |
 | `page` | `/page/{slug}` | Static pages |
 | `single` | `/post/{id}/{slug}` | Single post view |
-| `search` | `/search` | Search results |
+| `search` | `/search` (permalinks ON) or `?q=` on app root (permalinks OFF) | Search results |
 | `tag` | `/tag/{tag}` | Tag archive pages (supports spaces) |
 | `privacy` | `/privacy` | Privacy policy page |
 | `locale` | `/locale` | Locale/language switching |
@@ -5446,8 +5446,10 @@ The search system provides two complementary paths for finding published content
 
 | Path | Route | Controller | Output |
 |------|-------|-----------|--------|
-| **Full page** | `/search?q=keyword` | `SearchController` | Renders `search.php` template |
+| **Full page** | `/search?q=keyword` (permalinks ON) or `?q=keyword` on the app root (permalinks OFF) | `SearchController` | Renders `search.php` template |
 | **AJAX inline** | `GET /api/v1/search?q=keyword` | `SearchApiController` | JSON response consumed by `search.js` |
+
+The full-page path is permalink-aware: with SEO-friendly permalinks enabled the Dispatcher routes the `/search` path to `SearchController`; with permalinks disabled the query-string router (`HandleRequest::deliverQueryString()`) dispatches the `q` key on the app root. Both resolve to the same controller — use the `theme_search_url()` theme helper (`public/themes/blog/functions-post.php`) to build the search form action / JS `search_url` so it matches the active scheme instead of hard-coding `/search`.
 
 Both paths delegate to the same `SearchFinder` engine.
 
@@ -5456,14 +5458,15 @@ Both paths delegate to the same `SearchFinder` engine.
 | File | Purpose |
 |------|---------|
 | `lib/core/SearchFinder.php` | Core search engine — MySQL FULLTEXT `MATCH ... AGAINST` against `tbl_posts` |
-| `lib/controller/SearchController.php` | Frontend controller for full search page (`/search`) |
+| `lib/controller/SearchController.php` | Frontend controller for full search page (`/search` or `?q=` — permalink-aware) |
 | `lib/controller/api/SearchApiController.php` | REST API controller (`/api/v1/search`) |
 | `public/themes/blog/search.php` | Search results page template |
 | `public/themes/blog/sidebar.php` | Search form in sidebar |
 | `public/themes/blog/assets/js/search.js` | AJAX autocomplete JS (300 ms debounce) |
 | `public/themes/blog/lang/en.json` | Search i18n keys (`search.*`) |
-| `lib/core/Dispatcher.php` | Routes `/search` to `SearchController` |
+| `lib/core/Dispatcher.php` | Routes `/search` (permalinks ON) / `?q=` (permalinks OFF) to `SearchController` |
 | `lib/core/Bootstrap.php` | Route definition: `'search' => "/search"` |
+| `public/themes/blog/functions-post.php` | `theme_search_url()` — permalink-aware search URL builder |
 
 ### Architecture
 
@@ -5478,7 +5481,9 @@ Both paths delegate to the same `SearchFinder` engine.
               v                v                v
    ┌──────────────────┐  ┌──────────────────────────┐
    │  search.js AJAX  │  │  Form submit (GET) or     │
-   │  (300 ms delay)  │  │  direct URL /search?q=    │
+   │  (300 ms delay)  │  │  direct URL /search?q=     │
+   │                  │  │  (permalinks ON) or ?q=    │
+   │                  │  │  on app root (OFF)         │
    └────────┬─────────┘  └────────────┬─────────────┘
             │                         │
             v                         v
@@ -5554,7 +5559,7 @@ GET /api/v1/search?q=cicero&type=all
 
 ### Search Page (Full Page Rendering)
 
-When a user visits `/search?q=keyword` (directly or via form submit), the `Dispatcher` routes to `SearchController`:
+When a user runs a search (form submit or a direct URL — `/search?q=keyword` with permalinks ON, `?q=keyword` on the app root with permalinks OFF), the `Dispatcher` routes to `SearchController`:
 
 1. **`SearchController::search()`** reads `$_GET['q']` or `$_GET['keyword']` and `$_GET['type']`
 2. Delegates to `SearchFinder::searchAll()`, `searchPost()`, or `searchPage()`

@@ -329,6 +329,8 @@ $dbc = DbFactory::connect([
 
 **Files**: `.htaccess`, `lib/utility/write-htaccess.php`, `install/include/setup.php`, `lib/core/HandleRequest.php`, `lib/main.php`
 
+> **Related — permalinks disabled**: if the site's `permalink_setting` is `{"rewrite":"no"}` (query-string mode), a direct visit to `/search` returns the app's 404 by design — path-based routes are only dispatched when permalinks are enabled. Use `?q=keyword` on the app root instead, or enable permalinks in the admin panel. Search forms already handle this automatically via the `theme_search_url()` helper (`public/themes/blog/functions-post.php`), which emits `/search` when permalinks are ON and the app root `?q=` when OFF.
+
 ### 34. Search Shows Raw HTML Entities (like `&apos;` and `&quot;`)
 
 **Problem**: Post titles show `&apos;s Guide` instead of `'s Guide`. Content shows `&quot;` instead of `"`.
