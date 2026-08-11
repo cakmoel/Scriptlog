@@ -310,6 +310,9 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
                             href="<?= $url; ?>/index.php?load=privacy&p=audit-logs"><?= admin_translate('nav.audit_logs'); ?></a>
                     </li>
                     <li><a
+                            href="<?= $url; ?>/index.php?load=privacy&p=retention"><?= admin_translate('nav.data_retention'); ?></a>
+                    </li>
+                    <li><a
                             href="<?= $url . '/' . generate_request('index.php', 'get', ['privacy-policy'], false)['link']; ?>"><?= admin_translate('nav.privacy_policy'); ?></a>
                     </li>
                 </ul>
