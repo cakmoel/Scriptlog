@@ -8,12 +8,45 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#160---2026-08-11)
+- [Latest Release](#161---2026-08-12)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.6.1] - 2026-08-12
+
+### Added
+- **GDPR erasure test coverage**: Five new unit test files (`DaoErasureQueryTest`, `DataRequestErasureTest`, `DsarThrottleTest`, `TerminatorTest`, `UserErasureServiceTest`) covering account erasure queries, data-request erasure flows, and DSAR throttling
+- **`ScriptlogOpenssl` core class**: Project-level subclass of `Laminas\Crypt\Symmetric\Openssl` declaring `$supportedAlgos`
+- **Documentation**: PHPDoc for `LanguageDao` methods; developer guide sections for permalink-aware search routing and split theme-helper modules
+
+### Changed
+- **Code style normalization**: Admin controls, the installer, theme view models, and blog-theme templates reformatted to consistent brace/whitespace style (no behavioural change)
+- **Documentation**: Developer guide and database schema guide version stamps updated to 1.6.1
+
+### Fixed
+- **PHP 8.2+ dynamic-property deprecation** in remember-me token encryption: `laminas-crypt` 3.8 (pinned for PHP 7.4 support) assigns `$supportedAlgos` dynamically; `ScriptlogOpenssl` declares the property explicitly (mirrors the upstream 3.9.0 fix), keeps encryption byte-for-byte identical, and leaves existing `tbl_user_token` rows and remember-me cookies valid
+- **Admin privacy export**: output buffers are flushed before streaming the GDPR user-data JSON so the `Content-Disposition` header is emitted reliably
+
+### Removed
+- None
+
+### Deprecated
+- None
+
+### Notes
+Maintenance release following v1.6.0: PHP 8.2+ compatibility hardening for the authentication cookie path, GDPR/DSAR test coverage, documentation, and code-style housekeeping.
+
+### Codename
+**Maleo Senkawor** (retained) – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.6.0
+- **Changes since v1.6.0**: 60 commits plus housekeeping and follow-up fixes
+
+---
 
 ## [1.6.0] - 2026-08-11
 
