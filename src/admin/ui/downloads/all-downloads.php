@@ -1,6 +1,6 @@
 <?php if (!defined('SCRIPTLOG')) {
     exit();
-} 
+}
 
 ?>
  
@@ -86,7 +86,7 @@
                     <?php
                       $allDownloads = $allDownloads ?? [];
                     $downloadService = $downloadService ?? null;
-                    
+
                     if (is_array($allDownloads) && !empty($allDownloads)) :
                         $no = 0;
                         foreach ($allDownloads as $download) :
