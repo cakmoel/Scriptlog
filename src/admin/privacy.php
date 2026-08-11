@@ -62,6 +62,10 @@ try {
                     try {
                         $exportData = $dataRequestService->exportUserData($email, $options);
 
+                        while (ob_get_level()) {
+                            ob_end_clean();
+                        }
+
                         header('Content-Type: application/json');
                         header('Content-Disposition: attachment; filename="user_data_' . time() . '.json"');
                         echo json_encode($exportData, JSON_PRETTY_PRINT);
