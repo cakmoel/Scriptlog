@@ -6,7 +6,7 @@
     // Retrieve footer navigation from tbl_menu using existing utility function
     $footerMenus = theme_navigation('public');
     $footerMenuItems = [];
-    
+
     if (isset($footerMenus['items']) && !empty($footerMenus['items'])) {
         $footerMenuItems = array_values($footerMenus['items']);
     }
@@ -17,17 +17,19 @@
       <div class="col-12">
         <ul class="footer-nav list-inline text-center mb-4">
           <?php foreach ($footerMenuItems as $item) : ?>
-            <?php 
+                <?php
             // Skip parent items with children in footer (keep flat)
-            $isParent = false;
-            foreach ($footerMenuItems as $checkItem) {
-                if (isset($checkItem['parent_id']) && $checkItem['parent_id'] == $item['ID']) {
-                    $isParent = true;
-                    break;
+                $isParent = false;
+                foreach ($footerMenuItems as $checkItem) {
+                    if (isset($checkItem['parent_id']) && $checkItem['parent_id'] == $item['ID']) {
+                        $isParent = true;
+                        break;
+                    }
                 }
-            }
-            if ($isParent) continue;
-            ?>
+                if ($isParent) {
+                    continue;
+                }
+                ?>
             <li class="list-inline-item">
               <a href="<?= theme_escape_html($item['menu_link'] ?? '#'); ?>" class="footer-nav-link">
                 <?= theme_escape_html($item['menu_label'] ?? ''); ?>
