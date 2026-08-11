@@ -50,14 +50,14 @@ class UserDao extends Dao
 
         $users = (is_null($fetchMode)) ? $this->findAll([]) : $this->findAll([], $fetchMode);
 
-        return (empty($users)) ?: $users;
+        return (empty($users)) ? false : $users;
     }
 
     /**
      * getUserById
      * fetch single value of record by ID
      *
-     * @param integer $userID
+     * @param int|string $userID
      * @param object $sanitize
      * @param static $fetchMode = null
      * @return boolean|array|object
@@ -76,7 +76,7 @@ class UserDao extends Dao
 
         $userById = (is_null($fetchMode)) ? $this->findRow([(int)$cleanID]) : $this->findRow([(int)$cleanID], $fetchMode);
 
-        return (empty($userById)) ?: $userById;
+        return (empty($userById)) ? false : $userById;
     }
 
     /**
@@ -100,7 +100,7 @@ class UserDao extends Dao
 
         $userByEmail = (is_null($fetchMode)) ? $this->findRow([$user_email]) : $this->findRow([$user_email], $fetchMode);
 
-        return (empty($userByEmail)) ?: $userByEmail;
+        return (empty($userByEmail)) ? false : $userByEmail;
     }
 
     /**
@@ -125,7 +125,7 @@ class UserDao extends Dao
 
         $userByLogin = (is_null($fetchMode)) ? $this->findRow([$user_login]) : $this->findRow([$user_login], $fetchMode);
 
-        return (empty($userByLogin)) ?: $userByLogin;
+        return (empty($userByLogin)) ? false : $userByLogin;
     }
 
     /**
@@ -151,7 +151,7 @@ class UserDao extends Dao
 
         $userBySession = (is_null($fetchMode)) ? $this->findRow([$user_session]) : $this->findRow([$user_session], $fetchMode);
 
-        return (empty($userBySession)) ?: $userBySession;
+        return (empty($userBySession)) ? false : $userBySession;
     }
 
     /**
@@ -170,7 +170,7 @@ class UserDao extends Dao
 
         $resetKeyDetails = (is_null($fetchMode)) ? $this->findRow([$reset_key]) : $this->findRow([$reset_key], $fetchMode);
 
-        return (empty($resetKeyDetails)) ?: $resetKeyDetails;
+        return (empty($resetKeyDetails)) ? false : $resetKeyDetails;
     }
 
     /**
@@ -220,7 +220,7 @@ class UserDao extends Dao
      * Update user
      * Modify user record in user table
      *
-     * @param string $accessLevel
+     * @param string|bool $accessLevel
      * @param array $bind
      * @param integer $ID
      */
@@ -340,10 +340,21 @@ class UserDao extends Dao
      * @param integer $ID
      * @param object $sanitizing
      */
+    /**
+     * deleteUser
+     *
+     * Remove a user record. Returns whether at least one row was deleted so
+     * callers can distinguish a successful erasure from a no-op.
+     *
+     * @param int|string $userID
+     * @param object $sanitize Sanitizer instance
+     * @return bool True when a row was deleted, false otherwise
+     */
     public function deleteUser($userID, $sanitize)
     {
         $cleanID = $this->filteringId($sanitize, $userID, 'sql');
-        $this->deleteRecord("tbl_users", ["ID" => $cleanID]);
+
+        return $this->deleteRecord("tbl_users", ["ID" => $cleanID]) > 0;
     }
 
     /**
