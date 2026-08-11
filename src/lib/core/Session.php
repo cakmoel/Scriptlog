@@ -51,7 +51,8 @@ class Session
                 if (!headers_sent()) {
                     $this->session_state = session_start();
                 } else {
-                    error_log("Session cannot be started - headers already sent in " . $_SERVER['REQUEST_URI']);
+                    $request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : 'CLI';
+                    error_log("Session cannot be started - headers already sent in " . $request_uri);
                     $this->session_state = false;
                 }
             }
