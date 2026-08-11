@@ -215,10 +215,11 @@ class Dao
      * @param string $table
      * @param array $where
      * @param int|null $limit Maximum rows to delete, or null to delete all
+     * @return int Number of rows deleted
      */
     protected function deleteRecord($table, $where, ?int $limit = 1)
     {
-        $this->dbc->dbDelete($table, $where, $limit);
+        return $this->dbc->dbDelete($table, $where, $limit);
     }
 
     /**
@@ -262,6 +263,34 @@ class Dao
     protected function callRollBack()
     {
         $this->dbc->dbRollBack();
+    }
+
+    /**
+     * Run a callable inside a single database transaction.
+     *
+     * All DAO instances share the same Db connection from the Registry, so a
+     * transaction begun here atomically covers operations performed across
+     * multiple DAOs (e.g. comment anonymization + post reassignment + user
+     * deletion during GDPR erasure). Rolls back and rethrows on any Throwable.
+     *
+     * @param callable $work The work to run inside the transaction
+     * @return mixed The callable's return value
+     * @throws \Throwable
+     */
+    public function runInTransaction(callable $work)
+    {
+        $this->callTransaction();
+
+        try {
+            $result = $work();
+            $this->callCommit();
+
+            return $result;
+        } catch (\Throwable $e) {
+            $this->callRollBack();
+
+            throw $e;
+        }
     }
 
     /**
