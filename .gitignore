@@ -42,6 +42,7 @@ node_modules/
 src/public/cache/rate_limit/
 src/public/log/unlock_attempts/
 src/public/files/cache/
+src/lib/core/HTMLPurifier/DefinitionCache/
 
 # Storage - sensitive key files
 storage/keys/
