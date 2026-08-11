@@ -89,7 +89,7 @@ endif;
         'type_post' => t('search.type.post'),
         'type_page' => t('search.type.page'),
     ];
-?>
+    ?>
 <script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
     var scriptlog_vars = {
         api_url: '<?= app_url(); ?>/api/v1',
@@ -161,10 +161,10 @@ endif;
                             $current = get_locale();
                             $default = get_default_locale();
                             $permalinksEnabled = function_exists('is_permalink_enabled') && is_permalink_enabled() === 'yes';
-                            
+
                             foreach ($locales as $locale) :
                                 $is_active = ($locale === $current) ? 'active' : '';
-                                
+
                                 // Determine the correct URL based on permalink and locale prefix settings
                                 if (!$permalinksEnabled) {
                                     // When permalinks disabled: use query string format
@@ -173,7 +173,7 @@ endif;
                                     // When permalinks enabled: use locale_url() which handles prefix logic
                                     $lang_url = locale_url($_SERVER['REQUEST_URI'], $locale);
                                 }
-                                
+
                                 $native_name = get_language_name($locale, true);
                                 $english_name = get_language_name($locale, false);
                                 $lang_code = strtoupper($locale);
