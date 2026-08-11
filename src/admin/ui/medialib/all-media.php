@@ -24,36 +24,36 @@
       <div class="row">
           <div class="col-xs-12">
           <?php
-             if (isset($errors)) :
-                 ?>
+            if (isset($errors)) :
+                ?>
           <div class="alert alert-danger alert-dismissible">
                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                  <h4><i class="icon fa fa-ban"></i> Error!</h4>
-                 <?php
+                <?php
                 foreach ($errors as $e) :
                     echo safe_html($e);
                 endforeach;
-                 ?>
+                ?>
            </div>
-                 <?php
-             endif;
-             ?>
+                <?php
+            endif;
+            ?>
           
           <?php
-             if (isset($status)) :
-                 ?>
+            if (isset($status)) :
+                ?>
           <div class="alert alert-success alert-dismissible">
                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                  <h4><i class="icon fa fa-check"></i> Success!</h4>
-                        <?php
+                       <?php
                         foreach ($status as $s) :
                             echo safe_html($s);
                         endforeach;
-                         ?>
+                        ?>
            </div>
                  <?php
-             endif;
-             ?>
+            endif;
+            ?>
           
              <div class="box box-primary">
                 <div class="box-header with-border">
@@ -80,11 +80,11 @@
                  </thead>
                  <tbody>
                   <?php
-                     if (is_array($mediaLib)) :
-                         $no = 0;
-                         foreach ($mediaLib as $media) :
-                             $no++;
-                             ?>
+                    if (is_array($mediaLib)) :
+                        $no = 0;
+                        foreach ($mediaLib as $media) :
+                            $no++;
+                            ?>
                
                      <tr>
                         <td><?= $no; ?></td>
@@ -95,14 +95,14 @@
                         <td><?= safe_html($media['media_target']); ?></td>
                         
                         <td>
-                        <?php if ($media['media_target'] === 'download') : ?>
+                            <?php if ($media['media_target'] === 'download') : ?>
                         <a href="index.php?load=downloads&action=createLink&mediaId=<?= (int)$media['ID']; ?>" 
                            class="btn btn-success btn-xs" title="Create Download Link">
                             <i class="fa fa-link"></i> Create Link
                         </a>
-                        <?php else : ?>
+                            <?php else : ?>
                         <span class="text-muted">N/A</span>
-                        <?php endif; ?>
+                            <?php endif; ?>
                         </td>
 
                         <td>
@@ -118,9 +118,9 @@
                      </tr>
                  
                              <?php
-                         endforeach;
-                     endif;
-                     ?>
+                        endforeach;
+                    endif;
+                    ?>
                  
                  </tbody>
                  <tfoot>
