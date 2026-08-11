@@ -47,11 +47,11 @@ $searchAction = function_exists('theme_search_url') ? theme_search_url() : (rewr
           <h2 id="search-heading"><?= t('search.title'); ?></h2>
           <?php if (!empty($searchKeyword)) : ?>
             <p class="text-muted" aria-live="polite">
-              <?php if ($totalRows > 0) : ?>
-                <?= t('search.found_results', ['count' => $totalRows, 'keyword' => $searchKeyword]); ?>
-              <?php else : ?>
-                <?= t('search.no_results', ['keyword' => $searchKeyword]); ?>
-              <?php endif; ?>
+                <?php if ($totalRows > 0) : ?>
+                    <?= t('search.found_results', ['count' => $totalRows, 'keyword' => $searchKeyword]); ?>
+                <?php else : ?>
+                    <?= t('search.no_results', ['keyword' => $searchKeyword]); ?>
+                <?php endif; ?>
             </p>
           <?php endif; ?>
         </header>
@@ -67,29 +67,29 @@ $searchAction = function_exists('theme_search_url') ? theme_search_url() : (rewr
           </div>
 
         <?php elseif (!empty($searchKeyword) && !empty($results)) : ?>
-          <?php if ($totalPages > 1) : ?>
+            <?php if ($totalPages > 1) : ?>
             <p class="text-muted text-center small" role="status">
-              <?= t('search.page_x_of_y', ['page' => $currentPage, 'total' => $totalPages]); ?>
+                <?= t('search.page_x_of_y', ['page' => $currentPage, 'total' => $totalPages]); ?>
             </p>
-          <?php endif; ?>
+            <?php endif; ?>
 
           <div class="search-results-list" role="list" aria-label="<?= t('search.title'); ?>">
             <?php foreach ($results as $item) :
-              $itemId = isset($item->ID) ? (int)$item->ID : 0;
-              $itemTitle = isset($item->post_title) ? theme_escape_html($item->post_title) : '';
-              $itemType = isset($item->post_type) ? theme_escape_html($item->post_type) : 'blog';
-              $itemDate = isset($item->post_date) ? theme_escape_html(make_date($item->post_date)) : '';
-              $itemDateTime = isset($item->post_date) ? theme_escape_html($item->post_date) : '';
-              $itemExcerpt = isset($item->post_content) ? paragraph_l2br(safe_html(paragraph_trim($item->post_content))) : '';
+                $itemId = isset($item->ID) ? (int)$item->ID : 0;
+                $itemTitle = isset($item->post_title) ? theme_escape_html($item->post_title) : '';
+                $itemType = isset($item->post_type) ? theme_escape_html($item->post_type) : 'blog';
+                $itemDate = isset($item->post_date) ? theme_escape_html(make_date($item->post_date)) : '';
+                $itemDateTime = isset($item->post_date) ? theme_escape_html($item->post_date) : '';
+                $itemExcerpt = isset($item->post_content) ? paragraph_l2br(safe_html(paragraph_trim($item->post_content))) : '';
 
-              if ($itemType === 'page') {
-                $itemUrl = theme_page_url(['ID' => $itemId, 'post_slug' => isset($item->post_slug) ? $item->post_slug : '']);
-                $typeLabel = t('search.type.page');
-              } else {
-                $itemUrl = theme_post_url(['ID' => $itemId, 'post_slug' => isset($item->post_slug) ? $item->post_slug : '']);
-                $typeLabel = t('search.type.post');
-              }
-            ?>
+                if ($itemType === 'page') {
+                    $itemUrl = theme_page_url(['ID' => $itemId, 'post_slug' => isset($item->post_slug) ? $item->post_slug : '']);
+                    $typeLabel = t('search.type.page');
+                } else {
+                    $itemUrl = theme_post_url(['ID' => $itemId, 'post_slug' => isset($item->post_slug) ? $item->post_slug : '']);
+                    $typeLabel = t('search.type.post');
+                }
+                ?>
             <article class="search-result-item d-flex mb-4 pb-4 border-bottom" role="listitem">
               <div class="post-details w-100">
                 <h3 class="h5 mt-0">
@@ -108,12 +108,12 @@ $searchAction = function_exists('theme_search_url') ? theme_search_url() : (rewr
             <?php endforeach; ?>
           </div>
 
-          <?php if (!empty($paginationHtml)) : ?>
-            <?= $paginationHtml; ?>
+            <?php if (!empty($paginationHtml)) : ?>
+                <?= $paginationHtml; ?>
             <p class="text-muted text-center small mt-2" role="status">
-              <?= t('search.page_x_of_y', ['page' => $currentPage, 'total' => $totalPages]); ?>
+                <?= t('search.page_x_of_y', ['page' => $currentPage, 'total' => $totalPages]); ?>
             </p>
-          <?php endif; ?>
+            <?php endif; ?>
 
         <?php elseif (!empty($searchKeyword)) : ?>
           <div class="text-center py-5 empty-state" role="status">
