@@ -127,7 +127,7 @@ class GdprApiController extends ApiController
             $hasConsented = false;
 
             if ($this->consentService) {
-                $hasConsented = $this->consentService->hasConsented($consentType);
+                $hasConsented = $this->consentService->hasConsented($consentType, $this->getClientIp());
             }
 
             $links = $this->hateoas->rootLinks();
@@ -144,24 +144,15 @@ class GdprApiController extends ApiController
     /**
      * Get client IP address
      *
+     * Delegates to the shared get_ip_address() helper so proxy headers are
+     * only trusted when the request actually came through Cloudflare.
+     *
      * @return string
      */
     private function getClientIp()
     {
-        $ipKeys = ['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED',
-                   'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED',
-                   'REMOTE_ADDR'];
-
-        foreach ($ipKeys as $key) {
-            if (isset($_SERVER[$key])) {
-                $ip = $_SERVER[$key];
-                if (strpos($ip, ',') !== false) {
-                    $ip = trim(explode(',', $ip)[0]);
-                }
-                if (filter_var($ip, FILTER_VALIDATE_IP)) {
-                    return $ip;
-                }
-            }
+        if (function_exists('get_ip_address')) {
+            return get_ip_address();
         }
 
         return '0.0.0.0';
