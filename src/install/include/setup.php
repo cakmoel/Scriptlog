@@ -645,6 +645,7 @@ function install_i18n_data($link, $prefix = '', $default_lang = 'en')
         'nav.privacy_settings' => ['Privacy Settings', 'إعدادات الخصوصية', '隐私设置', 'Paramètres de confidentialité', 'Настройки конфиденциальности', 'Configuración de privacidad', 'Pengaturan Privasi'],
         'nav.data_requests' => ['Data Requests', 'طلبات البيانات', '数据请求', 'Demandes de données', 'Запросы данных', 'Solicitudes de datos', 'Permintaan Data'],
         'nav.audit_logs' => ['Audit Logs', 'سجلات التدقيق', '审计日志', 'Journaux d\'audit', 'Журналы аудита', 'Registros de auditoría', 'Log Audit'],
+        'nav.data_retention' => ['Data Retention', 'الاحتفاظ بالبيانات', '数据保留', 'Conservation des données', 'Хранение данных', 'Retención de datos', 'Penyimpanan Data'],
         'nav.privacy_policy' => ['Privacy Policy', 'سياسة الخصوصية', '隐私政策', 'Politique de confidentialité', 'Политика конфиденциальности', 'Política de Privacidad', 'Kebijakan Privasi'],
         'nav.languages' => ['Languages', 'اللغات', '语言', 'Langues', 'Языки', 'Idiomas', 'Bahasa'],
         'nav.all_languages' => ['All Languages', 'جميع اللغات', '所有语言', 'Toutes les langues', 'Все языки', 'Todos los idiomas', 'Semua Bahasa'],
@@ -892,6 +893,8 @@ function install_privacy_policy_data($link, $prefix = '')
 </ul>
 <h2>Data Security</h2>
 <p>We take the security of your data seriously and implement a variety of measures to protect it. These include password hashing, data encryption, XSS and CSRF protection, and prepared statements for all database queries.</p>
+<h2>Data Retention</h2>
+<p>Consent records and privacy audit logs are retained only as long as necessary to comply with legal obligations. These records are automatically deleted after the retention window configured by the site administrator (365 days by default).</p>
 <h2>Your Rights</h2>
 <p>You have the right to access, update, or delete the information we have on you.</p>
 <h2>Contact Us</h2>
@@ -915,6 +918,8 @@ function install_privacy_policy_data($link, $prefix = '')
 </ul>
 <h2>أمان البيانات</h2>
 <p>نأخذ أمان بياناتك بجدية وننفذ تدابير متنوعة للحماية.</p>
+<h2>الاحتفاظ بالبيانات</h2>
+<p>يتم الاحتفاظ بسجلات الموافقة وسجلات تدقيق الخصوصية فقط طالما كان ذلك ضرورياً للامتثال للالتزامات القانونية. تُحذف هذه السجلات تلقائياً بعد فترة الاحتفاظ التي يحددها مسؤول الموقع (365 يوماً افتراضياً).</p>
 <h2>حقوقك</h2>
 <p>لديك الحق في الوصول إلى معلوماتك وتحديثها أو حذفها.</p>
 <h2>اتصل بنا</h2>
@@ -938,6 +943,8 @@ function install_privacy_policy_data($link, $prefix = '')
 </ul>
 <h2>数据安全</h2>
 <p>我们非常重视数据安全，并实施各种保护措施。</p>
+<h2>数据保留</h2>
+<p>同意记录和隐私审计日志仅保留到满足法律义务所需的时间。这些记录会在站点管理员配置的保留期后自动删除（默认为 365 天）。</p>
 <h2>您的权利</h2>
 <p>您有权访问、更新或删除您的信息。</p>
 <h2>联系我们</h2>
@@ -961,6 +968,8 @@ function install_privacy_policy_data($link, $prefix = '')
 </ul>
 <h2>Sécurité des données</h2>
 <p>Nous prenons la sécurité des données au sérieux et mettons en œuvre diverses mesures de protection.</p>
+<h2>Conservation des données</h2>
+<p>Les enregistrements de consentement et les journaux d\'audit de confidentialité ne sont conservés que le temps nécessaire pour se conformer aux obligations légales. Ces enregistrements sont automatiquement supprimés après la période de conservation configurée par l\'administrateur du site (365 jours par défaut).</p>
 <h2>Vos droits</h2>
 <p>Vous avez le droit d\'accéder, de mettre à jour ou de supprimer vos informations.</p>
 <h2>Contactez-nous</h2>
@@ -984,6 +993,8 @@ function install_privacy_policy_data($link, $prefix = '')
 </ul>
 <h2>Безопасность данных</h2>
 <p>Мы серьезно относимся к безопасности данных и внедряем различные меры защиты.</p>
+<h2>Хранение данных</h2>
+<p>Записи о согласии и журналы аудита конфиденциальности хранятся только до тех пор, пока это необходимо для соблюдения правовых обязательств. Эти записи автоматически удаляются по истечении периода хранения, настроенного администратором сайта (по умолчанию 365 дней).</p>
 <h2>Ваши права</h2>
 <p>Вы имеете право на доступ, обновление или удаление вашей информации.</p>
 <h2>Свяжитесь с нами</h2>
@@ -1007,6 +1018,8 @@ function install_privacy_policy_data($link, $prefix = '')
 </ul>
 <h2>Seguridad de los datos</h2>
 <p>Nos tomamos en serio la seguridad de los datos e implementamos diversas medidas de protección.</p>
+<h2>Retención de datos</h2>
+<p>Los registros de consentimiento y los registros de auditoría de privacidad se conservan solo mientras sea necesario para cumplir con las obligaciones legales. Estos registros se eliminan automáticamente después del período de retención configurado por el administrador del sitio (365 días por defecto).</p>
 <h2>Tus derechos</h2>
 <p>Tienes derecho a acceder, actualizar o eliminar tu información.</p>
 <h2>Contáctenos</h2>
@@ -1030,6 +1043,8 @@ function install_privacy_policy_data($link, $prefix = '')
 </ul>
 <h2>Keamanan Data</h2>
 <p>Kami mengambil keamanan data secara serius dan menerapkan berbagai tindakan perlindungan.</p>
+<h2>Penyimpanan Data</h2>
+<p>Catatan persetujuan dan log audit privasi hanya disimpan selama diperlukan untuk memenuhi kewajiban hukum. Catatan ini otomatis dihapus setelah periode penyimpanan yang dikonfigurasi administrator situs (365 hari secara default).</p>
 <h2>Hak Anda</h2>
 <p>Anda berhak untuk mengakses, memperbarui, atau menghapus informasi Anda.</p>
 <h2>Hubungi Kami</h2>
