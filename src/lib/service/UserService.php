@@ -15,6 +15,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  */
 
+use Scriptlog\Core\AppException;
 use Scriptlog\Core\FormValidator;
 use Scriptlog\Core\Registry;
 use Scriptlog\Core\Sanitize;
@@ -116,7 +117,7 @@ class UserService
     /**
      * userDao
      *
-     * @var object
+     * @var UserDao
      *
      */
     private $userDao;
@@ -144,6 +145,20 @@ class UserService
      *
      */
     private $sanitize;
+
+    /**
+     * commentDao
+     *
+     * @var CommentDao|null
+     */
+    private $commentDao;
+
+    /**
+     * postDao
+     *
+     * @var PostDao|null
+     */
+    private $postDao;
 
     /**
      * key
@@ -177,7 +192,7 @@ class UserService
      * @method __constructor()
      *
      */
-    public function __construct(UserDao $userDao, FormValidator $validator, UserTokenDao $userToken, Sanitize $sanitize)
+    public function __construct(UserDao $userDao, FormValidator $validator, UserTokenDao $userToken, Sanitize $sanitize, ?CommentDao $commentDao = null, ?PostDao $postDao = null)
     {
         $this->userDao = $userDao;
 
@@ -186,6 +201,10 @@ class UserService
         $this->validator = $validator;
 
         $this->sanitize = $sanitize;
+
+        $this->commentDao = $commentDao;
+
+        $this->postDao = $postDao;
 
         if (Registry::isKeySet('key')) {
             $this->key = Registry::get('key');
@@ -334,7 +353,7 @@ class UserService
      * @method public grabUsers()
      * @param string $orderBy
      * @param static PDO::FETCH_MODE $fetchMode
-     * @return array
+     * @return array|bool|object
      *
      */
     public function grabUsers($orderBy = 'ID', $fetchMode = null)
@@ -348,7 +367,7 @@ class UserService
      *
      * @param string $userId
      * @param static PDO::FETCH_MODE $fetchMode
-     * @return array
+     * @return array|bool|object
      */
     public function grabUser($userId, $fetchMode = null)
     {
@@ -483,48 +502,95 @@ class UserService
     /**
      * removeUserWithAnonymization
      *
-     * Remove user and anonymize their data (GDPR compliance)
-     * This preserves data integrity while respecting Right to be Forgotten
+     * Remove user and anonymize their data (GDPR compliance).
+     *
+     * The comment anonymization, post-author reassignment and account deletion
+     * run inside a single database transaction so a partial failure cannot
+     * leave inconsistent state (N11). The fallback author for post
+     * reassignment is validated to exist and to not be the erased user (N12).
      *
      * @param int $userId
      * @param string $userEmail
      * @return bool
+     * @throws \Scriptlog\Core\AppException When no valid fallback author exists
      */
     public function removeUserWithAnonymization($userId, $userEmail = null)
     {
         $this->validator->sanitize($userId, 'int');
 
-        if ($userEmail) {
-            $commentDao = new CommentDao();
-            $commentDao->anonymizeCommentsByEmail($userEmail);
+        return $this->userDao->runInTransaction(function () use ($userId, $userEmail) {
+            if ($userEmail) {
+                $this->getCommentDao()->anonymizeCommentsByEmail($userEmail);
 
-            $postDao = new PostDao();
-            $postDao->anonymizePostAuthor($userId);
+                $fallbackAuthorId = $this->resolveFallbackAuthorId($userId);
 
-            $this->anonymizeUserData($userId);
-        }
+                $this->getPostDao()->anonymizePostAuthor($userId, $fallbackAuthorId);
+            }
 
-        return $this->userDao->deleteUser($userId, $this->sanitize);
+            return $this->userDao->deleteUser($userId, $this->sanitize);
+        });
     }
 
     /**
-     * Anonymize user record
+     * Resolve a valid fallback author for post reassignment during erasure.
      *
-     * @param int $userId
-     * @return bool
+     * Prefers user ID 1 (the traditional fallback) when that account exists
+     * and is not the user being erased; otherwise falls back to the first
+     * other available user. Throws when no suitable account remains.
+     *
+     * @param int $excludedUserId The user being erased
+     * @return int
+     * @throws \Scriptlog\Core\AppException When no fallback author is available
      */
-    private function anonymizeUserData($userId)
+    private function resolveFallbackAuthorId($excludedUserId)
     {
-        $sql = "UPDATE tbl_users SET 
-             user_email = CONCAT('deleted_', ID, '@user.local'),
-             user_fullname = 'Deleted User',
-             user_url = '#'
-             WHERE ID = ?";
+        $fallback = $this->userDao->getUserById(1, $this->sanitize);
 
-        $this->userDao->setSQL($sql);
-        $this->userDao->getDbc()->dbQuery($sql, [(int)$userId]);
+        if ($fallback && (int)$fallback['ID'] !== (int)$excludedUserId) {
+            return 1;
+        }
 
-        return true;
+        $users = $this->userDao->getUsers();
+
+        if (is_array($users)) {
+            foreach ($users as $user) {
+                if ((int)$user['ID'] !== (int)$excludedUserId) {
+                    return (int)$user['ID'];
+                }
+            }
+        }
+
+        throw new AppException("No fallback author available to reassign posts");
+    }
+
+    /**
+     * Lazy-access the injected CommentDao, falling back to a fresh instance
+     * when none was provided (backward compatibility with existing callers).
+     *
+     * @return CommentDao
+     */
+    private function getCommentDao()
+    {
+        if ($this->commentDao === null) {
+            $this->commentDao = new CommentDao();
+        }
+
+        return $this->commentDao;
+    }
+
+    /**
+     * Lazy-access the injected PostDao, falling back to a fresh instance
+     * when none was provided (backward compatibility with existing callers).
+     *
+     * @return PostDao
+     */
+    private function getPostDao()
+    {
+        if ($this->postDao === null) {
+            $this->postDao = new PostDao();
+        }
+
+        return $this->postDao;
     }
 
     /**
