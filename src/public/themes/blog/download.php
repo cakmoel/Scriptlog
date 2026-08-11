@@ -19,12 +19,19 @@ $downloadPageData = function_exists('get_download_page_data') ? get_download_pag
 // Extract file type icon
 $fileType = $downloadPageData['media']['media_type'] ?? '';
 $fileIcon = 'fa-file-o';
-if (strpos($fileType, 'image/') === 0) $fileIcon = 'fa-file-image-o';
-elseif (strpos($fileType, 'video/') === 0) $fileIcon = 'fa-file-video-o';
-elseif (strpos($fileType, 'audio/') === 0) $fileIcon = 'fa-file-audio-o';
-elseif (strpos($fileType, 'pdf') !== false) $fileIcon = 'fa-file-pdf-o';
-elseif (strpos($fileType, 'zip') !== false || strpos($fileType, 'compressed') !== false) $fileIcon = 'fa-file-archive-o';
-elseif (strpos($fileType, 'text/') === 0) $fileIcon = 'fa-file-text-o';
+if (strpos($fileType, 'image/') === 0) {
+    $fileIcon = 'fa-file-image-o';
+} elseif (strpos($fileType, 'video/') === 0) {
+    $fileIcon = 'fa-file-video-o';
+} elseif (strpos($fileType, 'audio/') === 0) {
+    $fileIcon = 'fa-file-audio-o';
+} elseif (strpos($fileType, 'pdf') !== false) {
+    $fileIcon = 'fa-file-pdf-o';
+} elseif (strpos($fileType, 'zip') !== false || strpos($fileType, 'compressed') !== false) {
+    $fileIcon = 'fa-file-archive-o';
+} elseif (strpos($fileType, 'text/') === 0) {
+    $fileIcon = 'fa-file-text-o';
+}
 
 $filename = $downloadPageData['media']['media_filename'] ?? '';
 $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
@@ -126,7 +133,7 @@ $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
                 <div id="copy-status" class="copy-status" aria-live="polite" role="status"></div>
             </div>
 
-            <?php if (!empty($downloadPageData['support_url'])) : ?>
+                <?php if (!empty($downloadPageData['support_url'])) : ?>
             <div class="download-support">
                 <p class="download-support-text">Support this project</p>
                 <a href="<?= theme_escape_html($downloadPageData['support_url']); ?>"
@@ -138,7 +145,7 @@ $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
                     <span><?= theme_escape_html($downloadPageData['support_label']); ?></span>
                 </a>
             </div>
-            <?php endif; ?>
+                <?php endif; ?>
 
             <div class="download-footer">
                 <div class="download-expiry-pill">
