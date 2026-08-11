@@ -235,10 +235,10 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
             <?php endif; ?>
 
             <?php if (access_control_list(ActionConst::CONFIGURATION)) : ?>
-            <li <?= ($module === 'option-general' || $module === 'option-permalink' 
-                || $module === 'option-reading' 
-                || $module === 'option-timezone' 
-                || $module === 'option-memberships' 
+            <li <?= ($module === 'option-general' || $module === 'option-permalink'
+                || $module === 'option-reading'
+                || $module === 'option-timezone'
+                || $module === 'option-memberships'
                 || $module === 'option-api'
                 || $module === 'option-mail'
                 || $module === 'option-downloads') ? 'class="treeview active"' : 'class="treeview"'; ?>>
@@ -478,5 +478,5 @@ body:not(.sidebar-collapse) .sidebar-lang-indicator {
     }
 }
 </style>
-<?php
+    <?php
 }
