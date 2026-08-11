@@ -1,4 +1,5 @@
 <?php
+
 namespace Scriptlog\Core\Theme;
 
 defined('SCRIPTLOG') || die('Direct access not permitted');
@@ -77,25 +78,58 @@ final class PageViewModel extends AbstractThemeViewModel
     }
 
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function id(): ?string { return $this->values['id'] ?? null; }
+    public function id(): ?string
+    {
+        return $this->values['id'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function title(): ?string { return $this->values['title'] ?? null; }
+    public function title(): ?string
+    {
+        return $this->values['title'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function url(): string { return $this->values['url'] ?? ''; }
+    public function url(): string
+    {
+        return $this->values['url'] ?? '';
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function slug(): ?string { return $this->values['slug'] ?? null; }
+    public function slug(): ?string
+    {
+        return $this->values['slug'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function author(): ?string { return $this->values['author'] ?? null; }
+    public function author(): ?string
+    {
+        return $this->values['author'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function date(): ?string { return $this->values['date'] ?? null; }
+    public function date(): ?string
+    {
+        return $this->values['date'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function excerpt(): ?string { return $this->values['excerpt'] ?? null; }
+    public function excerpt(): ?string
+    {
+        return $this->values['excerpt'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function content(): ?string { return $this->values['content'] ?? null; }
+    public function content(): ?string
+    {
+        return $this->values['content'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function media(): ?string { return $this->values['media'] ?? null; }
+    public function media(): ?string
+    {
+        return $this->values['media'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function mediaCaption(): ?string { return $this->values['media_caption'] ?? null; }
+    public function mediaCaption(): ?string
+    {
+        return $this->values['media_caption'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function tags(): ?string { return $this->values['tags'] ?? null; }
+    public function tags(): ?string
+    {
+        return $this->values['tags'] ?? null;
+    }
 }
