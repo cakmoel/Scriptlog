@@ -469,9 +469,20 @@ WHERE ID = ? AND post_type = 'blog'";
      * @return bool
      * @throws \InvalidArgumentException
      */
-    public function anonymizePostAuthor(int $authorId): bool
+    /**
+     * Reassign every post authored by $authorId to a fallback author.
+     *
+     * The fallback must be validated by the caller (it should exist and must
+     * not be the author being erased); it defaults to user ID 1 for backward
+     * compatibility with existing callers.
+     *
+     * @param int $authorId The author whose posts are being reassigned
+     * @param int $fallbackAuthorId The author the posts are reassigned to
+     * @return bool
+     */
+    public function anonymizePostAuthor(int $authorId, int $fallbackAuthorId = 1): bool
     {
-        $this->modify("tbl_posts", ['post_author' => 1], ['post_author' => $authorId]);
+        $this->modify("tbl_posts", ['post_author' => $fallbackAuthorId], ['post_author' => $authorId]);
 
         return true;
     }

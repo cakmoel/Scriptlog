@@ -13,10 +13,34 @@ $hasError = isset($searchResults['error']);
 $currentPage = isset($searchPagination['page']) ? (int)$searchPagination['page'] : 1;
 $totalPages = isset($searchPagination['totalPages']) ? (int)$searchPagination['totalPages'] : 0;
 $paginationHtml = isset($searchPagination['html']) ? $searchPagination['html'] : '';
+$searchAction = function_exists('theme_search_url') ? theme_search_url() : (rewrite_status() === 'yes' ? (string)app_url() . '/search' : (string)app_url() . '/');
 ?>
 <main role="main" id="search-results-page" class="container">
   <div class="row">
     <div class="posts-listing col-lg-8">
+
+      <!-- Full-page search form (works without JS; no CSRF on idempotent GET) -->
+      <section class="page-search" aria-labelledby="page-search-heading">
+        <div class="page-search-inner">
+          <h2 id="page-search-heading" class="sr-only"><?= t('search.title'); ?></h2>
+          <form action="<?= theme_escape_html($searchAction); ?>" method="get" role="search" class="page-search-form" aria-label="<?= t('search.title'); ?>">
+            <label for="page-search-keyword" class="sr-only"><?= t('search.form.label'); ?></label>
+            <div class="page-search-group">
+              <i class="fa fa-search page-search-icon" aria-hidden="true"></i>
+              <input type="search" id="page-search-keyword" name="q" class="page-search-input"
+                     value="<?= $searchKeyword; ?>"
+                     placeholder="<?= t('search.form.placeholder'); ?>"
+                     autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="100"
+                     aria-describedby="page-search-hint">
+              <button type="submit" class="page-search-submit" aria-label="<?= t('search.form.submit'); ?>">
+                <i class="fa fa-search d-sm-none" aria-hidden="true"></i>
+                <span class="d-none d-sm-inline"><?= t('search.form.submit'); ?></span>
+              </button>
+            </div>
+            <p id="page-search-hint" class="sr-only"><?= t('search.form.hint'); ?></p>
+          </form>
+        </div>
+      </section>
 
       <section aria-labelledby="search-heading">
         <header class="archive-header mb-5">

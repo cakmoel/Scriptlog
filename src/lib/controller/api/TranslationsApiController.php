@@ -137,7 +137,7 @@ class TranslationsApiController extends ApiController
                 'is_html' => !empty($this->requestData['is_html']) ? 1 : 0,
             ]);
 
-            ApiResponse::success(['id' => $id], 'Translation updated successfully', $this->hateoas->rootLinks());
+            ApiResponse::success(['id' => $id], 200, 'Translation updated successfully', $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'UPDATE_ERROR');
         }
@@ -161,7 +161,7 @@ class TranslationsApiController extends ApiController
 
         try {
             $this->translationService->deleteTranslation($id);
-            ApiResponse::success(null, 'Translation deleted successfully', $this->hateoas->rootLinks());
+            ApiResponse::success(null, 200, 'Translation deleted successfully', $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'DELETE_ERROR');
         }
@@ -223,7 +223,7 @@ class TranslationsApiController extends ApiController
 
         try {
             $this->translationService->regenerateCache($langCode);
-            ApiResponse::success(null, 'Cache regenerated successfully', $this->hateoas->rootLinks());
+            ApiResponse::success(null, 200, 'Cache regenerated successfully', $this->hateoas->rootLinks());
         } catch (\Throwable $e) {
             ApiResponse::error($e->getMessage(), 500, 'CACHE_ERROR');
         }

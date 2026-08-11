@@ -51,8 +51,8 @@ if (function_exists('theme_dir')) :
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/@fancyapps/fancybox/jquery.fancybox.min.css" integrity="sha384-/dUIqcuZmn0/Nt1CGyvylCjqPYa/w0/SdIVpbqBxsxYmfwd7PXM9Gt7PsRKRj9Xy" crossorigin="anonymous"></noscript>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/style.sea.min.css" id="theme-stylesheet" integrity="sha384-JbRgk69UODRbZObMRNsjMeO1wAK6VXCrdy16v0NB36QOH4GtS2oBEg0eoZFTNy37" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/style.sea.min.css" integrity="sha384-JbRgk69UODRbZObMRNsjMeO1wAK6VXCrdy16v0NB36QOH4GtS2oBEg0eoZFTNy37" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css" integrity="sha384-7D9pMA341OgtcGgB1wxRB84bW4oAcWU8Ng3qnM2mclo/QuT2Vq16jqCcZNb0okIS" crossorigin="anonymous" media="print">
-<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css" integrity="sha384-7D9pMA341OgtcGgB1wxRB84bW4oAcWU8Ng3qnM2mclo/QuT2Vq16jqCcZNb0okIS" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css" integrity="sha384-ANuvF57c6Fjjapt/uwFbPEiQaByvcdPL5dj1Lfg0oCnAVk+b/RgzPGU4TiTBdU92" crossorigin="anonymous" media="print">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/custom.min.css" integrity="sha384-ANuvF57c6Fjjapt/uwFbPEiQaByvcdPL5dj1Lfg0oCnAVk+b/RgzPGU4TiTBdU92" crossorigin="anonymous"></noscript>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.min.css" integrity="sha384-JPaoEK2fBp+uA/Wgxb/Yuj5YuYkAK49IPnJNh8uBhWTN+zc7pS9PVvfoRs3deKRh" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/not-found.min.css" integrity="sha384-JPaoEK2fBp+uA/Wgxb/Yuj5YuYkAK49IPnJNh8uBhWTN+zc7pS9PVvfoRs3deKRh" crossorigin="anonymous"></noscript>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/privacy.min.css" integrity="sha384-ZacOPBIrxBk6ObKa88A32hDhk9KIweS4fNdYXRhpIHTPGlv1mejG30r3Z1Z4aH2r" crossorigin="anonymous" media="print">
@@ -94,6 +94,7 @@ endif;
     var scriptlog_vars = {
         api_url: '<?= app_url(); ?>/api/v1',
         site_url: '<?= app_url(); ?>',
+        search_url: '<?= function_exists('theme_search_url') ? theme_search_url() : app_url(); ?>',
         theme_dir: '<?= theme_dir(); ?>',
         search: <?= json_encode($theme_search_i18n, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>
     };

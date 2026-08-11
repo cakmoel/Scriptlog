@@ -33,26 +33,43 @@ class CommentDao extends Dao
     /**
      * Find Comments
      *
+     * When an email is provided, only comments authored by that email are
+     * returned (used by GDPR data export so the whole table is never loaded
+     * into memory and filtered in PHP).
+     *
      * @method public findComments()
      * @param integer|string $orderBy -- default order By Id
+     * @param string|null $email -- optional comment author email filter
      * @return array
      *
      */
-    public function findComments($orderBy = 'ID')
+    public function findComments($orderBy = 'ID', $email = null)
     {
+        $allowedColumns = ['ID', 'comment_post_id', 'comment_date'];
+        $sortColumn = in_array($orderBy, $allowedColumns, true) ? $orderBy : 'ID';
+
         $sql = "SELECT c.ID, c.comment_post_id, c.comment_parent_id, c.comment_author_name, 
                   c.comment_author_ip, c.comment_author_email, 
                   c.comment_content, c.comment_status, 
                   c.comment_date, p.post_title 
            FROM tbl_comments AS c 
            INNER JOIN tbl_posts AS p 
-           ON c.comment_post_id = p.ID ORDER BY '$orderBy' DESC ";
+           ON c.comment_post_id = p.ID";
+
+        $data = [];
+
+        if ($email !== null) {
+            $sql .= " WHERE c.comment_author_email = ?";
+            $data[] = $email;
+        }
+
+        $sql .= " ORDER BY c.$sortColumn DESC ";
 
         $this->setSQL($sql);
 
-        $comments = $this->findAll([]);
+        $comments = $this->findAll($data);
 
-        return (empty($comments)) ?: $comments;
+        return (empty($comments)) ? [] : $comments;
     }
 
     /**

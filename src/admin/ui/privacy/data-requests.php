@@ -86,8 +86,8 @@
                    <tr>
                      <td><?= $no; ?></td>
                      <td>
-                            <?php
-                                 $typeLabel = '';
+                             <?php
+                                  $typeLabel = '';
                             $typeClass = 'label-default';
                             if ($request['request_type'] == 'access') {
                                 $typeLabel = 'Data Access';
@@ -97,6 +97,9 @@
                                 $typeClass = 'label-warning';
                             } elseif ($request['request_type'] == 'erasure') {
                                 $typeLabel = 'Erasure';
+                                $typeClass = 'label-danger';
+                            } elseif ($request['request_type'] == 'deletion') {
+                                $typeLabel = 'Deletion';
                                 $typeClass = 'label-danger';
                             }
                             ?>
@@ -127,23 +130,32 @@
                      <td><?= isset($request['request_date']) ? htmlout(date('M j, Y H:i', strtotime($request['request_date']))) : ""; ?></td>
                      <td>
                             <?php if ($request['request_status'] == 'pending') : ?>
-                        <form method="post" action="index.php?load=privacy" style="display:inline;">
+                        <form method="post" action="index.php?load=privacy&p=data-requests" style="display:inline;">
                             <input type="hidden" name="request_id" value="<?= (int)$request['ID']; ?>">
                             <input type="hidden" name="action" value="process">
+                            <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
                             <button type="submit" class="btn btn-xs btn-info">Process</button>
                         </form>
                             <?php endif; ?>
                             <?php if ($request['request_status'] == 'processing') : ?>
-                        <form method="post" action="index.php?load=privacy" style="display:inline;">
+                        <form method="post" action="index.php?load=privacy&p=data-requests" style="display:inline;">
                             <input type="hidden" name="request_id" value="<?= (int)$request['ID']; ?>">
                             <input type="hidden" name="action" value="complete">
+                            <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
+                            <?php if (in_array($request['request_type'], ['deletion', 'erasure'], true)) : ?>
+                            <label class="confirm-erasure" style="display:block;margin-bottom:4px;">
+                                <input type="checkbox" name="confirm_erasure" value="1" required>
+                                Confirm irreversible erasure
+                            </label>
+                            <?php endif; ?>
                             <button type="submit" class="btn btn-xs btn-success">Complete</button>
                         </form>
                             <?php endif; ?>
                             <?php if ($request['request_status'] != 'completed') : ?>
-                        <form method="post" action="index.php?load=privacy" style="display:inline;">
+                        <form method="post" action="index.php?load=privacy&p=data-requests" style="display:inline;">
                             <input type="hidden" name="request_id" value="<?= (int)$request['ID']; ?>">
                             <input type="hidden" name="action" value="reject">
+                            <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
                             <button type="submit" class="btn btn-xs btn-danger">Reject</button>
                         </form>
                             <?php endif; ?>

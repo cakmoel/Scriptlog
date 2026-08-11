@@ -18,12 +18,14 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  */
 
 use Scriptlog\Core\AppException;
+use Scriptlog\Core\FormValidator;
 use Scriptlog\Core\Sanitize;
 use Scriptlog\Dao\CommentDao;
 use Scriptlog\Dao\DataRequestDao;
 use Scriptlog\Dao\PostDao;
 use Scriptlog\Dao\PrivacyLogDao;
 use Scriptlog\Dao\UserDao;
+use Scriptlog\Dao\UserTokenDao;
 
 class DataRequestService
 {
@@ -52,19 +54,51 @@ class DataRequestService
     private $notificationService;
 
     /**
+     * UserService used to anonymize accounts on erasure.
+     * @var UserService|null
+     */
+    private $userService;
+
+    /**
+     * UserDao
+     * @var UserDao|null
+     */
+    private $userDao;
+
+    /**
+     * CommentDao
+     * @var CommentDao|null
+     */
+    private $commentDao;
+
+    /**
+     * PostDao
+     * @var PostDao|null
+     */
+    private $postDao;
+
+    /**
      * Constructor
      *
      * @param DataRequestDao $dataRequestDao
      * @param PrivacyLogDao $privacyLogDao
      * @param Sanitize $sanitizer
      * @param ConfigurationService|null $configService
+     * @param UserService|null $userService
+     * @param UserDao|null $userDao
+     * @param CommentDao|null $commentDao
+     * @param PostDao|null $postDao
      */
-    public function __construct(DataRequestDao $dataRequestDao, PrivacyLogDao $privacyLogDao, Sanitize $sanitizer, ?ConfigurationService $configService = null)
+    public function __construct(DataRequestDao $dataRequestDao, PrivacyLogDao $privacyLogDao, Sanitize $sanitizer, ?ConfigurationService $configService = null, ?UserService $userService = null, ?UserDao $userDao = null, ?CommentDao $commentDao = null, ?PostDao $postDao = null)
     {
         $this->dataRequestDao = $dataRequestDao;
         $this->privacyLogDao = $privacyLogDao;
         $this->sanitizer = $sanitizer;
         $this->notificationService = class_exists('NotificationService') ? new NotificationService($configService) : null;
+        $this->userService = $userService;
+        $this->userDao = $userDao;
+        $this->commentDao = $commentDao;
+        $this->postDao = $postDao;
     }
 
     /**
@@ -199,8 +233,7 @@ class DataRequestService
             'activity' => []
         ];
 
-        $userDao = new UserDao();
-        $user = $userDao->getUserByEmail($email);
+        $user = $this->getUserDao()->getUserByEmail($email);
 
         if ($user) {
             $exportData['profile'] = [
@@ -214,16 +247,11 @@ class DataRequestService
             $exportData['user_id'] = $user['ID'];
 
             if (isset($options['export_comments']) && $options['export_comments']) {
-                $commentDao = new CommentDao();
-                $comments = $commentDao->findComments();
-                $exportData['comments'] = array_filter($comments, function ($c) use ($email) {
-                    return isset($c['comment_author_email']) && $c['comment_author_email'] === $email;
-                });
+                $exportData['comments'] = $this->getCommentDao()->findComments('ID', $email);
             }
 
             if (isset($options['export_posts']) && $options['export_posts']) {
-                $postDao = new PostDao();
-                $posts = $postDao->findPosts('ID', $user['ID'], false);
+                $posts = $this->getPostDao()->findPosts('ID', $user['ID'], false);
                 $exportData['posts'] = $posts ?: [];
             }
 
@@ -249,6 +277,10 @@ class DataRequestService
     /**
      * Delete user data (anonymize)
      *
+     * Delegates to UserService::removeUserWithAnonymization() so the erasure
+     * machinery (comment anonymization, post reassignment, account removal)
+     * is actually executed instead of only logging.
+     *
      * @param string $email
      * @return bool
      */
@@ -258,8 +290,7 @@ class DataRequestService
             throw new AppException("Invalid email address");
         }
 
-        $userDao = new UserDao();
-        $user = $userDao->getUserByEmail($email);
+        $user = $this->getUserDao()->getUserByEmail($email);
 
         if (!$user) {
             throw new AppException("User not found");
@@ -267,6 +298,12 @@ class DataRequestService
 
         $userId = $user['ID'];
         $ipAddress = function_exists('get_ip_address') ? get_ip_address() : '';
+
+        $deleted = $this->getUserService()->removeUserWithAnonymization($userId, $email);
+
+        if (!$deleted) {
+            throw new AppException("Unable to delete user data");
+        }
 
         $this->privacyLogDao->createLog(
             'data_deleted',
@@ -278,6 +315,66 @@ class DataRequestService
         );
 
         return true;
+    }
+
+    /**
+     * Lazy-access the injected UserService, falling back to a fresh instance
+     * when none was provided (backward compatibility with existing callers).
+     *
+     * @return UserService
+     */
+    private function getUserService()
+    {
+        if ($this->userService === null) {
+            $this->userService = new UserService($this->getUserDao(), new FormValidator(), new UserTokenDao(), $this->sanitizer, $this->getCommentDao(), $this->getPostDao());
+        }
+
+        return $this->userService;
+    }
+
+    /**
+     * Lazy-access the injected UserDao, falling back to a fresh instance
+     * when none was provided (backward compatibility with existing callers).
+     *
+     * @return UserDao
+     */
+    private function getUserDao()
+    {
+        if ($this->userDao === null) {
+            $this->userDao = new UserDao();
+        }
+
+        return $this->userDao;
+    }
+
+    /**
+     * Lazy-access the injected CommentDao, falling back to a fresh instance
+     * when none was provided (backward compatibility with existing callers).
+     *
+     * @return CommentDao
+     */
+    private function getCommentDao()
+    {
+        if ($this->commentDao === null) {
+            $this->commentDao = new CommentDao();
+        }
+
+        return $this->commentDao;
+    }
+
+    /**
+     * Lazy-access the injected PostDao, falling back to a fresh instance
+     * when none was provided (backward compatibility with existing callers).
+     *
+     * @return PostDao
+     */
+    private function getPostDao()
+    {
+        if ($this->postDao === null) {
+            $this->postDao = new PostDao();
+        }
+
+        return $this->postDao;
     }
 
     /**

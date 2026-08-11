@@ -90,19 +90,25 @@ class ConsentDao extends Dao
     /**
      * Get all consent records
      *
+     * Sort column is validated against an explicit allow-list so raw input is
+     * never interpolated into the query.
+     *
      * @param string $orderBy
      * @return array|bool
      */
     public function getAllConsents($orderBy = 'ID')
     {
+        $allowedColumns = ['ID', 'consent_type', 'consent_status', 'consent_ip', 'consent_date', 'consent_updated'];
+        $sortColumn = in_array($orderBy, $allowedColumns, true) ? $orderBy : 'ID';
+
         $sql = "SELECT * FROM tbl_consents 
-                ORDER BY '$orderBy' DESC";
+                ORDER BY $sortColumn DESC";
 
         $this->setSQL($sql);
 
         $consents = $this->findAll([]);
 
-        return (empty($consents)) ? false : $consents;
+        return (empty($consents)) ? [] : $consents;
     }
 
     /**
@@ -127,20 +133,36 @@ class ConsentDao extends Dao
     /**
      * Check if user has given consent
      *
+     * Consent is evaluated per visitor when an IP address is provided;
+     * without one the check falls back to the site-global record (legacy).
+     *
+     * Semantics: returns true if the visitor has EVER accepted the given
+     * consent type. Retention is enforced separately by deleteOldConsents(),
+     * so a record pruned by the retention window simply no longer counts as
+     * an acceptance.
+     *
      * @param string $consentType
+     * @param string|null $ipAddress
      * @return bool
      */
-    public function hasConsented($consentType)
+    public function hasConsented($consentType, $ipAddress = null)
     {
+        $params = [$consentType];
+        $ipFilter = '';
+
+        if ($ipAddress !== null && $ipAddress !== '') {
+            $ipFilter = " AND consent_ip = ?";
+            $params[] = $ipAddress;
+        }
+
         $sql = "SELECT COUNT(ID) FROM tbl_consents 
                 WHERE consent_type = ? 
                 AND consent_status = 'accepted' 
-                ORDER BY consent_date DESC 
-                LIMIT 1";
+                {$ipFilter}";
 
         $this->setSQL($sql);
 
-        $count = $this->findColumn([$consentType]);
+        $count = $this->findColumn($params);
 
         return $count > 0;
     }
