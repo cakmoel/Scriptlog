@@ -13,10 +13,10 @@ try {
             } else {
                 // Check if user is authenticated via Remember Me cookie
                 $hasRememberMe = isset($_COOKIE['scriptlog_auth']) && !empty($_COOKIE['scriptlog_auth']);
-                
+
                 // Validate logout token
                 $valid_logout = !empty($logOutId) && verify_logout_id($logOutId);
-                
+
                 // If token is invalid but user has Remember Me cookie, allow logout
                 // This is the fix for the "URL Redirection to Untrusted Site" error
                 if (!$valid_logout && $hasRememberMe) {
