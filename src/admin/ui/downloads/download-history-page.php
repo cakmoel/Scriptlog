@@ -12,8 +12,8 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
     </section>
 
     <section class="content">
-        <?php if (isset($status) && !empty($status)): ?>
-            <?php foreach ($status as $msg): ?>
+        <?php if (isset($status) && !empty($status)) : ?>
+            <?php foreach ($status as $msg) : ?>
                 <div class="alert alert-success alert-dismissible">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                     <?= htmlout($msg); ?>
@@ -21,8 +21,8 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
             <?php endforeach; ?>
         <?php endif; ?>
 
-        <?php if (isset($errors) && !empty($errors)): ?>
-            <?php foreach ($errors as $error): ?>
+        <?php if (isset($errors) && !empty($errors)) : ?>
+            <?php foreach ($errors as $error) : ?>
                 <div class="alert alert-danger alert-dismissible">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                     <?= htmlout($error); ?>
@@ -40,11 +40,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
                 </div>
             </div>
             <div class="box-body">
-                <?php if (empty($history)): ?>
+                <?php if (empty($history)) : ?>
                     <div class="alert alert-info">
                         <i class="fa fa-info-circle"></i> No download history found for this media file.
                     </div>
-                <?php else: ?>
+                <?php else : ?>
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped">
                             <thead>
@@ -57,16 +57,16 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($history as $record): ?>
+                                <?php foreach ($history as $record) : ?>
                                     <tr>
                                         <td><?= htmlout($record['ID']); ?></td>
                                         <td><?= htmlout($record['media_identifier']); ?></td>
                                         <td><?= htmlout($record['ip_address']); ?></td>
                                         <td><?= htmlout(date('Y-m-d H:i:s', strtotime($record['created_at']))); ?></td>
                                         <td>
-                                            <?php if (strtotime($record['before_expired']) < time()): ?>
+                                            <?php if (strtotime($record['before_expired']) < time()) : ?>
                                                 <span class="label label-danger">Expired</span>
-                                            <?php else: ?>
+                                            <?php else : ?>
                                                 <span class="label label-success">Active</span>
                                             <?php endif; ?>
                                         </td>
