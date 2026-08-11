@@ -118,12 +118,18 @@ class PrivacyLogDao extends Dao
     /**
      * Get all logs
      *
+     * Sort column is validated against an explicit allow-list so raw input is
+     * never interpolated into the query.
+     *
      * @param string $orderBy
      * @return array|bool
      */
     public function getAllLogs($orderBy = 'ID')
     {
-        $sql = "SELECT * FROM tbl_privacy_logs ORDER BY '$orderBy' DESC";
+        $allowedColumns = ['ID', 'log_action', 'log_type', 'log_email', 'log_ip', 'log_date'];
+        $sortColumn = in_array($orderBy, $allowedColumns, true) ? $orderBy : 'ID';
+
+        $sql = "SELECT * FROM tbl_privacy_logs ORDER BY $sortColumn DESC";
         $this->setSQL($sql);
         return $this->findAll([]);
     }
