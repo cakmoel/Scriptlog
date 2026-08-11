@@ -274,7 +274,7 @@ function get_table_definitions($prefix = '')
     KEY idx_media_identifier(media_identifier)
   )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
-   $tblPrivacyPolicy = "CREATE TABLE IF NOT EXISTS {$prefix}tbl_privacy_policies (
+    $tblPrivacyPolicy = "CREATE TABLE IF NOT EXISTS {$prefix}tbl_privacy_policies (
     ID BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     locale VARCHAR(10) NOT NULL DEFAULT 'en',
     policy_title VARCHAR(255) NOT NULL,
@@ -286,7 +286,7 @@ function get_table_definitions($prefix = '')
     UNIQUE KEY locale (locale)
   ) Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
-   $tblApiKeys = "CREATE TABLE IF NOT EXISTS {$prefix}tbl_api_keys (
+    $tblApiKeys = "CREATE TABLE IF NOT EXISTS {$prefix}tbl_api_keys (
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT(20) UNSIGNED NOT NULL,
     key_hash VARCHAR(255) NOT NULL COMMENT 'password_hash() of the raw API key',
