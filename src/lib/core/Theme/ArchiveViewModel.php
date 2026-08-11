@@ -1,4 +1,5 @@
 <?php
+
 namespace Scriptlog\Core\Theme;
 
 defined('SCRIPTLOG') || die('Direct access not permitted');
@@ -71,13 +72,28 @@ final class ArchiveViewModel extends AbstractThemeViewModel
     }
 
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function url(): string { return $this->values['url'] ?? ''; }
+    public function url(): string
+    {
+        return $this->values['url'] ?? '';
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function label(): ?string { return $this->values['label'] ?? null; }
+    public function label(): ?string
+    {
+        return $this->values['label'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function year(): ?string { return $this->values['year'] ?? null; }
+    public function year(): ?string
+    {
+        return $this->values['year'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function month(): ?string { return $this->values['month'] ?? null; }
+    public function month(): ?string
+    {
+        return $this->values['month'] ?? null;
+    }
     /** @psalm-suppress PossiblyUnusedMethod -- public getter consumed by public/themes */
-    public function count(): ?string { return $this->values['count'] ?? null; }
+    public function count(): ?string
+    {
+        return $this->values['count'] ?? null;
+    }
 }
