@@ -79,15 +79,15 @@ try {
                 } elseif (isset($_GET['media_id'])) {
                     $mediaId = (int)$_GET['media_id'];
                 }
-                
+
                 if ($mediaId > 0) {
                     $history = $downloadController->getDownloadHistoryForMedia($mediaId);
-                    
+
                     $mediaFilename = '';
                     if (!empty($history) && isset($history[0]['media_filename'])) {
                         $mediaFilename = $history[0]['media_filename'];
                     }
-                    
+
                     $view = new View('admin', 'ui', 'downloads', 'download-history-page');
                     $view->set('pageTitle', 'Download History');
                     $view->set('mediaId', $mediaId);
@@ -99,7 +99,7 @@ try {
                     direct_page('index.php?load=downloads&error=invalidId', 400);
                 }
             }
-            
+
             break;
 
         case 'bulkExpire':
