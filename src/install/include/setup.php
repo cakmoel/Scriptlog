@@ -19,15 +19,15 @@ function current_url() // returning current url
 {
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== "off") ? "https" : "http";
     $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
-    
+
     $phpSelf = $_SERVER['PHP_SELF'];
-    
+
     $path = dirname(rtrim($phpSelf, '/'));
-    
+
     if ($path === '/') {
         $path = '';
     }
-    
+
     return $scheme . "://" . $host . $path . '/';
 }
 
@@ -477,7 +477,7 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
             $recordApiRateWrite = $link->prepare($saveSettings);
             $recordApiRateWrite->bind_param('ss', $api_rate_limit_write, $api_rate_limit_write_value);
             $recordApiRateWrite->execute();
-            
+
             // insert download settings
             $download_mime_types = "download_allowed_mime_types";
             $download_mime_types_value = json_encode([
@@ -510,37 +510,37 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
             $recordDownloadMimeTypes = $link->prepare($saveSettings);
             $recordDownloadMimeTypes->bind_param('ss', $download_mime_types, $download_mime_types_value);
             $recordDownloadMimeTypes->execute();
-            
+
             $download_expiry = "download_expiry_hours";
             $download_expiry_value = "8";
             $recordDownloadExpiry = $link->prepare($saveSettings);
             $recordDownloadExpiry->bind_param('ss', $download_expiry, $download_expiry_value);
             $recordDownloadExpiry->execute();
-            
+
             $download_hotlink = "download_hotlink_protection";
             $download_hotlink_value = "no";
             $recordDownloadHotlink = $link->prepare($saveSettings);
             $recordDownloadHotlink->bind_param('ss', $download_hotlink, $download_hotlink_value);
             $recordDownloadHotlink->execute();
-            
+
             $download_domains = "download_allowed_domains";
             $download_domains_value = json_encode([]);
             $recordDownloadDomains = $link->prepare($saveSettings);
             $recordDownloadDomains->bind_param('ss', $download_domains, $download_domains_value);
             $recordDownloadDomains->execute();
-            
+
             $download_support_url = "download_support_url";
             $download_support_url_value = "";
             $recordDownloadSupportUrl = $link->prepare($saveSettings);
             $recordDownloadSupportUrl->bind_param('ss', $download_support_url, $download_support_url_value);
             $recordDownloadSupportUrl->execute();
-            
+
             $download_support_label = "download_support_label";
             $download_support_label_value = "Support";
             $recordDownloadSupportLabel = $link->prepare($saveSettings);
             $recordDownloadSupportLabel->bind_param('ss', $download_support_label, $download_support_label_value);
             $recordDownloadSupportLabel->execute();
-            
+
             // insert language settings
             $link->query($insertLangSettings);
 
@@ -1148,7 +1148,7 @@ function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuse
                 $defuse_key_full_path = $appRoot . '/lib/utility/.lts/lts.php';
             }
         }
-        
+
         // Use absolute path for config.php and .env
         $defuseKeyPath = $defuse_key_full_path;
 
@@ -1210,9 +1210,9 @@ function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuse
             // Write config.php - calculate correct path
             $rootDir = dirname(dirname(__DIR__)); // From install/include to root
             $configPath = $rootDir . '/config.php';
-            
+
             $result = file_put_contents($configPath, $configFile, LOCK_EX);
-            
+
             // If failed, try alternate path
             if ($result === false) {
                 $configPath = dirname(__DIR__, 2) . '/config.php';
@@ -1223,7 +1223,7 @@ function write_config_file($protocol, $server_name, $dbhost, $dbpassword, $dbuse
                 // Also generate .env file for environment variables (pass full key path)
                 $envPath = $rootDir . '/.env';
                 write_env_file($protocol, $server_name, $dbhost, $dbuser, $dbpassword, $dbname, $dbport, $prefix, $email, $app_key, $distro, $defuseKeyPath);
-                
+
                 $configuration = true;
             }
         }
@@ -1430,7 +1430,7 @@ function purge_installation()
             $clean_installation = '<?php ';
 
             file_put_contents(__DIR__ . '/../index.php', $clean_installation, LOCK_EX);
-            
+
             chmod(__DIR__ . '/../index.php', 0664);
 
             unset($_SESSION['token']);
@@ -1459,10 +1459,10 @@ function generate_random_key_filename(): string
 
 /**
  * Generate and save Defuse encryption key outside document root
- * 
+ *
  * The key is automatically placed in a secure location outside the web root
  * (parent directory of public_html) with a random directory and filename.
- * 
+ *
  * @return string The full path to the generated key file
  * @throws Exception
  */
@@ -1470,30 +1470,30 @@ function generate_defuse_key()
 {
     $appRoot = dirname(__DIR__, 2);
     $parentDir = dirname($appRoot);
-    
+
     $secureStorage = $parentDir . DIRECTORY_SEPARATOR . 'storage';
     $keySubDir = 'keys';
     $keyDir = $secureStorage . DIRECTORY_SEPARATOR . $keySubDir;
-    
+
     if (!is_dir($keyDir)) {
         @mkdir($keyDir, 0755, true);
     }
-    
+
     if (!is_dir($keyDir) || !is_writable($keyDir)) {
         $keyDir = $appRoot . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'utility' . DIRECTORY_SEPARATOR . '.lts';
         if (!is_dir($keyDir)) {
             @mkdir($keyDir, 0755, true);
         }
     }
-    
+
     if (strpos($keyDir, $appRoot) !== false && !file_exists($keyDir . '/.htaccess')) {
         $htaccessContent = "# Deny all public access to encryption keys\nOrder deny,allow\nDeny from all\n";
         @file_put_contents($keyDir . '/.htaccess', $htaccessContent);
     }
-    
+
     $keyFilename = generate_random_key_filename();
     $keyFile = $keyDir . DIRECTORY_SEPARATOR . $keyFilename;
-    
+
     $maxAttempts = 10;
     $attempt = 0;
     while (file_exists($keyFile) && $attempt < $maxAttempts) {
@@ -1501,15 +1501,15 @@ function generate_defuse_key()
         $keyFile = $keyDir . DIRECTORY_SEPARATOR . $keyFilename;
         $attempt++;
     }
-    
+
     $key = Defuse\Crypto\Key::createNewRandomKey();
     $keyAscii = $key->saveToAsciiSafeString();
-    
+
     $phpContent = "<?php\n// Encryption key generated on " . date('Y-m-d H:i:s') . "\n// Do not delete or modify this file\nreturn '$keyAscii';";
     file_put_contents($keyFile, $phpContent, LOCK_EX);
-    
+
     chmod($keyFile, 0644);
-    
+
     return $keyFile;
 }
 
@@ -1517,7 +1517,7 @@ function generate_defuse_key()
  * genereate_table_prefix()
  *
  * @param integer $length
- * 
+ *
  */
 function generate_table_prefix($length = 6)
 {
@@ -1620,7 +1620,7 @@ location ~ /\.git/ {
     } elseif (stripos($web_server, 'microsoft-iis') !== false) {
         # Generate web.config for IIS with URL Rewrite and security rules
         $iis_config = dirname(__DIR__, 2) . '/web.config';
-        
+
         $webconfig_content = '<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <system.webServer>
