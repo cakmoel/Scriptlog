@@ -172,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Write configuration file - system generates encryption key automatically outside web root
                 $configResult = write_config_file($protocol, $server_host, $dbhost, $dbpass, $dbuser, $dbname, $dbport, $email, $key, $ca, $table_prefix, $defuse_key_path);
-                
+
                 if (!$configResult) {
                     $errors['errorSetup'] = "Failed to create configuration files. Please check file permissions.";
                 } else {
@@ -180,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      # Generate server config file based on web server
                     $server_config = generate_server_config();
                     $_SESSION['server_config'] = $server_config;
-                    
+
                     $installPath = rtrim(dirname($_SERVER['PHP_SELF']), '/');
                     if ($installPath === '/') {
                         $installPath = '';
