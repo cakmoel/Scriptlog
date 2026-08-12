@@ -4556,7 +4556,7 @@ ScriptLog includes a comprehensive i18n system for multi-language support, inclu
 |   |                     |  - URL prefix (/ar/, /es/)          |
 |   +----------+----------+  - Cookie (lang)                    |
 |              |             - Accept-Language header           |
-|              |             - Default (en)                   |
+|              |             - Default (en)                     |
 |              v                                                |
 |   +---------------------+                                     |
 |   | I18nManager         |  Load translations & manage locale  |
@@ -5442,75 +5442,89 @@ $notification->send('user@example.com', 'Subject', 'Email body');
 
 ## 25. Search Functionality
 
-The search system provides two complementary paths for finding published content:
+The search system provides three complementary paths for finding published content:
 
 | Path | Route | Controller | Output |
 |------|-------|-----------|--------|
-| **Full page** | `/search?q=keyword` (permalinks ON) or `?q=keyword` on the app root (permalinks OFF) | `SearchController` | Renders `search.php` template |
+| **Full page** | `/search?q=keyword` (permalinks ON) or `?q=keyword` on the app root (permalinks OFF) | `SearchController` (`/search`) / `HandleRequest::deliverQuerySearch()` (`?q=` OFF) | Renders `search.php` template |
 | **AJAX inline** | `GET /api/v1/search?q=keyword` | `SearchApiController` | JSON response consumed by `search.js` |
+| **HTMX inline** | `hx-get="/search"` on the search input (Valdur theme) | `SearchController` | HTML fragment (`partials/search-results.php`) swapped into `#search-suggestions` |
 
-The full-page path is permalink-aware: with SEO-friendly permalinks enabled the Dispatcher routes the `/search` path to `SearchController`; with permalinks disabled the query-string router (`HandleRequest::deliverQueryString()`) dispatches the `q` key on the app root. Both resolve to the same controller — use the `theme_search_url()` theme helper (`public/themes/blog/functions-post.php`) to build the search form action / JS `search_url` so it matches the active scheme instead of hard-coding `/search`.
+The full-page path is permalink-aware: with SEO-friendly permalinks enabled the Dispatcher routes the `/search` path to `SearchController`; with permalinks disabled the query-string router (`HandleRequest::deliverQueryString()`) dispatches the `q` key on the app root and `HandleRequest::deliverQuerySearch()` calls `SearchFinder::searchAll()` directly — it does **not** pass through `SearchController`. Use the `theme_search_url()` theme helper (`public/themes/blog/functions-post.php`) to build the search form action / JS `search_url` so it matches the active scheme instead of hard-coding `/search`.
 
-Both paths delegate to the same `SearchFinder` engine.
+All three paths delegate to the same `SearchFinder` engine.
 
 ### Key Files
 
 | File | Purpose |
 |------|---------|
 | `lib/core/SearchFinder.php` | Core search engine — MySQL FULLTEXT `MATCH ... AGAINST` against `tbl_posts` |
-| `lib/controller/SearchController.php` | Frontend controller for full search page (`/search` or `?q=` — permalink-aware) |
+| `lib/controller/SearchController.php` | Frontend controller for `/search` — rate-limited, `type`+`page` dispatch, full page or HTMX fragment |
 | `lib/controller/api/SearchApiController.php` | REST API controller (`/api/v1/search`) |
 | `public/themes/blog/search.php` | Search results page template |
 | `public/themes/blog/sidebar.php` | Search form in sidebar |
 | `public/themes/blog/assets/js/search.js` | AJAX autocomplete JS (300 ms debounce) |
 | `public/themes/blog/lang/en.json` | Search i18n keys (`search.*`) |
-| `lib/core/Dispatcher.php` | Routes `/search` (permalinks ON) / `?q=` (permalinks OFF) to `SearchController` |
+| `lib/core/Dispatcher.php` | Routes `/search` to `SearchController` (permalinks ON) |
+| `lib/core/HandleRequest.php` | `deliverQuerySearch()` — handles `?q=` on app root (permalinks OFF) via `SearchFinder::searchAll()` |
 | `lib/core/Bootstrap.php` | Route definition: `'search' => "/search"` |
 | `public/themes/blog/functions-post.php` | `theme_search_url()` — permalink-aware search URL builder |
 
 ### Architecture
 
 ```
-                    ┌──────────────────────┐
-                    │   User types/enters   │
-                    │   search keyword      │
-                    └──────────┬───────────┘
-                               │
-              ┌────────────────┼────────────────┐
-              │                │                │
-              v                v                v
-   ┌──────────────────┐  ┌──────────────────────────┐
-   │  search.js AJAX  │  │  Form submit (GET) or     │
-   │  (300 ms delay)  │  │  direct URL /search?q=     │
-   │                  │  │  (permalinks ON) or ?q=    │
-   │                  │  │  on app root (OFF)         │
-   └────────┬─────────┘  └────────────┬─────────────┘
-            │                         │
-            v                         v
-   ┌──────────────────┐  ┌──────────────────────┐
-   │SearchApiController│  │  SearchController    │
-   └────────┬─────────┘  └──────────┬───────────┘
-            │                       │
-            └──────────┬────────────┘
-                       │
-                       v
-              ┌──────────────────┐
-               │  SearchFinder    │
-               │  (FULLTEXT       │
-               │  IN BOOLEAN MODE)│
-               └────────┬─────────┘
-                        │
-           ┌────────────┼────────────┐
-           v            v            v
-    ┌───────────┐ ┌──────────┐ ┌──────────┐
-    │ searchAll │ │searchPost│ │searchPage│
-    │  (all)    │ │  (blog)  │ │  (page)  │
-    └─────┬─────┘ └────┬─────┘ └────┬─────┘
-          │            │            │
-          v            v            v
-    JSON response  Full template  search.php
-    (AJAX path)    (page path)    rendered
+                    ┌──────────────────────────────┐
+                    │     User types/enters        │
+                    │     search keyword           │
+                    └──────────────┬───────────────┘
+                                   │
+              ┌────────────────────┼────────────────────┐
+              │                    │                    │
+              v                    v                    v
+   ┌──────────────────────┐ ┌──────────────────────┐ ┌──────────────────────┐
+   │ Blog theme           │ │ Valdur theme         │ │ Form submit (GET) /  │
+   │ search.js (jQuery    │ │ HTMX hx-get="/search"│ │ direct URL           │
+   │ AJAX, 300 ms debounce│ │ (300 ms keyup delay) │ │ /search?q= (ON) or   │
+   │ GET /api/v1/search   │ │                      │ │ ?q= on root (OFF)    │
+   └──────────┬───────────┘ └──────────┬───────────┘ └──────────┬───────────┘
+              │                        │                        │
+              v                        v                        v
+   ┌──────────────────────┐ ┌──────────────────────┐ ┌──────────────────────┐
+   │ SearchApiController  │ │ SearchController     │ │ HandleRequest::      │
+   │ (API) → JSON         │ │ (rate-limited,       │ │ deliverQuerySearch() │
+   │ index / posts /      │ │ type + page) →       │ │ (permalinks OFF only)│
+   │ pages                │ │ HTMX fragment or     │ │ searchAll() direct — │
+   │                      │ │ full page            │ │ no controller        │
+   └──────────┬───────────┘ └──────────┬───────────┘ └──────────┬───────────┘
+              │                        │                        │
+              └────────────────────────┼────────────────────────┘
+                                       │
+                                       v
+                        ┌──────────────────────────────┐
+                        │          SearchFinder        │
+                        │  searchAll (all) / searchPost│
+                        │  (posts) / searchPage (pages)│
+                        │  FULLTEXT MATCH (post_title, │
+                        │  post_content, post_tags)    │
+                        │  AGAINST (? IN BOOLEAN MODE) │
+                        └──────────────┬───────────────┘
+                                       │
+                        ┌──────────────┼──────────────┐
+                        v                             v
+                 ┌──────────────────────┐      ┌──────────────────────┐
+                 │ JSON response        │      │ HTML output          │
+                 │ ApiResponse::success │      │full page → search.php│
+                 │ (AJAX + API path)    │      │ or HTMX fragment     │
+                 │                      │      │ (partials/search-    │
+                 │                      │      │ results.php)         │
+                 └──────────────────────┘      └──────────────────────┘
 ```
+
+> **Diagram notes (verified against the codebase):**
+> - `search.js` always requests `type=all`; the API `posts`/`pages` endpoints (`SearchApiController@posts`/`@pages`) map to `searchPost`/`searchPage`.
+> - Both `SearchController` and `SearchApiController` dispatch on `type` (`all`/`posts`/`pages`) — all three `SearchFinder` methods serve **both** JSON and HTML outputs; the output format depends on the entry controller, not the method.
+> - The permalinks-OFF query-string path (`?q=` on app root) is handled by `HandleRequest::deliverQuerySearch()`, which calls `SearchFinder::searchAll()` directly — it bypasses `SearchController`.
+> - HTMX requests (Valdur theme) return an HTML fragment (`partials/search-results.php`), not JSON.
 
 ### Search API Endpoints
 
@@ -5788,7 +5802,7 @@ Admin Flow:
 ```json
 POST /api/v1/posts/3/unlock
 {
-  "password": "Bac4D0nG(*)#"
+  "password": "YourPassword"
 }
 ```
 
