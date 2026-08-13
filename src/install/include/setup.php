@@ -478,6 +478,14 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
             $recordApiRateWrite->bind_param('ss', $api_rate_limit_write, $api_rate_limit_write_value);
             $recordApiRateWrite->execute();
 
+            // insert scheduled posting setting (enabled by default)
+            $writing_scheduled_post_enabled = "writing_scheduled_post_enabled";
+            $writing_scheduled_post_enabled_value = "1";
+
+            $recordWritingScheduledPost = $link->prepare($saveSettings);
+            $recordWritingScheduledPost->bind_param('ss', $writing_scheduled_post_enabled, $writing_scheduled_post_enabled_value);
+            $recordWritingScheduledPost->execute();
+
             // insert download settings
             $download_mime_types = "download_allowed_mime_types";
             $download_mime_types_value = json_encode([
@@ -632,6 +640,7 @@ function install_i18n_data($link, $prefix = '', $default_lang = 'en')
         'nav.widgets' => ['Widgets', 'الودجات', '小部件', 'Widgets', 'Виджеты', 'Widgets', 'Widget'],
         'nav.settings' => ['Settings', 'الإعدادات', '设置', 'Paramètres', 'Настройки', 'Configuración', 'Pengaturan'],
         'nav.general' => ['General', 'عام', '常规', 'Général', 'Общие', 'General', 'Umum'],
+        'nav.writing' => ['Writing', 'كتابة', '写作', 'Rédaction', 'Написание', 'Escritura', 'Menulis'],
         'nav.reading' => ['Reading', 'القراءة', '阅读', 'Lecture', 'Чтение', 'Lectura', 'Membaca'],
         'nav.permalink' => ['Permalink', 'الرابط الدائم', '固定链接', 'Permalien', 'Постоянная ссылка', 'Enlace permanente', 'Permalink'],
         'nav.timezone' => ['Timezone', 'المنطقة الزمنية', '时区', 'Fuseau horaire', 'Часовой пояс', 'Zona horaria', 'Zona Waktu'],
@@ -730,6 +739,7 @@ function install_i18n_data($link, $prefix = '', $default_lang = 'en')
         'admin.add_language' => ['Add Language', 'إضافة لغة', '添加语言', 'Ajouter une langue', 'Добавить язык', 'Añadir idioma', 'Tambah Bahasa'],
         'admin.edit_language' => ['Edit Language', 'تعديل اللغة', '编辑语言', 'Modifier la langue', 'Редактировать язык', 'Editar idioma', 'Edit Bahasa'],
         'admin.delete_language' => ['Delete Language', 'حذف اللغة', '删除语言', 'Supprimer la langue', 'Удалить язык', 'Eliminar idioma', 'Hapus Bahasa'],
+        'admin.no_languages' => ['No languages found', 'لا توجد لغات', '未找到语言', 'Aucune langue trouvée', 'Языки не найдены', 'No se encontraron idiomas', 'Tidak ada bahasa'],
       ],
       'header' => [
         'header.nav.home' => ['Home', 'الرئيسية', '首页', 'Accueil', 'Главная', 'Inicio', 'Beranda'],
