@@ -109,6 +109,18 @@ if (!file_exists(APP_ROOT . 'config.php')) {
     $app = Bootstrap::initialize(APP_ROOT);
 
     // Note: The Security functions (x_frame_option, etc.) are now called inside Bootstrap::applySecurity()
+
+    // Scheduled posting flip: promote due 'scheduled' posts to 'publish'.
+    // Runs before index.php serves the page cache so cached pages cannot hide
+    // newly published posts. Never fails a request.
+    if (isset($app->postDao, $app->configDao, $app->sanitizer) && class_exists('Scriptlog\Service\ScheduledPostService')) {
+        try {
+            $scheduledPostService = new Scriptlog\Service\ScheduledPostService($app->postDao, $app->configDao, $app->sanitizer);
+            $scheduledPostService->publishDuePosts();
+        } catch (\Throwable $e) {
+            error_log('Scheduled post publishing failed: ' . $e->getMessage());
+        }
+    }
 }
 
 // Handle frontend language switch
