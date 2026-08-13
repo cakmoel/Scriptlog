@@ -7,13 +7,34 @@
  *
  * @category function
  * @param  string $selected
+ * @param  bool   $includeScheduled Whether the 'Scheduled' option is included (admin only)
  * @return string
  */
-function post_status_dropdown($selected = '')
+function post_status_dropdown($selected = '', $includeScheduled = false)
 {
     $posts_status = ['publish' => 'Publish', 'draft' => 'Draft'];
 
+    if ($includeScheduled === true) {
+        $posts_status['scheduled'] = 'Scheduled';
+    }
+
     return dropdown('post_status', $posts_status, $selected);
+}
+
+/**
+ * post_status_label()
+ *
+ * Human-readable label for a post status.
+ *
+ * @category function
+ * @param  string $status
+ * @return string
+ */
+function post_status_label($status)
+{
+    $labels = ['publish' => 'Publish', 'draft' => 'Draft', 'scheduled' => 'Scheduled'];
+
+    return isset($labels[$status]) ? $labels[$status] : ucfirst((string)$status);
 }
 
 /**
