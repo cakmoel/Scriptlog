@@ -73,6 +73,7 @@
                   <th>Title</th>
                   <th>Author</th>
                   <th>Date</th>
+                  <th>Status</th>
                   <th>Edit</th>
                   <th>Delete</th>
                 </tr>
@@ -90,6 +91,19 @@
                       <td><?= safe_html($post['post_title']); ?></td>
                       <td><?= safe_html($post['user_login']); ?></td>
                       <td><?= isset($post['post_modified']) ? safe_html(make_date($post['post_modified'])) : safe_html(make_date($post['post_date'])); ?></td>
+
+                      <td>
+                        <?php
+                        $statusLabel = post_status_label($post['post_status']);
+                        $statusClass = 'label-default';
+                        if ($post['post_status'] === 'publish') {
+                            $statusClass = 'label-success';
+                        } elseif ($post['post_status'] === 'scheduled') {
+                            $statusClass = 'label-primary';
+                        }
+                        ?>
+                        <span class="label <?= $statusClass; ?>"><?= safe_html($statusLabel); ?></span>
+                      </td>
 
                       <td>
                         <a href="<?= generate_request("index.php", 'get', ['posts', ActionConst::EDITPOST, $post['ID']])['link']; ?>" class="btn btn-warning" title="Edit post">
@@ -114,6 +128,7 @@
                   <th>Title</th>
                   <th>Author</th>
                   <th>Date</th>
+                  <th>Status</th>
                   <th>Edit</th>
                   <th>Delete</th>
                 </tr>
