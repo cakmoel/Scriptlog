@@ -49,7 +49,7 @@ class PostValidator
         }
 
         // Status validation
-        if (!in_array($dto->postStatus, ['publish', 'draft'])) {
+        if (!in_array($dto->postStatus, ['publish', 'draft', 'scheduled'])) {
             $result->addError(MESSAGE_INVALID_SELECTBOX);
         }
 
