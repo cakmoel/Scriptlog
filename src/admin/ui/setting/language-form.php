@@ -1,6 +1,27 @@
 <?php if (!defined('SCRIPTLOG')) {
     exit();
 } ?>
+<style>
+    .language-form-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .language-form-actions .btn {
+        width: 100%;
+    }
+
+    @media (min-width: 768px) {
+        .language-form-actions {
+            flex-direction: row;
+        }
+
+        .language-form-actions .btn {
+            width: auto;
+        }
+    }
+</style>
 <div class="content-wrapper">
     <section class="content-header">
         <h1><?= (isset($pageTitle) ? safe_html($pageTitle) : ""); ?>
@@ -90,10 +111,12 @@
 
                             <div class="box-footer">
                                 <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? safe_html($csrfToken) : ''; ?>">
-                                <button type="submit" class="btn btn-primary">
-                                    <?= ($action === 'edit') ? 'Update' : 'Create'; ?> Language
-                                </button>
-                                <a href="index.php?load=languages" class="btn btn-default">Cancel</a>
+                                <div class="language-form-actions">
+                                    <button type="submit" class="btn btn-primary">
+                                        <?= ($action === 'edit') ? 'Update' : 'Create'; ?> Language
+                                    </button>
+                                    <a href="index.php?load=languages" class="btn btn-default">Cancel</a>
+                                </div>
                             </div>
                         </form>
                     </div>
