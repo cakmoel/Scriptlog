@@ -241,8 +241,9 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
                 || $module === 'option-memberships'
                 || $module === 'option-api'
                 || $module === 'option-mail'
-                || $module === 'option-downloads') ? 'class="treeview active"' : 'class="treeview"'; ?>>
-                <a href="#" aria-expanded="<?= (in_array($module, ['option-general', 'option-permalink', 'option-reading', 'option-timezone', 'option-memberships', 'option-api', 'option-mail', 'option-downloads'])) ? 'true' : 'false'; ?>">
+                || $module === 'option-downloads'
+                || $module === 'option-writing') ? 'class="treeview active"' : 'class="treeview"'; ?>>
+                <a href="#" aria-expanded="<?= (in_array($module, ['option-general', 'option-permalink', 'option-reading', 'option-timezone', 'option-memberships', 'option-api', 'option-mail', 'option-downloads', 'option-writing'])) ? 'true' : 'false'; ?>">
                     <i class="fa fa-sliders fa-fw" aria-hidden="true"></i>
                     <span><?= admin_translate('nav.settings'); ?></span>
                     <span class="pull-right-container">
@@ -274,6 +275,11 @@ function sidebar_navigation($module, $url, $user_id = null, $user_session = null
                     <li><a
                             href="<?= $url . '/' . generate_request('index.php', 'get', ['option-api', ActionConst::API_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.api'); ?></a>
                     </li>
+                    <?php if (access_control_list(ActionConst::WRITING)) : ?>
+                    <li><a
+                            href="<?= $url . '/' . generate_request('index.php', 'get', ['option-writing', ActionConst::WRITING_CONFIG, 0])['link']; ?>"><?= admin_translate('nav.writing'); ?></a>
+                    </li>
+                    <?php endif; ?>
                 </ul>
             </li>
             <?php endif; ?>
