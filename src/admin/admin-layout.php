@@ -278,9 +278,12 @@ function admin_footer($stylePath, $ubench = null)
         });
 
         //datetimepicker
+        var datepicker = document.getElementById('datetimepicker');
+        var pickWithTime = datepicker !== null && datepicker.getAttribute('data-time') === '1';
+
         jQuery('#datetimepicker').datetimepicker({
-            timepicker: false,
-            format: 'Y-m-d'
+            timepicker: pickWithTime,
+            format: pickWithTime ? 'Y-m-d H:i:s' : 'Y-m-d'
         });
 
         //icheck
