@@ -38,6 +38,7 @@ function admin_query()
         'option-downloads' => 'option-downloads.php',
         'option-mail' => 'option-mail.php',
         'option-api' => 'option-api.php',
+        'option-writing' => 'option-writing.php',
         'option-language' => 'option-language.php',
         'plugins' => 'plugins.php',
         'privacy' => 'privacy.php',
