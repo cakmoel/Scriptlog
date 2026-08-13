@@ -29,6 +29,9 @@ class ActionConst
     public const TIMEZONE_CONFIG   = "timezoneConfig";
     public const MEMBERSHIP_CONFIG = "membershipConfig";
     public const MAIL_CONFIG       = "mailConfig";
+    // action constant for writing (scheduled posting) functionality
+    public const WRITING          = "writing";
+    public const WRITING_CONFIG   = "writingConfig";
     // action constant for post functionality
     public const POSTS       = "posts";
     public const NEWPOST     = "newPost";
