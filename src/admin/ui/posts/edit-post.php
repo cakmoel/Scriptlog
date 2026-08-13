@@ -96,18 +96,22 @@
                               <i class="fa fa-calendar" aria-hidden="true"></i>
                            </div>
 
-                <input type="text" id="datetimepicker" name="<?= (isset($postData['post_modified']) ? "post_modified" : "post_date"); ?>" class="form-control" placeholder="YYYY-MM-DD HH:MM:SS" value="<?php
-                if (isset($postData['post_modified']) || isset($postData['post_date'])) {
-                    if ($postData['post_modified'] === null) {
-                        echo safe_html($postData['post_date']);
-                    } else {
-                        echo safe_html($postData['post_modified']);
-                    }
-                }
-                ?>">
+                           <?php
+                           $isScheduledPost = (isset($postData['post_status']) && $postData['post_status'] === 'scheduled');
+                           $dateFieldName = ($isScheduledPost || !isset($postData['post_modified'])) ? 'post_date' : 'post_modified';
+
+                           $dateFieldValue = '';
+                           if ($isScheduledPost) {
+                               $dateFieldValue = isset($postData['post_date']) ? $postData['post_date'] : '';
+                           } elseif (isset($postData['post_modified']) || isset($postData['post_date'])) {
+                               $dateFieldValue = ($postData['post_modified'] === null) ? $postData['post_date'] : $postData['post_modified'];
+                           }
+                           ?>
+
+                           <input type="text" id="datetimepicker" data-time="1" name="<?= $dateFieldName; ?>" class="form-control" placeholder="YYYY-MM-DD HH:MM:SS" value="<?= safe_html($dateFieldValue); ?>">
 
                         </div>
-                        <p class="help-block">Schedule or backdate your post if needed.</p>
+                        <p class="help-block">Pick a future date and time with status "Publish" to schedule this post, or a past date to backdate it.</p>
                      </div>
                      <!-- /.Date -->
 
