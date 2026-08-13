@@ -117,6 +117,10 @@ class ConfigurationService
     /**
      * addSetting
      *
+     * Creates a new configuration row. The DAO sanitizes both the name and
+     * the value internally.
+     *
+     * @return bool
      */
     public function addSetting()
     {
@@ -124,10 +128,11 @@ class ConfigurationService
         $this->validator->sanitize($this->setting_name, 'string');
         $this->validator->sanitize($this->setting_value, 'string');
 
-        return $this->configDao->createConfig([
-          'setting_name' => $this->setting_name,
-          'setting_value' => $this->setting_value
-        ]);
+        return $this->configDao->createConfig(
+            $this->setting_name,
+            $this->setting_value,
+            $this->sanitizer
+        );
     }
 
     /**
