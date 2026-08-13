@@ -36,6 +36,9 @@ class ScriptlogOpenssl extends \Laminas\Crypt\Symmetric\Openssl
      * lazily by the inherited getSupportedAlgorithms() method.
      *
      * @var array|null
+     * @psalm-suppress PossiblyUnusedProperty -- written dynamically by the
+     *     inherited getSupportedAlgorithms() in laminas-crypt 3.8.0, which
+     *     Psalm cannot see.
      */
     public $supportedAlgos;
 }
