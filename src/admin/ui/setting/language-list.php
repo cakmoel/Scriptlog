@@ -40,8 +40,8 @@
                     <div class="box-header with-border">
                         <h3 class="box-title">Languages</h3>
                         <div class="box-tools pull-right">
-                            <a href="index.php?load=languages&action=<?= ActionConst::NEWLANGUAGE; ?>" class="btn btn-primary btn-sm">
-                                <i class="fa fa-plus"></i> <?= admin_translate('addLanguage'); ?>
+                            <a href="index.php?load=languages&action=<?= ActionConst::NEWLANGUAGE; ?>" class="btn btn-primary" title="<?= admin_translate('admin.add_language'); ?>">
+                                <i class="fa fa-plus-circle margin-r-5" aria-hidden="true"></i><?= admin_translate('admin.add_language'); ?>
                             </a>
                         </div>
                     </div>
@@ -96,7 +96,7 @@
                                     <?php endforeach; ?>
                                 <?php else : ?>
                                     <tr>
-                                        <td colspan="8" class="text-center"><?= admin_translate('noLanguages'); ?></td>
+                                        <td colspan="8" class="text-center"><?= admin_translate('admin.no_languages'); ?></td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
