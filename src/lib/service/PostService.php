@@ -538,6 +538,10 @@ class PostService
             $postData['media_id'] = $this->post_image;
         }
 
+        if (!empty($this->post_date)) {
+            $postData['post_date'] = $this->post_date;
+        }
+
         $this->postDao->updatePost($this->sanitizer, $postData, $this->postId, $this->topics);
     }
 
