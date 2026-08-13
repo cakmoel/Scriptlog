@@ -74,9 +74,11 @@ class PostApplicationService
             ? getimagesize($file_location)
             : getimagesize(__DIR__ . '/../../' . APP_IMAGE . 'nophoto.jpg');
 
-        $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] === 'publish'))
-            ? 'public'
-            : 'private';
+        $media_access = 'private';
+        if (isset($_POST['post_status'])) {
+            $normalizedStatus = $this->normalizePostStatus((string)$_POST['post_status'], $this->resolvePostDate($filtered));
+            $media_access = ($normalizedStatus === 'publish') ? 'public' : 'private';
+        }
 
         $this->postService->processPostImage(
             $file_location,
@@ -139,7 +141,15 @@ class PostApplicationService
         $this->postService->setPostAuthor($this->postService->postAuthorId());
         $this->postService->setPostTitle($filtered['post_title']);
         $this->postService->setPostSlug($filtered['post_title']);
-        $this->postService->setPublish($filtered['post_status']);
+
+        $postDate = $this->resolvePostDate($filtered);
+        $normalizedStatus = $this->normalizePostStatus((string)$filtered['post_status'], $postDate);
+
+        $this->postService->setPublish($normalizedStatus);
+
+        if ($normalizedStatus === 'scheduled') {
+            $this->postService->setPostDate($postDate);
+        }
 
         if (isset($_POST['catID']) && $_POST['catID'] == 0) {
             $this->postService->setTopics(0);
@@ -151,7 +161,7 @@ class PostApplicationService
             ? getimagesize($file_location)
             : getimagesize(__DIR__ . '/../../' . APP_IMAGE . 'nophoto.jpg');
 
-        $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] == 'publish'))
+        $media_access = ($normalizedStatus === 'publish')
             ? 'public'
             : 'private';
 
@@ -224,6 +234,7 @@ class PostApplicationService
             'post_title' => isset($_POST['post_title']) ? Sanitize::strictSanitizer($_POST['post_title']) : "",
             'post_content' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
             'post_modified' => isset($_POST['post_modified']) ? Sanitize::mildSanitizer($_POST['post_modified']) : "",
+            'post_date' => isset($_POST['post_date']) ? Sanitize::mildSanitizer($_POST['post_date']) : "",
             'image_id' => isset($_POST['image_id']) ? FILTER_SANITIZE_NUMBER_INT : "",
             'catID' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_ARRAY],
             'post_summary' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -259,9 +270,11 @@ class PostApplicationService
         $this->postService->setPostAuthor($this->postService->postAuthorId());
 
         if (empty($_POST['post_date'])) {
-            $this->postService->setPostDate(date_for_database());
+            $postDate = date_for_database();
+            $this->postService->setPostDate($postDate);
         } else {
-            $this->postService->setPostDate(date_for_database($filtered['post_date']));
+            $postDate = date_for_database($filtered['post_date']);
+            $this->postService->setPostDate($postDate);
         }
 
         $this->postService->setPostTitle($filtered['post_title']);
@@ -279,7 +292,7 @@ class PostApplicationService
             $this->postService->setPostContent($filtered['post_content']);
         }
 
-        $this->postService->setPublish($filtered['post_status']);
+        $this->postService->setPublish($this->normalizePostStatus((string)$filtered['post_status'], $postDate));
         $this->postService->setVisibility($filtered['visibility']);
 
         if (empty($_POST['post_headlines'])) {
@@ -357,5 +370,42 @@ class PostApplicationService
         } else {
             $this->postService->setHeadlines($filtered['post_headlines']);
         }
+    }
+
+    /**
+     * Resolve the post publication datetime in site timezone.
+     *
+     * @param array $filtered Distilled post request data
+     * @return string Datetime 'Y-m-d H:i:s'
+     */
+    private function resolvePostDate(array $filtered): string
+    {
+        return empty($filtered['post_date']) ? date_for_database() : date_for_database($filtered['post_date']);
+    }
+
+    /**
+     * Normalize a submitted post status against its publication datetime.
+     *
+     * - 'publish' + future date  → 'scheduled' (auto-detect scheduling)
+     * - 'scheduled' + past date  → 'publish'   (due immediately)
+     * - anything else unchanged
+     *
+     * @param string $status Submitted post status
+     * @param string $date Publication datetime 'Y-m-d H:i:s'
+     * @return string Normalized post status
+     */
+    private function normalizePostStatus(string $status, string $date): string
+    {
+        $now = date_for_database();
+
+        if ($status === 'publish' && $date > $now) {
+            return 'scheduled';
+        }
+
+        if ($status === 'scheduled' && $date <= $now) {
+            return 'publish';
+        }
+
+        return $status;
     }
 }
