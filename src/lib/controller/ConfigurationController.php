@@ -1071,4 +1071,80 @@ class ConfigurationController
 
         return $this->view->render();
     }
+
+    /**
+     * updateWritingSetting
+     *
+     * Persists the Writing (scheduled posting) toggle.
+     *
+     * @return mixed
+     */
+    public function updateWritingSetting()
+    {
+        $errors = array();
+        $checkError = true;
+
+        $this->setView('writing-setting');
+
+        $writingSettingKeys = [
+            'writing_scheduled_post_enabled'
+        ];
+
+        if (isset($_POST['writingConfigSubmit'])) {
+            try {
+                if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
+                    throw new AppException("Sorry, unpleasant attempt detected!");
+                }
+
+                $enabled = isset($_POST['writing_scheduled_post_enabled']) ? '1' : '0';
+
+                $writingValues = [
+                    'writing_scheduled_post_enabled' => $enabled
+                ];
+
+                foreach ($writingSettingKeys as $key) {
+                    $existing = $this->configService->grabSettingByName($key);
+                    if ($existing) {
+                        $this->configService->setConfigId($existing['ID']);
+                        $this->configService->setConfigName($key);
+                        $this->configService->setConfigValue($writingValues[$key]);
+                        $this->configService->modifySetting();
+                    } else {
+                        $this->configService->setConfigName($key);
+                        $this->configService->setConfigValue($writingValues[$key]);
+                        $this->configService->addSetting();
+                    }
+                }
+
+                $_SESSION['status'] = "writingConfigUpdated";
+                direct_page('index.php?load=option-writing&status=writingConfigUpdated', 302);
+            } catch (AppException $e) {
+                $checkError = false;
+                $errors[] = $e->getMessage();
+            } catch (\Throwable $th) {
+                LogError::setStatusCode(http_response_code());
+                LogError::exceptionHandler($th);
+            }
+        }
+
+        $this->setPageTitle('Writing Settings');
+        $this->setFormAction(ActionConst::WRITING_CONFIG);
+
+        $currentWriting = [];
+        foreach ($writingSettingKeys as $key) {
+            $setting = $this->configService->grabSettingByName($key);
+            $currentWriting[$key] = $setting['setting_value'] ?? '1';
+        }
+
+        $this->view->set('pageTitle', $this->getPageTitle());
+        $this->view->set('formAction', $this->getFormAction());
+        $this->view->set('writing', $currentWriting);
+        if (!$checkError) {
+            $this->view->set('errors', $errors);
+        }
+        $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+
+        return $this->view->render();
+    }
 }
