@@ -73,6 +73,7 @@ function get_table_definitions($prefix = '')
   KEY post_media(media_id),
   KEY idx_post_slug(post_slug),
   KEY idx_post_locale(post_locale),
+  KEY idx_post_status_date(post_status, post_date),
   FULLTEXT KEY (post_tags, post_title, post_content)
   )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
