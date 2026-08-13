@@ -415,6 +415,10 @@ WHERE ID = ? AND post_type = 'blog'";
                 $updateData['media_id'] = $bind['media_id'];
             }
 
+            if (!empty($bind['post_date'])) {
+                $updateData['post_date'] = $bind['post_date'];
+            }
+
             $this->modify("tbl_posts", $updateData, ['ID' => (int)$cleanId]);
 
             $this->deleteRecord("tbl_post_topic", ['post_id' => (int)$cleanId], null);
@@ -440,6 +444,68 @@ WHERE ID = ? AND post_type = 'blog'";
             $this->error = (string)LogError::setStatusCode(500);
             LogError::exceptionHandler($th);
         }
+    }
+
+    /**
+     * Publish all scheduled posts whose post_date has passed.
+     *
+     * Promotes scheduled posts to 'publish' and flips the featured image
+     * media_access to 'public'. Runs both UPDATEs inside a single transaction
+     * and clears the page cache when any post is promoted.
+     *
+     * @param string $now Current datetime in site timezone ('Y-m-d H:i:s')
+     * @return int Number of posts promoted
+     * @throws \Throwable
+     */
+    public function publishDueScheduledPosts(string $now): int
+    {
+        $count = $this->runInTransaction(function () use ($now) {
+            $count = 0;
+
+            $stmt = $this->dbc->dbQuery(
+                "UPDATE tbl_posts AS p
+                 INNER JOIN tbl_media AS m ON m.ID = p.media_id
+                 SET p.post_status = 'publish', m.media_access = 'public'
+                 WHERE p.post_status = 'scheduled'
+                   AND p.post_date IS NOT NULL
+                   AND p.post_date <= ?",
+                [$now]
+            );
+            $count += (int)$stmt->rowCount();
+
+            $stmt = $this->dbc->dbQuery(
+                "UPDATE tbl_posts
+                 SET post_status = 'publish'
+                 WHERE post_status = 'scheduled'
+                   AND (media_id = 0 OR media_id IS NULL)
+                   AND post_date IS NOT NULL
+                   AND post_date <= ?",
+                [$now]
+            );
+            $count += (int)$stmt->rowCount();
+
+            return $count;
+        });
+
+        if ($count > 0 && function_exists('page_cache_clear')) {
+            page_cache_clear();
+        }
+
+        return $count;
+    }
+
+    /**
+     * Get the earliest post_date among still-scheduled posts.
+     *
+     * @return string|null Next scheduled datetime ('Y-m-d H:i:s'), or null when none
+     */
+    public function nextScheduledPostDate(): ?string
+    {
+        $sql = "SELECT MIN(post_date) FROM tbl_posts WHERE post_status = 'scheduled' AND post_date IS NOT NULL";
+
+        $value = $this->dbc->dbQuery($sql)->fetchColumn();
+
+        return ($value === false || $value === null || $value === '') ? null : (string)$value;
     }
 
     /**
