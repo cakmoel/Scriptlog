@@ -230,6 +230,7 @@ if (!function_exists('load_core_utilities')) {
         'write-log.php',
         'write-nginx-config.php',
         'write-web-config.php',
+        'writing-settings.php',
         ];
 
         $utility_dir = __DIR__ . DIRECTORY_SEPARATOR . 'utility' . DIRECTORY_SEPARATOR;
