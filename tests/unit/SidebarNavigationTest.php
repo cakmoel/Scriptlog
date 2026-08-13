@@ -111,6 +111,7 @@ function admin_translate(string \$key, ?string \$locale = null): string {
         'nav.mail_settings' => 'Mail Settings',
         'nav.download_settings' => 'Download Settings',
         'nav.api' => 'API',
+        'nav.writing' => 'Writing',
         'nav.plugins' => 'Plugins',
         'nav.privacy' => 'Privacy',
         'nav.privacy_settings' => 'Privacy Settings',
@@ -248,6 +249,8 @@ class ActionConst {
     public const DOWNLOAD_CONFIG = "downloadConfig";
     public const DELETEDOWNLOAD = "deleteDownload";
     public const API_CONFIG = "apiConfig";
+    public const WRITING = "writing";
+    public const WRITING_CONFIG = "writingConfig";
 }
 
 \$_SESSION['admin_locale'] = '{$locale}';
@@ -468,6 +471,43 @@ PHP;
     {
         $html = $this->runSnippet($this->buildSnippet('dashboard', ['plugins' => false]));
         $this->assertStringNotContainsString('Plugins', $html);
+    }
+
+    // -----------------------------------------------------------------------
+    // Writing (scheduled posting) settings link
+    // -----------------------------------------------------------------------
+
+    /**
+     * The Writing link under Settings is gated by the WRITING permission.
+     */
+    public function testWritingLinkRendersWithPermission(): void
+    {
+        $html = $this->runSnippet($this->buildSnippet('option-writing', ['writing' => true]));
+        $this->assertStringContainsString('option-writing', $html);
+        $this->assertStringContainsString('writingConfig', $html);
+        $this->assertStringContainsString('Writing', $html);
+    }
+
+    /**
+     * Without the WRITING permission, the Writing link must not render.
+     */
+    public function testWritingLinkHiddenWithoutPermission(): void
+    {
+        $html = $this->runSnippet($this->buildSnippet('dashboard'));
+        $this->assertStringNotContainsString('option-writing', $html);
+        $this->assertStringNotContainsString('writingConfig', $html);
+    }
+
+    /**
+     * Module 'option-writing' must activate the Settings treeview.
+     */
+    public function testWritingModuleActivatesSettingsTreeview(): void
+    {
+        $html = $this->runSnippet($this->buildSnippet('option-writing', ['writing' => true]));
+        $this->assertMatchesRegularExpression(
+            '/class="treeview active"[^>]*>.*Settings/s',
+            $html
+        );
     }
 
     // -----------------------------------------------------------------------
