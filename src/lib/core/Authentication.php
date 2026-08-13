@@ -611,6 +611,7 @@ class Authentication
             case ActionConst::USERS:
             case ActionConst::IMPORT:
             case ActionConst::PRIVACY:
+            case ActionConst::WRITING:
                 return $this->requireLevel($level, ['administrator']);
             case ActionConst::PLUGINS:
             case ActionConst::THEMES:
