@@ -16,7 +16,17 @@
 function validate_date($date, $format = 'Y-m-d')
 {
 
-    $d = DateTime::createFromFormat($format, $date);
+    // Accept the requested format first, then fall back to the full
+    // datetime format so scheduled-posting date/time input validates too.
+    $formats = array_unique([$format, 'Y-m-d H:i:s']);
 
-    return $d && $d->format($format) === $date;
+    foreach ($formats as $candidate) {
+        $d = DateTime::createFromFormat($candidate, $date);
+
+        if ($d && $d->format($candidate) === $date) {
+            return true;
+        }
+    }
+
+    return false;
 }
