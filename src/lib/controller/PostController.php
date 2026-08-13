@@ -371,7 +371,9 @@ class PostController extends BaseApp
             $this->view->set('errors', $errors);
         }
 
-        $this->view->set('postStatus', post_status_dropdown());
+        $scheduledEnabled = ($user_level === 'administrator' && function_exists('scheduled_post_enabled') && scheduled_post_enabled());
+
+        $this->view->set('postStatus', post_status_dropdown('', $scheduledEnabled));
         $this->view->set('commentStatus', comment_status_dropdown());
         $this->view->set('postVisibility', post_visibility_dropdown());
         $this->view->set('postLocale', post_locale_dropdown());
@@ -406,7 +408,9 @@ class PostController extends BaseApp
             $this->view->set('postContent', $data_post['post_content']);
         }
 
-        $this->view->set('postStatus', post_status_dropdown($getPost['post_status']));
+        $scheduledEnabled = ($user_level === 'administrator' && function_exists('scheduled_post_enabled') && scheduled_post_enabled());
+
+        $this->view->set('postStatus', post_status_dropdown($getPost['post_status'], $scheduledEnabled));
         $this->view->set('commentStatus', comment_status_dropdown($getPost['comment_status']));
         $this->view->set('postVisibility', post_visibility_dropdown($getPost['post_visibility']));
         $this->view->set('postLocale', post_locale_dropdown($getPost['post_locale'] ?? 'en'));
