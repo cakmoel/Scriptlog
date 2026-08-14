@@ -20,7 +20,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
-            "bamarni/composer-bin-plugin": true
+            "bamarni/composer-bin-plugin": true,
+            "cweagans/composer-patches": true
         }
     },
     "require": {
@@ -32,6 +33,7 @@
         "ext-openssl": "*",
         "ext-gd": "*",
         "catfan/medoo": "^2.1",
+        "cweagans/composer-patches": "^1.7",
         "defuse/php-encryption": "^2.2",
         "egulias/email-validator": "^2.1",
         "filp/whoops": "^2.9",
@@ -65,13 +67,21 @@
         "classmap": ["src/lib/"],
         "psr-4": {
             "Scriptlog\\": "src/lib/"
-        }
+        },
+        "exclude-from-classmap": [
+            "src/lib/vendor/pdepend/pdepend/src/main/php/Lazy/PDepend/DependencyInjection/Configuration.weak.php"
+        ]
     },
     "extra": {
         "bamarni-bin": {
             "bin-links": true,
             "target-directory": "vendor-bin",
             "forward-command": true
+        },
+        "patches": {
+            "intervention/image": {
+                "Fix implicit nullable params + imagedestroy() deprecations (PHP 8.4/8.5)": "patches/intervention-image-php84.patch"
+            }
         }
     },
     "scripts": {
