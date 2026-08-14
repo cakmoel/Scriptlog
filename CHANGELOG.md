@@ -8,12 +8,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#170---2026-08-14)
+- [Latest Release](#171---2026-08-14)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.7.1] - 2026-08-14
+
+### Added
+- **`intervention-image-php84.patch`**: Patch file referenced by the composer `extra.patches` configuration was missing from the repository, breaking `composer install` on fresh checkouts (fatal error during patch application). The patch applies the PHP 8.4/8.5 deprecation fixes to `intervention/image` on install
+
+### Fixed
+- **intervention/image PHP 8.4/8.5 deprecations** actually applied:
+  - `strtolower()` called with `null` for unset font `align`/`valign` (deprecated in PHP 8.5)
+  - implicit float-to-int conversion in `BrightnessCommand::execute()` (`imagefilter()` brightness level)
+- **`composer install` on fresh checkouts** now succeeds — the referenced patch file is versioned, restoring the CI pipeline (was failing on the v1.7.0 commit)
+
+### Changed
+- `APP_VERSION` bumped to **1.7.1**; developer/database schema guide version stamps updated accordingly
+
+### Removed
+- None
+
+### Deprecated
+- None
+
+### Notes
+Patch release. v1.7.0's scheduled-posting feature set was correct, but its composer patch file was never committed, so `composer install` failed on the v1.7.0 tag and in CI. This release adds the missing patch and bumps the version — v1.7.0 remains immutable as published.
+
+### Codename
+**Maleo Senkawor** (retained) – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.7.0
+- **Changes since v1.7.0**: 1 commit
+
+---
 
 ## [1.7.0] - 2026-08-14
 
@@ -821,6 +853,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.7.1 | 2026-08-14 | Stable |
 | 1.7.0 | 2026-08-14 | Stable |
 | 1.6.1 | 2026-08-12 | Stable |
 | 1.6.0 | 2026-08-11 | Stable |
