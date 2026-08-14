@@ -8,12 +8,58 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#161---2026-08-12)
+- [Latest Release](#170---2026-08-14)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.7.0] - 2026-08-14
+
+### Added
+- **Scheduled posting**: Write posts now, publish later. Posts can be saved with a future date and are promoted to `publish` automatically the moment their scheduled time arrives (on every request)
+- **`ScheduledPostService`**: Dedicated service orchestrating scheduled publishing, backed by new promotion methods in `PostDao` (composite index on `post_status` + `post_date`)
+- **Auto-scheduling**: Posts whose `post_date` is in the future are stored as `scheduled` automatically and flipped to `publish` when due
+- **Scheduled status in admin**: New `Scheduled` option and status label in the post status dropdowns, plus a status badge in the admin post list
+- **Writing settings page**: New `option-writing.php` admin page with a scheduled-posting enable toggle, `scheduled_post_enabled` setting, `updateWritingSetting` controller action, and `WRITING`/`WRITING_CONFIG` permission constants (granted to administrators)
+- **Datetime/time picker**: Admin date fields now support full datetime (date + time) selection for scheduling
+- **Migration & seeding**: `migrate-scheduling.php` migration script; scheduled-posting setting and writing i18n seeded during installation
+- **Tests**: New suites covering `ScheduledPostService`, `PostApplicationService` auto-scheduling, `PostDao` scheduling, post validator scheduled status, and scheduled posting utilities
+
+### Changed
+- **Language admin translation keys** normalized to snake-case (`b9b4c4fe`, `f10deecb`) and writing translations added
+- **`ConfigurationDao`** now owns setting sanitization (delegated from the controller)
+- **`validate_date()`** accepts full datetime format for scheduled timestamps
+- **Dependencies**: `phpstan/phpstan` 2.2.7 → 2.2.8, `squizlabs/php_codesniffer` 3.13.5 → 4.0.4
+- **Composer**: `cweagans/composer-patches` added with an `intervention/image` PHP 8.4/8.5 compatibility patch; lock file resynchronized
+- **Docs**: Developer guide search flow diagram refined; example credentials removed
+
+### Fixed
+- **intervention/image PHP 8.4/8.5 deprecations**: Implicit nullable parameters and `imagedestroy()` calls patched via `cweagans/composer-patches`
+- **Utility loader generator** output aligned with the normalized format
+- **Admin language form** actions stacked correctly on small screens
+
+### Security
+- **`phpcsstandards/phpcsutils`** updated to 1.2.3 to address CVE-2026-65954 (arbitrary code execution in dev tooling)
+
+### Removed
+- None
+
+### Deprecated
+- None
+
+### Notes
+Feature release centred on the scheduled-posting workflow — write posts ahead of time and let Scriptlog publish them automatically. Includes the new Writing settings page, datetime/time picking, scheduled status badges, an i18n key cleanup, and PHP 8.4/8.5 compatibility fixes for image handling. 45 commits since v1.6.1.
+
+### Codename
+**Maleo Senkawor** (retained) – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.6.1
+- **Changes since v1.6.1**: 45 commits
+
+---
 
 ## [1.6.1] - 2026-08-12
 
@@ -775,6 +821,8 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.7.0 | 2026-08-14 | Stable |
+| 1.6.1 | 2026-08-12 | Stable |
 | 1.6.0 | 2026-08-11 | Stable |
 | 1.5.1 | 2026-07-10 | Stable |
 | 1.5.0 | 2026-07-09 | Stable |
