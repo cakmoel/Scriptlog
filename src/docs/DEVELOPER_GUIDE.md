@@ -4349,7 +4349,7 @@ make_date($timestamp);             // Format date for display (frontend only, e.
 | `laminas/laminas-escaper` | ^2.12 | HTML escaping | `lib/utility/escape-html.php` |
 | `laminas/laminas-crypt` | ^3.3 | Cryptography | `lib/core/ScriptlogCryptonize.php` |
 | `laminas/laminas-feed` | ^2.17 | RSS/Atom feeds | `lib/core/AtomWriter.php`, `lib/core/RSSWriter.php` |
-| `symfony/mailer` | ^6.4 | Email delivery | `lib/service/NotificationService.php` |
+| `symfony/mailer` | ^5.4 | Email delivery | `lib/service/NotificationService.php` |
 | `vlucas/phpdotenv` | ^5.6 | .env file loading | `install/include/setup.php` |
 | `catfan/medoo` | ^2.1 | Database ORM | `lib/core/MedooInit.php` |
 
