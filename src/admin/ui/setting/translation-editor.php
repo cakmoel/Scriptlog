@@ -397,7 +397,7 @@
                                                             </button>
                                                             <form method="post" action="index.php?load=translations&action=deleteTranslation&Id=<?= (int)$trans['ID']; ?>" style="display:inline;">
                                                                 <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? safe_html($csrfToken) : ''; ?>">
-                                                                <button type="submit" class="btn btn-xs btn-premium btn-premium-delete" onclick="return confirm('Are you sure you want to delete this translation?');">
+                                                                <button type="submit" class="btn btn-xs btn-premium btn-premium-delete" data-confirm="Are you sure you want to delete this translation?">
                                                                     <i class="fa fa-trash"></i> Delete
                                                                 </button>
                                                             </form>
