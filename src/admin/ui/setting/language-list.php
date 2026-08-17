@@ -87,7 +87,7 @@
                                                     <i class="fa fa-edit"></i> Edit
                                                 </a>
                                                 <?php if (!$lang['lang_is_default']) : ?>
-                                                    <a href="index.php?load=languages&action=<?= ActionConst::DELETELANGUAGE; ?>&Id=<?= (int)$lang['ID']; ?>" class="btn btn-xs btn-danger" onclick="return confirm('Are you sure you want to delete this language?');">
+                                                    <a href="index.php?load=languages&action=<?= ActionConst::DELETELANGUAGE; ?>&Id=<?= (int)$lang['ID']; ?>" class="btn btn-xs btn-danger" data-confirm="Are you sure you want to delete this language?">
                                                         <i class="fa fa-trash"></i> Delete
                                                     </a>
                                                 <?php endif; ?>
