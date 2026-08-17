@@ -55,8 +55,15 @@ class PostDropdownFunctionsTest extends TestCase
         $this->assertStringContainsString('value="public"', $html);
         $this->assertStringContainsString('value="private"', $html);
         $this->assertStringContainsString('value="protected"', $html);
-        $this->assertStringContainsString('checkVisibilitySelection()', $html);
         $this->assertStringContainsString('post_password', $html);
+    }
+
+    public function testPostVisibilityDropdownUsesDataAttributeInsteadOfOnchange(): void
+    {
+        $html = post_visibility_dropdown();
+
+        $this->assertStringContainsString('data-change="checkVisibilitySelection"', $html);
+        $this->assertStringNotContainsString('onchange=', $html);
     }
 
     public function testPostVisibilityDropdownMarksSelected(): void
