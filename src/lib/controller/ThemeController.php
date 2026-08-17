@@ -107,7 +107,7 @@ class ThemeController extends BaseApp
           'theme_title' => isset($_POST['theme_title']) ? Sanitize::severeSanitizer($_POST['theme_title']) : "",
           'theme_description' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
           'theme_designer' => isset($_POST['theme_designer']) ? Sanitize::severeSanitizer($_POST['theme_designer']) : "",
-          'theme_directory' => isset($_POST['theme_directory']) ? Sanitize::severeSanitizer($_POST['theme_directory']) : ""
+          'theme_directory' => isset($_POST['theme_directory']) ? basename(Sanitize::severeSanitizer($_POST['theme_directory'])) : ""
         ];
 
         try {
@@ -334,7 +334,7 @@ class ThemeController extends BaseApp
         $filters = ['theme_title' => isset($_POST['theme_title']) ? Sanitize::severeSanitizer($_POST['theme_title']) : "",
                     'theme_description' => FILTER_SANITIZE_SPECIAL_CHARS,
                     'theme_designer' => isset($_POST['theme_designer']) ? Sanitize::severeSanitizer($_POST['theme_designer']) : "",
-                    'theme_directory' => isset($_POST['theme_directory']) ? Sanitize::severeSanitizer($_POST['theme_directory']) : "",
+                    'theme_directory' => isset($_POST['theme_directory']) ? basename(Sanitize::severeSanitizer($_POST['theme_directory'])) : "",
                     'theme_id' => FILTER_SANITIZE_NUMBER_INT];
         try {
             if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
