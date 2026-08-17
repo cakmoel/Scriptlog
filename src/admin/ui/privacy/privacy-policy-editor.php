@@ -212,14 +212,14 @@
                                                     <?php if (!isset($policy['is_default']) || $policy['is_default'] != 1) : ?>
                                                     <form method="post" action="index.php?load=privacy-policy&action=setDefault&Id=<?= (int)$policy['ID']; ?>" style="display: inline;">
                                                         <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
-                                                        <button type="submit" class="btn btn-xs btn-success" onclick="return confirm('Set this as the default privacy policy?');">
+                                                        <button type="submit" class="btn btn-xs btn-success" data-confirm="Set this as the default privacy policy?">
                                                             <i class="fa fa-check"></i> Set Default
                                                         </button>
                                                     </form>
                                                     <?php endif; ?>
                                                     <form method="post" action="index.php?load=privacy-policy&action=delete-policy&Id=<?= (int)$policy['ID']; ?>" style="display: inline;">
                                                         <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
-                                                        <button type="submit" class="btn btn-xs btn-danger" onclick="return confirm('Are you sure you want to delete this policy?');">
+                                                        <button type="submit" class="btn btn-xs btn-danger" data-confirm="Are you sure you want to delete this policy?">
                                                             <i class="fa fa-trash"></i> Delete
                                                         </button>
                                                     </form>
