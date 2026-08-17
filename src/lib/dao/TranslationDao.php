@@ -16,7 +16,7 @@ class TranslationDao extends Dao
             'translation_value' => $data['translation_value'],
             'translation_context' => $data['translation_context'] ?? null,
             'translation_plurals' => $data['translation_plurals'] ?? null,
-            'is_html' => $data['is_html'] ?? 0,
+            'is_html' => (int) ($data['is_html'] ?? 0),
         ]);
 
         return $this->lastId();
