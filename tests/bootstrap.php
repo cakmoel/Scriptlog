@@ -14,18 +14,20 @@ if (!defined('HTMLPURIFIER_PREFIX')) {
 
 date_default_timezone_set('UTC');
 
-require_once __DIR__ . '/../src/lib/vendor/autoload.php';
-
-// Register lazy PSR-4 backward-compatibility aliases BEFORE loading utilities
-// so class_exists('Dao'), class_exists('Sanitize'), etc. resolve via alias autoloader.
+// Register lazy backward-compatibility aliases BEFORE Composer autoloader
+// so that class_exists('Registry'), class_exists('ApiHateoas'), etc. resolve
+// via class_alias() instead of Composer re-including already-loaded files
+// (Composer uses plain include, not include_once, causing redeclaration fatals).
 if (file_exists(__DIR__ . '/../src/lib/autoload-aliases-map.php')) {
     $scriptlogAliasMap = require __DIR__ . '/../src/lib/autoload-aliases-map.php';
     spl_autoload_register(function ($className) use ($scriptlogAliasMap) {
         if (isset($scriptlogAliasMap[$className])) {
             class_alias($scriptlogAliasMap[$className], $className);
         }
-    });
+    }, true, true);
 }
+
+require_once __DIR__ . '/../src/lib/vendor/autoload.php';
 
 require_once __DIR__ . '/../src/lib/common.php';
 
@@ -63,7 +65,6 @@ if (class_exists('\\Scriptlog\\Core\\Registry')) {
 }
 
 require_once __DIR__ . '/../src/lib/utility/rate-limiter.php';
-require_once __DIR__ . '/../src/lib/core/ApiHateoas.php';
 
 // Setup autoloader for legacy non-namespaced utility files
 if (file_exists(__DIR__ . '/../src/lib/Autoloader.php')) {
