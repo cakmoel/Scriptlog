@@ -18,7 +18,7 @@ require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'dbtable.php';
 function current_url() // returning current url
 {
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== "off") ? "https" : "http";
-    $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
+    $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '');
 
     $phpSelf = $_SERVER['PHP_SELF'];
 
