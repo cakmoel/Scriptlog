@@ -31,7 +31,8 @@ function medoo_init()
       'password' => isset($read_config['db']['pass']) ? $read_config['db']['pass'] : "",
       'charset'  => 'utf8mb4',
       'collation' => 'utf8mb4_general_ci',
-      'port'     => isset($read_config['db']['port']) ? $read_config['db']['port'] : ""
+      'port'     => isset($read_config['db']['port']) ? $read_config['db']['port'] : "",
+      'prefix'   => isset($read_config['db']['prefix']) ? $read_config['db']['prefix'] : ""
     ];
 
     return (class_exists('MedooInit')) ? MedooInit::connect($configuration) : "";

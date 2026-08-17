@@ -164,6 +164,7 @@ class TranslationService
                     'translation_value' => $value,
                 ]);
 
+                $imported++;
                 continue;
             }
 
@@ -226,7 +227,7 @@ class TranslationService
             throw new ServiceException("Invalid translation key format");
         }
 
-        if (!isset($data['translation_value'])) {
+        if (!isset($data['translation_value']) || trim((string) $data['translation_value']) === '') {
             throw new ServiceException("Translation value is required");
         }
     }

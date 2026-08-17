@@ -403,9 +403,9 @@ class PostController extends BaseApp
 
         if ($data_post['post_visibility'] == 'protected') {
             $decrypted = decrypt_post_admin($getPost['ID']);
-            $this->view->set('postContent', $decrypted['post_content']);
+            $this->view->set('postContent', sanitize_post_content($decrypted['post_content']));
         } else {
-            $this->view->set('postContent', $data_post['post_content']);
+            $this->view->set('postContent', sanitize_post_content($data_post['post_content']));
         }
 
         $scheduledEnabled = ($user_level === 'administrator' && function_exists('scheduled_post_enabled') && scheduled_post_enabled());

@@ -34,17 +34,6 @@ class ProtectedPostService
     private $decryptPost;
 
     /**
-     * htmLawed attribute blacklist applied to post content.
-     *
-     * @var array
-     */
-    private $denyAttributes = [
-        'style', 'onclick', 'onerror', 'onload', 'onmouseover',
-        'onfocus', 'onblur', 'onchange', 'onsubmit', 'onkeydown',
-        'onkeyup', 'onkeypress'
-    ];
-
-    /**
      * Constructor.
      *
      * @param callable|null $decryptPost Callable (int $id, string $password) => array
@@ -117,19 +106,6 @@ class ProtectedPostService
      */
     public function sanitizeContent(string $content): string
     {
-        $decoded = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
-        $decoded = html_entity_decode($decoded, ENT_QUOTES, 'UTF-8');
-
-        $clean = preg_replace('/\s*style="[^"]*"/', '', $decoded) ?? '';
-        $clean = preg_replace('/\s*style=[^>\s]*/', '', $clean) ?? '';
-
-        if (function_exists('htmLawed')) {
-            return htmLawed($clean, array(
-                'deny_attribute' => implode(',', $this->denyAttributes),
-                'keep_bad' => 0
-            ));
-        }
-
-        return $clean;
+        return sanitize_post_content($content);
     }
 }

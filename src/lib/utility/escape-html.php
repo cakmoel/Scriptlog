@@ -28,6 +28,10 @@
 function escape_html($input, $type = 'html', $encoding = 'utf-8', $mode = 'base')
 {
 
+    if ($input === null) {
+        return '';
+    }
+
     $escaper = new Laminas\Escaper\Escaper($encoding);
 
     switch ($mode) {

@@ -227,22 +227,20 @@ class ApiRouter
             $controllerName = $controllerName;
         }
 
-        // Check if controller file exists
+        // Check if controller file exists; when absent, rely on the PSR-4
+        // autoloader / legacy alias map (e.g. the base ApiController that
+        // backs the API info route) instead of failing hard.
         $controllerFile = __DIR__ . '/../controller/api/' . $controllerName . '.php';
 
-        if (!file_exists($controllerFile)) {
-            ApiResponse::notFound('Controller not found: ' . $controllerName);
-            return;
+        if (file_exists($controllerFile)) {
+            require_once $controllerFile;
         }
-
-        // Include controller file
-        require_once $controllerFile;
 
         // Check if controller class exists
         $fullControllerName = $controllerName;
 
         if (!class_exists($fullControllerName)) {
-            ApiResponse::notFound('Controller class not found: ' . $fullControllerName);
+            ApiResponse::notFound('Controller not found: ' . $controllerName);
             return;
         }
 

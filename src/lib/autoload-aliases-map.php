@@ -11,7 +11,7 @@ return [
     'ActionConst' => 'Scriptlog\Core\ActionConst',
     'ApiAuth' => 'Scriptlog\Core\ApiAuth',
 'RateLimiter' => 'Scriptlog\Core\RateLimiter',
-    'ApiController' => 'Scriptlog\Controller\ApiController',
+    'ApiController' => 'Scriptlog\Controller\Api\ApiController',
     'ApiHelper' => 'Scriptlog\Core\ApiHelper',
     'ApiHateoas' => 'Scriptlog\Core\ApiHateoas',
     'ApiResponse' => 'Scriptlog\Core\ApiResponse',

@@ -165,7 +165,15 @@ MSG;
     private static function writeMessageToFile($data, $logPath)
     {
 
-        $fh = fopen($logPath, 'a+');
+        if ($logPath === null || $logPath === '') {
+            return false;
+        }
+
+        $fh = @fopen($logPath, 'a+');
+
+        if ($fh === false) {
+            return false;
+        }
 
         if (is_array($data)) {
             $data = print_r($data, 1);

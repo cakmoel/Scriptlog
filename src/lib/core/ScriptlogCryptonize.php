@@ -264,7 +264,13 @@ class ScriptlogCryptonize
         $keyFile = self::getDefuseKeyPath();
 
         if (file_exists($keyFile)) {
-            chmod($keyFile, 0644);
+            // Only chmod when the mode actually differs. Skipping the no-op
+            // avoids a spurious EPERM warning when a maintenance script runs
+            // under a different user than the one that created the key.
+            $currentMode = @fileperms($keyFile);
+            if ($currentMode !== false && ($currentMode & 0777) !== 0644) {
+                chmod($keyFile, 0644);
+            }
 
             if (strpos($keyFile, '.php') !== false) {
                 try {

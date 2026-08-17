@@ -391,7 +391,7 @@ class Util
             self::$hasArray = true;
             $uuid = 'include-php-' . uniqid() . mt_rand(1, 1000000);
 
-            $html .= (!empty($var) ? ' <img id="' . $uuid . '" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D" onclick="javascript:colToggle(this.id);" /><script>setImg("' . $uuid . '",' . $setImg . ',1);</script>' : '') . '<span style="color:#588bff;">array</span>(' . count($var) . ')';
+            $html .= (!empty($var) ? ' <img id="' . $uuid . '" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D" data-coltoggle /><script>setImg("' . $uuid . '",' . $setImg . ',1);</script>' : '') . '<span style="color:#588bff;">array</span>(' . count($var) . ')';
             if (!empty($var)) {
                 $html .= ' <span id="' . $uuid . '-collapsable" style="' . $setStyle . '"><br />[<br />';
 
@@ -443,7 +443,7 @@ class Util
             self::$hasArray = true;
             $uuid = 'include-php-' . uniqid() . mt_rand(1, 1000000);
 
-            $html .= ' <img id="' . $uuid . '" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D" onclick="javascript:colToggle(this.id);" /><script>setImg("' . $uuid . '",' . $setImg . ',1);</script><span style="color:#588bff;">object</span>(' . get_class($var) . ') <span id="' . $uuid . '-collapsable" style="' . $setStyle . '"><br />[<br />';
+            $html .= ' <img id="' . $uuid . '" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D" data-coltoggle /><script>setImg("' . $uuid . '",' . $setImg . ',1);</script><span style="color:#588bff;">object</span>(' . get_class($var) . ') <span id="' . $uuid . '-collapsable" style="' . $setStyle . '"><br />[<br />';
 
             $varArray = (array) $var;
 

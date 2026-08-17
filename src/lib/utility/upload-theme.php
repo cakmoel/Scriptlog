@@ -55,28 +55,30 @@ function upload_theme($file_name, $file_location, $blacklist)
 
     // Continue with blacklist for additional safety (defense in depth)
     foreach ($blacklist as $item) {
-        if (preg_match("/$item\$/i", $file_name)) {
+        if (preg_match("/" . preg_quote($item, '/') . "$/i", $file_name)) {
             scriptlog_error("Forbidden File Format");
         }
     }
 
     if (move_uploaded_file($file_location, $pathFile)) {
-        $zip = new ZipArchive();
-        $x = $zip->open($pathFile);
-
-        if ($x === true) {
-            $zip->extractTo(APP_ROOT . 'public/themes/');
-            $zip->close();
-
-            // Fix theme.ini permissions after extraction if exists
-            $theme_dir = APP_ROOT . 'public/themes/' . $file_basename;
-            $ini_file = $theme_dir . '/theme.ini';
-            if (file_exists($ini_file)) {
-                chmod($ini_file, 0644);
+        try {
+            safe_zip_extract($pathFile, APP_ROOT . 'public/themes/');
+        } catch (InvalidArgumentException $e) {
+            @unlink($pathFile);
+            if (is_dir(APP_ROOT . 'public/themes/' . $file_basename)) {
+                remove_dir_recursive(APP_ROOT . 'public/themes/' . $file_basename);
             }
-
-            unlink($pathFile);
+            throw $e;
         }
+
+        // Fix theme.ini permissions after extraction if exists
+        $theme_dir = APP_ROOT . 'public/themes/' . $file_basename;
+        $ini_file = $theme_dir . '/theme.ini';
+        if (file_exists($ini_file)) {
+            chmod($ini_file, 0644);
+        }
+
+        unlink($pathFile);
 
         return true;
     } else {

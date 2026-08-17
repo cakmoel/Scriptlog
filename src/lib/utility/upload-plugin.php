@@ -77,76 +77,18 @@ function upload_plugin($file_location, $file_name)
 function open_plugin_uploaded($zip_path_uploaded, $plugin_path)
 {
 
-    $file_count = 0;
-    $total_size = 0;
-    $zip = new ZipArchive();
+    // Defense-in-depth: skip entries matching the legacy dangerous-filename
+    // blacklist. The real control is the canonical path validation performed by
+    // safe_zip_extract(), which also closes the Windows-style "..\" gap.
+    $blacklist = [
+        '/(.*)(phpinfo|system|php_uname|chmod|fopen|eval|flclose|readfile|base64_decode|passthru)(.*)/Us'
+    ];
 
-    if ($zip->open($zip_path_uploaded) === true) {
-        $file_count = (version_compare(phpversion(), "7.4.30", ">=")) ? $zip->count() : $zip->numFiles;
+    $result = safe_zip_extract($zip_path_uploaded, $plugin_path, $blacklist);
 
-        for ($i = 0; $i < $file_count; $i++) {
-            $file_index = $zip->getNameIndex($i);
-            $stats = $zip->statIndex($i);
-
-            // Preventing zip slip path traversal
-            if (strpos($file_index, '../') !== false || substr($file_index, 0, 1) === '/') {
-                throw new InvalidArgumentException();
-            }
-
-            if (substr($file_index, -1) !== '/') {
-                $file_count++;
-                if ($file_count > MAX_FILES) {
-                    throw new InvalidArgumentException();
-                }
-
-                $fp = $zip->getStream($file_index);
-                $current_size = 0;
-                while (!feof($fp)) {
-                    $current_size += READ_LENGTH;
-                    $total_size += READ_LENGTH;
-
-                    if ($total_size > MAX_SIZE) {
-                        throw new InvalidArgumentException();
-                    }
-
-                    // Additional protection: checking compression ration
-                    if ($stats['comp_size'] > 0) {
-                        $ratio = $current_size / $stats['com_size'];
-                        if ($ratio > MAX_RATIO) {
-                            throw new InvalidArgumentException();
-                        }
-                    }
-
-                    $extractPath = $plugin_path . DIRECTORY_SEPARATOR . $file_index;
-                    $extractDir = dirname($extractPath);
-
-                    if (!is_dir($extractDir)) {
-                        mkdir($extractDir, 0755, true);
-                    }
-
-                    file_put_contents($extractPath, fread($fp, READ_LENGTH), FILE_APPEND);
-                }
-
-                fclose($fp);
-            } else {
-                mkdir($plugin_path . DIRECTORY_SEPARATOR . $file_index, 0755, true);
-            }
-
-            preg_match('/(.*)(phpinfo|system|php_uname|chmod|fopen|eval|flclose|readfile|base64_decode|passthru)(.*)/Us', $file_index, $matches);
-
-            if (count($matches) > 0) {
-                $zip->deleteName($file_index);
-            }
-        }
-
-        $zip->extractTo($plugin_path);
-
-        $zip->close();
-
-        unlink($zip_path_uploaded);
-
-        return true;
-    } else {
-        return false;
+    if ($result === true) {
+        @unlink($zip_path_uploaded);
     }
+
+    return $result;
 }
