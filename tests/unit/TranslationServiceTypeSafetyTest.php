@@ -34,20 +34,19 @@ class TranslationServiceTypeSafetyTest extends TestCase
         $this->assertStringNotContainsString("'is_html' => (int)(\$data['is_html'] ?? \$translation['is_html']),", $this->source);
     }
 
-    public function testValidateTranslationDataAcceptsEmptyStringValue(): void
+    public function testValidateTranslationDataRejectsEmptyStringValue(): void
     {
-        $this->assertStringContainsString("if (!isset(\$data['translation_value'])) {", $this->source);
-        $this->assertStringNotContainsString("\$data['translation_value'] === ''", $this->source);
+        $this->assertStringContainsString("if (!isset(\$data['translation_value']) || trim((string) \$data['translation_value']) === '') {", $this->source);
     }
 
-    public function testImportFromArrayCountsOnlyCreatedEntries(): void
+    public function testImportFromArrayCountsCreatedAndUpdatedEntries(): void
     {
         $this->assertStringContainsString(
             "'translation_value' => \$value," . "\n" .
-            "                ]);" . "\n\n" .
-            "                continue;",
+            "                ]);",
             $this->source
         );
         $this->assertStringContainsString("            \$imported++;", $this->source);
+        $this->assertStringContainsString("                continue;", $this->source);
     }
 }
