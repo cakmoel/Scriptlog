@@ -33,6 +33,24 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 final class Tokenizer
 {
     /**
+     * getSelectorKey
+     *
+     * Derives a stable 32-byte key for selector encryption from the
+     * application key (SHA-256 output is always 32 bytes and deterministic).
+     *
+     * @method public getSelectorKey()
+     * @static
+     * @return string 32 raw bytes
+     *
+     * @psalm-suppress PossiblyUnusedMethod — consumed by TokenizerTest and
+     *            future callers; kept public like the rest of the class.
+     */
+    public static function getSelectorKey(): string
+    {
+        return (string) hash('sha256', app_key(), true);
+    }
+
+    /**
      * Create token
      *
      * @method public createToken()
