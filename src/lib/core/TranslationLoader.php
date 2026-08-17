@@ -110,7 +110,18 @@ class TranslationLoader
     {
         $cacheFile = $this->getCacheFilePath($locale);
 
-        file_put_contents($cacheFile, json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        $cacheDir = dirname($cacheFile);
+        if (!is_dir($cacheDir)) {
+            if (!@mkdir($cacheDir, 0755, true) && !is_dir($cacheDir)) {
+                return;
+            }
+        }
+
+        if (!is_writable($cacheDir)) {
+            return;
+        }
+
+        @file_put_contents($cacheFile, json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     }
 
     private function loadFromDatabase(string $locale): array

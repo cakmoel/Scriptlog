@@ -60,7 +60,7 @@ class CSRFGuard
                 $_SESSION['csrf_' . $key] = null;
             }
 
-            if (self::$checkOrigin && sha1($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']) !== substr(base64_decode($hash), 10, 40)) {
+            if (self::$checkOrigin && !hash_equals(substr((string)base64_decode($hash), 10, 40), sha1($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']))) {
                 if ($throwException) {
                     if (version_compare(phpversion(), '7.4.33', '<=')) {
                         http_response_code(400);
@@ -72,7 +72,7 @@ class CSRFGuard
                 return false;
             }
 
-            if ($origin[$key] !== $hash) {
+            if (!hash_equals((string)$hash, (string)$origin[$key])) {
                 if ($throwException) {
                     if (version_compare(phpversion(), '7.4.33', '<=')) {
                         http_response_code(400);
@@ -149,6 +149,6 @@ class CSRFGuard
      */
     private static function randomString($length)
     {
-        return ircmaxell_random_generator($length);
+        return bin2hex(random_bytes((int)ceil($length / 2)));
     }
 }

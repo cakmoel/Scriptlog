@@ -113,7 +113,7 @@
                             <button type="button" 
                                     class="btn btn-xs btn-default" 
                                     title="Copy Download Page Link"
-                                    onclick="copyToClipboard('page-link-<?= $download['media_identifier']; ?>', 'Download page link copied!')">
+                                    data-copy data-copy-target="page-link-<?= $download['media_identifier']; ?>" data-copy-msg="Download page link copied!">
                                 <i class="fa fa-copy"></i>
                             </button>
                         </div>
@@ -128,7 +128,7 @@
                             <button type="button" 
                                     class="btn btn-xs btn-primary" 
                                     title="Copy Direct File Link"
-                                    onclick="copyToClipboard('file-link-<?= $download['media_identifier']; ?>', 'Direct file link copied!')">
+                                    data-copy data-copy-target="file-link-<?= $download['media_identifier']; ?>" data-copy-msg="Direct file link copied!">
                                 <i class="fa fa-download"></i>
                             </button>
                         </div>

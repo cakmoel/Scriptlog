@@ -86,6 +86,15 @@ if ($all_tables_exist) {
 // Tables are incomplete — show the admin account creation form
 $install_path = preg_replace("/\/install\.php.*$/i", "", current_url());
 
+// Session-backed CSRF token protecting the admin-account creation POST.
+// Without it, an unauthenticated request could create an admin account while
+// the site sits in the broken-install state (config.php exists, tables missing).
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$install_csrf = isset($_SESSION['install_csrf']) ? $_SESSION['install_csrf'] : bin2hex(random_bytes(32));
+$_SESSION['install_csrf'] = $install_csrf;
+
 install_header($install_path);
 
     $setup = isset($_POST['setup']) ? stripcslashes($_POST['setup']) : '';
@@ -93,6 +102,10 @@ install_header($install_path);
     $completed = false;
 
 if ($setup === 'install') {
+    if (!isset($_POST['csrf_token']) || !hash_equals($install_csrf, (string)$_POST['csrf_token'])) {
+        $errors['errorInstall'] = 'Invalid or missing security token. Please reload the page and try again.';
+    }
+
     $username = isset($_POST['user_login']) ? remove_bad_characters($_POST['user_login'], $set_config['db']['host'], $set_config['db']['user'], $set_config['db']['pass'], $set_config['db']['name'], $set_config['db']['port']) : "";
     $password = isset($_POST['user_pass1']) ? escapeHTML($_POST['user_pass1']) : "";
     $confirm = isset($_POST['user_pass2']) ? escapeHTML($_POST['user_pass2']) : "";
@@ -292,6 +305,7 @@ if ($setup === 'install') {
 
                   <hr class="my-4">
                   <input type="hidden" name="setup" value="install">
+                  <input type="hidden" name="csrf_token" value="<?= $install_csrf; ?>">
                   <button class="btn btn-success btn-lg btn-block shadow-sm" type="submit">
                       <i class="fa fa-rocket mr-2"></i> Complete Installation
                   </button>

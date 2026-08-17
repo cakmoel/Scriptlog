@@ -12,6 +12,10 @@
 function remove_dir_recursive($dir)
 {
 
+    if (!is_dir($dir)) {
+        return;
+    }
+
     foreach (scandir($dir) as $file) {
         if ('.' === $file || '..' === $file) {
             continue;

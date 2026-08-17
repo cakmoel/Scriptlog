@@ -16,6 +16,13 @@
 function whoops_error()
 {
 
+    // Never install global error handlers under test mode: PHPUnit manages
+    // its own error-to-exception conversion and a persistent handler would
+    // leak into every subsequent test class.
+    if (defined('SCRIPTLOG_TEST_MODE') && SCRIPTLOG_TEST_MODE) {
+        return;
+    }
+
     if (APP_DEVELOPMENT === true) {
         $whoops = new \Whoops\Run();
 

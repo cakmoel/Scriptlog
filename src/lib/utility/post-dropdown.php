@@ -73,7 +73,7 @@ function post_visibility_dropdown($selected = null)
     $dropdown = '';
     $dropdown .= '<div class="form-group">';
     $dropdown .= '<label for="visibility">Post visibility</label>';
-    $dropdown .= '<select name="' . $name . '" class="form-control" onchange="checkVisibilitySelection();" id="visibility.system">' . PHP_EOL;
+    $dropdown .= '<select name="' . $name . '" class="form-control" data-change="checkVisibilitySelection" id="visibility.system">' . PHP_EOL;
 
     $visibility_list = ['public' => 'Public', 'private' => 'Private', 'protected' => 'Protected'];
 

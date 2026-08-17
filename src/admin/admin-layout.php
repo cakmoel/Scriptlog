@@ -311,6 +311,72 @@ function admin_footer($stylePath, $ubench = null)
     <input type="hidden" id="csrf-token" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
     <input type="hidden" id="post_id" value="<?= (isset($post_id)) ? $post_id : ""; ?>">
 
+    <script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
+    // Delegated bindings replacing the inline event-handler attributes that were
+    // removed when the enforced CSP began blocking inline handlers
+    // (script-src-attr 'none'). The old on*="..." attributes are expressed as
+    // data-* attributes; the listeners reproduce the exact same behaviour.
+    document.addEventListener('click', function(event) {
+        var target = event.target.closest('[data-confirm],[data-action],[data-copy],[data-coltoggle]');
+        if (!target) {
+            return;
+        }
+
+        if (target.hasAttribute('data-confirm')) {
+            if (!window.confirm(target.getAttribute('data-confirm'))) {
+                event.preventDefault();
+                return;
+            }
+        }
+
+        if (target.getAttribute('data-action') === 'history-back') {
+            event.preventDefault();
+            window.history.back();
+            return;
+        }
+
+        if (target.hasAttribute('data-copy')) {
+            event.preventDefault();
+            if (typeof window.copyToClipboard === 'function') {
+                window.copyToClipboard(
+                    target.getAttribute('data-copy-target'),
+                    target.getAttribute('data-copy-msg')
+                );
+            }
+            return;
+        }
+
+        if (target.hasAttribute('data-coltoggle')) {
+            event.preventDefault();
+            if (typeof window.colToggle === 'function') {
+                window.colToggle(target.id);
+            }
+        }
+    });
+
+    document.addEventListener('input', function(event) {
+        if (event.target.hasAttribute('data-abs')) {
+            event.target.value = Math.abs(event.target.value);
+        }
+    });
+
+    document.addEventListener('change', function(event) {
+        var handler = event.target.getAttribute('data-change');
+        if (handler && typeof window[handler] === 'function') {
+            window[handler]();
+        }
+    });
+
+    document.addEventListener('submit', function(event) {
+        var guard = event.target.getAttribute('data-submit-guard');
+        if (guard && typeof window[guard] === 'function') {
+            if (window[guard]() === false) {
+                event.preventDefault();
+            }
+        }
+    });
+    </script>
+
 </body>
 
 </html>

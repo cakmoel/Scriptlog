@@ -67,6 +67,7 @@ function content_security_policy($app_url)
     $csp = "Content-Security-Policy: " .
         "default-src 'self'; " .
         "script-src 'self' 'unsafe-inline' {$scheme}; " .
+        "script-src-attr 'none'; " .
         "style-src 'self' 'unsafe-inline' {$scheme}; " .
         "img-src 'self' data: {$scheme}; " .
         "font-src 'self' data: {$scheme}; " .

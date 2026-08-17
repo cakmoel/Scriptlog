@@ -61,7 +61,7 @@ $session_id = (isset($userData['user_session'])) ? safe_html($userData['user_ses
  <!-- .box-body-->
 <div class="box-footer">
 <input type="hidden" name="csrfToken" value="<?= (isset($csrfToken)) ? $csrfToken : ""; ?>">
-<button type="button" class="btn btn-default" onclick="history.back()">Cancel</button>
+<button type="button" class="btn btn-default" data-action="history-back">Cancel</button>
 <input type="submit" name="userFormSubmit" class="btn btn-danger pull-right" value="<?= (($user_id) && ($user_id != '')) ? "Delete" : " "; ?>">
 </div>
 

@@ -157,17 +157,16 @@ class RateLimiter
     /**
      * Generate a unique key for the current client
      *
+     * Always keys on the client IP address. Previously the bucket key was
+     * derived from the attacker-controlled X-API-Key header when present,
+     * which let a client pick a fresh bucket per request and bypass the
+     * rate limit entirely.
+     *
      * @return string
      */
     private function getClientKey()
     {
-        $apiKey = isset($_SERVER['HTTP_X_API_KEY']) ? $_SERVER['HTTP_X_API_KEY'] : '';
-        if (!empty($apiKey)) {
-            return 'apikey:' . $apiKey;
-        }
-
-        $ip = get_ip_address();
-        return 'ip:' . $ip;
+        return 'ip:' . get_ip_address();
     }
 
     /**
