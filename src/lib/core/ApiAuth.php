@@ -103,16 +103,18 @@ class ApiAuth
         try {
             $dbc = Registry::get('dbc');
 
-            // Look up user by API key hash in the dedicated table
-            $sql = "SELECT k.user_id, k.key_hash, k.is_revoked,
+            // Look up every non-revoked, unexpired key for the user. bcrypt
+            // hashes cannot be searched by value, so all active keys are
+            // fetched and each is verified with password_verify() until one
+            // matches. (Previously ORDER BY id DESC LIMIT 1 made every key
+            // except the newest unverifiable.)
+            $sql = "SELECT k.id, k.user_id, k.key_hash, k.is_revoked,
                            u.ID, u.user_login, u.user_email, u.user_level,
                            u.user_banned, u.user_locked_until
                     FROM tbl_api_keys k
                     INNER JOIN tbl_users u ON k.user_id = u.ID
                     WHERE k.is_revoked = 0
-                    AND (k.expires_at IS NULL OR k.expires_at > NOW())
-                    ORDER BY k.id DESC
-                    LIMIT 1";
+                    AND (k.expires_at IS NULL OR k.expires_at > NOW())";
 
             $stmt = $dbc->prepare($sql);
             $stmt->execute();
@@ -125,8 +127,8 @@ class ApiAuth
                 // Try password_verify() first (for hashed keys)
                 if (password_verify($apiKey, $row['key_hash'])) {
                     $isValid = true;
-                } elseif ($row['key_hash'] === $apiKey) {
-                    // Legacy fallback: direct comparison for plaintext keys
+                } elseif (hash_equals($row['key_hash'], $apiKey)) {
+                    // Legacy fallback: constant-time comparison for plaintext keys
                     $isValid = true;
                 }
 
@@ -216,21 +218,16 @@ class ApiAuth
     /**
      * Get API Key from request headers
      *
+     * Only the X-API-Key header is accepted. Query-string keys were removed:
+     * they leak into access logs and defeat the point of a secret header.
+     *
      * @return string|null
      */
     private static function getApiKey()
     {
-        // Check X-API-Key header
         $apiKey = $_SERVER['HTTP_X_API_KEY'] ?? null;
 
-        if ($apiKey) {
-            return $apiKey;
-        }
-
-        // Check query string (less secure but useful for testing)
-        $apiKey = $_GET['api_key'] ?? null;
-
-        return $apiKey;
+        return $apiKey ?: null;
     }
 
     /**
@@ -476,27 +473,19 @@ class ApiAuth
     /**
      * Get client IP address
      *
+     * Delegates to the application-wide get_ip_address() helper, which trusts
+     * only REMOTE_ADDR (or a Cloudflare CF-Connecting-IP header). Client-supplied
+     * forwarding headers (X-Forwarded-For etc.) are never trusted, so the
+     * login-attempt and rate-limit accounting cannot be bypassed by spoofing.
+     * Falls back to the "0.0.0.0" sentinel when no REMOTE_ADDR is present.
+     *
      * @return string
      */
     private static function getClientIp()
     {
-        $ipKeys = ['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED',
-                   'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED',
-                   'REMOTE_ADDR'];
+        $ip = get_ip_address();
 
-        foreach ($ipKeys as $key) {
-            if (isset($_SERVER[$key])) {
-                $ip = $_SERVER[$key];
-                if (strpos($ip, ',') !== false) {
-                    $ip = trim(explode(',', $ip)[0]);
-                }
-                if (filter_var($ip, FILTER_VALIDATE_IP)) {
-                    return $ip;
-                }
-            }
-        }
-
-        return '0.0.0.0';
+        return $ip !== '' ? $ip : '0.0.0.0';
     }
 
     /**
