@@ -55,7 +55,7 @@ endif;
 $action = isset($formAction) ? $formAction : null;
 ?>
 
-<form method="post" action="<?= generate_request('index.php', 'post', ['templates', $action, 0])['link'];?>" role="form" onsubmit="return(mandatoryThemeUpload());" enctype="multipart/form-data" autocomplete="off">
+<form method="post" action="<?= generate_request('index.php', 'post', ['templates', $action, 0])['link'];?>" role="form" data-submit-guard="mandatoryThemeUpload" enctype="multipart/form-data" autocomplete="off">
 <input type="hidden" name="MAX_FILE_SIZE" value="<?= scriptlog_upload_filesize(); ?>" >
 
 <div class="box-body">
