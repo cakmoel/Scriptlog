@@ -649,10 +649,12 @@ class Authentication
     protected function getUserAuthSession()
     {
         if (Session::getInstance()->scriptlog_session_ip !== $this->ip_address || Session::getInstance()->scriptlog_session_agent !== sha1($this->accept_charset . $this->accept_encoding . $this->accept_language . $this->agent)) {
-            session_unset();
-            session_destroy();
-            session_start();
-            session_regenerate_id(true);
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                session_unset();
+                session_destroy();
+                session_start();
+                session_regenerate_id(true);
+            }
 
             Session::getInstance()->scriptlog_session_agent = $this->agent;
             Session::getInstance()->scriptlog_session_ip = $this->ip_address;
