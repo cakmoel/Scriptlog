@@ -172,6 +172,26 @@ class SecureHttpHeadersTest extends TestCase
         $this->assertStringNotContainsString('*', $joined);
     }
 
+    public function testCspScriptSrcAttrNoneViaSubprocess(): void
+    {
+        $result = $this->runSubprocess(
+            'content_security_policy("http://example.com");',
+            false
+        );
+        $headers = json_decode($result, true);
+        $this->assertIsArray($headers);
+
+        $cspEnforced = '';
+        foreach ($headers as $h) {
+            if (strpos($h, 'Content-Security-Policy:') === 0) {
+                $cspEnforced = $h;
+                break;
+            }
+        }
+
+        $this->assertStringContainsString("script-src-attr 'none'", $cspEnforced);
+    }
+
     public function testFunctionExistence(): void
     {
         require_once __DIR__ . '/../../src/lib/utility/secure-http-headers.php';
