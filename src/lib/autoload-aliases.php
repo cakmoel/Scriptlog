@@ -10,7 +10,7 @@ class_alias('Scriptlog\Core\ActionConst', 'ActionConst');
 class_alias('Scriptlog\Core\RateLimiter', 'RateLimiter');
 class_alias('Scriptlog\Core\ApiAuth', 'ApiAuth');
 class_alias('Scriptlog\Core\ApiHelper', 'ApiHelper');
-class_alias('Scriptlog\Controller\ApiController', 'ApiController');
+class_alias('Scriptlog\Controller\Api\ApiController', 'ApiController');
 class_alias('Scriptlog\Core\ApiHateoas', 'ApiHateoas');
 class_alias('Scriptlog\Core\ApiResponse', 'ApiResponse');
 class_alias('Scriptlog\Core\ApiRouter', 'ApiRouter');
