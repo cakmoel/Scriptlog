@@ -202,23 +202,27 @@ function set_webp_origin($current_width, $current_height, $file_location, $file_
         return false;
     }
 
-    if (!move_uploaded_file($file_location, $origin_path_uploaded)) {
+    if (filesize($file_location) !== $file_size) {
         return false;
     }
 
-    if (filesize($origin_path_uploaded) !== $file_size) {
-        unlink($origin_path_uploaded);
-        return false;
-    }
+    // Re-encode the original through the image library instead of persisting
+    // the raw upload bytes. Re-encoding strips any appended polyglot payload so
+    // the origin copy stored under an image extension cannot carry embedded
+    // content (defense in depth against static-polyglot stored-XSS vectors).
+    $image = photo_instance()->make($file_location);
+    $image->save($origin_path_uploaded, 90);
 
     // get filename
     $file_basename = substr($file_name, 0, strripos($file_name, '.'));
 
-    $origin_webp = photo_instance()->make($origin_path_uploaded);
-    if ($origin_webp->save($origin_path . $file_basename . '.webp', 80, 'webp')) {
-        $origin_webp->destroy();
+    if ($image->save($origin_path . $file_basename . '.webp', 80, 'webp')) {
+        $image->destroy();
         return true;
     }
+
+    $image->destroy();
+    return false;
 }
 
 /**
