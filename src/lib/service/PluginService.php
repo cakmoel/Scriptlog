@@ -246,14 +246,13 @@ class PluginService
         }
 
         $plugin_dir = str_replace(' ', '', $data_plugin['plugin_directory']);
+        $plugin_dir = basename($plugin_dir);
 
         $plugin_link = $data_plugin['plugin_link'];
 
-        if ($plugin_link != '#') {
+        if ($plugin_link != '#' && $plugin_dir !== '' && $plugin_dir !== '.' && $plugin_dir !== '..') {
             if (is_readable(__DIR__ . '/../../' . APP_PLUGIN . $plugin_dir)) {
                 delete_directory(__DIR__ . '/../../' . APP_PLUGIN . $plugin_dir);
-
-                unlink(__DIR__ . '/../../' . APP_PLUGIN . basename($plugin_dir . 'php'));
             }
         }
 
