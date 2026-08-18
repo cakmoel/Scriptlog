@@ -51,7 +51,7 @@
 
 | Requirement | Version | Purpose |
 |-------------|---------|---------|
-| **PHP** | 7.4 – 8.5 | Server-side runtime |
+| **PHP** | 7.4 - 8.5 | Server-side runtime |
 | **MySQL/MariaDB** | 5.7+ | Database server |
 | **Apache/Nginx** | Latest | Web server |
 | **Composer** | Latest | Dependency management |
@@ -110,24 +110,20 @@ composer require cakmoel/scriptlog:dev-develop --prefer-stable
 # Then: composer require cakmoel/scriptlog
 
 # The package will be installed in vendor/ directory
-# Entry point is in src/ directory
+# Front controller is index.php at the project root
 ```
 
 ### Running the Application
 
 ```bash
-# From project root (recommended)
+# From project root
 cd /path/to/your-project
-php -S localhost:8080 -t src
-
-# Or from within src directory
-cd /path/to/your-project/src
 php -S localhost:8080
 ```
 
 Then access the application at: **http://localhost:8080**
 
-> **NOTE:** The `-t src` flag tells PHP's built-in server that the `src` directory is the document root. Without this flag, the server cannot locate `index.php` and will return a "Failed to open stream" error.
+> **NOTE:** The front controller is `index.php` at the project root, so run the built-in server from the project root (no `-t` flag needed). With the wrong document root the server cannot locate `index.php` and returns a "Failed to open stream" error.
 
 > **TIP:** On Linux/Mac, ensure the web server user has write permissions to `public/cache/` and `public/log/`
 
@@ -344,7 +340,7 @@ If the key ends up in the fallback location, you can manually move it to `storag
 | `.env` | Root | Environment variables (auto-generated) |
 | `defuse_key` | `/var/www/your-project/storage/keys/[random_filename].php` | Encryption key for authentication |
 
-> **Installation troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` — [Installation Issues](TROUBLESHOOTING.md#installation-issues) and [Database Issues](TROUBLESHOOTING.md#database-issues).
+> **Installation troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` - [Installation Issues](TROUBLESHOOTING.md#installation-issues) and [Database Issues](TROUBLESHOOTING.md#database-issues).
 
 ---
 
@@ -424,9 +420,9 @@ All project classes now use `Scriptlog\*` namespaces with backward-compatible `c
 | `lib/handler/` | `Scriptlog\Handler` | `Scriptlog\Handler\PostHandler` |
 
 **Backward Compatibility:**
-- `lib/autoload-aliases.php` — 223 `class_alias()` entries mapping old global names to new namespaced classes (kept as reference)
-- `lib/autoload-aliases-map.php` — Static array map (223 entries) used by the lazy autoloader (fast, no class loading)
-- `lib/main.php` and `tests/bootstrap.php` register a lazy `spl_autoload_register()` that creates aliases on demand — **only when old class names are actually used at runtime**
+- `lib/autoload-aliases.php` - 232 `class_alias()` entries mapping old global names to new namespaced classes (kept as reference)
+- `lib/autoload-aliases-map.php` - Static array map (232 entries) used by the lazy autoloader (fast, no class loading)
+- `lib/main.php` and `tests/bootstrap.php` register a lazy `spl_autoload_register()` that creates aliases on demand - **only when old class names are actually used at runtime**
 
 **Performance impact:** Lazy loading reduced autoload overhead from ~100ms to ~30ms and memory from 12MB to 6MB per request. See `benchmark/autoload_perf_bench.md`.
 
@@ -434,13 +430,13 @@ All project classes now use `Scriptlog\*` namespaces with backward-compatible `c
 
 #### What Problem Did This Script Solve?
 
-Before the migration, the 179 original project classes were in the **global namespace** — no `namespace` declarations at all. This meant any class could be referenced simply by its short name (e.g., `Bootstrap`, `PostDao`). While simple, this approach caused problems:
+Before the migration, the 179 original project classes were in the **global namespace** - no `namespace` declarations at all. This meant any class could be referenced simply by its short name (e.g., `Bootstrap`, `PostDao`). While simple, this approach caused problems:
 
 - **Collisions**: Two Composer packages could define the same class name
 - **No autoloading control**: Composer's PSR-4 autoloader couldn't map paths to classes without namespaces
 - **Hard to modernize**: Modern PHP frameworks and tools expect namespaced code
 
-This script performed the **one-time migration** to add `namespace Scriptlog\*` declarations to all 179 original class files, add cross-namespace `use` imports where needed, and generate backward-compatible `class_alias()` entries so existing code continued working. Since then the project has grown to 223 classes, each new one being added manually to both alias files (see the TIP below).
+This script performed the **one-time migration** to add `namespace Scriptlog\*` declarations to all 179 original class files, add cross-namespace `use` imports where needed, and generate backward-compatible `class_alias()` entries so existing code continued working. Since then the project has grown to 232 classes, each new one being added manually to both alias files (see the TIP below).
 
 #### How It Works (3-Step Algorithm)
 
@@ -448,14 +444,14 @@ This script performed the **one-time migration** to add `namespace Scriptlog\*` 
 |------|-------------|----------------|
 | **1: Build class map** | Scans all `lib/` subdirectories, finds every class/interface/trait, maps each short name to its target namespace | None (read-only) |
 | **2: Process each file** | For every PHP file: tokenizes it, preserves existing `use` statements, detects cross-namespace references (extends, implements, new, instanceof, catch, ::), injects `namespace` declaration + new `use` statements | All 179 class files in `lib/core/`, `lib/dao/`, `lib/service/`, `lib/controller/`, `lib/model/`, `lib/handler/` |
-| **3: Generate aliases** | Writes `lib/autoload-aliases.php` with `class_alias()` entries mapping old global names (e.g., `Bootstrap`) to new namespaced names (e.g., `Scriptlog\Core\Bootstrap`) | `lib/autoload-aliases.php` (created; now 223 entries) |
+| **3: Generate aliases** | Writes `lib/autoload-aliases.php` with `class_alias()` entries mapping old global names (e.g., `Bootstrap`) to new namespaced names (e.g., `Scriptlog\Core\Bootstrap`) | `lib/autoload-aliases.php` (created; now 232 entries) |
 
 #### What It Did NOT Do
 
-- It did **not** create `lib/autoload-aliases-map.php` — that file was hand-crafted later in commit `20c376a2` as part of a performance optimization
-- It did **not** update `lib/main.php` or `tests/bootstrap.php` — those were updated in a later commit to use the lazy autoloader
-- It did **not** update `composer.json` — the PSR-4 autoloading config was added in Phase 1
-- It did **not** delete any files — backup `.bak` files were cleaned up in a separate commit
+- It did **not** create `lib/autoload-aliases-map.php` - that file was hand-crafted later in commit `20c376a2` as part of a performance optimization
+- It did **not** update `lib/main.php` or `tests/bootstrap.php` - those were updated in a later commit to use the lazy autoloader
+- It did **not** update `composer.json` - the PSR-4 autoloading config was added in Phase 1
+- It did **not** delete any files - backup `.bak` files were cleaned up in a separate commit
 
 #### The Tokenizer Logic (For Advanced Readers)
 
@@ -486,11 +482,11 @@ Since the migration script was **deleted** after use, adding new classes today i
 
 | When you create a new class... | You must update |
 |------------------------------|----------------|
-| New file in `lib/core/`, `lib/dao/`, etc. | Add the class to its appropriate namespace — no alias needed (new code uses namespaces) |
+| New file in `lib/core/`, `lib/dao/`, etc. | Add the class to its appropriate namespace - no alias needed (new code uses namespaces) |
 | New **public API** class referencing old global names | Add `class_alias()` entry to `lib/autoload-aliases.php` |
 | New **public API** class referencing old global names | Add array entry to `lib/autoload-aliases-map.php` |
 
-**Example — adding a new class manually:**
+**Example - adding a new class manually:**
 
 ```php
 <?php
@@ -517,7 +513,7 @@ class_alias('Scriptlog\Service\NewsletterService', 'NewsletterService');
 
 #### Full Source Code (Archive Reference)
 
-The script below is the exact code committed in `99e7964c`. It is kept here for historical reference — **do not run it again** (it would add duplicate namespace declarations):
+The script below is the exact code committed in `99e7964c`. It is kept here for historical reference - **do not run it again** (it would add duplicate namespace declarations):
 
 ```php
 <?php
@@ -825,24 +821,38 @@ private function validateContentExists($routeKey, $requestPath)
 {
     switch ($routeKey) {
         case 'single':
-            $postId = isset($requestPath->id) ? $requestPath->id : null;
-            $postSlug = isset($requestPath->post) ? $requestPath->post : null;
-            
-            if (empty($postId) || empty($postSlug)) {
-                return false;
-            }
-            
-            $post = class_exists('FrontHelper') ? FrontHelper::grabPreparedFrontPostById($postId) : null;
-            
-            if (empty($post) || !is_array($post)) {
-                return false;
-            }
-            
-            // Validate slug matches - redirect to 404 if slug is incorrect
-            $dbSlug = isset($post['post_slug']) ? $post['post_slug'] : '';
-            return ($dbSlug === $postSlug);
+            return $this->validateSinglePost($requestPath);
+        case 'page':
+            return $this->validatePage($requestPath);
+        case 'category':
+            return $this->validateCategory($requestPath);
+        case 'archive':
+            return $this->validateArchive($requestPath);
+        case 'tag':
+            return $this->validateTag($requestPath);
         // ... other cases
     }
+}
+
+private function validateSinglePost($requestPath)
+{
+    $postId = isset($requestPath->id) ? $requestPath->id : null;
+    $postSlug = isset($requestPath->post) ? $requestPath->post : null;
+
+    if (empty($postId) || empty($postSlug)) {
+        return false;
+    }
+
+    $frontService = function_exists('front_service') ? front_service() : null;
+    $post = $frontService ? $frontService->getPublishedPost((int) $postId) : null;
+
+    if (empty($post) || !is_array($post)) {
+        return false;
+    }
+
+    // Validate slug matches - redirect to 404 if slug is incorrect
+    $dbSlug = isset($post['post_slug']) ? $post['post_slug'] : '';
+    return ($dbSlug === $postSlug);
 }
 ```
 
@@ -881,7 +891,7 @@ Tags are stored as comma-separated values in `tbl_posts.post_tags` column (e.g.,
 | **Route Pattern** | `/tag/(?'tag'[\w\- ]+)` - supports spaces and hyphens |
 | **URL Encoding** | Spaces encoded as `%20` (e.g., `/tag/lorem%20ipsum`) |
 | **URL Decoding** | `RequestPath` class decodes automatically for SEO-friendly; `HandleRequest::isQueryStringRequested()` decodes for query string |
-| **Validation** | Dispatcher uses `FrontHelper::simpleSearchingTag()` to verify posts exist |
+| **Validation** | Dispatcher uses `FrontService::searchTag()` (via `front_service()`) to verify posts exist |
 | **Search** | Uses LIKE query (`%tag%`) to match tags in comma-separated list |
 
 **SEO-Friendly URL (Enabled)**:
@@ -905,7 +915,7 @@ Tags are stored as comma-separated values in `tbl_posts.post_tags` column (e.g.,
 - `lib/core/Dispatcher.php` - Tag validation in `validateContentExists()`
 - `lib/core/RequestPath.php` - URL decoding for `%20` spaces
 - `lib/core/HandleRequest.php` - `isQueryStringRequested()` for query string URLs
-- `lib/core/FrontHelper.php` - `simpleSearchingTag()` method
+- `lib/service/FrontService.php` - `searchTag()` method (via `front_service()`)
 - `lib/utility/permalinks.php` - `is_permalink_enabled()` function
 - `lib/model/TagModel.php` - `getPostsPublishedByTag()` method
 - `public/themes/blog/tag.php` - Tag archive template
@@ -979,6 +989,9 @@ Scriptlog/
 |   |-- signup.php              # User registration
 |   |-- option-*.php            # Settings pages (general, permalink, mail, ...)
 |   |-- ui/                     # Admin UI components
+|   |-- plugins/                # Installed plugins (each in its own folder)
+|   |   |-- index.php           # Plugin listing entry
+|   |   +-- hello-world/        # Example plugin (plugin.ini + main class)
 |   |-- assets/                 # Admin assets
 |   +-- wysiwyg/                # Rich text editor
 |
@@ -991,10 +1004,10 @@ Scriptlog/
 |   |-- options.php            # PHP configuration
 |   |-- Autoloader.php         # Legacy class autoloader
 |   |-- utility-loader.php     # Utility functions loader
-|   |-- autoload-aliases.php   # 223 class_alias() entries (reference only)
-|   |-- autoload-aliases-map.php # Static alias map for lazy autoloader (223 entries)
+|   |-- autoload-aliases.php   # 232 class_alias() entries (reference only)
+|   |-- autoload-aliases-map.php # Static alias map for lazy autoloader (232 entries)
 |   |
-|   +-- core/                  # Core classes — Scriptlog\Core (103 files)
+|   +-- core/                  # Core classes - Scriptlog\Core (102 files)
 |       |-- Bootstrap.php      # Application initialization, routes
 |       |-- Dispatcher.php     # URL routing
 |       |-- DbFactory.php      # PDO database connection
@@ -1009,7 +1022,7 @@ Scriptlog/
 |       |-- SearchFinder.php   # FULLTEXT search engine
 |       +-- ...
 |
-|   +-- dao/                  # Data Access Objects — Scriptlog\Dao (19 files)
+|   +-- dao/                  # Data Access Objects - Scriptlog\Dao (19 files)
 |       |-- PostDao.php       # Posts CRUD
 |       |-- UserDao.php       # Users CRUD
 |       |-- CommentDao.php    # Comments CRUD
@@ -1021,7 +1034,7 @@ Scriptlog/
 |       |-- ThemeDao.php      # Themes CRUD
 |       +-- ConfigurationDao.php
 |
-|   +-- dto/                   # Data Transfer Objects — Scriptlog\Dto
+|   +-- dto/                   # Data Transfer Objects - Scriptlog\Dto
 |       |-- PostRequestDto.php
 |       |-- UploadedFileDto.php
 |       +-- api/               # API DTOs
@@ -1029,9 +1042,10 @@ Scriptlog/
 |           |-- CommentApiDto.php
 |           +-- TopicApiDto.php
 |
-|   +-- service/               # Business logic layer — Scriptlog\Service (21 files)
+|   +-- service/               # Business logic layer - Scriptlog\Service (23 files)
 |       |-- PostService.php
 |       |-- PostApplicationService.php
+|       |-- ProtectedPostService.php
 |       |-- UserService.php
 |       |-- CommentService.php
 |       |-- TopicService.php
@@ -1042,6 +1056,7 @@ Scriptlog/
 |       |-- ThemeService.php
 |       |-- ConfigurationService.php
 |       |-- ReplyService.php
+|       |-- ScheduledPostService.php
 |       |-- FrontService.php
 |       |-- ConsentService.php
 |       |-- DataRequestService.php
@@ -1052,9 +1067,11 @@ Scriptlog/
 |       |-- TranslationService.php
 |       +-- NotificationService.php
 |
-|   +-- handler/               # Request handlers — Scriptlog\Handler (13 files)
+|   +-- handler/               # Request handlers - Scriptlog\Handler (13 files)
 |       |-- HandlerRegistry.php       # Handler registration & lookup
 |       |-- FrontRequestHandler.php   # Frontend dispatch coordinator
+|       |-- AdminActionRegistry.php   # Admin action registration & lookup
+|       |-- AdminActionCommand.php    # Base class for admin action commands
 |       |-- PostHandler.php
 |       |-- PageHandler.php
 |       |-- CategoryHandler.php
@@ -1063,19 +1080,26 @@ Scriptlog/
 |       |-- PrivacyHandler.php
 |       |-- DownloadHandler.php
 |       |-- BlogHandler.php
-|       |-- HomeHandler.php
-|       +-- admin/              # Admin action handlers
-|           |-- AdminActionRegistry.php
-|           +-- AdminActionCommand.php
+|       +-- HomeHandler.php
 |
-|   +-- validator/              # Validators — Scriptlog\Validator (5 files)
+|       +-- admin/              # Admin action commands (35 *Cmd.php classes)
+|           |-- comment/        # DeleteCommentCmd, EditCommentCmd, ListCommentsCmd
+|           |-- media/          # DeleteMediaCmd, EditMediaCmd, ListMediaCmd, NewMediaCmd
+|           |-- page/           # DeletePageCmd, EditPageCmd, ListPagesCmd, NewPageCmd
+|           |-- plugin/         # ActivatePluginCmd, DeactivatePluginCmd, DeletePluginCmd, InstallPluginCmd, ListPluginsCmd
+|           |-- post/           # DeletePostCmd, EditPostCmd, ListPostsCmd, NewPostCmd
+|           |-- theme/          # ActivateThemeCmd, DeactivateThemeCmd, DeleteThemeCmd, EditThemeCmd, InstallThemeCmd, ListThemesCmd, NewThemeCmd
+|           |-- topic/          # DeleteTopicCmd, EditTopicCmd, ListTopicsCmd, NewTopicCmd
+|           +-- user/           # DeleteUserCmd, EditUserCmd, ListUsersCmd, NewUserCmd
+|
+|   +-- validator/              # Validators - Scriptlog\Validator (5 files)
 |       |-- PostValidator.php
 |       |-- FileUploadValidator.php
 |       |-- ProtectedPostValidator.php
 |       |-- CompositeValidator.php
 |       +-- ValidationResult.php
 |
-|   +-- controller/            # Request controllers — Scriptlog\Controller (20 files)
+|   +-- controller/            # Request controllers - Scriptlog\Controller (20 files)
 |       |-- PostController.php
 |       |-- UserController.php
 |       |-- CommentController.php
@@ -1097,7 +1121,8 @@ Scriptlog/
 |       |-- TranslationController.php
 |       |-- ApiController.php
 |       |
-|       +-- api/              # API Controllers — Scriptlog\Controller\Api (11 files)
+|       +-- api/              # API Controllers - Scriptlog\Controller\Api (12 files)
+|           |-- ApiController.php        # Public API info endpoint (GET /api/v1)
 |           |-- PostsApiController.php
 |           |-- CategoriesApiController.php
 |           |-- CommentsApiController.php
@@ -1110,7 +1135,7 @@ Scriptlog/
 |           |-- TranslationsApiController.php
 |           +-- QueryApiController.php
 |
-|   +-- model/                # Data models — Scriptlog\Model (9 files)
+|   +-- model/                # Data models - Scriptlog\Model (9 files)
 |       |-- PostModel.php
 |       |-- FrontContentModel.php
 |       |-- TopicModel.php
@@ -1121,7 +1146,7 @@ Scriptlog/
 |       |-- ArchivesModel.php
 |       +-- DownloadModel.php
 |
-|   +-- utility/              # Utility functions (218 files, dash-lowercase)
+|   +-- utility/              # Utility functions (224 files, dash-lowercase)
 |       |-- app-config.php
 |       |-- app-url.php
 |       |-- csrf-defender.php
@@ -1147,15 +1172,17 @@ Scriptlog/
 |   +-- cache/               # Cache directory
 |   +-- log/                 # Log directory
 |
-|-- dev-docs/                # Developer documentation
-|   |-- DEVELOPER_GUIDE.md
-|   |-- TESTING_GUIDE.md
-|   |-- THEME_DEVELOPER_GUIDE.md
-|   |-- PLUGIN_DEVELOPER_GUIDE.md
-|   |-- API_DOCUMENTATION.md
-|   |-- DATABASE_SCHEMA_GUIDE.md
-|   |-- API_OPENAPI.yaml
-|   +-- API_OPENAPI.json
+|-- docs/                      # Documentation
+|   |-- dev-docs/              # Developer documentation
+|   |   |-- DEVELOPER_GUIDE.md
+|   |   |-- TESTING_GUIDE.md
+|   |   |-- THEME_DEVELOPER_GUIDE.md
+|   |   |-- PLUGIN_DEVELOPER_GUIDE.md
+|   |   |-- API_DOCUMENTATION.md
+|   |   |-- DATABASE_SCHEMA_GUIDE.md
+|   |   |-- API_OPENAPI.yaml
+|   |   +-- API_OPENAPI.json
+|   +-- user-docs/             # End-user documentation
 |
 |-- tests/                   # PHPUnit test suites
 |
@@ -1184,11 +1211,12 @@ Initializes the application and sets up the service container.
 
 ```php
 // Initialize the application
-$vars = Bootstrap::initialize(APP_ROOT);
+$app = Bootstrap::initialize(APP_ROOT);
 
-// Returns array with:
+// Returns an AppContext object exposing services via magic getters:
 // - Database credentials
 // - Services (authenticator, sessionMaker, userDao, etc.)
+// Usage: $app->postDao, $app->configDao, $app->sanitizer, ...
 ```
 
 ### Dispatcher (`lib/core/Dispatcher.php`)
@@ -1235,7 +1263,7 @@ $rules = [
 The Dispatcher validates content exists in the database before rendering templates to ensure proper 404 handling:
 
 - Uses named parameters from route patterns (`id`, `page`, `category`)
-- Checks database via FrontHelper methods
+- Checks the database via `FrontService` (through the `front_service()` helper)
 - Calls `errorNotFound()` before any output if content not found
 
 ### DbFactory (`lib/core/DbFactory.php`)
@@ -1474,7 +1502,7 @@ class NewsletterDao extends Dao
 }
 ```
 
-> **Note:** The prefix-aware `table()` helper is a protected method on `Dao`, so table names are always written as `$this->table('newsletter')` — never hard-coded with the raw `tbl_` prefix. Queries are executed through the `Db` wrapper (`dbQuery`/`dbInsert`/`dbUpdate`), not raw `PDOStatement` calls.
+> **Note:** The prefix-aware `table()` helper is a protected method on `Dao`, so table names are always written as `$this->table('newsletter')` - never hard-coded with the raw `tbl_` prefix. Queries are executed through the `Db` wrapper (`dbQuery`/`dbInsert`/`dbUpdate`), not raw `PDOStatement` calls.
 
 #### Step 3: Service
 
@@ -1598,11 +1626,11 @@ class Dao
 }
 ```
 
-> **Note:** The DAO layer is backed by the custom `Scriptlog\Core\Db` PDO wrapper (methods `dbQuery()`, `dbInsert()`, `dbUpdate()`, `dbDelete()`, `dbSelect()`, etc.) — not Medoo.
+> **Note:** The DAO layer is backed by the custom `Scriptlog\Core\Db` PDO wrapper (methods `dbQuery()`, `dbInsert()`, `dbUpdate()`, `dbDelete()`, `dbSelect()`, etc.) - not Medoo.
 
 ### PostDao Implementation
 
-The actual `PostDao` class at `lib/dao/PostDao.php` extends `Scriptlog\Core\Dao`. It is the current reference implementation of the DAO pattern (791 lines). It declares three private constants used by the shared paginated queries, then a full set of CRUD, archive, search, and API helper methods:
+The actual `PostDao` class at `lib/dao/PostDao.php` extends `Scriptlog\Core\Dao`. It is the current reference implementation of the DAO pattern (926 lines). It declares three private constants used by the shared paginated queries, then a full set of CRUD, archive, search, and API helper methods:
 
 ```php
 // lib/dao/PostDao.php (key methods, abridged)
@@ -1644,7 +1672,7 @@ class PostDao extends Dao
     }
 
     /**
-     * findPosts — retrieve all blog records from tbl_posts.
+     * findPosts - retrieve all blog records from tbl_posts.
      *
      * @param string $orderBy       Sort column (whitelisted)
      * @param int|null $author      Filter by author ID
@@ -1698,7 +1726,7 @@ WHERE p.post_type = 'blog'";
     }
 
     /**
-     * findPost — retrieve a single post record by ID.
+     * findPost - retrieve a single post record by ID.
      *
      * @param int $ID
      * @param Sanitize $sanitize
@@ -1751,7 +1779,7 @@ WHERE ID = ? AND post_type = 'blog'";
     }
 
     /**
-     * createPost — insert a new post record together with its topic relationships.
+     * createPost - insert a new post record together with its topic relationships.
      *
      * @param array $bind      Post column => value pairs
      * @param int|array $topicId  Topic/category ID(s)
@@ -1799,7 +1827,7 @@ WHERE ID = ? AND post_type = 'blog'";
     }
 
     /**
-     * updatePost — update an existing post record (transactional) together with
+     * updatePost - update an existing post record (transactional) together with
      * its topic relationships. Old relationships are deleted and re-created.
      *
      * @param Sanitize $sanitize
@@ -1869,7 +1897,7 @@ WHERE ID = ? AND post_type = 'blog'";
     }
 
     /**
-     * deletePost — delete a post record by ID.
+     * deletePost - delete a post record by ID.
      *
      * @param int $ID
      * @param Sanitize $sanitize
@@ -1887,7 +1915,7 @@ WHERE ID = ? AND post_type = 'blog'";
     }
 
     /**
-     * anonymizePostAuthor — reassign all posts of a deleted user to the
+     * anonymizePostAuthor - reassign all posts of a deleted user to the
      * primary administrator (ID 1). Used for GDPR "Right to be Forgotten".
      *
      * @param int $authorId
@@ -1902,7 +1930,7 @@ WHERE ID = ? AND post_type = 'blog'";
     }
 
     /**
-     * checkPostId — verify a blog post record exists.
+     * checkPostId - verify a blog post record exists.
      *
      * @param int $ID
      * @param Sanitize $sanitize
@@ -1924,7 +1952,7 @@ WHERE ID = ? AND post_type = 'blog'";
     }
 
     /**
-     * totalPostRecords — total blog post records (optionally per author).
+     * totalPostRecords - total blog post records (optionally per author).
      *
      * @param int|null $author
      * @return int
@@ -2059,7 +2087,7 @@ Indexes: `PRIMARY KEY (ID)`, `KEY author_id (post_author)`, `KEY post_media (med
 | `TranslationDao` | `lib/dao/TranslationDao.php` | Translation key/value pairs |
 | `UserTokenDao` | `lib/dao/UserTokenDao.php` | Persistent auth tokens / password reset |
 
-That is **19 DAO classes** in total. There is **no** dedicated DAO for `tbl_login_attempt`, `tbl_api_keys`, `tbl_mediameta`, `tbl_media_download`, or `tbl_download_log` — those tables are accessed via core classes, services, and utility functions (e.g. login throttling in `Authentication`, API keys in `lib/core/` middleware, media metadata/downloads via `MediaService`).
+That is **19 DAO classes** in total. There is **no** dedicated DAO for `tbl_login_attempt`, `tbl_api_keys`, `tbl_mediameta`, `tbl_media_download`, or `tbl_download_log` - those tables are accessed via core classes, services, and utility functions (e.g. login throttling in `Authentication`, API keys in `lib/core/` middleware, media metadata/downloads via `MediaService`).
 
 ---
 
@@ -2382,7 +2410,7 @@ class PostService
 | **API** | `createPostApi()`, `updatePostApi()`, `removePostApi()`, `getPostByIdApi()` | Post CRUD via API |
 | **Media** | `processPostImage()` (private `processDefaultImage()` / `processUploadedImage()`) | Featured image processing |
 
-The legacy `postStatusDropDown()`, `commentStatusDropDown()`, `visibilityDropDown()`, and `localeDropDown()` methods were removed from `PostService` (along with the DAO dropdown methods) — the admin form now calls `post_status_dropdown()`, `comment_status_dropdown()`, `post_visibility_dropdown()`, and `post_locale_dropdown()` utilities directly from the controller.
+The legacy `postStatusDropDown()`, `commentStatusDropDown()`, `visibilityDropDown()`, and `localeDropDown()` methods were removed from `PostService` (along with the DAO dropdown methods) - the admin form now calls `post_status_dropdown()`, `comment_status_dropdown()`, `post_visibility_dropdown()`, and `post_locale_dropdown()` utilities directly from the controller.
 
 ### Input Sanitization in PostService
 
@@ -2418,7 +2446,9 @@ PostService depends on:
 | `ThemeService` | `lib/service/ThemeService.php` | Theme logic |
 | `ConfigurationService` | `lib/service/ConfigurationService.php` | Settings |
 | `ReplyService` | `lib/service/ReplyService.php` | Reply logic |
+| `ScheduledPostService` | `lib/service/ScheduledPostService.php` | Promotes due scheduled posts at bootstrap |
 | `PostApplicationService` | `lib/service/PostApplicationService.php` | Post orchestration (create/update with media, encryption, headlines) |
+| `ProtectedPostService` | `lib/service/ProtectedPostService.php` | Password-protected post resolution and content sanitization |
 | `FrontService` | `lib/service/FrontService.php` | Frontend post/page/archive queries |
 | `ConsentService` | `lib/service/ConsentService.php` | GDPR consent management |
 | `DataRequestService` | `lib/service/DataRequestService.php` | GDPR data request handling |
@@ -2429,7 +2459,7 @@ PostService depends on:
 | `TranslationService` | `lib/service/TranslationService.php` | Translation management |
 | `NotificationService` | `lib/service/NotificationService.php` | Email notifications |
 
-That is **21 services** in total. Privacy audit logging is handled by the `PrivacyLogDao` (used by `DataRequestService`), not by a dedicated `PrivacyLogService`.
+That is **23 services** in total. Privacy audit logging is handled by the `PrivacyLogDao` (used by `DataRequestService`), not by a dedicated `PrivacyLogService`.
 
 ---
 
@@ -2445,12 +2475,12 @@ That is **21 services** in total. Privacy audit logging is handled by the `Priva
 | **View Rendering** | Controllers render views using View class |
 | **Session Messages** | Controllers set session status/error messages |
 
-### PostController Implementation (Thinned — Phase 3)
+### PostController Implementation (Thinned - Phase 3)
 
 The `PostController` was refactored in Phase 3 to delegate business logic to `PostApplicationService`. The controller now handles **only** HTTP/security, validation, view rendering, and simple delegation:
 
 ```php
-// lib/controller/PostController.php (thinned — 426 lines, down from ~656)
+// lib/controller/PostController.php (thinned - 430 lines, down from ~656)
 namespace Scriptlog\Controller;
 
 use Scriptlog\Core\ActionConst;
@@ -2720,14 +2750,14 @@ User Request
     v
 PostController::{method}()
     |
-    +-> checkPostCsrf()              — CSRF token validation
-    +-> checkPostPayload()           — Form key whitelist
-    +-> validatePostSubmission()     — DTO + PostValidator
+    +-> checkPostCsrf()              - CSRF token validation
+    +-> checkPostPayload()           - Form key whitelist
+    +-> validatePostSubmission()     - DTO + PostValidator
     |     +-> PostRequestDto::fromGlobals()
     |     +-> (new PostValidator())->validate($dto)
     |     +-> (new FileUploadValidator())->validate($uploadedFile)
     |     +-> (new ProtectedPostValidator())->validate($dto)
-    +-> PostApplicationService       — All business logic
+    +-> PostApplicationService       - All business logic
     |     +-> createPost() / updatePost()
     |           +-> File upload (upload_photo)
     |           +-> PostService setters
@@ -2738,7 +2768,7 @@ PostController::{method}()
     +-> Redirect or render view
 ```
 
-> **Key insight**: The controller's `insert()` and `update()` methods are now ~40 and ~70 lines respectively (down from ~80+ each in the original monolithic controller). All post preparation logic — media upload, encryption, slug generation, tag/headline processing — moved verbatim into `PostApplicationService`. The PostApplicationService itself is the orchestration layer between the controller and the domain services (PostService, TopicDao, MediaDao).
+> **Key insight**: The controller's `insert()` and `update()` methods are now ~40 and ~70 lines respectively (down from ~80+ each in the original monolithic controller). All post preparation logic - media upload, encryption, slug generation, tag/headline processing - moved verbatim into `PostApplicationService`. The PostApplicationService itself is the orchestration layer between the controller and the domain services (PostService, TopicDao, MediaDao).
 
 ### BaseApp Class
 
@@ -3232,7 +3262,8 @@ invoke_responsive_image(
     string $alt = '',
     string $class = 'img-fluid',
     bool $fetchpriority = false,
-    string $decoding = 'auto'
+    string $decoding = 'auto',
+    string $loading = 'auto' // 'lazy' for gallery images
 ): string
 ```
 
@@ -3275,7 +3306,7 @@ echo invoke_gallery_image('gallery-1.jpg', 'Gallery Image');
 <img src="https://example.com/public/files/pictures/medium/medium_image123.jpg" alt="My Image" width="730" height="486" class="img-fluid" decoding="auto">
 ```
 
-> **Image troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` — [Image/Media Issues](TROUBLESHOOTING.md#imagemedia-issues).
+> **Image troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` - [Image/Media Issues](TROUBLESHOOTING.md#imagemedia-issues).
 
 ### Example: Using Utility Functions
 
@@ -3353,31 +3384,33 @@ theme_directory = "my-custom-theme"
 ```php
 <?php
 defined('SCRIPTLOG') || die('Direct access not permitted');
-// NO call_theme_header() — system handles it
+// NO call_theme_header() - system handles it
 // Template content starts directly:
 ?>
 <div class="container">
     <!-- Page content -->
 </div>
 <?php
-// NO call_theme_footer() — system handles it
+// NO call_theme_footer() - system handles it
 ```
 
 This prevents duplicate HTML, "headers already sent" errors, and ensures proper 404 handling.
 
 ### Template Resolution
 
-| Route | Template | Fallback |
-|-------|----------|----------|
-| `/` | `home.php` | `index.php` |
-| `/post/{id}/{slug}` | `single.php` | `index.php` |
-| `/page/{slug}` | `page.php` | `index.php` |
-| `/category/{slug}` | `category.php` | `archive.php` → `index.php` |
-| `/tag/{tag}` | `tag.php` | `index.php` |
-| `/archive/{mm}/{yyyy}` | `archive.php` | `index.php` |
-| `/archives` | `archives.php` | `index.php` |
-| `/blog*` | `blog.php` | `index.php` |
-| 404 | `404.php` | `index.php` |
+Templates are resolved by the `ThemeRenderer` (`lib/core/ThemeRenderer.php`), which loads `header.php`, then the template matching the route key, then `footer.php`. Each route maps directly to `{routeKey}.php`; there is no `index.php` fallback chain.
+
+| Route | Template |
+|-------|----------|
+| `/` | `home.php` |
+| `/post/{id}/{slug}` | `single.php` |
+| `/page/{slug}` | `page.php` |
+| `/category/{slug}` | `category.php` |
+| `/tag/{tag}` | `tag.php` |
+| `/archive/{mm}/{yyyy}` | `archive.php` |
+| `/archives` | `archives.php` |
+| `/blog*` | `blog.php` |
+| 404 | `404.php` |
 
 ### Asset Locations
 
@@ -3394,7 +3427,7 @@ This prevents duplicate HTML, "headers already sent" errors, and ensures proper 
 ### Template Compliance
 
 - All templates start with `defined('SCRIPTLOG') \|\| die('Direct access not permitted')`
-- All dynamic output uses `htmlout()` for escaping, `htmLawed()` for content sanitization
+- All dynamic output is escaped with `theme_escape_html()` (single escaping boundary); `htmLawed()` is used for content sanitization
 - All forms include CSRF token via `block_csrf()`
 - Protected posts use `$post_visibility === 'protected'` check (not `'password-protected'`)
 - Images use `invoke_frontimg()`, `invoke_responsive_image()`, or `invoke_hero_image()`
@@ -3579,7 +3612,7 @@ ScriptLog provides a RESTful API that allows external applications to interact w
 
 **Latest Enhancements (v1.1.0):**
 - **Rate Limiting**: File-based sliding window rate limiter with per-client tracking
-- **HATEOAS**: RFC 5988 Web Linking support — all responses include `_links` for discoverable navigation
+- **HATEOAS**: RFC 5988 Web Linking support - all responses include `_links` for discoverable navigation
 
 ### Rate Limiting
 
@@ -3617,9 +3650,9 @@ All API responses include rate limit headers:
 #### Client Identification
 
 Rate limits are tracked per client using the following priority:
-1. **API Key** (`X-API-Key` header) — if provided
-2. **Bearer Token** (`Authorization` header) — if provided
-3. **IP Address** (`REMOTE_ADDR`) — fallback
+1. **API Key** (`X-API-Key` header) - if provided
+2. **Bearer Token** (`Authorization` header) - if provided
+3. **IP Address** (`REMOTE_ADDR`) - fallback
 
 ### HATEOAS (Hypermedia as the Engine of Application State)
 
@@ -3929,9 +3962,10 @@ This project uses two complementary testing approaches:
 
 | Metric | Value |
 |--------|-------|
-| **Total Tests** | 1,240 |
-| **Test Files** | 131 (`find tests -name "*Test.php"`) |
-| **Assertions** | 2,584 |
+| **Total Tests** | 2,269 |
+| **Test Files** | 167 (`find tests -name "*Test.php"`) |
+| **Assertions** | 8,074 |
+| **Skipped / Risky** | 15 skipped, 60 risky |
 | **PHPUnit Version** | 9.6.35 |
 | **Target Coverage** | 40% |
 | **Current Coverage** | ~38% |
@@ -3949,7 +3983,7 @@ The test coverage plan is organized into phases:
 | Phase 3: Core Classes | MEDIUM | ✅ Complete | 65 |
 | Phase 4: Controllers | MEDIUM | ✅ Complete | 34 |
 | Phase 5: Utilities | LOW | ✅ Complete | 68 |
-| Password Protected Posts | HIGH | ✅ Complete | 59 |
+| Password Protected Posts | HIGH | ✅ Complete | 42 |
 
 ### Test Categories
 
@@ -3979,22 +4013,21 @@ Comprehensive tests for the password-protected posts system:
 
 | Test File | Tests | Coverage |
 |-----------|-------|----------|
-| `tests/unit/ProtectedPostTest.php` | 12 | Core encryption/decryption functions |
+| `tests/unit/ProtectedPostTest.php` | 11 | Core `protect_post()` / encryption / password hash & verify |
 | `tests/unit/ProtectedPostRateLimitTest.php` | 20 | Rate limiting & password strength |
-| `tests/unit/PostControllerProtectedPostTest.php` | 27 | Controller flow & validation |
+| `tests/unit/PostControllerProtectedPostTest.php` | 11 | Controller flow & validation |
 
-**Total: 59 tests**
+**Total: 42 tests**
 
 | Test Category | Tests |
 |--------------|-------|
-| Rate Limiting Logic | 9 (5 attempts limit, old expiration, per-IP/per-post) |
-| Password Strength | 8 (length, uppercase, lowercase, number, special char) |
-| Functions Existence | 1 |
-| Session Storage | 3 |
-| Encryption/Decryption | 4 |
-| Visibility Validation | 4 |
-| Form Validation | 6 |
-| CSRF Protection | 1 |
+| Rate Limiting Logic | 8 (5-attempt limit, old-attempt expiration, per-IP/per-post) |
+| Password Strength | 7 (length, uppercase, lowercase, number, special char) |
+| Encryption/Decryption + `protect_post()` | 7 |
+| Session Storage | 6 |
+| Password Hash & Verify | 6 |
+| Functions Existence | 3 |
+| Visibility Validation | 3 |
 | Required Fields | 2 |
 
 Run password-protected posts tests:
@@ -4295,11 +4328,11 @@ All classes live under `Scriptlog\*` namespaces (e.g., `Scriptlog\Core\Bootstrap
 |----------|-----------|---------|
 | **Core** | `Scriptlog\Core` | Bootstrap, Dispatcher, DbFactory, Authentication, SessionMaker, Registry, FormValidator, Sanitize, View, Dao, Db, SearchFinder, CSRFGuard, BaseApp, BaseModel |
 | **DAO** | `Scriptlog\Dao` | PostDao, UserDao, CommentDao, ReplyDao, TopicDao, PostTopicDao, MediaDao, PageDao, MenuDao, PluginDao, ThemeDao, ConfigurationDao, ConsentDao, DataRequestDao, PrivacyLogDao, PrivacyPolicyDao, LanguageDao, TranslationDao, UserTokenDao |
-| **Service** | `Scriptlog\Service` | PostService, PostApplicationService, UserService, CommentService, ReplyService, TopicService, MediaService, PageService, MenuService, PluginService, ThemeService, ConfigurationService, ConsentService, DataRequestService, LanguageService, TranslationService, DownloadService, ExportService, MigrationService, FrontService, NotificationService |
+| **Service** | `Scriptlog\Service` | PostService, PostApplicationService, ProtectedPostService, ScheduledPostService, UserService, CommentService, ReplyService, TopicService, MediaService, PageService, MenuService, PluginService, ThemeService, ConfigurationService, ConsentService, DataRequestService, LanguageService, TranslationService, DownloadService, ExportService, MigrationService, FrontService, NotificationService |
 | **Controller** | `Scriptlog\Controller` | PostController, UserController, CommentController, ReplyController, TopicController, MediaController, PageController, MenuController, PluginController, ThemeController, ConfigurationController, DownloadController, DownloadAdminController, ExportController, ImportController, LanguageController, LocaleController, SearchController, TranslationController, ApiController |
-| **API Controller** | `Scriptlog\Controller\Api` | PostsApiController, CategoriesApiController, CommentsApiController, ArchivesApiController, SearchApiController, GdprApiController, LanguagesApiController, TranslationsApiController, MediaApiController, ProtectedPostApiController, QueryApiController |
+| **API Controller** | `Scriptlog\Controller\Api` | ApiController (info), PostsApiController, CategoriesApiController, CommentsApiController, ArchivesApiController, SearchApiController, GdprApiController, LanguagesApiController, TranslationsApiController, MediaApiController, ProtectedPostApiController, QueryApiController |
 | **Model** | `Scriptlog\Model` | PostModel, FrontContentModel, TopicModel, TagModel, PageModel, CommentModel, GalleryModel, ArchivesModel, DownloadModel |
-| **Handler** | `Scriptlog\Handler` | HandlerRegistry, FrontRequestHandler, PostHandler, PageHandler, CategoryHandler, TagHandler, ArchiveHandler, PrivacyHandler, DownloadHandler, BlogHandler, HomeHandler |
+| **Handler** | `Scriptlog\Handler` | HandlerRegistry, FrontRequestHandler, AdminActionRegistry, AdminActionCommand, PostHandler, PageHandler, CategoryHandler, TagHandler, ArchiveHandler, PrivacyHandler, DownloadHandler, BlogHandler, HomeHandler |
 
 ## Global Functions
 
@@ -4324,9 +4357,9 @@ get_ip_address();
 app_url();
 app_info();
 theme_identifier();
-invoke_frontimg($filename, $size = 'medium');
+invoke_frontimg($media_filename, $image_thumb = true);
 make_date($timestamp);             // Format date for display (frontend only, e.g. "July 26, 2026")
-                                    // ⚠ NOT for admin form <input> values — use raw Y-m-d H:i:s instead
+                                    // ⚠ NOT for admin form <input> values - use raw Y-m-d H:i:s instead
 ```
 
 ---
@@ -4631,43 +4664,31 @@ CREATE TABLE IF NOT EXISTS {$prefix}tbl_translations (
 
 ### Language Detection Priority
 
-1. **URL Prefix** - `/ar/`, `/es/`, `/fr/` (e.g., `example.com/ar/posts`)
-2. **Cookie** - `lang` cookie set by language switcher
+1. **Session** - `scriptlog_locale` (set when the user switches language)
+2. **Cookie** - `scriptlog_locale` cookie set by the language switcher
 3. **Accept-Language Header** - Browser's language preference
 4. **Default** - `en` (configurable)
 
 ### URL Routing for Languages
 
-Languages are handled via URL prefixes in the existing routing system:
+There are no URL-prefix routes like `/ar/...` in the routing table. Language switching uses two mechanisms:
 
-```php
-// lib/core/Bootstrap.php
-$rules = [
-    // ... existing rules
-    'language_blog' => "/{lang}/blog",
-    'language_single' => "/{lang}/post/(?'id'\d+)/(?'post'[\w\-]+)",
-    'language_page' => "/{lang}/page/(?'page'[^/]+)",
-    'language_category' => "/{lang}/category/(?'category'[\w\-]+)",
-    'language_tag' => "/{lang}/tag/(?'tag'[\w\-]+)",
-];
-```
+1. **`/locale` route** - registered in `Bootstrap::defineRoutingRules()`
+2. **`?switch-lang={code}` query parameter** - handled in `lib/main.php`; it stores the locale in the session (`scriptlog_locale`) and a `scriptlog_locale` cookie, then redirects back with `switch-lang` removed from the URL
+
+Valid locales: `en`, `ar`, `zh`, `fr`, `ru`, `es`, `id`.
 
 ### Translation Functions
 
 ```php
-// Basic translation
-__('Hello World');           // Returns translated string
-__('Welcome, %s', [$name]); // With placeholders
+// Frontend: t() - defined in public/themes/blog/functions-i18n.php
+t('key');                  // Returns translated string for current locale
+t('form.save');            // Dot-notation keys; falls back to en, then to the key itself
+t('welcome', ['name' => 'Sam']); // Placeholders: %name% replaced in the translated string
 
-// Echo translation
-_e('Submit');                // Echoes translated string
-
-// With context
-_x('Read', 'verb');          // Context disambiguates same key
-_ex('Read', 'book title');   // Echo with context
-
-// Plural forms
-_n('%d comment', '%d comments', $count);  // Returns correct form
+// Admin panel: hybrid DB + hardcoded fallback
+admin_translate('key');    // Returns translated string
+admin_t('key');            // Alias for admin_translate()
 ```
 
 ### RTL Support
@@ -4789,7 +4810,7 @@ The admin panel includes a translation editor at **Settings → Translations**:
 - **Cache**: Regenerate translation cache
 - **Language Selector**: Switch between languages or view all
 
-> **i18n troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` — [i18n/Translation Issues](TROUBLESHOOTING.md#i18ntranslation-issues).
+> **i18n troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` - [i18n/Translation Issues](TROUBLESHOOTING.md#i18ntranslation-issues).
 
 ### Adding Content i18n Support
 
@@ -4799,13 +4820,13 @@ To add locale support to a new content type:
 2. **Dao**: Add `post_locale`-style locale column to the select/insert/update queries
 3. **Service**: Add `setContentLocale()` method
 4. **Controller**: Add locale filters and setters
-5. **Admin UI**: Add locale dropdown to edit form via the `*_locale_dropdown()` utility (e.g. `post_locale_dropdown()` from `lib/utility/`) — the DAO-level `dropDown*()` helpers were removed in favor of utility functions
+5. **Admin UI**: Add locale dropdown to edit form via the `*_locale_dropdown()` utility (e.g. `post_locale_dropdown()` from `lib/utility/`) - the DAO-level `dropDown*()` helpers were removed in favor of utility functions
 
 ### Populating Languages and Translations
 
 The system includes:
 - 7 languages (en, ar, zh, fr, ru, es, id)
-- 111 translation keys with 819 total translations
+- 174 translation keys with 1,218 total translations (174 keys x 7 languages)
 - Translation editor in admin panel (Settings → Translations)
 - Translation cache in `public/files/cache/translations/`
 
@@ -5241,7 +5262,7 @@ To add support for a new platform:
 3.  Update `ExportController.php` to include the new format option.
 4.  Update the UI in `admin/ui/export/index.php` to add the new option.
 
-> **Export troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` — [Server/Config Issues](TROUBLESHOOTING.md#serverconfig-issues) (XML Parse Error).
+> **Export troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` - [Server/Config Issues](TROUBLESHOOTING.md#serverconfig-issues) (XML Parse Error).
 
 ---
 
@@ -5450,7 +5471,7 @@ The search system provides three complementary paths for finding published conte
 | **AJAX inline** | `GET /api/v1/search?q=keyword` | `SearchApiController` | JSON response consumed by `search.js` |
 | **HTMX inline** | `hx-get="/search"` on the search input (Valdur theme) | `SearchController` | HTML fragment (`partials/search-results.php`) swapped into `#search-suggestions` |
 
-The full-page path is permalink-aware: with SEO-friendly permalinks enabled the Dispatcher routes the `/search` path to `SearchController`; with permalinks disabled the query-string router (`HandleRequest::deliverQueryString()`) dispatches the `q` key on the app root and `HandleRequest::deliverQuerySearch()` calls `SearchFinder::searchAll()` directly — it does **not** pass through `SearchController`. Use the `theme_search_url()` theme helper (`public/themes/blog/functions-post.php`) to build the search form action / JS `search_url` so it matches the active scheme instead of hard-coding `/search`.
+The full-page path is permalink-aware: with SEO-friendly permalinks enabled the Dispatcher routes the `/search` path to `SearchController`; with permalinks disabled the query-string router (`HandleRequest::deliverQueryString()`) dispatches the `q` key on the app root and `HandleRequest::deliverQuerySearch()` calls `SearchFinder::searchAll()` directly - it does **not** pass through `SearchController`. Use the `theme_search_url()` theme helper (`public/themes/blog/functions-post.php`) to build the search form action / JS `search_url` so it matches the active scheme instead of hard-coding `/search`.
 
 All three paths delegate to the same `SearchFinder` engine.
 
@@ -5458,17 +5479,17 @@ All three paths delegate to the same `SearchFinder` engine.
 
 | File | Purpose |
 |------|---------|
-| `lib/core/SearchFinder.php` | Core search engine — MySQL FULLTEXT `MATCH ... AGAINST` against `tbl_posts` |
-| `lib/controller/SearchController.php` | Frontend controller for `/search` — rate-limited, `type`+`page` dispatch, full page or HTMX fragment |
+| `lib/core/SearchFinder.php` | Core search engine - MySQL FULLTEXT `MATCH ... AGAINST` against `tbl_posts` |
+| `lib/controller/SearchController.php` | Frontend controller for `/search` - rate-limited, `type`+`page` dispatch, full page or HTMX fragment |
 | `lib/controller/api/SearchApiController.php` | REST API controller (`/api/v1/search`) |
 | `public/themes/blog/search.php` | Search results page template |
 | `public/themes/blog/sidebar.php` | Search form in sidebar |
 | `public/themes/blog/assets/js/search.js` | AJAX autocomplete JS (300 ms debounce) |
 | `public/themes/blog/lang/en.json` | Search i18n keys (`search.*`) |
 | `lib/core/Dispatcher.php` | Routes `/search` to `SearchController` (permalinks ON) |
-| `lib/core/HandleRequest.php` | `deliverQuerySearch()` — handles `?q=` on app root (permalinks OFF) via `SearchFinder::searchAll()` |
+| `lib/core/HandleRequest.php` | `deliverQuerySearch()` - handles `?q=` on app root (permalinks OFF) via `SearchFinder::searchAll()` |
 | `lib/core/Bootstrap.php` | Route definition: `'search' => "/search"` |
-| `public/themes/blog/functions-post.php` | `theme_search_url()` — permalink-aware search URL builder |
+| `public/themes/blog/functions-post.php` | `theme_search_url()` - permalink-aware search URL builder |
 
 ### Architecture
 
@@ -5493,7 +5514,7 @@ All three paths delegate to the same `SearchFinder` engine.
    │ SearchApiController  │ │ SearchController     │ │ HandleRequest::      │
    │ (API) → JSON         │ │ (rate-limited,       │ │ deliverQuerySearch() │
    │ index / posts /      │ │ type + page) →       │ │ (permalinks OFF only)│
-   │ pages                │ │ HTMX fragment or     │ │ searchAll() direct — │
+   │ pages                │ │ HTMX fragment or     │ │ searchAll() direct - │
    │                      │ │ full page            │ │ no controller        │
    └──────────┬───────────┘ └──────────┬───────────┘ └──────────┬───────────┘
               │                        │                        │
@@ -5522,8 +5543,8 @@ All three paths delegate to the same `SearchFinder` engine.
 
 > **Diagram notes (verified against the codebase):**
 > - `search.js` always requests `type=all`; the API `posts`/`pages` endpoints (`SearchApiController@posts`/`@pages`) map to `searchPost`/`searchPage`.
-> - Both `SearchController` and `SearchApiController` dispatch on `type` (`all`/`posts`/`pages`) — all three `SearchFinder` methods serve **both** JSON and HTML outputs; the output format depends on the entry controller, not the method.
-> - The permalinks-OFF query-string path (`?q=` on app root) is handled by `HandleRequest::deliverQuerySearch()`, which calls `SearchFinder::searchAll()` directly — it bypasses `SearchController`.
+> - Both `SearchController` and `SearchApiController` dispatch on `type` (`all`/`posts`/`pages`) - all three `SearchFinder` methods serve **both** JSON and HTML outputs; the output format depends on the entry controller, not the method.
+> - The permalinks-OFF query-string path (`?q=` on app root) is handled by `HandleRequest::deliverQuerySearch()`, which calls `SearchFinder::searchAll()` directly - it bypasses `SearchController`.
 > - HTMX requests (Valdur theme) return an HTML fragment (`partials/search-results.php`), not JSON.
 
 ### Search API Endpoints
@@ -5573,7 +5594,7 @@ GET /api/v1/search?q=cicero&type=all
 
 ### Search Page (Full Page Rendering)
 
-When a user runs a search (form submit or a direct URL — `/search?q=keyword` with permalinks ON, `?q=keyword` on the app root with permalinks OFF), the `Dispatcher` routes to `SearchController`:
+When a user runs a search (form submit or a direct URL - `/search?q=keyword` with permalinks ON, `?q=keyword` on the app root with permalinks OFF), the `Dispatcher` routes to `SearchController`:
 
 1. **`SearchController::search()`** reads `$_GET['q']` or `$_GET['keyword']` and `$_GET['type']`
 2. Delegates to `SearchFinder::searchAll()`, `searchPost()`, or `searchPage()`
@@ -5593,7 +5614,7 @@ $totalRows = $searchResults['totalRows'] ?? 0;
 
 | Feature | Implementation |
 |---------|---------------|
-| **XSS Prevention** | Server-side sanitization via `SearchFinder::sanitizeKeyword()` + `htmlout()` in template |
+| **XSS Prevention** | Server-side sanitization via `SearchFinder::sanitizeKeyword()` + `theme_escape_html()` in template |
 | **SQL Injection** | Uses PDO prepared statements |
 | **CSRF Protection** | Hidden CSRF token in search form |
 | **Input Validation** | Keyword length limits (min 2, max 100 characters), non-string rejection |
@@ -5612,7 +5633,7 @@ The search results support both SEO-friendly and query string URLs based on perm
 
 ### Implementation Notes
 
-- **Search engine**: Uses MySQL FULLTEXT `MATCH (post_title, post_content, post_tags) AGAINST (? IN BOOLEAN MODE)` with `+` AND-semantics built by `SearchFinder::buildBooleanQuery()`. NOT `LIKE '%keyword%'` — the old LIKE implementation was replaced with FULLTEXT.
+- **Search engine**: Uses MySQL FULLTEXT `MATCH (post_title, post_content, post_tags) AGAINST (? IN BOOLEAN MODE)` with `+` AND-semantics built by `SearchFinder::buildBooleanQuery()`. NOT `LIKE '%keyword%'` - the old LIKE implementation was replaced with FULLTEXT.
 - **DB wrapper**: The `SearchFinder` class uses the custom `Db` class (PDO wrapper), NOT Medoo
 - **DB access**: via `Registry::get('dbc')`
 - **API auth**: Public endpoint (no authentication required)
@@ -5773,7 +5794,7 @@ Admin Flow:
 |--------|---------|
 | `post_visibility` | Set to `protected` for protected posts |
 | `post_password` | Bcrypt hash of the password |
-| `passphrase` | MD5 hash used for encryption: `md5(app_key + password)` |
+| `passphrase` | SHA-256 hash used for encryption: `hash('sha256', app_key() . password)` |
 | `post_content` | AES-encrypted content |
 
 ### Key Files
@@ -5783,7 +5804,7 @@ Admin Flow:
 | `lib/controller/api/ProtectedPostApiController.php` | API controller with unlock/verify endpoints |
 | `lib/utility/protected-post.php` | `decrypt_post()`, `decrypt_post_admin()`, rate limiting functions |
 | `lib/utility/encrypt-decrypt.php` | `encrypt()`, `decrypt()` using AES-256-CBC |
-| `lib/core/FrontHelper.php` | `grabPreparedFrontPostById()` - includes protected posts |
+| `lib/service/ProtectedPostService.php` | `resolve()`, `sanitizeContent()` - decrypts and sanitizes protected post content |
 | `public/themes/blog/assets/js/unlock-post.js` | AJAX form handler |
 | `public/themes/blog/single.php` | Uses AJAX unlock for protected posts |
 | `admin/ui/posts/edit-post.php` | Decrypts content for admin editing |
@@ -5840,12 +5861,13 @@ POST /api/v1/posts/3/unlock
 
 ### Unit Tests
 
-**Total: 59 tests across 3 files**
+**Total: 42 tests across 3 files**
 
 | Test File | Tests | Coverage |
 |-----------|-------|----------|
-| `tests/unit/ProtectedPostTest.php` | 12 | Core encryption/decryption functions |
+| `tests/unit/ProtectedPostTest.php` | 11 | Core `protect_post()` / encryption / password hash & verify |
 | `tests/unit/ProtectedPostRateLimitTest.php` | 20 | Rate limiting & password strength |
+| `tests/unit/PostControllerProtectedPostTest.php` | 11 | Controller flow & validation |
 
 Run tests:
 ```bash
@@ -5883,7 +5905,7 @@ The upload uses admin session authentication instead of API authentication:
 7. If invalid: return 401 Unauthorized
 ```
 
-> **Upload troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` — [Summernote AJAX Upload](TROUBLESHOOTING.md#imagemedia-issues).
+> **Upload troubleshooting**: See `dev-docs/TROUBLESHOOTING.md` - [Summernote AJAX Upload](TROUBLESHOOTING.md#imagemedia-issues).
 
 ### Key Files Modified
 
