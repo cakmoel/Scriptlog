@@ -8,12 +8,77 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#171---2026-08-14)
+- [Latest Release](#180---2026-08-19)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.8.0] - 2026-08-19
+
+### Added
+- **Centralized settings cache** (`app-settings.php`): New `app_settings()` reads all `tbl_settings` rows once per request into a memoized map; `app_setting()` fetches a single value with fallback default; `reset_app_settings_cache()` clears cache for tests and after admin writes. All setting-consuming utilities (`app_info()`, `app_reading_setting()`, `app_sitename()`, `app_tagline()`, `app_url()`) now read from the cache instead of issuing per-call database queries
+- **Page Cache admin settings**: Full-page cache can now be toggled and configured from the General Settings admin UI — a checkbox to enable/disable and a numeric field for cache lifetime (60–86400 seconds, default 3600). `page_cache_is_enabled()` and `page_cache_ttl()` helpers read from `APP_CACHE` constant or database settings with precedence rules
+- **`safe_zip_extract()`**: Defense-in-depth wrapper around ZipArchive that blocks path traversal (`../`), absolute paths, null bytes, symlink escapes, and zip-bomb archives; configurable skip patterns; used by `upload-plugin.php` and `upload-theme.php`
+- **`sanitize_post_content()`** and `post_content_deny_attributes()`: Strips `style` attributes and event-handler attributes (`on*`) from post HTML; used by `ProtectedPostService`
+- **SRI integrity hash sync**: `sync_integrity_hashes()` in `minify.php` scans theme templates for stale `integrity` attributes and recomputes `sha384` hashes after asset regeneration
+- **`Tokenizer::getSelectorKey()`**: Stable HMAC-derived key for post-visibility selector encryption, replacing per-request randomness
+- **`escape_html()` utility function**: Thin wrapper around `htmlspecialchars()` with `ENT_QUOTES` for consistent output escaping
+- **Db statement cache**: `Db::prepareCached()` reuses `PDOStatement` instances for identical SQL within a request; cache capped at 64 entries and cleared on connection close
+- **Theme caller memoization**: `theme_dir()` and `theme_identifier()` cache their return values per request via by-reference holders with `reset_theme_dir_cache()` / `reset_theme_identifier_cache()`
+- **Public API info endpoint**: `ApiController::info()` returns application metadata (name, version, PHP version) without authentication
+- **Cache settings in installer**: `cache_enabled=0` and `cache_lifetime=3600` seeded into `tbl_settings` during fresh installs and `install_database_table()`
+- **Tests**: 7 new test files — `AppSettingsTest`, `DbStatementCacheTest`, `ThemeCallerCacheTest`, `SyncIntegrityHashesTest`, `SafeZipExtractTest`, `SanitizePostContentTest`, `TokenizerSelectorKeyTest`, `MessageLogGuardTest`
+
+### Changed
+- **`applyTablePrefix()`**: Replaced per-table `preg_quote()` loop with a single compiled alternation pattern sorted longest-first; pattern cached after first call
+- **`ProtectedPostService`**: Delegates content sanitization to `sanitize_post_content()` instead of inline `voku\AntiXSS` calls
+- **Rate limiter**: Uses IP-only bucket key with `hash_equals()` comparison; removed API key header bypass
+- **`upload-photo.php`**: Re-encodes uploaded images through the GD/WebP library for polyglot-image defense; skips redundant `set_origin_photo()` when `fileinfo` extension is loaded
+- **Post visibility dropdown**: Uses `data-change` HTMX attribute instead of inline `onchange` handler
+- **CSP**: Added `script-src-attr 'none'` directive to block inline event handlers
+- **`TranslationLoader`**: Creates cache directory if missing; checks writability before writing
+- **`MessageLog::writeMessageToFile()`**: Added null/empty path guard and `@fopen()` warning suppression
+- **`Whoops` error handler**: Added safety check before accessing `$_SERVER` keys
+- **`remove-dir-recursive.php`**: Added guard to skip `chmod()` on already-permissive directories
+- **Autoload**: New `SafeZipExtract` and `SanitizePostContent` aliases registered in alias map and utility loader
+- **Composer**: `phpmetrics/phpmetrics` 2.10.0 → 2.11.0
+
+### Fixed
+- **Nginx config when permalinks disabled**: Added `location ~ ^/api/` block before the catch-all so API endpoints remain routable regardless of permalink setting
+- **PHP 8.5 compatibility**: Updated 14 admin templates (`admin-layout`, `setup-db`, `install-template`, `edit-menu`, `all-downloads`, `install-plugin`, `privacy-policy-editor`, `language-list`, `translation-editor`, `remove-profile`), `PostController`, `ThemeController`, `TranslationDao`, `TranslationService`, `Util`, `medooin.php`, and `install.php` for PHP 8.5 deprecations
+- **Autoload fallback**: Graceful fallback when a controller file is missing from the autoloader
+- **`session_destroy()` guard**: Checks `session_status()` before calling `session_destroy()` to prevent warnings on already-destroyed sessions
+- **Recursive directory removal**: Guards against non-directory entries and missing paths in `remove-dir-recursive.php`
+- **`PluginService`**: Added `basename()` sanitization and directory traversal guard on plugin directory paths
+
+### Removed
+- **`PageCache` OOP class**: Deleted `src/lib/core/PageCache.php` and its autoload aliases; replaced by procedural `page-cache.php` functions with database-driven cache enable and TTL settings
+
+### Security
+- **`safe_zip_extract()`** defends against path traversal, symlink escapes, zip bombs, and null-byte injection in plugin/theme uploads
+- **`sanitize_post_content()`** strips `style` attributes and `on*` event handlers from post HTML
+- **Polyglot image defense**: Uploaded images re-encoded through GD/WebP library to neutralize embedded scripts
+- **`hash_equals()`** used for rate-limiter token comparison to prevent timing attacks
+- **IP-only bucket key** in rate limiter eliminates API key header bypass
+- **`basename()` sanitization** in `PluginService` prevents directory traversal via crafted plugin paths
+- **`script-src-attr 'none'`** CSP directive blocks inline JavaScript event handlers
+
+### Deprecated
+- None
+
+### Notes
+Feature release with a centralized settings cache, database-driven page cache admin UI, multiple security hardening utilities (`safe_zip_extract`, `sanitize_post_content`, polyglot image defense), performance optimizations (Db statement cache, `applyTablePrefix` single-pass regex, theme caller memoization), SRI hash synchronization, and full PHP 8.5 compatibility across all admin templates. The `PageCache` OOP class has been removed in favor of procedural functions with configurable cache enable and TTL. 59 files changed, 78 unique commits since v1.7.1.
+
+### Codename
+**Maleo Senkawor** (retained) – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.7.1
+- **Changes since v1.7.1**: 78 commits
+
+---
 
 ## [1.7.1] - 2026-08-14
 
@@ -853,6 +918,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.8.0 | 2026-08-19 | Stable |
 | 1.7.1 | 2026-08-14 | Stable |
 | 1.7.0 | 2026-08-14 | Stable |
 | 1.6.1 | 2026-08-12 | Stable |
