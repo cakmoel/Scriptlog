@@ -310,6 +310,8 @@ function get_table_definitions($prefix = '')
 
     $insertLangSettings = "INSERT INTO {$prefix}tbl_settings (setting_name, setting_value) VALUES ('lang_default', 'en'), ('lang_available', 'en,ar,zh,fr,ru,es,id'), ('lang_auto_detect', '1'), ('lang_prefix_required', '1')";
 
+    $insertCacheSettings = "INSERT INTO {$prefix}tbl_settings (setting_name, setting_value) VALUES ('cache_enabled', '0'), ('cache_lifetime', '3600')";
+
     $alterPostLocale = "ALTER TABLE {$prefix}tbl_posts ADD COLUMN post_locale VARCHAR(10) NOT NULL DEFAULT 'en' AFTER post_type, ADD INDEX idx_post_locale (post_locale)";
 
     $alterTopicLocale = "ALTER TABLE {$prefix}tbl_topics ADD COLUMN topic_locale VARCHAR(10) NOT NULL DEFAULT 'en' AFTER topic_status, ADD INDEX idx_topic_locale (topic_locale)";
@@ -343,6 +345,7 @@ function get_table_definitions($prefix = '')
       'savePlugin' => $savePlugin,
       'insertDefaultLanguage' => $insertDefaultLanguage,
       'insertLangSettings' => $insertLangSettings,
+      'insertCacheSettings' => $insertCacheSettings,
       'alterPostLocale' => $alterPostLocale,
       'alterTopicLocale' => $alterTopicLocale,
       'alterMenuLocale' => $alterMenuLocale,

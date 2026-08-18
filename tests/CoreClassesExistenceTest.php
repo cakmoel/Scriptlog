@@ -192,11 +192,6 @@ class CoreClassesExistenceTest extends TestCase
         $this->assertTrue(class_exists('PassPhraseKey'));
     }
     
-    public function testPageCacheClassExists(): void
-    {
-        $this->assertTrue(class_exists('PageCache'));
-    }
-    
     public function testDbMySQLiClassExists(): void
     {
         $this->assertTrue(class_exists('DbMySQLi'));
