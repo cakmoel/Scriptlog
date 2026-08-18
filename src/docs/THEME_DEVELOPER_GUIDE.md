@@ -3,9 +3,9 @@
 **Project:** Blogware/Scriptlog CMS  
 **Version:** 1.1.0 | **Last Updated:** August 2026
 
-> **Audience:** Theme developers building custom themes from scratch. This guide is a superset of the theming section in [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md) and covers the complete theme development lifecycle — from directory structure through testing and troubleshooting.
+> **Audience:** Theme developers building custom themes from scratch. This guide is a superset of the theming section in [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md) and covers the complete theme development lifecycle - from directory structure through testing and troubleshooting.
 
-> **Recent changes (August 2026):** This guide was refreshed to match the theme remediation work (Phases 0–8) and the frontend service migration. The biggest practical differences for theme developers:
+> **Recent changes (August 2026):** This guide was refreshed to match the theme remediation work (Phases 0-8) and the frontend service migration. The biggest practical differences for theme developers:
 >
 > - Template files are rendered by the core `ThemeRenderer`, not by templates including each other. Templates never call `call_theme_header()`/`call_theme_footer()`.
 > - Output escaping has **one** boundary: `theme_escape_html()`. Avoid the old `htmlout()`-based examples in older blog posts.
@@ -32,7 +32,7 @@
 10. [Image Handling System](#10-image-handling-system)
 11. [i18n Integration for Themes](#11-i18n-integration-for-themes)
 12. [Security Considerations](#12-security-considerations)
-13. [Creating a Custom Theme — Step-by-Step](#13-creating-a-custom-theme--step-by-step)
+13. [Creating a Custom Theme - Step-by-Step](#13-creating-a-custom-theme---step-by-step)
 14. [Theme Registration & Activation](#14-theme-registration--activation)
 15. [Testing & Quality Assurance](#15-testing--quality-assurance)
 16. [Troubleshooting Common Issues](#16-troubleshooting-common-issues)
@@ -48,11 +48,11 @@ The theming system is designed with these principles:
 
 | Quality | How the Theme System Delivers |
 |---------|-------------------------------|
-| **Scalability** | Templates include only display logic — no database queries in templates. The theme helper files (`functions-*.php`) provide functions that call the model/DAO/service layers, keeping templates thin and maintainable. Multiple themes can coexist. |
+| **Scalability** | Templates include only display logic - no database queries in templates. The theme helper files (`functions-*.php`) provide functions that call the model/DAO/service layers, keeping templates thin and maintainable. Multiple themes can coexist. |
 | **Security** | All dynamic output is escaped exactly once via `theme_escape_html()` (the single escaping boundary). Content is sanitized via `htmLawed()` on the way in. Forms include CSRF tokens via `block_csrf()`. All PHP files use `defined('SCRIPTLOG') \|\| die()` guard. Password-protected posts are resolved by `ProtectedPostService` using AES-256-CBC encryption with bcrypt password hashes. |
-| **Safety** | Template loading is handled by the core system (`ThemeRenderer`) — never manual `include`/`require` of the full page in templates. 404 handling happens in the Dispatcher before any output, preventing "headers already sent" errors. If the active theme is missing templates, the system falls back to the default `blog` theme. |
+| **Safety** | Template loading is handled by the core system (`ThemeRenderer`) - never manual `include`/`require` of the full page in templates. 404 handling happens in the Dispatcher before any output, preventing "headers already sent" errors. If the active theme is missing templates, the system falls back to the default `blog` theme. |
 | **Speed** | Asset minification via `tmp/minify.php`. Lazy loading images with `loading="lazy"`. Minified CSS/JS in production (`*.min.css`, `*.min.js`). Translation caching avoids repeated file reads. |
-| **Reliability** | `ThemeDao` includes fallback logic — if the active theme is missing, it defaults to `blog`. `theme_identifier()` in `lib/utility/theme-caller.php` safely resolves theme paths. All PHP files are validated with `php -l` before deployment. |
+| **Reliability** | `ThemeDao` includes fallback logic - if the active theme is missing, it defaults to `blog`. `theme_identifier()` in `lib/utility/theme-caller.php` safely resolves theme paths. All PHP files are validated with `php -l` before deployment. |
 | **UI/UX (Premium)** | Bootstrap 4 responsive grid. Mobile-first with breakpoints at 768px/1024px/1440px. ARIA labels on all interactive elements. Keyboard navigation (skip link + visible focus). RTL support for Arabic. Fancybox lightbox for galleries. AJAX comment submission and search (with `aria-live` results). Cookie consent banner (GDPR). |
 
 ### How the Theme System Works
@@ -71,7 +71,7 @@ Request → Dispatcher
 
 Two important consequences for theme developers:
 
-1. **You never load the header/footer yourself.** Templates only contain the page body — the core renders `header.php` and `footer.php` around them. If you call `call_theme_header()` or `call_theme_footer()` inside a template, you'll get duplicated navigation and scripts.
+1. **You never load the header/footer yourself.** Templates only contain the page body - the core renders `header.php` and `footer.php` around them. If you call `call_theme_header()` or `call_theme_footer()` inside a template, you'll get duplicated navigation and scripts.
 2. **The route key and the template name match.** The Dispatcher looks up the route (`home`, `single`, `category`, ...) and renders the file with that name plus `.php`. There is no `index.php` fallback chain anymore.
 
 The active theme directory is resolved by `lib/utility/theme-caller.php` → `theme_identifier()`, which reads `tbl_themes`. If no theme is active, `ThemeRenderer` falls back to the bundled `blog` theme.
@@ -116,7 +116,7 @@ A complete theme must include these files (the `blog` theme is the reference imp
 ```
 public/themes/[theme-name]/
 ├── theme.ini              # Theme metadata (REQUIRED)
-├── functions.php          # Thin loader — requires the helper modules below (REQUIRED)
+├── functions.php          # Thin loader - requires the helper modules below (REQUIRED)
 ├── functions-i18n.php     # t(), locale_url(), language_switcher(), etc.
 ├── functions-nav.php      # front_navigation(), build_menu_tree(), convert_menu_link(), etc.
 ├── functions-post.php     # initialize_*(), prepare_post_card(), theme_post_url(), etc.
@@ -137,7 +137,7 @@ public/themes/[theme-name]/
 ├── 404.php                # 404 error page
 ├── privacy.php            # Privacy policy page
 ├── cookie-consent.php     # GDPR cookie consent banner
-├── index.php              # Entry point (usually empty — not used for routing)
+├── index.php              # Entry point (usually empty - not used for routing)
 ├── render-comments.php    # Comments section renderer (legacy wrapper)
 ├── download.php           # Download page template
 ├── download_file.php      # File download handler (no theme wrapper)
@@ -147,7 +147,7 @@ public/themes/[theme-name]/
 │   ├── paginator.php      # Pagination wrapper
 │   └── comments.php       # Comment list + "load more" section
 └── lang/                  # Translation files
-    ├── en.json            # English (always required — fallback language)
+    ├── en.json            # English (always required - fallback language)
     ├── ar.json            # Arabic
     ├── zh.json            # Chinese
     ├── fr.json            # French
@@ -162,29 +162,27 @@ public/themes/[theme-name]/
 
 ```
 assets/
-├── css/                  # Stylesheets
+├── css/                  # Stylesheets (sources + .min.css production versions)
 │   ├── style.sea.css     # Main theme styles (source)
 │   ├── style.sea.min.css # Minified production version
-│   ├── custom.css        # Custom overrides
+│   ├── custom.css        # Custom overrides (source)
 │   ├── custom.min.css    # Minified custom CSS
-│   ├── comment.css       # Comment section styling
+│   ├── comment.css       # Comment section styling (source)
 │   ├── comment.min.css   # Minified comment CSS
-│   ├── cookie-consent.css # Cookie banner styling
+│   ├── cookie-consent.css # Cookie banner styling (source)
 │   ├── cookie-consent.min.css # Minified cookie CSS
-│   ├── privacy.css       # Privacy page styling
+│   ├── privacy.css       # Privacy page styling (source)
 │   ├── privacy.min.css   # Minified privacy CSS
-│   ├── not-found.css     # 404 page styling
-│   ├── not-found.min.css # Minified 404 CSS
-│   ├── rtl.css           # RTL language support
+│   ├── rtl.css           # RTL language support (source)
 │   ├── rtl.min.css       # Minified RTL CSS
-│   ├── fontastic.css     # Fontastic icon font styles
-│   ├── fontastic.min.css # Minified fontastic
-│   ├── animate.css       # CSS animations
-│   ├── animate.min.css   # Minified animations
-│   ├── sina-nav.css      # Sina navigation styles
+│   ├── sina-nav.css      # Sina navigation styles (source)
 │   ├── sina-nav.min.css  # Minified sina-nav
-│   ├── prism-override.css # Prism syntax highlighting overrides
-│   └── prism-override.min.css # Minified Prism overrides
+│   ├── prism-override.css # Prism syntax highlighting overrides (source)
+│   ├── prism-override.min.css # Minified Prism overrides
+│   ├── not-found.min.css # 404 page styling (minified only)
+│   ├── fontastic.min.css # Fontastic icon font styles (minified only)
+│   ├── animate.min.css   # CSS animations (minified only)
+│   └── fonts/            # Icon/custom font files (blog.eot, blog.woff, ...)
 ├── js/                   # JavaScript
 │   ├── front.js          # Main frontend logic
 │   ├── front.min.js      # Minified version
@@ -216,7 +214,6 @@ assets/
 │   ├── popper.js/        # Popper.js (Bootstrap dropdowns)
 │   ├── jquery.cookie/    # jQuery cookie plugin
 │   └── prism/            # Prism.js syntax highlighting
-├── fonts/                # Custom fonts
 └── img/                  # Theme images (hero.jpg, placeholder.svg, favicon.ico, ...)
 ```
 
@@ -304,27 +301,27 @@ Dispatcher → ThemeRenderer::render(routeKey) loads templates in this sequence:
 <?php
 defined('SCRIPTLOG') || die('Direct access not permitted');
 
-// NO call_theme_header() here — the system handles it
+// NO call_theme_header() here - the system handles it
 // Template content starts directly:
 ?>
 <div class="container">
     <!-- Page content here -->
 </div>
 <?php
-// NO call_theme_footer() here — the system handles it
+// NO call_theme_footer() here - the system handles it
 ```
 
 ### Incorrect (DO NOT USE)
 
 ```php
 <?php
-call_theme_header();  // WRONG — causes duplicate headers and "headers already sent" errors
+call_theme_header();  // WRONG - causes duplicate headers and "headers already sent" errors
 ?>
 <div class="container">
     <!-- content -->
 </div>
 <?php
-call_theme_footer();  // WRONG — causes duplicate footers
+call_theme_footer();  // WRONG - causes duplicate footers
 ?>
 ```
 
@@ -338,7 +335,7 @@ call_theme_footer();  // WRONG — causes duplicate footers
 
 ## 5. Template Hierarchy
 
-The Dispatcher compiles the route table (defined in `Bootstrap::defineRoutingRules()`) and renders the template whose filename matches the route key. There is **no** `index.php` fallback chain — each route maps directly to `{routeKey}.php`:
+The Dispatcher compiles the route table (defined in `Bootstrap::defineRoutingRules()`) and renders the template whose filename matches the route key. There is **no** `index.php` fallback chain - each route maps directly to `{routeKey}.php`:
 
 | Route Key | URL Pattern | Template Rendered | Notes |
 |-----------|-------------|-------------------|-------|
@@ -352,13 +349,13 @@ The Dispatcher compiles the route table (defined in `Bootstrap::defineRoutingRul
 | `blog` | `/blog` and `/blog/*` | `blog.php` | |
 | `search` | `/search` (permalinks ON) or `?q=` on app root (permalinks OFF) | `search.php` | Routed to `SearchController` first |
 | `privacy` | `/privacy` | `privacy.php` | |
-| `locale` | `/locale` | — | Routed to `LocaleController` (language switch) |
+| `locale` | `/locale` | - | Routed to `LocaleController` (language switch) |
 | `download` | `/download/{identifier}` | `download.php` | |
 | `download_file` | `/download/{identifier}/file` | `download_file.php` | Bypasses header/footer (file stream) |
 | 404 | any unmatched URL | `404.php` | Set by the Dispatcher via `ThemeRenderer::render404()` |
 
 **Important:**
-- The Dispatcher validates content existence **before** rendering. If content is not found, it sets a 404 status and renders `404.php` — it never falls through to the requested template.
+- The Dispatcher validates content existence **before** rendering. If content is not found, it sets a 404 status and renders `404.php` - it never falls through to the requested template.
 - The `search`, `locale`, and `download_file` routes are special: they are handled by dedicated controllers/handlers and only some of them use the normal header/footer wrapper.
 - HTMX themes (like `valdur`) can request a fragment instead of a full page; the Dispatcher detects that and renders a partial view.
 
@@ -379,11 +376,11 @@ The homepage serves as the site's entry point and typically includes:
 **Key functions used:**
 
 ```php
-$featured = featured_post();                  // Random headline post
-$sticky = sticky_page();                       // Random sticky page
-$random = random_posts(1, 3);                  // Random posts for alternating layout
-$latest = latest_posts(6, 0);                  // Latest 6 posts
-$galleries = display_galleries(1, 8);          // Gallery images
+$featured = featured_post();                              // Random headline post(s)
+$sticky = sticky_page();                                   // Random sticky page(s)
+$random = random_posts(0, 6);                              // Random posts for alternating layout
+$latest = latest_posts(app_reading_setting()['post_per_page']); // Latest posts (posts-per-page setting)
+$galleries = display_galleries(0, 4);                      // Gallery images
 ```
 
 The latest-posts grid reuses the shared `partials/card.php` (via `prepare_post_card()`), so homepage cards look identical to category/tag/blog cards.
@@ -416,7 +413,7 @@ The single post template handles both public and password-protected posts:
 The protected/public decision is **owned by `Scriptlog\Service\ProtectedPostService`**, not by the template. The template only reads the result:
 
 ```php
-// In single.php — the service decides whether to show content or the unlock form
+// In single.php - the service decides whether to show content or the unlock form
 $protectedPostService = class_exists('ProtectedPostService') ? new ProtectedPostService() : null;
 $post_render = ($protectedPostService instanceof ProtectedPostService)
     ? $protectedPostService->resolve($retrieve_post, $_SESSION['unlocked_posts'] ?? [])
@@ -437,13 +434,13 @@ $show_password_form = $post_render['show_password_form'];
 ```
 
 **Important template rules (remediation):**
-- The template **never** calls `http_response_code()` or `exit()`. If the post is missing, it renders a plain "Post not found" message — the Dispatcher already validated content existence before the template ran.
+- The template **never** calls `http_response_code()` or `exit()`. If the post is missing, it renders a plain "Post not found" message - the Dispatcher already validated content existence before the template ran.
 - There is **no** `password-form.php` include anymore; the unlock form is inline in `single.php`.
 
 **Key JS dependencies:**
-- `assets/js/unlock-post.js` — handles AJAX unlock
-- `assets/js/comment-submission.js` — handles AJAX comment posting
-- `assets/js/load-comment.js` — loads comments dynamically
+- `assets/js/unlock-post.js` - handles AJAX unlock
+- `assets/js/comment-submission.js` - handles AJAX comment posting
+- `assets/js/load-comment.js` - loads comments dynamically
 
 **Security notes:**
 - Post data is fetched through `Scriptlog\Service\FrontService::getPublishedPost()` (via `front_service()`), not the deprecated `FrontHelper`.
@@ -501,8 +498,8 @@ $partial_dir = dirname(__FILE__) . '/partials/';
 ```
 
 **Key points:**
-- Every listing renders post cards through `partials/card.php` — the markup is identical on home, category, tag, archive, and blog pages.
-- `prepare_post_card()` returns a `PostViewModel` whose fields are escaped exactly once. The card partial prints them directly — no double escaping.
+- Every listing renders post cards through `partials/card.php` - the markup is identical on home, category, tag, archive, and blog pages.
+- `prepare_post_card()` returns a `PostViewModel` whose fields are escaped exactly once. The card partial prints them directly - no double escaping.
 - Pagination is a pre-built HTML string passed to `partials/paginator.php`, which wraps it in a Bootstrap `<nav>/<ul>` (and emits nothing when there is no pagination).
 
 ### 6.5 sidebar.php
@@ -514,14 +511,14 @@ $sidebar = function_exists('prepare_sidebar') ? prepare_sidebar() : null;
 ```
 
 Widgets include:
-- **Search form**: AJAX-powered with a hidden CSRF token, `aria-live` results container, a clear (×) button, and a permalink-aware non-JS fallback (the `search_action` is built with `theme_search_url()` — `/search` when permalinks are ON, app root `?q=` when OFF)
+- **Search form**: AJAX-powered with a hidden CSRF token, `aria-live` results container, a clear (×) button, and a permalink-aware non-JS fallback (the `search_action` is built with `theme_search_url()` - `/search` when permalinks are ON, app root `?q=` when OFF)
 - **Latest posts**: 5 most recent posts with thumbnails (via `$sidebar->latestPosts()`)
 - **Categories**: List with post counts (via `$sidebar->categories()`)
 - **Archives**: Monthly archive links with post counts (via `$sidebar->archives()`)
 - **Tags**: Tag cloud (via `$sidebar->tags()`)
 
 ```php
-// Search widget essentials — note the CSRF token and aria-live containers
+// Search widget essentials - note the CSRF token and aria-live containers
 <form action="<?= theme_escape_html($search_action); ?>" method="get" class="search-form" id="ajax-search-form"
       role="search" aria-label="<?= t('sidebar.search.title'); ?>">
     <input type="search" id="search-keyword" name="q" class="search-input"
@@ -543,7 +540,7 @@ Simple error page:
 
 ### 6.7 privacy.php
 
-Privacy policy page — either database-driven or static fallback:
+Privacy policy page - either database-driven or static fallback:
 - Policy content
 - Last updated date
 - Contact information
@@ -572,16 +569,16 @@ Download page templates:
 
 ### 6.11 archives.php
 
-Archive index page listing all archive months grouped by year (see the example at the end of §6.12):
+Archive index page listing all archive months grouped by year (see the example at the end of Section 6.12):
 
 ### 6.12 search.php
 
 The search results page displays matches from the `SearchFinder` engine:
 
-- **Route (permalinks ON)**: `/search?q=keyword` (full page) — the Dispatcher routes the `/search` path to `SearchController`
-- **Route (permalinks OFF)**: `?q=keyword` on the app root (e.g. `https://example.com/?q=keyword`) — the query-string router (`HandleRequest::deliverQueryString()`) dispatches the `q` key to `SearchController`
-- **AJAX**: `/api/v1/search?q=keyword` (sidebar widget — always path-based, independent of the permalink setting)
-- **Best practice**: never hard-code the `/search` path. Use the `theme_search_url()` helper (see §7.3) so the form action matches whichever URL scheme is active.
+- **Route (permalinks ON)**: `/search?q=keyword` (full page) - the Dispatcher routes the `/search` path to `SearchController`
+- **Route (permalinks OFF)**: `?q=keyword` on the app root (e.g. `https://example.com/?q=keyword`) - the query-string router (`HandleRequest::deliverQueryString()`) dispatches the `q` key to `SearchController`
+- **AJAX**: `/api/v1/search?q=keyword` (sidebar widget - always path-based, independent of the permalink setting)
+- **Best practice**: never hard-code the `/search` path. Use the `theme_search_url()` helper (see Section 7.3) so the form action matches whichever URL scheme is active.
 - **Data source**: four `$GLOBALS` entries set by `SearchController` before the template renders:
 
 | Global | Contents |
@@ -633,16 +630,16 @@ make_date($item->post_date)                                         // formatted
 - `search.type.post`, `search.type.page` (result type badges)
 
 **AJAX search flow (sidebar widget):**
-1. User types in search input — `search.js` fires a `GET /api/v1/search?q=keyword&type=all` request with a 300ms debounce
+1. User types in search input - `search.js` fires a `GET /api/v1/search?q=keyword&type=all` request with a 300ms debounce
 2. `SearchApiController` transforms results to JSON with id, title, slug, excerpt, type, date, url
-3. Up to 10 inline results shown in the `aria-live` dropdown; the "View all N results" link routes to `theme_search_url()` + `?q=keyword` (i.e. `/search?q=keyword` with permalinks ON, `?q=keyword` on the app root with permalinks OFF — the URL is read from `scriptlog_vars.search_url`, exposed by `header.php`)
+3. Up to 10 inline results shown in the `aria-live` dropdown; the "View all N results" link routes to `theme_search_url()` + `?q=keyword` (i.e. `/search?q=keyword` with permalinks ON, `?q=keyword` on the app root with permalinks OFF - the URL is read from `scriptlog_vars.search_url`, exposed by `header.php`)
 4. The request includes the hidden CSRF token from `#search-csrf`
 5. Non-JS fallback: the form submits via GET to the `theme_search_url()` action (permalinks-aware), and the Dispatcher routes to `SearchController`
 
 **Key JS dependencies:**
-- `assets/js/search.js` — jQuery AJAX autocomplete with debounce, XSS-safe rendering, clear-button handling
+- `assets/js/search.js` - jQuery AJAX autocomplete with debounce, XSS-safe rendering, clear-button handling
 
-**Archives example** (from `archives.php` — a grouped month/year listing):
+**Archives example** (from `archives.php` - a grouped month/year listing):
 
 ```
 2026
@@ -659,11 +656,11 @@ make_date($item->post_date)                                         // formatted
 
 ## 7. Theme Functions (functions.php & functions-*.php) Complete Reference
 
-> **Where do these functions live?** `functions.php` is a thin loader — it simply includes the five helper modules (`functions-i18n.php`, `functions-nav.php`, `functions-post.php`, `functions-media.php`, `functions-comments.php`). Every function below is guarded with `function_exists()` so the modules can be loaded safely more than once. You can call all of them as if they lived in a single `functions.php`.
+> **Where do these functions live?** `functions.php` is a thin loader - it simply includes the five helper modules (`functions-i18n.php`, `functions-nav.php`, `functions-post.php`, `functions-media.php`, `functions-comments.php`). Every function below is guarded with `function_exists()` so the modules can be loaded safely more than once. You can call all of them as if they lived in a single `functions.php`.
 >
 > The blog theme's `functions.php` also loads two shared building blocks before the modules:
-> - `theme_escape_html()` (from `lib/utility/theme-escape.php`) — the single output-escaping boundary used everywhere in the theme.
-> - The shared ViewModel layer (`Scriptlog\Core\Theme\*`) via `ThemeHelper::loadShared()` — the typed, already-escaped data objects templates render (`PostViewModel`, `SidebarViewModel`, `MenuViewModel`, ...).
+> - `theme_escape_html()` (from `lib/utility/theme-escape.php`) - the single output-escaping boundary used everywhere in the theme.
+> - The shared ViewModel layer (`Scriptlog\Core\Theme\*`) via `ThemeHelper::loadShared()` - the typed, already-escaped data objects templates render (`PostViewModel`, `SidebarViewModel`, `MenuViewModel`, ...).
 
 ### 7.1 i18n Functions (`functions-i18n.php`)
 
@@ -676,11 +673,11 @@ make_date($item->post_date)                                         // formatted
 | `is_rtl()` | `(): bool` | Check if current locale is RTL | `true` for Arabic |
 | `get_html_dir()` | `(): string` | Get HTML `dir` attribute value | `'ltr'` or `'rtl'` |
 | `language_switcher()` | `(array $args = []): string` | Generate language switcher HTML | HTML dropdown markup |
-| `get_language_name()` | `(string $locale, bool $native = false): string` | Get language display name | e.g. `'English'` or `'العربية'` |
+| `get_language_name()` | `(string $locale, bool $native = true): string` | Get language display name | e.g. `'English'` or `'العربية'` |
 | `get_all_language_names()` | `(): array` | Get all language display names | Locale → name map |
 | `detect_browser_locale()` | `(): string` | Detect locale from the `Accept-Language` header | Locale code, falls back to `'en'` |
 | `load_theme_translations()` | `(string $locale): array` | Load (and cache) a locale's JSON dictionary | Array of key → value |
-| `reset_i18n_cache()` | `(): void` | Clear the translation cache (used in tests) | — |
+| `reset_i18n_cache()` | `(): void` | Clear the translation cache (used in tests) | - |
 | `is_locale_prefix_enabled()` | `(): bool` | Whether the locale URL prefix feature is on | `true`/`false` |
 | `get_default_locale()` | `(): string` | Get the site's default language | e.g. `'en'` |
 
@@ -688,7 +685,6 @@ make_date($item->post_date)                                         // formatted
 
 | Function | Description | Returns |
 |----------|-------------|---------|
-| `request_path()` | Get the current request path object | `RequestPath` object |
 | `initialize_post()` | Initialize `PostModel` singleton | `PostModel` instance |
 | `initialize_page()` | Initialize `PageModel` singleton | `PageModel` instance |
 | `initialize_comment()` | Initialize `CommentModel` singleton | `CommentModel` instance |
@@ -716,27 +712,29 @@ make_date($item->post_date)                                         // formatted
 | `posts_by_category(int $topicId)` | Get posts by category/topic ID | Array with `entries` + `pagination` |
 | `retrieve_page(mixed $arg, bool $rewrite)` | Get page by ID or slug | Array or null |
 | `retrieve_archives()` | Get archives for sidebar widget | Array of archives |
-| `prepare_post_card(array $entry)` | **NEW** — normalize one post row into an escaped `PostViewModel` (used by `partials/card.php`) | `PostViewModel` |
+| `prepare_post_card(array $entry)` | **NEW** - normalize one post row into an escaped `PostViewModel` (used by `partials/card.php`) | `PostViewModel` |
 | `prepare_page(array $entry)` | Normalize a page row into an escaped `PageViewModel` | `PageViewModel` |
 | `prepare_archive(array $entry)` | Normalize an archive row into an escaped `ArchiveViewModel` | `ArchiveViewModel` |
 | `prepare_sidebar()` | Build the escaped `SidebarViewModel` (latest posts, categories, archives, tags, search action) | `SidebarViewModel` |
 | `format_topics($topics_data)` | Format topic data for display | Formatted array |
 | `nothing_found()` | Display a "no posts found" message | HTML string |
-| `theme_post_url(array $row)` | **NEW** — permalink-aware post URL from `['ID' => int, 'post_slug' => string]` | URL string |
-| `theme_page_url(array $row)` | **NEW** — permalink-aware page URL | URL string |
-| `theme_topic_url(array $row)` | **NEW** — permalink-aware category URL | URL string |
-| `theme_tag_url(string $tag)` | **NEW** — permalink-aware tag URL | URL string |
-| `theme_archive_url(string $month, string $year)` | **NEW** — permalink-aware archive URL | URL string |
-| `theme_search_url()` | **NEW** — permalink-aware search page URL: `{base}/search` when permalinks are ON, `{base}/` (query-string `?q=`) when OFF. Memoized per request. Use it for the full-page search form action (`search.php`), the sidebar `search_action` (`functions-post.php` / `sidebar.php`), and the `search_url` exposed to JS in `header.php` (`scriptlog_vars.search_url` consumed by `search.js` for the "View all results" link) | Raw (unescaped) URL string |
-| `theme_month_name(string $month)` | **NEW** — month number → local month name | String |
+| `theme_post_url(array $row)` | **NEW** - permalink-aware post URL from `['ID' => int, 'post_slug' => string]` | URL string |
+| `theme_page_url(array $row)` | **NEW** - permalink-aware page URL | URL string |
+| `theme_topic_url(array $row)` | **NEW** - permalink-aware category URL | URL string |
+| `theme_tag_url(string $tag)` | **NEW** - permalink-aware tag URL | URL string |
+| `theme_archive_url(string $month, string $year)` | **NEW** - permalink-aware archive URL | URL string |
+| `theme_search_url()` | **NEW** - permalink-aware search page URL: `{base}/search` when permalinks are ON, `{base}/` (query-string `?q=`) when OFF. Memoized per request. Use it for the full-page search form action (`search.php`), the sidebar `search_action` (`functions-post.php` / `sidebar.php`), and the `search_url` exposed to JS in `header.php` (`scriptlog_vars.search_url` consumed by `search.js` for the "View all results" link) | Raw (unescaped) URL string |
+| `theme_month_name(string $month)` | **NEW** - month number → local month name | String |
 
 ### 7.4 Navigation Functions (`functions-nav.php`)
 
+> **Where things live:** `theme_navigation()` is defined in `lib/utility/theme-navigation.php`. The `previous_post()`, `next_post()`, `link_tag()`, and `link_topic()` helpers are defined in `functions-post.php` (they render post navigation links) and are listed here because they are navigation-related.
+
 | Function | Signature | Description | Returns |
 |----------|-----------|-------------|---------|
-| `front_navigation()` | `(int $parent, array $menu): string` | **NEW behavior** — takes the raw `theme_navigation()` output, converts every item into a `MenuViewModel` (escaping once), builds the recursive tree with `build_menu_tree()`, and renders it | HTML string |
-| `build_menu_tree()` | `(array $items, array $parents, int $rootId = 0): array` | **NEW** — build a recursive `MenuViewModel` tree from flat items/parents | `MenuViewModel[]` |
-| `render_menu_tree()` | `(array $nodes): string` | **NEW** — render a `MenuViewModel` tree to dropdown HTML | HTML string |
+| `front_navigation()` | `(int $parent, array $menu): string` | **NEW behavior** - takes the raw `theme_navigation()` output, converts every item into a `MenuViewModel` (escaping once), builds the recursive tree with `build_menu_tree()`, and renders it | HTML string |
+| `build_menu_tree()` | `(array $items, array $parents, int $rootId = 0): array` | **NEW** - build a recursive `MenuViewModel` tree from flat items/parents | `MenuViewModel[]` |
+| `render_menu_tree()` | `(array $nodes): string` | **NEW** - render a `MenuViewModel` tree to dropdown HTML | HTML string |
 | `theme_navigation()` | `(string $visibility = 'public'): array` | Get menu items filtered by locale and visibility (lives in `lib/utility/theme-navigation.php`) | Array with `items` + `parents` |
 | `convert_menu_link()` | `(string $link, bool $permalinkEnabled): string` | Convert menu link between SEO-friendly and query-string format | Converted URL string |
 | `request_path()` | `(): object` | Get the current request path object | `RequestPath` object |
@@ -746,14 +744,16 @@ make_date($item->post_date)                                         // formatted
 | `previous_post()` | `(int $postId): string` | Get previous post navigation link | HTML string |
 | `next_post()` | `(int $postId): string` | Get next post navigation link | HTML string |
 
-### 7.5 Utility & Comments Functions (`functions-comments.php`, `functions-media.php`)
+### 7.5 Utility & Comments Functions (`functions-comments.php`, `functions-media.php`, `functions-post.php`)
+
+> **Where things live:** comment helpers (`total_comment()`, `block_csrf()`, `render_comments_section()`) are in `functions-comments.php`; media helpers (`get_slideshow()`, `display_galleries()`, `get_download_page_data()`, `get_post_thumbnail()`) are in `functions-media.php`; topic/tag helpers (`retrieves_topic_simple()`, `retrieves_topic_prepared()`, `sidebar_topics()`, `retrieve_tags()`) are in `functions-post.php`; and `make_date()` is a shared core helper in `lib/utility/make-date.php`.
 
 | Function | Signature | Description | Returns |
 |----------|-----------|-------------|---------|
 | `total_comment()` | `(int $postId): array` | Count approved comments for a post. **Returns an array** `['total' => int]`, not a plain integer. Use `$data['total']` | `['total' => int]` |
 | `block_csrf()` | `(): string` | Generate CSRF token for comment/search forms | Hidden input HTML |
 | `render_comments_section()` | `(int $postId, int $offset = 0): string` | Render comments section HTML by capturing `partials/comments.php` | HTML string |
-| `get_slideshow(int $limit)` | `(int $limit): array` | Get posts with media for the homepage slideshow | Array of posts |
+| `get_slideshow($limit = 5)` | `($limit = 5): array` | Get posts with media for the homepage slideshow | Array of posts |
 | `display_galleries()` | `(int $start, int $limit): array` | Get gallery media items | Array of media |
 | `get_download_page_data()` | `(string $identifier): array` | Get download page data by UUID identifier | Array |
 | `get_post_thumbnail()` | `(string $post_img, string $post_title, string $img_alt = ''): string` | Render an optimized post thumbnail image | HTML string |
@@ -761,7 +761,7 @@ make_date($item->post_date)                                         // formatted
 | `retrieves_topic_prepared()` | `(int $postId): array` | Get prepared topic data for a post | Array of topics |
 | `sidebar_topics()` | `(): array` | Get active topics with post counts | Array of topics |
 | `retrieve_tags()` | `(): array` | Get all tags from posts | Array of unique tags |
-| `make_date()` | `(string $timestamp): string` | Format date for display (e.g. "July 26, 2026"). ⚠ Display only — do NOT use in admin form `<input>` values; pass raw `Y-m-d H:i:s` instead. | Formatted date string |
+| `make_date()` | `(string $timestamp): string` | Format date for display (e.g. "July 26, 2026"). ⚠ Display only - do NOT use in admin form `<input>` values; pass raw `Y-m-d H:i:s` instead. | Formatted date string |
 
 ### 7.6 Shared Core Helpers (not theme files, but used everywhere)
 
@@ -869,18 +869,19 @@ foreach (available_locales() as $locale) :
 ### theme_navigation() Locale Filtering
 
 ```php
-function theme_navigation($visibility = 'public')
+function theme_navigation($visibility)
 {
-    $currentLocale = get_locale();
+    $currentLocale = function_exists('get_locale') ? get_locale() : 'en';
 
-    $sql = "SELECT ID, menu_label, menu_link, menu_status, menu_visibility, parent_id, menu_sort
+    $sql = "SELECT ID, menu_label, menu_link, menu_status, menu_visibility,
+                   parent_id, menu_sort, menu_locale
             FROM tbl_menu
             WHERE menu_status = 'Y'
               AND menu_visibility = ?
               AND (menu_locale = ? OR menu_locale IS NULL OR menu_locale = '')
-            ORDER BY menu_sort ASC";
+            ORDER BY menu_sort ASC, menu_label";
 
-    // ... execute query and return menu items filtered by locale
+    // ... execute query and return ['items' => [...], 'parents' => [...]]
 }
 ```
 
@@ -912,7 +913,7 @@ All CSS uses `media="print" onload="this.media='all'"` for non-blocking loading 
 
 ### 9.2 JavaScript Files
 
-All scripts after jQuery use the `defer` attribute for non-blocking execution. jQuery loads synchronously (no `defer`). In the blog theme, every `<script>` tag carries an SRI `integrity` hash and `crossorigin="anonymous"`, and inline `<script>` blocks include a CSP `nonce` (from the `CSP_NONCE` constant) — required by the site's Content-Security-Policy header.
+All scripts after jQuery use the `defer` attribute for non-blocking execution. jQuery loads synchronously (no `defer`). In the blog theme, every `<script>` tag carries an SRI `integrity` hash and `crossorigin="anonymous"`, and inline `<script>` blocks include a CSP `nonce` (from the `CSP_NONCE` constant) - required by the site's Content-Security-Policy header.
 
 | File | Purpose | Load Method |
 |------|---------|-------------|
@@ -988,7 +989,7 @@ JavaScript load order is critical for proper functionality. jQuery must load **s
 <?php endif; ?>
 ```
 
-> **The `header.php` also defines `scriptlog_vars`** — a global JS object exposing `api_url`, `site_url`, `theme_dir`, and a `search` object with translated strings for the AJAX search widget. Inline scripts that read it must include the `nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>"` attribute.
+> **The `header.php` also defines `scriptlog_vars`** - a global JS object exposing `api_url`, `site_url`, `theme_dir`, and a `search` object with translated strings for the AJAX search widget. Inline scripts that read it must include the `nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>"` attribute.
 
 ### 9.5 Minification Workflow
 
@@ -1046,13 +1047,14 @@ invoke_frontimg(string $media_filename, bool $image_thumb = true): string
 
 // Responsive <picture> element with WebP support
 invoke_responsive_image(
-    string $filename,
+    string $media_filename,
     string $size = 'thumbnail',    // 'thumbnail', 'medium', 'large'
     bool $image_thumb = true,
     string $alt = '',
     string $class = 'img-fluid',
     bool $fetchpriority = false,   // true for hero/LCP images
-    string $decoding = 'auto'
+    string $decoding = 'auto',
+    string $loading = 'auto'       // 'lazy'|'eager'|'auto' (no attribute when 'auto')
 ): string
 
 // Hero image with fetchpriority="high" (LCP optimization)
@@ -1060,13 +1062,13 @@ invoke_responsive_image(
 invoke_hero_image(string $media_filename, string $fallback_url = '', string $alt = ''): string
 
 // Gallery image with lazy loading
-invoke_gallery_image(string $filename, string $alt = ''): string
+invoke_gallery_image(string $media_filename, string $alt = ''): string
 ```
 
 ### Image Display in Templates
 
 ```php
-<!-- Hero/LCP image — high priority loading -->
+<!-- Hero/LCP image - high priority loading -->
 <?= invoke_hero_image($post['media_filename'], '', $post['post_title']); ?>
 
 <!-- Responsive image with WebP fallback -->
@@ -1130,7 +1132,7 @@ User selects language
 2. **English fallback**: if a key is missing from the current locale, `lang/en.json` is used
 3. **Key as-is**: if the key exists in neither, the key string itself is returned
 
-So every locale's dictionary may be a partial translation — missing keys automatically display in English.
+So every locale's dictionary may be a partial translation - missing keys automatically display in English.
 
 ### Translation Key Naming Convention
 
@@ -1160,16 +1162,16 @@ namespace.sub.key    →  "cookie_consent.buttons.accept"
 <?php endif; ?>
 ```
 
-**Two different interpolation formats — don't mix them up:**
+**Two different interpolation formats - don't mix them up:**
 
 | Format | Where it's used | Example |
 |--------|-----------------|---------|
-| `%param%` | PHP side — `t()` replaces `%param%` in the JSON string | `search.found_results` → `Found %count% result(s) for "%keyword%"` |
-| `{{placeholder}}` | JS side — the language switcher label is rendered by JavaScript | `header.nav.language_switch` → `Language: {{language}}` |
+| `%param%` | PHP side - `t()` replaces `%param%` in the JSON string | `search.found_results` → `Found %count% result(s) for "%keyword%"` |
+| `{{placeholder}}` | JS side - the language switcher label is rendered by JavaScript | `header.nav.language_switch` → `Language: {{language}}` |
 
 ### Translation Key Dictionary
 
-All keys below exist in `lang/en.json` (113 keys in the blog theme). Keys missing from another locale's JSON automatically fall back to English.
+All keys below exist in `lang/en.json` (117 keys in the blog theme). Keys missing from another locale's JSON automatically fall back to English.
 
 #### Navigation (header.nav.*, footer.navigation.*)
 | Key | English |
@@ -1321,19 +1323,19 @@ This prevents direct URL access to template files (e.g., `https://example.com/pu
 **There is one escaping boundary in the remediated themes: `theme_escape_html()`.** Use it for every dynamic string in a template. Never write your own `htmlspecialchars()` calls, and avoid mixing escape helpers.
 
 ```php
-// CORRECT — escape all dynamic output (plain text) with the single boundary
+// CORRECT - escape all dynamic output (plain text) with the single boundary
 <?= theme_escape_html($post['post_title']); ?>
 <a href="<?= theme_escape_html($postUrl); ?>"><?= theme_escape_html($post['post_title']); ?></a>
 
-// CORRECT — content that must keep its HTML is sanitized on the way in,
+// CORRECT - content that must keep its HTML is sanitized on the way in,
 // then printed as-is (trusted HTML). Never escaped a second time.
 <?= $post_content; ?>   <!-- already sanitized by htmLawed() in the service layer -->
 
-// CORRECT — post excerpt (pre-sanitized by paragraph_trim)
+// CORRECT - post excerpt (pre-sanitized by paragraph_trim)
 <?= paragraph_l2br(safe_html(paragraph_trim($post['post_content']))); ?>
 ```
 
-**The `htmlout()` double-encoding pitfall (for legacy code):** `htmlout()` chains `safe_html()` + `escape_html()`. Laminas' `escape_html()` calls `htmlspecialchars()` without `double_encode=false`, so valid entities like `&quot;` get re-encoded to `&amp;quot;`. Do not use `htmlout()` on content already stripped of tags — use `safe_html()` (as in the excerpt example above). New themes should simply use `theme_escape_html()` everywhere and only ever call `safe_html()` on pre-sanitized content.
+**The `htmlout()` double-encoding pitfall (for legacy code):** `htmlout()` chains `safe_html()` + `escape_html()`. Laminas' `escape_html()` calls `htmlspecialchars()` without `double_encode=false`, so valid entities like `&quot;` get re-encoded to `&amp;quot;`. Do not use `htmlout()` on content already stripped of tags - use `safe_html()` (as in the excerpt example above). New themes should simply use `theme_escape_html()` everywhere and only ever call `safe_html()` on pre-sanitized content.
 
 ### 12.3 CSRF Protection
 
@@ -1373,7 +1375,7 @@ The cookie consent banner must:
 ### 12.6 Security Checklist for Theme Development
 
 - [ ] All PHP files have `defined('SCRIPTLOG') || die()` guard
-- [ ] All dynamic output uses `theme_escape_html()` — the single escaping boundary; use `safe_html()` for content pre-sanitized by `paragraph_trim()` (never chain two escape helpers)
+- [ ] All dynamic output uses `theme_escape_html()` - the single escaping boundary; use `safe_html()` for content pre-sanitized by `paragraph_trim()` (never chain two escape helpers)
 - [ ] All forms include CSRF token via `block_csrf()` (including the AJAX search form)
 - [ ] User-submitted content is sanitized with `htmLawed()` in the service layer, not in templates
 - [ ] No database queries in templates (use the `functions-*.php` helpers / `FrontService`)
@@ -1386,7 +1388,7 @@ The cookie consent banner must:
 
 ---
 
-## 13. Creating a Custom Theme — Step-by-Step
+## 13. Creating a Custom Theme - Step-by-Step
 
 ### Step 1: Create Theme Directory
 
@@ -1407,7 +1409,7 @@ theme_directory = "my-theme"
 
 ### Step 3: Create functions.php
 
-**`functions.php` is a thin loader** — don't put all your code in it. Copy the structure from `public/themes/blog/functions.php`, which loads the shared helpers plus your own module files:
+**`functions.php` is a thin loader** - don't put all your code in it. Copy the structure from `public/themes/blog/functions.php`, which loads the shared helpers plus your own module files:
 
 ```php
 <?php
@@ -1486,7 +1488,7 @@ require dirname(__FILE__) . '/functions.php';
     <?php endif; ?>
     <link rel="shortcut icon" href="<?= theme_dir(); ?>assets/img/favicon.ico">
 
-    <!-- scriptlog_vars — the global JS config used by search.js and other scripts -->
+    <!-- scriptlog_vars - the global JS config used by search.js and other scripts -->
     <script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
         var scriptlog_vars = {
             api_url: '<?= app_url(); ?>/api/v1',
@@ -1552,7 +1554,7 @@ require dirname(__FILE__) . '/functions.php';
     </div>
 </footer>
 
-<!-- Scripts — jQuery MUST load first (synchronous), rest uses defer.
+<!-- Scripts - jQuery MUST load first (synchronous), rest uses defer.
      Add SRI integrity + crossorigin in production (see blog theme). -->
 <script src="<?= theme_dir(); ?>assets/vendor/jquery/jquery.min.js"></script>
 <script src="<?= theme_dir(); ?>assets/vendor/popper.js/umd/popper.min.js" defer></script>
@@ -1583,7 +1585,7 @@ if (function_exists('should_show_consent_banner') && should_show_consent_banner(
 
 ### Step 6: Create Template Files
 
-Each template follows the same pattern — no header/footer includes, just the content section.
+Each template follows the same pattern - no header/footer includes, just the content section.
 
 See [Section 6](#6-complete-template-reference) for detailed template descriptions.
 
@@ -1622,7 +1624,7 @@ cp -r public/themes/blog/assets/vendor/jquery.cookie public/themes/my-theme/asse
 cp -r public/themes/blog/assets/vendor/prism public/themes/my-theme/assets/vendor/
 ```
 
-(If you don't need a library — e.g. no syntax highlighting — you can skip it, but then also remove its `<link>`/`<script>` from your header/footer.)
+(If you don't need a library - e.g. no syntax highlighting - you can skip it, but then also remove its `<link>`/`<script>` from your header/footer.)
 
 ### Step 9: Minify Assets
 
@@ -1831,10 +1833,10 @@ cp public/themes/blog/assets/js/{search,unlock-post,comment-submission,load-comm
 **Fix:** Use only one Popper.js location:
 
 ```php
-<!-- CORRECT — single source -->
+<!-- CORRECT - single source -->
 <script src="assets/vendor/popper.js/umd/popper.min.js"></script>
 
-<!-- WRONG — don't load from two places -->
+<!-- WRONG - don't load from two places -->
 <script src="assets/vendor/bootstrap/js/popper.min.js"></script>
 <script src="assets/vendor/popper.js/umd/popper.min.js"></script>
 ```
@@ -1903,7 +1905,7 @@ curl -X POST "https://example.com/api/v1/posts/3/unlock" \
 | File | Location | Purpose |
 |------|----------|---------|
 | `theme.ini` | `public/themes/[theme]/` | Theme metadata configuration |
-| `functions.php` | `public/themes/[theme]/` | Thin loader — requires the modules below |
+| `functions.php` | `public/themes/[theme]/` | Thin loader - requires the modules below |
 | `functions-i18n.php` | `public/themes/[theme]/` | `t()`, `locale_url()`, `language_switcher()`, locale helpers |
 | `functions-nav.php` | `public/themes/[theme]/` | Menu tree + rendering, `convert_menu_link()` |
 | `functions-post.php` | `public/themes/[theme]/` | Post/page retrieval, `prepare_post_card()`, URL builders |
@@ -1936,11 +1938,11 @@ curl -X POST "https://example.com/api/v1/posts/3/unlock" \
 
 | File | Location | Purpose |
 |------|----------|---------|
-| `theme-caller.php` | `lib/utility/theme-caller.php` | `theme_identifier()`, `theme_dir()` — resolves active theme |
-| `theme-navigation.php` | `lib/utility/theme-navigation.php` | `theme_navigation()` — menu data with locale filtering |
-| `theme-escape.php` | `lib/utility/theme-escape.php` | `theme_escape_html()` — the single output-escaping boundary |
-| `front-service.php` | `lib/utility/front-service.php` | `front_service()` — returns the shared `FrontService` instance |
-| `front-paginator.php` | `lib/utility/front-paginator.php` | `front_paginator()` — returns a `Paginator` instance |
+| `theme-caller.php` | `lib/utility/theme-caller.php` | `theme_identifier()`, `theme_dir()` - resolves active theme |
+| `theme-navigation.php` | `lib/utility/theme-navigation.php` | `theme_navigation()` - menu data with locale filtering |
+| `theme-escape.php` | `lib/utility/theme-escape.php` | `theme_escape_html()` - the single output-escaping boundary |
+| `front-service.php` | `lib/utility/front-service.php` | `front_service()` - returns the shared `FrontService` instance |
+| `front-paginator.php` | `lib/utility/front-paginator.php` | `front_paginator()` - returns a `Paginator` instance |
 | `ThemeRenderer.php` | `lib/core/ThemeRenderer.php` | Renders header + content + footer; `render404()`; `blog` fallback |
 | `Theme/ThemeHelper.php` | `lib/core/Theme/ThemeHelper.php` | Loads shared ViewModel classes; exposes `factory()` |
 | `Theme/PostViewModel.php` | `lib/core/Theme/PostViewModel.php` | Escaped post data object rendered by templates |
@@ -1956,7 +1958,7 @@ curl -X POST "https://example.com/api/v1/posts/3/unlock" \
 | `ThemeController.php` | `lib/controller/ThemeController.php` | Theme admin page handling |
 | `FrontService.php` | `lib/service/FrontService.php` | Frontend data retrieval (posts, pages, topics, tags, archives, search) |
 | `ProtectedPostService.php` | `lib/service/ProtectedPostService.php` | Protected/public post resolution (decrypt, sanitize) |
-| `FrontHelper.php` | `lib/core/FrontHelper.php` | ⚠ **Deprecated** — kept for backward compatibility. Use `FrontService` instead. |
+| `FrontHelper.php` | `lib/core/FrontHelper.php` | ⚠ **Deprecated** - kept for backward compatibility. Use `FrontService` instead. |
 
 ### Asset Files
 
@@ -2063,7 +2065,7 @@ nothing_found()                       // "No posts" message
 14. Deploy
 ```
 
-> **Best Practice:** Always base your theme on `public/themes/blog/` — it contains all required functions (split into modules), correct template patterns (with shared `partials/`), the single `theme_escape_html()` escaping boundary, and working vendor configurations.
+> **Best Practice:** Always base your theme on `public/themes/blog/` - it contains all required functions (split into modules), correct template patterns (with shared `partials/`), the single `theme_escape_html()` escaping boundary, and working vendor configurations.
 
 ---
 
