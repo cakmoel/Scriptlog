@@ -1,6 +1,6 @@
 # Testing Guide - Scriptlog
 
-**Version:** 1.1.0 | **Last Updated:** June 2026
+**Version:** 1.3.0 | **Last Updated:** August 2026
 
 ---
 
@@ -34,12 +34,13 @@ This project uses two complementary testing approaches:
 
 | Metric | Value |
 |--------|-------|
-| **Total Tests** | 1,240 |
-| **Enabled Tests** | 1,292 (1,240 + 52 skipped) |
-| **Test Files** | 115 |
-| **Assertions** | 2,584 |
-| **PHPUnit Version** | 9.6.34 |
+| **Total Tests** | 2,269 |
+| **Test Files** | 167 |
+| **Assertions** | 8,074 |
+| **Skipped / Risky** | 15 skipped, 60 risky |
+| **PHPUnit Version** | 9.6.35 |
 | **Target Coverage** | 40% |
+| **Current Coverage** | ~38% |
 
 ### Test Categories
 
@@ -47,6 +48,8 @@ This project uses two complementary testing approaches:
 |----------|-------------|
 | **Unit Tests** | Utility function tests, class existence tests |
 | **Integration Tests** | Database CRUD operations using `blogware_test` database |
+| **Service Tests** | Business-logic tests for `lib/service/` classes |
+| **API Tests** | REST API tests under `tests/api/`, run via the dedicated API Tests suite |
 
 ---
 
@@ -54,15 +57,17 @@ This project uses two complementary testing approaches:
 
 ### Current State
 
-| Category | Files/Tests |
-|----------|-------------|
-| Core classes | ~90 |
-| DAO classes | 16 |
-| Service classes | 16 |
-| Controller classes | 15 |
+| Category | Files |
+|----------|-------|
+| Core classes (`lib/core`, excl. HTMLPurifier) | 103 |
+| DAO classes | 19 |
+| Service classes | 23 |
+| Controller classes (incl. 12 API) | 32 |
+| Handler classes (incl. admin commands) | 48 |
 | Model classes | 9 |
-| Utility functions | ~196 |
-| **Total PHP Files** | **339** |
+| Validator classes | 5 |
+| DTO classes (incl. `dto/api/`) | 5 |
+| Utility function files | 224 |
 
 ### Test-Scenario Plan to Reach 40%
 
@@ -143,7 +148,7 @@ Fill gaps in utility function testing.
 
 | Phase | Priority | Status | New Tests | Cumulative Total |
 |-------|----------|--------|-----------|----------|
-| Pre-existing | — | ✅ Complete | 833 | 833 |
+| Pre-existing | - | ✅ Complete | 833 | 833 |
 | Phase 1: DAO Integration | HIGH | ✅ Complete | 92 | 925 |
 | Phase 2: Service Layer | HIGH | ✅ Complete | 148 | 1,073 |
 | Phase 3: Core Classes | MEDIUM | ✅ Complete | 65 | 1,138 |
@@ -152,7 +157,9 @@ Fill gaps in utility function testing.
 | Password Protected Posts | HIGH | ✅ Complete | 59 | 466 |
 
 **Total New Tests Added**: 466
-**Total Suite**: 927 tests across 115 files, 1,968 assertions
+**Total Suite**: 2,269 tests across 167 files, 8,074 assertions
+
+> The phase table above is a historical record of when tests were added. Current suite totals as of August 2026: 2,269 tests across 167 files with 8,074 assertions (15 skipped, 60 risky).
 
 ### Recently Added Tests
 
@@ -191,7 +198,7 @@ Fill gaps in utility function testing.
 - ✓ `tests/integration/UserDaoIntegrationTest.php`
 - ✓ `tests/integration/PostDaoIntegrationTest.php` (Includes performance/eager loading tests)
 - ✓ `tests/integration/PostDaoMethodIntegrationTest.php`
-- ✓ `tests/integration/TopicDaoIntegrationTest.php`
+- ✓ `tests/integration/TopicDaoTest.php`
 - ✓ `tests/integration/PageDaoIntegrationTest.php`
 - ✓ `tests/integration/MenuDaoIntegrationTest.php`
 - ✓ `tests/integration/PluginDaoIntegrationTest.php`
@@ -235,23 +242,27 @@ Fill gaps in utility function testing.
 - ✓ `tests/service/MenuServiceTest.php` (14 tests)
 - ✓ `tests/service/PageServiceTest.php` (16 tests)
 - ✓ `tests/service/NotificationServiceTest.php` (14 tests)
+- ✓ `tests/service/DataRequestServiceTest.php`
+- ✓ `tests/service/ScheduledPostServiceTest.php`
+- ✓ `tests/service/DownloadCreateLinkTest.php`
 
-#### Phase 3 - Core Class Tests (Complete) — 65 tests
-- ✓ `tests/core/AuthenticationTest.php` (10 tests — user access control, cookie handling, login)
-- ✓ `tests/core/SessionMakerTest.php` (8 tests — session lifecycle, fingerprinting, encryption)
-- ✓ `tests/core/FormValidatorTest.php` (15 tests — input validation, sanitization, JSON output)
-- ✓ `tests/core/PaginatorTest.php` (8 tests — page calculation, limit generation, link rendering)
-- ✓ `tests/core/SanitizeTest.php` (8 tests — SQL/XSS/URI sanitization, mild/severe/strict filters)
-- ✓ `tests/core/DbFactoryTest.php` (4 tests — connection factory, error handling, singleton pattern)
-- ✓ `tests/core/DispatcherTest.php` (6 tests — URL routing, content validation, 404 handling)
-- ✓ `tests/core/ViewTest.php` (6 tests — template rendering, variable assignment, error handling)
+#### Phase 3 - Core Class Tests (Complete) - 65 tests
+Core tests live in `tests/core/` and `tests/unit/`. The dedicated `SessionMaker`, `Paginator`, `Sanitize`, `DbFactory`, and `View` test files were later removed during test consolidation; those classes are still exercised indirectly by integration and service tests.
+- ✓ `tests/core/AuthenticationTest.php` (10 tests - user access control, cookie handling, login)
+- ✓ `tests/core/FormValidatorTest.php` (15 tests - input validation, sanitization, JSON output)
+- ✓ `tests/unit/DispatcherDispatchTest.php` (6 tests - URL routing, content validation, 404 handling)
 
 #### Phase 4 - Controller Tests (Complete)
-- ✓ `tests/controller/PostControllerTest.php` (8 tests)
-- ✓ `tests/controller/UserControllerTest.php` (8 tests)
-- ✓ `tests/controller/CommentControllerTest.php` (6 tests)
-- ✓ `tests/controller/MediaControllerTest.php` (6 tests)
-- ✓ `tests/controller/TopicControllerTest.php` (6 tests)
+
+The original `tests/controller/*` files were consolidated into `tests/unit/` and `tests/api/unit/`. Current controller test files:
+
+- ✓ `tests/unit/PostControllerProtectedPostTest.php` (27 tests)
+- ✓ `tests/unit/PostControllerValidationTest.php`
+- ✓ `tests/unit/SearchControllerTest.php`
+- ✓ `tests/unit/ApiControllerTest.php`
+- ✓ `tests/unit/QueryApiControllerTest.php`
+- ✓ `tests/unit/SearchApiControllerTest.php`
+- ✓ `tests/api/unit/*ApiControllerTest.php` (10 API endpoint controller tests)
 
 #### Unit Tests (60+ files)
 - ✓ `tests/unit/AdminLocaleInitializationTest.php`
@@ -260,8 +271,6 @@ Fill gaps in utility function testing.
 - ✓ `tests/unit/AppKeyTest.php`
 - ✓ `tests/unit/BootstrapTest.php`
 - ✓ `tests/unit/ConfigFileGenerationTest.php`
-- ✓ `tests/unit/DbMySQLiFunctionsTest.php`
-- ✓ `tests/unit/DownloadHandlerTest.php`
 - ✓ `tests/unit/DownloadPageDataTest.php`
 - ✓ `tests/unit/DownloadServiceTest.php`
 - ✓ `tests/unit/DownloadSettingsTest.php`
@@ -282,7 +291,6 @@ Fill gaps in utility function testing.
 - ✓ `tests/unit/MedooinFunctionsTest.php` (26 tests)
 - ✓ `tests/unit/MembershipFunctionsTest.php` (26 tests)
 - ✓ `tests/unit/NavigationI18nTest.php`
-- ✓ `tests/unit/NumberCpusTest.php`
 - ✓ `tests/unit/OpenApiSpecVerificationTest.php`
 - ✓ `tests/unit/PageCacheTest.php`
 - ✓ `tests/unit/PerformanceOptimizationTest.php`
@@ -299,7 +307,8 @@ Fill gaps in utility function testing.
 - ✓ `tests/unit/ThemeRendererTest.php`
 - ✓ `tests/unit/ThemeUploadTest.php`
 - ✓ `tests/unit/TranslationLoaderTest.php`
-- ✓ `tests/unit/UtilityLoaderTest.php`
+
+Additional unit tests live under `tests/unit/handlers/`, `tests/unit/validator/`, and `tests/unit/dto/`. API tests are under `tests/api/unit/` and `tests/api/integration/` (plus `tests/api/unit/dto/`), and a smoke test under `tests/smoke/`.
 
 ## 4. Static Analysis with PHPStan
 
@@ -320,20 +329,31 @@ includes:
 
 parameters:
     phpVersion: 70400
+
     paths:
         - lib/
         - index.php
+
     excludePaths:
-        - lib/vendor/
-        - lib/core/HTMLPurifier/
+        - lib/vendor/*
+        - lib/core/HTMLPurifier/*
+        - lib/core/ServiceException.php
+        - tests/*
+
+    bootstrapFiles:
+        - tests/phpstan-bootstrap.php
+
+    reportUnmatchedIgnoredErrors: false
+
     level: 0
 ```
 
 ### Key Settings
 
 - **phpVersion**: Set to `70400` for PHP 7.4 compatibility
-- **level**: Currently at level 0 (most lenient). Increase gradually for stricter checks.
-- **excludePaths**: Excludes vendor and third-party code
+- **level**: Currently at level 0 (most lenient). The `composer phpstan` script runs at level 1; `composer phpstan:strict` runs at level 5.
+- **excludePaths**: Excludes vendor and third-party code (HTMLPurifier) plus the test suite itself
+- **bootstrapFiles**: Loads `tests/phpstan-bootstrap.php` before analysis
 
 ---
 
@@ -342,8 +362,14 @@ parameters:
 ### PHPUnit Commands
 
 ```bash
-# Run all tests
+# Run all tests (uses phpunit.xml: 5 test suites)
 lib/vendor/bin/phpunit
+
+# PHP 8.5 dev environment emits deprecation noise; suppress for readable output:
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit
+
+# Or via Composer
+composer test
 
 # Run with coverage (requires Xdebug)
 lib/vendor/bin/phpunit --coverage-html coverage
@@ -358,14 +384,17 @@ lib/vendor/bin/phpunit --filter "EmailValidation"
 ### PHPStan Commands
 
 ```bash
-# Run static analysis
-lib/vendor/bin/phpstan analyse
+# Run static analysis (level 1 via composer)
+composer phpstan
 
-# Run with specific config
-lib/vendor/bin/phpstan analyse --configuration=phpstan.neon
+# Run strict analysis (level 5)
+composer phpstan:strict
 
 # Run with memory limit (recommended)
 lib/vendor/bin/phpstan analyse --memory-limit=1G
+
+# Run with specific config
+lib/vendor/bin/phpstan analyse --configuration=phpstan.neon
 
 # Generate/update baseline
 lib/vendor/bin/phpstan analyse --generate-baseline=phpstan.baseline.neon
@@ -479,13 +508,19 @@ jobs:
 
 ### Pre-commit Hook
 
-Add to `.git/hooks/pre-commit`:
+The repository ships a pre-commit hook at `.githooks/pre-commit`. Enable it after clone:
 
 ```bash
-#!/bin/bash
-lib/vendor/bin/phpstan analyse --memory-limit=1G
-lib/vendor/bin/phpunit
+git config core.hooksPath .githooks
 ```
+
+The hook enforces:
+
+- No `.sql` files or unexpected non-directory files under `lib/` (SQL belongs in `install/`)
+- PHP 7.4 backward compatibility via the PHPCompatibility sniff (`phpcs-compatibility.xml`) on every staged PHP file
+- It blocks commits that use PHP 8.0+ features or rely on changed defaults (e.g. `html_entity_decode()` flags changed in PHP 8.1)
+
+Do not bypass with `git commit --no-verify`.
 
 ---
 
@@ -495,10 +530,11 @@ lib/vendor/bin/phpunit
 
 | Issue | Solution |
 |-------|----------|
-| Tests fail with "Database not found" | Run `mysql -u blogwareuser -puserblogware blogware_test < tests/setup_test_db.sql` |
+| Tests fail with "Database not found" | Run `php tests/setup_test_db.php`, or create the `blogware_test` database manually |
 | Integration tests skip unexpectedly | Ensure `Registry::set('dbc', ...)` is called in setUpBeforeClass for DAO-dependent tests |
 | Xdebug required for coverage | Install Xdebug or skip coverage with `--no-coverage` |
 | DAO locale/lang_code too long | Keep test locale values ≤ 10 chars for VARCHAR(10) columns |
+| PHPUnit deprecation noise on PHP 8.5 | Run with `php -d error_reporting='E_ALL' lib/vendor/bin/phpunit` |
 
 ### PHPStan Issues
 
@@ -519,4 +555,4 @@ lib/vendor/bin/phpunit
 
 ---
 
-*Last Updated: June 2026 | Version 1.2.0*
+*Last Updated: August 2026 | Version 1.3.0*
