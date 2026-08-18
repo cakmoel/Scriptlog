@@ -36,7 +36,69 @@ function minify_js($input) {
     return trim($output);
 }
 
+/**
+ * Recompute and rewrite the sha384 integrity hashes in a theme's PHP
+ * templates so they always match the on-disk (served) minified assets.
+ *
+ * Without this, regenerating .min.css/.min.js files leaves stale
+ * integrity attributes behind in header.php/footer.php, and browsers
+ * block the assets (SRI mismatch), which silently breaks styling and
+ * scripts on the live site.
+ *
+ * @param string $theme_dir Absolute path to the theme directory.
+ * @param string $repo_root Absolute path to the repository root.
+ * @return int Number of integrity attributes updated.
+ */
+function sync_integrity_hashes($theme_dir, $repo_root)
+{
+    $updated = 0;
+
+    foreach (glob($theme_dir . '/*.php') as $template) {
+        $html = file_get_contents($template);
+
+        if (strpos($html, 'integrity="sha384-') === false) {
+            continue;
+        }
+
+        $html = preg_replace_callback(
+            '/\b(?:href|src)="([^"]+)"\s+integrity="sha384-([^"]+)"/',
+            function ($tag) use ($theme_dir, $repo_root, &$updated) {
+                $tag_html = $tag[0];
+                $url = $tag[1];
+
+                if (strpos($url, '<?= theme_dir(); ?>') === 0) {
+                    $path = $theme_dir . '/' . substr($url, strlen('<?= theme_dir(); ?>'));
+                } else {
+                    $rel = ltrim((string) parse_url($url, PHP_URL_PATH), '/');
+                    $path = $repo_root . '/' . $rel;
+                }
+
+                $path = strtok($path, '?');
+
+                if (!is_file($path)) {
+                    return $tag_html;
+                }
+
+                $actual = base64_encode(hash('sha384', file_get_contents($path), true));
+
+                if ($tag[2] === $actual) {
+                    return $tag_html;
+                }
+
+                $updated++;
+                return str_replace('integrity="sha384-' . $tag[2] . '"', 'integrity="sha384-' . $actual . '"', $tag_html);
+            },
+            $html
+        );
+
+        file_put_contents($template, $html);
+    }
+
+    return $updated;
+}
+
 $themes_dir = __DIR__ . '/../public/themes';
+$repo_root = dirname(__DIR__);
 $theme_folders = array_diff(scandir($themes_dir), ['.', '..', 'index.php', 'maintenance.php']);
 
 $total_css = 0;
@@ -75,6 +137,13 @@ foreach ($theme_folders as $theme) {
             file_put_contents($min_file, minify_js(file_get_contents($file)));
             $total_js++;
         }
+    }
+
+    // Keep integrity hashes in theme templates in sync with regenerated assets
+    $theme_dir = $themes_dir . '/' . $theme;
+    $hashes_updated = sync_integrity_hashes($theme_dir, $repo_root);
+    if ($hashes_updated > 0) {
+        echo "  Updated $hashes_updated stale integrity hash(es) in theme templates.\n";
     }
 }
 

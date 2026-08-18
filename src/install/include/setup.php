@@ -552,6 +552,9 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
             // insert language settings
             $link->query($insertLangSettings);
 
+            // insert page cache settings (disabled by default)
+            $link->query($insertCacheSettings);
+
             // insert default theme
             $recordTheme = $link->prepare($saveTheme);
             $recordTheme->bind_param("sssss", $theme_title, $theme_desc, $theme_designer, $theme_directory, $theme_status);
