@@ -112,7 +112,6 @@ class_alias('Scriptlog\Core\MessageLog', 'MessageLog');
 class_alias('Scriptlog\Service\MigrationService', 'MigrationService');
 class_alias('Scriptlog\Core\ModelException', 'ModelException');
 class_alias('Scriptlog\Service\NotificationService', 'NotificationService');
-class_alias('Scriptlog\Core\PageCache', 'PageCache');
 class_alias('Scriptlog\Controller\PageController', 'PageController');
 class_alias('Scriptlog\Dao\PageDao', 'PageDao');
 class_alias('Scriptlog\Handler\PageHandler', 'PageHandler');
