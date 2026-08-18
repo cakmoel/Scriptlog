@@ -114,7 +114,6 @@ return [
     'MigrationService' => 'Scriptlog\Service\MigrationService',
     'ModelException' => 'Scriptlog\Core\ModelException',
     'NotificationService' => 'Scriptlog\Service\NotificationService',
-    'PageCache' => 'Scriptlog\Core\PageCache',
     'PageController' => 'Scriptlog\Controller\PageController',
     'PageDao' => 'Scriptlog\Dao\PageDao',
     'PageHandler' => 'Scriptlog\Handler\PageHandler',
