@@ -1,6 +1,6 @@
 # Developer Guide - Scriptlog
 
-**Version:** 1.8.0 | **Last Updated:** August 2026
+**Version:** 1.8.1 | **Last Updated:** August 2026
 
 ---
 
@@ -4316,7 +4316,7 @@ SCRIPTLOG          // Security constant (HMAC hash)
 
 // Settings
 APP_TITLE          // 'Scriptlog'
-APP_VERSION        // '1.8.0'
+APP_VERSION        // '1.8.1'
 APP_DEVELOPMENT    // true or false
 ```
 
@@ -6051,4 +6051,4 @@ This project is licensed under the MIT License.
 
 ---
 
-*Last Updated: August 2026 | Version 1.8.0*
+*Last Updated: August 2026 | Version 1.8.1*
