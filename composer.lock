@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "catfan/medoo",
-            "version": "v2.5.0",
+            "version": "v2.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/catfan/Medoo.git",
-                "reference": "3c6690957337b822520ade34a74fb715763d5515"
+                "reference": "f0e443d420d6844c89da18b0420918739ddb2d5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/catfan/Medoo/zipball/3c6690957337b822520ade34a74fb715763d5515",
-                "reference": "3c6690957337b822520ade34a74fb715763d5515",
+                "url": "https://api.github.com/repos/catfan/Medoo/zipball/f0e443d420d6844c89da18b0420918739ddb2d5d",
+                "reference": "f0e443d420d6844c89da18b0420918739ddb2d5d",
                 "shasum": ""
             },
             "require": {
@@ -25,6 +25,7 @@
                 "php": ">=7.3"
             },
             "require-dev": {
+                "phpstan/phpstan": "^2.2",
                 "phpunit/phpunit": "^13"
             },
             "suggest": {
@@ -80,7 +81,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2026-07-13T01:24:34+00:00"
+            "time": "2026-08-22T03:52:08+00:00"
         },
         {
             "name": "cweagans/composer-patches",
