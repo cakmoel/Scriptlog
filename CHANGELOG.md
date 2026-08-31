@@ -8,12 +8,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#180---2026-08-19)
+- [Latest Release](#181---2026-08-31)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.8.1] - 2026-08-31
+
+### Added
+- None
+
+### Changed
+- **Dependency updates**:
+  - `catfan/medoo` 2.5.0 → **2.6.0**
+  - `vlucas/phpdotenv` 5.6.4 → **5.7.0**
+  - Dev: `friendsofphp/php-cs-fixer` 3.95.18/3.95.20 → **3.95.23**
+  - Dev: `phpstan/phpstan` 2.2.8 → **2.2.9**
+
+### Fixed
+- None
+
+### Removed
+- None
+
+### Deprecated
+- None
+
+### Security
+- No new security advisories were introduced by this release. `composer audit` reports no vulnerable packages in the dependency tree.
+
+### Notes
+Patch release following v1.8.0: routine dependency bump to keep the runtime and development tooling current, plus documentation-only updates (reference diagrams, formatting normalization, corrected counts, and version stamps in the developer/testing/theme guides). No functional, user-facing, or breaking changes were introduced. All 2527 unit tests pass and CI on `main` is green.
+
+### Codename
+**Maleo Senkawor** (retained) – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.8.0
+- **Changes since v1.8.0**: 10 commits (dependencies + documentation only)
+
+---
 
 ## [1.8.0] - 2026-08-19
 
