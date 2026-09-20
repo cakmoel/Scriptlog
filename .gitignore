@@ -71,6 +71,10 @@ check-headers.php
 # aider
 .aider.*
 
+# opencode
+.opencode
+opencode.json
+
 # Todo
 /Todo/
 
