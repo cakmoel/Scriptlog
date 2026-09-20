@@ -56,6 +56,18 @@ class MenuDaoIntegrationTest extends TestCase
         self::$menuId = null;
     }
 
+    protected function tearDown(): void
+    {
+        // Remove every row this suite may have left behind so it never
+        // pollutes shared test data (e.g. the LanguageSwitcher menu assertions).
+        if (self::$pdo) {
+            self::$pdo->exec(
+                "DELETE FROM tbl_menu WHERE menu_link LIKE '%-test-%' OR menu_label IN ('Test Menu', 'Updated Menu Label')"
+            );
+        }
+        self::$menuId = null;
+    }
+
     public function testInsertMenu(): void
     {
         $link = self::TEST_LINK . '-' . time();

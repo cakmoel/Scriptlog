@@ -16,12 +16,12 @@ class CoverageVerificationTest extends TestCase
     {
         $this->assertFileExists(__DIR__ . '/integration/UserDaoIntegrationTest.php');
         $this->assertFileExists(__DIR__ . '/integration/PostDaoIntegrationTest.php');
-        $this->assertFileExists(__DIR__ . '/integration/PageDaoIntegrationTest.php');
+        $this->assertFileExists(__DIR__ . '/integration/TopicIntegrationTest.php');
     }
 
     public function testNewServiceTestExists(): void
     {
-        $this->assertFileExists(__DIR__ . '/service/UserServiceTest.php');
+        $this->assertTrue(class_exists('UserServiceTest'));
     }
 
     public function testBasicAssertionWorks(): void

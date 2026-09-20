@@ -192,6 +192,13 @@ class CoreClassesExistenceTest extends TestCase
         $this->assertTrue(class_exists('PassPhraseKey'));
     }
     
+    public function testPageCacheClassExists(): void
+    {
+        // PageCache class removed (dead code) — full-page cache lives in
+        // lib/utility/page-cache.php (page_cache_* functions).
+        $this->assertFalse(class_exists('PageCache'));
+    }
+    
     public function testDbMySQLiClassExists(): void
     {
         $this->assertTrue(class_exists('DbMySQLi'));

@@ -1,0 +1,18 @@
+{
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.1.1",
+    "eslint": "^10.7.0",
+    "globals": "^17.7.0",
+    "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:report": "playwright show-report",
+    "test:e2e:chromium": "playwright test --project=chromium",
+    "test:e2e:tb": "playwright test --config=playwright.tastybites.config.ts",
+    "test:e2e:tb:chromium": "playwright test --config=playwright.tastybites.config.ts --project=chromium",
+    "test:e2e:tb:typecheck": "tsc --noEmit"
+  }
+}

@@ -1,0 +1,18 @@
+{
+    "excludes": [
+        "install",
+        "phproject.php",
+        "lib/core/HTMLPurifier",
+        "lib/vendor",
+        "tests",
+        "tests/simpletest"
+    ],
+    "extensions": [
+        "php",
+        "php5",
+        "php7"
+    ],
+    "report": {
+        "html": "/metrics/"
+    }
+}

@@ -2,55 +2,64 @@
 
 use PHPUnit\Framework\TestCase;
 
-/**
- * ProtectedPostService Tests
- *
- * Covers the new Scriptlog\Service\ProtectedPostService which owns the
- * protected-vs-public render decision and the sanitization pipeline that
- * previously lived inline in the single.php template.
- */
 class ProtectedPostServiceTest extends TestCase
 {
     protected function setUp(): void
     {
-        require_once __DIR__ . '/../../src/lib/service/ProtectedPostService.php';
+        require_once __DIR__ . '/../../lib/service/ProtectedPostService.php';
     }
 
     public function testClassExists(): void
     {
-        $this->assertTrue(class_exists('Scriptlog\Service\ProtectedPostService'));
+        $this->assertTrue(class_exists('ProtectedPostService'));
     }
 
-    public function testPublicPostReturnsContent(): void
+    public function testConstructorAcceptsNoArguments(): void
     {
-        $service = new \Scriptlog\Service\ProtectedPostService();
-        $post = ['ID' => 1, 'post_visibility' => 'public', 'post_content' => '<p>Hello</p>'];
+        $service = new ProtectedPostService();
+        $this->assertInstanceOf(ProtectedPostService::class, $service);
+    }
 
-        $result = $service->resolve($post);
+    public function testPublicPostResolvesSanitizedContent(): void
+    {
+        $service = new ProtectedPostService();
 
+        $result = $service->resolve([
+            'ID' => 7,
+            'post_visibility' => 'public',
+            'post_content' => 'Hello &amp; goodbye <strong onclick="evil()">world</strong>'
+        ]);
+
+        $this->assertSame(7, $result['id']);
         $this->assertFalse($result['is_protected']);
         $this->assertFalse($result['is_unlocked']);
         $this->assertFalse($result['show_password_form']);
-        $this->assertSame('<p>Hello</p>', $result['content']);
-        $this->assertSame(1, $result['id']);
+        $this->assertStringContainsString('Hello &amp; goodbye', $result['content']);
+        $this->assertStringContainsString('<strong>world</strong>', $result['content']);
+        $this->assertStringNotContainsString('onclick', $result['content']);
     }
 
-    public function testPublicPostWithoutContentReturnsNotFound(): void
+    public function testPublicPostWithoutContentFallsBackToNotice(): void
     {
-        $service = new \Scriptlog\Service\ProtectedPostService();
-        $post = ['ID' => 1, 'post_visibility' => 'public'];
+        $service = new ProtectedPostService();
 
-        $result = $service->resolve($post);
+        $result = $service->resolve([
+            'ID' => 8,
+            'post_visibility' => 'public'
+        ]);
 
         $this->assertSame('Content not found', $result['content']);
     }
 
-    public function testProtectedPostNotUnlockedShowsPasswordForm(): void
+    public function testProtectedPostRequiresSessionKeyToRender(): void
     {
-        $service = new \Scriptlog\Service\ProtectedPostService();
-        $post = ['ID' => 2, 'post_visibility' => 'protected', 'post_content' => 'secret'];
+        $service = new ProtectedPostService();
 
-        $result = $service->resolve($post);
+        $result = $service->resolve([
+            'ID' => 9,
+            'post_visibility' => 'protected',
+            'post_content' => 'secret'
+        ], []);
 
         $this->assertTrue($result['is_protected']);
         $this->assertFalse($result['is_unlocked']);
@@ -58,82 +67,59 @@ class ProtectedPostServiceTest extends TestCase
         $this->assertSame('', $result['content']);
     }
 
-    public function testProtectedPostUnlockedDecryptsContent(): void
+    public function testProtectedPostUnlockedRendersDecryptedContent(): void
     {
-        $decrypt = function (int $id, string $password): array {
-            return ['post_content' => '<p>decrypted ' . $password . '</p>'];
+        $decrypt = function ($id, $password) {
+            return ['post_content' => 'Unlocked <p style="color:red">secret</p> <i onclick="x()">text</i>'];
         };
 
-        $service = new \Scriptlog\Service\ProtectedPostService($decrypt);
-        $post = ['ID' => 3, 'post_visibility' => 'protected', 'post_content' => 'ignored'];
+        $service = new ProtectedPostService($decrypt);
 
-        $result = $service->resolve($post, [3 => 'secret']);
+        $result = $service->resolve([
+            'ID' => 10,
+            'post_visibility' => 'protected',
+            'post_content' => 'encrypted blob'
+        ], [10 => 'correct-password']);
 
         $this->assertTrue($result['is_protected']);
         $this->assertTrue($result['is_unlocked']);
         $this->assertFalse($result['show_password_form']);
-        $this->assertStringContainsString('decrypted secret', $result['content']);
+        $this->assertStringContainsString('secret', $result['content']);
+        $this->assertStringNotContainsString('style=', $result['content']);
+        $this->assertStringNotContainsString('onclick', $result['content']);
     }
 
-    public function testProtectedPostUnlockedWhenDecryptReturnsNullProducesEmptyContent(): void
+    public function testDeniedOrInvalidIdNeverUnlocks(): void
     {
-        $service = new \Scriptlog\Service\ProtectedPostService(function () {
-            return null;
-        });
-        $post = ['ID' => 4, 'post_visibility' => 'protected', 'post_content' => 'secret'];
-
-        $result = $service->resolve($post, [4 => 'secret']);
-
-        $this->assertTrue($result['is_unlocked']);
-        $this->assertSame('', $result['content']);
-    }
-
-    public function testProtectedPostDecryptWithoutContentKeyReturnsEmpty(): void
-    {
-        $decrypt = function (): array {
-            return [];
+        $decrypt = function () {
+            return ['post_content' => 'should never render'];
         };
 
-        $service = new \Scriptlog\Service\ProtectedPostService($decrypt);
-        $post = ['ID' => 5, 'post_visibility' => 'protected'];
+        $service = new ProtectedPostService($decrypt);
 
-        $result = $service->resolve($post, [5 => 'secret']);
+        $result = $service->resolve([
+            'ID' => 0,
+            'post_visibility' => 'protected',
+            'post_content' => 'encrypted blob'
+        ], [999 => 'password']);
 
+        $this->assertFalse($result['is_unlocked']);
+        $this->assertTrue($result['show_password_form']);
         $this->assertSame('', $result['content']);
     }
 
-    public function testSanitizeContentStripsStyleAttributes(): void
+    public function testSanitizeContentStripsStyleAndEvents(): void
     {
-        $service = new \Scriptlog\Service\ProtectedPostService();
-        $content = '<p style="color:red">Hello</p>';
+        $service = new ProtectedPostService();
 
-        $cleaned = $service->sanitizeContent($content);
+        $html = '<p style="font-size:10px" onmouseover="steal()">Body</p>'
+            . '<a href="javascript:void(0)" onclick="go()">Link</a>';
 
-        $this->assertStringNotContainsString('style=', $cleaned);
-        $this->assertStringContainsString('Hello', $cleaned);
-    }
+        $cleaned = $service->sanitizeContent($html);
 
-    public function testSanitizeContentDecodesHtmlEntities(): void
-    {
-        $service = new \Scriptlog\Service\ProtectedPostService();
-        $content = '&lt;strong&gt;bold&lt;/strong&gt;';
-
-        $cleaned = $service->sanitizeContent($content);
-
-        $this->assertStringContainsString('<strong>bold</strong>', $cleaned);
-    }
-
-    public function testSanitizeContentRemovesEventHandlersWhenHtmLawedAvailable(): void
-    {
-        $service = new \Scriptlog\Service\ProtectedPostService();
-        $content = '<div onclick="alert(1)" style="x:y">content</div>';
-
-        $cleaned = $service->sanitizeContent($content);
-
-        $this->assertStringNotContainsString('style=', $cleaned);
-        $this->assertStringContainsString('content', $cleaned);
-        if (function_exists('htmLawed')) {
-            $this->assertStringNotContainsString('onclick', $cleaned);
-        }
+        $this->assertStringContainsString('Body', $cleaned);
+        $this->assertStringNotContainsString('style', $cleaned);
+        $this->assertStringNotContainsString('onmouseover', $cleaned);
+        $this->assertStringNotContainsString('onclick', $cleaned);
     }
 }

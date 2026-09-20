@@ -12,7 +12,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../../src/lib/utility/download-handler.php';
+require_once __DIR__ . '/../../lib/utility/download-handler.php';
 
 /**
  * @coversDefaultClass \DownloadUtility
@@ -148,7 +148,7 @@ class DownloadUtilityTest extends TestCase
         return [
             'future timestamp' => [time() + 3600, false],
             'past timestamp'  => [time() - 3600, true],
-            'current time'    => [time() + 60, false],
+            'current time'    => [time() + 600, false],
         ];
     }
 

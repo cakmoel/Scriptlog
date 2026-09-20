@@ -22,8 +22,8 @@ class GenerateOpenApiSpecTest extends PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->baseDir = dirname(__DIR__) . '/..';
-        $this->utilityFile = $this->baseDir . '/src/lib/utility/generate-openapi-spec.php';
-        $this->openapiFile = $this->baseDir . '/src/openapi.json';
+        $this->utilityFile = $this->baseDir . '/lib/utility/generate-openapi-spec.php';
+        $this->openapiFile = $this->baseDir . '/openapi.json';
     }
 
     public function testUtilityFileExists(): void
@@ -54,22 +54,17 @@ class GenerateOpenApiSpecTest extends PHPUnit\Framework\TestCase
         $this->assertIsArray($spec['servers']);
     }
 
-    public function testServersContainsHardcodedUrls(): void
+    public function testServersUseResolvableUrls(): void
     {
         $content = file_get_contents($this->openapiFile);
         $spec = json_decode($content, true);
 
-        $foundHardcoded = false;
-        foreach ($spec['servers'] as $server) {
-            if (isset($server['url']) && 
-                (strpos($server['url'], 'blogware.site') !== false || 
-                 strpos($server['url'], 'localhost') !== false)) {
-                $foundHardcoded = true;
-                break;
-            }
-        }
+        $this->assertNotEmpty($spec['servers'], 'Servers array should not be empty');
 
-        $this->assertTrue($foundHardcoded, 'Should contain hardcoded URLs for replacement');
+        foreach ($spec['servers'] as $server) {
+            $this->assertArrayHasKey('url', $server);
+            $this->assertNotEmpty($server['url']);
+        }
     }
 
     public function testOpenapiJsonHasInfoWithLogo(): void
@@ -138,7 +133,7 @@ class GenerateOpenApiSpecTest extends PHPUnit\Framework\TestCase
 
     public function testLogoPathUsesExistingFile(): void
     {
-        $picturesDir = $this->baseDir . '/src/public/files/pictures';
+        $picturesDir = $this->baseDir . '/public/files/pictures';
         $this->assertDirectoryExists($picturesDir);
 
         $files = scandir($picturesDir);
@@ -163,7 +158,7 @@ class GenerateOpenApiSpecTest extends PHPUnit\Framework\TestCase
     {
         $expectedPath = 'scriptlog-1200x630.jpg';
 
-        $picturesDir = $this->baseDir . '/src/public/files/pictures';
+        $picturesDir = $this->baseDir . '/public/files/pictures';
         $fileExists = file_exists($picturesDir . '/' . $expectedPath);
 
         $this->assertTrue($fileExists, 'Generated logo path should match existing file');

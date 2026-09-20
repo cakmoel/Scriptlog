@@ -13,7 +13,6 @@ use PHPUnit\Framework\TestCase;
 class MigrationServiceIntegrationTest extends TestCase
 {
     private static $pdo;
-    private static $originalDbc;
     private static $authorId = 1;
     private static $createdPostIds = [];
     private static $createdTopicIds = [];
@@ -42,7 +41,6 @@ class MigrationServiceIntegrationTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$originalDbc = Registry::isKeySet('dbc') ? Registry::get('dbc') : null;
         self::$pdo = new PDO(
             'mysql:host=localhost;dbname=blogware_test;charset=utf8mb4',
             'blogwareuser',
@@ -92,11 +90,6 @@ class MigrationServiceIntegrationTest extends TestCase
             }
 
             self::$pdo = null;
-        }
-
-        // Restore the Db object that was in the Registry before this test class ran
-        if (self::$originalDbc !== null) {
-            Registry::set('dbc', self::$originalDbc);
         }
     }
 
