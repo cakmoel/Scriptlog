@@ -49,6 +49,12 @@ jobs:
     - name: Install MySQL client
       run: sudo apt-get update && sudo apt-get install -y mariadb-client
 
+    - name: Materialize app configuration
+      # config.php is gitignored, but admin/login.php redirects to /install
+      # when it is missing; it is fully environment-driven, so the tracked
+      # sample works once the router sets $_ENV.
+      run: cp config.sample.php config.php
+
     - name: Import seeded e2e database
       run: |
         mysql -h 127.0.0.1 -P 3306 -u blogwareuser -puserblogware blogware_e2e < e2e/blogware_e2e.sql
