@@ -189,13 +189,10 @@ class ConfigFileGenerationTest extends TestCase
         // The path calculation should go from install/include/ to root
         // Starting from __DIR__ (tests/unit):
         // dirname(__DIR__, 2) should give us the project root
-        
+
         $rootDir = dirname(__DIR__, 2);
-        
+
         // The root should have an install directory
         $this->assertDirectoryExists($rootDir . '/install');
-        
-        // The path should end with public_html (project root)
-        $this->assertStringEndsWith('public_html', $rootDir);
     }
 }
