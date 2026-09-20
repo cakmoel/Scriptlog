@@ -286,31 +286,6 @@ class PageDao extends Dao
      */
     public function dropDownLocale($selected = "")
     {
-        $name = 'post_locale';
-
-        $locales = [
-          'en' => 'English',
-          'es' => 'Spanish',
-          'fr' => 'French',
-          'de' => 'German',
-          'it' => 'Italian',
-          'pt' => 'Portuguese',
-          'ru' => 'Russian',
-          'zh' => 'Chinese',
-          'ja' => 'Japanese',
-          'ko' => 'Korean',
-          'ar' => 'Arabic',
-          'hi' => 'Hindi',
-          'id' => 'Indonesian',
-          'ms' => 'Malay',
-          'tr' => 'Turkish',
-          'nl' => 'Dutch',
-          'pl' => 'Polish',
-          'vi' => 'Vietnamese',
-          'th' => 'Thai',
-          'he' => 'Hebrew'
-        ];
-
-        return dropdown($name, $locales, $selected);
+        return admin_locale_select('post_locale', $selected);
     }
 }
