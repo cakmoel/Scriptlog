@@ -45,6 +45,12 @@ jobs:
       with:
         php-version: '8.1'
         extensions: pdo, pdo_mysql, mbstring, json, curl, gd, fileinfo, openssl
+        tools: composer:v2
+
+    - name: Install PHP dependencies
+      run: composer install --no-interaction --prefer-dist
+      env:
+        COMPOSER_PLATFORM_CHECK: 'false'
 
     - name: Install MySQL client
       run: sudo apt-get update && sudo apt-get install -y mariadb-client
