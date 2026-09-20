@@ -122,15 +122,14 @@ class SessionSavePathTest extends TestCase
 
     public function testUsesSysTempDirFallbackWithoutAppRoot(): void
     {
-        // Temporarily remove APP_ROOT constant by re-running function via reflection-like approach
-        // We can test the fallback logic by checking if APP_ROOT was defined during bootstrap
-        // This test verifies the function handles the sys_get_temp_dir fallback path
         $path = resolve_session_save_path();
 
-        // If APP_ROOT wasn't defined, it would use blogware_sessions in temp
-        if (!defined('APP_ROOT')) {
-            $this->assertStringContainsString('blogware_sessions', $path);
+        if (defined('APP_ROOT')) {
+            $this->assertStringStartsWith(APP_ROOT, $path);
+            return;
         }
+
+        $this->assertStringContainsString('blogware_sessions', $path);
     }
 
     public function testMultipleCallsReturnSamePath(): void
