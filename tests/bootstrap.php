@@ -61,13 +61,13 @@ if (file_exists(__DIR__ . '/../lib/Autoloader.php')) {
     if (class_exists('Autoloader')) {
         Autoloader::setBaseDir(__DIR__ . '/..');
         Autoloader::addClassDir(array(
-            'src/lib/core'       . DIRECTORY_SEPARATOR,
-            'src/lib/dao'        . DIRECTORY_SEPARATOR,
-            'src/lib/service'    . DIRECTORY_SEPARATOR,
-            'src/lib/controller' . DIRECTORY_SEPARATOR,
-            'src/lib/model'      . DIRECTORY_SEPARATOR,
-            'src/lib/utility'    . DIRECTORY_SEPARATOR,
-            'src/lib/handler'    . DIRECTORY_SEPARATOR
+            'lib/core'       . DIRECTORY_SEPARATOR,
+            'lib/dao'        . DIRECTORY_SEPARATOR,
+            'lib/service'    . DIRECTORY_SEPARATOR,
+            'lib/controller' . DIRECTORY_SEPARATOR,
+            'lib/model'      . DIRECTORY_SEPARATOR,
+            'lib/utility'    . DIRECTORY_SEPARATOR,
+            'lib/handler'    . DIRECTORY_SEPARATOR
         ));
     }
 }
