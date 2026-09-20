@@ -10,10 +10,13 @@
         <paths>
             <directory name="lib/core" />
             <directory name="lib/dao" />
+            <directory name="lib/dto" />
             <directory name="lib/service" />
             <directory name="lib/controller" />
             <directory name="lib/model" />
             <directory name="lib/utility" />
+            <directory name="lib/handler" />
+            <directory name="lib/validator" />
         </paths>
 
         <haltbauer>
@@ -23,7 +26,7 @@
 
     <report>
         <template dir="lib/vendor/phpmetrics/phpmetrics/src/Hal/Report/Html/Template" name="default" />
-        <html path="build/phpmetrics/index.html" />
+        <html path="build/phpmetrics/html" />
         <json path="build/phpmetrics/report.json" />
         <csv path="build/phpmetrics/report.csv" />
         <violations path="build/phpmetrics/violations.xml" format="checkstyle" />

@@ -16,22 +16,22 @@
         "platform": {
             "php": "7.4.33"
         },
-        "vendor-dir": "src/lib/vendor",
+        "vendor-dir": "lib/vendor",
         "sort-packages": true,
         "allow-plugins": {
+            "cweagans/composer-patches": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
-            "bamarni/composer-bin-plugin": true,
-            "cweagans/composer-patches": true
+            "bamarni/composer-bin-plugin": true
         }
     },
     "require": {
         "php": ">=7.4",
+        "ext-fileinfo": "*",
+        "ext-gd": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
-        "ext-pdo": "*",
-        "ext-fileinfo": "*",
         "ext-openssl": "*",
-        "ext-gd": "*",
+        "ext-pdo": "*",
         "catfan/medoo": "^2.1",
         "cweagans/composer-patches": "^1.7",
         "defuse/php-encryption": "^2.2",
@@ -64,12 +64,12 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "autoload": {
-        "classmap": ["src/lib/"],
+        "classmap": ["lib/"],
         "psr-4": {
-            "Scriptlog\\": "src/lib/"
+            "Scriptlog\\": "lib/"
         },
         "exclude-from-classmap": [
-            "src/lib/vendor/pdepend/pdepend/src/main/php/Lazy/PDepend/DependencyInjection/Configuration.weak.php"
+            "lib/vendor/pdepend/pdepend/src/main/php/Lazy/PDepend/DependencyInjection/Configuration.weak.php"
         ]
     },
     "extra": {
@@ -99,11 +99,13 @@
         "psalm:baseline": "php vendor-bin/psalm/vendor/vimeo/psalm/psalm --set-baseline=psalm-baseline.xml",
         "psalm:update-baseline": "php vendor-bin/psalm/vendor/vimeo/psalm/psalm --update-baseline",
         "psalm:strict": "php vendor-bin/psalm/vendor/vimeo/psalm/psalm --no-cache --php-version=7.4 --ignore-baseline",
+        "rector": "php vendor-bin/rector/vendor/rector/rector/bin/rector process --no-progress-bar --dry-run",
+        "rector:apply": "php vendor-bin/rector/vendor/rector/rector/bin/rector process --no-progress-bar",
         "test": "phpunit --configuration phpunit.xml",
         "test:coverage": "phpunit --configuration phpunit.xml --coverage-html build/coverage",
         "test:coverage-clover": "phpunit --configuration phpunit.xml --coverage-clover build/coverage.xml",
-        "compat": "phpcs -p lib/ --standard=phpcs-compatibility.xml",
-        "compat:report": "phpcs -p lib/ --standard=phpcs-compatibility.xml --report-full=build/php-compatibility.txt",
+        "compat": "phpcs -p lib/ admin/ install/ api/ public/themes/ --extensions=php --no-cache --standard=phpcs-compatibility.xml",
+        "compat:report": "phpcs -p lib/ admin/ install/ api/ public/themes/ --extensions=php --no-cache --standard=phpcs-compatibility.xml --report-full=build/php-compatibility.txt",
         "composer-audit": "composer audit",
         "analyse": [
             "@phpstan",

@@ -39,7 +39,7 @@ class SidebarNavigationTest extends TestCase
         ?int $userId = null,
         ?string $userSession = null
     ): string {
-        $sidebarFile = var_export(realpath(__DIR__ . '/../../src/admin/sidebar-nav.php'), true);
+        $sidebarFile = var_export(realpath(__DIR__ . '/../../admin/sidebar-nav.php'), true);
 
         $defaultPerms = [
             'posts' => true,
@@ -54,6 +54,7 @@ class SidebarNavigationTest extends TestCase
             'themes' => true,
             'navigation' => true,
             'configuration' => true,
+            'writing' => true,
             'plugins' => true,
         ];
 
@@ -104,6 +105,7 @@ function admin_translate(string \$key, ?string \$locale = null): string {
         'nav.menus' => 'Menus',
         'nav.settings' => 'Settings',
         'nav.general' => 'General',
+        'nav.writing' => 'Writing',
         'nav.reading' => 'Reading',
         'nav.permalink' => 'Permalink',
         'nav.timezone' => 'Timezone',
@@ -111,7 +113,6 @@ function admin_translate(string \$key, ?string \$locale = null): string {
         'nav.mail_settings' => 'Mail Settings',
         'nav.download_settings' => 'Download Settings',
         'nav.api' => 'API',
-        'nav.writing' => 'Writing',
         'nav.plugins' => 'Plugins',
         'nav.privacy' => 'Privacy',
         'nav.privacy_settings' => 'Privacy Settings',
@@ -186,6 +187,8 @@ class ActionConst {
     public const TIMEZONE_CONFIG   = "timezoneConfig";
     public const MEMBERSHIP_CONFIG = "membershipConfig";
     public const MAIL_CONFIG       = "mailConfig";
+    public const WRITING_CONFIG    = "writingConfig";
+    public const WRITING           = "writing";
     public const POSTS       = "posts";
     public const NEWPOST     = "newPost";
     public const EDITPOST    = "editPost";
@@ -249,8 +252,6 @@ class ActionConst {
     public const DOWNLOAD_CONFIG = "downloadConfig";
     public const DELETEDOWNLOAD = "deleteDownload";
     public const API_CONFIG = "apiConfig";
-    public const WRITING = "writing";
-    public const WRITING_CONFIG = "writingConfig";
 }
 
 \$_SESSION['admin_locale'] = '{$locale}';
@@ -358,7 +359,7 @@ PHP;
     {
         $modules = ['option-general', 'option-permalink', 'option-reading',
                      'option-timezone', 'option-memberships', 'option-api',
-                     'option-mail', 'option-downloads'];
+                     'option-mail', 'option-downloads', 'option-writing'];
         foreach ($modules as $mod) {
             $html = $this->runSnippet($this->buildSnippet($mod));
             $this->assertMatchesRegularExpression(
@@ -473,41 +474,14 @@ PHP;
         $this->assertStringNotContainsString('Plugins', $html);
     }
 
-    // -----------------------------------------------------------------------
-    // Writing (scheduled posting) settings link
-    // -----------------------------------------------------------------------
-
     /**
-     * The Writing link under Settings is gated by the WRITING permission.
+     * When WRITING permission is denied, the Writing settings sub-item must be absent.
      */
-    public function testWritingLinkRendersWithPermission(): void
+    public function testWritingSettingsHiddenWithoutPermission(): void
     {
-        $html = $this->runSnippet($this->buildSnippet('option-writing', ['writing' => true]));
-        $this->assertStringContainsString('option-writing', $html);
-        $this->assertStringContainsString('writingConfig', $html);
-        $this->assertStringContainsString('Writing', $html);
-    }
-
-    /**
-     * Without the WRITING permission, the Writing link must not render.
-     */
-    public function testWritingLinkHiddenWithoutPermission(): void
-    {
-        $html = $this->runSnippet($this->buildSnippet('dashboard'));
+        $html = $this->runSnippet($this->buildSnippet('dashboard', ['writing' => false]));
+        $this->assertStringNotContainsString('nav.writing', $html);
         $this->assertStringNotContainsString('option-writing', $html);
-        $this->assertStringNotContainsString('writingConfig', $html);
-    }
-
-    /**
-     * Module 'option-writing' must activate the Settings treeview.
-     */
-    public function testWritingModuleActivatesSettingsTreeview(): void
-    {
-        $html = $this->runSnippet($this->buildSnippet('option-writing', ['writing' => true]));
-        $this->assertMatchesRegularExpression(
-            '/class="treeview active"[^>]*>.*Settings/s',
-            $html
-        );
     }
 
     // -----------------------------------------------------------------------
@@ -575,7 +549,8 @@ PHP;
     {
         $html = $this->runSnippet($this->buildSnippet('dashboard'));
         $items = ['General', 'Reading', 'Permalink', 'Timezone',
-                   'Membership', 'Mail Settings', 'Download Settings', 'API'];
+                   'Membership', 'Mail Settings', 'Download Settings', 'API',
+                   'Writing'];
         foreach ($items as $item) {
             $this->assertStringContainsString($item, $html, "Settings sub-item '$item' must appear");
         }

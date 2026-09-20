@@ -1,2529 +1,3103 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="4.30.0@d0bc6e25d89f649e4f36a534f330f8bb4643dd69">
+<files psalm-version="6.16.1@f1f5de594dc76faf8784e02d3dc4716c91c6f6ac">
+  <file src="index.php">
+    <UndefinedGlobalVariable>
+      <code><![CDATA[$app]]></code>
+    </UndefinedGlobalVariable>
+  </file>
   <file src="lib/common.php">
-    <InvalidScalarArgument occurrences="3">
-      <code>substr(PHP_OS, 0, 3) == 'DAR'</code>
-      <code>substr(PHP_OS, 0, 3) == 'MAC'</code>
-      <code>substr(PHP_OS, 0, 3) == 'WIN'</code>
+    <InvalidScalarArgument>
+      <code><![CDATA[substr(PHP_OS, 0, 3) == 'DAR']]></code>
+      <code><![CDATA[substr(PHP_OS, 0, 3) == 'MAC']]></code>
+      <code><![CDATA[substr(PHP_OS, 0, 3) == 'WIN']]></code>
     </InvalidScalarArgument>
   </file>
-  <file src="lib/controller/ApiController.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>array_map([$this, 'sanitize'], $value)</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>string</code>
-    </InvalidReturnType>
+  <file src="lib/controller/CommentController.php">
+    <UnusedClass>
+      <code><![CDATA[CommentController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/ConfigurationController.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$this-&gt;view-&gt;render()</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$this->view->render()]]></code>
     </InvalidReturnStatement>
-    <TypeDoesNotContainType occurrences="7">
-      <code>!$checkError</code>
-      <code>!$checkError</code>
-      <code>!$checkError</code>
-      <code>$checkError</code>
-      <code>$checkError</code>
-      <code>$checkError</code>
-      <code>$checkStatus</code>
+    <TypeDoesNotContainType>
+      <code><![CDATA[!$checkError]]></code>
+      <code><![CDATA[!$checkError]]></code>
+      <code><![CDATA[!$checkError]]></code>
+      <code><![CDATA[$checkError]]></code>
+      <code><![CDATA[$checkError]]></code>
+      <code><![CDATA[$checkError]]></code>
+      <code><![CDATA[$checkStatus]]></code>
+      <code><![CDATA[$checkStatus]]></code>
     </TypeDoesNotContainType>
+    <UnusedClass>
+      <code><![CDATA[ConfigurationController]]></code>
+    </UnusedClass>
+    <UnusedDocblockParam>
+      <code><![CDATA[$args]]></code>
+    </UnusedDocblockParam>
+    <UnusedVariable>
+      <code><![CDATA[$langSettingKeys]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/controller/DownloadAdminController.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$this-&gt;downloadService-&gt;createDownloadRecord($mediaId, $ipAddress)</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$this->downloadService->createDownloadRecord($mediaId, $ipAddress)]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>string|false</code>
+    <InvalidReturnType>
+      <code><![CDATA[string|false]]></code>
     </InvalidReturnType>
+    <UnusedClass>
+      <code><![CDATA[DownloadAdminController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="lib/controller/DownloadController.php">
+    <InvalidArrayOffset>
+      <code><![CDATA[$units[$i]]]></code>
+    </InvalidArrayOffset>
+    <InvalidOperand>
+      <code><![CDATA[$size /= 1024]]></code>
+      <code><![CDATA[round($size, 2)]]></code>
+    </InvalidOperand>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getDownloadPage]]></code>
+      <code><![CDATA[insert]]></code>
+      <code><![CDATA[listItems]]></code>
+      <code><![CDATA[remove]]></code>
+      <code><![CDATA[update]]></code>
+    </PossiblyUnusedMethod>
+    <UnusedProperty>
+      <code><![CDATA[$view]]></code>
+    </UnusedProperty>
+  </file>
+  <file src="lib/controller/ExportController.php">
+    <UnusedClass>
+      <code><![CDATA[ExportController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="lib/controller/ImportController.php">
+    <UnusedClass>
+      <code><![CDATA[ImportController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="lib/controller/LanguageController.php">
+    <UnusedClass>
+      <code><![CDATA[LanguageController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/MediaController.php">
-    <MismatchingDocblockParamType occurrences="1">
-      <code>object</code>
+    <InvalidOperand>
+      <code><![CDATA[$height]]></code>
+      <code><![CDATA[$width]]></code>
+    </InvalidOperand>
+    <MismatchingDocblockParamType>
+      <code><![CDATA[object]]></code>
     </MismatchingDocblockParamType>
-    <UndefinedDocblockClass occurrences="1">
-      <code>int|num</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
     </UndefinedDocblockClass>
+    <UnusedClass>
+      <code><![CDATA[MediaController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/MenuController.php">
-    <UndefinedDocblockClass occurrences="2">
-      <code>int|num</code>
-      <code>int|num</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
     </UndefinedDocblockClass>
+    <UnusedClass>
+      <code><![CDATA[MenuController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/PageController.php">
-    <UndefinedDocblockClass occurrences="1">
-      <code>int|num</code>
+    <RedundantCondition>
+      <code><![CDATA[!empty($_POST['image_id'])]]></code>
+    </RedundantCondition>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
     </UndefinedDocblockClass>
+    <UnusedClass>
+      <code><![CDATA[PageController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/PluginController.php">
-    <UndefinedDocblockClass occurrences="3">
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|num</code>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$id]]></code>
+    </PossiblyUnusedParam>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
     </UndefinedDocblockClass>
+    <UnusedClass>
+      <code><![CDATA[PluginController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/PostController.php">
-    <InvalidArgument occurrences="1">
-      <code>$this-&gt;postService-&gt;postAuthorId()</code>
-    </InvalidArgument>
-    <InvalidScalarArgument occurrences="2">
-      <code>(int)$this-&gt;postService-&gt;postAuthorId()</code>
-      <code>(int)distill_post_request($filters)['image_id']</code>
-    </InvalidScalarArgument>
-    <UndefinedDocblockClass occurrences="1">
-      <code>num|int</code>
-    </UndefinedDocblockClass>
+    <UnusedClass>
+      <code><![CDATA[PostController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="lib/controller/ReplyController.php">
+    <UnusedClass>
+      <code><![CDATA[ReplyController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="lib/controller/ThemeController.php">
+    <UnusedClass>
+      <code><![CDATA[ThemeController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/TopicController.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$this-&gt;view-&gt;render()</code>
-    </InvalidReturnStatement>
-    <UndefinedDocblockClass occurrences="2">
-      <code>int|num</code>
-      <code>int|num</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
     </UndefinedDocblockClass>
+    <UnusedClass>
+      <code><![CDATA[TopicController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="lib/controller/TranslationController.php">
+    <UnusedClass>
+      <code><![CDATA[TranslationController]]></code>
+    </UnusedClass>
+    <UnusedVariable>
+      <code><![CDATA[$totalCount]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/controller/UserController.php">
-    <InvalidClass occurrences="1">
-      <code>userService</code>
-    </InvalidClass>
-    <ParamNameMismatch occurrences="1">
-      <code>$userId</code>
+    <ParamNameMismatch>
+      <code><![CDATA[$userId]]></code>
     </ParamNameMismatch>
+    <UnusedClass>
+      <code><![CDATA[UserController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/api/ArchivesApiController.php">
-    <MissingFile occurrences="1">
-      <code>require __DIR__ . '/../../../config.php'</code>
-    </MissingFile>
+    <UnusedClass>
+      <code><![CDATA[ArchivesApiController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/api/CategoriesApiController.php">
-    <MissingFile occurrences="1">
-      <code>require __DIR__ . '/../../../config.php'</code>
-    </MissingFile>
-    <RedundantCast occurrences="1">
-      <code>(int)$topicId</code>
+    <InvalidNullableReturnType>
+      <code><![CDATA[string]]></code>
+    </InvalidNullableReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[preg_replace('/-+/', '-', $slug)]]></code>
+    </NullableReturnStatement>
+    <RedundantCast>
+      <code><![CDATA[(int)$topicId]]></code>
     </RedundantCast>
+    <UnusedClass>
+      <code><![CDATA[CategoriesApiController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/api/CommentsApiController.php">
-    <InvalidArgument occurrences="2">
-      <code>$ip</code>
-      <code>$ip</code>
+    <InvalidArgument>
+      <code><![CDATA[$ip]]></code>
     </InvalidArgument>
-    <InvalidReturnStatement occurrences="1">
-      <code>$ip</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$ip]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>string</code>
+    <InvalidReturnType>
+      <code><![CDATA[string]]></code>
     </InvalidReturnType>
-    <MissingFile occurrences="1">
-      <code>require __DIR__ . '/../../../config.php'</code>
-    </MissingFile>
+    <UnusedClass>
+      <code><![CDATA[CommentsApiController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/api/GdprApiController.php">
-    <InvalidArgument occurrences="2">
-      <code>$ip</code>
-      <code>$ip</code>
-    </InvalidArgument>
-    <InvalidReturnStatement occurrences="1">
-      <code>$ip</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>string</code>
-    </InvalidReturnType>
-    <InvalidScalarArgument occurrences="1">
-      <code>'Consent recorded'</code>
-    </InvalidScalarArgument>
+    <UnusedClass>
+      <code><![CDATA[GdprApiController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/api/LanguagesApiController.php">
-    <InvalidScalarArgument occurrences="3">
-      <code>'Default language set successfully'</code>
-      <code>'Language deleted successfully'</code>
-      <code>'Language updated successfully'</code>
-    </InvalidScalarArgument>
+    <UnusedClass>
+      <code><![CDATA[LanguagesApiController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="lib/controller/api/MediaApiController.php">
+    <InvalidArgument>
+      <code><![CDATA[$file['size']]]></code>
+    </InvalidArgument>
+    <UnusedClass>
+      <code><![CDATA[MediaApiController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/api/PostsApiController.php">
-    <MissingFile occurrences="1">
-      <code>require __DIR__ . '/../../../config.php'</code>
-    </MissingFile>
+    <InvalidNullableReturnType>
+      <code><![CDATA[string]]></code>
+    </InvalidNullableReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[preg_replace('/-+/', '-', $slug)]]></code>
+    </NullableReturnStatement>
+    <UnusedClass>
+      <code><![CDATA[PostsApiController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="lib/controller/api/ProtectedPostApiController.php">
+    <UnusedClass>
+      <code><![CDATA[ProtectedPostApiController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/api/SearchApiController.php">
-    <MissingFile occurrences="1">
-      <code>require __DIR__ . '/../../../config.php'</code>
-    </MissingFile>
-    <UndefinedThisPropertyFetch occurrences="1">
-      <code>$this-&gt;dbc</code>
-    </UndefinedThisPropertyFetch>
+    <UnusedClass>
+      <code><![CDATA[SearchApiController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/controller/api/TranslationsApiController.php">
-    <InvalidScalarArgument occurrences="3">
-      <code>'Cache regenerated successfully'</code>
-      <code>'Translation deleted successfully'</code>
-      <code>'Translation updated successfully'</code>
-    </InvalidScalarArgument>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$params]]></code>
+    </PossiblyUnusedParam>
+    <UnusedClass>
+      <code><![CDATA[TranslationsApiController]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/core/ApiAuth.php">
-    <InvalidArgument occurrences="2">
-      <code>$ip</code>
-      <code>$ip</code>
-    </InvalidArgument>
-    <InvalidReturnStatement occurrences="2">
-      <code>$apiKey</code>
-      <code>$ip</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="2">
-      <code>string</code>
-      <code>string|null</code>
-    </InvalidReturnType>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[generateApiKey]]></code>
+      <code><![CDATA[generateCsrfToken]]></code>
+      <code><![CDATA[getAuthType]]></code>
+      <code><![CDATA[revokeApiKey]]></code>
+      <code><![CDATA[revokeApiKeyById]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
   </file>
   <file src="lib/core/ApiHateoas.php">
-    <InvalidScalarArgument occurrences="1">
-      <code>$totalPages</code>
-    </InvalidScalarArgument>
-    <MissingFile occurrences="1">
-      <code>require __DIR__ . '/../../config.php'</code>
-    </MissingFile>
+    <InvalidArgument>
+      <code><![CDATA[$totalPages]]></code>
+    </InvalidArgument>
+  </file>
+  <file src="lib/core/ApiResponse.php">
+    <InvalidReturnType>
+      <code><![CDATA[void]]></code>
+      <code><![CDATA[void]]></code>
+    </InvalidReturnType>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[initRateLimit]]></code>
+      <code><![CDATA[notAcceptable]]></code>
+      <code><![CDATA[setCorsHeaders]]></code>
+      <code><![CDATA[tooManyRequests]]></code>
+      <code><![CDATA[validateAccept]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="lib/core/ApiRouter.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[any]]></code>
+      <code><![CDATA[delete]]></code>
+      <code><![CDATA[dispatch]]></code>
+      <code><![CDATA[get]]></code>
+      <code><![CDATA[getParams]]></code>
+      <code><![CDATA[getRoutes]]></code>
+      <code><![CDATA[patch]]></code>
+      <code><![CDATA[post]]></code>
+      <code><![CDATA[put]]></code>
+      <code><![CDATA[query]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/core/AppConfig.php">
-    <InvalidCast occurrences="1">
-      <code>$config</code>
+    <InvalidCast>
+      <code><![CDATA[$config]]></code>
     </InvalidCast>
-    <InvalidReturnType occurrences="1">
-      <code>mixed</code>
+    <InvalidReturnType>
+      <code><![CDATA[mixed]]></code>
     </InvalidReturnType>
+  </file>
+  <file src="lib/core/AppException.php">
+    <PossiblyUnusedProperty>
+      <code><![CDATA[$previous]]></code>
+    </PossiblyUnusedProperty>
   </file>
   <file src="lib/core/AtomWriter.php">
-    <RedundantPropertyInitializationCheck occurrences="1">
-      <code>isset($this-&gt;atomFeed)</code>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$feed_link]]></code>
+      <code><![CDATA[$limit]]></code>
+      <code><![CDATA[$title]]></code>
+      <code><![CDATA[$uri]]></code>
+    </PossiblyUnusedParam>
+    <RedundantPropertyInitializationCheck>
+      <code><![CDATA[isset($this->atomFeed)]]></code>
     </RedundantPropertyInitializationCheck>
-    <UndefinedDocblockClass occurrences="2">
-      <code>int|num</code>
-      <code>int|num</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
     </UndefinedDocblockClass>
+    <UnusedClass>
+      <code><![CDATA[AtomWriter]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/core/Authentication.php">
-    <InvalidReturnStatement occurrences="2">
-      <code>$this-&gt;userToken-&gt;updateTokenExpired($tokenId)</code>
-      <code>$this-&gt;userToken-&gt;updateUserToken($bind, $login)</code>
+    <InvalidArgument>
+      <code><![CDATA[0]]></code>
+    </InvalidArgument>
+    <InvalidReturnStatement>
+      <code><![CDATA[$this->userToken->updateTokenExpired($tokenId)]]></code>
+      <code><![CDATA[$this->userToken->updateUserToken($bind, $login)]]></code>
     </InvalidReturnStatement>
-    <InvalidScalarArgument occurrences="1">
-      <code>0</code>
-    </InvalidScalarArgument>
-    <UndefinedDocblockClass occurrences="1">
-      <code>integer|num</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[activateUserAccount]]></code>
+      <code><![CDATA[checkEmailExists]]></code>
+      <code><![CDATA[findUserById]]></code>
+      <code><![CDATA[login]]></code>
+      <code><![CDATA[markCookieAsExpired]]></code>
+      <code><![CDATA[renewPersistentLogin]]></code>
+      <code><![CDATA[resetUserPassword]]></code>
+      <code><![CDATA[updateNewPassword]]></code>
+      <code><![CDATA[validateUserAccount]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$id]]></code>
+    </PossiblyUnusedParam>
+    <UndefinedDocblockClass>
+      <code><![CDATA[integer|num]]></code>
     </UndefinedDocblockClass>
+    <UnusedVariable>
+      <code><![CDATA[$verified]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/core/Authorization.php">
-    <MismatchingDocblockReturnType occurrences="1">
-      <code>object</code>
+    <MismatchingDocblockReturnType>
+      <code><![CDATA[object]]></code>
     </MismatchingDocblockReturnType>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[authorizeRole]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="lib/core/BaseApp.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[insert]]></code>
+      <code><![CDATA[listItems]]></code>
+      <code><![CDATA[remove]]></code>
+      <code><![CDATA[update]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="lib/core/BaseModel.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getDbConnection]]></code>
+      <code><![CDATA[getLink]]></code>
+      <code><![CDATA[getPagination]]></code>
+      <code><![CDATA[getSql]]></code>
+      <code><![CDATA[setLink]]></code>
+      <code><![CDATA[setPagination]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/core/BlogSchema.php">
-    <ImplicitToStringCast occurrences="1">
-      <code>string</code>
+    <ImplicitToStringCast>
+      <code><![CDATA[string]]></code>
     </ImplicitToStringCast>
+    <UndefinedMagicPropertyAssignment>
+      <code><![CDATA[$singlePost->articleBody]]></code>
+      <code><![CDATA[$singlePost->author]]></code>
+      <code><![CDATA[$singlePost->dateModified]]></code>
+      <code><![CDATA[$singlePost->datePublished]]></code>
+      <code><![CDATA[$singlePost->description]]></code>
+      <code><![CDATA[$singlePost->headline]]></code>
+      <code><![CDATA[$singlePost->image]]></code>
+      <code><![CDATA[$singlePost->isFamilyFriendly]]></code>
+      <code><![CDATA[$singlePost->keywords]]></code>
+      <code><![CDATA[$singlePost->publisher]]></code>
+      <code><![CDATA[$singlePost->url]]></code>
+      <code><![CDATA[$singlePost->wordCount]]></code>
+    </UndefinedMagicPropertyAssignment>
+    <UnusedDocblockParam>
+      <code><![CDATA[$postId]]></code>
+    </UnusedDocblockParam>
   </file>
   <file src="lib/core/Bootstrap.php">
-    <InvalidArgument occurrences="8">
-      <code>$downloadController</code>
-      <code>$downloadService</code>
-      <code>$handlerRegistry</code>
-      <code>$mediaDao</code>
-      <code>$pageDao</code>
-      <code>$postDao</code>
-      <code>$topicDao</code>
+    <InvalidArgument>
+      <code><![CDATA[$handlerRegistry]]></code>
+      <code><![CDATA[[
+                    'mysql:host=' . $core_vars['db_host'] . ';port=' . $core_vars['db_port'] . ';dbname=' . $core_vars['db_name'] . ';charset=utf8mb4',
+                    $core_vars['db_user'],
+                    $core_vars['db_pwd']
+                ]]]></code>
     </InvalidArgument>
+    <InvalidCast>
+      <code><![CDATA[$handlerRegistry]]></code>
+      <code><![CDATA[[
+                    'mysql:host=' . $core_vars['db_host'] . ';port=' . $core_vars['db_port'] . ';dbname=' . $core_vars['db_name'] . ';charset=utf8mb4',
+                    $core_vars['db_user'],
+                    $core_vars['db_pwd']
+                ]]]></code>
+    </InvalidCast>
+    <UnusedFunctionCall>
+      <code><![CDATA[session_save_path]]></code>
+    </UnusedFunctionCall>
+  </file>
+  <file src="lib/core/CoreException.php">
+    <PossiblyUnusedProperty>
+      <code><![CDATA[$previous]]></code>
+    </PossiblyUnusedProperty>
   </file>
   <file src="lib/core/Dao.php">
-    <MismatchingDocblockParamType occurrences="1">
-      <code>object</code>
-    </MismatchingDocblockParamType>
-    <MismatchingDocblockReturnType occurrences="1">
-      <code>integer|numeric|null</code>
-    </MismatchingDocblockReturnType>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[closeConnection]]></code>
+      <code><![CDATA[replaceRecord]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedProperty>
+      <code><![CDATA[$error]]></code>
+    </PossiblyUnusedProperty>
   </file>
   <file src="lib/core/Dashboard.php">
-    <ParamNameMismatch occurrences="1">
-      <code>$viewName</code>
+    <ParamNameMismatch>
+      <code><![CDATA[$viewName]]></code>
     </ParamNameMismatch>
-  </file>
-  <file src="lib/core/DateGenerator.php">
-    <InvalidScalarArgument occurrences="9">
-      <code>$regs[1]</code>
-      <code>$regs[1]</code>
-      <code>$regs[2]</code>
-      <code>$regs[3]</code>
-      <code>$regs[3]</code>
-      <code>$regs[5]</code>
-      <code>substr($internaldate, 0, 4)</code>
-      <code>substr($internaldate, 5, 2)</code>
-      <code>substr($internaldate, 8, 2)</code>
-    </InvalidScalarArgument>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[detailItem]]></code>
+      <code><![CDATA[listItems]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/core/Db.php">
-    <ParamNameMismatch occurrences="1">
-      <code>$args</code>
+    <InvalidNullableReturnType>
+      <code><![CDATA[string]]></code>
+    </InvalidNullableReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$sql]]></code>
+    </NullableReturnStatement>
+    <ParamNameMismatch>
+      <code><![CDATA[$args]]></code>
     </ParamNameMismatch>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[getTablePrefix]]></code>
+      <code><![CDATA[prepare]]></code>
+      <code><![CDATA[setTablePrefix]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/core/DbException.php">
-    <InvalidThrow occurrences="1">
-      <code>throw new $this('Unknown ' . get_class($this));</code>
-    </InvalidThrow>
-    <UndefinedClass occurrences="1">
-      <code>new $this('Unknown ' . get_class($this))</code>
-    </UndefinedClass>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$code]]></code>
+    </PossiblyUnusedParam>
+    <PossiblyUnusedProperty>
+      <code><![CDATA[$previous]]></code>
+    </PossiblyUnusedProperty>
   </file>
-  <file src="lib/core/DbFactory.php">
-    <TypeDoesNotContainType occurrences="1">
-      <code>class_exists($database)</code>
-    </TypeDoesNotContainType>
+  <file src="lib/core/DbInterface.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[closeDbConnection]]></code>
+      <code><![CDATA[dbCommit]]></code>
+      <code><![CDATA[dbDelete]]></code>
+      <code><![CDATA[dbInsert]]></code>
+      <code><![CDATA[dbLastInsertId]]></code>
+      <code><![CDATA[dbQuery]]></code>
+      <code><![CDATA[dbReplace]]></code>
+      <code><![CDATA[dbRollBack]]></code>
+      <code><![CDATA[dbTransaction]]></code>
+      <code><![CDATA[dbUpdate]]></code>
+      <code><![CDATA[isConnected]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/core/DbMySQLi.php">
-    <EmptyArrayAccess occurrences="1">
-      <code>$result[$i]</code>
+    <EmptyArrayAccess>
+      <code><![CDATA[$result[$i]]]></code>
     </EmptyArrayAccess>
-    <FalsableReturnStatement occurrences="1">
-      <code>false</code>
+    <FalsableReturnStatement>
+      <code><![CDATA[false]]></code>
     </FalsableReturnStatement>
-    <InvalidReturnStatement occurrences="2">
-      <code>$this-&gt;dbc</code>
-      <code>true</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$this->dbc]]></code>
+      <code><![CDATA[true]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="2">
-      <code>bol</code>
-      <code>bool</code>
+    <InvalidReturnType>
+      <code><![CDATA[bol]]></code>
+      <code><![CDATA[bool]]></code>
     </InvalidReturnType>
-    <InvalidScalarArgument occurrences="2">
-      <code>$this-&gt;dbport</code>
-      <code>$this-&gt;dbport</code>
+    <InvalidScalarArgument>
+      <code><![CDATA[$this->dbport]]></code>
+      <code><![CDATA[$this->dbport]]></code>
     </InvalidScalarArgument>
-    <UndefinedDocblockClass occurrences="1">
-      <code>bol</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[cleanOutputDisplay]]></code>
+      <code><![CDATA[dbMySQLCommit]]></code>
+      <code><![CDATA[dbMySQLInsertId]]></code>
+      <code><![CDATA[dbMySQLTransaction]]></code>
+      <code><![CDATA[getNumRows]]></code>
+      <code><![CDATA[getResult]]></code>
+      <code><![CDATA[isTableExists]]></code>
+      <code><![CDATA[preparedInsert]]></code>
+      <code><![CDATA[preparedSelect]]></code>
+      <code><![CDATA[preparedUpdate]]></code>
+      <code><![CDATA[simpleQuery]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedProperty>
+      <code><![CDATA[$counter]]></code>
+      <code><![CDATA[$errors]]></code>
+    </PossiblyUnusedProperty>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
+    <UndefinedDocblockClass>
+      <code><![CDATA[bol]]></code>
     </UndefinedDocblockClass>
-    <UndefinedFunction occurrences="1">
-      <code>'escape_string'</code>
+    <UndefinedFunction>
+      <code><![CDATA['escape_string']]></code>
     </UndefinedFunction>
+    <UnusedDocblockParam>
+      <code><![CDATA[$ca]]></code>
+    </UnusedDocblockParam>
+    <UnusedProperty>
+      <code><![CDATA[$report_mode]]></code>
+    </UnusedProperty>
+  </file>
+  <file src="lib/core/DebugRoute.php">
+    <UnusedClass>
+      <code><![CDATA[DebugRoute]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/core/Dispatcher.php">
-    <RedundantCondition occurrences="2">
-      <code>is_array($matches)</code>
-      <code>is_object($requestPath) &amp;&amp; method_exists($requestPath, 'setParameters') &amp;&amp; is_array($matches)</code>
-    </RedundantCondition>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[dispatch]]></code>
+    </PossiblyUnusedMethod>
+    <TypeDoesNotContainType>
+      <code><![CDATA[!is_array($post)]]></code>
+    </TypeDoesNotContainType>
+    <UnusedVariable>
+      <code><![CDATA[$localeRouter]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="lib/core/ExportException.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/core/FormValidator.php">
-    <RedundantCondition occurrences="1">
-      <code>filter_var($var, $filter) !== false</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getJSON]]></code>
+      <code><![CDATA[validate]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedProperty>
+      <code><![CDATA[$fields]]></code>
+    </PossiblyUnusedProperty>
+    <RedundantCondition>
+      <code><![CDATA[filter_var($var, $filter) !== false]]></code>
     </RedundantCondition>
-    <TypeDoesNotContainType occurrences="2">
-      <code>$filter === false</code>
-      <code>$filter === false</code>
+    <TypeDoesNotContainType>
+      <code><![CDATA[$filter === false]]></code>
+      <code><![CDATA[$filter === false]]></code>
     </TypeDoesNotContainType>
-  </file>
-  <file src="lib/core/FrontHelper.php">
-    <InvalidScalarArgument occurrences="2">
-      <code>$id</code>
-      <code>$id</code>
-    </InvalidScalarArgument>
-    <NullableReturnStatement occurrences="1">
-      <code>self::$frontService-&gt;getPublishedPost((int)$id)</code>
-    </NullableReturnStatement>
-    <UndefinedDocblockClass occurrences="2">
-      <code>int|num</code>
-      <code>int|num</code>
-    </UndefinedDocblockClass>
-  </file>
-  <file src="lib/core/HTMLPurifier.autoload.php">
-    <UndefinedFunction occurrences="1">
-      <code>'__autoload'</code>
-    </UndefinedFunction>
-  </file>
-  <file src="lib/core/HTMLPurifier.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$array</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>string[]</code>
-    </InvalidReturnType>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/CSS.php">
-    <ParamNameMismatch occurrences="1">
-      <code>$css</code>
-    </ParamNameMismatch>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/CSS/AlphaValue.php">
-    <FalsableReturnStatement occurrences="1">
-      <code>$result</code>
-    </FalsableReturnStatement>
-    <InvalidReturnStatement occurrences="1">
-      <code>$result</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>string</code>
-    </InvalidReturnType>
-    <ParamNameMismatch occurrences="1">
-      <code>$number</code>
-    </ParamNameMismatch>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/CSS/Background.php">
-    <TypeDoesNotContainType occurrences="1">
-      <code>$caught['position'] !== false</code>
-    </TypeDoesNotContainType>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/CSS/Color.php">
-    <ParamNameMismatch occurrences="1">
-      <code>$color</code>
-    </ParamNameMismatch>
-    <RedundantCondition occurrences="1">
-      <code>$current_type == 'percentage'</code>
-    </RedundantCondition>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/CSS/Filter.php">
-    <ParamNameMismatch occurrences="1">
-      <code>$value</code>
-    </ParamNameMismatch>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/CSS/Font.php">
-    <LoopInvalidation occurrences="1">
-      <code>$i</code>
-    </LoopInvalidation>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/CSS/FontFamily.php">
-    <StringIncrement occurrences="2">
-      <code>$c</code>
-      <code>$c</code>
-    </StringIncrement>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/CSS/ListStyle.php">
-    <InvalidNullableReturnType occurrences="1">
-      <code>bool|string</code>
-    </InvalidNullableReturnType>
-    <TypeDoesNotContainType occurrences="3">
-      <code>$caught['image']</code>
-      <code>$caught['position']</code>
-      <code>$caught['type']</code>
-    </TypeDoesNotContainType>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/CSS/Number.php">
-    <ParamNameMismatch occurrences="1">
-      <code>$number</code>
-    </ParamNameMismatch>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/CSS/URI.php">
-    <InvalidScalarArgument occurrences="1">
-      <code>$result</code>
-    </InvalidScalarArgument>
-    <ParamNameMismatch occurrences="1">
-      <code>$uri_string</code>
-    </ParamNameMismatch>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/Clone.php">
-    <ParamNameMismatch occurrences="1">
-      <code>$v</code>
-    </ParamNameMismatch>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/HTML/Class.php">
-    <ImplementedReturnTypeMismatch occurrences="1">
-      <code>bool|string</code>
-    </ImplementedReturnTypeMismatch>
-    <InvalidReturnStatement occurrences="2">
-      <code>parent::split($string, $config, $context)</code>
-      <code>preg_split('/\s+/', $string)</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>bool|string</code>
-    </InvalidReturnType>
-    <UndefinedPropertyFetch occurrences="1">
-      <code>$config-&gt;getDefinition('HTML')-&gt;doctype</code>
-    </UndefinedPropertyFetch>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/HTML/ID.php">
-    <ParamNameMismatch occurrences="1">
-      <code>$id</code>
-    </ParamNameMismatch>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/Integer.php">
-    <ParamNameMismatch occurrences="1">
-      <code>$integer</code>
-    </ParamNameMismatch>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/URI.php">
-    <ParamNameMismatch occurrences="1">
-      <code>$uri</code>
-    </ParamNameMismatch>
-    <UndefinedMethod occurrences="2">
-      <code>filter</code>
-      <code>postFilter</code>
-    </UndefinedMethod>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/URI/Email.php">
-    <InvalidReturnType occurrences="1">
-      <code>mixed</code>
-    </InvalidReturnType>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/URI/Host.php">
-    <UndefinedClass occurrences="1">
-      <code>Net_IDNA2</code>
-    </UndefinedClass>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/URI/IPv4.php">
-    <ParamNameMismatch occurrences="1">
-      <code>$aIP</code>
-    </ParamNameMismatch>
-  </file>
-  <file src="lib/core/HTMLPurifier/AttrDef/URI/IPv6.php">
-    <InvalidScalarArgument occurrences="1">
-      <code>$ip</code>
-    </InvalidScalarArgument>
-    <ParamNameMismatch occurrences="1">
-      <code>$aIP</code>
-    </ParamNameMismatch>
-  </file>
-  <file src="lib/core/HTMLPurifier/Bootstrap.php">
-    <FalsableReturnStatement occurrences="2">
-      <code>false</code>
-      <code>false</code>
-    </FalsableReturnStatement>
-  </file>
-  <file src="lib/core/HTMLPurifier/ChildDef/Custom.php">
-    <UndefinedPropertyFetch occurrences="1">
-      <code>$node-&gt;name</code>
-    </UndefinedPropertyFetch>
-  </file>
-  <file src="lib/core/HTMLPurifier/ChildDef/List.php">
-    <FalsableReturnStatement occurrences="4">
-      <code>false</code>
-      <code>false</code>
-      <code>false</code>
-      <code>false</code>
-    </FalsableReturnStatement>
-  </file>
-  <file src="lib/core/HTMLPurifier/ChildDef/Optional.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>true</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>array</code>
-    </InvalidReturnType>
-  </file>
-  <file src="lib/core/HTMLPurifier/ChildDef/Required.php">
-    <FalsableReturnStatement occurrences="3">
-      <code>false</code>
-      <code>false</code>
-      <code>false</code>
-    </FalsableReturnStatement>
-  </file>
-  <file src="lib/core/HTMLPurifier/ChildDef/Table.php">
-    <FalsableReturnStatement occurrences="2">
-      <code>false</code>
-      <code>false</code>
-    </FalsableReturnStatement>
-    <RedundantCondition occurrences="1">
-      <code>$cols !== false</code>
-    </RedundantCondition>
-  </file>
-  <file src="lib/core/HTMLPurifier/Config.php">
-    <InvalidPropertyFetch occurrences="1">
-      <code>$def-&gt;allow_null</code>
-    </InvalidPropertyFetch>
-    <InvalidScalarArgument occurrences="1">
-      <code>$error</code>
-    </InvalidScalarArgument>
-    <TypeDoesNotContainType occurrences="1">
-      <code>$trace[$i + 1]['class'] === 'HTMLPurifier_Config'</code>
-    </TypeDoesNotContainType>
-  </file>
-  <file src="lib/core/HTMLPurifier/ConfigSchema.php">
-    <TypeDoesNotContainType occurrences="1">
-      <code>$prototype === true</code>
-    </TypeDoesNotContainType>
-  </file>
-  <file src="lib/core/HTMLPurifier/DefinitionCache/Serializer.php">
-    <InvalidNullableReturnType occurrences="3">
-      <code>int|bool</code>
-      <code>int|bool</code>
-      <code>int|bool</code>
-    </InvalidNullableReturnType>
-  </file>
-  <file src="lib/core/HTMLPurifier/DefinitionCacheFactory.php">
-    <TypeDoesNotContainType occurrences="1">
-      <code>$prototype === true</code>
-    </TypeDoesNotContainType>
-  </file>
-  <file src="lib/core/HTMLPurifier/Encoder.php">
-    <FalsableReturnStatement occurrences="5">
-      <code>false</code>
-      <code>false</code>
-      <code>false</code>
-      <code>false</code>
-      <code>false</code>
-    </FalsableReturnStatement>
-  </file>
-  <file src="lib/core/HTMLPurifier/EntityLookup.php">
-    <InvalidScalarArgument occurrences="1">
-      <code>$file</code>
-    </InvalidScalarArgument>
-  </file>
-  <file src="lib/core/HTMLPurifier/ErrorCollector.php">
-    <InvalidScalarArgument occurrences="2">
-      <code>HTMLPurifier_ErrorStruct::ATTR</code>
-      <code>HTMLPurifier_ErrorStruct::CSSPROP</code>
-    </InvalidScalarArgument>
-    <UndefinedVariable occurrences="1">
-      <code>$cssprop</code>
-    </UndefinedVariable>
-  </file>
-  <file src="lib/core/HTMLPurifier/Filter/ExtractStyleBlocks.php">
-    <UndefinedClass occurrences="1">
-      <code>csstidy</code>
-    </UndefinedClass>
-  </file>
-  <file src="lib/core/HTMLPurifier/Generator.php">
-    <InvalidCast occurrences="1">
-      <code>$tidy</code>
-    </InvalidCast>
-  </file>
-  <file src="lib/core/HTMLPurifier/HTMLDefinition.php">
-    <InvalidArgument occurrences="2">
-      <code>$allowed</code>
-      <code>$list</code>
-    </InvalidArgument>
-  </file>
-  <file src="lib/core/HTMLPurifier/HTMLModule.php">
-    <FalsableReturnStatement occurrences="1">
-      <code>false</code>
-    </FalsableReturnStatement>
-    <InvalidScalarArgument occurrences="1">
-      <code>$type</code>
-    </InvalidScalarArgument>
-  </file>
-  <file src="lib/core/HTMLPurifier/HTMLModule/Edit.php">
-    <FalsableReturnStatement occurrences="1">
-      <code>false</code>
-    </FalsableReturnStatement>
-    <InvalidArgument occurrences="2">
-      <code>$value[0]</code>
-      <code>$value[1]</code>
-    </InvalidArgument>
-  </file>
-  <file src="lib/core/HTMLPurifier/HTMLModule/Legacy.php">
-    <NullArgument occurrences="1">
-      <code>null</code>
-    </NullArgument>
-  </file>
-  <file src="lib/core/HTMLPurifier/HTMLModule/Object.php">
-    <NullArgument occurrences="1">
-      <code>null</code>
-    </NullArgument>
-  </file>
-  <file src="lib/core/HTMLPurifier/HTMLModule/SafeObject.php">
-    <InvalidArgument occurrences="1">
-      <code>false</code>
-    </InvalidArgument>
-  </file>
-  <file src="lib/core/HTMLPurifier/HTMLModule/SafeScripting.php">
-    <NullArgument occurrences="1">
-      <code>null</code>
-    </NullArgument>
-  </file>
-  <file src="lib/core/HTMLPurifier/HTMLModule/Tidy.php">
-    <InvalidDocblock occurrences="1">
-      <code>public function getFixType($name)</code>
-    </InvalidDocblock>
-    <InvalidReturnType occurrences="1">
-      <code>array</code>
-    </InvalidReturnType>
-  </file>
-  <file src="lib/core/HTMLPurifier/HTMLModuleManager.php">
-    <FalsableReturnStatement occurrences="2">
-      <code>false</code>
-      <code>false</code>
-    </FalsableReturnStatement>
-  </file>
-  <file src="lib/core/HTMLPurifier/Injector/AutoParagraph.php">
-    <InvalidNullableReturnType occurrences="1">
-      <code>bool</code>
-    </InvalidNullableReturnType>
-    <NullArgument occurrences="4">
-      <code>$i</code>
-      <code>$i</code>
-      <code>$i</code>
-      <code>$nesting</code>
-    </NullArgument>
-    <NullReference occurrences="2">
-      <code>$current</code>
-      <code>$prev</code>
-    </NullReference>
-    <NullableReturnStatement occurrences="1">
-      <code>null</code>
-    </NullableReturnStatement>
-  </file>
-  <file src="lib/core/HTMLPurifier/Injector/DisplayLinkURI.php">
-    <InvalidPropertyFetch occurrences="1">
-      <code>$token-&gt;start-&gt;attr</code>
-    </InvalidPropertyFetch>
-  </file>
-  <file src="lib/core/HTMLPurifier/Injector/PurifierLinkify.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>parent::prepare($config, $context)</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>string</code>
-    </InvalidReturnType>
-  </file>
-  <file src="lib/core/HTMLPurifier/Injector/RemoveEmpty.php">
-    <ImplementedReturnTypeMismatch occurrences="1">
-      <code>void</code>
-    </ImplementedReturnTypeMismatch>
-  </file>
-  <file src="lib/core/HTMLPurifier/Injector/SafeObject.php">
-    <ImplementedReturnTypeMismatch occurrences="1">
-      <code>void</code>
-    </ImplementedReturnTypeMismatch>
-    <InvalidArrayOffset occurrences="1">
-      <code>$token-&gt;attr['name']</code>
-    </InvalidArrayOffset>
-  </file>
-  <file src="lib/core/HTMLPurifier/Language.php">
-    <UndefinedPropertyAssignment occurrences="1">
-      <code>$stripped_token-&gt;attr</code>
-    </UndefinedPropertyAssignment>
-  </file>
-  <file src="lib/core/HTMLPurifier/LanguageFactory.php">
-    <TypeDoesNotContainType occurrences="1">
-      <code>$prototype == true</code>
-    </TypeDoesNotContainType>
-  </file>
-  <file src="lib/core/HTMLPurifier/Length.php">
-    <FalsableReturnStatement occurrences="3">
-      <code>false</code>
-      <code>false</code>
-      <code>false</code>
-    </FalsableReturnStatement>
-    <InvalidArgument occurrences="2">
-      <code>false</code>
-      <code>false</code>
-    </InvalidArgument>
-  </file>
-  <file src="lib/core/HTMLPurifier/Lexer.php">
-    <RedundantCast occurrences="1">
-      <code>(string)$html</code>
-    </RedundantCast>
-    <TypeDoesNotContainType occurrences="2">
-      <code>!$inst</code>
-      <code>$inst</code>
-    </TypeDoesNotContainType>
-  </file>
-  <file src="lib/core/HTMLPurifier/Lexer/DOMLex.php">
-    <InvalidReturnType occurrences="1">
-      <code>HTMLPurifier_Token</code>
-    </InvalidReturnType>
-    <NullArgument occurrences="1">
-      <code>$node-&gt;attributes</code>
-    </NullArgument>
-    <NullPropertyFetch occurrences="3">
-      <code>$def-&gt;doctype-&gt;dtdPublic</code>
-      <code>$def-&gt;doctype-&gt;dtdPublic</code>
-      <code>$def-&gt;doctype-&gt;dtdSystem</code>
-    </NullPropertyFetch>
-    <ParamNameMismatch occurrences="1">
-      <code>$html</code>
-    </ParamNameMismatch>
-    <RedundantCondition occurrences="3">
-      <code>isset($node-&gt;localName)</code>
-      <code>isset($node-&gt;nodeName)</code>
-      <code>isset($node-&gt;textContent)</code>
-    </RedundantCondition>
-    <TypeDoesNotContainType occurrences="1">
-      <code>!empty($def-&gt;doctype-&gt;dtdPublic)</code>
-    </TypeDoesNotContainType>
-    <UndefinedPropertyFetch occurrences="4">
-      <code>$attr-&gt;name</code>
-      <code>$attr-&gt;value</code>
-      <code>$node-&gt;data</code>
-      <code>$node-&gt;data</code>
-    </UndefinedPropertyFetch>
-  </file>
-  <file src="lib/core/HTMLPurifier/Lexer/DirectLex.php">
-    <LessSpecificImplementedReturnType occurrences="1">
-      <code>array|HTMLPurifier_Token[]</code>
-    </LessSpecificImplementedReturnType>
-    <ParamNameMismatch occurrences="1">
-      <code>$html</code>
-    </ParamNameMismatch>
-    <RedundantCondition occurrences="1">
-      <code>$inside_tag</code>
-    </RedundantCondition>
-    <TypeDoesNotContainType occurrences="1">
-      <code>$cursor === false</code>
-    </TypeDoesNotContainType>
-  </file>
-  <file src="lib/core/HTMLPurifier/Lexer/PH5P.php">
-    <InvalidPassByReference occurrences="1">
-      <code>array_keys($this-&gt;a_formatting, self::MARKER, true)</code>
-    </InvalidPassByReference>
-    <LoopInvalidation occurrences="3">
-      <code>$n</code>
-      <code>$n</code>
-      <code>$n</code>
-    </LoopInvalidation>
-    <ParadoxicalCondition occurrences="1">
-      <code>self::END_PHASE</code>
-    </ParadoxicalCondition>
-    <ParamNameMismatch occurrences="1">
-      <code>$html</code>
-    </ParamNameMismatch>
-    <RedundantCondition occurrences="2">
-      <code>$the_same</code>
-      <code>$this-&gt;foster_parent !== null</code>
-    </RedundantCondition>
-    <TooManyArguments occurrences="3">
-      <code>entityInAttributeValueState</code>
-      <code>entityInAttributeValueState</code>
-      <code>new DOMDocumentType(null, null, 'HTML')</code>
-    </TooManyArguments>
-  </file>
-  <file src="lib/core/HTMLPurifier/PercentEncoder.php">
-    <InvalidArrayAccess occurrences="1">
-      <code>$preserve[$i]</code>
-    </InvalidArrayAccess>
-    <InvalidScalarArgument occurrences="1">
-      <code>$preserve</code>
-    </InvalidScalarArgument>
-  </file>
-  <file src="lib/core/HTMLPurifier/Printer/ConfigForm.php">
-    <UndefinedThisPropertyAssignment occurrences="1">
-      <code>$this-&gt;genConfig</code>
-    </UndefinedThisPropertyAssignment>
-    <UndefinedThisPropertyFetch occurrences="1">
-      <code>$this-&gt;genConfig</code>
-    </UndefinedThisPropertyFetch>
-  </file>
-  <file src="lib/core/HTMLPurifier/Printer/HTMLDefinition.php">
-    <InvalidScalarArgument occurrences="5">
-      <code>0</code>
-      <code>0</code>
-      <code>0</code>
-      <code>0</code>
-      <code>0</code>
-    </InvalidScalarArgument>
-    <NullArgument occurrences="4">
-      <code>null</code>
-      <code>null</code>
-      <code>null</code>
-      <code>null</code>
-    </NullArgument>
-    <UndefinedPropertyFetch occurrences="3">
-      <code>$def-&gt;block</code>
-      <code>$def-&gt;dtd_regex</code>
-      <code>$def-&gt;inline</code>
-    </UndefinedPropertyFetch>
-  </file>
-  <file src="lib/core/HTMLPurifier/Strategy/FixNesting.php">
-    <LessSpecificImplementedReturnType occurrences="1">
-      <code>array|HTMLPurifier_Token[]</code>
-    </LessSpecificImplementedReturnType>
-  </file>
-  <file src="lib/core/HTMLPurifier/Strategy/MakeWellFormed.php">
-    <InvalidArrayAccess occurrences="2">
-      <code>$token</code>
-      <code>$zipper</code>
-    </InvalidArrayAccess>
-    <InvalidArrayOffset occurrences="1">
-      <code>list($zipper, $token)</code>
-    </InvalidArrayOffset>
-    <InvalidPropertyFetch occurrences="1">
-      <code>$object-&gt;skip</code>
-    </InvalidPropertyFetch>
-    <RedundantCondition occurrences="1">
-      <code>$reprocess</code>
-    </RedundantCondition>
-    <TypeDoesNotContainType occurrences="1">
-      <code>$token = $zipper-&gt;next($token)</code>
-    </TypeDoesNotContainType>
-  </file>
-  <file src="lib/core/HTMLPurifier/Strategy/RemoveForeignElements.php">
-    <LessSpecificImplementedReturnType occurrences="1">
-      <code>array|HTMLPurifier_Token[]</code>
-    </LessSpecificImplementedReturnType>
-  </file>
-  <file src="lib/core/HTMLPurifier/StringHashParser.php">
-    <EmptyArrayAccess occurrences="1">
-      <code>$ret[$state]</code>
-    </EmptyArrayAccess>
-    <FalsableReturnStatement occurrences="4">
-      <code>false</code>
-      <code>false</code>
-      <code>false</code>
-      <code>false</code>
-    </FalsableReturnStatement>
-  </file>
-  <file src="lib/core/HTMLPurifier/TagTransform/Simple.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$new_tag</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>string</code>
-    </InvalidReturnType>
-  </file>
-  <file src="lib/core/HTMLPurifier/Token.php">
-    <TypeDoesNotContainType occurrences="5">
-      <code>'HTMLPurifier_Token_Comment'</code>
-      <code>'HTMLPurifier_Token_Empty'</code>
-      <code>'HTMLPurifier_Token_End'</code>
-      <code>'HTMLPurifier_Token_Start'</code>
-      <code>'HTMLPurifier_Token_Text'</code>
-    </TypeDoesNotContainType>
-  </file>
-  <file src="lib/core/HTMLPurifier/URI.php">
-    <FalsableReturnStatement occurrences="2">
-      <code>false</code>
-      <code>false</code>
-    </FalsableReturnStatement>
-    <InvalidScalarArgument occurrences="4">
-      <code>$chars_pchar . '/'</code>
-      <code>$chars_pchar . '/?'</code>
-      <code>$chars_sub_delims . ':'</code>
-      <code>$chars_sub_delims . '@'</code>
-    </InvalidScalarArgument>
-    <UndefinedMethod occurrences="2">
-      <code>getDefaultScheme</code>
-      <code>getDefaultScheme</code>
-    </UndefinedMethod>
-    <UndefinedPropertyFetch occurrences="3">
-      <code>$def-&gt;defaultScheme</code>
-      <code>$def-&gt;defaultScheme</code>
-      <code>$uri_def-&gt;host</code>
-    </UndefinedPropertyFetch>
-  </file>
-  <file src="lib/core/HTMLPurifier/URIFilter/DisableExternal.php">
-    <ImplementedReturnTypeMismatch occurrences="1">
-      <code>void</code>
-    </ImplementedReturnTypeMismatch>
-    <UndefinedPropertyFetch occurrences="1">
-      <code>$config-&gt;getDefinition('URI')-&gt;host</code>
-    </UndefinedPropertyFetch>
-  </file>
-  <file src="lib/core/HTMLPurifier/URIFilter/MakeAbsolute.php">
-    <RedundantCondition occurrences="1">
-      <code>is_null($uri-&gt;host)</code>
-    </RedundantCondition>
-    <UndefinedPropertyFetch occurrences="1">
-      <code>$def-&gt;base</code>
-    </UndefinedPropertyFetch>
-  </file>
-  <file src="lib/core/HTMLPurifier/URIFilter/SafeIframe.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>preg_match($this-&gt;regexp, $uri-&gt;toString())</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>bool</code>
-    </InvalidReturnType>
-  </file>
-  <file src="lib/core/HTMLPurifier/URIParser.php">
-    <FalsableReturnStatement occurrences="1">
-      <code>false</code>
-    </FalsableReturnStatement>
-  </file>
-  <file src="lib/core/HTMLPurifier/URISchemeRegistry.php">
-    <TypeDoesNotContainType occurrences="1">
-      <code>$prototype == true</code>
-    </TypeDoesNotContainType>
-  </file>
-  <file src="lib/core/HTMLPurifier/UnitConverter.php">
-    <InvalidNullableReturnType occurrences="1">
-      <code>string</code>
-    </InvalidNullableReturnType>
-    <InvalidScalarArgument occurrences="5">
-      <code>$n</code>
-      <code>$n</code>
-      <code>$n</code>
-      <code>$n</code>
-      <code>substr($r, 0, strlen($r) + $scale)</code>
-    </InvalidScalarArgument>
-    <NullableReturnStatement occurrences="1">
-      <code>bcdiv($s1, $s2, $scale)</code>
-    </NullableReturnStatement>
-  </file>
-  <file src="lib/core/HTMLPurifier/VarParser.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$var</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>string</code>
-    </InvalidReturnType>
-    <NullableReturnStatement occurrences="1">
-      <code>null</code>
-    </NullableReturnStatement>
-  </file>
-  <file src="lib/core/HTMLPurifier/VarParser/Flexible.php">
-    <ImplementedReturnTypeMismatch occurrences="1">
-      <code>array|bool|float|int|mixed|null|string</code>
-    </ImplementedReturnTypeMismatch>
-  </file>
-  <file src="lib/core/HTMLPurifier/VarParser/Native.php">
-    <ImplementedReturnTypeMismatch occurrences="1">
-      <code>null|string</code>
-    </ImplementedReturnTypeMismatch>
-  </file>
-  <file src="lib/core/HTMLPurifier/Zipper.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>array($z, $t)</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>Tuple</code>
-    </InvalidReturnType>
-    <NullableReturnStatement occurrences="3">
-      <code>empty($this-&gt;back) ? null : array_pop($this-&gt;back)</code>
-      <code>empty($this-&gt;back) ? null : array_pop($this-&gt;back)</code>
-      <code>empty($this-&gt;front) ? null : array_pop($this-&gt;front)</code>
-    </NullableReturnStatement>
-    <UndefinedDocblockClass occurrences="5">
-      <code>Original</code>
-      <code>Original</code>
-      <code>Original</code>
-      <code>Original</code>
-      <code>Tuple</code>
-    </UndefinedDocblockClass>
+    <UnusedVariable>
+      <code><![CDATA[$filter]]></code>
+      <code><![CDATA[$key]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/core/HZip.php">
-    <InvalidClass occurrences="1">
-      <code>ZIPARCHIVE</code>
-    </InvalidClass>
+    <UnusedClass>
+      <code><![CDATA[HZip]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/core/HandleRequest.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>self::$frontHelper</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>object</code>
-    </InvalidReturnType>
+    <FalsableReturnStatement>
+      <code><![CDATA[$path]]></code>
+    </FalsableReturnStatement>
+    <InvalidPropertyFetch>
+      <code><![CDATA[self::$requestPathURI->matched]]></code>
+    </InvalidPropertyFetch>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[findRequestToRules]]></code>
+    </PossiblyUnusedMethod>
   </file>
-  <file src="lib/core/Html.php">
-    <InvalidArgument occurrences="1">
-      <code>$body</code>
-    </InvalidArgument>
-    <NullReference occurrences="1">
-      <code>$badTags</code>
-    </NullReference>
-    <UndefinedDocblockClass occurrences="1">
-      <code>htmlNode</code>
-    </UndefinedDocblockClass>
+  <file src="lib/core/I18nManager.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getAvailableLocales]]></code>
+      <code><![CDATA[getDetector]]></code>
+      <code><![CDATA[getLoader]]></code>
+      <code><![CDATA[getRouter]]></code>
+      <code><![CDATA[initializeWithSettings]]></code>
+      <code><![CDATA[isInitialized]]></code>
+      <code><![CDATA[isRtl]]></code>
+      <code><![CDATA[resetInstance]]></code>
+      <code><![CDATA[setLanguageDirection]]></code>
+      <code><![CDATA[t]]></code>
+      <code><![CDATA[url]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
+  </file>
+  <file src="lib/core/IException.php">
+    <UnusedClass>
+      <code><![CDATA[IException]]></code>
+    </UnusedClass>
+  </file>
+  <file src="lib/core/IThrowable.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getPrevious]]></code>
+      <code><![CDATA[getTrace]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="lib/core/LocaleDetector.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getDefaultLocale]]></code>
+      <code><![CDATA[isAutoDetectEnabled]]></code>
+      <code><![CDATA[setAutoDetect]]></code>
+      <code><![CDATA[setAvailableLocales]]></code>
+      <code><![CDATA[setDefaultLocale]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
+  </file>
+  <file src="lib/core/LocaleRouter.php">
+    <InvalidNullableReturnType>
+      <code><![CDATA[string]]></code>
+    </InvalidNullableReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[preg_replace('#' . $localePattern . '#', '/', $path, 1)]]></code>
+    </NullableReturnStatement>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[addRoute]]></code>
+      <code><![CDATA[buildCurrentUrl]]></code>
+      <code><![CDATA[getRoutes]]></code>
+      <code><![CDATA[hasLocalePrefix]]></code>
+      <code><![CDATA[match]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/core/LogError.php">
-    <UndefinedDocblockClass occurrences="1">
-      <code>number</code>
-    </UndefinedDocblockClass>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[void|bool]]></code>
+    </PossiblyUnusedReturnValue>
+    <UnusedDocblockParam>
+      <code><![CDATA[$_printError]]></code>
+      <code><![CDATA[$clear]]></code>
+      <code><![CDATA[$error_file]]></code>
+    </UnusedDocblockParam>
   </file>
   <file src="lib/core/Mailer.php">
-    <InvalidPropertyAssignmentValue occurrences="3">
-      <code>true</code>
-      <code>true</code>
-      <code>true</code>
+    <InvalidPropertyAssignmentValue>
+      <code><![CDATA[true]]></code>
+      <code><![CDATA[true]]></code>
+      <code><![CDATA[true]]></code>
     </InvalidPropertyAssignmentValue>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[setFrom]]></code>
+      <code><![CDATA[setHTMLBody]]></code>
+      <code><![CDATA[setSendBcc]]></code>
+      <code><![CDATA[setSendCc]]></code>
+      <code><![CDATA[setSendHTML]]></code>
+      <code><![CDATA[setSendText]]></code>
+      <code><![CDATA[setSendTo]]></code>
+      <code><![CDATA[setSubject]]></code>
+      <code><![CDATA[setTextBody]]></code>
+    </PossiblyUnusedMethod>
+    <RedundantCondition>
+      <code><![CDATA[$this->sendHTML]]></code>
+    </RedundantCondition>
   </file>
   <file src="lib/core/MessageLog.php">
-    <ImplicitToStringCast occurrences="1">
-      <code>$exception</code>
+    <ImplicitToStringCast>
+      <code><![CDATA[$exception]]></code>
     </ImplicitToStringCast>
-    <InvalidScalarArgument occurrences="1">
-      <code>1</code>
+    <InvalidScalarArgument>
+      <code><![CDATA[1]]></code>
     </InvalidScalarArgument>
-    <UndefinedDocblockClass occurrences="1">
-      <code>num|int</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[num|int]]></code>
     </UndefinedDocblockClass>
+    <UnusedMethod>
+      <code><![CDATA[errorCodeMessage]]></code>
+      <code><![CDATA[writeMessageToFile]]></code>
+    </UnusedMethod>
+    <UnusedParam>
+      <code><![CDATA[$code]]></code>
+      <code><![CDATA[$description]]></code>
+      <code><![CDATA[$file]]></code>
+      <code><![CDATA[$line]]></code>
+      <code><![CDATA[$logPath]]></code>
+    </UnusedParam>
+    <UnusedProperty>
+      <code><![CDATA[$display_errors]]></code>
+    </UnusedProperty>
+    <UnusedVariable>
+      <code><![CDATA[$msg]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/core/ModelException.php">
-    <InvalidThrow occurrences="1">
-      <code>throw new $this('Unknown' . get_class($this));</code>
-    </InvalidThrow>
-    <UndefinedClass occurrences="1">
-      <code>new $this('Unknown' . get_class($this))</code>
-    </UndefinedClass>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$code]]></code>
+    </PossiblyUnusedParam>
+    <UnusedClass>
+      <code><![CDATA[ModelException]]></code>
+    </UnusedClass>
   </file>
-  <file src="lib/core/PageCache.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>file_put_contents($this-&gt;cache_file, $contents)</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>boolean</code>
-    </InvalidReturnType>
-  </file>
-  <file src="lib/core/Pagination.php">
-    <InvalidOperand occurrences="1">
-      <code>$limit</code>
-    </InvalidOperand>
-    <InvalidReturnStatement occurrences="2">
-      <code>$position</code>
-      <code>ceil($totalData / $limit)</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="2">
-      <code>number</code>
-      <code>number</code>
-    </InvalidReturnType>
-    <RedundantCast occurrences="1">
-      <code>(int)1</code>
-    </RedundantCast>
-    <UndefinedDocblockClass occurrences="2">
-      <code>number</code>
-      <code>number</code>
-    </UndefinedDocblockClass>
-  </file>
-  <file src="lib/core/Paginator.php">
-    <InvalidPropertyAssignmentValue occurrences="1">
-      <code>$perPage</code>
-    </InvalidPropertyAssignmentValue>
-    <InvalidReturnStatement occurrences="1">
-      <code>['offset' =&gt; $this-&gt;get_start(), 'limit' =&gt; $this-&gt;_perPage]</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>string</code>
-    </InvalidReturnType>
-    <PossiblyInvalidDocblockTag occurrences="4">
-      <code>@var integer</code>
-      <code>@var integer</code>
-      <code>@var string $ext optionally pass in extra parameters to the GET</code>
-      <code>@var string $path optionally set the path for the link</code>
-    </PossiblyInvalidDocblockTag>
+  <file src="lib/core/PassPhraseKey.php">
+    <UnusedClass>
+      <code><![CDATA[PassPhraseKey]]></code>
+    </UnusedClass>
+    <UnusedVariable>
+      <code><![CDATA[$path]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/core/ProviderException.php">
-    <InvalidThrow occurrences="1">
-      <code>throw new $this('Unknown' . get_class($this));</code>
-    </InvalidThrow>
-    <UndefinedClass occurrences="1">
-      <code>new $this('Unknown' . get_class($this))</code>
-    </UndefinedClass>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$code]]></code>
+    </PossiblyUnusedParam>
+    <UnusedClass>
+      <code><![CDATA[ProviderException]]></code>
+    </UnusedClass>
   </file>
-  <file src="lib/core/Random.php">
-    <InvalidArrayOffset occurrences="1">
-      <code>$seed[$bytesNeeded]</code>
-    </InvalidArrayOffset>
-    <InvalidScalarArgument occurrences="2">
-      <code>$bytesNeeded</code>
-      <code>$bytesNeeded</code>
-    </InvalidScalarArgument>
+  <file src="lib/core/Psr4AutoloadTest.php">
+    <UnusedClass>
+      <code><![CDATA[Psr4AutoloadTest]]></code>
+    </UnusedClass>
+  </file>
+  <file src="lib/core/RateLimiter.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[cleanup]]></code>
+      <code><![CDATA[reset]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/core/Registry.php">
-    <InvalidDocblock occurrences="1">
-      <code>private static $data = [];</code>
+    <InvalidDocblock>
+      <code><![CDATA[private static $data = [];]]></code>
     </InvalidDocblock>
-    <InvalidReturnStatement occurrences="1">
-      <code>isset(self::$data[$key])</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[isset(self::$data[$key])]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>array</code>
+    <InvalidReturnType>
+      <code><![CDATA[array]]></code>
     </InvalidReturnType>
-  </file>
-  <file src="lib/core/RemoteAddress.php">
-    <InvalidArgument occurrences="1">
-      <code>$_SERVER[$header]</code>
-    </InvalidArgument>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[getObjectRegistered]]></code>
+      <code><![CDATA[registerObject]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/core/RequestPath.php">
-    <ReservedWord occurrences="2">
-      <code>mixed</code>
-      <code>mixed</code>
-    </ReservedWord>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getAll]]></code>
+      <code><![CDATA[setParameters]]></code>
+    </PossiblyUnusedMethod>
   </file>
-  <file src="lib/core/Resize.php">
-    <InvalidArgument occurrences="6">
-      <code>$crop</code>
-      <code>$this-&gt;image</code>
-      <code>$this-&gt;imageResized</code>
-      <code>$this-&gt;imageResized</code>
-      <code>$this-&gt;imageResized</code>
-      <code>$this-&gt;imageResized</code>
-    </InvalidArgument>
-    <InvalidPropertyAssignmentValue occurrences="2">
-      <code>imagecreatetruecolor($newWidth, $newHeight)</code>
-      <code>imagecreatetruecolor($optimalWidth, $optimalHeight)</code>
-    </InvalidPropertyAssignmentValue>
-    <InvalidScalarArgument occurrences="1">
-      <code>$invertScaleQuality</code>
-    </InvalidScalarArgument>
-    <UndefinedDocblockClass occurrences="3">
-      <code>GdImage|resources</code>
-      <code>num|int</code>
-      <code>num|int</code>
-    </UndefinedDocblockClass>
+  <file src="lib/core/Sanitize.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[sanitize]]></code>
+    </PossiblyUnusedMethod>
+    <UnevaluatedCode>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+    </UnevaluatedCode>
   </file>
-  <file src="lib/core/ResponsiveCaptcha.php">
-    <FalsableReturnStatement occurrences="1">
-      <code>false</code>
-    </FalsableReturnStatement>
-    <InvalidArrayOffset occurrences="3">
-      <code>$numberNames[$numGroup]</code>
-      <code>$numberNames[$number]</code>
-      <code>$numberNames[$onesPlace]</code>
-    </InvalidArrayOffset>
-    <InvalidScalarArgument occurrences="1">
-      <code>$number</code>
-    </InvalidScalarArgument>
+  <file src="lib/core/ScriptlogScanner.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getFilter]]></code>
+      <code><![CDATA[setFilter]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="lib/core/SearchFinder.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getError]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/core/ServiceException.php">
-    <InvalidThrow occurrences="1">
-      <code>throw new $this('Unknown' . get_class($this));</code>
-    </InvalidThrow>
-    <UndefinedClass occurrences="1">
-      <code>new $this('Unknown' . get_class($this))</code>
-    </UndefinedClass>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$code]]></code>
+    </PossiblyUnusedParam>
+    <PossiblyUnusedProperty>
+      <code><![CDATA[$previous]]></code>
+    </PossiblyUnusedProperty>
   </file>
   <file src="lib/core/Session.php">
-    <TypeDoesNotContainType occurrences="1">
-      <code>!$this-&gt;session_state = self::SESSION_STARTED</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__get]]></code>
+      <code><![CDATA[__set]]></code>
+      <code><![CDATA[destroy]]></code>
+    </PossiblyUnusedMethod>
+    <TypeDoesNotContainType>
+      <code><![CDATA[!$this->session_state = self::SESSION_STARTED]]></code>
     </TypeDoesNotContainType>
   </file>
   <file src="lib/core/SessionMaker.php">
-    <InvalidReturnStatement occurrences="2">
-      <code>false</code>
-      <code>session_destroy()</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[false]]></code>
+      <code><![CDATA[session_destroy()]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>void</code>
+    <InvalidReturnType>
+      <code><![CDATA[void]]></code>
     </InvalidReturnType>
+    <ParamNameMismatch>
+      <code><![CDATA[$data]]></code>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$id]]></code>
+    </ParamNameMismatch>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
   </file>
-  <file src="lib/core/Sitemap.php">
-    <InvalidParamDefault occurrences="1">
-      <code>string|null</code>
-    </InvalidParamDefault>
-    <InvalidScalarArgument occurrences="3">
-      <code>$date</code>
-      <code>$lastmod</code>
-      <code>$lastmod</code>
-    </InvalidScalarArgument>
+  <file src="lib/core/SessionMakerException.php">
+    <UnusedClass>
+      <code><![CDATA[SessionMakerException]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/core/SitemapService.php">
-    <InvalidArrayAccess occurrences="1">
-      <code>$pages[$key]</code>
+    <InvalidArrayAccess>
+      <code><![CDATA[$pages[$key]]]></code>
     </InvalidArrayAccess>
-    <InvalidReturnStatement occurrences="1">
-      <code>empty($this-&gt;sitemap-&gt;createSitemapIndex($this-&gt;domain, 'Now')) ? "1" : "0"</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1"/>
-  </file>
-  <file src="lib/core/SyntaxHighlight.php">
-    <InvalidArgument occurrences="1">
-      <code>array_values($regexp)</code>
-    </InvalidArgument>
-    <RedundantFunctionCall occurrences="1">
-      <code>array_values</code>
-    </RedundantFunctionCall>
+    <UnusedDocblockParam>
+      <code><![CDATA[$sitemap]]></code>
+    </UnusedDocblockParam>
   </file>
   <file src="lib/core/Tokenizer.php">
-    <UndefinedDocblockClass occurrences="1">
-      <code>integer|number</code>
-    </UndefinedDocblockClass>
-  </file>
-  <file src="lib/core/Util.php">
-    <FalsableReturnStatement occurrences="1">
-      <code>false</code>
+    <FalsableReturnStatement>
+      <code><![CDATA[password_hash($password, PASSWORD_BCRYPT, ['cost' => $cost])]]></code>
     </FalsableReturnStatement>
-    <InvalidArrayOffset occurrences="1">
-      <code>$digits[substr($slug, 0, 1)]</code>
-    </InvalidArrayOffset>
-    <InvalidOperand occurrences="1">
-      <code>$var</code>
-    </InvalidOperand>
-    <InvalidParamDefault occurrences="3">
-      <code>int</code>
-      <code>string</code>
-      <code>string</code>
-    </InvalidParamDefault>
-    <InvalidReturnStatement occurrences="3">
-      <code>$encoding ? mb_internal_encoding($encoding) : mb_internal_encoding()</code>
-      <code>static::random_string($length)</code>
-      <code>substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length)</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="2">
-      <code>bool</code>
-      <code>string</code>
-    </InvalidReturnType>
-    <InvalidScalarArgument occurrences="6">
-      <code>$key</code>
-      <code>$key</code>
-      <code>$key</code>
-      <code>$key</code>
-      <code>$number</code>
-      <code>$text[0]</code>
-    </InvalidScalarArgument>
-    <TypeDoesNotContainType occurrences="1">
-      <code>self::$hasArray</code>
-    </TypeDoesNotContainType>
+    <UndefinedDocblockClass>
+      <code><![CDATA[integer|number]]></code>
+    </UndefinedDocblockClass>
+    <UnusedDocblockParam>
+      <code><![CDATA[$key]]></code>
+    </UnusedDocblockParam>
+    <UnusedParam>
+      <code><![CDATA[$length]]></code>
+    </UnusedParam>
+  </file>
+  <file src="lib/core/TranslationLoader.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[get]]></code>
+      <code><![CDATA[invalidate]]></code>
+      <code><![CDATA[isCacheEnabled]]></code>
+      <code><![CDATA[setCacheEnabled]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="lib/core/View.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[get]]></code>
+    </PossiblyUnusedMethod>
+    <UnusedProperty>
+      <code><![CDATA[$errors]]></code>
+    </UnusedProperty>
+  </file>
+  <file src="lib/core/Wall.php">
+    <UnusedClass>
+      <code><![CDATA[Wall]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/dao/CommentDao.php">
-    <InvalidNullableReturnType occurrences="1">
-      <code>numeric|int</code>
-    </InvalidNullableReturnType>
-    <InvalidReturnStatement occurrences="2">
-      <code>$stmt &gt; 0</code>
-      <code>(empty($comments)) ?: $comments</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$stmt > 0]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="2">
-      <code>array</code>
-      <code>integer|numeric</code>
+    <InvalidReturnType>
+      <code><![CDATA[integer|numeric]]></code>
     </InvalidReturnType>
-    <InvalidScalarArgument occurrences="2">
-      <code>$ID</code>
-      <code>$id</code>
-    </InvalidScalarArgument>
-    <NullableReturnStatement occurrences="1">
-      <code>(empty($data)) ? $this-&gt;checkCountValue([]) : $this-&gt;checkCountValue($data)</code>
-    </NullableReturnStatement>
-    <UndefinedDocblockClass occurrences="1">
-      <code>integer|number</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[anonymizeComment]]></code>
+      <code><![CDATA[checkCommentId]]></code>
+      <code><![CDATA[countReplies]]></code>
+      <code><![CDATA[deleteComment]]></code>
+      <code><![CDATA[deleteCommentWithReplies]]></code>
+      <code><![CDATA[dropDownCommentStatement]]></code>
+      <code><![CDATA[findComment]]></code>
+      <code><![CDATA[findCommentWithPost]]></code>
+      <code><![CDATA[getPostCommentStatus]]></code>
+      <code><![CDATA[insertCommentApi]]></code>
+      <code><![CDATA[totalCommentRecords]]></code>
+      <code><![CDATA[updateComment]]></code>
+      <code><![CDATA[updateCommentApi]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$sanitize]]></code>
+    </PossiblyUnusedParam>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
+    <UndefinedDocblockClass>
+      <code><![CDATA[integer|number]]></code>
     </UndefinedDocblockClass>
   </file>
   <file src="lib/dao/ConfigurationDao.php">
-    <InvalidNullableReturnType occurrences="1">
-      <code>integer|numeric</code>
-    </InvalidNullableReturnType>
-    <InvalidParamDefault occurrences="1">
-      <code>integer</code>
+    <InvalidParamDefault>
+      <code><![CDATA[integer]]></code>
     </InvalidParamDefault>
-    <InvalidReturnStatement occurrences="4">
-      <code>(empty($configs)) ?: $configs</code>
-      <code>(empty($detailConfig)) ?: $detailConfig</code>
-      <code>(empty($general_configs)) ?: $general_configs</code>
-      <code>(empty($reading_configs)) ?: $reading_configs</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[(empty($configs)) ?: $configs]]></code>
+      <code><![CDATA[(empty($detailConfig)) ?: $detailConfig]]></code>
+      <code><![CDATA[(empty($general_configs)) ?: $general_configs]]></code>
+      <code><![CDATA[(empty($reading_configs)) ?: $reading_configs]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="3">
-      <code>array</code>
-      <code>array</code>
-      <code>array</code>
+    <InvalidReturnType>
+      <code><![CDATA[array]]></code>
+      <code><![CDATA[array]]></code>
+      <code><![CDATA[array]]></code>
     </InvalidReturnType>
-    <InvalidScalarArgument occurrences="2">
-      <code>$id</code>
-      <code>$id</code>
-    </InvalidScalarArgument>
-    <NullableReturnStatement occurrences="1">
-      <code>$this-&gt;checkCountValue($data)</code>
-    </NullableReturnStatement>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[checkConfigId]]></code>
+      <code><![CDATA[checkToSetup]]></code>
+      <code><![CDATA[deleteConfig]]></code>
+      <code><![CDATA[dropDownTimezone]]></code>
+      <code><![CDATA[findConfig]]></code>
+      <code><![CDATA[findConfigs]]></code>
+      <code><![CDATA[findGeneralConfigs]]></code>
+      <code><![CDATA[totalConfigRecords]]></code>
+      <code><![CDATA[updateConfig]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/dao/ConsentDao.php">
-    <InvalidReturnStatement occurrences="3">
-      <code>$this-&gt;checkCountValue([])</code>
-      <code>(empty($consents)) ? false : $consents</code>
-      <code>(empty($consents)) ? false : $consents</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="3">
-      <code>array|bool</code>
-      <code>array|bool</code>
-      <code>int</code>
-    </InvalidReturnType>
-    <NullableReturnStatement occurrences="1">
-      <code>$this-&gt;checkCountValue([])</code>
-    </NullableReturnStatement>
+    <InvalidOperand>
+      <code><![CDATA[$count > 0]]></code>
+    </InvalidOperand>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[deleteOldConsents]]></code>
+      <code><![CDATA[getAllConsents]]></code>
+      <code><![CDATA[getConsentsByIp]]></code>
+      <code><![CDATA[getLatestConsent]]></code>
+      <code><![CDATA[hasConsented]]></code>
+      <code><![CDATA[recordConsent]]></code>
+      <code><![CDATA[totalConsentRecords]]></code>
+      <code><![CDATA[updateConsent]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/dao/DataRequestDao.php">
-    <InvalidReturnStatement occurrences="4">
-      <code>$this-&gt;checkCountValue([])</code>
-      <code>$this-&gt;findAll([$email])</code>
-      <code>$this-&gt;findAll([$status])</code>
-      <code>$this-&gt;findAll([])</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="4">
-      <code>array|bool</code>
-      <code>array|bool</code>
-      <code>array|bool</code>
-      <code>int</code>
-    </InvalidReturnType>
-    <NullableReturnStatement occurrences="1">
-      <code>$this-&gt;checkCountValue([])</code>
-    </NullableReturnStatement>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[deleteRequest]]></code>
+      <code><![CDATA[getRequestByEmail]]></code>
+      <code><![CDATA[getRequestsByStatus]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
   </file>
   <file src="lib/dao/LanguageDao.php">
-    <InvalidReturnStatement occurrences="2">
-      <code>$this-&gt;findAll([])</code>
-      <code>$this-&gt;findAll([])</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="2">
-      <code>array</code>
-      <code>array</code>
-    </InvalidReturnType>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[codeExists]]></code>
+      <code><![CDATA[countLanguages]]></code>
+      <code><![CDATA[createLanguage]]></code>
+      <code><![CDATA[deleteLanguage]]></code>
+      <code><![CDATA[findActiveLanguages]]></code>
+      <code><![CDATA[findAllLanguages]]></code>
+      <code><![CDATA[findById]]></code>
+      <code><![CDATA[findDefaultLanguage]]></code>
+      <code><![CDATA[setDefaultLanguage]]></code>
+      <code><![CDATA[updateLanguage]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/dao/MediaDao.php">
-    <InvalidArgument occurrences="1">
-      <code>"media_id = {$idsanitized}"</code>
+    <InvalidArgument>
+      <code><![CDATA["media_id = {$idsanitized}"]]></code>
     </InvalidArgument>
-    <InvalidParamDefault occurrences="1">
-      <code>int</code>
+    <InvalidParamDefault>
+      <code><![CDATA[int]]></code>
     </InvalidParamDefault>
-    <InvalidReturnStatement occurrences="3">
-      <code>$stmt &gt; 0</code>
-      <code>(empty($allMedia)) ?: $allMedia</code>
-      <code>(empty($mediaByType)) ?: $mediaByType</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$stmt > 0]]></code>
+      <code><![CDATA[(empty($allMedia)) ?: $allMedia]]></code>
+      <code><![CDATA[(empty($mediaByType)) ?: $mediaByType]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="2">
-      <code>array</code>
-      <code>numeric</code>
+    <InvalidReturnType>
+      <code><![CDATA[array]]></code>
+      <code><![CDATA[numeric]]></code>
     </InvalidReturnType>
-    <InvalidScalarArgument occurrences="5">
-      <code>$id</code>
-      <code>$mediaId</code>
-      <code>$mediaId</code>
-      <code>$mediaId</code>
-      <code>$mediaId</code>
-    </InvalidScalarArgument>
-    <MismatchingDocblockReturnType occurrences="1">
-      <code>integer|numeric</code>
+    <MismatchingDocblockReturnType>
+      <code><![CDATA[integer|numeric]]></code>
     </MismatchingDocblockReturnType>
-    <UndefinedDocblockClass occurrences="1">
-      <code>int|num</code>
-    </UndefinedDocblockClass>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[checkMediaId]]></code>
+      <code><![CDATA[dropDownMediaAccess]]></code>
+      <code><![CDATA[dropDownMediaSelect]]></code>
+      <code><![CDATA[dropDownMediaStatus]]></code>
+      <code><![CDATA[dropDownMediaTarget]]></code>
+      <code><![CDATA[findAllMedia]]></code>
+      <code><![CDATA[findMediaByType]]></code>
+      <code><![CDATA[findMediaPage]]></code>
+      <code><![CDATA[imageUploadHandler]]></code>
+      <code><![CDATA[totalMediaRecords]]></code>
+      <code><![CDATA[updateMedia]]></code>
+      <code><![CDATA[updateMediaMeta]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$data]]></code>
+    </PossiblyUnusedParam>
+    <UnusedDocblockParam>
+      <code><![CDATA[$mediaId]]></code>
+      <code><![CDATA[$sanitize]]></code>
+    </UnusedDocblockParam>
+    <UnusedVariable>
+      <code><![CDATA[$image_src]]></code>
+      <code><![CDATA[$m]]></code>
+      <code><![CDATA[$media_ids]]></code>
+      <code><![CDATA[$media_ids]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/dao/MenuDao.php">
-    <InvalidParamDefault occurrences="1">
-      <code>integer</code>
+    <InvalidParamDefault>
+      <code><![CDATA[integer]]></code>
     </InvalidParamDefault>
-    <InvalidReturnStatement occurrences="2">
-      <code>$dropDown</code>
-      <code>$stmt &gt; 0</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$dropDown]]></code>
+      <code><![CDATA[$stmt > 0]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="2">
-      <code>numeric</code>
-      <code>void</code>
+    <InvalidReturnType>
+      <code><![CDATA[numeric]]></code>
+      <code><![CDATA[void]]></code>
     </InvalidReturnType>
-    <InvalidScalarArgument occurrences="6">
-      <code>$id</code>
-      <code>$id</code>
-      <code>$id</code>
-      <code>$id</code>
-      <code>$id</code>
-      <code>$menuId</code>
-    </InvalidScalarArgument>
-    <MismatchingDocblockReturnType occurrences="1">
-      <code>integer|numeric</code>
+    <MismatchingDocblockReturnType>
+      <code><![CDATA[integer|numeric]]></code>
     </MismatchingDocblockReturnType>
-    <UndefinedDocblockClass occurrences="3">
-      <code>num|int</code>
-      <code>num|int</code>
-      <code>num|int</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[activateMenu]]></code>
+      <code><![CDATA[checkMenuId]]></code>
+      <code><![CDATA[deactivateMenu]]></code>
+      <code><![CDATA[deleteMenu]]></code>
+      <code><![CDATA[dropDownLocale]]></code>
+      <code><![CDATA[dropDownMenuParent]]></code>
+      <code><![CDATA[dropDownMenuVisibility]]></code>
+      <code><![CDATA[findMenu]]></code>
+      <code><![CDATA[findMenuParent]]></code>
+      <code><![CDATA[insertMenu]]></code>
+      <code><![CDATA[menuExists]]></code>
+      <code><![CDATA[totalMenuRecords]]></code>
+      <code><![CDATA[updateMenu]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$data]]></code>
+      <code><![CDATA[$parentId]]></code>
+      <code><![CDATA[$sanitizing]]></code>
+    </PossiblyUnusedParam>
+    <UndefinedDocblockClass>
+      <code><![CDATA[num|int]]></code>
+      <code><![CDATA[num|int]]></code>
+      <code><![CDATA[num|int]]></code>
     </UndefinedDocblockClass>
+    <UnusedDocblockParam>
+      <code><![CDATA[$fetchMode]]></code>
+      <code><![CDATA[$sanitize]]></code>
+    </UnusedDocblockParam>
   </file>
   <file src="lib/dao/PageDao.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$stmt &gt; 0</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$stmt > 0]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>numeric</code>
+    <InvalidReturnType>
+      <code><![CDATA[numeric]]></code>
     </InvalidReturnType>
-    <InvalidScalarArgument occurrences="2">
-      <code>$id</code>
-      <code>$pageId</code>
-    </InvalidScalarArgument>
-    <MismatchingDocblockReturnType occurrences="1">
-      <code>numeric</code>
+    <MismatchingDocblockReturnType>
+      <code><![CDATA[numeric]]></code>
     </MismatchingDocblockReturnType>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[checkPageId]]></code>
+      <code><![CDATA[createPage]]></code>
+      <code><![CDATA[deletePage]]></code>
+      <code><![CDATA[dropDownCommentStatus]]></code>
+      <code><![CDATA[dropDownLocale]]></code>
+      <code><![CDATA[dropDownPostStatus]]></code>
+      <code><![CDATA[findPageById]]></code>
+      <code><![CDATA[findPages]]></code>
+      <code><![CDATA[totalPageRecords]]></code>
+      <code><![CDATA[updatePage]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$data]]></code>
+    </PossiblyUnusedParam>
   </file>
   <file src="lib/dao/PluginDao.php">
-    <InvalidArrayAccess occurrences="1">
-      <code>$rows['plugin_sort']</code>
+    <InvalidArrayAccess>
+      <code><![CDATA[$rows['plugin_sort']]]></code>
     </InvalidArrayAccess>
-    <InvalidReturnStatement occurrences="1">
-      <code>$stmt &gt; 0</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$stmt > 0]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>numeric</code>
+    <InvalidReturnType>
+      <code><![CDATA[numeric]]></code>
     </InvalidReturnType>
-    <InvalidScalarArgument occurrences="6">
-      <code>$id</code>
-      <code>$id</code>
-      <code>$id</code>
-      <code>$id</code>
-      <code>$id</code>
-      <code>$id</code>
-    </InvalidScalarArgument>
-    <MismatchingDocblockReturnType occurrences="1">
-      <code>numeric</code>
+    <MismatchingDocblockReturnType>
+      <code><![CDATA[numeric]]></code>
     </MismatchingDocblockReturnType>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[activatePlugin]]></code>
+      <code><![CDATA[checkPluginId]]></code>
+      <code><![CDATA[deactivatePlugin]]></code>
+      <code><![CDATA[deletePlugin]]></code>
+      <code><![CDATA[dropDownPluginLevel]]></code>
+      <code><![CDATA[getPlugin]]></code>
+      <code><![CDATA[getPlugins]]></code>
+      <code><![CDATA[insertPlugin]]></code>
+      <code><![CDATA[totalPluginRecords]]></code>
+      <code><![CDATA[updatePlugin]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$data]]></code>
+    </PossiblyUnusedParam>
+    <UnusedDocblockParam>
+      <code><![CDATA[$limit]]></code>
+      <code><![CDATA[$position]]></code>
+    </UnusedDocblockParam>
   </file>
   <file src="lib/dao/PostDao.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$stmt &gt; 0</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>numeric</code>
-    </InvalidReturnType>
-    <InvalidScalarArgument occurrences="2">
-      <code>$id</code>
-      <code>$id</code>
-    </InvalidScalarArgument>
-    <MismatchingDocblockReturnType occurrences="1">
-      <code>numeric</code>
-    </MismatchingDocblockReturnType>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[checkPostId]]></code>
+      <code><![CDATA[countPostsByYear]]></code>
+      <code><![CDATA[countPostsByYearMonth]]></code>
+      <code><![CDATA[countPublishedPosts]]></code>
+      <code><![CDATA[createPost]]></code>
+      <code><![CDATA[deletePost]]></code>
+      <code><![CDATA[deletePostComments]]></code>
+      <code><![CDATA[deletePostTopics]]></code>
+      <code><![CDATA[findArchiveIndex]]></code>
+      <code><![CDATA[findPostsByYear]]></code>
+      <code><![CDATA[findPostsByYearMonth]]></code>
+      <code><![CDATA[findPublishedPostById]]></code>
+      <code><![CDATA[findPublishedPostsPaginated]]></code>
+      <code><![CDATA[findTopicsByPostId]]></code>
+      <code><![CDATA[getPostById]]></code>
+      <code><![CDATA[insertPostApi]]></code>
+      <code><![CDATA[searchPostsApi]]></code>
+      <code><![CDATA[setPostTopics]]></code>
+      <code><![CDATA[totalPostRecords]]></code>
+      <code><![CDATA[updatePost]]></code>
+      <code><![CDATA[updatePostApi]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
   </file>
   <file src="lib/dao/PostTopicDao.php">
-    <InvalidScalarArgument occurrences="2">
-      <code>$postId</code>
-      <code>$topicId</code>
-    </InvalidScalarArgument>
+    <UnusedClass>
+      <code><![CDATA[PostTopicDao]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/dao/PrivacyLogDao.php">
-    <InvalidReturnStatement occurrences="6">
-      <code>$this-&gt;checkCountValue([])</code>
-      <code>$this-&gt;findAll([$action])</code>
-      <code>$this-&gt;findAll([$email])</code>
-      <code>$this-&gt;findAll([(int)$limit])</code>
-      <code>$this-&gt;findAll([(int)$userId])</code>
-      <code>$this-&gt;findAll([])</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="6">
-      <code>array|bool</code>
-      <code>array|bool</code>
-      <code>array|bool</code>
-      <code>array|bool</code>
-      <code>array|bool</code>
-      <code>int</code>
-    </InvalidReturnType>
-    <NullableReturnStatement occurrences="1">
-      <code>$this-&gt;checkCountValue([])</code>
-    </NullableReturnStatement>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[deleteOldLogs]]></code>
+      <code><![CDATA[getAllLogs]]></code>
+      <code><![CDATA[getLogById]]></code>
+      <code><![CDATA[getLogsByAction]]></code>
+      <code><![CDATA[getLogsByUserId]]></code>
+      <code><![CDATA[getRecentLogs]]></code>
+      <code><![CDATA[totalLogRecords]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[int]]></code>
+    </PossiblyUnusedReturnValue>
   </file>
   <file src="lib/dao/PrivacyPolicyDao.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$this-&gt;findAll([])</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>array</code>
-    </InvalidReturnType>
+    <UnusedClass>
+      <code><![CDATA[PrivacyPolicyDao]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/dao/ReplyDao.php">
-    <InvalidReturnStatement occurrences="4">
-      <code>$this-&gt;checkCountValue([(int)$parentId])</code>
-      <code>(empty($data)) ? $this-&gt;checkCountValue([]) : $this-&gt;checkCountValue($data)</code>
-      <code>(empty($replies)) ? null : $replies</code>
-      <code>(empty($replies)) ? null : $replies</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="3">
-      <code>array|null</code>
-      <code>array|null</code>
-      <code>int</code>
-    </InvalidReturnType>
-    <InvalidScalarArgument occurrences="5">
-      <code>$ID</code>
-      <code>$id</code>
-      <code>$id</code>
-      <code>$id</code>
-      <code>$parentId</code>
-    </InvalidScalarArgument>
-    <NullableReturnStatement occurrences="2">
-      <code>$this-&gt;checkCountValue([(int)$parentId])</code>
-      <code>(empty($data)) ? $this-&gt;checkCountValue([]) : $this-&gt;checkCountValue($data)</code>
-    </NullableReturnStatement>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[findRepliesByPost]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/dao/ThemeDao.php">
-    <FalsableReturnStatement occurrences="1">
-      <code>false</code>
+    <FalsableReturnStatement>
+      <code><![CDATA[false]]></code>
     </FalsableReturnStatement>
-    <InvalidParamDefault occurrences="1">
-      <code>integer</code>
+    <InvalidParamDefault>
+      <code><![CDATA[integer]]></code>
     </InvalidParamDefault>
-    <InvalidReturnStatement occurrences="3">
-      <code>$stmt &gt; 0</code>
-      <code>$this-&gt;findAll([])</code>
-      <code>(empty($is_actived)) ?: $is_actived</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$stmt > 0]]></code>
+      <code><![CDATA[(empty($is_actived)) ?: $is_actived]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="3">
-      <code>array</code>
-      <code>boolen|string</code>
-      <code>numeric</code>
+    <InvalidReturnType>
+      <code><![CDATA[boolen|string]]></code>
+      <code><![CDATA[numeric]]></code>
     </InvalidReturnType>
-    <InvalidScalarArgument occurrences="5">
-      <code>$id</code>
-      <code>$id</code>
-      <code>$id</code>
-      <code>$id</code>
-      <code>$id</code>
-    </InvalidScalarArgument>
-    <MismatchingDocblockReturnType occurrences="1">
-      <code>numeric|integer|null</code>
+    <MismatchingDocblockReturnType>
+      <code><![CDATA[numeric|integer|null]]></code>
     </MismatchingDocblockReturnType>
-    <UndefinedDocblockClass occurrences="1">
-      <code>boolen|string</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[activateTheme]]></code>
+      <code><![CDATA[checkThemeId]]></code>
+      <code><![CDATA[deactivateTheme]]></code>
+      <code><![CDATA[deleteTheme]]></code>
+      <code><![CDATA[findTheme]]></code>
+      <code><![CDATA[findThemes]]></code>
+      <code><![CDATA[insertTheme]]></code>
+      <code><![CDATA[isThemeActived]]></code>
+      <code><![CDATA[totalThemeRecords]]></code>
+      <code><![CDATA[updateTheme]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$data]]></code>
+    </PossiblyUnusedParam>
+    <UndefinedDocblockClass>
+      <code><![CDATA[boolen|string]]></code>
     </UndefinedDocblockClass>
   </file>
   <file src="lib/dao/TopicDao.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$stmt &gt; 0</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$stmt > 0]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>numeric</code>
+    <InvalidReturnType>
+      <code><![CDATA[numeric]]></code>
     </InvalidReturnType>
-    <InvalidScalarArgument occurrences="5">
-      <code>$id</code>
-      <code>$postId</code>
-      <code>$topicId</code>
-      <code>$topicId</code>
-      <code>$topicId</code>
-    </InvalidScalarArgument>
-    <MismatchingDocblockReturnType occurrences="1">
-      <code>numeric|int|null</code>
-    </MismatchingDocblockReturnType>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[checkTopicId]]></code>
+      <code><![CDATA[countActiveTopics]]></code>
+      <code><![CDATA[countPostsByTopic]]></code>
+      <code><![CDATA[deleteTopic]]></code>
+      <code><![CDATA[deleteTopicCascade]]></code>
+      <code><![CDATA[dropDownLocale]]></code>
+      <code><![CDATA[findActiveTopicsPaginated]]></code>
+      <code><![CDATA[findPostsByTopicPaginated]]></code>
+      <code><![CDATA[findTopicBySlug]]></code>
+      <code><![CDATA[findTopicWithPostCount]]></code>
+      <code><![CDATA[insertTopicApi]]></code>
+      <code><![CDATA[setCheckBoxTopic]]></code>
+      <code><![CDATA[totalTopicRecords]]></code>
+      <code><![CDATA[updateTopic]]></code>
+      <code><![CDATA[updateTopicApi]]></code>
+    </PossiblyUnusedMethod>
+    <UnusedDocblockParam>
+      <code><![CDATA[$limit]]></code>
+      <code><![CDATA[$position]]></code>
+    </UnusedDocblockParam>
+    <UnusedVariable>
+      <code><![CDATA[$checked]]></code>
+      <code><![CDATA[$checked]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/dao/TranslationDao.php">
-    <InvalidReturnStatement occurrences="10">
-      <code>$this-&gt;findAll([$langId, "%{$query}%", "%{$query}%", $limit, $offset])</code>
-      <code>$this-&gt;findAll([$langId, "%{$query}%", "%{$query}%"])</code>
-      <code>$this-&gt;findAll([$langId, $context, $limit, $offset])</code>
-      <code>$this-&gt;findAll([$langId, $context])</code>
-      <code>$this-&gt;findAll([$langId, $limit, $offset])</code>
-      <code>$this-&gt;findAll([$langId, $prefix . '%'])</code>
-      <code>$this-&gt;findAll([$langId])</code>
-      <code>$this-&gt;findAll([$limit, $offset])</code>
-      <code>$this-&gt;findAll([$localeCode])</code>
-      <code>$this-&gt;findAll([])</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="10">
-      <code>array</code>
-      <code>array</code>
-      <code>array</code>
-      <code>array</code>
-      <code>array</code>
-      <code>array</code>
-      <code>array</code>
-      <code>array</code>
-      <code>array</code>
-      <code>array</code>
-    </InvalidReturnType>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[countAllTranslations]]></code>
+      <code><![CDATA[countByContext]]></code>
+      <code><![CDATA[countByLanguage]]></code>
+      <code><![CDATA[countSearch]]></code>
+      <code><![CDATA[createTranslation]]></code>
+      <code><![CDATA[deleteByLanguage]]></code>
+      <code><![CDATA[deleteTranslation]]></code>
+      <code><![CDATA[exportToJson]]></code>
+      <code><![CDATA[findAllTranslationsPaginated]]></code>
+      <code><![CDATA[findByContext]]></code>
+      <code><![CDATA[findByContextPaginated]]></code>
+      <code><![CDATA[findById]]></code>
+      <code><![CDATA[findByKeyPrefix]]></code>
+      <code><![CDATA[findTranslationByKey]]></code>
+      <code><![CDATA[findTranslationsPaginated]]></code>
+      <code><![CDATA[getDistinctContexts]]></code>
+      <code><![CDATA[getTranslationValue]]></code>
+      <code><![CDATA[search]]></code>
+      <code><![CDATA[searchPaginated]]></code>
+      <code><![CDATA[updateTranslation]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/dao/UserDao.php">
-    <InvalidDocblock occurrences="1">
-      <code>[type]</code>
+    <InvalidDocblock>
+      <code><![CDATA[[type]]]></code>
     </InvalidDocblock>
-    <InvalidReturnStatement occurrences="4">
-      <code>$stmt &gt; 0</code>
-      <code>$this-&gt;checkCountValue($data) ?? 0</code>
-      <code>$userAccount</code>
-      <code>true</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$stmt > 0]]></code>
+      <code><![CDATA[$userAccount]]></code>
+      <code><![CDATA[true]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="4">
-      <code>false</code>
-      <code>int</code>
-      <code>integer</code>
-      <code>numeric</code>
+    <InvalidReturnType>
+      <code><![CDATA[false]]></code>
+      <code><![CDATA[int]]></code>
+      <code><![CDATA[numeric]]></code>
     </InvalidReturnType>
-    <InvalidScalarArgument occurrences="2">
-      <code>$userID</code>
-      <code>$userID</code>
-    </InvalidScalarArgument>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[activateUser]]></code>
+      <code><![CDATA[checkUserId]]></code>
+      <code><![CDATA[checkUserSession]]></code>
+      <code><![CDATA[getUserByResetKey]]></code>
+      <code><![CDATA[getUserBySession]]></code>
+      <code><![CDATA[recoverNewPassword]]></code>
+      <code><![CDATA[updateResetKey]]></code>
+      <code><![CDATA[updateUserSession]]></code>
+    </PossiblyUnusedMethod>
+    <UnusedDocblockParam>
+      <code><![CDATA[$accessLevel]]></code>
+      <code><![CDATA[$limit]]></code>
+      <code><![CDATA[$position]]></code>
+      <code><![CDATA[$sanitize]]></code>
+    </UnusedDocblockParam>
+    <UnusedVariable>
+      <code><![CDATA[$userAccount]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="lib/dao/UserTokenDao.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[createUserToken]]></code>
+      <code><![CDATA[deleteUserToken]]></code>
+      <code><![CDATA[getTokenByLogin]]></code>
+      <code><![CDATA[updateTokenExpired]]></code>
+      <code><![CDATA[updateUserToken]]></code>
+    </PossiblyUnusedMethod>
+    <UnusedDocblockParam>
+      <code><![CDATA[$sanitize]]></code>
+    </UnusedDocblockParam>
+  </file>
+  <file src="lib/dto/PostRequestDto.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[isNewPost]]></code>
+      <code><![CDATA[isSubmitted]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedProperty>
+      <code><![CDATA[$catIds]]></code>
+      <code><![CDATA[$imageId]]></code>
+      <code><![CDATA[$mediaFile]]></code>
+      <code><![CDATA[$postHeadlines]]></code>
+      <code><![CDATA[$postLocale]]></code>
+      <code><![CDATA[$postSummary]]></code>
+      <code><![CDATA[$postTags]]></code>
+    </PossiblyUnusedProperty>
+  </file>
+  <file src="lib/dto/UploadedFileDto.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getExtension]]></code>
+      <code><![CDATA[getGeneratedFilename]]></code>
+      <code><![CDATA[hasUploadError]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="lib/handler/AdminActionRegistry.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[execute]]></code>
+      <code><![CDATA[has]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="lib/handler/HomeHandler.php">
+    <UnusedClass>
+      <code><![CDATA[HomeHandler]]></code>
+    </UnusedClass>
+  </file>
+  <file src="lib/main.php">
+    <UnusedVariable>
+      <code><![CDATA[$redirectUrl]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/model/ArchivesModel.php">
-    <MismatchingDocblockParamType occurrences="2">
-      <code>object</code>
-      <code>object</code>
+    <MismatchingDocblockParamType>
+      <code><![CDATA[object]]></code>
+      <code><![CDATA[object]]></code>
     </MismatchingDocblockParamType>
   </file>
   <file src="lib/model/DownloadModel.php">
-    <InvalidReturnStatement occurrences="4">
-      <code>$this-&gt;findAll() ?? []</code>
-      <code>$this-&gt;findAll([$limit]) ?? []</code>
-      <code>$this-&gt;findAll([$limit]) ?? []</code>
-      <code>$this-&gt;findAll([$mediaId]) ?? []</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="4">
-      <code>array</code>
-      <code>array</code>
-      <code>array</code>
-      <code>array</code>
-    </InvalidReturnType>
-    <UndefinedDocblockClass occurrences="1">
-      <code>int|num</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[createDownloadLog]]></code>
+      <code><![CDATA[createMediaDownload]]></code>
+      <code><![CDATA[deleteMediaDownload]]></code>
+      <code><![CDATA[getAllMediaDownload]]></code>
+      <code><![CDATA[getDownloadCountByMedia]]></code>
+      <code><![CDATA[getDownloadHistory]]></code>
+      <code><![CDATA[getDownloadHistoryByMedia]]></code>
+      <code><![CDATA[getFileTypeDistribution]]></code>
+      <code><![CDATA[getMediaDownload]]></code>
+      <code><![CDATA[getMediaDownloadURL]]></code>
+      <code><![CDATA[getRecentDownloads]]></code>
+      <code><![CDATA[updateMediaDownload]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$bind]]></code>
+      <code><![CDATA[$mediaId]]></code>
+      <code><![CDATA[$sanitize]]></code>
+    </PossiblyUnusedParam>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
     </UndefinedDocblockClass>
   </file>
   <file src="lib/model/FrontContentModel.php">
-    <InvalidArgument occurrences="1">
-      <code>self::frontSanitizer()</code>
+    <InvalidArgument>
+      <code><![CDATA[self::frontSanitizer()]]></code>
     </InvalidArgument>
-    <InvalidClass occurrences="1">
-      <code>postModel</code>
+    <InvalidClass>
+      <code><![CDATA[postModel]]></code>
     </InvalidClass>
-    <InvalidDocblock occurrences="1">
-      <code>public static function frontLatestPosts($limit, PostModel $postModel, $position = null)</code>
+    <InvalidDocblock>
+      <code><![CDATA[public static function frontLatestPosts($limit, PostModel $postModel, $position = null)]]></code>
     </InvalidDocblock>
-    <InvalidScalarArgument occurrences="1">
-      <code>$postId</code>
-    </InvalidScalarArgument>
-    <UndefinedDocblockClass occurrences="6">
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|number</code>
-      <code>num|int</code>
-      <code>num|int</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[frontArchiveIndex]]></code>
+      <code><![CDATA[frontBlogPosts]]></code>
+      <code><![CDATA[frontGalleries]]></code>
+      <code><![CDATA[frontLatestPosts]]></code>
+      <code><![CDATA[frontLinkTag]]></code>
+      <code><![CDATA[frontLinkTopic]]></code>
+      <code><![CDATA[frontPageById]]></code>
+      <code><![CDATA[frontPageBySlug]]></code>
+      <code><![CDATA[frontPostById]]></code>
+      <code><![CDATA[frontPostsByArchive]]></code>
+      <code><![CDATA[frontPostsByTag]]></code>
+      <code><![CDATA[frontPostsByTopic]]></code>
+      <code><![CDATA[frontPostsFeed]]></code>
+      <code><![CDATA[frontRandomHeadlines]]></code>
+      <code><![CDATA[frontRandomPosts]]></code>
+      <code><![CDATA[frontRandomStickyPage]]></code>
+      <code><![CDATA[frontSidebarArchives]]></code>
+      <code><![CDATA[frontSidebarTopics]]></code>
+      <code><![CDATA[frontTopicById]]></code>
+      <code><![CDATA[frontTopicBySlug]]></code>
+    </PossiblyUnusedMethod>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|number]]></code>
+      <code><![CDATA[num|int]]></code>
+      <code><![CDATA[num|int]]></code>
     </UndefinedDocblockClass>
+    <UnusedParam>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$limit]]></code>
+      <code><![CDATA[$pageModel]]></code>
+      <code><![CDATA[$postId]]></code>
+      <code><![CDATA[$postModel]]></code>
+      <code><![CDATA[$postModel]]></code>
+      <code><![CDATA[$topicId]]></code>
+      <code><![CDATA[$topicId]]></code>
+      <code><![CDATA[$topicModel]]></code>
+      <code><![CDATA[$topicModel]]></code>
+    </UnusedParam>
   </file>
   <file src="lib/model/GalleryModel.php">
-    <UndefinedDocblockClass occurrences="2">
-      <code>int|num</code>
-      <code>int|num</code>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$limit]]></code>
+      <code><![CDATA[$start]]></code>
+    </PossiblyUnusedParam>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
     </UndefinedDocblockClass>
   </file>
   <file src="lib/model/PageModel.php">
-    <InvalidScalarArgument occurrences="1">
-      <code>$id</code>
-    </InvalidScalarArgument>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getPageById]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/model/PostModel.php">
-    <InvalidReturnStatement occurrences="2">
-      <code>(empty($entries)) ?: ['blogPosts' =&gt; $entries, 'paginationLink' =&gt; $this-&gt;pagination]</code>
-      <code>(empty($feeds)) ?: $feeds</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[(empty($entries)) ?: ['blogPosts' => $entries, 'paginationLink' => $this->pagination]]]></code>
+      <code><![CDATA[(empty($feeds)) ?: $feeds]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="2">
-      <code>void</code>
-      <code>void</code>
+    <InvalidReturnType>
+      <code><![CDATA[void]]></code>
+      <code><![CDATA[void]]></code>
     </InvalidReturnType>
-    <UndefinedDocblockClass occurrences="3">
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|num</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getPostByAuthor]]></code>
+      <code><![CDATA[getPostById]]></code>
+      <code><![CDATA[getPostBySlug]]></code>
+      <code><![CDATA[getPostFeeds]]></code>
+      <code><![CDATA[getRelatedPosts]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$limit]]></code>
+      <code><![CDATA[$limit]]></code>
+    </PossiblyUnusedParam>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
     </UndefinedDocblockClass>
+    <UnusedDocblockParam>
+      <code><![CDATA[$limit]]></code>
+      <code><![CDATA[$position]]></code>
+      <code><![CDATA[$sanitize]]></code>
+      <code><![CDATA[$start]]></code>
+      <code><![CDATA[$start]]></code>
+      <code><![CDATA[$status]]></code>
+    </UnusedDocblockParam>
+    <UnusedVariable>
+      <code><![CDATA[$entries]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/model/TagModel.php">
-    <InvalidScalarArgument occurrences="1">
-      <code>$tags</code>
+    <InvalidScalarArgument>
+      <code><![CDATA[$tags]]></code>
     </InvalidScalarArgument>
-    <RedundantCast occurrences="1">
-      <code>(array) $tag_exploaded</code>
-    </RedundantCast>
+    <UnusedDocblockParam>
+      <code><![CDATA[$paginator]]></code>
+    </UnusedDocblockParam>
+    <UnusedVariable>
+      <code><![CDATA[$entries]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/model/TopicModel.php">
-    <InvalidReturnStatement occurrences="2">
-      <code>(empty($active_topics)) ?: $active_topics</code>
-      <code>implode("", $link)</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[(empty($active_topics)) ?: $active_topics]]></code>
+      <code><![CDATA[implode("", $link)]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="2">
-      <code>array</code>
-      <code>array</code>
+    <InvalidReturnType>
+      <code><![CDATA[array]]></code>
+      <code><![CDATA[array]]></code>
     </InvalidReturnType>
-    <InvalidScalarArgument occurrences="1">
-      <code>$postId</code>
-    </InvalidScalarArgument>
-    <UndefinedConstant occurrences="2">
-      <code>PDO::FETCH_ASSOC|PDO::FETCH_OBJECT</code>
-      <code>PDO::FETCH_ASSOC|PDO::FETCH_OBJECT</code>
-    </UndefinedConstant>
-    <UndefinedDocblockClass occurrences="1">
-      <code>int|num</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getPostsPublishedByTopic]]></code>
+      <code><![CDATA[getTopicById]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$fetchMode]]></code>
+      <code><![CDATA[$id]]></code>
+    </PossiblyUnusedParam>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
     </UndefinedDocblockClass>
+    <UnusedDocblockParam>
+      <code><![CDATA[$fetchMode]]></code>
+      <code><![CDATA[$sanitize]]></code>
+    </UnusedDocblockParam>
+    <UnusedVariable>
+      <code><![CDATA[$entries]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/options.php">
-    <InvalidScalarArgument occurrences="7">
-      <code>0</code>
-      <code>1</code>
-      <code>1</code>
-      <code>1</code>
-      <code>1</code>
-      <code>100</code>
-      <code>1440</code>
+    <InvalidScalarArgument>
+      <code><![CDATA[0]]></code>
+      <code><![CDATA[1]]></code>
+      <code><![CDATA[1]]></code>
+      <code><![CDATA[1]]></code>
+      <code><![CDATA[1]]></code>
+      <code><![CDATA[100]]></code>
+      <code><![CDATA[1440]]></code>
     </InvalidScalarArgument>
   </file>
   <file src="lib/service/CommentService.php">
-    <InvalidDocblock occurrences="1">
-      <code>private $sanitizer;</code>
+    <InvalidDocblock>
+      <code><![CDATA[private $sanitizer;]]></code>
     </InvalidDocblock>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[commentStatementDropDown]]></code>
+      <code><![CDATA[countReplies]]></code>
+      <code><![CDATA[grabComment]]></code>
+      <code><![CDATA[grabComments]]></code>
+      <code><![CDATA[modifyComment]]></code>
+      <code><![CDATA[removeComment]]></code>
+      <code><![CDATA[setAuthorEmail]]></code>
+      <code><![CDATA[setAuthorIP]]></code>
+      <code><![CDATA[setAuthorName]]></code>
+      <code><![CDATA[setCommentContent]]></code>
+      <code><![CDATA[setCommentDate]]></code>
+      <code><![CDATA[setCommentId]]></code>
+      <code><![CDATA[setCommentStatus]]></code>
+      <code><![CDATA[setPostId]]></code>
+      <code><![CDATA[totalComments]]></code>
+    </PossiblyUnusedMethod>
+    <UnusedProperty>
+      <code><![CDATA[$author_email]]></code>
+      <code><![CDATA[$author_ip]]></code>
+      <code><![CDATA[$created_at]]></code>
+      <code><![CDATA[$post_id]]></code>
+    </UnusedProperty>
+  </file>
+  <file src="lib/service/ConfigurationService.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[addSetting]]></code>
+      <code><![CDATA[grabGeneralSettings]]></code>
+      <code><![CDATA[grabReadingSettings]]></code>
+      <code><![CDATA[grabSetting]]></code>
+      <code><![CDATA[grabSettings]]></code>
+      <code><![CDATA[membershipDefaultRoleDropDown]]></code>
+      <code><![CDATA[modifySetting]]></code>
+      <code><![CDATA[removeSetting]]></code>
+      <code><![CDATA[setConfigId]]></code>
+      <code><![CDATA[setConfigName]]></code>
+      <code><![CDATA[setConfigValue]]></code>
+      <code><![CDATA[timezoneIdentifierDropDown]]></code>
+      <code><![CDATA[totalSettings]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="lib/service/ConsentService.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[cleanOldConsents]]></code>
+      <code><![CDATA[getAllConsents]]></code>
+      <code><![CDATA[hasConsented]]></code>
+      <code><![CDATA[updateConsent]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[int|bool]]></code>
+    </PossiblyUnusedReturnValue>
   </file>
   <file src="lib/service/DataRequestService.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$this-&gt;dataRequestDao-&gt;getAllRequests()</code>
+    <InvalidArgument>
+      <code><![CDATA[$requestId]]></code>
+      <code><![CDATA[$requestId]]></code>
+    </InvalidArgument>
+    <InvalidReturnStatement>
+      <code><![CDATA[$this->dataRequestDao->getAllRequests()]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>array</code>
+    <InvalidReturnType>
+      <code><![CDATA[array]]></code>
     </InvalidReturnType>
-    <InvalidScalarArgument occurrences="2">
-      <code>$requestId</code>
-      <code>$requestId</code>
-    </InvalidScalarArgument>
+    <UnusedClass>
+      <code><![CDATA[DataRequestService]]></code>
+    </UnusedClass>
   </file>
   <file src="lib/service/DownloadService.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$identifier</code>
+    <FalsableReturnStatement>
+      <code><![CDATA[function_exists('generate_media_identifier')
+            ? generate_media_identifier()
+            : sprintf(
+                '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0x0fff) | 0x4000,
+                mt_rand(0, 0x3fff) | 0x8000,
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff)
+            )]]></code>
+    </FalsableReturnStatement>
+    <InvalidReturnStatement>
+      <code><![CDATA[$identifier]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>int</code>
+    <InvalidReturnType>
+      <code><![CDATA[int]]></code>
     </InvalidReturnType>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[refreshDownloadExpiry]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
+  </file>
+  <file src="lib/service/ExportService.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[exportToBlogspot]]></code>
+      <code><![CDATA[exportToGhost]]></code>
+      <code><![CDATA[exportToScriptlog]]></code>
+      <code><![CDATA[exportToWordPress]]></code>
+      <code><![CDATA[getCategories]]></code>
+      <code><![CDATA[getPages]]></code>
+      <code><![CDATA[getPosts]]></code>
+      <code><![CDATA[getStats]]></code>
+      <code><![CDATA[sanitizeInput]]></code>
+      <code><![CDATA[setAuthorId]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/service/FrontService.php">
-    <FalsableReturnStatement occurrences="3">
-      <code>FrontHelper::grabSimpleFrontPage($id)</code>
-      <code>FrontHelper::grabSimpleFrontPost($id)</code>
-      <code>FrontHelper::grabSimpleFrontTopic($id)</code>
-    </FalsableReturnStatement>
-    <InvalidReturnStatement occurrences="1">
-      <code>$topic</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$topic]]></code>
     </InvalidReturnStatement>
+    <UnusedProperty>
+      <code><![CDATA[$mediaDao]]></code>
+    </UnusedProperty>
+  </file>
+  <file src="lib/service/LanguageService.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[createLanguage]]></code>
+      <code><![CDATA[deleteLanguage]]></code>
+      <code><![CDATA[getAllLanguages]]></code>
+      <code><![CDATA[getDefaultLanguage]]></code>
+      <code><![CDATA[getLanguageByCode]]></code>
+      <code><![CDATA[getLanguageById]]></code>
+      <code><![CDATA[getLanguageCodes]]></code>
+      <code><![CDATA[setDefaultLanguage]]></code>
+      <code><![CDATA[updateLanguage]]></code>
+    </PossiblyUnusedMethod>
+    <UnusedProperty>
+      <code><![CDATA[$translationDao]]></code>
+    </UnusedProperty>
   </file>
   <file src="lib/service/MediaService.php">
-    <InvalidParamDefault occurrences="1">
-      <code>integer</code>
-    </InvalidParamDefault>
-    <InvalidReturnStatement occurrences="1"/>
-    <MismatchingDocblockParamType occurrences="3">
-      <code>object</code>
-      <code>object</code>
-      <code>object</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$this->mediaDao->updateMediaMeta($this->sanitizer, [
+                'meta_key' => $this->meta_key,
+                'meta_value' => $this->meta_value
+            ], $this->mediaId)]]></code>
+    </InvalidReturnStatement>
+    <MismatchingDocblockParamType>
+      <code><![CDATA[object]]></code>
+      <code><![CDATA[object]]></code>
+      <code><![CDATA[object]]></code>
     </MismatchingDocblockParamType>
-    <UndefinedDocblockClass occurrences="1">
-      <code>integer|number</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[addMedia]]></code>
+      <code><![CDATA[addMediaDownload]]></code>
+      <code><![CDATA[addMediaMeta]]></code>
+      <code><![CDATA[grabAllMedia]]></code>
+      <code><![CDATA[grabMedia]]></code>
+      <code><![CDATA[grabMediaMeta]]></code>
+      <code><![CDATA[isMediaUser]]></code>
+      <code><![CDATA[mediaAccessDropDown]]></code>
+      <code><![CDATA[mediaStatusDropDown]]></code>
+      <code><![CDATA[mediaTargetDropDown]]></code>
+      <code><![CDATA[modifyMedia]]></code>
+      <code><![CDATA[modifyMediaDownload]]></code>
+      <code><![CDATA[modifyMediaMeta]]></code>
+      <code><![CDATA[removeMedia]]></code>
+      <code><![CDATA[setBeforeExpired]]></code>
+      <code><![CDATA[setIpAddress]]></code>
+      <code><![CDATA[setMediaAccess]]></code>
+      <code><![CDATA[setMediaCaption]]></code>
+      <code><![CDATA[setMediaFilename]]></code>
+      <code><![CDATA[setMediaId]]></code>
+      <code><![CDATA[setMediaIdentifier]]></code>
+      <code><![CDATA[setMediaKey]]></code>
+      <code><![CDATA[setMediaStatus]]></code>
+      <code><![CDATA[setMediaTarget]]></code>
+      <code><![CDATA[setMediaType]]></code>
+      <code><![CDATA[setMediaUser]]></code>
+      <code><![CDATA[setMediaValue]]></code>
+      <code><![CDATA[totalMedia]]></code>
+    </PossiblyUnusedMethod>
+    <UndefinedDocblockClass>
+      <code><![CDATA[integer|number]]></code>
     </UndefinedDocblockClass>
   </file>
   <file src="lib/service/MenuService.php">
-    <UndefinedDocblockClass occurrences="1">
-      <code>int|num</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[addMenu]]></code>
+      <code><![CDATA[disableMenu]]></code>
+      <code><![CDATA[enableMenu]]></code>
+      <code><![CDATA[grabMenu]]></code>
+      <code><![CDATA[grabMenuParent]]></code>
+      <code><![CDATA[grabMenus]]></code>
+      <code><![CDATA[isMenuExists]]></code>
+      <code><![CDATA[localeDropDown]]></code>
+      <code><![CDATA[modifyMenu]]></code>
+      <code><![CDATA[parentDropDown]]></code>
+      <code><![CDATA[removeMenu]]></code>
+      <code><![CDATA[setMenuId]]></code>
+      <code><![CDATA[setMenuLabel]]></code>
+      <code><![CDATA[setMenuLink]]></code>
+      <code><![CDATA[setMenuLocale]]></code>
+      <code><![CDATA[setMenuOrder]]></code>
+      <code><![CDATA[setMenuStatus]]></code>
+      <code><![CDATA[setMenuVisibility]]></code>
+      <code><![CDATA[setParentId]]></code>
+      <code><![CDATA[totalMenus]]></code>
+      <code><![CDATA[visibilityDropDown]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$sort]]></code>
+    </PossiblyUnusedParam>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
     </UndefinedDocblockClass>
+  </file>
+  <file src="lib/service/MigrationService.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[getStats]]></code>
+      <code><![CDATA[importFromBlogspot]]></code>
+      <code><![CDATA[importFromGhost]]></code>
+      <code><![CDATA[importFromScriptlog]]></code>
+      <code><![CDATA[importFromWordPress]]></code>
+      <code><![CDATA[previewImport]]></code>
+      <code><![CDATA[setAuthorId]]></code>
+    </PossiblyUnusedMethod>
+    <UnusedProperty>
+      <code><![CDATA[$sanitizer]]></code>
+    </UnusedProperty>
   </file>
   <file src="lib/service/NotificationService.php">
-    <MissingFile occurrences="2">
-      <code>require APP_ROOT . '/config.php'</code>
-      <code>require APP_ROOT . '/config.php'</code>
-    </MissingFile>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getSmtpConfig]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+      <code><![CDATA[bool]]></code>
+      <code><![CDATA[bool]]></code>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
   </file>
   <file src="lib/service/PageService.php">
-    <InvalidPropertyAssignmentValue occurrences="1">
-      <code>$page_sticky</code>
+    <InvalidPropertyAssignmentValue>
+      <code><![CDATA[$page_sticky]]></code>
     </InvalidPropertyAssignmentValue>
-    <RedundantCondition occurrences="2">
-      <code>method_exists($medialib, 'deleteMedia')</code>
-      <code>method_exists($medialib, 'findMediaById')</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[addPage]]></code>
+      <code><![CDATA[commentStatusDropDown]]></code>
+      <code><![CDATA[grabPage]]></code>
+      <code><![CDATA[grabPages]]></code>
+      <code><![CDATA[localeDropDown]]></code>
+      <code><![CDATA[modifyPage]]></code>
+      <code><![CDATA[pageAuthorId]]></code>
+      <code><![CDATA[pageAuthorLevel]]></code>
+      <code><![CDATA[postStatusDropDown]]></code>
+      <code><![CDATA[removePage]]></code>
+      <code><![CDATA[setComment]]></code>
+      <code><![CDATA[setMetaDesc]]></code>
+      <code><![CDATA[setPageAuthor]]></code>
+      <code><![CDATA[setPageContent]]></code>
+      <code><![CDATA[setPageId]]></code>
+      <code><![CDATA[setPageImage]]></code>
+      <code><![CDATA[setPageLocale]]></code>
+      <code><![CDATA[setPageSlug]]></code>
+      <code><![CDATA[setPageTitle]]></code>
+      <code><![CDATA[setPostDate]]></code>
+      <code><![CDATA[setPostModified]]></code>
+      <code><![CDATA[setPostType]]></code>
+      <code><![CDATA[setPublish]]></code>
+      <code><![CDATA[setSticky]]></code>
+      <code><![CDATA[totalPages]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$post_image]]></code>
+    </PossiblyUnusedParam>
+    <RedundantCondition>
+      <code><![CDATA[method_exists($medialib, 'deleteMedia')]]></code>
+      <code><![CDATA[method_exists($medialib, 'findMediaById')]]></code>
     </RedundantCondition>
-    <RedundantPropertyInitializationCheck occurrences="8">
-      <code>$this-&gt;page_locale</code>
-      <code>$this-&gt;page_locale</code>
-      <code>$this-&gt;page_locale</code>
-      <code>$this-&gt;page_locale</code>
-      <code>'en'</code>
-      <code>'en'</code>
-      <code>'en'</code>
-      <code>'en'</code>
+    <RedundantPropertyInitializationCheck>
+      <code><![CDATA[$this->page_locale]]></code>
+      <code><![CDATA[$this->page_locale]]></code>
+      <code><![CDATA['en']]></code>
+      <code><![CDATA['en']]></code>
     </RedundantPropertyInitializationCheck>
-    <UndefinedDocblockClass occurrences="3">
-      <code>interger</code>
-      <code>int|number</code>
-      <code>slug</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[interger]]></code>
+      <code><![CDATA[int|number]]></code>
+      <code><![CDATA[slug]]></code>
     </UndefinedDocblockClass>
+    <UnusedDocblockParam>
+      <code><![CDATA[$type]]></code>
+    </UnusedDocblockParam>
   </file>
   <file src="lib/service/PluginService.php">
-    <MismatchingDocblockParamType occurrences="3">
-      <code>object</code>
-      <code>object</code>
-      <code>object</code>
+    <MismatchingDocblockParamType>
+      <code><![CDATA[object]]></code>
+      <code><![CDATA[object]]></code>
+      <code><![CDATA[object]]></code>
     </MismatchingDocblockParamType>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[activateInstalledPlugin]]></code>
+      <code><![CDATA[addPlugin]]></code>
+      <code><![CDATA[deactivateInstalledPlugin]]></code>
+      <code><![CDATA[grabPlugin]]></code>
+      <code><![CDATA[grabPlugins]]></code>
+      <code><![CDATA[isPluginExists]]></code>
+      <code><![CDATA[modifyPlugin]]></code>
+      <code><![CDATA[pluginLevelDropDown]]></code>
+      <code><![CDATA[removePlugin]]></code>
+      <code><![CDATA[setPluginDescription]]></code>
+      <code><![CDATA[setPluginDirectory]]></code>
+      <code><![CDATA[setPluginId]]></code>
+      <code><![CDATA[setPluginLevel]]></code>
+      <code><![CDATA[setPluginLink]]></code>
+      <code><![CDATA[setPluginName]]></code>
+      <code><![CDATA[setPluginSort]]></code>
+      <code><![CDATA[setPluginStatus]]></code>
+      <code><![CDATA[totalPlugins]]></code>
+    </PossiblyUnusedMethod>
+    <UnusedProperty>
+      <code><![CDATA[$sort]]></code>
+      <code><![CDATA[$status]]></code>
+    </UnusedProperty>
+    <UnusedVariable>
+      <code><![CDATA[$result]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="lib/service/PostApplicationService.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/service/PostService.php">
-    <FalsableReturnStatement occurrences="1">
-      <code>false</code>
+    <FalsableReturnStatement>
+      <code><![CDATA[false]]></code>
     </FalsableReturnStatement>
-    <InvalidArgument occurrences="1">
-      <code>PDO::FETCH_ASSOC</code>
+    <InvalidArgument>
+      <code><![CDATA[$mediaId]]></code>
     </InvalidArgument>
-    <InvalidPropertyAssignmentValue occurrences="2">
-      <code>$post_image</code>
-      <code>$tags</code>
+    <InvalidPropertyAssignmentValue>
+      <code><![CDATA[$post_image]]></code>
+      <code><![CDATA[$tags]]></code>
     </InvalidPropertyAssignmentValue>
-    <MismatchingDocblockParamType occurrences="3">
-      <code>object</code>
-      <code>object</code>
-      <code>object</code>
+    <MismatchingDocblockParamType>
+      <code><![CDATA[object]]></code>
+      <code><![CDATA[object]]></code>
+      <code><![CDATA[object]]></code>
     </MismatchingDocblockParamType>
-    <RedundantCondition occurrences="2">
-      <code>method_exists($medialib, 'deleteMedia')</code>
-      <code>method_exists($medialib, 'findMediaBlog')</code>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[integer]]></code>
+    </PossiblyUnusedReturnValue>
+    <RedundantCondition>
+      <code><![CDATA[method_exists($medialib, 'deleteMedia')]]></code>
+      <code><![CDATA[method_exists($medialib, 'findMediaBlog')]]></code>
     </RedundantCondition>
-    <RedundantPropertyInitializationCheck occurrences="8">
-      <code>$this-&gt;post_locale</code>
-      <code>$this-&gt;post_locale</code>
-      <code>$this-&gt;post_locale</code>
-      <code>$this-&gt;post_locale</code>
-      <code>'en'</code>
-      <code>'en'</code>
-      <code>'en'</code>
-      <code>'en'</code>
+    <RedundantPropertyInitializationCheck>
+      <code><![CDATA[$this->post_locale]]></code>
+      <code><![CDATA[$this->post_locale]]></code>
+      <code><![CDATA['en']]></code>
+      <code><![CDATA['en']]></code>
     </RedundantPropertyInitializationCheck>
   </file>
   <file src="lib/service/ReplyService.php">
-    <TooManyArguments occurrences="5">
-      <code>sanitize</code>
-      <code>sanitize</code>
-      <code>sanitize</code>
-      <code>sanitize</code>
-      <code>sanitize</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[checkReplyExists]]></code>
+      <code><![CDATA[setReplyDate]]></code>
+      <code><![CDATA[totalReplies]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+      <code><![CDATA[bool]]></code>
+      <code><![CDATA[int|bool]]></code>
+    </PossiblyUnusedReturnValue>
+    <TooManyArguments>
+      <code><![CDATA[sanitize]]></code>
+      <code><![CDATA[sanitize]]></code>
+      <code><![CDATA[sanitize]]></code>
+      <code><![CDATA[sanitize]]></code>
+      <code><![CDATA[sanitize]]></code>
     </TooManyArguments>
+    <UnusedProperty>
+      <code><![CDATA[$created_at]]></code>
+    </UnusedProperty>
   </file>
   <file src="lib/service/ThemeService.php">
-    <MismatchingDocblockReturnType occurrences="1">
-      <code>integer|numeric|null</code>
+    <MismatchingDocblockReturnType>
+      <code><![CDATA[integer|numeric|null]]></code>
     </MismatchingDocblockReturnType>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[setThemeStatus]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$data]]></code>
+    </PossiblyUnusedParam>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
+    <UnusedProperty>
+      <code><![CDATA[$theme_status]]></code>
+    </UnusedProperty>
   </file>
   <file src="lib/service/TopicService.php">
-    <MismatchingDocblockReturnType occurrences="1">
-      <code>integer|numeric|null</code>
+    <MismatchingDocblockReturnType>
+      <code><![CDATA[integer|numeric|null]]></code>
     </MismatchingDocblockReturnType>
-    <RedundantPropertyInitializationCheck occurrences="4">
-      <code>$this-&gt;topic_locale</code>
-      <code>$this-&gt;topic_locale</code>
-      <code>'en'</code>
-      <code>'en'</code>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[grabTopic]]></code>
+      <code><![CDATA[modifyTopic]]></code>
+      <code><![CDATA[removeTopic]]></code>
+      <code><![CDATA[setTopicId]]></code>
+      <code><![CDATA[setTopicStatus]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$data]]></code>
+    </PossiblyUnusedParam>
+    <RedundantPropertyInitializationCheck>
+      <code><![CDATA[$this->topic_locale]]></code>
+      <code><![CDATA[$this->topic_locale]]></code>
+      <code><![CDATA['en']]></code>
+      <code><![CDATA['en']]></code>
     </RedundantPropertyInitializationCheck>
   </file>
+  <file src="lib/service/TranslationService.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[countAll]]></code>
+      <code><![CDATA[countAllTranslations]]></code>
+      <code><![CDATA[countByContext]]></code>
+      <code><![CDATA[countSearch]]></code>
+      <code><![CDATA[createTranslation]]></code>
+      <code><![CDATA[deleteTranslation]]></code>
+      <code><![CDATA[exportToArray]]></code>
+      <code><![CDATA[getAllTranslations]]></code>
+      <code><![CDATA[getContexts]]></code>
+      <code><![CDATA[getTranslationCount]]></code>
+      <code><![CDATA[getTranslations]]></code>
+      <code><![CDATA[getTranslationsByContext]]></code>
+      <code><![CDATA[importFromArray]]></code>
+      <code><![CDATA[regenerateCache]]></code>
+      <code><![CDATA[searchTranslations]]></code>
+      <code><![CDATA[updateTranslation]]></code>
+    </PossiblyUnusedMethod>
+  </file>
   <file src="lib/service/UserService.php">
-    <InvalidScalarArgument occurrences="1">
-      <code>0</code>
-    </InvalidScalarArgument>
-    <UndefinedDocblockClass occurrences="1">
-      <code>strin</code>
+    <InvalidArgument>
+      <code><![CDATA[0]]></code>
+    </InvalidArgument>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[addUser]]></code>
+      <code><![CDATA[checkUserLogin]]></code>
+      <code><![CDATA[grabUser]]></code>
+      <code><![CDATA[grabUserByLogin]]></code>
+      <code><![CDATA[grabUsers]]></code>
+      <code><![CDATA[isEmailExists]]></code>
+      <code><![CDATA[modifyTokenExpired]]></code>
+      <code><![CDATA[modifyUser]]></code>
+      <code><![CDATA[reAuthenticateUserPrivilege]]></code>
+      <code><![CDATA[removeUser]]></code>
+      <code><![CDATA[setCookieExpireDate]]></code>
+      <code><![CDATA[setPwdHash]]></code>
+      <code><![CDATA[setSelectorHash]]></code>
+      <code><![CDATA[setUserActivationKey]]></code>
+      <code><![CDATA[setUserBanned]]></code>
+      <code><![CDATA[setUserEmail]]></code>
+      <code><![CDATA[setUserFullname]]></code>
+      <code><![CDATA[setUserId]]></code>
+      <code><![CDATA[setUserLevel]]></code>
+      <code><![CDATA[setUserLogin]]></code>
+      <code><![CDATA[setUserPass]]></code>
+      <code><![CDATA[setUserSession]]></code>
+      <code><![CDATA[setUserUrl]]></code>
+      <code><![CDATA[totalUsers]]></code>
+      <code><![CDATA[userLevelDropDown]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$user_banned]]></code>
+    </PossiblyUnusedParam>
+    <UndefinedDocblockClass>
+      <code><![CDATA[strin]]></code>
     </UndefinedDocblockClass>
+    <UnusedProperty>
+      <code><![CDATA[$key]]></code>
+    </UnusedProperty>
   </file>
   <file src="lib/utility/absolute-url.php">
-    <InvalidArgument occurrences="1">
-      <code>$parse</code>
+    <InvalidArgument>
+      <code><![CDATA[$parse]]></code>
     </InvalidArgument>
   </file>
+  <file src="lib/utility/admin-tag-title.php">
+    <InvalidOperand>
+      <code><![CDATA[http_response_code(400)]]></code>
+      <code><![CDATA[http_response_code(400)]]></code>
+      <code><![CDATA[http_response_code(400)]]></code>
+      <code><![CDATA[http_response_code(404)]]></code>
+    </InvalidOperand>
+  </file>
   <file src="lib/utility/admin-translations.php">
-    <DuplicateArrayKey occurrences="6">
-      <code>'nav.all_pages' =&gt; 'All Pages'</code>
-      <code>'nav.all_users' =&gt; 'All Users'</code>
-      <code>'nav.comments' =&gt; 'Comments'</code>
-      <code>'nav.export' =&gt; 'Export'</code>
-      <code>'nav.import' =&gt; 'Import'</code>
-      <code>'nav.tools' =&gt; 'Tools'</code>
+    <DuplicateArrayKey>
+      <code><![CDATA['nav.all_pages' => 'All Pages']]></code>
+      <code><![CDATA['nav.all_users' => 'All Users']]></code>
+      <code><![CDATA['nav.comments' => 'Comments']]></code>
+      <code><![CDATA['nav.export' => 'Export']]></code>
+      <code><![CDATA['nav.import' => 'Import']]></code>
+      <code><![CDATA['nav.tools' => 'Tools']]></code>
     </DuplicateArrayKey>
   </file>
   <file src="lib/utility/app-info.php">
-    <InvalidReturnStatement occurrences="3">
-      <code>(class_exists('AppConfig')) ? AppConfig::readConfiguration(invoke_config()) : ""</code>
-      <code>(class_exists('AppConfig')) ? AppConfig::readConfiguration(invoke_config()) : ""</code>
-      <code>(is_array($app_info)) ? $app_info : ""</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[(class_exists('AppConfig')) ? AppConfig::readConfiguration(invoke_config()) : ""]]></code>
+      <code><![CDATA[(class_exists('AppConfig')) ? AppConfig::readConfiguration(invoke_config()) : ""]]></code>
+      <code><![CDATA[(is_array($app_info)) ? $app_info : ""]]></code>
     </InvalidReturnStatement>
-    <RedundantCondition occurrences="1">
-      <code>is_array($app_info)</code>
+    <RedundantCondition>
+      <code><![CDATA[is_array($app_info)]]></code>
     </RedundantCondition>
-    <TypeDoesNotContainType occurrences="1">
-      <code>""</code>
+    <TypeDoesNotContainType>
+      <code><![CDATA[""]]></code>
     </TypeDoesNotContainType>
   </file>
+  <file src="lib/utility/app-key.php">
+    <UnusedVariable>
+      <code><![CDATA[$appKey]]></code>
+    </UnusedVariable>
+  </file>
   <file src="lib/utility/archive-scanner.php">
-    <UndefinedClass occurrences="4">
-      <code>BombScanner</code>
-      <code>BombScanner</code>
-      <code>RarBombEngine</code>
-      <code>ZipBombEngine</code>
+    <UndefinedClass>
+      <code><![CDATA[BombScanner]]></code>
+      <code><![CDATA[BombScanner]]></code>
+      <code><![CDATA[RarBombEngine]]></code>
+      <code><![CDATA[ZipBombEngine]]></code>
     </UndefinedClass>
   </file>
   <file src="lib/utility/autoloader.php">
-    <InvalidArgument occurrences="1"/>
-    <NullArgument occurrences="1">
-      <code>null</code>
+    <InvalidArgument>
+      <code><![CDATA[(strlen($conf['namespace']) > 0 // add namespace
+                ? rtrim($conf['namespace'], '\\') . '\\' : '') . 'autoloader']]></code>
+    </InvalidArgument>
+    <NullArgument>
+      <code><![CDATA[null]]></code>
     </NullArgument>
+    <ReferenceReusedFromConfusingScope>
+      <code><![CDATA[$ext]]></code>
+    </ReferenceReusedFromConfusingScope>
+    <UnusedFunctionCall>
+      <code><![CDATA[\spl_autoload_extensions]]></code>
+    </UnusedFunctionCall>
+  </file>
+  <file src="lib/utility/block-request-type.php">
+    <UnusedVariable>
+      <code><![CDATA[$block]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/utility/catch-weblink.php">
-    <InvalidNullableReturnType occurrences="1">
-      <code>array</code>
+    <InvalidNullableReturnType>
+      <code><![CDATA[array]]></code>
     </InvalidNullableReturnType>
-    <NullableReturnStatement occurrences="1">
-      <code>null</code>
+    <NullableReturnStatement>
+      <code><![CDATA[null]]></code>
     </NullableReturnStatement>
   </file>
+  <file src="lib/utility/certificate-authority.php">
+    <UnusedVariable>
+      <code><![CDATA[$ca_path]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="lib/utility/check-file-extension.php">
+    <UnevaluatedCode>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+    </UnevaluatedCode>
+    <UnusedVariable>
+      <code><![CDATA[$extension]]></code>
+    </UnusedVariable>
+  </file>
   <file src="lib/utility/check-internet-connection.php">
-    <ParadoxicalCondition occurrences="1">
-      <code>CONNECTION_ABORTED &amp; CONNECTION_TIMEOUT</code>
+    <ParadoxicalCondition>
+      <code><![CDATA[CONNECTION_ABORTED & CONNECTION_TIMEOUT]]></code>
     </ParadoxicalCondition>
+    <UnusedDocblockParam>
+      <code><![CDATA[$hostname]]></code>
+    </UnusedDocblockParam>
   </file>
   <file src="lib/utility/check-weblink.php">
-    <UndefinedDocblockClass occurrences="2">
-      <code>int|number</code>
-      <code>int|number</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|number]]></code>
+      <code><![CDATA[int|number]]></code>
     </UndefinedDocblockClass>
   </file>
-  <file src="lib/utility/clip.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$value</code>
-    </InvalidReturnStatement>
-  </file>
   <file src="lib/utility/comment-submission.php">
-    <MismatchingDocblockParamType occurrences="1">
-      <code>int|numeric</code>
+    <MismatchingDocblockParamType>
+      <code><![CDATA[int|numeric]]></code>
     </MismatchingDocblockParamType>
-    <RedundantCondition occurrences="1">
-      <code>$commentProvider instanceof CommentModel</code>
+    <RedundantCondition>
+      <code><![CDATA[$commentProvider instanceof CommentModel]]></code>
     </RedundantCondition>
+    <UnusedVariable>
+      <code><![CDATA[$errors]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/utility/convert-to-paragraph.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>'&lt;p&gt;' . preg_replace('/[\r\n]+/', "&lt;/p&gt;\n&lt;p&gt;", $text) . "&lt;/p&gt;\n"</code>
+    <InvalidReturnStatement>
+      <code><![CDATA['<p>' . preg_replace('/[\r\n]+/', "</p>\n<p>", $text) . "</p>\n"]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>void</code>
+    <InvalidReturnType>
+      <code><![CDATA[void]]></code>
+    </InvalidReturnType>
+  </file>
+  <file src="lib/utility/cookie-consent.php">
+    <InvalidReturnType>
+      <code><![CDATA[void]]></code>
     </InvalidReturnType>
   </file>
   <file src="lib/utility/cookies-baked.php">
-    <FalsableReturnStatement occurrences="1">
-      <code>false</code>
+    <FalsableReturnStatement>
+      <code><![CDATA[false]]></code>
+      <code><![CDATA[hash_hmac('sha384', $app_email . $app_key . get_ip_address(), hash('sha384', $app_email . $app_key . get_ip_address(), true))]]></code>
     </FalsableReturnStatement>
-    <InvalidArrayOffset occurrences="1">
-      <code>$_COOKIE[$cookies]</code>
+    <InvalidArrayOffset>
+      <code><![CDATA[$_COOKIE[$cookies]]]></code>
     </InvalidArrayOffset>
-    <InvalidIterator occurrences="1">
-      <code>$_COOKIE[$cookies]</code>
+    <InvalidIterator>
+      <code><![CDATA[$_COOKIE[$cookies]]]></code>
     </InvalidIterator>
-    <InvalidScalarArgument occurrences="1">
-      <code>$expire</code>
-    </InvalidScalarArgument>
+    <UnusedForeachValue>
+      <code><![CDATA[$value]]></code>
+    </UnusedForeachValue>
   </file>
   <file src="lib/utility/create-thumbnail.php">
-    <UndefinedDocblockClass occurrences="9">
-      <code>GdImage|Obj</code>
-      <code>GdImage|Obj</code>
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|num</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
     </UndefinedDocblockClass>
   </file>
-  <file src="lib/utility/current-request-method.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>(isset($_SERVER['REQUEST_METHOD'])) ? $_SERVER['REQUEST_METHOD'] : ""</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>void</code>
-    </InvalidReturnType>
+  <file src="lib/utility/current-load-page.php">
+    <FalsableReturnStatement>
+      <code><![CDATA[substr($_SERVER["SCRIPT_NAME"], strrpos($_SERVER["SCRIPT_NAME"], DIRECTORY_SEPARATOR) + 1)]]></code>
+    </FalsableReturnStatement>
+  </file>
+  <file src="lib/utility/date-conversion.php">
+    <UnevaluatedCode>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+    </UnevaluatedCode>
   </file>
   <file src="lib/utility/db-mysqli.php">
-    <EmptyArrayAccess occurrences="1">
-      <code>$result[ $i ]</code>
+    <EmptyArrayAccess>
+      <code><![CDATA[$result[ $i ]]]></code>
     </EmptyArrayAccess>
-    <InvalidReturnStatement occurrences="1">
-      <code>$dbscheme</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$dbscheme]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>void</code>
+    <InvalidReturnType>
+      <code><![CDATA[void]]></code>
     </InvalidReturnType>
-    <NullableReturnStatement occurrences="2">
-      <code>null</code>
-      <code>null</code>
+    <NullableReturnStatement>
+      <code><![CDATA[null]]></code>
+      <code><![CDATA[null]]></code>
     </NullableReturnStatement>
+    <UnusedVariable>
+      <code><![CDATA[$dbscheme]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/utility/do-logout.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$authenticator-&gt;logout()</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$authenticator->logout()]]></code>
     </InvalidReturnStatement>
+  </file>
+  <file src="lib/utility/download-handler.php">
+    <FalsableReturnStatement>
+      <code><![CDATA[$mimeType]]></code>
+    </FalsableReturnStatement>
+    <InvalidReturnType>
+      <code><![CDATA[void]]></code>
+    </InvalidReturnType>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getMimeType]]></code>
+      <code><![CDATA[sanitizeFilePath]]></code>
+    </PossiblyUnusedMethod>
   </file>
   <file src="lib/utility/download-settings.php">
-    <InvalidScalarArgument occurrences="1">
-      <code>(int)$hours</code>
-    </InvalidScalarArgument>
-    <RedundantCondition occurrences="1">
-      <code>$result</code>
+    <InvalidArgument>
+      <code><![CDATA[(int)$hours]]></code>
+    </InvalidArgument>
+    <RedundantCondition>
+      <code><![CDATA[$result]]></code>
     </RedundantCondition>
+  </file>
+  <file src="lib/utility/email-validation.php">
+    <UnusedDocblockParam>
+      <code><![CDATA[$validation_type]]></code>
+    </UnusedDocblockParam>
   </file>
   <file src="lib/utility/encrypt-decrypt.php">
-    <FalsableReturnStatement occurrences="1">
-      <code>false</code>
-    </FalsableReturnStatement>
-    <RedundantCondition occurrences="1">
-      <code>'openssl_random_pseudo_bytes'</code>
+    <RedundantCondition>
+      <code><![CDATA['openssl_random_pseudo_bytes']]></code>
     </RedundantCondition>
+    <UnusedDocblockParam>
+      <code><![CDATA[$text]]></code>
+      <code><![CDATA[$text]]></code>
+    </UnusedDocblockParam>
   </file>
   <file src="lib/utility/escape-html.php">
-    <InvalidDocblock occurrences="1">
-      <code>[type]</code>
+    <InvalidDocblock>
+      <code><![CDATA[[type]]]></code>
     </InvalidDocblock>
-    <InvalidReturnStatement occurrences="2">
-      <code>is_object($escaper) ? $escaper-&gt;escapeHtml($input) : ""</code>
-      <code>is_object($escaper) ? $escaper-&gt;escapeHtmlAttr($input) : ""</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[is_object($escaper) ? $escaper->escapeHtml($input) : ""]]></code>
+      <code><![CDATA[is_object($escaper) ? $escaper->escapeHtmlAttr($input) : ""]]></code>
     </InvalidReturnStatement>
-    <NullableReturnStatement occurrences="1">
-      <code>base_escape($input, $type, $escaper)</code>
+    <NullableReturnStatement>
+      <code><![CDATA[base_escape($input, $type, $escaper)]]></code>
     </NullableReturnStatement>
+    <UnevaluatedCode>
+      <code><![CDATA[return '';]]></code>
+    </UnevaluatedCode>
+  </file>
+  <file src="lib/utility/export-ghost.php">
+    <FalsableReturnStatement>
+      <code><![CDATA[json_encode($exportData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)]]></code>
+      <code><![CDATA[sprintf(
+            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0x0fff) | 0x4000,
+            mt_rand(0, 0x3fff) | 0x8000,
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff)
+        )]]></code>
+    </FalsableReturnStatement>
+    <UnusedProperty>
+      <code><![CDATA[$siteTitle]]></code>
+      <code><![CDATA[$siteUrl]]></code>
+    </UnusedProperty>
+  </file>
+  <file src="lib/utility/export-scriptlog.php">
+    <FalsableReturnStatement>
+      <code><![CDATA[json_encode($exportData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)]]></code>
+    </FalsableReturnStatement>
+    <UnusedForeachValue>
+      <code><![CDATA[$comment]]></code>
+      <code><![CDATA[$page]]></code>
+      <code><![CDATA[$post]]></code>
+      <code><![CDATA[$topic]]></code>
+    </UnusedForeachValue>
+  </file>
+  <file src="lib/utility/finding-pwd-cost.php">
+    <UnusedFunctionCall>
+      <code><![CDATA[password_hash]]></code>
+    </UnusedFunctionCall>
   </file>
   <file src="lib/utility/form-action.php">
-    <RedundantCondition occurrences="3">
-      <code>is_array($data)</code>
-      <code>is_array($data)</code>
-      <code>is_array($data)</code>
+    <RedundantCondition>
+      <code><![CDATA[is_array($data)]]></code>
+      <code><![CDATA[is_array($data)]]></code>
+      <code><![CDATA[is_array($data)]]></code>
     </RedundantCondition>
   </file>
+  <file src="lib/utility/form-filled-validation.php">
+    <UnusedVariable>
+      <code><![CDATA[$key]]></code>
+    </UnusedVariable>
+  </file>
   <file src="lib/utility/form-id.php">
-    <UndefinedDocblockClass occurrences="1">
-      <code>int|num</code>
-    </UndefinedDocblockClass>
+    <UnusedVariable>
+      <code><![CDATA[$form_id]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/utility/form-security.php">
-    <UndefinedDocblockClass occurrences="1">
-      <code>number|integer</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[number|integer]]></code>
     </UndefinedDocblockClass>
+    <UnusedForeachValue>
+      <code><![CDATA[$value]]></code>
+    </UnusedForeachValue>
   </file>
   <file src="lib/utility/format-size-unit.php">
-    <InvalidOperand occurrences="3">
-      <code>$bytes</code>
-      <code>$bytes</code>
-      <code>$bytes</code>
+    <InvalidOperand>
+      <code><![CDATA[$bytes]]></code>
+      <code><![CDATA[$bytes]]></code>
+      <code><![CDATA[$bytes]]></code>
+      <code><![CDATA[$bytes]]></code>
+      <code><![CDATA[$bytes]]></code>
     </InvalidOperand>
   </file>
   <file src="lib/utility/front-paginator.php">
-    <UndefinedDocblockClass occurrences="1">
-      <code>num|int</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[num|int]]></code>
     </UndefinedDocblockClass>
   </file>
-  <file src="lib/utility/front-sanitizer.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>(class_exists('Sanitize')) ? new Sanitize() : ""</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>object|bool</code>
-    </InvalidReturnType>
+  <file src="lib/utility/generate-media-identifier.php">
+    <FalsableReturnStatement>
+      <code><![CDATA[vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4))]]></code>
+    </FalsableReturnStatement>
   </file>
   <file src="lib/utility/generate-openapi-spec.php">
-    <MissingFile occurrences="1">
-      <code>require __DIR__ . '/../config.php'</code>
+    <MissingFile>
+      <code><![CDATA[require __DIR__ . '/../config.php']]></code>
     </MissingFile>
   </file>
+  <file src="lib/utility/generate-session-key.php">
+    <FalsableReturnStatement>
+      <code><![CDATA[$sessionKey]]></code>
+    </FalsableReturnStatement>
+  </file>
   <file src="lib/utility/generate-token.php">
-    <InvalidParamDefault occurrences="1">
-      <code>number</code>
+    <InvalidParamDefault>
+      <code><![CDATA[number]]></code>
     </InvalidParamDefault>
-    <UndefinedDocblockClass occurrences="1">
-      <code>number</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[number]]></code>
     </UndefinedDocblockClass>
   </file>
   <file src="lib/utility/get-browser-name.php">
-    <InvalidReturnStatement occurrences="1"/>
-    <InvalidReturnType occurrences="1">
-      <code>string</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[array(
+        'userAgent' => $u_agent,
+        'name'      => $bname,
+        'version'   => $version,
+        'platform'  => $platform,
+        'pattern'    => $pattern
+    )]]></code>
+    </InvalidReturnStatement>
+    <InvalidReturnType>
+      <code><![CDATA[string]]></code>
     </InvalidReturnType>
-    <TypeDoesNotContainType occurrences="1">
-      <code>$version == ""</code>
+    <TypeDoesNotContainType>
+      <code><![CDATA[$version == ""]]></code>
     </TypeDoesNotContainType>
+    <UnusedVariable>
+      <code><![CDATA[$version]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="lib/utility/get-directory-size.php">
+    <UnusedVariable>
+      <code><![CDATA[$key]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/utility/get-file-extension.php">
-    <InvalidPassByReference occurrences="1">
-      <code>explode(".", $file_name)</code>
+    <FalsableReturnStatement>
+      <code><![CDATA[$extension]]></code>
+    </FalsableReturnStatement>
+    <InvalidPassByReference>
+      <code><![CDATA[explode(".", $file_name)]]></code>
     </InvalidPassByReference>
-    <InvalidReturnStatement occurrences="1">
-      <code>$extension[1]</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$extension[1]]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>array</code>
+    <InvalidReturnType>
+      <code><![CDATA[array]]></code>
     </InvalidReturnType>
+    <UnusedVariable>
+      <code><![CDATA[$extension]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/utility/get-ip-address.php">
-    <InvalidOperand occurrences="1">
-      <code>$netmask</code>
+    <InvalidOperand>
+      <code><![CDATA[$netmask]]></code>
+      <code><![CDATA[pow(2, (32 - $netmask)) - 1]]></code>
     </InvalidOperand>
-    <InvalidReturnStatement occurrences="1">
-      <code>(method_exists($ip, 'getIpAddress')) ? $ip-&gt;getIpAddress() : ""</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[(method_exists($ip, 'getIpAddress')) ? $ip->getIpAddress() : ""]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>void</code>
+    <InvalidReturnType>
+      <code><![CDATA[void]]></code>
     </InvalidReturnType>
+    <RedundantCondition>
+      <code><![CDATA[empty($d)]]></code>
+      <code><![CDATA[empty($d)]]></code>
+    </RedundantCondition>
+    <TypeDoesNotContainType>
+      <code><![CDATA[$d]]></code>
+    </TypeDoesNotContainType>
   </file>
   <file src="lib/utility/get-mime.php">
-    <UndefinedDocblockClass occurrences="1">
-      <code>number|int</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[number|int]]></code>
     </UndefinedDocblockClass>
+  </file>
+  <file src="lib/utility/get-remembered-username.php">
+    <RedundantCondition>
+      <code><![CDATA[is_string($decrypted)]]></code>
+    </RedundantCondition>
+    <TypeDoesNotContainType>
+      <code><![CDATA['']]></code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="lib/utility/get-server-load.php">
+    <UnevaluatedCode>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+    </UnevaluatedCode>
   </file>
   <file src="lib/utility/hide-email.php">
-    <InvalidArrayOffset occurrences="1">
-      <code>$key[strpos($character_set, $email[$i])]</code>
+    <InvalidArrayOffset>
+      <code><![CDATA[$key[strpos($character_set, $email[$i])]]]></code>
     </InvalidArrayOffset>
-  </file>
-  <file src="lib/utility/htmlawed.php">
-    <InvalidArrayOffset occurrences="4">
-      <code>$inlineKidEleAr['del']</code>
-      <code>$inlineKidEleAr['del']</code>
-      <code>$inlineKidEleAr['ins']</code>
-      <code>$inlineKidEleAr['ins']</code>
-    </InvalidArrayOffset>
-    <InvalidLiteralArgument occurrences="1">
-      <code>' pre,script,textarea'</code>
-    </InvalidLiteralArgument>
-    <TypeDoesNotContainType occurrences="1">
-      <code>'*'</code>
-    </TypeDoesNotContainType>
-    <UndefinedVariable occurrences="2">
-      <code>$ele</code>
-      <code>$ele</code>
-    </UndefinedVariable>
   </file>
   <file src="lib/utility/human-login.php">
-    <UndefinedDocblockClass occurrences="2">
-      <code>integer|number</code>
-      <code>integer|number</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[integer|number]]></code>
+      <code><![CDATA[integer|number]]></code>
     </UndefinedDocblockClass>
   </file>
+  <file src="lib/utility/human-readable-datetime.php">
+    <FalsableReturnStatement>
+      <code><![CDATA[date_format($date, $format)]]></code>
+    </FalsableReturnStatement>
+  </file>
   <file src="lib/utility/import-blogspot.php">
-    <RedundantCondition occurrences="21">
-      <code>(string) $authorElement-&gt;name</code>
-      <code>(string) $cat['label']</code>
-      <code>(string) $cat['label']</code>
-      <code>(string) $cat['scheme']</code>
-      <code>(string) $cat['scheme']</code>
-      <code>(string) $cat['scheme']</code>
-      <code>(string) $cat['term']</code>
-      <code>(string) $cat['term']</code>
-      <code>(string) $cat['term']</code>
-      <code>(string) $cat['term']</code>
-      <code>(string) $contentElement['type']</code>
-      <code>(string) $l['href']</code>
-      <code>(string) $l['href']</code>
-      <code>(string) $l['rel']</code>
-      <code>(string) $l['rel']</code>
-      <code>(string) $link['href']</code>
-      <code>(string) $link['href']</code>
-      <code>(string) $link['rel']</code>
-      <code>(string) $link['rel']</code>
-      <code>(string) $this-&gt;xml-&gt;id</code>
-      <code>(string) $titleElement['type']</code>
+    <FalsableReturnStatement>
+      <code><![CDATA[$content]]></code>
+    </FalsableReturnStatement>
+    <InvalidNullableReturnType>
+      <code><![CDATA[string]]></code>
+    </InvalidNullableReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$content]]></code>
+    </NullableReturnStatement>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
+    <RedundantCondition>
+      <code><![CDATA[(string) $authorElement->name]]></code>
+      <code><![CDATA[(string) $cat['label']]]></code>
+      <code><![CDATA[(string) $cat['label']]]></code>
+      <code><![CDATA[(string) $cat['scheme']]]></code>
+      <code><![CDATA[(string) $cat['scheme']]]></code>
+      <code><![CDATA[(string) $cat['scheme']]]></code>
+      <code><![CDATA[(string) $cat['term']]]></code>
+      <code><![CDATA[(string) $cat['term']]]></code>
+      <code><![CDATA[(string) $cat['term']]]></code>
+      <code><![CDATA[(string) $cat['term']]]></code>
+      <code><![CDATA[(string) $contentElement['type']]]></code>
+      <code><![CDATA[(string) $l['href']]]></code>
+      <code><![CDATA[(string) $l['href']]]></code>
+      <code><![CDATA[(string) $l['rel']]]></code>
+      <code><![CDATA[(string) $l['rel']]]></code>
+      <code><![CDATA[(string) $link['href']]]></code>
+      <code><![CDATA[(string) $link['href']]]></code>
+      <code><![CDATA[(string) $link['rel']]]></code>
+      <code><![CDATA[(string) $link['rel']]]></code>
+      <code><![CDATA[(string) $this->xml->id]]></code>
+      <code><![CDATA[(string) $titleElement['type']]]></code>
     </RedundantCondition>
-    <TypeDoesNotContainNull occurrences="21">
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>'text'</code>
-      <code>'text'</code>
+    <TypeDoesNotContainNull>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['text']]></code>
+      <code><![CDATA['text']]></code>
     </TypeDoesNotContainNull>
+    <UnusedClosureParam>
+      <code><![CDATA[$context]]></code>
+      <code><![CDATA[$public]]></code>
+      <code><![CDATA[$system]]></code>
+    </UnusedClosureParam>
+    <UnusedFunctionCall>
+      <code><![CDATA[libxml_set_external_entity_loader]]></code>
+    </UnusedFunctionCall>
+    <UnusedVariable>
+      <code><![CDATA[$entryNamespaces]]></code>
+      <code><![CDATA[$namespaces]]></code>
+      <code><![CDATA[$repliesCount]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="lib/utility/import-ghost.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getSchema]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
+    <UnusedVariable>
+      <code><![CDATA[$postsData]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="lib/utility/import-scriptlog.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getPostTopics]]></code>
+      <code><![CDATA[getTags]]></code>
+      <code><![CDATA[getUsers]]></code>
+    </PossiblyUnusedMethod>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
   </file>
   <file src="lib/utility/import-wordpress.php">
-    <RedundantCondition occurrences="19">
-      <code>(string) $cat</code>
-      <code>(string) $cat</code>
-      <code>(string) $cat['domain']</code>
-      <code>(string) $cat['domain']</code>
-      <code>(string) $cat['domain']</code>
-      <code>(string) $cat['nicename']</code>
-      <code>(string) $cat['nicename']</code>
-      <code>(string) $cat['nicename']</code>
-      <code>(string) $comment-&gt;comment_approved</code>
-      <code>(string) $comment-&gt;comment_author</code>
-      <code>(string) $comment-&gt;comment_author_email</code>
-      <code>(string) $comment-&gt;comment_author_ip</code>
-      <code>(string) $comment-&gt;comment_author_url</code>
-      <code>(string) $comment-&gt;comment_content</code>
-      <code>(string) $comment-&gt;comment_date</code>
-      <code>(string) $comment-&gt;comment_parent</code>
-      <code>(string) $item-&gt;link</code>
-      <code>(string) $item-&gt;pubDate</code>
-      <code>(string) $item-&gt;title</code>
+    <FalsableReturnStatement>
+      <code><![CDATA[$content]]></code>
+    </FalsableReturnStatement>
+    <InvalidNullableReturnType>
+      <code><![CDATA[string]]></code>
+    </InvalidNullableReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$content]]></code>
+    </NullableReturnStatement>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
+    <RedundantCondition>
+      <code><![CDATA[(string) $cat]]></code>
+      <code><![CDATA[(string) $cat]]></code>
+      <code><![CDATA[(string) $cat['domain']]]></code>
+      <code><![CDATA[(string) $cat['domain']]]></code>
+      <code><![CDATA[(string) $cat['domain']]]></code>
+      <code><![CDATA[(string) $cat['nicename']]]></code>
+      <code><![CDATA[(string) $cat['nicename']]]></code>
+      <code><![CDATA[(string) $cat['nicename']]]></code>
+      <code><![CDATA[(string) $comment->comment_approved]]></code>
+      <code><![CDATA[(string) $comment->comment_author]]></code>
+      <code><![CDATA[(string) $comment->comment_author_email]]></code>
+      <code><![CDATA[(string) $comment->comment_author_ip]]></code>
+      <code><![CDATA[(string) $comment->comment_author_url]]></code>
+      <code><![CDATA[(string) $comment->comment_content]]></code>
+      <code><![CDATA[(string) $comment->comment_date]]></code>
+      <code><![CDATA[(string) $comment->comment_parent]]></code>
+      <code><![CDATA[(string) $item->link]]></code>
+      <code><![CDATA[(string) $item->pubDate]]></code>
+      <code><![CDATA[(string) $item->title]]></code>
     </RedundantCondition>
-    <TypeDoesNotContainNull occurrences="19">
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>''</code>
-      <code>'0'</code>
-      <code>'1'</code>
-      <code>date('Y-m-d H:i:s')</code>
+    <TypeDoesNotContainNull>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['']]></code>
+      <code><![CDATA['0']]></code>
+      <code><![CDATA['1']]></code>
+      <code><![CDATA[date('Y-m-d H:i:s')]]></code>
     </TypeDoesNotContainNull>
+    <UnusedParam>
+      <code><![CDATA[$namespaces]]></code>
+    </UnusedParam>
+    <UnusedVariable>
+      <code><![CDATA[$catName]]></code>
+      <code><![CDATA[$categories]]></code>
+      <code><![CDATA[$tags]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/utility/invoke-audio-uploaded.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>app_url() . DS . APP_AUDIO . rawurlencode(basename($media_filename))</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[app_url() . DS . APP_AUDIO . rawurlencode(basename($media_filename))]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>bool</code>
+    <InvalidReturnType>
+      <code><![CDATA[bool]]></code>
     </InvalidReturnType>
   </file>
   <file src="lib/utility/invoke-image-uploaded.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$image_src</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$image_src]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>false</code>
+    <InvalidReturnType>
+      <code><![CDATA[false]]></code>
     </InvalidReturnType>
+    <UnusedVariable>
+      <code><![CDATA[$image_src]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="lib/utility/invoke-video-uploaded.php">
+    <UnusedVariable>
+      <code><![CDATA[$video_src]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/utility/ips.php">
-    <InvalidLiteralArgument occurrences="2">
-      <code>(string)$agent</code>
-      <code>(string)$agent</code>
+    <InvalidLiteralArgument>
+      <code><![CDATA[(string)$agent]]></code>
+      <code><![CDATA[(string)$agent]]></code>
     </InvalidLiteralArgument>
-    <InvalidReturnStatement occurrences="4">
-      <code>str_ends_with($haystack, $needle)</code>
-      <code>str_starts_with($haystack, $needle)</code>
-      <code>substr_compare($haystack, $needle, -strlen($needle)) === 0</code>
-      <code>substr_compare($haystack, $needle, 0, strlen($needle)) === 0</code>
+    <InvalidOperand>
+      <code><![CDATA[filesize(basename(__DIR__ . DS . '.guard' . DS . 'fortres.gzip'))]]></code>
+    </InvalidOperand>
+    <InvalidReturnStatement>
+      <code><![CDATA[substr_compare($haystack, $needle, -strlen($needle)) === 0]]></code>
+      <code><![CDATA[substr_compare($haystack, $needle, 0, strlen($needle)) === 0]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="2">
-      <code>string</code>
-      <code>void</code>
+    <InvalidReturnType>
+      <code><![CDATA[string]]></code>
+      <code><![CDATA[void]]></code>
     </InvalidReturnType>
+    <UnusedVariable>
+      <code><![CDATA[$is_scanner]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="lib/utility/is-json-valid.php">
+    <UnusedFunctionCall>
+      <code><![CDATA[json_decode]]></code>
+    </UnusedFunctionCall>
   </file>
   <file src="lib/utility/is-non-administrator.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$user_level</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$user_level]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>string</code>
+    <InvalidReturnType>
+      <code><![CDATA[string]]></code>
     </InvalidReturnType>
+    <UnusedVariable>
+      <code><![CDATA[$user_level]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/utility/is-valid-domain.php">
-    <InvalidDocblock occurrences="1">
-      <code>function is_valid_domain($url)</code>
+    <InvalidDocblock>
+      <code><![CDATA[function is_valid_domain($url)]]></code>
     </InvalidDocblock>
   </file>
   <file src="lib/utility/limit-word.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>count(preg_split('~[^\p{L}\p{N}\']+~u', $str))</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[count(preg_split('~[^\p{L}\p{N}\']+~u', $str))]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>void</code>
+    <InvalidReturnType>
+      <code><![CDATA[void]]></code>
     </InvalidReturnType>
   </file>
-  <file src="lib/utility/login-attempt.php">
-    <InvalidReturnStatement occurrences="6">
-      <code>db_prepared_query($sql, [$ip], "s")</code>
-      <code>db_prepared_query($sql, [$ip], "s")</code>
-      <code>db_prepared_query($sql, [$login], 's')</code>
-      <code>db_prepared_query($sql, [$login], 's')</code>
-      <code>db_prepared_query($sql, [$sign_in_count, $locked_until, $login], "iss")</code>
-      <code>db_prepared_query($sql, [$sign_in_count, $login], "is")</code>
-    </InvalidReturnStatement>
+  <file src="lib/utility/make-date.php">
+    <TypeDoesNotContainType>
+      <code><![CDATA[!is_null($locale) && $locale == 'id']]></code>
+      <code><![CDATA[!is_null($locale) && $locale == 'id']]></code>
+      <code><![CDATA[!is_null($locale) && $locale == 'id']]></code>
+      <code><![CDATA[!is_null($locale) && $locale == 'id']]></code>
+      <code><![CDATA[!is_null($locale) && $locale == 'id']]></code>
+      <code><![CDATA[!is_null($locale) && $locale == 'id']]></code>
+      <code><![CDATA[!is_null($locale) && $locale == 'id']]></code>
+      <code><![CDATA[!is_null($locale) && $locale == 'id']]></code>
+      <code><![CDATA[!is_null($locale) && $locale == 'id']]></code>
+      <code><![CDATA[!is_null($locale) && $locale == 'id']]></code>
+      <code><![CDATA[!is_null($locale) && $locale == 'id']]></code>
+      <code><![CDATA[!is_null($locale) && $locale == 'id']]></code>
+    </TypeDoesNotContainType>
+    <UnevaluatedCode>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+    </UnevaluatedCode>
   </file>
   <file src="lib/utility/media-properties.php">
-    <InvalidParamDefault occurrences="1">
-      <code>string</code>
+    <InvalidParamDefault>
+      <code><![CDATA[string]]></code>
     </InvalidParamDefault>
   </file>
   <file src="lib/utility/medooin.php">
-    <InvalidReturnStatement occurrences="3">
-      <code>!empty($result) ? $result[0] : null</code>
-      <code>$database-&gt;get($table, $join, $columns, $where)</code>
-      <code>null</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[!empty($result) ? $result[0] : null]]></code>
+      <code><![CDATA[$database->get($table, $join, $columns, $where)]]></code>
+      <code><![CDATA[null]]></code>
     </InvalidReturnStatement>
   </file>
+  <file src="lib/utility/membership.php">
+    <UnusedDocblockParam>
+      <code><![CDATA[$id]]></code>
+    </UnusedDocblockParam>
+  </file>
   <file src="lib/utility/navigation-helper.php">
-    <UndefinedDocblockClass occurrences="1">
-      <code>int|number</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|number]]></code>
     </UndefinedDocblockClass>
   </file>
   <file src="lib/utility/page-cache.php">
-    <RedundantCondition occurrences="1">
-      <code>APP_CACHE !== true</code>
+    <RedundantCondition>
+      <code><![CDATA[APP_CACHE !== true]]></code>
     </RedundantCondition>
-    <TypeDoesNotContainType occurrences="2">
-      <code>APP_CACHE === true</code>
-      <code>APP_CACHE === true</code>
+    <TypeDoesNotContainType>
+      <code><![CDATA[APP_CACHE === true]]></code>
+      <code><![CDATA[APP_CACHE === true]]></code>
     </TypeDoesNotContainType>
   </file>
+  <file src="lib/utility/paragraph-trim.php">
+    <UnusedDocblockParam>
+      <code><![CDATA[$limit]]></code>
+      <code><![CDATA[$schr]]></code>
+      <code><![CDATA[$scnt]]></code>
+    </UnusedDocblockParam>
+    <UnusedVariable>
+      <code><![CDATA[$entry]]></code>
+    </UnusedVariable>
+  </file>
   <file src="lib/utility/permalinks.php">
-    <UndefinedDocblockClass occurrences="1">
-      <code>num|int</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[num|int]]></code>
     </UndefinedDocblockClass>
+    <UnevaluatedCode>
+      <code><![CDATA[break;]]></code>
+    </UnevaluatedCode>
+    <UnusedVariable>
+      <code><![CDATA[$tag_id]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="lib/utility/plugin-helper.php">
+    <UnusedVariable>
+      <code><![CDATA[$disabled]]></code>
+      <code><![CDATA[$enabled]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="lib/utility/plugin-validator.php">
+    <UnusedVariable>
+      <code><![CDATA[$info]]></code>
+      <code><![CDATA[$iniContent]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/utility/random-generator.php">
-    <InvalidOperand occurrences="2">
-      <code>$sec</code>
-      <code>$usec</code>
+    <InvalidOperand>
+      <code><![CDATA[$sec]]></code>
+      <code><![CDATA[$usec]]></code>
     </InvalidOperand>
-    <UndefinedDocblockClass occurrences="3">
-      <code>number</code>
-      <code>number|integer</code>
-      <code>number|integer</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[number]]></code>
+      <code><![CDATA[number|integer]]></code>
+      <code><![CDATA[number|integer]]></code>
     </UndefinedDocblockClass>
+    <UnevaluatedCode>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+      <code><![CDATA[break;]]></code>
+    </UnevaluatedCode>
+    <UnusedForeachValue>
+      <code><![CDATA[$i]]></code>
+    </UnusedForeachValue>
   </file>
   <file src="lib/utility/regenerate-session.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$newid</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>void</code>
-    </InvalidReturnType>
+    <FalsableReturnStatement>
+      <code><![CDATA[$newid]]></code>
+    </FalsableReturnStatement>
   </file>
   <file src="lib/utility/remove-accents.php">
-    <InvalidReturnStatement occurrences="2">
-      <code>$transliterator-&gt;transliterate($string)</code>
-      <code>class_exists('Util') ? Util::remove_accents($string) : ""</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$transliterator->transliterate($string)]]></code>
+      <code><![CDATA[class_exists('Util') ? Util::remove_accents($string) : ""]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>void</code>
-    </InvalidReturnType>
   </file>
   <file src="lib/utility/remove-xss.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$filter</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$filter]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>string</code>
+    <InvalidReturnType>
+      <code><![CDATA[string]]></code>
     </InvalidReturnType>
+    <NoValue>
+      <code><![CDATA[$dirty_string]]></code>
+    </NoValue>
   </file>
   <file src="lib/utility/sanitize-selection-box.php">
-    <InvalidArrayAccess occurrences="10">
-      <code>$values['comment_status']</code>
-      <code>$values['media_access']</code>
-      <code>$values['media_status']</code>
-      <code>$values['media_target']</code>
-      <code>$values['menu_status']</code>
-      <code>$values['permalinks']</code>
-      <code>$values['plugin_level']</code>
-      <code>$values['post_status']</code>
-      <code>$values['topic_status']</code>
-      <code>$values['user_level']</code>
-    </InvalidArrayAccess>
+    <UnevaluatedCode>
+      <code><![CDATA[break;]]></code>
+    </UnevaluatedCode>
   </file>
   <file src="lib/utility/sanitize-sql-orderby.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$orderby</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$orderby]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>bool | false</code>
+    <InvalidReturnType>
+      <code><![CDATA[bool | false]]></code>
     </InvalidReturnType>
   </file>
+  <file src="lib/utility/sanitize-urls.php">
+    <InvalidNullableReturnType>
+      <code><![CDATA[string]]></code>
+    </InvalidNullableReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$clean]]></code>
+    </NullableReturnStatement>
+  </file>
   <file src="lib/utility/scriptlog-error.php">
-    <InvalidArgument occurrences="1">
-      <code>false</code>
+    <InvalidArgument>
+      <code><![CDATA[false]]></code>
     </InvalidArgument>
+    <UnusedVariable>
+      <code><![CDATA[$app_url]]></code>
+      <code><![CDATA[$errorType]]></code>
+      <code><![CDATA[$site_name]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="lib/utility/scriptlog-password.php">
+    <FalsableReturnStatement>
+      <code><![CDATA[password_hash(base64_encode(hash('sha384', $password, true)), PASSWORD_DEFAULT, $options)]]></code>
+    </FalsableReturnStatement>
+    <UnusedDocblockParam>
+      <code><![CDATA[$id]]></code>
+    </UnusedDocblockParam>
+  </file>
+  <file src="lib/utility/scriptlog-upload-filesize.php">
+    <InvalidOperand>
+      <code><![CDATA[(intval($current_upload_filesize) * 10485760) / 10.29]]></code>
+    </InvalidOperand>
+    <UnusedVariable>
+      <code><![CDATA[$file_size]]></code>
+    </UnusedVariable>
   </file>
   <file src="lib/utility/scriptlog-verify-password.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>password_verify(base64_encode(hash('sha384', $user_input, true)), $stored)</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[password_verify(base64_encode(hash('sha384', $user_input, true)), $stored)]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>string</code>
+    <InvalidReturnType>
+      <code><![CDATA[string]]></code>
     </InvalidReturnType>
   </file>
   <file src="lib/utility/simple-salt.php">
-    <UndefinedDocblockClass occurrences="1">
-      <code>int|number</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|number]]></code>
     </UndefinedDocblockClass>
   </file>
   <file src="lib/utility/sitemap-generator.php">
-    <InvalidArgument occurrences="1">
-      <code>$items</code>
+    <InvalidArgument>
+      <code><![CDATA[$items]]></code>
     </InvalidArgument>
   </file>
-  <file src="lib/utility/strip-tags-content.php">
-    <RedundantCondition occurrences="1">
-      <code>is_array($tags)</code>
-    </RedundantCondition>
-  </file>
   <file src="lib/utility/tagger.php">
-    <RedundantCondition occurrences="3">
-      <code>is_iterable($newarr)</code>
-      <code>is_iterable($taglink)</code>
-      <code>is_iterable($taglink)</code>
+    <RedundantCondition>
+      <code><![CDATA[is_iterable($newarr)]]></code>
+      <code><![CDATA[is_iterable($taglink)]]></code>
+      <code><![CDATA[is_iterable($taglink)]]></code>
     </RedundantCondition>
-    <TypeDoesNotContainType occurrences="3">
-      <code>array()</code>
-      <code>array()</code>
-      <code>array()</code>
+    <TypeDoesNotContainType>
+      <code><![CDATA[array()]]></code>
+      <code><![CDATA[array()]]></code>
+      <code><![CDATA[array()]]></code>
     </TypeDoesNotContainType>
   </file>
+  <file src="lib/utility/terminator.php">
+    <UnusedVariable>
+      <code><![CDATA[$post_id]]></code>
+    </UnusedVariable>
+  </file>
   <file src="lib/utility/theme-meta.php">
-    <InvalidScalarArgument occurrences="4">
-      <code>$month</code>
-      <code>$value</code>
-      <code>$value</code>
-      <code>$value</code>
+    <InvalidScalarArgument>
+      <code><![CDATA[$month]]></code>
     </InvalidScalarArgument>
-    <RedundantCondition occurrences="2">
-      <code>generate_meta_tags($month_name, app_info()['site_description'], app_info()['site_name'], $scriptlog_image, $canonical)</code>
-      <code>generate_schema_org(ucfirst(trim(app_info()['site_name'] . '|' . $month . $year)), $canonical, $scriptlog_image, app_info()['site_description'], app_info()['site_keywords'], $scriptlog_imgthumb, date(DATE_ATOM))</code>
+    <RedundantCondition>
+      <code><![CDATA[generate_meta_tags($month_name, app_info()['site_description'], app_info()['site_name'], $scriptlog_image, $canonical)]]></code>
+      <code><![CDATA[generate_schema_org(ucfirst(trim(app_info()['site_name'] . '|' . $month . $year)), $canonical, $scriptlog_image, app_info()['site_description'], app_info()['site_keywords'], $scriptlog_imgthumb, date(DATE_ATOM))]]></code>
     </RedundantCondition>
-    <TypeDoesNotContainNull occurrences="2">
-      <code>is_null($month)</code>
-      <code>is_null($month)</code>
+    <TypeDoesNotContainNull>
+      <code><![CDATA[is_null($month)]]></code>
+      <code><![CDATA[is_null($month)]]></code>
     </TypeDoesNotContainNull>
   </file>
   <file src="lib/utility/time-elapsed-string.php">
-    <InvalidPropertyAssignmentValue occurrences="1">
-      <code>$diff-&gt;d -= $w * 7</code>
+    <InaccessibleProperty>
+      <code><![CDATA[$diff->d]]></code>
+    </InaccessibleProperty>
+    <InvalidOperand>
+      <code><![CDATA[$diff->d -= $w * 7]]></code>
+      <code><![CDATA[$w]]></code>
+      <code><![CDATA[$w * 7]]></code>
+    </InvalidOperand>
+    <InvalidPropertyAssignmentValue>
+      <code><![CDATA[$diff->d -= $w * 7]]></code>
     </InvalidPropertyAssignmentValue>
   </file>
   <file src="lib/utility/timezone.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>$timezoneList</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[$timezoneList]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>string</code>
+    <InvalidReturnType>
+      <code><![CDATA[string]]></code>
     </InvalidReturnType>
+    <UnusedVariable>
+      <code><![CDATA[$offsets]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="lib/utility/transform-html.php">
+    <FalsableReturnStatement>
+      <code><![CDATA[$string]]></code>
+    </FalsableReturnStatement>
+  </file>
+  <file src="lib/utility/turn-on-session.php">
+    <InvalidOperand>
+      <code><![CDATA[time() - $life_time]]></code>
+    </InvalidOperand>
   </file>
   <file src="lib/utility/uniqid-real.php">
-    <InvalidParamDefault occurrences="1">
-      <code>number</code>
+    <InvalidParamDefault>
+      <code><![CDATA[number]]></code>
     </InvalidParamDefault>
-    <UndefinedDocblockClass occurrences="1">
-      <code>number</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[number]]></code>
     </UndefinedDocblockClass>
   </file>
   <file src="lib/utility/unparse-url.php">
-    <InvalidArrayOffset occurrences="8">
-      <code>$parsed_url['fragment']</code>
-      <code>$parsed_url['host']</code>
-      <code>$parsed_url['pass']</code>
-      <code>$parsed_url['path']</code>
-      <code>$parsed_url['port']</code>
-      <code>$parsed_url['query']</code>
-      <code>$parsed_url['scheme']</code>
-      <code>$parsed_url['user']</code>
+    <InvalidArrayOffset>
+      <code><![CDATA[$parsed_url['fragment']]]></code>
+      <code><![CDATA[$parsed_url['host']]]></code>
+      <code><![CDATA[$parsed_url['pass']]]></code>
+      <code><![CDATA[$parsed_url['path']]]></code>
+      <code><![CDATA[$parsed_url['port']]]></code>
+      <code><![CDATA[$parsed_url['query']]]></code>
+      <code><![CDATA[$parsed_url['scheme']]]></code>
+      <code><![CDATA[$parsed_url['user']]]></code>
     </InvalidArrayOffset>
   </file>
   <file src="lib/utility/unreg-globals.php">
-    <RedundantCondition occurrences="2">
-      <code>is_array($_SESSION)</code>
-      <code>isset($_SESSION) &amp;&amp; is_array($_SESSION)</code>
+    <RedundantCondition>
+      <code><![CDATA[is_array($_SESSION)]]></code>
+      <code><![CDATA[isset($_SESSION) && is_array($_SESSION)]]></code>
     </RedundantCondition>
+    <TypeDoesNotContainType>
+      <code><![CDATA[array()]]></code>
+    </TypeDoesNotContainType>
+    <UnusedForeachValue>
+      <code><![CDATA[$v]]></code>
+    </UnusedForeachValue>
+  </file>
+  <file src="lib/utility/upload-audio.php">
+    <UnusedDocblockParam>
+      <code><![CDATA[$file_size]]></code>
+      <code><![CDATA[$file_type]]></code>
+    </UnusedDocblockParam>
   </file>
   <file src="lib/utility/upload-photo.php">
-    <InvalidNullableReturnType occurrences="1">
-      <code>false|true</code>
-    </InvalidNullableReturnType>
-    <InvalidScalarArgument occurrences="1">
-      <code>$file_size</code>
-    </InvalidScalarArgument>
-    <UndefinedDocblockClass occurrences="7">
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|num</code>
+    <InvalidArgument>
+      <code><![CDATA[$file_size]]></code>
+    </InvalidArgument>
+    <InvalidOperand>
+      <code><![CDATA[$medium_scaled * $current_height]]></code>
+      <code><![CDATA[$medium_scaled * $current_height]]></code>
+      <code><![CDATA[$medium_scaled * $current_width]]></code>
+      <code><![CDATA[$medium_scaled * $current_width]]></code>
+      <code><![CDATA[$medium_size / $current_height]]></code>
+      <code><![CDATA[$medium_size / $current_width]]></code>
+      <code><![CDATA[$small_scaled * $current_height]]></code>
+      <code><![CDATA[$small_scaled * $current_height]]></code>
+      <code><![CDATA[$small_scaled * $current_width]]></code>
+      <code><![CDATA[$small_scaled * $current_width]]></code>
+      <code><![CDATA[$small_size / $current_height]]></code>
+      <code><![CDATA[$small_size / $current_width]]></code>
+    </InvalidOperand>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
     </UndefinedDocblockClass>
+    <UnusedDocblockParam>
+      <code><![CDATA[$file_name]]></code>
+      <code><![CDATA[$file_type]]></code>
+    </UnusedDocblockParam>
+  </file>
+  <file src="lib/utility/upload-theme.php">
+    <UnusedVariable>
+      <code><![CDATA[$whitelist_mime_types]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="lib/utility/upload-video.php">
+    <UnusedDocblockParam>
+      <code><![CDATA[$file_size]]></code>
+      <code><![CDATA[$file_type]]></code>
+    </UnusedDocblockParam>
   </file>
   <file src="lib/utility/user-registration.php">
-    <InvalidReturnStatement occurrences="1">
-      <code>(class_exists('UserDao')) ? new UserDao() : ""</code>
+    <InvalidReturnStatement>
+      <code><![CDATA[(class_exists('UserDao')) ? new UserDao() : ""]]></code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>object|bool</code>
+    <InvalidReturnType>
+      <code><![CDATA[object|bool]]></code>
     </InvalidReturnType>
-    <UndefinedDocblockClass occurrences="3">
-      <code>int|num</code>
-      <code>int|num</code>
-      <code>int|num</code>
+    <UndefinedDocblockClass>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
+      <code><![CDATA[int|num]]></code>
     </UndefinedDocblockClass>
   </file>
   <file src="lib/utility/write-ini.php">
-    <TypeDoesNotContainType occurrences="2">
-      <code>is_array($array)</code>
-      <code>is_string($file)</code>
+    <TypeDoesNotContainType>
+      <code><![CDATA[is_array($array)]]></code>
+      <code><![CDATA[is_string($file)]]></code>
     </TypeDoesNotContainType>
+  </file>
+  <file src="lib/validator/CompositeValidator.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[add]]></code>
+      <code><![CDATA[count]]></code>
+      <code><![CDATA[validate]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="lib/validator/ValidationResult.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[hasErrors]]></code>
+    </PossiblyUnusedMethod>
   </file>
 </files>

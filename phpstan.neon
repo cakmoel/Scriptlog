@@ -14,6 +14,9 @@ parameters:
         - lib/core/ServiceException.php
         - tests/*
 
+    bootstrapFiles:
+        - tests/phpstan-bootstrap.php
+
     reportUnmatchedIgnoredErrors: false
 
     level: 0
