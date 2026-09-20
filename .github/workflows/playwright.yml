@@ -8,17 +8,61 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    # The e2e suite talks to a dedicated blogware_e2e database over 127.0.0.1:3306
+    # (see e2e/blog-selectors.ts and e2e/gdpr-fixtures.ts), and the app's own
+    # router (e2e/router.php) serves it over http://127.0.0.1:8099.
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: blogware_e2e
+          MARIADB_USER: blogwareuser
+          MARIADB_PASSWORD: userblogware
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
     steps:
     - uses: actions/checkout@v4
+
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+        cache: npm
+
     - name: Install dependencies
       run: npm ci
+
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: pdo, pdo_mysql, mbstring, json, curl, gd, fileinfo, openssl
+
+    - name: Install MySQL client
+      run: sudo apt-get update && sudo apt-get install -y mariadb-client
+
+    - name: Import seeded e2e database
+      run: |
+        mysql -h 127.0.0.1 -P 3306 -u blogwareuser -puserblogware blogware_e2e < e2e/blogware_e2e.sql
+      env:
+        MYSQL_PWD: userblogware
+
     - name: Run Playwright tests
+      # The suite defaults to http://127.0.0.1:8099; CI uses http://localhost so
+      # Chromium treats the connection as a secure context and keeps the app's
+      # Secure session cookies (the dev router serves plain HTTP).
+      env:
+        PLAYWRIGHT_BASE_URL: http://localhost:8099
       run: npx playwright test
+
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
