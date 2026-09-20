@@ -71,9 +71,10 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  webServer: {
+    command: 'php -S 127.0.0.1:8099 e2e/router.php',
+    url: 'http://127.0.0.1:8099/admin/login.php',
+    timeout: 120_000,
+    reuseExistingServer: !process.env.CI,
+  },
 });
