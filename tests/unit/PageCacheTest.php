@@ -76,6 +76,11 @@ class PageCacheTest extends TestCase
         // For testing purposes, we assume we need to check the logic.
         
         if (!defined('APP_CACHE') || APP_CACHE !== true) {
+            // Seed the settings memo so app_settings() does not hit the
+            // database (the unit suite must run without a database).
+            $settings = &app_settings_cache();
+            $settings = ($settings !== null) ? $settings : [];
+
             $this->assertFalse(page_cache_exists(), 'Should return false if APP_CACHE is disabled');
             return;
         }
