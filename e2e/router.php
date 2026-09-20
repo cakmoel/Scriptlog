@@ -20,7 +20,7 @@
 $_ENV['DB_NAME'] = 'blogware_e2e';
 $_ENV['DB_USER'] = 'blogwareuser';
 $_ENV['DB_PASS'] = 'userblogware';
-$_ENV['DB_HOST'] = 'localhost';
+$_ENV['DB_HOST'] = '127.0.0.1';
 $_ENV['DB_PORT'] = '3306';
 $_ENV['DB_PREFIX'] = '';
 $_ENV['APP_KEY'] = 'GVXUD7-72HUXD-2TFCDT-8DDC2A';
