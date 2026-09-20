@@ -19,12 +19,6 @@ class RoutingTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         self::$baseUrl = getenv('TEST_BASE_URL') ?: 'http://blogware.site';
-
-        if (!getenv('TEST_BASE_URL')) {
-            self::markTestSkipped(
-                'Smoke routing tests require a deployed application; set TEST_BASE_URL to enable them.'
-            );
-        }
     }
 
     public function testHomePageReturns200(): void
@@ -35,8 +29,19 @@ class RoutingTest extends TestCase
 
     public function testExistingPostReturns200(): void
     {
-        // Post ID 1 should exist in a standard installation
-        $status = $this->getHttpStatus('/post/1/');
+        // Resolve a real post URL from the API rather than hardcoding an ID,
+        // so the test works with any permalink configuration.
+        $response = @file_get_contents(self::$baseUrl . '/api/v1/posts', false);
+        $this->assertNotFalse($response, 'Posts API should be reachable');
+
+        $data = json_decode($response, true);
+        $post = isset($data['data'][0]) && is_array($data['data'][0]) ? $data['data'][0] : null;
+        $this->assertIsArray($post, 'Posts API should return at least one post');
+        $this->assertArrayHasKey('url', $post, 'Post should include a canonical url');
+
+        $path = parse_url($post['url'], PHP_URL_PATH) . '?' . parse_url($post['url'], PHP_URL_QUERY);
+
+        $status = $this->getHttpStatus($path);
         $this->assertEquals(200, $status, 'Existing post should return 200');
     }
 
@@ -54,9 +59,14 @@ class RoutingTest extends TestCase
 
     public function testApiEndpointsReturnJson(): void
     {
-        $response = $this->getUrl('/api/v1/posts');
-        $this->assertStringStartsWith('200', $http_response_header[0] ?? '');
-        $contentType = implode(', ', $http_response_header);
+        $response = @file_get_contents(self::$baseUrl . '/api/v1/posts');
+        $this->assertNotFalse($response, 'API should be reachable');
+
+        $headers = http_get_last_response_headers() ?: [];
+        $statusLine = $headers[0] ?? '';
+        preg_match('/\s(\d{3})\s/', $statusLine, $matches);
+        $this->assertEquals(200, (int)($matches[1] ?? 0), 'API should return HTTP 200');
+        $contentType = implode(', ', $headers);
         $this->assertStringContainsString('application/json', $contentType, 'API should return JSON content type');
     }
 

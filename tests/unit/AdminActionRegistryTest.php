@@ -1,76 +1,66 @@
-<?php defined('SCRIPTLOG') || define('SCRIPTLOG', true);
+<?php
 
 use PHPUnit\Framework\TestCase;
+use Scriptlog\Handler\AdminActionCommand;
+use Scriptlog\Handler\AdminActionRegistry;
 
 class AdminActionRegistryTest extends TestCase
 {
-    private $registry;
+    private AdminActionRegistry $registry;
 
     protected function setUp(): void
     {
-        $this->registry = new \Scriptlog\Handler\AdminActionRegistry();
+        $this->registry = new AdminActionRegistry();
     }
 
-    public function testHasReturnsFalseForUnregisteredAction(): void
+    public function testRegisterAndExecute(): void
     {
-        $this->assertFalse($this->registry->has('unknown_action'));
-    }
-
-    public function testRegisterAndHas(): void
-    {
-        $command = $this->createMock(\Scriptlog\Handler\AdminActionCommand::class);
-        $this->registry->register('test_action', $command);
-        $this->assertTrue($this->registry->has('test_action'));
-    }
-
-    public function testExecuteDelegatesToCommand(): void
-    {
-        $command = $this->createMock(\Scriptlog\Handler\AdminActionCommand::class);
+        $command = $this->createMock(AdminActionCommand::class);
         $command->expects($this->once())
             ->method('execute')
             ->with(['key' => 'value']);
 
-        $this->registry->register('test_action', $command);
-        $this->registry->execute('test_action', ['key' => 'value']);
+        $this->registry->register('TEST_ACTION', $command);
+        $this->assertTrue($this->registry->has('TEST_ACTION'));
+        $this->registry->execute('TEST_ACTION', ['key' => 'value']);
     }
 
-    public function testExecuteThrowsExceptionForUnregisteredAction(): void
+    public function testHasReturnsFalseForUnknownAction(): void
+    {
+        $this->assertFalse($this->registry->has('NONEXISTENT'));
+    }
+
+    public function testExecuteThrowsExceptionForUnknownAction(): void
     {
         $this->expectException(\RuntimeException::class);
-        $this->registry->execute('unknown_action', []);
+        $this->expectExceptionMessage('No command registered for action: NONEXISTENT');
+        $this->registry->execute('NONEXISTENT', []);
     }
 
-    public function testMultipleRegistrations(): void
+    public function testRegisterOverwritesExisting(): void
     {
-        $cmd1 = $this->createMock(\Scriptlog\Handler\AdminActionCommand::class);
-        $cmd2 = $this->createMock(\Scriptlog\Handler\AdminActionCommand::class);
+        $command1 = $this->createMock(AdminActionCommand::class);
+        $command2 = $this->createMock(AdminActionCommand::class);
+        $command2->expects($this->once())->method('execute');
 
-        $this->registry->register('action_a', $cmd1);
-        $this->registry->register('action_b', $cmd2);
-
-        $this->assertTrue($this->registry->has('action_a'));
-        $this->assertTrue($this->registry->has('action_b'));
+        $this->registry->register('ACTION', $command1);
+        $this->registry->register('ACTION', $command2);
+        $this->registry->execute('ACTION', []);
     }
 
-    public function testExecuteWithCorrectCommand(): void
+    public function testMultipleCommands(): void
     {
-        $cmd1 = $this->createMock(\Scriptlog\Handler\AdminActionCommand::class);
-        $cmd2 = $this->createMock(\Scriptlog\Handler\AdminActionCommand::class);
+        $cmdA = $this->createMock(AdminActionCommand::class);
+        $cmdB = $this->createMock(AdminActionCommand::class);
+        $cmdA->expects($this->once())->method('execute');
+        $cmdB->expects($this->once())->method('execute');
 
-        $cmd2->expects($this->once())->method('execute');
-        $cmd1->expects($this->never())->method('execute');
+        $this->registry->register('ACTION_A', $cmdA);
+        $this->registry->register('ACTION_B', $cmdB);
 
-        $this->registry->register('action_a', $cmd1);
-        $this->registry->register('action_b', $cmd2);
-
-        $this->registry->execute('action_b', []);
-    }
-
-    public function testHasAfterExecute(): void
-    {
-        $command = $this->createMock(\Scriptlog\Handler\AdminActionCommand::class);
-        $this->registry->register('test', $command);
-        $this->registry->execute('test', []);
-        $this->assertTrue($this->registry->has('test'));
+        $this->assertTrue($this->registry->has('ACTION_A'));
+        $this->assertTrue($this->registry->has('ACTION_B'));
+        $this->registry->execute('ACTION_A', []);
+        $this->registry->execute('ACTION_B', []);
     }
 }

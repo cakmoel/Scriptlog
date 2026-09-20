@@ -16,6 +16,16 @@ class LanguageDaoIntegrationTest extends TestCase
     private static $dao;
     private static $testLanguageId;
 
+    /**
+     * Generate a unique language code within the schema's VARCHAR(10) limit.
+     *
+     * @return string
+     */
+    private static function makeCode(): string
+    {
+        return 't' . substr(uniqid(), -6);
+    }
+
     public static function setUpBeforeClass(): void
     {
         // Connect to test database
@@ -28,17 +38,8 @@ class LanguageDaoIntegrationTest extends TestCase
             );
             
             // Load required classes
-            require_once __DIR__ . '/../../src/lib/core/Dao.php';
-            require_once __DIR__ . '/../../src/lib/core/Db.php';
-            require_once __DIR__ . '/../../src/lib/dao/LanguageDao.php';
-            
-            // Set up Db in Registry for Dao constructor
-            $db = new Db([
-                'mysql:host=localhost;dbname=blogware_test;charset=utf8mb4',
-                'blogwareuser',
-                'userblogware'
-            ]);
-            Registry::set('dbc', $db);
+            require_once __DIR__ . '/../../lib/core/Dao.php';
+            require_once __DIR__ . '/../../lib/dao/LanguageDao.php';
             
             // Initialize DAO
             self::$dao = new LanguageDao();
@@ -48,8 +49,6 @@ class LanguageDaoIntegrationTest extends TestCase
             
         } catch (PDOException $e) {
             self::markTestSkipped('Cannot connect to test database: ' . $e->getMessage());
-        } catch (Exception $e) {
-            self::markTestSkipped('Setup error: ' . $e->getMessage());
         }
     }
 
@@ -57,12 +56,6 @@ class LanguageDaoIntegrationTest extends TestCase
     {
         // Clean up test data
         self::cleanupTestData();
-        
-        // Restore 'en' as default language
-        if (self::$db) {
-            self::$db->exec("UPDATE tbl_languages SET lang_is_default = 0");
-            self::$db->exec("UPDATE tbl_languages SET lang_is_default = 1 WHERE lang_code = 'en'");
-        }
         
         if (self::$db) {
             self::$db = null;
@@ -74,8 +67,13 @@ class LanguageDaoIntegrationTest extends TestCase
         if (!self::$db) return;
         
         // Delete test languages (not the default 'en')
-        $stmt = self::$db->prepare("DELETE FROM tbl_languages WHERE lang_code LIKE 'x%'");
+        $stmt = self::$db->prepare("DELETE FROM tbl_languages WHERE lang_code LIKE 't%'");
         $stmt->execute();
+
+        // Restore 'en' as the default language — tests promote a test language
+        // to default, and leaving no default would break later runs.
+        self::$db->exec("UPDATE tbl_languages SET lang_is_default = 0");
+        self::$db->exec("UPDATE tbl_languages SET lang_is_default = 1 WHERE lang_code = 'en'");
     }
 
     protected function setUp(): void
@@ -89,13 +87,13 @@ class LanguageDaoIntegrationTest extends TestCase
 
     public function testCreateLanguage()
     {
-        $testCode = 'x' . substr(time(), -9);
+        $testCode = self::makeCode();
         
         $id = self::$dao->createLanguage([
             'lang_code' => $testCode,
             'lang_name' => 'Test Language',
             'lang_native' => 'Test Native',
-            'lang_locale' => 'xLOCALE',
+            'lang_locale' => 'tz_XX',
             'lang_direction' => 'ltr',
             'lang_sort' => 10,
             'lang_is_default' => 0,
@@ -111,7 +109,7 @@ class LanguageDaoIntegrationTest extends TestCase
     public function testFindById()
     {
         // First create a language
-        $testCode = 'xf' . substr(time(), -8);
+        $testCode = self::makeCode();
         $id = self::$dao->createLanguage([
             'lang_code' => $testCode,
             'lang_name' => 'Find Test',
@@ -135,7 +133,7 @@ class LanguageDaoIntegrationTest extends TestCase
 
     public function testFindLanguageByCode()
     {
-        $testCode = 'xc' . substr(time(), -8);
+        $testCode = self::makeCode();
         
         self::$dao->createLanguage([
             'lang_code' => $testCode,
@@ -178,7 +176,7 @@ class LanguageDaoIntegrationTest extends TestCase
 
     public function testUpdateLanguage()
     {
-        $testCode = 'xu' . substr(time(), -8);
+        $testCode = self::makeCode();
         
         $id = self::$dao->createLanguage([
             'lang_code' => $testCode,
@@ -199,7 +197,7 @@ class LanguageDaoIntegrationTest extends TestCase
 
     public function testSetDefaultLanguage()
     {
-        $testCode = 'xd' . substr(time(), -8);
+        $testCode = self::makeCode();
         
         $id = self::$dao->createLanguage([
             'lang_code' => $testCode,
@@ -227,7 +225,7 @@ class LanguageDaoIntegrationTest extends TestCase
 
     public function testDeleteLanguage()
     {
-        $testCode = 'xe' . substr(time(), -8);
+        $testCode = self::makeCode();
         
         $id = self::$dao->createLanguage([
             'lang_code' => $testCode,
@@ -263,7 +261,7 @@ class LanguageDaoIntegrationTest extends TestCase
 
     public function testCreateLanguageWithMinimalData()
     {
-        $testCode = 'xm' . substr(time(), -8);
+        $testCode = self::makeCode();
         
         $id = self::$dao->createLanguage([
             'lang_code' => $testCode,
@@ -280,19 +278,19 @@ class LanguageDaoIntegrationTest extends TestCase
         $this->assertEquals(1, $language['lang_is_active']); // Default
     }
 
-    public function testCreateDuplicateCodeThrowsException()
+public function testCreateDuplicateCodeThrowsException()
     {
-        $testCode = 'xr' . substr(time(), -8);
-        
+        $testCode = self::makeCode();
+
         self::$dao->createLanguage([
             'lang_code' => $testCode,
             'lang_name' => 'First',
             'lang_native' => 'First Native',
         ]);
-        
-        // Duplicate lang_code violates UNIQUE constraint at DB level
+
+        // Second create violates the UNIQUE KEY on lang_code
         $this->expectException(PDOException::class);
-        
+
         self::$dao->createLanguage([
             'lang_code' => $testCode,
             'lang_name' => 'Second',

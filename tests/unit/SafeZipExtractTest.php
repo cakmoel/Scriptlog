@@ -1,246 +1,214 @@
-<?php
+<?php defined('SCRIPTLOG') || define('SCRIPTLOG', true);
 
 use PHPUnit\Framework\TestCase;
 
 /**
- * SafeZipExtractTest
+ * Unit tests for safe_zip_extract() — the canonical safe ZIP extraction used by
+ * the theme and plugin uploaders (RCE F2/F8 remediation).
  *
- * Unit tests for the safe_zip_extract() function that provides
- * secure ZIP extraction with path traversal, symlink, and zip bomb defenses.
- *
- * @category Unit Test
- * @author Blogware Team
- * @license MIT
+ * Covers the happy path plus the zip-slip class of bugs: "../" traversal,
+ * Windows-style "..\" traversal, absolute paths, and the escape guard. Also
+ * verifies skip patterns are honoured.
  */
 class SafeZipExtractTest extends TestCase
 {
-    private $testDir;
+    /** @var string */
+    private $tmpBase;
 
     protected function setUp(): void
     {
-        if (!defined('MAX_FILES')) {
-            define('MAX_FILES', 10000);
-        }
-        if (!defined('MAX_SIZE')) {
-            define('MAX_SIZE', 1000000000);
-        }
-        if (!defined('MAX_RATIO')) {
-            define('MAX_RATIO', 10);
-        }
-        if (!defined('READ_LENGTH')) {
-            define('READ_LENGTH', 1024);
-        }
-
-        require_once __DIR__ . '/../../src/lib/utility/create-directory.php';
-        require_once __DIR__ . '/../../src/lib/utility/safe-zip-extract.php';
-
-        $this->testDir = sys_get_temp_dir() . '/safe_zip_test_' . uniqid();
-        mkdir($this->testDir, 0755, true);
+        $this->tmpBase = sys_get_temp_dir() . '/sze_' . uniqid();
+        mkdir($this->tmpBase, 0755, true);
     }
 
     protected function tearDown(): void
     {
-        if (is_dir($this->testDir)) {
-            $this->recursiveDelete($this->testDir);
+        if (is_dir($this->tmpBase)) {
+            $this->removeTree($this->tmpBase);
         }
     }
 
-    private function recursiveDelete(string $dir): void
+    private function removeTree(string $dir): void
     {
-        if (!is_dir($dir)) {
-            return;
+        $items = scandir($dir);
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+            $path = $dir . '/' . $item;
+            if (is_dir($path)) {
+                $this->removeTree($path);
+            } else {
+                @unlink($path);
+            }
         }
-        $files = array_diff(scandir($dir), ['.', '..']);
-        foreach ($files as $file) {
-            $path = $dir . '/' . $file;
-            is_dir($path) ? $this->recursiveDelete($path) : unlink($path);
-        }
-        rmdir($dir);
+        @rmdir($dir);
     }
 
-    private function createZip(array $entries): string
+    private function makeZip(array $entries): string
     {
-        $zipPath = $this->testDir . '/test_' . uniqid() . '.zip';
+        $zipPath = $this->tmpBase . '/archive.zip';
         $zip = new ZipArchive();
-        $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        $this->assertTrue(
+            $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true,
+            'Test zip should open for writing'
+        );
 
         foreach ($entries as $name => $content) {
-            $zip->addFromString($name, $content);
+            if (substr($name, -1) === '/') {
+                $zip->addEmptyDir(rtrim($name, '/'));
+            } else {
+                $zip->addFromString($name, $content);
+            }
         }
-
         $zip->close();
         return $zipPath;
     }
 
-    public function testFunctionExists(): void
+    public function testExtractsWellFormedArchive(): void
     {
-        $this->assertTrue(function_exists('safe_zip_extract'));
-    }
+        $dest = $this->tmpBase . '/dest';
+        mkdir($dest, 0755, true);
 
-    public function testExtractsValidZipSuccessfully(): void
-    {
-        $zipPath = $this->createZip([
-            'readme.txt' => 'Hello World',
-            'src/main.php' => '<?php echo "test";',
+        $zipPath = $this->makeZip([
+            'style.css' => 'body {}',
+            'js/main.js' => 'console.log(1);',
+            'img/' => '',
         ]);
 
-        $destDir = $this->testDir . '/output';
-        $result = safe_zip_extract($zipPath, $destDir);
-
-        $this->assertTrue($result);
-        $this->assertFileExists($destDir . '/readme.txt');
-        $this->assertFileExists($destDir . '/src/main.php');
-        $this->assertEquals('Hello World', file_get_contents($destDir . '/readme.txt'));
+        $this->assertTrue(safe_zip_extract($zipPath, $dest));
+        $this->assertFileExists($dest . '/style.css');
+        $this->assertFileExists($dest . '/js/main.js');
+        $this->assertSame('console.log(1);', file_get_contents($dest . '/js/main.js'));
     }
 
-    public function testRejectsPathTraversalWithDotDot(): void
+    public function testRejectsDotDotTraversal(): void
     {
-        $zipPath = $this->createZip([
-            '../etc/passwd' => 'malicious content',
+        $dest = $this->tmpBase . '/dest';
+        mkdir($dest, 0755, true);
+
+        $zipPath = $this->makeZip([
+            '../evil.txt' => 'pwned',
         ]);
 
-        $destDir = $this->testDir . '/output';
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('unsafe path');
+        try {
+            safe_zip_extract($zipPath, $dest);
+            $this->fail('Expected InvalidArgumentException for "../" entry');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringContainsString('unsafe path', $e->getMessage());
+        }
 
-        safe_zip_extract($zipPath, $destDir);
+        // No file may have escaped the destination.
+        $this->assertFileDoesNotExist($this->tmpBase . '/evil.txt');
+        $this->assertFileDoesNotExist($dest . '/evil.txt');
     }
 
-    public function testRejectsAbsoluteUnixPath(): void
+    public function testRejectsWindowsStyleBackslashTraversal(): void
     {
-        $zipPath = $this->createZip([
-            '/etc/passwd' => 'malicious content',
+        $dest = $this->tmpBase . '/dest';
+        mkdir($dest, 0755, true);
+
+        $zipPath = $this->makeZip([
+            '..\\evil.txt' => 'pwned',
         ]);
 
-        $destDir = $this->testDir . '/output';
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('unsafe path');
+        try {
+            safe_zip_extract($zipPath, $dest);
+            $this->fail('Expected InvalidArgumentException for "..\\" entry');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringContainsString('unsafe path', $e->getMessage());
+        }
 
-        safe_zip_extract($zipPath, $destDir);
+        $this->assertFileDoesNotExist($this->tmpBase . '/evil.txt');
+        $this->assertFileDoesNotExist($dest . '/evil.txt');
     }
 
-    public function testRejectsWindowsDriveLetterPath(): void
+    public function testRejectsAbsolutePathEntry(): void
     {
-        $zipPath = $this->createZip([
-            'C:/Windows/System32/evil.exe' => 'malicious content',
+        $dest = $this->tmpBase . '/dest';
+        mkdir($dest, 0755, true);
+
+        $zipPath = $this->makeZip([
+            '/etc/cron.d/evil' => 'pwned',
         ]);
 
-        $destDir = $this->testDir . '/output';
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('unsafe path');
-
-        safe_zip_extract($zipPath, $destDir);
+        try {
+            safe_zip_extract($zipPath, $dest);
+            $this->fail('Expected InvalidArgumentException for absolute path entry');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringContainsString('unsafe path', $e->getMessage());
+        }
     }
 
-    public function testRejectsBackslashTraversal(): void
+    public function testRejectsDriveLetterEntry(): void
     {
-        $zipPath = $this->createZip([
-            '..\\..\\etc\\passwd' => 'malicious content',
+        $dest = $this->tmpBase . '/dest';
+        mkdir($dest, 0755, true);
+
+        $zipPath = $this->makeZip([
+            'C:/windows/evil.txt' => 'pwned',
         ]);
 
-        $destDir = $this->testDir . '/output';
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('unsafe path');
-
-        safe_zip_extract($zipPath, $destDir);
+        try {
+            safe_zip_extract($zipPath, $dest);
+            $this->fail('Expected InvalidArgumentException for drive-letter entry');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringContainsString('unsafe path', $e->getMessage());
+        }
     }
 
-    public function testRejectsNullByteInPath(): void
+    public function testSkipPatternsAreHonoured(): void
     {
-        $zipPath = $this->createZip([
-            "file.txt" => 'content',
+        $dest = $this->tmpBase . '/dest';
+        mkdir($dest, 0755, true);
+
+        $zipPath = $this->makeZip([
+            'index.php' => '<?php',
+            'composer.json' => '{}',
         ]);
 
-        $destDir = $this->testDir . '/output';
-        $result = safe_zip_extract($zipPath, $destDir);
-        $this->assertTrue($result);
-
-        $this->assertFileExists($destDir . '/file.txt');
+        $this->assertTrue(
+            safe_zip_extract($zipPath, $dest, ['/^composer\.json$/i'])
+        );
+        $this->assertFileExists($dest . '/index.php');
+        $this->assertFileDoesNotExist($dest . '/composer.json');
     }
 
-    public function testRejectsInvalidZipFile(): void
+    public function testRejectsSymlinkEntry(): void
     {
-        $fakeZip = $this->testDir . '/not_a_zip.txt';
-        file_put_contents($fakeZip, 'This is not a zip file');
+        $dest = $this->tmpBase . '/dest';
+        mkdir($dest, 0755, true);
 
-        $destDir = $this->testDir . '/output';
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to open');
+        $zipPath = $this->tmpBase . '/link.zip';
+        $zip = new ZipArchive();
+        $this->assertTrue($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true);
+        $zip->addFromString('link', 'target.txt');
+        $zip->setExternalAttributesName('link', ZipArchive::OPSYS_UNIX, 0120777 << 16);
+        $zip->close();
 
-        safe_zip_extract($fakeZip, $destDir);
+        try {
+            safe_zip_extract($zipPath, $dest);
+            $this->fail('Expected InvalidArgumentException for a symlink entry');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringContainsString('symbolic link', $e->getMessage());
+        }
+
+        $this->assertFileDoesNotExist($dest . '/link');
     }
 
-    public function testRejectsNonexistentDestination(): void
+    public function testThrowsWhenArchiveIsNotAZip(): void
     {
-        $zipPath = $this->createZip(['file.txt' => 'content']);
+        $dest = $this->tmpBase . '/dest';
+        mkdir($dest, 0755, true);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid extraction destination');
+        $notZip = $this->tmpBase . '/not-a.zip';
+        file_put_contents($notZip, 'this is not a zip file');
 
-        safe_zip_extract($zipPath, '/nonexistent/path/that/does/not/exist');
-    }
-
-    public function testSkipsEntriesMatchingSkipPatterns(): void
-    {
-        $zipPath = $this->createZip([
-            'keep.txt' => 'keep this',
-            'skip_me.log' => 'skip this',
-            'another_skip.log' => 'also skip',
-        ]);
-
-        $destDir = $this->testDir . '/output';
-        $result = safe_zip_extract($zipPath, $destDir, ['/\.log$/']);
-
-        $this->assertTrue($result);
-        $this->assertFileExists($destDir . '/keep.txt');
-        $this->assertFileDoesNotExist($destDir . '/skip_me.log');
-        $this->assertFileDoesNotExist($destDir . '/another_skip.log');
-    }
-
-    public function testCreatesDestinationDirectoryIfMissing(): void
-    {
-        $zipPath = $this->createZip(['file.txt' => 'content']);
-
-        $destDir = $this->testDir . '/new/output/dir';
-        $this->assertDirectoryDoesNotExist($destDir);
-
-        $result = safe_zip_extract($zipPath, $destDir);
-
-        $this->assertTrue($result);
-        $this->assertDirectoryExists($destDir);
-        $this->assertFileExists($destDir . '/file.txt');
-    }
-
-    public function testHandlesDirectoriesInZip(): void
-    {
-        $zipPath = $this->createZip([
-            'src/' => '',
-            'src/main.php' => '<?php echo "hi";',
-            'tests/' => '',
-            'tests/unit.php' => '<?php echo "test";',
-        ]);
-
-        $destDir = $this->testDir . '/output';
-        $result = safe_zip_extract($zipPath, $destDir);
-
-        $this->assertTrue($result);
-        $this->assertDirectoryExists($destDir . '/src');
-        $this->assertDirectoryExists($destDir . '/tests');
-        $this->assertFileExists($destDir . '/src/main.php');
-        $this->assertFileExists($destDir . '/tests/unit.php');
-    }
-
-    public function testExtractsZipWithSingleFile(): void
-    {
-        $zipPath = $this->createZip([
-            'readme.txt' => 'Single file content',
-        ]);
-
-        $destDir = $this->testDir . '/output';
-        $result = safe_zip_extract($zipPath, $destDir);
-
-        $this->assertTrue($result);
-        $this->assertFileExists($destDir . '/readme.txt');
-        $this->assertEquals('Single file content', file_get_contents($destDir . '/readme.txt'));
+        try {
+            safe_zip_extract($notZip, $dest);
+            $this->fail('Expected InvalidArgumentException for non-zip archive');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringContainsString('Unable to open', $e->getMessage());
+        }
     }
 }

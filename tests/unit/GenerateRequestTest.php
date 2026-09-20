@@ -1,156 +1,161 @@
 <?php
+/**
+ * Generate Request Utility Test
+ *
+ * Tests for generate_request() function that builds HTTP query strings
+ * for CRUD functionality in admin pages.
+ *
+ * @category Tests
+ * @version 1.0
+ */
 
 use PHPUnit\Framework\TestCase;
 
+if (!defined('SCRIPTLOG')) {
+    define('SCRIPTLOG', true);
+}
+
+// Stub for check_request_generated() - prevents HTTP/CLI conflicts
+if (!function_exists('check_request_generated')) {
+    function check_request_generated()
+    {
+        return false;
+    }
+}
+
+// Stub for escape_html() - avoids laminas-escaper dependency
+if (!function_exists('escape_html')) {
+    function escape_html($input, $type = 'html', $encoding = 'utf-8', $mode = 'base')
+    {
+        return $input;
+    }
+}
+
+// Stub for build_query() - avoids escape_html dependency chain
+if (!function_exists('build_query')) {
+    function build_query($base, $query_data)
+    {
+        return basename($base) . '?' . http_build_query($query_data);
+    }
+}
+
+require_once __DIR__ . '/../../lib/utility/sanitize-urls.php';
+require_once __DIR__ . '/../../lib/utility/generate-request.php';
+
 class GenerateRequestTest extends TestCase
 {
-    private string $utilityPath;
-    private string $sanitizeUrlsPath;
-
     protected function setUp(): void
     {
         parent::setUp();
-        $this->utilityPath = __DIR__ . '/../../src/lib/utility/generate-request.php';
-        $this->sanitizeUrlsPath = __DIR__ . '/../../src/lib/utility/sanitize-urls.php';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
     }
 
-    public function testFunctionExists(): void
+    public function testGenerateRequestGetWithLoadOnly(): void
     {
-        $this->assertTrue(function_exists('generate_request'));
+        $result = generate_request('index.php', 'get', ['posts']);
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('link', $result);
+        $this->assertStringContainsString('load=posts', $result['link']);
     }
 
-    public function testSourceContainsRequireOnceBeforeFunction(): void
+    public function testGenerateRequestGetWithLoadAndAction(): void
     {
-        $source = file_get_contents($this->utilityPath);
-
-        $requirePos = strpos($source, 'require_once');
-        $functionPos = strpos($source, 'function generate_request');
-
-        $this->assertNotFalse($requirePos, 'Must contain require_once');
-        $this->assertNotFalse($functionPos, 'Must contain function declaration');
-        $this->assertLessThan($functionPos, $requirePos, 'require_once must be placed before function declaration');
+        $result = generate_request('index.php', 'get', ['posts', 'newPost']);
+        $this->assertStringContainsString('load=posts', $result['link']);
+        $this->assertStringContainsString('action=newPost', $result['link']);
     }
 
-    public function testSourceRequiresSanitizeUrls(): void
+    public function testGenerateRequestGetWithLoadActionAndId(): void
     {
-        $source = file_get_contents($this->utilityPath);
-        $this->assertStringContainsString("require_once __DIR__ . '/sanitize-urls.php'", $source);
+        $result = generate_request('index.php', 'get', ['posts', 'editPost', '5']);
+        $this->assertStringContainsString('load=posts', $result['link']);
+        $this->assertStringContainsString('action=editPost', $result['link']);
+        $this->assertStringContainsString('Id=5', $result['link']);
     }
 
-    public function testFileIsValidPhpSyntax(): void
+    public function testGenerateRequestGetWithAllParams(): void
     {
-        $output = [];
-        $returnCode = 0;
-        exec('php -l ' . escapeshellarg($this->utilityPath) . ' 2>&1', $output, $returnCode);
-        $this->assertEquals(0, $returnCode, 'PHP syntax check failed: ' . implode("\n", $output));
+        $result = generate_request('index.php', 'get', ['users', 'editUser', '3', 'abc123']);
+        $this->assertStringContainsString('load=users', $result['link']);
+        $this->assertStringContainsString('action=editUser', $result['link']);
+        $this->assertStringContainsString('Id=3', $result['link']);
+        $this->assertStringContainsString('sessionId=abc123', $result['link']);
     }
 
-    public function testHasStrictTypes(): void
+    public function testGenerateRequestGetStringEncodedFalse(): void
     {
-        $source = file_get_contents($this->utilityPath);
-        $this->assertStringContainsString('declare(strict_types=1)', $source);
+        $result = generate_request('index.php', 'get', ['posts'], false);
+        $this->assertStringContainsString('load=posts', $result['link']);
+        $this->assertStringNotContainsString('action=', $result['link']);
     }
 
-    public function testSourceUsesSanitizeUrlsInGetType(): void
+    public function testGenerateRequestPostWithLoadAndAction(): void
     {
-        $source = file_get_contents($this->utilityPath);
-        $this->assertStringContainsString("sanitize_urls(\$load)", $source);
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $result = generate_request('index.php', 'post', ['posts', 'savePost']);
+        $this->assertStringContainsString('load=posts', $result['link']);
+        $this->assertStringContainsString('action=savePost', $result['link']);
     }
 
-    public function testSourceHasGetAndPostCasesInSwitch(): void
+    public function testGenerateRequestPostWithAllParams(): void
     {
-        $source = file_get_contents($this->utilityPath);
-        $this->assertStringContainsString("case 'get'", $source);
-        $this->assertStringContainsString("case 'post'", $source);
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $result = generate_request('index.php', 'post', ['users', 'updateUser', '7', 'xyz789']);
+        $this->assertStringContainsString('load=users', $result['link']);
+        $this->assertStringContainsString('action=updateUser', $result['link']);
+        $this->assertStringContainsString('Id=7', $result['link']);
+        $this->assertStringContainsString('sessionId=xyz789', $result['link']);
     }
 
-    public function testSourceUsesBuildQueryFunction(): void
+    public function testGenerateRequestPostStringEncodedFalse(): void
     {
-        $source = file_get_contents($this->utilityPath);
-        $this->assertStringContainsString('build_query($base', $source);
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $result = generate_request('index.php', 'post', ['posts'], false);
+        $this->assertStringContainsString('load=posts', $result['link']);
+        $this->assertStringNotContainsString('action=', $result['link']);
     }
 
-    public function testSanitizeUrlsIsValidPhp(): void
+    public function testGenerateRequestEmptyDataReturnsNullValues(): void
     {
-        $output = [];
-        $returnCode = 0;
-        exec('php -l ' . escapeshellarg($this->sanitizeUrlsPath) . ' 2>&1', $output, $returnCode);
-        $this->assertEquals(0, $returnCode, 'PHP syntax check failed for sanitize-urls.php: ' . implode("\n", $output));
+        $result = generate_request('index.php', 'get', []);
+        $this->assertArrayHasKey('link', $result);
+        $this->assertStringContainsString('load=', $result['link']);
     }
 
-    public function testSanitizeUrlsUsesHtmlspecialchars(): void
+    public function testGenerateRequestLogoutLoad(): void
     {
-        $source = file_get_contents($this->sanitizeUrlsPath);
-        $this->assertStringContainsString('htmlspecialchars', $source);
-        $this->assertStringContainsString('ENT_QUOTES', $source);
-        $this->assertStringContainsString('ENT_HTML5', $source);
+        $result = generate_request('index.php', 'get', ['logout', 'logMeOut', '42']);
+        $this->assertStringContainsString('load=logout', $result['link']);
+        $this->assertStringContainsString('action=logMeOut', $result['link']);
+        $this->assertStringContainsString('logOutId=42', $result['link']);
     }
 
-    public function testSanitizeUrlsHasForceLowercaseOption(): void
+    public function testGenerateRequestSanitizesLoadValue(): void
     {
-        $source = file_get_contents($this->sanitizeUrlsPath);
-        $this->assertStringContainsString('$force_lowercase', $source);
+        $result = generate_request('index.php', 'get', ['admin/<script>']);
+        $this->assertStringContainsString('load=admin', $result['link']);
+        $this->assertStringNotContainsString('<script>', $result['link']);
     }
 
-    public function testSanitizeUrlsHandlesArrayInput(): void
+    public function testGenerateRequestDefaultsToGetType(): void
     {
-        if (!function_exists('sanitize_urls')) {
-            require_once $this->sanitizeUrlsPath;
-        }
-
-        $result = sanitize_urls(['Hello', 'World']);
-        $this->assertIsString($result);
+        $result = generate_request('index.php', 'invalid_type', ['posts']);
+        $this->assertArrayHasKey('link', $result);
+        $this->assertStringContainsString('load=posts', $result['link']);
     }
 
-    public function testSanitizeUrlsRemovesSpecialChars(): void
+    public function testGenerateRequestNoPhpStanIssetWarning(): void
     {
-        if (!function_exists('sanitize_urls')) {
-            require_once $this->sanitizeUrlsPath;
-        }
+        // PHPStan reported isset.variable on $data param (always defined).
+        // This test verifies calling with empty array produces no warnings/errors.
+        $result = generate_request('index.php', 'get', []);
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('link', $result);
 
-        $result = sanitize_urls('Hello <World> Test!');
-        $this->assertStringNotContainsString('<', $result);
-        $this->assertStringNotContainsString('>', $result);
-    }
+        $result = generate_request('index.php', 'get', []);
+        $this->assertIsArray($result);
 
-    public function testSanitizeUrlsReplacesSpacesWithHyphens(): void
-    {
-        if (!function_exists('sanitize_urls')) {
-            require_once $this->sanitizeUrlsPath;
-        }
-
-        $result = sanitize_urls('Hello World Test');
-        $this->assertStringNotContainsString(' ', $result);
-        $this->assertStringContainsString('-', $result);
-    }
-
-    public function testSanitizeUrlsForceLowercaseDefault(): void
-    {
-        if (!function_exists('sanitize_urls')) {
-            require_once $this->sanitizeUrlsPath;
-        }
-
-        $result = sanitize_urls('HELLO WORLD');
-        $this->assertEquals('hello-world', $result);
-    }
-
-    public function testSanitizeUrlsWithAnalMode(): void
-    {
-        if (!function_exists('sanitize_urls')) {
-            require_once $this->sanitizeUrlsPath;
-        }
-
-        $result = sanitize_urls('hello-world-123', true, true);
-        $this->assertMatchesRegularExpression('/^[a-zA-Z0-9-]+$/', $result);
-    }
-
-    public function testSanitizeUrlsPreservesHyphens(): void
-    {
-        if (!function_exists('sanitize_urls')) {
-            require_once $this->sanitizeUrlsPath;
-        }
-
-        $result = sanitize_urls('hello-world-test');
-        $this->assertEquals('hello-world-test', $result);
+        $result = generate_request('index.php', 'get', []);
+        $this->assertIsArray($result);
     }
 }

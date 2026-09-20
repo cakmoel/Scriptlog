@@ -1,6 +1,6 @@
 {
     "report": {
-        "html": "build/phpmetrics/index.html",
+        "html": "build/phpmetrics/html",
         "json": "build/phpmetrics/report.json",
         "csv": "build/phpmetrics/report.csv",
         "violations": "build/phpmetrics/violations.xml"

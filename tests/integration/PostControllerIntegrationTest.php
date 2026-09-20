@@ -20,10 +20,10 @@ class PostControllerIntegrationTest extends TestCase
     protected function setUp(): void
     {
         $this->postServiceMock = $this->createMock(PostService::class);
-        $topicDao = $this->createMock(TopicDao::class);
-        $mediaDao = $this->createMock(MediaDao::class);
-        $appService = $this->createMock(\Scriptlog\Service\PostApplicationService::class);
-        $this->postController = new PostController($this->postServiceMock, $topicDao, $mediaDao, $appService);
+        $topicDaoMock = $this->createMock(TopicDao::class);
+        $mediaDaoMock = $this->createMock(MediaDao::class);
+        $appServiceMock = $this->createMock(PostApplicationService::class);
+        $this->postController = new PostController($this->postServiceMock, $topicDaoMock, $mediaDaoMock, $appServiceMock);
     }
 
     protected function tearDown(): void
@@ -69,10 +69,11 @@ class PostControllerIntegrationTest extends TestCase
 
     public function testPostStatusValidation(): void
     {
-        $validOptions = ['publish' => 'Publish', 'draft' => 'Draft'];
-        
+        $validOptions = ['publish' => 'Publish', 'draft' => 'Draft', 'scheduled' => 'Scheduled'];
+
         $this->assertArrayHasKey('publish', $validOptions);
         $this->assertArrayHasKey('draft', $validOptions);
+        $this->assertArrayHasKey('scheduled', $validOptions);
         $this->assertArrayNotHasKey('pending', $validOptions);
     }
 
@@ -80,6 +81,7 @@ class PostControllerIntegrationTest extends TestCase
     {
         $this->assertEquals('publish', 'publish');
         $this->assertEquals('draft', 'draft');
+        $this->assertEquals('scheduled', 'scheduled');
     }
 
     public function testCommentStatusValidation(): void

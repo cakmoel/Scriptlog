@@ -17,6 +17,8 @@ class UserServiceTest extends TestCase
     private $formValidatorMock;
     private $sanitizeMock;
     private $userTokenMock;
+    private $commentDaoMock;
+    private $postDaoMock;
 
     protected function setUp(): void
     {
@@ -24,12 +26,16 @@ class UserServiceTest extends TestCase
         $this->formValidatorMock = $this->createMock(\FormValidator::class);
         $this->sanitizeMock = $this->createMock(\Sanitize::class);
         $this->userTokenMock = $this->createMock(\UserTokenDao::class);
+        $this->commentDaoMock = $this->createMock(\CommentDao::class);
+        $this->postDaoMock = $this->createMock(\PostDao::class);
         
         $this->userService = new \UserService(
             $this->userDaoMock,
             $this->formValidatorMock,
             $this->userTokenMock,
-            $this->sanitizeMock
+            $this->sanitizeMock,
+            $this->commentDaoMock,
+            $this->postDaoMock
         );
     }
 
@@ -170,6 +176,136 @@ class UserServiceTest extends TestCase
         
         $result = $this->userService->removeUser();
         $this->assertTrue($result);
+    }
+
+    public function testRemoveUserWithAnonymizationUsesInjectedDaos(): void
+    {
+        $this->userDaoMock->expects($this->once())
+            ->method('runInTransaction')
+            ->willReturnCallback(function (callable $callback) {
+                return $callback();
+            });
+
+        $this->userDaoMock->expects($this->once())
+            ->method('getUserById')
+            ->with(1, $this->sanitizeMock)
+            ->willReturn(['ID' => 1, 'user_login' => 'admin']);
+
+        $this->commentDaoMock->expects($this->once())
+            ->method('anonymizeCommentsByEmail')
+            ->with('user@example.com')
+            ->willReturn(true);
+
+        $this->postDaoMock->expects($this->once())
+            ->method('anonymizePostAuthor')
+            ->with(9, 1)
+            ->willReturn(true);
+
+        $this->userDaoMock->expects($this->once())
+            ->method('deleteUser')
+            ->with(9, $this->sanitizeMock)
+            ->willReturn(true);
+
+        $result = $this->userService->removeUserWithAnonymization(9, 'user@example.com');
+        $this->assertTrue($result);
+    }
+
+    public function testRemoveUserWithAnonymizationWithoutEmailOnlyDeletesUser(): void
+    {
+        $this->userDaoMock->expects($this->once())
+            ->method('runInTransaction')
+            ->willReturnCallback(function (callable $callback) {
+                return $callback();
+            });
+
+        $this->commentDaoMock->expects($this->never())
+            ->method('anonymizeCommentsByEmail');
+
+        $this->postDaoMock->expects($this->never())
+            ->method('anonymizePostAuthor');
+
+        $this->userDaoMock->expects($this->once())
+            ->method('deleteUser')
+            ->with(9, $this->sanitizeMock)
+            ->willReturn(true);
+
+        $result = $this->userService->removeUserWithAnonymization(9);
+        $this->assertTrue($result);
+    }
+
+    public function testRemoveUserWithAnonymizationPicksOtherFallbackWhenErasingUserOne(): void
+    {
+        $this->userDaoMock->expects($this->once())
+            ->method('runInTransaction')
+            ->willReturnCallback(function (callable $callback) {
+                return $callback();
+            });
+
+        $this->userDaoMock->expects($this->once())
+            ->method('getUserById')
+            ->with(1, $this->sanitizeMock)
+            ->willReturn(['ID' => 1, 'user_login' => 'admin']);
+
+        $this->userDaoMock->expects($this->once())
+            ->method('getUsers')
+            ->willReturn([
+                ['ID' => 1, 'user_login' => 'admin'],
+                ['ID' => 5, 'user_login' => 'editor']
+            ]);
+
+        $this->commentDaoMock->expects($this->once())
+            ->method('anonymizeCommentsByEmail')
+            ->with('admin@example.com')
+            ->willReturn(true);
+
+        $this->postDaoMock->expects($this->once())
+            ->method('anonymizePostAuthor')
+            ->with(1, 5)
+            ->willReturn(true);
+
+        $this->userDaoMock->expects($this->once())
+            ->method('deleteUser')
+            ->with(1, $this->sanitizeMock)
+            ->willReturn(true);
+
+        $result = $this->userService->removeUserWithAnonymization(1, 'admin@example.com');
+        $this->assertTrue($result);
+    }
+
+    public function testRemoveUserWithAnonymizationThrowsWhenNoFallbackAuthor(): void
+    {
+        $this->userDaoMock->expects($this->once())
+            ->method('runInTransaction')
+            ->willReturnCallback(function (callable $callback) {
+                return $callback();
+            });
+
+        $this->userDaoMock->expects($this->once())
+            ->method('getUserById')
+            ->with(1, $this->sanitizeMock)
+            ->willReturn(['ID' => 1, 'user_login' => 'admin']);
+
+        $this->userDaoMock->expects($this->once())
+            ->method('getUsers')
+            ->willReturn([
+                ['ID' => 1, 'user_login' => 'admin']
+            ]);
+
+        $this->commentDaoMock->expects($this->once())
+            ->method('anonymizeCommentsByEmail')
+            ->with('admin@example.com')
+            ->willReturn(true);
+
+        $this->postDaoMock->expects($this->never())
+            ->method('anonymizePostAuthor');
+
+        $this->userDaoMock->expects($this->never())
+            ->method('deleteUser');
+
+        $this->expectException(\AppException::class);
+        $this->expectExceptionMessage('No fallback author available to reassign posts');
+
+        $this->userService->removeUserWithAnonymization(1, 'admin@example.com');
     }
 
     public function testCheckUserLoginReturnsTrue(): void

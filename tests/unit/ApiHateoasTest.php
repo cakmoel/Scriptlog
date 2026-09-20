@@ -26,16 +26,13 @@ class ApiHateoasTest extends \PHPUnit\Framework\TestCase
         $_SERVER['SERVER_NAME'] = 'blogware.site';
         $_SERVER['REQUEST_URI'] = '/api/v1/posts';
 
-        // Read the actual app URL from config (matching ApiHateoas logic)
-        $configPath = __DIR__ . '/../../src/config.php';
-        if (!file_exists($configPath)) {
-            $configPath = __DIR__ . '/../../config.php';
-        }
+        // Read the actual app URL from config
+        $configPath = __DIR__ . '/../../config.php';
         if (file_exists($configPath)) {
             $config = require $configPath;
-            $this->appUrl = rtrim($config['app']['url'] ?? 'http://localhost', '/');
+            $this->appUrl = rtrim($config['app']['url'] ?? 'http://blogware.site', '/');
         } else {
-            $this->appUrl = 'http://localhost';
+            $this->appUrl = 'http://blogware.site';
         }
 
         $this->hateoas = new ApiHateoas($this->appUrl . '/api/v1');

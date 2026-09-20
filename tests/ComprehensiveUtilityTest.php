@@ -332,6 +332,7 @@ class ComprehensiveUtilityTest extends TestCase
         if (function_exists('finding_pwd_cost')) {
             $result = finding_pwd_cost(0.001, 10);
             $this->assertIsInt($result);
+            $this->assertGreaterThan(10, $result);
         }
     }
 
@@ -364,6 +365,11 @@ class ComprehensiveUtilityTest extends TestCase
         if (function_exists('random_generator')) {
             $result = random_generator(16);
             $this->assertIsString($result);
+            // Fixed-length contract: random_generator() must emit exactly
+            // $digits characters (regression guard for the legacy rand(1, 10)
+            // bug that appended a two-char "10"). See
+            // report/WP-VS-SCRIPTLOG-LOAD-TESTING-ANALYSIS-REPORT.md §9.2.
+            $this->assertEquals(16, strlen($result));
         }
     }
 
@@ -779,7 +785,7 @@ class ComprehensiveUtilityTest extends TestCase
     {
         if (function_exists('check_php_version')) {
             $result = check_php_version();
-            $this->assertIsString($result);
+            $this->assertIsBool($result);
         }
     }
 

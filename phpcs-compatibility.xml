@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<ruleset name="ScriptlogPHPCompatibility">
+    <description>Check PHP cross-version compatibility for Scriptlog (PHP 7.4+)</description>
+
+    <!-- Run against PHPCompatibility standard -->
+    <rule ref="PHPCompatibility"/>
+
+    <!-- Set target PHP version range -->
+    <config name="testVersion" value="7.4-"/>
+
+    <!-- Exclude vendor directory -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <!-- Exclude admin assets -->
+    <exclude-pattern>*/admin/assets/*</exclude-pattern>
+
+    <!-- Exclude theme assets -->
+    <exclude-pattern>*/themes/blog/assets/*</exclude-pattern>
+
+    <!-- Exclude HTMLPurifier (third-party) -->
+    <exclude-pattern>*/lib/core/HTMLPurifier/*</exclude-pattern>
+
+    <!-- Exclude third-party utility files -->
+    <exclude-pattern>*/lib/utility/htmlawed.php</exclude-pattern>
+
+    <!-- Exclude mysqli helper (standalone fallback) -->
+    <exclude-pattern>*/lib/utility/db-mysqli.php</exclude-pattern>
+
+    <!-- Exclude test files -->
+    <exclude-pattern>*/tests/*</exclude-pattern>
+
+    <!-- Exclude empty / HTML-only PHP files (no PHP code to scan) -->
+    <exclude-pattern>*/admin/plugins/index.php</exclude-pattern>
+    <exclude-pattern>*/admin/option-sitemap.php</exclude-pattern>
+    <exclude-pattern>*/public/themes/restoblog/functions.php</exclude-pattern>
+    <exclude-pattern>*/public/themes/restoblog/home.php</exclude-pattern>
+</ruleset>

@@ -56,11 +56,6 @@ parameters:
 			path: lib/utility/archive-scanner.php
 
 		-
-			message: "#^Result of function getimage_type \\(void\\) is used\\.$#"
-			count: 1
-			path: lib/utility/check-mime-type.php
-
-		-
 			message: "#^Result of function current_request_method \\(void\\) is used\\.$#"
 			count: 1
 			path: lib/utility/check-request-generated.php

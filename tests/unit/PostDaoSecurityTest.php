@@ -75,11 +75,11 @@ class PostDaoSecurityTest extends TestCase
             return;
         }
         
-        $source = file_get_contents(__DIR__ . '/../../src/lib/dao/PostDao.php');
+        $source = file_get_contents(__DIR__ . '/../../lib/dao/PostDao.php');
         
-        // Verify that ORDER BY uses a whitelist
-        $this->assertStringContainsString('ALLOWED_SORT_COLUMNS', $source);
-        $this->assertStringContainsString('resolveSortColumn', $source);
+        // Verify that ORDER BY uses a whitelist (via the resolveSortColumn helper)
+        $this->assertStringContainsString('$allowedColumns', $source);
+        $this->assertStringContainsString('in_array($sortBy, $allowedColumns)', $source);
         $this->assertStringContainsString('ORDER BY p.$sortColumn', $source);
     }
     
@@ -90,7 +90,7 @@ class PostDaoSecurityTest extends TestCase
             return;
         }
         
-        $source = file_get_contents(__DIR__ . '/../../src/lib/dao/PostDao.php');
+        $source = file_get_contents(__DIR__ . '/../../lib/dao/PostDao.php');
         
         // Verify that status filter is present
         $this->assertStringContainsString("p.post_status = 'publish'", $source);
@@ -105,7 +105,7 @@ class PostDaoSecurityTest extends TestCase
             return;
         }
         
-        $source = file_get_contents(__DIR__ . '/../../src/lib/dao/PostDao.php');
+        $source = file_get_contents(__DIR__ . '/../../lib/dao/PostDao.php');
         
         // Check for status filter anywhere in the findPost method
         $this->assertStringContainsString("post_status = 'publish'", $source);

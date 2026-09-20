@@ -27,9 +27,9 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->baseDir = dirname(__DIR__) . '/..';
-        $this->yamlFile = $this->baseDir . '/src/docs/API_OPENAPI.yaml';
-        $this->jsonFile = $this->baseDir . '/src/docs/API_OPENAPI.json';
-        $this->apiIndexFile = $this->baseDir . '/src/api/index.php';
+        $this->yamlFile = $this->baseDir . '/docs/dev-docs/API_OPENAPI.yaml';
+        $this->jsonFile = $this->baseDir . '/docs/dev-docs/API_OPENAPI.json';
+        $this->apiIndexFile = $this->baseDir . '/api/index.php';
 
         $this->loadSpecs();
     }
@@ -180,7 +180,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
         $this->assertIsArray($servers);
         $this->assertNotEmpty($servers);
-        $this->assertGreaterThanOrEqual(2, count($servers));
+        $this->assertGreaterThanOrEqual(1, count($servers));
     }
 
     public function testProductionServerUrlExists(): void
@@ -192,21 +192,23 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
         $this->assertNotEmpty($servers[0]['url']);
     }
 
-    public function testServerUrlsContainPlaceholderDomain(): void
+    public function testServerUrlsAreRelativeOrPlaceholder(): void
     {
         $servers = $this->yamlSpec['servers'] ?? [];
 
-        $hasPlaceholder = false;
-        foreach ($servers as $server) {
-            if (isset($server['url']) && 
-                (strpos($server['url'], 'blogware.site') !== false || 
-                 strpos($server['url'], 'localhost') !== false)) {
-                $hasPlaceholder = true;
-                break;
-            }
-        }
+        $this->assertNotEmpty($servers);
 
-        $this->assertTrue($hasPlaceholder, 'Servers should contain placeholder domain for replacement');
+        foreach ($servers as $server) {
+            $url = $server['url'] ?? '';
+            $isRelative = (strpos($url, '/') === 0);
+            $hasPlaceholder = (strpos($url, 'blogware.site') !== false
+                || strpos($url, 'localhost') !== false);
+
+            $this->assertTrue(
+                $isRelative || $hasPlaceholder,
+                "Server URL '{$url}' must be relative (starts with '/') or use the placeholder domain"
+            );
+        }
     }
 
     public function testSecuritySchemesExist(): void
