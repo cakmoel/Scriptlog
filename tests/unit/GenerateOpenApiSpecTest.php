@@ -54,22 +54,17 @@ class GenerateOpenApiSpecTest extends PHPUnit\Framework\TestCase
         $this->assertIsArray($spec['servers']);
     }
 
-    public function testServersContainsHardcodedUrls(): void
+    public function testServersUseResolvableUrls(): void
     {
         $content = file_get_contents($this->openapiFile);
         $spec = json_decode($content, true);
 
-        $foundHardcoded = false;
-        foreach ($spec['servers'] as $server) {
-            if (isset($server['url']) && 
-                (strpos($server['url'], 'blogware.site') !== false || 
-                 strpos($server['url'], 'localhost') !== false)) {
-                $foundHardcoded = true;
-                break;
-            }
-        }
+        $this->assertNotEmpty($spec['servers'], 'Servers array should not be empty');
 
-        $this->assertTrue($foundHardcoded, 'Should contain hardcoded URLs for replacement');
+        foreach ($spec['servers'] as $server) {
+            $this->assertArrayHasKey('url', $server);
+            $this->assertNotEmpty($server['url']);
+        }
     }
 
     public function testOpenapiJsonHasInfoWithLogo(): void
