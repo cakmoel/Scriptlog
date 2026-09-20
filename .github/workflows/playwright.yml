@@ -50,10 +50,10 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y mariadb-client
 
     - name: Materialize app configuration
-      # config.php is gitignored, but admin/login.php redirects to /install
-      # when it is missing; it is fully environment-driven, so the tracked
-      # sample works once the router sets $_ENV.
-      run: cp config.sample.php config.php
+      # config.php is gitignored, so it must be created on runners (admin/login.php
+      # redirects to /install when it is missing). The e2e fixture carries
+      # concrete values for the seeded database and dev server.
+      run: cp e2e/config.ci.php config.php
 
     - name: Import seeded e2e database
       run: |
