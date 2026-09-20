@@ -1,0 +1,101 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Pre-commit hook: enforce Scriptlog quality gates.
+ *
+ * 1. lib/ architectural layer rules
+ *    - No .sql files anywhere under lib/
+ *    - No unexpected non-directory files at lib/ root
+ * 2. PHP 7.4+ backward compatibility
+ *    - Runs PHPCompatibility sniff (phpcs-compatibility.xml) on every staged PHP file.
+ *    - Blocks commits that use PHP 8.0+ language features or rely on changed
+ *      defaults (e.g. html_entity_decode() flags changed in PHP 8.1).
+ *
+ * Requires: composer install (provides lib/vendor/bin/phpcs + phpcs-compatibility.xml)
+ */
+
+$permittedFiles = [
+    'autoload-aliases-map.php', 'autoload-aliases.php',
+    'Autoloader.php', 'common.php', 'index.html',
+    'main.php', 'options.php', 'utility-loader.php',
+];
+
+$errors = [];
+
+// --- Gate 1: lib/ architectural layer rules ---------------------------------
+$libFiles = [];
+exec('git diff --cached --name-only -- lib/', $libFiles);
+
+foreach ($libFiles as $file) {
+    if (pathinfo($file, PATHINFO_EXTENSION) === 'sql') {
+        $errors[] = "SQL file '$file' inside lib/ is not permitted. Use install/ instead.";
+        continue;
+    }
+    $parts = explode('/', $file);
+    if (count($parts) === 2 && is_file($file)) {
+        if (!in_array($parts[1], $permittedFiles, true)) {
+            $errors[] = "Unexpected file at lib/ root: '{$parts[1]}'. Only essential bootstrap files permitted.";
+        }
+    }
+}
+
+if (!empty($errors)) {
+    fwrite(STDERR, "=== lib/ Architectural Layer Violation ===\n");
+    fwrite(STDERR, "lib/ is for PHP classes organized by architectural layer.\n");
+    fwrite(STDERR, "No database files, standalone scripts, or non-class files belong here.\n\n");
+    foreach ($errors as $error) {
+        fwrite(STDERR, "  ✗ $error\n");
+    }
+    fwrite(STDERR, "\nCommit aborted. Fix the issue and try again.\n");
+    exit(1);
+}
+
+// --- Gate 2: PHP 7.4+ backward compatibility --------------------------------
+$stagedFiles = [];
+exec('git diff --cached --name-only --diff-filter=ACMR', $stagedFiles);
+
+$phpFiles = [];
+foreach ($stagedFiles as $file) {
+    // Check the working-tree content; the ruleset's exclude-patterns
+    // (vendor, tests, HTMLPurifier, ...) rely on real repo paths.
+    if (pathinfo($file, PATHINFO_EXTENSION) === 'php' && is_file($file)) {
+        $phpFiles[] = $file;
+    }
+}
+
+if (!empty($phpFiles)) {
+    $phpcs = __DIR__ . '/../lib/vendor/bin/phpcs';
+    $standard = __DIR__ . '/../phpcs-compatibility.xml';
+
+    if (!is_file($phpcs) || !is_file($standard)) {
+        fwrite(STDERR, "=== PHP 7.4 Compatibility Check Skipped ===\n");
+        fwrite(STDERR, "Missing tooling: $phpcs or $standard.\n");
+        fwrite(STDERR, "Run `composer install` before committing.\n\n");
+    } else {
+        $cmd = escapeshellcmd($phpcs)
+            . ' ' . implode(' ', array_map('escapeshellarg', $phpFiles))
+            . ' --standard=' . escapeshellarg($standard)
+            . ' -s';
+
+        exec($cmd, $output, $exitCode);
+
+        // PHPCS 4 exits with code 16 (PROCESS_ERROR) and no stdout output when
+        // every staged file is excluded by the ruleset (*/vendor/* paths), i.e.
+        // "nothing was checked". Treat that condition as a pass.
+        if ($exitCode === 16 && trim(implode("\n", $output)) === '') {
+            $exitCode = 0;
+        }
+
+        if ($exitCode !== 0) {
+            fwrite(STDERR, "=== PHP 7.4+ Backward Compatibility Violation ===\n");
+            fwrite(STDERR, "Project supports PHP 7.4+. The following staged PHP file(s)\n");
+            fwrite(STDERR, "fail the PHPCompatibility sniff (testVersion 7.4-):\n\n");
+            fwrite(STDERR, implode("\n", $output));
+            fwrite(STDERR, "\n\nFix the violations, or run `composer compat` locally to preview.\n");
+            fwrite(STDERR, "Commit aborted. Do not bypass this gate.\n");
+            exit(1);
+        }
+    }
+}
+
+exit(0);

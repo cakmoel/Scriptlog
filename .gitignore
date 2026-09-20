@@ -1,52 +1,84 @@
-# PHP dependencies
-/vendor/
-/lib/vendor/
-/src/vendor/
-/src/lib/vendor/
-composer.phar
+# Image files (if you want to ignore all images)
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.svg
+*.webp
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
+# But keep tracked UI/UX verification screenshots
+!docs/screenshots/
+!docs/screenshots/*.png
 
 # Session files
 sess_*
+# --- System / IDE ---
 
-# Logs
+.DS_Store
+__pycache__
+_data/
+.vscode/
+.idea/
+venv/
+*.cache
+*.txt
 *.log
 
-# Environment
+# --- PHP / Composer ---
+composer.phar
+
+# experiment and legacy
+experiment/
+legacy/
+
+# Vendor and dependencies
+vendor-bin/
+lib/vendor/
+lib/vendor/composer/
+
+# server configuration file
+.htaccess
+nginx-rewrites.conf
 .env
-.env.local
-.env.*.local
+config.php
+*.local.php
 
-# Build
+# ESLint and Node
 node_modules/
+.eslintcache
 
-# lts directory
-.lts/
-
-# lts
-*.txt
-
-# PHPUnit
+# phpunit cache
 .phpunit.result.cache
 
 # Runtime cache files
-src/public/cache/rate_limit/
-src/public/log/unlock_attempts/
-src/public/files/cache/
-src/lib/core/HTMLPurifier/DefinitionCache/
+public/cache/rate_limit/
+public/log/unlock_attempts/
 
-# Storage - sensitive key files
-storage/keys/
+# Diagnostic scripts (delete after use)
+check-headers.php
 
-# Themes
-src/public/themes/restoblog
-src/public/themes/tastybites
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Load-testing output (may contain infrastructure details)
+/siege-results/
+
+# aider
+.aider.*
+
+# opencode
+.opencode
+opencode.json
+
+# Todo
+/Todo/
+
+# Build
+/build/
+# HTMLPurifier runtime cache (generated during sanitization/tests)
+lib/core/HTMLPurifier/DefinitionCache/Serializer/URI/

@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<ruleset name="BlogwarePHPMD"
+    xmlns="http://pmd.sf.net/ruleset/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd"
+    xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd">
+
+    <description>Blogware/Scriptlog PHPMD Ruleset</description>
+
+    <!--
+    IMPORTANT: PHPMD refactoring changes code structure and can cause stale
+    entries in the Psalm baseline. After any PHPMD-driven refactoring, run:
+
+        composer psalm:update-baseline
+
+    This fixes "UnusedBaselineEntry" errors in Psalm analysis.
+    -->
+
+    <!-- ========================================= -->
+    <!-- High-Value Rules (Maintainability + Bugs)  -->
+    <!-- ========================================= -->
+
+    <!-- CleanCode: catches real bugs and forces cleaner conditionals -->
+    <rule ref="rulesets/cleancode.xml">
+        <exclude name="StaticAccess" />
+        <exclude name="MissingImport" />
+        <exclude name="BooleanArgumentFlag" />
+    </rule>
+
+    <!-- CodeSize: the most impactful PHPMD rules (complexity, length) -->
+    <rule ref="rulesets/codesize.xml" />
+
+    <!-- Design: catches tight coupling, debug leftovers, empty catches -->
+    <rule ref="rulesets/design.xml">
+        <exclude name="NumberOfChildren" />
+        <exclude name="DepthOfInheritance" />
+        <exclude name="ExitExpression" />
+    </rule>
+
+    <!-- UnusedCode: catches dead code that should be removed -->
+    <rule ref="rulesets/unusedcode.xml">
+        <exclude name="UnusedFormalParameter" />
+    </rule>
+
+    <!-- ========================================= -->
+    <!-- Disabled (Cosmetic / High Noise)           -->
+    <!-- ========================================= -->
+    <!-- Naming rules (ShortVariable, LongVariable, naming conventions):
+         entirely style preferences, high false-positive rate. Disabled. -->
+    <!-- Controversial rules: not applicable. -->
+
+    <!-- ========================================= -->
+    <!-- Exclude paths                              -->
+    <!-- ========================================= -->
+    <!-- Must match psalm.xml ignoreFiles for coherence -->
+    <exclude-pattern>*/lib/vendor/*</exclude-pattern>
+    <exclude-pattern>*/lib/core/HTMLPurifier/*</exclude-pattern>
+    <exclude-pattern>*/lib/core/HTMLPurifier.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/HTMLPurifier.auto.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/HTMLPurifier.autoload.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/HTMLPurifier.autoload-legacy.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/HTMLPurifier.composer.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/HTMLPurifier.func.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/HTMLPurifier.includes.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/HTMLPurifier.kses.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/HTMLPurifier.path.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/HTMLPurifier.safe-includes.php</exclude-pattern>
+    <!-- Bundled / third-party libraries in lib/core (ignored by Psalm) -->
+    <exclude-pattern>*/lib/core/Ubench.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/ResponsiveCaptcha.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/ImgCompressor.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/SyntaxHighlight.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/Html.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/Paginator.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/Resize.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/Random.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/Clean.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/DateGenerator.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/RemoteAddress.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/Pagination.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/Util.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/Sitemap.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/PageCache.php</exclude-pattern>
+    <exclude-pattern>*/lib/core/RSSWriter.php</exclude-pattern>
+    <exclude-pattern>*/lib/utility/htmlawed.php</exclude-pattern>
+    <exclude-pattern>*/tests/*</exclude-pattern>
+</ruleset>

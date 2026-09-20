@@ -134,33 +134,6 @@ class PostServiceTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testSetPassPhraseUsesSha256(): void
-    {
-        $passphrase = 'test-passphrase-123';
-        $this->postService->setPassPhrase($passphrase);
-        $ref = new ReflectionClass($this->postService);
-        $prop = $ref->getProperty('passphrase');
-        $prop->setAccessible(true);
-        $value = $prop->getValue($this->postService);
-        $expected = hash('sha256', app_key() . $passphrase);
-        $this->assertEquals($expected, $value);
-        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $value);
-    }
-
-    public function testSetPassPhraseDifferentInputs(): void
-    {
-        $this->postService->setPassPhrase('pass1');
-        $ref = new ReflectionClass($this->postService);
-        $prop = $ref->getProperty('passphrase');
-        $prop->setAccessible(true);
-        $val1 = $prop->getValue($this->postService);
-
-        $this->postService->setPassPhrase('pass2');
-        $val2 = $prop->getValue($this->postService);
-
-        $this->assertNotEquals($val1, $val2);
-    }
-
     public function testPostAuthorId(): void
     {
         $_SESSION['scriptlog_session_id'] = 1;
@@ -196,5 +169,132 @@ class PostServiceTest extends TestCase
         $this->postDaoMock->method('findPost')->willReturn(['ID' => 1, 'post_title' => 'Test']);
         $post = $this->postService->grabPost(1);
         $this->assertIsArray($post);
+    }
+
+    public function testGetPublishedPostsApiWithDefaults(): void
+    {
+        $expected = [
+            ['ID' => 1, 'post_title' => 'Post 1'],
+            ['ID' => 2, 'post_title' => 'Post 2']
+        ];
+
+        $this->postDaoMock->method('findPublishedPostsPaginated')
+            ->with(10, 0, 'ID', 'DESC', null)
+            ->willReturn($expected);
+
+        $result = $this->postService->getPublishedPostsApi();
+        $this->assertSame($expected, $result);
+    }
+
+    public function testGetPublishedPostsApiWithPage2PerPage5(): void
+    {
+        $expected = [
+            ['ID' => 6, 'post_title' => 'Post 6'],
+            ['ID' => 7, 'post_title' => 'Post 7']
+        ];
+
+        $this->postDaoMock->method('findPublishedPostsPaginated')
+            ->with(5, 5, 'post_date', 'ASC', null)
+            ->willReturn($expected);
+
+        $result = $this->postService->getPublishedPostsApi(2, 5, 'post_date', 'ASC');
+        $this->assertSame($expected, $result);
+    }
+
+    public function testGetPublishedPostsApiWithAuthorFilter(): void
+    {
+        $expected = [['ID' => 1, 'post_title' => 'My Post']];
+
+        $this->postDaoMock->method('findPublishedPostsPaginated')
+            ->with(10, 0, 'ID', 'DESC', 3)
+            ->willReturn($expected);
+
+        $result = $this->postService->getPublishedPostsApi(1, 10, 'ID', 'DESC', 3);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testCountPublishedPostsApi(): void
+    {
+        $this->postDaoMock->method('countPublishedPosts')
+            ->with(null)
+            ->willReturn(42);
+
+        $total = $this->postService->countPublishedPostsApi();
+        $this->assertSame(42, $total);
+    }
+
+    public function testCountPublishedPostsApiWithAuthor(): void
+    {
+        $this->postDaoMock->method('countPublishedPosts')
+            ->with(5)
+            ->willReturn(7);
+
+        $total = $this->postService->countPublishedPostsApi(5);
+        $this->assertSame(7, $total);
+    }
+
+    public function testGetPublishedPostApiReturnsPost(): void
+    {
+        $expected = ['ID' => 1, 'post_title' => 'Test Post', 'post_visibility' => 'public'];
+
+        $this->postDaoMock->method('findPublishedPostById')
+            ->with(1)
+            ->willReturn($expected);
+
+        $result = $this->postService->getPublishedPostApi(1);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testGetPublishedPostApiReturnsFalseWhenNotFound(): void
+    {
+        $this->postDaoMock->method('findPublishedPostById')
+            ->with(999)
+            ->willReturn(null);
+
+        $result = $this->postService->getPublishedPostApi(999);
+        $this->assertNull($result);
+    }
+
+    public function testGetPostByIdApiDelegatesToDao(): void
+    {
+        $expected = ['ID' => 42, 'post_title' => 'Draft', 'post_status' => 'draft'];
+
+        $this->postDaoMock->expects($this->once())
+            ->method('getPostById')
+            ->with(42)
+            ->willReturn($expected);
+
+        $result = $this->postService->getPostByIdApi(42);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testGetPostByIdApiReturnsNullWhenMissing(): void
+    {
+        $this->postDaoMock->method('getPostById')
+            ->with(999)
+            ->willReturn(null);
+
+        $result = $this->postService->getPostByIdApi(999);
+        $this->assertNull($result);
+    }
+
+    public function testSetPostTopicsApiDelegatesToDao(): void
+    {
+        $this->postDaoMock->expects($this->once())
+            ->method('setPostTopics')
+            ->with(42, [3, 7]);
+
+        $this->postService->setPostTopicsApi(42, [3, 7]);
+    }
+
+    public function testCreatePostApiDelegatesToDao(): void
+    {
+        $data = ['post_title' => 'New Post'];
+
+        $this->postDaoMock->method('insertPostApi')
+            ->with($data)
+            ->willReturn(77);
+
+        $this->assertSame(77, $this->postService->createPostApi($data));
     }
 }

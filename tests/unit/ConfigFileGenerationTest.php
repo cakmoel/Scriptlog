@@ -186,16 +186,13 @@ class ConfigFileGenerationTest extends TestCase
 
     public function testConfigFilePathCalculation(): void
     {
+        // The path calculation should go from install/include/ to root
         // Starting from __DIR__ (tests/unit):
         // dirname(__DIR__, 2) should give us the project root
-        
+
         $rootDir = dirname(__DIR__, 2);
-        $srcDir = $rootDir . '/src';
-        
-        // The src directory should have an install directory
-        $this->assertDirectoryExists($srcDir . '/install');
-        
-        // The root dir should be the project root
-        $this->assertStringEndsWith('Scriptlog', $rootDir);
+
+        // The root should have an install directory
+        $this->assertDirectoryExists($rootDir . '/install');
     }
 }

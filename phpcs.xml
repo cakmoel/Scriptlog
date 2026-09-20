@@ -63,4 +63,10 @@
     
     <!-- Exclude third-party utility files -->
     <exclude-pattern>*/lib/utility/htmlawed.php</exclude-pattern>
+
+    <!-- Exclude empty / HTML-only PHP files (no PHP code to scan) -->
+    <exclude-pattern>*/admin/plugins/index.php</exclude-pattern>
+    <exclude-pattern>*/admin/option-sitemap.php</exclude-pattern>
+    <exclude-pattern>*/public/themes/restoblog/functions.php</exclude-pattern>
+    <exclude-pattern>*/public/themes/restoblog/home.php</exclude-pattern>
 </ruleset>

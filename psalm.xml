@@ -11,21 +11,52 @@
 >
     <projectFiles>
         <directory name="lib/" />
+        <file name="index.php" />
         <ignoreFiles>
             <directory name="lib/vendor" />
+            <!-- HTMLPurifier bundled library -->
+            <directory name="lib/core/HTMLPurifier/" />
+            <file name="lib/core/HTMLPurifier.php" />
+            <file name="lib/core/HTMLPurifier.auto.php" />
+            <file name="lib/core/HTMLPurifier.autoload.php" />
+            <file name="lib/core/HTMLPurifier.autoload-legacy.php" />
+            <file name="lib/core/HTMLPurifier.composer.php" />
+            <file name="lib/core/HTMLPurifier.func.php" />
+            <file name="lib/core/HTMLPurifier.includes.php" />
+            <file name="lib/core/HTMLPurifier.kses.php" />
+            <file name="lib/core/HTMLPurifier.path.php" />
+            <file name="lib/core/HTMLPurifier.safe-includes.php" />
+            <!-- Other embedded third-party packages -->
+            <file name="lib/core/Ubench.php" />
+            <file name="lib/core/ResponsiveCaptcha.php" />
+            <file name="lib/core/ImgCompressor.php" />
+            <file name="lib/core/SyntaxHighlight.php" />
+            <file name="lib/core/Html.php" />
+            <file name="lib/core/Paginator.php" />
+            <file name="lib/core/Resize.php" />
+            <file name="lib/core/Random.php" />
+            <file name="lib/core/Clean.php" />
+            <file name="lib/core/DateGenerator.php" />
+            <file name="lib/core/RemoteAddress.php" />
+            <file name="lib/core/Pagination.php" />
+            <file name="lib/core/Util.php" />
+            <file name="lib/core/Sitemap.php" />
+            <file name="lib/core/PageCache.php" />
+            <file name="lib/core/RSSWriter.php" />
+            <file name="lib/utility/htmlawed.php" />
         </ignoreFiles>
     </projectFiles>
 
     <issueHandlers>
-        <MissingConstructor>
-            <errorLevel type="suppress">
-                <directory name="lib/" />
-            </errorLevel>
-        </MissingConstructor>
         <PropertyNotSetInConstructor>
             <errorLevel type="suppress">
                 <directory name="lib/" />
             </errorLevel>
         </PropertyNotSetInConstructor>
+        <MissingOverrideAttribute>
+            <errorLevel type="suppress">
+                <directory name="lib/" />
+            </errorLevel>
+        </MissingOverrideAttribute>
     </issueHandlers>
 </psalm>

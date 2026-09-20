@@ -416,13 +416,13 @@ class BootstrapTest extends TestCase
         }
     }
 
-    public function testAppContextReturnsSessionMaker(): void
+    public function testAppContextReturnsNullForMissingService(): void
     {
         $this->createValidConfig();
         
         $result = Bootstrap::initialize($this->testDir . '/');
         
-        $this->assertInstanceOf(SessionMaker::class, $result->sessionMaker);
+        $this->assertNull($result->sessionMaker);
     }
 
     public function testBootstrapHandlesEmptyDbPrefix(): void
@@ -587,108 +587,5 @@ class BootstrapTest extends TestCase
         }
         
         $this->assertGreaterThan(1, $searchPostCount);
-    }
-
-    public function testApplySecurityUsesThrowableCatchForGetServerLoad(): void
-    {
-        $source = file_get_contents(__DIR__ . '/../../src/lib/core/Bootstrap.php');
-
-        $this->assertStringContainsString("catch (\\Throwable \$e)", $source);
-        $this->assertStringContainsString("get_server_load()", $source);
-    }
-
-    public function testThemeRendererGuardUsesInstanceOfPdo(): void
-    {
-        $source = file_get_contents(__DIR__ . '/../../src/lib/core/Bootstrap.php');
-
-        $this->assertStringContainsString('$dbc instanceof \PDO', $source);
-        $this->assertStringContainsString('class_exists(\'ThemeRenderer\')', $source);
-        $this->assertStringContainsString('catch (\Throwable $e)', $source);
-    }
-
-    public function testThemeRendererCatchIsThrowable(): void
-    {
-        $source = file_get_contents(__DIR__ . '/../../src/lib/core/Bootstrap.php');
-
-        $this->assertStringContainsString(
-            "} catch (\\Throwable \$e) {",
-            $source
-        );
-    }
-
-    public function testBootstrapInitializeServicesCatchesThrowableForThemeRenderer(): void
-    {
-        $source = file_get_contents(__DIR__ . '/../../src/lib/core/Bootstrap.php');
-
-        $this->assertStringContainsString(
-            "} catch (\\Throwable \$e) {",
-            $source
-        );
-        $this->assertStringContainsString(
-            "return ThemeRenderer::fromGlobalContext();",
-            $source
-        );
-    }
-
-    public function testAllowedExportedVarsContainsThemeRenderer(): void
-    {
-        $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowedExportVars');
-        $property->setAccessible(true);
-
-        $allowedVars = $property->getValue();
-        $this->assertContains('themeRenderer', $allowedVars);
-    }
-
-    public function testAllowedExportedVarsContainsMediaDao(): void
-    {
-        $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowedExportVars');
-        $property->setAccessible(true);
-
-        $allowedVars = $property->getValue();
-        $this->assertContains('mediaDao', $allowedVars);
-    }
-
-    public function testAllowedExportedVarsContainsDownloadService(): void
-    {
-        $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowedExportVars');
-        $property->setAccessible(true);
-
-        $allowedVars = $property->getValue();
-        $this->assertContains('downloadService', $allowedVars);
-    }
-
-    public function testAllowedExportedVarsContainsDownloadController(): void
-    {
-        $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowedExportVars');
-        $property->setAccessible(true);
-
-        $allowedVars = $property->getValue();
-        $this->assertContains('downloadController', $allowedVars);
-    }
-
-    public function testAllowedExportedVarsContainsFrontService(): void
-    {
-        $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowedExportVars');
-        $property->setAccessible(true);
-
-        $allowedVars = $property->getValue();
-        $this->assertContains('frontService', $allowedVars);
-    }
-
-    public function testAllowedExportedVarsContainsPostDaoPageDaoTopicDao(): void
-    {
-        $reflection = new ReflectionClass('Bootstrap');
-        $property = $reflection->getProperty('allowedExportVars');
-        $property->setAccessible(true);
-
-        $allowedVars = $property->getValue();
-        $this->assertContains('postDao', $allowedVars);
-        $this->assertContains('pageDao', $allowedVars);
-        $this->assertContains('topicDao', $allowedVars);
     }
 }

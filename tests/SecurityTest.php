@@ -33,7 +33,29 @@ class SecurityTest extends TestCase
         $this->assertIsInt($id);
         $this->assertGreaterThan(0, $id);
     }
-    
+
+    public function testFormActionLoginIdPaddedToThreeDigits(): void
+    {
+        if (function_exists('form_action')) {
+            $result = form_action('login.php', ['LogIn', 7, 'testkey'], 'login');
+            $this->assertStringContainsString('Id=007', $result['doLogin']);
+
+            $result2 = form_action('login.php', ['LogIn', 42, 'testkey'], 'login');
+            $this->assertStringContainsString('Id=042', $result2['doLogin']);
+
+            $result3 = form_action('login.php', ['LogIn', 742, 'testkey'], 'login');
+            $this->assertStringContainsString('Id=742', $result3['doLogin']);
+        }
+    }
+
+    public function testFormActionLoginIdZeroPadded(): void
+    {
+        if (function_exists('form_action')) {
+            $result = form_action('login.php', ['LogIn', 0, 'testkey'], 'login');
+            $this->assertStringContainsString('Id=000', $result['doLogin']);
+        }
+    }
+
     public function testSimpleSalt(): void
     {
         $salt = simple_salt(16);

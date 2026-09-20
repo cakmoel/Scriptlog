@@ -16,13 +16,14 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
     private static $dao;
     private static $testPolicyIds = [];
 
-    private static $localeCounter = 0;
-
-    private static function uniqueLocale(): string
+    /**
+     * Generate a unique locale within the schema's VARCHAR(10) limit.
+     *
+     * @return string
+     */
+    private static function makeLocale(): string
     {
-        self::$localeCounter++;
-        $ts = substr(str_replace('.', '', microtime(true)), -6);
-        return 'xt' . $ts . self::$localeCounter;
+        return 'test' . substr(uniqid(), -6);
     }
 
     public static function setUpBeforeClass(): void
@@ -37,17 +38,8 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
             );
             
             // Load required classes
-            require_once __DIR__ . '/../../src/lib/core/Dao.php';
-            require_once __DIR__ . '/../../src/lib/core/Db.php';
-            require_once __DIR__ . '/../../src/lib/dao/PrivacyPolicyDao.php';
-            
-            // Set up Db in Registry for Dao constructor
-            $db = new Db([
-                'mysql:host=localhost;dbname=blogware_test;charset=utf8mb4',
-                'blogwareuser',
-                'userblogware'
-            ]);
-            Registry::set('dbc', $db);
+            require_once __DIR__ . '/../../lib/core/Dao.php';
+            require_once __DIR__ . '/../../lib/dao/PrivacyPolicyDao.php';
             
             // Initialize DAO
             self::$dao = new PrivacyPolicyDao();
@@ -75,7 +67,7 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
         if (!self::$db) return;
         
         // Delete test policies (not the default 'en')
-        $stmt = self::$db->prepare("DELETE FROM tbl_privacy_policies WHERE locale LIKE 'x%'");
+        $stmt = self::$db->prepare("DELETE FROM tbl_privacy_policies WHERE locale LIKE 'test%'");
         $stmt->execute();
     }
 
@@ -90,7 +82,7 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
 
     public function testCreatePolicy()
     {
-        $locale = self::uniqueLocale();
+        $locale = self::makeLocale();
         
         $id = self::$dao->createPolicy([
             'locale' => $locale,
@@ -107,7 +99,7 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
 
     public function testFindById()
     {
-        $locale = self::uniqueLocale();
+        $locale = self::makeLocale();
         
         $id = self::$dao->createPolicy([
             'locale' => $locale,
@@ -133,7 +125,7 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
 
     public function testFindByLocale()
     {
-        $locale = self::uniqueLocale();
+        $locale = self::makeLocale();
         
         self::$dao->createPolicy([
             'locale' => $locale,
@@ -149,7 +141,7 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
 
     public function testFindByLocaleReturnsNullForNonexistent()
     {
-        $policy = self::$dao->findByLocale('nonexist');
+        $policy = self::$dao->findByLocale('nonexistent_locale');
         
         $this->assertNull($policy);
     }
@@ -157,7 +149,7 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
     public function testFindDefault()
     {
         // First create a default policy
-        $locale = self::uniqueLocale();
+        $locale = self::makeLocale();
         
         $id = self::$dao->createPolicy([
             'locale' => $locale,
@@ -183,7 +175,7 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
 
     public function testUpdatePolicy()
     {
-        $locale = self::uniqueLocale();
+        $locale = self::makeLocale();
         
         $id = self::$dao->createPolicy([
             'locale' => $locale,
@@ -206,7 +198,7 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
 
     public function testDeletePolicy()
     {
-        $locale = self::uniqueLocale();
+        $locale = self::makeLocale();
         
         $id = self::$dao->createPolicy([
             'locale' => $locale,
@@ -224,7 +216,7 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
     public function testSetDefaultPolicy()
     {
         // Create first policy as default
-        $locale1 = self::uniqueLocale();
+        $locale1 = self::makeLocale();
         $id1 = self::$dao->createPolicy([
             'locale' => $locale1,
             'policy_title' => 'First Default',
@@ -233,7 +225,7 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
         ]);
         
         // Create second policy
-        $locale2 = self::uniqueLocale();
+        $locale2 = self::makeLocale();
         $id2 = self::$dao->createPolicy([
             'locale' => $locale2,
             'policy_title' => 'Second Default',
@@ -257,7 +249,7 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
     public function testClearDefaultPolicy()
     {
         // Create a default policy
-        $locale = self::uniqueLocale();
+        $locale = self::makeLocale();
         $id = self::$dao->createPolicy([
             'locale' => $locale,
             'policy_title' => 'Clear Test',
@@ -284,7 +276,7 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
 
     public function testSetAsDefaultPolicy()
     {
-        $locale = self::uniqueLocale();
+        $locale = self::makeLocale();
         
         $id = self::$dao->createPolicy([
             'locale' => $locale,
@@ -304,7 +296,7 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
 
     public function testPolicyExists()
     {
-        $locale = self::uniqueLocale();
+        $locale = self::makeLocale();
         
         self::$dao->createPolicy([
             'locale' => $locale,
@@ -316,14 +308,14 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
         
         $this->assertTrue($exists);
         
-        $notExists = self::$dao->policyExists('xnoexist');
+        $notExists = self::$dao->policyExists('nonexistent_locale_' . time());
         
         $this->assertFalse($notExists);
     }
 
     public function testCreatePolicyWithMinimalData()
     {
-        $locale = self::uniqueLocale();
+        $locale = self::makeLocale();
         
         $id = self::$dao->createPolicy([
             'locale' => $locale,
@@ -342,7 +334,7 @@ class PrivacyPolicyDaoIntegrationTest extends TestCase
 
     public function testCreateDuplicateLocaleThrowsException()
     {
-        $locale = self::uniqueLocale();
+        $locale = self::makeLocale();
         
         self::$dao->createPolicy([
             'locale' => $locale,

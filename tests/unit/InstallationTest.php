@@ -8,23 +8,11 @@ use PHPUnit\Framework\TestCase;
  * Tests installation utility functions from install/include/setup.php
  * Following PHPUnit best practices: Arrange-Act-Assert pattern
  * 
- * IMPORTANT: This test requires loading setup.php which has functions
- * that conflict with the main bootstrap. It must be run with a dedicated
- * bootstrap, not as part of the standard Unit Tests suite.
- * See: phpunit-installation.xml
+ * Note: Uses dedicated bootstrap-installation.php to avoid
+ * function redeclaration conflicts with lib/utility/db-mysqli.php
  */
 class InstallationTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        if (!function_exists('generate_random_key_filename')) {
-            $this->markTestSkipped(
-                'InstallationTest requires dedicated bootstrap. ' .
-                'Run: phpunit --bootstrap tests/bootstrap-installation.php tests/unit/InstallationTest.php'
-            );
-        }
-    }
-
     /**
      * Test that generate_random_key_filename returns a string
      * and follows the expected pattern (16 chars + .php)
@@ -408,7 +396,7 @@ class InstallationTest extends TestCase
     public function testSetupFileHasNoSyntaxErrors(): void
     {
         // Arrange
-        $setupFile = __DIR__ . '/../../src/install/include/setup.php';
+        $setupFile = __DIR__ . '/../../install/include/setup.php';
 
         // Act
         $output = [];
@@ -557,15 +545,15 @@ class InstallationTest extends TestCase
     }
 
     /**
-     * Test write_config_file has correct parameter signature (11 params)
+     * Test write_config_file has correct parameter signature (12 params)
      */
     public function testWriteConfigFileParameterSignature(): void
     {
         // Arrange
         $reflection = new ReflectionFunction('write_config_file');
 
-        // Assert - Function has 11 parameters
-        $this->assertEquals(11, $reflection->getNumberOfParameters());
+        // Assert - Function has 12 parameters (includes defuse_key_path)
+        $this->assertEquals(12, $reflection->getNumberOfParameters());
     }
 
     /**
@@ -607,5 +595,183 @@ class InstallationTest extends TestCase
 
         $url2 = setup_base_url('http', 'example.com');
         $this->assertStringContainsString('example.com', $url2);
+    }
+
+    /**
+     * Test friendly_mysql_error function exists
+     */
+    public function testFriendlyMysqlErrorFunctionExists(): void
+    {
+        $this->assertTrue(function_exists('friendly_mysql_error'));
+    }
+
+    /**
+     * Test friendly_mysql_error returns friendly message for error 2002 (host unreachable)
+     */
+    public function testFriendlyMysqlErrorHostUnreachable(): void
+    {
+        // Act
+        $msg = friendly_mysql_error(2002, 'getaddrinfo failed', 'sql999.example.com', 'user', 'testdb');
+
+        // Assert
+        $this->assertStringContainsString('Could not reach database server', $msg);
+        $this->assertStringContainsString('sql999.example.com', $msg);
+        $this->assertStringContainsString('verify the hostname', $msg);
+    }
+
+    /**
+     * Test friendly_mysql_error returns friendly message for error 1045 (access denied)
+     */
+    public function testFriendlyMysqlErrorAccessDenied(): void
+    {
+        // Act
+        $msg = friendly_mysql_error(1045, 'Access denied', 'localhost', 'wronguser', 'testdb');
+
+        // Assert
+        $this->assertStringContainsString('Access denied for user', $msg);
+        $this->assertStringContainsString('wronguser', $msg);
+        $this->assertStringContainsString('check your database username', $msg);
+    }
+
+    /**
+     * Test friendly_mysql_error returns friendly message for error 1049 (unknown database)
+     */
+    public function testFriendlyMysqlErrorUnknownDatabase(): void
+    {
+        // Act
+        $msg = friendly_mysql_error(1049, 'Unknown database', 'localhost', 'user', 'nonexistent_db');
+
+        // Assert
+        $this->assertStringContainsString('does not exist', $msg);
+        $this->assertStringContainsString('nonexistent_db', $msg);
+        $this->assertStringContainsString('create it', $msg);
+    }
+
+    /**
+     * Test friendly_mysql_error falls back to generic message for unknown error codes
+     */
+    public function testFriendlyMysqlErrorGenericFallback(): void
+    {
+        // Act
+        $msg = friendly_mysql_error(1234, 'Some weird error', 'localhost', 'user', 'testdb');
+
+        // Assert
+        $this->assertStringContainsString('Database connection failed', $msg);
+        $this->assertStringContainsString('Some weird error', $msg);
+    }
+
+    /**
+     * Test make_connection throws RuntimeException instead of mysqli_sql_exception
+     * Use localhost with wrong port to get fast failure (connection refused)
+     */
+    public function testMakeConnectionThrowsRuntimeException(): void
+    {
+        // Expect RuntimeException, not mysqli_sql_exception (old behavior)
+        $this->expectException(RuntimeException::class);
+
+        // Act - Port 1 should get connection refused very fast on localhost
+        make_connection('localhost', 'nobody', 'wrongpass', 'nonexistent', '1');
+    }
+
+    /**
+     * Test make_connection error message is user friendly
+     */
+    public function testMakeConnectionErrorIsUserFriendly(): void
+    {
+        try {
+            make_connection('localhost', 'nobody', 'wrongpass', 'nonexistent', '1');
+        } catch (RuntimeException $e) {
+            $msg = $e->getMessage();
+            $this->assertStringNotContainsString('php_network_getaddresses', $msg,
+                'Must not contain raw DNS error');
+            $this->assertStringNotContainsString('getaddrinfo', $msg,
+                'Must not contain raw getaddrinfo error');
+            $this->assertStringNotContainsString('mysqli', $msg,
+                'Must not contain raw mysqli error');
+            return;
+        }
+        $this->fail('Expected RuntimeException was not thrown');
+    }
+
+    /**
+     * Test install_i18n_data calls set_time_limit(120) to prevent timeout
+     * on slow systems (Windows, IIS, VM, etc.)
+     */
+    public function testInstallI18nDataSetsTimeLimit(): void
+    {
+        $reflection = new ReflectionFunction('install_i18n_data');
+        $source = self::getFunctionBody($reflection);
+
+        $this->assertStringContainsString(
+            'set_time_limit(120)',
+            $source,
+            'install_i18n_data must call set_time_limit(120) to prevent timeout on bulk inserts'
+        );
+    }
+
+    /**
+     * Test install_i18n_data wraps translation INSERT loop in a MySQL transaction
+     * with correct structural ordering: begin_transaction → try → foreach → commit
+     *
+     * This verifies the full transaction scaffold using positional assertions
+     * so every token is tested in its proper context.
+     */
+    public function testInstallI18nDataTransactionStructure(): void
+    {
+        $reflection = new ReflectionFunction('install_i18n_data');
+        $source = self::getFunctionBody($reflection);
+
+        // All tokens must exist
+        $beginTrans    = strpos($source, '$link->begin_transaction()');
+        $tryBlock      = strpos($source, 'try {');
+        $foreach       = strpos($source, 'foreach ($translations as $context => $keys)');
+        $linkCommit    = strpos($source, '$link->commit()');
+        $catchBlock    = strpos($source, 'catch (Exception $e)');
+        $linkRollback  = strpos($source, '$link->rollback()');
+        $throwE        = strpos($source, 'throw $e');
+
+        $this->assertNotFalse($beginTrans,   'Missing $link->begin_transaction()');
+        $this->assertNotFalse($tryBlock,     'Missing try {');
+        $this->assertNotFalse($foreach,      'Missing translation foreach loop');
+        $this->assertNotFalse($linkCommit,   'Missing $link->commit()');
+        $this->assertNotFalse($catchBlock,   'Missing catch (Exception $e)');
+        $this->assertNotFalse($linkRollback, 'Missing $link->rollback()');
+        $this->assertNotFalse($throwE,       'Missing throw $e');
+
+        // Strict ordering proves correct structure:
+        // 1. begin_transaction opens the transaction
+        // 2. try { guards the loop
+        // 3. foreach executes all INSERTs
+        // 4. commit() persists on success
+        // 5. catch handles exceptions
+        // 6. rollback() undoes on failure
+        // 7. throw $e re-raises after rollback
+        $this->assertLessThan($tryBlock,     $beginTrans,   'begin_transaction must come BEFORE try');
+        $this->assertLessThan($foreach,      $tryBlock,     'try { must come BEFORE the foreach loop');
+        $this->assertLessThan($linkCommit,   $foreach,      'foreach loop must come BEFORE commit');
+        $this->assertLessThan($catchBlock,   $linkCommit,   'commit must come BEFORE catch');
+        $this->assertLessThan($linkRollback, $catchBlock,   'catch must come BEFORE rollback');
+        $this->assertLessThan($throwE,       $linkRollback, 'rollback must come BEFORE throw $e');
+    }
+
+    /**
+     * Extract function body as a string for source analysis
+     *
+     * @param ReflectionFunction $reflection
+     * @return string
+     */
+    private static function getFunctionBody(ReflectionFunction $reflection): string
+    {
+        $filename = $reflection->getFileName();
+        $startLine = $reflection->getStartLine();
+        $endLine = $reflection->getEndLine();
+
+        $lines = file($filename);
+        $body = '';
+        for ($i = $startLine - 1; $i < $endLine; $i++) {
+            $body .= $lines[$i];
+        }
+
+        return $body;
     }
 }

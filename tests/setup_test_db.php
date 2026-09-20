@@ -50,6 +50,7 @@ try {
           post_sticky INT(5) NOT NULL DEFAULT "0",   
           post_type varchar(120) NOT NULL DEFAULT "blog",   
           comment_status varchar(20) NOT NULL DEFAULT "open",
+          post_locale VARCHAR(10) NOT NULL DEFAULT "en",
           passphrase varchar(255) DEFAULT NULL,
           PRIMARY KEY (ID),
           KEY author_id(post_author),
@@ -61,6 +62,7 @@ try {
           topic_title varchar(255) NOT NULL,    
           topic_slug varchar(255) NOT NULL,    
           topic_status enum("Y","N") NOT NULL DEFAULT "Y",
+          topic_locale VARCHAR(10) NOT NULL DEFAULT "en",
           PRIMARY KEY (ID)
         )Engine=InnoDB DEFAULT CHARSET=utf8mb4',
 
@@ -121,6 +123,7 @@ try {
            menu_link VARCHAR(255) DEFAULT NULL,
            menu_status ENUM("Y", "N") NOT NULL DEFAULT "N",
            menu_visibility VARCHAR(20) NOT NULL DEFAULT "public",
+           menu_locale VARCHAR(10) NOT NULL DEFAULT "en",
            parent_id INT(11) UNSIGNED NOT NULL DEFAULT "0",
            menu_sort INT(11) UNSIGNED NOT NULL DEFAULT "0",
            PRIMARY KEY (ID)
@@ -209,6 +212,58 @@ try {
     ]);
     
     echo "Test admin user created!\n";
+    
+    // ===== Language Switcher Test Data =====
+    
+    // Insert default languages
+    $langStmt = $pdo->prepare("INSERT IGNORE INTO tbl_languages (lang_code, lang_name, lang_native, lang_locale, lang_direction, lang_sort, lang_is_default, lang_is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    
+    // English (default)
+    $langStmt->execute(['en', 'English', 'English', 'en_US', 'ltr', 1, 1, 1]);
+    // Arabic (RTL)
+    $langStmt->execute(['ar', 'Arabic', 'العربية', 'ar_SA', 'rtl', 2, 0, 1]);
+    // Chinese
+    $langStmt->execute(['zh', 'Chinese', '中文', 'zh_CN', 'ltr', 3, 0, 1]);
+    // French
+    $langStmt->execute(['fr', 'French', 'Français', 'fr_FR', 'ltr', 4, 0, 1]);
+    // Spanish
+    $langStmt->execute(['es', 'Spanish', 'Español', 'es_ES', 'ltr', 5, 0, 1]);
+    // Indonesian
+    $langStmt->execute(['id', 'Indonesian', 'Bahasa Indonesia', 'id_ID', 'ltr', 6, 0, 1]);
+    
+    echo "Languages seeded!\n";
+    
+    // Insert test posts with different locales
+    $postStmt = $pdo->prepare("INSERT IGNORE INTO tbl_posts (post_title, post_slug, post_content, post_status, post_type, post_locale, post_author, post_date) VALUES (?, ?, ?, 'publish', 'blog', ?, 1, '2026-01-15 10:00:00')");
+    
+    $postStmt->execute(['English Post', 'english-post', 'This is an English test post content', 'en']);
+    $postStmt->execute(['Arabic Post', 'arabic-post', 'هذا هو محتوى مشاركة اختبار باللغة العربية', 'ar']);
+    $postStmt->execute(['Chinese Post', 'chinese-post', '这是一篇中文测试文章内容', 'zh']);
+    $postStmt->execute(['French Post', 'french-post', 'Ceci est un contenu de test en français', 'fr']);
+    
+    echo "Test posts seeded!\n";
+    
+    // Insert test topics with different locales
+    $topicStmt = $pdo->prepare("INSERT IGNORE INTO tbl_topics (topic_title, topic_slug, topic_status, topic_locale) VALUES (?, ?, 'Y', ?)");
+    
+    $topicStmt->execute(['English Category', 'english-category', 'en']);
+    $topicStmt->execute(['Arabic Category', 'arabic-category', 'ar']);
+    $topicStmt->execute(['Chinese Category', 'chinese-category', 'zh']);
+    
+    echo "Test topics seeded!\n";
+    
+    // Insert test menu items with different locales
+    $menuStmt = $pdo->prepare("INSERT IGNORE INTO tbl_menu (menu_label, menu_link, menu_status, menu_locale, menu_sort) VALUES (?, ?, 'Y', ?, ?)");
+    
+    $menuStmt->execute(['Home', '/', 'en', 1]);
+    $menuStmt->execute(['الرئيسية', '/', 'ar', 1]);
+    $menuStmt->execute(['首页', '/', 'zh', 1]);
+    $menuStmt->execute(['Accueil', '/', 'fr', 1]);
+    $menuStmt->execute(['Blog', '/blog', 'en', 2]);
+    $menuStmt->execute(['مدونة', '/blog', 'ar', 2]);
+    $menuStmt->execute(['博客', '/blog', 'zh', 2]);
+    
+    echo "Test menu items seeded!\n";
     
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage() . "\n";

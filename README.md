@@ -8,7 +8,7 @@
 [![MariaDB Version](https://img.shields.io/badge/MariaDB-10.3%2B-003545.svg)](https://mariadb.org/)
 [![PSR-12](https://img.shields.io/badge/PSR--12-Compliant-2C2C2C.svg)](https://www.php-fig.org/psr/psr-12/)
 [![Tests](https://github.com/cakmoel/Scriptlog/actions/workflows/tests.yml/badge.svg)](https://github.com/cakmoel/Scriptlog/actions/workflows/tests.yml)
-![Scriptlog Mascot](assets/scriptlog-mascot-min.png)
+![Scriptlog Mascot](assets/scriptlog-vector-logo.png)
 
 ---
 
@@ -30,14 +30,14 @@ Scriptlog is not designed to replace full-scale CMS frameworks. Instead, it is m
 ## Requirements
 
 Ensure your hosting environment meets the following requirements:
-- **PHP:** 7.4 - 8.5 (with extensions: `pdo`, `pdo_mysql`, `json`, `mbstring`, `curl`, `gd`, `fileinfo`, `openssl`)
+- **PHP:** 7.4 - 8.5 (with extensions: `pdo`, `pdo_mysql`, `mbstring`, `iconv`, `fileinfo`, `gd`, `curl`, `openssl`, `json`)
 - **Web Server:** Apache (with `mod_rewrite` enabled) or Nginx
 - **Database:** MySQL 5.7+ or MariaDB 10.3+
 - **Composer:** Latest (for dependency management)
 
 ## Installation
 
-The application lives in the `src/` directory, which is also your web root. All commands below run from the repository root.
+The application is served from the project root, which is your web root: `index.php` is the front controller and `admin/index.php` is the admin entry point. All commands below run from the repository root.
 
 1. **Clone the Repository**
    ```bash
@@ -53,21 +53,15 @@ The application lives in the `src/` directory, which is also your web root. All 
 
 3. **Set Permissions**
    ```bash
-   # Directories: readable and executable, Files: readable only
-   find src/public -type d -exec chmod 755 {} \;
-   find src/public -type f -exec chmod 644 {} \;
-
-   # Writable directories (web server needs write access)
-   chmod -R 775 src/public/cache src/public/log
-
-   # Writable uploads - directories only, files stay non-executable
-   find src/public/files -type d -exec chmod 775 {} \;
-   find src/public/files -type f -exec chmod 644 {} \;
-
-   # Restrict access to configuration files
-   chmod 640 src/config.php src/.env
+   # Writable directories the installer verifies (web server needs write access)
+   chmod -R 775 public/cache public/log public/files public/themes admin/plugins
    ```
-   > **Note:** Adjust ownership if needed - the web server user (e.g., `www-data`) must own or be in the group of `src/public/cache`, `src/public/log`, and `src/public/files`.
+   > **Note:** Adjust ownership if needed - the web server user (e.g., `www-data`) must be able to write to `public/cache`, `public/log`, `public/files`, `public/themes`, and `admin/plugins`.
+
+   After the installer finishes, restrict access to the generated configuration files:
+   ```bash
+   chmod 640 config.php .env
+   ```
 
 4. **Database Setup**
    Create a new empty database (use `utf8mb4_general_ci` collation).
@@ -75,25 +69,25 @@ The application lives in the `src/` directory, which is also your web root. All 
 5. **Run the Installer**
    Navigate to `/install/` in your web browser and follow the wizard:
    - Step 1: System Requirements Check (`install/index.php`)
-   - Step 2: Database Setup (`install/setup-db.php`) - creates 22 tables
+   - Step 2: Database Setup (`install/setup-db.php`) - creates 23 tables
    - Step 3: Complete Setup (`install/finish.php`)
 
 6. **Cleanup (Critical)**
-   For security purposes, **delete the `src/install/` directory** immediately after installation is complete.
+   For security purposes, **delete the `install/` directory** immediately after installation is complete.
 
 ### Configuration Files
 
-After installation, two configuration files are generated in `src/`:
+After installation, the following configuration files are generated:
 
 | File | Purpose |
 |------|---------|
-| `src/config.php` | Main configuration with `$_ENV` fallbacks |
-| `src/.env` | Environment variables (auto-generated) |
-| `storage/keys/[random_filename].php` | Defuse encryption key for authentication cookies (kept outside the web root) |
+| `config.php` | Main configuration with `$_ENV` fallbacks |
+| `.env` | Environment variables (auto-generated) |
+| `../storage/keys/[random_filename].php` | Defuse encryption key for authentication cookies (kept outside the web root) |
 
 ## Configuration
 
-Scriptlog supports both `.env` and `config.php` files for configuration. During installation, both files are automatically generated in the `src/` directory and kept in sync.
+Scriptlog supports both `.env` and `config.php` files for configuration. During installation, both files are automatically generated in the project root and kept in sync.
 
 ### config.php Structure
 
@@ -112,7 +106,7 @@ return [
         'url'   => $_ENV['APP_URL'] ?? 'https://your-domain.com',
         'email' => $_ENV['APP_EMAIL'] ?? '',
         'key'   => $_ENV['APP_KEY'] ?? '',
-        'defuse_key' => $_ENV['DEFUSE_KEY_PATH'] ?? 'storage/keys/[random].php'
+        'defuse_key' => $_ENV['DEFUSE_KEY_PATH'] ?? '/var/www/your-project/storage/keys/[random_filename].php'
     ],
     'mail' => [
         'smtp' => [
@@ -139,7 +133,7 @@ return [
 
 ## Running the Application
 
-The web root is the `src/` directory:
+The project root is the web root (`index.php` is the front controller):
 
 | Environment | URL |
 |-------------|-----|
@@ -151,80 +145,75 @@ The web root is the `src/` directory:
 
 ```
 Scriptlog/
-|-- assets/                    # Repository assets (mascot, graphics)
-|-- src/                       # Application root (your web root)
-|   |-- index.php              # Public front controller
-|   |-- config.php             # Main configuration (generated by the installer)
-|   |-- .env                   # Environment variables (generated by the installer)
-|   |
-|   |-- admin/                 # Administration panel (admin/index.php)
-|   |   |-- dashboard.php      # Dashboard
-|   |   |-- posts.php          # Post management
-|   |   |-- pages.php          # Page management
-|   |   |-- users.php          # User management
-|   |   |-- option-*.php       # Settings pages (general, mail, permalink, ...)
-|   |   +-- ...                # Other admin pages, UI assets, WYSIWYG editor
-|   |
-|   |-- api/                   # RESTful API (api/index.php, versioned at /api/v1/)
-|   |
-|   |-- install/               # Installer wizard (DELETE after installation)
-|   |   +-- include/           # Installer helpers (dbtable.php, check-engine.php, ...)
-|   |
-|   |-- lib/                   # Core library
-|   |   |-- main.php           # Application bootstrap loader
-|   |   |-- common.php         # Constants and shared functions
-|   |   |-- controller/        # Request controllers
-|   |   |-- core/              # Core classes (Bootstrap, Dispatcher, DbFactory, View, ...)
-|   |   |-- dao/               # Data Access Objects
-|   |   |-- dto/               # Data transfer objects
-|   |   |-- handler/           # Request and action handlers
-|   |   |-- model/             # Data models
-|   |   |-- service/           # Business logic layer
-|   |   |-- utility/           # Helper functions (200+ files)
-|   |   |-- validator/         # Input validation
-|   |   +-- vendor/            # Composer dependencies
-|   |
-|   |-- public/                # Public assets and generated files
-|   |   |-- themes/            # Theme templates (blog = default theme)
-|   |   |-- files/             # User uploads (pictures, audio, video, docs)
-|   |   |-- cache/             # Runtime cache
-|   |   +-- log/               # Log files
-|   |
-|   |-- docs/                  # Developer and user documentation
-|   |   |-- DEVELOPER_GUIDE.md
-|   |   |-- TESTING_GUIDE.md
-|   |   |-- THEME_DEVELOPER_GUIDE.md
-|   |   |-- PLUGIN_DEVELOPER_GUIDE.md
-|   |   |-- API_DOCUMENTATION.md
-|   |   |-- DATABASE_SCHEMA_GUIDE.md
-|   |   |-- API_OPENAPI.yaml
-|   |   +-- API_OPENAPI.json
-|   |
-|   |-- rss.php                # RSS feed
-|   |-- atom.php               # Atom feed
-|   |-- sitemap.php            # XML sitemap
-|   |-- robots.txt             # Search engine directives
-|   +-- readme.html            # In-app readme (installation reference)
+|-- index.php                    # Public front controller
+|-- config.php                   # Application configuration (generated by installer)
+|-- .env                         # Environment variables (generated by installer)
+|-- .htaccess                    # Apache rewrite and security rules
+|-- robots.txt                   # Search engine directives
+|-- rss.php / atom.php           # RSS and Atom feeds
+|-- sitemap.php                  # XML sitemap
+|-- readme.html                  # In-app readme (installation reference)
+|-- assets/                      # Repository assets (mascot, graphics)
 |
-|-- storage/                   # Sensitive data (KEEP outside the web root)
-|   +-- keys/                  # Defuse encryption keys
+|-- admin/                       # Administration panel (admin/index.php)
+|   |-- dashboard.php            # Dashboard
+|   |-- posts.php                # Post management
+|   |-- pages.php                # Page management
+|   |-- users.php                # User management
+|   |-- option-*.php             # Settings pages (general, mail, permalink, ...)
+|   |-- plugins/                 # Installed plugins (each in its own folder)
+|   |-- assets/                  # Admin assets
+|   +-- ...                      # Other admin pages, UI assets, WYSIWYG editor
 |
-|-- tests/                     # PHPUnit test suite
-|   |-- unit/                  # Unit tests
-|   |-- core/                  # Core class tests
-|   |-- controller/            # Controller tests
-|   |-- integration/           # Integration tests
-|   |-- service/               # Service tests
-|   +-- smoke/                 # Smoke tests
+|-- api/                         # RESTful API entry point (/api/v1/)
+|   +-- index.php
 |
-+-- composer.json              # Dependencies and scripts
-+-- phpunit.xml                # PHPUnit configuration
-+-- phpstan.neon               # PHPStan static analysis configuration
-+-- phpcs.xml                  # PHP_CodeSniffer configuration
-+-- psalm.xml                  # Psalm static analysis configuration
+|-- install/                     # Installer wizard (DELETE after installation)
+|   +-- include/                 # Installer helpers (dbtable.php, check-engine.php, ...)
+|
+|-- lib/                         # Core library
+|   |-- main.php                 # Application bootstrap loader
+|   |-- common.php               # Constants and shared functions
+|   |-- controller/              # Request controllers (20 files)
+|   |-- core/                    # Core classes (Bootstrap, Dispatcher, DbFactory, ...) (102 files)
+|   |-- dao/                     # Data Access Objects (19 files)
+|   |-- dto/                     # Data transfer objects
+|   |-- handler/                 # Request and action handlers (13 files + admin commands)
+|   |-- model/                   # Data models (9 files)
+|   |-- service/                 # Business logic layer (24 files)
+|   |-- utility/                 # Helper functions (224 files)
+|   |-- validator/               # Input validation (5 files)
+|   +-- vendor/                  # Composer dependencies
+|
+|-- public/                      # Public assets and generated files
+|   |-- themes/                  # Theme templates (blog = default theme)
+|   |-- files/                   # User uploads (pictures, audio, video, docs)
+|   |-- cache/                   # Runtime cache
+|   +-- log/                     # Log files
+|
+|-- docs/                        # Developer and user documentation
+|   |-- dev-docs/                # Developer guides and API reference
+|   +-- user-docs/               # End-user documentation
+|
+|-- tests/                       # PHPUnit test suite
+|   |-- unit/                    # Unit tests
+|   |-- core/                    # Core class tests
+|   |-- service/                 # Service tests
+|   |-- integration/             # Integration tests
+|   |-- api/                     # API tests
+|   |-- smoke/                   # Smoke tests
+|   +-- fixtures/                # Test fixtures
+|
++-- composer.json                # Dependencies and scripts
++-- phpunit.xml                  # PHPUnit configuration
++-- phpstan.neon                 # PHPStan static analysis configuration
++-- phpcs.xml                    # PHP_CodeSniffer configuration
++-- psalm.xml                    # Psalm static analysis configuration
 ```
 
-For detailed architecture and component documentation, see [DEVELOPER_GUIDE.md](src/docs/DEVELOPER_GUIDE.md).
+> **SECURITY:** The Defuse encryption key is written to `../storage/keys/` - a sibling of the application root, outside the web root (see `generate_defuse_key()` in `install/include/setup.php`).
+
+For detailed architecture and component documentation, see [DEVELOPER_GUIDE.md](docs/dev-docs/DEVELOPER_GUIDE.md).
 
 ## Development
 
@@ -240,30 +229,30 @@ Request -> Front Controller -> Bootstrap -> Dispatcher -> Controller -> Service 
 
 | Step | Component | Location |
 |------|-----------|----------|
-| 1 | **Front Controller** | `src/index.php` |
-| 2 | **Bootstrap** | `src/lib/core/Bootstrap.php` |
-| 3 | **Dispatcher** | `src/lib/core/Dispatcher.php` |
-| 4 | **Controller** | `src/lib/controller/*` |
-| 5 | **Service** | `src/lib/service/*` |
-| 6 | **DAO** | `src/lib/dao/*` |
-| 7 | **View** | `src/lib/core/View.php` |
+| 1 | **Front Controller** | `index.php` |
+| 2 | **Bootstrap** | `lib/core/Bootstrap.php` |
+| 3 | **Dispatcher** | `lib/core/Dispatcher.php` |
+| 4 | **Controller** | `lib/controller/*` |
+| 5 | **Service** | `lib/service/*` |
+| 6 | **DAO** | `lib/dao/*` |
+| 7 | **View** | `lib/core/View.php` |
 
 ### Adding New Features
 
 When adding features, follow the layered implementation pattern:
-1. **Database Table:** Add to `src/install/include/dbtable.php`
-2. **DAO:** Create in `src/lib/dao/` (Database interactions)
-3. **Service:** Create in `src/lib/service/` (Business logic)
-4. **Controller:** Create in `src/lib/controller/` (Request handling)
-5. **Routes:** Add to `src/lib/core/Bootstrap.php`
+1. **Database Table:** Add to `install/include/dbtable.php`
+2. **DAO:** Create in `lib/dao/` (Database interactions)
+3. **Service:** Create in `lib/service/` (Business logic)
+4. **Controller:** Create in `lib/controller/` (Request handling)
+5. **Routes:** Add to `lib/core/Bootstrap.php`
 
 > **WARNING:** Never bypass the DAO layer when accessing the database. Always use prepared statements to prevent SQL injection.
 
 ### Key Commands
 
-Run the following from the application root (`src/`):
+Run the following from the project root:
 - **Run Tests:** `lib/vendor/bin/phpunit`
-- **Static Analysis:** `lib/vendor/bin/phpstan analyse` (see [TESTING_GUIDE.md](src/docs/TESTING_GUIDE.md))
+- **Static Analysis:** `lib/vendor/bin/phpstan analyse` (see [TESTING_GUIDE.md](docs/dev-docs/TESTING_GUIDE.md))
 
 ## Security Features
 
