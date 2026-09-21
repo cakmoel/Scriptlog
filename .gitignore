@@ -11,6 +11,10 @@
 !docs/screenshots/
 !docs/screenshots/*.png
 
+# Keep the blog theme's image assets so fresh clones render without 404s
+!public/themes/blog/assets/img/hero.jpg
+!public/themes/blog/assets/img/placeholder.svg
+
 # Session files
 sess_*
 # --- System / IDE ---
