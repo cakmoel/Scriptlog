@@ -35,6 +35,11 @@ function rowForEmail(page: Page, email: string): Locator {
 }
 
 test.describe('GDPR admin data requests', () => {
+  // The seeded request rows are mutated by earlier tests (complete/reject), so
+  // these tests must run in declaration order on one worker instead of racing
+  // across fullyParallel workers.
+  test.describe.configure({ mode: 'serial' });
+
   test.beforeAll((): void => {
     clearRateLimiters();
     clearLoginAttempts();
@@ -83,7 +88,11 @@ test.describe('GDPR admin data requests', () => {
     await page.goto(REQUESTS_URL);
 
     const row: Locator = rowForEmail(page, 'erasure@e2e.local');
-    await row.locator('button', { hasText: 'Complete' }).click();
+    const completeForm: Locator = row.locator('form', {
+      has: page.locator('input[name="action"][value="complete"]'),
+    });
+    await noValidate(completeForm);
+    await completeForm.locator('button[type="submit"]').click();
 
     await expect(page.locator('.alert-success')).toContainText('updated');
     await expect(rowForEmail(page, 'erasure@e2e.local')).toContainText(
@@ -151,11 +160,12 @@ test.describe('GDPR admin data requests', () => {
         `SELECT COUNT(*) FROM tbl_comments WHERE comment_author_email='${GDPR_EMAIL}'`,
       ),
     ).toBe(0);
+    // Comment anonymized: the exact seeded comment is rewritten to "Deleted User".
     expect(
-      dbCount(
-        `SELECT COUNT(*) FROM tbl_comments WHERE comment_author_name='Deleted User'`,
+      dbScalar(
+        `SELECT comment_author_name FROM tbl_comments WHERE comment_content='A comment left by the GDPR e2e subject.'`,
       ),
-    ).toBe(1);
+    ).toBe('Deleted User');
     // Post reassigned to fallback author 767.
     expect(
       dbScalar(
