@@ -8,17 +8,68 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    # The e2e suite talks to a dedicated blogware_e2e database over 127.0.0.1:3306
+    # (see e2e/blog-selectors.ts and e2e/gdpr-fixtures.ts), and the app's own
+    # router (e2e/router.php) serves it over http://127.0.0.1:8099.
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: blogware_e2e
+          MARIADB_USER: blogwareuser
+          MARIADB_PASSWORD: userblogware
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
     steps:
     - uses: actions/checkout@v4
+
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+        cache: npm
+
     - name: Install dependencies
       run: npm ci
+
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: pdo, pdo_mysql, mbstring, json, curl, gd, fileinfo, openssl
+        tools: composer:v2
+
+    - name: Install PHP dependencies
+      run: composer install --no-interaction --prefer-dist
+      env:
+        COMPOSER_PLATFORM_CHECK: 'false'
+
+    - name: Install MySQL client
+      run: sudo apt-get update && sudo apt-get install -y mariadb-client
+
+    - name: Materialize app configuration
+      # config.php is gitignored, so it must be created on runners (admin/login.php
+      # redirects to /install when it is missing). The e2e fixture carries
+      # concrete values for the seeded database and dev server.
+      run: cp e2e/config.ci.php config.php
+
+    - name: Import seeded e2e database
+      run: |
+        mysql -h 127.0.0.1 -P 3306 -u blogwareuser -puserblogware blogware_e2e < e2e/blogware_e2e.sql
+      env:
+        MYSQL_PWD: userblogware
+
     - name: Run Playwright tests
       run: npx playwright test
+
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
