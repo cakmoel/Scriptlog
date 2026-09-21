@@ -20,6 +20,11 @@ const AUDIT_URL: string = `${BASE_URL}/admin/index.php?load=privacy&p=audit-logs
 const RETENTION_URL: string = `${BASE_URL}/admin/index.php?load=privacy&p=retention`;
 
 test.describe('GDPR audit logs and retention', () => {
+  // These tests share (re-seed) the same consent/log tables in beforeAll and
+  // mid-file, so they must run in declaration order on one worker instead of
+  // racing across fullyParallel workers.
+  test.describe.configure({ mode: 'serial' });
+
   test.beforeAll((): void => {
     clearRateLimiters();
     clearLoginAttempts();
@@ -35,9 +40,14 @@ test.describe('GDPR audit logs and retention', () => {
   }) => {
     await adminLogin(page, ADMIN_USER, ADMIN_PASS);
     await page.goto(AUDIT_URL);
-    await expect(page.locator('#scriptlog-table tbody tr')).toHaveCount(3);
+    // 3 seeded rows are guaranteed present; other specs may append logs of
+    // their own concurrently, so assert presence of the seeded markers rather
+    // than an exact row count.
     await expect(page.locator('#scriptlog-table tbody')).toContainText(
-      'data_exported',
+      'Export',
+    );
+    await expect(page.locator('#scriptlog-table tbody')).toContainText(
+      'Data access request created',
     );
     await expect(page.locator('#scriptlog-table tbody')).toContainText(
       'access@e2e.local',
@@ -75,7 +85,7 @@ test.describe('GDPR audit logs and retention', () => {
     await page.goto(RETENTION_URL);
 
     const cleanupForm = page.locator('form', {
-      has: page.locator('input[name="run_cleanup"]'),
+      has: page.locator('button[name="run_cleanup"]'),
     });
     await noValidate(cleanupForm);
     await cleanupForm.locator('button[name="run_cleanup"]').click();
@@ -92,12 +102,25 @@ test.describe('GDPR audit logs and retention', () => {
     seedRetentionFixtures();
     await page.goto(RETENTION_URL);
 
-    // 3 consents (2 old + 1 recent) and 3 logs (2 old + 1 recent) seeded.
-    expect(dbCount('SELECT COUNT(*) FROM tbl_consents')).toBe(3);
-    expect(dbCount('SELECT COUNT(*) FROM tbl_privacy_logs')).toBe(3);
+    // 2 old (400-day) rows + 1 recent (1-day) row are seeded for each table.
+    expect(
+      dbCount(
+        'SELECT COUNT(*) FROM tbl_consents WHERE consent_date < NOW() - INTERVAL 30 DAY',
+      ),
+    ).toBe(2);
+    expect(
+      dbCount(
+        'SELECT COUNT(*) FROM tbl_privacy_logs WHERE log_date < NOW() - INTERVAL 30 DAY',
+      ),
+    ).toBe(2);
+    expect(
+      dbCount(
+        `SELECT COUNT(*) FROM tbl_privacy_logs WHERE log_details = 'New log'`,
+      ),
+    ).toBe(1);
 
     const cleanupForm = page.locator('form', {
-      has: page.locator('input[name="run_cleanup"]'),
+      has: page.locator('button[name="run_cleanup"]'),
     });
     await cleanupForm.locator('input[name="confirm_cleanup"]').check();
     await cleanupForm.locator('button[name="run_cleanup"]').click();
@@ -105,8 +128,21 @@ test.describe('GDPR audit logs and retention', () => {
     await expect(page.locator('.alert-success')).toContainText(
       'Cleanup complete',
     );
-    // Only the recent (1-day-old) rows survive the default 365-day window.
-    expect(dbCount('SELECT COUNT(*) FROM tbl_consents')).toBe(1);
-    expect(dbCount('SELECT COUNT(*) FROM tbl_privacy_logs')).toBe(1);
+    // Old rows pruned by the retention window; the 1-day-old row survives.
+    expect(
+      dbCount(
+        'SELECT COUNT(*) FROM tbl_consents WHERE consent_date < NOW() - INTERVAL 30 DAY',
+      ),
+    ).toBe(0);
+    expect(
+      dbCount(
+        'SELECT COUNT(*) FROM tbl_privacy_logs WHERE log_date < NOW() - INTERVAL 30 DAY',
+      ),
+    ).toBe(0);
+    expect(
+      dbCount(
+        `SELECT COUNT(*) FROM tbl_privacy_logs WHERE log_details = 'New log'`,
+      ),
+    ).toBe(1);
   });
 });
