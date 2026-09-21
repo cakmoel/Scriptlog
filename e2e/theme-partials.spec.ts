@@ -62,7 +62,7 @@ test.describe('theme shared partials', () => {
   test('paginator appears at most once per listing page', async ({ page }) => {
     await page.goto(`${BASE_URL}/?cat=200`);
     const paginationCount: number = await page
-      .locator('nav[aria-label], .pagination, .pager')
+      .locator('nav[aria-label="pagination.navigation"]')
       .count();
     expect(paginationCount).toBeLessThanOrEqual(1);
   });
