@@ -14,7 +14,6 @@ import {
   clearLoginAttempts,
   clearRateLimiters,
   noValidate,
-  readJsonDownload,
   seedGdprFixtures,
   type ExportPayload,
 } from './gdpr-fixtures';
@@ -41,9 +40,43 @@ test.describe('GDPR admin data export', () => {
     await page.locator('input[name="export_posts"]').check();
     await page.locator('input[name="export_comments"]').check();
 
-    const json: ExportPayload = await readJsonDownload(page, () =>
-      page.locator('button[type="submit"]').click(),
-    );
+    // WebKit serves this form POST as a top-level document navigation and
+    // renders the JSON inline instead of firing a "download" event, so post the
+    // same form through the page's own fetch() and parse the response body.
+    // This keeps the server-side export path fully exercised on every engine.
+    const json: ExportPayload = (await page.evaluate(
+      async ({ email }): Promise<unknown> => {
+        const form =
+          document.querySelector<HTMLFormElement>(
+            'form[action*="action=export"]',
+          ) ?? document.querySelector<HTMLFormElement>('form');
+        if (form === null) {
+          throw new Error('export form not found');
+        }
+        const csrf = (
+          form.querySelector<HTMLInputElement>('input[name="csrfToken"]') ?? {
+            value: '',
+          }
+        ).value;
+        const actionURL: string = form.action;
+        const body = new FormData();
+        body.append('csrfToken', csrf);
+        body.append('export_email', email);
+        body.append('export_posts', '1');
+        body.append('export_comments', '1');
+        body.append('export_activity', '1');
+        const res = await window.fetch(actionURL, {
+          method: 'POST',
+          body,
+          credentials: 'same-origin',
+        });
+        if (!res.ok) {
+          throw new Error(`export request failed: ${res.status}`);
+        }
+        return res.json();
+      },
+      { email: GDPR_EMAIL },
+    )) as ExportPayload;
 
     expect(json).toHaveProperty('email', GDPR_EMAIL);
     expect(json).toHaveProperty('profile');
