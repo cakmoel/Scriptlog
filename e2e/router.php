@@ -46,6 +46,44 @@ if ($routerIsDocument) {
     $_SERVER['HTTPS'] = 'on';
 }
 
+// The HTTPS spoof above also makes the app mark its session/auth cookies
+// "Secure" (is_cookies_secured() mirrors is_ssl()). The PHP dev server is plain
+// HTTP, and WebKit refuses to store Secure cookies received over an insecure
+// connection - so the session the admin login created evaporates on the very
+// next document navigation and the flow bounces back to the login page. Keep
+// the spoof (it silences the CSP upgrade-insecure-requests directive and lets
+// Bootstrap/theme CSS render) but scrub the Secure flag off every Set-Cookie
+// header before the response is flushed.
+// Hold ALL output in RAM so the header rewrite below can always run. The
+// built-in server default (output_buffering=0) flushes headers with the page's
+// first byte, and a plain ini_set() only raises the auto-flush threshold - a
+// large page (the dashboard) still flushes mid-request and the Secure-flag
+// scrub below silently no-ops. A chunked ob_start(NULL, 0) never auto-flushes.
+ini_set('zlib.output_compression', 'Off');
+ob_start(null, 0);
+register_shutdown_function(function (): void {
+    // Never let the header rewrite throw: a request may have already flushed
+    // its headers (the app decides to send the response early), and PHP turns
+    // header_remove()/header() warnings into an ErrorException caught by the
+    // app's Whoops handler, which would replace a valid download with an error
+    // page. When headers already went out the Secure-flag scrub is a no-op.
+    if (headers_sent()) {
+        return;
+    }
+    $cleanCookies = [];
+    foreach (headers_list() as $header) {
+        if (stripos($header, 'Set-Cookie:') === 0) {
+            $cleanCookies[] = preg_replace('/;\s*Secure\b/i', '', $header);
+        }
+    }
+    if ($cleanCookies) {
+        @header_remove('Set-Cookie');
+        foreach ($cleanCookies as $cookie) {
+            @header($cookie, false);
+        }
+    }
+});
+
 // The app derives APP_PROTOCOL from $_SERVER['HTTPS'], which would make every
 // admin redirect (direct_page/login) target https://127.0.0.1:8099 and break
 // against this HTTP-only server. Pin the protocol to http up front (common.php
