@@ -19,8 +19,11 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* Opt out of parallel tests: the e2e suite shares one database and the GDPR
+   * fixtures re-seed shared tables, so files must run serially (see
+   * e2e/gdpr-fixtures.ts). Parallel workers race each other's reseeds.
+   */
+  workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -30,6 +33,7 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
   },
 
   /* Configure projects for major browsers */
@@ -76,5 +80,9 @@ export default defineConfig({
     url: 'http://127.0.0.1:8099/admin/login.php',
     timeout: 120_000,
     reuseExistingServer: !process.env.CI,
+    // The PHP built-in server is single-threaded by default; webkit keeps
+    // multiple parallel connections open so a page's "load" event never fires
+    // under serial asset serving. Give the test server several workers.
+    env: { PHP_CLI_SERVER_WORKERS: '4' },
   },
 });
