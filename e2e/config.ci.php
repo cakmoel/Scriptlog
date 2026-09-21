@@ -14,23 +14,26 @@
  * @license  MIT
  */
 
+// CI-only fixture config. Every value prefers its E2E_* env override so CI can
+// inject GitHub Secrets; the literals below are ephemeral local-test defaults
+// for the throwaway blogware_e2e service container, never production secrets.
 return [
 
     'db' => [
 
-        'host' => '127.0.0.1',
-        'user' => 'blogwareuser',
-        'pass' => 'userblogware',
-        'name' => 'blogware_e2e',
-        'port' => '3306',
-        'prefix' => ''
+        'host' => $_ENV['E2E_DB_HOST'] ?? getenv('E2E_DB_HOST') ?: '127.0.0.1',
+        'user' => $_ENV['E2E_DB_USER'] ?? getenv('E2E_DB_USER') ?: 'blogwareuser',
+        'pass' => $_ENV['E2E_DB_PASS'] ?? getenv('E2E_DB_PASS') ?: 'userblogware',
+        'name' => $_ENV['E2E_DB_NAME'] ?? getenv('E2E_DB_NAME') ?: 'blogware_e2e',
+        'port' => $_ENV['E2E_DB_PORT'] ?? getenv('E2E_DB_PORT') ?: '3306',
+        'prefix' => $_ENV['E2E_DB_PREFIX'] ?? getenv('E2E_DB_PREFIX') ?: ''
     ],
 
     'app' => [
 
-        'url'   => 'http://127.0.0.1:8099',
+        'url'   => $_ENV['PLAYWRIGHT_BASE_URL'] ?? getenv('PLAYWRIGHT_BASE_URL') ?: 'http://127.0.0.1:8099',
         'email' => 'admin@blogware.site',
-        'key'   => 'F5R5TE-WL7VSG-KKAZRH-377C04',
+        'key'   => $_ENV['E2E_APP_KEY'] ?? getenv('E2E_APP_KEY') ?: 'F5R5TE-WL7VSG-KKAZRH-377C04',
         'defuse_key' => 'lib/utility/.lts/lts.php'
     ],
 

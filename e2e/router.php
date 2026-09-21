@@ -17,14 +17,18 @@
  * @license  MIT
  */
 
-$_ENV['DB_NAME'] = 'blogware_e2e';
-$_ENV['DB_USER'] = 'blogwareuser';
-$_ENV['DB_PASS'] = 'userblogware';
-$_ENV['DB_HOST'] = '127.0.0.1';
-$_ENV['DB_PORT'] = '3306';
-$_ENV['DB_PREFIX'] = '';
-$_ENV['APP_KEY'] = 'GVXUD7-72HUXD-2TFCDT-8DDC2A';
-$_ENV['APP_URL'] = 'http://127.0.0.1:8099';
+// Ephemeral e2e-only connection: the database is a throwaway service container
+// (see .github/workflows/playwright.yml) or a local blogware_e2e schema. Values
+// are overridable via E2E_DB_* so no credential is frozen in the repo; the
+// fallbacks below are local-only test defaults, never production secrets.
+$_ENV['DB_NAME'] = getenv('E2E_DB_NAME') ?: 'blogware_e2e';
+$_ENV['DB_USER'] = getenv('E2E_DB_USER') ?: 'blogwareuser';
+$_ENV['DB_PASS'] = getenv('E2E_DB_PASS') ?: (getenv('MYSQL_PWD') ?: 'userblogware');
+$_ENV['DB_HOST'] = getenv('E2E_DB_HOST') ?: '127.0.0.1';
+$_ENV['DB_PORT'] = getenv('E2E_DB_PORT') ?: '3306';
+$_ENV['DB_PREFIX'] = getenv('E2E_DB_PREFIX') ?: '';
+$_ENV['APP_KEY'] = getenv('E2E_APP_KEY') ?: 'GVXUD7-72HUXD-2TFCDT-8DDC2A';
+$_ENV['APP_URL'] = getenv('PLAYWRIGHT_BASE_URL') ?: 'http://127.0.0.1:8099';
 
 // The production deployment is served over HTTPS (Apache on :443). Mark the
 // request as secure so the app skips the `upgrade-insecure-requests` CSP

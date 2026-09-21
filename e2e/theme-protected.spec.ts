@@ -11,6 +11,13 @@ const BASE_URL: string = BLOG_BASE_URL;
 const PROTECTED_POST: number = 12;
 const SECRET_TEXT: string =
   'This is the secret content of a protected e2e post.';
+// Fixture content password for the seeded protected post (post 12 in
+// blogware_e2e.sql). This unlocks synthetic fixture content only - it is not
+// an account credential and grants no access. Overridable for isolation, but
+// a non-default value requires re-seeding the post via protect_post() because
+// the encrypted body is tied to this password + APP_KEY.
+const PROTECTED_POST_PASSWORD: string =
+  process.env.E2E_PROTECTED_POST_PASSWORD || 'e2e-secret';
 // The app writes unlock-attempt counters under APP_ROOT/public/log (see
 // lib/utility/protected-post.php). Derive the path from the repo root so it
 // works on developers' machines and CI alike; the previous literal pointed at
@@ -112,7 +119,7 @@ test.describe('theme protected posts', () => {
     for (let i = 0; i < RETRIES; i++) {
       clearRateLimit();
       await page.goto(`${BASE_URL}/?p=${PROTECTED_POST}`);
-      await page.locator(BLOG.unlockInput).fill('e2e-secret');
+      await page.locator(BLOG.unlockInput).fill(PROTECTED_POST_PASSWORD);
       await page.locator(BLOG.unlockButton).click();
       // The reveal container fades in client-side (~300ms), so wait for
       // visibility instead of sampling `isVisible()` synchronously, which races
@@ -135,7 +142,7 @@ test.describe('theme protected posts', () => {
   test('correct password via API returns 200 with content', async ({
     request,
   }) => {
-    const res: APIResponse = await unlockWithRetry(request, 'e2e-secret', 200);
+    const res: APIResponse = await unlockWithRetry(request, PROTECTED_POST_PASSWORD, 200);
     expect(res.status()).toBe(200);
     const body = (await res.json()) as UnlockSuccessBody;
     expect(body.success).toBe(true);
@@ -160,7 +167,7 @@ test.describe('theme protected posts', () => {
       }
       limited = await request.post(
         `${BASE_URL}/api/v1/posts/${PROTECTED_POST}/unlock`,
-        { data: { password: 'e2e-secret' } },
+        { data: { password: PROTECTED_POST_PASSWORD } },
       );
       if (limited.status() === 429) break;
     }

@@ -1,7 +1,14 @@
 -- e2e/blogware_e2e.sql
 --
--- Seeded fixture database for the Playwright end-to-end suite. Regenerate with:
---   mysqldump -h 127.0.0.1 -P 3306 -u blogwareuser -puserblogware --skip-lock-tables --single-transaction blogware_e2e > e2e/blogware_e2e.sql
+-- Seeded fixture database for the Playwright end-to-end suite. Contains ONLY
+-- synthetic test fixtures (administrator + gdpr_user/noaccess_user with
+-- @e2e.local mailboxes, loopback IPs). No real PII or production secrets.
+-- Password hashes below are rotated placeholders: every spec syncs the live
+-- test DB to its runtime-resolved E2E_* password (see e2e/gdpr-fixtures.ts
+-- syncTestUserPasswords/seedGdprFixtures) before any login, so no committed
+-- hash corresponds to a usable password.
+-- Regenerate with (password via env, never on the command line):
+--   MYSQL_PWD="$E2E_DB_PASS" mysqldump -h 127.0.0.1 -P 3306 -u blogwareuser --skip-lock-tables --single-transaction blogware_e2e > e2e/blogware_e2e.sql
 --
 -- CI imports this into the mariadb service container before running the suite.
 --
@@ -890,9 +897,9 @@ CREATE TABLE `tbl_users` (
 LOCK TABLES `tbl_users` WRITE;
 /*!40000 ALTER TABLE `tbl_users` DISABLE KEYS */;
 INSERT INTO `tbl_users` VALUES
-(767,'administrator','admin@blogware.site','$2y$12$Zj3U.u32PCkokkMlYl4CMuE/g8cgvxhmfzlmaXYztjI6bir6X/DIO','administrator','Site Administrator',NULL,'1988-07-01 08:00:00','',NULL,'No','a94d86e417fa64db6da51a195cb3965ae88dd102f7462c3ce7a1d4558ecd13d780134fc4e271a2ddbfe6fe32ad708492',0,0,NULL,'2026-09-19 22:03:33'),
-(1540,'gdpr_user','gdpr.test@e2e.local','$2y$12$UDyTqkQDVC7xv8vJcVs9D.0CIoKazwUPKbpU0VYVOFVLXuxomgBWy','author','GDPR Test User','https://e2e.local','2026-01-01 08:00:00','','','No','',0,0,NULL,'2026-09-20 05:34:35'),
-(1541,'noaccess_user','noaccess@e2e.local','$2y$12$Ir.NvbmoWd/m4gX9UEOBWeYBcfbQ6BVGuTFkXo72jcDG.sKhwRpQu','author','No Access User','','2026-01-01 08:00:00','','','No','',0,0,NULL,'2026-09-20 05:34:35');
+(767,'administrator','admin@blogware.site','$2y$10$MVcSLCEyVOpCz4Q7o838j.l8W1wl.UI9rf3LDukGJm0hKF1fzr5zG','administrator','Site Administrator',NULL,'1988-07-01 08:00:00','',NULL,'No','a94d86e417fa64db6da51a195cb3965ae88dd102f7462c3ce7a1d4558ecd13d780134fc4e271a2ddbfe6fe32ad708492',0,0,NULL,'2026-09-19 22:03:33'),
+(1540,'gdpr_user','gdpr.test@e2e.local','$2y$10$gm4WQMB8cfRvKVJnLHjTC.juWQQbQFqbsBhJ4s4x8ravWB578JrrW','author','GDPR Test User','https://e2e.local','2026-01-01 08:00:00','','','No','',0,0,NULL,'2026-09-20 05:34:35'),
+(1541,'noaccess_user','noaccess@e2e.local','$2y$10$6hfrcEscwUxhyBzoIYmZ5enJ.9PW60qKQFJjKqNj2iAgUup2tk8Xq','author','No Access User','','2026-01-01 08:00:00','','','No','',0,0,NULL,'2026-09-20 05:34:35');
 /*!40000 ALTER TABLE `tbl_users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
