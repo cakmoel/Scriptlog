@@ -26,18 +26,38 @@ import {
   clearRateLimiters,
   dbScalar,
   runSql,
+  sqlEscape,
+  syncTestUserPasswords,
 } from './gdpr-fixtures';
+import { execSync } from 'child_process';
+import crypto from 'crypto';
 
 const XSS_POST_ID: number = 11;
 const XSS_PAYLOAD: string = '<p><img src="x" onerror="alert(1)"></p>';
 const EDIT_URL: string = `${BASE_URL}/admin/index.php?load=posts&action=editPost&Id=${XSS_POST_ID}`;
 
-const API_KEY: string =
-  '***REMOVED***';
-const API_KEY_HASH: string =
-  '***REMOVED***';
-const API_KEY_DESC: string = 'e2e remediation key';
+// Ephemeral per-run API key: the raw value exists only in this process and is
+// never committed. Its bcrypt hash is seeded for the admin user and removed in
+// afterAll, so no key material persists in the repo or the dump.
+const API_KEY: string = process.env.E2E_REMEDIATION_API_KEY || `e2e-remediation-${crypto.randomBytes(24).toString('hex')}`;
+const API_KEY_DESC: string = `e2e remediation key ${crypto.randomBytes(4).toString('hex')}`;
 const ADMIN_USER_ID: number = 767;
+
+/**
+ * Hash a raw API key with plain bcrypt (tbl_api_keys.key_hash uses
+ * password_hash() of the raw key - see table comment in blogware_e2e.sql).
+ * Key travels via stdin so it never appears in ps output.
+ *
+ * @param rawKey Raw API key to hash.
+ * @returns bcrypt hash string.
+ */
+function hashApiKey(rawKey: string): string {
+  const out: string = execSync(
+    `php -r '$k=stream_get_contents(STDIN); echo password_hash($k, PASSWORD_BCRYPT, ["cost"=>4]);'`,
+    { encoding: 'utf8', input: rawKey, stdio: ['pipe', 'pipe', 'ignore'] },
+  );
+  return out.trim();
+}
 
 // Post 11's original content is restored after the F1 test.
 let originalContent: string = '';
@@ -46,15 +66,21 @@ test.describe.serial('security remediation', () => {
   test.beforeAll((): void => {
     clearRateLimiters();
     clearLoginAttempts();
+    // Sync the dumped admin hash to the runtime-resolved E2E_ADMIN_PASS
+    // (no full GDPR reseed - this spec manages post 11 + API keys itself).
+    syncTestUserPasswords();
     originalContent = dbScalar(
       `SELECT post_content FROM tbl_posts WHERE ID = ${XSS_POST_ID}`,
     );
 
     // Seed a valid bcrypt-hashed API key for the admin user (idempotent).
-    runSql(`DELETE FROM tbl_api_keys WHERE description = '${API_KEY_DESC}'`);
+    // The hash is computed from the ephemeral raw key at runtime, so the repo
+    // never carries a working key+hash pair.
+    const apiKeyHash: string = hashApiKey(API_KEY);
+    runSql(`DELETE FROM tbl_api_keys WHERE description = '${sqlEscape(API_KEY_DESC)}'`);
     runSql(
       `INSERT INTO tbl_api_keys (user_id, key_hash, description, created_at)
-       VALUES (${ADMIN_USER_ID}, '${API_KEY_HASH}', '${API_KEY_DESC}', NOW())`,
+       VALUES (${ADMIN_USER_ID}, '${apiKeyHash}', '${sqlEscape(API_KEY_DESC)}', NOW())`,
     );
   });
 
@@ -63,7 +89,7 @@ test.describe.serial('security remediation', () => {
     runSql(
       `UPDATE tbl_posts SET post_content = '${originalContent.replace(/'/g, "''")}' WHERE ID = ${XSS_POST_ID}`,
     );
-    runSql(`DELETE FROM tbl_api_keys WHERE description = '${API_KEY_DESC}'`);
+    runSql(`DELETE FROM tbl_api_keys WHERE description = '${sqlEscape(API_KEY_DESC)}'`);
     clearRateLimiters();
   });
 

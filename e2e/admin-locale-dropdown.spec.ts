@@ -18,6 +18,7 @@ import {
   clearLoginAttempts,
   clearRateLimiters,
   dbRows,
+  syncTestUserPasswords,
 } from './gdpr-fixtures';
 
 const NEW_POST_URL: string = `${BASE_URL}/admin/index.php?load=posts&action=newPost`;
@@ -29,6 +30,9 @@ test.describe.serial('admin locale dropdown', () => {
   test.beforeAll((): void => {
     clearRateLimiters();
     clearLoginAttempts();
+    // No full reseed here (this spec asserts on dump language state), but the
+    // admin hash must still match the runtime-resolved E2E_ADMIN_PASS.
+    syncTestUserPasswords();
 
     activeLanguages = dbRows(
       'SELECT lang_code, lang_native FROM tbl_languages WHERE lang_is_active = 1 ORDER BY lang_sort',

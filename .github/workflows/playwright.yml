@@ -11,6 +11,14 @@ jobs:
     # The e2e suite talks to a dedicated blogware_e2e database over 127.0.0.1:3306
     # (see e2e/blog-selectors.ts and e2e/gdpr-fixtures.ts), and the app's own
     # router (e2e/router.php) serves it over http://127.0.0.1:8099.
+    # SECURITY: the MariaDB service below is an ephemeral throwaway container
+    # (destroyed after the job). Its password is a non-production test default.
+    # User passwords are NEVER committed: e2e/gdpr-fixtures.ts resolves
+    # E2E_ADMIN_PASS / E2E_GDPR_PASS / E2E_NOACCESS_PASS from the environment
+    # (GitHub Secrets when configured) or generates a per-run random value.
+    # Configure optional repository secrets E2E_ADMIN_PASS, E2E_GDPR_PASS,
+    # E2E_NOACCESS_PASS, E2E_DB_PASS for pinned values; forks without secrets
+    # still pass via the ephemeral fallback. See e2e/.env.example.
     services:
       mariadb:
         image: mariadb:10.11
@@ -18,7 +26,7 @@ jobs:
           MARIADB_ROOT_PASSWORD: root
           MARIADB_DATABASE: blogware_e2e
           MARIADB_USER: blogwareuser
-          MARIADB_PASSWORD: userblogware
+          MARIADB_PASSWORD: ${{ secrets.E2E_DB_PASS || 'userblogware' }}
         ports:
           - 3306:3306
         options: >-
@@ -63,12 +71,22 @@ jobs:
 
     - name: Import seeded e2e database
       run: |
-        mysql -h 127.0.0.1 -P 3306 -u blogwareuser -puserblogware blogware_e2e < e2e/blogware_e2e.sql
+        mysql -h 127.0.0.1 -P 3306 -u blogwareuser -p"$E2E_DB_PASS" blogware_e2e < e2e/blogware_e2e.sql
       env:
-        MYSQL_PWD: userblogware
+        E2E_DB_PASS: ${{ secrets.E2E_DB_PASS || 'userblogware' }}
+        MYSQL_PWD: ${{ secrets.E2E_DB_PASS || 'userblogware' }}
 
     - name: Run Playwright tests
       run: npx playwright test
+      env:
+        # Pinned only when repository secrets exist; otherwise the fixtures use
+        # a per-run ephemeral password and sync the test DB to it at seed time.
+        E2E_ADMIN_PASS: ${{ secrets.E2E_ADMIN_PASS }}
+        E2E_GDPR_PASS: ${{ secrets.E2E_GDPR_PASS }}
+        E2E_NOACCESS_PASS: ${{ secrets.E2E_NOACCESS_PASS }}
+        E2E_DB_PASS: ${{ secrets.E2E_DB_PASS || 'userblogware' }}
+        E2E_DB_USER: blogwareuser
+        E2E_DB_NAME: blogware_e2e
 
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
