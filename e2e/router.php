@@ -20,7 +20,7 @@
 $_ENV['DB_NAME'] = 'blogware_e2e';
 $_ENV['DB_USER'] = 'blogwareuser';
 $_ENV['DB_PASS'] = 'userblogware';
-$_ENV['DB_HOST'] = 'localhost';
+$_ENV['DB_HOST'] = '127.0.0.1';
 $_ENV['DB_PORT'] = '3306';
 $_ENV['DB_PREFIX'] = '';
 $_ENV['APP_KEY'] = 'GVXUD7-72HUXD-2TFCDT-8DDC2A';
@@ -92,12 +92,18 @@ if (!defined('APP_PROTOCOL')) {
     define('APP_PROTOCOL', 'http');
 }
 
-// If the requested URI maps to an existing file, serve it statically.
+// Dispatch the request. Files ending in .php are required here, in process,
+// so the environment forced above (and APP_PROTOCOL) stays visible on every
+// PHP built-in-server version. Static assets are passed through unchanged.
 $requestedPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 $docRoot = __DIR__ . '/..';
 $staticFile = realpath($docRoot . '/' . ltrim($requestedPath, '/'));
 
 if (is_file($staticFile)) {
+    if (stripos($staticFile, '.php') === strlen($staticFile) - 4) {
+        require $staticFile;
+        return;
+    }
     return false;
 }
 
