@@ -33,6 +33,11 @@ function acceptDialogs(page: Page): void {
 }
 
 test.describe('GDPR privacy policy editor', () => {
+  // beforeEach full-reseeds are shared state, so the file must run in
+  // declaration order on one worker instead of racing across fullyParallel
+  // workers (a sibling's reseed would wipe this test's Set Default / Delete).
+  test.describe.configure({ mode: 'serial' });
+
   test.beforeAll((): void => {
     clearRateLimiters();
     clearLoginAttempts();
@@ -125,12 +130,12 @@ test.describe('GDPR privacy policy editor', () => {
     await expect(page.locator('.alert-success')).toContainText(
       'Default policy set',
     );
-    expect(
-      dbScalar(`SELECT is_default FROM tbl_privacy_policies WHERE locale='fr'`),
-    ).toBe('1');
-    expect(
-      dbScalar(`SELECT is_default FROM tbl_privacy_policies WHERE locale='en'`),
-    ).toBe('0');
+    await expect
+      .poll(() => dbScalar(`SELECT is_default FROM tbl_privacy_policies WHERE locale='fr'`))
+      .toBe('1');
+    await expect
+      .poll(() => dbScalar(`SELECT is_default FROM tbl_privacy_policies WHERE locale='en'`))
+      .toBe('0');
   });
 
   test('deleting a policy removes it from the table', async ({ page }) => {
