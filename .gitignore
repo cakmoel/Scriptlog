@@ -82,3 +82,6 @@ opencode.json
 /build/
 # HTMLPurifier runtime cache (generated during sanitization/tests)
 lib/core/HTMLPurifier/DefinitionCache/Serializer/URI/
+
+# Storage
+/storage/
