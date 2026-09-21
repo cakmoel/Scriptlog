@@ -68,11 +68,6 @@ jobs:
         MYSQL_PWD: userblogware
 
     - name: Run Playwright tests
-      # The suite defaults to http://127.0.0.1:8099; CI uses http://localhost so
-      # Chromium treats the connection as a secure context and keeps the app's
-      # Secure session cookies (the dev router serves plain HTTP).
-      env:
-        PLAYWRIGHT_BASE_URL: http://localhost:8099
       run: npx playwright test
 
     - uses: actions/upload-artifact@v4
