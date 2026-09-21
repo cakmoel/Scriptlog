@@ -11,8 +11,16 @@ const BASE_URL: string = BLOG_BASE_URL;
 const PROTECTED_POST: number = 12;
 const SECRET_TEXT: string =
   'This is the secret content of a protected e2e post.';
-const RATE_LIMIT_DIR: string =
-  '/var/www/blogware/public_html/public/log/unlock_attempts';
+// The app writes unlock-attempt counters under APP_ROOT/public/log (see
+// lib/utility/protected-post.php). Derive the path from the repo root so it
+// works on developers' machines and CI alike; the previous literal pointed at
+// a production-only location and silently no-oped everywhere else.
+const RATE_LIMIT_DIR: string = path.join(
+  process.cwd(),
+  'public',
+  'log',
+  'unlock_attempts',
+);
 const RETRIES: number = 3;
 
 /** Unlock API success payload. */
@@ -106,9 +114,14 @@ test.describe('theme protected posts', () => {
       await page.goto(`${BASE_URL}/?p=${PROTECTED_POST}`);
       await page.locator(BLOG.unlockInput).fill('e2e-secret');
       await page.locator(BLOG.unlockButton).click();
+      // The reveal container fades in client-side (~300ms), so wait for
+      // visibility instead of sampling `isVisible()` synchronously, which races
+      // the animation and can wrongly report "not revealed" after a successful
+      // unlock, making the next retry land on an already-unlocked post.
       const revealed: boolean = await page
         .locator('#unlocked-content-12')
-        .isVisible();
+        .waitFor({ state: 'visible', timeout: 5000 })
+        .then(() => true, () => false);
       if (revealed) break;
     }
     await expect(page.locator('#unlocked-content-12')).toBeVisible({
