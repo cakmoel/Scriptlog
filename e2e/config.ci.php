@@ -30,7 +30,7 @@ return [
 
         'url'   => 'http://127.0.0.1:8099',
         'email' => 'admin@blogware.site',
-        'key'   => 'GVXUD7-72HUXD-2TFCDT-8DDC2A',
+        'key'   => 'F5R5TE-WL7VSG-KKAZRH-377C04',
         'defuse_key' => 'lib/utility/.lts/lts.php'
     ],
 
