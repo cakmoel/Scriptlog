@@ -41,12 +41,12 @@ policy editor performs CRUD reflected on the public page.
 
 ## Preconditions
 
-- `blogware_e2e` DB reachable; admin account ID **767** `administrator` / `***REMOVED***` — never
+- `blogware_e2e` DB reachable; admin account ID **767** `administrator` / `$E2E_ADMIN_PASS` (see `e2e/.env.example`) — never
   erased, never the erasure subject, and always present as the fallback author (user ID 1 is
   absent, so `resolveFallbackAuthorId()` returns 767).
-- Disposable GDPR subject: `gdpr_user` / `gdpr.test@e2e.local` / `***REMOVED***` (author level),
+- Disposable GDPR subject: `gdpr_user` / `gdpr.test@e2e.local` / `$E2E_GDPR_PASS` (author level),
   with one authored post (`GDPR E2E Post`) and one comment, and a `processing` deletion request.
-- Disposable low-privilege user: `noaccess_user` / `noaccess@e2e.local` / `***REMOVED***`.
+- Disposable low-privilege user: `noaccess_user` / `noaccess@e2e.local` / `$E2E_NOACCESS_PASS`.
 - Seed SQL must be idempotent and run in each spec's `beforeAll`; `afterAll`/`afterEach` cleans up
   disposable rows only (see Data Cleanup below). All traffic is `127.0.0.1`, so state is
   shared/IP-keyed — delete `tbl_consents`, `tbl_data_requests`, `tbl_privacy_logs`, and the

@@ -165,7 +165,7 @@ render on the public site via permalink URLs (`/post/{id}/{slug}`) or query stri
 | Field | Value |
 |-------|-------|
 | Username | `administrator` |
-| Password | `***REMOVED***` |
+| Password | `$E2E_ADMIN_PASS` (see `e2e/.env.example`) |
 | Role | `administrator` |
 
 For role-based tests an additional lower-privilege account (e.g. `editor` / `contributor`)

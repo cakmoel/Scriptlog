@@ -118,7 +118,7 @@ admins (and managers/editors/authors) moderate them.
 
 1. **Application installed** — `config.php` with valid DB credentials, all 22 tables
    created (`blogware_test` for tests), admin user seeded. See `specs/installer.md`.
-2. **Admin account exists** — `administrator` / `***REMOVED***` (from `AGENTS.md`).
+2. **Admin account exists** — `administrator` / `$E2E_ADMIN_PASS` (see `e2e/.env.example`).
 3. **At least one published post** with `comment_status = 'open'` exists on the frontend.
    For negative tests, also have a post with `comment_status = 'closed'`.
 4. **Reading setting** `comment_per_post` ("Comments to display in post") is known; set a

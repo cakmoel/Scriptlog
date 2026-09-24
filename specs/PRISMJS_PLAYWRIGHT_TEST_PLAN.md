@@ -13,7 +13,7 @@ This document defines a comprehensive Playwright end-to-end (E2E) test plan for 
 | **Prism.js version** | 1.30.0 |
 | **Prism theme** | Default (light) |
 | **Prism plugins** | Line Numbers, Show Language, Copy to Clipboard, Toolbar, Normalize Whitespace |
-| **Test account** | `administrator` / `***REMOVED***` |
+| **Test account** | `administrator` / `$E2E_ADMIN_PASS` |
 | **App URL** | `http://blogware.site` (resolves to 127.0.0.1 via `/etc/hosts`) |
 | **PHP version** | 8.5.8 |
 
@@ -125,7 +125,7 @@ The seeded post must contain the following code block formats, matching the lang
 The seed file should:
 
 1. Navigate to `/admin/login.php`
-2. Log in with `administrator` / `***REMOVED***`
+2. Log in with `administrator` / `$E2E_ADMIN_PASS`
 3. Navigate to `index.php?load=posts&action=newPost`
 4. Fill in the post title: "Prism.js Syntax Highlighting Test Post"
 5. Switch to Summernote's `codeview` (HTML source mode) or use JavaScript to set the textarea content directly
@@ -505,8 +505,10 @@ This file contains the HTML used in the seed post (see Section 2.3). It can be i
 A shared TypeScript file that exports constants:
 
 ```typescript
-export const ADMIN_USER = 'administrator';
-export const ADMIN_PASS = '***REMOVED***';
+export const ADMIN_USER: string =
+  process.env.E2E_ADMIN_USER || 'administrator';
+export const ADMIN_PASS: string =
+  process.env.E2E_ADMIN_PASS || 'local-e2e-admin-only'; // test-only, see e2e/.env.example
 export const TEST_POST_TITLE = 'Prism.js Syntax Highlighting Test Post';
 export const SUPPORTED_LANGUAGES = [
   'php', 'js', 'html', 'bash', 'css', 'python',

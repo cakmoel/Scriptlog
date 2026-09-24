@@ -122,7 +122,7 @@ The Dispatcher handles `?download=` even when SEO URLs are enabled
 | Field | Value |
 |-------|-------|
 | Username | `administrator` |
-| Password | `***REMOVED***` |
+| Password | `$E2E_ADMIN_PASS` (see `e2e/.env.example`) |
 | Role | `administrator` |
 
 A second lower-privilege account (e.g. `author`) is recommended for access-control tests.

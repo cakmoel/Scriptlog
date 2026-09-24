@@ -856,14 +856,14 @@ Dependencies on `fetch()` and `FormData` in JavaScript, and `SameSite` cookie at
 
 For Playwright-based testing, the following seed data must exist before tests:
 
-1. **Administrator user**: username=`administrator`, email=`admin@test.com`, password=`***REMOVED***`, level=`administrator` (matching the project's test account from AGENTS.md)
+1. **Administrator user**: username=`administrator`, email=`admin@test.com`, password=`$E2E_ADMIN_PASS`, level=`administrator` (test-only credentials resolved from `E2E_*` env vars — see `e2e/.env.example`)
 2. **Additional test users** (for access control tests):
-   - `manager_user` / `manager@test.com` / `Pass123$!` / level=`manager`
-   - `editor_user` / `editor@test.com` / `Pass123$!` / level=`editor`
-   - `author_user` / `author@test.com` / `Pass123$!` / level=`author`
-   - `contributor_user` / `contributor@test.com` / `Pass123$!` / level=`contributor`
-   - `subscriber_user` / `subscriber@test.com` / `Pass123$!` / level=`subscriber`
-3. **Banned user**: `banned_user` / `banned@test.com` / `Pass123$!` / level=`administrator` / `user_banned=1`
+   - `manager_user` / `manager@test.com` / (test-only password via environment) / level=`manager`
+   - `editor_user` / `editor@test.com` / (test-only password via environment) / level=`editor`
+   - `author_user` / `author@test.com` / (test-only password via environment) / level=`author`
+   - `contributor_user` / `contributor@test.com` / (test-only password via environment) / level=`contributor`
+   - `subscriber_user` / `subscriber@test.com` / (test-only password via environment) / level=`subscriber`
+3. **Banned user**: `banned_user` / `banned@test.com` / (test-only password via environment) / level=`administrator` / `user_banned=1`
 4. **Session must be isolated** per test scenario (clear cookies, session between tests)
 5. **Rate limiting tables** (`tbl_login_attempt`) must be truncated before each rate-limit test
 

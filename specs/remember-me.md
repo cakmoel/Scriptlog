@@ -99,7 +99,7 @@ DB token (old token marked expired, new token issued), which limits replay damag
 | Field | Value |
 |-------|-------|
 | Username | `administrator` |
-| Password | `***REMOVED***` |
+| Password | `$E2E_ADMIN_PASS` |
 | Role | `administrator` |
 
 ### 2.2 Cookie Set (after Remember Me login)
@@ -193,7 +193,7 @@ DB token (old token marked expired, new token issued), which limits replay damag
 | Action | Input | Expected Behaviour |
 |--------|-------|-------------------|
 | Enter username | `administrator` | Field populated |
-| Enter password | `***REMOVED***` | Password masked |
+| Enter password | `$E2E_ADMIN_PASS` | Password masked |
 | Check Remember Me | — | Box checked |
 | Click Log In | — | 302 → dashboard |
 | Inspect cookies | — | 3 cookies set with 30-day expiry |
@@ -246,7 +246,7 @@ DB token (old token marked expired, new token issued), which limits replay damag
 
 | Action | Input | Expected Behaviour |
 |--------|-------|-------------------|
-| Enter credentials | `administrator` / `***REMOVED***` | |
+| Enter credentials | `administrator` / `$E2E_ADMIN_PASS` | |
 | Leave Remember Me unchecked | — | |
 | Click Log In | — | 302 → dashboard |
 | Inspect cookies | — | **No** `scriptlog_*` auth cookies |
@@ -799,4 +799,4 @@ All pass → `$loggedIn = true`; token renewal runs (see §7).
 | E02 | Cookie `expired_date` timezone skew | Boundary | Set DB timestamp in different TZ | Compare on string equality (verify) |
 | E03 | Simultaneous auto-login from 2 devices | Race | Both with same cookies | First rotation wins; second rejected |
 | E04 | Empty `pwd_hash` / `selector_hash` in DB | Error | Manually null them | Verification fails → login form |
-| E05 | Remember Me with special-char password | Boundary | Password `***REMOVED***` | Unaffected (bcrypt) |
+| E05 | Remember Me with special-char password | Boundary | Password `$E2E_ADMIN_PASS` | Unaffected (bcrypt) |
