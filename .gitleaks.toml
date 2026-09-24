@@ -1,0 +1,43 @@
+# .gitleaks.toml — allowlists for DOCUMENTED, intentionally-committed test-only
+# and example values. These are synthetic fixtures (see e2e/.env.example,
+# e2e/gdpr-fixtures.ts, tests/, install/include/setup.php, docs/) and never
+# production secrets. Anything else matching a detection rule still fails CI
+# (see .github/workflows/secret-scan.yml). Keep this list minimal and always
+# explain WHY each entry is safe.
+#
+# NOTE: real local secrets (root .env, e2e/.env) are gitignored and therefore
+# never scanned in CI git mode; the path entries below only keep local
+# --no-git runs (which scan the working directory verbatim) noise-free.
+
+[allowlist]
+description = "Known-benign test fixtures, placeholders, and untracked artifacts"
+paths = [
+  # Composer dependencies and archives are untracked build artifacts.
+  '''lib/vendor/''',
+  '''vendor-bin/''',
+  '''\.phar$''',
+  # Local secret files are gitignored and cannot be committed.
+  '''(^|/)\.env$''',
+]
+regexes = [
+  # Ephemeral test-database default for the throwaway CI/local MariaDB
+  # service container (see .github/workflows/playwright.yml, e2e/router.php).
+  '''userblogware''',
+  # Placeholders from e2e/.env.example — not real credentials.
+  '''change-me-local-only''',
+  # Local-only fallbacks in e2e/gdpr-fixtures.ts; overridden by E2E_* env vars
+  # (GitHub Secrets or per-run ephemeral values) everywhere that matters.
+  '''local-e2e-(admin|gdpr|noaccess)-only''',
+  # Synthetic protected-post fixture password: unlocks e2e seed content only,
+  # not an account (see e2e/theme-protected.spec.ts).
+  '''e2e-secret''',
+  # Test-only APP_KEY fixtures used by the PHPUnit suite and the e2e seed.
+  '''V74FWK-S32CLA-Y22YKK-F3C936''',
+  '''GVXUD7-72HUXD-2TFCDT-8DDC2A''',
+  '''F5R5TE-WL7VSG-KKAZRH-377C04''',
+  '''def00000testkey[0-9]+''',
+  # Key-generation alphabet constant in install/include/setup.php, not a secret.
+  '''ABCDEFGHJKLMNPQRSTUVWXYZ23456789''',
+  # Documentation example placeholder (docs/dev-docs/API_DOCUMENTATION.md).
+  '''your-api-key''',
+]
