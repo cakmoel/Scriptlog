@@ -16,7 +16,7 @@ function get_server_load()
 {
     $load = array();
 
-    $factor = 15780543;
+    $factor = 15_780_543;
 
     $threshold = function_exists('number_cpus') ? (int)number_cpus() * $factor : "";
 
