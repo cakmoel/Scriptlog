@@ -21,8 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Admin locale catalog with native labels**: New `admin_locales_catalog()` function returns a map of `lang_code => native name` with database-driven catalog synchronization and static request caching; falls back to seven supported languages when no DB connection is available
 - **Native label select helpers**: New `admin_locale_select()` helper renders a native-name locale `<select>` with full XSS-safe attribute and label escaping; legacy locales not in the catalog are appended as uppercased-code options
 - **`getImageRadioButton()` and `createPageMedia()` in PageService**: Delegated to `MediaDao` so controllers never build DAOs themselves; featured-image radio list for the page form
-- **`boundwize/structarmed` dev dependency**: Planned structural analysis tool for catching array-shape mismatches — temporarily deferred due to PHP platform compatibility constraints (requires PHP 8.2+ vs project platform PHP 7.4)
-- **`structarmed` Composer script**: New `composer structarmed` command for structural integrity analysis during quality checks
+- **`composer audit` integration**: Security audit now included in the `composer build` quality script
 
 ### Changed
 - **Dependency injection in services**: `ExportService` now requires `UserDao` constructor parameter; `MigrationService` now accepts `UserDao` for import author lookups; `PageService` accepts `MediaDao`; `PostService` accepts optional `TopicDao` and `MediaDao` parameters
@@ -43,7 +42,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Direct DAO access in controllers**: Controllers should now delegate all data access through service layers rather than instantiating DAOs directly
 
 ### Notes
-Feature release with admin locale catalog improvements, service-layer refactoring toward dependency injection, and structural analysis tooling. `PostController`, `PageService`, and `MigrationService` are now `final` to enforce composition-based design. `ExportService` and `MigrationService` now require `UserDao` injection. `PostService` accepts optional `TopicDao` and `MediaDao` for backward compatibility. 67 commits since v1.8.1 including 40 test commits, 5 fix commits, 2 feat commits, 3 refactor commits, 5 CI commits, and 1 docs commit.
+Feature release with admin locale catalog improvements, service-layer refactoring toward dependency injection, and dependency injection improvements. `PostController`, `PageService`, and `MigrationService` are now `final` to enforce composition-based design. `ExportService` and `MigrationService` now require `UserDao` injection. `PostService` accepts optional `TopicDao` and `MediaDao` for backward compatibility. 67 commits since v1.8.1 including 40 test commits, 5 fix commits, 2 feat commits, 3 refactor commits, 5 CI commits, and 1 docs commit.
 
 ### Codename
 **Raja Ampat** – Honoring *Raja Ampat* (Four Kings), the globally renowned marine biodiversity hotspot in West Papua, Indonesia, home to 75% of all known coral species and critically endangered marine species including the whale shark (*Rhincodon typus*), manta ray (*Mobula alfredi*), and the endangered hawksbill turtle (*Eretmochelys imbricata*). With coral reef systems facing unprecedented bleaching events and overfishing pressures, Raja Ampat's endemic marine species represent some of the most threatened biodiversity on Earth. Conservation efforts by Conservation International and local marine protected area networks are working to protect these irreplaceable ecosystems.
