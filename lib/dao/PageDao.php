@@ -286,6 +286,6 @@ class PageDao extends Dao
      */
     public function dropDownLocale($selected = "")
     {
-        return admin_locale_select('post_locale', $selected);
+        return admin_locale_select('post_locale', (string)$selected);
     }
 }
