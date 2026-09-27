@@ -1,6 +1,6 @@
 # Developer Guide - Scriptlog
 
-**Version:** 1.9.0 | **Last Updated:** September 2026
+**Version: 1.8.2 | Last Updated: August 2026
 
 ---
 
@@ -6058,4 +6058,4 @@ This project is licensed under the MIT License.
 
 ---
 
-*Last Updated: September 2026 | Version 1.9.0*
+*Last Updated: August 2026 | Version 1.8.2*
