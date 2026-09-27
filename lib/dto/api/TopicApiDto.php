@@ -39,7 +39,7 @@ class TopicApiDto
 
     public static function transformCollection(array $topics, string $appUrl): array
     {
-        return array_map(function ($topic) use ($appUrl) {
+        return array_map(static function ($topic) use ($appUrl) {
             return self::transform($topic, $appUrl);
         }, $topics);
     }
