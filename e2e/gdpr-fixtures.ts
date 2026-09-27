@@ -253,22 +253,13 @@ export function dbRows(sql: string): Array<Record<string, string>> {
 // ---------------------------------------------------------------------------
 
 /**
- * Delete every file-backed rate-limit counter and expired PHP session file
- * (API read/write + DSAR namespaces + stale sessions that carry orphaned CSRF tokens).
+ * Delete every file-backed rate-limit counter (API read/write + DSAR namespaces).
  * Mirrors theme-protected.spec.ts clearRateLimit().
  */
 export function clearRateLimiters(): void {
-  if (fs.existsSync(RATE_LIMIT_DIR)) {
-    for (const f of fs.readdirSync(RATE_LIMIT_DIR)) {
-      fs.rmSync(path.join(RATE_LIMIT_DIR, f), { force: true });
-    }
-  }
-  if (fs.existsSync(SESSION_DIR)) {
-    for (const f of fs.readdirSync(SESSION_DIR)) {
-      if (f.startsWith('sess_')) {
-        fs.rmSync(path.join(SESSION_DIR, f), { force: true });
-      }
-    }
+  if (!fs.existsSync(RATE_LIMIT_DIR)) return;
+  for (const f of fs.readdirSync(RATE_LIMIT_DIR)) {
+    fs.rmSync(path.join(RATE_LIMIT_DIR, f), { force: true });
   }
 }
 
@@ -290,14 +281,22 @@ export function clearLoginAttempts(): void {
 }
 
 /**
- * Clear all browser cookies so consent banner state is deterministic.
+ * Clear consent-related browser cookies while preserving session cookies
+ * so that the PHP session (and CSRF tokens) remain intact across reseeding.
  *
  * @param context Browser context whose cookies should be cleared.
  */
 export async function clearConsentCookies(
   context: BrowserContext,
 ): Promise<void> {
+  const cookies = await context.cookies();
+  const sessionCookies = cookies.filter(
+    (c) => c.name === 'PHPSESSID' || c.name.startsWith('PHPSESSID_'),
+  );
   await context.clearCookies();
+  if (sessionCookies.length > 0) {
+    await context.addCookies(sessionCookies);
+  }
 }
 
 /**
