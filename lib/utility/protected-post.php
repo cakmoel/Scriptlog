@@ -178,7 +178,7 @@ function track_failed_unlock_attempt($post_id)
 
     $attempts[] = $now;
 
-    $attempts = array_filter($attempts, function ($timestamp) use ($now) {
+    $attempts = array_filter($attempts, static function ($timestamp) use ($now) {
         return ($now - $timestamp) < 900;
     });
 
@@ -213,7 +213,7 @@ function get_failed_unlock_attempts($post_id)
     $attempts = json_decode($data, true) ?: [];
     $now = time();
 
-    $recent_attempts = array_filter($attempts, function ($timestamp) use ($now) {
+    $recent_attempts = array_filter($attempts, static function ($timestamp) use ($now) {
         return ($now - $timestamp) < 900;
     });
 
