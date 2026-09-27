@@ -3,7 +3,7 @@
 define('DS', DIRECTORY_SEPARATOR);
 define('APP_TITLE', 'Scriptlog');
 define('APP_CODENAME', 'Maleo Senkawor');
-define('APP_VERSION', '1.8.1');
+define('APP_VERSION', '1.9.0');
 define('API_VERSION', 'v1');
 define('APP_ROOT', dirname(dirname(__FILE__)) . DS);
 define('APP_ADMIN', 'admin');
@@ -12,7 +12,7 @@ define('APP_LIBRARY', 'lib');
 define('APP_CACHE', false);
 define('APP_CACHE_DIR', APP_ROOT . APP_PUBLIC . DS . 'cache' . DS);
 define('APP_CACHE_LIFETIME', 3600); // 1 hour in seconds
-define('APP_FILE_SIZE', 1048576);
+define('APP_FILE_SIZE', 1_048_576);
 define('APP_IMAGE', APP_PUBLIC . DS . 'files' . DS . 'pictures' . DS);
 define('APP_IMAGE_LARGE', APP_IMAGE . 'large' . DS);
 define('APP_IMAGE_MEDIUM', APP_IMAGE . 'medium' . DS);
@@ -32,7 +32,7 @@ define('MESSAGE_INVALID_FULLNAME', "Please enter a valid fullname");
 define('MESSAGE_INVALID_SELECTBOX', "Please choose the available value provided");
 define('MESSAGE_INVALID_EMAILADDRESS', "Please enter a valid email address");
 define('MAX_FILES', 10000);
-define('MAX_SIZE', 1000000000); // 1 GB
+define('MAX_SIZE', 1_000_000_000); // 1 GB
 define('MAX_RATIO', 10);
 define('READ_LENGTH', 1024);
 define('COOKIE_CONSENT_LIFETIME_DAYS', 180); // Cookie consent lifetime in days (CNIL-aligned renewal)
