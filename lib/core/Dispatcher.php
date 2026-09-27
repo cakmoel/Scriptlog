@@ -442,7 +442,7 @@ class Dispatcher
             if (strpos($pattern, "?'") !== false) {
                 $numbered = preg_replace_callback(
                     "/\(\?'(\w+)'([^)]+)\)/",
-                    function ($m) use (&$paramMap) {
+                    static function ($m) use (&$paramMap) {
                         $pos = count($paramMap) + 1;
                         $paramMap[$pos] = $m[1];
                         return '(' . $m[2] . ')';
