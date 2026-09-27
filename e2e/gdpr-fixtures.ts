@@ -281,16 +281,22 @@ export function clearLoginAttempts(): void {
 }
 
 /**
- * No-op: consent state is managed by the database (seedGdprFixtures),
- * not browser cookies. Skipping cookie clearing to preserve the PHP
- * session (_scriptlog) and CSRF tokens across reseeding.
+ * Clear all browser cookies so consent banner state is deterministic,
+ * and clear PHP session files so the session store is fresh for each test.
+ * This prevents stale session/CSRF token issues when adminLogin creates
+ * a new session after seedGdprFixtures reseeds the database.
  *
- * @param context Browser context (unused).
+ * @param context Browser context whose cookies should be cleared.
  */
 export async function clearConsentCookies(
   context: BrowserContext,
 ): Promise<void> {
-  // intentionally empty — do not clear cookies
+  await context.clearCookies();
+  if (fs.existsSync(SESSION_DIR)) {
+    for (const f of fs.readdirSync(SESSION_DIR)) {
+      fs.rmSync(path.join(SESSION_DIR, f), { force: true });
+    }
+  }
 }
 
 /**
