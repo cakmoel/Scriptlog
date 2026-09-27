@@ -16,7 +16,7 @@ function hide_email($email)
 
     $key = str_shuffle($character_set);
     $cipher_text = '';
-    $id = 'e' . rand(1, 999999999);
+    $id = 'e' . rand(1, 999_999_999);
 
     for ($i = 0; $i < strlen($email); $i += 1) {
         $cipher_text .= $key[strpos($character_set, $email[$i])];
