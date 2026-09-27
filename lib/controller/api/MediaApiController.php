@@ -11,8 +11,35 @@ use Scriptlog\Core\ScriptlogCryptonize;
 use Scriptlog\Dao\MediaDao;
 use Scriptlog\Dao\UserDao;
 
-class MediaApiController extends ApiController
+final class MediaApiController extends ApiController
 {
+    /**
+     * @var MediaDao
+     */
+    private $mediaDao;
+
+    /**
+     * @var UserDao
+     */
+    private $userDao;
+
+    /**
+     * Constructor
+     *
+     * All dependencies are optional so ApiRouter can keep building this
+     * controller with no arguments; tests pass mocks instead.
+     *
+     * @param MediaDao|null $mediaDao Data access for media records
+     * @param UserDao|null $userDao Data access for user lookups
+     */
+    public function __construct(?MediaDao $mediaDao = null, ?UserDao $userDao = null)
+    {
+        parent::__construct();
+
+        $this->mediaDao = $mediaDao !== null ? $mediaDao : new MediaDao();
+        $this->userDao = $userDao !== null ? $userDao : new UserDao();
+    }
+
     /**
      * Upload image for Summernote
      *
@@ -76,8 +103,7 @@ class MediaApiController extends ApiController
         );
 
         // Save to database via MediaDao
-        $mediaDao = new MediaDao();
-        $mediaId = $mediaDao->createMedia([
+        $mediaId = $this->mediaDao->createMedia([
             'media_filename' => $newFilename,
             'media_caption' => '',
             'media_type' => 'image',
@@ -89,7 +115,7 @@ class MediaApiController extends ApiController
 
         // Link image to post via tbl_mediameta (only if post_id provided)
         if (!empty($postId)) {
-            $mediaDao->createMediaMeta([
+            $this->mediaDao->createMediaMeta([
                 'media_id' => $mediaId,
                 'meta_key' => 'post_id',
                 'meta_value' => (string)$postId
@@ -131,8 +157,7 @@ class MediaApiController extends ApiController
                 $cipherKey = ScriptlogCryptonize::scriptlogCipherKey();
                 $userLogin = ScriptlogCryptonize::scriptlogDecipher($_COOKIE['scriptlog_auth'], $cipherKey);
                 if (!empty($userLogin)) {
-                    $userDao = new UserDao();
-                    $user = $userDao->getUserByLogin($userLogin);
+                    $user = $this->userDao->getUserByLogin($userLogin);
                     if ($user) {
                         $userLevel = $user['user_level'];
                     }
