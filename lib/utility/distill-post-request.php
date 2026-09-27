@@ -20,7 +20,7 @@ function distill_post_request($refine)
         static $validFilterIds = null;
 
         if ($validFilterIds === null) {
-            $validFilterIds = array_map(function ($name) {
+            $validFilterIds = array_map(static function ($name) {
                 return filter_id($name);
             }, filter_list());
             $validFilterIds = array_flip($validFilterIds);
