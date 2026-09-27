@@ -55,7 +55,7 @@ class CommentApiDto
 
     public static function transformCollection(array $comments, string $appUrl): array
     {
-        return array_map(function ($comment) use ($appUrl) {
+        return array_map(static function ($comment) use ($appUrl) {
             return self::transform($comment, $appUrl);
         }, $comments);
     }
