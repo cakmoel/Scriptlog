@@ -132,7 +132,7 @@ class RateLimiter
             return [];
         }
 
-        return array_values(array_filter($timestamps, function ($ts) use ($windowStart) {
+        return array_values(array_filter($timestamps, static function ($ts) use ($windowStart) {
             return $ts > $windowStart;
         }));
     }
@@ -147,7 +147,7 @@ class RateLimiter
      */
     private function writeTimestamps($file, $timestamps, $windowStart)
     {
-        $valid = array_values(array_filter($timestamps, function ($ts) use ($windowStart) {
+        $valid = array_values(array_filter($timestamps, static function ($ts) use ($windowStart) {
             return $ts > $windowStart;
         }));
 
