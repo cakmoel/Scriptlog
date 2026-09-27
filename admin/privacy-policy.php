@@ -12,9 +12,7 @@ if (false === $app->authenticator->userAccessControl(ActionConst::PRIVACY)) {
 $privacyPolicyDao = class_exists('PrivacyPolicyDao') ? new PrivacyPolicyDao() : null;
 $errors = [];
 $status = [];
-$csrfToken = (class_exists('CSRFGuard') && ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST')
-    ? csrf_generate_token('csrfToken')
-    : (isset($_POST['csrfToken']) ? $_POST['csrfToken'] : "");
+$csrfToken = class_exists('CSRFGuard') ? csrf_generate_token('csrfToken') : "";
 
 try {
     switch ($action) {
