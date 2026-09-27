@@ -20,15 +20,23 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 use Scriptlog\Core\ImportException;
 use Scriptlog\Core\Registry;
 use Scriptlog\Core\Sanitize;
+use Scriptlog\Dao\UserDao;
 use BlogspotImporter;
 use GhostImporter;
 use ScriptlogImporter;
 use WordPressImporter;
 
-class MigrationService
+final class MigrationService
 {
     private $dbc;
     private $sanitizer;
+
+    /**
+     * Data access for import author lookups.
+     *
+     * @var UserDao
+     */
+    private $userDao;
 
     private $authorId;
     private $importStats;
@@ -41,10 +49,17 @@ class MigrationService
     public const SOURCE_BLOGSPOT = 'blogspot';
     public const SOURCE_SCRIPTLOG = 'scriptlog';
 
-    public function __construct(Sanitize $sanitizer)
+    /**
+     * MigrationService constructor.
+     *
+     * @param Sanitize $sanitizer Input sanitizer for import data
+     * @param UserDao $userDao Data access for import author lookups
+     */
+    public function __construct(Sanitize $sanitizer, UserDao $userDao)
     {
         $this->dbc = Registry::get('dbc');
         $this->sanitizer = $sanitizer;
+        $this->userDao = $userDao;
 
         $this->authorId = 1;
         $this->importStats = [
@@ -80,6 +95,20 @@ class MigrationService
     public function getStats()
     {
         return $this->importStats;
+    }
+
+    /**
+     * Get users available as import authors for the import form.
+     *
+     * Normalizes the DAO result to an array so callers never receive false.
+     *
+     * @return array List of user rows, empty when no users exist
+     */
+    public function getImportUsers(): array
+    {
+        $users = $this->userDao->getUsers('ID', \PDO::FETCH_ASSOC);
+
+        return empty($users) ? array() : $users;
     }
 
     /**
