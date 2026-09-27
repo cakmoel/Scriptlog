@@ -107,5 +107,5 @@ function post_visibility_dropdown($selected = null)
  */
 function post_locale_dropdown($selected = '')
 {
-    return admin_locale_select('post_locale', $selected);
+    return admin_locale_select('post_locale', (string)$selected);
 }
