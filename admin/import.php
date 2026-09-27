@@ -12,7 +12,7 @@ if (empty($action)) {
     }
 }
 
-$migrationService = new MigrationService($app->sanitizer);
+$migrationService = new MigrationService($app->sanitizer, new UserDao());
 $importController = new ImportController($migrationService);
 
 try {
