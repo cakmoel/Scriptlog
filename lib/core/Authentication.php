@@ -124,7 +124,7 @@ class Authentication
      * @var null|int|numeric
      *
      */
-    public const COOKIE_EXPIRE = 2592000;
+    public const COOKIE_EXPIRE = 2_592_000;
 
     /**
      * Constant COOKIE_PATH
