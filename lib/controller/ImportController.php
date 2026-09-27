@@ -21,22 +21,35 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 use Scriptlog\Core\BaseApp;
 use Scriptlog\Core\Session;
 use Scriptlog\Core\View;
-use Scriptlog\Dao\UserDao;
 use Scriptlog\Service\MigrationService;
 
-class ImportController extends BaseApp
+final class ImportController extends BaseApp
 {
+    /**
+     * Business logic for import operations.
+     *
+     * @var MigrationService
+     */
     private $migrationService;
-    private $userDao;
+
+    /**
+     * View renderer.
+     *
+     * @var View|null
+     */
     private $view;
 
     private $error = [];
     private $success = [];
 
+    /**
+     * ImportController constructor.
+     *
+     * @param MigrationService $migrationService Business logic for import operations
+     */
     public function __construct(MigrationService $migrationService)
     {
         $this->migrationService = $migrationService;
-        $this->userDao = new UserDao();
     }
 
     /**
@@ -92,7 +105,7 @@ class ImportController extends BaseApp
         $this->setPageTitle('Import Content');
         $this->view = new View('admin', 'ui', 'import', 'index');
 
-        $users = $this->userDao->getUsers('ID', \PDO::FETCH_ASSOC);
+        $users = $this->migrationService->getImportUsers();
 
         $this->view->set('pageTitle', $this->getPageTitle());
         $this->view->set('errors', $this->error);
