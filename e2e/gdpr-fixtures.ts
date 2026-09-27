@@ -152,13 +152,6 @@ export function hashUserPassword(password: string): string {
   return out.trim();
 }
 
-export const SESSION_DIR: string = path.join(
-  process.cwd(),
-  'public',
-  'files',
-  'cache',
-  'sessions',
-);
 export const RATE_LIMIT_DIR: string = path.join(
   process.cwd(),
   'public',
@@ -281,10 +274,7 @@ export function clearLoginAttempts(): void {
 }
 
 /**
- * Clear all browser cookies so consent banner state is deterministic,
- * and clear PHP session files so the session store is fresh for each test.
- * This prevents stale session/CSRF token issues when adminLogin creates
- * a new session after seedGdprFixtures reseeds the database.
+ * Clear all browser cookies so consent banner state is deterministic.
  *
  * @param context Browser context whose cookies should be cleared.
  */
@@ -292,11 +282,6 @@ export async function clearConsentCookies(
   context: BrowserContext,
 ): Promise<void> {
   await context.clearCookies();
-  if (fs.existsSync(SESSION_DIR)) {
-    for (const f of fs.readdirSync(SESSION_DIR)) {
-      fs.rmSync(path.join(SESSION_DIR, f), { force: true });
-    }
-  }
 }
 
 /**
