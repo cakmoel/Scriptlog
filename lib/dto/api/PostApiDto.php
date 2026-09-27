@@ -74,7 +74,7 @@ class PostApiDto
 
     public static function transformCollection(array $posts, string $appUrl): array
     {
-        return array_map(function ($post) use ($appUrl) {
+        return array_map(static function ($post) use ($appUrl) {
             return self::transform($post, $appUrl);
         }, $posts);
     }
