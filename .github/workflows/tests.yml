@@ -22,7 +22,7 @@ jobs:
           tools: composer:v2
 
       - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist
+        run: composer install --no-interaction --prefer-dist --ignore-platform-reqs
         env:
           COMPOSER_PLATFORM_CHECK: 'false'
 
