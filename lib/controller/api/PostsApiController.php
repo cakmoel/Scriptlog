@@ -31,7 +31,7 @@ use Scriptlog\Dto\Api\CommentApiDto;
 use Scriptlog\Dto\Api\PostApiDto;
 use Scriptlog\Service\PostService;
 
-class PostsApiController extends ApiController
+final class PostsApiController extends ApiController
 {
     /**
      * @var PostDao
@@ -70,21 +70,46 @@ class PostsApiController extends ApiController
 
     /**
      * Constructor
+     *
+     * All dependencies are optional so ApiRouter can keep building this
+     * controller with no arguments; tests pass mocks instead.
+     *
+     * @param PostDao|null $postDao Data access for posts
+     * @param TopicDao|null $topicDao Data access for topics
+     * @param CommentDao|null $commentDao Data access for comments
+     * @param MediaDao|null $mediaDao Data access for media
+     * @param Sanitize|null $sanitizer Input sanitizer
      */
-    public function __construct()
+    public function __construct(?PostDao $postDao = null, ?TopicDao $topicDao = null, ?CommentDao $commentDao = null, ?MediaDao $mediaDao = null, ?Sanitize $sanitizer = null)
     {
         $this->requiresAuth = false;
 
         parent::__construct();
 
-        // Initialize DAOs and services
-        $this->postDao = new PostDao();
-        $this->topicDao = new TopicDao();
-        $this->commentDao = new CommentDao();
-        $this->mediaDao = new MediaDao();
-        $this->sanitizer = new Sanitize();
+        // Dependencies are injected where the caller can provide them
+        $this->postDao = $this->resolve($postDao, PostDao::class);
+        $this->topicDao = $this->resolve($topicDao, TopicDao::class);
+        $this->commentDao = $this->resolve($commentDao, CommentDao::class);
+        $this->mediaDao = $this->resolve($mediaDao, MediaDao::class);
+        $this->sanitizer = $this->resolve($sanitizer, Sanitize::class);
         $this->hateoas = new ApiHateoas();
-        $this->postService = new PostService($this->postDao, new FormValidator(), $this->sanitizer);
+        $this->postService = new PostService($this->postDao, new FormValidator(), $this->sanitizer, $this->topicDao, $this->mediaDao);
+    }
+
+    /**
+     * Resolve an optional constructor dependency.
+     *
+     * @param object|null $provided Injected instance or null
+     * @param string $class Fallback class name
+     * @return object
+     */
+    private function resolve($provided, $class)
+    {
+        if ($provided !== null) {
+            return $provided;
+        }
+
+        return new $class();
     }
 
     /**
@@ -186,8 +211,8 @@ class PostsApiController extends ApiController
 
             // Get featured image if available
             if ($post['media_id']) {
-                $media = $this->mediaDao->findMediaById($post['media_id'], $this->sanitizer);
-                if ($media && is_array($media)) {
+                $media = $this->postService->getFeaturedMediaApi($post['media_id']);
+                if ($media !== null) {
                     $transformedPost['featured_image'] = $this->getAppUrl() . '/public/files/pictures/' . $media['media_filename'];
                 }
             }
