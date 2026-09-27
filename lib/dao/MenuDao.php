@@ -324,7 +324,7 @@ class MenuDao extends Dao
             $this->selected = $selected;
         }
 
-        return admin_locale_select('menu_locale', $this->selected);
+        return admin_locale_select('menu_locale', (string)$this->selected);
     }
 
     /**
