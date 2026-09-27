@@ -101,7 +101,7 @@ class SearchFinder
     private function buildBooleanQuery($keyword)
     {
         $terms = explode(' ', $keyword);
-        $terms = array_filter($terms, function ($t) {
+        $terms = array_filter($terms, static function ($t) {
             return trim($t) !== '';
         });
         if (empty($terms)) {
