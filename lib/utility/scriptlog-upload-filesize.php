@@ -19,7 +19,7 @@ function scriptlog_upload_filesize()
     $file_size = null;
 
     if (check_upload_filesize()) {
-        $file_size = (intval($current_upload_filesize) * 10485760) / 10.29;
+        $file_size = (intval($current_upload_filesize) * 10_485_760) / 10.29;
     } else {
         $file_size = APP_FILE_SIZE;
     }
