@@ -340,8 +340,8 @@ class Db implements DbInterface
         // Apply prefix to table name
         $tablename = $this->applyTablePrefix($tablename);
 
-        $setClause = implode(", ", array_map(fn ($key) => "$key = ?", array_keys($params)));
-        $whereClause = implode(" AND ", array_map(fn ($key) => "$key = ?", array_keys($where)));
+        $setClause = implode(", ", array_map(static fn ($key) => "$key = ?", array_keys($params)));
+        $whereClause = implode(" AND ", array_map(static fn ($key) => "$key = ?", array_keys($where)));
 
         $sql = "UPDATE `$tablename` SET $setClause WHERE $whereClause";
 
@@ -378,7 +378,7 @@ class Db implements DbInterface
         $placeholders = array_fill(0, count($fields), '?');
 
         $updateFields = array_keys($updateParams);
-        $updateAssignments = implode(", ", array_map(fn ($field) => "$field = ?", $updateFields));
+        $updateAssignments = implode(", ", array_map(static fn ($field) => "$field = ?", $updateFields));
 
         $sql = sprintf(
             "INSERT INTO `%s` (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s",
@@ -413,7 +413,7 @@ class Db implements DbInterface
         // Apply prefix to table name
         $tablename = $this->applyTablePrefix($tablename);
 
-        $whereClause = implode(" AND ", array_map(fn ($key) => "$key = ?", array_keys($where)));
+        $whereClause = implode(" AND ", array_map(static fn ($key) => "$key = ?", array_keys($where)));
 
         $sql = "DELETE FROM `$tablename` WHERE $whereClause";
 
@@ -503,11 +503,11 @@ class Db implements DbInterface
             // Longest first so prefix relationships (e.g. tbl_media vs
             // tbl_mediameta vs tbl_media_download) resolve to the longest
             // matching table name.
-            usort($tables, function ($a, $b) {
+            usort($tables, static function ($a, $b) {
                 return strlen($b) <=> strlen($a);
             });
 
-            $alternation = implode('|', array_map(function ($table) {
+            $alternation = implode('|', array_map(static function ($table) {
                 return preg_quote($table, '/');
             }, $tables));
 
