@@ -208,8 +208,8 @@ class PostService
         $this->postDao = $postDao;
         $this->validator = $validator;
         $this->sanitizer = $sanitizer;
-        $this->topicDao = $topicDao !== null ? $topicDao : new TopicDao();
-        $this->mediaDao = $mediaDao !== null ? $mediaDao : new MediaDao();
+        $this->topicDao = $topicDao;
+        $this->mediaDao = $mediaDao;
     }
 
     /**
@@ -481,7 +481,7 @@ class PostService
     public function addPost()
     {
 
-        $category = $this->topicDao;
+        $category = $this->topicDao !== null ? $this->topicDao : new TopicDao();
 
         $this->validator->sanitize($this->author, 'int');
         $this->validator->sanitize($this->post_image, 'int');
@@ -680,7 +680,7 @@ class PostService
         }
 
         clearstatcache();
-        $mediaLib = $this->mediaDao;
+        $mediaLib = $this->mediaDao !== null ? $this->mediaDao : new MediaDao();
 
         $media_metavalue = array(
           'Origin' => "nophoto.jpg",
@@ -729,7 +729,7 @@ class PostService
      */
     private function processUploadedImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, array $filtered, $oldMediaId = null)
     {
-        $mediaLib = $this->mediaDao;
+        $mediaLib = $this->mediaDao !== null ? $this->mediaDao : new MediaDao();
 
         if ($oldMediaId) {
             $sanitizer = new Sanitize();
@@ -979,7 +979,7 @@ class PostService
      */
     public function getFeaturedMediaApi($mediaId): ?array
     {
-        $media = $this->mediaDao->findMediaById((int)$mediaId, $this->sanitizer);
+        $media = $this->mediaDao !== null ? $this->mediaDao->findMediaById((int)$mediaId, $this->sanitizer) : null;
 
         return is_array($media) ? $media : null;
     }
@@ -995,7 +995,7 @@ class PostService
      */
     public function getTopicCheckboxes($postId = null): string
     {
-        return $this->topicDao->setCheckBoxTopic($postId);
+        return $this->topicDao !== null ? $this->topicDao->setCheckBoxTopic($postId) : null;
     }
 
     /**
@@ -1009,7 +1009,7 @@ class PostService
      */
     public function getMediaDropdown($selected = null): string
     {
-        return $this->mediaDao->dropDownMediaSelect($selected);
+        return $this->mediaDao !== null ? $this->mediaDao->dropDownMediaSelect($selected) : null;
     }
 
     /**
@@ -1023,6 +1023,6 @@ class PostService
      */
     public function getMediaUploadField($mediaId = null): string
     {
-        return $this->mediaDao->imageUploadHandler($mediaId);
+        return $this->mediaDao !== null ? $this->mediaDao->imageUploadHandler($mediaId) : null;
     }
 }
