@@ -12,7 +12,12 @@ if (false === $app->authenticator->userAccessControl(ActionConst::PRIVACY)) {
 $privacyPolicyDao = class_exists('PrivacyPolicyDao') ? new PrivacyPolicyDao() : null;
 $errors = [];
 $status = [];
-$csrfToken = class_exists('CSRFGuard') ? csrf_generate_token('csrfToken') : "";
+// Do not generate the CSRF token here: generating overwrites
+// $_SESSION['csrf_csrfToken'] before the POST check below runs, which would
+// invalidate the token the form was rendered with and turn every submit into
+// "unpleasant attempt". The token is (re)generated after POST handling,
+// just before rendering (see below).
+$csrfToken = "";
 
 try {
     switch ($action) {
@@ -130,6 +135,10 @@ try {
 } catch (Throwable $th) {
     $errors[] = $th->getMessage();
 }
+
+// (Re)generate the form token only after POST validation, so the check above
+// compares the submitted value against the token issued with the form.
+$csrfToken = class_exists('CSRFGuard') ? csrf_generate_token('csrfToken') : "";
 
 $languages = [];
 if (class_exists('LanguageDao')) {

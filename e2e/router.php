@@ -27,7 +27,12 @@ $_ENV['DB_PASS'] = getenv('E2E_DB_PASS') ?: (getenv('MYSQL_PWD') ?: 'userblogwar
 $_ENV['DB_HOST'] = getenv('E2E_DB_HOST') ?: '127.0.0.1';
 $_ENV['DB_PORT'] = getenv('E2E_DB_PORT') ?: '3306';
 $_ENV['DB_PREFIX'] = getenv('E2E_DB_PREFIX') ?: '';
-$_ENV['APP_KEY'] = getenv('E2E_APP_KEY') ?: 'GVXUD7-72HUXD-2TFCDT-8DDC2A';
+// NOTE: the APP_KEY fallback must match the key the committed
+// e2e/blogware_e2e.sql fixture was seeded with (same default as
+// e2e/config.ci.php); the seeded protected post's passphrase is
+// sha256(APP_KEY . password), so a different default makes the correct
+// password fail to decrypt locally while CI stays green.
+$_ENV['APP_KEY'] = getenv('E2E_APP_KEY') ?: 'F5R5TE-WL7VSG-KKAZRH-377C04';
 $_ENV['APP_URL'] = getenv('PLAYWRIGHT_BASE_URL') ?: 'http://127.0.0.1:8099';
 
 // The production deployment is served over HTTPS (Apache on :443). Mark the
