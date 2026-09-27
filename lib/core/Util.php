@@ -59,7 +59,7 @@ class Util
      *
      * @var integer
      */
-    public const SECONDS_IN_A_MONTH = 2592000;
+    public const SECONDS_IN_A_MONTH = 2_592_000;
 
     /**
      * A constant representing the number of seconds in a year (365 days),
@@ -67,7 +67,7 @@ class Util
      *
      * @var integer
      */
-    public const SECONDS_IN_A_YEAR = 31536000;
+    public const SECONDS_IN_A_YEAR = 31_536_000;
 
     /**
      * URL constants as defined in the PHP Manual under "Constants usable with
@@ -389,7 +389,7 @@ class Util
             }
 
             self::$hasArray = true;
-            $uuid = 'include-php-' . uniqid() . mt_rand(1, 1000000);
+            $uuid = 'include-php-' . uniqid() . mt_rand(1, 1_000_000);
 
             $html .= (!empty($var) ? ' <img id="' . $uuid . '" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D" data-coltoggle /><script>setImg("' . $uuid . '",' . $setImg . ',1);</script>' : '') . '<span style="color:#588bff;">array</span>(' . count($var) . ')';
             if (!empty($var)) {
@@ -441,7 +441,7 @@ class Util
             $done[] = &$var;
 
             self::$hasArray = true;
-            $uuid = 'include-php-' . uniqid() . mt_rand(1, 1000000);
+            $uuid = 'include-php-' . uniqid() . mt_rand(1, 1_000_000);
 
             $html .= ' <img id="' . $uuid . '" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D" data-coltoggle /><script>setImg("' . $uuid . '",' . $setImg . ',1);</script><span style="color:#588bff;">object</span>(' . get_class($var) . ') <span id="' . $uuid . '-collapsable" style="' . $setStyle . '"><br />[<br />';
 
@@ -734,7 +734,7 @@ class Util
      */
     public static function fix_broken_serialization($brokenSerializedData)
     {
-        $fixdSerializedData = preg_replace_callback('!s:(\d+):"(.*?)";!', function ($matches) {
+        $fixdSerializedData = preg_replace_callback('!s:(\d+):"(.*?)";!', static function ($matches) {
             $snip = $matches[2];
             return 's:' . strlen($snip) . ':"' . $snip . '";';
         }, $brokenSerializedData);
@@ -2186,7 +2186,7 @@ class Util
     {
         $flattened = array();
 
-        array_walk_recursive($array, function ($value, $key) use (&$flattened, $preserve_keys) {
+        array_walk_recursive($array, static function ($value, $key) use (&$flattened, $preserve_keys) {
             if ($preserve_keys && !is_int($key)) {
                 $flattened[$key] = $value;
             } else {
