@@ -31,7 +31,7 @@ class SyntaxHighlight
                 (?<!\\\)&quot;.*?(?<!\\\)&quot;|
                 (?<!\\\)\'(.*?)(?<!\\\)\'
             )/isx'
-            => function ($matches) use (&$tokens) {
+            => static function ($matches) use (&$tokens) {
                 return self::replaceId($tokens, $matches[1]);
             },
 
