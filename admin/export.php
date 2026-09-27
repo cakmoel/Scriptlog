@@ -10,7 +10,7 @@ if (empty($action)) {
     }
 }
 
-$exportService = new ExportService();
+$exportService = new ExportService(new UserDao());
 $exportController = new ExportController($exportService);
 
 try {
