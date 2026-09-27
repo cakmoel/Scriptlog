@@ -250,12 +250,12 @@ function medoo_fetch_callback($table, $columns, $where)
             $whereClause = db_build_where($where);
             $sql = "SELECT {$cols} FROM {$table}" . $whereClause['sql'];
             $result = $database->dbSelect($sql, $whereClause['params'], PDO::FETCH_ASSOC);
-            return array_map(function ($data) {
+            return array_map(static function ($data) {
                 return $data;
             }, $result);
         }
         // Medoo class
-        return $database->select($table, $columns, $where, function ($data) {
+        return $database->select($table, $columns, $where, static function ($data) {
             return $data;
         });
     }
