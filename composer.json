@@ -32,7 +32,6 @@
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "ext-pdo": "*",
-        "boundwize/structarmed": "^0.17.12",
         "catfan/medoo": "^2.1",
         "cweagans/composer-patches": "^1.7",
         "defuse/php-encryption": "^2.2",
