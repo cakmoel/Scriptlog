@@ -21,8 +21,6 @@ use Scriptlog\Core\AppException;
 use Scriptlog\Core\BaseApp;
 use Scriptlog\Core\LogError;
 use Scriptlog\Core\View;
-use Scriptlog\Dao\MediaDao;
-use Scriptlog\Dao\TopicDao;
 use Scriptlog\Dto\PostRequestDto;
 use Scriptlog\Dto\UploadedFileDto;
 use Scriptlog\Service\PostApplicationService;
@@ -31,23 +29,17 @@ use Scriptlog\Validator\FileUploadValidator;
 use Scriptlog\Validator\PostValidator;
 use Scriptlog\Validator\ProtectedPostValidator;
 
-class PostController extends BaseApp
+final class PostController extends BaseApp
 {
     private $view;
 
     private $postService;
 
-    private $topicDao;
-
-    private $mediaDao;
-
     private $appService;
 
-    public function __construct(PostService $postService, TopicDao $topicDao, MediaDao $mediaDao, PostApplicationService $appService)
+    public function __construct(PostService $postService, PostApplicationService $appService)
     {
         $this->postService = $postService;
-        $this->topicDao = $topicDao;
-        $this->mediaDao = $mediaDao;
         $this->appService = $appService;
     }
 
@@ -111,8 +103,6 @@ class PostController extends BaseApp
         $errors = array();
         $checkError = true;
         $user_level = $this->postService->postAuthorLevel();
-        $topics = $this->topicDao;
-        $medialib = $this->mediaDao;
 
         if (isset($_POST['postFormSubmit'])) {
             $mediaFile = UploadedFileDto::fromGlobals();
@@ -132,7 +122,7 @@ class PostController extends BaseApp
                 $checkError = $this->validatePostSubmission($file_location, $file_error, $file_size, $file_name, $errors, $checkError);
 
                 if (!$checkError) {
-                    $this->renderNewPostForm($errors, $_POST, $topics, $medialib, $user_level);
+                    $this->renderNewPostForm($errors, $_POST, $user_level);
                     return $this->view->render();
                 }
 
@@ -146,7 +136,7 @@ class PostController extends BaseApp
             }
         }
 
-        $this->renderNewPostForm(null, null, $topics, $medialib, $user_level);
+        $this->renderNewPostForm(null, null, $user_level);
         return $this->view->render();
     }
 
@@ -161,8 +151,6 @@ class PostController extends BaseApp
         $errors = array();
         $checkError = true;
         $user_level = $this->postService->postAuthorLevel();
-        $topics = $this->topicDao;
-        $medialib = $this->mediaDao;
 
         $getPost = $this->postService->grabPost($id);
         if (!$getPost) {
@@ -209,7 +197,7 @@ class PostController extends BaseApp
                 $checkError = $this->validatePostUpdate($file_location, $file_error, $file_size, $file_name, $errors, $checkError);
 
                 if (!$checkError) {
-                    $this->renderEditPostForm($errors, $data_post, $getPost, $topics, $medialib, $user_level);
+                    $this->renderEditPostForm($errors, $data_post, $getPost, $user_level);
                     return $this->view->render();
                 }
 
@@ -223,7 +211,7 @@ class PostController extends BaseApp
             }
         }
 
-        $this->renderEditPostForm(null, $data_post, $getPost, $topics, $medialib, $user_level);
+        $this->renderEditPostForm(null, $data_post, $getPost, $user_level);
         return $this->view->render();
     }
 
@@ -347,7 +335,7 @@ class PostController extends BaseApp
 
     // ─── Rendering ────────────────────────────────────────────
 
-    private function renderNewPostForm($errors, $formData, $topics, $medialib, $user_level)
+    private function renderNewPostForm($errors, $formData, $user_level)
     {
         $this->setView('edit-post');
         $this->setPageTitle(($formData !== null) ? 'Add New Post' : 'Add new post');
@@ -359,12 +347,12 @@ class PostController extends BaseApp
             $this->view->set('formData', $formData);
         }
 
-        $this->view->set('topics', $topics->setCheckBoxTopic());
+        $this->view->set('topics', $this->postService->getTopicCheckboxes());
 
         if ($user_level === 'contributor') {
-            $this->view->set('medialibs', $medialib->dropDownMediaSelect());
+            $this->view->set('medialibs', $this->postService->getMediaDropdown());
         } else {
-            $this->view->set('medialibs', $medialib->imageUploadHandler());
+            $this->view->set('medialibs', $this->postService->getMediaUploadField());
         }
 
         if (!empty($errors)) {
@@ -380,7 +368,7 @@ class PostController extends BaseApp
         $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
     }
 
-    private function renderEditPostForm($errors, $data_post, $getPost, $topics, $medialib, $user_level)
+    private function renderEditPostForm($errors, $data_post, $getPost, $user_level)
     {
         $this->setView('edit-post');
         $this->setPageTitle('Edit Post');
@@ -393,12 +381,12 @@ class PostController extends BaseApp
         }
 
         $this->view->set('postData', $data_post);
-        $this->view->set('topics', $topics->setCheckBoxTopic($getPost['ID']));
+        $this->view->set('topics', $this->postService->getTopicCheckboxes($getPost['ID']));
 
         if ($user_level === 'contributor') {
-            $this->view->set('medialibs', $medialib->dropDownMediaSelect($getPost['media_id']));
+            $this->view->set('medialibs', $this->postService->getMediaDropdown($getPost['media_id']));
         } else {
-            $this->view->set('medialibs', $medialib->imageUploadHandler($getPost['media_id']));
+            $this->view->set('medialibs', $this->postService->getMediaUploadField($getPost['media_id']));
         }
 
         if ($data_post['post_visibility'] == 'protected') {
