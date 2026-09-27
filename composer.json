@@ -32,6 +32,7 @@
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "ext-pdo": "*",
+        "boundwize/structarmed": "^0.17.12",
         "catfan/medoo": "^2.1",
         "cweagans/composer-patches": "^1.7",
         "defuse/php-encryption": "^2.2",
@@ -85,6 +86,7 @@
         }
     },
     "scripts": {
+        "structarmed": "structarmed analyse",
         "metrics": "php bin/phpmetrics",
         "phpstan": "phpstan analyse lib --level 1 --memory-limit=1G",
         "phpstan:strict": "phpstan analyse lib --level 5 --memory-limit=1G",
