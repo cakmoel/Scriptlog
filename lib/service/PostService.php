@@ -174,18 +174,42 @@ class PostService
     private $sanitizer;
 
     /**
+     * topicDao
+     *
+     * @var TopicDao
+     *
+     */
+    private $topicDao;
+
+    /**
+     * mediaDao
+     *
+     * @var MediaDao
+     *
+     */
+    private $mediaDao;
+
+    /**
      * Constructor
+     *
+     * Topic and media DAOs are optional so callers that cannot inject
+     * (API controllers are built with no arguments by ApiRouter) keep
+     * working; the admin composition root passes them explicitly.
      *
      * @param object $postDao
      * @param object $validator
      * @param object $sanitizer
+     * @param TopicDao|null $topicDao Data access for post category lookups and writes
+     * @param MediaDao|null $mediaDao Data access for post media lookups and writes
      *
      */
-    public function __construct(PostDao $postDao, FormValidator $validator, Sanitize $sanitizer)
+    public function __construct(PostDao $postDao, FormValidator $validator, Sanitize $sanitizer, ?TopicDao $topicDao = null, ?MediaDao $mediaDao = null)
     {
         $this->postDao = $postDao;
         $this->validator = $validator;
         $this->sanitizer = $sanitizer;
+        $this->topicDao = $topicDao !== null ? $topicDao : new TopicDao();
+        $this->mediaDao = $mediaDao !== null ? $mediaDao : new MediaDao();
     }
 
     /**
@@ -457,7 +481,7 @@ class PostService
     public function addPost()
     {
 
-        $category = new TopicDao();
+        $category = $this->topicDao;
 
         $this->validator->sanitize($this->author, 'int');
         $this->validator->sanitize($this->post_image, 'int');
@@ -568,7 +592,7 @@ class PostService
 
         // Handle media operation
         if (class_exists('MediaDao')) {
-            $medialib = new MediaDao();
+            $medialib = $this->mediaDao;
 
             if (method_exists($medialib, 'findMediaBlog') && $media_id) {
                 $media_data = $medialib->findMediaBlog((int)$media_id);
@@ -656,7 +680,7 @@ class PostService
         }
 
         clearstatcache();
-        $mediaLib = new MediaDao();
+        $mediaLib = $this->mediaDao;
 
         $media_metavalue = array(
           'Origin' => "nophoto.jpg",
@@ -705,7 +729,7 @@ class PostService
      */
     private function processUploadedImage($file_location, $file_type, $file_name, $file_size, $file_extension, $new_filename, $width, $height, $media_access, $user_level, array $filtered, $oldMediaId = null)
     {
-        $mediaLib = new MediaDao();
+        $mediaLib = $this->mediaDao;
 
         if ($oldMediaId) {
             $sanitizer = new Sanitize();
@@ -942,5 +966,63 @@ class PostService
     public function getPostByIdApi($postId)
     {
         return $this->postDao->getPostById((int)$postId);
+    }
+
+    /**
+     * Get featured media row for the API.
+     *
+     * Normalizes the DAO result to null when no media exists so callers
+     * never receive false or boolean true.
+     *
+     * @param int $mediaId
+     * @return array|null Media row or null when missing
+     */
+    public function getFeaturedMediaApi($mediaId): ?array
+    {
+        $media = $this->mediaDao->findMediaById((int)$mediaId, $this->sanitizer);
+
+        return is_array($media) ? $media : null;
+    }
+
+    /**
+     * Get topic checkboxes for the post form.
+     *
+     * Returns plain HTML so controllers pass data to views instead of DAO
+     * objects.
+     *
+     * @param int|string|null $postId Post ID to pre-check, null for new posts
+     * @return string Checkbox HTML
+     */
+    public function getTopicCheckboxes($postId = null): string
+    {
+        return $this->topicDao->setCheckBoxTopic($postId);
+    }
+
+    /**
+     * Get media dropdown for the post form.
+     *
+     * Returns plain HTML so controllers pass data to views instead of DAO
+     * objects.
+     *
+     * @param int|null $selected Media ID pre-selected in the list
+     * @return string Dropdown HTML
+     */
+    public function getMediaDropdown($selected = null): string
+    {
+        return $this->mediaDao->dropDownMediaSelect($selected);
+    }
+
+    /**
+     * Get media upload field for the post form.
+     *
+     * Returns plain HTML so controllers pass data to views instead of DAO
+     * objects.
+     *
+     * @param int|null $mediaId Current media ID for existing posts
+     * @return string Upload field HTML
+     */
+    public function getMediaUploadField($mediaId = null): string
+    {
+        return $this->mediaDao->imageUploadHandler($mediaId);
     }
 }
