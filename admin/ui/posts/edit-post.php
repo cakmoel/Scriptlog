@@ -119,9 +119,9 @@
                    <!-- /.post-visiblity -->
 
                    <div class="form-group">
-                      <label for="post_locale">Language</label>
+                      <label for="post_locale"><?= admin_translate('form.language'); ?></label>
                       <?= (isset($postLocale)) ? $postLocale : ""; ?>
-                      <p class="help-block">Select the language for this post.</p>
+                      <p class="help-block"><?= admin_translate('form.language_help_post'); ?></p>
                    </div>
 
                    </div>
