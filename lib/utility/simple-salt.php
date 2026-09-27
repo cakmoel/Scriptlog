@@ -23,7 +23,7 @@ function simple_salt($num_chars)
     if ((is_int($num_chars)) && ($num_chars > 0) && (!is_null($num_chars))) {
         $accepted_chars = (version_compare(PHP_VERSION, '7.0', '<=')) ? ircmaxell_generator_string('low', $num_chars) : random_bytes($num_chars);
 
-        srand(((int)((float)microtime() * 1000003)));
+        srand(((int)((float)microtime() * 1_000_003)));
 
         for ($i = 0; $i <= $num_chars; $i++) {
             $random_number = rand(0, (strlen($accepted_chars) - 1));
