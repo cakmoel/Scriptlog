@@ -64,7 +64,7 @@ function invoke_plugin($plugin_name, $args)
         }
 
         // Ensure the hook exists to return at least the original args
-        clip('clip_' . $plugin_name, null, function ($val) {
+        clip('clip_' . $plugin_name, null, static function ($val) {
             return $val;
         });
 
