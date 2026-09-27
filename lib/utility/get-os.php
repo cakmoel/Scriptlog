@@ -139,7 +139,7 @@ function get_linux_distro()
                 continue;
             }
 
-            $lines = array_filter(array_map(function ($line) {
+            $lines = array_filter(array_map(static function ($line) {
                 // skip empty lines
                 if (empty(trim($line))) {
                     return false;
