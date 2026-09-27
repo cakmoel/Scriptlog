@@ -21,22 +21,24 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 use Scriptlog\Core\BaseApp;
 use Scriptlog\Core\Session;
 use Scriptlog\Core\View;
-use Scriptlog\Dao\UserDao;
 use Scriptlog\Service\ExportService;
 
 class ExportController extends BaseApp
 {
     private $exportService;
-    private $userDao;
     private $view;
 
     private $error = [];
     private $success = [];
 
+    /**
+     * ExportController constructor.
+     *
+     * @param ExportService $exportService Business logic for export operations
+     */
     public function __construct(ExportService $exportService)
     {
         $this->exportService = $exportService;
-        $this->userDao = new UserDao();
     }
 
     /**
@@ -92,7 +94,7 @@ class ExportController extends BaseApp
         $this->setPageTitle('Export Content');
         $this->view = new View('admin', 'ui', 'export', 'index');
 
-        $users = $this->userDao->getUsers('ID', \PDO::FETCH_ASSOC);
+        $users = $this->exportService->getExportUsers();
 
         $this->view->set('pageTitle', $this->getPageTitle());
         $this->view->set('errors', $this->error);
