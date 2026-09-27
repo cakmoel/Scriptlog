@@ -42,13 +42,13 @@ final class SidebarViewModel extends AbstractThemeViewModel
         $self = new self();
 
         if (isset($row['latest_posts']) && is_array($row['latest_posts'])) {
-            $self->latestPosts = array_map(function ($post) use ($escape) {
+            $self->latestPosts = array_map(static function ($post) use ($escape) {
                 return PostViewModel::fromRow($post, $escape);
             }, $row['latest_posts']);
         }
 
         if (isset($row['categories']) && is_array($row['categories'])) {
-            $self->categories = array_map(function ($cat) use ($escape) {
+            $self->categories = array_map(static function ($cat) use ($escape) {
                 return [
                     'title' => self::safe($cat['topic_title'] ?? null, $escape),
                     'url'   => isset($cat['url']) ? $escape((string)$cat['url']) : '#',
@@ -58,7 +58,7 @@ final class SidebarViewModel extends AbstractThemeViewModel
         }
 
         if (isset($row['archives']) && is_array($row['archives'])) {
-            $self->archives = array_map(function ($arc) use ($escape) {
+            $self->archives = array_map(static function ($arc) use ($escape) {
                 return [
                     'label' => self::safe($arc['label'] ?? null, $escape),
                     'url'   => isset($arc['url']) ? $escape((string)$arc['url']) : '#',
@@ -68,7 +68,7 @@ final class SidebarViewModel extends AbstractThemeViewModel
         }
 
         if (isset($row['tags']) && is_array($row['tags'])) {
-            $self->tags = array_map(function ($tag) use ($escape) {
+            $self->tags = array_map(static function ($tag) use ($escape) {
                 return [
                     'label' => self::safe($tag['label'] ?? null, $escape),
                     'url'   => isset($tag['url']) ? $escape((string)$tag['url']) : '#',
