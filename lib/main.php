@@ -77,7 +77,7 @@ if (is_readable(APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'vendor/autoload.
 // when old global class names are referenced but the namespaced version was already loaded.
 if (file_exists(__DIR__ . '/autoload-aliases-map.php')) {
     $scriptlogAliasMap = require __DIR__ . '/autoload-aliases-map.php';
-    spl_autoload_register(function ($className) use ($scriptlogAliasMap) {
+    spl_autoload_register(static function ($className) use ($scriptlogAliasMap) {
         if (isset($scriptlogAliasMap[$className])) {
             class_alias($scriptlogAliasMap[$className], $className);
         }
