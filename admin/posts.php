@@ -7,9 +7,9 @@ $postId = isset($_GET['Id']) ? intval($_GET['Id']) : 0;
 $postDao = class_exists('PostDao') ? new PostDao() : "";
 $topicDao = class_exists('TopicDao') ? new TopicDao() : "";
 $mediaDao = class_exists('MediaDao') ? new MediaDao() : "";
-$postService = class_exists('PostService') ? new PostService($postDao, $app->validator, $app->sanitizer) : "";
+$postService = class_exists('PostService') ? new PostService($postDao, $app->validator, $app->sanitizer, $topicDao, $mediaDao) : "";
 $postAppService = class_exists('PostApplicationService') ? new PostApplicationService($postService) : "";
-$postController = class_exists('PostController') ? new PostController($postService, $topicDao, $mediaDao, $postAppService) : "";
+$postController = class_exists('PostController') ? new PostController($postService, $postAppService) : "";
 
 try {
     $actionKey = empty($action) ? 'default_post' : $action;
