@@ -180,7 +180,7 @@ class QueryApiController extends ApiController
                 return [];
             }
 
-            return array_map(function ($row) {
+            return array_map(static function ($row) {
                 $excerpt = strip_tags($row['post_content']);
                 if (mb_strlen($excerpt, 'UTF-8') > 200) {
                     $excerpt = mb_substr($excerpt, 0, 200, 'UTF-8') . '...';
