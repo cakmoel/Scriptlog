@@ -204,7 +204,7 @@ class TranslationLoader
     private function interpolate(string $text, array $params): string
     {
         return str_replace(
-            array_map(fn ($k) => ':' . $k, array_keys($params)),
+            array_map(static fn ($k) => ':' . $k, array_keys($params)),
             array_values($params),
             $text
         );
