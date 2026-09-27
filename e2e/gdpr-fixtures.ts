@@ -281,22 +281,16 @@ export function clearLoginAttempts(): void {
 }
 
 /**
- * Clear consent-related browser cookies while preserving session cookies
- * so that the PHP session (and CSRF tokens) remain intact across reseeding.
+ * No-op: consent state is managed by the database (seedGdprFixtures),
+ * not browser cookies. Skipping cookie clearing to preserve the PHP
+ * session (_scriptlog) and CSRF tokens across reseeding.
  *
- * @param context Browser context whose cookies should be cleared.
+ * @param context Browser context (unused).
  */
 export async function clearConsentCookies(
   context: BrowserContext,
 ): Promise<void> {
-  const cookies = await context.cookies();
-  const sessionCookies = cookies.filter(
-    (c) => c.name === 'PHPSESSID' || c.name.startsWith('PHPSESSID_'),
-  );
-  await context.clearCookies();
-  if (sessionCookies.length > 0) {
-    await context.addCookies(sessionCookies);
-  }
+  // intentionally empty — do not clear cookies
 }
 
 /**
