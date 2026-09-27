@@ -20,6 +20,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 use Scriptlog\Core\ExportException;
 use Scriptlog\Core\Registry;
 use Scriptlog\Core\Sanitize;
+use Scriptlog\Dao\UserDao;
 use BlogspotExporter;
 use GhostExporter;
 use ScriptlogExporter;
@@ -28,6 +29,7 @@ use WordPressExporter;
 class ExportService
 {
     private $dbc;
+    private $userDao;
     private $authorId;
     private $exportStats;
 
@@ -36,9 +38,15 @@ class ExportService
     public const DESTINATION_BLOGSPOT = 'blogspot';
     public const DESTINATION_SCRIPTLOG = 'scriptlog';
 
-    public function __construct()
+    /**
+     * ExportService constructor.
+     *
+     * @param UserDao $userDao Data access for export author lookups
+     */
+    public function __construct(UserDao $userDao)
     {
         $this->dbc = Registry::get('dbc');
+        $this->userDao = $userDao;
 
         $this->authorId = 1;
         $this->exportStats = [
@@ -82,6 +90,20 @@ class ExportService
             'categories_exported' => 0,
             'comments_exported' => 0,
         ];
+    }
+
+    /**
+     * Get users available as export authors for the export form.
+     *
+     * Normalizes the DAO result to an array so callers never receive false.
+     *
+     * @return array List of user rows, empty when no users exist
+     */
+    public function getExportUsers(): array
+    {
+        $users = $this->userDao->getUsers('ID', \PDO::FETCH_ASSOC);
+
+        return empty($users) ? array() : $users;
     }
 
     /**
