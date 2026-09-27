@@ -42,7 +42,7 @@ class BlogspotImporter
 
         libxml_use_internal_errors(true);
 
-        libxml_set_external_entity_loader(function ($public, $system, $context) {
+        libxml_set_external_entity_loader(static function ($public, $system, $context) {
             return null;
         });
 
