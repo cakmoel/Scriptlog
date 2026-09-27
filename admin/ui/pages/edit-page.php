@@ -142,9 +142,9 @@ if (isset($pageData['post_modified']) || isset($pageData['post_date'])) {
 </div>
 
 <div class="form-group">
-<label for="post_locale">Language</label>
+<label for="post_locale"><?= admin_translate('form.language'); ?></label>
 <?=(isset($pageLocale)) ? $pageLocale : ""; ?>
-<p class="help-block">Select the language for this page.</p>
+<p class="help-block"><?= admin_translate('form.language_help_page'); ?></p>
 </div>
 
 <div class="box-footer">
