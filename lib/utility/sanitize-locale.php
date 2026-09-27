@@ -75,27 +75,31 @@ function locale_dropdown($name, $selected = '')
 /**
  * admin_locales_catalog()
  *
- * Single source of truth for the supported admin content locales.
+ * Returns the single source of truth for the admin content locale dropdowns
+ * (posts, pages, topics, menus). The catalog is synchronized with the active
+ * languages in `tbl_languages` when a database connection is available and
+ * falls back to the seven supported languages otherwise, so the application
+ * keeps working in CLI/unit-test contexts without a connection.
  *
- * Falls back to the exact seven supported languages (with their native
- * names) when no database connection is available. When a LanguageDao is
- * available the catalog is overridden by the active languages from
- * tbl_languages (lang_code => native label).
+ * Labels are the native language names (e.g. `Español`, `العربية`), falling
+ * back to the English `lang_name` column when `lang_native` is empty. Labels
+ * are returned raw; callers MUST escape them before rendering.
+ *
+ * The catalog is cached with a `static` variable for the duration of the
+ * request.
  *
  * @category function
- * @see      lib/dao/LanguageDao.php
- * @return array<string,string>
- *
+ * @return array<string, string> Map of lang_code => native name
  */
-function admin_locales_catalog()
+function admin_locales_catalog(): array
 {
     static $catalog = null;
 
-    if ($catalog !== null) {
+    if (is_array($catalog)) {
         return $catalog;
     }
 
-    $catalog = array(
+    $catalog = [
         'en' => 'English',
         'ar' => 'العربية',
         'zh' => '中文',
@@ -103,43 +107,29 @@ function admin_locales_catalog()
         'ru' => 'Русский',
         'es' => 'Español',
         'id' => 'Bahasa Indonesia',
-    );
+    ];
 
     if (class_exists('LanguageDao')) {
         try {
-            $dao = new LanguageDao();
+            $languageDao = new LanguageDao();
+            $languages = $languageDao->findActiveLanguages();
 
-            if (method_exists($dao, 'findActiveLanguages')) {
-                $rows = $dao->findActiveLanguages();
+            if (!empty($languages)) {
+                $dbCatalog = [];
+                foreach ($languages as $language) {
+                    $code = (string)$language['lang_code'];
+                    $label = (!empty($language['lang_native']))
+                        ? (string)$language['lang_native']
+                        : (string)$language['lang_name'];
+                    $dbCatalog[$code] = $label;
+                }
 
-                if (is_array($rows) && !empty($rows)) {
-                    $dbCatalog = array();
-
-                    foreach ($rows as $row) {
-                        if (!is_array($row)) {
-                            continue;
-                        }
-
-                        $code = isset($row['lang_code']) ? (string)$row['lang_code'] : '';
-
-                        if ($code === '') {
-                            continue;
-                        }
-
-                        $label = isset($row['lang_native']) && $row['lang_native'] !== ''
-                            ? (string)$row['lang_native']
-                            : (isset($row['lang_name']) ? (string)$row['lang_name'] : $code);
-
-                        $dbCatalog[$code] = $label;
-                    }
-
-                    if (!empty($dbCatalog)) {
-                        $catalog = $dbCatalog;
-                    }
+                if ($dbCatalog !== []) {
+                    $catalog = $dbCatalog;
                 }
             }
-        } catch (\Scriptlog\Core\DbException $e) {
-            /* Database unavailable: keep the fallback catalog. */
+        } catch (\Throwable $e) {
+            // Database unavailable or unusable: keep the static fallback catalog.
         }
     }
 
@@ -149,45 +139,36 @@ function admin_locales_catalog()
 /**
  * admin_locale_select()
  *
- * Renders the admin content locale <select> with native labels.
+ * Renders a native-name locale `<select>` driven by admin_locales_catalog().
+ * The markup mirrors the generic `dropdown()` helper (`class="form-control
+ * select2"`, name/id set to `$name`) so existing admin CSS/JavaScript keeps
+ * working, but every attribute value and label is escaped for XSS safety.
  *
- * Every attribute and label is escaped, and a legacy stored locale that is
- * not part of the catalog is preserved (uppercased) as a selected option so
- * previously saved values round-trip safely.
+ * A legacy stored locale that is not part of the catalog (e.g. an older
+ * `'ja'` value) is appended as an uppercased-code option so editing an
+ * existing record never silently rewrites its locale.
  *
  * @category function
- * @param  string $name     Select name/id attribute
- * @param  string $selected Stored locale code (optional)
- * @return string
- *
+ * @param  string $name     The `name`/`id` attribute of the select element
+ * @param  string $selected The currently stored locale code, if any
+ * @return string Escaped HTML snippet for the select element
  */
-function admin_locale_select($name, $selected = '')
+function admin_locale_select(string $name, string $selected = ''): string
 {
-    $safeName = htmlspecialchars((string)$name, ENT_QUOTES, 'UTF-8');
-    $selected = (string)$selected;
+    $options = admin_locales_catalog();
 
-    $html = '<select class="form-control select2" name="' . $safeName . '" id="' . $safeName . '">' . PHP_EOL;
-
-    $hasSelected = false;
-
-    foreach (admin_locales_catalog() as $code => $label) {
-        $select = ($selected !== '' && $selected === (string)$code) ? ' selected' : '';
-
-        if ($select !== '') {
-            $hasSelected = true;
-        }
-
-        $safeCode = htmlspecialchars((string)$code, ENT_QUOTES, 'UTF-8');
-        $safeLabel = htmlspecialchars((string)$label, ENT_QUOTES, 'UTF-8');
-
-        $html .= '<option value="' . $safeCode . '"' . $select . '>' . $safeLabel . '</option>' . PHP_EOL;
+    if ($selected !== '' && !array_key_exists($selected, $options)) {
+        $options[$selected] = strtoupper($selected);
     }
 
-    if (!$hasSelected && $selected !== '') {
-        $safeSelected = htmlspecialchars($selected, ENT_QUOTES, 'UTF-8');
-        $html .= '<option value="' . $safeSelected . '" selected>'
-            . htmlspecialchars(strtoupper($selected), ENT_QUOTES, 'UTF-8')
-            . '</option>' . PHP_EOL;
+    $nameAttr = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+
+    $html = '<select class="form-control select2" name="' . $nameAttr . '" id="' . $nameAttr . '">' . PHP_EOL;
+
+    foreach ($options as $code => $label) {
+        $isSelected = ($selected !== '' && (string)$code === $selected) ? ' selected' : '';
+        $html .= '<option value="' . htmlspecialchars((string)$code, ENT_QUOTES, 'UTF-8') . '"' . $isSelected . '>'
+               . htmlspecialchars((string)$label, ENT_QUOTES, 'UTF-8') . '</option>' . PHP_EOL;
     }
 
     $html .= '</select>' . PHP_EOL;
