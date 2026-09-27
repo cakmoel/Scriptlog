@@ -21,7 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Admin locale catalog with native labels**: New `admin_locales_catalog()` function returns a map of `lang_code => native name` with database-driven catalog synchronization and static request caching; falls back to seven supported languages when no DB connection is available
 - **Native label select helpers**: New `admin_locale_select()` helper renders a native-name locale `<select>` with full XSS-safe attribute and label escaping; legacy locales not in the catalog are appended as uppercased-code options
 - **`getImageRadioButton()` and `createPageMedia()` in PageService**: Delegated to `MediaDao` so controllers never build DAOs themselves; featured-image radio list for the page form
-- **`boundwize/structarmed` dev dependency**: Structural analysis tool added to catch array-shape mismatches and prevent silent data corruption at build time
+- **`boundwize/structarmed` dev dependency**: Planned structural analysis tool for catching array-shape mismatches — temporarily deferred due to PHP platform compatibility constraints (requires PHP 8.2+ vs project platform PHP 7.4)
 - **`structarmed` Composer script**: New `composer structarmed` command for structural integrity analysis during quality checks
 
 ### Changed
@@ -33,11 +33,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 - **CSRF token persistence**: Submitted CSRF token is now preserved across policy saves so POST requests don't bounce on validation errors
-- **`boundwize/structarmed` platform compatibility**: Added `--ignore-platform-reqs` support for PHP 7.4 platform configuration
+- **`boundwize/structarmed` platform compatibility**: Removed `boundwize/structarmed` dependency and `structarmed` script from composer.json to fix CI failure caused by PHP 8.2+ requirement on a PHP 7.4 platform
 - **PHPStan level-1 compatibility**: Resolved `empty()` variable analysis error in `sanitize-locale.php`
 
 ### Security
-- **`boundwize/structarmed`**: Structural integrity analysis added to the build pipeline to detect array-shape mismatches and prevent silent data corruption
 - **`composer audit` integration**: Security audit now included in the `composer build` quality script
 
 ### Deprecated
