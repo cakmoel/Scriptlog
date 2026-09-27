@@ -29,7 +29,7 @@ function timezone_list()
         $tempTimezones[] = array('offset' => (int)$currentTimezone->getOffset($utcTime), 'identifier' => $timezoneIdentifier);
     }
 
-    usort($tempTimezones, function ($a, $b) {
+    usort($tempTimezones, static function ($a, $b) {
         return ($a['offset'] == $b['offset']) ? strcmp($a['identifier'], $b['identifier']) : $a['offset'] - $b['offset'];
     });
 
