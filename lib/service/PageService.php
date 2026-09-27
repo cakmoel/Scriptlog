@@ -21,7 +21,7 @@ use Scriptlog\Core\Session;
 use Scriptlog\Dao\MediaDao;
 use Scriptlog\Dao\PageDao;
 
-class PageService
+final class PageService
 {
     /**
      * page's ID
@@ -168,13 +168,27 @@ class PageService
     private $sanitizer;
 
     /**
-     * Initialize or instanstiate of class propertis
+     * MediaDao
+     *
+     * @var MediaDao
+     *
      */
-    public function __construct(PageDao $pageDao, FormValidator $validator, Sanitize $sanitizer)
+    private $mediaDao;
+
+    /**
+     * Initialize or instanstiate of class propertis
+     *
+     * @param PageDao $pageDao Data access for page records
+     * @param FormValidator $validator Input validator
+     * @param Sanitize $sanitizer Input sanitizer
+     * @param MediaDao $mediaDao Data access for page media lookups and writes
+     */
+    public function __construct(PageDao $pageDao, FormValidator $validator, Sanitize $sanitizer, MediaDao $mediaDao)
     {
         $this->pageDao = $pageDao;
         $this->validator = $validator;
         $this->sanitizer = $sanitizer;
+        $this->mediaDao = $mediaDao;
     }
 
     /**
@@ -453,7 +467,7 @@ class PageService
         $media_id = $data_page['media_id'] ?? 0;
 
         if (class_exists('MediaDao')) {
-            $medialib = new MediaDao();
+            $medialib = $this->mediaDao;
 
             if (method_exists($medialib, 'findMediaById') && $media_id) {
                 $media_data = $medialib->findMediaById((int)$media_id, $this->sanitizer);
@@ -524,6 +538,49 @@ class PageService
     public function localeDropDown($selected = "")
     {
         return $this->pageDao->dropDownLocale($selected);
+    }
+
+    /**
+     * getImageRadioButton()
+     *
+     * Featured-image radio list for the page form, delegated to MediaDao
+     * so controllers never build a DAO themselves.
+     *
+     * @param int|null $checked Media ID pre-selected in the list
+     * @return string HTML radio list
+     *
+     */
+    public function getImageRadioButton($checked = null): string
+    {
+        return $this->mediaDao->imageRadioButton($checked);
+    }
+
+    /**
+     * createPageMedia()
+     *
+     * Persist a page media record through the injected MediaDao.
+     *
+     * @param array $bind Media column values
+     * @return string New media ID as returned by the DAO
+     *
+     */
+    public function createPageMedia(array $bind): string
+    {
+        return $this->mediaDao->createMedia($bind);
+    }
+
+    /**
+     * createPageMediaMeta()
+     *
+     * Persist a page media meta record through the injected MediaDao.
+     *
+     * @param array $bind Media meta column values
+     * @return void
+     *
+     */
+    public function createPageMediaMeta(array $bind): void
+    {
+        $this->mediaDao->createMediaMeta($bind);
     }
 
     /**
