@@ -1,6 +1,6 @@
 # Testing Guide - Scriptlog
 
-**Version:** 1.3.0 | **Last Updated:** August 2026
+**Version:** 1.4.0 | **Last Updated:** September 2026
 
 ---
 
