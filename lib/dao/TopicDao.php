@@ -425,6 +425,6 @@ class TopicDao extends Dao
      */
     public function dropDownLocale($selected = "")
     {
-        return admin_locale_select('topic_locale', $selected);
+        return admin_locale_select('topic_locale', (string)$selected);
     }
 }
