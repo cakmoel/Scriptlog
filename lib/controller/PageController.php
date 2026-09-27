@@ -22,10 +22,9 @@ use Scriptlog\Core\BaseApp;
 use Scriptlog\Core\LogError;
 use Scriptlog\Core\Sanitize;
 use Scriptlog\Core\View;
-use Scriptlog\Dao\MediaDao;
 use Scriptlog\Service\PageService;
 
-class PageController extends BaseApp
+final class PageController extends BaseApp
 {
     /**
      * view
@@ -101,7 +100,6 @@ class PageController extends BaseApp
      */
     public function insert()
     {
-        $medialib = new MediaDao();
         $errors = array();
         $checkError = true;
         $user_level = $this->pageService->pageAuthorLevel();
@@ -112,7 +110,7 @@ class PageController extends BaseApp
             $this->setFormAction(ActionConst::NEWPAGE);
             $this->view->set('pageTitle', $this->getPageTitle());
             $this->view->set('formAction', $this->getFormAction());
-            $this->view->set('medialibs', $medialib->imageRadioButton());
+            $this->view->set('medialibs', $this->pageService->getImageRadioButton());
             $this->view->set('postStatus', $this->pageService->postStatusDropDown());
             $this->view->set('pageLocale', $this->pageService->localeDropDown());
             $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
@@ -174,14 +172,14 @@ class PageController extends BaseApp
                 $this->view->set('formAction', $this->getFormAction());
                 $this->view->set('errors', $errors);
                 $this->view->set('formData', $_POST);
-                $this->view->set('medialibs', $medialib->imageRadioButton());
+                $this->view->set('medialibs', $this->pageService->getImageRadioButton());
                 $this->view->set('postStatus', $this->pageService->postStatusDropDown());
                 $this->view->set('pageLocale', $this->pageService->localeDropDown(distill_post_request($filters)['post_locale']));
                 $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
                 return $this->view->render();
             }
 
-            $this->processPageMediaInsert($medialib, $filters, $user_level);
+            $this->processPageMediaInsert($filters, $user_level);
             $this->pageService->setPageAuthor((int)$this->pageService->pageAuthorId());
             $this->pageService->setPageLocale(distill_post_request($filters)['post_locale']);
 
@@ -219,7 +217,18 @@ class PageController extends BaseApp
         return $this->view->render();
     }
 
-    private function processPageMediaInsert($medialib, $filters, $user_level)
+    /**
+     * processPageMediaInsert()
+     *
+     * Create the fallback media record when a new page is saved without
+     * an explicit featured image. Media writes go through PageService.
+     *
+     * @param array $filters Distilled form filters
+     * @param mixed $user_level Media owner level
+     * @return void
+     *
+     */
+    private function processPageMediaInsert($filters, $user_level)
     {
         $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] === 'publish')) ? 'public' : 'private';
 
@@ -246,7 +255,7 @@ class PageController extends BaseApp
               'media_status' => '1'
             ];
 
-            $append_media = $medialib->createMedia($bind_media);
+            $append_media = $this->pageService->createPageMedia($bind_media);
 
             $mediameta = [
               'media_id' => $append_media,
@@ -254,7 +263,7 @@ class PageController extends BaseApp
               'meta_value' => json_encode($media_metavalue)
             ];
 
-            $medialib->createMediaMeta($mediameta);
+            $this->pageService->createPageMediaMeta($mediameta);
 
             $this->pageService->setPageImage($append_media);
         } else {
@@ -274,7 +283,6 @@ class PageController extends BaseApp
      */
     public function update($id)
     {
-        $medialib = new MediaDao();
         $errors = array();
         $checkError = true;
         $user_level = $this->pageService->pageAuthorLevel();
@@ -305,7 +313,7 @@ class PageController extends BaseApp
             $this->view->set('pageTitle', $this->getPageTitle());
             $this->view->set('formAction', $this->getFormAction());
             $this->view->set('pageData', $data_page);
-            $this->view->set('medialibs', $medialib->imageRadioButton($getPage['media_id']));
+                $this->view->set('medialibs', $this->pageService->getImageRadioButton($getPage['media_id']));
             $this->view->set('postStatus', $this->pageService->postStatusDropDown($getPage['post_status']));
             $this->view->set('pageLocale', $this->pageService->localeDropDown($data_page['post_locale'] ?? 'en'));
             $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
@@ -368,14 +376,14 @@ class PageController extends BaseApp
                 $this->view->set('formAction', $this->getFormAction());
                 $this->view->set('errors', $errors);
                 $this->view->set('pageData', $data_page);
-                $this->view->set('medialibs', $medialib->imageRadioButton($getPage['media_id']));
+            $this->view->set('medialibs', $this->pageService->getImageRadioButton($getPage['media_id']));
                 $this->view->set('postStatus', $this->pageService->postStatusDropDown($getPage['post_status']));
                 $this->view->set('pageLocale', $this->pageService->localeDropDown(distill_post_request($filters)['post_locale']));
                 $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
                 return $this->view->render();
             }
 
-            $this->processPageMediaUpdate($medialib, $getPage, $filters, $user_level);
+            $this->processPageMediaUpdate($getPage, $filters, $user_level);
             $this->pageService->setPageId((int)distill_post_request($filters)['page_id']);
 
             if (empty($_POST['post_modified'])) {
@@ -413,7 +421,19 @@ class PageController extends BaseApp
         return $this->view->render();
     }
 
-    private function processPageMediaUpdate($medialib, $getPage, $filters, $user_level)
+    /**
+     * processPageMediaUpdate()
+     *
+     * Create the fallback media record when an existing page is saved without
+     * an explicit featured image. Media writes go through PageService.
+     *
+     * @param array $getPage Current page row
+     * @param array $filters Distilled form filters
+     * @param mixed $user_level Media owner level
+     * @return void
+     *
+     */
+    private function processPageMediaUpdate($getPage, $filters, $user_level)
     {
         $media_access = (isset($_POST['post_status']) && ($_POST['post_status'] === 'publish')) ? 'public' : 'private';
 
@@ -440,7 +460,7 @@ class PageController extends BaseApp
               'media_status' => '1'
             ];
 
-            $append_media = $medialib->createMedia($bind_media);
+            $append_media = $this->pageService->createPageMedia($bind_media);
 
             $mediameta = [
               'media_id' => $append_media,
@@ -448,7 +468,7 @@ class PageController extends BaseApp
               'meta_value' => json_encode($media_metavalue)
             ];
 
-            $medialib->createMediaMeta($mediameta);
+            $this->pageService->createPageMediaMeta($mediameta);
 
             $this->pageService->setPageImage($append_media);
         } else {
