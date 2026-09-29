@@ -424,12 +424,60 @@ lib/vendor/bin/phpstan analyse --memory-limit=1G
 Shell utilities are covered with [BATS](https://bats-core.readthedocs.io/) (requires `bats` on PATH):
 
 ```bash
-# Unit tests for siege-tui.sh (sandboxed HOME per test)
+# Unit tests for load-test.sh, siege-tui.sh and deepshit.sh (sandboxed HOME per test)
 bats tests/bats
 
-# Include the opt-in end-to-end test (spawns a local php -S fixture on a free port)
-SIEGE_TUI_E2E=1 bats tests/bats
+# Just the performance-profiler suite
+bats tests/bats/deepshit.bats
+
+# Include the opt-in end-to-end tests (spawn a local php -S fixture on a free port)
+LOAD_TEST_E2E=1 bats tests/bats     # real ab + curl against a local fixture
+SIEGE_TUI_E2E=1 bats tests/bats      # real siege against a local fixture
+
+# Both opt-in suites at once
+LOAD_TEST_E2E=1 SIEGE_TUI_E2E=1 bats tests/bats
 ```
+
+The default run is fully mocked and hermetic. `load-test-helper.bash` puts stub
+`ab`/`curl` binaries first on `PATH` (and keeps the pristine value in
+`LT_REAL_PATH` for dependency-guard and end-to-end tests), while
+`test_helper.bash` gives every `siege-tui.sh` test an isolated `HOME`.
+`deepshit-helper.bash` goes further, because `deepshit.sh` edits the live
+PHP-FPM config tree: it redirects `PHP_ETC_DIR`, `PROFILE_DIR`, `LOG_DIR` and
+`XD_MODE_SCRIPT` into a per-test sandbox and puts command doubles for `sudo`,
+`curl`, `systemctl`, `php`, `flatpak`, `ab` and `siege` first on `PATH`. Its
+`ds_stripped_path` helper builds a PATH that cannot fall through to a tool the
+host really has, which is what makes "flatpak is not installed" testable.
+`ds_assert_no_real_system_access` is the tripwire: it fails if any delegated
+`sudo` argv mentions `/etc/php`, `/var/log/xdebug` or `/home`.
+
+| File | Tests | Subject |
+|------|-------|---------|
+| `tests/bats/load-test.bats` | 58 | `load-test.sh`: argument validation, weight/concurrency/request math, `ab` report parsing, CSV/metadata output, error-rate gating, warm-up, dry-run |
+| `tests/bats/siege-tui.bats` | 135 | `siege-tui.sh`: URL/header validation, config sanitising, workload generation, exact `siege` argv, results analysis, connectivity checks, TUI prompts, `run_scenario` exit-code mapping, CLI contract |
+| `tests/bats/deepshit.bats` | 137 | `deepshit.sh`: option parsing and validation, every phase 0-6, `--all`/`--restore`/menu dispatch, endpoint matrix and per-request profile attribution, the 11-endpoint manifest, load-test authorization gate, drop-in install/rollback, result-tree layout, run-log audit trail, `--site-url` targeting, the required-`SITE_URL` contract, optional `XD_MODE_SCRIPT`, the committed executable bit, cross-invocation load-report discovery, trailing-slash normalisation, clean `die`/`ERR`-trap failure paths, plus unit tests of the lifted path builders, mtime watermark, profile poll and duration validator |
+
+Totals: **330 tests**, all passing. The two `*_E2E` suites skip unless their
+variable is set to `1`; everything else runs unconditionally.
+
+Shell scripts are also linted with ShellCheck. `deepshit.sh`, `siege-tui.sh`
+and `xdebug-mode.sh` are clean at severity `info`:
+
+```bash
+shellcheck -s bash -S info deepshit.sh siege-tui.sh xdebug-mode.sh
+```
+
+`load-test.sh` is the exception: at the default severity it reports `SC2317`
+(functions reached only indirectly, via trap handlers and subshells) and one
+`SC2015` (`A && B || C` used as a conditional). Both are stylistic rather than
+defects, so raise the floor to `warning` for that file:
+
+```bash
+shellcheck -s bash -S warning load-test.sh
+```
+
+Note that `bats` and ShellCheck are **not** wired into `.github/workflows/tests.yml`,
+which currently runs only PHPUnit and PHPStan.
 
 ---
 
@@ -598,4 +646,4 @@ Do not bypass with `git commit --no-verify`.
 
 ---
 
-*Last Updated: August 2026 | Version 1.3.0*
+*Last Updated: September 2026 | Version 1.4.0*

@@ -343,8 +343,48 @@ _lt_row() {
     grep -q '"keep_alive": true' "$meta"
     grep -q '"max_error_rate_pct": 20' "$meta"
     grep -q '"weights": { "static": 45, "dynamic": 40, "login": 5, "notfound404": 10 }' "$meta"
-    grep -q '"ab_extra_flags": \[\],' "$meta" || grep -q '"ab_extra_flags": \[' "$meta"
     grep -q '"ab_version": "ApacheBench/2.4.41' "$meta"
+}
+
+@test "metadata sidecar records the keep-alive flag passed to ab" {
+    # -K was given above, so ab_extra_flags must list exactly -k. The previous
+    # assertion used a tautological `a || b` pair that matched regardless.
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -K -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+    grep -q '"ab_extra_flags": \["-k"\],' "${LOAD_TEST_OUT}.meta.json"
+
+    # Without -K the array must be genuinely empty, not merely "not -k".
+    local plain="${BATS_TEST_TMPDIR}/plain.csv"
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -r "$plain"
+    [ "$status" -eq 0 ]
+    grep -q '"ab_extra_flags": \[\],' "${plain}.meta.json"
+}
+
+@test "metadata sidecar is parseable JSON with the documented key set" {
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -l "site" -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+    command -v php >/dev/null 2>&1 || skip "php not available for JSON validation"
+
+    local meta="${LOAD_TEST_OUT}.meta.json"
+    run php -r '
+        $d = json_decode(file_get_contents($argv[1]), true);
+        if ($d === null) { fwrite(STDERR, "invalid JSON: " . json_last_error_msg() . PHP_EOL); exit(1); }
+        $need = ["generated_at_utc","host","script","target_base_url","site_label",
+                 "endpoints","rounds","total_concurrency","ab_requests_base",
+                 "min_round_samples","warmup_requests","weights","keep_alive",
+                 "strict_preflight","max_error_rate_pct","run_seed","ab_extra_flags",
+                 "ab_version","kernel"];
+        foreach ($need as $k) {
+            if (!array_key_exists($k, $d)) { fwrite(STDERR, "missing key: $k" . PHP_EOL); exit(1); }
+        }
+        if ($d["script"] !== "load-test.sh") { fwrite(STDERR, "wrong script key" . PHP_EOL); exit(1); }
+        if ($d["max_error_rate_pct"] !== null) { fwrite(STDERR, "gate should be null" . PHP_EOL); exit(1); }
+        exit(0);
+    ' "$meta"
+    [ "$status" -eq 0 ]
 }
 
 @test "-K passes -k to every ab invocation" {
@@ -403,9 +443,16 @@ _lt_row() {
         -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -r "$LOAD_TEST_OUT"
     [ "$status" -eq 0 ]
 
-    [[ "$output" == *"WARN: ab -g header layout unrecognized; using \$(NF - 1) fallback"* ]]
+    # The WARN must be emitted for every scenario (both the per-run counter and
+    # the summary aggregation) instead of silently yielding zero samples.
+    # Count OCCURRENCES, not lines. Each warning is emitted by awk to
+    # /dev/stderr, which is unbuffered, while the surrounding stdout is
+    # block-buffered. The two streams therefore interleave unpredictably and
+    # two warnings can end up sharing one line, so a line count flapped between
+    # 7 and 8 for identical runs. The number of warnings is what matters.
+    [ "$(grep -o 'WARN: ab -g header layout unrecognized' <<< "$output" | wc -l)" -eq 8 ]
+    [[ "$output" == *'using $(NF - 1) fallback'* ]]
     [[ "$output" == *"-> global percentiles over 30 pooled raw samples (ttime ms): p50=15.000 p95=29.000 p99=30.000"* ]]
-    [[ ! "$output" == *"raw latency extraction disabled"* ]]
 
     local row
     row=$(_lt_row "Static")
@@ -499,4 +546,336 @@ _lt_row() {
     [ "$(awk -F, 'NR>1 && $4 == "Static"' "$LOAD_TEST_OUT" | wc -l)" -eq 2 ]
     # Progress line prints on the last round (and every 10th).
     [[ "$output" == *"round 2/2 complete"* ]]
+}
+
+# ---------------------------------------------------------------------
+# workload sizing (weight matrix + floors) in the REAL run loop, not just
+# the dry-run arithmetic
+# ---------------------------------------------------------------------
+
+@test "measured request counts and concurrency follow the weight matrix" {
+    # base 100, weights 45/40/5/10, floor 2: the weight math is the only
+    # binding constraint, so each ab invocation must carry the exact
+    # (requests, concurrency) pair derived from TOTAL_CONCURRENCY=20.
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -b 100 -m 2 -w 45,40,5,10 \
+        -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+
+    [ "$(grep -c 'ab -n 45 -c 9 -g ' "$AB_LOG")" -eq 1 ]
+    [ "$(grep -c 'ab -n 40 -c 8 -g ' "$AB_LOG")" -eq 1 ]
+    [ "$(grep -c 'ab -n 5 -c 1 -g ' "$AB_LOG")" -eq 1 ]
+    [ "$(grep -c 'ab -n 10 -c 2 -g ' "$AB_LOG")" -eq 1 ]
+
+    local row
+    row=$(_lt_row "Login")
+    [[ "$row" == *,1,Login,*,1,5,5,0,* ]]
+}
+
+@test "zero-weight scenarios fall back to the concurrency and request floors" {
+    # 100% of the traffic on Static: the other three collapse to
+    # concurrency 1 and request count 2 (the hard floor ab needs for a
+    # percentile table, which -m 1 alone would not provide).
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -b 40 -m 1 -w 100,0,0,0 \
+        -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+
+    [ "$(grep -c 'ab -n 40 -c 20 -g ' "$AB_LOG")" -eq 1 ]
+    [ "$(grep -c 'ab -n 2 -c 1 -g ' "$AB_LOG")" -eq 3 ]
+
+    local row
+    row=$(_lt_row "404")
+    [[ "$row" == *,1,404,*,1,2,2,0,* ]]
+    row=$(_lt_row "Static")
+    [[ "$row" == *,1,Static,*,20,40,40,0,* ]]
+}
+
+@test "min-samples floor warning names every scenario it overrides" {
+    # Default weights with base 40 yield 18/16/2/4 requests per round, all
+    # below MIN_ROUND_SAMPLES=30, so every scenario must be reported.
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+
+    [[ "$output" == *"WARN  Static: weight-based request count (18) < MIN_ROUND_SAMPLES (30) -> using 30 req/round"* ]]
+    [[ "$output" == *"WARN  Dynamic: weight-based request count (16) < MIN_ROUND_SAMPLES (30) -> using 30 req/round"* ]]
+    [[ "$output" == *"WARN  Login: weight-based request count (2) < MIN_ROUND_SAMPLES (30) -> using 30 req/round"* ]]
+    [[ "$output" == *"WARN  404: weight-based request count (4) < MIN_ROUND_SAMPLES (30) -> using 30 req/round"* ]]
+}
+
+# ---------------------------------------------------------------------
+# percentile aggregation
+# ---------------------------------------------------------------------
+
+@test "global percentiles pool raw samples across every round" {
+    # Two rounds x 30 requests = 60 pooled samples. The mock writes ttime
+    # 1..30 per round, so the pooled series is 1,1,2,2,...,30,30 and
+    # nearest-rank gives p50=v[30]=15, p95=v[57]=29, p99=v[60]=30.
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 2 -W 5 -R 7 -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+
+    [ "$(grep -c 'global percentiles over 60 pooled raw samples (ttime ms): p50=15.000 p95=29.000 p99=30.000' <<< "$output")" -eq 4 ]
+}
+
+@test "per-round CSV percentiles are preserved alongside the pooled figure" {
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+
+    local row
+    row=$(_lt_row "Static")
+    # ab's own percentile table (p50=12, p95=20, p99=25) must NOT be confused
+    # with the pooled raw percentiles computed in the summary.
+    [[ "$row" == *,12,20,25,* ]]
+    [[ "$output" == *"global percentiles over 30 pooled raw samples (ttime ms): p50=15.000 p95=29.000 p99=30.000"* ]]
+}
+
+# ---------------------------------------------------------------------
+# CSV structural integrity
+# ---------------------------------------------------------------------
+
+@test "every CSV row carries the full 21-column schema" {
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 2 -W 5 -R 7 -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+
+    # Concurrent append()s are documented as safe below PIPE_BUF; this asserts
+    # that no row was torn or interleaved, i.e. NF is uniform and the
+    # round/scenario columns stay well-formed.
+    [ -z "$(awk -F, 'NF != 21 { print NR ": " NF }' "$LOAD_TEST_OUT")" ]
+    [ "$(awk -F, 'NR>1 && $3 !~ /^[0-9]+$/' "$LOAD_TEST_OUT" | wc -l)" -eq 0 ]
+    [ "$(awk -F, 'NR>1 && $3 != 1 && $3 != 2' "$LOAD_TEST_OUT" | wc -l)" -eq 0 ]
+    [ "$(awk -F, 'NR>1 && $4 !~ /^(Static|Dynamic|Login|404)$/' "$LOAD_TEST_OUT" | wc -l)" -eq 0 ]
+}
+
+# ---------------------------------------------------------------------
+# label / path hygiene
+# ---------------------------------------------------------------------
+
+@test "site labels are stripped of CSV field separators and quotes" {
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -l 'we"ird,label' -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+
+    local row
+    row=$(_lt_row "Static")
+    # Commas become semicolons; double quotes are dropped entirely.
+    [[ "$row" == *,weird\;label,1,Static,* ]]
+    [[ "$output" == *"Test Summary - weird;label (1 rounds, mixed concurrent traffic)"* ]]
+
+    # The default filename path uses the same sanitized label.
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -g /login.php -i 1 -W 5 -R 7 -l 'a,b' --dry-run
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"output csv       : ./results_a;b_"*".csv"* ]]
+}
+
+@test "-n overrides the not-found path and normalizes it" {
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -n this-page-is-not-real-alt \
+        -i 1 -W 5 -R 7 -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+
+    # Mock curl answers 404 for any URL containing this-page-is-not-real.
+    # The replacement path is 45 chars, i.e. exactly the status column width,
+    # so no padding is emitted before the arrow.
+    [[ "$output" == *"OK    404      https://example.test/this-page-is-not-real-alt -> HTTP 404 (expected 404)"* ]]
+    [[ "$output" != *"this-page-is-not-real/this-page-is-not-real"* ]]
+
+    local row
+    row=$(_lt_row "404")
+    [[ "$row" == *,1,404,https://example.test/this-page-is-not-real-alt,2,30,30,0,* ]]
+}
+
+# ---------------------------------------------------------------------
+# dependency guard and help
+# ---------------------------------------------------------------------
+
+@test "the declared dependency guard fires before any other validation" {
+    local stripped
+    for tool in ab curl awk bc; do
+        stripped=$(lt_stripped_path "$tool")
+        PATH="$stripped" run "$BASH" "$LOAD_TEST_SCRIPT" -u https://x.test -s /a.css -g /l.php
+        [ "$status" -eq 1 ]
+        [[ "$output" == *"ERROR: required tool '$tool' not found in PATH."* ]]
+        # The guard precedes argument validation and any I/O.
+        [[ "$output" != *"-g LOGIN_PATH is required"* ]]
+    done
+}
+
+@test "-h prints usage and exits 1" {
+    # usage() always terminates with exit 1, even for the explicit help flag.
+    run bash "$LOAD_TEST_SCRIPT" -h
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Usage:"* ]]
+    [[ "$output" == *"  -u  Base URL"* ]]
+    [[ "$output" == *"  -e  CI gate"* ]]
+    [[ "$output" == *"--relax-min-samples"* ]]
+}
+
+# ---------------------------------------------------------------------
+# warm-up phase
+# ---------------------------------------------------------------------
+
+@test "warm-up failures are surfaced but never abort the run" {
+    AB_MODE=total-fail run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+
+    [ "$(grep -c 'WARN  warm-up run exited nonzero' <<< "$output")" -eq 4 ]
+    [[ "$output" == *"Warm-up finished with warnings (see stderr)."* ]]
+    [[ "$output" == *"=== Warm-up: 5 requests per endpoint ==="* ]]
+}
+
+@test "warm-up is fired concurrently per endpoint with a fixed -c 5 budget" {
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 9 -R 7 -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+
+    # -W scales the request count only; concurrency stays at 5 and no -g dump
+    # is requested for unmeasured warm-up traffic.
+    [ "$(grep -c 'ab -n 9 -c 5 ' "$AB_LOG")" -eq 4 ]
+    [ "$(grep -c 'ab -n 9 -c 5 -g ' "$AB_LOG")" -eq 0 ]
+}
+
+# ---------------------------------------------------------------------
+# raw-data retention hook
+# ---------------------------------------------------------------------
+
+@test "LOAD_TEST_KEEP_RAW=1 preserves the workdir and reports its path" {
+    LOAD_TEST_KEEP_RAW=1 run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+
+    local workdir
+    workdir=$(sed -n 's/^NOTE: LOAD_TEST_KEEP_RAW=1 -> raw data retained in //p' <<< "$output")
+    [ -n "$workdir" ]
+    [ -d "$workdir" ]
+    # The per-run ab -g dumps are what makes independent re-analysis possible.
+    [ -f "${workdir}/raw_Static_1.tsv" ]
+    [ -f "${workdir}/raw_404_1.tsv" ]
+    rm -rf "$workdir"
+}
+
+@test "the workdir is removed by default" {
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"LOAD_TEST_KEEP_RAW"* ]]
+}
+
+# ---------------------------------------------------------------------
+# dry-run side-effect freedom
+# ---------------------------------------------------------------------
+
+@test "dry-run writes neither the CSV nor the metadata sidecar" {
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 --dry-run -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+
+    [ ! -e "$LOAD_TEST_OUT" ]
+    [ ! -e "${LOAD_TEST_OUT}.meta.json" ]
+    [ ! -s "$AB_LOG" ]
+}
+
+# ---------------------------------------------------------------------
+# CI gate arithmetic
+# ---------------------------------------------------------------------
+
+@test "-e accepts a fractional ceiling and echoes it in the verdict" {
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -e 2.5 -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Error-rate gate passed: combined 0.00% <= 2.5% (-e)."* ]]
+}
+
+@test "-e gate fails with a full abort when every scenario fails" {
+    # 4 scenarios x 30 requests sent, 30 counted failed each: combined 100%.
+    AB_MODE=total-fail run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -e 50 -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"ERROR-RATE GATE FAILED: combined error rate 100.00% exceeds -e ceiling of 50%."* ]]
+    [[ "$output" == *"transport-err=30 (100.00%) non2xx=0 (0.00%) combined=100.00%"* ]]
+}
+
+@test "-e gate counts non-2xx responses on top of transport failures" {
+    # 3 non-2xx per scenario x 4 = 12 out of 120 sent -> combined 10%.
+    AB_NON2XX=3 run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -e 9 -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"ERROR-RATE GATE FAILED: combined error rate 10.00% exceeds -e ceiling of 9%."* ]]
+}
+
+# ---------------------------------------------------------------------
+# progress reporting
+# ---------------------------------------------------------------------
+
+@test "progress is reported on every tenth round and on the last round only" {
+    run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 10 -W 5 -R 7 -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+
+    [ "$(grep -cE '^  round [0-9]+/10 complete$' <<< "$output")" -eq 1 ]
+    [[ "$output" == *"  round 10/10 complete"* ]]
+    [ "$(wc -l < "$LOAD_TEST_OUT")" -eq 41 ]
+}
+
+# ---------------------------------------------------------------------
+# end-to-end against a real fixture (opt-in: LOAD_TEST_E2E=1)
+#
+# Every other test mocks ab/curl. This one restores the pristine PATH so the
+# real ApacheBench and curl drive load-test.sh against a local `php -S`
+# server, proving the mocks match the tools' actual output formats.
+# ---------------------------------------------------------------------
+
+@test "e2e: real ab and curl produce a valid CSV and JSON sidecar" {
+    [ "${LOAD_TEST_E2E:-}" = "1" ] || skip "set LOAD_TEST_E2E=1 to enable"
+    command -v php >/dev/null 2>&1 || skip "php not available"
+    command -v ab >/dev/null 2>&1 || skip "apachebench not installed"
+
+    local info port docroot srv out
+    info=$(lt_start_php_fixture) || skip "could not start the php fixture"
+    read -r port docroot srv <<< "$info"
+
+    out="${BATS_TEST_TMPDIR}/e2e.csv"
+    PATH="$LT_REAL_PATH" run bash "$LOAD_TEST_SCRIPT" \
+        -u "http://127.0.0.1:${port}" \
+        -s /assets/app.css \
+        -d /dynamic.php \
+        -g /login.php \
+        -n /no-such-page-here \
+        -i 1 -W 2 -b 10 -m 2 -w 50,40,5,5 -R 4242 -e 100 -r "$out"
+
+    kill "$srv" 2>/dev/null || true
+
+    [ "$status" -eq 0 ]
+    [ -s "$out" ]
+    [ "$(awk -F, 'NF != 21' "$out" | wc -l)" -eq 0 ]
+    [ "$(awk 'END { print NR }' "$out")" -eq 5 ]
+
+    # Real ab output, parsed by load-test.sh: every scenario completed, so
+    # there are zero transport failures and a non-zero raw sample count
+    # (proof the ab -g header/ttime layout assumption holds for this ab).
+    [ "$(awk -F, 'NR>1 && $9 != 0' "$out" | wc -l)" -eq 0 ]
+    [ "$(awk -F, 'NR>1 && $21 <= 0' "$out" | wc -l)" -eq 0 ]
+
+    # Weight matrix applied to the measured loop: static req 5 lifted to its
+    # concurrency floor of 10, dynamic 4 lifted to 8, login/404 floored to 2.
+    [ "$(awk -F, 'NR>1 && ($4 == "Static")  && ($6 == 10 && $7 == 10) { n++ } END { print n+0 }' "$out")" -eq 1 ]
+    [ "$(awk -F, 'NR>1 && ($4 == "Dynamic") && ($6 == 8  && $7 == 8)  { n++ } END { print n+0 }' "$out")" -eq 1 ]
+    [ "$(awk -F, 'NR>1 && ($4 == "Login")   && ($6 == 1  && $7 == 2)  { n++ } END { print n+0 }' "$out")" -eq 1 ]
+    [ "$(awk -F, 'NR>1 && ($4 == "404")     && ($6 == 1  && $7 == 2)  { n++ } END { print n+0 }' "$out")" -eq 1 ]
+
+    # The fixture's missing page answers HTTP 404: real ab reports those under
+    # "Non-2xx responses", NOT under "Failed requests". Both the column and
+    # the non-strict pre-flight WARN must reflect that distinction.
+    [ "$(awk -F, 'NR>1 && $4 == "404" && $15 == 2 && $9 == 0 { n++ } END { print n+0 }' "$out")" -eq 1 ]
+    [[ "$output" == *"WARN  round 1 404: clean ab exit but 2 non-2xx response(s)"* ]]
+    [[ "$output" == *"pooled raw samples"* ]]
+    [[ "$output" == *"Error-rate gate passed"* ]]
+
+    php -r 'exit(json_decode(file_get_contents($argv[1]), true) === null ? 1 : 0);' \
+        "${out}.meta.json"
 }

@@ -31,6 +31,10 @@ LOAD_TEST_SCRIPT="${BATS_TEST_DIRNAME}/../../load-test.sh"
 lt_setup() {
     export LC_ALL=C
 
+    # Remember the pristine PATH so the opt-in E2E test can restore the real
+    # ab/curl after the mock bin dir has been prepended.
+    LT_REAL_PATH="$PATH"
+
     # Sandboxed mock bin directory prepended to PATH; stale per-test state
     # is cleared so tests cannot leak flags into one another.
     MOCK_BIN="${BATS_TEST_TMPDIR}/bin"
@@ -193,4 +197,81 @@ lt_run() {
         -W 5 \
         -R 12345 \
         "$@"
+}
+
+# Build a MINIMAL PATH directory that contains symlinks to every real tool
+# load-test.sh declares as required EXCEPT the ones named in $@. Used to prove
+# the up-front dependency guard fires before any other validation or I/O.
+#
+# `command -v` skips non-executable files, so a hidden-tool PATH cannot be
+# faked with a chmod-0 stub: the real directory must simply be absent from
+# PATH. Only the four declared tools are linked, which is enough because the
+# guard runs before any external command is invoked. Callers must therefore
+# invoke the script with an ABSOLUTE interpreter path ("$BASH"), not rely on
+# PATH lookup. Emits the directory on stdout.
+lt_stripped_path() {
+    local dir="${BATS_TEST_TMPDIR}/bin-stripped"
+    local tool real
+    rm -rf "$dir"
+    mkdir -p "$dir"
+    for tool in ab curl awk bc; do
+        [[ " $* " == *" $tool "* ]] && continue
+        real="$(command -v "$tool")" || continue
+        ln -sf "$real" "${dir}/${tool}"
+    done
+    printf '%s' "$dir"
+}
+
+# First free TCP port in a private range, or non-zero when none is available.
+lt_free_port() {
+    local p
+    for p in {31200..31249}; do
+        if ! timeout 1 bash -c "</dev/tcp/127.0.0.1/$p" 2>/dev/null; then
+            printf '%s' "$p"
+            return 0
+        fi
+    done
+    return 1
+}
+
+# Start a real `php -S` fixture exposing:
+#   /assets/app.css  -> a genuine static asset (served without PHP)
+#   /dynamic.php     -> a PHP endpoint returning 200
+#   /login.php       -> a PHP endpoint returning 200 (stands in for the admin
+#                       login controller, which needs a credential POST)
+# Emits "<port> <docroot> <pid>" and registers an EXIT trap in the caller for
+# the server process (bats kills the test process anyway, but the trap keeps
+# php from lingering between tests).
+lt_start_php_fixture() {
+    local port docroot
+    port=$(lt_free_port) || return 1
+    docroot="${BATS_TEST_TMPDIR}/docroot"
+    mkdir -p "${docroot}/assets"
+
+    printf 'body{color:#000}\n' > "${docroot}/assets/app.css"
+    printf '<?php echo "dynamic-ok";\n' > "${docroot}/dynamic.php"
+    printf '<?php echo "login-ok";\n' > "${docroot}/login.php"
+
+    php -S "127.0.0.1:${port}" -t "$docroot" >/dev/null 2>&1 &
+    local srv=$!
+
+    # Wait for the listener instead of sleeping blindly: poll until the fixture
+    # answers or the budget expires. The poll MUST use the pristine PATH -
+    # lt_setup has already installed the curl mock, which would report the
+    # fixture as ready before php has bound the port.
+    local waited=0 saved_path="$PATH"
+    PATH="${LT_REAL_PATH:-$PATH}"
+    while (( waited < 50 )); do
+        if curl -s -o /dev/null -m 2 "http://127.0.0.1:${port}/assets/app.css"; then
+            PATH="$saved_path"
+            printf '%s %s %s' "$port" "$docroot" "$srv"
+            return 0
+        fi
+        sleep 0.1
+        waited=$((waited + 1))
+    done
+    PATH="$saved_path"
+
+    kill "$srv" 2>/dev/null || true
+    return 1
 }
