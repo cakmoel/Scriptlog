@@ -46,27 +46,60 @@ function remove_x_powered_by()
  * content_security_policy
  *
  * Configured to allow:
- * - Inline JavaScript (via nonce/hash to be enforced later)
+ * - Inline JavaScript (via per-request nonce; 'unsafe-inline' is kept as a
+ *   fallback for browsers without nonce support and is ignored by
+ *   nonce-aware browsers for script elements)
  * - AJAX requests to same origin
  * - Form submissions
  * - Images and media
  * - Safe external resources
  *
  * Hardenend: removed 'unsafe-eval' to block eval-based XSS vectors.
+ * Inline event-handler attributes are blocked via `script-src-attr 'none'`.
  * A Report-Only header is also sent to monitor violations before
  * fully removing 'unsafe-inline'.
  *
  * @param string $app_url
+ * @return void
  */
 function content_security_policy($app_url)
 {
-    $is_ssl = is_ssl();
+    $nonce = defined('CSP_NONCE') ? CSP_NONCE : '';
+    $headers = build_csp_headers($app_url, $nonce);
+
+    header($headers['enforced']);
+    header($headers['reportOnly']);
+}
+
+/**
+ * build_csp_headers()
+ *
+ * Pure builder for the Content-Security-Policy header values emitted by
+ * content_security_policy(). Separated from header() emission so the
+ * policy is unit-testable (RCE audit follow-up R2).
+ *
+ * The enforced policy carries the per-request nonce in script-src.
+ * 'unsafe-inline' is retained as a fallback for browsers without nonce
+ * support; nonce-aware browsers ignore it for script elements, and
+ * `script-src-attr 'none'` blocks inline event-handler attributes
+ * everywhere the directive is honored.
+ *
+ * @category function
+ * @param string $app_url Application base URL for form-action
+ * @param string $nonce Per-request CSP nonce (may be empty pre-bootstrap)
+ * @return array Associative array with 'enforced' and 'reportOnly' header strings
+ */
+function build_csp_headers($app_url, $nonce)
+{
+    $is_ssl = function_exists('is_ssl') ? is_ssl() : false;
     $scheme = $is_ssl ? 'https:' : 'http:';
+
+    $nonceSrc = ($nonce !== '') ? " 'nonce-{$nonce}'" : '';
 
     // 1. Enforced CSP - blocks eval-based attacks
     $csp = "Content-Security-Policy: " .
         "default-src 'self'; " .
-        "script-src 'self' 'unsafe-inline' {$scheme}; " .
+        "script-src 'self' 'unsafe-inline'{$nonceSrc} {$scheme}; " .
         "script-src-attr 'none'; " .
         "style-src 'self' 'unsafe-inline' {$scheme}; " .
         "img-src 'self' data: {$scheme}; " .
@@ -85,14 +118,12 @@ function content_security_policy($app_url)
         $csp .= "; upgrade-insecure-requests";
     }
 
-    header($csp);
-
     // 2. Report-Only header for monitoring violations
     // This identifies what would break when we switch to nonce-based CSP.
     // Remove 'unsafe-inline' from report-only to see what inline scripts exist.
     $csp_report = "Content-Security-Policy-Report-Only: " .
         "default-src 'self'; " .
-        "script-src 'self' {$scheme}; " .
+        "script-src 'self'{$nonceSrc} {$scheme}; " .
         "style-src 'self' {$scheme}; " .
         "img-src 'self' data: {$scheme}; " .
         "font-src 'self' data: {$scheme}; " .
@@ -110,7 +141,7 @@ function content_security_policy($app_url)
         $csp_report .= "; upgrade-insecure-requests";
     }
 
-    header($csp_report);
+    return array('enforced' => $csp, 'reportOnly' => $csp_report);
 }
 
 /**

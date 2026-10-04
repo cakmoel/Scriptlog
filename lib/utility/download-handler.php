@@ -28,6 +28,9 @@ class DownloadUtility
      */
     public static function setDownloadHeaders($filename, $mimeType, $filesize)
     {
+        // M2: the filename is rooted in uploader-supplied names. Strip the
+        // quote and line breaks that could break out of the header value.
+        $filename = str_replace(array('"', "\r", "\n"), '', basename((string)$filename));
         header('Content-Type: ' . $mimeType);
         header('Content-Length: ' . $filesize);
         header('Content-Disposition: attachment; filename="' . $filename . '"');

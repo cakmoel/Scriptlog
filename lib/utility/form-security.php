@@ -85,7 +85,7 @@ function verify_form_token($form, $token)
  */
 function check_form_request($data, array $whitelist)
 {
-    $alwaysAllowed = ['csrfToken', 'postFormSubmit', 'MAX_FILE_SIZE'];
+    $alwaysAllowed = ['csrfToken', 'csrfPostForm', 'csrfThemeInstall', 'postFormSubmit', 'MAX_FILE_SIZE'];
 
     foreach ($data as $key => $value) {
         if (in_array($key, $alwaysAllowed, true)) {

@@ -69,7 +69,7 @@ $action = isset($formAction) ? $formAction : null;
 </div>
 <!-- /.box-body -->
 <div class="box-footer">
-<input type="hidden" name="csrfToken" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
+<input type="hidden" name="csrfThemeInstall" value="<?=(isset($csrfToken)) ? $csrfToken : ""; ?>">  
 <input type="submit" name="themeFormSubmit" class="btn btn-primary" value="Install Now">
 
 </div>

@@ -126,9 +126,20 @@ class PluginService
         $this->link = $link;
     }
 
+    /**
+     * Set the plugin directory.
+     *
+     * Reduced to its basename at write time so a crafted plugin.ini value
+     * (e.g. '../../evil') can never escape the plugin directory. Mirrors
+     * the theme handling in ThemeController; read paths already basename().
+     * See plan/RCE_REMEDIATION_PLAN.md (R5).
+     *
+     * @param string $directory Raw plugin directory value
+     * @return void
+     */
     public function setPluginDirectory($directory)
     {
-        $this->directory = $directory;
+        $this->directory = basename((string)$directory);
     }
 
     public function setPluginDescription($description)

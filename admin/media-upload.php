@@ -70,8 +70,20 @@ if ($file['size'] > $maxSize) {
     sendJsonResponse(400, false, 'FILE_TOO_LARGE', 'File size exceeds maximum allowed (5MB)');
 }
 
-// Generate unique filename
-$fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+// Generate unique filename. H5: the extension is forced from the validated
+// real MIME type, never from the client-supplied filename, so an uploaded
+// `shell.php` cannot land in the web-accessible pictures directory.
+$mimeToExtension = [
+    'image/jpeg' => 'jpg',
+    'image/png' => 'png',
+    'image/gif' => 'gif',
+    'image/webp' => 'webp',
+    'image/bmp' => 'bmp',
+];
+$fileExtension = isset($mimeToExtension[$fileType]) ? $mimeToExtension[$fileType] : '';
+if ($fileExtension === '') {
+    sendJsonResponse(400, false, 'INVALID_FILE_TYPE', 'Invalid file type. Only JPEG, PNG, GIF, WebP, and BMP are allowed.');
+}
 $newFilename = uniqid() . '_' . time() . '.' . $fileExtension;
 
 // Use existing upload_photo() function to resize to 3 sizes + WebP

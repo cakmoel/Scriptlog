@@ -254,7 +254,10 @@ final class PostController extends BaseApp
 
     private function checkPostCsrf()
     {
-        if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+        // Per-form CSRF slot: a token harvested from any other admin form
+        // (e.g. via stored XSS in a lower-privilege context) must not
+        // authorize post writes. See plan/RCE_REMEDIATION_PLAN.md (R3).
+        if (!csrf_check_token('csrfPostForm', $_POST, 60 * 10)) {
             header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . MESSAGE_BADREQUEST, true, 400);
             header('Status: 400 Bad Request');
             throw new AppException(MESSAGE_UNPLEASANT_ATTEMPT);
@@ -365,7 +368,7 @@ final class PostController extends BaseApp
         $this->view->set('commentStatus', comment_status_dropdown());
         $this->view->set('postVisibility', post_visibility_dropdown());
         $this->view->set('postLocale', post_locale_dropdown());
-        $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+        $this->view->set('csrfToken', csrf_generate_token('csrfPostForm'));
     }
 
     private function renderEditPostForm($errors, $data_post, $getPost, $user_level)
@@ -402,7 +405,7 @@ final class PostController extends BaseApp
         $this->view->set('commentStatus', comment_status_dropdown($getPost['comment_status']));
         $this->view->set('postVisibility', post_visibility_dropdown($getPost['post_visibility']));
         $this->view->set('postLocale', post_locale_dropdown($getPost['post_locale'] ?? 'en'));
-        $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+        $this->view->set('csrfToken', csrf_generate_token('csrfPostForm'));
     }
 
     /**

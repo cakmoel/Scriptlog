@@ -44,7 +44,14 @@ class WordPressImporter
             libxml_disable_entity_loader(true); // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.libxml_disable_entity_loaderDeprecated
         }
 
-        $this->xml = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_DTDLOAD);
+        // M1: never resolve external entities or fetch remote DTDs from an
+        // uploaded file (XXE/SSRF). Same null-loader pattern as the Blogspot
+        // importer; LIBXML_NONET is the version-independent network block.
+        libxml_set_external_entity_loader(static function ($public, $system, $context) {
+            return null;
+        });
+
+        $this->xml = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_DTDLOAD | LIBXML_NONET);
 
         if ($this->xml === false) {
             $errors = libxml_get_errors();

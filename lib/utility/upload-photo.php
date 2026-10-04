@@ -42,6 +42,10 @@ function photo_instance()
 function upload_photo($file_location, $file_size, $file_type, $file_name)
 {
 
+    // H5: never let directory components from the caller reach the
+    // filesystem. Filenames are generated upstream; this is the last gate.
+    $file_name = str_replace("\0", '', basename((string)$file_name));
+
     $small_size = 320;
     $medium_size = 640;
     $large_size = 770;

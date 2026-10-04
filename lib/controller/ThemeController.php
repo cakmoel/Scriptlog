@@ -173,7 +173,7 @@ class ThemeController extends BaseApp
             $this->setFormAction(ActionConst::INSTALLTHEME);
             $this->view->set('pageTitle', $this->getPageTitle());
             $this->view->set('formAction', $this->getFormAction());
-            $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+            $this->view->set('csrfToken', csrf_generate_token('csrfThemeInstall'));
             return $this->view->render();
         }
 
@@ -186,7 +186,11 @@ class ThemeController extends BaseApp
         $theme_dir = $theme_title;
 
         try {
-            if (!csrf_check_token('csrfToken', $_POST, 60 * 10)) {
+            // Per-form CSRF slot: the theme installer must not accept tokens
+            // minted for other admin forms (e.g. the post editor), breaking
+            // the stored-XSS -> CSRF-reuse leg of the RCE chain.
+            // See plan/RCE_REMEDIATION_PLAN.md (R3).
+            if (!csrf_check_token('csrfThemeInstall', $_POST, 60 * 10)) {
                 header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
                 throw new AppException("Sorry, unpleasant attempt detected!");
             }
@@ -200,7 +204,7 @@ class ThemeController extends BaseApp
                 $this->view->set('pageTitle', $this->getPageTitle());
                 $this->view->set('formAction', $this->getFormAction());
                 $this->view->set('errors', $errors);
-                $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+                $this->view->set('csrfToken', csrf_generate_token('csrfThemeInstall'));
                 return $this->view->render();
             }
 

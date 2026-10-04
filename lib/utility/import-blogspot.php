@@ -46,7 +46,7 @@ class BlogspotImporter
             return null;
         });
 
-        $this->xml = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_DTDLOAD);
+        $this->xml = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_DTDLOAD | LIBXML_NONET);
 
         if ($this->xml === false) {
             $errors = libxml_get_errors();
