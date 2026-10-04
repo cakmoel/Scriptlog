@@ -277,7 +277,8 @@ class PostModel extends BaseModel
         );
 
         if (empty($candidateIds)) {
-            return (empty($candidateIds)) ?: $candidateIds;
+            // Same empty-result value as the (empty($x)) ?: $x idiom below.
+            return true;
         }
 
         $pickedIds = $this->drawRandomIds($candidateIds, 5);
@@ -354,7 +355,8 @@ class PostModel extends BaseModel
         );
 
         if (empty($candidateIds)) {
-            return (empty($candidateIds)) ?: $candidateIds;
+            // Same empty-result value as the (empty($x)) ?: $x idiom below.
+            return true;
         }
 
         $pickedIds = $this->drawRandomIds($candidateIds, 3);

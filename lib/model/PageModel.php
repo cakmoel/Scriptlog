@@ -105,7 +105,8 @@ AND post_type = 'page' ORDER BY ID DESC LIMIT 20";
         }
 
         if (empty($ids)) {
-            return (empty($ids)) ?: $ids;
+            // Same empty-result value as the (empty($x)) ?: $x idiom below.
+            return true;
         }
 
         $picked = $ids[random_int(0, count($ids) - 1)];

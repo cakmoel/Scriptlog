@@ -45,9 +45,9 @@ function dotenv_cache_load($envFile, $cacheFile, $loader)
         return;
     }
 
-    $before = isset($_ENV) && is_array($_ENV) ? $_ENV : array();
+    $before = is_array($_ENV) ? $_ENV : array();
     call_user_func($loader);
-    $after = isset($_ENV) && is_array($_ENV) ? $_ENV : array();
+    $after = is_array($_ENV) ? $_ENV : array();
 
     $delta = array();
     foreach ($after as $name => $value) {

@@ -124,9 +124,7 @@ function admin_locales_catalog(): array
                     $dbCatalog[$code] = $label;
                 }
 
-                if (!empty($dbCatalog)) {
-                    $catalog = $dbCatalog;
-                }
+                $catalog = $dbCatalog;
             }
         } catch (\Throwable $e) {
             // Database unavailable or unusable: keep the static fallback catalog.
