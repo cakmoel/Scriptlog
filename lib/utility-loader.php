@@ -68,6 +68,7 @@ if (!function_exists('load_core_utilities')) {
         'distill-post-request.php',
         'distrib-name.php',
         'do-logout.php',
+        'dotenv-cache.php',
         'download-handler.php',
         'download-settings.php',
         'dropdown.php',

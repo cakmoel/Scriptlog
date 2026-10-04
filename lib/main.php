@@ -67,8 +67,22 @@ if (is_readable(APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'vendor/autoload.
 
     // Load the .env file if it exists
     if (file_exists(APP_ROOT . '.env')) {
-        $dotenv = Dotenv\Dotenv::createImmutable(APP_ROOT);
-        $dotenv->load();
+        // S1: serve .env from a plain PHP cache, rebuilt only when .env
+        // itself changes (file-date check). Falls back to plain Dotenv
+        // when the helper is unavailable.
+        if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'utility' . DIRECTORY_SEPARATOR . 'dotenv-cache.php')) {
+            require_once __DIR__ . DIRECTORY_SEPARATOR . 'utility' . DIRECTORY_SEPARATOR . 'dotenv-cache.php';
+        }
+        if (function_exists('dotenv_cache_load') && function_exists('dotenv_cache_paths')) {
+            list($dotenvEnvFile, $dotenvCacheFile) = dotenv_cache_paths(APP_ROOT);
+            dotenv_cache_load($dotenvEnvFile, $dotenvCacheFile, function () {
+                $dotenv = Dotenv\Dotenv::createImmutable(APP_ROOT);
+                $dotenv->load();
+            });
+        } else {
+            $dotenv = Dotenv\Dotenv::createImmutable(APP_ROOT);
+            $dotenv->load();
+        }
     }
 }
 
@@ -112,11 +126,14 @@ if (!file_exists(APP_ROOT . 'config.php')) {
 
     // Scheduled posting flip: promote due 'scheduled' posts to 'publish'.
     // Runs before index.php serves the page cache so cached pages cannot hide
-    // newly published posts. Never fails a request.
+    // newly published posts. Throttled to one check per 5 minutes (S3) so
+    // steady-state requests pay zero queries. Never fails a request.
     if (isset($app->postDao, $app->configDao, $app->sanitizer) && class_exists('Scriptlog\Service\ScheduledPostService')) {
         try {
             $scheduledPostService = new Scriptlog\Service\ScheduledPostService($app->postDao, $app->configDao, $app->sanitizer);
-            $scheduledPostService->publishDuePosts();
+            $scheduledPostService->publishDuePostsThrottled(
+                APP_ROOT . 'public' . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'scheduled' . DIRECTORY_SEPARATOR
+            );
         } catch (\Throwable $e) {
             error_log('Scheduled post publishing failed: ' . $e->getMessage());
         }
@@ -135,7 +152,15 @@ if (isset($_GET['switch-lang']) && !empty($_GET['switch-lang'])) {
         // Redirect to remove switch-lang from URL
         $redirectUrl = $_GET['redirect'] ?? '/';
         if (!empty($_GET['redirect'])) {
-            header("Location: " . urldecode($_GET['redirect']));
+            // H3: allow relative paths only. An absolute URL, protocol-
+            // relative URL, or backslash path would turn the language
+            // switch into an open redirect for phishing.
+            $redirect = urldecode($_GET['redirect']);
+            if (strpos($redirect, '/') === 0 && strpos($redirect, '//') !== 0 && strpos($redirect, "\\") === false && preg_match('/^[\x20-\x7E]*$/', $redirect)) {
+                header("Location: " . $redirect);
+            } else {
+                header("Location: /");
+            }
         } else {
             // Remove switch-lang param and redirect to same page
             $urlParts = parse_url($_SERVER['REQUEST_URI']);

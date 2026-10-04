@@ -271,6 +271,24 @@ class PostModel extends BaseModel
      */
     public function getRandomHeadlines()
     {
+        $candidateIds = $this->fetchRecentPostIds(
+            "post_type = 'blog' AND post_status = 'publish' AND post_headlines = '1'",
+            50
+        );
+
+        if (empty($candidateIds)) {
+            return (empty($candidateIds)) ?: $candidateIds;
+        }
+
+        $pickedIds = $this->drawRandomIds($candidateIds, 5);
+        $idParams = array();
+        $placeholders = array();
+        foreach (array_values($pickedIds) as $i => $pickedId) {
+            $key = ':pid' . $i;
+            $placeholders[] = $key;
+            $idParams[$key] = $pickedId;
+        }
+        $inList = implode(',', $placeholders);
 
         $sql = "SELECT p.ID, p.media_id, p.post_author,
         p.post_date, p.post_modified, p.post_title,
@@ -279,17 +297,17 @@ class PostModel extends BaseModel
         p.post_tags, u.user_login, u.user_fullname,
         m.media_filename, m.media_caption, m.media_type, m.media_target, m.media_access
         FROM tbl_posts AS p
-        INNER JOIN (SELECT ID FROM tbl_posts ORDER BY RAND() LIMIT 5) AS p2 ON p.ID = p2.ID 
         INNER JOIN tbl_users AS u ON p.post_author = u.ID
         LEFT JOIN tbl_media AS m ON p.media_id = m.ID
             AND m.media_target = 'blog' 
         WHERE p.post_type = 'blog'
         AND p.post_status = 'publish' 
-        AND p.post_headlines = '1' ";
+        AND p.post_headlines = '1'
+        AND p.ID IN ($inList)";
 
         $this->setSQL($sql);
 
-        $headlines = $this->findAll([]);
+        $headlines = $this->findAll($idParams);
 
         return (empty($headlines)) ?: $headlines;
     }
@@ -330,6 +348,24 @@ class PostModel extends BaseModel
      */
     public function getRandomPosts($start, $end)
     {
+        $candidateIds = $this->fetchRecentPostIds(
+            "post_type = 'blog' AND post_status = 'publish' AND post_visibility = 'public'",
+            50
+        );
+
+        if (empty($candidateIds)) {
+            return (empty($candidateIds)) ?: $candidateIds;
+        }
+
+        $pickedIds = $this->drawRandomIds($candidateIds, 3);
+        $idParams = array();
+        $placeholders = array();
+        foreach (array_values($pickedIds) as $i => $pickedId) {
+            $key = ':pid' . $i;
+            $placeholders[] = $key;
+            $idParams[$key] = $pickedId;
+        }
+        $inList = implode(',', $placeholders);
 
         $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified,
                    p.post_title, p.post_slug, p.post_content,
@@ -340,18 +376,18 @@ class PostModel extends BaseModel
                     JOIN " . $this->table('tbl_topics') . " t ON pt.topic_id = t.ID 
                     WHERE pt.post_id = p.ID AND t.topic_status = 'Y') AS topics_data
           FROM " . $this->table('tbl_posts') . " AS p
-          INNER JOIN (SELECT ID FROM " . $this->table('tbl_posts') . " ORDER BY RAND() LIMIT 3) AS p2 ON p.ID = p2.ID
           INNER JOIN " . $this->table('tbl_users') . " AS u ON p.post_author = u.ID
           LEFT JOIN " . $this->table('tbl_media') . " AS m ON p.media_id = m.ID
               AND m.media_target = 'blog'
           WHERE p.post_type = 'blog'
           AND p.post_status = 'publish'
           AND p.post_visibility = 'public'
+          AND p.ID IN ($inList)
           LIMIT :position, :end";
 
         $this->setSQL($sql);
 
-        $data = array(':position' => $start, ':end' => $end);
+        $data = array_merge($idParams, array(':position' => $start, ':end' => $end));
 
         $randomPosts = $this->findAll($data);
 
@@ -386,5 +422,63 @@ class PostModel extends BaseModel
         $sidebar_posts = $this->findAll([':limit' => $limit]);
 
         return (empty($sidebar_posts)) ?: ['sidebarPosts' => $sidebar_posts];
+    }
+
+    /**
+     * fetchRecentPostIds
+     *
+     * Fetch candidate post IDs from a bounded recent window using the
+     * indexed ID DESC path (no full-table random ordering scan).
+     *
+     * @param string $where WHERE clause without the WHERE keyword.
+     * @param int $window Maximum candidates to consider.
+     * @return array List of post IDs.
+     */
+    private function fetchRecentPostIds($where, $window)
+    {
+        $window = max(1, (int)$window);
+        $sql = "SELECT ID FROM " . $this->table('tbl_posts')
+            . " WHERE " . $where . " ORDER BY ID DESC LIMIT " . $window;
+
+        $this->setSQL($sql);
+        $rows = $this->findAll(array());
+
+        $ids = array();
+        if (is_array($rows)) {
+            foreach ($rows as $row) {
+                $id = is_array($row) ? (isset($row['ID']) ? $row['ID'] : null) : (isset($row->ID) ? $row->ID : null);
+                if ($id !== null) {
+                    $ids[] = (int)$id;
+                }
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * drawRandomIds
+     *
+     * Pick up to $need IDs from the candidate window using random_int()
+     * (PHP 7.4 compatible). Spread is spot-checked, not guaranteed uniform
+     * over huge tables, which is fine for sidebar widgets.
+     *
+     * @param array $candidateIds Candidate post IDs.
+     * @param int $need Number of IDs to draw.
+     * @return array Drawn post IDs.
+     */
+    private function drawRandomIds(array $candidateIds, $need)
+    {
+        $total = count($candidateIds);
+        $need = min(max(1, (int)$need), $total);
+
+        for ($i = $total - 1; $i > 0; $i--) {
+            $j = random_int(0, $i);
+            $tmp = $candidateIds[$i];
+            $candidateIds[$i] = $candidateIds[$j];
+            $candidateIds[$j] = $tmp;
+        }
+
+        return array_slice($candidateIds, 0, $need);
     }
 }

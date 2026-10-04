@@ -455,6 +455,14 @@ final class HandleRequest
             return;
         }
 
+        // S7: non-numeric IDs can never match the integer primary key, so
+        // fail cheap without touching the service or the database. Real
+        // pages (numeric IDs) take the unchanged path below.
+        if (!ctype_digit((string)$value)) {
+            self::renderTemplate('404', 404);
+            return;
+        }
+
         $frontService = self::handleFrontHelper();
         $query_post = $frontService ? $frontService->getSimplePost($value) : null;
         if (empty($query_post['ID'])) {
@@ -478,6 +486,12 @@ final class HandleRequest
             return;
         }
 
+        // S7: fail cheap on non-numeric IDs (see deliverQueryPost).
+        if (!ctype_digit((string)$value)) {
+            self::renderTemplate('404', 404);
+            return;
+        }
+
         $frontService = self::handleFrontHelper();
         $query_cat = $frontService ? $frontService->getSimpleTopic($value) : null;
         if (empty($query_cat['ID'])) {
@@ -498,6 +512,12 @@ final class HandleRequest
         $value = self::isQueryStringRequested()['value'];
         if (empty($value)) {
             direct_page('', 302);
+            return;
+        }
+
+        // S7: fail cheap on non-numeric IDs (see deliverQueryPost).
+        if (!ctype_digit((string)$value)) {
+            self::renderTemplate('404', 404);
             return;
         }
 

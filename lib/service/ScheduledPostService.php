@@ -124,6 +124,50 @@ class ScheduledPostService
     }
 
     /**
+     * Publish due posts, but check at most once per interval.
+     *
+     * S3: the unthrottled check costs ~6 percent of every frontend hit (E1).
+     * The timestamp file keeps steady-state requests at zero queries; a due
+     * post still goes public within $intervalSeconds of its date (default
+     * 300 seconds, never below 60). When the directory is not writable the
+     * method degrades to an unthrottled run (today's behavior).
+     *
+     * @param string $cacheDir Directory holding the check timestamp file.
+     * @param int $intervalSeconds Minimum seconds between checks.
+     * @return int Number of posts promoted to 'publish'
+     */
+    public function publishDuePostsThrottled($cacheDir, $intervalSeconds = 300)
+    {
+        $intervalSeconds = max(60, (int)$intervalSeconds);
+        $stampFile = rtrim((string)$cacheDir, '/\\')
+            . DIRECTORY_SEPARATOR . 'scheduled-post-check.txt';
+
+        if (is_file($stampFile)) {
+            $lastCheck = (int)@filemtime($stampFile);
+            if ($lastCheck > 0 && (time() - $lastCheck) < $intervalSeconds) {
+                return 0;
+            }
+        }
+
+        $count = $this->publishDuePosts();
+
+        if (!is_dir($cacheDir)) {
+            @mkdir($cacheDir, 0755, true);
+        }
+        if (is_dir($cacheDir) && is_writable($cacheDir)) {
+            // M4: block web access to the throttle directory with the same
+            // dual-syntax deny used by the other file caches.
+            $htaccess = rtrim((string)$cacheDir, '/\\') . DIRECTORY_SEPARATOR . '.htaccess';
+            if (!is_file($htaccess)) {
+                @file_put_contents($htaccess, "<IfModule mod_authz_core.c>\n    Require all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n    Order deny,allow\n    Deny from all\n</IfModule>\n");
+            }
+            @touch($stampFile);
+        }
+
+        return $count;
+    }
+
+    /**
      * Publish every scheduled post whose post_date has passed.
      *
      * Short-circuits when the feature is disabled or when no post is due

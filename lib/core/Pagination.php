@@ -53,11 +53,20 @@ class Pagination
     {
         $page_link = '';
 
+        // H4: escape every request-derived value at the sink. The hrefs are
+        // quoted and PHP_SELF/load/module are HTML-escaped; page numbers
+        // are integers. (No current callers; safe for future use.)
+        $self = htmlspecialchars(isset($_SERVER['PHP_SELF']) ? $_SERVER['PHP_SELF'] : '', ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401);
+        $load = htmlspecialchars(isset($_GET['load']) ? $_GET['load'] : '', ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401);
+        $module = htmlspecialchars(isset($_GET['module']) ? $_GET['module'] : '', ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401);
+        $activePage = abs((int)$activePage);
+        $totalPage = abs((int)$totalPage);
+
         // Link ke halaman pertama (Awal) dan sebelumnya (Sebelumnya)
         if ($activePage > 1) {
             $Sebelumnya = $activePage - 1;
-            $page_link .= "<span class=disabled><a href=" . escape_html($_SERVER['PHP_SELF']) . "?load=$_GET[load]&order=" . abs((int)1) . ">Awal</a></span>
-			<span class=disabled><a href=" . htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401) . "?load=$_GET[load]&order=" . abs((int)$Sebelumnya) . ">Sebelumnya</a></span> ";
+            $page_link .= "<span class=disabled><a href=\"" . $self . "?load=$load&order=" . abs((int)1) . "\">Awal</a></span>
+			<span class=disabled><a href=\"" . $self . "?load=$load&order=" . abs((int)$Sebelumnya) . "\">Sebelumnya</a></span> ";
         } else {
             $page_link .= "<span class=disabled> Awal</span>";
         }
@@ -69,7 +78,7 @@ class Pagination
             if ($i < 1) {
                 continue;
             }
-            $number .= "<span class=disabled><a href=$_SERVER[PHP_SELF]?module=$_GET[module]&order=" . abs((int)$i) . ">$i</a></span> ";
+            $number .= "<span class=disabled><a href=\"$self?module=$module&order=" . abs((int)$i) . "\">$i</a></span> ";
         }
 
         //active page
@@ -80,10 +89,10 @@ class Pagination
                 break;
             }
 
-            $number .= "<span class=disabled><a href=$_SERVER[PHP_SELF]?module=$_GET[module]&order=" . abs((int)$i) . ">$i</a></span>  ";
+            $number .= "<span class=disabled><a href=\"$self?module=$module&order=" . abs((int)$i) . "\">$i</a></span>  ";
         }
 
-        $number .= ($activePage + 2 < $totalPage ? " ... <span class=disabled><a href=$_SERVER[PHP_SELF]?module=$_GET[module]&order=" . abs((int)$totalPage) . ">$totalPage</a> </span>  " : " ");
+        $number .= ($activePage + 2 < $totalPage ? " ... <span class=disabled><a href=\"$self?module=$module&order=" . abs((int)$totalPage) . "\">$totalPage</a> </span>  " : " ");
 
         $page_link .= "$number";
 
@@ -91,8 +100,8 @@ class Pagination
         if ($activePage < $totalPage) {
             $berikutnya = $activePage + 1;
 
-            $page_link .= " <span class=disabled><a href=$_SERVER[PHP_SELF]?module=$_GET[module]&order=$berikutnya>Berikutnya</a></span>
-			<span class=disabled><a href=$_SERVER[PHP_SELF]?module=$_GET[module]&order=$totalPage>Terakhir</a></span> ";
+            $page_link .= " <span class=disabled><a href=\"$self?module=$module&order=$berikutnya\">Berikutnya</a></span>
+			<span class=disabled><a href=\"$self?module=$module&order=$totalPage\">Terakhir</a></span> ";
         } elseif ($activePage > $totalPage) {
             $page_link .= $this->setErrorPage();
         } else {

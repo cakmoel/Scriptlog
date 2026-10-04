@@ -716,9 +716,8 @@ class Bootstrap
 
     private static function initializePostSecurity(): void
     {
-        if (function_exists('call_htmlpurifier')) {
-            call_htmlpurifier();
-        }
+        // REM-7: HTMLPurifier is lazy-loaded at its use site
+        // (purify_dirty_html()) so pages without content skip it entirely.
         if (function_exists('get_server_load')) {
             try {
                 get_server_load();

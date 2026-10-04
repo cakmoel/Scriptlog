@@ -86,15 +86,38 @@ AND p.post_type = 'page'";
      */
     public function getRandomStickyPages()
     {
+        $candidateSql = "SELECT ID FROM " . $this->table('tbl_posts') . "
+WHERE post_sticky = '1'
+AND post_status = 'publish'
+AND post_type = 'page' ORDER BY ID DESC LIMIT 20";
 
-        $sql = "SELECT ID, post_title, post_content FROM tbl_posts 
-WHERE post_sticky = '1' 
-AND post_status = 'publish' 
-AND post_type = 'page' ORDER BY RAND() LIMIT 1 ";
+        $this->setSQL($candidateSql);
+        $rows = $this->findAll(array());
+
+        $ids = array();
+        if (is_array($rows)) {
+            foreach ($rows as $row) {
+                $id = is_array($row) ? (isset($row['ID']) ? $row['ID'] : null) : (isset($row->ID) ? $row->ID : null);
+                if ($id !== null) {
+                    $ids[] = (int)$id;
+                }
+            }
+        }
+
+        if (empty($ids)) {
+            return (empty($ids)) ?: $ids;
+        }
+
+        $picked = $ids[random_int(0, count($ids) - 1)];
+
+        $sql = "SELECT ID, post_title, post_content FROM " . $this->table('tbl_posts') . "
+WHERE ID = :id AND post_sticky = '1'
+AND post_status = 'publish'
+AND post_type = 'page' LIMIT 1";
 
         $this->setSQL($sql);
 
-        $sticky_pages = $this->findAll();
+        $sticky_pages = $this->findAll(array(':id' => $picked));
 
         return (empty($sticky_pages)) ?: $sticky_pages;
     }

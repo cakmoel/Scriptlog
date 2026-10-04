@@ -303,7 +303,7 @@ class Db implements DbInterface
             implode(", ", $placeholders)
         );
 
-        $stmt = $this->dbc->prepare($sql);
+        $stmt = $this->prepareCached($sql);
         return $stmt->execute(array_values($params));
     }
 
@@ -345,7 +345,7 @@ class Db implements DbInterface
 
         $sql = "UPDATE `$tablename` SET $setClause WHERE $whereClause";
 
-        $stmt = $this->dbc->prepare($sql);
+        $stmt = $this->prepareCached($sql);
         $stmt->execute(array_merge(array_values($params), array_values($where)));
 
         return $stmt->rowCount();
@@ -388,7 +388,7 @@ class Db implements DbInterface
             $updateAssignments
         );
 
-        $stmt = $this->dbc->prepare($sql);
+        $stmt = $this->prepareCached($sql);
         return $stmt->execute(array_merge(array_values($params), array_values($updateParams)));
     }
 
@@ -421,7 +421,7 @@ class Db implements DbInterface
             $sql .= " LIMIT $limit";
         }
 
-        $stmt = $this->dbc->prepare($sql);
+        $stmt = $this->prepareCached($sql);
         $stmt->execute(array_values($where));
 
         return $stmt->rowCount();

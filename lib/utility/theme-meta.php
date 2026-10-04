@@ -14,6 +14,10 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  */
 function theme_meta(): array
 {
+    $holder = &theme_meta_cache_holder();
+    if ($holder !== null) {
+        return $holder;
+    }
 
     $scriptlog_image = app_url() . DS . APP_IMAGE . 'scriptlog-1200x630.jpg';
     $scriptlog_imgthumb = app_url() . DS . APP_IMAGE . 'scriptlog-612x221.jpg';
@@ -27,16 +31,46 @@ function theme_meta(): array
     if ($permalinkEnabled === 'yes') {
         $uri = class_exists('RequestPath') ? new RequestPath() : "";
 
-        return metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri);
+        $holder = metatag_by_path($scriptlog_image, $scriptlog_imgthumb, $uri);
+        return $holder;
     } else {
         $qs = (array) HandleRequest::isQueryStringRequested();
-        return metatag_by_query(
+        $holder = metatag_by_query(
             isset($qs['key']) ? (string) $qs['key'] : '',
             isset($qs['value']) ? (string) $qs['value'] : '',
             $scriptlog_image,
             $scriptlog_imgthumb
         );
+        return $holder;
     }
+}
+
+/**
+ * theme_meta_cache_holder
+ *
+ * Request-scoped holder for the memoized theme_meta() result. The result
+ * only depends on the current request (path or query string), so computing
+ * it once per request is safe and makes repeat calls free.
+ *
+ * @return array|null Memoized result, or null when not yet computed.
+ */
+function &theme_meta_cache_holder()
+{
+    static $cached = null;
+    return $cached;
+}
+
+/**
+ * reset_theme_meta_cache
+ *
+ * Forget the memoized theme_meta() result (used by tests).
+ *
+ * @return void
+ */
+function reset_theme_meta_cache()
+{
+    $holder = &theme_meta_cache_holder();
+    $holder = null;
 }
 
 /**
