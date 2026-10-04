@@ -161,12 +161,15 @@ try {
             $rateResult = $rateLimiter->check(null, $readLimit, ApiResponse::RATE_WINDOW, 'read');
         }
 
+        // Store rate result for response headers BEFORE the rejection
+        // check: tooManyRequests() exits via ApiResponse::send(), so
+        // assigning after the check would leave the 429 response with
+        // empty rate-limit headers.
+        $GLOBALS['_api_rate_result'] = $rateResult;
+
         if (!$rateResult['allowed']) {
             ApiResponse::tooManyRequests('Rate limit exceeded. Please slow down.', $rateResult['retry_after']);
         }
-
-        // Store rate result for response headers
-        $GLOBALS['_api_rate_result'] = $rateResult;
     }
 
     // Register API routes

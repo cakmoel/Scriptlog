@@ -20,8 +20,8 @@ if (file_exists(__DIR__ . '/../config.php')) {
     exit;
 }
 
-// 1. CSRF Check
-if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+// 1. CSRF Check (constant-time comparison: plain !== leaks prefix timing)
+if (empty($_POST['csrf_token']) || empty($_SESSION['csrf_token']) || !hash_equals((string)$_SESSION['csrf_token'], (string)$_POST['csrf_token'])) {
     echo json_encode(['success' => false, 'message' => 'CSRF validation failed.']);
     exit;
 }

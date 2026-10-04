@@ -84,6 +84,25 @@ function read_nginx_config_template($permalink_status)
         $content .= '    deny all;' . PHP_EOL;
         $content .= '}' . PHP_EOL . PHP_EOL;
 
+        # H2: migration scripts are CLI-only; cache/upload internals and
+        # executable scripts under upload dirs must never be served.
+        $content .= '# Migration scripts, file caches, and uploadbed executables' . PHP_EOL;
+        $content .= 'location ~ ^/lib/ {' . PHP_EOL;
+        $content .= '    deny all;' . PHP_EOL;
+        $content .= '}' . PHP_EOL . PHP_EOL;
+
+        $content .= 'location ~ ^/install/migrate-.*\.php$ {' . PHP_EOL;
+        $content .= '    deny all;' . PHP_EOL;
+        $content .= '}' . PHP_EOL . PHP_EOL;
+
+        $content .= 'location ~ ^/(public/cache/rate_limit|public/files/cache)/ {' . PHP_EOL;
+        $content .= '    deny all;' . PHP_EOL;
+        $content .= '}' . PHP_EOL . PHP_EOL;
+
+        $content .= 'location ~* ^/public/files/(pictures|audio|video)/.*\.(php|phtml|phar|phps|pl|py|cgi)$ {' . PHP_EOL;
+        $content .= '    deny all;' . PHP_EOL;
+        $content .= '}' . PHP_EOL . PHP_EOL;
+
         $content .= 'location ~* \.(ini|log|db|sql)$ {' . PHP_EOL;
         $content .= '    deny all;' . PHP_EOL;
         $content .= '}' . PHP_EOL . PHP_EOL;
@@ -98,6 +117,32 @@ function read_nginx_config_template($permalink_status)
         $content .= '# Permalink disabled - route all other requests to index.php' . PHP_EOL;
         $content .= 'location / {' . PHP_EOL;
         $content .= '    try_files $uri $uri/ /index.php?$query_string;' . PHP_EOL;
+        $content .= '}' . PHP_EOL . PHP_EOL;
+
+        # Deny access to sensitive files (same set as the permalink branch)
+        $content .= '# Deny access to sensitive files' . PHP_EOL;
+        $content .= 'location ~ /\.(htaccess|htpasswd|git|env|config) {' . PHP_EOL;
+        $content .= '    deny all;' . PHP_EOL;
+        $content .= '}' . PHP_EOL . PHP_EOL;
+
+        $content .= 'location ~ ^/lib/ {' . PHP_EOL;
+        $content .= '    deny all;' . PHP_EOL;
+        $content .= '}' . PHP_EOL . PHP_EOL;
+
+        $content .= 'location ~ ^/install/migrate-.*\.php$ {' . PHP_EOL;
+        $content .= '    deny all;' . PHP_EOL;
+        $content .= '}' . PHP_EOL . PHP_EOL;
+
+        $content .= 'location ~ ^/(public/cache/rate_limit|public/files/cache)/ {' . PHP_EOL;
+        $content .= '    deny all;' . PHP_EOL;
+        $content .= '}' . PHP_EOL . PHP_EOL;
+
+        $content .= 'location ~* ^/public/files/(pictures|audio|video)/.*\.(php|phtml|phar|phps|pl|py|cgi)$ {' . PHP_EOL;
+        $content .= '    deny all;' . PHP_EOL;
+        $content .= '}' . PHP_EOL . PHP_EOL;
+
+        $content .= 'location ~* \.(ini|log|db|sql)$ {' . PHP_EOL;
+        $content .= '    deny all;' . PHP_EOL;
         $content .= '}' . PHP_EOL . PHP_EOL;
     }
 

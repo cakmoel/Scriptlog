@@ -74,6 +74,8 @@ function get_table_definitions($prefix = '')
   KEY idx_post_slug(post_slug),
   KEY idx_post_locale(post_locale),
   KEY idx_post_status_date(post_status, post_date),
+  KEY idx_post_date(post_date),
+  KEY idx_post_type_status(post_type, post_status, post_date),
   FULLTEXT KEY (post_tags, post_title, post_content)
   )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
@@ -125,7 +127,8 @@ function get_table_definitions($prefix = '')
     $tblPostTopic = "CREATE TABLE IF NOT EXISTS {$prefix}tbl_post_topic ( 
   post_id BIGINT(20) unsigned NOT NULL,    
   topic_id BIGINT(20) unsigned NOT NULL,
-  PRIMARY KEY(post_id, topic_id)
+  PRIMARY KEY(post_id, topic_id),
+  KEY idx_post_topic_topic(topic_id)
   )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
     $tblComment = "CREATE TABLE IF NOT EXISTS {$prefix}tbl_comments (
@@ -139,7 +142,8 @@ function get_table_definitions($prefix = '')
   comment_status VARCHAR(20) NOT NULL DEFAULT 'pending',
   comment_date datetime NOT NULL DEFAULT '1988-07-01 08:00:00',
   PRIMARY KEY (ID),
-  KEY id_comment_post(comment_post_id)
+  KEY id_comment_post(comment_post_id),
+  KEY idx_comment_post_status(comment_post_id, comment_status)
   )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
 
     $tblMenu = "CREATE TABLE IF NOT EXISTS {$prefix}tbl_menu (

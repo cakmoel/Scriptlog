@@ -1,5 +1,14 @@
 <?php
 
+// C2: this script runs DDL with the full database credentials. Web
+// execution is unauthenticated by design (no bootstrap, no login), so refuse
+// everything except CLI. Upgrades run `php install/migrate-*.php` over SSH/cron.
+if (PHP_SAPI !== 'cli') {
+    http_response_code(404);
+    exit;
+}
+
+
 /**
  * SMTP Migration Script
  *

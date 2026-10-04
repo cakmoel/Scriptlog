@@ -124,7 +124,7 @@ function admin_locales_catalog(): array
                     $dbCatalog[$code] = $label;
                 }
 
-                if ($dbCatalog !== []) {
+                if (!empty($dbCatalog)) {
                     $catalog = $dbCatalog;
                 }
             }
