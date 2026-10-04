@@ -42,6 +42,13 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
         $this->jsonSpec = json_decode(file_get_contents($this->jsonFile), true);
     }
 
+    private function requireYamlSpec(): void
+    {
+        if ($this->yamlSpec === null) {
+            $this->markTestSkipped('yaml extension not available (yaml_parse_file missing)');
+        }
+    }
+
     public function testYamlFileExists(): void
     {
         $this->assertFileExists($this->yamlFile);
@@ -82,6 +89,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testYamlAndJsonHaveOpenapiVersion(): void
     {
+        $this->requireYamlSpec();
         $yamlVersion = $this->yamlSpec['openapi'] ?? null;
         $jsonVersion = $this->jsonSpec['openapi'] ?? null;
 
@@ -92,6 +100,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testYamlAndJsonHaveSameInfo(): void
     {
+        $this->requireYamlSpec();
         $yamlInfo = $this->yamlSpec['info'] ?? [];
         $jsonInfo = $this->jsonSpec['info'] ?? [];
 
@@ -101,6 +110,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testYamlAndJsonPathsMatch(): void
     {
+        $this->requireYamlSpec();
         $yamlPaths = array_keys($this->yamlSpec['paths']);
         $jsonPaths = array_keys($this->jsonSpec['paths']);
 
@@ -109,6 +119,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testYamlAndJsonTagsMatch(): void
     {
+        $this->requireYamlSpec();
         $yamlTags = array_column($this->yamlSpec['tags'], 'name');
         $jsonTags = array_column($this->jsonSpec['tags'], 'name');
 
@@ -117,6 +128,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testSchemaCountsMatch(): void
     {
+        $this->requireYamlSpec();
         $yamlSchemaCount = count($this->yamlSpec['components']['schemas']);
         $jsonSchemaCount = count($this->jsonSpec['components']['schemas']);
 
@@ -125,6 +137,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testRequiredSchemasExist(): void
     {
+        $this->requireYamlSpec();
         $schemas = $this->yamlSpec['components']['schemas'] ?? [];
 
         $requiredSchemas = [
@@ -154,6 +167,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testExpectedTagsExist(): void
     {
+        $this->requireYamlSpec();
         $tags = array_column($this->yamlSpec['tags'], 'name');
 
         $expectedTags = [
@@ -176,6 +190,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testServersAreDefined(): void
     {
+        $this->requireYamlSpec();
         $servers = $this->yamlSpec['servers'] ?? [];
 
         $this->assertIsArray($servers);
@@ -185,6 +200,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testProductionServerUrlExists(): void
     {
+        $this->requireYamlSpec();
         $servers = $this->yamlSpec['servers'] ?? [];
 
         $this->assertArrayHasKey(0, $servers);
@@ -194,6 +210,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testServerUrlsAreRelativeOrPlaceholder(): void
     {
+        $this->requireYamlSpec();
         $servers = $this->yamlSpec['servers'] ?? [];
 
         $this->assertNotEmpty($servers);
@@ -213,6 +230,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testSecuritySchemesExist(): void
     {
+        $this->requireYamlSpec();
         $securitySchemes = $this->yamlSpec['components']['securitySchemes'] ?? [];
 
         $this->assertNotEmpty($securitySchemes);
@@ -220,6 +238,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testApiKeySecuritySchemeExists(): void
     {
+        $this->requireYamlSpec();
         $securitySchemes = $this->yamlSpec['components']['securitySchemes'] ?? [];
 
         $this->assertArrayHasKey('ApiKeyAuth', $securitySchemes);
@@ -227,6 +246,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testBearerSecuritySchemeExists(): void
     {
+        $this->requireYamlSpec();
         $securitySchemes = $this->yamlSpec['components']['securitySchemes'] ?? [];
 
         $this->assertArrayHasKey('BearerAuth', $securitySchemes);
@@ -234,6 +254,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testYamlHasComponents(): void
     {
+        $this->requireYamlSpec();
         $this->assertArrayHasKey('components', $this->yamlSpec);
     }
 
@@ -244,6 +265,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testPathsHaveGetOperations(): void
     {
+        $this->requireYamlSpec();
         $paths = $this->yamlSpec['paths'] ?? [];
         $getOperations = 0;
 
@@ -258,6 +280,7 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testPathsHavePostOperations(): void
     {
+        $this->requireYamlSpec();
         $paths = $this->yamlSpec['paths'] ?? [];
         $postOperations = 0;
 
@@ -272,39 +295,46 @@ class OpenApiSpecVerificationTest extends PHPUnit\Framework\TestCase
 
     public function testInfoHasTitle(): void
     {
+        $this->requireYamlSpec();
         $this->assertArrayHasKey('title', $this->yamlSpec['info']);
         $this->assertNotEmpty($this->yamlSpec['info']['title']);
     }
 
     public function testInfoHasVersion(): void
     {
+        $this->requireYamlSpec();
         $this->assertArrayHasKey('version', $this->yamlSpec['info']);
         $this->assertNotEmpty($this->yamlSpec['info']['version']);
     }
 
     public function testInfoHasDescription(): void
     {
+        $this->requireYamlSpec();
         $this->assertArrayHasKey('description', $this->yamlSpec['info']);
     }
 
     public function testInfoHasContact(): void
     {
+        $this->requireYamlSpec();
         $this->assertArrayHasKey('contact', $this->yamlSpec['info']);
     }
 
     public function testInfoHasLicense(): void
     {
+        $this->requireYamlSpec();
         $this->assertArrayHasKey('license', $this->yamlSpec['info']);
     }
 
     public function testXLogoExists(): void
     {
+        $this->requireYamlSpec();
         $this->assertArrayHasKey('x-logo', $this->yamlSpec['info']);
         $this->assertArrayHasKey('url', $this->yamlSpec['info']['x-logo']);
     }
 
     public function testXLogoContainsPlaceholderDomain(): void
     {
+        $this->requireYamlSpec();
         $logoUrl = $this->yamlSpec['info']['x-logo']['url'] ?? '';
 
         $this->assertStringContainsString('blogware.site', $logoUrl);
