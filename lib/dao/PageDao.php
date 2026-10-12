@@ -223,7 +223,7 @@ class PageDao extends Dao
      *
      * @param integer $id
      * @param object $sanitizing
-     * @return numeric
+     * @return bool
      */
     public function checkPageId($id, $sanitizing)
     {
@@ -265,8 +265,8 @@ class PageDao extends Dao
     /**
     * Total page records
     *
-    * @param array $data
-    * @return numeric
+     * @param array $data
+     * @return int|null
     */
     public function totalPageRecords(array $data = []): ?int
     {
