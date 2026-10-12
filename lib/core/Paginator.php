@@ -26,7 +26,7 @@ class Paginator
     /**
      * set get parameter for fetching the page number
      *
-     * @var string
+     * @var string|int
      */
     private $_instance;
 
@@ -62,8 +62,8 @@ class Paginator
      *
      *  pass values when class is istantiated
      *
-     * @param integer $_perPage  sets the number of items per page
-     * @param integer $_instance sets the instance for the GET parameter
+     * @param integer $perPage  sets the number of items per page
+     * @param integer $instance sets the instance for the GET parameter
      */
     public function __construct($perPage, $instance)
     {
@@ -91,8 +91,6 @@ class Paginator
      *
      * sets the instance parameter, if numeric value is 0 then set to 1
      *
-     * @var integer
-     *
      */
     private function set_instance()
     {
@@ -106,7 +104,7 @@ class Paginator
      *
      * collect a numberic value and assigns it to the totalRows
      *
-     * @var integer
+     * @param integer $_totalRows
      */
     public function set_total($_totalRows)
     {
@@ -131,7 +129,7 @@ class Paginator
      *
      * returns an array of the offset and limit returned on each call
      *
-     * @return string
+     * @return array
      *
      */
     public function get_limit_keys()
@@ -143,8 +141,8 @@ class Paginator
      *
      * create the html links for navigating through the dataset
      *
-     * @var string $path optionally set the path for the link
-     * @var string $ext optionally pass in extra parameters to the GET
+     * @param string $path optionally set the path for the link
+     * @param string $ext optionally pass in extra parameters to the GET
      * @return string returns the html menu
      *
      */
