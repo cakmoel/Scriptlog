@@ -165,8 +165,8 @@
   <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
-<script type="text/javascript">
-  function deleteMenu(id, menu) {
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
+function deleteMenu(id, menu) {
     if (confirm("Are you sure want to delete menu '" + menu + "'")) {
       window.location.href = 'index.php?load=menu&action=deleteMenu&Id=' + id;
     }
