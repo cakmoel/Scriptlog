@@ -74,7 +74,7 @@ final class PageService
      * Slug
      * property of URL SEO friendly
      *
-     * @var slug
+     * @var string
      *
      */
     private $slug;
@@ -114,7 +114,7 @@ final class PageService
     /**
      * Stick to the top of the blog
      *
-     * @var string
+     * @var string|int
      *
      */
     private $page_sticky;
@@ -239,7 +239,7 @@ final class PageService
     /**
      * SetPageImage
      *
-     * @param interger $post_image
+     * @param integer $post_image
      *
      */
     public function setPageImage($post_image)
@@ -364,7 +364,6 @@ final class PageService
      * grabPage
      *
      * @param int|number $id
-     * @param string $type
      * @return mixed
      *
      */
