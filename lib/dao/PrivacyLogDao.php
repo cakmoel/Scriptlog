@@ -22,6 +22,14 @@ use Scriptlog\Core\Dao;
 class PrivacyLogDao extends Dao
 {
     /**
+     * Explicit SELECT column list for tbl_privacy_logs (no SELECT *).
+     *
+     * @var string
+     */
+    private const SELECT_COLUMNS = 'ID, log_action, log_type, log_user_id, '
+        . 'log_email, log_details, log_ip, log_date';
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -62,7 +70,7 @@ class PrivacyLogDao extends Dao
      */
     public function getLogById($id)
     {
-        $sql = "SELECT * FROM tbl_privacy_logs WHERE ID = ?";
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM tbl_privacy_logs WHERE ID = ?";
         $this->setSQL($sql);
         return $this->findRow([(int)$id]);
     }
@@ -75,7 +83,7 @@ class PrivacyLogDao extends Dao
      */
     public function getLogsByUserId($userId)
     {
-        $sql = "SELECT * FROM tbl_privacy_logs 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM tbl_privacy_logs 
                 WHERE log_user_id = ? 
                 ORDER BY log_date DESC";
 
@@ -91,7 +99,7 @@ class PrivacyLogDao extends Dao
      */
     public function getLogsByEmail($email)
     {
-        $sql = "SELECT * FROM tbl_privacy_logs 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM tbl_privacy_logs 
                 WHERE log_email = ? 
                 ORDER BY log_date DESC";
 
@@ -107,7 +115,7 @@ class PrivacyLogDao extends Dao
      */
     public function getLogsByAction($action)
     {
-        $sql = "SELECT * FROM tbl_privacy_logs 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM tbl_privacy_logs 
                 WHERE log_action = ? 
                 ORDER BY log_date DESC";
 
@@ -129,7 +137,7 @@ class PrivacyLogDao extends Dao
         $allowedColumns = ['ID', 'log_action', 'log_type', 'log_email', 'log_ip', 'log_date'];
         $sortColumn = in_array($orderBy, $allowedColumns, true) ? $orderBy : 'ID';
 
-        $sql = "SELECT * FROM tbl_privacy_logs ORDER BY $sortColumn DESC";
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM tbl_privacy_logs ORDER BY $sortColumn DESC";
         $this->setSQL($sql);
         return $this->findAll([]);
     }
@@ -142,7 +150,7 @@ class PrivacyLogDao extends Dao
      */
     public function getRecentLogs($limit = 50)
     {
-        $sql = "SELECT * FROM tbl_privacy_logs 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM tbl_privacy_logs 
                 ORDER BY log_date DESC 
                 LIMIT ?";
 
