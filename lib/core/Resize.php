@@ -32,7 +32,7 @@ class Resize
     /**
      * width
      *
-     * @var num|int
+     * @var int
      *
      */
     private $width;
@@ -40,7 +40,7 @@ class Resize
     /**
      * height
      *
-     * @var num|int
+     * @var int
      *
      */
     private $height;
@@ -48,7 +48,7 @@ class Resize
     /**
      * imageResized
      *
-     * @var GdImage|resources
+     * @var resource
      *
      */
     private $imageResized;
