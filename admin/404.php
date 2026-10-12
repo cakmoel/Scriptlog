@@ -36,7 +36,7 @@ if ((isset($_GET['notfound']) && ($_GET['notfound'] === md5(app_key() . get_ip_a
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-<script type="text/javascript">function leave() {  window.location = "index.php?load=dashboard";} setTimeout("leave()", 5000);</script>
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">function leave() { window.location = "index.php?load=dashboard";} setTimeout("leave()", 5000);</script>
 <?php else :
     direct_page('index.php?load=dashboard', 307);
 endif;
