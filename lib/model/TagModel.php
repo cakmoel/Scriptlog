@@ -67,7 +67,7 @@ class TagModel extends BaseModel
      *
      * @param string $tag
      * @param object $sanitize
-     * @param Paginator $paginator
+     * @param Paginator $perPage
      * @return mixed
      */
     public function getPostsPublishedByTag($tag, $sanitize, Paginator $perPage)
