@@ -212,7 +212,7 @@ class CategoriesApiController extends ApiController
      *
      * POST /api/v1/categories
      *
-     * @param array $params Request data
+     * @param array $_params Request data
      * @return void
      */
     public function store($_params = [])
