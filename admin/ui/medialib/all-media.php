@@ -147,8 +147,8 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-  <script type="text/javascript">
-  function deleteMedia(id, level)
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
+function deleteMedia(id, level)
   {
       if (confirm("Are you sure want to delete media belongs to '" + level + "'"))
       {
