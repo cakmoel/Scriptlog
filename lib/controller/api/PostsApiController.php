@@ -283,7 +283,7 @@ final class PostsApiController extends ApiController
      *
      * POST /api/v1/posts
      *
-     * @param array $params Request data
+     * @param array $_params Request data
      * @return void
      */
     public function store($_params = [])
