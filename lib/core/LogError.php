@@ -25,12 +25,11 @@ class LogError
 
     public static function logPath()
     {
-        return static::$logFilePath;
+        return self::$logFilePath;
     }
 
     /**
      *
-     * @method customErrorMessage
      * @param string $privilege
      *
      */
@@ -40,45 +39,44 @@ class LogError
         if ($privilege === 'admin') {
             switch (self::getStatusCode()) {
                 case 400:
-                    echo MessageLog::contentMessage(static::$httpResponseCode, 'Bad Request', $privilege);
+                    echo MessageLog::contentMessage(self::$httpResponseCode, 'Bad Request', $privilege);
 
                     break;
 
                 case 403:
-                    echo MessageLog::contentMessage(static::$httpResponseCode, 'Forbidden', $privilege);
+                    echo MessageLog::contentMessage(self::$httpResponseCode, 'Forbidden', $privilege);
 
                     break;
 
                 case 404:
-                    echo MessageLog::contentMessage(static::$httpResponseCode, 'Not Found', $privilege);
+                    echo MessageLog::contentMessage(self::$httpResponseCode, 'Not Found', $privilege);
 
                     break;
 
                 case 405:
-                    echo MessageLog::contentMessage(static::$httpResponseCode, 'Method Not Allowed', $privilege);
+                    echo MessageLog::contentMessage(self::$httpResponseCode, 'Method Not Allowed', $privilege);
 
                     break;
 
                 case 413:
-                    echo MessageLog::contentMessage(static::$httpResponseCode, 'Payload Too Large', $privilege);
+                    echo MessageLog::contentMessage(self::$httpResponseCode, 'Payload Too Large', $privilege);
 
                     break;
 
                 case 500:
-                    echo MessageLog::contentMessage(static::$httpResponseCode, 'Internal Server Error', $privilege);
+                    echo MessageLog::contentMessage(self::$httpResponseCode, 'Internal Server Error', $privilege);
 
                     break;
             }
             return;
         }
 
-        echo MessageLog::contentMessage(static::$httpResponseCode);
+        echo MessageLog::contentMessage(self::$httpResponseCode);
     }
 
     /**
      * exceptionHandler
      *
-     * @method exceptionHandler
      * @param object $e
      */
     public static function exceptionHandler($e)
@@ -97,9 +95,8 @@ class LogError
      *
      * errorHandler
      *
-     * @method errorHandler
-     * @param integer $errorNumber
-     * @param string $errorString
+     * @param integer $code
+     * @param string $description
      * @param string $file
      * @param string $line
      * @return void|bool
@@ -114,9 +111,6 @@ class LogError
      *
      * @static method newMessage
      * @param \Exception|\Throwable $exception
-     * @param string $_printError
-     * @param string $clear
-     * @param string $error_file
      */
     public static function newMessage($exception)
     {
@@ -132,6 +126,6 @@ class LogError
 
     private static function getStatusCode()
     {
-        return static::$httpResponseCode;
+        return self::$httpResponseCode;
     }
 }
