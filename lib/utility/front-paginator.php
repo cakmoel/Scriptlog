@@ -5,7 +5,7 @@
  *
  * @category function
  * @author nirmalakhanza
- * @param num|int $perPage
+ * @param int $perPage
  * @param  $instance
  * @return object|bool
  *
