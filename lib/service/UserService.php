@@ -340,7 +340,7 @@ class UserService
     /**
      * setUserBanned
      *
-     * @param strin $user_banned
+     * @param string $user_banned
      */
     public function setUserBanned($user_banned)
     {
@@ -352,7 +352,7 @@ class UserService
      *
      * @method public grabUsers()
      * @param string $orderBy
-     * @param static PDO::FETCH_MODE $fetchMode
+     * @param int|null $fetchMode
      * @return array|bool|object
      *
      */
@@ -366,7 +366,7 @@ class UserService
      * grabUser
      *
      * @param string $userId
-     * @param static PDO::FETCH_MODE $fetchMode
+     * @param int|null $fetchMode
      * @return array|bool|object
      */
     public function grabUser($userId, $fetchMode = null)
@@ -378,7 +378,7 @@ class UserService
      * grabUserByLogin
      *
      * @param string $user_login
-     * @param static PDO::FETCH_MODE $fetchMode
+     * @param int|null $fetchMode
      * @return array
      */
     public function grabUserByLogin($user_login, $fetchMode = null)
@@ -391,7 +391,7 @@ class UserService
      *
      * @param string $login
      * @param string $expired
-     * @param static PDO::FETCH_MODE $fetchMode
+     * @param int|null $fetchMode
      * @return array
      */
     public function grabTokenByLogin($login, $expired, $fetchMode = null)
