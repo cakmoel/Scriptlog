@@ -155,7 +155,7 @@ class TopicController extends BaseApp
      * update
      *
      * @inheritDoc
-     * @param int|num $id
+     * @param int $id
      */
     public function update($id)
     {
@@ -247,7 +247,7 @@ class TopicController extends BaseApp
      *
      * @inheritDoc
      * @uses BaseApp::remove
-     * @param int|num $id
+     * @param int $id
      */
     public function remove($id)
     {
