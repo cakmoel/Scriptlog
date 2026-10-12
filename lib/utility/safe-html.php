@@ -6,7 +6,7 @@
  * Escaping output text results from database
  *
  * @category function
- * @param string $text
+ * @param string|null $data
  * @return string
  *
  */
