@@ -126,7 +126,7 @@ function listen_query_string($id, $app_url)
  *
  * @category Function
  * @author M.Noermoehammad
- * @param num|int $id
+ * @param int $id
  * @param string $app_url
  * @return mixed|array
  */
