@@ -8,6 +8,14 @@ use Scriptlog\Core\Dao;
 
 class TranslationDao extends Dao
 {
+    /**
+     * Explicit SELECT column list for tbl_translations (no SELECT *).
+     *
+     * @var string
+     */
+    private const SELECT_COLUMNS = 'ID, lang_id, translation_key, translation_value, '
+        . 'translation_context, translation_plurals, is_html, created_at, updated_at';
+
     public function createTranslation(array $data): int
     {
         $this->create($this->table('tbl_translations'), [
@@ -24,14 +32,14 @@ class TranslationDao extends Dao
 
     public function findById(int $id): ?array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_translations')} WHERE ID = ?";
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_translations')} WHERE ID = ?";
         $this->setSQL($sql);
         return $this->findRow([$id]) ?: null;
     }
 
     public function findTranslationsByLocale(int $langId): array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_translations')} 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_translations')} 
                 WHERE lang_id = ? 
                 ORDER BY translation_key ASC";
         $this->setSQL($sql);
@@ -40,7 +48,7 @@ class TranslationDao extends Dao
 
     public function findTranslationByKey(int $langId, string $key): ?array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_translations')} 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_translations')} 
                 WHERE lang_id = ? AND translation_key = ?";
         $this->setSQL($sql);
         return $this->findRow([$langId, $key]) ?: null;
@@ -48,7 +56,7 @@ class TranslationDao extends Dao
 
     public function findByContext(int $langId, string $context): array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_translations')} 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_translations')} 
                 WHERE lang_id = ? AND translation_context = ?
                 ORDER BY translation_key ASC";
         $this->setSQL($sql);
@@ -57,7 +65,7 @@ class TranslationDao extends Dao
 
     public function search(int $langId, string $query): array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_translations')} 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_translations')} 
                 WHERE lang_id = ? 
                 AND (translation_key LIKE ? OR translation_value LIKE ?)
                 ORDER BY translation_key ASC";
@@ -110,7 +118,7 @@ class TranslationDao extends Dao
 
     public function findByKeyPrefix(int $langId, string $prefix): array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_translations')} 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_translations')} 
                 WHERE lang_id = ? AND translation_key LIKE ?
                 ORDER BY translation_key ASC";
         $this->setSQL($sql);
@@ -140,7 +148,7 @@ class TranslationDao extends Dao
 
     public function findTranslationsPaginated(int $langId, int $offset, int $limit): array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_translations')} 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_translations')} 
                 WHERE lang_id = ? 
                 ORDER BY translation_key ASC
                 LIMIT ? OFFSET ?";
@@ -150,7 +158,7 @@ class TranslationDao extends Dao
 
     public function findByContextPaginated(int $langId, string $context, int $offset, int $limit): array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_translations')} 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_translations')} 
                 WHERE lang_id = ? AND translation_context = ?
                 ORDER BY translation_key ASC
                 LIMIT ? OFFSET ?";
@@ -160,7 +168,7 @@ class TranslationDao extends Dao
 
     public function searchPaginated(int $langId, string $query, int $offset, int $limit): array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_translations')} 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_translations')} 
                 WHERE lang_id = ? 
                 AND (translation_key LIKE ? OR translation_value LIKE ?)
                 ORDER BY translation_key ASC
@@ -194,7 +202,9 @@ class TranslationDao extends Dao
 
     public function findAllTranslationsPaginated(int $offset, int $limit): array
     {
-        $sql = "SELECT t.*, l.lang_code, l.lang_name 
+        $sql = "SELECT t.ID, t.lang_id, t.translation_key, t.translation_value, "
+                . "t.translation_context, t.translation_plurals, t.is_html, t.created_at, t.updated_at, "
+                . "l.lang_code, l.lang_name 
                 FROM {$this->table('tbl_translations')} t
                 LEFT JOIN {$this->table('tbl_languages')} l ON t.lang_id = l.ID
                 ORDER BY t.translation_key ASC
