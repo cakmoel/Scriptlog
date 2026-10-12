@@ -57,7 +57,7 @@ class ArchivesApiController extends ApiController
      *
      * Returns a list of years and months that have published posts
      *
-     * @param array $params Query parameters
+     * @param array $_params Query parameters
      * @return void
      */
     public function index($_params = [])
