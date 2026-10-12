@@ -69,7 +69,7 @@ function midfielder()
  * @see https://stackoverflow.com/questions/834303/startswith-and-endswith-functions-in-php
  * @license MIT
  * @version 1.0
- * @return string
+ * @return bool
  *
  */
 function starts_with($haystack, $needle)
@@ -85,7 +85,7 @@ function starts_with($haystack, $needle)
  * @see https://stackoverflow.com/questions/834303/startswith-and-endswith-functions-in-php
  * @param string $haystack
  * @param string $needle
- * @return void
+ * @return bool
  *
  */
 function ends_with($haystack, $needle)
