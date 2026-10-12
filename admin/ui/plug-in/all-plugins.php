@@ -136,8 +136,8 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-<script type="text/javascript">
-  function activatePlugin(id, plugin)
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
+function activatePlugin(id, plugin)
   {
       if (confirm("Are you sure want to activate '" + plugin + "'?"))
       {
