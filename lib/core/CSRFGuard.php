@@ -22,7 +22,6 @@ class CSRFGuard
     /**
      * check
      *
-     * @method public static check()
      * @return true|false|\Exception
      *
      */
