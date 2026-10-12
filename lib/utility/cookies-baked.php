@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * is_cookies_secured()
  *
@@ -43,11 +45,11 @@ function set_session_cookies_key($app_email, $app_key)
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * @param array $cookies
- * @return string
+ * @param string $cookies Cookie group name
+ * @return string|false
  *
  */
-function is_cookies(array $cookies)
+function is_cookies($cookies)
 {
 
     if (isset($_COOKIE[$cookies])) {
