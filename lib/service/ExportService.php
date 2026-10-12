@@ -244,7 +244,11 @@ class ExportService
 
         $whereClause = 'WHERE ' . implode(' AND ', $where);
 
-        $sql = "SELECT p.*, u.user_login, u.user_fullname 
+        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
+                p.post_title, p.post_slug, p.post_content, p.post_summary, p.post_keyword, 
+                p.post_status, p.post_visibility, p.post_password, p.post_tags, p.post_headlines, 
+                p.post_sticky, p.post_type, p.post_locale, p.comment_status, p.passphrase, 
+                u.user_login, u.user_fullname 
                 FROM tbl_posts p 
                 LEFT JOIN tbl_users u ON p.post_author = u.ID 
                 {$whereClause}
@@ -290,7 +294,11 @@ class ExportService
 
         $whereClause = 'WHERE ' . implode(' AND ', $where);
 
-        $sql = "SELECT p.*, u.user_login, u.user_fullname 
+        $sql = "SELECT p.ID, p.media_id, p.post_author, p.post_date, p.post_modified, 
+                p.post_title, p.post_slug, p.post_content, p.post_summary, p.post_keyword, 
+                p.post_status, p.post_visibility, p.post_password, p.post_tags, p.post_headlines, 
+                p.post_sticky, p.post_type, p.post_locale, p.comment_status, p.passphrase, 
+                u.user_login, u.user_fullname 
                 FROM tbl_posts p 
                 LEFT JOIN tbl_users u ON p.post_author = u.ID 
                 {$whereClause}
@@ -372,7 +380,8 @@ class ExportService
      */
     protected function getPostComments($postId)
     {
-        $sql = "SELECT * 
+        $sql = "SELECT ID, comment_post_id, comment_parent_id, comment_author_name, 
+                comment_author_ip, comment_author_email, comment_content, comment_status, comment_date 
                 FROM tbl_comments 
                 WHERE comment_post_id = ?
                 AND comment_status = 'approved'
