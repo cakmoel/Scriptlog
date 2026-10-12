@@ -391,7 +391,7 @@ final class Html
      * Iterate through each tag and add non-whitelisted tags to the
      * bad list. Also filter the attributes and remove non-whitelisted ones.
      *
-     * @param htmlNode $node Current HTML node
+     * @param \DOMNode $node Current HTML node
      * @param array $badTags Cumulative list of tags for deletion
      */
     protected function cleanNodes($node, &$badTags = array())
@@ -500,7 +500,6 @@ final class Html
      * It really shines when evaluating text so that's what we're doing here
      *
      * @param string $v string Attribute name
-     * @param int $depth Number of times to URL decode
      * @returns boolean True if nothing unsavory was found.
      */
     public static function decodeScrub($v)
