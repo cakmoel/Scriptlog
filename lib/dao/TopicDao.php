@@ -30,8 +30,6 @@ class TopicDao extends Dao
     /**
      * Find All Topics
      *
-     * @param integer $position
-     * @param integer $limit
      * @param string $orderBy
      * @return mixed
      */
@@ -99,7 +97,7 @@ class TopicDao extends Dao
      */
     public function findTopicWithPostCount($topicId)
     {
-        $sql = "SELECT t.*,
+        $sql = "SELECT t.ID, t.topic_title, t.topic_slug, t.topic_status, t.topic_locale,
                        (SELECT COUNT(*) FROM tbl_post_topic pt
                         INNER JOIN tbl_posts p ON pt.post_id = p.ID
                         WHERE pt.topic_id = t.ID
@@ -213,9 +211,7 @@ class TopicDao extends Dao
     /**
      * Insert a new records
      *
-     * @method createCategory
-     * @param string $title
-     * @param string $slug
+     * @param array $bind
      */
     public function createTopic($bind)
     {
@@ -232,9 +228,8 @@ class TopicDao extends Dao
     /**
      * Update an existing records
      *
-     * @param string $title
-     * @param string $slug
-     * @param string $status
+     * @param object $sanitize
+     * @param array $bind
      * @param integer $topicId
      */
     public function updateTopic($sanitize, $bind, $topicId)
@@ -254,7 +249,7 @@ class TopicDao extends Dao
      * Delete an existing records
      *
      * @param integer $topicId
-     * @param string $sanitizing
+     * @param string $sanitize
      */
     public function deleteTopic($topicId, $sanitize)
     {
@@ -340,8 +335,8 @@ class TopicDao extends Dao
      *
      * @method public checkTopicId()
      * @param integer $id
-     * @param object $sanitize
-     * @return numeric
+     * @param object $sanitizing
+     * @return bool
      *
      */
     public function checkTopicId($id, $sanitizing)
