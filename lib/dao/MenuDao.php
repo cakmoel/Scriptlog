@@ -34,7 +34,7 @@ class MenuDao extends Dao
      * Find all menus
      *
      * @method public findMenus()
-     * @param integer $orderBy
+     * @param string $orderBy
      *
      */
     public function findMenus($orderBy = 'menu_sort')
@@ -54,7 +54,6 @@ class MenuDao extends Dao
      *
      * @param integer $menuId
      * @param object $sanitizing
-     * @param static $fetchMode
      * @return boolean|array|object
      *
      */
@@ -83,7 +82,7 @@ class MenuDao extends Dao
     /**
      * findMenuParent
      *
-     * @param num|int $parentId
+     * @param int|string $parentId
      * @param object $sanitizing
      *
      */
@@ -201,7 +200,7 @@ class MenuDao extends Dao
      * Delete menu
      *
      * @param integer $id
-     * @param object $sanitizing
+     * @param object $sanitize
      *
      */
     public function deleteMenu($id, $sanitize)
@@ -215,7 +214,7 @@ class MenuDao extends Dao
      *
      * @param integer $id
      * @param object $sanitizing
-     * @return numeric
+     * @return bool
      *
      */
     public function checkMenuId($id, $sanitizing)
@@ -253,7 +252,7 @@ class MenuDao extends Dao
      * Retrieving menu ID to drop down menu parent
      *
      * @param string $selected
-     * @return void
+     * @return string
      *
      */
     public function dropDownMenuParent($selected = '')
@@ -332,7 +331,7 @@ class MenuDao extends Dao
      *
      * @method public totalMenuRecords()
      * @param array $data = null
-     * @return integer|numeric
+     * @return int|null
      *
      */
     public function totalMenuRecords(array $data = []): ?int
@@ -345,9 +344,8 @@ class MenuDao extends Dao
     /**
      * updateMenuSort
      *
-     * @param object $sanitize
-     * @param num|int $old_sort
-     * @param num|int $new_sort
+     * @param int|string $old_sort
+     * @param int|string $new_sort
      *
      */
     private function updateMenuSort($old_sort, $new_sort)
