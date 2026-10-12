@@ -32,7 +32,7 @@ class ThemeDao extends Dao
      * ordered by ID (default)
      *
      * @method mixed findThemes()
-     * @param integer $orderBy
+     * @param string $orderBy
      * @return mixed
      *
      */
@@ -101,7 +101,7 @@ class ThemeDao extends Dao
      * update an existing theme record
      *
      * @method mixed updateTheme()
-     * @param integer $id
+     * @param integer $ID
      * @param array $bind
      *
      */
@@ -139,7 +139,7 @@ class ThemeDao extends Dao
      * @method mixed checkThemeId()
      * @param integer $id
      * @param object $sanitize
-     * @return numeric
+     * @return bool
      *
      */
     public function checkThemeId($id, $sanitize)
@@ -155,7 +155,7 @@ class ThemeDao extends Dao
      * Is theme active or not
      *
      * @param string $theme_title
-     * @return boolen|string
+     * @return boolean|string
      *
      */
     public function isThemeActived($theme_title)
@@ -315,7 +315,7 @@ class ThemeDao extends Dao
      *
      * @method totalThemeRecords()
      * @param array $data
-     * @return numeric|integer|null
+     * @return int|null
      *
      */
     public function totalThemeRecords(array $data = array()): ?int
