@@ -118,7 +118,7 @@ if (isset($_POST['Change']) && $_POST['Change'] == 'Change Password') {
         ?>
 <div class="alert alert-danger">
         <?= safe_html($stop); ?>
-<script type="text/javascript">function leave() {  window.location = "<?= safe_html($config['app']['url']); ?>";} setTimeout("leave()", 3640);</script>
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">function leave() {  window.location = "<?= safe_html($config['app']['url']); ?>";} setTimeout("leave()", 3640);</script>
 </div>
     <?php else :
         ?>
@@ -165,8 +165,8 @@ if (isset($_POST['Change']) && $_POST['Change'] == 'Change Password') {
 <script src="assets/components/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- iCheck -->
 <script src="assets/components/iCheck/icheck.min.js"></script>
-<script>
-  $(function () {
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
+$(function () {
     $('input').iCheck({
       checkboxClass: 'icheckbox_square-blue',
       radioClass: 'iradio_square-blue',
