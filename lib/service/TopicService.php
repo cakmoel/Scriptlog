@@ -278,7 +278,7 @@ class TopicService
      * totalTopics
      *
      * @param array $data
-     * @return integer|numeric|null
+     * @return int|null
      */
     public function totalTopics(array $data = []): ?int
     {
