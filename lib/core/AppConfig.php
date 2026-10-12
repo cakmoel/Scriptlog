@@ -24,6 +24,12 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 
 class AppConfig
 {
+    /**
+     * Shared configuration payload. Holds the decoded array after
+     * readConfiguration() or the exported string during writeConfiguration().
+     *
+     * @var array|string
+     */
     private static $config;
 
     /**
@@ -52,8 +58,9 @@ class AppConfig
     public static function writeConfiguration($filename, array $config)
     {
 
-        self::$config = var_export($config, true);
+        $exported = var_export($config, true);
+        self::$config = $exported;
 
-        file_put_contents($filename, "<?php return self::$config; ");
+        file_put_contents($filename, "<?php return " . $exported . "; ");
     }
 }
