@@ -21,8 +21,8 @@ class GalleryModel extends BaseModel
     /**
      * getGalleries
      *
-     * @param int|num $start
-     * @param int|num $limit
+     * @param int|string $start
+     * @param int|string $limit
      *
      */
     public function getGalleries($start, $limit)
