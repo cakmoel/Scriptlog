@@ -297,7 +297,7 @@ function medoo_get_where($table, $columns, $where)
  * @param array $join
  * @param string|array $columns
  * @param array $where
- * @return void
+ * @return mixed
  */
 function medoo_get_join($table, $join, $columns, $where)
 {
