@@ -129,7 +129,7 @@ MSG;
     /**
      * messageError
      *
-     * @param num|int $code
+     * @param int $code
      * @param string $description
      * @param string $logPath
      * @param string $file
