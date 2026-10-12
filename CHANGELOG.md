@@ -8,12 +8,58 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#182---2026-09-27)
+- [Latest Release](#190---2026-10-12)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.9.0] - 2026-10-12
+
+### Added
+- **Comment honeypot anti-spam**: New `is_comment_honeypot_triggered()` helper and a hidden `website` field on the blog single-post template silently accept (without storing) bot-submitted comments
+- **Per-IP comment throttling**: New `check_comment_throttle()` guards comment submissions with a sliding-window rate limit (10 per 10 minutes by default) returning `429 Too Many Requests` with a `Retry-After` header
+- **Data request `request_updated` column migration**: New CLI-only `install/migrate-data-request-updated-column.php` adds and backfills the updated-at column for GDPR data requests
+- **CSP nonces on inline scripts**: Every inline `<script>` in the admin and auth layouts now carries a `nonce` attribute generated from the `CSP_NONCE` constant, closing the remaining nonce gap in the Content-Security-Policy
+- **Docblock and type coverage**: Corrected PHPDoc type annotations across more than 100 controllers, services, DAOs, models, and utilities, aligning signatures with PHPStan level-1 analysis
+
+### Changed
+- **Explicit SELECT column lists**: DAOs (`ConsentDao`, `DataRequestDao`, `LanguageDao`, `PrivacyLogDao`, `PrivacyPolicyDao`, `TranslationDao`) and selected queries now use dedicated `SELECT_COLUMNS` constants or explicit column lists instead of `*`, trimming per-request data transfer
+- **`AppConfig::writeConfiguration()`**: Exported configuration files now embed the resolved payload inline rather than referencing the shared `$config` property
+- **`LogError` / `PassPhraseKey`**: Static property access switched from `static::` to `self::` for private members
+- **Development guide**: Clone path, version stamp, and `APP_VERSION` reference aligned with the current release
+
+### Fixed
+- **CSRF token timing on privacy policy**: The form token is now (re)generated only after POST validation, preventing token invalidation and intermittent "unpleasant attempt" rejections
+- **`index.php` graceful failure**: The front controller now responds `500` with a clear message when neither `config.php` nor the installer is present, instead of fataling
+- **Optional-dependency guards**: Archive bomb scanning skips cleanly when `BombScanner` is unavailable; user registration and sanitizer/tag helpers guard missing DAOs and non-object database results
+- **Prepared-statement handling**: `DbMySQLi` returns `false` on failed prepared statements, and downstream callers handle it without raising fatal warnings
+- **CIDR wildcard netmask, elapsed-week, plugin sort order, and unique-id calculations**: Explicit integer/float casts remove type-coercion edge cases
+- **HTML escaper**: `escape_html()` returns `null` for empty input instead of emitting an invalid return value
+
+### Security
+- **`secure-http-headers` CSP directive**: The script-src policy now includes the shared nonce source, so nonce-tagged inline scripts are permitted while untagged inline execution remains blocked
+- **Comment ingestion hardening**: Honeypot detection and per-IP throttling reduce bot comment spam and abuse
+- **PHPDoc-driven static analysis**: Type corrections let PHPStan level-1 run clean, catching type mismatches that previously fell through
+
+### Deprecated
+- None
+
+### Removed
+- Redundant `empty()`/`isset()` checks flagged by PHPStan level-1 analysis
+
+### Notes
+Minor release focused on comment-spam defenses, CSP nonce hardening, and static-analysis-driven type corrections. 172 commits since v1.8.3 including 11 perf commits, 25 fix commits, 3 feat commits, 20 security commits, 8 chore commits, 2 refactor commits, 1 test commit, and 102 doc commits. The encrypted per-form CSRF slots, upload/download traversal guards, and XXE hardening from the v1.8.3 cycle are carried forward.
+
+### Codename
+**Maleo Senkawor** (retained) – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.8.3
+- **Changes since v1.8.3**: 172 commits
+
+---
 
 ## [1.8.2] - 2026-09-27
 
