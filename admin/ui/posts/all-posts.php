@@ -146,8 +146,8 @@
   <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
-<script type="text/javascript">
-  function deletePost(id, title) {
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
+function deletePost(id, title) {
     if (confirm("Are you sure want to delete Post '" + title + "'")) {
       window.location.href = 'index.php?load=posts&action=deletePost&Id=' + id;
     }
