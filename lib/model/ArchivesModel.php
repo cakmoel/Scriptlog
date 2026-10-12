@@ -82,8 +82,8 @@ class ArchivesModel extends BaseModel
     /**
      * getPostsByArchive
      *
-     * @param object $perPage
-     * @param object $sanitize
+     * @param Paginator $perPage
+     * @param Sanitize $sanitize
      * @param array $values
      * @see https://learnsql.com/cookbook/how-to-get-the-year-and-the-month-from-a-date-in-mysql/
      * @see https://stackoverflow.com/questions/21451199/get-records-in-database-by-year-and-month
