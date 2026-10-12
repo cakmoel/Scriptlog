@@ -47,7 +47,7 @@ class MediaController extends BaseApp
     /**
      * Initialize object properties
      *
-     * @param object $mediaService
+     * @param MediaService $mediaService
      *
      */
     public function __construct(MediaService $mediaService)
@@ -560,7 +560,7 @@ class MediaController extends BaseApp
      *
      * {@inheritDoc}
      * @see BaseApp::remove()
-     * @param int|num $id
+     * @param int $id
      *
      */
     public function remove($id)
