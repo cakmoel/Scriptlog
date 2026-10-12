@@ -278,7 +278,7 @@ final class PageController extends BaseApp
      *
      * update an existing record based on it's ID
      *
-     * @param int|num $id
+     * @param int $id
      *
      */
     public function update($id)
