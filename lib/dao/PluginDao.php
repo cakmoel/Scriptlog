@@ -32,8 +32,6 @@ class PluginDao extends Dao
     /**
      * Get list of plugins
      *
-     * @param integer $position
-     * @param integer $limit
      * @param string $orderBy
      * @return boolean|array|object
      *
@@ -87,7 +85,7 @@ class PluginDao extends Dao
         $getSort = "SELECT plugin_sort FROM tbl_plugin ORDER BY plugin_sort DESC";
         $this->setSQL($getSort);
         $rows = $this->findColumn();
-        $plugin_sorted = $rows['plugin_sort'] + 1;
+        $plugin_sorted = (int)$rows + 1;
 
         // input data plugin
         $this->create("tbl_plugin", [
@@ -177,7 +175,7 @@ class PluginDao extends Dao
      *
      * @param integer $id
      * @param object $sanitize
-     * @return numeric
+     * @return bool
      *
      */
     public function checkPluginId($id, $sanitize)
@@ -238,7 +236,8 @@ class PluginDao extends Dao
     /**
      * Set menu plugin
      *
-     * @param UserEvent $userEvent
+     * @param string $module
+     * @param string $user_level
      * @return string
      *
      */
@@ -256,7 +255,7 @@ class PluginDao extends Dao
 
                 if ($this->accessLevel == 'administrator' || $this->accessLevel == 'manager') {
                     if (is_dir(__DIR__ . '/../../' . APP_PLUGIN . safe_html($plugin['plugin_name'])) && is_readable($pluginPath)) {
-                        $plugin_selected = (isset($module) && $module == $plugin['plugin_name']) ? 'class="active"' : 'class=""';
+                        $plugin_selected = ($module == $plugin['plugin_name']) ? 'class="active"' : 'class=""';
 
                         $html .= '<li "' . $plugin_selected . '">';
 
@@ -303,7 +302,7 @@ class PluginDao extends Dao
      * Total plugins records
      *
      * @param array $data
-     * @return numeric
+     * @return int|null
      *
      */
     public function totalPluginRecords(array $data = []): ?int
