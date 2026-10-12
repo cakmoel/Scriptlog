@@ -6,7 +6,6 @@
  * Encrypt user password
  *
  * @param string $password
- * @param integer $id
  * @return string
  *
  */
