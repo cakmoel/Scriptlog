@@ -8,7 +8,7 @@
  * @author M.Noermoehammad
  * @license
  * @version 1.0
- * @param string $access_level
+ * @param string $plugin_name
  *
  */
 function set_plugin_navigation($plugin_name)
