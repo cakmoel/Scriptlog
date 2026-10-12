@@ -99,9 +99,9 @@ class PluginService
     /**
      * Constructor
      *
-     * @param object $pluginDao
-     * @param object $validator
-     * @param object $sanitize
+     * @param PluginDao $pluginDao
+     * @param FormValidator $validator
+     * @param Sanitize $sanitize
      *
      */
     public function __construct(PluginDao $pluginDao, FormValidator $validator, Sanitize $sanitize)
