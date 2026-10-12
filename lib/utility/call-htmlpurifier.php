@@ -7,7 +7,7 @@
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * @return string
+ * @return bool|int
  *
  */
 function call_htmlpurifier()
