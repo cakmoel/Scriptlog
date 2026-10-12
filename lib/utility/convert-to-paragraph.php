@@ -9,7 +9,7 @@
  * @license MIT
  * @version 1.0
  * @param string $text
- * @return void
+ * @return string
  */
 function convert_to_paragraph($text)
 {
