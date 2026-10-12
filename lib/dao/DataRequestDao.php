@@ -22,6 +22,14 @@ use Scriptlog\Core\Dao;
 class DataRequestDao extends Dao
 {
     /**
+     * Explicit SELECT column list for tbl_data_requests (no SELECT *).
+     *
+     * @var string
+     */
+    private const SELECT_COLUMNS = 'ID, request_type, request_email, request_status, '
+        . 'request_ip, request_note, request_date, request_updated, request_completed_date';
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -84,7 +92,7 @@ class DataRequestDao extends Dao
      */
     public function getRequestById($id)
     {
-        $sql = "SELECT * FROM tbl_data_requests WHERE ID = ?";
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM tbl_data_requests WHERE ID = ?";
         $this->setSQL($sql);
         return $this->findRow([(int)$id]);
     }
@@ -97,7 +105,7 @@ class DataRequestDao extends Dao
      */
     public function getRequestByEmail($email)
     {
-        $sql = "SELECT * FROM tbl_data_requests 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM tbl_data_requests 
                 WHERE request_email = ? 
                 ORDER BY request_date DESC";
 
@@ -119,7 +127,7 @@ class DataRequestDao extends Dao
         $allowedColumns = ['ID', 'request_type', 'request_email', 'request_status', 'request_date', 'request_completed_date'];
         $sortColumn = in_array($orderBy, $allowedColumns, true) ? $orderBy : 'ID';
 
-        $sql = "SELECT * FROM tbl_data_requests ORDER BY $sortColumn DESC";
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM tbl_data_requests ORDER BY $sortColumn DESC";
         $this->setSQL($sql);
         return $this->findAll([]);
     }
@@ -132,7 +140,7 @@ class DataRequestDao extends Dao
      */
     public function getRequestsByStatus($status)
     {
-        $sql = "SELECT * FROM tbl_data_requests 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM tbl_data_requests 
                 WHERE request_status = ? 
                 ORDER BY request_date DESC";
 
