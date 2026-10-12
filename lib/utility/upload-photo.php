@@ -164,13 +164,11 @@ function upload_photo($file_location, $file_size, $file_type, $file_name)
  * set_origin_photo
  *
  * @category Function
- * @param int|num $current_width
- * @param int|num $current_height
+ * @param int $current_width
+ * @param int $current_height
  * @param string $file_location
- * @param int|num $file_size
- * @param string $file_name
+ * @param int $file_size
  * @param string $file_path_uploaded
- * @param string $file_type
  *
  */
 function set_origin_photo($current_width, $current_height, $file_location, $file_size, $file_path_uploaded)
@@ -232,8 +230,8 @@ function set_webp_origin($current_width, $current_height, $file_location, $file_
 /**
  * set_regular_photo
  *
- * @param int|num $current_width
- * @param int|num $current_height
+ * @param int $current_width
+ * @param int $current_height
  * @param string $file_path_uploaded
  * @param string $file_path_thumb
  * @param string $file_name
@@ -272,8 +270,8 @@ function set_regular_photo($current_width, $current_height, $file_path_uploaded,
  * set_webp_regular
  *
  * @category Function
- * @param int|num $current_width
- * @param int|num $current_height
+ * @param int $current_width
+ * @param int $current_height
  * @param string $file_path_uploaded
  * @param string $file_path_thumb
  * @param string $file_name
