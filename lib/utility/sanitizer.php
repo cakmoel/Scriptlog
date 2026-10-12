@@ -32,5 +32,9 @@ function sanitize_string($str)
     // per-request connection count at one instead of N.
     $mysqli = class_exists('DbMySQLi') ? DbMySQLi::getInstance() : "";
 
+    if (!is_object($mysqli)) {
+        return $str;
+    }
+
     return $mysqli->filterData($str);
 }
