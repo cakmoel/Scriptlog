@@ -22,7 +22,7 @@
  * @see https://docs.laminas.dev/laminas-escaper/escaping-javascript/
  * @see https://docs.laminas.dev/laminas-escaper/escaping-css/
  * @see https://docs.laminas.dev/laminas-escaper/escaping-url/
- * @return string
+ * @return string|null
  *
  */
 function escape_html($input, $type = 'html', $encoding = 'utf-8', $mode = 'base')
@@ -50,9 +50,9 @@ function escape_html($input, $type = 'html', $encoding = 'utf-8', $mode = 'base'
  * base_escape
  *
  * @param string $input
- * @param [type] $type
- * @param object new Laminas\Escaper|Escaper $escaper
- * @return void
+ * @param string $type
+ * @param object $escaper
+ * @return string|null
  */
 function base_escape($input, $type, $escaper)
 {
@@ -62,6 +62,8 @@ function base_escape($input, $type, $escaper)
     } elseif ($type === 'html') {
         return is_object($escaper) ? $escaper->escapeHtml($input) : "";
     }
+
+    return null;
 }
 
 /**
