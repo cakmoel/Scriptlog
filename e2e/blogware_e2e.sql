@@ -143,6 +143,7 @@ CREATE TABLE `tbl_data_requests` (
   `request_note` text DEFAULT NULL,
   `request_status` varchar(20) DEFAULT 'pending',
   `request_date` timestamp NULL DEFAULT current_timestamp(),
+  `request_updated` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `request_completed_date` datetime DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `request_email` (`request_email`),
@@ -157,12 +158,12 @@ CREATE TABLE `tbl_data_requests` (
 LOCK TABLES `tbl_data_requests` WRITE;
 /*!40000 ALTER TABLE `tbl_data_requests` DISABLE KEYS */;
 INSERT INTO `tbl_data_requests` VALUES
-(2439,'access','access@e2e.local','127.0.0.1','Access request','pending','2026-07-01 02:00:00',NULL),
-(2440,'rectification','rectify@e2e.local','127.0.0.1','Rectify my name','pending','2026-07-01 02:05:00',NULL),
-(2441,'deletion','gdpr.test@e2e.local','127.0.0.1','GDPR delete me','processing','2026-07-01 02:10:00',NULL),
-(2442,'erasure','erasure@e2e.local','127.0.0.1','Right to be forgotten','processing','2026-07-01 02:15:00',NULL),
-(2443,'deletion','old-done@e2e.local','127.0.0.1','Done','completed','2026-06-01 02:00:00',NULL),
-(2444,'access','rejected@e2e.local','127.0.0.1','Nope','rejected','2026-06-02 02:00:00',NULL);
+(2439,'access','access@e2e.local','127.0.0.1','Access request','pending','2026-07-01 02:00:00','2026-07-01 02:00:00',NULL),
+(2440,'rectification','rectify@e2e.local','127.0.0.1','Rectify my name','pending','2026-07-01 02:05:00','2026-07-01 02:05:00',NULL),
+(2441,'deletion','gdpr.test@e2e.local','127.0.0.1','GDPR delete me','processing','2026-07-01 02:10:00','2026-07-01 02:11:00',NULL),
+(2442,'erasure','erasure@e2e.local','127.0.0.1','Right to be forgotten','processing','2026-07-01 02:15:00','2026-07-01 02:16:00',NULL),
+(2443,'deletion','old-done@e2e.local','127.0.0.1','Done','completed','2026-06-01 02:00:00','2026-06-02 02:00:00','2026-06-02 02:00:00'),
+(2444,'access','rejected@e2e.local','127.0.0.1','Nope','rejected','2026-06-02 02:00:00','2026-06-02 02:01:00',NULL);
 /*!40000 ALTER TABLE `tbl_data_requests` ENABLE KEYS */;
 UNLOCK TABLES;
 
