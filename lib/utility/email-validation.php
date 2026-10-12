@@ -57,7 +57,6 @@ function email_validation($email, $validation_type)
  * @license MIT
  * @version 1.0
  * @param string $email
- * @param array $validation_type
  * @uses \Egulias\EmailValidator\Validation\MultipleValidationWithAnd
  * @uses \Egulias\EmailValidator\Validation\DNSCheckValidation
  * @uses \Egulias\EmailValidator\Validation\RFCValidation
