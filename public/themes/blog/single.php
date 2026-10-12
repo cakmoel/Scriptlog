@@ -162,6 +162,7 @@ if (isset($retrieve_post['post_modified'])) {
 
                                     <div class="form-group">
                                         <input type="hidden" id="csrf" class="form-control" name="csrf" value="<?= block_csrf(); ?>">
+                                        <input type="text" id="website" class="form-control" name="website" value="" style="display:none !important;" tabindex="-1" autocomplete="off" aria-hidden="true">
                                         <input type="hidden" id="post_id" class="form-control" name="post_id" value="<?= abs((int)$post_id); ?>">
                                         <input type="hidden" id="parent_id" class="form-control" name="parent_id" value="0">
                                         <button type="submit" class="btn btn-secondary"><?= t('single.comment.submit'); ?></button>
