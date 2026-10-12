@@ -5,7 +5,6 @@
  *
  * @category function
  * @author Nirmala Khanza <nirmala.adiba.khanza@email.com>
- * @param int|num $id
  * @return bool|true|false
  *
  */
