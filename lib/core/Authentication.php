@@ -88,7 +88,7 @@ class Authentication
     /**
      * key
      *
-     * @var object
+     * @var Key
      *
      */
     private Key $key;
@@ -163,7 +163,7 @@ class Authentication
     /**
      * findUserById
      *
-     * @param integer|num $id
+     * @param int|string $id
      * @return array
      *
      */
@@ -213,7 +213,7 @@ class Authentication
      * markCookieAsExpired
      *
      * @param string $tokenId
-     * @return void
+     * @return mixed
      *
      */
     public function markCookieAsExpired($tokenId)
@@ -226,7 +226,7 @@ class Authentication
      *
      * @param array $bind
      * @param string $login
-     * @return void
+     * @return mixed
      *
      */
     public function renewPersistentLogin($bind, $login)
@@ -471,7 +471,7 @@ class Authentication
      * updating reset key and send notification to user
      *
      * @method public resetUserPassword()
-     * @param string $email
+     * @param string $user_email
      *
      */
     public function resetUserPassword($user_email)
@@ -575,7 +575,7 @@ class Authentication
      * Activate user account
      * user activation
      *
-     * @param string $keys
+     * @param string $key
      *
      */
     public function activateUserAccount($key)
