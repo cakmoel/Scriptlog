@@ -192,7 +192,7 @@ class Sitemap
      * Adds an item to sitemap
      *
      * @param string $loc URL of the page. This value must be less than 2,048 characters.
-     * @param string|null $priority The priority of this URL relative to other URLs on your site. Valid values range from 0.0 to 1.0.
+     * @param float|string|null $priority The priority of this URL relative to other URLs on your site. Valid values range from 0.0 to 1.0.
      * @param string|null $changefreq How frequently the page is likely to change. Valid values are always, hourly, daily, weekly, monthly, yearly and never.
      * @param string|int|null $lastmod The date of last modification of url. Unix timestamp or any English textual datetime description.
      * @return Sitemap
