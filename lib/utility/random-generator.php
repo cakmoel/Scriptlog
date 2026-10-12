@@ -56,7 +56,7 @@ function random_generator($digits)
 function make_seed()
 {
     list($usec, $sec) = explode(' ', microtime());
-    return $sec + $usec * 1_000_000;
+    return (int)$sec + (float)$usec * 1_000_000;
 }
 
 /**
