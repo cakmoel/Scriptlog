@@ -119,7 +119,7 @@ class DownloadAdminController extends BaseApp
     /**
      * View download history
      *
-     * @param int $downloadId
+     * @param int $mediaId
      */
     public function viewDownloadHistory($mediaId)
     {
