@@ -5,9 +5,8 @@
  * to retrieve image uploaded from it directory
  *
  * @category function
- * @param string $media_type
  * @param string $media_filename
- * @return false not readable | true image exists and readable
+ * @return string|false not readable (false) | image URL string when exists and readable
  *
  */
 function invoke_image_uploaded($media_filename, $image_thumb = true)
