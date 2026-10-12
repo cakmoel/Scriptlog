@@ -22,6 +22,14 @@ use Scriptlog\Core\Dao;
 class ConsentDao extends Dao
 {
     /**
+     * Explicit SELECT column list for tbl_consents (no SELECT *).
+     *
+     * @var string
+     */
+    private const SELECT_COLUMNS = 'ID, consent_type, consent_status, consent_ip, '
+        . 'consent_user_agent, consent_date, consent_updated';
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -75,7 +83,7 @@ class ConsentDao extends Dao
      */
     public function getLatestConsent($consentType)
     {
-        $sql = "SELECT * FROM tbl_consents 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM tbl_consents 
                 WHERE consent_type = ? 
                 ORDER BY consent_date DESC 
                 LIMIT 1";
@@ -101,7 +109,7 @@ class ConsentDao extends Dao
         $allowedColumns = ['ID', 'consent_type', 'consent_status', 'consent_ip', 'consent_date', 'consent_updated'];
         $sortColumn = in_array($orderBy, $allowedColumns, true) ? $orderBy : 'ID';
 
-        $sql = "SELECT * FROM tbl_consents 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM tbl_consents 
                 ORDER BY $sortColumn DESC";
 
         $this->setSQL($sql);
@@ -119,7 +127,7 @@ class ConsentDao extends Dao
      */
     public function getConsentsByIp($ipAddress)
     {
-        $sql = "SELECT * FROM tbl_consents 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM tbl_consents 
                 WHERE consent_ip = ? 
                 ORDER BY consent_date DESC";
 
