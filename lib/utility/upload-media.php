@@ -7,9 +7,10 @@
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * @param string $field_name
- * @param bool $check_image
- * @param bool $random_name
+ * @param string $file_location
+ * @param string $file_type
+ * @param string $file_size
+ * @param string $file_name
  *
  */
 function upload_media($file_location, $file_type, $file_size, $file_name)
