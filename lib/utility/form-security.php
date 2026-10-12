@@ -24,7 +24,7 @@
  * @param string $form
  * @param number|integer $length
  * @uses random_generator() on random-generator
- * @return void
+ * @return string
  *
  */
 function generate_form_token($form, $length)
