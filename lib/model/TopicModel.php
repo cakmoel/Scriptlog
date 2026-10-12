@@ -82,8 +82,7 @@ class TopicModel extends BaseModel
     /**
      * getTopicById
      *
-     * @param int|num $id
-     * @param object $sanitize
+     * @param int|string $id
      * @param int|null $fetchMode
      * @return mixed
      */
@@ -105,8 +104,7 @@ class TopicModel extends BaseModel
      *
      * @param int $postId
      * @param object $sanitize
-     * @param PDO::FETCH_ASSOC|PDO::FETCH_OBJECT $fetchMode
-     * @return array
+     * @return string
      *
      */
     public function getLinkTopic($postId, $sanitize)
