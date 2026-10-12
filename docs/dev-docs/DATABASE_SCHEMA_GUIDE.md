@@ -1,6 +1,6 @@
 # Database Schema Guide
 
-**Version:** 1.8.1 | **Last Updated:** September 2026
+**Version:** 1.8.3 | **Last Updated:** October 2026
 
 This guide documents every table in the Scriptlog database. It is written for developers of all levels, from beginners setting up their first installation to senior developers extending the schema.
 
@@ -22,6 +22,8 @@ install/include/dbtable.php
 The function `get_table_definitions($prefix)` in that file returns every `CREATE TABLE` statement plus a few seed inserts. The installer runs these statements in order. If you change the schema, change this file, never a live database by hand. See the section "Changing the schema" at the end.
 
 > Note: the installer creates all 23 tables, including `tbl_theme_licenses`. Installations created before that table was added to the installer get it by running `install/migrate-theme-license.php`.
+>
+> Note (S10 hot-filter indexes, `plan/PERFORMANCE_PLAN_SEPTEMBER2026.md` §S10): the installer also creates `idx_post_date` and `idx_post_type_status` on `tbl_posts`, `idx_post_topic_topic` on `tbl_post_topic`, and `idx_comment_post_status` on `tbl_comments`. Installations created before these indexes were added get them by running `install/migrate-hot-filter-indexes.php` (CLI only; idempotent per-index `SHOW INDEX` guard, safe to run twice).
 
 ## The table prefix
 
@@ -173,9 +175,9 @@ Stores both blog posts and static pages. The column `post_type` decides which: `
 | `comment_status` | VARCHAR(20) NOT NULL DEFAULT 'open' | `open` or `closed` |
 | `passphrase` | VARCHAR(255) DEFAULT NULL | Hash used by the protected post unlock flow |
 
-Indexes: PRIMARY KEY (`ID`), KEY `author_id` (`post_author`), KEY `post_media` (`media_id`), KEY `idx_post_slug` (`post_slug`), KEY `idx_post_locale` (`post_locale`), KEY `idx_post_status_date` (`post_status`, `post_date`), FULLTEXT KEY (`post_tags`, `post_title`, `post_content`).
+Indexes: PRIMARY KEY (`ID`), KEY `author_id` (`post_author`), KEY `post_media` (`media_id`), KEY `idx_post_slug` (`post_slug`), KEY `idx_post_locale` (`post_locale`), KEY `idx_post_status_date` (`post_status`, `post_date`), KEY `idx_post_date` (`post_date`), KEY `idx_post_type_status` (`post_type`, `post_status`, `post_date`), FULLTEXT KEY (`post_tags`, `post_title`, `post_content`).
 
-The FULLTEXT index powers the search engine. The slug index supports canonical URL validation, and the composite status/date index speeds up ordered listings of published content.
+The FULLTEXT index powers the search engine. The slug index supports canonical URL validation, and the composite status/date index speeds up ordered listings of published content. The hot-filter indexes added in S10 (`plan/PERFORMANCE_PLAN_SEPTEMBER2026.md` §S10) are `idx_post_date`, which speeds date-ordered and archive listings, and `idx_post_type_status`, which speeds listings filtered by content type and status (for example `blog` versus `page`, `publish` versus `draft`) ordered by date. Fresh installations get all of these indexes from `install/include/dbtable.php`; existing installations add the S10 ones with `install/migrate-hot-filter-indexes.php` (idempotent, safe to run twice).
 
 ### tbl_topics
 
@@ -200,7 +202,7 @@ Many-to-many join between posts and topics. A post can be in several topics and 
 | `post_id` | BIGINT(20) UNSIGNED NOT NULL | References `tbl_posts.ID` |
 | `topic_id` | BIGINT(20) UNSIGNED NOT NULL | References `tbl_topics.ID` |
 
-Indexes: PRIMARY KEY (`post_id`, `topic_id`). The composite primary key also prevents duplicate links.
+Indexes: PRIMARY KEY (`post_id`, `topic_id`), KEY `idx_post_topic_topic` (`topic_id`). The composite primary key also prevents duplicate links. The S10 hot-filter index `idx_post_topic_topic` (see `plan/PERFORMANCE_PLAN_SEPTEMBER2026.md` §S10) speeds the reverse lookup — finding posts by `topic_id` — which the leading `post_id` column of the primary key does not cover on its own.
 
 ### tbl_comments
 
@@ -218,7 +220,9 @@ Comments on posts, including nested replies. The reply relationship is modeled w
 | `comment_status` | VARCHAR(20) NOT NULL DEFAULT 'pending' | `pending`, `approved`, or `spam` |
 | `comment_date` | DATETIME NOT NULL DEFAULT '1988-07-01 08:00:00' | Submission date |
 
-Indexes: PRIMARY KEY (`ID`), KEY `id_comment_post` (`comment_post_id`).
+Indexes: PRIMARY KEY (`ID`), KEY `id_comment_post` (`comment_post_id`), KEY `idx_comment_post_status` (`comment_post_id`, `comment_status`).
+
+The S10 hot-filter index `idx_comment_post_status` (see `plan/PERFORMANCE_PLAN_SEPTEMBER2026.md` §S10) speeds the hot frontend filter on post plus status (for example approved comments of one post).
 
 ---
 
@@ -549,7 +553,7 @@ php tests/setup_test_db.php
 ## Changing the schema
 
 1. Edit the `CREATE TABLE` statements in `install/include/dbtable.php`.
-2. For new columns on existing tables, add an `ALTER TABLE` statement in the same file so existing installations are migrated. The locale columns on `tbl_posts`, `tbl_topics`, and `tbl_menu` are added this way.
+2. For new columns on existing tables, add an `ALTER TABLE` statement in the same file so existing installations are migrated. The locale columns on `tbl_posts`, `tbl_topics`, and `tbl_menu` are added this way. For new indexes on existing tables, ship a versioned migration under `install/` instead — see `install/migrate-hot-filter-indexes.php` (S10), which adds each missing index only when `SHOW INDEX` proves it is absent.
 3. If the change needs a real relationship, add a `FOREIGN KEY` constraint, as `tbl_api_keys` does.
 4. Recreate the test database and run the test suite:
    ```bash
