@@ -54,7 +54,7 @@ class Mailer
     /**
      * set properties
      * for sending text message
-     * @var string
+     * @var string|bool
      */
     private $sendText;
 
@@ -68,7 +68,7 @@ class Mailer
     /**
      * set properties
      * send email as HTML
-     * @var string
+     * @var string|bool
      */
     private $sendHTML;
 
@@ -241,8 +241,6 @@ class Mailer
 
     /**
      * getAppEmail
-     *
-     * @method private static getAppEmail()
      *
      * @return string
      *
