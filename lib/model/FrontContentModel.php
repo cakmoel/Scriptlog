@@ -76,7 +76,7 @@ final class FrontContentModel extends BaseModel
     /**
      * frontRandomHeadlinesPosts
      *
-     * @param postModel $postModel
+     * @param PostModel $postModel
      * @return mixed
      *
      */
@@ -89,8 +89,7 @@ final class FrontContentModel extends BaseModel
     /**
      * frontLatestPosts
      *
-     * @param int|num $position
-     * @param int|num $limit
+     * @param int|string $limit
      * @param PostModel $postModel
      * @param null|string $position
      * @return mixed
@@ -111,7 +110,8 @@ final class FrontContentModel extends BaseModel
     /**
      * frontRandomPosts
      *
-     * @param int|num $limit
+     * @param int|string $start
+     * @param int|string $end
      * @param PostModel $postModel
      * @return mixed
      *
@@ -133,7 +133,7 @@ final class FrontContentModel extends BaseModel
     public static function frontPostById($postId, PostModel $postModel)
     {
         self::$postModel = $postModel;
-        return self::$postModel->getPostById($postId, self::frontSanitizer());
+        return self::$postModel->getPostById($postId);
     }
 
     /**
@@ -142,7 +142,7 @@ final class FrontContentModel extends BaseModel
      * retrieve all posts records
      * and display it on rss page
      *
-     * @param int|num $limit
+     * @param int|string $limit
      * @param PostModel $postModel
      * @return mixed
      */
@@ -183,7 +183,7 @@ final class FrontContentModel extends BaseModel
     /**
      * frontPageById
      *
-     * @param int|num $id
+     * @param int|string $id
      * @param PageModel $pageModel
      * @return mixed
      *
@@ -238,7 +238,7 @@ final class FrontContentModel extends BaseModel
     /**
      * frontTopicById
      *
-     * @param num|int $topicId
+     * @param int|string $topicId
      * @param TopicModel $topicModel
      * @return mixed
      *
@@ -294,7 +294,7 @@ final class FrontContentModel extends BaseModel
     /**
      * frontPostsByTopic
      *
-     * @param num|int $topicId
+     * @param int|string $topicId
      * @param TopicModel $topicModel
      * @return mixed
      */
@@ -390,7 +390,7 @@ final class FrontContentModel extends BaseModel
     /**
      * frontPaginator
      *
-     * @param int|num $perPage
+     * @param int|string $perPage
      * @param string $instance
      * @return object|string
      *
