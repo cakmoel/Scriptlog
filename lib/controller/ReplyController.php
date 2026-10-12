@@ -83,7 +83,7 @@ class ReplyController extends BaseApp
     /**
      * Insert New Reply
      *
-     * @return string
+     * @return mixed
      */
     public function insert()
     {
@@ -177,7 +177,7 @@ class ReplyController extends BaseApp
      * Update Reply
      *
      * @param int $id
-     * @return string
+     * @return mixed
      */
     public function update($id)
     {
