@@ -35,7 +35,6 @@ class SiteMapService
     /**
      * __construct
      *
-     * @param Sitemap $sitemap
      */
     public function __construct()
     {
