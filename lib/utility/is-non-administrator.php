@@ -7,7 +7,7 @@
  *
  * @category function
  * @author M.Noermoehammad
- * @return string
+ * @return bool
  *
  */
 function is_non_administrator()
