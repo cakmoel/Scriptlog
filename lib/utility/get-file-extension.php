@@ -33,7 +33,7 @@ function get_file_extension($file_name)
  * read file extension with explode function
  *
  * @param string $file_name
- * @return array
+ * @return string
  *
  */
 function file_extension_explode($file_name)
