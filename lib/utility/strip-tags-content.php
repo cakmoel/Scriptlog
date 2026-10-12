@@ -6,9 +6,9 @@
  * Remove the HTML tags
  *
  * @param string $text
- * @param string $string
+ * @param string $tags
  * @param bool $invert
- * @return
+ * @return mixed
  *
  */
 function strip_tags_content($text, $tags, $invert = false)
