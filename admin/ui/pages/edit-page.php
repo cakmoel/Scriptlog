@@ -171,8 +171,8 @@ if (isset($pageData['post_modified']) || isset($pageData['post_date'])) {
 <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
-<script type="text/javascript">
-  var loadFile = function(event) {
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
+var loadFile = function(event) {
       var output = document.getElementById('output');
           output.src = URL.createObjectURL(event.target.files[0]);
       };
