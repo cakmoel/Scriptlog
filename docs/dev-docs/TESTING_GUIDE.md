@@ -1,6 +1,6 @@
 # Testing Guide - Scriptlog
 
-**Version:** 1.4.0 | **Last Updated:** September 2026
+**Version:** 1.3.0 | **Last Updated:** August 2026
 
 ---
 
@@ -347,13 +347,13 @@ parameters:
 
     reportUnmatchedIgnoredErrors: false
 
-    level: 0
+    level: 3
 ```
 
 ### Key Settings
 
 - **phpVersion**: Set to `70400` for PHP 7.4 compatibility
-- **level**: Currently at level 0 (most lenient). The `composer phpstan` script runs at level 1; `composer phpstan:strict` runs at level 5.
+- **level**: Currently at level 3. The `composer phpstan` script runs at level 1; `composer phpstan:strict` runs at level 5.
 - **excludePaths**: Excludes vendor and third-party code (HTMLPurifier) plus the test suite itself
 - **bootstrapFiles**: Loads `tests/phpstan-bootstrap.php` before analysis
 
@@ -460,20 +460,11 @@ host really has, which is what makes "flatpak is not installed" testable.
 Totals: **330 tests**, all passing. The two `*_E2E` suites skip unless their
 variable is set to `1`; everything else runs unconditionally.
 
-Shell scripts are also linted with ShellCheck. `deepshit.sh`, `siege-tui.sh`
-and `xdebug-mode.sh` are clean at severity `info`:
+Shell scripts are also linted with ShellCheck; `deepshit.sh` and
+`tests/bats/load-test.sh` are both clean at severity `info`:
 
 ```bash
-shellcheck -s bash -S info deepshit.sh siege-tui.sh xdebug-mode.sh
-```
-
-`load-test.sh` is the exception: at the default severity it reports `SC2317`
-(functions reached only indirectly, via trap handlers and subshells) and one
-`SC2015` (`A && B || C` used as a conditional). Both are stylistic rather than
-defects, so raise the floor to `warning` for that file:
-
-```bash
-shellcheck -s bash -S warning load-test.sh
+shellcheck -s bash deepshit.sh tests/bats/load-test.sh
 ```
 
 Note that `bats` and ShellCheck are **not** wired into `.github/workflows/tests.yml`,
@@ -646,4 +637,4 @@ Do not bypass with `git commit --no-verify`.
 
 ---
 
-*Last Updated: September 2026 | Version 1.4.0*
+*Last Updated: August 2026 | Version 1.3.0*
