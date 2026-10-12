@@ -21,7 +21,7 @@ class BlogSchema
     /**
      * Generate schema.org structured data for a blog post.
      *
-     * @param int $postId The ID of the blog post.
+     * @param int $post The ID of the blog post.
      * @return string JSON-LD structured data.
      */
     public static function generateBlogPostSchema(int $post)
