@@ -36,7 +36,7 @@ class ConfigurationDao extends Dao
      * @method public updateConfig()
      * @param object $sanitize
      * @param array $bind
-     * @param integer $ID
+     * @param integer $configId
      *
      */
     public function updateConfig($sanitize, $bind, $configId)
@@ -57,7 +57,7 @@ class ConfigurationDao extends Dao
      * Delete config
      *
      * @method public deleteConfig()
-     * @param integer $ID
+     * @param integer $configId
      *
      */
     public function deleteConfig($configId, $sanitize)
@@ -70,7 +70,7 @@ class ConfigurationDao extends Dao
      * Find configurations
      *
      * @method public findConfigs()
-     * @param integer $orderBy -- default order by ID
+     * @param string $orderBy -- default order by ID
      * @return array
      *
      */
@@ -249,7 +249,9 @@ class ConfigurationDao extends Dao
     /**
      * Create a new configuration entry
      *
-     * @param array $bind
+     * @param string $settingName
+     * @param string $settingValue
+     * @param object $sanitize
      * @return bool
      */
     public function createConfig($settingName, $settingValue, $sanitize)
