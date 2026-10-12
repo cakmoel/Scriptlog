@@ -101,9 +101,11 @@ test.describe.serial('security remediation', () => {
 
     const csp: string = res.headers()['content-security-policy'] || '';
     expect(csp).toContain("script-src-attr 'none'");
-    // script-src keeps 'unsafe-inline' per the F9 decision; only inline
-    // event-handler *attributes* are forbidden.
-    expect(csp).toContain("script-src 'self' 'unsafe-inline'");
+    // script-src is nonce-only: every inline script must carry the per-request
+    // nonce, and 'unsafe-inline' is no longer accepted as a fallback. (style-src
+    // still allows 'unsafe-inline' because themes rely on inline style attrs.)
+    expect(csp).toMatch(/script-src 'self' 'nonce-[^']+'/);
+    expect(csp).not.toContain("script-src 'self' 'unsafe-inline'");
   });
 
   test('admin pages carry no inline event-handler attributes', async ({
