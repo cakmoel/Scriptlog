@@ -8,7 +8,7 @@
  * @author Nirmalakhanza <nirmala.adiba.khanza@gmail.com>
  * @uses Util::remove_accents remove_accent
  * @param string $string
- * @return void
+ * @return string|false
  *
  */
 function remove_accents($string)
