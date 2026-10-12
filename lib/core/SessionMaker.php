@@ -172,7 +172,7 @@ class SessionMaker extends \SessionHandler
      * forget
      * destroy session
      *
-     * @return void
+     * @return bool
      *
      */
     public function forget()
