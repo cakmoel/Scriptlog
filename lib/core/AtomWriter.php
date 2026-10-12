@@ -44,7 +44,7 @@ class AtomWriter
     /**
      * grabPostFeed
      *
-     * @param int|num $limit
+     * @param int $limit
      * @return mixed
      */
     private function grabPostFeed($limit)
@@ -94,7 +94,7 @@ class AtomWriter
      * @param string $title
      * @param string $uri
      * @param string $feed_link
-     * @param int|num $limit
+     * @param int $limit
      *
      */
     public function generateAtomFeed($title, $uri, $feed_link, $limit)
