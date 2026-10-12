@@ -55,7 +55,7 @@ class SearchApiController extends ApiController
      * GET /api/v1/search/posts?q=keyword
      * GET /api/v1/search/pages?q=keyword
      *
-     * @param array $params Query parameters (q, type)
+     * @param array $_params Query parameters (q, type)
      * @return void
      */
     public function index($_params = [])
@@ -222,7 +222,7 @@ class SearchApiController extends ApiController
      * Transform search results for API response
      *
      * @param array $results
-     * @param string $type
+     * @param string $_type
      * @return array
      */
     private function transformResults($results, $_type)
