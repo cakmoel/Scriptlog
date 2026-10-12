@@ -194,7 +194,7 @@ class CommentDao extends Dao
      * DeleteComment
      *
      * @method public deleteComment()
-     * @param integer $ID
+     * @param integer $id
      * @param object $sanitize
      *
      */
@@ -261,7 +261,7 @@ class CommentDao extends Dao
  * @method public checkCommentId()
  * @param integer $id
  * @param object $sanitize
- * @return integer|numeric
+ * @return bool
  *
  */
     public function checkCommentId($id, $sanitize)
@@ -332,7 +332,9 @@ class CommentDao extends Dao
      */
     public function findCommentWithPost($commentId)
     {
-        $sql = "SELECT c.*, p.post_title, p.post_slug
+        $sql = "SELECT c.ID, c.comment_post_id, c.comment_parent_id, c.comment_author_name, 
+                c.comment_author_ip, c.comment_author_email, c.comment_content, c.comment_status, 
+                c.comment_date, p.post_title, p.post_slug
                 FROM tbl_comments c
                 LEFT JOIN tbl_posts p ON c.comment_post_id = p.ID
                 WHERE c.ID = ?";
