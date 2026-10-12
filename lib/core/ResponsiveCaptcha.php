@@ -37,7 +37,7 @@ class ResponsiveCaptcha
      *
      * @param string $answer The user's submitted response
      * @return boolean TRUE if the answer is correct
-     * @throws Exception
+     * @throws \Exception
      */
 
     public function checkAnswer($answer)
