@@ -8,9 +8,6 @@
  *
  * @category Function
  * @param string $content
- * @param integer|number $limit
- * @param string $schr
- * @param string $scnt
  *
  */
 
