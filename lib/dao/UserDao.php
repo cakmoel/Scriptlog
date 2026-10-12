@@ -32,10 +32,8 @@ class UserDao extends Dao
      * getUsers
      * list of users
      *
-     * @param integer $position
-     * @param integer $limit
-     * @param static $fetchMode
      * @param string $orderBy
+     * @param int|null $fetchMode
      * @return boolean|array|object
      */
     public function getUsers($orderBy = 'ID', $fetchMode = null)
@@ -59,7 +57,7 @@ class UserDao extends Dao
      *
      * @param int|string $userID
      * @param object $sanitize
-     * @param static $fetchMode = null
+     * @param int|null $fetchMode = null
      * @return boolean|array|object
      *
      */
@@ -83,7 +81,7 @@ class UserDao extends Dao
      * getUserByEmail()
      *
      * @param string $user_email
-     * @param static PDO::FETCH_MODE $fetchMode
+     * @param int|null $fetchMode
      * @return boolean|array|object
      *
      */
@@ -109,7 +107,7 @@ class UserDao extends Dao
      * retrieving user record based on user_login
      *
      * @param string $user_login
-     * @param static PDO::FETCH_MODE $fetchMode
+     * @param int|null $fetchMode
      * @return mixed
      *
      */
@@ -134,7 +132,7 @@ class UserDao extends Dao
      * retrieving user record based on user_session
      *
      * @param string $user_session
-     * @param static PDO::FETCH_MODE $fetchMode
+     * @param int|null $fetchMode
      * @return mixed
      *
      */
@@ -222,7 +220,7 @@ class UserDao extends Dao
      *
      * @param string|bool $accessLevel
      * @param array $bind
-     * @param integer $ID
+     * @param integer $userID
      */
     public function updateUser($accessLevel, $sanitize, $bind, $userID)
     {
@@ -273,8 +271,6 @@ class UserDao extends Dao
     /**
      * Update user session
      *
-     * @param string $accessLevel
-     * @param object $sanitize
      * @param array $bind
      * @param integer $userID
      */
@@ -288,7 +284,7 @@ class UserDao extends Dao
      * update temporary reset key
      * to reset password with key sent to user email account
      *
-     * @param string $reset_key
+     * @param array $bind
      * @param string $user_email
      *
      */
@@ -314,7 +310,7 @@ class UserDao extends Dao
      * Activate user
      *
      * @param string $key
-     * @return int
+     * @return bool
      */
     public function activateUser($key)
     {
@@ -387,7 +383,7 @@ class UserDao extends Dao
      *
      * checking whether user_login record does exists
      *
-     * @param [type] $user_login
+     * @param string $user_login
      * @return boolean
      */
     public function isUserLoginExists($user_login)
@@ -459,7 +455,7 @@ class UserDao extends Dao
      *
      * @param integer $userID
      * @param object $sanitize
-     * @return numeric
+     * @return bool
      */
     public function checkUserId($userID, $sanitize)
     {
@@ -560,7 +556,7 @@ class UserDao extends Dao
      * Check Activation Key
      *
      * @param string $key
-     * @return false
+     * @return bool
      */
     private function checkActivationKey($key)
     {
