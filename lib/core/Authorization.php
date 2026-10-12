@@ -51,7 +51,7 @@ class Authorization
     /**
      * getAuthInstance
      *
-     * @return object
+     * @return Authentication|null
      *
      */
     public static function getAuthInstance(): ?Authentication
