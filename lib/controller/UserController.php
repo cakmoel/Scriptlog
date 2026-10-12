@@ -57,7 +57,7 @@ class UserController extends BaseApp
      */
     private $configService;
 
-    public function __construct(userService $userService, ?ConfigurationService $configService = null)
+    public function __construct(UserService $userService, ?ConfigurationService $configService = null)
     {
         $this->userService = $userService;
         $this->configService = $configService;
@@ -119,9 +119,6 @@ class UserController extends BaseApp
      *
      * Show individual user profile (except:administrator)
      * retrieve individual user profile based on their user login
-     *
-     * @param integer $id
-     * @param object $sanitize
      *
      */
     public function showProfile($user_login)
