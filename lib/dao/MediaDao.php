@@ -32,7 +32,8 @@ class MediaDao extends Dao
      * Find All Media
      *
      * @method public findAllMedia()
-     * @param integer $ID
+     * @param string $orderBy
+     * @param string|null $user_level
      * @return array
      *
      */
@@ -184,7 +185,6 @@ class MediaDao extends Dao
      * Find media for blog based on ID
      *
      * @param int $mediaId
-     * @param obj $sanitize
      */
     public function findMediaBlog($mediaId)
     {
@@ -278,7 +278,6 @@ class MediaDao extends Dao
     /**
      * Add new media meta
      *
-     * @param integer $mediaId
      * @param string|array $bind
      *
      */
@@ -358,7 +357,7 @@ class MediaDao extends Dao
      * Delete Media
      *
      * @method public deleteMedia()
-     * @param integer $ID
+     * @param integer $mediaId
      * @param object $sanitize
      *
      */
@@ -379,7 +378,7 @@ class MediaDao extends Dao
      * @method public checkMediaId()
      * @param integer|numeric $id
      * @param object $sanitize
-     * @return numeric
+     * @return bool
      *
      */
     public function checkMediaId($id, $sanitize)
@@ -438,7 +437,7 @@ class MediaDao extends Dao
     /**
      * dropDownMediaStatus
      *
-     * @param int $selected
+     * @param int|string $selected
      * @return string
      *
      */
@@ -644,7 +643,7 @@ class MediaDao extends Dao
      *
      * @method public totalMediaRecords()
      * @param array $data = null
-     * @return integer|numeric
+     * @return int|null
      *
      */
     public function totalMediaRecords(array $data = []): ?int
