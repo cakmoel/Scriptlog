@@ -19,6 +19,7 @@
 - [Search Issues](#search-issues)
 - [Theme Issues](#theme-issues)
 - [Server/Config Issues](#serverconfig-issues)
+- [Testing/CI Issues](#testingci-issues)
 
 ---
 
@@ -488,6 +489,30 @@ $xml .= '<rss version="2.0">' . "\n";
 ```
 
 **Files**: `lib/utility/export-wordpress.php`, `lib/utility/export-blogspot.php`
+
+---
+
+## Testing/CI Issues
+
+### 42. Playwright Default Suite Fails on RestoBlog Theme Specs
+
+**Problem**: `npx playwright test` fails on `e2e/restoblog/**` specs during an ordinary run - pages render the `blog` theme instead of RestoBlog.
+
+**Root Cause**: RestoBlog is a premium theme (`theme_type='premium'`) with no active license in the e2e database, so `premium_theme_license_supports_render()` falls back to the `blog` theme for every request. RestoBlog already owns a dedicated Playwright config (`playwright.restoblog.config.js`) that flips the active theme in globalSetup, but the default `playwright.config.js` only ignored `**/tastybites/**`.
+
+**Solution**: Extended `testIgnore` in `playwright.config.js` to `['**/tastybites/**', '**/restoblog/**']`. Theme suites run under their own config (`npx playwright test --config=playwright.restoblog.config.js`), and RestoBlog specs additionally need an active license/theme seed in the e2e database to render.
+
+**Files**: `playwright.config.js`, `playwright.restoblog.config.js`, `lib/utility/theme-caller.php`
+
+### 43. OpenAPI Verification Test Fails - `API_OPENAPI.json` Missing
+
+**Problem**: Nearly the whole `OpenApiSpecVerificationTest` suite fails (JSON file exists, YAML-and-JSON coherence checks, etc.) even though `API_OPENAPI.yaml` is fine.
+
+**Root Cause**: `docs/dev-docs/API_OPENAPI.json` - previously tracked - was missing from the repository. The test loads it with `file_get_contents()`, so every JSON-backed assertion failed. The file only reappeared as an untracked artifact during spec-generation runs.
+
+**Solution**: Regenerated and committed the JSON sibling of the YAML (36 paths, 54 schemas). Also aligned the two server-coherence assertions with the deliberate "single relative `url: /api/v1` server" design (commit `7d03e1af`) - the test previously required at least two absolute placeholder-domain servers.
+
+**Files**: `docs/dev-docs/API_OPENAPI.json`, `docs/dev-docs/API_OPENAPI.yaml`, `tests/unit/OpenApiSpecVerificationTest.php`
 
 ---
 
