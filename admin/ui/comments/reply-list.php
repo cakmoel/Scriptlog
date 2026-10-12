@@ -161,8 +161,8 @@
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
-<script type="text/javascript">
-  function deleteReply(id, name)
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
+function deleteReply(id, name)
   {
       if (confirm("Are you sure want to delete reply from '" + name + "'"))
       {
