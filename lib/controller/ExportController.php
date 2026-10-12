@@ -189,7 +189,7 @@ class ExportController extends BaseApp
     /**
      * Set view
      *
-     * @param string $viewName
+     * @param string $_viewName
      */
     protected function setView($_viewName)
     {
