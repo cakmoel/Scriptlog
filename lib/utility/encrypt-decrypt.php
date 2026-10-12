@@ -38,7 +38,7 @@ function create_encoded_key()
  * @license MIT
  * @version 1.0
  * @see https://www.php.net/manual/en/function.openssl-encrypt.php
- * @param string $text
+ * @param string $data
  * @param string $key
  * @return string
  */
@@ -141,7 +141,7 @@ function _try_decrypt(string $data, string $hmac_key, string $aes_key)
  * @license MIT
  * @version 1.0
  * @see https://www.php.net/manual/en/function.openssl-decrypt.php
- * @param string $text
+ * @param string $data
  * @param string $key
  * @return string|false
  */
