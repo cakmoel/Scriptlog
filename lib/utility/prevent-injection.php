@@ -11,7 +11,7 @@
  * @see http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed
  * @see https://paragonie.com/blog/2015/06/preventing-xss-vulnerabilities-in-php-everything-you-need-know
  * @see https://github.com/tgalopin/html-sanitizer/blob/master/docs/1-getting-started.md
- * @param string $data
+ * @param string $str
  * @return string
  *
  */
