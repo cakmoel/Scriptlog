@@ -5,7 +5,7 @@
  *
  * @param string $user_input The user supplied string
  * @param string $stored The string of known length to compare against
- * @return string
+ * @return bool
  *
  */
 function scriptlog_verify_password($user_input, $stored)
