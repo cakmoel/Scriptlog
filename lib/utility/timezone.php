@@ -14,7 +14,7 @@
  * @see https://stackoverflow.com/questions/4755704/php-timezone-list
  * @see https://stackoverflow.com/questions/851574/how-do-i-get-greenwich-mean-time-in-php/9328760#9328760
  *
- * @return string
+ * @return array
  *
  */
 function timezone_list()
