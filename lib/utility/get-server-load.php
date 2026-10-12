@@ -24,6 +24,11 @@ function get_server_load()
         if (win_architecture() == 'x86') {
             // Win CPU
             $wmi = class_exists('COM') ? new COM('WinMgmts:\\\\.') : "";
+
+            if (!is_object($wmi)) {
+                goto sysload;
+            }
+
             $server = $wmi->InstancesOf('Win32_Processor');
             $server += $wmi->execquery("SELECT LoadPercentage FROM Win32_Processor");
             $cpu_num = 0;
