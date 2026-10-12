@@ -260,7 +260,7 @@ class PluginController extends BaseApp
     /**
      * enablePlugin
      *
-     * @param int|num $id
+     * @param int $id
      *
      */
     public function enablePlugin($id)
@@ -317,7 +317,7 @@ class PluginController extends BaseApp
     /**
      * disablePlugin
      *
-     * @param int|num $id
+     * @param int $id
      *
      */
     public function disablePlugin($id)
@@ -372,7 +372,7 @@ class PluginController extends BaseApp
     /**
      * remove
      *
-     * @param int|num $id
+     * @param int $id
      *
      */
     public function remove($id)
