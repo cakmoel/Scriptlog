@@ -128,8 +128,8 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-<script type="text/javascript">
-  function deleteTopic(id, title)
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
+function deleteTopic(id, title)
   {
       if (confirm("Are you sure want to delete Topic '" + title + "'"))
       {
