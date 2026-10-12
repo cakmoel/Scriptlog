@@ -5,7 +5,7 @@
  *
  * @category function
  * @see https://stackoverflow.com/questions/965235/how-can-i-truncate-a-string-to-the-first-20-words-in-php
- * @param string $text
+ * @param string $args
  * @param  $limit
  * @return string
  *
@@ -29,7 +29,7 @@ function limit_word($args, $limit)
  *
  * @param string $str
  * @see https://www.php.net/manual/en/function.str-word-count.php
- * @return void
+ * @return int
  */
 function str_word_count_utf8($str)
 {
