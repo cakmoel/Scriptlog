@@ -132,6 +132,10 @@ function tag_query()
 
     $tags = [];
 
+    if (!is_object($get_tags)) {
+        return array();
+    }
+
     while ($rows = $get_tags->fetch()) {
         if (isset($rows['postTags'])) {
             $tags = array_merge($tags, explode(",", strtolower(trim($rows['postTags']))));
@@ -161,6 +165,10 @@ function tag_path()
     $tagArrays = array();
 
     $get_tags = function_exists('db_simple_query') ? db_simple_query('SELECT DISTINCT LOWER(post_tags) AS postTags FROM tbl_posts WHERE post_tags != "" GROUP BY postTags') : "";
+
+    if (!is_object($get_tags)) {
+        return array();
+    }
 
     while ($row = $get_tags->fetch()) {
         $parts = isset($row['postTags']) ? explode(',', $row['postTags']) : [];
