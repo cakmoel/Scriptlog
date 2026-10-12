@@ -32,7 +32,7 @@ function get_ip_address()
  * @uses RemoteAddress::getIpAddress
  * @see https://github.com/zendframework/zend-http/blob/master/src/PhpEnvironment/RemoteAddress.php
  * @see https://framework.zend.com/apidoc/2.1/classes/Zend.Http.PhpEnvironment.RemoteAddress.html
- * @return void
+ * @return string
  *
  */
 function zend_ip_address()
@@ -92,7 +92,7 @@ function ip_range($ip, $range)
             #$netmask_dec = bindec(str_pad('', $netmask, '1') . str_pad('', 32-$netmask, '0'));
 
             # Strategy 2 - Use math to create it
-            $wildcard_dec = pow(2, (32 - $netmask)) - 1;
+            $wildcard_dec = pow(2, (32 - (int)$netmask)) - 1;
             $netmask_dec = ~$wildcard_dec;
 
             return ($ip_dec & $netmask_dec) == ($range_dec & $netmask_dec);
