@@ -46,18 +46,17 @@ function remove_x_powered_by()
  * content_security_policy
  *
  * Configured to allow:
- * - Inline JavaScript (via per-request nonce; 'unsafe-inline' is kept as a
- *   fallback for browsers without nonce support and is ignored by
- *   nonce-aware browsers for script elements)
+ * - Inline JavaScript only via per-request nonce (nonce-only script-src;
+ *   every inline script tag in themes and admin carries the CSP_NONCE value)
  * - AJAX requests to same origin
  * - Form submissions
  * - Images and media
  * - Safe external resources
  *
- * Hardenend: removed 'unsafe-eval' to block eval-based XSS vectors.
+ * Hardenend: removed 'unsafe-eval' and 'unsafe-inline' from script-src to
+ * block eval-based and injected-inline-script XSS vectors.
  * Inline event-handler attributes are blocked via `script-src-attr 'none'`.
- * A Report-Only header is also sent to monitor violations before
- * fully removing 'unsafe-inline'.
+ * A Report-Only header is also sent to monitor violations.
  *
  * @param string $app_url
  * @return void
@@ -78,11 +77,12 @@ function content_security_policy($app_url)
  * content_security_policy(). Separated from header() emission so the
  * policy is unit-testable (RCE audit follow-up R2).
  *
- * The enforced policy carries the per-request nonce in script-src.
- * 'unsafe-inline' is retained as a fallback for browsers without nonce
- * support; nonce-aware browsers ignore it for script elements, and
- * `script-src-attr 'none'` blocks inline event-handler attributes
- * everywhere the directive is honored.
+ * The enforced policy carries the per-request nonce in script-src and
+ * allows no 'unsafe-inline' fallback: every inline script tag in themes
+ * and admin carries a matching nonce, and `script-src-attr 'none'` blocks
+ * inline event-handler attributes everywhere the directive is honored.
+ * (style-src keeps 'unsafe-inline' because themes and admin use inline
+ * style attributes pervasively; tracked separately.)
  *
  * @category function
  * @param string $app_url Application base URL for form-action
@@ -96,10 +96,10 @@ function build_csp_headers($app_url, $nonce)
 
     $nonceSrc = ($nonce !== '') ? " 'nonce-{$nonce}'" : '';
 
-    // 1. Enforced CSP - blocks eval-based attacks
+    // 1. Enforced CSP - blocks eval-based and injected-inline-script attacks
     $csp = "Content-Security-Policy: " .
         "default-src 'self'; " .
-        "script-src 'self' 'unsafe-inline'{$nonceSrc} {$scheme}; " .
+        "script-src 'self'{$nonceSrc} {$scheme}; " .
         "script-src-attr 'none'; " .
         "style-src 'self' 'unsafe-inline' {$scheme}; " .
         "img-src 'self' data: {$scheme}; " .
@@ -119,8 +119,7 @@ function build_csp_headers($app_url, $nonce)
     }
 
     // 2. Report-Only header for monitoring violations
-    // This identifies what would break when we switch to nonce-based CSP.
-    // Remove 'unsafe-inline' from report-only to see what inline scripts exist.
+    // Mirrors the enforced policy so violations surface before they break.
     $csp_report = "Content-Security-Policy-Report-Only: " .
         "default-src 'self'; " .
         "script-src 'self'{$nonceSrc} {$scheme}; " .
