@@ -15,13 +15,13 @@ function time_elapsed_string($datetime, $full = false)
     $now = new DateTime();
     $ago = new DateTime($datetime);
     $diff = $now->diff($ago);
-    $w = floor($diff->d / 7);
+    $w = (int)floor($diff->d / 7);
     $diff->d -= $w * 7;
     $string = ['y' => 'year','m' => 'month','w' => 'week','d' => 'day','h' => 'hour','i' => 'minute','s' => 'second'];
     foreach ($string as $k => &$v) {
         if ($k == 'w' && $w) {
             $v = $w . ' week' . ($w > 1 ? 's' : '');
-        } elseif (isset($diff->$k) && $diff->$k) {
+        } elseif ($k !== 'w' && isset($diff->$k) && $diff->$k) {
             $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
         } else {
             unset($string[$k]);
