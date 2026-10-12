@@ -5,7 +5,7 @@
  *
  * @category function
  * @param string $media_filename
- * @return bool false if directory not readable
+ * @return string|false false if directory not readable
  *
  */
 function invoke_audio_uploaded($media_filename)
