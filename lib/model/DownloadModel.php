@@ -21,7 +21,7 @@ class DownloadModel extends BaseModel
     /**
      * getAllMediaDownload
      *
-     * @param string $orderBy
+     * @param string $_orderBy
      * @return mixed
      *
      */
@@ -49,7 +49,7 @@ class DownloadModel extends BaseModel
     /**
      * getMediaDownload
      *
-     * @param int|num $id
+     * @param int|string $mediaId
      * @param object $sanitize
      * @return mixed
      *
@@ -81,8 +81,8 @@ class DownloadModel extends BaseModel
     /**
      * getMediaDownloadURL
      *
-     * @param int|num $id
-     * @param object $sanitize
+     * @param string $identifier
+     * @param object $_sanitize
      * @return mixed
      *
      */
@@ -130,7 +130,7 @@ class DownloadModel extends BaseModel
      *
      * @param object $sanitize
      * @param array $bind
-     * @param int|num $mediaId
+     * @param int|string $mediaId
      *
      */
     public function updateMediaDownload($sanitize, $bind, $mediaId)
@@ -198,7 +198,8 @@ class DownloadModel extends BaseModel
      */
     public function getDownloadHistoryByMedia($mediaId)
     {
-        $sql = "SELECT * FROM tbl_download_log WHERE media_id = ? ORDER BY downloaded_at DESC";
+        $sql = "SELECT ID, media_id, media_identifier, ip_address, user_agent, downloaded_at, status 
+            FROM tbl_download_log WHERE media_id = ? ORDER BY downloaded_at DESC";
         $this->setSQL($sql);
         return $this->findAll([$mediaId]) ?? [];
     }
@@ -211,7 +212,8 @@ class DownloadModel extends BaseModel
      */
     public function getDownloadHistory($limit = 50)
     {
-        $sql = "SELECT dl.*, m.media_filename, m.media_caption 
+        $sql = "SELECT dl.ID, dl.media_id, dl.media_identifier, dl.ip_address, dl.user_agent, 
+                dl.downloaded_at, dl.status, m.media_filename, m.media_caption 
             FROM tbl_download_log dl
             INNER JOIN tbl_media m ON dl.media_id = m.ID
             ORDER BY dl.downloaded_at DESC LIMIT ?";
@@ -242,7 +244,8 @@ class DownloadModel extends BaseModel
      */
     public function getRecentDownloads($limit = 10)
     {
-        $sql = "SELECT dl.*, m.media_filename, m.media_caption 
+        $sql = "SELECT dl.ID, dl.media_id, dl.media_identifier, dl.ip_address, dl.user_agent, 
+                dl.downloaded_at, dl.status, m.media_filename, m.media_caption 
             FROM tbl_download_log dl
             INNER JOIN tbl_media m ON dl.media_id = m.ID
             ORDER BY dl.downloaded_at DESC LIMIT ?";
