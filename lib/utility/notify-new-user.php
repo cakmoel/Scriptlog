@@ -4,10 +4,8 @@
  * Mail Sender Function
  *
  * @category Function
- * @param string $sender
  * @param string $recipient
- * @param string $subject
- * @param string $content
+ * @param string $user_pass
  *
  */
 function notify_new_user($recipient, $user_pass)
