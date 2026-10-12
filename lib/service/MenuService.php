@@ -174,7 +174,7 @@ class MenuService
     /**
      * setMenuOrder
      *
-     * @param int|num $sort
+     * @param int|string $sort
      *
      */
     public function setMenuOrder($sort)
@@ -387,7 +387,7 @@ class MenuService
     /**
      * totalMenus
      *
-     * @param mixed|array $data
+     * @param array $data
      *
      */
     public function totalMenus(array $data = []): ?int
