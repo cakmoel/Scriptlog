@@ -7,11 +7,11 @@
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * @param int|num $current_width
- * @param int|num $current_height
- * @param int|num $max_size
+ * @param int $current_width
+ * @param int $current_height
+ * @param int $max_size
  * @param string $destination
- * @param GdImage|resource $img_src
+ * @param resource|object $img_src
  * @param int $quality
  * @param string $img_type
  * @return bool
@@ -64,12 +64,12 @@ function resize_image($current_width, $current_height, $max_size, $destination, 
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * @param int|num $current_width
- * @param int|num $current_height
- * @param int|num $new_size
+ * @param int $current_width
+ * @param int $current_height
+ * @param int $new_size
  * @param string $destination
- * @param GdImage|resource $img_src
- * @param int|num $quality
+ * @param resource|object $img_src
+ * @param int $quality
  * @param string $img_type
  * @return bool
  */
