@@ -5,7 +5,7 @@
  *
  * @category Function
  * @see https://www.php.net/manual/en/function.get-browser.php#101125
- * @return string
+ * @return array
  *
  */
 function get_browser_name()
