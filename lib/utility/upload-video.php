@@ -10,8 +10,6 @@
  * @license MIT
  * @version 1.0
  * @param string $file_location
- * @param string $file_size
- * @param string $file_type
  * @param string $file_name
  *
  */
