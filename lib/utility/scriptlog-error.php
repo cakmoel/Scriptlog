@@ -7,8 +7,8 @@
  *
  * @category function
  * @see https://www.php.net/manual/en/function.trigger-error.php#118794
- * @param string $message
- * @param string $level
+ * @param string $error_message
+ * @param string|int $error_type
  *
  */
 function scriptlog_error($error_message, $error_type = E_USER_NOTICE, $context = 1)
