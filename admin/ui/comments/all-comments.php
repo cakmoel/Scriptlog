@@ -141,8 +141,8 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-<script type="text/javascript">
-  function deleteComment(id, name)
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
+function deleteComment(id, name)
   {
       if (confirm("Are you sure want to delete comment from '" + name + "'"))
       {
