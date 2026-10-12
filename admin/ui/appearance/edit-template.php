@@ -106,8 +106,8 @@ endif;
 
 </div>
 <!-- /.content-wrapper -->
-<script type="text/javascript">
-  function deleteTheme(id, theme)
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
+function deleteTheme(id, theme)
   {
       if (confirm("Are you sure want to uninstall Theme '" + theme + "'"))
       {
