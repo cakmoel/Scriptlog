@@ -1,6 +1,6 @@
 # Developer Guide - Scriptlog
 
-**Version:** 1.8.3 | **Last Updated:** October 2026
+**Version:** 1.8.3 | **Last Updated:** August 2026
 
 ---
 
@@ -81,7 +81,7 @@
 ```bash
 # Clone repository
 git clone https://github.com/cakmoel/Scriptlog.git
-cd scriptlog
+cd Scriptlog
 
 # Install dependencies
 composer install
@@ -4318,7 +4318,7 @@ SCRIPTLOG          // Security constant (HMAC hash)
 
 // Settings
 APP_TITLE          // 'Scriptlog'
-APP_VERSION        // '1.8.3'
+APP_VERSION        // '1.8.1'
 APP_DEVELOPMENT    // true or false
 ```
 
@@ -6058,4 +6058,4 @@ This project is licensed under the MIT License.
 
 ---
 
-*Last Updated: October 2026 | Version 1.8.3*
+*Last Updated: August 2026 | Version 1.8.1*
