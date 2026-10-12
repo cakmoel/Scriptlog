@@ -6,7 +6,7 @@
  *
  * @param string $orderby
  * @see https://developer.wordpress.org/reference/functions/sanitize_sql_orderby/
- * @return bool | false if doesn't match preg_match
+ * @return string|false | false if doesn't match preg_match
  *
  */
 function sanitize_sql_orderby($orderby)
