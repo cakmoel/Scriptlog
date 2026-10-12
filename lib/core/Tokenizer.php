@@ -71,7 +71,6 @@ final class Tokenizer
      * setRandomPasswordProtected
      *
      * @param string $password
-     * @param string $key
      * @return string
      *
      */
@@ -86,9 +85,8 @@ final class Tokenizer
     /**
      * getRandomPasswordProtected
      *
-     * @param string $cipher_data
      * @param string $password
-     * @param string $key
+     * @param string $hash
      * @return bool
      *
      */
