@@ -21,7 +21,7 @@
  * @author  Lawrence Cherone
  * @see https://stackoverflow.com/questions/5695145/how-to-read-and-write-to-an-ini-file-with-php
  * @param string $file
- * @param array $data
+ * @param array $array
  *
  */
 function write_ini(string $file, array $array = [])
