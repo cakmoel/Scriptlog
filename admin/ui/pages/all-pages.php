@@ -125,8 +125,8 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-<script type="text/javascript">
-  function deletePage(id, title)
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
+function deletePage(id, title)
   {
       if (confirm("Are you sure want to delete Page '" + title + "'"))
       {
