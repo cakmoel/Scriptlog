@@ -5,12 +5,17 @@ use Egulias\EmailValidator\Validation\RFCValidation;
 /**
  * user_init_dao
  *
- * @return object|bool Returns true if class is a defined class, false otherwise.
+ * @return UserDao
+ * @throws \RuntimeException When the UserDao class is unavailable
  *
  */
 function user_init_dao()
 {
-    return (class_exists('UserDao')) ? new UserDao() : "";
+    if (!class_exists('UserDao')) {
+        throw new \RuntimeException('UserDao class is unavailable');
+    }
+
+    return new UserDao();
 }
 
 /**
@@ -45,7 +50,7 @@ function is_email_exists($userEmail)
  * @author Nirmala Khanza <nirmala.adiba.khanza@email.com>
  * @license MIT
  * @version 1.0
- * @return int|num
+ * @return int
  *
  */
 function signup_id()
@@ -56,7 +61,7 @@ function signup_id()
 /**
  * verify_signup_id
  *
- * @param int|num $signupId
+ * @param int $signupId
  * @return bool
  */
 function verify_signup_id($signupId)
@@ -102,7 +107,7 @@ function checking_signup_request($ip, $signupId, $uniqueKey, array $values)
  * processing_signup
  *
  * @param string $ip
- * @param int|num $signupId
+ * @param int $signupId
  * @param string $uniqueKey
  * @param mixed $errors
  * @param array $values
