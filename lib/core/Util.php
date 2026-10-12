@@ -1010,7 +1010,7 @@ class Util
      * Check if a string ends with the given string.
      *
      * @param  string $string
-     * @param  string $starts_with
+     * @param  string $ends_with
      * @return boolean
      */
     public static function ends_with($string, $ends_with)
@@ -1266,7 +1266,7 @@ class Util
      * or "2 weeks ago".
      *
      * @param  int    $from   The date to use as a starting point
-     * @param  int    $to     The date to compare to, defaults to now
+     * @param  int|string $to     The date to compare to, defaults to now
      * @param  string $suffix The string to add to the end, defaults to " ago"
      * @return string
      */
@@ -1566,7 +1566,7 @@ class Util
      *
      * @param string $filename The name of the filename to display to
      *                         browsers
-     * @param string $content  The content to output for the download.
+     * @param string|false $content  The content to output for the download.
      *                         If you don't specify this, just the
      *                         headers will be sent
      * @return boolean
@@ -1637,7 +1637,7 @@ class Util
     /**
      * Generates a string of random characters.
      *
-     * @throws  LengthException  If $length is bigger than the available
+     * @throws  \LengthException  If $length is bigger than the available
      *                           character pool and $no_duplicate_chars is
      *                           enabled
      *
@@ -1716,7 +1716,7 @@ class Util
      * Part of the Laravel Project <https://github.com/laravel/laravel>
      *
      * @param int $length length of string
-     * @return bool
+     * @return string
      */
     public static function secure_random_string($length = 16)
     {
@@ -1825,7 +1825,7 @@ class Util
      *
      * Part of the LinkifyURL Project <https://github.com/jmrware/LinkifyURL>
      *
-     * @param  array  $matches Matches from the preg_ function
+     * @param  string  $text Text to be linkified
      * @return string
      */
     protected static function linkifyRegex($text)
@@ -2062,7 +2062,7 @@ class Util
      *
      * @param   string $file The name of the file to get permissions form
      * @param   int $perms Numerical value of permissions to display as text.
-     * @return  string
+     * @return  string|false
      */
     public static function full_permissions($file, $perms = null)
     {
@@ -2249,7 +2249,7 @@ class Util
      *
      * @param  array   $array  The array to search
      * @param  scalar  $search The value to search for
-     * @param  string  $field  The field to search in, if not specified
+     * @param  string|false $field  The field to search in, if not specified
      *                         all fields will be searched
      * @return boolean|scalar  False on failure or the array key on success
      */
