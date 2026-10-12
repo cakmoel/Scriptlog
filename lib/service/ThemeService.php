@@ -458,7 +458,7 @@ class ThemeService
      * totalThemes
      *
      * @param array $data
-     * @return integer|numeric|null
+     * @return int|null
      */
     public function totalThemes(array $data = []): ?int
     {
