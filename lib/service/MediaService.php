@@ -158,9 +158,10 @@ class MediaService
     /**
      * Initialize an intanciates of class properties or method
      *
-     * @param object $mediaDao
-     * @param object $validator
-     * @param object $sanitizer
+     * @param MediaDao $mediaDao
+     * @param DownloadModel $downloadModel
+     * @param FormValidator $validator
+     * @param Sanitize $sanitizer
      *
      */
     public function __construct(MediaDao $mediaDao, DownloadModel $downloadModel, FormValidator $validator, Sanitize $sanitizer)
@@ -186,7 +187,7 @@ class MediaService
     /**
      * set media filename
      *
-     * @param string $string
+     * @param string $filename
      *
      */
     public function setMediaFilename($filename)
@@ -241,7 +242,7 @@ class MediaService
     /**
      * Set media access
      *
-     * @param mixed $string
+     * @param mixed $access
      *
      */
     public function setMediaAccess($access)
@@ -447,7 +448,7 @@ class MediaService
     /**
      * ModifyMetaMedia()
      *
-     * @return void
+     * @return mixed
      *
      */
     public function modifyMediaMeta()
