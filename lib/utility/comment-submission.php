@@ -139,6 +139,43 @@ function checking_form_input($author_name, $author_email, $comment_content)
 }
 
 /**
+ * is_comment_honeypot_triggered
+ *
+ * Honeypot anti-spam check for the hidden "website" form field. Real
+ * visitors never see or fill the field; bots typically do. A missing
+ * field (e.g. outdated cached forms) counts as clean.
+ *
+ * @category function
+ * @author M.Noermoehammad
+ * @param string|null $value Raw honeypot field value
+ * @return bool True when the value looks bot-submitted
+ */
+function is_comment_honeypot_triggered($value)
+{
+    return is_string($value) && trim($value) !== '';
+}
+
+/**
+ * check_comment_throttle
+ *
+ * Per-IP sliding-window throttle for comment submissions, backed by the
+ * shared file-based RateLimiter (same primitive as API rate limiting).
+ *
+ * @category function
+ * @author M.Noermoehammad
+ * @param string $ipAddress Client IP address
+ * @param int $limit Maximum submissions allowed in the window
+ * @param int $window Window size in seconds
+ * @param string|null $cacheDir Override rate-limit storage directory (tests)
+ * @return array Result with limit, remaining, reset, retry_after, allowed
+ */
+function check_comment_throttle($ipAddress, $limit = 10, $window = 600, $cacheDir = null)
+{
+    $limiter = new \Scriptlog\Core\RateLimiter($cacheDir);
+    return $limiter->check('comment:' . $ipAddress, (int)$limit, (int)$window, 'comment');
+}
+
+/**
  * processing_comment()
  *
  * @param array $values
@@ -159,6 +196,27 @@ function processing_comment(array $values)
     $csrf = (isset($values['csrf']) && $values['csrf'] == $_POST['csrf'] ? $values['csrf'] : "");
     $comment_at = date_for_database();
     $author_ip = get_ip_address();
+
+    // Honeypot anti-spam: silently accept (without storing) submissions
+    // whose hidden "website" field was filled, so bots learn nothing.
+    if (is_comment_honeypot_triggered(filter_input(INPUT_POST, 'website', FILTER_SANITIZE_SPECIAL_CHARS))) {
+        http_response_code(200);
+        $form_data['success'] = true;
+        $form_data['success_message'] = 'Comment was submitted successfully';
+        echo json_encode($form_data, JSON_PRETTY_PRINT);
+        exit;
+    }
+
+    // Per-IP throttling: at most 10 submissions per 10 minutes.
+    $throttle = check_comment_throttle($author_ip);
+    if (empty($throttle['allowed'])) {
+        http_response_code(429);
+        header('Retry-After: ' . (int)$throttle['retry_after']);
+        $form_data['success'] = false;
+        $form_data['error_message'] = 'Too many comments submitted. Please slow down and try again later.';
+        echo json_encode($form_data, JSON_PRETTY_PRINT);
+        exit;
+    }
 
     checking_form_payload($values);
 
@@ -207,7 +265,7 @@ function processing_comment(array $values)
  * fetch_comments()
  *
  * @category theme function
- * @param int|numeric $postId
+ * @param int $postId
  * @param integer $offset
  *
  */
