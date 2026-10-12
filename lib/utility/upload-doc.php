@@ -4,8 +4,8 @@
  * upload_doc()
  *
  * @category Function
- * @param string $filename
- * @param string $folder
+ * @param string $file_location
+ * @param string $file_name
  *
  */
 function upload_doc($file_location, $file_name)
