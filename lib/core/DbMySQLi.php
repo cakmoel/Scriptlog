@@ -100,7 +100,7 @@ class DbMySQLi
     /**
      * dbMySQLiTransaction()
      *
-     * @return bol
+     * @return bool
      *
      */
     public function dbMySQLTransaction()
@@ -179,7 +179,7 @@ class DbMySQLi
      * @param string $sql
      * @param array $params
      * @param string $types
-     * @return object
+     * @return object|false
      *
      */
     public function preparedQuery($sql, $params, $types = "")
@@ -214,12 +214,17 @@ class DbMySQLi
      * @param string $sql
      * @param array $params
      * @param string $types
-     * @return object
+     * @return object|false
      *
      */
     public function preparedSelect($sql, $params = [], $types = "")
     {
         $items = $this->preparedQuery($sql, $params, $types);
+
+        if (false === $items) {
+            return false;
+        }
+
         return $items->getResult();
     }
 
@@ -356,7 +361,6 @@ class DbMySQLi
     /**
      * getNumRows
      *
-     * @param string $sql
      * @return int|string
      */
     public function getNumRows($results)
@@ -410,7 +414,6 @@ class DbMySQLi
     /**
      * setDbRealConnection()
      *
-     * @param boolean $ca
      * @return bool
      *
      */
