@@ -57,7 +57,7 @@ class PassPhraseKey
      */
     public static function savePassPhraseKey($passphrase, $filename)
     {
-        static::$passphrase = $passphrase;
+        self::$passphrase = $passphrase;
 
         if (false === self::checkingUserLevel()) {
             scriptlog_error("You are not allowed to do this procedure");
@@ -135,17 +135,17 @@ class PassPhraseKey
 
         (version_compare(PHP_VERSION, '7.4', '>=')) ? clearstatcache() : clearstatcache(true);
 
-        static::$filename = $filename;
+        self::$filename = $filename;
 
         $path = [];
         $path = explode('/', self::grabDirectoryKey());
-        static::$filepath = DIRECTORY_SEPARATOR . $path[1] . DIRECTORY_SEPARATOR . $path[2] . DIRECTORY_SEPARATOR . $path[3] . DIRECTORY_SEPARATOR;
+        self::$filepath = DIRECTORY_SEPARATOR . $path[1] . DIRECTORY_SEPARATOR . $path[2] . DIRECTORY_SEPARATOR . $path[3] . DIRECTORY_SEPARATOR;
 
-        if ((!file_exists(static::$filepath . static::$filename)) || (!is_writable(static::$filepath . static::$filename))) {
+        if ((!file_exists(self::$filepath . self::$filename)) || (!is_writable(self::$filepath . self::$filename))) {
             scriptlog_error("Permission denied");
             return null;
         }
 
-        return static::$filepath . static::$filename;
+        return self::$filepath . self::$filename;
     }
 }
