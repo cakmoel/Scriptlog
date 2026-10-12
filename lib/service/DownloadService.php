@@ -110,7 +110,7 @@ class DownloadService
      *
      * @param int $mediaId
      * @param string $ipAddress
-     * @return int
+     * @return string
      */
     public function createDownloadRecord($mediaId, $ipAddress)
     {
@@ -271,7 +271,7 @@ class DownloadService
     /**
      * Get download URL
      *
-     * @param int $mediaId
+     * @param int $_mediaId
      * @param string $identifier
      * @return string
      */
