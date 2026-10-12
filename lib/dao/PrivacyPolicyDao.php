@@ -8,6 +8,14 @@ use Scriptlog\Core\Dao;
 
 class PrivacyPolicyDao extends Dao
 {
+    /**
+     * Explicit SELECT column list for tbl_privacy_policies (no SELECT *).
+     *
+     * @var string
+     */
+    private const SELECT_COLUMNS = 'ID, locale, policy_title, policy_content, '
+        . 'is_default, created_at, updated_at';
+
     public function createPolicy(array $data): int
     {
         $this->create($this->table('tbl_privacy_policies'), [
@@ -22,28 +30,28 @@ class PrivacyPolicyDao extends Dao
 
     public function findById(int $id): ?array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_privacy_policies')} WHERE ID = ?";
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_privacy_policies')} WHERE ID = ?";
         $this->setSQL($sql);
         return $this->findRow([$id]) ?: null;
     }
 
     public function findByLocale(string $locale): ?array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_privacy_policies')} WHERE locale = ?";
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_privacy_policies')} WHERE locale = ?";
         $this->setSQL($sql);
         return $this->findRow([$locale]) ?: null;
     }
 
     public function findDefault(): ?array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_privacy_policies')} WHERE is_default = 1 LIMIT 1";
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_privacy_policies')} WHERE is_default = 1 LIMIT 1";
         $this->setSQL($sql);
         return $this->findRow([]) ?: null;
     }
 
     public function findAllPolicies(): array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_privacy_policies')} ORDER BY locale ASC";
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_privacy_policies')} ORDER BY locale ASC";
         $this->setSQL($sql);
         return $this->findAll([]);
     }
