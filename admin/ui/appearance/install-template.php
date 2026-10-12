@@ -85,7 +85,7 @@ $action = isset($formAction) ? $formAction : null;
 
 </div>
 <!-- /.content-wrapper -->
-<script type="text/javascript">
+<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
 document.getElementById('themeUploaded').addEventListener('change', checkFile, false);
 
 function checkFile(e) {
