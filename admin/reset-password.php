@@ -181,8 +181,8 @@ endif;
 <script src="assets/dist/js/checklogin.js"></script>
 <script src="assets/components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="assets/components/iCheck/icheck.min.js"></script>
-<script>
-  $(function () {
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
+$(function () {
     $('input').iCheck({
       checkboxClass: 'icheckbox_square-blue',
       radioClass: 'iradio_square-blue',
@@ -190,19 +190,19 @@ endif;
     });
   });
 </script>
-<script>
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
 $('img').bind('contextmenu',function(e){return false;}); 
 </script>
-<script>
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
 $(document).bind("contextmenu",function(e){return false;});
 </script>
-<script>
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
 document.onkeydown=function(e){if(e.ctrlKey&&(e.keyCode===67||e.keyCode===86||e.keyCode===85||e.keyCode===117)){return false;}else{return true;}};$(document).keypress("u",function(e){if(e.ctrlKey)
 {return false;}
 else
 {return true;}});
 </script>
-<script>
+<script nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
 $(document).keydown(function(event){if(event.keyCode==123){return false}else if(event.ctrlKey&&event.shiftKey&&event.keyCode==73){return false}});
 </script>
 </body>
