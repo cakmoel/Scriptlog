@@ -83,7 +83,7 @@ function db_insert_id()
  * @license MIT
  * @version 1.0
  * @param string $sql
- * @return object
+ * @return object|null
  *
  */
 function db_simple_query($sql)
@@ -108,7 +108,7 @@ function db_simple_query($sql)
  * @version 1.0
  * @param string $sql
  * @param array $params
- * @return object
+ * @return object|null
  *
  */
 function db_prepared_query($sql, array $params, $types = "")
@@ -178,7 +178,7 @@ function db_num_rows($results)
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * @return void
+ * @return boolean
  *
  */
 function check_table()
@@ -227,7 +227,7 @@ function check_table()
  * @author Contributors
  * @license MIT
  * @version 1.0
- * @param string $statement
+ * @param \mysqli_stmt $Statement
  * @see https://stackoverflow.com/questions/10752815/mysqli-get-result-alternative
  * @return array
  *
