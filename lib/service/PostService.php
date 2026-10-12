@@ -32,7 +32,7 @@ class PostService
 
     /**
      * post's Image
-     * @var integer
+     * @var integer|string
      */
     private $post_image;
 
@@ -137,7 +137,7 @@ class PostService
     /**
      * post's tags
      *
-     * @var integer
+     * @var integer|string
      *
      */
     private $tags;
@@ -196,9 +196,9 @@ class PostService
      * (API controllers are built with no arguments by ApiRouter) keep
      * working; the admin composition root passes them explicitly.
      *
-     * @param object $postDao
-     * @param object $validator
-     * @param object $sanitizer
+     * @param PostDao $postDao
+     * @param FormValidator $validator
+     * @param Sanitize $sanitizer
      * @param TopicDao|null $topicDao Data access for post category lookups and writes
      * @param MediaDao|null $mediaDao Data access for post media lookups and writes
      *
@@ -779,7 +779,7 @@ class PostService
      * postAuthorId
      * Checking whether author cookie_id or session_id exists
      *
-     * @return string
+     * @return int|false
      *
      */
     public function postAuthorId()
