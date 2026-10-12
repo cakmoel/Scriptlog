@@ -471,7 +471,7 @@ class Dispatcher
      *
      * Handles actual file download - bypasses theme headers/footers
      *
-     * @param RequestPath $requestPath
+     * @param RequestPath $_requestPath
      *
      */
     private function renderDownloadFile($_requestPath)
