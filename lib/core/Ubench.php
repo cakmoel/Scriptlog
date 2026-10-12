@@ -56,7 +56,7 @@ class Ubench
      * Sets end microtime
      *
      * @return $this
-     * @throws Exception
+     * @throws \LogicException
      */
     public function end()
     {
@@ -75,7 +75,7 @@ class Ubench
      * @param bool $raw
      * @param  string $format The format to display (printf format)
      * @return float|string
-     * @throws Exception
+     * @throws \LogicException
      */
     public function getTime($raw = false, $format = null)
     {
@@ -95,7 +95,7 @@ class Ubench
     /**
      * Returns the memory usage at the end checkpoint
      *
-     * @param  boolean $readable Whether the result must be human readable
+     * @param  boolean $raw Whether the result must be human readable
      * @param  string  $format   The format to display (printf format)
      * @return string|float
      */
@@ -107,7 +107,7 @@ class Ubench
     /**
      * Returns the memory peak, readable or not
      *
-     * @param  boolean $readable Whether the result must be human readable
+     * @param  boolean $raw Whether the result must be human readable
      * @param  string  $format   The format to display (printf format)
      * @return string|float
      */
