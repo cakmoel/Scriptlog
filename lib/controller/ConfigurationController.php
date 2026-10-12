@@ -87,8 +87,7 @@ class ConfigurationController
     /**
      * UpdateGeneralSetting
      *
-     * @param string $args
-     * @return void
+     * @return mixed
      *
      */
     public function updateGeneralSetting()
