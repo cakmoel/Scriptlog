@@ -29,9 +29,9 @@ function checking_connection_with_fsockopen($hostname)
 }
 
 /**
- * checking_connection_with_fopen($ip)
+ * checking_connection_with_fopen($hostname)
  *
- * @param string $ip
+ * @param string $hostname
  *
  */
 function checking_connection_with_fopen($hostname)
@@ -43,8 +43,6 @@ function checking_connection_with_fopen($hostname)
 
 /**
  * checking_internet_connection
- *
- * @param string $hostname
  *
  */
 function checking_internet_connection()
