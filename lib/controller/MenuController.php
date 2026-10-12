@@ -202,7 +202,7 @@ class MenuController extends BaseApp
     /**
      * update()
      *
-     * @param int|num $id
+     * @param int $id
      *
      */
     public function update($id)
@@ -313,8 +313,8 @@ class MenuController extends BaseApp
     /**
      * remove()
      *
-     * @param int|num $id
-     * @return void
+     * @param int $id
+     * @return mixed
      */
     public function remove($id)
     {
