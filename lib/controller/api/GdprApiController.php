@@ -66,7 +66,7 @@ class GdprApiController extends ApiController
      *
      * POST /api/v1/gdpr/consent
      *
-     * @param array $params
+     * @param array $_params
      */
     public function consent($_params = [])
     {
@@ -113,7 +113,7 @@ class GdprApiController extends ApiController
      *
      * GET /api/v1/gdpr/consent
      *
-     * @param array $params
+     * @param array $_params
      */
     public function getConsentStatus($_params = [])
     {
