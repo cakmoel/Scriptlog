@@ -34,7 +34,7 @@ class PostModel extends BaseModel
      * Retrieve posts records for sharing post on post feeds
      *
      * @param integer $limit
-     * @return void
+     * @return bool|array
      *
      */
     public function getPostFeeds($limit)
@@ -65,9 +65,7 @@ class PostModel extends BaseModel
      *
      * retrieves latest posts and display it on homepage
      *
-     * @param int|numeric $position
-     * @param int|num $limit
-     * @param PDO::FETCH_MODE static $fetchMode = null
+     * @param int|string $limit
      * @return mixed
      *
      */
@@ -109,7 +107,7 @@ class PostModel extends BaseModel
      *
      * @param object $sanitize
      * @param Paginator $perPage
-     * @return void
+     * @return bool|array
      *
      */
     public function getAllBlogPosts($sanitize, Paginator $perPage)
@@ -158,8 +156,7 @@ class PostModel extends BaseModel
      *
      * retrieving detail post record by Id
      *
-     * @param int|num $id
-     * @param object $sanitize
+     * @param int|string $id
      * @return boolean|array|object|mixed
      *
      */
@@ -264,8 +261,6 @@ class PostModel extends BaseModel
      * retrieving random headlines
      *
      * @method public getRandomHeadlinesPosts()
-     * @param int $start
-     * @param int $limit
      * @return mixed
      *
      */
@@ -343,7 +338,8 @@ class PostModel extends BaseModel
      *
      * retrieving random posts and display it on homepage
      *
-     * @param int $limit
+     * @param int|string $start
+     * @param int|string $end
      * @return mixed
      *
      */
@@ -398,9 +394,7 @@ class PostModel extends BaseModel
     /**
      * getPostsOnSidebar
      *
-     * @param string $status
-     * @param int|num $start
-     * @param int|num $limit
+     * @param int|string $limit
      * @return array
      *
      */
