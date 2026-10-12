@@ -22,6 +22,14 @@ use Scriptlog\Core\Dao;
 class LanguageDao extends Dao
 {
     /**
+     * Explicit SELECT column list for tbl_languages (no SELECT *).
+     *
+     * @var string
+     */
+    private const SELECT_COLUMNS = 'ID, lang_code, lang_name, lang_native, lang_locale, '
+        . 'lang_direction, lang_sort, lang_is_default, lang_is_active, lang_created_at';
+
+    /**
      * Create a new language record.
      *
      * The `lang_code` value is normalized to lowercase before persistence.
@@ -65,7 +73,7 @@ class LanguageDao extends Dao
      */
     public function findById(int $id): ?array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_languages')} WHERE ID = ?";
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_languages')} WHERE ID = ?";
         $this->setSQL($sql);
         return $this->findRow([$id]) ?: null;
     }
@@ -78,7 +86,7 @@ class LanguageDao extends Dao
      */
     public function findLanguageByCode(string $code): ?array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_languages')} WHERE lang_code = ?";
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_languages')} WHERE lang_code = ?";
         $this->setSQL($sql);
         return $this->findRow([$code]) ?: null;
     }
@@ -93,7 +101,7 @@ class LanguageDao extends Dao
      */
     public function findActiveLanguages(): array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_languages')} 
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_languages')} 
                 WHERE lang_is_active = 1 
                 ORDER BY lang_sort ASC, lang_name ASC";
         $this->setSQL($sql);
@@ -107,7 +115,7 @@ class LanguageDao extends Dao
      */
     public function findDefaultLanguage(): ?array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_languages')} WHERE lang_is_default = 1 LIMIT 1";
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_languages')} WHERE lang_is_default = 1 LIMIT 1";
         $this->setSQL($sql);
         return $this->findRow([]) ?: null;
     }
@@ -191,7 +199,7 @@ class LanguageDao extends Dao
      */
     public function findAllLanguages(): array
     {
-        $sql = "SELECT * FROM {$this->table('tbl_languages')} ORDER BY lang_sort ASC, lang_name ASC";
+        $sql = "SELECT " . self::SELECT_COLUMNS . " FROM {$this->table('tbl_languages')} ORDER BY lang_sort ASC, lang_name ASC";
         $this->setSQL($sql);
         return $this->findAll([]);
     }
