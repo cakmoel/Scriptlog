@@ -45,8 +45,8 @@ class View
     /**
      * Constructor
      *
-     * @param string $accessPath
-     * @param string $dir
+     * @param string $eventPath
+     * @param string $uiPath
      * @param string $modulePath
      * @param string $file
      */
