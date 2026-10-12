@@ -95,7 +95,7 @@ class Registry
      * @method public isKeySet()
      * @static
      * @param string $key
-     * @return array
+     * @return bool
      *
      */
     public static function isKeySet($key)
