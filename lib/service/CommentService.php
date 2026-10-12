@@ -90,7 +90,7 @@ class CommentService
     /**
      * An instance of Sanitize
      *
-     * @var [type]
+     * @var Sanitize
      */
     private $sanitizer;
 
