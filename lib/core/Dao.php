@@ -93,7 +93,7 @@ class Dao
      * getting array of rows
      *
      * @param array $data
-     * @param PDO::FETCH_MODE static $fetchMode
+     * @param int|null $fetchMode
      * @throws DbException
      * @return array<array-key, mixed>
      */
@@ -116,7 +116,7 @@ class Dao
      * getting one row
      *
      * @param array $data
-     * @param PDO::FETCH_MODE static $fetchMode
+     * @param int|null $fetchMode
      * @throws DbException
      * @return mixed
      *
@@ -141,7 +141,7 @@ class Dao
      * getting single field value
      *
      * @param array $data
-     * @param PDO::FETCH_MODE static $fetchMode
+     * @param int|null $fetchMode
      * @throws DbException
      * @return boolean false if no more rows
      */
