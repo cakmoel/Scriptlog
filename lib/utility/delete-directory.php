@@ -50,7 +50,7 @@ function delete_directory($dirname)
  * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
- * @param string $path
+ * @param string $dir
  * @see https://stackoverflow.com/questions/4594180/deleting-all-files-from-a-folder-using-php
  * @see https://stackoverflow.com/questions/1334398/how-to-delete-a-folder-with-contents-using-php
  * @see https://stackoverflow.com/questions/3349753/delete-directory-with-files-in-it
