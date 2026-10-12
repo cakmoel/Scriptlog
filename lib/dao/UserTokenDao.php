@@ -30,7 +30,7 @@ class UserTokenDao extends Dao
     /**
      * get token by user email
      *
-     * @param string $user_email
+     * @param string $login
      * @param string $expired
      * @param string $fetchMode default value = null
      * @return mixed
@@ -82,7 +82,6 @@ class UserTokenDao extends Dao
     /**
      * UpdateUserToken
      *
-     * @param object $sanitize
      * @param array $bind
      * @param string $user_login
      *
