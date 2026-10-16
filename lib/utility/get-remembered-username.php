@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Safely retrieve username from remember-me cookie
  * FIX: Prevents fatal errors from corrupted cookies or key mismatches
