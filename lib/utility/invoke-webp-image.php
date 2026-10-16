@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * invoke_webp_image()
  * Returns WebP URL if available, otherwise returns original image URL
