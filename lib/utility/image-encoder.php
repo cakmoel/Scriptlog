@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Image Encoder Function
  * return local images as base64 encrypted code, i.e embedding the image
