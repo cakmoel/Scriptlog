@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 use Selective\ArchiveBomb\Scanner\BombScanner;
 use Selective\ArchiveBomb\Engine\ZipBombEngine;
 use Selective\ArchiveBomb\Engine\RarBombEngine;
