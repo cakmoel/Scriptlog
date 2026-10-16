@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Invoke fileicon
  * retrieve file icon (font awesome icon) and check it media type
