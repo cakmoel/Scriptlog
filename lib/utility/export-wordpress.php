@@ -1,6 +1,7 @@
 <?php
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * WordPress WXR Exporter Utility
  *
