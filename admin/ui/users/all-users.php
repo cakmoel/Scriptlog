@@ -10,7 +10,7 @@
         <small><a href="<?= generate_request('index.php', 'get', ['users', ActionConst::NEWUSER, 0, sha1(app_key())])['link']; ?>" class="btn btn-primary"> <i class="fa fa-plus-circle" aria-hidden="true"></i> Add New</a></small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard"></i> Home </a></li>
+        <li><a href="index.php?load=dashboard"><i class="fa fa-dashboard" aria-hidden="true"></i> Home </a></li>
         <li><a href="index.php?load=users">Users </a></li>
         <li class="active">Data Users</li>
       </ol>
