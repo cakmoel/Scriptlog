@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Page Cache Utility
  * Provides a simple file-based full-page cache for Scriptlog.
