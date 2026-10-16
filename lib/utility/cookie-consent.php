@@ -1,6 +1,7 @@
 <?php
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Cookie Consent Utility Functions
  *
