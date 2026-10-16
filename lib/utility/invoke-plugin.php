@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * setplugin
  * Checking whether plugin actived then set it as plugin navigation on sidebar nav
