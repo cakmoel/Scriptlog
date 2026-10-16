@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * absolute_url
  * takes the URL of web page, along with a link from within that page,
