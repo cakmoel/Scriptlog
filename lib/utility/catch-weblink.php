@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * catch_weblink
  *

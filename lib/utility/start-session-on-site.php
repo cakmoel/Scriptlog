@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * start_session_on_site
  *

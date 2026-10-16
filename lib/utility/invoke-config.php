@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Check configuration file function
  * checking whether configuration file exists

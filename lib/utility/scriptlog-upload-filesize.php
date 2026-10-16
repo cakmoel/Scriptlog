@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * scriptlog_upload_filesize
  * Determine upload max filesize for theme and plugin

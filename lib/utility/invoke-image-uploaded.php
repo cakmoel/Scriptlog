@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Function invoke image uploaded
  * to retrieve image uploaded from it directory

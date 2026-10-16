@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * autoloader - Simple autoloading function (PHP 5.4+)
  *

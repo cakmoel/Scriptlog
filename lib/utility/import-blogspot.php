@@ -1,6 +1,7 @@
 <?php
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Blogspot/Blogger XML Importer Utility
  *

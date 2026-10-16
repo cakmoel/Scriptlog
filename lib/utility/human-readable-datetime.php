@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Human Readable Datetime Function
  * Convert datetime field MySQL Database to human readable string

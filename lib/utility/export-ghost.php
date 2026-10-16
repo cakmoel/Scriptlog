@@ -1,6 +1,7 @@
 <?php
 
 defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Ghost Exporter Utility
  *

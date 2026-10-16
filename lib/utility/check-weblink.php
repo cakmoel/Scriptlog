@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * check_weblink
  * ฀check฀ all ฀links ฀on a ฀web ฀page฀

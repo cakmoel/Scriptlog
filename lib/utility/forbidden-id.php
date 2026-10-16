@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Forbidden Id function
  * generate unique identifier for 403 HTTP Response Code (Forbidden)

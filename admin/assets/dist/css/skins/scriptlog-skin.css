@@ -132,3 +132,40 @@
   border-bottom-right-radius: 2px;
   border-bottom-left-radius: 0;
 }
+/*
+ * Sticky admin footer (posts/users parity).
+ * When page content is shorter than the viewport, stretch the content area
+ * so .main-footer sits at the bottom of the screen instead of exposing the
+ * dark wrapper background beneath it. Long pages are unaffected: the wrapper
+ * keeps its internal scroll and the footer follows the content.
+ * (.main-sidebar is absolute and .control-sidebar-bg is fixed, so neither
+ * participates in this flex column.)
+ */
+.skin-scriptlog .wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.skin-scriptlog .content-wrapper {
+  flex: 1 0 auto;
+}
+/*
+ * Sidebar cap (posts/users/templates parity).
+ * An expanded submenu (e.g. Posts > All Posts/Add New/Categories) can make
+ * the sidebar taller than the viewport; AdminLTE's layout script then
+ * stretches .content-wrapper to match, giving short pages a scrollbar and
+ * pushing the footer around. Cap the sidebar at the viewport and scroll the
+ * menu internally instead, so page height is driven by content only.
+ * Skipped in mini/collapsed mode to preserve hover flyout menus, and below
+ * 768px where the sidebar is off-canvas.
+ */
+@media (min-width: 768px) {
+  body.skin-scriptlog:not(.sidebar-collapse) .main-sidebar {
+    max-height: 100vh;
+    overflow: hidden;
+  }
+  body.skin-scriptlog:not(.sidebar-collapse) .main-sidebar > .sidebar {
+    max-height: calc(100vh - 50px);
+    overflow-y: auto;
+  }
+}

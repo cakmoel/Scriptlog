@@ -8,12 +8,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#190---2026-10-12)
+- [Latest Release](#191---2026-10-16)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.9.1] - 2026-10-16
+
+### Added
+- None
+
+### Changed
+- **Admin skin cache-busting**: The admin skin stylesheet URL now appends the file modification time, ensuring browsers fetch fresh CSS after upgrades
+
+### Fixed
+- **CSRF token timing on privacy policy**: The form token is (re)generated only after POST validation, preventing token invalidation and intermittent "unpleasant attempt" rejections
+- **Installer compatibility with direct-access guards**: The installer entry point defines the `SCRIPTLOG` constant before including utility files so setup runs cleanly with hardened includes
+- **Admin list-table sorting indicators**: DataTables non-orderable targets now use negative indexes (`0, -1, -2`) so row-number and action columns stay unsortable on every list table regardless of column count
+- **Sticky admin footer and sidebar cap**: Short admin pages keep the footer at the viewport bottom, and expanded submenus scroll internally instead of stretching page height
+- **Alert heading level on posts list**: Error and success alerts use `h4` for correct heading hierarchy
+- **Users list icon accessibility**: Dashboard breadcrumb icon marked `aria-hidden`
+
+### Security
+- **Direct-access guards on utility layer**: All `lib/utility/` helpers now abort with `defined('SCRIPTLOG') || die(...)` when requested directly, closing direct web access to include-only files
+
+### Deprecated
+- None
+
+### Removed
+- None
+
+### Notes
+Patch release focused on include-layer hardening and admin UI polish. 221 commits since v1.9.0 (3 fix/test commits carried from the v1.9.0 cycle plus 209 utility guard commits, 5 admin/installer fixes, and 4 version-doc bumps). Test-only changes (e2e data-request seed column, CSP nonce assertion) are not user-facing. No API, schema, or behavior breaking changes.
+
+### Codename
+**Maleo Senkawor** (retained) – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.9.0
+- **Changes since v1.9.0**: 221 commits
+
+---
 
 ## [1.9.0] - 2026-10-12
 

@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * Sanitize_sql_orderby function
  * Ensures a string is a valid SQL ‘order by’ clause.

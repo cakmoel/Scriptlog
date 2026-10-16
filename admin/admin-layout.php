@@ -34,7 +34,7 @@ function admin_header($stylePath, $breadcrumb = null)
     <link rel="stylesheet" href="<?= $stylePath; ?>/assets/components/select2/css/select2.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/AdminLTE.min.css">
-    <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/skins/scriptlog-skin.css">
+    <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/skins/scriptlog-skin.css?v=<?= (@filemtime(__DIR__ . '/assets/dist/css/skins/scriptlog-skin.css') ?: APP_VERSION); ?>">
     <?php if ($isRtl) : ?>
     <!-- RTL Support -->
     <link rel="stylesheet" href="<?= $stylePath; ?>/assets/dist/css/rtl.css">
@@ -122,21 +122,13 @@ function admin_footer($stylePath, $ubench = null)
     ?>
 
         <footer class="main-footer">
-
-            <div class="pull-right hidden-xs">
-                <?php
-                echo APP_CODENAME;
-                ?>
-            </div>
-
+            <div class="pull-right hidden-xs"><?php echo APP_CODENAME; ?></div>
             <strong>Thank you for creating with
                 <a href="https://scriptlog.my.id" target="_blank" rel="noopener noreferrer"
                     title="PHP Blog Software">Scriptlog</a>
                 <?php echo APP_VERSION; ?>
             </strong>
-            <strong>
-                <?=((true === APP_DEVELOPMENT) && (isset($ubench))) ? " Page generated in: " . $ubench->getTime() . " Memory usage: " . $ubench->getMemoryUsage() : "" ?>
-            </strong>
+            <strong><?=((true === APP_DEVELOPMENT) && (isset($ubench))) ? " Page generated in: " . $ubench->getTime() . " Memory usage: " . $ubench->getMemoryUsage() : "" ?></strong>
         </footer>
 
         <div class="control-sidebar-bg"></div>
@@ -176,7 +168,12 @@ function admin_footer($stylePath, $ubench = null)
             "responsive": true,
             "order": [],
             "columnDefs": [{
-                "targets": [0, 4, 5],
+                // Negative targets count from the right, so the row-number
+                // column plus the last two action columns (Edit/Delete) are
+                // non-orderable on every admin list table regardless of how
+                // many columns it has (posts=7, users=6, ...). This keeps
+                // thead/tfoot sort indicators synchronized across pages.
+                "targets": [0, -1, -2],
                 "orderable": false,
             }, ],
 

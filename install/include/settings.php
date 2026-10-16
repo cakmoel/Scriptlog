@@ -22,6 +22,8 @@ if (file_exists(__DIR__ . '/../../lib' . $vendorAutoload)) {
 } elseif (file_exists(__DIR__ . '/../../../vendor/autoload.php')) {
     require_once __DIR__ . '/../../../vendor/autoload.php';
 }
+// Installer entry point: satisfy the SCRIPTLOG direct-access guard in utility files.
+defined('SCRIPTLOG') || define('SCRIPTLOG', 'SCRIPTLOG_INSTALL');
 include_once __DIR__ . '/../../lib/utility/is-ssl.php';
 include_once __DIR__ . '/../../lib/utility/get-browser-name.php';
 include_once __DIR__ . '/../../lib/utility/get-os.php';
