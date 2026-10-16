@@ -27,7 +27,7 @@
             ?>
           <div class="alert alert-danger alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            <h2><i class="icon fa fa-ban" aria-hidden="true"></i> Error!</h2>
+            <h4><i class="icon fa fa-ban" aria-hidden="true"></i> Error!</h4>
             <?php
             foreach ($errors as $e) :
                 echo safe_html($e);
@@ -44,7 +44,7 @@
         
           <div class="alert alert-success alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            <h2><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h2>
+            <h4><i class="icon fa fa-check" aria-hidden="true"></i> Success!</h4>
             <?php
             foreach ($status as $s) :
                 echo safe_html($s);
