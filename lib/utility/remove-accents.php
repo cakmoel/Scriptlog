@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * remove_accents
  * Converts all accent characters to their ASCII equivalents
