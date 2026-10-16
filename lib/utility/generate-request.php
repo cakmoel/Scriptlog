@@ -14,6 +14,8 @@
 
 declare(strict_types=1);
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 require_once __DIR__ . '/sanitize-urls.php';
 
 /**
