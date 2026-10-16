@@ -1,5 +1,7 @@
 <?php
 
+defined('SCRIPTLOG') || die("Direct access not permitted");
+
 /**
  * convert_to_paragraph
  * To display text retrieved from database as genuine paragraphs
