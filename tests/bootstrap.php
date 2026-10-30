@@ -13,6 +13,13 @@ ini_set('display_errors', 1);
 // PHPUnit process stays deterministic.
 define('SCRIPTLOG_TEST_MODE', true);
 
+// Force development error handling under PHPUnit. The suite runs without a
+// database, so production error paths would call direct_page(), which exits
+// the test process. Development mode keeps errors visible instead.
+if (!defined('APP_DEVELOPMENT')) {
+    define('APP_DEVELOPMENT', true);
+}
+
 // DAO base classes resolve the table prefix via get_table_prefix(), which
 // reads config.php (default 'tpglkl_'). The test database uses unprefixed
 // table names, so flag test mode to force an empty prefix.
