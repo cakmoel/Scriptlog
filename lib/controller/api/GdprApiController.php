@@ -23,7 +23,7 @@ use Scriptlog\Core\ApiResponse;
 use Scriptlog\Dao\ConsentDao;
 use Scriptlog\Service\ConsentService;
 
-class GdprApiController extends ApiController
+final class GdprApiController extends ApiController
 {
     /**
      * ConsentDao instance
