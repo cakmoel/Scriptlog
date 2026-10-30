@@ -25,7 +25,29 @@ function whoops_error()
         return;
     }
 
-    if (APP_DEVELOPMENT === true) {
+    /**
+     * @psalm-suppress TypeDoesNotContainType
+     */
+    if (defined('APP_DEVELOPMENT') && APP_DEVELOPMENT) {
+        // Never expose secrets via Whoops in any environment
+        $blacklisted = array(
+            'DB_PASS',
+            'DB_PASSWORD',
+            'DB_USER',
+            'DB_USERNAME',
+            'DB_HOST',
+            'DB_NAME',
+            'DB_DATABASE',
+            'DB_PREFIX',
+            'APP_KEY',
+            'DEFUSE_KEY_PATH',
+            'MAIL_PASSWORD',
+            'SMTP_PASSWORD',
+            'MAILER_PASSWORD',
+            'REDIS_PASSWORD',
+            'SESSION_SECRET'
+        );
+
         $whoops = new \Whoops\Run();
 
         $errorPage = new \Whoops\Handler\PrettyPageHandler();
@@ -33,8 +55,27 @@ function whoops_error()
         $errorPage->addDataTable(APP_TITLE, array(
             "version" => APP_VERSION,
             "codename" => APP_CODENAME,
-            "hostname" => app_url()
+            "hostname" => function_exists('app_url') ? app_url() : ''
         ));
+
+        /**
+         * @psalm-suppress RedundantCondition
+         */
+        if (method_exists($errorPage, 'blacklist')) { // @phpstan-ignore method.alreadyKnown
+            foreach ($blacklisted as $secretKey) {
+                $errorPage->blacklist('_SERVER', $secretKey);
+                $errorPage->blacklist('_ENV', $secretKey);
+                $errorPage->blacklist('_GET', $secretKey);
+                $errorPage->blacklist('_POST', $secretKey);
+                $errorPage->blacklist('_COOKIE', $secretKey);
+            }
+            // Also blacklist common patterns
+            $errorPage->blacklist('_SERVER', 'PASS');
+            $errorPage->blacklist('_SERVER', 'PASSWORD');
+            $errorPage->blacklist('_SERVER', 'SECRET');
+            $errorPage->blacklist('_SERVER', 'KEY');
+            $errorPage->blacklist('_SERVER', 'TOKEN');
+        }
 
         $whoops->pushHandler($errorPage);
         $whoops->register();
@@ -45,13 +86,27 @@ function whoops_error()
 
         register_shutdown_function(static function () {
             $error = error_get_last();
-            if ($error !== null) {
-                $e = new ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']);
 
-                if (class_exists('LogError')) {
-                    LogError::exceptionHandler($e);
-                }
+            if ($error === null) {
+                return;
             }
+
+            // Only genuine fatal errors need this safety net. Warnings,
+            // notices and deprecated diagnostics are already routed through
+            // set_error_handler('LogError::errorHandler') above, and a
+            // suppressed (@) diagnostic - for example an unwritable cache
+            // file - must never turn an otherwise successful request into
+            // the 301 redirect that MessageLog::messageException() performs
+            // when APP_DEVELOPMENT is false. Promoting those here produced
+            // bogus "301 Moved Permanently" responses for every API call
+            // whose rate-limit counter file could not be written.
+            if (!class_exists('LogError') || !LogError::isFatalErrorType($error['type'])) {
+                return;
+            }
+
+            $e = new ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']);
+
+            LogError::exceptionHandler($e);
         });
     }
 }
