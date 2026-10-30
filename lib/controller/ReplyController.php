@@ -23,7 +23,7 @@ use Scriptlog\Core\Sanitize;
 use Scriptlog\Core\View;
 use Scriptlog\Service\ReplyService;
 
-class ReplyController extends BaseApp
+final class ReplyController extends BaseApp
 {
     private $view;
     private $replyService;
