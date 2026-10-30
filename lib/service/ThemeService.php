@@ -20,7 +20,7 @@ use Scriptlog\Core\Sanitize;
 use Scriptlog\Dao\ThemeDao;
 use Scriptlog\Service\ThemeLicenseService;
 
-class ThemeService
+final class ThemeService
 {
     /**
      * Theme ID
