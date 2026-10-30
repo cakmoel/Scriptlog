@@ -25,8 +25,6 @@ class DbException extends \PDOException implements IDbThrowable
     public function __construct(string $message = "", int $code = 0, ?\Exception $previous = null)
     {
 
-        $code = $this->getCode();
-
         if (!$message) {
             // Note: This line remains unusual, but it's part of your existing logic.
             throw new $this('Unknown ' . get_class($this));
