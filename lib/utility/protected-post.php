@@ -123,6 +123,40 @@ function decrypt_post($post_id, $password)
 }
 
 /**
+ * decrypt_post_with_key()
+ *
+ * Decrypt a protected post using a derived passphrase key from session.
+ * The key must be a 64-character lowercase hex string.
+ *
+ * @category function
+ * @param int $post_id
+ * @param string $passphrase_key
+ * @return array
+ */
+function decrypt_post_with_key($post_id, $passphrase_key)
+{
+    if (!is_string($passphrase_key) || !preg_match('/^[a-f0-9]{64}$/', $passphrase_key)) {
+        return array('post_content' => '');
+    }
+
+    $grab_post = grab_post_protected($post_id);
+    $id_post = isset($grab_post['post_id']) ? (int)$grab_post['post_id'] : 0;
+    $content = isset($grab_post['post_content']) ? escape_html($grab_post['post_content']) : "";
+    $visibility = isset($grab_post['visibility']) ? escape_html($grab_post['visibility']) : "";
+    $passphrase = isset($grab_post['passphrase']) ? $grab_post['passphrase'] : "";
+
+    if (($visibility == 'protected') && $id_post > 0) {
+        if (!empty($passphrase)) {
+            if (function_exists('decrypt')) {
+                return array('post_content' => decrypt($content, $passphrase));
+            }
+        }
+    }
+
+    return array('post_content' => '');
+}
+
+/**
  * decrypt_post_admin
  *
  * Admin-only decryption - decrypts protected post without password verification
@@ -164,7 +198,11 @@ function track_failed_unlock_attempt($post_id)
     $log_dir = APP_ROOT . '/public/log/unlock_attempts/';
 
     if (!is_dir($log_dir)) {
-        mkdir($log_dir, 0755, true);
+        @mkdir($log_dir, 0755, true);
+    }
+    $htaccess = $log_dir . '.htaccess';
+    if (is_dir($log_dir) && !file_exists($htaccess)) {
+        @file_put_contents($htaccess, "<IfModule mod_authz_core.c>\n    Require all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n    Order deny,allow\n    Deny from all\n</IfModule>\n");
     }
 
     $log_file = $log_dir . $identifier . '.json';
