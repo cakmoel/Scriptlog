@@ -101,6 +101,11 @@ try {
                         $errors = [];
                     }
                     $errors[] = "Please enter a valid email address.";
+                } elseif (empty($_POST['confirm_delete'])) {
+                    if (empty($errors)) {
+                        $errors = [];
+                    }
+                    $errors[] = "Please confirm the deletion request before submitting.";
                 } else {
                     $note = 'User requested data deletion';
                     if (isset($_POST['delete_reason']) && trim((string)$_POST['delete_reason']) !== '') {
