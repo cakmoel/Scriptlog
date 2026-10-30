@@ -24,7 +24,7 @@ use Scriptlog\Core\Sanitize;
 use Scriptlog\Core\View;
 use Scriptlog\Service\MenuService;
 
-class MenuController extends BaseApp
+final class MenuController extends BaseApp
 {
     /**
      * view
