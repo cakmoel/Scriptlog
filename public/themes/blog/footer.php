@@ -109,7 +109,7 @@
 <script src="<?= theme_dir(); ?>assets/js/wow.min.js" integrity="sha384-XOseRua7mFtme3Rj2toJG4TV6dhOfTuxqFD12kXAlEvssIFjcpwaC/MTx8+6BUPN" crossorigin="anonymous" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/sina-nav.min.js" integrity="sha384-9iszGKzSIhu1BEKZdzZuu6WOLXRZuvE1AMg5nLn+Zi1t2C09NuIEywYzOk/lAJ1P" crossorigin="anonymous" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/cookie-consent.min.js" integrity="sha384-XdGHyJxPYVxaEsjfP8Z9oOsuz4p6sGT1QlLhML1gTcGIfUGBpNtM+FKOqSdKxNIE" crossorigin="anonymous" defer></script>
-<script src="<?= theme_dir(); ?>assets/js/search.min.js" integrity="sha384-9P/aQgM84r7RtGRrfBnJMsnMyDJnkDXbxlx1+RxE1swtZn9IRgQbX5awHyzocuAU" crossorigin="anonymous" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/search.min.js" integrity="sha384-WvuIUwbTx4g+W6iLzmKcvEpocHrJNIwHk9oolNUXWxL05M3ZIBK3s2keICbAhVXc" crossorigin="anonymous" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/unlock-post.min.js" integrity="sha384-NkKzpDeSB682ZQqYMFuEcsghhPX6gzWxD8phHVGSijG/yQM8t2TcskjfBr8GAo1J" crossorigin="anonymous" defer></script>
 <?php if (is_rtl()) : ?>
 <script src="<?= theme_dir(); ?>assets/js/rtl.min.js" integrity="sha384-1+uymlvUWF7Mb7OqV3KH8vk4U+VtQ7p0j7e3HDd2yOZq/8fqkK0BwaeonSlO1+KR" crossorigin="anonymous" defer></script>
