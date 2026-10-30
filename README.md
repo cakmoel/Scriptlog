@@ -3,7 +3,7 @@
 **Empowering Your Personal Weblog**
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
-[![PHP Version](https://img.shields.io/badge/PHP-7.4%20--%208.5-777BB4.svg)](https://www.php.net/)
+[![PHP Version](https://img.shields.io/badge/PHP-8.3%2B-777BB4.svg)](https://www.php.net/)
 [![MySQL Version](https://img.shields.io/badge/MySQL-5.7%2B-4479A1.svg)](https://www.mysql.com/)
 [![MariaDB Version](https://img.shields.io/badge/MariaDB-10.3%2B-003545.svg)](https://mariadb.org/)
 [![PSR-12](https://img.shields.io/badge/PSR--12-Compliant-2C2C2C.svg)](https://www.php-fig.org/psr/psr-12/)
@@ -22,7 +22,7 @@ Scriptlog is not designed to replace full-scale CMS frameworks. Instead, it is m
 - Run fast with minimal overhead.
 
 ### Core Technologies
-- **Backend:** PHP 7.4 - 8.5 (PSR-12 compliant)
+- **Backend:** PHP 8.3+ (PSR-12 compliant)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
 - **Architecture:** Multi-layered MVC-like (`Request` -> `Bootstrap` -> `Dispatcher` -> `Controller` -> `Service` -> `DAO` -> `Database`)
 - **Security:** Laminas (Escaper, Crypt), Defuse PHP Encryption, voku Anti-XSS, HTMLPurifier.
@@ -30,7 +30,7 @@ Scriptlog is not designed to replace full-scale CMS frameworks. Instead, it is m
 ## Requirements
 
 Ensure your hosting environment meets the following requirements:
-- **PHP:** 7.4 - 8.5 (with extensions: `pdo`, `pdo_mysql`, `mbstring`, `iconv`, `fileinfo`, `gd`, `curl`, `openssl`, `json`)
+- **PHP:** 8.3+ (with extensions: `pdo`, `pdo_mysql`, `mbstring`, `iconv`, `fileinfo`, `gd`, `curl`, `openssl`, `json`)
 - **Web Server:** Apache (with `mod_rewrite` enabled) or Nginx
 - **Database:** MySQL 5.7+ or MariaDB 10.3+
 - **Composer:** Latest (for dependency management)
@@ -49,7 +49,7 @@ The application is served from the project root, which is your web root: `index.
    ```bash
    composer install
    ```
-   > **Note:** Composer's `platform.php` config locks dependency resolution to PHP 7.4, ensuring all packages stay compatible across PHP 7.4 through 8.5. No runtime warnings occur on newer PHP versions.
+   > **Note:** Composer's `platform.php` config locks dependency resolution to PHP 7.4, keeping every package installable and runnable on PHP 7.4 through the current 8.x releases. The codebase itself stays PHP 7.4 backwards compatible, so nothing breaks on older PHP versions.
 
 3. **Set Permissions**
    ```bash
