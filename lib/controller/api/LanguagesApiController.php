@@ -9,7 +9,7 @@ use Scriptlog\Core\ApiHateoas;
 use Scriptlog\Core\ApiResponse;
 use Scriptlog\Service\LanguageService;
 
-class LanguagesApiController extends ApiController
+final class LanguagesApiController extends ApiController
 {
     private $languageService;
 
