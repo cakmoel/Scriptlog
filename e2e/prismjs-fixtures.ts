@@ -110,10 +110,11 @@ export const FIXTURE_SQL: string = [
   "INSERT INTO tbl_posts (ID, media_id, post_author, post_date, post_title,",
   "post_slug, post_content, post_summary, post_status, post_visibility,",
   "post_tags, post_headlines, post_sticky, post_type, post_locale,",
-  "comment_status) VALUES (99901, 0, 1, NOW(),",
+  "comment_status) VALUES (99901, 0, 767, NOW(),",
   "'Prism.js Syntax Highlighting Fixture', 'prismjs-fixture-post',",
-  "'<fixture html with pre/code language-* classes>', 'Prism fixture post',",
-  "'publish', 'public', 'prism,e2e', 0, 0, 'blog', 'en', 'closed')",
+  "'<pre class=\"line-numbers\"><code class=\"language-php\">...</code></pre>',",
+  "'Prism fixture post', 'publish', 'public', 'prism,e2e', 0, 0, 'blog',",
+  "'en', 'closed')",
   "ON DUPLICATE KEY UPDATE post_status='publish', post_visibility='public';",
 ].join('\n');
 

@@ -8,12 +8,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#1100---2026-10-31)
+- [Latest Release](#1101---2026-10-31)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.10.1] - 2026-10-31
+
+### Fixed
+- **PHPUnit error handling**: The test bootstrap now forces `APP_DEVELOPMENT`, so database-free CI runs no longer fall through to `direct_page()` and fail on an undefined `APP_HOSTNAME`
+- **Prism.js fixture seeding**: `e2e/blogware_e2e.sql` now seeds post `99901` (`prismjs-fixture-post`), so the Playwright suites can load the server-rendered fixture
+- **Exception constructors**: `DbException`, `ModelException`, and `ProviderException` no longer overwrite their `$code` argument before passing it to the parent constructor, resolving PHPStan's unused-parameter findings
 
 ## [1.10.0] - 2026-10-31
 
