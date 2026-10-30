@@ -18,7 +18,7 @@ use Scriptlog\Core\ServiceException;
 use Scriptlog\Dao\LanguageDao;
 use Scriptlog\Dao\TranslationDao;
 
-class LanguageService
+final class LanguageService
 {
     private $languageDao;
     private $translationDao;
