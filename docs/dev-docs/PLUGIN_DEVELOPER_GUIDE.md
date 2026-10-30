@@ -11,16 +11,32 @@ When a user uploads a plugin ZIP:
 1. `PluginController::installPlugin()` validates the ZIP
 2. `upload_plugin()` extracts and validates structure
 3. Plugin info from `plugin.ini` is saved to `tbl_plugin`
-4. Plugin appears in admin panel (status: Disabled)
+4. `PluginController::saveInstalledPlugin()` computes a **manifest digest** (SHA-256 over `plugin.ini` plus every PHP file in the plugin directory, relative paths sorted) and stores it in `tbl_plugin.plugin_manifest`
+5. Plugin appears in admin panel (status: Disabled)
 
 ### 2. Plugin Activation
 When a user clicks "Enable":
 1. `PluginController::enablePlugin($id)` is called
 2. `PluginService::activateInstalledPlugin()`:
-   - Executes `schema.sql` if exists (for database tables, split on `;`, skipping `--` comments)
+   - **Verifies the manifest first** (`plugin_manifest_verify()`). If the digest is missing or does not match the files on disk, activation is refused, an audit entry (`plugin_manifest_rejected`) is written, and the admin sees an integrity error. Nothing from the plugin is executed.
+   - Executes `schema.sql` if exists (for database tables, split on `;`, skipping `--` comments), validating every statement with `validate_plugin_schema_sql()` first
    - Calls `enable_plugin($plugin_path)` to load PHP files via `require_once` (loads main class file and `functions.php`)
    - Updates `plugin_status` = 'Y' in database
 3. The plugin's PHP class file is loaded, but hooks are **not yet registered** — they are registered later when the class is instantiated during `invoke_plugin()` call
+
+> **Manifest means "no edits after install".** Editing a plugin's PHP files (or `plugin.ini`) in place invalidates the digest and the plugin can no longer be activated. Ship changes as a new archive and re-install, or, when you trust the current files, record a fresh digest with `php install/migrate-plugin-manifest.php --backfill`.
+
+### 2b. `plugin_level` semantics
+
+`plugin_level` (`administrator` or `manager`) is an **admin-UI visibility hint only**. It controls:
+- which admin menu group the plugin's admin page is listed under (`PluginDao::setMenuPlugin()`), and
+- which value you pick in the install form's dropdown.
+
+It does **not** gate execution:
+- Once a plugin is activated it runs for **all visitors** of the site, including anonymous ones — hooks registered with `clip()` fire on the public frontend regardless of `plugin_level`.
+- `plugin_level` is **not** checked before `enable_plugin()` loads plugin code.
+
+Activation, deactivation, and deletion are **administrator-only** (the `PLUGIN_MANAGE` action is mapped to the `administrator` role in `Authentication::checkAccessByLevel()`); managers and lower roles are denied. Because an activated plugin executes server-side code, treat installation as an administrator-level trust decision: never install a plugin you have not reviewed, and keep `admin/plugins/` non-writable from the web process after installation.
 
 ### 3. Plugin Deactivation
 When a user clicks "Disable":
@@ -67,7 +83,8 @@ plugin_action = "my-plugin"
 |-------|----------|--------------|
 | plugin_name | Yes | Display name |
 | plugin_description | Yes | What the plugin does |
-| plugin_level | Yes | "administrator" or "manager" |
+| plugin_level | Yes | "administrator" or "manager" — admin-UI visibility hint only (see §2b) |
+| plugin_directory | No | Directory name of the plugin. Must match the archive name (e.g. `my-plugin.zip` → `my-plugin`); installation is refused on mismatch. Defaults to the archive name when omitted |
 | plugin_version | Yes | Semantic version (e.g., 1.0.0) |
 | plugin_author | Yes | Author name |
 | plugin_loader | Yes | PHP class filename (without .php) |
