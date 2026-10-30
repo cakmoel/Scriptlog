@@ -24,7 +24,7 @@ use Scriptlog\Core\Sanitize;
 use Scriptlog\Core\View;
 use Scriptlog\Service\MediaService;
 
-class MediaController extends BaseApp
+final class MediaController extends BaseApp
 {
     /**
      * View
