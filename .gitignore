@@ -15,6 +15,9 @@
 !public/themes/blog/assets/img/hero.jpg
 !public/themes/blog/assets/img/placeholder.svg
 
+# Keep the default post image so posts without a featured image render
+!public/files/pictures/nophoto.jpg
+
 # Session files
 sess_*
 # --- System / IDE ---
