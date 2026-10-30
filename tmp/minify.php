@@ -1,9 +1,15 @@
 <?php
 /**
  * Simple Minifier Script for Scriptlog Theme
- * Minifies CSS and JS files in ALL theme directories
- * 
- * Usage: php tmp/minify.php
+ * Minifies CSS and JS files in theme directories
+ *
+ * Usage: php tmp/minify.php            # every theme under public/themes/
+ *        php tmp/minify.php blog       # only public/themes/blog/
+ *
+ * The optional theme argument keeps a routine asset rebuild from touching
+ * unrelated themes (each rebuild also rewrites the sha384 integrity hashes in
+ * that theme's templates, so an unscoped run produces diffs you did not ask
+ * for).
  * 
  * @category function to minify CSS and JS files in Scriptlog theme directories 
  * @author Nirmala Adiba Khanza <nirmala.adiba.khanza@gmail.com>
@@ -37,6 +43,43 @@ function minify_js($input) {
 }
 
 /**
+ * Add or refresh the `v` cache-busting query parameter on an asset URL.
+ *
+ * The token is derived from the asset digest, so the URL changes exactly
+ * when the file content changes. This matters because theme assets are
+ * served with a 30-day `Cache-Control: max-age`: a returning visitor keeps
+ * the previous .min bytes, and the newly written integrity hash would make
+ * the browser block that stale response outright.
+ *
+ * @param string $url    Asset URL as written in the template.
+ * @param string $digest Base64-encoded sha384 digest of the asset.
+ * @return string URL carrying an up-to-date `v` parameter.
+ */
+function cache_busted_url($url, $digest)
+{
+    $token = substr(hash('sha256', $digest), 0, 12);
+    $prefix = '';
+
+    // Keep a leading PHP expression such as theme_dir() intact: its question
+    // mark belongs to the PHP tag, not to the asset's query string.
+    if (preg_match('/^(<\?.*?\?>)/', $url, $match)) {
+        $prefix = $match[1];
+        $url = substr($url, strlen($prefix));
+    }
+
+    $parts = explode('?', $url, 2);
+    $query = [];
+
+    if (isset($parts[1]) && $parts[1] !== '') {
+        parse_str($parts[1], $query);
+    }
+
+    $query['v'] = $token;
+
+    return $prefix . $parts[0] . '?' . http_build_query($query);
+}
+
+/**
  * Recompute and rewrite the sha384 integrity hashes in a theme's PHP
  * templates so they always match the on-disk (served) minified assets.
  *
@@ -44,6 +87,10 @@ function minify_js($input) {
  * integrity attributes behind in header.php/footer.php, and browsers
  * block the assets (SRI mismatch), which silently breaks styling and
  * scripts on the live site.
+ *
+ * When a hash actually changes the asset URL is cache-busted as well,
+ * otherwise returning visitors keep the old cached bytes and the new
+ * integrity hash blocks them.
  *
  * @param string $theme_dir Absolute path to the theme directory.
  * @param string $repo_root Absolute path to the repository root.
@@ -86,6 +133,13 @@ function sync_integrity_hashes($theme_dir, $repo_root)
                 }
 
                 $updated++;
+
+                $tag_html = str_replace(
+                    '"' . $url . '"',
+                    '"' . cache_busted_url($url, $actual) . '"',
+                    $tag_html
+                );
+
                 return str_replace('integrity="sha384-' . $tag[2] . '"', 'integrity="sha384-' . $actual . '"', $tag_html);
             },
             $html
@@ -99,7 +153,22 @@ function sync_integrity_hashes($theme_dir, $repo_root)
 
 $themes_dir = __DIR__ . '/../public/themes';
 $repo_root = dirname(__DIR__);
-$theme_folders = array_diff(scandir($themes_dir), ['.', '..', 'index.php', 'maintenance.php']);
+$theme_folders = array_values(array_diff(scandir($themes_dir), ['.', '..', 'index.php', 'maintenance.php']));
+
+// Optional CLI scope: `php tmp/minify.php blog` rebuilds one theme only, so
+// unrelated .min assets and integrity hashes stay untouched.
+$requested_theme = isset($argv[1]) ? trim((string) $argv[1]) : '';
+
+if ($requested_theme !== '') {
+    if (!in_array($requested_theme, $theme_folders, true) || !is_dir($themes_dir . '/' . $requested_theme)) {
+        fwrite(STDERR, "Unknown theme: {$requested_theme}\n");
+        fwrite(STDERR, 'Available themes: ' . implode(', ', $theme_folders) . "\n");
+        exit(1);
+    }
+
+    $theme_folders = [$requested_theme];
+    echo "Scoped to theme: {$requested_theme}\n";
+}
 
 $total_css = 0;
 $total_js = 0;
