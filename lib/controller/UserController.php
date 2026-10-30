@@ -31,7 +31,7 @@ use Scriptlog\Service\ConfigurationService;
 use Scriptlog\Service\NotificationService;
 use Scriptlog\Service\UserService;
 
-class UserController extends BaseApp
+final class UserController extends BaseApp
 {
     /**
      * an instance of view
