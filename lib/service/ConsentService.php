@@ -19,7 +19,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 
 use Scriptlog\Dao\ConsentDao;
 
-class ConsentService
+final class ConsentService
 {
     /**
      * Consent type
