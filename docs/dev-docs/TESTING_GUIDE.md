@@ -454,11 +454,23 @@ host really has, which is what makes "flatpak is not installed" testable.
 | File | Tests | Subject |
 |------|-------|---------|
 | `tests/bats/load-test.bats` | 58 | `load-test.sh`: argument validation, weight/concurrency/request math, `ab` report parsing, CSV/metadata output, error-rate gating, warm-up, dry-run |
+| `tests/bats/stress-test.bats` | 17 | `stress-test.sh`: argument validation, doubling/step ramp resolution, per-level run sizing, pooled-percentile stop conditions (SATURATED/BREAKING-POINT/COLLAPSED), CSV + metadata sidecar, strict pre-flight, connect-error taxonomy, dry-run |
+| `tests/bats/spike-test.bats` | 21 | `spike-test.sh`: argument validation, spike-above-baseline sanity, baseline/spike/recovery cycle ordering, per-cycle absorb/recover verdicts (RESILIENT/NOT RESILIENT), pooled CI error gate, CSV + metadata sidecar, warm-up tolerance, dry-run |
+| `tests/bats/soak-test.bats` | 24 | `soak-test.sh`: duration/cadence floors, fake-clock checkpoint loop, per-checkpoint CSV schema, first/last-third drift flags (THROUGHPUT-DRIFT down / LATENCY-DRIFT up), checkpoint sizing floors, abort durability, pooled CI error gate, dry-run |
 | `tests/bats/siege-tui.bats` | 135 | `siege-tui.sh`: URL/header validation, config sanitising, workload generation, exact `siege` argv, results analysis, connectivity checks, TUI prompts, `run_scenario` exit-code mapping, CLI contract |
 | `tests/bats/deepshit.bats` | 137 | `deepshit.sh`: option parsing and validation, every phase 0-6, `--all`/`--restore`/menu dispatch, endpoint matrix and per-request profile attribution, the 11-endpoint manifest, load-test authorization gate, drop-in install/rollback, result-tree layout, run-log audit trail, `--site-url` targeting, the required-`SITE_URL` contract, optional `XD_MODE_SCRIPT`, the committed executable bit, cross-invocation load-report discovery, trailing-slash normalisation, clean `die`/`ERR`-trap failure paths, plus unit tests of the lifted path builders, mtime watermark, profile poll and duration validator |
 
-Totals: **330 tests**, all passing. The two `*_E2E` suites skip unless their
+Totals: **392 tests**, all passing. The two `*_E2E` suites skip unless their
 variable is set to `1`; everything else runs unconditionally.
+
+The three performance-suite companions (`stress-test-helper.bash`,
+`spike-test-helper.bash`, `soak-test-helper.bash`) follow the same hermetic
+pattern as `load-test-helper.bash`: mocked `ab`/`curl` on a sandboxed PATH.
+The soak helper additionally mocks `date` and `sleep` around a fake wall clock
+(`$SOAK_FAKECLOCK`), so a `-d 60 -I 30` checkpoint soak runs instantly with
+exact cadence math, and scripts per-call `ab` numbers through `AB_RPS_SEQ` /
+`AB_P95_SEQ` (all three suites, since successive checkpoints/phases share
+identical `-n`/`-c`).
 
 Shell scripts are also linted with ShellCheck; `deepshit.sh` and
 `tests/bats/load-test.sh` are both clean at severity `info`:
@@ -587,6 +599,8 @@ End-to-end tests run separately via Playwright (`.github/workflows/playwright.ym
       - name: Run Playwright tests
         run: npx playwright test
 ```
+
+> **Playwright Test Agents (planner → generator → healer):** full workflow in [PLAYWRIGHT_AGENTS_GUIDE.md](PLAYWRIGHT_AGENTS_GUIDE.md).
 
 ### Pre-commit Hook
 
