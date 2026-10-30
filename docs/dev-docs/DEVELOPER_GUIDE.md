@@ -1,6 +1,6 @@
 # Developer Guide - Scriptlog
 
-**Version:** 1.9.1 | **Last Updated:** October 2026
+**Version:** 1.10.0 | **Last Updated:** October 2026
 
 ---
 
@@ -51,12 +51,14 @@
 
 | Requirement | Version | Purpose |
 |-------------|---------|---------|
-| **PHP** | 7.4 - 8.5 | Server-side runtime |
+| **PHP** | 8.3+ | Server-side runtime |
 | **MySQL/MariaDB** | 5.7+ | Database server |
 | **Apache/Nginx** | Latest | Web server |
 | **Composer** | Latest | Dependency management |
 
 > **NOTE:** PHP extensions required: `pdo`, `pdo_mysql`, `json`, `mbstring`, `curl`, `gd`, `fileinfo`, `openssl`
+
+> **NOTE:** PHP 8.3+ is the recommended runtime for this project. The codebase itself remains PHP 7.4 backwards compatible, and the PHPCompatibility sniff (`phpcs-compatibility.xml`, `testVersion 7.4-`) enforced by the pre-commit hook keeps it that way. New code may use PHP 8.3+ features only if it is guarded by a `version_compare()` check.
 
 ### Installation
 
@@ -4318,7 +4320,7 @@ SCRIPTLOG          // Security constant (HMAC hash)
 
 // Settings
 APP_TITLE          // 'Scriptlog'
-APP_VERSION        // '1.9.1'
+APP_VERSION        // '1.10.0'
 APP_DEVELOPMENT    // true or false
 ```
 
@@ -6058,4 +6060,4 @@ This project is licensed under the MIT License.
 
 ---
 
-*Last Updated: October 2026 | Version 1.9.1*
+*Last Updated: October 2026 | Version 1.10.0*
