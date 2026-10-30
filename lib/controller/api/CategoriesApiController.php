@@ -27,7 +27,7 @@ use Scriptlog\Dto\Api\PostApiDto;
 use Scriptlog\Dto\Api\TopicApiDto;
 use Scriptlog\Service\TopicService;
 
-class CategoriesApiController extends ApiController
+final class CategoriesApiController extends ApiController
 {
     /**
      * @var TopicDao
