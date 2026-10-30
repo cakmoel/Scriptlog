@@ -75,13 +75,23 @@ if (is_readable(APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'vendor/autoload.
         }
         if (function_exists('dotenv_cache_load') && function_exists('dotenv_cache_paths')) {
             list($dotenvEnvFile, $dotenvCacheFile) = dotenv_cache_paths(APP_ROOT);
-            dotenv_cache_load($dotenvEnvFile, $dotenvCacheFile, function () {
+            dotenv_cache_load($dotenvEnvFile, $dotenvCacheFile, static function () {
                 $dotenv = Dotenv\Dotenv::createImmutable(APP_ROOT);
                 $dotenv->load();
             });
         } else {
             $dotenv = Dotenv\Dotenv::createImmutable(APP_ROOT);
             $dotenv->load();
+        }
+
+        // SECURITY: Dotenv populates $_ENV and often ends up reflected in
+        // $_SERVER by server environments. Remove credential-bearing keys from
+        // $_SERVER without touching $_ENV (config.php reads $_ENV).
+        if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'utility' . DIRECTORY_SEPARATOR . 'app-environment.php')) {
+            require_once __DIR__ . DIRECTORY_SEPARATOR . 'utility' . DIRECTORY_SEPARATOR . 'app-environment.php';
+        }
+        if (function_exists('scriptlog_scrub_server_secrets')) {
+            scriptlog_scrub_server_secrets();
         }
     }
 }
@@ -141,11 +151,17 @@ if (!file_exists(APP_ROOT . 'config.php')) {
 }
 
 // Handle frontend language switch
-if (isset($_GET['switch-lang']) && !empty($_GET['switch-lang'])) {
-    $langCode = preg_replace('/[^a-z]{2}/', '', strtolower($_GET['switch-lang']));
+// SECURITY: never pass request data straight into strtolower(). An array or
+// object value (?switch-lang[]=x) raises a TypeError that used to reach the
+// Whoops debug handler and disclose credentials. Accept only a scalar string
+// that normalises to a two-letter locale code.
+$switchLang = isset($_GET['switch-lang']) ? $_GET['switch-lang'] : null;
+
+if (is_string($switchLang)) {
+    $langCode = strtolower(trim($switchLang));
     $validLocales = ['en', 'ar', 'zh', 'fr', 'ru', 'es', 'id'];
 
-    if (in_array($langCode, $validLocales)) {
+    if (preg_match('/^[a-z]{2}$/', $langCode) && in_array($langCode, $validLocales, true)) {
         $_SESSION['scriptlog_locale'] = $langCode;
         setcookie('scriptlog_locale', $langCode, time() + (86400 * 365), '/');
 

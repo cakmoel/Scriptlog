@@ -3,7 +3,7 @@
 define('DS', DIRECTORY_SEPARATOR);
 define('APP_TITLE', 'Scriptlog');
 define('APP_CODENAME', 'Maleo Senkawor');
-define('APP_VERSION', '1.9.1');
+define('APP_VERSION', '1.10.0');
 define('API_VERSION', 'v1');
 define('APP_ROOT', dirname(dirname(__FILE__)) . DS);
 define('APP_ADMIN', 'admin');
@@ -22,7 +22,21 @@ define('APP_VIDEO', APP_PUBLIC . DS . 'files' . DS . 'video' . DS);
 define('APP_DOCUMENT', APP_PUBLIC . DS . 'files' . DS . 'docs' . DS);
 define('APP_THEME', APP_PUBLIC . DS . 'themes' . DS);
 define('APP_PLUGIN', APP_ADMIN . DS . 'plugins' . DS);
-define('APP_DEVELOPMENT', true);
+
+// Load environment helper before resolving APP_DEVELOPMENT so we can read
+// .env or environment variables even if Dotenv hasn't run yet.
+if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'utility' . DIRECTORY_SEPARATOR . 'app-environment.php')) {
+    require_once __DIR__ . DIRECTORY_SEPARATOR . 'utility' . DIRECTORY_SEPARATOR . 'app-environment.php';
+}
+
+if (!defined('APP_DEVELOPMENT')) {
+    if (function_exists('scriptlog_app_is_development')) {
+        define('APP_DEVELOPMENT', scriptlog_app_is_development());
+    } else {
+        // Fail closed: default to false in production-like contexts
+        define('APP_DEVELOPMENT', false);
+    }
+}
 
 define('MESSAGE_BADREQUEST', "400 Bad Request");
 define('MESSAGE_UNPLEASANT_ATTEMPT', "Sorry, unpleasant attempt detected");

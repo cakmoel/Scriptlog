@@ -21,7 +21,7 @@ use Scriptlog\Core\Sanitize;
 use Scriptlog\Dao\MediaDao;
 use Scriptlog\Model\DownloadModel;
 
-class DownloadService
+final class DownloadService
 {
     private $downloadModel;
     private $mediaDao;

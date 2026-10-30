@@ -19,7 +19,7 @@ use Scriptlog\Core\FormValidator;
 use Scriptlog\Core\Sanitize;
 use Scriptlog\Dao\TopicDao;
 
-class TopicService
+final class TopicService
 {
     /**
      * Topic's ID

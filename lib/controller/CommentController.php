@@ -25,7 +25,7 @@ use Scriptlog\Core\Sanitize;
 use Scriptlog\Core\View;
 use Scriptlog\Service\CommentService;
 
-class CommentController extends BaseApp
+final class CommentController extends BaseApp
 {
     /**
      * view

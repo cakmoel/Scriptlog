@@ -23,7 +23,7 @@ use Scriptlog\Core\Sanitize;
 use Scriptlog\Core\View;
 use Scriptlog\Service\TopicService;
 
-class TopicController extends BaseApp
+final class TopicController extends BaseApp
 {
     private $view;
 

@@ -22,7 +22,7 @@ use Scriptlog\Core\BaseApp;
 use Scriptlog\Core\View;
 use Scriptlog\Service\DownloadService;
 
-class DownloadAdminController extends BaseApp
+final class DownloadAdminController extends BaseApp
 {
     private $downloadService;
     private $view;

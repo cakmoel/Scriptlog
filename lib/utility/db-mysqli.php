@@ -188,22 +188,35 @@ function check_table()
 
     $dbscheme = false;
 
+    $appDev = defined('APP_DEVELOPMENT')
+        ? (bool) constant('APP_DEVELOPMENT')
+        : false;
+
     if (
-        (APP_DEVELOPMENT === true) &&
-        (! (is_table_exists('tbl_comments') ||
-        is_table_exists('tbl_login_attempt') ||
-        is_table_exists('tbl_media') ||
-        is_table_exists('tbl_mediameta') ||
-        is_table_exists('tbl_media_download') ||
-        is_table_exists('tbl_menu') ||
-        is_table_exists('tbl_plugin') ||
-        is_table_exists('tbl_posts') ||
-        is_table_exists('tbl_post_topic') ||
-        is_table_exists('tbl_settings') ||
-        is_table_exists('tbl_themes') ||
-        is_table_exists('tbl_topics') ||
-        is_table_exists('tbl_users') ||
-        is_table_exists('tbl_user_token')))
+        $appDev &&
+        (! (is_table_exists('tbl_users') &&
+        is_table_exists('tbl_user_token') &&
+        is_table_exists('tbl_login_attempt') &&
+        is_table_exists('tbl_api_keys') &&
+        is_table_exists('tbl_posts') &&
+        is_table_exists('tbl_topics') &&
+        is_table_exists('tbl_post_topic') &&
+        is_table_exists('tbl_comments') &&
+        is_table_exists('tbl_media') &&
+        is_table_exists('tbl_mediameta') &&
+        is_table_exists('tbl_media_download') &&
+        is_table_exists('tbl_download_log') &&
+        is_table_exists('tbl_menu') &&
+        is_table_exists('tbl_settings') &&
+        is_table_exists('tbl_plugin') &&
+        is_table_exists('tbl_themes') &&
+        is_table_exists('tbl_theme_licenses') &&
+        is_table_exists('tbl_consents') &&
+        is_table_exists('tbl_data_requests') &&
+        is_table_exists('tbl_privacy_logs') &&
+        is_table_exists('tbl_privacy_policies') &&
+        is_table_exists('tbl_languages') &&
+        is_table_exists('tbl_translations')))
     ) {
         $dbscheme = false;
     } else {

@@ -75,6 +75,33 @@ class LogError
     }
 
     /**
+     * Determine whether a PHP error type is fatal
+     *
+     * Only fatal errors must be promoted to an exception by the shutdown
+     * handler. Warnings, notices and deprecated diagnostics are already
+     * handled by errorHandler() and must never be re-raised as an
+     * exception - doing so turns harmless conditions (for example an
+     * unwritable cache file) into a 301 redirect when APP_DEVELOPMENT is
+     * false.
+     *
+     * @param int $type PHP error type constant (E_*)
+     * @return bool
+     */
+    public static function isFatalErrorType($type): bool
+    {
+        $fatalTypes = [
+            E_ERROR,
+            E_PARSE,
+            E_CORE_ERROR,
+            E_COMPILE_ERROR,
+            E_USER_ERROR,
+            E_RECOVERABLE_ERROR,
+        ];
+
+        return in_array((int) $type, $fatalTypes, true);
+    }
+
+    /**
      * exceptionHandler
      *
      * @param object $e

@@ -23,7 +23,7 @@ use Scriptlog\Core\Session;
 use Scriptlog\Core\View;
 use Scriptlog\Service\ExportService;
 
-class ExportController extends BaseApp
+final class ExportController extends BaseApp
 {
     private $exportService;
     private $view;

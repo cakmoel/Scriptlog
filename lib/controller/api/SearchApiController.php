@@ -23,7 +23,7 @@ use Scriptlog\Core\ApiHateoas;
 use Scriptlog\Core\ApiResponse;
 use Scriptlog\Core\SearchFinder;
 
-class SearchApiController extends ApiController
+final class SearchApiController extends ApiController
 {
     /**
      * @var SearchFinder

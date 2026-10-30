@@ -15,7 +15,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @version  1.0
  */
 
-class LocaleController
+final class LocaleController
 {
     /**
      * Switch locale — handles POST from language switcher.

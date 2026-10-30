@@ -167,6 +167,7 @@ function get_table_definitions($prefix = '')
   plugin_desc tinytext,
   plugin_status enum('Y','N') NOT NULL DEFAULT 'N',
   plugin_level VARCHAR(20) NOT NULL,
+  plugin_manifest CHAR(64) DEFAULT NULL,
   plugin_sort INT(5) DEFAULT NULL,
   PRIMARY KEY(ID)
   )Engine=InnoDB DEFAULT CHARSET=utf8mb4";
@@ -329,7 +330,7 @@ function get_table_definitions($prefix = '')
     $saveAdmin    = "INSERT INTO {$prefix}tbl_users (user_login, user_email, user_pass, user_level, user_registered, `user_session`) VALUES (?, ?, ?, ?, ?, ?)";
     $saveSettings = "INSERT INTO {$prefix}tbl_settings (setting_name, setting_value) VALUES(?, ?)";
     $saveTheme   = "INSERT INTO {$prefix}tbl_themes (theme_title, theme_desc, theme_designer, theme_directory, theme_status) VALUES (?, ?, ?, ?, ?)";
-    $savePlugin  = "INSERT INTO {$prefix}tbl_plugin (plugin_name, plugin_link, plugin_directory, plugin_desc, plugin_status, plugin_level, plugin_sort) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $savePlugin  = "INSERT INTO {$prefix}tbl_plugin (plugin_name, plugin_link, plugin_directory, plugin_desc, plugin_status, plugin_level, plugin_manifest, plugin_sort) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     $insertDefaultLanguage = "INSERT INTO {$prefix}tbl_languages (lang_code, lang_name, lang_native, lang_locale, lang_direction, lang_sort, lang_is_default) VALUES ('en', 'English', 'English', 'en_US', 'ltr', 1, 1)";
 

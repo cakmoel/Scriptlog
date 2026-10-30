@@ -22,7 +22,7 @@ defined('SCRIPTLOG') || die('Direct access not permitted');
 use Scriptlog\Controller\ApiController;
 use Scriptlog\Core\ApiResponse;
 
-class ProtectedPostApiController extends ApiController
+final class ProtectedPostApiController extends ApiController
 {
     /**
      * Constructor
@@ -135,14 +135,19 @@ class ProtectedPostApiController extends ApiController
             return;
         }
 
-        $decoded_content = html_entity_decode($decrypted['post_content'], ENT_QUOTES, 'UTF-8');
-        $decoded_content = html_entity_decode($decoded_content, ENT_QUOTES, 'UTF-8');
-        $clean_content = preg_replace('/\s*style="[^"]*"/', '', $decoded_content);
-        $clean_content = preg_replace('/\s*style=[^>\s]*/', '', $clean_content);
-        $content = htmLawed($clean_content, array(
-            'deny_attribute' => 'style,onclick,onerror,onload,onmouseover,onfocus,onblur,onchange,onsubmit,onkeydown,onkeyup,onkeypress',
-            'keep_bad' => 0
-        ));
+        // Use canonical sanitizer
+        if (function_exists('sanitize_post_content')) {
+            $content = sanitize_post_content($decrypted['post_content']);
+        } else {
+            $decoded_content = html_entity_decode($decrypted['post_content'], ENT_QUOTES, 'UTF-8');
+            $decoded_content = html_entity_decode($decoded_content, ENT_QUOTES, 'UTF-8');
+            $clean_content = preg_replace('/\s*style="[^"]*"/', '', $decoded_content);
+            $clean_content = preg_replace('/\s*style=[^>\s]*/', '', $clean_content);
+            $content = function_exists('htmLawed') ? htmLawed($clean_content, array(
+                'deny_attribute' => 'style,onclick,onerror,onload,onmouseover,onfocus,onblur,onchange,onsubmit,onkeydown,onkeyup,onkeypress',
+                'keep_bad' => 0
+            )) : $clean_content;
+        }
 
         if (!isset($_SESSION)) {
             session_start();
@@ -151,7 +156,12 @@ class ProtectedPostApiController extends ApiController
         if (!isset($_SESSION['unlocked_posts'])) {
             $_SESSION['unlocked_posts'] = [];
         }
-        $_SESSION['unlocked_posts'][$postId] = $password;
+        // Store derived key, never the plaintext password
+        if (function_exists('app_key')) {
+            $_SESSION['unlocked_posts'][$postId] = hash('sha256', app_key() . $password);
+        } else {
+            $_SESSION['unlocked_posts'][$postId] = hash('sha256', $password);
+        }
 
         $this->respondWithHtmxFallback('unlock-success', [
             'content' => $content,

@@ -24,7 +24,7 @@ defined('SCRIPTLOG') || die('Direct access not permitted');
  * @psalm-suppress UnusedClass -- consumed by public/themes (single.php), which
  *                 are outside the Psalm scan tree (lib/ only).
  */
-class ProtectedPostService
+final class ProtectedPostService
 {
     /**
      * Callable responsible for decrypting a protected post's content.
@@ -72,10 +72,23 @@ class ProtectedPostService
 
         $rawContent = '';
 
-        if ($isProtected && $isUnlocked && $this->decryptPost) {
-            $decrypted = call_user_func($this->decryptPost, $id, $unlockedPosts[$id]);
-            if (isset($decrypted['post_content'])) {
-                $rawContent = $decrypted['post_content'];
+        if ($isProtected && $isUnlocked && isset($unlockedPosts[$id])) {
+            $sessionValue = $unlockedPosts[$id];
+            if (is_string($sessionValue) && preg_match('/^[a-f0-9]{64}$/', $sessionValue) && function_exists('decrypt_post_with_key')) {
+                $decrypted = decrypt_post_with_key($id, $sessionValue);
+                if (isset($decrypted['post_content'])) {
+                    $rawContent = $decrypted['post_content'];
+                }
+            } elseif (is_string($sessionValue) && $this->decryptPost) {
+                // Legacy session: contains plaintext password - migrate to derived key
+                $decrypted = call_user_func($this->decryptPost, $id, $sessionValue);
+                if (isset($decrypted['post_content'])) {
+                    $rawContent = $decrypted['post_content'];
+                }
+                if (function_exists('app_key')) {
+                    $unlockedPosts[$id] = hash('sha256', app_key() . $sessionValue);
+                    $_SESSION['unlocked_posts'][$id] = $unlockedPosts[$id];
+                }
             }
         } elseif (!$isProtected) {
             $rawContent = isset($post['post_content'])

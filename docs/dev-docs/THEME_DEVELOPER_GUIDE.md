@@ -999,19 +999,32 @@ JavaScript load order is critical for proper functionality. jQuery must load **s
 Use the CLI minification script to generate production-ready assets:
 
 ```bash
-php tmp/minify.php
+php tmp/minify.php          # every theme under public/themes/
+php tmp/minify.php blog     # only public/themes/blog/ (recommended)
 ```
+
+Passing a theme name scopes the rebuild to that directory. Without it the script
+also regenerates every other theme's `.min.css`/`.min.js` and rewrites their
+`integrity="sha384-..."` hashes, which shows up as unrelated diffs in your commit.
 
 **What it does:**
 - Scans `public/themes/*/assets/css/` for `.css` files (skips `.min.css`)
 - Scans `public/themes/*/assets/js/` for `.js` files (skips `.min.js`)
 - Generates corresponding `.min.css` and `.min.js` versions
 - Removes comments, whitespace, and redundant characters
+- Resyncs every `integrity="sha384-..."` attribute in that theme's PHP templates
 
 **When to use:**
 - After modifying source CSS/JS files
 - Before deploying to production
 - Before committing changes
+
+> **SRI coupling**: `header.php`/`footer.php` load the `.min` files with
+> `integrity="sha384-..."` + `crossorigin="anonymous"`. Regenerating a bundle
+> without resyncing the hash makes the browser refuse to execute it, so the fix
+> silently disappears - never hand-edit a hash, let `tmp/minify.php` rewrite it.
+> Syntax-check the source first (`node --check path/to/file.js`) because the
+> minifier is a regex whitespace/comment stripper, not a parser.
 
 > **Development mode:** Load source files directly (`style.css`, `front.js`) for debugging
 > **Production mode:** Load minified files (`style.sea.min.css`, `front.min.js`) for performance

@@ -8,12 +8,78 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#191---2026-10-16)
+- [Latest Release](#1100---2026-10-31)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.10.0] - 2026-10-31
+
+### Added
+- **Plugin integrity manifests**: Every plugin installed through the admin panel now records a SHA-256 digest over `plugin.ini` plus all PHP files in its directory (`tbl_plugin.plugin_manifest`); activation refuses files that no longer match
+- **Plugin manifest migration**: New CLI-only `install/migrate-plugin-manifest.php` adds the integrity column idempotently and supports an explicit `--backfill` for existing installations
+- **Plugin schema SQL allowlist**: New `validate_plugin_schema_sql()` permits only `CREATE TABLE`, `CREATE INDEX`, `ALTER TABLE ... ADD`, and `INSERT` statements against the plugin's own tables, rejecting multi-statements, comments, and destructive DDL/DML
+- **Plugin audit logging**: New `plugin_audit_log()` writes structured JSONL entries for install, activation, manifest rejection, and schema rejection events
+- **Environment detection utility**: New `scriptlog_app_is_development()` resolves `APP_DEVELOPMENT`, `APP_DEBUG`, and `APP_ENV` with a safe non-development default, and `scriptlog_scrub_server_secrets()` removes credentials from `$_SERVER`
+- **Administrator-only plugin mutations**: New `PLUGIN_MANAGE` action constant gates install, activate, deactivate, and delete; plugin listing remains available to managers
+- **Protected-post derived session keys**: New `decrypt_post_with_key()` decrypts using a keyed digest instead of storing the plaintext password in the session
+- **Rate-limit and unlock-log hardening**: The rate-limit cache and failed-unlock log directories now receive a deny-all `.htaccess` file
+- **Prism.js browser coverage**: Ten Playwright specs plus shared fixtures cover highlighting, inline code, plugins, RTL, CSP, console errors, double initialization, and accessibility
+- **Playwright Test Agents guide**: New `docs/dev-docs/PLAYWRIGHT_AGENTS_GUIDE.md` documents the planner, generator, and healer workflow
+- **Troubleshooting coverage**: Expanded guide entries for bootstrap guard failures, admin UI, and plugin integrity issues
+
+### Changed
+- **Theme upload flow**: `ThemeController` now separates form rendering, upload extraction, validation, and installation into focused helpers
+- **Plugin upload flow**: The plugin directory is derived from the archive name and must match `plugin.ini`; the manifest digest is computed before the row is written, and invalid uploads render the form with errors instead of redirecting silently
+- **Search combobox accessibility**: The suggestion list now uses `aria-activedescendant` while DOM focus stays on the input, and the active option is scrolled into view inside the popup
+- **Pagination markup**: The shared paginator partial wraps the existing pagination `<ul>` in a labelled `<nav>` instead of nesting a second `<ul>`
+- **Prism.js focus indicator**: The copy button restores a visible `:focus-visible` outline that the theme reset previously removed
+- **Controller and service finality**: Controllers and services are marked `final` where they are not intended for extension
+- **Scheduled post throttle signature**: `publishDuePostsThrottled()` now declares `string`/`int` parameters and an `int` return type
+- **PHP runtime guidance**: README and Developer Guide recommend PHP 8.3+ while documenting the retained PHP 7.4 compatibility floor
+- **Documentation**: Database Schema, Plugin Developer, Theme Developer, Testing, and Troubleshooting guides updated for manifests, upload rules, SRI hashes, and test counts
+
+### Fixed
+- **Rate limiter failure handling**: An unwritable counter file now fails open with a log entry instead of raising a warning, and the default cache path no longer produces a doubled directory separator
+- **Spurious 301 responses**: The shutdown handler promotes only genuine fatal errors, so suppressed warnings and notices can no longer turn a successful request into a redirect
+- **API session bootstrap**: `api/index.php` no longer re-registers the session save handler while a session is active, fixing 301 loops that surfaced as generic search errors
+- **Protected post legacy sessions**: Existing plaintext-password sessions still unlock once and are migrated to the derived key
+- **Language switch type safety**: `?switch-lang[]=x` and other non-scalar values are ignored instead of raising a `TypeError` in the debug handler
+- **Privacy policy CSRF ordering**: The form token is generated only after POST validation, so submissions no longer fail intermittently
+- **Privacy deletion confirmation**: Data deletion requests now require the confirmation checkbox before submission
+- **Installer table detection**: `check_table()` now requires the full expected table set and includes API keys, downloads, themes licenses, consents, data requests, privacy, language, and translation tables
+- **Whoops secret exposure**: Debug pages blacklist database, mail, key, and session credentials and no longer assume `app_url()` exists
+- **Plugin upload cleanup**: Invalid or mismatched plugin archives are deleted and reported instead of leaving partial directories behind
+
+### Security
+- **Fail-closed plugin activation**: A missing, malformed, or mismatched manifest blocks activation before any plugin code is loaded and writes an audit entry
+- **Plugin schema sandboxing**: Plugin `schema.sql` runs only through an allowlist that binds statements to the plugin's own tables
+- **Credential scrubbing**: Dotenv-loaded secrets are removed from `$_SERVER` during bootstrap without altering `$_ENV`, and Whoops blacklists common secret keys
+- **Protected-post session hardening**: Session state stores a keyed digest rather than the plaintext post password, with transparent migration for legacy sessions
+- **Plugin management authorization**: Install, activation, deactivation, and deletion are restricted to administrators
+- **Upload validation**: Plugins must match their declared directory and carry a valid integrity manifest; theme uploads retain per-form CSRF validation
+- **Cache and log exposure**: Rate-limit counters and failed-unlock logs are protected by deny-all `.htaccess` files
+- **Request input hardening**: The language switcher accepts only scalar two-letter locale codes
+
+### Deprecated
+- None
+
+### Removed
+- None
+
+### Notes
+Minor release focused on plugin supply-chain integrity, defense-in-depth for protected content, and request/bootstrap reliability. No public API, database schema, or configuration breaking changes. Existing installations should run `php install/migrate-plugin-manifest.php` and re-install or deliberately backfill plugins before activation. Test suite: 1,255 unit tests and 3,075 assertions passing (10 skipped); PHPStan clean.
+
+### Codename
+**Maleo Senkawor** (retained) – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.9.1
+- **Changes since v1.9.1**: 84 modified files and 18 new files
+
+---
 
 ## [1.9.1] - 2026-10-16
 

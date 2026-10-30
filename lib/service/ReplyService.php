@@ -19,7 +19,7 @@ use Scriptlog\Core\FormValidator;
 use Scriptlog\Core\Sanitize;
 use Scriptlog\Dao\ReplyDao;
 
-class ReplyService
+final class ReplyService
 {
     private $reply_id;
     private $post_id;

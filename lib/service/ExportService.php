@@ -26,7 +26,7 @@ use GhostExporter;
 use ScriptlogExporter;
 use WordPressExporter;
 
-class ExportService
+final class ExportService
 {
     private $dbc;
     private $userDao;

@@ -25,7 +25,7 @@ use Scriptlog\Core\View;
 use Scriptlog\Service\ConfigurationService;
 use Scriptlog\Service\LanguageService;
 
-class ConfigurationController
+final class ConfigurationController
 {
     /**
      * view

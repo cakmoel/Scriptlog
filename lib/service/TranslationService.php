@@ -9,7 +9,7 @@ use Scriptlog\Core\TranslationLoader;
 use Scriptlog\Dao\LanguageDao;
 use Scriptlog\Dao\TranslationDao;
 
-class TranslationService
+final class TranslationService
 {
     private $translationDao;
     private $languageDao;

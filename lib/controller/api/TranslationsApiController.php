@@ -10,7 +10,7 @@ use Scriptlog\Core\ApiResponse;
 use Scriptlog\Service\LanguageService;
 use Scriptlog\Service\TranslationService;
 
-class TranslationsApiController extends ApiController
+final class TranslationsApiController extends ApiController
 {
     private $translationService;
     private $languageService;
@@ -76,7 +76,11 @@ class TranslationsApiController extends ApiController
         }
     }
 
-    public function store($params = []): void
+    /**
+     * @param array<string,mixed> $params
+     * @psalm-suppress UnusedParam
+     */
+    public function store(array $params = array()): void
     {
         $this->requiresAuth = true;
 

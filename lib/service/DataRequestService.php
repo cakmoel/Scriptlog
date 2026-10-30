@@ -27,7 +27,7 @@ use Scriptlog\Dao\PrivacyLogDao;
 use Scriptlog\Dao\UserDao;
 use Scriptlog\Dao\UserTokenDao;
 
-class DataRequestService
+final class DataRequestService
 {
     /**
      * DataRequestDao

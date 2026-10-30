@@ -22,7 +22,7 @@ use Scriptlog\Dao\PostDao;
  * @version   1.0
  * @since     Since Release 1.0
  */
-class ScheduledPostService
+final class ScheduledPostService
 {
     /**
      * Name of the global enable/disable setting.
@@ -136,10 +136,10 @@ class ScheduledPostService
      * @param int $intervalSeconds Minimum seconds between checks.
      * @return int Number of posts promoted to 'publish'
      */
-    public function publishDuePostsThrottled($cacheDir, $intervalSeconds = 300)
+    public function publishDuePostsThrottled(string $cacheDir, int $intervalSeconds = 300): int
     {
-        $intervalSeconds = max(60, (int)$intervalSeconds);
-        $stampFile = rtrim((string)$cacheDir, '/\\')
+        $intervalSeconds = max(60, $intervalSeconds);
+        $stampFile = rtrim($cacheDir, '/\\')
             . DIRECTORY_SEPARATOR . 'scheduled-post-check.txt';
 
         if (is_file($stampFile)) {

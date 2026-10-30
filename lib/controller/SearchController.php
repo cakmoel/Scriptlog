@@ -18,7 +18,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 use Scriptlog\Core\SearchFinder;
 use Scriptlog\Core\ThemeRendererInterface;
 
-class SearchController
+final class SearchController
 {
     /**
      * @var SearchFinder|null

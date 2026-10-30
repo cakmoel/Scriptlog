@@ -613,7 +613,11 @@ class Authentication
             case ActionConst::PRIVACY:
             case ActionConst::WRITING:
                 return $this->requireLevel($level, ['administrator']);
+            case ActionConst::PLUGIN_MANAGE:
+                return $this->requireLevel($level, ['administrator']);
             case ActionConst::PLUGINS:
+                // Listing only; mutations require PLUGIN_MANAGE
+                return $this->requireLevel($level, ['administrator', 'manager']);
             case ActionConst::THEMES:
             case ActionConst::CONFIGURATION:
             case ActionConst::PAGES:

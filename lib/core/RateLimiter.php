@@ -44,7 +44,7 @@ class RateLimiter
      */
     public function __construct($cacheDir = null)
     {
-        $this->cacheDir = $cacheDir ?: (APP_ROOT . DS . 'public' . DS . 'cache' . DS . 'rate_limit');
+        $this->cacheDir = $cacheDir ?: (APP_ROOT . 'public' . DS . 'cache' . DS . 'rate_limit');
         $this->ensureCacheDir();
     }
 
@@ -58,6 +58,33 @@ class RateLimiter
         if (!is_dir($this->cacheDir)) {
             @mkdir($this->cacheDir, 0755, true);
         }
+        $htaccess = $this->cacheDir . DS . '.htaccess';
+        if (is_dir($this->cacheDir) && !file_exists($htaccess) && is_writable($this->cacheDir)) {
+            @file_put_contents($htaccess, "<IfModule mod_authz_core.c>\n    Require all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n    Order deny,allow\n    Deny from all\n</IfModule>\n");
+        }
+    }
+
+    /**
+     * Determine whether a counter file can be persisted
+     *
+     * Rate limiting is a best-effort protection: when the counter cannot be
+     * written (missing directory, read-only mount, or a file owned by
+     * another system user) the check() result must still allow the request
+     * instead of raising a warning that the global error handling turns
+     * into a failing response.
+     *
+     * @param string $file Counter file path
+     * @return bool
+     */
+    private function isCounterWritable($file)
+    {
+        clearstatcache(true, $file);
+
+        if (is_file($file)) {
+            return is_writable($file);
+        }
+
+        return is_dir($this->cacheDir) && is_writable($this->cacheDir);
     }
 
     /**
@@ -151,7 +178,15 @@ class RateLimiter
             return $ts > $windowStart;
         }));
 
-        @file_put_contents($file, json_encode($valid), LOCK_EX);
+        if (!$this->isCounterWritable($file)) {
+            // Fail open: an unwritable counter must not break the request.
+            error_log('RateLimiter: counter file is not writable: ' . $file);
+            return;
+        }
+
+        if (@file_put_contents($file, json_encode($valid), LOCK_EX) === false) {
+            error_log('RateLimiter: unable to persist counter file: ' . $file);
+        }
     }
 
     /**

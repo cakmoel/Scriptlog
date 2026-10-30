@@ -39,8 +39,8 @@ class PluginDao extends Dao
     public function getPlugins($orderBy = 'ID')
     {
 
-        $sql = "SELECT ID, plugin_name, plugin_link, plugin_directory, plugin_desc, 
-            plugin_status, plugin_level,
+        $sql = "SELECT ID, plugin_name, plugin_link, plugin_directory, plugin_desc,
+            plugin_status, plugin_level, plugin_manifest,
             plugin_sort FROM tbl_plugin ORDER BY '$orderBy' DESC";
 
         $this->setSQL($sql);
@@ -63,8 +63,8 @@ class PluginDao extends Dao
     {
         $idsanitized = $this->filteringId($sanitize, $id, 'sql');
 
-        $sql = "SELECT ID, plugin_name, plugin_link, plugin_directory, plugin_desc, 
-             plugin_status, plugin_level, plugin_sort 
+        $sql = "SELECT ID, plugin_name, plugin_link, plugin_directory, plugin_desc,
+             plugin_status, plugin_level, plugin_manifest, plugin_sort
              FROM tbl_plugin WHERE ID = ?";
 
         $this->setSQL($sql);
@@ -76,6 +76,11 @@ class PluginDao extends Dao
 
     /**
      * Insert new plugin
+     *
+     * `plugin_manifest` is optional so legacy callers keep working; when it is
+     * absent the row is stored with a NULL manifest, which
+     * plugin_manifest_verify() treats as "unverifiable" and therefore blocks
+     * activation until the plugin is reinstalled or backfilled.
      *
      * @param array $bind
      *
@@ -94,6 +99,7 @@ class PluginDao extends Dao
             'plugin_directory' => $bind['plugin_directory'],
             'plugin_desc' => $bind['plugin_desc'],
             'plugin_level' => $bind['plugin_level'],
+            'plugin_manifest' => isset($bind['plugin_manifest']) ? $bind['plugin_manifest'] : null,
             'plugin_sort' => $plugin_sorted
         ]);
 
@@ -320,9 +326,9 @@ class PluginDao extends Dao
      */
     public function findPluginsEnabled($plugin_level)
     {
-        $sql = "SELECT ID, plugin_name, plugin_link, plugin_directory, plugin_desc, 
+        $sql = "SELECT ID, plugin_name, plugin_link, plugin_directory, plugin_desc,
             plugin_status, plugin_level, plugin_sort
-            FROM tbl_plugin 
+            FROM tbl_plugin
             WHERE plugin_level = ?
             AND plugin_status = 'Y' ORDER BY plugin_name";
 
@@ -348,5 +354,27 @@ class PluginDao extends Dao
         $stmt = $this->findColumn([$plugin_name]);
 
         return ($stmt == 1) ? true : false;
+    }
+
+    /**
+     * Execute a validated schema statement
+     *
+     * @param string $sql
+     * @return bool
+     * @psalm-suppress PossiblyUnusedMethod
+     * @codeCoverageIgnore
+     */
+    public function executeValidatedSchemaStatement($sql)
+    {
+        if (!is_string($sql) || trim($sql) === '') {
+            return false;
+        }
+
+        try {
+            $this->dbc->dbQuery($sql);
+            return true;
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 }

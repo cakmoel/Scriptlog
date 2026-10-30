@@ -23,7 +23,7 @@ use Scriptlog\Core\LogError;
 use Scriptlog\Core\View;
 use Scriptlog\Service\PluginService;
 
-class PluginController extends BaseApp
+final class PluginController extends BaseApp
 {
     /**
      * view
@@ -74,6 +74,7 @@ class PluginController extends BaseApp
         if (isset($_SESSION['error'])) {
             ($_SESSION['error'] == 'pluginNotFound') ? array_push($errors, "Error: Plugin Not Found!") : "";
             ($_SESSION['error'] == 'tableNotFound') ? array_push($errors, "Error: Table Plugin Not Found") : "";
+            ($_SESSION['error'] == 'pluginManifestInvalid') ? array_push($errors, "Error: Plugin files failed the integrity check, so activation was refused. Reinstall the plugin from a trusted archive.") : "";
             unset($_SESSION['error']);
         }
         return $errors;
@@ -141,7 +142,20 @@ class PluginController extends BaseApp
                 return $this->view->render();
             }
 
-            $this->saveInstalledPlugin($file_name);
+            $this->saveInstalledPlugin($file_name, $errors);
+
+            if (!empty($errors)) {
+                $this->setView('install-plugin');
+                $this->setPageTitle('Upload Plugin');
+                $this->setFormAction(ActionConst::INSTALLPLUGIN);
+                $this->view->set('pageTitle', $this->getPageTitle());
+                $this->view->set('formAction', $this->getFormAction());
+                $this->view->set('errors', $errors);
+                $this->view->set('formData', $_POST);
+                $this->view->set('pluginLevel', $this->pluginService->pluginLevelDropDown());
+                $this->view->set('csrfToken', csrf_generate_token('csrfToken'));
+                return $this->view->render();
+            }
         } catch (\Throwable $th) {
             LogError::setStatusCode(http_response_code());
             LogError::exceptionHandler($th);
@@ -229,27 +243,85 @@ class PluginController extends BaseApp
         return $checkError;
     }
 
-    private function saveInstalledPlugin($file_name)
+    /**
+     * Persist the plugin described by the extracted plugin.ini.
+     *
+     * The plugin directory name is derived from the ZIP file name (the same
+     * convention upload_plugin() uses when extracting) and must agree with
+     * `plugin_directory` in plugin.ini. A manifest digest over plugin.ini plus
+     * every PHP file is recorded in tbl_plugin.plugin_manifest so activation can
+     * later detect any post-install modification.
+     *
+     * @param string $file_name Uploaded ZIP file name
+     * @param array  $errors    Collects user-facing errors; empty on success
+     * @return bool True when the plugin row was written (the caller is redirected)
+     */
+    private function saveInstalledPlugin($file_name, &$errors = array())
     {
-        $plugin_ini_path = __DIR__ . '/../../' . APP_PLUGIN . basename($file_name, '.zip') . DS . 'plugin.ini';
+        $errors = array();
 
-        if (file_exists($plugin_ini_path)) {
-            $plugin_ini = parse_ini_file($plugin_ini_path);
+        $plugin_dir_name = basename(current(explode('.', (string)$file_name)));
 
-            $plugin_link = generate_request('index.php', 'get', [$plugin_ini['plugin_loader'], $plugin_ini['plugin_action'], 0])['link'];
-
-            $this->pluginService->setPluginName($plugin_ini['plugin_name']);
-            $this->pluginService->setPluginLink($plugin_link);
-            $this->pluginService->setPluginDirectory($plugin_ini['plugin_directory']);
-            $this->pluginService->setPluginDescription($plugin_ini['plugin_description']);
-            $this->pluginService->setPluginLevel($plugin_ini['plugin_level']);
-            $this->pluginService->addPlugin();
-
-            $_SESSION['status'] = "pluginInstalled";
-            direct_page("index.php?load=plugins&status=pluginInstalled", 302);
-        } else {
-            direct_page("index.php?load=plugins", 302);
+        if ($plugin_dir_name === '' || $plugin_dir_name === '.' || $plugin_dir_name === '..') {
+            array_push($errors, "Invalid plugin directory");
+            return false;
         }
+
+        $plugin_root = __DIR__ . '/../../' . APP_PLUGIN . $plugin_dir_name;
+        $plugin_ini_path = $plugin_root . DS . 'plugin.ini';
+
+        if (!file_exists($plugin_ini_path)) {
+            direct_page("index.php?load=plugins", 302);
+            return false;
+        }
+
+        $plugin_ini = parse_ini_file($plugin_ini_path);
+
+        if (!is_array($plugin_ini) || !isset($plugin_ini['plugin_name'])) {
+            array_push($errors, "Invalid plugin configuration (plugin.ini)");
+            return false;
+        }
+
+        $declared_directory = isset($plugin_ini['plugin_directory'])
+            ? basename(trim((string)$plugin_ini['plugin_directory']))
+            : '';
+
+        if ($declared_directory === '' || $declared_directory === '.' || $declared_directory === '..') {
+            // Legacy plugins omit plugin_directory: fall back to the archive name.
+            $declared_directory = $plugin_dir_name;
+        }
+
+        if ($declared_directory !== $plugin_dir_name) {
+            delete_directory($plugin_root);
+            array_push($errors, "Plugin directory in plugin.ini does not match the uploaded archive");
+            return false;
+        }
+
+        if (file_exists(__DIR__ . '/../utility/plugin-manifest.php')) {
+            require_once __DIR__ . '/../utility/plugin-manifest.php';
+        }
+
+        $manifest = function_exists('plugin_manifest_hash') ? plugin_manifest_hash($plugin_root) : false;
+
+        if ($manifest === false) {
+            delete_directory($plugin_root);
+            array_push($errors, "Unable to compute plugin integrity manifest");
+            return false;
+        }
+
+        $plugin_link = generate_request('index.php', 'get', [$plugin_ini['plugin_loader'], $plugin_ini['plugin_action'], 0])['link'];
+
+        $this->pluginService->setPluginName($plugin_ini['plugin_name']);
+        $this->pluginService->setPluginLink($plugin_link);
+        $this->pluginService->setPluginDirectory($declared_directory);
+        $this->pluginService->setPluginDescription($plugin_ini['plugin_description']);
+        $this->pluginService->setPluginLevel($plugin_ini['plugin_level']);
+        $this->pluginService->setPluginManifest($manifest);
+        $this->pluginService->addPlugin();
+
+        $_SESSION['status'] = "pluginInstalled";
+        direct_page("index.php?load=plugins&status=pluginInstalled", 302);
+        return true;
     }
 
     public function update($id)

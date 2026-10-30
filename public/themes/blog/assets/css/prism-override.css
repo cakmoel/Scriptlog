@@ -18,3 +18,12 @@ code[class*="language-"] {
     font-size: 0.9em;
     color: #e83e8c;
 }
+
+/* Keyboard users: restore a visible focus indicator on the Prism copy
+   button. The theme reset forces button{outline:none!important}, which also
+   defeats the global :focus-visible rule. #07a matches the Prism keyword
+   color and keeps 4.4:1+ contrast on the light toolbar background. */
+div.code-toolbar > .toolbar > .toolbar-item > button:focus-visible {
+    outline: 2px solid #07a !important;
+    outline-offset: 2px;
+}

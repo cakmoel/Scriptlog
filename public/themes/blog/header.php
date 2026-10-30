@@ -68,8 +68,8 @@ if (function_exists('theme_dir')) :
 <!-- Prism.js syntax highlighting -->
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/prism/prism.css" integrity="sha384-+GkyFJeCCbBA3eRVrMwWcofk/aYW0UuRmirJN+mz8EfLFObEXVbVNYYmqROjxjDM" crossorigin="anonymous" media="print">
 <noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/vendor/prism/prism.css" integrity="sha384-+GkyFJeCCbBA3eRVrMwWcofk/aYW0UuRmirJN+mz8EfLFObEXVbVNYYmqROjxjDM" crossorigin="anonymous"></noscript>
-<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/prism-override.min.css" integrity="sha384-eoZdp54lW+jvWpkqC0BiMFINdqqFckG0ZuqgPvrQjrZucHm3OWupwDBo1D8cSzrC" crossorigin="anonymous" media="print">
-<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/prism-override.min.css" integrity="sha384-eoZdp54lW+jvWpkqC0BiMFINdqqFckG0ZuqgPvrQjrZucHm3OWupwDBo1D8cSzrC" crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/prism-override.min.css" integrity="sha384-FynhRoijFnUp6ZpaZDOqkePRzt72UFrc55fFeNxubraxvcyw+ndiqR63Q5nd05nV" crossorigin="anonymous" media="print">
+<noscript><link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/prism-override.min.css" integrity="sha384-FynhRoijFnUp6ZpaZDOqkePRzt72UFrc55fFeNxubraxvcyw+ndiqR63Q5nd05nV" crossorigin="anonymous"></noscript>
     <?php if (is_rtl()) : ?>
 <link rel="stylesheet" href="<?= theme_dir(); ?>assets/css/rtl.min.css" integrity="sha384-K0RODyvrBSyO0LWBpmt4OSQVXVpa2uGgM5qtK9sSwPQFD2tnSOJbO+pkAaEnFSGg" crossorigin="anonymous">
     <?php endif; ?>

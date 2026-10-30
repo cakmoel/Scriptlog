@@ -8,7 +8,7 @@ use Scriptlog\Core\ServiceException;
 use Scriptlog\Core\View;
 use Scriptlog\Service\LanguageService;
 
-class LanguageController
+final class LanguageController
 {
     private $languageService;
     private $view;
