@@ -78,6 +78,14 @@ class ActionConst
 
     // action constant for plugin functionality
     public const PLUGINS          = "plugins";
+    /**
+     * PLUGIN_MANAGE
+     *
+     * Administrator-only plugin mutation actions.
+     *
+     * @var string
+     */
+    public const PLUGIN_MANAGE    = "pluginManage";
     public const INSTALLPLUGIN    = "installPlugin";
     public const ACTIVATEPLUGIN   = "activatePlugin";
     public const DEACTIVATEPLUGIN = "deactivatePlugin";
