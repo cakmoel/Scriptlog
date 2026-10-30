@@ -26,7 +26,7 @@ use Scriptlog\Dao\CommentDao;
 use Scriptlog\Dto\Api\CommentApiDto;
 use Scriptlog\Service\CommentService;
 
-class CommentsApiController extends ApiController
+final class CommentsApiController extends ApiController
 {
     /**
      * @var CommentDao
