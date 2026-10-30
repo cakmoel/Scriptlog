@@ -16,7 +16,11 @@
  *
  * Accessibility:
  * - Input is role=combobox (see sidebar.php); dropdown is role=listbox,
- *   items role=option with aria-selected roving highlight.
+ *   items role=option with aria-selected + aria-activedescendant.
+ * - DOM focus stays on the input while navigating (WAI-ARIA 1.2 combobox
+ *   pattern). The active option is announced through
+ *   aria-activedescendant and scrolled into view manually, because the
+ *   popup scrolls (max-height) and focus no longer does it for us.
  * - ArrowUp/ArrowDown move, Enter opens the highlighted hit (or submits
  *   the full-page form), Escape dismisses.
  */
@@ -278,7 +282,7 @@
                     this.format(this.i18n.no_results || 'No results found for "%keyword%"', { keyword: keyword }) +
                     '</div>'
                 ).addClass('show');
-                this.input.attr('aria-expanded', 'true');
+                this.input.attr('aria-expanded', 'true').removeAttr('aria-activedescendant');
                 return;
             }
 
@@ -298,7 +302,7 @@
                     : '';
 
                 html +=
-                    '<div class="search-result-item" role="option" aria-selected="false" data-index="' + index + '">' +
+                    '<div class="search-result-item" role="option" id="' + self.optionId(index) + '" aria-selected="false" data-index="' + index + '">' +
                     '<a href="' + self.escapeHtml(item.url) + '" tabindex="-1">' +
                     '<div class="search-result-title">' + self.escapeHtml(item.title) + '</div>' +
                     (item.excerpt ? '<div class="search-result-excerpt">' + self.escapeHtml(item.excerpt) + '</div>' : '') +
@@ -319,9 +323,35 @@
             }
 
             this.results.html(html).addClass('show');
-            this.input.attr('aria-expanded', 'true');
+            this.input.attr('aria-expanded', 'true').removeAttr('aria-activedescendant');
         },
 
+        /**
+         * Build the DOM id that aria-activedescendant points at.
+         *
+         * The listbox id is used as prefix so two widgets on one page can
+         * never produce colliding option ids.
+         *
+         * @param {number} index Zero-based suggestion index.
+         * @returns {string} Option element id.
+         */
+        optionId: function(index) {
+            var base = this.results.attr('id') || 'search-results';
+            return base + '-option-' + index;
+        },
+
+        /**
+         * Move the roving highlight and update the combobox state.
+         *
+         * Focus deliberately stays on the input: the WAI-ARIA 1.2 combobox
+         * pattern owns ArrowUp/ArrowDown/Enter/Escape on the input, so moving
+         * DOM focus onto the suggestion link (the old behaviour) sent every
+         * subsequent key to the <a> and left the highlight stuck on the
+         * first hit.
+         *
+         * @param {number} step +1 for ArrowDown, -1 for ArrowUp.
+         * @returns {void}
+         */
         moveActive: function(step) {
             var items = this.results.find('.search-result-item');
             if (!items.length) {
@@ -336,10 +366,41 @@
             items.attr('aria-selected', 'false').removeClass('active');
             var current = items.eq(this.activeIndex);
             current.attr('aria-selected', 'true').addClass('active');
-            var link = current.find('a').first();
-            if (link.length) {
-                link.focus();
-                this.input.attr('aria-activedescendant', '');
+
+            var optionId = current.attr('id');
+            if (optionId) {
+                this.input.attr('aria-activedescendant', optionId);
+            }
+
+            this.scrollActiveIntoView(current);
+        },
+
+        /**
+         * Keep the active option visible inside the scrollable popup.
+         *
+         * The popup is `max-height: 400px; overflow-y: auto` (custom.css), so
+         * with up to ten hits the highlight can sit below the fold. Focus used
+         * to scroll it into view for free; with focus on the input this has to
+         * be done explicitly.
+         *
+         * @param {jQuery} item Active `.search-result-item`.
+         * @returns {void}
+         */
+        scrollActiveIntoView: function(item) {
+            var container = this.results.get(0);
+            var element = item.get(0);
+
+            if (!container || !element || container.scrollHeight <= container.clientHeight) {
+                return;
+            }
+
+            var containerRect = container.getBoundingClientRect();
+            var itemRect = element.getBoundingClientRect();
+
+            if (itemRect.top < containerRect.top) {
+                container.scrollTop -= (containerRect.top - itemRect.top);
+            } else if (itemRect.bottom > containerRect.bottom) {
+                container.scrollTop += (itemRect.bottom - containerRect.bottom);
             }
         },
 
@@ -380,7 +441,7 @@
             this.results.html('<div class="search-loading" role="status"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> ' +
                 this.escapeHtml(this.i18n.loading || 'Searching...') +
                 '</div>').addClass('show');
-            this.input.attr('aria-expanded', 'true');
+            this.input.attr('aria-expanded', 'true').removeAttr('aria-activedescendant');
         },
 
         showError: function(message) {
@@ -394,7 +455,7 @@
 
         hideResults: function() {
             this.results.removeClass('show');
-            this.input.attr('aria-expanded', 'false');
+            this.input.attr('aria-expanded', 'false').removeAttr('aria-activedescendant');
             this.activeIndex = -1;
         },
 
