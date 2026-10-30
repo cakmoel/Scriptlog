@@ -104,12 +104,12 @@
 <script src="<?= theme_dir(); ?>assets/js/jquery.pause.min.js" integrity="sha384-ozxO7tw8nUwiSvQ7WYLD9xV5KlhtBKrlM3ej/cvXGEdJgc7NDJxAEzm9f/dzi5Ne" crossorigin="anonymous" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/jquery.easing.min.js" integrity="sha384-leGYpHE9Tc4N9OwRd98xg6YFpB9shlc/RkilpFi0ljr3QD4tFoFptZvgnnzzwG4Q" crossorigin="anonymous" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/comment-submission.min.js" integrity="sha384-e21I4bx+tVEYvldpcE+4d9vMlBm1dIdbb66mNYFMz3t/buoe4iW0YOaTJFUY2EGr" crossorigin="anonymous" defer></script>
-<script src="<?= theme_dir(); ?>assets/js/load-comment.min.js?v=1.2" integrity="sha384-vKCnv4TzMuEMlGpns0/f5PdNtj3UmyfLl3x33uLcMMpOb/hZnjPabqy3+ZaOH4p4" crossorigin="anonymous" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/load-comment.min.js?v=04237e4b45b2" integrity="sha384-vKCnv4TzMuEMlGpns0/f5PdNtj3UmyfLl3x33uLcMMpOb/hZnjPabqy3+ZaOH4p4" crossorigin="anonymous" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/validator.min.js" integrity="sha384-IVLGjVZ5yAK+F5rq00pVxaH2zVPOHaexaLQTy+iLpU8XTO4vdBpAxwX3VvilNzFe" crossorigin="anonymous" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/wow.min.js" integrity="sha384-XOseRua7mFtme3Rj2toJG4TV6dhOfTuxqFD12kXAlEvssIFjcpwaC/MTx8+6BUPN" crossorigin="anonymous" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/sina-nav.min.js" integrity="sha384-9iszGKzSIhu1BEKZdzZuu6WOLXRZuvE1AMg5nLn+Zi1t2C09NuIEywYzOk/lAJ1P" crossorigin="anonymous" defer></script>
-<script src="<?= theme_dir(); ?>assets/js/cookie-consent.min.js" integrity="sha384-XdGHyJxPYVxaEsjfP8Z9oOsuz4p6sGT1QlLhML1gTcGIfUGBpNtM+FKOqSdKxNIE" crossorigin="anonymous" defer></script>
-<script src="<?= theme_dir(); ?>assets/js/search.min.js" integrity="sha384-WvuIUwbTx4g+W6iLzmKcvEpocHrJNIwHk9oolNUXWxL05M3ZIBK3s2keICbAhVXc" crossorigin="anonymous" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/cookie-consent.min.js?v=a488ee89b0fd" integrity="sha384-lPyR6KU9DCMcBOo3jowiRVYtirxMUeNzdNJGdTZT1rPSHNHrdYACjfQVzm8tEaK2" crossorigin="anonymous" defer></script>
+<script src="<?= theme_dir(); ?>assets/js/search.min.js" integrity="sha384-kSO9x70Y/bJuM1Do4B9JKgWFwf+dZzDFQHzz4aUb+QZBHHhY2VNqVuYGKrerhtTl" crossorigin="anonymous" defer></script>
 <script src="<?= theme_dir(); ?>assets/js/unlock-post.min.js" integrity="sha384-NkKzpDeSB682ZQqYMFuEcsghhPX6gzWxD8phHVGSijG/yQM8t2TcskjfBr8GAo1J" crossorigin="anonymous" defer></script>
 <?php if (is_rtl()) : ?>
 <script src="<?= theme_dir(); ?>assets/js/rtl.min.js" integrity="sha384-1+uymlvUWF7Mb7OqV3KH8vk4U+VtQ7p0j7e3HDd2yOZq/8fqkK0BwaeonSlO1+KR" crossorigin="anonymous" defer></script>
