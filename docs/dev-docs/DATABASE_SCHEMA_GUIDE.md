@@ -1,6 +1,6 @@
 # Database Schema Guide
 
-**Version:** 1.9.1 | **Last Updated:** October 2026
+**Version:** 1.10.0 | **Last Updated:** October 2026
 
 This guide documents every table in the Scriptlog database. It is written for developers of all levels, from beginners setting up their first installation to senior developers extending the schema.
 
@@ -334,10 +334,13 @@ Registered plugins.
 | `plugin_directory` | VARCHAR(100) NOT NULL | Directory the plugin loads from |
 | `plugin_desc` | TINYTEXT DEFAULT NULL | Description |
 | `plugin_status` | ENUM('Y','N') NOT NULL DEFAULT 'N' | `Y` active, `N` inactive |
-| `plugin_level` | VARCHAR(20) NOT NULL | Minimum user level allowed to use it |
+| `plugin_level` | VARCHAR(20) NOT NULL | Admin-UI visibility hint only (see the Plugin Developer Guide); does **not** gate frontend execution |
+| `plugin_manifest` | CHAR(64) DEFAULT NULL | SHA-256 over `plugin.ini` plus every PHP file in the plugin directory, recorded at install time and re-verified before activation. `NULL` means "unverifiable" and blocks activation |
 | `plugin_sort` | INT DEFAULT NULL | Ordering |
 
 Indexes: PRIMARY KEY (`ID`).
+
+> Note (plugin manifest integrity, `plan/RCE_REMEDIATION_OCTOBER2026_PLAN.md` §2.7–2.8): installations created before `plugin_manifest` was added to the installer get the column by running `install/migrate-plugin-manifest.php` (CLI only; idempotent `INFORMATION_SCHEMA` guard, safe to run twice). Existing plugin rows are left `NULL`, which refuses activation until the plugin is re-installed or the rows are deliberately backfilled with `php install/migrate-plugin-manifest.php --backfill` after verifying the plugin directories on disk. Fresh installations seed the bundled `hello-world` plugin with its digest already recorded.
 
 ### tbl_themes
 
