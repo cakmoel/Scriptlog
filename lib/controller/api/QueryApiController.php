@@ -36,7 +36,7 @@ use Scriptlog\Service\PostService;
 /**
  * @psalm-suppress UnusedClass
  */
-class QueryApiController extends ApiController
+final class QueryApiController extends ApiController
 {
     /**
      * @var PostService
