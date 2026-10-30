@@ -26,7 +26,7 @@ use Scriptlog\Dao\PostDao;
 use Scriptlog\Dto\Api\PostApiDto;
 use Scriptlog\Service\PostService;
 
-class ArchivesApiController extends ApiController
+final class ArchivesApiController extends ApiController
 {
     /**
      * @var ApiHateoas
