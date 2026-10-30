@@ -570,8 +570,29 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
             $plugin_level = "administrator";
             $plugin_sort = 1;
 
+            /**
+             * Record the integrity manifest for the bundled plugin so it can be
+             * activated without a manual backfill. plugin_manifest_hash()
+             * covers plugin.ini plus every PHP file in the plugin directory and
+             * fails closed (NULL) when the directory is not readable.
+             */
+            $plugin_manifest = null;
+            $plugin_manifest_utility = APP_PATH . 'lib' . DIRECTORY_SEPARATOR . 'utility' . DIRECTORY_SEPARATOR . 'plugin-manifest.php';
+
+            if (file_exists($plugin_manifest_utility)) {
+                require_once $plugin_manifest_utility;
+                if (function_exists('plugin_manifest_hash')) {
+                    $plugin_manifest_digest = plugin_manifest_hash(
+                        APP_PATH . 'admin' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $plugin_directory
+                    );
+                    if ($plugin_manifest_digest !== false) {
+                        $plugin_manifest = $plugin_manifest_digest;
+                    }
+                }
+            }
+
             $recordPlugin = $link->prepare($savePlugin);
-            $recordPlugin->bind_param("ssssssi", $plugin_name, $plugin_link, $plugin_directory, $plugin_desc, $plugin_status, $plugin_level, $plugin_sort);
+            $recordPlugin->bind_param("sssssssi", $plugin_name, $plugin_link, $plugin_directory, $plugin_desc, $plugin_status, $plugin_level, $plugin_manifest, $plugin_sort);
             $recordPlugin->execute();
 
             if ($recordAppKey->affected_rows > 0) {
