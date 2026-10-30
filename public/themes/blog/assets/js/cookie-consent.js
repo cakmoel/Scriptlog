@@ -30,8 +30,18 @@
             // Set API endpoint
             this.apiEndpoint = this.getApiEndpoint();
 
-            // Check if consent already given
-            if (!this.hasConsentCookie()) {
+            // Check if consent already given. Any failure while reading cookies
+            // must fall through to showing the banner: asking again is the safe
+            // (GDPR) default, staying hidden is not.
+            let hasConsent = false;
+
+            try {
+                hasConsent = this.hasConsentCookie();
+            } catch (error) {
+                hasConsent = false;
+            }
+
+            if (!hasConsent) {
                 // Show banner after a short delay
                 setTimeout(() => {
                     this.showBanner();
@@ -76,17 +86,28 @@
 
         /**
          * Get cookie value by name
+         *
+         * Only the matched cookie value is decoded. Decoding the whole
+         * `document.cookie` string throws a URIError as soon as any unrelated
+         * cookie on the domain holds a literal '%', which used to abort init()
+         * and leave the consent banner permanently hidden.
          */
         getCookieValue: function(name) {
-            const decodedCookie = decodeURIComponent(document.cookie);
-            const ca = decodedCookie.split(';');
-            for (let i = 0; i < ca.length; i++) {
-                let c = ca[i];
+            const cookies = document.cookie ? document.cookie.split(';') : [];
+
+            for (let i = 0; i < cookies.length; i++) {
+                let c = cookies[i];
                 while (c.charAt(0) === ' ') {
                     c = c.substring(1);
                 }
                 if (c.indexOf(name + '=') === 0) {
-                    return c.substring(name.length + 1, c.length);
+                    const value = c.substring(name.length + 1, c.length);
+                    try {
+                        return decodeURIComponent(value);
+                    } catch (error) {
+                        // Keep the raw value instead of breaking the whole banner
+                        return value;
+                    }
                 }
             }
             return null;
@@ -97,7 +118,8 @@
          */
         hasConsentCookie: function() {
             const status = this.getCookieValue(this.cookieName);
-            if (status === null) {
+
+            if (status !== 'accepted' && status !== 'rejected') {
                 return false;
             }
 
