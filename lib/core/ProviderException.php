@@ -24,8 +24,6 @@ class ProviderException extends \Exception implements IProviderThrowable
     public function __construct($message = null, $code = 0, ?\Exception $previous = null)
     {
 
-        $code = $this->getCode();
-
         if (!$message) {
             throw new $this('Unknown' . get_class($this));
         }
