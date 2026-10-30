@@ -22,7 +22,7 @@ class ActivatePluginCmd implements AdminActionCommand
         $pluginController = $context['pluginController'];
         $pluginId = (int)$context['id'];
 
-        if (false === $app->authenticator->userAccessControl(ActionConst::PLUGINS)) {
+        if (false === $app->authenticator->userAccessControl(ActionConst::PLUGIN_MANAGE)) {
             direct_page('index.php?load=403&forbidden=' . forbidden_id(), 403);
         }
 
