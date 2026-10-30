@@ -20,7 +20,7 @@ use Scriptlog\Core\Sanitize;
 use Scriptlog\Dao\MediaDao;
 use Scriptlog\Model\DownloadModel;
 
-class MediaService
+final class MediaService
 {
     /**
      * Id
