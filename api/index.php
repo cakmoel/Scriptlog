@@ -72,8 +72,19 @@ ob_start();
 require_once __DIR__ . '/../lib/main.php';
 
 // Ensure sessions are properly started for API requests that need authentication
-// This is needed for endpoints like media upload which require admin session
-if (isset($app->sessionMaker)) {
+// This is needed for endpoints like media upload which require admin session.
+//
+// IMPORTANT: lib/main.php -> Bootstrap::createSession() already installs the
+// SessionMaker save handler and starts the session. Calling
+// session_set_save_handler() again while the session is active raises
+// "Session save handler cannot be changed when a session is active", which the
+// application error handler promotes to an ErrorException. Because
+// MessageLog::exceptionHandler() redirects with a 301 when APP_DEVELOPMENT is
+// false, every API request ended up as a 301 loop back to /api/index.php -
+// surfacing in the sidebar autocomplete as the generic
+// "An error occurred during search. Please try again later." message.
+// Only bootstrap the session here when it is genuinely not running.
+if (isset($app->sessionMaker) && session_status() !== PHP_SESSION_ACTIVE) {
     session_save_path(resolve_session_save_path());
     session_set_save_handler($app->sessionMaker, true);
     register_shutdown_function('session_write_close');
