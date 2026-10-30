@@ -15,7 +15,7 @@ use Scriptlog\Core\View;
 use Scriptlog\Service\LanguageService;
 use Scriptlog\Service\TranslationService;
 
-class TranslationController
+final class TranslationController
 {
     private $translationService;
     private $languageService;
