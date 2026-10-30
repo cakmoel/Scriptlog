@@ -1,6 +1,9 @@
 <?php
 
-defined('SCRIPTLOG') || die("Direct access not permitted");
+// Allow inclusion during bootstrap
+if (!defined('SCRIPTLOG') && !defined('SCRIPTLOG_BOOTSTRAP')) {
+    define('SCRIPTLOG_BOOTSTRAP', true);
+}
 
 /**
  * dotenv_cache_load
