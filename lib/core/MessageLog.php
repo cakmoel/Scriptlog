@@ -92,7 +92,10 @@ MSG;
         $line = $exception->getLine();
         $responseCode = http_response_code();
 
-        if (APP_DEVELOPMENT === true) {
+        /**
+         * @psalm-suppress TypeDoesNotContainType
+         */
+        if (defined('APP_DEVELOPMENT') && APP_DEVELOPMENT) {
             $msg = <<<MSG
         <div class="content-wrapper">
         <section class="content-header">
