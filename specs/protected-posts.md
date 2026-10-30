@@ -109,7 +109,7 @@ The API endpoint is always `/api/v1/posts/{id}/unlock` (independent of permalink
 | Field | Value |
 |-------|-------|
 | Username | `administrator` |
-| Password | `$E2E_ADMIN_PASS` |
+| Password | `4dMin(*)^` |
 | Role | `administrator` |
 
 ### 9.4 Weak Password for Validation Tests
@@ -529,7 +529,7 @@ Headers:
 
 ### Preconditions
 
-- User is logged in as **administrator** (`administrator` / `$E2E_ADMIN_PASS`)
+- User is logged in as **administrator** (`administrator` / `4dMin(*)^`)
 - Protected post exists (ID=3)
 
 ### User Actions
