@@ -24,7 +24,7 @@ use Scriptlog\Core\Sanitize;
 use Scriptlog\Core\View;
 use Scriptlog\Service\ThemeService;
 
-class ThemeController extends BaseApp
+final class ThemeController extends BaseApp
 {
     private $view;
 
@@ -161,63 +161,97 @@ class ThemeController extends BaseApp
     /**
      * setupTheme
      *
+     * Handles the theme upload form: GET renders the install form, POST
+     * validates and installs the uploaded zip. Delegates rendering and
+     * upload processing to focused private helpers.
+     *
+     * @return mixed Rendered view output
      */
     public function setupTheme()
     {
-        $errors = array();
-        $checkError = true;
-
         if (!isset($_POST['themeFormSubmit'])) {
-            $this->setView('install-template');
-            $this->setPageTitle('Upload Theme');
-            $this->setFormAction(ActionConst::INSTALLTHEME);
-            $this->view->set('pageTitle', $this->getPageTitle());
-            $this->view->set('formAction', $this->getFormAction());
-            $this->view->set('csrfToken', csrf_generate_token('csrfThemeInstall'));
-            return $this->view->render();
+            return $this->renderInstallThemeForm();
         }
 
+        try {
+            $errors = array();
+            if (!$this->processThemeInstall($errors)) {
+                return $this->renderInstallThemeForm($errors);
+            }
+        } catch (\Throwable $th) {
+            LogError::setStatusCode(http_response_code());
+            LogError::exceptionHandler($th);
+        }
+
+        return $this->view->render();
+    }
+
+    /**
+     * Render the theme upload form, optionally carrying validation errors.
+     *
+     * @param array|null $errors Validation error messages, or null for a clean form
+     * @return mixed Rendered view output
+     */
+    private function renderInstallThemeForm(?array $errors = null)
+    {
+        $this->setView('install-template');
+        $this->setPageTitle('Upload Theme');
+        $this->setFormAction(ActionConst::INSTALLTHEME);
+        $this->view->set('pageTitle', $this->getPageTitle());
+        $this->view->set('formAction', $this->getFormAction());
+
+        if ($errors !== null) {
+            $this->view->set('errors', $errors);
+        }
+
+        $this->view->set('csrfToken', csrf_generate_token('csrfThemeInstall'));
+
+        return $this->view->render();
+    }
+
+    /**
+     * Process an uploaded theme zip: per-form CSRF check, validation,
+     * and installation.
+     *
+     * @param array $errors Out-parameter collecting validation error messages
+     * @return bool True when the theme was installed, false when validation failed
+     * @throws AppException When the CSRF token is missing or invalid
+     */
+    private function processThemeInstall(array &$errors)
+    {
+        // Per-form CSRF slot: the theme installer must not accept tokens
+        // minted for other admin forms (e.g. the post editor), breaking
+        // the stored-XSS -> CSRF-reuse leg of the RCE chain.
+        // See plan/RCE_REMEDIATION_PLAN.md (R3).
+        if (!csrf_check_token('csrfThemeInstall', $_POST, 60 * 10)) {
+            header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
+            throw new AppException("Sorry, unpleasant attempt detected!");
+        }
+
+        list($file_name, $file_size, $file_location, $file_error, $theme_title) = $this->extractUploadedThemeFile();
+
+        if (true !== $this->validateThemeUpload($file_error, $file_size, $file_location, $file_name, $theme_title, $errors, true)) {
+            return false;
+        }
+
+        $this->installUploadedTheme($file_name, $file_location, $theme_title, $theme_title);
+
+        return true;
+    }
+
+    /**
+     * Read the uploaded zip file attributes from the request.
+     *
+     * @return array [$file_name, $file_size, $file_location, $file_error, $theme_title]
+     */
+    private function extractUploadedThemeFile()
+    {
         $file_name = isset($_FILES['zip_file']['name']) ? $_FILES['zip_file']['name'] : null;
         $file_size = isset($_FILES['zip_file']['size']) ? $_FILES['zip_file']['size'] : null;
         $file_location = isset($_FILES['zip_file']['tmp_name']) ? $_FILES['zip_file']['tmp_name'] : null;
         $file_error = isset($_FILES['zip_file']['error']) ? $_FILES['zip_file']['error'] : null;
 
-        $theme_title = current(explode(".", $file_name));
-        $theme_dir = $theme_title;
-
-        try {
-            // Per-form CSRF slot: the theme installer must not accept tokens
-            // minted for other admin forms (e.g. the post editor), breaking
-            // the stored-XSS -> CSRF-reuse leg of the RCE chain.
-            // See plan/RCE_REMEDIATION_PLAN.md (R3).
-            if (!csrf_check_token('csrfThemeInstall', $_POST, 60 * 10)) {
-                header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
-                throw new AppException("Sorry, unpleasant attempt detected!");
-            }
-
-            $checkError = $this->validateThemeUpload($file_error, $file_size, $file_location, $file_name, $theme_title, $errors, $checkError);
-
-            if (!$checkError) {
-                $this->setView('install-template');
-                $this->setPageTitle('Upload Theme');
-                $this->setFormAction(ActionConst::INSTALLTHEME);
-                $this->view->set('pageTitle', $this->getPageTitle());
-                $this->view->set('formAction', $this->getFormAction());
-                $this->view->set('errors', $errors);
-                $this->view->set('csrfToken', csrf_generate_token('csrfThemeInstall'));
-                return $this->view->render();
-            }
-
-            $this->installUploadedTheme($file_name, $file_location, $theme_title, $theme_dir);
-        } catch (\Throwable $th) {
-            LogError::setStatusCode(http_response_code());
-            LogError::exceptionHandler($th);
-        } catch (AppException $e) {
-            LogError::setStatusCode(http_response_code());
-            LogError::exceptionHandler($e);
-        }
-
-        return $this->view->render();
+        return array($file_name, $file_size, $file_location, $file_error, current(explode(".", (string)$file_name)));
     }
 
     private function validateThemeUpload($file_error, $file_size, $file_location, $file_name, $theme_title, &$errors, $checkError)
