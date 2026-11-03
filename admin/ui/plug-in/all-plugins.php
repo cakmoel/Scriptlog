@@ -92,16 +92,28 @@
                        <td><p><?= html_entity_decode($plugin['plugin_desc'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401); ?></p></td>
                        <td><?= safe_html($plugin['plugin_level']); ?></td>
                        <td>
-                       <a href="javascript:deletePlugin('<?=(isset($plugin['ID']) ? safe_html((int)$plugin['ID']) : 0); ?>', '<?=(isset($plugin['plugin_name']) ? safe_html($plugin['plugin_name']) : ""); ?>')" title="Delete Plugin" class="btn btn-danger"> 
-                       <i class="fa fa-remove fa-fw"></i> Delete</a>
+                       <form method="post" action="<?= generate_request('index.php', 'post', ['plugins', ActionConst::DELETEPLUGIN, abs((int)$plugin['ID'])])['link']; ?>">
+                       <input type="hidden" name="Id" value="<?= abs((int)$plugin['ID']); ?>">
+                       <input type="hidden" name="csrfPluginAction" value="<?= csrf_generate_token('csrfPluginAction'); ?>">
+                       <button type="submit" class="btn btn-danger" data-confirm="Are you sure want to uninstall '<?= safe_html($plugin['plugin_name']); ?>? This action cannot be undone.">
+                       <i class="fa fa-remove fa-fw"></i> Delete</button>
+                       </form>
                        </td>
                        <td>
                             <?php if ($plugin['plugin_status'] == 'N') : ?>
-                       <a href="javascript:activatePlugin('<?= abs((int)$plugin['ID']); ?>', '<?= safe_html($plugin['plugin_name']); ?>')" class="btn btn-success" title="Enabled plugin">
-                       <i class="fa fa-toggle-on fa-fw"></i> Enabled</a>
+                       <form method="post" action="<?= generate_request('index.php', 'post', ['plugins', ActionConst::ACTIVATEPLUGIN, abs((int)$plugin['ID'])])['link']; ?>">
+                       <input type="hidden" name="Id" value="<?= abs((int)$plugin['ID']); ?>">
+                       <input type="hidden" name="csrfPluginAction" value="<?= csrf_generate_token('csrfPluginAction'); ?>">
+                       <button type="submit" class="btn btn-success" data-confirm="Are you sure want to activate '<?= safe_html($plugin['plugin_name']); ?>?">
+                       <i class="fa fa-toggle-on fa-fw"></i> Enabled</button>
+                       </form>
                             <?php else : ?>
-                       <a href="javascript:deactivatePlugin('<?= abs((int)$plugin['ID']); ?>', '<?= safe_html($plugin['plugin_name']); ?>')" class="btn btn-danger" title="Disabled plugin">
-                       <i class="fa fa-toggle-off fa-fw"></i> Disabled</a>
+                       <form method="post" action="<?= generate_request('index.php', 'post', ['plugins', ActionConst::DEACTIVATEPLUGIN, abs((int)$plugin['ID'])])['link']; ?>">
+                       <input type="hidden" name="Id" value="<?= abs((int)$plugin['ID']); ?>">
+                       <input type="hidden" name="csrfPluginAction" value="<?= csrf_generate_token('csrfPluginAction'); ?>">
+                       <button type="submit" class="btn btn-danger" data-confirm="Are you sure want to deactivate '<?= safe_html($plugin['plugin_name']); ?>?">
+                       <i class="fa fa-toggle-off fa-fw"></i> Disabled</button>
+                       </form>
                             <?php endif; ?>
                        </td>
                     
@@ -136,29 +148,4 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-<script type="text/javascript" nonce="<?= defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
-function activatePlugin(id, plugin)
-  {
-      if (confirm("Are you sure want to activate '" + plugin + "'?"))
-      {
-        window.location.href = 'index.php?load=plugins&action=activatePlugin&Id=' + id;
-      }
-  }
 
-  function deactivatePlugin(id, plugin)
-  {
-      if (confirm("Are you sure want to deactivate '" + plugin + "'?"))
-      {
-        window.location.href = 'index.php?load=plugins&action=deactivatePlugin&Id=' + id;
-      }
-  }
-  
-  function deletePlugin(id, plugin)
-  {
-      if (confirm("Are you sure want to uninstall '" + plugin + "'? This action cannot be undone."))
-      {
-        window.location.href = 'index.php?load=plugins&action=deletePlugin&Id=' + id;
-      }
-  }
-
-</script>
