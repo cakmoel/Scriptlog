@@ -38,6 +38,22 @@ if (!in_array($userLevel, $allowedLevels)) {
     sendJsonResponse(403, false, 'FORBIDDEN', 'Insufficient permissions');
 }
 
+// Phase 6 (task 6.4): Summernote image uploads must be CSRF protected.
+if (!isset($_POST['csrfToken'])) {
+    sendJsonResponse(400, false, 'CSRF_FAILED', 'Invalid CSRF token');
+}
+
+$csrfTokenValid = true;
+try {
+    $csrfTokenValid = csrf_check_token('csrfToken', $_POST, 60 * 10);
+} catch (\Scriptlog\Core\CoreException $e) {
+    $csrfTokenValid = false;
+}
+
+if (!$csrfTokenValid) {
+    sendJsonResponse(400, false, 'CSRF_FAILED', 'Invalid CSRF token');
+}
+
 // Check if file was uploaded
 if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
     $errorMessages = [
