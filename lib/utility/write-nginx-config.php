@@ -97,7 +97,7 @@ function read_nginx_config_template($permalink_status)
         $content .= '    deny all;' . PHP_EOL;
         $content .= '}' . PHP_EOL . PHP_EOL;
 
-        $content .= 'location ~ ^/(public/cache/rate_limit|public/files/cache)/ {' . PHP_EOL;
+        $content .= 'location ~ ^/(public/log|public/cache/rate_limit|public/files/cache)/ {' . PHP_EOL;
         $content .= '    deny all;' . PHP_EOL;
         $content .= '}' . PHP_EOL . PHP_EOL;
 
@@ -135,7 +135,7 @@ function read_nginx_config_template($permalink_status)
         $content .= '    deny all;' . PHP_EOL;
         $content .= '}' . PHP_EOL . PHP_EOL;
 
-        $content .= 'location ~ ^/(public/cache/rate_limit|public/files/cache)/ {' . PHP_EOL;
+        $content .= 'location ~ ^/(public/log|public/cache/rate_limit|public/files/cache)/ {' . PHP_EOL;
         $content .= '    deny all;' . PHP_EOL;
         $content .= '}' . PHP_EOL . PHP_EOL;
 
