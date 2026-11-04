@@ -72,6 +72,9 @@ function read_htaccess_config($permalink_status)
         $content .= '# API routes' . PHP_EOL;
         $content .= 'RewriteCond %{REQUEST_URI} ^/api [NC]' . PHP_EOL;
         $content .= 'RewriteRule ^api/(.*)$ api/index.php [QSA,L]' . PHP_EOL;
+        $content .= '# Deny runtime state/log and state/cache trees before any public asset routing' . PHP_EOL;
+        $content .= 'RewriteRule ^public/log/ - [F,L]' . PHP_EOL;
+        $content .= 'RewriteRule ^public/cache/ - [F,L]' . PHP_EOL;
         $content .= 'RewriteCond %{REQUEST_FILENAME} !-d ' . PHP_EOL;
         $content .= 'RewriteCond %{REQUEST_FILENAME} !-f ' . PHP_EOL;
         $content .= 'RewriteCond %{REQUEST_FILENAME} !-l ' . PHP_EOL;
