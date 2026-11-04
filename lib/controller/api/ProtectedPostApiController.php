@@ -135,19 +135,9 @@ final class ProtectedPostApiController extends ApiController
             return;
         }
 
-        // Use canonical sanitizer
-        if (function_exists('sanitize_post_content')) {
-            $content = sanitize_post_content($decrypted['post_content']);
-        } else {
-            $decoded_content = html_entity_decode($decrypted['post_content'], ENT_QUOTES, 'UTF-8');
-            $decoded_content = html_entity_decode($decoded_content, ENT_QUOTES, 'UTF-8');
-            $clean_content = preg_replace('/\s*style="[^"]*"/', '', $decoded_content);
-            $clean_content = preg_replace('/\s*style=[^>\s]*/', '', $clean_content);
-            $content = function_exists('htmLawed') ? htmLawed($clean_content, array(
-                'deny_attribute' => 'style,onclick,onerror,onload,onmouseover,onfocus,onblur,onchange,onsubmit,onkeydown,onkeyup,onkeypress',
-                'keep_bad' => 0
-            )) : $clean_content;
-        }
+        // Single canonical sanitizer owns all post-content output
+        // (RCE remediation: one sanitization pipeline for API, themes, admin).
+        $content = sanitize_post_content($decrypted['post_content']);
 
         if (!isset($_SESSION)) {
             session_start();
@@ -156,12 +146,9 @@ final class ProtectedPostApiController extends ApiController
         if (!isset($_SESSION['unlocked_posts'])) {
             $_SESSION['unlocked_posts'] = [];
         }
-        // Store derived key, never the plaintext password
-        if (function_exists('app_key')) {
-            $_SESSION['unlocked_posts'][$postId] = hash('sha256', app_key() . $password);
-        } else {
-            $_SESSION['unlocked_posts'][$postId] = hash('sha256', $password);
-        }
+        // Store the per-post derived unlock key (hash of app_key + password);
+        // never the cleartext password.
+        $_SESSION['unlocked_posts'][$postId] = hash('sha256', app_key() . $password);
 
         $this->respondWithHtmxFallback('unlock-success', [
             'content' => $content,
@@ -213,8 +200,10 @@ final class ProtectedPostApiController extends ApiController
             clear_failed_unlock_attempts($postId);
         }
 
+        $content = sanitize_post_content('');
+
         $this->respondWithHtmxFallback('unlock-success', [
-            'content' => '',
+            'content' => $content,
             'post_id' => $postId,
             'verified' => true
         ], [
