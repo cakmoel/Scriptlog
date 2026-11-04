@@ -54,7 +54,6 @@
     },
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.9",
-        "boundwize/structarmed": "^0.17.12",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "friendsofphp/php-cs-fixer": "^3.0",
         "phpcompatibility/php-compatibility": "^10.0.0@dev",
@@ -145,7 +144,6 @@
             "@phpcs",
             "@test",
             "@composer-audit"
-        ],
-        "structarmed": "structarmed analyse"
+        ]
     }
 }
