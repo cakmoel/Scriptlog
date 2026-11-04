@@ -102,6 +102,10 @@ test.describe('GDPR privacy policy editor', () => {
       .locator('#policyTable tbody tr')
       .filter({ hasText: 'ES' });
     await esRow.locator('a', { hasText: 'Edit' }).click();
+    // The Edit action performs a full navigation to the edit form; wait for the
+    // form to render before filling so slow page loads cannot exhaust the default
+    // locator fill timeout before the edit form appears.
+    await expect(page.locator('#policyForm')).toBeVisible({ timeout: 20_000 });
     await page.locator('#policy_title').fill('Spanish E2E Policy v2');
     await page.locator('button[type="submit"]').click();
     await expect(page.locator('.alert-success')).toContainText(
