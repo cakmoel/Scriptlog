@@ -477,7 +477,7 @@ class Authentication
     public function resetUserPassword($user_email)
     {
 
-        $reset_key = ircmaxell_random_generator(32);
+        $reset_key = bin2hex(random_bytes(32));
         $hashed_key = hash('sha256', $reset_key);
 
         if (filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
