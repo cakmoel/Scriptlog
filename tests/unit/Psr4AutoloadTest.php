@@ -110,18 +110,39 @@ class Psr4AutoloadTest extends TestCase
             true
         );
 
+        $expectedMappings = [
+            'Scriptlog\\Controller\\' => 'lib/controller/',
+            'Scriptlog\\Controller\\Api\\' => 'lib/controller/api/',
+            'Scriptlog\\Core\\' => 'lib/core/',
+            'Scriptlog\\Dao\\' => 'lib/dao/',
+            'Scriptlog\\Dto\\' => 'lib/dto/',
+            'Scriptlog\\Dto\\Api\\' => 'lib/dto/api/',
+            'Scriptlog\\Handler\\' => 'lib/handler/',
+            'Scriptlog\\Handler\\Admin\\' => 'lib/handler/admin/',
+            'Scriptlog\\Handler\\Admin\\Comment\\' => 'lib/handler/admin/comment/',
+            'Scriptlog\\Handler\\Admin\\Media\\' => 'lib/handler/admin/media/',
+            'Scriptlog\\Handler\\Admin\\Page\\' => 'lib/handler/admin/page/',
+            'Scriptlog\\Handler\\Admin\\Plugin\\' => 'lib/handler/admin/plugin/',
+            'Scriptlog\\Handler\\Admin\\Post\\' => 'lib/handler/admin/post/',
+            'Scriptlog\\Handler\\Admin\\Theme\\' => 'lib/handler/admin/theme/',
+            'Scriptlog\\Handler\\Admin\\Topic\\' => 'lib/handler/admin/topic/',
+            'Scriptlog\\Handler\\Admin\\User\\' => 'lib/handler/admin/user/',
+            'Scriptlog\\Model\\' => 'lib/model/',
+            'Scriptlog\\Service\\' => 'lib/service/',
+            'Scriptlog\\Validator\\' => 'lib/validator/',
+        ];
+
         $this->assertNotNull($composerJson, 'composer.json must be valid JSON');
         $this->assertArrayHasKey('autoload', $composerJson);
         $this->assertArrayHasKey('classmap', $composerJson['autoload']);
         $this->assertArrayHasKey('psr-4', $composerJson['autoload']);
-        $this->assertArrayHasKey('Scriptlog\\', $composerJson['autoload']['psr-4']);
         $this->assertSame(
             ['lib/'],
             $composerJson['autoload']['classmap']
         );
         $this->assertSame(
-            'lib/',
-            $composerJson['autoload']['psr-4']['Scriptlog\\']
+            $expectedMappings,
+            $composerJson['autoload']['psr-4']
         );
     }
 
@@ -135,15 +156,39 @@ class Psr4AutoloadTest extends TestCase
         $loader = require __DIR__ . '/../../lib/vendor/autoload.php';
         $prefixes = $loader->getPrefixesPsr4();
 
-        $this->assertArrayHasKey(
-            'Scriptlog\\',
-            $prefixes,
-            'Scriptlog\\ PSR-4 prefix must be registered'
-        );
-        $this->assertContains(
-            realpath(__DIR__ . '/../../lib'),
-            array_map('realpath', $prefixes['Scriptlog\\']),
-            'Scriptlog\\ prefix must map to lib/ directory'
-        );
+        $expectedMappings = [
+            'Scriptlog\\Controller\\' => 'lib/controller',
+            'Scriptlog\\Controller\\Api\\' => 'lib/controller/api',
+            'Scriptlog\\Core\\' => 'lib/core',
+            'Scriptlog\\Dao\\' => 'lib/dao',
+            'Scriptlog\\Dto\\' => 'lib/dto',
+            'Scriptlog\\Dto\\Api\\' => 'lib/dto/api',
+            'Scriptlog\\Handler\\' => 'lib/handler',
+            'Scriptlog\\Handler\\Admin\\' => 'lib/handler/admin',
+            'Scriptlog\\Handler\\Admin\\Comment\\' => 'lib/handler/admin/comment',
+            'Scriptlog\\Handler\\Admin\\Media\\' => 'lib/handler/admin/media',
+            'Scriptlog\\Handler\\Admin\\Page\\' => 'lib/handler/admin/page',
+            'Scriptlog\\Handler\\Admin\\Plugin\\' => 'lib/handler/admin/plugin',
+            'Scriptlog\\Handler\\Admin\\Post\\' => 'lib/handler/admin/post',
+            'Scriptlog\\Handler\\Admin\\Theme\\' => 'lib/handler/admin/theme',
+            'Scriptlog\\Handler\\Admin\\Topic\\' => 'lib/handler/admin/topic',
+            'Scriptlog\\Handler\\Admin\\User\\' => 'lib/handler/admin/user',
+            'Scriptlog\\Model\\' => 'lib/model',
+            'Scriptlog\\Service\\' => 'lib/service',
+            'Scriptlog\\Validator\\' => 'lib/validator',
+        ];
+
+        foreach ($expectedMappings as $prefix => $relativePath) {
+            $this->assertArrayHasKey(
+                $prefix,
+                $prefixes,
+                $prefix . ' PSR-4 prefix must be registered'
+            );
+            $this->assertContains(
+                realpath(__DIR__ . '/../../' . $relativePath),
+                array_map('realpath', $prefixes[$prefix]),
+                $prefix . ' prefix must map to ' . $relativePath . '/'
+            );
+        }
     }
 }

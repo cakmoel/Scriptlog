@@ -1,0 +1,28 @@
+# Protect files directory from direct web access
+# Allow only through PHP scripts (download handler)
+
+# Deny access to all files
+<FilesMatch ".*">
+    Order deny,allow
+    Deny from all
+</FilesMatch>
+
+# Allow index.php for directory listing (optional)
+<FilesMatch "^(index\.php)?$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>
+
+# Prevent directory browsing
+Options -Indexes
+
+# Disable script execution in this directory
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+
+# Additional security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>

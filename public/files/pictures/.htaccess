@@ -1,0 +1,14 @@
+# Never execute scripts from upload directories (Apache 2.4 and 2.2 syntax).
+# Images are served statically; any .php landing here (see H5) must not run.
+<FilesMatch "\.(php|phtml|phar|phps|pl|py|cgi)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Prevent directory browsing
+Options -Indexes

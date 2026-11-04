@@ -26,12 +26,15 @@
     },
     "require": {
         "php": ">=7.4",
+        "ext-curl": "*",
         "ext-fileinfo": "*",
         "ext-gd": "*",
+        "ext-iconv": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "ext-pdo": "*",
+        "ext-pdo_mysql": "*",
         "catfan/medoo": "^2.1",
         "cweagans/composer-patches": "^1.7",
         "defuse/php-encryption": "^2.2",
@@ -69,11 +72,26 @@
             "lib/"
         ],
         "psr-4": {
-            "Scriptlog\\": "lib/"
-        },
-        "exclude-from-classmap": [
-            "lib/vendor/pdepend/pdepend/src/main/php/Lazy/PDepend/DependencyInjection/Configuration.weak.php"
-        ]
+            "Scriptlog\\Controller\\": "lib/controller/",
+            "Scriptlog\\Controller\\Api\\": "lib/controller/api/",
+            "Scriptlog\\Core\\": "lib/core/",
+            "Scriptlog\\Dao\\": "lib/dao/",
+            "Scriptlog\\Dto\\": "lib/dto/",
+            "Scriptlog\\Dto\\Api\\": "lib/dto/api/",
+            "Scriptlog\\Handler\\": "lib/handler/",
+            "Scriptlog\\Handler\\Admin\\": "lib/handler/admin/",
+            "Scriptlog\\Handler\\Admin\\Comment\\": "lib/handler/admin/comment/",
+            "Scriptlog\\Handler\\Admin\\Media\\": "lib/handler/admin/media/",
+            "Scriptlog\\Handler\\Admin\\Page\\": "lib/handler/admin/page/",
+            "Scriptlog\\Handler\\Admin\\Plugin\\": "lib/handler/admin/plugin/",
+            "Scriptlog\\Handler\\Admin\\Post\\": "lib/handler/admin/post/",
+            "Scriptlog\\Handler\\Admin\\Theme\\": "lib/handler/admin/theme/",
+            "Scriptlog\\Handler\\Admin\\Topic\\": "lib/handler/admin/topic/",
+            "Scriptlog\\Handler\\Admin\\User\\": "lib/handler/admin/user/",
+            "Scriptlog\\Model\\": "lib/model/",
+            "Scriptlog\\Service\\": "lib/service/",
+            "Scriptlog\\Validator\\": "lib/validator/"
+        }
     },
     "extra": {
         "bamarni-bin": {
@@ -88,7 +106,7 @@
         }
     },
     "scripts": {
-        "metrics": "php bin/phpmetrics",
+        "metrics": "phpmetrics --config=phpmetrics.yml",
         "phpstan": "phpstan analyse lib --level 1 --memory-limit=1G",
         "phpstan:strict": "phpstan analyse lib --level 5 --memory-limit=1G",
         "phpcs": "phpcs --standard=phpcs.xml lib/",
