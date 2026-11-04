@@ -110,6 +110,15 @@ function read_web_config_template($permalink_status)
         $content .= '        </rewrite>' . "\n";
     }
 
+    $content .= '        <!-- RCE remediation F6: deny web access to runtime state directories -->' . "\n";
+    $content .= '        <security>' . "\n";
+    $content .= '            <requestFiltering>' . "\n";
+    $content .= '                <fileProtection>' . "\n";
+    $content .= '                    <add path="public\log" allowed="false" />' . "\n";
+    $content .= '                    <add path="public\cache" allowed="false" />' . "\n";
+    $content .= '                </fileProtection>' . "\n";
+    $content .= '            </requestFiltering>' . "\n";
+    $content .= '        </security>' . "\n";
     $content .= '    </system.webServer>' . "\n";
     $content .= '</configuration>' . "\n";
 
