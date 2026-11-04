@@ -8,12 +8,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#1101---2026-10-31)
+- [Latest Release](#1110---2026-11-04)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.11.0] - 2026-11-04
+
+### Added
+- **Per-theme asset minifier scoping**: The theme asset minifier now scopes rebuilds to each theme directory and cache-busts rebuilt assets with digest-based tokens, so assets no longer collide across themes.
+
+### Changed
+- **Plugin list actions**: The plugin management list now renders enable/disable and delete action forms inline within the action button row.
+
+### Fixed
+- **Consent banner**: The minified consent banner bundle is rebuilt and keeps working when cookie values fail to decode.
+- **Summernote image uploads**: Image uploads through the rich-text editor are now covered by CSRF validation.
+
+### Security
+- **Media mutation authorization**: Media edit, meta-update, and download operations now authorize the acting user against the media owner or a privileged role.
+- **Media edit context**: Media edit requests bind the submitted `media_id` to the target record and reject mismatches.
+- **Runtime state directory protection**: Generated Apache, Nginx, and IIS configurations deny web access to `public/log` and runtime cache directories.
+- **Password reset key generation**: Reset keys are now generated with a cryptographically secure random generator.
+
+### Deprecated
+- None
+
+### Removed
+- None
+
+### Notes
+Minor release focused on theme asset pipeline improvements and security hardening for media, plugin actions, and runtime state directories. No public API, database schema, or configuration breaking changes.
+
+### Codename
+**Maleo Senkawor** (retained) – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.10.1
+- **Changes since v1.10.1**: 14 commits
+
+---
 
 ## [1.10.1] - 2026-10-31
 
@@ -1150,6 +1186,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.11.0 | 2026-11-04 | Stable |
 | 1.8.0 | 2026-08-19 | Stable |
 | 1.7.1 | 2026-08-14 | Stable |
 | 1.7.0 | 2026-08-14 | Stable |
