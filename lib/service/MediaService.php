@@ -15,6 +15,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  */
 
+use Scriptlog\Core\AppException;
 use Scriptlog\Core\FormValidator;
 use Scriptlog\Core\Sanitize;
 use Scriptlog\Dao\MediaDao;
@@ -415,6 +416,30 @@ final class MediaService
     }
 
     /**
+     * Authorize the acting user to mutate the media record.
+     *
+     * Administrators and managers may mutate any media record; the owner of
+     * the media record may mutate their own record. Any other acting user is
+     * denied with a typed domain exception (RCE remediation plan - Phase 5).
+     *
+     * @return void
+     * @throws AppException When the acting user is not allowed to mutate media
+     */
+    private function assertMediaMutationAllowed(): void
+    {
+        $actingLevel = user_privilege();
+        $media = $this->mediaDao->findMediaById($this->mediaId, $this->sanitizer);
+        $ownerLevel = (is_array($media) && isset($media['media_user'])) ? (string) $media['media_user'] : '';
+
+        $isPrivileged = in_array($actingLevel, array('administrator', 'manager'), true);
+        $isOwner = ($actingLevel === $ownerLevel);
+
+        if (!$isPrivileged && !$isOwner) {
+            throw new AppException('You do not have permission to modify this media.');
+        }
+    }
+
+    /**
      * Updating media record
      *
      * @return object
@@ -425,6 +450,8 @@ final class MediaService
 
         $this->validator->sanitize($this->mediaId, 'int');
         $this->validator->sanitize($this->media_caption, 'string');
+
+        $this->assertMediaMutationAllowed();
 
         if (empty($this->media_filename)) {
             return $this->mediaDao->updateMedia($this->sanitizer, [
@@ -455,6 +482,8 @@ final class MediaService
     {
         $this->validator->sanitize($this->mediaId, 'int');
 
+        $this->assertMediaMutationAllowed();
+
         if (!empty($this->meta_key)) {
             return $this->mediaDao->updateMediaMeta($this->sanitizer, [
                 'meta_key' => $this->meta_key,
@@ -470,6 +499,8 @@ final class MediaService
     public function modifyMediaDownload()
     {
         $this->validator->sanitize($this->mediaId, 'int');
+
+        $this->assertMediaMutationAllowed();
 
         return $this->downloadModel->updateMediaDownload($this->sanitizer, [
           'media_identifier' => $this->media_identifier,
