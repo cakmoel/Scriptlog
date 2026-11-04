@@ -382,6 +382,11 @@ final class MediaController extends BaseApp
                     throw new AppException("Sorry, unpleasant attempt detected!");
                 }
 
+                if (isset($_POST['media_id']) && (int)$_POST['media_id'] !== (int)$id) {
+                    header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 400 Bad Request", true, 400);
+                    throw new AppException("Sorry, unpleasant attempt detected!");
+                }
+
                 $checkError = $this->validateMediaEdit($filters, $form_fields, $errors, $checkError);
 
                 if (!$checkError) {
@@ -389,7 +394,7 @@ final class MediaController extends BaseApp
                     return $this->view->render();
                 }
 
-                $checkError = $this->handleMediaFileUpdate($file_location, $file_error, $file_size, $file_name, $file_type, $file_extension, $new_filename, $filters, $errors, $checkError);
+                $checkError = $this->handleMediaFileUpdate($file_location, $file_error, $file_size, $file_name, $file_type, $file_extension, $new_filename, $filters, $id, $errors, $checkError);
 
                 if (!$checkError) {
                     $this->renderEditForm($errors, $data_media, $media_properties, $getMedia);
@@ -438,10 +443,10 @@ final class MediaController extends BaseApp
     }
 
     /** @SuppressWarnings(PHPMD.ExcessiveParameterList) */
-    private function handleMediaFileUpdate($file_location, $file_error, $file_size, $file_name, $file_type, $file_extension, $new_filename, $filters, &$errors, $checkError)
+    private function handleMediaFileUpdate($file_location, $file_error, $file_size, $file_name, $file_type, $file_extension, $new_filename, $filters, $mediaId, &$errors, $checkError)
     {
         if (empty($file_location)) {
-            $this->updateMediaMetaOnly($filters);
+            $this->updateMediaMetaOnly($filters, $mediaId);
             return $checkError;
         }
 
@@ -495,12 +500,12 @@ final class MediaController extends BaseApp
             upload_media($file_location, $file_type, $file_size, basename($new_filename));
         }
 
-        $this->updateMediaWithFile($new_filename, $file_type, $filters, $media_metavalue);
+        $this->updateMediaWithFile($new_filename, $file_type, $filters, $media_metavalue, $mediaId);
 
         return $checkError;
     }
 
-    private function updateMediaWithFile($new_filename, $file_type, $filters, $media_metavalue)
+    private function updateMediaWithFile($new_filename, $file_type, $filters, $media_metavalue, $mediaId)
     {
         $this->mediaService->setMediaFilename($new_filename);
         $this->mediaService->setMediaCaption(prevent_injection(distill_post_request($filters)['media_caption']));
@@ -508,14 +513,14 @@ final class MediaController extends BaseApp
         $this->mediaService->setMediaTarget(distill_post_request($filters)['media_target']);
         $this->mediaService->setMediaAccess(distill_post_request($filters)['media_access']);
         $this->mediaService->setMediaStatus(distill_post_request($filters)['media_status']);
-        $this->mediaService->setMediaId(distill_post_request($filters)['media_id']);
+        $this->mediaService->setMediaId($mediaId);
 
         $this->mediaService->setMediaKey($new_filename);
         $this->mediaService->setMediaValue(json_encode($media_metavalue));
         $this->mediaService->modifyMediaMeta();
 
         if (isset($_POST['media_target']) && $_POST['media_target'] == 'download') {
-            $this->mediaService->setMediaId(distill_post_request($filters)['media_id']);
+            $this->mediaService->setMediaId($mediaId);
             $this->mediaService->setMediaIdentifier(generate_media_identifier());
             $this->mediaService->setBeforeExpired(time() + self::TIME_BEFORE_EXPIRED * 60 * 60);
             $this->mediaService->setIpAddress(get_ip_address());
@@ -523,13 +528,13 @@ final class MediaController extends BaseApp
         }
     }
 
-    private function updateMediaMetaOnly($filters)
+    private function updateMediaMetaOnly($filters, $mediaId)
     {
         $this->mediaService->setMediaCaption(prevent_injection(distill_post_request($filters)['media_caption']));
         $this->mediaService->setMediaTarget(distill_post_request($filters)['media_target']);
         $this->mediaService->setMediaAccess(distill_post_request($filters)['media_access']);
         $this->mediaService->setMediaStatus(distill_post_request($filters)['media_status']);
-        $this->mediaService->setMediaId(distill_post_request($filters)['media_id']);
+        $this->mediaService->setMediaId($mediaId);
     }
 
     private function renderEditForm($errors = null, $data_media = null, $media_properties = null, $getMedia = null)
