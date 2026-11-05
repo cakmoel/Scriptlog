@@ -77,7 +77,7 @@ function install_footer($stylePath)
             </p>
 
             <ul class="list-inline">
-                <li class="list-inline-item"><a href="../license.txt" target="_blank" rel="noopener noreferrer" title="license.txt">License</a></li>
+                <li class="list-inline-item"><a href="../LICENSE.md" target="_blank" rel="noopener noreferrer" title="LICENSE.md">License</a></li>
                 <li class="list-inline-item">&middot;</li>
                 <li class="list-inline-item"><span class="badge badge-light" aria-label="Memory usage"><?= 'Memory: ' . convert_memory_used(memory_get_usage()); ?></span></li>
                 <li class="list-inline-item">&middot;</li>
