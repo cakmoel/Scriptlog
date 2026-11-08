@@ -474,7 +474,9 @@ _lt_row() {
     AB_NON2XX=3 run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
         -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -e 2 -r "$LOAD_TEST_OUT"
     [ "$status" -eq 1 ]
-    [[ "$output" == *"ERROR-RATE GATE FAILED: combined error rate 10.00% exceeds -e ceiling of 2%."* ]]
+    # The 404 scenario expects a non-2xx status and is excluded from the gate,
+    # so the combined rate is 9 unexpected responses out of 120 sent (7.50%).
+    [[ "$output" == *"ERROR-RATE GATE FAILED: combined error rate 7.50% exceeds -e ceiling of 2%."* ]]
 }
 
 # ---------------------------------------------------------------------
