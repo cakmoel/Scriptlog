@@ -1,0 +1,66 @@
+#!/usr/bin/env php
+<?php
+/**
+ * PHPMetrics wrapper - excludes third-party code from analysis
+ * 
+ * PHPMetrics 2.x has a known bug where --exclude doesn't work properly
+ * (see: https://github.com/phpmetrics/PhpMetrics/issues/463)
+ * 
+ * This script builds the directory list dynamically, excluding:
+ * - lib/core/HTMLPurifier/ (bundled third-party)
+ * - lib/core/HTMLPurifier*.php (bundled third-party files)
+ * - lib/vendor/ (Composer dependencies)
+ */
+
+$root = dirname(__DIR__);
+$scanDirs = [
+    'lib/controller',
+    'lib/dao',
+    'lib/dto',
+    'lib/handler',
+    'lib/model',
+    'lib/service',
+    'lib/utility',
+    'lib/validator'
+];
+
+// Add lib/core files individually, excluding HTMLPurifier
+$coreDir = $root . '/lib/core';
+if (is_dir($coreDir)) {
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($coreDir, RecursiveDirectoryIterator::SKIP_DOTS)
+    );
+    
+    foreach ($iterator as $file) {
+        if (!$file->isFile() || $file->getExtension() !== 'php') {
+            continue;
+        }
+        
+        $path = $file->getPathname();
+        $relativePath = str_replace($root . '/', '', $path);
+        
+        // Skip HTMLPurifier directory and files
+        if (strpos($relativePath, 'lib/core/HTMLPurifier/') === 0) {
+            continue;
+        }
+        if (strpos($file->getFilename(), 'HTMLPurifier') === 0) {
+            continue;
+        }
+        
+        $scanDirs[] = $relativePath;
+    }
+}
+
+$dirs = implode(',', $scanDirs);
+$phpmetrics = $root . '/lib/vendor/bin/phpmetrics';
+$config = $root . '/phpmetrics.json';
+
+$cmd = sprintf(
+    'php -d error_reporting=E_ALL\\&~E_DEPRECATED %s --config=%s %s',
+    escapeshellarg($phpmetrics),
+    escapeshellarg($config),
+    escapeshellarg($dirs)
+);
+
+passthru($cmd, $exitCode);
+exit($exitCode);
