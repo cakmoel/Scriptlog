@@ -80,6 +80,8 @@ policy editor performs CRUD reflected on the public page.
 
 - Consent is versioned: a mismatched `cookie_consent_version` re-shows the banner even when an
   `accepted` cookie exists.
+- Consent reading is resilient: a malformed sibling cookie (a literal `%` in any other cookie)
+  must not stop the banner from appearing.
 - `GET consent` reports `consent_given: true` only when an `accepted` row exists for the IP;
   `rejected` rows never count.
 - Erasure is transactional and irreversible: the subject user is deleted, the comment is
