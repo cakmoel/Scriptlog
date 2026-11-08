@@ -116,11 +116,13 @@ if (is_file($staticFile)) {
     return false;
 }
 
-// Mirror .htaccess: /api/* is handled by its own front controller.
-if (strpos($requestedPath, '/api') === 0) {
-    require __DIR__ . '/../api/index.php';
-    return;
-}
-
-// Otherwise route through the front controller (index.php).
+// Everything else - including /api/* - goes through the main front controller.
+//
+// Apache serves /api/* from api/index.php through .htaccess. nginx/DDEV (and
+// this server) instead hand every unknown path to index.php, which has to
+// forward API requests to api/index.php itself - see TROUBLESHOOTING.md issue
+// 55. Deliberately NOT special-casing /api here: the e2e suite must exercise
+// that hand-off, otherwise a regression in index.php stays invisible to the
+// browser tests. A direct hit on /api/index.php is still executed by PHP as a
+// real file through the is_file() passthrough above.
 require __DIR__ . '/../index.php';
