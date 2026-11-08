@@ -55,12 +55,27 @@ export const BLOG = {
   searchHeading: '#search-heading',
   sidebarSearchForm: '#ajax-search-form, form[role="search"], form.search',
 
+  // Sidebar autocomplete widget (sidebar.php + assets/js/search.js)
+  searchForm: '#ajax-search-form',
+  searchInput: '#search-keyword',
+  searchResults: '#search-results',
+  searchError: '#search-error',
+  searchClear: '#search-clear',
+  searchHint: '#search-hint',
+  searchResultItem: '#search-results .search-result-item',
+  searchResultLink: '#search-results .search-result-item a',
+  searchResultTitle: '#search-results .search-result-title',
+  searchResultCount: '#search-results .search-result-count',
+  searchNoResults: '#search-results .search-no-results',
+  searchViewAll: '#search-results .search-result-more a',
+
   // Cookie consent (cookie-consent.php / footer.php)
   cookieBanner: '.cookie-consent-banner',
   cookieBannerById: '#cookie-consent-banner',
   cookieAccept: '.cookie-btn-accept',
   cookieReject: '.cookie-btn-reject',
   cookieLearnMore: '.cookie-btn-learn-more',
+  cookieScript: 'script[src*="cookie-consent.min.js"]',
 
   // Privacy (privacy.php)
   privacyCard: '.privacy-card',
