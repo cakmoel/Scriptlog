@@ -1,7 +1,8 @@
 // theme-partials.spec.ts
 // Shared partials consistency: partials/card.php and partials/paginator.php render
 // identical structure on home, blog, category, tag, and archive. No per-template card
-// markup drift. Paginator appears at most once per listing.
+// markup drift. Paginator appears at most once per listing and its list markup is
+// never nested inside a duplicate pagination list.
 import { test, expect } from '@playwright/test';
 import { BLOG, BLOG_BASE_URL, type BlogRoute } from './blog-selectors';
 
@@ -61,10 +62,25 @@ test.describe('theme shared partials', () => {
 
   test('paginator appears at most once per listing page', async ({ page }) => {
     await page.goto(`${BASE_URL}/?cat=200`);
+    // Count paginator landmarks only: the broader nav[aria-label] selector
+    // also matches the main navigation landmark.
     const paginationCount: number = await page
       .locator('nav[aria-label="pagination.navigation"]')
       .count();
     expect(paginationCount).toBeLessThanOrEqual(1);
+  });
+
+  test('paginator markup contains no nested duplicate pagination list', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/?cat=200`);
+    // Paginator::page_links() emits the complete <ul class="pagination"> list
+    // and the shared partial wraps it in a nav landmark only - a second
+    // .pagination inside the first would be invalid nested list markup.
+    const nestedCount: number = await page
+      .locator('.pagination .pagination')
+      .count();
+    expect(nestedCount).toBe(0);
   });
 
   test('cards from home and blog are structurally identical', async ({
