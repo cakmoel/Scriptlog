@@ -96,6 +96,15 @@ if (is_readable(APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'vendor/autoload.
     }
 }
 
+// PHP core RCE advisories CVE-2026-109618 / CVE-2026-109619: log a warning when
+// this host runs an affected PHP build and, only when the operator opts in via
+// SCRIPTLOG_STRICT_PHP_SECURITY, fail closed. See
+// docs/dev-docs/PHP_RUNTIME_HARDENING.md for the verification and hardening steps.
+if (class_exists('Scriptlog\\Core\\PhpRuntimeSecurityGuard')) {
+    \Scriptlog\Core\PhpRuntimeSecurityGuard::report();
+    \Scriptlog\Core\PhpRuntimeSecurityGuard::enforce();
+}
+
 // Lazy PSR-4 backward-compatibility aliases (loads only when old class names are used)
 // MUST be registered BEFORE the custom Autoloader to prevent duplicate includes
 // when old global class names are referenced but the namespaced version was already loaded.
