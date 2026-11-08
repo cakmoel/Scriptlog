@@ -1,11 +1,16 @@
 // security-remediation.spec.ts
 // e2e verification for the RCE audit remediation
-// (plan/RCE_REMEDIATION_PLAN_20260816.md, report/RCE_AUDIT_REPORT_20260816_081632.md).
+// (plan/RCE_REMEDIATION_PLAN.md, report/RCE_AUDIT_REPORT_20260816_081632.md).
 //
 // Covers:
 //   F9  - enforced CSP carries `script-src-attr 'none'` (inline handlers dead).
+//   F9  - enforced CSP carries a per-request script nonce (RCE R2).
 //   F9  - admin pages ship no inline event-handler attributes.
 //   F1  - admin post editor sanitizes a stored XSS payload (onerror stripped).
+//   R1  - editor also strips handlers outside the legacy 12-name deny list
+//         (onpointerenter/ontoggle) and neutralizes javascript: URLs.
+//   R3  - post editor and theme installer use separated per-form CSRF slots,
+//         so a token harvested on one form cannot authorize the other.
 //   F5  - API keys authenticate only via the X-API-Key header, never the query
 //         string, and invalid keys are rejected.
 //   F6  - the API rate-limit bucket is keyed on the client IP: rotating
@@ -154,6 +159,63 @@ test.describe.serial('security remediation', () => {
     }
   });
 
+  test('admin post editor strips handlers outside the legacy deny list (RCE R1)', async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name === 'webkit',
+      'adminLogin does not complete in webkit in this dev env (pre-existing, affects all admin e2e specs)',
+    );
+    // Handlers NOT in the old 12-name deny list plus a javascript: URL.
+    // Seeded raw (not entity-encoded) to cover the non-encoded input path.
+    const payload: string =
+      '<p><img src="x" onpointerenter="alert(1)">' +
+      '<a href="javascript:alert(1)">x</a>' +
+      '<details ontoggle="alert(1)">y</details></p>';
+    runSql(`UPDATE tbl_posts SET post_content = '${payload}' WHERE ID = ${XSS_POST_ID}`);
+    try {
+      await adminLogin(page, ADMIN_USER, ADMIN_PASS);
+      const response = await page.goto(EDIT_URL);
+      expect(response?.status()).toBe(200);
+      await expect(page.locator('#summernote')).toBeVisible();
+
+      const html: string = await page.content();
+      expect(html).not.toContain('onpointerenter');
+      expect(html).not.toContain('ontoggle');
+      expect(html).not.toContain('javascript:alert');
+    } finally {
+      runSql(
+        `UPDATE tbl_posts SET post_content = '${originalContent.replace(/'/g, "''")}' WHERE ID = ${XSS_POST_ID}`,
+      );
+    }
+  });
+
+  test('post editor and theme installer use separated CSRF slots (RCE R3)', async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name === 'webkit',
+      'adminLogin does not complete in webkit in this dev env (pre-existing, affects all admin e2e specs)',
+    );
+    await adminLogin(page, ADMIN_USER, ADMIN_PASS);
+
+    // Post editor carries the post-form slot, never the installer slot.
+    const edit = await page.goto(EDIT_URL);
+    expect(edit?.status()).toBe(200);
+    await expect(page.locator('#summernote')).toBeVisible();
+    await expect(page.locator('input[name="csrfPostForm"]')).toHaveCount(1);
+    await expect(page.locator('input[name="csrfThemeInstall"]')).toHaveCount(0);
+
+    // Theme installer carries the installer slot, never the post slot.
+    const install = await page.goto(
+      `${BASE_URL}/admin/index.php?load=templates&action=installTheme`,
+    );
+    expect(install?.status()).toBe(200);
+    await expect(page.locator('input[name="zip_file"]')).toBeVisible();
+    await expect(page.locator('input[name="csrfThemeInstall"]')).toHaveCount(1);
+    await expect(page.locator('input[name="csrfPostForm"]')).toHaveCount(0);
+  });
+
   test('API key authenticates only via header, never query string (RCE F5)', async ({
     request,
   }) => {
@@ -192,6 +254,7 @@ test.describe.serial('security remediation', () => {
     // trigger a 429; because they are IP-keyed it must.
     let saw429: boolean = false;
     let first429At: number = -1;
+    let remainingOn429: string | null = null;
     for (let i = 0; i < 70; i++) {
       const key: string = `rotate_${i}_${'x'.repeat(40)}`;
       const res: APIResponse = await request.get(
@@ -201,6 +264,7 @@ test.describe.serial('security remediation', () => {
       if (res.status() === 429) {
         saw429 = true;
         first429At = i;
+        remainingOn429 = res.headers()['x-ratelimit-remaining'] ?? null;
         break;
       }
     }
@@ -208,6 +272,10 @@ test.describe.serial('security remediation', () => {
       true,
     );
     expect(first429At).toBeLessThanOrEqual(61);
+    // The rejection must carry the real bucket state (Remaining: 0), not
+    // an empty header: the stored rate result has to be assigned before
+    // the rejection branch exits.
+    expect(remainingOn429, 'rejection must report zero remaining').toBe('0');
 
     // Fresh keys AFTER exhaustion must remain blocked (no per-key bucket).
     for (let i = 0; i < 5; i++) {
