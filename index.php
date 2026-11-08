@@ -1,7 +1,5 @@
 <?php
 
-ob_start();
-
 /**
  * index.php file
  * 
@@ -12,6 +10,28 @@ ob_start();
  * @since    Since Release 1.0
  * 
  */
+
+// Front-controller API hand-off.
+//
+// Apache (.htaccess) and the generated nginx include send /api/* directly to
+// api/index.php. Servers that instead route every unknown path to this front
+// controller (DDEV/nginx without the include, PHP's built-in server, default
+// LiteSpeed) would render the theme 404 for /api/v1 - which surfaces in the
+// sidebar autocomplete as "An error occurred during search." Dispatch before
+// lib/main.php so api/index.php keeps its own bootstrap order.
+//
+// __DIR__ is passed explicitly because SCRIPT_NAME is not always the front
+// controller: PHP's built-in server reports the nearest matching file (for
+// /api/v1 it reports /api/index.php) while nginx/Apache report /index.php.
+require_once dirname(__FILE__) . '/lib/utility/api-request.php';
+
+if (scriptlog_is_api_request(null, null, __DIR__)) {
+    require dirname(__FILE__) . '/api/index.php';
+    exit;
+}
+
+ob_start();
+
 require dirname(__FILE__) . '/lib/main.php';
 
 // lib/main.php only provides $app when config.php exists (otherwise it
