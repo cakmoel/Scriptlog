@@ -13,6 +13,11 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './e2e',
+  /* The TastyBites and RestoBlog theme suites own their own configs (theme
+     flip + fixtures, see playwright.tastybites.config.ts and
+     playwright.restoblog.config.js) and must not run against this default
+     config's "blog" baseline. */
+  testIgnore: ['**/tastybites/**', '**/restoblog/**'],
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
