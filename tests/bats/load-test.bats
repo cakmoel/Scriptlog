@@ -801,11 +801,20 @@ _lt_row() {
 }
 
 @test "-e gate counts non-2xx responses on top of transport failures" {
-    # 3 non-2xx per scenario x 4 = 12 out of 120 sent -> combined 10%.
+    # 3 non-2xx for each of the three 2xx scenarios = 9 out of 120 sent -> 7.5%.
+    # The not-found probe's non-2xx responses are expected and excluded.
     AB_NON2XX=3 run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
-        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -e 9 -r "$LOAD_TEST_OUT"
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -e 7 -r "$LOAD_TEST_OUT"
     [ "$status" -eq 1 ]
-    [[ "$output" == *"ERROR-RATE GATE FAILED: combined error rate 10.00% exceeds -e ceiling of 9%."* ]]
+    [[ "$output" == *"ERROR-RATE GATE FAILED: combined error rate 7.50% exceeds -e ceiling of 7%."* ]]
+}
+
+@test "-e gate excludes expected non-2xx responses from the not-found probe" {
+    # Only the 404 probe returns non-2xx: 3 of 120 sent -> 2.5% if counted.
+    AB_NON2XX_404=3 run bash "$LOAD_TEST_SCRIPT" -u https://example.test -s /assets/app.css \
+        -d /dynamic-page.php -g /admin/login.php -i 1 -W 5 -R 7 -e 0 -r "$LOAD_TEST_OUT"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Error-rate gate passed: combined 0.00% <= 0% (-e)."* ]]
 }
 
 # ---------------------------------------------------------------------
