@@ -70,10 +70,12 @@ function safe_zip_extract($zipPath, $destDir, array $skipPatterns = [])
             // Normalize backslashes so Windows-style traversal is caught too
             $normalized = str_replace('\\', '/', $entry);
 
-            if (strpos($normalized, "\0") !== false
+            if (
+                strpos($normalized, "\0") !== false
                 || preg_match('#(^|/)\.\.(/|$)#', $normalized)
                 || substr($normalized, 0, 1) === '/'
-                || preg_match('#^[a-zA-Z]:/#', $normalized)) {
+                || preg_match('#^[a-zA-Z]:/#', $normalized)
+            ) {
                 throw new InvalidArgumentException('The uploaded archive contains an unsafe path.');
             }
 
@@ -114,8 +116,10 @@ function safe_zip_extract($zipPath, $destDir, array $skipPatterns = [])
 
             // Defense in depth: the resolved parent must stay inside the dest
             $resolvedDir = realpath($dir);
-            if ($resolvedDir === false
-                || strpos($resolvedDir . DIRECTORY_SEPARATOR, $destReal . DIRECTORY_SEPARATOR) !== 0) {
+            if (
+                $resolvedDir === false
+                || strpos($resolvedDir . DIRECTORY_SEPARATOR, $destReal . DIRECTORY_SEPARATOR) !== 0
+            ) {
                 throw new InvalidArgumentException('The uploaded archive escapes the destination directory.');
             }
             $target = $resolvedDir . DIRECTORY_SEPARATOR . basename($normalized);
