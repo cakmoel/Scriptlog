@@ -376,7 +376,7 @@ final class PageController extends BaseApp
                 $this->view->set('formAction', $this->getFormAction());
                 $this->view->set('errors', $errors);
                 $this->view->set('pageData', $data_page);
-            $this->view->set('medialibs', $this->pageService->getImageRadioButton($getPage['media_id']));
+                $this->view->set('medialibs', $this->pageService->getImageRadioButton($getPage['media_id']));
                 $this->view->set('postStatus', $this->pageService->postStatusDropDown($getPage['post_status']));
                 $this->view->set('pageLocale', $this->pageService->localeDropDown(distill_post_request($filters)['post_locale']));
                 $this->view->set('csrfToken', csrf_generate_token('csrfToken'));

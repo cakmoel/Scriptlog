@@ -120,6 +120,7 @@ class_alias('Scriptlog\Service\PageService', 'PageService');
 class_alias('Scriptlog\Core\Pagination', 'Pagination');
 class_alias('Scriptlog\Core\Paginator', 'Paginator');
 class_alias('Scriptlog\Core\PassPhraseKey', 'PassPhraseKey');
+class_alias('Scriptlog\Core\PhpRuntimeSecurityGuard', 'PhpRuntimeSecurityGuard');
 class_alias('Scriptlog\Controller\PluginController', 'PluginController');
 class_alias('Scriptlog\Dao\PluginDao', 'PluginDao');
 class_alias('Scriptlog\Service\PluginService', 'PluginService');

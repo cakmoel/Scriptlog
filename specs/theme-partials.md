@@ -64,6 +64,9 @@ card markup, otherwise a later refactor drifts.
   `locator('.post h3.h4')` count and both are >= 1.
 - Assert every `.post` card contains exactly one `h3.h4` and one `.post-meta`.
 - Assert exactly one `.pagination` (or none) per listing page.
+- Assert no `.pagination` element contains a nested `.pagination` descendant
+  (`Paginator::page_links()` emits the complete list; the shared partial wraps
+  it in a `nav` landmark only - a second list inside the first is invalid HTML).
 - Optionally assert the inner HTML of two cards from different routes is identical after
   normalizing the title/date text.
 
@@ -73,7 +76,8 @@ card markup, otherwise a later refactor drifts.
 
 - `partials/card.php`: `.post`, `.post-thumbnail`, `.post-details`, `h3.h4`, `.post-meta`,
   `meta.php`.
-- `partials/paginator.php`: `.pagination`, `.page-item`, `.page-link`.
+- `partials/paginator.php`: `<nav aria-label>` landmark wrapping the pre-built
+  `.pagination`, `.page-item`, `.page-link` list.
 - Consumer templates: `home.php`, `blog.php`, `category.php`, `tag.php`, `archive.php`.
 
 ---

@@ -357,6 +357,68 @@ Counter files are disposable; the `.htaccess` inside `public/cache/rate_limit/` 
 
 **Files**: `lib/core/RateLimiter.php`, `tests/unit/RateLimiterTest.php`
 
+### 55. Sidebar Search Autocomplete Fails on Nginx/DDEV - `/api/v1` Returns the Theme 404
+
+**Problem**: On `https://scriptlog.ddev.site/?p=1` the blog theme sidebar autocomplete always shows "An error occurred during search. Please try again later." The same code works on `https://blogware.site/?p=1` (Apache). Requesting the API directly exposes the difference:
+
+```bash
+# DDEV / nginx - HTML theme 404 (or the search results page when ?q= is present)
+curl -i https://scriptlog.ddev.site/api/v1
+# HTTP/2 404
+# content-type: text/html; charset=UTF-8
+
+curl -i "https://scriptlog.ddev.site/api/v1/search?q=cicero"
+# HTTP/2 200
+# content-type: text/html; charset=UTF-8   <-- full search page, not JSON
+
+# Apache / production - JSON
+curl -i https://blogware.site/api/v1
+# HTTP/1.1 200 OK
+# content-type: application/json; charset=utf-8
+```
+
+**Root Cause**: The web server never routes `/api/*` to `api/index.php`.
+
+- `public/themes/blog/header.php` always emits `api_url: '{base}/api/v1'`, and `assets/js/search.js` requests `{api_url}/search` with `dataType: 'json'`.
+- Apache's `.htaccess` has an explicit `RewriteRule ^api/(.*)$ api/index.php [QSA,L]`, so production reaches the API.
+- DDEV uses nginx's catch-all `try_files $uri $uri/ /index.php?$query_string;`. `/api/v1` does not exist as a file, so nginx sends it to the main front controller, which renders the theme 404. With `?q=...` the query-string router (`HandleRequest::deliverQuerySearch()`) renders the HTML search page instead - also not JSON.
+- The installer-generated `nginx-rewrites.conf` (`install/include/setup.php::generate_server_config()`) omitted the `/api/` location block entirely, so fresh nginx installs had no rewrite unless an administrator later saved the permalink settings (which regenerates the file through `read_nginx_config_template()`). DDEV additionally does not `include` a project-root `nginx-rewrites.conf` by default.
+
+The JS receives HTML where it expects JSON, the jQuery parse fails, and the generic `error` callback renders the message.
+
+**Solution**:
+
+1. **Front-controller fallback (fixes existing installs with no server change).** `index.php` now hands `/api/*` to `api/index.php` *before* `lib/main.php` bootstraps. The bootstrap-safe helper lives in `lib/utility/api-request.php` (`scriptlog_is_api_request()`); it strips the install base directory, ignores the query string, and matches only `/api`, `/api/`, and `/api/...` (so `/apiary` still goes through the normal dispatcher). Apache keeps using its `.htaccess` rule and never reaches this branch.
+2. **Installer nginx template.** `install/include/setup.php` now writes the API location before the catch-all:
+
+```nginx
+# API routes (must precede the catch-all location /)
+location ~ ^/api/ {
+    try_files $uri $uri/ /api/index.php?$query_string;
+}
+
+location / {
+    try_files $uri $uri/ /index.php?$query_string;
+}
+```
+
+3. **Existing nginx / DDEV deployments** can either deploy the updated `index.php` (works immediately) or add the block above to their vhost. For DDEV specifically, put it in `.ddev/nginx/api.conf` and run `ddev restart`; alternatively `include` the generated `nginx-rewrites.conf` from the vhost.
+
+Do **not** change `api_url` in `header.php` to a path-based workaround (e.g. `/api/index.php/v1`) - the API router, OpenAPI spec, HATEOAS links and external clients all use `/api/v1`.
+
+**Verification**:
+
+```bash
+curl -i https://<host>/api/v1                 # 200 + application/json
+curl -i "https://<host>/api/v1/search?q=cicero" # 200 + application/json
+```
+
+Then type at least two characters in the sidebar search box: suggestions must appear, and submitting must navigate to the permalink-aware results page. `tests/unit/ApiFrontControllerHandoffTest.php` covers the path matching and the front-controller ordering; `e2e/blog-search-autocomplete.spec.ts` covers the widget end to end.
+
+**Related**: [Issue 51](#51-every-api-request-returns-301---sidebar-search-autocomplete-always-errors) is the same symptom with a different status code (`301` from the error handler); [Issue 23](#23-api-session-initialization) covers the API session bootstrap.
+
+**Files**: `index.php`, `lib/utility/api-request.php`, `lib/utility-loader.php`, `install/include/setup.php`, `tests/unit/ApiFrontControllerHandoffTest.php`
+
 ---
 
 ## Navigation/URL Issues
@@ -734,7 +796,7 @@ The cache is rebuilt from the active database on the next request (TTL 3600s). I
 2. [ ] Verify database connection and table prefix
 3. [ ] Clear any relevant caches (translation cache, browser cache)
 4. [ ] Check cookie path - did you log out and back in after cookie path changes?
-5. [ ] For API issues: `curl -i /api/v1` returns `200` (not `301`), session initialization is idempotent, cookie path is `/`, and the CSRF token is valid
+5. [ ] For API issues: `curl -i /api/v1` returns `200` with `Content-Type: application/json` (not `301`, and not an HTML theme page), session initialization is idempotent, cookie path is `/`, and the CSRF token is valid. On nginx/DDEV also check [issue 55](#55-sidebar-search-autocomplete-fails-on-nginxddev---apiv1-returns-the-theme-404)
 6. [ ] For image issues: verify APP_IMAGE constants, file permissions, and `getimagesize()` path
 7. [ ] For i18n issues: verify charset=utf8mb4 in DSN and check database for missing keys
 8. [ ] For theme issues: verify no duplicate header/footer calls, check browser console for JS errors

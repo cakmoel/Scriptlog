@@ -1,6 +1,6 @@
 # Developer Guide - Scriptlog
 
-**Version:** 1.11.0 | **Last Updated:** November 2026
+**Version:** 1.12.0 | **Last Updated:** November 2026
 
 ---
 
@@ -59,6 +59,8 @@
 > **NOTE:** PHP extensions required: `pdo`, `pdo_mysql`, `json`, `mbstring`, `curl`, `gd`, `fileinfo`, `openssl`
 
 > **NOTE:** PHP 8.3+ is the recommended runtime for this project. The codebase itself remains PHP 7.4 backwards compatible, and the PHPCompatibility sniff (`phpcs-compatibility.xml`, `testVersion 7.4-`) enforced by the pre-commit hook keeps it that way. New code may use PHP 8.3+ features only if it is guarded by a `version_compare()` check.
+>
+> **SECURITY:** Production deployments must run a PHP release patched for CVE-2026-109618 (RCE via OOM corruption) and CVE-2026-109619 (RCE via stale global state): 8.2.35+, 8.3.36+, 8.4.27+ or 8.5.12+. PHP 7.4/8.0/8.1 are end-of-life and cannot be fixed. See [PHP_RUNTIME_HARDENING.md](PHP_RUNTIME_HARDENING.md) and run `php bin/php-security-check.php` before deploying.
 
 ### Installation
 
@@ -3966,13 +3968,13 @@ This project uses two complementary testing approaches:
 
 | Metric | Value |
 |--------|-------|
-| **Total Tests** | 2,269 |
-| **Test Files** | 167 (`find tests -name "*Test.php"`) |
-| **Assertions** | 8,074 |
-| **Skipped / Risky** | 15 skipped, 60 risky |
-| **PHPUnit Version** | 9.6.35 |
+| **Total Tests** | 2,513 |
+| **Test Files** | 171 (`find tests -name "*Test.php"`) |
+| **Assertions** | 8,679 |
+| **Skipped / Risky** | 84 skipped, 0 failures |
+| **PHPUnit Version** | 9.6.38 |
 | **Target Coverage** | 40% |
-| **Current Coverage** | ~38% |
+| **Current Coverage** | 25.98% lines (6,986/26,889) |
 
 ### Test Coverage Plan
 
@@ -4320,7 +4322,7 @@ SCRIPTLOG          // Security constant (HMAC hash)
 
 // Settings
 APP_TITLE          // 'Scriptlog'
-APP_VERSION        // '1.11.0'
+APP_VERSION        // '1.12.0'
 APP_DEVELOPMENT    // true or false
 ```
 
@@ -5494,6 +5496,7 @@ All three paths delegate to the same `SearchFinder` engine.
 | `lib/core/HandleRequest.php` | `deliverQuerySearch()` - handles `?q=` on app root (permalinks OFF) via `SearchFinder::searchAll()` |
 | `lib/core/Bootstrap.php` | Route definition: `'search' => "/search"` |
 | `public/themes/blog/functions-post.php` | `theme_search_url()` - permalink-aware search URL builder |
+| `index.php` + `lib/utility/api-request.php` | Front-controller hand-off for `/api/*` when the web server has no explicit API rewrite (nginx/DDEV, PHP built-in server) - see `TROUBLESHOOTING.md` issue 55 |
 
 ### Architecture
 
@@ -6060,4 +6063,4 @@ This project is licensed under the MIT License.
 
 ---
 
-*Last Updated: November 2026 | Version 1.11.0*
+*Last Updated: November 2026 | Version 1.12.0*

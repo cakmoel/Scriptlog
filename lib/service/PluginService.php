@@ -275,7 +275,6 @@ final class PluginService
         $sql_path = $plugin_path . '/schema.sql';
 
         if (file_exists($sql_path)) {
-
             $sql_contents = file_get_contents($sql_path);
             if ($sql_contents === false) {
                 direct_page('index.php?load=plugins&error=tableNotFound', 404);

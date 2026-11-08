@@ -49,7 +49,11 @@
 #   Error rates          : denominators are requests SENT (not completed),
 #                          so aborted rounds cannot dilute failure percentages.
 #                          transport = failed/sent; http = non2xx/sent;
-#                          combined = (failed+non2xx)/sent (the CI-gate figure).
+#                          combined = (failed+unexpected non2xx)/sent (the
+#                          CI-gate figure). Scenarios probing an intentional
+#                          error status (expected 404) treat their expected
+#                          non-2xx responses as by design, so only unexpected
+#                          non-2xx responses feed the failure rates.
 #   Latency precision    : percentiles are nearest-rank over POOLED raw
 #                          per-request times (ab -g), never averages of
 #                          per-round percentiles; dispersion reported as
@@ -59,6 +63,17 @@
 #                          latencies are lower bounds, not ground truth.
 #   Reproducibility      : launch order is a seeded Fisher-Yates shuffle; the
 #                          seed is printed and accepted via -R for exact reruns.
+#   Status-based reading  : M1 (plan/PERFORMANCE_PLAN_SEPTEMBER2026.md): ab's
+#                          "Failed requests" folds Length mismatches (per-request
+#                          CSRF tokens / nonces / random blocks) together with
+#                          real transport faults. Judge a run by status codes
+#                          (transport = failed/sent, http = non2xx/sent) and by
+#                          the taxonomy columns, NOT by raw byte-size equality.
+#                          To prove a Length flag is by-design variance, run
+#                          ./normalize-response.sh -u <URL> (fetches twice,
+#                          blanks volatile parts, compares checksums) or rerun
+#                          at least one round with -K (keep-alive) held constant
+#                          on both sides. Never change pages to please ab.
 #
 # REFERENCES
 #   Little's Law: L = lambda * W bounds concurrency vs arrival rate.
@@ -163,7 +178,7 @@ Optional:
   -S  Strict mode: abort before measuring if any endpoint fails its
       pre-flight check (transport error or unexpected HTTP status)
   -e  CI gate: exit nonzero when the COMBINED error rate
-      ((failed + non-2xx) / sent) exceeds this percentage, e.g. -e 2.5
+      ((failed + unexpected non-2xx) / sent) exceeds this percentage, e.g. -e 2.5
   --dry-run  Print the fully resolved workload (endpoints, weights,
       per-round request counts, seed, flags) and exit without
       touching the network or writing any files
@@ -646,7 +661,7 @@ echo ""
 # concurrently within the same round, approximating mixed real traffic.
 # ---------------------------------------------------------------------------
 run_scenario() {
-    local round=$1 name=$2 url=$3 concurrency=$4 requests=$5
+    local round=$1 name=$2 url=$3 concurrency=$4 requests=$5 expected_status=$6
     local out raw_file
     out=$(mktemp -p "$WORKDIR")
     # Per-run raw latency dump (ab -g): TSV, header row, then one row per
@@ -737,6 +752,18 @@ run_scenario() {
         recv_err=${recv_err:-0}
         len_err=${len_err:-0}
         exc_err=${exc_err:-0}
+        # Expected-status-aware failure accounting (F-14 follow-up): ab reports
+        # a single aggregated "Non-2xx responses" count and carries no per-status
+        # breakdown, so a scenario that intentionally probes an error status
+        # (the 404 not-found scenario, expected_status=404) legitimately produces
+        # non-2xx responses that are by design. Only deviations from expectation
+        # are failures: scenarios expecting a 2xx status treat any observed
+        # non-2xx as unexpected; scenarios expecting a non-2xx status treat the
+        # observed count as compliance data rather than failure data.
+        local unexpected_non2xx=0
+        if [[ "${expected_status}" == 2* ]]; then
+            unexpected_non2xx=$non2xx
+        fi
         # Count usable samples in THIS run's raw dump (rows after the header
         # with the full column set). The global aggregation across rounds
         # happens once at summary time.
@@ -773,12 +800,15 @@ run_scenario() {
         if [[ "$ab_exit" -ne 0 ]]; then
             echo "  WARN  round ${round} ${name}: ab exited ${ab_exit} with a PARTIAL report (complete=${complete}, failed=${failed})" >&2
         fi
-        # A clean ab exit (0) with non-2xx responses is worth a WARN too:
-        # ab treats an all-500 round as a successful run, so without this the
+        # A clean ab exit (0) with unexpected non-2xx responses is worth a WARN
+        # too: ab treats an all-500 round as a successful run, so without this the
         # terminal would show a "clean" scenario while every response was an
         # error. The CSV still records the true non2xx count for the summary.
-        if [[ "$ab_exit" -eq 0 && "${non2xx:-0}" -gt 0 ]]; then
-            echo "  WARN  round ${round} ${name}: clean ab exit but ${non2xx} non-2xx response(s)" >&2
+        # Expected-status responses (e.g. the by-design 404 not-found probe)
+        # never reach this branch as failures - see the unexpected_non2xx
+        # computation above.
+        if [[ "$ab_exit" -eq 0 && "${unexpected_non2xx:-0}" -gt 0 ]]; then
+            echo "  WARN  round ${round} ${name}: clean ab exit but ${unexpected_non2xx} non-2xx response(s)" >&2
         fi
     fi
 
@@ -871,7 +901,7 @@ for (( round=1; round<=ROUNDS; round++ )); do
         # floor of 2 for users who explicitly set -m 1.
         [[ "$scenario_requests" -lt 2 ]] && scenario_requests=2
 
-        run_scenario "$round" "$name" "${URLS[$name]}" "$scenario_concurrency" "$scenario_requests" &
+        run_scenario "$round" "$name" "${URLS[$name]}" "$scenario_concurrency" "$scenario_requests" "${EXPECTED_STATUS[$name]}" &
         child_pids+=($!)
     done
     # Wait for all four scenarios in this round to finish before starting
@@ -971,12 +1001,17 @@ for name in $(printf '%s\n' "${!URLS[@]}" | LC_ALL=C sort); do
     # cannot dilute the failure percentage. Three rates are reported because
     # ab folds different failure classes into different counters:
     #   transport = failed/sent          (connect/receive/length/exception)
-    #   http      = non2xx/sent          (genuine HTTP-level failures)
-    #   combined  = (failed+non2xx)/sent (the CI-gate figure; the two sets
-    #                                      are disjoint by construction)
+    #   http      = non2xx/sent          (share of responses that were error-status;
+    #                                    for scenarios probing an intentional
+    #                                    error status - e.g. the 404 not-found
+    #                                    probe - these are by design, not failures)
+    #   combined  = (failed+unexpected non2xx)/sent (the CI-gate figure; the
+    #                                      two sets are disjoint by construction;
+    #                                      unexpected excludes by-design responses
+    #                                      from error-probe scenarios)
     # Dispersion is reported as sample stddev + coefficient of variation so
     # single-round flukes are visible instead of hidden by the mean.
-    awk -F',' -v scenario="$name" '
+    awk -F',' -v scenario="$name" -v expected_status="${EXPECTED_STATUS[$name]}" '
         function sd(sum, sqsum, count,   mean, var_est) {
             if (count < 2) return 0
             mean = sum / count
@@ -1002,7 +1037,8 @@ for name in $(printf '%s\n' "${!URLS[@]}" | LC_ALL=C sort); do
             cv_p95  = (avg_p95 > 0) ? sd_p95 / avg_p95 * 100 : 0
             tr_rate = (sent > 0) ? failed / sent * 100 : 0
             http_rate = (sent > 0) ? non2xx / sent * 100 : 0
-            comb_rate = (sent > 0) ? (failed + non2xx) / sent * 100 : 0
+            unexpected = (expected_status ~ /^2/) ? non2xx : 0
+            comb_rate = (sent > 0) ? (failed + unexpected) / sent * 100 : 0
             printf "%-8s: rounds=%d sent=%d complete=%d | transport-err=%d (%.2f%%) non2xx=%d (%.2f%%) combined=%.2f%%\n", \
                 scenario, n, sent, complete, failed, tr_rate, non2xx, http_rate, comb_rate
             printf "%-8s   taxonomy: connect=%d receive=%d length=%d exceptions=%d\n", \
@@ -1025,10 +1061,22 @@ done
 overall_rc=0
 if [[ -n "$MAX_ERROR_RATE" ]]; then
     verdict=$(awk -F',' -v max="$MAX_ERROR_RATE" '
-        NR > 1 { rows++; sent += $7; failed += $9; non2xx += $15 }
+        BEGIN {
+            # Mirrors EXPECTED_STATUS in load-test.sh: scenarios probing an
+            # intentional error status (the 404 not-found scenario) treat their
+            # expected non-2xx responses as by design and exclude them from the
+            # failure math; 2xx-expected scenarios count every non-2xx response
+            # as an unexpected failure. (Named expected_status_map - "exp" is a
+            # reserved awk built-in function name and cannot be an array here.)
+            expected_status_map["Static"] = "200"
+            expected_status_map["Dynamic"] = "200"
+            expected_status_map["Login"] = "200"
+            expected_status_map["404"] = "404"
+        }
+        NR > 1 { rows++; sent += $7; failed += $9; if (expected_status_map[$4] ~ /^2/) { bad += $15 } }
         END {
             if (rows == 0 || sent == 0) { printf "0.00 VIOLATION"; exit }
-            rate = (failed + non2xx) / sent * 100
+            rate = (sent > 0) ? (failed + bad) / sent * 100 : 0
             printf "%.2f %s", rate, (rate > max) ? "VIOLATION" : "ok"
         }' "$OUTPUT_CSV")
     rate="${verdict%% *}"

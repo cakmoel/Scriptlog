@@ -340,7 +340,7 @@ class ThemeDao extends Dao
         $this->setSQL($sql);
         $stmt = $this->findColumn([$theme_title]);
 
-return ($stmt === 1) ? true : false;
+        return ($stmt === 1) ? true : false;
     }
 
     /**

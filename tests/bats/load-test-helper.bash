@@ -17,6 +17,7 @@
 # Behavior switches (set per test before running):
 #   AB_MODE        clean (default) | total-fail | partial
 #   AB_NON2XX      number placed on the Non-2xx responses line (default 0)
+#   AB_NON2XX_404  overrides AB_NON2XX for the not-found probe only
 #   AB_RAW_HEADER  bad -> emit an invalid ab -g header row (tests P7/F-15)
 #
 # The mock curl answers pre-flight probes with a per-scenario status code
@@ -44,7 +45,7 @@ lt_setup() {
     : > "${AB_LOG}"
     export AB_LOG
 
-    unset AB_MODE AB_NON2XX AB_RAW_HEADER
+    unset AB_MODE AB_NON2XX AB_NON2XX_404 AB_RAW_HEADER
     unset CURL_STATIC_STATUS CURL_DYNAMIC_STATUS CURL_LOGIN_STATUS CURL_404_STATUS
     unset CURL_TRANSPORT_FAIL
 
@@ -89,6 +90,12 @@ while (( i < ${#args[@]} )); do
         *)  url="${args[$i]}"; i=$((i + 1)) ;;
     esac
 done
+
+# The not-found probe is expected to answer with an error status, so tests can
+# give it its own non-2xx count without affecting the three 2xx scenarios.
+if [[ -n "${AB_NON2XX_404:-}" && "$url" == *"/this-page-is-not-real"* ]]; then
+    non2xx="${AB_NON2XX_404}"
+fi
 
 if [[ "$mode" == "total-fail" ]]; then
     printf '%s\n' "apachebench: Could not connect to server on ${url}"

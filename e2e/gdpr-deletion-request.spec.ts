@@ -21,11 +21,6 @@ import {
 const DELETION_URL: string = `${BASE_URL}/admin/index.php?load=privacy&p=data-deletion`;
 
 test.describe('GDPR admin data deletion request', () => {
-  // The DSAR rate limiter is shared per-IP and reseeded in beforeAll, so tests
-  // run in declaration order on one worker instead of racing across
-  // fullyParallel workers.
-  test.describe.configure({ mode: 'serial' });
-
   test.beforeAll((): void => {
     clearRateLimiters();
     clearLoginAttempts();
@@ -58,25 +53,33 @@ test.describe('GDPR admin data deletion request', () => {
     expect(count).toBeGreaterThan(0);
   });
 
-  test.fixme(
-    'deletion request requires email confirmation checkbox',
-    'admin/privacy.php data-deletion handler only checks isset($_POST[\'delete_email\']); confirm_delete is not enforced server-side, so a request row is created regardless of the checkbox.',
-    async ({ page }) => {
-      await adminLogin(page, ADMIN_USER, ADMIN_PASS);
-      await page.goto(DELETION_URL);
-      await expect(page.locator('form')).toBeVisible();
+  test('deletion request requires email confirmation checkbox', async ({
+    page,
+  }) => {
+    await adminLogin(page, ADMIN_USER, ADMIN_PASS);
+    await page.goto(DELETION_URL);
+    await expect(page.locator('form')).toBeVisible();
 
-      await noValidate(page.locator('form'));
-      await page.locator('#email').fill(GDPR_EMAIL);
-      // confirm_delete left unchecked
-      await page.locator('button[type="submit"]').click();
+    // novalidate bypasses the client-side `required` on the checkbox so the
+    // server-side guard in admin/privacy.php is what gets exercised here.
+    await noValidate(page.locator('form'));
+    await page.locator('#email').fill(GDPR_EMAIL);
+    // confirm_delete left unchecked
 
-      const count: number = dbCount(
-        `SELECT COUNT(*) FROM tbl_data_requests WHERE request_email='${GDPR_EMAIL}' AND request_type='deletion'`,
-      );
-      expect(count).toBe(0);
-    },
-  );
+    const before: number = dbCount(
+      `SELECT COUNT(*) FROM tbl_data_requests WHERE request_email='${GDPR_EMAIL}' AND request_type='deletion'`,
+    );
+    await page.locator('button[type="submit"]').click();
+
+    await expect(page.locator('.alert-danger')).toContainText(
+      'confirm the deletion request',
+    );
+
+    const after: number = dbCount(
+      `SELECT COUNT(*) FROM tbl_data_requests WHERE request_email='${GDPR_EMAIL}' AND request_type='deletion'`,
+    );
+    expect(after).toBe(before);
+  });
 
   test('deletion request is rate-limited per IP', async ({ page }) => {
     await adminLogin(page, ADMIN_USER, ADMIN_PASS);

@@ -8,12 +8,61 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#1110---2026-11-04)
+- [Latest Release](#1120---2026-11-09)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.12.0] - 2026-11-09
+
+### Added
+- **PHP runtime security guard**: New `Scriptlog\Core\PhpRuntimeSecurityGuard` evaluates the running PHP build against CVE-2026-109618 (OOM-corruption RCE), CVE-2026-109619 (stale-global-state RCE), and the informational CVE-2026-115560. `report()` writes one audit line for an affected runtime and `enforce()` fails closed when `SCRIPTLOG_STRICT_PHP_SECURITY` is enabled.
+- **PHP security CLI gate**: New `bin/php-security-check.php` prints the patched-release matrix (8.2.35+, 8.3.36+, 8.4.27+, 8.5.12+) and the INI knobs the advisories identify as exploitation paths.
+- **Runtime hardening guide**: New `docs/dev-docs/PHP_RUNTIME_HARDENING.md` documents verification, upgrade, and hardening steps.
+- **Front-controller API hand-off**: New `lib/utility/api-request.php` lets `index.php` dispatch `/api/*` to `api/index.php` on servers without an explicit API rewrite (DDEV/nginx, PHP's built-in server, default LiteSpeed). Covered by `tests/unit/ApiFrontControllerHandoffTest.php`.
+- **Installer nginx API location**: The generated nginx configuration now writes the `/api/` location block before the catch-all.
+- **Theme and security e2e coverage**: New Playwright suites for the Restoblog and Tastybites themes, admin plugins, admin UI parity, blog search API routing/autocomplete, and security hardening (disclosure, traversal, XSS, SSRF).
+- **Specifications**: New specs for security hardening, HTML injection, SSRF, and blog search API routing.
+
+### Changed
+- **Front-controller ordering**: `index.php` resolves the API hand-off before `lib/main.php` bootstraps, and `ob_start()` runs after the hand-off so the API keeps its own bootstrap order.
+- **Bootstrap wiring**: `lib/main.php` invokes the PHP runtime guard and `lib/utility-loader.php` loads the API hand-off helper.
+- **Dependency refresh**: PHPUnit 9.6.38, Symfony Config/Filesystem 5.4.56, and related polyfills; the Composer audit is clean.
+- **Metrics script**: `composer metrics` now runs `php bin/phpmetrics`.
+- **Load-test accounting**: `load-test.sh` distinguishes expected non-2xx probe responses (for example the 404 scenario) from unexpected failures in its CI gate.
+- **Documentation**: Developer, Testing, and Troubleshooting guides updated; Troubleshooting issue 55 covers the nginx/DDEV API routing failure.
+
+### Fixed
+- **API routing on nginx/DDEV**: `/api/v1` no longer renders the theme 404 (or the HTML search page), so sidebar autocomplete and external API clients receive JSON.
+- **Installer nginx rewrites**: Fresh nginx installs now include the API location block.
+- **Load-test false positives**: Intentional 404 probes no longer fail the combined error-rate gate.
+- **Coding-standard violations**: PHPCS now passes across `lib/`.
+- **Dev dependency advisories**: Patched the two Symfony advisories reported by `composer audit`.
+
+### Security
+- **Runtime advisory guard**: Affected PHP builds are logged, and regulated deployments can fail closed.
+- **Security e2e coverage**: New suites assert source-disclosure, path-traversal, SQL-injection, XSS, and SSRF expectations.
+- **Dependency advisories**: Symfony Config and Filesystem updated to patched 5.4 releases.
+
+### Deprecated
+- None
+
+### Removed
+- **structarmed**: Removed the obsolete structarmed configuration files and dependency.
+
+### Notes
+Minor release focused on PHP runtime hardening, API routing reliability, and expanded end-to-end security coverage. No public API, database schema, or configuration breaking changes. Run `php bin/php-security-check.php` before deploying.
+
+### Codename
+**Maleo Senkawor** (retained) – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.11.0
+- **Full comparison**: `v1.11.0...v1.12.0`
+
+---
 
 ## [1.11.0] - 2026-11-04
 
@@ -1186,6 +1235,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.12.0 | 2026-11-09 | Stable |
 | 1.11.0 | 2026-11-04 | Stable |
 | 1.8.0 | 2026-08-19 | Stable |
 | 1.7.1 | 2026-08-14 | Stable |

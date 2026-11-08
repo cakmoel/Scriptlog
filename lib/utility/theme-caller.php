@@ -144,8 +144,10 @@ function premium_theme_license_supports_render($theme)
     $themeDao = new ThemeDao();
     $fallback = $themeDao->findThemeByDirectory('blog');
 
-    if (!empty($fallback) && is_array($fallback)
-        && isset($fallback['theme_directory'])) {
+    if (
+        !empty($fallback) && is_array($fallback)
+        && isset($fallback['theme_directory'])
+    ) {
         $fallback['theme_type'] = isset($fallback['theme_type']) ? $fallback['theme_type'] : 'free';
         $fallback['license_status'] = isset($fallback['license_status']) ? $fallback['license_status'] : 'active';
         return $fallback;

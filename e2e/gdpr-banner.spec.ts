@@ -75,6 +75,62 @@ test.describe('GDPR cookie consent banner', () => {
     await expect(page.locator(BLOG.cookieBanner)).toBeHidden();
   });
 
+  test('banner still appears when an unrelated cookie is malformed', async ({
+    page,
+  }) => {
+    // Regression: cookie-consent.js used to run decodeURIComponent() over the
+    // whole document.cookie string. One sibling cookie holding a literal '%'
+    // throws URIError, aborts init(), and leaves the banner hidden forever.
+    const pageErrors: string[] = [];
+    page.on('pageerror', (error: Error): void => {
+      pageErrors.push(error.message);
+    });
+
+    await page.context().addCookies([
+      { name: 'e2e_malformed', value: '100%', url: `${BASE_URL}/` },
+    ]);
+
+    await page.goto(`${BASE_URL}/`);
+    await expect(page.locator(BLOG.cookieBanner)).toBeVisible();
+    expect(pageErrors).toEqual([]);
+  });
+
+  test('banner reappears when the stored consent version is outdated', async ({
+    page,
+  }) => {
+    // A policy change bumps COOKIE_CONSENT_VERSION, so a consent recorded for
+    // an older version must not suppress the banner.
+    await page.context().addCookies([
+      { name: 'cookie_consent', value: 'accepted', url: `${BASE_URL}/` },
+      { name: 'cookie_consent_version', value: '0', url: `${BASE_URL}/` },
+    ]);
+
+    await page.goto(`${BASE_URL}/`);
+    await expect(page.locator(BLOG.cookieBanner)).toBeVisible();
+  });
+
+  test('banner script is cache-busted so a stale cached copy cannot break SRI', async ({
+    page,
+  }) => {
+    // Assets are served with a 30-day max-age. If the URL stayed the same
+    // while the integrity hash changed, returning visitors would reuse the
+    // old cached script and the browser would block it (SRI mismatch).
+    await page.goto(`${BASE_URL}/`);
+
+    const src: string | null = await page
+      .locator(BLOG.cookieScript)
+      .getAttribute('src');
+    expect(src).toMatch(/cookie-consent\.min\.js\?v=[0-9a-f]+$/);
+
+    expect(
+      await page.evaluate(
+        (): string =>
+          typeof (window as unknown as Record<string, unknown>).CookieConsent,
+      ),
+    ).toBe('object');
+    await expect(page.locator(BLOG.cookieBanner)).toBeVisible();
+  });
+
   test('learn more links to the privacy policy', async ({ page }) => {
     await page.goto(`${BASE_URL}/`);
     const link = page.locator(BLOG.cookieLearnMore);
