@@ -122,6 +122,7 @@ return [
     'Pagination' => 'Scriptlog\Core\Pagination',
     'Paginator' => 'Scriptlog\Core\Paginator',
     'PassPhraseKey' => 'Scriptlog\Core\PassPhraseKey',
+    'PhpRuntimeSecurityGuard' => 'Scriptlog\Core\PhpRuntimeSecurityGuard',
     'PluginController' => 'Scriptlog\Controller\PluginController',
     'PluginDao' => 'Scriptlog\Dao\PluginDao',
     'PluginService' => 'Scriptlog\Service\PluginService',
