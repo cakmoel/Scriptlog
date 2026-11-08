@@ -40,14 +40,12 @@ function plugin_manifest_relative_files($pluginDirectory)
     $files = array();
 
     try {
-
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS),
             RecursiveIteratorIterator::LEAVES_ONLY
         );
 
         foreach ($iterator as $file) {
-
             if (!$file->isFile() || $file->isLink()) {
                 continue;
             }
@@ -61,13 +59,9 @@ function plugin_manifest_relative_files($pluginDirectory)
 
             $relative = substr($file->getPathname(), strlen($directory) + 1);
             $files[] = str_replace(DIRECTORY_SEPARATOR, '/', $relative);
-
         }
-
     } catch (\Throwable $th) {
-
         return false;
-
     }
 
     sort($files, SORT_STRING);
@@ -106,7 +100,6 @@ function plugin_manifest_hash($pluginDirectory)
     $context = hash_init('sha256');
 
     foreach ($files as $relative) {
-
         $absolute = $directory . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relative);
 
         if (!is_readable($absolute)) {
@@ -125,7 +118,6 @@ function plugin_manifest_hash($pluginDirectory)
         hash_update($context, "\0");
         hash_update($context, $contents);
         hash_update($context, "\0");
-
     }
 
     return hash_final($context);
