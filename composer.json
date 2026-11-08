@@ -105,7 +105,7 @@
         }
     },
     "scripts": {
-        "metrics": "phpmetrics --config=phpmetrics.yml",
+        "metrics": "php bin/phpmetrics",
         "phpstan": "phpstan analyse lib --level 1 --memory-limit=1G",
         "phpstan:strict": "phpstan analyse lib --level 5 --memory-limit=1G",
         "phpcs": "phpcs --standard=phpcs.xml lib/",
