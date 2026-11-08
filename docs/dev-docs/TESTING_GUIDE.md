@@ -1,6 +1,6 @@
 # Testing Guide - Scriptlog
 
-**Version:** 1.11.0 | **Last Updated:** November 2026
+**Version:** 1.12.0 | **Last Updated:** November 2026
 
 ---
 
@@ -34,13 +34,13 @@ This project uses two complementary testing approaches:
 
 | Metric | Value |
 |--------|-------|
-| **Total Tests** | 2,269 |
-| **Test Files** | 167 |
-| **Assertions** | 8,074 |
-| **Skipped / Risky** | 15 skipped, 60 risky |
-| **PHPUnit Version** | 9.6.35 |
+| **Total Tests** | 2,513 |
+| **Test Files** | 171 |
+| **Assertions** | 8,679 |
+| **Skipped / Risky** | 84 skipped, 0 failures |
+| **PHPUnit Version** | 9.6.38 |
 | **Target Coverage** | 40% |
-| **Current Coverage** | ~38% |
+| **Current Coverage** | 25.98% lines (6,986/26,889) |
 
 > These totals are a snapshot from the **last recorded run (August 2026)** - rerun the suite to refresh them.
 
@@ -159,9 +159,9 @@ Fill gaps in utility function testing.
 | Password Protected Posts | HIGH | ✅ Complete | 59 | 466 |
 
 **Total New Tests Added**: 466
-**Total Suite**: 2,269 tests across 167 files, 8,074 assertions
+**Total Suite**: 2,513 tests across 171 files, 8,679 assertions
 
-> The phase table above is a historical record of when tests were added. Last recorded run (August 2026): 2,269 tests across 167 files with 8,074 assertions (15 skipped, 60 risky). These totals are a snapshot - rerun the suite to refresh them.
+> The phase table above is a historical record of when tests were added. Last recorded run (November 2026): 2,513 tests across 171 files with 8,679 assertions (84 skipped, 0 failures). These totals are a snapshot - rerun the suite to refresh them.
 
 ### Recently Added Tests
 
@@ -651,4 +651,4 @@ Do not bypass with `git commit --no-verify`.
 
 ---
 
-*Last Updated: November 2026 | Version 1.11.0*
+*Last Updated: November 2026 | Version 1.12.0*
