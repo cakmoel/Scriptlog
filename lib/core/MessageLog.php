@@ -125,6 +125,16 @@ MSG;
             $data = ["Type:" => $class_except, "Messages:" => $messages, "File:" => $file, "Line:" => $line];
 
             file_put_contents($logPath, json_encode($data) . PHP_EOL, FILE_APPEND);
+
+            // A caller that already set a 4xx status (e.g. CSRF rejection)
+            // must keep it: redirecting with 301 would turn a deliberate
+            // client-error response into a successful redirect and hide the
+            // rejection from API/test clients. Log the exception and let the
+            // existing response status stand.
+            if ($responseCode >= 400 && $responseCode < 500) {
+                return;
+            }
+
             direct_page('index.php', 301);
         }
     }
