@@ -401,6 +401,7 @@ CREATE TABLE `tbl_plugin` (
   `plugin_status` enum('Y','N') NOT NULL DEFAULT 'N',
   `plugin_level` varchar(20) NOT NULL,
   `plugin_sort` int(5) DEFAULT NULL,
+  `plugin_manifest` CHAR(64) DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -412,10 +413,10 @@ CREATE TABLE `tbl_plugin` (
 LOCK TABLES `tbl_plugin` WRITE;
 /*!40000 ALTER TABLE `tbl_plugin` DISABLE KEYS */;
 INSERT INTO `tbl_plugin` VALUES
-(46,'Test Plugin','test-plugin','test-plugin-1785555526','Test plugin description','Y','administrator',0),
-(47,'Test Plugin','test-plugin','test-plugin-1785555526','Test plugin description','Y','administrator',0),
-(48,'Test Plugin','test-plugin','test-plugin-1785555526','Test plugin description','Y','administrator',0),
-(49,'Updated Plugin Name','test-plugin','test-plugin-1785555526','Test plugin description','Y','administrator',0);
+(46,'Test Plugin','test-plugin','test-plugin-1785555526','Test plugin description','Y','administrator',0,NULL),
+(47,'Test Plugin','test-plugin','test-plugin-1785555526','Test plugin description','Y','administrator',0,NULL),
+(48,'Test Plugin','test-plugin','test-plugin-1785555526','Test plugin description','Y','administrator',0,NULL),
+(49,'Updated Plugin Name','test-plugin','test-plugin-1785555526','Test plugin description','Y','administrator',0,NULL);
 /*!40000 ALTER TABLE `tbl_plugin` ENABLE KEYS */;
 UNLOCK TABLES;
 
