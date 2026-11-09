@@ -94,6 +94,7 @@ test.describe('GDPR admin data deletion request', () => {
       await page.locator('input[name="confirm_delete"]').check();
       await page.locator('button[type="submit"]').click();
       await expect(page.locator('.alert-success')).toBeVisible();
+      await expect(page.locator('.alert-success')).toContainText('submitted');
     }
 
     // 6th request is throttled.
