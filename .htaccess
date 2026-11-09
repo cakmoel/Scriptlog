@@ -1,46 +1,138 @@
-# Block access to dotfiles, including .env, .git, and .htaccess.
-<FilesMatch "^\. ">
-    Require all denied
+# =============================================
+# SECURITY HEADERS
+# =============================================
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    Header always set Permissions-Policy "accelerometer=(), ambient-light-sensor=(), autoplay=(self), battery=(), camera=(), cross-origin-isolated=(), display-capture=(), document-domain=(), encrypted-media=(self), fullscreen=(self), gamepad=(), geolocation=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), navigation-override=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(self), usb=(), web-share=(self), xr-spatial-tracking=()"
+</IfModule>
+
+# =============================================
+# SECURITY RULES - Block access to sensitive files
+# Auto-generated during installation
+# =============================================
+
+# Block access to all files starting with a dot (except .htaccess itself)
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
 </FilesMatch>
 
-# Block files that commonly contain configuration, logs, backups, or secrets.
+# Block access to specific sensitive file extensions
 <FilesMatch "\.(env|log|sql|sh|bak|old|tmp|swp|yaml|yml|ini|dist|example)$">
-    Require all denied
+    Order allow,deny
+    Deny from all
 </FilesMatch>
 
-# Block direct access to application configuration and dependency manifests.
+# Block access to config.php
 <Files "config.php">
-    Require all denied
-</Files>
-<Files "composer.json">
-    Require all denied
-</Files>
-<Files "composer.lock">
-    Require all denied
-</Files>
-<Files "package.json">
-    Require all denied
-</Files>
-<Files "package-lock.json">
-    Require all denied
+    Order allow,deny
+    Deny from all
 </Files>
 
+# Block access to composer files
+<Files "composer.json">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "composer.lock">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Block access to package files
+<Files "package.json">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "package-lock.json">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Block access to .git directory
+<IfModule mod_rewrite.c>
+    RewriteRule ^\.git - [F,L]
+</IfModule>
+
+# Block access to sensitive directories
+<IfModule mod_rewrite.c>
+    RewriteRule ^(lib)/ - [F,L]
+</IfModule>
+
+# =============================================
+# ScriptLog URL Rewriting
+# =============================================
+# START ScriptLog
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteRule ^\.git(?:/|$) - [F,L]
-    RewriteRule ^(lib)/ - [F,L]
-
-    # Route API requests through the API front controller.
+    RewriteBase /
+    # Ensure all front-end UI-UX files readable
+    RewriteCond %{REQUEST_FILENAME} !\.(ico|css|png|jpg|jpeg|webp|gif|js|txt|htm|html|eot|svg|ttf|woff|woff2|webm|ogg|mp4|wav|mp3|pdf)$ [NC]
+    RewriteRule ^public/.*$ index.php
+    # API routes
     RewriteCond %{REQUEST_URI} ^/api [NC]
     RewriteRule ^api/(.*)$ api/index.php [QSA,L]
-
-    # Route application URLs through the front controller while leaving
-    # existing files and directories untouched.
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-l
-    RewriteRule ^(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$ index.php [QSA,L]
+    RewriteCond %{REQUEST_FILENAME} !-d 
+    RewriteCond %{REQUEST_FILENAME} !-f 
+    RewriteCond %{REQUEST_FILENAME} !-l 
+    # Only route known application prefixes to index.php
+    RewriteRule ^(post|page|blog|category|archive|archives|tag|privacy|search|download|download_file)(/.*)?$ index.php [QSA,L]
     RewriteRule ^$ index.php [QSA,L]
-    RewriteRule ^[a-z]{2}/(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$ index.php [QSA,L]
+    RewriteRule ^[a-z]{2}/(post|page|blog|category|archive|archives|tag|privacy|search|download|download_file)(/.*)?$ index.php [QSA,L]
     RewriteRule ^[a-z]{2}/?$ index.php [QSA,L]
+</IfModule>
+# FINISH ScriptLog
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE application/rss+xml
+  AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+  AddOutputFilterByType DEFLATE application/x-font
+  AddOutputFilterByType DEFLATE application/x-font-opentype
+  AddOutputFilterByType DEFLATE application/x-font-otf
+  AddOutputFilterByType DEFLATE application/x-font-truetype
+  AddOutputFilterByType DEFLATE application/x-font-ttf
+  AddOutputFilterByType DEFLATE application/x-javascript
+  AddOutputFilterByType DEFLATE application/xhtml+xml
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE font/opentype
+  AddOutputFilterByType DEFLATE font/otf
+  AddOutputFilterByType DEFLATE font/ttf
+  AddOutputFilterByType DEFLATE image/svg+xml
+  AddOutputFilterByType DEFLATE image/x-icon
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE text/plain
+  AddOutputFilterByType DEFLATE text/xml
+  BrowserMatch ^Mozilla/4 gzip-only-text/html
+  BrowserMatch ^Mozilla/4\.0[678] no-gzip
+  BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+  Header append Vary User-Agent
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 month"
+  ExpiresByType image/x-icon "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType application/x-shockwave-flash "access plus 1 month"
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType text/javascript "access plus 1 month"
+  ExpiresByType application/x-javascript "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType application/pdf "access plus 1 month"
+  ExpiresByType application/x-font-woff "access plus 1 year"
+  ExpiresByType application/x-font-woff2 "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
 </IfModule>
