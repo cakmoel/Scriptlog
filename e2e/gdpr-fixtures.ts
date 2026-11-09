@@ -444,7 +444,13 @@ export function seedGdprFixtures(): void {
     DELETE FROM tbl_login_attempt;
     DELETE FROM tbl_settings WHERE setting_name IN ('consent_retention_days','privacy_log_retention_days');
     DELETE FROM tbl_user_token WHERE user_login IN ('${gdprUser}','${noaccessUser}');
-    DELETE FROM tbl_comments WHERE comment_author_email IN ('${gdprEmail}','${noaccessEmail}');
+    DELETE FROM tbl_comments
+      WHERE comment_author_email IN ('${gdprEmail}','${noaccessEmail}')
+         OR (
+           comment_post_id = ${GDPR_POST_ID}
+           AND comment_author_email = 'deleted@user.local'
+           AND comment_content = 'A comment left by the GDPR e2e subject.'
+         );
     DELETE FROM tbl_posts WHERE post_author IN (SELECT ID FROM tbl_users WHERE user_login IN ('${gdprUser}','${noaccessUser}'));
     DELETE FROM tbl_users WHERE user_login IN ('${gdprUser}','${noaccessUser}');
     DELETE FROM tbl_languages WHERE lang_code IN ('en','ar','zh','fr','ru','es','id');
@@ -517,7 +523,13 @@ export function cleanupGdprFixtures(): void {
     DELETE FROM tbl_login_attempt;
     DELETE FROM tbl_settings WHERE setting_name IN ('consent_retention_days','privacy_log_retention_days');
     DELETE FROM tbl_user_token WHERE user_login IN ('${gdprUser}','${noaccessUser}');
-    DELETE FROM tbl_comments WHERE comment_author_email IN ('${gdprEmail}','${noaccessEmail}');
+    DELETE FROM tbl_comments
+      WHERE comment_author_email IN ('${gdprEmail}','${noaccessEmail}')
+         OR (
+           comment_post_id = ${GDPR_POST_ID}
+           AND comment_author_email = 'deleted@user.local'
+           AND comment_content = 'A comment left by the GDPR e2e subject.'
+         );
     DELETE FROM tbl_posts WHERE post_author IN (SELECT ID FROM tbl_users WHERE user_login IN ('${gdprUser}','${noaccessUser}'));
     DELETE FROM tbl_users WHERE user_login IN ('${gdprUser}','${noaccessUser}');
   `);
