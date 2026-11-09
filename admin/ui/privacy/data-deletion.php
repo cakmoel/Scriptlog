@@ -21,7 +21,7 @@
          <div class="col-xs-12">
          
          <?php
-            if (isset($errors)) :
+            if (!empty($errors)) :
                 ?>
          <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -37,7 +37,7 @@
             ?>
          
          <?php
-            if (isset($status)) :
+            if (!empty($status)) :
                 ?>
          <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
