@@ -41,16 +41,35 @@ $_ENV['APP_URL'] = getenv('PLAYWRIGHT_BASE_URL') ?: 'http://127.0.0.1:8099';
 // https://127.0.0.1:8099, which this HTTP-only dev server cannot serve, so
 // Bootstrap/theme CSS never loads and responsive layout tests fail.
 //
-// The spoof is limited to HTML document navigations on purpose: is_ssl() also
-// drives the session cookie's Secure flag (is_cookies_secured()), and WebKit
-// refuses to store Secure cookies delivered over plain HTTP - which broke the
-// unlock-persistence flow (plan finding R7) because the _scriptlog cookie set
-// by the unlock XHR never survived. Non-document requests (API/XHR/fetch) see
-// HTTPS off, so their cookies stay storable while document CSP stays correct.
+// The spoof is limited to top-level document navigations on purpose: is_ssl()
+// also drives the session cookie's Secure flag (is_cookies_secured()), and
+// WebKit refuses to store Secure cookies delivered over plain HTTP - which
+// broke the unlock-persistence flow (plan finding R7) because the _scriptlog
+// cookie set by the unlock XHR never survived. Non-document requests
+// (API/XHR/fetch) see HTTPS off, so their cookies stay storable while document
+// CSP stays correct.
+//
+// Form POSTs are document navigations too. If they were left as "insecure",
+// their response would carry `upgrade-insecure-requests`, and WebKit applies
+// that directive to the next form submission - so a second POST in the same
+// flow silently went to https:// and failed its TLS handshake.
+//
+// The security-hardening spec also needs to observe the real production
+// contract (HSTS + Secure session cookie) over this HTTP-only server. It sends
+// the X-E2E-Security-Probe header so the header/cookie scrub below is skipped
+// for that one request; browsers never send it, so normal navigations keep
+// their plain-HTTP behaviour.
+$routerSecurityProbe =
+    isset($_SERVER['HTTP_X_E2E_SECURITY_PROBE'])
+    && $_SERVER['HTTP_X_E2E_SECURITY_PROBE'] === '1';
 $routerAccept = isset($_SERVER['HTTP_ACCEPT']) ? $_SERVER['HTTP_ACCEPT'] : '';
+$routerMethod = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
 $routerIsDocument =
-    (!isset($_SERVER['REQUEST_METHOD']) || $_SERVER['REQUEST_METHOD'] === 'GET')
-    && strpos($routerAccept, 'text/html') !== false;
+    $routerSecurityProbe
+    || (
+        in_array($routerMethod, ['GET', 'POST'], true)
+        && strpos($routerAccept, 'text/html') !== false
+    );
 if ($routerIsDocument) {
     $_SERVER['HTTPS'] = 'on';
 }
@@ -70,19 +89,28 @@ if ($routerIsDocument) {
 // scrub below silently no-ops. A chunked ob_start(NULL, 0) never auto-flushes.
 ini_set('zlib.output_compression', 'Off');
 ob_start(null, 0);
-register_shutdown_function(function (): void {
+register_shutdown_function(function () use ($routerSecurityProbe): void {
     // Never let the header rewrite throw: a request may have already flushed
     // its headers (the app decides to send the response early), and PHP turns
     // header_remove()/header() warnings into an ErrorException caught by the
     // app's Whoops handler, which would replace a valid download with an error
-    // page. When headers already went out the Secure-flag scrub is a no-op.
+    // page. When headers already went out the scrub is a no-op.
     if (headers_sent()) {
         return;
+    }
+    if (!$routerSecurityProbe) {
+        // HSTS is a production contract, but a browser that receives it over
+        // this plain-HTTP dev server upgrades every later request to https://
+        // and the connection fails (observed in Firefox/WebKit). Strip it for
+        // ordinary traffic; the probe request above asserts it is still sent.
+        @header_remove('Strict-Transport-Security');
     }
     $cleanCookies = [];
     foreach (headers_list() as $header) {
         if (stripos($header, 'Set-Cookie:') === 0) {
-            $cleanCookies[] = preg_replace('/;\s*Secure\b/i', '', $header);
+            $cleanCookies[] = $routerSecurityProbe
+                ? $header
+                : preg_replace('/;\s*Secure\b/i', '', $header);
         }
     }
     if ($cleanCookies) {
