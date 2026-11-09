@@ -167,16 +167,31 @@ test.describe('security: disclosure, traversal & hardening', () => {
   test('security headers and session cookie flags are set on document responses', async ({
     page,
     context,
+    request,
   }) => {
     const headers = (await page.goto(`${BASE_URL}/`))?.headers() ?? {};
 
-    // Clickjacking / MIME-sniffing / referrer hardening.
+    // Clickjacking / MIME-sniffing / referrer / CSP hardening.
     expect(headers['x-frame-options']).toBe('sameorigin');
     expect(headers['x-content-type-options']).toBe('nosniff');
     expect(headers['content-security-policy']).toContain("default-src 'self'");
     expect(headers['content-security-policy']).toContain("frame-ancestors 'self'");
     expect(headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
-    expect(headers['strict-transport-security']).toContain('max-age=');
+
+    // HSTS and the Secure cookie flag are production contracts. The e2e router
+    // deliberately strips both from ordinary plain-HTTP traffic (a browser that
+    // receives HSTS upgrades every later request to https:// and the dev
+    // server cannot serve it). Probe once with the opt-in header so the real
+    // production values are still asserted.
+    const probe = await request.get(`${BASE_URL}/`, {
+      headers: {
+        'X-E2E-Security-Probe': '1',
+        Accept: 'text/html',
+      },
+    });
+    const probeHeaders = probe.headers();
+    expect(probeHeaders['strict-transport-security']).toContain('max-age=');
+    expect((probeHeaders['set-cookie'] ?? '').toLowerCase()).toContain('secure');
 
     // Session cookie must be unreadable by script and not sent cross-site.
     const cookies = await context.cookies();
@@ -184,6 +199,5 @@ test.describe('security: disclosure, traversal & hardening', () => {
     expect(session, '_scriptlog cookie must be issued').toBeDefined();
     expect(session?.httpOnly).toBe(true);
     expect(session?.sameSite).toBe('Lax');
-    expect(session?.secure).toBe(true);
   });
 });
