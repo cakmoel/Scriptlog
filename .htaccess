@@ -1,0 +1,46 @@
+# Block access to dotfiles, including .env, .git, and .htaccess.
+<FilesMatch "^\. ">
+    Require all denied
+</FilesMatch>
+
+# Block files that commonly contain configuration, logs, backups, or secrets.
+<FilesMatch "\.(env|log|sql|sh|bak|old|tmp|swp|yaml|yml|ini|dist|example)$">
+    Require all denied
+</FilesMatch>
+
+# Block direct access to application configuration and dependency manifests.
+<Files "config.php">
+    Require all denied
+</Files>
+<Files "composer.json">
+    Require all denied
+</Files>
+<Files "composer.lock">
+    Require all denied
+</Files>
+<Files "package.json">
+    Require all denied
+</Files>
+<Files "package-lock.json">
+    Require all denied
+</Files>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^\.git(?:/|$) - [F,L]
+    RewriteRule ^(lib)/ - [F,L]
+
+    # Route API requests through the API front controller.
+    RewriteCond %{REQUEST_URI} ^/api [NC]
+    RewriteRule ^api/(.*)$ api/index.php [QSA,L]
+
+    # Route application URLs through the front controller while leaving
+    # existing files and directories untouched.
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-l
+    RewriteRule ^(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$ index.php [QSA,L]
+    RewriteRule ^$ index.php [QSA,L]
+    RewriteRule ^[a-z]{2}/(post|page|blog|category|archive|archives|tag|privacy|download|download_file)(/.*)?$ index.php [QSA,L]
+    RewriteRule ^[a-z]{2}/?$ index.php [QSA,L]
+</IfModule>
