@@ -20,8 +20,8 @@ const BASE_URL: string = BLOG_BASE_URL;
 
 /** Scratch e2e post backing every suggestion assertion. */
 const FIXTURE_POST_ID: number = 99960;
-const FIXTURE_POST_TITLE: string = 'Sidebar Autocomplete Beacon';
-const FIXTURE_KEYWORD: string = 'Beacon';
+const FIXTURE_POST_TITLE: string = 'Sidebar Autocomplete Zephyrbeacon';
+const FIXTURE_KEYWORD: string = 'zephyrbeacon';
 /** Keyword guaranteed to match nothing in the scratch database. */
 const NO_HIT_KEYWORD: string = 'zzzqqqxxnohitbeacon';
 /** Keyword backing the three-post keyboard-navigation fixture. */
@@ -45,10 +45,10 @@ function seedSearchFixture(): void {
       post_headlines, post_sticky, post_type, post_locale, comment_status
     ) VALUES (
       ${FIXTURE_POST_ID}, 0, 1, NOW(),
-      '${FIXTURE_POST_TITLE}', 'sidebar-autocomplete-beacon',
-      '<p>The sidebar autocomplete beacon verifies live search suggestions.</p>',
-      'Sidebar autocomplete beacon summary',
-      'publish', 'public', 'beacon,e2e', 0, 0, 'blog', 'en', 'closed'
+      '${FIXTURE_POST_TITLE}', 'sidebar-autocomplete-zephyrbeacon',
+      '<p>The sidebar autocomplete zephyrbeacon verifies live search suggestions.</p>',
+      'Sidebar autocomplete zephyrbeacon summary',
+      'publish', 'public', 'zephyrbeacon,e2e', 0, 0, 'blog', 'en', 'closed'
     )
     ON DUPLICATE KEY UPDATE
       post_title = VALUES(post_title),
