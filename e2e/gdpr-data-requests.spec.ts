@@ -10,6 +10,7 @@ import {
   ADMIN_USER,
   BASE_URL,
   GDPR_EMAIL,
+  GDPR_POST_ID,
   GDPR_POST_TITLE,
   adminLogin,
   clearConsentCookies,
@@ -154,9 +155,14 @@ test.describe('GDPR admin data requests', () => {
         `SELECT COUNT(*) FROM tbl_comments WHERE comment_author_email='${GDPR_EMAIL}'`,
       ),
     ).toBe(0);
+    // Only this fixture's comment is anonymized; scope the count to its
+    // content so unrelated anonymized rows in the dump cannot skew it.
     expect(
       dbCount(
-        `SELECT COUNT(*) FROM tbl_comments WHERE comment_author_name='Deleted User'`,
+        `SELECT COUNT(*) FROM tbl_comments
+         WHERE comment_author_name='Deleted User'
+           AND comment_post_id=${GDPR_POST_ID}
+           AND comment_content='A comment left by the GDPR e2e subject.'`,
       ),
     ).toBe(1);
     // Post reassigned to fallback author 767.
