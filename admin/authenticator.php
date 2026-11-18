@@ -68,9 +68,7 @@ if (class_exists('Session')) {
 
             $secret = function_exists('app_key') ? app_key() : "";
 
-            if (
-                !empty($secret) && Tokenizer::isSelectorValid(
-                    $token_info['selector_hash'],      // encrypted DB value
+            if (!empty($secret) && Tokenizer::isSelectorValid($token_info['selector_hash'],      // encrypted DB value
                     $_COOKIE['scriptlog_selector'],    // cookie
                     $secret
                 )
