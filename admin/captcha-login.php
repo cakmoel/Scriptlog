@@ -12,7 +12,7 @@
 
 require __DIR__ . '/../lib/main.php';
 
-$random_alpha =  function_exists('ircmaxell_generator_string') ? ircmaxell_generator_string('medium') : "";
+$random_alpha =  function_exists('random_bytes') ? bin2hex(random_bytes(32)) : bin2hex(openssl_random_pseudo_bytes(32));
 
 $captcha_code = substr($random_alpha, 0, 6);
 
