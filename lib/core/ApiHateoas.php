@@ -2,6 +2,9 @@
 
 namespace Scriptlog\Core;
 
+// Psalm folds this guard to true because lib/common.php declares SCRIPTLOG;
+// it still protects direct HTTP access, where the bootstrap never ran.
+/** @psalm-suppress ParadoxicalCondition */
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -11,7 +14,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * links for RESTful API responses following RFC 5988 (Web Linking).
  *
  * @category  Core Class
- * @author    Blogware Team
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
  * @since     1.0.0
