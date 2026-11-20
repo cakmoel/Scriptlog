@@ -12,6 +12,8 @@ class PageCacheTest extends TestCase
     private $originalServer;
     private $originalCookie;
     private $originalGet;
+    private $originalSession;
+    private $hadSession;
 
     protected function setUp(): void
     {
@@ -19,6 +21,8 @@ class PageCacheTest extends TestCase
         $this->originalServer = $_SERVER;
         $this->originalCookie = $_COOKIE;
         $this->originalGet = $_GET;
+        $this->hadSession = isset($_SESSION);
+        $this->originalSession = $_SESSION ?? [];
 
         // Set default server variables for CLI
         $_SERVER['REQUEST_URI'] = '/';
@@ -33,6 +37,12 @@ class PageCacheTest extends TestCase
         $_SERVER = $this->originalServer;
         $_COOKIE = $this->originalCookie;
         $_GET = $this->originalGet;
+
+        if ($this->hadSession) {
+            $_SESSION = $this->originalSession;
+        } else {
+            unset($_SESSION);
+        }
 
         // Cleanup any generated test cache files
         if (defined('APP_CACHE_DIR') && is_dir(APP_CACHE_DIR)) {
@@ -57,6 +67,27 @@ class PageCacheTest extends TestCase
         $_SERVER['HTTPS'] = 'on';
         $key2 = page_cache_key();
         $this->assertNotEquals($key1, $key2, 'HTTPS should generate a different key');
+    }
+
+    public function testPageCacheKeyIncludesActiveLocale()
+    {
+        $_SERVER['REQUEST_URI'] = '/localized-page';
+        $_SERVER['HTTP_HOST'] = 'localhost';
+        unset($_SERVER['HTTPS'], $_SESSION['scriptlog_locale'], $_COOKIE['scriptlog_locale']);
+
+        $neutralKey = page_cache_key();
+
+        $_COOKIE['scriptlog_locale'] = 'ar';
+        $cookieKey = page_cache_key();
+        $this->assertNotEquals($neutralKey, $cookieKey, 'Cookie locale should generate a different key');
+
+        $_SESSION['scriptlog_locale'] = 'fr';
+        $sessionKey = page_cache_key();
+        $this->assertNotEquals($cookieKey, $sessionKey, 'Session locale should take precedence');
+
+        unset($_COOKIE['scriptlog_locale']);
+        $_SESSION['scriptlog_locale'] = ['invalid'];
+        $this->assertSame($neutralKey, page_cache_key(), 'Invalid locale values must be ignored');
     }
 
     public function testPageCachePath()
