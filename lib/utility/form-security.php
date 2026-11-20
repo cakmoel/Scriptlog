@@ -37,12 +37,15 @@ function generate_form_token($form, $length)
     $token = null;
 
     if (function_exists("random_bytes")) {
-        $token = bin2hex(random_bytes($length) . $key);
-    } elseif (function_exists("openssl_random_pseudo_bytes")) {
-        $token = bin2hex(openssl_random_pseudo_bytes($length) . $key);
+        $random_bytes = random_bytes($length);
     } else {
-        $token = bin2hex(ircmaxell_random_generator($length) . $key);
+        // random_bytes() is a CSPRNG available on all PHP versions supported
+        // by Scriptlog (>= 7.4); the OpenSSL fallback is CSPRNG-backed as well.
+        // Token material never falls back to an insecure source.
+        $random_bytes = openssl_random_pseudo_bytes($length);
     }
+
+    $token = bin2hex($random_bytes . $key);
 
     if (empty($_SESSION[$form . '_csrf'])) {
         $_SESSION[$form . '_csrf'] = array();
