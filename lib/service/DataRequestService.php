@@ -10,7 +10,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Service layer for GDPR data requests (access, deletion)
  *
  * @category  Service Class
- * @author    Scriptlog
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0
