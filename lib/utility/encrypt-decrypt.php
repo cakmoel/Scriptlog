@@ -63,10 +63,11 @@ function encrypt(string $data, string $key): string
 
     if (function_exists('random_bytes')) {
         $iv = random_bytes($iv_length);
-    } elseif ('openssl_random_pseudo_bytes') {
-        $iv = openssl_random_pseudo_bytes($iv_length);
     } else {
-        $iv = ircmaxell_random_generator($iv_length);
+        // random_bytes() is a CSPRNG available on all PHP versions supported
+        // by Scriptlog (>= 7.4); the OpenSSL fallback is CSPRNG-backed as well,
+        // so the encryption IV never comes from an insecure source.
+        $iv = openssl_random_pseudo_bytes($iv_length);
     }
 
     $ciphertext = openssl_encrypt($data, $cipher_method, $passphrase, OPENSSL_RAW_DATA, $iv);

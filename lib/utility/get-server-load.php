@@ -42,7 +42,9 @@ function get_server_load()
                 break;
             }
 
-            $load[] = round($load_total / $cpu_num);
+            if ($cpu_num > 0) {
+                $load[] = round($load_total / $cpu_num);
+            }
         } else {
             goto sysload;
         }

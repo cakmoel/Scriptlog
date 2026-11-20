@@ -11,7 +11,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Provides common functionality for request handling, validation, and authentication
  *
  * @category  Controller Class
- * @author    Blogware Team
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0

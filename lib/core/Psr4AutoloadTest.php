@@ -12,7 +12,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * from lib/core/Psr4AutoloadTest.php via the Scriptlog\Core namespace.
  *
  * @category Core
- * @author   Scriptlog
+ * @author   M.Noermoehammad
  * @license  MIT License
  * @version  1.0
  * @since    1.0

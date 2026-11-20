@@ -6,7 +6,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * app_reading_setting()
  *
  * @category function
- * @author MNoermoehammad
+ * @author M.Noermoehammad
  * @return array
  *
  */

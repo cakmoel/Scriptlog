@@ -12,7 +12,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  *
  * @category Core Class
  *
- * @see https://github.com/ircmaxell/RandomLib
+ * @see https://www.php.net/manual/en/function.random-bytes.php
  * @see https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string
  * @see https://phppot.com/php/secure-remember-me-for-login-using-php-session-and-cookies/
  * @see https://paragonie.com/blog/2015/05/using-encryption-and-authentication-correctly
@@ -21,7 +21,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * @see https://paragonie.com/blog/2015/11/choosing-right-cryptography-library-for-your-php-project-guide
  * @see https://www.zimuel.it/blog/cryptography-made-easy-with-zend-framework
  *
- * @uses \RandomLib\Factory::getMediumStrengthGenerator
+ * @uses \random_bytes
  * @uses ScriptlogCryptonize::cipherMessage
  * @uses ScriptlogCryptonize::decipherMessage
  *
@@ -53,18 +53,31 @@ final class Tokenizer
     /**
      * Create token
      *
+     * Generates a random token from the cryptographically secure random
+     * number generator (random_bytes). The raw bytes are hex-encoded with
+     * bin2hex(), so each byte yields two lowercase hex characters and the
+     * historical token length contract is preserved (createToken(128) returns
+     * a 128 character lowercase hex token backed by 64 bytes, i.e. 512 bits of
+     * CSPRNG entropy).
+     *
      * @method public createToken()
      * @static
      * @param integer|number $length
      * @return string
      *
      */
-    public static function createToken($length)
+    public static function createToken($length): string
     {
+        $length = (int)$length;
 
-        $generator = (new \RandomLib\Factory())->getMediumStrengthGenerator();
+        // random_bytes() is a CSPRNG available on all PHP versions supported
+        // by Scriptlog (>= 7.4); bin2hex() renders two lowercase hex characters
+        // per byte, keeping the token length contract while removing the
+        // legacy medium-strength pseudo-random generator from the auth token
+        // path.
+        $byteLength = max(1, (int)ceil($length / 2));
 
-        return $generator->generateString($length);
+        return bin2hex(random_bytes($byteLength));
     }
 
     /**

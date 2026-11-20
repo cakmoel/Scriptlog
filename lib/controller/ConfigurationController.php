@@ -713,7 +713,7 @@ final class ConfigurationController
 
                 $settings = [
                   'allowed_mime_types' => $_POST['allowed_mime_types'] ?? [],
-                  'expiry_hours' => (int)($_POST['expiry_hours'] ?? 8),
+                  'expiry_hours' => (int)($_POST['expiry_hours'] ?? \DownloadSettings::DEFAULT_EXPIRY_HOURS),
                   'hotlink_protection' => isset($_POST['hotlink_protection']),
                   'allowed_domains' => array_filter(array_map('trim', explode("\n", $_POST['allowed_domains'] ?? ''))),
                   'support_url' => $_POST['support_url'] ?? '',

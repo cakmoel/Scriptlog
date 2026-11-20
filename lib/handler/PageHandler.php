@@ -46,6 +46,13 @@ class PageHandler implements FrontRequestHandler
             return;
         }
 
+        // S7 parity with HandleRequest::deliverQueryPage(): non-numeric IDs
+        // cannot match a record, so fail cheap before querying.
+        if (!ctype_digit((string) $id)) {
+            $this->renderer->render404();
+            return;
+        }
+
         $frontService = HandleRequest::handleFrontHelper();
 
         if (!$frontService || !method_exists($frontService, 'getSimplePage')) {

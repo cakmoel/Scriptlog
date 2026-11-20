@@ -3,9 +3,31 @@
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
+ * app_info_cache()
+ *
+ * Request-scoped holder for the memoized app_info() array.
+ * Accessed by reference so tests can reset it between cases.
+ *
+ * @category function
+ * @author   M.Noermoehammad
+ * @license  MIT
+ * @return array|null
+ *
+ */
+function &app_info_cache()
+{
+    static $app_info = null;
+    return $app_info;
+}
+
+/**
  * app_info()
  *
  * Retrieving site setting information
+ *
+ * Builds a fixed array from the already-memoized app_settings() map, so the
+ * result is stable for the lifetime of a request. Templates call this helper
+ * repeatedly; memoizing avoids rebuilding the same 13-key array on each call.
  *
  * @category function
  * @author M.Noermoehammad
@@ -16,6 +38,11 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  */
 function app_info()
 {
+    $app_info = &app_info_cache();
+
+    if ($app_info !== null) {
+        return $app_info;
+    }
 
     $settings = function_exists('app_settings') ? app_settings() : array();
 
@@ -49,4 +76,24 @@ function app_info()
     }
 
     return $app_info;
+}
+
+/**
+ * reset_app_info_cache()
+ *
+ * Forget the memoized app_info() array (used by tests and after admin writes
+ * that change site settings within the same process).
+ *
+ * @category function
+ * @author   M.Noermoehammad
+ * @license  MIT
+ * @return void
+ *
+ * @psalm-suppress UnusedVariable The assignment through the reference from
+ *     app_info_cache() is what clears the static cache.
+ */
+function reset_app_info_cache()
+{
+    $app_info = &app_info_cache();
+    $app_info = null;
 }

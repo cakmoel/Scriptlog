@@ -6,7 +6,7 @@
  * Renders the cookie consent banner HTML
  *
  * @category Theme Template
- * @author   Scriptlog
+ * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0
  */

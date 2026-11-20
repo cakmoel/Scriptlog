@@ -3,6 +3,25 @@
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
+ * Request-scoped Escaper instance cache keyed by encoding.
+ *
+ * Laminas\Escaper\Escaper is immutable once constructed (it only stores the
+ * encoding and the htmlspecialchars flags), but escape_html() used to build a
+ * new one on every call - 43 constructions per homepage render in the
+ * September 2026 profile. Reusing one instance per encoding keeps the escaping
+ * behaviour identical while removing that allocation churn.
+ *
+ * @category function
+ * @return array<string,\Laminas\Escaper\Escaper>
+ *
+ */
+function &escape_html_escaper_cache()
+{
+    static $escapers = array();
+    return $escapers;
+}
+
+/**
  * escape_html()
  *
  * Escape HTML, HTML Atrributes, JavaScript, CSS and Url.
@@ -34,7 +53,21 @@ function escape_html($input, $type = 'html', $encoding = 'utf-8', $mode = 'base'
         return '';
     }
 
-    $escaper = new Laminas\Escaper\Escaper($encoding);
+    if (is_string($encoding)) {
+        $escapers = &escape_html_escaper_cache();
+
+        if (!isset($escapers[$encoding])) {
+            $escapers[$encoding] = new Laminas\Escaper\Escaper($encoding);
+        }
+
+        $escaper = $escapers[$encoding];
+    } else {
+        // Preserve the historical failure mode for a non-string encoding.
+        // The parameter is untyped at runtime, so this branch stays reachable
+        // even though the documented contract is a string.
+        /** @psalm-suppress NoValue */
+        $escaper = new Laminas\Escaper\Escaper($encoding);
+    }
 
     switch ($mode) {
         default:

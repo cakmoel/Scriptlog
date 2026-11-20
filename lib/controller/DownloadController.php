@@ -87,11 +87,42 @@ class DownloadController extends BaseApp
             exit;
         }
 
+        $ipAddress = function_exists('get_ip_address') ? get_ip_address() : '';
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+        if (!$this->downloadService->isDownloadIpAllowed($identifier, $ipAddress)) {
+            $this->downloadService->recordDownloadAttempt(
+                $downloadInfo['media_id'],
+                $identifier,
+                $ipAddress,
+                $userAgent,
+                'failed'
+            );
+
+            http_response_code(403);
+            echo 'Download not allowed';
+            exit;
+        }
+
         $media = $this->downloadService->getMediaByIdentifier($identifier);
 
         if (!$media) {
             http_response_code(404);
             echo 'File not found';
+            exit;
+        }
+
+        if (!$this->downloadService->isMediaDownloadable($media)) {
+            $this->downloadService->recordDownloadAttempt(
+                $downloadInfo['media_id'],
+                $identifier,
+                $ipAddress,
+                $userAgent,
+                'failed'
+            );
+
+            http_response_code(403);
+            echo 'File not allowed';
             exit;
         }
 
@@ -115,9 +146,6 @@ class DownloadController extends BaseApp
                 exit;
             }
         }
-
-        $ipAddress = function_exists('get_ip_address') ? get_ip_address() : '';
-        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
         $this->downloadService->recordDownloadAttempt(
             $downloadInfo['media_id'],

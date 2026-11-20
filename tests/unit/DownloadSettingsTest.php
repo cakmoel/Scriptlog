@@ -35,12 +35,12 @@ class DownloadSettingsTest extends TestCase
 
     public function testDefaultExpiryHours(): void
     {
-        $this->assertEquals(8, DownloadSettings::getDownloadExpiry());
+        $this->assertEquals(1, DownloadSettings::getDownloadExpiry());
     }
 
     public function testDefaultExpiryConstant(): void
     {
-        $this->assertEquals(8, DownloadSettings::DEFAULT_EXPIRY_HOURS);
+        $this->assertEquals(1, DownloadSettings::DEFAULT_EXPIRY_HOURS);
     }
 
     public function testDefaultHotlinkProtectionDisabled(): void
@@ -86,7 +86,7 @@ class DownloadSettingsTest extends TestCase
     {
         $settings = DownloadSettings::getAllSettings();
         $this->assertIsArray($settings['allowed_mime_types']);
-        $this->assertEquals(8, $settings['expiry_hours']);
+        $this->assertEquals(1, $settings['expiry_hours']);
         $this->assertFalse($settings['hotlink_protection']);
         $this->assertIsArray($settings['allowed_domains']);
         $this->assertEquals('', $settings['support_url']);

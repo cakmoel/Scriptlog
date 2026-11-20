@@ -238,3 +238,68 @@ function handle_preflight_request()
         exit();
     }
 }
+
+/**
+ * Define the per-request Content-Security-Policy nonce.
+ *
+ * Extracted from Bootstrap::defineCspNonce() so the early page-cache path
+ * (lib/utility/page-cache-bootstrap.php) can mint exactly the same nonce without
+ * loading the framework. The first definition wins for the request, so
+ * calling this from both paths is safe.
+ *
+ * @category function
+ * @return void
+ */
+function scriptlog_define_csp_nonce()
+{
+    if (!defined('CSP_NONCE')) {
+        define('CSP_NONCE', base64_encode(random_bytes(20)));
+    }
+}
+
+/**
+ * Emit the application security response headers.
+ *
+ * Single source of truth shared by Bootstrap::applySecurity() (full
+ * bootstrap) and the early page-cache path, so a cached response carries
+ * byte-identical headers to an uncached one. No-op in CLI or once output
+ * has started (header() would warn).
+ *
+ * @category function
+ * @param string $app_url Application base URL used by the CSP form-action directive
+ * @return void
+ */
+function scriptlog_send_security_headers($app_url = '')
+{
+    if (headers_sent() || PHP_SAPI === 'cli') {
+        return;
+    }
+
+    $headerFunctions = [
+        'x_frame_option',
+        'x_content_type_options',
+        'x_xss_protection',
+        'strict_transport_security',
+        'referrer_policy',
+        'permissions_policy',
+        'remove_x_powered_by',
+    ];
+
+    foreach ($headerFunctions as $func) {
+        if (function_exists($func)) {
+            try {
+                $func();
+            } catch (\Throwable $e) {
+                error_log("Security header [$func] failed: " . $e->getMessage());
+            }
+        }
+    }
+
+    if (function_exists('content_security_policy')) {
+        try {
+            content_security_policy($app_url);
+        } catch (\Throwable $e) {
+            error_log("Security header [content_security_policy] failed: " . $e->getMessage());
+        }
+    }
+}

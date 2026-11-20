@@ -229,6 +229,11 @@ final class PhpRuntimeSecurityGuard
      *
      * @param array<string, string|false>|null $iniValues INI overrides keyed by directive name
      * @return array<string, mixed> The evaluation result
+     * @psalm-suppress PossiblyUnusedReturnValue -- consumed by the test suite
+     *     (tests/unit/PhpRuntimeSecurityGuardTest.php::testReportReturnsEvaluation);
+     *     the production caller in lib/main.php intentionally ignores it because
+     *     this method is fire-and-forget audit logging. Psalm does not analyse
+     *     tests/, so the value looks unused.
      */
     public static function report(?array $iniValues = null): array
     {
@@ -276,16 +281,17 @@ final class PhpRuntimeSecurityGuard
      * that prefer a hard outage over serving traffic on a vulnerable engine.
      *
      * @param array<string, string|false>|null $iniValues INI overrides keyed by directive name
+     * @param string|null $version Override for tests; null uses the running PHP version
      * @return void
      * @throws \RuntimeException When strict mode is on and the runtime is unpatched
      */
-    public static function enforce(?array $iniValues = null): void
+    public static function enforce(?array $iniValues = null, ?string $version = null): void
     {
         if (!self::isStrictMode()) {
             return;
         }
 
-        $result = self::evaluate(null, $iniValues);
+        $result = self::evaluate($version, $iniValues);
 
         if ($result['patched'] === false) {
             throw new \RuntimeException(
@@ -294,6 +300,40 @@ final class PhpRuntimeSecurityGuard
                 . ' require PHP 8.2.35+, 8.3.36+, 8.4.27+ or 8.5.12+.'
             );
         }
+    }
+
+    /**
+     * Emit a generic 503 for an affected runtime and terminate the request.
+     *
+     * The response deliberately omits the PHP version, advisory text, file
+     * paths and stack traces so that `display_errors=On` cannot turn the
+     * strict-mode failure into an information disclosure. The full diagnostic
+     * is logged server-side by the caller.
+     *
+     * API requests (identified by API_BASE_PATH) receive JSON so clients can
+     * parse the failure instead of seeing a blank 500.
+     *
+     * @return void
+     */
+    public static function renderUnavailable(): void
+    {
+        $isApi = defined('API_BASE_PATH');
+
+        if (!headers_sent()) {
+            http_response_code(503);
+            header('Cache-Control: no-store');
+            header('Retry-After: 3600');
+            header('Content-Type: ' . ($isApi ? 'application/json; charset=utf-8' : 'text/plain; charset=utf-8'));
+        }
+
+        if ($isApi) {
+            exit((string) json_encode(array(
+                'error' => 'service_unavailable',
+                'message' => 'Service temporarily unavailable.',
+            )));
+        }
+
+        exit('Service temporarily unavailable.');
     }
 
     /**
@@ -425,14 +465,38 @@ final class PhpRuntimeSecurityGuard
     /**
      * Determine whether fail-closed mode is enabled.
      *
+     * Sources are OR-ed so any single opt-in enables strict mode:
+     * 1. a caller-defined SCRIPTLOG_STRICT_PHP_SECURITY constant;
+     * 2. the process environment / $_ENV / $_SERVER, or the project .env file
+     *    through scriptlog_php_security_is_strict().
+     *
      * @return bool True when SCRIPTLOG_STRICT_PHP_SECURITY is truthy
      */
     private static function isStrictMode(): bool
     {
-        if (defined('SCRIPTLOG_STRICT_PHP_SECURITY') && self::isEnabled('SCRIPTLOG_STRICT_PHP_SECURITY')) {
+        if (defined('SCRIPTLOG_STRICT_PHP_SECURITY') && self::isEnabled(constant('SCRIPTLOG_STRICT_PHP_SECURITY'))) {
             return true;
         }
 
-        return self::isEnabled(getenv('SCRIPTLOG_STRICT_PHP_SECURITY'));
+        if (function_exists('scriptlog_php_security_is_strict')) {
+            return scriptlog_php_security_is_strict();
+        }
+
+        // Standalone fallback when lib/common.php was not loaded.
+        if (function_exists('scriptlog_env_get')) {
+            return self::isEnabled(scriptlog_env_get('SCRIPTLOG_STRICT_PHP_SECURITY'));
+        }
+
+        $value = getenv('SCRIPTLOG_STRICT_PHP_SECURITY');
+
+        if ($value === false || $value === null) {
+            if (isset($_ENV['SCRIPTLOG_STRICT_PHP_SECURITY'])) {
+                $value = $_ENV['SCRIPTLOG_STRICT_PHP_SECURITY'];
+            } elseif (isset($_SERVER['SCRIPTLOG_STRICT_PHP_SECURITY'])) {
+                $value = $_SERVER['SCRIPTLOG_STRICT_PHP_SECURITY'];
+            }
+        }
+
+        return self::isEnabled($value);
     }
 }

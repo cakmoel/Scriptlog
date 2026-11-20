@@ -298,6 +298,12 @@ class WordPressImporter
             return $comments;
         }
 
+        /**
+         * SimpleXMLElement is iterable on PHP 7.4, but Psalm's PHP 7.4 stubs
+         * do not declare the iterator's current()/key() methods.
+         *
+         * @psalm-suppress UndefinedMethod
+         */
         foreach ($wp->comment as $comment) {
             $commentData = [
               'author_name' => (string) $comment->comment_author ?? '',

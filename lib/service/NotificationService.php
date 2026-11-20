@@ -11,7 +11,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Supports SMTP configuration for various email providers
  *
  * @category  Service Class
- * @author    Scriptlog
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0

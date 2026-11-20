@@ -6,7 +6,7 @@
  * Loads privacy policy content from database based on current locale.
  *
  * @category Theme Template
- * @author   Scriptlog
+ * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0
  */

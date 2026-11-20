@@ -7,7 +7,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Writing Settings (Scheduled Posting) for Scriptlog
  *
  * @category Admin Page
- * @author   Scriptlog
+ * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0
  * @since    Since Release 1.0

@@ -11,7 +11,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Auto-creates the directory if it doesn't exist.
  *
  * @category Function
- * @author Blogware Team
+ * @author M.Noermoehammad
  * @license MIT
  * @return string
  */

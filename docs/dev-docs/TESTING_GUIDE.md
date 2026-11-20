@@ -1,6 +1,6 @@
 # Testing Guide - Scriptlog
 
-**Version:** 1.12.0 | **Last Updated:** November 2026
+**Version:** 1.13.0 | **Last Updated:** November 2026
 
 ---
 
@@ -34,15 +34,15 @@ This project uses two complementary testing approaches:
 
 | Metric | Value |
 |--------|-------|
-| **Total Tests** | 2,513 |
-| **Test Files** | 171 |
-| **Assertions** | 8,679 |
-| **Skipped / Risky** | 84 skipped, 0 failures |
+| **Total Tests** | 2,664 |
+| **Test Files** | 203 |
+| **Assertions** | 8,890 |
+| **Skipped / Risky** | 32 skipped, 59 risky, 0 failures |
 | **PHPUnit Version** | 9.6.38 |
 | **Target Coverage** | 40% |
-| **Current Coverage** | 25.98% lines (6,986/26,889) |
+| **Current Coverage** | 29.40% lines (7,963/27,085); 8.97% classes, 31.56% methods |
 
-> These totals are a snapshot from the **last recorded run (August 2026)** - rerun the suite to refresh them.
+> These totals are a snapshot from the **last recorded run (November 2026)** - rerun the suite to refresh them.
 
 ### Test Categories
 
@@ -57,19 +57,23 @@ This project uses two complementary testing approaches:
 
 ## 3. Test Coverage Plan
 
+The phases below were the plan used to grow the suite, and all of them are
+complete. Line coverage is 29.40%, so the 40% target is still open; the
+remaining work is tracked in `plan/COVERAGE_40_PERCENT_PLAN.md`.
+
 ### Current State
 
 | Category | Files |
 |----------|-------|
-| Core classes (`lib/core`, excl. HTMLPurifier) | 103 |
+| Core classes (`lib/core`, excl. HTMLPurifier) | 104 |
 | DAO classes | 19 |
-| Service classes | 23 |
+| Service classes | 24 |
 | Controller classes (incl. 12 API) | 32 |
 | Handler classes (incl. admin commands) | 48 |
 | Model classes | 9 |
 | Validator classes | 5 |
 | DTO classes (incl. `dto/api/`) | 5 |
-| Utility function files | 224 |
+| Utility function files | 230 |
 
 ### Test-Scenario Plan to Reach 40%
 
@@ -156,12 +160,13 @@ Fill gaps in utility function testing.
 | Phase 3: Core Classes | MEDIUM | ✅ Complete | 65 | 1,138 |
 | Phase 4: Controllers | MEDIUM | ✅ Complete | 34 | 1,172 |
 | Phase 5: Utilities | LOW | ✅ Complete | 68 | 1,240 |
-| Password Protected Posts | HIGH | ✅ Complete | 59 | 466 |
+| Password Protected Posts | HIGH | ✅ Complete | 59 | separate batch |
 
-**Total New Tests Added**: 466
-**Total Suite**: 2,513 tests across 171 files, 8,679 assertions
+**New tests added in phases 1-5**: 407
+**Cumulative total after phases 1-5**: 1,240
+**Total Suite**: 2,664 tests across 203 files, 8,890 assertions
 
-> The phase table above is a historical record of when tests were added. Last recorded run (November 2026): 2,513 tests across 171 files with 8,679 assertions (84 skipped, 0 failures). These totals are a snapshot - rerun the suite to refresh them.
+> The table records the original coverage plan and its completion status. The password-protected batch (59 tests) was recorded separately, so its row does not continue the cumulative column. For the current state, use the measured totals: last recorded run (November 2026) was 2,664 tests across 203 files with 8,890 assertions (32 skipped, 59 risky, 0 failures). These totals are a snapshot - rerun the suite to refresh them.
 
 ### Recently Added Tests
 
@@ -183,6 +188,35 @@ Fill gaps in utility function testing.
 - ✓ `tests/integration/MembershipIntegrationTest.php` (8 tests)
   - Integration tests for membership settings and role configuration
 
+#### API Entry Point Tests (November 2026)
+- ✓ `tests/api/unit/ApiEntryPointTest.php` (44 tests)
+  - Route-table wiring for every GET, write and search sub-route in `api/index.php`
+  - QUERY routes verified through the OPTIONS `Allow` header (PHP's built-in
+    server rejects unknown methods with 501 before the entry point runs)
+  - Service descriptor + HATEOAS discovery links on `GET /api/v1`
+  - Security headers, `X-API-Version`, JSON `Content-Type`
+  - Accept negotiation (406 + `Accept: application/json` hint) and supported variants
+  - CSRF-token helper, OpenAPI endpoint, 404 envelope for unknown paths
+  - CORS: configured origin reflected, unlisted origin never echoed
+  - Pins `api/index.php` to `require` (no `require_once`) for hard dependencies,
+    with the OpenAPI helper behind a `function_exists()` guard
+
+#### OpenAPI Route Coverage Tests (November 2026)
+- ✓ `tests/unit/OpenApiSpecRouteCoverageTest.php` (6 tests, 130 assertions)
+  - Contract test between the route table in `api/index.php` and `openapi.json`
+    (the file `GET /api/v1/openapi.json` serves verbatim)
+  - Both directions: every registered path is documented, every documented
+    path is registered
+  - HTTP-method parity per path, so a `PUT`/`PATCH`/`DELETE` added on one side
+    only is caught (path-name-only comparison misses it)
+  - `QUERY` routes documented under the `x-query` extension, never as `GET`
+  - Every `{parameter}` in a documented path is declared by each operation,
+    with `$ref` resolved into `components/parameters`, `in: path`, and
+    `required: true` enforced
+  - Normalises `posts/(?P<id>[0-9]+)` to `/posts/{id}` and fails if raw regex
+    survives the translation, so a parser regression cannot pass vacuously
+  - Static file comparison only - no database, no HTTP server
+
 #### PostDao Security Tests (April 2026)
 - ✓ `tests/unit/PostDaoSecurityTest.php` (6 tests)
   - Verifies onlyPublished parameter defaults to true in findPosts()
@@ -192,9 +226,9 @@ Fill gaps in utility function testing.
   - Verifies status filter: post_status = 'publish'
   - Verifies visibility filter: post_visibility = 'public'
 
-### All Planned Test Files Created ✓
+### Test files created for the 40% coverage goal
 
-### Recently Created Tests (contributing to 40% coverage goal)
+All planned test files are in place.
 
 #### Phase 1 - DAO Integration Tests (Complete)
 - ✓ `tests/integration/UserDaoIntegrationTest.php`
@@ -266,7 +300,7 @@ The original `tests/controller/*` files were consolidated into `tests/unit/` and
 - ✓ `tests/unit/SearchApiControllerTest.php`
 - ✓ `tests/api/unit/*ApiControllerTest.php` (10 API endpoint controller tests)
 
-#### Unit Tests (60+ files)
+#### Unit Tests (112 files; the main ones are listed below)
 - ✓ `tests/unit/AdminLocaleInitializationTest.php`
 - ✓ `tests/unit/ApiHateoasTest.php`
 - ✓ `tests/unit/ApiResponseTest.php`
@@ -367,14 +401,14 @@ parameters:
 # Run all tests (uses phpunit.xml: 5 test suites)
 lib/vendor/bin/phpunit
 
-# PHP 8.5 dev environment emits deprecation noise; suppress for readable output:
+# Run with full error reporting (E_ALL), as in local development
 php -d error_reporting='E_ALL' lib/vendor/bin/phpunit
 
 # Or via Composer
 composer test
 
-# Run with coverage (requires Xdebug)
-lib/vendor/bin/phpunit --coverage-html coverage
+# Run with coverage (requires Xdebug with coverage mode enabled)
+php -d xdebug.mode=coverage lib/vendor/bin/phpunit --coverage-html coverage
 
 # Run specific test file
 lib/vendor/bin/phpunit tests/EmailValidationTest.php
@@ -419,6 +453,24 @@ echo "Running PHPStan static analysis..."
 lib/vendor/bin/phpstan analyse --memory-limit=1G
 ```
 
+### Smoke Tests (live server required)
+
+`tests/smoke/` makes real HTTP requests against a running instance. It targets
+`TEST_BASE_URL`, defaulting to `http://blogware.site`:
+
+```bash
+# Point at your local dev server
+TEST_BASE_URL=http://localhost:8080 php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/smoke
+
+# No server? The suite skips itself (14 tests are marked skipped) instead of
+# failing, so a full run stays green on a machine with no web server.
+```
+
+`RoutingTest::setUpBeforeClass()` probes the base URL with `get_headers()`; when
+nothing answers, every test in the class is skipped with an explanatory message.
+Header capture deliberately avoids both `http_get_last_response_headers()`
+(PHP 8.4+) and the `$http_response_header` local (deprecated in PHP 8.5).
+
 ### Shell (BATS) Tests
 
 Shell utilities are covered with [BATS](https://bats-core.readthedocs.io/) (requires `bats` on PATH):
@@ -458,9 +510,9 @@ host really has, which is what makes "flatpak is not installed" testable.
 | `tests/bats/spike-test.bats` | 21 | `spike-test.sh`: argument validation, spike-above-baseline sanity, baseline/spike/recovery cycle ordering, per-cycle absorb/recover verdicts (RESILIENT/NOT RESILIENT), pooled CI error gate, CSV + metadata sidecar, warm-up tolerance, dry-run |
 | `tests/bats/soak-test.bats` | 24 | `soak-test.sh`: duration/cadence floors, fake-clock checkpoint loop, per-checkpoint CSV schema, first/last-third drift flags (THROUGHPUT-DRIFT down / LATENCY-DRIFT up), checkpoint sizing floors, abort durability, pooled CI error gate, dry-run |
 | `tests/bats/siege-tui.bats` | 135 | `siege-tui.sh`: URL/header validation, config sanitising, workload generation, exact `siege` argv, results analysis, connectivity checks, TUI prompts, `run_scenario` exit-code mapping, CLI contract |
-| `tests/bats/deepshit.bats` | 137 | `deepshit.sh`: option parsing and validation, every phase 0-6, `--all`/`--restore`/menu dispatch, endpoint matrix and per-request profile attribution, the 11-endpoint manifest, load-test authorization gate, drop-in install/rollback, result-tree layout, run-log audit trail, `--site-url` targeting, the required-`SITE_URL` contract, optional `XD_MODE_SCRIPT`, the committed executable bit, cross-invocation load-report discovery, trailing-slash normalisation, clean `die`/`ERR`-trap failure paths, plus unit tests of the lifted path builders, mtime watermark, profile poll and duration validator |
+| `tests/bats/deepshit.bats` | 138 | `deepshit.sh`: option parsing and validation, every phase 0-6, `--all`/`--restore`/menu dispatch, endpoint matrix and per-request profile attribution, the 11-endpoint manifest, load-test authorization gate, drop-in install/rollback, result-tree layout, run-log audit trail, `--site-url` targeting, the required-`SITE_URL` contract, optional `XD_MODE_SCRIPT`, the committed executable bit, cross-invocation load-report discovery, trailing-slash normalisation, clean `die`/`ERR`-trap failure paths, plus unit tests of the lifted path builders, the `PHP_ETC_DIR` default, mtime watermark, profile poll and duration validator |
 
-Totals: **392 tests**, all passing. The two `*_E2E` suites skip unless their
+Totals: **394 tests**, all passing. The two `*_E2E` suites skip unless their
 variable is set to `1`; everything else runs unconditionally.
 
 The three performance-suite companions (`stress-test-helper.bash`,
@@ -550,7 +602,7 @@ class MyTest extends TestCase
 CI runs without any database or MySQL service. PHP unit tests and static
 analysis run in `.github/workflows/tests.yml`; end-to-end browser tests run
 via Playwright in `.github/workflows/playwright.yml`. Database-backed
-Integration/Service suites are local-only (see §6).
+Integration/Service suites are local-only (see section 6).
 
 ### GitHub Actions Workflow (`.github/workflows/tests.yml`)
 
@@ -651,4 +703,4 @@ Do not bypass with `git commit --no-verify`.
 
 ---
 
-*Last Updated: November 2026 | Version 1.12.0*
+*Last Updated: November 2026 | Version 1.13.0*

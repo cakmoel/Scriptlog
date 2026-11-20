@@ -91,6 +91,7 @@ class TranslationLoader
     private function loadFromCache(string $locale): ?array
     {
         $cacheFile = $this->getCacheFilePath($locale);
+        $phpCacheFile = $this->getPhpCacheFilePath($locale);
 
         if (!file_exists($cacheFile)) {
             return null;
@@ -100,15 +101,33 @@ class TranslationLoader
             return null;
         }
 
-        $content = file_get_contents($cacheFile);
-        $data = json_decode($content, true);
+        // F12: prefer parse-once PHP array cache when current with JSON cache.
+        if (file_exists($phpCacheFile) && filemtime($phpCacheFile) >= filemtime($cacheFile)) {
+            $data = @include $phpCacheFile;
+            if (is_array($data)) {
+                return $data;
+            }
+        }
 
-        return is_array($data) ? $data : null;
+        $content = @file_get_contents($cacheFile);
+        if ($content === false) {
+            return null;
+        }
+
+        $data = json_decode($content, true);
+        if (!is_array($data)) {
+            return null;
+        }
+
+        $this->writePhpCache($phpCacheFile, $data);
+
+        return $data;
     }
 
     private function saveToCache(string $locale, array $translations): void
     {
         $cacheFile = $this->getCacheFilePath($locale);
+        $phpCacheFile = $this->getPhpCacheFilePath($locale);
 
         $cacheDir = dirname($cacheFile);
         if (!is_dir($cacheDir)) {
@@ -121,7 +140,9 @@ class TranslationLoader
             return;
         }
 
-        @file_put_contents($cacheFile, json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        @file_put_contents($cacheFile, json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+        clearstatcache(true, $cacheFile);
+        $this->writePhpCache($phpCacheFile, $translations);
     }
 
     private function loadFromDatabase(string $locale): array
@@ -180,6 +201,41 @@ class TranslationLoader
         return $this->cacheDir . $locale . '.json';
     }
 
+    /**
+     * Return the PHP parse-once cache path for a locale.
+     *
+     * @param string $locale Locale code
+     * @return string
+     */
+    private function getPhpCacheFilePath(string $locale): string
+    {
+        return $this->cacheDir . $locale . '.cache.php';
+    }
+
+    /**
+     * Write a PHP parse-once cache file for translations.
+     *
+     * @param string               $phpCacheFile Path to PHP cache file
+     * @param array<string, mixed> $translations Translations data
+     * @return void
+     */
+    private function writePhpCache(string $phpCacheFile, array $translations): void
+    {
+        $cacheDir = dirname($phpCacheFile);
+        if (!is_dir($cacheDir) || !is_writable($cacheDir)) {
+            return;
+        }
+
+        @file_put_contents(
+            $phpCacheFile,
+            "<?php\nreturn " . var_export($translations, true) . ";\n",
+            LOCK_EX
+        );
+        if (function_exists('opcache_invalidate')) {
+            @opcache_invalidate($phpCacheFile, true);
+        }
+    }
+
     private function isCacheExpired(string $cacheFile): bool
     {
         if ($this->cacheTtl === 0) {
@@ -195,7 +251,12 @@ class TranslationLoader
         $cacheFile = $this->getCacheFilePath($locale);
 
         if (file_exists($cacheFile)) {
-            unlink($cacheFile);
+            @unlink($cacheFile);
+        }
+
+        $phpCacheFile = $this->getPhpCacheFilePath($locale);
+        if (file_exists($phpCacheFile)) {
+            @unlink($phpCacheFile);
         }
 
         unset($this->loaded[$locale]);

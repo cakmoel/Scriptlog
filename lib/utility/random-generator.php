@@ -19,6 +19,14 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * global PRNG from microtime() on every request adds latency and weakens the
  * generator, which here only supplies a salt appended to random_bytes().
  *
+ * NOTE: This helper is intentionally retained for the token-salt / non-security
+ * uniqueness use only and is NOT suitable for security-sensitive token
+ * material (selectors, validators, reset keys, auth tokens). Security-sensitive
+ * token generation must use the CSPRNG-backed random_bytes() helpers instead
+ * (see generate_token(), generate_form_token(), and Scriptlog\Core\Tokenizer::
+ * createToken()); the RandomLib MEDIUM strength generators must never back
+ * security tokens.
+ *
  * @category function
  * @param int $digits
  * @return string

@@ -16,9 +16,13 @@ use Scriptlog\Core\ActionConst;
 class AdminActionRegistry
 {
     /**
-     * Registered command instances keyed by action constant.
+     * Registered commands keyed by action constant.
      *
-     * @var array<string, AdminActionCommand>
+     * A value is either a ready-made command instance (eager registration) or
+     * the class name of a command that is instantiated on first use (lazy
+     * registration).
+     *
+     * @var array<string, AdminActionCommand|string>
      */
     private array $commands = [];
 
@@ -35,14 +39,51 @@ class AdminActionRegistry
     }
 
     /**
+     * Register a command class for the given action, to be instantiated on use.
+     *
+     * Frontend requests never dispatch admin actions, so constructing every
+     * command at bootstrap (Bootstrap::buildAdminActionRegistry()) loaded ~35
+     * classes for nothing. Registering the class name instead defers both the
+     * autoload and the constructor to the first has()/execute() call.
+     *
+     * @param string $action       The action constant.
+     * @param string $commandClass Fully qualified or aliased command class name.
+     * @return void
+     */
+    public function registerClass(string $action, string $commandClass): void
+    {
+        $this->commands[$action] = $commandClass;
+    }
+
+    /**
      * Check whether a command is registered for the given action.
+     *
+     * For lazily registered commands this resolves the class, which preserves
+     * the old eager `class_exists()` guard: an action whose implementation is
+     * missing is reported as not registered instead of failing at execute().
      *
      * @param string $action The action constant.
      * @return bool
      */
     public function has(string $action): bool
     {
-        return isset($this->commands[$action]);
+        if (!isset($this->commands[$action])) {
+            return false;
+        }
+
+        $command = $this->commands[$action];
+
+        if ($command instanceof AdminActionCommand) {
+            return true;
+        }
+
+        if (!class_exists($command)) {
+            unset($this->commands[$action]);
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -55,9 +96,17 @@ class AdminActionRegistry
      */
     public function execute(string $action, array $context): void
     {
-        if (!isset($this->commands[$action])) {
+        if (!$this->has($action)) {
             throw new \RuntimeException("No command registered for action: " . $action);
         }
-        $this->commands[$action]->execute($context);
+
+        $command = $this->commands[$action];
+
+        if (is_string($command)) {
+            $command = new $command();
+            $this->commands[$action] = $command;
+        }
+
+        $command->execute($context);
     }
 }

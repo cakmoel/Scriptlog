@@ -120,6 +120,22 @@ function page_cache_is_search_request()
 
     return false;
 }
+
+/**
+ * Check whether the current request is an HTMX partial request.
+ *
+ * H2: HTMX clients request HTML fragments (and expect HX-* response
+ * semantics) that differ from full-page renders. The cache key covers
+ * only protocol+host+URI, so a fragment request must never be served a
+ * stored full page, and a fragment render must never be stored over it.
+ * Guarded consistently by exists/serve/start/finish.
+ *
+ * @return bool
+ */
+function page_cache_is_htmx_request()
+{
+    return isset($_SERVER['HTTP_HX_REQUEST']);
+}
 function page_cache_exists()
 {
     if (!page_cache_is_enabled() || ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
@@ -128,6 +144,11 @@ function page_cache_exists()
 
     // Don't cache search requests
     if (page_cache_is_search_request()) {
+        return false;
+    }
+
+    // Don't serve cached full pages to HTMX fragment requests
+    if (page_cache_is_htmx_request()) {
         return false;
     }
 
@@ -149,18 +170,122 @@ function page_cache_exists()
 /**
  * Serve the cached file and exit.
  *
+ * The stored HTML embeds per-request dynamic values (CSP nonces on inline
+ * scripts, per-session one-time CSRF tokens on public forms). Serving it
+ * verbatim would break inline scripts (nonce mismatch against the current
+ * response's CSP header) and form submissions (token unknown to the
+ * current visitor's session). D4: both are rewritten to values minted for
+ * the current request immediately before output.
+ *
  * @return void
  */
 function page_cache_serve()
 {
+    if (page_cache_is_htmx_request()) {
+        return;
+    }
+
     $key = page_cache_key();
     $path = page_cache_path($key);
 
     if (file_exists($path)) {
-        header('X-Scriptlog-Cache: Hit');
-        readfile($path);
-        exit;
+        $content = file_get_contents($path);
+
+        if (is_string($content)) {
+            header('X-Scriptlog-Cache: Hit');
+            // D5: drop the storage marker so a hit is byte-identical to the
+            // original (uncached) response — ab Length-mismatch noise stays
+            // at zero and Content-Length is stable across hits.
+            $content = preg_replace(
+                '/\n?<!-- Scriptlog Cache Generated: [^>]*-->\s*$/',
+                '',
+                $content
+            );
+            echo page_cache_refresh_dynamic_markup($content);
+            exit;
+        }
     }
+}
+
+/**
+ * Rewrite per-request dynamic markup inside cached HTML for the current visitor.
+ *
+ * Two substitutions are performed:
+ *
+ * 1. Every `nonce="..."` attribute is set to the current request's CSP_NONCE,
+ *    so inline scripts match the `script-src 'nonce-...'` header emitted for
+ *    this response (Bootstrap ran before the cached page is served).
+ * 2. Every hidden `<input ... name="csrf">` (the public comment form token,
+ *    stored under the `comment_form` session key by the themes' block_csrf())
+ *    receives a fresh one-time token generated for the current visitor's
+ *    session.
+ *
+ * Substitutions are no-ops when the markup is absent, so pages without
+ * inline scripts or comment forms pass through unchanged.
+ *
+ * @param string $html Cached page HTML
+ * @param callable|null $csrfTokenProvider Optional token factory
+ *        signature: callable(string $formKey): string. Defaults to
+ *        generate_form_token('comment_form', 32). Injectable for tests.
+ * @return string HTML with dynamic values refreshed for this request
+ */
+function page_cache_refresh_dynamic_markup($html, $csrfTokenProvider = null)
+{
+    if (!is_string($html) || $html === '') {
+        return is_string($html) ? $html : '';
+    }
+
+    // 1. Refresh CSP nonces so inline scripts match the current response.
+    if (defined('CSP_NONCE') && CSP_NONCE !== '') {
+        $refreshedMarkup = preg_replace_callback(
+            '/\bnonce="[^"]*"/',
+            static function () {
+                return 'nonce="' . CSP_NONCE . '"';
+            },
+            $html
+        );
+
+        if (is_string($refreshedMarkup)) {
+            $html = $refreshedMarkup;
+        }
+    }
+
+    // 2. Refresh the public comment-form CSRF token for this visitor's session.
+    if ($csrfTokenProvider === null) {
+        $csrfTokenProvider = static function ($formKey) {
+            return (function_exists('generate_form_token'))
+                ? generate_form_token($formKey, 32)
+                : '';
+        };
+    }
+
+    $refreshedMarkup = preg_replace_callback(
+        '/<input[^>]*\bname="csrf"[^>]*>/',
+        static function (array $matches) use ($csrfTokenProvider) {
+            $tag = $matches[0];
+            $token = (string)$csrfTokenProvider('comment_form');
+
+            if ($token === '') {
+                return $tag;
+            }
+
+            $updatedTag = preg_replace(
+                '/\bvalue="[^"]*"/',
+                'value="' . $token . '"',
+                $tag,
+                1
+            );
+
+            return is_string($updatedTag) ? $updatedTag : $tag;
+        },
+        $html
+    );
+
+    if (is_string($refreshedMarkup)) {
+        $html = $refreshedMarkup;
+    }
+
+    return $html;
 }
 
 /**
@@ -170,7 +295,7 @@ function page_cache_serve()
  */
 function page_cache_start()
 {
-    if (page_cache_is_enabled() && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET' && page_cache_is_anonymous() && !page_cache_is_search_request()) {
+    if (page_cache_is_enabled() && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET' && !page_cache_is_htmx_request() && page_cache_is_anonymous() && !page_cache_is_search_request()) {
         ob_start();
     }
 }
@@ -182,7 +307,7 @@ function page_cache_start()
  */
 function page_cache_finish()
 {
-    if (page_cache_is_enabled() && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET' && page_cache_is_anonymous() && !page_cache_is_search_request()) {
+    if (page_cache_is_enabled() && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET' && !page_cache_is_htmx_request() && page_cache_is_anonymous() && !page_cache_is_search_request()) {
         $content = ob_get_flush();
 
         if (!is_dir(APP_CACHE_DIR)) {

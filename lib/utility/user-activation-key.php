@@ -3,9 +3,9 @@
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
- * user_activation_key()
+ * user_activation_key
  *
- * generating user activation key
+ * Generating user activation key
  *
  * @category function
  * @author M.Noermoehammad
@@ -18,5 +18,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 function user_activation_key($value)
 {
     $salt = simple_salt(64);
-    return sha1(mt_rand(10000, 99999) . time() . $value . $salt);
+    // random_int() is a CSPRNG-backed source for token entropy; never
+    // silently downgrade token generation to a weak source.
+    return sha1(random_int(10000, 99999) . time() . $value . $salt);
 }

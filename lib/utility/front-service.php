@@ -11,7 +11,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * reaching for the deprecated FrontHelper static facade.
  *
  * @category Function
- * @author   System
+ * @author   M.Noermoehammad
  * @license  MIT
  * @return Scriptlog\Service\FrontService|null
  */

@@ -10,7 +10,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Data Access Object for GDPR data requests (access, rectification, erasure)
  *
  * @category  Dao Class
- * @author    Scriptlog
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0

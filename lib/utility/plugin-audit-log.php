@@ -9,7 +9,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * when possible (storage/logs/).
  *
  * @category function
- * @author   Scriptlog Team
+ * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0.0
  * @since    1.10.0

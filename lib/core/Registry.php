@@ -65,7 +65,8 @@ class Registry
      * @method public set()
      * @static
      * @param string $key
-     * @param string $value
+     * @param mixed $value Any value: service instance, null, scalar or array.
+     * @return void
      *
      */
     public static function set($key, $value)

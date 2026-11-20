@@ -521,7 +521,7 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
             $recordDownloadMimeTypes->execute();
 
             $download_expiry = "download_expiry_hours";
-            $download_expiry_value = "8";
+            $download_expiry_value = "1";
             $recordDownloadExpiry = $link->prepare($saveSettings);
             $recordDownloadExpiry->bind_param('ss', $download_expiry, $download_expiry_value);
             $recordDownloadExpiry->execute();
@@ -719,6 +719,10 @@ function install_i18n_data($link, $prefix = '', $default_lang = 'en')
         'form.parent' => ['Parent', 'الأصل', '父级', 'Parent', 'Родитель', 'Padre', 'Induk'],
         'form.link' => ['Link', 'الرابط', '链接', 'Lien', 'Ссылка', 'Enlace', 'Tautan'],
         'form.target' => ['Target', 'الهدف', '目标', 'Cible', 'Цель', 'Objetivo', 'Target'],
+        'form.name.label' => ['Name', 'الاسم', '姓名', 'Nom', 'Имя', 'Nombre', 'Nama'],
+        'form.name.placeholder' => ['Enter name', 'أدخل الاسم', '输入姓名', 'Entrez le nom', 'Введите имя', 'Ingrese el nombre', 'Masukkan nama'],
+        'form.email.label' => ['Email (will not be published)', 'البريد الإلكتروني (لن ينشر)', '邮箱（不会发布）', 'Email (ne sera pas publié)', 'Email (не будет опубликован)', 'Email (no será publicado)', 'Email (tidak akan dipublikasikan)'],
+        'form.email.placeholder' => ['Enter email', 'أدخل البريد الإلكتروني', '输入邮箱', 'Entrez lemail', 'Введите email', 'Ingrese el email', 'Masukkan email'],
       ],
       'button' => [
         'button.add' => ['Add New', 'إضافة جديد', '新建', 'Ajouter', 'Добавить', 'Añadir nuevo', 'Tambah Baru'],
@@ -795,12 +799,6 @@ function install_i18n_data($link, $prefix = '', $default_lang = 'en')
         'single.comment.label' => ['Type your comment', 'اكتب تعليقك', '输入您的评论', 'Tapez votre commentaire', 'Введите комментарий', 'Escribe tu comentario', 'Ketik komentar Anda'],
         'single.comment.placeholder' => ['Enter your comment', 'أدخل تعليقك', '输入您的评论', 'Entrez votre commentaire', 'Введите комментарий', 'Ingresa tu comentario', 'Masukkan komentar Anda'],
         'single.comment.submit' => ['Submit Comment', 'إرسال التعليق', '提交评论', 'Soumettre le commentaire', 'Отправить комментарий', 'Enviar comentario', 'Kirim Komentar'],
-      ],
-      'form' => [
-        'form.name.label' => ['Name', 'الاسم', '姓名', 'Nom', 'Имя', 'Nombre', 'Nama'],
-        'form.name.placeholder' => ['Enter name', 'أدخل الاسم', '输入姓名', 'Entrez le nom', 'Введите имя', 'Ingrese el nombre', 'Masukkan nama'],
-        'form.email.label' => ['Email (will not be published)', 'البريد الإلكتروني (لن ينشر)', '邮箱（不会发布）', 'Email (ne sera pas publié)', 'Email (не будет опубликован)', 'Email (no será publicado)', 'Email (tidak akan dipublikasikan)'],
-        'form.email.placeholder' => ['Enter email', 'أدخل البريد الإلكتروني', '输入邮箱', 'Entrez lemail', 'Введите email', 'Ingrese el email', 'Masukkan email'],
       ],
       'cookie_consent' => [
         'cookie_consent.banner.title' => ['We value your privacy', 'نقدر خصوصيتك', '我们重视您的隐私', 'Nous respectons votre vie privée', 'Мы ценим вашу конфиденциальность', 'Valoramos su privacidad', 'Kami menghargai privasi Anda'],
@@ -1307,6 +1305,9 @@ function write_env_file($protocol, $server_name, $dbhost, $dbuser, $dbpass, $dbn
     $envContent .= "DB_PREFIX=" . env_escape($prefix) . PHP_EOL;
     $envContent .= PHP_EOL;
     $envContent .= "# --- APPLICATION CONFIGURATION ---" . PHP_EOL;
+    $envContent .= '# Set to "local" for development; keep "production" on live hosts.' . PHP_EOL;
+    $envContent .= "APP_ENV=production" . PHP_EOL;
+    $envContent .= "APP_DEBUG=false" . PHP_EOL;
     $envContent .= "APP_URL=" . env_escape(setup_base_url($protocol, $server_name)) . PHP_EOL;
     $envContent .= "APP_EMAIL=" . env_escape($email) . PHP_EOL;
     $envContent .= "APP_KEY=" . env_escape($app_key) . PHP_EOL;
@@ -1327,6 +1328,10 @@ function write_env_file($protocol, $server_name, $dbhost, $dbuser, $dbpass, $dbn
     $envContent .= PHP_EOL;
     $envContent .= "# --- API SECURITY ---" . PHP_EOL;
     $envContent .= "CORS_ALLOWED_ORIGINS=" . env_escape(setup_base_url($protocol, $server_name)) . PHP_EOL;
+    $envContent .= PHP_EOL;
+    $envContent .= "# --- SECURITY ---" . PHP_EOL;
+    $envContent .= "# Opt-in fail-closed guard for affected PHP runtimes; leave empty unless you prefer an outage." . PHP_EOL;
+    $envContent .= "SCRIPTLOG_STRICT_PHP_SECURITY=" . PHP_EOL;
 
     file_put_contents(__DIR__ . '/../../.env', $envContent, LOCK_EX);
 }

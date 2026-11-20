@@ -85,8 +85,43 @@ affected. Configuration warnings (upload progress, fatal backtraces, `display_er
 are constant per host, so they are surfaced by the CLI gate rather than logged on
 every request.
 
-Set `SCRIPTLOG_STRICT_PHP_SECURITY=1` (environment variable or constant) to make an
-affected runtime fail closed instead of only logging.
+Set `SCRIPTLOG_STRICT_PHP_SECURITY=1` to make an affected runtime fail closed instead
+of only logging. The switch is opt-in and resolves from, in order:
+
+1. a PHP constant defined before `lib/common.php` (for example in `index.php` or a
+   prepend file);
+2. the process environment (`getenv()`), `$_ENV`, or `$_SERVER`;
+3. the project `.env` file, read directly because `lib/common.php` runs before Dotenv.
+
+Any truthy value (`1`, `true`, `on`, `yes`, `enabled`) enables strict mode; an absent,
+empty, or unrecognised value leaves it disabled. `lib/common.php` declares the constant
+once, so `SCRIPTLOG_STRICT_PHP_SECURITY` is always available as a boolean at runtime.
+
+When strict mode blocks a request, `lib/main.php` catches the failure and returns a
+generic `503 Service Unavailable` (JSON for API clients) with `Retry-After: 3600`.
+The PHP version, advisory text, file paths, and stack trace are written to the server
+log only, never to the response — so `display_errors=On` cannot turn the strict-mode
+failure into an information disclosure.
+
+### 3.4 Production error display
+
+`lib/main.php` applies a runtime error-display policy: when `APP_DEVELOPMENT` is false
+it sets `display_errors=0`, `display_startup_errors=0`, and `log_errors=1`, even if
+php.ini has `display_errors=On`. Development installs keep diagnostics visible by
+setting `APP_ENV=local` (or `APP_DEBUG=true`) in `.env`.
+
+This is defense in depth. The primary control is still the host configuration:
+
+```ini
+; php.ini or .user.ini on shared hosting
+display_errors = Off
+display_startup_errors = Off
+log_errors = On
+```
+
+Diagnostics that occur before `lib/main.php` runs (for example a parse error in
+`index.php` or `lib/common.php`) cannot be suppressed at runtime, which is why the
+host-level setting remains mandatory for production.
 
 ---
 

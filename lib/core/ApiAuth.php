@@ -11,7 +11,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Supports API Key and Bearer Token authentication
  *
  * @category  Core Class
- * @author    Blogware Team
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0

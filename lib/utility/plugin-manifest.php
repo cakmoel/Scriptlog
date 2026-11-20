@@ -14,7 +14,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * live inside the plugin directory.
  *
  * @category  function
- * @author    Scriptlog Team
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0.0
  * @since     1.10.0
@@ -80,7 +80,7 @@ function plugin_manifest_relative_files($pluginDirectory)
  * removal of plugin code invalidates it.
  *
  * @category  function
- * @author    Scriptlog Team
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0.0
  * @since     1.10.0
@@ -127,7 +127,7 @@ function plugin_manifest_hash($pluginDirectory)
  * plugin_manifest_is_hash()
  *
  * @category  function
- * @author    Scriptlog Team
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0.0
  * @since     1.10.0
@@ -147,7 +147,7 @@ function plugin_manifest_is_hash($value)
  * never verifies.
  *
  * @category  function
- * @author    Scriptlog Team
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0.0
  * @since     1.10.0

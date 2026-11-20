@@ -14,7 +14,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Compatible with PHP 7.4+.
  *
  * @category  Core Class
- * @author    Blogware Team
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
  */

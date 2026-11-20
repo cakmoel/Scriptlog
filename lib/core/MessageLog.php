@@ -76,7 +76,7 @@ MSG;
      *
      * @param \Exception|\Throwable $exception
      * @param string $logPath
-     * @return string|void -- return string or void
+     * @return void This method prints, logs or redirects; it never returns a value.
      *
      */
     public static function messageException($exception, $logPath)
