@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 - **Playwright CI database import**: the seeded `blogware_e2e` database is now imported with SSL disabled, matching the ephemeral MariaDB service and restoring the E2E workflow.
 - **E2E database helpers**: GDPR, TastyBites, and RestoBlog fixtures now disable SSL for `mysql` CLI calls so browser tests reach the test database in CI.
+- **Locale-aware page cache**: full-page cache keys now include the active locale, preventing an English cached page from being served after switching to Arabic in RTL browser tests.
 
 ### Removed
 - None
@@ -37,7 +38,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - None
 
 ### Notes
-Patch release for continuous-integration reliability and login CAPTCHA UI coverage only. No application code, database schema, configuration, or REST API behavior changed.
+Patch release for continuous-integration reliability, login CAPTCHA UI coverage, and locale-aware page caching. No database schema, configuration, or REST API behavior changed.
 
 ### Codename
 **Maleo Senkawor** (retained) – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
