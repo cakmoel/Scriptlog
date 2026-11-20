@@ -20,12 +20,16 @@ class DbFactory
     /**
      * Connect
      *
-     * @param string $connection
-     * @param array $options
-     * @throws DbException
+     * Builds the database wrapper from a PDO configuration tuple:
+     * `[dsn, username, password]`.
+     *
+     * @param array<int, string> $connection Database configuration tuple: DSN, user, password.
+     * @param array<int|string, mixed> $options Additional PDO driver options.
+     * @return Db|null Database wrapper, or null when connection setup failed.
+     * @throws DbException When the database object is not available.
      *
      */
-    public static function connect($connection, $options = [])
+    public static function connect(array $connection, array $options = [])
     {
 
         try {
@@ -43,5 +47,7 @@ class DbFactory
             LogError::setStatusCode(http_response_code(500));
             LogError::exceptionHandler($e);
         }
+
+        return null;
     }
 }
