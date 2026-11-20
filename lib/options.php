@@ -4,7 +4,7 @@
  * options.php
  *
  * @category File options.php will be place to Sets the value of a configuration option
- * @author M.Noermoehammmad
+ * @author M.Noermoehammad
  * @license MIT
  * @version 1.0
  *
