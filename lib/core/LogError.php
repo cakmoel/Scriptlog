@@ -138,11 +138,12 @@ class LogError
      *
      * @static method newMessage
      * @param \Exception|\Throwable $exception
+     * @return void
      */
     public static function newMessage($exception)
     {
 
-        return MessageLog::messageException($exception, self::logPath() . 'exceptions.log');
+        MessageLog::messageException($exception, self::logPath() . 'exceptions.log');
     }
 
     public static function setStatusCode($statusCode): int
