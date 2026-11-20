@@ -141,7 +141,9 @@ function get_sisfo()
     $sisfo = check_sisfo();
     $php_passed = version_compare($sisfo['PHPVersion'], '7.4', '>=');
     $web_server = check_web_server();
-    $server_success = in_array($web_server['WebServer'], ['Apache', 'LiteSpeed', 'nginx', 'Microsoft-IIS']);
+    $supported_web_servers = ['Apache', 'LiteSpeed', 'nginx', 'Microsoft-IIS', 'Caddy', 'lighttpd', 'Hiawatha', 'Tengine', 'openresty'];
+    $server_success = in_array($web_server['WebServer'], $supported_web_servers, true)
+        || strpos($web_server['WebServer'], 'Hiawatha v') === 0;
     ?>
 <div class="dashboard-section mb-5" role="region" aria-labelledby="env-title">
     <h5 id="env-title" class="dashboard-title">System Environment</h5>
