@@ -17,7 +17,7 @@ use Scriptlog\Dao\PostDao;
  * using a lightweight per-request flip (WordPress-style "poor man's cron").
  *
  * @category  Service Class
- * @author    Scriptlog
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0
