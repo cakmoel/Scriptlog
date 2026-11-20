@@ -255,11 +255,53 @@ class ScriptlogCryptonize
     }
 
     /**
+     * Memoized Defuse key for the current request.
+     *
+     * `scriptlogCipherKey()` is called by Bootstrap, SessionMaker and the
+     * cookie helpers on the same request. Resolving it re-reads `config.php`,
+     * opens a second mysqli connection to read `defuse_key_path`, stats and
+     * `require`s the key file, and parses the key. The key cannot change
+     * during a request, so the resolved object is cached here.
+     *
+     * @var Key|null
+     */
+    private static $cipherKeyCache = null;
+
+    /**
      * Load or generate a Defuse\Crypto key
      *
      * @return Key
      */
     public static function scriptlogCipherKey(): Key
+    {
+        if (self::$cipherKeyCache instanceof Key) {
+            return self::$cipherKeyCache;
+        }
+
+        self::$cipherKeyCache = self::loadCipherKey();
+
+        return self::$cipherKeyCache;
+    }
+
+    /**
+     * Discard the memoized key.
+     *
+     * Intended for tests and for long-running processes that rotate the key
+     * file at runtime; normal web requests never need to call it.
+     *
+     * @return void
+     */
+    public static function resetCipherKeyCache(): void
+    {
+        self::$cipherKeyCache = null;
+    }
+
+    /**
+     * Resolve the key path and load the key from disk, creating one if absent.
+     *
+     * @return Key
+     */
+    private static function loadCipherKey(): Key
     {
         $keyFile = self::getDefuseKeyPath();
 
