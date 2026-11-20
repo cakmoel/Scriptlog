@@ -521,7 +521,7 @@ function install_database_table($link, $protocol, $server_host, $user_login, $us
             $recordDownloadMimeTypes->execute();
 
             $download_expiry = "download_expiry_hours";
-            $download_expiry_value = "8";
+            $download_expiry_value = "1";
             $recordDownloadExpiry = $link->prepare($saveSettings);
             $recordDownloadExpiry->bind_param('ss', $download_expiry, $download_expiry_value);
             $recordDownloadExpiry->execute();
@@ -1307,6 +1307,9 @@ function write_env_file($protocol, $server_name, $dbhost, $dbuser, $dbpass, $dbn
     $envContent .= "DB_PREFIX=" . env_escape($prefix) . PHP_EOL;
     $envContent .= PHP_EOL;
     $envContent .= "# --- APPLICATION CONFIGURATION ---" . PHP_EOL;
+    $envContent .= '# Set to "local" for development; keep "production" on live hosts.' . PHP_EOL;
+    $envContent .= "APP_ENV=production" . PHP_EOL;
+    $envContent .= "APP_DEBUG=false" . PHP_EOL;
     $envContent .= "APP_URL=" . env_escape(setup_base_url($protocol, $server_name)) . PHP_EOL;
     $envContent .= "APP_EMAIL=" . env_escape($email) . PHP_EOL;
     $envContent .= "APP_KEY=" . env_escape($app_key) . PHP_EOL;
@@ -1327,6 +1330,10 @@ function write_env_file($protocol, $server_name, $dbhost, $dbuser, $dbpass, $dbn
     $envContent .= PHP_EOL;
     $envContent .= "# --- API SECURITY ---" . PHP_EOL;
     $envContent .= "CORS_ALLOWED_ORIGINS=" . env_escape(setup_base_url($protocol, $server_name)) . PHP_EOL;
+    $envContent .= PHP_EOL;
+    $envContent .= "# --- SECURITY ---" . PHP_EOL;
+    $envContent .= "# Opt-in fail-closed guard for affected PHP runtimes; leave empty unless you prefer an outage." . PHP_EOL;
+    $envContent .= "SCRIPTLOG_STRICT_PHP_SECURITY=" . PHP_EOL;
 
     file_put_contents(__DIR__ . '/../../.env', $envContent, LOCK_EX);
 }
