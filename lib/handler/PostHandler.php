@@ -46,6 +46,14 @@ class PostHandler implements FrontRequestHandler
             return;
         }
 
+        // S7 parity with HandleRequest::deliverQueryPost(): a non-numeric ID
+        // can never match the integer primary key, so fail cheap without a
+        // database round-trip.
+        if (!ctype_digit((string) $id)) {
+            $this->renderer->render404();
+            return;
+        }
+
         $frontService = HandleRequest::handleFrontHelper();
 
         if (!$frontService || !method_exists($frontService, 'getSimplePost')) {
