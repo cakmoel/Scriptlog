@@ -91,6 +91,7 @@ export function runSql(sql: string): string {
   return execFileSync(
     'mysql',
     [
+      '--skip-ssl',
       '-h',
       process.env.E2E_DB_HOST || '127.0.0.1',
       '-P',

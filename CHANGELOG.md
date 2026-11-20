@@ -18,13 +18,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [1.13.1] - 2026-11-20
 
 ### Added
-- None
+- **Login CAPTCHA UI coverage**: new `e2e/login-captcha-ui.spec.ts` verifies JPEG rendering, layout-safe dimensions, fresh captcha on reload, and a usable re-rendered form after a wrong code.
 
 ### Changed
 - None
 
 ### Fixed
 - **Playwright CI database import**: the seeded `blogware_e2e` database is now imported with SSL disabled, matching the ephemeral MariaDB service and restoring the E2E workflow.
+- **E2E database helpers**: GDPR, TastyBites, and RestoBlog fixtures now disable SSL for `mysql` CLI calls so browser tests reach the test database in CI.
 
 ### Removed
 - None
@@ -36,7 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - None
 
 ### Notes
-Patch release for continuous-integration reliability only. No application code, database schema, configuration, or REST API behavior changed.
+Patch release for continuous-integration reliability and login CAPTCHA UI coverage only. No application code, database schema, configuration, or REST API behavior changed.
 
 ### Codename
 **Maleo Senkawor** (retained) – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
