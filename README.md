@@ -6,7 +6,6 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.3%2B-777BB4.svg)](https://www.php.net/)
 [![MySQL Version](https://img.shields.io/badge/MySQL-5.7%2B-4479A1.svg)](https://www.mysql.com/)
 [![MariaDB Version](https://img.shields.io/badge/MariaDB-10.3%2B-003545.svg)](https://mariadb.org/)
-[![PSR-12](https://img.shields.io/badge/PSR--12-Compliant-2C2C2C.svg)](https://www.php-fig.org/psr/psr-12/)
 [![Tests](https://github.com/cakmoel/Scriptlog/actions/workflows/tests.yml/badge.svg)](https://github.com/cakmoel/Scriptlog/actions/workflows/tests.yml)
 ![Scriptlog Mascot](assets/scriptlog-vector-logo.png)
 
