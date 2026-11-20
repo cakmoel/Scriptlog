@@ -719,6 +719,10 @@ function install_i18n_data($link, $prefix = '', $default_lang = 'en')
         'form.parent' => ['Parent', 'الأصل', '父级', 'Parent', 'Родитель', 'Padre', 'Induk'],
         'form.link' => ['Link', 'الرابط', '链接', 'Lien', 'Ссылка', 'Enlace', 'Tautan'],
         'form.target' => ['Target', 'الهدف', '目标', 'Cible', 'Цель', 'Objetivo', 'Target'],
+        'form.name.label' => ['Name', 'الاسم', '姓名', 'Nom', 'Имя', 'Nombre', 'Nama'],
+        'form.name.placeholder' => ['Enter name', 'أدخل الاسم', '输入姓名', 'Entrez le nom', 'Введите имя', 'Ingrese el nombre', 'Masukkan nama'],
+        'form.email.label' => ['Email (will not be published)', 'البريد الإلكتروني (لن ينشر)', '邮箱（不会发布）', 'Email (ne sera pas publié)', 'Email (не будет опубликован)', 'Email (no será publicado)', 'Email (tidak akan dipublikasikan)'],
+        'form.email.placeholder' => ['Enter email', 'أدخل البريد الإلكتروني', '输入邮箱', 'Entrez lemail', 'Введите email', 'Ingrese el email', 'Masukkan email'],
       ],
       'button' => [
         'button.add' => ['Add New', 'إضافة جديد', '新建', 'Ajouter', 'Добавить', 'Añadir nuevo', 'Tambah Baru'],
@@ -795,12 +799,6 @@ function install_i18n_data($link, $prefix = '', $default_lang = 'en')
         'single.comment.label' => ['Type your comment', 'اكتب تعليقك', '输入您的评论', 'Tapez votre commentaire', 'Введите комментарий', 'Escribe tu comentario', 'Ketik komentar Anda'],
         'single.comment.placeholder' => ['Enter your comment', 'أدخل تعليقك', '输入您的评论', 'Entrez votre commentaire', 'Введите комментарий', 'Ingresa tu comentario', 'Masukkan komentar Anda'],
         'single.comment.submit' => ['Submit Comment', 'إرسال التعليق', '提交评论', 'Soumettre le commentaire', 'Отправить комментарий', 'Enviar comentario', 'Kirim Komentar'],
-      ],
-      'form' => [
-        'form.name.label' => ['Name', 'الاسم', '姓名', 'Nom', 'Имя', 'Nombre', 'Nama'],
-        'form.name.placeholder' => ['Enter name', 'أدخل الاسم', '输入姓名', 'Entrez le nom', 'Введите имя', 'Ingrese el nombre', 'Masukkan nama'],
-        'form.email.label' => ['Email (will not be published)', 'البريد الإلكتروني (لن ينشر)', '邮箱（不会发布）', 'Email (ne sera pas publié)', 'Email (не будет опубликован)', 'Email (no será publicado)', 'Email (tidak akan dipublikasikan)'],
-        'form.email.placeholder' => ['Enter email', 'أدخل البريد الإلكتروني', '输入邮箱', 'Entrez lemail', 'Введите email', 'Ingrese el email', 'Masukkan email'],
       ],
       'cookie_consent' => [
         'cookie_consent.banner.title' => ['We value your privacy', 'نقدر خصوصيتك', '我们重视您的隐私', 'Nous respectons votre vie privée', 'Мы ценим вашу конфиденциальность', 'Valoramos su privacidad', 'Kami menghargai privasi Anda'],
