@@ -3,6 +3,7 @@
 > **Purpose**: Common problems and how to fix them.
 > **Audience**: Anyone working on this project, from beginners to experienced developers.
 > **When to update**: Add an entry whenever you find and fix a bug.
+> **Numbering**: entries are numbered when they are added, so they are not always in numerical order.
 
 ---
 
@@ -43,7 +44,7 @@
 
 **Solution**: Changed to batch inserts. Instead of one row at a time, it now inserts 100 rows per query, cutting round trips from 980 to about 10.
 
-**Files**: `install/include/setup.php` (lines 807-836)
+**Files**: `install/include/setup.php` (`install_i18n_data()`)
 
 ### 3. IIS web.config Duplicate MIME Type
 
@@ -117,7 +118,7 @@
 
 **Solution**: Added `'post_date'` to the whitelist in `checkPostUpdatePayload()`.
 
-**Files**: `lib/controller/PostController.php` (line 458)
+**Files**: `lib/controller/PostController.php` (`checkPostUpdatePayload()`)
 
 ### 10. `check_form_request()` Only Validates First Key
 
@@ -138,7 +139,7 @@
 $this->deleteRecord("tbl_post_topic", ['post_id' => (int)$cleanId], null);
 ```
 
-**Files**: `lib/dao/PostDao.php` (line 243)
+**Files**: `lib/dao/PostDao.php` (`updatePost()`, `deletePost()`)
 
 ---
 
@@ -163,13 +164,17 @@ define('APP_IMAGE', APP_PUBLIC . DS . 'files' . DS . 'pictures' . DS);
 
 **Root Cause**: Someone used a WordPress function (`esc_attr()`) in a theme file.
 
-**Solution**: Replace with the project's `htmlout()` function:
+**Solution**: Replace it with `theme_escape_html()`, the escaping function used by theme templates:
 ```php
-// Wrong (WordPress function, doesn't exist here)
+// Wrong: WordPress function, not available here
 esc_attr($value);
-// Correct (this project's function)
-htmlout($value);
+
+// Correct: theme escaping helper (lib/utility/theme-escape.php)
+theme_escape_html($value);
 ```
+`htmlout()` also exists, but it runs two escapers and re-encodes valid entities such as `&quot;`, so do not use it for new theme code.
+
+**Files**: `lib/utility/theme-escape.php`
 
 ### 14. Summernote AJAX Upload - Unauthorized
 
@@ -187,13 +192,20 @@ htmlout($value);
 
 **Solution**: Added output buffering in `admin/media-upload.php`.
 
-### 16. `getimagesize()` nophoto.jpg Fallback
+### 16. `getimagesize()` Fallback Depends on a Relative Path
 
-**Context**: The `getimagesize()` function needs a valid file path. The fallback image uses a path relative to `__DIR__`, which assumes a specific directory structure:
+**Problem**: When a post or page has no featured image, `PageController` falls back to `nophoto.jpg` and builds the path by counting directory levels up from `__DIR__`:
 ```php
-__DIR__ . '/../../' . APP_IMAGE . 'nophoto.jpg'
+filesize(__DIR__ . '/../../' . APP_IMAGE . "nophoto.jpg")
 ```
-This path breaks if you reorganize the directory structure. A constant-based path would be safer.
+That only works while the controller stays exactly two levels below the project root. Move the file and the fallback breaks.
+
+**Solution**: Build the path from `APP_ROOT`, which already ends with a directory separator:
+```php
+filesize(APP_ROOT . APP_IMAGE . "nophoto.jpg")
+```
+
+**Files**: `lib/controller/PageController.php` (`processPageMediaInsert()`, `processPageMediaUpdate()`)
 
 ---
 
@@ -227,7 +239,7 @@ This path breaks if you reorganize the directory structure. A constant-based pat
 
 **Root Cause**: Files like `lib/utility/app-environment.php` and `lib/utility/dotenv-cache.php` had `defined('SCRIPTLOG') || die("Direct access not permitted")` guards. When loaded early in the bootstrap process (before `lib/common.php` defines `SCRIPTLOG`), they would trigger the guard and cause the entire request to die with that message.
 
-**Solution**: Allow these utility files to load during bootstrap by relaxing their SCRIPTLOG guards. Define a bootstrap flag or allow loading without SCRIPTLOG being set yet:
+**Solution**: Allow these files to load during bootstrap. Both now define a temporary `SCRIPTLOG_BOOTSTRAP` flag instead of calling `die()`:
 
 ```php
 // Allow inclusion during bootstrap
@@ -236,7 +248,7 @@ if (!defined('SCRIPTLOG') && !defined('SCRIPTLOG_BOOTSTRAP')) {
 }
 ```
 
-Or simply remove/relax the guard to allow early inclusion. The `SCRIPTLOG` constant will still be defined later by `lib/common.php` for normal operation.
+`lib/common.php` still defines `SCRIPTLOG` later, so normal requests keep the full guard.
 
 **Files**: `lib/utility/app-environment.php`, `lib/utility/dotenv-cache.php`
 
@@ -244,7 +256,7 @@ Or simply remove/relax the guard to allow early inclusion. The `SCRIPTLOG` const
 
 ## i18n/Translation Issues
 
-### 19. Translation Editor - JSON Parse Error
+### 56. Translation Editor - JSON Parse Error
 
 **Problem**: `SyntaxError: JSON.parse: unexpected character at line 1 column 1` appears in the Translation Editor.
 
@@ -295,7 +307,7 @@ $dbc = DbFactory::connect([
 
 **Solution**: Extract parameters by name from the matches array: use `$params['id']` instead of `$params[0]`.
 
-**Files**: API router utility
+**Files**: `lib/core/ApiRouter.php`
 
 ### 23. API Session Initialization
 
@@ -542,7 +554,7 @@ php tmp/minify.php blog                               # scoped rebuild + hash sy
 
 `tmp/minify.php` accepts an optional theme name so a rebuild no longer rewrites every theme's `.min.*` files and integrity hashes, and it refreshes `footer.php` automatically via `sync_integrity_hashes()`.
 
-**Verification**: `e2e/blog-search-autocomplete.spec.ts` asserts focus retention, `aria-activedescendant` tracking, wrap-around, Escape after several moves and active-option scrolling (30/30 across chromium/firefox/webkit). Plan: `specs/blog-search-autocomplete.md` §5.5.
+**Verification**: `e2e/blog-search-autocomplete.spec.ts` asserts focus retention, `aria-activedescendant` tracking, wrap-around, Escape after several moves and active-option scrolling (30/30 across chromium/firefox/webkit). Plan: section 5.5 of `specs/blog-search-autocomplete.md`.
 
 **Files**: `public/themes/blog/assets/js/search.js`, `public/themes/blog/assets/js/search.min.js`, `public/themes/blog/footer.php`, `tmp/minify.php`, `e2e/blog-search-autocomplete.spec.ts`
 
@@ -660,7 +672,7 @@ php tmp/minify.php blog                               # scoped rebuild + hash sy
 
 **Problem**: Clicking Enable on an installed plugin redirects back to the plugin list with `Error: Plugin files failed the integrity check, so activation was refused.`
 
-**Root Cause**: Phase 2 of the RCE remediation (`plan/RCE_REMEDIATION_OCTOBER2026_PLAN.md` §2.7) records a SHA-256 manifest over `plugin.ini` plus every PHP file at install time (`tbl_plugin.plugin_manifest`) and re-verifies it before `enable_plugin()` runs. The check fails when:
+**Root Cause**: Phase 2 of the RCE remediation (section 2.7 of `plan/RCE_REMEDIATION_OCTOBER2026_PLAN.md`) records a SHA-256 manifest over `plugin.ini` plus every PHP file at install time (`tbl_plugin.plugin_manifest`) and re-verifies it before `enable_plugin()` runs. The check fails when:
 - a plugin file was edited, added, or deleted after installation,
 - `plugin_manifest` is `NULL` because the plugin was installed before the column existed,
 - `plugin_directory` is blank or does not match the directory on disk.
@@ -700,7 +712,7 @@ The migration is CLI-only and idempotent (safe to run twice). Without `--backfil
 
 **Root Cause**: Plugin mutation was restricted to administrators in the Phase 2 RCE remediation — `PLUGIN_MANAGE` maps to `administrator` in `Authentication::checkAccessByLevel()`. This is by design: activating a plugin loads arbitrary PHP into the request.
 
-**Solution**: Perform plugin management with an administrator account. `plugin_level` on the plugin itself is only an admin-UI visibility hint and does not grant management rights (see `docs/dev-docs/PLUGIN_DEVELOPER_GUIDE.md` §2b).
+**Solution**: Perform plugin management with an administrator account. `plugin_level` on the plugin itself is only an admin-UI visibility hint and does not grant management rights (see section 2b of `docs/dev-docs/PLUGIN_DEVELOPER_GUIDE.md`).
 
 **Files**: `lib/core/Authentication.php`, `lib/dao/PluginDao.php` (`setMenuPlugin()`)
 
@@ -788,6 +800,30 @@ The cache is rebuilt from the active database on the next request (TTL 3600s). I
 
 > **Related**: CLI/e2e runs also leave `public/log/exceptions.log` modified and owned by your shell user. Restore it the same way and re-own it to `www-data` if production logging matters (see [Issue 52](#52-rate-limiter-counter-file-not-writable)).
 
+### 56. Admin E2E Login Fails With "Invalid username, email, or password"
+
+**Problem**: Admin Playwright specs (`admin-ui-parity`, `admin-plugins`, `admin-locale-dropdown`, GDPR admin specs) time out in `beforeEach` at `adminLogin()`. The login page shows `Invalid username, email, or password.` and no UI assertion runs.
+
+**Root Cause**: The `blogware_e2e` `administrator` row's `user_pass` no longer matches `ADMIN_PASS` (`4dMin(*)^`) in `e2e/gdpr-fixtures.ts`. Scriptlog hashes `base64_encode(hash('sha384', $password, true))` with `password_hash()` (see `lib/utility/scriptlog-password.php` and `scriptlog-verify-password.php`), so a plain `password_verify('4dMin(*)^', $hash)` check is not meaningful. A stale hash makes every admin login fail; this is unrelated to CAPTCHA or admin UI changes.
+
+**Solution**: Reseed the e2e admin row from the CLI, then re-run the affected spec:
+
+```bash
+php -r '
+$pdo = new PDO("mysql:host=127.0.0.1;port=3306;dbname=blogware_e2e;charset=utf8mb4", "blogwareuser", "userblogware", [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+$payload = base64_encode(hash("sha384", "4dMin(*)^", true));
+$hash = password_hash($payload, PASSWORD_DEFAULT);
+$stmt = $pdo->prepare("UPDATE tbl_users SET user_pass = :pass, user_banned = 0, user_signin_count = 0, user_locked_until = NULL WHERE user_login = :login");
+$stmt->execute([":pass" => $hash, ":login" => "administrator"]);
+echo "rows=" . $stmt->rowCount() . "\n";
+'
+npx playwright test e2e/admin-ui-parity.spec.ts --project=chromium --timeout=30000
+```
+
+**Verification**: Reseeding restored `admin-ui-parity` to 34 passed (Chromium + Firefox) and 17 skipped (WebKit, the known `adminLogin` dev-env limitation). The CAPTCHA UI spec (`e2e/login-captcha-ui.spec.ts`) does not depend on a successful admin login and stayed green throughout.
+
+**Files**: `e2e/gdpr-fixtures.ts`, `e2e/admin-ui-parity.spec.ts`, `docs/dev-docs/TROUBLESHOOTING.md`
+
 ---
 
 ## Checklist - Before Reporting an Issue
@@ -796,8 +832,9 @@ The cache is rebuilt from the active database on the next request (TTL 3600s). I
 2. [ ] Verify database connection and table prefix
 3. [ ] Clear any relevant caches (translation cache, browser cache)
 4. [ ] Check cookie path - did you log out and back in after cookie path changes?
-5. [ ] For API issues: `curl -i /api/v1` returns `200` with `Content-Type: application/json` (not `301`, and not an HTML theme page), session initialization is idempotent, cookie path is `/`, and the CSRF token is valid. On nginx/DDEV also check [issue 55](#55-sidebar-search-autocomplete-fails-on-nginxddev---apiv1-returns-the-theme-404)
+5. [ ] For API issues, confirm `curl -i /api/v1` returns `200` with `Content-Type: application/json` (not `301`, and not an HTML theme page). Also check that session initialization is idempotent, the cookie path is `/`, and the CSRF token is valid. On nginx/DDEV, see [issue 55](#55-sidebar-search-autocomplete-fails-on-nginxddev---apiv1-returns-the-theme-404)
 6. [ ] For image issues: verify APP_IMAGE constants, file permissions, and `getimagesize()` path
 7. [ ] For i18n issues: verify charset=utf8mb4 in DSN and check database for missing keys
 8. [ ] For theme issues: verify no duplicate header/footer calls, check browser console for JS errors
 9. [ ] After a CLI/e2e run: restore `public/files/cache/translations/` and re-own `public/cache/rate_limit/` + `public/log/` to `www-data` (issues 52 and 54)
+10. [ ] If admin e2e specs fail at `adminLogin()` with "Invalid username, email, or password", reseed the e2e admin hash (issue 56)

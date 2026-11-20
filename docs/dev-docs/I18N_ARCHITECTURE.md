@@ -1,9 +1,9 @@
-# i18n (Internationalization & Localization) Architecture Plan
+# i18n (Internationalization & Localization) Architecture
 
-**Project:** Blogware/Scriptlog CMS  
-**Version:** 2.0  
-**Last Updated:** April 2026  
-**Status:** ✅ Completed
+**Project:** Blogware/Scriptlog CMS
+**Version:** 2.1
+**Last Updated:** November 2026
+**Status:** Current implementation
 
 ---
 
@@ -13,94 +13,70 @@
 2. [Architecture Overview](#architecture-overview)
 3. [Database Schema](#database-schema)
 4. [Installation & Setup](#installation--setup)
-5. [Locale Prefix Routing](#locale-prefix-routing)
-6. [Fallback Mechanism](#fallback-mechanism)
+5. [Locale Routing and URL Generation](#locale-routing-and-url-generation)
+6. [Translation Storage, Loading, and Fallback](#translation-storage-loading-and-fallback)
 7. [Privacy Policy Implementation](#privacy-policy-implementation)
 8. [Theme Integration](#theme-integration)
    - [Frontend Language Switcher](#frontend-language-switcher)
-9. [Translation Keys Dictionary](#translation-keys-dictionary)
+9. [Translation Keys](#translation-keys)
 10. [Files Reference](#files-reference)
 11. [Admin Language Switcher](#admin-language-switcher)
+12. [REST API](#rest-api)
+13. [Verification Checklist](#verification-checklist)
 
 ---
 
 ## 1. Executive Summary
 
-This document outlines the complete architecture for implementing internationalization (i18n) and localization features in Blogware/Scriptlog CMS.
+This document describes the i18n implementation currently in the repository. It covers locale detection, URL handling, translation storage and fallback, installer seed data, theme helpers, privacy policies, the admin switcher, and the REST API.
 
-### Key Requirements
-
-| Requirement | Implementation |
-|-------------|----------------|
-| **Scope** | Full i18n - UI strings, menus, themes, user-generated content |
-| **Content Strategy** | Separate content per locale (posts, pages, topics, menus have locale) |
-| **URL Structure** | Prefix-based when permalinks enabled: `/en/`, `/es/`, `/fr/` |
-| **Translation Storage** | Hybrid: Database primary + JSON file cache |
-| **Default Language** | No prefix in URLs for default language (e.g., `/post/1/slug` stays as-is) |
-| **Locale Prefix** | Always enabled when permalinks enabled, configurable via admin settings |
-
-### Architecture Highlights
-
-- **Extendable**: Simple admin settings toggle for locale prefix
-- **Scalable**: JSON caching for high-performance
-- **Agile**: Modular design with clear separation of concerns
-- **Secure**: CSRF protection, XSS prevention, prepared statements
-- **Fast**: Multi-layer caching with lazy loading
+| Area | Current implementation |
+|------|------------------------|
+| **Scope** | UI strings, locale columns on posts/topics/menus, theme language files, privacy policies, and admin translations |
+| **Supported locales** | `en`, `ar`, `zh`, `fr`, `ru`, `es`, `id`; `ar` is RTL |
+| **Translation storage** | `tbl_translations` is the database source; `TranslationLoader` writes a flat generated JSON cache under `public/files/cache/translations/`; theme JSON files under `public/themes/{theme}/lang/` are the fallback source |
+| **Frontend `t()`** | Global theme helper in `functions-i18n.php`; reads the active theme's JSON file, falls back to English JSON, then to the key |
+| **Core `I18nManager::t()`** | Separate facade that reads loaded database/cache translations, falls back to theme JSON, then to the key |
+| **URL prefixes** | `Dispatcher` accepts and strips `/{locale}/...` paths in SEO mode; theme URL generation adds a prefix only when permalinks and `lang_prefix_required` are enabled |
+| **Default locale URL** | Theme helpers do not prefix the default locale. `I18nManager::url()`/`LocaleRouter::buildUrl()` prefix unconditionally when called directly |
+| **Admin/frontend separation** | Admin uses `admin_locale` and `?lang=`; frontend uses `scriptlog_locale` and `?switch-lang=` |
 
 ---
 
 ## 2. Architecture Overview
 
-### Request Flow
+### Request flow
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     REQUEST FLOW (i18n)                         │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   Permalinks ENABLED:  /en/post/1/slug                          │
-│   Permalinks DISABLED: ?p=1  (default language, no prefix)      │
-│       │                                                         │
-│       ▼                                                         │
-│   ┌──────────────────────┐                                      │
-│   │   LocaleDetector     │  → Detect/validate locale from URL   │
-│   └──────────┬───────────┘                                      │
-│              │                                                  │
-│              ▼                                                  │
-│   ┌──────────────────────┐                                      │
-│   │   TranslationLoader  │  → Load UI strings (DB → Cache)      │
-│   └──────────┬───────────┘                                      │
-│              │                                                  │
-│              ▼                                                  │
-│   ┌──────────────────────┐                                      │
-│   │   ContentFilter      │  → Filter content by locale          │
-│   └──────────┬───────────┘                                      │
-│              │                                                  │
-│              ▼                                                  │
-│   ┌──────────────────────┐                                      │
-│   │   Theme Render       │  → Render with translated strings    │
-│   └────────────────────┘                                        │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
+1. `Dispatcher::handleSeoFriendlyUrl()` inspects the request path.
+2. When a locale prefix is present, `LocaleRouter::extractLocale()` validates it, `I18nManager::setLocale()` selects it, and `LocaleRouter::stripLocalePrefix()` restores the normal route path.
+3. `Bootstrap::defineRoutingRules()` supplies the base routes only. There are no separate `*_with_locale` routes; prefixed paths are handled generically before normal route matching.
+4. `LocaleDetector` resolves the active locale from validated session/cookie values, browser `Accept-Language`, and configured defaults.
+5. `TranslationLoader` loads database rows or the generated JSON cache for core consumers. The blog theme's global `t()` helper loads theme JSON directly.
+6. Templates render through the theme helpers (`get_locale()`, `t()`, `locale_url()`, `is_rtl()`, `get_html_dir()`).
 
-### Fallback Priority
+There is no generic `ContentFilter` class. Locale-aware navigation filtering is implemented in `lib/utility/theme-navigation.php`, and content queries use the `*_locale` columns where appropriate.
 
-When a translation key is requested, the system checks in this order:
+### Fallback priority
 
-1. **Database** (`tbl_translations`) - Primary storage
-2. **JSON Files** (`public/themes/blog/lang/{locale}.json`) - Fallback
-3. **Key as-is** - Return the key if no translation found
+The project has two distinct translation lookups:
+
+| Consumer | Lookup order | Placeholder syntax |
+|----------|--------------|--------------------|
+| Theme `t()` | Active theme `lang/{locale}.json` → `lang/en.json` → key | `%name%` |
+| `I18nManager::t()` | Loaded DB/generated-cache value → theme `lang/{locale}.json` → key | `:name` |
+| `admin_translate()` | `tbl_translations` for the admin locale → hardcoded fallback table → key | See `admin_t()` for parameters |
+
+`TranslationLoader` falls back to theme JSON when DAOs are unavailable or a query fails, so the frontend still renders strings when the database is not reachable.
 
 ---
 
 ## 3. Database Schema
 
-### Existing Tables
+### Existing tables
 
-#### tbl_languages
+#### `tbl_languages`
 
-Stores available languages.
+Defined in `install/include/dbtable.php`:
 
 ```sql
 CREATE TABLE IF NOT EXISTS {$prefix}tbl_languages (
@@ -119,9 +95,9 @@ CREATE TABLE IF NOT EXISTS {$prefix}tbl_languages (
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-#### tbl_translations
+#### `tbl_translations`
 
-Stores UI/interface translation strings.
+`translation_context` is used for grouping and admin filtering; lookups are keyed by `translation_key`. The current installer schema has no foreign key on `lang_id`:
 
 ```sql
 CREATE TABLE IF NOT EXISTS {$prefix}tbl_translations (
@@ -137,14 +113,13 @@ CREATE TABLE IF NOT EXISTS {$prefix}tbl_translations (
     PRIMARY KEY (ID),
     UNIQUE KEY lang_key (lang_id, translation_key),
     KEY lang_id (lang_id),
-    KEY translation_key (translation_key(191)),
-    FOREIGN KEY (lang_id) REFERENCES {$prefix}tbl_languages(ID) ON DELETE CASCADE
+    KEY translation_key (translation_key(191))
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-### New Table: tbl_privacy_policies
+### Privacy policies table
 
-Privacy policy content stored per locale.
+`tbl_privacy_policies` is already part of the installer schema. `ID` is the primary key and `locale` is a unique key:
 
 ```sql
 CREATE TABLE IF NOT EXISTS {$prefix}tbl_privacy_policies (
@@ -160,626 +135,303 @@ CREATE TABLE IF NOT EXISTS {$prefix}tbl_privacy_policies (
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-### Existing Content Locale Columns
+### Content locale columns
 
-```sql
--- tbl_posts already has post_locale
-ALTER TABLE {$prefix}tbl_posts 
-    ADD COLUMN post_locale VARCHAR(10) NOT NULL DEFAULT 'en' AFTER post_type;
+The installer adds indexed locale columns to content tables:
 
--- tbl_topics already has topic_locale
-ALTER TABLE {$prefix}tbl_topics 
-    ADD COLUMN topic_locale VARCHAR(10) NOT NULL DEFAULT 'en' AFTER topic_status;
-
--- tbl_menu already has menu_locale
-ALTER TABLE {$prefix}tbl_menu 
-    ADD COLUMN menu_locale VARCHAR(10) NOT NULL DEFAULT 'en' AFTER menu_sort;
-```
+- `tbl_posts.post_locale`
+- `tbl_topics.topic_locale`
+- `tbl_menu.menu_locale`
 
 ### Settings
 
-```sql
--- Default language code
-INSERT INTO {$prefix}tbl_settings (setting_name, setting_value) 
-VALUES ('lang_default', 'en');
+`install/include/dbtable.php` seeds these settings:
 
--- Available languages (comma-separated codes)
-INSERT INTO {$prefix}tbl_settings (setting_name, setting_value) 
-VALUES ('lang_available', 'en,ar,zh,fr,ru,es,id');
+| Setting | Default | Purpose |
+|---------|---------|---------|
+| `lang_default` | `en` | Default locale |
+| `lang_available` | `en,ar,zh,fr,ru,es,id` | Enabled locale codes |
+| `lang_auto_detect` | `1` | Enable browser locale detection |
+| `lang_prefix_required` | `1` | Enable prefix generation in theme URL helpers |
 
--- Auto-detect browser language (0 or 1)
-INSERT INTO {$prefix}tbl_settings (setting_name, setting_value) 
-VALUES ('lang_auto_detect', '1');
-
--- Locale prefix in URLs (only when permalinks enabled)
-INSERT INTO {$prefix}tbl_settings (setting_name, setting_value) 
-VALUES ('lang_prefix_enabled', '1');
-```
+`lang_prefix_required` is the current key. There is no `lang_prefix_enabled` setting.
 
 ---
 
 ## 4. Installation & Setup
 
-### Installation Function: install_i18n_data()
+### `install_i18n_data()`
 
-Located in `install/include/setup.php`, this function is called during installation.
+`install_i18n_data()` lives in `install/include/setup.php` and runs during installation. It:
 
-**Supported Languages (7):**
-- English (en) - default
-- Arabic (ar) - RTL
-- Chinese (zh)
-- French (fr)
-- Russian (ru)
-- Spanish (es)
-- Indonesian (id)
+1. Inserts the seven supported languages.
+2. Inserts translations in batches of 100 inside one transaction.
+3. Updates `lang_available`, `lang_default`, `lang_auto_detect`, and `lang_prefix_required`.
+4. Calls `install_privacy_policy_data()` at the end.
 
-**Translation Contexts:**
+There is no separate `install_frontend_i18n_data()` function. Frontend contexts are part of the same `$translations` array in `install_i18n_data()`.
 
-| Context | Description | Keys |
-|---------|-------------|------|
-| `navigation` | Admin navigation | ~35 keys |
-| `form` | Form labels | ~8 keys |
-| `button` | Buttons | ~3 keys |
-| `error` | Error messages | ~3 keys |
-| `footer` | Footer text | ~1 key |
-| `admin` | Admin UI | ~5 keys |
+The current array contains **16 unique contexts and 165 unique keys per language**. With seven locales this produces **1,155 translation rows** (`165 × 7`). The second `form` block was merged into the original `form` context so no keys are silently dropped by PHP duplicate-key handling.
 
-### Frontend Translations
+| Context | Keys |
+|---------|-----:|
+| `navigation` | 63 |
+| `form` | 29 |
+| `button` | 11 |
+| `error` | 5 |
+| `footer` | 1 |
+| `status` | 5 |
+| `visibility` | 6 |
+| `admin` | 6 |
+| `header` | 5 |
+| `sidebar` | 6 |
+| `home` | 7 |
+| `single` | 4 |
+| `cookie_consent` | 6 |
+| `404` | 3 |
+| `privacy` | 7 |
+| `page` | 1 |
 
-Frontend translations are dynamically loaded into `tbl_translations` during installation using the `install_frontend_i18n_data()` function.
-
----
-
-## 5. Locale Prefix Routing
-
-### Behavior Summary
-
-| Permalinks | Locale Prefix | Default Language URL |
-|------------|---------------|---------------------|
-| Disabled | Never | `/` (no change) |
-| Enabled | Configurable | `/post/1/slug` (no prefix for 'en') |
-| Enabled + Lang changed | Yes | `/es/post/1/slug` |
-
-### Configuration
-
-- **Setting**: `lang_prefix_enabled` in `tbl_settings`
-- **Admin Toggle**: Simple checkbox in Language Settings
-- **Enable Condition**: Only active when permalinks are enabled (`rewrite` = 'yes')
-
-### Route Pattern Changes (Bootstrap.php)
-
-When locale prefix enabled:
-```php
-// Default language (no prefix)
-'single' => "/post/(?'id'\d+)/(?'post'[\w\-]+)"
-
-// With locale prefix (non-default languages)
-'single_with_locale' => "/(?>'locale'[\w\-]+)/post/(?'id'\d+)/(?'post'[\w\-]+)"
-```
-
-### URL Building Logic
-
-```php
-function locale_url(string $path, ?string $locale = null): string
-{
-    $i18n = I18nManager::getInstance();
-    $defaultLocale = $i18n->getDetector()->getDefaultLocale();
-    $currentLocale = $locale ?? $i18n->getLocale();
-    $permalinksEnabled = rewrite_status() === 'yes';
-    $prefixEnabled = $permalinksEnabled && is_locale_prefix_enabled();
-    
-    // Default language: no prefix
-    if ($currentLocale === $defaultLocale && !$prefixEnabled) {
-        return $path;
-    }
-    
-    // Non-default or prefix enabled:
-    return "/{$currentLocale}{$path}";
-}
-```
+`tests/unit/InstallationTest.php` contains a behavioral regression test that captures the installer's prepared statements and asserts the language count, per-locale key count, identical key sets, representative contexts, and transaction counters.
 
 ---
 
-## 6. Fallback Mechanism
+## 5. Locale Routing and URL Generation
 
-### I18nManager Enhancement
+### Routing behavior
 
-```php
-public function t(string $key, array $params = [], ?string $locale = null): string
-{
-    if (!$this->initialized) {
-        $this->initialize();
-    }
+| Mode | Behavior |
+|------|----------|
+| Permalinks disabled | Theme switcher uses `?switch-lang=...&redirect=...`; `locale_url()` returns the path unchanged |
+| Permalinks enabled | `Dispatcher` accepts `/{locale}/...`, sets the locale, strips the prefix, and matches the normal route |
+| Direct locale-prefixed URL | Accepted by the dispatcher even when `lang_prefix_required` is off; the setting controls URL generation, not request parsing |
+| Default locale in generated theme URLs | Never prefixed by `locale_url()` |
 
-    $locale = $locale ?? $this->locale;
+`Bootstrap.php` defines one `locale` route (`/locale`) for the locale controller; it does not define duplicated locale-prefixed routes. `.htaccess` already contains rewrite support for locale-prefixed paths.
 
-    // Priority 1: DB translations (already loaded)
-    $value = $this->translations[$key] ?? null;
+### Theme `locale_url()`
 
-    // Priority 2: Fallback to JSON file
-    if ($value === null) {
-        $value = $this->loadFromJsonFallback($key, $locale);
-    }
+`public/themes/blog/functions-i18n.php` implements `locale_url()` as follows:
 
-    // Priority 3: Return key as-is (no translation found)
-    if ($value === null) {
-        $value = $key;
-    }
+- Returns the path unchanged when permalinks are disabled.
+- Returns the path unchanged when `lang_prefix_required` is off.
+- Returns the path unchanged for the default locale.
+- Otherwise returns `/{locale}/{path}`.
 
-    // Handle parameters
-    if (!empty($params)) {
-        return $this->interpolate($value, $params);
-    }
+By contrast, `I18nManager::url()` delegates to `LocaleRouter::buildUrl()`, which always prefixes the supplied locale. The two APIs are not interchangeable.
 
-    return $value;
-}
+### Query-string language switching
 
-private function loadFromJsonFallback(string $key, string $locale): ?string
-{
-    $jsonPath = APP_ROOT . 'public' . DS . 'themes' . DS . 'blog' . DS . 'lang' . DS . $locale . '.json';
-    
-    if (!file_exists($jsonPath)) {
-        return null;
-    }
+`lib/main.php` validates `?switch-lang=` as a scalar two-letter code in the supported list, stores it in `$_SESSION['scriptlog_locale']` and the `scriptlog_locale` cookie, then redirects. A `redirect` parameter is accepted only when it is a relative, same-origin path; invalid values redirect to `/`.
 
-    $jsonContent = file_get_contents($jsonPath);
-    $translations = json_decode($jsonContent, true);
-    
-    return $translations[$key] ?? null;
-}
-```
+---
+
+## 6. Translation Storage, Loading, and Fallback
+
+### Database and generated cache
+
+`TranslationLoader` loads translations through `TranslationDao` and `LanguageDao`, then stores a flat `{key: value}` map in `public/files/cache/translations/{locale}.json`. The default cache lifetime is 3,600 seconds. `invalidate($locale)` removes the file and the in-memory entry; service write paths call invalidation.
+
+### Theme JSON files
+
+Each theme keeps source strings in `public/themes/{theme}/lang/{locale}.json`. The blog theme's global `t()` helper:
+
+1. Resolves the locale with `detect_browser_locale()`.
+2. Loads `lang/{locale}.json` once per request via `load_theme_translations()`.
+3. Uses `lang/en.json` as a fallback for a missing key.
+4. Returns the key itself if neither file contains it.
+5. Replaces `%param%` placeholders from the optional `$params` array.
+
+The installer's database seed set and the theme JSON files are maintained separately; the installer currently seeds more keys than the blog theme JSON contains. `ThemeI18nTest` verifies that the keys used by the theme are consistent across language files.
+
+### Core facade
+
+`I18nManager::t()` uses the database/generated cache first, then `loadFromJsonFallback()` against `public/themes/blog/lang/{locale}.json`, then returns the key. Its parameters use `:name` placeholders. This API is available to core/admin consumers; theme templates call the global `t()` helper instead.
 
 ---
 
 ## 7. Privacy Policy Implementation
 
-### Best Practices
+### Current implementation
 
-- Simple table structure with locale as primary key
-- Default policy used if locale not found
-- Admin interface to edit policies per language
-- HTML content allowed for formatting
+- The table is defined in `install/include/dbtable.php`.
+- Default localized policies are inserted by `install_privacy_policy_data()` in `install/include/setup.php`, called from `install_i18n_data()`.
+- `lib/dao/PrivacyPolicyDao.php` provides `findByLocale()`, `findDefault()`, `findAllPolicies()`, `createPolicy()`, `updatePolicy()`, `deletePolicy()`, `setDefaultPolicy()`, and `policyExists()`.
+- `public/themes/blog/privacy.php` loads the policy for the current locale, falls back to the default policy, and sanitizes permitted HTML with `htmLawed()` before rendering.
+- An admin editor and an end-to-end spec cover per-language policy editing.
 
-### Table Structure
-
-| Column | Type | Description |
-|--------|------|-------------|
-| ID | BIGINT | Primary key |
-| locale | VARCHAR(10) | Language code (en, ar, zh, etc.) |
-| policy_title | VARCHAR(255) | Title in that language |
-| policy_content | LONGTEXT | Full HTML content |
-| is_default | TINYINT | 1 if this is fallback |
-| created_at | TIMESTAMP | Creation date |
-| updated_at | TIMESTAMP | Last update |
-
-### PrivacyDao Methods
-
-```php
-class PrivacyPolicyDao extends Dao
-{
-    public function findByLocale(string $locale): ?array;
-    public function findDefault(): ?array;
-    public function createPolicy(array $data): int;
-    public function updatePolicy(int $id, array $data): void;
-    public function deletePolicy(int $id): void;
-}
-```
+`locale` is unique but is not the primary key; `ID` is the primary key.
 
 ---
 
 ## 8. Theme Integration
 
+### Theme i18n helpers
+
+The helpers live in `public/themes/blog/functions-i18n.php`; `functions.php` includes that file along with the other theme helper modules.
+
+| Function | Purpose |
+|----------|---------|
+| `t()` | Translate a key from theme JSON with `%param%` interpolation |
+| `detect_browser_locale()` | Resolve locale from session, cookie, browser header, then default |
+| `load_theme_translations()` | Load and memoize a locale's JSON file |
+| `locale_url()` | Build a locale-aware URL using permalink and prefix settings |
+| `is_locale_prefix_enabled()` | Read `lang_prefix_required` through `ConfigurationDao` |
+| `get_default_locale()` | Return the configured/default locale |
+| `get_locale()` | Return the active frontend locale |
+| `available_locales()` | Return supported locale codes |
+| `is_rtl()` / `get_html_dir()` | Return direction information |
+| `get_language_name()` | Return native or English language name |
+| `language_switcher()` | Render the switcher markup |
+
+`set_locale()` is not a blog-theme helper. LocaleController relies on the session/cookie flow.
+
 ### Frontend Language Switcher
 
-Location: `public/themes/blog/header.php`
+Location: `public/themes/blog/header.php`.
 
-The frontend theme includes a language switcher in the navigation bar that allows visitors to switch languages.
+The switcher lists `available_locales()` and marks the active locale. When permalinks are disabled, each link uses `?switch-lang={code}&redirect={current URL}`. When permalinks are enabled, links use `locale_url($_SERVER['REQUEST_URI'], $locale)`. The rendered URL is escaped with `theme_escape_html()`.
 
-```php
-<!-- public/themes/blog/header.php - Language Switcher -->
-<li class="dropdown language-switcher">
-    <button type="button" class="btn-language dropdown-toggle" 
-            id="languageMenu" data-toggle="dropdown">
-        <i class="fa fa-globe"></i>
-        <span class="lang-text"><?php echo get_language_name(get_locale(), true); ?></span>
-        <span class="lang-code"><?php echo strtoupper(get_locale()); ?></span>
-    </button>
-    <ul class="dropdown-menu" role="menu">
-        <?php foreach (available_locales() as $locale) : ?>
-        <li>
-            <a href="?switch-lang=<?php echo $locale; ?>">
-                <?php echo get_language_name($locale, true); ?>
-                <!-- Show check for current locale -->
-            </a>
-        </li>
-        <?php endforeach; ?>
-    </ul>
-</li>
-```
+The dropdown includes ARIA state (`aria-haspopup`, `aria-expanded`, `aria-labelledby`, `aria-current`) and is styled by the theme's RTL assets when applicable.
 
-### IMPORTANT: Separate from Admin
+### Separation from admin
 
-The frontend uses **COMPLETELY SEPARATE** locale system from admin panel:
-
-- **Session**: `$_SESSION['scriptlog_locale']` (NOT admin_locale)
-- **Cookie**: `scriptlog_locale` (NOT admin_locale)
-- **URL Parameter**: `?switch-lang=` (NOT ?lang=)
-- **Function**: `get_locale()` (NOT admin_get_locale())
-
-This ensures:
-- Frontend visitors can change language without affecting admin panel
-- Admin can change language without affecting frontend
-- No conflict between the two systems
-
-### Frontend Locale Handling
-
-The frontend uses different functions compared to the admin panel:
-
-| Function | Location | Purpose |
-|-----------|----------|---------|
-| `get_locale()` | `public/themes/blog/functions.php` | Get current frontend locale |
-| `set_locale()` | `public/themes/blog/functions.php` | Set locale |
-| `available_locales()` | `public/themes/blog/functions.php` | Get available languages |
-| `locale_url()` | `public/themes/blog/functions.php` | Generate locale-prefixed URL |
-| `get_language_name()` | `public/themes/blog/functions.php` | Get language name |
-| `t()` | `I18nManager` | Translate frontend strings |
-
-### Frontend Language Switch Flow
-
-```
-User clicks language in frontend dropdown
-         │
-         ▼
-?switch-lang=id (URL parameter)
-         │
-         ▼
-lib/main.php handles switch
-         │
-         ▼
-$_SESSION['scriptlog_locale'] = 'id' (NOT admin_locale!)
-         │
-         ▼
-Redirects to clean URL (without switch-lang)
-         │
-         ▼
-Page loads with new locale via get_locale()
-         │
-         ▼
-Theme renders with t() translations
-         │
-         ▼
-Admin panel language UNCHANGED
-```
-
-### Theme Files Modified
-
-| File | Purpose |
-|------|---------|
-| `functions.php` | i18n helper functions (t(), locale_url(), get_locale(), is_rtl(), available_locales(), language_switcher()) |
-| `header.php` | Dynamic lang/dir attributes, RTL CSS loading, language switcher |
-| `footer.php` | Copyright translation, RTL JS loading |
-| `sidebar.php` | Widget titles |
-| `single.php` | Comment form |
-| `cookie-consent.php` | Consent banner |
-| `privacy.php` | Load from database |
-| `404.php` | Error page |
-| `home.php` | Hero section, latest posts |
-| `category.php`, `tag.php`, `archive.php`, `page.php`, `blog.php` | Section headers |
-
-### Translation Helper Usage
-
-```php
-// Basic translation
-<?= t('sidebar.search.title'); ?>
-
-// With locale URL
-<a href="<?= locale_url('/post/1/slug'); ?>">Link</a>
-
-// Current locale
-<?= get_locale(); ?>  // Returns: 'en', 'ar', etc.
-
-// RTL check
-<?php if (is_rtl()): ?>
-    <link rel="stylesheet" href="rtl.css">
-<?php endif; ?>
-
-// Language direction
-<html lang="<?= get_locale(); ?>" dir="<?= get_html_dir(); ?>">
-```
+| Aspect | Frontend | Admin |
+|--------|----------|-------|
+| Session | `$_SESSION['scriptlog_locale']` | `$_SESSION['admin_locale']` |
+| Cookie | `scriptlog_locale` | `admin_locale` |
+| Query parameter | `?switch-lang=` | `?lang=` |
+| Locale helper | `get_locale()` | `admin_get_locale()` |
+| Translation helper | `t()` | `admin_translate()` / `admin_t()` |
 
 ---
 
-## 9. Translation Keys Dictionary
+## 9. Translation Keys
 
-### Navigation (header)
+The installed database keys and the active theme's JSON files are the sources of truth. The tables below are representative examples, not an exhaustive dictionary.
 
-| Key | English |
-|-----|---------|
-| header.nav.home | Home |
-| header.nav.blog | Blog |
-| header.nav.about | About |
-| header.nav.contact | Contact |
-| header.nav.search | Search |
-
-### Sidebar
+### Header and sidebar
 
 | Key | English |
 |-----|---------|
-| sidebar.search.title | Search |
-| sidebar.search.placeholder | What are you looking for? |
-| sidebar.latest_posts.title | Latest Posts |
-| sidebar.categories.title | Categories |
-| sidebar.archives.title | Archives |
-| sidebar.tags.title | Tags |
+| `header.nav.home` | Home |
+| `header.nav.blog` | Blog |
+| `header.nav.search` | Search |
+| `sidebar.search.title` | Search |
+| `sidebar.latest_posts.title` | Latest Posts |
 
-### Home Page
-
-| Key | English |
-|-----|---------|
-| home.hero.discover_more | Discover More |
-| home.hero.admin_panel | Go to administrator panel |
-| home.hero.scroll_down | Scroll Down |
-| home.intro.welcome | Welcome to ScriptLog |
-| home.intro.description | Your entryway to a personal blog... |
-| home.latest_posts.title | Latest from the blog |
-| home.divider.view_more | View More |
-
-### Single Post
+### Search and pagination
 
 | Key | English |
 |-----|---------|
-| single.comment.leave_reply | Leave a comment |
-| single.comment.label | Type your comment |
-| single.comment.placeholder | Enter your comment |
-| form.name.label | Name |
-| form.name.placeholder | Enter name |
-| form.email.label | Email (will not be published) |
-| form.email.placeholder | Enter email |
-| single.comment.submit | Submit Comment |
+| `search.title` | Search |
+| `search.found_results` | Found %count% result(s) for "%keyword%" |
+| `search.no_results` | No results found for "%keyword%" |
+| `pagination.previous` | Previous |
+| `pagination.next` | Next |
 
-### Footer
+### Home and single post
 
 | Key | English |
 |-----|---------|
-| footer.copyright | All rights reserved |
+| `home.intro.welcome` | Welcome to ScriptLog |
+| `home.intro.description` | Your entryway to a personal blog |
+| `single.comment.leave_reply` | Leave a comment |
+| `form.name.label` | Name |
+| `form.email.label` | Email (will not be published) |
 
-### Cookie Consent
-
-| Key | English |
-|-----|---------|
-| cookie_consent.banner.title | We value your privacy |
-| cookie_consent.banner.description | ...uses cookies to enhance... |
-| cookie_consent.buttons.accept | Accept All |
-| cookie_consent.buttons.reject | Reject All |
-| cookie_consent.buttons.learn_more | Learn More |
-| cookie_consent.privacy.link | Privacy Policy |
-
-### 404 Page
+### Footer, consent, errors, and privacy
 
 | Key | English |
 |-----|---------|
-| 404.title | 404 |
-| 404.message | The page you are looking for was not found. |
-| 404.back_home | Back to Home |
+| `footer.copyright` | All rights reserved |
+| `cookie_consent.banner.title` | We value your privacy |
+| `404.back_home` | Back to Home |
+| `error.wrong_password` | Incorrect password. Please try again. |
+| `privacy.page_title` | Privacy Policy |
+
+For the complete current set, inspect `install/include/setup.php` for installer keys and `public/themes/blog/lang/en.json` for theme keys.
 
 ---
 
 ## 10. Files Reference
 
-### Core Files (lib/)
+### Core files
 
-| File | Purpose | Status |
-|------|---------|--------|
-| lib/core/I18nManager.php | Central i18n facade | ✅ Exists |
-| lib/core/LocaleDetector.php | Locale detection | ✅ Exists |
-| lib/core/LocaleRouter.php | Locale-prefixed routing | ✅ Exists |
-| lib/core/TranslationLoader.php | Load translations | ✅ Exists |
-| lib/dao/LanguageDao.php | Language CRUD | ✅ Exists |
-| lib/dao/TranslationDao.php | Translation CRUD | ✅ Exists |
-| lib/core/PrivacyPolicyDao.php | Privacy policy CRUD | 🆕 To create |
+| File | Current role |
+|------|--------------|
+| `lib/core/I18nManager.php` | Locale/translation facade for core and admin consumers |
+| `lib/core/LocaleDetector.php` | Locale detection and validation |
+| `lib/core/LocaleRouter.php` | Prefix extraction/stripping and direct URL building |
+| `lib/core/TranslationLoader.php` | Database/cache loading, generated JSON cache, invalidation |
+| `lib/core/Dispatcher.php` | Strips valid locale prefixes before route matching |
+| `lib/core/Bootstrap.php` | Defines base routes, including `/locale` |
+| `lib/controller/LocaleController.php` | Handles the `/locale` route |
+| `lib/dao/LanguageDao.php` | Language CRUD |
+| `lib/dao/TranslationDao.php` | Translation CRUD and lookups |
+| `lib/dao/PrivacyPolicyDao.php` | Privacy policy CRUD |
+| `lib/utility/theme-navigation.php` | Locale-aware navigation data |
+| `lib/utility/admin-translations.php` | Admin locale helpers and fallback dictionary |
+| `lib/main.php` | Frontend `?switch-lang=` handling |
 
-### Installation Files (install/)
+### Installation files
 
-| File | Purpose | Status |
-|------|---------|--------|
-| install/include/dbtable.php | Table definitions | 🆕 Add privacy table |
-| install/include/setup.php | Installation functions | 🆕 Add frontend i18n data |
+| File | Current role |
+|------|--------------|
+| `install/include/dbtable.php` | Defines i18n, privacy, and settings tables; seeds locale settings |
+| `install/include/setup.php` | `install_i18n_data()` and `install_privacy_policy_data()` |
 
-### Theme Files (public/themes/blog/)
+### Theme files
 
-| File | Changes Required |
-|------|------------------|
-| functions.php | Already has helper functions ✅ |
-| header.php | Already has lang/dir/rtl support ✅ |
-| footer.php | 1 string replacement |
-| sidebar.php | 6 string replacements |
-| single.php | 8 string replacements |
-| cookie-consent.php | 7 string replacements |
-| 404.php | 2 string replacements |
-| home.php | 3 string replacements |
-| privacy.php | Load from database |
-| category.php, tag.php, archive.php, page.php, blog.php | Section titles |
+| File | Current role |
+|------|--------------|
+| `public/themes/blog/functions-i18n.php` | Frontend i18n helper functions |
+| `public/themes/blog/functions.php` | Aggregates theme helper modules |
+| `public/themes/blog/header.php` | `lang`/`dir` attributes, RTL assets, language switcher |
+| `public/themes/blog/lang/*.json` | Theme translation sources |
+| `public/themes/blog/privacy.php` | Loads the localized privacy policy from the database |
+| `public/themes/blog/assets/css/rtl.css` | RTL layout styles |
+| `public/themes/blog/assets/js/rtl.js` | RTL behavior |
 
-### Configuration Files
-
-| File | Changes |
-|------|---------|
-| lib/core/Bootstrap.php | Add locale prefix to routes |
-| lib/core/Dispatcher.php | Extract locale before routing |
-| lib/core/RequestPath.php | Handle locale in path |
-| .htaccess | Rewrite rules for locale prefixes |
+Generated cache files under `public/files/cache/translations/` are runtime artifacts, not source files. Revert incidental cache changes after running tests.
 
 ---
 
 ## 11. Admin Language Switcher
 
-### Overview
+Location: `admin/navigation.php`; request handling: `admin/index.php`.
 
-The admin panel includes a language switcher in the header navigation that allows administrators to switch between available languages without page reload. The implementation uses a simple URL-based query parameter approach.
+The admin switcher uses `?lang=`. `admin/index.php` validates the code, writes `$_SESSION['admin_locale']`, and issues a redirect with the `lang` parameter removed. On an unset locale, `admin_get_locale()` checks the admin session, then the `admin_locale` cookie, then returns `en`. `admin/index.php` also seeds the admin locale from `lang_default` when neither session nor cookie is set.
 
-### IMPORTANT: Separate Architecture
+`admin_translate()` reads `tbl_translations` through `TranslationDao` and falls back to the hardcoded dictionary in `admin-translations.php`; `admin_t()` adds parameter interpolation. The admin sidebar uses `admin_translate('nav.dashboard')`-style keys.
 
-The admin panel and frontend use **COMPLETELY SEPARATE** locale systems to prevent language changes in one area from affecting the other:
-
-| Aspect | Admin Panel | Frontend |
-|--------|------------|---------|
-| **Session Variable** | `$_SESSION['admin_locale']` | `$_SESSION['scriptlog_locale']` |
-| **Cookie** | `admin_locale` | `scriptlog_locale` |
-| **URL Parameter** | `?lang=` | `?switch-lang=` |
-| **Functions** | `admin_get_locale()` | `get_locale()` |
-
-This separation ensures:
-- Frontend visitors can change language without affecting admin panel
-- Admin can change language without affecting frontend visitors
-- No conflict between the two systems
-
-### Language Switcher in Admin Navigation
-
-Location: `admin/navigation.php`
-
-The language switcher is a Bootstrap dropdown menu that lists all available languages. When a user clicks a language option, it redirects to the same page with `?lang=` query parameter.
-
-```php
-<!-- admin/navigation.php - Language Switcher -->
-<li class="dropdown notifications-menu">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="Language">
-        <i class="fa fa-globe"></i>
-        <span class="hidden-xs"><?= strtoupper(admin_get_locale()); ?></span>
-    </a>
-    <ul class="dropdown-menu">
-        <li class="header"><?= admin_translate('nav.language_settings'); ?></li>
-        <li>
-            <ul class="menu">
-                <?php foreach (admin_get_available_locales() as $code => $name) : ?>
-                <li>
-                    <a href="?lang=<?= $code; ?>">
-                        <!-- Show check icon for current locale -->
-                        <?php if (admin_get_locale() === $code) : ?>
-                        <i class="fa fa-check text-success"></i>
-                        <?php else : ?>
-                        <i class="fa fa-globe text-muted"></i>
-                        <?php endif; ?>
-                        &nbsp;<?= safe_html($name); ?>
-                    </a>
-                </li>
-                <?php endforeach; ?>
-            </ul>
-        </li>
-    </ul>
-</li>
-```
-
-### How It Works
-
-1. **URL Parameter**: The switcher uses `?lang=` query parameter (e.g., `?lang=id` for Indonesian)
-
-2. **Locale Detection**: The `admin_get_locale()` function in `lib/utility/admin-translations.php` checks in this order:
-   - Session `$_SESSION['admin_locale']` first (NOT URL - prevents frontend pollution)
-   - Cookie `$_COOKIE['admin_locale']`
-   - Default: `'en'`
-
-3. **admin/index.php** handles the `?lang=` parameter and saves to session, then redirects to clean URL
-
-### Key Functions
-
-| Function | Location | Purpose |
-|----------|----------|---------|
-| `admin_get_locale()` | `lib/utility/admin-translations.php` | Get admin locale (session/cookie only) |
-| `admin_set_locale()` | `lib/utility/admin-translations.php` | Set admin locale |
-| `admin_get_available_locales()` | `lib/utility/admin-translations.php` | Get available languages |
-| `admin_translate()` | `lib/utility/admin-translations.php` | Translate admin UI strings |
-
-### Supported Languages
-
-| Code | Name | Direction |
-|------|------|-----------|
-| en | English | ltr |
-| ar | العربية | rtl |
-| zh | 中文 | ltr |
-| fr | Français | ltr |
-| ru | Русский | ltr |
-| es | Español | ltr |
-| id | Bahasa Indonesia | ltr |
-
-### Sidebar Translation
-
-The admin sidebar (`admin/sidebar-nav.php`) uses `admin_translate()` for all navigation items. When the locale changes via the language switcher, all sidebar items automatically update to the selected language.
-
-```php
-// Example: sidebar navigation items use admin_translate()
-<span><?= admin_translate('nav.dashboard'); ?></span>
-<span><?= admin_translate('nav.posts'); ?></span>
-<span><?= admin_translate('nav.users'); ?></span>
-```
-
-### Flow Diagram
-
-```
-User clicks language in admin dropdown
-         │
-         ▼
-?lang=id (URL parameter)
-         │
-         ▼
-admin/index.php processes ?lang= 
-         │
-         ▼
-Saves to $_SESSION['admin_locale'] (NOT scriptlog_locale!)
-         │
-         ▼
-Redirects to clean URL (no ?lang=)
-         │
-         ▼
-admin_get_locale() returns session value
-         │
-         ▼
-Sidebar renders with admin_translate('key', 'id')
-         │
-         ▼
-Admin panel displays in Indonesian
-         │
-         ▼
-Frontend language UNCHANGED
-```
+The frontend locale is unaffected by admin switching.
 
 ---
 
-## Implementation Phases
+## 12. REST API
 
-### Phase 1: Database & Installation
-- Add `tbl_privacy_policies` to dbtable.php
-- Add privacy policy data to install_i18n_data()
-- Add frontend translations to installation
+The i18n REST surface is registered in `api/index.php` under `/api/v1/`:
 
-### Phase 2: Fallback Enhancement
-- Enhance I18nManager for JSON fallback
+- `GET /languages`, `/languages/active`, `/languages/default`, `GET|PUT|PATCH|DELETE /languages/{code}`
+- `PUT|PATCH /languages/{code}/default`
+- `GET /translations/{code}`, `GET /translations/{code}/export`, `GET /translations/{code}/{key}`
+- `POST /translations/{code}`, `PUT|PATCH|DELETE /translations/{id}`
+- `POST /translations/{code}/import`, `POST /translations/{code}/cache`
 
-### Phase 3: Privacy Policy Database
-- Create PrivacyPolicyDao
-- Create admin interface for policy management
-- Update privacy.php template
-
-### Phase 4: Locale Prefix Routing
-- Update Bootstrap.php with locale routes
-- Update Dispatcher.php for locale extraction
-- Add locale prefix setting check
-
-### Phase 5: Theme Template Updates
-- Update all templates with t() calls
+Controllers live in `lib/controller/api/LanguagesApiController.php` and `lib/controller/api/TranslationsApiController.php`.
 
 ---
 
-## Testing Checklist
+## 13. Verification Checklist
 
-- [ ] Default language ('en') URLs: `/post/1/slug` works without prefix
-- [ ] Non-default language URLs: `/es/post/1/slug` shows Spanish
-- [ ] RTL layout works for Arabic locale
-- [ ] Language switcher generates correct URLs
-- [ ] Privacy policy loads from database per locale
-- [ ] Translation fallback works (DB → JSON → Key)
-- [ ] Permalinks disabled: No locale prefix in any URL
+The following behavior is covered by the current test suite; see `docs/dev-docs/I18N_TESTING_GUIDE.md` for commands and counts:
 
----
-
-**Document Version:** 2.0  
-**Last Updated:** March 2026
+- [x] Installer inserts 165 unique keys for each of seven locales exactly once
+- [x] Theme i18n keys are consistent across locales
+- [x] Locale detection and validation handle session, cookie, and browser values
+- [x] Locale prefix extraction and URL generation behave as documented
+- [x] Translation loading, generated cache use, and invalidation work
+- [x] Frontend language switching validates input and redirects safely
+- [x] Admin locale stays separate from frontend locale
+- [x] RTL helpers return the correct direction for Arabic

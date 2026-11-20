@@ -1,8 +1,8 @@
 # i18n Testing Guide
 
-**Project:** Blogware/Scriptlog CMS  
-**Version:** 1.0  
-**Last Updated:** March 2026  
+**Project:** Blogware/Scriptlog CMS
+**Version:** 2.1
+**Last Updated:** November 2026
 
 ---
 
@@ -18,31 +18,45 @@
 8. [RTL Testing](#rtl-testing)
 9. [Performance Testing](#performance-testing)
 10. [Troubleshooting](#troubleshooting)
+11. [Continuous Integration](#continuous-integration)
+12. [Appendix: Test Data](#appendix-test-data)
 
 ---
 
 ## Overview
 
-This guide covers testing procedures for the i18n (internationalization) system implemented in Blogware/Scriptlog CMS.
+This guide describes the i18n tests that currently exist in the repository and how to run them. It documents observed behavior, not planned coverage. For architecture details, see `docs/dev-docs/I18N_ARCHITECTURE.md`.
 
-### Test Files Location
+### Test files
 
-```
+Counts below reflect the current test files as of November 2026.
+
+```text
 tests/
 ├── unit/
-│   ├── LocaleDetectorTest.php       ✅ Pass (17 tests)
-│   ├── TranslationLoaderTest.php   ✅ Pass (9 tests)
-│   ├── I18nManagerTest.php         ✅ Pass (29 tests)
-│   ├── LocaleRouterTest.php         ✅ Pass
-│   ├── ThemeI18nTest.php            ✅ Pass (26 tests - Frontend JSON i18n)
-│   └── LanguageSwitcherTest.php     ✅ Pass (9 tests - NEW)
+│   ├── LocaleDetectorTest.php              17 tests (2 skipped)
+│   ├── TranslationLoaderTest.php            9 tests
+│   ├── I18nManagerTest.php                 29 tests (1 skipped)
+│   ├── LocaleRouterTest.php                18 tests
+│   ├── ThemeI18nTest.php                   37 tests
+│   ├── LanguageSwitcherTest.php             9 tests
+│   ├── TranslationCacheTest.php             2 tests
+│   ├── NavigationI18nTest.php              23 tests
+│   ├── AdminLocaleInitializationTest.php   13 tests
+│   ├── AdminTranslationsTest.php           12 tests
+│   ├── AdminLocalesCatalogTest.php          9 tests
+│   └── InstallationTest.php                47 tests (3 install_i18n_data tests)
 ├── integration/
-│   ├── LanguageDaoIntegrationTest.php
-│   ├── TranslationServiceIntegrationTest.php
-│   ├── PrivacyPolicyDaoIntegrationTest.php (NEW)
-│   └── LanguageSwitcherIntegrationTest.php (NEW - 19 tests)
+│   ├── LanguageSwitcherIntegrationTest.php 29 tests
+│   ├── LanguageDaoIntegrationTest.php      14 tests (skipped in standard runs)
+│   ├── TranslationServiceIntegrationTest.php 15 tests (skipped in standard runs)
+│   └── PrivacyPolicyDaoIntegrationTest.php 16 tests (skipped in standard runs)
+├── fixtures/
+│   └── language_switcher_fixture.php
 └── setup_test_db.php
 ```
+
+The i18n-focused unit tests total **181 tests** (3 skipped). The language-switcher integration test adds **29 tests**. The three DB-backed DAO/service integration classes currently skip at class setup.
 
 ---
 
@@ -50,68 +64,34 @@ tests/
 
 ### Prerequisites
 
-1. **PHP 7.4+** with PHPUnit 9.5
-2. **MySQL/MariaDB** with test database
-3. **Composer** dependencies installed
+1. PHP 7.4+ with PHPUnit 9.5+ (current binary: `lib/vendor/bin/phpunit`, PHPUnit 9.6.38)
+2. MySQL/MariaDB for integration tests that use a database
+3. Composer dependencies installed
 
-### Database Setup
+### Database setup
 
-1. Create the test database:
 ```bash
 mysql -u blogwareuser -p -e "CREATE DATABASE IF NOT EXISTS blogware_test"
-```
-
-2. Run the setup script to create tables:
-```bash
 php tests/setup_test_db.php
 ```
 
-3. Languages and translations are automatically populated during installation via `install_i18n_data()`:
-- `tbl_languages` - 7 languages (en, ar, zh, fr, ru, es, id)
-- `tbl_translations` - 203 translations (29 keys × 7 languages)
-- Other required tables for the CMS
+`tests/setup_test_db.php` creates the tables and seeds **six** languages: `en`, `ar`, `zh`, `fr`, `es`, `id`. It does not seed `ru` and does not call `install_i18n_data()`. Translation rows are not seeded by this script.
 
-### Translation Contexts
+`install_i18n_data()` is an installer function, not the test-DB setup path. During a real installation it seeds seven languages and 165 keys per language (1,155 rows), plus privacy policies. Its behavior is covered behaviorally in `tests/unit/InstallationTest.php`.
 
-| Context | Description | Sample Keys |
-|---------|-------------|------------|
-| `navigation` | Sidebar and menu items | nav.dashboard, nav.posts |
-| `form` | Form labels and buttons | form.save, form.cancel |
-| `button` | Action buttons | button.add, button.subscribe |
-| `error` | Error messages | error.not_found |
-| `footer` | Footer content | footer.copyright |
-| `admin` | Admin UI labels | admin.all_languages |
-| `cookie_consent` | Cookie consent banner | cookie_consent.buttons.accept |
+### Translation sources in tests
 
-### Frontend JSON Translations
+| Source | Used by | Notes |
+|--------|---------|-------|
+| `tbl_translations` | `I18nManager`, `TranslationLoader`, `admin_translate()` | Database source for core/admin consumers |
+| `public/files/cache/translations/{locale}.json` | `TranslationLoader` | Generated flat key/value cache; runtime artifact |
+| `public/themes/blog/lang/{locale}.json` | Theme `t()` | Source files for frontend templates; fallback for core loader |
+| Hardcoded arrays | `admin_translate_fallback()` | Used when DB rows are unavailable |
 
-The frontend uses **JSON files** for translations (no database required):
+The blog theme ships JSON files for `en`, `ar`, `zh`, `fr`, `ru`, `es`, and `id`.
 
-| File | Purpose |
-|------|---------|
-| `public/themes/blog/lang/en.json` | English (default) |
-| `public/themes/blog/lang/es.json` | Spanish |
-| `public/themes/blog/lang/ar.json` | Arabic (RTL) |
-| `public/themes/blog/lang/zh.json` | Chinese |
-| `public/themes/blog/lang/fr.json` | French |
-| `public/themes/blog/lang/ru.json` | Russian |
-| `public/themes/blog/lang/id.json` | Indonesian |
+### Verify the test database connection
 
-**Frontend Translation Keys:**
-- `header.nav.*` - Navigation
-- `sidebar.*` - Sidebar widgets
-- `home.*` - Homepage content
-- `single.*` - Single post page
-- `form.*` - Form labels
-- `cookie_consent.*` - Cookie consent banner
-- `404.*` - Error pages
-- `privacy.*` - Privacy policy
-- `button.*` - Buttons
-- `pagination.*` - Pagination
-
-### Verify Test Database Connection
-
-Run a quick test to verify connectivity:
 ```bash
 php -r "
 \$pdo = new PDO('mysql:host=localhost;dbname=blogware_test', 'blogwareuser', 'userblogware');
@@ -119,329 +99,192 @@ echo 'Database connection successful!';
 "
 ```
 
+These credentials are hardcoded in `tests/setup_test_db.php`; they are not read from `config.php`.
+
 ---
 
 ## Running Tests
 
-### Run All i18n Tests
+Run commands from `/var/www/blogware/public_html`.
+
+### Run the i18n unit tests
+
+PHPUnit 9 does not execute multiple explicit file paths in one invocation. Run each file separately:
 
 ```bash
-cd /var/www/blogware/public_html
-
-# Run all i18n unit tests
-lib/vendor/bin/phpunit tests/unit/LocaleDetectorTest.php
-lib/vendor/bin/phpunit tests/unit/TranslationLoaderTest.php
-lib/vendor/bin/phpunit tests/unit/I18nManagerTest.php
-lib/vendor/bin/phpunit tests/unit/LocaleRouterTest.php
-
-# Run frontend JSON i18n tests (no database required)
-lib/vendor/bin/phpunit tests/unit/ThemeI18nTest.php
-
-# Run all i18n-related tests at once
-lib/vendor/bin/phpunit --filter "Locale|I18n|Translation|Theme"
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/unit/LocaleDetectorTest.php
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/unit/TranslationLoaderTest.php
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/unit/I18nManagerTest.php
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/unit/LocaleRouterTest.php
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/unit/ThemeI18nTest.php
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/unit/LanguageSwitcherTest.php
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/unit/TranslationCacheTest.php
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/unit/NavigationI18nTest.php
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/unit/AdminLocaleInitializationTest.php
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/unit/AdminTranslationsTest.php
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/unit/AdminLocalesCatalogTest.php
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/unit/InstallationTest.php --filter testInstallI18nData
 ```
 
-### Run All Tests Pass Summary
-
-| Test File | Tests | Status |
-|-----------|-------|--------|
-| LocaleDetectorTest.php | 17 | ✅ Pass |
-| TranslationLoaderTest.php | 9 | ✅ Pass |
-| I18nManagerTest.php | 29 | ✅ Pass |
-| LocaleRouterTest.php | (included) | ✅ Pass |
-| ThemeI18nTest.php | 26 | ✅ Pass |
-| LanguageSwitcherTest.php | 9 | ✅ Pass |
-| LanguageSwitcherIntegrationTest.php | 19 | ✅ Pass (NEW) |
-| **Total** | **109+** | **✅ All Pass** |
-
-### Run with Coverage Report
+### Run the active i18n integration test
 
 ```bash
-lib/vendor/bin/phpunit tests/unit/ --coverage-html coverage/i18n/
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/integration/LanguageSwitcherIntegrationTest.php
 ```
 
-### Run Specific Test Class
+### Run the whole suite
 
 ```bash
-lib/vendor/bin/phpunit tests/unit/LocaleDetectorTest.php
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit --configuration phpunit.xml
 ```
 
-### Run Specific Test Method
+The suite rewrites files under `public/files/cache/translations/`. After a full run, check `git status` and revert incidental cache changes unless they were intentional:
 
 ```bash
-lib/vendor/bin/phpunit tests/unit/LocaleDetectorTest.php --filter testIsValidLocaleWithValidLocale
+git checkout -- public/files/cache/translations/
 ```
+
+### Run a specific method
+
+```bash
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/unit/LocaleDetectorTest.php --filter testIsValidLocaleWithValidLocale
+```
+
+### Coverage
+
+The coverage command below runs the **whole** unit suite; it is not i18n-scoped:
+
+```bash
+php -d error_reporting='E_ALL' lib/vendor/bin/phpunit --configuration phpunit.xml --coverage-html coverage/full/
+```
+
+### Current pass summary
+
+| Test file | Tests | Notes |
+|-----------|------:|-------|
+| `LocaleDetectorTest.php` | 17 | 2 skipped (cookie/CLI-related paths) |
+| `TranslationLoaderTest.php` | 9 | Includes interpolation and cache logic checks |
+| `I18nManagerTest.php` | 29 | 1 skipped (`testSetLocaleWithValidLocale`) |
+| `LocaleRouterTest.php` | 18 | Prefix extraction and URL building |
+| `ThemeI18nTest.php` | 37 | Theme JSON keys, interpolation, privacy/404 keys |
+| `LanguageSwitcherTest.php` | 9 | Helper-level URL/name generation |
+| `TranslationCacheTest.php` | 2 | Single loader; service write paths invalidate cache |
+| `NavigationI18nTest.php` | 23 | Locale-aware navigation helpers |
+| `AdminLocaleInitializationTest.php` | 13 | Admin default locale seeding |
+| `AdminTranslationsTest.php` | 12 | Admin translation helpers |
+| `AdminLocalesCatalogTest.php` | 9 | Admin locale catalog |
+| `InstallationTest.php` (i18n methods) | 3 | Installer transaction, timeout, and 165-key behavior |
+| `LanguageSwitcherIntegrationTest.php` | 29 | Fixture-based full switch flow |
 
 ---
 
 ## Unit Tests
 
-### LocaleDetectorTest ✅ PASS
+Method lists below are grouped by responsibility. The test files are the source of truth for exact method names.
 
-Tests for locale detection from various sources.
+### LocaleDetectorTest
 
-**Status:** All tests passing (17 tests, 2 skipped due to cookie headers in CLI)
+- Validates supported/unsupported locale codes.
+- Covers available/default locale accessors and setters.
+- Covers browser `Accept-Language` detection.
+- Two URL/session tests are skipped in CLI runs because they depend on cookie behavior.
 
-**Test Methods:**
+### TranslationLoaderTest
 
-| Method | Status | Description |
-|--------|--------|-------------|
-| `testIsValidLocaleWithValidLocale` | ✅ | Verify valid locales are accepted |
-| `testIsValidLocaleWithInvalidLocale` | ✅ | Verify invalid locales are rejected |
-| `testGetAvailableLocales` | ✅ | Test getting available locales |
-| `testSetAvailableLocales` | ✅ | Test setting available locales |
-| `testGetDefaultLocale` | ✅ | Test getting default locale |
-| `testSetLocaleWithValidLocale` | ⏭️ | Test setting valid locale (skipped - requires cookie) |
-| `testSetLocaleWithInvalidLocale` | ✅ | Test setting invalid locale |
-| `testExtractFromUrlWithValidLocale` | ⏭️ | Test URL-based locale extraction (skipped - requires cookie) |
-| `testExtractFromUrlWithInvalidLocale` | ✅ | Test URL with invalid locale |
-| `testDetectFromBrowserAcceptLanguage` | ✅ | Test browser header detection |
+- Covers cache directory/path setup, enable/disable state, interpolation, expiry, and in-memory caching.
+- Some cache-structure assertions use local arrays rather than the production `TranslationLoader::saveToCache()` output. Treat `lib/core/TranslationLoader.php` as the authority for the on-disk shape (a flat `{key: value}` map).
 
-### TranslationLoaderTest ✅ PASS
+### I18nManagerTest
 
-Tests for translation loading with caching.
+- Covers singleton access, locale getters/setters, translation fallback, RTL helpers, URL building, and getters for loader/router/detector.
+- `testSetLocaleWithValidLocale` is skipped in CLI runs.
 
-**Status:** All tests passing (9 tests)
+### LocaleRouterTest
 
-**Test Methods:**
+- Covers locale extraction/stripping from request paths, prefix detection, route matching, and direct URL building.
+- `LocaleRouter::buildUrl()` always prefixes the supplied locale; this differs from the theme's `locale_url()`.
 
-| Method | Status | Description |
-|--------|--------|-------------|
-| `testConstructorCreatesCacheDirectory` | ✅ | Verify cache directory creation |
-| `testCacheFilePathGeneration` | ✅ | Test cache path generation |
-| `testIsCacheEnabled` | ✅ | Test cache enable/disable |
-| `testSetCacheEnabled` | ✅ | Test setting cache enabled |
-| `testInterpolateMethod` | ✅ | Test parameter interpolation |
-| `testJsonCacheStructure` | ✅ | Test cache file structure |
-| `testCacheExpiryLogic` | ✅ | Test cache expiration |
-| `testMemoryCacheLayer` | ✅ | Test in-memory caching |
+### ThemeI18nTest
 
-### I18nManagerTest ✅ PASS
+- Covers `detect_browser_locale()`, `t()`, `load_theme_translations()`, and `available_locales()`.
+- Asserts key consistency across all seven theme JSON files.
+- Includes cookie-consent, privacy, and 404 key checks.
 
-Tests for the central i18n facade.
+### LanguageSwitcherTest
 
-**Status:** All tests passing (29 tests, 1 skipped)
+- Covers `get_language_name()`, URL generation patterns, redirect encoding, and all supported locale codes.
 
-**Test Methods:**
+### TranslationCacheTest
 
-| Method | Status | Description |
-|--------|--------|-------------|
-| `testGetInstanceReturnsSameInstance` | ✅ | Verify singleton pattern |
-| `testGetLocaleReturnsString` | ✅ | Test getLocale method |
-| `testGetAvailableLocalesReturnsArray` | ✅ | Test getAvailableLocales |
-| `testIsRtlReturnsBoolean` | ✅ | Test RTL detection |
-| `testTranslateMethodExists` | ✅ | Verify translate method |
-| `testTranslateWithValidKey` | ✅ | Test translation lookup |
-| `testTranslateWithUnknownKey` | ✅ | Test fallback behavior |
-| `testTranslateWithParameters` | ✅ | Test parameter interpolation |
-| `testSetLocaleWithValidLocale` | ⏭️ | Test valid locale setting (skipped - requires cookie) |
-| `testSetLocaleWithInvalidLocale` | ✅ | Test invalid locale rejection |
-| `testUrlMethodExists` | ✅ | Verify URL builder |
-| `testGetLoaderReturnsTranslationLoader` | ✅ | Verify loader getter |
-| `testSingletonPreventsCloning` | ✅ | Test singleton protection |
+- Asserts one `TranslationLoader` instance per request.
+- Statically checks that `TranslationService::createTranslation()`, `updateTranslation()`, `deleteTranslation()`, and `importFromArray()` invalidate the file cache.
+- Snapshots and restores cache files in `setUp()`/`tearDown()`.
 
-### ThemeI18nTest ✅ PASS (NEW)
+### NavigationI18nTest, AdminLocaleInitializationTest, AdminTranslationsTest, AdminLocalesCatalogTest
 
-Tests for JSON-based frontend translation system (no database).
+- Cover locale-aware navigation data, admin locale initialization from `lang_default`, admin translation helpers, and the admin locale catalog.
 
-**Status:** All tests passing (26 tests)
+### InstallationTest (i18n subset)
 
-**Test Methods:**
-
-| Method | Status | Description |
-|--------|--------|-------------|
-| `testDetectBrowserLocaleReturnsEnglishByDefault` | ✅ | Default locale is English |
-| `testDetectBrowserLocaleWithSpanishHeader` | ✅ | Spanish browser detection |
-| `testDetectBrowserLocaleWithFrenchHeader` | ✅ | French browser detection |
-| `testDetectBrowserLocaleWithArabicHeader` | ✅ | Arabic browser detection |
-| `testDetectBrowserLocaleWithChineseHeader` | ✅ | Chinese browser detection |
-| `testDetectBrowserLocaleWithRussianHeader` | ✅ | Russian browser detection |
-| `testDetectBrowserLocaleWithIndonesianHeader` | ✅ | Indonesian browser detection |
-| `testDetectBrowserLocaleFallsBackToEnglishForUnsupported` | ✅ | Fallback for unsupported languages |
-| `testSessionTakesPriorityOverBrowser` | ✅ | Session overrides browser |
-| `testCookieTakesPriorityOverBrowser` | ✅ | Cookie overrides browser |
-| `testTranslationReturnsKeyForUnknownKey` | ✅ | Unknown keys return key |
-| `testTranslationWorksForKnownEnglishKey` | ✅ | English translations work |
-| `testTranslationWorksForKnownSpanishKey` | ✅ | Spanish translations work |
-| `testTranslationWorksForKnownArabicKey` | ✅ | Arabic translations work |
-| `testTranslationWorksForKnownChineseKey` | ✅ | Chinese translations work |
-| `testTranslationWorksForKnownFrenchKey` | ✅ | French translations work |
-| `testTranslationWorksForKnownRussianKey` | ✅ | Russian translations work |
-| `testTranslationWorksForKnownIndonesianKey` | ✅ | Indonesian translations work |
-| `testTranslationWithParameterInterpolation` | ✅ | Parameter interpolation works |
-| `testFallbackToEnglishWhenTranslationMissing` | ✅ | Falls back to English |
-| `testLoadThemeTranslationsLoadsSpanish` | ✅ | JSON file loading works |
-| `testLoadThemeTranslationsLoadsArabic` | ✅ | Arabic JSON file loading |
-| `testLoadThemeTranslationsReturnsEmptyForUnknownLocale` | ✅ | Unknown locale returns empty |
-| `testCookieConsentTranslationsInSpanish` | ✅ | Cookie consent translations |
-| `testCookieConsentTranslationsInArabic` | ✅ | Cookie consent Arabic |
-| `testAllSupportedLocalesAreRecognized` | ✅ | All 7 locales recognized |
-
-### LanguageSwitcherTest ✅ PASS (NEW)
-
-Tests for the frontend language switcher UI functionality.
-
-**Status:** All tests passing (9 tests)
-
-**Test Methods:**
-
-| Method | Status | Description |
-|--------|--------|-------------|
-| `testGetLanguageNameNative` | ✅ | Verify native language names (English, العربية, 中文, etc.) |
-| `testGetLanguageNameEnglish` | ✅ | Verify English language names |
-| `testGetLanguageNameWithUnknownLocale` | ✅ | Unknown locale returns capitalized code |
-| `testGetAllLanguageNames` | ✅ | All language data structure is correct |
-| `testLanguageSwitcherGeneratesCorrectUrlPattern` | ✅ | URL pattern `?switch-lang=XX` is correct |
-| `testRedirectUrlEncoding` | ✅ | Redirect URL encoding handles special chars |
-| `testAllLanguageCodesGenerateUrls` | ✅ | All 7 language codes generate valid URLs |
-| `testArabicLocaleGeneration` | ✅ | Arabic native name contains RTL characters |
-| `testChineseLocaleGeneration` | ✅ | Chinese native name contains CJK characters |
+- `testInstallI18nDataSetsTimeLimit`: verifies the bulk-insert timeout guard.
+- `testInstallI18nDataTransactionStructure`: verifies `begin_transaction → try → foreach → commit → catch → rollback → throw`.
+- `testInstallI18nDataInsertsEveryUniqueTranslationOncePerLanguage`: captures the installer's SQL with a mysqli-like fake and asserts seven locales, 165 unique keys per locale, identical key sets, representative contexts, and one commit with no rollback.
 
 ---
 
 ## Integration Tests
 
-### LanguageDaoIntegrationTest
+### Active: LanguageSwitcherIntegrationTest
 
-Tests for language CRUD operations with database.
+This test uses `tests/fixtures/language_switcher_fixture.php`. It **does not include or execute `lib/main.php`**; it models the switch flow in a fixture. Production `lib/main.php` is stricter: it accepts only scalar two-letter codes, uses strict allow-list checks, and rejects open-redirect targets.
 
-**Prerequisites:**
-- Test database must be set up
-- `tbl_languages` table must exist
+Covered areas:
 
-**Test Methods:**
+- `?switch-lang=` handling and session/cookie persistence.
+- Redirect construction, including preservation of the original path/query and an explicit `redirect` parameter.
+- Locale-filtered posts, topics, and menus when the test DB is available.
+- RTL detection for Arabic and LTR for other bundled locales.
+- Invalid, malformed, empty, uppercase, and sequential switch inputs.
 
-| Method | Description |
-|--------|-------------|
-| `testCreateLanguage` | Create new language |
-| `testFindById` | Find language by ID |
-| `testFindByIdReturnsNullForNonexistent` | Handle missing ID |
-| `testFindLanguageByCode` | Find by code |
-| `testFindActiveLanguages` | Get active languages |
-| `testFindDefaultLanguage` | Get default language |
-| `testUpdateLanguage` | Update language |
-| `testSetDefaultLanguage` | Set as default |
-| `testDeleteLanguage` | Delete language |
-| `testCountLanguages` | Count total languages |
-| `testCodeExists` | Check code existence |
+Representative current method names:
 
-### TranslationServiceIntegrationTest
+- `testSwitchLangSetsSessionAndReturnsRedirect`
+- `testRedirectUrlPreservesOriginalPathAndQuery`
+- `testCookieFallbackWhenSessionExpires`
+- `testArabicIsRtlInDatabase`
+- `testUpperCaseLocaleIsNormalizedToLowercase`
 
-Tests for translation management with database.
+### Currently skipped DB-backed classes
 
-**Prerequisites:**
-- Test database must be set up
-- `tbl_languages` and `tbl_translations` tables must exist
-- A test language must exist (created automatically)
+`LanguageDaoIntegrationTest`, `TranslationServiceIntegrationTest`, and `PrivacyPolicyDaoIntegrationTest` contain 14, 15, and 16 test methods respectively, but skip during standard runs. The skip reason is that `tests/bootstrap.php` does not register the `dbc` object required by DAO constructors:
 
-**Test Methods:**
-
-| Method | Description |
-|--------|-------------|
-| `testGetTranslationsReturnsArray` | Get all translations |
-| `testGetTranslationsByContext` | Filter by context |
-| `testSearchTranslations` | Search functionality |
-| `testCreateTranslation` | Create new translation |
-| `testUpdateTranslation` | Update translation |
-| `testDeleteTranslation` | Delete translation |
-| `testExportToArray` | Export translations |
-| `testImportFromArray` | Import translations |
-| `testImportFromArrayUpdatesExisting` | Test merge behavior |
-
-### PrivacyPolicyDaoIntegrationTest
-
-Tests for privacy policy CRUD operations with database.
-
-**Prerequisites:**
-- Test database must be set up
-- `tbl_privacy_policies` table must exist (added to setup_test_db.php)
-
-**Test Methods:**
-
-| Method | Description |
-|--------|-------------|
-| `testCreatePolicy` | Create new privacy policy |
-| `testFindById` | Find policy by ID |
-| `testFindByIdReturnsNullForNonexistent` | Handle missing ID |
-| `testFindByLocale` | Find policy by locale |
-| `testFindByLocaleReturnsNullForNonexistent` | Handle missing locale |
-| `testFindDefault` | Get default policy |
-| `testFindAllPolicies` | Get all policies |
-| `testUpdatePolicy` | Update policy |
-| `testDeletePolicy` | Delete policy |
-| `testSetDefaultPolicy` | Set policy as default |
-| `testClearDefaultPolicy` | Clear default flag |
-| `testFetchAll` | Fetch all policies |
-| `testSetAsDefaultPolicy` | Set as default (alias) |
-| `testPolicyExists` | Check policy existence |
-| `testPolicyExistsReturnsFalse` | Check non-existent policy |
-| `testCreatePolicyWithMinimalData` | Test minimal data creation |
-| `testCreateDuplicateLocaleThrowsException` | Test UNIQUE constraint |
-
-### LanguageSwitcherIntegrationTest ✅ COMPLETED
-
-Tests for the full frontend language switching flow. Implements the I18N_INTEGRATION_TEST_PLAN covering 4 phases.
-
-**Location:** `tests/integration/LanguageSwitcherIntegrationTest.php`
-**Fixtures:** `tests/fixtures/language_switcher_fixture.php`
-**Status:** All tests passing (19 tests)
-
-**Test Flow Validated:**
-
-```
-1. ✓ User clicks language in dropdown → ?switch-lang=XX
-2. ✓ lib/main.php logic processes switch-lang parameter
-3. ✓ Locale saved to $_SESSION['scriptlog_locale']
-4. ✓ Redirect URL removes switch-lang param
-5. ✓ Session/cookie fallback works
-6. ✓ Content filtered by locale (posts, topics, menus)
-7. ✓ RTL layout detected for Arabic
-8. ✓ Invalid locales are rejected
-9. ✓ Default locale fallback works
+```text
+Cannot connect to test database: Database connection (dbc) is not set in the Registry
 ```
 
-**Test Methods:**
-
-| Phase | Method | Status | Description |
-|-------|--------|--------|-------------|
-| 1 | `testSwitchLangParameterSetsSession` | ✅ | Session set from ?switch-lang=ar |
-| 1 | `testSwitchLangForAllSupportedLocales` | ✅ | All 7 locales set session correctly |
-| 1 | `testRedirectUrlIsProperlyConstructed` | ✅ | Redirect preserves original URL |
-| 1 | `testRedirectUrlRemovesSwitchLangParam` | ✅ | switch-lang stripped from redirect |
-| 1 | `testLocaleIsStoredInSession` | ✅ | Session locale returned by detectLocale |
-| 1 | `testLocaleIsStoredInCookie` | ✅ | Cookie fallback when session empty |
-| 2 | `testPostsAreFilteredByLocale` | ✅ | Posts filtered exclusively by post_locale |
-| 2 | `testTopicsAreFilteredByLocale` | ✅ | Topics filtered exclusively by topic_locale |
-| 2 | `testMenuItemsAreFilteredByLocale` | ✅ | Menu items filtered exclusively by menu_locale |
-| 2 | `testNonexistentLocaleReturnsEmptyResults` | ✅ | Unknown locale returns empty results |
-| 3 | `testRTLIsDetectedForArabic` | ✅ | Arabic detected as RTL, others as LTR |
-| 3 | `testHtmlDirAttributeIsSetCorrectly` | ✅ | Dir attribute matches locale direction |
-| 3 | `testOnlyArabicIsRtl` | ✅ | No other locale falsely detected as RTL |
-| 4 | `testCompleteLanguageSwitchFlow` | ✅ | Full en→ar switch flow validated |
-| 4 | `testLanguageSwitchPersistsAcrossRequests` | ✅ | Language persists across simulated requests |
-| 4 | `testInvalidLocaleIsRejected` | ✅ | Invalid code 'xx' rejected (returns null) |
-| 4 | `testMalformedLocaleIsRejected` | ✅ | 'en-us' rejected (only 2-char codes) |
-| 4 | `testDefaultLocaleFallbackWorks` | ✅ | Falls back to 'en' when nothing set |
-| 4 | `testLocaleIsLowercased` | ✅ | 'AR' normalized to 'ar' |
-| 4 | `testCookieFallbackWhenSessionExpires` | ✅ | Cookie used when session locale absent |
+They are useful as executable specifications, but they are not active DB coverage in the standard suite. Do not describe them as passing CRUD tests unless the test harness is updated to register `dbc`.
 
 ---
 
 ## API Testing
 
-### Using cURL
+The i18n REST API is registered under `/api/v1/`.
 
-#### List Languages
+### List languages
+
 ```bash
 curl -X GET "http://localhost/api/v1/languages" \
   -H "Content-Type: application/json"
 ```
 
-#### Create Language
+### Create a language
+
+Write endpoints require authentication and administrator permission. Use an API key or bearer token:
+
 ```bash
 curl -X POST "http://localhost/api/v1/languages" \
   -H "Content-Type: application/json" \
-  -H "Cookie: scriptlog_auth=your_session" \
+  -H "X-API-Key: YOUR_API_KEY" \
   -d '{
     "lang_code": "fr",
     "lang_name": "French",
@@ -449,135 +292,121 @@ curl -X POST "http://localhost/api/v1/languages" \
   }'
 ```
 
-#### Get Translations
+Alternative authentication header:
+
+```bash
+-H "Authorization: Bearer YOUR_TOKEN"
+```
+
+`scriptlog_auth` is a browser auth cookie, not an API authentication header.
+
+### Translation endpoints
+
 ```bash
 curl -X GET "http://localhost/api/v1/translations/en" \
   -H "Content-Type: application/json"
-```
 
-#### Export Translations
-```bash
 curl -X GET "http://localhost/api/v1/translations/en/export" \
   -H "Content-Type: application/json"
 ```
 
-### Using Postman/Insomnia
+### OpenAPI specification
 
-Import the OpenAPI spec from `/docs/API_OPENAPI.json` and test all endpoints.
+Available locations:
 
-### API Test Scripts
+- `docs/dev-docs/API_OPENAPI.json`
+- `docs/html/API_OPENAPI.json`
+- `openapi.json`
+- Runtime endpoint: `GET /api/v1/openapi.json`
 
-```bash
-# Test script location
-tests/scripts/api-test.sh
-```
+There is no checked-in `tests/scripts/api-test.sh`.
 
 ---
 
 ## Manual Testing Checklist
 
-### Language Management
+### Language management
 
 - [ ] Add a new language
 - [ ] Edit language details
 - [ ] Set language as default
-- [ ] Delete non-default language
-- [ ] Attempt to delete default language (should fail)
+- [ ] Delete a non-default language
+- [ ] Attempt to delete the default language (should fail)
 - [ ] Toggle language active/inactive
 - [ ] Sort languages
 
-### Translation Management
+### Translation management
 
 - [ ] View translation list
 - [ ] Filter by context
 - [ ] Search translations
-- [ ] Create new translation
-- [ ] Edit translation value
-- [ ] Delete translation
+- [ ] Create, edit, and delete a translation
 - [ ] Export translations to JSON
 - [ ] Import translations from JSON
 - [ ] Regenerate cache
 
-### Locale Detection (Tested via Unit Tests ✅)
+### Locale detection and routing
 
-- [x] URL prefix `/en/blog` works
-- [x] URL prefix `/es/blog` works
+- [x] Locale prefix `/en/blog` resolves correctly
+- [x] Locale prefix `/es/blog` resolves correctly
 - [x] Session-stored locale persists
 - [x] Cookie-stored locale persists
 - [x] Browser language auto-detection works
 - [x] Default locale fallback works
 
-### Theme Integration (Tested via ThemeI18nTest ✅)
+### Theme integration
 
-- [x] `t()` function translates strings (26 unit tests)
-- [x] `locale_url()` generates prefixed URLs
-- [x] `get_locale()` returns current locale
-- [x] `is_rtl()` detects RTL languages
-- [x] `language_switcher()` displays correctly
-
-### RTL Support
-
-- [ ] Arabic locale shows RTL layout
-- [ ] Hebrew locale shows RTL layout
-- [ ] CSS loads for RTL languages
-- [ ] JavaScript RTL handlers work
-- [ ] Icons flip correctly
-- [ ] Navigation aligns right
+- [x] `t()` translates theme JSON keys (37 tests in `ThemeI18nTest`)
+- [x] `locale_url()` respects permalink and prefix settings
+- [x] `get_locale()` returns the current frontend locale
+- [x] `is_rtl()` and `get_html_dir()` return correct values
+- [x] `language_switcher()` renders the available locales
 
 ---
 
 ## RTL Testing
 
-### Test RTL Languages
+### Bundled RTL locale
 
-| Language | Code | Direction |
-|----------|------|-----------|
-| Arabic | ar | RTL |
-| Hebrew | he | RTL |
-| Farsi | fa | RTL |
-| Urdu | ur | RTL |
+Only **Arabic (`ar`)** is RTL in the bundled locale set.
 
-### RTL Browser Testing
+| Language | Code | Direction | Bundled |
+|----------|------|-----------|---------|
+| Arabic | ar | RTL | Yes |
+| Hebrew | he | RTL | No |
+| Farsi | fa | RTL | No |
+| Urdu | ur | RTL | No |
 
-1. Add RTL language (e.g., Arabic):
-   - Go to Admin > Languages > Add Language
-   - Set code: `ar`
-   - Set direction: `RTL`
+Hebrew, Farsi, and Urdu are only relevant if added as custom DB languages with matching direction and translation files; they are not shipped with the blog theme.
 
-2. Add Arabic translations:
-   - Go to Admin > Translations
-   - Select Arabic language
-   - Add translation: `header.nav.home` = `الرئيسية`
+### RTL browser checklist
 
-3. Test in browser:
-   - Navigate to `/ar/`
-   - Verify:
-     - [ ] HTML `dir="rtl"`
-     - [ ] CSS `rtl.css` loaded
-     - [ ] JS `rtl.js` loaded
-     - [ ] Text aligned right
-     - [ ] Navigation on right side
-     - [ ] Icons flipped
+1. Set `ar` as the active frontend locale.
+2. Navigate to the home page.
+3. Verify:
+   - [ ] HTML has `dir="rtl"`
+   - [ ] `rtl.css` is loaded from `public/themes/blog/assets/css/`
+   - [ ] `rtl.js` is loaded from `public/themes/blog/assets/js/`
+   - [ ] Text is right-aligned
+   - [ ] Navigation aligns right
+   - [ ] Icons flip correctly
+   - [ ] Dropdowns open left
 
-### RTL CSS Checklist
+### RTL CSS checklist
 
-- [ ] Text alignment is right
-- [ ] Margins/paddings are mirrored
-- [ ] Dropdowns open to left
-- [ ] Arrows/icons are flipped
-- [ ] Nav menu is on right
+- [ ] Margins and paddings are mirrored
 - [ ] Forms have correct direction
-- [ ] Modal close button on left
+- [ ] Modal close button is on the left
+- [ ] Browser console shows no errors
 
 ---
 
 ## Performance Testing
 
-### Translation Loading Benchmark
+### Translation lookup benchmark
 
 ```php
 <?php
-// Benchmark script
 $start = microtime(true);
 
 for ($i = 0; $i < 1000; $i++) {
@@ -585,30 +414,27 @@ for ($i = 0; $i < 1000; $i++) {
     $i18n->t('header.nav.home');
 }
 
-$end = microtime(true);
-echo "1000 translations: " . ($end - $start) . " seconds\n";
-echo "Average per translation: " . (($end - $start) / 1000) * 1000 . " ms\n";
+$elapsed = microtime(true) - $start;
+echo "1000 translations: {$elapsed} seconds\n";
+echo "Average per translation: " . (($elapsed / 1000) * 1000) . " ms\n";
 ```
 
-### Expected Performance
+This benchmark exercises the core `I18nManager` path (DB/generated cache → JSON → key), not the theme's global `t()` helper.
+
+### Indicative targets
 
 | Operation | Target | Acceptable |
 |-----------|--------|------------|
-| Single translation lookup (cached) | < 1ms | < 5ms |
+| Cached translation lookup | < 1ms | < 5ms |
 | Full locale load | < 50ms | < 200ms |
 | Page with 50 translations | < 100ms | < 500ms |
 | Cache regeneration | < 500ms | < 2000ms |
 
-### Cache Performance Test
+### Cache warm-up check
 
 ```bash
-# Clear cache
 rm -f public/files/cache/translations/*.json
-
-# First load (no cache)
 time curl -s "http://localhost/en/" > /dev/null
-
-# Second load (with cache)
 time curl -s "http://localhost/en/" > /dev/null
 ```
 
@@ -616,36 +442,28 @@ time curl -s "http://localhost/en/" > /dev/null
 
 ## Troubleshooting
 
-### Common Issues
+### Database connection failed
 
-#### Database Connection Failed
+The test DB credentials are in `tests/setup_test_db.php`, not `config.php`:
 
-```
-Error: Cannot connect to test database
-```
-
-**Solution:**
-1. Verify MySQL is running
-2. Check credentials in `config.php`
-3. Ensure `blogware_test` database exists
-
-#### Class Not Found
-
-```
-Error: Class 'LanguageDao' not found
+```php
+new PDO('mysql:host=localhost;dbname=blogware_test', 'blogwareuser', 'userblogware');
 ```
 
-**Solution:**
-1. Verify autoloader is configured
-2. Check `lib/dao/LanguageDao.php` exists
-3. Run `composer dump-autoload`
+Check that MySQL is running and that `blogware_test` exists.
 
-#### Translation Cache Not Updating
+### DAO class not found
 
-**Solution:**
+1. Verify Composer autoload: `composer dump-autoload`
+2. Confirm the class file exists under `lib/dao/`
+3. For DB-backed integration tests, remember that `dbc` is not registered by `tests/bootstrap.php`
+
+### Translation cache not updating
+
+Clear the generated cache and invalidate one locale through the loader:
+
 ```bash
-# Manually clear cache
-rm -rf public/files/cache/translations/
+rm -f public/files/cache/translations/*.json
 php -r "
 require 'lib/main.php';
 \$loader = new TranslationLoader();
@@ -653,38 +471,32 @@ require 'lib/main.php';
 "
 ```
 
-#### RTL Not Working
+`TranslationService` write methods should also call `invalidate()`; `TranslationCacheTest` checks this statically.
 
-**Checklist:**
-1. [ ] Language has `lang_direction = 'rtl'`
-2. [ ] CSS file exists: `public/themes/blog/assets/css/rtl.css`
-3. [ ] JS file exists: `public/themes/blog/assets/js/rtl.js`
-4. [ ] Browser console shows no errors
-5. [ ] HTML has `dir="rtl"` attribute
+### RTL not working
 
-### Test Debugging
+1. Confirm the locale is `ar` and `lang_direction` is `rtl`
+2. Confirm `public/themes/blog/assets/css/rtl.css` exists
+3. Confirm `public/themes/blog/assets/js/rtl.js` exists
+4. Confirm the rendered HTML contains `dir="rtl"`
+5. Check the browser console for errors
 
-Run tests with verbose output:
-```bash
-lib/vendor/bin/phpunit tests/unit/LocaleDetectorTest.php -v
-```
+### Log files
 
-Run tests with deprecation warnings:
-```bash
-lib/vendor/bin/phpunit tests/unit/LocaleDetectorTest.php --display-deprecations
-```
+Current log files include:
 
-### Log Files
-
-Check these log files for errors:
 - `public/log/error.log`
-- `public/log/debug.log`
+- `public/log/exceptions.log`
+- `public/log/hacklog.log`
+- `public/log/session.log`
+
+There is no `public/log/debug.log`.
 
 ---
 
 ## Continuous Integration
 
-### GitHub Actions (example)
+Example workflow. Run each test file in its own PHPUnit invocation; passing several paths to PHPUnit 9 only runs the first one.
 
 ```yaml
 name: i18n Tests
@@ -693,42 +505,61 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
-      - name: Install Dependencies
-        run: composer install
-      - name: Setup Test Database
-        run: php tests/setup_test_db.php
-      - name: Run i18n Tests
-        run: lib/vendor/bin/phpunit tests/unit/LocaleDetectorTest.php tests/unit/TranslationLoaderTest.php tests/unit/I18nManagerTest.php tests/unit/LocaleRouterTest.php tests/unit/ThemeI18nTest.php
+          php-version: '7.4'
+      - run: composer install --no-interaction --prefer-dist
+      - run: php tests/setup_test_db.php
+      - name: Run i18n tests
+        run: |
+          for test in \
+            tests/unit/LocaleDetectorTest.php \
+            tests/unit/TranslationLoaderTest.php \
+            tests/unit/I18nManagerTest.php \
+            tests/unit/LocaleRouterTest.php \
+            tests/unit/ThemeI18nTest.php \
+            tests/unit/LanguageSwitcherTest.php \
+            tests/unit/TranslationCacheTest.php \
+            tests/unit/NavigationI18nTest.php \
+            tests/unit/AdminLocaleInitializationTest.php \
+            tests/unit/AdminTranslationsTest.php \
+            tests/unit/AdminLocalesCatalogTest.php \
+            tests/integration/LanguageSwitcherIntegrationTest.php
+          do
+            php -d error_reporting='E_ALL' lib/vendor/bin/phpunit "$test" || exit 1
+          done
+          php -d error_reporting='E_ALL' lib/vendor/bin/phpunit tests/unit/InstallationTest.php --filter testInstallI18nData
+      - name: Restore generated translation cache
+        if: always()
+        run: git checkout -- public/files/cache/translations/ || true
 ```
 
 ---
 
 ## Appendix: Test Data
 
-### Sample Languages
+### Sample languages
+
+Illustrative rows for manual DB work. The installer's authoritative locale list is in `install/include/setup.php`:
 
 ```sql
 INSERT INTO tbl_languages (lang_code, lang_name, lang_native, lang_locale, lang_direction) VALUES
 ('en', 'English', 'English', 'en_US', 'ltr'),
-('es', 'Spanish', 'Español', 'es_ES', 'ltr'),
-('fr', 'French', 'Français', 'fr_FR', 'ltr'),
 ('ar', 'Arabic', 'العربية', 'ar_SA', 'rtl'),
-('he', 'Hebrew', 'עברית', 'he_IL', 'rtl');
+('zh', 'Chinese', '中文', 'zh_CN', 'ltr'),
+('fr', 'French', 'Français', 'fr_FR', 'ltr'),
+('es', 'Spanish', 'Español', 'es_ES', 'ltr'),
+('id', 'Indonesian', 'Bahasa Indonesia', 'id_ID', 'ltr');
 ```
 
-### Sample Translations
+### Sample translations
 
 ```sql
 INSERT INTO tbl_translations (lang_id, translation_key, translation_value, translation_context) VALUES
-(1, 'header.nav.home', 'Home', 'menu'),
-(1, 'header.nav.blog', 'Blog', 'menu'),
-(1, 'header.nav.about', 'About', 'menu'),
-(1, 'header.nav.contact', 'Contact', 'menu'),
+(1, 'header.nav.home', 'Home', 'header'),
+(1, 'header.nav.blog', 'Blog', 'header'),
+(1, 'header.nav.search', 'Search', 'header'),
 (1, 'footer.copyright', 'All rights reserved', 'footer'),
 (1, 'form.submit', 'Submit', 'form'),
 (1, 'form.cancel', 'Cancel', 'form'),
@@ -737,7 +568,4 @@ INSERT INTO tbl_translations (lang_id, translation_key, translation_value, trans
 (1, 'pagination.next', 'Next', 'pagination');
 ```
 
----
-
-**Document Version:** 2.0  
-**Last Updated:** March 2026
+For the complete installer context list, see `docs/dev-docs/I18N_ARCHITECTURE.md` §4. For theme keys, see `public/themes/blog/lang/en.json`.

@@ -1011,7 +1011,7 @@ Scriptlog/
 |   |-- autoload-aliases.php   # 233 class_alias() entries (reference only)
 |   |-- autoload-aliases-map.php # Static alias map for lazy autoloader (233 entries)
 |   |
-|   +-- core/                  # Core classes - Scriptlog\Core (102 files)
+|   +-- core/                  # Core classes - Scriptlog\Core (104 files)
 |       |-- Bootstrap.php      # Application initialization, routes
 |       |-- Dispatcher.php     # URL routing
 |       |-- DbFactory.php      # PDO database connection
@@ -1152,7 +1152,7 @@ Scriptlog/
 |       |-- ArchivesModel.php
 |       +-- DownloadModel.php
 |
-|   +-- utility/              # Utility functions (224 files, dash-lowercase)
+|   +-- utility/              # Utility functions (230 files, dash-lowercase)
 |       |-- app-config.php
 |       |-- app-url.php
 |       |-- csrf-defender.php
@@ -1618,10 +1618,10 @@ class Dao
     protected function findAll(array $data = [], $fetchMode = null);  // SELECT all rows
     protected function findRow(array $data = [], $fetchMode = null);  // SELECT one row
     protected function findColumn(array $data = [], $fetchMode = null); // SELECT one column
-    public function checkCountValue(array $data = []): ?int;           // Row-count for SELECT
+    public function checkCountValue(array $data = []): int;            // Row-count for SELECT
     protected function create($table, $params);          // INSERT via Db::dbInsert()
     protected function modify($table, $params, $where);  // UPDATE via Db::dbUpdate()
-    protected function deleteRecord($table, $where, $limit = 1); // DELETE via Db::dbDelete()
+    protected function deleteRecord($table, $where, ?int $limit = 1); // DELETE via Db::dbDelete()
     protected function replaceRecord($table, $params, $to);      // REPLACE via Db::dbReplace()
     protected function callTransaction();   // BEGIN (Db::dbTransaction())
     protected function callCommit();        // COMMIT (Db::dbCommit())
@@ -1977,7 +1977,7 @@ WHERE ID = ? AND post_type = 'blog'";
 
         $this->setSQL($sql);
 
-        return $this->checkCountValue($data) ?? 0;
+        return $this->checkCountValue($data);
     }
 
     /**
@@ -2465,7 +2465,7 @@ PostService depends on:
 | `TranslationService` | `lib/service/TranslationService.php` | Translation management |
 | `NotificationService` | `lib/service/NotificationService.php` | Email notifications |
 
-That is **23 services** in total. Privacy audit logging is handled by the `PrivacyLogDao` (used by `DataRequestService`), not by a dedicated `PrivacyLogService`.
+That is **24 services** in total. Privacy audit logging is handled by the `PrivacyLogDao` (used by `DataRequestService`), not by a dedicated `PrivacyLogService`.
 
 ---
 
@@ -2486,7 +2486,7 @@ That is **23 services** in total. Privacy audit logging is handled by the `Priva
 The `PostController` was refactored in Phase 3 to delegate business logic to `PostApplicationService`. The controller now handles **only** HTTP/security, validation, view rendering, and simple delegation:
 
 ```php
-// lib/controller/PostController.php (thinned - 430 lines, down from ~656)
+// lib/controller/PostController.php (thinned - 421 lines, down from ~656)
 namespace Scriptlog\Controller;
 
 use Scriptlog\Core\ActionConst;
@@ -2494,8 +2494,6 @@ use Scriptlog\Core\AppException;
 use Scriptlog\Core\BaseApp;
 use Scriptlog\Core\LogError;
 use Scriptlog\Core\View;
-use Scriptlog\Dao\MediaDao;
-use Scriptlog\Dao\TopicDao;
 use Scriptlog\Dto\PostRequestDto;
 use Scriptlog\Dto\UploadedFileDto;
 use Scriptlog\Service\PostApplicationService;
@@ -2504,19 +2502,20 @@ use Scriptlog\Validator\FileUploadValidator;
 use Scriptlog\Validator\PostValidator;
 use Scriptlog\Validator\ProtectedPostValidator;
 
-class PostController extends BaseApp
+final class PostController extends BaseApp
 {
     private $view;
     private $postService;
-    private $topicDao;
-    private $mediaDao;
     private $appService;
 
-    public function __construct(PostService $postService, TopicDao $topicDao, MediaDao $mediaDao, PostApplicationService $appService)
+    /**
+     * Two collaborators only: the domain service and the application service.
+     * Topic/media form data is fetched through PostService accessors below,
+     * not through injected DAOs.
+     */
+    public function __construct(PostService $postService, PostApplicationService $appService)
     {
         $this->postService = $postService;
-        $this->topicDao = $topicDao;
-        $this->mediaDao = $mediaDao;
         $this->appService = $appService;
     }
 
@@ -2532,8 +2531,6 @@ class PostController extends BaseApp
         $errors = array();
         $checkError = true;
         $user_level = $this->postService->postAuthorLevel();
-        $topics = $this->topicDao;
-        $medialib = $this->mediaDao;
 
         if (isset($_POST['postFormSubmit'])) {
             $mediaFile = UploadedFileDto::fromGlobals();
@@ -2552,7 +2549,7 @@ class PostController extends BaseApp
                 $checkError = $this->validatePostSubmission($file_location, $file_error, $file_size, $file_name, $errors, $checkError);
 
                 if (!$checkError) {
-                    $this->renderNewPostForm($errors, $_POST, $topics, $medialib, $user_level);
+                    $this->renderNewPostForm($errors, $_POST, $user_level);
                     return $this->view->render();
                 }
 
@@ -2568,7 +2565,7 @@ class PostController extends BaseApp
             }
         }
 
-        $this->renderNewPostForm(null, null, $topics, $medialib, $user_level);
+        $this->renderNewPostForm(null, null, $user_level);
         return $this->view->render();
     }
 
@@ -2577,8 +2574,6 @@ class PostController extends BaseApp
         $errors = array();
         $checkError = true;
         $user_level = $this->postService->postAuthorLevel();
-        $topics = $this->topicDao;
-        $medialib = $this->mediaDao;
 
         $getPost = $this->postService->grabPost($id);
         if (!$getPost) {
@@ -2621,7 +2616,7 @@ class PostController extends BaseApp
                 $checkError = $this->validatePostUpdate($file_location, $file_error, $file_size, $file_name, $errors, $checkError);
 
                 if (!$checkError) {
-                    $this->renderEditPostForm($errors, $data_post, $getPost, $topics, $medialib, $user_level);
+                    $this->renderEditPostForm($errors, $data_post, $getPost, $user_level);
                     return $this->view->render();
                 }
 
@@ -2638,7 +2633,7 @@ class PostController extends BaseApp
             }
         }
 
-        $this->renderEditPostForm(null, $data_post, $getPost, $topics, $medialib, $user_level);
+        $this->renderEditPostForm(null, $data_post, $getPost, $user_level);
         return $this->view->render();
     }
 
@@ -2715,15 +2710,22 @@ class PostController extends BaseApp
 
     // ─── Rendering ────────────────────────────────────────────
 
-    private function renderNewPostForm($errors, $formData, $topics, $medialib, $user_level)
+    private function renderNewPostForm($errors, $formData, $user_level)
     {
-        // Sets view, pageTitle, formAction, topics, medialibs,
-        // postStatus/commentStatus/visibility/locale dropdowns, csrfToken
+        // Sets view, pageTitle, formAction, then pulls form data from PostService:
+        //   topics     -> $this->postService->getTopicCheckboxes()
+        //   medialibs  -> getMediaDropdown() (contributor) / getMediaUploadField()
+        // postStatus/commentStatus/postVisibility/postLocale come from the
+        // post_status_dropdown(), comment_status_dropdown(),
+        // post_visibility_dropdown() and post_locale_dropdown() utilities.
     }
 
-    private function renderEditPostForm($errors, $data_post, $getPost, $topics, $medialib, $user_level)
+    private function renderEditPostForm($errors, $data_post, $getPost, $user_level)
     {
-        // Same as renderNewPostForm but with existing post data
+        // Same as renderNewPostForm but with existing post data:
+        //   topics     -> getTopicCheckboxes($getPost['ID'])
+        //   medialibs  -> getMediaDropdown($getPost['media_id'])
+        //                 or getMediaUploadField($getPost['media_id'])
         // Handles protected post decryption via decrypt_post_admin()
     }
 
@@ -3968,13 +3970,13 @@ This project uses two complementary testing approaches:
 
 | Metric | Value |
 |--------|-------|
-| **Total Tests** | 2,513 |
-| **Test Files** | 171 (`find tests -name "*Test.php"`) |
-| **Assertions** | 8,679 |
-| **Skipped / Risky** | 84 skipped, 0 failures |
+| **Total Tests** | 2,664 |
+| **Test Files** | 203 (`find tests -name "*Test.php"`) |
+| **Assertions** | 8,890 |
+| **Skipped / Risky** | 32 skipped, 59 risky, 0 failures |
 | **PHPUnit Version** | 9.6.38 |
 | **Target Coverage** | 40% |
-| **Current Coverage** | 25.98% lines (6,986/26,889) |
+| **Current Coverage** | 29.40% lines (7,963/27,085); 8.97% classes, 31.56% methods |
 
 ### Test Coverage Plan
 
@@ -4231,16 +4233,14 @@ See `dev-docs/TROUBLESHOOTING.md` for documented issues and solutions covering i
 
 ### Debug Mode
 
-```php
-// In config.php or common.php
-define('APP_DEVELOPMENT', true);
+Development mode is resolved from `APP_ENV`, `APP_DEBUG`, or `APP_DEVELOPMENT` in `.env` (see `lib/utility/app-environment.php`):
 
-// Enable error reporting
-if (APP_DEVELOPMENT) {
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-}
+```dotenv
+APP_ENV=local
+APP_DEBUG=true
 ```
+
+`lib/main.php` enforces a production error-display policy: when `APP_DEVELOPMENT` is false it sets `display_errors=0`, `display_startup_errors=0`, and `log_errors=1` even if php.ini has `display_errors=On`. Keep `APP_ENV=production` and `APP_DEBUG=false` on live hosts.
 
 > **WARNING:** Never enable debug mode in production as it may expose sensitive information.
 
@@ -4319,6 +4319,7 @@ APP_AUDIO          // 'public/files/audio'
 
 // Security
 SCRIPTLOG          // Security constant (HMAC hash)
+SCRIPTLOG_STRICT_PHP_SECURITY // bool, opt-in fail-closed PHP runtime guard (constant/env/.env)
 
 // Settings
 APP_TITLE          // 'Scriptlog'
