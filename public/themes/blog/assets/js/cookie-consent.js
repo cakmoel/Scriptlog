@@ -4,7 +4,7 @@
  * Handles cookie consent banner interactions
  *
  * @category Theme Assets
- * @author   Scriptlog
+ * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0
  */
