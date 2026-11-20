@@ -64,7 +64,9 @@ if (!function_exists('scriptlog_install_base_path')) {
         }
 
         if (strpos($realFrontDir, $realDocumentRoot . '/') === 0) {
-            return substr($realFrontDir, strlen($realDocumentRoot));
+            $basePath = substr($realFrontDir, strlen($realDocumentRoot));
+
+            return is_string($basePath) ? $basePath : '';
         }
 
         return '';
@@ -119,7 +121,8 @@ if (!function_exists('scriptlog_request_path_relative_to_front_controller')) {
         }
 
         if ($base !== '' && strpos($path, $base) === 0) {
-            $path = substr($path, strlen($base));
+            $trimmedPath = substr($path, strlen($base));
+            $path = is_string($trimmedPath) ? $trimmedPath : '';
         }
 
         if ($path === '') {
