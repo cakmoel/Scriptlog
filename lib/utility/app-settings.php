@@ -9,7 +9,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Accessed by reference so tests can reset it between cases.
  *
  * @category function
- * @author   Scriptlog Engineering
+ * @author   M.Noermoehammad
  * @license  MIT
  * @return array|null
  *
@@ -31,7 +31,7 @@ function &app_settings_cache()
  * wrapper) and Medoo connection objects exposed by medoo_init().
  *
  * @category function
- * @author   Scriptlog Engineering
+ * @author   M.Noermoehammad
  * @license  MIT
  * @return array<string,string>
  *
@@ -86,7 +86,7 @@ function app_settings()
  * Falls back to $default when the setting is missing or blank.
  *
  * @category function
- * @author   Scriptlog Engineering
+ * @author   M.Noermoehammad
  * @license  MIT
  * @param string $name
  * @param string $default
@@ -105,8 +105,12 @@ function app_setting($name, $default = '')
  *
  * Forget the memoized settings map (used by tests and after admin writes).
  *
+ * app_info() is derived from this map, so its memo is invalidated too -
+ * otherwise a settings change within one process (admin write, test fixture)
+ * would leave app_info() serving stale values.
+ *
  * @category function
- * @author   Scriptlog Engineering
+ * @author   M.Noermoehammad
  * @license  MIT
  * @return void
  *
@@ -115,4 +119,8 @@ function reset_app_settings_cache()
 {
     $settings = &app_settings_cache();
     $settings = null;
+
+    if (function_exists('reset_app_info_cache')) {
+        reset_app_info_cache();
+    }
 }
