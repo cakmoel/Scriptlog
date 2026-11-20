@@ -3,6 +3,18 @@
 defined('SCRIPTLOG') || die("Direct access not permitted");
 /**
  * File authenticator.php - Refactored for AppContext
+ *
+ * @category authenticator.php checking whether cookies or session exists or not
+ * @author M.Noermoehammad
+ * @author Vincy vincy@gmail.com
+ * @license MIT
+ * @version 1.0.0
+ * @see https://phppot.com/php/secure-remember-me-for-login-using-php-session-and-cookies/
+ * @see https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string
+ * @see https://paragonie.com/blog/2015/04/secure-authentication-php-with-long-term-persistence
+ * @see https://en.wikibooks.org/wiki/PHP_Programming/Sessions#Avoiding_Session_Fixation
+ * @see https://stackoverflow.com/a/17266448/6667699
+ *
  */
 
 use Scriptlog\Core\Authentication;
