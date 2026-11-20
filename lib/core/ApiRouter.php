@@ -2,6 +2,9 @@
 
 namespace Scriptlog\Core;
 
+// Psalm folds this guard to true because lib/common.php declares SCRIPTLOG;
+// it still protects direct HTTP access, where the bootstrap never ran.
+/** @psalm-suppress ParadoxicalCondition */
 defined('SCRIPTLOG') || die("Direct access not permitted");
 
 /**
@@ -11,7 +14,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Supports GET, POST, PUT, PATCH, DELETE HTTP methods
  *
  * @category  Core Class
- * @author    Blogware Team
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0
@@ -21,7 +24,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
 class ApiRouter
 {
     /**
-     * @var array Registered routes
+     * @var array<string, array<string, array{handler: string|callable, pattern: string}>> Registered routes
      */
     private $routes = [];
 
@@ -49,60 +52,65 @@ class ApiRouter
      * Register a GET route
      *
      * @param string $pattern Route pattern
-     * @param string $handler Controller@method
-     * @return self
+     * @param string|callable $handler Controller@method string, or a callable
+     *                                  receiving the matched route params
+     * @return void
      */
     public function get($pattern, $handler)
     {
-        return $this->addRoute('GET', $pattern, $handler);
+        $this->addRoute('GET', $pattern, $handler);
     }
 
     /**
      * Register a POST route
      *
      * @param string $pattern Route pattern
-     * @param string $handler Controller@method
-     * @return self
+     * @param string|callable $handler Controller@method string, or a callable
+     *                                  receiving the matched route params
+     * @return void
      */
     public function post($pattern, $handler)
     {
-        return $this->addRoute('POST', $pattern, $handler);
+        $this->addRoute('POST', $pattern, $handler);
     }
 
     /**
      * Register a PUT route
      *
      * @param string $pattern Route pattern
-     * @param string $handler Controller@method
-     * @return self
+     * @param string|callable $handler Controller@method string, or a callable
+     *                                  receiving the matched route params
+     * @return void
      */
     public function put($pattern, $handler)
     {
-        return $this->addRoute('PUT', $pattern, $handler);
+        $this->addRoute('PUT', $pattern, $handler);
     }
 
     /**
      * Register a PATCH route
      *
      * @param string $pattern Route pattern
-     * @param string $handler Controller@method
-     * @return self
+     * @param string|callable $handler Controller@method string, or a callable
+     *                                  receiving the matched route params
+     * @return void
      */
     public function patch($pattern, $handler)
     {
-        return $this->addRoute('PATCH', $pattern, $handler);
+        $this->addRoute('PATCH', $pattern, $handler);
     }
 
     /**
      * Register a DELETE route
      *
      * @param string $pattern Route pattern
-     * @param string $handler Controller@method
-     * @return self
+     * @param string|callable $handler Controller@method string, or a callable
+     *                                  receiving the matched route params
+     * @return void
      */
     public function delete($pattern, $handler)
     {
-        return $this->addRoute('DELETE', $pattern, $handler);
+        $this->addRoute('DELETE', $pattern, $handler);
     }
 
     /**
@@ -112,12 +120,13 @@ class ApiRouter
      * where the query input is passed as request content rather than URI params.
      *
      * @param string $pattern Route pattern
-     * @param string $handler Controller@method
-     * @return self
+     * @param string|callable $handler Controller@method string, or a callable
+     *                                  receiving the matched route params
+     * @return void
      */
     public function query($pattern, $handler)
     {
-        return $this->addRoute('QUERY', $pattern, $handler);
+        $this->addRoute('QUERY', $pattern, $handler);
     }
 
     /**
@@ -125,12 +134,13 @@ class ApiRouter
      *
      * @param string $method HTTP method
      * @param string $pattern Route pattern
-     * @param string $handler Controller@method
-     * @return self
+     * @param string|callable $handler Controller@method string, or a callable
+     *                                  receiving the matched route params
+     * @return void
      */
     public function any($method, $pattern, $handler)
     {
-        return $this->addRoute($method, $pattern, $handler);
+        $this->addRoute($method, $pattern, $handler);
     }
 
     /**
@@ -138,8 +148,9 @@ class ApiRouter
      *
      * @param string $method HTTP method
      * @param string $pattern Route pattern
-     * @param string $handler Controller@method
-     * @return self
+     * @param string|callable $handler Controller@method string, or a callable
+     *                                  receiving the matched route params
+     * @return void
      */
     private function addRoute($method, $pattern, $handler)
     {
@@ -150,8 +161,6 @@ class ApiRouter
             'handler' => $handler,
             'pattern' => $pattern
         ];
-
-        return $this;
     }
 
     /**
@@ -209,8 +218,9 @@ class ApiRouter
         $handler = $result['handler'];
         $this->params = $result['params'];
 
-        // Check if handler is a callable (closure/callback)
-        if (is_callable($handler)) {
+        // Check if handler is a closure/callback instead of a Controller@method
+        // string. Callable strings are left to the controller branch below.
+        if (!is_string($handler) && is_callable($handler)) {
             try {
                 call_user_func_array($handler, [$this->params]);
             } catch (\Throwable $e) {
