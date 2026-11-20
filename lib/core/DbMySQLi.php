@@ -414,10 +414,16 @@ class DbMySQLi
     /**
      * setDbRealConnection()
      *
-     * @return bool
+     * Opens (or reopens) the underlying mysqli handle on `$this->dbc` and
+     * leaves it in the configured state (report mode + utf8mb4 charset).
+     *
+     * The established handle is intentionally not returned: the connection
+     * is owned by the instance, and every caller only needs the side effect.
+     *
+     * @return void
      *
      */
-    protected function setDbRealConnection()
+    protected function setDbRealConnection(): void
     {
 
         self::$config = $this->getConfiguration();
@@ -460,8 +466,6 @@ class DbMySQLi
 
         self::activateReportMode();
         $this->dbc->set_charset('utf8mb4');
-
-        return $this->dbc;
     }
 
     /**
