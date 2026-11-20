@@ -95,6 +95,58 @@ final class DownloadService
     }
 
     /**
+     * Check if the requester IP is allowed to redeem the download grant
+     *
+     * Compares the IP address captured when the grant was created against the
+     * current requester address. Fails closed when no usable grant information
+     * is available so unbound or unknown identifiers are never treated as valid.
+     *
+     * @param string $identifier
+     * @param string $ipAddress
+     * @return bool
+     */
+    public function isDownloadIpAllowed($identifier, $ipAddress)
+    {
+        $downloadInfo = $this->getDownloadInfo($identifier);
+
+        if (!$downloadInfo || !isset($downloadInfo['ip_address'])) {
+            return false;
+        }
+
+        $storedIpAddress = (string)$downloadInfo['ip_address'];
+
+        // Fail closed: an empty stored address never matches a requester.
+        return $storedIpAddress !== '' && $storedIpAddress === (string)$ipAddress;
+    }
+
+    /**
+     * Check if media is downloadable at redemption time
+     *
+     * Re-validates the media access level and publish status captured at grant
+     * creation against the current record, failing closed when the media is
+     * private or no longer enabled for download.
+     *
+     * @param array $media
+     * @return bool
+     */
+    public function isMediaDownloadable(array $media)
+    {
+        if (empty($media)) {
+            return false;
+        }
+
+        if (!isset($media['media_access']) || $media['media_access'] !== 'public') {
+            return false;
+        }
+
+        if (!isset($media['media_status']) || (int)$media['media_status'] !== 1) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Check if MIME type is allowed
      *
      * @param string $mimeType
@@ -231,23 +283,40 @@ final class DownloadService
     /**
      * Generate download identifier
      *
+     * Token identifiers for media downloads are generated through the
+     * CSPRNG-backed generate_media_identifier() helper (random_bytes, failing
+     * closed when no secure RNG is available). The previous insecure fallback
+     * generator was removed so download token generation never silently
+     * downgrades to a weak source.
+     *
      * @return string
      */
     public function generateDownloadIdentifier()
     {
-        return function_exists('generate_media_identifier')
-            ? generate_media_identifier()
-            : sprintf(
-                '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-                mt_rand(0, 0xffff),
-                mt_rand(0, 0xffff),
-                mt_rand(0, 0xffff),
-                mt_rand(0, 0x0fff) | 0x4000,
-                mt_rand(0, 0x3fff) | 0x8000,
-                mt_rand(0, 0xffff),
-                mt_rand(0, 0xffff),
-                mt_rand(0, 0xffff)
-            );
+        if (function_exists('generate_media_identifier')) {
+            return generate_media_identifier();
+        }
+
+        // random_bytes() is a CSPRNG available on all PHP versions supported
+        // by Scriptlog (>= 7.4); fail closed instead of silently downgrading
+        // token material to an insecure generator.
+        if (function_exists('random_bytes')) {
+            $data = random_bytes(16);
+        } elseif (function_exists('openssl_random_pseudo_bytes')) {
+            $data = openssl_random_pseudo_bytes(16);
+        } else {
+            scriptlog_error('no cryptographically secure random function available');
+            return '';
+        }
+
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+        $identifier = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+
+        // vsprintf() only fails on a format/argument mismatch; fail closed
+        // rather than letting a boolean leak into an identifier column.
+        return is_string($identifier) ? $identifier : '';
     }
 
     /**
