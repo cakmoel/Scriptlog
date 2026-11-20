@@ -8,12 +8,73 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#1120---2026-11-09)
+- [Latest Release](#1130---2026-11-20)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.13.0] - 2026-11-20
+
+### Added
+- **Early page-cache serving**: anonymous GET cache hits are served before the full framework bootstrap while preserving security headers, CSP nonce, and a fresh comment-form CSRF token.
+- **Parse-once translation cache**: `TranslationLoader` writes PHP cache files alongside JSON caches and invalidates both on refresh.
+- **Environment-driven strict runtime mode**: `SCRIPTLOG_STRICT_PHP_SECURITY` can now be supplied by the process environment, `$_ENV`/`$_SERVER`, or `.env`.
+- **Installer environment defaults**: new installs write `APP_ENV=production`, `APP_DEBUG=false`, and `SCRIPTLOG_STRICT_PHP_SECURITY` to `.env`.
+- **Shared security-header helpers**: new utilities mint CSP nonces and refresh dynamic cached markup consistently.
+- **Developer APIs**: added `scriptlog_env_file_value()`, `scriptlog_php_security_is_strict()`, `scriptlog_apply_error_display_policy()`, `scriptlog_send_security_headers()`, `scriptlog_define_csp_nonce()`, `page_cache_refresh_dynamic_markup()`, `AdminActionRegistry::registerClass()`, `ScriptlogCryptonize::resetCipherKeyCache()`, and `PhpRuntimeSecurityGuard::renderUnavailable()`.
+- **Documentation**: added DEEPSHIT guide/report and refreshed developer, i18n, testing, troubleshooting, and PHP runtime hardening guides.
+
+### Changed
+- **Bootstrap composition root**: service wiring is split into focused helpers, admin commands register lazily, and several per-request values are memoized.
+- **CSPRNG-only token material**: auth tokens, CAPTCHA codes, download identifiers, form tokens, activation keys, salts, and encryption IVs now use `random_bytes()`/`random_int()` paths.
+- **Page cache enabled by default**: `APP_CACHE` is now `true`; cached pages refresh per-visitor CSP nonces and CSRF tokens, and HTMX fragment requests bypass the full-page cache.
+- **Download grant lifetime**: the default expiry is now 1 hour instead of 8 hours for new installs and defaults.
+- **API entry point**: hard dependencies use plain `require`, duplicate OpenAPI utility declaration was removed, and route closures/phpdocs were simplified.
+- **ApiRouter registration methods now return void** instead of `$this`. No in-repo caller used fluent chaining.
+- **Dependency refresh**: Medoo 2.6.1 and php-cs-fixer 3.95.30.
+- **Installer and platform messaging**: installer recognizes Caddy, lighttpd, Hiawatha, Tengine, and openresty; README states PHP 8.3+.
+- **Static-analysis and docblock cleanup** across API controllers, DTOs, DAOs, services, handlers, utilities, and tests.
+
+### Fixed
+- **4xx error statuses** are no longer rewritten into 301 redirects.
+- **GDPR/privacy UI** renders deletion alerts only when non-empty.
+- **API routing/bootstrap** handles missing hard dependencies, duplicate declarations, and session/bootstrap ordering more reliably.
+- **Download settings** use `DownloadSettings::DEFAULT_EXPIRY_HOURS` consistently in the admin UI.
+- **Request guards** reject non-numeric post/page/category IDs early and avoid server-load division by zero.
+- **Translation caches** use locked writes, stale PHP-cache invalidation, and safer JSON decoding.
+- **E2E stability**: rate-limit assertions, GDPR fixtures, autocomplete keywords, plugin manifests, and HTTP/HSTS probes are more deterministic.
+- **Stale tests** now match the 1-hour download expiry and single `searchPost` export.
+
+### Removed
+- Insecure RNG fallbacks from security-sensitive flows, including RandomLib medium-strength tokens, `mt_rand()` activation keys/salts/CAPTCHA answers, and `ircmaxell_random_generator()` token/IV/download identifiers.
+- Redundant `prevent_injection()` call after input is reduced to `[A-Za-z0-9_]`.
+- Duplicate `require_once` calls in `api/index.php` and the duplicate `searchPost` export key in `Bootstrap`.
+- No database tables, columns, or configuration keys were removed.
+
+### Security
+- **Runtime guard**: strict mode honors `.env`, logs full diagnostics server-side, and returns a generic 503 (JSON for API requests) without leaking versions, paths, or stack traces.
+- **Production error policy**: `display_errors` and `display_startup_errors` are forced off and `log_errors` is enabled outside development.
+- **Download grants**: redemption re-checks stored requester IP plus current media access/status, fails closed on mismatch, and records failed attempts.
+- **CAPTCHA**: CSPRNG answers, randomized rendering, no-cache headers, internal error logging, and a 500 response on generation failure.
+- **Cached responses**: CSP nonces and comment-form CSRF tokens are re-minted per request so cached HTML cannot weaken script or form security.
+- **Apache hardening** and expanded security e2e coverage for disclosure, traversal, XSS, SSRF, HSTS, and Secure cookies.
+
+### Deprecated
+- `RandomLib`-backed helpers are deprecated for security-sensitive use; new security-sensitive code must use the CSPRNG helpers.
+
+### Notes
+Minor release focused on performance caching, security hardening, static-analysis cleanup, and reliability fixes. No database schema change, configuration removal, or REST API version bump. Existing installations retain their current `.env` and strict mode remains opt-in by default.
+
+### Codename
+**Maleo Senkawor** (retained) – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.12.0
+- **Full comparison**: `v1.12.0...v1.13.0`
+
+---
 
 ## [1.12.0] - 2026-11-09
 
@@ -1235,6 +1296,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.13.0 | 2026-11-20 | Stable |
 | 1.12.0 | 2026-11-09 | Stable |
 | 1.11.0 | 2026-11-04 | Stable |
 | 1.8.0 | 2026-08-19 | Stable |
