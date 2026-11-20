@@ -7,6 +7,14 @@
 include __DIR__ . '/options.php';
 require __DIR__ . '/common.php';
 
+// Production error-display policy. Local development may render PHP
+// diagnostics; a production install must never do so even when php.ini has
+// display_errors=On. APP_DEVELOPMENT comes from APP_ENV/APP_DEBUG in
+// lib/common.php, so set APP_ENV=local (or APP_DEBUG=true) to debug locally.
+if (function_exists('scriptlog_apply_error_display_policy')) {
+    scriptlog_apply_error_display_policy();
+}
+
 /**
  * Early 404 Short-Circuit
  *
@@ -102,7 +110,16 @@ if (is_readable(APP_ROOT . APP_LIBRARY . DIRECTORY_SEPARATOR . 'vendor/autoload.
 // docs/dev-docs/PHP_RUNTIME_HARDENING.md for the verification and hardening steps.
 if (class_exists('Scriptlog\\Core\\PhpRuntimeSecurityGuard')) {
     \Scriptlog\Core\PhpRuntimeSecurityGuard::report();
-    \Scriptlog\Core\PhpRuntimeSecurityGuard::enforce();
+
+    try {
+        \Scriptlog\Core\PhpRuntimeSecurityGuard::enforce();
+    } catch (\RuntimeException $e) {
+        // Log the full diagnostic server-side; the client only receives a
+        // generic 503 so display_errors=On cannot disclose the PHP version,
+        // advisory text, paths or a stack trace.
+        error_log('[scriptlog][php-runtime-security] strict mode blocked request: ' . $e->getMessage());
+        \Scriptlog\Core\PhpRuntimeSecurityGuard::renderUnavailable();
+    }
 }
 
 // Lazy PSR-4 backward-compatibility aliases (loads only when old class names are used)
@@ -115,6 +132,25 @@ if (file_exists(__DIR__ . '/autoload-aliases-map.php')) {
             class_alias($scriptlogAliasMap[$className], $className);
         }
     });
+}
+
+/**
+ * Early page-cache serve (F11).
+ *
+ * A cache hit needs a CSP nonce, a session CSRF token and the security headers
+ * - not the config, cipher key, 230 utilities, DAOs, i18n or dispatcher that
+ * the full bootstrap builds. lib/utility/page-cache-bootstrap.php loads only
+ * what a hit uses and exits; on anything it cannot reproduce exactly it returns
+ * false and this file continues with the normal bootstrap. Placed after
+ * Composer, Dotenv, the PHP-runtime guard and the alias map so none of them is
+ * duplicated (or skipped) on the early path.
+ */
+if (is_readable(__DIR__ . DIRECTORY_SEPARATOR . 'utility' . DIRECTORY_SEPARATOR . 'page-cache-bootstrap.php')) {
+    require_once __DIR__ . DIRECTORY_SEPARATOR . 'utility' . DIRECTORY_SEPARATOR . 'page-cache-bootstrap.php';
+
+    if (function_exists('scriptlog_serve_page_cache_early')) {
+        scriptlog_serve_page_cache_early(APP_ROOT);
+    }
 }
 
 if (class_exists('Autoloader')) {
