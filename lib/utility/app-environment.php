@@ -27,7 +27,7 @@ if (!defined('SCRIPTLOG')) {
  * before Dotenv has been loaded.
  *
  * @category function
- * @author   Scriptlog Team
+ * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0.0
  * @since    1.10.0
@@ -236,6 +236,183 @@ function scriptlog_resolve_env_path()
     }
 
     return '';
+}
+
+/**
+ * scriptlog_env_file_value()
+ *
+ * Read a single key from a Dotenv-style file without loading the whole file
+ * into the process environment. This exists because lib/common.php runs before
+ * Dotenv in lib/main.php, so the .env fallback must be read directly.
+ *
+ * Parsing rules (mirrors the subset of Dotenv syntax this project ships):
+ * - blank lines and lines starting with "#" are ignored;
+ * - the first occurrence of a key wins;
+ * - a value wrapped in matching single or double quotes is unquoted;
+ * - an unquoted " #" sequence starts an inline comment;
+ * - unreadable or missing files resolve to null.
+ *
+ * @category function
+ * @author   M.Noermoehammad
+ * @license  MIT
+ * @version  1.0.0
+ * @since    1.13.0
+ * @param string      $key     Environment variable name
+ * @param string|null $envPath Optional explicit .env path
+ * @return string|null Raw value, or null when the key/file is absent
+ */
+function scriptlog_env_file_value($key, $envPath = null)
+{
+    static $cache = array();
+
+    if (!is_string($key) || $key === '') {
+        return null;
+    }
+
+    if ($envPath === null || $envPath === '') {
+        $envPath = scriptlog_resolve_env_path();
+    }
+
+    if (!is_string($envPath) || $envPath === '' || !is_readable($envPath)) {
+        return null;
+    }
+
+    // Never cache in test mode so a test can rewrite the same path.
+    $useCache = !(defined('SCRIPTLOG_TEST_MODE') && SCRIPTLOG_TEST_MODE);
+
+    if ($useCache && isset($cache[$envPath])) {
+        return array_key_exists($key, $cache[$envPath]) ? $cache[$envPath][$key] : null;
+    }
+
+    $lines = @file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+    if (!is_array($lines)) {
+        return null;
+    }
+
+    $parsed = array();
+
+    foreach ($lines as $line) {
+        $lineTrimmed = trim($line);
+
+        if ($lineTrimmed === '' || strpos($lineTrimmed, '#') === 0) {
+            continue;
+        }
+
+        $separator = strpos($lineTrimmed, '=');
+
+        if ($separator === false) {
+            continue;
+        }
+
+        $lineKey = trim(substr($lineTrimmed, 0, $separator));
+
+        if ($lineKey === '' || array_key_exists($lineKey, $parsed)) {
+            continue;
+        }
+
+        $value = trim((string) substr($lineTrimmed, $separator + 1));
+        $quote = substr($value, 0, 1);
+
+        if (($quote === '"' || $quote === "'") && strlen($value) >= 2) {
+            $closing = strpos($value, $quote, 1);
+
+            if ($closing !== false) {
+                $value = (string) substr($value, 1, $closing - 1);
+            }
+        } else {
+            $comment = strpos($value, ' #');
+
+            if ($comment !== false) {
+                $value = rtrim((string) substr($value, 0, $comment));
+            }
+        }
+
+        $parsed[$lineKey] = $value;
+    }
+
+    if ($useCache) {
+        $cache[$envPath] = $parsed;
+    }
+
+    return array_key_exists($key, $parsed) ? $parsed[$key] : null;
+}
+
+/**
+ * scriptlog_php_security_is_strict()
+ *
+ * Resolve whether the PHP runtime security guard must fail closed. The switch
+ * is opt-in and fail-open: only an explicit truthy value enables it.
+ *
+ * Precedence (highest to lowest):
+ * - process environment / $_ENV / $_SERVER (via scriptlog_env_get());
+ * - the project .env file, read directly because lib/common.php runs before
+ *   Dotenv in lib/main.php;
+ * - fallback: false.
+ *
+ * @category function
+ * @author   M.Noermoehammad
+ * @license  MIT
+ * @version  1.0.0
+ * @since    1.13.0
+ * @param string|null $envPath Optional explicit .env path
+ * @return bool True when SCRIPTLOG_STRICT_PHP_SECURITY is truthy
+ */
+function scriptlog_php_security_is_strict($envPath = null)
+{
+    $value = scriptlog_env_get('SCRIPTLOG_STRICT_PHP_SECURITY');
+
+    if ($value === null || $value === '') {
+        $fileValue = scriptlog_env_file_value('SCRIPTLOG_STRICT_PHP_SECURITY', $envPath);
+
+        if ($fileValue !== null) {
+            $value = $fileValue;
+        }
+    }
+
+    if ($value === null) {
+        return false;
+    }
+
+    return scriptlog_is_truthy_environment_value($value);
+}
+
+/**
+ * scriptlog_apply_error_display_policy()
+ *
+ * Enforce the production error-display policy. A development install may
+ * render PHP diagnostics; every other install must hide them from the client
+ * even when php.ini has `display_errors=On`. Errors are still written to the
+ * server log (`log_errors=1`) for operators.
+ *
+ * APP_DEVELOPMENT is resolved in lib/common.php from APP_ENV / APP_DEBUG /
+ * APP_DEVELOPMENT. Set `APP_ENV=local` (or `APP_DEBUG=true`) locally to keep
+ * diagnostics visible.
+ *
+ * @category function
+ * @author   M.Noermoehammad
+ * @license  MIT
+ * @version  1.0.0
+ * @since    1.13.0
+ * @param bool|null $isDevelopment Override for tests; null resolves APP_DEVELOPMENT
+ * @return bool True when display_errors is left enabled
+ */
+function scriptlog_apply_error_display_policy($isDevelopment = null)
+{
+    if ($isDevelopment === null) {
+        $isDevelopment = defined('APP_DEVELOPMENT') ? (bool) APP_DEVELOPMENT : false;
+    }
+
+    if ($isDevelopment) {
+        return true;
+    }
+
+    // ini_set() can be disabled by a host; never let a failure here break boot.
+    @ini_set('display_errors', '0');
+    @ini_set('display_startup_errors', '0');
+    @ini_set('log_errors', '1');
+
+    return false;
 }
 
 /**
