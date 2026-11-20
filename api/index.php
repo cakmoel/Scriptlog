@@ -12,7 +12,7 @@
  * Base URL: /api/v1/
  *
  * @category  api/index.php
- * @author    Blogware Team
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0
@@ -63,13 +63,13 @@ header('X-API-Version: ' . API_VERSION);
 
 // Set error reporting for API (production should disable this)
 error_reporting(0);
-ini_set('display_errors', 0);
+ini_set('display_errors', '0');
 
 // Start output buffering for clean JSON responses
 ob_start();
 
 // Load required core files
-require_once __DIR__ . '/../lib/main.php';
+require __DIR__ . '/../lib/main.php';
 
 // Ensure sessions are properly started for API requests that need authentication
 // This is needed for endpoints like media upload which require admin session.
@@ -85,6 +85,10 @@ require_once __DIR__ . '/../lib/main.php';
 // "An error occurred during search. Please try again later." message.
 // Only bootstrap the session here when it is genuinely not running.
 if (isset($app->sessionMaker) && session_status() !== PHP_SESSION_ACTIVE) {
+    // session_save_path() is a setter: the value it returns is the previous
+    // save path, which is intentionally discarded here. Psalm's callmap
+    // marks it side-effect free, hence the targeted suppression.
+    /** @psalm-suppress UnusedFunctionCall */
     session_save_path(resolve_session_save_path());
     session_set_save_handler($app->sessionMaker, true);
     register_shutdown_function('session_write_close');
@@ -92,23 +96,30 @@ if (isset($app->sessionMaker) && session_status() !== PHP_SESSION_ACTIVE) {
         start_session_on_site($app->sessionMaker);
     }
 }
-require_once __DIR__ . '/../lib/core/ApiAuth.php';
-require_once __DIR__ . '/../lib/core/ApiResponse.php';
-require_once __DIR__ . '/../lib/core/ApiRouter.php';
-require_once __DIR__ . '/../lib/controller/ApiController.php';
-require_once __DIR__ . '/../lib/controller/api/PostsApiController.php';
-require_once __DIR__ . '/../lib/controller/api/CategoriesApiController.php';
-require_once __DIR__ . '/../lib/controller/api/CommentsApiController.php';
-require_once __DIR__ . '/../lib/controller/api/ArchivesApiController.php';
-require_once __DIR__ . '/../lib/controller/api/GdprApiController.php';
-require_once __DIR__ . '/../lib/controller/api/LanguagesApiController.php';
-require_once __DIR__ . '/../lib/controller/api/TranslationsApiController.php';
-require_once __DIR__ . '/../lib/controller/api/SearchApiController.php';
-require_once __DIR__ . '/../lib/controller/api/ProtectedPostApiController.php';
-require_once __DIR__ . '/../lib/controller/api/MediaApiController.php';
-require_once __DIR__ . '/../lib/controller/api/QueryApiController.php';
-require_once __DIR__ . '/../lib/utility/rate-limiter.php';
-require_once __DIR__ . '/../lib/core/ApiHateoas.php';
+// Load required core files.
+//
+// These are hard dependencies of every API request: a missing file must be a
+// fatal error, never a silent skip that later surfaces as "class not found"
+// halfway through dispatch. The API entry point is a leaf front controller -
+// nothing includes it twice in one request and none of the classes below is
+// autoloaded during the lib/main.php bootstrap - so plain require is safe here.
+require __DIR__ . '/../lib/core/ApiAuth.php';
+require __DIR__ . '/../lib/core/ApiResponse.php';
+require __DIR__ . '/../lib/core/ApiRouter.php';
+require __DIR__ . '/../lib/controller/ApiController.php';
+require __DIR__ . '/../lib/controller/api/PostsApiController.php';
+require __DIR__ . '/../lib/controller/api/CategoriesApiController.php';
+require __DIR__ . '/../lib/controller/api/CommentsApiController.php';
+require __DIR__ . '/../lib/controller/api/ArchivesApiController.php';
+require __DIR__ . '/../lib/controller/api/GdprApiController.php';
+require __DIR__ . '/../lib/controller/api/LanguagesApiController.php';
+require __DIR__ . '/../lib/controller/api/TranslationsApiController.php';
+require __DIR__ . '/../lib/controller/api/SearchApiController.php';
+require __DIR__ . '/../lib/controller/api/ProtectedPostApiController.php';
+require __DIR__ . '/../lib/controller/api/MediaApiController.php';
+require __DIR__ . '/../lib/controller/api/QueryApiController.php';
+require __DIR__ . '/../lib/utility/rate-limiter.php';
+require __DIR__ . '/../lib/core/ApiHateoas.php';
 
 // Initialize API
 try {
@@ -260,7 +271,7 @@ try {
     $router->post('translations/(?P<code>[a-z]{2})/cache', 'TranslationsApiController@cache');
 
     // Health check endpoint
-    $router->get('health', function ($params) {
+    $router->get('health', function () {
         ApiResponse::success([
             'status' => 'healthy',
             'timestamp' => date('Y-m-d H:i:s'),
@@ -269,9 +280,14 @@ try {
     });
 
     // API OpenAPI spec endpoint (dynamic - uses runtime URL)
-    $router->get('openapi.json', function ($params) {
-        // Load utility and generate dynamic spec
-        require_once __DIR__ . '/../lib/utility/generate-openapi-spec.php';
+    $router->get('openapi.json', function () {
+        // Load utility and generate dynamic spec. The utility loader already
+        // declares generate_openapi_spec() during bootstrap, so a blind require
+        // would be a fatal redeclaration; guard on the function instead of
+        // relying on require_once.
+        if (!function_exists('generate_openapi_spec')) {
+            require __DIR__ . '/../lib/utility/generate-openapi-spec.php';
+        }
         generate_openapi_spec();
         exit;
     });
@@ -281,7 +297,7 @@ try {
     $router->get('/', 'ApiController@info');
 
     // CSRF token helper endpoint (no auth required)
-    $router->get('csrf-token', function ($params) {
+    $router->get('csrf-token', function () {
         $token = ApiAuth::generateCsrfToken();
         ApiResponse::success([
             'csrf_token' => $token,
