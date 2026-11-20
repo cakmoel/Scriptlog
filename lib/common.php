@@ -3,13 +3,13 @@
 define('DS', DIRECTORY_SEPARATOR);
 define('APP_TITLE', 'Scriptlog');
 define('APP_CODENAME', 'Maleo Senkawor');
-define('APP_VERSION', '1.12.0');
+define('APP_VERSION', '1.13.0');
 define('API_VERSION', 'v1');
 define('APP_ROOT', dirname(dirname(__FILE__)) . DS);
 define('APP_ADMIN', 'admin');
 define('APP_PUBLIC', 'public');
 define('APP_LIBRARY', 'lib');
-define('APP_CACHE', false);
+define('APP_CACHE', true);
 define('APP_CACHE_DIR', APP_ROOT . APP_PUBLIC . DS . 'cache' . DS);
 define('APP_CACHE_LIFETIME', 3600); // 1 hour in seconds
 define('APP_FILE_SIZE', 1_048_576);
@@ -35,6 +35,19 @@ if (!defined('APP_DEVELOPMENT')) {
     } else {
         // Fail closed: default to false in production-like contexts
         define('APP_DEVELOPMENT', false);
+    }
+}
+
+// Opt-in fail-closed switch for the PHP core RCE guard (CVE-2026-109618 /
+// CVE-2026-109619). Declared here because common.php runs before Dotenv, so
+// this is the only hook that sees both a caller-defined constant and the
+// environment/.env value. Default is false: strict mode is opt-in only.
+if (!defined('SCRIPTLOG_STRICT_PHP_SECURITY')) {
+    if (function_exists('scriptlog_php_security_is_strict')) {
+        define('SCRIPTLOG_STRICT_PHP_SECURITY', scriptlog_php_security_is_strict());
+    } else {
+        // Fail open: never enable strict mode by accident
+        define('SCRIPTLOG_STRICT_PHP_SECURITY', false);
     }
 }
 
