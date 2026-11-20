@@ -71,7 +71,7 @@ jobs:
 
     - name: Import seeded e2e database
       run: |
-        mysql -h 127.0.0.1 -P 3306 -u blogwareuser -p"$E2E_DB_PASS" blogware_e2e < e2e/blogware_e2e.sql
+        mysql --skip-ssl -h 127.0.0.1 -P 3306 -u blogwareuser blogware_e2e < e2e/blogware_e2e.sql
       env:
         E2E_DB_PASS: ${{ secrets.E2E_DB_PASS || 'userblogware' }}
         MYSQL_PWD: ${{ secrets.E2E_DB_PASS || 'userblogware' }}

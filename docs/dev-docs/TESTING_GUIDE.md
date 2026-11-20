@@ -1,6 +1,6 @@
 # Testing Guide - Scriptlog
 
-**Version:** 1.13.0 | **Last Updated:** November 2026
+**Version:** 1.13.1 | **Last Updated:** November 2026
 
 ---
 
@@ -703,4 +703,4 @@ Do not bypass with `git commit --no-verify`.
 
 ---
 
-*Last Updated: November 2026 | Version 1.13.0*
+*Last Updated: November 2026 | Version 1.13.1*

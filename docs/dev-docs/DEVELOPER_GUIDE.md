@@ -1,6 +1,6 @@
 # Developer Guide - Scriptlog
 
-**Version:** 1.13.0 | **Last Updated:** November 2026
+**Version:** 1.13.1 | **Last Updated:** November 2026
 
 ---
 
@@ -4323,7 +4323,7 @@ SCRIPTLOG_STRICT_PHP_SECURITY // bool, opt-in fail-closed PHP runtime guard (con
 
 // Settings
 APP_TITLE          // 'Scriptlog'
-APP_VERSION        // '1.13.0'
+APP_VERSION        // '1.13.1'
 APP_DEVELOPMENT    // true or false
 ```
 
@@ -6064,4 +6064,4 @@ This project is licensed under the MIT License.
 
 ---
 
-*Last Updated: November 2026 | Version 1.13.0*
+*Last Updated: November 2026 | Version 1.13.1*
