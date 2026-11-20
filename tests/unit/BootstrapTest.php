@@ -571,21 +571,21 @@ class BootstrapTest extends TestCase
         $this->assertGreaterThan(15, count($allowedVars));
     }
 
-    public function testBootstrapIncludesSearchPostTwiceInAllowedVars(): void
+    public function testBootstrapIncludesSearchPostOnceInAllowedVars(): void
     {
         $reflection = new ReflectionClass('Bootstrap');
         $property = $reflection->getProperty('allowedExportVars');
         $property->setAccessible(true);
-        
+
         $allowedVars = $property->getValue();
-        
+
         $searchPostCount = 0;
         foreach ($allowedVars as $var) {
             if ($var === 'searchPost') {
                 $searchPostCount++;
             }
         }
-        
-        $this->assertGreaterThan(1, $searchPostCount);
+
+        $this->assertSame(1, $searchPostCount);
     }
 }
