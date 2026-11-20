@@ -10,7 +10,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Handles frontend search requests with HTMX fragment support.
  *
  * @category Controller
- * @author   Scriptlog
+ * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0
  */
