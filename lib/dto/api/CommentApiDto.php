@@ -12,7 +12,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * the standardized API response format.
  *
  * @category DTO
- * @author   Blogware Team
+ * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0
  * @since    Since Release 1.0
