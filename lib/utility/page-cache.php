@@ -22,7 +22,20 @@ function page_cache_key()
     $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 
-    return md5($protocol . $host . $uri);
+    // Cached HTML is locale-specific: it carries <html lang/dir>, translated
+    // strings and locale-aware links. Include the active locale so a cached
+    // English page can never be served to an Arabic visitor (or vice versa).
+    $locale = '';
+    $sessionLocale = $_SESSION['scriptlog_locale'] ?? '';
+    $cookieLocale = $_COOKIE['scriptlog_locale'] ?? '';
+
+    if (is_string($sessionLocale) && preg_match('/^[a-z]{2}$/', $sessionLocale)) {
+        $locale = $sessionLocale;
+    } elseif (is_string($cookieLocale) && preg_match('/^[a-z]{2}$/', $cookieLocale)) {
+        $locale = $cookieLocale;
+    }
+
+    return md5($protocol . $host . $uri . '|locale:' . $locale);
 }
 
 /**
