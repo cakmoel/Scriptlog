@@ -12,7 +12,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * row is missing (new installs and existing blogs before first save).
  *
  * @category function
- * @author   Scriptlog
+ * @author   M.Noermoehammad
  * @license  MIT
  * @version  1.0
  * @return bool
