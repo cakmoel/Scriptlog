@@ -8,7 +8,7 @@ defined('SCRIPTLOG') || die("Direct access not permitted");
  * Helper functions for cookie consent management
  *
  * @category  Utility
- * @author    Scriptlog
+ * @author    M.Noermoehammad
  * @license   MIT
  * @version   1.0
  * @since     Since Release 1.0
