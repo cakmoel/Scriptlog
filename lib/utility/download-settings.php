@@ -44,7 +44,16 @@ class DownloadSettings
         'application/json',
     ];
 
-    public const DEFAULT_EXPIRY_HOURS = 8;
+    /**
+     * Default download grant lifetime in hours.
+     *
+     * Defaults to a short (one hour) grant lifetime so unconfigured installs
+     * cannot hand out long-lived download tokens. Operators may opt in to a
+     * longer lifetime via the download_expiry_hours setting.
+     *
+     * @var int
+     */
+    public const DEFAULT_EXPIRY_HOURS = 1;
 
     public const KEY_ALLOWED_MIME_TYPES = 'download_allowed_mime_types';
     public const KEY_EXPIRY_HOURS = 'download_expiry_hours';
