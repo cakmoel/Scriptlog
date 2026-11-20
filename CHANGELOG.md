@@ -8,12 +8,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Quick Links
 
-- [Latest Release](#1130---2026-11-20)
+- [Latest Release](#1131---2026-11-20)
 - [All Releases](#releases)
 
 ---
 
 ## Releases
+
+## [1.13.1] - 2026-11-20
+
+### Added
+- None
+
+### Changed
+- None
+
+### Fixed
+- **Playwright CI database import**: the seeded `blogware_e2e` database is now imported with SSL disabled, matching the ephemeral MariaDB service and restoring the E2E workflow.
+
+### Removed
+- None
+
+### Security
+- None
+
+### Deprecated
+- None
+
+### Notes
+Patch release for continuous-integration reliability only. No application code, database schema, configuration, or REST API behavior changed.
+
+### Codename
+**Maleo Senkawor** (retained) – Honoring *Macrocephalon maleo*, the critically endangered megapode endemic to Sulawesi, Indonesia.
+
+### Comparison
+- **Previous release**: v1.13.0
+- **Full comparison**: `v1.13.0...v1.13.1`
+
+---
 
 ## [1.13.0] - 2026-11-20
 
@@ -1296,6 +1328,7 @@ This patch addresses security vulnerabilities detected by Dependabot and removes
 
 | Version | Date | Status |
 |---------|------|--------|
+| 1.13.1 | 2026-11-20 | Stable |
 | 1.13.0 | 2026-11-20 | Stable |
 | 1.12.0 | 2026-11-09 | Stable |
 | 1.11.0 | 2026-11-04 | Stable |
